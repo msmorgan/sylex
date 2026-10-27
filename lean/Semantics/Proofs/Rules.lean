@@ -16,6 +16,17 @@ open Semantics Semantics.Templates Semantics.Definitions
 
 namespace Semantics.Proofs.Rules
 
+/-- Every designation row with inherent abilities, in declaration order. -/
+def designationDefinitions : List RegistryDefinition := [initiative_definition, monarch_definition]
+
+/-- The Saga and Siege rows exercised below, in their original declaration order. -/
+def subtypeDefinitions : List RegistryDefinition := [siege_definition, saga_definition]
+
+/-- Every card type's row, in the declared order (`cardTypes`). -/
+def cardTypeDefinitions : List RegistryDefinition :=
+  [ creature_definition, artifact_definition, land_definition, enchantment_definition,
+    instant_definition, sorcery_definition,
+    planeswalker_definition, battle_definition, kindred_definition, dungeon_definition ]
 
 /-! ## State-based actions -/
 
@@ -38,27 +49,8 @@ theorem badConferralScopeKind :
       = [.kindLte (.quality .color) (.join .object .player)] := by
   decide
 
-/-- [CR#702.170d] "A plotted card's owner may cast it from exile without paying its mana cost
-during their main phase while the stack is empty during any turn after the turn in which it became
-plotted. … A plotted card may be cast this way even if it doesn't have the plot ability while in
-exile." A rule for every plotted card, not part of plot's text [CR#702.170a]; "you" on a card in
-exile is its owner [CR#109.5]. -/
-def plottedCardCast : ConferralRule :=
-  { scope := .and [.isCard, hasDesignation plotted, in_ exileZone],
-    confer :=
-      .ability (static
-        (onlyUnless
-          (can you (cast this_ (from_ := exileZone) (payment := withoutPaying))
-            (timing := asSorcery))
-          (did any (gainDesignation this_ plotted) soFarThisTurn))) }
 theorem okPlottedCardCast : ConferralRule.check plottedCardCast = [] := by decide
 
-/-- [CR#702.143d] "That card's owner may look at that card as long as it remains in exile": the
-look right of every foretold card, whatever made it foretold. Its cast right, "for any foretell
-cost it has", needs a cost term naming a keyword's cost, which the grammar does not have. -/
-def foretoldCardLook : ConferralRule :=
-  { scope := .and [.isCard, hasDesignation foretold, in_ exileZone],
-    confer := .ability (static (visibility .lookAt you (objects this_))) }
 theorem okForetoldCardLook : ConferralRule.check foretoldCardLook = [] := by decide
 
 /-! ## The results of damage
@@ -69,25 +61,8 @@ replacement of a result replaces this row's action, not the damage: wither and i
 marking and the life loss [CR#120.3d,702.80a,702.90b,702.90c]. Lifelink, an ability, is the
 keyword's own body [CR#702.15b]. -/
 
-/-- [CR#120.3a] "Damage dealt to a player by a source without infect causes that player to lose
-that much life." In a row scoped to players, "you" is the player. Infect replaces the loss
-(`infect`) [CR#702.90b]. -/
-def playerDamageLifeLoss : ConferralRule :=
-  { scope := isPlayer,
-    confer := .property (asEvent (does any (dealDamage anyAmount you)) (loseLife thatMuch)) }
 theorem okPlayerDamageLifeLoss : ConferralRule.check playerDamageLifeLoss = [] := by decide
 
-/-- [CR#120.3g,702.164c] "Combat damage dealt to a player by a creature with toxic causes that
-creature's controller to give the player a number of poison counters equal to that creature's
-total toxic value, in addition to the damage's other results." One row for the creature,
-reading the sum of its toxic abilities' N values [CR#702.164b], not one per toxic ability: the
-keyword is bodiless, so combat damage from a creature with toxic 2 and toxic 1 gives three poison
-counters once. -/
-def toxicPoison : ConferralRule :=
-  { scope := .and [isCreature, .hasKeyword (.the (.named "toxic"))],
-    confer := .property
-      (asEvent (does this_ (dealDamage anyAmount (a isPlayer) (some .combat)))
-        (putCounters (totalToxicValue this_) poison (that player))) }
 theorem okToxicPoison : ConferralRule.check toxicPoison = [] := by decide
 
 /-- A creature with two toxic abilities has one result: each ability is the bare keyword, with
@@ -113,86 +88,26 @@ A keyword whose rule the CR states as a rule of the game, not as an ability of i
 no body (`lean/CONTRACTS.md`, "Keyword abilities with no body"); its rule is a row here, as
 toxic's is. -/
 
-/-- [CR#702.2b,704.5h] "If a creature has toughness greater than 0, and it's been dealt damage by
-a source with deathtouch since the last time state-based actions were checked, that creature is
-destroyed." The source is read as it dealt the damage, from any zone [CR#702.2d]; "is destroyed"
-is the destroy action, which regeneration can replace. -/
-def deathtouchDestruction : SbaRule :=
-  { scope := isCreature,
-    when :=
-      .and
-        [ .compareAmt (toughnessOf .this) .greater 0,
-          did (by_ (a (and [isSource, hasKeyword deathtouch]))) (dealDamage anyAmount .this)
-            (within (.between (some .stateBasedActionsChecked) (some .now))) ],
-    then_ := destroy .this }
 theorem okDeathtouchDestruction : SbaRule.check deathtouchDestruction = [] := by decide
 
-/-- [CR#703.4a,502.1,702.26a] "Immediately after the untap step begins, all phased-in permanents
-with phasing that the active player controls phase out, and all phased-out permanents that the
-active player controlled when they phased out phase in." One row, so each permanent does one or
-the other: one phased out this way is not phased in again by the same action. The active player
-is read as the controller whose turn it is [CR#102.1]. The phase-in half reads the phased-out
-permanent's present controller, which phasing does not change [CR#702.26d]; it differs from the
-one it phased out under only if a control effect ended while it was phased out [CR#702.26f], and
-reading that one needs a term for the active player (`lean-v3-active-player-term`). An Aura,
-Equipment or Fortification that phased out indirectly, with the permanent it is attached to,
-doesn't phase in by itself but with that permanent [CR#702.26g], so the phase-in half skips a
-phased-out permanent attached to a phased-out one. That reads "indirectly" by the attachment: an
-attachment that phased out directly and whose host later phased out too is skipped as well,
-which the rule would phase in (`lean-v3-phasing-direct-phase-out`). That every permanent changes
-at once is the engine's. -/
-def phasingTurnBased : ConferralRule :=
-  { scope := isPermanent,
-    confer :=
-      .turnBased .untapStep
-        (doIf (.duringPart .turn (some (controllerOf .this)))
-          (doIf (is .this isPhasedOut)
-            (doIf
-              (not (is .this (.attachment .attachment none (some (a (and [isPermanent,
-                isPhasedOut]))))))
-              (.setStatus .phasedIn .this) none)
-            (some (doIf (is .this (hasKeyword phasing)) (.setStatus .phasedOut .this) none)))
-          none) }
 theorem okPhasingTurnBased : ConferralRule.check phasingTurnBased = [] := by decide
 
 /-! ## Registry definitions -/
 
-/-- [CR#122.1] "A counter is a marker placed on an object or player." A charge counter is a
-marker and nothing else: the CR gives it no behavior of its own, so it confers nothing. -/
-def chargeCounterDefinition : RegistryDefinition := .counter chargeCounter []
-theorem okChargeCounter : RegistryDefinition.check chargeCounterDefinition = [] := by decide
+theorem okChargeCounter : RegistryDefinition.check chargeCounter_definition = [] := by decide
 
-/-- [CR#122.1b] "A keyword counter on a permanent … causes that object to gain that keyword."
-The counter is not an ability, so its conferral is the ability-free `property` flavor; but its
-bearer gains the keyword in layer 6 [CR#613.1f], and that gained ability can be removed by
-another effect [CR#113.12], applied in timestamp order [CR#613.7,613.7c]. -/
-def flyingCounterDefinition : RegistryDefinition :=
-  .counter flyingCounter [.property (Templates.abilityGrant .this (keyword (.named "flying")))]
-theorem okFlyingCounter : RegistryDefinition.check flyingCounterDefinition = [] := by decide
+theorem okFlyingCounter : RegistryDefinition.check flyingCounter_definition = [] := by decide
 
-/-- A keyword counter's conferral written with `grants` is the one `flyingCounterDefinition`
+/-- A keyword counter's conferral written with `grants` is the one `flyingCounter_definition`
 writes, the keyword gained by its bearer [CR#122.1b,613.1f]. -/
 theorem grantsIsTheKeywordConferral :
-    flyingCounterDefinition = .counter flyingCounter [grants (.named "flying")] := rfl
+    flyingCounter_definition = .counter flyingCounter [grants (.named "flying")] := rfl
 
-/-- [CR#122.1a] "A +X/+Y counter on a creature … adds X to that object's power and Y to that
-object's toughness." The definition states what ONE counter confers, "+1/+1" in layer 7c
-[CR#613.4c], and the model applies it once per counter held, so the conferral reads no count.
-
-The conferral is about its bearer wherever the bearer is: a +1/+1 counter also counts "on a
-creature card in a zone other than the battlefield" [CR#122.1a], and the checker asserts no zone
-for the bearer of a stat change, a definition's or a card's (`lean-checker-sweep-zone`). -/
-def p1p1CounterDefinition : RegistryDefinition :=
-  .counter (.named "p1p1Counter") [boost (.up 1) (.up 1)]
 theorem p1p1CounterDefinitionZone :
-    RegistryDefinition.check p1p1CounterDefinition = [] := by decide
+    RegistryDefinition.check p1p1Counter_definition = [] := by decide
 
-/-- [CR#122.1a]: the minus counter's twin of `p1p1CounterDefinition`, subtracting 1 from each
-stat. -/
-def m1m1CounterDefinition : RegistryDefinition :=
-  .counter (.named "m1m1Counter") [boost (.down 1) (.down 1)]
 theorem m1m1CounterDefinitionZone :
-    RegistryDefinition.check m1m1CounterDefinition = [] := by decide
+    RegistryDefinition.check m1m1Counter_definition = [] := by decide
 
 /-- [CR#122.1f] "If a player has ten or more poison counters, that player loses the game." A
 poison counter is a player's. -/
@@ -211,10 +126,7 @@ keys, so it refuses an unnamed row. -/
 theorem badNamelessCounter :
     RegistryDefinition.check (.counter (.named "") []) = [.definitionNamed] := by decide
 
-/-- Subtypes are type-line vocabulary [CR#205.3a,205.3b]. This catalog row supplies the word
-without an intrinsic conferral. -/
-def gargoyle : RegistryDefinition := .subtype Semantics.Definitions.gargoyle []
-theorem okGargoyle : RegistryDefinition.check gargoyle = [] := by decide
+theorem okGargoyle : RegistryDefinition.check gargoyle_definition = [] := by decide
 
 /-- Subtypes are written as words [CR#205.3b]. The registry requires a nonempty word as its
 lookup key. -/
@@ -223,7 +135,7 @@ theorem badNamelessSubtype :
 
 /-! ## The card types' rows
 
-Each card type's declared `RegistryDefinition.cardType` row (`Semantics.Definitions.CardTypeRules`) checks,
+Each card type's declared `RegistryDefinition.cardType` row (`plugins_v3/builtin/definitions/card_type/`) checks,
 and each rule a row confers is pinned on the row: it is one of the row's conferrals, and it checks.
 -/
 
@@ -237,29 +149,29 @@ def confersOf : RegistryDefinition → List Conferral
 sorcery, a creature is a Combatant, it can attack and block, the summoning-sickness rule applies
 to it, damage is marked on it, and the toughness and lethal-damage state-based actions apply to
 it. -/
-theorem okCreatureType : RegistryDefinition.check creatureType = [] := by decide
+theorem okCreatureType : RegistryDefinition.check creature_definition = [] := by decide
 
 /-- [CR#302.5] "Creatures can attack and block." -/
 theorem okCreatureCanAttack :
-    creatureCanAttack ∈ confersOf creatureType ∧ creatureCanAttack.check = [] :=
-  ⟨by simp [confersOf, creatureType], by decide⟩
+    creatureCanAttack ∈ confersOf creature_definition ∧ creatureCanAttack.check = [] :=
+  ⟨by simp [confersOf, creature_definition], by decide⟩
 theorem okCreatureCanBlock :
-    creatureCanBlock ∈ confersOf creatureType ∧ creatureCanBlock.check = [] :=
-  ⟨by simp [confersOf, creatureType], by decide⟩
+    creatureCanBlock ∈ confersOf creature_definition ∧ creatureCanBlock.check = [] :=
+  ⟨by simp [confersOf, creature_definition], by decide⟩
 
 /-- [CR#302.6] "A creature can't attack unless it has been under its controller's control
 continuously since their most recent turn began." -/
 theorem okSummoningSicknessAttack :
-    summoningSicknessAttack ∈ confersOf creatureType ∧ summoningSicknessAttack.check = [] :=
-  ⟨by simp [confersOf, creatureType], by decide⟩
+    summoningSicknessAttack ∈ confersOf creature_definition ∧ summoningSicknessAttack.check = [] :=
+  ⟨by simp [confersOf, creature_definition], by decide⟩
 
 /-- [CR#302.6] "A creature's activated ability with the tap symbol or the untap symbol in its
 activation cost can't be activated unless the creature has been under its controller's control
 continuously since their most recent turn began." -/
 theorem okSummoningSicknessActivation :
-    summoningSicknessActivation ∈ confersOf creatureType ∧
+    summoningSicknessActivation ∈ confersOf creature_definition ∧
       summoningSicknessActivation.check = [] :=
-  ⟨by simp [confersOf, creatureType], by decide⟩
+  ⟨by simp [confersOf, creature_definition], by decide⟩
 
 /-- [CR#302.6] The summoning-sickness reading's "their" reads the player its condition names, the
 creature's controller: with no player named before it, "their most recent turn" reads nothing. -/
@@ -271,101 +183,101 @@ theorem badHeldSinceTheirTurnWithNoPlayer :
 /-- [CR#120.3e] Damage dealt to a creature by a source with neither wither nor infect is marked
 on it. -/
 theorem okCreatureDamageMarking :
-    creatureDamageMarking ∈ confersOf creatureType ∧ creatureDamageMarking.check = [] :=
-  ⟨by simp [confersOf, creatureType], by decide⟩
+    creatureDamageMarking ∈ confersOf creature_definition ∧ creatureDamageMarking.check = [] :=
+  ⟨by simp [confersOf, creature_definition], by decide⟩
 
 /-- [CR#704.5f] "If a creature has toughness 0 or less, it's put into its owner's graveyard." -/
 theorem okToughnessZero :
-    toughnessZero ∈ confersOf creatureType ∧ toughnessZero.check = [] :=
-  ⟨by simp [confersOf, creatureType], by decide⟩
+    toughnessZero ∈ confersOf creature_definition ∧ toughnessZero.check = [] :=
+  ⟨by simp [confersOf, creature_definition], by decide⟩
 
 /-- [CR#704.5g] A creature with toughness greater than 0 and damage marked on it greater than or
 equal to its toughness is destroyed. -/
 theorem okLethalDamage :
-    lethalDamage ∈ confersOf creatureType ∧ lethalDamage.check = [] :=
-  ⟨by simp [confersOf, creatureType], by decide⟩
+    lethalDamage ∈ confersOf creature_definition ∧ lethalDamage.check = [] :=
+  ⟨by simp [confersOf, creature_definition], by decide⟩
 
 /-- [CR#306.1,306.5b,306.6,120.3c,704.5i] A planeswalker card may be cast as a sorcery; a
 planeswalker enters with loyalty, can be attacked, loses loyalty to damage, and the loyalty
 state-based action applies to it. -/
-theorem okPlaneswalkerType : RegistryDefinition.check planeswalkerType = [] := by decide
+theorem okPlaneswalkerType : RegistryDefinition.check planeswalker_definition = [] := by decide
 
 /-- [CR#306.5b] A planeswalker enters with loyalty counters equal to its printed loyalty, which
 is the loyalty the row reads, the card not yet being on the battlefield [CR#306.5a]. -/
 theorem okPlaneswalkerLoyalty :
-    planeswalkerLoyalty ∈ confersOf planeswalkerType ∧ planeswalkerLoyalty.check = [] :=
-  ⟨by simp [confersOf, planeswalkerType], by decide⟩
+    planeswalkerLoyalty ∈ confersOf planeswalker_definition ∧ planeswalkerLoyalty.check = [] :=
+  ⟨by simp [confersOf, planeswalker_definition], by decide⟩
 
 /-- [CR#306.6] "Planeswalkers can be attacked." -/
 theorem okPlaneswalkerCanBeAttacked :
-    planeswalkerCanBeAttacked ∈ confersOf planeswalkerType ∧
+    planeswalkerCanBeAttacked ∈ confersOf planeswalker_definition ∧
       planeswalkerCanBeAttacked.check = [] :=
-  ⟨by simp [confersOf, planeswalkerType], by decide⟩
+  ⟨by simp [confersOf, planeswalker_definition], by decide⟩
 
 /-- [CR#120.3c] Damage dealt to a planeswalker removes that many loyalty counters from it. -/
 theorem okPlaneswalkerLoyaltyDamage :
-    planeswalkerLoyaltyDamage ∈ confersOf planeswalkerType ∧
+    planeswalkerLoyaltyDamage ∈ confersOf planeswalker_definition ∧
       planeswalkerLoyaltyDamage.check = [] :=
-  ⟨by simp [confersOf, planeswalkerType], by decide⟩
+  ⟨by simp [confersOf, planeswalker_definition], by decide⟩
 
 /-- [CR#704.5i] "If a planeswalker has loyalty 0, it's put into its owner's graveyard." -/
 theorem okLoyaltyZero :
-    loyaltyZero ∈ confersOf planeswalkerType ∧ loyaltyZero.check = [] :=
-  ⟨by simp [confersOf, planeswalkerType], by decide⟩
+    loyaltyZero ∈ confersOf planeswalker_definition ∧ loyaltyZero.check = [] :=
+  ⟨by simp [confersOf, planeswalker_definition], by decide⟩
 
 /-- [CR#310.1,310.4b,310.5,120.3h,704.5w,310.9a] A battle card may be cast as a sorcery; a battle
 enters with defense, can be attacked, loses defense to damage, the non-Siege state-based action
 applies to it, and its controller chooses its protector as it enters. -/
-theorem okBattleType : RegistryDefinition.check battleType = [] := by decide
+theorem okBattleType : RegistryDefinition.check battle_definition = [] := by decide
 
 /-- [CR#310.4b] A battle enters with defense counters equal to its printed defense, which is the
 defense the row reads, the card not yet being on the battlefield [CR#310.4a]. -/
 theorem okBattleDefense :
-    battleDefense ∈ confersOf battleType ∧ battleDefense.check = [] :=
-  ⟨by simp [confersOf, battleType], by decide⟩
+    battleDefense ∈ confersOf battle_definition ∧ battleDefense.check = [] :=
+  ⟨by simp [confersOf, battle_definition], by decide⟩
 
 /-- [CR#310.5] "Battles can be attacked." -/
 theorem okBattleCanBeAttacked :
-    battleCanBeAttacked ∈ confersOf battleType ∧ battleCanBeAttacked.check = [] :=
-  ⟨by simp [confersOf, battleType], by decide⟩
+    battleCanBeAttacked ∈ confersOf battle_definition ∧ battleCanBeAttacked.check = [] :=
+  ⟨by simp [confersOf, battle_definition], by decide⟩
 
 /-- [CR#120.3h] Damage dealt to a battle removes that many defense counters from it. -/
 theorem okBattleDefenseDamage :
-    battleDefenseDamage ∈ confersOf battleType ∧ battleDefenseDamage.check = [] :=
-  ⟨by simp [confersOf, battleType], by decide⟩
+    battleDefenseDamage ∈ confersOf battle_definition ∧ battleDefenseDamage.check = [] :=
+  ⟨by simp [confersOf, battle_definition], by decide⟩
 
 /-- [CR#704.5w,310.8] "If a non-Siege battle has defense 0, it's put into its owner's
 graveyard." Its defense on the battlefield is its defense-counter count [CR#310.4c]. -/
 theorem okBattleDefenseZero :
-    battleDefenseZero ∈ confersOf battleType ∧ battleDefenseZero.check = [] :=
-  ⟨by simp [confersOf, battleType], by decide⟩
+    battleDefenseZero ∈ confersOf battle_definition ∧ battleDefenseZero.check = [] :=
+  ⟨by simp [confersOf, battle_definition], by decide⟩
 
 /-- [CR#310.9a,205.3q] As a battle with no battle type enters, its controller chooses its
 protector, and the only player it may choose is itself. -/
 theorem okBattleProtector :
-    battleProtector ∈ confersOf battleType ∧ battleProtector.check = [] :=
-  ⟨by simp [confersOf, battleType], by decide⟩
+    battleProtector ∈ confersOf battle_definition ∧ battleProtector.check = [] :=
+  ⟨by simp [confersOf, battle_definition], by decide⟩
 
 /-- [CR#301.1] An artifact card may be cast as a sorcery. -/
-theorem okArtifactType : RegistryDefinition.check artifactType = [] := by decide
+theorem okArtifactType : RegistryDefinition.check artifact_definition = [] := by decide
 
 /-- [CR#305.1] A land card may be played as a sorcery. -/
-theorem okLandType : RegistryDefinition.check landType = [] := by decide
+theorem okLandType : RegistryDefinition.check land_definition = [] := by decide
 
 /-- [CR#303.1] An enchantment card may be cast as a sorcery. -/
-theorem okEnchantmentType : RegistryDefinition.check enchantmentType = [] := by decide
+theorem okEnchantmentType : RegistryDefinition.check enchantment_definition = [] := by decide
 
 /-- [CR#304.1] An instant card may be cast whenever its owner has priority. -/
-theorem okInstantType : RegistryDefinition.check instantType = [] := by decide
+theorem okInstantType : RegistryDefinition.check instant_definition = [] := by decide
 
 /-- [CR#307.1] A sorcery card may be cast as a sorcery. -/
-theorem okSorceryType : RegistryDefinition.check sorceryType = [] := by decide
+theorem okSorceryType : RegistryDefinition.check sorcery_definition = [] := by decide
 
 /-- [CR#308.1] Kindred confers nothing of its own. -/
-theorem okKindredType : RegistryDefinition.check kindredType = [] := by decide
+theorem okKindredType : RegistryDefinition.check kindred_definition = [] := by decide
 
 /-- [CR#309.2c] "Dungeon cards are not permanents. They can't be cast." -/
-theorem okDungeonType : RegistryDefinition.check dungeonType = [] := by decide
+theorem okDungeonType : RegistryDefinition.check dungeon_definition = [] := by decide
 
 /-- The rows are the declared card types, one each, in the declared order. -/
 theorem cardTypeRowsAreDeclared :
@@ -380,59 +292,37 @@ theorem badNamelessCardType :
 
 /-! ## The rules-defined subtypes (ruling 2026-10-10, `semantics-v2-subtype-rules`) -/
 
-/-- "This Aura/Equipment/Fortification is attached": the attachment relation the engine's
-attach-permission model keeps [CR#704.5m,704.5n]. -/
-def isAttached (subject : NounPhrase) : Condition :=
-  .matches subject (.attachment .attachment none none)
+theorem okEquipmentDefinition : RegistryDefinition.check equipment_definition = [] := by decide
 
-/-- [CR#301.5,704.5n] An Equipment may be attached to a creature, and one attached to no legal
-host becomes unattached. -/
-def equipmentDefinition : RegistryDefinition :=
-  .subtype Semantics.Definitions.equipment
-    [ .property (mayBeAttachedTo thisEquipment (allOf isCreature)),
-      .stateBased (.not (isAttached thisEquipment)) (.attachment .unattached thisEquipment none) ]
-theorem okEquipmentDefinition : RegistryDefinition.check equipmentDefinition = [] := by decide
+theorem okFortificationDefinition : RegistryDefinition.check fortification_definition = [] := by decide
 
-/-- [CR#301.6,704.5n] The Land twin of Equipment. -/
-def fortificationDefinition : RegistryDefinition :=
-  .subtype Semantics.Definitions.fortification
-    [ .property (mayBeAttachedTo thisFortification (allOf isLand)),
-      .stateBased (.not (isAttached thisFortification))
-        (.attachment .unattached thisFortification none) ]
-theorem okFortificationDefinition : RegistryDefinition.check fortificationDefinition = [] := by decide
+theorem okAuraDefinition : RegistryDefinition.check aura_definition = [] := by decide
 
-/-- [CR#704.5m] An Aura that is not attached is put into its owner's graveyard. -/
-def auraDefinition : RegistryDefinition :=
-  .subtype Semantics.Definitions.aura
-    [ .stateBased (.not (isAttached thisAura))
-        (.move thisAura (.zone .battlefield none) (some graveyard) .arrival []) ]
-theorem okAuraDefinition : RegistryDefinition.check auraDefinition = [] := by decide
-
-/-- [CR#714.3a,714.3c,714.4] The declared Saga row (`Semantics.Definitions.SubtypeRules`): its
+/-- [CR#714.3a,714.3c,714.4] The declared Saga row (`plugins_v3/builtin/definitions/subtype/`): its
 lore counter on entering, the lore increment and the sacrifice rule. -/
-theorem okSagaDefinition : RegistryDefinition.check sagaDefinition = [] := by decide
+theorem okSagaDefinition : RegistryDefinition.check saga_definition = [] := by decide
 
-/-- [CR#310.12a,310.12b,704.5v] The declared Siege row (`Semantics.Definitions.SubtypeRules`): the
+/-- [CR#310.12a,310.12b,704.5v] The declared Siege row (`plugins_v3/builtin/definitions/subtype/`): the
 opponent protector, the last-counter trigger and the Siege state-based action. -/
-theorem okSiegeDefinition : RegistryDefinition.check siegeDefinition = [] := by decide
+theorem okSiegeDefinition : RegistryDefinition.check siege_definition = [] := by decide
 
 /-- [CR#310.12a] As a Siege enters, its controller chooses its protector among their
 opponents. -/
 theorem okSiegeProtector :
-    siegeProtector ∈ confersOf siegeDefinition ∧ siegeProtector.check = [] :=
-  ⟨by simp [confersOf, siegeDefinition], by decide⟩
+    siegeProtector ∈ confersOf siege_definition ∧ siegeProtector.check = [] :=
+  ⟨by simp [confersOf, siege_definition], by decide⟩
 
 /-- [CR#310.12b] When the last defense counter is removed from a Siege, it is exiled, and then
 its controller may cast it transformed without paying its mana cost. -/
 theorem okSiegeLastCounter :
-    siegeLastCounter ∈ confersOf siegeDefinition ∧ siegeLastCounter.check = [] :=
-  ⟨by simp [confersOf, siegeDefinition], by decide⟩
+    siegeLastCounter ∈ confersOf siege_definition ∧ siegeLastCounter.check = [] :=
+  ⟨by simp [confersOf, siege_definition], by decide⟩
 
 /-- [CR#704.5v] A Siege with defense 0 that is the source of no ability that has triggered but
 not yet left the stack is put into its owner's graveyard. -/
 theorem okSiegeDefenseZero :
-    siegeDefenseZero ∈ confersOf siegeDefinition ∧ siegeDefenseZero.check = [] :=
-  ⟨by simp [confersOf, siegeDefinition], by decide⟩
+    siegeDefenseZero ∈ confersOf siege_definition ∧ siegeDefenseZero.check = [] :=
+  ⟨by simp [confersOf, siege_definition], by decide⟩
 
 /-- The lore increment is a turn-based action [CR#714.3c], a game action and no effect
 [CR#703.1,609.1]: the `turnBased` conferral that encloses it says so, and the put itself carries
@@ -440,7 +330,7 @@ no cause. Doubling Season's "if an effect would put" is `causedBy .anEffect` [CR
 doubles a Saga's entry counter, put by a replacement effect [CR#714.3a], and not the increment.
 The checker has no matcher, so this pins the row's spelling; the matching is the engine's. -/
 theorem sagaLoreIncrementIsTurnBased :
-    ∃ parts, sagaDefinition = .subtype Semantics.Definitions.saga parts ∧
+    ∃ parts, saga_definition = .subtype Semantics.Definitions.saga parts ∧
       parts[1]? = some (.turnBased .firstMain (doIf sagaHasChapterAbilities sagaLoreIncrement)) :=
   ⟨_, rfl, rfl⟩
 
@@ -469,40 +359,40 @@ row: it is one of the row's conferrals, and it checks in the row's context. -/
 /-- [CR#725.1,725.2] "The monarch is a designation a player can have. There is no monarch in a
 game until an effect instructs a player to become the monarch"; its two inherent triggered
 abilities check. -/
-theorem okMonarchDefinition : RegistryDefinition.check monarchDefinition = [] := by decide
+theorem okMonarchDefinition : RegistryDefinition.check monarch_definition = [] := by decide
 
 /-- [CR#725.2] "At the beginning of the monarch's end step, that player draws a card." -/
 theorem okMonarchDraw :
-    monarchDraw ∈ confersOf monarchDefinition ∧
-      monarchDraw.checkIn monarchDefinition.conferralContext = [] :=
-  ⟨by simp [confersOf, monarchDefinition], by decide⟩
+    monarchDraw ∈ confersOf monarch_definition ∧
+      monarchDraw.checkIn monarch_definition.conferralContext = [] :=
+  ⟨by simp [confersOf, monarch_definition], by decide⟩
 
 /-- [CR#725.2] "Whenever a creature deals combat damage to the monarch, its controller becomes
 the monarch." -/
 theorem okMonarchSteal :
-    monarchSteal ∈ confersOf monarchDefinition ∧
-      monarchSteal.checkIn monarchDefinition.conferralContext = [] :=
-  ⟨by simp [confersOf, monarchDefinition], by decide⟩
+    monarchSteal ∈ confersOf monarch_definition ∧
+      monarchSteal.checkIn monarch_definition.conferralContext = [] :=
+  ⟨by simp [confersOf, monarch_definition], by decide⟩
 
 /-- [CR#726.1,726.2] The one of the initiative's inherent triggered
 abilities the grammar can write checks; the two that venture into Undercity [CR#701.49d] wait on
 a venture action (`lean-v3-venture-dungeon`). -/
-theorem okInitiativeDefinition : RegistryDefinition.check initiativeDefinition = [] := by decide
+theorem okInitiativeDefinition : RegistryDefinition.check initiative_definition = [] := by decide
 
 /-- [CR#726.2] "Whenever one or more creatures a player controls deal combat damage to the player
 who has the initiative, the controller of those creatures takes the initiative." -/
 theorem okInitiativeSteal :
-    initiativeSteal ∈ confersOf initiativeDefinition ∧
-      initiativeSteal.checkIn initiativeDefinition.conferralContext = [] :=
-  ⟨by simp [confersOf, initiativeDefinition], by decide⟩
+    initiativeSteal ∈ confersOf initiative_definition ∧
+      initiativeSteal.checkIn initiative_definition.conferralContext = [] :=
+  ⟨by simp [confersOf, initiative_definition], by decide⟩
 
 /-- [CR#725.2,726.2] The designations' abilities are controlled by the player who held the
 designation when they triggered; a card type's are its objects' own, controlled as their source
 is [CR#113.8]. -/
 theorem designationControllerReading :
-    monarchDefinition.controllingDesignation? = some monarch ∧
-      initiativeDefinition.controllingDesignation? = some initiative ∧
-      creatureType.controllingDesignation? = none := by decide
+    monarch_definition.controllingDesignation? = some monarch ∧
+      initiative_definition.controllingDesignation? = some initiative ∧
+      creature_definition.controllingDesignation? = none := by decide
 
 /-- [CR#725.2] The monarch's abilities have no source, so a trigger on its row that names "this"
 names nothing, and is refused. -/
@@ -534,11 +424,7 @@ theorem designationRowsAreDeclared :
     designationDefinitions.map RegistryDefinition.controllingDesignation?
       = [some initiative, some monarch] := by decide
 
-/-- [CR#709.5c] "'Left half unlocked' and 'right half unlocked' are designations that a
-permanent on the battlefield can have." -/
-def leftHalfUnlocked : RegistryDefinition :=
-  .designation (.named "leftHalfUnlocked" (.heldBy .object)) []
-theorem okLeftHalfUnlocked : RegistryDefinition.check leftHalfUnlocked = [] := by decide
+theorem okLeftHalfUnlocked : RegistryDefinition.check leftHalfUnlocked_definition = [] := by decide
 
 /-- Goaded is one named designation [CR#701.15b]. This registry uses nonempty designation
 names as lookup keys. -/
@@ -658,7 +544,7 @@ theorem badUnnamedPredefinedToken :
 
 /-- The predicate-scoped rules tables the builtin plugin carries. What a card type or a subtype
 confers, its results of damage and state-based actions among them, is on that type's declared
-`RegistryDefinition` row (`Semantics.Definitions.CardTypeRules`, `Semantics.Definitions.SubtypeRules`),
+`RegistryDefinition` row (`plugins_v3/builtin/definitions/card_type/`, `plugins_v3/builtin/definitions/subtype/`),
 not here. The deathtouch lethal-damage row [CR#704.5h] is not written yet. -/
 def builtinTables : RulesTables :=
   { conferral := [plottedCardCast, foretoldCardLook, playerDamageLifeLoss, toxicPoison] }

@@ -59,8 +59,8 @@ theorem plotSpecialActionEndsAtThePlottedState :
 
 /-- The plotted card's cast right is the rule row for every plotted card in exile [CR#702.170d]. -/
 theorem plottedCardRuleCarriesTheCastRight :
-    Proofs.Rules.plottedCardCast.scope = .and [.isCard, hasDesignation plotted, in_ exileZone] ∧
-    Proofs.Rules.plottedCardCast.confer =
+    Definitions.plottedCardCast.scope = .and [.isCard, hasDesignation plotted, in_ exileZone] ∧
+    Definitions.plottedCardCast.confer =
       .ability (static
         (onlyUnless
           (can you (cast this_ (from_ := exileZone) (payment := withoutPaying))

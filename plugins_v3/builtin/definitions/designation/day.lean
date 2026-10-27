@@ -1,0 +1,9 @@
+/-- Day and night, the designations the game itself holds, exactly one once either is held
+[CR#731.1]. -/
+designation day := {
+  lexical := { nouns := [{ lemma := "day", countability := [Mass] }, { lemma := "night", countability := [Mass] }] },
+  spelling := "day",
+  scope := .heldByGame,
+  sole := false,
+  confers := []
+}

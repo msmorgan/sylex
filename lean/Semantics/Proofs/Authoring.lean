@@ -611,7 +611,7 @@ template shared : Condition := { body := exists_ atom }
 example : (shared : Predicate) = atom := rfl
 example : (shared : Condition) = exists_ atom := rfl
 example : (creature : Predicate) = isCreature := rfl
-example : (creature : NounWord) = Definitions.creature := rfl
+example : (creature : NounWord) = Definitions.NounWord.creature := rfl
 example : (creature : CardType) = Semantics.CardType.creature := rfl
 example : (and [atom] : Predicate) = Templates.Predicate.and [atom] := rfl
 example : (and [exists_ atom] : Condition) = Templates.Condition.and [exists_ atom] := rfl
@@ -642,6 +642,16 @@ example (subject : NounPhrase) : subjects subject =
 action optOut (subject : NounPhrase) := { body := sacrifice (.inCaller subject) }
 example (subject : NounPhrase) : optOut subject =
     .ownScope (some (.action "optOut" .none)) (sacrifice (.inCaller subject)) := rfl
+
+action actorAcrossControllerHandoff := {
+  body := instruct (controllerOf theActor) (instruct .actor (sacrifice theActor))
+}
+
+theorem generatedActorKeepsDynamicHandoffReads :
+    actorAcrossControllerHandoff = .ownScope (some (.action "actorAcrossControllerHandoff"))
+      (instruct (controllerOf (.firstMention "actorAcrossControllerHandoff.actor" theActor))
+        (instruct .actor
+          (sacrifice (.laterMention "actorAcrossControllerHandoff.actor" theActor)))) := rfl
 
 action actorTwice := { body := instruct theActor (sacrifice theActor) }
 example : actorTwice = .ownScope (some (.action "actorTwice" .none))
@@ -714,6 +724,15 @@ example : testWord = abilityWord (.named "testWord") (activated [blue] (draw 1))
 
 ability_word alreadyWord := { body := landfall (activated [blue] (draw 1)) }
 example : alreadyWord = landfall (activated [blue] (draw 1)) := rfl
+
+action shieldWithoutDeed (subject : NounPhrase) := {
+  deed := none,
+  body := clearDamage subject
+}
+
+example : (match shieldWithoutDeed this_ with
+  | .ownScope none _ => true
+  | _ => false) = true := rfl
 
 counter testCounter := { lexical := { lemma := "test counter", plural := "test counters" }, confers := [] }
 subtype testSubtype := { name := "Test", kind := creature }
@@ -992,8 +1011,8 @@ example : repeatedActor = Ability.keyword (.named "repeatedActor") []
     [static (can theActor (draw 1)), static (cant theActor (draw 2))] := rfl
 end KeywordActorScope
 
-example (ability : Ability) : infinity ability =
-    Ability.keyword infinity.label [.ability (.inCaller ability)]
+example (ability : Ability) : (infinity ability : Ability) =
+    Ability.keyword Definitions.Ability.infinity.label [.ability (.inCaller ability)]
       [static (onlyWhile (abilityGrant thisPermanent (.inCaller ability))
         (is thisPermanent (hasDesignation harnessed)))] := rfl
 example (ability : Ability) : maxSpeed ability =
@@ -1002,3 +1021,16 @@ example (ability : Ability) : maxSpeed ability =
         (.compareAmt (speedOf .you) .eq 4))] := rfl
 
 end Semantics.Proofs.Authoring
+
+namespace Semantics.Proofs.Authoring.RegistryBundle
+
+open Semantics Semantics.Templates Semantics.Definitions
+
+load_bundle "test-fixtures/authoring-registry"
+
+theorem registryConferralMayReferToItsCatalogValue :
+    bundleBearer_definition = .subtype bundleBearer [bundleConferral] := rfl
+
+theorem appliedReturnTypeInBundle : bundlePredicates = [hasSubtype bundleBearer] := rfl
+
+end Semantics.Proofs.Authoring.RegistryBundle

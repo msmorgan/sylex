@@ -1,0 +1,7 @@
+subtype sponge := {
+  lexical := { lemma := "Sponge" },
+  spelling := "Sponge",
+  kind := .creature,
+  name := "Sponge",
+  confers := []
+}

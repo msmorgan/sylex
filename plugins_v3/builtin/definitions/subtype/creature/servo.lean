@@ -1,0 +1,7 @@
+subtype servo := {
+  lexical := { lemma := "Servo" },
+  spelling := "Servo",
+  kind := .creature,
+  name := "Servo",
+  confers := []
+}

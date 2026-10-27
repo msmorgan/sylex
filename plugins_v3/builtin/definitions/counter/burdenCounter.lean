@@ -1,0 +1,6 @@
+counter burdenCounter := {
+  lexical := { lemma := "burden counter" },
+  spelling := "burden counter",
+  holder := .object,
+  confers := []
+}

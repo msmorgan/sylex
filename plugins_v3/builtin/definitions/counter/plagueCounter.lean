@@ -1,0 +1,6 @@
+counter plagueCounter := {
+  lexical := { lemma := "plague counter" },
+  spelling := "plague counter",
+  holder := .object,
+  confers := []
+}

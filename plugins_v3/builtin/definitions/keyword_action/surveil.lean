@@ -1,0 +1,7 @@
+/-- "surveil N" (`Definition`, [CR#701.25a]): the performer's own library. -/
+action surveil (amount : Amount) : Action := {
+  lexical := { verbs := [{ lemma := "surveil", past := "surveilled", gerund := "surveilling", frames := [Amount, Intransitive, Monotransitive] }] },
+  spelling := "surveil <amount>",
+  body :=
+    lookAndSortSlice (.slice .top amount (libraryOf .actor)) graveyard
+}

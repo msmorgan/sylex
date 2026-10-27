@@ -1,0 +1,15 @@
+/-- Kindred: neither a permanent type nor an instant or sorcery type. A kindred card always has
+another card type, and is cast and resolves by it [CR#308.1], so the other type settles both
+whether it can be a permanent [CR#110.4] and its Card Class.
+
+ [CR#308.1] A kindred card is cast and resolves by its other card type, so kindred confers
+nothing of its own. -/
+card_type kindred := {
+  lexical := { lemma := "kindred" },
+  spelling := "kindred",
+  name := "Kindred",
+  permanent := false,
+  stats := [],
+  instantOrSorcery := false,
+  confers := []
+}

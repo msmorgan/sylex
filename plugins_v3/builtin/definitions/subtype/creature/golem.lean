@@ -1,0 +1,7 @@
+subtype golem := {
+  lexical := { lemma := "Golem" },
+  spelling := "Golem",
+  kind := .creature,
+  name := "Golem",
+  confers := []
+}

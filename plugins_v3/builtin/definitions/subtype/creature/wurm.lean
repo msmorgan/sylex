@@ -1,0 +1,7 @@
+subtype wurm := {
+  lexical := { lemma := "Wurm" },
+  spelling := "Wurm",
+  kind := .creature,
+  name := "Wurm",
+  confers := []
+}

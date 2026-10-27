@@ -1,0 +1,7 @@
+subtype bison := {
+  lexical := { lemma := "Bison", plural := "Bison" },
+  spelling := "Bison",
+  kind := .creature,
+  name := "Bison",
+  confers := []
+}

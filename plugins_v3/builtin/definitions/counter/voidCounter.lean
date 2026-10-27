@@ -1,0 +1,6 @@
+counter voidCounter := {
+  lexical := { lemma := "void counter" },
+  spelling := "void counter",
+  holder := .object,
+  confers := []
+}

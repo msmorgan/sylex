@@ -1,0 +1,14 @@
+/-- "double <subject>'s power and toughness": it gets +X/+Y, X its power and Y its toughness
+(`Definition`, [CR#701.10b,701.10c]). -/
+action doublePowerAndToughness (subject : NounPhrase)
+    (duration : Option Duration := none) : Action := {
+  -- TODO(spelling): double <subject>'s power and toughness [<duration>]; string substitution cannot
+  -- form possessives or omit an absent duration.
+  lexical := { verbs := [{ lemma := "double", frames := [Monotransitive] }] },
+  deed := "double",
+  body :=
+    get subject
+        (.up (powerOf subject))
+        (.up (toughnessOf subject))
+        duration
+}

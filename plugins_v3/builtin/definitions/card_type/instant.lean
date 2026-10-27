@@ -1,0 +1,13 @@
+/-- Instant: not a permanent type [CR#110.4]; an instant card is an instant or sorcery card
+[CR#110.4a,304.1].
+
+ [CR#304.1] "A player who has priority may cast an instant card from their hand." -/
+card_type instant := {
+  lexical := { lemma := "instant" },
+  spelling := "instant",
+  name := "Instant",
+  permanent := false,
+  instantOrSorcery := true,
+  stats := [],
+  confers := [castableFrom yourHand asInstant]
+}

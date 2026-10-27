@@ -1,0 +1,6 @@
+counter landmarkCounter := {
+  lexical := { lemma := "landmark counter" },
+  spelling := "landmark counter",
+  holder := .object,
+  confers := []
+}

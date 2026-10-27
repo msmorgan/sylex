@@ -35,12 +35,12 @@ theorem fightUsesTheTwoBoundParticipantsInOppositeDirections :
     let after := (stepAction 64 .postEvent .obj (DRS.ofList [])
       (instruct (.firstMention "fight.test.source" (target isCreature))
         (fight (.firstMention "fight.test.other" (target isCreature))))).1
-    (identityBinding "fight.source" after).map (·.id) = some 0 ∧
+    (identityBinding "fight.actor" after).map (·.id) = some 0 ∧
       (identityBinding "fight.other" after).map (·.id) = some 1 ∧
       (identityBinding "fight.test.source" after).map (·.id) = some 0 ∧
       (identityBinding "fight.test.other" after).map (·.id) = some 1 ∧
       fightParticipantPairs (fight (target isCreature)) =
-        [("fight.source", "fight.other"), ("fight.other", "fight.source")] := by decide
+        [("fight.actor", "fight.other"), ("fight.other", "fight.actor")] := by decide
 
 private def fightGuard : Action → Option Condition
   | .ownScope _ (.doIf guard _ none _) => some guard
@@ -52,7 +52,7 @@ neither fights or deals damage [CR#109.2,701.14b]. -/
 theorem fightGuardTestsBothCreaturesNow :
     fightGuard (fight (target isCreature)) = some (.and [
       .matches (.firstMention "fight.other" (.inCaller (target isCreature))) isCreature,
-      .matches (.firstMention "fight.source" .actor) isCreature]) := rfl
+      .matches (.firstMention "fight.actor" .actor) isCreature]) := rfl
 
 /-! ## Fight each other -/
 

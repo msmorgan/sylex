@@ -1,0 +1,18 @@
+/-- A counter declaration's name read as its kind (`CounterKind.named`), so a bare
+`p1p1Counter` is the +1/+1 counter's kind [CR#122.1]. A counter is placed on an object or a
+player [CR#122.1]: a kind is an object's unless its declaration names a player as its holder, as
+energy and experience counters do, and poison and rad counters [CR#122.1f,122.1i].
+
+ [CR#122.1a] "A +X/+Y counter on a creature … adds X to that object's power and Y to that
+object's toughness." The definition states what ONE counter confers, "+1/+1" in layer 7c
+[CR#613.4c], and the model applies it once per counter held, so the conferral reads no count.
+
+The conferral is about its bearer wherever the bearer is: a +1/+1 counter also counts "on a
+creature card in a zone other than the battlefield" [CR#122.1a], and the checker asserts no zone
+for the bearer of a stat change, a definition's or a card's (`lean-checker-sweep-zone`). -/
+counter p1p1Counter := {
+  lexical := { lemma := "+1/+1 counter" },
+  spelling := "+1/+1 counter",
+  holder := .object,
+  confers := [boost (.up 1) (.up 1)]
+}

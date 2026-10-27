@@ -1,0 +1,10 @@
+/-- "convert <subject>": turn it so that its other face is up, under the transform rules
+[CR#701.28a,701.27a..701.27f]. Converting is transforming written with another verb: a "transforms into" trigger
+sees either [CR#701.27e], and "can't transform" forbids either [CR#701.28f], so the word is this
+Template's and the tree is `transform`'s. -/
+template convert (subject : NounPhrase) : Action := {
+  lexical := { verbs := [{ lemma := "convert", frames := [Monotransitive] }] },
+  spelling := "convert <subject>",
+  body :=
+    transform subject
+}

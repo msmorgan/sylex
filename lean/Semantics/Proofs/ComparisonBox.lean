@@ -1,6 +1,6 @@
 import Semantics.Check.AbilityRules
 import Semantics.Proofs.Helpers
-import Semantics.Definitions.Phrasings
+import Semantics.Definitions
 
 open Semantics.Templates Semantics.Definitions
 

@@ -1,7 +1,6 @@
 import Semantics.Check.AbilityRules
-import Semantics.Definitions.Subtypes
+import Semantics.Definitions
 import Semantics.Templates
-import Semantics.Definitions.Phrasings
 import Semantics.Proofs.Helpers
 
 namespace Semantics.Proofs.RefusalReachability

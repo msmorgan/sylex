@@ -1,0 +1,6 @@
+counter dutyCounter := {
+  lexical := { lemma := "duty counter" },
+  spelling := "duty counter",
+  holder := .object,
+  confers := []
+}

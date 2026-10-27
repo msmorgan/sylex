@@ -1,0 +1,6 @@
+/-- "the player who has the initiative": only one player can have it at a time [CR#726.3]. -/
+template theInitiativeHolder : NounPhrase := {
+  spelling := "the player who has the initiative",
+  body :=
+    the (.and [isPlayer, .hasDesignation initiative none])
+}

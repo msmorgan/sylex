@@ -1,0 +1,7 @@
+subtype employee := {
+  lexical := { lemma := "Employee" },
+  spelling := "Employee",
+  kind := .creature,
+  name := "Employee",
+  confers := []
+}

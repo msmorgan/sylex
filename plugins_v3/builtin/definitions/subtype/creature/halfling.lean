@@ -1,0 +1,7 @@
+subtype halfling := {
+  lexical := { lemma := "Halfling" },
+  spelling := "Halfling",
+  kind := .creature,
+  name := "Halfling",
+  confers := []
+}

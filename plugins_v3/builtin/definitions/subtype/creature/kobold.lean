@@ -1,0 +1,7 @@
+subtype kobold := {
+  lexical := { lemma := "Kobold" },
+  spelling := "Kobold",
+  kind := .creature,
+  name := "Kobold",
+  confers := []
+}

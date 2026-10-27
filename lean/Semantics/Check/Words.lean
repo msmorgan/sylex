@@ -1,4 +1,4 @@
-import Semantics.Definitions.CardTypes
+import Semantics.Words
 
 /-!
 # Semantics.Check.Words

@@ -1,0 +1,7 @@
+subtype astartes := {
+  lexical := { lemma := "Astartes", plural := "Astartes" },
+  spelling := "Astartes",
+  kind := .creature,
+  name := "Astartes",
+  confers := []
+}

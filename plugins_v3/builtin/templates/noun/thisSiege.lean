@@ -1,0 +1,5 @@
+template thisSiege : NounPhrase := {
+  spelling := "this Siege",
+  body :=
+    .headed (.subtype siege) .this
+}

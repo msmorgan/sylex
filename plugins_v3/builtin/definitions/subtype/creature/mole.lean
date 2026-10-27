@@ -1,0 +1,7 @@
+subtype mole := {
+  lexical := { lemma := "Mole" },
+  spelling := "Mole",
+  kind := .creature,
+  name := "Mole",
+  confers := []
+}

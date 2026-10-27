@@ -1,0 +1,9 @@
+/-- [CR#709.5c] "'Left half unlocked' and 'right half unlocked' are designations that a
+permanent on the battlefield can have." -/
+designation leftHalfUnlocked := {
+  lexical := { adjectives := ["unlocked"] },
+  spelling := "left half unlocked",
+  scope := (.heldBy .object),
+  sole := false,
+  confers := []
+}

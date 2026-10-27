@@ -47,13 +47,13 @@ theorem fightBindsOtherAndKeepsTheSource (other : NounPhrase) :
       .ownScope (some (.action "fight" .performs))
         (doIf (and [
           is (.firstMention "fight.other" (.inCaller other)) isCreature,
-          is (.firstMention "fight.source" .actor) isCreature])
+          is (.firstMention "fight.actor" .actor) isCreature])
           (.simultaneously [
-            .dealDamage (.statOf (.stat .power) (.laterMention "fight.source" .actor))
+            .dealDamage (.statOf (.stat .power) (.laterMention "fight.actor" .actor))
               (.laterMention "fight.other" (.inCaller other)),
             instruct (.laterMention "fight.other" (.inCaller other))
               (.dealDamage (.statOf (.stat .power) (.laterMention "fight.other" (.inCaller other)))
-                (.laterMention "fight.source" .actor))])
+                (.laterMention "fight.actor" .actor))])
           none) := rfl
 
 theorem okAirbendOne :

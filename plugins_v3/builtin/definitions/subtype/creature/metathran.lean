@@ -1,0 +1,7 @@
+subtype metathran := {
+  lexical := { lemma := "Metathran", plural := "Metathran" },
+  spelling := "Metathran",
+  kind := .creature,
+  name := "Metathran",
+  confers := []
+}

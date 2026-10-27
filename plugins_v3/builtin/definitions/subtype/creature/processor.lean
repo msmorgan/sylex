@@ -1,0 +1,7 @@
+subtype processor := {
+  lexical := { lemma := "Processor" },
+  spelling := "Processor",
+  kind := .creature,
+  name := "Processor",
+  confers := []
+}

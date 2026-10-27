@@ -1,0 +1,7 @@
+subtype spike := {
+  lexical := { lemma := "Spike" },
+  spelling := "Spike",
+  kind := .creature,
+  name := "Spike",
+  confers := []
+}

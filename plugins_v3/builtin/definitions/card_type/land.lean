@@ -1,0 +1,13 @@
+/-- Land: a permanent type [CR#110.4].
+
+ [CR#305.1] "A player who has priority may play a land card from their hand during a main
+phase of their turn when the stack is empty." -/
+card_type land := {
+  lexical := { lemma := "land" },
+  spelling := "land",
+  name := "Land",
+  permanent := true,
+  stats := [],
+  instantOrSorcery := false,
+  confers := [playableFrom yourHand asSorcery]
+}

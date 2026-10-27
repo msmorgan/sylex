@@ -1,0 +1,7 @@
+subtype lamia := {
+  lexical := { lemma := "Lamia" },
+  spelling := "Lamia",
+  kind := .creature,
+  name := "Lamia",
+  confers := []
+}

@@ -1,0 +1,6 @@
+counter isolationCounter := {
+  lexical := { lemma := "isolation counter" },
+  spelling := "isolation counter",
+  holder := .object,
+  confers := []
+}

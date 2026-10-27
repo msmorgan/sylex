@@ -1,0 +1,7 @@
+subtype spirit := {
+  lexical := { lemma := "Spirit" },
+  spelling := "Spirit",
+  kind := .creature,
+  name := "Spirit",
+  confers := []
+}
