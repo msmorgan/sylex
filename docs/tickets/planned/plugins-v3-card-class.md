@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-expansion-baseline]
+needs: [plugins-v3-expansion-baseline-hardening]
 ---
 # Replace `CardType.permanent` and `CardType.instantOrSorcery` with `cardClass : Option CardClass`
 
