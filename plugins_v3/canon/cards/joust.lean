@@ -1,0 +1,13 @@
+/-- Joust: "Choose target creature you control and target creature you don't control. The
+creature you control gets +2/+1 until end of turn if it's a Knight. Then those creatures fight
+each other." The "if" is printed after its clause, so its "it" reads that clause's subject, "the
+creature you control", though the condition is checked before the creature gets +2/+1
+[CR#608.2c]. -/
+card joust : Spelled :=
+  { name := "Joust", cost := [generic 1, pip .red], types := [.sorcery],
+    text :=
+      [ spell (sequentially
+          [ chooseFightPair,
+            doOnlyIf (get (the (and [isCreature, youControl])) (up 2) (up 1) untilEndOfTurn)
+              (is it (hasSubtype knight)),
+            fightEachOther (those creature) ]) ] }

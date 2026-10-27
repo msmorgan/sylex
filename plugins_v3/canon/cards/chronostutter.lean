@@ -1,0 +1,3 @@
+card chronostutter : Spelled :=
+  { name := "Chronostutter", cost := [generic 5, pip .blue], types := [.instant],
+    text := [ spell (putInto (target isCreature) (fromTop 2 library)) ] }

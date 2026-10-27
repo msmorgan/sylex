@@ -1,0 +1,18 @@
+/-- Midnight Crusader Shuttle: "If you gain control of a creature this way" reads the grant in
+the second arm of the villainous choice [CR#608.2c,613.1b]. "Midnight Entity" is a flavor word
+[CR#207.2d]. -/
+card midnightCrusaderShuttle : Spelled :=
+  { name := "Midnight Crusader Shuttle", cost := [generic 4], types := [.artifact],
+    subtypes := [vehicle],
+    text :=
+      [ flavorWord "Midnight Entity"
+          (whenever (does thisVehicle attack)
+            (sequentially
+              [ faceAVillainousChoice
+                  (instruct defendingPlayer (sacrifice (a isCreature)))
+                  (gainControl (target (and [isCreature, controlledBy defendingPlayer]))
+                    untilEndOfTurn),
+                doIf (did you (gainControlOf (a isCreature)) thisWay)
+                  (sequentially [tap it, becomeAttacking it (some defendingPlayer)]) ])),
+        crew 2 ],
+    power := stat 3, toughness := stat 4 }

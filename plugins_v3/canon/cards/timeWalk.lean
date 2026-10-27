@@ -1,0 +1,3 @@
+card timeWalk : Spelled :=
+  { name := "Time Walk", cost := [generic 1, pip .blue], types := [.sorcery],
+    text := [spell (extraTurn 1)] }

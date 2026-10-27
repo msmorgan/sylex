@@ -174,11 +174,13 @@ kernel.
 
 ## Cards
 
-`Semantics/Cards/<Family>.lean` contains the printed-card bench. Each card is a
-`Spelled` value, so a card that stops checking stops defining. Phrase-level
-bench items have their own named acceptance or refusal theorems beside them.
-`SemanticsCards` builds the card families; `SemanticsProofs` builds the pin
-suites. The full build includes both.
+`plugins_v3/canon/cards/<name>.lean` contains one `card <name> : Spelled := { ... }`
+declaration per printed card. `Semantics/Cards.lean` loads that bundle with
+`load_bundle "../plugins_v3/canon"`, using the builtin vocabulary. A card that
+stops checking stops defining; each declaration generates an `ok_<name>` theorem.
+Phrase-level bench items and their named acceptance or refusal theorems live in
+`Semantics/Proofs/Cards<Family>.lean`. `SemanticsCards` builds the card bundle;
+`SemanticsProofs` builds the pin suites. The full build includes both.
 
 A refused card identifies a missing template or definition, a missing construct, or a checker
 regression. Keep its sentence and assertion while repairing that boundary.
@@ -187,7 +189,7 @@ formats are not reserved in the syntax.
 
 ## The authoring boundary
 
-A bench card is `spelled <| card`. The `spelled` elaborator (`Check/Card.lean`) reads the
+A `card` declaration expands through `spelled`. The `spelled` elaborator (`Check/Card.lean`) reads the
 elaborated term before reduction erases its Template and Definition calls, and records it as an
 `Authoring.Form` tree (`Semantics/Authoring.lean`): the named calls, data constructors,
 literals and parameters it was written with, and a `raw` leaf for any semantic constructor

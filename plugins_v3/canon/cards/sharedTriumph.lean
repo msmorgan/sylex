@@ -1,0 +1,6 @@
+card sharedTriumph : Spelled :=
+  { name := "Shared Triumph", cost := [generic 1, pip .white], types := [.enchantment],
+    text :=
+      [ static (entersChoosing thisEnchantment (.subtype .creature)),
+        static (getsPt (allOf (and [isCreature, ofChosen (.subtype .creature)]))
+          (up 1) (up 1)) ] }

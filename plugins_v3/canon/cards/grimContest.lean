@@ -1,0 +1,12 @@
+/-- Grim Contest: "Choose target creature you control and target creature an opponent controls.
+Each of those creatures deals damage equal to its toughness to the other." "The other" is the
+current member's counterpart in the group of two the targets make up
+(`DRS.distributivePair?`). -/
+card grimContest : Spelled :=
+  { name := "Grim Contest", cost := [generic 1, pip .black, pip .green], types := [.instant],
+    text :=
+      [ spell (sequentially
+          [ choose (both (target (and [isCreature, youControl]))
+                         (target (and [isCreature, anOpponentControls]))),
+            instruct (eachOf (those creature))
+              (dealDamage (toughnessOf it) theOther) ]) ] }

@@ -1,9 +1,10 @@
+import Semantics.Cards
 import Semantics.Definitions
 import Semantics.Check.Card
 import Semantics.Check.Rules
-import Semantics.Cards.Anaphora
-import Semantics.Cards.Keyword
-import Semantics.Cards.Turn
+import Semantics.Proofs.CardsAnaphora
+import Semantics.Proofs.CardsKeyword
+import Semantics.Proofs.CardsTurn
 
 /-!
 # Semantics.Proofs.LinkedReadback

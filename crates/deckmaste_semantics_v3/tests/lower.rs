@@ -496,3 +496,48 @@ fn mutually_exclusive_match_arms_do_not_repeat_a_template_parameter() {
         NounPhrase::You
     );
 }
+
+#[test]
+fn live_canon_cards_elaborate_with_builtin() {
+    let canon = Bundle::load(&Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins_v3/canon"))
+        .unwrap();
+    assert_eq!(canon.items.len(), 908);
+    let names: Vec<_> = canon.items.keys().map(|key| key.bare_name).collect();
+    let bundle = Bundle::from_items(
+        builtin()
+            .items
+            .into_values()
+            .chain(canon.items.into_values())
+            .collect(),
+    )
+    .unwrap();
+    let reader = Elaborator::new(&bundle);
+    let errors: Vec<_> = names
+        .iter()
+        .filter_map(|name| {
+            reader
+                .read::<Card>(name.as_str())
+                .err()
+                .map(|error| format!("{name}: {error}"))
+        })
+        .collect();
+    assert!(errors.is_empty(), "{}", errors.join("\n"));
+}
+
+#[test]
+fn anonymous_structures_and_right_associative_application_elaborate() {
+    let bundle = builtin();
+    let reader = Elaborator::new(&bundle);
+    assert_eq!(
+        reader.read::<KeywordFamily>("⟨protection, none⟩").unwrap(),
+        reader
+            .read::<KeywordFamily>("{ word := protection, sort := none }")
+            .unwrap()
+    );
+    assert_eq!(
+        reader
+            .read::<Option<Ability>>("some <| spell <| draw 1")
+            .unwrap(),
+        Some(reader.read::<Ability>("spell (draw 1)").unwrap())
+    );
+}

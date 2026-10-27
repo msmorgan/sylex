@@ -1,0 +1,8 @@
+/-- Mystic Veil -/
+card mysticVeil : Spelled :=
+  { name := "Mystic Veil", cost := [generic 1, pip .blue], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ asThoughFlashSacrificedAtCleanup,
+        enchant isCreature,
+        static (abilityGrant (enchanted creature) shroud) ] }

@@ -1,0 +1,8 @@
+card cripplingFear : Spelled :=
+  { name := "Crippling Fear", cost := [generic 2, pip .black, pip .black],
+    types := [.sorcery],
+    text :=
+      [ spell (sequentially
+          [ choose (a (quality (.subtype .creature))),
+            get (allOf (and [isCreature, not (ofChosen (.subtype .creature))]))
+              (down 3) (down 3) untilEndOfTurn ]) ] }

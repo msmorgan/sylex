@@ -1,0 +1,12 @@
+/-- Cho-Manno's Blessing -/
+card choMannosBlessing : Spelled :=
+  { name := "Cho-Manno's Blessing", cost := [pip .white, pip .white], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ flash,
+        enchant isCreature,
+        static (entersChoosing thisAura .color),
+        static (retention
+          (abilityGrant (enchanted creature) (protection
+              (ofChosen .color)))
+          thisAura) ] }

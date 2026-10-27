@@ -1,0 +1,9 @@
+/-- Scapeshift -/
+card scapeshift : Spelled :=
+  { name := "Scapeshift", cost := [generic 2, pip .green, pip .green], types := [.sorcery],
+    text :=
+      [ spell (sequentially
+          [ sacrifice (counted anyNumber isLand),
+            search yourLibrary (counted (upToOf groupSize) isLand),
+            putOntoBattlefieldTapped them,
+            shuffle ]) ] }

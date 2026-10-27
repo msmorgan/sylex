@@ -1,0 +1,11 @@
+/-- Council's Judgment -/
+card councilsJudgment : Spelled :=
+  { name := "Council's Judgment", cost := [generic 1, pip .white, pip .white],
+    types := [.sorcery],
+    text :=
+      [ willOfTheCouncil
+          (spell (sequentially
+            [ instruct eachPlayer (voteStartingWith you .openly
+                (byCandidate (a (and [ isPermanent, non isLand,
+                                         youDontControl ])))),
+              exile (allOf (and [isPermanent, withMostVotes])) ])) ] }

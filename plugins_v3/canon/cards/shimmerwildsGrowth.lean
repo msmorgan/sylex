@@ -1,0 +1,11 @@
+/-- Shimmerwilds Growth -/
+card shimmerwildsGrowth : Spelled :=
+  { name := "Shimmerwilds Growth", cost := [generic 1, pip .green], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isLand,
+        static (entersChoosing thisAura .color),
+        static (qualityChange (enchanted land) .sets
+          (chosenQuality (ofChosen .color))),
+        whenever (does any (tapForMana (enchanted land)))
+          (instruct (controllerOf (that land)) (addMana 1 ofTheChosenColor)) ] }

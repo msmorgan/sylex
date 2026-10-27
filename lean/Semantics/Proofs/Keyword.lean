@@ -1,8 +1,10 @@
+import Semantics.Proofs.CardsKeyword
+import Semantics.Cards
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Cards.Cost
-import Semantics.Cards.Counters
-import Semantics.Cards.Turn
+import Semantics.Proofs.CardsCost
+import Semantics.Proofs.CardsCounters
+import Semantics.Proofs.CardsTurn
 import Semantics.Proofs.Helpers
 
 /-!

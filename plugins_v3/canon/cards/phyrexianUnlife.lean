@@ -1,0 +1,15 @@
+/-- "As long as you have 0 or less life, all damage is dealt to you as though its source had
+infect", the same indicative form as Everlasting Torment's [CR#609.4]. Treated as having infect,
+the source's damage to you takes infect's player row (`Definitions.infect`): it doesn't cause
+you to lose life; rather, that source's controller gives you that many poison counters
+[CR#702.90b,120.3b]. A source that has infect already gets that result once, multiple instances
+of infect being redundant [CR#702.90f]. -/
+card phyrexianUnlife : Spelled :=
+  { name := "Phyrexian Unlife", cost := [generic 2, pip .white], types := [.enchantment],
+    text :=
+      [ static (cant you (loseGame (some .nonpositiveLife))),
+        static
+          (onlyWhile
+            (asThough (by_ (a isSource)) (dealDamage anyAmount you)
+              (holds (is thatSource (hasKeyword infect))))
+            (compareAmt (lifeTotalOf you) .atMost 0)) ] }

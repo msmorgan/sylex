@@ -1,13 +1,15 @@
+import Semantics.Proofs.CardsTrigger
+import Semantics.Cards
 import Semantics.Check.NumberSlots
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Cards.Keyword
-import Semantics.Cards.Static
-import Semantics.Cards.Deontic
-import Semantics.Cards.Cost
-import Semantics.Cards.Faces
-import Semantics.Cards.Description
-import Semantics.Cards.Turn
+import Semantics.Proofs.CardsKeyword
+import Semantics.Proofs.CardsStatic
+import Semantics.Proofs.CardsDeontic
+import Semantics.Proofs.CardsCost
+import Semantics.Proofs.CardsFaces
+import Semantics.Proofs.CardsDescription
+import Semantics.Proofs.CardsTurn
 import Semantics.Proofs.Helpers
 
 open Semantics Semantics.Templates Semantics.Definitions

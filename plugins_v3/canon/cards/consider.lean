@@ -1,0 +1,3 @@
+card consider : Spelled :=
+  { name := "Consider", cost := [pip .blue], types := [.instant],
+    text := [spell (sequentially [surveil 1, draw 1])] }

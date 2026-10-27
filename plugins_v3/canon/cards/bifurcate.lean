@@ -1,0 +1,8 @@
+card bifurcate : Spelled :=
+  { name := "Bifurcate", cost := [generic 3, pip .green], types := [.sorcery],
+    text :=
+      [ spell (sequentially
+          [ search yourLibrary
+              (a (and [isPermanentCard, (shares .cardName .share (target (and [isCreature, isNontoken])))])),
+            putOntoBattlefield (that card),
+            shuffle ]) ] }

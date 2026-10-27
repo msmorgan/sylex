@@ -1,0 +1,7 @@
+card arcaneFlight : Spelled :=
+  { name := "Arcane Flight", cost := [pip .blue], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isCreature,
+        static (conjunction [ getsPt (enchanted creature) (up 1) (up 1),
+            abilityGrant it flying ]) ] }

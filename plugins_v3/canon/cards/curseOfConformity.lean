@@ -1,0 +1,9 @@
+/-- Curse of Conformity -/
+card curseOfConformity : Spelled :=
+  { name := "Curse of Conformity", cost := [generic 4, pip .white], types := [.enchantment],
+    subtypes := [aura, curse],
+    text :=
+      [ enchant isPlayer,
+        static (conjunction [ getsBase (allOf (and [ isCreature, non (hasSupertype .legendary),
+                             controlledBy (enchanted player) ])) 3 3,
+            qualityChange them .loses (everyTypeOf .creature) ]) ] }

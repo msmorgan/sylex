@@ -1,0 +1,5 @@
+card suppressionField : Spelled :=
+  { name := "Suppression Field", cost := [generic 1, pip .white], types := [.enchantment],
+    text :=
+      [ static (costShift (allOf (and [abilityHead .anyActivated, not isManaAbility]))
+          (more 2)) ] }

@@ -1,0 +1,8 @@
+card adNauseam : Spelled :=
+  { name := "Ad Nauseam", cost := [generic 3, pip .black, pip .black], types := [.instant],
+    text :=
+      [ spell (sequentially
+          [ reveal (topSlice 1),
+            putInto (that card) hand,
+            loseLife (statOf (.stat .manaValue) it),
+            may (repeat_ anyNumberOfTimes) ]) ] }

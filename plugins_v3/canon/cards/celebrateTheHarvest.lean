@@ -1,0 +1,9 @@
+/-- Celebrate the Harvest -/
+card celebrateTheHarvest : Spelled :=
+  { name := "Celebrate the Harvest", cost := [generic 3, pip .green], types := [.sorcery],
+    text :=
+      [ spell (sequentially
+          [ search yourLibrary (counted (upToOf (letter .x)) (and [isLand, hasSupertype .basic])),
+            define .x (distinctCount (.value .power) (allOf (and [isCreature, youControl]))),
+            putOntoBattlefieldTapped (those card),
+            shuffle ]) ] }

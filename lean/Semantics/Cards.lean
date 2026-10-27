@@ -1,15 +1,12 @@
-import Semantics.Cards.Anaphora
-import Semantics.Cards.Choice
-import Semantics.Cards.Copy
-import Semantics.Cards.Cost
-import Semantics.Cards.Counters
-import Semantics.Cards.Damage
-import Semantics.Cards.Deontic
-import Semantics.Cards.Description
-import Semantics.Cards.Faces
-import Semantics.Cards.Keyword
-import Semantics.Cards.Mana
-import Semantics.Cards.Piles
-import Semantics.Cards.Static
-import Semantics.Cards.Trigger
-import Semantics.Cards.Turn
+import Semantics
+import Semantics.Check
+import Semantics.Check.Card
+import Semantics.Definitions
+
+open Semantics Semantics.Templates Semantics.Definitions
+
+namespace Semantics.Cards
+
+load_bundle "../plugins_v3/canon"
+
+end Semantics.Cards

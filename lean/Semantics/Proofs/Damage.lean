@@ -1,13 +1,16 @@
+import Semantics.Proofs.CardsAnaphora
+import Semantics.Proofs.CardsDescription
+import Semantics.Cards
 import Semantics.Check.NumberSlots
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Cards.Damage
-import Semantics.Cards.Faces
-import Semantics.Cards.Choice
-import Semantics.Cards.Cost
-import Semantics.Cards.Keyword
-import Semantics.Cards.Piles
-import Semantics.Cards.Turn
+import Semantics.Proofs.CardsDamage
+import Semantics.Proofs.CardsFaces
+import Semantics.Proofs.CardsChoice
+import Semantics.Proofs.CardsCost
+import Semantics.Proofs.CardsKeyword
+import Semantics.Proofs.CardsPiles
+import Semantics.Proofs.CardsTurn
 
 /-!
 # Semantics.Proofs.Damage

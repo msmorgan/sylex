@@ -1,0 +1,16 @@
+/-- "All damage is dealt as though its source had wither": an indicative "as though" statement
+about every dealing of damage, not a permission [CR#609.4,101.2]. The passive's agent is the
+damage's source, "a source", and "its source" reads it back as "that source". Treated as having
+wither, the source's damage to a creature takes wither's own row (`Definitions.wither`): it
+isn't marked; rather, that source's controller puts that many −1/−1 counters on it
+[CR#702.80a,120.3d]. A source that has wither already gets that result once, multiple instances
+of wither being redundant [CR#702.80d]. -/
+card everlastingTorment : Spelled :=
+  { name := "Everlasting Torment", cost := [generic 2, hybridPip .black .red],
+    types := [.enchantment],
+    text :=
+      [ static (cant (bare isPlayer) (gainLife anyAmount)),
+        static (cant any (preventDamage allDamage (damage := would any (dealDamage anyAmount)))),
+        static
+          (asThough (by_ (a isSource)) (dealDamage anyAmount)
+            (holds (is thatSource (hasKeyword wither)))) ] }

@@ -1,0 +1,9 @@
+/-- Fortune's Favor -/
+card fortunesFavor : Spelled :=
+  { name := "Fortune's Favor", cost := [generic 3, pip .blue], types := [.instant],
+    text :=
+      [ spell (sequentially
+          [ instruct (target isOpponent) (lookAt (topSlice 4)),
+            instruct they (separateIntoPiles them 2 [.faceDown, .faceUp]),
+            putInto onePile hand,
+            putInto theOther graveyard ]) ] }

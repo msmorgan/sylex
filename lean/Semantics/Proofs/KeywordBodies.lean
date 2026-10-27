@@ -1,6 +1,7 @@
+import Semantics.Cards
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Cards.Keyword
+import Semantics.Proofs.CardsKeyword
 
 /-!
 # Semantics.Proofs.KeywordBodies

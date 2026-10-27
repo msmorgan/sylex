@@ -1,0 +1,3 @@
+card fatigue : Spelled :=
+  { name := "Fatigue", cost := [generic 1, pip .blue], types := [.sorcery],
+    text := [spell (instruct (target isPlayer) (skipPart .drawStep 1))] }

@@ -1,0 +1,16 @@
+/-- Liliana of the Veil -/
+card lilianaOfTheVeil : Spelled :=
+  { name := "Liliana of the Veil", cost := [generic 1, pip .black, pip .black],
+    supertypes := [.legendary], types := [.planeswalker],
+    subtypes := [liliana],
+    text :=
+      [ activated (loyaltySymbol (up 1))
+          (instruct eachPlayer (discard (a (cardIn hand)))),
+        activated (loyaltySymbol (down 2)) (instruct (target isPlayer) (sacrifice (a isCreature))),
+        activated (loyaltySymbol (down 6))
+          (sequentially
+            [ separateIntoPiles
+                (allOf (and [isPermanent, controlledBy (target isPlayer)])) 2,
+              instruct they (sacrifice (allOf (and [isPermanent, inPile (pileOfChoice they)]))) ])
+                  ],
+    loyalty := stat 3 }

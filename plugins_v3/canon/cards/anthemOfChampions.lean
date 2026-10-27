@@ -1,0 +1,3 @@
+card anthemOfChampions : Spelled :=
+  { name := "Anthem of Champions", cost := [pip .green, pip .white], types := [.enchantment],
+    text := [static (getsPt (allOf (and [isCreature, youControl])) (up 1) (up 1))] }

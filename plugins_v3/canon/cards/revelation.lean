@@ -1,0 +1,4 @@
+/-- Revelation -/
+card revelation : Spelled :=
+  { name := "Revelation", cost := [pip .green], supertypes := [.world], types := [.enchantment],
+    text := [static (visibility .reveal (bare isPlayer) wholeHand)] }

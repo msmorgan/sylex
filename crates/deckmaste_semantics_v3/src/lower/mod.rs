@@ -511,21 +511,7 @@ impl<'a> Elaborator<'a> {
             return self.invoke(decl, rest, ty, scope, stack);
         }
         if let Some(inner) = ty.strip_prefix("Option ") {
-            let option_tokens = if tokens.first().is_some_and(|t| is_atom(t, ".")) {
-                &tokens[1..]
-            } else {
-                tokens
-            };
-            if matches!(option_tokens, [Token::Ident(n)] if bare(n.as_str()) == "none") {
-                return Ok(Value::Null);
-            }
-            let tokens = if matches!(option_tokens.first(), Some(Token::Ident(n)) if bare(n.as_str()) == "some")
-            {
-                &option_tokens[1..]
-            } else {
-                tokens
-            };
-            return self.eval(tokens, inner, scope, stack);
+            return self.option_value(tokens, inner, scope, stack);
         }
         if let [Token::Group('[', elements)] = tokens {
             if elements.first().is_some_and(|t| is_atom(t, ","))
@@ -570,6 +556,9 @@ impl<'a> Elaborator<'a> {
         }
         if let [Token::Group('{', fields)] = tokens {
             return self.record(fields, ty, scope, stack);
+        }
+        if let [Token::Group('⟨', fields)] = tokens {
+            return self.anonymous_constructor(fields, ty, scope, stack);
         }
         if let [Token::String(s)] = tokens {
             if ty == "String" {
@@ -866,6 +855,57 @@ impl<'a> Elaborator<'a> {
         }
         Ok(values)
     }
+    fn option_value(
+        &self,
+        tokens: &[Token],
+        inner: &str,
+        scope: &mut Scope,
+        stack: &mut Vec<BundleKey>,
+    ) -> Result<Value> {
+        let option_tokens = if tokens.first().is_some_and(|t| is_atom(t, ".")) {
+            &tokens[1..]
+        } else {
+            tokens
+        };
+        if matches!(option_tokens, [Token::Ident(n)] if bare(n.as_str()) == "none") {
+            return Ok(Value::Null);
+        }
+        let value = if matches!(option_tokens.first(), Some(Token::Ident(n)) if bare(n.as_str()) == "some")
+        {
+            let value = &option_tokens[1..];
+            if value.first().is_some_and(|token| is_atom(token, "<|")) {
+                &value[1..]
+            } else {
+                value
+            }
+        } else {
+            tokens
+        };
+        self.eval(value, inner, scope, stack)
+    }
+
+    fn anonymous_constructor(
+        &self,
+        fields: &[Token],
+        ty: &str,
+        scope: &mut Scope,
+        stack: &mut Vec<BundleKey>,
+    ) -> Result<Value> {
+        let constructors =
+            shape(ty).ok_or_else(|| LowerError::new(format!("{ty} has no constructor")))?;
+        if constructors.len() != 1 {
+            return Err(LowerError::new(format!(
+                "{ty} needs an explicit constructor"
+            )));
+        }
+        let ctor = &constructors[0];
+        let arguments: Vec<_> = split(fields, ",")
+            .into_iter()
+            .map(|field| Token::Group('(', field.to_vec()))
+            .collect();
+        Ok(ctor.value(self.arguments(&ctor.fields, &arguments, scope, stack)?))
+    }
+
     fn record(
         &self,
         tokens: &[Token],

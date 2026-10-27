@@ -1,0 +1,5 @@
+card nevermore : Spelled :=
+  { name := "Nevermore", cost := [generic 1, pip .white, pip .white], types := [.enchantment],
+    text :=
+      [ static (entersChoosingFrom thisEnchantment .cardName (nameOfCard (non isLand))),
+        static (cant any (cast (bare (and [isSpell, named chosenName])))) ] }

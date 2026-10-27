@@ -189,6 +189,11 @@ impl Elaborator<'_> {
         if let [Token::Group('(', inner)] = tokens {
             return self.infer(inner, scope, stack);
         }
+        if let Some(i) = tokens.iter().position(|token| is_atom(token, ":")) {
+            let ty = normal(&reader::render(&tokens[i + 1..]));
+            let value = self.eval(&tokens[..i], &ty, scope, stack)?;
+            return Ok((ty, value));
+        }
         if let [Token::Ident(n)] = tokens
             && let Some(bound) = scope.bindings.get(n)
         {

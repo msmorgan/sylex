@@ -1,6 +1,7 @@
+import Semantics.Cards
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Cards.Mana
+import Semantics.Proofs.CardsMana
 import Semantics.Proofs.Helpers
 
 /-!

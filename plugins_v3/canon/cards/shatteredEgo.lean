@@ -1,0 +1,8 @@
+card shatteredEgo : Spelled :=
+  { name := "Shattered Ego", cost := [pip .blue], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isCreature,
+        static (getsPt (enchanted creature) (down 3) (down 0)),
+        activated [generic 3, pip .blue, pip .blue]
+          (putInto (enchanted creature) (fromTop 3 library)) ] }

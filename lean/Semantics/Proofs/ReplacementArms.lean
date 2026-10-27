@@ -1,7 +1,8 @@
+import Semantics.Cards
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Cards.Keyword
-import Semantics.Cards.Damage
+import Semantics.Proofs.CardsKeyword
+import Semantics.Proofs.CardsDamage
 
 /-!
 # Semantics.Proofs.ReplacementArms

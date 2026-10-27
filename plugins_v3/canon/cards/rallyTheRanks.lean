@@ -1,0 +1,7 @@
+card rallyTheRanks : Spelled :=
+  { name := "Rally the Ranks", cost := [generic 1, pip .white], types := [.enchantment],
+    text :=
+      [ static (entersChoosing thisEnchantment (.subtype .creature)),
+        static (getsPt
+          (allOf (and [isCreature, youControl, ofChosen (.subtype .creature)]))
+          (up 1) (up 1)) ] }

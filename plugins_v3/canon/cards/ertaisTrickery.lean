@@ -1,0 +1,6 @@
+/-- Ertai's Trickery -/
+card ertaisTrickery : Spelled :=
+  { name := "Ertai's Trickery", cost := [pip .blue], types := [.instant],
+    text :=
+      [ spell (doOnlyIf (counter (target isSpell))
+          (keywordCostPaid kicker it)) ] }

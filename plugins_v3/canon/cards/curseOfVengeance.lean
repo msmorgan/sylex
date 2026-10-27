@@ -1,0 +1,11 @@
+card curseOfVengeance : Spelled :=
+  { name := "Curse of Vengeance", cost := [pip .black], types := [.enchantment],
+    subtypes := [aura, curse],
+    text :=
+      [ enchant isPlayer,
+        whenever (does (enchanted player) (cast (a isSpell)))
+          (putCounters 1 spiteCounter thisAura),
+        when (does (enchanted player) loseGame)
+          (sequentially
+            [ gainLife (letter .x), draw (letter .x),
+              define .x (countersOn spiteCounter thisAura) ]) ] }

@@ -1,0 +1,7 @@
+card aetherTunnel : Spelled :=
+  { name := "Aether Tunnel", cost := [generic 1, pip .blue], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isCreature,
+        static (conjunction [ getsPt (enchanted creature) (up 1) (up 0),
+            cant any (block it) ]) ] }

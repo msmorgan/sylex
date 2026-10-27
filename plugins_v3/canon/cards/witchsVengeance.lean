@@ -1,0 +1,7 @@
+/-- Witch's Vengeance -/
+card witchsVengeance : Spelled :=
+  { name := "Witch's Vengeance", cost := [generic 1, pip .black, pip .black],
+    types := [.sorcery],
+    text :=
+      [ spell (get (allOf (and [isCreature, ofYourChoice (.subtype .creature)]))
+          (down 3) (down 3) untilEndOfTurn) ] }

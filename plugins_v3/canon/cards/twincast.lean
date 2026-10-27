@@ -1,0 +1,7 @@
+/-- Twincast -/
+card twincast : Spelled :=
+  { name := "Twincast", cost := [pip .blue, pip .blue], types := [.instant],
+    text :=
+      [ spell (sequentially
+          [ copyOnStack (target (and [isInstantOrSorcery, isSpell])),
+            may (chooseNewTargets (that .copy)) ]) ] }

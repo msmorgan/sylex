@@ -1,0 +1,9 @@
+card primalVigor : Spelled :=
+  { name := "Primal Vigor", cost := [generic 4, pip .green], types := [.enchantment],
+    text :=
+      [ static (replace (would any (createObject anyAmount (token (copyOf (counted (orMore 1) isToken)) []))) (instead (create (times 2 groupSize) asThose []))),
+        static
+            (replace
+               (would any
+                  (putCounters anyAmount p1p1Counter (a isCreature)))
+            (instead (putCounters (times 2 thatMuch) p1p1Counter (that creature)))) ] }

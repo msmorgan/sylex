@@ -82,13 +82,14 @@ impl Reader<'_> {
             if Some(c) == end {
                 return Ok(tokens);
             }
-            if ")]}".contains(c) {
+            if ")]}⟩".contains(c) {
                 return Err(ReadError(format!("unexpected closing delimiter {c}")));
             }
             if let Some(close) = match c {
                 '(' => Some(')'),
                 '[' => Some(']'),
                 '{' => Some('}'),
+                '⟨' => Some('⟩'),
                 _ => None,
             } {
                 tokens.push(Token::Group(c, self.tokens(Some(close))?));
@@ -386,6 +387,7 @@ pub fn render(tokens: &[Token]) -> String {
                 close = match open {
                     '(' => ')',
                     '[' => ']',
+                    '⟨' => '⟩',
                     _ => '}',
                 }
             ),

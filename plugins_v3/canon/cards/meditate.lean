@@ -1,0 +1,3 @@
+card meditate : Spelled :=
+  { name := "Meditate", cost := [generic 2, pip .blue], types := [.instant],
+    text := [spell (sequentially [draw 4, skipPart .turn 1])] }

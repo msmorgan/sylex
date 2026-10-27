@@ -1,0 +1,9 @@
+card arachnoform : Spelled :=
+  { name := "Arachnoform", cost := [generic 1, pip .green], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isCreature,
+        static (conjunction [ getsPt (enchanted creature) (up 2) (up 2),
+            abilityGrant (enchanted creature) reach,
+            qualityChange (enchanted creature) .adds (everyTypeOf
+                .creature) ]) ] }

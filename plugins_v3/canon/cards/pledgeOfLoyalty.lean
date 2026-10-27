@@ -1,0 +1,10 @@
+/-- Pledge of Loyalty -/
+card pledgeOfLoyalty : Spelled :=
+  { name := "Pledge of Loyalty", cost := [generic 1, pip .white], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isCreature,
+        static (retention
+          (abilityGrant (enchanted creature)
+            (protection (eachKind .color (allOf (and [isPermanent, youControl])))))
+          thisAura) ] }

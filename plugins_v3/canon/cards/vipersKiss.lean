@@ -1,0 +1,8 @@
+card vipersKiss : Spelled :=
+  { name := "Viper's Kiss", cost := [pip .black], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isCreature,
+        static (conjunction
+                  [ getsPt (enchanted creature) (down 1) (down 1),
+            cant any (activate (allOf (and [abilityHead .anyActivated, abilityOf it]))) ]) ] }

@@ -1,9 +1,10 @@
+import Semantics.Cards
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Cards.Choice
-import Semantics.Cards.Damage
-import Semantics.Cards.Counters
-import Semantics.Cards.Description
+import Semantics.Proofs.CardsChoice
+import Semantics.Proofs.CardsDamage
+import Semantics.Proofs.CardsCounters
+import Semantics.Proofs.CardsDescription
 
 /-!
 # Semantics.Proofs.ContrastAnchor

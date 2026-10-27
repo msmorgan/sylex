@@ -1,0 +1,9 @@
+/-- Paradox Haze -/
+card paradoxHaze : Spelled :=
+  { name := "Paradox Haze", cost := [generic 2, pip .blue], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isPlayer,
+        at_ (nthOccurrence (.nth 1) (beginningOfPossessed .upkeep (enchanted player))
+               (some .turn))
+          (instruct (that player) (additionalStep .upkeep none 1)) ] }

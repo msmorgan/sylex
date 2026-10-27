@@ -1,0 +1,11 @@
+/-- Awesome Presence -/
+card awesomePresence : Spelled :=
+  { name := "Awesome Presence", cost := [pip .blue], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isCreature,
+        static (gatedBy (scaledGenericMana (forEach 3 (and [ isCreature, controlledBy they,
+                             inCombat .blockerOf it ]))) any (block
+                                                                       (enchanted
+                                                                          (.type
+                                                                             .creature)))) ] }

@@ -1,0 +1,4 @@
+card yavimayaCradleOfGrowth : Spelled :=
+  { name := "Yavimaya, Cradle of Growth", supertypes := [.legendary], types := [.land],
+    text :=
+      [ static (addSubtype (allOf isLand) forest) ] }

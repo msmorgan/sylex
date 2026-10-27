@@ -1,0 +1,14 @@
+/- ## Cast as though it had flash, sacrificed at cleanup
+
+Each prints "You may cast this spell as though it had flash. If you cast it any time a sorcery
+couldn't have been cast, the controller of the permanent it becomes sacrifices it at the
+beginning of the next cleanup step." (`asThoughFlashSacrificedAtCleanup`). -/
+
+/-- Armor of Thorns -/
+card armorOfThorns : Spelled :=
+  { name := "Armor of Thorns", cost := [generic 1, pip .green], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ asThoughFlashSacrificedAtCleanup,
+        enchant (and [isCreature, non (hasColor .black)]),
+        static (getsPt (enchanted creature) (up 2) (up 2)) ] }

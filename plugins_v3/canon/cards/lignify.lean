@@ -1,0 +1,9 @@
+card lignify : Spelled :=
+  { name := "Lignify", cost := [generic 1, pip .green], types := [.kindred, .enchantment],
+    subtypes := [treefolk, aura],
+    text :=
+      [ enchant isCreature,
+        static (conjunction [ qualityChange (enchanted creature) .sets
+              (bundle { characteristics := { subtypes := [treefolk] } }),
+            getsBase it 0 4,
+            allAbilityLoss it ]) ] }

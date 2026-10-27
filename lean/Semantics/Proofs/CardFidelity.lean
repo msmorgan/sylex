@@ -1,3 +1,13 @@
+import Semantics.Proofs.CardsAnaphora
+import Semantics.Proofs.CardsChoice
+import Semantics.Proofs.CardsCopy
+import Semantics.Proofs.CardsCounters
+import Semantics.Proofs.CardsDamage
+import Semantics.Proofs.CardsKeyword
+import Semantics.Proofs.CardsMana
+import Semantics.Proofs.CardsStatic
+import Semantics.Proofs.CardsTrigger
+import Semantics.Proofs.CardsTurn
 import Semantics.Cards
 import Semantics.Check.Card
 

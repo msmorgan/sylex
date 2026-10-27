@@ -1,0 +1,6 @@
+card dampingMatrix : Spelled :=
+  { name := "Damping Matrix", cost := [generic 3], types := [.artifact],
+    text :=
+      [ static (cant any (activate (allOf (and [ abilityHead .anyActivated,
+                         abilityOf (allOf (or [isArtifact, isCreature])),
+                         not isManaAbility ])))) ] }

@@ -1,0 +1,10 @@
+card conjurersBan : Spelled :=
+  { name := "Conjurer's Ban", cost := [pip .white, pip .black], types := [.sorcery],
+    text :=
+      [ spell (sequentially
+          [ choose (a (quality .cardName)),
+            establishThroughout (conjunction
+                                   [ cant any (cast (bare (and [isSpell, named chosenName]))),
+                  cant any (play
+                              (allOf (and [isLand, named chosenName]))) ]) untilYourNextTurn ]),
+        spell (draw 1) ] }

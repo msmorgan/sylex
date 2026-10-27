@@ -1,0 +1,4 @@
+card endure : Spelled :=
+  { name := "Endure", cost := [generic 3, pip .white, pip .white], types := [.instant],
+    text :=
+      [ spell (preventAll (youAnd (allOf (and [isPermanent, youControl]))) thisTurn) ] }

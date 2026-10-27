@@ -1,0 +1,11 @@
+card chanceForGlory : Spelled :=
+  { name := "Chance for Glory", cost := [generic 1, pip .red, pip .white],
+    types := [.instant],
+    text :=
+      [ spell (sequentially
+          [ establish
+              (abilityGrant (allOf (and [isCreature, youControl]))
+                indestructible),
+            extraTurn 1,
+            delay (beginningOfThatTurns .endStep) loseGame ])
+                ] }

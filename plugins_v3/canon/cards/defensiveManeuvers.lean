@@ -1,0 +1,6 @@
+/-- Defensive Maneuvers -/
+card defensiveManeuvers : Spelled :=
+  { name := "Defensive Maneuvers", cost := [generic 3, pip .white], types := [.instant],
+    text :=
+      [ spell (get (allOf (and [isCreature, ofYourChoice (.subtype .creature)]))
+          (up 0) (up 4) untilEndOfTurn) ] }

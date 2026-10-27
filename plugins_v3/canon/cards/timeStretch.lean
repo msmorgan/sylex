@@ -1,0 +1,3 @@
+card timeStretch : Spelled :=
+  { name := "Time Stretch", cost := [generic 8, pip .blue, pip .blue], types := [.sorcery],
+    text := [spell (instruct (target isPlayer) (extraTurn 2))] }

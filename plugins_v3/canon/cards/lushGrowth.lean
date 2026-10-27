@@ -1,0 +1,9 @@
+card lushGrowth : Spelled :=
+  { name := "Lush Growth", cost := [pip .green], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isLand,
+        static (qualityChange (enchanted land) .sets
+          (bundle
+            { characteristics :=
+              { subtypes := [mountain, forest, plains] } })) ] }

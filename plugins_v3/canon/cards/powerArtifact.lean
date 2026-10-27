@@ -1,0 +1,9 @@
+/-- Power Artifact -/
+card powerArtifact : Spelled :=
+  { name := "Power Artifact", cost := [pip .blue, pip .blue], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isArtifact,
+        static (costShift
+          (allOf (and [abilityHead .anyActivated, abilityOf (enchanted artifact)]))
+          (less 2 (some 1))) ] }

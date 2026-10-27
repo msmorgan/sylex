@@ -16,13 +16,19 @@ name = "builtinBundle"
 path = "../plugins_v3/builtin"
 text = true
 
+[[input_dir]]
+name = "canonBundle"
+path = "../plugins_v3/canon"
+text = true
+
 [[lean_lib]]
 name = "Semantics"
-extraDepTargets = ["builtinBundle"]
+needs = ["builtinBundle"]
 roots = ["Semantics", "Semantics.Check", "Semantics.Primitives", "Semantics.Definitions"]
 
 [[lean_lib]]
 name = "SemanticsCards"
+needs = ["canonBundle"]
 roots = ["Semantics.Cards"]
 
 [[lean_lib]]

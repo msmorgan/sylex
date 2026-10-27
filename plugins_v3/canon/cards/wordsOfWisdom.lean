@@ -1,0 +1,3 @@
+card wordsOfWisdom : Spelled :=
+  { name := "Words of Wisdom", cost := [generic 1, pip .blue], types := [.instant],
+    text := [spell (sequentially [draw 2, instruct (each isOtherPlayer) (draw 1)])] }

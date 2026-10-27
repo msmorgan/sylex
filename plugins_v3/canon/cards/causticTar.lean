@@ -1,0 +1,7 @@
+card causticTar : Spelled :=
+  { name := "Caustic Tar", cost := [generic 4, pip .black, pip .black], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isLand,
+        static (abilityGrant (enchanted land)
+          (activated tapSymbol (instruct (target isPlayer) (loseLife 3)))) ] }

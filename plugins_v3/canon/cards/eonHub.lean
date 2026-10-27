@@ -1,0 +1,3 @@
+card eonHub : Spelled :=
+  { name := "Eon Hub", cost := [generic 5], types := [.artifact],
+    text := [static (partSkip (bare isPlayer) .upkeep)] }

@@ -1,0 +1,10 @@
+card voidstoneGargoyle : Spelled :=
+  { name := "Voidstone Gargoyle", cost := [generic 3, pip .white, pip .white],
+    types := [.creature], subtypes := [gargoyle],
+    text :=
+      [ flying,
+        static (entersChoosingFrom thisCreature .cardName (nameOfCard (non isLand))),
+        static (cant any (cast (bare (and [isSpell, named chosenName])))),
+        static (cant any (activate (allOf (and [ abilityHead .anyActivated,
+                         abilityOf (allOf (and [isSource, named chosenName])) ])))) ],
+    power := stat 3, toughness := stat 3 }

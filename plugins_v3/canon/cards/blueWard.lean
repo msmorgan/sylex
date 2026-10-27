@@ -1,0 +1,9 @@
+/-- Blue Ward -/
+card blueWard : Spelled :=
+  { name := "Blue Ward", cost := [pip .white], types := [.enchantment],
+    subtypes := [aura],
+    text :=
+      [ enchant isCreature,
+        static (retention
+          (abilityGrant (enchanted creature) (protection (hasColor .blue)))
+          thisAura) ] }

@@ -1,0 +1,7 @@
+card irenicussVileDuplication : Spelled :=
+  { name := "Irenicus's Vile Duplication", cost := [generic 3, pip .blue], types := [.sorcery],
+    text :=
+      [ spell (create 1
+          (copyOf (target (and [isCreature, youControl]))
+            [alsoHas flying, isntLegendary])
+          []) ] }

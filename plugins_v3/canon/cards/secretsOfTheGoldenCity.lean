@@ -1,0 +1,7 @@
+card secretsOfTheGoldenCity : Spelled :=
+  { name := "Secrets of the Golden City", cost := [generic 1, pip .blue, pip .blue],
+    types := [.sorcery],
+    text :=
+      [ ascend,
+        spell (replace (draw 2)
+          (doIf (is you (hasDesignation citysBlessing)) (instead (draw 3)))) ] }

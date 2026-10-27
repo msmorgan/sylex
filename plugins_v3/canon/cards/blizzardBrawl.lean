@@ -1,0 +1,15 @@
+/-- Blizzard Brawl: "Choose target creature you control and target creature you don't control.
+If you control three or more snow permanents, the creature you control gets +1/+0 and gains
+indestructible until end of turn. Then those creatures fight each other." "The creature you
+control" reads back the first target, which its restriction picks out of the two; "those
+creatures fight each other" is the two-creature fight of [CR#701.14a]. -/
+card blizzardBrawl : Spelled :=
+  { name := "Blizzard Brawl", cost := [pip .green], supertypes := [.snow], types := [.sorcery],
+    text :=
+      [ spell (sequentially
+          [ chooseFightPair,
+            doIf (compareAmt (countOf (and [hasSupertype .snow, isPermanent, youControl]))
+                .atLeast 3)
+              (establishFor (the (and [isCreature, youControl]))
+                [getsPt it (up 1) (up 0), abilityGrant it indestructible] untilEndOfTurn),
+            fightEachOther (those creature) ]) ] }

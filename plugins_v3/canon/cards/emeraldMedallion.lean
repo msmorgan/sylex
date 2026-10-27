@@ -1,0 +1,4 @@
+card emeraldMedallion : Spelled :=
+  { name := "Emerald Medallion", cost := [generic 2], types := [.artifact],
+    text := [static (spellsCost (and [hasColor .green, isSpell, did you (cast which) thisObject])
+        (less 1))] }

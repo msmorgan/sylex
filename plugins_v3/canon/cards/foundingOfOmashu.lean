@@ -1,0 +1,10 @@
+card foundingOfOmashu : Spelled :=
+  { name := "Founding of Omashu", cost := [generic 2, pip .red], types := [.enchantment],
+    subtypes := [saga],
+    text :=
+      [ when (chapterMark [1])
+          (create 2 (creatureToken 1 1 [.white] [ally])),
+        when (chapterMark [2])
+          (may (discard (a (cardIn yourHand))) (draw 1)),
+        when (chapterMark [3])
+          (get (allOf (and [isCreature, youControl])) (up 1) (up 0) untilEndOfTurn) ] }

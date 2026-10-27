@@ -1,8 +1,9 @@
+import Semantics.Cards
 import Semantics.Check
 import Semantics.Check.Card
 import Semantics.Definitions
-import Semantics.Cards.Choice
-import Semantics.Cards.Cost
+import Semantics.Proofs.CardsChoice
+import Semantics.Proofs.CardsCost
 
 open Semantics Semantics.Templates Semantics.Definitions
 
@@ -425,7 +426,7 @@ private def korlessaWritten : Spelled := spelled <| .singleFaced
       subtypes := [dragon, bard],
       text :=
         [ static (visibility .lookAt you topOfLibrary),
-          static (Cards.castFromTop (and [isSpell, hasSubtype dragon])) ],
+          static (Templates.castFromTop (and [isSpell, hasSubtype dragon])) ],
       power := stat 1, toughness := stat 4 } }
 
 theorem subtypeCoercionKeepsTheCard : Cards.korlessaScaleSinger.card = korlessaWritten.card := rfl
@@ -442,7 +443,7 @@ private def charRumblerWritten : Spelled := spelled <| .singleFaced
         [ doubleStrike,
           activated (mana [pip .red])
             (get thisCreature (up (.lit 1)) (up (.lit 0)) (some untilEndOfTurn)) ],
-      power := some (.lit (-1)), toughness := stat 3 } }
+      power := some (amountLit (-1)), toughness := stat 3 } }
 
 theorem numeralsKeepTheCard : Cards.charRumbler.card = charRumblerWritten.card := rfl
 

@@ -1,0 +1,8 @@
+/-- Bonus Round -/
+card bonusRound : Spelled :=
+  { name := "Bonus Round", cost := [generic 1, pip .red, pip .red], types := [.sorcery],
+    text :=
+      [ spell (delayWithin (does (a isPlayer) (cast (a
+            (and [isInstantOrSorcery, isSpell])))) untilEndOfTurn (sequentially
+            [ instruct (that player) (copyOnStack it),
+              instruct (that player) (may (chooseNewTargets (that .copy))) ])) ] }
