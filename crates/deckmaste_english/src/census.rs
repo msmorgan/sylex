@@ -5,7 +5,11 @@
 //! A unit is read when it has a Reading and both round-trip laws hold:
 //! law 1 over the whole Packed Forest
 //! ([`deckmaste_syntax::Parse::verify_realization`]) and law 2 on its
-//! cheapest Readings ([`LAW_TWO_READINGS`]). No attachment tree is enumerated
+//! cheapest Readings ([`LAW_TWO_READINGS`] by default; every Reading under
+//! [`run_with`] with `usize::MAX`, which `cargo xtask english strata
+//! --all-readings` passes). The exhaustive run took about 123 s and peaked at
+//! roughly 27 GB of memory, so it is opt-in; [`Report::law_two_exhaustive`]
+//! records which the report verified. No attachment tree is enumerated
 //! except for a unit with a judgment, whose Readings are checked against it
 //! up to [`judgment::READING_LIMIT`]. A unit is known-wrong-only when it has a
 //! judgment none of its Readings satisfies.
@@ -151,14 +155,33 @@ pub struct Report {
     /// Units with a Derivation but no single product segmentation.
     pub not_segmentable: Vec<String>,
     pub units: Vec<UnitResult>,
+    /// Whether law 2 was checked on every Reading of every unit, not only each
+    /// unit's cheapest [`LAW_TWO_READINGS`].
+    pub law_two_exhaustive: bool,
 }
 
-/// Runs the census over `corpus`.
+/// Runs the census over `corpus`, checking law 2 on each unit's cheapest
+/// [`LAW_TWO_READINGS`] Readings.
 ///
 /// # Panics
 /// If a census worker thread panics.
 #[must_use]
 pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) -> Report {
+    run_with(corpus, env, judgments, LAW_TWO_READINGS)
+}
+
+/// Runs the census, checking law 2 on each unit's cheapest `law_two_readings`
+/// Readings; `usize::MAX` checks every Reading (about 27 GB of memory).
+///
+/// # Panics
+/// If a census worker thread panics.
+#[must_use]
+pub fn run_with(
+    corpus: &Corpus,
+    env: &LexicalEnvironment,
+    judgments: &[Judgment],
+    law_two_readings: usize,
+) -> Report {
     let grammar = crate::bind(&env.lexicon, &env.frames).and_then(|grammar| {
         let frame = crate::segments::segment_frame(&grammar)?;
         Ok((grammar, frame))
@@ -236,6 +259,7 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
                                         let judge = |text: &str, analyzed: &AnalyzedText| {
                                             let entries = entries(text);
                                             judge_unit(
+                                                law_two_readings,
                                                 grammar,
                                                 frame,
                                                 env,
@@ -287,7 +311,10 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
     });
     batches.sort_unstable_by_key(|(start, _)| *start);
     let units: Vec<UnitResult> = batches.into_iter().flat_map(|(_, units)| units).collect();
-    summarize(corpus.faces.len(), bind_error, units)
+    Report {
+        law_two_exhaustive: law_two_readings == usize::MAX,
+        ..summarize(corpus.faces.len(), bind_error, units)
+    }
 }
 
 /// Judges a bracketed line of a cleave face as its Uncleaved Text, then, if
@@ -306,6 +333,7 @@ fn judge_cleave(
 }
 
 fn judge_unit(
+    law_two_readings: usize,
     grammar: &CompiledGrammar,
     frame: &SegmentFrame,
     env: &LexicalEnvironment,
@@ -323,11 +351,20 @@ fn judge_unit(
     }
     let segments = Some(crate::segments::segments(&parse, frame));
     let cheapest_tier = parse.cheapest_tier().map_or(0, |(_, tied)| tied);
-    let (verdict, derivations) = judge_parse(grammar, env, &parse, derivations, scope, entries);
+    let (verdict, derivations) = judge_parse(
+        law_two_readings,
+        grammar,
+        env,
+        &parse,
+        derivations,
+        scope,
+        entries,
+    );
     (verdict, derivations, segments, cheapest_tier)
 }
 
 fn judge_parse(
+    law_two_readings: usize,
     grammar: &CompiledGrammar,
     env: &LexicalEnvironment,
     parse: &deckmaste_syntax::Parse<'_>,
@@ -341,7 +378,7 @@ fn judge_parse(
             derivations,
         );
     }
-    for reading in parse.best_readings(LAW_TWO_READINGS) {
+    for reading in parse.best_readings(law_two_readings) {
         if let Err(why) = judgment::law_two(grammar, &env.lexicon, parse, &reading, scope) {
             return (Verdict::Unread(Unread::Law(why)), derivations);
         }
@@ -496,6 +533,7 @@ fn summarize(faces: usize, bind_error: Option<String>, units: Vec<UnitResult>) -
         ambiguous_segments,
         not_segmentable,
         units,
+        law_two_exhaustive: false,
     }
 }
 
