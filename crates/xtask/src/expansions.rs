@@ -536,4 +536,366 @@ mod tests {
             Outcome::Failed(_)
         ));
     }
+    fn fixture(name: &str, body: &str) -> Bundle {
+        Bundle::from_items(vec![BundleItem {
+            declaration: reader::parse(&format!("primitive {name} : Nat := {{ body := {body} }}"))
+                .unwrap(),
+            file: "original.lean".into(),
+        }])
+        .unwrap()
+    }
+
+    fn args(plugin: &Path, out: Option<&Path>, baseline: Option<&Path>) -> ExpansionsArgs {
+        ExpansionsArgs {
+            plugin: plugin.to_owned(),
+            out: out.map(Path::to_owned),
+            compare: baseline.map(Path::to_owned),
+            expect: Vec::new(),
+            rename: Vec::new(),
+            rename_file: Vec::new(),
+            no_prelude: true,
+        }
+    }
+
+    #[test]
+    fn keyed_dumps_are_byte_identical() {
+        let temp = tempfile::tempdir().unwrap();
+        let plugin = temp.path().join("plugin");
+        std::fs::create_dir(&plugin).unwrap();
+        std::fs::write(plugin.join("z.lean"), "primitive a : Nat := { body := 3 }").unwrap();
+        std::fs::write(plugin.join("a.lean"), "primitive z : Nat := { body := 4 }").unwrap();
+        let first = temp.path().join("first");
+        let second = temp.path().join("second");
+        run(&args(&plugin, Some(&first), None)).unwrap();
+        run(&args(&plugin, Some(&second), None)).unwrap();
+        assert_eq!(
+            std::fs::read(first.join(INDEX_FILE)).unwrap(),
+            std::fs::read(second.join(INDEX_FILE)).unwrap()
+        );
+        let snapshot = read_snapshot(&first).unwrap();
+        assert_eq!(
+            snapshot.keys().map(key_label).collect::<Vec<_>>(),
+            ["a : Nat", "z : Nat"]
+        );
+    }
+
+    #[test]
+    fn moving_a_lean_file_reports_no_changes_and_compare_writes_nothing() {
+        let temp = tempfile::tempdir().unwrap();
+        let plugin = temp.path().join("plugin");
+        std::fs::create_dir(&plugin).unwrap();
+        std::fs::write(
+            plugin.join("before.lean"),
+            "primitive value : Nat := { body := 3 }",
+        )
+        .unwrap();
+        let baseline = temp.path().join("baseline");
+        run(&args(&plugin, Some(&baseline), None)).unwrap();
+        let original = std::fs::read(baseline.join(INDEX_FILE)).unwrap();
+        let default_before = std::fs::read(default_out_dir().join(INDEX_FILE)).ok();
+        std::fs::create_dir(plugin.join("nested")).unwrap();
+        std::fs::rename(plugin.join("before.lean"), plugin.join("nested/after.lean")).unwrap();
+        let after = expand_all_keyed(&Bundle::load(&plugin).unwrap());
+        let comparison = compare(&read_snapshot(&baseline).unwrap(), &after, &[], &[]).unwrap();
+        assert_eq!(comparison.differences, []);
+        comparison.ensure_success().unwrap();
+        run(&args(&plugin, None, Some(&baseline))).unwrap();
+        assert_eq!(std::fs::read(baseline.join(INDEX_FILE)).unwrap(), original);
+        assert_eq!(
+            std::fs::read(default_out_dir().join(INDEX_FILE)).ok(),
+            default_before
+        );
+        assert_eq!(baseline.read_dir().unwrap().count(), 1);
+    }
+
+    #[test]
+    fn editing_a_body_requires_an_expectation() {
+        let before = expand_all_keyed(&fixture("value", "3"));
+        let after = expand_all_keyed(&fixture("value", "4"));
+        let comparison = compare(&before, &after, &[], &[]).unwrap();
+        assert_eq!(
+            comparison.differences,
+            [Difference::Changed(before.keys().next().unwrap().clone())]
+        );
+        assert!(comparison.ensure_success().is_err());
+        for selector in ["value", "value : Nat"] {
+            compare(&before, &after, &[selector.into()], &[])
+                .unwrap()
+                .ensure_success()
+                .unwrap();
+        }
+    }
+
+    #[test]
+    fn declaration_renames_require_a_mapping_and_preserved_value() {
+        let before = expand_all_keyed(&fixture("old", "3"));
+        let after = expand_all_keyed(&fixture("new", "3"));
+        let unmapped = compare(&before, &after, &[], &[]).unwrap();
+        assert!(unmapped.ensure_success().is_err());
+        assert!(matches!(
+            &unmapped.differences[..],
+            [Difference::Added(_), Difference::Removed(_)]
+        ));
+        let renames = [("old : Nat".into(), "new : Nat".into())];
+        compare(&before, &after, &[], &renames)
+            .unwrap()
+            .ensure_success()
+            .unwrap();
+        let changed = expand_all_keyed(&fixture("new", "4"));
+        assert!(
+            compare(&before, &changed, &[], &renames)
+                .unwrap()
+                .ensure_success()
+                .is_err()
+        );
+        compare(&before, &changed, &["new : Nat".into()], &renames)
+            .unwrap()
+            .ensure_success()
+            .unwrap();
+    }
+
+    #[test]
+    fn rename_comparison_preserves_invocation_arguments() {
+        let make = |name: &str, parameter: &str| {
+            Bundle::from_items(vec![BundleItem {
+                declaration: reader::parse(&format!(
+                    "primitive {name} ({parameter} : Nat) : Nat := {{ body := 3 }}"
+                ))
+                .unwrap(),
+                file: "example.lean".into(),
+            }])
+            .unwrap()
+        };
+        let before = expand_all_keyed(&make("old", "count"));
+        let after = expand_all_keyed(&make("new", "count"));
+        let renames = [("old".into(), "new".into())];
+        compare(&before, &after, &[], &renames)
+            .unwrap()
+            .ensure_success()
+            .unwrap();
+        let changed = expand_all_keyed(&make("new", "amount"));
+        assert!(
+            compare(&before, &changed, &[], &renames)
+                .unwrap()
+                .ensure_success()
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn arbitrary_names_and_overloaded_keys_round_trip_without_paths() {
+        let names = [
+            "Branchloft Pathway // Boulderloft Pathway",
+            "../Circle of Protection: \"Red\" / Dr. X = Y",
+            "with : delimiter : Spelled",
+            "line\nbreak\\and\ttab",
+        ];
+        let mut items = Vec::new();
+        for name in names {
+            for source in [
+                "primitive placeholder : Nat := { body := 3 }",
+                "primitive placeholder : Bool := { body := false }",
+            ] {
+                let mut declaration = reader::parse(source).unwrap();
+                declaration.name = name.into();
+                items.push(BundleItem {
+                    declaration,
+                    file: "shared.lean".into(),
+                });
+            }
+        }
+        let bundle = Bundle::from_items(items).unwrap();
+        let outcomes = expand_all_keyed(&bundle);
+        assert_eq!(outcomes.len(), names.len() * 2);
+        assert!(
+            outcomes
+                .values()
+                .all(|outcome| matches!(outcome, Outcome::Printed(_)))
+        );
+        let temp = tempfile::tempdir().unwrap();
+        std::fs::write(
+            temp.path().join(INDEX_FILE),
+            snapshot_bytes(&outcomes).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(read_snapshot(temp.path()).unwrap(), outcomes);
+        assert_eq!(temp.path().read_dir().unwrap().count(), 1);
+        assert_eq!(
+            snapshot_bytes(&outcomes).unwrap(),
+            snapshot_bytes(&expand_all_keyed(&bundle)).unwrap()
+        );
+        compare(&outcomes, &outcomes, &[], &[])
+            .unwrap()
+            .ensure_success()
+            .unwrap();
+    }
+
+    #[test]
+    fn additions_and_removals_are_sorted_and_require_expectations() {
+        let before = expand_all_keyed(&fixture("z", "3"));
+        let after = expand_all_keyed(&fixture("a", "4"));
+        let result = compare(&before, &after, &[], &[]).unwrap();
+        assert_eq!(
+            result
+                .differences
+                .iter()
+                .map(|diff| format!("{} {}", diff.label(), key_label(diff.key())))
+                .collect::<Vec<_>>(),
+            ["added a : Nat", "removed z : Nat"]
+        );
+        assert!(result.ensure_success().is_err());
+        compare(&before, &after, &["z".into(), "a".into()], &[])
+            .unwrap()
+            .ensure_success()
+            .unwrap();
+    }
+
+    #[test]
+    fn unused_and_ambiguous_allowances_fail() {
+        let before = expand_all_keyed(&fixture("value", "3"));
+        for expected in [vec!["value".into()], vec!["missing".into()]] {
+            assert!(
+                compare(&before, &before, &expected, &[])
+                    .unwrap()
+                    .ensure_success()
+                    .is_err()
+            );
+        }
+        assert!(compare(&before, &before, &[], &[("value".into(), "value".into())]).is_err());
+        assert!(compare(&before, &before, &[], &[("missing".into(), "value".into())]).is_err());
+        let after = expand_all_keyed(&fixture("value", "4"));
+        assert!(
+            compare(
+                &before,
+                &after,
+                &["value".into(), "value : Nat".into()],
+                &[]
+            )
+            .unwrap()
+            .ensure_success()
+            .is_err()
+        );
+        let mut overloaded = before.clone();
+        let key = BundleKey {
+            bare_name: "value".into(),
+            return_type: "Bool".into(),
+        };
+        overloaded.insert(key, Outcome::Printed("false".into()));
+        assert!(
+            compare(&overloaded, &overloaded, &["value".into()], &[])
+                .unwrap()
+                .ensure_success()
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn duplicate_rename_endpoints_and_redundant_expectations_fail() {
+        let before = expand_all_keyed(&fixture("old", "3"));
+        let after = expand_all_keyed(&fixture("new", "3"));
+        let rename = ("old".into(), "new".into());
+        assert!(compare(&before, &after, &[], &[rename.clone(), rename.clone()]).is_err());
+        assert!(
+            compare(&before, &after, &["new".into()], &[rename])
+                .unwrap()
+                .ensure_success()
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn cli_compares_expected_edits_and_renames_and_can_save_new_output() {
+        let temp = tempfile::tempdir().unwrap();
+        let plugin = temp.path().join("plugin");
+        std::fs::create_dir(&plugin).unwrap();
+        let source = plugin.join("example.lean");
+        std::fs::write(&source, "primitive old : Nat := { body := 3 }").unwrap();
+        let baseline = temp.path().join("baseline");
+        run(&args(&plugin, Some(&baseline), None)).unwrap();
+        let original = std::fs::read(baseline.join(INDEX_FILE)).unwrap();
+        std::fs::write(&source, "primitive old : Nat := { body := 4 }").unwrap();
+        let mut comparison = args(&plugin, None, Some(&baseline));
+        assert!(run(&comparison).is_err());
+        comparison.expect.push("old : Nat".into());
+        run(&comparison).unwrap();
+        std::fs::write(&source, "primitive new : Nat := { body := 3 }").unwrap();
+        comparison.expect.clear();
+        assert!(run(&comparison).is_err());
+        comparison.rename.push("old : Nat=new : Nat".into());
+        let output = temp.path().join("after");
+        comparison.out = Some(output.clone());
+        run(&comparison).unwrap();
+        assert_eq!(
+            read_snapshot(&output).unwrap(),
+            expand_all_keyed(&fixture("new", "3"))
+        );
+        let rename_file = temp.path().join("renames.json");
+        std::fs::write(&rename_file, r#"[["old : Nat", "new : Nat"]]"#).unwrap();
+        comparison.rename.clear();
+        comparison.rename_file.push(rename_file);
+        run(&comparison).unwrap();
+        std::fs::write(&source, "primitive new : Nat := { body := 4 }").unwrap();
+        assert!(run(&comparison).is_err());
+        comparison.expect.push("new".into());
+        run(&comparison).unwrap();
+        assert_eq!(std::fs::read(baseline.join(INDEX_FILE)).unwrap(), original);
+    }
+
+    #[test]
+    fn comparison_rejects_outputs_overlapping_the_baseline() {
+        let temp = tempfile::tempdir().unwrap();
+        let plugin = temp.path().join("plugin");
+        std::fs::create_dir(&plugin).unwrap();
+        std::fs::write(
+            plugin.join("example.lean"),
+            "primitive value : Nat := { body := 3 }",
+        )
+        .unwrap();
+        let baseline = temp.path().join("baseline");
+        run(&args(&plugin, Some(&baseline), None)).unwrap();
+        let original = std::fs::read(baseline.join(INDEX_FILE)).unwrap();
+        for out in [&baseline, &baseline.join("child"), temp.path()] {
+            assert!(run(&args(&plugin, Some(out), Some(&baseline))).is_err());
+            assert_eq!(std::fs::read(baseline.join(INDEX_FILE)).unwrap(), original);
+        }
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn comparison_rejects_a_symlink_alias_of_the_baseline() {
+        let temp = tempfile::tempdir().unwrap();
+        let baseline = temp.path().join("baseline");
+        std::fs::create_dir(&baseline).unwrap();
+        std::fs::write(
+            baseline.join(INDEX_FILE),
+            snapshot_bytes(&expand_all_keyed(&fixture("value", "3"))).unwrap(),
+        )
+        .unwrap();
+        let alias = temp.path().join("alias");
+        std::os::unix::fs::symlink(&baseline, &alias).unwrap();
+        assert!(run(&args(temp.path(), Some(&alias), Some(&baseline))).is_err());
+        assert!(read_snapshot(&baseline).is_ok());
+    }
+
+    #[test]
+    fn malformed_or_failed_baselines_are_rejected() {
+        let temp = tempfile::tempdir().unwrap();
+        let file = temp.path().join(INDEX_FILE);
+        std::fs::write(&file, "old path-based index").unwrap();
+        assert!(read_snapshot(temp.path()).is_err());
+        let good = snapshot_bytes(&expand_all_keyed(&fixture("value", "3"))).unwrap();
+        let mut snapshot: Snapshot = serde_json::from_slice(&good).unwrap();
+        snapshot.version += 1;
+        std::fs::write(&file, serde_json::to_vec(&snapshot).unwrap()).unwrap();
+        assert!(read_snapshot(temp.path()).is_err());
+        snapshot.version = FORMAT_VERSION;
+        snapshot.declarations[0].outcome = Outcome::Failed("broken".into());
+        std::fs::write(&file, serde_json::to_vec(&snapshot).unwrap()).unwrap();
+        assert!(read_snapshot(temp.path()).is_err());
+        let mut duplicate: serde_json::Value = serde_json::from_slice(&good).unwrap();
+        let declarations = duplicate["declarations"].as_array_mut().unwrap();
+        declarations.push(declarations[0].clone());
+        std::fs::write(&file, serde_json::to_vec(&duplicate).unwrap()).unwrap();
+        assert!(read_snapshot(temp.path()).is_err());
+    }
 }
