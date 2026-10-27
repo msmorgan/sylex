@@ -150,4 +150,8 @@ semantic_template artifactCreatureToken (power toughness : Nat) (colors : List C
       { colors, types := [.artifact, .creature], subtypes, text := abilities,
         power := some (.lit power), toughness := some (.lit toughness) } }
 
+semantic_template NounWord.instant : NounWord := .type .instant
+semantic_template NounWord.sorcery : NounWord := .type .sorcery
+semantic_template NounWord.kindred : NounWord := .type .kindred
+
 end Semantics.Definitions

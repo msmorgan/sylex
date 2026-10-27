@@ -585,14 +585,221 @@ Note: Inferred this name from the expected resulting type of `.combat`:
 #guard_msgs in
 example : Action := dealDamage (to := a isPlayer) (kind := .combat)
 
-/--
-error: Invalid dotted identifier notation: The expected type of `.snow` could not be determined
+example : activated [.snow] (draw 1) = activated (mana [.snow]) (draw 1) := rfl
 
-Hint: Using one of these would be unambiguous:
-  [apply] `ManaSymbol.snow`
-  [apply] `Supertype.snow`
--/
-#guard_msgs in
-example : Ability := activated [.snow] (draw 1)
+namespace BundleDsl
+
+primitive token : NounWord := { spelling := "token", body := .token }
+template token (spec : TokenSpec) : CreationSpec := { body := .token spec [] }
+primitive atom : Predicate := { lemma := "card", body := .isCard }
+template shared : Predicate := { body := atom }
+template shared : Condition := { body := exists_ atom }
+
+example : (shared : Predicate) = atom := rfl
+example : (shared : Condition) = exists_ atom := rfl
+example : (creature : Predicate) = isCreature := rfl
+example : (creature : NounWord) = Definitions.creature := rfl
+example : (creature : CardType) = Semantics.CardType.creature := rfl
+example : (and [atom] : Predicate) = Templates.Predicate.and [atom] := rfl
+example : (and [exists_ atom] : Condition) = Templates.Condition.and [exists_ atom] := rfl
+example : (devour 2 : Ability) = Definitions.devour 2 := rfl
+example : (devour thisCreature : Action) = Definitions.Action.devour thisCreature := rfl
+
+/-- A parameter's two occurrences share the generated Binding Identity. -/
+template twice (subject : NounPhrase) : Action := {
+  body := instruct (controllerOf subject) (sacrifice subject),
+}
+example (subject : NounPhrase) : twice subject =
+    instruct (controllerOf (.firstMention "twice.subject" subject))
+      (sacrifice (.laterMention "twice.subject" subject)) := rfl
+
+action drawCards (amount : Amount) := { body := draw amount }
+example (amount : Amount) : drawCards amount =
+    .ownScope (some (.action "drawCards" .none)) (draw (.inCaller amount)) := rfl
+example : drawCards.deed = Deed.action "drawCards" .none := rfl
+
+action subjects (subject : NounPhrase) := {
+  body := instruct subject (sacrifice subject),
+}
+example (subject : NounPhrase) : subjects subject =
+    .ownScope (some (.action "subjects" .none))
+      (instruct (.firstMention "subjects.subject" (.inCaller subject))
+        (sacrifice (.laterMention "subjects.subject" (.inCaller subject)))) := rfl
+
+action optOut (subject : NounPhrase) := { body := sacrifice (.inCaller subject) }
+example (subject : NounPhrase) : optOut subject =
+    .ownScope (some (.action "optOut" .none)) (sacrifice (.inCaller subject)) := rfl
+
+action actorTwice := { body := instruct theActor (sacrifice theActor) }
+example : actorTwice = .ownScope (some (.action "actorTwice" .none))
+    (instruct (.firstMention "actorTwice.actor" theActor)
+      (sacrifice (.laterMention "actorTwice.actor" theActor))) := rfl
+
+action containers (values : List Action) (rider : Option Location) := {
+  body := sequentially (values ++ [enter (from_ := rider)]),
+}
+
+example (values : List Action) (rider : Option Location) : containers values rider =
+    .ownScope (some (.action "containers" .none))
+      (sequentially (values.map Action.inCaller ++ [enter (from_ := rider.map Location.inCaller)])) :=
+  rfl
+
+action ballotArgument (ballot : Ballot) := { body := vote (ballot := ballot) }
+example (candidate : NounPhrase) : ballotArgument (.byCandidate candidate) =
+    .ownScope (some (.action "ballotArgument" .none)) (vote (ballot := .byCandidate (.inCaller candidate))) := rfl
+
+keyword recursiveKeyword := { body := [static (cant any attack
+  (except := byObjects (bare (hasKeyword recursiveKeyword))))] }
+keyword parameterKeyword (amount : Amount) (cost : Cost) := { body := [activated cost (draw amount)] }
+example : (parameterKeyword : KeywordLabel) = parameterKeyword.label := rfl
+example : (parameterKeyword : KeywordTerm) = theKeyword parameterKeyword.label := rfl
+example : (parameterKeyword : Option KeywordLabel) = some parameterKeyword.label := rfl
+example : (parameterKeyword : Option KeywordTerm) = some (theKeyword parameterKeyword.label) := rfl
+example : (recursiveKeyword : KeywordTerm) = theKeyword recursiveKeyword.label := rfl
+
+keyword nounKeyword (subject : NounPhrase) := {
+  body := [spell (instruct subject (sacrifice subject))],
+}
+example (subject : NounPhrase) : nounKeyword subject =
+    Ability.keyword nounKeyword.label []
+      [spell (instruct (.firstMention "nounKeyword.subject" (.inCaller subject))
+        (sacrifice (.laterMention "nounKeyword.subject" (.inCaller subject))))] := rfl
+
+abbrev KeywordNumber := Amount
+keyword aliasedKeyword (amount : KeywordNumber) := { body := [spell (draw amount)] }
+example (amount : Amount) : aliasedKeyword amount =
+    Ability.keyword aliasedKeyword.label [.number (.inCaller amount)]
+      [spell (draw (.inCaller amount))] := rfl
+
+keyword selfFlying := {
+  body := [static (cant any (block thisCreature)
+    (except := byObjects (bare [creature, andOr [hasKeyword selfFlying, hasKeyword reach]])))],
+}
+keyword selfSuspend (amount : Amount) (cost : Cost) := {
+  body := [
+    static (specialAction (whileTrue (couldBeginToCast you thisCard yourHand)) cost
+      (exileWithCounters thisCard amount timeCounter)),
+    at_ (beginningOfYour .upkeep)
+      (if_ := is thisCard [in_ exileZone, hasKeyword selfSuspend, hasCounter timeCounter])
+      (removeCounters (oneThrough 1) timeCounter thisCard),
+    when (does any (removeCounters theLast timeCounter thisCard))
+      (if_ := is thisCard (in_ exileZone))
+      [may (play thisCard (payment := withoutPaying)),
+       doIf (did you (cast (a [creature, spell])) thisWay)
+        (gain (that spell) haste
+          (forAsLongAs (or [is (that spell) youControl, is (becomes (that spell)) youControl])))],
+  ],
+}
+theorem selfFlyingChecks : Ability.check (DRS.ofList []) selfFlying = [] := by decide
+theorem selfSuspendChecks : Ability.check (DRS.ofList []) (selfSuspend 2 [blue]) = [] := by decide
+
+ability_word testWord := { body := activated [blue] (draw 1) }
+example : testWord = abilityWord (.named "testWord") (activated [blue] (draw 1)) := rfl
+
+ability_word alreadyWord := { body := landfall (activated [blue] (draw 1)) }
+example : alreadyWord = landfall (activated [blue] (draw 1)) := rfl
+
+counter testCounter := { lemma := "test counter", plural := "test counters", confers := [] }
+subtype testSubtype := { lemma := "Test", kind := creature }
+subtype testSpellSubtype := { lemma := "Test spell", kind := .spell }
+designation testDesignation := { scope := .heldBy .player, sole := true }
+card_type testCardType := { name := "Test", permanent := false }
+relation testRelation := { lemma := "testRelation" }
+token testToken := { name := "Test", token := { types := [artifact] } }
+sba testSba := { scope := creature, when := exists_ creature, then_ := draw 1 }
+conferral testConferral := { scope := creature, confer := boost (up 1) (up 1) }
+card testCard := { name := "Test", types := [sorcery], text := [spell (draw 1)] }
+
+card authoredSurface := {
+  name := "Authored surface", cost := [blue, 2], types := [sorcery],
+  text := [parameterKeyword 2 [blue], spell [drawCards 1, draw 1]],
+}
+card authoredSpree := {
+  name := "Authored spree", cost := [white], types := [sorcery],
+  text := [spell (chooseSpree [([generic 1], draw 1), ([generic 2], draw 2)])],
+}
+theorem postponedListsRetainAuthorship : authoredSpree.authoring.onlyAuthored = true :=
+  authoredSpree.onlyAuthored
+
+theorem surfaceRetainsAuthorship : authoredSurface.authoring.onlyAuthored = true :=
+  authoredSurface.onlyAuthored
+
+open Lean Elab Command in
+run_cmd do
+  let env ← getEnv
+  unless Semantics.Authoring.primitiveAttribute.hasTag env
+      ``Semantics.Proofs.Authoring.BundleDsl.atom do throwError "primitive tag missing"
+  unless (Semantics.Authoring.declarationMetadataExt.getState env).any
+      (fun entry => entry.declaration == ``Semantics.Proofs.Authoring.BundleDsl.testCounter &&
+        entry.kind == `counter && entry.fields.any (·.1 == `plural)) do
+    throwError "declaration metadata missing"
+
+example : RegistryDefinition.check testCounter_definition = [] := ok_testCounter
+example : RegistryDefinition.check testSubtype_definition = [] := ok_testSubtype
+example : RegistryDefinition.check testSpellSubtype_definition = [] := ok_testSpellSubtype
+example : RegistryDefinition.check testDesignation_definition = [] := ok_testDesignation
+example : RegistryDefinition.check testCardType_definition = [] := ok_testCardType
+example : RegistryDefinition.check testRelation_definition = [] := ok_testRelation
+example : PredefinedToken.check testToken = [] := ok_testToken
+example : SbaRule.check testSba = [] := ok_testSba
+example : ConferralRule.check testConferral = [] := ok_testConferral
+example : Card.check testCard.card = [] := ok_testCard
+example : testCard.authoring.onlyAuthored = true := testCard.onlyAuthored
+
+example : ([] : Action) = sequentially [] := rfl
+example : ([] : Predicate) = Templates.Predicate.and [] := rfl
+example : ([] : Condition) = Templates.Condition.and [] := rfl
+example : ([] : StaticSpec) = conjunction [] := rfl
+example : ([] : Cost) = mana [] := rfl
+example : ([] : Option (List Color)) = some [] := rfl
+example : (instant : NounWord) = NounWord.type .instant := rfl
+example : (sorcery : NounWord) = NounWord.type .sorcery := rfl
+example : (kindred : NounWord) = NounWord.type .kindred := rfl
+
+example : ([draw 1, draw 2] : Action) = sequentially [draw 1, draw 2] := rfl
+example : ([isCard] : Predicate) = Templates.Predicate.and [isCard] := rfl
+example : ([exists_ isCard] : Condition) = Templates.Condition.and [exists_ isCard] := rfl
+example : ([cant any attack] : StaticSpec) = conjunction [cant any attack] := rfl
+example : ([blue, 2] : Cost) = mana [pip .blue, generic 2] := rfl
+example : ([[blue], tapSymbol] : Cost) = compound [mana [pip .blue], tapSymbol] := rfl
+example : ([blue] : Option (List Color)) = some [Color.blue] := rfl
+example : (blue : ColorOrColorless) = ColorOrColorless.of .blue := rfl
+example : (combat : Option DamageKind) = some DamageKind.combat := rfl
+example : (this : NounPhrase) = this_ := rfl
+example : ({ subtypes := [testSubtype] } : CharacteristicBundle) =
+    { characteristics := { subtypes := [testSubtype] } } := rfl
+example : (cant any attack : Ability) = static (cant any attack) := rfl
+
+open Lean Authoring in
+#guard match topoSortBundle [
+  { key := ⟨`z, `Semantics.Action⟩, file := "z.lean", references := [`a] },
+  { key := ⟨`a, `Semantics.Predicate⟩, file := "a.lean" },
+  { key := ⟨`a, `Semantics.Condition⟩, file := "other.lean" },
+  { key := ⟨`flying, `Semantics.Ability⟩, file := "kw.lean", references := [`flying] },
+  { key := ⟨`devour, `Semantics.Ability⟩, file := "kw.lean", references := [`devour] },
+  { key := ⟨`devour, `Semantics.Action⟩, file := "act.lean" }
+] with
+| .ok items => items.map (·.key) ==
+    [⟨`a, `Semantics.Condition⟩, ⟨`a, `Semantics.Predicate⟩, ⟨`devour, `Semantics.Action⟩,
+     ⟨`devour, `Semantics.Ability⟩, ⟨`flying, `Semantics.Ability⟩, ⟨`z, `Semantics.Action⟩]
+| .error _ => false
+
+open Lean Authoring in
+#guard match topoSortBundle [
+  { key := ⟨`a, `Semantics.Action⟩, file := "a.lean", references := [`b] },
+  { key := ⟨`b, `Semantics.Action⟩, file := "b.lean", references := [`a] }
+] with
+| .error message => message ==
+    "Dependency cycle in bundle: a : Semantics.Action (a.lean), b : Semantics.Action (b.lean)"
+| .ok _ => false
+
+end BundleDsl
+
+namespace BundleFixture
+load_bundle "test-fixtures/authoring-bundle"
+example : bundleCard.card.check = [] := ok_bundleCard
+example : bundleCard.authoring.onlyAuthored = true := bundleCard.onlyAuthored
+example : (bundleQuality : Predicate) = bundleAtom := rfl
+end BundleFixture
 
 end Semantics.Proofs.Authoring

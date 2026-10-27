@@ -7,8 +7,8 @@ Caller-scope wrapping (`inCaller`) for `Definition` arguments in Semantics v3
 (`docs/decisions/semantics-v3.md` §1.4, §2). `withBindings`, `CaptureInput`, and
 `Amount.parameter` are retired. Definition `NounPhrase` parameter identities (`BindingId`)
 are generated as outermost `firstMention` / `laterMention` around `inCaller`; a written
-`NounPhrase.inCaller p` opts that occurrence out. Templates and performer identities remain
-hand-written, as do the other `X.inCaller` wrappers.
+`NounPhrase.inCaller p` opts that occurrence out. The `action` and `keyword` commands wrap
+parameters through these instances; `template` preserves their caller scope.
 -/
 
 namespace Semantics
@@ -57,6 +57,17 @@ instance : CallerScope TokenSpec where
 
 instance : CallerScope MoveRider where
   caller := MoveRider.inCaller
+
+instance {α : Type} [CallerScope α] : CallerScope (Option α) where
+  caller := Option.map CallerScope.caller
+
+instance {α : Type} [CallerScope α] : CallerScope (List α) where
+  caller := List.map CallerScope.caller
+
+instance : CallerScope Ballot where
+  caller
+    | .byCandidate candidates => .byCandidate (CallerScope.caller candidates)
+    | ballot => ballot
 
 class CallerSplice (α : Type) where
   close : α → α

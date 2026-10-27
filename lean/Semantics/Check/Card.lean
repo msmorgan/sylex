@@ -340,6 +340,8 @@ open Lean Meta Elab Term in
 @[term_elab spelledTerm] unsafe def elabSpelled : TermElab := fun stx _ => do
   let `(spelled <| $card) := stx | throwUnsupportedSyntax
   let value ← elabTermEnsuringType card (mkConst ``Semantics.Card)
+  synthesizeSyntheticMVarsNoPostponing
+  let value ← instantiateMVars value
   let form ← Authoring.inspect value
   unless form.onlyAuthored do
     throwError "Card definitions must use semantic templates or definitions; raw constructors: {form.rawNames.eraseDups}"

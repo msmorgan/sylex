@@ -26,7 +26,7 @@ end Semantics
 
 namespace Semantics.Authoring
 
-open Lean Meta Elab Command
+open Lean Meta Elab Command Term
 
 inductive Form where
   | data (children : List Form)
@@ -157,6 +157,82 @@ initialize spliceSchemas : SimplePersistentEnvExtension (Name × Array Name) (Na
     addImportedFn := mkStateFromImportedEntries addSpliceSchema {}
   }
 
+/-- Expected-result dispatch entries survive module imports. -/
+structure ExpectedTypeEntry where
+  bareName : Name
+  returnType : Name
+  declaration : Name
+  deriving Inhabited
+
+initialize expectedTypeDispatchExt : SimplePersistentEnvExtension ExpectedTypeEntry
+    (List ExpectedTypeEntry) ← registerSimplePersistentEnvExtension {
+  addEntryFn := fun entries entry => entry :: entries
+  addImportedFn := fun imports => imports.toList.flatMap Array.toList
+}
+
+private def registerExpectedType (declaration : Name) : CommandElabM Unit := do
+  let result ← liftTermElabM do
+    forallTelescopeReducing (← getConstInfo declaration).type fun _ result =>
+      return result.getAppFn.constName?
+  if let some returnType := result then
+    let bareName := Name.mkSimple declaration.getString!
+    modifyEnv fun env => expectedTypeDispatchExt.addEntry env
+      { bareName, returnType, declaration }
+    let word := bareName.getString!
+    let nounAliases := ["Creature", "Artifact", "Enchantment", "Land", "Planeswalker", "Battle",
+      "Instant", "Sorcery", "Kindred", "Card", "Permanent", "Player", "Token", "Spell"]
+    if returnType == `Semantics.Predicate && nounAliases.any (fun n => word == "is" ++ n) then
+      let alias := Name.mkSimple ((word.drop 2).toString.toLower)
+      modifyEnv fun env => expectedTypeDispatchExt.addEntry env
+        { bareName := alias, returnType, declaration }
+    if bareName == `this_ then
+      modifyEnv fun env => expectedTypeDispatchExt.addEntry env
+        { bareName := `this, returnType, declaration }
+
+private def lastNameComponent : Name → String
+  | .str _ part => part
+  | _ => ""
+
+private def needsExpectedTypeDispatch (entries : List ExpectedTypeEntry) (bare : Name) : Bool :=
+  let entries := entries.filter (·.bareName == bare)
+  entries.any (fun e =>
+    lastNameComponent e.declaration.getPrefix == e.returnType.getString! ||
+    e.declaration.getString! != bare.getString!) ||
+    (entries.map (·.returnType)).eraseDups.length > 1
+
+private def dispatchTarget? (bare sort : Name) : TermElabM (Option Name) := do
+  let entries := expectedTypeDispatchExt.getState (← getEnv)
+  unless needsExpectedTypeDispatch entries bare do return none
+  let ns ← getCurrNamespace
+  let opens ← getOpenDecls
+  let visible := fun (decl : Name) =>
+    let scopeName := if lastNameComponent decl.getPrefix == sort.getString! then
+        decl.getPrefix.getPrefix else decl.getPrefix
+    scopeName.isPrefixOf ns || opens.any (fun
+      | .simple n _ => n == scopeName
+      | .explicit _ n => n == decl)
+  return (entries.find? fun e => e.bareName == bare && e.returnType == sort &&
+    visible e.declaration).map (·.declaration)
+
+@[scoped term_elab Lean.Parser.Term.app]
+def dispatchOnExpectedType : TermElab := fun stx expected? => do
+  unless (← getEnv).contains `Semantics.Action do throwUnsupportedSyntax
+  let fn := stx[0]
+  unless fn.isIdent do throwUnsupportedSyntax
+  unless needsExpectedTypeDispatch (expectedTypeDispatchExt.getState (← getEnv)) fn.getId do
+    throwUnsupportedSyntax
+  if (← getLCtx).findFromUserName? fn.getId |>.isSome then throwUnsupportedSyntax
+  let some expected := expected? | throwUnsupportedSyntax
+  let expected ← instantiateMVars expected
+  if expected.getAppFn.isMVar then
+    tryPostpone
+    throwUnsupportedSyntax
+  let some sort := (← whnfR expected).getAppFn.constName? | throwUnsupportedSyntax
+  let some target ← dispatchTarget? fn.getId sort | throwUnsupportedSyntax
+  if fn.getId == target then throwUnsupportedSyntax
+  let call := stx.setArg 0 (mkCIdentFrom fn target)
+  withMacroExpansion stx call <| Term.elabTerm call expected?
+
 /-- A supplied expression or parameterized body retaining its caller's scope. -/
 syntax (name := spliceMode) "splice " term : term
 
@@ -240,7 +316,7 @@ lexical context and splice schema. The caller tags it a definition or a template
 private def elabAuthoredDecl (mods : TSyntax ``Parser.Command.declModifiers)
     (name : TSyntax ``Parser.Command.declId) (signature : TSyntax ``Parser.Command.optDeclSig)
     (value : TSyntax ``Parser.Command.declVal) : CommandElabM Unit := do
-    let context ← `(bracketedBinder| [Semantics.AuthoringContext])
+    let context ← `(bracketedBinder| [$(mkIdent `Semantics.AuthoringContext)])
     let mut binders := #[context.raw]
     let mut splices : Array (TSyntax `ident) := #[]
     for binder in signature.raw[0].getArgs do
@@ -266,8 +342,8 @@ private def elabAuthoredDecl (mods : TSyntax ``Parser.Command.declModifiers)
       for identifier in splices.reverse do
         body ← `(term| let $identifier := $closeFn $identifier; $body)
       body ← `(term|
-        letI : Semantics.AuthoringContext :=
-          Semantics.AuthoringContext.child (inferInstance : Semantics.AuthoringContext)
+        letI : $(mkIdent `Semantics.AuthoringContext) :=
+          $(mkIdent `Semantics.AuthoringContext.child) (inferInstance : $(mkIdent `Semantics.AuthoringContext))
         $body)
       value := ⟨value.raw.setArg 1 body.raw⟩
     elabCommand (← `($mods:declModifiers def $name:declId $signature:optDeclSig $value:declVal))
@@ -275,6 +351,7 @@ private def elabAuthoredDecl (mods : TSyntax ``Parser.Command.declModifiers)
     elabCommand (← `(attribute [contextual_authoring] $identifier:ident))
     let declaration ← resolveGlobalConstNoOverload identifier
     modifyEnv fun env => spliceSchemas.addEntry env (declaration, splices.map (·.getId))
+    registerExpectedType declaration
 
 /-- The label a keyword ability Definition is written under (`.keyword (.named "kicker") …`), read
 from its expansion with its parameters left abstract; `none` for any other Definition. -/
@@ -331,6 +408,104 @@ private def checkActionDeed (declaration : Name) (deed : Expr) : MetaM Unit := d
 `Deed.action`. -/
 def deedConstant (name : Name) : Name := name ++ `deed
 
+private def countFVarOccurrences (fvar : FVarId) (e : Expr) : Nat :=
+  match e with
+  | .fvar id => if id == fvar then 1 else 0
+  | .app fn arg =>
+    if e.isAppOfArity `Semantics.NounPhrase.inCaller 1 && arg.isFVar then 0
+    else countFVarOccurrences fvar fn + countFVarOccurrences fvar arg
+  | .lam _ ty body _ | .forallE _ ty body _ =>
+    countFVarOccurrences fvar ty + countFVarOccurrences fvar body
+  | .letE _ ty val body _ =>
+    countFVarOccurrences fvar ty + countFVarOccurrences fvar val + countFVarOccurrences fvar body
+  | .mdata _ b | .proj _ _ b => countFVarOccurrences fvar b
+  | _ => 0
+
+private def isTheActorExpr (e : Expr) : Bool :=
+  e.isAppOfArity `Semantics.Templates.theActor 1 ||
+  e.isConstOf `Semantics.NounPhrase.actor ||
+  e.isConstOf `Semantics.Primitives.NounPhrase.actor
+
+private def countActorOccurrences (e : Expr) : Nat :=
+  if isTheActorExpr e then 1
+  else match e with
+  | .app fn arg => countActorOccurrences fn + countActorOccurrences arg
+  | .lam _ ty body _ | .forallE _ ty body _ =>
+    countActorOccurrences ty + countActorOccurrences body
+  | .letE _ ty val body _ =>
+    countActorOccurrences ty + countActorOccurrences val + countActorOccurrences body
+  | .mdata _ b | .proj _ _ b => countActorOccurrences b
+  | _ => 0
+
+private partial def rewriteMentions (wrapInCaller : Bool) (actorIdentity? : Option String)
+    (parameters : List (FVarId × String)) (e : Expr) (acceptsIdentity : Bool := true) :
+    StateT (List String) TermElabM Expr := do
+  if let some actorId := actorIdentity? then
+    if isTheActorExpr e then
+      let seen ← get
+      let mention := if seen.contains actorId then `Semantics.NounPhrase.laterMention
+        else `Semantics.NounPhrase.firstMention
+      set (actorId :: seen)
+      return mkApp2 (mkConst mention) (mkStrLit actorId) e
+  match e with
+  | .fvar id =>
+    let some (_, identity) := parameters.find? (·.1 == id) | return e
+    unless acceptsIdentity do
+      throwError "NounPhrase parameter requires a semantic constructor or authored declaration"
+    let seen ← get
+    let mention := if seen.contains identity then `Semantics.NounPhrase.laterMention
+      else `Semantics.NounPhrase.firstMention
+    set (identity :: seen)
+    let inner := if wrapInCaller then mkApp (mkConst `Semantics.NounPhrase.inCaller) e else e
+    return mkApp2 (mkConst mention) (mkStrLit identity) inner
+  | .app fn arg =>
+    if e.isAppOfArity `Semantics.NounPhrase.inCaller 1 && arg.isFVar then
+      return e
+    let acceptsArgument := acceptsParameterIdentity (← getEnv) e.getAppFn
+    return .app (← rewriteMentions wrapInCaller actorIdentity? parameters fn acceptsIdentity)
+      (← rewriteMentions wrapInCaller actorIdentity? parameters arg acceptsArgument)
+  | .lam n ty b bi =>
+    return .lam n ty (← rewriteMentions wrapInCaller actorIdentity? parameters b) bi
+  | .letE n ty v b nd =>
+    return .letE n ty (← rewriteMentions wrapInCaller actorIdentity? parameters v)
+      (← rewriteMentions wrapInCaller actorIdentity? parameters b) nd
+  | .mdata d b =>
+    return .mdata d (← rewriteMentions wrapInCaller actorIdentity? parameters b acceptsIdentity)
+  | .proj n i b =>
+    return .proj n i (← rewriteMentions wrapInCaller actorIdentity? parameters b false)
+  | _ => return e
+
+syntax (name := bindDeclBody) "bind_decl_body% " ident str term : term
+elab_rules : term <= expected
+  | `(bind_decl_body% $isDef:ident $declName:str $body:term) => do
+    let isDefinition := isDef.getId.eraseMacroScopes == `true
+    let value ← Term.elabTermEnsuringType body expected
+    Term.synthesizeSyntheticMVarsNoPostponing
+    let mut value ← instantiateMVars value
+    if isDefinition then
+      let mut substitutions : Array (FVarId × Expr) := #[]
+      for localDecl in ← getLCtx do
+        unless localDecl.isImplementationDetail do
+          if !(← whnf localDecl.type).isConstOf `Semantics.NounPhrase then
+            let classType := mkApp (mkConst `Semantics.CallerScope) localDecl.type
+            if let .some _ ← trySynthInstance classType then
+              let wrapped ← mkAppM `Semantics.CallerScope.caller #[mkFVar localDecl.fvarId]
+              substitutions := substitutions.push (localDecl.fvarId, wrapped)
+      value := value.replace fun e =>
+        if e.isFVar then (substitutions.find? (·.1 == e.fvarId!)).map (·.2) else none
+    let mut npParams : List (FVarId × String) := []
+    for localDecl in ← getLCtx do
+      unless localDecl.isImplementationDetail do
+        if (← whnf localDecl.type).isConstOf `Semantics.NounPhrase then
+          let idStr := s!"{declName.getString}.{localDecl.userName}"
+          if isDefinition || countFVarOccurrences localDecl.fvarId value ≥ 2 then
+            npParams := npParams ++ [(localDecl.fvarId, idStr)]
+    let actorId? :=
+      if isDefinition && countActorOccurrences value ≥ 2 then
+        some s!"{declName.getString}.actor"
+      else none
+    return (← (rewriteMentions isDefinition actorId? npParams value).run []).1
+
 syntax (name := semanticDefinitionDecl) declModifiers "semantic_definition " declId
   ppIndent(optDeclSig) declVal : command
 
@@ -345,7 +520,9 @@ elab_rules : command
     let declarationName := (⟨name.raw[0]⟩ : TSyntax `ident).getId
     let identityPrefix := Syntax.mkStrLit declarationName.getString!
     let body : Term := ⟨value.raw[1]⟩
-    let body ← `(term| bind_parameters% $identityPrefix $body)
+    let body ← if body.raw.getKind == ``bindDeclBody then
+      pure body
+    else `(term| bind_parameters% $identityPrefix $body)
     let value := ⟨value.raw.setArg 1 body.raw⟩
     elabAuthoredDecl mods name signature value
     -- A failed body may have recovered to `sorry`; do not diagnose its missing scope too.
@@ -362,7 +539,7 @@ elab_rules : command
     elabCommand (← `(attribute [«semantic_definition»] $identifier:ident))
     if let some label ← liftTermElabM (keywordDefinitionLabel? declaration) then
       let labelName := keywordLabelConstant declaration
-      liftCoreM <| addAndCompile <| .defnDecl {
+      unless (← getEnv).contains labelName do liftCoreM <| addAndCompile <| .defnDecl {
         name := labelName
         levelParams := []
         type := mkConst `Semantics.KeywordLabel
@@ -592,6 +769,472 @@ def inspect (term : Expr) (visited : List Name := [])
   let cache ← IO.mkRef ({} : InspectionCache)
   let clean ← IO.mkRef ({} : Std.HashSet Name)
   inspectCore cache clean term visited context parameters bodyParameter
+
+private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) := do
+  let env ← getEnv
+  let localLabel := (← getCurrNamespace) ++ stx.getId ++ `label
+  if env.contains localLabel then
+    return some localLabel
+  let sortedLabel := (← getCurrNamespace) ++ `Ability ++ stx.getId ++ `label
+  if env.contains sortedLabel then return some sortedLabel
+  let candidates ← try resolveGlobalConst stx catch _ => pure []
+  let some defn := candidates.find? (Authoring.definitionAttribute.hasTag env) | return none
+  let lbl := Authoring.keywordLabelConstant defn
+  return if env.contains lbl then some lbl else none
+
+@[scoped term_elab ident] def elabBareIdentDispatch : TermElab := fun stx expected? => do
+  unless (← getEnv).contains `Semantics.Action do throwUnsupportedSyntax
+  let some expected := expected? | throwUnsupportedSyntax
+  if let some ldecl := (← getLCtx).findFromUserName? stx.getId then
+    unless ldecl.isAuxDecl do throwUnsupportedSyntax
+  let entries := expectedTypeDispatchExt.getState (← getEnv)
+  let inTable := needsExpectedTypeDispatch entries stx.getId
+  let kwLabel? ← resolveKeywordLabelConst? stx
+  if !inTable && kwLabel?.isNone then
+    throwUnsupportedSyntax
+  let expected ← instantiateMVars expected
+  if expected.getAppFn.isMVar then
+    tryPostpone
+    throwUnsupportedSyntax
+  let expectedWhnf ← whnfR expected
+  let (expectedHead, isOption) :=
+    if expectedWhnf.isAppOfArity ``Option 1 then
+      (expectedWhnf.appArg!, true)
+    else
+      (expectedWhnf, false)
+  let some sort := (← whnfR expectedHead).getAppFn.constName? | throwUnsupportedSyntax
+  -- 1. Check bare noun / keyword dispatch table
+  if let some targetDecl ← dispatchTarget? stx.getId sort then
+    if stx.getId == targetDecl then throwUnsupportedSyntax
+    let term ← if isOption then `(term| some $(mkCIdentFrom stx targetDecl))
+      else pure (mkCIdentFrom stx targetDecl)
+    return ← withMacroExpansion stx term <| elabTerm term (some expected)
+  -- 2. Check KeywordLabel / KeywordTerm resolution (including self-reference during keyword elab)
+  if sort == `Semantics.KeywordLabel || sort == `Semantics.KeywordTerm then
+    if let some labelConst := kwLabel? then
+      let term ←
+        if sort == `Semantics.KeywordLabel then
+          if isOption then `(term| some $(mkCIdentFrom stx labelConst))
+          else pure (mkCIdentFrom stx labelConst)
+        else
+          if isOption then `(term| some ($(mkIdent `Semantics.Templates.theKeyword) $(mkCIdentFrom stx labelConst)))
+          else `(term| $(mkIdent `Semantics.Templates.theKeyword) $(mkCIdentFrom stx labelConst))
+      return ← withMacroExpansion stx term <| elabTerm term (some expected)
+  throwUnsupportedSyntax
+
+/-- Top-down structure literal elaborator: allows writing `{ subtypes := [subtype] }` directly
+where `CharacteristicBundle` is expected. -/
+@[scoped term_elab Lean.Parser.Term.structInst] def elabCharacteristicBundleStruct : TermElab :=
+    fun stx expected? => do
+  unless (← getEnv).contains `Semantics.Action do throwUnsupportedSyntax
+  let some expected := expected? | throwUnsupportedSyntax
+  let fields := stx[2][0].getSepArgs
+  if fields.any (fun field => field[0][0].getId.eraseMacroScopes ∈ [`characteristics, `copyOf]) then
+    throwUnsupportedSyntax
+  let expected ← instantiateMVars expected
+  if expected.getAppFn.isMVar then
+    tryPostpone
+    throwUnsupportedSyntax
+  let expectedWhnf ← whnfR expected
+  unless expectedWhnf.isConstOf `Semantics.CharacteristicBundle do throwUnsupportedSyntax
+  let structTerm : Term := ⟨stx⟩
+  let expanded ← `(term| ({ characteristics := $structTerm } : $(mkIdent `Semantics.CharacteristicBundle)))
+  withMacroExpansion stx expanded <| elabTerm expanded (some expected)
+
+
+/-- Top-down list literal elaborator (`Action` → `sequentially`, `Predicate` → `Predicate.and`,
+`Condition` → `Condition.and`, `StaticSpec` → `conjunction`, `Cost` → `mana` or `compound`,
+`Option (List α)` → `some [...]`). Intercepts `List.cons` after `«term[_]»` macro expansion so
+expected element types flow top-down into every list element! -/
+@[scoped term_elab Lean.Parser.Term.app] def elabDomainList : TermElab := fun stx expected? => do
+  unless (← getEnv).contains `Semantics.Action do throwUnsupportedSyntax
+  let fn := if stx.isIdent then stx else stx[0]
+  unless fn.isIdent && fn.getId.eraseMacroScopes ∈ [``List.cons, ``List.nil] do
+    throwUnsupportedSyntax
+  let some expected := expected? | throwUnsupportedSyntax
+  let expected ← instantiateMVars expected
+  if expected.getAppFn.isMVar then
+    tryPostpone
+    throwUnsupportedSyntax
+  let expectedWhnf ← whnfR expected
+  let listTerm : Term := ⟨stx⟩
+  if expectedWhnf.isAppOfArity ``Option 1 then
+    let inner ← whnfR expectedWhnf.appArg!
+    if inner.isAppOfArity ``List 1 then
+      let expanded ← `(term| some $listTerm)
+      return ← withMacroExpansion stx expanded <| elabTerm expanded (some expected)
+  let some sort := expectedWhnf.getAppFn.constName? | throwUnsupportedSyntax
+  match sort with
+  | `Semantics.Action =>
+    let expanded ← `(term| $(mkIdent `Semantics.Templates.sequentially) $listTerm)
+    withMacroExpansion stx expanded <| elabTerm expanded (some expected)
+  | `Semantics.Predicate =>
+    let expanded ← `(term| $(mkIdent `Semantics.Templates.Predicate.and) $listTerm)
+    withMacroExpansion stx expanded <| elabTerm expanded (some expected)
+  | `Semantics.Condition =>
+    let expanded ← `(term| $(mkIdent `Semantics.Templates.Condition.and) $listTerm)
+    withMacroExpansion stx expanded <| elabTerm expanded (some expected)
+  | `Semantics.StaticSpec =>
+    let expanded ← `(term| $(mkIdent `Semantics.Templates.conjunction) $listTerm)
+    withMacroExpansion stx expanded <| elabTerm expanded (some expected)
+  | `Semantics.Cost =>
+    let saved ← saveState
+    try
+      let manaExpanded ← `(term| $(mkIdent `Semantics.Templates.mana) $listTerm)
+      let res ← withMacroExpansion stx manaExpanded <| elabTerm manaExpanded (some expected)
+      Term.synthesizeSyntheticMVarsNoPostponing
+      if ← MonadLog.hasErrors then
+        restoreState saved
+        let compExpanded ← `(term| $(mkIdent `Semantics.Templates.compound) $listTerm)
+        withMacroExpansion stx compExpanded <| elabTerm compExpanded (some expected)
+      else
+        return res
+    catch _ =>
+      restoreState saved
+      let compExpanded ← `(term| $(mkIdent `Semantics.Templates.compound) $listTerm)
+      withMacroExpansion stx compExpanded <| elabTerm compExpanded (some expected)
+  | _ =>
+    throwUnsupportedSyntax
+
+
+syntax (name := keywordArguments) "keyword_arguments% " "[" term,* "]" : term
+elab_rules : term
+  | `(keyword_arguments% [$arguments,*]) => do
+    let mut values := #[]
+    for argument in arguments.getElems do
+      let value ← elabTerm argument none
+      let type ← whnf (← inferType value)
+      if type.isConstOf `Semantics.NounPhrase then continue
+      let ctor ← match type.getAppFn.constName? with
+        | some `Semantics.Cost => pure `cost
+        | some `Semantics.Amount => pure `number
+        | some `Semantics.Predicate => pure `quality
+        | some `Semantics.DeckCondition => pure `deckCondition
+        | some `Semantics.Ability => pure `ability
+        | _ => throwErrorAt argument "No KeywordParam constructor for {type}"
+      values := values.push (← mkAppM (`Semantics.KeywordParam ++ ctor) #[value])
+    mkListLit (mkConst `Semantics.KeywordParam) values.toList
+
+elab "ability_word_body% " label:str body:term : term <= expected => do
+  let value ← elabTermEnsuringType body expected
+  let reduced ← whnf value
+  if reduced.isAppOfArity `Semantics.Ability.italicHead 2 &&
+      reduced.appFn!.appArg!.isAppOfArity `Semantics.ItalicWord.abilityWord 1 then return value
+  let label := mkStrLit label.getString
+  mkAppM `Semantics.Templates.abilityWord
+    #[mkApp (mkConst `Semantics.AbilityWordLabel.named) label, value]
+
+initialize primitiveAttribute : TagAttribute ←
+  registerTagAttribute `semantic_primitive "An authored primitive declaration."
+
+structure DeclarationMetadata where
+  declaration : Name
+  kind : Name
+  fields : List (Name × Syntax)
+
+initialize declarationMetadataExt : SimplePersistentEnvExtension DeclarationMetadata
+    (List DeclarationMetadata) ← registerSimplePersistentEnvExtension {
+  addEntryFn := fun entries entry => entry :: entries
+  addImportedFn := fun imports => imports.toList.flatMap Array.toList
+}
+
+syntax declField := ident " := " term
+syntax declBlock := "{" withoutPosition(sepBy(declField, ",", ", ", allowTrailingSep)) "}"
+syntax (name := authoredDeclCmd) declModifiers ident ident ppIndent(optDeclSig)
+  " := " (declBlock <|> term) : command
+
+private def commandReturnType? (kind : Name) : Option Name :=
+  match kind with
+  | `action => some `Action | `keyword | `ability_word => some `Ability
+  | `counter => some `CounterKind | `subtype => some `Subtype
+  | `designation => some `DesignationLabel | `card_type => some `CardType
+  | `relation => some `RelationLabel | `token => some `PredefinedToken
+  | `sba => some `SbaRule | `conferral => some `ConferralRule | `card => some `Spelled
+  | _ => none
+
+private def authoredKinds : List Name :=
+  [`primitive, `template, `action, `keyword, `ability_word, `counter, `designation,
+   `subtype, `card_type, `relation, `token, `sba, `conferral, `card]
+
+private def blockFields (block : Syntax) : CommandElabM (List (Name × Term)) := do
+  let mut fields := []
+  for field in block[1].getSepArgs do
+    let key := field[0].getId.eraseMacroScopes
+    if fields.any (·.1 == key) then throwErrorAt field "Duplicate declaration field {key}"
+    if key ∈ [`rule, `parameters] then throwErrorAt field "Unsupported declaration field {key}"
+    fields := fields ++ [(key, ⟨field[2]⟩)]
+  return fields
+
+private def makeStruct (fields : List (Name × Term)) : CommandElabM Term := do
+  let fs ← fields.toArray.mapM fun (key, value) =>
+    `(Parser.Term.structInstField| $(mkIdent key):ident := $value)
+  `(term| { $fs:structInstField,* })
+
+private def generatedCheck (name : Ident) (sort : Name) : CommandElabM Unit := do
+  let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
+  let check := mkIdent (`Semantics ++ sort ++ `check)
+  elabCommand (← `(theorem $ok : $check $name = [] := by decide))
+
+@[command_elab authoredDeclCmd]
+def elabAuthoredCommand : CommandElab := fun stx => do
+  let mods : TSyntax ``Parser.Command.declModifiers := ⟨stx[0]⟩
+  let kind := stx[1].getId.eraseMacroScopes
+  unless authoredKinds.contains kind do throwUnsupportedSyntax
+  let original : Ident := ⟨stx[2]⟩
+  let mut name := original
+  let mut sig : TSyntax ``Parser.Command.optDeclSig := ⟨stx[3]⟩
+  let payload := stx[5]
+  let fields ← if payload.isOfKind ``declBlock then blockFields payload else pure []
+  let required := fun key => match fields.lookup key with
+    | some value => pure value
+    | none => throwErrorAt payload "{kind} requires `{key} := ...`"
+  let label := (fields.lookup `lemma).getD (Syntax.mkStrLit original.getId.getString!)
+  let rules := (fields.lookup `rules <|> fields.lookup `confers).getD (← `(term| []))
+  let resultSort? ← if sig.raw[1].isNone then
+      pure ((commandReturnType? kind).map (`Semantics ++ ·))
+    else if sig.raw[1][0][1].isIdent then liftTermElabM do
+      let candidates ← try resolveGlobalConst sig.raw[1][0][1] catch _ => pure []
+      if let some candidate := candidates.head? then
+        return (← whnf (← mkConstWithFreshMVarLevels candidate)).getAppFn.constName?
+      else return none
+    else pure none
+  let resultName := resultSort?.map (fun sort => Name.mkSimple sort.getString!)
+  if sig.raw[1].isNone then
+    let some result := resultName | throwErrorAt sig "{kind} requires an explicit return type"
+    sig := ⟨sig.raw.setArg 1 (mkNullNode #[(← `(Parser.Term.typeSpec| : $(mkIdent (`Semantics ++ result)))).raw])⟩
+  if kind ∈ [`primitive, `template, `action, `keyword] then
+    let full := (← getCurrNamespace) ++ original.getId
+    if (← getEnv).contains full then
+      let some result := resultName | throwErrorAt sig "Expected a named return type"
+      name := mkIdentFrom original (result ++ original.getId)
+  if kind ∈ [`primitive, `template, `action, `keyword] then
+    if let some result := resultSort? then
+      let declaration := (← getCurrNamespace) ++ name.getId
+      modifyEnv fun env => expectedTypeDispatchExt.addEntry env {
+        bareName := Name.mkSimple original.getId.getString!
+        returnType := result
+        declaration
+      }
+  let declId ← `(Parser.Command.declId| $name:ident)
+  let emit := fun (body : Term) (definition : Bool) => do
+    let value ← `(Parser.Command.declVal| := $body)
+    if definition then
+      elabCommand (← `($mods:declModifiers semantic_definition $declId:declId
+        $sig:optDeclSig $value:declVal))
+    else
+      elabCommand (← `($mods:declModifiers semantic_template $declId:declId
+        $sig:optDeclSig $value:declVal))
+  if kind ∈ [`primitive, `template, `action, `keyword, `ability_word] then
+    let mut body ← if payload.isOfKind ``declBlock then required `body else pure ⟨payload⟩
+    let identity := Syntax.mkStrLit name.getId.toString
+    if kind == `action then
+      let deed := (fields.lookup `deed).getD (Syntax.mkStrLit original.getId.getString!)
+      let deed : Term := if deed.raw.isIdent then Syntax.mkStrLit deed.raw.getId.toString else deed
+      let permanent := (fields.lookup `permanent).getD (mkIdent `Semantics.DeedPermanent.none)
+      let permanent : Term := if permanent.raw.getId ∈ [`performs, `isAbout] then
+        mkIdent (`Semantics.DeedPermanent ++ permanent.raw.getId) else permanent
+      body ← `(term| $(mkIdent `Semantics.Action.ownScope)
+        (some ($(mkIdent `Semantics.Deed.action) $deed $permanent)) $body)
+    if kind == `keyword then
+      let labelName := (← getCurrNamespace) ++ name.getId ++ `label
+      let labelValue ← liftTermElabM <| elabTermEnsuringType label (mkConst ``String)
+      liftCoreM <| addAndCompile <| .defnDecl {
+        name := labelName, levelParams := [], type := mkConst `Semantics.KeywordLabel
+        value := mkApp (mkConst `Semantics.KeywordLabel.named) labelValue
+        hints := .regular 0, safety := .safe
+      }
+      definitionAttribute.setTag labelName
+      let mut args : Array Term := #[]
+      for binder in sig.raw[0].getArgs do
+        if binder.isOfKind ``Parser.Term.explicitBinder then
+          for id in binder[1].getArgs do
+            let argument : Term := ⟨id⟩
+            args := args.push argument
+      body ← `(term| $(mkIdent `Semantics.Ability.keyword) $(mkIdent labelName) (keyword_arguments% [$args,*]) $body)
+    if kind == `ability_word then
+      let labelStr : StrLit := ⟨label.raw⟩
+      body ← `(term| ability_word_body% $labelStr:str $body)
+    if kind == `template then body ← `(term| bind_decl_body% false $identity $body)
+    if kind ∈ [`action, `keyword] then body ← `(term| bind_decl_body% true $identity $body)
+    emit body (kind ∈ [`action, `keyword])
+    if kind == `primitive then elabCommand (← `(attribute [semantic_primitive] $name))
+  else if kind ∈ [`counter, `subtype, `designation, `card_type, `relation] then
+    let body ← match kind with
+      | `counter =>
+        let holder := (fields.lookup `holder).getD (mkIdent `Semantics.Kind.object)
+        `(term| $(mkIdent `Semantics.CounterKind.named) $(Syntax.mkStrLit original.getId.getString!) $holder)
+      | `subtype =>
+        let k ← required `kind
+        if k.raw.getId == `spell || (k.raw.reprint.getD "").trimAscii.toString == ".spell" then
+          `(term| $(mkIdent `Semantics.Subtype.spell) $label)
+        else `(term| $(mkIdent `Semantics.Subtype.of) $k $label)
+      | `designation =>
+        let scope ← required `scope
+        let sole := (fields.lookup `sole).getD (← `(term| false))
+        `(term| $(mkIdent `Semantics.DesignationLabel.named) $label $scope (sole := $sole))
+      | `card_type =>
+        let permanent ← required `permanent
+        let stats := (fields.lookup `stats).getD (← `(term| []))
+        let instantOrSorcery := (fields.lookup `instantOrSorcery).getD (← `(term| false))
+        let label := (fields.lookup `name).getD label
+        `(term| { name := $label, permanent := $permanent, stats := $stats,
+                  instantOrSorcery := $instantOrSorcery })
+      | _ => `(term| $(mkIdent `Semantics.RelationLabel.named) $label)
+    emit body true
+    let row := mkIdent (name.getId.getPrefix ++ Name.mkSimple (name.getId.getString! ++ "_definition"))
+    let ctor := mkIdent (`Semantics.RegistryDefinition ++ if kind == `card_type then `cardType else kind)
+    let rowBody ← if kind == `relation then `(term| $ctor $name) else `(term| $ctor $name $rules)
+    elabCommand (← `(def $row : $(mkIdent `Semantics.RegistryDefinition) := $rowBody))
+    let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
+    elabCommand (← `(theorem $ok : $(mkIdent `Semantics.RegistryDefinition.check) $row = [] := by decide))
+  else
+    let mut body ← if payload.isOfKind ``declBlock then
+      if let some body := fields.lookup `body then pure body
+      else makeStruct (fields.filter fun f =>
+        !(f.1 ∈ [`lemma, `plural, `verbs, `nouns, `adjectives, `determinatives, `bound, `spelling]))
+      else pure ⟨payload⟩
+    if kind == `card then
+      if body.raw.isOfKind ``Parser.Term.structInst then
+        body ← `(term| $(mkIdent `Semantics.Templates.singleFacedCard) $body)
+      body := ⟨mkNode `Semantics.spelledTerm #[mkAtom "spelled", mkAtom "<|", body.raw]⟩
+    let value ← `(Parser.Command.declVal| := $body)
+    elabCommand (← `($mods:declModifiers def $declId:declId $sig:optDeclSig $value:declVal))
+    if kind == `card then
+      let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
+      elabCommand (← `(theorem $ok : $(mkIdent `Semantics.Card.check) ($(mkIdent `Semantics.Spelled.card) $name) = [] :=
+        $(mkIdent `Semantics.Spelled.ok) $name))
+    else generatedCheck name (resultName.getD .anonymous)
+  let declaration ← resolveGlobalConstNoOverload name
+  modifyEnv fun env => declarationMetadataExt.addEntry env
+    { declaration, kind, fields := fields.map fun (k, v) => (k, v.raw) }
+
+/-- A declaration's bare spelling and semantic result sort identify a bundle node. -/
+structure BundleKey where
+  bareName : Name
+  returnType : Name
+  deriving BEq, Hashable, Inhabited, Repr
+
+structure BundleItem where
+  key : BundleKey
+  file : String
+  references : List Name := []
+  stx : Syntax := .missing
+  deriving Inhabited
+
+private def bundleKeyLess (a b : BundleKey) : Bool :=
+  a.bareName.toString < b.bareName.toString ||
+    (a.bareName == b.bareName && a.returnType.toString < b.returnType.toString)
+
+def bundleDependencies (items : List BundleItem) (item : BundleItem) : List BundleKey :=
+  items.filterMap fun other =>
+    if item.references.contains other.key.bareName &&
+      (other.key.bareName != item.key.bareName ||
+        (item.key.returnType == `Semantics.Ability && other.key.returnType == `Semantics.Action))
+    then some other.key else none
+
+/-- Kahn's algorithm, choosing the least ready (bare name, return type) at every step. -/
+def topoSortBundle (items : List BundleItem) : Except String (List BundleItem) := Id.run do
+  let mut seen : List BundleKey := []
+  for item in items do
+    if seen.contains item.key then
+      return .error s!"Duplicate bundle declaration: {item.key.bareName} : {item.key.returnType} ({item.file})"
+    seen := item.key :: seen
+  let mut byKey : Std.HashMap BundleKey BundleItem := {}
+  let mut degrees : Std.HashMap BundleKey Nat := {}
+  let mut dependents : Std.HashMap BundleKey (List BundleKey) := {}
+  let mut ready := []
+  for item in items do
+    byKey := byKey.insert item.key item
+    let deps := bundleDependencies items item
+    degrees := degrees.insert item.key deps.length
+    if deps.isEmpty then ready := item.key :: ready
+    for dep in deps do
+      dependents := dependents.insert dep (item.key :: dependents.getD dep [])
+  ready := ready.mergeSort bundleKeyLess
+  let mut sorted := []
+  while !ready.isEmpty do
+    let key := ready.head!
+    ready := ready.tail!
+    sorted := sorted ++ [byKey.getD key default]
+    for dependent in dependents.getD key [] do
+      let degree := degrees.getD dependent 0 - 1
+      degrees := degrees.insert dependent degree
+      if degree == 0 then ready := (dependent :: ready).mergeSort bundleKeyLess
+  if sorted.length != items.length then
+    let remaining := items.filter (fun item => degrees.getD item.key 0 > 0)
+      |>.mergeSort (fun a b => bundleKeyLess a.key b.key)
+    let rec reaches (fuel : Nat) (target : BundleKey) (pending seen : List BundleKey) : Bool :=
+      match fuel, pending with
+      | 0, _ | _, [] => false
+      | fuel + 1, key :: rest =>
+        if key == target then true
+        else if seen.contains key then reaches fuel target rest seen
+        else reaches fuel target
+          (bundleDependencies items (byKey.getD key default) ++ rest) (key :: seen)
+    let cyclic := remaining.filter fun item => reaches (items.length * (items.length + 1) + 1)
+      item.key (bundleDependencies items item) []
+    let summary := cyclic.map fun item =>
+      s!"{item.key.bareName} : {item.key.returnType} ({item.file})"
+    return .error s!"Dependency cycle in bundle: {", ".intercalate summary}"
+  return .ok sorted
+
+private partial def referencedIdents (bound : List Name) (stx : Syntax) : List Name :=
+  if stx.isOfKind ``declField then
+    if stx[0].getId ∈ [`lemma, `plural, `verbs, `nouns, `adjectives, `determinatives,
+        `bound, `spelling] then []
+    else referencedIdents bound stx[2]
+  else if stx.isOfKind ``Parser.Term.structInstField then
+    referencedIdents bound stx[1]
+  else match stx with
+    | .ident _ _ name _ => if bound.contains name then [] else [name]
+    | .node _ _ args => args.toList.flatMap (referencedIdents bound)
+    | _ => []
+
+private def bundleItem (file : String) (stx : Syntax) : Except String BundleItem := do
+  unless stx.isOfKind ``authoredDeclCmd && authoredKinds.contains stx[1].getId do
+    throw s!"Unsupported command in bundle file {file}"
+  let kind := stx[1].getId.eraseMacroScopes
+  let sig := stx[3]
+  let result ← if let some result := commandReturnType? kind then pure result
+    else if sig[1].isNone || !sig[1][0][1].isIdent then
+      throw s!"{file}: {kind} requires a named return type"
+    else pure sig[1][0][1].getId
+  let returnType := if (`Semantics).isPrefixOf result then result else `Semantics ++ result
+  let bareName := Name.mkSimple stx[2].getId.getString!
+  let bound := sig[0].getArgs.toList.flatMap fun binder =>
+    binder[1].getArgs.toList.filterMap fun id => if id.isIdent then some id.getId else none
+  return { key := { bareName, returnType }, file, stx,
+           references := referencedIdents bound stx[5] }
+
+private def parseBundleFile (env : Environment) (opts : Options) (path : System.FilePath) :
+    IO (List BundleItem) := do
+  let content ← IO.FS.readFile path
+  let input := Parser.mkInputContext content path.toString
+  let mut state : Parser.ModuleParserState := {}
+  let mut items := []
+  repeat
+    let (stx, next, messages) := Parser.parseCommand input { env, options := opts } state {}
+    if messages.hasErrors then
+      let errors ← messages.toList.mapM (·.toString)
+      throw <| IO.userError ("\n".intercalate errors)
+    state := next
+    if Parser.isTerminalCommand stx then break
+    items := items ++ [← IO.ofExcept (bundleItem path.toString stx)]
+  return items
+
+/-- Load declarations from loose Lean files, independent of their paths and source ordering. -/
+elab "load_bundle " directory:str : command => do
+  let paths ← liftIO <| (System.FilePath.mk directory.getString).walkDir
+  let paths := paths.toList.filter (·.extension == some "lean")
+    |>.mergeSort (fun a b => a.toString < b.toString)
+  let mut items := []
+  for path in paths do
+    items := items ++ (← liftIO <| parseBundleFile (← getEnv) (← getOptions) path)
+  let sorted ← match topoSortBundle items with
+    | .ok sorted => pure sorted
+    | .error error => throwError error
+  for item in sorted do
+    withRef item.stx <| elabCommand item.stx
 
 end Semantics.Authoring
 

@@ -6,8 +6,8 @@ import Semantics.CallerScope
 
 Phrasing helpers (`Template`s, `semantic_template`) for `semantics-v3`
 (`docs/decisions/semantics-v3.md` §§1–3). A Template expands transparently in the caller's DRS
-scope and writes `firstMention` / `laterMention` by hand whenever a `NounPhrase` parameter is
-mentioned more than once before a zone change; only Definitions generate parameter identities.
+scope. The `template` command generates `firstMention` / `laterMention` for repeated noun
+parameters; the lower-level `semantic_template` form preserves explicitly authored mentions.
 Templates are spelled over primitives and other Templates and name no catalog item and no card type:
 the layering is Primitives → Templates → Definitions → Cards. A phrasing helper that names a card type or a catalog entry ("this creature", "your party")
 lives above it, in `Semantics.Definitions.Phrasings`, and one that needs a composite Definition in
@@ -299,85 +299,7 @@ semantic_template Timing.or (disjuncts : List Timing := []) : Timing := .or disj
 semantic_template Timing.not (timing : Timing) : Timing := .not timing
 semantic_template Cost.or (costs : List Cost := []) : Cost := .or costs
 
-open Lean Elab Term in
-/-- Words several sorts share, each sort's template (or definition) by the result type it builds:
-the combinators `and`, `or`, `andOr` and `not`; the verb and the determiner `target`; and the
-other words whose sorts' templates are namespaced (`did`, `was`, `allBut`, `half`, `token`,
-`written`, `copy`, `doIf`, `replace`, `nthOccurrence`, …). A word one of whose sorts is a
-Definition (`crew`, `saddle`) is dispatched where that Definition is declared, above this
-layer. -/
-private def expectedTypeDispatch : List (Name × List (Name × Name)) :=
-  [ (`and, [ (``Semantics.Predicate, `Semantics.Templates.Predicate.and),
-             (``Semantics.Condition, `Semantics.Templates.Condition.and),
-             (``Semantics.NounPhrase, `Semantics.Templates.NounPhrase.and),
-             (``Semantics.Location, `Semantics.Templates.Location.and),
-             (``Semantics.Timing, `Semantics.Templates.Timing.and) ]),
-    (`or, [ (``Semantics.Predicate, `Semantics.Templates.Predicate.or),
-            (``Semantics.Condition, `Semantics.Templates.Condition.or),
-            (``Semantics.NounPhrase, `Semantics.Templates.NounPhrase.or),
-            (``Semantics.Location, `Semantics.Templates.Location.or),
-            (``Semantics.Timing, `Semantics.Templates.Timing.or),
-            (``Semantics.Cost, `Semantics.Templates.Cost.or) ]),
-    (`andOr, [ (``Semantics.Predicate, `Semantics.Templates.Predicate.andOr),
-               (``Semantics.NounPhrase, `Semantics.Templates.NounPhrase.andOr),
-               (``Semantics.Location, `Semantics.Templates.Location.andOr) ]),
-    (`not, [ (``Semantics.Predicate, `Semantics.Templates.Predicate.not),
-             (``Semantics.Condition, `Semantics.Templates.Condition.not),
-             (``Semantics.Location, `Semantics.Templates.Location.not),
-             (``Semantics.Timing, `Semantics.Templates.Timing.not) ]),
-    (`target, [ (``Semantics.NounPhrase, `Semantics.Templates.target),
-                (``Semantics.Action, `Semantics.Templates.Action.target) ]),
-    (`attachment, [ (``Semantics.Predicate, `Semantics.Templates.Predicate.attachment),
-                    (``Semantics.Action, `Semantics.Templates.Action.attachment) ]),
-    (`duringPart, [ (``Semantics.Timing, `Semantics.Templates.duringPart),
-                    (``Semantics.Condition, `Semantics.Templates.Condition.duringPart) ]),
-    (`did, [ (``Semantics.Predicate, `Semantics.Templates.Predicate.did),
-             (``Semantics.Condition, `Semantics.Templates.Condition.did) ]),
-    (`was, [ (``Semantics.Predicate, `Semantics.Templates.Predicate.was),
-             (``Semantics.Condition, `Semantics.Templates.Condition.was) ]),
-    (`allBut, [ (``Semantics.PreventCut, `Semantics.Templates.PreventCut.allBut),
-                (``Semantics.IgnoredOutcomes, `Semantics.Templates.IgnoredOutcomes.allBut) ]),
-    (`half, [ (``Semantics.Amount, `Semantics.Templates.half),
-              (``Semantics.PreventCut, `Semantics.Templates.PreventCut.half) ]),
-    (`token, [ (``Semantics.CreationSpec, `Semantics.Templates.CreationSpec.token) ]),
-    (`written, [ (``Semantics.TokenSpec, `Semantics.Templates.written),
-                 (``Semantics.AbilityLost, `Semantics.Templates.AbilityLost.written) ]),
-    (`ofColor, [ (``Semantics.PipPaid, `Semantics.Templates.ofColor),
-                 (``Semantics.ManaTypeTerm, `Semantics.Templates.ManaTypeTerm.ofColor) ]),
-    (`copy, [ (``Semantics.Action, `Semantics.Templates.Action.copy) ]),
-    (`doIf, [ (``Semantics.Action, `Semantics.Templates.doIf),
-              (``Semantics.Replacement, `Semantics.Templates.Replacement.doIf) ]),
-    (`replace, [ (``Semantics.Action, `Semantics.Templates.Action.replace),
-                 (``Semantics.StaticSpec, `Semantics.Templates.StaticSpec.replace) ]),
-    (`nthOccurrence,
-      [ (``Semantics.GameEvent, `Semantics.Templates.nthOccurrence),
-        (``Semantics.WouldClause, `Semantics.Templates.WouldClause.nthOccurrence) ]) ]
-
-open Lean Elab Term Meta in
-/-- Top-down dispatch of a shared word on the expected type: `and [p, q]` elaborates as the one
-template its expected type names, so a nested combinator costs one elaboration per node (an
-overload would elaborate every alternative, bottom-up) and the elaborated term is that template's
-call, as `Authoring.inspect` records it. With no expected type known, or a sort without such a
-template, the ordinary application elaborator takes over. -/
-def dispatchOnExpectedType (table : List (Name × List (Name × Name))) : TermElab :=
-    fun stx expectedType? => do
-  let fn := stx[0]
-  unless fn.isIdent do throwUnsupportedSyntax
-  let some sorts := table.lookup fn.getId | throwUnsupportedSyntax
-  if (← getLCtx).findFromUserName? fn.getId |>.isSome then throwUnsupportedSyntax
-  let some expected := expectedType? | throwUnsupportedSyntax
-  let expected ← instantiateMVars expected
-  if expected.getAppFn.isMVar then
-    tryPostpone
-    throwUnsupportedSyntax
-  let some sort := (← whnfR expected).getAppFn.constName? | throwUnsupportedSyntax
-  let some template := sorts.lookup sort | throwUnsupportedSyntax
-  let call := stx.setArg 0 (mkCIdentFrom fn template)
-  withMacroExpansion stx call <| elabTerm call expectedType?
-
-open Lean Elab Term in
-@[scoped term_elab Lean.Parser.Term.app, inherit_doc dispatchOnExpectedType]
-def elabExpectedTypeDispatch : TermElab := dispatchOnExpectedType expectedTypeDispatch
+open scoped Semantics.Authoring
 
 /-! ### Types, kinds and roles -/
 
@@ -2505,4 +2427,33 @@ semantic_template Action.saddle (permanent : NounPhrase) : Action := .saddle per
 /-- "<ability> triggers": the act a trigger prohibition names. -/
 semantic_template trigger : Action := .trigger
 
+semantic_template white : Color := .white
+semantic_template blue : Color := .blue
+semantic_template black : Color := .black
+semantic_template red : Color := .red
+semantic_template green : Color := .green
+semantic_template theKeyword (label : KeywordLabel) : KeywordTerm := .the label
+semantic_template DamageKind.combat : DamageKind := .combat
+semantic_template NounWord.spell : NounWord := .spell
+
+instance [AuthoringContext] : Coe Color ManaSymbol := ⟨pip⟩
+instance [AuthoringContext] (n : Nat) : OfNat ManaSymbol n := ⟨generic n⟩
+instance : Coe Color ColorOrColorless := ⟨.of⟩
+instance : Coe Characteristics CharacteristicBundle := ⟨fun c => { characteristics := c }⟩
+instance [AuthoringContext] : Coe StaticSpec Ability := ⟨static⟩
+
+end Semantics.Templates
+
+namespace Semantics.Templates
+open Lean Elab Term
+@[scoped term_elab Lean.Parser.Term.app]
+def elabExpectedTypeDispatch : TermElab := Authoring.dispatchOnExpectedType
+@[scoped term_elab ident]
+def elabBareIdentDispatch : TermElab := Authoring.elabBareIdentDispatch
+@[scoped term_elab Lean.Parser.Term.app]
+def elabDomainList : TermElab := Authoring.elabDomainList
+@[scoped term_elab ident]
+def elabEmptyDomainList : TermElab := Authoring.elabDomainList
+@[scoped term_elab Lean.Parser.Term.structInst]
+def elabCharacteristicBundleStruct : TermElab := Authoring.elabCharacteristicBundleStruct
 end Semantics.Templates

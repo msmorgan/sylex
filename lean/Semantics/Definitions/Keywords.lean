@@ -1914,18 +1914,4 @@ semantic_definition wither : Ability :=
         (replace (causedBy (bySource this_) (would any (markDamage (a isCreature))))
           (instead (putCounters thatMuch m1m1Counter (that creature)))) ]
 
-open Lean Elab Term in
-/-- `crew`, `saddle` and `devour` name a keyword ability declared here and the action its
-definition performs (`Action.crew`, `Action.saddle`, `Action.devour`
-[CR#702.122a,702.171a,702.82b]): the expected type picks one, as `Semantics.Templates`
-dispatches the words its own sorts share. -/
-@[scoped term_elab Lean.Parser.Term.app]
-def elabKeywordDispatch : TermElab := Templates.dispatchOnExpectedType
-  [ (`crew, [ (``Semantics.Action, `Semantics.Templates.Action.crew),
-              (``Semantics.Ability, `Semantics.Definitions.crew) ]),
-    (`saddle, [ (``Semantics.Action, `Semantics.Templates.Action.saddle),
-                (``Semantics.Ability, `Semantics.Definitions.saddle) ]),
-    (`devour, [ (``Semantics.Action, `Semantics.Definitions.Action.devour),
-                (``Semantics.Ability, `Semantics.Definitions.devour) ]) ]
-
 end Semantics.Definitions
