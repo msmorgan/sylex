@@ -329,3 +329,48 @@ impl DRS {
             .count()
     }
 }
+
+impl Kind {
+    #[must_use]
+    pub fn targetable(&self) -> bool {
+        match self {
+            Self::Object | Self::Player => true,
+            Self::Join { left, right } => left.targetable() && right.targetable(),
+            _ => false,
+        }
+    }
+    #[must_use]
+    pub fn targeter(&self) -> bool {
+        match self {
+            Self::Object => true,
+            Self::Join { left, right } => left.targeter() && right.targeter(),
+            _ => false,
+        }
+    }
+    #[must_use]
+    pub fn phrasal(&self) -> bool {
+        match self {
+            Self::Object | Self::Player | Self::Quality { .. } => true,
+            Self::Join { left, right } => left.phrasal() && right.phrasal(),
+            _ => false,
+        }
+    }
+    #[must_use]
+    pub fn binding(&self) -> Referent {
+        Referent::new(
+            Determiner::The,
+            Plurality::One,
+            if *self == Self::Player {
+                Payload::Player { chosen: false }
+            } else {
+                Payload::Object {
+                    ty: Vec::new(),
+                    zone: None,
+                    prov: None,
+                    orig: None,
+                    size: None,
+                }
+            },
+        )
+    }
+}

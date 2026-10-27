@@ -1,17 +1,66 @@
 //! Discourse state mirrored from `lean/Semantics/Check/Words.lean`.
-mod events;
 mod choices;
-mod words;
-mod selections;
+mod events;
 mod local_shape;
-pub use selections::{run_payloads, selection_payload, slice_payload};
-pub use words::{common_types, merge_types, normalize_types};
+mod selections;
+mod words;
+pub use selections::run_payloads;
+pub use selections::selection_payload;
+pub use selections::slice_payload;
+pub use words::common_types;
+pub use words::merge_types;
+pub use words::normalize_types;
+mod anchors;
+mod circumstances;
+mod described;
+mod descriptions;
+mod groups;
+mod header_context;
+mod mentions;
+mod noun_facts;
+mod nouns;
 mod phrase_facts;
+mod predicate_facts;
+mod stepping;
+pub use circumstances::step_duration_with;
+pub use circumstances::step_location_with;
+pub use circumstances::step_lookback_span_with;
+pub use circumstances::step_quantity_with;
+pub use circumstances::step_timing_with;
+pub use circumstances::step_turn_ref_with;
+pub use described::step_description_with;
+pub use descriptions::participial_read;
+pub use descriptions::whole_groups;
 pub use events::EventFacts;
-use crate::ast::{
-    AttachMove, BindingId, CardType, Deed, ExposeVerb, Kind, Letter, NounWord, OutcomeSort,
-    PileFace, Plurality, Procedure, QualitySort, Reach, SlotCarrier, Status, Subtype, Zone,
-};
+pub use mentions::choice_mode_checks;
+pub use mentions::mention_this;
+pub use mentions::mention_you;
+pub use mentions::step_determiner_with;
+pub use mentions::step_noun_alternatives_with;
+pub use mentions::step_slice_count_with;
+pub use nouns::step_noun_with;
+pub use stepping::NounResult;
+pub use stepping::StepOps;
+pub use stepping::StepResult;
+
+use crate::ast::AttachMove;
+use crate::ast::BindingId;
+use crate::ast::CardType;
+use crate::ast::Deed;
+use crate::ast::ExposeVerb;
+use crate::ast::Kind;
+use crate::ast::Letter;
+use crate::ast::NounWord;
+use crate::ast::OutcomeSort;
+use crate::ast::PileFace;
+use crate::ast::Plurality;
+use crate::ast::Procedure;
+use crate::ast::QualitySort;
+use crate::ast::Reach;
+use crate::ast::SlotCarrier;
+use crate::ast::Status;
+use crate::ast::Subtype;
+use crate::ast::Zone;
 
 pub type ReferentId = u64;
 
@@ -944,7 +993,8 @@ impl DRS {
     /// Read all members bound to the parameter, preserving their identities.
     ///
     /// # Errors
-    /// Refuses an identity that has no visible binding or earlier refused first mention.
+    /// Refuses an identity that has no visible binding or earlier refused first
+    /// mention.
     pub fn later_mention(
         &mut self,
         identity: BindingId,
@@ -1028,7 +1078,8 @@ impl DRS {
 }
 
 impl DRS {
-    /// Apply the post-event zone transition, remapping every scope's references.
+    /// Apply the post-event zone transition, remapping every scope's
+    /// references.
     pub fn apply_zone_move(
         &mut self,
         ids: &[ReferentId],

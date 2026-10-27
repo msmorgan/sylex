@@ -240,3 +240,44 @@ impl NounPhrase {
         false
     }
 }
+
+impl super::CausedEvent {
+    #[must_use]
+    pub fn read_by(
+        &self,
+        anchor: Option<&super::ParticipialAnchor>,
+        verbs: &[super::EventVerb],
+    ) -> bool {
+        match anchor {
+            Some(super::ParticipialAnchor::Deed { deed }) => {
+                self.deed.as_ref() == Some(deed)
+                    || (matches!(deed, crate::ast::Deed::Action { label, permanent: crate::ast::DeedPermanent::None } if label.as_str() == "cast")
+                        && matches!(&self.deed, Some(crate::ast::Deed::Action { label, permanent: crate::ast::DeedPermanent::None }) if label.as_str() == "play"))
+            }
+            Some(super::ParticipialAnchor::ZoneChange {
+                origin,
+                destination,
+            }) => self.zone_change.as_ref().is_some_and(|change| {
+                change.destination.as_ref() == Some(destination)
+                    && origin.as_ref().is_none_or(|origin| {
+                        change.origin.as_ref().is_none_or(|zone| zone == origin)
+                    })
+            }),
+            None => self.verbs.iter().any(|verb| verbs.contains(verb)),
+        }
+    }
+    #[must_use]
+    pub fn subject_fits(
+        &self,
+        subject: Option<&crate::ast::Kind>,
+        subject_is_patient: bool,
+    ) -> bool {
+        let participant = if subject_is_patient { &self.patient } else { &self.performer };
+        participant
+            .as_deref()
+            .zip(subject)
+            .is_none_or(|(participant, subject)| {
+                participant.lte(subject) || subject.lte(participant)
+            })
+    }
+}
