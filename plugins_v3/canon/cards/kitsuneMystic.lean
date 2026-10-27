@@ -2,7 +2,11 @@ card kitsuneMystic : Spelled := { body := .flip
   { characteristics :=
     { name := "Kitsune Mystic", cost := [generic 3, pip .white], types := [.creature],
       subtypes := [fox, wizard],
-      text := [kitsuneMysticFlip], power := stat 2, toughness := stat 3 } }
+      text := [(at_ (beginningOfEach .endStep)
+            (if_ := is thisCreature
+              (attachedBy (some .enchanted)
+                (counted (orMore 2) aura)))
+            (flip thisCreature))], power := stat 2, toughness := stat 3 } }
   { characteristics :=
     { name := "Autumn-Tail, Kitsune Sage", supertypes := [.legendary], types := [.creature],
       subtypes := [fox, wizard],

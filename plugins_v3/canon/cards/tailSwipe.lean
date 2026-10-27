@@ -7,7 +7,8 @@ card tailSwipe : Spelled :=
   { name := "Tail Swipe", cost := [pip .green], types := [.instant],
     text :=
       [ spell (sequentially
-          [ chooseFightPair,
+          [ (choose (both (target (and [isCreature, youControl])) (target (and [isCreature,
+            youDontControl])))),
             doIf (did you (cast thisSpell)
                 (within soFarThisTurn (duringPart .mainPhase you)))
               (get (the (and [isCreature, youControl])) (up 1) (up 1) untilEndOfTurn),

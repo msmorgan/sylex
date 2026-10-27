@@ -10,6 +10,6 @@ card urborgScavengers : Spelled :=
           (fun k => static (onlyWhile
             (keywordGrant thisCreature k (and [in_ (exiledWith thisCreature), hasKeyword k]))
             (exists_ (and [in_ (exiledWith thisCreature), hasKeyword k]))))
-          [ flying, firstStrike, doubleStrike, deathtouch, haste, hexproofAbilities,
+          [ flying, firstStrike, doubleStrike, deathtouch, haste, (.anyIn ⟨hexproof, none⟩),
             indestructible, lifelink, menace, reach, trample, vigilance ] ],
     power := stat 2, toughness := stat 2 }

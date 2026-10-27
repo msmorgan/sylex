@@ -3,4 +3,8 @@ card frogify : Spelled :=
     subtypes := [aura],
     text :=
       [ enchant isCreature,
-        static (enchantedBecomesVanilla [.blue] frog 1 1) ] }
+        static ((conjunction [ allAbilityLoss (enchanted creature),
+                qualityChange it .sets
+                  (bundle { characteristics := { colors := [.blue], types := [.creature], subtypes
+                    := [frog] } }),
+                getsBase it (amountLit 1) (amountLit 1) ])) ] }

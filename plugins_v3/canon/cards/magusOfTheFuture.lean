@@ -3,5 +3,6 @@ card magusOfTheFuture : Spelled :=
     types := [.creature], subtypes := [human, wizard],
     text :=
       [ static (visibility .reveal you topOfLibrary),
-        static playLandsAndCastSpellsFromTop ],
+        static (conjunction [(can you (play (allOf isLand) (from_ := onTop))), (can you (cast (bare
+          isSpell) (from_ := onTop)))]) ],
     power := stat 2, toughness := stat 3 }

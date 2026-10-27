@@ -3,4 +3,5 @@ card futureSight : Spelled :=
     types := [.enchantment],
     text :=
       [ static (visibility .reveal you topOfLibrary),
-        static playLandsAndCastSpellsFromTop ] }
+        static (conjunction [(can you (play (allOf isLand) (from_ := onTop))), (can you (cast (bare
+          isSpell) (from_ := onTop)))]) ] }

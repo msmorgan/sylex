@@ -83,14 +83,6 @@ def pontiffOfBlight : Ability :=
   static (abilityGrant (allOf (and [isCreature, youControl, isOther])) extort)
 theorem okPontiffOfBlight : Ability.check (DRS.ofList []) pontiffOfBlight = [] := by decide
 
-/-- "enchanted creature loses all abilities and is a <colors> <subtype> with base P/T" -/
-def enchantedBecomesVanilla (colors : List Color) (subtype : Subtype) (power toughness : Nat) :
-    StaticSpec :=
-  conjunction [ allAbilityLoss (enchanted creature),
-      qualityChange it .sets
-        (bundle { characteristics := { colors, types := [.creature], subtypes := [subtype] } }),
-      getsBase it (.lit power) (.lit toughness) ]
-
 /-- Blade of the Oni -/
 def bladeOfTheOniStatic : StaticSpec :=
   conjunction [ getsBase (equipped creature) 5 5,
@@ -100,7 +92,11 @@ def bladeOfTheOniStatic : StaticSpec :=
 theorem okBladeOfTheOniStatic : StaticSpec.check (DRS.ofList []) bladeOfTheOniStatic = [] := by decide
 
 def castCreatureSpellsFromTop : StaticSpec :=
-  can you (cast (bare (and [isSpell, isCreature])) (from_ := onTop))
+  (match garruksHorde.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons _ (List.cons (Ability.static part) _))) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okCastCreatureSpellsFromTop : StaticSpec.check (DRS.ofList []) castCreatureSpellsFromTop = [] := by decide
 
 def tayamLine : StaticSpec :=
@@ -227,8 +223,11 @@ theorem okCelebr8000Doubles : Action.check (DRS.ofList []) celebr8000Doubles = [
 than pay cycling costs." Cycling is an activated ability [CR#702.29a], and an alternative cost
 replaces an activation cost as it replaces a spell's mana cost [CR#118.9,602.2b]. -/
 def newPerspectivesCyclingAltCost : Ability :=
-  static (onlyWhile (altCost (allOf (abilityHead (.keyword cycling))) [generic 0])
-    (compareAmt (countOf (cardIn yourHand)) .atLeast 7))
+  (match newPerspectives.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons part _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okNewPerspectivesCyclingAltCost :
     Ability.check (DRS.ofList []) newPerspectivesCyclingAltCost = [] := by decide
 /-- Whether an ability is an alternative cost that applies only "as long as" a condition holds. -/
@@ -250,10 +249,11 @@ cost (the `keyword` field) is the event a replacement watches, and paying {0} is
 in its place, the shape an "instead" effect takes [CR#614.1a]. Declining the `may` leaves the
 echo cost to be paid. -/
 def thickSkinnedGoblinEchoPayment : Ability :=
-  static (replace
-    (would you (pay anyCost .once .paid (allOf (and [isPermanent, youControl]))
-      (some echo)))
-    (instead (may (pay [generic 0] .once))))
+  (match thickSkinnedGoblin.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons part _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okThickSkinnedGoblinEchoPayment :
     Ability.check (DRS.ofList []) thickSkinnedGoblinEchoPayment = [] := by decide
 /-- Fumiko the Lowblood -/
@@ -264,9 +264,11 @@ theorem okFumikoBushidoX : Ability.check (DRS.ofList []) fumikoBushidoX = [] := 
 
 /-- Tourach, Dread Cantor -/
 def tourachDiscardTrigger : Ability :=
-  whenever (does anOpponent (discard (a
-    isCard)))
-    (putCounters 1 p1p1Counter thisCreature)
+  (match tourachDreadCantor.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons _ (List.cons part _))) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okTourachDiscardTrigger : Ability.check (DRS.ofList []) tourachDiscardTrigger = [] := by decide
 
 /-- Soul of Emancipation -/
@@ -295,9 +297,11 @@ theorem okHarriedDronesmithToken : Action.check (DRS.ofList []) harriedDronesmit
 
 /-- Veiling Oddity -/
 def veilingOddityLine : Ability :=
-  when (does any (removeCounters theLast timeCounter this_))
-    (while_ := whileTrue (is this_ (cardIn exileZone)))
-    (establishThroughout (cant any (block (allOf isCreature))) thisTurn)
+  (match veilingOddity.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons part _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okVeilingOddityLine : Ability.check (DRS.ofList []) veilingOddityLine = [] := by decide
 
 /-- Darkblade Agent -/
@@ -316,22 +320,57 @@ theorem okFrenziedGorespawnMenaceTrigger :
     Ability.check (DRS.ofList []) frenziedGorespawnMenaceTrigger = [] := by decide
 /-- Pir, Imaginative Rascal's replacement -/
 def pirDistributive : Ability :=
-  static (replace
-            (would any
-               (putCounters anyAmount anyKind
-                  (a (and [isPermanent, controlledBy (youOr (a isTeammate))]))))
-                      (instead (putCounters (plus thatMuch 1) thoseCounters (that permanent))))
+  (match pirImaginativeRascal.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons part _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okPirDistributive : Ability.check (DRS.ofList []) pirDistributive = [] := by decide
 
-def protectionAbilities : KeywordTerm := .anyIn ⟨protection, none⟩
-def landwalkAbilities : KeywordTerm := .anyIn ⟨landwalk, none⟩
+def protectionAbilities : KeywordTerm := (match concertedEffort.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons _
+        (List.cons _ (List.cons _ (List.cons _ (List.cons (Action.doIf (Condition.exists_
+        (NounPhrase.described _ (Predicate.coord _ (List.cons _ (List.cons _ (List.cons
+        (Predicate.hasKeyword part) _)))))) _ _ _) _)))))))) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
+def landwalkAbilities : KeywordTerm := (match cairnWanderer.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.static (StaticSpec.conjunction _ (List.cons _ (List.cons _
+        (List.cons _ (List.cons _ (List.cons _ (List.cons _ (List.cons (StaticSpec.conditional
+        (StaticSpec.characteristicChange _ (List.cons (CharacteristicEdit.addedSelectionOf _
+        (AbilitySelection.specified (List.cons (AbilityLost.term part) _))) _)) _ _) _))))))))) _))
+        => some part
+      | _ => none
+    | _ => none).get (by decide)
 /-- Hexproof and each "hexproof from [quality]" [CR#702.11d]. -/
-def hexproofAbilities : KeywordTerm := .anyIn ⟨hexproof, none⟩
+def hexproofAbilities : KeywordTerm := (match odricLunarchMarshal.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons _
+        (List.cons _ (List.cons _ (List.cons _ (List.cons (Action.doIf (Condition.exists_
+        (NounPhrase.described _ (Predicate.coord _ (List.cons _ (List.cons _ (List.cons
+        (Predicate.hasKeyword part) _)))))) _ _ _) _)))))))) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 /-- Shay Cormac -/
 def wardAbilities : KeywordTerm := .anyIn ⟨ward, none⟩
 /-- Tolaria, Shelkin Brownie -/
-def bandsWithOtherAbilities : KeywordTerm := .anyIn ⟨bandsWithOther, none⟩
-def protectionFromAnyColor : KeywordTerm := .anyIn ⟨protection, some .color⟩
+def bandsWithOtherAbilities : KeywordTerm := (match shelkinBrownie.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.activated _ (Action.establish (StaticSpec.characteristicChange _
+        (List.cons (CharacteristicEdit.removedAbilities (AbilitySelection.specified (List.cons
+        (AbilityLost.term part) _))) _)) _) _ _ _ _) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
+def protectionFromAnyColor : KeywordTerm := (match escapedShapeshifter.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.static (StaticSpec.conjunction _ (List.cons _ (List.cons _ (List.cons _
+        (List.cons (StaticSpec.conditional (StaticSpec.characteristicChange _ (List.cons
+        (CharacteristicEdit.addedSelectionOf _ (AbilitySelection.specified (List.cons
+        (AbilityLost.term part) _))) _)) _ _) _)))))) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 /-- Commander's Plate's equip lines -/
 def commandersPlateEquip : List Ability :=
@@ -351,10 +390,14 @@ theorem okBedrockTortoiseWindow : StaticSpec.check (DRS.ofList []) bedrockTortoi
 
 /-- Marit Lage -/
 def maritLage : CharacteristicBundle :=
-  { characteristics :=
-    { name := "Marit Lage", colors := [.black], supertypes := [.legendary], types := [.creature],
-      subtypes := [avatar], text := [flying, indestructible],
-      power := stat 20, toughness := stat 20 } }
+  (match darkDepths.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _
+        (Action.withContinuation _ _ (Option.some (Action.ownScope _ (Action.createObject _
+        (CreationSpec.token (TokenSpec.inCaller (TokenSpec.written part)) _) _))) _)) _))) => some
+        part
+      | _ => none
+    | _ => none).get (by decide)
 
 def giantGrowth : Action :=
   get (target isCreature) (up 3) (up 3) untilEndOfTurn

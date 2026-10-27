@@ -78,14 +78,6 @@ def steelswarmOperatorMana : Action :=
     [spendOnly [toActivate (some (and [isSource, isArtifact]))]]
 theorem okSteelswarmOperatorMana : Action.check (DRS.ofList []) steelswarmOperatorMana = [] := by decide
 
-/-- A Thriving land: enters tapped choosing a color other than its own, taps for either. -/
-def thrivingLand (name : String) (own : Color) : Card := singleFacedCard
-  { name, types := [.land],
-    text :=
-      [ static (entersTapped thisLand),
-        static (entersChoosingFrom thisLand .color (colorOtherThan own)),
-        activated tapSymbol (addMana 1 (ofTheChosenColor (some [.of own]))) ] }
-
 /-- Nahiri, the Unforgiving's 0: "… card with mana value less than Nahiri's loyalty from your
 graveyard". On the battlefield her loyalty is her loyalty-counter count [CR#306.5c], not her
 printed number, and the bound reads it as the ability resolves. -/

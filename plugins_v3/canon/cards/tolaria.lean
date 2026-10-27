@@ -5,5 +5,5 @@ card tolaria : Spelled :=
       [ activated tapSymbol (addMana 1 (manaOf [[.of .blue]])),
         activatedOnlyDuring (compound [tapSymbol])
           (establishThroughout (abilityLoss (target isCreature)
-              [written banding, abilities bandsWithOtherAbilities]) untilEndOfTurn)
+              [written banding, abilities (.anyIn ⟨bandsWithOther, none⟩)]) untilEndOfTurn)
           (duringPart .upkeep none) ] }

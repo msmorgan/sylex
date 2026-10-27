@@ -18,6 +18,8 @@ card afflictedDeserter : Spelled := { body := .transforming
                 doIf (did (that artifact) (putInto theActor graveyard) thisWay)
                   (instruct thisCreature (dealDamage 3 (controllerOf (that artifact)))) ]),
           at_ (beginningOfEach .upkeep)
-            (if_ := aPlayerCastTwoOrMoreLastTurn)
+            (if_ := (compareAmt
+                  (aggregateOver .max isPlayer (eventCount (cast (a isSpell)) they lastTurn))
+                    .atLeast 2))
             (transform thisCreature) ],
       power := stat 5, toughness := stat 4 } } }

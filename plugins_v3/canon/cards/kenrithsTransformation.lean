@@ -4,4 +4,8 @@ card kenrithsTransformation : Spelled :=
     text :=
       [ enchant isCreature,
         when (does thisAura enter) (draw 1),
-        static (enchantedBecomesVanilla [.green] elk 3 3) ] }
+        static ((conjunction [ allAbilityLoss (enchanted creature),
+                qualityChange it .sets
+                  (bundle { characteristics := { colors := [.green], types := [.creature], subtypes
+                    := [elk] } }),
+                getsBase it (amountLit 3) (amountLit 3) ])) ] }

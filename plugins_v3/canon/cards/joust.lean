@@ -7,7 +7,8 @@ card joust : Spelled :=
   { name := "Joust", cost := [generic 1, pip .red], types := [.sorcery],
     text :=
       [ spell (sequentially
-          [ chooseFightPair,
+          [ (choose (both (target (and [isCreature, youControl])) (target (and [isCreature,
+            youDontControl])))),
             doOnlyIf (get (the (and [isCreature, youControl])) (up 2) (up 1) untilEndOfTurn)
               (is it (hasSubtype knight)),
             fightEachOther (those creature) ]) ] }

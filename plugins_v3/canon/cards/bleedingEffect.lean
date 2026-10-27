@@ -10,5 +10,6 @@ card bleedingEffect : Spelled :=
                   (and [isCreature, in_ yourGraveyard, hasKeyword k]))
                 untilEndOfTurn)
               (exists_ (and [isCreature, in_ yourGraveyard, hasKeyword k]))))
-          [ flying, firstStrike, doubleStrike, deathtouch, hexproofAbilities, indestructible,
+          [ flying, firstStrike, doubleStrike, deathtouch, (.anyIn ⟨hexproof, none⟩),
+            indestructible,
             lifelink, menace, reach, trample, vigilance ] ] }

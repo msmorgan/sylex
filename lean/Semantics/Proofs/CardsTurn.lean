@@ -109,9 +109,18 @@ def saheelisCopy : Action :=
       atNext .endStep (exile it) ]
 theorem okSaheelisCopy : Action.check (DRS.ofList []) saheelisCopy = [] := by decide
 
-def finalFortuneExtraTurn : Action := extraTurn 1
+def finalFortuneExtraTurn : Action := (match finalFortune.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ (Action.sequentially (List.cons part _))) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okFinalFortuneExtraTurn : Action.check (DRS.ofList []) finalFortuneExtraTurn = [] := by decide
-def finalFortuneThatTurn : TurnRef := thatTime
+def finalFortuneThatTurn : TurnRef := (match finalFortune.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ (Action.sequentially (List.cons _ (List.cons (Action.delay
+        (GameEvent.beginningOf _ _ part) _ _ _) _)))) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okFinalFortuneThatTurn :
     TurnRef.check ((stepAction 512 .postEvent .obj (DRS.ofList []) finalFortuneExtraTurn).1) finalFortuneThatTurn = [] := by
   decide
@@ -155,22 +164,21 @@ onto the battlefield with [this object]" reads the creature that ability puts, t
 puts it [CR#607.1a,607.2c]. -/
 
 /-- "creature card in a graveyard" -/
-def creatureCardInAGraveyard : Predicate := and [isCreature, isCard, in_ graveyard]
-
-/-- "creature put onto the battlefield with <source>" [CR#607.2c] -/
-def creaturePutOntoTheBattlefieldWith (source : NounPhrase) : Predicate :=
-  and [isCreature, did (by_ source) (putOntoBattlefield which)]
-
-/-- "When <source> leaves the battlefield, that creature's controller sacrifices it." -/
-def sacrificedWhenItLeaves (source : NounPhrase) : Action :=
-  delay (does source (leave battlefield)) (instruct (controllerOf (that creature)) (sacrifice it))
+def creatureCardInAGraveyard : Predicate := (match necromancy.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _
+        (List.cons (Action.move (NounPhrase.described _ part) _ _ _ _) _)))) _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 /-- "it loses 'enchant creature card in a graveyard' and gains 'enchant creature put onto the
 battlefield with this Aura.'" -/
 def swapsEnchantForLinkedEntry : Action :=
-  establish (conjunction
-    [ abilityLoss it [written (enchant creatureCardInAGraveyard)],
-      abilityGrant it (enchant (creaturePutOntoTheBattlefieldWith thisAura)) ]
-    (subject := it))
+  (match danceOfTheDead.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
+        part _))) _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 end Semantics.Cards

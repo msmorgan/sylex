@@ -57,7 +57,11 @@ theorem okSparkmagesGambit : Action.check (DRS.ofList []) sparkmagesGambit = [] 
 
 /-- Glacial Chasm -/
 def glacialChasmCant : Ability :=
-  static (cant (allOf (and [isCreature, youControl])) attack)
+  (match glacialChasm.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons _ (List.cons part _))) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okGlacialChasmCant : Ability.check (DRS.ofList []) glacialChasmCant = [] := by decide
 
 def desperateCastaways : Ability :=
@@ -249,11 +253,11 @@ theorem okConcussiveBolt : Action.check (DRS.ofList []) concussiveBolt = [] := b
 
 /-- "attack you unless their controller pays {2} for each" -/
 def attackToll : StaticSpec :=
-  gatedBy (scaledGenericMana
-      (forEach 2
-         (and [isCreature, controlledBy they, inCombat .attackerOf you]))) (actor
-                                                                                     (allOf
-                                                                                        isCreature)) (attack you)
+  (match ghostlyPrisonWhole.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.static part) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 /-- Archangel of Tithes -/
 def archangelOfTithesBlockToll : Ability :=
@@ -306,7 +310,12 @@ theorem okCastFromGraveyardByDiscardingALand :
 
 /-- "Auras already attached to those artifacts" -/
 def aurasAlreadyAttachedToThoseArtifacts : NounPhrase :=
-  allOf (and [aura, attachedTo (those artifact)])
+  (match guardianBeast.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.static (StaticSpec.conditional (StaticSpec.conjunction _ (List.cons
+        (StaticSpec.retention _ part) _)) _ _)) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 /-- Guardian Beast's protection: "As long as this creature is untapped, noncreature artifacts you
 control can't be enchanted, they have indestructible, and other players can't gain control of
@@ -317,13 +326,11 @@ hypothetical indefinite the prohibition closes, so "they" reads the artifacts, a
 Aura already on such an artifact illegal [CR#303.4c,704.5m], and "already attached" reads the
 host back, as *Benevolent Blessing*'s does. -/
 def guardianBeastProtection : StaticSpec :=
-  onlyWhile
-    (conjunction
-      [ retention (cant any (attachTo (a aura) them)) aurasAlreadyAttachedToThoseArtifacts,
-        abilityGrant them indestructible,
-        cant (bare (and [isPlayer, isOther])) (gainControlOf them) ]
-      (bare (and [non isCreature, isArtifact, youControl])))
-    (is thisCreature isUntapped)
+  (match guardianBeast.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.static part) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 /-- The exemption reaches "can't be enchanted" and not "have indestructible" or "can't gain
 control of" (owner ruling 2026-10-22, 3b): it wraps that clause in the card, and wrapped around

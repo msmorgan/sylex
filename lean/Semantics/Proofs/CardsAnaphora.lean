@@ -290,7 +290,12 @@ theorem okVedalkenSquirrelWhackerReroll :
 
 /-- Investigator's Journal's count -/
 def greatestCreaturesAPlayerControls : Amount :=
-  aggregateOver .max isPlayer (countOf (and [isCreature, controlledBy they]))
+  (match investigatorsJournal.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.static (StaticSpec.replace _ (Replacement.withRiders (List.cons
+        (MoveRider.withCounters part _ _) _)) _ _ _)) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okGreatestCreaturesAPlayerControls :
     Amount.check (DRS.ofList []) greatestCreaturesAPlayerControls = [] := by decide
 /-- Cavern-Hoard Dragon -/
@@ -301,7 +306,13 @@ theorem okGreatestArtifactsAnOpponentControls :
 
 /-- "each creature that player or that planeswalker's controller controls" -/
 def eachCreatureThatSplitControls : NounPhrase :=
-  each (and [isCreature, controlledBy splitOverPlaneswalker])
+  (match heartOfBogardan.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
+        (Action.simultaneously (List.cons _ (List.cons (Action.instruct _ (Action.dealDamage _ part
+        _)) _))) _))) _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 def anyTargetAnnounced : NounPhrase := target isAnyTarget
 theorem okAnyTargetAnnounced : NounPhrase.checkAt none (DRS.ofList []) anyTargetAnnounced = [] := by decide
@@ -342,12 +353,21 @@ theorem okEachCreatureThatSplitControls :
 
 /-- Boreas Charger's description -/
 def opponentWithMoreLands : Predicate :=
-  compareOver isOpponent (countOf (and [isLand, controlledBy they])) .greater
-    (countOf (and [isLand, youControl]))
+  (match landTax.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.triggered _ _ _ _ _ _ (Option.some (Condition.exists_
+        (NounPhrase.described _ part))) _) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okOpponentWithMoreLands : Predicate.checkAt .player (DRS.ofList []) opponentWithMoreLands = [] := by
   decide
 
-def bioplasmCardTest : Condition := is it (and [isCard, isCreature])
+def bioplasmCardTest : Condition := (match bioplasm.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons
+        (Action.doIf part _ _ _) _)))) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okBioplasmCardTest : Condition.check (nextClause bioplasmAfterExile) bioplasmCardTest = [] := by decide
 
 /-- Blessed Respite -/
@@ -356,10 +376,19 @@ def blessedRespiteShuffle : Action :=
 theorem okBlessedRespiteShuffle : Action.check (DRS.ofList []) blessedRespiteShuffle = [] := by decide
 
 /-- Nekrataal -/
-def nekrataalEntry : GameEvent := does thisCreature enter
+def nekrataalEntry : GameEvent := (match nekrataalWhole.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.triggered part _ _ _ _ _ _ _) _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okNekrataalEntry : GameEvent.check (DRS.ofList []) nekrataalEntry = [] := by decide
 def nekrataalDestroy : Action :=
-  destroy (target (and [isCreature, non isArtifact, non (hasColor .black)]))
+  (match nekrataalWhole.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
+        part _))) _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okNekrataalDestroy :
     Action.check ((stepGameEvent 512 (DRS.ofList []) nekrataalEntry).1) nekrataalDestroy = [] := by decide
 def nekrataalRider : DRS :=
@@ -391,7 +420,12 @@ theorem engulfingFlamesNoDestroyStamp :
     (participialCandidates (.deed (.action "destroy")) (some .one) none false engulfingFlamesRider).length = 0 := by decide
 theorem engulfingFlamesBareReadStands : countReach .bare .one engulfingFlamesRider = 1 := by decide
 
-def bioplasmExiledPronoun : NounPhrase := it
+def bioplasmExiledPronoun : NounPhrase := (match bioplasm.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons
+        (Action.doIf (Condition.matches part _) _ _ _) _)))) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okBioplasmExiledPronoun :
     NounPhrase.checkAt (some .object) bioplasmAfterExile bioplasmExiledPronoun = [] := by decide
 theorem bioplasmNoTypedRead :
@@ -422,10 +456,19 @@ theorem bioplasmTypedCardReadWrites :
   decide
 
 /-- Scapeshift -/
-def scapeshiftSacrifice : Action := sacrifice (counted anyNumber isLand)
+def scapeshiftSacrifice : Action := (match scapeshift.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ (Action.sequentially (List.cons part _))) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okScapeshiftSacrifice : Action.check (DRS.ofList []) scapeshiftSacrifice = [] := by decide
 def scapeshiftSacrificed : DRS := (stepAction 512 .postEvent .obj (DRS.ofList []) scapeshiftSacrifice).1
-def scapeshiftSearch : Action := search yourLibrary (counted (upToOf groupSize) isLand)
+def scapeshiftSearch : Action := (match scapeshift.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ (Action.sequentially (List.cons _ (List.cons part _)))) _) =>
+        some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okScapeshiftSearch : Action.check scapeshiftSacrificed scapeshiftSearch = [] := by
   decide
 def scapeshiftAfterSearch : DRS := (stepAction 512 .postEvent .obj scapeshiftSacrificed scapeshiftSearch).1
@@ -456,7 +499,12 @@ theorem okTezzeretAllArtifacts : Action.check (DRS.ofList []) tezzeretAllArtifac
 
 def companyContext : DRS := (stepAction 512 .postEvent .obj (DRS.ofList []) (lookAt (topSlice 6))).1
 def companyDescribedSlice : NounPhrase :=
-  fromAmong (upTo 2) (and [isCreature, hasManaValue .atMost 3]) them
+  (match collectedCompany.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ (Action.sequentially (List.cons _ (List.cons (Action.move part _
+        _ _ _) _)))) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okCompanyDescribedSlice :
     NounPhrase.checkAt (some .object) companyContext companyDescribedSlice = [] := by decide
 def companyBareSlice : NounPhrase := someOf (exactly 2) them
@@ -473,7 +521,12 @@ theorem okExileTopThenPutFromAmong : Action.check (DRS.ofList []) exileTopThenPu
 
 /-- Thought Sponge -/
 def greatestCardsAnOpponentDrew : Amount :=
-  aggregateOver .max isOpponent (eventCount (draw anyAmount) they soFarThisTurn)
+  (match thoughtSponge.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.static (StaticSpec.replace _ (Replacement.withRiders
+        (List.cons (MoveRider.withCounters part _ _) _)) _ _ _)) _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okGreatestCardsAnOpponentDrew : Amount.check (DRS.ofList []) greatestCardsAnOpponentDrew = [] := by
   decide
 def greatestCardsAPlayerDiscardedThisWay : Amount :=
@@ -503,9 +556,18 @@ theorem eachPlayerDoesNotIntroduceASeparateGroup :
 
 /-- Soul Ransom -/
 def soulRansomRansom : Action :=
-  sequentially [instruct (controllerOf thisAura) (sacrifice it), instruct they (draw 2)]
+  (match soulRansom.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons _ (List.cons (Ability.activated _ part _ _ _ _) _))) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okSoulRansomRansom : Action.check (DRS.ofList []) soulRansomRansom = [] := by decide
-def thisAurasController : NounPhrase := controllerOf thisAura
+def thisAurasController : NounPhrase := (match soulRansom.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons _ (List.cons (Ability.activated _ (Action.sequentially (List.cons
+        (Action.instruct part _) _)) _ _ _ _) _))) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okThisAurasController : NounPhrase.checkAt (some .player) (DRS.ofList []) thisAurasController = [] := by
   decide
 def targetCreaturesController : NounPhrase := controllerOf (target isCreature)
@@ -604,16 +666,11 @@ their toughness is half that creature's toughness. Round up each time." The poss
 every later "that creature" read the destroyed creature: step `C` of `AC>R1` only prefers a
 referent no same-clause pronoun took, and here no other creature remains. -/
 def sawInHalfBody : Action :=
-  sequentially
-    [ destroy (target isCreature),
-      doIf (did (that creature) die thisWay)
-        (instruct (controllerOf it)
-          (create 2
-            (copyOf (that creature)
-              (copyCharacteristics
-                { power := half .up (powerOf (that creature)),
-                  toughness := half .up (toughnessOf (that creature)) } false))
-            [])) ]
+  (match sawInHalf.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ part) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 /-- The card checks clean, and the destroyed creature (`1`) is the only referent any anaphor
 resolved: "its" and all three "that creature" mentions read it. -/
 theorem okSawInHalf :
@@ -627,10 +684,11 @@ shuffle randomizes the card [CR#701.24a], so no later "it" names it as a card in
 "its mana value" reads the permanent by its last known information, as it was moved out of a
 public zone into a hidden one [CR#608.2h] (`DRS.shuffledLastKnown`). -/
 def zoyowasJusticeBody : Action :=
-  sequentially
-    [ instruct (ownerOf (target (and [or [isArtifact, isCreature], hasManaValue .atLeast 1])))
-        (shuffleInto it),
-      instruct (that player) (discover (statOf (.stat .manaValue) it)) ]
+  (match zoyowasJustice.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ part) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 /-- Gyome, Master Chef: "{1}, Sacrifice a Food: Target creature gains indestructible until
 end of turn. Tap it." -/

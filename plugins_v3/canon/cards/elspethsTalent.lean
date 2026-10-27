@@ -3,8 +3,11 @@ card elspethsTalent : Spelled :=
     types := [.enchantment], subtypes := [aura],
     text :=
       [ enchant isPlaneswalker,
-        static elspethsTalentGrant,
-        whenever (does you (activate loyaltyAbilityOfEnchanted))
+        static (abilityGrant (enchanted planeswalker)
+              (activated (loyaltySymbol (up 1))
+                (create 3 (creatureToken 1 1 [.white] [soldier])))),
+        whenever (does you (activate (a (and [abilityHead .loyalty, abilityOf (enchanted
+          planeswalker)]))))
           (establishFor (allOf (and [isCreature, youControl]))
             [getsPt them (up 2) (up 2), abilityGrant them vigilance]
             untilEndOfTurn) ] }

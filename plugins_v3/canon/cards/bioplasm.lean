@@ -6,7 +6,7 @@ card bioplasm : Spelled :=
       [ whenever (does thisCreature attack)
           (sequentially
             [ exile (topSlice 1),
-              doIf bioplasmCardTest
+              doIf (is it (and [isCard, isCreature]))
                 (get thisCreature
                   (up (powerOf (the (and [was (exile which), isCreature, isCard]))))
                   (up (toughnessOf it))

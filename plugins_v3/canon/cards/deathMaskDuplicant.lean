@@ -9,6 +9,6 @@ card deathMaskDuplicant : Spelled :=
           (fun k => static (onlyWhile
             (keywordGrant thisCreature k (and [in_ (exiledWith thisCreature), hasKeyword k]))
             (exists_ (and [in_ (exiledWith thisCreature), hasKeyword k]))))
-          [ flying, fear, firstStrike, doubleStrike, haste, landwalkAbilities,
-            protectionAbilities, trample ] ],
+          [ flying, fear, firstStrike, doubleStrike, haste, (.anyIn ⟨landwalk, none⟩),
+            (.anyIn ⟨protection, none⟩), trample ] ],
     power := stat 5, toughness := stat 5 }

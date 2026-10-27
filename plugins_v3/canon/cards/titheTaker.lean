@@ -4,8 +4,8 @@ card titheTaker : Spelled :=
     subtypes := [human, soldier],
     text :=
       [ static (partScope .turn you
-          (conjunction [ spellsCost (and [isSpell, did yourOpponents (cast which) thisObject])
-              (more 1),
+          (conjunction [ (costShift (allOf (and [isSpell, did yourOpponents (cast which)
+            thisObject])) (more 1)),
               costShift (allOf (and [ abilityHead .anyActivated,
                   did yourOpponents (activate which) thisObject,
                                     not isManaAbility ]))

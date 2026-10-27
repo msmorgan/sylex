@@ -267,8 +267,11 @@ def thoughtLashTrigger : Ability :=
 theorem okThoughtLashTrigger : Ability.check (DRS.ofList []) thoughtLashTrigger = [] := by decide
 /-- Heart of Bogardan -/
 def heartOfBogardanHeader : GameEvent :=
-  does (a isPlayer)
-      (pay anyCost .once .unpaid (some thisEnchantment) (some cumulativeUpkeep))
+  (match heartOfBogardan.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.triggered part _ _ _ _ _ _ _) _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okHeartOfBogardanHeader : GameEvent.check (DRS.ofList []) heartOfBogardanHeader = [] := by decide
 /-- Balduvian Fallen -/
 def balduvianFallenHeader : GameEvent := does any (pay anyCost .once .paid (some thisCreature) (some cumulativeUpkeep))
@@ -345,8 +348,11 @@ theorem angelicCubPutsTheCounterOnItself :
 
 /-- Debris Beetle -/
 def debrisBeetleTrigger : Ability :=
-  when (does thisVehicle enter)
-    (sequentially [instruct eachOpponent (loseLife 3), gainLife 3])
+  (match debrisBeetle.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons part _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okDebrisBeetleTrigger : Ability.check (DRS.ofList []) debrisBeetleTrigger = [] := by decide
 /-- Roads Go Ever, Ever On's chapters II and III -/
 def roadsGoEverEverOnChapters : Ability :=
@@ -427,10 +433,11 @@ theorem okDontBlinkReplacement : Action.check (DRS.ofList []) dontBlinkReplaceme
 
 /-- Autarch Mammoth -/
 def autarchMammothLine : Ability :=
-  when (does thisCreature enter)
-    (joins := [ joinedHeadWhile (does thisCreature attack)
-        (whileTrue (is thisCreature (hasDesignation saddled))) ])
-    (create 1 (creatureToken 3 3 [.green] [elephant]))
+  (match autarchMammoth.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons part _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okAutarchMammothLine : Ability.check (DRS.ofList []) autarchMammothLine = [] := by decide
 /-- Altar of the Brood -/
 def altarOfTheBrood : Ability :=
@@ -479,12 +486,6 @@ def herosDemise : Action := destroy (target (and [isCreature, hasSupertype .lege
 theorem okHerosDemise : Action.check (DRS.ofList []) herosDemise = [] := by decide
 
 theorem bioplasmTwoCandidates : countOnes .object bioplasmAfterExile = 2 := by decide
-
-private semantic_template creatureDamagedByAttachedHostThisTurn (attachment : AttachWord) : NounPhrase :=
-  a (.and [isCreature,
-    .did { subj := .actor (.attachHost attachment creature)
-           action := .dealDamage .anyAmount .which
-           within := some (.duration soFarThisTurn none) }])
 
 /-- Curie, Emergent Intelligence's first ability: "Whenever Curie deals combat damage to a
 player, draw cards equal to its base power" [CR#208.4b]. -/

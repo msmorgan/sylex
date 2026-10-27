@@ -5,7 +5,8 @@ card malametBattleGlyph : Spelled :=
   { name := "Malamet Battle Glyph", cost := [pip .green], types := [.sorcery],
     text :=
       [ spell (sequentially
-          [ chooseFightPair,
+          [ (choose (both (target (and [isCreature, youControl])) (target (and [isCreature,
+            youDontControl])))),
             doIf (did (the (and [isCreature, youControl])) enter soFarThisTurn)
               (putCounters 1 p1p1Counter it),
             fightEachOther (those creature) ]) ] }

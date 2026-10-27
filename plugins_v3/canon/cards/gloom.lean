@@ -1,7 +1,8 @@
 card gloom : Spelled :=
   { name := "Gloom", cost := [generic 2, pip .black], types := [.enchantment],
     text :=
-      [ static (spellsCost (and [isSpell, hasColor .white]) (more 3)),
+      [ static ((costShift (allOf (and [isSpell, hasColor .white])) (more 3))),
         static (costShift
-          (allOf (and [abilityHead .anyActivated, abilityOf (allOf (and [isEnchantment, hasColor .white]))]))
+          (allOf (and [abilityHead .anyActivated, abilityOf (allOf (and [isEnchantment, hasColor
+            .white]))]))
           (more 3)) ] }

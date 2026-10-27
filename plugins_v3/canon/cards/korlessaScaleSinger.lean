@@ -4,5 +4,5 @@ card korlessaScaleSinger : Spelled :=
     subtypes := [dragon, bard],
     text :=
       [ static (visibility .lookAt you topOfLibrary),
-        static (castFromTop (and [isSpell, dragon])) ],
+        static ((can you (cast (bare (and [isSpell, dragon])) (from_ := onTop)))) ],
     power := stat 1, toughness := stat 4 }

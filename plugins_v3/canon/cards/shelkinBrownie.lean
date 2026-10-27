@@ -6,5 +6,5 @@ card shelkinBrownie : Spelled :=
       [ activated (compound [tapSymbol])
           (establishThroughout
              (abilityLoss (target isCreature)
-                [abilities bandsWithOtherAbilities]) untilEndOfTurn) ],
+                [abilities (.anyIn ⟨bandsWithOther, none⟩)]) untilEndOfTurn) ],
     power := stat 1, toughness := stat 1 }

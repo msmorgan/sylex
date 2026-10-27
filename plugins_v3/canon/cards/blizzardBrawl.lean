@@ -7,7 +7,8 @@ card blizzardBrawl : Spelled :=
   { name := "Blizzard Brawl", cost := [pip .green], supertypes := [.snow], types := [.sorcery],
     text :=
       [ spell (sequentially
-          [ chooseFightPair,
+          [ (choose (both (target (and [isCreature, youControl])) (target (and [isCreature,
+            youDontControl])))),
             doIf (compareAmt (countOf (and [hasSupertype .snow, isPermanent, youControl]))
                 .atLeast 3)
               (establishFor (the (and [isCreature, youControl]))

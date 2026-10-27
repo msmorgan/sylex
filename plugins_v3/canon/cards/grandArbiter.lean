@@ -3,9 +3,10 @@ card grandArbiter : Spelled :=
     supertypes := [.legendary], types := [.creature],
     subtypes := [human, advisor],
     text :=
-      [ static (spellsCost (and [hasColor .white, isSpell, did you (cast which) thisObject])
-          (less 1)),
-        static (spellsCost (and [hasColor .blue, isSpell, did you (cast which) thisObject])
-          (less 1)),
-        static (spellsCost (and [isSpell, did yourOpponents (cast which) thisObject]) (more 1)) ],
+      [ static ((costShift (allOf (and [hasColor .white, isSpell, did you (cast which) thisObject]))
+        (less 1))),
+        static ((costShift (allOf (and [hasColor .blue, isSpell, did you (cast which) thisObject]))
+          (less 1))),
+        static ((costShift (allOf (and [isSpell, did yourOpponents (cast which) thisObject])) (more
+          1))) ],
     power := stat 2, toughness := stat 3 }

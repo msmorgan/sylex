@@ -6,7 +6,10 @@ card scytheOfTheWretched : Spelled :=
       [ static (getsPt
           (equipped creature)
           (up 2) (up 2)),
-        whenever (does (creatureDamagedByAttachedHostThisTurn .equipped) die)
+        whenever (does ((a (and [isCreature,
+              predicateDid { subj := actor (attachHost .equipped creature),
+                             action := dealDamage anyAmount which,
+                             within := some (within soFarThisTurn none) }]))) die)
           (sequentially
             [ returnToBattlefield (that card)
                 [(under you)],

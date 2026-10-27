@@ -21,7 +21,11 @@ open Semantics Semantics.Templates Semantics.Definitions
 namespace Semantics.Cards
 
 def forkedBolt : Action :=
-  dealDivided this_ 2 (targets (oneThrough 2) isAnyTarget)
+  (match chandrasPyrohelixCard.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ part) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okForkedBolt : Action.check (DRS.ofList []) forkedBolt = [] := by decide
 def thoughtReflection : Ability :=
   static (replace (would you (draw 1)) (instead (draw 2)))
@@ -36,10 +40,17 @@ theorem okAbandonedOutpost : Ability.check (DRS.ofList []) abandonedOutpost = []
 def timeVaultLock : Ability := static (doesntUntap thisArtifact you)
 theorem okTimeVaultLock : Ability.check (DRS.ofList []) timeVaultLock = [] := by decide
 def hymnOfRebirth : Action :=
-  putOntoBattlefieldUnderYourControl (target (and [isCreature, in_ graveyard]))
-    (from_ := graveyard)
+  (match hymnOfRebirthCard.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ part) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okHymnOfRebirth : Action.check (DRS.ofList []) hymnOfRebirth = [] := by decide
-def counterspell : Action := counter (target isSpell)
+def counterspell : Action := (match counterspellCard.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ part) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okCounterspell : Action.check (DRS.ofList []) counterspell = [] := by decide
 
 def adantoVanguard : Ability :=
@@ -100,11 +111,11 @@ theorem okRoilingHorror : Ability.check (DRS.ofList []) roilingHorror = [] := by
 /-- Wilt-Leaf Liege's last line: "If a spell or ability an opponent controls causes you to discard
 this card, put it onto the battlefield instead of putting it into your graveyard." -/
 def wiltLeafLiegeDiscardReplacement : Ability :=
-  static (replace
-    (causedBy
-      (bySource (a (and [or [isSpell, abilityHead .anyOnStack], anOpponentControls])))
-      (would you (discard thisCard)))
-    (instead (putOntoBattlefield it)))
+  (match wiltLeafLiege.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons _ (List.cons part _))) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 /-- The discard has a performer (you) and, orthogonally, a cause (a spell or ability an opponent
 controls) [CR#609.1,701.9a], and the replacement checks clean with both. -/
@@ -132,14 +143,13 @@ def solfataraLandLock : Action :=
   establishThroughout (cant (target isPlayer) (play any)) thisTurn
 theorem okSolfataraLandLock : Action.check (DRS.ofList []) solfataraLandLock = [] := by decide
 
-/-- "each nonbasic land is a <type>": a moon effect. -/
-def nonbasicLandsAre (type : Subtype) : StaticSpec :=
-  qualityChange (allOf (and [isLand, non (hasSupertype .basic)])) .sets
-    (bundle { characteristics := { subtypes := [type] } })
-
 /-- Volrath's Laboratory -/
 def volrathsLaboratoryChoice : StaticSpec :=
-  conjunction [entersChoosing thisArtifact .color, entersChoosing thisArtifact (.subtype .creature)]
+  (match volrathsLaboratory.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.static part) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okVolrathsLaboratoryChoice : StaticSpec.check (DRS.ofList []) volrathsLaboratoryChoice = [] := by decide
 /-- Call to Arms -/
 def callToArmsChoice : StaticSpec :=
@@ -180,10 +190,6 @@ def lithoformBlightLoss : StaticSpec :=
   conjunction [ qualityChange (enchanted land) .loses (everyTypeOf .land),
       allAbilityLoss it ]
 theorem okLithoformBlightLoss : StaticSpec.check (DRS.ofList []) lithoformBlightLoss = [] := by decide
-
-/-- "activated abilities of <p> can't be activated" -/
-def cantActivateAbilitiesOf (p : Predicate) : StaticSpec :=
-  cant any (activate (allOf (and [abilityHead .anyActivated, abilityOf (allOf p)])))
 
 def theLadyOfOtariaLine : StaticSpec :=
   altCost this_
@@ -297,7 +303,11 @@ theorem okLanternOfInsightRider : Ability.check (DRS.ofList []) lanternOfInsight
 
 /-- Phyrexian Unlife -/
 def phyrexianUnlifeImmunity : Ability :=
-  static (cant you (loseGame (some .nonpositiveLife)))
+  (match phyrexianUnlife.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons part _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okPhyrexianUnlifeImmunity : Ability.check (DRS.ofList []) phyrexianUnlifeImmunity = [] := by decide
 /-- Umbris, Fear Manifest -/
 def umbrisPump : Ability :=

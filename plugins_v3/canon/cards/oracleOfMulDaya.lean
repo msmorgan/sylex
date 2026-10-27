@@ -6,5 +6,5 @@ card oracleOfMulDaya : Spelled :=
           (can you (play (counted (additional (exactly 1)) isLand))
              (timing := onEachOfYourTurns)),
         static (visibility .reveal you topOfLibrary),
-        static playLandsFromTop ],
+        static (can you (play (allOf isLand) (from_ := onTop))) ],
     power := stat 2, toughness := stat 2 }

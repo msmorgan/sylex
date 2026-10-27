@@ -4,6 +4,7 @@ card thoughtSponge : Spelled :=
     subtypes := [sponge],
     text :=
       [ flash,
-        static (entersWithCounters thisCreature greatestCardsAnOpponentDrew p1p1Counter),
+        static (entersWithCounters thisCreature (aggregateOver .max isOpponent (eventCount (draw
+          anyAmount) they soFarThisTurn)) p1p1Counter),
         when (does thisCreature die) (draw (powerOf thisCreature)) ],
     power := stat 1, toughness := stat 1 }

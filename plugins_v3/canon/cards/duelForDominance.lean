@@ -8,7 +8,8 @@ card duelForDominance : Spelled :=
   { name := "Duel for Dominance", cost := [generic 1, pip .green], types := [.instant],
     text :=
       [ coven (spell (sequentially
-          [ chooseFightPair,
+          [ (choose (both (target (and [isCreature, youControl])) (target (and [isCreature,
+            youDontControl])))),
             doIf (compareAmt (distinctCount (.value .power) (allOf (and [isCreature, youControl])))
                 .atLeast 3)
               (putCounters 1 p1p1Counter (the (and [isCreature, isChosen, youControl]))),

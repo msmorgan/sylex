@@ -8,5 +8,9 @@ card wiltLeafLiege : Spelled :=
           (up 1) (up 1)),
         static (getsPt (allOf (and [isCreature, hasColor .white, youControl, isOther]))
           (up 1) (up 1)),
-        wiltLeafLiegeDiscardReplacement ],
+        (static (replace
+              (causedBy
+                (bySource (a (and [or [isSpell, abilityHead .anyOnStack], anOpponentControls])))
+                (would you (discard thisCard)))
+              (instead (putOntoBattlefield it)))) ],
     power := stat 4, toughness := stat 4 }

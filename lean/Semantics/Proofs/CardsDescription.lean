@@ -150,7 +150,13 @@ theorem okCroakingCounterpartCopy : Action.check (DRS.ofList []) croakingCounter
 
 /-- "a loyalty ability of enchanted planeswalker" -/
 def loyaltyAbilityOfEnchanted : NounPhrase :=
-  a (and [abilityHead .loyalty, abilityOf (enchanted planeswalker)])
+  (match elspethsTalent.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons _ (List.cons (Ability.triggered (GameEvent.does _ (Action.ownScope _
+        (Action.procedure _ (NounPhrase.firstMention _ (NounPhrase.inCaller part)) _ _ _ _))) _ _ _
+        _ _ _ _) _))) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okLoyaltyAbilityOfEnchanted :
     NounPhrase.checkAt (some .object) (DRS.ofList []) loyaltyAbilityOfEnchanted = [] := by
   decide
@@ -190,7 +196,13 @@ def fellTheMighty : Action :=
                   hasPower .greater (powerOf (target isCreature))]))
 theorem okFellTheMighty : Action.check (DRS.ofList []) fellTheMighty = [] := by decide
 
-def targetPlayerOrPlaneswalker : NounPhrase := target (or [isPlaneswalker, isPlayer])
+def targetPlayerOrPlaneswalker : NounPhrase := (match heartOfBogardan.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
+        (Action.simultaneously (List.cons (Action.instruct _ (Action.dealDamage _ part _)) _)) _)))
+        _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okTargetPlayerOrPlaneswalker :
     NounPhrase.checkAt none (DRS.ofList []) targetPlayerOrPlaneswalker = [] := by decide
 
@@ -214,9 +226,18 @@ theorem okRequitingHexAdditionalRead : Ability.check (DRS.ofList []) requitingHe
   decide
 
 /-- Bioplasm -/
-def bioplasmAttack : GameEvent := does thisCreature attack
+def bioplasmAttack : GameEvent := (match bioplasm.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.triggered part _ _ _ _ _ _ _) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okBioplasmAttack : GameEvent.check (DRS.ofList []) bioplasmAttack = [] := by decide
-def bioplasmExile : Action := exile (topSlice 1)
+def bioplasmExile : Action := (match bioplasm.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons part _))) _) =>
+        some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okBioplasmExile :
     Action.check ((stepGameEvent 512 (DRS.ofList []) bioplasmAttack).1) bioplasmExile = [] := by decide
 def bioplasmAfterExile : DRS := (stepAction 512 .postEvent .obj ((stepGameEvent 512 (DRS.ofList []) bioplasmAttack).1) bioplasmExile).1
@@ -376,17 +397,16 @@ theorem okSquadCommanderTokens : Ability.check (DRS.ofList []) squadCommanderTok
 
 /-- At Knifepoint -/
 def atKnifepointOutlaws : Ability :=
-  static (partScope .turn you
-            (abilityGrant (allOf (and [isOutlaw, youControl])) firstStrike))
+  (match atKnifepoint.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons part _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 def atKnifepointCrime : Ability :=
-  whenever (does you commitCrime) (create 1 (written
-      { characteristics :=
-        { colors := [.red], types := [.creature], subtypes := [mercenary],
-          text :=
-            [ activatedOnlyDuring tapSymbol
-                (get (target (and [isCreature, youControl])) (up 1) (up 0)
-                  untilEndOfTurn)
-                asSorcery ],
-          power := stat 1, toughness := stat 1 } })) (limit := oncePerTurn)
+  (match atKnifepoint.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons part _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 end Semantics.Cards

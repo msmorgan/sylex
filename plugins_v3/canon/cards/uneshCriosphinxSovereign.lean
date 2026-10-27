@@ -4,7 +4,8 @@ card uneshCriosphinxSovereign : Spelled :=
     supertypes := [.legendary], types := [.creature], subtypes := [sphinx],
     text :=
       [ flying,
-        static (spellsCost (and [sphinx, isSpell, did you (cast which) thisObject]) (less 2)),
+        static ((costShift (allOf (and [sphinx, isSpell, did you (cast which) thisObject])) (less
+          2))),
         whenever
           (does (eitherOf thisCreature
             (a (and [sphinx, youControl, isOther]))) enter)

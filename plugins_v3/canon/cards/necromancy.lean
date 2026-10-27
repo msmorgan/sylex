@@ -7,9 +7,11 @@ card necromancy : Spelled :=
           (sequentially
             [ establish (conjunction
                 [ addSubtype it aura,
-                  abilityGrant it (enchant (creaturePutOntoTheBattlefieldWith this_)) ]
+                  abilityGrant it (enchant ((and [isCreature, did (by_ this_) (putOntoBattlefield
+                    which)]))) ]
                 (subject := it)),
-              putOntoBattlefieldUnderYourControl (target creatureCardInAGraveyard),
+              putOntoBattlefieldUnderYourControl (target (and [isCreature, isCard, in_ graveyard])),
               attachTo thisEnchantment it,
-              sacrificedWhenItLeaves thisEnchantment ])
+              (delay (does thisEnchantment (leave battlefield)) (instruct (controllerOf (that
+                creature)) (sacrifice it))) ])
           (if_ := is it (in_ battlefield)) ] }

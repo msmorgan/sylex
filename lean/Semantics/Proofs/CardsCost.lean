@@ -100,9 +100,6 @@ def ancientStoneIdol : Ability :=
   static (costShift this_ (less (forEach 1 (and [isCreature, isAttacking]))))
 theorem okAncientStoneIdol : Ability.check (DRS.ofList []) ancientStoneIdol = [] := by decide
 
-/-- "<p> spells cost {N} more/less to cast" -/
-def spellsCost (p : Predicate) (shift : CostShift) : StaticSpec := costShift (allOf p) shift
-
 def nullhideFerox : Ability :=
   activated [generic 2]
     (establishThroughout (allAbilityLoss thisCreature) untilEndOfTurn)
@@ -113,14 +110,16 @@ def saheelisEmblem : Action :=
   getEmblem
     [ static (getsPt (allOf (and [isArtifact, isCreature, youControl]))
         (up 1) (up 1)),
-      static (spellsCost (and [isArtifact, isSpell, did you (cast which) thisObject]) (less 1)) ]
+      static ((costShift (allOf (and [isArtifact, isSpell, did you (cast which) thisObject])) (less 1))) ]
 theorem okSaheelisEmblem : Action.check (DRS.ofList []) saheelisEmblem = [] := by decide
 
 /-- Elspeth's Talent -/
 def elspethsTalentGrant : StaticSpec :=
-  abilityGrant (enchanted planeswalker)
-    (activated (loyaltySymbol (up 1))
-      (create 3 (creatureToken 1 1 [.white] [soldier])))
+  (match elspethsTalent.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.static part) _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okElspethsTalentGrant : StaticSpec.check (DRS.ofList []) elspethsTalentGrant = [] := by decide
 
 /-- Amoeboid Changeling -/
@@ -158,9 +157,11 @@ def ferventChampionEquipDiscount : Ability :=
 theorem okFerventChampionEquipDiscount : Ability.check (DRS.ofList []) ferventChampionEquipDiscount = [] := by decide
 
 def oppressiveRaysLine : StaticSpec :=
-  costShift (allOf (and [abilityHead .anyActivated, abilityOf (enchanted (.type
-      .creature))]))
-    (more 3)
+  (match oppressiveRays.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons _ (List.cons (Ability.static part) _))) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okOppressiveRaysLine : StaticSpec.check (DRS.ofList []) oppressiveRaysLine = [] := by decide
 
 def hurrJackalAbility : Ability :=
@@ -216,7 +217,12 @@ theorem okDiplomaticEscortLine : Ability.check (DRS.ofList []) diplomaticEscortL
 
 /-- Prosperity -/
 theorem prosperityCostLetters : costLetters [.variable, pip .blue] = [letterB .x] := rfl
-def prosperityTextLetter : Amount := letter .x
+def prosperityTextLetter : Amount := (match prosperity.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ (Action.instruct _ (Action.draw (Quantity.exactlyOf part)))) _)
+        => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem prosperityTextReadsCostLetter :
     let context := DRS.ofList (costLetters [.variable, pip .blue])
     let out := (stepAmount 64 context prosperityTextLetter).1
@@ -226,9 +232,7 @@ theorem noCostNoLetter : costLetters none = [] := by decide
 
 /-- Doc Aurlock, Grizzled Genius -/
 def docAurlockCost : StaticSpec :=
-  spellsCost
-    (and [isSpell, did you (cast which (from_ := some (or [yourGraveyard, exileZone]))) thisObject])
-    (less 2)
+  (costShift (allOf (and [isSpell, did you (cast which (from_ := some (or [yourGraveyard, exileZone]))) thisObject])) (less 2))
 theorem okDocAurlockCost : StaticSpec.check (DRS.ofList []) docAurlockCost = [] := by decide
 /-- Obelisk of Undoing -/
 def obeliskOfUndoing : Ability :=

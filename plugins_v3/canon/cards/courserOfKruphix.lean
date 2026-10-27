@@ -3,7 +3,7 @@ card courserOfKruphix : Spelled :=
     types := [.enchantment, .creature], subtypes := [centaur],
     text :=
       [ static (visibility .reveal you topOfLibrary),
-        static playLandsFromTop,
+        static (can you (play (allOf isLand) (from_ := onTop))),
         whenever (does (a (and [isLand, youControl])) enter)
           (gainLife 1) ],
     power := stat 2, toughness := stat 4 }

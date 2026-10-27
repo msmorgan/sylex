@@ -11,5 +11,5 @@ card escapedShapeshifter : Spelled :=
             (exists_
               (and [ isCreature, anOpponentControls, hasKeyword k,
                      not (named "Escaped Shapeshifter") ]))))
-          [flying, firstStrike, trample, protectionFromAnyColor] ],
+          [flying, firstStrike, trample, (.anyIn ⟨protection, some .color⟩)] ],
     power := stat 3, toughness := stat 4 }

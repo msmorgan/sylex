@@ -125,7 +125,11 @@ theorem okIndestructibleAura : Action.check (DRS.ofList []) indestructibleAura =
 def shieldmatesBlessing : Action :=
   preventNext (target isAnyTarget) 3 thisTurn
 theorem okShieldmatesBlessing : Action.check (DRS.ofList []) shieldmatesBlessing = [] := by decide
-def moonlitWake : Ability := whenever (does (a isCreature) die) (gainLife 1)
+def moonlitWake : Ability := (match moonlitWakeCard.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons part _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okMoonlitWake : Ability.check (DRS.ofList []) moonlitWake = [] := by decide
 def eliteJavelineer : Ability :=
   whenever (does thisCreature block)
@@ -134,7 +138,11 @@ def eliteJavelineer : Ability :=
 theorem okEliteJavelineer : Ability.check (DRS.ofList []) eliteJavelineer = [] := by decide
 /-- Glacial Chasm -/
 def glacialChasmShield : Ability :=
-  static (replace (would any (dealDamage anyAmount you)) (instead (preventDamage allDamage)))
+  (match glacialChasm.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons _ (List.cons _ (List.cons part _)))) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okGlacialChasmShield : Ability.check (DRS.ofList []) glacialChasmShield = [] := by decide
 def corneredCrook : Ability :=
   when (does thisCreature enter)

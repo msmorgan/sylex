@@ -6,5 +6,9 @@ card darkDepths : Spelled :=
         activated [generic 3]
           (removeCounters (exactly 1) iceCounter thisLand),
         when (stateHolds (not (is thisLand (hasCounter iceCounter))))
-          (doIfDone (sacrifice thisLand) (create 1 maritLage))
-              ] }
+          (doIfDone (sacrifice thisLand)
+            (create 1 (written
+              { characteristics :=
+                { name := "Marit Lage", colors := [.black], supertypes := [.legendary],
+                  types := [.creature], subtypes := [avatar], text := [flying, indestructible],
+                  power := stat 20, toughness := stat 20 } }))) ] }

@@ -47,7 +47,11 @@ theorem okChooseCreatureYouControlAndCreatureYouDont :
 /-- The opening the fight-and-bite cards share: "Choose target creature you control and target
 creature you don't control." -/
 def chooseFightPair : Action :=
-  choose (both (target (and [isCreature, youControl])) (target (and [isCreature, youDontControl])))
+  (match joust.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ (Action.sequentially (List.cons part _))) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 /-- Joust's postposed "if it's a Knight" reads the one creature its clause re-mentions, the
 target you control, and not the target you don't control, which its clause does not mention.
@@ -203,10 +207,11 @@ theorem okAshnodsBattleGear : Ability.check (DRS.ofList []) ashnodsBattleGear = 
 
 /-- Phyrexian Ingester -/
 def phyrexianIngesterPump : Ability :=
-  static (conjunction [ getsPt thisCreature (up (letter .x)) (up (letter .y)),
-      letterDefinition .x
-        (powerOf (the (and [isCreature, in_ (exiledWith thisCreature)]))),
-      letterDefinition .y (toughnessOf (that card)) ])
+  (match phyrexianIngester.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons part _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okPhyrexianIngesterPump : Ability.check (DRS.ofList []) phyrexianIngesterPump = [] := by decide
 
 /-- Tahngarth, First Mate -/
@@ -243,21 +248,27 @@ theorem okNecromentiaChoice : Action.check (DRS.ofList []) necromentiaChoice = [
 
 /-- "play lands from the top of your library" -/
 def playLandsFromTop : StaticSpec :=
-  can you (play (allOf isLand) (from_ := onTop))
-/-- "cast <p> spells from the top of your library" -/
-def castFromTop (p : Predicate) : StaticSpec :=
-  can you (cast (bare p) (from_ := onTop))
-
+  (match oracleOfMulDaya.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons _ (List.cons (Ability.static part) _))) => some part
+      | _ => none
+    | _ => none).get (by decide)
 /-- Future Sight; Magus of the Future -/
 def playLandsAndCastSpellsFromTop : StaticSpec :=
-  conjunction [playLandsFromTop, castFromTop isSpell]
+  (match magusOfTheFuture.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.static part) _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okPlayLandsAndCastSpellsFromTop :
     StaticSpec.check (DRS.ofList []) playLandsAndCastSpellsFromTop = [] := by decide
 /-- Assemble the Players -/
 def castSmallCreatureFromTopOnceEachTurn : StaticSpec :=
-  can you
-      (cast (counted (exactly 1) (and [isSpell, isCreature, hasPower .atMost 2]))
-         (from_ := onTop)) (timing := eachTurn)
+  (match assembleThePlayers.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.static part) _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okCastSmallCreatureFromTopOnceEachTurn :
     StaticSpec.check (DRS.ofList []) castSmallCreatureFromTopOnceEachTurn = [] := by decide
 
@@ -324,7 +335,11 @@ theorem okTranquilFrillbackOffer : Action.check (DRS.ofList []) tranquilFrillbac
 
 /-- Duneblast -/
 def duneblast : Action :=
-  sequentially [choose (counted (upTo 1) isCreature), destroy theRest]
+  (match duneblastCard.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons (Ability.spell _ part) _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okDuneblast : Action.check (DRS.ofList []) duneblast = [] := by decide
 /-- Boreas Charger -/
 def boreasChargerChoice : Action := choose (a opponentWithMoreLands)
@@ -424,7 +439,7 @@ def akiriUnattachOffer : Ability :=
 theorem okAkiriUnattachOffer : Ability.check (DRS.ofList []) akiriUnattachOffer = [] := by decide
 /-- Summoning Materia -/
 def summoningMateriaTopCast : Ability :=
-  static (onlyWhile (castFromTop (and [isSpell, isCreature]))
+  static (onlyWhile ((can you (cast (bare (and [isSpell, isCreature])) (from_ := onTop))))
     (is thisEquipment (attachedTo (a isCreature))))
 theorem okSummoningMateriaTopCast : Ability.check (DRS.ofList []) summoningMateriaTopCast = [] := by decide
 /-- Vizier of the Menagerie -/
@@ -493,18 +508,12 @@ theorem loxodonPeacekeeperThemReadsTheTiedPlayers :
     (resolveCandidates (.word .player) .many (nextClause after)).map (·.det) = [.count] := by
   decide
 
-/-- "The permanent of `kind` `who` controls with the greatest mana value." -/
-private def greatestManaValue (kind : Predicate) (who : NounPhrase) : NounPhrase :=
-  the (and [kind, controlledBy who,
-            superlative .max (.stat .manaValue) (and [kind, controlledBy who])])
-
-/-- Juxtapose's last sentence: "If two or more permanents a player controls are tied for
-greatest, their controller chooses one of them." -/
 private def juxtaposeTie : Action :=
-  doIf (thereAre (counted (orMore 2)
-          (and [isPermanent, controlledBy (a isPlayer),
-                tiedFor .max (.stat .manaValue) (and [isPermanent, controlledBy (that player)])])))
-    (instruct (controllerOf them) (choose (someOf (exactly 1) them)))
+  (match juxtapose.card with
+    | .singleFaced face => match face.characteristics.text with
+      | .spell _ (.sequentially (_ :: _ :: action :: _)) :: _ => some action
+      | _ => none
+    | _ => none).get (by decide)
 
 /-- In *Juxtapose*, "them" reads the tied permanents the counted existential introduces
 (`.count`), even after an ordinary plural mention of artifacts ("artifacts you control get

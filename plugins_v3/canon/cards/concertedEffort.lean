@@ -11,5 +11,6 @@ card concertedEffort : Spelled :=
                   (and [isCreature, youControl, hasKeyword k]))
                 untilEndOfTurn)
               (exists_ (and [isCreature, youControl, hasKeyword k]))))
-          [ flying, fear, firstStrike, doubleStrike, landwalkAbilities, protectionAbilities,
+          [ flying, fear, firstStrike, doubleStrike, (.anyIn ⟨landwalk, none⟩), (.anyIn ⟨protection,
+            none⟩),
             trample, vigilance ] ] }

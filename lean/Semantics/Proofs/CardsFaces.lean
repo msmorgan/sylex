@@ -115,17 +115,20 @@ theorem planeswalkerBackWithoutLoyaltyOk :
 
 /-- Garruk Relentless -/
 def garrukRelentlessFlip : Ability :=
-  when
-    (stateHolds
-      (is thisPlaneswalker (compare .atMost 2 (axes := [.counter loyaltyCounter]))))
-    (transform thisPlaneswalker)
+  (match garrukRelentless.card with
+    | Card.transforming face _ => match face.characteristics.text with
+      | (List.cons part _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okGarrukRelentlessFlip : Ability.check (DRS.ofList []) garrukRelentlessFlip = [] := by decide
 /-- Garruk Relentless's first 0: "Garruk Relentless deals 3 damage to target creature. That
 creature deals damage equal to its power to him." -/
 def garrukRelentlessFight : Action :=
-  sequentially
-    [ instruct thisPlaneswalker (dealDamage 3 (target isCreature)),
-      dealDamageOwnPower (that creature) thisPlaneswalker ]
+  (match garrukRelentless.card with
+    | Card.transforming face _ => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.activated _ part _ _ _ _) _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okGarrukRelentlessFight : Action.check (DRS.ofList []) garrukRelentlessFight = [] := by
   decide
 
@@ -136,11 +139,11 @@ theorem okManaClashFlip : Action.check (DRS.ofList []) manaClashFlip = [] := by 
 
 /-- Kitsune Mystic -/
 def kitsuneMysticFlip : Ability :=
-  at_ (beginningOfEach .endStep)
-    (if_ := is thisCreature
-      (attachedBy (some .enchanted)
-        (counted (orMore 2) aura)))
-    (flip thisCreature)
+  (match kitsuneMystic.card with
+    | Card.flip face _ => match face.characteristics.text with
+      | (List.cons part _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okKitsuneMysticFlip : Ability.check (DRS.ofList []) kitsuneMysticFlip = [] := by decide
 
 /-- Vesuvan Shapeshifter -/
@@ -162,8 +165,12 @@ spell each does not satisfy it. A `DidClause.ordinal` ("cast a second spell") na
 period (`Period` has none), and a counted patient ("cast two or more spells") counts spells, not
 casting events [CR#601.2a]. -/
 def aPlayerCastTwoOrMoreLastTurn : Condition :=
-  compareAmt
-    (aggregateOver .max isPlayer (eventCount (cast (a isSpell)) they lastTurn)) .atLeast 2
+  (match afflictedDeserter.card with
+    | Card.transforming _ face => match face.characteristics.text with
+      | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ (Option.some part) _) _)) => some
+        part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okAPlayerCastTwoOrMoreLastTurn :
     Condition.check (DRS.ofList []) aPlayerCastTwoOrMoreLastTurn = [] := by decide
 
@@ -181,21 +188,18 @@ theorem badCountedCastPatientLastTurn :
 
 /-- Chittering Host's face, as both melding cards carry it. -/
 def chitteringHost : CardFace :=
-  { characteristics :=
-    { name := "Chittering Host", types := [.creature],
-      subtypes := [eldrazi, horror],
-      text :=
-        [ haste, menace,
-          when (does thisCreature enter)
-            (establishFor (allOf (and [isCreature, youControl, isOther]))
-              [getsPt them (up 1) (up 0), abilityGrant them menace]
-              untilEndOfTurn) ],
-      power := stat 5, toughness := stat 6 } }
-def chitteringHostOnScavengers : CardFace := chitteringHost
+  (match midnightScavengers.card with
+    | (Card.transforming _ part) => some part
+    | _ => none).get (by decide)
+def chitteringHostOnScavengers : CardFace := (match midnightScavengers.card with
+    | (Card.transforming _ part) => some part
+    | _ => none).get (by decide)
 theorem okChitteringHostOnScavengers : CardFace.check .back chitteringHostOnScavengers = [] := by
   decide
 /-- Chittering Host as the GRAF RATS card carries it -/
-def chitteringHostOnGrafRats : CardFace := chitteringHost
+def chitteringHostOnGrafRats : CardFace := (match midnightScavengers.card with
+    | (Card.transforming _ part) => some part
+    | _ => none).get (by decide)
 theorem okChitteringHostOnGrafRats : CardFace.check .back chitteringHostOnGrafRats = [] := by
   decide
 

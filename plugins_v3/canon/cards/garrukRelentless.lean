@@ -5,8 +5,13 @@ card garrukRelentless : Spelled := { body := .transforming
       supertypes := [.legendary], types := [.planeswalker],
       subtypes := [garruk],
       text :=
-        [ garrukRelentlessFlip,
-          activated (loyaltySymbol (up 0)) garrukRelentlessFight,
+        [ (when
+              (stateHolds
+                (is thisPlaneswalker (compare .atMost 2 (axes := [.counter loyaltyCounter]))))
+              (transform thisPlaneswalker)),
+          activated (loyaltySymbol (up 0)) (sequentially
+                [ instruct thisPlaneswalker (dealDamage 3 (target isCreature)),
+                  dealDamageOwnPower (that creature) thisPlaneswalker ]),
           activated (loyaltySymbol (up 0))
             (create 1 (creatureToken 2 2 [.green] [wolf])) ],
       loyalty := stat 3 } }

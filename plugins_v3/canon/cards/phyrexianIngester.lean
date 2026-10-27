@@ -6,5 +6,8 @@ card phyrexianIngester : Spelled :=
       [ imprint
           (when (does thisCreature enter)
             (may (exile (target (and [isCreature, isNontoken]))))),
-        phyrexianIngesterPump ],
+        (static (conjunction [ getsPt thisCreature (up (letter .x)) (up (letter .y)),
+                letterDefinition .x
+                  (powerOf (the (and [isCreature, in_ (exiledWith thisCreature)]))),
+                letterDefinition .y (toughnessOf (that card)) ])) ],
     power := stat 3, toughness := stat 3 }

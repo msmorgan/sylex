@@ -6,8 +6,19 @@ card juxtapose : Spelled :=
   { name := "Juxtapose", cost := [generic 3, pip .blue], types := [.sorcery],
     text :=
       [ spell (sequentially
-          [ exchangeControl (greatestManaValue isCreature you)
-              (greatestManaValue isCreature (target isPlayer)),
-            exchangeControl (greatestManaValue isArtifact you)
-              (greatestManaValue isArtifact (that player)),
-            juxtaposeTie ]) ] }
+          [ exchangeControl ((the (and [isCreature, controlledBy you,
+                        superlative .max (.stat .manaValue) (and [isCreature, controlledBy you])])))
+              ((the (and [isCreature, controlledBy (target isPlayer),
+                            superlative .max (.stat .manaValue) (and [isCreature, controlledBy
+                              (target isPlayer)])]))),
+            exchangeControl ((the (and [isArtifact, controlledBy you,
+                          superlative .max (.stat .manaValue) (and [isArtifact, controlledBy
+                            you])])))
+              ((the (and [isArtifact, controlledBy (that player),
+                            superlative .max (.stat .manaValue) (and [isArtifact, controlledBy (that
+                              player)])]))),
+            (doIf (thereAre (counted (orMore 2)
+                        (and [isPermanent, controlledBy (a isPlayer),
+                              tiedFor .max (.stat .manaValue) (and [isPermanent, controlledBy (that
+                                player)])])))
+                  (instruct (controllerOf them) (choose (someOf (exactly 1) them)))) ]) ] }

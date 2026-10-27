@@ -426,7 +426,7 @@ private def korlessaWritten : Spelled := spelled <| .singleFaced
       subtypes := [dragon, bard],
       text :=
         [ static (visibility .lookAt you topOfLibrary),
-          static (Templates.castFromTop (and [isSpell, hasSubtype dragon])) ],
+          static (can you (cast (bare (and [isSpell, hasSubtype dragon])) (from_ := onTop))) ],
       power := stat 1, toughness := stat 4 } }
 
 theorem subtypeCoercionKeepsTheCard : Cards.korlessaScaleSinger.card = korlessaWritten.card := rfl

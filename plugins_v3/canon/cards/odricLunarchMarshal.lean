@@ -11,6 +11,6 @@ card odricLunarchMarshal : Spelled :=
                   (and [isCreature, youControl, hasKeyword k]))
                 untilEndOfTurn)
               (exists_ (and [isCreature, youControl, hasKeyword k]))))
-          [ firstStrike, flying, deathtouch, doubleStrike, haste, hexproofAbilities,
+          [ firstStrike, flying, deathtouch, doubleStrike, haste, (.anyIn ⟨hexproof, none⟩),
             indestructible, lifelink, menace, reach, skulk, trample, vigilance ] ],
     power := stat 3, toughness := stat 3 }

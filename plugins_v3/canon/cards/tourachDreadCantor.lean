@@ -6,7 +6,9 @@ card tourachDreadCantor : Spelled :=
     text :=
       [ kicker [pip .black, pip .black],
         protection (hasColor .white),
-        tourachDiscardTrigger,
+        (whenever (does anOpponent (discard (a
+              isCard)))
+              (putCounters 1 p1p1Counter thisCreature)),
         when (does thisCreature enter) (if_ := keywordCostPaid kicker
                                                          thisCreature)
           (instruct (target isOpponent) (discard (countedAtRandom (exactly 2) isCard))) ],

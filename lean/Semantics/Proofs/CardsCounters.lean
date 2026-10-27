@@ -83,10 +83,11 @@ def savagebornHydra : Ability :=
     (putCounters 1 p1p1Counter thisCreature) asSorcery
 theorem okSavagebornHydra : Ability.check (DRS.ofList []) savagebornHydra = [] := by decide
 def woeleecher : Ability :=
-  activated (compound [[pip .white], tapSymbol])
-    (doIfDone
-      (removeCounters (exactly 1) m1m1Counter (target isCreature))
-      (gainLife 2))
+  (match woeleecherWhole.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons part _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okWoeleecher : Ability.check (DRS.ofList []) woeleecher = [] := by decide
 def anointerOfValor : Ability :=
   whenever (does (a isCreature) attack)
@@ -161,18 +162,20 @@ theorem okCorpsejackMenace : Ability.check (DRS.ofList []) corpsejackMenace = []
 /-- Doubling Season's first line: "If an effect would create one or more tokens under your
 control, it creates twice that many of those tokens instead." -/
 def doublingSeasonTokens : Ability :=
-  static (replace
-    (causedBy byAnEffect
-      (would any (createObject anyAmount (token (copyOf (counted (orMore 1) isToken)) []) you)))
-    (instead (create (times 2 groupSize) asThose [])))
+  (match doublingSeason.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons part _) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 /-- Doubling Season's second line: "If an effect would put one or more counters on a permanent
 you control, it puts twice that many of those counters on that permanent instead." -/
 def doublingSeasonCounters : Ability :=
-  static (replace
-    (causedBy byAnEffect
-      (would any (putCounters anyAmount anyKind (a (and [isPermanent, youControl])))))
-    (instead (putCounters (times 2 thatMuch) thoseCounters (that permanent))))
+  (match doublingSeason.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons part _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 
 /-- Whether an ability is a replacement whose would-clause an effect causes. -/
 private def watchesAnEffect : Ability → Bool
@@ -237,11 +240,11 @@ def captainMarvelSameKinds : Ability :=
 theorem okCaptainMarvelSameKinds : Ability.check (DRS.ofList []) captainMarvelSameKinds = [] := by decide
 /-- Denry Klin, Editor in Chief -/
 def denryKlinSameKinds : Ability :=
-  whenever (does (a (and [isNontoken, and [isCreature, youControl]])) enter)
-    (if_ := is thisCreature hasCounter)
-    (doForEachKind .counterKind .counterKind
-      (putCounters (statOf .boundCounter thisCreature) thatKind (that creature))
-      (domain := thisCreature))
+  (match denryKlin.card with
+    | Card.singleFaced face => match face.characteristics.text with
+      | (List.cons _ (List.cons part _)) => some part
+      | _ => none
+    | _ => none).get (by decide)
 theorem okDenryKlinSameKinds : Ability.check (DRS.ofList []) denryKlinSameKinds = [] := by decide
 
 /-- Me, the Immortal -/
