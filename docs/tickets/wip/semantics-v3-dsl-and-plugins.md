@@ -22,12 +22,17 @@ Standard constraints apply.
   `lean/Semantics/` v3 types (`Subject`, `AnyValue` / `any`, `NounPhrase.which`,
   `instruct`, `does`, `would` / `instead`, `cant`/`must`/`can`/`gatedBy` +
   `DeonticMods`, `did` / `tally`, and the 10-constructor `GameEvent`).
-- **Port the Clean-Sheet DRT Checker (`reads.rs`):**
-  - `crates/deckmaste_semantics_v3/src/reads.rs` mirrors `lean/Semantics/Check/`'s
-    `DRS`, `ReferentId`, `Referent`, `GramRole`, nested DRS boxes,
-    `enterOwnScope` / `inCaller` / `leaveOwnScope`, `firstMention` /
-    `laterMention` (`List ReferentId`), `StepPhase.preEvent` vs `.postEvent`,
-    and the `J1`, `J2`, `D′`, and `AC>R1` resolution gates.
+- **Owner ruling: separate syntax from engine lowering.**
+  `crates/deckmaste_semantics_v3` is the pure AST, bundle reader, and declaration
+  expander (`ast.rs`, `reader.rs`, `bundle.rs`, `src/lower/`). Identifiers use
+  `dpsi::Ident` throughout both crates.
+  `crates/deckmaste_lowering_v3` depends on that syntax and owns `reads.rs`,
+  `refusal.rs`, and `src/reads/`: `DRS`, referents, scope boxes, mention identities,
+  pre-event/post-event resolution, and the `J1`, `J2`, Principle A, `D′`, and
+  `AC>R1` machinery needed to unify engine slot bindings. Existing AST inspection
+  and stepping helpers are preserved there as extension traits and functions.
+  Lean remains the full checker authority. Do not port `Check/Abilities.lean`,
+  `Rules.lean`, `Triggers.lean`, or `Card.lean` into Rust for this ticket.
 - **One language: Genuine Lean 4 `{ field := val, ... }` brace-and-comma declarations:**
   - Every declaration and card lives in its own individual `.lean` file in `plugins_v3/`:
     - `plugins_v3/builtin/primitives/{action,ability,condition,cost,determiner,event,mana,noun,pile,predicate,pronoun,quantity,static,timing,zone}/<name>.lean`
@@ -105,8 +110,8 @@ Standard constraints apply.
   workspace.
 - `plugins_v2/builtin/` and `crates/deckmaste_macro_def` are deleted, with xtask
   `expansions.rs` and `plugins_v2_declarations.rs` reading `plugins_v3/` instead.
-- `cargo test -p deckmaste_semantics_v3 -p xtask -p deckmaste_plugin` and
-  `cargo clippy -p deckmaste_semantics_v3 -p xtask -p deckmaste_plugin --tests -- -D warnings` pass.
+- `cargo test -p deckmaste_semantics_v3 -p deckmaste_lowering_v3 -p xtask -p deckmaste_plugin` and
+  `cargo clippy -p deckmaste_semantics_v3 -p deckmaste_lowering_v3 -p xtask -p deckmaste_plugin --tests -- -D warnings` pass.
 - `cargo xtask lean check` passes on the live `plugins_v3/builtin` bundle.
   `lean definitions` and `lean macros align` were retired with RON-to-Lean
   code generation; they are not gates for this ticket.

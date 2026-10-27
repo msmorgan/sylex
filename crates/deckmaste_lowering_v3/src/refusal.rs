@@ -1,8 +1,19 @@
 //! Refusal vocabulary mirrored from `lean/Semantics/Check/Refusal.lean`.
-use crate::ast::{
-    AbilityWordLabel, BindingId, ChoiceRef, ChoiceSort, DesignationLabel, KeywordLabel, Kind,
-    Letter, OutcomeSort, Period, Plurality, PossessorAxis, QualitySort, Reach,
-};
+use deckmaste_semantics_v3::ast::AbilityWordLabel;
+use deckmaste_semantics_v3::ast::BindingId;
+use deckmaste_semantics_v3::ast::ChoiceRef;
+use deckmaste_semantics_v3::ast::ChoiceSort;
+use deckmaste_semantics_v3::ast::DesignationLabel;
+use deckmaste_semantics_v3::ast::KeywordLabel;
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::Letter;
+use deckmaste_semantics_v3::ast::OutcomeSort;
+use deckmaste_semantics_v3::ast::Period;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::PossessorAxis;
+use deckmaste_semantics_v3::ast::QualitySort;
+use deckmaste_semantics_v3::ast::Reach;
+
 use crate::reads::ParticipialAnchor;
 
 /// Mirrors `Semantics/Check/Refusal.lean:16`.

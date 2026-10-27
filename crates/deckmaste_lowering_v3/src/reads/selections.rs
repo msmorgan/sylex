@@ -1,21 +1,29 @@
 //! Selection and creation metadata from the corresponding Lean checker modules.
+use deckmaste_semantics_v3::ast::Amount;
+use deckmaste_semantics_v3::ast::CardType;
+use deckmaste_semantics_v3::ast::CreationSpec;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::Quantity;
+use deckmaste_semantics_v3::ast::SliceCount;
+use deckmaste_semantics_v3::ast::TokenSpec;
+use deckmaste_semantics_v3::ast::Zone;
+
 use super::Determiner;
 use super::Origin;
 use super::Payload;
 use super::Referent;
 use super::merge_types;
 use super::normalize_types;
-use crate::ast::Amount;
-use crate::ast::CardType;
-use crate::ast::CreationSpec;
-use crate::ast::Plurality;
-use crate::ast::Quantity;
-use crate::ast::SliceCount;
-use crate::ast::TokenSpec;
-use crate::ast::Zone;
-impl Amount {
+/// Discourse inspection of `Amount`.
+pub trait AmountSelectionsExt: Sized {
     #[must_use]
-    pub fn exact(&self) -> Option<u64> {
+    fn exact(&self) -> Option<u64>;
+    #[doc(hidden)]
+    fn exact_at(&self, fuel: u64) -> Option<u64>;
+}
+
+impl AmountSelectionsExt for Amount {
+    fn exact(&self) -> Option<u64> {
         self.exact_at(64)
     }
     fn exact_at(&self, fuel: u64) -> Option<u64> {
@@ -26,9 +34,16 @@ impl Amount {
         }
     }
 }
-impl Quantity {
+/// Discourse inspection of `Quantity`.
+pub trait QuantitySelectionsExt: Sized {
     #[must_use]
-    pub fn exact(&self) -> Option<u64> {
+    fn exact(&self) -> Option<u64>;
+    #[doc(hidden)]
+    fn exact_at(&self, fuel: u64) -> Option<u64>;
+}
+
+impl QuantitySelectionsExt for Quantity {
+    fn exact(&self) -> Option<u64> {
         self.exact_at(64)
     }
     fn exact_at(&self, fuel: u64) -> Option<u64> {
@@ -46,9 +61,14 @@ impl Quantity {
         }
     }
 }
-impl SliceCount {
+/// Discourse inspection of `SliceCount`.
+pub trait SliceCountSelectionsExt: Sized {
     #[must_use]
-    pub fn exact(&self) -> Option<u64> {
+    fn exact(&self) -> Option<u64>;
+}
+
+impl SliceCountSelectionsExt for SliceCount {
+    fn exact(&self) -> Option<u64> {
         match self {
             Self::Counted { quantity } => quantity.exact(),
             Self::Whole | Self::Totalling { .. } => None,
@@ -100,7 +120,13 @@ pub fn run_payloads(zone: Option<Zone>, stop_types: Vec<CardType>) -> (Payload, 
         },
     )
 }
-impl TokenSpec {
+/// Discourse inspection of `TokenSpec`.
+pub trait TokenSpecSelectionsExt: Sized {
+    #[doc(hidden)]
+    fn created_types(&self, source_types: &[CardType], fuel: u64) -> Vec<CardType>;
+}
+
+impl TokenSpecSelectionsExt for TokenSpec {
     fn created_types(&self, source_types: &[CardType], fuel: u64) -> Vec<CardType> {
         match (fuel, self) {
             (0, _) => vec![],
@@ -113,9 +139,19 @@ impl TokenSpec {
         }
     }
 }
-impl CreationSpec {
+/// Discourse inspection of `CreationSpec`.
+pub trait CreationSpecSelectionsExt: Sized {
     #[must_use]
-    pub fn created_referent(
+    fn created_referent(
+        &self,
+        count: &Plurality,
+        performer: &Plurality,
+        source_types: &[CardType],
+    ) -> Referent;
+}
+
+impl CreationSpecSelectionsExt for CreationSpec {
+    fn created_referent(
         &self,
         count: &Plurality,
         performer: &Plurality,

@@ -1,7 +1,8 @@
 //! Balanced-delimiter reading of loose Lean declaration files.
 
-use dpsi::Ident;
 use std::collections::BTreeMap;
+
+use dpsi::Ident;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Token {

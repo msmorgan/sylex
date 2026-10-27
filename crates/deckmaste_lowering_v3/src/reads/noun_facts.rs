@@ -1,18 +1,95 @@
 //! Noun-phrase shape and kind facts from `Check/Phrase`.
+use deckmaste_semantics_v3::ast::Coordinator;
+use deckmaste_semantics_v3::ast::DetPhrase;
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::NounPhrase;
+use deckmaste_semantics_v3::ast::NounWord;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::Reach;
+use deckmaste_semantics_v3::ast::SlotCarrier;
+
 use super::DRS;
 use super::Determiner;
 use super::ReferentId;
-use crate::ast::Coordinator;
-use crate::ast::DetPhrase;
-use crate::ast::Kind;
-use crate::ast::NounPhrase;
-use crate::ast::NounWord;
-use crate::ast::Plurality;
-use crate::ast::Reach;
-use crate::ast::SlotCarrier;
-impl NounPhrase {
+use crate::reads::NounPhrasePhraseFactsExt;
+use crate::reads::NounWordAnchorsExt;
+use crate::reads::PredicateAnchorsExt;
+use crate::reads::PredicateFactsExt;
+use crate::reads::ReachAnchorsExt;
+/// Discourse inspection of `NounPhrase`.
+pub trait NounPhraseFactsExt: Sized {
     #[must_use]
-    pub fn kind(&self) -> Option<Kind> {
+    fn kind(&self) -> Option<Kind>;
+    #[doc(hidden)]
+    fn kind_at(&self, fuel: u64) -> Option<Kind>;
+    #[must_use]
+    fn kind_in(&self, drs: &DRS, default: Kind) -> Kind;
+    #[doc(hidden)]
+    fn kind_in_at(&self, drs: &DRS, default: Kind, fuel: u64) -> Kind;
+    #[must_use]
+    fn selected_kind(&self, drs: &DRS, ids: &[ReferentId]) -> Kind;
+    fn selection_kind_override(&self, fuel: u64) -> Option<Kind>;
+    #[must_use]
+    fn agent_choosable(&self) -> bool;
+    #[doc(hidden)]
+    fn agent_choosable_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn per_member_ok(&self) -> bool;
+    #[must_use]
+    fn anchor_phrase(&self) -> bool;
+    #[doc(hidden)]
+    fn anchor_phrase_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn group_mention(&self) -> bool;
+    #[doc(hidden)]
+    fn group_mention_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn countable_group(&self) -> bool;
+    #[must_use]
+    fn existential_mention(&self) -> bool;
+    #[doc(hidden)]
+    fn existential_mention_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn pile_mention(&self) -> bool;
+    #[doc(hidden)]
+    fn pile_mention_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn partitive_base(&self) -> bool;
+    #[doc(hidden)]
+    fn partitive_base_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn player_group_mention(&self) -> bool;
+    #[doc(hidden)]
+    fn player_group_mention_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn sole_holder_ok(&self) -> bool;
+    #[must_use]
+    fn slice_possessor_ok(&self) -> bool;
+    #[must_use]
+    fn event_agent_ok(&self) -> bool;
+    #[doc(hidden)]
+    fn event_agent_ok_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn token_phrase(&self) -> bool;
+    #[doc(hidden)]
+    fn token_phrase_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn narrow_bare_to(&self, carrier: &SlotCarrier) -> Self;
+    #[doc(hidden)]
+    #[must_use]
+    fn narrow_bare_to_at(&self, carrier: &SlotCarrier, fuel: u64) -> Self;
+    #[must_use]
+    fn self_defined_ok(&self) -> bool;
+    #[must_use]
+    fn ascribable_in(&self, drs: &DRS) -> bool;
+    #[doc(hidden)]
+    fn ascribable_at(&self, drs: &DRS, fuel: u64) -> bool;
+    #[must_use]
+    fn has_bare_other(&self) -> bool;
+}
+
+impl NounPhraseFactsExt for NounPhrase {
+    fn kind(&self) -> Option<Kind> {
         self.kind_at(64)
     }
     fn kind_at(&self, fuel: u64) -> Option<Kind> {
@@ -55,8 +132,7 @@ impl NounPhrase {
             _ => Some(Kind::Object),
         }
     }
-    #[must_use]
-    pub fn kind_in(&self, drs: &DRS, default: Kind) -> Kind {
+    fn kind_in(&self, drs: &DRS, default: Kind) -> Kind {
         self.kind_in_at(drs, default, 64)
     }
     fn kind_in_at(&self, drs: &DRS, default: Kind, fuel: u64) -> Kind {
@@ -86,8 +162,7 @@ impl NounPhrase {
             _ => self.kind().unwrap_or(default),
         }
     }
-    #[must_use]
-    pub fn selected_kind(&self, drs: &DRS, ids: &[ReferentId]) -> Kind {
+    fn selected_kind(&self, drs: &DRS, ids: &[ReferentId]) -> Kind {
         self.selection_kind_override(64)
             .or_else(|| {
                 ids.first()
@@ -121,8 +196,7 @@ impl NounPhrase {
             _ => None,
         }
     }
-    #[must_use]
-    pub fn agent_choosable(&self) -> bool {
+    fn agent_choosable(&self) -> bool {
         self.agent_choosable_at(64)
     }
     fn agent_choosable_at(&self, fuel: u64) -> bool {
@@ -141,13 +215,11 @@ impl NounPhrase {
             ),
         }
     }
-    #[must_use]
-    pub fn per_member_ok(&self) -> bool {
+    fn per_member_ok(&self) -> bool {
         matches!(self.determiner(), Some(Determiner::Each | Determiner::All))
             || self.plurality() == Plurality::One
     }
-    #[must_use]
-    pub fn anchor_phrase(&self) -> bool {
+    fn anchor_phrase(&self) -> bool {
         self.anchor_phrase_at(64)
     }
     fn anchor_phrase_at(&self, fuel: u64) -> bool {
@@ -180,8 +252,7 @@ impl NounPhrase {
             _ => self.determiner().is_none_or(|d| d == Determiner::Target),
         }
     }
-    #[must_use]
-    pub fn group_mention(&self) -> bool {
+    fn group_mention(&self) -> bool {
         self.group_mention_at(64)
     }
     fn group_mention_at(&self, fuel: u64) -> bool {
@@ -215,13 +286,11 @@ impl NounPhrase {
             _ => self.determiner() == Some(Determiner::Target),
         }
     }
-    #[must_use]
-    pub fn countable_group(&self) -> bool {
+    fn countable_group(&self) -> bool {
         matches!(self.determiner(), Some(Determiner::All | Determiner::Count))
             || self.group_mention()
     }
-    #[must_use]
-    pub fn existential_mention(&self) -> bool {
+    fn existential_mention(&self) -> bool {
         self.existential_mention_at(64)
     }
     fn existential_mention_at(&self, fuel: u64) -> bool {
@@ -244,8 +313,7 @@ impl NounPhrase {
             _ => matches!(self.determiner(), Some(Determiner::A | Determiner::Count)),
         }
     }
-    #[must_use]
-    pub fn pile_mention(&self) -> bool {
+    fn pile_mention(&self) -> bool {
         self.pile_mention_at(64)
     }
     fn pile_mention_at(&self, fuel: u64) -> bool {
@@ -267,8 +335,7 @@ impl NounPhrase {
             _ => false,
         }
     }
-    #[must_use]
-    pub fn partitive_base(&self) -> bool {
+    fn partitive_base(&self) -> bool {
         self.partitive_base_at(64)
     }
     fn partitive_base_at(&self, fuel: u64) -> bool {
@@ -281,8 +348,7 @@ impl NounPhrase {
             _ => self.determiner() == Some(Determiner::All) || self.group_mention(),
         }
     }
-    #[must_use]
-    pub fn player_group_mention(&self) -> bool {
+    fn player_group_mention(&self) -> bool {
         self.player_group_mention_at(64)
     }
     fn player_group_mention_at(&self, fuel: u64) -> bool {
@@ -303,16 +369,13 @@ impl NounPhrase {
             _ => false,
         }
     }
-    #[must_use]
-    pub fn sole_holder_ok(&self) -> bool {
+    fn sole_holder_ok(&self) -> bool {
         self.player_group_mention() || self.plurality() == Plurality::One
     }
-    #[must_use]
-    pub fn slice_possessor_ok(&self) -> bool {
+    fn slice_possessor_ok(&self) -> bool {
         self.determiner() == Some(Determiner::Each) || self.sole_holder_ok()
     }
-    #[must_use]
-    pub fn event_agent_ok(&self) -> bool {
+    fn event_agent_ok(&self) -> bool {
         self.event_agent_ok_at(64)
     }
     fn event_agent_ok_at(&self, fuel: u64) -> bool {
@@ -337,8 +400,7 @@ impl NounPhrase {
             _ => self.player_group_mention(),
         }
     }
-    #[must_use]
-    pub fn token_phrase(&self) -> bool {
+    fn token_phrase(&self) -> bool {
         self.token_phrase_at(64)
     }
     fn token_phrase_at(&self, fuel: u64) -> bool {
@@ -362,8 +424,7 @@ impl NounPhrase {
             _ => false,
         }
     }
-    #[must_use]
-    pub fn narrow_bare_to(&self, carrier: &SlotCarrier) -> Self {
+    fn narrow_bare_to(&self, carrier: &SlotCarrier) -> Self {
         self.narrow_bare_to_at(carrier, 64)
     }
     fn narrow_bare_to_at(&self, carrier: &SlotCarrier, fuel: u64) -> Self {
@@ -394,11 +455,8 @@ impl NounPhrase {
             _ => self.clone(),
         }
     }
-}
 
-impl NounPhrase {
-    #[must_use]
-    pub fn self_defined_ok(&self) -> bool {
+    fn self_defined_ok(&self) -> bool {
         let mut noun = self;
         for _ in 0..64 {
             match noun {
@@ -419,11 +477,8 @@ impl NounPhrase {
         }
         false
     }
-}
 
-impl NounPhrase {
-    #[must_use]
-    pub fn ascribable_in(&self, drs: &DRS) -> bool {
+    fn ascribable_in(&self, drs: &DRS) -> bool {
         self.ascribable_at(drs, 64)
     }
     fn ascribable_at(&self, drs: &DRS, fuel: u64) -> bool {
@@ -443,5 +498,19 @@ impl NounPhrase {
             Self::Actor => drs.performers.first().is_some_and(|actor| actor.ascribable),
             _ => false,
         }
+    }
+
+    fn has_bare_other(&self) -> bool {
+        let mut noun = self;
+        for _ in 0..64 {
+            match noun {
+                Self::InCaller { body }
+                | Self::FirstMention { phrase: body, .. }
+                | Self::Headed { subject: body, .. } => noun = body,
+                Self::Described { predicate, .. } => return predicate.has_bare_other(),
+                _ => return false,
+            }
+        }
+        false
     }
 }

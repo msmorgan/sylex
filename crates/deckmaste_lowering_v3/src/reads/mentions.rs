@@ -1,4 +1,11 @@
 //! Identity-preserving mentions and noun coordination.
+use deckmaste_semantics_v3::ast::ChoiceMode;
+use deckmaste_semantics_v3::ast::DetPhrase;
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::NounPhrase;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::SliceCount;
+
 use super::DRS;
 use super::Determiner;
 use super::GramRole;
@@ -8,12 +15,7 @@ use super::Referent;
 use super::ReferentId;
 use super::StepOps;
 use super::circumstances::refuse;
-use crate::ast::ChoiceMode;
-use crate::ast::DetPhrase;
-use crate::ast::Kind;
-use crate::ast::NounPhrase;
-use crate::ast::Plurality;
-use crate::ast::SliceCount;
+use crate::reads::QuantityLocalShapeExt;
 use crate::refusal::Refusal;
 
 #[must_use]

@@ -6,6 +6,7 @@
 //! order.
 mod characteristics;
 mod compute;
+mod plurality;
 mod schema;
 mod snapshot;
 mod types;

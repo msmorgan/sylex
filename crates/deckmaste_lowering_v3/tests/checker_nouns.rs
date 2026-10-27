@@ -1,8 +1,8 @@
 // These tests isolate the noun handler. Any callback into an unrelated AST
 // layer is a test failure, rather than an accepting fallback.
+use deckmaste_lowering_v3::reads::*;
+use deckmaste_lowering_v3::refusal::Refusal;
 use deckmaste_semantics_v3::ast::*;
-use deckmaste_semantics_v3::reads::*;
-use deckmaste_semantics_v3::refusal::Refusal;
 struct Nouns;
 impl StepOps for Nouns {
     fn fuel(&self) -> u64 {

@@ -1,32 +1,42 @@
 //! Predicate metadata used by the phrase checker, mirroring `Check/Phrase` and
 //! `Check/PredicateShape`. Scope wrappers are preserved by the stepping layer.
+use deckmaste_semantics_v3::ast::AttachmentSide;
+use deckmaste_semantics_v3::ast::CardType;
+use deckmaste_semantics_v3::ast::ChoiceRef;
+use deckmaste_semantics_v3::ast::CombatRelation;
+use deckmaste_semantics_v3::ast::Coordinator;
+use deckmaste_semantics_v3::ast::CounterKind;
+use deckmaste_semantics_v3::ast::DesignationLabel;
+use deckmaste_semantics_v3::ast::DesignationScope;
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::Location;
+use deckmaste_semantics_v3::ast::NounPhrase;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::PossessorAxis;
+use deckmaste_semantics_v3::ast::Predicate;
+use deckmaste_semantics_v3::ast::ProjAxis;
+use deckmaste_semantics_v3::ast::QualitySort;
+use deckmaste_semantics_v3::ast::Zone;
+
 use super::Determiner;
 use super::Origin;
 use super::Payload;
 use super::Referent;
 use super::common_types;
 use super::merge_types;
-use crate::ast::AttachmentSide;
-use crate::ast::CardType;
-use crate::ast::ChoiceRef;
-use crate::ast::CombatRelation;
-use crate::ast::Coordinator;
-use crate::ast::CounterKind;
-use crate::ast::DesignationLabel;
-use crate::ast::DesignationScope;
-use crate::ast::Kind;
-use crate::ast::Location;
-use crate::ast::NounPhrase;
-use crate::ast::Plurality;
-use crate::ast::PossessorAxis;
-use crate::ast::Predicate;
-use crate::ast::ProjAxis;
-use crate::ast::QualitySort;
-use crate::ast::Zone;
+use crate::reads::KindResolutionExt;
+use crate::reads::SubtypeWordsExt;
 
-impl Location {
+/// Discourse inspection of `Location`.
+pub trait LocationPredicateFactsExt: Sized {
     #[must_use]
-    pub fn sort(&self) -> Option<Zone> {
+    fn sort(&self) -> Option<Zone>;
+    #[doc(hidden)]
+    fn sort_at(&self, fuel: u64) -> Option<Zone>;
+}
+
+impl LocationPredicateFactsExt for Location {
+    fn sort(&self) -> Option<Zone> {
         self.sort_at(64)
     }
     fn sort_at(&self, fuel: u64) -> Option<Zone> {
@@ -51,9 +61,16 @@ impl Location {
         }
     }
 }
-impl ProjAxis {
+/// Discourse inspection of `ProjAxis`.
+pub trait ProjAxisPredicateFactsExt: Sized {
     #[must_use]
-    pub fn scope(&self) -> Kind {
+    fn scope(&self) -> Kind;
+    #[must_use]
+    fn multi_valued(&self) -> bool;
+}
+
+impl ProjAxisPredicateFactsExt for ProjAxis {
+    fn scope(&self) -> Kind {
         match self {
             Self::Stat { .. } | Self::MarkedDamage | Self::Chapter | Self::KeywordNumber { .. } => {
                 Kind::Object
@@ -69,14 +86,18 @@ impl ProjAxis {
             },
         }
     }
-    #[must_use]
-    pub fn multi_valued(&self) -> bool {
+    fn multi_valued(&self) -> bool {
         matches!(self, Self::Chapter | Self::KeywordNumber { .. })
     }
 }
-impl DesignationLabel {
+/// Discourse inspection of `DesignationLabel`.
+pub trait DesignationLabelPredicateFactsExt: Sized {
     #[must_use]
-    pub fn holder(&self) -> Option<Kind> {
+    fn holder(&self) -> Option<Kind>;
+}
+
+impl DesignationLabelPredicateFactsExt for DesignationLabel {
+    fn holder(&self) -> Option<Kind> {
         match self {
             Self::Named {
                 scope: DesignationScope::HeldBy { holder },
@@ -93,9 +114,80 @@ impl DesignationLabel {
         }
     }
 }
-impl Predicate {
+/// Discourse inspection of `Predicate`.
+pub trait PredicateFactsExt: Sized {
     #[must_use]
-    pub fn kind(&self) -> Option<Kind> {
+    fn kind(&self) -> Option<Kind>;
+    #[doc(hidden)]
+    fn kind_at(&self, fuel: u64) -> Option<Kind>;
+    #[must_use]
+    fn scope_body(&self) -> &Self;
+    #[must_use]
+    fn conjuncts(&self) -> Vec<&Self>;
+    #[doc(hidden)]
+    fn conjuncts_at(&self, fuel: u64) -> Vec<&Self>;
+    #[must_use]
+    fn flattened(&self) -> Vec<Self>;
+    #[doc(hidden)]
+    fn flattened_at(&self, fuel: u64) -> Vec<Self>;
+    #[must_use]
+    fn seed_types(&self) -> Vec<CardType>;
+    #[must_use]
+    fn written_types(&self) -> Vec<CardType>;
+    #[doc(hidden)]
+    fn types_at(&self, fuel: u64, seed: bool) -> Vec<CardType>;
+    #[must_use]
+    fn head_type_alternatives(&self) -> Vec<Vec<CardType>>;
+    #[doc(hidden)]
+    fn head_type_alternatives_at(&self, fuel: u64) -> Vec<Vec<CardType>>;
+    #[must_use]
+    fn seed_zone(&self) -> Option<Zone>;
+    #[must_use]
+    fn explicit_zone(&self) -> Option<Zone>;
+    #[doc(hidden)]
+    fn zone_at(&self, fuel: u64, explicit: bool) -> Option<Zone>;
+    #[doc(hidden)]
+    fn conjunct_any(&self, fuel: u64, leaf: fn(&Self) -> bool) -> bool;
+    #[must_use]
+    fn seeds_token(&self) -> bool;
+    #[must_use]
+    fn head_is_placeless(&self) -> bool;
+    #[must_use]
+    fn demands_card(&self) -> bool;
+    #[must_use]
+    fn has_other(&self) -> bool;
+    #[must_use]
+    fn has_bare_other(&self) -> bool;
+    #[must_use]
+    fn seeds_ability(&self) -> bool;
+    #[doc(hidden)]
+    fn seeds_ability_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn phrase_zone(&self, kind: &Kind) -> Option<Zone>;
+    #[must_use]
+    fn of_kind(&self, kind: &Kind) -> Self;
+    #[must_use]
+    fn payload(&self, kind: &Kind) -> Payload;
+    #[must_use]
+    fn binding(&self, det: Determiner, plur: Plurality, kind: &Kind) -> Referent;
+    #[must_use]
+    fn control_fact(&self) -> Option<bool>;
+    #[doc(hidden)]
+    fn control_fact_at(&self, fuel: u64) -> Option<bool>;
+    #[must_use]
+    fn opponent_controls(&self) -> bool;
+    #[must_use]
+    fn negatable(&self) -> bool;
+    #[must_use]
+    fn uniquifies(&self) -> bool;
+    #[must_use]
+    fn chosen_ref(&self) -> Option<&ChoiceRef>;
+    #[doc(hidden)]
+    fn chosen_ref_at(&self, fuel: u64) -> Option<&ChoiceRef>;
+}
+
+impl PredicateFactsExt for Predicate {
+    fn kind(&self) -> Option<Kind> {
         self.kind_at(64)
     }
     fn kind_at(&self, fuel: u64) -> Option<Kind> {
@@ -174,8 +266,7 @@ impl Predicate {
             _ => Some(Kind::Object),
         }
     }
-    #[must_use]
-    pub fn scope_body(&self) -> &Self {
+    fn scope_body(&self) -> &Self {
         let mut p = self;
         for _ in 0..64 {
             match p {
@@ -185,8 +276,7 @@ impl Predicate {
         }
         p
     }
-    #[must_use]
-    pub fn conjuncts(&self) -> Vec<&Self> {
+    fn conjuncts(&self) -> Vec<&Self> {
         self.conjuncts_at(64)
     }
     fn conjuncts_at(&self, fuel: u64) -> Vec<&Self> {
@@ -205,8 +295,7 @@ impl Predicate {
             _ => vec![self],
         }
     }
-    #[must_use]
-    pub fn flattened(&self) -> Vec<Self> {
+    fn flattened(&self) -> Vec<Self> {
         self.flattened_at(64)
     }
     fn flattened_at(&self, fuel: u64) -> Vec<Self> {
@@ -229,12 +318,10 @@ impl Predicate {
             _ => vec![self.clone()],
         }
     }
-    #[must_use]
-    pub fn seed_types(&self) -> Vec<CardType> {
+    fn seed_types(&self) -> Vec<CardType> {
         self.types_at(64, true)
     }
-    #[must_use]
-    pub fn written_types(&self) -> Vec<CardType> {
+    fn written_types(&self) -> Vec<CardType> {
         self.types_at(64, false)
     }
     fn types_at(&self, fuel: u64, seed: bool) -> Vec<CardType> {
@@ -274,8 +361,7 @@ impl Predicate {
             _ => vec![],
         }
     }
-    #[must_use]
-    pub fn head_type_alternatives(&self) -> Vec<Vec<CardType>> {
+    fn head_type_alternatives(&self) -> Vec<Vec<CardType>> {
         self.head_type_alternatives_at(64)
     }
     fn head_type_alternatives_at(&self, fuel: u64) -> Vec<Vec<CardType>> {
@@ -312,12 +398,10 @@ impl Predicate {
             _ => vec![vec![]],
         }
     }
-    #[must_use]
-    pub fn seed_zone(&self) -> Option<Zone> {
+    fn seed_zone(&self) -> Option<Zone> {
         self.zone_at(64, false)
     }
-    #[must_use]
-    pub fn explicit_zone(&self) -> Option<Zone> {
+    fn explicit_zone(&self) -> Option<Zone> {
         self.zone_at(64, true)
     }
     fn zone_at(&self, fuel: u64, explicit: bool) -> Option<Zone> {
@@ -389,28 +473,22 @@ impl Predicate {
             _ => false,
         }
     }
-    #[must_use]
-    pub fn seeds_token(&self) -> bool {
+    fn seeds_token(&self) -> bool {
         self.conjunct_any(64, |p| matches!(p, Self::IsToken))
     }
-    #[must_use]
-    pub fn head_is_placeless(&self) -> bool {
+    fn head_is_placeless(&self) -> bool {
         self.conjunct_any(64, |p| matches!(p, Self::IsSource | Self::IsCard))
     }
-    #[must_use]
-    pub fn demands_card(&self) -> bool {
+    fn demands_card(&self) -> bool {
         self.conjunct_any(64, |p| matches!(p, Self::IsCard))
     }
-    #[must_use]
-    pub fn has_other(&self) -> bool {
+    fn has_other(&self) -> bool {
         self.conjunct_any(64, |p| matches!(p, Self::Other | Self::OtherThan { .. }))
     }
-    #[must_use]
-    pub fn has_bare_other(&self) -> bool {
+    fn has_bare_other(&self) -> bool {
         self.conjunct_any(64, |p| matches!(p, Self::Other))
     }
-    #[must_use]
-    pub fn seeds_ability(&self) -> bool {
+    fn seeds_ability(&self) -> bool {
         self.seeds_ability_at(64)
     }
     fn seeds_ability_at(&self, fuel: u64) -> bool {
@@ -439,8 +517,7 @@ impl Predicate {
             _ => false,
         }
     }
-    #[must_use]
-    pub fn phrase_zone(&self, kind: &Kind) -> Option<Zone> {
+    fn phrase_zone(&self, kind: &Kind) -> Option<Zone> {
         if !kind.lte(&Kind::Object) {
             None
         } else if self.head_is_placeless() {
@@ -449,8 +526,7 @@ impl Predicate {
             self.seed_zone().or(Some(Zone::Battlefield))
         }
     }
-    #[must_use]
-    pub fn of_kind(&self, kind: &Kind) -> Self {
+    fn of_kind(&self, kind: &Kind) -> Self {
         match self {
             Self::Coord {
                 coordinator: Coordinator::Or | Coordinator::AndOr,
@@ -469,8 +545,7 @@ impl Predicate {
             _ => self.clone(),
         }
     }
-    #[must_use]
-    pub fn payload(&self, kind: &Kind) -> Payload {
+    fn payload(&self, kind: &Kind) -> Payload {
         match kind {
             Kind::Object => {
                 let p = self.of_kind(kind);
@@ -505,14 +580,12 @@ impl Predicate {
             Kind::Outcome => Payload::Difference,
         }
     }
-    #[must_use]
-    pub fn binding(&self, det: Determiner, plur: Plurality, kind: &Kind) -> Referent {
+    fn binding(&self, det: Determiner, plur: Plurality, kind: &Kind) -> Referent {
         let mut binding = Referent::new(det, plur, self.payload(kind));
         binding.introduced_as_source = self.conjuncts().iter().any(|p| matches!(p, Self::IsSource));
         binding
     }
-    #[must_use]
-    pub fn control_fact(&self) -> Option<bool> {
+    fn control_fact(&self) -> Option<bool> {
         self.control_fact_at(64)
     }
     fn control_fact_at(&self, fuel: u64) -> Option<bool> {
@@ -546,12 +619,10 @@ impl Predicate {
             _ => None,
         }
     }
-    #[must_use]
-    pub fn opponent_controls(&self) -> bool {
+    fn opponent_controls(&self) -> bool {
         self.conjunct_any(64, |p| matches!(p, Self::HasPossessor { axis: PossessorAxis::Controller, possessor } if possessor.names_opponent()))
     }
-    #[must_use]
-    pub fn negatable(&self) -> bool {
+    fn negatable(&self) -> bool {
         let mut p = self;
         for _ in 0..64 {
             match p {
@@ -567,8 +638,7 @@ impl Predicate {
         }
         true
     }
-    #[must_use]
-    pub fn uniquifies(&self) -> bool {
+    fn uniquifies(&self) -> bool {
         self.conjunct_any(64, |p| match p {
             Self::Chosen { .. }
             | Self::Superlative { .. }
@@ -589,8 +659,7 @@ impl Predicate {
             _ => false,
         })
     }
-    #[must_use]
-    pub fn chosen_ref(&self) -> Option<&ChoiceRef> {
+    fn chosen_ref(&self) -> Option<&ChoiceRef> {
         self.chosen_ref_at(64)
     }
     fn chosen_ref_at(&self, fuel: u64) -> Option<&ChoiceRef> {
@@ -608,9 +677,14 @@ impl Predicate {
         }
     }
 }
-impl NounPhrase {
+/// Discourse inspection of `NounPhrase`.
+pub trait NounPhrasePredicateFactsExt: Sized {
     #[must_use]
-    pub fn names_opponent(&self) -> bool {
+    fn names_opponent(&self) -> bool;
+}
+
+impl NounPhrasePredicateFactsExt for NounPhrase {
+    fn names_opponent(&self) -> bool {
         matches!(self, Self::Described { predicate, .. } if matches!(predicate.as_ref(), Predicate::IsOpponentOf { who } if **who == Self::You))
     }
 }

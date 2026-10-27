@@ -1,25 +1,54 @@
 //! Scalar and payload facts from `Semantics/Check/Words.lean`.
+use deckmaste_semantics_v3::ast::CardType;
+use deckmaste_semantics_v3::ast::ChoiceRef;
+use deckmaste_semantics_v3::ast::ChoiceSort;
+use deckmaste_semantics_v3::ast::Delta;
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::OutcomeSort;
+use deckmaste_semantics_v3::ast::PileFace;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::QualitySort;
+use deckmaste_semantics_v3::ast::Stat;
+use deckmaste_semantics_v3::ast::Subtype;
+
 use super::DRS;
 use super::Determiner;
 use super::Origin;
 use super::Payload;
 use super::Referent;
 use super::Stamp;
-use crate::ast::CardType;
-use crate::ast::ChoiceRef;
-use crate::ast::ChoiceSort;
-use crate::ast::Delta;
-use crate::ast::Kind;
-use crate::ast::OutcomeSort;
-use crate::ast::PileFace;
-use crate::ast::Plurality;
-use crate::ast::QualitySort;
-use crate::ast::Stat;
-use crate::ast::Subtype;
+use crate::reads::KindResolutionExt;
 
-impl CardType {
+/// Discourse inspection of `CardType`.
+pub trait CardTypeWordsExt: Sized {
     #[must_use]
-    pub fn creature() -> Self {
+    fn creature() -> Self;
+    #[must_use]
+    fn artifact() -> Self;
+    #[must_use]
+    fn land() -> Self;
+    #[must_use]
+    fn enchantment() -> Self;
+    #[must_use]
+    fn instant() -> Self;
+    #[must_use]
+    fn sorcery() -> Self;
+    #[must_use]
+    fn planeswalker() -> Self;
+    #[must_use]
+    fn battle() -> Self;
+    #[must_use]
+    fn kindred() -> Self;
+    #[must_use]
+    fn dungeon() -> Self;
+    #[doc(hidden)]
+    fn plain(name: &str, permanent: bool, instant_or_sorcery: bool) -> Self;
+    #[must_use]
+    fn all() -> [Self; 10];
+}
+
+impl CardTypeWordsExt for CardType {
+    fn creature() -> Self {
         Self {
             name: "Creature".into(),
             permanent: true,
@@ -27,46 +56,37 @@ impl CardType {
             instant_or_sorcery: false,
         }
     }
-    #[must_use]
-    pub fn artifact() -> Self {
+    fn artifact() -> Self {
         Self::plain("Artifact", true, false)
     }
-    #[must_use]
-    pub fn land() -> Self {
+    fn land() -> Self {
         Self::plain("Land", true, false)
     }
-    #[must_use]
-    pub fn enchantment() -> Self {
+    fn enchantment() -> Self {
         Self::plain("Enchantment", true, false)
     }
-    #[must_use]
-    pub fn instant() -> Self {
+    fn instant() -> Self {
         Self::plain("Instant", false, true)
     }
-    #[must_use]
-    pub fn sorcery() -> Self {
+    fn sorcery() -> Self {
         Self::plain("Sorcery", false, true)
     }
-    #[must_use]
-    pub fn planeswalker() -> Self {
+    fn planeswalker() -> Self {
         Self {
             stats: vec![Stat::Loyalty],
             ..Self::plain("Planeswalker", true, false)
         }
     }
-    #[must_use]
-    pub fn battle() -> Self {
+    fn battle() -> Self {
         Self {
             stats: vec![Stat::Defense],
             ..Self::plain("Battle", true, false)
         }
     }
-    #[must_use]
-    pub fn kindred() -> Self {
+    fn kindred() -> Self {
         Self::plain("Kindred", false, false)
     }
-    #[must_use]
-    pub fn dungeon() -> Self {
+    fn dungeon() -> Self {
         Self::plain("Dungeon", false, false)
     }
     fn plain(name: &str, permanent: bool, instant_or_sorcery: bool) -> Self {
@@ -77,8 +97,7 @@ impl CardType {
             instant_or_sorcery,
         }
     }
-    #[must_use]
-    pub fn all() -> [Self; 10] {
+    fn all() -> [Self; 10] {
         [
             Self::creature(),
             Self::artifact(),
@@ -123,19 +142,30 @@ fn join_seed(left: Vec<CardType>, right: Vec<CardType>) -> Vec<CardType> {
         common_types(&left, &right)
     }
 }
-impl QualitySort {
+/// Discourse inspection of `QualitySort`.
+pub trait QualitySortWordsExt: Sized {
     #[must_use]
-    pub fn chosen_read_ok(&self) -> bool {
+    fn chosen_read_ok(&self) -> bool;
+}
+
+impl QualitySortWordsExt for QualitySort {
+    fn chosen_read_ok(&self) -> bool {
         !matches!(self, Self::Number | Self::CounterKind)
     }
 }
-impl OutcomeSort {
+/// Discourse inspection of `OutcomeSort`.
+pub trait OutcomeSortWordsExt: Sized {
     #[must_use]
-    pub fn comparable(&self) -> bool {
+    fn comparable(&self) -> bool;
+    #[must_use]
+    fn is_amount(&self) -> bool;
+}
+
+impl OutcomeSortWordsExt for OutcomeSort {
+    fn comparable(&self) -> bool {
         matches!(self, Self::RollResult | Self::DamageMarked)
     }
-    #[must_use]
-    pub fn is_amount(&self) -> bool {
+    fn is_amount(&self) -> bool {
         !matches!(
             self,
             Self::CoinFlipped
@@ -146,26 +176,38 @@ impl OutcomeSort {
         )
     }
 }
-impl<T> Delta<T> {
-    pub fn amount(&self) -> &T {
+/// Discourse inspection of `Delta`.
+pub trait DeltaWordsExt<T>: Sized {
+    fn amount(&self) -> &T;
+    fn is_set(&self) -> bool;
+}
+
+impl<T> DeltaWordsExt<T> for Delta<T> {
+    fn amount(&self) -> &T {
         match self {
             Self::Up { amount } | Self::Down { amount } | Self::Set { amount } => amount,
         }
     }
-    pub fn is_set(&self) -> bool {
+    fn is_set(&self) -> bool {
         matches!(self, Self::Set { .. })
     }
 }
-impl Subtype {
+/// Discourse inspection of `Subtype`.
+pub trait SubtypeWordsExt: Sized {
     #[must_use]
-    pub fn card_type(&self) -> Option<&CardType> {
+    fn card_type(&self) -> Option<&CardType>;
+    #[must_use]
+    fn fits(&self, ty: &CardType) -> bool;
+}
+
+impl SubtypeWordsExt for Subtype {
+    fn card_type(&self) -> Option<&CardType> {
         match self {
             Self::Of { host, .. } => Some(host),
             Self::Spell { .. } => None,
         }
     }
-    #[must_use]
-    pub fn fits(&self, ty: &CardType) -> bool {
+    fn fits(&self, ty: &CardType) -> bool {
         match self {
             Self::Of { host, .. } => host == ty,
             Self::Spell { .. } => ty.instant_or_sorcery,
@@ -258,34 +300,46 @@ impl Payload {
         })
     }
 }
-impl ChoiceSort {
+/// Discourse inspection of `ChoiceSort`.
+pub trait ChoiceSortWordsExt: Sized {
     #[must_use]
-    pub fn at(kind: &Kind) -> Option<Self> {
+    fn at(kind: &Kind) -> Option<Self>;
+    #[must_use]
+    fn binding(&self) -> Referent;
+    #[must_use]
+    fn binds(&self, kind: &Kind, payload: &Payload) -> bool;
+}
+
+impl ChoiceSortWordsExt for ChoiceSort {
+    fn at(kind: &Kind) -> Option<Self> {
         match kind {
             Kind::Quality { sort } => Some(Self::Quality { sort: sort.clone() }),
             Kind::Player => Some(Self::Player),
             _ => None,
         }
     }
-    #[must_use]
-    pub fn binding(&self) -> Referent {
+    fn binding(&self) -> Referent {
         let payload = match self {
             Self::Quality { sort } => Payload::Quality { q: sort.clone() },
             Self::Player => Payload::Player { chosen: true },
         };
         Referent::new(Determiner::A, Plurality::One, payload)
     }
-    #[must_use]
-    pub fn binds(&self, kind: &Kind, payload: &Payload) -> bool {
+    fn binds(&self, kind: &Kind, payload: &Payload) -> bool {
         match self {
             Self::Quality { sort } => Kind::Quality { sort: sort.clone() }.lte(kind),
             Self::Player => matches!(payload, Payload::Player { chosen: true }),
         }
     }
 }
-impl ChoiceRef {
+/// Discourse inspection of `ChoiceRef`.
+pub trait ChoiceRefWordsExt: Sized {
     #[must_use]
-    pub fn permits(&self, count: usize) -> bool {
+    fn permits(&self, count: usize) -> bool;
+}
+
+impl ChoiceRefWordsExt for ChoiceRef {
+    fn permits(&self, count: usize) -> bool {
         match self {
             Self::TheChoice => count == 1,
             Self::TheLatestChoice => count != 0,
@@ -330,33 +384,41 @@ impl DRS {
     }
 }
 
-impl Kind {
+/// Discourse inspection of `Kind`.
+pub trait KindWordsExt: Sized {
     #[must_use]
-    pub fn targetable(&self) -> bool {
+    fn targetable(&self) -> bool;
+    #[must_use]
+    fn targeter(&self) -> bool;
+    #[must_use]
+    fn phrasal(&self) -> bool;
+    #[must_use]
+    fn binding(&self) -> Referent;
+}
+
+impl KindWordsExt for Kind {
+    fn targetable(&self) -> bool {
         match self {
             Self::Object | Self::Player => true,
             Self::Join { left, right } => left.targetable() && right.targetable(),
             _ => false,
         }
     }
-    #[must_use]
-    pub fn targeter(&self) -> bool {
+    fn targeter(&self) -> bool {
         match self {
             Self::Object => true,
             Self::Join { left, right } => left.targeter() && right.targeter(),
             _ => false,
         }
     }
-    #[must_use]
-    pub fn phrasal(&self) -> bool {
+    fn phrasal(&self) -> bool {
         match self {
             Self::Object | Self::Player | Self::Quality { .. } => true,
             Self::Join { left, right } => left.phrasal() && right.phrasal(),
             _ => false,
         }
     }
-    #[must_use]
-    pub fn binding(&self) -> Referent {
+    fn binding(&self) -> Referent {
         Referent::new(
             Determiner::The,
             Plurality::One,

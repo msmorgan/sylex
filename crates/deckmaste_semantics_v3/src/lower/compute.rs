@@ -250,7 +250,7 @@ impl Elaborator<'_> {
             let value = self.eval(base, "NounPhrase", scope, stack)?;
             let np: crate::ast::NounPhrase =
                 serde_json::from_value(value).map_err(|e| LowerError::new(e.to_string()))?;
-            return serde_json::to_value(np.plurality())
+            return serde_json::to_value(super::plurality::noun_plurality(&np))
                 .map(Some)
                 .map_err(|e| LowerError::new(e.to_string()));
         }

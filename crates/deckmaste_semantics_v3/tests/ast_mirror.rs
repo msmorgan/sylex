@@ -1,6 +1,8 @@
-use deckmaste_semantics_v3::reader::{Token, tokenize};
 use std::collections::BTreeMap;
 use std::path::Path;
+
+use deckmaste_semantics_v3::reader::Token;
+use deckmaste_semantics_v3::reader::tokenize;
 
 fn id(token: &Token) -> Option<&str> {
     match token {
@@ -121,18 +123,4 @@ fn every_lean_syntax_type_has_the_same_constructors_and_field_counts() {
     }
     let rust = rust_declarations(include_str!("../src/ast.rs"));
     assert_eq!(rust, lean);
-}
-#[test]
-fn discourse_state_and_refusals_keep_the_lean_data_shapes() {
-    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../lean/Semantics/Check");
-    let mut rust = rust_declarations(include_str!("../src/reads.rs"));
-    rust.remove("StepPhase");
-    assert_eq!(
-        rust,
-        lean_declarations(&std::fs::read_to_string(root.join("Words.lean")).unwrap())
-    );
-    assert_eq!(
-        rust_declarations(include_str!("../src/refusal.rs")),
-        lean_declarations(&std::fs::read_to_string(root.join("Refusal.lean")).unwrap())
-    );
 }

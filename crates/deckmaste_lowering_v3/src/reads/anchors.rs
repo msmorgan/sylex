@@ -1,27 +1,44 @@
 //! Structural anchors for event and participial clauses.
+use deckmaste_semantics_v3::ast::Action;
+use deckmaste_semantics_v3::ast::CardType;
+use deckmaste_semantics_v3::ast::Coordinator;
+use deckmaste_semantics_v3::ast::CoreDeed;
+use deckmaste_semantics_v3::ast::Deed;
+use deckmaste_semantics_v3::ast::DetPhrase;
+use deckmaste_semantics_v3::ast::DidClause;
+use deckmaste_semantics_v3::ast::KeywordLabel;
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::LookbackSpan;
+use deckmaste_semantics_v3::ast::NounPhrase;
+use deckmaste_semantics_v3::ast::NounWord;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::Predicate;
+use deckmaste_semantics_v3::ast::Reach;
+use deckmaste_semantics_v3::ast::Subject;
+use deckmaste_semantics_v3::ast::Subtype;
+use deckmaste_semantics_v3::ast::Zone;
+
 use super::GramRole;
 use super::ParticipialAnchor;
-use crate::ast::Action;
-use crate::ast::CardType;
-use crate::ast::Coordinator;
-use crate::ast::CoreDeed;
-use crate::ast::Deed;
-use crate::ast::DetPhrase;
-use crate::ast::DidClause;
-use crate::ast::KeywordLabel;
-use crate::ast::Kind;
-use crate::ast::LookbackSpan;
-use crate::ast::NounPhrase;
-use crate::ast::NounWord;
-use crate::ast::Plurality;
-use crate::ast::Predicate;
-use crate::ast::Reach;
-use crate::ast::Subject;
-use crate::ast::Subtype;
-use crate::ast::Zone;
-impl NounWord {
+use crate::reads::LocationPredicateFactsExt;
+use crate::reads::NounPhraseEventsExt;
+use crate::reads::PredicateFactsExt;
+/// Discourse inspection of `NounWord`.
+pub trait NounWordAnchorsExt: Sized {
     #[must_use]
-    pub fn kind(&self) -> Kind {
+    fn kind(&self) -> Kind;
+    #[must_use]
+    fn is_head(&self) -> bool;
+    #[must_use]
+    fn attach_host_zone(&self) -> Option<Zone>;
+    #[must_use]
+    fn attach_host_types(&self) -> Vec<CardType>;
+    #[must_use]
+    fn read_payload(&self, payload: &super::Payload) -> super::Payload;
+}
+
+impl NounWordAnchorsExt for NounWord {
+    fn kind(&self) -> Kind {
         match self {
             Self::OfType { word, .. } | Self::Copied { word } => word.kind(),
             Self::Player => Kind::Player,
@@ -33,8 +50,7 @@ impl NounWord {
             _ => Kind::Object,
         }
     }
-    #[must_use]
-    pub fn is_head(&self) -> bool {
+    fn is_head(&self) -> bool {
         matches!(
             self,
             Self::Type { .. }
@@ -47,32 +63,123 @@ impl NounWord {
                 | Self::Ability
         )
     }
+
+    fn attach_host_zone(&self) -> Option<Zone> {
+        match self {
+            Self::OfType { word, .. } | Self::Copied { word } => word.attach_host_zone(),
+            Self::Type { .. }
+            | Self::Subtype {
+                subtype: Subtype::Of { .. },
+            }
+            | Self::Permanent
+            | Self::Token => Some(Zone::Battlefield),
+            Self::Spell | Self::Copy => Some(Zone::Stack),
+            _ => None,
+        }
+    }
+    fn attach_host_types(&self) -> Vec<CardType> {
+        match self {
+            Self::OfType { word, type_ } => {
+                super::merge_types(&word.attach_host_types(), std::slice::from_ref(type_))
+            }
+            Self::Copied { word } => word.attach_host_types(),
+            Self::Type { type_ }
+            | Self::Subtype {
+                subtype: Subtype::Of { host: type_, .. },
+            } => vec![type_.clone()],
+            _ => Vec::new(),
+        }
+    }
+    fn read_payload(&self, payload: &super::Payload) -> super::Payload {
+        use super::Origin;
+        use super::Payload;
+        let Payload::Object {
+            ty,
+            zone,
+            prov,
+            orig,
+            size,
+        } = payload
+        else {
+            return payload.clone();
+        };
+        let object = |ty, zone, orig| Payload::Object {
+            ty,
+            zone,
+            prov: prov.clone(),
+            orig,
+            size: *size,
+        };
+        match self {
+            Self::Type { type_ }
+            | Self::Subtype {
+                subtype: Subtype::Of { host: type_, .. },
+            } => object(
+                super::merge_types(ty, std::slice::from_ref(type_)),
+                zone.clone()
+                    .or_else(|| type_.permanent.then_some(Zone::Battlefield)),
+                orig.clone(),
+            ),
+            Self::Ability => Payload::Ability {
+                orig: orig.clone(),
+                zone: Some(Zone::Stack),
+            },
+            Self::Spell
+            | Self::Subtype {
+                subtype: Subtype::Spell { .. },
+            } => object(ty.clone(), Some(Zone::Stack), orig.clone()),
+            Self::Token => object(ty.clone(), Some(Zone::Battlefield), Some(Origin::Token)),
+            Self::Permanent => object(ty.clone(), Some(Zone::Battlefield), orig.clone()),
+            Self::Emblem => object(ty.clone(), Some(Zone::Command), orig.clone()),
+            _ => payload.clone(),
+        }
+    }
 }
-impl Reach {
+/// Discourse inspection of `Reach`.
+pub trait ReachAnchorsExt: Sized {
     #[must_use]
-    pub fn kind(&self) -> Kind {
+    fn kind(&self) -> Kind;
+    #[must_use]
+    fn is_bare_pronoun(&self) -> bool;
+}
+
+impl ReachAnchorsExt for Reach {
+    fn kind(&self) -> Kind {
         match self {
             Self::Word { word } | Self::UnionHalf { word } => word.kind(),
             _ => Kind::Object,
         }
     }
-    #[must_use]
-    pub fn is_bare_pronoun(&self) -> bool {
+    fn is_bare_pronoun(&self) -> bool {
         matches!(self, Self::Bare | Self::AtSlot { .. })
     }
 }
-impl Subject {
+/// Discourse inspection of `Subject`.
+pub trait SubjectAnchorsExt: Sized {
     #[must_use]
-    pub fn patient_role(&self) -> GramRole {
+    fn patient_role(&self) -> GramRole;
+}
+
+impl SubjectAnchorsExt for Subject {
+    fn patient_role(&self) -> GramRole {
         match self {
             Self::Actor { .. } => GramRole::Obj,
             Self::Any | Self::By { .. } => GramRole::Subj,
         }
     }
 }
-impl Action {
+/// Discourse inspection of `Action`.
+pub trait ActionAnchorsExt: Sized {
     #[must_use]
-    pub fn named_deed(&self) -> Option<Deed> {
+    fn named_deed(&self) -> Option<Deed>;
+    #[must_use]
+    fn written_zone_change(&self) -> Option<(Option<Zone>, Zone)>;
+    #[must_use]
+    fn participial_anchor(&self) -> Option<ParticipialAnchor>;
+}
+
+impl ActionAnchorsExt for Action {
+    fn named_deed(&self) -> Option<Deed> {
         let mut action = self;
         for _ in 0..64 {
             match action {
@@ -124,8 +231,7 @@ impl Action {
         }
         None
     }
-    #[must_use]
-    pub fn written_zone_change(&self) -> Option<(Option<Zone>, Zone)> {
+    fn written_zone_change(&self) -> Option<(Option<Zone>, Zone)> {
         let mut action = self;
         for _ in 0..64 {
             match action {
@@ -140,8 +246,7 @@ impl Action {
         }
         None
     }
-    #[must_use]
-    pub fn participial_anchor(&self) -> Option<ParticipialAnchor> {
+    fn participial_anchor(&self) -> Option<ParticipialAnchor> {
         self.named_deed()
             .map(|deed| ParticipialAnchor::Deed { deed })
             .or_else(|| {
@@ -154,9 +259,14 @@ impl Action {
             })
     }
 }
-impl NounPhrase {
+/// Discourse inspection of `NounPhrase`.
+pub trait NounPhraseAnchorsExt: Sized {
     #[must_use]
-    pub fn is_which(&self) -> bool {
+    fn is_which(&self) -> bool;
+}
+
+impl NounPhraseAnchorsExt for NounPhrase {
+    fn is_which(&self) -> bool {
         let mut phrase = self;
         for _ in 0..64 {
             match phrase {
@@ -171,9 +281,16 @@ impl NounPhrase {
         false
     }
 }
-impl DidClause {
+/// Discourse inspection of `DidClause`.
+pub trait DidClauseAnchorsExt: Sized {
     #[must_use]
-    pub fn anchor(&self) -> Option<ParticipialAnchor> {
+    fn anchor(&self) -> Option<ParticipialAnchor>;
+    #[must_use]
+    fn participial_agent_ok(&self, anchor: &ParticipialAnchor) -> bool;
+}
+
+impl DidClauseAnchorsExt for DidClause {
+    fn anchor(&self) -> Option<ParticipialAnchor> {
         let subject = match self.subj.as_ref() {
             Subject::Actor { np } | Subject::By { np } => np.is_which(),
             Subject::Any => false,
@@ -184,8 +301,7 @@ impl DidClause {
             None
         }
     }
-    #[must_use]
-    pub fn participial_agent_ok(&self, anchor: &ParticipialAnchor) -> bool {
+    fn participial_agent_ok(&self, anchor: &ParticipialAnchor) -> bool {
         match self.subj.as_ref() {
             Subject::Any => true,
             Subject::Actor { np } | Subject::By { np } => {
@@ -205,16 +321,27 @@ impl DidClause {
         }
     }
 }
-impl Predicate {
+/// Discourse inspection of `Predicate`.
+pub trait PredicateAnchorsExt: Sized {
     #[must_use]
-    pub fn participial_anchor(&self) -> Option<(&DidClause, ParticipialAnchor)> {
+    fn participial_anchor(&self) -> Option<(&DidClause, ParticipialAnchor)>;
+    #[must_use]
+    fn participial_head(conjuncts: &[&Self], group: bool) -> (Option<NounWord>, Vec<Zone>);
+    #[must_use]
+    fn with_anchor_span(&self) -> Self;
+    #[doc(hidden)]
+    #[must_use]
+    fn with_anchor_span_at(&self, fuel: u64) -> Self;
+}
+
+impl PredicateAnchorsExt for Predicate {
+    fn participial_anchor(&self) -> Option<(&DidClause, ParticipialAnchor)> {
         self.conjuncts().into_iter().find_map(|p| match p {
             Self::Did { clause } => clause.anchor().map(|anchor| (clause.as_ref(), anchor)),
             _ => None,
         })
     }
-    #[must_use]
-    pub fn participial_head(conjuncts: &[&Self], group: bool) -> (Option<NounWord>, Vec<Zone>) {
+    fn participial_head(conjuncts: &[&Self], group: bool) -> (Option<NounWord>, Vec<Zone>) {
         let card = conjuncts.contains(&&Self::IsCard);
         let mut zones: Vec<_> = conjuncts
             .iter()
@@ -250,8 +377,7 @@ impl Predicate {
         }
         (word, zones)
     }
-    #[must_use]
-    pub fn with_anchor_span(&self) -> Self {
+    fn with_anchor_span(&self) -> Self {
         self.with_anchor_span_at(64)
     }
     fn with_anchor_span_at(&self, fuel: u64) -> Self {
@@ -281,89 +407,18 @@ impl Predicate {
         }
     }
 }
-impl DetPhrase {
+/// Discourse inspection of `DetPhrase`.
+pub trait DetPhraseAnchorsExt: Sized {
     #[must_use]
-    pub fn participial_number(&self) -> Option<Option<&Plurality>> {
+    fn participial_number(&self) -> Option<Option<&Plurality>>;
+}
+
+impl DetPhraseAnchorsExt for DetPhrase {
+    fn participial_number(&self) -> Option<Option<&Plurality>> {
         match self {
             Self::The { plur } => Some(Some(plur)),
             Self::All | Self::Each => Some(None),
             _ => None,
-        }
-    }
-}
-
-impl NounWord {
-    #[must_use]
-    pub fn attach_host_zone(&self) -> Option<Zone> {
-        match self {
-            Self::OfType { word, .. } | Self::Copied { word } => word.attach_host_zone(),
-            Self::Type { .. }
-            | Self::Subtype {
-                subtype: Subtype::Of { .. },
-            }
-            | Self::Permanent
-            | Self::Token => Some(Zone::Battlefield),
-            Self::Spell | Self::Copy => Some(Zone::Stack),
-            _ => None,
-        }
-    }
-    #[must_use]
-    pub fn attach_host_types(&self) -> Vec<CardType> {
-        match self {
-            Self::OfType { word, type_ } => {
-                super::merge_types(&word.attach_host_types(), std::slice::from_ref(type_))
-            }
-            Self::Copied { word } => word.attach_host_types(),
-            Self::Type { type_ }
-            | Self::Subtype {
-                subtype: Subtype::Of { host: type_, .. },
-            } => vec![type_.clone()],
-            _ => Vec::new(),
-        }
-    }
-    #[must_use]
-    pub fn read_payload(&self, payload: &super::Payload) -> super::Payload {
-        use super::Origin;
-        use super::Payload;
-        let Payload::Object {
-            ty,
-            zone,
-            prov,
-            orig,
-            size,
-        } = payload
-        else {
-            return payload.clone();
-        };
-        let object = |ty, zone, orig| Payload::Object {
-            ty,
-            zone,
-            prov: prov.clone(),
-            orig,
-            size: *size,
-        };
-        match self {
-            Self::Type { type_ }
-            | Self::Subtype {
-                subtype: Subtype::Of { host: type_, .. },
-            } => object(
-                super::merge_types(ty, std::slice::from_ref(type_)),
-                zone.clone()
-                    .or_else(|| type_.permanent.then_some(Zone::Battlefield)),
-                orig.clone(),
-            ),
-            Self::Ability => Payload::Ability {
-                orig: orig.clone(),
-                zone: Some(Zone::Stack),
-            },
-            Self::Spell
-            | Self::Subtype {
-                subtype: Subtype::Spell { .. },
-            } => object(ty.clone(), Some(Zone::Stack), orig.clone()),
-            Self::Token => object(ty.clone(), Some(Zone::Battlefield), Some(Origin::Token)),
-            Self::Permanent => object(ty.clone(), Some(Zone::Battlefield), orig.clone()),
-            Self::Emblem => object(ty.clone(), Some(Zone::Command), orig.clone()),
-            _ => payload.clone(),
         }
     }
 }

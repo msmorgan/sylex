@@ -1,5 +1,14 @@
-//! Determiners and plurality from `Semantics/Check/Phrase.lean`.
-use super::Determiner;
+//! Syntactic plurality used by bundle authoring expressions.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Determiner {
+    Target,
+    A,
+    Each,
+    All,
+    The,
+    Part,
+    Count,
+}
 use crate::ast::Amount;
 use crate::ast::Coordinator;
 use crate::ast::DetPhrase;
@@ -11,12 +20,12 @@ use crate::ast::SliceCount;
 
 impl Amount {
     #[must_use]
-    pub fn plurality(&self) -> Plurality {
-        self.plurality_at(64)
+    fn authoring_plurality(&self) -> Plurality {
+        self.authoring_plurality_at(64)
     }
-    fn plurality_at(&self, fuel: u64) -> Plurality {
+    fn authoring_plurality_at(&self, fuel: u64) -> Plurality {
         match (fuel, self) {
-            (1.., Self::InCaller { body }) => body.plurality_at(fuel - 1),
+            (1.., Self::InCaller { body }) => body.authoring_plurality_at(fuel - 1),
             (1.., Self::Lit { value: 1 } | Self::TheNth { .. }) => Plurality::One,
             _ => Plurality::Many,
         }
@@ -24,18 +33,18 @@ impl Amount {
 }
 impl Quantity {
     #[must_use]
-    pub fn plurality(&self) -> Plurality {
-        self.plurality_at(64)
+    fn authoring_plurality(&self) -> Plurality {
+        self.authoring_plurality_at(64)
     }
-    fn plurality_at(&self, fuel: u64) -> Plurality {
+    fn authoring_plurality_at(&self, fuel: u64) -> Plurality {
         match (fuel, self) {
             (0, _) => Plurality::Many,
             (_, Self::InCaller { body } | Self::Additional { quantity: body }) => {
-                body.plurality_at(fuel - 1)
+                body.authoring_plurality_at(fuel - 1)
             }
             (_, Self::Range { high: Some(1), .. } | Self::TheLast) => Plurality::One,
             (_, Self::ExactlyOf { amount } | Self::UpToOf { amount }) => {
-                amount.plurality_at(fuel - 1)
+                amount.authoring_plurality_at(fuel - 1)
             }
             _ => Plurality::Many,
         }
@@ -43,7 +52,7 @@ impl Quantity {
 }
 impl DetPhrase {
     #[must_use]
-    pub fn determiner(&self) -> Determiner {
+    fn authoring_determiner(&self) -> Determiner {
         match self {
             Self::Target { .. } => Determiner::Target,
             Self::A { .. } => Determiner::A,
@@ -54,9 +63,11 @@ impl DetPhrase {
         }
     }
     #[must_use]
-    pub fn plurality(&self) -> Plurality {
+    fn authoring_plurality(&self) -> Plurality {
         match self {
-            Self::Target { quantity } | Self::Count { quantity, .. } => quantity.plurality(),
+            Self::Target { quantity } | Self::Count { quantity, .. } => {
+                quantity.authoring_plurality()
+            }
             Self::The { plur } => plur.clone(),
             Self::A { .. } | Self::Each => Plurality::One,
             Self::All => Plurality::Many,
@@ -65,19 +76,15 @@ impl DetPhrase {
 }
 impl SliceCount {
     #[must_use]
-    pub fn plurality(&self) -> Plurality {
+    fn authoring_plurality(&self) -> Plurality {
         match self {
-            Self::Counted { quantity } => quantity.plurality(),
+            Self::Counted { quantity } => quantity.authoring_plurality(),
             Self::Whole | Self::Totalling { .. } => Plurality::Many,
         }
     }
 }
 impl NounPhrase {
-    #[must_use]
-    pub fn determiner(&self) -> Option<Determiner> {
-        self.determiner_at(64)
-    }
-    fn determiner_at(&self, fuel: u64) -> Option<Determiner> {
+    fn authoring_determiner_at(&self, fuel: u64) -> Option<Determiner> {
         match (fuel, self) {
             (0, _) => None,
             (
@@ -85,8 +92,8 @@ impl NounPhrase {
                 Self::InCaller { body }
                 | Self::FirstMention { phrase: body, .. }
                 | Self::Agree { group: body, .. },
-            ) => body.determiner_at(fuel - 1),
-            (_, Self::Described { determiner, .. }) => Some(determiner.determiner()),
+            ) => body.authoring_determiner_at(fuel - 1),
+            (_, Self::Described { determiner, .. }) => Some(determiner.authoring_determiner()),
             (_, Self::EachOf { .. }) => Some(Determiner::Each),
             (_, Self::Slice { .. } | Self::Run { .. } | Self::TheRest { .. }) => {
                 Some(Determiner::The)
@@ -97,10 +104,10 @@ impl NounPhrase {
         }
     }
     #[must_use]
-    pub fn plurality(&self) -> Plurality {
-        self.plurality_at(64)
+    fn authoring_plurality(&self) -> Plurality {
+        self.authoring_plurality_at(64)
     }
-    fn plurality_at(&self, fuel: u64) -> Plurality {
+    fn authoring_plurality_at(&self, fuel: u64) -> Plurality {
         match (fuel, self) {
             (0, _) => Plurality::One,
             (
@@ -108,9 +115,11 @@ impl NounPhrase {
                 Self::InCaller { body }
                 | Self::FirstMention { phrase: body, .. }
                 | Self::LaterMention { phrase: body, .. },
-            ) => body.plurality_at(fuel - 1),
-            (_, Self::Described { determiner, .. }) => determiner.plurality(),
-            (_, Self::SomeOf { count, .. } | Self::PileOf { count, .. }) => count.plurality(),
+            ) => body.authoring_plurality_at(fuel - 1),
+            (_, Self::Described { determiner, .. }) => determiner.authoring_plurality(),
+            (_, Self::SomeOf { count, .. } | Self::PileOf { count, .. }) => {
+                count.authoring_plurality()
+            }
             (
                 _,
                 Self::TheRest { plurality }
@@ -122,15 +131,15 @@ impl NounPhrase {
                     Location::Zone {
                         whose: Some(who), ..
                     } => {
-                        if who.determiner_at(fuel - 1) == Some(Determiner::Each) {
+                        if who.authoring_determiner_at(fuel - 1) == Some(Determiner::Each) {
                             Plurality::Many
                         } else {
-                            who.plurality_at(fuel - 1)
+                            who.authoring_plurality_at(fuel - 1)
                         }
                     }
                     _ => Plurality::One,
                 };
-                if amount.plurality() == Plurality::One && owner == Plurality::One {
+                if amount.authoring_plurality() == Plurality::One && owner == Plurality::One {
                     Plurality::One
                 } else {
                     Plurality::Many
@@ -153,8 +162,12 @@ impl NounPhrase {
                 },
             ) => phrases
                 .first()
-                .map_or(Plurality::One, |p| p.plurality_at(fuel - 1)),
+                .map_or(Plurality::One, |p| p.authoring_plurality_at(fuel - 1)),
             _ => Plurality::One,
         }
     }
+}
+
+pub(super) fn noun_plurality(noun: &NounPhrase) -> Plurality {
+    noun.authoring_plurality()
 }

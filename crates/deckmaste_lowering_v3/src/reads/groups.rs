@@ -1,12 +1,14 @@
 //! Selection evidence and remainder groups, from `Check/Words`.
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::Plurality;
+
 use super::DRS;
 use super::Determiner;
 use super::Referent;
 use super::ReferentId;
 use super::SelectionEvidence;
 use super::whole_groups;
-use crate::ast::Kind;
-use crate::ast::Plurality;
+use crate::reads::KindResolutionExt;
 fn group(kind: &Kind, r: &Referent) -> bool {
     kind.lte(&r.payload.kind()) && r.plur == Plurality::Many
 }

@@ -1,15 +1,22 @@
 //! Event head and magnitude rules from `Semantics/Check/Events.lean`.
-use crate::ast::Action;
-use crate::ast::Deed;
-use crate::ast::Delta;
-use crate::ast::DidClause;
-use crate::ast::GameEvent;
-use crate::ast::NounPhrase;
-use crate::ast::OutcomeSort;
-use crate::ast::TallyMode;
+use deckmaste_semantics_v3::ast::Action;
+use deckmaste_semantics_v3::ast::Deed;
+use deckmaste_semantics_v3::ast::Delta;
+use deckmaste_semantics_v3::ast::DidClause;
+use deckmaste_semantics_v3::ast::GameEvent;
+use deckmaste_semantics_v3::ast::NounPhrase;
+use deckmaste_semantics_v3::ast::OutcomeSort;
+use deckmaste_semantics_v3::ast::TallyMode;
 
-impl<T> Delta<T> {
-    pub fn life_outcomes(&self) -> Vec<OutcomeSort> {
+use crate::reads::KindResolutionExt;
+
+/// Discourse inspection of `Delta`.
+pub trait DeltaEventsExt<T>: Sized {
+    fn life_outcomes(&self) -> Vec<OutcomeSort>;
+}
+
+impl<T> DeltaEventsExt<T> for Delta<T> {
+    fn life_outcomes(&self) -> Vec<OutcomeSort> {
         match self {
             Self::Up { .. } => vec![OutcomeSort::LifeGained],
             Self::Down { .. } => vec![OutcomeSort::LifeLost],
@@ -18,9 +25,22 @@ impl<T> Delta<T> {
     }
 }
 
-impl Action {
+/// Discourse inspection of `Action`.
+pub trait ActionEventsExt: Sized {
     #[must_use]
-    pub fn scope_body(&self) -> &Self {
+    fn scope_body(&self) -> &Self;
+    #[must_use]
+    fn own_deed(&self) -> Option<&Deed>;
+    fn head_gate(&self, admits: impl FnOnce(&Self) -> bool) -> bool;
+    #[must_use]
+    fn event_head(&self) -> bool;
+    fn event_head_ok(&self) -> bool;
+    #[must_use]
+    fn event_has_magnitude(&self) -> bool;
+}
+
+impl ActionEventsExt for Action {
+    fn scope_body(&self) -> &Self {
         let mut body = self;
         for _ in 0..64 {
             match body {
@@ -31,8 +51,7 @@ impl Action {
         body
     }
 
-    #[must_use]
-    pub fn own_deed(&self) -> Option<&Deed> {
+    fn own_deed(&self) -> Option<&Deed> {
         let mut body = self;
         for _ in 0..64 {
             match body {
@@ -50,12 +69,11 @@ impl Action {
         None
     }
 
-    pub fn head_gate(&self, admits: impl FnOnce(&Self) -> bool) -> bool {
+    fn head_gate(&self, admits: impl FnOnce(&Self) -> bool) -> bool {
         self.own_deed().is_some() || admits(self.scope_body())
     }
 
-    #[must_use]
-    pub fn event_head(&self) -> bool {
+    fn event_head(&self) -> bool {
         match self {
             Self::DealDamage { .. }
             | Self::MarkDamage { .. }
@@ -138,12 +156,11 @@ impl Action {
         }
     }
 
-    pub fn event_head_ok(&self) -> bool {
+    fn event_head_ok(&self) -> bool {
         self.head_gate(Self::event_head)
     }
 
-    #[must_use]
-    pub fn event_has_magnitude(&self) -> bool {
+    fn event_has_magnitude(&self) -> bool {
         let mut body = self;
         for _ in 0..64 {
             match body {
@@ -172,9 +189,16 @@ pub struct EventFacts {
     pub has_magnitude: bool,
 }
 
-impl GameEvent {
+/// Discourse inspection of `GameEvent`.
+pub trait GameEventEventsExt: Sized {
     #[must_use]
-    pub fn facts(&self) -> EventFacts {
+    fn facts(&self) -> EventFacts;
+    #[must_use]
+    fn scope_body(&self) -> &Self;
+}
+
+impl GameEventEventsExt for GameEvent {
+    fn facts(&self) -> EventFacts {
         let mut event = self;
         for _ in 0..64 {
             match event {
@@ -197,8 +221,7 @@ impl GameEvent {
         }
         EventFacts::default()
     }
-    #[must_use]
-    pub fn scope_body(&self) -> &Self {
+    fn scope_body(&self) -> &Self {
         let mut event = self;
         for _ in 0..64 {
             match event {
@@ -209,24 +232,39 @@ impl GameEvent {
         event
     }
 }
-impl DidClause {
+/// Discourse inspection of `DidClause`.
+pub trait DidClauseEventsExt: Sized {
     #[must_use]
-    pub fn has_magnitude(&self) -> bool {
+    fn has_magnitude(&self) -> bool;
+}
+
+impl DidClauseEventsExt for DidClause {
+    fn has_magnitude(&self) -> bool {
         self.action.event_has_magnitude()
     }
 }
-impl TallyMode {
+/// Discourse inspection of `TallyMode`.
+pub trait TallyModeEventsExt: Sized {
     #[must_use]
-    pub fn permits(&self, clause: &DidClause) -> bool {
+    fn permits(&self, clause: &DidClause) -> bool;
+}
+
+impl TallyModeEventsExt for TallyMode {
+    fn permits(&self, clause: &DidClause) -> bool {
         match self {
             Self::Events => true,
             Self::Quantity => clause.has_magnitude(),
         }
     }
 }
-impl NounPhrase {
+/// Discourse inspection of `NounPhrase`.
+pub trait NounPhraseEventsExt: Sized {
     #[must_use]
-    pub fn is_you(&self) -> bool {
+    fn is_you(&self) -> bool;
+}
+
+impl NounPhraseEventsExt for NounPhrase {
+    fn is_you(&self) -> bool {
         let mut phrase = self;
         for _ in 0..64 {
             match phrase {
@@ -251,8 +289,8 @@ impl super::CausedEvent {
         match anchor {
             Some(super::ParticipialAnchor::Deed { deed }) => {
                 self.deed.as_ref() == Some(deed)
-                    || (matches!(deed, crate::ast::Deed::Action { label, permanent: crate::ast::DeedPermanent::None } if label.as_str() == "cast")
-                        && matches!(&self.deed, Some(crate::ast::Deed::Action { label, permanent: crate::ast::DeedPermanent::None }) if label.as_str() == "play"))
+                    || (matches!(deed, deckmaste_semantics_v3::ast::Deed::Action { label, permanent: deckmaste_semantics_v3::ast::DeedPermanent::None } if label.as_str() == "cast")
+                        && matches!(&self.deed, Some(deckmaste_semantics_v3::ast::Deed::Action { label, permanent: deckmaste_semantics_v3::ast::DeedPermanent::None }) if label.as_str() == "play"))
             }
             Some(super::ParticipialAnchor::ZoneChange {
                 origin,
@@ -269,7 +307,7 @@ impl super::CausedEvent {
     #[must_use]
     pub fn subject_fits(
         &self,
-        subject: Option<&crate::ast::Kind>,
+        subject: Option<&deckmaste_semantics_v3::ast::Kind>,
         subject_is_patient: bool,
     ) -> bool {
         let participant = if subject_is_patient { &self.patient } else { &self.performer };

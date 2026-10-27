@@ -1,4 +1,11 @@
 //! Stepping of definite, indefinite, and participial descriptions.
+use deckmaste_semantics_v3::ast::ChoiceSort;
+use deckmaste_semantics_v3::ast::DetPhrase;
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::LookbackSpan;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::Predicate;
+
 use super::DRS;
 use super::Determiner;
 use super::GramRole;
@@ -7,12 +14,14 @@ use super::StepOps;
 use super::circumstances::refuse;
 use super::participial_read;
 use super::step_determiner_with;
-use crate::ast::ChoiceSort;
-use crate::ast::DetPhrase;
-use crate::ast::Kind;
-use crate::ast::LookbackSpan;
-use crate::ast::Plurality;
-use crate::ast::Predicate;
+use crate::reads::ChoiceRefWordsExt;
+use crate::reads::ChoiceSortWordsExt;
+use crate::reads::DetPhraseAnchorsExt;
+use crate::reads::DetPhrasePhraseFactsExt;
+use crate::reads::DidClauseAnchorsExt;
+use crate::reads::KindWordsExt;
+use crate::reads::PredicateAnchorsExt;
+use crate::reads::PredicateFactsExt;
 use crate::refusal::Refusal;
 
 pub fn step_description_with(

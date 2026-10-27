@@ -1,4 +1,68 @@
 //! Discourse state mirrored from `lean/Semantics/Check/Words.lean`.
+pub use amounts::KindAxisAmountsExt;
+pub use amounts::LinkedFacetAmountsExt;
+pub use anchors::ActionAnchorsExt;
+pub use anchors::DetPhraseAnchorsExt;
+pub use anchors::DidClauseAnchorsExt;
+pub use anchors::NounPhraseAnchorsExt;
+pub use anchors::NounWordAnchorsExt;
+pub use anchors::PredicateAnchorsExt;
+pub use anchors::ReachAnchorsExt;
+pub use anchors::SubjectAnchorsExt;
+pub use choice_domains::ChoiceDomainExt;
+pub use choice_domains::KeywordLabelChoiceDomainsExt;
+pub use choice_domains::KeywordTermChoiceDomainsExt;
+pub use clauses::ActionClausesExt;
+pub use clauses::TokenSpecClausesExt;
+pub use conditions::AmountConditionsExt;
+pub use conditions::ConditionExt;
+pub use conditions::PredicateConditionsExt;
+pub use event_history::ActionEventHistoryExt;
+pub use event_history::DeedEventHistoryExt;
+pub use event_history::GameEventHistoryExt;
+pub use event_history::LocationEventHistoryExt;
+pub use events::ActionEventsExt;
+pub use events::DeltaEventsExt;
+pub use events::DidClauseEventsExt;
+pub use events::GameEventEventsExt;
+pub use events::NounPhraseEventsExt;
+pub use events::TallyModeEventsExt;
+pub use local_shape::AmountLocalShapeExt;
+pub use local_shape::CostLocalShapeExt;
+pub use local_shape::CostShiftLocalShapeExt;
+pub use local_shape::CounterKindSourceLocalShapeExt;
+pub use local_shape::CreationSpecLocalShapeExt;
+pub use local_shape::DieSidesLocalShapeExt;
+pub use local_shape::ManaHeldLocalShapeExt;
+pub use local_shape::ManaRiderLocalShapeExt;
+pub use local_shape::ProducedManaLocalShapeExt;
+pub use local_shape::QuantityLocalShapeExt;
+pub use local_shape::RollWatchLocalShapeExt;
+pub use lookbacks::DidClauseLookbacksExt;
+pub use noun_facts::NounPhraseFactsExt;
+pub use phrase_facts::AmountPhraseFactsExt;
+pub use phrase_facts::DetPhrasePhraseFactsExt;
+pub use phrase_facts::NounPhrasePhraseFactsExt;
+pub use phrase_facts::QuantityPhraseFactsExt;
+pub use phrase_facts::SliceCountPhraseFactsExt;
+pub use predicate_facts::DesignationLabelPredicateFactsExt;
+pub use predicate_facts::LocationPredicateFactsExt;
+pub use predicate_facts::NounPhrasePredicateFactsExt;
+pub use predicate_facts::PredicateFactsExt;
+pub use predicate_facts::ProjAxisPredicateFactsExt;
+pub use selections::AmountSelectionsExt;
+pub use selections::CreationSpecSelectionsExt;
+pub use selections::QuantitySelectionsExt;
+pub use selections::SliceCountSelectionsExt;
+pub use selections::TokenSpecSelectionsExt;
+pub use words::CardTypeWordsExt;
+pub use words::ChoiceRefWordsExt;
+pub use words::ChoiceSortWordsExt;
+pub use words::DeltaWordsExt;
+pub use words::KindWordsExt;
+pub use words::OutcomeSortWordsExt;
+pub use words::QualitySortWordsExt;
+pub use words::SubtypeWordsExt;
 mod choices;
 mod events;
 mod local_shape;
@@ -12,13 +76,36 @@ pub use words::merge_types;
 pub use words::normalize_types;
 mod anchors;
 mod circumstances;
+mod clauses;
+mod conditions;
+pub use conditions::step_condition_with;
+mod amounts;
+pub use amounts::step_amount_with;
+mod predicates;
+pub use predicates::step_predicate_with;
+mod choice_domains;
+pub use choice_domains::sorted_domain_check_with;
+pub use choice_domains::step_choice_domain_with;
+pub use choice_domains::step_color_term_with;
+mod lookbacks;
+pub use lookbacks::lookback_ground_refusals;
+pub use lookbacks::step_did_with;
+pub use lookbacks::step_relative_did_with;
 mod described;
 mod descriptions;
+mod event_history;
 mod groups;
 mod header_context;
 mod mentions;
 mod noun_facts;
 mod nouns;
+pub use clauses::ActionClause;
+pub use clauses::event_ordinal_refusals;
+pub use clauses::step_causing_with;
+pub use clauses::step_event_subject_with;
+pub use clauses::step_event_with;
+pub use clauses::step_subject_after_with;
+pub use clauses::step_would_with;
 mod phrase_facts;
 mod predicate_facts;
 mod stepping;
@@ -28,6 +115,24 @@ pub use circumstances::step_lookback_span_with;
 pub use circumstances::step_quantity_with;
 pub use circumstances::step_timing_with;
 pub use circumstances::step_turn_ref_with;
+use deckmaste_semantics_v3::ast::AttachMove;
+use deckmaste_semantics_v3::ast::BindingId;
+use deckmaste_semantics_v3::ast::CardType;
+use deckmaste_semantics_v3::ast::Deed;
+use deckmaste_semantics_v3::ast::ExposeVerb;
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::Letter;
+use deckmaste_semantics_v3::ast::NounWord;
+use deckmaste_semantics_v3::ast::OutcomeSort;
+use deckmaste_semantics_v3::ast::PileFace;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::Procedure;
+use deckmaste_semantics_v3::ast::QualitySort;
+use deckmaste_semantics_v3::ast::Reach;
+use deckmaste_semantics_v3::ast::SlotCarrier;
+use deckmaste_semantics_v3::ast::Status;
+use deckmaste_semantics_v3::ast::Subtype;
+use deckmaste_semantics_v3::ast::Zone;
 pub use described::step_description_with;
 pub use descriptions::participial_read;
 pub use descriptions::whole_groups;
@@ -42,25 +147,6 @@ pub use nouns::step_noun_with;
 pub use stepping::NounResult;
 pub use stepping::StepOps;
 pub use stepping::StepResult;
-
-use crate::ast::AttachMove;
-use crate::ast::BindingId;
-use crate::ast::CardType;
-use crate::ast::Deed;
-use crate::ast::ExposeVerb;
-use crate::ast::Kind;
-use crate::ast::Letter;
-use crate::ast::NounWord;
-use crate::ast::OutcomeSort;
-use crate::ast::PileFace;
-use crate::ast::Plurality;
-use crate::ast::Procedure;
-use crate::ast::QualitySort;
-use crate::ast::Reach;
-use crate::ast::SlotCarrier;
-use crate::ast::Status;
-use crate::ast::Subtype;
-use crate::ast::Zone;
 
 pub type ReferentId = u64;
 
@@ -690,9 +776,14 @@ fn dedup<T: PartialEq>(values: &mut Vec<T>) {
     }
 }
 
-impl Kind {
+/// Discourse inspection of `Kind`.
+pub trait KindResolutionExt: Sized {
     #[must_use]
-    pub fn lte(&self, other: &Self) -> bool {
+    fn lte(&self, other: &Self) -> bool;
+}
+
+impl KindResolutionExt for Kind {
+    fn lte(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Join { left, right }, _) => left.lte(other) && right.lte(other),
             (_, Self::Join { left, right }) => self.lte(left) || self.lte(right),

@@ -1,5 +1,15 @@
-use deckmaste_semantics_v3::ast::{Kind, NounWord, Plurality, Reach, SlotCarrier, Zone};
-use deckmaste_semantics_v3::reads::{ActorShape, DRS, Determiner, GramRole, Payload, Referent};
+use deckmaste_lowering_v3::reads::ActorShape;
+use deckmaste_lowering_v3::reads::DRS;
+use deckmaste_lowering_v3::reads::Determiner;
+use deckmaste_lowering_v3::reads::GramRole;
+use deckmaste_lowering_v3::reads::Payload;
+use deckmaste_lowering_v3::reads::Referent;
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::NounWord;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::Reach;
+use deckmaste_semantics_v3::ast::SlotCarrier;
+use deckmaste_semantics_v3::ast::Zone;
 use dpsi::Ident;
 
 fn object(det: Determiner) -> Referent {
@@ -44,7 +54,10 @@ fn buffered_subject_is_a_clause_mate_but_ranks_for_possessors() {
     let subject = add(&mut drs, GramRole::Other);
     drs.next_clause();
     drs.record_mention(subject, GramRole::Subj, true, false);
-    assert_eq!(drs.resolve_candidates(&Reach::Bare, &Plurality::One, true), Vec::<&Referent>::new());
+    assert_eq!(
+        drs.resolve_candidates(&Reach::Bare, &Plurality::One, true),
+        Vec::<&Referent>::new()
+    );
     assert_eq!(
         drs.resolve_candidates(&Reach::Bare, &Plurality::One, false)[0].id,
         subject
@@ -92,7 +105,10 @@ fn own_scope_masks_caller_but_preserves_performer_and_bound_arguments() {
     });
     assert!(drs.is_visible(argument));
     drs.leave_own_scope();
-    assert_eq!(drs.scope_stack, Vec::<deckmaste_semantics_v3::reads::OwnScopeFrame>::new());
+    assert_eq!(
+        drs.scope_stack,
+        Vec::<deckmaste_lowering_v3::reads::OwnScopeFrame>::new()
+    );
     assert!(drs.pending_roles.contains(&(argument, GramRole::Obj)));
 }
 #[test]
@@ -114,7 +130,10 @@ fn failed_first_mention_is_not_reported_again() {
     let identity = Ident::new("missing");
     assert!(drs.later_mention(identity, GramRole::Other, false).is_err());
     drs.first_mention(identity, &[]);
-    assert_eq!(drs.later_mention(identity, GramRole::Other, false).unwrap(), Vec::<u64>::new());
+    assert_eq!(
+        drs.later_mention(identity, GramRole::Other, false).unwrap(),
+        Vec::<u64>::new()
+    );
 }
 #[test]
 fn consuming_slot_excludes_departed_object_before_ranking() {

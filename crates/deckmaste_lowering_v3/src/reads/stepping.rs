@@ -1,27 +1,28 @@
 //! Mutually recursive checker operations, matching the Lean `StepOps`
 //! interface.
+use deckmaste_semantics_v3::ast::Ability;
+use deckmaste_semantics_v3::ast::Action;
+use deckmaste_semantics_v3::ast::Amount;
+use deckmaste_semantics_v3::ast::CardType;
+use deckmaste_semantics_v3::ast::Condition;
+use deckmaste_semantics_v3::ast::Cost;
+use deckmaste_semantics_v3::ast::DeckTrait;
+use deckmaste_semantics_v3::ast::GameEvent;
+use deckmaste_semantics_v3::ast::Location;
+use deckmaste_semantics_v3::ast::MoveRider;
+use deckmaste_semantics_v3::ast::NounPhrase;
+use deckmaste_semantics_v3::ast::Predicate;
+use deckmaste_semantics_v3::ast::Quantity;
+use deckmaste_semantics_v3::ast::Replacement;
+use deckmaste_semantics_v3::ast::StaticSpec;
+use deckmaste_semantics_v3::ast::Timing;
+use deckmaste_semantics_v3::ast::TokenSpec;
+use deckmaste_semantics_v3::ast::WouldClause;
+
 use super::DRS;
 use super::GramRole;
 use super::ReferentId;
 use super::StepPhase;
-use crate::ast::Ability;
-use crate::ast::Action;
-use crate::ast::Amount;
-use crate::ast::CardType;
-use crate::ast::Condition;
-use crate::ast::Cost;
-use crate::ast::DeckTrait;
-use crate::ast::GameEvent;
-use crate::ast::Location;
-use crate::ast::MoveRider;
-use crate::ast::NounPhrase;
-use crate::ast::Predicate;
-use crate::ast::Quantity;
-use crate::ast::Replacement;
-use crate::ast::StaticSpec;
-use crate::ast::Timing;
-use crate::ast::TokenSpec;
-use crate::ast::WouldClause;
 use crate::refusal::Refusal;
 
 pub type StepResult = (DRS, Vec<Refusal>);

@@ -1,4 +1,16 @@
 //! Noun-phrase stepping with discourse identity and grammatical roles.
+use deckmaste_semantics_v3::ast::AttachWord;
+use deckmaste_semantics_v3::ast::Coordinator;
+use deckmaste_semantics_v3::ast::DesignationLabel;
+use deckmaste_semantics_v3::ast::DesignationScope;
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::Location;
+use deckmaste_semantics_v3::ast::NounPhrase;
+use deckmaste_semantics_v3::ast::NounWord;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::Reach;
+use deckmaste_semantics_v3::ast::Zone;
+
 use super::DRS;
 use super::Determiner;
 use super::GramRole;
@@ -8,17 +20,15 @@ use super::Referent;
 use super::StepOps;
 use super::circumstances::kind_check;
 use super::circumstances::refuse;
-use crate::ast::AttachWord;
-use crate::ast::Coordinator;
-use crate::ast::DesignationLabel;
-use crate::ast::DesignationScope;
-use crate::ast::Kind;
-use crate::ast::Location;
-use crate::ast::NounPhrase;
-use crate::ast::NounWord;
-use crate::ast::Plurality;
-use crate::ast::Reach;
-use crate::ast::Zone;
+use crate::reads::KindResolutionExt;
+use crate::reads::KindWordsExt;
+use crate::reads::LocationPredicateFactsExt;
+use crate::reads::NounPhraseFactsExt;
+use crate::reads::NounPhrasePhraseFactsExt;
+use crate::reads::NounWordAnchorsExt;
+use crate::reads::PredicateFactsExt;
+use crate::reads::ReachAnchorsExt;
+use crate::reads::SliceCountPhraseFactsExt;
 use crate::refusal::Refusal;
 
 fn introduce(
@@ -257,8 +267,8 @@ impl<O: StepOps> NounContext<'_, O> {
     }
     fn some_of(
         self,
-        count: &crate::ast::SliceCount,
-        description: Option<&crate::ast::Predicate>,
+        count: &deckmaste_semantics_v3::ast::SliceCount,
+        description: Option<&deckmaste_semantics_v3::ast::Predicate>,
         group: &NounPhrase,
     ) -> NounResult {
         let Self {
@@ -305,7 +315,7 @@ impl<O: StepOps> NounContext<'_, O> {
     }
     fn slice(
         self,
-        amount: &crate::ast::Amount,
+        amount: &deckmaste_semantics_v3::ast::Amount,
         pile: &Location,
         plurality: Plurality,
     ) -> NounResult {
@@ -340,7 +350,7 @@ impl<O: StepOps> NounContext<'_, O> {
     }
     fn run(
         self,
-        stop: &crate::ast::Predicate,
+        stop: &deckmaste_semantics_v3::ast::Predicate,
         pile: &Location,
         plurality: Plurality,
     ) -> NounResult {
@@ -363,7 +373,11 @@ impl<O: StepOps> NounContext<'_, O> {
         let run_id = out.prepend(vec![reference], role, in_arg_slot)[0];
         (out, vec![run_id, stopped_id], errors)
     }
-    fn pile_of(self, count: &crate::ast::SliceCount, by_: Option<&NounPhrase>) -> NounResult {
+    fn pile_of(
+        self,
+        count: &deckmaste_semantics_v3::ast::SliceCount,
+        by_: Option<&NounPhrase>,
+    ) -> NounResult {
         let Self {
             ops,
             drs,
@@ -404,7 +418,11 @@ impl<O: StepOps> NounContext<'_, O> {
             errors,
         )
     }
-    fn one_each_of(self, roles: &[crate::ast::Predicate], pool: &NounPhrase) -> NounResult {
+    fn one_each_of(
+        self,
+        roles: &[deckmaste_semantics_v3::ast::Predicate],
+        pool: &NounPhrase,
+    ) -> NounResult {
         let Self {
             ops,
             mut drs,
@@ -476,7 +494,11 @@ impl<O: StepOps> NounContext<'_, O> {
             ),
         )
     }
-    fn possessor(self, axis: &crate::ast::PossessorAxis, subject: &NounPhrase) -> NounResult {
+    fn possessor(
+        self,
+        axis: &deckmaste_semantics_v3::ast::PossessorAxis,
+        subject: &NounPhrase,
+    ) -> NounResult {
         let Self {
             ops,
             mut drs,

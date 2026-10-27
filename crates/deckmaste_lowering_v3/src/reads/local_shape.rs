@@ -1,22 +1,25 @@
 //! Local shape checks from `Semantics/Check/LocalShape.lean`.
+use deckmaste_semantics_v3::ast::Amount;
+use deckmaste_semantics_v3::ast::ArithOp;
+use deckmaste_semantics_v3::ast::ChoiceRef;
+use deckmaste_semantics_v3::ast::ChoiceSort;
+use deckmaste_semantics_v3::ast::Cost;
+use deckmaste_semantics_v3::ast::CostShift;
+use deckmaste_semantics_v3::ast::CounterKindSource;
+use deckmaste_semantics_v3::ast::CreationSpec;
+use deckmaste_semantics_v3::ast::DieSides;
+use deckmaste_semantics_v3::ast::ManaCostTerm;
+use deckmaste_semantics_v3::ast::ManaHeld;
+use deckmaste_semantics_v3::ast::ManaRider;
+use deckmaste_semantics_v3::ast::OutcomeSort;
+use deckmaste_semantics_v3::ast::ProducedMana;
+use deckmaste_semantics_v3::ast::QualitySort;
+use deckmaste_semantics_v3::ast::Quantity;
+use deckmaste_semantics_v3::ast::RollWatch;
+
 use super::DRS;
-use crate::ast::Amount;
-use crate::ast::ArithOp;
-use crate::ast::ChoiceRef;
-use crate::ast::ChoiceSort;
-use crate::ast::Cost;
-use crate::ast::CostShift;
-use crate::ast::CounterKindSource;
-use crate::ast::CreationSpec;
-use crate::ast::DieSides;
-use crate::ast::ManaCostTerm;
-use crate::ast::ManaHeld;
-use crate::ast::ManaRider;
-use crate::ast::OutcomeSort;
-use crate::ast::ProducedMana;
-use crate::ast::QualitySort;
-use crate::ast::Quantity;
-use crate::ast::RollWatch;
+use crate::reads::AmountSelectionsExt;
+use crate::reads::DeltaWordsExt;
 use crate::refusal::Refusal;
 
 fn refuse(ok: bool, error: Refusal) -> Vec<Refusal> {
@@ -38,9 +41,20 @@ fn choice(drs: &DRS, quality: QualitySort) -> Vec<Refusal> {
         },
     )
 }
-impl Amount {
+/// Discourse inspection of `Amount`.
+pub trait AmountLocalShapeExt: Sized {
     #[must_use]
-    pub fn non_zero(&self) -> bool {
+    fn non_zero(&self) -> bool;
+    #[doc(hidden)]
+    fn non_zero_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn for_each(&self) -> bool;
+    #[must_use]
+    fn unit(&self) -> bool;
+}
+
+impl AmountLocalShapeExt for Amount {
+    fn non_zero(&self) -> bool {
         self.non_zero_at(64)
     }
     fn non_zero_at(&self, fuel: u64) -> bool {
@@ -50,8 +64,7 @@ impl Amount {
             _ => true,
         }
     }
-    #[must_use]
-    pub fn for_each(&self) -> bool {
+    fn for_each(&self) -> bool {
         let mut amount = self;
         for _ in 0..64 {
             match amount {
@@ -64,14 +77,24 @@ impl Amount {
         }
         false
     }
-    #[must_use]
-    pub fn unit(&self) -> bool {
+    fn unit(&self) -> bool {
         self.exact() == Some(1)
     }
 }
-impl Quantity {
+/// Discourse inspection of `Quantity`.
+pub trait QuantityLocalShapeExt: Sized {
     #[must_use]
-    pub fn non_zero(&self) -> bool {
+    fn non_zero(&self) -> bool;
+    #[doc(hidden)]
+    fn non_zero_at(&self, fuel: u64) -> bool;
+    #[must_use]
+    fn literal(&self) -> bool;
+    #[must_use]
+    fn modes_fit(&self, count: u64) -> bool;
+}
+
+impl QuantityLocalShapeExt for Quantity {
+    fn non_zero(&self) -> bool {
         self.non_zero_at(64)
     }
     fn non_zero_at(&self, fuel: u64) -> bool {
@@ -84,8 +107,7 @@ impl Quantity {
             _ => true,
         }
     }
-    #[must_use]
-    pub fn literal(&self) -> bool {
+    fn literal(&self) -> bool {
         let mut quantity = self;
         for _ in 0..64 {
             match quantity {
@@ -96,8 +118,7 @@ impl Quantity {
         }
         false
     }
-    #[must_use]
-    pub fn modes_fit(&self, count: u64) -> bool {
+    fn modes_fit(&self, count: u64) -> bool {
         let mut quantity = self;
         for _ in 0..64 {
             match quantity {
@@ -115,9 +136,14 @@ impl Quantity {
         true
     }
 }
-impl RollWatch {
+/// Discourse inspection of `RollWatch`.
+pub trait RollWatchLocalShapeExt: Sized {
     #[must_use]
-    pub fn local_checks(&self) -> Vec<Refusal> {
+    fn local_checks(&self) -> Vec<Refusal>;
+}
+
+impl RollWatchLocalShapeExt for RollWatch {
+    fn local_checks(&self) -> Vec<Refusal> {
         match self {
             Self::ResultIn { quantity } => {
                 let mut errors = refuse(quantity.non_zero(), Refusal::NonZeroQ);
@@ -128,9 +154,14 @@ impl RollWatch {
         }
     }
 }
-impl DieSides {
+/// Discourse inspection of `DieSides`.
+pub trait DieSidesLocalShapeExt: Sized {
     #[must_use]
-    pub fn local_checks(&self, drs: &DRS) -> Vec<Refusal> {
+    fn local_checks(&self, drs: &DRS) -> Vec<Refusal>;
+}
+
+impl DieSidesLocalShapeExt for DieSides {
+    fn local_checks(&self, drs: &DRS) -> Vec<Refusal> {
         match self {
             Self::Sides { sides } => refuse(*sides != 0, Refusal::NonZeroQ),
             Self::ThoseDice => outcome(drs, OutcomeSort::DiceRolled),
@@ -138,9 +169,14 @@ impl DieSides {
         }
     }
 }
-impl ProducedMana {
+/// Discourse inspection of `ProducedMana`.
+pub trait ProducedManaLocalShapeExt: Sized {
     #[must_use]
-    pub fn local_checks(&self, drs: &DRS) -> Vec<Refusal> {
+    fn local_checks(&self, drs: &DRS) -> Vec<Refusal>;
+}
+
+impl ProducedManaLocalShapeExt for ProducedMana {
+    fn local_checks(&self, drs: &DRS) -> Vec<Refusal> {
         match self {
             Self::Runs { runs } => refuse(
                 !runs.is_empty() && runs.iter().all(|run| !run.is_empty()),
@@ -152,9 +188,14 @@ impl ProducedMana {
         }
     }
 }
-impl ManaRider {
+/// Discourse inspection of `ManaRider`.
+pub trait ManaRiderLocalShapeExt: Sized {
     #[must_use]
-    pub fn local_checks(&self) -> Vec<Refusal> {
+    fn local_checks(&self) -> Vec<Refusal>;
+}
+
+impl ManaRiderLocalShapeExt for ManaRider {
+    fn local_checks(&self) -> Vec<Refusal> {
         match self {
             Self::SpendOnly { purposes } | Self::SpendNotOn { purposes } => {
                 refuse(!purposes.is_empty(), Refusal::NonEmpty)
@@ -163,18 +204,28 @@ impl ManaRider {
         }
     }
 }
-impl ManaHeld {
+/// Discourse inspection of `ManaHeld`.
+pub trait ManaHeldLocalShapeExt: Sized {
     #[must_use]
-    pub fn local_checks(&self, drs: &DRS) -> Vec<Refusal> {
+    fn local_checks(&self, drs: &DRS) -> Vec<Refusal>;
+}
+
+impl ManaHeldLocalShapeExt for ManaHeld {
+    fn local_checks(&self, drs: &DRS) -> Vec<Refusal> {
         match self {
             Self::ThisMana => outcome(drs, OutcomeSort::ManaAdded),
             Self::Unspent { .. } => vec![],
         }
     }
 }
-impl Cost {
+/// Discourse inspection of `Cost`.
+pub trait CostLocalShapeExt: Sized {
     #[must_use]
-    pub fn local_checks(&self) -> Vec<Refusal> {
+    fn local_checks(&self) -> Vec<Refusal>;
+}
+
+impl CostLocalShapeExt for Cost {
+    fn local_checks(&self) -> Vec<Refusal> {
         match self {
             Self::Mana { cost } => refuse(!cost.is_empty(), Refusal::NonEmpty),
             Self::Scaled { amount, .. } => refuse(amount.for_each(), Refusal::ForEachAmount),
@@ -182,9 +233,14 @@ impl Cost {
         }
     }
 }
-impl CostShift {
+/// Discourse inspection of `CostShift`.
+pub trait CostShiftLocalShapeExt: Sized {
     #[must_use]
-    pub fn local_checks(&self) -> Vec<Refusal> {
+    fn local_checks(&self) -> Vec<Refusal>;
+}
+
+impl CostShiftLocalShapeExt for CostShift {
+    fn local_checks(&self) -> Vec<Refusal> {
         match self {
             Self::Generic { change, .. } => refuse(!change.is_set(), Refusal::ShiftSets),
             Self::BySymbols { change, .. } => {
@@ -197,18 +253,28 @@ impl CostShift {
         }
     }
 }
-impl CreationSpec {
+/// Discourse inspection of `CreationSpec`.
+pub trait CreationSpecLocalShapeExt: Sized {
     #[must_use]
-    pub fn local_checks(&self) -> Vec<Refusal> {
+    fn local_checks(&self) -> Vec<Refusal>;
+}
+
+impl CreationSpecLocalShapeExt for CreationSpec {
+    fn local_checks(&self) -> Vec<Refusal> {
         match self {
             Self::Emblem { abilities, .. } => refuse(!abilities.is_empty(), Refusal::NonEmpty),
             Self::Token { .. } => vec![],
         }
     }
 }
-impl CounterKindSource {
+/// Discourse inspection of `CounterKindSource`.
+pub trait CounterKindSourceLocalShapeExt: Sized {
     #[must_use]
-    pub fn local_checks(&self, drs: &DRS) -> Vec<Refusal> {
+    fn local_checks(&self, drs: &DRS) -> Vec<Refusal>;
+}
+
+impl CounterKindSourceLocalShapeExt for CounterKindSource {
+    fn local_checks(&self, drs: &DRS) -> Vec<Refusal> {
         match self {
             Self::Chosen { menu } | Self::DistinctChosen { menu } => {
                 refuse(!menu.is_empty(), Refusal::NonEmpty)

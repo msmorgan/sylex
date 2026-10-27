@@ -1,8 +1,15 @@
 //! Loose declaration bundles and dependency ordering matching `Authoring.lean`.
-use crate::reader::{self, Declaration, ReadError, Token};
+use std::collections::BTreeMap;
+use std::collections::BTreeSet;
+use std::path::Path;
+use std::path::PathBuf;
+
 use dpsi::Ident;
-use std::collections::{BTreeMap, BTreeSet};
-use std::path::{Path, PathBuf};
+
+use crate::reader::Declaration;
+use crate::reader::ReadError;
+use crate::reader::Token;
+use crate::reader::{self};
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct BundleKey {
@@ -120,7 +127,8 @@ impl Bundle {
     /// Load all `.lean` files recursively. Paths carry no semantic information.
     ///
     /// # Errors
-    /// Reports IO, malformed declaration, duplicate key, and exact cycle errors.
+    /// Reports IO, malformed declaration, duplicate key, and exact cycle
+    /// errors.
     pub fn load(path: &Path) -> Result<Self, ReadError> {
         fn walk(path: &Path, items: &mut Vec<BundleItem>) -> Result<(), ReadError> {
             let entries = std::fs::read_dir(path)
@@ -149,7 +157,8 @@ impl Bundle {
     /// Order declarations with the lexicographically least ready key first.
     ///
     /// # Errors
-    /// Reports duplicate keys and only nodes participating in dependency cycles.
+    /// Reports duplicate keys and only nodes participating in dependency
+    /// cycles.
     pub fn from_items(items: Vec<BundleItem>) -> Result<Self, ReadError> {
         let mut by_key = BTreeMap::new();
         for item in items {

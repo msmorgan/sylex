@@ -1,6 +1,6 @@
+use deckmaste_lowering_v3::reads::*;
+use deckmaste_lowering_v3::refusal::Refusal;
 use deckmaste_semantics_v3::ast::*;
-use deckmaste_semantics_v3::reads::*;
-use deckmaste_semantics_v3::refusal::Refusal;
 
 fn draw() -> Action {
     Action::Draw {

@@ -1,4 +1,5 @@
-//! Syntax mirrored from `lean/Semantics/{Words,Events,Abilities,Card,Rules}.lean`.
+//! Syntax mirrored from
+//! `lean/Semantics/{Words,Events,Abilities,Card,Rules}.lean`.
 use dpsi::Ident;
 
 pub type FlavorWordLabel = Ident;

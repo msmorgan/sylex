@@ -1,4 +1,14 @@
 //! Definite, participial, and contrast-anchor resolution from the Lean checker.
+use deckmaste_semantics_v3::ast::CardType;
+use deckmaste_semantics_v3::ast::Kind;
+use deckmaste_semantics_v3::ast::NounPhrase;
+use deckmaste_semantics_v3::ast::NounWord;
+use deckmaste_semantics_v3::ast::Plurality;
+use deckmaste_semantics_v3::ast::PossessorAxis;
+use deckmaste_semantics_v3::ast::Predicate;
+use deckmaste_semantics_v3::ast::Subtype;
+use deckmaste_semantics_v3::ast::Zone;
+
 use super::ContrastAnchor;
 use super::DRS;
 use super::Determiner;
@@ -9,15 +19,9 @@ use super::Referent;
 use super::ReferentId;
 use super::Stamp;
 use super::card_zone;
-use crate::ast::CardType;
-use crate::ast::Kind;
-use crate::ast::NounPhrase;
-use crate::ast::NounWord;
-use crate::ast::Plurality;
-use crate::ast::PossessorAxis;
-use crate::ast::Predicate;
-use crate::ast::Subtype;
-use crate::ast::Zone;
+use crate::reads::KindResolutionExt;
+use crate::reads::NounPhrasePredicateFactsExt;
+use crate::reads::PredicateFactsExt;
 
 fn compatible<T: PartialEq>(a: Option<&T>, b: Option<&T>) -> bool {
     a.zip(b).is_none_or(|(a, b)| a == b)

@@ -603,6 +603,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "deckmaste_lowering_v3"
+version = "0.1.0"
+dependencies = [
+ "deckmaste_semantics_v3",
+ "dpsi",
+ "syn 2.0.117",
+]
+
+[[package]]
 name = "deckmaste_migrations"
 version = "0.1.0"
 dependencies = [
