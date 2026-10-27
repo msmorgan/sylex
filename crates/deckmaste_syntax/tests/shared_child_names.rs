@@ -51,7 +51,7 @@ fn grammar(lexicon: &Lexicon, equations: &str) -> Result<CompiledGrammar, String
 fn count(equations: &str, text: &str) -> usize {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon, equations).unwrap();
-    let found = grammar.parse(&lexicon, text).readings();
+    let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
         assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
     }

@@ -59,7 +59,7 @@ fn a_last_conjunct_ending_in_a_dependent_has_the_same_forest_and_tree_key() {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon);
     let parse = grammar.parse(&lexicon, "Card or card this card.");
-    let ranked = parse.best_ranked(usize::MAX);
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     assert_eq!(ranked.len(), 1, "{ranked:#?}");
     let (key, reading) = &ranked[0];
     // The first conjunct ends in its head and the last in a dependent: the
@@ -76,7 +76,7 @@ fn a_last_conjunct_ending_in_its_head_has_the_same_forest_and_tree_key() {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon);
     let parse = grammar.parse(&lexicon, "Card this card or card.");
-    let ranked = parse.best_ranked(usize::MAX);
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     assert_eq!(ranked.len(), 1, "{ranked:#?}");
     let (key, reading) = &ranked[0];
     assert_eq!(key.attachment_class, 0);

@@ -111,7 +111,7 @@ fn grammar(
 fn families(internalised: &str, text: &str) -> Vec<Option<FrameFamily>> {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon, internalised).unwrap();
-    let readings = grammar.parse(&lexicon, text).readings();
+    let readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &readings {
         assert_eq!(grammar.admit(reading, &lexicon), Ok(()));
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);

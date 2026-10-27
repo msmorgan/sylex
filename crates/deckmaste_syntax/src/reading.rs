@@ -157,25 +157,33 @@ impl Parse<'_> {
     }
 
     /// Every Reading, deduplicated and ranked by its Ranking Key, then by its
-    /// own order. This builds every tree; outside tests, use
-    /// [`Parse::best_readings`] or [`Parse::derivation_count`].
-    #[must_use]
-    pub fn readings(&self) -> Vec<Reading> {
-        self.ranked(None).into_iter().map(|(_, r)| r).collect()
+    /// own order. Each iterator step materializes only the requested Reading.
+    pub fn readings(&self) -> impl Iterator<Item = Reading> + '_ {
+        self.best_readings(usize::MAX)
     }
 
-    /// The `k` best Readings by Ranking Key. Each forest node keeps only its
-    /// `k` best trees, so the work is bounded by `k` and the forest's size,
-    /// never by the number of attachment trees.
-    #[must_use]
-    pub fn best_readings(&self, k: usize) -> Vec<Reading> {
-        self.ranked(Some(k)).into_iter().map(|(_, r)| r).collect()
+    /// The `k` best Readings, enumerated lazily over an internal flyweight arena.
+    pub fn best_readings(&self, k: usize) -> impl Iterator<Item = Reading> + '_ {
+        self.best_ranked(k).map(|(_, reading)| reading)
     }
 
-    /// The `k` best Readings with their Ranking Keys, best first.
-    #[must_use]
-    pub fn best_ranked(&self, k: usize) -> Vec<(RankingKey, Reading)> {
-        self.ranked(Some(k))
+    /// The `k` best Readings with their Ranking Keys, best first. Huang &
+    /// Chiang (2005), Algorithm 3 advances child streams only on demand;
+    /// features and Selected Frames are cloned only for the emitted Reading.
+    pub fn best_ranked(&self, k: usize) -> impl Iterator<Item = (RankingKey, Reading)> + '_ {
+        let mut enumeration = Enumeration::new(self);
+        let mut index = 0;
+        std::iter::from_fn(move || {
+            if index == k {
+                return None;
+            }
+            let Some((key, tree)) = enumeration.ranked(index) else {
+                index = k;
+                return None;
+            };
+            index += 1;
+            Some((key, enumeration.materialize(tree)))
+        })
     }
 
     /// The least Ranking Key in the forest and the number of Derivations that
@@ -257,6 +265,21 @@ impl Parse<'_> {
         previous: Option<usize>,
         child: ChildRef,
     ) -> RankingKey {
+        let high = match child {
+            ChildRef::Node(n) => self.high_attachment(n),
+            _ => false,
+        };
+        self.edge_key_with_high(item, anchors, previous, child, high)
+    }
+
+    fn edge_key_with_high(
+        &self,
+        item: usize,
+        anchors: Anchors,
+        previous: Option<usize>,
+        child: ChildRef,
+        high_attachment: bool,
+    ) -> RankingKey {
         let ChildRef::Node(n) = child else {
             return RankingKey::default();
         };
@@ -266,7 +289,7 @@ impl Parse<'_> {
             words: self.words(node.start, node.end),
             coordination: node.summary.coordinator.is_some(),
             head_final: node.summary.head_final,
-            high_attachment: self.high_attachment(n),
+            high_attachment,
         };
         let head = || anchors.head.map(|(start, end)| self.words(start, end));
         let first = || {
@@ -325,115 +348,471 @@ impl Parse<'_> {
             .count();
         u64::try_from(starts).unwrap_or(u64::MAX)
     }
+}
 
-    fn ranked(&self, limit: Option<usize>) -> Vec<(RankingKey, Reading)> {
-        let mut memo = ForestMemo::default();
-        let mut all = BTreeSet::new();
-        for &root in &self.forest.roots {
-            all.extend(self.node_trees(root, limit, &mut memo));
+// Huang & Chiang (2005), Algorithm 3: each stream retains its best-so-far
+// values and a frontier of (family, child ranks). Only a request for another
+// value expands the last candidate's immediate successors.
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+struct TreeId(u32);
+#[derive(Clone, Copy, Default, PartialEq, Eq, Hash)]
+struct SeqId(u32);
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+enum TreeEntry {
+    Node {
+        node: usize,
+        production: usize,
+        children: SeqId,
+    },
+    Leaf(usize),
+}
+#[derive(Clone, Copy)]
+struct SeqEntry {
+    prefix: SeqId,
+    last: TreeId,
+    len: usize,
+}
+#[derive(Clone, Copy)]
+enum Value {
+    Tree(TreeId),
+    Seq(SeqId),
+}
+#[derive(Clone, Copy)]
+enum Operation {
+    Wrap { node: usize, production: usize },
+    Append,
+    Pass,
+}
+#[derive(Clone, Copy)]
+struct Edge {
+    tails: [Option<usize>; 2],
+    operation: Operation,
+    key: RankingKey,
+}
+#[derive(Clone, Copy)]
+struct Candidate {
+    edge: usize,
+    ranks: [usize; 2],
+    key: RankingKey,
+    value: Value,
+}
+#[derive(Default)]
+struct Stream {
+    edges: Vec<Edge>,
+    best: Vec<(RankingKey, Value)>,
+    frontier: Vec<Candidate>,
+    seen: BTreeSet<(usize, [usize; 2])>,
+    pending: Option<Candidate>,
+    initialized: bool,
+}
+
+struct Enumeration<'a, 'g> {
+    parse: &'a Parse<'g>,
+    trees: Vec<TreeEntry>,
+    sequences: Vec<SeqEntry>,
+    features: Vec<Option<BTreeMap<Ident, Ident>>>,
+    streams: Vec<Stream>,
+    root: Option<usize>,
+}
+
+type StreamMemo = ForestMemo<usize, Vec<(Anchors, usize)>>;
+
+impl<'a, 'g> Enumeration<'a, 'g> {
+    fn new(parse: &'a Parse<'g>) -> Self {
+        Self {
+            parse,
+            trees: Vec::new(),
+            sequences: Vec::new(),
+            features: vec![None; parse.forest.nodes.len()],
+            streams: Vec::new(),
+            root: None,
         }
-        truncate(all, limit)
     }
 
-    fn node_trees(
-        &self,
-        node: usize,
-        limit: Option<usize>,
-        memo: &mut TreeMemo,
-    ) -> Vec<(RankingKey, Reading)> {
+    fn stream(&mut self, edges: Vec<Edge>) -> usize {
+        let id = self.streams.len();
+        self.streams.push(Stream {
+            edges,
+            ..Stream::default()
+        });
+        id
+    }
+
+    fn singleton(&mut self, key: RankingKey, value: Value) -> usize {
+        let id = self.stream(Vec::new());
+        self.streams[id].initialized = true;
+        self.streams[id].best.push((key, value));
+        id
+    }
+
+    fn tree(&mut self, entry: TreeEntry) -> TreeId {
+        let id = TreeId(u32::try_from(self.trees.len()).expect("Reading arena exceeds u32"));
+        self.trees.push(entry);
+        id
+    }
+
+    fn sequence(&mut self, prefix: SeqId, last: TreeId) -> SeqId {
+        let len = self.sequence_len(prefix) + 1;
+        self.sequences.push(SeqEntry { prefix, last, len });
+        SeqId(u32::try_from(self.sequences.len()).expect("Reading sequence arena exceeds u32"))
+    }
+
+    fn sequence_len(&self, id: SeqId) -> usize {
+        if id.0 == 0 { 0 } else { self.sequences[id.0 as usize - 1].len }
+    }
+
+    fn features(&mut self, node: usize) -> &BTreeMap<Ident, Ident> {
+        self.features[node].get_or_insert_with(|| {
+            let packed = &self.parse.forest.nodes[node];
+            self.parse
+                .grammar
+                .feature_map(packed.category, &packed.summary)
+        })
+    }
+
+    // Build the stream graph with the same path exclusion as the other forest
+    // walks. A cycle-tainted graph is private to the path that built it; only
+    // cycle-free stream graphs enter the memo. Resuming a stream therefore
+    // cannot accidentally change its ancestor exclusions.
+    fn node_stream(&mut self, node: usize, memo: &mut StreamMemo) -> usize {
         let frame = match memo.nodes.enter(node) {
-            Visit::Known(trees) => return trees,
-            Visit::Cycle => return Vec::new(),
+            Visit::Known(id) => return id,
+            Visit::Cycle => return self.stream(Vec::new()),
             Visit::Open(frame) => frame,
         };
-        let grammar = self.grammar;
-        let packed = &self.forest.nodes[node];
-        let mut trees = BTreeSet::new();
-        for &(production, item) in &packed.families {
-            let p = &grammar.productions[production];
-            let own = grammar.production_key(production);
-            for (key, children) in self
-                .item_sequences(item, limit, memo)
-                .into_iter()
-                .flat_map(|(_, sequences)| sequences)
-            {
-                trees.insert((
-                    key + own,
-                    Reading::Node(ReadingNode {
-                        production: p.id,
-                        category: grammar.categories[p.lhs],
-                        features: grammar.feature_map(p.lhs, &packed.summary),
-                        gap: packed.summary.gap,
-                        selected_frame: p.frame.map(|f| grammar.frames[f].clone()),
-                        children,
-                    }),
-                ));
+        self.features(node);
+        let mut edges = Vec::new();
+        for &(production, item) in &self.parse.forest.nodes[node].families {
+            for (_, sequence) in self.item_streams(item, memo) {
+                edges.push(Edge {
+                    tails: [Some(sequence), None],
+                    operation: Operation::Wrap { node, production },
+                    key: self.parse.grammar.production_key(production),
+                });
             }
         }
-        let trees = truncate(trees, limit);
-        memo.nodes.leave(frame, &trees);
-        trees
+        let id = self.stream(edges);
+        memo.nodes.leave(frame, &id);
+        id
     }
 
-    /// An item's `limit` best child sequences for each [`Anchors`] their
-    /// Derivations leave.
-    fn item_sequences(
-        &self,
-        item: usize,
-        limit: Option<usize>,
-        memo: &mut TreeMemo,
-    ) -> Vec<(Anchors, Sequences)> {
-        if let Some(sequences) = memo.items.get(&item) {
-            return sequences.clone();
+    fn item_streams(&mut self, item: usize, memo: &mut StreamMemo) -> Vec<(Anchors, usize)> {
+        if let Some(groups) = memo.items.get(&item) {
+            return groups.clone();
         }
         let mark = memo.nodes.mark();
-        let mut out: BTreeMap<Anchors, BTreeSet<(RankingKey, Vec<Reading>)>> = BTreeMap::new();
-        for &(previous, child) in &self.forest.items[item].families {
-            let prefixes = match previous {
-                Some(p) => self.item_sequences(p, limit, memo),
-                None => vec![(
-                    Anchors::default(),
-                    vec![(RankingKey::default(), Vec::new())],
-                )],
+        let mut groups: BTreeMap<Anchors, Vec<Edge>> = BTreeMap::new();
+        for &(previous, child) in &self.parse.forest.items[item].families {
+            let prefixes = if let Some(p) = previous {
+                self.item_streams(p, memo)
+            } else {
+                let empty = self.singleton(RankingKey::default(), Value::Seq(SeqId(0)));
+                vec![(Anchors::default(), empty)]
             };
-            let lasts: Vec<(RankingKey, Option<Reading>)> = match child {
-                ChildRef::Node(n) => self
-                    .node_trees(n, limit, memo)
-                    .into_iter()
-                    .map(|(k, r)| (k, Some(r)))
-                    .collect(),
-                ChildRef::Leaf(l) => vec![(
-                    self.leaf_key(item, l),
-                    Some(Reading::Leaf(self.forest.leaves[l].reading.clone())),
-                )],
-                ChildRef::Punct => vec![(RankingKey::default(), None)],
+            let last = match child {
+                ChildRef::Node(n) => Some(self.node_stream(n, memo)),
+                ChildRef::Leaf(l) => {
+                    let tree = self.tree(TreeEntry::Leaf(l));
+                    Some(self.singleton(self.parse.leaf_key(item, l), Value::Tree(tree)))
+                }
+                ChildRef::Punct => None,
             };
-            for (anchors, prefixes) in prefixes {
-                let edge = self.edge_key(item, anchors, previous, child);
-                let group = out.entry(self.anchors(item, anchors, child)).or_default();
-                for (prefix_key, prefix) in &prefixes {
-                    for (last_key, last) in &lasts {
-                        let mut sequence = prefix.clone();
-                        sequence.extend(last.clone());
-                        group.insert((*prefix_key + *last_key + edge, sequence));
+            let high = if let ChildRef::Node(n) = child {
+                let grammar = self.parse.grammar;
+                let category = self.parse.forest.nodes[n].category;
+                grammar.attaches_high(self.features(n), category)
+            } else {
+                false
+            };
+            for (anchors, prefix) in prefixes {
+                let key = self
+                    .parse
+                    .edge_key_with_high(item, anchors, previous, child, high);
+                groups
+                    .entry(self.parse.anchors(item, anchors, child))
+                    .or_default()
+                    .push(Edge {
+                        tails: [Some(prefix), last],
+                        operation: Operation::Append,
+                        key,
+                    });
+            }
+        }
+        let groups: Vec<_> = groups
+            .into_iter()
+            .map(|(anchors, edges)| (anchors, self.stream(edges)))
+            .collect();
+        if memo.nodes.settle(mark) {
+            memo.items.insert(item, groups.clone());
+        }
+        groups
+    }
+
+    fn ranked(&mut self, index: usize) -> Option<(RankingKey, TreeId)> {
+        let root = if let Some(root) = self.root {
+            root
+        } else {
+            let mut memo = StreamMemo::default();
+            let mut edges = Vec::new();
+            for &node in &self.parse.forest.roots {
+                let stream = self.node_stream(node, &mut memo);
+                edges.push(Edge {
+                    tails: [Some(stream), None],
+                    operation: Operation::Pass,
+                    key: RankingKey::default(),
+                });
+            }
+            let root = self.stream(edges);
+            self.root = Some(root);
+            root
+        };
+        let (key, Value::Tree(tree)) = self.get(root, index)? else { unreachable!() };
+        Some((key, tree))
+    }
+
+    fn get(&mut self, stream: usize, index: usize) -> Option<(RankingKey, Value)> {
+        if !self.streams[stream].initialized {
+            self.streams[stream].initialized = true;
+            for edge in 0..self.streams[stream].edges.len() {
+                self.offer(stream, edge, [0, 0]);
+            }
+        }
+        while self.streams[stream].best.len() <= index {
+            if let Some(last) = self.streams[stream].pending.take() {
+                let edge = self.streams[stream].edges[last.edge];
+                for dimension in 0..2 {
+                    if edge.tails[dimension].is_some() {
+                        let mut ranks = last.ranks;
+                        ranks[dimension] += 1;
+                        self.offer(stream, last.edge, ranks);
                     }
                 }
             }
+            let candidate = self.pop(stream)?;
+            self.streams[stream].pending = Some(candidate);
+            let duplicate = self.streams[stream]
+                .best
+                .last()
+                .is_some_and(|&(key, value)| {
+                    key == candidate.key && self.compare(value, candidate.value).is_eq()
+                });
+            if !duplicate {
+                self.streams[stream]
+                    .best
+                    .push((candidate.key, candidate.value));
+            }
         }
-        let sequences: Vec<_> = out
-            .into_iter()
-            .map(|(anchors, group)| (anchors, truncate(group, limit)))
-            .collect();
-        if memo.nodes.settle(mark) {
-            memo.items.insert(item, sequences.clone());
+        self.streams[stream].best.get(index).copied()
+    }
+
+    fn offer(&mut self, stream: usize, edge: usize, ranks: [usize; 2]) {
+        if !self.streams[stream].seen.insert((edge, ranks)) {
+            return;
         }
-        sequences
+        let definition = self.streams[stream].edges[edge];
+        let Some((first_key, first)) = self.get(definition.tails[0].unwrap(), ranks[0]) else {
+            return;
+        };
+        let (last_key, last) = if let Some(tail) = definition.tails[1] {
+            let Some((key, value)) = self.get(tail, ranks[1]) else { return };
+            (key, Some(value))
+        } else {
+            (RankingKey::default(), None)
+        };
+        let value = match definition.operation {
+            Operation::Wrap { node, production } => {
+                let Value::Seq(children) = first else { unreachable!() };
+                Value::Tree(self.tree(TreeEntry::Node {
+                    node,
+                    production,
+                    children,
+                }))
+            }
+            Operation::Append => {
+                let Value::Seq(prefix) = first else { unreachable!() };
+                match last {
+                    Some(Value::Tree(tree)) => Value::Seq(self.sequence(prefix, tree)),
+                    None => first,
+                    _ => unreachable!(),
+                }
+            }
+            Operation::Pass => first,
+        };
+        let candidate = Candidate {
+            edge,
+            ranks,
+            key: first_key + last_key + definition.key,
+            value,
+        };
+        self.push(stream, candidate);
+    }
+
+    fn candidate_cmp(&self, a: Candidate, b: Candidate) -> std::cmp::Ordering {
+        a.key
+            .cmp(&b.key)
+            .then_with(|| self.compare(a.value, b.value))
+    }
+
+    // A binary min-heap whose comparison borrows the arena, rather than
+    // storing owned Reading keys or self-referential comparator objects.
+    fn push(&mut self, stream: usize, candidate: Candidate) {
+        let mut at = self.streams[stream].frontier.len();
+        self.streams[stream].frontier.push(candidate);
+        while at > 0 {
+            let parent = (at - 1) / 2;
+            if !self
+                .candidate_cmp(candidate, self.streams[stream].frontier[parent])
+                .is_lt()
+            {
+                break;
+            }
+            self.streams[stream].frontier.swap(at, parent);
+            at = parent;
+        }
+    }
+
+    fn pop(&mut self, stream: usize) -> Option<Candidate> {
+        let heap = &mut self.streams[stream].frontier;
+        if heap.is_empty() {
+            return None;
+        }
+        let first = heap.swap_remove(0);
+        let mut at = 0;
+        let len = self.streams[stream].frontier.len();
+        while at * 2 + 1 < len {
+            let mut child = at * 2 + 1;
+            let heap = &self.streams[stream].frontier;
+            if child + 1 < len && self.candidate_cmp(heap[child + 1], heap[child]).is_lt() {
+                child += 1;
+            }
+            if !self.candidate_cmp(heap[child], heap[at]).is_lt() {
+                break;
+            }
+            self.streams[stream].frontier.swap(at, child);
+            at = child;
+        }
+        Some(first)
+    }
+
+    fn compare(&self, a: Value, b: Value) -> std::cmp::Ordering {
+        match (a, b) {
+            (Value::Tree(a), Value::Tree(b)) => self.compare_tree(a, b),
+            (Value::Seq(a), Value::Seq(b)) => self.compare_sequence(a, b),
+            _ => unreachable!(),
+        }
+    }
+
+    fn compare_tree(&self, a: TreeId, b: TreeId) -> std::cmp::Ordering {
+        use std::cmp::Ordering;
+        if a == b {
+            return Ordering::Equal;
+        }
+        match (self.trees[a.0 as usize], self.trees[b.0 as usize]) {
+            (TreeEntry::Leaf(a), TreeEntry::Leaf(b)) => {
+                if a == b {
+                    Ordering::Equal
+                } else {
+                    self.parse.forest.leaves[a]
+                        .reading
+                        .cmp(&self.parse.forest.leaves[b].reading)
+                }
+            }
+            (TreeEntry::Node { .. }, TreeEntry::Leaf(_)) => Ordering::Less,
+            (TreeEntry::Leaf(_), TreeEntry::Node { .. }) => Ordering::Greater,
+            (
+                TreeEntry::Node {
+                    node: a,
+                    production: pa,
+                    children: ca,
+                },
+                TreeEntry::Node {
+                    node: b,
+                    production: pb,
+                    children: cb,
+                },
+            ) => {
+                let grammar = self.parse.grammar;
+                let pa = &grammar.productions[pa];
+                let pb = &grammar.productions[pb];
+                pa.id
+                    .cmp(&pb.id)
+                    .then_with(|| grammar.categories[pa.lhs].cmp(&grammar.categories[pb.lhs]))
+                    .then_with(|| {
+                        self.features[a]
+                            .as_ref()
+                            .unwrap()
+                            .cmp(self.features[b].as_ref().unwrap())
+                    })
+                    .then_with(|| {
+                        self.parse.forest.nodes[a]
+                            .summary
+                            .gap
+                            .cmp(&self.parse.forest.nodes[b].summary.gap)
+                    })
+                    .then_with(|| {
+                        pa.frame
+                            .map(|f| &grammar.frames[f])
+                            .cmp(&pb.frame.map(|f| &grammar.frames[f]))
+                    })
+                    .then_with(|| self.compare_sequence(ca, cb))
+            }
+        }
+    }
+
+    fn compare_sequence(&self, mut a: SeqId, mut b: SeqId) -> std::cmp::Ordering {
+        if a == b {
+            return std::cmp::Ordering::Equal;
+        }
+        let la = self.sequence_len(a);
+        let lb = self.sequence_len(b);
+        for _ in lb..la {
+            a = self.sequences[a.0 as usize - 1].prefix;
+        }
+        for _ in la..lb {
+            b = self.sequences[b.0 as usize - 1].prefix;
+        }
+        self.compare_equal_length(a, b).then_with(|| la.cmp(&lb))
+    }
+
+    fn compare_equal_length(&self, a: SeqId, b: SeqId) -> std::cmp::Ordering {
+        if a == b {
+            return std::cmp::Ordering::Equal;
+        }
+        let a = self.sequences[a.0 as usize - 1];
+        let b = self.sequences[b.0 as usize - 1];
+        self.compare_equal_length(a.prefix, b.prefix)
+            .then_with(|| self.compare_tree(a.last, b.last))
+    }
+
+    fn materialize(&self, tree: TreeId) -> Reading {
+        match self.trees[tree.0 as usize] {
+            TreeEntry::Leaf(leaf) => Reading::Leaf(self.parse.forest.leaves[leaf].reading.clone()),
+            TreeEntry::Node {
+                node,
+                production,
+                mut children,
+            } => {
+                let grammar = self.parse.grammar;
+                let production = &grammar.productions[production];
+                let mut readings = Vec::with_capacity(self.sequence_len(children));
+                while children.0 != 0 {
+                    let entry = self.sequences[children.0 as usize - 1];
+                    readings.push(self.materialize(entry.last));
+                    children = entry.prefix;
+                }
+                readings.reverse();
+                Reading::Node(ReadingNode {
+                    production: production.id,
+                    category: grammar.categories[production.lhs],
+                    features: self.features[node].as_ref().unwrap().clone(),
+                    gap: self.parse.forest.nodes[node].summary.gap,
+                    selected_frame: production.frame.map(|f| grammar.frames[f].clone()),
+                    children: readings,
+                })
+            }
+        }
     }
 }
-
-/// Child sequences, each with the Ranking Key it adds.
-type Sequences = Vec<(RankingKey, Vec<Reading>)>;
-type TreeMemo = ForestMemo<Vec<(RankingKey, Reading)>, Vec<(Anchors, Sequences)>>;
 
 /// The extents, as chart positions, of the children of a Derivation's prefix
 /// that a later child's Ranking Key reads: its head, read by an Adjunct,
@@ -476,11 +855,6 @@ fn least(a: Tier, b: Tier) -> Tier {
             std::cmp::Ordering::Equal => (ka, na.saturating_add(nb)),
         }),
     }
-}
-
-/// The best `limit` entries of an ordered set, or all of them.
-fn truncate<T: Ord>(set: BTreeSet<(RankingKey, T)>, limit: Option<usize>) -> Vec<(RankingKey, T)> {
-    set.into_iter().take(limit.unwrap_or(usize::MAX)).collect()
 }
 
 impl CompiledGrammar {
@@ -1241,4 +1615,100 @@ pub(crate) fn with_before(binding: Binding) -> Binding {
 }
 pub(crate) fn with_after(binding: Binding) -> Binding {
     if glues_before(binding) { Binding::Bound } else { Binding::Prefix }
+}
+
+#[cfg(test)]
+mod enumeration_tests {
+    use super::*;
+
+    fn fixture() -> (Lexicon, CompiledGrammar) {
+        let lexicon = Lexicon::new(vec![deckmaste_lexical::Lexeme::noun(
+            "noun",
+            "card",
+            vec![deckmaste_lexical::Countability::Count],
+            deckmaste_lexical::Source {
+                kind: deckmaste_lexical::SourceKind::Core,
+                path: "reading.rs".to_owned(),
+                owner: "test".to_owned(),
+            },
+        )])
+        .unwrap();
+        let grammar = crate::Grammar::from_ron_str(
+            r#"(
+            root: "S", categories: { "S": () },
+            productions: [
+                (name: "Leaf", lhs: "S", rhs: [Lex("head", Noun)]),
+                (name: "Pair", lhs: "S", rhs: [Cat("left", "S"), Cat("right", "S")]),
+            ],
+        )"#,
+        )
+        .unwrap();
+        let grammar =
+            CompiledGrammar::bind(&grammar, &lexicon, &crate::FrameCatalog::default()).unwrap();
+        (lexicon, grammar)
+    }
+
+    #[test]
+    fn lazy_stream_advances_only_requested_ranks() {
+        let (lexicon, grammar) = fixture();
+        let parse = grammar.parse(&lexicon, "card card card card card card card card card");
+        assert_eq!(parse.derivation_count(), 1430);
+        let mut enumeration = Enumeration::new(&parse);
+        assert!(enumeration.streams.is_empty());
+        let first = enumeration.ranked(0).unwrap();
+        let sizes: Vec<_> = enumeration.streams.iter().map(|s| s.best.len()).collect();
+        assert!(sizes.iter().all(|&n| n <= 1));
+        assert_eq!(enumeration.ranked(0).unwrap().0, first.0);
+        assert_eq!(
+            sizes,
+            enumeration
+                .streams
+                .iter()
+                .map(|s| s.best.len())
+                .collect::<Vec<_>>()
+        );
+        assert_eq!(enumeration.streams[enumeration.root.unwrap()].best.len(), 1);
+        let second = enumeration.ranked(1).unwrap();
+        assert!(enumeration.materialize(first.1) < enumeration.materialize(second.1));
+        assert_eq!(enumeration.streams[enumeration.root.unwrap()].best.len(), 2);
+        assert!(parse.best_readings(0).next().is_none());
+    }
+
+    #[test]
+    fn arena_order_matches_owned_reading_and_sequence_order() {
+        let (lexicon, grammar) = fixture();
+        let parse = grammar.parse(&lexicon, "card card card card");
+        let mut enumeration = Enumeration::new(&parse);
+        for index in 0..5 {
+            assert!(enumeration.ranked(index).is_some());
+        }
+        assert!(enumeration.ranked(5).is_none());
+        for a in 0..enumeration.trees.len() {
+            for b in 0..enumeration.trees.len() {
+                let a = TreeId(u32::try_from(a).unwrap());
+                let b = TreeId(u32::try_from(b).unwrap());
+                assert_eq!(
+                    enumeration.compare_tree(a, b),
+                    enumeration.materialize(a).cmp(&enumeration.materialize(b))
+                );
+            }
+        }
+        let owned = |mut id: SeqId| {
+            let mut out = Vec::new();
+            while id.0 != 0 {
+                let entry = enumeration.sequences[id.0 as usize - 1];
+                out.push(enumeration.materialize(entry.last));
+                id = entry.prefix;
+            }
+            out.reverse();
+            out
+        };
+        for a in 0..=enumeration.sequences.len() {
+            for b in 0..=enumeration.sequences.len() {
+                let a = SeqId(u32::try_from(a).unwrap());
+                let b = SeqId(u32::try_from(b).unwrap());
+                assert_eq!(enumeration.compare_sequence(a, b), owned(a).cmp(&owned(b)));
+            }
+        }
+    }
 }

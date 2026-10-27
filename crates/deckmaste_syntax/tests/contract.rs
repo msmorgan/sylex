@@ -104,7 +104,7 @@ fn checked(
 ) -> BTreeSet<Reading> {
     let parse = grammar.parse_analyzed(analyzed);
     let text = analyzed.text();
-    let readings: BTreeSet<Reading> = parse.readings().into_iter().collect();
+    let readings: BTreeSet<Reading> = parse.readings().collect::<Vec<_>>().into_iter().collect();
     if !readings.is_empty() {
         assert_eq!(parse.verify_realization(lexicon), Ok(()), "{text}");
     }
@@ -322,7 +322,8 @@ fn multiword_lexeme_is_atomic_and_needs_its_separator() {
     let decomposed = bind(source, &separate, NO_FRAMES)
         .unwrap()
         .parse(&separate, "First strike.")
-        .readings();
+        .readings()
+        .collect::<Vec<_>>();
     assert_eq!(decomposed.len(), 1);
     assert!(matches!(
         grammar.admit(&decomposed[0], &lexicon),
@@ -331,7 +332,7 @@ fn multiword_lexeme_is_atomic_and_needs_its_separator() {
     // Neither lexical nor constructional realization inserts two spaces.
     // Reject the source rather than admitting a law-one failure.
     let spaced = grammar.parse(&lexicon, "First  strike.");
-    assert_eq!(spaced.readings(), [] as [Reading; 0]);
+    assert_eq!(spaced.readings().collect::<Vec<_>>(), [] as [Reading; 0]);
     assert_eq!(spaced.verify_realization(&lexicon), Ok(()));
 }
 
@@ -410,6 +411,7 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
     let (straddling, rebuilt): (Vec<Reading>, Vec<Reading>) = apart
         .parse(&separate, "Big first strike damage.")
         .readings()
+        .collect::<Vec<_>>()
         .into_iter()
         .partition(|r| r.node().is_some_and(|n| n.production.as_str() == "Split"));
     assert_eq!(straddling.len(), 1);
@@ -418,7 +420,10 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
     for reading in &rebuilt {
         assert!(rejected(reading, &grammar, &lexicon), "{reading:#?}");
     }
-    let rebuilding = apart.parse(&separate, "First strike damage.").readings();
+    let rebuilding = apart
+        .parse(&separate, "First strike damage.")
+        .readings()
+        .collect::<Vec<_>>();
     assert_ne!(rebuilding, []);
     for reading in &rebuilding {
         assert!(rejected(reading, &grammar, &lexicon), "{reading:#?}");
@@ -784,6 +789,7 @@ fn gap_survives_packing_until_its_governor() {
         let parse = grammar.parse_category(&analyzed, "Clause").unwrap();
         let gaps: Vec<Gap> = parse
             .readings()
+            .collect::<Vec<_>>()
             .iter()
             .map(|r| r.node().unwrap().gap)
             .collect();
@@ -943,7 +949,7 @@ fn unary_cycle_hides_no_finite_sibling() {
     let parse = grammar.parse(&lexicon, "Card.");
     assert_eq!(parse.derivation_count(), 4);
     assert_eq!(readings(&grammar, &lexicon, "Card."), expected);
-    assert_eq!(parse.best_readings(4).len(), 4);
+    assert_eq!(parse.best_readings(4).collect::<Vec<_>>().len(), 4);
 }
 
 /// Whether a Reading has `value` as a leaf.
@@ -1111,7 +1117,7 @@ fn assert_family(
         let analyzed = lexicon.analyze(&text);
         let parse = grammar.parse_category(&analyzed, category).unwrap();
         assert_eq!(parse.verify_realization(lexicon), Ok(()), "{text}");
-        let parsed: BTreeSet<Reading> = parse.readings().into_iter().collect();
+        let parsed: BTreeSet<Reading> = parse.readings().collect::<Vec<_>>().into_iter().collect();
         assert_eq!(parsed, group, "{text}");
     }
     size
@@ -1342,7 +1348,7 @@ fn reparse_keeps_a_category_reported_under_another_name() {
     .unwrap();
     let analyzed = lexicon.analyze("first strike");
     let parse = grammar.parse_category(&analyzed, "Premodified").unwrap();
-    let readings = parse.readings();
+    let readings = parse.readings().collect::<Vec<_>>();
     assert_eq!(readings.len(), 1);
     let reading = &readings[0];
     assert_eq!(parse.category(), "Nominal");

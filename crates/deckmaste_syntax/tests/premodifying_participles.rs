@@ -94,7 +94,11 @@ fn count(text: &str) -> usize {
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
     .unwrap();
-    grammar.parse(&lexicon, text).readings().len()
+    grammar
+        .parse(&lexicon, text)
+        .readings()
+        .collect::<Vec<_>>()
+        .len()
 }
 
 #[test]

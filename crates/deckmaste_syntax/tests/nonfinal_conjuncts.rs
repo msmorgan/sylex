@@ -84,7 +84,7 @@ fn reading(text: &str) -> Reading {
     .unwrap();
     let parse = grammar.parse(&lexicon, text);
     assert_eq!(parse.verify_realization(&lexicon), Ok(()), "{text}");
-    let mut readings = parse.readings();
+    let mut readings = parse.readings().collect::<Vec<_>>();
     assert_eq!(readings.len(), 1, "{text}: {readings:#?}");
     let reading = readings.remove(0);
     assert_eq!(grammar.admit(&reading, &lexicon), Ok(()), "{text}");

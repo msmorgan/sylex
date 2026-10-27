@@ -79,7 +79,7 @@ fn grammar(lexicon: &Lexicon, elliptical: &str) -> CompiledGrammar {
 }
 
 fn count(grammar: &CompiledGrammar, lexicon: &Lexicon, text: &str) -> usize {
-    let found = grammar.parse(lexicon, text).readings();
+    let found = grammar.parse(lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
         assert_eq!(grammar.admit(reading, lexicon), Ok(()), "{text}");
     }
@@ -112,7 +112,10 @@ fn the_head_a_phrase_ending_in_an_ellipsis_site_depends_on_follows_it() {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon, "Some([Plain])");
     // *card [that] can* is the Subject of *draws*.
-    let found = grammar.parse(&lexicon, "Card can draws.").readings();
+    let found = grammar
+        .parse(&lexicon, "Card can draws.")
+        .readings()
+        .collect::<Vec<_>>();
     assert_eq!(found.len(), 1, "{found:#?}");
     let clause = found[0].node().unwrap().children[0].node().unwrap();
     assert_eq!(clause.production.as_str(), "SubjectPredicate");

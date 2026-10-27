@@ -67,7 +67,7 @@ fn a_dependent_the_one_before_it_can_hold_ranks_first_inside_it() {
     let grammar = grammar(&lexicon);
     let parse = grammar.parse(&lexicon, "Card this card, card.");
     // Both analyses are Readings.
-    let ranked = parse.best_ranked(usize::MAX);
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     assert_eq!(ranked.len(), 2, "{ranked:#?}");
     // The noun's group holds the temporal, and ranks first.
     let (best, reading) = &ranked[0];
@@ -92,7 +92,10 @@ fn a_stacked_dependent_with_no_other_site_is_the_reading() {
     let grammar = grammar(&lexicon);
     // The adjective's group cannot hold the temporal: the pair is the only
     // analysis.
-    let found = grammar.parse(&lexicon, "Red this card, card.").readings();
+    let found = grammar
+        .parse(&lexicon, "Red this card, card.")
+        .readings()
+        .collect::<Vec<_>>();
     assert_eq!(found.len(), 1, "{found:#?}");
     assert!(uses(&found[0], "PreposedPair"));
     assert_eq!(grammar.admit(&found[0], &lexicon), Ok(()));

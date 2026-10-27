@@ -62,7 +62,10 @@ fn a_verb_selects_an_intransitive_preposition() {
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
     .unwrap();
-    let mut readings = grammar.parse(&lexicon, "Phase out.").readings();
+    let mut readings = grammar
+        .parse(&lexicon, "Phase out.")
+        .readings()
+        .collect::<Vec<_>>();
     assert_eq!(readings.len(), 1, "{readings:#?}");
     let reading = readings.remove(0);
     assert_eq!(grammar.admit(&reading, &lexicon), Ok(()));
@@ -73,7 +76,11 @@ fn a_verb_selects_an_intransitive_preposition() {
         Some(FrameFamily::Prepositional)
     );
     assert!(
-        grammar.parse(&lexicon, "Phase.").readings().is_empty(),
+        grammar
+            .parse(&lexicon, "Phase.")
+            .readings()
+            .collect::<Vec<_>>()
+            .is_empty(),
         "the particle is selected, not optional"
     );
 }
@@ -132,7 +139,10 @@ fn an_idiom_selects_its_particle_and_a_predicative() {
         &FrameCatalog::from_ron_str(frames).unwrap(),
     )
     .unwrap();
-    let mut readings = grammar.parse(&lexicon, "Come up heads.").readings();
+    let mut readings = grammar
+        .parse(&lexicon, "Come up heads.")
+        .readings()
+        .collect::<Vec<_>>();
     assert_eq!(readings.len(), 1, "{readings:#?}");
     let reading = readings.remove(0);
     assert_eq!(grammar.admit(&reading, &lexicon), Ok(()));
@@ -143,7 +153,11 @@ fn an_idiom_selects_its_particle_and_a_predicative() {
     );
     for text in ["Come up.", "Come heads."] {
         assert!(
-            grammar.parse(&lexicon, text).readings().is_empty(),
+            grammar
+                .parse(&lexicon, text)
+                .readings()
+                .collect::<Vec<_>>()
+                .is_empty(),
             "{text}"
         );
     }

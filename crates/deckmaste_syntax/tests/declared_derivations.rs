@@ -112,7 +112,11 @@ fn bind(text: &str) -> Result<(Lexicon, CompiledGrammar), LoadError> {
 
 fn count(text: &str, input: &str) -> usize {
     let (lexicon, grammar) = bind(text).unwrap();
-    grammar.parse(&lexicon, input).readings().len()
+    grammar
+        .parse(&lexicon, input)
+        .readings()
+        .collect::<Vec<_>>()
+        .len()
 }
 
 fn load_error(text: &str) -> String {

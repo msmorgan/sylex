@@ -85,7 +85,7 @@ fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
 fn count(text: &str) -> usize {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon);
-    let found = grammar.parse(&lexicon, text).readings();
+    let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
         assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);
@@ -122,7 +122,7 @@ fn a_cluster_ends_in_a_sequence_of_adjuncts() {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon);
     let text = "Give card, card in hand in hand, and card in hand in hand.";
-    let found = grammar.parse(&lexicon, text).readings();
+    let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     assert_eq!(found.len(), 1);
     let (realized, constituents) = grammar.constituents(&found[0], &lexicon).unwrap();
     let verb = constituents
@@ -168,7 +168,7 @@ fn each_dependent_in_a_cluster_bears_its_function_in_the_verbs_phrase() {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon);
     let text = "Give card to player in hand and card to player.";
-    let found = grammar.parse(&lexicon, text).readings();
+    let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     assert_eq!(found.len(), 1);
     let (realized, constituents) = grammar.constituents(&found[0], &lexicon).unwrap();
     let verb = constituents
@@ -255,7 +255,7 @@ fn remnant_count(text: &str) -> usize {
         &FrameCatalog::from_ron_str(REMNANT_FRAMES).unwrap(),
     )
     .unwrap();
-    let found = grammar.parse(&lexicon, text).readings();
+    let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
         assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);

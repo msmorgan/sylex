@@ -109,7 +109,7 @@ fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
 fn only_reading(text: &str) -> Reading {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon);
-    let mut readings = grammar.parse(&lexicon, text).readings();
+    let mut readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     assert_eq!(readings.len(), 1, "{text}: {readings:#?}");
     let reading = readings.remove(0);
     assert_eq!(grammar.admit(&reading, &lexicon), Ok(()));
@@ -149,7 +149,11 @@ fn an_amount_and_a_cost_are_selected_not_optional() {
     let grammar = grammar(&lexicon);
     for text in ["Scry.", "Waterbend 2.", "Scry {3}.", "Amass 2."] {
         assert!(
-            grammar.parse(&lexicon, text).readings().is_empty(),
+            grammar
+                .parse(&lexicon, text)
+                .readings()
+                .collect::<Vec<_>>()
+                .is_empty(),
             "{text}"
         );
     }

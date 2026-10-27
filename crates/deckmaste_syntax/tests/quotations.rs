@@ -61,7 +61,7 @@ fn quotations_round_trip_with_derived_punctuation() {
         r#"it gains "it gains 'it draws' and 'it draws'" and "it draws.""#,
     ] {
         let parse = grammar.parse(&lexicon, text);
-        let readings = parse.readings();
+        let readings = parse.readings().collect::<Vec<_>>();
         assert_eq!(readings.len(), 1, "{text}: {readings:#?}");
         assert_eq!(parse.verify_realization(&lexicon), Ok(()), "{text}");
         assert_eq!(grammar.admit(&readings[0], &lexicon), Ok(()), "{text}");
@@ -84,7 +84,11 @@ fn quotation_marks_and_their_punctuation_are_oracle_s() {
         r#"it gains "it draws", "it draws", and "it draws"."#,
     ] {
         assert!(
-            grammar.parse(&lexicon, text).readings().is_empty(),
+            grammar
+                .parse(&lexicon, text)
+                .readings()
+                .collect::<Vec<_>>()
+                .is_empty(),
             "{text}"
         );
     }

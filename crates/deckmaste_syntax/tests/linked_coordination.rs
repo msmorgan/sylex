@@ -71,7 +71,7 @@ fn readings(text: &str) -> Vec<Reading> {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon, LINKED).unwrap();
     let parse = grammar.parse(&lexicon, text);
-    let readings = parse.readings();
+    let readings = parse.readings().collect::<Vec<_>>();
     assert_eq!(parse.verify_realization(&lexicon), Ok(()), "{text}");
     for reading in &readings {
         assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
@@ -139,4 +139,5 @@ fn readings_of(text: &str) -> Vec<Reading> {
         .unwrap()
         .parse(&lexicon, text)
         .readings()
+        .collect::<Vec<_>>()
 }

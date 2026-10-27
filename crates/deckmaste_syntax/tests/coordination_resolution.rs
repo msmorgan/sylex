@@ -80,7 +80,7 @@ fn productions(reading: &Reading) -> Vec<String> {
 fn readings(coordination: &str, text: &str) -> Vec<Reading> {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon, coordination).unwrap();
-    let readings = grammar.parse(&lexicon, text).readings();
+    let readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &readings {
         assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);

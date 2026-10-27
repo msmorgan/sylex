@@ -86,7 +86,7 @@ fn readings(obligatory: bool, text: &str) -> Vec<Reading> {
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
     .unwrap();
-    let readings = grammar.parse(&lexicon, text).readings();
+    let readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &readings {
         assert_eq!(grammar.admit(reading, &lexicon), Ok(()));
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);

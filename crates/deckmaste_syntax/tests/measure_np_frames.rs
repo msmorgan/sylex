@@ -100,7 +100,7 @@ fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
 fn only_reading(text: &str) -> Reading {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon);
-    let mut readings = grammar.parse(&lexicon, text).readings();
+    let mut readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     assert_eq!(readings.len(), 1, "{text}: {readings:#?}");
     let reading = readings.remove(0);
     assert_eq!(grammar.admit(&reading, &lexicon), Ok(()));
@@ -137,10 +137,20 @@ fn a_measure_noun_phrase_is_no_general_object() {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon);
     assert_eq!(
-        grammar.parse(&lexicon, "Draw 2.").readings(),
+        grammar
+            .parse(&lexicon, "Draw 2.")
+            .readings()
+            .collect::<Vec<_>>(),
         [] as [Reading; 0]
     );
-    assert_eq!(grammar.parse(&lexicon, "Draw card.").readings().len(), 1);
+    assert_eq!(
+        grammar
+            .parse(&lexicon, "Draw card.")
+            .readings()
+            .collect::<Vec<_>>()
+            .len(),
+        1
+    );
 }
 
 #[test]

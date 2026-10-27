@@ -75,16 +75,22 @@ fn a_phrase_the_sibling_selects_is_its_complement_only() {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon, EXTENDED).unwrap();
     for text in ["Card in card.", "Card of card."] {
-        let found = grammar.parse(&lexicon, text).readings();
+        let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
         assert_eq!(found.len(), 1, "{text}: {found:#?}");
         assert_eq!(grammar.admit(&found[0], &lexicon), Ok(()), "{text}");
     }
     // *in card* is the extension, never the postmodifier of the bare subject.
-    let found = grammar.parse(&lexicon, "Card in card.").readings();
+    let found = grammar
+        .parse(&lexicon, "Card in card.")
+        .readings()
+        .collect::<Vec<_>>();
     let predicate = found[0].node().unwrap().children[0].node().unwrap();
     assert_eq!(predicate.production.as_str(), "Extended");
     // *of card* is no extension: it postmodifies the bare subject.
-    let found = grammar.parse(&lexicon, "Card of card.").readings();
+    let found = grammar
+        .parse(&lexicon, "Card of card.")
+        .readings()
+        .collect::<Vec<_>>();
     let predicate = found[0].node().unwrap().children[0].node().unwrap();
     assert_eq!(predicate.production.as_str(), "Bare");
 }
@@ -99,11 +105,15 @@ fn a_child_before_a_selected_complement_does_not_end_in_one() {
     assert_eq!(
         open.parse(&lexicon, "Card in card in card.")
             .readings()
+            .collect::<Vec<_>>()
             .len(),
         2
     );
     // Closed, the first *in* phrase begins the extension.
-    let found = grammar.parse(&lexicon, "Card in card in card.").readings();
+    let found = grammar
+        .parse(&lexicon, "Card in card in card.")
+        .readings()
+        .collect::<Vec<_>>();
     assert_eq!(found.len(), 1, "{found:#?}");
     assert_eq!(grammar.admit(&found[0], &lexicon), Ok(()));
     let subject = found[0].node().unwrap().children[0]
@@ -114,7 +124,10 @@ fn a_child_before_a_selected_complement_does_not_end_in_one() {
         .unwrap();
     assert_eq!(subject.production.as_str(), "Noun");
     // A phrase the extension cannot take still ends the subject.
-    let found = grammar.parse(&lexicon, "Card of card in card.").readings();
+    let found = grammar
+        .parse(&lexicon, "Card of card in card.")
+        .readings()
+        .collect::<Vec<_>>();
     assert!(
         found.iter().any(|reading| {
             let predicate = reading.node().unwrap().children[0].node().unwrap();

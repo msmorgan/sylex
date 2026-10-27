@@ -65,7 +65,7 @@ fn readings(text: &str) -> Vec<Reading> {
 fn readings_with(equations: &str, text: &str) -> Vec<Reading> {
     let lexicon = lexicon();
     let grammar = grammar(&lexicon, equations);
-    let readings = grammar.parse(&lexicon, text).readings();
+    let readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &readings {
         assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);

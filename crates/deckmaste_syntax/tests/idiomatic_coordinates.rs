@@ -71,7 +71,7 @@ fn count(text: &str) -> usize {
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
     .unwrap();
-    let found = grammar.parse(&lexicon, text).readings();
+    let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
         assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);

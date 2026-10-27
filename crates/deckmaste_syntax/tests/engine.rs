@@ -86,7 +86,7 @@ fn bind(text: &str, lexicon: &Lexicon) -> Result<CompiledGrammar, LoadError> {
 /// Parses and checks round-trip law 1 and Admission on every Reading.
 fn readings(grammar: &CompiledGrammar, lexicon: &Lexicon, text: &str) -> Vec<Reading> {
     let parse = grammar.parse(lexicon, text);
-    let readings = parse.readings();
+    let readings = parse.readings().collect::<Vec<_>>();
     assert_eq!(
         u128::try_from(readings.len()).unwrap(),
         parse.derivation_count(),
@@ -222,6 +222,7 @@ fn feature_exclusion_is_shared_by_parsing_and_admission() {
     let finite = unrestricted
         .parse(&lexicon, "Sees the card.")
         .best_readings(1)
+        .collect::<Vec<_>>()
         .pop()
         .unwrap();
     assert!(grammar.admit(&finite, &lexicon).is_err());
@@ -233,7 +234,10 @@ fn unknown_words_are_vocabulary_gaps() {
     let grammar = bind(GRAMMAR, &lexicon).unwrap();
     let parse = grammar.parse(&lexicon, "See the frobnicator.");
     assert_eq!(parse.vocabulary_gaps, vec![8..19]);
-    assert_eq!(parse.readings(), [] as [deckmaste_syntax::Reading; 0]);
+    assert_eq!(
+        parse.readings().collect::<Vec<_>>(),
+        [] as [deckmaste_syntax::Reading; 0]
+    );
 }
 
 #[test]
@@ -358,9 +362,12 @@ fn best_readings_are_the_cheapest_prefix() {
         &lexicon,
         "See the man on the hill with the telescope in the card.",
     );
-    let all = parse.readings();
+    let all = parse.readings().collect::<Vec<_>>();
     for k in [1, 3, 14, 20] {
-        assert_eq!(parse.best_readings(k), all[..k.min(all.len())]);
+        assert_eq!(
+            parse.best_readings(k).collect::<Vec<_>>(),
+            all[..k.min(all.len())]
+        );
     }
 }
 
@@ -372,8 +379,8 @@ fn best_ranked_orders_by_key_then_reading() {
         &lexicon,
         "See the man on the hill with the telescope in the card.",
     );
-    let ranked = parse.best_ranked(usize::MAX);
-    assert_eq!(ranked.len(), parse.readings().len());
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
+    assert_eq!(ranked.len(), parse.readings().collect::<Vec<_>>().len());
     for (key, reading) in &ranked {
         assert_eq!(
             *key,
@@ -396,7 +403,7 @@ fn cheapest_tier_counts_its_derivations_without_building_trees() {
         &lexicon,
         "See the man on the hill with the telescope in the card.",
     );
-    let ranked = parse.best_ranked(usize::MAX);
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     let least = ranked[0].0;
     let tied = ranked.iter().filter(|(key, _)| *key == least).count();
     assert_eq!(parse.cheapest_tier(), Some((least, tied as u128)));
@@ -418,7 +425,7 @@ fn best_readings_do_not_enumerate_every_attachment() {
     let parse = grammar.parse(&lexicon, &text);
     // V NP and ten PPs: the eleventh Catalan number of trees.
     assert_eq!(parse.derivation_count(), 58_786);
-    let best = parse.best_readings(2);
+    let best = parse.best_readings(2).collect::<Vec<_>>();
     assert_eq!(best.len(), 2);
     for reading in &best {
         assert_eq!(grammar.admit(reading, &lexicon), Ok(()));
@@ -434,7 +441,7 @@ fn both_laws_hold_over_the_forest_without_enumeration() {
     let text = "See the man on the hill with the telescope in the card.";
     let parse = grammar.parse(&lexicon, text);
     assert_eq!(parse.verify_realization(&lexicon), Ok(()));
-    let readings = parse.readings();
+    let readings = parse.readings().collect::<Vec<_>>();
     for reading in &readings {
         let again = grammar.parse(&lexicon, &grammar.realize(reading, &lexicon).unwrap());
         assert!(again.contains(reading), "{reading:#?}");
@@ -520,7 +527,7 @@ fn a_phrase_parses_and_admits_as_its_own_category() {
     let grammar = bind(GRAMMAR, &lexicon).unwrap();
     let analyzed = lexicon.analyze("the man on the hill");
     let parse = grammar.parse_category(&analyzed, "NounPhrase").unwrap();
-    let readings = parse.readings();
+    let readings = parse.readings().collect::<Vec<_>>();
     assert_eq!(readings.len(), 1);
     assert_eq!(parse.admit(&readings[0], &lexicon), Ok(()));
     assert_eq!(
@@ -647,7 +654,7 @@ fn realization_checks_reachable_leaves_and_reports_misspellings() {
     unused.end = 3;
     analyzed.matches.push(unused);
     let parse = grammar.parse_analyzed(&analyzed);
-    assert_ne!(parse.readings(), [] as [Reading; 0]);
+    assert_ne!(parse.readings().collect::<Vec<_>>(), [] as [Reading; 0]);
     assert_eq!(parse.verify_realization(&lexicon), Ok(()));
 
     let changed = Lexicon::new([Lexeme::invariant(

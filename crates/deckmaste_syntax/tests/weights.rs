@@ -50,7 +50,7 @@ fn a_light_child_is_one_leaf_and_a_heavy_child_more() {
         ("Card!", 0),
         ("Card card!", 1),
     ] {
-        let found = grammar.parse(&lexicon, text).readings();
+        let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
         assert_eq!(found.len(), readings, "{text}: {found:#?}");
         for reading in &found {
             assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");

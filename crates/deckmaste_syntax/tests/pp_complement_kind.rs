@@ -93,6 +93,7 @@ fn readings(text: &str) -> Vec<Reading> {
         .unwrap()
         .parse(&lexicon, text)
         .readings()
+        .collect::<Vec<_>>()
 }
 
 fn productions(reading: &Reading, out: &mut Vec<String>) {
