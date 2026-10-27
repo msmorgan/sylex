@@ -686,6 +686,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "deckmaste_semantics_v3"
+version = "0.1.0"
+dependencies = [
+ "dpsi",
+ "syn 2.0.117",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
 name = "deckmaste_spelling"
 version = "0.1.0"
 

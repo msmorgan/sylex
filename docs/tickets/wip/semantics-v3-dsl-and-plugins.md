@@ -20,7 +20,7 @@ Standard constraints apply.
 
 - **Lean-first authority:** `crates/deckmaste_semantics_v3` mirrors the proven
   `lean/Semantics/` v3 types (`Subject`, `AnyValue` / `any`, `NounPhrase.which`,
-  `instruct`, `does`, `would` / `instead`, `cant`/`must`/`may`/`gatedBy` +
+  `instruct`, `does`, `would` / `instead`, `cant`/`must`/`can`/`gatedBy` +
   `DeonticMods`, `did` / `tally`, and the 10-constructor `GameEvent`).
 - **Port the Clean-Sheet DRT Checker (`reads.rs`):**
   - `crates/deckmaste_semantics_v3/src/reads.rs` mirrors `lean/Semantics/Check/`'s
@@ -41,10 +41,10 @@ Standard constraints apply.
   - Every declaration uses `{ field := val, ... }` brace-and-comma blocks — 100% valid
     Lean 4 checked by `lake build`, and zero-significant-whitespace so the Rust parser
     in `deckmaste_semantics_v3` is a ~250-line balanced-delimiter reader.
-  - Self-contained declarations unify Layer 2 lexical catalog fields (`lemma`, `plural`,
+  - Self-contained declarations unify Layer 2 lexical catalog fields inside `lexical := { ... }` (`lemma`, `plural`,
     `verbs`, `nouns`, `adjectives`, `determinatives`, `bound` matching
-    `crates/deckmaste_lexical_source/src/schema.rs`), Layer 3 `spelling := "..."` string
-    templates (the foundation for the CxG `deckmaste_spelling` crate), and `semantics_v3`
+    `crates/deckmaste_lexical_source/src/schema.rs`), Layer 3 top-level `spelling := "..."` string
+    templates (with `<param>` placeholders, or `-- TODO(spelling):` when deferred) (the foundation for the CxG `deckmaste_spelling` crate), and `semantics_v3`
     meaning (`body`, `confers`, `rules`) in a single declaration block (retiring separate
     `Counters.lean` + `Proofs/Rules.lean`, `Subtypes.lean` + `SubtypeRules.lean`, etc.).
   - No `rule:` data field — CR citations live in `--` comments (e.g. `-- [CR#701.47a]`) checked by
@@ -105,8 +105,10 @@ Standard constraints apply.
   workspace.
 - `plugins_v2/builtin/` and `crates/deckmaste_macro_def` are deleted, with xtask
   `expansions.rs` and `plugins_v2_declarations.rs` reading `plugins_v3/` instead.
-- `cargo test -p deckmaste_semantics_v3 -p xtask` and
-  `cargo clippy -p deckmaste_semantics_v3 -p xtask --tests -- -D warnings` pass.
-- `cargo xtask lean check`, `cargo xtask lean definitions`, and
-  `cargo xtask lean macros align --deny-drift` pass 100% on `plugins_v3/builtin`
-  and `plugins_v3/canon`.
+- `cargo test -p deckmaste_semantics_v3 -p xtask -p deckmaste_plugin` and
+  `cargo clippy -p deckmaste_semantics_v3 -p xtask -p deckmaste_plugin --tests -- -D warnings` pass.
+- `cargo xtask lean check` passes on the live `plugins_v3/builtin` bundle.
+  `lean definitions` and `lean macros align` were retired with RON-to-Lean
+  code generation; they are not gates for this ticket.
+- The reader supports `card` declarations; `plugins_v3/canon` is populated
+  by the dependent `plugins-v3-canon` ticket.
