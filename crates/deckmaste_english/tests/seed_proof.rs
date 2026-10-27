@@ -46,7 +46,7 @@ impl Seed {
             "{text}: {:?}",
             parse.vocabulary_gaps
         );
-        let readings = parse.readings();
+        let readings = parse.readings().collect::<Vec<_>>();
         for reading in &readings {
             assert_eq!(self.grammar.admit(reading, &self.lexicon), Ok(()));
             assert_eq!(self.grammar.realize(reading, &self.lexicon).unwrap(), text);
@@ -206,7 +206,7 @@ fn ranking_key_ranks_a_higher_component_over_any_amount_of_a_lower_one() {
     let parse = s
         .grammar
         .parse(&s.lexicon, "Exile target creature with a counter on it.");
-    let ranked = parse.best_ranked(usize::MAX);
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     assert_eq!(
         ranked.len(),
         s.readings("Exile target creature with a counter on it.")
@@ -256,7 +256,7 @@ fn a_dependent_of_the_last_conjunct_alone_violates_the_coordination_class() {
         &s.lexicon,
         "Destroy target creature or permanent you control.",
     );
-    let ranked = parse.best_ranked(usize::MAX);
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     assert_eq!(ranked[0].0.attachment_class, 0);
     assert!(ranked.iter().any(|(key, _)| key.attachment_class == 1));
 }
@@ -452,7 +452,7 @@ fn chart_and_forest_sizes() {
             m.chart_items,
             m.completed_nodes,
             m.families,
-            parse.readings().len()
+            parse.readings().collect::<Vec<_>>().len()
         );
     }
 }

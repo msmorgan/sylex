@@ -36,6 +36,7 @@ fn noun_phrase_readings(text: &str) -> Vec<Reading> {
         .parse_category(&analyzed, "NounPhrase")
         .unwrap()
         .readings()
+        .collect::<Vec<_>>()
 }
 
 #[test]

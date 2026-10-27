@@ -56,7 +56,7 @@ fn a_distributive_adjunct_attaches_to_the_outermost_predicate() {
     )
     .unwrap()[0];
     let parse = judge.parse(entry).unwrap();
-    let (key, best) = parse.best_ranked(1).remove(0);
+    let (key, best) = parse.best_ranked(1).next().unwrap();
     assert!(key.right_association_words < 0, "{key:?}");
     let (text, constituents) = grammar.constituents(&best, &env.lexicon).unwrap();
     let located = deckmaste_english::judgment::Located { text, constituents };
@@ -82,7 +82,7 @@ fn a_face_s_own_name_ranks_before_another_card_s_name_spelled_alike() {
             .filter(|h| h.as_str().starts_with("name:"))
             .collect::<Vec<_>>()
     };
-    let ranked = parse.best_ranked(usize::MAX);
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     assert_eq!(ranked.len(), 2);
     let other = deckmaste_english::corpus::card_name_lexeme("Nicol Bolas");
     assert!(names(&ranked[0].1).iter().all(|h| *h == own));
@@ -105,7 +105,7 @@ fn forest_keys_follow_each_packed_prefix_s_own_division_of_the_text() {
     let scope = std::collections::BTreeSet::new();
     let text = "Return to the battlefield tapped creature cards at random that were put into your graveyard this turn.";
     let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
-    let ranked = parse.best_ranked(usize::MAX);
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     let mut objects = std::collections::BTreeSet::new();
     for (key, reading) in &ranked {
         assert_eq!(grammar.ranking_key(reading, &env.lexicon, &scope), Ok(*key));

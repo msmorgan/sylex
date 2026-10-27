@@ -467,20 +467,20 @@ impl Judge<'_> {
             return Outcome::Fails(format!("round-trip law 1: {fault}"));
         }
         let readings = parse.readings();
-        let mut located = Vec::with_capacity(readings.len());
-        for reading in &readings {
-            if let Err(why) = law_two(self.grammar, self.lexicon, &parse, reading, &scope(entry)) {
+        let mut located = Vec::new();
+        for reading in readings {
+            if let Err(why) = law_two(self.grammar, self.lexicon, &parse, &reading, &scope(entry)) {
                 return Outcome::Fails(why);
             }
-            match self.grammar.constituents(reading, self.lexicon) {
+            match self.grammar.constituents(&reading, self.lexicon) {
                 Ok((text, constituents)) => located.push(Located { text, constituents }),
                 Err(e) => return Outcome::Fails(format!("realization: {e}")),
             }
         }
         if let Some(n) = entry.readings
-            && n != readings.len()
+            && n != located.len()
         {
-            return Outcome::Fails(format!("{} Readings, not {n}", readings.len()));
+            return Outcome::Fails(format!("{} Readings, not {n}", located.len()));
         }
         for group in &entry.groups {
             if !located

@@ -147,7 +147,7 @@ fn document_indentation_is_not_admitted_as_unrealizable_whitespace() {
     ] {
         let parse = grammar.parse(&env.lexicon, text);
         assert_eq!(parse.derivation_count(), 0, "{text:?}");
-        assert!(parse.best_readings(1).is_empty(), "{text:?}");
+        assert!(parse.best_readings(1).next().is_none(), "{text:?}");
     }
 }
 
@@ -163,7 +163,7 @@ fn modal_choice_headers_have_one_analysis_and_round_trip() {
         let parse = grammar.parse(&env.lexicon, choice);
         assert_eq!(parse.derivation_count(), 1, "{choice}");
         parse.verify_realization(&env.lexicon).unwrap();
-        let readings = parse.best_readings(1);
+        let readings = parse.best_readings(1).collect::<Vec<_>>();
         assert_eq!(readings.len(), 1, "{choice}");
         grammar.admit(&readings[0], &env.lexicon).unwrap();
         let text = grammar.realize(&readings[0], &env.lexicon).unwrap();

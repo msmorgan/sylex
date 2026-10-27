@@ -7,10 +7,12 @@
 //! ([`deckmaste_syntax::Parse::verify_realization`]) and law 2 on its
 //! cheapest Readings ([`LAW_TWO_READINGS`] by default; every Reading under
 //! [`run_with`] with `usize::MAX`, which `cargo xtask english strata
-//! --all-readings` passes). The exhaustive run took about 123 s and peaked at
-//! roughly 27 GB of memory, so it is opt-in; [`Report::law_two_exhaustive`]
-//! records which the report verified. No attachment tree is enumerated
-//! except for a unit with a judgment, whose Readings are checked against it
+//! --all-readings` passes). With lazy flyweight enumeration, the full-corpus
+//! exhaustive run took 72.45 s and peaked at 1,550,860 KiB RSS, versus 59.37 s
+//! and 1,473,920 KiB for eight Readings (2026-10-27, dev profile). Its 22.0%
+//! wall-time increase exceeds the 15% threshold, so it remains opt-in;
+//! [`Report::law_two_exhaustive`] records which the report verified. Readings
+//! are materialized one at a time. A unit with a judgment is checked against it
 //! up to [`judgment::READING_LIMIT`]. A unit is known-wrong-only when it has a
 //! judgment none of its Readings satisfies.
 //!
@@ -49,6 +51,9 @@ use crate::segments::SegmentFrame;
 use crate::segments::Segmentation;
 
 /// How many of a unit's cheapest Readings round-trip law 2 is checked on.
+/// Eight took 59.37 s / 1,473,920 KiB peak RSS across the corpus; exhaustive
+/// checking took 72.45 s / 1,550,860 KiB (2026-10-27), 22.0% slower, above
+/// the 15% threshold for making exhaustive checking the default.
 pub const LAW_TWO_READINGS: usize = 8;
 
 /// What the census found for one unit.
@@ -156,7 +161,9 @@ pub struct Report {
     pub not_segmentable: Vec<String>,
     pub units: Vec<UnitResult>,
     /// Whether law 2 was checked on every Reading of every unit, not only each
-    /// unit's cheapest [`LAW_TWO_READINGS`].
+    /// unit's cheapest [`LAW_TWO_READINGS`]. Exhaustive checking measured
+    /// 72.45 s / 1,550,860 KiB peak RSS, versus 59.37 s / 1,473,920 KiB
+    /// for eight (2026-10-27); the 22.0% increase keeps it opt-in.
     pub law_two_exhaustive: bool,
 }
 
@@ -171,7 +178,9 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
 }
 
 /// Runs the census, checking law 2 on each unit's cheapest `law_two_readings`
-/// Readings; `usize::MAX` checks every Reading (about 27 GB of memory).
+/// Readings; `usize::MAX` checks every Reading (72.45 s and 1,550,860 KiB
+/// peak RSS across the corpus, versus 59.37 s and 1,473,920 KiB for eight,
+/// measured 2026-10-27).
 ///
 /// # Panics
 /// If a census worker thread panics.
@@ -389,9 +398,9 @@ fn judge_parse(
             lexicon: &env.lexicon,
         };
         let limit = usize::try_from(judgment::READING_LIMIT).unwrap_or(usize::MAX);
-        let endorsed = parse.best_readings(limit).iter().any(|reading| {
+        let endorsed = parse.best_readings(limit).any(|reading| {
             grammar
-                .constituents(reading, &env.lexicon)
+                .constituents(&reading, &env.lexicon)
                 .is_ok_and(|(text, constituents)| {
                     let located = Located { text, constituents };
                     entries.iter().all(|e| judge.endorses(e, &located))

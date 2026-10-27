@@ -48,8 +48,10 @@ struct StrataArgs {
     #[arg(long)]
     check: bool,
     /// Check round-trip law 2 on every Reading of every unit, not only each
-    /// unit's cheapest 8. Takes about two minutes and roughly 27 GB of memory;
-    /// the report records that law 2 was exhaustive.
+    /// unit's cheapest 8. Measured 72.45 s / 1,550,860 KiB peak RSS, versus
+    /// 59.37 s / 1,473,920 KiB for eight (2026-10-27). The 22.0% wall-time
+    /// increase exceeds the 15% default threshold; the report records that
+    /// law 2 was exhaustive.
     #[arg(long)]
     all_readings: bool,
 }
@@ -79,11 +81,7 @@ fn strata(args: &StrataArgs, output: &mut dyn Write) -> Result<()> {
             .filter(|(name, _)| name != "seed.txt")
             .flat_map(|(_, entries)| entries)
             .collect();
-    let law_two_readings = if args.all_readings {
-        usize::MAX
-    } else {
-        census::LAW_TWO_READINGS
-    };
+    let law_two_readings = if args.all_readings { usize::MAX } else { census::LAW_TWO_READINGS };
     let report = census::run_with(&corpus, &env, &judgments, law_two_readings);
     if let Some(parent) = args.output.parent() {
         std::fs::create_dir_all(parent)?;
@@ -243,9 +241,9 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
             )?,
             None => writeln!(output, "Cheapest tier: none")?,
         }
-        for (index, (key, reading)) in parse.best_ranked(args.limit).iter().enumerate() {
-            parse.admit(reading, &env.lexicon)?;
-            dump_reading(&grammar, &env, *key, reading, index + 1, output)?;
+        for (index, (key, reading)) in parse.best_ranked(args.limit).enumerate() {
+            parse.admit(&reading, &env.lexicon)?;
+            dump_reading(&grammar, &env, key, &reading, index + 1, output)?;
         }
         writeln!(output)?;
     }
