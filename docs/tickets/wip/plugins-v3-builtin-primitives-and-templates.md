@@ -3,7 +3,7 @@ needs: [plugins-v3-builtin-actions-and-definitions]
 ---
 # Migrate `Templates.lean` into `plugins_v3/builtin/{primitives,templates}/`
 
-**Split `lean/Semantics/Templates.lean` (~2,508 lines) into individual `.lean` files under
+**Split `lean/Semantics/Templates.lean` (816 declarations) into individual `.lean` files under
 `plugins_v3/builtin/primitives/` (1-to-1 `Semantics.Primitives.*` bindings) and
 `plugins_v3/builtin/templates/` (composite phrasings), and enforce that only `primitive`
 declarations reference raw `Semantics.Primitives.*` constructors.** Fourth of four atomic tickets
@@ -41,3 +41,47 @@ constraints apply.
 - Non-`primitive` declarations are gated against referencing raw `Semantics.Primitives.*` constructors.
 - `cargo xtask lean check` (`lake build --wfail`) exits 0 with zero errors and zero warnings across
   `Semantics`, `SemanticsCards`, and `SemanticsProofs`.
+
+## Implemented inventory
+
+The source at migration time contained 816 `semantic_template` declarations, including the
+private `zoneChange` helper; current declarations take precedence over earlier example lists.
+The migration preserves that inventory and adds 109 constructor bindings needed by the existing
+builtin definitions to cross the primitive boundary. Core coercions, keyword/deed elaborators,
+and `Cost.asPaid` remain Lean machinery in `Semantics.Primitives`, with the authored vocabulary
+loaded into `Semantics.Templates` by `Semantics.Definitions`.
+
+New files by category (existing bundle files are excluded):
+
+| Category | Primitives | Templates |
+| --- | ---: | ---: |
+| ability | 25 | 60 |
+| action | 133 | 74 |
+| amount | 0 | 11 |
+| condition | 24 | 10 |
+| cost | 23 | 6 |
+| determiner | 11 | 17 |
+| duration | 0 | 13 |
+| event | 19 | 8 |
+| mana | 27 | 11 |
+| noun | 49 | 31 |
+| pile | 5 | 3 |
+| predicate | 84 | 35 |
+| pronoun | 18 | 5 |
+| quantity | 62 | 1 |
+| static | 81 | 0 |
+| timing | 28 | 11 |
+| zone | 35 | 5 |
+
+Each bundle file has one command and no module headers. The six status helpers carry nested
+lexical metadata from `statuses.ron`; the source inventory contained no new ability-word catalog
+or turn-part declarations. Fixed phrasings use angle-bracket parameters. Structural combinators,
+optional clauses and inflected wording that plain string substitution cannot express retain
+an explicit `TODO(spelling)` inside their declaration blocks.
+
+The constructor-boundary proofs cover qualified primitive references, anonymous AST constructors,
+action bodies, parameter defaults and constructor abbreviations, plus a primitive-to-template
+success case and branch-local mention generation. Existing
+`annotated`, `token`, `paymentArgument` and actor-scope fixtures use the corresponding primitive
+helpers. The Static refusal fixture writes its subject explicitly to keep testing the
+Action-versus-Replacement mismatch independently of coercion printing. No tests are retired.

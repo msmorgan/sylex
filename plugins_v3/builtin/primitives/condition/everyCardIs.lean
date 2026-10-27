@@ -1,0 +1,7 @@
+/-- "Each <scope> in your starting deck <trait>." [CR#702.139a] -/
+-- [CR#702.139a]
+primitive everyCardIs (scope : Predicate) (trait : DeckTrait) : DeckCondition := {
+  spelling := "Each <scope> in your starting deck <trait>.",
+  body :=
+    Semantics.Primitives.DeckCondition.everyCardIs scope trait
+}

@@ -1,5 +1,5 @@
 template thisFortification : NounPhrase := {
   spelling := "this Fortification",
   body :=
-    .headed (.subtype fortification) .this
+    Semantics.Templates.NounPhrase.headed (Semantics.NounWord.subtype Semantics.Definitions.fortification) Semantics.Templates.NounPhrase.this_
 }

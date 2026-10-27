@@ -1,5 +1,5 @@
 template thisAura : NounPhrase := {
   spelling := "this Aura",
   body :=
-    .headed (.subtype aura) .this
+    Semantics.Templates.NounPhrase.headed (Semantics.NounWord.subtype Semantics.Definitions.aura) Semantics.Templates.NounPhrase.this_
 }

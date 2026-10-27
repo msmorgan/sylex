@@ -7,9 +7,14 @@ keyword echo (cost : Cost) : Ability := {
   -- TODO(spelling): echo [mana cost] / echo—[verbal cost]; separator and terminal period depend
   -- on the Cost structure.
   body :=
-    [ at_ (beginningOfYour .upkeep)
-        (if_ := some (not (heldSince (is thisPermanent youControl)
-          (.beginningOf .upkeep (some .you) (.previous (some .you))))))
-        (doUnlessKeywordCost (sacrifice thisPermanent) cost thisPermanent
-          echo) ]
+    [Semantics.Templates.Ability.at_ (Semantics.Templates.GameEvent.beginningOfYour Semantics.TurnPart.upkeep)
+        (Semantics.Templates.Action.doUnlessKeywordCost (Semantics.Definitions.sacrifice Semantics.Templates.NounPhrase.thisPermanent) cost
+          Semantics.Templates.NounPhrase.thisPermanent Semantics.Definitions.echo.label)
+        [] [] Option.none Option.none Option.none
+        (Option.some
+          (Semantics.Templates.Condition.not
+            (Semantics.Templates.Condition.heldSince
+              (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.thisPermanent Semantics.Templates.Predicate.youControl)
+              (Semantics.Templates.GameEvent.beginningOf Semantics.TurnPart.upkeep (Option.some Semantics.Templates.NounPhrase.you)
+                (Semantics.Templates.TurnRef.turnRefPrevious (Option.some Semantics.Templates.NounPhrase.you))))))]
 }

@@ -7,6 +7,7 @@ that cast, and the delayed trigger is created as the permanent it becomes is put
 battlefield [CR#608.3g]. A cast under another effect's permission is not that cast, so nothing
 is sacrificed (Mystic Veil ruling, 2022-12-08). -/
 template asThoughFlashSacrificedAtCleanup : Ability := {
+  spelling := "You may cast this spell as though it had flash. If you cast it any time a sorcery couldn’t have been cast, the controller of the permanent it becomes sacrifices it at the beginning of the next cleanup step.",
   body :=
     static (can you (cast thisSpell) (asThough := asThoughHadFlash it)
       (rider := some (doIf (did you (cast it) (within thisGame (some (not asSorcery))))

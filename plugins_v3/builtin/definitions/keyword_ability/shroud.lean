@@ -4,5 +4,6 @@ keyword shroud : Ability := {
   lexical := { lemma := "shroud" },
   spelling := "shroud",
   body :=
-    [static (cant .any (.target this_))]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.cant Semantics.Templates.Subject.any (Semantics.Templates.Action.target Semantics.Templates.NounPhrase.this_))]
 }

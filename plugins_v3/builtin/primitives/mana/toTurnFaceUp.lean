@@ -1,0 +1,7 @@
+/-- "to turn <subject> face up" [CR#116.2b] -/
+-- [CR#116.2b]
+primitive toTurnFaceUp (subject : Predicate) : SpendPurpose := {
+  spelling := "to turn <subject> face up",
+  body :=
+    Semantics.Primitives.SpendPurpose.toTurnFaceUp subject
+}

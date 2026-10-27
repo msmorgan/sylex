@@ -2,5 +2,6 @@ keyword tiered : Ability := {
   lexical := { lemma := "tiered" },
   spelling := "tiered",
   body :=
-    [static (.modeChoice (.setQuantity (oneThrough 1)))]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.modeChoice (Semantics.Templates.ModeChange.setQuantity (Semantics.Templates.Quantity.oneThrough 1)))]
 }

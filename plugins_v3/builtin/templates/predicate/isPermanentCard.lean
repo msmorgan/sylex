@@ -4,5 +4,5 @@ types, wherever it is. -/
 template isPermanentCard : Predicate := {
   spelling := "permanent card",
   body :=
-    .and [.isCard, isPermanentType]
+    Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isCard, Semantics.Templates.Predicate.isPermanentType]
 }

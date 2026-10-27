@@ -1,0 +1,8 @@
+/-- The described object's own current existence: "spells you cast", "if you cast it from your
+hand" read its own casting [CR#400.7]. -/
+-- [CR#400.7]
+primitive thisObject : LookbackSpan := {
+  spelling := "spells you cast",
+  body :=
+    Semantics.Primitives.LookbackSpan.thisObject
+}

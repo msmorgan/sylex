@@ -13,16 +13,28 @@ attachment that phased out directly and whose host later phased out too is skipp
 which the rule would phase in (`lean-v3-phasing-direct-phase-out`). That every permanent changes
 at once is the engine's. -/
 conferral phasingTurnBased := {
+
   body :=
-    { scope := isPermanent,
+    { scope := Semantics.Templates.Predicate.isPermanent,
       confer :=
-        .turnBased .untapStep
-          (doIf (.duringPart .turn (some (controllerOf .this)))
-            (doIf (is .this isPhasedOut)
-              (doIf
-                (not (is .this (.attachment .attachment none (some (a (and [isPermanent,
-                  isPhasedOut]))))))
-                (.setStatus .phasedIn .this) none)
-              (some (doIf (is .this (hasKeyword phasing)) (.setStatus .phasedOut .this) none)))
-            none) }
+        Semantics.Conferral.turnBased Semantics.TurnPart.untapStep
+          (Semantics.Templates.Action.doIf
+            (Semantics.Templates.Condition.duringPart Semantics.TurnPart.turn
+              (Option.some (Semantics.Templates.NounPhrase.controllerOf Semantics.Templates.NounPhrase.this_)))
+            (Semantics.Templates.Action.doIf
+              (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.this_ Semantics.Templates.Predicate.isPhasedOut)
+              (Semantics.Templates.Action.doIf
+                (Semantics.Templates.Condition.not
+                  (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.this_
+                    (Semantics.Templates.Predicate.predicateAttachment Semantics.AttachmentSide.attachment Option.none
+                      (Option.some
+                        (Semantics.Templates.NounPhrase.a
+                          (Semantics.Templates.Predicate.and
+                            [Semantics.Templates.Predicate.isPermanent, Semantics.Templates.Predicate.isPhasedOut]))))))
+                (Semantics.Templates.Action.setStatus Semantics.Status.phasedIn Semantics.Templates.NounPhrase.this_))
+              (Option.some
+                (Semantics.Templates.Action.doIf
+                  (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.this_
+                    (Semantics.Templates.Predicate.hasKeyword (Semantics.Templates.KeywordTerm.theKeyword Semantics.Definitions.phasing.label)))
+                  (Semantics.Templates.Action.setStatus Semantics.Status.phasedOut Semantics.Templates.NounPhrase.this_))))) }
 }

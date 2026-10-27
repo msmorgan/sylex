@@ -6,9 +6,8 @@ action shuffleInto (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "shuffle", frames := [Intransitive, Monotransitive, (TransitiveWithPP ["into"])] }] },
   deed := "shuffle",
   body :=
-    sequentially
-        [ .move subject .anyLocation
-            (some (.zone .library none))
-            .arrival [],
-          .shuffle (.zone .library none) ]
+    Semantics.Templates.Action.sequentially
+      [Semantics.Templates.Action.actionMove subject Semantics.Templates.Location.wherever
+          (Option.some (Semantics.Templates.Location.zone Semantics.Zone.library Option.none)) Semantics.ObservationPoint.arrival [],
+        Semantics.Templates.Action.actionShuffle (Semantics.Templates.Location.zone Semantics.Zone.library Option.none)]
 }

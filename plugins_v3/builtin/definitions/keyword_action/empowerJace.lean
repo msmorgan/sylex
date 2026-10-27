@@ -5,17 +5,25 @@ action empowerJace (amount : Amount) : Action := {
   lexical := { verbs := [{ lemma := "empower Jace", third_singular := "empowers Jace", past := "empowered Jace", gerund := "empowering Jace", frames := [Amount] }] },
   spelling := "empower Jace <amount>",
   body :=
-    let jaceToken : Predicate := and [.isToken, isPlaneswalker, .hasSubtype jace, actorControls]
-    sequentially
-        [ doIf (not (exists_ jaceToken))
-            (create 1 (written
-              { characteristics :=
-                  { colors := [.blue], types := [.planeswalker], subtypes := [jace],
-                    loyalty := some 0,
+    have jaceToken :=
+      Semantics.Templates.Predicate.and
+        [Semantics.Templates.Predicate.isToken, Semantics.Templates.Predicate.isPlaneswalker,
+          Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.jace, Semantics.Templates.Predicate.actorControls];
+    Semantics.Templates.Action.sequentially
+      [Semantics.Templates.Action.doIf (Semantics.Templates.Condition.not (Semantics.Templates.Condition.exists_ jaceToken))
+          (Semantics.Definitions.create 1
+            (Semantics.Templates.TokenSpec.written
+              {
+                characteristics :=
+                  { colors := [Semantics.Color.blue], types := [Semantics.CardType.planeswalker],
+                    subtypes := [Semantics.Definitions.jace],
                     text :=
-                      [ activated (loyaltySymbol (.down 1)) (surveil 1),
-                        activated (loyaltySymbol (.down 3)) (draw 1) ] } }))
-            none,
-          choose (a jaceToken),
-          putCounters amount loyaltyCounter it ]
+                      [Semantics.Templates.Ability.activated (Semantics.Templates.Cost.loyaltySymbol (Semantics.Templates.down 1))
+                          (Semantics.Definitions.surveil 1),
+                        Semantics.Templates.Ability.activated (Semantics.Templates.Cost.loyaltySymbol (Semantics.Templates.down 3))
+                          (Semantics.Templates.Action.draw 1)],
+                    loyalty := Option.some 0 } })),
+        Semantics.Templates.Action.choose (Semantics.Templates.NounPhrase.a jaceToken),
+        Semantics.Templates.Action.putCounters amount (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.loyaltyCounter)
+          Semantics.Templates.NounPhrase.it]
 }

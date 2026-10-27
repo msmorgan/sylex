@@ -5,6 +5,11 @@ subtype equipment := {
   spelling := "Equipment",
   kind := .artifact,
   name := "Equipment",
-  confers := [ .property (mayBeAttachedTo thisEquipment (allOf isCreature)),
-      .stateBased (.not (isAttached thisEquipment)) (.attachment .unattached thisEquipment none) ]
+  confers :=
+    [Semantics.Conferral.property
+        (Semantics.Templates.StaticSpec.mayBeAttachedTo Semantics.Templates.NounPhrase.thisEquipment
+          (Semantics.Templates.NounPhrase.allOf Semantics.Templates.Predicate.isCreature)),
+      Semantics.Conferral.stateBased
+        (Semantics.Templates.Condition.not (Semantics.Templates.Condition.isAttached Semantics.Templates.NounPhrase.thisEquipment))
+        (Semantics.Templates.Action.attachment Semantics.AttachMove.unattached Semantics.Templates.NounPhrase.thisEquipment Option.none)]
 }

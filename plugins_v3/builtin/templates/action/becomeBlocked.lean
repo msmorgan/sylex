@@ -1,0 +1,10 @@
+/-- "<subject> becomes blocked": the Blocked status, which an effect can give an attacking creature
+too, not a block by a particular creature [CR#509.1h,509.3c]. "Becomes blocked by <blocker>" stays
+`block` with a `by` subject [CR#509.3d]. -/
+-- [CR#509.1h,509.3c]
+-- [CR#509.3d]
+template becomeBlocked (subject : NounPhrase) : Action := {
+  spelling := "<subject> becomes blocked",
+  body :=
+    Semantics.Templates.Action.combat subject (Semantics.Templates.CombatUpdate.combatUpdateParticipation (Semantics.Templates.CombatParticipation.combatParticipationBlocked Bool.true))
+}

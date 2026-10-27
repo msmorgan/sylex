@@ -3,9 +3,13 @@ this token: You gain 3 life.'" [CR#111.10b] -/
 template foodToken : CharacteristicBundle := {
   spelling := "Food token",
   body :=
-    { characteristics :=
-        { types := [.artifact], subtypes := [food],
+    {
+      characteristics :=
+        { types := [Semantics.CardType.artifact], subtypes := [Semantics.Definitions.food],
           text :=
-            [ activated (.compound [.mana [generic 2], .tapSymbol, .perform (sacrifice thisArtifact)])
-                (gainLife 3) ] } }
+            [Semantics.Templates.Ability.activated
+                (Semantics.Templates.Cost.compound
+                  [Semantics.Templates.Cost.mana [Semantics.Templates.ManaSymbol.generic 2], Semantics.Templates.Cost.tapSymbol,
+                    Semantics.Templates.Cost.perform (Semantics.Definitions.sacrifice Semantics.Templates.NounPhrase.thisArtifact)])
+                (Semantics.Templates.Action.gainLife 3)] } }
 }

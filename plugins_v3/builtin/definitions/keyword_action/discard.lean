@@ -4,6 +4,6 @@ action discard (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "discard", frames := [Monotransitive] }] },
   spelling := "discard <subject>",
   body :=
-    .move subject (.zone .hand (some .actor))
-        graveyard .arrival []
+    Semantics.Templates.Action.actionMove subject (Semantics.Templates.Location.zone Semantics.Zone.hand (Option.some Semantics.Templates.NounPhrase.actor))
+      (Option.some Semantics.Templates.Location.graveyard) Semantics.ObservationPoint.arrival []
 }

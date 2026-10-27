@@ -12,9 +12,10 @@ would-clause alike. `Timing.whileDoing` would state only a co-occurrence and liv
 slot only, which a replacement's would-clause has not. A countered spell's move (`counter`) is
 caused by no resolution [CR#701.6a], so none of the three applies to it. -/
 action resolve (subject : NounPhrase) : Action := {
+
   -- TODO(spelling): <subject> resolves/resolve; string substitution cannot choose
   -- subject-verb agreement for a singular spell versus multiple spells or abilities.
   body :=
-    .procedure .resolve subject .itsOwnCost none
-        none none
+    Semantics.Templates.Action.procedure Semantics.Procedure.resolve subject Semantics.Templates.PlayPayment.itsOwnCost Option.none Option.none
+      Option.none
 }

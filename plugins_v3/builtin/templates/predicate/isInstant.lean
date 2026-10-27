@@ -1,5 +1,5 @@
 template isInstant : Predicate := {
   spelling := "instant",
   body :=
-    .hasType Semantics.CardType.instant
+    Semantics.Templates.Predicate.hasType Semantics.CardType.instant
 }

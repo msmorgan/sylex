@@ -1,0 +1,7 @@
+/-- "only as an instant": any time you have priority [CR#117.1a]. -/
+-- [CR#117.1a]
+template asInstant : Timing := {
+  spelling := "only as an instant",
+  body :=
+    Semantics.Templates.Timing.whileTrue (Semantics.Templates.Condition.conditionHasPriority Semantics.Templates.NounPhrase.you)
+}

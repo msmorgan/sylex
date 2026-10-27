@@ -2,5 +2,5 @@
 template army : Predicate := {
   spelling := "Army creature you control",
   body :=
-    .and [.hasSubtype Subtype.army, isCreature, actorControls]
+    Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.hasSubtype Subtype.army, isCreature, actorControls]
 }

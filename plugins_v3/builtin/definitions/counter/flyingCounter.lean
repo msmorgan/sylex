@@ -6,5 +6,8 @@ counter flyingCounter := {
   lexical := { lemma := "flying counter" },
   spelling := "flying counter",
   holder := .object,
-  confers := [.property (Templates.abilityGrant .this (keyword (.named "flying")))]
+  confers :=
+    [Semantics.Conferral.property
+        (Semantics.Templates.StaticSpec.abilityGrant Semantics.Templates.NounPhrase.this_
+          (Semantics.Templates.keyword (Semantics.KeywordLabel.named "flying")))]
 }

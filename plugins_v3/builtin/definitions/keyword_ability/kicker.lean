@@ -9,5 +9,5 @@ keyword kicker (cost : Cost) : Ability := {
   -- TODO(spelling): kicker [mana cost] / kicker—[verbal cost]; separator and terminal period
   -- depend on the Cost structure.
   body :=
-    [static (.addedCost cost true .once)]
+    [Semantics.Templates.Ability.static (Semantics.Templates.StaticSpec.addedCost cost Bool.true Semantics.PayTimes.once)]
 }

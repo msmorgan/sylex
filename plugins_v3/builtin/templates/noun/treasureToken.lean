@@ -3,9 +3,13 @@ Sacrifice this token: Add one mana of any color.'" [CR#111.10a] -/
 template treasureToken : CharacteristicBundle := {
   spelling := "Treasure token",
   body :=
-    { characteristics :=
-        { types := [.artifact], subtypes := [treasure],
+    {
+      characteristics :=
+        { types := [Semantics.CardType.artifact], subtypes := [Semantics.Definitions.treasure],
           text :=
-            [ activated (.compound [.tapSymbol, .perform (sacrifice thisArtifact)])
-                (.addMana 1 (.anyColor .sameColor) []) ] } }
+            [Semantics.Templates.Ability.activated
+                (Semantics.Templates.Cost.compound
+                  [Semantics.Templates.Cost.tapSymbol,
+                    Semantics.Templates.Cost.perform (Semantics.Definitions.sacrifice Semantics.Templates.NounPhrase.thisArtifact)])
+                (Semantics.Templates.Action.addMana 1 (Semantics.Templates.ProducedMana.ofAnyColor Semantics.ColorFreedom.sameColor) [])] } }
 }

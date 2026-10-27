@@ -175,7 +175,7 @@ in the application
   @Templates.StaticSpec.replace instAuthoringContext (would (actor you) (draw 1)) (draw 2)
 -/
 #guard_msgs in
-example : StaticSpec := replace (would you (draw 1)) (draw 2)
+example : StaticSpec := replace (would (actor you) (draw 1)) (draw 2)
 
 /-- "Draw a card. If you control three or more artifacts, draw two cards instead.": the
 condition is the replacement's own, so the draw happens unreplaced while it fails

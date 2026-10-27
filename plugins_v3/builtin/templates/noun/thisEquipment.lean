@@ -1,5 +1,5 @@
 template thisEquipment : NounPhrase := {
   spelling := "this Equipment",
   body :=
-    .headed (.subtype equipment) .this
+    Semantics.Templates.NounPhrase.headed (Semantics.NounWord.subtype Semantics.Definitions.equipment) Semantics.Templates.NounPhrase.this_
 }

@@ -228,6 +228,7 @@ private def addSortAlias (full : Name) : CommandElabM Unit := do
       registerExpectedType alias
 
 private def registerSharedAliases (declaration : Name) : CommandElabM Unit := do
+  addSortAlias declaration
   let result? ← liftTermElabM <| forallTelescopeReducing (← getConstInfo declaration).type
     fun _ type => pure type.getAppFn.constName?
   if let some result := result? then
@@ -265,6 +266,20 @@ private def dispatchTarget? (bare sort : Name) : TermElabM (Option Name) := do
   return (entries.find? fun e => e.bareName == bare && e.returnType == sort &&
     visible e.declaration).map (·.declaration)
 
+private def hasOrdinaryNamespaceBinding (stx : Syntax) (expected : Expr) : TermElabM Bool := do
+  let ns ← getCurrNamespace
+  let env ← getEnv
+  let candidates ← try resolveGlobalConst stx catch _ => pure []
+  for name in candidates do
+    let visible := (privateToUserName? name).getD name
+    if !visible.getPrefix.isAnonymous && visible.getPrefix.isPrefixOf ns &&
+        !definitionAttribute.hasTag env name && !templateAttribute.hasTag env name then
+      let saved ← saveState
+      let matchesExpected ← isDefEq (← inferType (← mkConstWithFreshMVarLevels name)) expected
+      saved.restore
+      if matchesExpected then return true
+  return false
+
 @[scoped term_elab Lean.Parser.Term.app]
 def dispatchOnExpectedType : TermElab := fun stx expected? => do
   unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
@@ -281,6 +296,18 @@ def dispatchOnExpectedType : TermElab := fun stx expected? => do
   let some sort := (← whnfR expected).getAppFn.constName? | throwUnsupportedSyntax
   let some target ← dispatchTarget? fn.getId sort | throwUnsupportedSyntax
   if fn.getId == target then throwUnsupportedSyntax
+  let alternatives ← try resolveGlobalConst fn catch _ => pure []
+  for candidate in (target :: alternatives).eraseDups do
+    let env ← getEnv
+    unless definitionAttribute.hasTag env candidate || templateAttribute.hasTag env candidate do
+      continue
+    let saved ← saveState
+    try
+      let call := stx.setArg 0 (mkCIdentFrom fn candidate)
+      let value ← withMacroExpansion stx call <| Term.elabTerm call expected?
+      unless ← MonadLog.hasErrors do return value
+    catch _ => pure ()
+    saved.restore
   let call := stx.setArg 0 (mkCIdentFrom fn target)
   withMacroExpansion stx call <| Term.elabTerm call expected?
 
@@ -459,21 +486,30 @@ private def checkActionDeed (declaration : Name) (deed : Expr) : MetaM Unit := d
 `Deed.action`. -/
 def deedConstant (name : Name) : Name := name ++ `deed
 
-private def countFVarOccurrences (fvar : FVarId) (e : Expr) : Nat :=
-  match e with
+private partial def countFVarOccurrences (env : Environment) (fvar : FVarId) (e : Expr) : Nat := Id.run do
+  if let some info := Lean.Meta.getMatcherInfoCore? env (e.getAppFn.constName?.getD .anonymous) then
+    let args := e.getAppArgs
+    if args.size == info.arity then
+      let first := info.getFirstAltPos
+      let prefixCount := (args.extract 0 first).foldl (fun n arg => n + countFVarOccurrences env fvar arg) 0
+      let branches := (args.extract first args.size).foldl
+        (fun n arg => max n (countFVarOccurrences env fvar arg)) 0
+      return prefixCount + branches
+  return match e with
   | .fvar id => if id == fvar then 1 else 0
   | .app fn arg =>
     if e.isAppOfArity `Semantics.NounPhrase.inCaller 1 && arg.isFVar then 0
-    else countFVarOccurrences fvar fn + countFVarOccurrences fvar arg
+    else countFVarOccurrences env fvar fn + countFVarOccurrences env fvar arg
   | .lam _ ty body _ | .forallE _ ty body _ =>
-    countFVarOccurrences fvar ty + countFVarOccurrences fvar body
+    countFVarOccurrences env fvar ty + countFVarOccurrences env fvar body
   | .letE _ ty val body _ =>
-    countFVarOccurrences fvar ty + countFVarOccurrences fvar val + countFVarOccurrences fvar body
-  | .mdata _ b | .proj _ _ b => countFVarOccurrences fvar b
+    countFVarOccurrences env fvar ty + countFVarOccurrences env fvar val + countFVarOccurrences env fvar body
+  | .mdata _ b | .proj _ _ b => countFVarOccurrences env fvar b
   | _ => 0
 
 private def isTheActorExpr (e : Expr) : Bool :=
-  e.isAppOfArity `Semantics.Templates.theActor 1
+  e.isAppOfArity `Semantics.Templates.theActor 1 ||
+    e.isAppOfArity `Semantics.Templates.NounPhrase.theActor 1
 
 private def countActorOccurrences (e : Expr) : Nat :=
   if isTheActorExpr e then 1
@@ -504,6 +540,22 @@ private partial def rejectGeneratedIdentities (identities : List String) (e : Ex
 private partial def rewriteMentions (wrapInCaller : Bool) (actorIdentity? : Option String)
     (parameters : List (FVarId × String)) (e : Expr) (acceptsIdentity : Bool := true) :
     StateT (List String) TermElabM Expr := do
+  -- Predicate alternatives are checked in separate Reference Scopes. A mention introduced
+  -- in one alternative cannot provide the identity used in another, or after the disjunction.
+  if e.getAppFn.constName? ∈ [some `Semantics.Predicate.or,
+      some `Semantics.Templates.Predicate.or] then
+    let args := e.getAppArgs
+    if let some choices := args.back? then
+      let rec alternatives (list : Expr) : StateT (List String) TermElabM Expr := do
+        if list.isAppOfArity ``List.cons 3 then
+          let parts := list.getAppArgs
+          let incoming ← get
+          let head ← rewriteMentions wrapInCaller actorIdentity? parameters parts[1]!
+          set incoming
+          let tail ← alternatives parts[2]!
+          return mkApp3 list.getAppFn parts[0]! head tail
+        return list
+      return mkAppN e.getAppFn (args.set! (args.size - 1) (← alternatives choices))
   if let some actorId := actorIdentity? then
     if isTheActorExpr e then
       let seen ← get
@@ -571,7 +623,7 @@ elab_rules : term <= expected
         if (← whnf localDecl.type).isConstOf `Semantics.NounPhrase then
           let idStr := s!"{declName.getString}.{localDecl.userName}"
           reserved := idStr :: reserved
-          if isDefinition || countFVarOccurrences localDecl.fvarId value ≥ 2 then
+          if isDefinition || countFVarOccurrences (← getEnv) localDecl.fvarId value ≥ 2 then
             npParams := npParams ++ [(localDecl.fvarId, idStr)]
     rejectGeneratedIdentities reserved value
     let actorId? :=
@@ -652,7 +704,9 @@ elab "declare_semantic_primitives" : command => do
     | _ => none
   for (name, ctor) in constructors.mergeSort (fun a b => a.2.numFields ≤ b.2.numFields) do
       if expressionAttribute.hasTag env ctor.induct &&
-          !internalAttribute.hasTag env name && !internalAttribute.hasTag env ctor.induct then
+          (!internalAttribute.hasTag env name ||
+            name ∈ [`Semantics.NounPhrase.pro, `Semantics.NounPhrase.which]) &&
+          !internalAttribute.hasTag env ctor.induct then
         let publicName := name.replacePrefix `Semantics `Semantics.Primitives
         let current ← getEnv
         let type := ctor.type.replace fun expr =>
@@ -791,6 +845,24 @@ private partial def inspectCore (cache : IO.Ref InspectionCache)
       | .const name levels =>
         let env ← getEnv
         let info ← getConstInfo name
+        -- Core coercions predate the bundle. Their authoring evidence is the corresponding
+        -- public primitive call, checked for definitional equality before recording it.
+        let coercion := (privateToUserName? name).getD name
+        let coercions : List (Name × Name) := [
+          (`Semantics.Templates.coeSubtypePredicate, `Semantics.Templates.hasSubtype),
+          (`Semantics.Templates.coeManaCostCost, `Semantics.Templates.mana),
+          (`Semantics.Templates.coeActionCost, `Semantics.Templates.perform),
+          (`Semantics.Templates.coeCharacteristicBundleTokenSpec, `Semantics.Templates.written),
+          (`Semantics.Templates.coeCounterKindCounterKindSource, `Semantics.Templates.printedKind),
+          (`Semantics.Templates.coeStringNameSource, `Semantics.Templates.printedName),
+          (`Semantics.Templates.coeConditionAsThough, `Semantics.Templates.holds),
+          (`Semantics.Templates.coeStaticSpecAbility, `Semantics.Templates.static)]
+        if let some target := coercions.lookup coercion then
+          if env.contains target then
+            let expanded := mkAppN (mkConst target) (#[context] ++ args)
+            unless ← isDefEq term expanded do
+              throwError "Core coercion {name} disagrees with authored primitive {target}"
+            return ← inspectCore cache clean expanded visited context parameters bodyParameter
         if isAuthored env name then
           let mut arguments := []
           let splices := (spliceSchemas.getState env |>.find? name).getD #[]
@@ -863,6 +935,7 @@ private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) :
 @[scoped term_elab ident] def elabBareIdentDispatch : TermElab := fun stx expected? => do
   unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
   let some expected := expected? | throwUnsupportedSyntax
+  if ← hasOrdinaryNamespaceBinding stx expected then throwUnsupportedSyntax
   if let some ldecl := (← getLCtx).findFromUserName? stx.getId then
     unless ldecl.isAuxDecl do throwUnsupportedSyntax
   let entries := expectedTypeDispatchExt.getState (← getEnv)
@@ -1085,6 +1158,55 @@ private def registryKinds : List Name :=
 initialize bundleRegistryAttribute : TagAttribute ←
   registerTagAttribute `bundle_registry "A catalog value registered before its bundle rules."
 
+/-- Check the author's elaborated term before command-generated constructors are introduced.
+Closed word tags are data; exposed AST constructors require a primitive declaration. -/
+elab "primitive_boundary% " body:term : term <= expected => do
+  let value ← elabTermEnsuringType body expected
+  synthesizeSyntheticMVarsNoPostponing
+  let value ← instantiateMVars value
+  let env ← getEnv
+  for name in value.foldConsts [] (fun name names => name :: names) do
+    let exposed := (`Semantics).isPrefixOf name && env.contains (name.replacePrefix `Semantics `Semantics.Primitives)
+    let raw ← match env.find? name with
+      | some (.ctorInfo _) => pure (exposed && name.getPrefix != `Semantics.Delta)
+      | some (.defnInfo info) =>
+        if let .abbrev := info.hints then
+          if (`Semantics.Templates).isPrefixOf name || (`Semantics.Definitions).isPrefixOf name then
+            pure false
+          else lambdaTelescope info.value fun _ body => do
+            let head := body.getAppFn.constName?.getD .anonymous
+            return (`Semantics).isPrefixOf head && head.getPrefix != `Semantics.Delta &&
+              env.contains (head.replacePrefix `Semantics `Semantics.Primitives)
+        else pure false
+      | _ => pure false
+    if (`Semantics.Primitives).isPrefixOf name || raw then
+      throwErrorAt body "Only primitive declarations may reference raw semantic constructor {name}"
+  return value
+
+private partial def guardAuthoredDefaults (stx : Syntax) : CommandElabM Syntax := do
+  if stx.isOfKind ``Parser.Term.binderDefault then
+    let value : Term := ⟨stx[1]⟩
+    return stx.setArg 1 (← `(term| primitive_boundary% $value)).raw
+  match stx with
+  | .node info kind args => return .node info kind (← args.mapM guardAuthoredDefaults)
+  | _ => return stx
+
+private def validateAuthoredDefaults (signature : Syntax) : CommandElabM Unit := do
+  unless (signature.find? (·.isOfKind ``Parser.Term.binderDefault)).isSome do return
+  let context ← `(bracketedBinder| [Semantics.AuthoringContext])
+  let mut binders := #[context.raw]
+  for binder in signature[0].getArgs do
+    let mut binder := binder
+    if binder[2].getNumArgs == 2 && binder[2][1].isOfKind ``spliceMode then
+      let resultType : Term := ⟨binder[2][1][1]⟩
+      binder := binder.setArg 2 (binder[2].setArg 1 (← `(term| caller_splice_type% $resultType)).raw)
+    binders := binders.push binder
+  let checks : Array (TSyntax ``Parser.Term.funBinder) := binders.map (⟨·⟩)
+  let check ← `(term| fun $checks* => ())
+  liftTermElabM <| withoutErrToSorry do
+    discard <| elabTerm check none
+    synthesizeSyntheticMVarsNoPostponing
+
 private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : CommandElabM Unit := do
   let mods : TSyntax ``Parser.Command.declModifiers := ⟨stx[0]⟩
   let kind := stx[1].getId.eraseMacroScopes
@@ -1092,8 +1214,21 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : Comma
   let original : Ident := ⟨stx[2]⟩
   let mut name := original
   let mut sig : TSyntax ``Parser.Command.optDeclSig := ⟨stx[3]⟩
-  let payload := stx[5]
-  let fields ← if payload.isOfKind ``declBlock then blockFields payload else pure []
+  let mut payload := stx[5]
+  let mut fields ← if payload.isOfKind ``declBlock then blockFields payload else pure []
+  let cardBodyIsStruct := if payload.isOfKind ``declBlock then
+    (fields.lookup `body).any (·.raw.isOfKind ``Parser.Term.structInst)
+    else payload.isOfKind ``Parser.Term.structInst
+  if kind != `primitive then
+    sig := ⟨← guardAuthoredDefaults sig.raw⟩
+    validateAuthoredDefaults sig.raw
+    fields ← fields.mapM fun (key, value) => do
+      if lexicalFields.contains key || key ∈ [`name, `label, `kind, `deed, `permanent, `ofAbility] then
+        return (key, value)
+      return (key, ← `(term| primitive_boundary% $value))
+    unless payload.isOfKind ``declBlock do
+      let body : Term := ⟨payload⟩
+      payload := (← `(term| primitive_boundary% $body)).raw
   for (field, value) in fields do
     unless lexicalFields.contains field || (semanticFields kind).contains field do
       throwErrorAt value "Unknown field {field} in {kind} declaration"
@@ -1243,7 +1378,7 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : Comma
         !lexicalFields.contains f.1)
       else pure ⟨payload⟩
     if kind == `card then
-      if body.raw.isOfKind ``Parser.Term.structInst then
+      if cardBodyIsStruct || body.raw.isOfKind ``Parser.Term.structInst then
         body ← `(term| $(mkIdent `Semantics.Templates.singleFacedCard) $body)
       body := ⟨mkNode `Semantics.spelledTerm #[mkAtom "spelled", mkAtom "<|", body.raw]⟩
     let value ← `(Parser.Command.declVal| := $body)
@@ -1352,7 +1487,9 @@ private partial def referencedIdents (bound : List Name) (stx : Syntax) : List N
       else if [`creature, `artifact, `enchantment, `land, `planeswalker, `battle,
           `instant, `sorcery, `kindred, `card, `permanent, `player, `token, `spell].contains name then
         [name, Name.mkSimple ("is" ++ name.toString.capitalize)]
-      else [name]
+      else [name, name.replacePrefix `Semantics.Templates .anonymous,
+        name.replacePrefix `Templates .anonymous,
+        name.replacePrefix `Semantics.Definitions .anonymous]
     | .node _ _ args => args.toList.flatMap (referencedIdents bound)
     | _ => []
 
@@ -1367,12 +1504,17 @@ private def bundleItem (file : String) (stx : Syntax) : Except String BundleItem
     else if sig[1][0][1].isIdent then pure sig[1][0][1].getId
     else pure (Name.mkSimple (sig[1][0][1].reprint.getD ""))
   let returnType := if (`Semantics).isPrefixOf result then result else `Semantics ++ result
-  let bareName := Name.mkSimple stx[2].getId.getString!
+  let declared := stx[2].getId
+  let bareName := if declared.getPrefix.isAnonymous ||
+      declared.getPrefix == Name.mkSimple returnType.getString! then
+    Name.mkSimple declared.getString! else declared
   let bound := sig[0].getArgs.toList.flatMap fun binder =>
     binder[1].getArgs.toList.filterMap fun id => if id.isIdent then some id.getId else none
   return { key := { bareName, returnType }, file, stx,
            valueRegistered := registryKinds.contains kind,
-           references := referencedIdents bound stx[5] }
+           references := referencedIdents bound stx[3] ++ referencedIdents bound stx[5] ++
+             (if kind == `ability_word then [`abilityWord] else []) ++
+             (if kind == `card then [`singleFacedCard] else []) }
 
 private def parseBundleFile (env : Environment) (opts : Options) (path : System.FilePath) :
     IO (List BundleItem) := do
@@ -1396,7 +1538,12 @@ private def parseBundleFile (env : Environment) (opts : Options) (path : System.
   return items
 
 /-- Load declarations from loose Lean files, independent of their paths and source ordering. -/
-elab "load_bundle " directory:str : command => do
+syntax (name := loadBundle) "load_bundle " str (" templatesIn " ident)? : command
+
+@[command_elab loadBundle]
+def elabLoadBundle : CommandElab := fun stx => do
+  let directory : StrLit := ⟨stx[1]⟩
+  let templateNamespace := if stx[2].isNone then none else some stx[2][1].getId
   let paths ← liftIO <| (System.FilePath.mk directory.getString).walkDir
   let paths := paths.toList.filter (·.extension == some "lean")
     |>.mergeSort (fun a b => a.toString < b.toString)
@@ -1423,7 +1570,21 @@ elab "load_bundle " directory:str : command => do
       registerKeywordLabel (name ++ `label) label
   for item in sorted do
     try
-      withRef item.stx <| elabCommand item.stx
+      let messageCount := (← get).messages.toList.length
+      let content ← liftIO <| IO.FS.readFile item.file
+      withReader (fun ctx => { ctx with fileName := item.file, fileMap := FileMap.ofString content }) do
+        let callerNamespace ← getCurrNamespace
+        let ns := templateNamespace
+        if let some ns := ns then
+          if item.stx[1].getId ∈ [`primitive, `template] then
+            withScope (fun scope => { scope with
+                currNamespace := ns
+                openDecls := .simple callerNamespace [] :: scope.openDecls }) do
+              withRef item.stx <| elabCommand item.stx
+          else withRef item.stx <| elabCommand item.stx
+        else withRef item.stx <| elabCommand item.stx
+      if (← get).messages.toList.length > messageCount then
+        logInfo m!"While loading {item.file}"
     catch error =>
       throwError "{item.file}: {error.toMessageData}"
 

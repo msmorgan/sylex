@@ -5,17 +5,23 @@ keyword emergeFrom (quality : Predicate) (cost : Cost) : Ability := {
   label := "emerge",
   spelling := "emerge from <quality> <cost>",
   body :=
-    [ static
-        (altCost this_
-          (some
-            (.compound
-              [ cost,
-                .perform (sacrifice (a (and [quality, isPermanent]))) ]))),
-      static
-        (onlyWhile
-          (.costShift thisSpell
-            (less
-              (.statOf (.stat .manaValue) (the (and [was (sacrifice which), isPermanent])))
-              none))
-          (keywordCostPaid emerge thisSpell)) ]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.altCost Semantics.Templates.NounPhrase.this_
+          (Option.some
+            (Semantics.Templates.Cost.compound
+              [cost,
+                Semantics.Templates.Cost.perform
+                  (Semantics.Definitions.sacrifice
+                    (Semantics.Templates.NounPhrase.a
+                      (Semantics.Templates.Predicate.and [quality, Semantics.Templates.Predicate.isPermanent])))]))),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.onlyWhile
+          (Semantics.Templates.StaticSpec.costShift Semantics.Templates.NounPhrase.thisSpell
+            (Semantics.Templates.CostShift.less
+              (Semantics.Templates.Amount.statOf (Semantics.ProjAxis.stat Semantics.Stat.manaValue)
+                (Semantics.Templates.NounPhrase.the
+                  (Semantics.Templates.Predicate.and
+                    [Semantics.Templates.Predicate.was (Semantics.Definitions.sacrifice Semantics.Templates.NounPhrase.which),
+                      Semantics.Templates.Predicate.isPermanent])))))
+          (Semantics.Templates.Condition.keywordCostPaid Semantics.Definitions.emerge.label Semantics.Templates.NounPhrase.thisSpell))]
 }

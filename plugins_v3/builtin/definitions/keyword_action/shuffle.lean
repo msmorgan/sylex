@@ -3,5 +3,5 @@ action shuffle : Action := {
   lexical := { verbs := [{ lemma := "shuffle", frames := [Intransitive, Monotransitive, (TransitiveWithPP ["into"])] }] },
   spelling := "shuffle",
   body :=
-    .shuffle (libraryOf .actor)
+    Semantics.Templates.Action.actionShuffle (Semantics.Templates.Location.libraryOf Semantics.Templates.NounPhrase.actor)
 }

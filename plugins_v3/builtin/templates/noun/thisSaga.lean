@@ -1,5 +1,5 @@
 template thisSaga : NounPhrase := {
   spelling := "this Saga",
   body :=
-    .headed (.subtype saga) .this
+    Semantics.Templates.NounPhrase.headed (Semantics.NounWord.subtype Semantics.Definitions.saga) Semantics.Templates.NounPhrase.this_
 }

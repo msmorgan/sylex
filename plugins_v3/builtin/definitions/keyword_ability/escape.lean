@@ -6,7 +6,8 @@ keyword escape (cost : Cost) : Ability := {
   },
   spelling := "escape—<cost>.",
   body :=
-    [ static
-        (can you
-          (cast this_ (from_ := yourGraveyard) (payment := .payingInstead cost))) ]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.can (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
+          (Semantics.Definitions.cast Semantics.Templates.NounPhrase.this_ (Option.some Semantics.Templates.Location.yourGraveyard)
+            (Semantics.Templates.PlayPayment.payingInstead cost)))]
 }

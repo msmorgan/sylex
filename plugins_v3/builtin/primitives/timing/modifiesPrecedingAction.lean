@@ -1,0 +1,8 @@
+/-- A rider that modifies the meaning of the action before it, in force only for that action's
+event: "It can't be regenerated", "The damage can't be prevented" [CR#608.2c]. -/
+-- [CR#608.2c]
+primitive modifiesPrecedingAction : Duration := {
+  spelling := "It can't be regenerated",
+  body :=
+    Semantics.Primitives.Duration.modifiesPrecedingAction
+}

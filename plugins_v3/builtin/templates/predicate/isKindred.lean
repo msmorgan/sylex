@@ -1,5 +1,5 @@
 template isKindred : Predicate := {
   spelling := "kindred",
   body :=
-    .hasType Semantics.CardType.kindred
+    Semantics.Templates.Predicate.hasType Semantics.CardType.kindred
 }

@@ -1,0 +1,7 @@
+/-- "Gains the text of <source>'s rules text" (splice [CR#702.47a,612.10]). -/
+-- [CR#702.47a,612.10]
+primitive appendTextOf (source : NounPhrase) : TextChange := {
+  spelling := "Gains the text of <source>'s rules text",
+  body :=
+    Semantics.Primitives.TextChange.appendTextOf source
+}

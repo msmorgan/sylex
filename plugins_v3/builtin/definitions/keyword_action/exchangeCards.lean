@@ -3,7 +3,5 @@ action exchangeCards (left right : NounPhrase) : Action := {
   deed := "exchange",
   spelling := "exchange <left> and <right>",
   body :=
-    .exchange
-        (.cardsAcross left
-          right)
+    Semantics.Templates.Action.actionExchange (Semantics.Templates.Exchanged.exchangedCardsAcross left right)
 }

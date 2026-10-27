@@ -1,5 +1,5 @@
 template fullParty : Condition := {
   spelling := "you have a full party",
   body :=
-    fullPartyOf .you
+    Semantics.Templates.Condition.fullPartyOf Semantics.Templates.NounPhrase.you
 }

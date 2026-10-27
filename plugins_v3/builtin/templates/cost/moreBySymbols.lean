@@ -1,0 +1,7 @@
+/-- "costs <cost> more", symbol by symbol [CR#702.48c,118.7] -/
+-- [CR#702.48c,118.7]
+template moreBySymbols (cost : ManaCostTerm) : CostShift := {
+  spelling := "costs <cost> more",
+  body :=
+    Semantics.Templates.CostShift.costShiftBySymbols (Semantics.Delta.up cost) Bool.false
+}

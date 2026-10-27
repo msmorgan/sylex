@@ -1,5 +1,5 @@
 template thisArtifact : NounPhrase := {
   spelling := "this artifact",
   body :=
-    .headed (.type Semantics.CardType.artifact) .this
+    Semantics.Templates.NounPhrase.headed (Semantics.NounWord.type Semantics.CardType.artifact) Semantics.Templates.NounPhrase.this_
 }

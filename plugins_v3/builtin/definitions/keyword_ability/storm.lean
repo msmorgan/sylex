@@ -5,12 +5,19 @@ keyword storm : Ability := {
   lexical := { lemma := "storm" },
   spelling := "storm",
   body :=
-    [ when (does you (cast thisSpell))
-        (sequentially
-          [ .copy .fromStack thisSpell
-              (eventCount
-                (cast (a (and [isSpell, isOther])))
-                (a .isPlayer) earlierThisTurn)
+    [Semantics.Templates.Ability.when
+        (Semantics.Templates.GameEvent.does (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
+          (Semantics.Definitions.cast Semantics.Templates.NounPhrase.thisSpell))
+        (Semantics.Templates.Action.sequentially
+          [Semantics.Templates.Action.copy Semantics.CopySort.fromStack Semantics.Templates.NounPhrase.thisSpell
+              (Semantics.Templates.Amount.eventCount
+                (Semantics.Definitions.cast
+                  (Semantics.Templates.NounPhrase.a
+                    (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isSpell, Semantics.Templates.Predicate.isOther])))
+                (Semantics.Templates.Subject.actor (Semantics.Templates.NounPhrase.a Semantics.Templates.Predicate.isPlayer))
+                Semantics.Templates.Duration.earlierThisTurn)
               [],
-            may (.chooseNewTargets (.pro (.word .copy) .many)) ]) ]
+            Semantics.Templates.Action.may
+              (Semantics.Templates.Action.chooseNewTargets
+                (Semantics.Templates.NounPhrase.nounPhrasePro (Semantics.Reach.word Semantics.NounWord.copy) Semantics.Plurality.many))])]
 }

@@ -3,5 +3,5 @@ action exchangeValues (left right : Amount) : Action := {
   deed := "exchange",
   spelling := "exchange <left> and <right>",
   body :=
-    .exchange (.values left right)
+    Semantics.Templates.Action.actionExchange (Semantics.Templates.Exchanged.exchangedValues left right)
 }

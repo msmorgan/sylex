@@ -13,8 +13,11 @@ keyword typecycling (quality : Predicate) (cost : Cost) : Ability := {
   -- TODO(spelling): Islandcycling [cost] / basic landcycling [cost]; the Predicate needs a
   -- lowercase bound stem rather than its ordinary rendered phrase.
   body :=
-    [ activated (.compound [cost, .perform (discard this_)])
-        (sequentially
-          [ search yourLibrary (a (and [isCard, quality])),
-            reveal it, putInto it hand, shuffle ]) ]
+    [Semantics.Templates.Ability.activated
+        (Semantics.Templates.Cost.compound [cost, Semantics.Templates.Cost.perform (Semantics.Definitions.discard Semantics.Templates.NounPhrase.this_)])
+        (Semantics.Templates.Action.sequentially
+          [Semantics.Definitions.search Semantics.Templates.Location.yourLibrary
+              (Semantics.Templates.NounPhrase.a (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isCard, quality])),
+            Semantics.Definitions.reveal Semantics.Templates.NounPhrase.it,
+            Semantics.Templates.Action.putInto Semantics.Templates.NounPhrase.it Semantics.Templates.Location.hand, Semantics.Definitions.shuffle])]
 }

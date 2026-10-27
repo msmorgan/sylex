@@ -595,7 +595,7 @@ example (card token action keyword counter subtype template primitive designatio
    ability_word, card_type, sba, conferral]
 
 /-- Declaration modifiers and documentation pass through to the generated template. -/
-@[inline] private template annotated : Predicate := { body := .isCard }
+@[inline] private template annotated : Predicate := { body := Templates.Predicate.isCard }
 example : annotated = Predicate.isCard := rfl
 
 /-- error: Unknown field speling in template declaration -/
@@ -603,7 +603,7 @@ example : annotated = Predicate.isCard := rfl
 template misspelledMetadata : Predicate := { speling := "card", body := .isCard }
 
 primitive token : NounWord := { spelling := "token", body := .token }
-template token (spec : TokenSpec) : CreationSpec := { body := .token spec [] }
+template token (spec : TokenSpec) : CreationSpec := { body := Templates.CreationSpec.token spec [] }
 primitive atom : Predicate := { lexical := { lemma := "card" }, body := .isCard }
 template shared : Predicate := { body := atom }
 template shared : Condition := { body := exists_ atom }
@@ -611,7 +611,7 @@ template shared : Condition := { body := exists_ atom }
 example : (shared : Predicate) = atom := rfl
 example : (shared : Condition) = exists_ atom := rfl
 example : (creature : Predicate) = isCreature := rfl
-example : (creature : NounWord) = Definitions.NounWord.creature := rfl
+example : (creature : NounWord) = Templates.NounWord.creature := rfl
 example : (creature : CardType) = Semantics.CardType.creature := rfl
 example : (and [atom] : Predicate) = Templates.Predicate.and [atom] := rfl
 example : (and [exists_ atom] : Condition) = Templates.Condition.and [exists_ atom] := rfl
@@ -643,8 +643,13 @@ action optOut (subject : NounPhrase) := { body := sacrifice (.inCaller subject) 
 example (subject : NounPhrase) : optOut subject =
     .ownScope (some (.action "optOut" .none)) (sacrifice (.inCaller subject)) := rfl
 
+primitive dynamicActor : NounPhrase := {
+  -- TODO(spelling): The actor at the current handoff, without a generated Binding Identity.
+  body := Semantics.Primitives.NounPhrase.actor
+}
+
 action actorAcrossControllerHandoff := {
-  body := instruct (controllerOf theActor) (instruct .actor (sacrifice theActor))
+  body := instruct (controllerOf theActor) (instruct dynamicActor (sacrifice theActor))
 }
 
 theorem generatedActorKeepsDynamicHandoffReads :
@@ -921,7 +926,7 @@ example : Ability.keywordFirst.label = KeywordLabel.named "keywordFirst" := rfl
 example : Action.keywordFirst = .ownScope (some (.action "keywordFirst" .none)) (draw 1) := rfl
 
 action paymentArgument (payment : PlayPayment) := {
-  body := .procedure .cast this_ payment none none none,
+  body := Templates.Action.procedure .cast this_ payment none none none,
 }
 example (payment : PlayPayment) : paymentArgument payment =
     .ownScope (some (.action "paymentArgument" .none))
@@ -1034,3 +1039,57 @@ theorem registryConferralMayReferToItsCatalogValue :
 theorem appliedReturnTypeInBundle : bundlePredicates = [hasSubtype bundleBearer] := rfl
 
 end Semantics.Proofs.Authoring.RegistryBundle
+
+namespace Semantics.Proofs.Authoring.PrimitiveBoundary
+
+open Semantics Semantics.Templates Semantics.Definitions
+
+/-- error: Only primitive declarations may reference raw semantic constructor Semantics.Primitives.Action.skipPart -/
+#guard_msgs in
+template rawPrimitiveWrapper : Action := {
+  body := Semantics.Primitives.Action.skipPart .combat 1
+}
+
+/-- error: Only primitive declarations may reference raw semantic constructor Semantics.Action.skipPart -/
+#guard_msgs in
+template rawAnonymousConstructor : Action := { body := .skipPart .combat 1 }
+
+/-- error: Only primitive declarations may reference raw semantic constructor Semantics.Action.skipPart -/
+#guard_msgs in
+action rawActionConstructor := { body := .skipPart .combat 1 }
+
+/-- error: Only primitive declarations may reference raw semantic constructor Semantics.Primitives.Action.skipPart -/
+#guard_msgs in
+template rawDefaultConstructor
+    (effect : Action := Primitives.Action.skipPart .combat 1) : Action := {
+  body := effect
+}
+
+/-- error: Only primitive declarations may reference raw semantic constructor Semantics.Predicate.and -/
+#guard_msgs in
+template rawConstructorAlias : Predicate := { body := Semantics.Predicate.and [] }
+
+primitive skipCombatPrimitive : Action := {
+  -- TODO(spelling): Test fixture for the constructor boundary.
+  body := Semantics.Primitives.Action.skipPart .combat 1
+}
+
+template skipCombatTemplate : Action := {
+  spelling := "skip your next combat phase",
+  body := skipCombatPrimitive
+}
+
+theorem primitiveAndTemplatePreserveTheConstructor :
+    skipCombatTemplate = Action.skipPart .combat 1 := rfl
+
+template separateAlternatives (subject : NounPhrase) : Predicate := {
+  body := Templates.Predicate.or [controlledBy subject, ownedBy subject]
+}
+
+/-- Each alternative introduces its own mention; neither branch borrows the other's identity. -/
+theorem alternativeMentionsStayInTheirBranches (subject : NounPhrase) :
+    separateAlternatives subject = Predicate.or
+      [controlledBy (.firstMention "separateAlternatives.subject" subject),
+       ownedBy (.firstMention "separateAlternatives.subject" subject)] := rfl
+
+end Semantics.Proofs.Authoring.PrimitiveBoundary

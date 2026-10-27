@@ -1,5 +1,5 @@
 template thisCreature : NounPhrase := {
   spelling := "this creature",
   body :=
-    .headed (.type Semantics.CardType.creature) .this
+    Semantics.Templates.NounPhrase.headed (Semantics.NounWord.type Semantics.CardType.creature) Semantics.Templates.NounPhrase.this_
 }

@@ -3,8 +3,8 @@ action manifest (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "manifest", frames := [Monotransitive] }] },
   spelling := "manifest <subject>",
   body :=
-    sequentially
-      [ .turnFaceDown subject faceDownCreature,
-        .move subject .anyLocation battlefield .arrival
-          [(.faceDown faceDownCreature)] ]
+    Semantics.Templates.Action.sequentially
+      [Semantics.Templates.Action.turnFaceDown subject Semantics.Templates.FaceDown.faceDownCreature,
+        Semantics.Templates.Action.actionMove subject Semantics.Templates.Location.wherever (Option.some Semantics.Templates.Location.battlefield)
+          Semantics.ObservationPoint.arrival [Semantics.Templates.MoveRider.faceDownAs Semantics.Templates.FaceDown.faceDownCreature]]
 }

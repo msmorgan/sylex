@@ -7,6 +7,12 @@ keyword morph (cost : Cost) : Ability := {
   -- TODO(spelling): morph [mana cost] / morph—[verbal cost]; separator and terminal period depend
   -- on the Cost structure.
   body :=
-    [ static (can you (cast thisCard (payment := .faceDown faceDownCreature (mana [generic 3])))),
-      static (.specialAction none none cost (turnFaceUp this_)) ]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.can (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
+          (Semantics.Definitions.cast Semantics.Templates.NounPhrase.thisCard Option.none
+            (Semantics.Templates.PlayPayment.playPaymentFaceDown Semantics.Templates.FaceDown.faceDownCreature
+              (Semantics.Templates.Cost.mana [Semantics.Templates.ManaSymbol.generic 3])))),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.staticSpecSpecialAction Option.none Option.none cost
+          (Semantics.Templates.Action.turnFaceUp Semantics.Templates.NounPhrase.this_))]
 }

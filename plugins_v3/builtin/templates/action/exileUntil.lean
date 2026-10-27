@@ -2,5 +2,5 @@
 template exileUntil (subject : NounPhrase) (event : GameEvent) : Action := {
   spelling := "exile <subject> until <event>",
   body :=
-    .holdUntil (exile subject) event
+    Semantics.Templates.Action.holdUntil (Semantics.Definitions.exile subject) event
 }

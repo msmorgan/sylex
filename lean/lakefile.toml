@@ -19,7 +19,7 @@ text = true
 [[lean_lib]]
 name = "Semantics"
 extraDepTargets = ["builtinBundle"]
-roots = ["Semantics", "Semantics.Check", "Semantics.Primitives", "Semantics.Templates", "Semantics.Definitions"]
+roots = ["Semantics", "Semantics.Check", "Semantics.Primitives", "Semantics.Definitions"]
 
 [[lean_lib]]
 name = "SemanticsCards"

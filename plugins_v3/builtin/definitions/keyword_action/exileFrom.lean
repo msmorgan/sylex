@@ -3,6 +3,5 @@ action exileFrom (subject : NounPhrase) (from_ : Location) : Action := {
   deed := "exile",
   spelling := "exile <subject> from <from_>",
   body :=
-    .move subject from_
-        exileZone .arrival []
+    Semantics.Templates.Action.actionMove subject from_ (Option.some Semantics.Templates.Location.exileZone) Semantics.ObservationPoint.arrival []
 }

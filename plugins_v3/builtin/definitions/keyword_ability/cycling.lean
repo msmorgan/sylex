@@ -10,5 +10,7 @@ keyword cycling (cost : Cost) : Ability := {
   -- TODO(spelling): cycling [mana cost] / cycling—[verbal cost]; separator and terminal period
   -- depend on the Cost structure.
   body :=
-    [activated (.compound [cost, .perform (discard this_)]) (draw 1)]
+    [Semantics.Templates.Ability.activated
+        (Semantics.Templates.Cost.compound [cost, Semantics.Templates.Cost.perform (Semantics.Definitions.discard Semantics.Templates.NounPhrase.this_)])
+        (Semantics.Templates.Action.draw 1)]
 }

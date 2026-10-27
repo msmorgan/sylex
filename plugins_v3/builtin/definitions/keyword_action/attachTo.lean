@@ -4,6 +4,5 @@ action attachTo (subject host : NounPhrase) : Action := {
   deed := "attach",
   spelling := "attach <subject> to <host>",
   body :=
-    .attachment .attached subject
-        (some host)
+    Semantics.Templates.Action.attachment Semantics.AttachMove.attached subject (Option.some host)
 }

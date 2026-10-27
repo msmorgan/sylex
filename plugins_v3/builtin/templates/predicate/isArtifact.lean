@@ -1,5 +1,5 @@
 template isArtifact : Predicate := {
   spelling := "artifact",
   body :=
-    .hasType Semantics.CardType.artifact
+    Semantics.Templates.Predicate.hasType Semantics.CardType.artifact
 }

@@ -6,6 +6,5 @@ action cast (subject : NounPhrase) (from_ : Option Location := none)
   -- substitution cannot branch on optional fields or supply contextual agreement and morphology.
   lexical := { verbs := [{ lemma := "cast", past := "cast", frames := [Monotransitive] }] },
   body :=
-    .procedure .cast subject payment
-        resulting from_ none
+    Semantics.Templates.Action.procedure Semantics.Procedure.cast subject payment resulting from_ Option.none
 }

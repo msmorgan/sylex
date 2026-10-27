@@ -6,12 +6,18 @@ action connive (amount : Amount := 1) : Action := {
   permanent := performs,
   spelling := "connive <amount>",
   body :=
-    instruct (controllerOf theActor)
-        (sequentially
-          [ draw amount,
-            discard (counted (.exactlyOf amount) .isCard),
-            .doForEach (allOf (and [non isLand, .isCard,
-                .did { subj := .any, action := discard .which, within := some .thisWay }]))
-              (putCounters 1 p1p1Counter
-                theActor) ])
+    Semantics.Templates.Action.instruct (Semantics.Templates.NounPhrase.controllerOf Semantics.Templates.NounPhrase.theActor)
+      (Semantics.Templates.Action.sequentially
+        [Semantics.Templates.Action.draw amount,
+          Semantics.Definitions.discard
+            (Semantics.Templates.NounPhrase.counted (Semantics.Templates.Quantity.exactlyOf amount) Semantics.Templates.Predicate.isCard),
+          Semantics.Templates.Action.doForEach
+            (Semantics.Templates.NounPhrase.allOf
+              (Semantics.Templates.Predicate.and
+                [Semantics.Templates.Predicate.non Semantics.Templates.Predicate.isLand, Semantics.Templates.Predicate.isCard,
+                  Semantics.Templates.Predicate.predicateDid
+                    { subj := Semantics.Templates.Subject.any, action := Semantics.Definitions.discard Semantics.Templates.NounPhrase.which,
+                      within := Option.some Semantics.Templates.LookbackSpan.thisWay }]))
+            (Semantics.Templates.Action.putCounters 1 (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.p1p1Counter)
+              Semantics.Templates.NounPhrase.theActor)])
 }

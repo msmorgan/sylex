@@ -3,7 +3,5 @@ action exchangeControl (left right : NounPhrase) : Action := {
   deed := "exchange",
   spelling := "exchange control of <left> and <right>",
   body :=
-    .exchange
-        (.controlOf left
-          right)
+    Semantics.Templates.Action.actionExchange (Semantics.Templates.Exchanged.exchangedControlOf left right)
 }

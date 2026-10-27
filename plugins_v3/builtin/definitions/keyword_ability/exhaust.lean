@@ -2,5 +2,6 @@ keyword exhaust (ability : Ability) : Ability := {
   lexical := { lemma := "exhaust", parameters := [[DashAbility]] },
   spelling := "exhaust — <ability>",
   body :=
-    [.qualified ability none oncePerObject none none]
+    [Semantics.Templates.Ability.qualified ability Option.none (Option.some Semantics.Templates.UsageLimit.oncePerObject) Option.none
+        Option.none]
 }

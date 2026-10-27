@@ -2,7 +2,10 @@
 template isOutlaw : Predicate := {
   spelling := "outlaw",
   body :=
-    .coord .andOr
-      [ .hasSubtype assassin, .hasSubtype mercenary, .hasSubtype pirate, .hasSubtype rogue,
-        .hasSubtype warlock ]
+    Semantics.Templates.Predicate.predicateCoord Semantics.Coordinator.andOr
+      [Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.assassin,
+        Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.mercenary,
+        Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.pirate,
+        Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.rogue,
+        Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.warlock]
 }

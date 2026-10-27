@@ -6,6 +6,5 @@ action activate (subject : NounPhrase) (from_ : Option Location := none)
   -- substitution cannot branch on optional fields or supply contextual agreement and morphology.
   lexical := { verbs := [{ lemma := "activate", frames := [Monotransitive, Intransitive] }] },
   body :=
-    .procedure .activate subject
-        payment resulting from_ none
+    Semantics.Templates.Action.procedure Semantics.Procedure.activate subject payment resulting from_ Option.none
 }

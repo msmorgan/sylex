@@ -6,5 +6,5 @@ template destroyCantRegenerate (subject : NounPhrase) : Action := {
   -- TODO(spelling): Destroy <subject>. It/They can't be regenerated. String substitution cannot
   -- choose the pronoun from subject plurality.
   body :=
-    doUnderProhibition (destroy subject) (regeneration (.pro .bare (NounPhrase.inCaller subject).plur))
+    doUnderProhibition (destroy subject) (regeneration (Semantics.Templates.NounPhrase.nounPhrasePro .bare (NounPhrase.inCaller subject).plur))
 }

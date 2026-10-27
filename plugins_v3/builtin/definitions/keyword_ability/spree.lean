@@ -2,5 +2,6 @@ keyword spree : Ability := {
   lexical := { lemma := "spree" },
   spelling := "spree",
   body :=
-    [static (.modeChoice (.setQuantity (orMore 1)))]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.modeChoice (Semantics.Templates.ModeChange.setQuantity (Semantics.Templates.Quantity.orMore 1)))]
 }

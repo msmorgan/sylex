@@ -1,0 +1,7 @@
+/-- "if <subj> would <action>": the event a replacement watches [CR#614.1]. -/
+-- [CR#614.1]
+primitive would (subj : Subject) (action : Action) : WouldClause := {
+  spelling := "if <subj> would <action>",
+  body :=
+    Semantics.Primitives.WouldClause.would subj action
+}

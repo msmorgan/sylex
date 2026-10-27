@@ -6,6 +6,5 @@ action voteStartingWith (first : NounPhrase) (disclosure : Disclosure)
   lexical := { verbs := [{ lemma := "vote", frames := [(Prepositional ["for"]), Intransitive] }] },
   deed := "vote",
   body :=
-    .vote (some first) disclosure
-        ballot none
+    Semantics.Templates.Action.actionVote (Option.some first) disclosure ballot Option.none
 }

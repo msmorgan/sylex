@@ -16,20 +16,46 @@ keyword suspend (amount : Amount) (cost : Cost) : Ability := {
   },
   spelling := "suspend <amount>—<cost>",
   body :=
-    [ static
-        (specialAction (whileTrue (couldBeginToCast you thisCard yourHand)) cost
-          (exileWithCounters thisCard amount timeCounter)),
-      at_ (beginningOfYour .upkeep)
-        (if_ := some (is thisCard
-          (and [in_ exileZone, hasKeyword suspend, .hasCounters (some timeCounter)])))
-        (removeCounters (oneThrough 1) timeCounter thisCard),
-      when (does any (removeCounters theLast timeCounter thisCard))
-        (if_ := some (is thisCard (in_ exileZone)))
-        (sequentially
-          [ may (play thisCard (payment := withoutPaying)),
-            doIf (did you (cast (a (and [isCreature, isSpell]))) thisWay)
-              (gain (that .spell) haste
-                (some (forAsLongAs
-                  (or [is (that .spell) youControl, is (becomes (that .spell)) youControl]))))
-              none ]) ]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.specialAction
+          (Semantics.Templates.Timing.whileTrue
+            (Semantics.Templates.Condition.couldBeginToCast Semantics.Templates.NounPhrase.you Semantics.Templates.NounPhrase.thisCard
+              Semantics.Templates.Location.yourHand))
+          cost
+          (Semantics.Definitions.exileWithCounters Semantics.Templates.NounPhrase.thisCard amount Semantics.Definitions.timeCounter)),
+      Semantics.Templates.Ability.at_ (Semantics.Templates.GameEvent.beginningOfYour Semantics.TurnPart.upkeep)
+        (Semantics.Templates.Action.removeCounters (Semantics.Templates.Quantity.oneThrough 1)
+          (Option.some (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.timeCounter)) Semantics.Templates.NounPhrase.thisCard)
+        [] [] Option.none Option.none Option.none
+        (Option.some
+          (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.thisCard
+            (Semantics.Templates.Predicate.and
+              [Semantics.Templates.Predicate.in_ Semantics.Templates.Location.exileZone,
+                Semantics.Templates.Predicate.hasKeyword (Semantics.Templates.KeywordTerm.theKeyword Semantics.Definitions.suspend.label),
+                Semantics.Templates.Predicate.hasCounter (Option.some Semantics.Definitions.timeCounter)]))),
+      Semantics.Templates.Ability.when
+        (Semantics.Templates.GameEvent.does Semantics.Templates.Subject.any
+          (Semantics.Templates.Action.removeCounters Semantics.Templates.Quantity.theLast
+            (Option.some (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.timeCounter)) Semantics.Templates.NounPhrase.thisCard))
+        (Semantics.Templates.Action.sequentially
+          [Semantics.Templates.Action.may
+              (Semantics.Definitions.play Semantics.Templates.NounPhrase.thisCard Option.none Semantics.Templates.PlayPayment.withoutPaying),
+            Semantics.Templates.Action.doIf
+              (Semantics.Templates.Condition.did (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
+                (Semantics.Definitions.cast
+                  (Semantics.Templates.NounPhrase.a
+                    (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isCreature, Semantics.Templates.Predicate.isSpell])))
+                Semantics.Templates.LookbackSpan.thisWay)
+              (Semantics.Templates.Action.gain (Semantics.Templates.NounPhrase.that Semantics.NounWord.spell) Semantics.Definitions.haste
+                (Option.some
+                  (Semantics.Templates.Duration.forAsLongAs
+                    (Semantics.Templates.Condition.or
+                      [Semantics.Templates.Condition.is (Semantics.Templates.NounPhrase.that Semantics.NounWord.spell)
+                          Semantics.Templates.Predicate.youControl,
+                        Semantics.Templates.Condition.is
+                          (Semantics.Templates.NounPhrase.becomes (Semantics.Templates.NounPhrase.that Semantics.NounWord.spell))
+                          Semantics.Templates.Predicate.youControl]))))])
+        [] [] Option.none Option.none Option.none
+        (Option.some
+          (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.thisCard (Semantics.Templates.Predicate.in_ Semantics.Templates.Location.exileZone)))]
 }

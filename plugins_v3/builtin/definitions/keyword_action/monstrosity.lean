@@ -6,9 +6,12 @@ action monstrosity (amount : Amount) : Action := {
   permanent := isAbout,
   spelling := "monstrosity <amount>",
   body :=
-    doIf (not (is .actor (hasDesignation monstrous)))
-        (sequentially
-          [ putCounters amount p1p1Counter .actor,
-            gainDesignation .actor monstrous ])
-        none
+    Semantics.Templates.Action.doIf
+      (Semantics.Templates.Condition.not
+        (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.actor
+          (Semantics.Templates.Predicate.hasDesignation Semantics.Definitions.monstrous)))
+      (Semantics.Templates.Action.sequentially
+        [Semantics.Templates.Action.putCounters amount (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.p1p1Counter)
+            Semantics.Templates.NounPhrase.actor,
+          Semantics.Templates.Action.gainDesignation Semantics.Templates.NounPhrase.actor Semantics.Definitions.monstrous])
 }

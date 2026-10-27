@@ -2,7 +2,13 @@ keyword skulk : Ability := {
   lexical := { lemma := "skulk" },
   spelling := "skulk",
   body :=
-    [ static
-        (cant (.by (allOf (and [isCreature, hasPower .greater (powerOf thisCreature)])))
-          (.block thisCreature)) ]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.cant
+          (Semantics.Templates.Subject.by_
+            (Semantics.Templates.NounPhrase.allOf
+              (Semantics.Templates.Predicate.and
+                [Semantics.Templates.Predicate.isCreature,
+                  Semantics.Templates.Predicate.hasPower Semantics.Comparator.greater
+                    (Semantics.Templates.Amount.powerOf Semantics.Templates.NounPhrase.thisCreature)])))
+          (Semantics.Templates.Action.block Semantics.Templates.NounPhrase.thisCreature))]
 }

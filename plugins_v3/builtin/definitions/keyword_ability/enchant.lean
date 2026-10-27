@@ -16,22 +16,44 @@ keyword enchant (subject : Predicate) : Ability := {
   },
   spelling := "enchant <subject>",
   body :=
-    [ static (.addsTarget thisAura subject),
-      static (mayBeAttachedTo thisAura (allOf subject)),
-      static
-        (replace (would thisAura enter)
-          (doIf (not (exists_ (legalHostOf thisAura)))
-            (instead (doIf (is thisAura (in_ stack)) (putInto thisAura graveyard))))),
-      static
-        (replace
-          (would .any
-            (.move thisAura (not stack) battlefield .arrival [.not (.attachedTo .any)]))
-          (doIf (exists_ (legalHostOf thisAura))
-            (before (choose (a (legalHostOf thisAura)))
-              (some (alongside (attachTo thisAura it)))))),
-      static
-        (replace
-          (would thisAura
-            (enter (riders := [.attachedTo .any, .not (.attachedTo (a (legalHostOf thisAura)))])))
-          (instead (doIf (is thisAura (in_ stack)) (putInto thisAura graveyard)))) ]
+    [Semantics.Templates.Ability.static (Semantics.Templates.StaticSpec.addsTarget Semantics.Templates.NounPhrase.thisAura subject),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.mayBeAttachedTo Semantics.Templates.NounPhrase.thisAura (Semantics.Templates.NounPhrase.allOf subject)),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.replace
+          (Semantics.Templates.WouldClause.would (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.thisAura) Semantics.Templates.Action.enter)
+          (Semantics.Templates.Replacement.doIf
+            (Semantics.Templates.Condition.not
+              (Semantics.Templates.Condition.exists_ (Semantics.Templates.Predicate.legalHostOf Semantics.Templates.NounPhrase.thisAura)))
+            (Semantics.Templates.Replacement.instead
+              (Semantics.Templates.Action.doIf
+                (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.thisAura (Semantics.Templates.Predicate.in_ Semantics.Templates.Location.stack))
+                (Semantics.Templates.Action.putInto Semantics.Templates.NounPhrase.thisAura Semantics.Templates.Location.graveyard))))),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.replace
+          (Semantics.Templates.WouldClause.would Semantics.Templates.Subject.any
+            (Semantics.Templates.Action.actionMove Semantics.Templates.NounPhrase.thisAura
+              (Semantics.Templates.Location.not Semantics.Templates.Location.stack) (Option.some Semantics.Templates.Location.battlefield)
+              Semantics.ObservationPoint.arrival
+              [Semantics.Templates.MoveRider.moveRiderNot (Semantics.Templates.MoveRider.moveRiderAttachedTo Semantics.Templates.NounPhrase.any)]))
+          (Semantics.Templates.Replacement.doIf
+            (Semantics.Templates.Condition.exists_ (Semantics.Templates.Predicate.legalHostOf Semantics.Templates.NounPhrase.thisAura))
+            (Semantics.Templates.Replacement.before
+              (Semantics.Templates.Action.choose
+                (Semantics.Templates.NounPhrase.a (Semantics.Templates.Predicate.legalHostOf Semantics.Templates.NounPhrase.thisAura)))
+              (Option.some
+                (Semantics.Templates.Replacement.alongside
+                  (Semantics.Definitions.attachTo Semantics.Templates.NounPhrase.thisAura Semantics.Templates.NounPhrase.it)))))),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.replace
+          (Semantics.Templates.WouldClause.would (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.thisAura)
+            (Semantics.Templates.Action.enter Option.none
+              [Semantics.Templates.MoveRider.moveRiderAttachedTo Semantics.Templates.NounPhrase.any,
+                Semantics.Templates.MoveRider.moveRiderNot
+                  (Semantics.Templates.MoveRider.moveRiderAttachedTo
+                    (Semantics.Templates.NounPhrase.a (Semantics.Templates.Predicate.legalHostOf Semantics.Templates.NounPhrase.thisAura)))]))
+          (Semantics.Templates.Replacement.instead
+            (Semantics.Templates.Action.doIf
+              (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.thisAura (Semantics.Templates.Predicate.in_ Semantics.Templates.Location.stack))
+              (Semantics.Templates.Action.putInto Semantics.Templates.NounPhrase.thisAura Semantics.Templates.Location.graveyard))))]
 }

@@ -6,25 +6,42 @@ keyword protection (quality : Predicate) : Ability := {
   -- TODO(spelling): Protection from red / protection from creatures; the quality needs
   -- context-dependent article or number inflection, not literal substitution.
   body :=
-    [ static
-        (cant
-          (.by
-            (allOf
-              (or
-                [ and [isSpell, quality],
-                  .abilityOf (allOf (and [.isSource, quality])) ])))
-          (.target this_)),
-      static
-        (cant any (attachTo (allOf (and [.hasSubtype aura, quality])) this_)),
-      static
-        (cant any
-          (attachTo
-            (allOf
-              (and [or [.hasSubtype equipment, .hasSubtype fortification], quality]))
-            thisPermanent)),
-      static
-        (replace
-          (would (by_ (allOf (and [.isSource, quality]))) (dealDamage anyAmount this_))
-          (instead (preventDamage allDamage))),
-      static (cant (.by (allOf (and [isCreature, quality]))) (.block thisCreature)) ]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.cant
+          (Semantics.Templates.Subject.by_
+            (Semantics.Templates.NounPhrase.allOf
+              (Semantics.Templates.Predicate.or
+                [Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isSpell, quality],
+                  Semantics.Templates.Predicate.abilityOf
+                    (Semantics.Templates.NounPhrase.allOf
+                      (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isSource, quality]))])))
+          (Semantics.Templates.Action.target Semantics.Templates.NounPhrase.this_)),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.cant Semantics.Templates.Subject.any
+          (Semantics.Definitions.attachTo
+            (Semantics.Templates.NounPhrase.allOf
+              (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.aura, quality]))
+            Semantics.Templates.NounPhrase.this_)),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.cant Semantics.Templates.Subject.any
+          (Semantics.Definitions.attachTo
+            (Semantics.Templates.NounPhrase.allOf
+              (Semantics.Templates.Predicate.and
+                [Semantics.Templates.Predicate.or
+                    [Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.equipment,
+                      Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.fortification],
+                  quality]))
+            Semantics.Templates.NounPhrase.thisPermanent)),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.replace
+          (Semantics.Templates.WouldClause.would
+            (Semantics.Templates.Subject.by_
+              (Semantics.Templates.NounPhrase.allOf (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isSource, quality])))
+            (Semantics.Templates.Action.dealDamage Semantics.Templates.Amount.anyAmount Semantics.Templates.NounPhrase.this_))
+          (Semantics.Templates.Replacement.instead (Semantics.Templates.Action.preventDamage Semantics.Templates.PreventCut.allDamage))),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.cant
+          (Semantics.Templates.Subject.by_
+            (Semantics.Templates.NounPhrase.allOf (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isCreature, quality])))
+          (Semantics.Templates.Action.block Semantics.Templates.NounPhrase.thisCreature))]
 }

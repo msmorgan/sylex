@@ -6,14 +6,22 @@ keyword encore (cost : Cost) : Ability := {
   lexical := { lemma := "encore", parameters := [[Cost]] },
   spelling := "encore <cost>",
   body :=
-    [ activatedOnlyDuring
-        (.compound [cost, .perform (exileFrom thisCard yourGraveyard)])
-        (sequentially
-          [ .doForEach eachOpponent
-              (sequentially
-                [ create 1 (copyOf this_),
-                  establishThroughout (must thatToken (.attack (some (that player)))) thisTurn ]),
-            gain thoseTokens (keyword haste),
-            atNext .endStep (sacrifice thoseTokens) ])
-        asSorcery ]
+    [Semantics.Templates.Ability.activatedOnlyDuring
+        (Semantics.Templates.Cost.compound
+          [cost,
+            Semantics.Templates.Cost.perform
+              (Semantics.Definitions.exileFrom Semantics.Templates.NounPhrase.thisCard Semantics.Templates.Location.yourGraveyard)])
+        (Semantics.Templates.Action.sequentially
+          [Semantics.Templates.Action.doForEach Semantics.Templates.NounPhrase.eachOpponent
+              (Semantics.Templates.Action.sequentially
+                [Semantics.Definitions.create 1 (Semantics.Templates.TokenSpec.copyOf Semantics.Templates.NounPhrase.this_),
+                  Semantics.Templates.Action.establishThroughout
+                    (Semantics.Templates.StaticSpec.must (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.thatToken)
+                      (Semantics.Templates.Action.attack (Option.some (Semantics.Templates.NounPhrase.that Semantics.Templates.NounWord.player))))
+                    Semantics.Templates.Duration.thisTurn]),
+            Semantics.Templates.Action.gain Semantics.Templates.NounPhrase.thoseTokens
+              (Semantics.Templates.keyword Semantics.Definitions.haste.label),
+            Semantics.Templates.Action.atNext Semantics.TurnPart.endStep
+              (Semantics.Definitions.sacrifice Semantics.Templates.NounPhrase.thoseTokens)])
+        Semantics.Templates.Timing.asSorcery]
 }

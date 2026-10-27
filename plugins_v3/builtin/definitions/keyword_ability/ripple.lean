@@ -6,16 +6,31 @@ keyword ripple (amount : Amount) : Ability := {
   lexical := { lemma := "ripple", parameters := [[Amount]] },
   spelling := "ripple <amount>",
   body :=
-    [ when (does you (cast thisSpell))
-        (may (reveal (.slice .top amount (libraryOf .you)))
-          (some
-            (sequentially
-              [ castWithoutPaying
-                  (.someOf (.counted anyNumber) (some (.shares .cardName .share this_))
-                    (those .card))
-                  none,
-                .move
-                  (allOf
-                    (and [isCard, was (reveal which) thisWay, not (was (cast which) thisWay)]))
-                  .anyLocation onBottom .arrival [.inOrder .anyOrder] ]))) ]
+    [Semantics.Templates.Ability.when
+        (Semantics.Templates.GameEvent.does (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
+          (Semantics.Definitions.cast Semantics.Templates.NounPhrase.thisSpell))
+        (Semantics.Templates.Action.may
+          (Semantics.Definitions.reveal
+            (Semantics.Templates.NounPhrase.slice Semantics.PileEnd.top amount
+              (Semantics.Templates.Location.libraryOf Semantics.Templates.NounPhrase.you)))
+          (Option.some
+            (Semantics.Templates.Action.sequentially
+              [Semantics.Definitions.castWithoutPaying
+                  (Semantics.Templates.NounPhrase.nounPhraseSomeOf (Semantics.Templates.SliceCount.sliceCountCounted Semantics.Templates.Quantity.anyNumber)
+                    (Option.some
+                      (Semantics.Templates.Predicate.shares Semantics.QualitySort.cardName Semantics.Agreement.share
+                        Semantics.Templates.NounPhrase.this_))
+                    (Semantics.Templates.NounPhrase.those Semantics.NounWord.card))
+                  Option.none,
+                Semantics.Templates.Action.actionMove
+                  (Semantics.Templates.NounPhrase.allOf
+                    (Semantics.Templates.Predicate.and
+                      [Semantics.Templates.Predicate.isCard,
+                        Semantics.Templates.Predicate.was (Semantics.Definitions.reveal Semantics.Templates.NounPhrase.which)
+                          (Option.some Semantics.Templates.LookbackSpan.thisWay),
+                        Semantics.Templates.Predicate.not
+                          (Semantics.Templates.Predicate.was (Semantics.Definitions.cast Semantics.Templates.NounPhrase.which)
+                            (Option.some Semantics.Templates.LookbackSpan.thisWay))]))
+                  Semantics.Templates.Location.wherever (Option.some Semantics.Templates.Location.onBottom)
+                  Semantics.ObservationPoint.arrival [Semantics.Templates.MoveRider.inOrder Semantics.Arrangement.anyOrder]])))]
 }

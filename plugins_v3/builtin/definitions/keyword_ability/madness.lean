@@ -3,15 +3,25 @@ keyword madness (cost : Cost) : Ability := {
   -- TODO(spelling): madness [mana cost] / madness—[verbal cost]; separator and terminal period
   -- depend on the Cost structure.
   body :=
-    [ static
-        (replace (would (a isPlayer) (discard thisCard))
-          (instead
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.replace
+          (Semantics.Templates.WouldClause.would (Semantics.Templates.Subject.actor (Semantics.Templates.NounPhrase.a Semantics.Templates.Predicate.isPlayer))
+            (Semantics.Definitions.discard Semantics.Templates.NounPhrase.thisCard))
+          (Semantics.Templates.Replacement.instead
             -- This escape crosses the nested discard scope, rather than wrapping a parameter.
-            (.ownScope (some discard.deed) (exileFrom (.inCaller thisCard) hand)))),
-      when
-        (.causes (.event (does any (discard thisCard))) (does any (exileFrom thisCard hand)))
-        (instruct (ownerOf thisCard)
-          (mayOrElse
-            (cast thisCard (from_ := exileZone) (payment := .payingInstead cost))
-            (putInto thisCard graveyard))) ]
+            (Semantics.Action.ownScope (Option.some Semantics.Definitions.Action.discard.deed)
+              (Semantics.Definitions.exileFrom (Semantics.NounPhrase.inCaller Semantics.Templates.NounPhrase.thisCard)
+                Semantics.Templates.Location.hand)))),
+      Semantics.Templates.Ability.when
+        (Semantics.Templates.GameEvent.causes
+          (Semantics.Templates.Causing.byEvent
+            (Semantics.Templates.GameEvent.does Semantics.Templates.Subject.any
+              (Semantics.Definitions.discard Semantics.Templates.NounPhrase.thisCard)))
+          (Semantics.Templates.GameEvent.does Semantics.Templates.Subject.any
+            (Semantics.Definitions.exileFrom Semantics.Templates.NounPhrase.thisCard Semantics.Templates.Location.hand)))
+        (Semantics.Templates.Action.instruct (Semantics.Templates.NounPhrase.ownerOf Semantics.Templates.NounPhrase.thisCard)
+          (Semantics.Templates.Action.mayOrElse
+            (Semantics.Definitions.cast Semantics.Templates.NounPhrase.thisCard (Option.some Semantics.Templates.Location.exileZone)
+              (Semantics.Templates.PlayPayment.payingInstead cost))
+            (Semantics.Templates.Action.putInto Semantics.Templates.NounPhrase.thisCard Semantics.Templates.Location.graveyard)))]
 }

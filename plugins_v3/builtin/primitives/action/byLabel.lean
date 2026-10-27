@@ -1,0 +1,6 @@
+/-- "for <options>", as a vote's choices -/
+primitive byLabel (options : List VoteLabel) : Ballot := {
+  spelling := "for <options>",
+  body :=
+    Semantics.Primitives.Ballot.byLabel options
+}

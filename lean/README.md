@@ -23,10 +23,11 @@ templates and definitions, card bench and proofs, and propagates build failures.
 
 The obsolete `plugins_v2` card/definition emitters and macro generator have
 been retired. `lean definitions` and `lean macros generate|check|align` are no
-longer commands. The ported v3 declarations now live in `Semantics/Templates.lean` and
-`Semantics/Definitions.lean` (re-exporting its `Semantics/Definitions/` submodules), maintained in Lean while the replacement DSL is
-designed; v2 RON output must not regenerate them. Existing v2 readers elsewhere remain until their consumers
-are cut over.
+longer commands. The v3 declarations live in `plugins_v3/builtin/`, one authored command
+per file. `Semantics/Definitions.lean` loads that bundle, placing primitives and templates in
+`Semantics.Templates` and the rules-defined vocabulary in `Semantics.Definitions`.
+v2 RON output must not regenerate them. Existing v2 readers elsewhere remain until their
+consumers are cut over.
 
 ### Retired tooling tests
 
@@ -47,14 +48,14 @@ longer apply to the native v3 workbench.
 ## Syntax, templates and definitions
 
 The syntax modules are `Words`, `Events`, `Abilities`, `Card`, and `Rules`;
-`Primitives` wraps their constructors, `Templates` holds the transparent phrasings, and
-`Definitions` the rules-defined vocabulary (card types, keyword actions and abilities, counters,
-tokens and designations), with the templates that name a card type or a catalog entry
-(`Definitions/Phrasings`: "historic", "this creature", "your party") and those written over a
-Definition. A constructor earns
-its place through an obligation or structural distinction its expansion would not carry. Common
-phrasings live in `Templates`: for example, "permanent", "colorless", "spell" and "attacking"
-expand into shared predicates.
+`Primitives` supplies constructor wrappers and authoring coercions. The builtin bundle's
+`primitives/` files expose individual constructors; `templates/` files compose those bindings
+into phrasings. `definitions/` contains rules-defined vocabulary (card types, keyword actions
+and abilities, counters, tokens and designations), and `rules/` contains rule rows.
+Only `primitive` commands may reference the raw constructor bindings. A constructor earns
+its place through an obligation or structural distinction its expansion would not carry.
+Common phrasings such as "permanent", "colorless", "spell" and "attacking" expand into shared
+predicates.
 
 Actions and their templates and definitions use dictionary forms (`exile`, `mill`, `gainLife`);
 static-spec templates use nouns (`modification`, `abilityGrant`), except that the deontic

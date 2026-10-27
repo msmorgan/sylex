@@ -4,6 +4,10 @@ subtype aura := {
   spelling := "Aura",
   kind := .enchantment,
   name := "Aura",
-  confers := [ .stateBased (.not (isAttached thisAura))
-        (.move thisAura (.zone .battlefield none) (some graveyard) .arrival []) ]
+  confers :=
+    [Semantics.Conferral.stateBased
+        (Semantics.Templates.Condition.not (Semantics.Templates.Condition.isAttached Semantics.Templates.NounPhrase.thisAura))
+        (Semantics.Templates.Action.actionMove Semantics.Templates.NounPhrase.thisAura
+          (Semantics.Templates.Location.zone Semantics.Zone.battlefield Option.none) (Option.some Semantics.Templates.Location.graveyard)
+          Semantics.ObservationPoint.arrival [])]
 }

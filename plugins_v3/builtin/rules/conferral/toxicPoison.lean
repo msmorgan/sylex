@@ -5,9 +5,20 @@ reading the sum of its toxic abilities' N values [CR#702.164b], not one per toxi
 keyword is bodiless, so combat damage from a creature with toxic 2 and toxic 1 gives three poison
 counters once. -/
 conferral toxicPoison := {
+
   body :=
-    { scope := .and [isCreature, .hasKeyword (.the (.named "toxic"))],
-      confer := .property
-        (asEvent (does this_ (dealDamage anyAmount (a isPlayer) (some .combat)))
-          (putCounters (totalToxicValue this_) poison (that player))) }
+    {
+      scope :=
+        Semantics.Templates.Predicate.and
+          [Semantics.Templates.Predicate.isCreature,
+            Semantics.Templates.Predicate.hasKeyword (Semantics.KeywordTerm.the (Semantics.KeywordLabel.named "toxic"))],
+      confer :=
+        Semantics.Conferral.property
+          (Semantics.Templates.StaticSpec.asEvent
+            (Semantics.Templates.GameEvent.does (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.this_)
+              (Semantics.Templates.Action.dealDamage Semantics.Templates.Amount.anyAmount
+                (Semantics.Templates.NounPhrase.a Semantics.Templates.Predicate.isPlayer) (Option.some Semantics.DamageKind.combat)))
+            (Semantics.Templates.Action.putCounters (Semantics.Templates.Amount.totalToxicValue Semantics.Templates.NounPhrase.this_)
+              (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.poison)
+              (Semantics.Templates.NounPhrase.that Semantics.Templates.NounWord.player))) }
 }

@@ -5,14 +5,15 @@ action detain (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "detain", frames := [Monotransitive] }] },
   spelling := "detain <subject>",
   body :=
-    establishThroughout
-        (.conjunction none
-          [ cant (actor subject) (.attack none),
-            cant (actor subject) (.block .any),
-            cant .any
-              (activate (allOf
-                  (and
-                    [ .abilityHead .anyActivated,
-                      .abilityOf subject ]))) ])
-        untilYourNextTurn
+    Semantics.Templates.Action.establishThroughout
+      (Semantics.Templates.StaticSpec.staticSpecConjunction Option.none
+        [Semantics.Templates.StaticSpec.cant (Semantics.Templates.Subject.actor subject) (Semantics.Templates.Action.attack Option.none),
+          Semantics.Templates.StaticSpec.cant (Semantics.Templates.Subject.actor subject) (Semantics.Templates.Action.block Semantics.Templates.NounPhrase.any),
+          Semantics.Templates.StaticSpec.cant Semantics.Templates.Subject.any
+            (Semantics.Definitions.activate
+              (Semantics.Templates.NounPhrase.allOf
+                (Semantics.Templates.Predicate.and
+                  [Semantics.Templates.Predicate.abilityHead Semantics.AbilityClass.anyActivated,
+                    Semantics.Templates.Predicate.abilityOf subject])))])
+      Semantics.Templates.Duration.untilYourNextTurn
 }

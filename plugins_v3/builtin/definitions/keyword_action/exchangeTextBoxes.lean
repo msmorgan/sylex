@@ -3,8 +3,5 @@ action exchangeTextBoxes (left right : NounPhrase) : Action := {
   deed := "exchange",
   spelling := "exchange the text boxes of <left> and <right>",
   body :=
-    .establish
-        (.textChange left
-          (.exchangeWith right))
-        none
+    Semantics.Templates.Action.establish (Semantics.Templates.StaticSpec.textChange left (Semantics.Templates.TextChange.exchangeWith right)) Option.none
 }

@@ -3,12 +3,23 @@ a source with deathtouch since the last time state-based actions were checked, t
 destroyed." The source is read as it dealt the damage, from any zone [CR#702.2d]; "is destroyed"
 is the destroy action, which regeneration can replace. -/
 sba deathtouchDestruction := {
+
   body :=
-    { scope := isCreature,
+    { scope := Semantics.Templates.Predicate.isCreature,
       when :=
-        .and
-          [ .compareAmt (toughnessOf .this) .greater 0,
-            did (by_ (a (and [isSource, hasKeyword deathtouch]))) (dealDamage anyAmount .this)
-              (within (.between (some .stateBasedActionsChecked) (some .now))) ],
-      then_ := destroy .this }
+        Semantics.Templates.Condition.and
+          [Semantics.Templates.Condition.compareAmt (Semantics.Templates.Amount.toughnessOf Semantics.Templates.NounPhrase.this_)
+              Semantics.Comparator.greater 0,
+            Semantics.Templates.Condition.did
+              (Semantics.Templates.Subject.by_
+                (Semantics.Templates.NounPhrase.a
+                  (Semantics.Templates.Predicate.and
+                    [Semantics.Templates.Predicate.isSource,
+                      Semantics.Templates.Predicate.hasKeyword
+                        (Semantics.Templates.KeywordTerm.theKeyword Semantics.Definitions.deathtouch.label)])))
+              (Semantics.Templates.Action.dealDamage Semantics.Templates.Amount.anyAmount Semantics.Templates.NounPhrase.this_)
+              (Semantics.Templates.LookbackSpan.within
+                (Semantics.Templates.Duration.durationBetween (Option.some Semantics.Templates.GameEvent.gameEventStateBasedActionsChecked)
+                  (Option.some Semantics.Templates.GameEvent.gameEventNow)))],
+      then_ := Semantics.Definitions.destroy Semantics.Templates.NounPhrase.this_ }
 }

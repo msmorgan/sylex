@@ -6,6 +6,11 @@ keyword vigilance : Ability := {
   lexical := { lemma := "vigilance" },
   spelling := "vigilance",
   body :=
-    [ static (cant any (tap thisCreature)
-        (causedBy := byEvent (does thisCreature (.attack none)))) ]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.cant Semantics.Templates.Subject.any
+          (Semantics.Definitions.tap Semantics.Templates.NounPhrase.thisCreature) Option.none Option.none Option.none
+          (Option.some
+            (Semantics.Templates.Causing.byEvent
+              (Semantics.Templates.GameEvent.does (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.thisCreature)
+                (Semantics.Templates.Action.attack Option.none)))))]
 }

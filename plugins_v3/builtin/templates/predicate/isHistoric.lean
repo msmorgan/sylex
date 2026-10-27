@@ -2,5 +2,8 @@
 template isHistoric : Predicate := {
   spelling := "historic",
   body :=
-    .or [.hasType Semantics.CardType.artifact, .hasSupertype .legendary, .hasSubtype saga]
+    Semantics.Templates.Predicate.or
+      [Semantics.Templates.Predicate.hasType Semantics.CardType.artifact,
+        Semantics.Templates.Predicate.hasSupertype Semantics.Supertype.legendary,
+        Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.saga]
 }

@@ -1,0 +1,10 @@
+/-- "unblocked": an attacking creature once no blocker was declared for it [CR#509.1h], or one
+that entered attacking after blockers were declared [CR#508.4d]. Not `not isBlocked`: before
+blockers are declared an attacking creature is neither. -/
+-- [CR#509.1h]
+-- [CR#508.4d]
+primitive isUnblocked : Predicate := {
+  spelling := "unblocked",
+  body :=
+    Semantics.Primitives.Predicate.inCombat Semantics.CombatRelation.unblocked Option.none
+}

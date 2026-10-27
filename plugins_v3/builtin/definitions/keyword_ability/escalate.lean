@@ -3,5 +3,5 @@ keyword escalate (cost : Cost) : Ability := {
   -- TODO(spelling): escalate [mana cost] / escalate—[verbal cost]; separator and terminal period
   -- depend on the Cost structure.
   body :=
-    [static (.modeChoice (.extraModesCost cost))]
+    [Semantics.Templates.Ability.static (Semantics.Templates.StaticSpec.modeChoice (Semantics.Templates.ModeChange.extraModesCost cost))]
 }

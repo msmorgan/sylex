@@ -2,7 +2,8 @@ keyword outlast (cost : Cost) : Ability := {
   lexical := { lemma := "outlast", parameters := [[Cost]] },
   spelling := "outlast <cost>",
   body :=
-    [ activatedOnlyDuring (.compound [cost, .tapSymbol])
-        (putCounters 1 p1p1Counter thisCreature)
-        asSorcery ]
+    [Semantics.Templates.Ability.activatedOnlyDuring (Semantics.Templates.Cost.compound [cost, Semantics.Templates.Cost.tapSymbol])
+        (Semantics.Templates.Action.putCounters 1 (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.p1p1Counter)
+          Semantics.Templates.NounPhrase.thisCreature)
+        Semantics.Templates.Timing.asSorcery]
 }

@@ -2,7 +2,16 @@
 look right of every foretold card, whatever made it foretold. Its cast right, "for any foretell
 cost it has", needs a cost term naming a keyword's cost, which the grammar does not have. -/
 conferral foretoldCardLook := {
+
   body :=
-    { scope := .and [.isCard, hasDesignation foretold, in_ exileZone],
-      confer := .ability (static (visibility .lookAt you (objects this_))) }
+    {
+      scope :=
+        Semantics.Templates.Predicate.and
+          [Semantics.Templates.Predicate.isCard, Semantics.Templates.Predicate.hasDesignation Semantics.Definitions.foretold,
+            Semantics.Templates.Predicate.in_ Semantics.Templates.Location.exileZone],
+      confer :=
+        Semantics.Conferral.ability
+          (Semantics.Templates.Ability.static
+            (Semantics.Templates.StaticSpec.visibility Semantics.ExposeVerb.lookAt Semantics.Templates.NounPhrase.you
+              (Semantics.Templates.VisibleThing.objects Semantics.Templates.NounPhrase.this_))) }
 }

@@ -1,0 +1,7 @@
+/-- "<object>'s mana cost" as the mana a cost shift changes by [CR#702.48a]. -/
+-- [CR#702.48a]
+primitive manaCostOf (object : NounPhrase) : ManaCostTerm := {
+  spelling := "<object>'s mana cost",
+  body :=
+    Semantics.Primitives.ManaCostTerm.manaCostOf object
+}

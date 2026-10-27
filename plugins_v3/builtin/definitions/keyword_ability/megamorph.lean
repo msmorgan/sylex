@@ -7,10 +7,21 @@ keyword megamorph (cost : Cost) : Ability := {
   label := "morph",
   spelling := "megamorph <cost>",
   body :=
-    [ static (can you (cast thisCard (payment := .faceDown faceDownCreature (mana [generic 3])))),
-      static (.specialAction none none cost (turnFaceUp this_)),
-      static
-        (replace (would any (turnFaceUp thisPermanent))
-          (doIf (keywordCostPaid morph thisPermanent)
-            (alongside (putCounters 1 p1p1Counter thisPermanent)))) ]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.can (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
+          (Semantics.Definitions.cast Semantics.Templates.NounPhrase.thisCard Option.none
+            (Semantics.Templates.PlayPayment.playPaymentFaceDown Semantics.Templates.FaceDown.faceDownCreature
+              (Semantics.Templates.Cost.mana [Semantics.Templates.ManaSymbol.generic 3])))),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.staticSpecSpecialAction Option.none Option.none cost
+          (Semantics.Templates.Action.turnFaceUp Semantics.Templates.NounPhrase.this_)),
+      Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.replace
+          (Semantics.Templates.WouldClause.would Semantics.Templates.Subject.any
+            (Semantics.Templates.Action.turnFaceUp Semantics.Templates.NounPhrase.thisPermanent))
+          (Semantics.Templates.Replacement.doIf
+            (Semantics.Templates.Condition.keywordCostPaid Semantics.Definitions.morph.label Semantics.Templates.NounPhrase.thisPermanent)
+            (Semantics.Templates.Replacement.alongside
+              (Semantics.Templates.Action.putCounters 1 (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.p1p1Counter)
+                Semantics.Templates.NounPhrase.thisPermanent))))]
 }

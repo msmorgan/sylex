@@ -1,5 +1,5 @@
 template isLand : Predicate := {
   spelling := "land",
   body :=
-    .hasType Semantics.CardType.land
+    Semantics.Templates.Predicate.hasType Semantics.CardType.land
 }

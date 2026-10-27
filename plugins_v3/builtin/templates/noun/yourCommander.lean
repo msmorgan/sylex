@@ -2,5 +2,5 @@
 template yourCommander : NounPhrase := {
   spelling := "your commander",
   body :=
-    .designated commander .you
+    Semantics.Templates.NounPhrase.designated Semantics.Definitions.commander Semantics.Templates.NounPhrase.you
 }

@@ -1163,8 +1163,11 @@ theorem uncausedProhibitionIsYouCantLoseLife :
     prohibitionCause? (cant you (loseLife anyAmount)) = none ∧
       prohibitionCause? (cant you (loseLife anyAmount)) ≠
         prohibitionCause? (cant you (loseLife anyAmount) (causedBy := byEvent damageToYou)) ∧
-      StaticSpec.check (DRS.ofList []) (cant you (loseLife anyAmount)) = [] :=
-  ⟨rfl, by simp [prohibitionCause?, cant], by decide⟩
+      StaticSpec.check (DRS.ofList []) (cant you (loseLife anyAmount)) = [] := by
+  refine And.intro rfl (And.intro ?_ ?_)
+  · intro h
+    cases h
+  · decide
 
 /-- The cause is stepped as part of the prohibition: "that creature" in it, with no creature in
 scope, is refused. -/

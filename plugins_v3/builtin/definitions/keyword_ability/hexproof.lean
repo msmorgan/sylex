@@ -5,5 +5,11 @@ keyword hexproof : Ability := {
   lexical := { lemma := "hexproof", parameters := [[], [Quality (Some ("from"))]] },
   spelling := "hexproof",
   body :=
-    [static (cant (.by (allOf (and [.in_ stack, opponentsControl]))) (.target this_))]
+    [Semantics.Templates.Ability.static
+        (Semantics.Templates.StaticSpec.cant
+          (Semantics.Templates.Subject.by_
+            (Semantics.Templates.NounPhrase.allOf
+              (Semantics.Templates.Predicate.and
+                [Semantics.Templates.Predicate.in_ Semantics.Templates.Location.stack, Semantics.Templates.Predicate.opponentsControl])))
+          (Semantics.Templates.Action.target Semantics.Templates.NounPhrase.this_))]
 }

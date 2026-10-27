@@ -4,5 +4,6 @@ action revealHand : Action := {
   deed := "reveal",
   spelling := "reveal your hand",
   body :=
-    .expose .reveal (.zone (handOf .actor))
+    Semantics.Templates.Action.expose Semantics.ExposeVerb.reveal
+      (Semantics.Templates.Exposed.exposedZone (Semantics.Templates.Location.handOf Semantics.Templates.NounPhrase.actor))
 }

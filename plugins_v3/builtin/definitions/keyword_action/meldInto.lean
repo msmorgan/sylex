@@ -4,6 +4,6 @@ action meldInto (subject : NounPhrase) (into : String) : Action := {
   deed := "meld",
   spelling := "meld <subject> into <into>",
   body :=
-    .move subject .anyLocation battlefield
-        .arrival [.entersMelded into]
+    Semantics.Templates.Action.actionMove subject Semantics.Templates.Location.wherever (Option.some Semantics.Templates.Location.battlefield)
+      Semantics.ObservationPoint.arrival [Semantics.Templates.MoveRider.moveRiderEntersMelded into]
 }
