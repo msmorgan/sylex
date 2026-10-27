@@ -13,7 +13,7 @@ noun words and the creature tokens. They are `semantic_template`s, transparent p
 Template is, declared in the Definitions layer so that `Semantics.Templates` names no catalog
 item: the layering is Primitives → Templates → Definitions → Cards. A phrasing helper that needs
 a composite Definition lives after it, in `Semantics.Definitions.Actions` or
-`Semantics.Definitions.Keywords`.
+`Semantics.Definitions`.
 -/
 
 namespace Semantics.Definitions

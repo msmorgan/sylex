@@ -1,0 +1,7 @@
+ability_word descend4 (ability : Ability) : Ability := {
+  lexical := { lemma := "descend 4", listed := Rules },
+  label := "descend 4",
+  spelling := "descend 4 — <ability>",
+  body :=
+    ability
+}

@@ -11,7 +11,7 @@ parameters; the lower-level `semantic_template` form preserves explicitly author
 Templates are spelled over primitives and other Templates and name no catalog item and no card type:
 the layering is Primitives → Templates → Definitions → Cards. A phrasing helper that names a card type or a catalog entry ("this creature", "your party")
 lives above it, in `Semantics.Definitions.Phrasings`, and one that needs a composite Definition in
-`Semantics.Definitions.Actions` or `Semantics.Definitions.Keywords`.
+`Semantics.Definitions.Actions` or `Semantics.Definitions`.
 -/
 
 namespace Semantics.Templates

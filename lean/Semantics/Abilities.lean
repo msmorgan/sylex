@@ -1526,7 +1526,7 @@ attribute [semantic_expression] Semantics.GameEvent Semantics.NounPhrase Semanti
 
 classify_semantic_syntax
 
--- A keyword ability is written through its typed Definition in `Semantics.Definitions.Keywords`,
+-- A keyword ability is written through its typed Definition in `Semantics.Definitions`,
 -- whose signature fixes its parameters; `Ability.keyword` is that Definition's expansion carrier.
 attribute [internal_expansion] Semantics.Ability.keyword
 

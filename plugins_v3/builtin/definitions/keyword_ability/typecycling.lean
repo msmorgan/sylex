@@ -1,0 +1,20 @@
+/-- "<Type>cycling <cost>": a cycling ability qualified by the card it searches for, labelled
+cycling, since typecycling abilities are cycling abilities [CR#702.29e,702.29f]. "[Cost], Discard
+this card: Search your library for a [type] card, reveal it, and put it into your hand. Then
+shuffle your library." [CR#702.29e] -/
+keyword typecycling (quality : Predicate) (cost : Cost) : Ability := {
+  lexical := {
+    lemma := "cycling",
+    parameters := [[Cost], [DashNonManaCost]],
+    bound := { surface := "cycling", stems := [Subtype, CardType, Supertype] },
+    verbs := [{ lemma := "cycle", frames := [Monotransitive] }]
+  },
+  label := "cycling",
+  -- TODO(spelling): Islandcycling [cost] / basic landcycling [cost]; the Predicate needs a
+  -- lowercase bound stem rather than its ordinary rendered phrase.
+  body :=
+    [ activated (.compound [cost, .perform (discard this_)])
+        (sequentially
+          [ search yourLibrary (a (and [isCard, quality])),
+            reveal it, putInto it hand, shuffle ]) ]
+}

@@ -1,0 +1,7 @@
+ability_word valiant (ability : Ability) : Ability := {
+  lexical := { lemma := "valiant", listed := Rules },
+  label := "valiant",
+  spelling := "valiant — <ability>",
+  body :=
+    ability
+}

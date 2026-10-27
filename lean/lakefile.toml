@@ -11,8 +11,14 @@ defaultTargets = ["Semantics", "SemanticsCards", "SemanticsProofs"]
 # Idris `%unbound_implicits off`: every implicit is written out.
 autoImplicit = false
 
+[[input_dir]]
+name = "builtinBundle"
+path = "../plugins_v3/builtin"
+text = true
+
 [[lean_lib]]
 name = "Semantics"
+extraDepTargets = ["builtinBundle"]
 roots = ["Semantics", "Semantics.Check", "Semantics.Primitives", "Semantics.Templates", "Semantics.Definitions"]
 
 [[lean_lib]]

@@ -1,0 +1,28 @@
+/-- "Foretell [cost]": any time its owner has priority during their turn, they may pay {2} and
+exile this card from their hand face down, a special action [CR#702.143a,702.143b]; it becomes a
+foretold card, which its owner may look at as long as it stays one, and may cast after the
+current turn has ended by paying [cost] rather than its mana cost [CR#702.143a,702.143c]. The
+exile names the hand, so the ability functions only there [CR#113.6m]; the special action and the
+card's becoming foretold are separate events, and both permissions are keyed on the state. -/
+keyword foretell (cost : Cost) : Ability := {
+  lexical := {
+    lemma := "foretell",
+    parameters := [[Cost]],
+    verbs := [{ lemma := "foretell", past := "foretold", frames := [Monotransitive] }]
+  },
+  spelling := "foretell <cost>",
+  body :=
+    [ static
+        (specialAction (duringPart .turn you) (mana [generic 2])
+          (sequentially
+            [ exileFaceDownFrom thisCard yourHand,
+              gainDesignation it foretold,
+              establishThroughout (visibility .lookAt you (objects it))
+                (forAsLongAs (is it (hasDesignation foretold))),
+              establishThroughout
+                (onlyWhile
+                  (can you
+                    (cast it (from_ := exileZone) (payment := payingInstead cost)))
+                  (is it (hasDesignation foretold)))
+                onALaterTurn ])) ]
+}

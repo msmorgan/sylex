@@ -1,0 +1,7 @@
+ability_word formidable (ability : Ability) : Ability := {
+  lexical := { lemma := "formidable", listed := Rules },
+  label := "formidable",
+  spelling := "formidable — <ability>",
+  body :=
+    ability
+}

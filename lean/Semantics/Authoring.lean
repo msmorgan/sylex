@@ -550,7 +550,8 @@ private partial def rewriteMentions (wrapInCaller : Bool) (actorIdentity? : Opti
 syntax (name := bindDeclBody) "bind_decl_body% " ident str term : term
 elab_rules : term <= expected
   | `(bind_decl_body% $isDef:ident $declName:str $body:term) => do
-    let isDefinition := isDef.getId.eraseMacroScopes == `true
+    let isDefinition := isDef.getId.eraseMacroScopes != `false
+    let bindsActor := isDef.getId.eraseMacroScopes == `true
     let value ← Term.elabTermEnsuringType body expected
     Term.synthesizeSyntheticMVarsNoPostponing
     let mut value ← instantiateMVars value
@@ -565,7 +566,7 @@ elab_rules : term <= expected
               substitutions := substitutions.push (localDecl.fvarId, wrapped)
       value := value.replace fun e =>
         if e.isFVar then (substitutions.find? (·.1 == e.fvarId!)).map (·.2) else none
-    let mut reserved := if isDefinition then [s!"{declName.getString}.actor"] else []
+    let mut reserved := if bindsActor then [s!"{declName.getString}.actor"] else []
     let mut npParams : List (FVarId × String) := []
     for localDecl in ← getLCtx do
       unless localDecl.isImplementationDetail do
@@ -576,7 +577,7 @@ elab_rules : term <= expected
             npParams := npParams ++ [(localDecl.fvarId, idStr)]
     rejectGeneratedIdentities reserved value
     let actorId? :=
-      if isDefinition && countActorOccurrences value ≥ 2 then
+      if bindsActor && countActorOccurrences value ≥ 2 then
         some s!"{declName.getString}.actor"
       else none
     return (← (rewriteMentions isDefinition actorId? npParams value).run []).1
@@ -1032,9 +1033,10 @@ private def lexicalFields : List Name :=
   [`lexical, `spelling]
 
 private def semanticFields : Name → List Name
-  | `primitive | `template | `ability_word => [`body]
+  | `primitive | `template => [`body]
+  | `ability_word => [`body, `label]
   | `keyword => [`body, `label, `cost, `reminder]
-  | `action => [`body, `deed, `permanent]
+  | `action => [`body, `deed, `permanent, `ofAbility]
   | `counter => [`holder, `confers, `rules]
   | `subtype => [`kind, `name, `confers, `rules]
   | `designation => [`scope, `sole, `confers, `rules]
@@ -1065,6 +1067,19 @@ private def generatedCheck (name : Ident) (sort : Name) : CommandElabM Unit := d
   let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
   let check := mkIdent (`Semantics ++ sort ++ `check)
   elabCommand (← `(theorem $ok : $check $name = [] := by decide))
+
+private def registerKeywordLabel (name : Name) (label : Term) : CommandElabM Unit := do
+  let value ← liftTermElabM <| elabTermEnsuringType label (mkConst ``String)
+  let value := mkApp (mkConst `Semantics.KeywordLabel.named) value
+  if (← getEnv).contains name then
+    unless ← liftTermElabM <| isDefEq (mkConst name) value do
+      throwError "Conflicting keyword label {name}"
+  else
+    liftCoreM <| addAndCompile <| .defnDecl {
+      name, levelParams := [], type := mkConst `Semantics.KeywordLabel
+      value, hints := .regular 0, safety := .safe
+    }
+  definitionAttribute.setTag name
 
 @[command_elab authoredDeclCmd]
 def elabAuthoredCommand : CommandElab := fun stx => do
@@ -1133,18 +1148,21 @@ def elabAuthoredCommand : CommandElab := fun stx => do
       let permanent := (fields.lookup `permanent).getD (mkIdent `Semantics.DeedPermanent.none)
       let permanent : Term := if permanent.raw.getId ∈ [`performs, `isAbout] then
         mkIdent (`Semantics.DeedPermanent ++ permanent.raw.getId) else permanent
-      body ← `(term| $(mkIdent `Semantics.Action.ownScope)
-        (some ($(mkIdent `Semantics.Deed.action) $deed $permanent)) $body)
+      let deed ← if let some ability := fields.lookup `ofAbility then
+          if (fields.lookup `deed).isSome || (fields.lookup `permanent).isSome then
+            throwErrorAt payload "ofAbility cannot be combined with deed or permanent"
+          unless ability.raw.isIdent do
+            throwErrorAt ability "ofAbility requires a keyword identifier"
+          let some label ← liftTermElabM <| resolveKeywordLabelConst? ability.raw
+            | throwErrorAt ability "Unknown keyword ability label {ability}"
+          let ability := mkCIdent label
+          `(term| $(mkIdent `Semantics.Deed.ofAbility) $ability)
+        else `(term| $(mkIdent `Semantics.Deed.action) $deed $permanent)
+      body ← `(term| $(mkIdent `Semantics.Action.ownScope) (some $deed) $body)
     if kind == `keyword then
       let labelName := (← getCurrNamespace) ++ name.getId ++ `label
       let labelTerm := (fields.lookup `label).getD declarationLabel
-      let labelValue ← liftTermElabM <| elabTermEnsuringType labelTerm (mkConst ``String)
-      liftCoreM <| addAndCompile <| .defnDecl {
-        name := labelName, levelParams := [], type := mkConst `Semantics.KeywordLabel
-        value := mkApp (mkConst `Semantics.KeywordLabel.named) labelValue
-        hints := .regular 0, safety := .safe
-      }
-      definitionAttribute.setTag labelName
+      registerKeywordLabel labelName labelTerm
       let mut args : Array Term := #[]
       for binder in sig.raw[0].getArgs do
         if binder.isOfKind ``Parser.Term.explicitBinder then
@@ -1154,10 +1172,13 @@ def elabAuthoredCommand : CommandElab := fun stx => do
       body ← `(term| $(mkIdent `Semantics.Ability.keyword) $(mkIdent labelName)
         (keyword_arguments% [$args,*]) $body)
     if kind == `ability_word then
-      let labelStr : StrLit := declarationLabel
-      body ← `(term| ability_word_body% $labelStr:str $body)
+      let label := (fields.lookup `label).getD declarationLabel
+      unless label.raw.isStrLit?.isSome do throwErrorAt label "Ability-word label must be a string literal"
+      let label : StrLit := ⟨label.raw⟩
+      body ← `(term| ability_word_body% $label:str $body)
     if kind == `template then body ← `(term| bind_decl_body% false $identity $body)
-    if kind ∈ [`action, `keyword] then body ← `(term| bind_decl_body% true $identity $body)
+    if kind == `action then body ← `(term| bind_decl_body% true $identity $body)
+    if kind == `keyword then body ← `(term| bind_decl_body% keyword $identity $body)
     emit body (kind ∈ [`action, `keyword])
     if kind == `primitive then
       elabCommand (← `(attribute [semantic_primitive] $name))
@@ -1238,7 +1259,8 @@ private def bundleKeyLess (a b : BundleKey) : Bool :=
 
 def bundleDependencies (items : List BundleItem) (item : BundleItem) : List BundleKey :=
   items.filterMap fun other =>
-    if item.references.contains other.key.bareName &&
+    let qualified := Name.mkSimple other.key.returnType.getString! ++ other.key.bareName
+    if (item.references.contains other.key.bareName || item.references.contains qualified) &&
       (other.key.bareName != item.key.bareName ||
         (item.key.returnType == `Semantics.Ability && other.key.returnType == `Semantics.Action))
     then some other.key else none
@@ -1292,7 +1314,7 @@ def topoSortBundle (items : List BundleItem) : Except String (List BundleItem) :
 
 private partial def referencedIdents (bound : List Name) (stx : Syntax) : List Name :=
   if stx.isOfKind ``declField then
-    if lexicalFields.contains stx[0].getId.eraseMacroScopes then []
+    if lexicalFields.contains stx[0].getId.eraseMacroScopes || stx[0].getId == `ofAbility then []
     else referencedIdents bound stx[2]
   else if stx.isOfKind ``Parser.Term.structInstField then
     referencedIdents bound stx[1]
@@ -1356,6 +1378,17 @@ elab "load_bundle " directory:str : command => do
   let sorted ← match topoSortBundle items with
     | .ok sorted => pure sorted
     | .error error => throwError error
+  -- Labels do not depend on bodies. Register them before elaborating an ability's own deed.
+  for item in sorted do
+    if item.stx[1].getId == `keyword then
+      let original := item.stx[2].getId
+      let ns ← getCurrNamespace
+      let full := ns ++ original
+      let name := if (← getEnv).contains full then
+        ns ++ `Ability ++ original else full
+      let fields ← if item.stx[5].isOfKind ``declBlock then blockFields item.stx[5] else pure []
+      let label := (fields.lookup `label).getD (Syntax.mkStrLit original.getString!)
+      registerKeywordLabel (name ++ `label) label
   for item in sorted do
     withRef item.stx <| elabCommand item.stx
 

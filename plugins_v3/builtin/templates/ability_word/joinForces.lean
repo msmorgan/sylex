@@ -1,0 +1,7 @@
+ability_word joinForces (ability : Ability) : Ability := {
+  lexical := { lemma := "join forces", listed := Rules },
+  label := "join forces",
+  spelling := "join forces — <ability>",
+  body :=
+    ability
+}

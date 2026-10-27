@@ -1078,7 +1078,7 @@ minimum-two-fields packing rule has no semantic counterpart in an edit list.
 
 `Ability.keyword` takes an ordered `List KeywordParam`. It is an internal
 expansion carrier: a card writes a keyword ability through its typed Definition
-(`Semantics/Definitions/Keywords.lean`), whose signature fixes the arguments'
+(`../plugins_v3/builtin/definitions/keyword_ability/`), whose signature fixes the arguments'
 number and order, so there is no argument schema table and the checker does not
 branch on keyword names. A quality a keyword restricts to objects is restricted by
 the Definition's body, which uses it as an object's quality: typecycling's "[type]

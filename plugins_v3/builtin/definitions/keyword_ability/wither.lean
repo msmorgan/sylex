@@ -1,0 +1,12 @@
+/-- "Wither": damage this deals to a creature isn't marked on it; rather, its controller puts
+that many −1/−1 counters on that creature [CR#702.80a]. A replacement of the marking result
+[CR#120.3e,614.6]: a source with infect as well puts the counters once [CR#120.3d]. Wither
+functions from any zone [CR#702.80c]. -/
+keyword wither : Ability := {
+  lexical := { lemma := "wither" },
+  spelling := "wither",
+  body :=
+    [ static
+        (replace (causedBy (bySource this_) (would any (markDamage (a isCreature))))
+          (instead (putCounters thatMuch m1m1Counter (that creature)))) ]
+}

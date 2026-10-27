@@ -1,0 +1,12 @@
+/-- "Retrace": "You may cast this card from your graveyard by discarding a land card as an
+additional cost to cast it" [CR#702.81a]. The discard is added to the mana cost or an alternative
+cost, so an alternative cost still applies [CR#118.9a,601.2b]. -/
+keyword retrace : Ability := {
+  lexical := { lemma := "retrace" },
+  spelling := "retrace",
+  body :=
+    [ static
+        (can you
+          (cast this_ (from_ := yourGraveyard)
+            (payment := plusAdditional (.perform (discard (a (and [.isCard, isLand]))))))) ]
+}

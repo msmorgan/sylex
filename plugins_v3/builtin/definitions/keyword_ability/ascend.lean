@@ -1,0 +1,19 @@
+keyword ascend : Ability := {
+  lexical := { lemma := "ascend" },
+  spelling := "ascend",
+  body :=
+    [ byCardClass
+        (static
+          (.whileHolds
+            (and
+              [ .compareAmt (countOf (and [isPermanent, youControl])) .atLeast 10,
+                not (is .you (hasDesignation citysBlessing)) ])
+            (gainDesignation .you citysBlessing restOfGame)))
+        (spell
+          (doIf
+            (and
+              [ .compareAmt (countOf (and [isPermanent, youControl])) .atLeast 10,
+                not (is .you (hasDesignation citysBlessing)) ])
+            (gainDesignation .you citysBlessing restOfGame)
+            none)) ]
+}

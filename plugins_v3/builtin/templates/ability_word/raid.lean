@@ -1,0 +1,7 @@
+ability_word raid (ability : Ability) : Ability := {
+  lexical := { lemma := "raid", listed := Rules },
+  label := "raid",
+  spelling := "raid — <ability>",
+  body :=
+    ability
+}

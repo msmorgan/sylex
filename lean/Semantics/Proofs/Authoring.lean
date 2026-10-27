@@ -945,4 +945,60 @@ load_bundle "test-fixtures/authoring-invalid-multiple"
 #guard_msgs (error) in
 load_bundle "test-fixtures/authoring-invalid-empty"
 
+namespace AbilityDeedBundle
+load_bundle "test-fixtures/authoring-ability-deed"
+
+example (subject : NounPhrase) : Action.bundleDevour subject =
+    Action.ownScope (some (.ofAbility (.named "bundle devour")))
+      (sacrifice (.firstMention "bundleDevour.subject" (.inCaller subject))) := rfl
+
+example : bundleDevour = Ability.keyword (.named "bundle devour") []
+    [spell (Action.bundleDevour thisCreature)] := rfl
+
+/-- error: ofAbility cannot be combined with deed or permanent -/
+#guard_msgs in
+action invalidAbilityDeed := {
+  ofAbility := bundleDevour, deed := "other", body := draw 1,
+}
+end AbilityDeedBundle
+
+example (ability : Ability) : fatefulHour ability =
+    abilityWord (.named "fateful hour") ability := rfl
+example (ability : Ability) : councilsDilemma ability =
+    abilityWord (.named "council’s dilemma") ability := rfl
+example : typecycling.label = cycling.label := rfl
+example : equipQuality.label = equip.label := rfl
+example : hexproofFrom.label = hexproof.label := rfl
+example : devourQuality.label = devour.label := rfl
+example (subject : NounPhrase) : Definitions.Action.devour subject =
+    Action.ownScope (some (.ofAbility devour))
+      (sacrifice (.firstMention "devour.subject" (.inCaller subject))) := rfl
+
+open Lean Authoring in
+#guard match topoSortBundle [
+  { key := ⟨`devour, `Semantics.Ability⟩, file := "ability.lean", references := [`entry] },
+  { key := ⟨`entry, `Semantics.Ability⟩, file := "helper.lean", references := [`Action.devour] },
+  { key := ⟨`devour, `Semantics.Action⟩, file := "action.lean" }
+] with
+| .ok items => items.map (·.key) ==
+    [⟨`devour, `Semantics.Action⟩, ⟨`entry, `Semantics.Ability⟩, ⟨`devour, `Semantics.Ability⟩]
+| .error _ => false
+
+namespace KeywordActorScope
+keyword repeatedActor := {
+  body := [static (can theActor (draw 1)), static (cant theActor (draw 2))],
+}
+example : repeatedActor = Ability.keyword (.named "repeatedActor") []
+    [static (can theActor (draw 1)), static (cant theActor (draw 2))] := rfl
+end KeywordActorScope
+
+example (ability : Ability) : infinity ability =
+    Ability.keyword infinity.label [.ability (.inCaller ability)]
+      [static (onlyWhile (abilityGrant thisPermanent (.inCaller ability))
+        (is thisPermanent (hasDesignation harnessed)))] := rfl
+example (ability : Ability) : maxSpeed ability =
+    Ability.keyword maxSpeed.label [.ability (.inCaller ability)]
+      [static (onlyWhile (abilityGrant this_ (.inCaller ability))
+        (.compareAmt (speedOf .you) .eq 4))] := rfl
+
 end Semantics.Proofs.Authoring

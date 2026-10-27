@@ -8,7 +8,6 @@ import Semantics.Definitions.Actions
 import Semantics.Definitions.CardTypeRules
 import Semantics.Definitions.SubtypeRules
 import Semantics.Definitions.DesignationRules
-import Semantics.Definitions.Keywords
 
 /-!
 # Semantics.Definitions
@@ -24,7 +23,15 @@ the checker compares card types by value. The rest are in `namespace Semantics.D
 `Semantics.Templates`: the leaf catalogs (`Counters`, `Designations`, `Relations`, `Subtypes`) are
 spelled over primitives; `Phrasings` holds the Templates that name a card type or a leaf catalog
 entry, spelled over `Semantics.Templates` and the leaf catalogs; the composite Definitions
-(`Actions`, `Keywords`) are spelled over all of them; and `CardTypeRules`, `SubtypeRules` and
+(`Actions` and the keyword bundle) are spelled over all of them; and `CardTypeRules`, `SubtypeRules` and
 `DesignationRules` hold what each card type and each rules-defined subtype confers and the
 designations' inherent abilities, spelled over `Actions`.
 -/
+
+namespace Semantics.Definitions
+
+open Semantics.Templates
+
+load_bundle "../plugins_v3/builtin"
+
+end Semantics.Definitions
