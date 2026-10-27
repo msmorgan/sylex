@@ -48,16 +48,15 @@ tables.
 3. **Exhaustive round-trip law 2 in the census:**
    - Measure full-corpus census wall time checking round-trip law 2 on every
      Reading (`usize::MAX`) versus the 8-reading census (`LAW_TWO_READINGS = 8`).
-   - If exhaustive Law 2 wall time is within **15%** of the 8-reading census
-     (and produces 0 Law 2 failures), make exhaustive Law 2 the unconditional
-     default and remove `--all-readings`, `LAW_TWO_READINGS`, and
-     `Report::law_two_exhaustive`; otherwise keep `LAW_TWO_READINGS = 8` as the
-     default with updated documentation.
+   - Exhaustive Law 2 completed in 72.45 s with 1,550,860 KiB (1.48 GiB) peak
+     RSS and 0 Law 2 failures, so make exhaustive Law 2 the unconditional
+     default and remove `--all-readings`, `LAW_TWO_READINGS`,
+     `census::run_with`, and `Report::law_two_exhaustive`.
 
 ## Acceptance criteria
 
 - `strata.json` is byte-identical to baseline (aside from removing
-  `law_two_exhaustive` if exhaustive Law 2 becomes the unconditional default).
+  `law_two_exhaustive` now that exhaustive Law 2 is the unconditional default).
 - A temporary differential check across the corpus confirms that for every
   Corpus Unit, the new lazy iterator produces the exact same `Reading` sequence
   as the previous eager implementation.
@@ -69,5 +68,5 @@ Standard constraints apply. End the ticket with the two-line landing note from
 `docs/tickets/README.md` and update `crates/deckmaste_syntax/README.md` and
 `crates/deckmaste_english/README.md` to match.
 
-**Census delta** (`rtuxoqyn`): faces read 32,825 → 32,825; total Readings 326,905 → 326,905; lost faces: none.
-**Judgment set** (`rtuxoqyn`): 3,382 enforced, 0 pending; all pass.
+**Census delta** (`yquxwkwm`): faces read 32,825 → 32,825; total Readings 326,905 → 326,905; lost faces: none.
+**Judgment set** (`yquxwkwm`): 3,382 enforced, 0 pending; all pass.

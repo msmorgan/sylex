@@ -4,17 +4,11 @@
 //!
 //! A unit is read when it has a Reading and both round-trip laws hold:
 //! law 1 over the whole Packed Forest
-//! ([`deckmaste_syntax::Parse::verify_realization`]) and law 2 on its
-//! cheapest Readings ([`LAW_TWO_READINGS`] by default; every Reading under
-//! [`run_with`] with `usize::MAX`, which `cargo xtask english strata
-//! --all-readings` passes). With lazy flyweight enumeration, the full-corpus
-//! exhaustive run took 72.45 s and peaked at 1,550,860 KiB RSS, versus 59.37 s
-//! and 1,473,920 KiB for eight Readings (2026-10-27, dev profile). Its 22.0%
-//! wall-time increase exceeds the 15% threshold, so it remains opt-in;
-//! [`Report::law_two_exhaustive`] records which the report verified. Readings
-//! are materialized one at a time. A unit with a judgment is checked against it
-//! up to [`judgment::READING_LIMIT`]. A unit is known-wrong-only when it has a
-//! judgment none of its Readings satisfies.
+//! ([`deckmaste_syntax::Parse::verify_realization`]) and law 2 on every
+//! Reading ([`deckmaste_syntax::Parse::readings`]), materialized one at a
+//! time through the syntax engine's lazy flyweight arena. A unit with a
+//! judgment is checked against it up to [`judgment::READING_LIMIT`]. A unit is
+//! known-wrong-only when it has a judgment none of its Readings satisfies.
 //!
 //! A line of a cleave face with square brackets is read as its two texts
 //! ([`crate::cleave`]), each judged as a unit of its own: it is read when
@@ -49,12 +43,6 @@ use crate::profile::Profiler;
 use crate::profile::Stratum;
 use crate::segments::SegmentFrame;
 use crate::segments::Segmentation;
-
-/// How many of a unit's cheapest Readings round-trip law 2 is checked on.
-/// Eight took 59.37 s / 1,473,920 KiB peak RSS across the corpus; exhaustive
-/// checking took 72.45 s / 1,550,860 KiB (2026-10-27), 22.0% slower, above
-/// the 15% threshold for making exhaustive checking the default.
-pub const LAW_TWO_READINGS: usize = 8;
 
 /// What the census found for one unit.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
@@ -160,37 +148,15 @@ pub struct Report {
     /// Units with a Derivation but no single product segmentation.
     pub not_segmentable: Vec<String>,
     pub units: Vec<UnitResult>,
-    /// Whether law 2 was checked on every Reading of every unit, not only each
-    /// unit's cheapest [`LAW_TWO_READINGS`]. Exhaustive checking measured
-    /// 72.45 s / 1,550,860 KiB peak RSS, versus 59.37 s / 1,473,920 KiB
-    /// for eight (2026-10-27); the 22.0% increase keeps it opt-in.
-    pub law_two_exhaustive: bool,
 }
 
-/// Runs the census over `corpus`, checking law 2 on each unit's cheapest
-/// [`LAW_TWO_READINGS`] Readings.
+/// Runs the census over `corpus`, checking both round-trip laws on every
+/// Reading of every unit.
 ///
 /// # Panics
 /// If a census worker thread panics.
 #[must_use]
 pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) -> Report {
-    run_with(corpus, env, judgments, LAW_TWO_READINGS)
-}
-
-/// Runs the census, checking law 2 on each unit's cheapest `law_two_readings`
-/// Readings; `usize::MAX` checks every Reading (72.45 s and 1,550,860 KiB
-/// peak RSS across the corpus, versus 59.37 s and 1,473,920 KiB for eight,
-/// measured 2026-10-27).
-///
-/// # Panics
-/// If a census worker thread panics.
-#[must_use]
-pub fn run_with(
-    corpus: &Corpus,
-    env: &LexicalEnvironment,
-    judgments: &[Judgment],
-    law_two_readings: usize,
-) -> Report {
     let grammar = crate::bind(&env.lexicon, &env.frames).and_then(|grammar| {
         let frame = crate::segments::segment_frame(&grammar)?;
         Ok((grammar, frame))
@@ -268,7 +234,6 @@ pub fn run_with(
                                         let judge = |text: &str, analyzed: &AnalyzedText| {
                                             let entries = entries(text);
                                             judge_unit(
-                                                law_two_readings,
                                                 grammar,
                                                 frame,
                                                 env,
@@ -320,10 +285,7 @@ pub fn run_with(
     });
     batches.sort_unstable_by_key(|(start, _)| *start);
     let units: Vec<UnitResult> = batches.into_iter().flat_map(|(_, units)| units).collect();
-    Report {
-        law_two_exhaustive: law_two_readings == usize::MAX,
-        ..summarize(corpus.faces.len(), bind_error, units)
-    }
+    summarize(corpus.faces.len(), bind_error, units)
 }
 
 /// Judges a bracketed line of a cleave face as its Uncleaved Text, then, if
@@ -342,7 +304,6 @@ fn judge_cleave(
 }
 
 fn judge_unit(
-    law_two_readings: usize,
     grammar: &CompiledGrammar,
     frame: &SegmentFrame,
     env: &LexicalEnvironment,
@@ -361,7 +322,6 @@ fn judge_unit(
     let segments = Some(crate::segments::segments(&parse, frame));
     let cheapest_tier = parse.cheapest_tier().map_or(0, |(_, tied)| tied);
     let (verdict, derivations) = judge_parse(
-        law_two_readings,
         grammar,
         env,
         &parse,
@@ -373,7 +333,6 @@ fn judge_unit(
 }
 
 fn judge_parse(
-    law_two_readings: usize,
     grammar: &CompiledGrammar,
     env: &LexicalEnvironment,
     parse: &deckmaste_syntax::Parse<'_>,
@@ -387,7 +346,7 @@ fn judge_parse(
             derivations,
         );
     }
-    for reading in parse.best_readings(law_two_readings) {
+    for reading in parse.readings() {
         if let Err(why) = judgment::law_two(grammar, &env.lexicon, parse, &reading, scope) {
             return (Verdict::Unread(Unread::Law(why)), derivations);
         }
@@ -542,7 +501,6 @@ fn summarize(faces: usize, bind_error: Option<String>, units: Vec<UnitResult>) -
         ambiguous_segments,
         not_segmentable,
         units,
-        law_two_exhaustive: false,
     }
 }
 

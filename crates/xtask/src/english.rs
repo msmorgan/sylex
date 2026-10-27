@@ -47,13 +47,6 @@ struct StrataArgs {
     /// deferred, or when a deferred unit is read.
     #[arg(long)]
     check: bool,
-    /// Check round-trip law 2 on every Reading of every unit, not only each
-    /// unit's cheapest 8. Measured 72.45 s / 1,550,860 KiB peak RSS, versus
-    /// 59.37 s / 1,473,920 KiB for eight (2026-10-27). The 22.0% wall-time
-    /// increase exceeds the 15% default threshold; the report records that
-    /// law 2 was exhaustive.
-    #[arg(long)]
-    all_readings: bool,
 }
 
 pub fn run(args: &EnglishArgs, output: &mut dyn Write) -> Result<()> {
@@ -81,8 +74,7 @@ fn strata(args: &StrataArgs, output: &mut dyn Write) -> Result<()> {
             .filter(|(name, _)| name != "seed.txt")
             .flat_map(|(_, entries)| entries)
             .collect();
-    let law_two_readings = if args.all_readings { usize::MAX } else { census::LAW_TWO_READINGS };
-    let report = census::run_with(&corpus, &env, &judgments, law_two_readings);
+    let report = census::run(&corpus, &env, &judgments);
     if let Some(parent) = args.output.parent() {
         std::fs::create_dir_all(parent)?;
     }
