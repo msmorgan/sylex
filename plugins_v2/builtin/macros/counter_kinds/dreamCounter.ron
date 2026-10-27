@@ -1,6 +1,0 @@
-CounterKind(
-    name: "dreamCounter",
-    params: [],
-    spelling: "dream",
-    holder: Object,
-)

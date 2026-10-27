@@ -1,6 +1,0 @@
-CounterKind(
-    name: "doomCounter",
-    params: [],
-    spelling: "doom",
-    holder: Object,
-)

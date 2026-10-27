@@ -1,6 +1,0 @@
-(
-    name: "tokenOnTheBattlefield",
-    kinds: [Predicate],
-    params: [],
-    body: And([IsToken, permanent]),
-)

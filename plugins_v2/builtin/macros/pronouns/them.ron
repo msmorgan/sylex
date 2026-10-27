@@ -1,7 +1,0 @@
-// "them"
-(
-    name: "them",
-    kinds: [NounPhrase],
-    params: [],
-    body: Pro(Bare, Many, Whole),
-)

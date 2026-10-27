@@ -1,6 +1,0 @@
-CounterKind(
-    name: "brainCounter",
-    params: [],
-    spelling: "brain",
-    holder: Object,
-)

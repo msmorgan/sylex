@@ -1,5 +1,0 @@
-AbilityWord(
-    name: "coven",
-    spelling: "Coven",
-    grammar: FixedTerm(surface: "Coven"),
-)

@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "illusion",
-    spelling: "Illusion",
-    grammar: Noun(singular: "Illusion"),
-    params: [],
-)
-

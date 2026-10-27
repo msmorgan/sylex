@@ -1,6 +1,0 @@
-(
-    name: "loseLife",
-    kinds: [Instruction],
-    params: {"amount": Amount},
-    body: ChangeLife(delta: Down(amount: Param(amount))),
-)

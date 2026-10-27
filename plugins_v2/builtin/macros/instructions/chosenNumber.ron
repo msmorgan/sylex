@@ -1,7 +1,0 @@
-// "the chosen number": the number the choice named.
-(
-    name: "chosenNumber",
-    kinds: [Amount],
-    params: [],
-    body: ChosenNumber(TheChoice),
-)

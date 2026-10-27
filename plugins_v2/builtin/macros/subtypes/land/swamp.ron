@@ -1,8 +1,0 @@
-Subtype(
-    category: Land,
-    name: "swamp",
-    spelling: "Swamp",
-    grammar: Noun(singular: "Swamp"),
-    params: [],
-)
-

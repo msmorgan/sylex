@@ -1,6 +1,0 @@
-CounterKind(
-    name: "pinCounter",
-    params: [],
-    spelling: "pin",
-    holder: Object,
-)

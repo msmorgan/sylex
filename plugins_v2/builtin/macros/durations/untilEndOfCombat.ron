@@ -1,6 +1,0 @@
-(
-    name: "untilEndOfCombat",
-    kinds: [Duration],
-    params: [],
-    body: Between(None, EndOf(Combat, None, Current)),
-)

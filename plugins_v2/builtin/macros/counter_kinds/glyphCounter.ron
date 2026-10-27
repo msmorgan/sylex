@@ -1,6 +1,0 @@
-CounterKind(
-    name: "glyphCounter",
-    params: [],
-    spelling: "glyph",
-    holder: Object,
-)

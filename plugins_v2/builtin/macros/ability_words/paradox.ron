@@ -1,5 +1,0 @@
-AbilityWord(
-    name: "paradox",
-    spelling: "Paradox",
-    grammar: FixedTerm(surface: "Paradox"),
-)

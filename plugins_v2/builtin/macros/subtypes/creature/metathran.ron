@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "metathran",
-    spelling: "Metathran",
-    grammar: Noun(singular: "Metathran", plural: Unavailable),
-    params: [],
-)
-

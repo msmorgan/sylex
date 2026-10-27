@@ -1,7 +1,0 @@
-// "<performer> draws <amount> card(s)" [CR#121.1].
-(
-    name: "draw",
-    kinds: [Instruction],
-    params: {"amount": Amount},
-    body: Draw(Param(amount)),
-)

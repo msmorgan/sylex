@@ -1,6 +1,0 @@
-CounterKind(
-    name: "stashCounter",
-    params: [],
-    spelling: "stash",
-    holder: Object,
-)

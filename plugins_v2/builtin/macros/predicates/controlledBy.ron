@@ -1,7 +1,0 @@
-// "<player> controls"
-(
-    name: "controlledBy",
-    kinds: [Predicate],
-    params: {"player": NounPhrase},
-    body: HasPossessor(Controller, Param(player)),
-)

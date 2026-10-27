@@ -1,7 +1,0 @@
-CounterKind(
-    name: "verseCounter",
-    params: [],
-    spelling: "verse",
-    grammar: FixedTerm(surface: "verse"),
-    holder: Object,
-)

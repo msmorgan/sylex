@@ -1,7 +1,0 @@
-// "<subject> regenerates": the verb as an event.
-(
-    name: "regenerates",
-    kinds: [GameEvent],
-    params: {"subject": NounPhrase},
-    body: VerbedEvent(None, regenerate, Param(subject), None, None),
-)

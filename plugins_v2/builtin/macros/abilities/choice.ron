@@ -1,9 +1,0 @@
-// `StaticSpec.Choice` under Lean's own name for it: the alias
-// `declare_semantic_primitives` generates, so a card writes a macro where the
-// basis has a constructor (ADR 12.1).
-(
-    name: "choice",
-    kinds: [StaticSpec],
-    params: {"occasion": Any, "subject": Subject, "sort": Any, "disclosure": Disclosure, "domain": Default(Any, None)},
-    body: Choice(occasion: Param(occasion), subject: Param(subject), sort: Param(sort), domain: Param(domain), disclosure: Param(disclosure)),
-)

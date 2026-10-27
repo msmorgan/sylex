@@ -1,7 +1,0 @@
-// "<performer> controls": `youControl` with the actor in place of "you".
-(
-    name: "actorControls",
-    kinds: [Predicate],
-    params: [],
-    body: HasPossessor(Controller, Actor),
-)

@@ -1,7 +1,0 @@
-Type(
-    name: "dungeon",
-    spelling: "dungeon",
-    grammar: Noun(singular: "dungeon"),
-    params: [],
-    body: CardType(card_type: Dungeon, permanent_type: false, confers: []),
-)

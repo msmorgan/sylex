@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "licid",
-    spelling: "Licid",
-    grammar: Noun(singular: "Licid", plural: Unavailable),
-    params: [],
-)
-

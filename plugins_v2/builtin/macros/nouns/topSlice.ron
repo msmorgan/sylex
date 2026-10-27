@@ -1,7 +1,0 @@
-// "the top N cards of your library"
-(
-    name: "topSlice",
-    kinds: [NounPhrase],
-    params: {"amount": Amount},
-    body: Slice(Top, Param(amount), library(You)),
-)

@@ -1,4 +1,13 @@
 //! Discourse state mirrored from `lean/Semantics/Check/Words.lean`.
+mod events;
+mod choices;
+mod words;
+mod selections;
+mod local_shape;
+pub use selections::{run_payloads, selection_payload, slice_payload};
+pub use words::{common_types, merge_types, normalize_types};
+mod phrase_facts;
+pub use events::EventFacts;
 use crate::ast::{
     AttachMove, BindingId, CardType, Deed, ExposeVerb, Kind, Letter, NounWord, OutcomeSort,
     PileFace, Plurality, Procedure, QualitySort, Reach, SlotCarrier, Status, Subtype, Zone,

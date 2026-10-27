@@ -1,6 +1,0 @@
-CounterKind(
-    name: "arrowCounter",
-    params: [],
-    spelling: "arrow",
-    holder: Object,
-)

@@ -1,6 +1,0 @@
-(
-    name: "untilYourNextTurn",
-    kinds: [Duration],
-    params: [],
-    body: Between(None, BeginningOf(Turn, You, Next(None))),
-)

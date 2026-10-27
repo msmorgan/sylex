@@ -1,9 +1,0 @@
-// Goaded is a permanent designation [CR#701.15b].
-Designation(
-    name: "goaded",
-    params: [],
-    spelling: "goaded",
-    scope: HeldBy(Object),
-    effectful: true,
-    zone: Battlefield,
-)

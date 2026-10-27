@@ -1,7 +1,0 @@
-// "meld <subject> into <name>"
-(
-    name: "meldInto",
-    kinds: [Instruction],
-    params: {"subject": NounPhrase, "into": String},
-    body: Enact(verb: meld, instruction: Move(Param(subject), wherever, battlefield, [EntersMelded(Param(into))])),
-)

@@ -1,7 +1,0 @@
-// "for the rest of the game": a span with neither boundary [CR#611.2a].
-(
-    name: "restOfGame",
-    kinds: [Duration],
-    params: [],
-    body: Between(None, None),
-)

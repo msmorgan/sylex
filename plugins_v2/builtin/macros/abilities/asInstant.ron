@@ -1,8 +1,0 @@
-// "only as an instant": any time you have priority [CR#117.1a]. A mana ability
-// may be activated without priority [CR#117.1d], so this is written.
-(
-    name: "asInstant",
-    kinds: [Timing],
-    params: [],
-    body: OnlyIf(HasPriority(You)),
-)

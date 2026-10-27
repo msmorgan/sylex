@@ -44,9 +44,9 @@ enum Cmd {
     Validate(ValidateArgs),
     /// Show a card as parsed from a plugin, with its macros expanded.
     Card(CardArgs),
-    /// Print the fully expanded body of every `plugins_v2` macro declaration,
+    /// Print the fully expanded body of every `plugins_v3` macro declaration,
     /// one file each, for `diff -r` between two trees (defaults to
-    /// `plugins_v2/builtin` into `target/expansions`).
+    /// `plugins_v3/builtin` into `target/expansions`).
     Expansions(ExpansionsArgs),
     /// The render-back fidelity gate: diff every finished card's rendered
     /// English against the oracle snapshot (strong form — any unwaivered
@@ -134,7 +134,7 @@ mod tests {
             assert!(Cli::try_parse_from(["cargo xtask", "lean", command]).is_err());
         }
         assert!(
-            Cli::try_parse_from(["cargo xtask", "lean", "check", "plugins_v2/testing"]).is_err()
+            Cli::try_parse_from(["cargo xtask", "lean", "check", "plugins_v3/testing"]).is_err()
         );
         assert!(Cli::try_parse_from(["cargo xtask", "lean"]).is_err());
         assert!(Cli::try_parse_from(["cargo xtask", "lean-check"]).is_err());

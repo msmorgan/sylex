@@ -1,6 +1,0 @@
-CounterKind(
-    name: "currencyCounter",
-    params: [],
-    spelling: "currency",
-    holder: Object,
-)

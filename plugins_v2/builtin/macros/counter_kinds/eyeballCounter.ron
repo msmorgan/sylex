@@ -1,6 +1,0 @@
-CounterKind(
-    name: "eyeballCounter",
-    params: [],
-    spelling: "eyeball",
-    holder: Object,
-)

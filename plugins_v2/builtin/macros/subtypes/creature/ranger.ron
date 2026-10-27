@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "ranger",
-    spelling: "Ranger",
-    grammar: Noun(singular: "Ranger", plural: Unavailable),
-    params: [],
-)
-

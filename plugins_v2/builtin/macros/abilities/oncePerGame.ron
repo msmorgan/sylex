@@ -1,7 +1,0 @@
-// "only once each game": no more than one per game [CR#602.5b].
-(
-    name: "oncePerGame",
-    kinds: [UsageLimit],
-    params: [],
-    body: Mk(MoreThan(1), Game),
-)

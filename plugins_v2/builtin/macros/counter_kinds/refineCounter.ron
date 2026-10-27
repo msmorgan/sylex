@@ -1,6 +1,0 @@
-CounterKind(
-    name: "refineCounter",
-    params: [],
-    spelling: "refine",
-    holder: Object,
-)

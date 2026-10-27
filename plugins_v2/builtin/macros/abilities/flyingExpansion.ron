@@ -1,9 +1,0 @@
-// Flying's definition, a static ability: "This creature can't be blocked except by creatures
-// with flying and/or reach." [CR#702.9b] The exempt blockers are the prohibition's Deontic
-// Exception.
-(
-    name: "flyingExpansion",
-    kinds: [Ability],
-    params: [],
-    body: Static(cantBeBlockedExceptBy(subject: thisCreature, blockers: And([creature, Or([HasKeyword(The(flying)), HasKeyword(The(reach))])]))),
-)

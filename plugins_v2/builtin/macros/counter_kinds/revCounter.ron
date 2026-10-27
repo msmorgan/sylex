@@ -1,6 +1,0 @@
-CounterKind(
-    name: "revCounter",
-    params: [],
-    spelling: "rev",
-    holder: Object,
-)

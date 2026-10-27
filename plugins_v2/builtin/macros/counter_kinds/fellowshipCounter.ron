@@ -1,6 +1,0 @@
-CounterKind(
-    name: "fellowshipCounter",
-    params: [],
-    spelling: "fellowship",
-    holder: Object,
-)

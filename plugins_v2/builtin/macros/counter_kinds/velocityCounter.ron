@@ -1,6 +1,0 @@
-CounterKind(
-    name: "velocityCounter",
-    params: [],
-    spelling: "velocity",
-    holder: Object,
-)

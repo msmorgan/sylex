@@ -1,8 +1,0 @@
-// "only as a sorcery": during your main phase, while the stack is empty
-// [CR#307.5].
-(
-    name: "asSorcery",
-    kinds: [Timing],
-    params: [],
-    body: And([InPart(MainPhase, You, Current), OnlyIf(Not(exists(inZone(stack))))]),
-)

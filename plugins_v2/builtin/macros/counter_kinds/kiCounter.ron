@@ -1,6 +1,0 @@
-CounterKind(
-    name: "kiCounter",
-    params: [],
-    spelling: "ki",
-    holder: Object,
-)

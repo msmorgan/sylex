@@ -1,6 +1,0 @@
-CounterKind(
-    name: "shredCounter",
-    params: [],
-    spelling: "shred",
-    holder: Object,
-)

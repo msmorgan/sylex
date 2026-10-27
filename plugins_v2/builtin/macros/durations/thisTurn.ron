@@ -1,8 +1,0 @@
-// "this turn", as an effect lasts: until the turn ends [CR#514.2]. A lookback's
-// "this turn" is `soFarThisTurn`.
-(
-    name: "thisTurn",
-    kinds: [Duration],
-    params: [],
-    body: Between(None, EndOf(Turn, None, Current)),
-)

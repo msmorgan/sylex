@@ -1,6 +1,0 @@
-CounterKind(
-    name: "intelCounter",
-    params: [],
-    spelling: "intel",
-    holder: Object,
-)

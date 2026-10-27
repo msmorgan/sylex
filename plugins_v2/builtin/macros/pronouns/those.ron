@@ -1,7 +1,0 @@
-// "those <word>s", e.g. `those .card`.
-(
-    name: "those",
-    kinds: [NounPhrase],
-    params: {"w": NounWord},
-    body: Pro(Word(Param(w)), Many, Whole),
-)

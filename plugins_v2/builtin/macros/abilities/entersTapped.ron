@@ -1,7 +1,0 @@
-// "<subject> enters tapped"
-(
-    name: "entersTapped",
-    kinds: [StaticSpec],
-    params: {"subject": NounPhrase},
-    body: EntryRider(Param(subject), EntersAs(Tapped)),
-)

@@ -1,7 +1,0 @@
-// "any target" [CR#115.4].
-(
-    name: "anyTarget",
-    kinds: [Predicate],
-    params: [],
-    body: Or([HasType(Creature), HasType(Planeswalker), HasType(Battle), AnyPlayer]),
-)

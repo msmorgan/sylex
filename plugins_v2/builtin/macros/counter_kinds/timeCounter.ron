@@ -1,7 +1,0 @@
-CounterKind(
-    name: "timeCounter",
-    params: [],
-    spelling: "time",
-    grammar: FixedTerm(surface: "time"),
-    holder: Object,
-)

@@ -1,6 +1,0 @@
-CounterKind(
-    name: "bloodlineCounter",
-    params: [],
-    spelling: "bloodline",
-    holder: Object,
-)

@@ -1,6 +1,0 @@
-CounterKind(
-    name: "plagueCounter",
-    params: [],
-    spelling: "plague",
-    holder: Object,
-)

@@ -1,7 +1,0 @@
-// "all …"
-(
-    name: "allOf",
-    kinds: [NounPhrase],
-    params: {"p": Predicate},
-    body: Described(All, Param(p)),
-)

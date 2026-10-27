@@ -1,6 +1,0 @@
-CounterKind(
-    name: "paralyzationCounter",
-    params: [],
-    spelling: "paralyzation",
-    holder: Object,
-)

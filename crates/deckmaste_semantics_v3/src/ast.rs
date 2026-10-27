@@ -10,7 +10,7 @@ pub type ProducedRun = Vec<ColorOrColorless>;
 pub type ChapterNumber = u64;
 
 /// Mirrors `Semantics/Words.lean:30`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Procedure {
     Activate,
     Cast,
@@ -19,7 +19,7 @@ pub enum Procedure {
 }
 
 /// Mirrors `Semantics/Words.lean:35`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Stat {
     Power,
     Toughness,
@@ -31,7 +31,7 @@ pub enum Stat {
 }
 
 /// Mirrors `Semantics/Words.lean:54`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct CardType {
     pub name: Ident,
     pub permanent: bool,
@@ -40,14 +40,14 @@ pub struct CardType {
 }
 
 /// Mirrors `Semantics/Words.lean:119`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CardClass {
     PermanentCard,
     InstantOrSorceryCard,
 }
 
 /// Mirrors `Semantics/Words.lean:132`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum PlayerStat {
     LifeTotal,
     StartingLifeTotal,
@@ -55,7 +55,7 @@ pub enum PlayerStat {
 }
 
 /// Mirrors `Semantics/Words.lean:139`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Comparator {
     AtLeast,
     AtMost,
@@ -65,7 +65,7 @@ pub enum Comparator {
 }
 
 /// Mirrors `Semantics/Words.lean:144`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum QualitySort {
     Color,
     Subtype { host: CardType },
@@ -77,14 +77,14 @@ pub enum QualitySort {
 }
 
 /// Mirrors `Semantics/Words.lean:155`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Letter {
     X,
     Y,
 }
 
 /// Mirrors `Semantics/Words.lean:160`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Kind {
     Object,
     Player,
@@ -97,7 +97,7 @@ pub enum Kind {
 }
 
 /// Mirrors `Semantics/Words.lean:173`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum AggregateOp {
     Sum,
     Min,
@@ -105,7 +105,7 @@ pub enum AggregateOp {
 }
 
 /// Mirrors `Semantics/Words.lean:177`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum SubtypeScope {
     Any,
     BasicOnly,
@@ -113,7 +113,7 @@ pub enum SubtypeScope {
 }
 
 /// Mirrors `Semantics/Words.lean:182`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum KindAxis {
     CardType,
     PermanentType,
@@ -125,7 +125,7 @@ pub enum KindAxis {
 }
 
 /// Mirrors `Semantics/Words.lean:194`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum OutcomeSort {
     DamageDealt,
     DamageMarked,
@@ -146,49 +146,49 @@ pub enum OutcomeSort {
 }
 
 /// Mirrors `Semantics/Words.lean:200`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum FlipCall {
     Wins,
     Loses,
 }
 
 /// Mirrors `Semantics/Words.lean:204`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CoinFace {
     Heads,
     Tails,
 }
 
 /// Mirrors `Semantics/Words.lean:208`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum RollExtreme {
     Lowest,
     Highest,
 }
 
 /// Mirrors `Semantics/Words.lean:212`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Plurality {
     One,
     Many,
 }
 
 /// Mirrors `Semantics/Words.lean:219`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Agreement {
     Share,
     Differ,
 }
 
 /// Mirrors `Semantics/Words.lean:250`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum PossessorAxis {
     Owner,
     Controller,
 }
 
 /// Mirrors `Semantics/Words.lean:265`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CombatRelation {
     AttackerOf,
     DeclaredAttacker,
@@ -201,21 +201,21 @@ pub enum CombatRelation {
 }
 
 /// Mirrors `Semantics/Words.lean:271`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CombatRole {
     Attacking,
     Defending,
 }
 
 /// Mirrors `Semantics/Words.lean:276`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum AttachMove {
     Attached,
     Unattached,
 }
 
 /// Mirrors `Semantics/Words.lean:280`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ArithOp {
     Plus,
     Minus,
@@ -224,7 +224,7 @@ pub enum ArithOp {
 }
 
 /// Mirrors `Semantics/Words.lean:284`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Zone {
     Battlefield,
     Graveyard,
@@ -236,27 +236,27 @@ pub enum Zone {
 }
 
 /// Mirrors `Semantics/Words.lean:288`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum PileEnd {
     Top,
     Bottom,
 }
 
 /// Mirrors `Semantics/Words.lean:292`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Arrangement {
     AnyOrder,
     RandomOrder,
 }
 
 /// Mirrors `Semantics/Words.lean:297`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Ordinal {
     Nth { n: u64 },
 }
 
 /// Mirrors `Semantics/Words.lean:304`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum DesignationScope {
     HeldBy { holder: Box<Kind> },
     HeldByCard,
@@ -264,7 +264,7 @@ pub enum DesignationScope {
 }
 
 /// Mirrors `Semantics/Words.lean:321`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum DesignationLabel {
     Named {
         name: Ident,
@@ -274,32 +274,32 @@ pub enum DesignationLabel {
 }
 
 /// Mirrors `Semantics/Words.lean:329`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum RelationLabel {
     Named { name: Ident },
 }
 
 /// Mirrors `Semantics/Words.lean:334`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum MergePosition {
     Top,
     Bottom,
 }
 
 /// Mirrors `Semantics/Words.lean:343`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum KeywordLabel {
     Named { name: Ident },
 }
 
 /// Mirrors `Semantics/Words.lean:349`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum AbilityWordLabel {
     Named { name: Ident },
 }
 
 /// Mirrors `Semantics/Words.lean:373`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CoreDeed {
     Target,
     Draw,
@@ -309,13 +309,13 @@ pub enum CoreDeed {
 }
 
 /// Mirrors `Semantics/Words.lean:378`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum StateBasedCause {
     NonpositiveLife,
 }
 
 /// Mirrors `Semantics/Words.lean:384`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum DeedPermanent {
     None,
     Performs,
@@ -323,7 +323,7 @@ pub enum DeedPermanent {
 }
 
 /// Mirrors `Semantics/Words.lean:399`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Deed {
     Core {
         deed: CoreDeed,
@@ -338,21 +338,21 @@ pub enum Deed {
 }
 
 /// Mirrors `Semantics/Words.lean:407`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum PileFace {
     FaceDown,
     FaceUp,
 }
 
 /// Mirrors `Semantics/Words.lean:411`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ChoiceSort {
     Quality { sort: QualitySort },
     Player,
 }
 
 /// Mirrors `Semantics/Words.lean:417`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum DieSides {
     Sides { sides: u64 },
     ThoseDice,
@@ -360,42 +360,42 @@ pub enum DieSides {
 }
 
 /// Mirrors `Semantics/Words.lean:426`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ChoiceRef {
     TheChoice,
     TheLatestChoice,
 }
 
 /// Mirrors `Semantics/Words.lean:430`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Disclosure {
     Openly,
     Secretly,
 }
 
 /// Mirrors `Semantics/Words.lean:434`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum HiddenSort {
     Numbers,
     Choices,
 }
 
 /// Mirrors `Semantics/Words.lean:438`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ExposeVerb {
     LookAt,
     Reveal,
 }
 
 /// Mirrors `Semantics/Words.lean:443`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Subtype {
     Of { host: CardType, label: Ident },
     Spell { label: Ident },
 }
 
 /// Mirrors `Semantics/Words.lean:451`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum NounWord {
     Type {
         type_: CardType,
@@ -425,7 +425,7 @@ pub enum NounWord {
 }
 
 /// Mirrors `Semantics/Words.lean:480`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum SlotCarrier {
     Permanent,
     Card,
@@ -434,7 +434,7 @@ pub enum SlotCarrier {
 }
 
 /// Mirrors `Semantics/Words.lean:485`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Reach {
     Bare,
     AtSlot { slot: SlotCarrier },
@@ -443,7 +443,7 @@ pub enum Reach {
 }
 
 /// Mirrors `Semantics/Words.lean:498`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum EntryCounterMark {
     Fresh,
     Additional,
@@ -451,14 +451,14 @@ pub enum EntryCounterMark {
 }
 
 /// Mirrors `Semantics/Words.lean:502`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum RoundMode {
     Up,
     Down,
 }
 
 /// Mirrors `Semantics/Words.lean:510`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum TargetExtent {
     SomeTarget,
     SoleTarget,
@@ -466,7 +466,7 @@ pub enum TargetExtent {
 }
 
 /// Mirrors `Semantics/Words.lean:514`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CopySort {
     FromStack,
     FromCardZone,
@@ -474,14 +474,14 @@ pub enum CopySort {
 }
 
 /// Mirrors `Semantics/Words.lean:522`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct KeywordFamily {
     pub word: KeywordLabel,
     pub sort: Option<QualitySort>,
 }
 
 /// Mirrors `Semantics/Words.lean:527`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum KeywordTerm {
     The { keyword: KeywordLabel },
     AnyIn { family: KeywordFamily },
@@ -489,7 +489,7 @@ pub enum KeywordTerm {
 }
 
 /// Mirrors `Semantics/Words.lean:537`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum LinkSource {
     ByKeyword {
         keyword: KeywordLabel,
@@ -503,7 +503,7 @@ pub enum LinkSource {
 }
 
 /// Mirrors `Semantics/Words.lean:544`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum AbilityClass {
     AnyOnStack,
     AnyActivated,
@@ -514,14 +514,14 @@ pub enum AbilityClass {
 }
 
 /// Mirrors `Semantics/Words.lean:558`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ItalicWord {
     AbilityWord { label: AbilityWordLabel },
     FlavorWord { label: FlavorWordLabel },
 }
 
 /// Mirrors `Semantics/Words.lean:563`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Color {
     White,
     Blue,
@@ -531,21 +531,21 @@ pub enum Color {
 }
 
 /// Mirrors `Semantics/Words.lean:567`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ColorOrColorless {
     Colorless,
     Of { color: Color },
 }
 
 /// Mirrors `Semantics/Words.lean:572`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum SimpleManaSymbol {
     Generic { amount: u64 },
     Specific { color: ColorOrColorless },
 }
 
 /// Mirrors `Semantics/Words.lean:577`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ManaSymbol {
     Simple {
         symbol: SimpleManaSymbol,
@@ -563,7 +563,7 @@ pub enum ManaSymbol {
 }
 
 /// Mirrors `Semantics/Words.lean:591`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum SubtypeSpace {
     BasicLand,
     Land,
@@ -571,7 +571,7 @@ pub enum SubtypeSpace {
 }
 
 /// Mirrors `Semantics/Words.lean:595`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum PayTimes {
     Once,
     AnyNumberOfTimes,
@@ -579,14 +579,14 @@ pub enum PayTimes {
 }
 
 /// Mirrors `Semantics/Words.lean:601`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CostNamed {
     Containing { symbol: ManaSymbol },
     OfKeyword { keyword: KeywordLabel },
 }
 
 /// Mirrors `Semantics/Words.lean:606`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ColorFreedom {
     SameColor,
     EachColor,
@@ -594,7 +594,7 @@ pub enum ColorFreedom {
 }
 
 /// Mirrors `Semantics/Words.lean:610`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ManaMatch {
     AnyColor,
     AnyType,
@@ -602,7 +602,7 @@ pub enum ManaMatch {
 }
 
 /// Mirrors `Semantics/Words.lean:617`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Delta<T> {
     Up { amount: T },
     Down { amount: T },
@@ -610,14 +610,14 @@ pub enum Delta<T> {
 }
 
 /// Mirrors `Semantics/Words.lean:623`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Parity {
     Even,
     Odd,
 }
 
 /// Mirrors `Semantics/Words.lean:627`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Supertype {
     Legendary,
     Basic,
@@ -626,28 +626,28 @@ pub enum Supertype {
 }
 
 /// Mirrors `Semantics/Words.lean:631`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum LockState {
     Locked,
     Unlocked,
 }
 
 /// Mirrors `Semantics/Words.lean:636`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum AttachmentSide {
     Host,
     Attachment,
 }
 
 /// Mirrors `Semantics/Words.lean:641`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CardFaceSide {
     Front,
     Back,
 }
 
 /// Mirrors `Semantics/Words.lean:645`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum AttachWord {
     Enchanted,
     Equipped,
@@ -655,7 +655,7 @@ pub enum AttachWord {
 }
 
 /// Mirrors `Semantics/Words.lean:651`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum OutcomeVerb {
     WinGame,
     LoseGame,
@@ -663,7 +663,7 @@ pub enum OutcomeVerb {
 }
 
 /// Mirrors `Semantics/Words.lean:658`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum DefinedSlots {
     PowerAlone,
     ToughnessAlone,
@@ -671,13 +671,13 @@ pub enum DefinedSlots {
 }
 
 /// Mirrors `Semantics/Words.lean:670`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CounterKind {
     Named { name: Ident, holder: Box<Kind> },
 }
 
 /// Mirrors `Semantics/Words.lean:674`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ProjAxis {
     Stat { stat: Stat },
     PlayerStat { stat: PlayerStat },
@@ -690,7 +690,7 @@ pub enum ProjAxis {
 }
 
 /// Mirrors `Semantics/Words.lean:700`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Status {
     Tapped,
     Untapped,
@@ -703,14 +703,14 @@ pub enum Status {
 }
 
 /// Mirrors `Semantics/Words.lean:704`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ColorSpec {
     Some { colors: Vec<Color> },
     Every,
 }
 
 /// Mirrors `Semantics/Words.lean:710`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum TurnPart {
     Turn,
     BeginningPhase,
@@ -733,7 +733,7 @@ pub enum TurnPart {
 }
 
 /// Mirrors `Semantics/Words.lean:726`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Period {
     Turn,
     YourTurn,
@@ -743,49 +743,49 @@ pub enum Period {
 }
 
 /// Mirrors `Semantics/Words.lean:735`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum EventSide {
     Before,
     After,
 }
 
 /// Mirrors `Semantics/Events.lean:12`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum PaymentOutcome {
     Paid,
     Unpaid,
 }
 
 /// Mirrors `Semantics/Events.lean:18`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum TallyMode {
     Events,
     Quantity,
 }
 
 /// Mirrors `Semantics/Events.lean:23`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ReplUse {
     Repeatedly,
     NextTimeOnly,
 }
 
 /// Mirrors `Semantics/Events.lean:33`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum DamageKind {
     Combat,
     Noncombat,
 }
 
 /// Mirrors `Semantics/Events.lean:40`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CondMarking {
     AsLongAs,
     IfSo,
 }
 
 /// Mirrors `Semantics/Events.lean:45`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ChoiceMode {
     Unmarked,
     TheirChoice,
@@ -794,28 +794,28 @@ pub enum ChoiceMode {
 }
 
 /// Mirrors `Semantics/Abilities.lean:21`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ObservationPoint {
     Arrival,
     Departure,
 }
 
 /// Mirrors `Semantics/Abilities.lean:25`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ManaHeld {
     ThisMana,
     Unspent { type_: Option<ColorOrColorless> },
 }
 
 /// Mirrors `Semantics/Abilities.lean:32`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum TextWord {
     Color { color: Color },
     Subtype { subtype: Subtype },
 }
 
 /// Mirrors `Semantics/Abilities.lean:39`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum TextWordSort {
     Color,
     LandType,
@@ -823,7 +823,7 @@ pub enum TextWordSort {
 }
 
 /// Mirrors `Semantics/Abilities.lean:43`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum QualityOp {
     Adds,
     Sets,
@@ -831,7 +831,7 @@ pub enum QualityOp {
 }
 
 /// Mirrors `Semantics/Abilities.lean:50`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct TypeLineChanges {
     pub supertypes: Option<Vec<Supertype>>,
     pub types: Option<Vec<CardType>>,
@@ -839,7 +839,7 @@ pub struct TypeLineChanges {
 }
 
 /// Mirrors `Semantics/Abilities.lean:56`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CharacteristicStat {
     Power,
     Toughness,
@@ -848,28 +848,28 @@ pub enum CharacteristicStat {
 }
 
 /// Mirrors `Semantics/Abilities.lean:60`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum SpentMode {
     AffectsIt,
     TriggersThen,
 }
 
 /// Mirrors `Semantics/Abilities.lean:66`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ContinuationPolicy {
     Optional,
     Required,
 }
 
 /// Mirrors `Semantics/Abilities.lean:73`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum NameSource {
     Printed { name: Ident },
     Chosen,
 }
 
 /// Mirrors `Semantics/Abilities.lean:81`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Coordinator {
     And,
     Or,
@@ -877,7 +877,7 @@ pub enum Coordinator {
 }
 
 /// Mirrors `Semantics/Abilities.lean:97`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Location {
     InCaller {
         body: Box<Location>,
@@ -908,7 +908,7 @@ pub enum Location {
 }
 
 /// Mirrors `Semantics/Abilities.lean:118`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ChoiceDomain {
     NameOfCard { predicate: Box<Predicate> },
     ColorOtherThan { color: Color },
@@ -921,7 +921,7 @@ pub enum ChoiceDomain {
 }
 
 /// Mirrors `Semantics/Abilities.lean:131`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Subject {
     Actor { np: Box<NounPhrase> },
     Any,
@@ -929,7 +929,7 @@ pub enum Subject {
 }
 
 /// Mirrors `Semantics/Abilities.lean:137`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum LookbackSpan {
     Duration {
         d: Box<Duration>,
@@ -941,7 +941,7 @@ pub enum LookbackSpan {
 }
 
 /// Mirrors `Semantics/Abilities.lean:159`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct DidClause {
     pub subj: Box<Subject>,
     pub action: Box<Action>,
@@ -950,7 +950,7 @@ pub struct DidClause {
 }
 
 /// Mirrors `Semantics/Abilities.lean:167`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum TurnRef {
     Current,
     Previous { player: Option<Box<NounPhrase>> },
@@ -962,7 +962,7 @@ pub enum TurnRef {
 }
 
 /// Mirrors `Semantics/Abilities.lean:186`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Timing {
     InPart {
         part: TurnPart,
@@ -992,7 +992,7 @@ pub enum Timing {
 }
 
 /// Mirrors `Semantics/Abilities.lean:203`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Duration {
     Between {
         start: Option<Box<GameEvent>>,
@@ -1005,7 +1005,7 @@ pub enum Duration {
 }
 
 /// Mirrors `Semantics/Abilities.lean:215`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum LinkedFacet {
     ColorsSpent,
     ManaValueSpent,
@@ -1023,7 +1023,7 @@ pub enum LinkedFacet {
 }
 
 /// Mirrors `Semantics/Abilities.lean:232`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Predicate {
     InCaller {
         body: Box<Predicate>,
@@ -1190,7 +1190,7 @@ pub enum Predicate {
 }
 
 /// Mirrors `Semantics/Abilities.lean:338`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum DetPhrase {
     Target {
         quantity: Box<Quantity>,
@@ -1210,7 +1210,7 @@ pub enum DetPhrase {
 }
 
 /// Mirrors `Semantics/Abilities.lean:349`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ColorTerm {
     Lit { color: Color },
     Chosen { ref_: ChoiceRef },
@@ -1218,14 +1218,14 @@ pub enum ColorTerm {
 }
 
 /// Mirrors `Semantics/Abilities.lean:358`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ManaTypeTerm {
     Colorless,
     OfColor { color: Box<ColorTerm> },
 }
 
 /// Mirrors `Semantics/Abilities.lean:362`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum NounPhrase {
     InCaller {
         body: Box<NounPhrase>,
@@ -1324,7 +1324,7 @@ pub enum NounPhrase {
 }
 
 /// Mirrors `Semantics/Abilities.lean:426`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Amount {
     InCaller {
         body: Box<Amount>,
@@ -1407,7 +1407,7 @@ pub enum Amount {
 }
 
 /// Mirrors `Semantics/Abilities.lean:460`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Quantity {
     InCaller { body: Box<Quantity> },
     Range { low: Option<u64>, high: Option<u64> },
@@ -1420,7 +1420,7 @@ pub enum Quantity {
 }
 
 /// Mirrors `Semantics/Abilities.lean:479`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum SliceCount {
     Counted {
         quantity: Box<Quantity>,
@@ -1434,7 +1434,7 @@ pub enum SliceCount {
 }
 
 /// Mirrors `Semantics/Abilities.lean:487`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Door {
     ThisDoor,
     DoorOf {
@@ -1444,7 +1444,7 @@ pub enum Door {
 }
 
 /// Mirrors `Semantics/Abilities.lean:492`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum RollWatch {
     AnyResult,
     ResultIn { quantity: Box<Quantity> },
@@ -1452,7 +1452,7 @@ pub enum RollWatch {
 }
 
 /// Mirrors `Semantics/Abilities.lean:497`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Condition {
     InCaller {
         body: Box<Condition>,
@@ -1515,7 +1515,7 @@ pub enum Condition {
 }
 
 /// Mirrors `Semantics/Abilities.lean:539`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum GameEvent {
     InCaller {
         body: Box<GameEvent>,
@@ -1554,7 +1554,7 @@ pub enum GameEvent {
 }
 
 /// Mirrors `Semantics/Abilities.lean:561`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Causing {
     Source { source: Box<NounPhrase> },
     Event { event: Box<GameEvent> },
@@ -1562,14 +1562,14 @@ pub enum Causing {
 }
 
 /// Mirrors `Semantics/Abilities.lean:566`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum FlipScope {
     Count { amount: Box<Amount> },
     Per { each: Box<NounPhrase> },
 }
 
 /// Mirrors `Semantics/Abilities.lean:570`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum IgnoredOutcomes {
     Extreme {
         extreme: RollExtreme,
@@ -1584,7 +1584,7 @@ pub enum IgnoredOutcomes {
 }
 
 /// Mirrors `Semantics/Abilities.lean:575`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Ballot {
     AnyBallot,
     ByLabel { options: Vec<VoteLabel> },
@@ -1592,7 +1592,7 @@ pub enum Ballot {
 }
 
 /// Mirrors `Semantics/Abilities.lean:580`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Exposed {
     Cards { cards: Box<NounPhrase> },
     Zone { zone: Box<Location> },
@@ -1600,7 +1600,7 @@ pub enum Exposed {
 }
 
 /// Mirrors `Semantics/Abilities.lean:585`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum VisibleThing {
     TopOfLibrary,
     WholeHand,
@@ -1608,13 +1608,13 @@ pub enum VisibleThing {
 }
 
 /// Mirrors `Semantics/Abilities.lean:594`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum UsageLimit {
     Mk { times: Box<Amount>, per: Period },
 }
 
 /// Mirrors `Semantics/Abilities.lean:598`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct JoinedHeader {
     pub event: Box<GameEvent>,
     pub alternatives: Vec<GameEvent>,
@@ -1623,7 +1623,7 @@ pub struct JoinedHeader {
 }
 
 /// Mirrors `Semantics/Abilities.lean:607`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum SpendPurpose {
     ToCast { predicate: Box<Predicate> },
     ToActivate { source: Option<Box<Predicate>> },
@@ -1632,7 +1632,7 @@ pub enum SpendPurpose {
 }
 
 /// Mirrors `Semantics/Abilities.lean:616`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum AsThough {
     Condition {
         cond: Box<Condition>,
@@ -1649,7 +1649,7 @@ pub enum AsThough {
 }
 
 /// Mirrors `Semantics/Abilities.lean:623`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Exchanged {
     LifeTotals {
         parties: Box<NounPhrase>,
@@ -1673,7 +1673,7 @@ pub enum Exchanged {
 }
 
 /// Mirrors `Semantics/Abilities.lean:633`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum TextChange {
     RemoveBracketed,
     TargetToEach,
@@ -1691,14 +1691,14 @@ pub enum TextChange {
 }
 
 /// Mirrors `Semantics/Abilities.lean:657`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum WrittenQuality {
     EveryTypeOf { space: SubtypeSpace },
     Chosen { quality: Box<Predicate> },
 }
 
 /// Mirrors `Semantics/Abilities.lean:662`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CounterKindSource {
     Printed { kind: CounterKind },
     Chosen { menu: Vec<CounterKind> },
@@ -1710,14 +1710,14 @@ pub enum CounterKindSource {
 }
 
 /// Mirrors `Semantics/Abilities.lean:680`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ManaCostTerm {
     Lit { cost: ManaCost },
     ManaCostOf { object: Box<NounPhrase> },
 }
 
 /// Mirrors `Semantics/Abilities.lean:686`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CostShift {
     Generic {
         change: Delta<Box<Amount>>,
@@ -1730,21 +1730,21 @@ pub enum CostShift {
 }
 
 /// Mirrors `Semantics/Abilities.lean:702`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum PipPaid {
     Generic,
     OfColor { color: Box<ColorTerm> },
 }
 
 /// Mirrors `Semantics/Abilities.lean:711`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum DeonticExcept {
     ByKeyword { label: KeywordLabel },
     ByObjects { objects: Box<NounPhrase> },
 }
 
 /// Mirrors `Semantics/Abilities.lean:718`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum PreventCut {
     All,
     Some { amount: Box<Amount> },
@@ -1754,14 +1754,14 @@ pub enum PreventCut {
 }
 
 /// Mirrors `Semantics/Abilities.lean:725`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum DividedVerb {
     Damage { source: Box<NounPhrase> },
     Counters { kind: CounterKind },
 }
 
 /// Mirrors `Semantics/Abilities.lean:729`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ProducedMana {
     Runs { runs: Vec<ProducedRun> },
     AnyColor { freedom: ColorFreedom },
@@ -1775,7 +1775,7 @@ pub enum ProducedMana {
 }
 
 /// Mirrors `Semantics/Abilities.lean:740`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum DeckTrait {
     ACharacteristic { predicate: Box<Predicate> },
     ManaValueParity { parity: Parity },
@@ -1785,7 +1785,7 @@ pub enum DeckTrait {
 }
 
 /// Mirrors `Semantics/Abilities.lean:751`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum DeckCondition {
     EveryCardIs {
         scope: Box<Predicate>,
@@ -1804,7 +1804,7 @@ pub enum DeckCondition {
 }
 
 /// Mirrors `Semantics/Abilities.lean:766`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CombatParticipation {
     Attacking { defender: Option<Box<NounPhrase>> },
     Blocked { value: bool },
@@ -1812,7 +1812,7 @@ pub enum CombatParticipation {
 }
 
 /// Mirrors `Semantics/Abilities.lean:771`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CombatUpdate {
     Participation {
         state: Box<CombatParticipation>,
@@ -1824,7 +1824,7 @@ pub enum CombatUpdate {
 }
 
 /// Mirrors `Semantics/Abilities.lean:777`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Repetition {
     Again,
     MoreTimes {
@@ -1842,7 +1842,7 @@ pub enum Repetition {
 }
 
 /// Mirrors `Semantics/Abilities.lean:788`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct Characteristics {
     pub name: Option<Ident>,
     pub cost: Option<ManaCost>,
@@ -1858,20 +1858,20 @@ pub struct Characteristics {
 }
 
 /// Mirrors `Semantics/Abilities.lean:804`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct CharacteristicBundle {
     pub characteristics: Box<Characteristics>,
     pub qualities: Vec<WrittenQuality>,
 }
 
 /// Mirrors `Semantics/Abilities.lean:812`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct FaceDown {
     pub characteristics: Option<Box<Characteristics>>,
 }
 
 /// Mirrors `Semantics/Abilities.lean:816`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CharacteristicEdit {
     TypeLine {
         op: QualityOp,
@@ -1916,7 +1916,7 @@ pub enum CharacteristicEdit {
 }
 
 /// Mirrors `Semantics/Abilities.lean:840`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum AbilitySelection {
     Specified { abilities: Vec<AbilityLost> },
     Family { class_: AbilityClass },
@@ -1925,7 +1925,7 @@ pub enum AbilitySelection {
 }
 
 /// Mirrors `Semantics/Abilities.lean:849`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum TokenSpec {
     InCaller {
         body: Box<TokenSpec>,
@@ -1945,7 +1945,7 @@ pub enum TokenSpec {
 }
 
 /// Mirrors `Semantics/Abilities.lean:862`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum WouldClause {
     Would {
         subj: Box<Subject>,
@@ -1966,7 +1966,7 @@ pub enum WouldClause {
 }
 
 /// Mirrors `Semantics/Abilities.lean:877`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Replacement {
     InCaller {
         body: Box<Replacement>,
@@ -1991,7 +1991,7 @@ pub enum Replacement {
 }
 
 /// Mirrors `Semantics/Abilities.lean:914`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct DeonticMods {
     pub timing: Option<Box<Timing>>,
     pub as_though: Option<Box<AsThough>>,
@@ -2001,7 +2001,7 @@ pub struct DeonticMods {
 }
 
 /// Mirrors `Semantics/Abilities.lean:939`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum StaticSpec {
     InCaller {
         body: Box<StaticSpec>,
@@ -2150,7 +2150,7 @@ pub enum StaticSpec {
 }
 
 /// Mirrors `Semantics/Abilities.lean:1099`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ModeChange {
     AllInstead {
         cost: Option<Box<Cost>>,
@@ -2169,7 +2169,7 @@ pub enum ModeChange {
 }
 
 /// Mirrors `Semantics/Abilities.lean:1113`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum PlayPayment {
     ItsOwnCost,
     WithoutPaying,
@@ -2194,7 +2194,7 @@ pub enum PlayPayment {
 }
 
 /// Mirrors `Semantics/Abilities.lean:1144`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum MoveRider {
     InCaller {
         body: Box<MoveRider>,
@@ -2237,7 +2237,7 @@ pub enum MoveRider {
 }
 
 /// Mirrors `Semantics/Abilities.lean:1175`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Cost {
     AnyCost,
     InCaller {
@@ -2272,14 +2272,14 @@ pub enum Cost {
 }
 
 /// Mirrors `Semantics/Abilities.lean:1198`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ManaSubstitute {
     pub action: Box<Action>,
     pub pays: Vec<PipPaid>,
 }
 
 /// Mirrors `Semantics/Abilities.lean:1202`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ManaRider {
     SpendOnly {
         purposes: Vec<SpendPurpose>,
@@ -2296,7 +2296,7 @@ pub enum ManaRider {
 }
 
 /// Mirrors `Semantics/Abilities.lean:1207`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CopyExcept {
     Edits {
         edits: Vec<CharacteristicEdit>,
@@ -2313,14 +2313,14 @@ pub enum CopyExcept {
 }
 
 /// Mirrors `Semantics/Abilities.lean:1213`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct RollRow {
     pub results: Box<Quantity>,
     pub action: Box<Action>,
 }
 
 /// Mirrors `Semantics/Abilities.lean:1217`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CreationSpec {
     Token {
         spec: Box<TokenSpec>,
@@ -2333,7 +2333,7 @@ pub enum CreationSpec {
 }
 
 /// Mirrors `Semantics/Abilities.lean:1222`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Action {
     InCaller {
         body: Box<Action>,
@@ -2661,7 +2661,7 @@ pub enum Action {
 }
 
 /// Mirrors `Semantics/Abilities.lean:1435`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum KeywordParam {
     Cost { cost: Box<Cost> },
     Quality { predicate: Box<Predicate> },
@@ -2672,14 +2672,14 @@ pub enum KeywordParam {
 }
 
 /// Mirrors `Semantics/Abilities.lean:1450`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum AbilityLost {
     Written { ability: Box<Ability> },
     Term { keyword: KeywordTerm },
 }
 
 /// Mirrors `Semantics/Abilities.lean:1454`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Ability {
     InCaller {
         body: Box<Ability>,
@@ -2736,13 +2736,13 @@ pub enum Ability {
 }
 
 /// Mirrors `Semantics/Card.lean:13`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct CardFace {
     pub characteristics: Box<Characteristics>,
 }
 
 /// Mirrors `Semantics/Card.lean:17`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct SharedLineHalf {
     pub name: Ident,
     pub cost: Option<ManaCost>,
@@ -2750,14 +2750,14 @@ pub struct SharedLineHalf {
 }
 
 /// Mirrors `Semantics/Card.lean:23`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum LevelRange {
     Between { from_: u64, to: u64 },
     Plus { from_: u64 },
 }
 
 /// Mirrors `Semantics/Card.lean:30`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct LevelBand {
     pub range: LevelRange,
     pub text: Vec<Ability>,
@@ -2766,7 +2766,7 @@ pub struct LevelBand {
 }
 
 /// Mirrors `Semantics/Card.lean:37`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct PrototypeFrame {
     pub cost: Option<ManaCost>,
     pub power: Option<Box<Amount>>,
@@ -2774,7 +2774,7 @@ pub struct PrototypeFrame {
 }
 
 /// Mirrors `Semantics/Card.lean:42`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Card {
     SingleFaced {
         face: CardFace,
@@ -2815,7 +2815,7 @@ pub enum Card {
 }
 
 /// Mirrors `Semantics/Rules.lean:25`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct SbaRule {
     pub scope: Box<Predicate>,
     pub when: Box<Condition>,
@@ -2823,14 +2823,14 @@ pub struct SbaRule {
 }
 
 /// Mirrors `Semantics/Rules.lean:36`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct PredefinedToken {
     pub name: Ident,
     pub token: Box<CharacteristicBundle>,
 }
 
 /// Mirrors `Semantics/Rules.lean:51`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum Conferral {
     Ability {
         confer: Box<Ability>,
@@ -2849,14 +2849,14 @@ pub enum Conferral {
 }
 
 /// Mirrors `Semantics/Rules.lean:75`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ConferralRule {
     pub scope: Box<Predicate>,
     pub confer: Conferral,
 }
 
 /// Mirrors `Semantics/Rules.lean:87`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum RegistryDefinition {
     Counter {
         kind: CounterKind,
@@ -2880,7 +2880,7 @@ pub enum RegistryDefinition {
 }
 
 /// Mirrors `Semantics/Rules.lean:155`.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct RulesTables {
     pub sba: Vec<SbaRule>,
     pub conferral: Vec<ConferralRule>,

@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "ooze",
-    spelling: "Ooze",
-    grammar: Noun(singular: "Ooze"),
-    params: [],
-)
-

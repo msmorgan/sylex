@@ -1,7 +1,0 @@
-// "the bottom card of your library"
-(
-    name: "bottomCard",
-    kinds: [NounPhrase],
-    params: [],
-    body: Slice(Bottom, 1, library(You)),
-)

@@ -1,6 +1,0 @@
-CounterKind(
-    name: "burdenCounter",
-    params: [],
-    spelling: "burden",
-    holder: Object,
-)

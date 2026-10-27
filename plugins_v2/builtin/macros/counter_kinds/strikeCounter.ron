@@ -1,6 +1,0 @@
-CounterKind(
-    name: "strikeCounter",
-    params: [],
-    spelling: "strike",
-    holder: Object,
-)

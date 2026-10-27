@@ -1603,8 +1603,8 @@ fn added_diff_lines(diff: &str) -> BTreeSet<(String, usize)> {
         if let Some(path) = line.strip_prefix("+++ ") {
             // A unified diff separates the path from an optional timestamp with
             // a TAB, so only a TAB ends the path: a plain space is
-            // part of it (`plugins_v2/canon/cards/Luminarch
-            // Aspirant.ron`).
+            // part of it (`plugins_v3/canon/cards/Luminarch
+            // Aspirant.lean`).
             let path = path.split('\t').next().unwrap_or(path);
             file = Some(path.strip_prefix("b/").unwrap_or(path).to_string());
             continue;
@@ -2192,15 +2192,15 @@ const CR_FIXTURE: &str = "rule 100.1";
     #[test]
     fn added_diff_lines_keeps_a_path_containing_spaces() {
         let diff = concat!(
-            "diff --git a/cards/Luminarch Aspirant.ron b/cards/Luminarch Aspirant.ron\n",
+            "diff --git a/cards/Luminarch Aspirant.lean b/cards/Luminarch Aspirant.lean\n",
             "--- /dev/null\n",
-            "+++ b/cards/Luminarch Aspirant.ron\n",
+            "+++ b/cards/Luminarch Aspirant.lean\n",
             "@@ -0,0 +1,1 @@\n",
             "+// [CR#506.1]\n",
         );
         assert_eq!(
             added_diff_lines(diff),
-            BTreeSet::from([("cards/Luminarch Aspirant.ron".into(), 1)])
+            BTreeSet::from([("cards/Luminarch Aspirant.lean".into(), 1)])
         );
     }
 

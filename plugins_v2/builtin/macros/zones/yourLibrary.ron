@@ -1,6 +1,0 @@
-(
-    name: "yourLibrary",
-    kinds: [ZoneExpr],
-    params: [],
-    body: Zone(Library, PossessedBy(You)),
-)

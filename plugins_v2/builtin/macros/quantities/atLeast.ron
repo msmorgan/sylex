@@ -1,6 +1,0 @@
-(
-    name: "atLeast",
-    kinds: [Quantity],
-    params: {"n": Nat},
-    body: Range(Param(n), None),
-)

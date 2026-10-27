@@ -1,7 +1,0 @@
-// "only once during each of your turns" [CR#602.5b].
-(
-    name: "onceEachYourTurn",
-    kinds: [UsageLimit],
-    params: [],
-    body: Mk(MoreThan(1), YourTurn),
-)

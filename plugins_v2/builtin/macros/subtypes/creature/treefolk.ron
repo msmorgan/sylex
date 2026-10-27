@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "treefolk",
-    spelling: "Treefolk",
-    grammar: Noun(singular: "Treefolk", plural: "Treefolk"),
-    params: [],
-)
-

@@ -1,6 +1,0 @@
-(
-    name: "toughnessOf",
-    kinds: [Amount],
-    params: {"subject": NounPhrase},
-    body: StatOf(Stat(Toughness), Param(subject)),
-)

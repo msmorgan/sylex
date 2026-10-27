@@ -1,6 +1,0 @@
-CounterKind(
-    name: "filibusterCounter",
-    params: [],
-    spelling: "filibuster",
-    holder: Object,
-)

@@ -1,6 +1,0 @@
-(
-    name: "thisArtifact",
-    kinds: [NounPhrase],
-    params: [],
-    body: AsType(Artifact, This, None),
-)

@@ -1,6 +1,0 @@
-(
-    name: "blocked",
-    kinds: [Predicate],
-    params: [],
-    body: InCombat(BlockedBy, None),
-)

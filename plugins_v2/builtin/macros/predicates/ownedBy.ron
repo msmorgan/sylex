@@ -1,7 +1,0 @@
-// "<player> owns"
-(
-    name: "ownedBy",
-    kinds: [Predicate],
-    params: {"player": NounPhrase},
-    body: HasPossessor(Owner, Param(player)),
-)

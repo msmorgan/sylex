@@ -1,7 +1,0 @@
-Type(
-    name: "battle",
-    spelling: "battle",
-    grammar: Noun(singular: "battle"),
-    params: [],
-    body: CardType(card_type: Battle, permanent_type: true, confers: []),
-)

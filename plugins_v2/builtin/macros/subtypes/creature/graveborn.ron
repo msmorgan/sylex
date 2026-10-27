@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "graveborn",
-    spelling: "Graveborn",
-    grammar: Noun(singular: "Graveborn", plural: Unavailable),
-    params: [],
-)
-

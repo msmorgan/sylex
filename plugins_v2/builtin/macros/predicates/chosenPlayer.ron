@@ -1,7 +1,0 @@
-// "the chosen player": the player the choice named.
-(
-    name: "chosenPlayer",
-    kinds: [Predicate],
-    params: [],
-    body: ChosenPlayer(TheChoice),
-)

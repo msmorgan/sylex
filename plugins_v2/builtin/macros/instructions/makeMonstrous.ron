@@ -1,8 +1,0 @@
-// "monstrosity N" with its reminder text [CR#701.37a]: "If this permanent isn't monstrous,
-// put N +1/+1 counters on it and it becomes monstrous."
-(
-    name: "makeMonstrous",
-    kinds: [Instruction],
-    params: {"amount": Amount},
-    body: DoIf(Not(Matches(thisPermanent, HasDesignation(monstrous, None))), Sequentially([PutCounters(Param(amount), p1p1Counter, thisPermanent), GainDesignation(thisPermanent, monstrous, None)]), None),
-)

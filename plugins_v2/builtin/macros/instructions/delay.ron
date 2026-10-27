@@ -1,8 +1,0 @@
-// "When <event> [or <alternatives>], <instruction>": a delayed trigger with
-// no window [CR#603.7a].
-(
-    name: "delay",
-    kinds: [Instruction],
-    params: {"event": GameEvent, "instruction": Instruction, "alternatives": Default(GameEvents, [])},
-    body: Delay(Param(event), Param(alternatives), None, Param(instruction)),
-)

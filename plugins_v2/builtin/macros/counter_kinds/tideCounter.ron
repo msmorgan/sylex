@@ -1,6 +1,0 @@
-CounterKind(
-    name: "tideCounter",
-    params: [],
-    spelling: "tide",
-    holder: Object,
-)

@@ -1,9 +1,0 @@
-// No supported Oracle rules-text or Comprehensive Rules plural is attested.
-Subtype(
-    category: Enchantment,
-    name: "background",
-    spelling: "Background",
-    grammar: Noun(singular: "Background", plural: Unavailable),
-    params: [],
-)
-

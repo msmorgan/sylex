@@ -1,9 +1,0 @@
-// Suspected is a permanent designation [CR#701.60b].
-Designation(
-    name: "suspected",
-    params: [],
-    spelling: "suspected",
-    scope: HeldBy(Object),
-    effectful: true,
-    zone: Battlefield,
-)

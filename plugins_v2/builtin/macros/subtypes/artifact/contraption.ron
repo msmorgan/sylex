@@ -1,8 +1,0 @@
-Subtype(
-    category: Artifact,
-    name: "contraption",
-    spelling: "Contraption",
-    grammar: Noun(singular: "Contraption"),
-    params: [],
-)
-

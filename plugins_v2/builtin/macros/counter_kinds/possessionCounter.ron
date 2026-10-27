@@ -1,6 +1,0 @@
-CounterKind(
-    name: "possessionCounter",
-    params: [],
-    spelling: "possession",
-    holder: Object,
-)

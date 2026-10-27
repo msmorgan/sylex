@@ -1,6 +1,0 @@
-(
-    name: "creatureYouDontControl",
-    kinds: [Predicate],
-    params: [],
-    body: And([creature, Not(HasPossessor(Controller, You))]),
-)

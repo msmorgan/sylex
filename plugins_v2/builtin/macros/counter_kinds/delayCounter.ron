@@ -1,6 +1,0 @@
-CounterKind(
-    name: "delayCounter",
-    params: [],
-    spelling: "delay",
-    holder: Object,
-)

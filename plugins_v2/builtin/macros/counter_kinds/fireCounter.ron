@@ -1,6 +1,0 @@
-CounterKind(
-    name: "fireCounter",
-    params: [],
-    spelling: "fire",
-    holder: Object,
-)

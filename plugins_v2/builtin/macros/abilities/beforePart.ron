@@ -1,7 +1,0 @@
-// "before <whose> <part>": before the part of the current turn begins.
-(
-    name: "beforePart",
-    kinds: [Timing],
-    params: {"part": TurnPart, "whose": Default(Any, None)},
-    body: RelativeToEvent(Before, BeginningOf(Param(part), Param(whose), Current)),
-)

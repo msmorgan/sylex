@@ -1,7 +1,0 @@
-// A flavor word in italics before an ability [CR#207.2d].
-(
-    name: "flavorWord",
-    kinds: [Ability],
-    params: {"word": FlavorWordLabel, "ability": Ability},
-    body: ItalicHead(FlavorWord(Param(word)), Param(ability)),
-)

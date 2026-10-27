@@ -1,6 +1,0 @@
-CounterKind(
-    name: "fuseCounter",
-    params: [],
-    spelling: "fuse",
-    holder: Object,
-)

@@ -1,6 +1,0 @@
-CounterKind(
-    name: "depletionCounter",
-    params: [],
-    spelling: "depletion",
-    holder: Object,
-)

@@ -1,7 +1,0 @@
-// "<group> with the same name"
-(
-    name: "withTheSameName",
-    kinds: [NounPhrase],
-    params: {"group": NounPhrase},
-    body: Agree(CardName, Share, Param(group)),
-)

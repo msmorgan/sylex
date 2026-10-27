@@ -1,6 +1,0 @@
-(
-    name: "pip",
-    kinds: [ManaSymbol],
-    params: {"color": Color},
-    body: Simple(Specific(Of(Param(color)))),
-)

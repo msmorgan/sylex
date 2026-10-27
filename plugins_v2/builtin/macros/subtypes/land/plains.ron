@@ -1,8 +1,0 @@
-Subtype(
-    category: Land,
-    name: "plains",
-    spelling: "Plains",
-    grammar: Noun(singular: "Plains", plural: "Plains"),
-    params: [],
-)
-

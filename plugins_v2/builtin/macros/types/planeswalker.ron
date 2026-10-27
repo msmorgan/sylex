@@ -1,7 +1,0 @@
-Type(
-    name: "planeswalker",
-    spelling: "planeswalker",
-    grammar: Noun(singular: "planeswalker"),
-    params: [],
-    body: CardType(card_type: Planeswalker, permanent_type: true, confers: []),
-)

@@ -1,8 +1,0 @@
-Subtype(
-    category: Artifact,
-    name: "spacecraft",
-    spelling: "Spacecraft",
-    grammar: Noun(singular: "Spacecraft", plural: "Spacecraft"),
-    params: [],
-)
-

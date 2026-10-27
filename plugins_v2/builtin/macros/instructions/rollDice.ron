@@ -1,7 +1,0 @@
-// "<performer> rolls <count> d<sides>" [CR#706.1].
-(
-    name: "rollDice",
-    kinds: [Instruction],
-    params: {"count": Nat, "sides": Nat},
-    body: RollDice(Lit(Param(count)), Sides(Param(sides))),
-)

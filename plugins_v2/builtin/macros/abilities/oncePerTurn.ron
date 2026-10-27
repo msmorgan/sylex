@@ -1,7 +1,0 @@
-// "only once each turn": no more than one per turn [CR#602.5b].
-(
-    name: "oncePerTurn",
-    kinds: [UsageLimit],
-    params: [],
-    body: Mk(MoreThan(1), Turn),
-)

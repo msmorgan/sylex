@@ -1,6 +1,0 @@
-(
-    name: "thisAbility",
-    kinds: [NounPhrase],
-    params: [],
-    body: AsMarker(Ability, This),
-)

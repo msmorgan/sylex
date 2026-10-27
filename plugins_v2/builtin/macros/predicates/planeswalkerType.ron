@@ -1,6 +1,0 @@
-(
-    name: "planeswalkerType",
-    kinds: [Subtype],
-    params: {"label": String},
-    body: Of(Planeswalker, Param(label)),
-)

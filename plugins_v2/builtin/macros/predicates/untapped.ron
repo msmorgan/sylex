@@ -1,6 +1,0 @@
-(
-    name: "untapped",
-    kinds: [Predicate],
-    params: [],
-    body: HasStatus(Untapped),
-)

@@ -1,7 +1,0 @@
-// "Search your library for <quantity> <p>"
-(
-    name: "searchLibraryFor",
-    kinds: [Instruction],
-    params: {"quantity": Quantity, "p": Predicate},
-    body: Search(scope: OneZone(yourLibrary), quantity: Param(quantity), predicate: Param(p)),
-)

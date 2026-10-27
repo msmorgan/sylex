@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "villain",
-    spelling: "Villain",
-    grammar: Noun(singular: "Villain"),
-    params: [],
-)
-

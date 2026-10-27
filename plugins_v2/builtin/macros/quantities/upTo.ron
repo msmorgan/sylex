@@ -1,6 +1,0 @@
-(
-    name: "upTo",
-    kinds: [Quantity],
-    params: {"n": Nat},
-    body: Range(None, Param(n)),
-)

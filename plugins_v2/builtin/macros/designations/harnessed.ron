@@ -1,9 +1,0 @@
-// Harnessed is a permanent designation [CR#701.64b].
-Designation(
-    name: "harnessed",
-    params: [],
-    spelling: "harnessed",
-    scope: HeldBy(Object),
-    effectful: true,
-    zone: Battlefield,
-)

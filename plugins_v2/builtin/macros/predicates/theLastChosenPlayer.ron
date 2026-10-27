@@ -1,7 +1,0 @@
-// "the last chosen player"
-(
-    name: "theLastChosenPlayer",
-    kinds: [Predicate],
-    params: [],
-    body: ChosenPlayer(TheLatestChoice),
-)

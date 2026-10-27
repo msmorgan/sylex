@@ -1,7 +1,0 @@
-// "return <subject> to <zone>"
-(
-    name: "returnTo",
-    kinds: [Instruction],
-    params: {"subject": NounPhrase, "destination": ZoneExpr, "riders": MoveRiders},
-    body: Enact(verb: Core(Return), instruction: Move(Param(subject), wherever, Param(destination), Param(riders))),
-)

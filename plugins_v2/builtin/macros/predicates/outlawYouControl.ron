@@ -1,6 +1,0 @@
-(
-    name: "outlawYouControl",
-    kinds: [Predicate],
-    params: [],
-    body: And([outlaw, HasPossessor(Controller, You)]),
-)

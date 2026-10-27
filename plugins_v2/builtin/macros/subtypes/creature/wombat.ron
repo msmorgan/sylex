@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "wombat",
-    spelling: "Wombat",
-    grammar: Noun(singular: "Wombat", plural: Unavailable),
-    params: [],
-)
-

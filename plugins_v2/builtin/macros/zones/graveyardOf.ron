@@ -1,6 +1,0 @@
-(
-    name: "graveyardOf",
-    kinds: [ZoneExpr],
-    params: {"player": NounPhrase},
-    body: Zone(Graveyard, PossessedBy(Param(player))),
-)

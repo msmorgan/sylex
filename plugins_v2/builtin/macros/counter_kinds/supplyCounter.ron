@@ -1,6 +1,0 @@
-CounterKind(
-    name: "supplyCounter",
-    params: [],
-    spelling: "supply",
-    holder: Object,
-)

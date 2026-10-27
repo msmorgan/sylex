@@ -1,7 +1,0 @@
-// "until <player>'s next turn"
-(
-    name: "untilNextTurnOf",
-    kinds: [Duration],
-    params: {"player": Subject},
-    body: Between(None, BeginningOf(Turn, Param(player), Next(None))),
-)

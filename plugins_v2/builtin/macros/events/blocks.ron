@@ -1,7 +1,0 @@
-// "<subject> blocks [<blocked>]"
-(
-    name: "blocks",
-    kinds: [GameEvent],
-    params: {"subject": NounPhrase, "blocked": Default(Any, None)},
-    body: Combat(BlockerOf, Param(subject), Param(blocked)),
-)

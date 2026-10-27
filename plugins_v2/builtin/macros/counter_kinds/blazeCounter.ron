@@ -1,6 +1,0 @@
-CounterKind(
-    name: "blazeCounter",
-    params: [],
-    spelling: "blaze",
-    holder: Object,
-)

@@ -1,6 +1,0 @@
-CounterKind(
-    name: "interventionCounter",
-    params: [],
-    spelling: "intervention",
-    holder: Object,
-)

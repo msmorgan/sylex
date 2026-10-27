@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "hero",
-    spelling: "Hero",
-    grammar: Noun(singular: "Hero", plural: "Heroes"),
-    params: [],
-)
-

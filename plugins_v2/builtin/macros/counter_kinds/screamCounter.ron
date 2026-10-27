@@ -1,6 +1,0 @@
-CounterKind(
-    name: "screamCounter",
-    params: [],
-    spelling: "scream",
-    holder: Object,
-)

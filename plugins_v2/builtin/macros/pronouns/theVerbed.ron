@@ -1,8 +1,0 @@
-// "the <verb>ed <word>", e.g. "the tapped creatures"; with no word, the
-// pronoun the deed stamped: "it" or "them", "the exiled card".
-(
-    name: "theVerbed",
-    kinds: [NounPhrase],
-    params: {"verb": Deed, "plurality": Plurality, "word": Default(Any, None), "marking": Default(VerbedMarking, Attributive)},
-    body: Pro(Verbed(Param(verb), Param(word), Param(marking)), Param(plurality), Whole),
-)

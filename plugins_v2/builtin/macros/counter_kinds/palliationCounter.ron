@@ -1,6 +1,0 @@
-CounterKind(
-    name: "palliationCounter",
-    params: [],
-    spelling: "palliation",
-    holder: Object,
-)

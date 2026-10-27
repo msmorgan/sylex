@@ -1,6 +1,0 @@
-CounterKind(
-    name: "javelinCounter",
-    params: [],
-    spelling: "javelin",
-    holder: Object,
-)

@@ -1,6 +1,0 @@
-CounterKind(
-    name: "isolationCounter",
-    params: [],
-    spelling: "isolation",
-    holder: Object,
-)

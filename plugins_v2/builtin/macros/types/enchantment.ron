@@ -1,7 +1,0 @@
-Type(
-    name: "enchantment",
-    spelling: "enchantment",
-    grammar: Noun(singular: "enchantment"),
-    params: [],
-    body: CardType(card_type: Enchantment, permanent_type: true, confers: []),
-)

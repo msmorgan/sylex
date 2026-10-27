@@ -1,7 +1,0 @@
-// "a … of your choice"
-(
-    name: "aYourChoice",
-    kinds: [NounPhrase],
-    params: {"p": Predicate},
-    body: Described(A(YourChoice), Param(p)),
-)

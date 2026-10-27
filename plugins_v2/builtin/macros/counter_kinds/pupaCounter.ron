@@ -1,6 +1,0 @@
-CounterKind(
-    name: "pupaCounter",
-    params: [],
-    spelling: "pupa",
-    holder: Object,
-)

@@ -1,8 +1,0 @@
-Subtype(
-    category: Land,
-    name: "cave",
-    spelling: "Cave",
-    grammar: Noun(singular: "Cave"),
-    params: [],
-)
-

@@ -1,5 +1,0 @@
-AbilityWord(
-    name: "descend4",
-    spelling: "Descend 4",
-    grammar: FixedTerm(surface: "Descend 4"),
-)

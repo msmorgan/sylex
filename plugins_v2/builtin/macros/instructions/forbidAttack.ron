@@ -1,7 +1,0 @@
-// "<subject> can't attack [this turn]"
-(
-    name: "forbidAttack",
-    kinds: [Instruction],
-    params: {"subject": NounPhrase, "duration": Duration},
-    body: Establish(DeonticRule(Param(subject), Forbid, [Core(Attack)], Agent, None, NoPatient, None, NoRider, None), Param(duration)),
-)

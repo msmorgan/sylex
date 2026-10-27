@@ -1,7 +1,0 @@
-Type(
-    name: "artifact",
-    spelling: "artifact",
-    grammar: Noun(singular: "artifact"),
-    params: [],
-    body: CardType(card_type: Artifact, permanent_type: true, confers: []),
-)

@@ -1,7 +1,0 @@
-// "<performer> may <body>. [If they do, <if_did>.] [If they don't, <if_not>.]"
-(
-    name: "may",
-    kinds: [Instruction],
-    params: {"body": Instruction, "if_did": Default(Any, None), "if_not": Default(Any, None)},
-    body: WithContinuation(Optional, Param(body), Param(if_did), Param(if_not)),
-)

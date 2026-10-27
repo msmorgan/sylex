@@ -1,6 +1,0 @@
-CounterKind(
-    name: "planCounter",
-    params: [],
-    spelling: "plan",
-    holder: Object,
-)

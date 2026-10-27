@@ -1,7 +1,0 @@
-// "at the beginning of <possessor>'s <part>", each time it comes
-(
-    name: "beginningOfPossessed",
-    kinds: [GameEvent],
-    params: {"part": TurnPart, "possessor": NounPhrase},
-    body: BeginningOf(Param(part), Param(possessor), Each(None)),
-)

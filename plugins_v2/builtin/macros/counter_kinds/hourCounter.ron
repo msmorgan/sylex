@@ -1,6 +1,0 @@
-CounterKind(
-    name: "hourCounter",
-    params: [],
-    spelling: "hour",
-    holder: Object,
-)

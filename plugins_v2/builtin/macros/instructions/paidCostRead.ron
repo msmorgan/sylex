@@ -1,7 +1,0 @@
-// "<subject>'s <keyword> cost was paid", read back.
-(
-    name: "paidCostRead",
-    kinds: [Amount],
-    params: {"which": LinkSource, "subject": NounPhrase, "window": Default(Any, None)},
-    body: Paid(Readback(Param(which), Param(window)), Param(subject)),
-)

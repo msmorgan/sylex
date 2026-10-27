@@ -1,6 +1,0 @@
-CounterKind(
-    name: "wishCounter",
-    params: [],
-    spelling: "wish",
-    holder: Object,
-)

@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "golem",
-    spelling: "Golem",
-    grammar: Noun(singular: "Golem"),
-    params: [],
-)
-

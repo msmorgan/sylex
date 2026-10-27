@@ -1,6 +1,0 @@
-(
-    name: "powerOf",
-    kinds: [Amount],
-    params: {"subject": NounPhrase},
-    body: StatOf(Stat(Power), Param(subject)),
-)

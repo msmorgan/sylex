@@ -1,7 +1,0 @@
-// "during <whose> <part>": during that part of the current turn.
-(
-    name: "duringPart",
-    kinds: [Timing],
-    params: {"part": TurnPart, "whose": Default(Any, None)},
-    body: InPart(Param(part), Param(whose), Current),
-)

@@ -1,6 +1,0 @@
-CounterKind(
-    name: "briberyCounter",
-    params: [],
-    spelling: "bribery",
-    holder: Object,
-)

@@ -1,6 +1,0 @@
-CounterKind(
-    name: "honeCounter",
-    params: [],
-    spelling: "hone",
-    holder: Object,
-)

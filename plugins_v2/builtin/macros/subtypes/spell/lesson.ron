@@ -1,8 +1,0 @@
-// No supported Oracle rules-text or Comprehensive Rules plural is attested.
-SpellSubtype(
-    name: "lesson",
-    spelling: "Lesson",
-    grammar: Noun(singular: "Lesson", plural: Unavailable),
-    params: [],
-)
-

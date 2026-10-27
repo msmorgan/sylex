@@ -1,6 +1,0 @@
-CounterKind(
-    name: "levelCounter",
-    params: [],
-    spelling: "level",
-    holder: Object,
-)

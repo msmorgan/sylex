@@ -1,6 +1,0 @@
-(
-    name: "putOntoBattlefield",
-    kinds: [Instruction],
-    params: {"subject": NounPhrase},
-    body: Move(Param(subject), wherever, battlefield, []),
-)

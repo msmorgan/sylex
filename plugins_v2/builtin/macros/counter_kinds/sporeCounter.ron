@@ -1,7 +1,0 @@
-CounterKind(
-    name: "sporeCounter",
-    params: [],
-    spelling: "spore",
-    grammar: FixedTerm(surface: "spore"),
-    holder: Object,
-)

@@ -1,5 +1,0 @@
-AbilityWord(
-    name: "heroic",
-    spelling: "Heroic",
-    grammar: FixedTerm(surface: "Heroic"),
-)

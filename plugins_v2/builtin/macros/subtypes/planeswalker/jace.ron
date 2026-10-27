@@ -1,8 +1,0 @@
-Subtype(
-    category: Planeswalker,
-    name: "jace",
-    spelling: "Jace",
-    grammar: Noun(singular: "Jace"),
-    params: [],
-)
-

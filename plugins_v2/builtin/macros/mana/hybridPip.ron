@@ -1,7 +1,0 @@
-// "{A/B}"
-(
-    name: "hybridPip",
-    kinds: [ManaSymbol],
-    params: {"left": Color, "right": Color},
-    body: Hybrid(Specific(Of(Param(left))), Param(right)),
-)

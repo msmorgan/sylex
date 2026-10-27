@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "construct",
-    spelling: "Construct",
-    grammar: Noun(singular: "Construct"),
-    params: [],
-)
-

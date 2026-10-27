@@ -1,5 +1,0 @@
-AbilityWord(
-    name: "opus",
-    spelling: "Opus",
-    grammar: FixedTerm(surface: "Opus"),
-)

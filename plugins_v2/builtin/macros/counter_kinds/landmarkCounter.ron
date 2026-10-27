@@ -1,6 +1,0 @@
-CounterKind(
-    name: "landmarkCounter",
-    params: [],
-    spelling: "landmark",
-    holder: Object,
-)

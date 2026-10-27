@@ -1,6 +1,0 @@
-CounterKind(
-    name: "windCounter",
-    params: [],
-    spelling: "wind",
-    holder: Object,
-)

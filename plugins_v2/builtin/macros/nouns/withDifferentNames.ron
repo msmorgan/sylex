@@ -1,7 +1,0 @@
-// "<group> with different names"
-(
-    name: "withDifferentNames",
-    kinds: [NounPhrase],
-    params: {"group": NounPhrase},
-    body: Agree(CardName, Differ, Param(group)),
-)

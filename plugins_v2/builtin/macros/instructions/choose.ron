@@ -1,8 +1,0 @@
-// "<performer> chooses <subject>", openly unless the caller says otherwise.
-// The chooser is the actor.
-(
-    name: "choose",
-    kinds: [Instruction],
-    params: {"subject": NounPhrase, "disclosure": Default(Disclosure, Openly)},
-    body: Choose(None, Param(subject), Param(disclosure), None),
-)

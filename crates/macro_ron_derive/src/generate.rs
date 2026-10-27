@@ -800,9 +800,8 @@ fn gen_serialize(input: &Input) -> TokenStream {
             // field bare, but name the constructor they elide:
             // `serialize_newtype_struct` carries `Type.Variant`, which RON's
             // `UNWRAP_NEWTYPES` drops (leaving `Green`, or `3`) while a
-            // structural consumer — `deckmaste_semantics_v2`'s Lean emitter,
-            // which must name every constructor — reads it off and restores
-            // the application. `.` is a legal RON raw-identifier character, so
+            // structural consumer that must name every constructor can read
+            // it off and restore the application. `.` is a legal RON raw-identifier character, so
             // the name still validates when the extension is off.
             (Some(Marker::Embed | Marker::Literal), Shape::Struct(fields)) => {
                 let field = fields[0].ident.as_ref().expect("struct fields are named");

@@ -1,7 +1,0 @@
-// "the number of times <subject>'s <keyword> cost was paid"
-(
-    name: "timesPaid",
-    kinds: [Amount],
-    params: {"which": LinkSource, "subject": NounPhrase},
-    body: Paid(TimesPaid(Param(which)), Param(subject)),
-)

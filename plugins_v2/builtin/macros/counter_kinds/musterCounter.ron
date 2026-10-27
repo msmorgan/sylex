@@ -1,6 +1,0 @@
-CounterKind(
-    name: "musterCounter",
-    params: [],
-    spelling: "muster",
-    holder: Object,
-)

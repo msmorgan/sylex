@@ -1,7 +1,0 @@
-// "this combat", as a lookback reads it.
-(
-    name: "thisCombat",
-    kinds: [Duration],
-    params: [],
-    body: Between(BeginningOf(Combat, None, Current), Now),
-)

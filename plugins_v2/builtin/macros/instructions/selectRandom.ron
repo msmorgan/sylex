@@ -1,8 +1,0 @@
-// "<quantity> <what> at random": a random selection, made by the actor; the
-// randomness is the determiner's (`AtRandom`).
-(
-    name: "selectRandom",
-    kinds: [Instruction],
-    params: {"quantity": Quantity, "what": Predicate},
-    body: Choose(None, Described(Count(Param(quantity), AtRandom), Param(what)), Openly, None),
-)

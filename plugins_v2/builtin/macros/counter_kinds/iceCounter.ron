@@ -1,6 +1,0 @@
-CounterKind(
-    name: "iceCounter",
-    params: [],
-    spelling: "ice",
-    holder: Object,
-)

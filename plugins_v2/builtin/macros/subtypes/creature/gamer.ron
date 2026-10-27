@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "gamer",
-    spelling: "Gamer",
-    grammar: Noun(singular: "Gamer", plural: Unavailable),
-    params: [],
-)
-

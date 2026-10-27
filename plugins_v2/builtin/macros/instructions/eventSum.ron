@@ -1,7 +1,0 @@
-// The accumulated magnitude of historical events involving the subject.
-(
-    name: "eventSum",
-    kinds: [Amount],
-    params: {"event": GameEvent, "who": NounPhrase, "within": Duration, "timing": Default(Any, None)},
-    body: EventTally(Sum, Param(who), Mk(Param(event), Param(within), Param(timing))),
-)

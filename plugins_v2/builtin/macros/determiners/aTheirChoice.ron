@@ -1,7 +1,0 @@
-// "a … of their choice", the chooser being the last-mentioned player.
-(
-    name: "aTheirChoice",
-    kinds: [NounPhrase],
-    params: {"p": Predicate},
-    body: Described(A(TheirChoice(Top(1))), Param(p)),
-)

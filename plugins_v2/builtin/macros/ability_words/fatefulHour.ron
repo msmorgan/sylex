@@ -1,5 +1,0 @@
-AbilityWord(
-    name: "fatefulHour",
-    spelling: "Fateful hour",
-    grammar: FixedTerm(surface: "Fateful hour"),
-)

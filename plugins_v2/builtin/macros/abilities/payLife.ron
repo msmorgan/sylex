@@ -1,7 +1,0 @@
-// "Pay N life" as a cost, paid by the actor.
-(
-    name: "payLife",
-    kinds: [Cost],
-    params: {"amount": Nat},
-    body: Perform(ChangeLife(delta: Down(amount: Lit(Param(amount))))),
-)

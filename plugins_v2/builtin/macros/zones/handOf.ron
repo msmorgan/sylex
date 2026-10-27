@@ -1,6 +1,0 @@
-(
-    name: "handOf",
-    kinds: [ZoneExpr],
-    params: {"player": NounPhrase},
-    body: Zone(Hand, PossessedBy(Param(player))),
-)

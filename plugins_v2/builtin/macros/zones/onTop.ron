@@ -1,8 +1,0 @@
-// "on top of its owner's library": the library a card goes to is its owner's
-// [CR#400.3].
-(
-    name: "onTop",
-    kinds: [ZoneExpr],
-    params: [],
-    body: Place(Top, Library(Bare)),
-)

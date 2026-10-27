@@ -1,6 +1,0 @@
-(
-    name: "faceDown",
-    kinds: [Predicate],
-    params: [],
-    body: HasStatus(FaceDown),
-)

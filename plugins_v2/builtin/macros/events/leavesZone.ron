@@ -1,7 +1,0 @@
-// "<subject> leaves <zone>"
-(
-    name: "leavesZone",
-    kinds: [GameEvent],
-    params: {"subject": NounPhrase, "zone": ZoneExpr},
-    body: ZoneChange(Param(subject), Zones([Param(zone)]), None, Before),
-)

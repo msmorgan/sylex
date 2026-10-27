@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "employee",
-    spelling: "Employee",
-    grammar: Noun(singular: "Employee", plural: Unavailable),
-    params: [],
-)
-

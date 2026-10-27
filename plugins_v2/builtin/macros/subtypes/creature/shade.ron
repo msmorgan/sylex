@@ -1,8 +1,0 @@
-Subtype(
-    category: Creature,
-    name: "shade",
-    spelling: "Shade",
-    grammar: Noun(singular: "Shade", plural: Unavailable),
-    params: [],
-)
-

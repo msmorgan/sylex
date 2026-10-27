@@ -1,6 +1,0 @@
-CounterKind(
-    name: "bountyCounter",
-    params: [],
-    spelling: "bounty",
-    holder: Object,
-)

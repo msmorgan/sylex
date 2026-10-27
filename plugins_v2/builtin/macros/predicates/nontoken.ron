@@ -1,6 +1,0 @@
-(
-    name: "nontoken",
-    kinds: [Predicate],
-    params: [],
-    body: Not(IsToken),
-)

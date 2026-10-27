@@ -1,7 +1,0 @@
-// "until <event>": a span with only an end.
-(
-    name: "untilEvent",
-    kinds: [Duration],
-    params: {"event": GameEvent},
-    body: Between(None, Param(event)),
-)

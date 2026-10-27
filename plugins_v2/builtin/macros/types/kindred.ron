@@ -1,7 +1,0 @@
-Type(
-    name: "kindred",
-    spelling: "kindred",
-    grammar: Noun(singular: "kindred", plural: Unavailable),
-    params: [],
-    body: CardType(card_type: Kindred, permanent_type: false, confers: []),
-)

@@ -1,7 +1,0 @@
-// "a …"
-(
-    name: "a",
-    kinds: [NounPhrase],
-    params: {"p": Predicate},
-    body: Described(A(Unmarked), Param(p)),
-)

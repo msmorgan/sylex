@@ -1,7 +1,0 @@
-(
-    name: "expend",
-    kinds: [GameEvent],
-    params: {"player": Subject, "amount": Amount},
-    metadata: (grammar: (verb: (bare: "expend", frames: [Predicate([Amount])]))),
-    body: (),
-)

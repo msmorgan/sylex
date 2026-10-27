@@ -1,7 +1,0 @@
-// "it": the permanent slot's occupant, as "sacrifice it" reads it.
-(
-    name: "itPermanent",
-    kinds: [NounPhrase],
-    params: [],
-    body: Pro(AtSlot(Permanent), One, Whole),
-)

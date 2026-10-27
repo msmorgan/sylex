@@ -1,7 +1,0 @@
-// "<instruction> unless <performer> pays <cost>"
-(
-    name: "doUnless",
-    kinds: [Instruction],
-    params: {"instruction": Instruction, "cost": Cost},
-    body: WithContinuation(Optional, Pay(Param(cost), Once), None, Param(instruction)),
-)

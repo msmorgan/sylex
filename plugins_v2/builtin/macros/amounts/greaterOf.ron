@@ -1,8 +1,0 @@
-// "the greater of <a> and <b>", "<a> or <b>, whichever is greater": the
-// maximum over the two listed amounts.
-(
-    name: "greaterOf",
-    kinds: [Amount],
-    params: {"a": Amount, "b": Amount},
-    body: AggregateOf(Max, [Param(a), Param(b)]),
-)

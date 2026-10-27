@@ -1,7 +1,0 @@
-// "cast by <player>", with no rank of its own.
-(
-    name: "castBy",
-    kinds: [Predicate],
-    params: {"player": NounPhrase},
-    body: CastBy(Param(player), None),
-)

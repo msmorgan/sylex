@@ -1,6 +1,0 @@
-CounterKind(
-    name: "fateCounter",
-    params: [],
-    spelling: "fate",
-    holder: Object,
-)

@@ -1,7 +1,0 @@
-// "an Army you control"
-(
-    name: "armyYouControl",
-    kinds: [Predicate],
-    params: [],
-    body: And([HasSubtype(army), creature, HasPossessor(Controller, You)]),
-)

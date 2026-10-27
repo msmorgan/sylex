@@ -1,7 +1,0 @@
-// "<performer> returns <subject> [from <from>] to its owner's hand"
-(
-    name: "returnToHand",
-    kinds: [Instruction],
-    params: {"subject": NounPhrase, "from": Default(ZoneExpr, Wherever)},
-    body: Enact(Return, Move(Param(subject), Param(from), hand, [])),
-)
