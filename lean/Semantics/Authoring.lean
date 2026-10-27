@@ -473,9 +473,7 @@ private def countFVarOccurrences (fvar : FVarId) (e : Expr) : Nat :=
   | _ => 0
 
 private def isTheActorExpr (e : Expr) : Bool :=
-  e.isAppOfArity `Semantics.Templates.theActor 1 ||
-  e.isConstOf `Semantics.NounPhrase.actor ||
-  e.isConstOf `Semantics.Primitives.NounPhrase.actor
+  e.isAppOfArity `Semantics.Templates.theActor 1
 
 private def countActorOccurrences (e : Expr) : Nat :=
   if isTheActorExpr e then 1
@@ -1081,8 +1079,13 @@ private def registerKeywordLabel (name : Name) (label : Term) : CommandElabM Uni
     }
   definitionAttribute.setTag name
 
-@[command_elab authoredDeclCmd]
-def elabAuthoredCommand : CommandElab := fun stx => do
+private def registryKinds : List Name :=
+  [`counter, `subtype, `designation, `card_type, `relation]
+
+initialize bundleRegistryAttribute : TagAttribute ←
+  registerTagAttribute `bundle_registry "A catalog value registered before its bundle rules."
+
+private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : CommandElabM Unit := do
   let mods : TSyntax ``Parser.Command.declModifiers := ⟨stx[0]⟩
   let kind := stx[1].getId.eraseMacroScopes
   unless authoredKinds.contains kind do throwUnsupportedSyntax
@@ -1115,7 +1118,8 @@ def elabAuthoredCommand : CommandElab := fun stx => do
     sig := ⟨sig.raw.setArg 1 (mkNullNode #[typeSpec.raw])⟩
   if authoredKinds.contains kind then
     let full := (← getCurrNamespace) ++ original.getId
-    if (← getEnv).contains full then
+    if (← getEnv).contains full &&
+        !(registryKinds.contains kind && bundleRegistryAttribute.hasTag (← getEnv) full) then
       let some result := resultName | throwErrorAt sig "Expected a named return type"
       addSortAlias full
       name := mkIdentFrom original (result ++ original.getId)
@@ -1130,7 +1134,14 @@ def elabAuthoredCommand : CommandElab := fun stx => do
   let declId ← `(Parser.Command.declId| $name:ident)
   let emit := fun (body : Term) (definition : Bool) => do
     let value ← `(Parser.Command.declVal| := $body)
-    if definition then
+    if definition && registryKinds.contains kind &&
+        bundleRegistryAttribute.hasTag (← getEnv) ((← getCurrNamespace) ++ name.getId) then
+      let existing := Lean.mkConst ((← getCurrNamespace) ++ name.getId)
+      let sameValue ← liftTermElabM do
+        isDefEq existing (← elabTermEnsuringType body (← inferType existing))
+      unless sameValue do
+        throwError "Conflicting catalog value {name}"
+    else if definition then
       elabCommand (← `($mods:declModifiers semantic_definition $declId:declId
         $sig:optDeclSig $value:declVal))
     else
@@ -1158,7 +1169,9 @@ def elabAuthoredCommand : CommandElab := fun stx => do
           let ability := mkCIdent label
           `(term| $(mkIdent `Semantics.Deed.ofAbility) $ability)
         else `(term| $(mkIdent `Semantics.Deed.action) $deed $permanent)
-      body ← `(term| $(mkIdent `Semantics.Action.ownScope) (some $deed) $body)
+      let deed ← if (fields.lookup `deed).any (fun value => value.raw.isIdent &&
+          value.raw.getId == `none) then `(term| none) else `(term| some $deed)
+      body ← `(term| $(mkIdent `Semantics.Action.ownScope) $deed $body)
     if kind == `keyword then
       let labelName := (← getCurrNamespace) ++ name.getId ++ `label
       let labelTerm := (fields.lookup `label).getD declarationLabel
@@ -1208,6 +1221,12 @@ def elabAuthoredCommand : CommandElab := fun stx => do
                   instantOrSorcery := $instantOrSorcery })
       | _ => `(term| $(mkIdent `Semantics.RelationLabel.named) $declarationLabel)
     emit body true
+    if registryOnly then
+      bundleRegistryAttribute.setTag ((← getCurrNamespace) ++ name.getId)
+      let declaration ← resolveGlobalConstNoOverload name
+      registerExpectedType declaration
+      registerSharedAliases declaration
+      return
     let rowName := name.getId.getPrefix ++ Name.mkSimple (name.getId.getString! ++ "_definition")
     let row := mkIdent rowName
     let ctorKind := if kind == `card_type then `cardType else kind
@@ -1240,6 +1259,9 @@ def elabAuthoredCommand : CommandElab := fun stx => do
   registerExpectedType declaration
   registerSharedAliases declaration
 
+@[command_elab authoredDeclCmd]
+def elabAuthoredCommand : CommandElab := elabAuthoredCommandImpl false
+
 /-- A declaration's bare spelling and semantic result sort identify a bundle node. -/
 structure BundleKey where
   bareName : Name
@@ -1250,6 +1272,7 @@ structure BundleItem where
   key : BundleKey
   file : String
   references : List Name := []
+  valueRegistered : Bool := false
   stx : Syntax := .missing
   deriving Inhabited
 
@@ -1260,7 +1283,10 @@ private def bundleKeyLess (a b : BundleKey) : Bool :=
 def bundleDependencies (items : List BundleItem) (item : BundleItem) : List BundleKey :=
   items.filterMap fun other =>
     let qualified := Name.mkSimple other.key.returnType.getString! ++ other.key.bareName
-    if (item.references.contains other.key.bareName || item.references.contains qualified) &&
+    let row := Name.mkSimple (other.key.bareName.getString! ++ "_definition")
+    if ((other.valueRegistered && item.references.contains row) ||
+        (!other.valueRegistered &&
+          (item.references.contains other.key.bareName || item.references.contains qualified))) &&
       (other.key.bareName != item.key.bareName ||
         (item.key.returnType == `Semantics.Ability && other.key.returnType == `Semantics.Action))
     then some other.key else none
@@ -1336,14 +1362,16 @@ private def bundleItem (file : String) (stx : Syntax) : Except String BundleItem
   let kind := stx[1].getId.eraseMacroScopes
   let sig := stx[3]
   let result ← if let some result := commandReturnType? kind then pure result
-    else if sig[1].isNone || !sig[1][0][1].isIdent then
+    else if sig[1].isNone then
       throw s!"{file}: {kind} requires a named return type"
-    else pure sig[1][0][1].getId
+    else if sig[1][0][1].isIdent then pure sig[1][0][1].getId
+    else pure (Name.mkSimple (sig[1][0][1].reprint.getD ""))
   let returnType := if (`Semantics).isPrefixOf result then result else `Semantics ++ result
   let bareName := Name.mkSimple stx[2].getId.getString!
   let bound := sig[0].getArgs.toList.flatMap fun binder =>
     binder[1].getArgs.toList.filterMap fun id => if id.isIdent then some id.getId else none
   return { key := { bareName, returnType }, file, stx,
+           valueRegistered := registryKinds.contains kind,
            references := referencedIdents bound stx[5] }
 
 private def parseBundleFile (env : Environment) (opts : Options) (path : System.FilePath) :
@@ -1378,6 +1406,10 @@ elab "load_bundle " directory:str : command => do
   let sorted ← match topoSortBundle items with
     | .ok sorted => pure sorted
     | .error error => throwError error
+  -- Catalog values are leaves; their conferrals may refer back through action and noun helpers.
+  for item in sorted do
+    if item.valueRegistered then
+      withRef item.stx <| elabAuthoredCommandImpl true item.stx
   -- Labels do not depend on bodies. Register them before elaborating an ability's own deed.
   for item in sorted do
     if item.stx[1].getId == `keyword then
@@ -1390,7 +1422,10 @@ elab "load_bundle " directory:str : command => do
       let label := (fields.lookup `label).getD (Syntax.mkStrLit original.getString!)
       registerKeywordLabel (name ++ `label) label
   for item in sorted do
-    withRef item.stx <| elabCommand item.stx
+    try
+      withRef item.stx <| elabCommand item.stx
+    catch error =>
+      throwError "{item.file}: {error.toMessageData}"
 
 end Semantics.Authoring
 
