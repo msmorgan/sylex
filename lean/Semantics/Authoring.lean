@@ -166,7 +166,9 @@ structure ExpectedTypeEntry where
 
 initialize expectedTypeDispatchExt : SimplePersistentEnvExtension ExpectedTypeEntry
     (List ExpectedTypeEntry) ← registerSimplePersistentEnvExtension {
-  addEntryFn := fun entries entry => entry :: entries
+  addEntryFn := fun entries entry => entry :: entries.filter (fun previous =>
+    previous.bareName != entry.bareName || previous.returnType != entry.returnType ||
+      previous.declaration != entry.declaration)
   addImportedFn := fun imports => imports.toList.flatMap Array.toList
 }
 
@@ -206,6 +208,7 @@ private def dispatchTarget? (bare sort : Name) : TermElabM (Option Name) := do
   let ns ← getCurrNamespace
   let opens ← getOpenDecls
   let visible := fun (decl : Name) =>
+    let decl := (privateToUserName? decl).getD decl
     let scopeName := if lastNameComponent decl.getPrefix == sort.getString! then
         decl.getPrefix.getPrefix else decl.getPrefix
     scopeName.isPrefixOf ns || opens.any (fun
@@ -216,7 +219,7 @@ private def dispatchTarget? (bare sort : Name) : TermElabM (Option Name) := do
 
 @[scoped term_elab Lean.Parser.Term.app]
 def dispatchOnExpectedType : TermElab := fun stx expected? => do
-  unless (← getEnv).contains `Semantics.Action do throwUnsupportedSyntax
+  unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
   let fn := stx[0]
   unless fn.isIdent do throwUnsupportedSyntax
   unless needsExpectedTypeDispatch (expectedTypeDispatchExt.getState (← getEnv)) fn.getId do
@@ -316,7 +319,7 @@ lexical context and splice schema. The caller tags it a definition or a template
 private def elabAuthoredDecl (mods : TSyntax ``Parser.Command.declModifiers)
     (name : TSyntax ``Parser.Command.declId) (signature : TSyntax ``Parser.Command.optDeclSig)
     (value : TSyntax ``Parser.Command.declVal) : CommandElabM Unit := do
-    let context ← `(bracketedBinder| [$(mkIdent `Semantics.AuthoringContext)])
+    let context ← `(bracketedBinder| [Semantics.AuthoringContext])
     let mut binders := #[context.raw]
     let mut splices : Array (TSyntax `ident) := #[]
     for binder in signature.raw[0].getArgs do
@@ -342,8 +345,8 @@ private def elabAuthoredDecl (mods : TSyntax ``Parser.Command.declModifiers)
       for identifier in splices.reverse do
         body ← `(term| let $identifier := $closeFn $identifier; $body)
       body ← `(term|
-        letI : $(mkIdent `Semantics.AuthoringContext) :=
-          $(mkIdent `Semantics.AuthoringContext.child) (inferInstance : $(mkIdent `Semantics.AuthoringContext))
+        letI : Semantics.AuthoringContext :=
+          Semantics.AuthoringContext.child (inferInstance : Semantics.AuthoringContext)
         $body)
       value := ⟨value.raw.setArg 1 body.raw⟩
     elabCommand (← `($mods:declModifiers def $name:declId $signature:optDeclSig $value:declVal))
@@ -783,7 +786,7 @@ private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) :
   return if env.contains lbl then some lbl else none
 
 @[scoped term_elab ident] def elabBareIdentDispatch : TermElab := fun stx expected? => do
-  unless (← getEnv).contains `Semantics.Action do throwUnsupportedSyntax
+  unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
   let some expected := expected? | throwUnsupportedSyntax
   if let some ldecl := (← getLCtx).findFromUserName? stx.getId then
     unless ldecl.isAuxDecl do throwUnsupportedSyntax
@@ -803,13 +806,13 @@ private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) :
     else
       (expectedWhnf, false)
   let some sort := (← whnfR expectedHead).getAppFn.constName? | throwUnsupportedSyntax
-  -- 1. Check bare noun / keyword dispatch table
+  -- All result sorts use the declaration registry.
   if let some targetDecl ← dispatchTarget? stx.getId sort then
     if stx.getId == targetDecl then throwUnsupportedSyntax
     let term ← if isOption then `(term| some $(mkCIdentFrom stx targetDecl))
       else pure (mkCIdentFrom stx targetDecl)
     return ← withMacroExpansion stx term <| elabTerm term (some expected)
-  -- 2. Check KeywordLabel / KeywordTerm resolution (including self-reference during keyword elab)
+  -- Labels are available even while their keyword body is being elaborated.
   if sort == `Semantics.KeywordLabel || sort == `Semantics.KeywordTerm then
     if let some labelConst := kwLabel? then
       let term ←
@@ -817,7 +820,8 @@ private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) :
           if isOption then `(term| some $(mkCIdentFrom stx labelConst))
           else pure (mkCIdentFrom stx labelConst)
         else
-          if isOption then `(term| some ($(mkIdent `Semantics.Templates.theKeyword) $(mkCIdentFrom stx labelConst)))
+          if isOption then
+            `(term| some ($(mkIdent `Semantics.Templates.theKeyword) $(mkCIdentFrom stx labelConst)))
           else `(term| $(mkIdent `Semantics.Templates.theKeyword) $(mkCIdentFrom stx labelConst))
       return ← withMacroExpansion stx term <| elabTerm term (some expected)
   throwUnsupportedSyntax
@@ -826,10 +830,11 @@ private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) :
 where `CharacteristicBundle` is expected. -/
 @[scoped term_elab Lean.Parser.Term.structInst] def elabCharacteristicBundleStruct : TermElab :=
     fun stx expected? => do
-  unless (← getEnv).contains `Semantics.Action do throwUnsupportedSyntax
+  unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
   let some expected := expected? | throwUnsupportedSyntax
+  unless stx[1].isNone do throwUnsupportedSyntax
   let fields := stx[2][0].getSepArgs
-  if fields.any (fun field => field[0][0].getId.eraseMacroScopes ∈ [`characteristics, `copyOf]) then
+  if fields.any (fun field => field[0][0].getId.eraseMacroScopes ∈ [`characteristics, `qualities]) then
     throwUnsupportedSyntax
   let expected ← instantiateMVars expected
   if expected.getAppFn.isMVar then
@@ -838,7 +843,8 @@ where `CharacteristicBundle` is expected. -/
   let expectedWhnf ← whnfR expected
   unless expectedWhnf.isConstOf `Semantics.CharacteristicBundle do throwUnsupportedSyntax
   let structTerm : Term := ⟨stx⟩
-  let expanded ← `(term| ({ characteristics := $structTerm } : $(mkIdent `Semantics.CharacteristicBundle)))
+  let bundleType := mkIdent `Semantics.CharacteristicBundle
+  let expanded ← `(term| ({ characteristics := $structTerm } : $bundleType))
   withMacroExpansion stx expanded <| elabTerm expanded (some expected)
 
 
@@ -847,7 +853,7 @@ where `CharacteristicBundle` is expected. -/
 `Option (List α)` → `some [...]`). Intercepts `List.cons` after `«term[_]»` macro expansion so
 expected element types flow top-down into every list element! -/
 @[scoped term_elab Lean.Parser.Term.app] def elabDomainList : TermElab := fun stx expected? => do
-  unless (← getEnv).contains `Semantics.Action do throwUnsupportedSyntax
+  unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
   let fn := if stx.isIdent then stx else stx[0]
   unless fn.isIdent && fn.getId.eraseMacroScopes ∈ [``List.cons, ``List.nil] do
     throwUnsupportedSyntax
@@ -956,6 +962,24 @@ private def authoredKinds : List Name :=
   [`primitive, `template, `action, `keyword, `ability_word, `counter, `designation,
    `subtype, `card_type, `relation, `token, `sba, `conferral, `card]
 
+private def lexicalFields : List Name :=
+  [`lemma, `plural, `verbs, `nouns, `adjectives, `determinatives, `bound, `spelling]
+
+private def semanticFields : Name → List Name
+  | `primitive | `template | `keyword | `ability_word => [`body]
+  | `action => [`body, `deed, `permanent]
+  | `counter => [`holder, `confers, `rules]
+  | `subtype => [`kind, `confers, `rules]
+  | `designation => [`scope, `sole, `confers, `rules]
+  | `card_type => [`name, `permanent, `stats, `instantOrSorcery, `confers, `rules]
+  | `relation => []
+  | `token => [`name, `token, `body]
+  | `sba => [`scope, `when, `then_, `body]
+  | `conferral => [`scope, `confer, `body]
+  | `card => [`name, `cost, `colors, `supertypes, `types, `subtypes, `text,
+              `power, `toughness, `loyalty, `defense, `body]
+  | _ => []
+
 private def blockFields (block : Syntax) : CommandElabM (List (Name × Term)) := do
   let mut fields := []
   for field in block[1].getSepArgs do
@@ -985,10 +1009,14 @@ def elabAuthoredCommand : CommandElab := fun stx => do
   let mut sig : TSyntax ``Parser.Command.optDeclSig := ⟨stx[3]⟩
   let payload := stx[5]
   let fields ← if payload.isOfKind ``declBlock then blockFields payload else pure []
+  for (field, value) in fields do
+    unless lexicalFields.contains field || (semanticFields kind).contains field do
+      throwErrorAt value "Unknown field {field} in {kind} declaration"
   let required := fun key => match fields.lookup key with
     | some value => pure value
     | none => throwErrorAt payload "{kind} requires `{key} := ...`"
-  let label := (fields.lookup `lemma).getD (Syntax.mkStrLit original.getId.getString!)
+  let declarationLabel := Syntax.mkStrLit original.getId.getString!
+  let label := (fields.lookup `lemma).getD declarationLabel
   let rules := (fields.lookup `rules <|> fields.lookup `confers).getD (← `(term| []))
   let resultSort? ← if sig.raw[1].isNone then
       pure ((commandReturnType? kind).map (`Semantics ++ ·))
@@ -1001,7 +1029,8 @@ def elabAuthoredCommand : CommandElab := fun stx => do
   let resultName := resultSort?.map (fun sort => Name.mkSimple sort.getString!)
   if sig.raw[1].isNone then
     let some result := resultName | throwErrorAt sig "{kind} requires an explicit return type"
-    sig := ⟨sig.raw.setArg 1 (mkNullNode #[(← `(Parser.Term.typeSpec| : $(mkIdent (`Semantics ++ result)))).raw])⟩
+    let typeSpec ← `(Parser.Term.typeSpec| : $(mkIdent (`Semantics ++ result)))
+    sig := ⟨sig.raw.setArg 1 (mkNullNode #[typeSpec.raw])⟩
   if kind ∈ [`primitive, `template, `action, `keyword] then
     let full := (← getCurrNamespace) ++ original.getId
     if (← getEnv).contains full then
@@ -1037,7 +1066,7 @@ def elabAuthoredCommand : CommandElab := fun stx => do
         (some ($(mkIdent `Semantics.Deed.action) $deed $permanent)) $body)
     if kind == `keyword then
       let labelName := (← getCurrNamespace) ++ name.getId ++ `label
-      let labelValue ← liftTermElabM <| elabTermEnsuringType label (mkConst ``String)
+      let labelValue := mkStrLit declarationLabel.getString
       liftCoreM <| addAndCompile <| .defnDecl {
         name := labelName, levelParams := [], type := mkConst `Semantics.KeywordLabel
         value := mkApp (mkConst `Semantics.KeywordLabel.named) labelValue
@@ -1050,9 +1079,10 @@ def elabAuthoredCommand : CommandElab := fun stx => do
           for id in binder[1].getArgs do
             let argument : Term := ⟨id⟩
             args := args.push argument
-      body ← `(term| $(mkIdent `Semantics.Ability.keyword) $(mkIdent labelName) (keyword_arguments% [$args,*]) $body)
+      body ← `(term| $(mkIdent `Semantics.Ability.keyword) $(mkIdent labelName)
+        (keyword_arguments% [$args,*]) $body)
     if kind == `ability_word then
-      let labelStr : StrLit := ⟨label.raw⟩
+      let labelStr : StrLit := declarationLabel
       body ← `(term| ability_word_body% $labelStr:str $body)
     if kind == `template then body ← `(term| bind_decl_body% false $identity $body)
     if kind ∈ [`action, `keyword] then body ← `(term| bind_decl_body% true $identity $body)
@@ -1062,7 +1092,7 @@ def elabAuthoredCommand : CommandElab := fun stx => do
     let body ← match kind with
       | `counter =>
         let holder := (fields.lookup `holder).getD (mkIdent `Semantics.Kind.object)
-        `(term| $(mkIdent `Semantics.CounterKind.named) $(Syntax.mkStrLit original.getId.getString!) $holder)
+        `(term| $(mkIdent `Semantics.CounterKind.named) $declarationLabel $holder)
       | `subtype =>
         let k ← required `kind
         if k.raw.getId == `spell || (k.raw.reprint.getD "").trimAscii.toString == ".spell" then
@@ -1071,7 +1101,7 @@ def elabAuthoredCommand : CommandElab := fun stx => do
       | `designation =>
         let scope ← required `scope
         let sole := (fields.lookup `sole).getD (← `(term| false))
-        `(term| $(mkIdent `Semantics.DesignationLabel.named) $label $scope (sole := $sole))
+        `(term| $(mkIdent `Semantics.DesignationLabel.named) $declarationLabel $scope (sole := $sole))
       | `card_type =>
         let permanent ← required `permanent
         let stats := (fields.lookup `stats).getD (← `(term| []))
@@ -1079,19 +1109,22 @@ def elabAuthoredCommand : CommandElab := fun stx => do
         let label := (fields.lookup `name).getD label
         `(term| { name := $label, permanent := $permanent, stats := $stats,
                   instantOrSorcery := $instantOrSorcery })
-      | _ => `(term| $(mkIdent `Semantics.RelationLabel.named) $label)
+      | _ => `(term| $(mkIdent `Semantics.RelationLabel.named) $declarationLabel)
     emit body true
-    let row := mkIdent (name.getId.getPrefix ++ Name.mkSimple (name.getId.getString! ++ "_definition"))
-    let ctor := mkIdent (`Semantics.RegistryDefinition ++ if kind == `card_type then `cardType else kind)
+    let rowName := name.getId.getPrefix ++ Name.mkSimple (name.getId.getString! ++ "_definition")
+    let row := mkIdent rowName
+    let ctorKind := if kind == `card_type then `cardType else kind
+    let ctor := mkIdent (`Semantics.RegistryDefinition ++ ctorKind)
     let rowBody ← if kind == `relation then `(term| $ctor $name) else `(term| $ctor $name $rules)
     elabCommand (← `(def $row : $(mkIdent `Semantics.RegistryDefinition) := $rowBody))
     let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
-    elabCommand (← `(theorem $ok : $(mkIdent `Semantics.RegistryDefinition.check) $row = [] := by decide))
+    let check := mkIdent `Semantics.RegistryDefinition.check
+    elabCommand (← `(theorem $ok : $check $row = [] := by decide))
   else
     let mut body ← if payload.isOfKind ``declBlock then
       if let some body := fields.lookup `body then pure body
       else makeStruct (fields.filter fun f =>
-        !(f.1 ∈ [`lemma, `plural, `verbs, `nouns, `adjectives, `determinatives, `bound, `spelling]))
+        !lexicalFields.contains f.1)
       else pure ⟨payload⟩
     if kind == `card then
       if body.raw.isOfKind ``Parser.Term.structInst then
@@ -1101,7 +1134,9 @@ def elabAuthoredCommand : CommandElab := fun stx => do
     elabCommand (← `($mods:declModifiers def $declId:declId $sig:optDeclSig $value:declVal))
     if kind == `card then
       let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
-      elabCommand (← `(theorem $ok : $(mkIdent `Semantics.Card.check) ($(mkIdent `Semantics.Spelled.card) $name) = [] :=
+      let check := mkIdent `Semantics.Card.check
+      let cardValue := mkIdent `Semantics.Spelled.card
+      elabCommand (← `(theorem $ok : $check ($cardValue $name) = [] :=
         $(mkIdent `Semantics.Spelled.ok) $name))
     else generatedCheck name (resultName.getD .anonymous)
   let declaration ← resolveGlobalConstNoOverload name
@@ -1137,7 +1172,8 @@ def topoSortBundle (items : List BundleItem) : Except String (List BundleItem) :
   let mut seen : List BundleKey := []
   for item in items do
     if seen.contains item.key then
-      return .error s!"Duplicate bundle declaration: {item.key.bareName} : {item.key.returnType} ({item.file})"
+      return .error (s!"Duplicate bundle declaration: {item.key.bareName} : " ++
+        s!"{item.key.returnType} ({item.file})")
     seen := item.key :: seen
   let mut byKey : Std.HashMap BundleKey BundleItem := {}
   let mut degrees : Std.HashMap BundleKey Nat := {}
@@ -1180,8 +1216,7 @@ def topoSortBundle (items : List BundleItem) : Except String (List BundleItem) :
 
 private partial def referencedIdents (bound : List Name) (stx : Syntax) : List Name :=
   if stx.isOfKind ``declField then
-    if stx[0].getId ∈ [`lemma, `plural, `verbs, `nouns, `adjectives, `determinatives,
-        `bound, `spelling] then []
+    if lexicalFields.contains stx[0].getId then []
     else referencedIdents bound stx[2]
   else if stx.isOfKind ``Parser.Term.structInstField then
     referencedIdents bound stx[1]

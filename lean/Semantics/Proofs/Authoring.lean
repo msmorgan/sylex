@@ -589,6 +589,19 @@ example : activated [.snow] (draw 1) = activated (mana [.snow]) (draw 1) := rfl
 
 namespace BundleDsl
 
+example (card token action keyword counter subtype template primitive designation relation
+    ability_word card_type sba conferral : Nat) : List Nat :=
+  [card, token, action, keyword, counter, subtype, template, primitive, designation, relation,
+   ability_word, card_type, sba, conferral]
+
+/-- Declaration modifiers and documentation pass through to the generated template. -/
+@[inline] private template annotated : Predicate := { body := .isCard }
+example : annotated = Predicate.isCard := rfl
+
+/-- error: Unknown field speling in template declaration -/
+#guard_msgs in
+template misspelledMetadata : Predicate := { speling := "card", body := .isCard }
+
 primitive token : NounWord := { spelling := "token", body := .token }
 template token (spec : TokenSpec) : CreationSpec := { body := .token spec [] }
 primitive atom : Predicate := { lemma := "card", body := .isCard }
@@ -650,7 +663,10 @@ example (candidate : NounPhrase) : ballotArgument (.byCandidate candidate) =
 
 keyword recursiveKeyword := { body := [static (cant any attack
   (except := byObjects (bare (hasKeyword recursiveKeyword))))] }
-keyword parameterKeyword (amount : Amount) (cost : Cost) := { body := [activated cost (draw amount)] }
+keyword parameterKeyword (amount : Amount) (cost : Cost) := {
+  lemma := "parameter keyword", spelling := "parameter <amount> <cost>",
+  body := [activated cost (draw amount)],
+}
 example : (parameterKeyword : KeywordLabel) = parameterKeyword.label := rfl
 example : (parameterKeyword : KeywordTerm) = theKeyword parameterKeyword.label := rfl
 example : (parameterKeyword : Option KeywordLabel) = some parameterKeyword.label := rfl
@@ -702,9 +718,9 @@ example : alreadyWord = landfall (activated [blue] (draw 1)) := rfl
 counter testCounter := { lemma := "test counter", plural := "test counters", confers := [] }
 subtype testSubtype := { lemma := "Test", kind := creature }
 subtype testSpellSubtype := { lemma := "Test spell", kind := .spell }
-designation testDesignation := { scope := .heldBy .player, sole := true }
+designation testDesignation := { lemma := "test designation", scope := .heldBy .player, sole := true }
 card_type testCardType := { name := "Test", permanent := false }
-relation testRelation := { lemma := "testRelation" }
+relation testRelation := { lemma := "test relation" }
 token testToken := { name := "Test", token := { types := [artifact] } }
 sba testSba := { scope := creature, when := exists_ creature, then_ := draw 1 }
 conferral testConferral := { scope := creature, confer := boost (up 1) (up 1) }
@@ -733,6 +749,13 @@ run_cmd do
       (fun entry => entry.declaration == ``Semantics.Proofs.Authoring.BundleDsl.testCounter &&
         entry.kind == `counter && entry.fields.any (·.1 == `plural)) do
     throwError "declaration metadata missing"
+
+example : testCounter = CounterKind.named "testCounter" .object := rfl
+example : parameterKeyword.label = KeywordLabel.named "parameterKeyword" := rfl
+example : testDesignation = DesignationLabel.named "testDesignation" (.heldBy .player) true := rfl
+example : testRelation = RelationLabel.named "testRelation" := rfl
+example : testSpellSubtype = Subtype.spell "Test spell" := rfl
+example : testCardType = { name := "Test", permanent := false } := rfl
 
 example : RegistryDefinition.check testCounter_definition = [] := ok_testCounter
 example : RegistryDefinition.check testSubtype_definition = [] := ok_testSubtype
@@ -791,6 +814,28 @@ open Lean Authoring in
 ] with
 | .error message => message ==
     "Dependency cycle in bundle: a : Semantics.Action (a.lean), b : Semantics.Action (b.lean)"
+| .ok _ => false
+
+example (bundle : CharacteristicBundle) :
+    ({ bundle with qualities := [] } : CharacteristicBundle) =
+      { characteristics := bundle.characteristics, qualities := [] } := rfl
+
+open Lean Authoring in
+#guard match topoSortBundle [
+  { key := ⟨`a, `Semantics.Action⟩, file := "a.lean", references := [`b] },
+  { key := ⟨`b, `Semantics.Action⟩, file := "b.lean", references := [`a] },
+  { key := ⟨`blocked, `Semantics.Action⟩, file := "blocked.lean", references := [`a] }
+] with
+| .error message => message ==
+    "Dependency cycle in bundle: a : Semantics.Action (a.lean), b : Semantics.Action (b.lean)"
+| .ok _ => false
+
+open Lean Authoring in
+#guard match topoSortBundle [
+  { key := ⟨`a, `Semantics.Action⟩, file := "first.lean" },
+  { key := ⟨`a, `Semantics.Action⟩, file := "second.lean" }
+] with
+| .error message => message == "Duplicate bundle declaration: a : Semantics.Action (second.lean)"
 | .ok _ => false
 
 end BundleDsl
