@@ -64,21 +64,18 @@ constraints apply.
      `.of .blue`, etc.) for card types, colors, supertypes, comparators, turn parts, roundings, and
      quality sorts.
 
-5. **Rewrite all 908 `plugins_v3/canon/cards/*.lean` files to house style and restore comments/citations:**
+5. **Rewrite all 908 `plugins_v3/canon/cards/*.lean` files to house style and strip bare-name comments:**
    - Omit `: Spelled` and `body :=`.
    - Use coercions and top-down list elaborators (`cost := [2, black]`, `types := [instant]`,
      `supertypes := [legendary]`, `power := 3`, `toughness := 2`, `manaOf [[blue], [colorless, blue]]`,
      bare `StaticSpec` in `text := [...]` without `static (...)`, `[a, b]` for `sequentially [a, b]`
      in `Action` position and `and [a, b]` in `Predicate`/`Condition` position, and bare card-type /
      noun predicates in `target creature`, `target [permanent, non land, hasManaValue atMost 3]`, etc.).
-   - Restore all card header comments and CR citations dropped during extraction:
-     - Currently only 39 of 908 files in `plugins_v3/canon/cards/` have CR citations, 448 have
-       no comment at all, and ~420 have only a bare card-name stub (`/-- Doubling Season -/`).
-     - Carry over all 237 card comments/citations from `plugins_v2/canon/cards/*.ron` (at `tkryskrm`,
-       230 with CR citations), all 50 card comments/citations from `plugins/canon/cards/*.ron`, and
-       all comments/citations from `lean/Semantics/Cards/*.lean` (at `oozlxsyy`).
-     - Replace bare card-name stub comments (`/-- Doubling Season -/`) with the card's Oracle text
-       and/or the rule or interaction the card pins.
+   - Strip the ~420 redundant bare card-name doc comments (`/-- Doubling Season -/`,
+     `/-- Mourning Patrol // Morning Apparition -/`, etc.). Card files do not need a comment
+     repeating their name or a generic CR citation; retain (or carry over from `plugins/canon/cards/`)
+     only substantive comments on cards that were canonized to illustrate or pin a particular rule
+     or interaction (e.g. `adaptiveAutomaton.lean`, `hitRun.lean`).
    - Format multi-line records and ability lists consistently across all 908 card files.
 
 ## Examples
@@ -137,10 +134,9 @@ card := modalDfc {
 ## Acceptance
 
 - Every file in `plugins_v3/canon/cards/` is named `<card_filename(name)>.lean` and begins with
-  `card :=` (after its doc comment).
-- Every card comment/citation from `plugins_v2/canon/cards/` (`tkryskrm`), `plugins/canon/cards/`,
-  and `lean/Semantics/Cards/` (`oozlxsyy`) is restored, with no bare card-name stub comments
-  (`/-- <Card Name> -/`).
+  `card :=` (after any rule-explaining doc comment).
+- Zero bare card-name stub comments (`/-- <Card Name> -/`) in `plugins_v3/canon/cards/`; only cards
+  canonized to illustrate a specific rule or interaction carry a doc comment.
 - Zero occurrences of `: Spelled`, `body :=`, `singleFacedCard`, `{ characteristics :=`, `generic `,
   `pip .`, `stat `, or raw dot-constructors (`.creature`, `.white`, `.of .`, etc.) in
   `plugins_v3/canon/cards/`.
