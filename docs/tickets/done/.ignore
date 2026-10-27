@@ -1,0 +1,3 @@
+# Completed tickets carry historical snapshots and point-in-time counts; keep
+# default ripgrep/fd searches out of `done/` unless explicitly targeted.
+*
