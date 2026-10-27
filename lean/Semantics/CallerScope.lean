@@ -13,6 +13,15 @@ parameters through these instances; `template` preserves their caller scope.
 
 namespace Semantics
 
+/-- A play payment read in the caller's Reference Scope: its cost, when it names one. -/
+def PlayPayment.inCaller : PlayPayment → PlayPayment
+  | .payingInstead cost => .payingInstead (.inCaller cost)
+  | .plusAdditional cost => .plusAdditional (.inCaller cost)
+  | .faceDown spec cost => .faceDown spec (.inCaller cost)
+  | .transformed cost => .transformed (.inCaller cost)
+  | payment => payment
+
+
 class CallerScope (α : Type) where
   caller : α → α
 
@@ -63,6 +72,9 @@ instance {α : Type} [CallerScope α] : CallerScope (Option α) where
 
 instance {α : Type} [CallerScope α] : CallerScope (List α) where
   caller := List.map CallerScope.caller
+
+instance : CallerScope PlayPayment where
+  caller := PlayPayment.inCaller
 
 instance : CallerScope Ballot where
   caller

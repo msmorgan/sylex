@@ -60,13 +60,6 @@ def Ballot.inCaller : Ballot → Ballot
   | .byCandidate candidates => .byCandidate (.inCaller candidates)
   | ballot => ballot
 
-/-- A play payment read in the caller's Reference Scope: its cost, when it names one. -/
-def PlayPayment.inCaller : PlayPayment → PlayPayment
-  | .payingInstead cost => .payingInstead (.inCaller cost)
-  | .plusAdditional cost => .plusAdditional (.inCaller cost)
-  | .faceDown spec cost => .faceDown spec (.inCaller cost)
-  | .transformed cost => .transformed (.inCaller cost)
-  | payment => payment
 
 end Semantics
 

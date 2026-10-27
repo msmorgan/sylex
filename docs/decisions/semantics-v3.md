@@ -635,12 +635,13 @@ Rather than an ad-hoc, indentation-sensitive pseudo-DSL or separate RON catalog 
 - **Command macros:** `primitive`, `action`, `keyword`, `ability_word`, `counter`, `designation`, `subtype`, `card_type`, `relation`, `token`, `sba`, `conferral`, `template`, `card`.
 - **100% Valid Lean 4:** Every declaration elaborates directly in Lean 4 and is verified by `lake build`. Because the syntax uses balanced delimiters (`{ ... }`, `[ ... ]`, `( ... )`) with zero significant whitespace, the Rust parser in `crates/deckmaste_semantics_v3` is a small ~250-line balanced-delimiter reader.
 - **Unified 3-layer declaration blocks:** A single self-contained block unifies:
-  1. *Layer 2 lexical catalog fields* (`lemma`, `plural`, `verbs`, `nouns`, `adjectives`, `determinatives`, `bound` matching `crates/deckmaste_lexical_source/src/schema.rs`),
-  2. *Layer 3 `spelling := "..."` string templates* (the foundation for the Construction Grammar `deckmaste_spelling` crate), and
+  1. *Layer 2 lexical catalog fields inside `lexical := { ... }`* (`lemma`, `plural`, `verbs`, `nouns`, `adjectives`, `determinatives`, `bound`, `variants`, `bracketed_text_removable` matching `crates/deckmaste_lexical_source/src/schema.rs`),
+  2. *Layer 3 top-level `spelling := "..."` string templates* (the foundation for the Construction Grammar `deckmaste_spelling` crate), and
   3. *`semantics_v3` meaning* (`body`, `confers`, `rules`),
   retiring separate files such as `Counters.lean` + `Proofs/Rules.lean` and `Subtypes.lean` + `SubtypeRules.lean`.
+- Lean discards `lexical` and `spelling` during command elaboration without elaborating or retaining their contents. Nested catalog structures and identifiers need no Lean declarations and create no bundle dependencies.
 - **No `rule:` data field:** CR citations live in standard `--` comments (e.g. `-- [CR#701.47a]`) checked by `cargo xtask cite`.
-- **Derived keyword parameters:** The `parameters:` field is omitted on `keyword`; parameters are derived directly from the declaration's typed parameter signature and `spelling`.
+- **Derived keyword parameters:** The `parameters:` field is omitted on `keyword`; parameters are derived directly from the declaration's typed parameter signature.
 
 ### 4.5 Loose-Bundle Topological DAG Loading and Authoring Coercions
 

@@ -604,7 +604,7 @@ template misspelledMetadata : Predicate := { speling := "card", body := .isCard 
 
 primitive token : NounWord := { spelling := "token", body := .token }
 template token (spec : TokenSpec) : CreationSpec := { body := .token spec [] }
-primitive atom : Predicate := { lemma := "card", body := .isCard }
+primitive atom : Predicate := { lexical := { lemma := "card" }, body := .isCard }
 template shared : Predicate := { body := atom }
 template shared : Condition := { body := exists_ atom }
 
@@ -664,7 +664,7 @@ example (candidate : NounPhrase) : ballotArgument (.byCandidate candidate) =
 keyword recursiveKeyword := { body := [static (cant any attack
   (except := byObjects (bare (hasKeyword recursiveKeyword))))] }
 keyword parameterKeyword (amount : Amount) (cost : Cost) := {
-  lemma := "parameter keyword", spelling := "parameter <amount> <cost>",
+  lexical := { lemma := "parameter keyword" }, spelling := "parameter <amount> <cost>",
   body := [activated cost (draw amount)],
 }
 example : (parameterKeyword : KeywordLabel) = parameterKeyword.label := rfl
@@ -715,12 +715,12 @@ example : testWord = abilityWord (.named "testWord") (activated [blue] (draw 1))
 ability_word alreadyWord := { body := landfall (activated [blue] (draw 1)) }
 example : alreadyWord = landfall (activated [blue] (draw 1)) := rfl
 
-counter testCounter := { lemma := "test counter", plural := "test counters", confers := [] }
-subtype testSubtype := { lemma := "Test", kind := creature }
-subtype testSpellSubtype := { lemma := "Test spell", kind := .spell }
-designation testDesignation := { lemma := "test designation", scope := .heldBy .player, sole := true }
+counter testCounter := { lexical := { lemma := "test counter", plural := "test counters" }, confers := [] }
+subtype testSubtype := { name := "Test", kind := creature }
+subtype testSpellSubtype := { name := "Test spell", kind := .spell }
+designation testDesignation := { lexical := { lemma := "test designation" }, scope := .heldBy .player, sole := true }
 card_type testCardType := { name := "Test", permanent := false }
-relation testRelation := { lemma := "test relation" }
+relation testRelation := { lexical := { lemma := "test relation" } }
 token testToken := { name := "Test", token := { types := [artifact] } }
 sba testSba := { scope := creature, when := exists_ creature, then_ := draw 1 }
 conferral testConferral := { scope := creature, confer := boost (up 1) (up 1) }
@@ -745,10 +745,6 @@ run_cmd do
   let env ← getEnv
   unless Semantics.Authoring.primitiveAttribute.hasTag env
       ``Semantics.Proofs.Authoring.BundleDsl.atom do throwError "primitive tag missing"
-  unless (Semantics.Authoring.declarationMetadataExt.getState env).any
-      (fun entry => entry.declaration == ``Semantics.Proofs.Authoring.BundleDsl.testCounter &&
-        entry.kind == `counter && entry.fields.any (·.1 == `plural)) do
-    throwError "declaration metadata missing"
 
 example : testCounter = CounterKind.named "testCounter" .object := rfl
 example : parameterKeyword.label = KeywordLabel.named "parameterKeyword" := rfl
@@ -838,6 +834,83 @@ open Lean Authoring in
 | .error message => message == "Duplicate bundle declaration: a : Semantics.Action (second.lean)"
 | .ok _ => false
 
+primitive dslLexicalRich : Predicate := {
+  lexical := {
+    lemma := "kick",
+    verbs := [{ lemma := "kick", frames := [monotransitive] }],
+    bound := { surface := "walk", stems := [LandType] },
+    variants := [unelaboratedVariant], bracketed_text_removable := true
+  },
+  spelling := "kick", body := isCard,
+}
+example : dslLexicalRich = isCard := rfl
+
+/-- error: Unknown field lemma in template declaration -/
+#guard_msgs in
+template misplacedLexical : Predicate := { lemma := "card", body := isCard }
+
+/-- error: parameter identity is generated: manualIdentity.subject -/
+#guard_msgs (error) in
+action manualIdentity (subject : NounPhrase) := {
+  body := sacrifice (.firstMention "manualIdentity.subject" subject),
+}
+
+action Action.sortedIdentity (subject : NounPhrase) := { body := sacrifice subject }
+example (subject : NounPhrase) : Action.sortedIdentity subject =
+    .ownScope (some (.action "sortedIdentity" .none))
+      (sacrifice (.firstMention "sortedIdentity.subject" (.inCaller subject))) := rfl
+
+example : Predicate.shared = atom := rfl
+example : Condition.shared = exists_ atom := rfl
+counter sharedRegistry := {}
+relation sharedRegistry := {}
+example : CounterKind.sharedRegistry = CounterKind.named "sharedRegistry" .object := rfl
+example : RelationLabel.sharedRegistry = RelationLabel.named "sharedRegistry" := rfl
+example : (sharedRegistry : CounterKind) = CounterKind.sharedRegistry := rfl
+example : (sharedRegistry : RelationLabel) = RelationLabel.sharedRegistry := rfl
+
+keyword customLabel (subject quality : Predicate) (promise : Action) := {
+  label := "custom label",
+}
+example (subject quality : Predicate) (promise : Action) : customLabel subject quality promise =
+    Ability.keyword (.named "custom label")
+      [.subject (.inCaller subject), .quality (.inCaller quality)] [] := rfl
+example : customLabel.label = KeywordLabel.named "custom label" := rfl
+
+example (cost : Cost) : CallerScope.caller (PlayPayment.payingInstead cost) =
+    PlayPayment.payingInstead (.inCaller cost) := rfl
+
+/-- error: parameter identity is generated: singleManual.subject -/
+#guard_msgs (error) in
+template singleManual (subject : NounPhrase) : Action := {
+  body := sacrifice (.laterMention "singleManual.subject" subject),
+}
+
+/-- error: parameter identity is generated: manualActor.actor -/
+#guard_msgs (error) in
+action manualActor := { body := sacrifice (.firstMention "manualActor.actor" theActor) }
+
+keyword Ability.reverseShared (amount : Amount) := { label := "reverse shared" }
+action reverseShared := { body := draw 1 }
+example : Action.reverseShared = reverseShared := rfl
+example : Ability.reverseShared.label = KeywordLabel.named "reverse shared" := rfl
+
+keyword keywordFirst := {}
+action keywordFirst := { body := draw 1 }
+example : Ability.keywordFirst = Ability.keyword (.named "keywordFirst") [] [] := rfl
+example : Ability.keywordFirst.label = KeywordLabel.named "keywordFirst" := rfl
+example : Action.keywordFirst = .ownScope (some (.action "keywordFirst" .none)) (draw 1) := rfl
+
+action paymentArgument (payment : PlayPayment) := {
+  body := .procedure .cast this_ payment none none none,
+}
+example (payment : PlayPayment) : paymentArgument payment =
+    .ownScope (some (.action "paymentArgument" .none))
+      (.procedure .cast this_ payment.inCaller none none none) := rfl
+
+example : Definitions.Ability.devour 2 = Definitions.devour 2 := rfl
+example : Templates.NounPhrase.target isCreature = Templates.target isCreature := rfl
+
 end BundleDsl
 
 namespace BundleFixture
@@ -845,6 +918,31 @@ load_bundle "test-fixtures/authoring-bundle"
 example : bundleCard.card.check = [] := ok_bundleCard
 example : bundleCard.authoring.onlyAuthored = true := bundleCard.onlyAuthored
 example : (bundleQuality : Predicate) = bundleAtom := rfl
+example : Action.bundleShared = Action.ownScope (some (.action "bundleShared" .none)) bundleDraw := rfl
+example : Ability.bundleShared = .keyword (.named "bundleShared") [] [spell Action.bundleShared] := rfl
 end BundleFixture
+
+open BundleDsl in
+example : ([reverseShared 2] : List Ability) = [BundleDsl.Ability.reverseShared 2] := rfl
+open BundleDsl in
+example : (reverseShared : KeywordLabel) = KeywordLabel.named "reverse shared" := rfl
+open BundleDsl in
+example : (reverseShared : KeywordTerm) = theKeyword (.named "reverse shared") := rfl
+open BundleDsl in
+example : (keywordFirst : KeywordLabel) = KeywordLabel.named "keywordFirst" := rfl
+
+namespace BundleAliases
+load_bundle "test-fixtures/authoring-aliases"
+example : aQuality = Templates.Predicate.and [Semantics.Predicate.isToken, Semantics.Predicate.isCard] := rfl
+example : aSubject = NounPhrase.you := rfl
+end BundleAliases
+
+/-- error: bundle file 'test-fixtures/authoring-invalid-multiple/two.lean' must contain exactly one declaration, found 2 -/
+#guard_msgs (error) in
+load_bundle "test-fixtures/authoring-invalid-multiple"
+
+/-- error: bundle file 'test-fixtures/authoring-invalid-empty/empty.lean' must contain exactly one declaration, found 0 -/
+#guard_msgs (error) in
+load_bundle "test-fixtures/authoring-invalid-empty"
 
 end Semantics.Proofs.Authoring
