@@ -1,145 +1,62 @@
 ---
-needs: [plugins-v3-builtin-cleanup, plugins-v3-builtin-primitives-and-conferrals-cleanup]
+needs: [plugins-v3-canon-authoring-surface, plugins-v3-conferral-inlining]
 ---
-# Clean up `plugins_v3/canon/cards` authoring syntax, coercions, and filenames
+# Rewrite the 908 `plugins_v3/canon/cards` files to house style and printed-name filenames
 
-**Replace `camelCase` card identifiers, `: Spelled` annotations, raw dot-constructors, and
-`{ body := ... }` wrappers in `plugins_v3/canon/cards/` with anonymous `card := ...` declarations,
-structured multi-faced constructors, authoring coercions, and `card_filename` filenames.** Standard
-constraints apply.
+Standard constraints apply. This ticket uses the surface built by
+`plugins-v3-canon-authoring-surface`. Do it with a script (scratchpad), not by hand and not
+with parallel agents. Land it in three changes, comparing the expansion baseline after each one.
 
-## Scope
+## Steps
 
-1. **Anonymous `card := ...` header and `cardNamed` proof lookup:**
-   - Change the `card` command syntax in `lean/Semantics/Authoring.lean` and
-     `crates/deckmaste_semantics_v3/src/{reader.rs,bundle.rs,lower/mod.rs}` from
-     `card <ident> : Spelled := ...` to anonymous `card := <term>` (with no identifier or
-     `: Spelled` before `:=`).
-   - Derive the internal declaration key (`Name.mkSimple` in Lean, `Ident` in Rust) from the card's
-     printed name: `name` on a single-faced card (`"Saw in Half"`), `<front.name> // <back.name>` on
-     `transforming` and `modalDfc` cards (`"Branchloft Pathway // Boulderloft Pathway"`),
-     `<left.name> // <right.name>` on `split` and `sharedLineSplit` cards, and
-     `<normal.name> // <adventure.name>` (or `<normal.name> // <alternative.name>`) on `adventurer`
-     and `flip` cards.
-   - Provide a `cardNamed "<name>"` term elaborator in `lean/Semantics/Authoring.lean` so proof
-     suites (`lean/Semantics/Proofs/Cards*.lean`) reference a canon card by its printed name string
-     (`(cardNamed "Saw in Half").card`) without invented `camelCase` Lean identifiers.
+1. **Rewrite the syntax.** The baseline must show zero changes, keyed by declaration.
+   - Replace `card <ident> : Spelled := …` with `card := …`.
+   - Drop `body :=`, `singleFacedCard` and `{ characteristics := … }`.
+   - Use the record constructors for multi-part cards.
+   - Use bare numerals for stats and costs (`cost := [2, black]`, `power := 3`). Drop `stat `,
+     `generic ` and `pip .`.
+   - Use bare words in place of dot constructors.
+   - Write lists for `sequentially` and `and`, and bare `StaticSpec` in `text`.
+   - Use `this_`, not `this`.
+   - Format records and ability lists consistently.
 
-2. **Card filenames on disk via `deckmaste_core::plugin::card_filename`:**
-   - Rename all 908 files in `plugins_v3/canon/cards/` from `<camelCase>.lean` to
-     `<card_filename(name)>.lean` using the character escaping from
-     `crates/deckmaste_core/src/plugin.rs` (`card_filename`), where `< > : " / \ | ? *` map to
-     `{less}`, `{greater}`, `{colon}`, `{quote}`, `{slash}`, `{backslash}`, `{pipe}`, `{question}`,
-     `{star}` and spaces, periods, commas, apostrophes, and hyphens remain literal (e.g.
-     `Saw in Half.lean`, `Branchloft Pathway {slash}{slash} Boulderloft Pathway.lean`,
-     `Summon{colon} Esper Ramuh.lean`).
-
-3. **Structured `Card` layout constructors and `Coe Characteristics Card`:**
-   - Provide `Coe Characteristics CardFace := ⟨CardFace.mk⟩` and
-     `Coe Characteristics Card := ⟨singleFacedCard⟩` so single-faced cards are written directly as
-     `card := { name := "...", ... }` without `{ body := ((singleFacedCard ...)) }` or
-     `{ characteristics := { ... } }`.
-   - Expose each multi-faced or multi-part `Card` constructor (`transforming`, `modalDfc`, `split`,
-     `sharedLineSplit`, `adventurer`, `flip`, `leveler`, `prototype` [CR#709.1,710.1,711.1,712.1,715.1,718.1])
-     as a primitive/template taking its fields as a braced record (`ctor { field := value, ... }`
-     elaborating to `ctor (field := value) ...` in Lean and lowering in `deckmaste_semantics_v3`):
-     - `card := modalDfc { front := { ... }, back := { ... } }`
-     - `card := transforming { front := { ... }, back := { ... } }`
-     - `card := adventurer { normal := { ... }, adventure := { ... } }`
-     - `card := split { left := { ... }, right := { ... } }`
-     - `card := sharedLineSplit { shared := { ... }, left := { ... }, right := { ... } }`
-     - `card := flip { normal := { ... }, alternative := { ... } }`
-     - `card := leveler { inner := { ... }, bands := [ ... ] }`
-     - `card := prototype { inner := { ... }, alternative := { ... } }`
-   - Remove the `body` field from `card` declarations in `Authoring.lean` and `reader.rs`.
-
-4. **Missing coercions, defaults, and bare word primitives:**
-   - Add `OfNat PrintedStat n` (and `OfNat (Option PrintedStat) n` / `Coe PrintedStat (Option PrintedStat)`),
-     `OfNat (Option Amount) n`, and `Coe Amount (Option Amount)` in `lean/Semantics/Primitives.lean`
-     and `crates/deckmaste_semantics_v3/src/lower/` so `power := 3, toughness := 2, loyalty := 3`
-     write bare numerals instead of `stat 3`.
-   - Default `copyCharacteristics`'s `typesAdded : Bool := false` parameter.
-   - Ensure bare primitives/templates exist in `plugins_v3/builtin/` (and are used instead of raw
-     dot-constructors `.creature`, `.white`, `.legendary`, `.atLeast`, `.upkeep`, `.endStep`, `.x`,
-     `.of .blue`, etc.) for card types, colors, supertypes, comparators, turn parts, roundings, and
-     quality sorts.
-
-5. **Rewrite all 908 `plugins_v3/canon/cards/*.lean` files to house style and strip bare-name comments:**
-   - Omit `: Spelled` and `body :=`.
-   - Use coercions and top-down list elaborators (`cost := [2, black]`, `types := [instant]`,
-     `supertypes := [legendary]`, `power := 3`, `toughness := 2`, `manaOf [[blue], [colorless, blue]]`,
-     bare `StaticSpec` in `text := [...]` without `static (...)`, `[a, b]` for `sequentially [a, b]`
-     in `Action` position and `and [a, b]` in `Predicate`/`Condition` position, and bare card-type /
-     noun predicates in `target creature`, `target [permanent, non land, hasManaValue atMost 3]`, etc.).
-   - Strip the ~420 redundant bare card-name doc comments (`/-- Doubling Season -/`,
-     `/-- Mourning Patrol // Morning Apparition -/`, etc.). Card files do not need a comment
-     repeating their name or a generic CR citation; retain (or carry over from `plugins/canon/cards/`)
-     only substantive comments on cards that were canonized to illustrate or pin a particular rule
-     or interaction (e.g. `adaptiveAutomaton.lean`, `hitRun.lean`).
-   - Format multi-line records and ability lists consistently across all 908 card files.
-
-## Examples
-
-```lean
--- plugins_v3/canon/cards/Saw in Half.lean
-card := {
-  name := "Saw in Half",
-  cost := [2, black],
-  types := [instant],
-  text := [
-    spell [
-      destroy (target creature),
-      doIf (did (that creature) die thisWay)
-        (instruct (controllerOf it)
-          (create 2
-            (copyOf (that creature)
-              (copyCharacteristics {
-                power := half up (powerOf (that creature)),
-                toughness := half up (toughnessOf (that creature))
-              }))))
-    ]
-  ]
-}
-
--- plugins_v3/canon/cards/Academy Journeymage.lean
-card := {
-  name := "Academy Journeymage",
-  cost := [4, blue],
-  types := [creature],
-  subtypes := [human, wizard],
-  text := [
-    onlyIfSo (costShift this (less 1)) (exists_ [wizard, youControl]),
-    when (does thisCreature enter)
-      (returnToHand (target [creature, anOpponentControls]))
-  ],
-  power := 3,
-  toughness := 2
-}
-
--- plugins_v3/canon/cards/Branchloft Pathway {slash}{slash} Boulderloft Pathway.lean
-card := modalDfc {
-  front := {
-    name := "Branchloft Pathway",
-    types := [land],
-    text := [activated tapSymbol (addMana 1 (manaOf [[green]]))]
-  },
-  back := {
-    name := "Boulderloft Pathway",
-    types := [land],
-    text := [activated tapSymbol (addMana 1 (manaOf [[white]]))]
-  }
-}
-```
+   Because keys change from camelCase identifiers to printed names, this step also:
+   - Migrates every proof reference: about 155 `Cards.<id>` references and about 100 `<id>.card`
+     uses across about 17 `lean/Semantics/Proofs/*.lean` files, not only `Cards*.lean`. They
+     become `cardNamed "<name>"`.
+   - Updates `deckmaste_semantics_v3/tests/lower.rs` `live_canon_cards_elaborate_with_builtin`.
+   - Has the baseline compared with an explicit old-key to new-key map.
+2. **Rename the files.** Rename each file to `<card_filename(name)>.lean`, using
+   `deckmaste_core::plugin::card_filename`.
+   - It escapes `< > : " / \ | ? *` as `{less}`…`{star}` and leaves everything else literal.
+     For example: `Saw in Half.lean`, `Circle of Protection{colon} Red.lean`,
+     `Branchloft Pathway {slash}{slash} Boulderloft Pathway.lean`.
+   - The canon bundle is read by directory walk (`load_bundle`, `Bundle::load`), not by
+     `import`, so filenames with spaces and braces are safe.
+   - Store names in NFC.
+3. **Strip the name-only comments.** About 406 files have a one-line `/-- <Card Name> -/`.
+   - Keep or carry over (from `plugins/canon/cards/`) only comments that explain why the card
+     is canonical, meaning which rule or interaction it pins. Examples are
+     `adaptiveAutomaton` and `hitRun`.
 
 ## Acceptance
 
-- Every file in `plugins_v3/canon/cards/` is named `<card_filename(name)>.lean` and begins with
-  `card :=` (after any rule-explaining doc comment).
-- Zero bare card-name stub comments (`/-- <Card Name> -/`) in `plugins_v3/canon/cards/`; only cards
-  canonized to illustrate a specific rule or interaction carry a doc comment.
-- Zero occurrences of `: Spelled`, `body :=`, `singleFacedCard`, `{ characteristics :=`, `generic `,
-  `pip .`, `stat `, or raw dot-constructors (`.creature`, `.white`, `.of .`, etc.) in
-  `plugins_v3/canon/cards/`.
-- `cargo test -p deckmaste_semantics_v3 -p deckmaste_lowering_v3 -p xtask`,
-  `cargo clippy -p deckmaste_semantics_v3 -p deckmaste_lowering_v3 -p xtask --tests -- -D warnings`,
-  `cargo xtask lean check`, and the CR citation gates pass.
+- Every file is named `card_filename` of its key. Its first non-comment token is `card :=`.
+- Zero matches in `plugins_v3/canon/cards` for any of the following:
+  - `: Spelled`
+  - `body :=`
+  - `singleFacedCard`
+  - `characteristics :=`
+  - `\bstat `
+  - `\bgeneric `
+  - `pip \.`
+  - `^/-- [^\n]* -/$` whose text equals the card's name
+  - any dot constructor that is not on `plugins-v3-canon-authoring-surface`'s list of kept
+    exceptions
+- The old `card <ident>` syntax and the `body` field are removed from `Authoring.lean` and the
+  Rust reader.
+- The baseline shows zero changed expansions under the key map.
+- Gates: `cargo xtask lean check`. Run tests and clippy for `deckmaste_semantics_v3` and
+  `xtask`.
+- Tickets that cite canon cards by camelCase name or old path are re-pointed. This includes
+  `lean-v3-card-head-noun-sweep`, which should not run concurrently with this ticket.
