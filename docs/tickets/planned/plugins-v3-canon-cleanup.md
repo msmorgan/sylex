@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-cleanup]
+needs: [plugins-v3-builtin-cleanup, plugins-v3-builtin-primitives-and-conferrals-cleanup]
 ---
 # Clean up `plugins_v3/canon/cards` authoring syntax, coercions, and filenames
 
