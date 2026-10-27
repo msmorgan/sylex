@@ -51,12 +51,42 @@ like it moves with it.
 
 `census::run` profiles and parses every unit and reports it **read** (a Reading
 exists, round-trip law 1 holds over the whole Packed Forest and law 2 on its
-cheapest Readings), **known-wrong-only** (a judgment for that exact text is
+cheapest eight Readings by default), **known-wrong-only** (a judgment for that exact text is
 satisfied by none of its Readings) or **unread** (with the reason: the grammar
 does not bind, a vocabulary gap, no Reading, or a law failure, which is a
 defect). Counts are per Stratum, with faces counted at their highest unit, plus
 per Syntactic Family and the most frequent skeletons.
-No attachment tree is enumerated except for a unit with a judgment.
+The census, judgment evaluator and `english parse` command consume Readings
+one at a time through the syntax engine's lazy Huang & Chiang (2005),
+Algorithm 3 enumeration over a flyweight arena. The Parse APIs borrow their
+Parse and return iterators:
+
+- `best_readings(k) -> impl Iterator<Item = Reading> + '_`
+- `best_ranked(k) -> impl Iterator<Item = (RankingKey, Reading)> + '_`
+- `readings() -> impl Iterator<Item = Reading> + '_`
+
+Intermediate candidates share tree and child-sequence handles; owned Readings,
+including their feature maps and Selected Frames, are materialized only by
+`.next()`. Consumers needing indexing or slices use `.collect()`.
+
+`LAW_TWO_READINGS = 8` remains the default. `census::run_with(..., usize::MAX)`
+or `cargo xtask english strata --all-readings` checks Law 2 on every Reading;
+`Report::law_two_exhaustive` records that choice. Full-corpus measurements on
+2026-10-27, using the dev profile and `/usr/bin/time -v`:
+
+| Enumeration / Law 2 limit | Wall time | User CPU | System CPU | Peak RSS (KiB) |
+| --- | ---: | ---: | ---: | ---: |
+| Previous eager / 8 | 66.96 s | 1491.01 s | 8.57 s | 6,056,668 |
+| Lazy flyweight / 8 | 59.37 s | 1329.02 s | 2.17 s | 1,473,920 |
+| Lazy flyweight / exhaustive | 72.45 s | 1484.80 s | 2.13 s | 1,550,860 |
+
+Exhaustive checking had zero Law 2 failures and stayed below 10 GB, but its
+22.0% wall-time increase exceeded the 15% threshold for making it the default.
+The eight-Reading report was byte-identical to baseline; exhaustive checking
+changed only `law_two_exhaustive`. A temporary differential check over all
+92,934 Corpus Units (92,958 parses including both cleave forms) compared
+326,921 exhaustive Readings and every top-eight ranked sequence against the
+previous eager implementation, with zero sequence mismatches.
 
 Each unit's count is reported two ways. `derivations` is the size of its Packed
 Forest, the number of trees: the census's no-Reading verdict and the judgment
@@ -101,7 +131,7 @@ predates and current Oracle texts already carry. A correction whose Oracle text
 no longer occurs exactly once in its face's text is stale and fails `--check`.
 
 ```
-cargo xtask english strata [--card NAME]... [--check]
+cargo xtask english strata [--card NAME]... [--check] [--all-readings]
 ```
 
 prints the summary and writes the full per-unit report to

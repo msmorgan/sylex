@@ -18,13 +18,24 @@ It has no proc macros and no generated code: a grammar is data.
    text and returns a `Parse`: the Packed Forest, its `Metrics`, and vocabulary
    gaps. Constituents are packed by (Category, span, summary); a summary holds the
    Category's features, its Gap, and the engine-derived facts a parent may check.
-4. `Parse::best_readings(k)` returns the `k` best Readings by Ranking Key
+4. `Parse::best_readings(k) -> impl Iterator<Item = Reading> + '_` yields
+   up to `k` Readings by Ranking Key
    (`RankingKey`, `docs/decisions/english-v4.md` §4.3): Attachment Class,
    then Right Association words, then summed Production Cost, compared in that
    order, with the Reading's own order as the final tie-break, so the best
-   Reading is unique. Every component is a sum over the Reading's Productions,
-   so each forest node keeps only its `k` best trees and the walk never builds
-   every attachment tree. Right Association is computed from spans for every
+   Reading is unique. Enumeration uses Huang & Chiang (2005),
+   [Algorithm 3](https://aclanthology.org/W05-1506.pdf), over an internal
+   flyweight arena. Each forest node and each Earley item/anchor group keeps
+   deduplicated best-so-far handles and a min-heap of candidate families and
+   child ranks. Requesting another result expands the last candidate's
+   immediate successors, requesting child ranks only as needed. Flat tree
+   entries and cons-cell child sequences share subtrees and prefixes; no
+   intermediate candidate owns a `ReadingNode`. Feature maps are cached once
+   per forest node, and comparisons borrow Selected Frames. Only `.next()`
+   materializes an owned Reading, cloning its features and frames. Arena
+   comparisons match `Reading::Ord` field-for-field, including lexicographic
+   children, and stop immediately at identical handles.
+   Right Association is computed from spans for every
    unselected dependent (a child named `adjunct`, `modifier` or `supplement`
    after its phrase's `head`): the words of its host, unless the host is a
    coordination, plus the words between the host and it; the last conjunct of
@@ -41,14 +52,20 @@ It has no proc macros and no generated code: a grammar is data.
    (*At the beginning of each combat this turn, …*). The chart
    tracks `head_final` as the last head-line child's, which neither
    punctuation nor the coordinator changes, so that the last conjunct's item
-   records the first's. `best_ranked(k)` returns the keys too,
+   records the first's.
+   `best_ranked(k) -> impl Iterator<Item = (RankingKey, Reading)> + '_`
+   yields the keys too;
    the tree-side `CompiledGrammar::ranking_key` (feature
    `tree-ranking-key`, enabled for tests only) computes a given Reading's key to
    check the forest's, and `cheapest_tier()` counts the Derivations sharing the least key without
    building trees. `derivation_count()` counts trees without building
-   them. `readings()` builds them all and is for tests. A Derivation never
-   contains its own Constituent, so a unary cycle adds none of its own and
-   hides none of its finite siblings.
+   them. `readings() -> impl Iterator<Item = Reading> + '_` lazily yields
+   every Reading; callers needing a vector or set use `.collect()`.
+   All three iterators borrow the Parse, which must outlive them. A Derivation
+   never contains its own Constituent: stream graphs reached through an open
+   unary cycle remain private to that ancestor path, while cycle-free graphs
+   are memoized. A cycle therefore adds no Derivation of its own and hides
+   none of its finite siblings.
    The forest is readable from outside through `PackedForest`'s accessors
    (`roots`, `node_span`, `node_items`, `item_families`, `leaf_span`),
    `Parse::count_node` and the `walk` memo; `deckmaste_english`'s census

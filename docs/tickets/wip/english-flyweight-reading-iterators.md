@@ -68,3 +68,6 @@ tables.
 Standard constraints apply. End the ticket with the two-line landing note from
 `docs/tickets/README.md` and update `crates/deckmaste_syntax/README.md` and
 `crates/deckmaste_english/README.md` to match.
+
+**Census delta** (`rtuxoqyn`): faces read 32,825 → 32,825; total Readings 326,905 → 326,905; lost faces: none.
+**Judgment set** (`rtuxoqyn`): 3,382 enforced, 0 pending; all pass.
