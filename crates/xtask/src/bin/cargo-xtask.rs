@@ -44,9 +44,8 @@ enum Cmd {
     Validate(ValidateArgs),
     /// Show a card as parsed from a plugin, with its macros expanded.
     Card(CardArgs),
-    /// Print the fully expanded body of every `plugins_v3` macro declaration,
-    /// one file each, for `diff -r` between two trees (defaults to
-    /// `plugins_v3/builtin` into `target/expansions`).
+    /// Write or compare keyed expansion snapshots of `plugins_v3` declarations
+    /// (defaults to `plugins_v3/builtin` into `target/expansions`).
     Expansions(ExpansionsArgs),
     /// The render-back fidelity gate: diff every finished card's rendered
     /// English against the oracle snapshot (strong form — any unwaivered
