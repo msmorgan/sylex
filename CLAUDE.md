@@ -126,7 +126,8 @@ them.
 - Symbol questions → rust-analyzer LSP first, grep second (subagents load it via ToolSearch
   `select:LSP`).
 - Lean work → load the `lean4:*` skills and Lean LSP MCP tools (ToolSearch
-  `select:mcp__lean-lsp__…`) before the first edit; subagent briefs must say so.
+  `select:mcp__lean-lsp__…`) before the first edit; subagent briefs must say so. Always pass `-q`
+  (`--quiet`) to `lake build` so its progress spinner does not flood context.
 - Code shape: `cargo xtask map enums`; for Lean, `lean/Semantics/Words.lean` and
   `lean/Semantics/Abilities.lean`. Current declarations beat inventories in old plans.
 - Plans and specs write "standard constraints apply" plus deltas; never restate this file.

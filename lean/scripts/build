@@ -2,4 +2,4 @@
 # Full gate: syntax, checker, bench, and every pin suite; no errors and no warnings.
 # Inner loop: `lake build Semantics` (skips the pin suites).
 cd "$(dirname "$0")/.." || exit 1
-exec lake build --wfail "$@"
+exec lake build -q --wfail "$@"

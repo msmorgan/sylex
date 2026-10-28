@@ -31,7 +31,7 @@ pub fn run(args: &LeanArgs) -> anyhow::Result<()> {
 fn check(lake: &mut Command, workbench: &Path) -> anyhow::Result<()> {
     let status = lake
         .current_dir(workbench)
-        .args(["build", "--wfail"])
+        .args(["build", "-q", "--wfail"])
         .status()
         .context("starting the Lean workbench build")?;
     anyhow::ensure!(status.success(), "Lean workbench build failed: {status}");
@@ -53,7 +53,7 @@ mod tests {
 
     #[test]
     fn check_builds_the_workbench_with_warnings_as_errors() {
-        stub("test \"$PWD\" = \"$EXPECTED_WORKBENCH\" && test \"$#\" = 2 && test \"$1\" = build && test \"$2\" = --wfail").unwrap();
+        stub("test \"$PWD\" = \"$EXPECTED_WORKBENCH\" && test \"$#\" = 3 && test \"$1\" = build && test \"$2\" = -q && test \"$3\" = --wfail").unwrap();
     }
 
     #[test]
