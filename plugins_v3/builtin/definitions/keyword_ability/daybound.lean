@@ -15,7 +15,7 @@ keyword daybound : Ability := {
               (currentFace .front))
             (transform thisPermanent))),
       static
-        (cant Templates.Subject.any
+        (cant any
           (transform thisPermanent) none none
           (some (deonticExceptByKeyword daybound.label)))]
 }

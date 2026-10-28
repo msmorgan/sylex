@@ -9,6 +9,6 @@ template doUnderProhibition (action forbidden : Action) : Action := {
   body :=
     sequentially
       [action,
-        establish (staticSpecCant Templates.Subject.any forbidden { })
+        establish (staticSpecCant any forbidden { })
           (some modifiesPrecedingAction)]
 }

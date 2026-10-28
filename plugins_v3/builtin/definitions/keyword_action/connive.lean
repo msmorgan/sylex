@@ -16,7 +16,7 @@ action connive (amount : Amount := 1) : Action := {
               (and
                 [non isLand, isCard,
                   predicateDid
-                    { subj := Templates.Subject.any, action := discard which,
+                    { subj := any, action := discard which,
                       within := some thisWay }]))
             (putCounters 1 (printedKind p1p1Counter)
               theActor)])

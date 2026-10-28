@@ -8,8 +8,8 @@ action detain (subject : NounPhrase) : Action := {
     establishThroughout
       (staticSpecConjunction none
         [cant (actor subject) (attack none),
-          cant (actor subject) (block Templates.NounPhrase.any),
-          cant Templates.Subject.any
+          cant (actor subject) (block any),
+          cant any
             (activate
               (allOf
                 (and

@@ -8,7 +8,7 @@ keyword nightbound : Ability := {
             (is thisPermanent isTransformed)
             (transform thisPermanent))),
       static
-        (cant Templates.Subject.any
+        (cant any
           (transform thisPermanent) none none
           (some (deonticExceptByKeyword nightbound.label)))]
 }

@@ -13,7 +13,7 @@ keyword vanishing (amount : Amount) : Ability := {
           (is thisPermanent
             (hasCounter (some timeCounter)))),
       when
-        (does Templates.Subject.any
+        (does any
           (removeCounters theLast
             (some (printedKind timeCounter))
             thisPermanent))

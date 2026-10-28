@@ -4,7 +4,7 @@ keyword decayed : Ability := {
   body :=
     [static
         (cant (actor thisCreature)
-          (block Templates.NounPhrase.any)),
+          (block any)),
       when
         (does (actor thisCreature)
           (attack none))

@@ -6,14 +6,14 @@ keyword rebound : Ability := {
         (replace
           (causedBy
             (byEvent
-              (does Templates.Subject.any
+              (does any
                 (resolve thisSpell)))
-            (would Templates.Subject.any
+            (would any
               (putInto thisSpell graveyard
                 (some stack))))
           (doIf
             (is thisSpell
-              (did Templates.Subject.any
+              (did any
                 (cast which (some yourHand))
                 (some thisObject)))
             (instead

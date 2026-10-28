@@ -8,9 +8,9 @@ keyword buyback (cost : Cost) : Ability := {
         (replace
           (causedBy
             (byEvent
-              (does Templates.Subject.any
+              (does any
                 (resolve thisSpell)))
-            (would Templates.Subject.any
+            (would any
               (putInto thisSpell graveyard
                 (some stack))))
           (doIf

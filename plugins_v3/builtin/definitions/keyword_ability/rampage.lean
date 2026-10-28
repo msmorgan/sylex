@@ -3,7 +3,7 @@ keyword rampage (amount : Amount) : Ability := {
   spelling := "rampage <amount>",
   body :=
     [whenever
-        (does Templates.Subject.any
+        (does any
           (becomeBlocked thisCreature))
         (get thisCreature
           (up

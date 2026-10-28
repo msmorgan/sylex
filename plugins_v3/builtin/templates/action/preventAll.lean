@@ -8,7 +8,7 @@ template preventAll (to : NounPhrase) (duration : Option Duration)
   body :=
     establish
       (replace
-        (would Templates.Subject.any (dealDamage anyAmount to kind))
+        (would any (dealDamage anyAmount to kind))
         (instead (preventDamage allDamage none none))
         none .repeatedly none)
       duration

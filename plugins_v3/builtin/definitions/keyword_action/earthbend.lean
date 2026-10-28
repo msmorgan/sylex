@@ -22,7 +22,7 @@ action earthbend (amount : Amount) : Action := {
             die)
           (returnToBattlefield (that land)
             [entersAs .tapped, under actor])
-          [does Templates.Subject.any
+          [does any
               (actionMove (that land)
                 battlefield (some exileZone)
                 .departure [])]]

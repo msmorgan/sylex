@@ -7,7 +7,7 @@ template preventNext (to : NounPhrase) (amount : Amount) (duration : Option Dura
   body :=
     establish
       (replace
-        (would Templates.Subject.any (dealDamage anyAmount to kind))
+        (would any (dealDamage anyAmount to kind))
         (instead
           (preventDamage (theNext amount) none none))
         none .repeatedly none)

@@ -15,9 +15,9 @@ keyword madness (cost : Cost) : Ability := {
       when
         (causes
           (byEvent
-            (does Templates.Subject.any
+            (does any
               (discard thisCard)))
-          (does Templates.Subject.any
+          (does any
             (exileFrom thisCard hand)))
         (instruct (ownerOf thisCard)
           (mayOrElse

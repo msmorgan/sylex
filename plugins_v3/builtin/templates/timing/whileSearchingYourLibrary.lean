@@ -4,5 +4,5 @@ template whileSearchingYourLibrary : Timing := {
   body :=
     whileDoing
       (does (actor you)
-        (actionSearch yourLibrary Templates.NounPhrase.any))
+        (actionSearch yourLibrary any))
 }

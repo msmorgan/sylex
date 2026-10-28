@@ -12,7 +12,7 @@ action airbend (subject : NounPhrase) : Action := {
             (and
               [isCard,
                 predicateDid
-                  { subj := Templates.Subject.any, action := Semantics.Definitions.exile which,
+                  { subj := any, action := Semantics.Definitions.exile which,
                     within := some thisWay }]))
           (instruct (ownerOf it)
             (establish

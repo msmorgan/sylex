@@ -19,7 +19,7 @@ conferral plottedCardCast := {
                 (cast this_ (some exileZone)
                   withoutPaying)
                 (some asSorcery))
-              (did Templates.Subject.any
+              (did any
                 (gainDesignation this_ plotted)
                 (within soFarThisTurn)))) }
 }

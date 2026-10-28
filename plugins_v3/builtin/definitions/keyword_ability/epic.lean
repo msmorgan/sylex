@@ -5,7 +5,7 @@ keyword epic : Ability := {
     [spell
         (establishThroughout
           (cant (actor you)
-            (cast Templates.NounPhrase.any))
+            (cast any))
           restOfGame),
       spell
         (delayWithin (beginningOfYour .upkeep)

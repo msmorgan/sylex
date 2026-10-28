@@ -7,7 +7,7 @@ action regenerate (subject : NounPhrase) : Action := {
   body :=
     establish
       (replace
-        (would Templates.Subject.any (Semantics.Definitions.destroy subject))
+        (would any (Semantics.Definitions.destroy subject))
         (instead (Semantics.Definitions.regeneration subject)) none
         .nextTimeOnly none)
       (some thisTurn)

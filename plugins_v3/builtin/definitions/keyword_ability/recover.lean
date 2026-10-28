@@ -4,7 +4,7 @@ keyword recover (cost : Cost) : Ability := {
   -- depend on the Cost structure.
   body :=
     [when
-        (does Templates.Subject.any
+        (does any
           (actionMove (a isCreature) battlefield
             (some yourGraveyard) .departure []))
         (may (pay cost .once)

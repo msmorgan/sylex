@@ -7,7 +7,7 @@ keyword vigilance : Ability := {
   spelling := "vigilance",
   body :=
     [static
-        (cant Templates.Subject.any
+        (cant any
           (tap thisCreature) none none none
           (some
             (byEvent

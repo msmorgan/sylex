@@ -31,11 +31,11 @@ keyword enchant (subject : Predicate) : Ability := {
                 (putInto thisAura graveyard))))),
       static
         (replace
-          (would Templates.Subject.any
+          (would any
             (actionMove thisAura
               (not stack) (some battlefield)
               .arrival
-              [moveRiderNot (moveRiderAttachedTo Templates.NounPhrase.any)]))
+              [moveRiderNot (moveRiderAttachedTo any)]))
           (doIf
             (exists_ (legalHostOf thisAura))
             (before
@@ -48,7 +48,7 @@ keyword enchant (subject : Predicate) : Ability := {
         (replace
           (would (actor thisAura)
             (enter none
-              [moveRiderAttachedTo Templates.NounPhrase.any,
+              [moveRiderAttachedTo any,
                 moveRiderNot
                   (moveRiderAttachedTo
                     (a (legalHostOf thisAura)))]))

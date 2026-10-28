@@ -10,7 +10,7 @@ keyword paradigm : Ability := {
     [spell
         (doIf
           (not
-            (did Templates.Subject.any
+            (did any
               (resolve
                 (a
                   (and

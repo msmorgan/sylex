@@ -12,9 +12,9 @@ keyword haunt : Ability := {
         (when
           (causes
             (byEvent
-              (does Templates.Subject.any
+              (does any
                 (resolve thisSpell)))
-            (does Templates.Subject.any
+            (does any
               (putInto thisSpell graveyard
                 (some stack))))
           (sequentially

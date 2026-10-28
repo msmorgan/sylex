@@ -4,7 +4,7 @@ template attachmentChoice (subject chosen : NounPhrase) : StaticSpec := {
   spelling := "As <subject> becomes attached, choose <chosen>",
   body :=
     asEvent
-      (does Templates.Subject.any
+      (does any
         (attachment .attached subject none))
       (actionChoose none chosen .openly none)
 }

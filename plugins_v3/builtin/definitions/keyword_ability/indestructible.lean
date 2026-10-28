@@ -3,5 +3,5 @@ keyword indestructible : Ability := {
   spelling := "indestructible",
   body :=
     [static
-        (cant Templates.Subject.any (destroy thisPermanent))]
+        (cant any (destroy thisPermanent))]
 }

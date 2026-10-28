@@ -34,7 +34,7 @@ keyword suspend (amount : Amount) (cost : Cost) : Ability := {
                 hasKeyword (theKeyword suspend.label),
                 hasCounter (some timeCounter)]))),
       when
-        (does Templates.Subject.any
+        (does any
           (removeCounters theLast
             (some (printedKind timeCounter)) thisCard))
         (sequentially
