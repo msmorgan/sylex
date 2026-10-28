@@ -628,9 +628,33 @@ fn mutually_exclusive_match_arms_do_not_repeat_a_template_parameter() {
 
 #[test]
 fn live_canon_cards_elaborate_with_builtin() {
+    fn card_filename(name: &str) -> String {
+        let mut out = String::with_capacity(name.len());
+        for c in name.chars() {
+            match c {
+                '<' => out.push_str("{less}"),
+                '>' => out.push_str("{greater}"),
+                ':' => out.push_str("{colon}"),
+                '"' => out.push_str("{quote}"),
+                '/' => out.push_str("{slash}"),
+                '\\' => out.push_str("{backslash}"),
+                '|' => out.push_str("{pipe}"),
+                '?' => out.push_str("{question}"),
+                '*' => out.push_str("{star}"),
+                _ => out.push(c),
+            }
+        }
+        out
+    }
+
     let canon = Bundle::load(&Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins_v3/canon"))
         .unwrap();
     assert_eq!(canon.items.len(), 908);
+    for (key, item) in &canon.items {
+        let expected = format!("{}.lean", card_filename(key.bare_name.as_str()));
+        let actual = item.file.file_name().unwrap().to_str().unwrap();
+        assert_eq!(actual, expected, "filename mismatch for {}", key.bare_name);
+    }
     let names: Vec<_> = canon.items.keys().map(|key| key.bare_name).collect();
     let bundle = Bundle::from_items(
         builtin()

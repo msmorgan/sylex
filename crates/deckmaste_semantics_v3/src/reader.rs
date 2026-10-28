@@ -280,9 +280,6 @@ fn printed_card_name(tokens: &[Token]) -> Result<String, ReadError> {
             .collect::<Result<Vec<_>, _>>()
             .map(|names| names.join(" // "));
     }
-    if let Some(characteristics) = fields.get(&Ident::new("characteristics")) {
-        return printed_card_name(characteristics);
-    }
     let name = fields
         .get(&Ident::new("name"))
         .ok_or_else(|| ReadError("anonymous card requires a printed name".into()))?;

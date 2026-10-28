@@ -131,7 +131,7 @@ pinned by `okFiresongAndSunspeaker` (`Proofs/CardsKeyword.lean:166`). If `thatJo
   `graveyardOriginsAreDepartureObserved` (`Proofs/CardFidelity.lean:158`),
   `spelledGraveyardOriginsAreDepartureObserved` (`:172`), the `flawlessForgeryLine` pin
   (`Proofs/CardFidelity.lean:37`), `Proofs/Keyword.lean:458` and `:478`, `Proofs/Trigger.lean:352`,
-  `Proofs/Counters.lean:781`, `costCoercionsKeepTheCard` (`Proofs/Authoring.lean:350-356`) and
+  `Proofs/Counters.lean:781`, `costCoercionsKeepTheCard` (`Proofs/Authoring.lean:414`) and
   `Proofs/Mana.lean:385`. Where a pin states a term equality against a copied tree, update the
   copy in lockstep.
 - Add one pin: `seedbornMuseUntapsOnlyPermanents` in `Proofs/CardFidelity.lean`, asserting that

@@ -1,8 +1,7 @@
-/-- Angelic Cub's trigger sentence: "Whenever this creature becomes the target of a spell or
-ability for the first time each turn, put a +1/+1 counter on it."
-Fragment: the conditional flying sentence needs preposed static-condition ordering; the
-`StaticSpec.conditional` stepper currently reads the grant's "it" before its antecedent in
-"As long as this creature has three or more +1/+1 counters on it". -/
+/-- "Whenever this creature becomes the target of a spell or ability for the first time each turn,
+put a +1/+1 counter on it": "for the first time each turn" watches only the first matching trigger
+event each turn [CR#603.2], and "it" in the effect resolves to `thisCreature` rather than the
+targeting spell or ability. -/
 card := {
   name := "Angelic Cub",
   cost := [1, white],

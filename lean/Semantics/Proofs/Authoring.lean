@@ -982,6 +982,9 @@ card := { name := none, types := [sorcery] }
 card := { body := singleFacedCard { name := "Legacy body", types := [sorcery] } }
 /-- error: Anonymous card requires a printed name -/
 #guard_msgs in
+card := { characteristics := { name := "Legacy wrapper", types := [sorcery] } }
+/-- error: Anonymous card requires a printed name -/
+#guard_msgs in
 card := transforming { front := { name := "Front", types := [sorcery] }, back := {} }
 
 card := transforming {

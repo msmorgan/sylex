@@ -1276,8 +1276,6 @@ private partial def printedCardName (stx : Syntax) : Except String String := do
       let some value := fields.lookup part | throw s!"Missing card part {part}"
       printedCardName value
     return " // ".intercalate names
-  if let some characteristics := fields.lookup `characteristics then
-    return ← printedCardName characteristics
   let some name := fields.lookup `name | throw "Anonymous card requires a printed name"
   if let some name := name.isStrLit? then return name
   if let `(term| some $value:str) := name then return value.getString

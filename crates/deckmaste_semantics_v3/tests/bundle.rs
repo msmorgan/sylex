@@ -308,6 +308,7 @@ fn anonymous_cards_refuse_missing_names_and_legacy_body() {
         "{}",
         "{ name := none }",
         "{ body := {} }",
+        r#"{ characteristics := { name := "Legacy" } }"#,
         r#"transforming { front := { name := "Front" }, back := {} }"#,
         r#"split { left := { name := none }, right := { name := "Right" } }"#,
         "leveler { inner := {}, bands := [] }",

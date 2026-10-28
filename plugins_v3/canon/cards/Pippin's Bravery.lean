@@ -1,6 +1,3 @@
-/-- Pippin's Bravery: "You may sacrifice a Food. If you do, target creature gets +4/+4 until end of
-turn. Otherwise, that creature gets +2/+2 until end of turn." The same shape as Insatiable
-Appetite. -/
 card := {
   name := "Pippin's Bravery",
   cost := [green],
