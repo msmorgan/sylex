@@ -765,7 +765,7 @@ mod tests {
         let reader = Elaborator::new(&bundle);
         // Constructor basis checked against Lean's reduction of amass Zombie 3.
         let basis = r#"
-            have creature : CardType := { name := "Creature", permanent := true, stats := [.power, .toughness] };
+            have creature : CardType := { name := "Creature", cardClass := some .permanentCard, stats := [.power, .toughness] };
             have zombie : Subtype := .of creature "Zombie";
             have army : Predicate := .coord .and [
                 .hasSubtype (.of creature "Army"), .hasType creature, .hasPossessor .controller .actor];

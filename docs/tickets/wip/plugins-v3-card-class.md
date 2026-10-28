@@ -50,7 +50,12 @@ consumer. The verified list follows; re-grep for `permanent` and
 ## Acceptance
 
 - No `permanent` or `instantOrSorcery` field remains on `CardType` in Lean or Rust.
-- The expansion baseline changes only the ten `card_type` declarations.
+- The ten `card_type` declarations (artifact, battle, creature, dungeon, enchantment,
+  instant, kindred, land, planeswalker and sorcery) use `cardClass : Option CardClass`.
+- Every other expansion changes only by mechanically replacing embedded `CardType`
+  literals and sampled `CardType.mk` invocations with their corresponding `card_class`
+  representation. Comparison against a mechanically converted copy of the baseline must
+  report **0 differences**; retain every sample and all other content and metadata.
 - Gates: `cargo xtask lean check`. Run tests and clippy for `deckmaste_semantics_v3`,
   `deckmaste_lowering_v3` and `xtask`.
 
@@ -63,23 +68,39 @@ expanded over builtin:
 cargo xtask expansions --out docs/evidence/plugins-v3-expansions/plugins-v3-card-class/before
 ```
 
-After the change, inspect the unified diffs for the ten expected registry changes:
+After the change, retain the original baseline and make a mechanically converted copy
+in a temporary directory outside the workspace (for example,
+`/tmp/card-class-normalized-before/snapshot.json`). Convert only:
+
+- Expanded `CardType { name, permanent, stats, instant_or_sorcery }` literals to
+  `CardType { name, card_class, stats }`, preserving `name` and `stats` exactly.
+  `(true, false)` maps to `Some(PermanentCard)`, `(false, true)` maps to
+  `Some(InstantOrSorceryCard)`, and `(false, false)` maps to `None`. Reject contradictory
+  `(true, true)` flags rather than selecting a class.
+- Sampled `Semantics.CardType.mk name permanent stats instantOrSorcery` invocations to
+  `Semantics.CardType.mk name cardClass stats`, with the same mapping to `some`/`none`.
+  Preserve all samples, including both present classes, and their bounded-product order.
+
+Do not change any other AST fields, conferrals, spelling, lexical metadata or sample
+content, and do not drop records or collapse distinct sample identities. The ten
+`card_type` registry expansions and every embedded CardType use this same substitution.
+
+If correcting the generic sampler changes its sample basis, first regenerate a control
+baseline from the pre-CardType tree with that same corrected sampler, then apply the
+mechanical conversion to the control baseline. Retain the original saved baseline and
+report added samples and any displaced bounded-product samples separately. Sampling
+optional finite enums and booleans must be generic, without a CardType-specific branch.
+
+Run the strict comparison against that copy without an allowance list:
 
 ```bash
-cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-card-class/before \
-  --expect 'artifact : CardType' \
-  --expect 'battle : CardType' \
-  --expect 'creature : CardType' \
-  --expect 'dungeon : CardType' \
-  --expect 'enchantment : CardType' \
-  --expect 'instant : CardType' \
-  --expect 'kindred : CardType' \
-  --expect 'land : CardType' \
-  --expect 'planeswalker : CardType' \
-  --expect 'sorcery : CardType'
+cargo xtask expansions --compare /tmp/card-class-normalized-before
 ```
 
-Every other declaration must compare unchanged. No rename map is needed.
+The command must exit 0 with **0 differences**. There is no declaration rename map.
+Alternatively, `--expect` may list every changed declaration only when a separate
+comparison verifies zero residual differences beyond the exact mechanical substitutions
+above; allowances alone do not satisfy acceptance.
 
 The saved format is `before/snapshot.json` (version 2). Save commands refuse an
 existing snapshot unless `--force` is deliberately added; unrelated nonempty

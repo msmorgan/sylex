@@ -64,8 +64,125 @@ fn registry_declarations_lower_without_expanding_their_rules() {
     let reader = Elaborator::new(&bundle);
     let creature = reader.read::<CardType>("creature").unwrap();
     assert_eq!(creature.name, Ident::new("Creature"));
-    assert!(creature.permanent);
+    assert_eq!(creature.card_class, Some(CardClass::PermanentCard));
     assert!(creature.stats.contains(&Stat::Power));
+}
+
+#[test]
+fn builtin_card_types_contribute_their_declared_classes() {
+    let bundle = builtin();
+    let reader = Elaborator::new(&bundle);
+    for (name, class) in [
+        ("artifact", Some(CardClass::PermanentCard)),
+        ("battle", Some(CardClass::PermanentCard)),
+        ("creature", Some(CardClass::PermanentCard)),
+        ("enchantment", Some(CardClass::PermanentCard)),
+        ("land", Some(CardClass::PermanentCard)),
+        ("planeswalker", Some(CardClass::PermanentCard)),
+        ("instant", Some(CardClass::InstantOrSorceryCard)),
+        ("sorcery", Some(CardClass::InstantOrSorceryCard)),
+        ("kindred", None),
+        ("dungeon", None),
+    ] {
+        assert_eq!(
+            reader.read::<CardType>(name).unwrap().card_class,
+            class,
+            "{name}"
+        );
+    }
+}
+
+#[test]
+fn card_type_class_defaults_match_between_registries_and_constructors() {
+    let bundle = declarations(&["card_type sample := { name := \"Sample\" }"]);
+    let reader = Elaborator::new(&bundle);
+    let expected = CardType {
+        name: Ident::new("Sample"),
+        card_class: None,
+        stats: vec![],
+    };
+    for term in [
+        "sample",
+        "{ name := \"Sample\" }",
+        "Semantics.CardType.mk \"Sample\"",
+    ] {
+        assert_eq!(reader.read::<CardType>(term).unwrap(), expected, "{term}");
+    }
+}
+
+#[test]
+fn snapshot_samples_preserve_card_type_classes_and_stats() {
+    let bundle = declarations(&["primitive example (ty : CardType) : CardType := { body := ty }"]);
+    let reader = Elaborator::new(&bundle);
+    let samples = reader.sample_invocations(&bundle.order[0]).unwrap();
+    let values = samples
+        .arguments
+        .iter()
+        .map(|arguments| {
+            reader
+                .read::<CardType>(&format!("example {arguments}"))
+                .unwrap()
+        })
+        .collect::<Vec<_>>();
+    for class in [
+        None,
+        Some(CardClass::PermanentCard),
+        Some(CardClass::InstantOrSorceryCard),
+    ] {
+        assert!(
+            values.iter().any(|value| value.card_class == class),
+            "{class:?}"
+        );
+    }
+    assert!(values.iter().any(|value| value.stats == [Stat::Power]));
+    assert!(values.iter().any(|value| value.stats.is_empty()));
+}
+
+#[test]
+fn snapshot_samples_cover_optional_booleans_and_enums() {
+    let bundle = declarations(&[
+        "primitive boolean (flag : Option Bool) : Option Bool := { body := flag }",
+        "primitive zone (location : Option Zone) : Option Zone := { body := location }",
+    ]);
+    let reader = Elaborator::new(&bundle);
+    for key in &bundle.order {
+        let samples = reader.sample_invocations(key).unwrap();
+        if key.bare_name.as_str() == "boolean" {
+            let values = samples
+                .arguments
+                .iter()
+                .map(|arguments| {
+                    reader
+                        .read::<Option<bool>>(&format!("boolean {arguments}"))
+                        .unwrap()
+                })
+                .collect::<Vec<_>>();
+            assert_eq!(values, [None, Some(false), Some(true)]);
+        } else {
+            let values = samples
+                .arguments
+                .iter()
+                .map(|arguments| {
+                    reader
+                        .read::<Option<Zone>>(&format!("zone {arguments}"))
+                        .unwrap()
+                })
+                .collect::<Vec<_>>();
+            assert_eq!(
+                values,
+                [
+                    None,
+                    Some(Zone::Battlefield),
+                    Some(Zone::Graveyard),
+                    Some(Zone::Exile),
+                    Some(Zone::Hand),
+                    Some(Zone::Library),
+                    Some(Zone::Stack),
+                    Some(Zone::Command),
+                ]
+            );
+        }
+    }
 }
 
 #[test]

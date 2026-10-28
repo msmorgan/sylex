@@ -1308,16 +1308,12 @@ impl<'a> Elaborator<'a> {
                     )?,
                 ),
                 (
-                    "permanent".into(),
-                    field("permanent", "Bool", None, scope, stack)?,
+                    "card_class".into(),
+                    field("cardClass", "Option CardClass", Some("none"), scope, stack)?,
                 ),
                 (
                     "stats".into(),
                     field("stats", "List Stat", Some("[]"), scope, stack)?,
-                ),
-                (
-                    "instant_or_sorcery".into(),
-                    field("instantOrSorcery", "Bool", Some("false"), scope, stack)?,
                 ),
             ]))),
             _ => Err(LowerError::new("not a registry declaration")),

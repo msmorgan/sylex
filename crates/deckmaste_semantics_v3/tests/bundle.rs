@@ -136,7 +136,7 @@ fn all_command_kinds_read_independently_of_paths() {
             "counter" | "relation" => ("", ""),
             "designation" => ("", "scope := player"),
             "subtype" => ("", "kind := creature, name := \"Sample\""),
-            "card_type" => ("", "permanent := true"),
+            "card_type" => ("", "cardClass := some .permanentCard"),
             "token" => ("", "name := \"Sample\", token := {}"),
             "sba" => ("", "scope := creature, when := condition, then_ := action"),
             "conferral" => ("", "scope := creature, confer := property"),

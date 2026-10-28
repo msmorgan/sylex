@@ -1,4 +1,5 @@
 //! Scalar and payload facts from `Semantics/Check/Words.lean`.
+use deckmaste_semantics_v3::ast::CardClass;
 use deckmaste_semantics_v3::ast::CardType;
 use deckmaste_semantics_v3::ast::ChoiceRef;
 use deckmaste_semantics_v3::ast::ChoiceSort;
@@ -42,7 +43,7 @@ pub trait CardTypeWordsExt: Sized {
     #[must_use]
     fn dungeon() -> Self;
     #[doc(hidden)]
-    fn plain(name: &str, permanent: bool, instant_or_sorcery: bool) -> Self;
+    fn plain(name: &str, card_class: Option<CardClass>) -> Self;
     #[must_use]
     fn all() -> [Self; 10];
 }
@@ -51,50 +52,48 @@ impl CardTypeWordsExt for CardType {
     fn creature() -> Self {
         Self {
             name: "Creature".into(),
-            permanent: true,
+            card_class: Some(CardClass::PermanentCard),
             stats: vec![Stat::Power, Stat::Toughness],
-            instant_or_sorcery: false,
         }
     }
     fn artifact() -> Self {
-        Self::plain("Artifact", true, false)
+        Self::plain("Artifact", Some(CardClass::PermanentCard))
     }
     fn land() -> Self {
-        Self::plain("Land", true, false)
+        Self::plain("Land", Some(CardClass::PermanentCard))
     }
     fn enchantment() -> Self {
-        Self::plain("Enchantment", true, false)
+        Self::plain("Enchantment", Some(CardClass::PermanentCard))
     }
     fn instant() -> Self {
-        Self::plain("Instant", false, true)
+        Self::plain("Instant", Some(CardClass::InstantOrSorceryCard))
     }
     fn sorcery() -> Self {
-        Self::plain("Sorcery", false, true)
+        Self::plain("Sorcery", Some(CardClass::InstantOrSorceryCard))
     }
     fn planeswalker() -> Self {
         Self {
             stats: vec![Stat::Loyalty],
-            ..Self::plain("Planeswalker", true, false)
+            ..Self::plain("Planeswalker", Some(CardClass::PermanentCard))
         }
     }
     fn battle() -> Self {
         Self {
             stats: vec![Stat::Defense],
-            ..Self::plain("Battle", true, false)
+            ..Self::plain("Battle", Some(CardClass::PermanentCard))
         }
     }
     fn kindred() -> Self {
-        Self::plain("Kindred", false, false)
+        Self::plain("Kindred", None)
     }
     fn dungeon() -> Self {
-        Self::plain("Dungeon", false, false)
+        Self::plain("Dungeon", None)
     }
-    fn plain(name: &str, permanent: bool, instant_or_sorcery: bool) -> Self {
+    fn plain(name: &str, card_class: Option<CardClass>) -> Self {
         Self {
             name: name.into(),
-            permanent,
+            card_class,
             stats: vec![],
-            instant_or_sorcery,
         }
     }
     fn all() -> [Self; 10] {
@@ -210,7 +209,7 @@ impl SubtypeWordsExt for Subtype {
     fn fits(&self, ty: &CardType) -> bool {
         match self {
             Self::Of { host, .. } => host == ty,
-            Self::Spell { .. } => ty.instant_or_sorcery,
+            Self::Spell { .. } => ty.card_class == Some(CardClass::InstantOrSorceryCard),
         }
     }
 }

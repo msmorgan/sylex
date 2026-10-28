@@ -1,5 +1,6 @@
 //! Structural anchors for event and participial clauses.
 use deckmaste_semantics_v3::ast::Action;
+use deckmaste_semantics_v3::ast::CardClass;
 use deckmaste_semantics_v3::ast::CardType;
 use deckmaste_semantics_v3::ast::Coordinator;
 use deckmaste_semantics_v3::ast::CoreDeed;
@@ -116,8 +117,10 @@ impl NounWordAnchorsExt for NounWord {
                 subtype: Subtype::Of { host: type_, .. },
             } => object(
                 super::merge_types(ty, std::slice::from_ref(type_)),
-                zone.clone()
-                    .or_else(|| type_.permanent.then_some(Zone::Battlefield)),
+                zone.clone().or_else(|| {
+                    (type_.card_class == Some(CardClass::PermanentCard))
+                        .then_some(Zone::Battlefield)
+                }),
                 orig.clone(),
             ),
             Self::Ability => Payload::Ability {

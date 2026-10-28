@@ -30,14 +30,8 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
             "",
             vec![
                 Field::new("name", "name", "String", None),
-                Field::new("permanent", "permanent", "Bool", None),
+                Field::new("cardClass", "card_class", "Option CardClass", Some("none")),
                 Field::new("stats", "stats", "List Stat", Some("[]")),
-                Field::new(
-                    "instantOrSorcery",
-                    "instant_or_sorcery",
-                    "Bool",
-                    Some("false"),
-                ),
             ],
         )],
         "CardClass" => vec![

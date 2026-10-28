@@ -1,4 +1,5 @@
 //! Definite, participial, and contrast-anchor resolution from the Lean checker.
+use deckmaste_semantics_v3::ast::CardClass;
 use deckmaste_semantics_v3::ast::CardType;
 use deckmaste_semantics_v3::ast::Kind;
 use deckmaste_semantics_v3::ast::NounPhrase;
@@ -133,7 +134,10 @@ impl DRS {
             return Some(ContrastAnchor::You);
         }
         let source_zone = if !self.source_types.is_empty()
-            && self.source_types.iter().all(|t| t.instant_or_sorcery)
+            && self
+                .source_types
+                .iter()
+                .all(|t| t.card_class == Some(CardClass::InstantOrSorceryCard))
         {
             Some(Zone::Stack)
         } else {

@@ -228,10 +228,16 @@ fn variants(ty: &str, ordinal: usize, limitations: &mut BTreeSet<String>) -> Res
         return Ok(vec![value]);
     }
     if let Some(inner) = ty.strip_prefix("Option ") {
-        return Ok(vec![
-            "none".into(),
-            format!("some ({})", sample(inner, ordinal, &mut BTreeSet::new())?),
-        ]);
+        let finite = inner == "Bool"
+            || shape(inner).is_some_and(|ctors| ctors.iter().all(|ctor| ctor.fields.is_empty()));
+        let present = if finite {
+            variants(inner, ordinal, limitations)?
+        } else {
+            vec![sample(inner, ordinal, &mut BTreeSet::new())?]
+        };
+        let mut values = vec!["none".into()];
+        values.extend(present.into_iter().map(|value| format!("some ({value})")));
+        return Ok(values);
     }
     if let Some(inner) = ty.strip_prefix("List ") {
         let elements = variants(inner, ordinal, limitations)?;

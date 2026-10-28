@@ -35,9 +35,8 @@ pub enum Stat {
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct CardType {
     pub name: Ident,
-    pub permanent: bool,
+    pub card_class: Option<CardClass>,
     pub stats: Vec<Stat>,
-    pub instant_or_sorcery: bool,
 }
 
 /// Mirrors `Semantics/Words.lean:119`.
