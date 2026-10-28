@@ -693,11 +693,11 @@ theorem flashSacrificeCardsCarryTheRider :
         | _ => none) =
       List.replicate 10 (some asThoughFlashSacrificedAtCleanup) := rfl
 
-theorem okMysticVeil : (cardNamed "Mystic Veil").card.check = [] := (cardNamed "Mystic Veil").ok
+theorem okMysticVeil : (cardNamed "Mystic Veil").card.check = [] := cardNamedOk "Mystic Veil"
 
 /-- Ward of Lights: the rider, and protection that doesn't remove it [CR#702.16n]. -/
 theorem okWardOfLights : (cardNamed "Ward of Lights").card.check = [] :=
-  (cardNamed "Ward of Lights").ok
+  cardNamedOk "Ward of Lights"
 
 /-- The scoping is in the term: the rider reads the permission's clause back, so its "it" is
 this spell and "cast … this way" is the permitted cast [CR#113.2c]. Written as a separate static,

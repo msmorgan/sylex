@@ -1,4 +1,5 @@
 import Semantics.Definitions
+import Semantics.Proofs.Helpers
 
 open Semantics.Templates Semantics.Definitions
 

@@ -1,6 +1,4 @@
 import Semantics.Primitives
-import Semantics.Check.Phrase
-import Semantics.Check.Rules
 
 /-!
 # Semantics.Definitions

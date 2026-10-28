@@ -528,7 +528,7 @@ theorem durationConventionWitnesses :
 the loses-the-game exception) unchanged. -/
 theorem okAsThoughSourceHadKeywordCards :
     (cardNamed "Everlasting Torment").card.check = [] ∧ (cardNamed "Phyrexian Unlife").card.check = [] :=
-  ⟨(cardNamed "Everlasting Torment").ok, (cardNamed "Phyrexian Unlife").ok⟩
+  ⟨cardNamedOk "Everlasting Torment", cardNamedOk "Phyrexian Unlife"⟩
 
 /-- The damage lines name the keywords by reference, as a condition on the damage's source
 ("as though its source had wither"), so they take wither's and infect's own rows
@@ -572,7 +572,7 @@ theorem asThoughIsNotRecordedAsPermitted :
 theorem okIndicativeCrewAsThough :
     (cardNamed "Hotshot Mechanic").card.check = [] ∧
       StaticSpec.check (DRS.ofList []) Cards.cloudspireCaptainCrewLine = [] :=
-  ⟨(cardNamed "Hotshot Mechanic").ok, Cards.okCloudspireCaptainCrewLine⟩
+  ⟨cardNamedOk "Hotshot Mechanic", Cards.okCloudspireCaptainCrewLine⟩
 
 /-- Hotshot Mechanic: "… as though its power were 2 greater." -/
 theorem okLiteralAsThoughAmount :

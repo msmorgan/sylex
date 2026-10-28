@@ -1,4 +1,5 @@
 import Semantics.Definitions
+import Semantics.Check.Phrase
 open Semantics Semantics.Templates Semantics.Definitions
 
 namespace Semantics.Proofs.TypeEvidence

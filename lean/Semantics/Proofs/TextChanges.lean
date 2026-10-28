@@ -65,7 +65,7 @@ theorem bracketedCardRecordsTheCall :
     (formCalls bracketedSpell.authoring).count ``Templates.bracketed = 1 := by decide
 
 /-- The card with its brackets still checks, and a cleave card still checks. -/
-theorem bracketedCleaveCardChecks : bracketedSpell.card.check = [] := bracketedSpell.ok
+theorem bracketedCleaveCardChecks : bracketedSpell.card.check = [] := by decide
 
 /-- The card's Core is the unbracketed card: nothing in Core marks the brackets. -/
 theorem bracketedCardCoreIsUnbracketed :

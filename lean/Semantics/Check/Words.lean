@@ -97,10 +97,6 @@ def Plurality.isOne : Plurality → Bool
   | .one => true
   | .many => false
 
-def outputPlur : Plurality → Plurality → Plurality
-  | .one, .one => .one
-  | _, _ => .many
-
 def atLeastTwo : Nat → Bool
   | _ + 2 => true
   | _ => false

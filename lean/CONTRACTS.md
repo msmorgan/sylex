@@ -123,9 +123,9 @@ the existence of a checking function.
 
 `spelled <| card` is the checked authoring boundary. It retains an
 `Authoring.Form` tree before unfolding erases named template and definition
-calls, and constructs `Spelled` with both `onlyAuthored` and the existing
-`ok : card.check = []` proof. The constructor is private. Record construction
-and record update cannot replace these checks. Unregistered helper definitions
+calls, and constructs `Spelled` with `onlyAuthored`. The constructor is private;
+cards emitted by the DSL provide separate `ok_<card>` validity proofs. Record
+construction and record update cannot replace these checks. Unregistered helper definitions
 and nested template and definition arguments are inspected; opaque or variable
 semantic content without authoring evidence is refused, including expressions
 nested in printed-data records.

@@ -1,12 +1,10 @@
 import Semantics.Card
-import Semantics.Authoring
 import Semantics.Check.AbilityRules
 
 /-!
 # Semantics.Check.Card
 
-The card frame laws of `Card.idr` and the checker's entry point: `check : Card → List
-Refusal`, and `Spelled`, a card the checker admits.
+The card frame laws of `Card.idr` and the checker's entry point: `check : Card → List Refusal`.
 -/
 
 namespace Semantics
@@ -325,37 +323,18 @@ def Card.check : Card → List Refusal
     inner.check .front ++ refuse (prototypeFrameOk line) .prototypeFrame ++
       prototypeAltCheck line alternative
 
-/-- A card with semantic validity and retained evidence of template- and definition-only
-authoring. The elaborator connects the authoring tree to the input term before their reduction. -/
-structure Spelled where
-  private mk ::
-  card : Card
-  authoring : Authoring.Form
-  onlyAuthored : authoring.onlyAuthored = true
-  ok : card.check = []
-
-syntax (name := spelledTerm) "spelled" " <| " term : term
-
 open Lean Meta Elab Term in
-/-- `spelled <| card …` checks the authoring boundary and synthesizes both proofs. -/
-@[term_elab spelledTerm] unsafe def elabSpelled : TermElab := fun stx _ => do
-  let `(spelled <| $card) := stx | throwUnsupportedSyntax
-  let value ← elabTermEnsuringType card (mkConst ``Semantics.Card)
+/-- Evaluate `Card.check` for readable refusals, then construct the kernel `decide` proof. -/
+elab "check_card% " cardTerm:term : term => do
+  let value ← elabTermEnsuringType cardTerm (mkConst ``Semantics.Card)
   synthesizeSyntheticMVarsNoPostponing
   let value ← instantiateMVars value
-  let form ← Authoring.inspect value
-  unless form.onlyAuthored do
-    throwError "Card definitions must use semantic templates or definitions; raw constructors: {form.rawNames.eraseDups}"
-  let tree := toExpr form
-  let authored ← mkEq (mkApp (mkConst ``Authoring.Form.onlyAuthored) tree) (mkConst ``Bool.true)
-  let onlyAuthored ← mkDecideProof authored
   let verdict := mkApp (mkConst ``Card.check) value
-  let refusals ← evalExpr (List Refusal)
+  let refusals ← unsafe evalExpr (List Refusal)
     (mkApp (mkConst ``List [Level.zero]) (mkConst ``Refusal)) verdict
   unless refusals.isEmpty do
     throwError "Card semantic check failed: {repr refusals}"
   let valid ← mkEq verdict (mkApp (mkConst ``List.nil [Level.zero]) (mkConst ``Refusal))
-  let ok ← mkDecideProof valid
-  return mkAppN (mkConst ``Spelled.mk) #[value, tree, onlyAuthored, ok]
+  mkDecideProof valid
 
 end Semantics

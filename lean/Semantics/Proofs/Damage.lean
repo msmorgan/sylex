@@ -1084,7 +1084,7 @@ theorem witherFunctionsFromAnyZone :
       | _ => false) = true ∧
       (bodyStatics wither).head? = some markingReplacedByCounters ∧
       (cardNamed "Puncture Blast").card.check = [] :=
-  ⟨by decide, rfl, (cardNamed "Puncture Blast").ok⟩
+  ⟨by decide, rfl, cardNamedOk "Puncture Blast"⟩
 
 /-- Infect's player row replaces the life loss its own damage would cause, caused by that damage
 event and not by the source, so other life loss the source causes is not replaced
@@ -1123,7 +1123,7 @@ private def conditionalStatics (card : Spelled) : List (StaticSpec × Condition)
 /-- *Archon of Coronation*: "As long as you're the monarch, damage doesn't cause you to lose life."
 The card checks. -/
 theorem okArchonOfCoronation : (cardNamed "Archon of Coronation").card.check = [] :=
-  (cardNamed "Archon of Coronation").ok
+  cardNamedOk "Archon of Coronation"
 
 /-- *Archon of Coronation* writes a prohibition of losing life, restricted to a loss the damage
 dealt to you causes [CR#120.3a], while you are the monarch: a cause-qualified prohibition, not a

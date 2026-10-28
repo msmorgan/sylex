@@ -1,11 +1,12 @@
 # Semantics workbench ported from Idris.
 #
-#   lake build Semantics           -- syntax, checker, templates and definitions (the inner loop)
+#   lake build Semantics            -- syntax, checker and templates (the inner loop)
+#   lake build SemanticsDefinitions -- plus the builtin definitions and their checker proofs
 #   lake build SemanticsCards      -- plus the printed-card bench
 #   lake build                     -- plus the pin suites (the full gate; ./scripts/build adds --wfail)
 name = "mtg"
 version = "0.1.0"
-defaultTargets = ["Semantics", "SemanticsCards", "SemanticsProofs"]
+defaultTargets = ["Semantics", "SemanticsDefinitions", "SemanticsCards", "SemanticsProofs"]
 
 [leanOptions]
 # Idris `%unbound_implicits off`: every implicit is written out.
@@ -23,8 +24,12 @@ text = true
 
 [[lean_lib]]
 name = "Semantics"
+roots = ["Semantics", "Semantics.Check", "Semantics.Primitives"]
+
+[[lean_lib]]
+name = "SemanticsDefinitions"
 needs = ["builtinBundle"]
-roots = ["Semantics", "Semantics.Check", "Semantics.Primitives", "Semantics.Definitions"]
+roots = ["Semantics.Definitions", "Semantics.Check.Builtin"]
 
 [[lean_lib]]
 name = "SemanticsCards"

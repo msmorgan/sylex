@@ -1,5 +1,6 @@
 import Semantics.Definitions
 import Semantics.Check.Rules
+import Semantics.Check.Builtin
 
 /-!
 # Semantics.Proofs.Rules

@@ -1,4 +1,5 @@
 import Semantics.FastInductives
+import Semantics.Card
 
 /-!
 # Semantics.Authoring
@@ -9,9 +10,9 @@ that the tree contains no raw semantic constructor; correspondence between the e
 term and this tree is the elaborator's responsibility.
 -/
 
-namespace Semantics.Authoring
-
 open Lean Meta Elab Command Term
+
+namespace Semantics.Authoring
 
 inductive Form where
   | data (children : List Form)
@@ -80,6 +81,9 @@ initialize expectedTypeDispatchExt : SimplePersistentEnvExtension ExpectedTypeEn
 
 private def expectedTypeEntries (env : Environment) (bare : Name) : List ExpectedTypeEntry :=
   expectedTypeDispatchExt.getState env |>.find? bare |>.getD []
+
+private def domainElabActive (env : Environment) : Bool :=
+  env.mainModule != `Semantics.Authoring && env.contains `Semantics.Color
 
 private def authoredResultSort? (type : Expr) : MetaM (Option Name) := do
   let type ← whnfR type
@@ -206,7 +210,7 @@ private def hasOrdinaryNamespaceBinding (stx : Syntax) (expected : Expr)
 
 @[scoped term_elab Lean.Parser.Term.app]
 def dispatchOnExpectedType : TermElab := fun stx expected? => do
-  unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
+  unless domainElabActive (← getEnv) do throwUnsupportedSyntax
   let fn := stx[0]
   unless fn.isIdent do throwUnsupportedSyntax
   if ← isCallableLocal fn.getId then throwUnsupportedSyntax
@@ -852,6 +856,40 @@ def inspect (term : Expr) (visited : List Name := [])
   let clean ← IO.mkRef ({} : Std.HashSet Name)
   inspectCore cache clean term visited context parameters bodyParameter
 
+end Semantics.Authoring
+
+namespace Semantics
+
+/-- A card with semantic validity and retained evidence of template- and definition-only
+authoring. The elaborator connects the authoring tree to the input term before their reduction. -/
+structure Spelled where
+  private mk ::
+  card : Card
+  authoring : Authoring.Form
+  onlyAuthored : authoring.onlyAuthored = true
+
+syntax (name := spelledTerm) "spelled" " <| " term : term
+
+open Lean Meta Elab Term in
+/-- `spelled <| card …` checks the authoring boundary and synthesizes the authoring proof. -/
+@[term_elab spelledTerm] unsafe def elabSpelled : TermElab := fun stx _ => do
+  let `(spelled <| $card) := stx | throwUnsupportedSyntax
+  let value ← elabTermEnsuringType card (mkConst ``Semantics.Card)
+  synthesizeSyntheticMVarsNoPostponing
+  let value ← instantiateMVars value
+  let form ← Authoring.inspect value
+  unless form.onlyAuthored do
+    throwError s!"Card definitions must use semantic templates or definitions; " ++
+      s!"raw constructors: {form.rawNames.eraseDups}"
+  let tree := toExpr form
+  let authored ← mkEq (mkApp (mkConst ``Authoring.Form.onlyAuthored) tree) (mkConst ``Bool.true)
+  let onlyAuthored ← mkDecideProof authored
+  return mkAppN (mkConst ``Spelled.mk) #[value, tree, onlyAuthored]
+
+end Semantics
+
+namespace Semantics.Authoring
+
 private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) := do
   let env ← getEnv
   let localLabel := (← getCurrNamespace) ++ stx.getId ++ `label
@@ -867,7 +905,7 @@ private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) :
   return if env.contains lbl then some lbl else none
 
 @[scoped term_elab ident] def elabBareIdentDispatch : TermElab := fun stx expected? => do
-  unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
+  unless domainElabActive (← getEnv) do throwUnsupportedSyntax
   let some expected := expected? | throwUnsupportedSyntax
   if let some ldecl := (← getLCtx).findFromUserName? stx.getId then
     unless ldecl.isAuxDecl do throwUnsupportedSyntax
@@ -914,7 +952,7 @@ private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) :
   throwUnsupportedSyntax
 
 private def elabClosedWord (application : Bool) : TermElab := fun stx expected? => do
-  unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
+  unless domainElabActive (← getEnv) do throwUnsupportedSyntax
   let fn := if application then stx[0] else stx
   unless fn.isIdent && fn.getId.getPrefix.isAnonymous do throwUnsupportedSyntax
   if fn.getId.eraseMacroScopes ∈ [`some, `none] then throwUnsupportedSyntax
@@ -956,7 +994,7 @@ def elabClosedWordApp : TermElab := elabClosedWord true
 where `CharacteristicBundle` is expected. -/
 @[scoped term_elab Lean.Parser.Term.structInst] def elabCharacteristicBundleStruct : TermElab :=
     fun stx expected? => do
-  unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
+  unless domainElabActive (← getEnv) do throwUnsupportedSyntax
   let some expected := expected? | throwUnsupportedSyntax
   unless stx[1].isNone do throwUnsupportedSyntax
   let fields := stx[2][0].getSepArgs
@@ -983,7 +1021,7 @@ where `CharacteristicBundle` is expected. -/
 `Option (List α)` → `some [...]`). Intercepts `List.cons` after `«term[_]»` macro expansion so
 expected element types flow top-down into every list element! -/
 @[scoped term_elab Lean.Parser.Term.app] def elabDomainList : TermElab := fun stx expected? => do
-  unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
+  unless domainElabActive (← getEnv) do throwUnsupportedSyntax
   let fn := if stx.isIdent then stx else stx[0]
   unless fn.isIdent && fn.getId.eraseMacroScopes ∈ [``List.cons, ``List.nil] do
     throwUnsupportedSyntax
@@ -1226,10 +1264,30 @@ private def makeStruct (fields : List (Name × Term)) : CommandElabM Term := do
     `(Parser.Term.structInstField| $(mkIdent key):ident := $value)
   `(term| { $fs:structInstField,* })
 
+structure PendingCheckEntry where
+  thmName : Name
+  checkFn : Name
+  target : Name
+  deriving Inhabited
+
+initialize pendingChecksExt :
+    SimplePersistentEnvExtension PendingCheckEntry (Array PendingCheckEntry) ←
+  registerSimplePersistentEnvExtension {
+    addEntryFn := fun entries entry => entries.push entry
+    addImportedFn := fun imports => imports.foldl (· ++ ·) #[]
+  }
+
 private def generatedCheck (name : Ident) (sort : Name) : CommandElabM Unit := do
-  let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
-  let check := mkIdent (`Semantics ++ sort ++ `check)
-  elabCommand (← `(theorem $ok : $check $name = [] := by decide))
+  let checkFn := `Semantics ++ sort ++ `check
+  if (← getEnv).contains checkFn then
+    let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
+    let check := mkIdent checkFn
+    elabCommand (← `(theorem $ok : $check $name = [] := by decide))
+  else
+    let thmName := (← getCurrNamespace) ++
+      (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
+    let target := (← getCurrNamespace) ++ name.getId
+    modifyEnv fun env => pendingChecksExt.addEntry env { thmName, checkFn, target }
 
 private def registerKeywordLabel (name : Name) (label : Term) : CommandElabM Unit := do
   let value ← liftTermElabM <| elabTermEnsuringType label (mkConst ``String)
@@ -1459,9 +1517,16 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : Comma
     let ctor := mkIdent (`Semantics.RegistryDefinition ++ ctorKind)
     let rowBody ← if kind == `relation then `(term| $ctor $name) else `(term| $ctor $name $rules)
     elabCommand (← `(def $row : $(mkIdent `Semantics.RegistryDefinition) := $rowBody))
-    let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
-    let check := mkIdent `Semantics.RegistryDefinition.check
-    elabCommand (← `(theorem $ok : $check $row = [] := by decide))
+    let checkFn := `Semantics.RegistryDefinition.check
+    if (← getEnv).contains checkFn then
+      let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
+      let check := mkIdent checkFn
+      elabCommand (← `(theorem $ok : $check $row = [] := by decide))
+    else
+      let thmName := (← getCurrNamespace) ++
+        (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
+      let target := (← getCurrNamespace) ++ rowName
+      modifyEnv fun env => pendingChecksExt.addEntry env { thmName, checkFn, target }
   else
     let mut body ← if payload.isOfKind ``declBlock then
       if let some body := fields.lookup `body then pure body
@@ -1476,8 +1541,9 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : Comma
       let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
       let check := mkIdent `Semantics.Card.check
       let cardValue := mkIdent `Semantics.Spelled.card
-      elabCommand (← `(theorem $ok : $check ($cardValue $name) = [] :=
-        $(mkIdent `Semantics.Spelled.ok) $name))
+      let proof : Term := ⟨mkNode `Semantics.«termCheck_card%_»
+        #[mkAtom "check_card%", (← `(term| ($cardValue $name))).raw]⟩
+      elabCommand (← `(theorem $ok : $check ($cardValue $name) = [] := $proof))
     else generatedCheck name (resultName.getD .anonymous)
   let declaration ← resolveGlobalConstNoOverload name
   registerExpectedType declaration
@@ -1699,6 +1765,19 @@ def elabLoadBundle : CommandElab := fun stx => do
         logInfo m!"While loading {item.file}"
     catch error =>
       throwError "{item.file}: {error.toMessageData}"
+
+/-- Emit the queued `ok_` checks collected while `Semantics.Check` was out of scope. -/
+syntax (name := emitPendingChecks) "emit_pending_checks" : command
+
+@[command_elab emitPendingChecks]
+def elabEmitPendingChecks : CommandElab := fun _ => do
+  let env ← getEnv
+  let entries := pendingChecksExt.getState env
+  for entry in entries do
+    let thmIdent := mkIdent (`_root_ ++ entry.thmName)
+    let checkIdent := mkIdent (`_root_ ++ entry.checkFn)
+    let targetIdent := mkIdent (`_root_ ++ entry.target)
+    elabCommand (← `(theorem $thmIdent : $checkIdent $targetIdent = [] := by decide))
 
 end Semantics.Authoring
 

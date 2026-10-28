@@ -84,6 +84,6 @@ theorem soChoosesNeedsAPlayer :
 theorem mayDeclineUntapCardsCheck :
     Ability.check (DRS.ofList []) Cards.ashnodsBattleGear = [] ∧
       (cardNamed "Helm of Possession").card.check = [] :=
-  ⟨Cards.okAshnodsBattleGear, (cardNamed "Helm of Possession").ok⟩
+  ⟨Cards.okAshnodsBattleGear, cardNamedOk "Helm of Possession"⟩
 
 end Semantics.Proofs.UntapStep

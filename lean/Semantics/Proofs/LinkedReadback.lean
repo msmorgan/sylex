@@ -245,7 +245,7 @@ kicked spell, scry 2.") read the kicker cost of a spell neither prints [CR#702.3
 spelled and check clean. -/
 theorem kickedReadsAnotherSpellsKicker :
     (cardNamed "Ertai's Trickery").card.check = [] ∧ (cardNamed "Merfolk Falconer").card.check = [] :=
-  ⟨(cardNamed "Ertai's Trickery").ok, (cardNamed "Merfolk Falconer").ok⟩
+  ⟨cardNamedOk "Ertai's Trickery", cardNamedOk "Merfolk Falconer"⟩
 
 /-- Required pin: "exile it haunting target creature" relates two objects [CR#702.55a]. -/
 theorem okRelateHaunting :
@@ -524,16 +524,16 @@ def entering (steps : List Action) : Ability :=
 
 /-- Required pin: Necromancy as printed [CR#607.2c,603.7a]. -/
 theorem okNecromancy : (cardNamed "Necromancy").card.check = [] :=
-  (cardNamed "Necromancy").ok
+  cardNamedOk "Necromancy"
 
 /-- Required pin: Animate Dead as printed; its return puts the creature onto the battlefield
 [CR#607.2c]. -/
 theorem okAnimateDead : (cardNamed "Animate Dead").card.check = [] :=
-  (cardNamed "Animate Dead").ok
+  cardNamedOk "Animate Dead"
 
 /-- Required pin: Dance of the Dead as printed. -/
 theorem okDanceOfTheDead : (cardNamed "Dance of the Dead").card.check = [] :=
-  (cardNamed "Dance of the Dead").ok
+  cardNamedOk "Dance of the Dead"
 
 /-- The granted quality reads the put whichever side of the grant it is on [CR#607.1,607.1a]. -/
 theorem okPutBeforeOrAfterTheGrant :

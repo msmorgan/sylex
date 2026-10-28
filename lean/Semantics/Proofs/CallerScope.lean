@@ -78,25 +78,25 @@ private def explicitExpansion : Spelled := spelled <| .singleFaced
       name := "Expansion witness", types := [.sorcery],
       text := [spell (expand (drawTwice 1))] } }
 theorem explicitExpansionPreservesAuthorship : explicitExpansion.authoring.onlyAuthored = true := explicitExpansion.onlyAuthored
-theorem explicitExpansionChecksItsResult : explicitExpansion.card.check = [] := explicitExpansion.ok
+theorem explicitExpansionChecksItsResult : explicitExpansion.card.check = [] := by decide
 private def explicitBodyParameter : Spelled := spelled <| .singleFaced
   { characteristics := {
       name := "Body witness", types := [.sorcery],
       text := [spell
       (onChosen (target isCreature) (fun chosen => setStatus .tapped chosen))] } }
-theorem suppliedBodyCanNameTheTemplateSubject : explicitBodyParameter.card.check = [] := explicitBodyParameter.ok
+theorem suppliedBodyCanNameTheTemplateSubject : explicitBodyParameter.card.check = [] := by decide
 private def aliasedBodyParameter : Spelled := spelled <| .singleFaced
   { characteristics := {
       name := "Aliased body witness", types := [.sorcery],
       text := [spell
       (withSubjectBody (target isCreature) (fun subject => setStatus .tapped subject))] } }
-theorem bodyTypeAliasesRetainParameterEvidence : aliasedBodyParameter.card.check = [] := aliasedBodyParameter.ok
+theorem bodyTypeAliasesRetainParameterEvidence : aliasedBodyParameter.card.check = [] := by decide
 private def nestedBodyParameter : Spelled := spelled <| .singleFaced
   { characteristics := {
       name := "Nested body witness", types := [.sorcery],
       text := [spell
       (onChosen (target isCreature) (fun subject => moveSubject subject))] } }
-theorem parameterizedBodiesForwardSubjectsIntoNestedTemplates : nestedBodyParameter.card.check = [] := nestedBodyParameter.ok
+theorem parameterizedBodiesForwardSubjectsIntoNestedTemplates : nestedBodyParameter.card.check = [] := by decide
 
 theorem templateArgumentsAreEvaluatedAtTheirTextualUse :
     (unusedSubject it).check (DRS.ofList []) = [] ∧

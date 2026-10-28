@@ -575,7 +575,7 @@ private def grantedChoice : Spelled := spelled <| .singleFaced
 theorem suppliedBodyBindsAnAbility : grantedChoice.authoring.onlyAuthored = true :=
   grantedChoice.onlyAuthored
 
-theorem suppliedAbilityBodyChecks : grantedChoice.card.check = [] := grantedChoice.ok
+theorem suppliedAbilityBodyChecks : grantedChoice.card.check = [] := by decide
 
 -- A leading-dot name resolves against the expected type before any coercion applies, so an
 -- optional kind keeps its `some` (lean-v3-deal-damage-kind) and a mana cost of leading-dot
@@ -944,7 +944,7 @@ card := { name := "Mr. Orfeo, the Boulder", types := [creature], power := 3, tou
 theorem printedNameLookupChecks : Card.check (cardNamed "Mr. Orfeo, the Boulder") = [] :=
   cardNamedOk "Mr. Orfeo, the Boulder"
 theorem printedNameLookupRetainsProof : (cardNamed "Mr. Orfeo, the Boulder" : Spelled).card.check = [] :=
-  (cardNamed "Mr. Orfeo, the Boulder").ok
+  cardNamedOk "Mr. Orfeo, the Boulder"
 open Lean Elab Command Term in
 run_cmd do
   let tree ← liftTermElabM do

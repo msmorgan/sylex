@@ -1574,4 +1574,66 @@ def Location.observedOnDeparture (from_ : Location) : Bool :=
   | some zones => zones.any fun zone => zone.sort == some .battlefield
   | none => false
 
+def outputPlur : Plurality → Plurality → Plurality
+  | .one, .one => .one
+  | _, _ => .many
+
+def Amount.plur (a : Amount) (fuel : Nat := 64) : Plurality :=
+  match fuel, a with
+  | n + 1, .inCaller body => body.plur n
+  | _ + 1, .lit 1 | _ + 1, .theNth _ => .one
+  | _, _ => .many
+termination_by structural fuel
+
+def Quantity.plur (q : Quantity) (fuel : Nat := 64) : Plurality :=
+  match fuel, q with
+  | 0, _ => .many
+  | n + 1, .inCaller body => body.plur n
+  | _ + 1, .range _ (some 1) | _ + 1, .theLast => .one
+  | n + 1, .exactlyOf amount | n + 1, .upToOf amount => amount.plur n
+  | n + 1, .additional q => q.plur n
+  | _ + 1, _ => .many
+termination_by structural fuel
+
+def DetPhrase.plur : DetPhrase → Plurality
+  | .target q | .count q _ => q.plur
+  | .the plur => plur
+  | .a _ | .each => .one
+  | .all => .many
+
+def SliceCount.plur : SliceCount → Plurality
+  | .counted q => q.plur
+  | .whole | .totalling .. => .many
+
+def NounPhrase.isEach (np : NounPhrase) (fuel : Nat := 64) : Bool :=
+  match fuel, np with
+  | 0, _ => false
+  | n + 1, .inCaller b | n + 1, .firstMention _ b | n + 1, .agree _ _ b => b.isEach n
+  | _ + 1, .described .each _ => true
+  | _ + 1, .eachOf _ => true
+  | _, _ => false
+termination_by structural fuel
+
+def NounPhrase.plur (np : NounPhrase) (fuel : Nat := 64) : Plurality :=
+  match fuel, np with
+  | 0, _ => .one
+  | n + 1, .inCaller body | n + 1, .firstMention _ body | n + 1, .laterMention _ body => body.plur n
+  | _ + 1, .described d _ => d.plur
+  | _ + 1, .someOf c _ _ | _ + 1, .pileOf c _ => c.plur
+  | _ + 1, .theRest pl | _ + 1, .pro _ pl | _ + 1, .refl pl => pl
+  -- A slice is its count of cards from each owner's pile: one when both are one. Its size is
+  -- read through its Definition argument: `mill (.lit 1)` writes `.inCaller (.lit 1)`, one card
+  -- as `topSlice (.lit 1)` is [CR#701.17a]; "the top card of each player's library" is one per
+  -- player, collected.
+  | n + 1, .slice _ count pool =>
+    let ownerPlur := match pool with
+      | .zone _ (some who) => if who.isEach n then .many else who.plur n
+      | _ => .one
+    outputPlur count.plur ownerPlur
+  | _ + 1, .run .. | _ + 1, .oneEachOf .. => .many
+  | _ + 1, .and _ | _ + 1, .coord .andOr _ => .many
+  | n + 1, .or (x :: _) => x.plur n
+  | _ + 1, _ => .one
+termination_by structural fuel
+
 end Semantics
