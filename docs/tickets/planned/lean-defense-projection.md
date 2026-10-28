@@ -10,7 +10,7 @@ the battlefield is its defense-counter count [CR#310.4c], so the counter read
 covers the state-based action [CR#704.5w] and the damage result [CR#120.3h].
 What has no spelling is the *printed* defense, and so the battle's intrinsic
 conferral [CR#310.4b], the exact analogue of the planeswalker row [CR#306.5b]
-that `rules/grant/` writes.
+in `plugins_v3/builtin/definitions/card_type/planeswalker.lean`.
 
 Decided (2026-10-13, owner; `semantics-v3.md` §3.7; archived `semantics-v2.md`
 §7, Q81, Q82):
@@ -24,14 +24,16 @@ Decided (2026-10-13, owner; `semantics-v3.md` §3.7; archived `semantics-v2.md`
   home and shape as the planeswalker loyalty entry. It is the witness the
   `defense` axis exists for.
 
-`lean-v3-stat-reads-and-number-regimes` (2026-10-22) landed the battle row beside
-`planeswalkerLoyalty`. Its interim `ProjAxis.printed` read is retired (owner ruling 2026-10-22,
-`semantics-v3.md` §0.1 item 5): the [CR#310.4b] conferral reads `statOf(stat(defense), this)`, as
+`lean-v3-stat-reads-and-number-regimes` (2026-10-22) landed the battle entry conferral, now inlined in
+`plugins_v3/builtin/definitions/card_type/battle.lean`, alongside the loyalty entry conferral in
+`plugins_v3/builtin/definitions/card_type/planeswalker.lean`. Its interim `ProjAxis.printed` read
+is retired (owner ruling 2026-10-22, `semantics-v3.md` §0.1 item 5): the [CR#310.4b] conferral
+reads `statOf(stat(defense), this)`, as
 decided above, because off the battlefield a battle's defense already is its printed number
 [CR#310.4a].
 
 Do: add `defense` to `Stat` with its citation, thread it through
 `Stat.comparedType` and every exhaustive read in `Check/`, mirror it in
 `crates/deckmaste_semantics_v3` (when created in `semantics-v3-dsl-and-plugins`),
-and add the battle conferral row beside `planeswalkerLoyalty` in
-`Proofs/Rules.lean`. Standard constraints apply.
+and pin the entry conferrals of `battle_definition` and `planeswalker_definition` in
+`lean/Semantics/Proofs/Rules.lean`. Standard constraints apply.

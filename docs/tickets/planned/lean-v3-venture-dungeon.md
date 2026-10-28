@@ -7,7 +7,8 @@ Standard constraints apply.
 
 Declare `ventureIntoTheDungeon` and its variant venture into [quality] [CR#701.49a..701.49d] in
 `Definitions/Actions.lean`, then author the initiative's two "ventures into Undercity" triggers on
-`initiativeDefinition` (`Definitions/DesignationRules.lean`) [CR#726.2]. Moved here from
+`initiative_definition` (`plugins_v3/builtin/definitions/designation/initiative.lean`) [CR#726.2],
+beside the inlined combat-damage conferral. Moved here from
 `lean-v3-keyword-bodies-and-catalog-sync`, which declared learn and empower Jace.
 
 Design (from ADR `semantics-v3.md` §0.1 items 4 and 5):
