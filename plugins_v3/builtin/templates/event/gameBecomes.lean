@@ -3,5 +3,5 @@
 template gameBecomes (designation : DesignationLabel) : GameEvent := {
   spelling := "whenever it becomes <designation>",
   body :=
-    Semantics.Templates.GameEvent.does Semantics.Templates.Subject.any (Semantics.Templates.Action.setGameDesignation designation)
+    does Subject.any (setGameDesignation designation)
 }

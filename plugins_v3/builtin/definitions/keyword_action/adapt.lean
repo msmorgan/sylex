@@ -7,10 +7,10 @@ action adapt (amount : Amount) : Action := {
   permanent := isAbout,
   spelling := "adapt <amount>",
   body :=
-    Semantics.Templates.Action.doIf
-      (Semantics.Templates.Condition.not
-        (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.actor
-          (Semantics.Templates.Predicate.hasCounter (Option.some Semantics.Definitions.p1p1Counter))))
-      (Semantics.Templates.Action.putCounters amount (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.p1p1Counter)
-        Semantics.Templates.NounPhrase.actor)
+    doIf
+      (not
+        (is actor
+          (hasCounter (some p1p1Counter))))
+      (putCounters amount (printedKind p1p1Counter)
+        actor)
 }

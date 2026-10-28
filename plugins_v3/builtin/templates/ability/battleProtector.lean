@@ -14,12 +14,12 @@ template battleProtector : Conferral := {
   -- whose inherent or ability-free origin cannot be encoded by card-text substitution.
   body :=
     Semantics.Conferral.property
-      (Semantics.Templates.StaticSpec.onlyUnless
-        (Semantics.Templates.StaticSpec.entersChoosingPlayer Semantics.Templates.NounPhrase.this_
-          (Semantics.Templates.NounPhrase.a
-            (Semantics.Templates.Predicate.and
-              [Semantics.Templates.Predicate.isPlayer,
-                Semantics.Templates.Predicate.not (Semantics.Templates.Predicate.otherThan Semantics.Templates.NounPhrase.you)])))
-        (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.this_
-          (Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.siege)))
+      (onlyUnless
+        (entersChoosingPlayer this_
+          (a
+            (and
+              [isPlayer,
+                not (otherThan you)])))
+        (is this_
+          (hasSubtype siege)))
 }

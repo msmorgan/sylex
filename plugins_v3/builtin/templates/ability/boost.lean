@@ -6,7 +6,7 @@ template boost (power toughness : Delta Amount) : Conferral := {
   -- TODO(spelling): Context-dependent wording: +X/+Y; string substitution cannot express its omitted or inflected parts.
   body :=
     Semantics.Conferral.property
-      (Semantics.Templates.StaticSpec.characteristicChange Semantics.Templates.NounPhrase.this_
-        [Semantics.Templates.CharacteristicEdit.statEdit Semantics.CharacteristicStat.power power,
-          Semantics.Templates.CharacteristicEdit.statEdit Semantics.CharacteristicStat.toughness toughness])
+      (characteristicChange this_
+        [statEdit Semantics.CharacteristicStat.power power,
+          statEdit Semantics.CharacteristicStat.toughness toughness])
 }

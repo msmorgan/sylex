@@ -3,5 +3,5 @@
 template ptSwitch (subject : NounPhrase) : StaticSpec := {
   spelling := "Switch <subject>'s power and toughness",
   body :=
-    Semantics.Templates.StaticSpec.characteristicChange subject [Semantics.Templates.CharacteristicEdit.characteristicEditPtSwitch]
+    characteristicChange subject [characteristicEditPtSwitch]
 }

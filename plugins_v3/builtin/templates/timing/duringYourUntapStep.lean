@@ -3,6 +3,6 @@
 template duringYourUntapStep : Timing := {
   spelling := "during your untap step",
   body :=
-    Semantics.Templates.Timing.timingInPart Semantics.TurnPart.untapStep (Option.some Semantics.Templates.NounPhrase.you)
-      (Semantics.Templates.TurnRef.eachTime Option.none)
+    timingInPart Semantics.TurnPart.untapStep (some you)
+      (eachTime none)
 }

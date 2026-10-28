@@ -6,5 +6,5 @@ coerced to `perform (payLife amount)`, one payment of that life. -/
 template payLife (amount : Amount := anyAmount) : Action := {
   spelling := "pay <amount> life",
   body :=
-    Semantics.Templates.Action.pay (Semantics.Templates.Cost.perform (Semantics.Templates.Action.loseLife amount)) Semantics.PayTimes.once
+    pay (perform (loseLife amount)) Semantics.PayTimes.once
 }

@@ -2,5 +2,5 @@
 template targets (q : Quantity) (p : Predicate) : NounPhrase := {
   -- TODO(spelling): <q> target <p>s; string substitution cannot inflect verbs, nouns, or ordinals.
   body :=
-    Semantics.Templates.NounPhrase.described (Semantics.Templates.DetPhrase.detPhraseTarget q) p
+    described (detPhraseTarget q) p
 }

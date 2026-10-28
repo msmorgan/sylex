@@ -5,8 +5,8 @@ action mill (amount : Amount) : Action := {
   -- article and number agreement.
   lexical := { verbs := [{ lemma := "mill", frames := [Monotransitive] }] },
   body :=
-    Semantics.Templates.Action.actionMove
-      (Semantics.Templates.NounPhrase.slice Semantics.PileEnd.top amount (Semantics.Templates.Location.libraryOf Semantics.Templates.NounPhrase.actor))
-      (Semantics.Templates.Location.zone Semantics.Zone.library Option.none) (Option.some Semantics.Templates.Location.graveyard)
+    actionMove
+      (slice Semantics.PileEnd.top amount (libraryOf actor))
+      (zone Semantics.Zone.library none) (some graveyard)
       Semantics.ObservationPoint.arrival []
 }

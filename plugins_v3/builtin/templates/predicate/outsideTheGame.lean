@@ -8,10 +8,10 @@ cards are there [CR#400.11a], and so is a Lesson that learn reveals [CR#701.48a]
 template outsideTheGame : Predicate := {
   spelling := "outside the game",
   body :=
-    Semantics.Templates.Predicate.not
-      (Semantics.Templates.Predicate.in_
-        (Semantics.Templates.Location.or
-          [Semantics.Templates.Location.library, Semantics.Templates.Location.hand, Semantics.Templates.Location.battlefield,
-            Semantics.Templates.Location.graveyard, Semantics.Templates.Location.stack, Semantics.Templates.Location.exileZone,
-            Semantics.Templates.Location.commandZone]))
+    not
+      (in_
+        (or
+          [library, hand, battlefield,
+            graveyard, stack, exileZone,
+            commandZone]))
 }

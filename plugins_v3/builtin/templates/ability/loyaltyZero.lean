@@ -8,8 +8,8 @@ template loyaltyZero : Conferral := {
   -- substitution.
   body :=
     Semantics.Conferral.stateBased
-      (Semantics.Templates.Condition.compareAmt
-        (Semantics.Templates.Amount.countersOn (Semantics.CounterKind.named "loyaltyCounter") Semantics.Templates.NounPhrase.this_)
+      (compareAmt
+        (countersOn (Semantics.CounterKind.named "loyaltyCounter") this_)
         Semantics.Comparator.eq 0)
-      (Semantics.Templates.Action.putInto Semantics.Templates.NounPhrase.this_ Semantics.Templates.Location.graveyard)
+      (putInto this_ graveyard)
 }

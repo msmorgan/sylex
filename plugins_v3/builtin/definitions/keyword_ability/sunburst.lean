@@ -7,30 +7,30 @@ keyword sunburst : Ability := {
   lexical := { lemma := "sunburst" },
   spelling := "sunburst",
   body :=
-    [Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.replace
-          (Semantics.Templates.WouldClause.would (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.thisPermanent)
-            (Semantics.Templates.Action.enter (Option.some Semantics.Templates.Location.stack)))
-          (Semantics.Templates.Replacement.doIf
-            (Semantics.Templates.Condition.and
-              [Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.thisPermanent
-                  (Semantics.Templates.Predicate.hasTypeIgnoringTypeChanges Semantics.CardType.creature),
-                Semantics.Templates.Condition.coloredManaSpentToCast Semantics.Templates.NounPhrase.thisSpell])
-            (Semantics.Templates.Replacement.withRiders
-              [Semantics.Templates.MoveRider.withCounters (Semantics.Templates.Amount.colorsSpentToCast Semantics.Templates.NounPhrase.thisSpell)
-                  (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.p1p1Counter) Semantics.EntryCounterMark.fresh]))),
-      Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.replace
-          (Semantics.Templates.WouldClause.would (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.thisPermanent)
-            (Semantics.Templates.Action.enter (Option.some Semantics.Templates.Location.stack)))
-          (Semantics.Templates.Replacement.doIf
-            (Semantics.Templates.Condition.and
-              [Semantics.Templates.Condition.not
-                  (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.thisPermanent
-                    (Semantics.Templates.Predicate.hasTypeIgnoringTypeChanges Semantics.CardType.creature)),
-                Semantics.Templates.Condition.coloredManaSpentToCast Semantics.Templates.NounPhrase.thisSpell])
-            (Semantics.Templates.Replacement.withRiders
-              [Semantics.Templates.MoveRider.withCounters (Semantics.Templates.Amount.colorsSpentToCast Semantics.Templates.NounPhrase.thisSpell)
-                  (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.chargeCounter)
+    [static
+        (replace
+          (would (actor thisPermanent)
+            (enter (some stack)))
+          (doIf
+            (and
+              [is thisPermanent
+                  (hasTypeIgnoringTypeChanges Semantics.CardType.creature),
+                coloredManaSpentToCast thisSpell])
+            (withRiders
+              [withCounters (colorsSpentToCast thisSpell)
+                  (printedKind p1p1Counter) Semantics.EntryCounterMark.fresh]))),
+      static
+        (replace
+          (would (actor thisPermanent)
+            (enter (some stack)))
+          (doIf
+            (and
+              [not
+                  (is thisPermanent
+                    (hasTypeIgnoringTypeChanges Semantics.CardType.creature)),
+                coloredManaSpentToCast thisSpell])
+            (withRiders
+              [withCounters (colorsSpentToCast thisSpell)
+                  (printedKind chargeCounter)
                   Semantics.EntryCounterMark.fresh])))]
 }

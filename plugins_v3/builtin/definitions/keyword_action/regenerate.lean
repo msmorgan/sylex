@@ -5,10 +5,10 @@ action regenerate (subject : NounPhrase) : Action := {
   deed := none,
   spelling := "regenerate <subject>",
   body :=
-    Semantics.Templates.Action.establish
-      (Semantics.Templates.StaticSpec.replace
-        (Semantics.Templates.WouldClause.would Semantics.Templates.Subject.any (Semantics.Definitions.destroy subject))
-        (Semantics.Templates.Replacement.instead (Semantics.Definitions.regeneration subject)) Option.none
-        Semantics.ReplUse.nextTimeOnly Option.none)
-      (Option.some Semantics.Templates.Duration.thisTurn)
+    establish
+      (replace
+        (would Subject.any (destroy subject))
+        (instead (regeneration subject)) none
+        Semantics.ReplUse.nextTimeOnly none)
+      (some thisTurn)
 }

@@ -5,11 +5,11 @@ template foodToken : CharacteristicBundle := {
   body :=
     {
       characteristics :=
-        { types := [Semantics.CardType.artifact], subtypes := [Semantics.Definitions.food],
+        { types := [Semantics.CardType.artifact], subtypes := [food],
           text :=
-            [Semantics.Templates.Ability.activated
-                (Semantics.Templates.Cost.compound
-                  [Semantics.Templates.Cost.mana [Semantics.Templates.ManaSymbol.generic 2], Semantics.Templates.Cost.tapSymbol,
-                    Semantics.Templates.Cost.perform (Semantics.Definitions.sacrifice Semantics.Templates.NounPhrase.thisArtifact)])
-                (Semantics.Templates.Action.gainLife 3)] } }
+            [activated
+                (compound
+                  [mana [generic 2], tapSymbol,
+                    perform (sacrifice thisArtifact)])
+                (gainLife 3)] } }
 }

@@ -2,20 +2,20 @@ keyword graft (amount : Amount) : Ability := {
   lexical := { lemma := "graft", parameters := [[Amount]] },
   spelling := "graft <amount>",
   body :=
-    [Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.entersWithCounters Semantics.Templates.NounPhrase.thisPermanent amount Semantics.Definitions.p1p1Counter),
-      Semantics.Templates.Ability.whenever
-        (Semantics.Templates.GameEvent.does
-          (Semantics.Templates.Subject.actor
-            (Semantics.Templates.NounPhrase.a
-              (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isCreature, Semantics.Templates.Predicate.isOther])))
-          Semantics.Templates.Action.enter)
-        (Semantics.Templates.Action.may
-          (Semantics.Templates.Action.moveCounters 1 Semantics.Templates.NounPhrase.thisPermanent
-            (Semantics.Templates.NounPhrase.that Semantics.Templates.NounWord.creature)
-            (Option.some (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.p1p1Counter))))
-        [] [] Option.none Option.none Option.none
-        (Option.some
-          (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.thisPermanent
-            (Semantics.Templates.Predicate.hasCounter (Option.some Semantics.Definitions.p1p1Counter))))]
+    [static
+        (entersWithCounters thisPermanent amount p1p1Counter),
+      whenever
+        (does
+          (actor
+            (a
+              (and [isCreature, isOther])))
+          enter)
+        (may
+          (moveCounters 1 thisPermanent
+            (that creature)
+            (some (printedKind p1p1Counter))))
+        [] [] none none none
+        (some
+          (is thisPermanent
+            (hasCounter (some p1p1Counter))))]
 }

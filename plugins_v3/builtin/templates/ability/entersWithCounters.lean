@@ -3,6 +3,6 @@ template entersWithCounters (subject : NounPhrase) (amount : Amount) (kind : Cou
     StaticSpec := {
   -- TODO(spelling): <subject> enters with N <kind> counters on it; wording varies with amount, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
-    Semantics.Templates.StaticSpec.enters subject
-      [Semantics.Templates.MoveRider.withCounters amount (Semantics.Templates.CounterKindSource.printedKind kind) Semantics.EntryCounterMark.fresh]
+    enters subject
+      [withCounters amount (printedKind kind) Semantics.EntryCounterMark.fresh]
 }

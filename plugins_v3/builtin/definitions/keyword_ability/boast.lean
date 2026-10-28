@@ -6,11 +6,11 @@ keyword boast (ability : Ability) : Ability := {
   },
   spelling := "boast — <ability>",
   body :=
-    [Semantics.Templates.Ability.qualified ability Option.none (Option.some Semantics.Templates.UsageLimit.oncePerTurn)
-        (Option.some
-          (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.thisCreature
-            (Semantics.Templates.Predicate.did (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.which)
-              (Semantics.Templates.Action.attack Option.none)
-              (Option.some (Semantics.Templates.LookbackSpan.within Semantics.Templates.Duration.soFarThisTurn)))))
-        Option.none]
+    [qualified ability none (some oncePerTurn)
+        (some
+          (is thisCreature
+            (did (actor which)
+              (attack none)
+              (some (within soFarThisTurn)))))
+        none]
 }

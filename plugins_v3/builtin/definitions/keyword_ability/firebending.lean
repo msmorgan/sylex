@@ -6,13 +6,13 @@ keyword firebending (amount : Amount) : Ability := {
   },
   spelling := "firebending <amount>",
   body :=
-    [Semantics.Templates.Ability.whenever
-        (Semantics.Templates.GameEvent.does (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.thisCreature)
-          (Semantics.Templates.Action.attack Option.none))
-        (Semantics.Templates.Action.sequentially
-          [Semantics.Templates.Action.addMana amount
-              (Semantics.Templates.ProducedMana.manaOf [[Semantics.ColorOrColorless.of Semantics.Color.red]]) [],
-            Semantics.Templates.Action.establishThroughout
-              (Semantics.Templates.StaticSpec.manaRetention Semantics.Templates.NounPhrase.you Semantics.Templates.ManaHeld.thisMana)
-              Semantics.Templates.Duration.untilEndOfCombat])]
+    [whenever
+        (does (actor thisCreature)
+          (attack none))
+        (sequentially
+          [addMana amount
+              (manaOf [[Semantics.ColorOrColorless.of Semantics.Color.red]]) [],
+            establishThroughout
+              (manaRetention you thisMana)
+              untilEndOfCombat])]
 }

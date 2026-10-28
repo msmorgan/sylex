@@ -1,5 +1,5 @@
 template thisSpacecraft : NounPhrase := {
   spelling := "this Spacecraft",
   body :=
-    Semantics.Templates.NounPhrase.headed (Semantics.NounWord.subtype Semantics.Definitions.spacecraft) Semantics.Templates.NounPhrase.this_
+    headed (Semantics.NounWord.subtype spacecraft) this_
 }

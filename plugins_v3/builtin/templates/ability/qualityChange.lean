@@ -3,5 +3,5 @@ template qualityChange (subject : NounPhrase) (op : QualityOp) (payload : Qualit
     StaticSpec := {
   -- TODO(spelling): A quality change: `op` applied to `payload` on `subject`'s characteristics.
   body :=
-    Semantics.Templates.StaticSpec.characteristicChange subject (Semantics.QualityPayload.edits op payload)
+    characteristicChange subject (Semantics.QualityPayload.edits op payload)
 }

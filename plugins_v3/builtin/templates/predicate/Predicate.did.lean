@@ -7,5 +7,5 @@ template Predicate.did (subj : Subject) (action : Action)
     Predicate := {
   -- TODO(spelling): Context-dependent wording: <subj> <action>ed [<within>]; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Templates.Predicate.predicateDid { subj := subj, action := action, within := within, ordinal := ordinal }
+    predicateDid { subj := subj, action := action, within := within, ordinal := ordinal }
 }

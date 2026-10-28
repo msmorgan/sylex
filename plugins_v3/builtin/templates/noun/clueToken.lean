@@ -5,11 +5,11 @@ template clueToken : CharacteristicBundle := {
   body :=
     {
       characteristics :=
-        { types := [Semantics.CardType.artifact], subtypes := [Semantics.Definitions.clue],
+        { types := [Semantics.CardType.artifact], subtypes := [clue],
           text :=
-            [Semantics.Templates.Ability.activated
-                (Semantics.Templates.Cost.compound
-                  [Semantics.Templates.Cost.mana [Semantics.Templates.ManaSymbol.generic 2],
-                    Semantics.Templates.Cost.perform (Semantics.Definitions.sacrifice Semantics.Templates.NounPhrase.thisArtifact)])
-                (Semantics.Templates.Action.draw 1)] } }
+            [activated
+                (compound
+                  [mana [generic 2],
+                    perform (sacrifice thisArtifact)])
+                (draw 1)] } }
 }

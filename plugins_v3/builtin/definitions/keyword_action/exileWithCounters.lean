@@ -6,7 +6,7 @@ action exileWithCounters (subject : NounPhrase) (amount : Amount)
   lexical := { verbs := [{ lemma := "exile", frames := [Monotransitive] }] },
   deed := "exile",
   body :=
-    Semantics.Templates.Action.actionMove subject Semantics.Templates.Location.wherever (Option.some Semantics.Templates.Location.exileZone)
+    actionMove subject wherever (some exileZone)
       Semantics.ObservationPoint.arrival
-      [Semantics.Templates.MoveRider.withCounters amount (Semantics.Templates.CounterKindSource.printedKind kind) Semantics.EntryCounterMark.fresh]
+      [withCounters amount (printedKind kind) Semantics.EntryCounterMark.fresh]
 }

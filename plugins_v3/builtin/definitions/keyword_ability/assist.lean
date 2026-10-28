@@ -7,20 +7,20 @@ keyword assist : Ability := {
   lexical := { lemma := "assist" },
   spelling := "assist",
   body :=
-    [Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.asEvent
-          (Semantics.Templates.GameEvent.does (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
-            (Semantics.Definitions.cast Semantics.Templates.NounPhrase.thisSpell))
-          (Semantics.Templates.Action.may
-            (Semantics.Templates.Action.choose
-              (Semantics.Templates.NounPhrase.a
-                (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isPlayer, Semantics.Templates.Predicate.isOther]))))),
-      Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.paySubstitute Semantics.Templates.NounPhrase.thisSpell
+    [static
+        (asEvent
+          (does (actor you)
+            (cast thisSpell))
+          (may
+            (choose
+              (a
+                (and [isPlayer, isOther]))))),
+      static
+        (paySubstitute thisSpell
           {
             action :=
-              Semantics.Templates.Action.instruct (Semantics.Templates.NounPhrase.the Semantics.Templates.Predicate.isChosenPlayer)
-                (Semantics.Templates.Action.pay (Semantics.Templates.Cost.mana [Semantics.Templates.ManaSymbol.generic 1])
+              instruct (the isChosenPlayer)
+                (pay (mana [generic 1])
                   Semantics.PayTimes.once),
-            pays := [Semantics.Templates.PipPaid.generic] })]
+            pays := [generic] })]
 }

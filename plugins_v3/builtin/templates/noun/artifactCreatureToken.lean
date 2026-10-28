@@ -8,6 +8,6 @@ template artifactCreatureToken (power toughness : Nat) (colors : List Color)
     {
       characteristics :=
         { colors := colors, types := [Semantics.CardType.artifact, Semantics.CardType.creature], subtypes := subtypes,
-          text := abilities, power := Option.some (Semantics.Templates.Amount.amountLit ↑power),
-          toughness := Option.some (Semantics.Templates.Amount.amountLit ↑toughness) } }
+          text := abilities, power := some (amountLit ↑power),
+          toughness := some (amountLit ↑toughness) } }
 }

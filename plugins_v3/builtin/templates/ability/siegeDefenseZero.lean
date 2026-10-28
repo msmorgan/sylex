@@ -8,10 +8,10 @@ template siegeDefenseZero : Conferral := {
   -- conferral, whose inherent or ability-free origin cannot be encoded by card-text substitution.
   body :=
     Semantics.Conferral.stateBased
-      (Semantics.Templates.Condition.and
-        [Semantics.Templates.Condition.compareAmt
-            (Semantics.Templates.Amount.countersOn Semantics.Definitions.defenseCounter Semantics.Templates.NounPhrase.this_)
+      (and
+        [compareAmt
+            (countersOn defenseCounter this_)
             Semantics.Comparator.eq 0,
-          Semantics.Templates.Condition.siegeHasNoWaitingTrigger])
-      (Semantics.Templates.Action.putInto Semantics.Templates.NounPhrase.this_ Semantics.Templates.Location.graveyard)
+          siegeHasNoWaitingTrigger])
+      (putInto this_ graveyard)
 }

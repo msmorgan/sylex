@@ -7,8 +7,8 @@ regenerated"). A destroy with this rider is one no regeneration shield replaces
 template doUnderProhibition (action forbidden : Action) : Action := {
   spelling := "<action>. <forbidden> can't happen",
   body :=
-    Semantics.Templates.Action.sequentially
+    sequentially
       [action,
-        Semantics.Templates.Action.establish (Semantics.Templates.StaticSpec.staticSpecCant Semantics.Templates.Subject.any forbidden { })
-          (Option.some Semantics.Templates.Duration.modifiesPrecedingAction)]
+        establish (staticSpecCant Subject.any forbidden { })
+          (some modifiesPrecedingAction)]
 }

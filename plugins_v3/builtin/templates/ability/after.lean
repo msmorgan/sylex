@@ -5,5 +5,5 @@ template after (roll : GameEvent) (modify : Action) (limit : Option UsageLimit :
     Ability := {
   -- TODO(spelling): After <roll>, <modify>; wording varies with limit, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
-    Semantics.Templates.Ability.static (Semantics.Templates.StaticSpec.staticSpecRollModifier roll modify limit)
+    static (staticSpecRollModifier roll modify limit)
 }

@@ -4,5 +4,5 @@ template withTotal (axis : ProjAxis) (comparator : Comparator) (bound : Amount)
     (group : NounPhrase) : NounPhrase := {
   spelling := "any number of <group> with total <axis> <comparator> <bound>",
   body :=
-    Semantics.Templates.NounPhrase.nounPhraseSomeOf (Semantics.Templates.SliceCount.sliceCountTotalling axis comparator bound) Option.none group
+    nounPhraseSomeOf (sliceCountTotalling axis comparator bound) none group
 }

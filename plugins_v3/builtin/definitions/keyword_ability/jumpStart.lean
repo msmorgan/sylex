@@ -7,18 +7,18 @@ keyword jumpStart : Ability := {
   lexical := { lemma := "jump-start" },
   spelling := "jump-start",
   body :=
-    [Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.can (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
-          (Semantics.Definitions.cast Semantics.Templates.NounPhrase.this_ (Option.some Semantics.Templates.Location.yourGraveyard)
-            (Semantics.Templates.PlayPayment.plusAdditional
-              (Semantics.Templates.Cost.perform (Semantics.Definitions.discard (Semantics.Templates.NounPhrase.a Semantics.Templates.Predicate.isCard))))
-            (Option.some Semantics.Templates.Predicate.isInstantOrSorcery))),
-      Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.replace
-          (Semantics.Templates.WouldClause.would (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.thisSpell)
-            (Semantics.Templates.Action.leave Semantics.Templates.Location.stack))
-          (Semantics.Templates.Replacement.doIf
-            (Semantics.Templates.Condition.choiceWasTaken (Semantics.LinkSource.byKeyword Semantics.Definitions.jumpStart.label)
-              Semantics.Templates.NounPhrase.thisSpell)
-            (Semantics.Templates.Replacement.instead (Semantics.Definitions.exile Semantics.Templates.NounPhrase.thisSpell))))]
+    [static
+        (can (actor you)
+          (cast this_ (some yourGraveyard)
+            (plusAdditional
+              (perform (discard (a isCard))))
+            (some isInstantOrSorcery))),
+      static
+        (replace
+          (would (actor thisSpell)
+            (leave stack))
+          (doIf
+            (choiceWasTaken (Semantics.LinkSource.byKeyword jumpStart.label)
+              thisSpell)
+            (instead (exile thisSpell))))]
 }

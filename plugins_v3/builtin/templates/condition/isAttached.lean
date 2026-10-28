@@ -5,6 +5,6 @@ template isAttached (subject : NounPhrase) : Condition := {
   -- TODO(spelling): <subject> is/are attached; string substitution cannot choose subject-verb
   -- agreement.
   body :=
-    Semantics.Templates.Condition.is subject
-      (Semantics.Templates.Predicate.predicateAttachment Semantics.AttachmentSide.attachment Option.none Option.none)
+    is subject
+      (predicateAttachment Semantics.AttachmentSide.attachment none none)
 }

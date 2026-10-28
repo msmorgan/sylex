@@ -5,6 +5,6 @@ action millCards (cards : NounPhrase) : Action := {
   deed := "mill",
   spelling := "mill <cards>",
   body :=
-    Semantics.Templates.Action.actionMove cards Semantics.Templates.Location.library (Option.some Semantics.Templates.Location.graveyard)
+    actionMove cards library (some graveyard)
       Semantics.ObservationPoint.arrival []
 }

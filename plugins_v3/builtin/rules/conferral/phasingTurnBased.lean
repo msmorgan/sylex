@@ -15,26 +15,26 @@ at once is the engine's. -/
 conferral phasingTurnBased := {
 
   body :=
-    { scope := Semantics.Templates.Predicate.isPermanent,
+    { scope := isPermanent,
       confer :=
         Semantics.Conferral.turnBased Semantics.TurnPart.untapStep
-          (Semantics.Templates.Action.doIf
-            (Semantics.Templates.Condition.duringPart Semantics.TurnPart.turn
-              (Option.some (Semantics.Templates.NounPhrase.controllerOf Semantics.Templates.NounPhrase.this_)))
-            (Semantics.Templates.Action.doIf
-              (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.this_ Semantics.Templates.Predicate.isPhasedOut)
-              (Semantics.Templates.Action.doIf
-                (Semantics.Templates.Condition.not
-                  (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.this_
-                    (Semantics.Templates.Predicate.predicateAttachment Semantics.AttachmentSide.attachment Option.none
-                      (Option.some
-                        (Semantics.Templates.NounPhrase.a
-                          (Semantics.Templates.Predicate.and
-                            [Semantics.Templates.Predicate.isPermanent, Semantics.Templates.Predicate.isPhasedOut]))))))
-                (Semantics.Templates.Action.setStatus Semantics.Status.phasedIn Semantics.Templates.NounPhrase.this_))
-              (Option.some
-                (Semantics.Templates.Action.doIf
-                  (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.this_
-                    (Semantics.Templates.Predicate.hasKeyword (Semantics.Templates.KeywordTerm.theKeyword Semantics.Definitions.phasing.label)))
-                  (Semantics.Templates.Action.setStatus Semantics.Status.phasedOut Semantics.Templates.NounPhrase.this_))))) }
+          (doIf
+            (duringPart Semantics.TurnPart.turn
+              (some (controllerOf this_)))
+            (doIf
+              (is this_ isPhasedOut)
+              (doIf
+                (not
+                  (is this_
+                    (predicateAttachment Semantics.AttachmentSide.attachment none
+                      (some
+                        (a
+                          (and
+                            [isPermanent, isPhasedOut]))))))
+                (setStatus Semantics.Status.phasedIn this_))
+              (some
+                (doIf
+                  (is this_
+                    (hasKeyword (theKeyword phasing.label)))
+                  (setStatus Semantics.Status.phasedOut this_))))) }
 }

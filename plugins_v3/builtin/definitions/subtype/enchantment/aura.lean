@@ -6,8 +6,8 @@ subtype aura := {
   name := "Aura",
   confers :=
     [Semantics.Conferral.stateBased
-        (Semantics.Templates.Condition.not (Semantics.Templates.Condition.isAttached Semantics.Templates.NounPhrase.thisAura))
-        (Semantics.Templates.Action.actionMove Semantics.Templates.NounPhrase.thisAura
-          (Semantics.Templates.Location.zone Semantics.Zone.battlefield Option.none) (Option.some Semantics.Templates.Location.graveyard)
+        (not (isAttached thisAura))
+        (actionMove thisAura
+          (zone Semantics.Zone.battlefield none) (some graveyard)
           Semantics.ObservationPoint.arrival [])]
 }

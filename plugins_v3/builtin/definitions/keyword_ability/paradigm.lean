@@ -7,23 +7,23 @@ keyword paradigm : Ability := {
   lexical := { lemma := "paradigm" },
   spelling := "paradigm",
   body :=
-    [Semantics.Templates.Ability.spell
-        (Semantics.Templates.Action.doIf
-          (Semantics.Templates.Condition.not
-            (Semantics.Templates.Condition.did Semantics.Templates.Subject.any
-              (Semantics.Definitions.resolve
-                (Semantics.Templates.NounPhrase.a
-                  (Semantics.Templates.Predicate.and
-                    [Semantics.Templates.Predicate.isSpell, Semantics.Templates.Predicate.isOther, Semantics.Templates.Predicate.youControl,
-                      Semantics.Templates.Predicate.shares Semantics.QualitySort.cardName Semantics.Agreement.share
-                        Semantics.Templates.NounPhrase.thisSpell])))
-              (Semantics.Templates.LookbackSpan.within Semantics.Templates.Duration.thisGame)))
-          (Semantics.Templates.Action.delayWithin (Semantics.Templates.GameEvent.beginningOfYour Semantics.TurnPart.firstMain)
-            Semantics.Templates.Duration.restOfGame
-            (Semantics.Templates.Action.sequentially
-              [Semantics.Templates.Action.copy (Semantics.CopySort.inZone Semantics.Zone.exile) Semantics.Templates.NounPhrase.this_ 1 [],
-                Semantics.Templates.Action.may
-                  (Semantics.Definitions.cast (Semantics.Templates.NounPhrase.that Semantics.NounWord.copy) Option.none
-                    Semantics.Templates.PlayPayment.withoutPaying)]))),
-      Semantics.Templates.Ability.spell (Semantics.Definitions.exile Semantics.Templates.NounPhrase.thisSpell)]
+    [spell
+        (doIf
+          (not
+            (did Subject.any
+              (resolve
+                (a
+                  (and
+                    [isSpell, isOther, youControl,
+                      shares Semantics.QualitySort.cardName Semantics.Agreement.share
+                        thisSpell])))
+              (within thisGame)))
+          (delayWithin (beginningOfYour Semantics.TurnPart.firstMain)
+            restOfGame
+            (sequentially
+              [copy (Semantics.CopySort.inZone Semantics.Zone.exile) this_ 1 [],
+                may
+                  (cast (that Semantics.NounWord.copy) none
+                    withoutPaying)]))),
+      spell (exile thisSpell)]
 }

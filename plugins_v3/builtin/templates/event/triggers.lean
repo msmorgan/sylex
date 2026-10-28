@@ -6,8 +6,8 @@ template triggers (ability : NounPhrase) (by_ : Option NounPhrase := none) : Gam
   -- TODO(spelling): Context-dependent wording: <ability> triggers [by <cause>]; string substitution cannot express its omitted or inflected parts.
   body :=
     match by_ with
-    | Option.none => Semantics.Templates.GameEvent.does (Semantics.Templates.Subject.actor ability) Semantics.Templates.Action.trigger
-    | Option.some cause =>
-      Semantics.Templates.GameEvent.causes (Semantics.Templates.Causing.bySource cause)
-        (Semantics.Templates.GameEvent.does (Semantics.Templates.Subject.actor ability) Semantics.Templates.Action.trigger)
+    | none => does (actor ability) trigger
+    | some cause =>
+      causes (bySource cause)
+        (does (actor ability) trigger)
 }

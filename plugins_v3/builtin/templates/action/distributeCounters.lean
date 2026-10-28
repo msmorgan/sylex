@@ -3,5 +3,5 @@ template distributeCounters (amount : Amount) (kind : CounterKind) (among : Noun
     Action := {
   -- TODO(spelling): distribute N <kind> counters among <among>; wording varies with amount, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
-    Semantics.Templates.Action.distribute (Semantics.Templates.DividedVerb.dividedVerbCounters kind) amount among
+    distribute (dividedVerbCounters kind) amount among
 }

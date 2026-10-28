@@ -2,6 +2,6 @@
 template untilEndOfTurn : Duration := {
   spelling := "until end of turn",
   body :=
-    Semantics.Templates.Duration.durationBetween Option.none
-      (Option.some (Semantics.Templates.GameEvent.endOf Semantics.TurnPart.turn Option.none Semantics.Templates.TurnRef.turnRefCurrent))
+    durationBetween none
+      (some (endOf Semantics.TurnPart.turn none turnRefCurrent))
 }

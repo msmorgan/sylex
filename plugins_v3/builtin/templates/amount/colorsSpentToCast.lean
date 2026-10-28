@@ -2,5 +2,5 @@
 template colorsSpentToCast (spell : NounPhrase) : Amount := {
   -- TODO(spelling): Context-dependent wording: for each color of mana spent to cast <n>; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Templates.Amount.paid Semantics.Templates.LinkedFacet.linkedFacetColorsSpent spell
+    paid linkedFacetColorsSpent spell
 }

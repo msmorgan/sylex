@@ -7,9 +7,9 @@ subtype equipment := {
   name := "Equipment",
   confers :=
     [Semantics.Conferral.property
-        (Semantics.Templates.StaticSpec.mayBeAttachedTo Semantics.Templates.NounPhrase.thisEquipment
-          (Semantics.Templates.NounPhrase.allOf Semantics.Templates.Predicate.isCreature)),
+        (mayBeAttachedTo thisEquipment
+          (allOf isCreature)),
       Semantics.Conferral.stateBased
-        (Semantics.Templates.Condition.not (Semantics.Templates.Condition.isAttached Semantics.Templates.NounPhrase.thisEquipment))
-        (Semantics.Templates.Action.attachment Semantics.AttachMove.unattached Semantics.Templates.NounPhrase.thisEquipment Option.none)]
+        (not (isAttached thisEquipment))
+        (attachment Semantics.AttachMove.unattached thisEquipment none)]
 }

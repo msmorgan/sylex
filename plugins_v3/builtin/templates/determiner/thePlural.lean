@@ -3,5 +3,5 @@
 template thePlural (p : Predicate) : NounPhrase := {
   -- TODO(spelling): Context-dependent wording: the …s; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Templates.NounPhrase.described (Semantics.Templates.DetPhrase.detPhraseThe Semantics.Plurality.many) p
+    described (detPhraseThe Semantics.Plurality.many) p
 }

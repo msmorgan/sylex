@@ -8,10 +8,10 @@ action searchZonesOf (whose : NounPhrase) (for_ : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "search", frames := [(TransitiveWithPP ["for"]), Monotransitive, (Prepositional ["for"])] }] },
   deed := "search",
   body :=
-    Semantics.Templates.Action.actionSearch
-      (Semantics.Templates.Location.and
-        [Semantics.Templates.Location.zone Semantics.Zone.graveyard (Option.some whose),
-          Semantics.Templates.Location.zone Semantics.Zone.hand (Option.some whose),
-          Semantics.Templates.Location.zone Semantics.Zone.library (Option.some whose)])
+    actionSearch
+      (and
+        [zone Semantics.Zone.graveyard (some whose),
+          zone Semantics.Zone.hand (some whose),
+          zone Semantics.Zone.library (some whose)])
       (Semantics.NounPhrase.inCaller for_)
 }

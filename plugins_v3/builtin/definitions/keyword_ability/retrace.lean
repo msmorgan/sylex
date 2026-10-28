@@ -5,12 +5,12 @@ keyword retrace : Ability := {
   lexical := { lemma := "retrace" },
   spelling := "retrace",
   body :=
-    [Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.can (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
-          (Semantics.Definitions.cast Semantics.Templates.NounPhrase.this_ (Option.some Semantics.Templates.Location.yourGraveyard)
-            (Semantics.Templates.PlayPayment.plusAdditional
-              (Semantics.Templates.Cost.perform
-                (Semantics.Definitions.discard
-                  (Semantics.Templates.NounPhrase.a
-                    (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isCard, Semantics.Templates.Predicate.isLand])))))))]
+    [static
+        (can (actor you)
+          (cast this_ (some yourGraveyard)
+            (plusAdditional
+              (perform
+                (discard
+                  (a
+                    (and [isCard, isLand])))))))]
 }

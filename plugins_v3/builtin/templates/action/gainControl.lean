@@ -6,5 +6,5 @@ template gainControl (subject : NounPhrase) (duration : Option Duration := none)
     (controller : NounPhrase := theActor) : Action := {
   -- TODO(spelling): Context-dependent wording: [<controller>] gain[s] control of <subject> [duration]; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Templates.Action.establish (Semantics.Templates.StaticSpec.controlGrant controller subject) duration
+    establish (controlGrant controller subject) duration
 }

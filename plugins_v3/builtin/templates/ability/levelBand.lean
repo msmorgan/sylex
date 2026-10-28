@@ -4,6 +4,6 @@ template levelBand (range : LevelRange) (power toughness : Nat) (text : List Abi
     LevelBand := {
   -- TODO(spelling): One level band of a leveler: its range, power/toughness box, and text .
   body :=
-    { range := range, text := text, power := Semantics.Templates.stat power,
-      toughness := Semantics.Templates.stat toughness }
+    { range := range, text := text, power := stat power,
+      toughness := stat toughness }
 }

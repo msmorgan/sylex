@@ -10,14 +10,14 @@ template lethalDamage : Conferral := {
   -- free origin cannot be encoded by card-text substitution.
   body :=
     Semantics.Conferral.stateBased
-      (Semantics.Templates.Condition.and
-        [Semantics.Templates.Condition.compareAmt (Semantics.Templates.Amount.toughnessOf Semantics.Templates.NounPhrase.this_)
+      (and
+        [compareAmt (toughnessOf this_)
             Semantics.Comparator.greater 0,
-          Semantics.Templates.Condition.compareAmt
-            (Semantics.Templates.Amount.statOf Semantics.ProjAxis.markedDamage Semantics.Templates.NounPhrase.this_)
+          compareAmt
+            (statOf Semantics.ProjAxis.markedDamage this_)
             Semantics.Comparator.greater 0,
-          Semantics.Templates.Condition.compareAmt
-            (Semantics.Templates.Amount.statOf Semantics.ProjAxis.markedDamage Semantics.Templates.NounPhrase.this_)
-            Semantics.Comparator.atLeast (Semantics.Templates.Amount.toughnessOf Semantics.Templates.NounPhrase.this_)])
-      (Semantics.Definitions.destroy Semantics.Templates.NounPhrase.this_)
+          compareAmt
+            (statOf Semantics.ProjAxis.markedDamage this_)
+            Semantics.Comparator.atLeast (toughnessOf this_)])
+      (destroy this_)
 }

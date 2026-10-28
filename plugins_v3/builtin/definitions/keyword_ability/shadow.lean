@@ -5,22 +5,22 @@ keyword shadow : Ability := {
   lexical := { lemma := "shadow" },
   spelling := "shadow",
   body :=
-    [Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.cant
-          (Semantics.Templates.Subject.by_
-            (Semantics.Templates.NounPhrase.allOf
-              (Semantics.Templates.Predicate.and
-                [Semantics.Templates.Predicate.isCreature,
-                  Semantics.Templates.Predicate.not
-                    (Semantics.Templates.Predicate.hasKeyword (Semantics.Templates.KeywordTerm.theKeyword Semantics.Definitions.shadow.label))])))
-          (Semantics.Templates.Action.block Semantics.Templates.NounPhrase.thisCreature)),
-      Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.cant (Semantics.Templates.Subject.by_ Semantics.Templates.NounPhrase.thisCreature)
-          (Semantics.Templates.Action.block
-            (Semantics.Templates.NounPhrase.allOf
-              (Semantics.Templates.Predicate.and
-                [Semantics.Templates.Predicate.isCreature,
-                  Semantics.Templates.Predicate.not
-                    (Semantics.Templates.Predicate.hasKeyword
-                      (Semantics.Templates.KeywordTerm.theKeyword Semantics.Definitions.shadow.label))]))))]
+    [static
+        (cant
+          (by_
+            (allOf
+              (and
+                [isCreature,
+                  not
+                    (hasKeyword (theKeyword shadow.label))])))
+          (block thisCreature)),
+      static
+        (cant (by_ thisCreature)
+          (block
+            (allOf
+              (and
+                [isCreature,
+                  not
+                    (hasKeyword
+                      (theKeyword shadow.label))]))))]
 }

@@ -2,8 +2,8 @@
 template splitOverPermanent : NounPhrase := {
   spelling := "any target",
   body :=
-    Semantics.Templates.NounPhrase.eitherOf
-      (Semantics.Templates.NounPhrase.nounPhrasePro (Semantics.Reach.unionHalf Semantics.NounWord.player) Semantics.Plurality.one)
-      (Semantics.Templates.NounPhrase.possessorOf Semantics.PossessorAxis.controller
-        (Semantics.Templates.NounPhrase.nounPhrasePro (Semantics.Reach.unionHalf Semantics.NounWord.permanent) Semantics.Plurality.one))
+    eitherOf
+      (nounPhrasePro (Semantics.Reach.unionHalf Semantics.NounWord.player) Semantics.Plurality.one)
+      (possessorOf Semantics.PossessorAxis.controller
+        (nounPhrasePro (Semantics.Reach.unionHalf Semantics.NounWord.permanent) Semantics.Plurality.one))
 }

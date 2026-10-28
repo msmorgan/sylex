@@ -2,5 +2,5 @@
 template becomeBlocking (subject blocked : NounPhrase) : Action := {
   spelling := "<subject> becomes blocking <blocked>",
   body :=
-    Semantics.Templates.Action.combat subject (Semantics.Templates.CombatUpdate.combatUpdateBlocking Semantics.AttachMove.attached blocked)
+    combat subject (combatUpdateBlocking Semantics.AttachMove.attached blocked)
 }

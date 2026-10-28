@@ -8,15 +8,15 @@ template delayUnlessPaid (event : GameEvent) (action : Action) (player : NounPhr
     (cost : Cost) : Action := {
   spelling := "<action> at <event> unless <player> pays <cost> before that step",
   body :=
-    Semantics.Templates.Action.sequentially
-      [Semantics.Templates.Action.actionDelay event [] Option.none action,
-        Semantics.Templates.Action.establish
-          (Semantics.Templates.StaticSpec.staticSpecSpecialAction (Option.some player) Option.none cost
-            (Semantics.Templates.Action.establish
-              (Semantics.Templates.StaticSpec.staticSpecCant
-                (Semantics.Templates.Subject.actor
-                  (Semantics.NounPhrase.laterMention "delay.trigger" Semantics.Templates.NounPhrase.thisAbility))
-                Semantics.Templates.Action.trigger { })
-              Option.none))
-          (Option.some (Semantics.Templates.Duration.durationBetween Option.none (Option.some event)))]
+    sequentially
+      [actionDelay event [] none action,
+        establish
+          (staticSpecSpecialAction (some player) none cost
+            (establish
+              (staticSpecCant
+                (actor
+                  (Semantics.NounPhrase.laterMention "delay.trigger" thisAbility))
+                trigger { })
+              none))
+          (some (durationBetween none (some event)))]
 }

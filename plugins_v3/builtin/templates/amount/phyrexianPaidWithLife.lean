@@ -3,5 +3,5 @@
 template phyrexianPaidWithLife (spell : NounPhrase) : Amount := {
   spelling := "the Phyrexian mana symbols in <spell>'s cost its caster paid life for",
   body :=
-    Semantics.Templates.Amount.paid Semantics.Templates.LinkedFacet.linkedFacetPhyrexianPaidWithLife spell
+    paid linkedFacetPhyrexianPaidWithLife spell
 }

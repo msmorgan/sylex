@@ -5,11 +5,11 @@ template treasureToken : CharacteristicBundle := {
   body :=
     {
       characteristics :=
-        { types := [Semantics.CardType.artifact], subtypes := [Semantics.Definitions.treasure],
+        { types := [Semantics.CardType.artifact], subtypes := [treasure],
           text :=
-            [Semantics.Templates.Ability.activated
-                (Semantics.Templates.Cost.compound
-                  [Semantics.Templates.Cost.tapSymbol,
-                    Semantics.Templates.Cost.perform (Semantics.Definitions.sacrifice Semantics.Templates.NounPhrase.thisArtifact)])
-                (Semantics.Templates.Action.addMana 1 (Semantics.Templates.ProducedMana.ofAnyColor Semantics.ColorFreedom.sameColor) [])] } }
+            [activated
+                (compound
+                  [tapSymbol,
+                    perform (sacrifice thisArtifact)])
+                (addMana 1 (ofAnyColor Semantics.ColorFreedom.sameColor) [])] } }
 }

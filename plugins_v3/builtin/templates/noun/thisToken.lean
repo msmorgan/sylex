@@ -1,5 +1,5 @@
 template thisToken : NounPhrase := {
   spelling := "this token",
   body :=
-    Semantics.Templates.NounPhrase.headed Semantics.NounWord.token Semantics.Templates.NounPhrase.this_
+    headed Semantics.NounWord.token this_
 }

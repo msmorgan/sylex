@@ -6,7 +6,7 @@ template toughnessZero : Conferral := {
   -- substitution.
   body :=
     Semantics.Conferral.stateBased
-      (Semantics.Templates.Condition.compareAmt (Semantics.Templates.Amount.toughnessOf Semantics.Templates.NounPhrase.this_)
+      (compareAmt (toughnessOf this_)
         Semantics.Comparator.atMost 0)
-      (Semantics.Templates.Action.putInto Semantics.Templates.NounPhrase.this_ Semantics.Templates.Location.graveyard)
+      (putInto this_ graveyard)
 }

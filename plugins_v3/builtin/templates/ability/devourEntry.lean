@@ -6,21 +6,21 @@ template devourEntry (quality head : Predicate) (amount : Amount) : Ability := {
 
   -- TODO(spelling): Devour entry wording inflects quality and head and repeats the counted action; plain substitution cannot select those forms.
   body :=
-    Semantics.Templates.Ability.static
-      (Semantics.Templates.StaticSpec.replace
-        (Semantics.Templates.WouldClause.would (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.thisPermanent) Semantics.Templates.Action.enter)
-        (Semantics.Templates.Replacement.before
-          (Semantics.Templates.Action.may
-            (Semantics.Definitions.Action.devour
-              (Semantics.Templates.NounPhrase.counted Semantics.Templates.Quantity.anyNumber
-                (Semantics.Templates.Predicate.and [quality, Semantics.Templates.Predicate.in_ Semantics.Templates.Location.battlefield]))))
-          (Option.some
-            (Semantics.Templates.Replacement.alongside
-              (Semantics.Templates.Action.putCounters
-                (Semantics.Templates.Amount.forEach amount
-                  (Semantics.Templates.Predicate.and
+    static
+      (replace
+        (would (actor thisPermanent) enter)
+        (before
+          (may
+            (Action.devour
+              (counted anyNumber
+                (and [quality, in_ battlefield]))))
+          (some
+            (alongside
+              (putCounters
+                (forEach amount
+                  (and
                     [head,
-                      Semantics.Templates.Predicate.was (Semantics.Definitions.sacrifice Semantics.Templates.NounPhrase.which)
-                        (Option.some Semantics.Templates.LookbackSpan.thisWay)]))
-                (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.p1p1Counter) Semantics.Templates.NounPhrase.thisPermanent)))))
+                      was (sacrifice which)
+                        (some thisWay)]))
+                (printedKind p1p1Counter) thisPermanent)))))
 }

@@ -7,5 +7,5 @@ action search (scope : Location) (for_ : NounPhrase := any) : Action := {
   -- fields or supply contextual agreement and morphology.
   lexical := { verbs := [{ lemma := "search", frames := [(TransitiveWithPP ["for"]), Monotransitive, (Prepositional ["for"])] }] },
   body :=
-    Semantics.Templates.Action.actionSearch scope (Semantics.NounPhrase.inCaller for_)
+    actionSearch scope (Semantics.NounPhrase.inCaller for_)
 }

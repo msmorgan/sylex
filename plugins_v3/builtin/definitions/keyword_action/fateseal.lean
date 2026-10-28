@@ -4,9 +4,9 @@ action fateseal (amount : Amount) : Action := {
   lexical := { verbs := [{ lemma := "fateseal", frames := [Amount] }] },
   spelling := "fateseal <amount>",
   body :=
-    Semantics.Templates.Action.lookAndSortSlice
-      (Semantics.Templates.NounPhrase.slice Semantics.PileEnd.top amount
-        (Semantics.Templates.Location.libraryOf
-          (Semantics.Templates.NounPhrase.a (Semantics.Templates.Predicate.isOpponentOf Semantics.Templates.NounPhrase.actor))))
-      Semantics.Templates.Location.onBottom [Semantics.Templates.MoveRider.inOrder Semantics.Arrangement.anyOrder]
+    lookAndSortSlice
+      (slice Semantics.PileEnd.top amount
+        (libraryOf
+          (a (isOpponentOf actor))))
+      onBottom [inOrder Semantics.Arrangement.anyOrder]
 }

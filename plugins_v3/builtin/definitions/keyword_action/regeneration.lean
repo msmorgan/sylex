@@ -8,13 +8,13 @@ action regeneration (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "regenerate", frames := [Intransitive, Monotransitive] }] },
   deed := "regenerate",
   body :=
-    Semantics.Templates.Action.sequentially
-      [Semantics.Templates.Action.clearDamage subject,
-        Semantics.Templates.Action.instruct (Semantics.Templates.NounPhrase.possessorOf Semantics.PossessorAxis.controller subject)
-          (Semantics.Definitions.tap subject),
-        Semantics.Templates.Action.doIf
-          (Semantics.Templates.Condition.or
-            [Semantics.Templates.Condition.is subject (Semantics.Templates.Predicate.inCombat Semantics.CombatRelation.attackerOf Option.none),
-              Semantics.Templates.Condition.is subject (Semantics.Templates.Predicate.inCombat Semantics.CombatRelation.blockerOf Option.none)])
-          (Semantics.Templates.Action.removeFromCombat subject)]
+    sequentially
+      [clearDamage subject,
+        instruct (possessorOf Semantics.PossessorAxis.controller subject)
+          (tap subject),
+        doIf
+          (or
+            [is subject (inCombat Semantics.CombatRelation.attackerOf none),
+              is subject (inCombat Semantics.CombatRelation.blockerOf none)])
+          (removeFromCombat subject)]
 }

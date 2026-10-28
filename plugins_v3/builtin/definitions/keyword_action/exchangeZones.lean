@@ -3,5 +3,5 @@ action exchangeZones (left right : Location) : Action := {
   deed := "exchange",
   spelling := "exchange <left> and <right>",
   body :=
-    Semantics.Templates.Action.actionExchange (Semantics.Templates.Exchanged.exchangedZones left right)
+    actionExchange (exchangedZones left right)
 }

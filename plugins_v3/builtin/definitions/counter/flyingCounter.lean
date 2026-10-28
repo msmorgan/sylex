@@ -8,6 +8,6 @@ counter flyingCounter := {
   holder := .object,
   confers :=
     [Semantics.Conferral.property
-        (Semantics.Templates.StaticSpec.abilityGrant Semantics.Templates.NounPhrase.this_
-          (Semantics.Templates.keyword (Semantics.KeywordLabel.named "flying")))]
+        (abilityGrant this_
+          (keyword (Semantics.KeywordLabel.named "flying")))]
 }

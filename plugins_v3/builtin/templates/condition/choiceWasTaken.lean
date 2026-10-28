@@ -4,6 +4,6 @@
 template choiceWasTaken (which : LinkSource) (subject : NounPhrase) : Condition := {
   spelling := "if <subject>'s <which> was taken",
   body :=
-    Semantics.Templates.Condition.compareAmt (Semantics.Templates.Amount.paid (Semantics.Templates.LinkedFacet.linkedFacetTaken which) subject)
+    compareAmt (paid (linkedFacetTaken which) subject)
       Semantics.Comparator.atLeast 1
 }

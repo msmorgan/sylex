@@ -4,13 +4,13 @@
 template duringNextTurnOf (player : NounPhrase) : Duration := {
   spelling := "during <player>'s next turn",
   body :=
-    Semantics.Templates.Duration.durationBetween
-      (Option.some
-        (Semantics.Templates.GameEvent.beginningOf Semantics.TurnPart.turn
-          (Option.some (player))
-          (Semantics.Templates.TurnRef.nextTime Option.none)))
-      (Option.some
-        (Semantics.Templates.GameEvent.endOf Semantics.TurnPart.turn
-          (Option.some (player))
-          (Semantics.Templates.TurnRef.nextTime Option.none)))
+    durationBetween
+      (some
+        (beginningOf Semantics.TurnPart.turn
+          (some (player))
+          (nextTime none)))
+      (some
+        (endOf Semantics.TurnPart.turn
+          (some (player))
+          (nextTime none)))
 }

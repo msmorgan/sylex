@@ -6,19 +6,19 @@ keyword crew (amount : Amount) : Ability := {
   },
   spelling := "crew <amount>",
   body :=
-    [Semantics.Templates.Ability.activated
-        (Semantics.Templates.Cost.perform
-          (Semantics.Definitions.tap
-            (Semantics.Templates.NounPhrase.withTotal (Semantics.ProjAxis.stat Semantics.Stat.power) Semantics.Comparator.atLeast
+    [activated
+        (perform
+          (tap
+            (withTotal (Semantics.ProjAxis.stat Semantics.Stat.power) Semantics.Comparator.atLeast
               amount
-              (Semantics.Templates.NounPhrase.allOf
-                (Semantics.Templates.Predicate.and
-                  [Semantics.Templates.Predicate.isUntapped,
-                    Semantics.Templates.Predicate.and
-                      [Semantics.Templates.Predicate.isCreature, Semantics.Templates.Predicate.youControl, Semantics.Templates.Predicate.isOther]])))))
-        (Semantics.Templates.Action.establishThroughout
-          (Semantics.Templates.StaticSpec.characteristicChange Semantics.Templates.NounPhrase.thisPermanent
-            [Semantics.Templates.CharacteristicEdit.characteristicEditTypeLine Semantics.QualityOp.adds
-                { types := Option.some [Semantics.CardType.artifact, Semantics.CardType.creature] }])
-          Semantics.Templates.Duration.untilEndOfTurn)]
+              (allOf
+                (and
+                  [isUntapped,
+                    and
+                      [isCreature, youControl, isOther]])))))
+        (establishThroughout
+          (characteristicChange thisPermanent
+            [characteristicEditTypeLine Semantics.QualityOp.adds
+                { types := some [Semantics.CardType.artifact, Semantics.CardType.creature] }])
+          untilEndOfTurn)]
 }

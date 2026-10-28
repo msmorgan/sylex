@@ -3,5 +3,5 @@
 template exiledFaceDown : FaceDown := {
   -- TODO(spelling): A card exiled face down: no characteristics .
   body :=
-    { characteristics := Option.none }
+    { characteristics := none }
 }

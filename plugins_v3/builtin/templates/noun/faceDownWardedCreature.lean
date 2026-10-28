@@ -8,10 +8,10 @@ template faceDownWardedCreature : FaceDown := {
   body :=
     {
       characteristics :=
-        Option.some
+        some
           { types := [Semantics.CardType.creature],
             text :=
               [Semantics.Ability.keyword (Semantics.KeywordLabel.named "ward")
-                  [Semantics.Templates.KeywordParam.keywordParamCost (Semantics.Templates.Cost.mana [Semantics.Templates.ManaSymbol.generic 2])] []],
-            power := Option.some 2, toughness := Option.some 2 } }
+                  [keywordParamCost (mana [generic 2])] []],
+            power := some 2, toughness := some 2 } }
 }

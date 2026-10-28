@@ -5,19 +5,19 @@ keyword storm : Ability := {
   lexical := { lemma := "storm" },
   spelling := "storm",
   body :=
-    [Semantics.Templates.Ability.when
-        (Semantics.Templates.GameEvent.does (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
-          (Semantics.Definitions.cast Semantics.Templates.NounPhrase.thisSpell))
-        (Semantics.Templates.Action.sequentially
-          [Semantics.Templates.Action.copy Semantics.CopySort.fromStack Semantics.Templates.NounPhrase.thisSpell
-              (Semantics.Templates.Amount.eventCount
-                (Semantics.Definitions.cast
-                  (Semantics.Templates.NounPhrase.a
-                    (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isSpell, Semantics.Templates.Predicate.isOther])))
-                (Semantics.Templates.Subject.actor (Semantics.Templates.NounPhrase.a Semantics.Templates.Predicate.isPlayer))
-                Semantics.Templates.Duration.earlierThisTurn)
+    [when
+        (does (actor you)
+          (cast thisSpell))
+        (sequentially
+          [copy Semantics.CopySort.fromStack thisSpell
+              (eventCount
+                (cast
+                  (a
+                    (and [isSpell, isOther])))
+                (actor (a isPlayer))
+                earlierThisTurn)
               [],
-            Semantics.Templates.Action.may
-              (Semantics.Templates.Action.chooseNewTargets
-                (Semantics.Templates.NounPhrase.nounPhrasePro (Semantics.Reach.word Semantics.NounWord.copy) Semantics.Plurality.many))])]
+            may
+              (chooseNewTargets
+                (nounPhrasePro (Semantics.Reach.word Semantics.NounWord.copy) Semantics.Plurality.many))])]
 }

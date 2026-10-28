@@ -2,7 +2,7 @@
 template theMonarch : NounPhrase := {
   spelling := "the monarch",
   body :=
-    Semantics.Templates.NounPhrase.the
-      (Semantics.Templates.Predicate.and
-        [Semantics.Templates.Predicate.isPlayer, Semantics.Templates.Predicate.hasDesignation Semantics.Definitions.monarch Option.none])
+    the
+      (and
+        [isPlayer, hasDesignation monarch none])
 }

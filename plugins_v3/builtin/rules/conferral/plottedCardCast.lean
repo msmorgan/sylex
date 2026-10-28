@@ -8,18 +8,18 @@ conferral plottedCardCast := {
   body :=
     {
       scope :=
-        Semantics.Templates.Predicate.and
-          [Semantics.Templates.Predicate.isCard, Semantics.Templates.Predicate.hasDesignation Semantics.Definitions.plotted,
-            Semantics.Templates.Predicate.in_ Semantics.Templates.Location.exileZone],
+        and
+          [isCard, hasDesignation plotted,
+            in_ exileZone],
       confer :=
         Semantics.Conferral.ability
-          (Semantics.Templates.Ability.static
-            (Semantics.Templates.StaticSpec.onlyUnless
-              (Semantics.Templates.StaticSpec.can (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
-                (Semantics.Definitions.cast Semantics.Templates.NounPhrase.this_ (Option.some Semantics.Templates.Location.exileZone)
-                  Semantics.Templates.PlayPayment.withoutPaying)
-                (Option.some Semantics.Templates.Timing.asSorcery))
-              (Semantics.Templates.Condition.did Semantics.Templates.Subject.any
-                (Semantics.Templates.Action.gainDesignation Semantics.Templates.NounPhrase.this_ Semantics.Definitions.plotted)
-                (Semantics.Templates.LookbackSpan.within Semantics.Templates.Duration.soFarThisTurn)))) }
+          (static
+            (onlyUnless
+              (can (actor you)
+                (cast this_ (some exileZone)
+                  withoutPaying)
+                (some asSorcery))
+              (did Subject.any
+                (gainDesignation this_ plotted)
+                (within soFarThisTurn)))) }
 }

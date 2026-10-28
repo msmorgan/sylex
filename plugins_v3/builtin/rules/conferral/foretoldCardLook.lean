@@ -6,12 +6,12 @@ conferral foretoldCardLook := {
   body :=
     {
       scope :=
-        Semantics.Templates.Predicate.and
-          [Semantics.Templates.Predicate.isCard, Semantics.Templates.Predicate.hasDesignation Semantics.Definitions.foretold,
-            Semantics.Templates.Predicate.in_ Semantics.Templates.Location.exileZone],
+        and
+          [isCard, hasDesignation foretold,
+            in_ exileZone],
       confer :=
         Semantics.Conferral.ability
-          (Semantics.Templates.Ability.static
-            (Semantics.Templates.StaticSpec.visibility Semantics.ExposeVerb.lookAt Semantics.Templates.NounPhrase.you
-              (Semantics.Templates.VisibleThing.objects Semantics.Templates.NounPhrase.this_))) }
+          (static
+            (visibility Semantics.ExposeVerb.lookAt you
+              (objects this_))) }
 }

@@ -2,8 +2,8 @@
 template lastTurn : Duration := {
   spelling := "last turn",
   body :=
-    Semantics.Templates.Duration.durationBetween
-      (Option.some
-        (Semantics.Templates.GameEvent.beginningOf Semantics.TurnPart.turn Option.none (Semantics.Templates.TurnRef.turnRefPrevious Option.none)))
-      (Option.some (Semantics.Templates.GameEvent.endOf Semantics.TurnPart.turn Option.none (Semantics.Templates.TurnRef.turnRefPrevious Option.none)))
+    durationBetween
+      (some
+        (beginningOf Semantics.TurnPart.turn none (turnRefPrevious none)))
+      (some (endOf Semantics.TurnPart.turn none (turnRefPrevious none)))
 }

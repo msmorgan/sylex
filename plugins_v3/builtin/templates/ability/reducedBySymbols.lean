@@ -3,5 +3,5 @@
 template reducedBySymbols (subject : NounPhrase) (cost : ManaCostTerm) : StaticSpec := {
   spelling := "<subject>'s total cost is reduced by <cost>",
   body :=
-    Semantics.Templates.StaticSpec.costShift subject (Semantics.Templates.CostShift.costShiftBySymbols (Semantics.Delta.down cost) Bool.false)
+    costShift subject (costShiftBySymbols (Semantics.Delta.down cost) false)
 }

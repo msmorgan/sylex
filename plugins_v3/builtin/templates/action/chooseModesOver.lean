@@ -9,5 +9,5 @@ template chooseModesOver {α : Type} (quantity : Quantity) (items : List α)
     (frame : splice (α → Action)) : Action := {
   -- TODO(spelling): Choose N. <frame>; wording varies with items, quantity, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
-    Semantics.Templates.Action.actionChooseModes quantity (List.map (fun (item : α) => (Option.none, Option.none, frame item)) items)
+    actionChooseModes quantity (List.map (fun (item : α) => (none, none, frame item)) items)
 }

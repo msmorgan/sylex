@@ -6,8 +6,8 @@ template entersUnless (subject : NounPhrase) (riders : List MoveRider)
     (condition : Condition) : StaticSpec := {
   spelling := "<subject> enters <riders> unless <condition>",
   body :=
-    Semantics.Templates.StaticSpec.replace
-      (Semantics.Templates.WouldClause.would (Semantics.Templates.Subject.actor subject) Semantics.Templates.Action.enter)
-      (Semantics.Templates.Replacement.doIf (Semantics.Templates.Condition.not condition) (Semantics.Templates.Replacement.withRiders riders))
-      Option.none Semantics.ReplUse.repeatedly Option.none
+    replace
+      (would (actor subject) enter)
+      (doIf (not condition) (withRiders riders))
+      none Semantics.ReplUse.repeatedly none
 }

@@ -11,8 +11,8 @@ template planeswalkerLoyalty : Conferral := {
   -- whose inherent or ability-free origin cannot be encoded by card-text substitution.
   body :=
     Semantics.Conferral.ability
-      (Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.entersWithCounters Semantics.Templates.NounPhrase.this_
-          (Semantics.Templates.Amount.statOf (Semantics.ProjAxis.stat Semantics.Stat.loyalty) Semantics.Templates.NounPhrase.this_)
+      (static
+        (entersWithCounters this_
+          (statOf (Semantics.ProjAxis.stat Semantics.Stat.loyalty) this_)
           (Semantics.CounterKind.named "loyaltyCounter")))
 }

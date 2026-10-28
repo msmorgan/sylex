@@ -5,6 +5,6 @@ action manifestPlacement (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "manifest", frames := [Monotransitive] }] },
   deed := "manifest",
   body :=
-    Semantics.Templates.Action.actionMove subject Semantics.Templates.Location.wherever (Option.some Semantics.Templates.Location.battlefield)
+    actionMove subject wherever (some battlefield)
       Semantics.ObservationPoint.arrival []
 }

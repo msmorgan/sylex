@@ -11,5 +11,5 @@ template cant (subj : Subject) (action : Action)
     (causedBy : Option Causing := none) : StaticSpec := {
   -- TODO(spelling): <subj> can't <action>; wording varies with asThough, causedBy, except, timing, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
-    Semantics.Templates.StaticSpec.staticSpecCant subj action { timing := timing, asThough := asThough, except := except, cause := causedBy }
+    staticSpecCant subj action { timing := timing, asThough := asThough, except := except, cause := causedBy }
 }

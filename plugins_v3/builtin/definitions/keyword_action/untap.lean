@@ -3,5 +3,5 @@ action untap (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "untap", past := "untapped", gerund := "untapping", frames := [Monotransitive, Intransitive] }] },
   spelling := "untap <subject>",
   body :=
-    Semantics.Templates.Action.setStatus Semantics.Status.untapped subject
+    setStatus Semantics.Status.untapped subject
 }

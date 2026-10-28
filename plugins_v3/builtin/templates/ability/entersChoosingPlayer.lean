@@ -2,5 +2,5 @@
 template entersChoosingPlayer (subject player : NounPhrase) : StaticSpec := {
   spelling := "As <subject> enters, choose <player>",
   body :=
-    Semantics.Templates.StaticSpec.entryChoice subject player
+    entryChoice subject player
 }

@@ -2,5 +2,5 @@
 template aTheirChoice (p : Predicate) : NounPhrase := {
   -- TODO(spelling): Context-dependent wording: a … of their choice; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Templates.NounPhrase.described (Semantics.Templates.DetPhrase.detPhraseA Semantics.ChoiceMode.theirChoice) p
+    described (detPhraseA Semantics.ChoiceMode.theirChoice) p
 }

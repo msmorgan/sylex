@@ -6,5 +6,5 @@ template pay (cost : Cost) (times : PayTimes) (outcome : PaymentOutcome := .paid
     (whose : Option NounPhrase := none) (keyword : Option KeywordLabel := none) : Action := {
   -- TODO(spelling): pay <cost>; wording varies with keyword, outcome, times, whose, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
-    Semantics.Templates.Action.actionPay (Semantics.Cost.asPaid cost) times outcome whose keyword
+    actionPay (Semantics.Cost.asPaid cost) times outcome whose keyword
 }

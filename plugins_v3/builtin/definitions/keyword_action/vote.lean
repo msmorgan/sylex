@@ -6,5 +6,5 @@ action vote (disclosure : Disclosure := .openly)
   -- on optional fields or supply contextual agreement and morphology.
   lexical := { verbs := [{ lemma := "vote", frames := [(Prepositional ["for"]), Intransitive] }] },
   body :=
-    Semantics.Templates.Action.actionVote Option.none disclosure ballot times
+    actionVote none disclosure ballot times
 }

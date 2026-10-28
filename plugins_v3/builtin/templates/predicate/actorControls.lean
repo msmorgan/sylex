@@ -2,5 +2,5 @@
 template actorControls : Predicate := {
   -- TODO(spelling): Context-dependent wording: … <performer> controls; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Templates.Predicate.hasPossessor Semantics.PossessorAxis.controller Semantics.Templates.NounPhrase.theActor
+    hasPossessor Semantics.PossessorAxis.controller theActor
 }

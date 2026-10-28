@@ -3,5 +3,5 @@
 template isPermanent : Predicate := {
   spelling := "permanent",
   body :=
-    Semantics.Templates.Predicate.in_ Semantics.Templates.Location.battlefield
+    in_ battlefield
 }

@@ -2,5 +2,5 @@
 template joinedHead (event : GameEvent) : JoinedHeader := {
   spelling := "whenever <event>",
   body :=
-    { event := event, alternatives := [], while_ := Option.none, timing := Option.none }
+    { event := event, alternatives := [], while_ := none, timing := none }
 }

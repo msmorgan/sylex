@@ -12,7 +12,7 @@ action fightEachOther (pair : NounPhrase) : Action := {
   permanent := performs,
   spelling := "<pair> fight each other",
   body :=
-    Semantics.Templates.Action.doIf (Semantics.Templates.Condition.is pair Semantics.Templates.Predicate.isCreature)
-      (Semantics.Templates.Action.instruct (Semantics.Templates.NounPhrase.eachOf pair)
-        (Semantics.Templates.Action.dealDamage (Semantics.Templates.Amount.powerOf Semantics.Templates.NounPhrase.it) Semantics.Templates.NounPhrase.theOther))
+    doIf (is pair isCreature)
+      (instruct (eachOf pair)
+        (dealDamage (powerOf it) theOther))
 }

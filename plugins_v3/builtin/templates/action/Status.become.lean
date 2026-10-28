@@ -3,5 +3,5 @@
 template Status.become (status : Status) : Action := {
   -- TODO(spelling): Context-dependent wording: <subject> becomes <status>; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Templates.Action.setStatus status Semantics.Templates.NounPhrase.theActor
+    setStatus status theActor
 }

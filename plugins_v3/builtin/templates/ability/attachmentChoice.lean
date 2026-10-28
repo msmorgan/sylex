@@ -3,8 +3,8 @@ it becomes attached. -/
 template attachmentChoice (subject chosen : NounPhrase) : StaticSpec := {
   spelling := "As <subject> becomes attached, choose <chosen>",
   body :=
-    Semantics.Templates.StaticSpec.asEvent
-      (Semantics.Templates.GameEvent.does Semantics.Templates.Subject.any
-        (Semantics.Templates.Action.attachment Semantics.AttachMove.attached subject Option.none))
-      (Semantics.Templates.Action.actionChoose Option.none chosen Semantics.Disclosure.openly Option.none)
+    asEvent
+      (does Subject.any
+        (attachment Semantics.AttachMove.attached subject none))
+      (actionChoose none chosen Semantics.Disclosure.openly none)
 }

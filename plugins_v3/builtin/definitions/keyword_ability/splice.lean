@@ -14,11 +14,11 @@ keyword Ability.splice (quality : Predicate) (cost : Cost) : Ability := {
   -- TODO(spelling): splice onto [quality] [mana cost] / splice onto [quality]—[verbal cost]. The
   -- separator and terminal period depend on the Cost structure.
   body :=
-    [Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.staticSpecRevealedAsCast
-          (Semantics.Templates.NounPhrase.a (Semantics.Templates.Predicate.and [Semantics.Templates.Predicate.isSpell, quality]))
-          (Semantics.Templates.StaticSpec.staticSpecConjunction Option.none
-            [Semantics.Templates.StaticSpec.addedCost cost Bool.false Semantics.PayTimes.once,
-              Semantics.Templates.StaticSpec.textChange (Semantics.Templates.NounPhrase.that Semantics.NounWord.spell)
-                (Semantics.Templates.TextChange.appendTextOf Semantics.Templates.NounPhrase.this_)]))]
+    [static
+        (staticSpecRevealedAsCast
+          (a (and [isSpell, quality]))
+          (staticSpecConjunction none
+            [addedCost cost false Semantics.PayTimes.once,
+              textChange (that Semantics.NounWord.spell)
+                (appendTextOf this_)]))]
 }

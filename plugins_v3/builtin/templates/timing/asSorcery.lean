@@ -6,10 +6,10 @@ holds without priority [CR#307.5a]. -/
 template asSorcery : Timing := {
   spelling := "only as a sorcery",
   body :=
-    Semantics.Templates.Timing.and
-      [Semantics.Templates.Timing.whileTrue (Semantics.Templates.Condition.conditionHasPriority Semantics.Templates.NounPhrase.you),
-        Semantics.Templates.Timing.timingInPart Semantics.TurnPart.mainPhase (Option.some Semantics.Templates.NounPhrase.you)
-          Semantics.Templates.TurnRef.turnRefCurrent,
-        Semantics.Templates.Timing.whileTrue
-          (Semantics.Templates.Condition.not (Semantics.Templates.Condition.exists_ (Semantics.Templates.Predicate.in_ Semantics.Templates.Location.stack)))]
+    and
+      [whileTrue (conditionHasPriority you),
+        timingInPart Semantics.TurnPart.mainPhase (some you)
+          turnRefCurrent,
+        whileTrue
+          (not (exists_ (in_ stack)))]
 }

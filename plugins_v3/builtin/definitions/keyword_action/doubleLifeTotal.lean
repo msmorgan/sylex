@@ -5,6 +5,6 @@ action doubleLifeTotal : Action := {
   deed := "double",
   spelling := "double your life total",
   body :=
-    Semantics.Templates.Action.changeLife
-      (Semantics.Templates.setTo (Semantics.Templates.Amount.times 2 (Semantics.Templates.Amount.lifeTotalOf Semantics.Templates.NounPhrase.actor)))
+    changeLife
+      (setTo (times 2 (lifeTotalOf actor)))
 }

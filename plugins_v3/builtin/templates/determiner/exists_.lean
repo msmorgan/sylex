@@ -3,5 +3,5 @@
 template exists_ (p : Predicate) : Condition := {
   -- TODO(spelling): Context-dependent wording: if there is a …; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Templates.Condition.thereAre (Semantics.Templates.NounPhrase.described (Semantics.Templates.DetPhrase.detPhraseA Semantics.ChoiceMode.unmarked) p)
+    thereAre (described (detPhraseA Semantics.ChoiceMode.unmarked) p)
 }

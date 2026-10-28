@@ -1,5 +1,5 @@
 template thisCase : NounPhrase := {
   spelling := "this Case",
   body :=
-    Semantics.Templates.NounPhrase.headed (Semantics.NounWord.subtype Semantics.Definitions.case) Semantics.Templates.NounPhrase.this_
+    headed (Semantics.NounWord.subtype case) this_
 }

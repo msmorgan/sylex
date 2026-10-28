@@ -3,5 +3,5 @@
 template thisCard : NounPhrase := {
   spelling := "this card",
   body :=
-    Semantics.Templates.NounPhrase.headed Semantics.NounWord.card Semantics.Templates.NounPhrase.this_
+    headed Semantics.NounWord.card this_
 }

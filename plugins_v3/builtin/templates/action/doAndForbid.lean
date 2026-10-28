@@ -4,8 +4,8 @@ regenerated"). -/
 template doAndForbid (action forbidden : Action) : Action := {
   spelling := "<action>. <forbidden> can't happen this turn",
   body :=
-    Semantics.Templates.Action.sequentially
+    sequentially
       [action,
-        Semantics.Templates.Action.establish (Semantics.Templates.StaticSpec.staticSpecCant Semantics.Templates.Subject.any forbidden { })
-          (Option.some Semantics.Templates.Duration.untilEndOfTurn)]
+        establish (staticSpecCant Subject.any forbidden { })
+          (some untilEndOfTurn)]
 }

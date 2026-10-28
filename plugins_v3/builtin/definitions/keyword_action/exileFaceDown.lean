@@ -4,6 +4,6 @@ action exileFaceDown (subject : NounPhrase) : Action := {
   deed := "exile",
   spelling := "exile <subject> face down",
   body :=
-    Semantics.Templates.Action.actionMove subject Semantics.Templates.Location.wherever (Option.some Semantics.Templates.Location.exileZone)
-      Semantics.ObservationPoint.arrival [Semantics.Templates.MoveRider.faceDownAs Semantics.Templates.FaceDown.exiledFaceDown]
+    actionMove subject wherever (some exileZone)
+      Semantics.ObservationPoint.arrival [faceDownAs exiledFaceDown]
 }

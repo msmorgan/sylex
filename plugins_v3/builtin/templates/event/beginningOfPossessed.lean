@@ -2,5 +2,5 @@
 template beginningOfPossessed (part : TurnPart) (possessor : NounPhrase) : GameEvent := {
   spelling := "at the beginning of <possessor>'s <part>",
   body :=
-    Semantics.Templates.GameEvent.beginningOf part (Option.some possessor) (Semantics.Templates.TurnRef.eachTime Option.none)
+    beginningOf part (some possessor) (eachTime none)
 }

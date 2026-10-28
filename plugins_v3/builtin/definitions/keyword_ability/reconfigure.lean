@@ -6,17 +6,17 @@ keyword reconfigure (cost : Cost) : Ability := {
   -- TODO(spelling): reconfigure [mana cost] / reconfigure—[verbal cost]; separator and terminal
   -- period depend on the Cost structure.
   body :=
-    [Semantics.Templates.Ability.activatedOnlyDuring cost
-        (Semantics.Definitions.attachTo Semantics.Templates.NounPhrase.thisPermanent
-          (Semantics.Templates.NounPhrase.target
-            (Semantics.Templates.Predicate.and
-              [Semantics.Templates.Predicate.isCreature, Semantics.Templates.Predicate.isOther, Semantics.Templates.Predicate.youControl])))
-        Semantics.Templates.Timing.asSorcery,
-      Semantics.Templates.Ability.abilityActivated cost (Semantics.Templates.Action.unattach Semantics.Templates.NounPhrase.thisPermanent)
-        (Option.some Semantics.Templates.Timing.asSorcery) Option.none
-        (Option.some
-          (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.thisPermanent
-            (Semantics.Templates.Predicate.predicateAttachment Semantics.AttachmentSide.attachment Option.none
-              (Option.some (Semantics.Templates.NounPhrase.a Semantics.Templates.Predicate.isCreature)))))
-        Option.none]
+    [activatedOnlyDuring cost
+        (attachTo thisPermanent
+          (target
+            (and
+              [isCreature, isOther, youControl])))
+        asSorcery,
+      abilityActivated cost (unattach thisPermanent)
+        (some asSorcery) none
+        (some
+          (is thisPermanent
+            (predicateAttachment Semantics.AttachmentSide.attachment none
+              (some (a isCreature)))))
+        none]
 }

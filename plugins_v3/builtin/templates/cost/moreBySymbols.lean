@@ -3,5 +3,5 @@
 template moreBySymbols (cost : ManaCostTerm) : CostShift := {
   spelling := "costs <cost> more",
   body :=
-    Semantics.Templates.CostShift.costShiftBySymbols (Semantics.Delta.up cost) Bool.false
+    costShiftBySymbols (Semantics.Delta.up cost) false
 }

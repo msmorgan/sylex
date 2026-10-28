@@ -3,5 +3,5 @@
 template sagaHasTriggeredChapter : Condition := {
   spelling := "this Saga is the source of a chapter ability that has triggered but not yet left the stack",
   body :=
-    exists_ (Semantics.Templates.Predicate.and [chapterAbilityOf thisSaga, triggeredNotLeftStack])
+    exists_ (and [chapterAbilityOf thisSaga, triggeredNotLeftStack])
 }

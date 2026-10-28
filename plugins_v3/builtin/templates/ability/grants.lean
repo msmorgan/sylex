@@ -6,6 +6,6 @@ template grants (keyword : KeywordLabel) : Conferral := {
   spelling := "<keyword>",
   body :=
     Semantics.Conferral.property
-      (Semantics.Templates.StaticSpec.characteristicChange Semantics.Templates.NounPhrase.this_
-        [Semantics.Templates.CharacteristicEdit.characteristicEditAddedAbilities [Semantics.Ability.keyword keyword [] []]])
+      (characteristicChange this_
+        [characteristicEditAddedAbilities [Semantics.Ability.keyword keyword [] []]])
 }

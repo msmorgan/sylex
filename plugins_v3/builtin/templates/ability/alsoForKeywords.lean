@@ -17,25 +17,25 @@ template alsoForKeywords (body : KeywordTerm → Ability)
         (fun (x : Semantics.Ability) =>
           match x with
           | Semantics.Ability.triggered event alternatives while_ joins timing limit intervening action =>
-            Option.some action
-          | x => Option.none)
+            some action
+          | x => none)
         parts;
     have specs :=
       List.filterMap
         (fun (x : Semantics.Ability) =>
           match x with
-          | Semantics.Ability.static spec => Option.some spec
-          | x => Option.none)
+          | Semantics.Ability.static spec => some spec
+          | x => none)
         parts;
     match parts with
     | Semantics.Ability.triggered event alternatives while_ joins timing limit intervening action :: tail =>
-      if (List.length actions == List.length parts) = Bool.true then
-        Semantics.Templates.Ability.abilityTriggered event alternatives while_ joins timing limit intervening
-          (Semantics.Templates.Action.sequentially actions)
-      else Semantics.Templates.Ability.static (Semantics.Templates.StaticSpec.staticSpecConjunction Option.none [])
+      if (List.length actions == List.length parts) = true then
+        abilityTriggered event alternatives while_ joins timing limit intervening
+          (sequentially actions)
+      else static (staticSpecConjunction none [])
     | Semantics.Ability.static spec :: tail =>
-      Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.staticSpecConjunction Option.none
-          (if (List.length specs == List.length parts) = Bool.true then specs else []))
-    | x => Semantics.Templates.Ability.static (Semantics.Templates.StaticSpec.staticSpecConjunction Option.none [])
+      static
+        (staticSpecConjunction none
+          (if (List.length specs == List.length parts) = true then specs else []))
+    | x => static (staticSpecConjunction none [])
 }

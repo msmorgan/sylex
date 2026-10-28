@@ -6,23 +6,23 @@ action learn : Action := {
   lexical := { verbs := [{ lemma := "learn", frames := [Intransitive] }] },
   spelling := "learn",
   body :=
-    Semantics.Templates.Action.sequentially
-      [Semantics.Templates.Action.may (Semantics.Definitions.discard (Semantics.Templates.NounPhrase.a Semantics.Templates.Predicate.isCard))
-          (Option.some (Semantics.Templates.Action.draw 1)),
-        Semantics.Templates.Action.doIf
-          (Semantics.Templates.Condition.not
-            (Semantics.Templates.Condition.exists_
-              (Semantics.Templates.Predicate.and
-                [Semantics.Templates.Predicate.isCard,
-                  Semantics.Templates.Predicate.was (Semantics.Definitions.discard Semantics.Templates.NounPhrase.which)
-                    (Option.some Semantics.Templates.LookbackSpan.thisWay)])))
-          (Semantics.Templates.Action.may
-            (Semantics.Templates.Action.sequentially
-              [Semantics.Definitions.reveal
-                  (Semantics.Templates.NounPhrase.a
-                    (Semantics.Templates.Predicate.and
-                      [Semantics.Templates.Predicate.isCard, Semantics.Templates.Predicate.hasSubtype Semantics.Definitions.lesson,
-                        Semantics.Templates.Predicate.ownedBy Semantics.Templates.NounPhrase.actor, Semantics.Templates.Predicate.outsideTheGame])),
-                Semantics.Templates.Action.putInto Semantics.Templates.NounPhrase.it
-                  (Semantics.Templates.Location.handOf Semantics.Templates.NounPhrase.actor)]))]
+    sequentially
+      [may (discard (a isCard))
+          (some (draw 1)),
+        doIf
+          (not
+            (exists_
+              (and
+                [isCard,
+                  was (discard which)
+                    (some thisWay)])))
+          (may
+            (sequentially
+              [reveal
+                  (a
+                    (and
+                      [isCard, hasSubtype lesson,
+                        ownedBy actor, outsideTheGame])),
+                putInto it
+                  (handOf actor)]))]
 }

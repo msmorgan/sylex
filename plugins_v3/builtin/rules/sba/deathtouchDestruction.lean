@@ -5,21 +5,21 @@ is the destroy action, which regeneration can replace. -/
 sba deathtouchDestruction := {
 
   body :=
-    { scope := Semantics.Templates.Predicate.isCreature,
+    { scope := isCreature,
       when :=
-        Semantics.Templates.Condition.and
-          [Semantics.Templates.Condition.compareAmt (Semantics.Templates.Amount.toughnessOf Semantics.Templates.NounPhrase.this_)
+        and
+          [compareAmt (toughnessOf this_)
               Semantics.Comparator.greater 0,
-            Semantics.Templates.Condition.did
-              (Semantics.Templates.Subject.by_
-                (Semantics.Templates.NounPhrase.a
-                  (Semantics.Templates.Predicate.and
-                    [Semantics.Templates.Predicate.isSource,
-                      Semantics.Templates.Predicate.hasKeyword
-                        (Semantics.Templates.KeywordTerm.theKeyword Semantics.Definitions.deathtouch.label)])))
-              (Semantics.Templates.Action.dealDamage Semantics.Templates.Amount.anyAmount Semantics.Templates.NounPhrase.this_)
-              (Semantics.Templates.LookbackSpan.within
-                (Semantics.Templates.Duration.durationBetween (Option.some Semantics.Templates.GameEvent.gameEventStateBasedActionsChecked)
-                  (Option.some Semantics.Templates.GameEvent.gameEventNow)))],
-      then_ := Semantics.Definitions.destroy Semantics.Templates.NounPhrase.this_ }
+            did
+              (by_
+                (a
+                  (and
+                    [isSource,
+                      hasKeyword
+                        (theKeyword deathtouch.label)])))
+              (dealDamage anyAmount this_)
+              (within
+                (durationBetween (some gameEventStateBasedActionsChecked)
+                  (some gameEventNow)))],
+      then_ := destroy this_ }
 }

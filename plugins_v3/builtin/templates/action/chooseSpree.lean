@@ -3,10 +3,10 @@
 template chooseSpree (modes : List (Option Cost × Action)) : Action := {
   -- TODO(spelling): Context-dependent wording: Choose one or more — [cost] — <mode>; …; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Templates.Action.actionChooseModes (Semantics.Templates.Quantity.orMore 1)
+    actionChooseModes (orMore 1)
       (List.map
         (fun (x : Option Semantics.Cost × Semantics.Action) =>
           match x with
-          | (c, e) => (c, Option.none, e))
+          | (c, e) => (c, none, e))
         modes)
 }

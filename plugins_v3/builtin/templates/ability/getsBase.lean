@@ -2,5 +2,5 @@
 template getsBase (subject : NounPhrase) (power toughness : Amount) : StaticSpec := {
   -- TODO(spelling): Context-dependent wording: <subject> has base power and toughness P/T; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Templates.StaticSpec.getsPt subject (Semantics.Templates.setTo power) (Semantics.Templates.setTo toughness)
+    getsPt subject (setTo power) (setTo toughness)
 }

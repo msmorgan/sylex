@@ -2,5 +2,5 @@
 template moreThan (n : Nat) : Quantity := {
   spelling := "more than <n>",
   body :=
-    Semantics.Templates.Quantity.quantityMoreThanOf (Semantics.Templates.Amount.amountLit ↑n)
+    quantityMoreThanOf (amountLit ↑n)
 }

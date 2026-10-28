@@ -3,6 +3,6 @@
 template onALaterTurn : Duration := {
   spelling := "on a later turn",
   body :=
-    Semantics.Templates.Duration.durationBetween
-      (Option.some (Semantics.Templates.GameEvent.endOf Semantics.TurnPart.turn Option.none Semantics.Templates.TurnRef.turnRefCurrent)) Option.none
+    durationBetween
+      (some (endOf Semantics.TurnPart.turn none turnRefCurrent)) none
 }

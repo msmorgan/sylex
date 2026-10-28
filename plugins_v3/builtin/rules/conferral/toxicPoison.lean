@@ -9,16 +9,16 @@ conferral toxicPoison := {
   body :=
     {
       scope :=
-        Semantics.Templates.Predicate.and
-          [Semantics.Templates.Predicate.isCreature,
-            Semantics.Templates.Predicate.hasKeyword (Semantics.KeywordTerm.the (Semantics.KeywordLabel.named "toxic"))],
+        and
+          [isCreature,
+            hasKeyword (Semantics.KeywordTerm.the (Semantics.KeywordLabel.named "toxic"))],
       confer :=
         Semantics.Conferral.property
-          (Semantics.Templates.StaticSpec.asEvent
-            (Semantics.Templates.GameEvent.does (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.this_)
-              (Semantics.Templates.Action.dealDamage Semantics.Templates.Amount.anyAmount
-                (Semantics.Templates.NounPhrase.a Semantics.Templates.Predicate.isPlayer) (Option.some Semantics.DamageKind.combat)))
-            (Semantics.Templates.Action.putCounters (Semantics.Templates.Amount.totalToxicValue Semantics.Templates.NounPhrase.this_)
-              (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.poison)
-              (Semantics.Templates.NounPhrase.that Semantics.Templates.NounWord.player))) }
+          (asEvent
+            (does (actor this_)
+              (dealDamage anyAmount
+                (a isPlayer) (some Semantics.DamageKind.combat)))
+            (putCounters (totalToxicValue this_)
+              (printedKind poison)
+              (that player))) }
 }

@@ -7,15 +7,15 @@ keyword flashback (cost : Cost) : Ability := {
   -- TODO(spelling): flashback [mana cost] / flashback—[verbal cost]; separator and terminal
   -- period depend on the Cost structure.
   body :=
-    [Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.can (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.you)
-          (Semantics.Definitions.cast Semantics.Templates.NounPhrase.this_ (Option.some Semantics.Templates.Location.yourGraveyard)
-            (Semantics.Templates.PlayPayment.payingInstead cost) (Option.some Semantics.Templates.Predicate.isInstantOrSorcery))),
-      Semantics.Templates.Ability.static
-        (Semantics.Templates.StaticSpec.replace
-          (Semantics.Templates.WouldClause.would (Semantics.Templates.Subject.actor Semantics.Templates.NounPhrase.thisSpell)
-            (Semantics.Templates.Action.leave Semantics.Templates.Location.stack))
-          (Semantics.Templates.Replacement.doIf
-            (Semantics.Templates.Condition.keywordCostPaid Semantics.Definitions.flashback.label Semantics.Templates.NounPhrase.thisSpell)
-            (Semantics.Templates.Replacement.instead (Semantics.Definitions.exile Semantics.Templates.NounPhrase.thisSpell))))]
+    [static
+        (can (actor you)
+          (cast this_ (some yourGraveyard)
+            (payingInstead cost) (some isInstantOrSorcery))),
+      static
+        (replace
+          (would (actor thisSpell)
+            (leave stack))
+          (doIf
+            (keywordCostPaid flashback.label thisSpell)
+            (instead (exile thisSpell))))]
 }

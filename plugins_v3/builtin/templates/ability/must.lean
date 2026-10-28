@@ -10,5 +10,5 @@ template must (subj : Subject) (action : Action)
     (except : Option DeonticExcept := none) : StaticSpec := {
   -- TODO(spelling): <subj> <action>s if able; string substitution cannot inflect verbs, nouns, or ordinals.
   body :=
-    Semantics.Templates.StaticSpec.staticSpecMust subj action { timing := timing, asThough := asThough, except := except }
+    staticSpecMust subj action { timing := timing, asThough := asThough, except := except }
 }

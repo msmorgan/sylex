@@ -2,5 +2,5 @@
 template more (amount : Amount) : CostShift := {
   spelling := "costs <amount> more",
   body :=
-    Semantics.Templates.CostShift.costShiftGeneric (Semantics.Templates.up amount) Option.none
+    costShiftGeneric (up amount) none
 }

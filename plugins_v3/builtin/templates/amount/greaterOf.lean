@@ -2,5 +2,5 @@
 template greaterOf (a b : Amount) : Amount := {
   spelling := "the greater of <a> and <b>",
   body :=
-    Semantics.Templates.Amount.aggregateOf Semantics.AggregateOp.max [a, b]
+    aggregateOf Semantics.AggregateOp.max [a, b]
 }

@@ -5,18 +5,18 @@ action amass (subtype : Subtype) (count : Amount) : Action := {
   -- substitution cannot inflect.
   lexical := { verbs := [{ lemma := "amass", frames := [TransitiveAmount, Monotransitive] }] },
   body :=
-    Semantics.Templates.Action.sequentially
-      [Semantics.Templates.Action.doIf
-          (Semantics.Templates.Condition.not (Semantics.Templates.Condition.exists_ Semantics.Templates.Predicate.army))
-          (Semantics.Definitions.create 1
-            (Semantics.Templates.TokenSpec.written
-              (Semantics.Templates.CharacteristicBundle.creatureToken 0 0 [Semantics.Color.black]
-                [subtype, Semantics.Definitions.Subtype.army]))),
-        Semantics.Templates.Action.choose (Semantics.Templates.NounPhrase.a Semantics.Templates.Predicate.army),
-        Semantics.Templates.Action.putCounters count (Semantics.Templates.CounterKindSource.printedKind Semantics.Definitions.p1p1Counter)
-          (Semantics.Templates.NounPhrase.that (Semantics.NounWord.type Semantics.CardType.creature)),
-        Semantics.Templates.Action.doIf
-          (Semantics.Templates.Condition.not
-            (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.it (Semantics.Templates.Predicate.hasSubtype subtype)))
-          (Semantics.Templates.Action.become Semantics.Templates.NounPhrase.it { characteristics := { subtypes := [subtype] } })]
+    sequentially
+      [doIf
+          (not (exists_ Predicate.army))
+          (create 1
+            (written
+              (creatureToken 0 0 [Semantics.Color.black]
+                [subtype, army]))),
+        choose (a Predicate.army),
+        putCounters count (printedKind p1p1Counter)
+          (that (Semantics.NounWord.type Semantics.CardType.creature)),
+        doIf
+          (not
+            (is it (hasSubtype subtype)))
+          (become it { characteristics := { subtypes := [subtype] } })]
 }

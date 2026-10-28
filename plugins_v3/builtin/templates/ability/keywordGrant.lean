@@ -7,8 +7,8 @@ template keywordGrant (subject : NounPhrase) (term : KeywordTerm)
   -- TODO(spelling): <subject> has <term>; wording varies with holders, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
     match term with
-    | Semantics.KeywordTerm.the label => Semantics.Templates.StaticSpec.abilityGrant subject (Semantics.Templates.keyword label)
+    | Semantics.KeywordTerm.the label => abilityGrant subject (keyword label)
     | x =>
-      Semantics.Templates.StaticSpec.abilityGrantSelected subject (Semantics.Templates.NounPhrase.allOf holders)
-        (Semantics.Templates.AbilitySelection.abilitySelectionSpecified [Semantics.Templates.AbilityLost.abilities term])
+      abilityGrantSelected subject (allOf holders)
+        (abilitySelectionSpecified [abilities term])
 }

@@ -6,6 +6,6 @@ template dealDamageOwnPower (source : NounPhrase) (recipient : NounPhrase) :
     Action := {
   spelling := "<source> deals damage equal to its power to <recipient>",
   body :=
-    Semantics.Templates.Action.instruct source
-      (Semantics.Templates.Action.dealDamage (Semantics.Templates.Amount.powerOf Semantics.Templates.NounPhrase.it) recipient)
+    instruct source
+      (dealDamage (powerOf it) recipient)
 }

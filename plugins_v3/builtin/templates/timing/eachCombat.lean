@@ -3,5 +3,5 @@
 template eachCombat : Timing := {
   spelling := "each combat",
   body :=
-    Semantics.Templates.Timing.timingInPart Semantics.TurnPart.combat Option.none (Semantics.Templates.TurnRef.eachTime Option.none)
+    timingInPart Semantics.TurnPart.combat none (eachTime none)
 }

@@ -6,5 +6,5 @@ keyword multikicker (cost : Cost) : Ability := {
   label := "kicker",
   spelling := "multikicker <cost>",
   body :=
-    [Semantics.Templates.Ability.static (Semantics.Templates.StaticSpec.addedCost cost Bool.true Semantics.PayTimes.anyNumberOfTimes)]
+    [static (addedCost cost true Semantics.PayTimes.anyNumberOfTimes)]
 }

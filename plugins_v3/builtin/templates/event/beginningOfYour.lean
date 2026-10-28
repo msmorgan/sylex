@@ -2,5 +2,5 @@
 template beginningOfYour (part : TurnPart) : GameEvent := {
   spelling := "at the beginning of your <part>",
   body :=
-    Semantics.Templates.GameEvent.beginningOf part (Option.some Semantics.Templates.NounPhrase.you) (Semantics.Templates.TurnRef.eachTime Option.none)
+    beginningOf part (some you) (eachTime none)
 }

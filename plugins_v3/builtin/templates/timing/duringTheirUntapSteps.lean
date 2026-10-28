@@ -4,7 +4,7 @@ resolved to the players the deontic subject names ("Players can't untap …") [C
 template duringTheirUntapSteps : Timing := {
   spelling := "during their untap steps",
   body :=
-    Semantics.Templates.Timing.timingInPart Semantics.TurnPart.untapStep
-      (Option.some (Semantics.Templates.NounPhrase.nounPhrasePro (Semantics.Reach.word Semantics.NounWord.player) Semantics.Plurality.many))
-      (Semantics.Templates.TurnRef.eachTime Option.none)
+    timingInPart Semantics.TurnPart.untapStep
+      (some (nounPhrasePro (Semantics.Reach.word Semantics.NounWord.player) Semantics.Plurality.many))
+      (eachTime none)
 }

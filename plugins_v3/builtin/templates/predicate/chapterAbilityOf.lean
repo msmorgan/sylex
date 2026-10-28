@@ -3,7 +3,7 @@
 template chapterAbilityOf (saga : NounPhrase) : Predicate := {
   spelling := "a chapter ability of <saga>",
   body :=
-    Semantics.Templates.Predicate.and
-      [Semantics.Templates.Predicate.abilityOf saga,
-        Semantics.Templates.Predicate.predicateCompare [Semantics.ProjAxis.chapter] Semantics.Comparator.atLeast 1]
+    and
+      [abilityOf saga,
+        predicateCompare [Semantics.ProjAxis.chapter] Semantics.Comparator.atLeast 1]
 }

@@ -9,5 +9,5 @@ template can (subj : Subject) (action : Action)
     (rider : Option Action := none) : StaticSpec := {
   -- TODO(spelling): <subj> can <action>; wording varies with asThough, except, rider, timing, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
-    Semantics.Templates.StaticSpec.staticSpecCan subj action { timing := timing, asThough := asThough, except := except, rider := rider }
+    staticSpecCan subj action { timing := timing, asThough := asThough, except := except, rider := rider }
 }

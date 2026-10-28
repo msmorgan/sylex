@@ -3,5 +3,5 @@ definition. -/
 template define (letter : Letter) (amount : Amount) : Action := {
   spelling := "<letter> is <amount>",
   body :=
-    Semantics.Templates.Action.establish (Semantics.Templates.StaticSpec.letterDefinition letter amount) Option.none
+    establish (letterDefinition letter amount) none
 }

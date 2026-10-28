@@ -4,5 +4,5 @@ template fullPartyOf (player : NounPhrase) : Condition := {
   -- TODO(spelling): <player> has/have a full party; string substitution cannot select possessive or
   -- subject agreement.
   body :=
-    Semantics.Templates.Condition.compareAmt (Semantics.Templates.Amount.partySizeOf player) Semantics.Comparator.eq 4
+    compareAmt (partySizeOf player) Semantics.Comparator.eq 4
 }

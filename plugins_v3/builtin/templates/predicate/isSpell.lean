@@ -3,7 +3,7 @@
 template isSpell : Predicate := {
   spelling := "spell",
   body :=
-    Semantics.Templates.Predicate.and
-      [Semantics.Templates.Predicate.in_ Semantics.Templates.Location.stack,
-        Semantics.Templates.Predicate.not (Semantics.Templates.Predicate.abilityHead Semantics.AbilityClass.anyOnStack)]
+    and
+      [in_ stack,
+        not (abilityHead Semantics.AbilityClass.anyOnStack)]
 }

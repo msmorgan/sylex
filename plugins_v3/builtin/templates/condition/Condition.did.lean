@@ -3,5 +3,5 @@ template Condition.did (subj : Subject) (action : Action) (within : LookbackSpan
     Condition := {
   -- TODO(spelling): if <subj> <action>ed <within>; string substitution cannot inflect verbs, nouns, or ordinals.
   body :=
-    Semantics.Templates.Condition.conditionDid { subj := subj, action := action, within := Option.some within }
+    conditionDid { subj := subj, action := action, within := some within }
 }

@@ -5,8 +5,8 @@ template entryChoice (subject chosen : NounPhrase) (disclosure : Disclosure := .
     StaticSpec := {
   -- TODO(spelling): Context-dependent wording: As <subject> enters, [secretly] choose <chosen>; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Templates.StaticSpec.replace
-      (Semantics.Templates.WouldClause.would (Semantics.Templates.Subject.actor subject) Semantics.Templates.Action.enter)
-      (Semantics.Templates.Replacement.before (Semantics.Templates.Action.actionChoose Option.none chosen disclosure Option.none) Option.none)
-      Option.none Semantics.ReplUse.repeatedly Option.none
+    replace
+      (would (actor subject) enter)
+      (before (actionChoose none chosen disclosure none) none)
+      none Semantics.ReplUse.repeatedly none
 }

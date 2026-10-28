@@ -2,5 +2,5 @@
 template either (left right : Cost) : Cost := {
   spelling := "<left> or <right>",
   body :=
-    Semantics.Templates.Cost.or [left, right]
+    or [left, right]
 }

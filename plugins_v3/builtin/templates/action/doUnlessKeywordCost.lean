@@ -6,8 +6,8 @@ template doUnlessKeywordCost (action : Action) (cost : Cost) (whose : NounPhrase
     (keyword : KeywordLabel) : Action := {
   spelling := "<action> unless you pay <whose>'s <keyword> cost",
   body :=
-    Semantics.Templates.Action.withContinuation Semantics.ContinuationPolicy.optional
-      (Semantics.Templates.Action.actionPay (Semantics.Cost.asPaid cost) Semantics.PayTimes.once Semantics.PaymentOutcome.paid
-        (Option.some whose) (Option.some keyword))
-      Option.none (Option.some action)
+    withContinuation Semantics.ContinuationPolicy.optional
+      (actionPay (Semantics.Cost.asPaid cost) Semantics.PayTimes.once Semantics.PaymentOutcome.paid
+        (some whose) (some keyword))
+      none (some action)
 }

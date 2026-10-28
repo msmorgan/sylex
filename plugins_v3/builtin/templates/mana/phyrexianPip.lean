@@ -3,5 +3,5 @@
 template phyrexianPip (color : Color) : ManaSymbol := {
   -- TODO(spelling): Context-dependent wording: {G/P}; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.ManaSymbol.phyrexian color Option.none
+    Semantics.ManaSymbol.phyrexian color none
 }

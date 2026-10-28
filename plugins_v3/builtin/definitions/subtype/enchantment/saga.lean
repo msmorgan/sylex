@@ -10,21 +10,21 @@ subtype saga := {
   name := "Saga",
   confers :=
     [Semantics.Conferral.ability
-        (Semantics.Templates.Ability.static
-          (Semantics.Templates.StaticSpec.onlyUnless
-            (Semantics.Templates.StaticSpec.entersWithCounters Semantics.Templates.NounPhrase.thisSaga 1
+        (static
+          (onlyUnless
+            (entersWithCounters thisSaga 1
               (Semantics.CounterKind.named "loreCounter"))
-            (Semantics.Templates.Condition.is Semantics.Templates.NounPhrase.thisSaga
-              (Semantics.Templates.Predicate.hasKeyword (Semantics.KeywordTerm.the (Semantics.KeywordLabel.named "readAhead")))))),
+            (is thisSaga
+              (hasKeyword (Semantics.KeywordTerm.the (Semantics.KeywordLabel.named "readAhead")))))),
       Semantics.Conferral.turnBased Semantics.TurnPart.firstMain
-        (Semantics.Templates.Action.doIf Semantics.Templates.Condition.sagaHasChapterAbilities
-          Semantics.Templates.Action.sagaLoreIncrement),
+        (doIf sagaHasChapterAbilities
+          sagaLoreIncrement),
       Semantics.Conferral.stateBased
-        (Semantics.Templates.Condition.and
-          [Semantics.Templates.Condition.sagaHasChapterAbilities,
-            Semantics.Templates.Condition.compareAmt
-              (Semantics.Templates.Amount.countersOn (Semantics.CounterKind.named "loreCounter") Semantics.Templates.NounPhrase.thisSaga)
-              Semantics.Comparator.atLeast (Semantics.Templates.Amount.finalChapterNumber Semantics.Templates.NounPhrase.thisSaga),
-            Semantics.Templates.Condition.not Semantics.Templates.Condition.sagaHasTriggeredChapter])
-        (Semantics.Definitions.sacrifice Semantics.Templates.NounPhrase.thisSaga)]
+        (and
+          [sagaHasChapterAbilities,
+            compareAmt
+              (countersOn (Semantics.CounterKind.named "loreCounter") thisSaga)
+              Semantics.Comparator.atLeast (finalChapterNumber thisSaga),
+            not sagaHasTriggeredChapter])
+        (sacrifice thisSaga)]
 }
