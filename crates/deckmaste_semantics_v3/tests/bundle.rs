@@ -105,8 +105,7 @@ fn duplicate_keys_are_refused() {
 }
 #[test]
 fn card_declarations_are_supported_without_a_canon_directory() {
-    let decl =
-        parse("card example := { name := \"Example\", types := [creature], text := [] }").unwrap();
+    let decl = parse("card := { name := \"Example\", types := [creature], text := [] }").unwrap();
     assert_eq!(decl.return_type, Ident::new("Spelled"));
 }
 
@@ -143,7 +142,8 @@ fn all_command_kinds_read_independently_of_paths() {
             "card" => ("", "name := \"Sample\", types := [creature]"),
             _ => unreachable!(),
         };
-        let source = format!("{command} sample {signature} := {{{body}}}");
+        let name = if command == "card" { "" } else { "sample" };
+        let source = format!("{command} {name} {signature} := {{{body}}}");
         assert_eq!(parse(&source).unwrap().command, Ident::new(command));
     }
 }
@@ -253,4 +253,65 @@ fn primitive_shadowed_by_a_parameter_is_loaded_before_its_caller() {
         .map(|key| key.bare_name.as_str())
         .collect();
     assert_eq!(names, ["name", "isNamed"]);
+}
+
+#[test]
+fn anonymous_card_keys_follow_the_printed_faces() {
+    for (term, key) in [
+        (
+            r#"{ name := "Mr. Orfeo, the Boulder" }"#,
+            "Mr. Orfeo, the Boulder",
+        ),
+        (
+            r#"transforming { front := { name := "Day" }, back := { name := "Night" } }"#,
+            "Day // Night",
+        ),
+        (
+            r#"modalDfc { front := { name := "Front" }, back := { name := "Back" } }"#,
+            "Front // Back",
+        ),
+        (
+            r#"split { left := { name := "Left" }, right := { name := "Right" } }"#,
+            "Left // Right",
+        ),
+        (
+            r#"sharedLineSplit { shared := {}, left := { name := "Left" }, right := { name := "Right" } }"#,
+            "Left // Right",
+        ),
+        (
+            r#"adventurer { normal := { name := "Normal" }, adventure := { name := "Adventure" } }"#,
+            "Normal // Adventure",
+        ),
+        (
+            r#"flip { normal := { name := "Normal" }, alternative := { name := "Alternative" } }"#,
+            "Normal // Alternative",
+        ),
+        (
+            r#"leveler { inner := { name := "Leveler" }, bands := [] }"#,
+            "Leveler",
+        ),
+        (
+            r#"prototype { inner := { name := "Prototype" }, alternative := {} }"#,
+            "Prototype",
+        ),
+    ] {
+        assert_eq!(
+            parse(&format!("card := {term}")).unwrap().name.as_str(),
+            key
+        );
+    }
+}
+
+#[test]
+fn anonymous_cards_refuse_missing_names_and_legacy_body() {
+    for term in [
+        "{}",
+        "{ name := none }",
+        "{ body := {} }",
+        r#"transforming { front := { name := "Front" }, back := {} }"#,
+        r#"split { left := { name := none }, right := { name := "Right" } }"#,
+        "leveler { inner := {}, bands := [] }",
+    ] {
+        assert!(parse(&format!("card := {term}")).is_err(), "{term}");
+    }
 }

@@ -91,10 +91,10 @@ fn an_ability_word_invocation_expands_at_an_ability_position() {
 fn a_keyword_action_invocation_expands_at_an_action_position() {
     let bundle = with_declarations(&[
         "action drawFor (amount : Amount) := { deed := none, body := draw amount }",
-        "card drawingSpell := { name := \"Drawing Spell\", cost := [.blue], types := [instant], text := [spell (drawFor 2)] }",
+        "card := { name := \"Drawing Spell\", cost := [.blue], types := [instant], text := [spell (drawFor 2)] }",
     ]);
     let card = Elaborator::new(&bundle)
-        .read::<Card>("drawingSpell")
+        .read::<Card>(r#"cardNamed "Drawing Spell""#)
         .unwrap();
     let Card::SingleFaced { face } = card else {
         panic!("expected single-faced card")
@@ -161,10 +161,10 @@ fn a_turn_part_declaration_may_name_its_own_constructor() {
     let bundle = with_declarations(&[
         "primitive fixtureUpkeep : TurnPart := { body := Semantics.TurnPart.upkeep }",
         "template fixtureUpkeepStep : TurnPart := { body := fixtureUpkeep }",
-        "card upkeepSpell := { name := \"Upkeep Spell\", cost := [.blue], types := [instant], text := [spell (draw 1) (timing := duringPart fixtureUpkeepStep)] }",
+        "card := { name := \"Upkeep Spell\", cost := [.blue], types := [instant], text := [spell (draw 1) (timing := duringPart fixtureUpkeepStep)] }",
     ]);
     let Card::SingleFaced { face } = Elaborator::new(&bundle)
-        .read::<Card>("upkeepSpell")
+        .read::<Card>(r#"cardNamed "Upkeep Spell""#)
         .unwrap()
     else {
         panic!("expected single-faced card")

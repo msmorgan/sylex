@@ -240,10 +240,28 @@ fn split<'a>(tokens: &'a [Token], separator: &str) -> Vec<&'a [Token]> {
         .collect()
 }
 fn bare(name: &str) -> &str {
+    if !name
+        .chars()
+        .all(|c| c.is_alphanumeric() || "_'.«»".contains(c))
+    {
+        return name;
+    }
     name.rsplit('.')
         .next()
         .unwrap_or(name)
         .trim_matches(['«', '»'])
+}
+
+fn named_record_arguments(tokens: &[Token]) -> Result<Vec<Token>> {
+    let fields = reader::fields(tokens).map_err(|e| LowerError::new(e.to_string()))?;
+    Ok(fields
+        .into_iter()
+        .map(|(name, value)| {
+            let mut field = vec![Token::Ident(name), Token::Atom(":=".into())];
+            field.extend(value);
+            Token::Group('(', field)
+        })
+        .collect())
 }
 
 #[derive(Clone)]
@@ -285,7 +303,18 @@ impl<'a> Elaborator<'a> {
     /// # Errors
     /// Reports unknown names, invalid arguments, and ill-typed constructors.
     pub fn read<T: SemanticType>(&self, source: &str) -> Result<T> {
-        let tokens = reader::tokenize(source).map_err(|e| LowerError::new(e.to_string()))?;
+        let tokens = if T::semantic_type() == "Card"
+            && self.bundle.items.contains_key(&BundleKey {
+                bare_name: Ident::new(source),
+                return_type: Ident::new("Spelled"),
+            }) {
+            vec![
+                Token::Ident(Ident::new("cardNamed")),
+                Token::String(source.to_owned()),
+            ]
+        } else {
+            reader::tokenize(source).map_err(|e| LowerError::new(e.to_string()))?
+        };
         let value = self.eval(
             &tokens,
             &T::semantic_type(),
@@ -356,16 +385,16 @@ impl<'a> Elaborator<'a> {
             }
             vec![Token::Group('{', fields)]
         };
-        if matches!(tokens.as_slice(), [Token::Group('{', _)]) {
-            let characteristics = self.eval(&tokens, "Characteristics", scope, stack)?;
-            let face = construct("CardFace", "mk", vec![characteristics])?;
-            construct("Card", "singleFaced", vec![face])
-        } else {
-            self.eval(&tokens, "Card", scope, stack)
-        }
+        self.eval(&tokens, "Card", scope, stack)
     }
 
     fn declaration(&self, name: &str, ty: &str) -> Option<&Declaration> {
+        if let Some(item) = self.bundle.items.get(&BundleKey {
+            bare_name: Ident::new(name),
+            return_type: Ident::new(if ty == "Card" { "Spelled" } else { ty }),
+        }) {
+            return Some(&item.declaration);
+        }
         let ty = if ty == "Card"
             && self.bundle.items.contains_key(&BundleKey {
                 bare_name: Ident::new(bare(name)),
@@ -460,6 +489,20 @@ impl<'a> Elaborator<'a> {
     ) -> Result<Value> {
         if tokens.is_empty() {
             return Err(LowerError::new("missing term"));
+        }
+        if matches!(ty, "Card" | "Spelled")
+            && let [Token::Ident(command), Token::String(name)] = tokens
+            && command.as_str() == "cardNamed"
+        {
+            let decl = self
+                .bundle
+                .items
+                .get(&BundleKey {
+                    bare_name: Ident::new(name),
+                    return_type: Ident::new("Spelled"),
+                })
+                .ok_or_else(|| LowerError::new(format!("unknown card {name}")))?;
+            return self.invoke(&decl.declaration, &[], "Card", scope, stack);
         }
         if let [Token::Group('(', body)] = tokens {
             return self.eval(body, ty, scope, stack);
@@ -710,6 +753,16 @@ impl<'a> Elaborator<'a> {
                     )));
                 }
             }
+            let named;
+            let rest = if ty == "Card"
+                && ctor.name.as_str() != "singleFaced"
+                && let [Token::Group('{', fields)] = rest
+            {
+                named = named_record_arguments(fields)?;
+                named.as_slice()
+            } else {
+                rest
+            };
             let values = self.arguments(&ctor.fields, rest, scope, stack)?;
             return Ok(ctor.value(values));
         }
@@ -915,6 +968,20 @@ impl<'a> Elaborator<'a> {
         scope: &mut Scope,
         stack: &mut Vec<BundleKey>,
     ) -> Result<Value> {
+        if ty == "Card"
+            || (ty == "CardFace"
+                && !reader::fields(tokens)
+                    .map_err(|e| LowerError::new(e.to_string()))?
+                    .contains_key(&Ident::new("characteristics")))
+        {
+            let characteristics = self.record(tokens, "Characteristics", scope, stack)?;
+            let face = construct("CardFace", "mk", vec![characteristics])?;
+            return if ty == "Card" {
+                construct("Card", "singleFaced", vec![face])
+            } else {
+                Ok(face)
+            };
+        }
         let cs = shape(ty).ok_or_else(|| LowerError::new(format!("{ty} is not a structure")))?;
         let ctor = cs
             .into_iter()

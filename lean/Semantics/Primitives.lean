@@ -238,6 +238,7 @@ private def coeColorManaSymbol : Color → ManaSymbol :=
 
 instance [AuthoringContext] : Coe Color ManaSymbol := ⟨coeColorManaSymbol⟩
 instance [AuthoringContext] (n : Nat) : OfNat ManaSymbol n := ⟨.simple (.generic n)⟩
+instance [AuthoringContext] (n : Nat) : OfNat (Option Amount) n := ⟨some (.lit n)⟩
 instance : Coe Color ColorOrColorless := ⟨.of⟩
 instance : Coe Characteristics CharacteristicBundle := ⟨fun c => { characteristics := c }⟩
 private def coeStaticSpecAbility : StaticSpec → Ability :=
@@ -259,4 +260,6 @@ def elabDomainList : TermElab := Authoring.elabDomainList
 def elabEmptyDomainList : TermElab := Authoring.elabDomainList
 @[scoped term_elab Lean.Parser.Term.structInst]
 def elabCharacteristicBundleStruct : TermElab := Authoring.elabCharacteristicBundleStruct
+@[scoped term_elab Lean.Parser.Term.app]
+def elabCardRecord : TermElab := Authoring.elabCardRecord
 end Semantics.Templates

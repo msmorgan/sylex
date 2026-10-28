@@ -1023,10 +1023,14 @@ where `CharacteristicBundle` is expected. -/
     tryPostpone
     throwUnsupportedSyntax
   let expectedWhnf ← whnfR expected
-  unless expectedWhnf.isConstOf `Semantics.CharacteristicBundle do throwUnsupportedSyntax
   let structTerm : Term := ⟨stx⟩
-  let bundleType := mkIdent `Semantics.CharacteristicBundle
-  let expanded ← `(term| ({ characteristics := $structTerm } : $bundleType))
+  let expanded ← if expectedWhnf.isConstOf `Semantics.CharacteristicBundle then
+      `(term| ({ characteristics := $structTerm } : $(mkIdent `Semantics.CharacteristicBundle)))
+    else if expectedWhnf.isConstOf `Semantics.CardFace then
+      `(term| ({ characteristics := $structTerm } : $(mkIdent `Semantics.CardFace)))
+    else if expectedWhnf.isConstOf `Semantics.Card then
+      `(term| $(mkIdent `Semantics.Card.singleFaced) { characteristics := $structTerm })
+    else throwUnsupportedSyntax
   withMacroExpansion stx expanded <| elabTerm expanded (some expected)
 
 
@@ -1122,6 +1126,115 @@ syntax declField := ident " := " term
 syntax declBlock := "{" withoutPosition(sepBy(declField, ",", ", ", allowTrailingSep)) "}"
 syntax (name := authoredDeclCmd) declModifiers ident ident ppIndent(optDeclSig)
   " := " (declBlock <|> term) : command
+
+syntax (name := anonymousCardCmd) (priority := high) declModifiers ident " := " term : command
+syntax (name := cardNamedTerm) "cardNamed " str : term
+syntax (name := cardNamedOkTerm) "cardNamedOk " str : term
+
+private def resolvePrintedCard (key : String) : TermElabM Name := do
+  let env ← getEnv
+  let bare := Name.mkSimple key
+  let ns ← getCurrNamespace
+  let opens ← getOpenDecls
+  let candidates := [ns ++ bare] ++ (opens.filterMap fun
+    | .simple n _ => some (n ++ bare)
+    | .explicit alias n => if alias == bare then some n else none) ++
+    [`Semantics.Cards ++ bare]
+  for name in candidates.eraseDups do
+    if let some info := env.find? name then
+      if (← whnfR info.type).isConstOf `Semantics.Spelled then return name
+  throwError "Unknown card {key}"
+
+@[term_elab cardNamedTerm]
+def elabCardNamed : TermElab := fun stx expected? => do
+  let name ← resolvePrintedCard (stx[1].isStrLit?.getD "")
+  let value := Lean.mkConst name
+  if let some expected := expected? then
+    if (← whnfR (← instantiateMVars expected)).isConstOf `Semantics.Card then
+      return mkApp (mkConst `Semantics.Spelled.card) value
+  return value
+
+@[term_elab cardNamedOkTerm]
+def elabCardNamedOk : TermElab := fun stx _ => do
+  let name ← resolvePrintedCard (stx[1].isStrLit?.getD "")
+  return mkConst (name.getPrefix ++ Name.mkSimple ("ok_" ++ name.getString!))
+
+private def cardRecordFields (stx : Syntax) : Except String (List (Name × Syntax)) := do
+  if let `(term| {}) := stx then return []
+  unless stx.isOfKind ``Parser.Term.structInst && stx[1].isNone do
+    throw "Anonymous card requires a named card record"
+  let mut fields := []
+  for field in stx[2][0].getSepArgs do
+    let name := field[0][0].getId.eraseMacroScopes
+    if fields.any (·.1 == name) then throw s!"Duplicate card field {name}"
+    if name == `body then throw "Anonymous card does not accept body :="
+    fields := fields ++ [(name, if field[1].isNone then (mkIdent name).raw else field[1][2][2])]
+  return fields
+
+@[scoped term_elab Lean.Parser.Term.app]
+def elabCardRecord : TermElab := fun stx expected? => do
+  let some expected := expected? | throwUnsupportedSyntax
+  unless (← whnfR (← instantiateMVars expected)).isConstOf `Semantics.Card do
+    throwUnsupportedSyntax
+  let fn := stx[0]
+  let name := if fn.isOfKind ``Parser.Term.dotIdent then fn[1].getId else fn.getId
+  unless name ∈ [`transforming, `modalDfc, `split, `sharedLineSplit, `adventurer,
+      `flip, `leveler, `prototype] && stx[1].getArgs.size == 1 do throwUnsupportedSyntax
+  let record := stx[1][0]
+  unless record.isOfKind ``Parser.Term.structInst do throwUnsupportedSyntax
+  let fields ← match cardRecordFields record with
+    | .ok fields => pure fields
+    | .error message => throwErrorAt record message
+  let ctor := `Semantics.Card ++ name
+  let info ← getConstInfo ctor
+  let args ← forallTelescopeReducing info.type fun params _ => do
+    let mut remaining := fields
+    let mut args : Array Term := #[]
+    for param in params do
+      let field := (← param.fvarId!.getDecl).userName
+      let some value := remaining.lookup field | throwErrorAt record "Missing card field {field}"
+      args := args.push ⟨value⟩
+      remaining := remaining.filter (·.1 != field)
+    unless remaining.isEmpty do throwErrorAt record "Unknown card field {remaining.head!.1}"
+    return args
+  let expanded ← `(term| $(mkCIdent ctor) $args*)
+  withMacroExpansion stx expanded <| elabTerm expanded expected?
+
+private partial def printedCardName (stx : Syntax) : Except String String := do
+  if stx.isOfKind ``Parser.Term.paren then return ← printedCardName stx[1]
+  let (record, parts) ← if stx.isOfKind ``Parser.Term.app then do
+    let fn := stx[0]
+    let ctor := if fn.isOfKind ``Parser.Term.dotIdent then fn[1].getId else fn.getId
+    let parts ← match ctor with
+      | `transforming | `modalDfc => pure [`front, `back]
+      | `split | `sharedLineSplit => pure [`left, `right]
+      | `adventurer => pure [`normal, `adventure]
+      | `flip => pure [`normal, `alternative]
+      | `leveler | `prototype => pure [`inner]
+      | _ => throw "Expected a card constructor"
+    unless stx[1].getArgs.size == 1 do throw "Expected named card parts"
+    pure (stx[1][0], parts)
+    else pure (stx, [])
+  let fields ← cardRecordFields record
+  if !parts.isEmpty then
+    let names ← parts.mapM fun part => do
+      let some value := fields.lookup part | throw s!"Missing card part {part}"
+      printedCardName value
+    return " // ".intercalate names
+  if let some characteristics := fields.lookup `characteristics then
+    return ← printedCardName characteristics
+  let some name := fields.lookup `name | throw "Anonymous card requires a printed name"
+  if let some name := name.isStrLit? then return name
+  if let `(term| some $value:str) := name then return value.getString
+  throw "Anonymous card requires a printed name"
+
+private def namedCardSyntax (stx : Syntax) : Except String Syntax := do
+  unless stx[1].getId == `card do throw "Only card accepts an anonymous declaration"
+  let name ← printedCardName stx[3]
+  return mkNode ``authoredDeclCmd #[stx[0],
+    mkIdent `card, mkIdent (Name.mkSimple name),
+    mkNode ``Parser.Command.optDeclSig #[mkNullNode #[], mkNullNode #[]],
+    mkAtom ":=", stx[3]]
 
 private def commandReturnType? (kind : Name) : Option Name :=
   match kind with
@@ -1252,9 +1365,6 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : Comma
   let mut sig : TSyntax ``Parser.Command.optDeclSig := ⟨stx[3]⟩
   let mut payload := stx[5]
   let mut fields ← if payload.isOfKind ``declBlock then blockFields payload else pure []
-  let cardBodyIsStruct := if payload.isOfKind ``declBlock then
-    (fields.lookup `body).any (·.raw.isOfKind ``Parser.Term.structInst)
-    else payload.isOfKind ``Parser.Term.structInst
   if kind != `primitive then
     sig := ⟨← guardAuthoredDefaults sig.raw⟩
     validateAuthoredDefaults sig.raw
@@ -1416,8 +1526,6 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : Comma
         !lexicalFields.contains f.1)
       else pure ⟨payload⟩
     if kind == `card then
-      if cardBodyIsStruct || body.raw.isOfKind ``Parser.Term.structInst then
-        body ← `(term| $(mkIdent `Semantics.Templates.singleFacedCard) $body)
       body := ⟨mkNode `Semantics.spelledTerm #[mkAtom "spelled", mkAtom "<|", body.raw]⟩
     let value ← `(Parser.Command.declVal| := $body)
     elabCommand (← `($mods:declModifiers def $declId:declId $sig:optDeclSig $value:declVal))
@@ -1434,6 +1542,13 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : Comma
 
 @[command_elab authoredDeclCmd]
 def elabAuthoredCommand : CommandElab := elabAuthoredCommandImpl false
+
+@[command_elab anonymousCardCmd]
+def elabAnonymousCard : CommandElab := fun stx => do
+  let named ← match namedCardSyntax stx with
+    | .ok named => pure named
+    | .error message => throwError message
+  elabAuthoredCommandImpl false named
 
 /-- A declaration's bare spelling and semantic result sort identify a bundle node. -/
 structure BundleKey where
@@ -1538,6 +1653,7 @@ private partial def referencedIdents (bound : List Name) (stx : Syntax) : List N
     | _ => []
 
 private def bundleItem (file : String) (stx : Syntax) : Except String BundleItem := do
+  let stx ← if stx.isOfKind ``anonymousCardCmd then namedCardSyntax stx else pure stx
   unless stx.isOfKind ``authoredDeclCmd && authoredKinds.contains stx[1].getId do
     throw s!"Unsupported command in bundle file {file}"
   let kind := stx[1].getId.eraseMacroScopes
@@ -1560,8 +1676,7 @@ private def bundleItem (file : String) (stx : Syntax) : Except String BundleItem
            -- Bound names may denote primitive functions in application position.
            primitiveReferences := referencedIdents [] stx[3] ++ referencedIdents [] stx[5],
            references := referencedIdents bound stx[3] ++ referencedIdents bound stx[5] ++
-             (if kind == `ability_word then [`abilityWord] else []) ++
-             (if kind == `card then [`singleFacedCard] else []) }
+             (if kind == `ability_word then [`abilityWord] else []) }
 
 private def parseBundleFile (env : Environment) (opts : Options) (path : System.FilePath) :
     IO (List BundleItem) := do

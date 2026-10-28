@@ -318,9 +318,11 @@ fn closed_builtin_keywords_and_actions_expand() {
 #[test]
 fn card_declarations_lower_into_single_faced_cards() {
     let bundle = declarations(&[
-        "card sample := { name := \"Example\", cost := [2, .blue], types := [], text := [] }",
+        "card := { name := \"Example\", cost := [2, .blue], types := [], text := [] }",
     ]);
-    let Card::SingleFaced { face } = Elaborator::new(&bundle).read::<Card>("sample").unwrap()
+    let Card::SingleFaced { face } = Elaborator::new(&bundle)
+        .read::<Card>(r#"cardNamed "Example""#)
+        .unwrap()
     else {
         panic!("expected single faced card")
     };
@@ -751,4 +753,111 @@ fn snapshot_samples_report_caps_and_recursive_constructors() {
                 .any(|s| s.contains(&format!("({parameter} := Semantics.TurnPart.cleanup)")))
         );
     }
+}
+
+#[test]
+fn card_records_and_printed_name_lookup_preserve_punctuation() {
+    let bundle = declarations(&[
+        r#"card := { name := "Mr. Orfeo, the Boulder", power := 3, toughness := 4, loyalty := 3, defense := 5, cost := [2, blue] }"#,
+    ]);
+    let reader = Elaborator::new(&bundle);
+    let card = reader
+        .read::<Card>(r#"cardNamed "Mr. Orfeo, the Boulder""#)
+        .unwrap();
+    assert_eq!(reader.read::<Card>("Mr. Orfeo, the Boulder").unwrap(), card);
+    let Card::SingleFaced { face } = card else { panic!("expected single face") };
+    let c = face.characteristics;
+    assert_eq!(c.power, Some(Box::new(Amount::Lit { value: 3 })));
+    assert_eq!(c.toughness, Some(Box::new(Amount::Lit { value: 4 })));
+    assert_eq!(c.loyalty, Some(Box::new(Amount::Lit { value: 3 })));
+    assert_eq!(c.defense, Some(Box::new(Amount::Lit { value: 5 })));
+    assert_eq!(
+        c.cost,
+        Some(vec![
+            ManaSymbol::Simple {
+                symbol: SimpleManaSymbol::Generic { amount: 2 }
+            },
+            ManaSymbol::Simple {
+                symbol: SimpleManaSymbol::Specific {
+                    color: ColorOrColorless::Of { color: Color::Blue }
+                }
+            },
+        ])
+    );
+}
+
+#[test]
+fn multipart_card_records_match_positional_constructors() {
+    let bundle = declarations(&[]);
+    let reader = Elaborator::new(&bundle);
+    let a = r#"{ name := "A" }"#;
+    let b = r#"{ name := "B" }"#;
+    for (ctor, first, second) in [
+        ("transforming", "front", "back"),
+        ("modalDfc", "front", "back"),
+        ("split", "left", "right"),
+        ("adventurer", "normal", "adventure"),
+        ("flip", "normal", "alternative"),
+    ] {
+        let expected = reader
+            .read::<Card>(&format!(
+                ".{ctor} {{ characteristics := {a} }} {{ characteristics := {b} }}"
+            ))
+            .unwrap();
+        let term = format!("{ctor} {{ {second} := {b}, {first} := {a} }}");
+        assert_eq!(reader.read::<Card>(&term).unwrap(), expected);
+        let named = declarations(&[&format!("card := {term}")]);
+        assert_eq!(
+            Elaborator::new(&named).read::<Card>("A // B").unwrap(),
+            expected
+        );
+    }
+    for (term, positional, name) in [
+        (
+            r#"sharedLineSplit { shared := {}, left := { name := "L" }, right := { name := "R" } }"#,
+            r#".sharedLineSplit { characteristics := {} } { name := "L" } { name := "R" }"#,
+            "L // R",
+        ),
+        (
+            r#"leveler { inner := { name := "Level" }, bands := [{ range := .between 1 2, power := 2, toughness := 3 }] }"#,
+            r#".leveler { characteristics := { name := "Level" } } [{ range := .between 1 2, power := 2, toughness := 3 }]"#,
+            "Level",
+        ),
+        (
+            r#"prototype { inner := { name := "Proto" }, alternative := { cost := [1, blue, blue], power := 2, toughness := 1 } }"#,
+            r#".prototype { characteristics := { name := "Proto" } } { cost := [1, blue, blue], power := 2, toughness := 1 }"#,
+            "Proto",
+        ),
+    ] {
+        let expected = reader.read::<Card>(positional).unwrap();
+        assert_eq!(reader.read::<Card>(term).unwrap(), expected);
+        let named = declarations(&[&format!("card := {term}")]);
+        assert_eq!(
+            Elaborator::new(&named).read::<Card>(name).unwrap(),
+            expected
+        );
+    }
+    for term in [
+        "transforming { front := {} }",
+        "transforming { front := {}, back := {}, extra := {} }",
+        "transforming { front := {}, front := {}, back := {} }",
+    ] {
+        assert!(reader.read::<Card>(term).is_err(), "{term}");
+    }
+}
+
+#[test]
+fn copy_characteristics_defaults_to_setting_types() {
+    let bundle = builtin();
+    let reader = Elaborator::new(&bundle);
+    assert_eq!(
+        reader
+            .read::<Vec<CopyExcept>>("copyCharacteristics { types := [creature], power := 3 }")
+            .unwrap(),
+        reader
+            .read::<Vec<CopyExcept>>(
+                "copyCharacteristics { types := [creature], power := 3 } false"
+            )
+            .unwrap(),
+    );
 }

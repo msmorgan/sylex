@@ -113,14 +113,8 @@ impl BundleItem {
                 visit(value, &bound, &mut refs);
             }
         }
-        match self.declaration.command.as_str() {
-            "ability_word" => {
-                refs.insert(Ident::new("abilityWord"));
-            }
-            "card" => {
-                refs.insert(Ident::new("singleFacedCard"));
-            }
-            _ => {}
+        if self.declaration.command.as_str() == "ability_word" {
+            refs.insert(Ident::new("abilityWord"));
         }
         refs
     }

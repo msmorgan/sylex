@@ -1,5 +1,5 @@
 /-- Copy exceptions retain their own edit block; added abilities remain copy-specific. -/
-template copyCharacteristics (c : Characteristics) (typesAdded : Bool) : List CopyExcept := {
+template copyCharacteristics (c : Characteristics) (typesAdded : Bool := false) : List CopyExcept := {
   body :=
     have typeOp := if typesAdded = true then Semantics.QualityOp.adds else Semantics.QualityOp.sets;
     have types :=

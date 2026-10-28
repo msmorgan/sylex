@@ -416,8 +416,8 @@ theorem costCoercionsKeepTheCard : Cards.coldStorage.card = coldStorageWritten.c
 theorem costCoercionsKeepTheAuthoring :
     faceOf Cards.coldStorage.authoring = faceOf coldStorageWritten.authoring := rfl
 
-theorem envelopeIsTheSingleFacedCardTemplate :
-    (formCalls Cards.coldStorage.authoring).head? = some ``Templates.singleFacedCard := rfl
+theorem envelopeIsSingleFacedCard :
+    Cards.coldStorage.authoring = coldStorageWritten.authoring := rfl
 
 /-- *Korlessa, Scale Singer* before the sweep: `hasSubtype dragon` written out. -/
 private def korlessaWritten : Spelled := spelled <| .singleFaced
@@ -753,21 +753,21 @@ relation testRelation := { lexical := { lemma := "test relation" } }
 token testToken := { name := "Test", token := { types := [artifact] } }
 sba testSba := { scope := creature, when := exists_ creature, then_ := draw 1 }
 conferral testConferral := { scope := creature, confer := boost (up 1) (up 1) }
-card testCard := { name := "Test", types := [sorcery], text := [spell (draw 1)] }
+card := { name := "Test Card", types := [sorcery], text := [spell (draw 1)] }
 
-card authoredSurface := {
+card := {
   name := "Authored surface", cost := [blue, 2], types := [sorcery],
   text := [parameterKeyword 2 [blue], spell [drawCards 1, draw 1]],
 }
-card authoredSpree := {
+card := {
   name := "Authored spree", cost := [white], types := [sorcery],
   text := [spell (chooseSpree [([generic 1], draw 1), ([generic 2], draw 2)])],
 }
-theorem postponedListsRetainAuthorship : authoredSpree.authoring.onlyAuthored = true :=
-  authoredSpree.onlyAuthored
+theorem postponedListsRetainAuthorship : (cardNamed "Authored spree").authoring.onlyAuthored = true :=
+  (cardNamed "Authored spree").onlyAuthored
 
-theorem surfaceRetainsAuthorship : authoredSurface.authoring.onlyAuthored = true :=
-  authoredSurface.onlyAuthored
+theorem surfaceRetainsAuthorship : (cardNamed "Authored surface").authoring.onlyAuthored = true :=
+  (cardNamed "Authored surface").onlyAuthored
 
 open Lean Elab Command in
 run_cmd do
@@ -791,8 +791,8 @@ example : RegistryDefinition.check testRelation_definition = [] := ok_testRelati
 example : PredefinedToken.check testToken = [] := ok_testToken
 example : SbaRule.check testSba = [] := ok_testSba
 example : ConferralRule.check testConferral = [] := ok_testConferral
-example : Card.check testCard.card = [] := ok_testCard
-example : testCard.authoring.onlyAuthored = true := testCard.onlyAuthored
+example : Card.check (cardNamed "Test Card").card = [] := cardNamedOk "Test Card"
+example : (cardNamed "Test Card").authoring.onlyAuthored = true := (cardNamed "Test Card").onlyAuthored
 
 example : ([] : Action) = sequentially [] := rfl
 example : ([] : Predicate) = Templates.Predicate.and [] := rfl
@@ -940,12 +940,93 @@ example (payment : PlayPayment) : paymentArgument payment =
 example : Definitions.Ability.devour 2 = Definitions.devour 2 := rfl
 example : Templates.NounPhrase.target isCreature = Templates.target isCreature := rfl
 
+card := { name := "Mr. Orfeo, the Boulder", types := [creature], power := 3, toughness := 4 }
+theorem printedNameLookupChecks : Card.check (cardNamed "Mr. Orfeo, the Boulder") = [] :=
+  cardNamedOk "Mr. Orfeo, the Boulder"
+theorem printedNameLookupRetainsProof : (cardNamed "Mr. Orfeo, the Boulder" : Spelled).card.check = [] :=
+  (cardNamed "Mr. Orfeo, the Boulder").ok
+open Lean Elab Command Term in
+run_cmd do
+  let tree ← liftTermElabM do
+    let term ← elabTerm (← `(term| (3 : Option Amount))) none
+    synthesizeSyntheticMVarsNoPostponing
+    Authoring.inspect (← instantiateMVars term)
+  let rec hasLiteral : Authoring.Form → Bool
+    | .constructor name children => name == `Semantics.Amount.lit || children.any hasLiteral
+    | .data children | .call _ children => children.any hasLiteral
+    | .binder _ body => hasLiteral body
+    | _ => false
+  unless hasLiteral tree do throwError "Optional stat numeral lost its Amount.lit leaf"
+
+theorem optionalPowerNumeral : (3 : Option Amount) = some (.lit 3) := rfl
+theorem optionalToughnessNumeral : (4 : Option Amount) = some (.lit 4) := rfl
+theorem loyaltyNumeral : ({ loyalty := 3, defense := 5 } : Characteristics).loyalty = some (.lit 3) := rfl
+theorem defenseNumeral : ({ loyalty := 3, defense := 5 } : Characteristics).defense = some (.lit 5) := rfl
+theorem manaNumeralsAndColors : ([2, blue] : ManaCost) = [ManaSymbol.simple (.generic 2), .simple (.specific (.of .blue))] := rfl
+
+/-- error: Anonymous card requires a printed name -/
+#guard_msgs in
+card := { types := [sorcery] }
+/-- error: Anonymous card requires a printed name -/
+#guard_msgs in
+card := { name := none, types := [sorcery] }
+/-- error: Anonymous card does not accept body := -/
+#guard_msgs in
+card := { body := singleFacedCard { name := "Legacy body", types := [sorcery] } }
+/-- error: Anonymous card requires a printed name -/
+#guard_msgs in
+card := transforming { front := { name := "Front", types := [sorcery] }, back := {} }
+
+card := transforming {
+  front := { name := "Day", types := [artifact] },
+  back := { name := "Night", types := [artifact] } }
+card := modalDfc {
+  front := { name := "Front", types := [sorcery] },
+  back := { name := "Back", types := [land] } }
+card := split {
+  right := { name := "Right", types := [instant] },
+  left := { name := "Left", types := [instant] } }
+card := sharedLineSplit {
+  shared := { types := [enchantment] },
+  left := { name := "Door one" }, right := { name := "Door two" } }
+card := adventurer {
+  normal := { name := "Normal", types := [artifact] },
+  adventure := { name := "Adventure", types := [sorcery] } }
+card := flip {
+  normal := { name := "Unflipped", types := [artifact] },
+  alternative := { name := "Flipped", types := [artifact] } }
+card := leveler {
+  inner := { name := "Leveler", types := [creature], power := 1, toughness := 1 },
+  bands := [{ range := .between 1 2, power := 2, toughness := 3 }] }
+card := prototype {
+  inner := { name := "Prototype", types := [creature], power := 4, toughness := 4 },
+  alternative := { cost := [1, blue, blue], power := 2, toughness := 1 } }
+theorem transformingPrintedKey : Card.check (cardNamed "Day // Night") = [] := cardNamedOk "Day // Night"
+theorem modalDfcPrintedKey : Card.check (cardNamed "Front // Back") = [] := cardNamedOk "Front // Back"
+theorem splitPrintedKey : Card.check (cardNamed "Left // Right") = [] := cardNamedOk "Left // Right"
+theorem sharedLineSplitPrintedKey : Card.check (cardNamed "Door one // Door two") = [] := cardNamedOk "Door one // Door two"
+theorem adventurerPrintedKey : Card.check (cardNamed "Normal // Adventure") = [] := cardNamedOk "Normal // Adventure"
+theorem flipPrintedKey : Card.check (cardNamed "Unflipped // Flipped") = [] := cardNamedOk "Unflipped // Flipped"
+theorem levelerPrintedKey : Card.check (cardNamed "Leveler") = [] := cardNamedOk "Leveler"
+theorem prototypePrintedKey : Card.check (cardNamed "Prototype") = [] := cardNamedOk "Prototype"
+theorem copyCharacteristicsDefault : (copyCharacteristics { power := 3 }) = copyCharacteristics { power := 3 } false := rfl
+
+/-- error: Missing card field back -/
+#guard_msgs in
+example : Card := transforming { front := { name := "Front" } }
+/-- error: Duplicate card field front -/
+#guard_msgs in
+example : Card := transforming { front := {}, front := {}, back := {} }
+/-- error: Unknown card field extra -/
+#guard_msgs in
+example : Card := transforming { front := {}, back := {}, extra := {} }
+
 end BundleDsl
 
 namespace BundleFixture
 load_bundle "test-fixtures/authoring-bundle"
-example : bundleCard.card.check = [] := ok_bundleCard
-example : bundleCard.authoring.onlyAuthored = true := bundleCard.onlyAuthored
+example : (cardNamed "Bundle fixture").card.check = [] := cardNamedOk "Bundle fixture"
+example : (cardNamed "Bundle fixture").authoring.onlyAuthored = true := (cardNamed "Bundle fixture").onlyAuthored
 example : (bundleQuality : Predicate) = bundleAtom := rfl
 example : Action.bundleShared = Action.ownScope (some (.action "bundleShared" .none)) bundleDraw := rfl
 example : Ability.bundleShared = .keyword (.named "bundleShared") [] [spell Action.bundleShared] := rfl

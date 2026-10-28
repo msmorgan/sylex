@@ -235,6 +235,63 @@ fn result_type(command: &str) -> Option<&'static str> {
     }
 }
 
+fn printed_card_name(tokens: &[Token]) -> Result<String, ReadError> {
+    if let [Token::Group('(', inner)] = tokens {
+        return printed_card_name(inner);
+    }
+    if let [Token::Atom(dot), rest @ ..] = tokens
+        && dot == "."
+    {
+        return printed_card_name(rest);
+    }
+    let (record, parts): (&[Token], &[&str]) = match tokens {
+        [Token::Group('{', record)] => (record, &[]),
+        [Token::Ident(ctor), Token::Group('{', record)] => {
+            let parts: &[&str] = match ctor.as_str() {
+                "transforming" | "modalDfc" => &["front", "back"],
+                "split" | "sharedLineSplit" => &["left", "right"],
+                "adventurer" => &["normal", "adventure"],
+                "flip" => &["normal", "alternative"],
+                "leveler" | "prototype" => &["inner"],
+                _ => return Err(ReadError("expected a card constructor".into())),
+            };
+            (record, parts)
+        }
+        _ => {
+            return Err(ReadError(
+                "anonymous card requires a named card record".into(),
+            ));
+        }
+    };
+    let fields = fields(record)?;
+    if fields.contains_key(&Ident::new("body")) {
+        return Err(ReadError("anonymous card does not accept body :=".into()));
+    }
+    if !parts.is_empty() {
+        return parts
+            .iter()
+            .map(|part| {
+                let term = fields
+                    .get(&Ident::new(part))
+                    .ok_or_else(|| ReadError(format!("missing card part {part}")))?;
+                printed_card_name(term)
+            })
+            .collect::<Result<Vec<_>, _>>()
+            .map(|names| names.join(" // "));
+    }
+    if let Some(characteristics) = fields.get(&Ident::new("characteristics")) {
+        return printed_card_name(characteristics);
+    }
+    let name = fields
+        .get(&Ident::new("name"))
+        .ok_or_else(|| ReadError("anonymous card requires a printed name".into()))?;
+    match name.as_slice() {
+        [Token::String(name)] => Ok(name.clone()),
+        [Token::Ident(some), Token::String(name)] if some.as_str() == "some" => Ok(name.clone()),
+        _ => Err(ReadError("anonymous card requires a printed name".into())),
+    }
+}
+
 /// Parse exactly one brace-and-comma declaration, independent of its file path.
 ///
 /// # Errors
@@ -245,6 +302,16 @@ pub fn parse(source: &str) -> Result<Declaration, ReadError> {
         return Err(ReadError("expected exactly one declaration".into()));
     };
     let command = ident(command)?;
+    if command.as_str() == "card" && atom(name, ":=") {
+        let name = printed_card_name(rest)?;
+        return Ok(Declaration {
+            command,
+            name: Ident::new(&name),
+            return_type: Ident::new("Spelled"),
+            parameters: Vec::new(),
+            fields: BTreeMap::from([(Ident::new("body"), rest.to_vec())]),
+        });
+    }
     let mut name = ident(name)?;
     if result_type(command.as_str()).is_none()
         && !matches!(command.as_str(), "primitive" | "template")
@@ -298,7 +365,9 @@ pub fn parse(source: &str) -> Result<Declaration, ReadError> {
             .strip_prefix("Semantics.")
             .unwrap_or(result.as_str()),
     );
-    if let Some(bare) = name.as_str().strip_prefix(&format!("{return_type}.")) {
+    if command.as_str() != "card"
+        && let Some(bare) = name.as_str().strip_prefix(&format!("{return_type}."))
+    {
         name = Ident::new(bare);
     }
     let [assignment, Token::Group('{', body)] = rest else {

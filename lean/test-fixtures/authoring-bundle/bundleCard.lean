@@ -1,1 +1,1 @@
-card bundleCard := { name := "Bundle fixture", types := [sorcery], text := [spell bundleDraw] }
+card := { name := "Bundle fixture", types := [sorcery], text := [spell bundleDraw] }
