@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-build-speed]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
 ---
 # Audit hand-written `ownScope` bodies in the proof suites
 

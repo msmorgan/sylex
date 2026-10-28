@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-checker-and-drt-fixes, plugins-v3-builtin-primitives-and-templates, lean-build-speed]
+needs: [lean-v3-checker-and-drt-fixes, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
 ---
 # A single-use "as though" statement
 

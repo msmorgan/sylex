@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-build-speed]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
 ---
 # A term for the active player
 

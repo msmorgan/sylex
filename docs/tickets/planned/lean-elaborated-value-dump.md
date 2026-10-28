@@ -1,5 +1,5 @@
 ---
-needs: [lean-build-speed]
+needs: [lean-generated-canon-modules]
 ---
 # An untracked dump of every elaborated canon card and builtin declaration, from Lean
 

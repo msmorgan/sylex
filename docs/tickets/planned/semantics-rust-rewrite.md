@@ -23,7 +23,7 @@ crates:
 
 Start this only after:
 
-- `lean-build-speed`;
+- `lean-module-layering` and `lean-generated-canon-modules`;
 - `plugins-v3-data-language`;
 - the remaining `lean-v3-*` tickets, so that the Lean workbench's semantics are settled before
   Rust reimplements them.

@@ -1,5 +1,5 @@
 ---
-needs: [lean-build-speed, lean-elaborated-value-dump]
+needs: [lean-generated-canon-modules, lean-elaborated-value-dump]
 ---
 # [design] `plugins_v3` as a data language whose files are their own AST
 
@@ -60,9 +60,17 @@ simplicity.
 5. **What replaces `Authoring.Form`.** Only Lean self-tests use it; Rust has no use for it. Either
    build it from the parsed tree for the two call-tree pins (`Proofs/TextChanges.lean`,
    `Proofs/UntapStep.lean`), or retire those pins in favour of tests on the parse tree.
-6. **The dependency graph.** Build typed dependency edges, so that `exileZone`'s
-   `zone .exile none` and `devourEntry`'s `Action.devour` workarounds disappear and no
-   qualification is ever needed.
+6. **The dependency graph and builtin modules.** Do not do file discovery or dependency
+   sorting inside a Lean elaborator.
+   - `cargo xtask lean gen` (`lean-generated-canon-modules`) parses the builtin in the new
+     grammar and writes gitignored Lean modules with real `import`s.
+   - Each strongly connected component of the possibly over-approximate dependency graph becomes
+     one module, so a false edge only merges two modules instead of failing.
+   - Delete `load_bundle`, `topoSortBundle`, `referencedIdents`, the directory walk and the
+     `builtinBundle` input. Lake then builds the builtin in parallel and rebuilds only the
+     dependents of an edited declaration.
+   - The `exileZone` (`zone .exile none`) and `devourEntry` (`Action.devour`) workarounds
+     disappear, and no qualification is ever needed.
 
 ## Implementation, once settled
 

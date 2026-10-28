@@ -1,5 +1,5 @@
 ---
-needs: [lean-build-speed]
+needs: [lean-generated-canon-modules]
 ---
 # Preposed condition ordering on `StaticSpec.conditional` and Angelic Cub's second ability
 

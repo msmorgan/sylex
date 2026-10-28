@@ -1,5 +1,5 @@
 ---
-needs: [lean-build-speed]
+needs: [lean-generated-canon-modules]
 ---
 # Two loose ends from the overnight `plugins-v3-*` chain
 
