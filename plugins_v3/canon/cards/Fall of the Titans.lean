@@ -1,4 +1,3 @@
-/-- Fall of the Titans -/
 card := {
   name := "Fall of the Titans",
   cost := [«variable», «variable», red],

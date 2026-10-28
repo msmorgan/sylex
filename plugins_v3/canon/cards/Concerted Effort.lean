@@ -1,4 +1,3 @@
-/-- Concerted Effort -/
 card := {
   name := "Concerted Effort",
   cost := [2, white, white],

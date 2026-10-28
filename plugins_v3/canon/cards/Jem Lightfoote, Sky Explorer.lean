@@ -1,4 +1,3 @@
-/-- Jem Lightfoote, Sky Explorer -/
 card := {
   name := "Jem Lightfoote, Sky Explorer",
   cost := [2, white, blue],

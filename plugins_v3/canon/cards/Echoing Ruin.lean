@@ -1,4 +1,3 @@
-/-- Echoing Ruin -/
 card := {
   name := "Echoing Ruin",
   cost := [1, red],

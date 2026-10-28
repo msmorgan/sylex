@@ -1,4 +1,3 @@
-/-- Dance of the Dead -/
 card := {
   name := "Dance of the Dead",
   cost := [1, black],

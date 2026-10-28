@@ -1,4 +1,3 @@
-/-- Thranduil's Company -/
 card := {
   name := "Thranduil's Company",
   cost := [2, green, blue],

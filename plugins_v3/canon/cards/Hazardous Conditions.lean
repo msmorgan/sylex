@@ -1,4 +1,3 @@
-/-- Hazardous Conditions -/
 card := {
   name := "Hazardous Conditions",
   cost := [2, black, green],

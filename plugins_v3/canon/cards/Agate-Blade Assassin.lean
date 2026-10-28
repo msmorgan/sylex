@@ -1,4 +1,3 @@
-/-- Agate-Blade Assassin -/
 card := {
   name := "Agate-Blade Assassin",
   cost := [1, black],

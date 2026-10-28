@@ -1,4 +1,3 @@
-/-- Naban, Dean of Iteration -/
 card := {
   name := "Naban, Dean of Iteration",
   cost := [1, blue],

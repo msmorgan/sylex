@@ -1,4 +1,3 @@
-/-- Apathy -/
 card := {
   name := "Apathy",
   cost := [blue],

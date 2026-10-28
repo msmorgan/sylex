@@ -1,4 +1,3 @@
-/-- Berserk -/
 card := {
   name := "Berserk",
   cost := [green],

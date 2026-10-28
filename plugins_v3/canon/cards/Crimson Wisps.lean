@@ -1,4 +1,3 @@
-/-- Crimson Wisps -/
 card := {
   name := "Crimson Wisps",
   cost := [red],

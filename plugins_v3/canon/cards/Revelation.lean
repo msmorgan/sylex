@@ -1,4 +1,3 @@
-/-- Revelation -/
 card := {
   name := "Revelation",
   cost := [green],

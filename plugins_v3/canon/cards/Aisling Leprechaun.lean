@@ -1,4 +1,3 @@
-/-- Aisling Leprechaun -/
 card := {
   name := "Aisling Leprechaun",
   cost := [green],

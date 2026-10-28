@@ -1,4 +1,3 @@
-/-- Seasoned Warrenguard -/
 card := {
   name := "Seasoned Warrenguard",
   cost := [white],

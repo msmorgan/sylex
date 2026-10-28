@@ -1,4 +1,3 @@
-/-- Rites of Flourishing -/
 card := {
   name := "Rites of Flourishing",
   cost := [2, green],

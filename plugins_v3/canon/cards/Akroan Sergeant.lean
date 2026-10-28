@@ -1,4 +1,3 @@
-/-- Akroan Sergeant -/
 card := {
   name := "Akroan Sergeant",
   cost := [2, red],

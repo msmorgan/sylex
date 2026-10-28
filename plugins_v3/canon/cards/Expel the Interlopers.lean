@@ -1,4 +1,3 @@
-/-- Expel the Interlopers -/
 card := {
   name := "Expel the Interlopers",
   cost := [3, white, white],

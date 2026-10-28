@@ -1,4 +1,3 @@
-/-- Rooftop Storm -/
 card := {
   name := "Rooftop Storm",
   cost := [5, blue],

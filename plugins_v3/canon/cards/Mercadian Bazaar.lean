@@ -1,4 +1,3 @@
-/-- Mercadian Bazaar -/
 card := {
   name := "Mercadian Bazaar",
   types := [land],

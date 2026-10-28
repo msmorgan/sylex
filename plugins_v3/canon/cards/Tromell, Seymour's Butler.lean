@@ -1,4 +1,3 @@
-/-- Tromell, Seymour's Butler -/
 card := {
   name := "Tromell, Seymour's Butler",
   cost := [2, green],

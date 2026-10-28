@@ -1,4 +1,3 @@
-/-- Bile Blight -/
 card := {
   name := "Bile Blight",
   cost := [black, black],

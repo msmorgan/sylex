@@ -1,4 +1,3 @@
-/-- Talion, the Kindly Lord -/
 card := {
   name := "Talion, the Kindly Lord",
   cost := [2, blue, black],

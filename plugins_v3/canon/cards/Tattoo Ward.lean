@@ -1,4 +1,3 @@
-/-- Tattoo Ward -/
 card := {
   name := "Tattoo Ward",
   cost := [2, white],

@@ -1,4 +1,3 @@
-/-- Profit // Loss -/
 card := split
   {
     left := {

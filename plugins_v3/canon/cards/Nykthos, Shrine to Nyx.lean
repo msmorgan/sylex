@@ -1,4 +1,3 @@
-/-- Nykthos, Shrine to Nyx -/
 card := {
   name := "Nykthos, Shrine to Nyx",
   supertypes := [legendary],

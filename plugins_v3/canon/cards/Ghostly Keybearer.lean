@@ -1,4 +1,3 @@
-/-- Ghostly Keybearer -/
 card := {
   name := "Ghostly Keybearer",
   cost := [3, blue],

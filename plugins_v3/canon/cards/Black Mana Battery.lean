@@ -1,4 +1,3 @@
-/-- Black Mana Battery -/
 card := {
   name := "Black Mana Battery",
   cost := [4],

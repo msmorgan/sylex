@@ -1,4 +1,3 @@
-/-- Germination Practicum -/
 card := {
   name := "Germination Practicum",
   cost := [3, green, green],

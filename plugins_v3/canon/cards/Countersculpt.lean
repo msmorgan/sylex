@@ -1,4 +1,3 @@
-/-- Countersculpt -/
 card := {
   name := "Countersculpt",
   cost := [blue, blue],

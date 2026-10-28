@@ -1,4 +1,3 @@
-/-- Arlinn Kord // Arlinn, Embraced by the Moon -/
 card := transforming
   {
     front := {

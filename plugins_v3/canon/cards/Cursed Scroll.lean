@@ -1,3 +1,5 @@
+/-- Pins choosing a card name, revealing a random card, and comparing that card
+to the chosen name. Revealing leaves the card in its zone [CR#701.20b]. -/
 card := {
   name := "Cursed Scroll",
   cost := [1],

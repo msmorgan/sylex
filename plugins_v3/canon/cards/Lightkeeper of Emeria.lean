@@ -1,4 +1,3 @@
-/-- Lightkeeper of Emeria -/
 card := {
   name := "Lightkeeper of Emeria",
   cost := [3, white],

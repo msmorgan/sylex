@@ -1,4 +1,3 @@
-/-- Thunderwave -/
 card := {
   name := "Thunderwave",
   cost := [2, red, red],

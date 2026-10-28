@@ -1,4 +1,3 @@
-/-- Scythe of the Wretched. -/
 card := {
   name := "Scythe of the Wretched",
   cost := [2],

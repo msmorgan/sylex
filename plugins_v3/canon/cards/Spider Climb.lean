@@ -1,4 +1,3 @@
-/-- Spider Climb -/
 card := {
   name := "Spider Climb",
   cost := [green],

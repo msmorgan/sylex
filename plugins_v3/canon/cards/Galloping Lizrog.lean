@@ -1,4 +1,3 @@
-/-- Galloping Lizrog -/
 card := {
   name := "Galloping Lizrog",
   cost := [3, green, blue],

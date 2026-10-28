@@ -1,4 +1,3 @@
-/-- Clone -/
 card := {
   name := "Clone",
   cost := [3, blue],

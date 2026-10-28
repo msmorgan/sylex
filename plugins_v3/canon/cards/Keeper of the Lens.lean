@@ -1,4 +1,3 @@
-/-- Keeper of the Lens -/
 card := {
   name := "Keeper of the Lens",
   cost := [1],

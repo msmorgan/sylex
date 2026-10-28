@@ -1,4 +1,3 @@
-/-- Soulstone Sanctuary -/
 card := {
   name := "Soulstone Sanctuary",
   types := [land],

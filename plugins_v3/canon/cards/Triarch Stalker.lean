@@ -1,4 +1,3 @@
-/-- Triarch Stalker -/
 card := {
   name := "Triarch Stalker",
   cost := [3, black, black],

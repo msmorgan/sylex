@@ -1,4 +1,3 @@
-/-- Unesh, Criosphinx Sovereign -/
 card := {
   name := "Unesh, Criosphinx Sovereign",
   cost := [4, blue, blue],

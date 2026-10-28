@@ -1,4 +1,3 @@
-/-- Psychic Purge -/
 card := {
   name := "Psychic Purge",
   cost := [blue],

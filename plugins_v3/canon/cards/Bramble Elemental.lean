@@ -1,4 +1,3 @@
-/-- Bramble Elemental -/
 card := {
   name := "Bramble Elemental",
   cost := [3, green, green],

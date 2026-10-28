@@ -1,4 +1,3 @@
-/-- Stone Haven Outfitter -/
 card := {
   name := "Stone Haven Outfitter",
   cost := [1, white],

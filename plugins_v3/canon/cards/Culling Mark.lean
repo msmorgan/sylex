@@ -1,4 +1,3 @@
-/-- Culling Mark -/
 card := {
   name := "Culling Mark",
   cost := [2, green],

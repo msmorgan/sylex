@@ -1,4 +1,3 @@
-/-- Brimstone Mage -/
 card := leveler
   {
     inner := {

@@ -1,4 +1,3 @@
-/-- Conspicuous Snoop -/
 card := {
   name := "Conspicuous Snoop",
   cost := [red, red],

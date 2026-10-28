@@ -1,4 +1,3 @@
-/-- Burn, Burn, Tree and Fern -/
 card := {
   name := "Burn, Burn, Tree and Fern",
   cost := [3, red],

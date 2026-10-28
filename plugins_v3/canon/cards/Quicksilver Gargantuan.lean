@@ -1,4 +1,3 @@
-/-- Quicksilver Gargantuan -/
 card := {
   name := "Quicksilver Gargantuan",
   cost := [5, blue, blue],

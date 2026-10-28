@@ -1,4 +1,3 @@
-/-- Fiend Binder -/
 card := {
   name := "Fiend Binder",
   cost := [3, white],

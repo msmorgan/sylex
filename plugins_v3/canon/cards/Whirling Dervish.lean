@@ -1,4 +1,3 @@
-/-- Whirling Dervish -/
 card := {
   name := "Whirling Dervish",
   cost := [green, green],

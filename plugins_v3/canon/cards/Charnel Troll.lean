@@ -1,4 +1,3 @@
-/-- Charnel Troll -/
 card := {
   name := "Charnel Troll",
   cost := [1, black, green],

@@ -1,4 +1,3 @@
-/-- Plea for Power -/
 card := {
   name := "Plea for Power",
   cost := [3, blue],

@@ -1,4 +1,3 @@
-/-- Land Tax -/
 card := {
   name := "Land Tax",
   cost := [white],

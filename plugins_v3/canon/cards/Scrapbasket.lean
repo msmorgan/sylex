@@ -1,4 +1,3 @@
-/-- Scrapbasket -/
 card := {
   name := "Scrapbasket",
   cost := [4],

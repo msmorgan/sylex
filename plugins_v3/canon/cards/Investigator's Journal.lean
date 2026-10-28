@@ -1,4 +1,3 @@
-/-- Investigator's Journal -/
 card := {
   name := "Investigator's Journal",
   cost := [2],

@@ -1,4 +1,3 @@
-/-- Churning Eddy -/
 card := {
   name := "Churning Eddy",
   cost := [3, blue],

@@ -1,4 +1,3 @@
-/-- Old-Growth Dryads -/
 card := {
   name := "Old-Growth Dryads",
   cost := [green],

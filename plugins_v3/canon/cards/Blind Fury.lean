@@ -1,4 +1,3 @@
-/-- Blind Fury -/
 card := {
   name := "Blind Fury",
   cost := [2, red, red],

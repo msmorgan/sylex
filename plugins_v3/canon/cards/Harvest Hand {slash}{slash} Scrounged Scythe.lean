@@ -1,4 +1,3 @@
-/-- Harvest Hand // Scrounged Scythe -/
 card := transforming
   {
     front := {

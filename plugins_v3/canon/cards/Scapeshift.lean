@@ -1,4 +1,3 @@
-/-- Scapeshift -/
 card := {
   name := "Scapeshift",
   cost := [2, green, green],

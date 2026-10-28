@@ -1,4 +1,3 @@
-/-- Heat Wave -/
 card := {
   name := "Heat Wave",
   cost := [2, red],

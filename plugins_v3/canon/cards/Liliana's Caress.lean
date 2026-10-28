@@ -1,4 +1,3 @@
-/-- Liliana's Caress -/
 card := {
   name := "Liliana's Caress",
   cost := [1, black],

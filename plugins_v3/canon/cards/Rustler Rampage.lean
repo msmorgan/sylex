@@ -1,4 +1,3 @@
-/-- Rustler Rampage -/
 card := {
   name := "Rustler Rampage",
   cost := [white],

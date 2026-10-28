@@ -1,4 +1,3 @@
-/-- Cho-Manno's Blessing -/
 card := {
   name := "Cho-Manno's Blessing",
   cost := [white, white],

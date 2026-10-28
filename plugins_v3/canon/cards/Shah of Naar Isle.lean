@@ -1,4 +1,3 @@
-/-- Shah of Naar Isle -/
 card := {
   name := "Shah of Naar Isle",
   cost := [3, red],

@@ -1,4 +1,3 @@
-/-- Haakon, Stromgald Scourge -/
 card := {
   name := "Haakon, Stromgald Scourge",
   cost := [1, black, black],

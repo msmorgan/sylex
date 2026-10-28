@@ -1,4 +1,3 @@
-/-- Vaevictis Asmadi, the Dire -/
 card := {
   name := "Vaevictis Asmadi, the Dire",
   cost := [3, black, red, green],

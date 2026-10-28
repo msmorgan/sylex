@@ -1,4 +1,3 @@
-/-- Sanctum Prelate -/
 card := {
   name := "Sanctum Prelate",
   cost := [1, white, white],

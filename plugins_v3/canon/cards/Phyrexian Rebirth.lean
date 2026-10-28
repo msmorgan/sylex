@@ -1,4 +1,3 @@
-/-- Phyrexian Rebirth -/
 card := {
   name := "Phyrexian Rebirth",
   cost := [4, white, white],

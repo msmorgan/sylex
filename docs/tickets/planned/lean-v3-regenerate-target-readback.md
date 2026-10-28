@@ -31,13 +31,15 @@ are ([CR#601.2c])" (`docs/decisions/semantics-v3.md` §0.1 item 2, step 2).
    enclosing the `establish`, with its `.target` stamp, so later text reads it by D′ ("it") and
    AC>R1 ("that creature"). Non-target mentions in the pattern stay hypothetical. Add no AST node,
    field or variant ([CR#701.19a] is unchanged; §0.1 item 5(c)).
-2. Spell *Debt of Loyalty* in `Cards/` as a `spelled` card:
+2. Spell *Debt of Loyalty* as an anonymous `card :=` declaration in
+   `plugins_v3/canon/cards/Debt of Loyalty.lean` (read as `cardNamed "Debt of Loyalty"`):
    ```lean
    .triggerReflexively (regenerate (target isCreature))
      (some (does any (regeneration it)))
      (gainControl (that creature))
    ```
-   following *Matopi Golem*'s reflexive "When it regenerates this way" (`Cards/Counters.lean:714`,
+   following *Matopi Golem*'s reflexive "When it regenerates this way"
+   (`plugins_v3/canon/cards/Matopi Golem.lean`, read as `cardNamed "Matopi Golem"`,
    pinned by `regenerationEventDescribesTheApplicationRatherThanTheShield`,
    `Proofs/ActionFamilies.lean:298-312`). If `triggerReflexively` is not the form for a
    postposed "if it regenerates this way" on a spell, use the form of the "If it regenerates this way, draw a card" fixture at
@@ -58,11 +60,11 @@ are ([CR#601.2c])" (`docs/decisions/semantics-v3.md` §0.1 item 2, step 2).
 
 - Rewritten: `regenerationPatternDoesNotLeakIntoFollowingText` →
   `regeneratedTargetIsReadBack`, asserting `targets (actionResult (DRS.ofList []) (regenerateBy (target isCreature))) = 1`, because the old claim is the defect.
-- Added: `debtOfLoyalty` (spelled). Every fixture must be a Vintage-legal card (owner,
-  2026-10-25), so no invented "Regenerate target creature. Tap it." pin is added.
+- Added: `cardNamed "Debt of Loyalty"` (anonymous canon card). Every fixture must be a
+  Vintage-legal card (owner, 2026-10-25), so no invented "Regenerate target creature. Tap it." pin is added.
 - Must stay green: `regenerateTargetsOnce`, `okRegenerationApplication`
   (`Proofs/BindingIdentity.lean:272`), `regenerationEventDescribesTheApplicationRatherThanTheShield`,
-  `matopiGolem`, `modifyingProhibitionReadsOnlyThePrecedingActionsObjects`
+  `cardNamed "Matopi Golem"`, `modifyingProhibitionReadsOnlyThePrecedingActionsObjects`
   (`Proofs/Deontic.lean:631-648`).
 
 ## Acceptance

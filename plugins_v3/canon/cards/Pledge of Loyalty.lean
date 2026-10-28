@@ -1,4 +1,3 @@
-/-- Pledge of Loyalty -/
 card := {
   name := "Pledge of Loyalty",
   cost := [1, white],

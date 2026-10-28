@@ -1,4 +1,3 @@
-/-- Meletis Charlatan -/
 card := {
   name := "Meletis Charlatan",
   cost := [2, blue],

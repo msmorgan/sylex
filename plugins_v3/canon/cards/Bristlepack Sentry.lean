@@ -1,4 +1,3 @@
-/-- Bristlepack Sentry -/
 card := {
   name := "Bristlepack Sentry",
   cost := [1, green],

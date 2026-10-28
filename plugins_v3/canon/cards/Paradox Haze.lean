@@ -1,4 +1,3 @@
-/-- Paradox Haze -/
 card := {
   name := "Paradox Haze",
   cost := [2, blue],

@@ -1,4 +1,3 @@
-/-- Orchard Elemental -/
 card := {
   name := "Orchard Elemental",
   cost := [5, green],

@@ -1,4 +1,3 @@
-/-- Inferno Elemental -/
 card := {
   name := "Inferno Elemental",
   cost := [4, red, red],

@@ -1,4 +1,3 @@
-/-- Borrowed Malevolence -/
 card := {
   name := "Borrowed Malevolence",
   cost := [black],

@@ -1,4 +1,3 @@
-/-- Squelch -/
 card := {
   name := "Squelch",
   cost := [1, blue],

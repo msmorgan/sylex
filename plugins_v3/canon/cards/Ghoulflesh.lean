@@ -1,4 +1,3 @@
-/-- Ghoulflesh -/
 card := {
   name := "Ghoulflesh",
   cost := [black],

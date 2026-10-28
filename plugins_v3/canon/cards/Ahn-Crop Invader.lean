@@ -1,4 +1,3 @@
-/-- Ahn-Crop Invader -/
 card := {
   name := "Ahn-Crop Invader",
   cost := [2, red],

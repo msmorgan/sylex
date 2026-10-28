@@ -1,4 +1,3 @@
-/-- Necromancy -/
 card := {
   name := "Necromancy",
   cost := [2, black],

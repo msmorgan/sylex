@@ -1,4 +1,3 @@
-/-- Scheming Aspirant -/
 card := {
   name := "Scheming Aspirant",
   cost := [1, black],

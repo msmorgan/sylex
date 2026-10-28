@@ -1,4 +1,3 @@
-/-- Aurelia, the Law Above -/
 card := {
   name := "Aurelia, the Law Above",
   cost := [3, red, white],

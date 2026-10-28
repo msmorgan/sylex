@@ -1,4 +1,3 @@
-/-- Nightcreep -/
 card := {
   name := "Nightcreep",
   cost := [black, black],

@@ -1,4 +1,3 @@
-/-- Ancestral Blade -/
 card := {
   name := "Ancestral Blade",
   cost := [1, white],

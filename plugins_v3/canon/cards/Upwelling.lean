@@ -1,4 +1,3 @@
-/-- Upwelling -/
 card := {
   name := "Upwelling",
   cost := [3, green],

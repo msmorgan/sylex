@@ -1,4 +1,3 @@
-/-- Collected Company -/
 card := {
   name := "Collected Company",
   cost := [3, green],

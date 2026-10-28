@@ -1,4 +1,3 @@
-/-- Caught in the Crossfire -/
 card := {
   name := "Caught in the Crossfire",
   cost := [red, red],

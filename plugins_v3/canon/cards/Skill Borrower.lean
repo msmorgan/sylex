@@ -1,4 +1,3 @@
-/-- Skill Borrower -/
 card := {
   name := "Skill Borrower",
   cost := [2, blue],

@@ -1,4 +1,3 @@
-/-- Autarch Mammoth -/
 card := {
   name := "Autarch Mammoth",
   cost := [4, green, green],

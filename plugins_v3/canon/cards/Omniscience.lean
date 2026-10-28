@@ -1,4 +1,3 @@
-/-- Omniscience -/
 card := {
   name := "Omniscience",
   cost := [7, blue, blue, blue],

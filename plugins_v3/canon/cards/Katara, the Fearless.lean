@@ -1,4 +1,3 @@
-/-- Katara, the Fearless -/
 card := {
   name := "Katara, the Fearless",
   cost := [green, white, blue],

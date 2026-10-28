@@ -1,4 +1,3 @@
-/-- Kopala, Warden of Waves -/
 card := {
   name := "Kopala, Warden of Waves",
   cost := [1, blue, blue],

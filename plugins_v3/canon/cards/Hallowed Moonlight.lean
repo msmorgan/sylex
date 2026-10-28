@@ -1,4 +1,3 @@
-/-- Hallowed Moonlight -/
 card := {
   name := "Hallowed Moonlight",
   cost := [1, white],

@@ -1,4 +1,3 @@
-/-- Hijack -/
 card := {
   name := "Hijack",
   cost := [1, red, red],

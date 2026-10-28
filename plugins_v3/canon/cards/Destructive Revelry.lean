@@ -1,4 +1,3 @@
-/-- Destructive Revelry -/
 card := {
   name := "Destructive Revelry",
   cost := [red, green],

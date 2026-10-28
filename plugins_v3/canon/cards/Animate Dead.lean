@@ -1,4 +1,3 @@
-/-- Animate Dead -/
 card := {
   name := "Animate Dead",
   cost := [1, black],

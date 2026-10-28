@@ -1,4 +1,3 @@
-/-- Death-Mask Duplicant -/
 card := {
   name := "Death-Mask Duplicant",
   cost := [7],

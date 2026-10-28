@@ -1,4 +1,3 @@
-/-- Grimdancer -/
 card := {
   name := "Grimdancer",
   cost := [1, black, black],

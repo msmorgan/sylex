@@ -1,4 +1,3 @@
-/-- Rosheen Meanderer -/
 card := {
   name := "Rosheen Meanderer",
   cost := [3, hybridPip red green],

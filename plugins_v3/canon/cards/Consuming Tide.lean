@@ -1,4 +1,3 @@
-/-- Consuming Tide -/
 card := {
   name := "Consuming Tide",
   cost := [2, blue, blue],

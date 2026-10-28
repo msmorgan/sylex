@@ -1,4 +1,3 @@
-/-- Archfiend's Vessel -/
 card := {
   name := "Archfiend's Vessel",
   cost := [black],

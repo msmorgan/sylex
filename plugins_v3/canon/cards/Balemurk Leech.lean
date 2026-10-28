@@ -1,4 +1,3 @@
-/-- Balemurk Leech -/
 card := {
   name := "Balemurk Leech",
   cost := [1, black],

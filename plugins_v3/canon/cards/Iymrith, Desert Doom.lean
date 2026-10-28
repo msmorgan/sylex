@@ -1,4 +1,3 @@
-/-- Iymrith, Desert Doom -/
 card := {
   name := "Iymrith, Desert Doom",
   cost := [3, blue, blue],

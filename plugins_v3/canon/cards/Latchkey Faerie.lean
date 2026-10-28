@@ -1,4 +1,3 @@
-/-- Latchkey Faerie -/
 card := {
   name := "Latchkey Faerie",
   cost := [3, blue],

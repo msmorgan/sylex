@@ -1,4 +1,3 @@
-/-- Seraphic Greatsword -/
 card := {
   name := "Seraphic Greatsword",
   cost := [1, white],

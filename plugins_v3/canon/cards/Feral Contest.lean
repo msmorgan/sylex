@@ -1,4 +1,3 @@
-/-- Feral Contest -/
 card := {
   name := "Feral Contest",
   cost := [3, green],

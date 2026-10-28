@@ -1,4 +1,3 @@
-/-- Bard, Heir of Girion -/
 card := {
   name := "Bard, Heir of Girion",
   cost := [2, white, blue],

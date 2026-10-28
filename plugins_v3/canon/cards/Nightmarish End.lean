@@ -1,4 +1,3 @@
-/-- Nightmarish End -/
 card := {
   name := "Nightmarish End",
   cost := [2, black],

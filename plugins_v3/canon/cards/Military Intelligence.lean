@@ -1,4 +1,3 @@
-/-- Military Intelligence -/
 card := {
   name := "Military Intelligence",
   cost := [1, blue],

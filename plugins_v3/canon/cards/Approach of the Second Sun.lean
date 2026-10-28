@@ -1,4 +1,3 @@
-/-- Approach of the Second Sun -/
 card := {
   name := "Approach of the Second Sun",
   cost := [6, white],

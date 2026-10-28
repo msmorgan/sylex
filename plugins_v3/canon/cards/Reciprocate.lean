@@ -1,4 +1,3 @@
-/-- Reciprocate -/
 card := {
   name := "Reciprocate",
   cost := [white],

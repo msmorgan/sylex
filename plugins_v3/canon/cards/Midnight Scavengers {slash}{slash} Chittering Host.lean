@@ -1,4 +1,3 @@
-/-- Midnight Scavengers // Chittering Host -/
 card := transforming
   {
     front := {

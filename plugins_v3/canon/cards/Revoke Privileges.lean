@@ -1,4 +1,3 @@
-/-- Revoke Privileges -/
 card := {
   name := "Revoke Privileges",
   cost := [2, white],

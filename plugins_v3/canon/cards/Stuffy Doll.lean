@@ -1,4 +1,3 @@
-/-- Stuffy Doll -/
 card := {
   name := "Stuffy Doll",
   cost := [5],

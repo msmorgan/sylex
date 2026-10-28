@@ -1,4 +1,3 @@
-/-- Escaped Shapeshifter -/
 card := {
   name := "Escaped Shapeshifter",
   cost := [3, blue, blue],

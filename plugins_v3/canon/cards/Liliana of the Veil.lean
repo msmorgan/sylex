@@ -1,4 +1,3 @@
-/-- Liliana of the Veil -/
 card := {
   name := "Liliana of the Veil",
   cost := [1, black, black],

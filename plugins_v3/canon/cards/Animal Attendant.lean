@@ -1,4 +1,3 @@
-/-- Animal Attendant -/
 card := {
   name := "Animal Attendant",
   cost := [1, green],

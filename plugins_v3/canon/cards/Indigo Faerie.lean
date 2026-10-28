@@ -1,4 +1,3 @@
-/-- Indigo Faerie -/
 card := {
   name := "Indigo Faerie",
   cost := [1, blue],

@@ -1,4 +1,3 @@
-/-- Menacing Ogre -/
 card := {
   name := "Menacing Ogre",
   cost := [3, red, red],

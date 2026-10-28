@@ -1,4 +1,3 @@
-/-- Obeka, Splitter of Seconds -/
 card := {
   name := "Obeka, Splitter of Seconds",
   cost := [1, blue, black, red],

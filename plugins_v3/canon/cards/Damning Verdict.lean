@@ -1,4 +1,3 @@
-/-- Damning Verdict -/
 card := {
   name := "Damning Verdict",
   cost := [3, white, white],

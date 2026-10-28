@@ -1,4 +1,3 @@
-/-- Custodi Squire -/
 card := {
   name := "Custodi Squire",
   cost := [4, white],

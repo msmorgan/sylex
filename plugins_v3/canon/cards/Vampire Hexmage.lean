@@ -1,4 +1,3 @@
-/-- Vampire Hexmage -/
 card := {
   name := "Vampire Hexmage",
   cost := [black, black],

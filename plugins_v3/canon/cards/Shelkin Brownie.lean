@@ -1,4 +1,3 @@
-/-- Shelkin Brownie -/
 card := {
   name := "Shelkin Brownie",
   cost := [1, green],

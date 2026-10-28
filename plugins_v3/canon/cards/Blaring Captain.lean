@@ -1,4 +1,3 @@
-/-- Blaring Captain -/
 card := {
   name := "Blaring Captain",
   cost := [3, black],

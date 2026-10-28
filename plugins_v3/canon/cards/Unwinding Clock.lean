@@ -1,4 +1,3 @@
-/-- Unwinding Clock -/
 card := {
   name := "Unwinding Clock",
   cost := [4],

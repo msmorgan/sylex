@@ -1,4 +1,3 @@
-/-- Twinshot Sniper -/
 card := {
   name := "Twinshot Sniper",
   cost := [3, red],

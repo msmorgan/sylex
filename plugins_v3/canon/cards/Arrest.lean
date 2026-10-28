@@ -1,4 +1,3 @@
-/-- Arrest -/
 card := {
   name := "Arrest",
   cost := [2, white],

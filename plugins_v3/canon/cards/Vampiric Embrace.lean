@@ -1,4 +1,3 @@
-/-- Vampiric Embrace. -/
 card := {
   name := "Vampiric Embrace",
   cost := [2, black, black],

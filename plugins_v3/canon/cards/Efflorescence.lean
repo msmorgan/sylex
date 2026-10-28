@@ -1,5 +1,3 @@
-/-- Efflorescence: "Put two +1/+1 counters on target creature. / Infusion — If you gained life
-this turn, that creature also gains trample and indestructible until end of turn." -/
 card := {
   name := "Efflorescence",
   cost := [2, green],

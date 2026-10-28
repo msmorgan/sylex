@@ -1,4 +1,3 @@
-/-- Pacifism -/
 card := {
   name := "Pacifism",
   cost := [1, white],

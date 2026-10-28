@@ -1,4 +1,3 @@
-/-- Atris, Oracle of Half-Truths -/
 card := {
   name := "Atris, Oracle of Half-Truths",
   cost := [2, blue, black],

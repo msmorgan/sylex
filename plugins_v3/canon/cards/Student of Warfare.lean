@@ -1,4 +1,3 @@
-/-- Student of Warfare -/
 card := leveler
   {
     inner := {

@@ -1,4 +1,3 @@
-/-- Mutavault -/
 card := {
   name := "Mutavault",
   types := [land],

@@ -1,4 +1,3 @@
-/-- Grave Servitude -/
 card := {
   name := "Grave Servitude",
   cost := [1, black],

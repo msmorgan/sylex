@@ -1,4 +1,3 @@
-/-- Alabaster Leech -/
 card := {
   name := "Alabaster Leech",
   cost := [white],

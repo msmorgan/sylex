@@ -1,4 +1,3 @@
-/-- Thawing Glaciers -/
 card := {
   name := "Thawing Glaciers",
   types := [land],

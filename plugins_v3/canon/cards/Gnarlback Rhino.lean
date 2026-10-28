@@ -1,4 +1,3 @@
-/-- Gnarlback Rhino -/
 card := {
   name := "Gnarlback Rhino",
   cost := [2, green, green],

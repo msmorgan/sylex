@@ -1,4 +1,3 @@
-/-- Gaddock Teeg -/
 card := {
   name := "Gaddock Teeg",
   cost := [green, white],

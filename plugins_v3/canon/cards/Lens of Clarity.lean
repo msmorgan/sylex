@@ -1,4 +1,3 @@
-/-- Lens of Clarity -/
 card := {
   name := "Lens of Clarity",
   cost := [1],

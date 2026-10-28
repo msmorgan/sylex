@@ -1,4 +1,3 @@
-/-- Witch's Vengeance -/
 card := {
   name := "Witch's Vengeance",
   cost := [1, black, black],

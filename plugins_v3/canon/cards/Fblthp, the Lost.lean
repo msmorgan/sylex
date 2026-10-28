@@ -1,4 +1,3 @@
-/-- Fblthp, the Lost -/
 card := {
   name := "Fblthp, the Lost",
   cost := [1, blue],

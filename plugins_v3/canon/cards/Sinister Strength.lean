@@ -1,4 +1,3 @@
-/-- Sinister Strength -/
 card := {
   name := "Sinister Strength",
   cost := [1, black],

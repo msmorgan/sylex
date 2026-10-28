@@ -1,4 +1,3 @@
-/-- Caller of the Hunt -/
 card := {
   name := "Caller of the Hunt",
   cost := [2, green],

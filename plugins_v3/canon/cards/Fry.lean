@@ -1,4 +1,3 @@
-/-- Fry -/
 card := {
   name := "Fry",
   cost := [1, red],

@@ -1,4 +1,3 @@
-/-- Vorel of the Hull Clade -/
 card := {
   name := "Vorel of the Hull Clade",
   cost := [1, green, blue],

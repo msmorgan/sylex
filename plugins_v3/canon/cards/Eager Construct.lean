@@ -1,4 +1,3 @@
-/-- Eager Construct -/
 card := {
   name := "Eager Construct",
   cost := [2],

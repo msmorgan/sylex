@@ -1,4 +1,3 @@
-/-- Rogues' Gallery -/
 card := {
   name := "Rogues' Gallery",
   cost := [2, black],

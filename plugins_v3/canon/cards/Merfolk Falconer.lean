@@ -1,4 +1,3 @@
-/-- Merfolk Falconer -/
 card := {
   name := "Merfolk Falconer",
   cost := [3, blue, blue],

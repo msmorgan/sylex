@@ -1,4 +1,3 @@
-/-- Tawnos, the Toymaker -/
 card := {
   name := "Tawnos, the Toymaker",
   cost := [3, green, blue],

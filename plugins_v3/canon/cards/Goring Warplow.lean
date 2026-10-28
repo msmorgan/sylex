@@ -1,4 +1,3 @@
-/-- Goring Warplow -/
 card := prototype
   {
     inner := {

@@ -1,4 +1,3 @@
-/-- Predatory Wurm -/
 card := {
   name := "Predatory Wurm",
   cost := [3, green],

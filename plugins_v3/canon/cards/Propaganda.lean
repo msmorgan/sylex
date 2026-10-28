@@ -1,4 +1,3 @@
-/-- Propaganda -/
 card := {
   name := "Propaganda",
   cost := [2, blue],

@@ -1,4 +1,3 @@
-/-- Archon of Absolution -/
 card := {
   name := "Archon of Absolution",
   cost := [3, white],

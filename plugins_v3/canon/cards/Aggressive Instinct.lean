@@ -1,4 +1,3 @@
-/-- Aggressive Instinct -/
 card := {
   name := "Aggressive Instinct",
   cost := [1, green],

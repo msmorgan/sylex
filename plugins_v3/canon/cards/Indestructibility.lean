@@ -1,4 +1,3 @@
-/-- Indestructibility -/
 card := {
   name := "Indestructibility",
   cost := [3, white],

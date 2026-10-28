@@ -1,4 +1,3 @@
-/-- Lightning Reflexes -/
 card := {
   name := "Lightning Reflexes",
   cost := [1, red],

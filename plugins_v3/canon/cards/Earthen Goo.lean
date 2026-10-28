@@ -1,4 +1,3 @@
-/-- Earthen Goo -/
 card := {
   name := "Earthen Goo",
   cost := [2, red],

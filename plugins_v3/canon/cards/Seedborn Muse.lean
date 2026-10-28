@@ -1,4 +1,3 @@
-/-- Seedborn Muse -/
 card := {
   name := "Seedborn Muse",
   cost := [3, green, green],

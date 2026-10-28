@@ -1,4 +1,3 @@
-/-- Aim High -/
 card := {
   name := "Aim High",
   cost := [1, green],

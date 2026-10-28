@@ -1,3 +1,5 @@
+/-- Pins winning a coin flip, which differs from merely obtaining heads or tails
+[CR#705.2], and the luck-counter threshold on its upkeep trigger. -/
 card := {
   name := "Chance Encounter",
   cost := [2, red, red],

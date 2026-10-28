@@ -1,4 +1,3 @@
-/-- Eagle Vision -/
 card := {
   name := "Eagle Vision",
   cost := [4, blue],

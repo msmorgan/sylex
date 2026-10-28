@@ -1,4 +1,3 @@
-/-- Captain Marvel, Apex Avenger -/
 card := {
   name := "Captain Marvel, Apex Avenger",
   cost := [5, red, white],

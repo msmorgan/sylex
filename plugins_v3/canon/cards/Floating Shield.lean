@@ -1,4 +1,3 @@
-/-- Floating Shield -/
 card := {
   name := "Floating Shield",
   cost := [2, white],

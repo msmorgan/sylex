@@ -1,4 +1,3 @@
-/-- Repeated Reverberation -/
 card := {
   name := "Repeated Reverberation",
   cost := [2, red, red],

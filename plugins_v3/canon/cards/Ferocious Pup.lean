@@ -1,4 +1,3 @@
-/-- Ferocious Pup -/
 card := {
   name := "Ferocious Pup",
   cost := [2, green],

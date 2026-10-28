@@ -1,4 +1,3 @@
-/-- Steelclaw Lance -/
 card := {
   name := "Steelclaw Lance",
   cost := [black, red],

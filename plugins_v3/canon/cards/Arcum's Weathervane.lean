@@ -1,4 +1,3 @@
-/-- Arcum's Weathervane -/
 card := {
   name := "Arcum's Weathervane",
   cost := [2],

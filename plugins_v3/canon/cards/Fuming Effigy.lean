@@ -1,4 +1,3 @@
-/-- Fuming Effigy -/
 card := {
   name := "Fuming Effigy",
   cost := [3, red],

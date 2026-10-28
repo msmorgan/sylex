@@ -1,3 +1,6 @@
+/-- Pins the planeswalker entry conferral [CR#306.5b] and loyalty costs
+[CR#606.4], with loyalty-ability timing and the once-per-turn restriction [CR#606.3].
+Zero loyalty puts the planeswalker into its owner’s graveyard [CR#704.5i]. -/
 card := {
   name := "Jace Beleren",
   cost := [1, blue, blue],

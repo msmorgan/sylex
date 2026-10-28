@@ -1,4 +1,3 @@
-/-- Commander's Insignia -/
 card := {
   name := "Commander's Insignia",
   cost := [2, white, white],

@@ -1,4 +1,3 @@
-/-- Bioplasm -/
 card := {
   name := "Bioplasm",
   cost := [3, green, green],

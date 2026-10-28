@@ -1,4 +1,3 @@
-/-- Field of Dreams -/
 card := {
   name := "Field of Dreams",
   cost := [blue],

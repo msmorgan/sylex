@@ -1,4 +1,3 @@
-/-- Tyrant of Valakut -/
 card := {
   name := "Tyrant of Valakut",
   cost := [5, red, red],

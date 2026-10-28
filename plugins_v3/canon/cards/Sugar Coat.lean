@@ -1,4 +1,3 @@
-/-- Sugar Coat -/
 card := {
   name := "Sugar Coat",
   cost := [2, blue],

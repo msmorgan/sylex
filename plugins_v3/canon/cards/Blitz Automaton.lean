@@ -1,4 +1,3 @@
-/-- Blitz Automaton -/
 card := prototype
   {
     inner := {

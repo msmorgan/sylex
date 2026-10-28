@@ -1,4 +1,3 @@
-/-- Sandstone Oracle -/
 card := {
   name := "Sandstone Oracle",
   cost := [7],

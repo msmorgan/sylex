@@ -1,4 +1,3 @@
-/-- Foriysian Brigade -/
 card := {
   name := "Foriysian Brigade",
   cost := [3, white],

@@ -1,4 +1,3 @@
-/-- Containment Priest -/
 card := {
   name := "Containment Priest",
   cost := [1, white],

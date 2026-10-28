@@ -1,4 +1,3 @@
-/-- Elemental Resonance -/
 card := {
   name := "Elemental Resonance",
   cost := [2, green, green],

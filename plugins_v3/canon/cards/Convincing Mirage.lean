@@ -1,4 +1,3 @@
-/-- Convincing Mirage -/
 card := {
   name := "Convincing Mirage",
   cost := [1, blue],

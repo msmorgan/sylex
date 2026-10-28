@@ -1,4 +1,3 @@
-/-- Curator of Destinies -/
 card := {
   name := "Curator of Destinies",
   cost := [4, blue, blue],

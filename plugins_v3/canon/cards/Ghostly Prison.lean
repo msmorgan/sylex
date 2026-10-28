@@ -1,4 +1,3 @@
-/-- Ghostly Prison -/
 card := {
   name := "Ghostly Prison",
   cost := [2, white],

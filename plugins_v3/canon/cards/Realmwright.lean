@@ -1,4 +1,3 @@
-/-- Realmwright -/
 card := {
   name := "Realmwright",
   cost := [blue],

@@ -1,4 +1,3 @@
-/-- Soul's Might -/
 card := {
   name := "Soul's Might",
   cost := [4, green],

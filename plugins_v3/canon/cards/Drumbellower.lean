@@ -1,4 +1,3 @@
-/-- Drumbellower -/
 card := {
   name := "Drumbellower",
   cost := [2, white],

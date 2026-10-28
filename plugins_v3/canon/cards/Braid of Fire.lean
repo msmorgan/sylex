@@ -1,4 +1,3 @@
-/-- Braid of Fire -/
 card := {
   name := "Braid of Fire",
   cost := [1, red],

@@ -1,4 +1,3 @@
-/-- Danitha, New Benalia's Light -/
 card := {
   name := "Danitha, New Benalia's Light",
   cost := [1, green, white],

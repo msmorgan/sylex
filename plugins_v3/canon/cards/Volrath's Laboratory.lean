@@ -1,4 +1,3 @@
-/-- Volrath's Laboratory -/
 card := {
   name := "Volrath's Laboratory",
   cost := [5],

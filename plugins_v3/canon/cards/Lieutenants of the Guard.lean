@@ -1,4 +1,3 @@
-/-- Lieutenants of the Guard -/
 card := {
   name := "Lieutenants of the Guard",
   cost := [4, white],

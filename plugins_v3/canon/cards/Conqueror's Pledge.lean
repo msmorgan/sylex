@@ -1,4 +1,3 @@
-/-- Conqueror's Pledge -/
 card := {
   name := "Conqueror's Pledge",
   cost := [2, white, white, white],

@@ -1,4 +1,3 @@
-/-- Rafter Demon -/
 card := {
   name := "Rafter Demon",
   cost := [2, black, red],

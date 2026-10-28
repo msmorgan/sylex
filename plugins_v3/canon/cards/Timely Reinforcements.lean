@@ -1,4 +1,3 @@
-/-- Timely Reinforcements -/
 card := {
   name := "Timely Reinforcements",
   cost := [2, white],

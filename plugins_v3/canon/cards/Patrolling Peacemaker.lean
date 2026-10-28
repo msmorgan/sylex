@@ -1,4 +1,3 @@
-/-- Patrolling Peacemaker -/
 card := {
   name := "Patrolling Peacemaker",
   cost := [2, white],

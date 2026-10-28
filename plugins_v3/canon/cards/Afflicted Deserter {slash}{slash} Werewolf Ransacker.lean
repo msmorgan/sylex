@@ -1,4 +1,3 @@
-/-- Afflicted Deserter // Werewolf Ransacker -/
 card := transforming
   {
     front := {

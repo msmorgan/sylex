@@ -1,4 +1,3 @@
-/-- Bonus Round -/
 card := {
   name := "Bonus Round",
   cost := [1, red, red],

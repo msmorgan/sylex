@@ -1,4 +1,3 @@
-/-- Celestial Judgment -/
 card := {
   name := "Celestial Judgment",
   cost := [4, white, white],

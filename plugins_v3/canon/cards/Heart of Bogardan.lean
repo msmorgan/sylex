@@ -1,4 +1,3 @@
-/-- Heart of Bogardan -/
 card := {
   name := "Heart of Bogardan",
   cost := [2, red, red],

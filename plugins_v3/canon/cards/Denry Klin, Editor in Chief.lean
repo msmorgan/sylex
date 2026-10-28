@@ -1,4 +1,3 @@
-/-- Denry Klin, Editor in Chief -/
 card := {
   name := "Denry Klin, Editor in Chief",
   cost := [2, white, blue],

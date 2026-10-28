@@ -1,4 +1,3 @@
-/-- Extinction -/
 card := {
   name := "Extinction",
   cost := [4, black],

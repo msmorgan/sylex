@@ -1,4 +1,3 @@
-/-- Deadpool, Trading Card -/
 card := {
   name := "Deadpool, Trading Card",
   cost := [2, black, red],

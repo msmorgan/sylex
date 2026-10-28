@@ -1,4 +1,3 @@
-/-- Sphinx of Uthuun -/
 card := {
   name := "Sphinx of Uthuun",
   cost := [5, blue, blue],

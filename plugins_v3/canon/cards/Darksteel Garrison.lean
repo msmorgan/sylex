@@ -1,4 +1,3 @@
-/-- Darksteel Garrison -/
 card := {
   name := "Darksteel Garrison",
   cost := [2],

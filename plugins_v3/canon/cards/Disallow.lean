@@ -1,4 +1,3 @@
-/-- Disallow -/
 card := {
   name := "Disallow",
   cost := [1, blue, blue],

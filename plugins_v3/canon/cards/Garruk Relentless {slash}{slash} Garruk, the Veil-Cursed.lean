@@ -1,4 +1,3 @@
-/-- Garruk Relentless // Garruk, the Veil-Cursed -/
 card := transforming
   {
     front := {

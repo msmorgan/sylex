@@ -1,4 +1,3 @@
-/-- Sculpting Steel -/
 card := {
   name := "Sculpting Steel",
   cost := [3],

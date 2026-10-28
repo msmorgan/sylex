@@ -1,4 +1,3 @@
-/-- Mox Diamond -/
 card := {
   name := "Mox Diamond",
   cost := some [],

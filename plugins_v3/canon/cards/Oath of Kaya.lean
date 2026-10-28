@@ -1,4 +1,3 @@
-/-- Oath of Kaya -/
 card := {
   name := "Oath of Kaya",
   cost := [1, white, black],

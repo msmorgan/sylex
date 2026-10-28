@@ -1,4 +1,3 @@
-/-- Benevolent Blessing -/
 card := {
   name := "Benevolent Blessing",
   cost := [1, white],

@@ -1,4 +1,3 @@
-/-- Scourge of Nel Toth -/
 card := {
   name := "Scourge of Nel Toth",
   cost := [5, black, black],

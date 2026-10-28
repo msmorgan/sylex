@@ -1,4 +1,3 @@
-/-- Arcane Proxy -/
 card := prototype
   {
     inner := {

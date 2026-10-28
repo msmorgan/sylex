@@ -1,6 +1,3 @@
-/-- Wormfang Manta {5}{U}{U} — Creature — Nightmare Fish Beast 6/1. "Flying. When Wormfang
-Manta enters, you skip your next turn. When Wormfang Manta leaves the battlefield, you take an
-extra turn after this one." -/
 card := {
   name := "Wormfang Manta",
   cost := [5, blue, blue],

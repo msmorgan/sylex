@@ -1,4 +1,3 @@
-/-- Verity Circle -/
 card := {
   name := "Verity Circle",
   cost := [2, blue],

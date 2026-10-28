@@ -1,4 +1,3 @@
-/-- Festival -/
 card := {
   name := "Festival",
   cost := [white],

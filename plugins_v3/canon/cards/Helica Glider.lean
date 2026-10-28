@@ -1,4 +1,3 @@
-/-- Helica Glider -/
 card := {
   name := "Helica Glider",
   cost := [2, white],

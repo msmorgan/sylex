@@ -1,4 +1,3 @@
-/-- Ichor Shade -/
 card := {
   name := "Ichor Shade",
   cost := [2, black],

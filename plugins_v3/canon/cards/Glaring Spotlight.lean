@@ -1,4 +1,5 @@
-/-- Glaring Spotlight -/
+/-- Pins an as-though exception for targeting by your spells and abilities.
+The exception applies only to that act and does not remove hexproof [CR#609.4]. -/
 card := {
   name := "Glaring Spotlight",
   cost := [1],

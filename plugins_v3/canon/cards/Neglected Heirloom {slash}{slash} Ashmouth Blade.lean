@@ -1,4 +1,3 @@
-/-- Neglected Heirloom // Ashmouth Blade -/
 card := transforming
   {
     front := {

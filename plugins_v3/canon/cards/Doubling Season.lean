@@ -1,4 +1,3 @@
-/-- Doubling Season -/
 card := {
   name := "Doubling Season",
   cost := [4, green],

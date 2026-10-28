@@ -1,4 +1,3 @@
-/-- Black Vise -/
 card := {
   name := "Black Vise",
   cost := [1],

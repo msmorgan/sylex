@@ -1,4 +1,3 @@
-/-- Power Artifact -/
 card := {
   name := "Power Artifact",
   cost := [blue, blue],

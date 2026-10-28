@@ -1,4 +1,3 @@
-/-- Soldevi Adnate -/
 card := {
   name := "Soldevi Adnate",
   cost := [1, black],

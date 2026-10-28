@@ -1,4 +1,3 @@
-/-- Strionic Resonator -/
 card := {
   name := "Strionic Resonator",
   cost := [2],

@@ -1,4 +1,3 @@
-/-- Watcher in the Web -/
 card := {
   name := "Watcher in the Web",
   cost := [4, green],

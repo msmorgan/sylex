@@ -1,4 +1,3 @@
-/-- Ainok Tracker -/
 card := {
   name := "Ainok Tracker",
   cost := [5, red],

@@ -1,4 +1,3 @@
-/-- Chrome Mox -/
 card := {
   name := "Chrome Mox",
   cost := some [],

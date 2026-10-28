@@ -1,4 +1,3 @@
-/-- Yedora, Grave Gardener -/
 card := {
   name := "Yedora, Grave Gardener",
   cost := [4, green],

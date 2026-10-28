@@ -1,4 +1,3 @@
-/-- Blood Reckoning -/
 card := {
   name := "Blood Reckoning",
   cost := [3, black],

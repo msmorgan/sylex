@@ -1,4 +1,3 @@
-/-- Nyxathid -/
 card := {
   name := "Nyxathid",
   cost := [1, black, black],

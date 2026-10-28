@@ -1,4 +1,3 @@
-/-- Secret Rendezvous -/
 card := {
   name := "Secret Rendezvous",
   cost := [1, white, white],

@@ -1,4 +1,3 @@
-/-- Eyetwitch -/
 card := {
   name := "Eyetwitch",
   cost := [black],

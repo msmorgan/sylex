@@ -1,4 +1,3 @@
-/-- Tezzeret's Gatebreaker -/
 card := {
   name := "Tezzeret's Gatebreaker",
   cost := [4],

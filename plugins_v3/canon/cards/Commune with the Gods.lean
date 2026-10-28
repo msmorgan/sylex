@@ -1,4 +1,3 @@
-/-- Commune with the Gods -/
 card := {
   name := "Commune with the Gods",
   cost := [1, green],

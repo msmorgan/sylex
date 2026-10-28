@@ -1,4 +1,3 @@
-/-- Tyrant's Choice -/
 card := {
   name := "Tyrant's Choice",
   cost := [1, black],

@@ -1,4 +1,3 @@
-/-- Cairn Wanderer -/
 card := {
   name := "Cairn Wanderer",
   cost := [4, black],

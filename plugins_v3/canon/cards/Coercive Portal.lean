@@ -1,4 +1,3 @@
-/-- Coercive Portal -/
 card := {
   name := "Coercive Portal",
   cost := [4],

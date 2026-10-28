@@ -1,4 +1,3 @@
-/-- Prismari Pianist -/
 card := {
   name := "Prismari Pianist",
   cost := [1, red, red],

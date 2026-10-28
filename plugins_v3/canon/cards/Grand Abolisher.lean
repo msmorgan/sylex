@@ -1,4 +1,3 @@
-/-- Grand Abolisher -/
 card := {
   name := "Grand Abolisher",
   cost := [white, white],

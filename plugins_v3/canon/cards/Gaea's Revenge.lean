@@ -1,4 +1,3 @@
-/-- Gaea's Revenge -/
 card := {
   name := "Gaea's Revenge",
   cost := [5, green, green],

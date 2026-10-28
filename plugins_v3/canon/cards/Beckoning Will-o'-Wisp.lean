@@ -1,4 +1,3 @@
-/-- Beckoning Will-o'-Wisp -/
 card := {
   name := "Beckoning Will-o'-Wisp",
   cost := [2, white],

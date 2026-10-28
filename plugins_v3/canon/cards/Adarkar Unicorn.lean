@@ -1,4 +1,3 @@
-/-- Adarkar Unicorn -/
 card := {
   name := "Adarkar Unicorn",
   cost := [1, white, white],

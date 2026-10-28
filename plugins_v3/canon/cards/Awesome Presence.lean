@@ -1,4 +1,3 @@
-/-- Awesome Presence -/
 card := {
   name := "Awesome Presence",
   cost := [blue],

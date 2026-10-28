@@ -1,4 +1,3 @@
-/-- Blood Sun -/
 card := {
   name := "Blood Sun",
   cost := [2, red],

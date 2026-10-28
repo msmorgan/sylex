@@ -1,4 +1,3 @@
-/-- Syr Konrad, the Grim -/
 card := {
   name := "Syr Konrad, the Grim",
   cost := [3, black, black],

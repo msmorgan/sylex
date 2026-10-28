@@ -1,4 +1,3 @@
-/-- Inquisitor's Flail -/
 card := {
   name := "Inquisitor's Flail",
   cost := [2],

@@ -1,4 +1,3 @@
-/-- True-Name Nemesis -/
 card := {
   name := "True-Name Nemesis",
   cost := [1, blue, blue],

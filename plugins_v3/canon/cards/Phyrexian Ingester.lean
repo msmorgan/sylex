@@ -1,4 +1,3 @@
-/-- Phyrexian Ingester -/
 card := {
   name := "Phyrexian Ingester",
   cost := [6, blue],

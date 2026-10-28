@@ -1,4 +1,3 @@
-/-- Grave Peril -/
 card := {
   name := "Grave Peril",
   cost := [1, black],

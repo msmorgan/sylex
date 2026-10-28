@@ -1,4 +1,3 @@
-/-- Sphinx of the Second Sun -/
 card := {
   name := "Sphinx of the Second Sun",
   cost := [6, blue, blue],

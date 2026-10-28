@@ -1,4 +1,3 @@
-/-- Fact or Fiction -/
 card := {
   name := "Fact or Fiction",
   cost := [3, blue],

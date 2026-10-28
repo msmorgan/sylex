@@ -1,4 +1,3 @@
-/-- Two-Headed Giant of Foriys -/
 card := {
   name := "Two-Headed Giant of Foriys",
   cost := [4, red],

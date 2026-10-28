@@ -1,4 +1,3 @@
-/-- Celebrate the Harvest -/
 card := {
   name := "Celebrate the Harvest",
   cost := [3, green],

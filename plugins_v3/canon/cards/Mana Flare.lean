@@ -1,4 +1,3 @@
-/-- Mana Flare -/
 card := {
   name := "Mana Flare",
   cost := [2, red],

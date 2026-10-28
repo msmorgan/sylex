@@ -1,4 +1,3 @@
-/-- Hymn to Tourach -/
 card := {
   name := "Hymn to Tourach",
   cost := [black, black],

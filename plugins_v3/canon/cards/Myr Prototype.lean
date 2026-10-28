@@ -1,4 +1,3 @@
-/-- Myr Prototype -/
 card := {
   name := "Myr Prototype",
   cost := [5],

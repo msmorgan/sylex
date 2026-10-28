@@ -1,4 +1,3 @@
-/-- Unblinking Observer -/
 card := {
   name := "Unblinking Observer",
   cost := [1, blue],

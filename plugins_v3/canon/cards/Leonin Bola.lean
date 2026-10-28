@@ -1,4 +1,3 @@
-/-- Leonin Bola -/
 card := {
   name := "Leonin Bola",
   cost := [1],

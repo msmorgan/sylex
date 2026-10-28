@@ -1,4 +1,3 @@
-/-- Heart of Yavimaya -/
 card := {
   name := "Heart of Yavimaya",
   types := [land],

@@ -1,4 +1,3 @@
-/-- Leyline of Vitality -/
 card := {
   name := "Leyline of Vitality",
   cost := [2, green, green],

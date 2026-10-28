@@ -1,5 +1,3 @@
-/-- Aerial Volley {G} — Instant. "Aerial Volley deals 3 damage divided as you choose among
-one, two, or three target creatures with flying." -/
 card := {
   name := "Aerial Volley",
   cost := [green],

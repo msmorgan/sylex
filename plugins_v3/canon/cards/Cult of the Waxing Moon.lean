@@ -1,4 +1,3 @@
-/-- Cult of the Waxing Moon -/
 card := {
   name := "Cult of the Waxing Moon",
   cost := [4, green],

@@ -1,4 +1,3 @@
-/-- Donal, Herald of Wings -/
 card := {
   name := "Donal, Herald of Wings",
   cost := [2, blue, blue],

@@ -1,4 +1,3 @@
-/-- Embercleave -/
 card := {
   name := "Embercleave",
   cost := [4, red, red],

@@ -1,4 +1,3 @@
-/-- Ertai's Trickery -/
 card := {
   name := "Ertai's Trickery",
   cost := [blue],

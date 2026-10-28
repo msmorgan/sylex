@@ -1,4 +1,3 @@
-/-- Explosive Singularity -/
 card := {
   name := "Explosive Singularity",
   cost := [8, red, red],

@@ -1,4 +1,3 @@
-/-- Vraska's Scorn -/
 card := {
   name := "Vraska's Scorn",
   cost := [2, black, black],

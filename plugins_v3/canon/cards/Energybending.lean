@@ -1,4 +1,3 @@
-/-- Energybending -/
 card := {
   name := "Energybending",
   cost := [2],

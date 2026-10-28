@@ -1,4 +1,3 @@
-/-- Darkest Hour -/
 card := {
   name := "Darkest Hour",
   cost := [black],

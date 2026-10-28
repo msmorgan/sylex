@@ -1,4 +1,5 @@
-/-- Mana Leak {1}{U} — Instant. "Counter target spell unless its controller pays {3}." -/
+/-- Pins the unless-payment construction with the targeted spell’s controller
+as the payer [CR#118.12a]. -/
 card := {
   name := "Mana Leak",
   cost := [1, blue],

@@ -1,4 +1,3 @@
-/-- Pentarch Ward -/
 card := {
   name := "Pentarch Ward",
   cost := [2, white],

@@ -1,4 +1,3 @@
-/-- Moonlit Meditation -/
 card := {
   name := "Moonlit Meditation",
   cost := [2, blue],

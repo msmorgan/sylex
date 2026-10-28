@@ -1,4 +1,3 @@
-/-- Vexing Shusher -/
 card := {
   name := "Vexing Shusher",
   cost := [hybridPip red green, hybridPip red green],

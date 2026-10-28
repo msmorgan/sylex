@@ -1,4 +1,3 @@
-/-- Parapet -/
 card := {
   name := "Parapet",
   cost := [1, white],

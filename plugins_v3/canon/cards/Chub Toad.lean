@@ -1,4 +1,3 @@
-/-- Chub Toad -/
 card := {
   name := "Chub Toad",
   cost := [2, green],

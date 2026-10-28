@@ -1,4 +1,3 @@
-/-- Termination Facilitator -/
 card := {
   name := "Termination Facilitator",
   cost := [1, black],

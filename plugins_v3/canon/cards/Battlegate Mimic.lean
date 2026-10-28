@@ -1,4 +1,3 @@
-/-- Battlegate Mimic -/
 card := {
   name := "Battlegate Mimic",
   cost := [1, hybridPip red white],

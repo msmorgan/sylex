@@ -1,4 +1,3 @@
-/-- Rhystic Study -/
 card := {
   name := "Rhystic Study",
   cost := [2, blue],

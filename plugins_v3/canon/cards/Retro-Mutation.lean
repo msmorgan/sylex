@@ -1,4 +1,3 @@
-/-- Retro-Mutation -/
 card := {
   name := "Retro-Mutation",
   cost := [2, blue],

@@ -1,4 +1,3 @@
-/-- Wall of Shards -/
 card := {
   name := "Wall of Shards",
   cost := [1, white],

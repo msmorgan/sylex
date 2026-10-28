@@ -1,4 +1,3 @@
-/-- Soul Ransom -/
 card := {
   name := "Soul Ransom",
   cost := [2, blue, black],

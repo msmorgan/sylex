@@ -1,4 +1,3 @@
-/-- Out of Bounds -/
 card := {
   name := "Out of Bounds",
   cost := [3, blue],

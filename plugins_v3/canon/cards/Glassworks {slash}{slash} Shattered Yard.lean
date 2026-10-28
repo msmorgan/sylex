@@ -1,4 +1,3 @@
-/-- Glassworks // Shattered Yard -/
 card := sharedLineSplit
   {
     shared := { types := [enchantment], subtypes := [room] },

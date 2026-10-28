@@ -1,4 +1,3 @@
-/-- Asmira, Holy Avenger -/
 card := {
   name := "Asmira, Holy Avenger",
   cost := [2, green, white],

@@ -1,4 +1,3 @@
-/-- Defensive Maneuvers -/
 card := {
   name := "Defensive Maneuvers",
   cost := [3, white],

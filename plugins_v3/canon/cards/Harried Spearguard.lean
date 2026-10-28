@@ -1,4 +1,3 @@
-/-- Harried Spearguard -/
 card := {
   name := "Harried Spearguard",
   cost := [red],

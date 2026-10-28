@@ -1,4 +1,3 @@
-/-- Empty City Ruse -/
 card := {
   name := "Empty City Ruse",
   cost := [white],

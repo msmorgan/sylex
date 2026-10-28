@@ -1,4 +1,3 @@
-/-- Chromatic Armor -/
 card := {
   name := "Chromatic Armor",
   cost := [1, white, blue],

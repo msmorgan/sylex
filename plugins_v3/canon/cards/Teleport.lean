@@ -1,4 +1,3 @@
-/-- Teleport -/
 card := {
   name := "Teleport",
   cost := [blue, blue, blue],

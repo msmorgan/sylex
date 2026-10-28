@@ -1,4 +1,3 @@
-/-- Stomp and Howl -/
 card := {
   name := "Stomp and Howl",
   cost := [2, green],

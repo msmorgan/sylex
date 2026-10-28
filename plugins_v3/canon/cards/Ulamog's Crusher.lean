@@ -1,4 +1,3 @@
-/-- Ulamog's Crusher -/
 card := {
   name := "Ulamog's Crusher",
   cost := [8],

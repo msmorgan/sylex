@@ -1,4 +1,3 @@
-/-- Generator Servant -/
 card := {
   name := "Generator Servant",
   cost := [1, red],

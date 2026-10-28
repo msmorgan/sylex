@@ -1,4 +1,3 @@
-/-- Briarblade Adept -/
 card := {
   name := "Briarblade Adept",
   cost := [4, black],

@@ -1,4 +1,3 @@
-/-- Blatant Thievery -/
 card := {
   name := "Blatant Thievery",
   cost := [4, blue, blue, blue],

@@ -1,4 +1,3 @@
-/-- Keeper of the Flame -/
 card := {
   name := "Keeper of the Flame",
   cost := [red, red],

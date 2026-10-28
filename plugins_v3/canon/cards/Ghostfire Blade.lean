@@ -1,4 +1,3 @@
-/-- Ghostfire Blade -/
 card := {
   name := "Ghostfire Blade",
   cost := [1],

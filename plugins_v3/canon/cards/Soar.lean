@@ -1,4 +1,3 @@
-/-- Soar -/
 card := {
   name := "Soar",
   cost := [1, blue],

@@ -1,4 +1,3 @@
-/-- Academy Journeymage -/
 card := {
   name := "Academy Journeymage",
   cost := [4, blue],

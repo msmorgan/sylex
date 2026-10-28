@@ -1,4 +1,3 @@
-/-- Krosan Druid -/
 card := {
   name := "Krosan Druid",
   cost := [2, green],

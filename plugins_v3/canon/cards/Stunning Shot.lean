@@ -1,4 +1,3 @@
-/-- Stunning Shot -/
 card := {
   name := "Stunning Shot",
   cost := [1, white],

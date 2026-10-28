@@ -1,4 +1,3 @@
-/-- Void Mirror -/
 card := {
   name := "Void Mirror",
   cost := [2],

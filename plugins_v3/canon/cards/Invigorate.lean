@@ -1,4 +1,3 @@
-/-- Invigorate -/
 card := {
   name := "Invigorate",
   cost := [2, green],

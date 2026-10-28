@@ -1,4 +1,3 @@
-/-- Artificer's Assistant -/
 card := {
   name := "Artificer's Assistant",
   cost := [blue],

@@ -1,4 +1,3 @@
-/-- Overgrown Zealot -/
 card := {
   name := "Overgrown Zealot",
   cost := [1, green],

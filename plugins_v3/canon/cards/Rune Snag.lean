@@ -1,4 +1,3 @@
-/-- Rune Snag -/
 card := {
   name := "Rune Snag",
   cost := [1, blue],

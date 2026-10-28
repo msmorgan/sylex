@@ -1,4 +1,3 @@
-/-- Tithe Taker -/
 card := {
   name := "Tithe Taker",
   cost := [1, white],

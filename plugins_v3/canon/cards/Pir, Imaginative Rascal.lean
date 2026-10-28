@@ -1,4 +1,3 @@
-/-- Pir, Imaginative Rascal -/
 card := {
   name := "Pir, Imaginative Rascal",
   cost := [2, green],

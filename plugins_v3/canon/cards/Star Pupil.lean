@@ -1,4 +1,3 @@
-/-- Star Pupil -/
 card := {
   name := "Star Pupil",
   cost := [white],

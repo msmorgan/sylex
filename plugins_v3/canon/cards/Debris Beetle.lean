@@ -1,4 +1,3 @@
-/-- Debris Beetle -/
 card := {
   name := "Debris Beetle",
   cost := [2, black, green],

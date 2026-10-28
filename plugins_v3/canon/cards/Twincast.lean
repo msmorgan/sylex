@@ -1,4 +1,3 @@
-/-- Twincast -/
 card := {
   name := "Twincast",
   cost := [blue, blue],

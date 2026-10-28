@@ -1,4 +1,3 @@
-/-- Riddles in the Dark -/
 card := {
   name := "Riddles in the Dark",
   cost := [2, blue],

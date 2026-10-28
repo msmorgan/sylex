@@ -1,4 +1,3 @@
-/-- Requisition Raid -/
 card := {
   name := "Requisition Raid",
   cost := [white],

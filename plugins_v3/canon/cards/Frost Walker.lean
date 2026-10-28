@@ -1,4 +1,3 @@
-/-- Frost Walker -/
 card := {
   name := "Frost Walker",
   cost := [1, blue],

@@ -1,4 +1,3 @@
-/-- Mystic Veil -/
 card := {
   name := "Mystic Veil",
   cost := [1, blue],

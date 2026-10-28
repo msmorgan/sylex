@@ -1,4 +1,3 @@
-/-- Mourning Patrol // Morning Apparition -/
 card := transforming
   {
     front := {

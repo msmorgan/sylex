@@ -1,4 +1,3 @@
-/-- Fellwar Stone -/
 card := {
   name := "Fellwar Stone",
   cost := [2],

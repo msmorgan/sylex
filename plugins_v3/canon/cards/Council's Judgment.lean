@@ -1,4 +1,3 @@
-/-- Council's Judgment -/
 card := {
   name := "Council's Judgment",
   cost := [1, white, white],

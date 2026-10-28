@@ -1,4 +1,3 @@
-/-- Nissa, Ascended Animist -/
 card := {
   name := "Nissa, Ascended Animist",
   cost := [3, green, green, phyrexianPip green, phyrexianPip green],

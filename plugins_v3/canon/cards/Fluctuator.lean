@@ -1,4 +1,3 @@
-/-- Fluctuator -/
 card := {
   name := "Fluctuator",
   cost := [2],

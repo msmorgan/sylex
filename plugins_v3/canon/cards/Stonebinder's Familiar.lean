@@ -1,4 +1,3 @@
-/-- Stonebinder's Familiar -/
 card := {
   name := "Stonebinder's Familiar",
   cost := [white],

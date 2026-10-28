@@ -1,4 +1,3 @@
-/-- Tower Winder -/
 card := {
   name := "Tower Winder",
   cost := [1, green],

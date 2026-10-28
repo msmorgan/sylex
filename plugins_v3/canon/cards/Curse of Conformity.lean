@@ -1,4 +1,3 @@
-/-- Curse of Conformity -/
 card := {
   name := "Curse of Conformity",
   cost := [4, white],

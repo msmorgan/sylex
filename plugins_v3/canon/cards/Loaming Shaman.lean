@@ -1,4 +1,3 @@
-/-- Loaming Shaman -/
 card := {
   name := "Loaming Shaman",
   cost := [2, green],

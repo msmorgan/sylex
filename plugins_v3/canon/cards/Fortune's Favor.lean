@@ -1,4 +1,3 @@
-/-- Fortune's Favor -/
 card := {
   name := "Fortune's Favor",
   cost := [3, blue],

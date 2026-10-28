@@ -1,4 +1,3 @@
-/-- Delivery Moogle -/
 card := {
   name := "Delivery Moogle",
   cost := [3, white],

@@ -1,4 +1,3 @@
-/-- Raffine's Guidance -/
 card := {
   name := "Raffine's Guidance",
   cost := [white],

@@ -1,4 +1,3 @@
-/-- Spirit of the Labyrinth -/
 card := {
   name := "Spirit of the Labyrinth",
   cost := [1, white],

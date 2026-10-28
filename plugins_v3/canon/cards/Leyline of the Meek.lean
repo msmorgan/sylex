@@ -1,4 +1,3 @@
-/-- Leyline of the Meek -/
 card := {
   name := "Leyline of the Meek",
   cost := [2, white, white],

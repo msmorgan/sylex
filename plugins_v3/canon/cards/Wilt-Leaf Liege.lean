@@ -1,4 +1,3 @@
-/-- Wilt-Leaf Liege -/
 card := {
   name := "Wilt-Leaf Liege",
   cost := [1, hybridPip green white, hybridPip green white, hybridPip green white],

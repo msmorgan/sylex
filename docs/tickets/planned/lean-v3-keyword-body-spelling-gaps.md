@@ -45,18 +45,17 @@ semantic_definition reconfigure (cost : Cost) : Ability :=
 - Add [CR#702.151b] to the docstring (`:1486-1488`).
 
 Pins:
-- Added: *Lizard Blades* (Vintage-legal) in `Cards/Cost.lean` beside the Equipment cards
-  (`:805-819`):
+- Added: *Lizard Blades* (Vintage-legal) in
+  `plugins_v3/canon/cards/Lizard Blades.lean`, as an anonymous declaration:
   ```lean
-  /-- Lizard Blades -/
-  def lizardBlades : Spelled := spelled <| singleFacedCard
-    { name := "Lizard Blades", cost := [generic 1, pip .red],
-      types := [.artifact, .creature], subtypes := [equipment, lizard],
+  card :=
+    { name := "Lizard Blades", cost := [1, red],
+      types := [artifact, creature], subtypes := [equipment, lizard],
       text :=
         [ doubleStrike,
-          static (abilityGrant (equipped creature) doubleStrike),
-          reconfigure [generic 2] ],
-      power := stat 1, toughness := stat 1 }
+          abilityGrant (equipped creature) doubleStrike,
+          reconfigure [2] ],
+      power := 1, toughness := 1 }
   ```
   Confirm its Oracle text in `data/derived/cards.jsonl` first.
 - Rewritten if its pattern no longer matches: `reconfigureUnattachesWithoutTheAttachDeed`
@@ -107,17 +106,19 @@ Change:
    .back)` instead of `isTransformed`, which is `rfl`-equal and names the CR's "back face up".
 
 Pins:
-- Added: *Tavern Ruffian // Tavern Smasher* (Vintage-legal) in `Cards/Faces.lean` beside
-  `afflictedDeserter` (`:317-339`):
+- Added: *Tavern Ruffian // Tavern Smasher* (Vintage-legal) in
+  `plugins_v3/canon/cards/Tavern Ruffian {slash}{slash} Tavern Smasher.lean`. The existing
+  transforming-card example is
+  `plugins_v3/canon/cards/Afflicted Deserter {slash}{slash} Werewolf Ransacker.lean`:
   ```lean
-  def tavernRuffian : Spelled := spelled <| .transforming
-    { characteristics :=
-      { name := "Tavern Ruffian", cost := [generic 3, pip .red], types := [.creature],
-        subtypes := [human, warrior, werewolf], text := [ daybound ],
-        power := stat 2, toughness := stat 5 } }
-    { characteristics :=
-      { name := "Tavern Smasher", types := [.creature], subtypes := [werewolf],
-        text := [ nightbound ], power := stat 6, toughness := stat 5 } }
+  card := transforming {
+    front := {
+      name := "Tavern Ruffian", cost := [3, red], types := [creature],
+      subtypes := [human, warrior, werewolf], text := [daybound],
+      power := 2, toughness := 5 },
+    back := {
+      name := "Tavern Smasher", types := [creature], subtypes := [werewolf],
+      text := [nightbound], power := 6, toughness := 5 } }
   ```
   Confirm both faces in `data/derived/cards.jsonl` first.
 - Added: `dayboundEntersTransformedOnlyAsADoubleFacedCard` in `Proofs/OffStack.lean`, asserting by

@@ -1,4 +1,3 @@
-/-- Bewitching Leechcraft -/
 card := {
   name := "Bewitching Leechcraft",
   cost := [1, blue],

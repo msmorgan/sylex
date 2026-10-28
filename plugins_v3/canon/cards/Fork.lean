@@ -1,4 +1,3 @@
-/-- Fork -/
 card := {
   name := "Fork",
   cost := [red, red],

@@ -1,4 +1,3 @@
-/-- Skeleton Ship -/
 card := {
   name := "Skeleton Ship",
   cost := [3, blue, black],

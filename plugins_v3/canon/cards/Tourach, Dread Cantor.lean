@@ -1,4 +1,3 @@
-/-- Tourach, Dread Cantor -/
 card := {
   name := "Tourach, Dread Cantor",
   cost := [1, black],

@@ -1,4 +1,3 @@
-/-- Angus Mackenzie -/
 card := {
   name := "Angus Mackenzie",
   cost := [green, white, blue],

@@ -1,4 +1,3 @@
-/-- Smite -/
 card := {
   name := "Smite",
   cost := [white],

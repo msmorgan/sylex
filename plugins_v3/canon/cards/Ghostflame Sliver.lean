@@ -1,4 +1,3 @@
-/-- Ghostflame Sliver -/
 card := {
   name := "Ghostflame Sliver",
   cost := [black, red],

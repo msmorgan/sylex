@@ -1,4 +1,3 @@
-/-- Promise of Bunrei -/
 card := {
   name := "Promise of Bunrei",
   cost := [2, white],

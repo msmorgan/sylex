@@ -1,4 +1,3 @@
-/-- Sheltered Valley -/
 card := {
   name := "Sheltered Valley",
   types := [land],

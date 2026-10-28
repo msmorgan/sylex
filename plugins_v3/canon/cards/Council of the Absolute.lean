@@ -1,4 +1,3 @@
-/-- Council of the Absolute -/
 card := {
   name := "Council of the Absolute",
   cost := [2, white, blue],

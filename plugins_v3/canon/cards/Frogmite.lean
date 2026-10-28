@@ -1,4 +1,3 @@
-/-- Frogmite -/
 card := {
   name := "Frogmite",
   cost := [4],

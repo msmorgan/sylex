@@ -1,4 +1,3 @@
-/-- Ersatz Gnomes -/
 card := {
   name := "Ersatz Gnomes",
   cost := [3],

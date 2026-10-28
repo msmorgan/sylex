@@ -1,4 +1,3 @@
-/-- Disarm {U} — Instant. "Unattach all Equipment from target creature." -/
 card := {
   name := "Disarm",
   cost := [blue],

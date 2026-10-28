@@ -1,4 +1,3 @@
-/-- Edgewalker -/
 card := {
   name := "Edgewalker",
   cost := [1, white, black],

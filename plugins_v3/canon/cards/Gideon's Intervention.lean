@@ -1,4 +1,3 @@
-/-- Gideon's Intervention -/
 card := {
   name := "Gideon's Intervention",
   cost := [2, white, white],

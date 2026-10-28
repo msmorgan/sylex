@@ -1,4 +1,3 @@
-/-- Ashes of the Fallen -/
 card := {
   name := "Ashes of the Fallen",
   cost := [2],

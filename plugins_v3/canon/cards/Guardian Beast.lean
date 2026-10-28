@@ -1,4 +1,3 @@
-/-- Guardian Beast -/
 card := {
   name := "Guardian Beast",
   cost := [3, black],

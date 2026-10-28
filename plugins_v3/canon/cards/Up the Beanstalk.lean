@@ -1,4 +1,3 @@
-/-- Up the Beanstalk -/
 card := {
   name := "Up the Beanstalk",
   cost := [1, green],

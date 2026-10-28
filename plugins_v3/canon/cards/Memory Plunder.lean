@@ -1,4 +1,3 @@
-/-- Memory Plunder -/
 card := {
   name := "Memory Plunder",
   cost := [hybridPip blue black, hybridPip blue black, hybridPip blue black, hybridPip blue black],

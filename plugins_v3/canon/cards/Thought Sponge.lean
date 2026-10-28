@@ -1,4 +1,3 @@
-/-- Thought Sponge -/
 card := {
   name := "Thought Sponge",
   cost := [3, blue],

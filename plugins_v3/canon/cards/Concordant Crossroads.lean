@@ -1,4 +1,3 @@
-/-- Concordant Crossroads -/
 card := {
   name := "Concordant Crossroads",
   cost := [green],

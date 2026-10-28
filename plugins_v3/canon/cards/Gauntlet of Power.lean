@@ -1,4 +1,3 @@
-/-- Gauntlet of Power -/
 card := {
   name := "Gauntlet of Power",
   cost := [5],

@@ -4,7 +4,6 @@ Each prints "You may cast this spell as though it had flash. If you cast it any 
 couldn't have been cast, the controller of the permanent it becomes sacrifices it at the
 beginning of the next cleanup step." (`asThoughFlashSacrificedAtCleanup`). -/
 
-/-- Armor of Thorns -/
 card := {
   name := "Armor of Thorns",
   cost := [1, green],

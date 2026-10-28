@@ -1,4 +1,3 @@
-/-- Fist of Suns -/
 card := {
   name := "Fist of Suns",
   cost := [3],

@@ -1,4 +1,3 @@
-/-- Veiling Oddity -/
 card := {
   name := "Veiling Oddity",
   cost := [3, blue],

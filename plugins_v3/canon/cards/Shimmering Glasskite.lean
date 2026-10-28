@@ -1,4 +1,3 @@
-/-- Shimmering Glasskite -/
 card := {
   name := "Shimmering Glasskite",
   cost := [3, blue],

@@ -1,4 +1,3 @@
-/-- Dark Depths -/
 card := {
   name := "Dark Depths",
   supertypes := [legendary, snow],

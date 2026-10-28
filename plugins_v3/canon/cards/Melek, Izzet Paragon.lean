@@ -1,4 +1,3 @@
-/-- Melek, Izzet Paragon -/
 card := {
   name := "Melek, Izzet Paragon",
   cost := [4, blue, red],

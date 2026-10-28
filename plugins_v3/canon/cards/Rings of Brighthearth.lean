@@ -1,4 +1,3 @@
-/-- Rings of Brighthearth -/
 card := {
   name := "Rings of Brighthearth",
   cost := [3],

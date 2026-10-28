@@ -1,4 +1,3 @@
-/-- Iron Man, Bleeding Edge -/
 card := {
   name := "Iron Man, Bleeding Edge",
   cost := [3, blue, blue],

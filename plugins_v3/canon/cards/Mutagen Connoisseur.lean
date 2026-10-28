@@ -1,4 +1,3 @@
-/-- Mutagen Connoisseur -/
 card := {
   name := "Mutagen Connoisseur",
   cost := [1, green, blue],

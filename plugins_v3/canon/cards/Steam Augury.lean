@@ -1,4 +1,3 @@
-/-- Steam Augury -/
 card := {
   name := "Steam Augury",
   cost := [2, blue, red],

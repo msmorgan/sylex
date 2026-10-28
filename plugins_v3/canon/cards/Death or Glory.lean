@@ -1,4 +1,3 @@
-/-- Death or Glory -/
 card := {
   name := "Death or Glory",
   cost := [4, white],

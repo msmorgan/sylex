@@ -1,4 +1,3 @@
-/-- Brazen Blademaster -/
 card := {
   name := "Brazen Blademaster",
   cost := [2, red],

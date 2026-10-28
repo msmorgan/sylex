@@ -1,4 +1,3 @@
-/-- Bloodline Pretender -/
 card := {
   name := "Bloodline Pretender",
   cost := [3],

@@ -1,4 +1,3 @@
-/-- Thallid -/
 card := {
   name := "Thallid",
   cost := [green],

@@ -1,4 +1,3 @@
-/-- False Peace -/
 card := {
   name := "False Peace",
   cost := [white],

@@ -1,4 +1,3 @@
-/-- Bloom Hulk -/
 card := {
   name := "Bloom Hulk",
   cost := [3, green],

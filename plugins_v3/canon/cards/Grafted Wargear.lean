@@ -1,4 +1,3 @@
-/-- Grafted Wargear -/
 card := {
   name := "Grafted Wargear",
   cost := [3],

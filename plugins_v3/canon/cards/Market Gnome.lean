@@ -1,4 +1,3 @@
-/-- Market Gnome -/
 card := {
   name := "Market Gnome",
   cost := [white],

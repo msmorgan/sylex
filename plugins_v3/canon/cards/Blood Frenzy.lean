@@ -1,4 +1,3 @@
-/-- Blood Frenzy -/
 card := {
   name := "Blood Frenzy",
   cost := [1, red],

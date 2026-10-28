@@ -1,4 +1,3 @@
-/-- Shimmerwilds Growth -/
 card := {
   name := "Shimmerwilds Growth",
   cost := [1, green],

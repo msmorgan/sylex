@@ -1,4 +1,3 @@
-/-- Tuktuk the Explorer -/
 card := {
   name := "Tuktuk the Explorer",
   cost := [2, red],

@@ -1,4 +1,3 @@
-/-- Gather Specimens -/
 card := {
   name := "Gather Specimens",
   cost := [3, blue, blue, blue],

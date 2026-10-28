@@ -1,4 +1,3 @@
-/-- Highspire Bell-Ringer -/
 card := {
   name := "Highspire Bell-Ringer",
   cost := [2, blue],

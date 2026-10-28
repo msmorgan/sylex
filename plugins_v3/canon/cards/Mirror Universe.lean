@@ -1,4 +1,3 @@
-/-- Mirror Universe -/
 card := {
   name := "Mirror Universe",
   cost := [6],

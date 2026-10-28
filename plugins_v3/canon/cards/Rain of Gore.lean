@@ -1,4 +1,3 @@
-/-- Rain of Gore -/
 card := {
   name := "Rain of Gore",
   cost := [black, red],

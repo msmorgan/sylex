@@ -1,4 +1,3 @@
-/-- Blessed Reversal -/
 card := {
   name := "Blessed Reversal",
   cost := [1, white],

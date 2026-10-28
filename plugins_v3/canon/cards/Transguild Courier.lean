@@ -1,4 +1,3 @@
-/-- Transguild Courier -/
 card := {
   name := "Transguild Courier",
   cost := [4],

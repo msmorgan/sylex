@@ -1,4 +1,3 @@
-/-- Burn at the Stake -/
 card := {
   name := "Burn at the Stake",
   cost := [2, red, red, red],

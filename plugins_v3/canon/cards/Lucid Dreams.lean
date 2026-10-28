@@ -1,4 +1,3 @@
-/-- Lucid Dreams -/
 card := {
   name := "Lucid Dreams",
   cost := [3, blue, blue],

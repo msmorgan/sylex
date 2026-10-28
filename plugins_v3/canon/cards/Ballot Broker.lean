@@ -1,4 +1,3 @@
-/-- Ballot Broker -/
 card := {
   name := "Ballot Broker",
   cost := [2, white],

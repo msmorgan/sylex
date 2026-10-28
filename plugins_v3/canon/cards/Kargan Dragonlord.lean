@@ -1,4 +1,3 @@
-/-- Kargan Dragonlord -/
 card := leveler
   {
     inner := {

@@ -1,4 +1,3 @@
-/-- Blood Spatter Analysis -/
 card := {
   name := "Blood Spatter Analysis",
   cost := [black, red],

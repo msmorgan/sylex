@@ -1,4 +1,3 @@
-/-- Mistbreath Elder -/
 card := {
   name := "Mistbreath Elder",
   cost := [green],

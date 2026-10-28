@@ -1,4 +1,3 @@
-/-- Aya of Alexandria -/
 card := {
   name := "Aya of Alexandria",
   cost := [2, red, white],

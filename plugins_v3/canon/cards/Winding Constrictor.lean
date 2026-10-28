@@ -1,4 +1,3 @@
-/-- Winding Constrictor -/
 card := {
   name := "Winding Constrictor",
   cost := [black, green],

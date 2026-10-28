@@ -1,4 +1,3 @@
-/-- Thran Lens -/
 card := {
   name := "Thran Lens",
   cost := [2],

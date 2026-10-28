@@ -1,4 +1,3 @@
-/-- Thousand Moons Infantry -/
 card := {
   name := "Thousand Moons Infantry",
   cost := [2, white],

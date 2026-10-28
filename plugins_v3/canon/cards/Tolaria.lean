@@ -1,4 +1,3 @@
-/-- Tolaria -/
 card := {
   name := "Tolaria",
   supertypes := [legendary],

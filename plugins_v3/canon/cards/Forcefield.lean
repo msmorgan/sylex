@@ -1,4 +1,3 @@
-/-- Forcefield -/
 card := {
   name := "Forcefield",
   cost := [3],

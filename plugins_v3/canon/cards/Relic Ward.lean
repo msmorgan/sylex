@@ -1,4 +1,3 @@
-/-- Relic Ward -/
 card := {
   name := "Relic Ward",
   cost := [1, white],

@@ -1,4 +1,3 @@
-/-- Enormous Energy Blade -/
 card := {
   name := "Enormous Energy Blade",
   cost := [2, black],

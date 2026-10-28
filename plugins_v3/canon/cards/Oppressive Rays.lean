@@ -1,4 +1,3 @@
-/-- Oppressive Rays -/
 card := {
   name := "Oppressive Rays",
   cost := [white],

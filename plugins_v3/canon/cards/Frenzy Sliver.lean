@@ -1,4 +1,3 @@
-/-- Frenzy Sliver -/
 card := {
   name := "Frenzy Sliver",
   cost := [1, black],
