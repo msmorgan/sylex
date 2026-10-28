@@ -1,91 +1,66 @@
 ---
 needs: [plugins-v3-builtin-cleanup]
 ---
-# [design] Settle the primitive/template boundary in `plugins_v3/builtin/primitives`
+# Settle the primitive/template boundary in `plugins_v3/builtin/primitives`
 
-Standard constraints apply. This ticket needs a design dialogue before implementation.
-`docs/decisions/semantics-v3.md` §4.5 says `primitives/` holds "1-to-1 bindings over
-`Semantics.Primitives.<Type>.<ctor>`" and `templates/` holds composite phrasings. It does not
-say which side a binding with fixed arguments belongs on. The extraction
-(`uvnrnvqq`) left two families of files that depend on that answer.
+Standard constraints apply. The owner settled the boundary on 2026-10-28;
+`docs/decisions/semantics-v3.md` §4.5 records the ruling.
 
-## What is there
+## Settled transformation
 
-- **About 110 primitives with a sort prefix**, such as `abilityActivated`,
-  `abilityTriggered`, `actionMove`, `actionChoose`, `staticSpecCant`,
-  `staticSpecConjunction`, `conditionDid`, `predicateDid` and `nounPhrasePro`.
-  - These are the full-arity bindings, and usually the only binding for their constructor.
-  - The unprefixed names next to them are narrower. `activated` takes `(cost, action)` and fixes
-    four `none`s, while `abilityActivated` takes all six. `choose` takes 2 of the 4 arguments.
-    `conjunction` swaps the argument order.
-  - `move`, `did` and `pro` have no unprefixed primitive at all.
-  - Prefixing was most likely how the extraction avoided collisions. Renaming to the bare
-    constructor name collides on `(name, return_type)` with existing templates
-    (`conditionDid`/`predicateDid` against `template did : Condition/Predicate`,
-    `staticSpecCant` against `template cant : StaticSpec`, whose body calls it).
-  - The prefix pattern also catches some names whose constructor is genuinely sort-named
-    (`doorOf`, `abilityWord`, `keywordParamCost`, `detPhraseA`).
-- **About 149 primitives that apply one constructor with some arguments fixed:**
-  - `graveyard` is `Location.zone .graveyard none` and `oncePerTurn` is `UsageLimit.mk 1 .turn`.
-  - `when`, `whenever` and `at_` have identical `Ability.triggered` bodies.
-  - The `activatedOnly*` family fixes slots of `Ability.activated`.
-  - Others include `isTapped`, `it`, `topOf` and `controllerOf`.
+Apply the verified 622-file partition: 80 bare-name renames, 17 duplicate removals,
+137 moves to Templates, six widened duplicate counterparts, three widened fixed-argument
+primitives, and 379 retained primitives. Within the retained group, `conclude` and `doIf`
+expose their previously omitted default fields. Promote the six deontic/lookback Templates
+and add six missing primitives. This leaves 480 files in `primitives/`.
 
-## Questions to settle
+A primitive body directly applies one `Semantics.Primitives.<Type>.<ctor>` to its parameters;
+defaults are declared on binders. Fixed-argument expression specializations are Templates.
+The promoted `can`, `cant`, `must`, `gatedBy` and both `did` bindings directly assemble their
+non-expression `DeonticMods`/`DidClause` data records with the existing field defaults.
+`when`, `whenever` and `at_` remain separate spelling attachment points over `triggered`.
+The 11 remaining prefixed two-layer pairs are tracked by
+`plugins-v3-shadowed-primitive-names`.
 
-1. Is a binding with fixed arguments a primitive or a template? If it is a template, every
-   constructor needs exactly one full-arity primitive, which probably means un-prefixing the
-   wrappers.
-2. What bare name does a full-arity primitive take when a template already holds
-   `(name, return_type)`? Options:
-   - Rename the template (for example, `cant` is the phrasing and the primitive is
-     `staticCant`).
-   - Let primitives live in a separate key space.
-   - Accept the prefixes as policy, and then write the rule down.
-3. `when`, `whenever` and `at_` give one meaning three names. Keep them as spelling attachment
-   points (templates), or collapse them?
+`doForEachKind` takes `axis`, `domain := none`, `sort`, then `body`. Its callers must preserve
+the domain-before-body order used by mention assignment and checking. Both loaders allow a
+non-primitive to depend on a distinct same-bare-name primitive, and ignore leading-dot enum
+constructor names when collecting bundle dependencies. Primitive dependencies conservatively retain
+matching bound names to make shadowed functions available before elaboration. Expected-type dispatch
+tries visible authored alternatives for coercions when no exact result-sort entry matches, unwraps optional
+result sorts and distinguishes callable local variables from auxiliary or non-callable locals.
 
-## Once settled
+## Checkable acceptance
 
-- Record the ruling in `semantics-v3.md` §4.5.
-- Apply it with a script, checked against the expansion baseline (meaning preserved; keys
-  renamed per the ruling).
-- Move the files that change side between `primitives/` and `templates/`.
-- Keep or add doc comments on the files this ticket touches (`plugins-v3-builtin-doc-comments`
-  runs after it).
+- Enumerate `.lean` files in `primitives/`: exactly 480, each a single `primitive` declaration
+  whose body begins with the direct `Semantics.Primitives` constructor application. Inspect its
+  argument syntax against its binders and constructor fields; only the six named record bindings
+  above assemble non-expression records. No expression-packing helper or fixed expression argument
+  is admitted as a primitive body.
+- For all 137 manifest moves, the old path is absent, the new declaration is a `template`, and
+  the whitespace-normalized body equals the manifest's `new_body`. The 80 rename pairs are unique
+  and update all builtin, canon and Lean callers. The renamed `MoveRider.not` file is in `move/`.
+- The 17 deleted keys are absent; the six promoted declarations retain their keys; the six added
+  keys are present. Remaining parameter and result types in the 80 renamed and 11 retained
+  prefixed bindings omit redundant `Semantics.` prefixes.
+- The expansion comparison accepts exactly the 80 renames and 35 expected differences:
+  17 deleted duplicates, six new primitives, 11 widened primitives, and the explicitly ordered
+  `doForEachKind : Action` signature. No caller or card differences are accepted, including
+  `doubleCounters : Action` and `vorelOfTheHullClade : Spelled`.
+- Bundle ordering, optional-result dispatch, non-callable local shadowing and callable local
+  and ordinary namespace function precedence have regression checks. All affected Rust tests and clippy, the Lean check and
+  citation gates pass. Existing proof assertions retain their semantic claims; call-name pins
+  follow the generated sort-qualified names.
 
-## Acceptance
+## Expansion evidence
 
-The acceptance criteria are written down as part of the ruling. Whatever they are, they must
-be checkable by a script over declaration headers and bodies, not by "etc."
+Keep `docs/evidence/plugins-v3-expansions/plugins-v3-primitive-template-boundary/before/snapshot.json`
+unchanged. It contains 2992 declarations and 80536 samples. `renames.json` contains the 80
+`[old_key, new_key]` pairs; `expected.txt` contains the 35 exact declaration keys above. These
+are ignored evidence, never tracked gate authority.
 
-## Expansion baseline workflow
-
-Save before editing; this single invocation includes builtin and canon, with canon
-expanded over builtin:
-
-```bash
-cargo xtask expansions --out docs/evidence/plugins-v3-expansions/plugins-v3-primitive-template-boundary/before
-```
-
-Once the ruling is settled, the rewrite script writes `docs/evidence/plugins-v3-expansions/plugins-v3-primitive-template-boundary/renames.json`
-as a JSON array of `[old_key, new_key]` pairs for every changed declaration key.
-Use `[]` if no keys change. Compare after the rewrite:
-
-```bash
-cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-primitive-template-boundary/before \
-  --rename-file docs/evidence/plugins-v3-expansions/plugins-v3-primitive-template-boundary/renames.json
-```
-
-Require zero differences; accepted renames have their own count. Any proposed
-meaning change needs the design ruling before an explicit `--expect` allowance.
-
-The saved format is `before/snapshot.json` (version 2). Save commands refuse an
-existing snapshot unless `--force` is deliberately added; unrelated nonempty
-directories are always refused. Comparison writes nothing unless `--out` is also
-given. Review the sampling summary for constructor omissions and capped products.
-
-Declaration rename maps also normalize `<decl>.<param>` and `<decl>.actor` mention
-IDs in callers, simultaneously, so swaps and chains work. Renaming a repeated
-`NounPhrase` parameter changes `<decl>.<param>` IDs in callers; those changes
-remain visible and require review and explicit expectations where intended.
+Use `cargo xtask expansions --compare <before> --rename-file <renames.json>`, adding one
+`--expect '<name> : <Type>'` for each expected key. `--out <after>` optionally saves a separate
+snapshot. The comparison must exit successfully, reporting `35 differences, 80 renames` with
+zero unexpected differences and no failed samples. The sampler is bounded: inspect its omitted
+constructors and capped products rather than treating sampling as an exhaustive proof.
