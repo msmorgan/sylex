@@ -4,12 +4,15 @@ the source's damage to you takes infect's player row (`Definitions.infect`): it 
 you to lose life; rather, that source's controller gives you that many poison counters
 [CR#702.90b,120.3b]. A source that has infect already gets that result once, multiple instances
 of infect being redundant [CR#702.90f]. -/
-card phyrexianUnlife : Spelled :=
-  { name := "Phyrexian Unlife", cost := [generic 2, pip .white], types := [.enchantment],
-    text :=
-      [ static (cant you (loseGame (some .nonpositiveLife))),
-        static
-          (onlyWhile
-            (asThough (by_ (a isSource)) (dealDamage anyAmount you)
-              (holds (is thatSource (hasKeyword infect))))
-            (compareAmt (lifeTotalOf you) .atMost 0)) ] }
+card := {
+  name := "Phyrexian Unlife",
+  cost := [2, white],
+  types := [enchantment],
+  text := [
+    cant you (loseGame (some nonpositiveLife)),
+    onlyWhile
+      (asThough (by_ (a isSource)) (dealDamage anyAmount you)
+         (holds (is thatSource (hasKeyword infect))))
+      (compareAmt (lifeTotalOf you) atMost 0)
+  ]
+}

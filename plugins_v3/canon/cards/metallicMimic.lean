@@ -3,15 +3,17 @@ Characteristic-Defining Ability: it depends on the choice made as it enters, as 
 power does, and depending on a choice is no condition [CR#604.3a]. Its counter on the other
 creatures of the chosen type as they enter stays a separate ability, affecting other objects
 [CR#604.3a]. -/
-card metallicMimic : Spelled :=
-  { name := "Metallic Mimic", cost := [generic 2], types := [.artifact, .creature],
-    subtypes := [shapeshifter],
-    text :=
-      [ static (entersChoosing thisCreature (.subtype .creature)),
-        static (qualityDefinition thisCreature .adds (chosenQuality (ofChosen (.subtype
-            .creature)))),
-        static (entersWithAdditionalCounters
-          (each (and [ isCreature, youControl, ofChosen (.subtype .creature),
-                        isOther ]))
-          1 p1p1Counter) ],
-    power := stat 2, toughness := stat 1 }
+card := {
+  name := "Metallic Mimic",
+  cost := [2],
+  types := [artifact, creature],
+  subtypes := [shapeshifter],
+  text := [
+    entersChoosing thisCreature (subtype creature),
+    qualityDefinition thisCreature adds (chosenQuality (ofChosen (subtype creature))),
+    entersWithAdditionalCounters
+      (each [isCreature, youControl, ofChosen (subtype creature), isOther]) 1 p1p1Counter
+  ],
+  power := 2,
+  toughness := 1
+}

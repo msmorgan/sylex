@@ -1,4 +1,7 @@
 /-- Darkest Hour -/
-card darkestHour : Spelled :=
-  { name := "Darkest Hour", cost := [pip .black], types := [.enchantment],
-    text := [static (qualityChange (allOf isCreature) .sets (colored (.some [.black])))] }
+card := {
+  name := "Darkest Hour",
+  cost := [black],
+  types := [enchantment],
+  text := [qualityChange (allOf isCreature) sets (colored (.some [black]))]
+}

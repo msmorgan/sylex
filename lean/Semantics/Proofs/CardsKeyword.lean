@@ -92,7 +92,7 @@ def bladeOfTheOniStatic : StaticSpec :=
 theorem okBladeOfTheOniStatic : StaticSpec.check (DRS.ofList []) bladeOfTheOniStatic = [] := by decide
 
 def castCreatureSpellsFromTop : StaticSpec :=
-  (match garruksHorde.card with
+  (match (cardNamed "Garruk's Horde").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.static part) _))) => some part
       | _ => none
@@ -223,7 +223,7 @@ theorem okCelebr8000Doubles : Action.check (DRS.ofList []) celebr8000Doubles = [
 than pay cycling costs." Cycling is an activated ability [CR#702.29a], and an alternative cost
 replaces an activation cost as it replaces a spell's mana cost [CR#118.9,602.2b]. -/
 def newPerspectivesCyclingAltCost : Ability :=
-  (match newPerspectives.card with
+  (match (cardNamed "New Perspectives").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -249,7 +249,7 @@ cost (the `keyword` field) is the event a replacement watches, and paying {0} is
 in its place, the shape an "instead" effect takes [CR#614.1a]. Declining the `may` leaves the
 echo cost to be paid. -/
 def thickSkinnedGoblinEchoPayment : Ability :=
-  (match thickSkinnedGoblin.card with
+  (match (cardNamed "Thick-Skinned Goblin").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -264,7 +264,7 @@ theorem okFumikoBushidoX : Ability.check (DRS.ofList []) fumikoBushidoX = [] := 
 
 /-- Tourach, Dread Cantor -/
 def tourachDiscardTrigger : Ability :=
-  (match tourachDreadCantor.card with
+  (match (cardNamed "Tourach, Dread Cantor").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons part _))) => some part
       | _ => none
@@ -297,7 +297,7 @@ theorem okHarriedDronesmithToken : Action.check (DRS.ofList []) harriedDronesmit
 
 /-- Veiling Oddity -/
 def veilingOddityLine : Ability :=
-  (match veilingOddity.card with
+  (match (cardNamed "Veiling Oddity").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -320,14 +320,14 @@ theorem okFrenziedGorespawnMenaceTrigger :
     Ability.check (DRS.ofList []) frenziedGorespawnMenaceTrigger = [] := by decide
 /-- Pir, Imaginative Rascal's replacement -/
 def pirDistributive : Ability :=
-  (match pirImaginativeRascal.card with
+  (match (cardNamed "Pir, Imaginative Rascal").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okPirDistributive : Ability.check (DRS.ofList []) pirDistributive = [] := by decide
 
-def protectionAbilities : KeywordTerm := (match concertedEffort.card with
+def protectionAbilities : KeywordTerm := (match (cardNamed "Concerted Effort").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons _
         (List.cons _ (List.cons _ (List.cons _ (List.cons (Action.doIf (Condition.exists_
@@ -335,7 +335,7 @@ def protectionAbilities : KeywordTerm := (match concertedEffort.card with
         (Predicate.hasKeyword part) _)))))) _ _ _) _)))))))) _) => some part
       | _ => none
     | _ => none).get (by decide)
-def landwalkAbilities : KeywordTerm := (match cairnWanderer.card with
+def landwalkAbilities : KeywordTerm := (match (cardNamed "Cairn Wanderer").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.static (StaticSpec.conjunction _ (List.cons _ (List.cons _
         (List.cons _ (List.cons _ (List.cons _ (List.cons _ (List.cons (StaticSpec.conditional
@@ -345,7 +345,7 @@ def landwalkAbilities : KeywordTerm := (match cairnWanderer.card with
       | _ => none
     | _ => none).get (by decide)
 /-- Hexproof and each "hexproof from [quality]" [CR#702.11d]. -/
-def hexproofAbilities : KeywordTerm := (match odricLunarchMarshal.card with
+def hexproofAbilities : KeywordTerm := (match (cardNamed "Odric, Lunarch Marshal").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons _
         (List.cons _ (List.cons _ (List.cons _ (List.cons (Action.doIf (Condition.exists_
@@ -356,14 +356,14 @@ def hexproofAbilities : KeywordTerm := (match odricLunarchMarshal.card with
 /-- Shay Cormac -/
 def wardAbilities : KeywordTerm := .anyIn ⟨ward, none⟩
 /-- Tolaria, Shelkin Brownie -/
-def bandsWithOtherAbilities : KeywordTerm := (match shelkinBrownie.card with
+def bandsWithOtherAbilities : KeywordTerm := (match (cardNamed "Shelkin Brownie").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.activated _ (Action.establish (StaticSpec.characteristicChange _
         (List.cons (CharacteristicEdit.removedAbilities (AbilitySelection.specified (List.cons
         (AbilityLost.term part) _))) _)) _) _ _ _ _) _) => some part
       | _ => none
     | _ => none).get (by decide)
-def protectionFromAnyColor : KeywordTerm := (match escapedShapeshifter.card with
+def protectionFromAnyColor : KeywordTerm := (match (cardNamed "Escaped Shapeshifter").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.static (StaticSpec.conjunction _ (List.cons _ (List.cons _ (List.cons _
         (List.cons (StaticSpec.conditional (StaticSpec.characteristicChange _ (List.cons
@@ -390,7 +390,7 @@ theorem okBedrockTortoiseWindow : StaticSpec.check (DRS.ofList []) bedrockTortoi
 
 /-- Marit Lage -/
 def maritLage : CharacteristicBundle :=
-  (match darkDepths.card with
+  (match (cardNamed "Dark Depths").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _
         (Action.withContinuation _ _ (Option.some (Action.ownScope _ (Action.createObject _

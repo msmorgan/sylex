@@ -1,8 +1,11 @@
 /-- Caller of the Hunt -/
-card callerOfTheHunt : Spelled :=
-  { name := "Caller of the Hunt", cost := [generic 2, pip .green], types := [.creature],
-    subtypes := [human],
-    text :=
-      [ static (addedCost (choose (a (quality (.subtype .creature)))) false),
-        static (ptDefinition thisCreature .bothEach
-          (countOf (and [isCreature, ofChosen (.subtype .creature)]))) ] }
+card := {
+  name := "Caller of the Hunt",
+  cost := [2, green],
+  types := [creature],
+  subtypes := [human],
+  text := [
+    addedCost (choose (a (quality (subtype creature)))) false,
+    ptDefinition thisCreature bothEach (countOf [isCreature, ofChosen (subtype creature)])
+  ]
+}

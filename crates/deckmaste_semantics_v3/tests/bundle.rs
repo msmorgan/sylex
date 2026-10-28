@@ -315,3 +315,18 @@ fn anonymous_cards_refuse_missing_names_and_legacy_body() {
         assert!(parse(&format!("card := {term}")).is_err(), "{term}");
     }
 }
+
+#[test]
+fn legacy_named_cards_are_rejected() {
+    for source in [
+        r#"card legacy := { name := "Legacy" }"#,
+        r#"card legacy : Spelled := { name := "Legacy" }"#,
+        r#"card legacy := { body := singleFacedCard { name := "Legacy" } }"#,
+    ] {
+        let error = parse(source).unwrap_err();
+        assert!(
+            error.to_string().contains("named card declarations"),
+            "{error}"
+        );
+    }
+}

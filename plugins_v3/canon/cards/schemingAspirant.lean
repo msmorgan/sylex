@@ -1,8 +1,10 @@
 /-- Scheming Aspirant -/
-card schemingAspirant : Spelled :=
-  { name := "Scheming Aspirant", cost := [generic 1, pip .black], types := [.creature],
-    subtypes := [phyrexian, advisor],
-    text :=
-      [ whenever (does you proliferate)
-          (sequentially [instruct eachOpponent (loseLife 2), gainLife 2]) ],
-    power := stat 1, toughness := stat 3 }
+card := {
+  name := "Scheming Aspirant",
+  cost := [1, black],
+  types := [creature],
+  subtypes := [phyrexian, advisor],
+  text := [whenever (does you proliferate) [instruct eachOpponent (loseLife 2), gainLife 2]],
+  power := 1,
+  toughness := 3
+}

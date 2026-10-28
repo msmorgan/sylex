@@ -1,8 +1,6 @@
-card gush : Spelled :=
-  { name := "Gush", cost := [generic 4, pip .blue], types := [.instant],
-    text :=
-      [ static (altCost this_
-          (returnToHand
-            (counted (exactly 2)
-              (and [isLand, island, youControl])))),
-        spell (draw 2) ] }
+card := {
+  name := "Gush",
+  cost := [4, blue],
+  types := [instant],
+  text := [altCost this_ (returnToHand (counted (exactly 2) [isLand, island, youControl])), spell (draw 2)]
+}

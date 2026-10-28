@@ -1,7 +1,12 @@
-card meddlingMage : Spelled :=
-  { name := "Meddling Mage", cost := [pip .white, pip .blue], types := [.creature],
-    subtypes := [human, wizard],
-    text :=
-      [ static (entersChoosingFrom thisCreature .cardName (nameOfCard (non isLand))),
-        static (cant any (cast (bare (and [isSpell, named chosenName])))) ],
-    power := stat 2, toughness := stat 2 }
+card := {
+  name := "Meddling Mage",
+  cost := [white, blue],
+  types := [creature],
+  subtypes := [human, wizard],
+  text := [
+    entersChoosingFrom thisCreature cardName (nameOfCard (non isLand)),
+    cant any (cast (bare [isSpell, named chosenName]))
+  ],
+  power := 2,
+  toughness := 2
+}

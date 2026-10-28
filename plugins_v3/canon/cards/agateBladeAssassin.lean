@@ -1,9 +1,10 @@
 /-- Agate-Blade Assassin -/
-card agateBladeAssassin : Spelled :=
-  { name := "Agate-Blade Assassin", cost := [generic 1, pip .black], types := [.creature],
-    subtypes := [lizard, assassin],
-    text :=
-      [ whenever (does thisCreature attack)
-          (sequentially
-            [instruct defendingPlayer (loseLife 1), gainLife 1]) ],
-    power := stat 1, toughness := stat 3 }
+card := {
+  name := "Agate-Blade Assassin",
+  cost := [1, black],
+  types := [creature],
+  subtypes := [lizard, assassin],
+  text := [whenever (does thisCreature attack) [instruct defendingPlayer (loseLife 1), gainLife 1]],
+  power := 1,
+  toughness := 3
+}

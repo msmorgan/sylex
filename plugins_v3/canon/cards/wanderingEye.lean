@@ -1,5 +1,9 @@
-card wanderingEye : Spelled :=
-  { name := "Wandering Eye", cost := [generic 2, pip .blue], types := [.creature],
-    subtypes := [illusion],
-    text := [flying, static (visibility .reveal (bare isPlayer) wholeHand)],
-    power := stat 1, toughness := stat 3 }
+card := {
+  name := "Wandering Eye",
+  cost := [2, blue],
+  types := [creature],
+  subtypes := [illusion],
+  text := [flying, visibility reveal (bare isPlayer) wholeHand],
+  power := 1,
+  toughness := 3
+}

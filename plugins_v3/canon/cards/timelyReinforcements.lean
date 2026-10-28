@@ -1,10 +1,16 @@
 /-- Timely Reinforcements -/
-card timelyReinforcements : Spelled :=
-  { name := "Timely Reinforcements", cost := [generic 2, pip .white], types := [.sorcery],
-    text :=
-      [ spell (sequentially
-          [ doIf (compareAmt (lifeTotalOf you) .less (lifeTotalOf anOpponent))
-              (gainLife 6),
-            doIf (compareAmt (countOf (and [isCreature, youControl])) .less
-                    (countOf (and [isCreature, anOpponentControls])))
-              (create 3 (creatureToken 1 1 [.white] [soldier])) ]) ] }
+card := {
+  name := "Timely Reinforcements",
+  cost := [2, white],
+  types := [sorcery],
+  text := [
+    spell
+      [
+        doIf (compareAmt (lifeTotalOf you) less (lifeTotalOf anOpponent)) (gainLife 6),
+        doIf
+          (compareAmt (countOf [isCreature, youControl]) less
+             (countOf [isCreature, anOpponentControls]))
+          (create 3 (creatureToken 1 1 [white] [soldier]))
+      ]
+  ]
+}

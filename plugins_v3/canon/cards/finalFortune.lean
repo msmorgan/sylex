@@ -1,7 +1,6 @@
-card finalFortune : Spelled :=
-  { name := "Final Fortune", cost := [pip .red, pip .red], types := [.instant],
-    text :=
-      [ spell (sequentially
-          [ extraTurn 1,
-            delay (beginningOfThatTurns .endStep) loseGame ])
-                ] }
+card := {
+  name := "Final Fortune",
+  cost := [red, red],
+  types := [instant],
+  text := [spell [extraTurn 1, delay (beginningOfThatTurns endStep) loseGame]]
+}

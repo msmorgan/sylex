@@ -1,8 +1,12 @@
-card acceleratedMutation : Spelled :=
-  { name := "Accelerated Mutation", cost := [generic 3, pip .green, pip .green],
-    types := [.instant],
-    text :=
-      [ spell (sequentially
-          [ get (target isCreature) (up (letter .x)) (up (letter .x)) untilEndOfTurn,
-            define .x (aggregate .max (.stat .manaValue)
-              (and [isPermanent, youControl])) ]) ] }
+card := {
+  name := "Accelerated Mutation",
+  cost := [3, green, green],
+  types := [instant],
+  text := [
+    spell
+      [
+        get (target isCreature) (up (letter x)) (up (letter x)) untilEndOfTurn,
+        define x (aggregate max (stat manaValue) [isPermanent, youControl])
+      ]
+  ]
+}

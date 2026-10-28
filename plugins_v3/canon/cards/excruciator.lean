@@ -1,9 +1,9 @@
-card excruciator : Spelled :=
-  { name := "Excruciator", cost := [generic 6, pip .red, pip .red], types := [.creature],
-    subtypes := [avatar],
-    text :=
-      [ static
-          (cant any
-            (preventDamage allDamage
-              (damage := would (by_ thisCreature) (dealDamage anyAmount)))) ],
-    power := stat 7, toughness := stat 7 }
+card := {
+  name := "Excruciator",
+  cost := [6, red, red],
+  types := [creature],
+  subtypes := [avatar],
+  text := [cant any (preventDamage allDamage (damage := would (by_ thisCreature) (dealDamage anyAmount)))],
+  power := 7,
+  toughness := 7
+}

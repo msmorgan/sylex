@@ -2,11 +2,15 @@
 Each of those creatures deals damage equal to its toughness to the other." "The other" is the
 current member's counterpart in the group of two the targets make up
 (`DRS.distributivePair?`). -/
-card grimContest : Spelled :=
-  { name := "Grim Contest", cost := [generic 1, pip .black, pip .green], types := [.instant],
-    text :=
-      [ spell (sequentially
-          [ choose (both (target (and [isCreature, youControl]))
-                         (target (and [isCreature, anOpponentControls]))),
-            instruct (eachOf (those creature))
-              (dealDamage (toughnessOf it) theOther) ]) ] }
+card := {
+  name := "Grim Contest",
+  cost := [1, black, green],
+  types := [instant],
+  text := [
+    spell
+      [
+        choose (both (target [isCreature, youControl]) (target [isCreature, anOpponentControls])),
+        instruct (eachOf (those creature)) (dealDamage (toughnessOf it) theOther)
+      ]
+  ]
+}

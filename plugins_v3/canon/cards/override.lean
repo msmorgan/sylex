@@ -1,5 +1,11 @@
-card override : Spelled :=
-  { name := "Override", cost := [generic 2, pip .blue], types := [.instant],
-    text :=
-      [ spell (instruct (controllerOf (target isSpell)) (doUnless (instruct you (counter it))
-          (scaledGenericMana (forEach 1 (and [isArtifact, youControl]))))) ] }
+card := {
+  name := "Override",
+  cost := [2, blue],
+  types := [instant],
+  text := [
+    spell
+      (instruct (controllerOf (target isSpell))
+         (doUnless (instruct you (counter it))
+            (scaledGenericMana (forEach 1 [isArtifact, youControl]))))
+  ]
+}

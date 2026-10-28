@@ -1,7 +1,12 @@
-card explore : Spelled :=
-  { name := "Explore", cost := [generic 1, pip .green], types := [.sorcery],
-    text :=
-      [ spell (sequentially
-          [ establishThroughout (can you (play (counted (additional (exactly 1)) isLand)))
-              thisTurn,
-            draw 1 ]) ] }
+card := {
+  name := "Explore",
+  cost := [1, green],
+  types := [sorcery],
+  text := [
+    spell
+      [
+        establishThroughout (can you (play (counted (additional (exactly 1)) isLand))) thisTurn,
+        draw 1
+      ]
+  ]
+}

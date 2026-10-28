@@ -278,7 +278,7 @@ theorem cantBePreventedIsADeonticOverPreventDamage :
     let cantBePrevented : StaticSpec :=
       cant any
         (preventDamage allDamage (damage := would (by_ thisCreature) (dealDamage anyAmount)))
-    Cards.excruciator.card =
+    (cardNamed "Excruciator").card =
         singleFacedCard
           { name := "Excruciator", cost := [generic 6, pip .red, pip .red], types := [.creature],
             subtypes := [avatar], text := [static cantBePrevented],
@@ -504,16 +504,16 @@ theorem durationConventionWitnesses :
     (match epic with
       | .keyword _ _ [.spell _ (.establish _ d), _] => some d
       | _ => none) = some (some restOfGame) ∧
-    (match printedText Cards.screamingNemesis with
+    (match printedText (cardNamed "Screaming Nemesis") with
       | [_, .triggered _ _ _ _ _ _ _ (.sequentially [_, .doIf _ (.establish _ d) _ _])] => some d
       | _ => none) = some (some restOfGame) ∧
-    (match printedText Cards.terror with
+    (match printedText (cardNamed "Terror") with
       | [.spell _ (.sequentially [_, .establish _ d])] => some d
       | _ => none) = some (some Duration.modifiesPrecedingAction) ∧
-    (match printedText Cards.pinpointAvalanche with
+    (match printedText (cardNamed "Pinpoint Avalanche") with
       | [.spell _ (.sequentially [_, .establish _ d])] => some d
       | _ => none) = some (some Duration.modifiesPrecedingAction) ∧
-    (match printedText Cards.vexingShusher with
+    (match printedText (cardNamed "Vexing Shusher") with
       | [_, .activated _ (.establish _ d) _ _ _ _] => some d
       | _ => none) = some none ∧
     (match Cards.boseijuMana with
@@ -527,19 +527,19 @@ theorem durationConventionWitnesses :
 "as though" statements and their other lines (the life-gain and damage-prevention prohibitions,
 the loses-the-game exception) unchanged. -/
 theorem okAsThoughSourceHadKeywordCards :
-    Cards.everlastingTorment.card.check = [] ∧ Cards.phyrexianUnlife.card.check = [] :=
-  ⟨Cards.everlastingTorment.ok, Cards.phyrexianUnlife.ok⟩
+    (cardNamed "Everlasting Torment").card.check = [] ∧ (cardNamed "Phyrexian Unlife").card.check = [] :=
+  ⟨(cardNamed "Everlasting Torment").ok, (cardNamed "Phyrexian Unlife").ok⟩
 
 /-- The damage lines name the keywords by reference, as a condition on the damage's source
 ("as though its source had wither"), so they take wither's and infect's own rows
 [CR#702.80a,702.90b]. The condition grants nothing: for a source that has the keyword already it
 is simply true, and the keyword's result happens once [CR#120.3d,702.80d,702.90f]. -/
 theorem asThoughSourceHadKeywordByReference :
-    (match printedText Cards.everlastingTorment with
+    (match printedText (cardNamed "Everlasting Torment") with
       | [_, _, .static (.asThough subj action cond)] => some (subj, action, cond)
       | _ => none) =
       some (by_ (a isSource), dealDamage anyAmount, holds (is thatSource (hasKeyword wither))) ∧
-    (match printedText Cards.phyrexianUnlife with
+    (match printedText (cardNamed "Phyrexian Unlife") with
       | [_, .static (.conditional (.asThough subj action cond) _ _)] => some (subj, action, cond)
       | _ => none) =
       some (by_ (a isSource), dealDamage anyAmount you,
@@ -570,9 +570,9 @@ theorem asThoughIsNotRecordedAsPermitted :
 
 /-- Hotshot Mechanic and Cloudspire Captain check in the indicative form. -/
 theorem okIndicativeCrewAsThough :
-    Cards.hotshotMechanic.card.check = [] ∧
+    (cardNamed "Hotshot Mechanic").card.check = [] ∧
       StaticSpec.check (DRS.ofList []) Cards.cloudspireCaptainCrewLine = [] :=
-  ⟨Cards.hotshotMechanic.ok, Cards.okCloudspireCaptainCrewLine⟩
+  ⟨(cardNamed "Hotshot Mechanic").ok, Cards.okCloudspireCaptainCrewLine⟩
 
 /-- Hotshot Mechanic: "… as though its power were 2 greater." -/
 theorem okLiteralAsThoughAmount :

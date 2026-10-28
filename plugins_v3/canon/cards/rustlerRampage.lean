@@ -1,10 +1,14 @@
 /-- Rustler Rampage -/
-card rustlerRampage : Spelled :=
-  { name := "Rustler Rampage", cost := [pip .white], types := [.instant],
-    text :=
-      [ spell (chooseSpree
-          [ ([generic 1],
-             untap
-               (allOf (and [isCreature, controlledBy (target isPlayer)]))),
-            ([generic 1],
-             gain (target isCreature) doubleStrike untilEndOfTurn) ]) ] }
+card := {
+  name := "Rustler Rampage",
+  cost := [white],
+  types := [instant],
+  text := [
+    spell
+      (chooseSpree
+         [
+           ([1], untap (allOf [isCreature, controlledBy (target isPlayer)])),
+           ([1], gain (target isCreature) doubleStrike untilEndOfTurn)
+         ])
+  ]
+}

@@ -1,9 +1,14 @@
 /-- Hallowed Moonlight -/
-card hallowedMoonlight : Spelled :=
-  { name := "Hallowed Moonlight", cost := [generic 1, pip .white], types := [.instant],
-    text :=
-      [ spell (sequentially
-          [ replaceEvent (would (a (and [isCreature, not (did any (cast which) thisObject)])) enter)
-              (instead (exile it))
-              untilEndOfTurn,
-            draw 1 ]) ] }
+card := {
+  name := "Hallowed Moonlight",
+  cost := [1, white],
+  types := [instant],
+  text := [
+    spell
+      [
+        replaceEvent (would (a [isCreature, not (did any (cast which) thisObject)]) enter)
+          (instead (exile it)) untilEndOfTurn,
+        draw 1
+      ]
+  ]
+}

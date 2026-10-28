@@ -1,7 +1,7 @@
 /-- Leyline of the Meek -/
-card leylineOfTheMeek : Spelled :=
-  { name := "Leyline of the Meek", cost := [generic 2, pip .white, pip .white],
-    types := [.enchantment],
-    text :=
-      [ mayBeginOnBattlefield,
-        static (getsPt (allOf (and [isCreature, isToken])) (up 1) (up 1)) ] }
+card := {
+  name := "Leyline of the Meek",
+  cost := [2, white, white],
+  types := [enchantment],
+  text := [mayBeginOnBattlefield, getsPt (allOf [isCreature, isToken]) (up 1) (up 1)]
+}

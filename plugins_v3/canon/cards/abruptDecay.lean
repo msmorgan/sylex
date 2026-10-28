@@ -1,7 +1,9 @@
-card abruptDecay : Spelled :=
-  { name := "Abrupt Decay", cost := [pip .black, pip .green], types := [.instant],
-    text :=
-      [ static (cant any (counter thisSpell)),
-        spell
-            (destroy
-               (target (and [isPermanent, non isLand, hasManaValue .atMost 3]))) ] }
+card := {
+  name := "Abrupt Decay",
+  cost := [black, green],
+  types := [instant],
+  text := [
+    cant any (counter thisSpell),
+    spell (destroy (target [isPermanent, non isLand, hasManaValue atMost 3]))
+  ]
+}

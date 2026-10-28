@@ -1,10 +1,16 @@
 /-- Steam Augury -/
-card steamAugury : Spelled :=
-  { name := "Steam Augury", cost := [generic 2, pip .blue, pip .red], types := [.instant],
-    text :=
-      [ spell (sequentially
-          [ reveal (topSlice 5),
-            separateIntoPiles them 2,
-            instruct anOpponent (choose onePile),
-            putInto (that .pile) hand,
-            putInto theOther graveyard ]) ] }
+card := {
+  name := "Steam Augury",
+  cost := [2, blue, red],
+  types := [instant],
+  text := [
+    spell
+      [
+        reveal (topSlice 5),
+        separateIntoPiles them 2,
+        instruct anOpponent (choose onePile),
+        putInto (that pile) hand,
+        putInto theOther graveyard
+      ]
+  ]
+}

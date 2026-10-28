@@ -1,6 +1,9 @@
-card harbingerOfTheSeas : Spelled :=
-  { name := "Harbinger of the Seas", cost := [generic 1, pip .blue, pip .blue],
-    types := [.creature], subtypes := [merfolk, wizard],
-    text := [static ((qualityChange (allOf (and [isLand, non (hasSupertype .basic)])) .sets
-          (bundle { characteristics := { subtypes := [island] } })))], power := stat 2, toughness :=
-            stat 2 }
+card := {
+  name := "Harbinger of the Seas",
+  cost := [1, blue, blue],
+  types := [creature],
+  subtypes := [merfolk, wizard],
+  text := [qualityChange (allOf [isLand, non (hasSupertype basic)]) sets (bundle { subtypes := [island] })],
+  power := 2,
+  toughness := 2
+}

@@ -1,11 +1,15 @@
 /-- Indigo Faerie -/
-card indigoFaerie : Spelled :=
-  { name := "Indigo Faerie", cost := [generic 1, pip .blue], types := [.creature],
-    subtypes := [faerie, wizard],
-    text :=
-      [ flying,
-        activated [pip .blue]
-          (establishThroughout
-             (qualityChange (target isPermanent) .adds
-                (colored (.some [.blue]))) untilEndOfTurn) ],
-    power := stat 1, toughness := stat 1 }
+card := {
+  name := "Indigo Faerie",
+  cost := [1, blue],
+  types := [creature],
+  subtypes := [faerie, wizard],
+  text := [
+    flying,
+    activated [blue]
+      (establishThroughout (qualityChange (target isPermanent) adds (colored (.some [blue])))
+         untilEndOfTurn)
+  ],
+  power := 1,
+  toughness := 1
+}

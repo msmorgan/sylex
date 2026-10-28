@@ -1,5 +1,9 @@
-card illusionaryForces : Spelled :=
-  { name := "Illusionary Forces", cost := [generic 3, pip .blue], types := [.creature],
-    subtypes := [illusion],
-    text := [flying, cumulativeUpkeep [pip .blue]],
-    power := stat 4, toughness := stat 4 }
+card := {
+  name := "Illusionary Forces",
+  cost := [3, blue],
+  types := [creature],
+  subtypes := [illusion],
+  text := [flying, cumulativeUpkeep [blue]],
+  power := 4,
+  toughness := 4
+}

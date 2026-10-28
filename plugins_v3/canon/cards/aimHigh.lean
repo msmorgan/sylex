@@ -1,8 +1,13 @@
 /-- Aim High -/
-card aimHigh : Spelled :=
-  { name := "Aim High", cost := [generic 1, pip .green], types := [.instant],
-    text :=
-      [ spell (sequentially
-          [ untap (target isCreature),
-            establishFor it [getsPt it (up 2) (up 2), abilityGrant it reach]
-              untilEndOfTurn ]) ] }
+card := {
+  name := "Aim High",
+  cost := [1, green],
+  types := [instant],
+  text := [
+    spell
+      [
+        untap (target isCreature),
+        establishFor it [getsPt it (up 2) (up 2), abilityGrant it reach] untilEndOfTurn
+      ]
+  ]
+}

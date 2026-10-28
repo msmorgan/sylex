@@ -1,4 +1,7 @@
 /-- Thran Lens -/
-card thranLens : Spelled :=
-  { name := "Thran Lens", cost := [generic 2], types := [.artifact],
-    text := [static (qualityChange (allOf isPermanent) .sets (colored (.some [])))] }
+card := {
+  name := "Thran Lens",
+  cost := [2],
+  types := [artifact],
+  text := [qualityChange (allOf isPermanent) sets (colored (.some []))]
+}

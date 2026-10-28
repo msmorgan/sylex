@@ -125,7 +125,7 @@ theorem okIndestructibleAura : Action.check (DRS.ofList []) indestructibleAura =
 def shieldmatesBlessing : Action :=
   preventNext (target isAnyTarget) 3 thisTurn
 theorem okShieldmatesBlessing : Action.check (DRS.ofList []) shieldmatesBlessing = [] := by decide
-def moonlitWake : Ability := (match moonlitWakeCard.card with
+def moonlitWake : Ability := (match (cardNamed "Moonlit Wake").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -138,7 +138,7 @@ def eliteJavelineer : Ability :=
 theorem okEliteJavelineer : Ability.check (DRS.ofList []) eliteJavelineer = [] := by decide
 /-- Glacial Chasm -/
 def glacialChasmShield : Ability :=
-  (match glacialChasm.card with
+  (match (cardNamed "Glacial Chasm").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons _ (List.cons part _)))) => some part
       | _ => none

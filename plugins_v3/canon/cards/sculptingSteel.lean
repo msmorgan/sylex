@@ -1,4 +1,7 @@
 /-- Sculpting Steel -/
-card sculptingSteel : Spelled :=
-  { name := "Sculpting Steel", cost := [generic 3], types := [.artifact],
-    text := [static (enters thisArtifact [asCopyOf true (a isArtifact) []])] }
+card := {
+  name := "Sculpting Steel",
+  cost := [3],
+  types := [artifact],
+  text := [enters thisArtifact [asCopyOf true (a isArtifact) []]]
+}

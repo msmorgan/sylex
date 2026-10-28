@@ -1,7 +1,10 @@
 /-- Seedborn Muse -/
-card seedbornMuse : Spelled :=
-  { name := "Seedborn Muse", cost := [generic 3, pip .green, pip .green],
-    types := [.creature], subtypes := [spirit],
-    text :=
-      [ static (untapDuring (allOf youControl) (each isOtherPlayer)) ],
-    power := stat 2, toughness := stat 4 }
+card := {
+  name := "Seedborn Muse",
+  cost := [3, green, green],
+  types := [creature],
+  subtypes := [spirit],
+  text := [untapDuring (allOf youControl) (each isOtherPlayer)],
+  power := 2,
+  toughness := 4
+}

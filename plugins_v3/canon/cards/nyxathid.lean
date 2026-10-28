@@ -1,10 +1,14 @@
 /-- Nyxathid -/
-card nyxathid : Spelled :=
-  { name := "Nyxathid", cost := [generic 1, pip .black, pip .black], types := [.creature],
-    subtypes := [elemental],
-    text :=
-      [ static (entersChoosingPlayer thisCreature anOpponent),
-        static (getsPt thisCreature
-          (down (countOf (cardIn (handOf (the isChosenPlayer)))))
-          (down (countOf (cardIn (handOf (the isChosenPlayer)))))) ],
-    power := stat 7, toughness := stat 7 }
+card := {
+  name := "Nyxathid",
+  cost := [1, black, black],
+  types := [creature],
+  subtypes := [elemental],
+  text := [
+    entersChoosingPlayer thisCreature anOpponent,
+    getsPt thisCreature (down (countOf (cardIn (handOf (the isChosenPlayer)))))
+      (down (countOf (cardIn (handOf (the isChosenPlayer)))))
+  ],
+  power := 7,
+  toughness := 7
+}

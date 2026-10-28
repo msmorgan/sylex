@@ -1,5 +1,6 @@
-card terror : Spelled :=
-  { name := "Terror", cost := [generic 1, pip .black], types := [.instant],
-    text :=
-      [ spell (destroyCantRegenerate
-          (target (and [isCreature, non isArtifact, non (hasColor .black)]))) ] }
+card := {
+  name := "Terror",
+  cost := [1, black],
+  types := [instant],
+  text := [spell (destroyCantRegenerate (target [isCreature, non isArtifact, non (hasColor black)]))]
+}

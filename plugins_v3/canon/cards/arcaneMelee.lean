@@ -1,3 +1,6 @@
-card arcaneMelee : Spelled :=
-  { name := "Arcane Melee", cost := [generic 4, pip .blue], types := [.enchantment],
-    text := [static ((costShift (allOf (and [isInstantOrSorcery, isSpell])) (less 2)))] }
+card := {
+  name := "Arcane Melee",
+  cost := [4, blue],
+  types := [enchantment],
+  text := [costShift (allOf [isInstantOrSorcery, isSpell]) (less 2)]
+}

@@ -1,8 +1,13 @@
-card candlesOfLeng : Spelled :=
-  { name := "Candles of Leng", cost := [generic 2], types := [.artifact],
-    text :=
-      [ activated (compound [[generic 4], tapSymbol])
-          (sequentially
-            [ reveal (topSlice 1),
-              doIf (is it (shares .cardName .share (a (cardIn yourGraveyard))))
-                (putInto it graveyard) (draw 1) ]) ] }
+card := {
+  name := "Candles of Leng",
+  cost := [2],
+  types := [artifact],
+  text := [
+    activated (compound [[4], tapSymbol])
+      [
+        reveal (topSlice 1),
+        doIf (is it (shares cardName share (a (cardIn yourGraveyard)))) (putInto it graveyard)
+          (draw 1)
+      ]
+  ]
+}

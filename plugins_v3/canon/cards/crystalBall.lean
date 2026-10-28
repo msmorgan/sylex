@@ -1,3 +1,6 @@
-card crystalBall : Spelled :=
-  { name := "Crystal Ball", cost := [generic 3], types := [.artifact],
-    text := [activated (compound [[generic 1], tapSymbol]) (scry 2)] }
+card := {
+  name := "Crystal Ball",
+  cost := [3],
+  types := [artifact],
+  text := [activated (compound [[1], tapSymbol]) (scry 2)]
+}

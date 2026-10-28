@@ -1,8 +1,9 @@
-card forceOfWill : Spelled :=
-  { name := "Force of Will", cost := [generic 3, pip .blue, pip .blue], types := [.instant],
-    text :=
-      [ static (altCost this_
-          (compound
-            [ payLife 1,
-              (exile (a (and [hasColor .blue, in_ yourHand]))) ])),
-        spell (counter (target isSpell)) ] }
+card := {
+  name := "Force of Will",
+  cost := [3, blue, blue],
+  types := [instant],
+  text := [
+    altCost this_ (compound [payLife 1, (exile (a [hasColor blue, in_ yourHand]))]),
+    spell (counter (target isSpell))
+  ]
+}

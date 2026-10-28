@@ -1,11 +1,14 @@
 /-- Lightning Reflexes -/
-card lightningReflexes : Spelled :=
-  { name := "Lightning Reflexes", cost := [generic 1, pip .red], types := [.enchantment],
-    subtypes := [aura],
-    text :=
-      [ asThoughFlashSacrificedAtCleanup,
-        enchant isCreature,
-        static (conjunction
-          [ getsPt (enchanted creature) (up 1) (up 0),
-            abilityGrant (enchanted creature) firstStrike ]
-          (subject := enchanted creature)) ] }
+card := {
+  name := "Lightning Reflexes",
+  cost := [1, red],
+  types := [enchantment],
+  subtypes := [aura],
+  text := [
+    asThoughFlashSacrificedAtCleanup,
+    enchant isCreature,
+    conjunction
+      [getsPt (enchanted creature) (up 1) (up 0), abilityGrant (enchanted creature) firstStrike]
+      (subject := enchanted creature)
+  ]
+}

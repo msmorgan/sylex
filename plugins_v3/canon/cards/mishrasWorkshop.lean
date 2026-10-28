@@ -1,6 +1,9 @@
-card mishrasWorkshop : Spelled :=
-  { name := "Mishra's Workshop", types := [.land],
-    text :=
-      [ activated tapSymbol
-          (addMana 1 (manaOf [[.colorless, .colorless, .colorless]])
-            [spendOnly [toCast (and [isArtifact, isSpell])]]) ] }
+card := {
+  name := "Mishra's Workshop",
+  types := [land],
+  text := [
+    activated tapSymbol
+      (addMana 1 (manaOf [[colorless, colorless, colorless]])
+         [spendOnly [toCast [isArtifact, isSpell]]])
+  ]
+}

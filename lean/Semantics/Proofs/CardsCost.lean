@@ -115,7 +115,7 @@ theorem okSaheelisEmblem : Action.check (DRS.ofList []) saheelisEmblem = [] := b
 
 /-- Elspeth's Talent -/
 def elspethsTalentGrant : StaticSpec :=
-  (match elspethsTalent.card with
+  (match (cardNamed "Elspeth's Talent").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.static part) _)) => some part
       | _ => none
@@ -157,7 +157,7 @@ def ferventChampionEquipDiscount : Ability :=
 theorem okFerventChampionEquipDiscount : Ability.check (DRS.ofList []) ferventChampionEquipDiscount = [] := by decide
 
 def oppressiveRaysLine : StaticSpec :=
-  (match oppressiveRays.card with
+  (match (cardNamed "Oppressive Rays").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.static part) _))) => some part
       | _ => none
@@ -217,7 +217,7 @@ theorem okDiplomaticEscortLine : Ability.check (DRS.ofList []) diplomaticEscortL
 
 /-- Prosperity -/
 theorem prosperityCostLetters : costLetters [.variable, pip .blue] = [letterB .x] := rfl
-def prosperityTextLetter : Amount := (match prosperity.card with
+def prosperityTextLetter : Amount := (match (cardNamed "Prosperity").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ (Action.instruct _ (Action.draw (Quantity.exactlyOf part)))) _)
         => some part

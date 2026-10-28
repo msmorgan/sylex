@@ -27,6 +27,7 @@ pub struct Declaration {
     pub return_type: Ident,
     pub parameters: Vec<Parameter>,
     pub fields: BTreeMap<Ident, Vec<Token>>,
+    pub card: Option<Vec<Token>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, thiserror::Error)]
@@ -309,8 +310,14 @@ pub fn parse(source: &str) -> Result<Declaration, ReadError> {
             name: Ident::new(&name),
             return_type: Ident::new("Spelled"),
             parameters: Vec::new(),
-            fields: BTreeMap::from([(Ident::new("body"), rest.to_vec())]),
+            fields: BTreeMap::new(),
+            card: Some(rest.to_vec()),
         });
+    }
+    if command.as_str() == "card" {
+        return Err(ReadError(
+            "named card declarations are no longer supported; use card := ...".into(),
+        ));
     }
     let mut name = ident(name)?;
     if result_type(command.as_str()).is_none()
@@ -391,20 +398,6 @@ pub fn parse(source: &str) -> Result<Declaration, ReadError> {
         "token" => &["name", "token", "body"],
         "sba" => &["scope", "when", "then_", "body"],
         "conferral" => &["scope", "confer", "body"],
-        "card" => &[
-            "name",
-            "cost",
-            "colors",
-            "supertypes",
-            "types",
-            "subtypes",
-            "text",
-            "power",
-            "toughness",
-            "loyalty",
-            "defense",
-            "body",
-        ],
         _ => &[],
     };
     for field in fields.keys() {
@@ -431,6 +424,7 @@ pub fn parse(source: &str) -> Result<Declaration, ReadError> {
         return_type,
         parameters,
         fields,
+        card: None,
     })
 }
 

@@ -1,10 +1,15 @@
-card frogify : Spelled :=
-  { name := "Frogify", cost := [generic 1, pip .blue], types := [.enchantment],
-    subtypes := [aura],
-    text :=
-      [ enchant isCreature,
-        static ((conjunction [ allAbilityLoss (enchanted creature),
-                qualityChange it .sets
-                  (bundle { characteristics := { colors := [.blue], types := [.creature], subtypes
-                    := [frog] } }),
-                getsBase it (lit 1) (lit 1) ])) ] }
+card := {
+  name := "Frogify",
+  cost := [1, blue],
+  types := [enchantment],
+  subtypes := [aura],
+  text := [
+    enchant isCreature,
+    static
+      [
+        allAbilityLoss (enchanted creature),
+        qualityChange it sets (bundle { colors := [blue], types := [creature], subtypes := [frog] }),
+        getsBase it (lit 1) (lit 1)
+      ]
+  ]
+}

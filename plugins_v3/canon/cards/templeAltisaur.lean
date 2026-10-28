@@ -1,7 +1,12 @@
-card templeAltisaur : Spelled :=
-  { name := "Temple Altisaur", cost := [generic 4, pip .white], types := [.creature],
-    subtypes := [dinosaur],
-    text :=
-      [ static (replace (would (a isSource) (dealDamage anyAmount (a (and [dinosaur, youControl, isOther]))))
-          (instead (preventDamage (allBut 1)))) ],
-    power := stat 3, toughness := stat 4 }
+card := {
+  name := "Temple Altisaur",
+  cost := [4, white],
+  types := [creature],
+  subtypes := [dinosaur],
+  text := [
+    replace (would (a isSource) (dealDamage anyAmount (a [dinosaur, youControl, isOther])))
+      (instead (preventDamage (allBut 1)))
+  ],
+  power := 3,
+  toughness := 4
+}

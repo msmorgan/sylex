@@ -1,9 +1,16 @@
-card arcaneAdaptation : Spelled :=
-  { name := "Arcane Adaptation", cost := [generic 2, pip .blue], types := [.enchantment],
-    text :=
-      [ static (entersChoosing thisEnchantment (.subtype .creature)),
-        static (qualityChange (and [
-            allOf (and [isCreature, youControl]),
-            allOf (and [isCreature, isSpell, youControl]),
-            allOf (and [isCard, isCreature, youOwn, not (in_ battlefield)]) ]) .adds
-            (chosenQuality (ofChosen (.subtype .creature)))) ] }
+card := {
+  name := "Arcane Adaptation",
+  cost := [2, blue],
+  types := [enchantment],
+  text := [
+    entersChoosing thisEnchantment (subtype creature),
+    qualityChange
+      (and
+         [
+           allOf [isCreature, youControl],
+           allOf [isCreature, isSpell, youControl],
+           allOf [isCard, isCreature, youOwn, not (in_ battlefield)]
+         ])
+      adds (chosenQuality (ofChosen (subtype creature)))
+  ]
+}

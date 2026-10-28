@@ -1,8 +1,9 @@
-card wardSliver : Spelled :=
-  { name := "Ward Sliver", cost := [generic 4, pip .white], types := [.creature],
-    subtypes := [sliver],
-    text :=
-      [ static (entersChoosing thisCreature .color),
-        static (abilityGrant (allOf sliver)
-          (protection (ofChosen .color))) ],
-    power := stat 2, toughness := stat 2 }
+card := {
+  name := "Ward Sliver",
+  cost := [4, white],
+  types := [creature],
+  subtypes := [sliver],
+  text := [entersChoosing thisCreature color, abilityGrant (allOf sliver) (protection (ofChosen color))],
+  power := 2,
+  toughness := 2
+}

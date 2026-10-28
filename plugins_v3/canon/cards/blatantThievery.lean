@@ -1,7 +1,7 @@
 /-- Blatant Thievery -/
-card blatantThievery : Spelled :=
-  { name := "Blatant Thievery", cost := [generic 4, pip .blue, pip .blue, pip .blue],
-    types := [.sorcery],
-    text :=
-      [ spell (doForEach eachOpponent
-          (gainControl (target (controlledBy (that player))))) ] }
+card := {
+  name := "Blatant Thievery",
+  cost := [4, blue, blue, blue],
+  types := [sorcery],
+  text := [spell (doForEach eachOpponent (gainControl (target (controlledBy (that player)))))]
+}

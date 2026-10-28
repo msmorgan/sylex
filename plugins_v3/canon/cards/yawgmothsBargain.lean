@@ -1,6 +1,6 @@
-card yawgmothsBargain : Spelled :=
-  { name := "Yawgmoth's Bargain", cost := [generic 4, pip .black, pip .black],
-    types := [.enchantment],
-    text :=
-      [ static (partSkip you .drawStep),
-        activated (payLife 1) (draw 1) ] }
+card := {
+  name := "Yawgmoth's Bargain",
+  cost := [4, black, black],
+  types := [enchantment],
+  text := [partSkip you drawStep, activated (payLife 1) (draw 1)]
+}

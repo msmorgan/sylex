@@ -1,5 +1,7 @@
 /-- Extinction -/
-card extinction : Spelled :=
-  { name := "Extinction", cost := [generic 4, pip .black], types := [.sorcery],
-    text :=
-      [ spell (destroy (allOf (and [isCreature, ofYourChoice (.subtype .creature)]))) ] }
+card := {
+  name := "Extinction",
+  cost := [4, black],
+  types := [sorcery],
+  text := [spell (destroy (allOf [isCreature, ofYourChoice (subtype creature)]))]
+}

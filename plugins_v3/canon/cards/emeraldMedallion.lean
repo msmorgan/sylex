@@ -1,4 +1,6 @@
-card emeraldMedallion : Spelled :=
-  { name := "Emerald Medallion", cost := [generic 2], types := [.artifact],
-    text := [static ((costShift (allOf (and [hasColor .green, isSpell, did you (cast which)
-      thisObject])) (less 1)))] }
+card := {
+  name := "Emerald Medallion",
+  cost := [2],
+  types := [artifact],
+  text := [costShift (allOf [hasColor green, isSpell, did you (cast which) thisObject]) (less 1)]
+}

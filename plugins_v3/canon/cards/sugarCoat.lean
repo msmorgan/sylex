@@ -1,16 +1,22 @@
 /-- Sugar Coat -/
-card sugarCoat : Spelled :=
-  { name := "Sugar Coat", cost := [generic 2, pip .blue], types := [.enchantment],
-    subtypes := [aura],
-    text :=
-      [ flash,
-        enchant (or [isCreature, food]),
-        static (conjunction [ qualityChange (enchanted permanent) .sets
-              (bundle
-                { characteristics :=
-                  { types := [.artifact], subtypes := [food],
-                    text :=
-                      [ activated (compound [[generic 2], tapSymbol, (sacrifice
-                          thisArtifact)])
-                          (gainLife 3) ] } }),
-            allAbilityLoss it ]) ] }
+card := {
+  name := "Sugar Coat",
+  cost := [2, blue],
+  types := [enchantment],
+  subtypes := [aura],
+  text := [
+    flash,
+    enchant (or [isCreature, food]),
+    static
+      [
+        qualityChange (enchanted permanent) sets
+          (bundle
+             {
+               types := [artifact],
+               subtypes := [food],
+               text := [activated (compound [[2], tapSymbol, (sacrifice thisArtifact)]) (gainLife 3)]
+             }),
+        allAbilityLoss it
+      ]
+  ]
+}

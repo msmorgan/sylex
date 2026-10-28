@@ -1,4 +1,6 @@
-card disembowel : Spelled :=
-  { name := "Disembowel", cost := [.variable, pip .black], types := [.instant],
-    text :=
-      [ spell (destroy (target (and [isCreature, hasManaValue .eq (letter .x)]))) ] }
+card := {
+  name := "Disembowel",
+  cost := [«variable», black],
+  types := [instant],
+  text := [spell (destroy (target [isCreature, hasManaValue eq (letter x)]))]
+}

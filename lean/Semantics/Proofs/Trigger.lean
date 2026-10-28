@@ -316,7 +316,7 @@ private def firstTriggerEvent (card : Spelled) : Option GameEvent :=
 /-- Required pin: *Tezzeret's Gatebreaker*'s "When this artifact enters" is the intransitive
 `enter` with this artifact as its Actor [CR#603.6a]. -/
 theorem gatebreakerTriggersOnThisArtifactEntering :
-    firstTriggerEvent Cards.tezzeretsGatebreaker = some (.does (.actor thisArtifact) enter) :=
+    firstTriggerEvent (cardNamed "Tezzeret's Gatebreaker") = some (.does (.actor thisArtifact) enter) :=
   rfl
 
 /-- Whether a card's first ability, its "… The same is true for …" line, is a trigger with no
@@ -337,9 +337,9 @@ turn if a creature you control has first strike" prints its "if" after the effec
 intervening "if" [CR#603.4] and the condition is part of the effect: each `sequentially` step is a
 `doIf`; so are *Bleeding Effect*'s and *Concerted Effort*'s. -/
 theorem trailingIfIsInTheEffect :
-    conditionIsInTheEffect Cards.odricLunarchMarshal = true ∧
-      conditionIsInTheEffect Cards.bleedingEffect = true ∧
-      conditionIsInTheEffect Cards.concertedEffort = true := by
+    conditionIsInTheEffect (cardNamed "Odric, Lunarch Marshal") = true ∧
+      conditionIsInTheEffect (cardNamed "Bleeding Effect") = true ∧
+      conditionIsInTheEffect (cardNamed "Concerted Effort") = true := by
   decide
 
 /-- The number of keywords a card's lines grant through one triggered ability each, with the
@@ -359,7 +359,7 @@ private def triggeredSteps (card : Spelled) : Option (Nat × List Nat) :=
 "Odric's ability" [CR#113.2c]): a single triggered ability whose action runs `sequentially` over
 its 13 keywords, first strike and the 12 the same is true for. -/
 theorem odricIsOneAbility :
-    triggeredSteps Cards.odricLunarchMarshal = some (1, [13]) := by
+    triggeredSteps (cardNamed "Odric, Lunarch Marshal") = some (1, [13]) := by
   decide
 
 end Semantics.Proofs.Trigger

@@ -1,6 +1,10 @@
 /-- Frenzy Sliver -/
-card frenzySliver : Spelled :=
-  { name := "Frenzy Sliver", cost := [generic 1, pip .black], types := [.creature],
-    subtypes := [sliver],
-    text := [static (abilityGrant (allOf (and [sliver, isCreature])) (frenzy 1))],
-    power := stat 1, toughness := stat 1 }
+card := {
+  name := "Frenzy Sliver",
+  cost := [1, black],
+  types := [creature],
+  subtypes := [sliver],
+  text := [abilityGrant (allOf [sliver, isCreature]) (frenzy 1)],
+  power := 1,
+  toughness := 1
+}

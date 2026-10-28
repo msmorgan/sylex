@@ -1,5 +1,9 @@
-card wizenedSnitches : Spelled :=
-  { name := "Wizened Snitches", cost := [generic 3, pip .blue], types := [.creature],
-    subtypes := [faerie, rogue],
-    text := [flying, static (visibility .reveal (bare isPlayer) topOfLibrary)],
-    power := stat 1, toughness := stat 3 }
+card := {
+  name := "Wizened Snitches",
+  cost := [3, blue],
+  types := [creature],
+  subtypes := [faerie, rogue],
+  text := [flying, visibility reveal (bare isPlayer) topOfLibrary],
+  power := 1,
+  toughness := 3
+}

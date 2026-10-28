@@ -217,7 +217,7 @@ creature left the battlefield, so it doesn't move counters but puts the same num
 the creature had, read by last known information [CR#122.8,608.2h]: a loop over its counter
 kinds, not a [CR#122.5] move and not one counter of each kind. -/
 theorem starPupilPutsTheSameNumberOfEachKind :
-    (match Cards.starPupil.card with
+    (match (cardNamed "Star Pupil").card with
       | .singleFaced { characteristics := { text := [_, .triggered _ _ _ _ _ _ _ effect], .. } } =>
         some effect
       | _ => none) =
@@ -235,7 +235,7 @@ theorem denryKlinPutsTheSameNumberOfEachKind :
 
 /-- Celestial Convergence's upkeep effect, after its counter removal. -/
 private def celestialConvergenceAfterRemoval : Option Action :=
-  match Cards.celestialConvergence.card with
+  match (cardNamed "Celestial Convergence").card with
   | .singleFaced { characteristics := { text := [_, .triggered _ _ _ _ _ _ _
       (.sequentially [_, rest]) ], .. } } => some rest
   | _ => none
@@ -720,7 +720,7 @@ reads the target creature (3), not the land; the two "you control"s re-mention o
 resolved too (`mentionYou`; with handoff performers taking no id, `DRS.performers`, the ids are
 renumbered from 3 and 5). -/
 theorem thranduilsCompanyItIsTheTargetCreature :
-    let result := match (printedText Cards.thranduilsCompany)[1]? with
+    let result := match (printedText (cardNamed "Thranduil's Company"))[1]? with
       | some line => lineTrace line
       | none => (DRS.ofList [], [.nonEmpty])
     result.2 = [] ∧ result.1.resolvedIds = [3, 0, 2] ∧
@@ -732,7 +732,7 @@ theorem thranduilsCompanyItIsTheTargetCreature :
 one target creature an opponent controls and put a stun counter on it." "it" reads the second
 target (4, the tapped creature), not the first (1). -/
 theorem stunningShotItIsTheTappedCreature :
-    let result := match (printedText Cards.stunningShot)[0]? with
+    let result := match (printedText (cardNamed "Stunning Shot"))[0]? with
       | some line => lineTrace line
       | none => (DRS.ofList [], [.nonEmpty])
     result.2 = [] ∧ result.1.resolvedIds = [4] ∧
@@ -784,7 +784,7 @@ theorem theNthEncodesTheCounterThreshold :
 has flying. The same is true for …" is one static ability [CR#113.2c], a `conjunction` of 12
 parts: flying and the 11 the same is true for. The card has two lines. -/
 theorem urborgScavengersIsOneStatic :
-    (match Cards.urborgScavengers.card with
+    (match (cardNamed "Urborg Scavengers").card with
       | .singleFaced face =>
         face.characteristics.text.length == 2 &&
           match (face.characteristics.text[1]? : Option Ability) with

@@ -1,8 +1,13 @@
 /-- Watcher in the Web -/
-card watcherInTheWeb : Spelled :=
-  { name := "Watcher in the Web", cost := [generic 4, pip .green], types := [.creature],
-    subtypes := [spider],
-    text := [reach, static
-               (can thisCreature (block (counted (additional (exactly 7)) isCreature))
-                  (timing := eachCombat))],
-    power := stat 2, toughness := stat 5 }
+card := {
+  name := "Watcher in the Web",
+  cost := [4, green],
+  types := [creature],
+  subtypes := [spider],
+  text := [
+    reach,
+    can thisCreature (block (counted (additional (exactly 7)) isCreature)) (timing := eachCombat)
+  ],
+  power := 2,
+  toughness := 5
+}

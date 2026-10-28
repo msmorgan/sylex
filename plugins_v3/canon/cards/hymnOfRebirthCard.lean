@@ -1,5 +1,9 @@
-card hymnOfRebirthCard : Spelled :=
-  { name := "Hymn of Rebirth", cost := [generic 3, pip .green, pip .white],
-    types := [.sorcery], text := [spell (putOntoBattlefieldUnderYourControl (target (and
-      [isCreature, in_ graveyard]))
-          (from_ := graveyard))] }
+card := {
+  name := "Hymn of Rebirth",
+  cost := [3, green, white],
+  types := [sorcery],
+  text := [
+    spell
+      (putOntoBattlefieldUnderYourControl (target [isCreature, in_ graveyard]) (from_ := graveyard))
+  ]
+}

@@ -1,5 +1,10 @@
-card mistformUltimus : Spelled :=
-  { name := "Mistform Ultimus", cost := [generic 3, pip .blue], supertypes := [.legendary],
-    types := [.creature], subtypes := [illusion],
-    text := [static (qualityDefinition thisCreature .adds (everyTypeOf .creature))],
-    power := stat 3, toughness := stat 3 }
+card := {
+  name := "Mistform Ultimus",
+  cost := [3, blue],
+  supertypes := [legendary],
+  types := [creature],
+  subtypes := [illusion],
+  text := [qualityDefinition thisCreature adds (everyTypeOf creature)],
+  power := 3,
+  toughness := 3
+}

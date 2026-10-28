@@ -1,6 +1,7 @@
 /-- Secret Rendezvous -/
-card secretRendezvous : Spelled :=
-  { name := "Secret Rendezvous", cost := [generic 1, pip .white, pip .white],
-    types := [.sorcery],
-    text := [ spell (instruct (eachOf (youAnd (target isOpponent))) (draw 3)) ]
-        }
+card := {
+  name := "Secret Rendezvous",
+  cost := [1, white, white],
+  types := [sorcery],
+  text := [spell (instruct (eachOf (youAnd (target isOpponent))) (draw 3))]
+}

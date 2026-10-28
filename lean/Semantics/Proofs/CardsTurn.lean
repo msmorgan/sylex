@@ -109,13 +109,13 @@ def saheelisCopy : Action :=
       atNext .endStep (exile it) ]
 theorem okSaheelisCopy : Action.check (DRS.ofList []) saheelisCopy = [] := by decide
 
-def finalFortuneExtraTurn : Action := (match finalFortune.card with
+def finalFortuneExtraTurn : Action := (match (cardNamed "Final Fortune").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ (Action.sequentially (List.cons part _))) _) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okFinalFortuneExtraTurn : Action.check (DRS.ofList []) finalFortuneExtraTurn = [] := by decide
-def finalFortuneThatTurn : TurnRef := (match finalFortune.card with
+def finalFortuneThatTurn : TurnRef := (match (cardNamed "Final Fortune").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ (Action.sequentially (List.cons _ (List.cons (Action.delay
         (GameEvent.beginningOf _ _ part) _ _ _) _)))) _) => some part
@@ -164,7 +164,7 @@ onto the battlefield with [this object]" reads the creature that ability puts, t
 puts it [CR#607.1a,607.2c]. -/
 
 /-- "creature card in a graveyard" -/
-def creatureCardInAGraveyard : Predicate := (match necromancy.card with
+def creatureCardInAGraveyard : Predicate := (match (cardNamed "Necromancy").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _
         (List.cons (Action.move (NounPhrase.described _ part) _ _ _ _) _)))) _)) => some part
@@ -174,7 +174,7 @@ def creatureCardInAGraveyard : Predicate := (match necromancy.card with
 /-- "it loses 'enchant creature card in a graveyard' and gains 'enchant creature put onto the
 battlefield with this Aura.'" -/
 def swapsEnchantForLinkedEntry : Action :=
-  (match danceOfTheDead.card with
+  (match (cardNamed "Dance of the Dead").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
         part _))) _)) => some part

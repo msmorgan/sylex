@@ -1,9 +1,8 @@
 /-- Pacifism -/
-card pacifism : Spelled :=
-  { name := "Pacifism", cost := [generic 1, pip .white], types := [.enchantment],
-    subtypes := [aura],
-    text :=
-      [ enchant isCreature,
-        static (conjunction
-                  [cant (enchanted creature) attack, cant
-                     (enchanted creature) block]) ] }
+card := {
+  name := "Pacifism",
+  cost := [1, white],
+  types := [enchantment],
+  subtypes := [aura],
+  text := [enchant isCreature, static [cant (enchanted creature) attack, cant (enchanted creature) block]]
+}

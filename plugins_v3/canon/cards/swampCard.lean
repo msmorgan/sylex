@@ -1,2 +1,1 @@
-card swampCard : Spelled :=
-  { name := "Swamp", supertypes := [.basic], types := [.land], subtypes := [swamp] }
+card := { name := "Swamp", supertypes := [basic], types := [land], subtypes := [swamp] }

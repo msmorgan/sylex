@@ -1,10 +1,13 @@
 /-- Krosan Druid -/
-card krosanDruid : Spelled :=
-  { name := "Krosan Druid", cost := [generic 2, pip .green], types := [.creature],
-    subtypes := [centaur, druid],
-    text :=
-      [ kicker [generic 4, pip .green],
-        when (does thisCreature enter) (if_ := keywordCostPaid kicker
-                                                         thisCreature)
-          (gainLife 10) ],
-    power := stat 2, toughness := stat 3 }
+card := {
+  name := "Krosan Druid",
+  cost := [2, green],
+  types := [creature],
+  subtypes := [centaur, druid],
+  text := [
+    kicker [4, green],
+    when (does thisCreature enter) (if_ := keywordCostPaid kicker thisCreature) (gainLife 10)
+  ],
+  power := 2,
+  toughness := 3
+}

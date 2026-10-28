@@ -21,7 +21,7 @@ open Semantics Semantics.Templates Semantics.Definitions
 namespace Semantics.Cards
 
 def forkedBolt : Action :=
-  (match chandrasPyrohelixCard.card with
+  (match (cardNamed "Chandra's Pyrohelix").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ part) _) => some part
       | _ => none
@@ -40,13 +40,13 @@ theorem okAbandonedOutpost : Ability.check (DRS.ofList []) abandonedOutpost = []
 def timeVaultLock : Ability := static (doesntUntap thisArtifact you)
 theorem okTimeVaultLock : Ability.check (DRS.ofList []) timeVaultLock = [] := by decide
 def hymnOfRebirth : Action :=
-  (match hymnOfRebirthCard.card with
+  (match (cardNamed "Hymn of Rebirth").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ part) _) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okHymnOfRebirth : Action.check (DRS.ofList []) hymnOfRebirth = [] := by decide
-def counterspell : Action := (match counterspellCard.card with
+def counterspell : Action := (match (cardNamed "Counterspell").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ part) _) => some part
       | _ => none
@@ -111,7 +111,7 @@ theorem okRoilingHorror : Ability.check (DRS.ofList []) roilingHorror = [] := by
 /-- Wilt-Leaf Liege's last line: "If a spell or ability an opponent controls causes you to discard
 this card, put it onto the battlefield instead of putting it into your graveyard." -/
 def wiltLeafLiegeDiscardReplacement : Ability :=
-  (match wiltLeafLiege.card with
+  (match (cardNamed "Wilt-Leaf Liege").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons part _))) => some part
       | _ => none
@@ -145,7 +145,7 @@ theorem okSolfataraLandLock : Action.check (DRS.ofList []) solfataraLandLock = [
 
 /-- Volrath's Laboratory -/
 def volrathsLaboratoryChoice : StaticSpec :=
-  (match volrathsLaboratory.card with
+  (match (cardNamed "Volrath's Laboratory").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.static part) _) => some part
       | _ => none
@@ -303,7 +303,7 @@ theorem okLanternOfInsightRider : Ability.check (DRS.ofList []) lanternOfInsight
 
 /-- Phyrexian Unlife -/
 def phyrexianUnlifeImmunity : Ability :=
-  (match phyrexianUnlife.card with
+  (match (cardNamed "Phyrexian Unlife").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none

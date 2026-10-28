@@ -178,7 +178,7 @@ theorem cantTriggerReadsTheDelayedTriggerByIdentity :
 kind and determiner: the trigger's damage dealt to "any other target", then the condition, then
 "they" in the branch's clause. -/
 private def screamingNemesisThey : Option (List (Kind × Determiner)) :=
-  match (match Cards.screamingNemesis.card with
+  match (match (cardNamed "Screaming Nemesis").card with
       | .singleFaced face => face.characteristics.text
       | _ => []) with
   | [_, .triggered _ _ _ _ _ _ _ (.sequentially [first, .doIf condition _ _ _])] =>
@@ -588,7 +588,7 @@ theorem shadowbaneRiderIsDidPreventDamageThisWay :
         (instead
           (preventDamage allDamage (also := doIf blackPrevented (gainLife thatMuch))))
         (use := .nextTimeOnly)
-    Cards.shadowbane.card =
+    (cardNamed "Shadowbane").card =
         singleFacedCard
           { name := "Shadowbane", cost := [generic 1, pip .white], types := [.instant],
             text := [spell (establishThroughout rule thisTurn)] } ∧
@@ -718,7 +718,7 @@ theorem okShieldedRedirectionSizesItsCut :
         (would (aYourChoice isSource)
           (dealDamage anyAmount (andOr [you, allOf (and [isPermanent, youControl])])))
         (instead (redirectDamage (.shield 2) (target isAnyTarget)))
-    Cards.harmsWay.card =
+    (cardNamed "Harm's Way").card =
         singleFacedCard
           { name := "Harm's Way", cost := [pip .white], types := [.instant],
             text := [spell (establishThroughout harmsWay thisTurn)] } ∧
@@ -1083,8 +1083,8 @@ theorem witherFunctionsFromAnyZone :
         | _ => true
       | _ => false) = true ∧
       (bodyStatics wither).head? = some markingReplacedByCounters ∧
-      Cards.punctureBlast.card.check = [] :=
-  ⟨by decide, rfl, Cards.punctureBlast.ok⟩
+      (cardNamed "Puncture Blast").card.check = [] :=
+  ⟨by decide, rfl, (cardNamed "Puncture Blast").ok⟩
 
 /-- Infect's player row replaces the life loss its own damage would cause, caused by that damage
 event and not by the source, so other life loss the source causes is not replaced
@@ -1122,14 +1122,14 @@ private def conditionalStatics (card : Spelled) : List (StaticSpec × Condition)
 
 /-- *Archon of Coronation*: "As long as you're the monarch, damage doesn't cause you to lose life."
 The card checks. -/
-theorem okArchonOfCoronation : Cards.archonOfCoronation.card.check = [] :=
-  Cards.archonOfCoronation.ok
+theorem okArchonOfCoronation : (cardNamed "Archon of Coronation").card.check = [] :=
+  (cardNamed "Archon of Coronation").ok
 
 /-- *Archon of Coronation* writes a prohibition of losing life, restricted to a loss the damage
 dealt to you causes [CR#120.3a], while you are the monarch: a cause-qualified prohibition, not a
 replacement, since nothing happens instead [CR#614.1a]. -/
 theorem archonProhibitsTheLifeLossDamageCauses :
-    conditionalStatics Cards.archonOfCoronation =
+    conditionalStatics (cardNamed "Archon of Coronation") =
         [(cant you (loseLife anyAmount) (causedBy := byEvent damageToYou),
           is you (hasDesignation monarch))] ∧
       prohibitionCause? (cant you (loseLife anyAmount) (causedBy := byEvent damageToYou)) =
@@ -1268,7 +1268,7 @@ theorem phyrexianInfiltratorExchangesControl :
     Cards.phyrexianInfiltrator.ownDeed? == some exchangeControl.deed := by decide
 
 theorem mirrorUniverseExchangesLifeTotals :
-    (match Cards.mirrorUniverse.card with
+    (match (cardNamed "Mirror Universe").card with
       | .singleFaced face =>
         match face.characteristics.text with
         | [.activated _ exchanging ..] =>
@@ -1277,7 +1277,7 @@ theorem mirrorUniverseExchangesLifeTotals :
       | _ => false : Bool) := by decide
 
 theorem juxtaposeExchangesControl :
-    (match Cards.juxtapose.card with
+    (match (cardNamed "Juxtapose").card with
       | .singleFaced face =>
         match face.characteristics.text with
         | [.spell _ (.sequentially [creatures, artifacts, _])] =>
@@ -1307,7 +1307,7 @@ theorem harnessInfinityExchangesZones :
     Cards.harnessInfinityExchange.ownDeed? == some exchangeZones.deed := by decide
 
 theorem deadpoolTradingCardExchangesTextBoxes :
-    (match Cards.deadpoolTradingCard.card with
+    (match (cardNamed "Deadpool, Trading Card").card with
       | .singleFaced face =>
         match face.characteristics.text with
         | .static (.replace _ (.alongside

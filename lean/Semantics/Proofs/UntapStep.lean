@@ -60,10 +60,10 @@ theorem doesntUntapIsNoStunReplacement :
 
 /-- The four untap-step cards are written with `untapDuring`, so each expands through `must`. -/
 theorem untapStepCardsUseUntapDuring :
-    (Form.calls Cards.seedbornMuse.authoring).contains ``untapDuring ∧
-      (Form.calls Cards.unwindingClock.authoring).contains ``untapDuring ∧
-      (Form.calls Cards.thousandMoonsInfantry.authoring).contains ``untapDuring ∧
-      (Form.calls Cards.drumbellower.authoring).contains ``untapDuring := by
+    (Form.calls (cardNamed "Seedborn Muse").authoring).contains ``untapDuring ∧
+      (Form.calls (cardNamed "Unwinding Clock").authoring).contains ``untapDuring ∧
+      (Form.calls (cardNamed "Thousand Moons Infantry").authoring).contains ``untapDuring ∧
+      (Form.calls (cardNamed "Drumbellower").authoring).contains ``untapDuring := by
   decide
 
 /-- "You may choose not to untap <subject> during [<whose>] untap step" is no permission to untap
@@ -83,7 +83,7 @@ theorem soChoosesNeedsAPlayer :
 /-- *Ashnod's Battle Gear* and *Helm of Possession* still check. -/
 theorem mayDeclineUntapCardsCheck :
     Ability.check (DRS.ofList []) Cards.ashnodsBattleGear = [] ∧
-      Cards.helmOfPossession.card.check = [] :=
-  ⟨Cards.okAshnodsBattleGear, Cards.helmOfPossession.ok⟩
+      (cardNamed "Helm of Possession").card.check = [] :=
+  ⟨Cards.okAshnodsBattleGear, (cardNamed "Helm of Possession").ok⟩
 
 end Semantics.Proofs.UntapStep

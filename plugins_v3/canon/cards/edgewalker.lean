@@ -1,8 +1,13 @@
 /-- Edgewalker -/
-card edgewalker : Spelled :=
-  { name := "Edgewalker", cost := [generic 1, pip .white, pip .black], types := [.creature],
-    subtypes := [human, cleric],
-    text :=
-      [ static ((costShift (allOf (and [cleric, isSpell, did you (cast which) thisObject]))
-        (lessBySymbols (symbols [pip .white, pip .black]) (coloredOnly := true)))) ],
-    power := stat 2, toughness := stat 2 }
+card := {
+  name := "Edgewalker",
+  cost := [1, white, black],
+  types := [creature],
+  subtypes := [human, cleric],
+  text := [
+    costShift (allOf [cleric, isSpell, did you (cast which) thisObject])
+      (lessBySymbols (symbols [white, black]) (coloredOnly := true))
+  ],
+  power := 2,
+  toughness := 2
+}

@@ -1,13 +1,15 @@
 /-- Doubling Season -/
-card doublingSeason : Spelled :=
-  { name := "Doubling Season", cost := [generic 4, pip .green], types := [.enchantment],
-    text :=
-      [ static (replace
-          (causedBy byAnEffect
-            (would any
-              (createObject anyAmount (token (copyOf (counted (orMore 1) isToken)) []) you)))
-          (instead (create (times 2 groupSize) asThose []))),
-        static (replace
-          (causedBy byAnEffect
-            (would any (putCounters anyAmount anyKind (a (and [isPermanent, youControl])))))
-          (instead (putCounters (times 2 thatMuch) thoseCounters (that permanent)))) ] }
+card := {
+  name := "Doubling Season",
+  cost := [4, green],
+  types := [enchantment],
+  text := [
+    replace
+      (causedBy byAnEffect
+         (would any (createObject anyAmount (token (copyOf (counted (orMore 1) isToken)) []) you)))
+      (instead (create (times 2 groupSize) asThose [])),
+    replace
+      (causedBy byAnEffect (would any (putCounters anyAmount anyKind (a [isPermanent, youControl]))))
+      (instead (putCounters (times 2 thatMuch) thoseCounters (that permanent)))
+  ]
+}

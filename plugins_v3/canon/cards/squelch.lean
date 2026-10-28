@@ -1,7 +1,7 @@
 /-- Squelch -/
-card squelch : Spelled :=
-  { name := "Squelch", cost := [generic 1, pip .blue], types := [.instant],
-    text :=
-      [ spell (sequentially
-          [counter (target (abilityHead .anyActivated)), draw 1]) ]
-              }
+card := {
+  name := "Squelch",
+  cost := [1, blue],
+  types := [instant],
+  text := [spell [counter (target (abilityHead anyActivated)), draw 1]]
+}

@@ -1,4 +1,6 @@
-card spaceTimeAnomaly : Spelled :=
-  { name := "Space-Time Anomaly", cost := [generic 2, pip .white, pip .blue],
-    types := [.sorcery],
-    text := [ spell (instruct (target isPlayer) (mill (lifeTotalOf you))) ] }
+card := {
+  name := "Space-Time Anomaly",
+  cost := [2, white, blue],
+  types := [sorcery],
+  text := [spell (instruct (target isPlayer) (mill (lifeTotalOf you)))]
+}

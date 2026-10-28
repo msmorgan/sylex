@@ -1,12 +1,14 @@
-card wickedAkuba : Spelled :=
-  { name := "Wicked Akuba", cost := [pip .black, pip .black], types := [.creature],
-    subtypes := [spirit],
-    text :=
-      [ activated [pip .black]
-          (instruct
-             (target
-                (and
-                   [ isPlayer,
-                     did thisCreature (dealDamage anyAmount which) (within soFarThisTurn) ]))
-            (loseLife 1)) ],
-    power := stat 2, toughness := stat 2 }
+card := {
+  name := "Wicked Akuba",
+  cost := [black, black],
+  types := [creature],
+  subtypes := [spirit],
+  text := [
+    activated [black]
+      (instruct
+         (target [isPlayer, did thisCreature (dealDamage anyAmount which) (within soFarThisTurn)])
+         (loseLife 1))
+  ],
+  power := 2,
+  toughness := 2
+}

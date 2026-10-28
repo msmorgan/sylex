@@ -5,10 +5,14 @@ couldn't have been cast, the controller of the permanent it becomes sacrifices i
 beginning of the next cleanup step." (`asThoughFlashSacrificedAtCleanup`). -/
 
 /-- Armor of Thorns -/
-card armorOfThorns : Spelled :=
-  { name := "Armor of Thorns", cost := [generic 1, pip .green], types := [.enchantment],
-    subtypes := [aura],
-    text :=
-      [ asThoughFlashSacrificedAtCleanup,
-        enchant (and [isCreature, non (hasColor .black)]),
-        static (getsPt (enchanted creature) (up 2) (up 2)) ] }
+card := {
+  name := "Armor of Thorns",
+  cost := [1, green],
+  types := [enchantment],
+  subtypes := [aura],
+  text := [
+    asThoughFlashSacrificedAtCleanup,
+    enchant [isCreature, non (hasColor black)],
+    getsPt (enchanted creature) (up 2) (up 2)
+  ]
+}

@@ -1,6 +1,7 @@
 /-- Blood Sun -/
-card bloodSun : Spelled :=
-  { name := "Blood Sun", cost := [generic 2, pip .red], types := [.enchantment],
-    text :=
-      [ when (does thisEnchantment enter) (draw 1),
-        static (allAbilityLoss (allOf isLand) isManaAbility) ] }
+card := {
+  name := "Blood Sun",
+  cost := [2, red],
+  types := [enchantment],
+  text := [when (does thisEnchantment enter) (draw 1), allAbilityLoss (allOf isLand) isManaAbility]
+}

@@ -1,10 +1,16 @@
 /-- Meletis Charlatan -/
-card meletisCharlatan : Spelled :=
-  { name := "Meletis Charlatan", cost := [generic 2, pip .blue], types := [.creature],
-    subtypes := [human, wizard],
-    text :=
-      [ activated (compound [[generic 2, pip .blue], tapSymbol])
-          (sequentially
-            [ instruct (controllerOf (target (and [isInstantOrSorcery, isSpell]))) (copyOnStack it),
-              instruct (that player) (may (chooseNewTargets (that .copy))) ]) ],
-    power := stat 2, toughness := stat 3 }
+card := {
+  name := "Meletis Charlatan",
+  cost := [2, blue],
+  types := [creature],
+  subtypes := [human, wizard],
+  text := [
+    activated (compound [[2, blue], tapSymbol])
+      [
+        instruct (controllerOf (target [isInstantOrSorcery, isSpell])) (copyOnStack it),
+        instruct (that player) (may (chooseNewTargets (that copy)))
+      ]
+  ],
+  power := 2,
+  toughness := 3
+}

@@ -1,12 +1,16 @@
 /-- Malamet Battle Glyph: "Choose target creature you control and target creature you don't
 control. If the creature you control entered this turn, put a +1/+1 counter on it. Then those
 creatures fight each other." -/
-card malametBattleGlyph : Spelled :=
-  { name := "Malamet Battle Glyph", cost := [pip .green], types := [.sorcery],
-    text :=
-      [ spell (sequentially
-          [ (choose (both (target (and [isCreature, youControl])) (target (and [isCreature,
-            youDontControl])))),
-            doIf (did (the (and [isCreature, youControl])) enter soFarThisTurn)
-              (putCounters 1 p1p1Counter it),
-            fightEachOther (those creature) ]) ] }
+card := {
+  name := "Malamet Battle Glyph",
+  cost := [green],
+  types := [sorcery],
+  text := [
+    spell
+      [
+        (choose (both (target [isCreature, youControl]) (target [isCreature, youDontControl]))),
+        doIf (did (the [isCreature, youControl]) enter soFarThisTurn) (putCounters 1 p1p1Counter it),
+        fightEachOther (those creature)
+      ]
+  ]
+}

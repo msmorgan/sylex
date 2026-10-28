@@ -1,9 +1,11 @@
 /-- Explosive Singularity -/
-card explosiveSingularity : Spelled :=
-  { name := "Explosive Singularity", cost := [generic 8, pip .red, pip .red], types := [.sorcery],
-    text :=
-      [ static (addedCost
-          (tap (counted anyNumber (and [isCreature, youControl, isUntapped])))
-          true),
-        static (costShift this_ (less (times 1 groupSize))),
-        spell (instruct this_ (dealDamage 10 (target isAnyTarget))) ] }
+card := {
+  name := "Explosive Singularity",
+  cost := [8, red, red],
+  types := [sorcery],
+  text := [
+    addedCost (tap (counted anyNumber [isCreature, youControl, isUntapped])) true,
+    costShift this_ (less (times 1 groupSize)),
+    spell (instruct this_ (dealDamage 10 (target isAnyTarget)))
+  ]
+}

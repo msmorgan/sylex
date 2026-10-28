@@ -1,3 +1,6 @@
-card telepathy : Spelled :=
-  { name := "Telepathy", cost := [pip .blue], types := [.enchantment],
-    text := [static (visibility .reveal yourOpponents wholeHand)] }
+card := {
+  name := "Telepathy",
+  cost := [blue],
+  types := [enchantment],
+  text := [visibility reveal yourOpponents wholeHand]
+}

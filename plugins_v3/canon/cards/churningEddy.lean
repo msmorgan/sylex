@@ -1,4 +1,7 @@
 /-- Churning Eddy -/
-card churningEddy : Spelled :=
-  { name := "Churning Eddy", cost := [generic 3, pip .blue], types := [.sorcery],
-    text := [ spell (returnToHand (both (target isCreature) (target isLand))) ] }
+card := {
+  name := "Churning Eddy",
+  cost := [3, blue],
+  types := [sorcery],
+  text := [spell (returnToHand (both (target isCreature) (target isLand)))]
+}

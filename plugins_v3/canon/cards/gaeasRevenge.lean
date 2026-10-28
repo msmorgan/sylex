@@ -1,11 +1,19 @@
 /-- Gaea's Revenge -/
-card gaeasRevenge : Spelled :=
-  { name := "Gaea's Revenge", cost := [generic 5, pip .green, pip .green],
-    types := [.creature], subtypes := [elemental],
-    text :=
-      [ static (cant any (counter thisSpell)),
-        haste,
-        static (cant (by_ (allOf (or [ and [isSpell, non (hasColor .green)],
-                        abilityOf (allOf (and [isSource, non (hasColor .green)])) ])))
-                            (target thisCreature)) ],
-    power := stat 8, toughness := stat 5 }
+card := {
+  name := "Gaea's Revenge",
+  cost := [5, green, green],
+  types := [creature],
+  subtypes := [elemental],
+  text := [
+    cant any (counter thisSpell),
+    haste,
+    cant
+      (by_
+         (allOf
+            (or
+               [[isSpell, non (hasColor green)], abilityOf (allOf [isSource, non (hasColor green)])])))
+      (target thisCreature)
+  ],
+  power := 8,
+  toughness := 5
+}

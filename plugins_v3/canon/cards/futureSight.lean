@@ -1,7 +1,13 @@
-card futureSight : Spelled :=
-  { name := "Future Sight", cost := [generic 2, pip .blue, pip .blue, pip .blue],
-    types := [.enchantment],
-    text :=
-      [ static (visibility .reveal you topOfLibrary),
-        static (conjunction [(can you (play (allOf isLand) (from_ := onTop))), (can you (cast (bare
-          isSpell) (from_ := onTop)))]) ] }
+card := {
+  name := "Future Sight",
+  cost := [2, blue, blue, blue],
+  types := [enchantment],
+  text := [
+    visibility reveal you topOfLibrary,
+    static
+      [
+        (can you (play (allOf isLand) (from_ := onTop))),
+        (can you (cast (bare isSpell) (from_ := onTop)))
+      ]
+  ]
+}

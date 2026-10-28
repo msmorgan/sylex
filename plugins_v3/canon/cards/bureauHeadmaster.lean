@@ -1,10 +1,12 @@
-card bureauHeadmaster : Spelled :=
-  { name := "Bureau Headmaster", cost := [pip .red, pip .white], types := [.creature],
-    subtypes := [human, assassin],
-    text :=
-      [ static ((costShift (allOf (and [isSpell, equipment, did you (cast which) thisObject])) (less
-        1))),
-        static (costShift (allOf (and [abilityHead (.keyword equip),
-            did you (activate which) thisObject]))
-            (less 1)) ],
-    power := stat 2, toughness := stat 2 }
+card := {
+  name := "Bureau Headmaster",
+  cost := [red, white],
+  types := [creature],
+  subtypes := [human, assassin],
+  text := [
+    costShift (allOf [isSpell, equipment, did you (cast which) thisObject]) (less 1),
+    costShift (allOf [abilityHead (keyword equip), did you (activate which) thisObject]) (less 1)
+  ],
+  power := 2,
+  toughness := 2
+}

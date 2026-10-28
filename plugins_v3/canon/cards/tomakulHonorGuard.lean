@@ -1,4 +1,9 @@
-card tomakulHonorGuard : Spelled :=
-  { name := "Tomakul Honor Guard", cost := [generic 1, pip .green], types := [.creature],
-    subtypes := [human, soldier],
-    text := [ward [generic 2]], power := stat 3, toughness := stat 1 }
+card := {
+  name := "Tomakul Honor Guard",
+  cost := [1, green],
+  types := [creature],
+  subtypes := [human, soldier],
+  text := [ward [2]],
+  power := 3,
+  toughness := 1
+}

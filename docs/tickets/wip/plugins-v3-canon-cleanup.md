@@ -47,7 +47,8 @@ with parallel agents. Land it in three changes, comparing the expansion baseline
   - `body :=`
   - `singleFacedCard`
   - `characteristics :=`
-  - `\bstat `
+  - `\bstat ` (other than the `ProjAxis.stat` bare-word constructor
+    `stat (power|toughness|manaValue|loyalty|defense|basePower|baseToughness)`)
   - `\bgeneric `
   - `pip \.`
   - `^/-- [^\n]* -/$` whose text equals the card's name

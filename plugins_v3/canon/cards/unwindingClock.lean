@@ -1,6 +1,7 @@
 /-- Unwinding Clock -/
-card unwindingClock : Spelled :=
-  { name := "Unwinding Clock", cost := [generic 4], types := [.artifact],
-    text :=
-      [ static (untapDuring (allOf (and [isArtifact, youControl]))
-          (each isOtherPlayer)) ] }
+card := {
+  name := "Unwinding Clock",
+  cost := [4],
+  types := [artifact],
+  text := [untapDuring (allOf [isArtifact, youControl]) (each isOtherPlayer)]
+}

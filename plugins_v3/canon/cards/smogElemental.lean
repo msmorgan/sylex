@@ -1,10 +1,9 @@
-card smogElemental : Spelled :=
-  { name := "Smog Elemental", cost := [generic 4, pip .black, pip .black],
-    types := [.creature], subtypes := [elemental],
-    text :=
-      [ flying,
-        static (getsPt
-          (allOf (and [ isCreature, hasKeyword flying,
-                         opponentsControl ]))
-          (down 1) (down 1)) ],
-    power := stat 3, toughness := stat 3 }
+card := {
+  name := "Smog Elemental",
+  cost := [4, black, black],
+  types := [creature],
+  subtypes := [elemental],
+  text := [flying, getsPt (allOf [isCreature, hasKeyword flying, opponentsControl]) (down 1) (down 1)],
+  power := 3,
+  toughness := 3
+}

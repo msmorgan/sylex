@@ -1,8 +1,9 @@
-card polarKraken : Spelled :=
-  { name := "Polar Kraken", cost := [generic 8, pip .blue, pip .blue, pip .blue],
-    types := [.creature], subtypes := [kraken],
-    text :=
-      [ trample,
-        static (entersTapped thisCreature),
-        cumulativeUpkeep (sacrifice (a isLand)) ],
-    power := stat 11, toughness := stat 11 }
+card := {
+  name := "Polar Kraken",
+  cost := [8, blue, blue, blue],
+  types := [creature],
+  subtypes := [kraken],
+  text := [trample, entersTapped thisCreature, cumulativeUpkeep (sacrifice (a isLand))],
+  power := 11,
+  toughness := 11
+}

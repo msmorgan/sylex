@@ -1,3 +1,6 @@
-card prosperity : Spelled :=
-  { name := "Prosperity", cost := [.variable, pip .blue], types := [.sorcery],
-    text := [spell (instruct eachPlayer (draw (letter .x)))] }
+card := {
+  name := "Prosperity",
+  cost := [«variable», blue],
+  types := [sorcery],
+  text := [spell (instruct eachPlayer (draw (letter x)))]
+}

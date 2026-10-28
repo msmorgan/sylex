@@ -1321,7 +1321,7 @@ private def semanticFields : Name → List Name
   | `sba => [`scope, `when, `then_, `body]
   | `conferral => [`scope, `confer, `body]
   | `card => [`name, `cost, `colors, `supertypes, `types, `subtypes, `text,
-              `power, `toughness, `loyalty, `defense, `body]
+              `power, `toughness, `loyalty, `defense]
   | _ => []
 
 private def blockFields (block : Syntax) : CommandElabM (List (Name × Term)) := do
@@ -1596,7 +1596,10 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : Comma
   registerSharedAliases declaration
 
 @[command_elab authoredDeclCmd]
-def elabAuthoredCommand : CommandElab := elabAuthoredCommandImpl false
+def elabAuthoredCommand : CommandElab := fun stx => do
+  if stx[1].getId == `card then
+    throwError "Named card declarations are no longer supported; use card := ..."
+  elabAuthoredCommandImpl false stx
 
 @[command_elab anonymousCardCmd]
 def elabAnonymousCard : CommandElab := fun stx => do
@@ -1710,6 +1713,8 @@ private partial def referencedIdents (bound : List Name) (stx : Syntax) : List N
     | _ => []
 
 private def bundleItem (file : String) (stx : Syntax) : Except String BundleItem := do
+  if stx.isOfKind ``authoredDeclCmd && stx[1].getId == `card then
+    throw "Named card declarations are no longer supported; use card := ..."
   let stx ← if stx.isOfKind ``anonymousCardCmd then namedCardSyntax stx else pure stx
   unless stx.isOfKind ``authoredDeclCmd && authoredKinds.contains stx[1].getId do
     throw s!"Unsupported command in bundle file {file}"
@@ -1799,9 +1804,9 @@ def elabLoadBundle : CommandElab := fun stx => do
             withScope (fun scope => { scope with
                 currNamespace := ns
                 openDecls := .simple callerNamespace [] :: scope.openDecls }) do
-              withRef item.stx <| elabCommand item.stx
-          else withRef item.stx <| elabCommand item.stx
-        else withRef item.stx <| elabCommand item.stx
+              withRef item.stx <| elabAuthoredCommandImpl false item.stx
+          else withRef item.stx <| elabAuthoredCommandImpl false item.stx
+        else withRef item.stx <| elabAuthoredCommandImpl false item.stx
       if (← get).messages.toList.length > messageCount then
         logInfo m!"While loading {item.file}"
     catch error =>

@@ -1,16 +1,23 @@
 /-- Harvest Hand // Scrounged Scythe -/
-card harvestHand : Spelled := { body := .transforming
-  { characteristics :=
-    { name := "Harvest Hand", cost := [generic 3], types := [.artifact, .creature],
+card := transforming
+  {
+    front := {
+      name := "Harvest Hand",
+      cost := [3],
+      types := [artifact, creature],
       subtypes := [scarecrow],
-      text := [ when (does thisCreature die) (returnToBattlefieldTransformed it you) ],
-      power := stat 2, toughness := stat 2 } }
-  { characteristics :=
-    { name := "Scrounged Scythe", types := [.artifact], subtypes := [equipment],
-      text :=
-        [ static (getsPt (equipped creature) (up 1) (up 1)),
-          static
-            (onlyWhile (abilityGrant (equipped creature) menace)
-              (is (equipped creature)
-                human)),
-          equip [generic 2] ] } } }
+      text := [when (does thisCreature die) (returnToBattlefieldTransformed it you)],
+      power := 2,
+      toughness := 2
+    },
+    back := {
+      name := "Scrounged Scythe",
+      types := [artifact],
+      subtypes := [equipment],
+      text := [
+        getsPt (equipped creature) (up 1) (up 1),
+        onlyWhile (abilityGrant (equipped creature) menace) (is (equipped creature) human),
+        equip [2]
+      ]
+    }
+  }

@@ -1,17 +1,21 @@
 /-- Unesh, Criosphinx Sovereign -/
-card uneshCriosphinxSovereign : Spelled :=
-  { name := "Unesh, Criosphinx Sovereign", cost := [generic 4, pip .blue, pip .blue],
-    supertypes := [.legendary], types := [.creature], subtypes := [sphinx],
-    text :=
-      [ flying,
-        static ((costShift (allOf (and [sphinx, isSpell, did you (cast which) thisObject])) (less
-          2))),
-        whenever
-          (does (eitherOf thisCreature
-            (a (and [sphinx, youControl, isOther]))) enter)
-          (sequentially
-            [ reveal (topSlice 4),
-              instruct anOpponent (separateIntoPiles them 2),
-              putInto onePile hand,
-              putInto theOther graveyard ]) ],
-    power := stat 4, toughness := stat 4 }
+card := {
+  name := "Unesh, Criosphinx Sovereign",
+  cost := [4, blue, blue],
+  supertypes := [legendary],
+  types := [creature],
+  subtypes := [sphinx],
+  text := [
+    flying,
+    costShift (allOf [sphinx, isSpell, did you (cast which) thisObject]) (less 2),
+    whenever (does (eitherOf thisCreature (a [sphinx, youControl, isOther])) enter)
+      [
+        reveal (topSlice 4),
+        instruct anOpponent (separateIntoPiles them 2),
+        putInto onePile hand,
+        putInto theOther graveyard
+      ]
+  ],
+  power := 4,
+  toughness := 4
+}

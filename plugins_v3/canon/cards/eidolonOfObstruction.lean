@@ -1,10 +1,13 @@
-card eidolonOfObstruction : Spelled :=
-  { name := "Eidolon of Obstruction", cost := [generic 1, pip .white],
-    types := [.enchantment, .creature], subtypes := [spirit],
-    text :=
-      [ firstStrike,
-        static (costShift
-          (allOf (and [ abilityHead .loyalty,
-                         abilityOf (allOf (and [isPlaneswalker, opponentsControl])) ]))
-          (more 1)) ],
-    power := stat 2, toughness := stat 1 }
+card := {
+  name := "Eidolon of Obstruction",
+  cost := [1, white],
+  types := [enchantment, creature],
+  subtypes := [spirit],
+  text := [
+    firstStrike,
+    costShift (allOf [abilityHead loyalty, abilityOf (allOf [isPlaneswalker, opponentsControl])])
+      (more 1)
+  ],
+  power := 2,
+  toughness := 1
+}

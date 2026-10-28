@@ -1,8 +1,12 @@
-card distantMelody : Spelled :=
-  { name := "Distant Melody", cost := [generic 3, pip .blue], types := [.sorcery],
-    text :=
-      [ spell (sequentially
-          [ choose (a (quality (.subtype .creature))),
-            draw
-              (forEach 1
-                (and [isPermanent, youControl, ofChosen (.subtype .creature)])) ]) ] }
+card := {
+  name := "Distant Melody",
+  cost := [3, blue],
+  types := [sorcery],
+  text := [
+    spell
+      [
+        choose (a (quality (subtype creature))),
+        draw (forEach 1 [isPermanent, youControl, ofChosen (subtype creature)])
+      ]
+  ]
+}

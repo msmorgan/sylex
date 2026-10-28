@@ -1,4 +1,6 @@
-card silence : Spelled :=
-  { name := "Silence", cost := [pip .white], types := [.instant],
-    text :=
-      [ spell (establishThroughout (cant yourOpponents (cast any)) thisTurn) ] }
+card := {
+  name := "Silence",
+  cost := [white],
+  types := [instant],
+  text := [spell (establishThroughout (cant yourOpponents (cast any)) thisTurn)]
+}

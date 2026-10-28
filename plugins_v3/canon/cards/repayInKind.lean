@@ -1,5 +1,6 @@
-card repayInKind : Spelled :=
-  { name := "Repay in Kind", cost := [generic 5, pip .black, pip .black], types := [.sorcery],
-    text :=
-      [ spell (instruct eachPlayer (setLife (aggregate .min (.playerStat .lifeTotal) isPlayer)))
-          ] }
+card := {
+  name := "Repay in Kind",
+  cost := [5, black, black],
+  types := [sorcery],
+  text := [spell (instruct eachPlayer (setLife (aggregate min (playerStat lifeTotal) isPlayer)))]
+}

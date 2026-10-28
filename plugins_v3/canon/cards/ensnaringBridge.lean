@@ -1,5 +1,6 @@
-card ensnaringBridge : Spelled :=
-  { name := "Ensnaring Bridge", cost := [generic 3], types := [.artifact],
-    text :=
-      [ static (cant (allOf (and [ isCreature,
-                         hasPower .greater (countOf (cardIn yourHand)) ])) attack) ] }
+card := {
+  name := "Ensnaring Bridge",
+  cost := [3],
+  types := [artifact],
+  text := [cant (allOf [isCreature, hasPower greater (countOf (cardIn yourHand))]) attack]
+}

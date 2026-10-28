@@ -1,6 +1,7 @@
 /-- Disallow -/
-card disallow : Spelled :=
-  { name := "Disallow", cost := [generic 1, pip .blue, pip .blue], types := [.instant],
-    text :=
-      [ spell (counter
-            (target (or [isSpell, abilityHead .anyActivated, abilityHead .anyTriggered]))) ] }
+card := {
+  name := "Disallow",
+  cost := [1, blue, blue],
+  types := [instant],
+  text := [spell (counter (target (or [isSpell, abilityHead anyActivated, abilityHead anyTriggered])))]
+}

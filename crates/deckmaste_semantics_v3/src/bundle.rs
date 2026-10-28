@@ -108,6 +108,9 @@ impl BundleItem {
                 visit(default, &bound, &mut refs);
             }
         }
+        if let Some(card) = &self.declaration.card {
+            visit(card, &bound, &mut refs);
+        }
         for (key, value) in &self.declaration.fields {
             if !matches!(key.as_str(), "lexical" | "spelling" | "ofAbility") {
                 visit(value, &bound, &mut refs);

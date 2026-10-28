@@ -1,13 +1,14 @@
 /-- Bristlepack Sentry -/
-card bristlepackSentry : Spelled :=
-  { name := "Bristlepack Sentry", cost := [generic 1, pip .green], types := [.creature],
-    subtypes := [plant, wolf],
-    text :=
-      [ defender,
-        static (onlyWhile
-          (can thisCreature attack
-             (asThough :=
-                holds (is it (not (hasKeyword defender)))))
-          (exists_ (and [ isCreature, youControl,
-                           hasPower .atLeast 4 ]))) ],
-    power := stat 3, toughness := stat 3 }
+card := {
+  name := "Bristlepack Sentry",
+  cost := [1, green],
+  types := [creature],
+  subtypes := [plant, wolf],
+  text := [
+    defender,
+    onlyWhile (can thisCreature attack (asThough := holds (is it (not (hasKeyword defender)))))
+      (exists_ [isCreature, youControl, hasPower atLeast 4])
+  ],
+  power := 3,
+  toughness := 3
+}

@@ -1,7 +1,10 @@
 /-- Scrapbasket -/
-card scrapbasket : Spelled :=
-  { name := "Scrapbasket", cost := [generic 4], types := [.artifact, .creature],
-    subtypes := [scarecrow],
-    text := [activated [generic 1] (becomeColor thisCreature .every
-        untilEndOfTurn)],
-    power := stat 3, toughness := stat 2 }
+card := {
+  name := "Scrapbasket",
+  cost := [4],
+  types := [artifact, creature],
+  subtypes := [scarecrow],
+  text := [activated [1] (becomeColor thisCreature every untilEndOfTurn)],
+  power := 3,
+  toughness := 2
+}

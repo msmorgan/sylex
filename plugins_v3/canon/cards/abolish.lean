@@ -1,6 +1,9 @@
-card abolish : Spelled :=
-  { name := "Abolish", cost := [generic 1, pip .white, pip .white], types := [.instant],
-    text :=
-      [ static (altCost this_
-          (discard (a (and [plains, in_ yourHand])))),
-        spell (destroy (target (or [isArtifact, isEnchantment]))) ] }
+card := {
+  name := "Abolish",
+  cost := [1, white, white],
+  types := [instant],
+  text := [
+    altCost this_ (discard (a [plains, in_ yourHand])),
+    spell (destroy (target (or [isArtifact, isEnchantment])))
+  ]
+}

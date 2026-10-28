@@ -1,10 +1,16 @@
-card conspiracy : Spelled :=
-  { name := "Conspiracy", cost := [generic 3, pip .black, pip .black],
-    types := [.enchantment],
-    text :=
-      [ static (entersChoosing thisEnchantment (.subtype .creature)),
-        static (qualityChange (and [
-            allOf (and [isCreature, youControl]),
-            allOf (and [isCreature, isSpell, youControl]),
-            allOf (and [isCard, isCreature, youOwn, not (in_ battlefield)]) ]) .sets
-            (chosenQuality (ofChosen (.subtype .creature)))) ] }
+card := {
+  name := "Conspiracy",
+  cost := [3, black, black],
+  types := [enchantment],
+  text := [
+    entersChoosing thisEnchantment (subtype creature),
+    qualityChange
+      (and
+         [
+           allOf [isCreature, youControl],
+           allOf [isCreature, isSpell, youControl],
+           allOf [isCard, isCreature, youOwn, not (in_ battlefield)]
+         ])
+      sets (chosenQuality (ofChosen (subtype creature)))
+  ]
+}

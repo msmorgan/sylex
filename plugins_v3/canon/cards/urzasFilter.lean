@@ -1,3 +1,6 @@
-card urzasFilter : Spelled :=
-  { name := "Urza's Filter", cost := [generic 4], types := [.artifact],
-    text := [static ((costShift (allOf (and [isMulticolored, isSpell])) (less 2)))] }
+card := {
+  name := "Urza's Filter",
+  cost := [4],
+  types := [artifact],
+  text := [costShift (allOf [isMulticolored, isSpell]) (less 2)]
+}

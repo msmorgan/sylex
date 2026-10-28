@@ -1,18 +1,28 @@
-card kitsuneMystic : Spelled := { body := .flip
-  { characteristics :=
-    { name := "Kitsune Mystic", cost := [generic 3, pip .white], types := [.creature],
+card := flip
+  {
+    normal := {
+      name := "Kitsune Mystic",
+      cost := [3, white],
+      types := [creature],
       subtypes := [fox, wizard],
-      text := [(at_ (beginningOfEach .endStep)
-            (if_ := is thisCreature
-              (attachedBy (some .enchanted)
-                (counted (orMore 2) aura)))
-            (flip thisCreature))], power := stat 2, toughness := stat 3 } }
-  { characteristics :=
-    { name := "Autumn-Tail, Kitsune Sage", supertypes := [.legendary], types := [.creature],
+      text := [
+        (at_ (beginningOfEach endStep)
+           (if_ := is thisCreature (attachedBy (some enchanted) (counted (orMore 2) aura)))
+           (flip thisCreature))
+      ],
+      power := 2,
+      toughness := 3
+    },
+    alternative := {
+      name := "Autumn-Tail, Kitsune Sage",
+      supertypes := [legendary],
+      types := [creature],
       subtypes := [fox, wizard],
-      text :=
-        [ activated [generic 1]
-            (attachTo
-              (target (and [aura, attachedTo (a isCreature)]))
-              (a (and [isCreature, isOther]))) ],
-      power := stat 4, toughness := stat 5 } } }
+      text := [
+        activated [1]
+          (attachTo (target [aura, attachedTo (a isCreature)]) (a [isCreature, isOther]))
+      ],
+      power := 4,
+      toughness := 5
+    }
+  }

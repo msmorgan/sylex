@@ -1,3 +1,1 @@
-card consider : Spelled :=
-  { name := "Consider", cost := [pip .blue], types := [.instant],
-    text := [spell (sequentially [surveil 1, draw 1])] }
+card := { name := "Consider", cost := [blue], types := [instant], text := [spell [surveil 1, draw 1]] }

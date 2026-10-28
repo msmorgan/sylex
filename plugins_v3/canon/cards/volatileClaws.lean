@@ -1,8 +1,10 @@
-card volatileClaws : Spelled :=
-  { name := "Volatile Claws", cost := [generic 2, pip .red], types := [.instant],
-    text :=
-      [ spell
-          (establishFor (allOf (and [isCreature, youControl]))
-            [ getsPt them (up 2) (up 0),
-              qualityChange them .adds (everyTypeOf .creature) ]
-            untilEndOfTurn) ] }
+card := {
+  name := "Volatile Claws",
+  cost := [2, red],
+  types := [instant],
+  text := [
+    spell
+      (establishFor (allOf [isCreature, youControl])
+         [getsPt them (up 2) (up 0), qualityChange them adds (everyTypeOf creature)] untilEndOfTurn)
+  ]
+}

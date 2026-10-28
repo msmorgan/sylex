@@ -1,6 +1,7 @@
 /-- Blessed Reversal -/
-card blessedReversal : Spelled :=
-  { name := "Blessed Reversal", cost := [generic 1, pip .white], types := [.instant],
-    text :=
-      [ spell (gainLife
-          (forEach 3 (and [isCreature, inCombat .attackerOf you]))) ] }
+card := {
+  name := "Blessed Reversal",
+  cost := [1, white],
+  types := [instant],
+  text := [spell (gainLife (forEach 3 [isCreature, inCombat attackerOf you]))]
+}

@@ -454,14 +454,14 @@ selection, each other keyword is granted bare, and no `addedAbilities` holds a f
 [CR#702.1c]. Death-Mask Duplicant's landwalk part reads off exactly the objects its condition
 finds. -/
 theorem familyTermsGrantThroughAddedSelectionOf :
-    grantForms Cards.deathMaskDuplicant 1 =
+    grantForms (cardNamed "Death-Mask Duplicant") 1 =
         [ some none, some none, some none, some none, some none,
           some (some Cards.landwalkAbilities), some (some Cards.protectionAbilities), some none ] ∧
-      grantForms Cards.cairnWanderer 1 =
+      grantForms (cardNamed "Cairn Wanderer") 1 =
         [ some none, some none, some none, some none, some none, some none,
           some (some Cards.landwalkAbilities), some none, some (some Cards.protectionAbilities),
           some none, some none, some none, some none ] ∧
-      (staticParts Cards.deathMaskDuplicant 1)[5]? =
+      (staticParts (cardNamed "Death-Mask Duplicant") 1)[5]? =
         some (onlyWhile
           (abilityGrantSelected thisCreature
             (allOf (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities]))
@@ -474,12 +474,12 @@ theorem familyTermsGrantThroughAddedSelectionOf :
 the hexproof variants the objects its condition finds have [CR#702.1c] (Odric's ruling of
 2020-01-24), and every other keyword bare. -/
 theorem odricGrantsHexproofVariants :
-    (grantForms Cards.odricLunarchMarshal 0).all Option.isSome ∧
-      (grantForms Cards.odricLunarchMarshal 0).filterMap (·.bind id) = [Cards.hexproofAbilities] ∧
-      (grantForms Cards.bleedingEffect 0).all Option.isSome ∧
-      (grantForms Cards.bleedingEffect 0).filterMap (·.bind id) = [Cards.hexproofAbilities] ∧
-      (grantForms Cards.urborgScavengers 1).all Option.isSome ∧
-      (grantForms Cards.urborgScavengers 1).filterMap (·.bind id) = [Cards.hexproofAbilities] := by
+    (grantForms (cardNamed "Odric, Lunarch Marshal") 0).all Option.isSome ∧
+      (grantForms (cardNamed "Odric, Lunarch Marshal") 0).filterMap (·.bind id) = [Cards.hexproofAbilities] ∧
+      (grantForms (cardNamed "Bleeding Effect") 0).all Option.isSome ∧
+      (grantForms (cardNamed "Bleeding Effect") 0).filterMap (·.bind id) = [Cards.hexproofAbilities] ∧
+      (grantForms (cardNamed "Urborg Scavengers") 1).all Option.isSome ∧
+      (grantForms (cardNamed "Urborg Scavengers") 1).filterMap (·.bind id) = [Cards.hexproofAbilities] := by
   decide
 
 /-- A keyword wants a modal spell when its own Definition writes a Mode Change: entwine,

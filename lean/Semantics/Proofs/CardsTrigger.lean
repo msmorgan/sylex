@@ -267,7 +267,7 @@ def thoughtLashTrigger : Ability :=
 theorem okThoughtLashTrigger : Ability.check (DRS.ofList []) thoughtLashTrigger = [] := by decide
 /-- Heart of Bogardan -/
 def heartOfBogardanHeader : GameEvent :=
-  (match heartOfBogardan.card with
+  (match (cardNamed "Heart of Bogardan").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered part _ _ _ _ _ _ _) _)) => some part
       | _ => none
@@ -320,7 +320,7 @@ theorem frostWalkerSacrificesItself :
       (nextClause (stepGameEvent 64 (DRS.ofList [])
         (does (a (or [isSpell, abilityHead .anyOnStack])) (target thisCreature))).1)
       (sacrifice it)).1
-    frostWalker.card.check = [] ∧ out.resolvedIds = [2] ∧
+    (cardNamed "Frost Walker").card.check = [] ∧ out.resolvedIds = [2] ∧
       (out.findById? 2).map (fun ref => (ref.det, ref.zone, ref.movedFrom)) =
         some (.self, some .graveyard, [1]) ∧
       (out.findById? 0).bind (·.zone) = some .stack := by
@@ -328,7 +328,7 @@ theorem frostWalkerSacrificesItself :
 
 /-- Segmented Wurm's "it" is the source (`1`), not the targeting spell or ability (`0`). -/
 theorem segmentedWurmPutsTheCounterOnItself :
-    segmentedWurm.card.check = [] ∧
+    (cardNamed "Segmented Wurm").card.check = [] ∧
     (stepAction 64 .postEvent .obj
       (nextClause (stepGameEvent 64 (DRS.ofList [])
         (does (a (or [isSpell, abilityHead .anyOnStack])) (target thisCreature))).1)
@@ -338,7 +338,7 @@ theorem segmentedWurmPutsTheCounterOnItself :
 /-- Angelic Cub's trigger reads "it" as the source (`1`), not the targeting spell or ability
 (`0`); the trigger fragment keeps its first occurrence each turn. -/
 theorem angelicCubPutsTheCounterOnItself :
-    angelicCub.card.check = [] ∧
+    (cardNamed "Angelic Cub").card.check = [] ∧
     (stepAction 64 .postEvent .obj
       (nextClause (stepGameEvent 64 (DRS.ofList [])
         (nthOccurrence (.nth 1)
@@ -348,7 +348,7 @@ theorem angelicCubPutsTheCounterOnItself :
 
 /-- Debris Beetle -/
 def debrisBeetleTrigger : Ability :=
-  (match debrisBeetle.card with
+  (match (cardNamed "Debris Beetle").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -433,7 +433,7 @@ theorem okDontBlinkReplacement : Action.check (DRS.ofList []) dontBlinkReplaceme
 
 /-- Autarch Mammoth -/
 def autarchMammothLine : Ability :=
-  (match autarchMammoth.card with
+  (match (cardNamed "Autarch Mammoth").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none

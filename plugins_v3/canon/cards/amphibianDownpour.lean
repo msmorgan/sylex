@@ -1,11 +1,17 @@
-card amphibianDownpour : Spelled :=
-  { name := "Amphibian Downpour", cost := [generic 2, pip .blue], types := [.enchantment],
-    subtypes := [aura],
-    text :=
-      [ flash, storm,
-        enchant isCreature,
-        static ((conjunction [ allAbilityLoss (enchanted creature),
-                qualityChange it .sets
-                  (bundle { characteristics := { colors := [.blue], types := [.creature], subtypes
-                    := [frog] } }),
-                getsBase it (lit 1) (lit 1) ])) ] }
+card := {
+  name := "Amphibian Downpour",
+  cost := [2, blue],
+  types := [enchantment],
+  subtypes := [aura],
+  text := [
+    flash,
+    storm,
+    enchant isCreature,
+    static
+      [
+        allAbilityLoss (enchanted creature),
+        qualityChange it sets (bundle { colors := [blue], types := [creature], subtypes := [frog] }),
+        getsBase it (lit 1) (lit 1)
+      ]
+  ]
+}

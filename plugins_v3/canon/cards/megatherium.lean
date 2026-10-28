@@ -1,9 +1,13 @@
-card megatherium : Spelled :=
-  { name := "Megatherium", cost := [generic 2, pip .green], types := [.creature],
-    subtypes := [beast],
-    text :=
-      [ trample,
-        when (does thisCreature enter)
-          (doUnless (sacrifice thisCreature)
-            (scaledGenericMana (forEach 1 (cardIn yourHand)))) ],
-    power := stat 4, toughness := stat 4 }
+card := {
+  name := "Megatherium",
+  cost := [2, green],
+  types := [creature],
+  subtypes := [beast],
+  text := [
+    trample,
+    when (does thisCreature enter)
+      (doUnless (sacrifice thisCreature) (scaledGenericMana (forEach 1 (cardIn yourHand))))
+  ],
+  power := 4,
+  toughness := 4
+}

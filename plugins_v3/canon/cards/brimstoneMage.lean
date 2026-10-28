@@ -1,10 +1,27 @@
 /-- Brimstone Mage -/
-card brimstoneMage : Spelled := { body := .leveler
-  { characteristics :=
-    { name := "Brimstone Mage", cost := [generic 2, pip .red], types := [.creature],
+card := leveler
+  {
+    inner := {
+      name := "Brimstone Mage",
+      cost := [2, red],
+      types := [creature],
       subtypes := [human, shaman],
-      text := [levelUp [generic 3, pip .red]], power := stat 2, toughness := stat 2 } }
-  [ levelBand (.between 1 2) 2 3
-      [activated tapSymbol (instruct thisCreature (dealDamage 1 (target isAnyTarget)))],
-    levelBand (.plus 3) 2 4
-      [activated tapSymbol (instruct thisCreature (dealDamage 3 (target isAnyTarget)))] ] }
+      text := [levelUp [3, red]],
+      power := 2,
+      toughness := 2
+    },
+    bands := [
+      {
+        range := between 1 2,
+        power := 2,
+        toughness := 3,
+        text := [activated tapSymbol (instruct thisCreature (dealDamage 1 (target isAnyTarget)))]
+      },
+      {
+        range := plus 3,
+        power := 2,
+        toughness := 4,
+        text := [activated tapSymbol (instruct thisCreature (dealDamage 3 (target isAnyTarget)))]
+      }
+    ]
+  }

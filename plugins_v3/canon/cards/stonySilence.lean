@@ -1,4 +1,6 @@
-card stonySilence : Spelled :=
-  { name := "Stony Silence", cost := [generic 1, pip .white], types := [.enchantment],
-    text := [static ((cant any (activate (allOf (and [abilityHead .anyActivated, abilityOf (allOf
-      isArtifact)])))))] }
+card := {
+  name := "Stony Silence",
+  cost := [1, white],
+  types := [enchantment],
+  text := [cant any (activate (allOf [abilityHead anyActivated, abilityOf (allOf isArtifact)]))]
+}

@@ -1,3 +1,6 @@
-card thornOfAmethyst : Spelled :=
-  { name := "Thorn of Amethyst", cost := [generic 2], types := [.artifact],
-    text := [static ((costShift (allOf (and [non isCreature, isSpell])) (more 1)))] }
+card := {
+  name := "Thorn of Amethyst",
+  cost := [2],
+  types := [artifact],
+  text := [costShift (allOf [non isCreature, isSpell]) (more 1)]
+}

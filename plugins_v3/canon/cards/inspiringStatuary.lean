@@ -1,5 +1,6 @@
-card inspiringStatuary : Spelled :=
-  { name := "Inspiring Statuary", cost := [generic 3], types := [.artifact],
-    text :=
-      [ static (abilityGrant (allOf (and [non isArtifact, isSpell,
-          did you (cast which) thisObject])) improvise) ] }
+card := {
+  name := "Inspiring Statuary",
+  cost := [3],
+  types := [artifact],
+  text := [abilityGrant (allOf [non isArtifact, isSpell, did you (cast which) thisObject]) improvise]
+}

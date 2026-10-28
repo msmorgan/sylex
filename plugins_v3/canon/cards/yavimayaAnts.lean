@@ -1,5 +1,9 @@
-card yavimayaAnts : Spelled :=
-  { name := "Yavimaya Ants", cost := [generic 2, pip .green, pip .green], types := [.creature],
-    subtypes := [insect],
-    text := [trample, haste, cumulativeUpkeep [pip .green, pip .green]],
-    power := stat 5, toughness := stat 1 }
+card := {
+  name := "Yavimaya Ants",
+  cost := [2, green, green],
+  types := [creature],
+  subtypes := [insect],
+  text := [trample, haste, cumulativeUpkeep [green, green]],
+  power := 5,
+  toughness := 1
+}

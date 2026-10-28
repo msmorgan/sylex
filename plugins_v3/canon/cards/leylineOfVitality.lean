@@ -1,8 +1,11 @@
 /-- Leyline of Vitality -/
-card leylineOfVitality : Spelled :=
-  { name := "Leyline of Vitality", cost := [generic 2, pip .green, pip .green],
-    types := [.enchantment],
-    text :=
-      [ mayBeginOnBattlefield,
-        static (getsPt (allOf (and [isCreature, youControl])) (up 0) (up 1)),
-        whenever (does (a (and [isCreature, youControl])) enter) (may (gainLife 1)) ] }
+card := {
+  name := "Leyline of Vitality",
+  cost := [2, green, green],
+  types := [enchantment],
+  text := [
+    mayBeginOnBattlefield,
+    getsPt (allOf [isCreature, youControl]) (up 0) (up 1),
+    whenever (does (a [isCreature, youControl]) enter) (may (gainLife 1))
+  ]
+}

@@ -1,8 +1,14 @@
-card linvalaKeeperOfSilence : Spelled :=
-  { name := "Linvala, Keeper of Silence", cost := [generic 2, pip .white, pip .white],
-    supertypes := [.legendary], types := [.creature], subtypes := [angel],
-    text :=
-      [ flying,
-        static (cant any (activate (allOf (and [ abilityHead .anyActivated,
-                         abilityOf (allOf (and [isCreature, opponentsControl])) ])))) ],
-    power := stat 3, toughness := stat 4 }
+card := {
+  name := "Linvala, Keeper of Silence",
+  cost := [2, white, white],
+  supertypes := [legendary],
+  types := [creature],
+  subtypes := [angel],
+  text := [
+    flying,
+    cant any
+      (activate (allOf [abilityHead anyActivated, abilityOf (allOf [isCreature, opponentsControl])]))
+  ],
+  power := 3,
+  toughness := 4
+}

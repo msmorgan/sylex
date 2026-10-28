@@ -1,18 +1,25 @@
-card akkiLavarunner : Spelled := { body := .flip
-  { characteristics :=
-    { name := "Akki Lavarunner", cost := [generic 3, pip .red], types := [.creature],
+card := flip
+  {
+    normal := {
+      name := "Akki Lavarunner",
+      cost := [3, red],
+      types := [creature],
       subtypes := [goblin, warrior],
-      text :=
-        [ haste,
-          whenever (does thisCreature (dealDamage (to := anOpponent)))
-            (flip thisCreature) ],
-      power := stat 1, toughness := stat 1 } }
-  { characteristics :=
-    { name := "Tok-Tok, Volcano Born", supertypes := [.legendary], types := [.creature],
+      text := [haste, whenever (does thisCreature (dealDamage (to := anOpponent))) (flip thisCreature)],
+      power := 1,
+      toughness := 1
+    },
+    alternative := {
+      name := "Tok-Tok, Volcano Born",
+      supertypes := [legendary],
+      types := [creature],
       subtypes := [goblin, shaman],
-      text :=
-        [ protection (hasColor .red),
-          static
-            (replace (would (a (and [isSource, hasColor .red])) (dealDamage anyAmount (a isPlayer)))
-              (instead (instruct it (dealDamage (plus thatMuch 1) (that player))))) ],
-      power := stat 2, toughness := stat 2 } } }
+      text := [
+        protection (hasColor red),
+        replace (would (a [isSource, hasColor red]) (dealDamage anyAmount (a isPlayer)))
+          (instead (instruct it (dealDamage (plus thatMuch 1) (that player))))
+      ],
+      power := 2,
+      toughness := 2
+    }
+  }

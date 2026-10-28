@@ -1,14 +1,26 @@
 /-- Death-Mask Duplicant -/
-card deathMaskDuplicant : Spelled :=
-  { name := "Death-Mask Duplicant", cost := [generic 7], types := [.artifact, .creature],
-    subtypes := [shapeshifter],
-    text :=
-      [ imprint
-          (activated [generic 1] (exile (target (and [isCreature, in_ yourGraveyard])))),
-        alsoForKeywords
-          (fun k => static (onlyWhile
-            (keywordGrant thisCreature k (and [in_ (exiledWith thisCreature), hasKeyword k]))
-            (exists_ (and [in_ (exiledWith thisCreature), hasKeyword k]))))
-          [ flying, fear, firstStrike, doubleStrike, haste, (.anyIn ⟨landwalk, none⟩),
-            (.anyIn ⟨protection, none⟩), trample ] ],
-    power := stat 5, toughness := stat 5 }
+card := {
+  name := "Death-Mask Duplicant",
+  cost := [7],
+  types := [artifact, creature],
+  subtypes := [shapeshifter],
+  text := [
+    imprint (activated [1] (exile (target [isCreature, in_ yourGraveyard]))),
+    alsoForKeywords
+      (fun k => static
+         (onlyWhile (keywordGrant thisCreature k [in_ (exiledWith thisCreature), hasKeyword k])
+            (exists_ [in_ (exiledWith thisCreature), hasKeyword k])))
+      [
+        flying,
+        fear,
+        firstStrike,
+        doubleStrike,
+        haste,
+        (anyIn ⟨landwalk, none⟩),
+        (anyIn ⟨protection, none⟩),
+        trample
+      ]
+  ],
+  power := 5,
+  toughness := 5
+}

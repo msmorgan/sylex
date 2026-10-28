@@ -1,6 +1,10 @@
 /-- Teleport -/
-card teleport : Spelled :=
-  { name := "Teleport", cost := [pip .blue, pip .blue, pip .blue], types := [.instant],
-    text :=
-      [ spell (establishThroughout (cant any (block (target isCreature))) thisTurn)
-          (timing := duringPart .declareAttackers none) ] }
+card := {
+  name := "Teleport",
+  cost := [blue, blue, blue],
+  types := [instant],
+  text := [
+    spell (establishThroughout (cant any (block (target isCreature))) thisTurn)
+      (timing := duringPart declareAttackers none)
+  ]
+}

@@ -1,6 +1,7 @@
 /-- False Peace -/
-card falsePeace : Spelled :=
-  { name := "False Peace", cost := [pip .white], types := [.sorcery],
-    text :=
-      [ spell (establishThroughout (partSkip (target isPlayer) .combat) (duringNextTurnOf (that
-              .player))) ] }
+card := {
+  name := "False Peace",
+  cost := [white],
+  types := [sorcery],
+  text := [spell (establishThroughout (partSkip (target isPlayer) combat) (duringNextTurnOf (that player)))]
+}

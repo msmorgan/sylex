@@ -1,5 +1,6 @@
-card tranquilGrove : Spelled :=
-  { name := "Tranquil Grove", cost := [generic 1, pip .green], types := [.enchantment],
-    text :=
-      [ activated [generic 1, pip .green, pip .green]
-          (destroy (allOf (and [isEnchantment, isOther]))) ] }
+card := {
+  name := "Tranquil Grove",
+  cost := [1, green],
+  types := [enchantment],
+  text := [activated [1, green, green] (destroy (allOf [isEnchantment, isOther]))]
+}

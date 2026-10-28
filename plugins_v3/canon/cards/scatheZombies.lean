@@ -1,3 +1,8 @@
-card scatheZombies : Spelled :=
-  { name := "Scathe Zombies", cost := [generic 2, pip .black], types := [.creature],
-    subtypes := [zombie], power := stat 2, toughness := stat 2 }
+card := {
+  name := "Scathe Zombies",
+  cost := [2, black],
+  types := [creature],
+  subtypes := [zombie],
+  power := 2,
+  toughness := 2
+}

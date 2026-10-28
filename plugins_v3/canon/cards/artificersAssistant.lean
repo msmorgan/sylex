@@ -1,10 +1,10 @@
 /-- Artificer's Assistant -/
-card artificersAssistant : Spelled :=
-  { name := "Artificer's Assistant", cost := [pip .blue], types := [.creature],
-    subtypes := [bird],
-    text :=
-      [ flying,
-        whenever (does you (cast (a
-          (and [isHistoric, isSpell])))) (scry 1)
-            ],
-    power := stat 1, toughness := stat 1 }
+card := {
+  name := "Artificer's Assistant",
+  cost := [blue],
+  types := [creature],
+  subtypes := [bird],
+  text := [flying, whenever (does you (cast (a [isHistoric, isSpell]))) (scry 1)],
+  power := 1,
+  toughness := 1
+}

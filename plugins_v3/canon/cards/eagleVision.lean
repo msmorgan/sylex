@@ -1,4 +1,7 @@
 /-- Eagle Vision -/
-card eagleVision : Spelled :=
-  { name := "Eagle Vision", cost := [generic 4, pip .blue], types := [.sorcery],
-    text := [freerunning [generic 1, pip .blue], spell (draw 3)] }
+card := {
+  name := "Eagle Vision",
+  cost := [4, blue],
+  types := [sorcery],
+  text := [freerunning [1, blue], spell (draw 3)]
+}

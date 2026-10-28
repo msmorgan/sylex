@@ -1,12 +1,12 @@
-card bramblewoodParagon : Spelled :=
-  { name := "Bramblewood Paragon", cost := [generic 1, pip .green], types := [.creature],
-    subtypes := [elf, warrior],
-    text :=
-      [ static (entersWithAdditionalCounters
-          (each (and [ isCreature, warrior, youControl,
-                        isOther ]))
-          1 p1p1Counter),
-        static (abilityGrant
-          (each (and [isCreature, youControl, hasCounter p1p1Counter]))
-          trample) ],
-    power := stat 2, toughness := stat 2 }
+card := {
+  name := "Bramblewood Paragon",
+  cost := [1, green],
+  types := [creature],
+  subtypes := [elf, warrior],
+  text := [
+    entersWithAdditionalCounters (each [isCreature, warrior, youControl, isOther]) 1 p1p1Counter,
+    abilityGrant (each [isCreature, youControl, hasCounter p1p1Counter]) trample
+  ],
+  power := 2,
+  toughness := 2
+}

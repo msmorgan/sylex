@@ -1,3 +1,1 @@
-card serumVisions : Spelled :=
-  { name := "Serum Visions", cost := [pip .blue], types := [.sorcery],
-    text := [spell (sequentially [draw 1, scry 2])] }
+card := { name := "Serum Visions", cost := [blue], types := [sorcery], text := [spell [draw 1, scry 2]] }

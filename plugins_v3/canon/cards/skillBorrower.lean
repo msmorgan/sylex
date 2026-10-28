@@ -1,10 +1,14 @@
 /-- Skill Borrower -/
-card skillBorrower : Spelled :=
-  { name := "Skill Borrower", cost := [generic 2, pip .blue], types := [.artifact, .creature],
-    subtypes := [human, wizard],
-    text :=
-      [ static (visibility .reveal you topOfLibrary),
-        static (onlyWhile
-          (abilityGrantFrom thisCreature (topSlice 1) [.anyActivated])
-          (is (topSlice 1) (or [isArtifact, isCreature]))) ],
-    power := stat 1, toughness := stat 3 }
+card := {
+  name := "Skill Borrower",
+  cost := [2, blue],
+  types := [artifact, creature],
+  subtypes := [human, wizard],
+  text := [
+    visibility reveal you topOfLibrary,
+    onlyWhile (abilityGrantFrom thisCreature (topSlice 1) [anyActivated])
+      (is (topSlice 1) (or [isArtifact, isCreature]))
+  ],
+  power := 1,
+  toughness := 3
+}

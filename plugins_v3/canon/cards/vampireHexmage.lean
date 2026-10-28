@@ -1,9 +1,10 @@
 /-- Vampire Hexmage -/
-card vampireHexmage : Spelled :=
-  { name := "Vampire Hexmage", cost := [pip .black, pip .black], types := [.creature],
-    subtypes := [vampire, shaman],
-    text :=
-      [ firstStrike,
-        activated (sacrifice thisCreature) (removeAllCounters none
-            (target isPermanent)) ],
-    power := stat 2, toughness := stat 1 }
+card := {
+  name := "Vampire Hexmage",
+  cost := [black, black],
+  types := [creature],
+  subtypes := [vampire, shaman],
+  text := [firstStrike, activated (sacrifice thisCreature) (removeAllCounters none (target isPermanent))],
+  power := 2,
+  toughness := 1
+}

@@ -1,6 +1,6 @@
-card hissingMiasma : Spelled :=
-  { name := "Hissing Miasma", cost := [generic 1, pip .black, pip .black],
-    types := [.enchantment],
-    text :=
-      [ whenever (does (a isCreature) (attack you))
-          (instruct (controllerOf it) (loseLife 1)) ] }
+card := {
+  name := "Hissing Miasma",
+  cost := [1, black, black],
+  types := [enchantment],
+  text := [whenever (does (a isCreature) (attack you)) (instruct (controllerOf it) (loseLife 1))]
+}

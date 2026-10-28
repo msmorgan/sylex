@@ -1,7 +1,9 @@
-card highGround : Spelled :=
-  { name := "High Ground", cost := [pip .white], types := [.enchantment],
-    text :=
-        [static
-           (can (each (and [isCreature, youControl]))
-              (block (counted (additional (exactly 1)) isCreature))
-        (timing := eachCombat))] }
+card := {
+  name := "High Ground",
+  cost := [white],
+  types := [enchantment],
+  text := [
+    can (each [isCreature, youControl]) (block (counted (additional (exactly 1)) isCreature))
+      (timing := eachCombat)
+  ]
+}

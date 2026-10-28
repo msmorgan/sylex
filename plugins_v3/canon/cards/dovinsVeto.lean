@@ -1,5 +1,6 @@
-card dovinsVeto : Spelled :=
-  { name := "Dovin's Veto", cost := [pip .white, pip .blue], types := [.instant],
-    text :=
-      [ static (cant any (counter thisSpell)),
-        spell (counter (target (and [isSpell, non isCreature]))) ] }
+card := {
+  name := "Dovin's Veto",
+  cost := [white, blue],
+  types := [instant],
+  text := [cant any (counter thisSpell), spell (counter (target [isSpell, non isCreature]))]
+}

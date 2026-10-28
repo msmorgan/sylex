@@ -1,6 +1,10 @@
 /-- Aggressive Instinct -/
-card aggressiveInstinct : Spelled :=
-  { name := "Aggressive Instinct", cost := [generic 1, pip .green], types := [.sorcery],
-    text :=
-      [ spell (dealDamageOwnPower (target (and [isCreature, youControl]))
-          (target (and [isCreature, youDontControl]))) ] }
+card := {
+  name := "Aggressive Instinct",
+  cost := [1, green],
+  types := [sorcery],
+  text := [
+    spell
+      (dealDamageOwnPower (target [isCreature, youControl]) (target [isCreature, youDontControl]))
+  ]
+}

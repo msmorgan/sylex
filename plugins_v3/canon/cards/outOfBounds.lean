@@ -1,4 +1,7 @@
 /-- Out of Bounds -/
-card outOfBounds : Spelled :=
-  { name := "Out of Bounds", cost := [generic 3, pip .blue], types := [.instant],
-    text := [assist, spell (counter (target isSpell))] }
+card := {
+  name := "Out of Bounds",
+  cost := [3, blue],
+  types := [instant],
+  text := [assist, spell (counter (target isSpell))]
+}

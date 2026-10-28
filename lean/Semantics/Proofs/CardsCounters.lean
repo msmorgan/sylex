@@ -83,7 +83,7 @@ def savagebornHydra : Ability :=
     (putCounters 1 p1p1Counter thisCreature) asSorcery
 theorem okSavagebornHydra : Ability.check (DRS.ofList []) savagebornHydra = [] := by decide
 def woeleecher : Ability :=
-  (match woeleecherWhole.card with
+  (match (cardNamed "Woeleecher").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -162,7 +162,7 @@ theorem okCorpsejackMenace : Ability.check (DRS.ofList []) corpsejackMenace = []
 /-- Doubling Season's first line: "If an effect would create one or more tokens under your
 control, it creates twice that many of those tokens instead." -/
 def doublingSeasonTokens : Ability :=
-  (match doublingSeason.card with
+  (match (cardNamed "Doubling Season").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -171,7 +171,7 @@ def doublingSeasonTokens : Ability :=
 /-- Doubling Season's second line: "If an effect would put one or more counters on a permanent
 you control, it puts twice that many of those counters on that permanent instead." -/
 def doublingSeasonCounters : Ability :=
-  (match doublingSeason.card with
+  (match (cardNamed "Doubling Season").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -240,7 +240,7 @@ def captainMarvelSameKinds : Ability :=
 theorem okCaptainMarvelSameKinds : Ability.check (DRS.ofList []) captainMarvelSameKinds = [] := by decide
 /-- Denry Klin, Editor in Chief -/
 def denryKlinSameKinds : Ability :=
-  (match denryKlin.card with
+  (match (cardNamed "Denry Klin, Editor in Chief").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none

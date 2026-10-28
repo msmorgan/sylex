@@ -1,7 +1,7 @@
-card manaChains : Spelled :=
-  { name := "Mana Chains", cost := [pip .blue], types := [.enchantment],
-    subtypes := [aura],
-    text :=
-      [ enchant isCreature,
-        static (abilityGrant (enchanted creature) (cumulativeUpkeep (mana
-            [generic 1]))) ] }
+card := {
+  name := "Mana Chains",
+  cost := [blue],
+  types := [enchantment],
+  subtypes := [aura],
+  text := [enchant isCreature, abilityGrant (enchanted creature) (cumulativeUpkeep (mana [1]))]
+}

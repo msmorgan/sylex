@@ -1,7 +1,11 @@
 /-- Ashes of the Fallen -/
-card ashesOfTheFallen : Spelled :=
-  { name := "Ashes of the Fallen", cost := [generic 2], types := [.artifact],
-    text :=
-      [ static (entersChoosing thisArtifact (.subtype .creature)),
-        static (qualityChange (each (and [isCreature, in_ yourGraveyard])) .adds
-          (chosenQuality (ofChosen (.subtype .creature)))) ] }
+card := {
+  name := "Ashes of the Fallen",
+  cost := [2],
+  types := [artifact],
+  text := [
+    entersChoosing thisArtifact (subtype creature),
+    qualityChange (each [isCreature, in_ yourGraveyard]) adds
+      (chosenQuality (ofChosen (subtype creature)))
+  ]
+}

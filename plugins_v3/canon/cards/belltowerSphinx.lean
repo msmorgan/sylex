@@ -1,8 +1,13 @@
-card belltowerSphinx : Spelled :=
-  { name := "Belltower Sphinx", cost := [generic 4, pip .blue], types := [.creature],
-    subtypes := [sphinx],
-    text :=
-      [ flying,
-        whenever (does (a isSource) (dealDamage anyAmount thisCreature))
-          (instruct (controllerOf thatSource) (mill thatMuch)) ],
-    power := stat 2, toughness := stat 5 }
+card := {
+  name := "Belltower Sphinx",
+  cost := [4, blue],
+  types := [creature],
+  subtypes := [sphinx],
+  text := [
+    flying,
+    whenever (does (a isSource) (dealDamage anyAmount thisCreature))
+      (instruct (controllerOf thatSource) (mill thatMuch))
+  ],
+  power := 2,
+  toughness := 5
+}

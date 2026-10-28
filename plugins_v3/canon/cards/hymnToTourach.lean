@@ -1,6 +1,7 @@
 /-- Hymn to Tourach -/
-card hymnToTourach : Spelled :=
-  { name := "Hymn to Tourach", cost := [pip .black, pip .black], types := [.sorcery],
-    text :=
-      [ spell (discard (countedAtRandom (exactly 2) (cardIn (handOf (target
-          isPlayer))))) ] }
+card := {
+  name := "Hymn to Tourach",
+  cost := [black, black],
+  types := [sorcery],
+  text := [spell (discard (countedAtRandom (exactly 2) (cardIn (handOf (target isPlayer)))))]
+}

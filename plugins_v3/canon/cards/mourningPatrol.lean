@@ -1,13 +1,22 @@
 /-- Mourning Patrol // Morning Apparition -/
-card mourningPatrol : Spelled := { body := .transforming
-  { characteristics :=
-    { name := "Mourning Patrol", cost := [generic 2, pip .white], types := [.creature],
-      subtypes := [human, soldier], text := [vigilance, disturb [generic 3, pip .white]],
-      power := stat 2, toughness := stat 3 } }
-  { characteristics :=
-    { name := "Morning Apparition", colors := [.white], types := [.creature],
+card := transforming
+  {
+    front := {
+      name := "Mourning Patrol",
+      cost := [2, white],
+      types := [creature],
+      subtypes := [human, soldier],
+      text := [vigilance, disturb [3, white]],
+      power := 2,
+      toughness := 3
+    },
+    back := {
+      name := "Morning Apparition",
+      colors := [white],
+      types := [creature],
       subtypes := [spirit, soldier],
-      text :=
-        [ flying, vigilance,
-          static (replace (would any (putInto thisCreature graveyard)) (instead (exile it))) ],
-      power := stat 2, toughness := stat 1 } } }
+      text := [flying, vigilance, replace (would any (putInto thisCreature graveyard)) (instead (exile it))],
+      power := 2,
+      toughness := 1
+    }
+  }

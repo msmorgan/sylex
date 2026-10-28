@@ -1,12 +1,17 @@
-card dreadSlaver : Spelled :=
-  { name := "Dread Slaver", cost := [generic 3, pip .black, pip .black],
-    types := [.creature], subtypes := [zombie, horror],
-    text :=
-      [ whenever
-          (does (a (and [ isCreature,
-                            did thisCreature (dealDamage anyAmount which) (within soFarThisTurn) ])) die)
-          (sequentially
-            [ returnToBattlefield it [(under you)],
-              become (that creature)
-                { characteristics := { colors := [.black], subtypes := [zombie] } } ]) ],
-    power := stat 3, toughness := stat 5 }
+card := {
+  name := "Dread Slaver",
+  cost := [3, black, black],
+  types := [creature],
+  subtypes := [zombie, horror],
+  text := [
+    whenever
+      (does (a [isCreature, did thisCreature (dealDamage anyAmount which) (within soFarThisTurn)])
+         die)
+      [
+        returnToBattlefield it [(under you)],
+        become (that creature) { colors := [black], subtypes := [zombie] }
+      ]
+  ],
+  power := 3,
+  toughness := 5
+}

@@ -1,8 +1,13 @@
 /-- Lens of Clarity -/
-card lensOfClarity : Spelled :=
-  { name := "Lens of Clarity", cost := [generic 1], types := [.artifact],
-    text :=
-      [ static (conjunction [ visibility .lookAt you topOfLibrary,
-            visibility .lookAt you
-              (objects
-                (allOf (and [isCreature, isFaceDown, youDontControl]))) ]) ] }
+card := {
+  name := "Lens of Clarity",
+  cost := [1],
+  types := [artifact],
+  text := [
+    static
+      [
+        visibility lookAt you topOfLibrary,
+        visibility lookAt you (objects (allOf [isCreature, isFaceDown, youDontControl]))
+      ]
+  ]
+}

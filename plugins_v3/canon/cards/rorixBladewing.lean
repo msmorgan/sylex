@@ -1,4 +1,10 @@
-card rorixBladewing : Spelled :=
-  { name := "Rorix Bladewing", cost := [generic 3, pip .red, pip .red, pip .red],
-    supertypes := [.legendary], types := [.creature], subtypes := [dragon],
-    text := [flying, haste], power := stat 6, toughness := stat 5 }
+card := {
+  name := "Rorix Bladewing",
+  cost := [3, red, red, red],
+  supertypes := [legendary],
+  types := [creature],
+  subtypes := [dragon],
+  text := [flying, haste],
+  power := 6,
+  toughness := 5
+}

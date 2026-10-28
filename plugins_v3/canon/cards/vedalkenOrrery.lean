@@ -1,4 +1,6 @@
-card vedalkenOrrery : Spelled :=
-  { name := "Vedalken Orrery", cost := [generic 4], types := [.artifact],
-    text :=
-      [ static (can you (cast (bare isSpell)) (asThough := asThoughHadFlash them)) ] }
+card := {
+  name := "Vedalken Orrery",
+  cost := [4],
+  types := [artifact],
+  text := [can you (cast (bare isSpell)) (asThough := asThoughHadFlash them)]
+}

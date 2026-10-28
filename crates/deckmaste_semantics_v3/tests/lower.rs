@@ -922,3 +922,30 @@ fn bare_words_dispatch_by_expected_sort() {
     );
     assert!(reader.read::<ColorSpec>("some [white]").is_err());
 }
+
+#[test]
+fn bare_characteristic_records_preserve_written_token_and_change_values() {
+    let bundle = builtin();
+    let reader = Elaborator::new(&bundle);
+    let fields = "types := [creature], subtypes := [frog], power := 1, toughness := 1";
+    let explicit = format!("{{ characteristics := {{ {fields} }} }}");
+    let bare = format!("{{ {fields} }}");
+    assert_eq!(
+        reader.read::<CharacteristicBundle>(&bare).unwrap(),
+        reader.read::<CharacteristicBundle>(&explicit).unwrap(),
+    );
+    assert_eq!(
+        reader.read::<TokenSpec>(&format!("written {bare}")).unwrap(),
+        reader.read::<TokenSpec>(&format!("written {explicit}")).unwrap(),
+    );
+    assert_eq!(
+        reader
+            .read::<StaticSpec>(&format!("qualityChange thisCreature sets (bundle {bare})"))
+            .unwrap(),
+        reader
+            .read::<StaticSpec>(&format!(
+                "qualityChange thisCreature sets (bundle {explicit})"
+            ))
+            .unwrap(),
+    );
+}

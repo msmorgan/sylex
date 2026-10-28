@@ -7,9 +7,14 @@ any earlier mention (`Ability.textContextWith`). -/
 
 /-- Dispatch: "Tap target creature. / Metalcraft — If you control three or more artifacts, exile
 that creature." -/
-card dispatch : Spelled :=
-  { name := "Dispatch", cost := [pip .white], types := [.instant],
-    text :=
-      [ spell (tap (target isCreature)),
-        metalcraft (spell (doIf (compareAmt (countOf (and [isArtifact, youControl])) .atLeast 3)
-          (exile (that creature)))) ] }
+card := {
+  name := "Dispatch",
+  cost := [white],
+  types := [instant],
+  text := [
+    spell (tap (target isCreature)),
+    metalcraft
+      (spell
+         (doIf (compareAmt (countOf [isArtifact, youControl]) atLeast 3) (exile (that creature))))
+  ]
+}

@@ -1,7 +1,8 @@
-card peopleOfTheWoods : Spelled :=
-  { name := "People of the Woods", cost := [pip .green, pip .green], types := [.creature],
-    subtypes := [human],
-    text :=
-      [ static (ptDefinition thisCreature .toughnessAlone
-          (countOf (and [forest, youControl]))) ],
-    power := stat 1 }
+card := {
+  name := "People of the Woods",
+  cost := [green, green],
+  types := [creature],
+  subtypes := [human],
+  text := [ptDefinition thisCreature toughnessAlone (countOf [forest, youControl])],
+  power := 1
+}

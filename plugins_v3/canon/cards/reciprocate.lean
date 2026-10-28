@@ -1,8 +1,7 @@
 /-- Reciprocate -/
-card reciprocate : Spelled :=
-  { name := "Reciprocate", cost := [pip .white], types := [.instant],
-    text :=
-      [ spell (exile
-          (target
-             (and
-                [isCreature, did which (dealDamage anyAmount you) (within soFarThisTurn)]))) ] }
+card := {
+  name := "Reciprocate",
+  cost := [white],
+  types := [instant],
+  text := [spell (exile (target [isCreature, did which (dealDamage anyAmount you) (within soFarThisTurn)]))]
+}

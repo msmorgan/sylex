@@ -1,9 +1,14 @@
 /-- Stunning Shot -/
-card stunningShot : Spelled :=
-  { name := "Stunning Shot", cost := [generic 1, pip .white], types := [.sorcery],
-    text :=
-      [ spell (sequentially
-          [ putCounters 2 p1p1Counter
-              (targets (upTo 1) (and [isCreature, youControl])),
-            tap (targets (upTo 1) (and [isCreature, anOpponentControls])),
-            putCounters 1 stunCounter it ]) ] }
+card := {
+  name := "Stunning Shot",
+  cost := [1, white],
+  types := [sorcery],
+  text := [
+    spell
+      [
+        putCounters 2 p1p1Counter (targets (upTo 1) [isCreature, youControl]),
+        tap (targets (upTo 1) [isCreature, anOpponentControls]),
+        putCounters 1 stunCounter it
+      ]
+  ]
+}

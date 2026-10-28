@@ -150,7 +150,7 @@ theorem okCroakingCounterpartCopy : Action.check (DRS.ofList []) croakingCounter
 
 /-- "a loyalty ability of enchanted planeswalker" -/
 def loyaltyAbilityOfEnchanted : NounPhrase :=
-  (match elspethsTalent.card with
+  (match (cardNamed "Elspeth's Talent").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.triggered (GameEvent.does _ (Action.ownScope _
         (Action.procedure _ (NounPhrase.firstMention _ (NounPhrase.inCaller part)) _ _ _ _))) _ _ _
@@ -196,7 +196,7 @@ def fellTheMighty : Action :=
                   hasPower .greater (powerOf (target isCreature))]))
 theorem okFellTheMighty : Action.check (DRS.ofList []) fellTheMighty = [] := by decide
 
-def targetPlayerOrPlaneswalker : NounPhrase := (match heartOfBogardan.card with
+def targetPlayerOrPlaneswalker : NounPhrase := (match (cardNamed "Heart of Bogardan").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
         (Action.simultaneously (List.cons (Action.instruct _ (Action.dealDamage _ part _)) _)) _)))
@@ -226,13 +226,13 @@ theorem okRequitingHexAdditionalRead : Ability.check (DRS.ofList []) requitingHe
   decide
 
 /-- Bioplasm -/
-def bioplasmAttack : GameEvent := (match bioplasm.card with
+def bioplasmAttack : GameEvent := (match (cardNamed "Bioplasm").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered part _ _ _ _ _ _ _) _) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okBioplasmAttack : GameEvent.check (DRS.ofList []) bioplasmAttack = [] := by decide
-def bioplasmExile : Action := (match bioplasm.card with
+def bioplasmExile : Action := (match (cardNamed "Bioplasm").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons part _))) _) =>
         some part
@@ -397,13 +397,13 @@ theorem okSquadCommanderTokens : Ability.check (DRS.ofList []) squadCommanderTok
 
 /-- At Knifepoint -/
 def atKnifepointOutlaws : Ability :=
-  (match atKnifepoint.card with
+  (match (cardNamed "At Knifepoint").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
     | _ => none).get (by decide)
 def atKnifepointCrime : Ability :=
-  (match atKnifepoint.card with
+  (match (cardNamed "At Knifepoint").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none

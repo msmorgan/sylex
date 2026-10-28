@@ -1,21 +1,25 @@
-card gideonJura : Spelled :=
-  { name := "Gideon Jura", cost := [generic 3, pip .white, pip .white],
-    supertypes := [.legendary], types := [.planeswalker], subtypes := [gideon],
-    text :=
-      [ activated (loyaltySymbol (up 2))
-          (establishThroughout
-            (must (allOf (and [isCreature, controlledBy (target isOpponent)]))
-               (attack thisPlaneswalker))
-            (duringNextTurnOf (that player))),
-        activated (loyaltySymbol (down 2)) (destroy (target (and [isCreature, isTapped]))),
-        activated (loyaltySymbol (up 0))
-          (sequentially
-            [ establishThroughout (qualityChange thisPlaneswalker .sets
-                  (bundle
-                    { characteristics :=
-                      { types := [.creature],
-                        subtypes := [human, soldier],
-                        power := stat 6, toughness := stat 6 } }
-                    (some .planeswalker))) untilEndOfTurn,
-              preventAll it thisTurn ]) ],
-    loyalty := stat 6 }
+card := {
+  name := "Gideon Jura",
+  cost := [3, white, white],
+  supertypes := [legendary],
+  types := [planeswalker],
+  subtypes := [gideon],
+  text := [
+    activated (loyaltySymbol (up 2))
+      (establishThroughout
+         (must (allOf [isCreature, controlledBy (target isOpponent)]) (attack thisPlaneswalker))
+         (duringNextTurnOf (that player))),
+    activated (loyaltySymbol (down 2)) (destroy (target [isCreature, isTapped])),
+    activated (loyaltySymbol (up 0))
+      [
+        establishThroughout
+          (qualityChange thisPlaneswalker sets
+             (bundle
+                { types := [creature], subtypes := [human, soldier], power := 6, toughness := 6 }
+                (some planeswalker)))
+          untilEndOfTurn,
+        preventAll it thisTurn
+      ]
+  ],
+  loyalty := 6
+}

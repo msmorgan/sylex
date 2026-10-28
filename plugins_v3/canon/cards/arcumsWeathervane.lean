@@ -1,13 +1,15 @@
 /-- Arcum's Weathervane -/
-card arcumsWeathervane : Spelled :=
-  { name := "Arcum's Weathervane", cost := [generic 2], types := [.artifact],
-    text :=
-      [ activated (compound [[generic 2], tapSymbol])
-          (establish
-            (qualityChange (target (and [isLand, hasSupertype .snow])) .loses
-              (bundle { characteristics := { supertypes := [.snow] } }))),
-        activated (compound [[generic 2], tapSymbol])
-          (establish
-            (qualityChange (target (and [isLand, hasSupertype .basic, not (hasSupertype
-                .snow)])) .adds
-              (bundle { characteristics := { supertypes := [.snow] } }))) ] }
+card := {
+  name := "Arcum's Weathervane",
+  cost := [2],
+  types := [artifact],
+  text := [
+    activated (compound [[2], tapSymbol])
+      (establish
+         (qualityChange (target [isLand, hasSupertype snow]) loses (bundle { supertypes := [snow] }))),
+    activated (compound [[2], tapSymbol])
+      (establish
+         (qualityChange (target [isLand, hasSupertype basic, not (hasSupertype snow)]) adds
+            (bundle { supertypes := [snow] })))
+  ]
+}

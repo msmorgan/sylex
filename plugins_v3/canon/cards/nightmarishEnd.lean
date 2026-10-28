@@ -1,8 +1,13 @@
 /-- Nightmarish End -/
-card nightmarishEnd : Spelled :=
-  { name := "Nightmarish End", cost := [generic 2, pip .black], types := [.instant],
-    text :=
-      [ spell (sequentially
-          [ get (target isCreature) (down (letter .x)) (down (letter .x))
-              untilEndOfTurn,
-            define .x (countOf (cardIn yourHand)) ]) ] }
+card := {
+  name := "Nightmarish End",
+  cost := [2, black],
+  types := [instant],
+  text := [
+    spell
+      [
+        get (target isCreature) (down (letter x)) (down (letter x)) untilEndOfTurn,
+        define x (countOf (cardIn yourHand))
+      ]
+  ]
+}

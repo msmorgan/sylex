@@ -244,8 +244,8 @@ Trickery* ("Counter target spell if it was kicked.") and *Merfolk Falconer* ("Wh
 kicked spell, scry 2.") read the kicker cost of a spell neither prints [CR#702.33d], and both are
 spelled and check clean. -/
 theorem kickedReadsAnotherSpellsKicker :
-    Cards.ertaisTrickery.card.check = [] ∧ Cards.merfolkFalconer.card.check = [] :=
-  ⟨Cards.ertaisTrickery.ok, Cards.merfolkFalconer.ok⟩
+    (cardNamed "Ertai's Trickery").card.check = [] ∧ (cardNamed "Merfolk Falconer").card.check = [] :=
+  ⟨(cardNamed "Ertai's Trickery").ok, (cardNamed "Merfolk Falconer").ok⟩
 
 /-- Required pin: "exile it haunting target creature" relates two objects [CR#702.55a]. -/
 theorem okRelateHaunting :
@@ -523,17 +523,17 @@ def entering (steps : List Action) : Ability :=
   when (does thisEnchantment enter) (sequentially steps)
 
 /-- Required pin: Necromancy as printed [CR#607.2c,603.7a]. -/
-theorem okNecromancy : Semantics.Cards.necromancy.card.check = [] :=
-  Semantics.Cards.necromancy.ok
+theorem okNecromancy : (cardNamed "Necromancy").card.check = [] :=
+  (cardNamed "Necromancy").ok
 
 /-- Required pin: Animate Dead as printed; its return puts the creature onto the battlefield
 [CR#607.2c]. -/
-theorem okAnimateDead : Semantics.Cards.animateDead.card.check = [] :=
-  Semantics.Cards.animateDead.ok
+theorem okAnimateDead : (cardNamed "Animate Dead").card.check = [] :=
+  (cardNamed "Animate Dead").ok
 
 /-- Required pin: Dance of the Dead as printed. -/
-theorem okDanceOfTheDead : Semantics.Cards.danceOfTheDead.card.check = [] :=
-  Semantics.Cards.danceOfTheDead.ok
+theorem okDanceOfTheDead : (cardNamed "Dance of the Dead").card.check = [] :=
+  (cardNamed "Dance of the Dead").ok
 
 /-- The granted quality reads the put whichever side of the grant it is on [CR#607.1,607.1a]. -/
 theorem okPutBeforeOrAfterTheGrant :

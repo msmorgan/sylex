@@ -47,7 +47,7 @@ theorem okChooseCreatureYouControlAndCreatureYouDont :
 /-- The opening the fight-and-bite cards share: "Choose target creature you control and target
 creature you don't control." -/
 def chooseFightPair : Action :=
-  (match joust.card with
+  (match (cardNamed "Joust").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ (Action.sequentially (List.cons part _))) _) => some part
       | _ => none
@@ -207,7 +207,7 @@ theorem okAshnodsBattleGear : Ability.check (DRS.ofList []) ashnodsBattleGear = 
 
 /-- Phyrexian Ingester -/
 def phyrexianIngesterPump : Ability :=
-  (match phyrexianIngester.card with
+  (match (cardNamed "Phyrexian Ingester").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -248,14 +248,14 @@ theorem okNecromentiaChoice : Action.check (DRS.ofList []) necromentiaChoice = [
 
 /-- "play lands from the top of your library" -/
 def playLandsFromTop : StaticSpec :=
-  (match oracleOfMulDaya.card with
+  (match (cardNamed "Oracle of Mul Daya").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.static part) _))) => some part
       | _ => none
     | _ => none).get (by decide)
 /-- Future Sight; Magus of the Future -/
 def playLandsAndCastSpellsFromTop : StaticSpec :=
-  (match magusOfTheFuture.card with
+  (match (cardNamed "Magus of the Future").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.static part) _)) => some part
       | _ => none
@@ -264,7 +264,7 @@ theorem okPlayLandsAndCastSpellsFromTop :
     StaticSpec.check (DRS.ofList []) playLandsAndCastSpellsFromTop = [] := by decide
 /-- Assemble the Players -/
 def castSmallCreatureFromTopOnceEachTurn : StaticSpec :=
-  (match assembleThePlayers.card with
+  (match (cardNamed "Assemble the Players").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.static part) _)) => some part
       | _ => none
@@ -335,7 +335,7 @@ theorem okTranquilFrillbackOffer : Action.check (DRS.ofList []) tranquilFrillbac
 
 /-- Duneblast -/
 def duneblast : Action :=
-  (match duneblastCard.card with
+  (match (cardNamed "Duneblast").card with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ part) _) => some part
       | _ => none
@@ -509,7 +509,7 @@ theorem loxodonPeacekeeperThemReadsTheTiedPlayers :
   decide
 
 private def juxtaposeTie : Action :=
-  (match juxtapose.card with
+  (match (cardNamed "Juxtapose").card with
     | .singleFaced face => match face.characteristics.text with
       | .spell _ (.sequentially (_ :: _ :: action :: _)) :: _ => some action
       | _ => none

@@ -1,17 +1,23 @@
 /-- Loxodon Peacekeeper: "If two or more players are tied for lowest life total, you choose one
 of them, and that player gains control of this creature." "Them" reads the players the counted
 existential introduces (`semantics-v3.md` §1.3, box 2). -/
-card loxodonPeacekeeper : Spelled :=
-  { name := "Loxodon Peacekeeper", cost := [generic 1, pip .white], types := [.creature],
-    subtypes := [elephant, soldier],
-    text :=
-      [ at_ (beginningOfYour .upkeep)
-          (sequentially
-            [ gainControl thisCreature (controller :=
-                the (and [isPlayer, superlative .min (.playerStat .lifeTotal) isPlayer])),
-              doIf (thereAre (counted (orMore 2)
-                      (and [isPlayer, tiedFor .min (.playerStat .lifeTotal) isPlayer])))
-                (sequentially
-                  [ choose (someOf (exactly 1) themPlayers),
-                    gainControl thisCreature (controller := that player) ]) ]) ],
-    power := stat 4, toughness := stat 4 }
+card := {
+  name := "Loxodon Peacekeeper",
+  cost := [1, white],
+  types := [creature],
+  subtypes := [elephant, soldier],
+  text := [
+    at_ (beginningOfYour upkeep)
+      [
+        gainControl thisCreature
+          (controller := the [isPlayer, superlative min (playerStat lifeTotal) isPlayer]),
+        doIf (thereAre (counted (orMore 2) [isPlayer, tiedFor min (playerStat lifeTotal) isPlayer]))
+          [
+            choose (someOf (exactly 1) themPlayers),
+            gainControl thisCreature (controller := that player)
+          ]
+      ]
+  ],
+  power := 4,
+  toughness := 4
+}

@@ -3,14 +3,19 @@ If you control three or more snow permanents, the creature you control gets +1/+
 indestructible until end of turn. Then those creatures fight each other." "The creature you
 control" reads back the first target, which its restriction picks out of the two; "those
 creatures fight each other" is the two-creature fight of [CR#701.14a]. -/
-card blizzardBrawl : Spelled :=
-  { name := "Blizzard Brawl", cost := [pip .green], supertypes := [.snow], types := [.sorcery],
-    text :=
-      [ spell (sequentially
-          [ (choose (both (target (and [isCreature, youControl])) (target (and [isCreature,
-            youDontControl])))),
-            doIf (compareAmt (countOf (and [hasSupertype .snow, isPermanent, youControl]))
-                .atLeast 3)
-              (establishFor (the (and [isCreature, youControl]))
-                [getsPt it (up 1) (up 0), abilityGrant it indestructible] untilEndOfTurn),
-            fightEachOther (those creature) ]) ] }
+card := {
+  name := "Blizzard Brawl",
+  cost := [green],
+  supertypes := [snow],
+  types := [sorcery],
+  text := [
+    spell
+      [
+        (choose (both (target [isCreature, youControl]) (target [isCreature, youDontControl]))),
+        doIf (compareAmt (countOf [hasSupertype snow, isPermanent, youControl]) atLeast 3)
+          (establishFor (the [isCreature, youControl])
+             [getsPt it (up 1) (up 0), abilityGrant it indestructible] untilEndOfTurn),
+        fightEachOther (those creature)
+      ]
+  ]
+}

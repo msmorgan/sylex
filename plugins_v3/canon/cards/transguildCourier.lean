@@ -1,6 +1,10 @@
 /-- Transguild Courier -/
-card transguildCourier : Spelled :=
-  { name := "Transguild Courier", cost := [generic 4], types := [.artifact, .creature],
-    subtypes := [golem],
-    text := [static (qualityDefinition thisCreature .sets (colored .every))],
-    power := stat 3, toughness := stat 3 }
+card := {
+  name := "Transguild Courier",
+  cost := [4],
+  types := [artifact, creature],
+  subtypes := [golem],
+  text := [qualityDefinition thisCreature sets (colored every)],
+  power := 3,
+  toughness := 3
+}

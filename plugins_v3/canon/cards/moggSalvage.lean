@@ -1,10 +1,10 @@
-card moggSalvage : Spelled :=
-  { name := "Mogg Salvage", cost := [generic 2, pip .red], types := [.instant],
-    text :=
-      [ static (onlyWhile (altCost this_)
-          (and
-            [ exists_ (and [ isLand, island,
-                              anOpponentControls ]),
-              exists_ (and [ isLand, mountain,
-                              youControl ]) ])),
-        spell (destroy (target isArtifact)) ] }
+card := {
+  name := "Mogg Salvage",
+  cost := [2, red],
+  types := [instant],
+  text := [
+    onlyWhile (altCost this_)
+      [exists_ [isLand, island, anOpponentControls], exists_ [isLand, mountain, youControl]],
+    spell (destroy (target isArtifact))
+  ]
+}

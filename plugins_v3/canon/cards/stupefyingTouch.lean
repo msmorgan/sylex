@@ -1,8 +1,11 @@
-card stupefyingTouch : Spelled :=
-  { name := "Stupefying Touch", cost := [generic 1, pip .blue], types := [.enchantment],
-    subtypes := [aura],
-    text :=
-      [ enchant isCreature,
-        when (does thisAura enter) (draw 1),
-        static (cant any (activate (allOf (and [ abilityHead .anyActivated,
-                         abilityOf (enchanted creature) ])))) ] }
+card := {
+  name := "Stupefying Touch",
+  cost := [1, blue],
+  types := [enchantment],
+  subtypes := [aura],
+  text := [
+    enchant isCreature,
+    when (does thisAura enter) (draw 1),
+    cant any (activate (allOf [abilityHead anyActivated, abilityOf (enchanted creature)]))
+  ]
+}

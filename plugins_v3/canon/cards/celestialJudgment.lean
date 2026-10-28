@@ -1,8 +1,14 @@
 /-- Celestial Judgment -/
-card celestialJudgment : Spelled :=
-  { name := "Celestial Judgment", cost := [generic 4, pip .white, pip .white],
-    types := [.sorcery],
-    text :=
-      [ spell (sequentially
-          [ doForEachKind (.value .power) (allOf isCreature) .number (choose (a (and [isCreature, hasPower .eq chosenNumber]))),
-            destroy (each (and [isCreature, notChosen])) ]) ] }
+card := {
+  name := "Celestial Judgment",
+  cost := [4, white, white],
+  types := [sorcery],
+  text := [
+    spell
+      [
+        doForEachKind (value power) (allOf isCreature) number
+          (choose (a [isCreature, hasPower eq chosenNumber])),
+        destroy (each [isCreature, notChosen])
+      ]
+  ]
+}

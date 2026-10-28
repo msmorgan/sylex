@@ -1,6 +1,10 @@
 /-- Ainok Tracker -/
-card ainokTracker : Spelled :=
-  { name := "Ainok Tracker", cost := [generic 5, pip .red], types := [.creature],
-    subtypes := [dog, scout],
-    text := [firstStrike, morph [generic 4, pip .red]],
-    power := stat 3, toughness := stat 3 }
+card := {
+  name := "Ainok Tracker",
+  cost := [5, red],
+  types := [creature],
+  subtypes := [dog, scout],
+  text := [firstStrike, morph [4, red]],
+  power := 3,
+  toughness := 3
+}

@@ -158,8 +158,8 @@ theorem jeskaiAscendancyUntapsItsPumpedGroup :
 
 /-- Diminish sets one target creature's base power and toughness to 1/1 [CR#613.4b]. -/
 theorem diminishKeepsOneTargetForBothSetDeltas :
-    let result := firstLineTrace Cards.diminish
-    singleFaceText Cards.diminish.card =
+    let result := firstLineTrace (cardNamed "Diminish")
+    singleFaceText (cardNamed "Diminish").card =
       [.spell none (get (target isCreature) (.set 1) (.set 1)
         (some untilEndOfTurn))] ∧
       result.2 = [] ∧ creatureIdentity result.1 0 = true ∧
@@ -193,17 +193,17 @@ theorem builtToSmashConditionAndTrampleReadThePumpedTarget :
 sacrifice cumulative upkeep may make is published to this line for a linked readback, and is no
 pronoun's antecedent. -/
 theorem earthenGooBothCounterDeltasReadItsOwnSubject :
-    let result := cardLineTrace Cards.earthenGoo 2
+    let result := cardLineTrace (cardNamed "Earthen Goo") 2
     let subject := result.1.resolvedIds.headD 0
     result.2 = [] ∧ result.1.resolvedIds.length = 1 ∧ creatureIdentity result.1 subject = true ∧
       (result.1.findById? subject).map (·.pronounResolved) = some true := by decide
 
 theorem nyxathidBothDeltasReadItsUniqueAnnouncedPlayer :
-    let result := cardLineTrace Cards.nyxathid 1
+    let result := cardLineTrace (cardNamed "Nyxathid") 1
     result.2 = [] ∧ countChoice .player result.1 = 1 ∧
       (result.1.findById? 0).map (·.payload) = some (.player true) ∧
       creatureIdentity result.1 1 = true ∧
-      (singleFaceText Cards.nyxathid.card)[1]? = some (.static
+      (singleFaceText (cardNamed "Nyxathid").card)[1]? = some (.static
         (getsPt thisCreature
           (.down (countOf (.and [.isCard, .in_ (handOf (the isChosenPlayer))])))
           (.down (countOf (.and [.isCard, .in_ (handOf (the isChosenPlayer))]))))) := by
@@ -218,7 +218,7 @@ theorem archpriestOfIonaGivesFlyingToItsPumpedTarget :
       (result.1.findById? 4).map (·.ty) = some [.creature] := by decide
 
 theorem nightmarishEndKeepsItsTargetAndDefinesBothDeltaLetters :
-    let result := firstLineTrace Cards.nightmarishEnd
+    let result := firstLineTrace (cardNamed "Nightmarish End")
     result.2 = [] ∧ creatureIdentity result.1 0 = true ∧
       (result.1.findById? 0).map (·.det) = some .target ∧
       anyOpenLetter .x result.1 = false := by decide
@@ -240,18 +240,18 @@ theorem distortionStrikeProhibitionReadsItsPumpedTarget :
   decide
 
 theorem awakenTheBearGrantsTrampleToItsPumpedTarget :
-    let result := firstLineTrace Cards.awakenTheBear
+    let result := firstLineTrace (cardNamed "Awaken the Bear")
     result.2 = [] ∧ result.1.resolvedIds = [0] ∧ creatureIdentity result.1 0 = true ∧
       (result.1.findById? 0).map (·.det) = some .target := by decide
 
 theorem spidersilkArmorGrantsReachToItsPumpedGroup :
-    let result := firstLineTrace Cards.spidersilkArmor
+    let result := firstLineTrace (cardNamed "Spidersilk Armor")
     result.2 = [] ∧ result.1.resolvedIds = [1] ∧ creatureIdentity result.1 1 = true ∧
       (result.1.findById? 1).map (·.plur) = some .many := by decide
 
 theorem enchantedVanillaChangesOnlyItsAttachmentHost :
     let result := stepStaticSpec 32 (DRS.ofList [])
-      ((match Cards.frogify.card with
+      ((match (cardNamed "Frogify").card with
         | .singleFaced face => match face.characteristics.text with
           | _ :: .static spec :: _ => some spec
           | _ => none
@@ -427,15 +427,15 @@ Inversion* and *Ego Erasure* ("get … and lose all creature types"). -/
 private def getsAndGainsBodies : List (Option Action) :=
   [ abilityBody Cards.ghorClanRampager,
     abilityBody Cards.archpriestOfIonaFullParty,
-    (frontText Cards.elspethsTalent.card)[2]? >>= abilityBody,
+    (frontText (cardNamed "Elspeth's Talent").card)[2]? >>= abilityBody,
     (faceText Cards.chitteringHost)[2]? >>= abilityBody,
-    (frontText Cards.awakenTheBear.card)[0]? >>= abilityBody,
-    (frontText Cards.aimHigh.card)[0]? >>= abilityBody,
-    (frontText Cards.volatileClaws.card)[0]? >>= abilityBody,
-    (frontText Cards.arlinnKord.card)[0]? >>= abilityBody,
-    (backText Cards.arlinnKord.card)[0]? >>= abilityBody,
-    (frontText Cards.berserk.card)[0]? >>= abilityBody,
-    (backText Cards.garrukRelentless.card)[2]? >>= abilityBody,
+    (frontText (cardNamed "Awaken the Bear").card)[0]? >>= abilityBody,
+    (frontText (cardNamed "Aim High").card)[0]? >>= abilityBody,
+    (frontText (cardNamed "Volatile Claws").card)[0]? >>= abilityBody,
+    (frontText (cardNamed "Arlinn Kord // Arlinn, Embraced by the Moon").card)[0]? >>= abilityBody,
+    (backText (cardNamed "Arlinn Kord // Arlinn, Embraced by the Moon").card)[0]? >>= abilityBody,
+    (frontText (cardNamed "Berserk").card)[0]? >>= abilityBody,
+    (backText (cardNamed "Garruk Relentless // Garruk, the Veil-Cursed").card)[2]? >>= abilityBody,
     some Cards.namelessInversionBody,
     some Cards.egoErasureBody ]
 

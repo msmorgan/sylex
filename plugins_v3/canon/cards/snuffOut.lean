@@ -1,6 +1,9 @@
-card snuffOut : Spelled :=
-  { name := "Snuff Out", cost := [generic 3, pip .black], types := [.instant],
-    text :=
-      [ static (onlyWhile (altCost this_ (payLife 4))
-          (exists_ (and [isLand, swamp, youControl]))),
-        spell (destroyCantRegenerate (target (and [isCreature, non (hasColor .black)]))) ] }
+card := {
+  name := "Snuff Out",
+  cost := [3, black],
+  types := [instant],
+  text := [
+    onlyWhile (altCost this_ (payLife 4)) (exists_ [isLand, swamp, youControl]),
+    spell (destroyCantRegenerate (target [isCreature, non (hasColor black)]))
+  ]
+}

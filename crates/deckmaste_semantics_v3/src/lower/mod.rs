@@ -386,23 +386,11 @@ impl<'a> Elaborator<'a> {
         scope: &mut Scope,
         stack: &mut Vec<BundleKey>,
     ) -> Result<Value> {
-        let tokens = if let Some(body) = decl.fields.get(&Ident::new("body")) {
-            body.clone()
-        } else {
-            let mut fields = Vec::new();
-            for (name, value) in &decl.fields {
-                if ["lexical", "spelling"].contains(&name.as_str()) {
-                    continue;
-                }
-                if !fields.is_empty() {
-                    fields.push(Token::Atom(",".into()));
-                }
-                fields.extend([Token::Ident(*name), Token::Atom(":=".into())]);
-                fields.extend(value.clone());
-            }
-            vec![Token::Group('{', fields)]
-        };
-        self.eval(&tokens, "Card", scope, stack)
+        let tokens = decl
+            .card
+            .as_ref()
+            .ok_or_else(|| LowerError::new("card requires an anonymous declaration"))?;
+        self.eval(tokens, "Card", scope, stack)
     }
 
     fn declaration(&self, name: &str, ty: &str) -> Option<&Declaration> {
@@ -991,6 +979,15 @@ impl<'a> Elaborator<'a> {
         scope: &mut Scope,
         stack: &mut Vec<BundleKey>,
     ) -> Result<Value> {
+        if ty == "CharacteristicBundle" {
+            let fields = reader::fields(tokens).map_err(|e| LowerError::new(e.to_string()))?;
+            if !fields.contains_key(&Ident::new("characteristics"))
+                && !fields.contains_key(&Ident::new("qualities"))
+            {
+                let characteristics = self.record(tokens, "Characteristics", scope, stack)?;
+                return construct(ty, "mk", vec![characteristics, Value::Array(Vec::new())]);
+            }
+        }
         if ty == "Card"
             || (ty == "CardFace"
                 && !reader::fields(tokens)

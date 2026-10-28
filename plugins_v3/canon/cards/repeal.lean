@@ -1,6 +1,6 @@
-card repeal : Spelled :=
-  { name := "Repeal", cost := [.variable, pip .blue], types := [.instant],
-    text :=
-      [ spell (sequentially
-          [ returnToHand (target (and [non isLand, isPermanent, hasManaValue .eq (letter .x)])),
-            draw 1 ]) ] }
+card := {
+  name := "Repeal",
+  cost := [«variable», blue],
+  types := [instant],
+  text := [spell [returnToHand (target [non isLand, isPermanent, hasManaValue eq (letter x)]), draw 1]]
+}

@@ -1,8 +1,14 @@
-card standardize : Spelled :=
-  { name := "Standardize", cost := [pip .blue, pip .blue], types := [.instant],
-    text :=
-      [ spell (sequentially
-          [ choose (a (qualityFrom (.subtype .creature) (typeOtherThan wall))),
-            establishThroughout (qualityChange (each isCreature) .sets
-                                   (chosenQuality (ofChosen (.subtype
-                  .creature)))) untilEndOfTurn ]) ] }
+card := {
+  name := "Standardize",
+  cost := [blue, blue],
+  types := [instant],
+  text := [
+    spell
+      [
+        choose (a (qualityFrom (subtype creature) (typeOtherThan wall))),
+        establishThroughout
+          (qualityChange (each isCreature) sets (chosenQuality (ofChosen (subtype creature))))
+          untilEndOfTurn
+      ]
+  ]
+}

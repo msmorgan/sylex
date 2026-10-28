@@ -211,14 +211,14 @@ anchor. -/
 theorem caromAnchorsOnTheFirstTarget :
     let firstTarget := (stepWouldClause 64 (framed [.instant])
       (would any (dealDamage anyAmount (target isCreature)))).1.findById? 0
-    anchorsOf (spellOf Cards.carom) (framed [.instant]) = [.mention 0] ∧
+    anchorsOf (spellOf (cardNamed "Carom")) (framed [.instant]) = [.mention 0] ∧
       firstTarget.map (fun ref => (ref.det, ref.ty)) = some (.target, [.creature]) := by
   decide
 
 /-- Feral Contest: "Put a +1/+1 counter on target creature you control. Another target creature
 blocks it this turn if able." -/
 theorem feralContestAnchorsOnTheFirstTarget :
-    mentionsOf (spellOf Cards.feralContest) (framed [.sorcery]) = [some (.target, [.creature])]
+    mentionsOf (spellOf (cardNamed "Feral Contest")) (framed [.sorcery]) = [some (.target, [.creature])]
     := by
   decide
 
@@ -349,7 +349,7 @@ other attacking creature." The anchor is the current member of the group the sub
 count would be of attackers you do not control. The affected set is fixed as the effect begins
 [CR#611.2c], but the amount is a function of each member. -/
 theorem runAnchorsOnTheMemberNotTheGroup :
-    let after := (stepAction 64 .postEvent .obj (framed [.instant]) (rightSpellOf Cards.hitRun)).1
+    let after := (stepAction 64 .postEvent .obj (framed [.instant]) (rightSpellOf (cardNamed "Hit // Run"))).1
     after.contrastAnchors = [.member 1] ∧ after.contrastAnchors ≠ [.mention 1] ∧
       (after.findById? 1).map (fun ref => (ref.det, ref.ty)) = some (.all, [.creature]) := by
   decide

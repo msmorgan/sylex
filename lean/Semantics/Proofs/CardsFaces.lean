@@ -115,7 +115,7 @@ theorem planeswalkerBackWithoutLoyaltyOk :
 
 /-- Garruk Relentless -/
 def garrukRelentlessFlip : Ability :=
-  (match garrukRelentless.card with
+  (match (cardNamed "Garruk Relentless // Garruk, the Veil-Cursed").card with
     | Card.transforming face _ => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -124,7 +124,7 @@ theorem okGarrukRelentlessFlip : Ability.check (DRS.ofList []) garrukRelentlessF
 /-- Garruk Relentless's first 0: "Garruk Relentless deals 3 damage to target creature. That
 creature deals damage equal to its power to him." -/
 def garrukRelentlessFight : Action :=
-  (match garrukRelentless.card with
+  (match (cardNamed "Garruk Relentless // Garruk, the Veil-Cursed").card with
     | Card.transforming face _ => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.activated _ part _ _ _ _) _)) => some part
       | _ => none
@@ -139,7 +139,7 @@ theorem okManaClashFlip : Action.check (DRS.ofList []) manaClashFlip = [] := by 
 
 /-- Kitsune Mystic -/
 def kitsuneMysticFlip : Ability :=
-  (match kitsuneMystic.card with
+  (match (cardNamed "Kitsune Mystic // Autumn-Tail, Kitsune Sage").card with
     | Card.flip face _ => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -165,7 +165,7 @@ spell each does not satisfy it. A `DidClause.ordinal` ("cast a second spell") na
 period (`Period` has none), and a counted patient ("cast two or more spells") counts spells, not
 casting events [CR#601.2a]. -/
 def aPlayerCastTwoOrMoreLastTurn : Condition :=
-  (match afflictedDeserter.card with
+  (match (cardNamed "Afflicted Deserter // Werewolf Ransacker").card with
     | Card.transforming _ face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ (Option.some part) _) _)) => some
         part
@@ -188,16 +188,16 @@ theorem badCountedCastPatientLastTurn :
 
 /-- Chittering Host's face, as both melding cards carry it. -/
 def chitteringHost : CardFace :=
-  (match midnightScavengers.card with
+  (match (cardNamed "Midnight Scavengers // Chittering Host").card with
     | (Card.transforming _ part) => some part
     | _ => none).get (by decide)
-def chitteringHostOnScavengers : CardFace := (match midnightScavengers.card with
+def chitteringHostOnScavengers : CardFace := (match (cardNamed "Midnight Scavengers // Chittering Host").card with
     | (Card.transforming _ part) => some part
     | _ => none).get (by decide)
 theorem okChitteringHostOnScavengers : CardFace.check .back chitteringHostOnScavengers = [] := by
   decide
 /-- Chittering Host as the GRAF RATS card carries it -/
-def chitteringHostOnGrafRats : CardFace := (match midnightScavengers.card with
+def chitteringHostOnGrafRats : CardFace := (match (cardNamed "Midnight Scavengers // Chittering Host").card with
     | (Card.transforming _ part) => some part
     | _ => none).get (by decide)
 theorem okChitteringHostOnGrafRats : CardFace.check .back chitteringHostOnGrafRats = [] := by

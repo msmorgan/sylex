@@ -5,12 +5,13 @@ wither, the source's damage to a creature takes wither's own row (`Definitions.w
 isn't marked; rather, that source's controller puts that many −1/−1 counters on it
 [CR#702.80a,120.3d]. A source that has wither already gets that result once, multiple instances
 of wither being redundant [CR#702.80d]. -/
-card everlastingTorment : Spelled :=
-  { name := "Everlasting Torment", cost := [generic 2, hybridPip .black .red],
-    types := [.enchantment],
-    text :=
-      [ static (cant (bare isPlayer) (gainLife anyAmount)),
-        static (cant any (preventDamage allDamage (damage := would any (dealDamage anyAmount)))),
-        static
-          (asThough (by_ (a isSource)) (dealDamage anyAmount)
-            (holds (is thatSource (hasKeyword wither)))) ] }
+card := {
+  name := "Everlasting Torment",
+  cost := [2, hybridPip black red],
+  types := [enchantment],
+  text := [
+    cant (bare isPlayer) (gainLife anyAmount),
+    cant any (preventDamage allDamage (damage := would any (dealDamage anyAmount))),
+    asThough (by_ (a isSource)) (dealDamage anyAmount) (holds (is thatSource (hasKeyword wither)))
+  ]
+}

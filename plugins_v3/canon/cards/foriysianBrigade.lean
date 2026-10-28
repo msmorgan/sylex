@@ -1,9 +1,10 @@
 /-- Foriysian Brigade -/
-card foriysianBrigade : Spelled :=
-  { name := "Foriysian Brigade", cost := [generic 3, pip .white], types := [.creature],
-    subtypes := [human, soldier],
-    text :=
-        [static
-           (can thisCreature (block (counted (additional (exactly 1)) isCreature))
-              (timing := eachCombat))],
-    power := stat 2, toughness := stat 4 }
+card := {
+  name := "Foriysian Brigade",
+  cost := [3, white],
+  types := [creature],
+  subtypes := [human, soldier],
+  text := [can thisCreature (block (counted (additional (exactly 1)) isCreature)) (timing := eachCombat)],
+  power := 2,
+  toughness := 4
+}

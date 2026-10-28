@@ -1,7 +1,16 @@
-card pithingNeedle : Spelled :=
-  { name := "Pithing Needle", cost := [generic 1], types := [.artifact],
-    text :=
-      [ static (entersChoosing thisArtifact .cardName),
-        static (cant any (activate (allOf (and [ abilityHead .anyActivated,
-                         abilityOf (allOf (and [isSource, named chosenName])),
-                         not isManaAbility ])))) ] }
+card := {
+  name := "Pithing Needle",
+  cost := [1],
+  types := [artifact],
+  text := [
+    entersChoosing thisArtifact cardName,
+    cant any
+      (activate
+         (allOf
+            [
+              abilityHead anyActivated,
+              abilityOf (allOf [isSource, named chosenName]),
+              not isManaAbility
+            ]))
+  ]
+}

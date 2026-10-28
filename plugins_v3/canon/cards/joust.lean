@@ -3,12 +3,17 @@ creature you control gets +2/+1 until end of turn if it's a Knight. Then those c
 each other." The "if" is printed after its clause, so its "it" reads that clause's subject, "the
 creature you control", though the condition is checked before the creature gets +2/+1
 [CR#608.2c]. -/
-card joust : Spelled :=
-  { name := "Joust", cost := [generic 1, pip .red], types := [.sorcery],
-    text :=
-      [ spell (sequentially
-          [ (choose (both (target (and [isCreature, youControl])) (target (and [isCreature,
-            youDontControl])))),
-            doOnlyIf (get (the (and [isCreature, youControl])) (up 2) (up 1) untilEndOfTurn)
-              (is it (hasSubtype knight)),
-            fightEachOther (those creature) ]) ] }
+card := {
+  name := "Joust",
+  cost := [1, red],
+  types := [sorcery],
+  text := [
+    spell
+      [
+        (choose (both (target [isCreature, youControl]) (target [isCreature, youDontControl]))),
+        doOnlyIf (get (the [isCreature, youControl]) (up 2) (up 1) untilEndOfTurn)
+          (is it (hasSubtype knight)),
+        fightEachOther (those creature)
+      ]
+  ]
+}

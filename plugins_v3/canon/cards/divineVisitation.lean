@@ -1,9 +1,21 @@
-card divineVisitation : Spelled :=
-  { name := "Divine Visitation", cost := [generic 3, pip .white, pip .white],
-    types := [.enchantment],
-    text :=
-      [ static (replace (would any (createObject anyAmount (token (copyOf (counted (orMore 1) (and [isCreature, isToken]))) []) you)) (instead (create groupSize (written
-            { characteristics :=
-              { colors := [.white], types := [.creature], subtypes := [angel],
-                text := [flying,
-                         vigilance], power := stat 4, toughness := stat 4 } })))) ] }
+card := {
+  name := "Divine Visitation",
+  cost := [3, white, white],
+  types := [enchantment],
+  text := [
+    replace
+      (would any
+         (createObject anyAmount (token (copyOf (counted (orMore 1) [isCreature, isToken])) []) you))
+      (instead
+         (create groupSize
+            (written
+               {
+                 colors := [white],
+                 types := [creature],
+                 subtypes := [angel],
+                 text := [flying, vigilance],
+                 power := 4,
+                 toughness := 4
+               })))
+  ]
+}

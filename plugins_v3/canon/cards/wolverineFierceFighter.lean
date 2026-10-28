@@ -6,14 +6,18 @@ by that event [CR#120.3e]. The text heals only damage "already dealt", what was 
 event marks the new damage, so healing before the event removes exactly that and never the new
 damage; healed as part of the event, whether the new damage is removed too would turn on an order
 the text does not state. -/
-card wolverineFierceFighter : Spelled :=
-  { name := "Wolverine, Fierce Fighter", cost := [generic 2, pip .red, pip .green],
-    supertypes := [.legendary], types := [.creature], subtypes := [mutant, berserker, hero],
-    text :=
-      [ haste,
-        when (does thisCreature enter)
-          (instruct thisCreature (fight (targets (upTo 1) (and [isCreature, isOther])))),
-        static
-          (replace (would any (dealDamage anyAmount thisCreature))
-            (before (heal thisCreature))) ],
-    power := stat 3, toughness := stat 5 }
+card := {
+  name := "Wolverine, Fierce Fighter",
+  cost := [2, red, green],
+  supertypes := [legendary],
+  types := [creature],
+  subtypes := [mutant, berserker, hero],
+  text := [
+    haste,
+    when (does thisCreature enter)
+      (instruct thisCreature (fight (targets (upTo 1) [isCreature, isOther]))),
+    replace (would any (dealDamage anyAmount thisCreature)) (before (heal thisCreature))
+  ],
+  power := 3,
+  toughness := 5
+}

@@ -1,4 +1,6 @@
-card nullRod : Spelled :=
-  { name := "Null Rod", cost := [generic 2], types := [.artifact],
-    text := [static ((cant any (activate (allOf (and [abilityHead .anyActivated, abilityOf (allOf
-      isArtifact)])))))] }
+card := {
+  name := "Null Rod",
+  cost := [2],
+  types := [artifact],
+  text := [cant any (activate (allOf [abilityHead anyActivated, abilityOf (allOf isArtifact)]))]
+}

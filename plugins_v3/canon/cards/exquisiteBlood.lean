@@ -1,3 +1,6 @@
-card exquisiteBlood : Spelled :=
-  { name := "Exquisite Blood", cost := [generic 4, pip .black], types := [.enchantment],
-    text := [whenever (does anOpponent (loseLife anyAmount)) (gainLife thatMuch)] }
+card := {
+  name := "Exquisite Blood",
+  cost := [4, black],
+  types := [enchantment],
+  text := [whenever (does anOpponent (loseLife anyAmount)) (gainLife thatMuch)]
+}

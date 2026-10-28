@@ -1,2 +1,1 @@
-card islandCard : Spelled :=
-  { name := "Island", supertypes := [.basic], types := [.land], subtypes := [island] }
+card := { name := "Island", supertypes := [basic], types := [land], subtypes := [island] }

@@ -1,5 +1,8 @@
 /-- Concordant Crossroads -/
-card concordantCrossroads : Spelled :=
-  { name := "Concordant Crossroads", cost := [pip .green], supertypes := [.world],
-    types := [.enchantment], text := [static (abilityGrant (allOf isCreature) haste)]
-        }
+card := {
+  name := "Concordant Crossroads",
+  cost := [green],
+  supertypes := [world],
+  types := [enchantment],
+  text := [abilityGrant (allOf isCreature) haste]
+}

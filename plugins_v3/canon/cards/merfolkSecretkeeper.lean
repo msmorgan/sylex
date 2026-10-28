@@ -1,9 +1,18 @@
-card merfolkSecretkeeper : Spelled := { body := .adventurer
-  { characteristics :=
-    { name := "Merfolk Secretkeeper", cost := [pip .blue], types := [.creature],
+card := adventurer
+  {
+    normal := {
+      name := "Merfolk Secretkeeper",
+      cost := [blue],
+      types := [creature],
       subtypes := [merfolk, wizard],
-      power := stat 0, toughness := stat 4 } }
-  { characteristics :=
-    { name := "Venture Deeper", cost := [pip .blue], types := [.sorcery],
+      power := 0,
+      toughness := 4
+    },
+    adventure := {
+      name := "Venture Deeper",
+      cost := [blue],
+      types := [sorcery],
       subtypes := [adventure],
-      text := [ spell (instruct (target isPlayer) (mill 4)) ] } } }
+      text := [spell (instruct (target isPlayer) (mill 4))]
+    }
+  }

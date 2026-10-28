@@ -36,8 +36,8 @@ private def preeminentCaptainWithDefaults : Spelled := spelled <| singleFacedCar
 
 theorem templateDefaultsAreAuthored :
     preeminentCaptainWithDefaults.authoring.onlyAuthored = true ∧
-    Cards.helmOfPossession.authoring.onlyAuthored = true :=
-  ⟨preeminentCaptainWithDefaults.onlyAuthored, Cards.helmOfPossession.onlyAuthored⟩
+    (cardNamed "Helm of Possession").authoring.onlyAuthored = true :=
+  ⟨preeminentCaptainWithDefaults.onlyAuthored, (cardNamed "Helm of Possession").onlyAuthored⟩
 
 private def rawKeywordCard : Card := .singleFaced
   { characteristics :=
@@ -401,9 +401,9 @@ private def faceOf : Authoring.Form → Authoring.Form
 /-- *Cold Storage* before the sweep: `some`, `mana [...]` and `perform (...)` written out. -/
 private def coldStorageWritten : Spelled := spelled <| .singleFaced
   { characteristics :=
-    { name := "Cold Storage", cost := some [generic 4], types := [.artifact],
+    { name := "Cold Storage", cost := some [4], types := [artifact],
       text :=
-        [ activated (mana [generic 3]) (exile (target (and [isCreature, youControl]))),
+        [ activated (mana [3]) (exile (target (and [isCreature, youControl]))),
           activated (perform (sacrifice thisArtifact))
             (returnToBattlefield (each (and [isCreature, cardIn (exiledWith thisArtifact)]))
               [(under you)]) ] } }
@@ -411,48 +411,48 @@ private def coldStorageWritten : Spelled := spelled <| .singleFaced
 theorem tokenBundleCoercionIsWritten (t : CharacteristicBundle) (n : Amount) :
     create n t = create n (written t) := rfl
 
-theorem costCoercionsKeepTheCard : Cards.coldStorage.card = coldStorageWritten.card := rfl
+theorem costCoercionsKeepTheCard : (cardNamed "Cold Storage").card = coldStorageWritten.card := rfl
 
 theorem costCoercionsKeepTheAuthoring :
-    faceOf Cards.coldStorage.authoring = faceOf coldStorageWritten.authoring := rfl
+    faceOf (cardNamed "Cold Storage").authoring = faceOf coldStorageWritten.authoring := rfl
 
 theorem envelopeIsSingleFacedCard :
-    Cards.coldStorage.authoring = coldStorageWritten.authoring := rfl
+    (cardNamed "Cold Storage").authoring = coldStorageWritten.authoring := rfl
 
 /-- *Korlessa, Scale Singer* before the sweep: `hasSubtype dragon` written out. -/
 private def korlessaWritten : Spelled := spelled <| .singleFaced
   { characteristics :=
-    { name := "Korlessa, Scale Singer", cost := some [pip .green, pip .blue],
-      supertypes := [.legendary], types := [.creature],
+    { name := "Korlessa, Scale Singer", cost := some [green, blue],
+      supertypes := [.legendary], types := [creature],
       subtypes := [dragon, bard],
       text :=
         [ static (visibility .lookAt you topOfLibrary),
           static (can you (cast (bare (and [isSpell, hasSubtype dragon])) (from_ := onTop))) ],
-      power := stat 1, toughness := stat 4 } }
+      power := 1, toughness := 4 } }
 
-theorem subtypeCoercionKeepsTheCard : Cards.korlessaScaleSinger.card = korlessaWritten.card := rfl
+theorem subtypeCoercionKeepsTheCard : (cardNamed "Korlessa, Scale Singer").card = korlessaWritten.card := rfl
 
 theorem subtypeCoercionKeepsTheAuthoring :
-    faceOf Cards.korlessaScaleSinger.authoring = faceOf korlessaWritten.authoring := rfl
+    faceOf (cardNamed "Korlessa, Scale Singer").authoring = faceOf korlessaWritten.authoring := rfl
 
 /-- *Char-Rumbler* before the sweep: `.lit 1`, `.lit 0` and `some untilEndOfTurn` written out. -/
 private def charRumblerWritten : Spelled := spelled <| .singleFaced
   { characteristics :=
-    { name := "Char-Rumbler", cost := some [generic 2, pip .red, pip .red], types := [.creature],
+    { name := "Char-Rumbler", cost := some [2, red, red], types := [creature],
       subtypes := [elemental],
       text :=
         [ doubleStrike,
-          activated (mana [pip .red])
+          activated (mana [red])
             (get thisCreature (up (.lit 1)) (up (.lit 0)) (some untilEndOfTurn)) ],
-      power := some (lit (-1)), toughness := stat 3 } }
+      power := some (lit (-1)), toughness := 3 } }
 
-theorem numeralsKeepTheCard : Cards.charRumbler.card = charRumblerWritten.card := rfl
+theorem numeralsKeepTheCard : (cardNamed "Char-Rumbler").card = charRumblerWritten.card := rfl
 
 theorem numeralsKeepTheTemplates :
-    formCalls (faceOf Cards.charRumbler.authoring) = formCalls (faceOf charRumblerWritten.authoring) := rfl
+    formCalls (faceOf (cardNamed "Char-Rumbler").authoring) = formCalls (faceOf charRumblerWritten.authoring) := rfl
 
 theorem numeralsKeepTheLiterals :
-    runs (formNumerals (faceOf Cards.charRumbler.authoring)) =
+    runs (formNumerals (faceOf (cardNamed "Char-Rumbler").authoring)) =
       runs (formNumerals (faceOf charRumblerWritten.authoring)) := rfl
 
 /-! ## A sentence shared by a modal header
@@ -489,10 +489,10 @@ private def suppliedBody : Authoring.Form → Option (Lean.Name × List Lean.Nam
 /-- *Call Damage Control*: one header, "Return those cards from your graveyard to your hand.", and
 one target per bullet. -/
 theorem callDamageControlWritesEachPartOnce :
-    let calls := formCalls Cards.callDamageControl.authoring
+    let calls := formCalls (cardNamed "Call Damage Control").authoring
     calls.count ``Templates.chooseModesOver = 1 ∧ calls.count ``Templates.returnToHand = 1 ∧
       calls.count ``Semantics.Templates.NounPhrase.target = 4 ∧
-      (modesOver? Cards.callDamageControl.authoring).map
+      (modesOver? (cardNamed "Call Damage Control").authoring).map
           (fun (items, body) => (items.map fun item => (formCalls item).head?, suppliedBody body)) =
         some ([some ``Semantics.Templates.NounPhrase.target,
             some ``Semantics.Templates.NounPhrase.target,
@@ -515,20 +515,20 @@ private def callDamageControlModes : Card := .singleFaced
                 .inCaller (returnToHand (target (and [isLand, isCard])) yourGraveyard)) ]) ] } }
 
 theorem callDamageControlIsAnOrdinaryChooseModes :
-    Cards.callDamageControl.card = callDamageControlModes := rfl
+    (cardNamed "Call Damage Control").card = callDamageControlModes := rfl
 
 /-- *Wild Shape*: one header, "Until end of turn, target creature you control has that base power
 and toughness, becomes that creature type, and gains that ability.", and one creature shape per
 bullet. -/
 theorem wildShapeWritesEachPartOnce :
-    let calls := formCalls Cards.wildShape.authoring
+    let calls := formCalls (cardNamed "Wild Shape").authoring
     calls.count ``Templates.chooseModesOver = 1 ∧ calls.count ``Templates.establish = 1 ∧
       calls.count ``Semantics.Templates.NounPhrase.target = 1 ∧ calls.count ``Templates.untilEndOfTurn = 1 ∧
-      (modesOver? Cards.wildShape.authoring).map
+      (modesOver? (cardNamed "Wild Shape").authoring).map
           (fun (items, body) => (items.map formCalls, suppliedBody body)) =
-        some ([[``turtle, ``hexproof, ``Templates.Amount.stat, ``Templates.Amount.stat],
-            [``spider, ``reach, ``Templates.Amount.stat, ``Templates.Amount.stat],
-            [``elephant, ``trample, ``Templates.Amount.stat, ``Templates.Amount.stat]],
+        some ([[``turtle, ``hexproof],
+            [``spider, ``reach],
+            [``elephant, ``trample]],
           some (`shape,
             [``Templates.establish, ``Templates.qualityChange, ``Semantics.Templates.NounPhrase.target,
               ``Templates.Predicate.and, ``isCreature, ``youControl, ``Templates.bundle,
@@ -553,7 +553,7 @@ private def wildShapeModes : Card :=
                 (none, none, shape spider reach 1 5),
                 (none, none, shape elephant trample 3 3) ]) ] } }
 
-theorem wildShapeIsAnOrdinaryChooseModes : Cards.wildShape.card = wildShapeModes := rfl
+theorem wildShapeIsAnOrdinaryChooseModes : (cardNamed "Wild Shape").card = wildShapeModes := rfl
 
 /-- A supplied body that ignores its bullet gives identical modes: the bullets are written, but
 nothing of them reaches the modes. -/
@@ -963,6 +963,13 @@ theorem optionalToughnessNumeral : (4 : Option Amount) = some (.lit 4) := rfl
 theorem loyaltyNumeral : ({ loyalty := 3, defense := 5 } : Characteristics).loyalty = some (.lit 3) := rfl
 theorem defenseNumeral : ({ loyalty := 3, defense := 5 } : Characteristics).defense = some (.lit 5) := rfl
 theorem manaNumeralsAndColors : ([2, blue] : ManaCost) = [ManaSymbol.simple (.generic 2), .simple (.specific (.of .blue))] := rfl
+
+/-- error: Named card declarations are no longer supported; use card := ... -/
+#guard_msgs in
+card legacyNamed := { name := "Legacy Named", types := [sorcery] }
+/-- error: Named card declarations are no longer supported; use card := ... -/
+#guard_msgs in
+card legacyTyped : Spelled := { name := "Legacy Typed", types := [sorcery] }
 
 /-- error: Anonymous card requires a printed name -/
 #guard_msgs in

@@ -70,7 +70,7 @@ affect Auras as normal" [CR#702.16n]. The exemption belongs to the clause it wra
 grant of protection from black, written as its own clause, carries none and removes Attachments
 in its own right. Which Aura goes to the graveyard is the engine's to apply. -/
 theorem exemptionDoesNotCoverOtherProtection :
-    retentionOf? blackWard = some (retention protectionFromBlack thisAura) ∧
+    retentionOf? (cardNamed "Black Ward") = some (retention protectionFromBlack thisAura) ∧
     StaticSpec.check emptyContext
       (conjunction [retention protectionFromBlack thisAura, protectionFromBlack]) = [] ∧
     protectionFromBlack.removesAttachments = true :=
@@ -84,14 +84,14 @@ Aura" by the `attachedTo` it carries; the engine reads it once, as the effect st
 attached after the effect began is not exempt: the exemption leaves its clause whole, and that
 clause forbids such an Aura to become attached at all. -/
 theorem alreadyAttachedIsReadWhenTheEffectStarts :
-    (match retentionOf? benevolentBlessing with
+    (match retentionOf? (cardNamed "Benevolent Blessing") with
      | some (.retention spec (.described _ p)) =>
        spec.removesAttachments &&
          (match spec.attachmentHost?, p.attachmentHosts with
           | some (.attachHost .enchanted _), [.pro .bare .one] => true
           | _, _ => false)
      | _ => false) = true ∧
-    (match retentionOf? blackWard with
+    (match retentionOf? (cardNamed "Black Ward") with
      | some (.retention _ (.headed (.subtype _) .this)) => true
      | _ => false) = true := by decide
 
@@ -151,13 +151,13 @@ doesn't remove Auras." The exemption is the grant's conjunction member, beside `
 wraps the grant as a whole, the one protection ability whose quality is "each color", so it
 reaches each of the five abilities that grant is ("this effect" [CR#702.16h,702.16n]). -/
 theorem spectraWardExemptsAurasFromEachColor :
-    memberRetentionOf? spectraWard =
+    memberRetentionOf? (cardNamed "Spectra Ward") =
       some (retention (abilityGrant (enchanted creature) (protection (eachKind .color)))
         (allOf aura)) ∧
-    (exemptClause? (memberRetentionOf? spectraWard)).map
+    (exemptClause? (memberRetentionOf? (cardNamed "Spectra Ward"))).map
         (fun spec => (grantedAbilities spec).flatMap (·.keywordInstances?.getD [])) =
       some protectionFromEachOfFiveColors ∧
-    ((exemptClause? (memberRetentionOf? spectraWard)).map (·.removesAttachments)).getD false
+    ((exemptClause? (memberRetentionOf? (cardNamed "Spectra Ward"))).map (·.removesAttachments)).getD false
       = true :=
   ⟨rfl, rfl, by decide⟩
 
@@ -168,12 +168,12 @@ applies at each moment to whatever its text indicates [CR#611.3a,702.16i], so th
 fixed instances and the engine reads the colors as it applies. The exemption wraps the whole
 grant. -/
 theorem pledgeOfLoyaltyReadsItsColorsContinuously :
-    memberRetentionOf? pledgeOfLoyalty =
+    memberRetentionOf? (cardNamed "Pledge of Loyalty") =
       some (retention
         (abilityGrant (enchanted creature)
           (protection (eachKind .color (some (allOf (and [isPermanent, youControl]))))))
         thisAura) ∧
-    (match exemptClause? (memberRetentionOf? pledgeOfLoyalty) with
+    (match exemptClause? (memberRetentionOf? (cardNamed "Pledge of Loyalty")) with
      | some spec =>
        spec.removesAttachments &&
          (grantedAbilities spec).all (fun ability =>

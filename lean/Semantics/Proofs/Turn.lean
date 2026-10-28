@@ -685,19 +685,19 @@ theorem flashSacrificeRidesThePermission :
 /-- Each of the ten cards carries the sentence as the permission's rider, its first ability,
 and no sibling static [CR#113.2c]. -/
 theorem flashSacrificeCardsCarryTheRider :
-    [ Semantics.Cards.armorOfThorns, Semantics.Cards.graveServitude,
-      Semantics.Cards.lightningReflexes, Semantics.Cards.mysticVeil, Semantics.Cards.necromancy,
-      Semantics.Cards.parapet, Semantics.Cards.relicWard, Semantics.Cards.soar,
-      Semantics.Cards.spiderClimb, Semantics.Cards.wardOfLights ].map (fun c => match c.card with
+    [ (cardNamed "Armor of Thorns"), (cardNamed "Grave Servitude"),
+      (cardNamed "Lightning Reflexes"), (cardNamed "Mystic Veil"), (cardNamed "Necromancy"),
+      (cardNamed "Parapet"), (cardNamed "Relic Ward"), (cardNamed "Soar"),
+      (cardNamed "Spider Climb"), (cardNamed "Ward of Lights") ].map (fun c => match c.card with
         | .singleFaced face => face.characteristics.text.head?
         | _ => none) =
       List.replicate 10 (some asThoughFlashSacrificedAtCleanup) := rfl
 
-theorem okMysticVeil : Semantics.Cards.mysticVeil.card.check = [] := Semantics.Cards.mysticVeil.ok
+theorem okMysticVeil : (cardNamed "Mystic Veil").card.check = [] := (cardNamed "Mystic Veil").ok
 
 /-- Ward of Lights: the rider, and protection that doesn't remove it [CR#702.16n]. -/
-theorem okWardOfLights : Semantics.Cards.wardOfLights.card.check = [] :=
-  Semantics.Cards.wardOfLights.ok
+theorem okWardOfLights : (cardNamed "Ward of Lights").card.check = [] :=
+  (cardNamed "Ward of Lights").ok
 
 /-- The scoping is in the term: the rider reads the permission's clause back, so its "it" is
 this spell and "cast … this way" is the permitted cast [CR#113.2c]. Written as a separate static,

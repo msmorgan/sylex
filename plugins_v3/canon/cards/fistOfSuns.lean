@@ -1,6 +1,7 @@
 /-- Fist of Suns -/
-card fistOfSuns : Spelled :=
-  { name := "Fist of Suns", cost := [generic 3], types := [.artifact],
-    text :=
-      [ static (altCost (allOf (and [isSpell, did you (cast which) thisObject]))
-          [pip .white, pip .blue, pip .black, pip .red, pip .green]) ] }
+card := {
+  name := "Fist of Suns",
+  cost := [3],
+  types := [artifact],
+  text := [altCost (allOf [isSpell, did you (cast which) thisObject]) [white, blue, black, red, green]]
+}

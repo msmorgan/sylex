@@ -1,4 +1,7 @@
 /-- Upwelling -/
-card upwelling : Spelled :=
-  { name := "Upwelling", cost := [generic 3, pip .green], types := [.enchantment],
-    text := [static (manaRetention eachPlayer (unspent none))] }
+card := {
+  name := "Upwelling",
+  cost := [3, green],
+  types := [enchantment],
+  text := [manaRetention eachPlayer (unspent none)]
+}
