@@ -1,3 +1,4 @@
+/-- The chapter numbers in a Saga chapter ability. -/
 primitive chapterMark (chapters : List Nat := []) : GameEvent := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
   body :=

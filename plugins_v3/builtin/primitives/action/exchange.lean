@@ -1,3 +1,7 @@
+/-- Exchange operands with an all-or-nothing action [CR#701.12a]. The operands distinguish
+control, life totals, cards, zones, and numeric values [CR#701.12b..701.12g]. Text-box exchange
+instead creates a text-changing effect [CR#701.12h,612.5]. Life totals keep a group of players
+as their operand, so "two target players" can name both parties. -/
 primitive exchange (exchanged : Exchanged) : Action := {
   -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
   body := Semantics.Primitives.Action.exchange exchanged

@@ -1,3 +1,4 @@
+/-- A quantity equal to the given amount. -/
 primitive exactlyOf (amount : Amount) : Quantity := {
   spelling := "<amount>",
   body :=

@@ -1,3 +1,5 @@
+/-- "Gift a card" means the effect is "The chosen player draws a card."
+[CR#702.174e] -/
 /- The licensed phrasings of gift: its templating is not normative ("Gift a card", "Gift a
 tapped Fish"), so each is a Template over `gift` [CR#702.174a,702.174d..702.174i]. -/
 

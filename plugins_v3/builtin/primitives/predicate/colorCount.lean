@@ -1,3 +1,4 @@
+/-- Authoring primitive for `Predicate.colorCount`. -/
 primitive colorCount (comparator : Comparator) (count : Nat) : Predicate := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
   body :=

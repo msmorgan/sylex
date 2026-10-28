@@ -1,3 +1,4 @@
+/-- A quantity bounded by the given minimum and maximum. -/
 primitive range (low : Option Nat := none) (high : Option Nat := none) : Quantity := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
   body :=

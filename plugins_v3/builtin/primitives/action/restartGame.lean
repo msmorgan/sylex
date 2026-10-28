@@ -1,3 +1,4 @@
+/-- Restart the game. -/
 primitive restartGame : Action := {
   spelling := "restart the game",
   body :=

@@ -1,3 +1,4 @@
+/-- Authoring primitive for `Predicate.hasStatus`. -/
 primitive hasStatus (status : Status) : Predicate := {
   spelling := "<status>",
   body :=

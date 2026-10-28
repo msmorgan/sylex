@@ -1,3 +1,4 @@
+/-- A cost composed of all the listed costs. -/
 primitive compound (costs : List Cost := []) : Cost := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
   body :=

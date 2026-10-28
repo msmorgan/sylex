@@ -1,3 +1,4 @@
+/-- Authoring primitive for `StaticSpec.letterDefinition`. -/
 primitive letterDefinition (letter : Letter) (amount : Amount) : StaticSpec := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
   body :=

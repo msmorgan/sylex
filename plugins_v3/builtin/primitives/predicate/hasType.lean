@@ -1,3 +1,4 @@
+/-- Authoring primitive for `Predicate.hasType`. -/
 primitive hasType (t : CardType) : Predicate := {
   spelling := "<t>",
   body :=

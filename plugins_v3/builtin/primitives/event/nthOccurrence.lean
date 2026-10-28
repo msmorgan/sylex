@@ -1,3 +1,4 @@
+/-- The specified occurrence of an event within an optional period. -/
 primitive nthOccurrence (ordinal : Ordinal) (event : GameEvent)
     (per : Option Period := none) : GameEvent := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.

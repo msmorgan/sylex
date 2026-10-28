@@ -1,3 +1,4 @@
+/-- Test whether the named choice has the most votes, optionally allowing a tie. -/
 primitive voteLead (label : String) (orTied : Bool) : Condition := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
   body :=

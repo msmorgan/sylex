@@ -1,3 +1,4 @@
+/-- A choice between alternative costs. -/
 primitive or (costs : List Cost := []) : Cost := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
   body :=

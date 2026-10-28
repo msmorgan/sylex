@@ -1,3 +1,5 @@
+/-- "a P/T <colors> <subtypes> artifact creature token [with <abilities>]":
+`creatureToken` with the artifact card type beside creature. -/
 template artifactCreatureToken (power toughness : Nat) (colors : List Color)
     (subtypes : List Subtype) (abilities : List Ability := []) : CharacteristicBundle := {
 

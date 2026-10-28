@@ -1,3 +1,4 @@
+/-- "{N}": a numerical generic mana symbol [CR#107.4b]. -/
 template generic (amount : Nat) : ManaSymbol := {
   spelling := "{<amount>}",
   body :=

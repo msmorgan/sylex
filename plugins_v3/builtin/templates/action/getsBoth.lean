@@ -1,3 +1,5 @@
+/-- "<subject> gets +X/+X [<duration>]": the same delta to power and toughness,
+written once [CR#613.4c]. -/
 template getsBoth (subject : NounPhrase) (delta : Delta Amount)
     (duration : Option Duration := none) : Action := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.

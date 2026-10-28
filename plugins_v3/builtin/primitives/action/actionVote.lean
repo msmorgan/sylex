@@ -1,3 +1,5 @@
+/-- The actor votes for a choice from the ballot, with the specified starting player when supplied
+[CR#701.38a]. -/
 primitive actionVote (first : Option NounPhrase) (disclosure : Disclosure) (ballot : Ballot) (times : Option Quantity) : Action := {
   -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
   body := Semantics.Primitives.Action.vote first disclosure ballot times

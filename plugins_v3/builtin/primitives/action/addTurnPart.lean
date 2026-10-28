@@ -1,3 +1,4 @@
+/-- Add turns for the actor [CR#500.7], or add phases or steps to the turn [CR#500.8,500.9]. -/
 primitive addTurnPart (part : TurnPart) (count : Amount)
     (anchor : Option TurnPart := none) (followedBy : Option TurnPart := none) : Action := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.

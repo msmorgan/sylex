@@ -1,3 +1,4 @@
+/-- "up to <n>": a Quantity with the given upper bound. -/
 template upTo (n : Nat) : Quantity := {
   spelling := "up to <n>",
   body := range none (some n)

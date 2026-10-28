@@ -1,3 +1,4 @@
+/-- "planeswalker" -/
 template planeswalker : NounWord := {
   spelling := "planeswalker",
   body :=
