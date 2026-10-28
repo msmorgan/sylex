@@ -176,7 +176,7 @@ kernel.
 
 `plugins_v3/canon/cards/<name>.lean` contains one declaration per printed card. The authoring
 surface is `card := { name := "Printed name", ... }`, or `card := transforming { ... }`
-for multipart cards. Legacy named declarations remain accepted until canon cleanup.
+for multipart cards. Named (`card <ident> := …`) and `: Spelled` declarations are rejected.
 `cardNamed "Printed name"` retrieves the `Spelled` value (or its card when `Card` is expected);
 its `.ok` projection and `cardNamedOk "Printed name"` expose the checking proof. Printed names,
 including punctuation, are declaration keys; multipart names join with ` // `.

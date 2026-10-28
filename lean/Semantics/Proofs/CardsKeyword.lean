@@ -10,7 +10,7 @@ import Semantics.Proofs.CardsTrigger
 Port of `idris/src/Experimental/Cards/Keyword.idr`: the printed cards of the Keyword family
 (keyword abilities, their parameters and grants) and the bench items beside them.
 
-`battleSquadron` prints a `*/*` box: those slots are `none` under the printed-star ruling.
+Battle Squadron prints a `*/*` box: those slots are `none` under the printed-star ruling.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions

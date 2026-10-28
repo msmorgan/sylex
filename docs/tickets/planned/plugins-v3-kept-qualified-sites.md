@@ -1,26 +1,65 @@
 ---
-needs: [plugins-v3-canon-authoring-surface]
+needs: [plugins-v3-expansion-baseline-recursive-samples]
 ---
-# Eliminate the qualified sites retained by builtin cleanup
+# Eliminate the qualified sites and dependency-scan workarounds left by builtin cleanup
 
-Standard constraints apply.
+Standard constraints apply. Kept qualifications and workarounds are defects to eliminate, not
+permanent exceptions.
 
-Remove the remaining `Semantics.` qualifications retained in Step 2 of
-`plugins-v3-builtin-cleanup`. Change `ouqkwnvy` lists all 102 original sites; the cleanup
-ticket summarizes their causes. Reconcile that inventory with the current declarations.
+## Sites
 
-Fix the underlying obstacles before shortening the sites:
+1. **`Semantics.` qualifications.** Change `ouqkwnvy` lists the 102 sites kept in step 2 of
+   `plugins-v3-builtin-cleanup`. Reconcile that list with the current declarations; some may
+   since have been shortened by `plugins-v3-canon-authoring-surface`.
+2. **Partly unqualified sites that keep `Templates.<Sort>.`.** These pass the "zero
+   `Semantics.`" check in letter only. In each, a parameter of the same name shadows the bare
+   word:
+   - `templates/amount/eventSum.lean` and `eventCount.lean` (`Templates.LookbackSpan.within`)
+   - `templates/action/lookAt.lean` and `definitions/keyword_action/reveal.lean`
+     (`Templates.Exposed.cards`)
+   - `definitions/keyword_action/create.lean` (`Templates.CreationSpec.token`)
+3. **Dependency-scan workarounds:**
+   - `templates/ability/devourEntry.lean` writes `Action.devour` "so the untyped DAG does not add
+     a false cycle edge".
+   - `templates/zone/exileZone.lean` writes `zone .exile none` so the scan "does not form a
+     cycle with the `exile` action".
+   - The `exileZone` workaround is written into `lean/CONTRACTS.md` (around `:145`) and
+     `lean/README.md` (around `:250`) as if it were the contract. Remove it from both once
+     fixed.
 
-- Untyped Lean bundle-DAG cycle false positives on `Semantics.Definitions.*` and
-  `Semantics.CardType.*`, preserving authored calls, deed references and parameter identity.
-- The `.sets` multi-token argument check in
-  `crates/deckmaste_semantics_v3/src/lower/compute.rs:495` for
-  `Semantics.Characteristics.valueEdits`, including the typed conditional in
+## Causes to fix first
+
+- **The six `Semantics.Definitions.*` calls that fail when unqualified** (`madness`, `airbend`,
+  `devour`, `regenerate`, `regeneration`, `controllerSacrifices`).
+  - **The root cause is not known.** The overnight log's hypothesis is that `referencedIdents`
+    reads `structInstField` at `stx[1]` instead of `stx[2]`. That is wrong: in Lean v4.35,
+    `stx[1]` holds the `:= value`.
+  - The "untyped bundle-DAG cycle false positive" that change `ouqkwnvy` and the overnight log
+    give as the cause is a guess. Each referenced action has a single declaration, so a bare
+    reference produces a normal edge.
+  - Reproduce each failure on a scratch copy and record the actual error before changing
+    `bundleDependencies` or the elaboration order.
+- **The untyped dependency scan.** `bundleDependencies` (Lean) and `Bundle::load` (Rust) add edges
+  by bare name without regard to expected type. That is behind items 3's two workarounds. Make
+  the edge typed by the reference's expected sort where it is known. Otherwise drop edges that
+  would only close a cycle through a different return type, and report a cycle that remains
+  ambiguous.
+- **The `.sets` multi-token argument check** in `crates/deckmaste_semantics_v3/src/lower/compute.rs`
+  (around `:495`, `Semantics.Characteristics.valueEdits`), including the typed conditional in
   `copyCharacteristics`.
-- Qualified helper/projection dispatch in templates (`Characteristics.*`, `Cost.asPaid`,
+- **Parameter-shadowed bare words** (item 2). Let a NounPhrase or Duration parameter coexist with
+  a same-named word of another sort, the way `elabClosedWord` already prefers a compatible local.
+- **Qualified helper and projection dispatch** in Templates (`Characteristics.*`, `Cost.asPaid`,
   `Location.observedOnDeparture`, `QualityPayload.edits`) and qualified pattern heads.
 
-Use the settled canon authoring surface, preserving helper behavior and pattern matching.
-Require unchanged builtin and canon expansions, clean Lean checking, and focused Rust and
-Lean regressions for dependency resolution and helper argument parsing. Kept qualifications
-are defects to eliminate, not permanent exceptions.
+## Acceptance
+
+- Zero `Semantics.` and zero `Templates.<Sort>.` qualifications in
+  `plugins_v3/builtin/{definitions,templates,rules}`.
+- `devourEntry` writes `devour`, and `exileZone` writes its bare form.
+- The `exileZone` workaround text is gone from CONTRACTS.md and README.md.
+- Focused Lean and Rust regressions for typed dependency edges, parameter-shadowed words and
+  helper argument parsing.
+- Builtin and canon expansion baselines show 0 differences.
+- Gates: `cargo xtask lean check`. Run `cargo test` and clippy for `deckmaste_semantics_v3` and
+  `xtask`.

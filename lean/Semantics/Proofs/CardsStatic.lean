@@ -12,7 +12,7 @@ Port of `idris/src/Experimental/Cards/Static.idr`: the printed cards of the Stat
 (continuous clauses: pumps, definitions, ascriptions, locks, alternative costs, visibility) and
 the bench items beside them.
 
-`maro`, `peopleOfTheWoods` and `cultivatorColossus` print `*` boxes: those slots are `none`
+Maro, People of the Woods and Cultivator Colossus print `*` boxes: those slots are `none`
 under the printed-star ruling, and their Characteristic-Defining Abilities set them.
 -/
 

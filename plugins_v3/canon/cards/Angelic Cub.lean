@@ -1,7 +1,9 @@
 /-- "Whenever this creature becomes the target of a spell or ability for the first time each turn,
 put a +1/+1 counter on it": "for the first time each turn" watches only the first matching trigger
-event each turn [CR#603.2], and "it" in the effect resolves to `thisCreature` rather than the
-targeting spell or ability. -/
+event each turn, and "it" in the effect resolves to `thisCreature` rather than the targeting spell
+or ability.
+Fragment: the conditional flying sentence ("As long as this creature has three or more +1/+1
+counters on it, it has flying") is missing until `lean-v3-preposed-static-condition-ordering`. -/
 card := {
   name := "Angelic Cub",
   cost := [1, white],
