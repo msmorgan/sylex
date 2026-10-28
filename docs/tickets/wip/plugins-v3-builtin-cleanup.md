@@ -34,11 +34,25 @@ agents. Land each step as its own change, with the baseline compared after each 
 3. **Rename the `Type.ident.lean` files.** There are 47 `*.*.lean` files. Rename each to
    `<ident>.lean` and remove the sort prefix from its declaration header. Bundle keys already
    use `(bare_name, return_type)`, so the declaration key does not change.
-   - One rename collides: `templates/action/Status.become.lean` would become a second
-     `become : Action`. Give it a distinct name and record it as an explicit baseline rename.
-   - The other same-folder pairs (`nthOccurrence`, `ofColor`) differ in return type and are
-     fine.
-4. **Retire `primitives/noun/NounPhrase.any.lean` and `Subject.any.lean`.** Their call sites
+   - Rename `templates/action/Status.become.lean` to `becomeStatus.lean`, with declaration
+     `becomeStatus (status : Status) : Action`. Record
+     `Status.become : Action` → `becomeStatus : Action` in the baseline rename map.
+   - Move `primitives/event/WouldClause.nthOccurrence.lean` to
+     `primitives/would/nthOccurrence.lean`, preserving `(ordinal : Ordinal)`
+     `(clause : WouldClause)` `(per : Option Period := none) : WouldClause`.
+   - Move `primitives/mana/ManaTypeTerm.ofColor.lean` to
+     `primitives/mana_type/ofColor.lean` and `primitives/noun/Subject.any.lean` to
+     `primitives/subject/any.lean`. Distinct return types permit shared bare names,
+     but distinct files are still required.
+   - Preserve every declaration's parameters, types, defaults and body; change only the name.
+     Preserve call-site arguments, including the three proofs' actual untapped/tapped values.
+   - `Authoring.lean` retains return-sort aliases. The five parameter-shadowed calls in
+     `create`, `reveal`, `lookAt`, `eventCount` and `eventSum`, and `Action.devour` in
+     `devourEntry`, still resolve through those aliases.
+   - Application dispatch unwraps `Option` before choosing a return sort. Token coercion
+     evidence uses `Templates.TokenSpec.written`; exports and authoring-tree expectations
+     follow the renamed declarations.
+4. **Retire `primitives/noun/any.lean` and `primitives/subject/any.lean`.** Their call sites
    use the `AnyValue` `any` instance instead (`Words.lean:20`, `Primitives.lean:80-81`).
 5. **Inline `templates/predicate/army.lean` into `definitions/keyword_action/amass.lean`.**
    - `army` was a local helper for amass [CR#701.47a], not a general predicate.
@@ -46,6 +60,24 @@ agents. Land each step as its own change, with the baseline compared after each 
      in the body (it is used twice) instead of pasting it twice.
    - The expected baseline changes are the removed `army : Predicate` key and the unchanged
      amass expansion.
+
+## Step 2 kept sites and follow-up ownership
+
+Change `ouqkwnvy` lists all 102 retained qualified sites. They comprise:
+
+- `Semantics.CardType.*` and `Semantics.Definitions.*`: untyped bundle-DAG cycle false
+  positives, authored-call resolution and deed/parameter identity handling.
+- Helper and projection calls in templates: `Characteristics.*`, `Cost.asPaid`,
+  `Location.observedOnDeparture` and `QualityPayload.edits` use qualified Rust dispatch.
+- `QualityOp` in `copyCharacteristics`: the conditional needs type information, and
+  `Characteristics.valueEdits` requires a single-token final argument; `.sets` exposes
+  the multi-token argument check in `crates/deckmaste_semantics_v3/src/lower/compute.rs:495`.
+- Qualified pattern heads retain their structural matching meaning.
+
+These are defects tracked by `plugins-v3-kept-qualified-sites`, after
+`plugins-v3-canon-authoring-surface`. Shared-name typeclass dispatch belongs to
+`lean-v3-overloaded-primitive-typeclasses`; the 11 prefixed structural primitive names
+belong to `plugins-v3-shadowed-primitive-names`, after `plugins-v3-primitive-template-boundary`.
 
 ## Acceptance
 

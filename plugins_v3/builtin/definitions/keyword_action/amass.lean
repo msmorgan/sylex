@@ -5,14 +5,15 @@ action amass (subtype : Subtype) (count : Amount) : Action := {
   -- substitution cannot inflect.
   lexical := { verbs := [{ lemma := "amass", frames := [TransitiveAmount, Monotransitive] }] },
   body :=
+    have isArmy : Predicate := and [hasSubtype army, isCreature, actorControls];
     sequentially
       [doIf
-          (not (exists_ Predicate.army))
+          (not (exists_ isArmy))
           (create 1
             (written
               (creatureToken 0 0 [.black]
                 [subtype, army]))),
-        choose (a Predicate.army),
+        choose (a isArmy),
         putCounters count (printedKind p1p1Counter)
           (that (.type Semantics.CardType.creature)),
         doIf

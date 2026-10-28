@@ -1508,14 +1508,9 @@ mod tests {
         let before = expand_keys(&bundle, std::iter::once(&key)).outcomes;
         let marker = "| Semantics.DefinedSlots.bothEach =>";
         let (prefix, arm) = original.split_once(marker).unwrap();
-        std::fs::write(
-            &file,
-            format!(
-                "{prefix}{marker}{}",
-                arm.replace("Semantics.QualityOp.sets", "Semantics.QualityOp.adds")
-            ),
-        )
-        .unwrap();
+        let edited_arm = arm.replace(".sets", ".adds");
+        assert_ne!(edited_arm, arm, "the mutation must change the bothEach arm");
+        std::fs::write(&file, format!("{prefix}{marker}{edited_arm}")).unwrap();
         let edited = expand_keys(&Bundle::load(&plugin).unwrap(), std::iter::once(&key)).outcomes;
         let comparison = compare(&before, &edited, &[], &[]).unwrap();
         assert_eq!(comparison.differences, [Difference::Changed(key.clone())]);
