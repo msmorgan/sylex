@@ -81,3 +81,25 @@ elaborator and Rust reader/lowering path, plus a test on each side. Develop test
   from the builtin dot-form rewrite, which must also show zero changes.
 - Gates: `cargo xtask lean check`. Run tests and clippy for `deckmaste_semantics_v3`,
   `deckmaste_lowering_v3` and `xtask`.
+
+## Expansion baseline workflow
+
+Save before editing; this single invocation includes builtin and canon, with canon
+expanded over builtin:
+
+```bash
+cargo xtask expansions --out docs/evidence/plugins-v3-expansions/plugins-v3-canon-authoring-surface/before
+```
+
+After the change, require zero differences and exit 0:
+
+```bash
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-canon-authoring-surface/before
+```
+
+No rename map or expected differences are needed.
+
+The saved format is `before/snapshot.json` (version 2). Save commands refuse an
+existing snapshot unless `--force` is deliberately added; unrelated nonempty
+directories are always refused. Comparison writes nothing unless `--out` is also
+given. Review the sampling summary for constructor omissions and capped products.

@@ -59,3 +59,51 @@ Tickets that cite these helpers by name and must be re-pointed when they are cla
 - The 27 files are deleted, and the owning declarations' conferral expansions are unchanged
   (baseline: only the 27 template keys are removed).
 - `cargo xtask lean check`. Run tests for `deckmaste_semantics_v3` and `xtask`.
+
+## Expansion baseline workflow
+
+Save before editing; this single invocation includes builtin and canon, with canon
+expanded over builtin:
+
+```bash
+cargo xtask expansions --out docs/evidence/plugins-v3-expansions/plugins-v3-conferral-inlining/before
+```
+
+After inlining, accept only the 27 removed helpers; owning registry expansions
+and canon must remain unchanged. No rename map is needed:
+
+```bash
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-conferral-inlining/before \
+  --expect 'toughnessZero : Conferral' \
+  --expect 'lethalDamage : Conferral' \
+  --expect 'summoningSicknessAttack : Conferral' \
+  --expect 'summoningSicknessActivation : Conferral' \
+  --expect 'creatureDamageMarking : Conferral' \
+  --expect 'creatureCanAttack : Conferral' \
+  --expect 'creatureCanBlock : Conferral' \
+  --expect 'combatant : Conferral' \
+  --expect 'loyaltyZero : Conferral' \
+  --expect 'planeswalkerLoyalty : Conferral' \
+  --expect 'planeswalkerCanBeAttacked : Conferral' \
+  --expect 'planeswalkerLoyaltyDamage : Conferral' \
+  --expect 'battleDefenseZero : Conferral' \
+  --expect 'battleDefense : Conferral' \
+  --expect 'battleCanBeAttacked : Conferral' \
+  --expect 'battleDefenseDamage : Conferral' \
+  --expect 'battleProtector : Conferral' \
+  --expect 'siegeProtector : Conferral' \
+  --expect 'siegeLastCounter : Conferral' \
+  --expect 'siegeDefenseZero : Conferral' \
+  --expect 'monarchDraw : Conferral' \
+  --expect 'monarchSteal : Conferral' \
+  --expect 'initiativeSteal : Conferral' \
+  --expect 'sagaLoreIncrement : Action' \
+  --expect 'sagaHasChapterAbilities : Condition' \
+  --expect 'sagaHasTriggeredChapter : Condition' \
+  --expect 'siegeHasNoWaitingTrigger : Condition'
+```
+
+The saved format is `before/snapshot.json` (version 2). Save commands refuse an
+existing snapshot unless `--force` is deliberately added; unrelated nonempty
+directories are always refused. Comparison writes nothing unless `--out` is also
+given. Review the sampling summary for constructor omissions and capped products.

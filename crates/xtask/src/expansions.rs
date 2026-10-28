@@ -1,26 +1,46 @@
 //! Typed expansion snapshots of loose `plugins_v3` declarations.
 //!
-//! Each declaration is instantiated with deterministic constructor-basis
-//! arguments. Defaulted parameters keep their defaults. Registry snapshots
-//! include conferrals. Every declaration must produce a typed value; failures
-//! make the command fail.
-//!
-//! Before a cleanup, save a baseline with
+//! By default one invocation saves both builtin and canon, expanding canon over
+//! the builtin prelude. Before a cleanup, save:
 //! `cargo xtask expansions --out docs/evidence/plugins-v3-expansions/<ticket>/before`.
-//! Make the change, then run
+//! Make the change, then compare:
 //! `cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/<ticket>/before`.
-//! Comparison alone writes nothing. Add `--out <DIR>` to also save the new snapshot.
-//! Use `--plugin plugins_v3/canon` on both runs to inspect only canon declarations,
-//! expanded over the builtin prelude. The default plugin is `plugins_v3/builtin`.
+//! Comparison alone writes nothing; `--out <DIR>` also saves the new snapshot.
+//! Existing snapshots require `--force` to overwrite, including legacy `_index.txt`
+//! output. Unrelated nonempty directories are always refused. Repeatable
+//! `--plugin <PATH>` selects specific bundles; `--no-prelude` loads them alone.
 //!
-//! The versioned JSON `_index.txt` contains sorted records keyed by separate
-//! `(bare_name, return_type)` fields, independent of source paths. Names (including
-//! printed card names with punctuation or slashes) never become filesystem paths.
-//! Use repeatable `--expect 'name : Type'` (or an unambiguous bare name) to accept
-//! added, removed, or changed keys. Use `--rename 'old : Type=new : Type'` for
-//! key renames: sampled arguments and expanded values must still agree, unless
-//! the changed key is also expected. For names containing `=`, `--rename-file`
-//! accepts a JSON array of `[old_key, new_key]` pairs. Unused allowances fail.
+//! Version 2 `snapshot.json` contains sorted records keyed by separate
+//! `(bare_name, return_type, sample)` fields, independent of source paths. The
+//! sample is the invocation argument string (empty for a closed or default-only
+//! invocation). Every record includes whitespace-normalized `spelling` and
+//! `lexical` fields, preserving absence. Names never become filesystem paths.
+//!
+//! Finite constructors, both booleans, absent/present options, empty/singleton
+//! lists, default omission, and representative populated records and mixed
+//! function results are sampled. Constructor fields use deterministic base
+//! values. Each declaration has a cap of 256 invocations: individual parameter
+//! variants precede lexicographic product combinations. The summary reports
+//! capped combinations and omitted recursive constructors; this is a bounded
+//! comparison. Registry snapshots include conferrals. Every sample must produce
+//! a typed value; expansion failures make the command fail.
+//!
+//! Changed declarations print unified diffs including sample arguments, spelling,
+//! lexical fields, and expanded values. Repeatable `--expect 'name : Type'` (or
+//! an unambiguous bare name) accepts added, removed, or changed declarations.
+//! Inspect each diff even when expected: allowances do not distinguish a spelling
+//! edit from a semantic edit. Unused or duplicate allowances fail.
+//!
+//! `--rename 'old : Type=new : Type'` accepts declaration key renames. For names
+//! containing `=`, use `--rename-file docs/evidence/plugins-v3-expansions/<ticket>/renames.json`,
+//! a JSON array of `[old_key, new_key]` pairs. Maps are simultaneous, allowing
+//! swaps and chains without collisions with unrenamed survivors. Accepted renames
+//! have a separate count (`0 differences, 908 renames` succeeds). A renamed
+//! declaration whose record also changes prints `changed <new_key>` and requires
+//! `--expect <new_key>` too. Declaration renames normalize `<decl>.<param>` and
+//! `<decl>.actor` mention IDs throughout callers. Parameter renames on declarations
+//! with repeated `NounPhrase` parameters still change `<decl>.<param>` IDs in
+//! callers and remain visible in their diffs.
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::fmt::Write as _;

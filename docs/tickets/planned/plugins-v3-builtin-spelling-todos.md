@@ -31,4 +31,35 @@ goes in the change description; it is not tracked evidence.
 
 - Every remaining `TODO(spelling)` falls in bucket 3 and says what is deferred.
 - Every bucket-2 declaration has a `spelling`.
-- The expansion baseline shows no changes, because Lean discards `spelling`.
+- The expansion baseline accepts every bucket-2 declaration via `--expect`. Review
+  every unified diff to confirm that only `spelling` changed; semantic expansions
+  and `lexical` must remain unchanged.
+
+## Expansion baseline workflow
+
+Save before editing; this single invocation includes builtin and canon, with canon
+expanded over builtin:
+
+```bash
+cargo xtask expansions --out docs/evidence/plugins-v3-expansions/plugins-v3-builtin-spelling-todos/before
+```
+
+The triage script writes every bucket-2 declaration key (`name : Type`, one per
+line, no blank lines) to `docs/evidence/plugins-v3-expansions/plugins-v3-builtin-spelling-todos/bucket-2.keys`. Pass every key
+through `--expect` after adding its spelling:
+
+```bash
+mapfile -t bucket2 < docs/evidence/plugins-v3-expansions/plugins-v3-builtin-spelling-todos/bucket-2.keys
+expected=()
+for key in "${bucket2[@]}"; do expected+=(--expect "$key"); done
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-builtin-spelling-todos/before "${expected[@]}"
+```
+
+Check every unified diff: only `spelling` may change. Semantic expansions and
+`lexical` must stay unchanged, including on expected keys; `--expect` accepts a
+declaration difference without classifying its contents. No rename map is needed.
+
+The saved format is `before/snapshot.json` (version 2). Save commands refuse an
+existing snapshot unless `--force` is deliberately added; unrelated nonempty
+directories are always refused. Comparison writes nothing unless `--out` is also
+given. Review the sampling summary for constructor omissions and capped products.

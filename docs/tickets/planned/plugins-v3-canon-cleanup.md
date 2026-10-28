@@ -60,3 +60,36 @@ with parallel agents. Land it in three changes, comparing the expansion baseline
   `xtask`.
 - Tickets that cite canon cards by camelCase name or old path are re-pointed. This includes
   `lean-v3-card-head-noun-sweep`, which should not run concurrently with this ticket.
+
+## Expansion baseline workflow
+
+Save before editing; this single invocation includes builtin and canon, with canon
+expanded over builtin:
+
+```bash
+cargo xtask expansions --out docs/evidence/plugins-v3-expansions/plugins-v3-canon-cleanup/before
+```
+
+Before rewriting the declaration headers, the migration script writes all 908
+old identifier keys and new printed-name keys to `docs/evidence/plugins-v3-expansions/plugins-v3-canon-cleanup/renames.json`
+as JSON `[old_key, new_key]` pairs (including ` : Spelled` on both endpoints).
+Keep names verbatim, including spaces, punctuation and ` // `. After each of the
+three landed steps compare to the original baseline with the same map:
+
+```bash
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-canon-cleanup/before \
+  --rename-file docs/evidence/plugins-v3-expansions/plugins-v3-canon-cleanup/renames.json
+```
+
+Require `0 differences, 908 renames` and exit 0; file moves and comment removal
+add no differences. Do not use `--expect` to conceal changed expansions.
+
+The saved format is `before/snapshot.json` (version 2). Save commands refuse an
+existing snapshot unless `--force` is deliberately added; unrelated nonempty
+directories are always refused. Comparison writes nothing unless `--out` is also
+given. Review the sampling summary for constructor omissions and capped products.
+
+Declaration rename maps also normalize `<decl>.<param>` and `<decl>.actor` mention
+IDs in callers, simultaneously, so swaps and chains work. Renaming a repeated
+`NounPhrase` parameter changes `<decl>.<param>` IDs in callers; those changes
+remain visible and require review and explicit expectations where intended.

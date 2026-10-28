@@ -55,3 +55,55 @@ agents. Land each step as its own change, with the baseline compared after each 
 - The baseline comparison reports only the renames listed in steps 3 and 5.
 - Gates: `cargo xtask lean check`. Run tests and clippy for `deckmaste_semantics_v3`,
   `deckmaste_lowering_v3` and `xtask`.
+
+## Expansion baseline workflow
+
+Save before editing; this single invocation includes builtin and canon, with canon
+expanded over builtin:
+
+```bash
+cargo xtask expansions --out docs/evidence/plugins-v3-expansions/plugins-v3-builtin-cleanup/before
+```
+
+After steps 1 and 2, require zero differences:
+
+```bash
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-builtin-cleanup/before
+```
+
+The rewrite script for step 3 writes `docs/evidence/plugins-v3-expansions/plugins-v3-builtin-cleanup/renames.json`, a JSON array
+of `[old_key, new_key]` pairs containing the settled replacement for
+`Status.become : Action`. File moves whose declaration key stays the same need no entry.
+After step 3:
+
+```bash
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-builtin-cleanup/before \
+  --rename-file docs/evidence/plugins-v3-expansions/plugins-v3-builtin-cleanup/renames.json
+```
+
+After step 4, compare to the same saved baseline, retaining the rename map and
+accepting precisely the two retired declarations:
+
+```bash
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-builtin-cleanup/before \
+  --rename-file docs/evidence/plugins-v3-expansions/plugins-v3-builtin-cleanup/renames.json \
+  --expect 'any : NounPhrase' --expect 'any : Subject'
+```
+
+After step 5, add the removed helper; amass must remain unchanged:
+
+```bash
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-builtin-cleanup/before \
+  --rename-file docs/evidence/plugins-v3-expansions/plugins-v3-builtin-cleanup/renames.json \
+  --expect 'any : NounPhrase' --expect 'any : Subject' --expect 'army : Predicate'
+```
+
+The saved format is `before/snapshot.json` (version 2). Save commands refuse an
+existing snapshot unless `--force` is deliberately added; unrelated nonempty
+directories are always refused. Comparison writes nothing unless `--out` is also
+given. Review the sampling summary for constructor omissions and capped products.
+
+Declaration rename maps also normalize `<decl>.<param>` and `<decl>.actor` mention
+IDs in callers, simultaneously, so swaps and chains work. Renaming a repeated
+`NounPhrase` parameter changes `<decl>.<param>` IDs in callers; those changes
+remain visible and require review and explicit expectations where intended.

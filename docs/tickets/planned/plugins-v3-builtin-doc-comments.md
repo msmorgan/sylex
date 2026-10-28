@@ -45,3 +45,25 @@ extracted files (for example `absorb.lean`).
 - The CR citation gates are clean: `cite check --list-noncompliant` is empty, `cite check`
   reports 0 stale, and `bless` has been run.
 - The baseline shows no changes.
+
+## Expansion baseline workflow
+
+Save before editing; this single invocation includes builtin and canon, with canon
+expanded over builtin:
+
+```bash
+cargo xtask expansions --out docs/evidence/plugins-v3-expansions/plugins-v3-builtin-doc-comments/before
+```
+
+After the change, require zero differences and exit 0:
+
+```bash
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-builtin-doc-comments/before
+```
+
+No rename map or expected differences are needed.
+
+The saved format is `before/snapshot.json` (version 2). Save commands refuse an
+existing snapshot unless `--force` is deliberately added; unrelated nonempty
+directories are always refused. Comparison writes nothing unless `--out` is also
+given. Review the sampling summary for constructor omissions and capped products.

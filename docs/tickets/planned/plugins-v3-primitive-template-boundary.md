@@ -58,3 +58,34 @@ say which side a binding with fixed arguments belongs on. The extraction
 
 The acceptance criteria are written down as part of the ruling. Whatever they are, they must
 be checkable by a script over declaration headers and bodies, not by "etc."
+
+## Expansion baseline workflow
+
+Save before editing; this single invocation includes builtin and canon, with canon
+expanded over builtin:
+
+```bash
+cargo xtask expansions --out docs/evidence/plugins-v3-expansions/plugins-v3-primitive-template-boundary/before
+```
+
+Once the ruling is settled, the rewrite script writes `docs/evidence/plugins-v3-expansions/plugins-v3-primitive-template-boundary/renames.json`
+as a JSON array of `[old_key, new_key]` pairs for every changed declaration key.
+Use `[]` if no keys change. Compare after the rewrite:
+
+```bash
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-primitive-template-boundary/before \
+  --rename-file docs/evidence/plugins-v3-expansions/plugins-v3-primitive-template-boundary/renames.json
+```
+
+Require zero differences; accepted renames have their own count. Any proposed
+meaning change needs the design ruling before an explicit `--expect` allowance.
+
+The saved format is `before/snapshot.json` (version 2). Save commands refuse an
+existing snapshot unless `--force` is deliberately added; unrelated nonempty
+directories are always refused. Comparison writes nothing unless `--out` is also
+given. Review the sampling summary for constructor omissions and capped products.
+
+Declaration rename maps also normalize `<decl>.<param>` and `<decl>.actor` mention
+IDs in callers, simultaneously, so swaps and chains work. Renaming a repeated
+`NounPhrase` parameter changes `<decl>.<param>` IDs in callers; those changes
+remain visible and require review and explicit expectations where intended.

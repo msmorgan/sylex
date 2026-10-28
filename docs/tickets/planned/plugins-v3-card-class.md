@@ -53,3 +53,35 @@ consumer. The verified list follows; re-grep for `permanent` and
 - The expansion baseline changes only the ten `card_type` declarations.
 - Gates: `cargo xtask lean check`. Run tests and clippy for `deckmaste_semantics_v3`,
   `deckmaste_lowering_v3` and `xtask`.
+
+## Expansion baseline workflow
+
+Save before editing; this single invocation includes builtin and canon, with canon
+expanded over builtin:
+
+```bash
+cargo xtask expansions --out docs/evidence/plugins-v3-expansions/plugins-v3-card-class/before
+```
+
+After the change, inspect the unified diffs for the ten expected registry changes:
+
+```bash
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-card-class/before \
+  --expect 'artifact : CardType' \
+  --expect 'battle : CardType' \
+  --expect 'creature : CardType' \
+  --expect 'dungeon : CardType' \
+  --expect 'enchantment : CardType' \
+  --expect 'instant : CardType' \
+  --expect 'kindred : CardType' \
+  --expect 'land : CardType' \
+  --expect 'planeswalker : CardType' \
+  --expect 'sorcery : CardType'
+```
+
+Every other declaration must compare unchanged. No rename map is needed.
+
+The saved format is `before/snapshot.json` (version 2). Save commands refuse an
+existing snapshot unless `--force` is deliberately added; unrelated nonempty
+directories are always refused. Comparison writes nothing unless `--out` is also
+given. Review the sampling summary for constructor omissions and capped products.
