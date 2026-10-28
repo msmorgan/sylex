@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-build-speed]
 ---
 # "When you lose control of <object>" has no event
 

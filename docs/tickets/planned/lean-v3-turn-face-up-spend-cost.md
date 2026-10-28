@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-build-speed]
 ---
 # Which cost a turn-face-up spend purpose pays
 

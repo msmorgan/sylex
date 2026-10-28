@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-build-speed]
 ---
 # Pin "that crewed it this turn" and "that saddled it this turn"
 

@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-build-speed]
 ---
 # Enlist: an optional cost to attack and its linked trigger
 

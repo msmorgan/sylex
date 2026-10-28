@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-action-clause-spine]
+needs: [lean-v3-action-clause-spine, lean-build-speed]
 ---
 **[port-required: semantics-v3] The lethal-damage state-based actions have no
 spelling.** Found by `lean-rules-tables` (2026-09-07): [CR#704.5g] reads the

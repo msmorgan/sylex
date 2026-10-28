@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-colored-mana-spent-count, plugins-v3-builtin-primitives-and-templates]
+needs: [lean-v3-colored-mana-spent-count, plugins-v3-builtin-primitives-and-templates, lean-build-speed]
 ---
 # "At least three mana of the same color was spent to cast it"
 

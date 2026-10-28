@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-primitive-template-boundary]
+needs: [plugins-v3-data-language]
 ---
 # Remove the remaining sort-prefixed structural primitive names
 

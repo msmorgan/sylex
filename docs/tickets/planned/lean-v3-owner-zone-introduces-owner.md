@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-checker-and-drt-fixes, plugins-v3-builtin-primitives-and-templates]
+needs: [lean-v3-checker-and-drt-fixes, plugins-v3-builtin-primitives-and-templates, lean-build-speed]
 ---
 # "Its owner's hand" introduces the owner
 

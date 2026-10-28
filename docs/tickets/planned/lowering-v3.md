@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-canon, plugins-v3-card-class, plugins-v3-builtin-cleanup, plugins-v3-conferral-inlining, plugins-v3-primitive-template-boundary, plugins-v3-canon-cleanup]
+needs: [semantics-rust-rewrite]
 ---
 **Create `crates/deckmaste_lowering_v3`: `semantics_v3` to `core` (updated
 2026-10-14 per [`docs/decisions/semantics-v3.md`](../../decisions/semantics-v3.md)).**

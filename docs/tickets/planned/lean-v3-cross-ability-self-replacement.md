@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-spell-abilities-share-targets, plugins-v3-builtin-primitives-and-templates]
+needs: [lean-v3-spell-abilities-share-targets, plugins-v3-builtin-primitives-and-templates, lean-build-speed]
 ---
 # A later spell ability's "instead" replaces an earlier spell ability's effect
 

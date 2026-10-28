@@ -1,9 +1,10 @@
 ---
-needs: [plugins-v3-expansion-baseline-recursive-samples]
+needs: [plugins-v3-data-language]
 ---
 # `at_` takes a turn point; `when` and `whenever` take an event
 
-Standard constraints apply.
+Standard constraints apply. Implement in the `plugins-v3-data-language` grammar, in Lean only:
+the Rust crates are being rewritten (`semantics-rust-rewrite`).
 
 ## The defect
 
@@ -40,9 +41,8 @@ same kind of thing:
 
 ## Acceptance
 
-- `at_ (does it enter)` and `whenever (beginningOfYour upkeep)` fail to elaborate in both Lean
-  and Rust, pinned by negative tests.
-- Builtin and canon expansion baselines show 0 differences, apart from keys this ticket
-  renames, each listed.
-- Gates: `cargo xtask lean check`. Run `cargo test` and clippy for `deckmaste_semantics_v3` and
-  `xtask`.
+- `at_ (does it enter)` and `whenever (beginningOfYour upkeep)` fail to elaborate, pinned by
+  negative Lean tests.
+- The Lean dump (`lean-elaborated-value-dump`) shows 0 differences, apart from keys this
+  ticket renames, each listed.
+- Gate: `cargo xtask lean check`.

@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [lean-build-speed]
 ---
 # Preposed condition ordering on `StaticSpec.conditional` and Angelic Cub's second ability
 
