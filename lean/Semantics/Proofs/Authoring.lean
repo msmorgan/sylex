@@ -154,12 +154,12 @@ example : Subtype := Semantics.Primitives.Subtype.spell "Adventure"
 #guard_msgs in
 example : Spelled := spelled <| .singleFaced
   { characteristics :=
-    { name := "Authoring witness", types := [{ name := "Artifact", permanent := false }],
+    { name := "Authoring witness", types := [{ name := "Artifact", cardClass := none }],
       cost := some [generic 1] } }
 
 /-- error: Unknown identifier `Semantics.Primitives.CardType.mk` -/
 #guard_msgs in
-example : CardType := Semantics.Primitives.CardType.mk "Artifact" true [] false
+example : CardType := Semantics.Primitives.CardType.mk "Artifact" (some CardClass.permanentCard) []
 
 -- `CounterKind`, `DesignationLabel` and `RelationLabel` are catalog items in the same way
 -- (`Semantics.Definitions.Counters`, `.Designations`, `.Relations`): each value carries its own
@@ -744,7 +744,7 @@ counter testCounter := { lexical := { lemma := "test counter", plural := "test c
 subtype testSubtype := { name := "Test", kind := creature }
 subtype testSpellSubtype := { name := "Test spell", kind := .spell }
 designation testDesignation := { lexical := { lemma := "test designation" }, scope := .heldBy .player, sole := true }
-card_type testCardType := { name := "Test", permanent := false }
+card_type testCardType := { name := "Test" }
 relation testRelation := { lexical := { lemma := "test relation" } }
 token testToken := { name := "Test", token := { types := [artifact] } }
 sba testSba := { scope := creature, when := exists_ creature, then_ := draw 1 }
@@ -776,7 +776,7 @@ example : parameterKeyword.label = KeywordLabel.named "parameterKeyword" := rfl
 example : testDesignation = DesignationLabel.named "testDesignation" (.heldBy .player) true := rfl
 example : testRelation = RelationLabel.named "testRelation" := rfl
 example : testSpellSubtype = Subtype.spell "Test spell" := rfl
-example : testCardType = { name := "Test", permanent := false } := rfl
+example : testCardType = { name := "Test", cardClass := none } := rfl
 
 example : RegistryDefinition.check testCounter_definition = [] := ok_testCounter
 example : RegistryDefinition.check testSubtype_definition = [] := ok_testSubtype

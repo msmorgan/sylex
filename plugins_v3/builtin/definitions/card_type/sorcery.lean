@@ -6,8 +6,7 @@ card_type sorcery := {
   lexical := { lemma := "sorcery" },
   spelling := "sorcery",
   name := "Sorcery",
-  permanent := false,
-  instantOrSorcery := true,
+  cardClass := some .instantOrSorceryCard,
   stats := [],
   confers := [castableFrom yourHand asSorcery]
 }

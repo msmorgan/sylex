@@ -71,9 +71,10 @@ theorem permanentPerformedActions :
 /-- The six permanent types are artifact, battle, creature, enchantment, land and planeswalker
 [CR#110.4]; instant, sorcery, kindred and dungeon are not [CR#110.4,309.2c]. -/
 theorem permanentTypesAreDeclared :
-    cardTypes.filter (·.permanent) =
+    cardTypes.filter (·.cardClass == some .permanentCard) =
         [.creature, .artifact, .land, .enchantment, .planeswalker, .battle] ∧
-      cardTypes.filter (!·.permanent) = [.instant, .sorcery, .kindred, .dungeon] := by decide
+      cardTypes.filter (·.cardClass != some .permanentCard) =
+        [.instant, .sorcery, .kindred, .dungeon] := by decide
 
 /-- A card type's stats are its declaration's: power and toughness are a creature's
 [CR#302.4], loyalty a planeswalker's [CR#306.5] and defense a battle's [CR#310.4]; no other card

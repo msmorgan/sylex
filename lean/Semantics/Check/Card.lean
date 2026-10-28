@@ -15,7 +15,7 @@ inductive FaceSide where
   | front | back
   deriving DecidableEq, Repr
 
-def anyPermanentType (tys : List CardType) : Bool := tys.any (·.permanent)
+def anyPermanentType (tys : List CardType) : Bool := tys.any (·.cardClass == some .permanentCard)
 
 def doorFrameOk (text : List Ability) : Bool := text.all fun a => !a.namesThisDoor
 

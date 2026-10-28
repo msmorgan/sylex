@@ -7,9 +7,8 @@ card_type planeswalker := {
   lexical := { lemma := "planeswalker" },
   spelling := "planeswalker",
   name := "Planeswalker",
-  permanent := true,
+  cardClass := some .permanentCard,
   stats := [.loyalty],
-  instantOrSorcery := false,
   confers := [ castableFrom yourHand asSorcery, planeswalkerLoyalty, planeswalkerCanBeAttacked,
       planeswalkerLoyaltyDamage, loyaltyZero ]
 }

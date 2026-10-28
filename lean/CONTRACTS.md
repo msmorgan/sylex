@@ -153,8 +153,8 @@ semantic fields are inspected recursively. The modules are layered one way,
 re-exported by `Semantics.Definitions`. Templates name no catalog item and no card type. The card
 types (`Semantics.Definitions.CardTypes`) are the one catalog below the stack: each is a
 `semantic_definition` in `namespace Semantics` (`CardType.creature`) over `Semantics.Words`
-alone, because the checker compares card types by value and reads their fields (`permanent`,
-`stats`, `instantOrSorcery`); what a card type confers is its `RegistryDefinition.cardType` row
+alone, because the checker compares card types by value and reads their fields (`cardClass`,
+`stats`); what a card type confers is its `RegistryDefinition.cardType` row
 (`Semantics.Definitions.CardTypeRules`), above Templates, and what a rules-defined subtype
 confers is its `RegistryDefinition.subtype` row (`Semantics.Definitions.SubtypeRules`, Siege and Saga),
 beside it. The other leaf
@@ -1105,7 +1105,7 @@ trigger on the spell's being put into a graveyard during its resolution
 - **Engine.** The card has one half, the one its Card Class selects:
   `onPermanent` on a permanent card, `onInstantOrSorcery` on an instant or sorcery
   card (`cardClassOf`, `Words.lean`) [CR#110.4,110.4a], computed from the card
-  types' `permanent` and `instantOrSorcery` fields. A card whose types give it no
+  types' `cardClass` fields. A card whose types give it no
   Card Class (a dungeon [CR#309.2c]) has neither half.
 - **Checker.** Both halves are checked, each in the same incoming context
   (`Check/Phrase.lean`, the `byCardClass` arm), so a choice an earlier ability

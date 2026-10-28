@@ -8,9 +8,8 @@ card_type battle := {
   lexical := { lemma := "battle" },
   spelling := "battle",
   name := "Battle",
-  permanent := true,
+  cardClass := some .permanentCard,
   stats := [.defense],
-  instantOrSorcery := false,
   confers := [ castableFrom yourHand asSorcery, battleDefense, battleCanBeAttacked, battleDefenseDamage,
       battleDefenseZero, battleProtector ]
 }

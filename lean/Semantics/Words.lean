@@ -46,73 +46,6 @@ inductive Stat where
   | basePower | baseToughness
   deriving DecidableEq, Repr
 
-/-- A card type [CR#205.2a]: its name and the fields the rules read off it, whether it is a
-permanent type [CR#110.4], the characteristic stats its objects have [CR#302.4,306.5,310.4],
-and whether its cards are instant or sorcery cards [CR#110.4a]. A card names a declared card
-type (`CardType.creature` and its peers below), never the raw structure: `spelled` refuses it. What a
-card type confers on its objects is not a field; it is the type's `RegistryDefinition.cardType` row. -/
-structure CardType where
-  /-- The word the type line prints. -/
-  name : String
-  /-- A permanent type: one of the six whose objects can be permanents [CR#110.4]. -/
-  permanent : Bool
-  /-- The characteristic stats only objects of this type have: power and toughness for a
-  creature [CR#302.4], loyalty for a planeswalker [CR#306.5], defense for a battle [CR#310.4]. -/
-  stats : List Stat := []
-  /-- An instant or sorcery card [CR#110.4,304.1,307.1]. With `permanent`, it settles a card's
-  Card Class [CR#110.4a]; a type that is neither, as kindred [CR#308.1] and dungeon
-  [CR#309.2c] are, gives a card no Card Class of its own. -/
-  instantOrSorcery : Bool := false
-  deriving DecidableEq, Repr
-
-/-- Creature: a permanent type [CR#110.4], whose objects alone have power and toughness
-[CR#302.4]. -/
-semantic_definition CardType.creature : CardType :=
-  { name := "Creature", permanent := true, stats := [.power, .toughness] }
-
-/-- Artifact: a permanent type [CR#110.4]. -/
-semantic_definition CardType.artifact : CardType := { name := "Artifact", permanent := true }
-
-/-- Land: a permanent type [CR#110.4]. -/
-semantic_definition CardType.land : CardType := { name := "Land", permanent := true }
-
-/-- Enchantment: a permanent type [CR#110.4]. -/
-semantic_definition CardType.enchantment : CardType :=
-  { name := "Enchantment", permanent := true }
-
-/-- Instant: not a permanent type [CR#110.4]; an instant card is an instant or sorcery card
-[CR#110.4a,304.1]. -/
-semantic_definition CardType.instant : CardType :=
-  { name := "Instant", permanent := false, instantOrSorcery := true }
-
-/-- Sorcery: not a permanent type [CR#110.4]; a sorcery card is an instant or sorcery card
-[CR#110.4a,307.1]. -/
-semantic_definition CardType.sorcery : CardType :=
-  { name := "Sorcery", permanent := false, instantOrSorcery := true }
-
-/-- Planeswalker: a permanent type [CR#110.4], whose objects alone have loyalty [CR#306.5]. -/
-semantic_definition CardType.planeswalker : CardType :=
-  { name := "Planeswalker", permanent := true, stats := [.loyalty] }
-
-/-- Battle: a permanent type [CR#110.4], whose objects have defense [CR#310.4]. -/
-semantic_definition CardType.battle : CardType :=
-  { name := "Battle", permanent := true, stats := [.defense] }
-
-/-- Kindred: neither a permanent type nor an instant or sorcery type. A kindred card always has
-another card type, and is cast and resolves by it [CR#308.1], so the other type settles both
-whether it can be a permanent [CR#110.4] and its Card Class. -/
-semantic_definition CardType.kindred : CardType := { name := "Kindred", permanent := false }
-
-/-- Dungeon: a card type all the same, though a dungeon begins outside the game [CR#309.2] and is
-never a permanent or a spell [CR#309.2c]. -/
-semantic_definition CardType.dungeon : CardType := { name := "Dungeon", permanent := false }
-
-/-- The declared card types in canonical order: the order the checker remembers a referent's
-types in (`normalizeTypes`), where the order they are written in is immaterial. -/
-def cardTypes : List CardType :=
-  [ .creature, .artifact, .land, .enchantment, .instant, .sorcery, .planeswalker, .battle,
-    .kindred, .dungeon ]
-
 /-- A card's Card Class: a permanent card or an instant or sorcery card, by its card types
 [CR#110.4,110.4a]. A keyword the rules define one way on a permanent and another on an instant or
 sorcery spell selects its half by it (`Ability.byCardClass`). -/
@@ -120,13 +53,77 @@ inductive CardClass where
   | permanentCard | instantOrSorceryCard
   deriving DecidableEq, Repr
 
+/-- A card type [CR#205.2a]: its name, the Card Class it contributes [CR#110.4,110.4a], and the
+characteristic stats its objects have [CR#302.4,306.5,310.4]. A card names a declared card type
+(`CardType.creature` and its peers below), never the raw structure: `spelled` refuses it. What a
+card type confers on its objects is not a field; it is the type's `RegistryDefinition.cardType` row. -/
+structure CardType where
+  /-- The word the type line prints. -/
+  name : String
+  /-- The Card Class this type contributes [CR#110.4,110.4a]; kindred [CR#308.1] and dungeon
+  [CR#309.2c] contribute none. -/
+  cardClass : Option CardClass := none
+  /-- The characteristic stats only objects of this type have: power and toughness for a
+  creature [CR#302.4], loyalty for a planeswalker [CR#306.5], defense for a battle [CR#310.4]. -/
+  stats : List Stat := []
+  deriving DecidableEq, Repr
+
+/-- Creature: a permanent type [CR#110.4], whose objects alone have power and toughness
+[CR#302.4]. -/
+semantic_definition CardType.creature : CardType :=
+  { name := "Creature", cardClass := some .permanentCard, stats := [.power, .toughness] }
+
+/-- Artifact: a permanent type [CR#110.4]. -/
+semantic_definition CardType.artifact : CardType :=
+  { name := "Artifact", cardClass := some .permanentCard }
+
+/-- Land: a permanent type [CR#110.4]. -/
+semantic_definition CardType.land : CardType := { name := "Land", cardClass := some .permanentCard }
+
+/-- Enchantment: a permanent type [CR#110.4]. -/
+semantic_definition CardType.enchantment : CardType :=
+  { name := "Enchantment", cardClass := some .permanentCard }
+
+/-- Instant: not a permanent type [CR#110.4]; an instant card is an instant or sorcery card
+[CR#110.4a,304.1]. -/
+semantic_definition CardType.instant : CardType :=
+  { name := "Instant", cardClass := some .instantOrSorceryCard }
+
+/-- Sorcery: not a permanent type [CR#110.4]; a sorcery card is an instant or sorcery card
+[CR#110.4a,307.1]. -/
+semantic_definition CardType.sorcery : CardType :=
+  { name := "Sorcery", cardClass := some .instantOrSorceryCard }
+
+/-- Planeswalker: a permanent type [CR#110.4], whose objects alone have loyalty [CR#306.5]. -/
+semantic_definition CardType.planeswalker : CardType :=
+  { name := "Planeswalker", cardClass := some .permanentCard, stats := [.loyalty] }
+
+/-- Battle: a permanent type [CR#110.4], whose objects have defense [CR#310.4]. -/
+semantic_definition CardType.battle : CardType :=
+  { name := "Battle", cardClass := some .permanentCard, stats := [.defense] }
+
+/-- Kindred: neither a permanent type nor an instant or sorcery type. A kindred card always has
+another card type, and is cast and resolves by it [CR#308.1], so the other type settles both
+whether it can be a permanent [CR#110.4] and its Card Class. -/
+semantic_definition CardType.kindred : CardType := { name := "Kindred" }
+
+/-- Dungeon: a card type all the same, though a dungeon begins outside the game [CR#309.2] and is
+never a permanent or a spell [CR#309.2c]. -/
+semantic_definition CardType.dungeon : CardType := { name := "Dungeon" }
+
+/-- The declared card types in canonical order: the order the checker remembers a referent's
+types in (`normalizeTypes`), where the order they are written in is immaterial. -/
+def cardTypes : List CardType :=
+  [ .creature, .artifact, .land, .enchantment, .instant, .sorcery, .planeswalker, .battle,
+    .kindred, .dungeon ]
+
 /-- The Card Class of a card with card types `tys`, read off their fields: an instant or sorcery
 card if any of them is an instant or sorcery type, a permanent card if any is a permanent type
 [CR#110.4,110.4a], and none otherwise. A kindred card reads by its other card type [CR#308.1]; a
 dungeon card has no Card Class [CR#309.2c]. -/
 def cardClassOf (tys : List CardType) : Option CardClass :=
-  if tys.any (·.instantOrSorcery) then some .instantOrSorceryCard
-  else if tys.any (·.permanent) then some .permanentCard
+  if tys.any (·.cardClass == some .instantOrSorceryCard) then some .instantOrSorceryCard
+  else if tys.any (·.cardClass == some .permanentCard) then some .permanentCard
   else none
 
 inductive PlayerStat where

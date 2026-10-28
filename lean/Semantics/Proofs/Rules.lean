@@ -287,7 +287,8 @@ theorem cardTypeRowsAreDeclared :
 
 /-- A card type is written as a word [CR#205.2a]; the registry refuses a nameless one. -/
 theorem badNamelessCardType :
-    RegistryDefinition.check (.cardType { name := "", permanent := true } []) = [.definitionNamed] := by
+    RegistryDefinition.check (.cardType { name := "", cardClass := some .permanentCard } []) =
+      [.definitionNamed] := by
   decide
 
 /-! ## The rules-defined subtypes (ruling 2026-10-10, `semantics-v2-subtype-rules`) -/

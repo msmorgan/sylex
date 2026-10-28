@@ -912,7 +912,7 @@ def NounWord.readPayload (head : NounWord) : Payload → Payload
     match head with
     | .type t | .subtype (.of t _) =>
       .object (mergeTypes ty [t])
-        (zone.orElse (fun _ => if t.permanent then some .battlefield else none))
+        (zone.orElse (fun _ => if t.cardClass == some .permanentCard then some .battlefield else none))
         stamp origin size
     | .ability => .ability origin (some .stack)
     | .spell | .subtype (.spell _) => .object ty (some .stack) stamp origin size

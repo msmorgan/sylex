@@ -6,8 +6,7 @@ card_type dungeon := {
   lexical := { lemma := "dungeon" },
   spelling := "dungeon",
   name := "Dungeon",
-  permanent := false,
+  cardClass := none,
   stats := [],
-  instantOrSorcery := false,
   confers := []
 }

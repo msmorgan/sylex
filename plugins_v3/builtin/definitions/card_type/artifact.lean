@@ -5,8 +5,7 @@ card_type artifact := {
   lexical := { lemma := "artifact" },
   spelling := "artifact",
   name := "Artifact",
-  permanent := true,
+  cardClass := some .permanentCard,
   stats := [],
-  instantOrSorcery := false,
   confers := [castableFrom yourHand asSorcery]
 }

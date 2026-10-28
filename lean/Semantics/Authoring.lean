@@ -1111,7 +1111,7 @@ private def semanticFields : Name → List Name
   | `counter => [`holder, `confers, `rules]
   | `subtype => [`kind, `name, `confers, `rules]
   | `designation => [`scope, `sole, `confers, `rules]
-  | `card_type => [`name, `permanent, `stats, `instantOrSorcery, `confers, `rules]
+  | `card_type => [`name, `cardClass, `stats, `confers, `rules]
   | `relation => []
   | `token => [`name, `token, `body]
   | `sba => [`scope, `when, `then_, `body]
@@ -1348,12 +1348,10 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : Comma
         let sole := (fields.lookup `sole).getD (← `(term| false))
         `(term| $(mkIdent `Semantics.DesignationLabel.named) $declarationLabel $scope (sole := $sole))
       | `card_type =>
-        let permanent ← required `permanent
+        let cardClass := (fields.lookup `cardClass).getD (← `(term| none))
         let stats := (fields.lookup `stats).getD (← `(term| []))
-        let instantOrSorcery := (fields.lookup `instantOrSorcery).getD (← `(term| false))
         let label := (fields.lookup `name).getD label
-        `(term| { name := $label, permanent := $permanent, stats := $stats,
-                  instantOrSorcery := $instantOrSorcery })
+        `(term| { name := $label, cardClass := $cardClass, stats := $stats })
       | _ => `(term| $(mkIdent `Semantics.RelationLabel.named) $declarationLabel)
     emit body true
     if registryOnly then

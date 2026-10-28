@@ -11,9 +11,8 @@ card_type creature := {
   lexical := { lemma := "creature" },
   spelling := "creature",
   name := "Creature",
-  permanent := true,
+  cardClass := some .permanentCard,
   stats := [.power, .toughness],
-  instantOrSorcery := false,
   confers := [ castableFrom yourHand asSorcery, combatant, creatureCanAttack, creatureCanBlock,
       summoningSicknessAttack, summoningSicknessActivation, creatureDamageMarking, toughnessZero,
       lethalDamage ]

@@ -6,8 +6,7 @@ card_type land := {
   lexical := { lemma := "land" },
   spelling := "land",
   name := "Land",
-  permanent := true,
+  cardClass := some .permanentCard,
   stats := [],
-  instantOrSorcery := false,
   confers := [playableFrom yourHand asSorcery]
 }

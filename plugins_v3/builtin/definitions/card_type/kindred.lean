@@ -8,8 +8,7 @@ card_type kindred := {
   lexical := { lemma := "kindred" },
   spelling := "kindred",
   name := "Kindred",
-  permanent := false,
+  cardClass := none,
   stats := [],
-  instantOrSorcery := false,
   confers := []
 }

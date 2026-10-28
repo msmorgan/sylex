@@ -6,8 +6,7 @@ card_type instant := {
   lexical := { lemma := "instant" },
   spelling := "instant",
   name := "Instant",
-  permanent := false,
-  instantOrSorcery := true,
+  cardClass := some .instantOrSorceryCard,
   stats := [],
   confers := [castableFrom yourHand asInstant]
 }

@@ -1036,7 +1036,7 @@ def controlFits : Option Bool → Option Bool → Bool
 /-- The Source's zone as its Card Types tell it: an instant or sorcery is a spell on the stack;
 any other Source may function from more than one zone, so its zone is unknown. -/
 def sourceZone (types : List CardType) : Option Zone :=
-  if !types.isEmpty && types.all (·.instantOrSorcery) then some .stack
+  if !types.isEmpty && types.all (·.cardClass == some .instantOrSorceryCard) then some .stack
   else none
 
 /-- Whether `b` can be the Contrast Anchor of a bare "another"/"other" of kind `k` whose Head Noun
@@ -1753,7 +1753,7 @@ def Subtype.type : Subtype → Option CardType
 
 def Subtype.fits : Subtype → CardType → Bool
   | .of host _, t => host == t
-  | .spell _, t => t.instantOrSorcery
+  | .spell _, t => t.cardClass == some .instantOrSorceryCard
 
 def Subtype.label : Subtype → String
   | .of _ label => label
