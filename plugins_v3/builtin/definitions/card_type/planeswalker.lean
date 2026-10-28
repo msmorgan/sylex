@@ -9,6 +9,21 @@ card_type planeswalker := {
   name := "Planeswalker",
   cardClass := some .permanentCard,
   stats := [.loyalty],
-  confers := [ castableFrom yourHand asSorcery, planeswalkerLoyalty, planeswalkerCanBeAttacked,
-      planeswalkerLoyaltyDamage, loyaltyZero ]
+  confers :=
+    [castableFrom yourHand asSorcery,
+      .ability
+        (static
+          (entersWithCounters this_
+            (statOf (.stat .loyalty) this_)
+            (.named "loyaltyCounter"))),
+      .property (can any (attack this_)),
+      damageResult
+        (loseCounters
+          (some (printedKind (.named "loyaltyCounter")))
+          (some thatMuch) this_),
+      .stateBased
+        (compareAmt
+          (countersOn (.named "loyaltyCounter") this_)
+          .eq 0)
+        (putInto this_ graveyard)]
 }

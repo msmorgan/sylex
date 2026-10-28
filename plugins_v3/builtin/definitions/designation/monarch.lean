@@ -9,5 +9,9 @@ designation monarch := {
   spelling := "monarch",
   scope := (.heldBy .player),
   sole := true,
-  confers := [monarchDraw, monarchSteal]
+  confers :=
+    [.ability (at_ (beginningOfPossessed .endStep theMonarch) (instruct (that player) (draw 1))),
+      .ability
+        (whenever (does (a isCreature) (dealDamage (to := theMonarch) (kind := some .combat)))
+          (gainDesignation (controllerOf it) monarch))]
 }

@@ -13,7 +13,31 @@ card_type creature := {
   name := "Creature",
   cardClass := some .permanentCard,
   stats := [.power, .toughness],
-  confers := [ castableFrom yourHand asSorcery, combatant, creatureCanAttack, creatureCanBlock,
-      summoningSicknessAttack, summoningSicknessActivation, creatureDamageMarking, toughnessZero,
-      lethalDamage ]
+  confers :=
+    [castableFrom yourHand asSorcery,
+      .property (staticSpecCombatant this_),
+      .property (can this_ attack),
+      .property (can this_ block),
+      .property (onlyUnless (cant this_ attack) (controlledSinceTheirTurnBegan it)),
+      .property
+        (onlyUnless
+          (cant any (activate (allOf (and [abilityHead .anyActivated, abilityOf this_,
+            tapOrUntapInCost]))))
+          (controlledSinceTheirTurnBegan this_)),
+      damageResult (markDamage this_ thatMuch),
+      .stateBased
+        (compareAmt (toughnessOf this_)
+          .atMost 0)
+        (putInto this_ graveyard),
+      .stateBased
+        (and
+          [compareAmt (toughnessOf this_)
+              .greater 0,
+            compareAmt
+              (statOf .markedDamage this_)
+              .greater 0,
+            compareAmt
+              (statOf .markedDamage this_)
+              .atLeast (toughnessOf this_)])
+        (destroy this_)]
 }

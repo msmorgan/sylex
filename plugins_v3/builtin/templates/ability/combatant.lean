@@ -1,7 +1,0 @@
-/-- What the creature type confers [CR#508.1a]: its object is a Combatant. -/
--- [CR#508.1a]
-template combatant : Conferral := {
-  -- TODO(spelling): What the creature type confers : its object is a Combatant.
-  body :=
-    .property (staticSpecCombatant this_)
-}

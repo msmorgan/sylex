@@ -9,6 +9,8 @@ subtype saga := {
   kind := .enchantment,
   name := "Saga",
   confers :=
+    have hasChapterAbilities : Condition :=
+      compareAmt (finalChapterNumber thisSaga) .atLeast 1;
     [.ability
         (static
           (onlyUnless
@@ -17,14 +19,14 @@ subtype saga := {
             (is thisSaga
               (hasKeyword (.the (.named "readAhead")))))),
       .turnBased .firstMain
-        (doIf sagaHasChapterAbilities
-          sagaLoreIncrement),
+        (doIf hasChapterAbilities
+          (putCounters 1 (printedKind (.named "loreCounter")) thisSaga)),
       .stateBased
         (and
-          [sagaHasChapterAbilities,
+          [hasChapterAbilities,
             compareAmt
               (countersOn (.named "loreCounter") thisSaga)
               .atLeast (finalChapterNumber thisSaga),
-            not sagaHasTriggeredChapter])
+            not (exists_ (and [chapterAbilityOf thisSaga, triggeredNotLeftStack]))])
         (sacrifice thisSaga)]
 }

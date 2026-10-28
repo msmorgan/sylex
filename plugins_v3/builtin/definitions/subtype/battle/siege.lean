@@ -6,5 +6,18 @@ subtype siege := {
   spelling := "Siege",
   kind := .battle,
   name := "Siege",
-  confers := [siegeProtector, siegeLastCounter, siegeDefenseZero]
+  confers :=
+    [.property (entersChoosingPlayer thisSiege anOpponent),
+      .ability
+        (when (does any (removeCounters theLast defenseCounter thisPermanent))
+          (sequentially
+            [ exile it,
+              may (cast it (payment := withoutPaying) (resulting := some isTransformed)) ])),
+      .stateBased
+        (and
+          [compareAmt
+              (countersOn defenseCounter this_)
+              .eq 0,
+            (not (exists_ (and [abilityOf this_, triggeredNotLeftStack])))])
+        (putInto this_ graveyard)]
 }

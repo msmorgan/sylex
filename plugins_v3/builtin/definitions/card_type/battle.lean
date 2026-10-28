@@ -10,6 +10,34 @@ card_type battle := {
   name := "Battle",
   cardClass := some .permanentCard,
   stats := [.defense],
-  confers := [ castableFrom yourHand asSorcery, battleDefense, battleCanBeAttacked, battleDefenseDamage,
-      battleDefenseZero, battleProtector ]
+  confers :=
+    [castableFrom yourHand asSorcery,
+      .ability
+        (static
+          (entersWithCounters this_
+            (statOf (.stat .defense) this_)
+            (.named "defenseCounter"))),
+      .property (can any (attack this_)),
+      damageResult
+        (loseCounters
+          (some (printedKind (.named "defenseCounter")))
+          (some thatMuch) this_),
+      .stateBased
+        (and
+          [not
+              (is this_
+                (hasSubtype siege)),
+            compareAmt
+              (countersOn (.named "defenseCounter") this_)
+              .eq 0])
+        (putInto this_ graveyard),
+      .property
+        (onlyUnless
+          (entersChoosingPlayer this_
+            (a
+              (and
+                [isPlayer,
+                  not (otherThan you)])))
+          (is this_
+            (hasSubtype siege)))]
 }

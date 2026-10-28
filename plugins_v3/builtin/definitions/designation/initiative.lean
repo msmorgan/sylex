@@ -13,5 +13,10 @@ designation initiative := {
   spelling := "initiative",
   scope := (.heldBy .player),
   sole := true,
-  confers := [initiativeSteal]
+  confers :=
+    [.ability
+        (whenever
+          (does (counted (orMore 1) (and [isCreature, controlledBy (a isPlayer)]))
+            (dealDamage (to := theInitiativeHolder) (kind := some .combat)))
+          (gainDesignation (controllerOf (those creature)) initiative))]
 }
