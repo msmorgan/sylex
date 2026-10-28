@@ -130,5 +130,3 @@ them.
 - Code shape: `cargo xtask map enums`; for Lean, `lean/Semantics/Words.lean` and
   `lean/Semantics/Abilities.lean`. Current declarations beat inventories in old plans.
 - Plans and specs write "standard constraints apply" plus deltas; never restate this file.
-- Dispatching agents: explore once, share a byte-identical brief prefix, include settled rulings,
-  and send follow-ups to an agent that already holds the context.
