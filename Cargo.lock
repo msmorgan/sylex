@@ -528,6 +528,7 @@ dependencies = [
  "deckmaste_lexical_source",
  "deckmaste_syntax",
  "dpsi",
+ "rayon",
  "ron",
  "serde",
  "thiserror",
