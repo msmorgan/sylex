@@ -8,18 +8,24 @@ kernel-checked proof that its refusal list is empty. Runtime game execution
 remains in Rust.
 
 Run `lean/scripts/build` from the repository root, or `./scripts/build` from
-this directory. It builds the syntax, checker, templates and definitions, printed-card bench,
-and pin suites with warnings treated as failures. For the
-semantics inner loop, run `lake build Semantics` from this directory.
+this directory. It builds every library (syntax and checker, builtin definitions and their
+`ok_` theorems, the generated card bench, and the pin suites) with warnings treated as failures.
+The inner loops, from this directory, are `lake build Semantics` for checker work, a bare
+`lake build` (the default targets `Semantics`, `SemanticsDefinitions` and
+`SemanticsCheckBuiltin`) for builtin work, `lake build SemanticsCards` for card work, and the
+editor or `lake build SemanticsProofs` for proofs. `lakefile.lean` lists them.
 
 Lean is the active workbench. The [succession decision](../docs/decisions/lean-is-the-workbench.md)
 records the frozen Idris reference and migration history.
 
 ## Workbench gate
 
-`cargo xtask lean check` runs `lake build --wfail` in `lean/`, the same full
-workbench gate as `lean/scripts/build`. It builds the active syntax, checker,
-templates and definitions, card bench and proofs, and propagates build failures.
+`cargo xtask lean check` runs `lake build --wfail` over every library in `lean/`, the same
+full workbench gate as `lean/scripts/build`, and propagates build failures. It then reruns the
+Lake generation regression (`crates/xtask/src/lean.rs`): the real `lakefile.lean` over the stub
+card tree in `test-fixtures/lake-generation/`, checking that a clean tree builds, that a card
+edit rebuilds exactly its data and check shards, that a fixture-card edit rebuilds `Fixtures`
+and the proof importing it, and that `lake setup-file` regenerates.
 
 The obsolete `plugins_v2` card/definition emitters and macro generator have
 been retired. `lean definitions` and `lean macros generate|check|align` are no
@@ -174,18 +180,41 @@ kernel.
 
 ## Cards
 
-`plugins_v3/canon/cards/<name>.lean` contains one declaration per printed card. The authoring
+`plugins_v3/canon/cards/<name>.lean` contains one declaration per printed card, in the file
+its printed name names (`card_filename`, `crates/deckmaste_core/src/plugin.rs`). The authoring
 surface is `card := { name := "Printed name", ... }`, or `card := transforming { ... }`
 for multipart cards. Named (`card <ident> := …`) and `: Spelled` declarations are rejected.
 `cardNamed "Printed name"` retrieves the `Spelled` value (or its card when `Card` is expected);
-its `.ok` projection and `cardNamedOk "Printed name"` expose the checking proof. Printed names,
+`cardNamedOk "Printed name"` is the proof that its card checks. Printed names,
 including punctuation, are declaration keys; multipart names join with ` // `.
-`Semantics/Cards.lean` loads that bundle with
-`load_bundle "../plugins_v3/canon"`, using the builtin vocabulary. A card that
-stops checking stops defining; each declaration generates an `ok_<name>` theorem.
-Phrase-level bench items and their named acceptance or refusal theorems live in
-`Semantics/Proofs/Cards<Family>.lean`. `SemanticsCards` builds the card bundle;
-`SemanticsProofs` builds the pin suites. The full build includes both.
+
+No Lean code reads the card files. `genCanon` in `lakefile.lean` does, on every `lake build`,
+`lake setup-file` (the language server) and `lake lean`, and writes the gitignored modules
+`Semantics/Cards/Data/{Fixtures,Shard00..15}.lean` and `Semantics/Cards/Check/*` with the same
+names, rewriting only what changed:
+
+- A data module holds each card file's text verbatim, wrapped in `canon_card "<file>"` …
+  `end_canon_card` under a `-- source: plugins_v3/canon/cards/<file>:1` line. `canon_card`
+  admits exactly one anonymous `card` declaration whose printed name is the file's, and defines
+  it `noncomputable`. Data modules import `Semantics.Definitions`, never `Semantics.Check`, so a
+  checker edit re-elaborates no card.
+- A check module holds, under the same `-- source:` line, `check_canon_card "<file>"`
+  (`Semantics/CanonCheck.lean`): the card's refusal report and its kernel `decide` theorem
+  `ok_<name>`. A refused card fails there, next to its source line.
+- `Fixtures` holds every card a module under `Semantics/Proofs/` names through `cardNamed` or
+  `cardNamedOk`; the shards hold the rest, each card by an FNV-1a hash of its file name, so
+  adding a card moves no other. Lake must know the module set before it builds, so the names are
+  fixed.
+
+`Semantics.Cards` (`SemanticsCards`) imports every check module. Proofs import
+`Semantics.Cards.Data.Fixtures` for canon cards, never `Semantics.Cards` or a check module;
+`cardNamedOk` on a canon card there checks it in place. A proof module that defines a term from
+a canon card opens a `noncomputable section`. Phrase-level bench items and their named
+acceptance or refusal theorems live in `Semantics/Proofs/Cards<Family>.lean`.
+
+Lake hashes a module's source before it awaits the library's `needs`, so `lakefile.lean`
+replaces the builtin `input` facet with one that runs `genCanon` first; the comment there cites
+the Lake source it depends on, and the regression above guards it.
 
 A refused card identifies a missing template or definition, a missing construct, or a checker
 regression. Keep its sentence and assertion while repairing that boundary.
