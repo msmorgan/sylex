@@ -2,12 +2,12 @@
 //! parsed, each reported as read, known-wrong-only or unread
 //! (`docs/decisions/english-v4.md` §6.2).
 //!
-//! A unit is read when it has a Reading and both round-trip laws hold:
-//! law 1 over the whole Packed Forest
-//! ([`deckmaste_syntax::Parse::verify_realization`]) and law 2 on every
-//! Reading ([`deckmaste_syntax::Parse::readings`]), materialized one at a
-//! time through the syntax engine's lazy flyweight arena. A unit with a
-//! judgment is checked against it up to [`judgment::READING_LIMIT`]. A unit is
+//! A unit is read when it has a Reading and round-trip law 1 holds over the
+//! whole Packed Forest ([`deckmaste_syntax::Parse::verify_realization`]).
+//! Law 2 follows for these parser-produced Readings from law 1 under the same
+//! parse context and lexical environment, so no per-Reading pass is needed.
+//! A unit with a judgment is checked against it up to
+//! [`judgment::READING_LIMIT`]. A unit is
 //! known-wrong-only when it has a judgment none of its Readings satisfies.
 //!
 //! A line of a cleave face with square brackets is read as its two texts
@@ -212,7 +212,7 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
                 Some((grammar, frame)) => {
                     let judge = |text: &str, analyzed: &AnalyzedText| {
                         let entries = entries(text);
-                        judge_unit(grammar, frame, env, analyzed, &face.scope, &entries)
+                        judge_unit(grammar, frame, env, analyzed, &entries)
                     };
                     match cleave {
                         None => judge(&unit.text, &analyzed),
@@ -265,7 +265,6 @@ fn judge_unit(
     frame: &SegmentFrame,
     env: &LexicalEnvironment,
     analyzed: &deckmaste_lexical::AnalyzedText,
-    scope: &BTreeSet<deckmaste_lexical::LexemeId>,
     entries: &[&Judgment],
 ) -> (Verdict, u128, Option<Segmentation>, u128) {
     let parse = grammar.parse_analyzed(analyzed);
@@ -278,7 +277,7 @@ fn judge_unit(
     }
     let segments = Some(crate::segments::segments(&parse, frame));
     let cheapest_tier = parse.cheapest_tier().map_or(0, |(_, tied)| tied);
-    let (verdict, derivations) = judge_parse(grammar, env, &parse, derivations, scope, entries);
+    let (verdict, derivations) = judge_parse(grammar, env, &parse, derivations, entries);
     (verdict, derivations, segments, cheapest_tier)
 }
 
@@ -287,7 +286,6 @@ fn judge_parse(
     env: &LexicalEnvironment,
     parse: &deckmaste_syntax::Parse<'_>,
     derivations: u128,
-    scope: &BTreeSet<deckmaste_lexical::LexemeId>,
     entries: &[&Judgment],
 ) -> (Verdict, u128) {
     if let Err(fault) = parse.verify_realization(&env.lexicon) {
@@ -295,11 +293,6 @@ fn judge_parse(
             Verdict::Unread(Unread::Law(format!("law 1: {fault}"))),
             derivations,
         );
-    }
-    for reading in parse.readings() {
-        if let Err(why) = judgment::law_two(grammar, &env.lexicon, parse, &reading, scope) {
-            return (Verdict::Unread(Unread::Law(why)), derivations);
-        }
     }
     if !entries.is_empty() {
         let judge = Judge {

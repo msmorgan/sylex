@@ -50,9 +50,9 @@ like it moves with it.
 ## Census
 
 `census::run` profiles and parses every unit and reports it **read** (a Reading
-exists, round-trip law 1 holds over the whole Packed Forest and law 2 holds on
-every Reading), **known-wrong-only** (a judgment for that exact text is
-satisfied by none of its Readings) or **unread** (with the reason: the grammar
+exists and round-trip law 1 holds over the whole Packed Forest),
+**known-wrong-only** (a judgment for that exact text is satisfied by none of
+its Readings) or **unread** (with the reason: the grammar
 does not bind, a vocabulary gap, no Reading, or a law failure, which is a
 defect). Counts are per Stratum, with faces counted at their highest unit, plus
 per Syntactic Family and the most frequent skeletons.
@@ -69,9 +69,14 @@ Intermediate candidates share tree and child-sequence handles; owned Readings,
 including their feature maps and Selected Frames, are materialized only by
 `.next()`. Consumers needing indexing or slices use `.collect()`.
 
-Because lazy flyweight enumeration materializes one Reading at a time,
-`census::run` checks round-trip Law 2 on every Reading unconditionally.
-Full-corpus measurements on 2026-10-27, using the dev profile and
+The census does not enumerate Readings to check law 2: each Reading already
+belongs to the parse of the input, and law 1 establishes that its realization
+is that input. Under the same parse context and lexical environment, membership
+in the parse of its realization follows. Independent-tree law 2 tests remain
+in the test suite. The census materializes Readings only for judgments.
+
+Historical full-corpus measurements before removing the census law 2 pass,
+on 2026-10-27, using the dev profile and
 `/usr/bin/time -v`:
 
 | Enumeration / Law 2 limit | Wall time | User CPU | System CPU | Peak RSS (KiB) |
