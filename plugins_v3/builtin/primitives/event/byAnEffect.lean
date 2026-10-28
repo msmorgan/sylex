@@ -4,7 +4,6 @@ node that encloses it: a turn-based action is none [CR#703.1]. -/
 -- [CR#609.1,614.16]
 -- [CR#703.1]
 primitive byAnEffect : Causing := {
-  -- TODO(spelling): Context-dependent wording: an effect causes …; string substitution cannot express its omitted or inflected parts.
   body :=
     Semantics.Primitives.Causing.anEffect
 }

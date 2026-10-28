@@ -3,7 +3,6 @@ definition's conferral is per counter (`RegistryDefinition.counter`), so the del
 -- [CR#122.1a]
 -- [CR#613.4c]
 template boost (power toughness : Delta Amount) : Conferral := {
-  -- TODO(spelling): Context-dependent wording: +X/+Y; string substitution cannot express its omitted or inflected parts.
   body :=
     .property
       (characteristicChange this_

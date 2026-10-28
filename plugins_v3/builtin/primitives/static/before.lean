@@ -3,7 +3,6 @@ written: "As this enters, choose a color", whose choice is made before the perma
 [CR#614.1c,614.12a]. -/
 -- [CR#614.1c,614.12a]
 primitive before (action : Action) (body : Option Replacement := none) : Replacement := {
-  -- TODO(spelling): As this enters, choose a color; wording varies with action, body, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
     Semantics.Primitives.Replacement.before action body
 }

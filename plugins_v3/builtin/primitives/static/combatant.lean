@@ -3,6 +3,5 @@ damage marking, continuous-control restrictions, attacking and blocking.
 [CR#120.3e,302.6,508.1a,509.1a] This states a quality rather than granting an Ability.
 [CR#113.12] -/
 primitive combatant (subject : NounPhrase) : StaticSpec := {
-  -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
   body := Semantics.Primitives.StaticSpec.combatant subject
 }

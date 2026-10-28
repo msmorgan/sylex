@@ -3,8 +3,6 @@
 keyword actions are declared below the keyword abilities. -/
 template faceDownWardedCreature : FaceDown := {
 
-  -- TODO(spelling): face down with ward {2}; the characteristic record is implicit in cloak and
-  -- needs contextual face-down wording.
   body :=
     {
       characteristics :=
