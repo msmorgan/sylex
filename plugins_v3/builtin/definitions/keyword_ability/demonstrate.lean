@@ -1,3 +1,6 @@
+/-- "Demonstrate" means "When you cast this spell, you may copy it and you may choose new targets
+for the copy. If you copy the spell, choose an opponent. That player copies the spell and may
+choose new targets for that copy." [CR#702.144a] -/
 keyword demonstrate : Ability := {
   lexical := { lemma := "demonstrate" },
   spelling := "demonstrate",

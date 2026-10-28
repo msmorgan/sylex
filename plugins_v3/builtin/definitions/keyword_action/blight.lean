@@ -1,3 +1,4 @@
+/-- Blight N: put N −1/−1 counters on a creature you control. [CR#701.68a] -/
 action blight (amount : Amount) : Action := {
   lexical := { verbs := [{ lemma := "blight", frames := [Amount] }] },
   spelling := "blight <amount>",

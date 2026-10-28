@@ -1,3 +1,6 @@
+/-- Two creatures paired by a soulbond ability [CR#702.95b]. A creature is
+paired with only one other [CR#702.95d], and the pairing ends as
+[CR#702.95e] says. -/
 relation paired := {
 
 }

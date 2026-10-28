@@ -1,3 +1,5 @@
+/-- "Firebending N" means "Whenever this creature attacks, add N {R}. Until end of combat, you don't
+lose this mana as steps and phases end." [CR#702.189a] -/
 keyword firebending (amount : Amount) : Ability := {
   lexical := {
     lemma := "firebending",

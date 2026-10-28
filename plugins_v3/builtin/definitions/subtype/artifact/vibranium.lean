@@ -1,3 +1,7 @@
+/-- Vibranium is an artifact subtype [CR#205.3g], also used by the predefined Vibranium token
+[CR#111.10w].
+
+No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype vibranium := {
   lexical := { lemma := "Vibranium" },
   spelling := "Vibranium",

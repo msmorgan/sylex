@@ -1,3 +1,5 @@
+/-- "Dethrone" means "Whenever this creature attacks the player with the most life or tied for most
+life, put a +1/+1 counter on this creature." [CR#702.105a] -/
 keyword dethrone : Ability := {
   lexical := { lemma := "dethrone" },
   spelling := "dethrone",

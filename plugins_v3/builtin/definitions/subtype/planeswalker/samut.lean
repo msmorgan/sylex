@@ -1,3 +1,4 @@
+/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
 subtype samut := {
   lexical := { lemma := "Samut" },
   spelling := "Samut",

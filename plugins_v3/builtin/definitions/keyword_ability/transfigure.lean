@@ -1,3 +1,6 @@
+/-- "Transfigure [cost]" means "[Cost], Sacrifice this permanent: Search your library for a creature
+card with the same mana value as this permanent and put it onto the battlefield. Then shuffle
+your library. Activate only as a sorcery." [CR#702.71a] -/
 keyword transfigure (cost : Cost) : Ability := {
   lexical := { lemma := "transfigure", parameters := [[Cost]] },
   spelling := "transfigure <cost>",

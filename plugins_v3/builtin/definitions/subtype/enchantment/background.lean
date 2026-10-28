@@ -1,3 +1,7 @@
+/-- A legendary Background enchantment card can be a second commander with a commander that has
+choose a Background. [CR#702.124k]
+
+No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype background := {
   lexical := { lemma := "Background" },
   spelling := "Background",

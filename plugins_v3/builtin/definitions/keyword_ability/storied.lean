@@ -1,3 +1,6 @@
+/-- "Storied" means "Any time you control three or more permanents that are artifacts, Sagas, and/or
+legendary and you don't have an enduring story, you have an enduring story for the rest of the
+game." [CR#702.195a] -/
 keyword storied : Ability := {
   lexical := { lemma := "storied" },
   spelling := "storied",

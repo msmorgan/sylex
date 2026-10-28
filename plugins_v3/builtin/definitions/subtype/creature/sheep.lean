@@ -1,3 +1,4 @@
+/-- Supported Oracle uses this only as an attributive subtype; no plural noun context is attested. -/
 subtype sheep := {
   lexical := { lemma := "Sheep", plural := "Sheep" },
   spelling := "Sheep",

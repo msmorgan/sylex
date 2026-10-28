@@ -1,3 +1,5 @@
+/-- "Teamwork N" means "As an additional cost to cast this spell, you may tap any number of
+creatures you control with total power N or more." [CR#702.194a] -/
 keyword teamwork (amount : Amount) : Ability := {
   lexical := { lemma := "teamwork", parameters := [[Amount]] },
   spelling := "teamwork <amount>",

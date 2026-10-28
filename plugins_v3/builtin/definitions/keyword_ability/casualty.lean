@@ -1,3 +1,6 @@
+/-- Casualty N means "As an additional cost to cast this spell, you may sacrifice a creature with
+power N or greater," and "When you cast this spell, if a casualty cost was paid for it, copy it.
+If the spell has any targets, you may choose new targets for the copy." [CR#702.153a] -/
 keyword casualty (amount : Amount) : Ability := {
   lexical := { lemma := "casualty", parameters := [[Amount]] },
   spelling := "casualty <amount>",

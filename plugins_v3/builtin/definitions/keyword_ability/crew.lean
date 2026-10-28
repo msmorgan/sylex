@@ -1,3 +1,5 @@
+/-- "Crew N" means "Tap any number of other untapped creatures you control with total power N or
+greater: This permanent becomes an artifact creature until end of turn." [CR#702.122a] -/
 keyword crew (amount : Amount) : Ability := {
   lexical := {
     lemma := "crew",

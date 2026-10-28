@@ -1,3 +1,7 @@
+/-- "Convoke" means "For each colored mana in this spell's total cost, you may tap an untapped
+creature of that color you control rather than pay that mana. For each generic mana in this
+spell's total cost, you may tap an untapped creature you control rather than pay that mana."
+[CR#702.51a] It is neither an additional nor an alternative cost. [CR#702.51b] -/
 keyword convoke : Ability := {
   lexical := { lemma := "convoke", verbs := [{ lemma := "convoke", frames := [Monotransitive] }] },
   spelling := "convoke",

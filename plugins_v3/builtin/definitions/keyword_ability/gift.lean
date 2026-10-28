@@ -1,3 +1,7 @@
+/-- Gift represents two abilities. The first is "As an additional cost to cast this spell, you may
+choose an opponent." [CR#702.174a] The second is "When this permanent enters, if its gift cost
+was paid, [effect]" on a permanent, and "If this spell’s gift cost was paid, [effect]" on an
+instant or sorcery spell. [CR#702.174b] -/
 keyword gift (promise : Action) : Ability := {
   lexical := { lemma := "gift", parameters := [[Quality (None)]], nouns := ["gift"] },
   -- TODO(spelling): Gift a card / gift a tapped Fish; the promised Action must select a licensed

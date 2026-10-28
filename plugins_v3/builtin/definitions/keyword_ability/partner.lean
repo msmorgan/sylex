@@ -1,3 +1,5 @@
+/-- "Partner" means "You may designate two legendary cards as your commander rather than one if each
+of them has partner." [CR#702.124h] -/
 keyword partner : Ability := {
   lexical := {
     lemma := "partner",

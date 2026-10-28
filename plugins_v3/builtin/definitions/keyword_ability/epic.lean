@@ -1,3 +1,6 @@
+/-- "Epic" means "For the rest of the game, you can't cast spells," and "At the beginning of each of
+your upkeeps for the rest of the game, copy this spell except for its epic ability. If the spell
+has any targets, you may choose new targets for the copy." [CR#702.50a] -/
 keyword epic : Ability := {
   lexical := { lemma := "epic" },
   spelling := "epic",

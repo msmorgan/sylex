@@ -1,3 +1,6 @@
+/-- "Transmute [cost]" means "[Cost], Discard this card: Search your library for a card with the
+same mana value as the discarded card, reveal that card, and put it into your hand. Then shuffle
+your library. Activate only as a sorcery." [CR#702.53a] -/
 keyword transmute (cost : Cost) : Ability := {
   lexical := { lemma := "transmute", parameters := [[Cost]] },
   spelling := "transmute <cost>",

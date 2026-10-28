@@ -1,3 +1,8 @@
+/-- "Exchange <left> with <right>", cards in two different zones
+[CR#701.12d]: possible only if every card is owned by the same player,
+and possible even if one zone is empty; a card attached to an object
+hands that attachment to the card it is exchanged with [CR#701.12e]. All
+or nothing, like every exchange [CR#701.12a]. -/
 action exchangeCards (left right : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "exchange", frames := [Monotransitive, (TransitiveWithPP ["with"])] }] },
   deed := "exchange",

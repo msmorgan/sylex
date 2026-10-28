@@ -1,3 +1,7 @@
+/-- "Emerge [cost]" means "You may cast this spell by paying [cost] and sacrificing a creature
+rather than paying its mana cost" and "If you chose to pay this spell's emerge cost, its total
+cost is reduced by an amount of generic mana equal to the sacrificed creature's mana value."
+[CR#702.119a] -/
 keyword emerge (cost : Cost) : Ability := {
   lexical := { lemma := "emerge", parameters := [[Cost], [Quality (Some ("from")), Cost]] },
   spelling := "emerge <cost>",

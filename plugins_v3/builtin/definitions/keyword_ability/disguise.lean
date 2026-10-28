@@ -1,3 +1,7 @@
+/-- "Disguise [cost]" means "You may cast this card as a 2/2 face-down creature with ward {2}, no
+name, no subtypes, and no mana cost by paying {3} rather than paying its mana cost."
+[CR#702.168a] Turning it face up for its disguise cost is a special action any time you have
+priority. [CR#702.168d] -/
 keyword disguise (cost : Cost) : Ability := {
   lexical := { lemma := "disguise", parameters := [[Cost]] },
   spelling := "disguise <cost>",

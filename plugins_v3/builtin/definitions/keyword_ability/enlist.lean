@@ -1,3 +1,7 @@
+/-- Enlist means "As this creature attacks, you may tap up to one untapped creature you control that
+you didn’t choose to attack with and that either has haste or has been under your control
+continuously since this turn began. When you do, this creature gets +X/+0 until end of turn,
+where X is the tapped creature’s power." [CR#702.154a] -/
 keyword enlist : Ability := {
   lexical := { lemma := "enlist", verbs := [{ lemma := "enlist", frames := [Monotransitive] }] },
   spelling := "enlist",

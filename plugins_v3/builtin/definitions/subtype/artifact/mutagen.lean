@@ -1,3 +1,7 @@
+/-- Mutagen is an artifact subtype [CR#205.3g], also used by the predefined Mutagen token
+[CR#111.10v].
+
+No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype mutagen := {
   lexical := { lemma := "Mutagen" },
   spelling := "Mutagen",

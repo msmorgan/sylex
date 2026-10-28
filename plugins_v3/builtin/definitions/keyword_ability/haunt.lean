@@ -1,3 +1,6 @@
+/-- "Haunt" on a permanent means "When this permanent is put into a graveyard from the battlefield,
+exile it haunting target creature," and on an instant or sorcery spell "When this spell is put
+into a graveyard during its resolution, exile it haunting target creature." [CR#702.55a] -/
 keyword haunt : Ability := {
   lexical := { lemma := "haunt", verbs := [{ lemma := "haunt", frames := [Monotransitive] }] },
   spelling := "haunt",

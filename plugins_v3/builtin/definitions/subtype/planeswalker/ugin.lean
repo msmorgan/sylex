@@ -1,3 +1,4 @@
+/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
 subtype ugin := {
   lexical := { lemma := "Ugin" },
   spelling := "Ugin",

@@ -1,3 +1,5 @@
+/-- "Prowess" means "Whenever you cast a noncreature spell, this creature gets +1/+1 until end of
+turn." [CR#702.108a] -/
 keyword prowess : Ability := {
   lexical := { lemma := "prowess" },
   spelling := "prowess",

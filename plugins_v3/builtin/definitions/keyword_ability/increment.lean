@@ -1,3 +1,6 @@
+/-- "Increment" means "Whenever you cast a spell, if this permanent is a creature and the amount of
+mana spent to cast that spell is greater than this creature's power or this creature's
+toughness, put a +1/+1 counter on this creature." [CR#702.191a] -/
 keyword increment : Ability := {
   lexical := { lemma := "increment" },
   spelling := "increment",

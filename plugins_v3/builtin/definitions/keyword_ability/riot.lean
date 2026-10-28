@@ -1,3 +1,5 @@
+/-- "Riot" means "You may have this permanent enter with an additional +1/+1 counter on it. If you
+don't, it gains haste." [CR#702.136a] -/
 keyword riot : Ability := {
   lexical := { lemma := "riot" },
   spelling := "riot",

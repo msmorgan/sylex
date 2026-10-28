@@ -1,3 +1,7 @@
+/-- "[Quality] offering" means "As an additional cost to cast this spell, you may sacrifice a
+[quality] permanent. If you chose to pay the additional cost, this spell's total cost is reduced
+by the sacrificed permanent's mana cost, and you may cast this spell any time you could cast an
+instant." [CR#702.48a] -/
 keyword offering (quality : Predicate) : Ability := {
   lexical := { lemma := "offering", parameters := [[QualityBefore]] },
   spelling := "<quality> offering",

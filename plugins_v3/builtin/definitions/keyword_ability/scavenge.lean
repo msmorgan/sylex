@@ -1,3 +1,6 @@
+/-- "Scavenge [cost]" means "[Cost], Exile this card from your graveyard: Put a number of +1/+1
+counters equal to the power of the card you exiled on target creature. Activate only as a
+sorcery." [CR#702.97a] -/
 keyword scavenge (cost : Cost) : Ability := {
   lexical := { lemma := "scavenge", parameters := [[Cost]] },
   spelling := "scavenge <cost>",

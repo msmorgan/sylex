@@ -1,3 +1,7 @@
+/-- Powerstone is an artifact subtype [CR#205.3g], also used by the predefined Powerstone token
+[CR#111.10h].
+
+No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype powerstone := {
   lexical := { lemma := "Powerstone" },
   spelling := "Powerstone",

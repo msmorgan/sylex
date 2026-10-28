@@ -1,3 +1,6 @@
+/-- "Improvise" means "For each generic mana in this spell's total cost, you may tap an untapped
+artifact you control rather than pay that mana." [CR#702.126a] It is neither an additional nor
+an alternative cost. [CR#702.126b] -/
 keyword improvise : Ability := {
   lexical := { lemma := "improvise" },
   spelling := "improvise",

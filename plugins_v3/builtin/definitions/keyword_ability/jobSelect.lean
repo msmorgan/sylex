@@ -1,3 +1,5 @@
+/-- "Job select" means "When this Equipment enters, create a 1/1 colorless Hero creature token, then
+attach this Equipment to it." [CR#702.182a] -/
 keyword jobSelect : Ability := {
   lexical := { lemma := "job select" },
   spelling := "job select",

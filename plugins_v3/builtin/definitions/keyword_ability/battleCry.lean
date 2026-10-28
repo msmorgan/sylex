@@ -1,3 +1,5 @@
+/-- "Battle cry" means "Whenever this creature attacks, each other attacking creature gets +1/+0
+until end of turn." [CR#702.91a] -/
 keyword battleCry : Ability := {
   lexical := { lemma := "battle cry" },
   spelling := "battle cry",

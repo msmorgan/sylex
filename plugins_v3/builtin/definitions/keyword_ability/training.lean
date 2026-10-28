@@ -1,3 +1,5 @@
+/-- "Training" means "Whenever this creature and at least one other creature with power greater than
+this creature's power attack, put a +1/+1 counter on this creature." [CR#702.149a] -/
 keyword training : Ability := {
   lexical := { lemma := "training", verbs := [{ lemma := "train", frames := [Intransitive] }] },
   spelling := "training",

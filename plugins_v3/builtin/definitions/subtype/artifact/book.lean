@@ -1,3 +1,4 @@
+/-- No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype book := {
   lexical := { lemma := "Book" },
   spelling := "Book",

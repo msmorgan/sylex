@@ -1,3 +1,6 @@
+/-- "Gravestorm" means "When you cast this spell, copy it for each permanent that was put into a
+graveyard from the battlefield this turn. If the spell has any targets, you may choose new
+targets for any of the copies." [CR#702.69a] -/
 keyword gravestorm : Ability := {
   lexical := { lemma := "gravestorm" },
   spelling := "gravestorm",

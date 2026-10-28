@@ -1,3 +1,4 @@
+/-- A land with the basic land subtype Forest has the intrinsic ability "{T}: Add {G}." [CR#305.6] -/
 subtype forest := {
   lexical := { lemma := "Forest" },
   spelling := "Forest",

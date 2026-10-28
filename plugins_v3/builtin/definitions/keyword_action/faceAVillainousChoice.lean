@@ -1,3 +1,5 @@
+/-- Face a villainous choice: choose an option and perform all actions in it, doing as much as
+possible even if the option is illegal or impossible. [CR#701.55a,701.55b] -/
 action faceAVillainousChoice (first second : Action) : Action := {
   lexical := { verbs := [{ lemma := "face", frames := [Monotransitive, (TransitiveWithComplement SetOffClause)] }] },
   spelling := "face a villainous choice — <first> or <second>",

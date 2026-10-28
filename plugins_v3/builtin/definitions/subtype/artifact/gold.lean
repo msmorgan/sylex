@@ -1,3 +1,6 @@
+/-- Gold is an artifact subtype [CR#205.3g], also used by the predefined Gold token [CR#111.10c].
+
+No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype gold := {
   lexical := { lemma := "Gold" },
   spelling := "Gold",

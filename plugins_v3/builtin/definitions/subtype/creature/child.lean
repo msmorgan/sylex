@@ -1,3 +1,4 @@
+/-- Supported Oracle uses `Children` only in a flavor-word label, not as a subtype noun. -/
 subtype child := {
   lexical := { lemma := "Child", plural := "Children" },
   spelling := "Child",

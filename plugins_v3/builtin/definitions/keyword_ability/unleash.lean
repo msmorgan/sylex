@@ -1,3 +1,5 @@
+/-- "Unleash" means "You may have this permanent enter with an additional +1/+1 counter on it" and
+"This permanent can't block as long as it has a +1/+1 counter on it." [CR#702.98a] -/
 keyword unleash : Ability := {
   lexical := { lemma := "unleash" },
   spelling := "unleash",

@@ -1,3 +1,4 @@
+/-- Monstrous is a permanent designation [CR#701.37b]. -/
 designation monstrous := {
   lexical := { adjectives := ["monstrous"] },
   spelling := "monstrous",

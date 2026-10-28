@@ -1,3 +1,4 @@
+/-- Clue is an artifact subtype [CR#205.3g], also used by the predefined Clue token [CR#111.10f]. -/
 subtype clue := {
   lexical := { lemma := "Clue" },
   spelling := "Clue",

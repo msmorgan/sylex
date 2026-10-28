@@ -1,3 +1,4 @@
+/-- No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype rune := {
   lexical := { lemma := "Rune" },
   spelling := "Rune",

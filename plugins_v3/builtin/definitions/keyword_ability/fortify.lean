@@ -1,3 +1,5 @@
+/-- "Fortify [cost]" means "[Cost]: Attach this Fortification to target land you control. Activate
+only as a sorcery." [CR#702.67a] -/
 keyword fortify (cost : Cost) : Ability := {
   lexical := {
     lemma := "fortify",

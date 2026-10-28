@@ -1,3 +1,4 @@
+/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
 subtype ashiok := {
   lexical := { lemma := "Ashiok" },
   spelling := "Ashiok",

@@ -1,3 +1,7 @@
+/-- Learn can put a Lesson card owned outside the game into the learner's hand if they did not
+discard a card. [CR#701.48a]
+
+No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype lesson := {
   lexical := { lemma := "Lesson" },
   spelling := "Lesson",

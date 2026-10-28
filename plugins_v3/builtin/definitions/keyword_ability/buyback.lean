@@ -1,3 +1,6 @@
+/-- "Buyback [cost]" means "You may pay an additional [cost] as you cast this spell" and "If the
+buyback cost was paid, put this spell into its owner's hand instead of into that player's
+graveyard as it resolves." [CR#702.27a] -/
 keyword buyback (cost : Cost) : Ability := {
   lexical := { lemma := "buyback", parameters := [[Cost], [DashNonManaCost]] },
   -- TODO(spelling): buyback [mana cost] / buyback—[verbal cost]; separator and terminal period

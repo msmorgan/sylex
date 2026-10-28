@@ -1,3 +1,6 @@
+/-- A card with cipher in exile is "encoded" on the creature chosen as its
+spell resolved [CR#702.99b], for as long as [CR#702.99c] says: the card is
+the first side, the creature the second. -/
 relation encodedOn := {
 
 }

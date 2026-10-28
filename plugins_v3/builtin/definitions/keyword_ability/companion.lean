@@ -1,5 +1,3 @@
-/- ## Abilities -/
-
 /-- "Companion — <condition>" [CR#702.139a]: once during the game, any time you have priority and
 the stack is empty during a main phase of your turn, you may pay {3} and put this card from
 outside the game into your hand, a special action [CR#116.2g]. Revealing it before the game, if

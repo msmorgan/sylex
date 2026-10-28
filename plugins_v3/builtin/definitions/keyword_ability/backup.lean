@@ -1,3 +1,6 @@
+/-- "Backup N" means "When this creature enters, put N +1/+1 counters on target creature. If that's
+another creature, it also gains the non-backup abilities of this creature printed below this one
+until end of turn." [CR#702.165a] Only printed abilities are granted. [CR#702.165c] -/
 keyword backup (amount : Amount) : Ability := {
   lexical := { lemma := "backup", parameters := [[Amount]] },
   spelling := "backup <amount>",

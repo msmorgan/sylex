@@ -1,3 +1,4 @@
+/-- Investigate: create a Clue token. [CR#701.16a] -/
 action investigate : Action := {
   lexical := { verbs := [{ lemma := "investigate", frames := [Intransitive] }] },
   spelling := "investigate",

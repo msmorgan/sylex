@@ -1,3 +1,5 @@
+/-- Recruit: draw a card, then discard a card; if you discarded a nonland card, create a 1/1 white
+Human Soldier creature token. [CR#701.70a] -/
 action recruit : Action := {
   lexical := { verbs := [{ lemma := "recruit", frames := [Intransitive] }] },
   spelling := "recruit",

@@ -1,3 +1,6 @@
+/-- "Offspring [cost]" means "You may pay an additional [cost] as you cast this spell" and "When
+this permanent enters, if its offspring cost was paid, create a token that's a copy of it,
+except it's 1/1." [CR#702.175a] -/
 keyword offspring (cost : Cost) : Ability := {
   lexical := { lemma := "offspring", parameters := [[Cost]] },
   spelling := "offspring <cost>",

@@ -1,3 +1,5 @@
+/-- Endure N: the permanent's controller creates an N/N white Spirit creature token unless they put
+N +1/+1 counters on that permanent. [CR#701.63a] -/
 action endure (amount : Amount) : Action := {
   lexical := { verbs := [{ lemma := "endure", frames := [Amount] }] },
   permanent := performs,

@@ -1,3 +1,6 @@
+/-- "Rebound" means "If this spell was cast from your hand, instead of putting it into your
+graveyard as it resolves, exile it and, at the beginning of your next upkeep, you may cast this
+card from exile without paying its mana cost." [CR#702.88a] -/
 keyword rebound : Ability := {
   lexical := { lemma := "rebound" },
   spelling := "rebound",

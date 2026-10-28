@@ -1,3 +1,5 @@
+/-- The city's blessing is a player designation that lasts for the rest of the game
+[CR#702.131a,702.131c]. -/
 designation citysBlessing := {
   lexical := { nouns := [{ lemma := "city's blessing", countability := [Mass] }] },
   spelling := "city's blessing",

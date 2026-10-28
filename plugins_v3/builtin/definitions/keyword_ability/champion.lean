@@ -1,3 +1,6 @@
+/-- "Champion an [object]" means "When this permanent enters, sacrifice it unless you exile another
+[object] you control" and "When this permanent leaves the battlefield, return the exiled card to
+the battlefield under its owner's control" [CR#702.72a] -/
 keyword champion (subject : Predicate) : Ability := {
   lexical := {
     lemma := "champion",

@@ -1,3 +1,6 @@
+/-- Blood is an artifact subtype [CR#205.3g], also used by the predefined Blood token [CR#111.10g].
+
+No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype blood := {
   lexical := { lemma := "Blood" },
   spelling := "Blood",

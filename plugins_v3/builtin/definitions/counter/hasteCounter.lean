@@ -1,3 +1,5 @@
+/-- A haste counter causes its bearer to gain haste; keyword counters apply in layer 6.
+[CR#122.1b,613.1f] -/
 counter hasteCounter := {
   lexical := { lemma := "haste counter" },
   spelling := "haste counter",

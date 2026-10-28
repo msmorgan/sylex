@@ -1,3 +1,6 @@
+/-- "Dredge N" means "As long as you have at least N cards in your library, if you would draw a
+card, you may instead mill N cards and return this card from your graveyard to your hand."
+[CR#702.52a] -/
 keyword dredge (amount : Amount) : Ability := {
   lexical := { lemma := "dredge", parameters := [[Amount]] },
   spelling := "dredge <amount>",

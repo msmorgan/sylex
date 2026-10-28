@@ -1,3 +1,5 @@
+/-- "Mentor" means "Whenever this creature attacks, put a +1/+1 counter on target attacking creature
+with power less than this creature's power." [CR#702.134a] -/
 keyword mentor : Ability := {
   lexical := { lemma := "mentor", verbs := [{ lemma := "mentor", frames := [Monotransitive] }] },
   spelling := "mentor",

@@ -1,3 +1,5 @@
+/-- Saddled is a permanent designation until the end of the turn or until it leaves the
+battlefield [CR#702.171b]. -/
 designation saddled := {
   lexical := { adjectives := ["saddled"] },
   spelling := "saddled",

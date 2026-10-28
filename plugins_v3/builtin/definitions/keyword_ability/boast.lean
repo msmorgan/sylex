@@ -1,3 +1,5 @@
+/-- "Boast — [Cost]: [Effect]" means "[Cost]: [Effect]. Activate only if this creature attacked this
+turn and only once each turn." [CR#702.142a] -/
 keyword boast (ability : Ability) : Ability := {
   lexical := {
     lemma := "boast",

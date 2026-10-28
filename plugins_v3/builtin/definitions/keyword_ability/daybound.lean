@@ -1,3 +1,6 @@
+/-- "Daybound" means "If it is night and this permanent is represented by a double-faced card, it
+enters transformed," "As it becomes night, if this permanent is front face up, transform it,"
+and "This permanent can't transform except due to its daybound ability." [CR#702.145b] -/
 keyword daybound : Ability := {
   lexical := { lemma := "daybound" },
   spelling := "daybound",

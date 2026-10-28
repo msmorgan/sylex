@@ -1,3 +1,4 @@
+/-- No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype planet := {
   lexical := { lemma := "Planet" },
   spelling := "Planet",

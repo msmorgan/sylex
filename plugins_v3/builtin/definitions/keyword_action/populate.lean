@@ -1,3 +1,5 @@
+/-- Populate: choose a creature token you control and create a token that is a copy of it.
+[CR#701.36a] -/
 action populate : Action := {
   lexical := { verbs := [{ lemma := "populate", frames := [Intransitive] }] },
   spelling := "populate",

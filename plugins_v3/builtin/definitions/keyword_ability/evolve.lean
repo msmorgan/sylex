@@ -1,3 +1,6 @@
+/-- "Evolve" means "Whenever a creature you control enters, if that creature's power is greater than
+this creature's power and/or that creature's toughness is greater than this creature's
+toughness, put a +1/+1 counter on this creature." [CR#702.100a] -/
 keyword evolve : Ability := {
   lexical := { lemma := "evolve", verbs := [{ lemma := "evolve", frames := [Intransitive] }] },
   spelling := "evolve",

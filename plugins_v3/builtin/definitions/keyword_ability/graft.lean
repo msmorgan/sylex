@@ -1,3 +1,6 @@
+/-- "Graft N" means "This permanent enters with N +1/+1 counters on it" and "Whenever another
+creature enters, if this permanent has a +1/+1 counter on it, you may move a +1/+1 counter from
+this permanent onto that creature." [CR#702.58a] -/
 keyword graft (amount : Amount) : Ability := {
   lexical := { lemma := "graft", parameters := [[Amount]] },
   spelling := "graft <amount>",

@@ -1,3 +1,5 @@
+/-- "Tribute N" means "As this creature enters, choose an opponent. That player may put an
+additional N +1/+1 counters on it as it enters." [CR#702.104a] -/
 keyword tribute (amount : Amount) : Ability := {
   lexical := {
     lemma := "tribute",

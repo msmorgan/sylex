@@ -1,3 +1,7 @@
+/-- Heartwood is an artifact subtype [CR#205.3g], also used by the predefined Heartwood token
+[CR#111.10x].
+
+No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype heartwood := {
   lexical := { lemma := "Heartwood" },
   spelling := "Heartwood",

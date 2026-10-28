@@ -1,3 +1,5 @@
+/-- An enduring story is a player designation that lasts for the rest of the game
+[CR#702.195a..702.195b]. -/
 designation enduringStory := {
   lexical := { nouns := ["enduring story"] },
   spelling := "enduring story",

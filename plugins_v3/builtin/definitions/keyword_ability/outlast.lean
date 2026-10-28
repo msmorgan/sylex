@@ -1,3 +1,5 @@
+/-- "Outlast [cost]" means "[Cost], {T}: Put a +1/+1 counter on this creature. Activate only as a
+sorcery." [CR#702.107a] -/
 keyword outlast (cost : Cost) : Ability := {
   lexical := { lemma := "outlast", parameters := [[Cost]] },
   spelling := "outlast <cost>",

@@ -1,3 +1,5 @@
+/-- A trample counter causes its bearer to gain trample; keyword counters apply in layer 6.
+[CR#122.1b,613.1f] -/
 counter trampleCounter := {
   lexical := { lemma := "trample counter" },
   spelling := "trample counter",

@@ -1,3 +1,5 @@
+/-- "Mayhem [cost]" means "As long as you discarded this card this turn, you may cast it from your
+graveyard by paying [cost] rather than paying its mana cost." [CR#702.187b] -/
 keyword mayhem (cost : Cost) : Ability := {
   lexical := { lemma := "mayhem", parameters := [[Cost], []] },
   spelling := "mayhem <cost>",

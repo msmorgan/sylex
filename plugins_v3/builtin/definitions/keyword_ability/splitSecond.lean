@@ -1,3 +1,5 @@
+/-- "Split second" means "As long as this spell is on the stack, players can't cast other spells or
+activate abilities that aren't mana abilities." [CR#702.61a] -/
 keyword splitSecond : Ability := {
   lexical := { lemma := "split second" },
   spelling := "split second",

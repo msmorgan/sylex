@@ -1,3 +1,4 @@
+/-- Goaded is a permanent designation [CR#701.15b]. -/
 designation goaded := {
   lexical := { adjectives := ["goaded"] },
   spelling := "goaded",

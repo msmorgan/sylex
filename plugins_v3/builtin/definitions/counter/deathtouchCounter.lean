@@ -1,3 +1,5 @@
+/-- A deathtouch counter causes its bearer to gain deathtouch; keyword counters apply in layer 6.
+[CR#122.1b,613.1f] -/
 counter deathtouchCounter := {
   lexical := { lemma := "deathtouch counter" },
   spelling := "deathtouch counter",

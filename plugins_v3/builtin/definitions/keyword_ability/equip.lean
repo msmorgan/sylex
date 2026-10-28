@@ -1,3 +1,5 @@
+/-- "Equip [cost]" means "[Cost]: Attach this permanent to target creature you control. Activate
+only as a sorcery." [CR#702.6a] -/
 keyword equip (cost : Cost) : Ability := {
   lexical := {
     lemma := "equip",

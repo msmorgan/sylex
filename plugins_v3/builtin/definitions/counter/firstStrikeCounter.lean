@@ -1,3 +1,5 @@
+/-- A first strike counter causes its bearer to gain first strike; keyword counters apply in layer
+6. [CR#122.1b,613.1f] -/
 counter firstStrikeCounter := {
   lexical := { lemma := "first strike counter" },
   spelling := "first strike counter",

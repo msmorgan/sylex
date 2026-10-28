@@ -1,5 +1,3 @@
-/- ## Keyword abilities -/
-
 /-- "Absorb N": "If a source would deal damage to this creature, prevent N of that damage."
 [CR#702.64a] -/
 keyword absorb (amount : Amount) : Ability := {

@@ -1,3 +1,6 @@
+/-- "Delve" means "For each generic mana in this spell's total cost, you may exile a card from your
+graveyard rather than pay that mana." [CR#702.66a] It is neither an additional nor an
+alternative cost. [CR#702.66b] -/
 keyword delve : Ability := {
   lexical := { lemma := "delve" },
   spelling := "delve",

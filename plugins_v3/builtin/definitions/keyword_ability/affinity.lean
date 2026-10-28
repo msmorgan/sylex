@@ -1,3 +1,5 @@
+/-- "Affinity for [text]" means "This spell costs {1} less to cast for each [text] you control."
+[CR#702.41a] -/
 keyword affinity (quality : Predicate) : Ability := {
   lexical := { lemma := "affinity", parameters := [[Quality (Some ("for"))]] },
   -- TODO(spelling): Affinity for artifacts / affinity for green creatures; the quality needs

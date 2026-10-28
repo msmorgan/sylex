@@ -1,3 +1,4 @@
+/-- No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype urzas := {
   lexical := { lemma := "Urza's", plural := "Urza's" },
   spelling := "Urza's",

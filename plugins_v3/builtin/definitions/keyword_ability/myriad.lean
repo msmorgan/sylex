@@ -1,3 +1,7 @@
+/-- "Myriad" means "Whenever this creature attacks, for each opponent other than defending player,
+you may create a token that's a copy of this creature that's tapped and attacking that player or
+a planeswalker they control. If one or more tokens are created this way, exile the tokens at end
+of combat." [CR#702.116a] -/
 keyword myriad : Ability := {
   lexical := { lemma := "myriad" },
   spelling := "myriad",

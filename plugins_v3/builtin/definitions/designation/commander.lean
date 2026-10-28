@@ -1,3 +1,5 @@
+/-- The commander designation is an attribute of the card itself, retained across zone changes.
+A deck can have two commanders with partner. [CR#903.3,702.124a] -/
 designation commander := {
   lexical := { nouns := ["commander"] },
   spelling := "commander",

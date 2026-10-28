@@ -1,3 +1,4 @@
+/-- A land with the basic land subtype Mountain has the intrinsic ability "{T}: Add {R}." [CR#305.6] -/
 subtype mountain := {
   lexical := { lemma := "Mountain" },
   spelling := "Mountain",

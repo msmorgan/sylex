@@ -1,3 +1,5 @@
+/-- "Rampage N" means "Whenever this creature becomes blocked, it gets +N/+N until end of turn for
+each creature blocking it beyond the first." [CR#702.23a] -/
 keyword rampage (amount : Amount) : Ability := {
   lexical := { lemma := "rampage", parameters := [[Amount]] },
   spelling := "rampage <amount>",

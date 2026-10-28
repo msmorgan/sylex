@@ -1,3 +1,6 @@
+/-- "Embalm [cost]" means "[Cost], Exile this card from your graveyard: Create a token that's a copy
+of this card, except it's white, it has no mana cost, and it's a Zombie in addition to its other
+types. Activate only as a sorcery." [CR#702.128a] -/
 keyword embalm (cost : Cost) : Ability := {
   lexical := {
     lemma := "embalm",

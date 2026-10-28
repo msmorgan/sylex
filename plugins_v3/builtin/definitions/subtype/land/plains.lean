@@ -1,3 +1,4 @@
+/-- A land with the basic land subtype Plains has the intrinsic ability "{T}: Add {W}." [CR#305.6] -/
 subtype plains := {
   lexical := { lemma := "Plains", plural := "Plains" },
   spelling := "Plains",

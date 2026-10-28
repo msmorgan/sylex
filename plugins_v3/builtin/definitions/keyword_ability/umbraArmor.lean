@@ -1,3 +1,5 @@
+/-- "Umbra armor" means "If enchanted permanent would be destroyed, instead remove all damage marked
+on it and destroy this Aura." [CR#702.89a] -/
 keyword umbraArmor : Ability := {
   lexical := { lemma := "umbra armor" },
   spelling := "umbra armor",

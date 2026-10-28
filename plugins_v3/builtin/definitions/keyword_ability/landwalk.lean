@@ -1,3 +1,6 @@
+/-- A creature with landwalk cannot be blocked while the defending player controls a land matching
+the land type, card type, supertype, or combination specified by its landwalk ability.
+[CR#702.14c] -/
 keyword landwalk (quality : Predicate) : Ability := {
   lexical := {
     lemma := "landwalk",

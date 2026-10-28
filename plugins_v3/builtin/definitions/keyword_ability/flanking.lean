@@ -1,3 +1,5 @@
+/-- "Flanking" means "Whenever this creature becomes blocked by a creature without flanking, the
+blocking creature gets −1/−1 until end of turn." [CR#702.25a] -/
 keyword flanking : Ability := {
   lexical := { lemma := "flanking" },
   spelling := "flanking",

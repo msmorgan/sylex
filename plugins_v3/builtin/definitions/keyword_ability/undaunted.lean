@@ -1,3 +1,5 @@
+/-- "Undaunted" means "This spell costs {1} less to cast for each opponent you have."
+[CR#702.125a] -/
 keyword undaunted : Ability := {
   lexical := { lemma := "undaunted" },
   spelling := "undaunted",

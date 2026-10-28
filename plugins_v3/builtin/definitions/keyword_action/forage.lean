@@ -1,3 +1,4 @@
+/-- Forage: exile three cards from your graveyard or sacrifice a Food. [CR#701.61a] -/
 action forage : Action := {
   lexical := { verbs := [{ lemma := "forage", frames := [Intransitive] }] },
   spelling := "forage",

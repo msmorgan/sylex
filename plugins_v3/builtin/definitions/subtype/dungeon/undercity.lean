@@ -1,3 +1,5 @@
+/-- Undercity is a dungeon subtype [CR#205.3p]. Venture into Undercity restricts the dungeon chosen
+if its player has no dungeon in the command zone [CR#701.49d]. -/
 subtype undercity := {
   lexical := { lemma := "Undercity" },
   spelling := "Undercity",
