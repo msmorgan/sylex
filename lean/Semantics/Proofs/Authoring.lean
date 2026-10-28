@@ -490,11 +490,13 @@ one target per bullet. -/
 theorem callDamageControlWritesEachPartOnce :
     let calls := formCalls Cards.callDamageControl.authoring
     calls.count ``Templates.chooseModesOver = 1 ∧ calls.count ``Templates.returnToHand = 1 ∧
-      calls.count ``Semantics.Templates.target = 4 ∧
+      calls.count ``Semantics.Templates.NounPhrase.target = 4 ∧
       (modesOver? Cards.callDamageControl.authoring).map
           (fun (items, body) => (items.map fun item => (formCalls item).head?, suppliedBody body)) =
-        some ([some ``Semantics.Templates.target, some ``Semantics.Templates.target, some ``Semantics.Templates.target,
-            some ``Semantics.Templates.target],
+        some ([some ``Semantics.Templates.NounPhrase.target,
+            some ``Semantics.Templates.NounPhrase.target,
+            some ``Semantics.Templates.NounPhrase.target,
+            some ``Semantics.Templates.NounPhrase.target],
           some (`cards, [``Templates.returnToHand, ``Templates.yourGraveyard])) := by
   decide
 
@@ -520,13 +522,13 @@ bullet. -/
 theorem wildShapeWritesEachPartOnce :
     let calls := formCalls Cards.wildShape.authoring
     calls.count ``Templates.chooseModesOver = 1 ∧ calls.count ``Templates.establish = 1 ∧
-      calls.count ``Semantics.Templates.target = 1 ∧ calls.count ``Templates.untilEndOfTurn = 1 ∧
+      calls.count ``Semantics.Templates.NounPhrase.target = 1 ∧ calls.count ``Templates.untilEndOfTurn = 1 ∧
       (modesOver? Cards.wildShape.authoring).map
           (fun (items, body) => (items.map formCalls, suppliedBody body)) =
         some ([[``turtle, ``hexproof, ``stat, ``stat], [``spider, ``reach, ``stat, ``stat],
             [``elephant, ``trample, ``stat, ``stat]],
           some (`shape,
-            [``Templates.establish, ``Templates.qualityChange, ``Semantics.Templates.target,
+            [``Templates.establish, ``Templates.qualityChange, ``Semantics.Templates.NounPhrase.target,
               ``Templates.Predicate.and, ``isCreature, ``youControl, ``Templates.bundle,
               ``Templates.untilEndOfTurn])) := by
   decide

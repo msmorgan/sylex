@@ -18,6 +18,5 @@ load_bundle "../plugins_v3/builtin" templatesIn Semantics.Templates
 end Semantics.Definitions
 
 namespace Semantics.Templates
-export Semantics.Templates.Action (target)
-export Semantics.Templates.Status (become)
+export Semantics.Templates.NounPhrase (target)
 end Semantics.Templates

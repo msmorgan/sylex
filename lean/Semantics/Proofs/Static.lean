@@ -172,7 +172,7 @@ has type
 but is expected to have type
   Replacement
 in the application
-  @Templates.StaticSpec.replace instAuthoringContext (would (actor you) (draw 1)) (draw 2)
+  @Templates.StaticSpec.replace instAuthoringContext (would (Templates.Subject.actor you) (draw 1)) (draw 2)
 -/
 #guard_msgs in
 example : StaticSpec := replace (would (actor you) (draw 1)) (draw 2)

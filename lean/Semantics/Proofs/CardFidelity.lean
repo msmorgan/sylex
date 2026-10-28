@@ -208,7 +208,7 @@ private def triggerEvents (card : Card) : List GameEvent :=
 /-- Darksteel Garrison: "Whenever fortified land becomes tapped" fires on the change from untapped
 to tapped [CR#603.2e], for mana or not (ruling 2007-05-01). -/
 theorem darksteelGarrisonWatchesBecomingTapped :
-    triggerEvents Cards.darksteelGarrison.card = [does (fortified land) (become tapped)] := rfl
+    triggerEvents Cards.darksteelGarrison.card = [does (fortified land) (becomeStatus tapped)] := rfl
 
 /-- Lightmine Field deals damage "equal to the number of attacking creatures", not the number of
 the triggering group. -/

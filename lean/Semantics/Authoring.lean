@@ -293,7 +293,10 @@ def dispatchOnExpectedType : TermElab := fun stx expected? => do
   if expected.getAppFn.isMVar then
     tryPostpone
     throwUnsupportedSyntax
-  let some sort := (← whnfR expected).getAppFn.constName? | throwUnsupportedSyntax
+  let expectedWhnf ← whnfR expected
+  let expectedHead :=
+    if expectedWhnf.isAppOfArity ``Option 1 then expectedWhnf.appArg! else expectedWhnf
+  let some sort := (← whnfR expectedHead).getAppFn.constName? | throwUnsupportedSyntax
   let some target ← dispatchTarget? fn.getId sort | throwUnsupportedSyntax
   if fn.getId == target then throwUnsupportedSyntax
   let alternatives ← try resolveGlobalConst fn catch _ => pure []
@@ -852,7 +855,7 @@ private partial def inspectCore (cache : IO.Ref InspectionCache)
           (`Semantics.Templates.coeSubtypePredicate, `Semantics.Templates.hasSubtype),
           (`Semantics.Templates.coeManaCostCost, `Semantics.Templates.mana),
           (`Semantics.Templates.coeActionCost, `Semantics.Templates.perform),
-          (`Semantics.Templates.coeCharacteristicBundleTokenSpec, `Semantics.Templates.written),
+          (`Semantics.Templates.coeCharacteristicBundleTokenSpec, `Semantics.Templates.TokenSpec.written),
           (`Semantics.Templates.coeCounterKindCounterKindSource, `Semantics.Templates.printedKind),
           (`Semantics.Templates.coeStringNameSource, `Semantics.Templates.printedName),
           (`Semantics.Templates.coeConditionAsThough, `Semantics.Templates.holds),

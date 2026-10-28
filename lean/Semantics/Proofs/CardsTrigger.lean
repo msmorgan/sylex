@@ -46,7 +46,7 @@ def beastWhisperer : Ability :=
     [isCreature, isSpell])))) (draw 1)
 theorem okBeastWhisperer : Ability.check (DRS.ofList []) beastWhisperer = [] := by decide
 def mesmericOrb : Ability :=
-  whenever (does (a isPermanent) (become untapped))
+  whenever (does (a isPermanent) (becomeStatus untapped))
     (instruct (controllerOf (that permanent)) (mill 1))
 theorem okMesmericOrb : Ability.check (DRS.ofList []) mesmericOrb = [] := by decide
 def secretPlans : Ability :=

@@ -103,7 +103,7 @@ def songOfEarendil : Action :=
     (each (and [isCreature, youControl, not (hasKeyword flying)]))
 theorem okSongOfEarendil : Action.check (DRS.ofList []) songOfEarendil = [] := by decide
 def gideonsAvenger : Ability :=
-  whenever (does (a (and [isCreature, anOpponentControls])) (become tapped))
+  whenever (does (a (and [isCreature, anOpponentControls])) (becomeStatus tapped))
     (putCounters 1 p1p1Counter thisCreature)
 theorem okGideonsAvenger : Ability.check (DRS.ofList []) gideonsAvenger = [] := by decide
 def prologueToPhyresis : Action :=
