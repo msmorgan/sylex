@@ -3,7 +3,7 @@ import Semantics.Check
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Proofs.CardsDescription
+import Semantics.Proofs.CardsHelpers
 
 /-!
 # Semantics.Cards.Anaphora
@@ -72,9 +72,6 @@ def foulTongueShriek : Action :=
         (forEach 1 (and [isAttacking, isCreature, youControl]))),
       gainLife thatMuch ]
 theorem okFoulTongueShriek : Action.check (DRS.ofList []) foulTongueShriek = [] := by decide
-
-def phyrexianInfiltrator : Action := exchangeControl thisCreature (target isCreature)
-theorem okPhyrexianInfiltrator : Action.check (DRS.ofList []) phyrexianInfiltrator = [] := by decide
 
 def impulse : Action :=
   sequentially
@@ -275,19 +272,6 @@ def wyllExtraDie : Action :=
     none
 theorem okWyllExtraDie : Action.check (DRS.ofList []) wyllExtraDie = [] := by decide
 
-/-- Vedalken Squirrel-Whacker -/
-def vedalkenSquirrelWhackerReroll : Action :=
-  replaceEvent (would you (rollDice anyAmount (.sides 6)))
-    (instead (sequentially
-      [ rollDice thatMuch .thoseDice,
-        may
-          (chooseOne
-            (exchangeValues (theOutcome .rollResult) (basePowerOf thisCreature))
-            (exchangeValues (theOutcome .rollResult) (baseToughnessOf thisCreature))) ]))
-    none
-theorem okVedalkenSquirrelWhackerReroll :
-    Action.check (DRS.ofList []) vedalkenSquirrelWhackerReroll = [] := by decide
-
 /-- Investigator's Journal's count -/
 def greatestCreaturesAPlayerControls : Amount :=
   (match (cardNamed "Investigator's Journal").card with
@@ -303,16 +287,6 @@ def greatestArtifactsAnOpponentControls : Amount :=
   aggregateOver .max isOpponent (countOf (and [isArtifact, controlledBy they]))
 theorem okGreatestArtifactsAnOpponentControls :
     Amount.check (DRS.ofList []) greatestArtifactsAnOpponentControls = [] := by decide
-
-/-- "each creature that player or that planeswalker's controller controls" -/
-def eachCreatureThatSplitControls : NounPhrase :=
-  (match (cardNamed "Heart of Bogardan").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
-        (Action.simultaneously (List.cons _ (List.cons (Action.instruct _ (Action.dealDamage _ part
-        _)) _))) _))) _)) => some part
-      | _ => none
-    | _ => none).get (by decide)
 
 def anyTargetAnnounced : NounPhrase := target isAnyTarget
 theorem okAnyTargetAnnounced : NounPhrase.checkAt none (DRS.ofList []) anyTargetAnnounced = [] := by decide
@@ -350,25 +324,6 @@ theorem okEachCreatureThatSplitControls :
         ((stepNounPhrase 512 (DRS.ofList []) .obj true playerOrPlaneswalkerAnnounced).1)
         eachCreatureThatSplitControls = [] := by
   decide
-
-/-- Boreas Charger's description -/
-def opponentWithMoreLands : Predicate :=
-  (match (cardNamed "Land Tax").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons (Ability.triggered _ _ _ _ _ _ (Option.some (Condition.exists_
-        (NounPhrase.described _ part))) _) _) => some part
-      | _ => none
-    | _ => none).get (by decide)
-theorem okOpponentWithMoreLands : Predicate.checkAt .player (DRS.ofList []) opponentWithMoreLands = [] := by
-  decide
-
-def bioplasmCardTest : Condition := (match (cardNamed "Bioplasm").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons
-        (Action.doIf part _ _ _) _)))) _) => some part
-      | _ => none
-    | _ => none).get (by decide)
-theorem okBioplasmCardTest : Condition.check (nextClause bioplasmAfterExile) bioplasmCardTest = [] := by decide
 
 /-- Blessed Respite -/
 def blessedRespiteShuffle : Action :=
@@ -435,7 +390,6 @@ theorem bioplasmNoTypedRead :
 theorem bioplasmExiledCardHasNoType :
     (participialCandidates (.deed (.action "exile")) (some .one) none false bioplasmAfterExile).map (·.ty)
       = [[]] := by decide
-def bioplasmAfterTest : DRS := (stepCondition 512 (nextClause bioplasmAfterExile) bioplasmCardTest).1
 theorem bioplasmTypeTestPreservesExiledIdentity :
     let before := participialCandidates (.deed (.action "exile")) (some .one) none false bioplasmAfterExile
     let after := participialCandidates (.deed (.action "exile")) (some .one) none false bioplasmAfterTest

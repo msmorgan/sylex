@@ -1,4 +1,3 @@
-import Semantics.Cards
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
@@ -35,10 +34,6 @@ def truthOrConsequencesVote : Ability :=
         instruct this_
           (dealDamage (times 3 (votesFor "consequences")) (that player)) ]))
 theorem okTruthOrConsequencesVote : Ability.check (DRS.ofList []) truthOrConsequencesVote = [] := by decide
-
-/-- Harness Infinity: the exchange action alone, as the Idris bench holds it. -/
-def harnessInfinityExchange : Action := exchangeZones hand graveyard
-theorem okHarnessInfinityExchange : Action.check (DRS.ofList []) harnessInfinityExchange = [] := by decide
 
 theorem countedAtRandomIsPlural : NounPhrase.plur twoCardsAtRandom = .many := by decide
 

@@ -2,8 +2,7 @@ import Semantics.Cards
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Proofs.CardsChoice
-import Semantics.Proofs.CardsTrigger
+import Semantics.Proofs.CardsHelpers
 
 /-!
 # Semantics.Cards.Static

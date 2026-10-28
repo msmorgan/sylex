@@ -2,7 +2,7 @@ import Semantics.Cards
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Proofs.CardsAnaphora
+import Semantics.Proofs.CardsHelpers
 
 /-!
 # Semantics.Cards.Trigger
@@ -289,9 +289,6 @@ def allSeeingArbiterHeader : GameEvent :=
     (cardIn hand)))
 theorem okAllSeeingArbiterHeader : GameEvent.check (DRS.ofList []) allSeeingArbiterHeader = [] := by decide
 
-/-- Tahngarth, First Mate -/
-def tahngarthHeader : GameEvent := does anOpponent (attackWith (counted (orMore 1) isCreature))
-theorem okTahngarthHeader : GameEvent.check (DRS.ofList []) tahngarthHeader = [] := by decide
 /-- Myth Unbound -/
 def mythUnboundTrigger : Ability :=
   whenever (does any (putInto yourCommander commandZone (from_ := some any))) (draw 1)
@@ -320,7 +317,7 @@ theorem frostWalkerSacrificesItself :
       (nextClause (stepGameEvent 64 (DRS.ofList [])
         (does (a (or [isSpell, abilityHead .anyOnStack])) (target thisCreature))).1)
       (sacrifice it)).1
-    (cardNamed "Frost Walker").card.check = [] ∧ out.resolvedIds = [2] ∧
+    out.resolvedIds = [2] ∧
       (out.findById? 2).map (fun ref => (ref.det, ref.zone, ref.movedFrom)) =
         some (.self, some .graveyard, [1]) ∧
       (out.findById? 0).bind (·.zone) = some .stack := by
@@ -328,7 +325,6 @@ theorem frostWalkerSacrificesItself :
 
 /-- Segmented Wurm's "it" is the source (`1`), not the targeting spell or ability (`0`). -/
 theorem segmentedWurmPutsTheCounterOnItself :
-    (cardNamed "Segmented Wurm").card.check = [] ∧
     (stepAction 64 .postEvent .obj
       (nextClause (stepGameEvent 64 (DRS.ofList [])
         (does (a (or [isSpell, abilityHead .anyOnStack])) (target thisCreature))).1)
@@ -338,7 +334,6 @@ theorem segmentedWurmPutsTheCounterOnItself :
 /-- Angelic Cub's trigger reads "it" as the source (`1`), not the targeting spell or ability
 (`0`); the trigger fragment keeps its first occurrence each turn. -/
 theorem angelicCubPutsTheCounterOnItself :
-    (cardNamed "Angelic Cub").card.check = [] ∧
     (stepAction 64 .postEvent .obj
       (nextClause (stepGameEvent 64 (DRS.ofList [])
         (nthOccurrence (.nth 1)

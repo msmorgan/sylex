@@ -2,9 +2,7 @@ import Semantics.Cards
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Proofs.CardsDescription
-import Semantics.Proofs.CardsKeyword
-import Semantics.Proofs.CardsStatic
+import Semantics.Proofs.CardsHelpers
 
 /-!
 # Semantics.Cards.Cost
@@ -239,11 +237,6 @@ def obeliskOfUndoing : Ability :=
   activated (compound [[generic 6], tapSymbol])
     (returnToHand (target (and [isPermanent, youOwn, youControl])))
 theorem okObeliskOfUndoing : Ability.check (DRS.ofList []) obeliskOfUndoing = [] := by decide
-/-- Soul Conduit -/
-def soulConduitExchange : Ability :=
-  activated (compound [[generic 6], tapSymbol])
-    (exchangeLifeTotals (targets (exactly 2) isPlayer))
-theorem okSoulConduitExchange : Ability.check (DRS.ofList []) soulConduitExchange = [] := by decide
 
 /-- Cavern-Hoard Dragon -/
 def cavernHoardDragonRider : Ability :=

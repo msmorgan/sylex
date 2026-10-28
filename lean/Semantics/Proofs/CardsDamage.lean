@@ -2,9 +2,7 @@ import Semantics.Cards
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Proofs.CardsDescription
-import Semantics.Proofs.CardsAnaphora
-import Semantics.Proofs.CardsTrigger
+import Semantics.Proofs.CardsHelpers
 
 /-!
 # Semantics.Cards.Damage
@@ -17,9 +15,6 @@ open Semantics Semantics.Templates Semantics.Definitions
 
 namespace Semantics.Cards
 
-/-- Lightning Bolt -/
-def bolt : Action := instruct this_ (dealDamage 3 (target isAnyTarget))
-theorem okBolt : Action.check (DRS.ofList []) bolt = [] := by decide
 def barrageOfBoulders : Action :=
   instruct this_ (dealDamage 1 (each (and [isCreature, youDontControl])))
 theorem okBarrageOfBoulders : Action.check (DRS.ofList []) barrageOfBoulders = [] := by decide
@@ -51,11 +46,7 @@ def pyriteSpellbomb : Ability :=
   activated (compound [[pip .red], sacrifice thisArtifact])
     (instruct this_ (dealDamage 2 (target isAnyTarget)))
 theorem okPyriteSpellbomb : Ability.check (DRS.ofList []) pyriteSpellbomb = [] := by decide
-def karplusanYeti : Action :=
-  sequentially
-    [ dealDamageOwnPower thisCreature (target isCreature),
-      dealDamageOwnPower (that creature) thisCreature ]
-theorem okKarplusanYeti : Action.check (DRS.ofList []) karplusanYeti = [] := by decide
+
 def suddenDemise : Action :=
   sequentially
     [ choose (a (quality .color)),
@@ -183,17 +174,6 @@ theorem okPurgingScythe : Ability.check (DRS.ofList []) purgingScythe = [] := by
 def chandraNalaarsX : Ability :=
   activated (loyaltySymbol (down (letter .x))) (instruct this_ (dealDamage (letter .x) (target isCreature)))
 theorem okChandraNalaarsX : Ability.check (DRS.ofList []) chandraNalaarsX = [] := by decide
-
-/-- Inkshield -/
-def inkshieldRider : Action :=
-  establishThroughout
-    (replace (would any (dealDamage anyAmount you (some .combat)))
-      (instead
-        (preventDamage allDamage
-          (also :=
-            create preventedThisWay (creatureToken 2 1 [.white, .black] [inkling] [flying])))))
-    thisTurn
-theorem okInkshieldRider : Action.check (DRS.ofList []) inkshieldRider = [] := by decide
 
 def onakkeJavelineerBolt : Ability :=
   activated tapSymbol
@@ -397,13 +377,7 @@ def goblinLyreLoseFlip : Action :=
                                      [isCreature, controlledBy
                                         splitOverPlaneswalker])) you) ]
 theorem okGoblinLyreLoseFlip : Action.check (DRS.ofList []) goblinLyreLoseFlip = [] := by decide
-/-- Quenchable Fire -/
-def quenchableFire : Action :=
-  sequentially
-    [ instruct this_ (dealDamage 3 targetPlayerOrPlaneswalker),
-      delayUnlessPaid (beginningOf .upkeep you nextTime) (instruct this_ (dealDamage 3 thatJoin))
-        splitOverPlaneswalker [pip .blue] ]
-theorem okQuenchableFire : Action.check (DRS.ofList []) quenchableFire = [] := by decide
+
 /-- Searing Blaze, both sentences -/
 def searingBlaze : Ability :=
   landfall

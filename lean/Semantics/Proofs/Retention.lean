@@ -1,6 +1,5 @@
 import Semantics.Cards
 import Semantics.Proofs.CardsDeontic
-import Semantics.Proofs.CardsKeyword
 import Semantics.Proofs.Helpers
 
 /-!

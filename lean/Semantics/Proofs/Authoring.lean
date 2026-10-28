@@ -2,8 +2,6 @@ import Semantics.Cards
 import Semantics.Check
 import Semantics.Check.Card
 import Semantics.Definitions
-import Semantics.Proofs.CardsChoice
-import Semantics.Proofs.CardsCost
 
 open Semantics Semantics.Templates Semantics.Definitions
 

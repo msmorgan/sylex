@@ -2,7 +2,7 @@ import Semantics.Cards
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Proofs.CardsDescription
+import Semantics.Proofs.CardsHelpers
 
 /-!
 # Semantics.Cards.Deontic
@@ -280,15 +280,6 @@ def distortionStrikeLine : Action :=
     [ get (target isCreature) (up 1) (up 0) untilEndOfTurn,
       establishThroughout (cant any (block (that creature))) thisTurn ]
 theorem okDistortionStrikeLine : Action.check (DRS.ofList []) distortionStrikeLine = [] := by decide
-
-/-- Cloudspire Captain: "This creature saddles Mounts and crews Vehicles as though its power were
-2 greater.", indicative as Hotshot Mechanic's is [CR#609.4]. -/
-def cloudspireCaptainCrewLine : StaticSpec :=
-  conjunction
-    [ asThough thisCreature (saddle (allOf (hasSubtype mount))) (greaterBy .power 2),
-      asThough thisCreature (crew (allOf (hasSubtype vehicle))) (greaterBy .power 2) ]
-theorem okCloudspireCaptainCrewLine : StaticSpec.check (DRS.ofList []) cloudspireCaptainCrewLine = [] := by
-  decide
 
 /-- Conqueror's Flail -/
 def conquerorsFlailProhibition : StaticSpec :=

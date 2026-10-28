@@ -75,6 +75,7 @@ import Semantics.Proofs.CardsDamage
 import Semantics.Proofs.CardsDeontic
 import Semantics.Proofs.CardsDescription
 import Semantics.Proofs.CardsFaces
+import Semantics.Proofs.CardsHelpers
 import Semantics.Proofs.CardsKeyword
 import Semantics.Proofs.CardsMana
 import Semantics.Proofs.CardsPiles

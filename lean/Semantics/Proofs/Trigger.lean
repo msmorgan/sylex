@@ -1,8 +1,6 @@
 import Semantics.Cards
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Proofs.CardsPiles
-import Semantics.Proofs.CardsTurn
 
 /-!
 # Semantics.Proofs.Trigger

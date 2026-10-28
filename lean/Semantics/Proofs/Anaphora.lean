@@ -1,10 +1,9 @@
-import Semantics.Proofs.CardsDescription
 import Semantics.Cards
 import Semantics.Check
 import Semantics.Definitions
 import Semantics.Check.Card
 import Semantics.Proofs.Helpers
-import Semantics.Proofs.CardsAnaphora
+import Semantics.Proofs.CardsHelpers
 
 /-!
 # Semantics.Proofs.Anaphora

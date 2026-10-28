@@ -2,8 +2,7 @@ import Semantics.Cards
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Proofs.CardsAnaphora
-import Semantics.Proofs.CardsTrigger
+import Semantics.Proofs.CardsHelpers
 
 /-!
 # Semantics.Cards.Choice
@@ -202,8 +201,6 @@ theorem okDemonicConsultationChoice : Action.check (DRS.ofList []) demonicConsul
   decide
 def voidChoice : Action := choose (a (quality .number))
 theorem okVoidChoice : Action.check (DRS.ofList []) voidChoice = [] := by decide
-def ashnodsBattleGear : Ability := static (mayDeclineUntap thisArtifact you)
-theorem okAshnodsBattleGear : Ability.check (DRS.ofList []) ashnodsBattleGear = [] := by decide
 
 /-- Phyrexian Ingester -/
 def phyrexianIngesterPump : Ability :=
@@ -213,14 +210,6 @@ def phyrexianIngesterPump : Ability :=
       | _ => none
     | _ => none).get (by decide)
 theorem okPhyrexianIngesterPump : Ability.check (DRS.ofList []) phyrexianIngesterPump = [] := by decide
-
-/-- Tahngarth, First Mate -/
-def tahngarthChoosesDefender : Action :=
-  choose (a (and [ or [isPlaneswalker, isPlayer],
-               inCombat .attackedBy (that player) ]))
-theorem okTahngarthChoosesDefender :
-    Action.check ((stepGameEvent 512 (DRS.ofList []) tahngarthHeader).1) tahngarthChoosesDefender = [] := by
-  decide
 
 /-- Koh, the Face Stealer -/
 def kohChooser : Ability :=

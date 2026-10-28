@@ -1,9 +1,6 @@
-import Semantics.Cards
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Proofs.CardsAnaphora
-import Semantics.Proofs.CardsKeyword
 
 /-!
 # Semantics.Cards.Mana
@@ -168,14 +165,6 @@ def delightedHalflingMana : Ability :=
       [ whenSpentOn .affectsIt true (a (and [hasSupertype .legendary, isSpell]))
           (establish (cant any (counter (that .spell)))) ])
 theorem okDelightedHalflingMana : Ability.check (DRS.ofList []) delightedHalflingMana = [] := by decide
-
-/-- Boseiju, Who Shelters All -/
-def boseijuMana : Ability :=
-  activated (compound [tapSymbol, payLife 2])
-    (addMana 1 (manaOf [[.colorless]])
-      [ whenSpentOn .affectsIt false (a (and [isInstantOrSorcery, isSpell]))
-          (establish (cant any (counter (that .spell)))) ])
-theorem okBoseijuMana : Ability.check (DRS.ofList []) boseijuMana = [] := by decide
 
 /-- Thran Turbine -/
 def thranTurbineMana : Action :=

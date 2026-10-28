@@ -2,7 +2,6 @@ import Semantics.Cards
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Proofs.CardsTrigger
 
 /-!
 # Semantics.Cards.Keyword
@@ -242,20 +241,6 @@ theorem badNewPerspectivesWithoutCondition :
       altCostAsLongAs (static (altCost (allOf (abilityHead (.keyword cycling))) [generic 0]))
         = false := by decide
 
-/-- Thick-Skinned Goblin: "You may pay {0} rather than pay the echo cost for permanents you
-control." Echo's cost is paid while its triggered ability resolves [CR#702.30a], neither a
-spell's mana cost nor an activation cost, so it is no alternative cost: the payment of echo's
-cost (the `keyword` field) is the event a replacement watches, and paying {0} is what may happen
-in its place, the shape an "instead" effect takes [CR#614.1a]. Declining the `may` leaves the
-echo cost to be paid. -/
-def thickSkinnedGoblinEchoPayment : Ability :=
-  (match (cardNamed "Thick-Skinned Goblin").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons part _) => some part
-      | _ => none
-    | _ => none).get (by decide)
-theorem okThickSkinnedGoblinEchoPayment :
-    Ability.check (DRS.ofList []) thickSkinnedGoblinEchoPayment = [] := by decide
 /-- Fumiko the Lowblood -/
 def fumikoBushidoX : Ability :=
   static (conjunction [ abilityGrant thisCreature (bushido (letter .x)),
@@ -327,34 +312,6 @@ def pirDistributive : Ability :=
     | _ => none).get (by decide)
 theorem okPirDistributive : Ability.check (DRS.ofList []) pirDistributive = [] := by decide
 
-def protectionAbilities : KeywordTerm := (match (cardNamed "Concerted Effort").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons _
-        (List.cons _ (List.cons _ (List.cons _ (List.cons (Action.doIf (Condition.exists_
-        (NounPhrase.described _ (Predicate.coord _ (List.cons _ (List.cons _ (List.cons
-        (Predicate.hasKeyword part) _)))))) _ _ _) _)))))))) _) => some part
-      | _ => none
-    | _ => none).get (by decide)
-def landwalkAbilities : KeywordTerm := (match (cardNamed "Cairn Wanderer").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons _ (List.cons (Ability.static (StaticSpec.conjunction _ (List.cons _ (List.cons _
-        (List.cons _ (List.cons _ (List.cons _ (List.cons _ (List.cons (StaticSpec.conditional
-        (StaticSpec.characteristicChange _ (List.cons (CharacteristicEdit.addedSelectionOf _
-        (AbilitySelection.specified (List.cons (AbilityLost.term part) _))) _)) _ _) _))))))))) _))
-        => some part
-      | _ => none
-    | _ => none).get (by decide)
-/-- Hexproof and each "hexproof from [quality]" [CR#702.11d]. -/
-def hexproofAbilities : KeywordTerm := (match (cardNamed "Odric, Lunarch Marshal").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons _
-        (List.cons _ (List.cons _ (List.cons _ (List.cons (Action.doIf (Condition.exists_
-        (NounPhrase.described _ (Predicate.coord _ (List.cons _ (List.cons _ (List.cons
-        (Predicate.hasKeyword part) _)))))) _ _ _) _)))))))) _) => some part
-      | _ => none
-    | _ => none).get (by decide)
-/-- Shay Cormac -/
-def wardAbilities : KeywordTerm := .anyIn ⟨ward, none⟩
 /-- Tolaria, Shelkin Brownie -/
 def bandsWithOtherAbilities : KeywordTerm := (match (cardNamed "Shelkin Brownie").card with
     | Card.singleFaced face => match face.characteristics.text with
@@ -404,10 +361,7 @@ def giantGrowth : Action :=
 theorem okGiantGrowth : Action.check (DRS.ofList []) giantGrowth = [] := by decide
 def amassZombiesTwo : Action := amass zombie 2
 theorem okAmassZombiesTwo : Action.check (DRS.ofList []) amassZombiesTwo = [] := by decide
-/-- Avarice Totem -/
-def avariceTotemExchange : Action :=
-  exchangeControl thisArtifact (target (and [isPermanent, non isLand]))
-theorem okAvariceTotemExchange : Action.check (DRS.ofList []) avariceTotemExchange = [] := by decide
+
 /-- Arcanum Wings -- aura swap [CR#702.65a] -/
 def arcanumWingsAuraSwap : Ability :=
   auraSwap [generic 2, pip .blue]

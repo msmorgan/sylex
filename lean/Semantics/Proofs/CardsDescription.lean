@@ -2,6 +2,7 @@ import Semantics.Cards
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
+import Semantics.Proofs.CardsHelpers
 
 /-!
 # Semantics.Cards.Description
@@ -196,20 +197,6 @@ def fellTheMighty : Action :=
                   hasPower .greater (powerOf (target isCreature))]))
 theorem okFellTheMighty : Action.check (DRS.ofList []) fellTheMighty = [] := by decide
 
-def targetPlayerOrPlaneswalker : NounPhrase := (match (cardNamed "Heart of Bogardan").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
-        (Action.simultaneously (List.cons (Action.instruct _ (Action.dealDamage _ part _)) _)) _)))
-        _)) => some part
-      | _ => none
-    | _ => none).get (by decide)
-theorem okTargetPlayerOrPlaneswalker :
-    NounPhrase.checkAt none (DRS.ofList []) targetPlayerOrPlaneswalker = [] := by decide
-
-def targetOpponentOrPlaneswalker : NounPhrase := target (or [isPlaneswalker, isOpponent])
-theorem okTargetOpponentOrPlaneswalker :
-    NounPhrase.checkAt none (DRS.ofList []) targetOpponentOrPlaneswalker = [] := by decide
-
 /-- Baleful Mastery's paid read -/
 def balefulMasteryPaidRead : Ability :=
   spell (doIf (costWasPaid .theAlternative none this_) (instruct anOpponent (draw 1)))
@@ -225,22 +212,6 @@ def requitingHexAdditionalRead : Ability :=
 theorem okRequitingHexAdditionalRead : Ability.check (DRS.ofList []) requitingHexAdditionalRead = [] := by
   decide
 
-/-- Bioplasm -/
-def bioplasmAttack : GameEvent := (match (cardNamed "Bioplasm").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons (Ability.triggered part _ _ _ _ _ _ _) _) => some part
-      | _ => none
-    | _ => none).get (by decide)
-theorem okBioplasmAttack : GameEvent.check (DRS.ofList []) bioplasmAttack = [] := by decide
-def bioplasmExile : Action := (match (cardNamed "Bioplasm").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons part _))) _) =>
-        some part
-      | _ => none
-    | _ => none).get (by decide)
-theorem okBioplasmExile :
-    Action.check ((stepGameEvent 512 (DRS.ofList []) bioplasmAttack).1) bioplasmExile = [] := by decide
-def bioplasmAfterExile : DRS := (stepAction 512 .postEvent .obj ((stepGameEvent 512 (DRS.ofList []) bioplasmAttack).1) bioplasmExile).1
 def bioplasmExiledCard : NounPhrase := the (and [was (exile which), isCard])
 theorem okBioplasmExiledCard :
     NounPhrase.checkAt (some .object) bioplasmAfterExile bioplasmExiledCard = [] := by decide

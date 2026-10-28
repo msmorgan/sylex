@@ -121,16 +121,6 @@ def garrukRelentlessFlip : Ability :=
       | _ => none
     | _ => none).get (by decide)
 theorem okGarrukRelentlessFlip : Ability.check (DRS.ofList []) garrukRelentlessFlip = [] := by decide
-/-- Garruk Relentless's first 0: "Garruk Relentless deals 3 damage to target creature. That
-creature deals damage equal to its power to him." -/
-def garrukRelentlessFight : Action :=
-  (match (cardNamed "Garruk Relentless // Garruk, the Veil-Cursed").card with
-    | Card.transforming face _ => match face.characteristics.text with
-      | (List.cons _ (List.cons (Ability.activated _ part _ _ _ _) _)) => some part
-      | _ => none
-    | _ => none).get (by decide)
-theorem okGarrukRelentlessFight : Action.check (DRS.ofList []) garrukRelentlessFight = [] := by
-  decide
 
 /-- Mana Clash -/
 def manaClashFlip : Action :=

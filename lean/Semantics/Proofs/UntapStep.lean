@@ -1,9 +1,7 @@
-import Semantics.Proofs.CardsChoice
 import Semantics.Cards
 import Semantics.Definitions
 import Semantics.Check.Card
-import Semantics.Proofs.CardsStatic
-import Semantics.Proofs.CardsKeyword
+import Semantics.Proofs.CardsHelpers
 
 /-!
 # Semantics.Proofs.UntapStep

@@ -2,8 +2,6 @@ import Semantics.Cards
 import Semantics.Definitions
 import Semantics.Check.Card
 import Semantics.Check.Rules
-import Semantics.Proofs.CardsAnaphora
-import Semantics.Proofs.CardsKeyword
 import Semantics.Proofs.CardsTurn
 
 /-!
