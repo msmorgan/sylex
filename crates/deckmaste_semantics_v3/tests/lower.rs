@@ -435,11 +435,21 @@ fn every_builtin_declaration_has_a_typed_snapshot() {
     let reader = Elaborator::new(&bundle);
     let mut failures = Vec::new();
     for key in &bundle.order {
-        let result = reader
-            .sample_arguments(key)
-            .and_then(|(args, result)| reader.snapshot(key, &args, result));
-        if let Err(error) = result {
-            failures.push(format!("{} : {}: {error}", key.bare_name, key.return_type));
+        match reader.sample_invocations(key) {
+            Ok(samples) => {
+                assert_ne!(samples.arguments, Vec::<String>::new());
+                for arguments in samples.arguments {
+                    if let Err(error) = reader.snapshot(key, &arguments, samples.result_type) {
+                        failures.push(format!(
+                            "{} : {} {arguments}: {error}",
+                            key.bare_name, key.return_type
+                        ));
+                    }
+                }
+            }
+            Err(error) => {
+                failures.push(format!("{} : {}: {error}", key.bare_name, key.return_type));
+            }
         }
     }
     assert!(failures.is_empty(), "{}", failures.join("\n\n"));
@@ -540,4 +550,88 @@ fn anonymous_structures_and_right_associative_application_elaborate() {
             .unwrap(),
         Some(reader.read::<Ability>("spell (draw 1)").unwrap())
     );
+}
+
+#[test]
+fn qualified_any_constructors_are_distinct_from_the_any_value_helper() {
+    let bundle = declarations(&[]);
+    let reader = Elaborator::new(&bundle);
+    assert_eq!(
+        reader
+            .read::<SubtypeScope>("Semantics.SubtypeScope.any")
+            .unwrap(),
+        SubtypeScope::Any
+    );
+    assert_eq!(
+        reader.read::<SubtypeScope>(".any").unwrap(),
+        SubtypeScope::Any
+    );
+    assert_eq!(reader.read::<NounPhrase>("any").unwrap(), NounPhrase::Any);
+}
+
+#[test]
+fn snapshot_samples_exercise_defaults_and_every_defined_slot() {
+    let bundle = declarations(&[
+        "template example (flag : Bool := false) (slots : DefinedSlots) : Nat := { body := if flag then 10 else (match slots with | .powerAlone => 3 | .toughnessAlone => 4 | .bothEach => 5) }",
+        "template optional (who : Option NounPhrase := none) : Nat := { body := match who with | none => 0 | some x => 1 }",
+        "template listed (items : List Nat := []) : Nat := { body := List.length items }",
+        "primitive closed : Nat := { body := 9 }",
+    ]);
+    let reader = Elaborator::new(&bundle);
+    for (name, expected) in [
+        ("example", vec!["3", "4", "5", "10"]),
+        ("optional", vec!["0", "1"]),
+        ("listed", vec!["0", "1"]),
+        ("closed", vec!["9"]),
+    ] {
+        let key = bundle
+            .items
+            .keys()
+            .find(|k| k.bare_name.as_str() == name)
+            .unwrap();
+        let samples = reader.sample_invocations(key).unwrap();
+        let mut values = samples
+            .arguments
+            .iter()
+            .map(|args| reader.snapshot(key, args, samples.result_type).unwrap())
+            .collect::<Vec<_>>();
+        values.sort();
+        values.dedup();
+        let mut expected = expected.into_iter().map(str::to_owned).collect::<Vec<_>>();
+        expected.sort();
+        assert_eq!(values, expected, "{name}");
+        if name != "example" {
+            assert!(samples.arguments.contains(&String::new()));
+        }
+    }
+}
+
+#[test]
+fn snapshot_samples_report_caps_and_recursive_constructors() {
+    let bundle = declarations(&[
+        "primitive example (a b c d : TurnPart) (body : Ability) : Nat := { body := 3 }",
+    ]);
+    let key = &bundle.order[0];
+    let samples = Elaborator::new(&bundle).sample_invocations(key).unwrap();
+    assert_eq!(samples.arguments.len(), 256);
+    assert!(
+        samples
+            .limitations
+            .iter()
+            .any(|s| s.contains("sample cap 256") && s.contains("omitted"))
+    );
+    assert!(
+        samples
+            .limitations
+            .iter()
+            .any(|s| s.contains("Ability.inCaller omitted") && s.contains("recursive"))
+    );
+    for parameter in ["a", "b", "c", "d"] {
+        assert!(
+            samples
+                .arguments
+                .iter()
+                .any(|s| s.contains(&format!("({parameter} := Semantics.TurnPart.cleanup)")))
+        );
+    }
 }

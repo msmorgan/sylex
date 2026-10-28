@@ -651,11 +651,32 @@ fn bind_pattern(pattern: &[Token], ty: &str, value: &Value, scope: &mut Scope) -
         return Ok(bind_pattern(&pattern[..i], left, &value[0], scope)?
             && bind_pattern(&pattern[i + 1..], right, &value[1], scope)?);
     }
+    if ty.starts_with("List ") && matches!(pattern, [Token::Group('[', items)] if items.is_empty())
+    {
+        return Ok(value.as_array().is_some_and(Vec::is_empty));
+    }
     let (name, args) = match pattern {
         [Token::Ident(n), rest @ ..] => (n, rest),
         [Token::Atom(dot), Token::Ident(n), rest @ ..] if dot == "." => (n, rest),
         _ => return Err(LowerError::new("invalid data pattern")),
     };
+    if ty == "Bool" && args.is_empty() && matches!(bare(name.as_str()), "true" | "false") {
+        return Ok(value == &Value::Bool(bare(name.as_str()) == "true"));
+    }
+    if let Some(inner) = ty.strip_prefix("Option ") {
+        match (bare(name.as_str()), args) {
+            ("none", []) => return Ok(value.is_null()),
+            ("some", [argument]) => {
+                return if value.is_null() {
+                    Ok(false)
+                } else {
+                    bind_pattern(std::slice::from_ref(argument), inner, value, scope)
+                };
+            }
+            ("none" | "some", _) => return Err(LowerError::new("option pattern arity mismatch")),
+            _ => {}
+        }
+    }
     if let Some(ctor) = shape(ty).and_then(|cs| {
         cs.into_iter()
             .find(|c| c.name.as_str() == bare(name.as_str()))

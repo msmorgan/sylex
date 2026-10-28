@@ -11,6 +11,8 @@ mod schema;
 mod snapshot;
 mod types;
 
+pub use snapshot::InvocationSamples;
+
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
@@ -684,7 +686,7 @@ impl<'a> Elaborator<'a> {
         if ty == "Bool" && rest.is_empty() && ["true", "false"].contains(&bare(name)) {
             return Ok(Value::Bool(bare(name) == "true"));
         }
-        if bare(name) == "any" && rest.is_empty() {
+        if name == "any" && matches!(tokens.first(), Some(Token::Ident(_))) && rest.is_empty() {
             return any_value(ty);
         }
         let raw = matches!(tokens.first(), Some(t) if is_atom(t, "."))
