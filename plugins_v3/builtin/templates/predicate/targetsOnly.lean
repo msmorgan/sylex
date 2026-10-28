@@ -1,0 +1,6 @@
+/-- "that targets only <subject>" [CR#115.9c] -/
+-- [CR#115.9c]
+template targetsOnly (subject : NounPhrase) : Predicate := {
+  spelling := "that targets only <subject>",
+  body := targeting subject .only
+}

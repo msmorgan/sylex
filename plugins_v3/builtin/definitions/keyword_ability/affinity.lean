@@ -5,7 +5,7 @@ keyword affinity (quality : Predicate) : Ability := {
   body :=
     [static
         (costShift thisSpell
-          (costShiftGeneric
+          (generic
             (down
               (forEach 1 (and [quality, youControl])))
             none))]

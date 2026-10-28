@@ -11,9 +11,7 @@ action airbend (subject : NounPhrase) : Action := {
           (allOf
             (and
               [isCard,
-                predicateDid
-                  { subj := any, action := Semantics.Definitions.exile which,
-                    within := some thisWay }]))
+                did (any) (Semantics.Definitions.exile which) (within := some thisWay)]))
           (instruct (ownerOf it)
             (establish
               (can (actor (ownerOf it))

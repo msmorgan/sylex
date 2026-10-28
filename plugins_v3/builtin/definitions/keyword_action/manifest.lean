@@ -5,6 +5,6 @@ action manifest (subject : NounPhrase) : Action := {
   body :=
     sequentially
       [turnFaceDown subject faceDownCreature,
-        actionMove subject wherever (some battlefield)
+        move subject wherever (some battlefield)
           .arrival [faceDownAs faceDownCreature]]
 }

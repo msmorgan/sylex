@@ -7,4 +7,4 @@ card frogify : Spelled :=
                 qualityChange it .sets
                   (bundle { characteristics := { colors := [.blue], types := [.creature], subtypes
                     := [frog] } }),
-                getsBase it (amountLit 1) (amountLit 1) ])) ] }
+                getsBase it (lit 1) (lit 1) ])) ] }

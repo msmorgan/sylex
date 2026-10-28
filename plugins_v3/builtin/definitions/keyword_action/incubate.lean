@@ -4,7 +4,7 @@ action incubate (amount : Amount) : Action := {
   spelling := "incubate <amount>",
   body :=
     create 1
-      (tokenSpecDoubleFaced
+      (doubleFaced
         {
           characteristics :=
             { types := [Semantics.CardType.artifact], subtypes := [incubator],

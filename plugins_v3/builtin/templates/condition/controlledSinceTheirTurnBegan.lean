@@ -8,5 +8,5 @@ template controlledSinceTheirTurnBegan (subject : NounPhrase) : Condition := {
       (is subject
         (controlledBy (controllerOf it)))
       (beginningOf .turn none
-        (turnRefMostRecent they))
+        (mostRecent they))
 }

@@ -4,5 +4,5 @@ template onALaterTurn : Duration := {
   spelling := "on a later turn",
   body :=
     durationBetween
-      (some (endOf .turn none turnRefCurrent)) none
+      (some (endOf .turn none current)) none
 }

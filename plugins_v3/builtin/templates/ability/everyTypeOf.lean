@@ -2,5 +2,5 @@
 template everyTypeOf (space : SubtypeSpace) : QualityPayload := {
   spelling := "every <space> type",
   body :=
-    qualityPayloadQuality (withEveryType space)
+    quality (withEveryType space)
 }

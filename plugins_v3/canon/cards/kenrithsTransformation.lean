@@ -8,4 +8,4 @@ card kenrithsTransformation : Spelled :=
                 qualityChange it .sets
                   (bundle { characteristics := { colors := [.green], types := [.creature], subtypes
                     := [elk] } }),
-                getsBase it (amountLit 3) (amountLit 3) ])) ] }
+                getsBase it (lit 3) (lit 3) ])) ] }

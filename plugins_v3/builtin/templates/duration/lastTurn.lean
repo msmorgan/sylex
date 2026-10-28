@@ -4,6 +4,6 @@ template lastTurn : Duration := {
   body :=
     durationBetween
       (some
-        (beginningOf .turn none (turnRefPrevious none)))
-      (some (endOf .turn none (turnRefPrevious none)))
+        (beginningOf .turn none (previous none)))
+      (some (endOf .turn none (previous none)))
 }

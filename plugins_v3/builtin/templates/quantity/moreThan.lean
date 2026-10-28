@@ -2,5 +2,5 @@
 template moreThan (n : Nat) : Quantity := {
   spelling := "more than <n>",
   body :=
-    quantityMoreThanOf (amountLit ↑n)
+    moreThanOf (lit ↑n)
 }

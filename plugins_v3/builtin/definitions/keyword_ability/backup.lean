@@ -13,6 +13,6 @@ keyword backup (amount : Amount) : Ability := {
               (establishThroughout
                 (abilityGrantSelected (that creature)
                   thisCreature
-                  (abilitySelectionPrintedAfter backup.label))
+                  (printedAfter backup.label))
                 untilEndOfTurn)])]
 }

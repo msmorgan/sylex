@@ -3,5 +3,5 @@ action exchangeCards (left right : NounPhrase) : Action := {
   deed := "exchange",
   spelling := "exchange <left> and <right>",
   body :=
-    actionExchange (exchangedCardsAcross left right)
+    exchange (cardsAcross left right)
 }

@@ -12,9 +12,9 @@ keyword epic : Ability := {
           restOfGame
           (sequentially
             [copy .fromStack thisSpell 1
-                [copyExceptEdits
-                    [characteristicEditRemovedAbilities
-                        (abilitySelectionSpecified
+                [edits
+                    [removedAbilities
+                        (specified
                           [abilities (theKeyword epic.label)])]],
               may
                 (chooseNewTargets (that .copy))]))]

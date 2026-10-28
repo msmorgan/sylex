@@ -35,12 +35,13 @@ impl BundleItem {
             "counter" | "subtype" | "designation" | "card_type" | "relation"
         )
     }
-    fn references(&self) -> BTreeSet<Ident> {
+    fn references(&self, include_bound: bool) -> BTreeSet<Ident> {
         fn visit(tokens: &[Token], bound: &BTreeSet<Ident>, references: &mut BTreeSet<Ident>) {
             for (index, token) in tokens.iter().enumerate() {
                 match token {
                     Token::Ident(id)
                         if !bound.contains(id)
+                            && !matches!(index.checked_sub(1).and_then(|i| tokens.get(i)), Some(Token::Atom(a)) if a == ".")
                             && !matches!(tokens.get(index + 1), Some(Token::Atom(a)) if a == ":=") =>
                     {
                         references.insert(*id);
@@ -92,7 +93,14 @@ impl BundleItem {
                 }
             }
         }
-        let bound = self.declaration.parameters.iter().map(|p| p.name).collect();
+        if self.declaration.command.as_str() == "primitive" {
+            return BTreeSet::new();
+        }
+        let bound = if include_bound {
+            BTreeSet::new()
+        } else {
+            self.declaration.parameters.iter().map(|p| p.name).collect()
+        };
         let mut refs = BTreeSet::new();
         for parameter in &self.declaration.parameters {
             visit(&parameter.ty, &bound, &mut refs);
@@ -175,10 +183,18 @@ impl Bundle {
         let mut degrees = BTreeMap::new();
         let mut ready = BTreeSet::new();
         for (key, item) in &by_key {
-            let refs = item.references();
+            let refs = item.references(false);
+            // A non-callable parameter can shadow a primitive in application position.
+            // Conservatively order primitive leaves before all matching references.
+            let primitive_refs = item.references(true);
             let deps: BTreeSet<_> = by_key
                 .iter()
                 .filter_map(|(other, value)| {
+                    let refs = if value.declaration.command.as_str() == "primitive" {
+                        &primitive_refs
+                    } else {
+                        &refs
+                    };
                     let named = if value.registered() {
                         refs.contains(&Ident::new(&format!("{}_definition", other.bare_name)))
                     } else {
@@ -189,7 +205,9 @@ impl Bundle {
                             )))
                     };
                     (named
+                        && other != key
                         && (other.bare_name != key.bare_name
+                            || value.declaration.command.as_str() == "primitive"
                             || (key.return_type.as_str() == "Ability"
                                 && other.return_type.as_str() == "Action")))
                         .then(|| other.clone())

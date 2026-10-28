@@ -26,11 +26,10 @@ conferral phasingTurnBased := {
               (doIf
                 (not
                   (is this_
-                    (predicateAttachment .attachment none
-                      (some
+                    (attachment .attachment (some
                         (a
                           (and
-                            [isPermanent, isPhasedOut]))))))
+                            [isPermanent, isPhasedOut]))) none)))
                 (setStatus .phasedIn this_))
               (some
                 (doIf

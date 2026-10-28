@@ -3,5 +3,5 @@ template becomeAttacking (subject : NounPhrase) (defender : Option NounPhrase) :
   -- TODO(spelling): Context-dependent wording: <subject> becomes attacking [<defender>]; string substitution cannot express its omitted or inflected parts.
   body :=
     combat subject
-      (combatUpdateParticipation (combatParticipationAttacking defender))
+      (participation (attacking defender))
 }

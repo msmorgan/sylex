@@ -10,11 +10,10 @@ keyword megamorph (cost : Cost) : Ability := {
     [static
         (can (actor you)
           (cast thisCard none
-            (playPaymentFaceDown faceDownCreature
+            (faceDown faceDownCreature
               (mana [generic 3])))),
       static
-        (staticSpecSpecialAction none none cost
-          (turnFaceUp this_)),
+        (specialAction none cost (turnFaceUp this_) none),
       static
         (replace
           (would any

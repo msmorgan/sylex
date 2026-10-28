@@ -2,5 +2,5 @@
 template abilityGrant (subject : NounPhrase) (ability : Ability) : StaticSpec := {
   spelling := "<subject> has <ability>",
   body :=
-    characteristicChange subject [characteristicEditAddedAbilities [ability]]
+    characteristicChange subject [addedAbilities [ability]]
 }

@@ -18,16 +18,15 @@ keyword hideaway (amount : Amount) : Ability := {
           [lookAt (topSlice amount),
             exileFaceDown
               (someOf (oneThrough 1) them),
-            actionMove theRest wherever
+            move theRest wherever
               (some onBottom) .arrival
               [inOrder .randomOrder],
             establishThroughout
-              (staticSpecConjunction none
-                [visibility .lookAt you
+              (conjunction [visibility .lookAt you
                     (objects exiledCard),
                   visibility .lookAt
                     (controllerOf thisPermanent)
-                    (objects exiledCard)])
+                    (objects exiledCard)] none)
               (forAsLongAs
                 (is exiledCard (in_ exileZone)))])]
 }

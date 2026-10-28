@@ -9,7 +9,5 @@ card denryKlin : Spelled :=
             (chosenKind [p1p1Counter, firstStrikeCounter, vigilanceCounter]) .fresh]),
         (whenever (does (a (and [isNontoken, and [isCreature, youControl]])) enter)
               (if_ := is thisCreature hasCounter)
-              (doForEachKind .counterKind .counterKind
-                (putCounters (statOf .boundCounter thisCreature) thatKind (that creature))
-                (domain := thisCreature))) ],
+              (doForEachKind .counterKind (thisCreature) .counterKind (putCounters (statOf .boundCounter thisCreature) thatKind (that creature)))) ],
     power := stat 2, toughness := stat 2 }

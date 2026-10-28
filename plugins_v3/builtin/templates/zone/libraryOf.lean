@@ -1,0 +1,6 @@
+/-- "<player>'s library": a face-down pile [CR#401.2]. -/
+-- [CR#401.2]
+template libraryOf (player : NounPhrase) : Location := {
+  spelling := "<player>'s library",
+  body := zone .library (some player)
+}

@@ -3,5 +3,5 @@ action exileFrom (subject : NounPhrase) (from_ : Location) : Action := {
   deed := "exile",
   spelling := "exile <subject> from <from_>",
   body :=
-    actionMove subject from_ (some exileZone) .arrival []
+    move subject from_ (some exileZone) .arrival []
 }

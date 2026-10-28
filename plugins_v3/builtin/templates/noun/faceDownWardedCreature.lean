@@ -12,6 +12,6 @@ template faceDownWardedCreature : FaceDown := {
           { types := [Semantics.CardType.creature],
             text :=
               [.keyword (.named "ward")
-                  [keywordParamCost (mana [generic 2])] []],
+                  [cost (mana [generic 2])] []],
             power := some 2, toughness := some 2 } }
 }

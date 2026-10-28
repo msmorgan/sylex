@@ -9,5 +9,5 @@ template mayDeclineUntap (subject : NounPhrase) (whose : Option NounPhrase) : St
     duringUntapStep whose
       (onlyIfSo
         (cant any (untap subject))
-        (conditionSoChooses you))
+        (soChooses you))
 }

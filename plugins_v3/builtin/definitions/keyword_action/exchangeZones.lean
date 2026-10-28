@@ -3,5 +3,5 @@ action exchangeZones (left right : Location) : Action := {
   deed := "exchange",
   spelling := "exchange <left> and <right>",
   body :=
-    actionExchange (exchangedZones left right)
+    exchange (zones left right)
 }

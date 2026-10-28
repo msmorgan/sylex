@@ -16,5 +16,5 @@ keyword echo (cost : Cost) : Ability := {
             (heldSince
               (is thisPermanent youControl)
               (beginningOf .upkeep (some you)
-                (turnRefPrevious (some you))))))]
+                (previous (some you))))))]
 }

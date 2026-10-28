@@ -2,6 +2,6 @@
 template onBottom : Location := {
   spelling := "on the bottom of its owner's library",
   body :=
-    locationFromEnd .bottom (.nth 1)
+    fromEnd .bottom (.nth 1)
       (zone .library none)
 }

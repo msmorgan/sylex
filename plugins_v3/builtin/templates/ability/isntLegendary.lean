@@ -2,7 +2,7 @@
 template isntLegendary : CopyExcept := {
   spelling := "except it isn't legendary",
   body :=
-    copyExceptEdits
-      [characteristicEditTypeLine .loses
+    edits
+      [typeLine .loses
           { supertypes := some [.legendary] }]
 }

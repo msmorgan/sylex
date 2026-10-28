@@ -3,5 +3,5 @@ action exchangeValues (left right : Amount) : Action := {
   deed := "exchange",
   spelling := "exchange <left> and <right>",
   body :=
-    actionExchange (exchangedValues left right)
+    exchange (values left right)
 }

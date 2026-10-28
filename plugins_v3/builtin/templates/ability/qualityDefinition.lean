@@ -6,5 +6,5 @@ template qualityDefinition (subject : NounPhrase) (op : QualityOp)
     (payload : QualityPayload) : StaticSpec := {
   -- TODO(spelling): Context-dependent wording: <subject> is <quality>; string substitution cannot express its omitted or inflected parts.
   body :=
-    staticSpecCharacteristicDefining subject (Semantics.QualityPayload.edits op payload)
+    characteristicDefining subject (Semantics.QualityPayload.edits op payload)
 }

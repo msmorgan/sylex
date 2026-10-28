@@ -3,5 +3,5 @@ template abilityLoss (subject : NounPhrase) (abilities : List AbilityLost) : Sta
   spelling := "<subject> loses <abilities>",
   body :=
     characteristicChange subject
-      [characteristicEditRemovedAbilities (abilitySelectionSpecified abilities)]
+      [removedAbilities (specified abilities)]
 }

@@ -5,6 +5,6 @@ action millCards (cards : NounPhrase) : Action := {
   deed := "mill",
   spelling := "mill <cards>",
   body :=
-    actionMove cards library (some graveyard)
+    move cards library (some graveyard)
       .arrival []
 }

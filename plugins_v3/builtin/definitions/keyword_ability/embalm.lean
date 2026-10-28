@@ -13,11 +13,11 @@ keyword embalm (cost : Cost) : Ability := {
               (exileFrom thisCard yourGraveyard)])
         (create 1
           (copyOf this_
-            [copyExceptEdits
-                [characteristicEditColors .sets
+            [edits
+                [colors .sets
                     (.some [.white]),
-                  characteristicEditManaCost none,
-                  characteristicEditTypeLine .adds
+                  manaCost none,
+                  typeLine .adds
                     { subtypes := some [zombie] }]]))
         asSorcery]
 }

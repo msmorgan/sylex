@@ -2,5 +2,5 @@
 template countOf (p : Predicate) : Amount := {
   -- TODO(spelling): Context-dependent wording: the number of …s; string substitution cannot express its omitted or inflected parts.
   body :=
-    numberOf (described detPhraseAll p)
+    numberOf (described all p)
 }

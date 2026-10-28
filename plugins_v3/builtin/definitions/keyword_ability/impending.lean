@@ -15,7 +15,7 @@ keyword impending (amount : Amount) (cost : Cost) : Ability := {
       static
         (onlyWhile
           (characteristicChange thisPermanent
-            [characteristicEditTypeLine .loses
+            [typeLine .loses
                 { types := some [Semantics.CardType.creature] }])
           (and
             [keywordCostPaid impending.label thisPermanent,

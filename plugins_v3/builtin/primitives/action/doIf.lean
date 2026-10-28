@@ -1,6 +1,4 @@
-primitive doIf (condition : Condition) (action : Action)
-    (otherwise : Option Action := none) : Action := {
+primitive doIf (condition : Condition) (action : Action) (otherwise : Option Action := none) (postposed : Bool := false) : Action := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
-  body :=
-    Semantics.Primitives.Action.doIf condition action otherwise
+  body := Semantics.Primitives.Action.doIf condition action otherwise postposed
 }

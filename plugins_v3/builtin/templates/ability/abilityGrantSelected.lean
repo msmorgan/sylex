@@ -4,5 +4,5 @@ template abilityGrantSelected (subject : NounPhrase) (source : NounPhrase)
     (selection : AbilitySelection) : StaticSpec := {
   spelling := "<subject> has <selection> of <source>",
   body :=
-    characteristicChange subject [characteristicEditAddedSelectionOf source selection]
+    characteristicChange subject [addedSelectionOf source selection]
 }

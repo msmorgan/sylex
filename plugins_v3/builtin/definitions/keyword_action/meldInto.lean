@@ -4,6 +4,6 @@ action meldInto (subject : NounPhrase) (into : String) : Action := {
   deed := "meld",
   spelling := "meld <subject> into <into>",
   body :=
-    actionMove subject wherever (some battlefield)
-      .arrival [moveRiderEntersMelded into]
+    move subject wherever (some battlefield)
+      .arrival [entersMelded into]
 }

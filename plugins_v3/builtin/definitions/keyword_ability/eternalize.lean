@@ -10,13 +10,13 @@ keyword eternalize (cost : Cost) : Ability := {
               (exileFrom thisCard yourGraveyard)])
         (create 1
           (copyOf this_
-            [copyExceptEdits
-                [characteristicEditColors .sets
+            [edits
+                [colors .sets
                     (.some [.black]),
-                  characteristicEditStat .sets .power 4,
-                  characteristicEditStat .sets .toughness 4,
-                  characteristicEditManaCost none,
-                  characteristicEditTypeLine .adds
+                  stat .sets .power 4,
+                  stat .sets .toughness 4,
+                  manaCost none,
+                  typeLine .adds
                     { subtypes := some [zombie] }]]))
         asSorcery]
 }

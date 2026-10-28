@@ -7,7 +7,7 @@ action shuffleInto (subject : NounPhrase) : Action := {
   deed := "shuffle",
   body :=
     sequentially
-      [actionMove subject wherever
+      [move subject wherever
           (some (zone .library none)) .arrival [],
         actionShuffle (zone .library none)]
 }

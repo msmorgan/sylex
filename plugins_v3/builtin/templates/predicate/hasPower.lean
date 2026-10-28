@@ -2,5 +2,5 @@
 template hasPower (cmp : Comparator) (amt : Amount) : Predicate := {
   spelling := "with power <cmp> <amt>",
   body :=
-    predicateCompare [.stat .power] cmp amt
+    compare cmp amt [.stat .power]
 }

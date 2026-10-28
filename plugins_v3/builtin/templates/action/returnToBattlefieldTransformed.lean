@@ -3,5 +3,5 @@ template returnToBattlefieldTransformed (subject controller : NounPhrase) : Acti
   spelling := "return <subject> to the battlefield transformed under <controller>'s control",
   body :=
     returnToBattlefield subject
-      [moveRiderEntersTransformed, under controller]
+      [entersTransformed, under controller]
 }

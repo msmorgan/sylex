@@ -9,14 +9,11 @@ template delayUnlessPaid (event : GameEvent) (action : Action) (player : NounPhr
   spelling := "<action> at <event> unless <player> pays <cost> before that step",
   body :=
     sequentially
-      [actionDelay event [] none action,
+      [delay event action [] none,
         establish
-          (staticSpecSpecialAction (some player) none cost
-            (establish
-              (staticSpecCant
-                (actor
-                  (.laterMention "delay.trigger" thisAbility))
-                trigger { })
-              none))
+          (specialAction none cost (establish
+              (cant (actor
+                  (.laterMention "delay.trigger" thisAbility)) trigger)
+              none) (some player))
           (some (durationBetween none (some event)))]
 }

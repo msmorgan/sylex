@@ -172,10 +172,15 @@ initialize expectedTypeDispatchExt : SimplePersistentEnvExtension ExpectedTypeEn
   addImportedFn := fun imports => imports.toList.flatMap Array.toList
 }
 
+private def authoredResultSort? (type : Expr) : MetaM (Option Name) := do
+  let type ← whnfR type
+  let type := if type.isAppOfArity ``Option 1 then type.appArg! else type
+  return (← whnfR type).getAppFn.constName?
+
 private def registerExpectedType (declaration : Name) : CommandElabM Unit := do
   let result ← liftTermElabM do
     forallTelescopeReducing (← getConstInfo declaration).type fun _ result =>
-      return result.getAppFn.constName?
+      authoredResultSort? result
   if let some returnType := result then
     let bareName := Name.mkSimple declaration.getString!
     modifyEnv fun env => expectedTypeDispatchExt.addEntry env
@@ -201,7 +206,7 @@ initialize primitiveAttribute : TagAttribute ←
 private def addSortAlias (full : Name) : CommandElabM Unit := do
   let previous ← getConstInfo full
   let previousSort? ← liftTermElabM <| forallTelescopeReducing previous.type fun _ type =>
-    pure type.getAppFn.constName?
+    authoredResultSort? type
   if let some previousSort := previousSort? then
     if lastNameComponent full.getPrefix == previousSort.getString! then return
     let alias := full.getPrefix ++ Name.mkSimple previousSort.getString! ++
@@ -230,7 +235,7 @@ private def addSortAlias (full : Name) : CommandElabM Unit := do
 private def registerSharedAliases (declaration : Name) : CommandElabM Unit := do
   addSortAlias declaration
   let result? ← liftTermElabM <| forallTelescopeReducing (← getConstInfo declaration).type
-    fun _ type => pure type.getAppFn.constName?
+    fun _ type => authoredResultSort? type
   if let some result := result? then
     let ns := if lastNameComponent declaration.getPrefix == result.getString! then
       declaration.getPrefix.getPrefix else declaration.getPrefix
@@ -251,9 +256,20 @@ private def needsExpectedTypeDispatch (entries : List ExpectedTypeEntry) (bare :
     e.declaration.getString! != bare.getString!) ||
     (entries.map (·.returnType)).eraseDups.length > 1
 
-private def dispatchTarget? (bare sort : Name) : TermElabM (Option Name) := do
+private def isCallableLocal (id : Name) : TermElabM Bool := do
+  let some ldecl := (← getLCtx).findFromUserName? id | return false
+  if ldecl.isAuxDecl then return false
+  return (← whnf ldecl.type).isForall
+
+private def isShadowedByNonCallableLocal (id : Name) : TermElabM Bool := do
+  let some ldecl := (← getLCtx).findFromUserName? id | return false
+  if ldecl.isAuxDecl then return true
+  return !(← whnf ldecl.type).isForall
+
+private def dispatchTarget? (bare sort : Name) (allowSingle : Bool := false) :
+    TermElabM (Option Name) := do
   let entries := expectedTypeDispatchExt.getState (← getEnv)
-  unless needsExpectedTypeDispatch entries bare do return none
+  unless allowSingle || needsExpectedTypeDispatch entries bare do return none
   let ns ← getCurrNamespace
   let opens ← getOpenDecls
   let visible := fun (decl : Name) =>
@@ -266,7 +282,8 @@ private def dispatchTarget? (bare sort : Name) : TermElabM (Option Name) := do
   return (entries.find? fun e => e.bareName == bare && e.returnType == sort &&
     visible e.declaration).map (·.declaration)
 
-private def hasOrdinaryNamespaceBinding (stx : Syntax) (expected : Expr) : TermElabM Bool := do
+private def hasOrdinaryNamespaceBinding (stx : Syntax) (expected : Expr)
+    (application : Bool := false) : TermElabM Bool := do
   let ns ← getCurrNamespace
   let env ← getEnv
   let candidates ← try resolveGlobalConst stx catch _ => pure []
@@ -275,7 +292,9 @@ private def hasOrdinaryNamespaceBinding (stx : Syntax) (expected : Expr) : TermE
     if !visible.getPrefix.isAnonymous && visible.getPrefix.isPrefixOf ns &&
         !definitionAttribute.hasTag env name && !templateAttribute.hasTag env name then
       let saved ← saveState
-      let matchesExpected ← isDefEq (← inferType (← mkConstWithFreshMVarLevels name)) expected
+      let type ← inferType (← mkConstWithFreshMVarLevels name)
+      let matchesExpected ← if application && (← whnf type).isForall then pure true
+        else isDefEq type expected
       saved.restore
       if matchesExpected then return true
   return false
@@ -285,10 +304,13 @@ def dispatchOnExpectedType : TermElab := fun stx expected? => do
   unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
   let fn := stx[0]
   unless fn.isIdent do throwUnsupportedSyntax
-  unless needsExpectedTypeDispatch (expectedTypeDispatchExt.getState (← getEnv)) fn.getId do
+  if ← isCallableLocal fn.getId then throwUnsupportedSyntax
+  let shadowed ← isShadowedByNonCallableLocal fn.getId
+  unless shadowed || needsExpectedTypeDispatch
+      (expectedTypeDispatchExt.getState (← getEnv)) fn.getId do
     throwUnsupportedSyntax
-  if (← getLCtx).findFromUserName? fn.getId |>.isSome then throwUnsupportedSyntax
   let some expected := expected? | throwUnsupportedSyntax
+  if ← hasOrdinaryNamespaceBinding fn expected (application := true) then throwUnsupportedSyntax
   let expected ← instantiateMVars expected
   if expected.getAppFn.isMVar then
     tryPostpone
@@ -297,10 +319,17 @@ def dispatchOnExpectedType : TermElab := fun stx expected? => do
   let expectedHead :=
     if expectedWhnf.isAppOfArity ``Option 1 then expectedWhnf.appArg! else expectedWhnf
   let some sort := (← whnfR expectedHead).getAppFn.constName? | throwUnsupportedSyntax
-  let some target ← dispatchTarget? fn.getId sort | throwUnsupportedSyntax
+  let exact ← dispatchTarget? fn.getId sort (allowSingle := shadowed)
+  let targets ← if let some target := exact then pure [target] else do
+    -- A noun phrase may be requested through its Subject coercion.
+    let entries := (expectedTypeDispatchExt.getState (← getEnv)).filter (·.bareName == fn.getId)
+    let visible ← entries.mapM fun entry =>
+      dispatchTarget? fn.getId entry.returnType (allowSingle := shadowed)
+    pure (visible.filterMap id).eraseDups
+  let some target := targets.head? | throwUnsupportedSyntax
   if fn.getId == target then throwUnsupportedSyntax
   let alternatives ← try resolveGlobalConst fn catch _ => pure []
-  for candidate in (target :: alternatives).eraseDups do
+  for candidate in (targets ++ alternatives).eraseDups do
     let env ← getEnv
     unless definitionAttribute.hasTag env candidate || templateAttribute.hasTag env candidate do
       continue
@@ -951,11 +980,13 @@ private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) :
     tryPostpone
     throwUnsupportedSyntax
   let expectedWhnf ← whnfR expected
-  let (expectedHead, isOption) :=
+  let (expectedHead, isOption) ←
     if expectedWhnf.isAppOfArity ``Option 1 then
-      (expectedWhnf.appArg!, true)
+      pure (expectedWhnf.appArg!, true)
+    else if expectedWhnf.isForall then
+      forallTelescopeReducing expectedWhnf fun _ body => pure (body, false)
     else
-      (expectedWhnf, false)
+      pure (expectedWhnf, false)
   let some sort := (← whnfR expectedHead).getAppFn.constName? | throwUnsupportedSyntax
   -- All result sorts use the declaration registry.
   if let some targetDecl ← dispatchTarget? stx.getId sort then
@@ -1017,7 +1048,9 @@ expected element types flow top-down into every list element! -/
   let listTerm : Term := ⟨stx⟩
   if expectedWhnf.isAppOfArity ``Option 1 then
     let inner ← whnfR expectedWhnf.appArg!
-    if inner.isAppOfArity ``List 1 then
+    if inner.isAppOfArity ``List 1 ||
+        inner.getAppFn.constName? ∈ [some `Semantics.Action, some `Semantics.Predicate,
+          some `Semantics.Condition, some `Semantics.StaticSpec, some `Semantics.Cost] then
       let expanded ← `(term| some $listTerm)
       return ← withMacroExpansion stx expanded <| elabTerm expanded (some expected)
   let some sort := expectedWhnf.getAppFn.constName? | throwUnsupportedSyntax
@@ -1243,12 +1276,16 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : Comma
   let rules := (fields.lookup `rules <|> fields.lookup `confers).getD (← `(term| []))
   let resultSort? ← if sig.raw[1].isNone then
       pure ((commandReturnType? kind).map (`Semantics ++ ·))
-    else if sig.raw[1][0][1].isIdent then liftTermElabM do
-      let candidates ← try resolveGlobalConst sig.raw[1][0][1] catch _ => pure []
+    else liftTermElabM do
+      let type : Term := ⟨sig.raw[1][0][1]⟩
+      let type ← match type with
+        | `(Option $inner) => pure inner.raw
+        | _ => pure type.raw
+      unless type.isIdent do return none
+      let candidates ← try resolveGlobalConst type catch _ => pure []
       if let some candidate := candidates.head? then
-        return (← whnf (← mkConstWithFreshMVarLevels candidate)).getAppFn.constName?
+        authoredResultSort? (← mkConstWithFreshMVarLevels candidate)
       else return none
-    else pure none
   let resultName := resultSort?.map (fun sort => Name.mkSimple sort.getString!)
   if sig.raw[1].isNone then
     let some result := resultName | throwErrorAt sig "{kind} requires an explicit return type"
@@ -1408,7 +1445,9 @@ structure BundleItem where
   key : BundleKey
   file : String
   references : List Name := []
+  primitiveReferences : List Name := []
   valueRegistered : Bool := false
+  primitive : Bool := false
   stx : Syntax := .missing
   deriving Inhabited
 
@@ -1417,13 +1456,16 @@ private def bundleKeyLess (a b : BundleKey) : Bool :=
     (a.bareName == b.bareName && a.returnType.toString < b.returnType.toString)
 
 def bundleDependencies (items : List BundleItem) (item : BundleItem) : List BundleKey :=
-  items.filterMap fun other =>
+  if item.primitive then [] else items.filterMap fun other =>
     let qualified := Name.mkSimple other.key.returnType.getString! ++ other.key.bareName
     let row := Name.mkSimple (other.key.bareName.getString! ++ "_definition")
-    if ((other.valueRegistered && item.references.contains row) ||
+    let references := if other.primitive then item.references ++ item.primitiveReferences
+      else item.references
+    if ((other.valueRegistered && references.contains row) ||
         (!other.valueRegistered &&
-          (item.references.contains other.key.bareName || item.references.contains qualified))) &&
-      (other.key.bareName != item.key.bareName ||
+          (references.contains other.key.bareName || references.contains qualified))) &&
+      other.key != item.key &&
+      (other.key.bareName != item.key.bareName || other.primitive ||
         (item.key.returnType == `Semantics.Ability && other.key.returnType == `Semantics.Action))
     then some other.key else none
 
@@ -1478,6 +1520,7 @@ private partial def referencedIdents (bound : List Name) (stx : Syntax) : List N
   if stx.isOfKind ``declField then
     if lexicalFields.contains stx[0].getId.eraseMacroScopes || stx[0].getId == `ofAbility then []
     else referencedIdents bound stx[2]
+  else if stx.isOfKind ``Parser.Term.dotIdent then []
   else if stx.isOfKind ``Parser.Term.structInstField then
     referencedIdents bound stx[1]
   else match stx with
@@ -1513,6 +1556,9 @@ private def bundleItem (file : String) (stx : Syntax) : Except String BundleItem
     binder[1].getArgs.toList.filterMap fun id => if id.isIdent then some id.getId else none
   return { key := { bareName, returnType }, file, stx,
            valueRegistered := registryKinds.contains kind,
+           primitive := kind == `primitive,
+           -- Bound names may denote primitive functions in application position.
+           primitiveReferences := referencedIdents [] stx[3] ++ referencedIdents [] stx[5],
            references := referencedIdents bound stx[3] ++ referencedIdents bound stx[5] ++
              (if kind == `ability_word then [`abilityWord] else []) ++
              (if kind == `card then [`singleFacedCard] else []) }

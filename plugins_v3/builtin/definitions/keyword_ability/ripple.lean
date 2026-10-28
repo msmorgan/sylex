@@ -16,13 +16,13 @@ keyword ripple (amount : Amount) : Ability := {
           (some
             (sequentially
               [castWithoutPaying
-                  (nounPhraseSomeOf (sliceCountCounted anyNumber)
+                  (nounPhraseSomeOf (counted anyNumber)
                     (some
                       (shares .cardName .share
                         this_))
                     (those .card))
                   none,
-                actionMove
+                move
                   (allOf
                     (and
                       [isCard,

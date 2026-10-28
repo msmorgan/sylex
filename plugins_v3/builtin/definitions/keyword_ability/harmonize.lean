@@ -18,7 +18,7 @@ keyword harmonize (cost : Cost) : Ability := {
       static
         (onlyWhile
           (costShift thisSpell
-            (costShiftGeneric
+            (generic
               (down
                 (powerOf
                   (the

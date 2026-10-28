@@ -5,5 +5,5 @@ template putOntoBattlefieldAttachedTo (subject host : NounPhrase)
   -- TODO(spelling): Context-dependent wording: put <subject> [from <from_>] onto the battlefield attached to <host>; string substitution cannot express its omitted or inflected parts.
   body :=
     zoneChange subject battlefield
-      (Option.getD from_ wherever) [moveRiderAttachedTo host]
+      (Option.getD from_ wherever) [attachedTo host]
 }

@@ -5,5 +5,5 @@ action revealHand : Action := {
   spelling := "reveal your hand",
   body :=
     expose .reveal
-      (exposedZone (handOf actor))
+      (zone (handOf actor))
 }

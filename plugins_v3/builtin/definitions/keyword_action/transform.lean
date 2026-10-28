@@ -5,5 +5,5 @@ action transform (subject : NounPhrase) (into : Option Predicate := none) : Acti
   -- optional fields or supply contextual agreement and morphology.
   lexical := { verbs := [{ lemma := "transform", frames := [Monotransitive, Intransitive, (Prepositional ["into"])] }], adjectives := ["transformed"] },
   body :=
-    actionTurnOver subject into
+    turnOver subject into
 }

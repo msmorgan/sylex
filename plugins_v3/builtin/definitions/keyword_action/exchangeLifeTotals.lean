@@ -4,5 +4,5 @@ action exchangeLifeTotals (parties : NounPhrase) : Action := {
   -- TODO(spelling): exchange the life totals of <parties>; the participant group needs
   -- coordinated possessives or a with-phrase, which string substitution cannot select.
   body :=
-    actionExchange (exchangedLifeTotals parties)
+    exchange (lifeTotals parties)
 }

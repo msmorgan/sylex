@@ -1,0 +1,5 @@
+/-- "the number of counters removed this way" -/
+template removedThisWay : Amount := {
+  spelling := "the number of counters removed this way",
+  body := theOutcome .countersRemoved
+}

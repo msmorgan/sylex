@@ -15,10 +15,9 @@ keyword Ability.splice (quality : Predicate) (cost : Cost) : Ability := {
   -- separator and terminal period depend on the Cost structure.
   body :=
     [static
-        (staticSpecRevealedAsCast
+        (revealedAsCast
           (a (and [isSpell, quality]))
-          (staticSpecConjunction none
-            [addedCost cost false .once,
+          (conjunction [addedCost cost false .once,
               textChange (that .spell)
-                (appendTextOf this_)]))]
+                (appendTextOf this_)] none))]
 }

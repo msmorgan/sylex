@@ -5,7 +5,7 @@ keyword recover (cost : Cost) : Ability := {
   body :=
     [when
         (does any
-          (actionMove (a isCreature) battlefield
+          (move (a isCreature) battlefield
             (some yourGraveyard) .departure []))
         (may (pay cost .once)
           (some (returnToHand this_ yourGraveyard))

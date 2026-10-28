@@ -5,13 +5,13 @@ template ptDefinition (subject : NounPhrase) (slots : DefinedSlots) (amount : Am
     StaticSpec := {
   -- TODO(spelling): Context-dependent wording: <subject>'s power [and toughness] [are each] [is] equal to <amount>; string substitution cannot express its omitted or inflected parts.
   body :=
-    staticSpecCharacteristicDefining subject
+    characteristicDefining subject
       (match slots with
       | Semantics.DefinedSlots.powerAlone =>
-        [characteristicEditStat .sets .power amount]
+        [stat .sets .power amount]
       | Semantics.DefinedSlots.toughnessAlone =>
-        [characteristicEditStat .sets .toughness amount]
+        [stat .sets .toughness amount]
       | Semantics.DefinedSlots.bothEach =>
-        [characteristicEditStat .sets .power amount,
-          characteristicEditStat .sets .toughness amount])
+        [stat .sets .power amount,
+          stat .sets .toughness amount])
 }

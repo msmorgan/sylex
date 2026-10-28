@@ -19,5 +19,5 @@ keyword storm : Ability := {
               [],
             may
               (chooseNewTargets
-                (nounPhrasePro (.word .copy) .many))])]
+                (pro (.word .copy) .many))])]
 }

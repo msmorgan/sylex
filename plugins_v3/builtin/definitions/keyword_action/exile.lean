@@ -3,6 +3,6 @@ action exile (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "exile", frames := [Monotransitive] }] },
   spelling := "exile <subject>",
   body :=
-    actionMove subject wherever (some exileZone)
+    move subject wherever (some exileZone)
       .arrival []
 }

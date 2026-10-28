@@ -5,9 +5,8 @@ keyword disguise (cost : Cost) : Ability := {
     [static
         (can (actor you)
           (cast thisCard none
-            (playPaymentFaceDown faceDownWardedCreature
+            (faceDown faceDownWardedCreature
               (mana [generic 3])))),
       static
-        (staticSpecSpecialAction none none cost
-          (turnFaceUp this_))]
+        (specialAction none cost (turnFaceUp this_) none)]
 }

@@ -1,0 +1,5 @@
+/-- "the last chosen color" -/
+template theLastChosenColor : ColorTerm := {
+  spelling := "the last chosen color",
+  body := chosen .theLatestChoice
+}

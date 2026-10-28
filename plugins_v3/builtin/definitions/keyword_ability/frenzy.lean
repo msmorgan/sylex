@@ -6,7 +6,7 @@ keyword frenzy (amount : Amount) : Ability := {
   body :=
     [whenever
         (does (actor thisCreature)
-          (actionAttackUnblocked none))
+          (attackUnblocked none))
         (get thisCreature (up amount) (up 0)
           (some untilEndOfTurn))]
 }

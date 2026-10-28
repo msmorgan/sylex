@@ -5,6 +5,6 @@ action cloak (subject : NounPhrase) : Action := {
   body :=
     sequentially
       [turnFaceDown subject faceDownWardedCreature,
-        actionMove subject wherever (some battlefield)
+        move subject wherever (some battlefield)
           .arrival [faceDownAs faceDownWardedCreature]]
 }

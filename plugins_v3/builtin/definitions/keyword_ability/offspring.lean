@@ -7,9 +7,9 @@ keyword offspring (cost : Cost) : Ability := {
         (does (actor thisPermanent) enter)
         (create 1
           (copyOf thisPermanent
-            [copyExceptEdits
-                [characteristicEditStat .sets .power 1,
-                  characteristicEditStat .sets .toughness 1]]))
+            [edits
+                [stat .sets .power 1,
+                  stat .sets .toughness 1]]))
         [] [] none none none
         (some
           (keywordCostPaid offspring.label thisPermanent))]

@@ -10,8 +10,6 @@ card vampiricEmbrace : Spelled :=
         static (abilityGrant
           (enchanted creature) flying),
         whenever (does ((a (and [isCreature,
-              predicateDid { subj := actor (attachHost .enchanted creature),
-                             action := dealDamage anyAmount which,
-                             within := some (within soFarThisTurn none) }]))) die)
+              did (actor (attachHost .enchanted creature)) (dealDamage anyAmount which) (within := some (within soFarThisTurn none))]))) die)
           (putCounters 1 p1p1Counter
             (that creature)) ] }

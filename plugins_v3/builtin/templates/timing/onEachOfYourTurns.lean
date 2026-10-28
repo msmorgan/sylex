@@ -2,6 +2,6 @@
 template onEachOfYourTurns : Timing := {
   spelling := "on each of your turns",
   body :=
-    timingInPart .turn (some you)
+    inPart .turn (some you)
       (eachTime none)
 }

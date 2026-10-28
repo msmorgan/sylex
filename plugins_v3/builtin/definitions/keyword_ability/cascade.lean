@@ -4,8 +4,7 @@ keyword cascade : Ability := {
   spelling := "cascade",
   body :=
     have cheaper :=
-      predicateCompare [.stat .manaValue] .less
-        (statOf (.stat .manaValue) thisSpell);
+      compare .less (statOf (.stat .manaValue) thisSpell) [.stat .manaValue];
     [when
         (does (actor you)
           (cast thisSpell))
@@ -17,7 +16,7 @@ keyword cascade : Ability := {
             may
               (castWithoutPaying (that .card)
                 (some cheaper)),
-            actionMove
+            move
               (allOf
                 (and
                   [isCard,

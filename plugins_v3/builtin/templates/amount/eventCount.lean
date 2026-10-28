@@ -3,7 +3,7 @@ template eventCount (action : Action) (subj : Subject) (within : Duration)
     (timing : Option Timing := none) : Amount := {
   -- TODO(spelling): The number of occurrences of a historical action clause.
   body :=
-    amountTally
+    tally
       { subj := subj, action := action, within := some (Templates.LookbackSpan.within within timing) }
       .events
 }

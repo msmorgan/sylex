@@ -3,5 +3,5 @@ template theLastChosenPlayer : Predicate := {
   spelling := "the last chosen player",
   body :=
     and
-      [isPlayer, predicateChosen .theLatestChoice]
+      [isPlayer, chosen .theLatestChoice]
 }

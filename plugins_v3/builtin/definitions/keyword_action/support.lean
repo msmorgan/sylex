@@ -5,6 +5,6 @@ action support (amount : Amount) : Action := {
   body :=
     putCounters 1 (printedKind p1p1Counter)
       (eachOf
-        (described (detPhraseTarget (upToOf amount))
+        (described (target (upToOf amount))
           (and [isCreature, isOther])))
 }

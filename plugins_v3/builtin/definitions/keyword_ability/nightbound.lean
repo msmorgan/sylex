@@ -10,5 +10,5 @@ keyword nightbound : Ability := {
       static
         (cant any
           (transform thisPermanent) none none
-          (some (deonticExceptByKeyword nightbound.label)))]
+          (some (byKeyword nightbound.label)))]
 }

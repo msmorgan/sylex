@@ -7,7 +7,7 @@ keyword daybound : Ability := {
           (would (actor thisPermanent)
             enter)
           (doIf (gameIs night)
-            (withRiders [moveRiderEntersTransformed]))),
+            (withRiders [entersTransformed]))),
       static
         (asEvent (gameBecomes night)
           (doIf
@@ -17,5 +17,5 @@ keyword daybound : Ability := {
       static
         (cant any
           (transform thisPermanent) none none
-          (some (deonticExceptByKeyword daybound.label)))]
+          (some (byKeyword daybound.label)))]
 }

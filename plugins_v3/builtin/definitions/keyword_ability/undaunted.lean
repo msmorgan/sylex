@@ -4,6 +4,6 @@ keyword undaunted : Ability := {
   body :=
     [static
         (costShift thisSpell
-          (costShiftGeneric (down (forEach 1 isOpponent))
+          (generic (down (forEach 1 isOpponent))
             none))]
 }

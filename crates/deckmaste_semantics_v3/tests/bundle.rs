@@ -198,3 +198,59 @@ fn token_rendering_preserves_numerals_and_compound_operators() {
     assert_eq!(deckmaste_semantics_v3::reader::render(&tokens), source);
     assert_eq!(tokenize("0xFF").unwrap(), vec![Token::Atom("0xFF".into())]);
 }
+
+#[test]
+fn same_name_primitive_precedes_its_template() {
+    let bundle = Bundle::from_items(vec![
+        item("template timesPaid : Amount := { body := timesPaid }"),
+        item("primitive timesPaid : LinkedFacet := { body := Semantics.Primitives.LinkedFacet.timesPaid }"),
+        item("template phyrexianPaidWithLife : Amount := { body := phyrexianPaidWithLife }"),
+        item("primitive phyrexianPaidWithLife : LinkedFacet := { body := Semantics.Primitives.LinkedFacet.phyrexianPaidWithLife }"),
+    ])
+    .unwrap();
+    let order: Vec<_> = bundle
+        .order
+        .iter()
+        .map(|key| (key.bare_name.as_str(), key.return_type.as_str()))
+        .collect();
+    assert_eq!(
+        order,
+        [
+            ("phyrexianPaidWithLife", "LinkedFacet"),
+            ("phyrexianPaidWithLife", "Amount"),
+            ("timesPaid", "LinkedFacet"),
+            ("timesPaid", "Amount"),
+        ]
+    );
+}
+
+#[test]
+fn enum_constructor_names_do_not_create_bundle_dependencies() {
+    let bundle = Bundle::from_items(vec![
+        item("template exileZone : Location := { body := zone .exile none }"),
+        item("action exile := { body := exileZone }"),
+        item("primitive zone : Location := { body := Semantics.Primitives.Location.zone }"),
+    ])
+    .unwrap();
+    let names: Vec<_> = bundle
+        .order
+        .iter()
+        .map(|key| key.bare_name.as_str())
+        .collect();
+    assert_eq!(names, ["zone", "exileZone", "exile"]);
+}
+
+#[test]
+fn primitive_shadowed_by_a_parameter_is_loaded_before_its_caller() {
+    let bundle = Bundle::from_items(vec![
+        item("template isNamed (name : String) : CopyExcept := { body := edits [name .sets name] }"),
+        item("primitive name (op : QualityOp) (name : String) : CharacteristicEdit := { body := Semantics.Primitives.CharacteristicEdit.name op name }"),
+    ])
+    .unwrap();
+    let names: Vec<_> = bundle
+        .order
+        .iter()
+        .map(|key| key.bare_name.as_str())
+        .collect();
+    assert_eq!(names, ["name", "isNamed"]);
+}

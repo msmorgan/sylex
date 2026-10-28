@@ -16,6 +16,6 @@ keyword buyback (cost : Cost) : Ability := {
           (doIf
             (keywordCostPaid buyback.label thisSpell)
             (instead
-              (actionMove thisSpell wherever
+              (move thisSpell wherever
                 (some hand) .arrival []))))]
 }

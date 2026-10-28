@@ -7,6 +7,6 @@ template entryChoice (subject chosen : NounPhrase) (disclosure : Disclosure := .
   body :=
     replace
       (would (actor subject) enter)
-      (before (actionChoose none chosen disclosure none) none)
+      (before (choose chosen disclosure none none) none)
       none .repeatedly none
 }

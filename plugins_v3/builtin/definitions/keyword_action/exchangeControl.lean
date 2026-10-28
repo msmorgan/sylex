@@ -3,5 +3,5 @@ action exchangeControl (left right : NounPhrase) : Action := {
   deed := "exchange",
   spelling := "exchange control of <left> and <right>",
   body :=
-    actionExchange (exchangedControlOf left right)
+    exchange (controlOf left right)
 }

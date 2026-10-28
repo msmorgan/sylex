@@ -11,7 +11,7 @@ template zoneChange (subject : NounPhrase) (destination : Location)
     (from_ : Location) (riders : List MoveRider) : Action := {
   -- TODO(spelling): Put; wording varies with destination, from_, riders, subject, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
-    actionMove subject from_ (some destination)
+    move subject from_ (some destination)
       (if Semantics.Location.observedOnDeparture from_ = true then .departure
       else .arrival)
       riders

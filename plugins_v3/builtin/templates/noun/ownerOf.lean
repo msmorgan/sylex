@@ -1,0 +1,4 @@
+template ownerOf (subject : NounPhrase) : NounPhrase := {
+  spelling := "<subject>'s owner",
+  body := possessorOf .owner subject
+}

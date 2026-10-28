@@ -15,7 +15,7 @@ card_type creature := {
   stats := [.power, .toughness],
   confers :=
     [castableFrom yourHand asSorcery,
-      .property (staticSpecCombatant this_),
+      .property (combatant this_),
       .property (can this_ attack),
       .property (can this_ block),
       .property (onlyUnless (cant this_ attack) (controlledSinceTheirTurnBegan it)),

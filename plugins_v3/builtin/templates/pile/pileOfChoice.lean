@@ -2,5 +2,5 @@
 template pileOfChoice (player : NounPhrase) : NounPhrase := {
   spelling := "the pile of <player>'s choice",
   body :=
-    pileOf (sliceCountCounted (exactly 1)) (some player)
+    pileOf (counted (exactly 1)) (some player)
 }

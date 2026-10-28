@@ -2,5 +2,5 @@
 template eachTurn : Timing := {
   spelling := "each turn",
   body :=
-    timingInPart .turn none (eachTime none)
+    inPart .turn none (eachTime none)
 }

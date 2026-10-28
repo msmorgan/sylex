@@ -7,5 +7,5 @@ template grants (keyword : KeywordLabel) : Conferral := {
   body :=
     .property
       (characteristicChange this_
-        [characteristicEditAddedAbilities [.keyword keyword [] []]])
+        [addedAbilities [.keyword keyword [] []]])
 }

@@ -134,15 +134,15 @@ theorem okHibernationsEndTrigger : Ability.check (DRS.ofList []) hibernationsEnd
 def bloomTenderMana : Ability :=
   vivid
     (activated tapSymbol
-      (doForEachKind .color .color (addMana 1 ofTheChosenColor)
-         (allOf (and [isPermanent, youControl]))))
+      (doForEachKind .color (allOf (and [isPermanent, youControl])) .color
+        (addMana 1 ofTheChosenColor)))
 theorem okBloomTenderMana : Ability.check (DRS.ofList []) bloomTenderMana = [] := by decide
 
 /-- Tarnation Vista -/
 def tarnationVistaMana : Ability :=
   activated (compound [[generic 1], tapSymbol])
-    (doForEachKind .color .color (addMana 1 ofTheChosenColor)
-       (allOf (and [isPermanent, isMonocolored, youControl])))
+    (doForEachKind .color (allOf (and [isPermanent, isMonocolored, youControl])) .color
+      (addMana 1 ofTheChosenColor))
 theorem okTarnationVistaMana : Ability.check (DRS.ofList []) tarnationVistaMana = [] := by decide
 
 /-- Soul Shatter -/

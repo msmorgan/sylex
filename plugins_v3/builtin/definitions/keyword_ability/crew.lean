@@ -18,7 +18,7 @@ keyword crew (amount : Amount) : Ability := {
                       [isCreature, youControl, isOther]])))))
         (establishThroughout
           (characteristicChange thisPermanent
-            [characteristicEditTypeLine .adds
+            [typeLine .adds
                 { types := some [Semantics.CardType.artifact, Semantics.CardType.creature] }])
           untilEndOfTurn)]
 }

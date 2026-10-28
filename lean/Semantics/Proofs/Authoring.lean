@@ -360,7 +360,8 @@ end
 cost, the card type and the printed power and toughness. -/
 theorem printedDataNeedsNoExpressionTemplate :
     formCalls plain.authoring =
-      [``Templates.generic, ``CardType.creature, ``Templates.stat, ``Templates.stat] := by
+      [``Templates.ManaSymbol.generic, ``CardType.creature,
+        ``Templates.Amount.stat, ``Templates.Amount.stat] := by
   decide
 
 /-- A keyword written by its Definition is recorded as that Definition's call. -/
@@ -443,7 +444,7 @@ private def charRumblerWritten : Spelled := spelled <| .singleFaced
         [ doubleStrike,
           activated (mana [pip .red])
             (get thisCreature (up (.lit 1)) (up (.lit 0)) (some untilEndOfTurn)) ],
-      power := some (amountLit (-1)), toughness := stat 3 } }
+      power := some (lit (-1)), toughness := stat 3 } }
 
 theorem numeralsKeepTheCard : Cards.charRumbler.card = charRumblerWritten.card := rfl
 
@@ -525,8 +526,9 @@ theorem wildShapeWritesEachPartOnce :
       calls.count ``Semantics.Templates.NounPhrase.target = 1 ∧ calls.count ``Templates.untilEndOfTurn = 1 ∧
       (modesOver? Cards.wildShape.authoring).map
           (fun (items, body) => (items.map formCalls, suppliedBody body)) =
-        some ([[``turtle, ``hexproof, ``stat, ``stat], [``spider, ``reach, ``stat, ``stat],
-            [``elephant, ``trample, ``stat, ``stat]],
+        some ([[``turtle, ``hexproof, ``Templates.Amount.stat, ``Templates.Amount.stat],
+            [``spider, ``reach, ``Templates.Amount.stat, ``Templates.Amount.stat],
+            [``elephant, ``trample, ``Templates.Amount.stat, ``Templates.Amount.stat]],
           some (`shape,
             [``Templates.establish, ``Templates.qualityChange, ``Semantics.Templates.NounPhrase.target,
               ``Templates.Predicate.and, ``isCreature, ``youControl, ``Templates.bundle,
@@ -1096,3 +1098,35 @@ theorem alternativeMentionsStayInTheirBranches (subject : NounPhrase) :
        ownedBy (.firstMention "separateAlternatives.subject" subject)] := rfl
 
 end Semantics.Proofs.Authoring.PrimitiveBoundary
+
+namespace Semantics.Proofs.Authoring
+
+open Lean Authoring in
+#guard match topoSortBundle [
+  { key := ⟨`timesPaid, `Semantics.Amount⟩, file := "amount.lean",
+    references := [`timesPaid] },
+  { key := ⟨`timesPaid, `Semantics.LinkedFacet⟩, file := "facet.lean", primitive := true }
+] with
+| .ok items => items.map (·.key) ==
+    [⟨`timesPaid, `Semantics.LinkedFacet⟩, ⟨`timesPaid, `Semantics.Amount⟩]
+| .error _ => false
+
+theorem optionalStatDispatchesToAmount :
+    (stat 3 : Option Amount) = Templates.Amount.stat 3 := rfl
+
+theorem nonCallableLocalAllowsPrimitiveDispatch (name : String) :
+    (name .sets name : CharacteristicEdit) = CharacteristicEdit.name .sets name := rfl
+
+theorem callableLocalKeepsApplication (name : String → CharacteristicEdit) (value : String) :
+    (name value : CharacteristicEdit) = name value := rfl
+
+theorem overloadedNounCoercesToSubject :
+    (a isCreature : Subject) = Subject.actor (Templates.NounPhrase.a isCreature) := rfl
+
+namespace OrdinaryFunction
+private def card (value : Nat) : Nat := value + 1
+
+theorem ordinaryNamespaceFunctionKeepsApplication : card 3 = 4 := rfl
+end OrdinaryFunction
+
+end Semantics.Proofs.Authoring

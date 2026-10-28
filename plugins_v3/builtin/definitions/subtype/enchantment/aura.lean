@@ -7,7 +7,7 @@ subtype aura := {
   confers :=
     [.stateBased
         (not (isAttached thisAura))
-        (actionMove thisAura
+        (move thisAura
           (zone .battlefield none) (some graveyard)
           .arrival [])]
 }

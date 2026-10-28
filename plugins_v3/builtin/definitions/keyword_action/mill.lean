@@ -5,7 +5,7 @@ action mill (amount : Amount) : Action := {
   -- article and number agreement.
   lexical := { verbs := [{ lemma := "mill", frames := [Monotransitive] }] },
   body :=
-    actionMove
+    move
       (slice .top amount (libraryOf actor))
       (zone .library none) (some graveyard)
       .arrival []

@@ -4,6 +4,6 @@ template creatureToken (power toughness : Nat) (colors : List Color)
   -- TODO(spelling): <power>/<toughness> <colors> <subtypes> creature token with <abilities>;
   -- optional colors/abilities, coordination, and token number require conditional realization.
   body :=
-    creatureTokenOf (amountLit ↑power) (amountLit ↑toughness) colors subtypes
+    creatureTokenOf (lit ↑power) (lit ↑toughness) colors subtypes
       abilities
 }

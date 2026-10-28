@@ -32,10 +32,10 @@ keyword enchant (subject : Predicate) : Ability := {
       static
         (replace
           (would any
-            (actionMove thisAura
+            (move thisAura
               (not stack) (some battlefield)
               .arrival
-              [moveRiderNot (moveRiderAttachedTo any)]))
+              [not (attachedTo any)]))
           (doIf
             (exists_ (legalHostOf thisAura))
             (before
@@ -48,9 +48,9 @@ keyword enchant (subject : Predicate) : Ability := {
         (replace
           (would (actor thisAura)
             (enter none
-              [moveRiderAttachedTo any,
-                moveRiderNot
-                  (moveRiderAttachedTo
+              [attachedTo any,
+                not
+                  (attachedTo
                     (a (legalHostOf thisAura)))]))
           (instead
             (doIf

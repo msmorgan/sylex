@@ -2,5 +2,5 @@
 template onePile : NounPhrase := {
   spelling := "one pile",
   body :=
-    pileOf (sliceCountCounted (exactly 1)) none
+    pileOf (counted (exactly 1)) none
 }

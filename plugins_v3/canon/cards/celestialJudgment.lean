@@ -4,5 +4,5 @@ card celestialJudgment : Spelled :=
     types := [.sorcery],
     text :=
       [ spell (sequentially
-          [ doForEachKind (.value .power) .number (choose (a (and [isCreature, hasPower .eq chosenNumber]))) (allOf isCreature),
+          [ doForEachKind (.value .power) (allOf isCreature) .number (choose (a (and [isCreature, hasPower .eq chosenNumber]))),
             destroy (each (and [isCreature, notChosen])) ]) ] }

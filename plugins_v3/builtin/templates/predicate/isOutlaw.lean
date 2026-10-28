@@ -2,7 +2,7 @@
 template isOutlaw : Predicate := {
   spelling := "outlaw",
   body :=
-    predicateCoord .andOr
+    coord .andOr
       [hasSubtype assassin,
         hasSubtype mercenary,
         hasSubtype pirate,

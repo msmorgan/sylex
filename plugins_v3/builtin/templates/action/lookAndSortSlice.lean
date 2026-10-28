@@ -7,11 +7,11 @@ template lookAndSortSlice (slice : NounPhrase) (spill : Location)
     sequentially
       [expose .lookAt
           (cards (slice)),
-        actionMove
+        move
           (someOf anyNumber
             (slice))
           wherever (some spill) .arrival spillRiders,
-        actionMove theRest wherever
+        move theRest wherever
           (some onTop) .arrival
           [inOrder .anyOrder]]
 }

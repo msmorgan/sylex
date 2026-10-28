@@ -4,6 +4,6 @@ action exileFaceDown (subject : NounPhrase) : Action := {
   deed := "exile",
   spelling := "exile <subject> face down",
   body :=
-    actionMove subject wherever (some exileZone)
+    move subject wherever (some exileZone)
       .arrival [faceDownAs exiledFaceDown]
 }

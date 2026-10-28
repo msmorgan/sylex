@@ -1,0 +1,5 @@
+/-- "themselves" -/
+template themselves : NounPhrase := {
+  spelling := "themselves",
+  body := refl .many
+}

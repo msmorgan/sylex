@@ -2,5 +2,5 @@
 template aTheirChoice (p : Predicate) : NounPhrase := {
   -- TODO(spelling): Context-dependent wording: a … of their choice; string substitution cannot express its omitted or inflected parts.
   body :=
-    described (detPhraseA .theirChoice) p
+    described (a .theirChoice) p
 }

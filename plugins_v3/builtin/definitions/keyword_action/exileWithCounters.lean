@@ -6,7 +6,7 @@ action exileWithCounters (subject : NounPhrase) (amount : Amount)
   lexical := { verbs := [{ lemma := "exile", frames := [Monotransitive] }] },
   deed := "exile",
   body :=
-    actionMove subject wherever (some exileZone)
+    move subject wherever (some exileZone)
       .arrival
       [withCounters amount (printedKind kind) .fresh]
 }

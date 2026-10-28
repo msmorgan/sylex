@@ -30,12 +30,11 @@ template alsoForKeywords (body : KeywordTerm → Ability)
     match parts with
     | Semantics.Ability.triggered event alternatives while_ joins timing limit intervening action :: tail =>
       if (List.length actions == List.length parts) = true then
-        abilityTriggered event alternatives while_ joins timing limit intervening
+        triggered event alternatives while_ joins timing limit intervening
           (sequentially actions)
-      else static (staticSpecConjunction none [])
+      else static (conjunction [] none)
     | Semantics.Ability.static spec :: tail =>
       static
-        (staticSpecConjunction none
-          (if (List.length specs == List.length parts) = true then specs else []))
-    | x => static (staticSpecConjunction none [])
+        (conjunction (if (List.length specs == List.length parts) = true then specs else []) none)
+    | x => static (conjunction [] none)
 }

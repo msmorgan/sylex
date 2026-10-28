@@ -9,7 +9,7 @@ template copyCharacteristics (c : Characteristics) (typesAdded : Bool) : List Co
               List.isEmpty (Semantics.Characteristics.subtypes c)) =
             true then
         []
-      else [characteristicEditTypeLine typeOp (Semantics.Characteristics.typeChanges c)];
+      else [typeLine typeOp (Semantics.Characteristics.typeChanges c)];
     have values :=
       Semantics.Characteristics.valueEdits
         { name := Semantics.Characteristics.name c, cost := Semantics.Characteristics.cost c,
@@ -19,6 +19,6 @@ template copyCharacteristics (c : Characteristics) (typesAdded : Bool) : List Co
           loyalty := Semantics.Characteristics.loyalty c, defense := Semantics.Characteristics.defense c }
         Semantics.QualityOp.sets;
     have edits := types ++ values;
-    (if List.isEmpty edits = true then [] else [copyExceptEdits edits]) ++
+    (if List.isEmpty edits = true then [] else [edits edits]) ++
       List.map alsoHas (Semantics.Characteristics.text c)
 }

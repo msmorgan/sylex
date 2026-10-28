@@ -2,5 +2,5 @@
 template removeFromCombat (subject : NounPhrase) : Action := {
   spelling := "remove <subject> from combat",
   body :=
-    combat subject (combatUpdateParticipation combatParticipationOutsideCombat)
+    combat subject (participation outsideCombat)
 }

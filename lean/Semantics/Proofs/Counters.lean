@@ -221,9 +221,8 @@ theorem starPupilPutsTheSameNumberOfEachKind :
       | .singleFaced { characteristics := { text := [_, .triggered _ _ _ _ _ _ _ effect], .. } } =>
         some effect
       | _ => none) =
-      some (doForEachKind .counterKind .counterKind
-        (putCounters (statOf .boundCounter it) thatKind (target (and [isCreature, youControl])))
-        (domain := some it)) := rfl
+      some (doForEachKind .counterKind (some it) .counterKind
+        (putCounters (statOf .boundCounter it) thatKind (target (and [isCreature, youControl])))) := rfl
 
 /-- Denry Klin's "put the same number of each kind of counter on that creature", as its Oracle
 text prints it: a loop over the kinds on Denry Klin, putting as many of each. -/
@@ -231,9 +230,8 @@ theorem denryKlinPutsTheSameNumberOfEachKind :
     (match Cards.denryKlinSameKinds with
       | .triggered _ _ _ _ _ _ _ effect => some effect
       | _ => none) =
-      some (doForEachKind .counterKind .counterKind
-        (putCounters (statOf .boundCounter thisCreature) thatKind (that creature))
-        (domain := some thisCreature)) := rfl
+      some (doForEachKind .counterKind (some thisCreature) .counterKind
+        (putCounters (statOf .boundCounter thisCreature) thatKind (that creature))) := rfl
 
 /-- Celestial Convergence's upkeep effect, after its counter removal. -/
 private def celestialConvergenceAfterRemoval : Option Action :=

@@ -190,7 +190,7 @@ fn live_primitives_expand_through_the_constructor_basis() {
     let bundle = builtin();
     let reader = Elaborator::new(&bundle);
     assert_eq!(
-        reader.read::<Amount>("amountLit 7").unwrap(),
+        reader.read::<Amount>("lit 7").unwrap(),
         Amount::Lit { value: 7 }
     );
     assert_eq!(reader.read::<NounPhrase>("you").unwrap(), NounPhrase::You);

@@ -3,6 +3,6 @@ action destroy (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "destroy", frames := [Monotransitive] }] },
   spelling := "destroy <subject>",
   body :=
-    actionMove subject (zone .battlefield none)
+    move subject (zone .battlefield none)
       (some graveyard) .departure []
 }

@@ -2,5 +2,5 @@
 template getEmblem (abilities : List Ability) : Action := {
   spelling := "you get an emblem with <abilities>",
   body :=
-    createObject 1 (creationSpecEmblem none abilities) none
+    createObject 1 (emblem none abilities) none
 }

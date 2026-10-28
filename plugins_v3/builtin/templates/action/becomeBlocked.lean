@@ -6,5 +6,5 @@ too, not a block by a particular creature [CR#509.1h,509.3c]. "Becomes blocked b
 template becomeBlocked (subject : NounPhrase) : Action := {
   spelling := "<subject> becomes blocked",
   body :=
-    combat subject (combatUpdateParticipation (combatParticipationBlocked true))
+    combat subject (participation (blocked true))
 }

@@ -6,8 +6,8 @@ template splitOverPlaneswalker : NounPhrase := {
   -- the phrase, which string substitution cannot branch on.
   body :=
     eitherOf
-      (nounPhrasePro (.unionHalf .player) .one)
+      (pro (.unionHalf .player) .one)
       (possessorOf .controller
-        (nounPhrasePro (.unionHalf (.type Semantics.CardType.planeswalker))
+        (pro (.unionHalf (.type Semantics.CardType.planeswalker))
           .one))
 }

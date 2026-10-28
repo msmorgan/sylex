@@ -3,5 +3,5 @@
 template asInstant : Timing := {
   spelling := "only as an instant",
   body :=
-    whileTrue (conditionHasPriority you)
+    whileTrue (hasPriority you)
 }

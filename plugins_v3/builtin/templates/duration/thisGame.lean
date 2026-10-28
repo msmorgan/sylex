@@ -2,5 +2,5 @@
 template thisGame : Duration := {
   spelling := "this game",
   body :=
-    durationBetween none (some gameEventNow)
+    durationBetween none (some now)
 }

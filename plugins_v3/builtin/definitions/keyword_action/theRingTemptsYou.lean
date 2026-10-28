@@ -29,7 +29,7 @@ action theRingTemptsYou : Action := {
           (getNamedEmblem "The Ring"
             [static
                 (characteristicChange (allOf ringBearers)
-                  [characteristicEditTypeLine .adds
+                  [typeLine .adds
                       { supertypes := some [.legendary] }]),
               static
                 (cant

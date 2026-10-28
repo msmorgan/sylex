@@ -5,7 +5,7 @@ back ("that number plus 1") [CR#604.3a,613.4a]. -/
 template ptDefinitions (subject : NounPhrase) (power toughness : Amount) : StaticSpec := {
   spelling := "<subject>'s power is equal to <power> and its toughness is equal to <toughness>",
   body :=
-    staticSpecCharacteristicDefining subject
-      [characteristicEditStat .sets .power power,
-        characteristicEditStat .sets .toughness toughness]
+    characteristicDefining subject
+      [stat .sets .power power,
+        stat .sets .toughness toughness]
 }

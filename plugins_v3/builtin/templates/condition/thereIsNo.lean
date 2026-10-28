@@ -4,6 +4,6 @@ template thereIsNo (designation : DesignationLabel) : Condition := {
   body :=
     not
       (thereAre
-        (described (detPhraseA .unmarked)
+        (described (a .unmarked)
           (hasDesignation designation none)))
 }

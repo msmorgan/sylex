@@ -3,6 +3,6 @@ template thisCombat : Duration := {
   spelling := "this combat",
   body :=
     durationBetween
-      (some (beginningOf .combat none turnRefCurrent))
-      (some gameEventNow)
+      (some (beginningOf .combat none current))
+      (some now)
 }

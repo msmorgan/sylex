@@ -7,9 +7,7 @@ card scytheOfTheWretched : Spelled :=
           (equipped creature)
           (up 2) (up 2)),
         whenever (does ((a (and [isCreature,
-              predicateDid { subj := actor (attachHost .equipped creature),
-                             action := dealDamage anyAmount which,
-                             within := some (within soFarThisTurn none) }]))) die)
+              did (actor (attachHost .equipped creature)) (dealDamage anyAmount which) (within := some (within soFarThisTurn none))]))) die)
           (sequentially
             [ returnToBattlefield (that card)
                 [(under you)],

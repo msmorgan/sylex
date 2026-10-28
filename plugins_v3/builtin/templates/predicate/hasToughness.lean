@@ -2,5 +2,5 @@
 template hasToughness (cmp : Comparator) (amt : Amount) : Predicate := {
   spelling := "with toughness <cmp> <amt>",
   body :=
-    predicateCompare [.stat .toughness] cmp amt
+    compare cmp amt [.stat .toughness]
 }

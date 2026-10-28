@@ -6,14 +6,13 @@ action detain (subject : NounPhrase) : Action := {
   spelling := "detain <subject>",
   body :=
     establishThroughout
-      (staticSpecConjunction none
-        [cant (actor subject) (attack none),
+      (conjunction [cant (actor subject) (attack none),
           cant (actor subject) (block any),
           cant any
             (activate
               (allOf
                 (and
                   [abilityHead .anyActivated,
-                    abilityOf subject])))])
+                    abilityOf subject])))] none)
       untilYourNextTurn
 }

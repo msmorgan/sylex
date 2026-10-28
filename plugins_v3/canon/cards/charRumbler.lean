@@ -5,4 +5,4 @@ card charRumbler : Spelled :=
       [ doubleStrike,
         activated [pip .red]
           (get thisCreature (up 1) (up 0) untilEndOfTurn) ],
-    power := some (amountLit (-1)), toughness := stat 3 }
+    power := some (lit (-1)), toughness := stat 3 }

@@ -2,5 +2,5 @@
 template chosenQuality (quality : Predicate) : QualityPayload := {
   spelling := "the chosen <quality>",
   body :=
-    qualityPayloadQuality (withQuality quality)
+    quality (withQuality quality)
 }

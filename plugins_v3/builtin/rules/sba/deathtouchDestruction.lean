@@ -19,7 +19,7 @@ sba deathtouchDestruction := {
                         (theKeyword deathtouch.label)])))
               (dealDamage anyAmount this_)
               (within
-                (durationBetween (some gameEventStateBasedActionsChecked)
-                  (some gameEventNow)))],
+                (durationBetween (some stateBasedActionsChecked)
+                  (some now)))],
       then_ := destroy this_ }
 }

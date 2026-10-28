@@ -8,11 +8,11 @@ action earthbend (amount : Amount) : Action := {
           (characteristicChange
             (target
               (and [isLand, actorControls]))
-            [characteristicEditTypeLine .adds
+            [typeLine .adds
                 { types := some [Semantics.CardType.creature] },
-              characteristicEditStat .sets .power 0,
-              characteristicEditStat .sets .toughness 0,
-              characteristicEditAddedAbilities [haste]])
+              stat .sets .power 0,
+              stat .sets .toughness 0,
+              addedAbilities [haste]])
           none,
         putCounters amount (printedKind p1p1Counter)
           (that land),
@@ -23,7 +23,7 @@ action earthbend (amount : Amount) : Action := {
           (returnToBattlefield (that land)
             [entersAs .tapped, under actor])
           [does any
-              (actionMove (that land)
+              (move (that land)
                 battlefield (some exileZone)
                 .departure [])]]
 }

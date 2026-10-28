@@ -12,11 +12,7 @@ keyword reconfigure (cost : Cost) : Ability := {
             (and
               [isCreature, isOther, youControl])))
         asSorcery,
-      abilityActivated cost (unattach thisPermanent)
-        (some asSorcery) none
-        (some
+      activated cost (unattach thisPermanent) (some asSorcery) none (some
           (is thisPermanent
-            (predicateAttachment .attachment none
-              (some (a isCreature)))))
-        none]
+            (attachment .attachment (some (a isCreature)) none))) none]
 }

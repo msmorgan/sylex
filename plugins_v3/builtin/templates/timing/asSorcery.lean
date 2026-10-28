@@ -7,9 +7,9 @@ template asSorcery : Timing := {
   spelling := "only as a sorcery",
   body :=
     and
-      [whileTrue (conditionHasPriority you),
-        timingInPart .mainPhase (some you)
-          turnRefCurrent,
+      [whileTrue (hasPriority you),
+        inPart .mainPhase (some you)
+          current,
         whileTrue
           (not (exists_ (in_ stack)))]
 }

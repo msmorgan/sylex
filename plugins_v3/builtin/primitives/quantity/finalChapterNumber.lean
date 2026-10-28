@@ -1,8 +1,0 @@
-/-- "<saga>'s final chapter number": the greatest of its chapter numbers, 0 with none
-[CR#714.2d]. -/
--- [CR#714.2d]
-primitive finalChapterNumber (saga : NounPhrase) : Amount := {
-  spelling := "<saga>'s final chapter number",
-  body :=
-    Semantics.Primitives.Amount.aggregate Semantics.AggregateOp.max Semantics.ProjAxis.chapter saga
-}

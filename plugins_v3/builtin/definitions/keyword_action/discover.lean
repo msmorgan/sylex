@@ -4,7 +4,7 @@ action discover (amount : Amount) : Action := {
   spelling := "discover <amount>",
   body :=
     have fits :=
-      predicateCompare [.stat .manaValue] .atMost amount;
+      compare .atMost amount [.stat .manaValue];
     sequentially
       [exile
           (run .top
@@ -15,7 +15,7 @@ action discover (amount : Amount) : Action := {
           none
           (some
             (putInto (that .card) hand)),
-        actionMove theRest wherever
+        move theRest wherever
           (some onBottom) .arrival
           [inOrder .randomOrder]]
 }

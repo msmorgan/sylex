@@ -5,6 +5,6 @@ action manifestPlacement (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "manifest", frames := [Monotransitive] }] },
   deed := "manifest",
   body :=
-    actionMove subject wherever (some battlefield)
+    move subject wherever (some battlefield)
       .arrival []
 }

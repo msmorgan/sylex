@@ -10,5 +10,5 @@ template keywordGrant (subject : NounPhrase) (term : KeywordTerm)
     | Semantics.KeywordTerm.the label => abilityGrant subject (keyword label)
     | x =>
       abilityGrantSelected subject (allOf holders)
-        (abilitySelectionSpecified [abilities term])
+        (specified [abilities term])
 }

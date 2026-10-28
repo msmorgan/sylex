@@ -1,0 +1,7 @@
+/-- "<saga>'s final chapter number": the greatest of its chapter numbers, 0 with none
+[CR#714.2d]. -/
+-- [CR#714.2d]
+template finalChapterNumber (saga : NounPhrase) : Amount := {
+  spelling := "<saga>'s final chapter number",
+  body := amountAggregate .max .chapter saga
+}
