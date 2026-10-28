@@ -9,7 +9,7 @@ keyword storm : Ability := {
         (does (actor you)
           (cast thisSpell))
         (sequentially
-          [copy Semantics.CopySort.fromStack thisSpell
+          [copy .fromStack thisSpell
               (eventCount
                 (cast
                   (a
@@ -19,5 +19,5 @@ keyword storm : Ability := {
               [],
             may
               (chooseNewTargets
-                (nounPhrasePro (Semantics.Reach.word Semantics.NounWord.copy) Semantics.Plurality.many))])]
+                (nounPhrasePro (.word .copy) .many))])]
 }

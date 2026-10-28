@@ -3,6 +3,6 @@ template getsPt (subject : NounPhrase) (power toughness : Delta Amount) : Static
   -- TODO(spelling): Context-dependent wording: <subject> gets +P/+T [until …]; string substitution cannot express its omitted or inflected parts.
   body :=
     characteristicChange subject
-      [statEdit Semantics.CharacteristicStat.power power,
-        statEdit Semantics.CharacteristicStat.toughness toughness]
+      [statEdit .power power,
+        statEdit .toughness toughness]
 }

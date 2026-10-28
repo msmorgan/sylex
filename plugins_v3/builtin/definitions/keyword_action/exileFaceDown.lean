@@ -5,5 +5,5 @@ action exileFaceDown (subject : NounPhrase) : Action := {
   spelling := "exile <subject> face down",
   body :=
     actionMove subject wherever (some exileZone)
-      Semantics.ObservationPoint.arrival [faceDownAs exiledFaceDown]
+      .arrival [faceDownAs exiledFaceDown]
 }

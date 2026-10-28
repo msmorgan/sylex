@@ -9,8 +9,8 @@ action proliferate : Action := {
             (and
               [andOr [isPermanent, isPlayer],
                 hasCounter none]))
-          Semantics.Disclosure.openly none,
-        doForEach (those Semantics.NounWord.join)
+          .openly none,
+        doForEach (those .join)
           (putCounters 1 (sameKindAs it)
             it)]
 }

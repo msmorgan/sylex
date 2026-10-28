@@ -3,5 +3,5 @@
 template lessBySymbols (cost : ManaCostTerm) (coloredOnly : Bool := false) : CostShift := {
   -- TODO(spelling): costs <cost> less; wording varies with coloredOnly, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
-    costShiftBySymbols (Semantics.Delta.down cost) coloredOnly
+    costShiftBySymbols (.down cost) coloredOnly
 }

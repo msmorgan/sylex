@@ -1,5 +1,5 @@
 template thisSiege : NounPhrase := {
   spelling := "this Siege",
   body :=
-    headed (Semantics.NounWord.subtype siege) this_
+    headed (.subtype siege) this_
 }

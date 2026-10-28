@@ -11,7 +11,7 @@ template discardThenForEachNonland (discarded : NounPhrase) (step : Action) :
             (and
               [non isLand, isCard,
                 predicateDid
-                  { subj := Subject.any, action := discard which,
+                  { subj := Templates.Subject.any, action := discard which,
                     within := some thisWay }]))
           step]
 }

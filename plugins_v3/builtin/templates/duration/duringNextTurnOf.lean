@@ -6,11 +6,11 @@ template duringNextTurnOf (player : NounPhrase) : Duration := {
   body :=
     durationBetween
       (some
-        (beginningOf Semantics.TurnPart.turn
+        (beginningOf .turn
           (some (player))
           (nextTime none)))
       (some
-        (endOf Semantics.TurnPart.turn
+        (endOf .turn
           (some (player))
           (nextTime none)))
 }

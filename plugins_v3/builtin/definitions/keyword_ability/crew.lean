@@ -9,7 +9,7 @@ keyword crew (amount : Amount) : Ability := {
     [activated
         (perform
           (tap
-            (withTotal (Semantics.ProjAxis.stat Semantics.Stat.power) Semantics.Comparator.atLeast
+            (withTotal (.stat .power) .atLeast
               amount
               (allOf
                 (and
@@ -18,7 +18,7 @@ keyword crew (amount : Amount) : Ability := {
                       [isCreature, youControl, isOther]])))))
         (establishThroughout
           (characteristicChange thisPermanent
-            [characteristicEditTypeLine Semantics.QualityOp.adds
+            [characteristicEditTypeLine .adds
                 { types := some [Semantics.CardType.artifact, Semantics.CardType.creature] }])
           untilEndOfTurn)]
 }

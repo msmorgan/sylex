@@ -6,5 +6,5 @@ action millCards (cards : NounPhrase) : Action := {
   spelling := "mill <cards>",
   body :=
     actionMove cards library (some graveyard)
-      Semantics.ObservationPoint.arrival []
+      .arrival []
 }

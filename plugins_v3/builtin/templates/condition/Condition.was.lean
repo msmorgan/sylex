@@ -2,5 +2,5 @@
 template Condition.was (action : Action) (within : LookbackSpan) : Condition := {
   spelling := "if <action> was done <within>",
   body :=
-    conditionDid { subj := Subject.any, action := action, within := some within }
+    conditionDid { subj := Templates.Subject.any, action := action, within := some within }
 }

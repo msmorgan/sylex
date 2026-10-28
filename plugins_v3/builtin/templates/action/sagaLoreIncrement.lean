@@ -2,6 +2,6 @@
 template sagaLoreIncrement : Action := {
   spelling := "put a lore counter on this Saga",
   body :=
-    putCounters 1 (printedKind (Semantics.CounterKind.named "loreCounter"))
+    putCounters 1 (printedKind (.named "loreCounter"))
       thisSaga
 }

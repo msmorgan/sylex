@@ -9,15 +9,15 @@ keyword madness (cost : Cost) : Ability := {
             (discard thisCard))
           (instead
             -- This escape crosses the nested discard scope, rather than wrapping a parameter.
-            (Semantics.Action.ownScope (some discard.deed)
-              (exileFrom (Semantics.NounPhrase.inCaller thisCard)
+            (.ownScope (some Semantics.Definitions.Action.discard.deed)
+              (exileFrom (.inCaller thisCard)
                 hand)))),
       when
         (causes
           (byEvent
-            (does Subject.any
+            (does Templates.Subject.any
               (discard thisCard)))
-          (does Subject.any
+          (does Templates.Subject.any
             (exileFrom thisCard hand)))
         (instruct (ownerOf thisCard)
           (mayOrElse

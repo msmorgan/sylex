@@ -4,5 +4,5 @@ template entersWithCounters (subject : NounPhrase) (amount : Amount) (kind : Cou
   -- TODO(spelling): <subject> enters with N <kind> counters on it; wording varies with amount, requiring optional clauses, inflection or structure-dependent phrasing.
   body :=
     enters subject
-      [withCounters amount (printedKind kind) Semantics.EntryCounterMark.fresh]
+      [withCounters amount (printedKind kind) .fresh]
 }

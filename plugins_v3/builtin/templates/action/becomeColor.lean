@@ -4,6 +4,6 @@ template becomeColor (subject : NounPhrase) (colors : ColorSpec)
   -- TODO(spelling): Context-dependent wording: <subject> becomes <colors> [until …]; string substitution cannot express its omitted or inflected parts.
   body :=
     establish
-      (qualityChange subject Semantics.QualityOp.sets (colored colors))
+      (qualityChange subject .sets (colored colors))
       duration
 }

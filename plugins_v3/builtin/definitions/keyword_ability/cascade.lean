@@ -4,18 +4,18 @@ keyword cascade : Ability := {
   spelling := "cascade",
   body :=
     have cheaper :=
-      predicateCompare [Semantics.ProjAxis.stat Semantics.Stat.manaValue] Semantics.Comparator.less
-        (statOf (Semantics.ProjAxis.stat Semantics.Stat.manaValue) thisSpell);
+      predicateCompare [.stat .manaValue] .less
+        (statOf (.stat .manaValue) thisSpell);
     [when
         (does (actor you)
           (cast thisSpell))
         (sequentially
           [exile
-              (run Semantics.PileEnd.top
+              (run .top
                 (and [non isLand, cheaper])
                 (libraryOf you)),
             may
-              (castWithoutPaying (that Semantics.NounWord.card)
+              (castWithoutPaying (that .card)
                 (some cheaper)),
             actionMove
               (allOf
@@ -26,6 +26,6 @@ keyword cascade : Ability := {
                     not
                       (was (cast which)
                         (some thisWay))]))
-              wherever (some onBottom) Semantics.ObservationPoint.arrival
-              [inOrder Semantics.Arrangement.randomOrder]])]
+              wherever (some onBottom) .arrival
+              [inOrder .randomOrder]])]
 }

@@ -11,7 +11,7 @@ keyword splitSecond : Ability := {
                 (activate
                   (allOf
                     (and
-                      [abilityHead Semantics.AbilityClass.anyActivated,
+                      [abilityHead .anyActivated,
                         non isManaAbility])))])
           (is thisSpell (in_ stack)))]
 }

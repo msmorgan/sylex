@@ -6,5 +6,5 @@ action manifestPlacement (subject : NounPhrase) : Action := {
   deed := "manifest",
   body :=
     actionMove subject wherever (some battlefield)
-      Semantics.ObservationPoint.arrival []
+      .arrival []
 }

@@ -3,7 +3,7 @@ keyword rampage (amount : Amount) : Ability := {
   spelling := "rampage <amount>",
   body :=
     [whenever
-        (does Subject.any
+        (does Templates.Subject.any
           (becomeBlocked thisCreature))
         (get thisCreature
           (up
@@ -12,7 +12,7 @@ keyword rampage (amount : Amount) : Ability := {
                 (countOf
                   (and
                     [isCreature,
-                      inCombat Semantics.CombatRelation.blockerOf
+                      inCombat .blockerOf
                         (some thisCreature)]))
                 1)))
           (up
@@ -21,7 +21,7 @@ keyword rampage (amount : Amount) : Ability := {
                 (countOf
                   (and
                     [isCreature,
-                      inCombat Semantics.CombatRelation.blockerOf
+                      inCombat .blockerOf
                         (some thisCreature)]))
                 1)))
           (some untilEndOfTurn))]

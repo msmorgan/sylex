@@ -4,9 +4,9 @@
 template castableFrom (zone : Location) (timing : Timing) : Conferral := {
   spelling := "You may cast this card from <zone> <timing>",
   body :=
-    Semantics.Conferral.property
+    .property
       (can (actor you)
-        (procedure Semantics.Procedure.cast this_ itsOwnCost
+        (procedure .cast this_ itsOwnCost
           none (some zone) none)
         (some timing))
 }

@@ -6,5 +6,5 @@ action cloak (subject : NounPhrase) : Action := {
     sequentially
       [turnFaceDown subject faceDownWardedCreature,
         actionMove subject wherever (some battlefield)
-          Semantics.ObservationPoint.arrival [faceDownAs faceDownWardedCreature]]
+          .arrival [faceDownAs faceDownWardedCreature]]
 }

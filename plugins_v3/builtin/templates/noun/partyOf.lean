@@ -7,5 +7,5 @@ template partyOf (player : NounPhrase) : NounPhrase := {
     nounPhraseOneEachOf partyRoles
       (allOf
         (and
-          [isCreature, hasPossessor Semantics.PossessorAxis.controller player]))
+          [isCreature, hasPossessor .controller player]))
 }

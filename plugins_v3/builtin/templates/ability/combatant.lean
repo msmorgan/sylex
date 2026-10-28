@@ -3,5 +3,5 @@
 template combatant : Conferral := {
   -- TODO(spelling): What the creature type confers : its object is a Combatant.
   body :=
-    Semantics.Conferral.property (staticSpecCombatant this_)
+    .property (staticSpecCombatant this_)
 }

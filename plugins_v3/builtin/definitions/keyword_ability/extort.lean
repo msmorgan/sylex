@@ -7,8 +7,8 @@ keyword extort : Ability := {
           (cast (a isSpell)))
         (may
           (pay
-            (mana [hybridPip Semantics.Color.white Semantics.Color.black])
-            Semantics.PayTimes.once)
+            (mana [hybridPip .white .black])
+            .once)
           (some
             (sequentially
               [instruct eachOpponent (loseLife 1),

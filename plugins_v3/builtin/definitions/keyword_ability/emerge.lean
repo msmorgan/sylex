@@ -13,7 +13,7 @@ keyword emerge (cost : Cost) : Ability := {
         (onlyWhile
           (costShift thisSpell
             (less
-              (statOf (Semantics.ProjAxis.stat Semantics.Stat.manaValue)
+              (statOf (.stat .manaValue)
                 (the
                   (and
                     [was (sacrifice which),

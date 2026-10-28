@@ -4,7 +4,7 @@ keyword forecast (ability : Ability) : Ability := {
   body :=
     [qualified ability
         (some
-          (duringPart Semantics.TurnPart.upkeep
+          (duringPart .upkeep
             (some (ownerOf this_))))
-        (some oncePerTurn) none (some Semantics.Zone.hand)]
+        (some oncePerTurn) none (some .hand)]
 }

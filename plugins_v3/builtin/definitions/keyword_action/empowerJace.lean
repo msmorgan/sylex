@@ -15,7 +15,7 @@ action empowerJace (amount : Amount) : Action := {
             (written
               {
                 characteristics :=
-                  { colors := [Semantics.Color.blue], types := [Semantics.CardType.planeswalker],
+                  { colors := [.blue], types := [Semantics.CardType.planeswalker],
                     subtypes := [jace],
                     text :=
                       [activated (loyaltySymbol (down 1))

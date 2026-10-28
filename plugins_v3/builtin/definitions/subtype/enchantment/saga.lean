@@ -9,22 +9,22 @@ subtype saga := {
   kind := .enchantment,
   name := "Saga",
   confers :=
-    [Semantics.Conferral.ability
+    [.ability
         (static
           (onlyUnless
             (entersWithCounters thisSaga 1
-              (Semantics.CounterKind.named "loreCounter"))
+              (.named "loreCounter"))
             (is thisSaga
-              (hasKeyword (Semantics.KeywordTerm.the (Semantics.KeywordLabel.named "readAhead")))))),
-      Semantics.Conferral.turnBased Semantics.TurnPart.firstMain
+              (hasKeyword (.the (.named "readAhead")))))),
+      .turnBased .firstMain
         (doIf sagaHasChapterAbilities
           sagaLoreIncrement),
-      Semantics.Conferral.stateBased
+      .stateBased
         (and
           [sagaHasChapterAbilities,
             compareAmt
-              (countersOn (Semantics.CounterKind.named "loreCounter") thisSaga)
-              Semantics.Comparator.atLeast (finalChapterNumber thisSaga),
+              (countersOn (.named "loreCounter") thisSaga)
+              .atLeast (finalChapterNumber thisSaga),
             not sagaHasTriggeredChapter])
         (sacrifice thisSaga)]
 }

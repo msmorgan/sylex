@@ -3,5 +3,5 @@ template faceDown : Status := {
   lexical := { prepositions := [{ lemma := "face down", frames := [{ complement := Intransitive, hosts := NominalAndPredicate }] }] },
   spelling := "face down",
   body :=
-    Semantics.Status.faceDown
+    .faceDown
 }

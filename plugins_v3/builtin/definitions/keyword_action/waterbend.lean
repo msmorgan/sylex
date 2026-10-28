@@ -13,5 +13,5 @@ action waterbend (cost : Cost) : Action := {
                   or [isArtifact, isCreature],
                   actorControls])))
           [generic]))
-      Semantics.PayTimes.once Semantics.PaymentOutcome.paid none none
+      .once .paid none none
 }

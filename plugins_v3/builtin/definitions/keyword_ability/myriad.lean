@@ -12,7 +12,7 @@ keyword myriad : Ability := {
                   [isOpponent, otherThan defendingPlayer]))
               (may
                 (create 1 (copyOf thisCreature)
-                  [entersAs Semantics.Status.tapped,
+                  [entersAs .tapped,
                     entersAttacking
                       (some
                         (or
@@ -23,7 +23,7 @@ keyword myriad : Ability := {
                                   controlledBy they])]))])),
             doIf
               (compareAmt (numberOf thoseTokens)
-                Semantics.Comparator.atLeast 1)
-              (atNext Semantics.TurnPart.endOfCombat
+                .atLeast 1)
+              (atNext .endOfCombat
                 (exile thoseTokens))])]
 }

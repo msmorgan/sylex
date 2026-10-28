@@ -10,10 +10,10 @@ keyword transfigure (cost : Cost) : Ability := {
               (a
                 (and
                   [isCard, isCreature,
-                    hasManaValue Semantics.Comparator.eq
-                      (statOf (Semantics.ProjAxis.stat Semantics.Stat.manaValue)
+                    hasManaValue .eq
+                      (statOf (.stat .manaValue)
                         thisPermanent)])),
-            putOntoBattlefield (that Semantics.NounWord.card),
+            putOntoBattlefield (that .card),
             shuffle])
         asSorcery]
 }

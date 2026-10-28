@@ -18,7 +18,7 @@ keyword Ability.splice (quality : Predicate) (cost : Cost) : Ability := {
         (staticSpecRevealedAsCast
           (a (and [isSpell, quality]))
           (staticSpecConjunction none
-            [addedCost cost false Semantics.PayTimes.once,
-              textChange (that Semantics.NounWord.spell)
+            [addedCost cost false .once,
+              textChange (that .spell)
                 (appendTextOf this_)]))]
 }

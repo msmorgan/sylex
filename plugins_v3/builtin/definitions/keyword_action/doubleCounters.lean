@@ -5,7 +5,7 @@ action doubleCounters (on : NounPhrase) : Action := {
   deed := "double",
   spelling := "double the number of each kind of counter on <on>",
   body :=
-    actionDoForEachKind Semantics.KindAxis.counterKind (some on) Semantics.QualitySort.counterKind
-      (putCounters (statOf Semantics.ProjAxis.boundCounter on)
+    actionDoForEachKind .counterKind (some on) .counterKind
+      (putCounters (statOf .boundCounter on)
         thatKind on)
 }

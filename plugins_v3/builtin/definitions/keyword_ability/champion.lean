@@ -16,7 +16,7 @@ keyword champion (subject : Predicate) : Ability := {
                 (a
                   (and
                     [subject, youControl, isOther]))))
-            Semantics.PayTimes.once)
+            .once)
           (sacrifice thisPermanent)),
       when
         (does (actor thisPermanent) leave)

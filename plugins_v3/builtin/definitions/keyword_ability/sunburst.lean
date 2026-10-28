@@ -18,7 +18,7 @@ keyword sunburst : Ability := {
                 coloredManaSpentToCast thisSpell])
             (withRiders
               [withCounters (colorsSpentToCast thisSpell)
-                  (printedKind p1p1Counter) Semantics.EntryCounterMark.fresh]))),
+                  (printedKind p1p1Counter) .fresh]))),
       static
         (replace
           (would (actor thisPermanent)
@@ -32,5 +32,5 @@ keyword sunburst : Ability := {
             (withRiders
               [withCounters (colorsSpentToCast thisSpell)
                   (printedKind chargeCounter)
-                  Semantics.EntryCounterMark.fresh])))]
+                  .fresh])))]
 }

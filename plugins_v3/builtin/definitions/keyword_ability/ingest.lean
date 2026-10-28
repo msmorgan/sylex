@@ -5,8 +5,8 @@ keyword ingest : Ability := {
     [whenever
         (does (actor thisCreature)
           (dealDamage anyAmount (a isPlayer)
-            (some Semantics.DamageKind.combat)))
+            (some .combat)))
         (instruct they
           (exile
-            (slice Semantics.PileEnd.top 1 (libraryOf they))))]
+            (slice .top 1 (libraryOf they))))]
 }

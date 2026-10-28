@@ -7,5 +7,5 @@ template enters (subject : NounPhrase) (riders : List MoveRider) : StaticSpec :=
   body :=
     replace
       (would (actor subject) enter)
-      (withRiders riders) none Semantics.ReplUse.repeatedly none
+      (withRiders riders) none .repeatedly none
 }

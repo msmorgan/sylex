@@ -6,5 +6,5 @@ action manifest (subject : NounPhrase) : Action := {
     sequentially
       [turnFaceDown subject faceDownCreature,
         actionMove subject wherever (some battlefield)
-          Semantics.ObservationPoint.arrival [faceDownAs faceDownCreature]]
+          .arrival [faceDownAs faceDownCreature]]
 }

@@ -9,7 +9,7 @@ sba deathtouchDestruction := {
       when :=
         and
           [compareAmt (toughnessOf this_)
-              Semantics.Comparator.greater 0,
+              .greater 0,
             did
               (by_
                 (a

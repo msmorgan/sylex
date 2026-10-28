@@ -5,8 +5,8 @@ definition's conferral is per counter (`RegistryDefinition.counter`), so the del
 template boost (power toughness : Delta Amount) : Conferral := {
   -- TODO(spelling): Context-dependent wording: +X/+Y; string substitution cannot express its omitted or inflected parts.
   body :=
-    Semantics.Conferral.property
+    .property
       (characteristicChange this_
-        [statEdit Semantics.CharacteristicStat.power power,
-          statEdit Semantics.CharacteristicStat.toughness toughness])
+        [statEdit .power power,
+          statEdit .toughness toughness])
 }

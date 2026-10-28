@@ -16,7 +16,7 @@ keyword reconfigure (cost : Cost) : Ability := {
         (some asSorcery) none
         (some
           (is thisPermanent
-            (predicateAttachment Semantics.AttachmentSide.attachment none
+            (predicateAttachment .attachment none
               (some (a isCreature)))))
         none]
 }

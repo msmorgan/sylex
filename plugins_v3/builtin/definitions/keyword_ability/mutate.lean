@@ -18,23 +18,23 @@ keyword mutate (cost : Cost) : Ability := {
               [isCreature,
                 not (hasSubtype human),
                 ownedBy (ownerOf thisSpell)]))
-          (choiceWasTaken (Semantics.LinkSource.byKeyword mutate.label)
+          (choiceWasTaken (.byKeyword mutate.label)
             thisSpell)),
       static
         (replace
           (would (actor thisSpell) enter)
           (doIf
-            (choiceWasTaken (Semantics.LinkSource.byKeyword mutate.label)
+            (choiceWasTaken (.byKeyword mutate.label)
               thisSpell)
             (instead
               (chooseOne
                 (merge thisSpell
                   (the
                     (was (target which)))
-                  Semantics.MergePosition.top)
+                  .top)
                 (merge thisSpell
                   (the
                     (was (target which)))
-                  Semantics.MergePosition.bottom))))
-          none Semantics.ReplUse.repeatedly none)]
+                  .bottom))))
+          none .repeatedly none)]
 }

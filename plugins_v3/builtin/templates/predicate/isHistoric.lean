@@ -4,6 +4,6 @@ template isHistoric : Predicate := {
   body :=
     or
       [hasType Semantics.CardType.artifact,
-        hasSupertype Semantics.Supertype.legendary,
+        hasSupertype .legendary,
         hasSubtype saga]
 }

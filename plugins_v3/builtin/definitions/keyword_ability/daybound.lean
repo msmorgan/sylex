@@ -12,10 +12,10 @@ keyword daybound : Ability := {
         (asEvent (gameBecomes night)
           (doIf
             (is thisPermanent
-              (currentFace Semantics.CardFaceSide.front))
+              (currentFace .front))
             (transform thisPermanent))),
       static
-        (cant Subject.any
+        (cant Templates.Subject.any
           (transform thisPermanent) none none
           (some (deonticExceptByKeyword daybound.label)))]
 }

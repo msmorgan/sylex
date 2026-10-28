@@ -4,6 +4,6 @@ template untilYourNextTurn : Duration := {
   body :=
     durationBetween none
       (some
-        (beginningOf Semantics.TurnPart.turn (some you)
+        (beginningOf .turn (some you)
           (nextTime none)))
 }

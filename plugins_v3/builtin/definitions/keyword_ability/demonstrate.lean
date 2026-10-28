@@ -9,7 +9,7 @@ keyword demonstrate : Ability := {
           (sequentially
             [copyOnStack thisSpell,
               may
-                (chooseNewTargets (that Semantics.NounWord.copy))])
+                (chooseNewTargets (that .copy))])
           (some
             (sequentially
               [choose anOpponent,
@@ -17,5 +17,5 @@ keyword demonstrate : Ability := {
                   (copyOnStack thisSpell),
                 instruct (the isChosenPlayer)
                   (may
-                    (chooseNewTargets (that Semantics.NounWord.copy)))])))]
+                    (chooseNewTargets (that .copy)))])))]
 }

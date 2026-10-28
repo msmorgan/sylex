@@ -9,15 +9,15 @@ keyword conspire : Ability := {
               (counted (exactly 2)
                 (and
                   [isUntapped, isCreature, youControl,
-                    shares Semantics.QualitySort.color Semantics.Agreement.share
+                    shares .color .share
                       thisSpell]))))
-          true Semantics.PayTimes.once),
+          true .once),
       when
         (does (actor you)
           (cast thisSpell))
         (sequentially
           [copyOnStack thisSpell,
-            may (chooseNewTargets (that Semantics.NounWord.copy))])
+            may (chooseNewTargets (that .copy))])
         [] [] none none none
         (some
           (keywordCostPaid conspire.label thisSpell))]

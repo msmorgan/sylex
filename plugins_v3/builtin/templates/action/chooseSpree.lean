@@ -5,7 +5,7 @@ template chooseSpree (modes : List (Option Cost × Action)) : Action := {
   body :=
     actionChooseModes (orMore 1)
       (List.map
-        (fun (x : Option Semantics.Cost × Semantics.Action) =>
+        (fun (x : Option Cost × Action) =>
           match x with
           | (c, e) => (c, none, e))
         modes)

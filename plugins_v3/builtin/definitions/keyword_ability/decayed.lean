@@ -4,10 +4,10 @@ keyword decayed : Ability := {
   body :=
     [static
         (cant (actor thisCreature)
-          (block NounPhrase.any)),
+          (block Templates.NounPhrase.any)),
       when
         (does (actor thisCreature)
           (attack none))
-        (atNext Semantics.TurnPart.endOfCombat
+        (atNext .endOfCombat
           (sacrifice thisPermanent))]
 }

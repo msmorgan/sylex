@@ -6,5 +6,5 @@ action Action.devour (subject : NounPhrase) : Action := {
   ofAbility := devour,
   spelling := "devour <subject>",
   body :=
-    sacrifice subject
+    Semantics.Definitions.sacrifice subject
 }

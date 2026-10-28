@@ -3,5 +3,5 @@ template tapped : Status := {
   lexical := { adjectives := ["tapped"] },
   spelling := "tapped",
   body :=
-    Semantics.Status.tapped
+    .tapped
 }

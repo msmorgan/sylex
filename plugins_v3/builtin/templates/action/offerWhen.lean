@@ -3,6 +3,6 @@ template offerWhen (body : Action) (triggerBody : Action) : Action := {
   -- TODO(spelling): Context-dependent wording: may <body>. When they do, <trigger>; string substitution cannot express its omitted or inflected parts.
   body :=
     actionTriggerReflexively
-      (withContinuation Semantics.ContinuationPolicy.optional body none none) none
+      (withContinuation .optional body none none) none
       triggerBody
 }

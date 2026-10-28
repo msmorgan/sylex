@@ -6,6 +6,6 @@ template doAndForbid (action forbidden : Action) : Action := {
   body :=
     sequentially
       [action,
-        establish (staticSpecCant Subject.any forbidden { })
+        establish (staticSpecCant Templates.Subject.any forbidden { })
           (some untilEndOfTurn)]
 }

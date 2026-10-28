@@ -2,7 +2,7 @@
 template isOutlaw : Predicate := {
   spelling := "outlaw",
   body :=
-    predicateCoord Semantics.Coordinator.andOr
+    predicateCoord .andOr
       [hasSubtype assassin,
         hasSubtype mercenary,
         hasSubtype pirate,

@@ -8,6 +8,6 @@ template planeswalkerLoyaltyDamage : Conferral := {
   body :=
     damageResult
       (loseCounters
-        (some (printedKind (Semantics.CounterKind.named "loyaltyCounter")))
+        (some (printedKind (.named "loyaltyCounter")))
         (some thatMuch) this_)
 }

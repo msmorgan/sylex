@@ -1,5 +1,5 @@
 template thisEmblem : NounPhrase := {
   spelling := "this emblem",
   body :=
-    headed Semantics.NounWord.emblem this_
+    headed .emblem this_
 }

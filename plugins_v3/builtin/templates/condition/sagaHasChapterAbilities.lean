@@ -4,5 +4,5 @@ template sagaHasChapterAbilities : Condition := {
   spelling := "this Saga has one or more chapter abilities",
   body :=
     compareAmt (finalChapterNumber thisSaga)
-      Semantics.Comparator.atLeast 1
+      .atLeast 1
 }

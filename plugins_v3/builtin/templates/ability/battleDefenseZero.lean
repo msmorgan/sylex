@@ -7,13 +7,13 @@ template battleDefenseZero : Conferral := {
   -- is a rules conferral, whose inherent or ability-free origin cannot be encoded by card-text
   -- substitution.
   body :=
-    Semantics.Conferral.stateBased
+    .stateBased
       (and
         [not
             (is this_
               (hasSubtype siege)),
           compareAmt
-            (countersOn (Semantics.CounterKind.named "defenseCounter") this_)
-            Semantics.Comparator.eq 0])
+            (countersOn (.named "defenseCounter") this_)
+            .eq 0])
       (putInto this_ graveyard)
 }

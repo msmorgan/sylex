@@ -7,7 +7,7 @@ keyword mobilize (amount : Amount) : Ability := {
           (attack none))
         (sequentially
           [createTappedAttacking amount
-              (creatureToken 1 1 [Semantics.Color.red] [warrior]),
-            atNext Semantics.TurnPart.endStep
+              (creatureToken 1 1 [.red] [warrior]),
+            atNext .endStep
               (sacrifice thoseTokens)])]
 }

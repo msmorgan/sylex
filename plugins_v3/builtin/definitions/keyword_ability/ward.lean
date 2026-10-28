@@ -10,8 +10,8 @@ keyword ward (cost : Cost) : Ability := {
               (and
                 [in_ stack, opponentsControl])))
           (target thisPermanent))
-        (instruct (controllerOf (that Semantics.NounWord.stack))
-          (mayOrElse (pay cost Semantics.PayTimes.once)
+        (instruct (controllerOf (that .stack))
+          (mayOrElse (pay cost .once)
             (instruct you
-              (counter (that Semantics.NounWord.stack)))))]
+              (counter (that .stack)))))]
 }

@@ -6,5 +6,5 @@ template isAttached (subject : NounPhrase) : Condition := {
   -- agreement.
   body :=
     is subject
-      (predicateAttachment Semantics.AttachmentSide.attachment none none)
+      (predicateAttachment .attachment none none)
 }

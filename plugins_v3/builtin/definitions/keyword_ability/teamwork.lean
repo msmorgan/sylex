@@ -6,9 +6,9 @@ keyword teamwork (amount : Amount) : Ability := {
         (addedCost
           (perform
             (tap
-              (withTotal (Semantics.ProjAxis.stat Semantics.Stat.power) Semantics.Comparator.atLeast
+              (withTotal (.stat .power) .atLeast
                 amount
                 (allOf
                   (and [isCreature, youControl])))))
-          true Semantics.PayTimes.once)]
+          true .once)]
 }

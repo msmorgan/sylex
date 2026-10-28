@@ -3,5 +3,5 @@
 template thatSource : NounPhrase := {
   spelling := "that source",
   body :=
-    that Semantics.NounWord.source
+    that .source
 }

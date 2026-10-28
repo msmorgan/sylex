@@ -19,13 +19,13 @@ keyword hideaway (amount : Amount) : Ability := {
             exileFaceDown
               (someOf (oneThrough 1) them),
             actionMove theRest wherever
-              (some onBottom) Semantics.ObservationPoint.arrival
-              [inOrder Semantics.Arrangement.randomOrder],
+              (some onBottom) .arrival
+              [inOrder .randomOrder],
             establishThroughout
               (staticSpecConjunction none
-                [visibility Semantics.ExposeVerb.lookAt you
+                [visibility .lookAt you
                     (objects exiledCard),
-                  visibility Semantics.ExposeVerb.lookAt
+                  visibility .lookAt
                     (controllerOf thisPermanent)
                     (objects exiledCard)])
               (forAsLongAs

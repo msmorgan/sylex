@@ -12,14 +12,14 @@ conferral plottedCardCast := {
           [isCard, hasDesignation plotted,
             in_ exileZone],
       confer :=
-        Semantics.Conferral.ability
+        .ability
           (static
             (onlyUnless
               (can (actor you)
                 (cast this_ (some exileZone)
                   withoutPaying)
                 (some asSorcery))
-              (did Subject.any
+              (did Templates.Subject.any
                 (gainDesignation this_ plotted)
                 (within soFarThisTurn)))) }
 }

@@ -4,7 +4,7 @@ action collectEvidence (amount : Amount) : Action := {
   spelling := "collect evidence <amount>",
   body :=
     exile
-      (withTotal (Semantics.ProjAxis.stat Semantics.Stat.manaValue) Semantics.Comparator.atLeast amount
+      (withTotal (.stat .manaValue) .atLeast amount
         (allOf
           (and
             [isCard,

@@ -2,5 +2,5 @@ template addSubtype (subject : NounPhrase) (subtype : Subtype) : StaticSpec := {
   -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
   body :=
     characteristicChange subject
-      [characteristicEditTypeLine Semantics.QualityOp.adds { subtypes := some [subtype] }]
+      [characteristicEditTypeLine .adds { subtypes := some [subtype] }]
 }

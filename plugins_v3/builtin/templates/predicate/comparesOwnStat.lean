@@ -3,5 +3,5 @@ template comparesOwnStat (stat : Stat) (domain : Predicate) (comparator : Compar
     (bound : Amount) (member : NounPhrase := ownMember) : Predicate := {
   -- TODO(spelling): Context-dependent wording: a <dom> with <stat> <r> <bound>; string substitution cannot express its omitted or inflected parts.
   body :=
-    compareOver domain (statOf (Semantics.ProjAxis.stat stat) member) comparator bound
+    compareOver domain (statOf (.stat stat) member) comparator bound
 }

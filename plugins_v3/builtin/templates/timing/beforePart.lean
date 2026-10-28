@@ -2,6 +2,6 @@
 template beforePart (part : TurnPart) (whose : Option NounPhrase := none) : Timing := {
   spelling := "before <whose> <part>",
   body :=
-    timingRelativeToEvent Semantics.EventSide.before
+    timingRelativeToEvent .before
       (beginningOf part whose turnRefCurrent)
 }

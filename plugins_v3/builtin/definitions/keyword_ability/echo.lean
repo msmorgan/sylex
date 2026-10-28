@@ -7,7 +7,7 @@ keyword echo (cost : Cost) : Ability := {
   -- TODO(spelling): echo [mana cost] / echo—[verbal cost]; separator and terminal period depend
   -- on the Cost structure.
   body :=
-    [at_ (beginningOfYour Semantics.TurnPart.upkeep)
+    [at_ (beginningOfYour .upkeep)
         (doUnlessKeywordCost (sacrifice thisPermanent) cost
           thisPermanent echo.label)
         [] [] none none none
@@ -15,6 +15,6 @@ keyword echo (cost : Cost) : Ability := {
           (not
             (heldSince
               (is thisPermanent youControl)
-              (beginningOf Semantics.TurnPart.upkeep (some you)
+              (beginningOf .upkeep (some you)
                 (turnRefPrevious (some you))))))]
 }

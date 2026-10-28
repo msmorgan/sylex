@@ -7,6 +7,6 @@ action exileWithCounters (subject : NounPhrase) (amount : Amount)
   deed := "exile",
   body :=
     actionMove subject wherever (some exileZone)
-      Semantics.ObservationPoint.arrival
-      [withCounters amount (printedKind kind) Semantics.EntryCounterMark.fresh]
+      .arrival
+      [withCounters amount (printedKind kind) .fresh]
 }

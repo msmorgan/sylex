@@ -18,7 +18,7 @@ keyword jumpStart : Ability := {
           (would (actor thisSpell)
             (leave stack))
           (doIf
-            (choiceWasTaken (Semantics.LinkSource.byKeyword jumpStart.label)
+            (choiceWasTaken (.byKeyword jumpStart.label)
               thisSpell)
             (instead (exile thisSpell))))]
 }

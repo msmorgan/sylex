@@ -2,5 +2,5 @@
 template entersChoosingPlayerSecretly (subject player : NounPhrase) : StaticSpec := {
   spelling := "As <subject> enters, secretly choose <player>",
   body :=
-    entryChoice subject player Semantics.Disclosure.secretly
+    entryChoice subject player .secretly
 }

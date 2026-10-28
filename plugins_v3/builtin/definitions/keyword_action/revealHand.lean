@@ -4,6 +4,6 @@ action revealHand : Action := {
   deed := "reveal",
   spelling := "reveal your hand",
   body :=
-    expose Semantics.ExposeVerb.reveal
+    expose .reveal
       (exposedZone (handOf actor))
 }

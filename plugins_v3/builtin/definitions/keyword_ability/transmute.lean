@@ -9,13 +9,13 @@ keyword transmute (cost : Cost) : Ability := {
               (a
                 (and
                   [isCard,
-                    hasManaValue Semantics.Comparator.eq
-                      (statOf (Semantics.ProjAxis.stat Semantics.Stat.manaValue)
+                    hasManaValue .eq
+                      (statOf (.stat .manaValue)
                         (the
                           (and
                             [was (discard which),
                               isCard])))])),
-            reveal (that Semantics.NounWord.card),
+            reveal (that .card),
             putInto it hand, shuffle])
         asSorcery]
 }

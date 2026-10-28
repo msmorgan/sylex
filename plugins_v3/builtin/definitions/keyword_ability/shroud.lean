@@ -5,5 +5,5 @@ keyword shroud : Ability := {
   spelling := "shroud",
   body :=
     [static
-        (cant Subject.any (target this_))]
+        (cant Templates.Subject.any (target this_))]
 }

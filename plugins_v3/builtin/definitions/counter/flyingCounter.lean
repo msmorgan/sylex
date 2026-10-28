@@ -7,7 +7,7 @@ counter flyingCounter := {
   spelling := "flying counter",
   holder := .object,
   confers :=
-    [Semantics.Conferral.property
+    [.property
         (abilityGrant this_
-          (keyword (Semantics.KeywordLabel.named "flying")))]
+          (keyword (.named "flying")))]
 }

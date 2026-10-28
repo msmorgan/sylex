@@ -10,8 +10,8 @@ action searchZonesOf (whose : NounPhrase) (for_ : NounPhrase) : Action := {
   body :=
     actionSearch
       (and
-        [zone Semantics.Zone.graveyard (some whose),
-          zone Semantics.Zone.hand (some whose),
-          zone Semantics.Zone.library (some whose)])
-      (Semantics.NounPhrase.inCaller for_)
+        [zone .graveyard (some whose),
+          zone .hand (some whose),
+          zone .library (some whose)])
+      (.inCaller for_)
 }

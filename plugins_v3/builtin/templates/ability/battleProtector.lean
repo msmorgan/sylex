@@ -13,7 +13,7 @@ template battleProtector : Conferral := {
   -- it has no battle types, only its controller can be its protector.; this is a rules conferral,
   -- whose inherent or ability-free origin cannot be encoded by card-text substitution.
   body :=
-    Semantics.Conferral.property
+    .property
       (onlyUnless
         (entersChoosingPlayer this_
           (a

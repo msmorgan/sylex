@@ -5,9 +5,9 @@ subtype aura := {
   kind := .enchantment,
   name := "Aura",
   confers :=
-    [Semantics.Conferral.stateBased
+    [.stateBased
         (not (isAttached thisAura))
         (actionMove thisAura
-          (zone Semantics.Zone.battlefield none) (some graveyard)
-          Semantics.ObservationPoint.arrival [])]
+          (zone .battlefield none) (some graveyard)
+          .arrival [])]
 }

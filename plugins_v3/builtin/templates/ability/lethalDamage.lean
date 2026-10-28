@@ -9,15 +9,15 @@ template lethalDamage : Conferral := {
   -- dealt lethal damage and is destroyed.; this is a rules conferral, whose inherent or ability-
   -- free origin cannot be encoded by card-text substitution.
   body :=
-    Semantics.Conferral.stateBased
+    .stateBased
       (and
         [compareAmt (toughnessOf this_)
-            Semantics.Comparator.greater 0,
+            .greater 0,
           compareAmt
-            (statOf Semantics.ProjAxis.markedDamage this_)
-            Semantics.Comparator.greater 0,
+            (statOf .markedDamage this_)
+            .greater 0,
           compareAmt
-            (statOf Semantics.ProjAxis.markedDamage this_)
-            Semantics.Comparator.atLeast (toughnessOf this_)])
+            (statOf .markedDamage this_)
+            .atLeast (toughnessOf this_)])
       (destroy this_)
 }

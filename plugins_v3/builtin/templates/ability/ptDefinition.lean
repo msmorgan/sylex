@@ -8,10 +8,10 @@ template ptDefinition (subject : NounPhrase) (slots : DefinedSlots) (amount : Am
     staticSpecCharacteristicDefining subject
       (match slots with
       | Semantics.DefinedSlots.powerAlone =>
-        [characteristicEditStat Semantics.QualityOp.sets Semantics.CharacteristicStat.power amount]
+        [characteristicEditStat .sets .power amount]
       | Semantics.DefinedSlots.toughnessAlone =>
-        [characteristicEditStat Semantics.QualityOp.sets Semantics.CharacteristicStat.toughness amount]
+        [characteristicEditStat .sets .toughness amount]
       | Semantics.DefinedSlots.bothEach =>
-        [characteristicEditStat Semantics.QualityOp.sets Semantics.CharacteristicStat.power amount,
-          characteristicEditStat Semantics.QualityOp.sets Semantics.CharacteristicStat.toughness amount])
+        [characteristicEditStat .sets .power amount,
+          characteristicEditStat .sets .toughness amount])
 }

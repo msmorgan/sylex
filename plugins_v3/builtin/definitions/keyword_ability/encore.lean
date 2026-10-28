@@ -21,7 +21,7 @@ keyword encore (cost : Cost) : Ability := {
                     thisTurn]),
             gain thoseTokens
               (keyword haste.label),
-            atNext Semantics.TurnPart.endStep
+            atNext .endStep
               (sacrifice thoseTokens)])
         asSorcery]
 }

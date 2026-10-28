@@ -11,16 +11,16 @@ keyword ripple (amount : Amount) : Ability := {
           (cast thisSpell))
         (may
           (reveal
-            (slice Semantics.PileEnd.top amount
+            (slice .top amount
               (libraryOf you)))
           (some
             (sequentially
               [castWithoutPaying
                   (nounPhraseSomeOf (sliceCountCounted anyNumber)
                     (some
-                      (shares Semantics.QualitySort.cardName Semantics.Agreement.share
+                      (shares .cardName .share
                         this_))
-                    (those Semantics.NounWord.card))
+                    (those .card))
                   none,
                 actionMove
                   (allOf
@@ -32,5 +32,5 @@ keyword ripple (amount : Amount) : Ability := {
                           (was (cast which)
                             (some thisWay))]))
                   wherever (some onBottom)
-                  Semantics.ObservationPoint.arrival [inOrder Semantics.Arrangement.anyOrder]])))]
+                  .arrival [inOrder .anyOrder]])))]
 }

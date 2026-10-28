@@ -3,5 +3,5 @@ template untilEndOfTurn : Duration := {
   spelling := "until end of turn",
   body :=
     durationBetween none
-      (some (endOf Semantics.TurnPart.turn none turnRefCurrent))
+      (some (endOf .turn none turnRefCurrent))
 }

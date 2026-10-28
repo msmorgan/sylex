@@ -9,6 +9,6 @@ template preventAllBy (source : NounPhrase) (to : NounPhrase)
         (would (by_ source)
           (dealDamage anyAmount to kind))
         (instead (preventDamage allDamage none none))
-        none Semantics.ReplUse.repeatedly none)
+        none .repeatedly none)
       duration
 }

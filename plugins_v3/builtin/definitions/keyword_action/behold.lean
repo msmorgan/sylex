@@ -3,7 +3,7 @@ action behold (quality : Predicate) : Action := {
   spelling := "behold <quality>",
   body :=
     chooseOne
-      (expose Semantics.ExposeVerb.reveal
+      (expose .reveal
         (cards
           (a
             (and

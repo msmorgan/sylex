@@ -4,7 +4,7 @@ template become (subject : NounPhrase) (added : CharacteristicBundle)
   -- TODO(spelling): Context-dependent wording: <subject> becomes <added> in addition to its other types [until …]; string substitution cannot express its omitted or inflected parts.
   body :=
     establish
-      (qualityChange subject Semantics.QualityOp.adds
+      (qualityChange subject .adds
         (bundle added none))
       duration
 }

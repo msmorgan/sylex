@@ -3,5 +3,5 @@ template untapped : Status := {
   lexical := { adjectives := ["untapped"] },
   spelling := "untapped",
   body :=
-    Semantics.Status.untapped
+    .untapped
 }

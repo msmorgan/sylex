@@ -2,5 +2,5 @@
 template thatJoin : NounPhrase := {
   spelling := "that player or planeswalker",
   body :=
-    that Semantics.NounWord.join
+    that .join
 }

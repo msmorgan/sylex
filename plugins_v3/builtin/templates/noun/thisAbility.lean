@@ -1,5 +1,5 @@
 template thisAbility : NounPhrase := {
   spelling := "this ability",
   body :=
-    headed Semantics.NounWord.ability this_
+    headed .ability this_
 }

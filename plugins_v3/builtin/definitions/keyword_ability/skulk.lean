@@ -8,7 +8,7 @@ keyword skulk : Ability := {
             (allOf
               (and
                 [isCreature,
-                  hasPower Semantics.Comparator.greater
+                  hasPower .greater
                     (powerOf thisCreature)])))
           (block thisCreature))]
 }

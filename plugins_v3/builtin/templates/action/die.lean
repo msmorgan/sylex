@@ -3,6 +3,6 @@
 template die : Action := {
   -- TODO(spelling): Context-dependent wording: <subject> dies; string substitution cannot express its omitted or inflected parts.
   body :=
-    actionMove theActor (zone Semantics.Zone.battlefield none)
-      (some (zone Semantics.Zone.graveyard none)) Semantics.ObservationPoint.departure []
+    actionMove theActor (zone .battlefield none)
+      (some (zone .graveyard none)) .departure []
 }

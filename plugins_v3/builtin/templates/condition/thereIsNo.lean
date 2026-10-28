@@ -4,6 +4,6 @@ template thereIsNo (designation : DesignationLabel) : Condition := {
   body :=
     not
       (thereAre
-        (described (detPhraseA Semantics.ChoiceMode.unmarked)
+        (described (detPhraseA .unmarked)
           (hasDesignation designation none)))
 }

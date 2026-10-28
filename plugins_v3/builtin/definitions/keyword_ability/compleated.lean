@@ -12,13 +12,13 @@ keyword compleated : Ability := {
           (would (actor thisPermanent)
             (enter none
               [withCounters anyAmount
-                  (printedKind loyaltyCounter) Semantics.EntryCounterMark.fresh]))
+                  (printedKind loyaltyCounter) .fresh]))
           (doIf
             (compareAmt (phyrexianPaidWithLife thisSpell)
-              Semantics.Comparator.atLeast 1)
+              .atLeast 1)
             (withRiders
               [withCounters
                   (times 2 (phyrexianPaidWithLife thisSpell))
                   (printedKind loyaltyCounter)
-                  Semantics.EntryCounterMark.fewer])))]
+                  .fewer])))]
 }

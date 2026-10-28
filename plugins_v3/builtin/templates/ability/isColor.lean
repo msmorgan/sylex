@@ -3,5 +3,5 @@ template isColor (color : Color) : CopyExcept := {
   spelling := "except it's <color>",
   body :=
     copyExceptEdits
-      [characteristicEditColors Semantics.QualityOp.sets (Semantics.ColorSpec.some [color])]
+      [characteristicEditColors .sets (.some [color])]
 }

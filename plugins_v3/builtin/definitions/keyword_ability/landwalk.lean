@@ -9,7 +9,7 @@ keyword landwalk (quality : Predicate) : Ability := {
   body :=
     [static
         (onlyWhile
-          (cant Subject.any (block thisCreature))
+          (cant Templates.Subject.any (block thisCreature))
           (exists_
             (and
               [isLand, quality,

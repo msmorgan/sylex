@@ -1,5 +1,5 @@
 template lookAt (cards : NounPhrase) : Action := {
   spelling := "look at <cards>",
   body :=
-    expose Semantics.ExposeVerb.lookAt (Exposed.cards cards)
+    expose .lookAt (Templates.Exposed.cards cards)
 }

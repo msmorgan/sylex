@@ -10,11 +10,11 @@ action amass (subtype : Subtype) (count : Amount) : Action := {
           (not (exists_ Predicate.army))
           (create 1
             (written
-              (creatureToken 0 0 [Semantics.Color.black]
+              (creatureToken 0 0 [.black]
                 [subtype, army]))),
         choose (a Predicate.army),
         putCounters count (printedKind p1p1Counter)
-          (that (Semantics.NounWord.type Semantics.CardType.creature)),
+          (that (.type Semantics.CardType.creature)),
         doIf
           (not
             (is it (hasSubtype subtype)))

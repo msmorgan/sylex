@@ -5,10 +5,10 @@ subtype fortification := {
   kind := .artifact,
   name := "Fortification",
   confers :=
-    [Semantics.Conferral.property
+    [.property
         (mayBeAttachedTo thisFortification
           (allOf isLand)),
-      Semantics.Conferral.stateBased
+      .stateBased
         (not (isAttached thisFortification))
-        (attachment Semantics.AttachMove.unattached thisFortification none)]
+        (attachment .unattached thisFortification none)]
 }

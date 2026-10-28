@@ -14,10 +14,10 @@ keyword embalm (cost : Cost) : Ability := {
         (create 1
           (copyOf this_
             [copyExceptEdits
-                [characteristicEditColors Semantics.QualityOp.sets
-                    (Semantics.ColorSpec.some [Semantics.Color.white]),
+                [characteristicEditColors .sets
+                    (.some [.white]),
                   characteristicEditManaCost none,
-                  characteristicEditTypeLine Semantics.QualityOp.adds
+                  characteristicEditTypeLine .adds
                     { subtypes := some [zombie] }]]))
         asSorcery]
 }

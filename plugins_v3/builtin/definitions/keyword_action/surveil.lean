@@ -4,6 +4,6 @@ action surveil (amount : Amount) : Action := {
   spelling := "surveil <amount>",
   body :=
     lookAndSortSlice
-      (slice Semantics.PileEnd.top amount (libraryOf actor))
+      (slice .top amount (libraryOf actor))
       graveyard
 }

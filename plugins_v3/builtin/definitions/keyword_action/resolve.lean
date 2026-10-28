@@ -16,6 +16,6 @@ action resolve (subject : NounPhrase) : Action := {
   -- TODO(spelling): <subject> resolves/resolve; string substitution cannot choose
   -- subject-verb agreement for a singular spell versus multiple spells or abilities.
   body :=
-    procedure Semantics.Procedure.resolve subject itsOwnCost none none
+    procedure .resolve subject itsOwnCost none none
       none
 }

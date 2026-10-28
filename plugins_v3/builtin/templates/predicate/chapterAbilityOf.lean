@@ -5,5 +5,5 @@ template chapterAbilityOf (saga : NounPhrase) : Predicate := {
   body :=
     and
       [abilityOf saga,
-        predicateCompare [Semantics.ProjAxis.chapter] Semantics.Comparator.atLeast 1]
+        predicateCompare [.chapter] .atLeast 1]
 }

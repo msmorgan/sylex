@@ -4,6 +4,6 @@ template untilYourNextEndStep : Duration := {
   body :=
     durationBetween none
       (some
-        (beginningOf Semantics.TurnPart.endStep (some you)
+        (beginningOf .endStep (some you)
           (nextTime none)))
 }

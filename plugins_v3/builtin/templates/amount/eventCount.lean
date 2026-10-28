@@ -4,6 +4,6 @@ template eventCount (action : Action) (subj : Subject) (within : Duration)
   -- TODO(spelling): The number of occurrences of a historical action clause.
   body :=
     amountTally
-      { subj := subj, action := action, within := some (LookbackSpan.within within timing) }
-      Semantics.TallyMode.events
+      { subj := subj, action := action, within := some (Templates.LookbackSpan.within within timing) }
+      .events
 }

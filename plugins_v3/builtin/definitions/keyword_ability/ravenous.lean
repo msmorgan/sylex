@@ -4,10 +4,10 @@ keyword ravenous : Ability := {
   body :=
     [static
         (entersWithCounters thisPermanent
-          (letter Semantics.Letter.x) p1p1Counter),
+          (letter .x) p1p1Counter),
       when
         (does (actor thisPermanent) enter)
         (draw 1) [] [] none none none
         (some
-          (compareAmt (letter Semantics.Letter.x) Semantics.Comparator.atLeast 5))]
+          (compareAmt (letter .x) .atLeast 5))]
 }

@@ -4,5 +4,5 @@ action exile (subject : NounPhrase) : Action := {
   spelling := "exile <subject>",
   body :=
     actionMove subject wherever (some exileZone)
-      Semantics.ObservationPoint.arrival []
+      .arrival []
 }

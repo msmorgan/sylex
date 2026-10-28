@@ -6,5 +6,5 @@ template putOntoBattlefieldTappedAttacking (subject : NounPhrase)
   -- TODO(spelling): Context-dependent wording: put <subject> onto the battlefield tapped and attacking [<defender>]; string substitution cannot express its omitted or inflected parts.
   body :=
     zoneChange subject battlefield from_
-      [entersAs Semantics.Status.tapped, entersAttacking defender]
+      [entersAs .tapped, entersAttacking defender]
 }

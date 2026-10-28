@@ -10,9 +10,9 @@ template planeswalkerLoyalty : Conferral := {
   -- of loyalty counters on it equal to its printed loyalty number.'; this is a rules conferral,
   -- whose inherent or ability-free origin cannot be encoded by card-text substitution.
   body :=
-    Semantics.Conferral.ability
+    .ability
       (static
         (entersWithCounters this_
-          (statOf (Semantics.ProjAxis.stat Semantics.Stat.loyalty) this_)
-          (Semantics.CounterKind.named "loyaltyCounter")))
+          (statOf (.stat .loyalty) this_)
+          (.named "loyaltyCounter")))
 }

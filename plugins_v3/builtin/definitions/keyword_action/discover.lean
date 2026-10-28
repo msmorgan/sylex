@@ -4,18 +4,18 @@ action discover (amount : Amount) : Action := {
   spelling := "discover <amount>",
   body :=
     have fits :=
-      predicateCompare [Semantics.ProjAxis.stat Semantics.Stat.manaValue] Semantics.Comparator.atMost amount;
+      predicateCompare [.stat .manaValue] .atMost amount;
     sequentially
       [exile
-          (run Semantics.PileEnd.top
+          (run .top
             (and [non isLand, fits])
             (libraryOf actor)),
-        withContinuation Semantics.ContinuationPolicy.optional
-          (castWithoutPaying (that Semantics.NounWord.card) (some fits))
+        withContinuation .optional
+          (castWithoutPaying (that .card) (some fits))
           none
           (some
-            (putInto (that Semantics.NounWord.card) hand)),
+            (putInto (that .card) hand)),
         actionMove theRest wherever
-          (some onBottom) Semantics.ObservationPoint.arrival
-          [inOrder Semantics.Arrangement.randomOrder]]
+          (some onBottom) .arrival
+          [inOrder .randomOrder]]
 }

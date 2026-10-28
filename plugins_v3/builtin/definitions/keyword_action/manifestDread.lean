@@ -4,9 +4,9 @@ action manifestDread : Action := {
   spelling := "manifest dread",
   body :=
     sequentially
-      [expose Semantics.ExposeVerb.lookAt
+      [expose .lookAt
           (cards
-            (slice Semantics.PileEnd.top 2
+            (slice .top 2
               (libraryOf actor))),
         manifest
           (someOf (exactly 1) them),

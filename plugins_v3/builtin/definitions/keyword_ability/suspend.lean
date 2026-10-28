@@ -23,7 +23,7 @@ keyword suspend (amount : Amount) (cost : Cost) : Ability := {
               yourHand))
           cost
           (exileWithCounters thisCard amount timeCounter)),
-      at_ (beginningOfYour Semantics.TurnPart.upkeep)
+      at_ (beginningOfYour .upkeep)
         (removeCounters (oneThrough 1)
           (some (printedKind timeCounter)) thisCard)
         [] [] none none none
@@ -34,7 +34,7 @@ keyword suspend (amount : Amount) (cost : Cost) : Ability := {
                 hasKeyword (theKeyword suspend.label),
                 hasCounter (some timeCounter)]))),
       when
-        (does Subject.any
+        (does Templates.Subject.any
           (removeCounters theLast
             (some (printedKind timeCounter)) thisCard))
         (sequentially
@@ -46,14 +46,14 @@ keyword suspend (amount : Amount) (cost : Cost) : Ability := {
                   (a
                     (and [isCreature, isSpell])))
                 thisWay)
-              (gain (that Semantics.NounWord.spell) haste
+              (gain (that .spell) haste
                 (some
                   (forAsLongAs
                     (or
-                      [is (that Semantics.NounWord.spell)
+                      [is (that .spell)
                           youControl,
                         is
-                          (becomes (that Semantics.NounWord.spell))
+                          (becomes (that .spell))
                           youControl]))))])
         [] [] none none none
         (some

@@ -3,5 +3,5 @@ template partScope (part : TurnPart) (whose : Option NounPhrase) (spec : StaticS
     StaticSpec := {
   -- TODO(spelling): Context-dependent wording: During [<whose>] <part>, <spec>; string substitution cannot express its omitted or inflected parts.
   body :=
-    conditional spec (duringPart part whose) Semantics.CondMarking.asLongAs
+    conditional spec (duringPart part whose) .asLongAs
 }

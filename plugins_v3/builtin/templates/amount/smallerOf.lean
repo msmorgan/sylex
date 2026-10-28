@@ -3,5 +3,5 @@
 template smallerOf (a b : Amount) : Amount := {
   spelling := "the smaller of <a> and <b>",
   body :=
-    aggregateOf Semantics.AggregateOp.min [a, b]
+    aggregateOf .min [a, b]
 }

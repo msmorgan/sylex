@@ -8,6 +8,6 @@ template battleDefenseDamage : Conferral := {
   body :=
     damageResult
       (loseCounters
-        (some (printedKind (Semantics.CounterKind.named "defenseCounter")))
+        (some (printedKind (.named "defenseCounter")))
         (some thatMuch) this_)
 }

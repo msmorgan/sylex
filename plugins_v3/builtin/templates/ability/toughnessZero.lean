@@ -5,8 +5,8 @@ template toughnessZero : Conferral := {
   -- this is a rules conferral, whose inherent or ability-free origin cannot be encoded by card-text
   -- substitution.
   body :=
-    Semantics.Conferral.stateBased
+    .stateBased
       (compareAmt (toughnessOf this_)
-        Semantics.Comparator.atMost 0)
+        .atMost 0)
       (putInto this_ graveyard)
 }

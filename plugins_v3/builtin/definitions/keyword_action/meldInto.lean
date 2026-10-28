@@ -5,5 +5,5 @@ action meldInto (subject : NounPhrase) (into : String) : Action := {
   spelling := "meld <subject> into <into>",
   body :=
     actionMove subject wherever (some battlefield)
-      Semantics.ObservationPoint.arrival [moveRiderEntersMelded into]
+      .arrival [moveRiderEntersMelded into]
 }

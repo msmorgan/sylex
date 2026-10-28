@@ -5,7 +5,7 @@ by its declaration's name (`grants (.named "flying")`). -/
 template grants (keyword : KeywordLabel) : Conferral := {
   spelling := "<keyword>",
   body :=
-    Semantics.Conferral.property
+    .property
       (characteristicChange this_
-        [characteristicEditAddedAbilities [Semantics.Ability.keyword keyword [] []]])
+        [characteristicEditAddedAbilities [.keyword keyword [] []]])
 }

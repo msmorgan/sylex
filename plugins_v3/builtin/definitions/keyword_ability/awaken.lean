@@ -12,11 +12,11 @@ keyword awaken (amount : Amount) (cost : Cost) : Ability := {
                   (and [isLand, youControl])),
               establish
                 (characteristicChange (that land)
-                  [characteristicEditTypeLine Semantics.QualityOp.adds
+                  [characteristicEditTypeLine .adds
                       { types := some [Semantics.CardType.creature],
                         subtypes := some [elemental] },
-                    characteristicEditStat Semantics.QualityOp.sets Semantics.CharacteristicStat.power 0,
-                    characteristicEditStat Semantics.QualityOp.sets Semantics.CharacteristicStat.toughness 0,
+                    characteristicEditStat .sets .power 0,
+                    characteristicEditStat .sets .toughness 0,
                     characteristicEditAddedAbilities
                       [keyword haste.label]])
                 none]))]

@@ -10,10 +10,10 @@ keyword prowl (cost : Cost) : Ability := {
             (actor
               (a
                 (and
-                  [shares (Semantics.QualitySort.subtype Semantics.CardType.creature)
-                      Semantics.Agreement.share thisSpell,
+                  [shares (.subtype Semantics.CardType.creature)
+                      .share thisSpell,
                     youControl])))
             (dealDamage anyAmount (a isPlayer)
-              (some Semantics.DamageKind.combat))
+              (some .combat))
             (within soFarThisTurn)))]
 }

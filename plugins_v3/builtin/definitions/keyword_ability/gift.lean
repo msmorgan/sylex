@@ -5,7 +5,7 @@ keyword gift (promise : Action) : Ability := {
   body :=
     [static
         (addedCost (perform (choose anOpponent))
-          true Semantics.PayTimes.once),
+          true .once),
       byCardClass
         (when
           (does (actor thisPermanent) enter)

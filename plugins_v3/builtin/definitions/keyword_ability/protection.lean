@@ -17,13 +17,13 @@ keyword protection (quality : Predicate) : Ability := {
                       (and [isSource, quality]))])))
           (target this_)),
       static
-        (cant Subject.any
+        (cant Templates.Subject.any
           (attachTo
             (allOf
               (and [hasSubtype aura, quality]))
             this_)),
       static
-        (cant Subject.any
+        (cant Templates.Subject.any
           (attachTo
             (allOf
               (and

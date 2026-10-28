@@ -6,13 +6,13 @@ action airbend (subject : NounPhrase) : Action := {
   spelling := "airbend <subject>",
   body :=
     sequentially
-      [exile subject,
+      [Semantics.Definitions.exile subject,
         doForEach
           (allOf
             (and
               [isCard,
                 predicateDid
-                  { subj := Subject.any, action := exile which,
+                  { subj := Templates.Subject.any, action := Semantics.Definitions.exile which,
                     within := some thisWay }]))
           (instruct (ownerOf it)
             (establish

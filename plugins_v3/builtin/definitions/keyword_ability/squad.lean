@@ -3,11 +3,11 @@ keyword squad (cost : Cost) : Ability := {
   -- TODO(spelling): squad [mana cost] / squad—[verbal cost]; separator and terminal period depend
   -- on the Cost structure.
   body :=
-    [static (addedCost cost true Semantics.PayTimes.anyNumberOfTimes),
+    [static (addedCost cost true .anyNumberOfTimes),
       when
         (does (actor thisCreature) enter)
         (create
-          (timesPaid (Semantics.LinkSource.byKeyword squad.label)
+          (timesPaid (.byKeyword squad.label)
             thisCreature)
           (copyOf thisCreature []))
         [] [] none none none

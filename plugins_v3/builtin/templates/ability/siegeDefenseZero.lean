@@ -7,11 +7,11 @@ template siegeDefenseZero : Conferral := {
   -- triggered but not yet left the stack, it's put into its owner's graveyard.; this is a rules
   -- conferral, whose inherent or ability-free origin cannot be encoded by card-text substitution.
   body :=
-    Semantics.Conferral.stateBased
+    .stateBased
       (and
         [compareAmt
             (countersOn defenseCounter this_)
-            Semantics.Comparator.eq 0,
+            .eq 0,
           siegeHasNoWaitingTrigger])
       (putInto this_ graveyard)
 }

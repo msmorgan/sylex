@@ -3,6 +3,6 @@ action sacrifice (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "sacrifice", frames := [Monotransitive] }] },
   spelling := "sacrifice <subject>",
   body :=
-    actionMove subject (zone Semantics.Zone.battlefield none)
-      (some graveyard) Semantics.ObservationPoint.departure []
+    actionMove subject (zone .battlefield none)
+      (some graveyard) .departure []
 }

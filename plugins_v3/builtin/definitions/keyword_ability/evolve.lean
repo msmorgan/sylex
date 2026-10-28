@@ -15,8 +15,8 @@ keyword evolve : Ability := {
           (or
             [compareAmt
                 (powerOf (that creature))
-                Semantics.Comparator.greater (powerOf thisCreature),
+                .greater (powerOf thisCreature),
               compareAmt
                 (toughnessOf (that creature))
-                Semantics.Comparator.greater (toughnessOf thisCreature)]))]
+                .greater (toughnessOf thisCreature)]))]
 }

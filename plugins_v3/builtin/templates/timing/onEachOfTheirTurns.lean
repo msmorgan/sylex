@@ -4,7 +4,7 @@ of their turns"). -/
 template onEachOfTheirTurns : Timing := {
   spelling := "on each of their turns",
   body :=
-    timingInPart Semantics.TurnPart.turn
-      (some (nounPhrasePro (Semantics.Reach.word Semantics.NounWord.player) Semantics.Plurality.one))
+    timingInPart .turn
+      (some (nounPhrasePro (.word .player) .one))
       (eachTime none)
 }

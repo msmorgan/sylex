@@ -17,10 +17,10 @@ keyword cipher : Ability := {
           (whenever
             (does (actor thisCreature)
               (dealDamage anyAmount (a isPlayer)
-                (some Semantics.DamageKind.combat)))
+                (some .combat)))
             (may
               (sequentially
-                [copy Semantics.CopySort.fromCardZone
+                [copy .fromCardZone
                     (the
                       (and
                         [isCard,
@@ -28,6 +28,6 @@ keyword cipher : Ability := {
                             (some thisCreature)]))
                     1 [],
                   may
-                    (cast (that Semantics.NounWord.copy) none
+                    (cast (that .copy) none
                       withoutPaying)]))))]
 }

@@ -7,6 +7,6 @@ action castWithoutPaying (subject : NounPhrase) (resulting : Option Predicate) :
   lexical := { verbs := [{ lemma := "cast", past := "cast", frames := [Monotransitive] }] },
   deed := "cast",
   body :=
-    procedure Semantics.Procedure.cast subject withoutPaying resulting none
+    procedure .cast subject withoutPaying resulting none
       none
 }

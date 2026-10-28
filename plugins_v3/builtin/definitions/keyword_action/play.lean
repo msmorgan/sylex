@@ -6,5 +6,5 @@ action play (subject : NounPhrase) (from_ : Option Location := none)
   -- substitution cannot branch on optional fields or supply contextual agreement and morphology.
   lexical := { verbs := [{ lemma := "play", frames := [Monotransitive, Intransitive] }] },
   body :=
-    procedure Semantics.Procedure.play subject payment resulting from_ none
+    procedure .play subject payment resulting from_ none
 }

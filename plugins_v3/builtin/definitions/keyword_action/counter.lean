@@ -3,6 +3,6 @@ action counter (subject : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "counter", frames := [Monotransitive] }] },
   spelling := "counter <subject>",
   body :=
-    actionMove subject (zone Semantics.Zone.stack none)
-      (some (zone Semantics.Zone.graveyard none)) Semantics.ObservationPoint.arrival []
+    actionMove subject (zone .stack none)
+      (some (zone .graveyard none)) .arrival []
 }

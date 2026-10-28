@@ -10,11 +10,11 @@ action regeneration (subject : NounPhrase) : Action := {
   body :=
     sequentially
       [clearDamage subject,
-        instruct (possessorOf Semantics.PossessorAxis.controller subject)
-          (tap subject),
+        instruct (possessorOf .controller subject)
+          (Semantics.Definitions.tap subject),
         doIf
           (or
-            [is subject (inCombat Semantics.CombatRelation.attackerOf none),
-              is subject (inCombat Semantics.CombatRelation.blockerOf none)])
+            [is subject (inCombat .attackerOf none),
+              is subject (inCombat .blockerOf none)])
           (removeFromCombat subject)]
 }

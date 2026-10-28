@@ -13,9 +13,9 @@ keyword increment : Ability := {
             [is thisPermanent isCreature,
               or
                 [compareAmt
-                    (manaValueSpentToCast (that Semantics.NounWord.spell))
-                    Semantics.Comparator.greater (powerOf thisCreature),
+                    (manaValueSpentToCast (that .spell))
+                    .greater (powerOf thisCreature),
                   compareAmt
-                    (manaValueSpentToCast (that Semantics.NounWord.spell))
-                    Semantics.Comparator.greater (toughnessOf thisCreature)]]))]
+                    (manaValueSpentToCast (that .spell))
+                    .greater (toughnessOf thisCreature)]]))]
 }

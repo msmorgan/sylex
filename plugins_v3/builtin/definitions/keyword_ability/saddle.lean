@@ -9,7 +9,7 @@ keyword saddle (amount : Amount) : Ability := {
     [activatedOnlyDuring
         (perform
           (tap
-            (withTotal (Semantics.ProjAxis.stat Semantics.Stat.power) Semantics.Comparator.atLeast
+            (withTotal (.stat .power) .atLeast
               amount
               (allOf
                 (and

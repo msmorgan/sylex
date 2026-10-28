@@ -17,6 +17,6 @@ action recruit : Action := {
               isLand))
           (create 1
             (written
-              (creatureToken 1 1 [Semantics.Color.white]
+              (creatureToken 1 1 [.white]
                 [human, soldier])))]
 }

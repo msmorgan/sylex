@@ -7,6 +7,6 @@ template keywordOf (ability : Ability) : KeywordTerm := {
   spelling := "with <ability>",
   body :=
     match ability with
-    | Semantics.Ability.keyword label params body => Semantics.KeywordTerm.the label
-    | x => Semantics.KeywordTerm.the (Semantics.KeywordLabel.named "")
+    | Semantics.Ability.keyword label params body => .the label
+    | x => .the (.named "")
 }

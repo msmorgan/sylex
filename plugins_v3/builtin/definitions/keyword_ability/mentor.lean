@@ -9,6 +9,6 @@ keyword mentor : Ability := {
           (target
             (and
               [isCreature, isAttacking,
-                hasPower Semantics.Comparator.less
+                hasPower .less
                   (powerOf thisCreature)])))]
 }

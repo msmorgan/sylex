@@ -4,5 +4,5 @@ template untilNextTurnOf (player : NounPhrase) : Duration := {
   body :=
     durationBetween none
       (some
-        (beginningOf Semantics.TurnPart.turn (some player) (nextTime none)))
+        (beginningOf .turn (some player) (nextTime none)))
 }

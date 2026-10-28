@@ -7,17 +7,17 @@ action explore : Action := {
     instruct (controllerOf theActor)
       (sequentially
         [reveal
-            (slice Semantics.PileEnd.top 1 (libraryOf actor)),
+            (slice .top 1 (libraryOf actor)),
           doIf
-            (is (that Semantics.NounWord.card) isLand)
-            (putInto (that Semantics.NounWord.card)
-              (zone Semantics.Zone.hand
-                (some (ownerOf (that Semantics.NounWord.card)))))
+            (is (that .card) isLand)
+            (putInto (that .card)
+              (zone .hand
+                (some (ownerOf (that .card)))))
             (some
               (sequentially
                 [putCounters 1 (printedKind p1p1Counter)
                     theActor,
                   may
-                    (putInto (that Semantics.NounWord.card)
+                    (putInto (that .card)
                       graveyard)]))])
 }

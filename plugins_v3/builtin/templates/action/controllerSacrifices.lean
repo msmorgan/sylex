@@ -5,6 +5,6 @@ template controllerSacrifices (subject : NounPhrase) : Action := {
   -- TODO(spelling): <subject>'s controller sacrifices it/them. String substitution cannot form the
   -- possessor or choose the agreeing pronoun.
   body :=
-    instruct (possessorOf Semantics.PossessorAxis.controller subject)
-      (sacrifice subject)
+    instruct (possessorOf .controller subject)
+      (Semantics.Definitions.sacrifice subject)
 }

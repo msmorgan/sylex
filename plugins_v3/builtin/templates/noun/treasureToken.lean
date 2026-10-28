@@ -11,5 +11,5 @@ template treasureToken : CharacteristicBundle := {
                 (compound
                   [tapSymbol,
                     perform (sacrifice thisArtifact)])
-                (addMana 1 (ofAnyColor Semantics.ColorFreedom.sameColor) [])] } }
+                (addMana 1 (ofAnyColor .sameColor) [])] } }
 }

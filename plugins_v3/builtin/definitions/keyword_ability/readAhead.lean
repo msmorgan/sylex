@@ -10,7 +10,7 @@ keyword readAhead : Ability := {
                 (and
                   [chapterAbilityOf thisSaga,
                     not
-                      (predicateCompare [Semantics.ProjAxis.chapter] Semantics.Comparator.eq
+                      (predicateCompare [.chapter] .eq
                         (countersOn loreCounter
                           thisSaga))])))
             trigger)

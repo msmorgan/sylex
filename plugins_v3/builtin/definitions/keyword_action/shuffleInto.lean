@@ -8,6 +8,6 @@ action shuffleInto (subject : NounPhrase) : Action := {
   body :=
     sequentially
       [actionMove subject wherever
-          (some (zone Semantics.Zone.library none)) Semantics.ObservationPoint.arrival [],
-        actionShuffle (zone Semantics.Zone.library none)]
+          (some (zone .library none)) .arrival [],
+        actionShuffle (zone .library none)]
 }

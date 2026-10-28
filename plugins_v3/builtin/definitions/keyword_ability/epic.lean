@@ -5,17 +5,17 @@ keyword epic : Ability := {
     [spell
         (establishThroughout
           (cant (actor you)
-            (cast NounPhrase.any))
+            (cast Templates.NounPhrase.any))
           restOfGame),
       spell
-        (delayWithin (beginningOfYour Semantics.TurnPart.upkeep)
+        (delayWithin (beginningOfYour .upkeep)
           restOfGame
           (sequentially
-            [copy Semantics.CopySort.fromStack thisSpell 1
+            [copy .fromStack thisSpell 1
                 [copyExceptEdits
                     [characteristicEditRemovedAbilities
                         (abilitySelectionSpecified
                           [abilities (theKeyword epic.label)])]],
               may
-                (chooseNewTargets (that Semantics.NounWord.copy))]))]
+                (chooseNewTargets (that .copy))]))]
 }

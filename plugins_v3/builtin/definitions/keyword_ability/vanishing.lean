@@ -4,7 +4,7 @@ keyword vanishing (amount : Amount) : Ability := {
   body :=
     [static
         (entersWithCounters thisPermanent amount timeCounter),
-      at_ (beginningOfYour Semantics.TurnPart.upkeep)
+      at_ (beginningOfYour .upkeep)
         (removeCounters (oneThrough 1)
           (some (printedKind timeCounter))
           thisPermanent)
@@ -13,7 +13,7 @@ keyword vanishing (amount : Amount) : Ability := {
           (is thisPermanent
             (hasCounter (some timeCounter)))),
       when
-        (does Subject.any
+        (does Templates.Subject.any
           (removeCounters theLast
             (some (printedKind timeCounter))
             thisPermanent))

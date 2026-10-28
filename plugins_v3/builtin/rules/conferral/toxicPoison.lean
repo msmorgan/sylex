@@ -11,13 +11,13 @@ conferral toxicPoison := {
       scope :=
         and
           [isCreature,
-            hasKeyword (Semantics.KeywordTerm.the (Semantics.KeywordLabel.named "toxic"))],
+            hasKeyword (.the (.named "toxic"))],
       confer :=
-        Semantics.Conferral.property
+        .property
           (asEvent
             (does (actor this_)
               (dealDamage anyAmount
-                (a isPlayer) (some Semantics.DamageKind.combat)))
+                (a isPlayer) (some .combat)))
             (putCounters (totalToxicValue this_)
               (printedKind poison)
               (that player))) }

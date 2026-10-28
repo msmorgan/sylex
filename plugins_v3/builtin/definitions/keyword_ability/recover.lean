@@ -4,10 +4,10 @@ keyword recover (cost : Cost) : Ability := {
   -- depend on the Cost structure.
   body :=
     [when
-        (does Subject.any
+        (does Templates.Subject.any
           (actionMove (a isCreature) battlefield
-            (some yourGraveyard) Semantics.ObservationPoint.departure []))
-        (may (pay cost Semantics.PayTimes.once)
+            (some yourGraveyard) .departure []))
+        (may (pay cost .once)
           (some (returnToHand this_ yourGraveyard))
           (some (exile this_)))]
 }

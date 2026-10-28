@@ -10,20 +10,20 @@ keyword paradigm : Ability := {
     [spell
         (doIf
           (not
-            (did Subject.any
+            (did Templates.Subject.any
               (resolve
                 (a
                   (and
                     [isSpell, isOther, youControl,
-                      shares Semantics.QualitySort.cardName Semantics.Agreement.share
+                      shares .cardName .share
                         thisSpell])))
               (within thisGame)))
-          (delayWithin (beginningOfYour Semantics.TurnPart.firstMain)
+          (delayWithin (beginningOfYour .firstMain)
             restOfGame
             (sequentially
-              [copy (Semantics.CopySort.inZone Semantics.Zone.exile) this_ 1 [],
+              [copy (.inZone .exile) this_ 1 [],
                 may
-                  (cast (that Semantics.NounWord.copy) none
+                  (cast (that .copy) none
                     withoutPaying)]))),
       spell (exile thisSpell)]
 }

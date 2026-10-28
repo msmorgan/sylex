@@ -14,7 +14,7 @@ template alsoForKeywords (body : KeywordTerm → Ability)
     have parts := List.map body keywords;
     have actions :=
       List.filterMap
-        (fun (x : Semantics.Ability) =>
+        (fun (x : Ability) =>
           match x with
           | Semantics.Ability.triggered event alternatives while_ joins timing limit intervening action =>
             some action
@@ -22,7 +22,7 @@ template alsoForKeywords (body : KeywordTerm → Ability)
         parts;
     have specs :=
       List.filterMap
-        (fun (x : Semantics.Ability) =>
+        (fun (x : Ability) =>
           match x with
           | Semantics.Ability.static spec => some spec
           | x => none)

@@ -1,5 +1,5 @@
 template thisRoom : NounPhrase := {
   spelling := "this Room",
   body :=
-    headed (Semantics.NounWord.subtype room) this_
+    headed (.subtype room) this_
 }

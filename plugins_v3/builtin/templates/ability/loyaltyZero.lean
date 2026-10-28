@@ -7,9 +7,9 @@ template loyaltyZero : Conferral := {
   -- a rules conferral, whose inherent or ability-free origin cannot be encoded by card-text
   -- substitution.
   body :=
-    Semantics.Conferral.stateBased
+    .stateBased
       (compareAmt
-        (countersOn (Semantics.CounterKind.named "loyaltyCounter") this_)
-        Semantics.Comparator.eq 0)
+        (countersOn (.named "loyaltyCounter") this_)
+        .eq 0)
       (putInto this_ graveyard)
 }

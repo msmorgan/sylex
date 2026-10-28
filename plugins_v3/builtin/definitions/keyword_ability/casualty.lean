@@ -8,14 +8,14 @@ keyword casualty (amount : Amount) : Ability := {
             (sacrifice
               (a
                 (and
-                  [isCreature, hasPower Semantics.Comparator.atLeast amount]))))
-          true Semantics.PayTimes.once),
+                  [isCreature, hasPower .atLeast amount]))))
+          true .once),
       when
         (does (actor you)
           (cast thisSpell))
         (sequentially
           [copyOnStack thisSpell,
-            may (chooseNewTargets (that Semantics.NounWord.copy))])
+            may (chooseNewTargets (that .copy))])
         [] [] none none none
         (some
           (keywordCostPaid casualty.label thisSpell))]

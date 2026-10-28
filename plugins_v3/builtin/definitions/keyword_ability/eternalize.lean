@@ -11,12 +11,12 @@ keyword eternalize (cost : Cost) : Ability := {
         (create 1
           (copyOf this_
             [copyExceptEdits
-                [characteristicEditColors Semantics.QualityOp.sets
-                    (Semantics.ColorSpec.some [Semantics.Color.black]),
-                  characteristicEditStat Semantics.QualityOp.sets Semantics.CharacteristicStat.power 4,
-                  characteristicEditStat Semantics.QualityOp.sets Semantics.CharacteristicStat.toughness 4,
+                [characteristicEditColors .sets
+                    (.some [.black]),
+                  characteristicEditStat .sets .power 4,
+                  characteristicEditStat .sets .toughness 4,
                   characteristicEditManaCost none,
-                  characteristicEditTypeLine Semantics.QualityOp.adds
+                  characteristicEditTypeLine .adds
                     { subtypes := some [zombie] }]]))
         asSorcery]
 }

@@ -6,10 +6,10 @@ subtype equipment := {
   kind := .artifact,
   name := "Equipment",
   confers :=
-    [Semantics.Conferral.property
+    [.property
         (mayBeAttachedTo thisEquipment
           (allOf isCreature)),
-      Semantics.Conferral.stateBased
+      .stateBased
         (not (isAttached thisEquipment))
-        (attachment Semantics.AttachMove.unattached thisEquipment none)]
+        (attachment .unattached thisEquipment none)]
 }

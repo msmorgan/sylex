@@ -15,7 +15,7 @@ template delayUnlessPaid (event : GameEvent) (action : Action) (player : NounPhr
             (establish
               (staticSpecCant
                 (actor
-                  (Semantics.NounPhrase.laterMention "delay.trigger" thisAbility))
+                  (.laterMention "delay.trigger" thisAbility))
                 trigger { })
               none))
           (some (durationBetween none (some event)))]

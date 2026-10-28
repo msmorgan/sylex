@@ -17,24 +17,24 @@ conferral phasingTurnBased := {
   body :=
     { scope := isPermanent,
       confer :=
-        Semantics.Conferral.turnBased Semantics.TurnPart.untapStep
+        .turnBased .untapStep
           (doIf
-            (duringPart Semantics.TurnPart.turn
+            (duringPart .turn
               (some (controllerOf this_)))
             (doIf
               (is this_ isPhasedOut)
               (doIf
                 (not
                   (is this_
-                    (predicateAttachment Semantics.AttachmentSide.attachment none
+                    (predicateAttachment .attachment none
                       (some
                         (a
                           (and
                             [isPermanent, isPhasedOut]))))))
-                (setStatus Semantics.Status.phasedIn this_))
+                (setStatus .phasedIn this_))
               (some
                 (doIf
                   (is this_
                     (hasKeyword (theKeyword phasing.label)))
-                  (setStatus Semantics.Status.phasedOut this_))))) }
+                  (setStatus .phasedOut this_))))) }
 }

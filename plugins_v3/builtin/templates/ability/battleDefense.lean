@@ -8,9 +8,9 @@ template battleDefense : Conferral := {
   -- defense counters on it equal to its printed defense number.'; this is a rules conferral, whose
   -- inherent or ability-free origin cannot be encoded by card-text substitution.
   body :=
-    Semantics.Conferral.ability
+    .ability
       (static
         (entersWithCounters this_
-          (statOf (Semantics.ProjAxis.stat Semantics.Stat.defense) this_)
-          (Semantics.CounterKind.named "defenseCounter")))
+          (statOf (.stat .defense) this_)
+          (.named "defenseCounter")))
 }

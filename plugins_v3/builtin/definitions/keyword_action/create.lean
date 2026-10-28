@@ -6,5 +6,5 @@ action create (count : Amount) (token : TokenSpec) (riders : List MoveRider := [
   -- optional fields or supply contextual agreement and morphology.
   lexical := { verbs := [{ lemma := "create", frames := [Monotransitive] }] },
   body :=
-    createObject count (CreationSpec.token token riders) none
+    createObject count (Templates.CreationSpec.token token riders) none
 }

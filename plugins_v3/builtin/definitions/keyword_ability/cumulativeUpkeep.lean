@@ -9,7 +9,7 @@ keyword cumulativeUpkeep (cost : Cost) : Ability := {
   -- and terminal period depend on the Cost structure.
   body :=
     [at_
-        (beginningOf Semantics.TurnPart.upkeep (some you)
+        (beginningOf .upkeep (some you)
           (eachTime none))
         (sequentially
           [putCounters 1 (printedKind ageCounter)

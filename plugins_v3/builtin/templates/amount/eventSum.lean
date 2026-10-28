@@ -4,6 +4,6 @@ template eventSum (action : Action) (subj : Subject) (within : Duration)
   -- TODO(spelling): The accumulated magnitude of historical action events.
   body :=
     amountTally
-      { subj := subj, action := action, within := some (LookbackSpan.within within timing) }
-      Semantics.TallyMode.quantity
+      { subj := subj, action := action, within := some (Templates.LookbackSpan.within within timing) }
+      .quantity
 }

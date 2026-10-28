@@ -5,13 +5,13 @@ template lookAndSortSlice (slice : NounPhrase) (spill : Location)
   -- TODO(spelling): Context-dependent wording: look at <slice>, put any number of them into <spill> [riders] and the rest on top of its owner's library in any order; string substitution cannot express its omitted or inflected parts.
   body :=
     sequentially
-      [expose Semantics.ExposeVerb.lookAt
+      [expose .lookAt
           (cards (slice)),
         actionMove
           (someOf anyNumber
             (slice))
-          wherever (some spill) Semantics.ObservationPoint.arrival spillRiders,
+          wherever (some spill) .arrival spillRiders,
         actionMove theRest wherever
-          (some onTop) Semantics.ObservationPoint.arrival
-          [inOrder Semantics.Arrangement.anyOrder]]
+          (some onTop) .arrival
+          [inOrder .anyOrder]]
 }

@@ -12,5 +12,5 @@ keyword bargain : Ability := {
                     and
                       [isEnchantment, isPermanent],
                     isToken]))))
-          true Semantics.PayTimes.once)]
+          true .once)]
 }

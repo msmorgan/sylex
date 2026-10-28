@@ -17,7 +17,7 @@ keyword megamorph (cost : Cost) : Ability := {
           (turnFaceUp this_)),
       static
         (replace
-          (would Subject.any
+          (would Templates.Subject.any
             (turnFaceUp thisPermanent))
           (doIf
             (keywordCostPaid morph.label thisPermanent)

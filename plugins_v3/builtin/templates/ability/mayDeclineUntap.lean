@@ -8,6 +8,6 @@ template mayDeclineUntap (subject : NounPhrase) (whose : Option NounPhrase) : St
   body :=
     duringUntapStep whose
       (onlyIfSo
-        (cant Subject.any (untap subject))
+        (cant Templates.Subject.any (untap subject))
         (conditionSoChooses you))
 }

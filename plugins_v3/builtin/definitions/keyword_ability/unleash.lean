@@ -13,7 +13,7 @@ keyword unleash : Ability := {
       static
         (onlyWhile
           (cant (actor thisPermanent)
-            (block NounPhrase.any))
+            (block Templates.NounPhrase.any))
           (is thisPermanent
             (hasCounter (some p1p1Counter))))]
 }

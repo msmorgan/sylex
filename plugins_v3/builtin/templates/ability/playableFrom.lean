@@ -3,9 +3,9 @@
 template playableFrom (zone : Location) (timing : Timing) : Conferral := {
   spelling := "You may play this card from <zone> <timing>",
   body :=
-    Semantics.Conferral.property
+    .property
       (can (actor you)
-        (procedure Semantics.Procedure.play this_ itsOwnCost
+        (procedure .play this_ itsOwnCost
           none (some zone) none)
         (some timing))
 }
