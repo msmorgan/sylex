@@ -1,8 +1,13 @@
-import Semantics.Cards
+import Semantics.Cards.Data.Fixtures
+import Semantics.Check
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
 import Semantics.Proofs.CardsHelpers
+
+-- Canon cards are `noncomputable` data (`Semantics.Cards.Data`); so is what reads them.
+noncomputable section
+
 
 /-!
 # Semantics.Cards.Damage
@@ -476,3 +481,5 @@ def theLastRoninII : Action :=
 theorem okTheLastRoninII : Action.check (DRS.ofList []) theLastRoninII = [] := by decide
 
 end Semantics.Cards
+
+end

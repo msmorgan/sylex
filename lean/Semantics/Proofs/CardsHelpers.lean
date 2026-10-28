@@ -1,7 +1,11 @@
-import Semantics.Cards
+import Semantics.Cards.Data.Fixtures
+import Semantics.Check
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
+
+-- Canon cards are `noncomputable` data (`Semantics.Cards.Data`); so is what reads them.
+noncomputable section
 
 /-!
 # Semantics.Proofs.CardsHelpers
@@ -232,3 +236,5 @@ def boseijuMana : Ability :=
 theorem okBoseijuMana : Ability.check (DRS.ofList []) boseijuMana = [] := by decide
 
 end Semantics.Cards
+
+end

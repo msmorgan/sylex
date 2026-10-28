@@ -1,8 +1,13 @@
-import Semantics.Cards
+import Semantics.Cards.Data.Fixtures
+import Semantics.Check
 import Semantics
 import Semantics.Definitions
 import Semantics.Check.Card
 import Semantics.Proofs.CardsHelpers
+
+-- Canon cards are `noncomputable` data (`Semantics.Cards.Data`); so is what reads them.
+noncomputable section
+
 
 /-!
 # Semantics.Cards.Deontic
@@ -352,3 +357,5 @@ theorem okFioranReformistPlayersCantBecomeTheMonarch :
     Ability.check (DRS.ofList []) fioranReformistPlayersCantBecomeTheMonarch = [] := by decide
 
 end Semantics.Cards
+
+end

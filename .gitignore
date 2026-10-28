@@ -29,3 +29,6 @@
 /lean/GeneratedDefinitions.lean
 # Scratch left by the retired v2 macro alignment command.
 /lean/GeneratedMacroAlignment.lean
+# The canon card modules `genCanon` (lean/lakefile.lean) generates on every Lake build.
+/lean/Semantics/Cards/Data/
+/lean/Semantics/Cards/Check/

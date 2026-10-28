@@ -1,8 +1,13 @@
-import Semantics.Cards
+import Semantics.Cards.Data.Fixtures
+import Semantics.Check
 import Semantics.Check.NumberSlots
 import Semantics.Definitions
 import Semantics.Check.Card
 import Semantics.Proofs.CardsHelpers
+
+-- Canon cards are `noncomputable` data (`Semantics.Cards.Data`); so is what reads them.
+noncomputable section
+
 
 /-!
 # Semantics.Proofs.Damage
@@ -1309,3 +1314,5 @@ theorem deadpoolTradingCardExchangesTextBoxes :
       | _ => false : Bool) := by decide
 
 end Semantics.Proofs.Damage
+
+end

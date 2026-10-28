@@ -1,4 +1,5 @@
-import Semantics.Cards
+import Semantics.Cards.Data.Fixtures
+import Semantics.Check
 import Semantics.Definitions
 import Semantics.Check.Card
 import Semantics.Proofs.CardsHelpers

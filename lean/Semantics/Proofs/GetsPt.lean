@@ -1,5 +1,6 @@
 import Semantics.Proofs.CardsTrigger
-import Semantics.Cards
+import Semantics.Cards.Data.Fixtures
+import Semantics.Check
 import Semantics.Check.NumberSlots
 import Semantics.Definitions
 import Semantics.Check.Card
@@ -11,6 +12,10 @@ import Semantics.Proofs.CardsFaces
 import Semantics.Proofs.CardsDescription
 import Semantics.Proofs.CardsTurn
 import Semantics.Proofs.Helpers
+
+-- Canon cards are `noncomputable` data (`Semantics.Cards.Data`); so is what reads them.
+noncomputable section
+
 
 open Semantics Semantics.Templates Semantics.Definitions
 
@@ -506,3 +511,5 @@ theorem subjectRepeatedInEachPartIsSteppedEachTime :
   decide
 
 end Semantics.Proofs.GetsPt
+
+end

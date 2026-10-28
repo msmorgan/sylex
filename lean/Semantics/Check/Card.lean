@@ -324,14 +324,18 @@ def Card.check : Card → List Refusal
       prototypeAltCheck line alternative
 
 open Lean Meta Elab Term in
-/-- Evaluate `Card.check` for readable refusals, then construct the kernel `decide` proof. -/
+/-- Evaluate `Card.check` for readable refusals, then construct the kernel `decide` proof.
+A generated canon card is `noncomputable` (it has no compiled code), so the report evaluates its
+unfolded value. -/
 elab "check_card% " cardTerm:term : term => do
   let value ← elabTermEnsuringType cardTerm (mkConst ``Semantics.Card)
   synthesizeSyntheticMVarsNoPostponing
   let value ← instantiateMVars value
   let verdict := mkApp (mkConst ``Card.check) value
+  let env ← getEnv
+  let evaluated ← deltaExpand verdict (isNoncomputable env)
   let refusals ← unsafe evalExpr (List Refusal)
-    (mkApp (mkConst ``List [Level.zero]) (mkConst ``Refusal)) verdict
+    (mkApp (mkConst ``List [Level.zero]) (mkConst ``Refusal)) evaluated
   unless refusals.isEmpty do
     throwError "Card semantic check failed: {repr refusals}"
   let valid ← mkEq verdict (mkApp (mkConst ``List.nil [Level.zero]) (mkConst ``Refusal))

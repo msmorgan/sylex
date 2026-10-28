@@ -122,11 +122,16 @@ private def addSortAlias (full : Name) : CommandElabM Unit := do
     let alias := full.getPrefix ++ Name.mkSimple previousSort.getString! ++
       Name.mkSimple full.getString!
     unless (← getEnv).contains alias do
-      liftCoreM <| addAndCompile <| .defnDecl {
+      let decl := .defnDecl {
         name := alias, levelParams := previous.levelParams, type := previous.type
         value := mkConst full (previous.levelParams.map Level.param)
         hints := .abbrev, safety := .safe
       }
+      -- A generated canon card is `noncomputable`, and so is its alias.
+      if isNoncomputable (← getEnv) full then
+        liftCoreM <| addDecl decl
+        modifyEnv (addNoncomputable · alias)
+      else liftCoreM <| addAndCompile decl
       for attr in [definitionAttribute, templateAttribute, contextualAuthoringAttribute,
           primitiveAttribute] do
         if attr.hasTag (← getEnv) full then attr.setTag alias
@@ -1136,10 +1141,15 @@ def elabCardNamed : TermElab := fun stx expected? => do
       return mkApp (mkConst `Semantics.Spelled.card) value
   return value
 
+/-- The card's `ok_` theorem where it is in scope; a canon card read from its data module, whose
+`ok_` theorem lives in a check module, is checked here instead (`check_card%`). -/
 @[term_elab cardNamedOkTerm]
-def elabCardNamedOk : TermElab := fun stx _ => do
+def elabCardNamedOk : TermElab := fun stx expected? => do
   let name ← resolvePrintedCard (stx[1].isStrLit?.getD "")
-  return mkConst (name.getPrefix ++ Name.mkSimple ("ok_" ++ name.getString!))
+  let ok := name.getPrefix ++ Name.mkSimple ("ok_" ++ name.getString!)
+  if (← getEnv).contains ok then return mkConst ok
+  let card ← `(term| $(mkCIdent ``Semantics.Spelled.card) $(mkIdent (`_root_ ++ name)))
+  elabTerm (mkNode `Semantics.«termCheck_card%_» #[mkAtom "check_card%", card]) expected?
 
 private def cardRecordFields (stx : Syntax) : Except String (List (Name × Syntax)) := do
   if let `(term| {}) := stx then return []
@@ -1264,6 +1274,28 @@ private def makeStruct (fields : List (Name × Term)) : CommandElabM Term := do
     `(Parser.Term.structInstField| $(mkIdent key):ident := $value)
   `(term| { $fs:structInstField,* })
 
+/-- A canon card generated into a data module: its card file and the declaration it defines.
+`check_canon_card` (`Check/Card.lean`) finds the declaration by file. -/
+structure CanonCardEntry where
+  file : String
+  declaration : Name
+  deriving Inhabited
+
+initialize canonCardsExt :
+    SimplePersistentEnvExtension CanonCardEntry (Array CanonCardEntry) ←
+  registerSimplePersistentEnvExtension {
+    addEntryFn := fun entries entry => entries.push entry
+    addImportedFn := fun imports => imports.foldl (· ++ ·) #[]
+  }
+
+/-- The card file of a printed name: `card_filename` in `crates/deckmaste_core/src/plugin.rs`
+and `canonCardFileName` in `lean/lakefile.lean`. -/
+def cardFileName (name : String) : String :=
+  name.foldl (init := "") (fun out c => out ++ match c with
+    | '<' => "{less}" | '>' => "{greater}" | ':' => "{colon}" | '"' => "{quote}"
+    | '/' => "{slash}" | '\\' => "{backslash}" | '|' => "{pipe}" | '?' => "{question}"
+    | '*' => "{star}" | c => c.toString) ++ ".lean"
+
 structure PendingCheckEntry where
   thmName : Name
   checkFn : Name
@@ -1357,7 +1389,10 @@ private def validateAuthoredDefaults (signature : Syntax) : CommandElabM Unit :=
     discard <| elabTerm check none
     synthesizeSyntheticMVarsNoPostponing
 
-private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : CommandElabM Unit := do
+/-- `canonFile` marks a canon card generated into a data module: its constant is
+`noncomputable`, and its `ok_` theorem is left to the matching check module. -/
+private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax)
+    (canonFile : Option String := none) : CommandElabM Unit := do
   let mods : TSyntax ``Parser.Command.declModifiers := ⟨stx[0]⟩
   let kind := stx[1].getId.eraseMacroScopes
   unless authoredKinds.contains kind do throwUnsupportedSyntax
@@ -1536,8 +1571,16 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : Comma
     if kind == `card then
       body := ⟨mkNode `Semantics.spelledTerm #[mkAtom "spelled", mkAtom "<|", body.raw]⟩
     let value ← `(Parser.Command.declVal| := $body)
+    -- `declModifiers` slot 4 is `meta` or `noncomputable`.
+    let mods : TSyntax ``Parser.Command.declModifiers := if canonFile.isSome then
+        ⟨mods.raw.setArg 4 (mkNullNode #[mkNode ``Parser.Command.«noncomputable»
+          #[mkAtom "noncomputable"]])⟩
+      else mods
     elabCommand (← `($mods:declModifiers def $declId:declId $sig:optDeclSig $value:declVal))
-    if kind == `card then
+    if let some file := canonFile then
+      let declaration ← resolveGlobalConstNoOverload name
+      modifyEnv (canonCardsExt.addEntry · { file, declaration })
+    else if kind == `card then
       let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
       let check := mkIdent `Semantics.Card.check
       let cardValue := mkIdent `Semantics.Spelled.card
@@ -1561,6 +1604,27 @@ def elabAnonymousCard : CommandElab := fun stx => do
     | .ok named => pure named
     | .error message => throwError message
   elabAuthoredCommandImpl false named
+
+/-- One canon card file, as `genCanon` (`lean/lakefile.lean`) writes it into a data module: the
+file's text, which must be exactly one anonymous `card` declaration whose printed name is the
+file's. -/
+syntax (name := canonCardCmd) "canon_card " str ppLine command ppLine "end_canon_card" : command
+
+@[command_elab canonCardCmd]
+def elabCanonCard : CommandElab := fun stx => do
+  let file := stx[1].isStrLit?.getD ""
+  let inner := stx[2]
+  if inner.isOfKind ``authoredDeclCmd && inner[1].getId == `card then
+    throwErrorAt inner "Named card declarations are no longer supported; use card := ..."
+  unless inner.isOfKind ``anonymousCardCmd do
+    throwErrorAt inner "Unsupported command in card file {file}"
+  let named ← match namedCardSyntax inner with
+    | .ok named => pure named
+    | .error message => throwErrorAt inner message
+  let printed := named[2].getId.getString!
+  unless cardFileName printed == file do
+    throwErrorAt inner "Card file {file} declares {printed}, whose file is {cardFileName printed}"
+  withRef inner <| elabAuthoredCommandImpl false named (canonFile := some file)
 
 /-- A declaration's bare spelling and semantic result sort identify a bundle node. -/
 structure BundleKey where

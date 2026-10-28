@@ -1,6 +1,7 @@
-import Semantics.Cards
+import Semantics.Cards.Data.Fixtures
 import Semantics.Check
 import Semantics.Check.Card
+import Semantics.CanonCheck
 import Semantics.Definitions
 
 open Semantics Semantics.Templates Semantics.Definitions
@@ -1028,6 +1029,55 @@ example : Card := transforming { front := {}, front := {}, back := {} }
 /-- error: Unknown card field extra -/
 #guard_msgs in
 example : Card := transforming { front := {}, back := {}, extra := {} }
+
+/-! ## Generated canon card files
+
+`genCanon` (`lean/lakefile.lean`) writes each card file into a data module as `canon_card`, and
+its `ok_` theorem into the check module as `check_canon_card`. -/
+
+canon_card "Canon Witness.lean"
+card := { name := "Canon Witness", types := [sorcery], text := [spell (draw 1)] }
+end_canon_card
+
+check_canon_card "Canon Witness.lean"
+
+/-- The data module's card is noncomputable; the check module proves it. -/
+theorem canonCardIsCheckedByItsCheckModule :
+    Card.check (cardNamed "Canon Witness") = [] := cardNamedOk "Canon Witness"
+
+open Lean in
+run_cmd do
+  unless isNoncomputable (← getEnv) ``«Canon Witness» do
+    throwError "a generated canon card must be noncomputable"
+  unless (← getEnv).contains ``«ok_Canon Witness» do
+    throwError "check_canon_card must name the card's ok_ theorem"
+
+-- A canon card's file name is its printed name's card file name.
+canon_card "Canon Witness{colon} Split.lean"
+card := { name := "Canon Witness: Split", types := [sorcery] }
+end_canon_card
+
+/-- error: Card file Misnamed.lean declares Canon Elsewhere, whose file is Canon Elsewhere.lean -/
+#guard_msgs in
+canon_card "Misnamed.lean"
+card := { name := "Canon Elsewhere", types := [sorcery] }
+end_canon_card
+
+/-- error: Unsupported command in card file Template.lean -/
+#guard_msgs in
+canon_card "Template.lean"
+template canonTemplate : Action := { body := draw 1 }
+end_canon_card
+
+/-- error: Named card declarations are no longer supported; use card := ... -/
+#guard_msgs in
+canon_card "Legacy.lean"
+card legacyCanon := { name := "Legacy", types := [sorcery] }
+end_canon_card
+
+/-- error: No canon card was generated from Missing.lean -/
+#guard_msgs in
+check_canon_card "Missing.lean"
 
 end BundleDsl
 

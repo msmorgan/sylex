@@ -1,9 +1,14 @@
-import Semantics.Cards
+import Semantics.Cards.Data.Fixtures
+import Semantics.Check
 import Semantics.Definitions
 import Semantics.Check.Card
 import Semantics.Check.Rules
 import Semantics.Proofs.CardsCounters
 import Semantics.Proofs.Helpers
+
+-- Canon cards are `noncomputable` data (`Semantics.Cards.Data`); so is what reads them.
+noncomputable section
+
 
 /-!
 # Semantics.Proofs.Counters
@@ -794,3 +799,5 @@ theorem urborgScavengersIsOneStatic :
   decide
 
 end Semantics.Proofs.Counters
+
+end
