@@ -1,4 +1,4 @@
 primitive all  : DetPhrase := {
-  -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
+  spelling := "all",
   body := Semantics.Primitives.DetPhrase.all
 }

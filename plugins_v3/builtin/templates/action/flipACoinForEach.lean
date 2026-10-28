@@ -1,7 +1,7 @@
 /-- "flip a coin for each <each>" -/
 template flipACoinForEach (each : NounPhrase) (call : Option FlipCall := none)
     (outcome : Option CoinFace := none) : Action := {
-  -- TODO(spelling): flip a coin for each <each>; wording varies with call, outcome, requiring optional clauses, inflection or structure-dependent phrasing.
+  -- TODO(spelling): Include or omit the clauses supplied by call, outcome.
   body :=
     actionFlipCoins (per each) call outcome
 }

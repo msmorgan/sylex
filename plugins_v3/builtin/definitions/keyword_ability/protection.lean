@@ -3,8 +3,7 @@
 and fortifying are a permanent's [CR#702.16d] and blocking a creature's [CR#702.16f]. -/
 keyword protection (quality : Predicate) : Ability := {
   lexical := { lemma := "protection", parameters := [[Quality (Some ("from"))]] },
-  -- TODO(spelling): Protection from red / protection from creatures; the quality needs
-  -- context-dependent article or number inflection, not literal substitution.
+  spelling := "protection from <quality>",
   body :=
     [static
         (cant

@@ -2,8 +2,7 @@
 their creator's control (`Definition`, [CR#701.7a,111.2]). -/
 action create (count : Amount) (token : TokenSpec) (riders : List MoveRider := []) :
     Action := {
-  -- TODO(spelling): create <count> <token> [<riders>]; string substitution cannot branch on
-  -- optional fields or supply contextual agreement and morphology.
+  -- TODO(spelling): Format and coordinate the riders list entries, including the empty case.
   lexical := { verbs := [{ lemma := "create", frames := [Monotransitive] }] },
   body :=
     createObject count (Templates.CreationSpec.token token riders) none

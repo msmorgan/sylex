@@ -16,8 +16,7 @@ keyword equipQuality (quality : Predicate) (cost : Cost) : Ability := {
              ]
   },
   label := "equip",
-  -- TODO(spelling): equip [quality] [mana cost] / equip [quality]—[verbal cost]. The separator
-  -- and terminal period depend on the Cost structure.
+  spelling := "equip <quality> <cost>",
   body :=
     [ activatedOnlyDuring cost
         (attachTo thisPermanent (target (and [quality, isCreature, youControl])))

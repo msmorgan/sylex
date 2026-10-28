@@ -2,7 +2,7 @@
 -- [CR#615.1]
 template preventAllBy (source : NounPhrase) (to : NounPhrase)
     (duration : Option Duration) (kind : Option DamageKind := none) : Action := {
-  -- TODO(spelling): Context-dependent wording: Prevent all <kind> damage that would be dealt [to <to>] by <source> [duration]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by duration, kind.
   body :=
     establish
       (replace

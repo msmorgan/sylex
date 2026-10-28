@@ -7,8 +7,7 @@ keyword cycling (cost : Cost) : Ability := {
     bound := { surface := "cycling", stems := [Subtype, CardType, Supertype] },
     verbs := [{ lemma := "cycle", frames := [Monotransitive] }]
   },
-  -- TODO(spelling): cycling [mana cost] / cycling—[verbal cost]; separator and terminal period
-  -- depend on the Cost structure.
+  spelling := "cycling <cost>",
   body :=
     [activated
         (compound [cost, perform (discard this_)])

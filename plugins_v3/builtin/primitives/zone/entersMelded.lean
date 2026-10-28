@@ -1,4 +1,4 @@
 primitive entersMelded (into : String) : MoveRider := {
-  -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
+  spelling := "melded into <into>",
   body := Semantics.Primitives.MoveRider.entersMelded into
 }

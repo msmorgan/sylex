@@ -1,6 +1,6 @@
 /-- Remove marked damage from the subject. -/
 primitive clearDamage (subject : NounPhrase) : Action := {
-  -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
+  spelling := "remove all damage marked on <subject>",
   body :=
     Semantics.Primitives.Action.clearDamage subject
 }

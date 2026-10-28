@@ -1,8 +1,7 @@
 /-- "<performer> amasses <subtype> N" with its reminder text (`Definition`, [CR#701.47a]): the
 chosen Army is `that (.type .creature)` and `it`, resolved inside `ownScope`. -/
 action amass (subtype : Subtype) (count : Amount) : Action := {
-  -- TODO(spelling): amass <subtype> <count>; Oracle pluralizes the creature subtype, which string
-  -- substitution cannot inflect.
+  spelling := "amass <subtype> <count>",
   lexical := { verbs := [{ lemma := "amass", frames := [TransitiveAmount, Monotransitive] }] },
   body :=
     have isArmy : Predicate := and [hasSubtype army, isCreature, actorControls];

@@ -2,8 +2,7 @@
 opponent controls, counter that spell or ability unless that player pays [cost]." [CR#702.21a] -/
 keyword ward (cost : Cost) : Ability := {
   lexical := { lemma := "ward", parameters := [[Cost], [DashNonManaCost]] },
-  -- TODO(spelling): ward [mana cost] / ward—[verbal cost]; separator and terminal period depend
-  -- on the Cost structure.
+  spelling := "ward <cost>",
   body :=
     [whenever
         (does

@@ -9,7 +9,7 @@ observed on its departure, and "from anywhere" is not a leaves-the-battlefield t
 -- [CR#603.6c]
 template zoneChange (subject : NounPhrase) (destination : Location)
     (from_ : Location) (riders : List MoveRider) : Action := {
-  -- TODO(spelling): Put; wording varies with destination, from_, riders, subject, requiring optional clauses, inflection or structure-dependent phrasing.
+  -- TODO(spelling): Format and coordinate the riders list entries, including the empty case.
   body :=
     move subject from_ (some destination)
       (if Semantics.Location.observedOnDeparture from_ = true then .departure

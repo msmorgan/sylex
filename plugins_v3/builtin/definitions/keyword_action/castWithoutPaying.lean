@@ -2,8 +2,7 @@
 (`Definition`, [CR#701.5,601.2]). -/
 action castWithoutPaying (subject : NounPhrase) (resulting : Option Predicate) :
     Action := {
-  -- TODO(spelling): cast <subject> without paying its/their mana cost [<resulting>]; string
-  -- substitution cannot branch on optional fields or supply contextual agreement and morphology.
+  -- TODO(spelling): Include or omit the clauses supplied by resulting.
   lexical := { verbs := [{ lemma := "cast", past := "cast", frames := [Monotransitive] }] },
   deed := "cast",
   body :=

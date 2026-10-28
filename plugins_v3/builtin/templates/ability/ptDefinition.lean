@@ -3,7 +3,8 @@ Characteristic-Defining Ability setting each stat `slots` names [CR#604.3a,613.4
 -- [CR#604.3a,613.4a]
 template ptDefinition (subject : NounPhrase) (slots : DefinedSlots) (amount : Amount) :
     StaticSpec := {
-  -- TODO(spelling): Context-dependent wording: <subject>'s power [and toughness] [are each] [is] equal to <amount>; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): The slots select power, toughness, or both, changing the named stats and the
+  -- 'each' clause.
   body :=
     characteristicDefining subject
       (match slots with

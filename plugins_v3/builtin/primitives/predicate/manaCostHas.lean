@@ -1,6 +1,6 @@
 /-- Authoring primitive for `Predicate.manaCostHas`. -/
 primitive manaCostHas (symbol : ManaSymbol) : Predicate := {
-  -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
+  spelling := "with <symbol> in its mana cost",
   body :=
     Semantics.Primitives.Predicate.manaCostHas symbol
 }

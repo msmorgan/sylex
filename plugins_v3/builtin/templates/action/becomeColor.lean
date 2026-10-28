@@ -1,7 +1,7 @@
 /-- "<subject> becomes <colors> [until …]" -/
 template becomeColor (subject : NounPhrase) (colors : ColorSpec)
     (duration : Option Duration := none) : Action := {
-  -- TODO(spelling): Context-dependent wording: <subject> becomes <colors> [until …]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by duration.
   body :=
     establish
       (qualityChange subject .sets (colored colors))

@@ -8,7 +8,7 @@ primitive must (subj : Subject) (action : Action)
     (timing : Option Timing := none)
     (asThough : Option AsThough := none)
     (except : Option DeonticExcept := none) : StaticSpec := {
-  -- TODO(spelling): <subj> <action>s if able; string substitution cannot inflect verbs, nouns, or ordinals.
+  -- TODO(spelling): Include or omit the clauses supplied by timing, asThough, except.
   body :=
     Semantics.Primitives.StaticSpec.must subj action { timing := timing, asThough := asThough, except := except }
 }

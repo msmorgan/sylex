@@ -11,8 +11,7 @@ keyword Ability.splice (quality : Predicate) (cost : Cost) : Ability := {
     parameters := [[Quality (Some ("onto")), Cost], [Quality (Some ("onto")), DashNonManaCost]],
     verbs := [{ lemma := "splice", frames := [TransitiveWithPP (["onto"])] }]
   },
-  -- TODO(spelling): splice onto [quality] [mana cost] / splice onto [quality]—[verbal cost]. The
-  -- separator and terminal period depend on the Cost structure.
+  spelling := "splice onto <quality> <cost>",
   body :=
     [static
         (revealedAsCast

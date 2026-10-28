@@ -1,6 +1,6 @@
 /-- "enters attacking [<defender>]" -/
 primitive entersAttacking (defender : Option NounPhrase) : MoveRider := {
-  -- TODO(spelling): Context-dependent wording: enters attacking [<defender>]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by defender.
   body :=
     Semantics.Primitives.MoveRider.entersAttacking defender
 }

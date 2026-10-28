@@ -1,6 +1,6 @@
 /-- Authoring primitive for `Predicate.abilityHead`. -/
 primitive abilityHead (class_ : AbilityClass) : Predicate := {
-  -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
+  spelling := "<class_> ability",
   body :=
     Semantics.Primitives.Predicate.abilityHead class_
 }

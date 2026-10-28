@@ -1,6 +1,6 @@
 /-- "<subject> leaves <from_>", the battlefield unless said. -/
 template leave (from_ : Location := battlefield) : Action := {
-  -- TODO(spelling): Context-dependent wording: <subject> leaves <from_>; string substitution cannot express its omitted or inflected parts.
+  spelling := "leaves <from_>",
   body :=
     move theActor from_ none .departure []
 }

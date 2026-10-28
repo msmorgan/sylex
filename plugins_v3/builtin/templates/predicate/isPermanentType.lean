@@ -2,8 +2,8 @@
 [CR#110.4]; read off the types, so it holds of a card or a token. -/
 template isPermanentType : Predicate := {
 
-  -- TODO(spelling): artifact, battle, creature, enchantment, land, or planeswalker; this predicate
-  -- needs contextual noun coordination, not one invariant modifier.
+  -- TODO(spelling): Select and coordinate the applicable permanent-type nouns within the enclosing
+  -- description.
   body :=
     or
       [hasType Semantics.CardType.artifact, hasType Semantics.CardType.battle,

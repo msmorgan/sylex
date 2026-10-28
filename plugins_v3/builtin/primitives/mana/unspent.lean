@@ -1,6 +1,6 @@
 /-- "unspent [<type>] mana" -/
 primitive unspent (type : Option ColorOrColorless) : ManaHeld := {
-  -- TODO(spelling): Context-dependent wording: unspent [<type>] mana; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by type.
   body :=
     Semantics.Primitives.ManaHeld.unspent type
 }

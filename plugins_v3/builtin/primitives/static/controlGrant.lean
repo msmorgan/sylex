@@ -1,6 +1,6 @@
 /-- Authoring primitive for `StaticSpec.controlGrant`. -/
 primitive controlGrant (player subject : NounPhrase) : StaticSpec := {
-  -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
+  spelling := "<player> controls <subject>",
   body :=
     Semantics.Primitives.StaticSpec.controlGrant player subject
 }

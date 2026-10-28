@@ -8,8 +8,7 @@ keyword morph (cost : Cost) : Ability := {
     parameters := [[Cost], [DashNonManaCost]],
     variants := [{ lemma := "megamorph", parameters := [[Cost]] }]
   },
-  -- TODO(spelling): morph [mana cost] / morph—[verbal cost]; separator and terminal period depend
-  -- on the Cost structure.
+  spelling := "morph <cost>",
   body :=
     [static
         (can (actor you)

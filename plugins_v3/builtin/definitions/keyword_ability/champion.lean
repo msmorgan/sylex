@@ -7,8 +7,7 @@ keyword champion (subject : Predicate) : Ability := {
     parameters := [[Quality (None)]],
     verbs := [{ lemma := "champion", frames := [Monotransitive] }]
   },
-  -- TODO(spelling): Champion a creature / champion an Elf; the quality needs context-dependent
-  -- article or number inflection, not literal substitution.
+  spelling := "champion <subject>",
   body :=
     [when
         (does (actor thisPermanent) enter)

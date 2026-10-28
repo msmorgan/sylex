@@ -3,8 +3,7 @@ Equipment away and is no attaching [CR#701.3d], so it is the bare attachment cha
 deed. -/
 keyword reconfigure (cost : Cost) : Ability := {
   lexical := { lemma := "reconfigure", parameters := [[Cost], [DashNonManaCost]] },
-  -- TODO(spelling): reconfigure [mana cost] / reconfigure—[verbal cost]; separator and terminal
-  -- period depend on the Cost structure.
+  spelling := "reconfigure <cost>",
   body :=
     [activatedOnlyDuring cost
         (attachTo thisPermanent

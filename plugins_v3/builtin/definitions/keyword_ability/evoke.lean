@@ -3,8 +3,7 @@ and "When this permanent enters, if its evoke cost was paid, its controller sacr
 [CR#702.74a] -/
 keyword evoke (cost : Cost) : Ability := {
   lexical := { lemma := "evoke", parameters := [[Cost], [DashNonManaCost]] },
-  -- TODO(spelling): evoke [mana cost] / evoke—[verbal cost]; separator and terminal period depend
-  -- on the Cost structure.
+  spelling := "evoke <cost>",
   body :=
     [ static (altCost this_ (some cost)),
       when (does thisPermanent enter)

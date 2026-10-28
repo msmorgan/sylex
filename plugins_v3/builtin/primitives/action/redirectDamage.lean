@@ -3,7 +3,7 @@
 -- [CR#614.9]
 primitive redirectDamage (cut : PreventCut) (to : NounPhrase)
     (damage : Option WouldClause := none) : Action := {
-  -- TODO(spelling): Context-dependent wording: <cut> [of <damage>] is dealt to <to> instead; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by damage.
   body :=
     Semantics.Primitives.Action.redirectDamage cut to damage
 }

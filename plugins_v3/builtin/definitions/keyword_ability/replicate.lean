@@ -4,8 +4,7 @@ each time its replicate cost was paid. If the spell has any targets, you may cho
 for any of the copies." [CR#702.56a] -/
 keyword replicate (cost : Cost) : Ability := {
   lexical := { lemma := "replicate", parameters := [[Cost], [DashNonManaCost]] },
-  -- TODO(spelling): replicate [mana cost] / replicate—[verbal cost]; separator and terminal
-  -- period depend on the Cost structure.
+  spelling := "replicate <cost>",
   body :=
     [static (addedCost cost true .anyNumberOfTimes),
       when

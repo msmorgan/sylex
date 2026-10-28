@@ -10,8 +10,7 @@ keyword typecycling (quality : Predicate) (cost : Cost) : Ability := {
     verbs := [{ lemma := "cycle", frames := [Monotransitive] }]
   },
   label := "cycling",
-  -- TODO(spelling): Islandcycling [cost] / basic landcycling [cost]; the Predicate needs a
-  -- lowercase bound stem rather than its ordinary rendered phrase.
+  spelling := "<quality>cycling <cost>",
   body :=
     [activated
         (compound [cost, perform (discard this_)])

@@ -1,6 +1,6 @@
 /-- "<spec> during [<whose>] untap step" -/
 template duringUntapStep (whose : Option NounPhrase) (spec : StaticSpec) : StaticSpec := {
-  -- TODO(spelling): Context-dependent wording: <spec> during [<whose>] untap step; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by whose.
   body :=
     partScope .untapStep whose spec
 }

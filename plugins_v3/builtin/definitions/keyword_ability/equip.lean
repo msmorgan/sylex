@@ -14,8 +14,7 @@ keyword equip (cost : Cost) : Ability := {
                }
              ]
   },
-  -- TODO(spelling): equip [mana cost] / equip—[verbal cost]; separator and terminal period depend
-  -- on the Cost structure.
+  spelling := "equip <cost>",
   body :=
     [ activatedOnlyDuring cost
         (attachTo thisPermanent (target (and [isCreature, youControl])))

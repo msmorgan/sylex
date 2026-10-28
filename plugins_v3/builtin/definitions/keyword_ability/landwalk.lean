@@ -7,8 +7,7 @@ keyword landwalk (quality : Predicate) : Ability := {
     parameters := [[], [Quality (Some ("of"))]],
     bound := { surface := "walk", stems := [LandType, CardType] }
   },
-  -- TODO(spelling): Islandwalk / nonbasic landwalk; the Predicate needs a lowercase bound stem
-  -- rather than its ordinary rendered phrase.
+  spelling := "<quality>walk",
   body :=
     [static
         (onlyWhile

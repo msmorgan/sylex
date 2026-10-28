@@ -3,7 +3,7 @@ Token characteristics are defined by the creating effect [CR#111.3]; the Incubat
 predefined double-faced Token [CR#111.10i]. -/
 template createDoubleFacedToken (front back : CharacteristicBundle)
     (riders : List MoveRider := []) : Action := {
-  -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
+  -- TODO(spelling): Format and coordinate the riders list entries, including the empty case.
   body :=
     createObject 1 (token (doubleFaced front back) riders)
       none

@@ -9,7 +9,7 @@ primitive cant (subj : Subject) (action : Action)
     (asThough : Option AsThough := none)
     (except : Option DeonticExcept := none)
     (causedBy : Option Causing := none) : StaticSpec := {
-  -- TODO(spelling): <subj> can't <action>; wording varies with asThough, causedBy, except, timing, requiring optional clauses, inflection or structure-dependent phrasing.
+  -- TODO(spelling): Include or omit the clauses supplied by timing, asThough, except, causedBy.
   body :=
     Semantics.Primitives.StaticSpec.cant subj action { timing := timing, asThough := asThough, except := except, cause := causedBy }
 }

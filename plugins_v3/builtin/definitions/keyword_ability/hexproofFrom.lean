@@ -4,8 +4,7 @@ ability, so it is written as hexproof with a quality (`Definition`, [CR#702.11d]
 keyword hexproofFrom (quality : Predicate) : Ability := {
   lexical := { lemma := "hexproof", parameters := [[], [Quality (Some ("from"))]] },
   label := "hexproof",
-  -- TODO(spelling): Hexproof from blue / hexproof from planeswalkers; the quality needs
-  -- context-dependent article or number inflection, not literal substitution.
+  spelling := "hexproof from <quality>",
   body :=
     [ static
         (cant

@@ -1,6 +1,6 @@
 /-- "to activate abilities [of <source>]" -/
 primitive toActivate (source : Option Predicate) : SpendPurpose := {
-  -- TODO(spelling): Context-dependent wording: to activate abilities [of <source>]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by source.
   body :=
     Semantics.Primitives.SpendPurpose.toActivate source
 }

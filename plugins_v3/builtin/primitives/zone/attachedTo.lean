@@ -1,4 +1,4 @@
 primitive attachedTo (host : NounPhrase) : MoveRider := {
-  -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
+  spelling := "attached to <host>",
   body := Semantics.Primitives.MoveRider.attachedTo host
 }

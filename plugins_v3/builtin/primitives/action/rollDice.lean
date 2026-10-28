@@ -2,7 +2,8 @@
 default `1` and "roll one or more dice" `anyAmount`. -/
 primitive rollDice (count : Amount := 1)
     (sides : DieSides := .sides 6) (watch : RollWatch := anyResult) : Action := {
-  -- TODO(spelling): Context-dependent wording: roll <count> <sides>-sided dice [and watch for <watch>]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): The watch selects an unqualified roll or a required outcome clause; sides may
+  -- name planar dice.
   body :=
     Semantics.Primitives.Action.rollDice count sides watch
 }

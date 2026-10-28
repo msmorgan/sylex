@@ -2,8 +2,8 @@
 planeswalker" split, or the controller of the permanent half. -/
 template splitOverPlaneswalker : NounPhrase := {
 
-  -- TODO(spelling): that player or that permanent's controller; the subject's union half selects
-  -- the phrase, which string substitution cannot branch on.
+  -- TODO(spelling): Select the player or the permanent's controller from the preceding subject's
+  -- union alternative.
   body :=
     eitherOf
       (pro (.unionHalf .player) .one)

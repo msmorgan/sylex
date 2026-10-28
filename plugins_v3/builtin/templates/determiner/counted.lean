@@ -1,6 +1,6 @@
 /-- "N …", "up to N …" -/
 template counted (q : Quantity) (p : Predicate) : NounPhrase := {
-  -- TODO(spelling): Context-dependent wording: N …; string substitution cannot express its omitted or inflected parts.
+  spelling := "<q> <p>",
   body :=
     described (count q none) p
 }

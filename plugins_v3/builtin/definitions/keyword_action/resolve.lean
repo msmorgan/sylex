@@ -13,8 +13,7 @@ slot only, which a replacement's would-clause has not. A countered spell's move 
 caused by no resolution [CR#701.6a], so none of the three applies to it. -/
 action resolve (subject : NounPhrase) : Action := {
 
-  -- TODO(spelling): <subject> resolves/resolve; string substitution cannot choose
-  -- subject-verb agreement for a singular spell versus multiple spells or abilities.
+  spelling := "<subject> resolves",
   body :=
     procedure .resolve subject itsOwnCost none none
       none

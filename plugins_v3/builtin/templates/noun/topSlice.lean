@@ -1,6 +1,6 @@
 /-- "the top N cards of your library" -/
 template topSlice (amount : Amount) : NounPhrase := {
-  -- TODO(spelling): the top N cards of your library; wording varies with amount, requiring optional clauses, inflection or structure-dependent phrasing.
+  spelling := "the top <amount> cards of your library",
   body :=
     slice .top amount (libraryOf you)
 }

@@ -4,7 +4,7 @@ control of target creature" and "target player gains control of …" (`instruct`
 -- [CR#613.1b]
 template gainControl (subject : NounPhrase) (duration : Option Duration := none)
     (controller : NounPhrase := theActor) : Action := {
-  -- TODO(spelling): Context-dependent wording: [<controller>] gain[s] control of <subject> [duration]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by duration.
   body :=
     establish (controlGrant controller subject) duration
 }

@@ -1,7 +1,7 @@
 /-- "<subject> becomes <added> in addition to its other types [until …]" -/
 template become (subject : NounPhrase) (added : CharacteristicBundle)
     (duration : Option Duration := none) : Action := {
-  -- TODO(spelling): Context-dependent wording: <subject> becomes <added> in addition to its other types [until …]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by duration.
   body :=
     establish
       (qualityChange subject .adds

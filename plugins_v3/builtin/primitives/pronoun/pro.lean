@@ -1,4 +1,5 @@
 primitive pro (reach : Reach) (plurality : Plurality) : NounPhrase := {
-  -- TODO(spelling): Pronoun form depends on reach, number, and the antecedent's grammatical features.
+  -- TODO(spelling): Select the pronoun from reach, plurality, and the antecedent's grammatical
+  -- role.
   body := Semantics.Primitives.NounPhrase.pro reach plurality
 }

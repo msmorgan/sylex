@@ -1,5 +1,5 @@
 /-- "target …" -/
 primitive target (quantity : Quantity) : DetPhrase := {
-  -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
+  spelling := "<quantity> target",
   body := Semantics.Primitives.DetPhrase.target quantity
 }

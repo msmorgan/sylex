@@ -1,4 +1,4 @@
 primitive attackUnblocked (defender : Option NounPhrase) : Action := {
-  -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
+  -- TODO(spelling): Include or omit the clauses supplied by defender.
   body := Semantics.Primitives.Action.attackUnblocked defender
 }

@@ -2,6 +2,6 @@
 -- [CR#603.12]
 primitive triggerReflexively (body triggerBody : Action)
     (event : Option GameEvent := none) : Action := {
-  -- TODO(spelling): Context-dependent wording: <body>. When you do, <trigger>; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by event.
   body := Semantics.Primitives.Action.triggerReflexively body event triggerBody
 }

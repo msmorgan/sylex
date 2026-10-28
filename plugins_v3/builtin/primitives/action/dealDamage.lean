@@ -1,7 +1,7 @@
 /-- "<subject> deals [<amount>] [<kind>] damage [to <to>]" -/
 primitive dealDamage (amount : Amount := anyAmount)
     (to : NounPhrase := any) (kind : Option DamageKind := none) : Action := {
-  -- TODO(spelling): Context-dependent wording: <subject> deals [<amount>] [<kind>] damage [to <to>]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by kind.
   body :=
     Semantics.Primitives.Action.dealDamage amount to kind
 }

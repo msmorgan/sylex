@@ -1,6 +1,6 @@
 /-- "each …" -/
 template each (p : Predicate) : NounPhrase := {
-  -- TODO(spelling): Context-dependent wording: each …; string substitution cannot express its omitted or inflected parts.
+  spelling := "each <p>",
   body :=
     described each p
 }

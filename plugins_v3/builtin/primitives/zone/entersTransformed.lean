@@ -1,4 +1,4 @@
 primitive entersTransformed  : MoveRider := {
-  -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
+  spelling := "transformed",
   body := Semantics.Primitives.MoveRider.entersTransformed
 }

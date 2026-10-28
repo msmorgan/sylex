@@ -1,6 +1,6 @@
 /-- "the number of times <subject>'s <keyword> cost was paid" -/
 template timesPaid (which : LinkSource) (subject : NounPhrase) : Amount := {
-  -- TODO(spelling): Context-dependent wording: the number of times <subject>'s <keyword> cost was paid; string substitution cannot express its omitted or inflected parts.
+  spelling := "the number of times <subject>'s <which> cost was paid",
   body :=
     paid (timesPaid which) subject
 }

@@ -3,7 +3,7 @@ you would create one or more tokens each turn" [CR#614.1]. -/
 -- [CR#614.1]
 primitive nthOccurrence (ordinal : Ordinal) (clause : WouldClause)
     (per : Option Period := none) : WouldClause := {
-  -- TODO(spelling): Context-dependent wording: the <ordinal> time <clause> [each <per>]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by per.
   body :=
     Semantics.Primitives.WouldClause.nthOccurrence ordinal per clause
 }

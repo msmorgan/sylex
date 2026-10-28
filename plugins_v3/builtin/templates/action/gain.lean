@@ -1,6 +1,6 @@
 template gain (subject : NounPhrase) (ability : Ability)
     (duration : Option Duration := none) : Action := {
-  -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
+  -- TODO(spelling): Include or omit the clauses supplied by duration.
   body :=
     establish
       (characteristicChange subject [addedAbilities [ability]]) duration

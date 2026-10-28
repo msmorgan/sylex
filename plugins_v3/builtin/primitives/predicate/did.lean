@@ -5,7 +5,7 @@ Participial Description reads ("the creature you sacrificed"). An `ordinal` pick
 primitive did (subj : Subject) (action : Action)
     (within : Option LookbackSpan := none) (ordinal : Option (Ordinal × Option Period) := none) :
     Predicate := {
-  -- TODO(spelling): Context-dependent wording: <subj> <action>ed [<within>]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by within, ordinal.
   body :=
     Semantics.Primitives.Predicate.did { subj := subj, action := action, within := within, ordinal := ordinal }
 }

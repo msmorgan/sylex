@@ -1,6 +1,6 @@
 /-- "a … of your choice" -/
 template aYourChoice (p : Predicate) : NounPhrase := {
-  -- TODO(spelling): Context-dependent wording: a … of your choice; string substitution cannot express its omitted or inflected parts.
+  spelling := "a <p> of your choice",
   body :=
     described (a .yourChoice) p
 }

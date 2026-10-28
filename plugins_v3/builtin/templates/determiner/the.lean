@@ -1,6 +1,6 @@
 /-- "the …" -/
 template the (p : Predicate) : NounPhrase := {
-  -- TODO(spelling): Context-dependent wording: the …; string substitution cannot express its omitted or inflected parts.
+  spelling := "the <p>",
   body :=
     described the p
 }

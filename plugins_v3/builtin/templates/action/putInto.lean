@@ -2,7 +2,8 @@
 its owner's control". -/
 template putInto (subject : NounPhrase) (destination : Location)
     (from_ : Option Location := none) (riders : List MoveRider := []) : Action := {
-  -- TODO(spelling): Context-dependent wording: put <subject> into <destination> [from <from_>] [<riders>]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by from_. Format and coordinate the riders
+  -- list entries, including the empty case.
   body :=
     zoneChange subject destination (Option.getD from_ wherever) riders
 }

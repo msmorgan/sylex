@@ -5,8 +5,7 @@ keyword cumulativeUpkeep (cost : Cost) : Ability := {
     parameters := [[Cost], [DashNonManaCost]],
     nouns := [{ lemma := "cumulative upkeep", countability := [Mass] }]
   },
-  -- TODO(spelling): cumulative upkeep [mana cost] / cumulative upkeep—[verbal cost]; separator
-  -- and terminal period depend on the Cost structure.
+  spelling := "cumulative upkeep <cost>",
   body :=
     [at_
         (beginningOf .upkeep (some you)

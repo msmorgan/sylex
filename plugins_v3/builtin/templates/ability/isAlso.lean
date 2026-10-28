@@ -1,6 +1,7 @@
 /-- "except it's <types> in addition to its other types" -/
 template isAlso (types : List CardType) (subtypes : List Subtype) : CopyExcept := {
-  -- TODO(spelling): except it's <types> in addition to its other types; wording varies with subtypes, requiring optional clauses, inflection or structure-dependent phrasing.
+  -- TODO(spelling): Format and coordinate the types, subtypes list entries, including the empty
+  -- case.
   body :=
     edits
       [typeLine .adds

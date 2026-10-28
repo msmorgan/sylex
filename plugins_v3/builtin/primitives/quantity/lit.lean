@@ -1,5 +1,5 @@
 /-- A literal integer amount. -/
 primitive lit (value : Int) : Amount := {
-  -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
+  spelling := "<value>",
   body := Semantics.Primitives.Amount.lit value
 }

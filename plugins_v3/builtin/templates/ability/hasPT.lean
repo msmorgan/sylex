@@ -1,6 +1,6 @@
 /-- "except it's <power>/<toughness>" -/
 template hasPT (power toughness : Amount) : CopyExcept := {
-  -- TODO(spelling): Context-dependent wording: except it's <power>/<toughness>; string substitution cannot express its omitted or inflected parts.
+  spelling := "except it's <power>/<toughness>",
   body :=
     edits
       [stat .sets .power power,

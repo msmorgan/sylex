@@ -3,7 +3,7 @@ before the permanent enters [CR#603.6d,614.1c,614.12a]. -/
 -- [CR#603.6d,614.1c,614.12a]
 template entryChoice (subject chosen : NounPhrase) (disclosure : Disclosure := .openly) :
     StaticSpec := {
-  -- TODO(spelling): Context-dependent wording: As <subject> enters, [secretly] choose <chosen>; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): The disclosure selects whether 'secretly' precedes the choice instruction.
   body :=
     replace
       (would (actor subject) enter)

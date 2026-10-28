@@ -1,4 +1,4 @@
 primitive soChooses (chooser : NounPhrase) : Condition := {
-  -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
+  spelling := "<chooser> so chooses",
   body := Semantics.Primitives.Condition.soChooses chooser
 }

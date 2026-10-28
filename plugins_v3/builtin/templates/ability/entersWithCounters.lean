@@ -1,7 +1,7 @@
 /-- "<subject> enters with N <kind> counters on it" -/
 template entersWithCounters (subject : NounPhrase) (amount : Amount) (kind : CounterKind) :
     StaticSpec := {
-  -- TODO(spelling): <subject> enters with N <kind> counters on it; wording varies with amount, requiring optional clauses, inflection or structure-dependent phrasing.
+  spelling := "<subject> enters with <amount> <kind> counters on it",
   body :=
     enters subject
       [withCounters amount (printedKind kind) .fresh]

@@ -6,8 +6,7 @@ battlefield as the spell resolves [CR#608.3g], controlled by the spell's control
 its own. -/
 keyword blitz (cost : Cost) : Ability := {
   lexical := { lemma := "blitz", parameters := [[Cost], [DashNonManaCost]] },
-  -- TODO(spelling): blitz [mana cost] / blitz—[verbal cost]; separator and terminal period depend
-  -- on the Cost structure.
+  spelling := "blitz <cost>",
   body :=
     [ static (altCost this_ (some cost)),
       static

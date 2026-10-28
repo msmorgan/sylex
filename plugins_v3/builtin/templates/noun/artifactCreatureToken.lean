@@ -3,9 +3,8 @@
 template artifactCreatureToken (power toughness : Nat) (colors : List Color)
     (subtypes : List Subtype) (abilities : List Ability := []) : CharacteristicBundle := {
 
-  -- TODO(spelling): <power>/<toughness> <colors> <subtypes> artifact creature token with
-  -- <abilities>; optional colors/abilities, coordination, and token number require conditional
-  -- realization.
+  -- TODO(spelling): Format and coordinate the colors, subtypes, abilities list entries, including
+  -- the empty case.
   body :=
     {
       characteristics :=

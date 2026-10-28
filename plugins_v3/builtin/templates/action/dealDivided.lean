@@ -1,7 +1,7 @@
 /-- "<source> deals N damage divided as you choose among <among>" -/
 template dealDivided (source : NounPhrase) (amount : Amount) (among : NounPhrase) :
     Action := {
-  -- TODO(spelling): <source> deals N damage divided as you choose among <among>; wording varies with amount, requiring optional clauses, inflection or structure-dependent phrasing.
+  spelling := "<source> deals <amount> damage divided as you choose among <among>",
   body :=
     distribute (damage source) amount among
 }

@@ -1,6 +1,6 @@
 /-- "a …" -/
 template a (p : Predicate) : NounPhrase := {
-  -- TODO(spelling): Context-dependent wording: a …; string substitution cannot express its omitted or inflected parts.
+  spelling := "a <p>",
   body :=
     described (a .unmarked) p
 }

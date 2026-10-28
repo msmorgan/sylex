@@ -7,7 +7,7 @@ primitive can (subj : Subject) (action : Action)
     (asThough : Option AsThough := none)
     (except : Option DeonticExcept := none)
     (rider : Option Action := none) : StaticSpec := {
-  -- TODO(spelling): <subj> can <action>; wording varies with asThough, except, rider, timing, requiring optional clauses, inflection or structure-dependent phrasing.
+  -- TODO(spelling): Include or omit the clauses supplied by timing, asThough, except, rider.
   body :=
     Semantics.Primitives.StaticSpec.can subj action { timing := timing, asThough := asThough, except := except, rider := rider }
 }

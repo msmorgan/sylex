@@ -4,7 +4,7 @@
 -- [CR#122.5]
 primitive moveCounters (amount : Amount) (source destination : NounPhrase)
     (kind : Option CounterKindSource := none) : Action := {
-  -- TODO(spelling): Context-dependent wording: move <amount> [<kind>] counters from <source> onto <destination>; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by kind.
   body :=
     Semantics.Primitives.Action.moveCounters amount kind source destination
 }

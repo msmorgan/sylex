@@ -16,8 +16,7 @@ keyword partnerWith (quality : Predicate) : Ability := {
                   { lemma := "doctor's companion" }
                 ]
   },
-  -- TODO(spelling): Partner with [card name]; quality is a named Predicate, so the spelling
-  -- must extract its name rather than substitute the rendered predicate.
+  spelling := "partner with <quality>",
   body :=
     [when
         (does (actor thisPermanent) enter)

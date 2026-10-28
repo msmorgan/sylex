@@ -4,8 +4,8 @@ was paid, [effect]" on a permanent, and "If this spell’s gift cost was paid, [
 instant or sorcery spell. [CR#702.174b] -/
 keyword gift (promise : Action) : Ability := {
   lexical := { lemma := "gift", parameters := [[Quality (None)]], nouns := ["gift"] },
-  -- TODO(spelling): Gift a card / gift a tapped Fish; the promised Action must select a licensed
-  -- noun phrase, not print an action clause.
+  -- TODO(spelling): Extract the promised gift's noun phrase from the Action; substituting its
+  -- action clause is not gift wording.
   body :=
     [static
         (addedCost (perform (choose anOpponent))

@@ -7,8 +7,8 @@ keyword craft (cost : Cost) : Ability := {
     parameters := [[Quality (Some ("with")), Cost]],
     verbs := [{ lemma := "craft", frames := [Monotransitive] }]
   },
-  -- TODO(spelling): Craft with [materials] [cost]; the Cost combines material selection and
-  -- payment, which require structural decomposition.
+  -- TODO(spelling): The cost must be decomposed into the materials after 'with' and the remaining
+  -- payment.
   body :=
     []
 }

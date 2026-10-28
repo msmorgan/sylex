@@ -1,6 +1,7 @@
 /-- "<player>'s life total becomes <amount>" -/
 template setLife (amount : Amount) : Action := {
-  -- TODO(spelling): Context-dependent wording: <player>'s life total becomes <amount>; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): The Actor supplies the possessor of 'life total'; no subject parameter is
+  -- available in this declaration.
   body :=
     changeLife (setTo amount)
 }

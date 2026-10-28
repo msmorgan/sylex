@@ -3,8 +3,7 @@ marked on it and tap it. If it's an attacking or blocking creature, remove it fr
 [CR#701.19a], the deed "can't be regenerated" forbids. Activating or casting what creates a
 shield is not regenerating (`regenerate`, [CR#701.19c]) (`Definition`). -/
 action regeneration (subject : NounPhrase) : Action := {
-  -- TODO(spelling): the regeneration of <subject>; this is shield application, not the Oracle
-  -- instruction that creates a regeneration shield.
+  spelling := "the regeneration of <subject>",
   lexical := { verbs := [{ lemma := "regenerate", frames := [Intransitive, Monotransitive] }] },
   deed := "regenerate",
   body :=

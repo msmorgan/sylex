@@ -4,8 +4,7 @@ cost was paid, exile this card instead of putting it anywhere else any time it w
 stack" [CR#702.34a]. -/
 keyword flashback (cost : Cost) : Ability := {
   lexical := { lemma := "flashback", parameters := [[Cost], [DashNonManaCost]] },
-  -- TODO(spelling): flashback [mana cost] / flashback—[verbal cost]; separator and terminal
-  -- period depend on the Cost structure.
+  spelling := "flashback <cost>",
   body :=
     [static
         (can (actor you)

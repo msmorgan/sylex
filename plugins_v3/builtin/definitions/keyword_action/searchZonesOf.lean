@@ -3,8 +3,7 @@
 `inCaller` opts out of generated identity. Whether the search selection should be bound
 is an open owner question; this preserves the existing expansion. -/
 action searchZonesOf (whose : NounPhrase) (for_ : NounPhrase) : Action := {
-  -- TODO(spelling): search <whose>'s graveyard, hand, and library for <for_>; string substitution
-  -- cannot form possessives.
+  spelling := "search <whose>'s graveyard, hand, and library for <for_>",
   lexical := { verbs := [{ lemma := "search", frames := [(TransitiveWithPP ["for"]), Monotransitive, (Prepositional ["for"])] }] },
   deed := "search",
   body :=

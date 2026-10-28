@@ -1,5 +1,5 @@
 template pip (color : Color) : ManaSymbol := {
-  -- TODO(spelling): No fixed surface wording; this helper composes semantic structure.
+  spelling := "{<color>}",
   body :=
     .simple (.specific (.of color))
 }

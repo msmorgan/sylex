@@ -1,4 +1,4 @@
 primitive hasPriority (player : NounPhrase) : Condition := {
-  -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
+  spelling := "<player> has priority",
   body := Semantics.Primitives.Condition.hasPriority player
 }

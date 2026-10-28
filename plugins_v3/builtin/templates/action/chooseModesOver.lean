@@ -7,7 +7,7 @@ before targets [CR#601.2b,601.2c] and a mode's targets are chosen only if it is
 -- [CR#700.2a,700.2c]
 template chooseModesOver {α : Type} (quantity : Quantity) (items : List α)
     (frame : splice (α → Action)) : Action := {
-  -- TODO(spelling): Choose N. <frame>; wording varies with items, quantity, requiring optional clauses, inflection or structure-dependent phrasing.
+  -- TODO(spelling): Format and coordinate the items list entries, including the empty case.
   body :=
     actionChooseModes quantity (List.map (fun (item : α) => (none, none, frame item)) items)
 }

@@ -4,7 +4,7 @@
 primitive replace (event : WouldClause) (replacement : Replacement)
     (timing : Option Timing := none) (use : ReplUse := .repeatedly)
     (limit : Option UsageLimit := none) : StaticSpec := {
-  -- TODO(spelling): Context-dependent wording: If <event> would …, <replacement> instead; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by timing, limit.
   body :=
     Semantics.Primitives.StaticSpec.replace event replacement timing use limit
 }

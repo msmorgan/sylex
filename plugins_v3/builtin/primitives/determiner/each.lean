@@ -1,5 +1,5 @@
 /-- "each …" -/
 primitive each  : DetPhrase := {
-  -- TODO(spelling): Structural constructor; surface wording belongs to its phrasing templates.
+  spelling := "each",
   body := Semantics.Primitives.DetPhrase.each
 }

@@ -4,8 +4,7 @@ Assassin creature or a commander under your control." [CR#702.173a] The lookback
 reads the creature as it dealt the damage, as prowl's does. -/
 keyword freerunning (cost : Cost) : Ability := {
   lexical := { lemma := "freerunning", parameters := [[Cost], [DashNonManaCost]] },
-  -- TODO(spelling): freerunning [mana cost] / freerunning—[verbal cost]; separator and terminal
-  -- period depend on the Cost structure.
+  spelling := "freerunning <cost>",
   body :=
     [static
         (onlyWhile (altCost this_ (some cost))

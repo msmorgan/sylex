@@ -9,7 +9,7 @@ A keyword with variants grants each of them through `keywordGrant` [CR#702.1c]. 
 -- [CR#702.1c]
 template alsoForKeywords (body : KeywordTerm → Ability)
     (keywords : List KeywordTerm := []) : Ability := {
-  -- TODO(spelling): Context-dependent wording: <the ability, for the first keyword>. The same is true for <the other keywords>.; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Format and coordinate the keywords list entries, including the empty case.
   body :=
     have parts := List.map body keywords;
     have actions :=

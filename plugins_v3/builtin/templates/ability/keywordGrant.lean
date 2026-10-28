@@ -4,7 +4,8 @@ that the objects `holders` describes have, "the <term> abilities of those object
 -- [CR#702.1c]
 template keywordGrant (subject : NounPhrase) (term : KeywordTerm)
     (holders : Predicate) : StaticSpec := {
-  -- TODO(spelling): <subject> has <term>; wording varies with holders, requiring optional clauses, inflection or structure-dependent phrasing.
+  -- TODO(spelling): A bare term grants the keyword; a family term instead names the abilities of
+  -- holders.
   body :=
     match term with
     | Semantics.KeywordTerm.the label => abilityGrant subject (keyword label)

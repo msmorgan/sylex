@@ -2,8 +2,7 @@
 [CR#701.11b,701.11c]). -/
 action tripleToughness (subject : NounPhrase) (duration : Option Duration := none) :
     Action := {
-  -- TODO(spelling): triple <subject>'s toughness [<duration>]; string substitution cannot form
-  -- possessives or omit an absent duration.
+  -- TODO(spelling): Include or omit the clauses supplied by duration.
   lexical := { verbs := [{ lemma := "triple", frames := [Monotransitive] }] },
   deed := "triple",
   body :=

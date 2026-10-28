@@ -3,7 +3,7 @@ ability it is ("a triggered ability of a creature you control") is `Predicate.ab
 description, and what made it trigger is a cause. -/
 -- [CR#603.2]
 template triggers (ability : NounPhrase) (by_ : Option NounPhrase := none) : GameEvent := {
-  -- TODO(spelling): Context-dependent wording: <ability> triggers [by <cause>]; string substitution cannot express its omitted or inflected parts.
+  -- TODO(spelling): Include or omit the clauses supplied by by_.
   body :=
     match by_ with
     | none => does (actor ability) trigger

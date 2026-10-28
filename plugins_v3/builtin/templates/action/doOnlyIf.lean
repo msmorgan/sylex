@@ -6,6 +6,6 @@ as it resolves [CR#601.2c,608.2c]. -/
 -- [CR#601.2c,608.2c]
 template doOnlyIf (action : Action) (condition : Condition)
     (otherwise : Option Action := none) : Action := {
-  -- TODO(spelling): <action> if <condition>; wording varies with otherwise, requiring optional clauses, inflection or structure-dependent phrasing.
+  -- TODO(spelling): Include or omit the clauses supplied by otherwise.
   body := doIf condition action otherwise true
 }

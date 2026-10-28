@@ -3,7 +3,7 @@ trigger [CR#706.2,706.2a,113.3c]. `limit` is a printed "only once each turn". -/
 -- [CR#706.2,706.2a,113.3c]
 template after (roll : GameEvent) (modify : Action) (limit : Option UsageLimit := none) :
     Ability := {
-  -- TODO(spelling): After <roll>, <modify>; wording varies with limit, requiring optional clauses, inflection or structure-dependent phrasing.
+  -- TODO(spelling): Include or omit the clauses supplied by limit.
   body :=
     static (rollModifier roll modify limit)
 }

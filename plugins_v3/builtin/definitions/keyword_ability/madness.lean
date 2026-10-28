@@ -4,8 +4,7 @@ may cast it by paying [cost] rather than paying its mana cost. If that player do
 this card into their graveyard." [CR#702.35a] -/
 keyword madness (cost : Cost) : Ability := {
   lexical := { lemma := "madness", parameters := [[Cost], [DashNonManaCost]] },
-  -- TODO(spelling): madness [mana cost] / madness—[verbal cost]; separator and terminal period
-  -- depend on the Cost structure.
+  spelling := "madness <cost>",
   body :=
     [static
         (replace

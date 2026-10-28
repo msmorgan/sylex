@@ -3,8 +3,7 @@ buyback cost was paid, put this spell into its owner's hand instead of into that
 graveyard as it resolves." [CR#702.27a] -/
 keyword buyback (cost : Cost) : Ability := {
   lexical := { lemma := "buyback", parameters := [[Cost], [DashNonManaCost]] },
-  -- TODO(spelling): buyback [mana cost] / buyback—[verbal cost]; separator and terminal period
-  -- depend on the Cost structure.
+  spelling := "buyback <cost>",
   body :=
     [static (addedCost cost true .once),
       static

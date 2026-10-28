@@ -4,8 +4,7 @@ under your control since then unless you have controlled it continuously since t
 is of this permanent's echo cost, which a replacement or a trigger on paying it reads. -/
 keyword echo (cost : Cost) : Ability := {
   lexical := { lemma := "echo", parameters := [[Cost], [DashNonManaCost]] },
-  -- TODO(spelling): echo [mana cost] / echo—[verbal cost]; separator and terminal period depend
-  -- on the Cost structure.
+  spelling := "echo <cost>",
   body :=
     [at_ (beginningOfYour .upkeep)
         (doUnlessKeywordCost (sacrifice thisPermanent) cost

@@ -10,8 +10,7 @@ keyword warp (cost : Cost) : Ability := {
     parameters := [[Cost], [DashNonManaCost]],
     verbs := [{ lemma := "warp", frames := [Monotransitive] }]
   },
-  -- TODO(spelling): warp [mana cost] / warp—[verbal cost]; separator and terminal period depend
-  -- on the Cost structure.
+  spelling := "warp <cost>",
   body :=
     [ static (onlyWhile (altCost this_ (some cost))
         (is this_ (did any (cast which (from_ := yourHand)) thisObject))),
