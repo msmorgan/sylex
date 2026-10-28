@@ -29,20 +29,32 @@ all of it single-threaded. The measurements below are from 2026-10-28, on a 24-c
      `Expr` objects in `Abilities.olean`.
    - Record in `lean/CONTRACTS.md` that recursion over the spine must use fuel. Structural
      recursion over it then fails loudly instead of puzzling the next author.
-2. **Shard `Semantics.Cards` into deterministic modules.**
+2. **Give `Semantics.Definitions` its own `lean_lib`.**
+   - `needs = ["builtinBundle"]` sits on the whole `Semantics` library. Lake hashes that input
+     into every module of the library, so any builtin edit rebuilds `Abilities.lean` (~41 s) and
+     `Check/Phrase.lean` (~25 s), though only `Definitions.lean` reads the bundle.
+   - Move `Semantics.Definitions` into a library of its own carrying the `needs`, and drop it
+     from `Semantics`.
+3. **Shard `Semantics.Cards` into deterministic modules.**
    - Assign each card to a shard by a stable hash of its filename (16 shards for now). Adding a
      card must not move any other card.
    - Each shard tracks only its own files as build inputs. The current single `canonBundle`
      `input_dir` covers all of `plugins_v3/canon`, which would rebuild every shard on any edit.
+     - In Lake 5.0, `needs` is per library, and TOML `input_dir` filters support only
+       `startsWith`, `endsWith` and `mem`. So each shard is its own `lean_lib` with its own
+       `input_dir`.
+     - Assign files to shards either in `lakefile.lean`, with a filter that computes the shard,
+       or through generated `mem` lists in `lakefile.toml`, plus a check that fails when a card
+       file is in no list.
    - `Semantics.Cards` becomes an umbrella that imports the shards, and `cardNamed` resolves a
      card in any shard.
-3. **Stop generating code for card constants.**
+4. **Stop generating code for card constants.**
    - Add `noncomputable` to the modifiers when `kind == card` (`Authoring.lean` around `:1584`).
    - `elabSpelled` runs `evalExpr` on the `Card` term before the `Spelled` `def` is added, and
      `Spelled.ok` is a `Prop` field checked by the kernel, so neither needs compiled code for the
      constant. Keep it that way.
    - Test: a failing card still reports its refusals.
-4. **Decouple the proofs from `Semantics.Cards`.**
+5. **Decouple the proofs from `Semantics.Cards`.**
    - Delete the three dead imports (`CardsCopy`, `CardsMana`, `CardsPiles`).
    - Move the shared bench helpers into `Proofs/CardsHelpers.lean`, breaking the 7-deep chain
      and the imports of `Cards*` modules from `Anaphora`, `Damage`, `Deontic`, `Keyword`,
@@ -64,21 +76,27 @@ all of it single-threaded. The measurements below are from 2026-10-28, on a 24-c
      `(cardNamed "Frost Walker").card.check = []`, and the same for "Segmented Wurm" and
      "Angelic Cub". Retire them, naming each one: the card's `Spelled.ok` already proves exactly
      this when the card loads.
-   - Proofs that need canon cards load just those cards with a targeted command, e.g.
-     `load_cards ["Saw in Half", …]`, reading the real files.
+   - Proofs that need canon cards import only the shard modules that hold those cards.
+     - Do not load card files from inside a proof module (`load_cards`, `IO.FS.readFile`). Lake
+       does not track files an elaborator reads, so the proof would not rebuild when its card
+       changed. Each such module would also re-prove its cards' kernel `decide` (about 65 s
+       across the 123 card uses).
+     - Importing a shard keeps both the dependency and the proof single. If a card moves to
+       another shard, the proof fails to find it with `cardNamed` and must update its import:
+       loudly, never silently.
      - Never copy card terms into proof files: a copy would let a proof pass against a stale
-       card. That applies to the 61 `(cardNamed …).card` sub-term extractions too, which take
-       their terms from the loaded cards.
-     - Loading the same card in two modules that a third imports must not declare it twice. Use
-       per-module namespacing, or a small shared fixture module.
+       card. That applies to the 61 `(cardNamed …).card` sub-term extractions too, which keep
+       reading the imported cards.
 
 ## Acceptance
 
 - `cargo xtask lean check` passes with no warnings, and no theorem depends on
   `Lean.ofReduceBool`.
-- No module in `lean/Semantics/Proofs/` imports `Semantics.Cards`.
+- No module in `lean/Semantics/Proofs/` imports the `Semantics.Cards` umbrella, and none reads
+  card files directly.
 - No `recOn`, `below`, `brecOn` or `termination_by` over the spine types; checked by grep.
-- Touching one canon card rebuilds exactly one shard and no proof module that does not load
-  that card.
+- Touching one canon card rebuilds exactly one shard and only the proof modules that import
+  that shard.
+- Touching one builtin file does not rebuild `Abilities.lean` or `Check/*`.
 - Per-module build times before and after are recorded in the change description. The target is
   about 3 minutes wall-clock for a clean `lean check`.

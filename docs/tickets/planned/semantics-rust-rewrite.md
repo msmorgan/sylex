@@ -6,15 +6,15 @@ needs: [plugins-v3-data-language, lean-v3-active-player-term, lean-v3-binding-ac
 Standard constraints apply. This is an epic, and needs a design dialogue before it is split into
 tickets.
 
-Delete `deckmaste_semantics_v3` and `deckmaste_lowering_v3`. Their only outside user is
-`xtask expansions`, which goes too; `lean-elaborated-value-dump` replaces it. Rebuild as three
+`plugins-v3-data-language` deletes `deckmaste_semantics_v3`, `deckmaste_lowering_v3` and
+`xtask expansions` when it converts the files. This epic starts from that state and builds three
 crates:
 
 - **`semantics`** parses the `plugins-v3-data-language` grammar into its AST and expands
   Templates and Definitions. It does no reference resolution.
 - **`discourse`** implements the DRT referent resolution of `docs/decisions/semantics-v3.md` §1
   and §3 in Rust. Lean is never in the hot path of card compilation, so this is a
-  reimplementation, not a reader of Lean output. `deckmaste_lowering_v3` already has part of it.
+  reimplementation, not a reader of Lean output. The deleted `deckmaste_lowering_v3` had part of it; recover what is useful from jj history.
 - **`lowering`** translates the resolved AST to the `deckmaste_core` representation. Its seams
   are as already designed in `lowering-v3`: regions, `ownScope` to `Action::Composite`, the
   action-clause spine, and so on.

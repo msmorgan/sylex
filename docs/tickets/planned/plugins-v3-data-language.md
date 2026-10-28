@@ -1,5 +1,5 @@
 ---
-needs: [lean-build-speed, lean-elaborated-value-dump, plugins-v3-expansion-baseline-recursive-samples]
+needs: [lean-build-speed, lean-elaborated-value-dump]
 ---
 # [design] `plugins_v3` as a data language whose files are their own AST
 
@@ -66,12 +66,19 @@ simplicity.
 
 ## Implementation, once settled
 
-- **Oracle.** Before converting:
-  - save the Rust expansion baseline (`cargo xtask expansions --out …/before`), the last use of
-    the old crate;
-  - save the Lean dump (`lean-elaborated-value-dump`).
+- **Oracle.** Save the Lean dump (`lean-elaborated-value-dump`) before converting. Afterwards it
+  must show 0 differences under the conversion's rename map. The Rust `xtask expansions` cannot
+  read the converted files, so it is no oracle here.
+- **Delete the old Rust crates in this same change, right after the conversion.** The old Rust
+  parser cannot read the converted files, so these would fail `cargo test` from the moment the
+  files change:
+  - `deckmaste_semantics_v3` and `deckmaste_lowering_v3`, including their tests
+    (`tests/bundle.rs`, `tests/lower.rs`);
+  - `xtask expansions`;
+  - `crates/xtask/tests/suite/plugins_v3_declarations.rs`.
 
-  After converting, the Lean dump must show 0 differences under the conversion's rename map.
+  If the conversion uses the old crate as its emitter, run it first, then delete. Delete any
+  ticket text that still names these crates as live.
 - **Delete** `AuthoringContext`, `Authoring.inspect`, `Authoring.Form` (unless question 5 keeps a
   parse-tree form), `onlyAuthored`, `primitive_boundary%`, `splice`/`CallerSplice`, and the scoped
   `term_elab` hooks. Rewrite or retire `Proofs/Authoring.lean` and `Proofs/CallerScope.lean` to
