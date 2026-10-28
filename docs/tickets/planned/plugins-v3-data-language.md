@@ -62,8 +62,12 @@ simplicity.
    `Proofs/UntapStep.lean`), or retire those pins in favour of tests on the parse tree.
 6. **The dependency graph and builtin modules.** Do not do file discovery or dependency
    sorting inside a Lean elaborator.
-   - `cargo xtask lean gen` (`lean-generated-canon-modules`) parses the builtin in the new
-     grammar and writes gitignored Lean modules with real `import`s.
+   - The Lake generator from `lean-generated-canon-modules` (a `lakefile.lean` target behind the
+     `Module.inputFacet` override, ending with `setTrace .nil`) parses the builtin in the new
+     grammar. It writes gitignored Lean modules with real `import`s.
+   - One module per component makes module names change as the builtin changes. That also
+     requires overriding `LeanLib.modulesFacet`, so the library awaits the generator before
+     listing its modules. Add a case for it to the generator's regression test.
    - Each strongly connected component of the possibly over-approximate dependency graph becomes
      one module, so a false edge only merges two modules instead of failing.
    - Delete `load_bundle`, `topoSortBundle`, `referencedIdents`, the directory walk and the

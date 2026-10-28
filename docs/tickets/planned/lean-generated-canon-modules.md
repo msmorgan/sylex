@@ -1,72 +1,128 @@
 ---
 needs: [lean-module-layering]
 ---
-# Generate real Lean modules for canon cards, splitting card data from card checks
+# Generate canon card modules inside Lake, and split the build into targets
 
 Standard constraints apply. This is the second half of the Lean build speedup, after
 `lean-module-layering`.
 
-Today `Semantics.Cards` runs `load_bundle "../plugins_v3/canon"`, which reads all 908 card files
-with `IO.FS.readFile` inside one elaborator, on one core.
+## The defect
 
-- Lake cannot see files an elaborator reads, so tracking happens only through the library-wide
-  `canonBundle` input. Any card edit rebuilds the whole module (~4.2 min).
+`Semantics.Cards` runs `load_bundle "../plugins_v3/canon"`. That reads all 908 card files with
+`IO.FS.readFile` inside one elaborator, on one core.
+
+- Lake cannot see files an elaborator reads. Tracking happens only through the library-wide
+  `canonBundle` input, so any card edit rebuilds the whole module (~4.2 min).
 - About 223 s of that is kernel `decide` on `Card.check card = []`, run inside `elabSpelled`
   together with elaboration. So checker edits re-elaborate every card.
 - 32 proof modules import the whole module.
+- `defaultTargets` builds everything, proofs included, on every `lake build`.
 
 ## Rulings (owner, 2026-10-28)
 
-- **Generation is run by `xtask`.** `cargo xtask lean gen` writes gitignored `.lean` modules
-  before `lake` runs. `cargo xtask lean check` runs gen first, and `scripts/provision-workspace`
-  runs it so fresh workspaces work with lean-lsp at once. Making generation Lake-native is a
-  follow-up: `lean-lake-native-generation`.
+- **Generation is part of Lake.** A bare `lake build` and the Lean language server
+  (`lake setup-file`) must pick up plugin edits on their own, with no `xtask` step and no
+  watcher. This replaces `lean-lake-native-generation`, which is deleted.
 - **Card proofs stay kernel `decide`.** No `native_decide` and no `Lean.ofReduceBool`. The canon
   is expected to shrink, but Lean will later check card definitions produced by the CxG layer,
-  heading toward the 32k corpus. The Data/Check split below keeps that open: a compiled verifier
-  could replace or augment the Check side alone (`lean-compiled-card-verifier`, maybe).
+  heading toward the 32k corpus. Keeping data separate from checks leaves room for a compiled
+  verifier on the Check side (`lean-compiled-card-verifier`, maybe).
+- **Proofs are not built by default.** The default `lake build` is the fast loop.
+
+## Lake mechanics
+
+Verified on Lean 4.35 / Lake 5.0, by reading the Lake source under
+`~/.elan/toolchains/leanprover--lean4---v4.35.0/src/lean/lake/` and by throwaway experiments
+(Antigravity consult, 2026-10-28). Paths below are relative to that directory.
+
+- **`extraDepTargets` alone is unsafe.**
+  - When a library is built directly, `Module.recFetchInput` (`Lake/Build/Module.lean:30-38`)
+    reads and hashes each module's `.lean` source before `recFetchPreSetup` awaits the library's
+    `extraDep` (`:557-571`).
+  - So a generator run as an extra dependency rewrites a shard after Lake has already hashed the
+    old text. The stale `.olean` is kept. On a clean tree, the build fails on the missing file.
+- **Override `Module.inputFacet` in `lakefile.lean`.** Make it await `mod.lib.extraDep.fetch`
+  before reading `mod.leanFile`. Every path through a module then sees freshly generated source.
+  - Lake folds package facet declarations over its built-in facets
+    (`Lake/Load/Workspace.lean:39`), so a `module_facet` with that name replaces the built-in one.
+  - The paths covered include `lake build`, `lake setup-file`, `lake lean` and transitive imports.
+- **The generator target calls `setTrace .nil`.** `recFetchPreSetup` mixes the library's
+  `extraDep` trace into every module's trace (`Lake/Build/Module.lean:603`). With a non-empty
+  trace, any card edit would rebuild every shard. With `.nil`, each shard rebuilds only when its
+  own generated text changes.
+- **The language server picks edits up.** `lake setup-file` runs the generator: through
+  `setupEditedModule` (`Lake/Build/Module.lean:1433-1442`) for the edited file's library, and
+  through import fetching for every imported library. `lake lean` runs it too. `lake env` does
+  not, and nothing depends on that.
 
 ## Changes
 
-- **Generator.** `cargo xtask lean gen` reads `plugins_v3/canon/cards/` and writes gitignored
-  modules. It rewrites only files whose content changed, so Lake's hashes stay stable.
-  - **`Semantics/Cards/Data/<Card>.lean`**, only for cards a proof uses. Find those from
-    `cardNamed "…"` uses under `lean/Semantics/Proofs/`. Each defines the card's `noncomputable`
-    `Card` constant. It imports `Semantics.Definitions` and never `Semantics.Check`.
-    - Module names are a deterministic, identifier-safe mangling of the printed name, because
-      Lean module names cannot hold spaces or `//`.
-    - The generator writes the name-to-module map next to the modules.
-  - **`Semantics/Cards/Data/ShardNN.lean`** (16 shards, by a stable hash of the filename, so
-    adding a card moves no other). Each defines its remaining cards, and imports, never
-    restates, the per-card modules of its cards. Every card is elaborated exactly once.
-  - **`Semantics/Cards/Check/ShardNN.lean`** imports its data shard and `Semantics.Check.Card`.
-    For each card it runs the `evalExpr` refusal report (readable failures) and proves
-    `theorem ok_<card> : <card>.check = [] := by decide`.
-  - **`Semantics/Cards.lean`** becomes an umbrella that imports the check shards. `cardNamed`
-    resolves through the data modules.
-  - **Source positions.** Each generated module copies the source verbatim under a header naming
-    its original path and line offset. `xtask lean` maps reported positions, parser errors
-    included, back to the `plugins_v3/` file and line.
-  - **Staleness.** Each generated module records the hash of its sources. A bare `lake build` run
-    on stale modules fails with a message to run `cargo xtask lean gen`.
-- **Delete** the canon `load_bundle` use, any `load_cards`, and the `canonBundle` `input_dir`.
-- **Proofs** that inspect canon cards import `Semantics.Cards.Data.<Card>` and never the
-  umbrella or the shards. They do not wait on any card proofs, and they never re-elaborate or
-  re-prove a card.
-- **Retire or rewrite** the proof tests that exercise canon `load_bundle` itself (in
-  `Proofs/Authoring.lean`), naming each one. The builtin `load_bundle` remains until
-  `plugins-v3-data-language` generates the builtin as modules too.
+1. **Convert `lean/lakefile.toml` to `lean/lakefile.lean`,** keeping its options and libraries.
+2. **`target genCanon`** is written in Lean inside `lakefile.lean`, with no Cargo in the loop. It
+   reads `plugins_v3/canon/cards/` and writes gitignored modules, rewriting only files whose text
+   changed. It ends with `setTrace .nil`.
+   - **Fixed module names only.** Lake must know the module set before it builds, so a card edit
+     never changes it.
+   - **`Semantics/Cards/Data/Fixtures.lean`** holds every card that a proof references. That set
+     is found from `cardNamed "…"` uses under `lean/Semantics/Proofs/`, or from a committed
+     manifest the generator checks against them; choose one.
+   - **`Semantics/Cards/Data/Shard00..15.lean`** hold the rest. Assign each card by a stable hash of
+     its filename, so adding a card moves no other card. Cards in `Fixtures` are excluded, so each
+     card is elaborated exactly once.
+   - Data modules define `noncomputable` `Card` constants, import `Semantics.Definitions`, and
+     never import `Semantics.Check`.
+   - **`Semantics/Cards/Check/Fixtures.lean`** and **`Check/Shard00..15.lean`** each import their
+     data module and `Semantics.Check.Card`. For each card they run the `evalExpr` refusal report
+     and prove `theorem ok_<card> : <card>.check = [] := by decide`.
+   - Above each generated card, write `-- source: plugins_v3/canon/cards/<file>.lean:<line>`. The
+     source text follows verbatim, so an error at a generated line reads straight back to its
+     origin.
+3. **Override `Module.inputFacet`** as described above, in about 15 lines. Comment it with the
+   Lake source references, because it depends on Lake's internal facet wiring.
+4. **Delete** the canon `load_bundle` use, any `load_cards`, and the `canonBundle` `input_dir`.
+5. **Targets:**
+
+   | Library | Contents | Default |
+   |---|---|---|
+   | `Semantics` | AST, checker, elaborator | yes |
+   | `SemanticsDefinitions` | `Semantics.Definitions` (builtin) | yes |
+   | `SemanticsCheckBuiltin` | `Semantics.Check.Builtin` (builtin `ok_` theorems) | yes |
+   | `SemanticsCardsData` | `Cards.Data.Fixtures`, `Cards.Data.Shard00..15`; needs `genCanon` | no |
+   | `SemanticsCards` | `Semantics.Cards` umbrella over `Cards.Check.*`; needs `genCanon` | no |
+   | `SemanticsProofs` | `Semantics.Proofs`; imports `Cards.Data.Fixtures`, never `SemanticsCards` | no |
+
+   - **Inner loops:** `lake build Semantics` for checker work, `lake build` for builtin work,
+     `lake build SemanticsCards` for card work, and the editor or `lake build SemanticsProofs` for
+     proofs.
+   - **The gate:** `cargo xtask lean check` builds every library with `--wfail`.
+   - Update the usage comment at the top of the lakefile and `lean/README.md`.
+6. **Proofs** import `Semantics.Cards.Data.Fixtures` for canon cards, never the umbrella or a check
+   shard.
+7. **Retire or rewrite** the proof tests that exercise canon `load_bundle` itself (in
+   `Proofs/Authoring.lean`), naming each one. The builtin `load_bundle` stays until
+   `plugins-v3-data-language` generates the builtin through the same mechanism.
+
+## Regression test
+
+The facet override depends on Lake internals, and a toolchain bump could bring stale builds back
+silently. Add a test that rebuilds Gemini's experiment against the real lakefile: a throwaway
+copy, or a tiny fixture package that shares the override code. It must show:
+
+- a clean build with no generated files present succeeds;
+- editing one card rebuilds exactly that card's data shard and check shard, and nothing else;
+- editing a fixture card rebuilds `Fixtures` and the proofs that import it;
+- `lake setup-file` on a proof module regenerates after a card edit.
+
+Run it from `cargo xtask lean check`, or as an `xtask` test.
 
 ## Acceptance
 
-- No module in `lean/Semantics/Proofs/` imports `Semantics.Cards` or a shard.
-- No Lean code reads `plugins_v3/canon` at elaboration time.
-- Editing one card regenerates exactly one source module. Lake then rebuilds only that card's
-  data module or shard, its check shard, and the proof modules that import that card.
+- After editing a card, a bare `lake build SemanticsCards` and the language server need no other
+  step.
+- No module in `lean/Semantics/Proofs/` imports `Semantics.Cards` or a check shard.
+- No Lean code reads `plugins_v3/canon` at elaboration time; only the Lake generator does.
 - Editing a `Check/*` module re-elaborates no card data.
-- A deliberately failing card reports its refusals at its original file and line.
-- Bare `lake build` on stale generated modules fails with the gen instruction.
-- Per-module build times before and after are recorded. The target is about 2 minutes or less
-  for a clean `lean check`.
-- Gate: `cargo xtask lean check`. Add an `xtask` test for the generator: stable output, only
-  changed files rewritten, position mapping, and the staleness check.
+- A deliberately failing card reports its refusals next to its `-- source:` line.
+- The regression test passes.
+- Per-module build times before and after are recorded. The target is about 2 minutes or less for
+  a clean `lean check`.
