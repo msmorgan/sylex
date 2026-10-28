@@ -1,4 +1,4 @@
-import Semantics.Authoring
+import Semantics.FastInductives
 
 /-!
 # Semantics.Words
@@ -70,46 +70,59 @@ structure CardType where
 
 /-- Creature: a permanent type [CR#110.4], whose objects alone have power and toughness
 [CR#302.4]. -/
-semantic_definition CardType.creature : CardType :=
+@[semantic_definition, contextual_authoring]
+def CardType.creature [AuthoringContext] : CardType :=
   { name := "Creature", cardClass := some .permanentCard, stats := [.power, .toughness] }
 
 /-- Artifact: a permanent type [CR#110.4]. -/
-semantic_definition CardType.artifact : CardType :=
+@[semantic_definition, contextual_authoring]
+def CardType.artifact [AuthoringContext] : CardType :=
   { name := "Artifact", cardClass := some .permanentCard }
 
 /-- Land: a permanent type [CR#110.4]. -/
-semantic_definition CardType.land : CardType := { name := "Land", cardClass := some .permanentCard }
+@[semantic_definition, contextual_authoring]
+def CardType.land [AuthoringContext] : CardType :=
+  { name := "Land", cardClass := some .permanentCard }
 
 /-- Enchantment: a permanent type [CR#110.4]. -/
-semantic_definition CardType.enchantment : CardType :=
+@[semantic_definition, contextual_authoring]
+def CardType.enchantment [AuthoringContext] : CardType :=
   { name := "Enchantment", cardClass := some .permanentCard }
 
 /-- Instant: not a permanent type [CR#110.4]; an instant card is an instant or sorcery card
 [CR#110.4a,304.1]. -/
-semantic_definition CardType.instant : CardType :=
+@[semantic_definition, contextual_authoring]
+def CardType.instant [AuthoringContext] : CardType :=
   { name := "Instant", cardClass := some .instantOrSorceryCard }
 
 /-- Sorcery: not a permanent type [CR#110.4]; a sorcery card is an instant or sorcery card
 [CR#110.4a,307.1]. -/
-semantic_definition CardType.sorcery : CardType :=
+@[semantic_definition, contextual_authoring]
+def CardType.sorcery [AuthoringContext] : CardType :=
   { name := "Sorcery", cardClass := some .instantOrSorceryCard }
 
 /-- Planeswalker: a permanent type [CR#110.4], whose objects alone have loyalty [CR#306.5]. -/
-semantic_definition CardType.planeswalker : CardType :=
+@[semantic_definition, contextual_authoring]
+def CardType.planeswalker [AuthoringContext] : CardType :=
   { name := "Planeswalker", cardClass := some .permanentCard, stats := [.loyalty] }
 
 /-- Battle: a permanent type [CR#110.4], whose objects have defense [CR#310.4]. -/
-semantic_definition CardType.battle : CardType :=
+@[semantic_definition, contextual_authoring]
+def CardType.battle [AuthoringContext] : CardType :=
   { name := "Battle", cardClass := some .permanentCard, stats := [.defense] }
 
 /-- Kindred: neither a permanent type nor an instant or sorcery type. A kindred card always has
 another card type, and is cast and resolves by it [CR#308.1], so the other type settles both
 whether it can be a permanent [CR#110.4] and its Card Class. -/
-semantic_definition CardType.kindred : CardType := { name := "Kindred" }
+@[semantic_definition, contextual_authoring]
+def CardType.kindred [AuthoringContext] : CardType :=
+  { name := "Kindred" }
 
 /-- Dungeon: a card type all the same, though a dungeon begins outside the game [CR#309.2] and is
 never a permanent or a spell [CR#309.2c]. -/
-semantic_definition CardType.dungeon : CardType := { name := "Dungeon" }
+@[semantic_definition, contextual_authoring]
+def CardType.dungeon [AuthoringContext] : CardType :=
+  { name := "Dungeon" }
 
 /-- The declared card types in canonical order: the order the checker remembers a referent's
 types in (`normalizeTypes`), where the order they are written in is immaterial. -/

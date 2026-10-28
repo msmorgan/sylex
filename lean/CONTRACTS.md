@@ -181,6 +181,13 @@ sort and a Definition share (`crew`, `saddle`) is dispatched on its expected typ
 Definition is declared, so Templates name nothing above them. A declaration whose bare name another
 declaration or a syntax word already takes is named in its sort's namespace (`Subtype.army`,
 `Subtype.infinity`, `DesignationLabel.solved`, `Ability.splice`).
+
+Mutual inductive elaboration of the syntax spine in `Semantics.FastInductives`
+(`runFastInductives`) generates `casesOn`, `ctorIdx`, `ctorElim`, and `noConfusion`, omitting
+`recOn`, `below`, `brecOn`, `SizeOf`, and injectivity theorems across the types. Consequently,
+recursion over the `Abilities.lean` spine uses explicit `fuel : Nat` with
+`termination_by structural fuel`.
+
 `Semantics.Primitives` provides the generated constructor wrappers
 (`declare_semantic_primitives`, `Semantics.Primitives.<Type>.<name>`), which
 have definitionally identical constructor signatures and are registered as

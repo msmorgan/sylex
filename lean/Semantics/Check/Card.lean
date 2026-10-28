@@ -1,4 +1,5 @@
 import Semantics.Card
+import Semantics.Authoring
 import Semantics.Check.AbilityRules
 
 /-!
