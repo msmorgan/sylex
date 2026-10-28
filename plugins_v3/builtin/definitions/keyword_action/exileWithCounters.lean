@@ -7,5 +7,5 @@ action exileWithCounters (subject : NounPhrase) (amount : Amount)
   body :=
     move subject wherever (some exileZone)
       .arrival
-      [withCounters amount (printedKind kind) .fresh]
+      [withCounters amount (printedKind kind) fresh]
 }

@@ -12,7 +12,7 @@ keyword training : Ability := {
                 counted (orMore 1)
                   (and
                     [isCreature, isOther,
-                      hasPower .greater
+                      hasPower greater
                         (powerOf thisCreature)])]))
           (attack none))
         (putCounters 1 (printedKind p1p1Counter)

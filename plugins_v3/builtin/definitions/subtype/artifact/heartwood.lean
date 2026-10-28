@@ -5,7 +5,7 @@ No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype heartwood := {
   lexical := { lemma := "Heartwood" },
   spelling := "Heartwood",
-  kind := .artifact,
+  kind := artifact,
   name := "Heartwood",
   confers := []
 }

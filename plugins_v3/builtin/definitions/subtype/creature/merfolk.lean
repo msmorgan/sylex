@@ -1,7 +1,7 @@
 subtype merfolk := {
   lexical := { lemma := "Merfolk", plural := "Merfolk" },
   spelling := "Merfolk",
-  kind := .creature,
+  kind := creature,
   name := "Merfolk",
   confers := []
 }

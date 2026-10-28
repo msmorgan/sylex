@@ -5,5 +5,5 @@ template isSpell : Predicate := {
   body :=
     and
       [in_ stack,
-        not (abilityHead .anyOnStack)]
+        not (abilityHead anyOnStack)]
 }

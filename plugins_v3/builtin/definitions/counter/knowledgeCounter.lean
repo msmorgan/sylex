@@ -1,6 +1,6 @@
 counter knowledgeCounter := {
   lexical := { lemma := "knowledge counter" },
   spelling := "knowledge counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

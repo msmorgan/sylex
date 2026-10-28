@@ -31,10 +31,10 @@ keyword mutate (cost : Cost) : Ability := {
                 (merge thisSpell
                   (the
                     (was (target which)))
-                  .top)
+                  top)
                 (merge thisSpell
                   (the
                     (was (target which)))
-                  .bottom))))
-          none .repeatedly none)]
+                  bottom))))
+          none repeatedly none)]
 }

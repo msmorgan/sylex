@@ -4,6 +4,6 @@ triggered but not yet left the stack. [CR#122.1g] -/
 counter defenseCounter := {
   lexical := { lemma := "defense counter" },
   spelling := "defense counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

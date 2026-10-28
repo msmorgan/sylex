@@ -14,5 +14,5 @@ keyword bloodthirst (amount : Amount) : Ability := {
               (within soFarThisTurn))
             (withRiders
               [withCounters amount (printedKind p1p1Counter)
-                  .fresh])))]
+                  fresh])))]
 }

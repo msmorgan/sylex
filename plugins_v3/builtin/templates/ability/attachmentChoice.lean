@@ -5,6 +5,6 @@ template attachmentChoice (subject chosen : NounPhrase) : StaticSpec := {
   body :=
     asEvent
       (does any
-        (attachment .attached subject none))
-      (choose chosen .openly none none)
+        (attachment attached subject none))
+      (choose chosen openly none none)
 }

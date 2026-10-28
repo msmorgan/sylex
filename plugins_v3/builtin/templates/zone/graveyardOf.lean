@@ -1,5 +1,5 @@
 /-- "<player>'s graveyard" -/
 template graveyardOf (player : NounPhrase) : Location := {
   spelling := "<player>'s graveyard",
-  body := zone .graveyard (some player)
+  body := zone graveyard (some player)
 }

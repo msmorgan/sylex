@@ -3,7 +3,7 @@ battlefield [CR#702.171b]. -/
 designation saddled := {
   lexical := { adjectives := ["saddled"] },
   spelling := "saddled",
-  scope := (.heldBy .object),
+  scope := (.heldBy object),
   sole := false,
   confers := []
 }

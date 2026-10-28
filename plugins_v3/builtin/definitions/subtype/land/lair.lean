@@ -2,7 +2,7 @@
 subtype lair := {
   lexical := { lemma := "Lair" },
   spelling := "Lair",
-  kind := .land,
+  kind := land,
   name := "Lair",
   confers := []
 }

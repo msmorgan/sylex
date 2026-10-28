@@ -2,7 +2,7 @@
 subtype aurochs := {
   lexical := { lemma := "Aurochs", plural := "Aurochs" },
   spelling := "Aurochs",
-  kind := .creature,
+  kind := creature,
   name := "Aurochs",
   confers := []
 }

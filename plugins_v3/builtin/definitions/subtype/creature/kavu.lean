@@ -1,7 +1,7 @@
 subtype kavu := {
   lexical := { lemma := "Kavu", plural := "Kavu" },
   spelling := "Kavu",
-  kind := .creature,
+  kind := creature,
   name := "Kavu",
   confers := []
 }

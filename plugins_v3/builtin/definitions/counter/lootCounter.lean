@@ -1,6 +1,6 @@
 counter lootCounter := {
   lexical := { lemma := "loot counter" },
   spelling := "loot counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

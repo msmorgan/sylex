@@ -3,6 +3,6 @@ marker and nothing else: the CR gives it no behavior of its own, so it confers n
 counter chargeCounter := {
   lexical := { lemma := "charge counter" },
   spelling := "charge counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

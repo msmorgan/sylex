@@ -18,6 +18,6 @@ keyword freerunning (cost : Cost) : Ability := {
                         hasDesignation commander],
                     youControl])))
             (dealDamage anyAmount (a isPlayer)
-              (some .combat))
+              (some combat))
             (within soFarThisTurn)))]
 }

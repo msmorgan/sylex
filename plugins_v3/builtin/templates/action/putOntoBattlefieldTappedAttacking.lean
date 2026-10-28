@@ -6,5 +6,5 @@ template putOntoBattlefieldTappedAttacking (subject : NounPhrase)
   -- TODO(spelling): Include or omit the clauses supplied by defender.
   body :=
     zoneChange subject battlefield from_
-      [entersAs .tapped, entersAttacking defender]
+      [entersAs tapped, entersAttacking defender]
 }

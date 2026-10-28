@@ -1,5 +1,5 @@
 template thisSpell : NounPhrase := {
   spelling := "this spell",
   body :=
-    headed .spell this_
+    headed spell this_
 }

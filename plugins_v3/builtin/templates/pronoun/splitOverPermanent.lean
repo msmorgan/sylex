@@ -3,7 +3,7 @@ template splitOverPermanent : NounPhrase := {
   spelling := "any target",
   body :=
     eitherOf
-      (pro (.unionHalf .player) .one)
+      (pro (.unionHalf player) .one)
       (possessorOf .controller
-        (pro (.unionHalf .permanent) .one))
+        (pro (.unionHalf permanent) .one))
 }

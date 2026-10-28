@@ -1,6 +1,6 @@
 counter mineCounter := {
   lexical := { lemma := "mine counter" },
   spelling := "mine counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

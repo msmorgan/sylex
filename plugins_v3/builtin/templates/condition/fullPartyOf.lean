@@ -3,5 +3,5 @@ template fullPartyOf (player : NounPhrase) : Condition := {
 
   spelling := "<player> has a full party",
   body :=
-    compareAmt (partySizeOf player) .eq 4
+    compareAmt (partySizeOf player) eq 4
 }

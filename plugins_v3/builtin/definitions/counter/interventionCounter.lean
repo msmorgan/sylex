@@ -1,6 +1,6 @@
 counter interventionCounter := {
   lexical := { lemma := "intervention counter" },
   spelling := "intervention counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

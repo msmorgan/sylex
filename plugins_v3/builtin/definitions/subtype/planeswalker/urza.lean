@@ -2,7 +2,7 @@
 subtype urza := {
   lexical := { lemma := "Urza" },
   spelling := "Urza",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Urza",
   confers := []
 }

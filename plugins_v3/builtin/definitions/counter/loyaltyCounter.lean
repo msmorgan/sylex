@@ -4,6 +4,6 @@ planeswalker with zero loyalty is put into its owner's graveyard as a state-base
 counter loyaltyCounter := {
   lexical := { lemma := "loyalty counter" },
   spelling := "loyalty counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

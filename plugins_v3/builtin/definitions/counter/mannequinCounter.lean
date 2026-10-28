@@ -1,6 +1,6 @@
 counter mannequinCounter := {
   lexical := { lemma := "mannequin counter" },
   spelling := "mannequin counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

@@ -5,8 +5,8 @@ action fateseal (amount : Amount) : Action := {
   spelling := "fateseal <amount>",
   body :=
     lookAndSortSlice
-      (slice .top amount
+      (slice top amount
         (libraryOf
           (a (isOpponentOf actor))))
-      onBottom [inOrder .anyOrder]
+      onBottom [inOrder anyOrder]
 }

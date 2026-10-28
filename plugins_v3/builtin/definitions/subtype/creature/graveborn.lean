@@ -1,7 +1,7 @@
 subtype graveborn := {
   lexical := { lemma := "Graveborn", plural := "Graveborn" },
   spelling := "Graveborn",
-  kind := .creature,
+  kind := creature,
   name := "Graveborn",
   confers := []
 }

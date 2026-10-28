@@ -1,6 +1,6 @@
 counter trapCounter := {
   lexical := { lemma := "trap counter" },
   spelling := "trap counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

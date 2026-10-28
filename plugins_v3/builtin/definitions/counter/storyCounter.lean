@@ -1,6 +1,6 @@
 counter storyCounter := {
   lexical := { lemma := "story counter" },
   spelling := "story counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

@@ -1,7 +1,7 @@
 subtype sliver := {
   lexical := { lemma := "Sliver" },
   spelling := "Sliver",
-  kind := .creature,
+  kind := creature,
   name := "Sliver",
   confers := []
 }

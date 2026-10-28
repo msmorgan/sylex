@@ -17,7 +17,7 @@ keyword emerge (cost : Cost) : Ability := {
         (onlyWhile
           (costShift thisSpell
             (less
-              (statOf (.stat .manaValue)
+              (statOf (.stat manaValue)
                 (the
                   (and
                     [was (sacrifice which),

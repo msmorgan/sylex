@@ -2,5 +2,5 @@
 template noManaSpentToCast (spell : NounPhrase) : Condition := {
   spelling := "if no mana was spent to cast <spell>",
   body :=
-    compareAmt (manaValueSpentToCast spell) .eq 0
+    compareAmt (manaValueSpentToCast spell) eq 0
 }

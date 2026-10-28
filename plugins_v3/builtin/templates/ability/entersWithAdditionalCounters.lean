@@ -5,5 +5,5 @@ template entersWithAdditionalCounters (subject : NounPhrase) (amount : Amount)
   body :=
     enters subject
       [withCounters amount (printedKind kind)
-          .additional]
+          additional]
 }

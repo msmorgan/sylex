@@ -5,5 +5,5 @@ text box, type line, power and toughness apply [CR#710.1a,710.2]. Flipping is no
 -- [CR#701.1]
 template flip (subject : NounPhrase) : Action := {
   spelling := "flip <subject>",
-  body := setStatus .flipped subject
+  body := setStatus flipped subject
 }

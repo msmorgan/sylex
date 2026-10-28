@@ -2,7 +2,7 @@
 subtype dihada := {
   lexical := { lemma := "Dihada" },
   spelling := "Dihada",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Dihada",
   confers := []
 }

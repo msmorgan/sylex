@@ -14,8 +14,8 @@ keyword storied : Ability := {
                     [isPermanent, youControl,
                       andOr
                         [isArtifact, hasSubtype saga,
-                          hasSupertype .legendary]]))
-                .atLeast 3,
+                          hasSupertype legendary]]))
+                atLeast 3,
               not
                 (is you
                   (hasDesignation enduringStory))])

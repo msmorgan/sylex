@@ -3,7 +3,7 @@ creatures. [CR#301.7a,301.7b] -/
 subtype vehicle := {
   lexical := { lemma := "Vehicle" },
   spelling := "Vehicle",
-  kind := .artifact,
+  kind := artifact,
   name := "Vehicle",
   confers := []
 }

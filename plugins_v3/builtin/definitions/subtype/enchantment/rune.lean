@@ -2,7 +2,7 @@
 subtype rune := {
   lexical := { lemma := "Rune" },
   spelling := "Rune",
-  kind := .enchantment,
+  kind := enchantment,
   name := "Rune",
   confers := []
 }

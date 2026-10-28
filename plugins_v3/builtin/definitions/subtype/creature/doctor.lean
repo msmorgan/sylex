@@ -3,7 +3,7 @@ a legendary Time Lord Doctor creature card with no other creature types [CR#702.
 subtype doctor := {
   lexical := { lemma := "Doctor" },
   spelling := "Doctor",
-  kind := .creature,
+  kind := creature,
   name := "Doctor",
   confers := []
 }

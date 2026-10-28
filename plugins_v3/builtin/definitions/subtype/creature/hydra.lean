@@ -1,7 +1,7 @@
 subtype hydra := {
   lexical := { lemma := "Hydra" },
   spelling := "Hydra",
-  kind := .creature,
+  kind := creature,
   name := "Hydra",
   confers := []
 }

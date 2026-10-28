@@ -3,7 +3,7 @@ permanent on the battlefield can have." -/
 designation leftHalfUnlocked := {
   lexical := { adjectives := ["unlocked"] },
   spelling := "left half unlocked",
-  scope := (.heldBy .object),
+  scope := (.heldBy object),
   sole := false,
   confers := []
 }

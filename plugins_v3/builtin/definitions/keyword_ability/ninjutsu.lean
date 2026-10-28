@@ -12,7 +12,7 @@ keyword ninjutsu (cost : Cost) : Ability := {
         (and
           [or
               [isPlayer, isPlaneswalker, isBattle],
-            inCombat .attackedBy
+            inCombat attackedBy
               (some
                 (the
                   (and

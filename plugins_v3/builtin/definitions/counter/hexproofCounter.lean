@@ -3,6 +3,6 @@
 counter hexproofCounter := {
   lexical := { lemma := "hexproof counter" },
   spelling := "hexproof counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

@@ -1,7 +1,7 @@
 subtype assemblyWorker := {
   lexical := { lemma := "Assembly-Worker" },
   spelling := "Assembly-Worker",
-  kind := .creature,
+  kind := creature,
   name := "Assembly-Worker",
   confers := []
 }

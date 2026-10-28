@@ -1,4 +1,4 @@
 template isFaceUp : Predicate := {
   spelling := "face up",
-  body := hasStatus .faceUp
+  body := hasStatus faceUp
 }

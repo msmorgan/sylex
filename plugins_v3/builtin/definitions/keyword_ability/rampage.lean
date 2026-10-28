@@ -14,7 +14,7 @@ keyword rampage (amount : Amount) : Ability := {
                 (countOf
                   (and
                     [isCreature,
-                      inCombat .blockerOf
+                      inCombat blockerOf
                         (some thisCreature)]))
                 1)))
           (up
@@ -23,7 +23,7 @@ keyword rampage (amount : Amount) : Ability := {
                 (countOf
                   (and
                     [isCreature,
-                      inCombat .blockerOf
+                      inCombat blockerOf
                         (some thisCreature)]))
                 1)))
           (some untilEndOfTurn))]

@@ -12,7 +12,7 @@ keyword saddle (amount : Amount) : Ability := {
     [activatedOnlyDuring
         (perform
           (tap
-            (withTotal (.stat .power) .atLeast
+            (withTotal (.stat power) atLeast
               amount
               (allOf
                 (and

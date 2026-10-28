@@ -11,12 +11,12 @@ creatures that deal combat damage to the player who has it takes it. -/
 designation initiative := {
   lexical := { nouns := ["initiative"] },
   spelling := "initiative",
-  scope := (.heldBy .player),
+  scope := (.heldBy player),
   sole := true,
   confers :=
-    [.ability
+    [ability
         (whenever
           (does (counted (orMore 1) (and [isCreature, controlledBy (a isPlayer)]))
-            (dealDamage (to := theInitiativeHolder) (kind := some .combat)))
+            (dealDamage (to := theInitiativeHolder) (kind := some combat)))
           (gainDesignation (controllerOf (those creature)) initiative))]
 }

@@ -2,5 +2,5 @@
 ("the total power of those creatures"). -/
 template totalOf (axis : ProjAxis) (group : NounPhrase) : Amount := {
   spelling := "the total <axis> of <group>",
-  body := amountAggregate .sum axis group
+  body := amountAggregate sum axis group
 }

@@ -1,7 +1,7 @@
 subtype tiefling := {
   lexical := { lemma := "Tiefling" },
   spelling := "Tiefling",
-  kind := .creature,
+  kind := creature,
   name := "Tiefling",
   confers := []
 }

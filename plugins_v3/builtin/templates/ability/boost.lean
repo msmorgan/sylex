@@ -6,6 +6,6 @@ template boost (power toughness : Delta Amount) : Conferral := {
   body :=
     .property
       (characteristicChange this_
-        [statEdit .power power,
-          statEdit .toughness toughness])
+        [statEdit power power,
+          statEdit toughness toughness])
 }

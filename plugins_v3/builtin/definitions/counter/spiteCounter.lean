@@ -1,6 +1,6 @@
 counter spiteCounter := {
   lexical := { lemma := "spite counter" },
   spelling := "spite counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

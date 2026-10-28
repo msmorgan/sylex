@@ -2,7 +2,7 @@
 subtype fortification := {
   lexical := { lemma := "Fortification" },
   spelling := "Fortification",
-  kind := .artifact,
+  kind := artifact,
   name := "Fortification",
   confers :=
     [.property
@@ -10,5 +10,5 @@ subtype fortification := {
           (allOf isLand)),
       .stateBased
         (not (isAttached thisFortification))
-        (attachment .unattached thisFortification none)]
+        (attachment unattached thisFortification none)]
 }

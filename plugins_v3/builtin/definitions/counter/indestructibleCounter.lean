@@ -3,6 +3,6 @@ layer 6. [CR#122.1b,613.1f] -/
 counter indestructibleCounter := {
   lexical := { lemma := "indestructible counter" },
   spelling := "indestructible counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

@@ -13,7 +13,7 @@ keyword firebending (amount : Amount) : Ability := {
           (attack none))
         (sequentially
           [addMana amount
-              (manaOf [[.of .red]]) [],
+              (manaOf [[.of red]]) [],
             establishThroughout
               (manaRetention you thisMana)
               untilEndOfCombat])]

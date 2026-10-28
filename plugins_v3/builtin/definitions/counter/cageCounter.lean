@@ -1,6 +1,6 @@
 counter cageCounter := {
   lexical := { lemma := "cage counter" },
   spelling := "cage counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

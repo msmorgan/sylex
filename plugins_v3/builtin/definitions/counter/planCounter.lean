@@ -1,6 +1,6 @@
 counter planCounter := {
   lexical := { lemma := "plan counter" },
   spelling := "plan counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

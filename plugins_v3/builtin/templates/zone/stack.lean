@@ -1,4 +1,4 @@
 template stack : Location := {
   spelling := "the stack",
-  body := zone .stack none
+  body := zone stack none
 }

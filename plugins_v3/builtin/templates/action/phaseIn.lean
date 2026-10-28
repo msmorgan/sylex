@@ -3,5 +3,5 @@
 template phaseIn : Action := {
   spelling := "phases in",
   body :=
-    setStatus .phasedIn theActor
+    setStatus phasedIn theActor
 }

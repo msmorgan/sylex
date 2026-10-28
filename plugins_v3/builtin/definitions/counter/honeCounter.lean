@@ -3,6 +3,6 @@
 counter honeCounter := {
   lexical := { lemma := "hone counter" },
   spelling := "hone counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

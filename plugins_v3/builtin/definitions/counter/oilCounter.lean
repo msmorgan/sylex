@@ -3,6 +3,6 @@ counter rules [CR#122.1]. -/
 counter oilCounter := {
   lexical := { lemma := "oil counter" },
   spelling := "oil counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

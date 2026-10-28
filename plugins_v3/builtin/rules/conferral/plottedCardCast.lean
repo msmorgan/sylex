@@ -12,7 +12,7 @@ conferral plottedCardCast := {
           [isCard, hasDesignation plotted,
             in_ exileZone],
       confer :=
-        .ability
+        ability
           (static
             (onlyUnless
               (can (actor you)

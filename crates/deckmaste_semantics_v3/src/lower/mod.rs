@@ -264,6 +264,23 @@ fn named_record_arguments(tokens: &[Token]) -> Result<Vec<Token>> {
         .collect())
 }
 
+fn nullary_word(name: &str, ty: &str) -> Option<Value> {
+    if ["some", "none"].contains(&name) {
+        return None;
+    }
+    let ty = ty.strip_prefix("Option ").unwrap_or(ty);
+    let constructors = shape(ty)?;
+    if !matches!(ty, "NounWord" | "ColorOrColorless" | "SimpleManaSymbol")
+        && constructors.iter().any(|ctor| !ctor.fields.is_empty())
+    {
+        return None;
+    }
+    constructors
+        .into_iter()
+        .find(|ctor| ctor.name.as_str() == name && ctor.fields.is_empty())
+        .map(|ctor| ctor.value(Vec::new()))
+}
+
 #[derive(Clone)]
 struct Bound {
     ty: String,
@@ -480,6 +497,26 @@ impl<'a> Elaborator<'a> {
         self.eval_inner(tokens, &expected, scope, stack)
             .map_err(|e| e.at(format!("{} as {expected}", reader::render(tokens))))
     }
+    fn bound_value(name: &str, bound: Bound, ty: &str, scope: &mut Scope) -> Result<Value> {
+        if Self::coerce(bound.value.clone(), &bound.ty, ty).is_err()
+            && let Some(word) = nullary_word(name, ty)
+        {
+            return Ok(word);
+        }
+        let mut value = bound.value;
+        if let Some(identity) = bound.identity {
+            let mention = if scope.seen.insert(identity) { "firstMention" } else { "laterMention" };
+            if bound.caller {
+                value = construct("NounPhrase", "inCaller", vec![value])?;
+            }
+            value = construct(
+                "NounPhrase",
+                mention,
+                vec![Value::String(identity.to_string()), value],
+            )?;
+        }
+        Self::coerce(value, &bound.ty, ty)
+    }
     fn eval_inner(
         &self,
         tokens: &[Token],
@@ -534,20 +571,7 @@ impl<'a> Elaborator<'a> {
         if let [Token::Ident(name)] = tokens
             && let Some(bound) = scope.bindings.get(name).cloned()
         {
-            let mut value = bound.value;
-            if let Some(identity) = bound.identity {
-                let mention =
-                    if scope.seen.insert(identity) { "firstMention" } else { "laterMention" };
-                if bound.caller {
-                    value = construct("NounPhrase", "inCaller", vec![value])?;
-                }
-                value = construct(
-                    "NounPhrase",
-                    mention,
-                    vec![Value::String(identity.to_string()), value],
-                )?;
-            }
-            return Self::coerce(value, &bound.ty, ty);
+            return Self::bound_value(name.as_str(), bound, ty, scope);
         }
         if ty.starts_with("Option ")
             && let [Token::Ident(name), rest @ ..] = tokens
@@ -739,19 +763,18 @@ impl<'a> Elaborator<'a> {
         if !raw && let Some(decl) = self.declaration(name, ty) {
             return self.invoke(decl, rest, ty, scope, stack);
         }
-        if let Some(ctor) =
-            shape(ty).and_then(|cs| cs.into_iter().find(|c| c.name.as_str() == bare(name)))
+        if (raw || !["some", "none"].contains(&bare(name)))
+            && let Some(ctor) =
+                shape(ty).and_then(|cs| cs.into_iter().find(|c| c.name.as_str() == bare(name)))
         {
             // An explicit type qualifier must agree with the expected type.
-            let components: Vec<_> = name.split('.').collect();
-            if components.len() > 1 {
-                let qualifier = components[components.len() - 2];
-                let base = ty.split_whitespace().next().unwrap_or(ty);
-                if qualifier != base {
-                    return Err(LowerError::new(format!(
-                        "constructor belongs to {qualifier}, expected {base}"
-                    )));
-                }
+            if let Some(qualifier) = name.rsplit('.').nth(1)
+                && let base = ty.split_whitespace().next().unwrap_or(ty)
+                && qualifier != base
+            {
+                return Err(LowerError::new(format!(
+                    "constructor belongs to {qualifier}, expected {base}"
+                )));
             }
             let named;
             let rest = if ty == "Card"
@@ -1020,6 +1043,13 @@ impl<'a> Elaborator<'a> {
             return_type: decl.return_type,
         };
         if stack.contains(&key) {
+            if stack.last() == Some(&key)
+                && tokens.is_empty()
+                && decl.command.as_str() == "template"
+                && let Some(word) = nullary_word(decl.name.as_str(), expected)
+            {
+                return Ok(word);
+            }
             return Err(LowerError::new(format!(
                 "recursive expansion of {} : {}",
                 decl.name, decl.return_type

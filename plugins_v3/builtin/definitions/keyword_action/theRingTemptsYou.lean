@@ -29,15 +29,15 @@ action theRingTemptsYou : Action := {
           (getNamedEmblem "The Ring"
             [static
                 (characteristicChange (allOf ringBearers)
-                  [typeLine .adds
-                      { supertypes := some [.legendary] }]),
+                  [typeLine adds
+                      { supertypes := some [legendary] }]),
               static
                 (cant
                   (by_
                     (allOf
                       (and
                         [isCreature,
-                          hasPower .greater
+                          hasPower greater
                             (powerOf (a ringBearers))])))
                   (block (allOf ringBearers))),
               static
@@ -50,7 +50,7 @@ action theRingTemptsYou : Action := {
                         [draw 1,
                           discard
                             (a (cardIn hand))])))
-                  (compareAmt timesTempted .atLeast 2)),
+                  (compareAmt timesTempted atLeast 2)),
               static
                 (onlyWhile
                   (abilityGrant this_
@@ -58,18 +58,18 @@ action theRingTemptsYou : Action := {
                       (does
                         (by_ (a isCreature))
                         (block (a ringBearers)))
-                      (atNext .endOfCombat
+                      (atNext endOfCombat
                         (controllerSacrifices
                           (that creature)))))
-                  (compareAmt timesTempted .atLeast 3)),
+                  (compareAmt timesTempted atLeast 3)),
               static
                 (onlyWhile
                   (abilityGrant this_
                     (whenever
                       (does (actor (a ringBearers))
                         (dealDamage anyAmount
-                          (a isPlayer) (some .combat)))
+                          (a isPlayer) (some combat)))
                       (instruct eachOpponent (loseLife 3))))
-                  (compareAmt timesTempted .atLeast 4))]) ::
+                  (compareAmt timesTempted atLeast 4))]) ::
         tempting)
 }

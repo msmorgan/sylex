@@ -3,7 +3,7 @@ battlefield [CR#701.45a]. -/
 subtype contraption := {
   lexical := { lemma := "Contraption" },
   spelling := "Contraption",
-  kind := .artifact,
+  kind := artifact,
   name := "Contraption",
   confers := []
 }

@@ -1,7 +1,7 @@
 subtype qu := {
   lexical := { lemma := "Qu", plural := "Qu" },
   spelling := "Qu",
-  kind := .creature,
+  kind := creature,
   name := "Qu",
   confers := []
 }

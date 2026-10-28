@@ -4,7 +4,7 @@ No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype junk := {
   lexical := { lemma := "Junk" },
   spelling := "Junk",
-  kind := .artifact,
+  kind := artifact,
   name := "Junk",
   confers := []
 }

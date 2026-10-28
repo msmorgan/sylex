@@ -2,7 +2,7 @@
 subtype dovin := {
   lexical := { lemma := "Dovin" },
   spelling := "Dovin",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Dovin",
   confers := []
 }

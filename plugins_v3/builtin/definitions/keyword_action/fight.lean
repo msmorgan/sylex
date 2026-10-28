@@ -10,8 +10,8 @@ action fight (other : NounPhrase) : Action := {
           is theActor isCreature])
       (simultaneously
         [dealDamage
-            (statOf (.stat .power) theActor) other,
+            (statOf (.stat power) theActor) other,
           instruct other
-            (dealDamage (statOf (.stat .power) other)
+            (dealDamage (statOf (.stat power) other)
               theActor)])
 }

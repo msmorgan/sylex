@@ -1,7 +1,7 @@
 subtype kree := {
   lexical := { lemma := "Kree", plural := "Kree" },
   spelling := "Kree",
-  kind := .creature,
+  kind := creature,
   name := "Kree",
   confers := []
 }

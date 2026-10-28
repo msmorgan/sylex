@@ -2,7 +2,7 @@
 subtype guff := {
   lexical := { lemma := "Guff" },
   spelling := "Guff",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Guff",
   confers := []
 }

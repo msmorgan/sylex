@@ -2,7 +2,7 @@
 subtype teferi := {
   lexical := { lemma := "Teferi" },
   spelling := "Teferi",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Teferi",
   confers := []
 }

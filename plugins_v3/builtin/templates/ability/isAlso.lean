@@ -4,6 +4,6 @@ template isAlso (types : List CardType) (subtypes : List Subtype) : CopyExcept :
   -- case.
   body :=
     edits
-      [typeLine .adds
+      [typeLine adds
           (Semantics.Characteristics.typeChanges { types := types, subtypes := subtypes })]
 }

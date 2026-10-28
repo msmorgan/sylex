@@ -13,8 +13,8 @@ keyword readAhead : Ability := {
                 (and
                   [chapterAbilityOf thisSaga,
                     not
-                      (compare .eq (countersOn loreCounter
-                          thisSaga) [.chapter])])))
+                      (compare eq (countersOn loreCounter
+                          thisSaga) [chapter])])))
             trigger)
           (did (actor thisSaga)
             enter (within soFarThisTurn)))]

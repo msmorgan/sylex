@@ -8,7 +8,7 @@ keyword cumulativeUpkeep (cost : Cost) : Ability := {
   spelling := "cumulative upkeep <cost>",
   body :=
     [at_
-        (beginningOf .upkeep (some you)
+        (beginningOf upkeep (some you)
           (eachTime none))
         (sequentially
           [putCounters 1 (printedKind ageCounter)

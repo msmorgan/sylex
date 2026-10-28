@@ -16,7 +16,7 @@ keyword amplify (amount : Amount) : Ability := {
                 (and
                   [cardIn yourHand,
                     shares (.subtype Semantics.CardType.creature)
-                      .share thisPermanent])))
+                      share thisPermanent])))
             (some
               (alongside
                 (putCounters

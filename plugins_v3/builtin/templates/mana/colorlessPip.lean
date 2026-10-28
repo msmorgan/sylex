@@ -2,5 +2,5 @@
 template colorlessPip : ManaSymbol := {
   spelling := "{C}",
   body :=
-    .simple (.specific .colorless)
+    .simple (.specific colorless)
 }

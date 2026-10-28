@@ -1,6 +1,6 @@
 counter bookCounter := {
   lexical := { lemma := "book counter" },
   spelling := "book counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

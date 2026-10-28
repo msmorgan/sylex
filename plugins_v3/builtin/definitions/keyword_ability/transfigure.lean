@@ -13,10 +13,10 @@ keyword transfigure (cost : Cost) : Ability := {
               (a
                 (and
                   [isCard, isCreature,
-                    hasManaValue .eq
-                      (statOf (.stat .manaValue)
+                    hasManaValue eq
+                      (statOf (.stat manaValue)
                         thisPermanent)])),
-            putOntoBattlefield (that .card),
+            putOntoBattlefield (that card),
             shuffle])
         asSorcery]
 }

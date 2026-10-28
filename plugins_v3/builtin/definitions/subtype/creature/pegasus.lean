@@ -1,7 +1,7 @@
 subtype pegasus := {
   lexical := { lemma := "Pegasus", plural := "Pegasi" },
   spelling := "Pegasus",
-  kind := .creature,
+  kind := creature,
   name := "Pegasus",
   confers := []
 }

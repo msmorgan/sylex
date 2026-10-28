@@ -11,14 +11,14 @@ keyword epic : Ability := {
             (cast any))
           restOfGame),
       spell
-        (delayWithin (beginningOfYour .upkeep)
+        (delayWithin (beginningOfYour upkeep)
           restOfGame
           (sequentially
-            [copy .fromStack thisSpell 1
+            [copy fromStack thisSpell 1
                 [edits
                     [removedAbilities
                         (specified
                           [abilities (theKeyword epic.label)])]],
               may
-                (chooseNewTargets (that .copy))]))]
+                (chooseNewTargets (that copy))]))]
 }

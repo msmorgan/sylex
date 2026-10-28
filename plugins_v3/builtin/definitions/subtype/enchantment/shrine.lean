@@ -1,7 +1,7 @@
 subtype shrine := {
   lexical := { lemma := "Shrine" },
   spelling := "Shrine",
-  kind := .enchantment,
+  kind := enchantment,
   name := "Shrine",
   confers := []
 }

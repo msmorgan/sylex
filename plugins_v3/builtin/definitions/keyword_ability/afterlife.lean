@@ -5,5 +5,5 @@ keyword afterlife (amount : Amount) : Ability := {
   spelling := "afterlife <amount>",
   body :=
     [ when (does thisPermanent die)
-        (create amount (creatureToken 1 1 [.white, .black] [spirit] [flying])) ]
+        (create amount (creatureToken 1 1 [white, black] [spirit] [flying])) ]
 }

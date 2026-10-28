@@ -2,5 +2,5 @@
 -- [CR#105.2c]
 template isColorless : Predicate := {
   spelling := "colorless",
-  body := colorCount .eq 0
+  body := colorCount eq 0
 }

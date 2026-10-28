@@ -3,6 +3,6 @@ time travel. [CR#702.62a,702.63a,701.56a] -/
 counter timeCounter := {
   lexical := { lemma := "time counter" },
   spelling := "time counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

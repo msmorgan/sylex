@@ -1,6 +1,6 @@
 counter sleepCounter := {
   lexical := { lemma := "sleep counter" },
   spelling := "sleep counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

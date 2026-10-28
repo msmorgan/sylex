@@ -2,7 +2,7 @@
 subtype szat := {
   lexical := { lemma := "Szat" },
   spelling := "Szat",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Szat",
   confers := []
 }

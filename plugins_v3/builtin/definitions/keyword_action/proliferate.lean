@@ -7,8 +7,8 @@ action proliferate : Action := {
       [choose (counted anyNumber
             (and
               [andOr [isPermanent, isPlayer],
-                hasCounter none])) .openly none none,
-        doForEach (those .join)
+                hasCounter none])) openly none none,
+        doForEach (those join)
           (putCounters 1 (sameKindAs it)
             it)]
 }

@@ -1,7 +1,7 @@
 subtype spawn := {
   lexical := { lemma := "Spawn", plural := ["Spawn", "Spawns"] },
   spelling := "Spawn",
-  kind := .creature,
+  kind := creature,
   name := "Spawn",
   confers := []
 }

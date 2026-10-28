@@ -1,6 +1,6 @@
 counter currencyCounter := {
   lexical := { lemma := "currency counter" },
   spelling := "currency counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

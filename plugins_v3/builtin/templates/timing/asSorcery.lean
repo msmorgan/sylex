@@ -8,7 +8,7 @@ template asSorcery : Timing := {
   body :=
     and
       [whileTrue (hasPriority you),
-        inPart .mainPhase (some you)
+        inPart mainPhase (some you)
           current,
         whileTrue
           (not (exists_ (in_ stack)))]

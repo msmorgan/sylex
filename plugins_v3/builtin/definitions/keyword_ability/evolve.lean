@@ -18,8 +18,8 @@ keyword evolve : Ability := {
           (or
             [compareAmt
                 (powerOf (that creature))
-                .greater (powerOf thisCreature),
+                greater (powerOf thisCreature),
               compareAmt
                 (toughnessOf (that creature))
-                .greater (toughnessOf thisCreature)]))]
+                greater (toughnessOf thisCreature)]))]
 }

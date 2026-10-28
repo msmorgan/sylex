@@ -1,7 +1,7 @@
 subtype bobblehead := {
   lexical := { lemma := "Bobblehead" },
   spelling := "Bobblehead",
-  kind := .artifact,
+  kind := artifact,
   name := "Bobblehead",
   confers := []
 }

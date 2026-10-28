@@ -1,6 +1,6 @@
 counter iceCounter := {
   lexical := { lemma := "ice counter" },
   spelling := "ice counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

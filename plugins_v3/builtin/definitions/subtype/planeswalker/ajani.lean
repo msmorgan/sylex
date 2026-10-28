@@ -2,7 +2,7 @@
 subtype ajani := {
   lexical := { lemma := "Ajani" },
   spelling := "Ajani",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Ajani",
   confers := []
 }

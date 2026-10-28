@@ -14,5 +14,5 @@ keyword gravestorm : Ability := {
                 (actor (a isPermanent))
                 soFarThisTurn),
             may
-              (chooseNewTargets (those .copy))])]
+              (chooseNewTargets (those copy))])]
 }

@@ -1,7 +1,7 @@
 subtype aetherborn := {
   lexical := { lemma := "Aetherborn", plural := "Aetherborn" },
   spelling := "Aetherborn",
-  kind := .creature,
+  kind := creature,
   name := "Aetherborn",
   confers := []
 }

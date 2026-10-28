@@ -260,6 +260,10 @@ def elabDomainList : TermElab := Authoring.elabDomainList
 def elabEmptyDomainList : TermElab := Authoring.elabDomainList
 @[scoped term_elab Lean.Parser.Term.structInst]
 def elabCharacteristicBundleStruct : TermElab := Authoring.elabCharacteristicBundleStruct
+@[scoped term_elab ident]
+def elabClosedWordIdent : TermElab := Authoring.elabClosedWordIdent
+@[scoped term_elab Lean.Parser.Term.app]
+def elabClosedWordApp : TermElab := Authoring.elabClosedWordApp
 @[scoped term_elab Lean.Parser.Term.app]
 def elabCardRecord : TermElab := Authoring.elabCardRecord
 end Semantics.Templates

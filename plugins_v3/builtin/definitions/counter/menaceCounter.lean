@@ -3,6 +3,6 @@
 counter menaceCounter := {
   lexical := { lemma := "menace counter" },
   spelling := "menace counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

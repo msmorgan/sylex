@@ -1,4 +1,4 @@
 template isPhasedOut : Predicate := {
   spelling := "phased out",
-  body := hasStatus .phasedOut
+  body := hasStatus phasedOut
 }

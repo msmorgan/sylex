@@ -3,5 +3,5 @@ tapped 1/1 blue Fish creature token." [CR#702.174f] -/
 template giftATappedFish : Ability := {
   spelling := "gift a tapped Fish",
   body :=
-    gift (createTappedToken (creatureToken 1 1 [.blue] [fish]))
+    gift (createTappedToken (creatureToken 1 1 [blue] [fish]))
 }

@@ -4,6 +4,6 @@ removes a shield counter. [CR#122.1c] -/
 counter shieldCounter := {
   lexical := { lemma := "shield counter" },
   spelling := "shield counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

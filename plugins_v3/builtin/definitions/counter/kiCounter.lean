@@ -1,6 +1,6 @@
 counter kiCounter := {
   lexical := { lemma := "ki counter" },
   spelling := "ki counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

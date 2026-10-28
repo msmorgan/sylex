@@ -17,9 +17,9 @@ conferral phasingTurnBased := {
   body :=
     { scope := isPermanent,
       confer :=
-        .turnBased .untapStep
+        .turnBased untapStep
           (doIf
-            (duringPart .turn
+            (duringPart turn
               (some (controllerOf this_)))
             (doIf
               (is this_ isPhasedOut)
@@ -30,10 +30,10 @@ conferral phasingTurnBased := {
                         (a
                           (and
                             [isPermanent, isPhasedOut]))) none)))
-                (setStatus .phasedIn this_))
+                (setStatus phasedIn this_))
               (some
                 (doIf
                   (is this_
                     (hasKeyword (theKeyword phasing.label)))
-                  (setStatus .phasedOut this_))))) }
+                  (setStatus phasedOut this_))))) }
 }

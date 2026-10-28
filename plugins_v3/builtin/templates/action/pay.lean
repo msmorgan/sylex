@@ -2,7 +2,7 @@
 plain payment ("Pay 5 life", `payLife`) is paid by making that payment once, not by paying a
 payment (`Cost.asPaid`). -/
 -- [CR#118.1]
-template pay (cost : Cost) (times : PayTimes) (outcome : PaymentOutcome := .paid)
+template pay (cost : Cost) (times : PayTimes) (outcome : PaymentOutcome := paid)
     (whose : Option NounPhrase := none) (keyword : Option KeywordLabel := none) : Action := {
   -- TODO(spelling): Include or omit the clauses supplied by whose, keyword.
   body :=

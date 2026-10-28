@@ -1,6 +1,6 @@
 counter harmonyCounter := {
   lexical := { lemma := "harmony counter" },
   spelling := "harmony counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

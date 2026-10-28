@@ -20,11 +20,11 @@ keyword hideaway (amount : Amount) : Ability := {
               (someOf (oneThrough 1) them),
             move theRest wherever
               (some onBottom) .arrival
-              [inOrder .randomOrder],
+              [inOrder randomOrder],
             establishThroughout
-              (conjunction [visibility .lookAt you
+              (conjunction [visibility lookAt you
                     (objects exiledCard),
-                  visibility .lookAt
+                  visibility lookAt
                     (controllerOf thisPermanent)
                     (objects exiledCard)] none)
               (forAsLongAs

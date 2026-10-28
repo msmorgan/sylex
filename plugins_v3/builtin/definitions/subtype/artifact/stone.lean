@@ -2,7 +2,7 @@
 subtype stone := {
   lexical := { lemma := "Stone" },
   spelling := "Stone",
-  kind := .artifact,
+  kind := artifact,
   name := "Stone",
   confers := []
 }

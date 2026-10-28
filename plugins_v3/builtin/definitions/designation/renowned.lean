@@ -2,7 +2,7 @@
 designation renowned := {
   lexical := { adjectives := ["renowned"] },
   spelling := "renowned",
-  scope := (.heldBy .object),
+  scope := (.heldBy object),
   sole := false,
   confers := []
 }

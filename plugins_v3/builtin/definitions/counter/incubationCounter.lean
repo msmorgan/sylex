@@ -1,6 +1,6 @@
 counter incubationCounter := {
   lexical := { lemma := "incubation counter" },
   spelling := "incubation counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

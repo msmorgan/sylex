@@ -5,5 +5,5 @@ template addSubtype (subject : NounPhrase) (subtype : Subtype) : StaticSpec := {
   spelling := "<subject> is a <subtype> in addition to its other types",
   body :=
     characteristicChange subject
-      [typeLine .adds { subtypes := some [subtype] }]
+      [typeLine adds { subtypes := some [subtype] }]
 }

@@ -5,5 +5,5 @@ keyword fear : Ability := {
   spelling := "fear",
   body :=
     [ static (cant any (block thisCreature)
-        (except := byObjects (bare (and [isCreature, andOr [isArtifact, hasColor .black]])))) ]
+        (except := byObjects (bare (and [isCreature, andOr [isArtifact, hasColor black]])))) ]
 }

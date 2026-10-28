@@ -7,7 +7,7 @@ keyword renown (count : Amount) : Ability := {
     [when
         (does (actor thisCreature)
           (dealDamage anyAmount (a isPlayer)
-            (some .combat)))
+            (some combat)))
         (sequentially
           [putCounters count (printedKind p1p1Counter)
               thisCreature,

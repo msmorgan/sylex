@@ -2,7 +2,7 @@
 subtype serra := {
   lexical := { lemma := "Serra" },
   spelling := "Serra",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Serra",
   confers := []
 }

@@ -3,5 +3,5 @@ template thisTurn : Duration := {
   spelling := "this turn",
   body :=
     durationBetween none
-      (some (endOf .turn none current))
+      (some (endOf turn none current))
 }

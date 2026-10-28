@@ -7,7 +7,7 @@ keyword livingMetal : Ability := {
     [static
         (onlyWhile
           (characteristicChange thisPermanent
-            [typeLine .adds
+            [typeLine adds
                 { types := some [Semantics.CardType.artifact, Semantics.CardType.creature] }])
-          (duringPart .turn (some you)))]
+          (duringPart turn (some you)))]
 }

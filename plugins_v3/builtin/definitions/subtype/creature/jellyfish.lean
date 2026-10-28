@@ -1,7 +1,7 @@
 subtype jellyfish := {
   lexical := { lemma := "Jellyfish", plural := "Jellyfish" },
   spelling := "Jellyfish",
-  kind := .creature,
+  kind := creature,
   name := "Jellyfish",
   confers := []
 }

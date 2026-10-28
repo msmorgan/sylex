@@ -12,7 +12,7 @@ keyword blitz (cost : Cost) : Ability := {
       static
         (resolutionDelayedTrigger
           (doIf (keywordCostPaid blitz thisSpell)
-            (atNext .endStep (sacrifice (becomes thisSpell))))),
+            (atNext endStep (sacrifice (becomes thisSpell))))),
       static
         (onlyWhile (abilityGrant thisPermanent (keyword haste))
           (keywordCostPaid blitz thisPermanent)),

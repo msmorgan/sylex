@@ -2,7 +2,7 @@
 subtype narset := {
   lexical := { lemma := "Narset" },
   spelling := "Narset",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Narset",
   confers := []
 }

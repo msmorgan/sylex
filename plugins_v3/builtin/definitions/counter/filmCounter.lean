@@ -1,6 +1,6 @@
 counter filmCounter := {
   lexical := { lemma := "film counter" },
   spelling := "film counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

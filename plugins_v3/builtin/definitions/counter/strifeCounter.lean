@@ -1,6 +1,6 @@
 counter strifeCounter := {
   lexical := { lemma := "strife counter" },
   spelling := "strife counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

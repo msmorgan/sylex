@@ -2,7 +2,7 @@
 subtype trap := {
   lexical := { lemma := "Trap" },
   spelling := "Trap",
-  kind := .spell,
+  kind := spell,
   name := "Trap",
   confers := []
 }

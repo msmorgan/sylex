@@ -3,6 +3,6 @@
 counter exaltedCounter := {
   lexical := { lemma := "exalted counter" },
   spelling := "exalted counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

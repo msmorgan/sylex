@@ -3,6 +3,6 @@ template soFarThisTurn : Duration := {
   spelling := "this turn",
   body :=
     durationBetween
-      (some (beginningOf .turn none current))
+      (some (beginningOf turn none current))
       (some now)
 }

@@ -17,10 +17,10 @@ keyword embalm (cost : Cost) : Ability := {
         (create 1
           (copyOf this_
             [edits
-                [colors .sets
-                    (.some [.white]),
+                [colors sets
+                    (.some [white]),
                   manaCost none,
-                  typeLine .adds
+                  typeLine adds
                     { subtypes := some [zombie] }]]))
         asSorcery]
 }

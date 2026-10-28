@@ -1,6 +1,6 @@
 counter studyCounter := {
   lexical := { lemma := "study counter" },
   spelling := "study counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

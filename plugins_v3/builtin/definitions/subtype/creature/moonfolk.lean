@@ -1,7 +1,7 @@
 subtype moonfolk := {
   lexical := { lemma := "Moonfolk", plural := "Moonfolk" },
   spelling := "Moonfolk",
-  kind := .creature,
+  kind := creature,
   name := "Moonfolk",
   confers := []
 }

@@ -174,8 +174,13 @@ kernel.
 
 ## Cards
 
-`plugins_v3/canon/cards/<name>.lean` contains one `card <name> : Spelled := { ... }`
-declaration per printed card. `Semantics/Cards.lean` loads that bundle with
+`plugins_v3/canon/cards/<name>.lean` contains one declaration per printed card. The authoring
+surface is `card := { name := "Printed name", ... }`, or `card := transforming { ... }`
+for multipart cards. Legacy named declarations remain accepted until canon cleanup.
+`cardNamed "Printed name"` retrieves the `Spelled` value (or its card when `Card` is expected);
+its `.ok` projection and `cardNamedOk "Printed name"` expose the checking proof. Printed names,
+including punctuation, are declaration keys; multipart names join with ` // `.
+`Semantics/Cards.lean` loads that bundle with
 `load_bundle "../plugins_v3/canon"`, using the builtin vocabulary. A card that
 stops checking stops defining; each declaration generates an `ok_<name>` theorem.
 Phrase-level bench items and their named acceptance or refusal theorems live in
@@ -239,9 +244,12 @@ fuel; it never moves a function to well-founded recursion.
   the type's namespace. Fields and arguments use descriptive words.
 - Lean keywords used as names take a trailing underscore, such as `if_`,
   `from_`, and `repeat_`.
-- Write templates and definitions bare (`creature`) and constructors with a leading dot
-  (`.hasType`). The bench opens `Semantics.Templates` and `Semantics.Definitions`; it does not open syntax
-  namespaces whose constructors would shadow core names.
+- Write templates, definitions, and closed word-tag constructors bare (`creature`, `legendary`,
+  `sets`, `upkeep`); write semantic-expression and internal constructors with a leading dot in
+  checker and proof code (`.hasType`), and keep `.some` on `ColorSpec` (`.some [red]`, `.some []`)
+  and `zone .exile none` in `exileZone`. The bench opens `Semantics.Templates` and
+  `Semantics.Definitions`; it does not open syntax namespaces whose constructors would shadow core
+  names.
 - Syntax is unindexed. Contexts and inferred attributes are explicit inputs
   and results of the checker. Sort-specific constructors retain the
   distinctions needed to check their fields.

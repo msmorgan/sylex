@@ -5,5 +5,5 @@ template choiceWasTaken (which : LinkSource) (subject : NounPhrase) : Condition 
   spelling := "if <subject>'s <which> was taken",
   body :=
     compareAmt (paid (taken which) subject)
-      .atLeast 1
+      atLeast 1
 }

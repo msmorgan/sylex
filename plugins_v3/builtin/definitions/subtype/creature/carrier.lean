@@ -1,7 +1,7 @@
 subtype carrier := {
   lexical := { lemma := "Carrier" },
   spelling := "Carrier",
-  kind := .creature,
+  kind := creature,
   name := "Carrier",
   confers := []
 }

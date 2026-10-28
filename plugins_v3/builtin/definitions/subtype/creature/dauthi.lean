@@ -1,7 +1,7 @@
 subtype dauthi := {
   lexical := { lemma := "Dauthi", plural := "Dauthi" },
   spelling := "Dauthi",
-  kind := .creature,
+  kind := creature,
   name := "Dauthi",
   confers := []
 }

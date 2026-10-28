@@ -1,7 +1,7 @@
 subtype custodes := {
   lexical := { lemma := "Custodes", plural := "Custodes" },
   spelling := "Custodes",
-  kind := .creature,
+  kind := creature,
   name := "Custodes",
   confers := []
 }

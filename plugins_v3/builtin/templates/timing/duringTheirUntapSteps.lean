@@ -4,7 +4,7 @@ resolved to the players the deontic subject names ("Players can't untap …") [C
 template duringTheirUntapSteps : Timing := {
   spelling := "during their untap steps",
   body :=
-    inPart .untapStep
-      (some (pro (.word .player) .many))
+    inPart untapStep
+      (some (pro (.word player) .many))
       (eachTime none)
 }

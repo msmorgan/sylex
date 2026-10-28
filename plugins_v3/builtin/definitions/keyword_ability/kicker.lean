@@ -9,5 +9,5 @@ keyword kicker (cost : Cost) : Ability := {
   },
   spelling := "kicker <cost>",
   body :=
-    [static (addedCost cost true .once)]
+    [static (addedCost cost true once)]
 }

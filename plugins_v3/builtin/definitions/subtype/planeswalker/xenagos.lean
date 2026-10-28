@@ -2,7 +2,7 @@
 subtype xenagos := {
   lexical := { lemma := "Xenagos" },
   spelling := "Xenagos",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Xenagos",
   confers := []
 }

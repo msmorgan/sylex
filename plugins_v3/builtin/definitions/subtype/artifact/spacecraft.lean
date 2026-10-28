@@ -3,7 +3,7 @@ power/toughness boxes can be designated as a commander [CR#903.3]. -/
 subtype spacecraft := {
   lexical := { lemma := "Spacecraft", plural := "Spacecraft" },
   spelling := "Spacecraft",
-  kind := .artifact,
+  kind := artifact,
   name := "Spacecraft",
   confers := []
 }

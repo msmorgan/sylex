@@ -2,7 +2,7 @@
 designation rightHalfUnlocked := {
   lexical := { adjectives := ["unlocked"] },
   spelling := "right half unlocked",
-  scope := (.heldBy .object),
+  scope := (.heldBy object),
   sole := false,
   confers := []
 }

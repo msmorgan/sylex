@@ -1,6 +1,6 @@
 counter winchCounter := {
   lexical := { lemma := "winch counter" },
   spelling := "winch counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

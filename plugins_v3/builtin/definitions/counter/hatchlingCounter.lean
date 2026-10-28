@@ -1,6 +1,6 @@
 counter hatchlingCounter := {
   lexical := { lemma := "hatchling counter" },
   spelling := "hatchling counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

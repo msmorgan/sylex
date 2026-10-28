@@ -1,6 +1,6 @@
 counter divinityCounter := {
   lexical := { lemma := "divinity counter" },
   spelling := "divinity counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

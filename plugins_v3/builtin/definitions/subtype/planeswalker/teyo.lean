@@ -2,7 +2,7 @@
 subtype teyo := {
   lexical := { lemma := "Teyo" },
   spelling := "Teyo",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Teyo",
   confers := []
 }

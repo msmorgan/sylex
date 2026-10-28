@@ -3,6 +3,6 @@ graveyard with exile. [CR#122.1h] -/
 counter finalityCounter := {
   lexical := { lemma := "finality counter" },
   spelling := "finality counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

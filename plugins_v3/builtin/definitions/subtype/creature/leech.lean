@@ -2,7 +2,7 @@
 subtype leech := {
   lexical := { lemma := "Leech" },
   spelling := "Leech",
-  kind := .creature,
+  kind := creature,
   name := "Leech",
   confers := []
 }

@@ -2,7 +2,7 @@
 subtype yanling := {
   lexical := { lemma := "Yanling" },
   spelling := "Yanling",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Yanling",
   confers := []
 }

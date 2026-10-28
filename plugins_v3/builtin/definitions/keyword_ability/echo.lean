@@ -6,7 +6,7 @@ keyword echo (cost : Cost) : Ability := {
   lexical := { lemma := "echo", parameters := [[Cost], [DashNonManaCost]] },
   spelling := "echo <cost>",
   body :=
-    [at_ (beginningOfYour .upkeep)
+    [at_ (beginningOfYour upkeep)
         (doUnlessKeywordCost (sacrifice thisPermanent) cost
           thisPermanent echo.label)
         [] [] none none none
@@ -14,6 +14,6 @@ keyword echo (cost : Cost) : Ability := {
           (not
             (heldSince
               (is thisPermanent youControl)
-              (beginningOf .upkeep (some you)
+              (beginningOf upkeep (some you)
                 (previous (some you))))))]
 }

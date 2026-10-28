@@ -2,7 +2,7 @@
 subtype ugin := {
   lexical := { lemma := "Ugin" },
   spelling := "Ugin",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Ugin",
   confers := []
 }

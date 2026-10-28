@@ -9,7 +9,7 @@ keyword unearth (cost : Cost) : Ability := {
         (sequentially
           [ returnToBattlefield thisCard (from_ := yourGraveyard),
             gainHaste thisPermanent,
-            atNext .endStep
+            atNext endStep
               (exile thisPermanent),
             replaceEvent (would thisPermanent leave)
               (instead (exile thisPermanent))

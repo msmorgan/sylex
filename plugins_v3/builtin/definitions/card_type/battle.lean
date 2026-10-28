@@ -9,13 +9,13 @@ card_type battle := {
   spelling := "battle",
   name := "Battle",
   cardClass := some .permanentCard,
-  stats := [.defense],
+  stats := [defense],
   confers :=
     [castableFrom yourHand asSorcery,
-      .ability
+      ability
         (static
           (entersWithCounters this_
-            (statOf (.stat .defense) this_)
+            (statOf (.stat defense) this_)
             (.named "defenseCounter"))),
       .property (can any (attack this_)),
       damageResult
@@ -29,7 +29,7 @@ card_type battle := {
                 (hasSubtype siege)),
             compareAmt
               (countersOn (.named "defenseCounter") this_)
-              .eq 0])
+              eq 0])
         (putInto this_ graveyard),
       .property
         (onlyUnless

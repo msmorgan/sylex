@@ -1,7 +1,7 @@
 subtype incarnation := {
   lexical := { lemma := "Incarnation" },
   spelling := "Incarnation",
-  kind := .creature,
+  kind := creature,
   name := "Incarnation",
   confers := []
 }

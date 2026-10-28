@@ -1,6 +1,6 @@
 counter ingredientCounter := {
   lexical := { lemma := "ingredient counter" },
   spelling := "ingredient counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

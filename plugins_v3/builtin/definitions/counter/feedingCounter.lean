@@ -1,6 +1,6 @@
 counter feedingCounter := {
   lexical := { lemma := "feeding counter" },
   spelling := "feeding counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

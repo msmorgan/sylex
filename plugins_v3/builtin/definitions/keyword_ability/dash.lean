@@ -9,7 +9,7 @@ keyword dash (cost : Cost) : Ability := {
       static
         (resolutionDelayedTrigger
           (doIf (keywordCostPaid dash thisSpell)
-            (atNext .endStep (returnToHand (becomes thisSpell))))),
+            (atNext endStep (returnToHand (becomes thisSpell))))),
       static
         (onlyWhile (abilityGrant thisPermanent (keyword haste))
           (keywordCostPaid dash thisPermanent)) ]

@@ -1,6 +1,6 @@
 counter pageCounter := {
   lexical := { lemma := "page counter" },
   spelling := "page counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

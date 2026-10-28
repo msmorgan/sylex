@@ -1,7 +1,7 @@
 subtype construct := {
   lexical := { lemma := "Construct" },
   spelling := "Construct",
-  kind := .creature,
+  kind := creature,
   name := "Construct",
   confers := []
 }

@@ -11,8 +11,8 @@ keyword dethrone : Ability := {
               (a
                 (and
                   [isPlayer,
-                    superlative .max
-                      (.playerStat .lifeTotal) isPlayer])))))
+                    superlative max
+                      (.playerStat lifeTotal) isPlayer])))))
         (putCounters 1 (printedKind p1p1Counter)
           thisCreature)]
 }

@@ -1,4 +1,4 @@
 template isUntapped : Predicate := {
   spelling := "untapped",
-  body := hasStatus .untapped
+  body := hasStatus untapped
 }

@@ -7,7 +7,7 @@ keyword poisonous (amount : Amount) : Ability := {
     [whenever
         (does (actor thisCreature)
           (dealDamage anyAmount (a isPlayer)
-            (some .combat)))
+            (some combat)))
         (putCounters amount (printedKind poison)
           they)]
 }

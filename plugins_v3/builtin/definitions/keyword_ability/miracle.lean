@@ -7,8 +7,8 @@ keyword miracle (cost : Cost) : Ability := {
   spelling := "miracle <cost>",
   body :=
     [ static
-        (asEvent (nthOccurrence (.nth 1) (does you (draw 1)) (some .turn))
-          (doIf (is (that .card) (not (otherThan thisCard)))
+        (asEvent (nthOccurrence (nth 1) (does you (draw 1)) (some turn))
+          (doIf (is (that card) (not (otherThan thisCard)))
             (triggerReflexively (may (reveal thisCard))
               (may (cast thisCard (payment := payingInstead cost))))
             none)) ]

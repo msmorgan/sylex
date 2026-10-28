@@ -2,7 +2,7 @@
 designation suspected := {
   lexical := { adjectives := ["suspected"] },
   spelling := "suspected",
-  scope := (.heldBy .object),
+  scope := (.heldBy object),
   sole := false,
   confers := []
 }

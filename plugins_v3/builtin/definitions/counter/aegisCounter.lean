@@ -1,6 +1,6 @@
 counter aegisCounter := {
   lexical := { lemma := "aegis counter" },
   spelling := "aegis counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

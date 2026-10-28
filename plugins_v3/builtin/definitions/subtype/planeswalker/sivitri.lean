@@ -2,7 +2,7 @@
 subtype sivitri := {
   lexical := { lemma := "Sivitri" },
   spelling := "Sivitri",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Sivitri",
   confers := []
 }

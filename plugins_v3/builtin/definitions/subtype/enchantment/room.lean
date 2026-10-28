@@ -2,7 +2,7 @@
 subtype room := {
   lexical := { lemma := "Room" },
   spelling := "Room",
-  kind := .enchantment,
+  kind := enchantment,
   name := "Room",
   confers := []
 }

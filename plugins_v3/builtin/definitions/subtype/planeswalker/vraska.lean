@@ -2,7 +2,7 @@
 subtype vraska := {
   lexical := { lemma := "Vraska" },
   spelling := "Vraska",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Vraska",
   confers := []
 }

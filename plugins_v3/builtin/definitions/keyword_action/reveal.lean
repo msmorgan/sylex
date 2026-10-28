@@ -3,5 +3,5 @@ action reveal (cards : NounPhrase) : Action := {
   lexical := { verbs := [{ lemma := "reveal", frames := [Monotransitive] }] },
   spelling := "reveal <cards>",
   body :=
-    expose .reveal (Templates.Exposed.cards cards)
+    expose reveal (Templates.Exposed.cards cards)
 }

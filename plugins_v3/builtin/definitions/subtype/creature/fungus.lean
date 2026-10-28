@@ -1,7 +1,7 @@
 subtype fungus := {
   lexical := { lemma := "Fungus", plural := "Fungi" },
   spelling := "Fungus",
-  kind := .creature,
+  kind := creature,
   name := "Fungus",
   confers := []
 }

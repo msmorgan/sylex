@@ -1,6 +1,6 @@
 counter rustCounter := {
   lexical := { lemma := "rust counter" },
   spelling := "rust counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

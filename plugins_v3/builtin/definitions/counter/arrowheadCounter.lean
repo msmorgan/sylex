@@ -1,6 +1,6 @@
 counter arrowheadCounter := {
   lexical := { lemma := "arrowhead counter" },
   spelling := "arrowhead counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

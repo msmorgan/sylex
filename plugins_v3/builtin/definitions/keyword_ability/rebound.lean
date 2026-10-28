@@ -23,7 +23,7 @@ keyword rebound : Ability := {
               (sequentially
                 [exile thisSpell,
                   delay
-                    (beginningOf .upkeep (some you)
+                    (beginningOf upkeep (some you)
                       (nextTime none))
                     (may
                       (cast this_ none

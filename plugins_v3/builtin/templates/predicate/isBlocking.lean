@@ -1,4 +1,4 @@
 template isBlocking : Predicate := {
   spelling := "blocking",
-  body := inCombat .blockerOf none
+  body := inCombat blockerOf none
 }

@@ -9,6 +9,6 @@ action regenerate (subject : NounPhrase) : Action := {
       (replace
         (would any (Semantics.Definitions.destroy subject))
         (instead (Semantics.Definitions.regeneration subject)) none
-        .nextTimeOnly none)
+        nextTimeOnly none)
       (some thisTurn)
 }

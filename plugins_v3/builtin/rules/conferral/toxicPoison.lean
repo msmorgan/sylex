@@ -17,7 +17,7 @@ conferral toxicPoison := {
           (asEvent
             (does (actor this_)
               (dealDamage anyAmount
-                (a isPlayer) (some .combat)))
+                (a isPlayer) (some combat)))
             (putCounters (totalToxicValue this_)
               (printedKind poison)
               (that player))) }

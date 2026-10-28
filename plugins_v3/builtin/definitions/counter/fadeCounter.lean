@@ -3,6 +3,6 @@ permanent if a fade counter cannot be removed. [CR#702.32a] -/
 counter fadeCounter := {
   lexical := { lemma := "fade counter" },
   spelling := "fade counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

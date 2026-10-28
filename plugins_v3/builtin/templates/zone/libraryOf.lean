@@ -2,5 +2,5 @@
 -- [CR#401.2]
 template libraryOf (player : NounPhrase) : Location := {
   spelling := "<player>'s library",
-  body := zone .library (some player)
+  body := zone library (some player)
 }

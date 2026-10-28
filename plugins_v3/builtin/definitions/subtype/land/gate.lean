@@ -1,7 +1,7 @@
 subtype gate := {
   lexical := { lemma := "Gate" },
   spelling := "Gate",
-  kind := .land,
+  kind := land,
   name := "Gate",
   confers := []
 }

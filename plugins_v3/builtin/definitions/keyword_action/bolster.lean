@@ -9,7 +9,7 @@ action bolster (amount : Amount) : Action := {
           (a
             (and
               [isCreature, actorControls,
-                superlative .min (.stat .toughness)
+                superlative min (.stat toughness)
                   (and
                     [isCreature, actorControls])])),
         putCounters amount (printedKind p1p1Counter)

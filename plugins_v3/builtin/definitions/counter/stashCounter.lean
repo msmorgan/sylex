@@ -1,6 +1,6 @@
 counter stashCounter := {
   lexical := { lemma := "stash counter" },
   spelling := "stash counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

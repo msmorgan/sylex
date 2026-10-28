@@ -1,6 +1,6 @@
 counter emberCounter := {
   lexical := { lemma := "ember counter" },
   spelling := "ember counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

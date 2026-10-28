@@ -7,6 +7,6 @@ template creatureTokenOf (power toughness : Amount) (colors : List Color)
   -- the empty case.
   body :=
     { characteristics :=
-        { colors, types := [.creature], subtypes, text := abilities, power := power,
+        { colors, types := [creature], subtypes, text := abilities, power := power,
           toughness := toughness } }
 }

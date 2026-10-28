@@ -164,13 +164,21 @@ structure ExpectedTypeEntry where
   declaration : Name
   deriving Inhabited
 
+private def addExpectedTypeEntry (table : NameMap (List ExpectedTypeEntry))
+    (entry : ExpectedTypeEntry) : NameMap (List ExpectedTypeEntry) :=
+  let prev := table.find? entry.bareName |>.getD []
+  let filtered := prev.filter fun previous =>
+    previous.returnType != entry.returnType || previous.declaration != entry.declaration
+  table.insert entry.bareName (entry :: filtered)
+
 initialize expectedTypeDispatchExt : SimplePersistentEnvExtension ExpectedTypeEntry
-    (List ExpectedTypeEntry) ← registerSimplePersistentEnvExtension {
-  addEntryFn := fun entries entry => entry :: entries.filter (fun previous =>
-    previous.bareName != entry.bareName || previous.returnType != entry.returnType ||
-      previous.declaration != entry.declaration)
-  addImportedFn := fun imports => imports.toList.flatMap Array.toList
+    (NameMap (List ExpectedTypeEntry)) ← registerSimplePersistentEnvExtension {
+  addEntryFn := addExpectedTypeEntry
+  addImportedFn := mkStateFromImportedEntries addExpectedTypeEntry {}
 }
+
+private def expectedTypeEntries (env : Environment) (bare : Name) : List ExpectedTypeEntry :=
+  expectedTypeDispatchExt.getState env |>.find? bare |>.getD []
 
 private def authoredResultSort? (type : Expr) : MetaM (Option Name) := do
   let type ← whnfR type
@@ -240,8 +248,8 @@ private def registerSharedAliases (declaration : Name) : CommandElabM Unit := do
     let ns := if lastNameComponent declaration.getPrefix == result.getString! then
       declaration.getPrefix.getPrefix else declaration.getPrefix
     let bare := Name.mkSimple declaration.getString!
-    let siblings := (expectedTypeDispatchExt.getState (← getEnv)).filter fun entry =>
-      entry.bareName == bare && entry.declaration.getString! == bare.getString! &&
+    let siblings := (expectedTypeEntries (← getEnv) bare).filter fun entry =>
+      entry.declaration.getString! == bare.getString! &&
         entry.returnType != result &&
         (entry.declaration.getPrefix == ns ||
           entry.declaration.getPrefix == ns ++ Name.mkSimple entry.returnType.getString!)
@@ -250,7 +258,6 @@ private def registerSharedAliases (declaration : Name) : CommandElabM Unit := do
       for sibling in siblings do addSortAlias sibling.declaration
 
 private def needsExpectedTypeDispatch (entries : List ExpectedTypeEntry) (bare : Name) : Bool :=
-  let entries := entries.filter (·.bareName == bare)
   entries.any (fun e =>
     lastNameComponent e.declaration.getPrefix == e.returnType.getString! ||
     e.declaration.getString! != bare.getString!) ||
@@ -268,7 +275,7 @@ private def isShadowedByNonCallableLocal (id : Name) : TermElabM Bool := do
 
 private def dispatchTarget? (bare sort : Name) (allowSingle : Bool := false) :
     TermElabM (Option Name) := do
-  let entries := expectedTypeDispatchExt.getState (← getEnv)
+  let entries := expectedTypeEntries (← getEnv) bare
   unless allowSingle || needsExpectedTypeDispatch entries bare do return none
   let ns ← getCurrNamespace
   let opens ← getOpenDecls
@@ -279,7 +286,7 @@ private def dispatchTarget? (bare sort : Name) (allowSingle : Bool := false) :
     scopeName.isPrefixOf ns || opens.any (fun
       | .simple n _ => n == scopeName
       | .explicit _ n => n == decl)
-  return (entries.find? fun e => e.bareName == bare && e.returnType == sort &&
+  return (entries.find? fun e => e.returnType == sort &&
     visible e.declaration).map (·.declaration)
 
 private def hasOrdinaryNamespaceBinding (stx : Syntax) (expected : Expr)
@@ -306,8 +313,8 @@ def dispatchOnExpectedType : TermElab := fun stx expected? => do
   unless fn.isIdent do throwUnsupportedSyntax
   if ← isCallableLocal fn.getId then throwUnsupportedSyntax
   let shadowed ← isShadowedByNonCallableLocal fn.getId
-  unless shadowed || needsExpectedTypeDispatch
-      (expectedTypeDispatchExt.getState (← getEnv)) fn.getId do
+  let entries := expectedTypeEntries (← getEnv) fn.getId
+  unless shadowed || needsExpectedTypeDispatch entries fn.getId do
     throwUnsupportedSyntax
   let some expected := expected? | throwUnsupportedSyntax
   if ← hasOrdinaryNamespaceBinding fn expected (application := true) then throwUnsupportedSyntax
@@ -322,7 +329,6 @@ def dispatchOnExpectedType : TermElab := fun stx expected? => do
   let exact ← dispatchTarget? fn.getId sort (allowSingle := shadowed)
   let targets ← if let some target := exact then pure [target] else do
     -- A noun phrase may be requested through its Subject coercion.
-    let entries := (expectedTypeDispatchExt.getState (← getEnv)).filter (·.bareName == fn.getId)
     let visible ← entries.mapM fun entry =>
       dispatchTarget? fn.getId entry.returnType (allowSingle := shadowed)
     pure (visible.filterMap id).eraseDups
@@ -502,16 +508,21 @@ def actionDefinitionDeed? (name : Name) : MetaM (Option Expr) := do
       return none
     return some (mkApp2 (mkConst `Semantics.Deed.action) label permanent)
 
+initialize actionDeedsExt : SimplePersistentEnvExtension (Name × Expr) (List (Name × Expr)) ←
+  registerSimplePersistentEnvExtension {
+    addEntryFn := fun entries entry => entry :: entries
+    addImportedFn := fun imports => imports.toList.flatMap Array.toList
+  }
+
 /-- Definitions sharing a keyword-action label must agree on what the deed says of a
 Permanent, including Definitions imported from other modules. -/
 private def checkActionDeed (declaration : Name) (deed : Expr) : MetaM Unit := do
   let env ← getEnv
-  for (name, _) in env.constants.toList do
-    if name != declaration && definitionAttribute.hasTag env name then
-      if let some other ← actionDefinitionDeed? name then
-        if (← isDefEq deed.appFn!.appArg! other.appFn!.appArg!) &&
-            !(← isDefEq deed.appArg! other.appArg!) then
-          throwError "Action Definitions for deed {deed.appFn!.appArg!} must agree on DeedPermanent"
+  for (name, other) in actionDeedsExt.getState env do
+    if name != declaration then
+      if (← isDefEq deed.appFn!.appArg! other.appFn!.appArg!) &&
+          !(← isDefEq deed.appArg! other.appArg!) then
+        throwError "Action Definitions for deed {deed.appFn!.appArg!} must agree on DeedPermanent"
 
 /-- The authored `Deed` an Action Definition generates: `exile.deed` is the keyword action
 `exile` performs. A card names a deed through it (`elabDeedName`), never by the internal
@@ -708,6 +719,7 @@ elab_rules : command
       definitionAttribute.setTag labelName
     if let some deed ← liftTermElabM (actionDefinitionDeed? declaration) then
       liftTermElabM <| checkActionDeed declaration deed
+      modifyEnv fun env => actionDeedsExt.addEntry env (declaration, deed)
       let deedName := deedConstant declaration
       liftCoreM <| addAndCompile <| .defnDecl {
         name := deedName
@@ -967,17 +979,14 @@ private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) :
 @[scoped term_elab ident] def elabBareIdentDispatch : TermElab := fun stx expected? => do
   unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
   let some expected := expected? | throwUnsupportedSyntax
-  if ← hasOrdinaryNamespaceBinding stx expected then throwUnsupportedSyntax
   if let some ldecl := (← getLCtx).findFromUserName? stx.getId then
     unless ldecl.isAuxDecl do throwUnsupportedSyntax
-  let entries := expectedTypeDispatchExt.getState (← getEnv)
+  let entries := expectedTypeEntries (← getEnv) stx.getId
   let inTable := needsExpectedTypeDispatch entries stx.getId
-  let kwLabel? ← resolveKeywordLabelConst? stx
-  if !inTable && kwLabel?.isNone then
-    throwUnsupportedSyntax
   let expected ← instantiateMVars expected
   if expected.getAppFn.isMVar then
-    tryPostpone
+    if inTable || (← resolveKeywordLabelConst? stx).isSome then
+      tryPostpone
     throwUnsupportedSyntax
   let expectedWhnf ← whnfR expected
   let (expectedHead, isOption) ←
@@ -988,6 +997,12 @@ private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) :
     else
       pure (expectedWhnf, false)
   let some sort := (← whnfR expectedHead).getAppFn.constName? | throwUnsupportedSyntax
+  let kwLabel? ← if sort == `Semantics.KeywordLabel || sort == `Semantics.KeywordTerm then
+      resolveKeywordLabelConst? stx
+    else pure none
+  if !inTable && kwLabel?.isNone then
+    throwUnsupportedSyntax
+  if ← hasOrdinaryNamespaceBinding stx expected then throwUnsupportedSyntax
   -- All result sorts use the declaration registry.
   if let some targetDecl ← dispatchTarget? stx.getId sort then
     if stx.getId == targetDecl then throwUnsupportedSyntax
@@ -1007,6 +1022,45 @@ private def resolveKeywordLabelConst? (stx : Syntax) : TermElabM (Option Name) :
           else `(term| $(mkIdent `Semantics.Templates.theKeyword) $(mkCIdentFrom stx labelConst))
       return ← withMacroExpansion stx term <| elabTerm term (some expected)
   throwUnsupportedSyntax
+
+private def elabClosedWord (application : Bool) : TermElab := fun stx expected? => do
+  unless (← getEnv).contains `Semantics.Color do throwUnsupportedSyntax
+  let fn := if application then stx[0] else stx
+  unless fn.isIdent && fn.getId.getPrefix.isAnonymous do throwUnsupportedSyntax
+  if fn.getId.eraseMacroScopes ∈ [`some, `none] then throwUnsupportedSyntax
+  let some expected := expected? | throwUnsupportedSyntax
+  let expected ← instantiateMVars expected
+  if expected.getAppFn.isMVar then throwUnsupportedSyntax
+  let expectedWhnf := expected
+  let isOption := expectedWhnf.isAppOfArity ``Option 1
+  let inner := if isOption then expectedWhnf.appArg! else expectedWhnf
+  let some sort := inner.getAppFn.constName? | throwUnsupportedSyntax
+  let env ← getEnv
+  unless (`Semantics).isPrefixOf sort && sort != `Semantics.Card do throwUnsupportedSyntax
+  let ctor := sort ++ fn.getId.eraseMacroScopes
+  let some (.ctorInfo _) := env.find? ctor | throwUnsupportedSyntax
+  if expressionAttribute.hasTag env sort || internalAttribute.hasTag env sort then
+    throwUnsupportedSyntax
+  if let some localDecl := (← getLCtx).findFromUserName? fn.getId then
+    unless localDecl.isAuxDecl do
+      let saved ← saveState
+      let compatible ← isDefEq localDecl.type expected <||> isDefEq localDecl.type inner
+      saved.restore
+      if compatible || (application && (← whnf localDecl.type).isForall) then
+        throwUnsupportedSyntax
+  if ← hasOrdinaryNamespaceBinding fn expected application then throwUnsupportedSyntax
+  if let some target ← dispatchTarget? fn.getId sort (allowSingle := true) then
+    if env.contains target then throwUnsupportedSyntax
+  let call := if application then stx.setArg 0 (mkCIdentFrom fn ctor)
+    else mkCIdentFrom fn ctor
+  let call ← if isOption then `(term| some $(⟨call⟩)) else pure ⟨call⟩
+  withMacroExpansion stx call <| elabTerm call expected?
+
+@[scoped term_elab ident]
+def elabClosedWordIdent : TermElab := elabClosedWord false
+
+@[scoped term_elab Lean.Parser.Term.app]
+def elabClosedWordApp : TermElab := elabClosedWord true
 
 /-- Top-down structure literal elaborator: allows writing `{ subtypes := [subtype] }` directly
 where `CharacteristicBundle` is expected. -/
@@ -1136,10 +1190,10 @@ private def resolvePrintedCard (key : String) : TermElabM Name := do
   let bare := Name.mkSimple key
   let ns ← getCurrNamespace
   let opens ← getOpenDecls
-  let candidates := [ns ++ bare] ++ (opens.filterMap fun
+  let candidates := [ns ++ bare, ns ++ `Spelled ++ bare] ++ (opens.filterMap fun
     | .simple n _ => some (n ++ bare)
     | .explicit alias n => if alias == bare then some n else none) ++
-    [`Semantics.Cards ++ bare]
+    [`Semantics.Cards ++ bare, `Semantics.Cards.Spelled ++ bare]
   for name in candidates.eraseDups do
     if let some info := env.find? name then
       if (← whnfR info.type).isConstOf `Semantics.Spelled then return name
@@ -1168,7 +1222,8 @@ private def cardRecordFields (stx : Syntax) : Except String (List (Name × Synta
     let name := field[0][0].getId.eraseMacroScopes
     if fields.any (·.1 == name) then throw s!"Duplicate card field {name}"
     if name == `body then throw "Anonymous card does not accept body :="
-    fields := fields ++ [(name, if field[1].isNone then (mkIdent name).raw else field[1][2][2])]
+    if field[1].isNone then throw s!"Card field {name} requires :="
+    fields := fields ++ [(name, field[1][2][2])]
   return fields
 
 @[scoped term_elab Lean.Parser.Term.app]
@@ -1571,18 +1626,20 @@ private def bundleKeyLess (a b : BundleKey) : Bool :=
     (a.bareName == b.bareName && a.returnType.toString < b.returnType.toString)
 
 def bundleDependencies (items : List BundleItem) (item : BundleItem) : List BundleKey :=
-  if item.primitive then [] else items.filterMap fun other =>
-    let qualified := Name.mkSimple other.key.returnType.getString! ++ other.key.bareName
-    let row := Name.mkSimple (other.key.bareName.getString! ++ "_definition")
-    let references := if other.primitive then item.references ++ item.primitiveReferences
-      else item.references
-    if ((other.valueRegistered && references.contains row) ||
-        (!other.valueRegistered &&
-          (references.contains other.key.bareName || references.contains qualified))) &&
-      other.key != item.key &&
-      (other.key.bareName != item.key.bareName || other.primitive ||
-        (item.key.returnType == `Semantics.Ability && other.key.returnType == `Semantics.Action))
-    then some other.key else none
+  if item.primitive then [] else
+    let refSet := Std.HashSet.ofList item.references
+    let primRefSet := Std.HashSet.ofList (item.references ++ item.primitiveReferences)
+    items.filterMap fun other =>
+      let qualified := Name.mkSimple other.key.returnType.getString! ++ other.key.bareName
+      let row := Name.mkSimple (other.key.bareName.getString! ++ "_definition")
+      let references := if other.primitive then primRefSet else refSet
+      if ((other.valueRegistered && references.contains row) ||
+          (!other.valueRegistered &&
+            (references.contains other.key.bareName || references.contains qualified))) &&
+        other.key != item.key &&
+        (other.key.bareName != item.key.bareName || other.primitive ||
+          (item.key.returnType == `Semantics.Ability && other.key.returnType == `Semantics.Action))
+      then some other.key else none
 
 /-- Kahn's algorithm, choosing the least ready (bare name, return type) at every step. -/
 def topoSortBundle (items : List BundleItem) : Except String (List BundleItem) := Id.run do

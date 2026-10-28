@@ -2,7 +2,7 @@
 subtype daretti := {
   lexical := { lemma := "Daretti" },
   spelling := "Daretti",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Daretti",
   confers := []
 }

@@ -2,5 +2,5 @@
 -- [CR#602.5b,702.177a]
 template oncePerObject : UsageLimit := {
   spelling := "Activate only once",
-  body := usageLimit 1 .thisObject
+  body := usageLimit 1 thisObject
 }

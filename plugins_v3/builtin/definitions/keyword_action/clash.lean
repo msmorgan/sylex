@@ -5,10 +5,10 @@ action clash : Action := {
   spelling := "clash",
   body :=
     sequentially
-      [expose .reveal
+      [expose reveal
           (cards
-            (slice .top 1
+            (slice top 1
               (libraryOf actor))),
         may
-          (putInto (that .card) onBottom)]
+          (putInto (that card) onBottom)]
 }

@@ -1,6 +1,6 @@
 counter invitationCounter := {
   lexical := { lemma := "invitation counter" },
   spelling := "invitation counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

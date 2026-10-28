@@ -2,7 +2,7 @@
 subtype plan := {
   lexical := { lemma := "Plan" },
   spelling := "Plan",
-  kind := .enchantment,
+  kind := enchantment,
   name := "Plan",
   confers := []
 }

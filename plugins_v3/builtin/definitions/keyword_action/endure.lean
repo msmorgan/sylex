@@ -8,5 +8,5 @@ action endure (amount : Amount) : Action := {
     instruct (controllerOf theActor)
         (chooseOne
           (putCounters amount p1p1Counter theActor)
-          (create 1 (creatureTokenOf amount amount [.white] [spirit])))
+          (create 1 (creatureTokenOf amount amount [white] [spirit])))
 }

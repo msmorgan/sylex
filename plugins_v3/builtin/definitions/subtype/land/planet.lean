@@ -2,7 +2,7 @@
 subtype planet := {
   lexical := { lemma := "Planet" },
   spelling := "Planet",
-  kind := .land,
+  kind := land,
   name := "Planet",
   confers := []
 }

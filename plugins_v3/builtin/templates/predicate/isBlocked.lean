@@ -3,5 +3,5 @@ blocked, until it is removed from combat [CR#509.1h,506.4]. -/
 -- [CR#509.1h,506.4]
 template isBlocked : Predicate := {
   spelling := "blocked",
-  body := inCombat .blockedBy none
+  body := inCombat blockedBy none
 }

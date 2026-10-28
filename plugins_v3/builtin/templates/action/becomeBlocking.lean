@@ -2,5 +2,5 @@
 template becomeBlocking (subject blocked : NounPhrase) : Action := {
   spelling := "<subject> becomes blocking <blocked>",
   body :=
-    combat subject (blocking .attached blocked)
+    combat subject (blocking attached blocked)
 }

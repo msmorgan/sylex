@@ -3,5 +3,5 @@
 -- [CR#400.3]
 template library : Location := {
   spelling := "its owner's library",
-  body := zone .library none
+  body := zone library none
 }

@@ -16,5 +16,5 @@ keyword dredge (amount : Amount) : Ability := {
                     returnToHand this_ yourGraveyard]))))
           (compareAmt
             (countOf (cardIn yourLibrary))
-            .atLeast amount))]
+            atLeast amount))]
 }

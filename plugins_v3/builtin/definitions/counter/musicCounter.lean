@@ -1,6 +1,6 @@
 counter musicCounter := {
   lexical := { lemma := "music counter" },
   spelling := "music counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

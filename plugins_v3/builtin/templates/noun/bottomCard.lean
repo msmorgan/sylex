@@ -2,5 +2,5 @@
 template bottomCard : NounPhrase := {
   spelling := "the bottom card of your library",
   body :=
-    slice .bottom 1 (libraryOf you)
+    slice bottom 1 (libraryOf you)
 }

@@ -12,7 +12,7 @@ keyword soulshift (amount : Amount) : Ability := {
             (target
               (and
                 [isCard, hasSubtype spirit,
-                  hasManaValue .atMost amount,
+                  hasManaValue atMost amount,
                   in_ yourGraveyard]))
             yourGraveyard))]
 }

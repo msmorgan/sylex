@@ -4,5 +4,5 @@ template entersWithFewerCounters (subject : NounPhrase) (amount : Amount)
   spelling := "<subject> enters with <amount> fewer <kind> counters on it",
   body :=
     enters subject
-      [withCounters amount (printedKind kind) .fewer]
+      [withCounters amount (printedKind kind) fewer]
 }

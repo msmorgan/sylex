@@ -3,6 +3,6 @@
 counter shadowCounter := {
   lexical := { lemma := "shadow counter" },
   spelling := "shadow counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

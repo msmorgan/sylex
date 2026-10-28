@@ -9,7 +9,7 @@ keyword skulk : Ability := {
             (allOf
               (and
                 [isCreature,
-                  hasPower .greater
+                  hasPower greater
                     (powerOf thisCreature)])))
           (block thisCreature))]
 }

@@ -6,7 +6,7 @@ No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype class_ := {
   lexical := { lemma := "Class" },
   spelling := "Class",
-  kind := .enchantment,
+  kind := enchantment,
   name := "Class",
   confers := []
 }

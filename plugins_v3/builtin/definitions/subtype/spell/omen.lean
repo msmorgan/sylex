@@ -5,7 +5,7 @@ No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype omen := {
   lexical := { lemma := "Omen" },
   spelling := "Omen",
-  kind := .spell,
+  kind := spell,
   name := "Omen",
   confers := []
 }

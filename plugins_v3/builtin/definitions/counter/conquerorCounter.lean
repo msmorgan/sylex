@@ -1,6 +1,6 @@
 counter conquerorCounter := {
   lexical := { lemma := "conqueror counter" },
   spelling := "conqueror counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

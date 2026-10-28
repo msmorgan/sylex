@@ -2,7 +2,7 @@
 subtype calix := {
   lexical := { lemma := "Calix" },
   spelling := "Calix",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Calix",
   confers := []
 }

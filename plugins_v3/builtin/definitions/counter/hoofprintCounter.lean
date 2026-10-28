@@ -1,6 +1,6 @@
 counter hoofprintCounter := {
   lexical := { lemma := "hoofprint counter" },
   spelling := "hoofprint counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

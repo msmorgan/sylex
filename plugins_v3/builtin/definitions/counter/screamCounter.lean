@@ -1,6 +1,6 @@
 counter screamCounter := {
   lexical := { lemma := "scream counter" },
   spelling := "scream counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

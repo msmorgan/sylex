@@ -1,6 +1,6 @@
 counter ingenuityCounter := {
   lexical := { lemma := "ingenuity counter" },
   spelling := "ingenuity counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

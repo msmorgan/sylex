@@ -5,7 +5,7 @@ template lookAndSortSlice (slice : NounPhrase) (spill : Location)
   -- TODO(spelling): Format and coordinate the spillRiders list entries, including the empty case.
   body :=
     sequentially
-      [expose .lookAt
+      [expose lookAt
           (cards (slice)),
         move
           (someOf anyNumber
@@ -13,5 +13,5 @@ template lookAndSortSlice (slice : NounPhrase) (spill : Location)
           wherever (some spill) .arrival spillRiders,
         move theRest wherever
           (some onTop) .arrival
-          [inOrder .anyOrder]]
+          [inOrder anyOrder]]
 }

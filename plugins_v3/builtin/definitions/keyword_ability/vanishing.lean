@@ -7,7 +7,7 @@ keyword vanishing (amount : Amount) : Ability := {
   body :=
     [static
         (entersWithCounters thisPermanent amount timeCounter),
-      at_ (beginningOfYour .upkeep)
+      at_ (beginningOfYour upkeep)
         (removeCounters (oneThrough 1)
           (some (printedKind timeCounter))
           thisPermanent)

@@ -13,6 +13,6 @@ keyword haste : Ability := {
     [ static (can thisCreature attack
         (asThough := holds (controlledSinceTheirTurnBegan it))),
       static (can (controllerOf thisCreature)
-        (activate (allOf (and [abilityHead .anyActivated, abilityOf it, tapOrUntapInCost])))
+        (activate (allOf (and [abilityHead anyActivated, abilityOf it, tapOrUntapInCost])))
         (asThough := holds (controlledSinceTheirTurnBegan thisCreature))) ]
 }

@@ -1,6 +1,6 @@
 counter nightCounter := {
   lexical := { lemma := "night counter" },
   spelling := "night counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

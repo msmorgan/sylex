@@ -13,12 +13,12 @@ keyword eternalize (cost : Cost) : Ability := {
         (create 1
           (copyOf this_
             [edits
-                [colors .sets
-                    (.some [.black]),
-                  stat .sets .power 4,
-                  stat .sets .toughness 4,
+                [colors sets
+                    (.some [black]),
+                  stat sets power 4,
+                  stat sets toughness 4,
                   manaCost none,
-                  typeLine .adds
+                  typeLine adds
                     { subtypes := some [zombie] }]]))
         asSorcery]
 }

@@ -10,6 +10,6 @@ template preventNext (to : NounPhrase) (amount : Amount) (duration : Option Dura
         (would any (dealDamage anyAmount to kind))
         (instead
           (preventDamage (theNext amount) none none))
-        none .repeatedly none)
+        none repeatedly none)
       duration
 }

@@ -2,7 +2,7 @@
 subtype island := {
   lexical := { lemma := "Island" },
   spelling := "Island",
-  kind := .land,
+  kind := land,
   name := "Island",
   confers := []
 }

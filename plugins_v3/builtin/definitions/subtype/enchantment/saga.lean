@@ -6,19 +6,19 @@ left the stack. -/
 subtype saga := {
   lexical := { lemma := "Saga" },
   spelling := "Saga",
-  kind := .enchantment,
+  kind := enchantment,
   name := "Saga",
   confers :=
     have hasChapterAbilities : Condition :=
-      compareAmt (finalChapterNumber thisSaga) .atLeast 1;
-    [.ability
+      compareAmt (finalChapterNumber thisSaga) atLeast 1;
+    [ability
         (static
           (onlyUnless
             (entersWithCounters thisSaga 1
               (.named "loreCounter"))
             (is thisSaga
               (hasKeyword (.the (.named "readAhead")))))),
-      .turnBased .firstMain
+      .turnBased firstMain
         (doIf hasChapterAbilities
           (putCounters 1 (printedKind (.named "loreCounter")) thisSaga)),
       .stateBased
@@ -26,7 +26,7 @@ subtype saga := {
           [hasChapterAbilities,
             compareAmt
               (countersOn (.named "loreCounter") thisSaga)
-              .atLeast (finalChapterNumber thisSaga),
+              atLeast (finalChapterNumber thisSaga),
             not (exists_ (and [chapterAbilityOf thisSaga, triggeredNotLeftStack]))])
         (sacrifice thisSaga)]
 }

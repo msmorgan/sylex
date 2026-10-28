@@ -3,6 +3,6 @@
 template duringYourUntapStep : Timing := {
   spelling := "during your untap step",
   body :=
-    inPart .untapStep (some you)
+    inPart untapStep (some you)
       (eachTime none)
 }

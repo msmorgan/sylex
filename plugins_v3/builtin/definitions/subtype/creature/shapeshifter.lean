@@ -1,7 +1,7 @@
 subtype shapeshifter := {
   lexical := { lemma := "Shapeshifter" },
   spelling := "Shapeshifter",
-  kind := .creature,
+  kind := creature,
   name := "Shapeshifter",
   confers := []
 }

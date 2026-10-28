@@ -2,7 +2,7 @@
 subtype mountain := {
   lexical := { lemma := "Mountain" },
   spelling := "Mountain",
-  kind := .land,
+  kind := land,
   name := "Mountain",
   confers := []
 }

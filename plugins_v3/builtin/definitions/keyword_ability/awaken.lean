@@ -16,11 +16,11 @@ keyword awaken (amount : Amount) (cost : Cost) : Ability := {
                   (and [isLand, youControl])),
               establish
                 (characteristicChange (that land)
-                  [typeLine .adds
+                  [typeLine adds
                       { types := some [Semantics.CardType.creature],
                         subtypes := some [elemental] },
-                    stat .sets .power 0,
-                    stat .sets .toughness 0,
+                    stat sets power 0,
+                    stat sets toughness 0,
                     addedAbilities
                       [keyword haste.label]])
                 none]))]

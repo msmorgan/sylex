@@ -2,5 +2,5 @@
 template lookAtHandOf (player : NounPhrase) : Action := {
   spelling := "look at <player>'s hand",
   body :=
-    expose .lookAt (zone (handOf player))
+    expose lookAt (zone (handOf player))
 }

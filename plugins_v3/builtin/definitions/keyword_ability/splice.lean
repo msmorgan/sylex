@@ -16,7 +16,7 @@ keyword Ability.splice (quality : Predicate) (cost : Cost) : Ability := {
     [static
         (revealedAsCast
           (a (and [isSpell, quality]))
-          (conjunction [addedCost cost false .once,
-              textChange (that .spell)
+          (conjunction [addedCost cost false once,
+              textChange (that spell)
                 (appendTextOf this_)] none))]
 }

@@ -2,7 +2,7 @@
 subtype infinity := {
   lexical := { lemma := "Infinity" },
   spelling := "Infinity",
-  kind := .artifact,
+  kind := artifact,
   name := "Infinity",
   confers := []
 }

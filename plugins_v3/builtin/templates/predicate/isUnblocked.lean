@@ -5,5 +5,5 @@ blockers are declared an attacking creature is neither. -/
 -- [CR#508.4d]
 template isUnblocked : Predicate := {
   spelling := "unblocked",
-  body := inCombat .unblocked none
+  body := inCombat unblocked none
 }

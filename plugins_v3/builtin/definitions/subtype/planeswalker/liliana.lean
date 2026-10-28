@@ -2,7 +2,7 @@
 subtype liliana := {
   lexical := { lemma := "Liliana" },
   spelling := "Liliana",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Liliana",
   confers := []
 }

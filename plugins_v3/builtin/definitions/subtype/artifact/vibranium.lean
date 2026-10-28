@@ -5,7 +5,7 @@ No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype vibranium := {
   lexical := { lemma := "Vibranium" },
   spelling := "Vibranium",
-  kind := .artifact,
+  kind := artifact,
   name := "Vibranium",
   confers := []
 }

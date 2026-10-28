@@ -2,7 +2,7 @@
 subtype grist := {
   lexical := { lemma := "Grist" },
   spelling := "Grist",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Grist",
   confers := []
 }

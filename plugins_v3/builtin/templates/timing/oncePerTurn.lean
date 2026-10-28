@@ -2,5 +2,5 @@
 -- [CR#602.5b]
 template oncePerTurn : UsageLimit := {
   spelling := "only once each turn",
-  body := usageLimit 1 .turn
+  body := usageLimit 1 turn
 }

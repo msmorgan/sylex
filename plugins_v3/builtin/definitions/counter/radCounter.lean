@@ -4,6 +4,6 @@ card milled this way. [CR#122.1i,728.1] -/
 counter radCounter := {
   lexical := { lemma := "rad counter" },
   spelling := "rad counter",
-  holder := .player,
+  holder := player,
   confers := []
 }

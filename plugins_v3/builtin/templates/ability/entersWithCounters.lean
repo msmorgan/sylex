@@ -4,5 +4,5 @@ template entersWithCounters (subject : NounPhrase) (amount : Amount) (kind : Cou
   spelling := "<subject> enters with <amount> <kind> counters on it",
   body :=
     enters subject
-      [withCounters amount (printedKind kind) .fresh]
+      [withCounters amount (printedKind kind) fresh]
 }

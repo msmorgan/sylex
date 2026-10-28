@@ -5,6 +5,6 @@ template enter (from_ : Option Location := none) (riders : List MoveRider := [])
   -- list entries, including the empty case.
   body :=
     move theActor (Option.getD from_ wherever)
-      (some (zone .battlefield none)) .arrival
+      (some (zone battlefield none)) .arrival
       riders
 }

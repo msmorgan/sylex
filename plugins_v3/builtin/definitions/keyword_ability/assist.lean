@@ -21,6 +21,6 @@ keyword assist : Ability := {
             action :=
               instruct (the isChosenPlayer)
                 (pay (mana [generic 1])
-                  .once),
+                  once),
             pays := [generic] })]
 }

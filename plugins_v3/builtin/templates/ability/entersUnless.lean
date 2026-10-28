@@ -9,5 +9,5 @@ template entersUnless (subject : NounPhrase) (riders : List MoveRider)
     replace
       (would (actor subject) enter)
       (doIf (not condition) (withRiders riders))
-      none .repeatedly none
+      none repeatedly none
 }

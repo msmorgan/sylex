@@ -2,7 +2,7 @@
 subtype mine := {
   lexical := { lemma := "Mine" },
   spelling := "Mine",
-  kind := .land,
+  kind := land,
   name := "Mine",
   confers := []
 }

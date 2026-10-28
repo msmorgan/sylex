@@ -5,5 +5,5 @@ template eventSum (action : Action) (subj : Subject) (within : Duration)
   body :=
     tally
       { subj := subj, action := action, within := some (Templates.LookbackSpan.within within timing) }
-      .quantity
+      quantity
 }

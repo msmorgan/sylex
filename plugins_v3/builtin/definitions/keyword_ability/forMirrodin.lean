@@ -6,6 +6,6 @@ keyword forMirrodin : Ability := {
   body :=
     [ when (does thisEquipment enter)
         (sequentially
-          [ create 1 (creatureToken 2 2 [.red] [rebel]),
+          [ create 1 (creatureToken 2 2 [red] [rebel]),
             attachTo thisEquipment thatToken ]) ]
 }

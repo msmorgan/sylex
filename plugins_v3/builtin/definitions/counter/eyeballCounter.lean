@@ -1,6 +1,6 @@
 counter eyeballCounter := {
   lexical := { lemma := "eyeball counter" },
   spelling := "eyeball counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

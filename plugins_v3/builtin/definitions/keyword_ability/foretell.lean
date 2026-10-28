@@ -13,11 +13,11 @@ keyword foretell (cost : Cost) : Ability := {
   spelling := "foretell <cost>",
   body :=
     [ static
-        (specialAction (duringPart .turn you) (mana [generic 2])
+        (specialAction (duringPart turn you) (mana [generic 2])
           (sequentially
             [ exileFaceDownFrom thisCard yourHand,
               gainDesignation it foretold,
-              establishThroughout (visibility .lookAt you (objects it))
+              establishThroughout (visibility lookAt you (objects it))
                 (forAsLongAs (is it (hasDesignation foretold))),
               establishThroughout
                 (onlyWhile

@@ -136,12 +136,22 @@ they stand for and the retained Form is the one the written-out call gives: core
 `mana [generic 1]`), an `Action` as a `Cost` (`sacrifice thisArtifact` for `perform (…)`), a
 catalog `Subtype` as a `Predicate` (`goblin` for `hasSubtype goblin`), and a
 `CharacteristicBundle` as a `TokenSpec` (`t` for `written t`). An anonymous record cannot use
-that coercion: write `create n (written { … })`. A leading-dot name resolves
-against the expected type before any coercion applies, so `some .combat`, `mana [.snow]` and
-`hasColor .white` keep their heads. A numeral is an `Amount` (`3` for `.lit 3`): it stays an
-`OfNat.ofNat` term that `inspect` reads through to its `Amount.lit` leaf, naming the same Templates
-and literals. A single-faced card is `singleFacedCard { name := …, … }`. The pins are
-`Proofs/Authoring`.
+that coercion: write `create n (written { … })`. Closed word-tag constructors
+(colors, supertypes, comparators, turn parts, roundings, quality ops, statuses,
+possessors, choice modes, level ranges and similar non-expression data sorts)
+resolve bare against the expected sort (`upkeep` for `some .upkeep`, `sets` for
+`.sets`, `half up …` alongside `getsPt it (up 2) (up 2)`). `ColorSpec.some`
+retains its leading dot (`.some [red]`, `.some []`) so bare `some` stays the
+`Option` constructor, and `exileZone` retains `zone .exile none` so the untyped
+bundle dependency scan does not form a cycle with the `exile` action. A
+leading-dot name resolves against the expected type before any coercion applies,
+so `some .combat` and `mana [.snow]` keep their heads. A numeral is an `Amount`
+(`3` for `.lit 3`): it stays an `OfNat.ofNat` term that `inspect` reads through
+to its `Amount.lit` leaf, naming the same Templates and literals. Numerals also
+inhabit `Option Amount`, so printed stats use `power := 3` without an explicit
+wrapper; inspection still reaches `Amount.lit`. A single-faced card is
+`card := { name := …, … }`, elaborated directly as `Card.singleFaced`. The pins
+are `Proofs/Authoring`.
 
 Semantic expressions must use authored declarations: a `semantic_definition`
 (a Definition, the rules-defined vocabulary of a keyword action, keyword

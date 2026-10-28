@@ -10,6 +10,6 @@ keyword decayed : Ability := {
       when
         (does (actor thisCreature)
           (attack none))
-        (atNext .endOfCombat
+        (atNext endOfCombat
           (sacrifice thisPermanent))]
 }

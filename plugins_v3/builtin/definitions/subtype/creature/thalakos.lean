@@ -1,7 +1,7 @@
 subtype thalakos := {
   lexical := { lemma := "Thalakos", plural := "Thalakos" },
   spelling := "Thalakos",
-  kind := .creature,
+  kind := creature,
   name := "Thalakos",
   confers := []
 }

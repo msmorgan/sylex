@@ -1,6 +1,6 @@
 counter gemCounter := {
   lexical := { lemma := "gem counter" },
   spelling := "gem counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

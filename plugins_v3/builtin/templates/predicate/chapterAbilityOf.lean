@@ -5,5 +5,5 @@ template chapterAbilityOf (saga : NounPhrase) : Predicate := {
   body :=
     and
       [abilityOf saga,
-        compare .atLeast 1 [.chapter]]
+        compare atLeast 1 [chapter]]
 }

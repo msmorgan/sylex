@@ -1,7 +1,7 @@
 subtype mount := {
   lexical := { lemma := "Mount" },
   spelling := "Mount",
-  kind := .creature,
+  kind := creature,
   name := "Mount",
   confers := []
 }

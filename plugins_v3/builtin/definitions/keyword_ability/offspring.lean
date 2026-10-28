@@ -5,14 +5,14 @@ keyword offspring (cost : Cost) : Ability := {
   lexical := { lemma := "offspring", parameters := [[Cost]] },
   spelling := "offspring <cost>",
   body :=
-    [static (addedCost cost true .once),
+    [static (addedCost cost true once),
       when
         (does (actor thisPermanent) enter)
         (create 1
           (copyOf thisPermanent
             [edits
-                [stat .sets .power 1,
-                  stat .sets .toughness 1]]))
+                [stat sets power 1,
+                  stat sets toughness 1]]))
         [] [] none none none
         (some
           (keywordCostPaid offspring.label thisPermanent))]

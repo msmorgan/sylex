@@ -4,6 +4,6 @@ template untilYourNextEndStep : Duration := {
   body :=
     durationBetween none
       (some
-        (beginningOf .endStep (some you)
+        (beginningOf endStep (some you)
           (nextTime none)))
 }

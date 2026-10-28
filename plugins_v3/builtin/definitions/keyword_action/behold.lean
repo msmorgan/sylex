@@ -5,7 +5,7 @@ action behold (quality : Predicate) : Action := {
   spelling := "behold <quality>",
   body :=
     chooseOne
-      (expose .reveal
+      (expose reveal
         (cards
           (a
             (and

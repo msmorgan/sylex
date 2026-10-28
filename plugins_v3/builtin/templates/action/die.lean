@@ -3,6 +3,6 @@
 template die : Action := {
   spelling := "dies",
   body :=
-    move theActor (zone .battlefield none)
-      (some (zone .graveyard none)) .departure []
+    move theActor (zone battlefield none)
+      (some (zone graveyard none)) .departure []
 }

@@ -3,7 +3,7 @@ chooses an Army creature its performer controls [CR#701.47a]. -/
 subtype army := {
   lexical := { lemma := "Army" },
   spelling := "Army",
-  kind := .creature,
+  kind := creature,
   name := "Army",
   confers := []
 }

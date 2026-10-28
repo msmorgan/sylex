@@ -5,7 +5,7 @@ keyword buyback (cost : Cost) : Ability := {
   lexical := { lemma := "buyback", parameters := [[Cost], [DashNonManaCost]] },
   spelling := "buyback <cost>",
   body :=
-    [static (addedCost cost true .once),
+    [static (addedCost cost true once),
       static
         (replace
           (causedBy

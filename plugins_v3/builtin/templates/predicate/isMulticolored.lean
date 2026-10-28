@@ -2,5 +2,5 @@
 -- [CR#105.2b]
 template isMulticolored : Predicate := {
   spelling := "multicolored",
-  body := colorCount .atLeast 2
+  body := colorCount atLeast 2
 }

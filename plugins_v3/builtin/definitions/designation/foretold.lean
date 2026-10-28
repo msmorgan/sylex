@@ -4,7 +4,7 @@ cast it for a foretell cost on a later turn [CR#702.143a,702.143c,702.143d]. -/
 designation foretold := {
   lexical := { adjectives := ["foretold"] },
   spelling := "foretold",
-  scope := (.heldBy .object),
+  scope := (.heldBy object),
   sole := false,
   confers := []
 }

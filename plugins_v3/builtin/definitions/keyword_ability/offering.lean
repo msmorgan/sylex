@@ -11,7 +11,7 @@ keyword offering (quality : Predicate) : Ability := {
           (perform
             (sacrifice
               (a (and [quality, isPermanent]))))
-          true .once),
+          true once),
       static
         (onlyWhile
           (reducedBySymbols thisSpell

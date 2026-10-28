@@ -4,11 +4,11 @@ its owner's graveyard at defense 0 once no ability of it waits to leave the stac
 subtype siege := {
   lexical := { lemma := "Siege" },
   spelling := "Siege",
-  kind := .battle,
+  kind := battle,
   name := "Siege",
   confers :=
     [.property (entersChoosingPlayer thisSiege anOpponent),
-      .ability
+      ability
         (when (does any (removeCounters theLast defenseCounter thisPermanent))
           (sequentially
             [ exile it,
@@ -17,7 +17,7 @@ subtype siege := {
         (and
           [compareAmt
               (countersOn defenseCounter this_)
-              .eq 0,
+              eq 0,
             (not (exists_ (and [abilityOf this_, triggeredNotLeftStack])))])
         (putInto this_ graveyard)]
 }

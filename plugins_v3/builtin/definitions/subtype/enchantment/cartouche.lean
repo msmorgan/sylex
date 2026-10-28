@@ -2,7 +2,7 @@
 subtype cartouche := {
   lexical := { lemma := "Cartouche" },
   spelling := "Cartouche",
-  kind := .enchantment,
+  kind := enchantment,
   name := "Cartouche",
   confers := []
 }

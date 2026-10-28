@@ -1,7 +1,7 @@
 subtype eldrazi := {
   lexical := { lemma := "Eldrazi", plural := "Eldrazi" },
   spelling := "Eldrazi",
-  kind := .creature,
+  kind := creature,
   name := "Eldrazi",
   confers := []
 }

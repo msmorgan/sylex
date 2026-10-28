@@ -3,7 +3,7 @@ without an intrinsic conferral. -/
 subtype gargoyle := {
   lexical := { lemma := "Gargoyle" },
   spelling := "Gargoyle",
-  kind := .creature,
+  kind := creature,
   name := "Gargoyle",
   confers := []
 }

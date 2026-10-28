@@ -1,5 +1,5 @@
 template thisPermanent : NounPhrase := {
   spelling := "this permanent",
   body :=
-    headed .permanent this_
+    headed permanent this_
 }

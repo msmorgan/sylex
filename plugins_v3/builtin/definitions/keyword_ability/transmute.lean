@@ -12,13 +12,13 @@ keyword transmute (cost : Cost) : Ability := {
               (a
                 (and
                   [isCard,
-                    hasManaValue .eq
-                      (statOf (.stat .manaValue)
+                    hasManaValue eq
+                      (statOf (.stat manaValue)
                         (the
                           (and
                             [was (discard which),
                               isCard])))])),
-            reveal (that .card),
+            reveal (that card),
             putInto it hand, shuffle])
         asSorcery]
 }

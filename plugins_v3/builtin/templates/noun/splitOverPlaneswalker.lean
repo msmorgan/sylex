@@ -6,7 +6,7 @@ template splitOverPlaneswalker : NounPhrase := {
   -- union alternative.
   body :=
     eitherOf
-      (pro (.unionHalf .player) .one)
+      (pro (.unionHalf player) .one)
       (possessorOf .controller
         (pro (.unionHalf (.type Semantics.CardType.planeswalker))
           .one))

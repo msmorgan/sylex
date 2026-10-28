@@ -1,6 +1,6 @@
 counter hitCounter := {
   lexical := { lemma := "hit counter" },
   spelling := "hit counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

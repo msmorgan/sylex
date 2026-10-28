@@ -1,4 +1,4 @@
 template battlefield : Location := {
   spelling := "the battlefield",
-  body := zone .battlefield none
+  body := zone battlefield none
 }

@@ -3,5 +3,5 @@ template createTappedToken (token : CharacteristicBundle) (count : Amount := 1) 
     Action := {
   spelling := "create <count> tapped <token>",
   body :=
-    create count token [entersAs .tapped]
+    create count token [entersAs tapped]
 }

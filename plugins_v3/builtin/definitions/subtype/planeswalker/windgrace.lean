@@ -2,7 +2,7 @@
 subtype windgrace := {
   lexical := { lemma := "Windgrace" },
   spelling := "Windgrace",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Windgrace",
   confers := []
 }

@@ -2,7 +2,7 @@
 subtype oko := {
   lexical := { lemma := "Oko" },
   spelling := "Oko",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Oko",
   confers := []
 }

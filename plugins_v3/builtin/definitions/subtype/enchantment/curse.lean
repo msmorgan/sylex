@@ -1,7 +1,7 @@
 subtype curse := {
   lexical := { lemma := "Curse" },
   spelling := "Curse",
-  kind := .enchantment,
+  kind := enchantment,
   name := "Curse",
   confers := []
 }

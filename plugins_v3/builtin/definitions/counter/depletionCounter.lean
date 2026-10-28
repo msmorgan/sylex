@@ -1,6 +1,6 @@
 counter depletionCounter := {
   lexical := { lemma := "depletion counter" },
   spelling := "depletion counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

@@ -2,7 +2,7 @@
 subtype quintorius := {
   lexical := { lemma := "Quintorius" },
   spelling := "Quintorius",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Quintorius",
   confers := []
 }

@@ -1,5 +1,5 @@
 template thisToken : NounPhrase := {
   spelling := "this token",
   body :=
-    headed .token this_
+    headed token this_
 }

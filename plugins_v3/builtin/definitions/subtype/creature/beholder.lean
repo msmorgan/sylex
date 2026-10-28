@@ -1,7 +1,7 @@
 subtype beholder := {
   lexical := { lemma := "Beholder" },
   spelling := "Beholder",
-  kind := .creature,
+  kind := creature,
   name := "Beholder",
   confers := []
 }

@@ -1,6 +1,6 @@
 counter polypCounter := {
   lexical := { lemma := "polyp counter" },
   spelling := "polyp counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

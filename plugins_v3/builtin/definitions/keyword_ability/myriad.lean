@@ -16,7 +16,7 @@ keyword myriad : Ability := {
                   [isOpponent, otherThan defendingPlayer]))
               (may
                 (create 1 (copyOf thisCreature)
-                  [entersAs .tapped,
+                  [entersAs tapped,
                     entersAttacking
                       (some
                         (or
@@ -27,7 +27,7 @@ keyword myriad : Ability := {
                                   controlledBy they])]))])),
             doIf
               (compareAmt (numberOf thoseTokens)
-                .atLeast 1)
-              (atNext .endOfCombat
+                atLeast 1)
+              (atNext endOfCombat
                 (exile thoseTokens))])]
 }

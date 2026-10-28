@@ -5,7 +5,7 @@ another effect [CR#113.12], applied in timestamp order [CR#613.7,613.7c]. -/
 counter flyingCounter := {
   lexical := { lemma := "flying counter" },
   spelling := "flying counter",
-  holder := .object,
+  holder := object,
   confers :=
     [.property
         (abilityGrant this_

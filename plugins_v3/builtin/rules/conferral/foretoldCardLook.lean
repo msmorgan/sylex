@@ -10,8 +10,8 @@ conferral foretoldCardLook := {
           [isCard, hasDesignation foretold,
             in_ exileZone],
       confer :=
-        .ability
+        ability
           (static
-            (visibility .lookAt you
+            (visibility lookAt you
               (objects this_))) }
 }

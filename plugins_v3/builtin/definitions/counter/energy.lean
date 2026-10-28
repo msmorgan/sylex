@@ -3,6 +3,6 @@ player. [CR#107.14] -/
 counter energy := {
   lexical := { lemma := "energy counter" },
   spelling := "energy counter",
-  holder := .player,
+  holder := player,
   confers := []
 }

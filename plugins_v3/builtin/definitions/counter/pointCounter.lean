@@ -1,6 +1,6 @@
 counter pointCounter := {
   lexical := { lemma := "point counter" },
   spelling := "point counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

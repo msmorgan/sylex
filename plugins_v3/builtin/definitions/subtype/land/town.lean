@@ -1,7 +1,7 @@
 subtype town := {
   lexical := { lemma := "Town" },
   spelling := "Town",
-  kind := .land,
+  kind := land,
   name := "Town",
   confers := []
 }

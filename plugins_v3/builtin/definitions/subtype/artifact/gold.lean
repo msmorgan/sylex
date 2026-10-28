@@ -4,7 +4,7 @@ No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype gold := {
   lexical := { lemma := "Gold" },
   spelling := "Gold",
-  kind := .artifact,
+  kind := artifact,
   name := "Gold",
   confers := []
 }

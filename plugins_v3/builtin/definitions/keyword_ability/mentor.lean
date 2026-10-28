@@ -11,6 +11,6 @@ keyword mentor : Ability := {
           (target
             (and
               [isCreature, isAttacking,
-                hasPower .less
+                hasPower less
                   (powerOf thisCreature)])))]
 }

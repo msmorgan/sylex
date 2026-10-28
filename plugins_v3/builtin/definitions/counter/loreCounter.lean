@@ -4,6 +4,6 @@ crosses their threshold [CR#714.2b]; the final chapter number also governs the S
 counter loreCounter := {
   lexical := { lemma := "lore counter" },
   spelling := "lore counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

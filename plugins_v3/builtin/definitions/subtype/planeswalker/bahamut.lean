@@ -2,7 +2,7 @@
 subtype bahamut := {
   lexical := { lemma := "Bahamut" },
   spelling := "Bahamut",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Bahamut",
   confers := []
 }

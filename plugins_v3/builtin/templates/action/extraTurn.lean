@@ -2,5 +2,5 @@
 -- [CR#500.7]
 template extraTurn (count : Amount) : Action := {
   spelling := "take <count> extra turns after this one",
-  body := addTurnPart .turn count none none
+  body := addTurnPart turn count none none
 }

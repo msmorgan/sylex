@@ -17,7 +17,7 @@ keyword warp (cost : Cost) : Ability := {
       static
         (resolutionDelayedTrigger
           (doIf (keywordCostPaid warp thisSpell)
-            (atNext .endStep
+            (atNext endStep
               (sequentially
                 [ exile (becomes thisSpell),
                   establishThroughout

@@ -2,7 +2,7 @@
 subtype dellian := {
   lexical := { lemma := "Dellian" },
   spelling := "Dellian",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Dellian",
   confers := []
 }

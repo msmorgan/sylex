@@ -15,15 +15,15 @@ keyword paradigm : Ability := {
                 (a
                   (and
                     [isSpell, isOther, youControl,
-                      shares .cardName .share
+                      shares cardName share
                         thisSpell])))
               (within thisGame)))
-          (delayWithin (beginningOfYour .firstMain)
+          (delayWithin (beginningOfYour firstMain)
             restOfGame
             (sequentially
-              [copy (.inZone .exile) this_ 1 [],
+              [copy (.inZone exile) this_ 1 [],
                 may
-                  (cast (that .copy) none
+                  (cast (that copy) none
                     withoutPaying)]))),
       spell (exile thisSpell)]
 }

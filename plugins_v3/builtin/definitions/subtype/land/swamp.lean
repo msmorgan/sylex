@@ -2,7 +2,7 @@
 subtype swamp := {
   lexical := { lemma := "Swamp" },
   spelling := "Swamp",
-  kind := .land,
+  kind := land,
   name := "Swamp",
   confers := []
 }

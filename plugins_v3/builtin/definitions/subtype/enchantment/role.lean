@@ -4,7 +4,7 @@ one with the most recent timestamp is put into its owner's graveyard as a state-
 subtype role := {
   lexical := { lemma := "Role" },
   spelling := "Role",
-  kind := .enchantment,
+  kind := enchantment,
   name := "Role",
   confers := []
 }

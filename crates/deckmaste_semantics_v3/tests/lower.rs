@@ -861,3 +861,64 @@ fn copy_characteristics_defaults_to_setting_types() {
             .unwrap(),
     );
 }
+
+#[test]
+fn closed_words_resolve_in_their_own_declaration_and_under_typed_shadowing() {
+    let bundle = declarations(&[
+        "template white : Color := { body := white }",
+        "template axis (power : Amount) : Stat := { body := power }",
+    ]);
+    let reader = Elaborator::new(&bundle);
+    assert_eq!(reader.read::<Color>("white").unwrap(), Color::White);
+    assert_eq!(reader.read::<Stat>("axis 3").unwrap(), Stat::Power);
+}
+
+#[test]
+fn bare_words_dispatch_by_expected_sort() {
+    let bundle = builtin();
+    let reader = Elaborator::new(&bundle);
+    assert_eq!(
+        reader.read::<Supertype>("legendary").unwrap(),
+        Supertype::Legendary
+    );
+    assert_eq!(
+        reader.read::<Comparator>("atLeast").unwrap(),
+        Comparator::AtLeast
+    );
+    assert_eq!(reader.read::<QualityOp>("sets").unwrap(), QualityOp::Sets);
+    assert_eq!(
+        reader.read::<Option<TurnPart>>("upkeep").unwrap(),
+        Some(TurnPart::Upkeep)
+    );
+    assert_eq!(
+        reader.read::<LevelRange>("between 1 2").unwrap(),
+        LevelRange::Between { from_: 1, to: 2 }
+    );
+    assert_eq!(
+        reader.read::<LevelRange>("plus 3").unwrap(),
+        LevelRange::Plus { from_: 3 }
+    );
+    assert_eq!(
+        reader
+            .read::<Amount>("half up (powerOf thisCreature)")
+            .unwrap(),
+        reader
+            .read::<Amount>("half .up (powerOf thisCreature)")
+            .unwrap()
+    );
+    assert_eq!(
+        reader
+            .read::<StaticSpec>("getsPt it (up 2) (up 2)")
+            .unwrap(),
+        reader
+            .read::<StaticSpec>("getsPt it (.up 2) (.up 2)")
+            .unwrap()
+    );
+    assert_eq!(
+        reader.read::<ColorSpec>(".some [white]").unwrap(),
+        ColorSpec::Some {
+            colors: vec![Color::White]
+        }
+    );
+    assert!(reader.read::<ColorSpec>("some [white]").is_err());
+}

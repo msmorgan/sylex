@@ -4,7 +4,7 @@ paying its mana cost on a later turn [CR#702.170a,702.170c,702.170d]. -/
 designation plotted := {
   lexical := { adjectives := ["plotted"] },
   spelling := "plotted",
-  scope := (.heldBy .object),
+  scope := (.heldBy object),
   sole := false,
   confers := []
 }

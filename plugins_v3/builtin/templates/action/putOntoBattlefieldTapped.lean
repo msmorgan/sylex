@@ -4,5 +4,5 @@ template putOntoBattlefieldTapped (subject : NounPhrase)
   -- TODO(spelling): Include or omit the clauses supplied by from_.
   body :=
     zoneChange subject battlefield
-      (Option.getD from_ wherever) [entersAs .tapped]
+      (Option.getD from_ wherever) [entersAs tapped]
 }

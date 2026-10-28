@@ -1,6 +1,6 @@
 counter phylacteryCounter := {
   lexical := { lemma := "phylactery counter" },
   spelling := "phylactery counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

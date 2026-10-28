@@ -1,6 +1,6 @@
 counter incarnationCounter := {
   lexical := { lemma := "incarnation counter" },
   spelling := "incarnation counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

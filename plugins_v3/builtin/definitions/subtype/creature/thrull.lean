@@ -1,7 +1,7 @@
 subtype thrull := {
   lexical := { lemma := "Thrull" },
   spelling := "Thrull",
-  kind := .creature,
+  kind := creature,
   name := "Thrull",
   confers := []
 }

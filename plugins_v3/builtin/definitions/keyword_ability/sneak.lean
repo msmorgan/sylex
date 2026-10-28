@@ -12,7 +12,7 @@ keyword sneak (cost : Cost) : Ability := {
         (and
           [or
               [isPlayer, isPlaneswalker, isBattle],
-            inCombat .attackedBy
+            inCombat attackedBy
               (some
                 (the
                   (and
@@ -33,7 +33,7 @@ keyword sneak (cost : Cost) : Ability := {
           (some
             (and
               [asInstant,
-                duringPart .declareBlockers
+                duringPart declareBlockers
                   (some you)]))),
       static
         (replace
@@ -43,6 +43,6 @@ keyword sneak (cost : Cost) : Ability := {
             (keywordCostPaid sneak.label thisPermanent)
             -- It enters tapped and attacking what the returned creature was attacking [CR#702.190b].
             (withRiders
-              [entersAs .tapped,
+              [entersAs tapped,
                 entersAttacking (some returnedCreaturesDefender)])))]
 }

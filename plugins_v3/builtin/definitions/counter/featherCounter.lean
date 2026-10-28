@@ -1,6 +1,6 @@
 counter featherCounter := {
   lexical := { lemma := "feather counter" },
   spelling := "feather counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

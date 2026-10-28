@@ -4,17 +4,17 @@ keyword cascade : Ability := {
   spelling := "cascade",
   body :=
     have cheaper :=
-      compare .less (statOf (.stat .manaValue) thisSpell) [.stat .manaValue];
+      compare less (statOf (.stat manaValue) thisSpell) [.stat manaValue];
     [when
         (does (actor you)
           (cast thisSpell))
         (sequentially
           [exile
-              (run .top
+              (run top
                 (and [non isLand, cheaper])
                 (libraryOf you)),
             may
-              (castWithoutPaying (that .card)
+              (castWithoutPaying (that card)
                 (some cheaper)),
             move
               (allOf
@@ -26,5 +26,5 @@ keyword cascade : Ability := {
                       (was (cast which)
                         (some thisWay))]))
               wherever (some onBottom) .arrival
-              [inOrder .randomOrder]])]
+              [inOrder randomOrder]])]
 }

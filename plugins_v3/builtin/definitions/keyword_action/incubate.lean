@@ -16,5 +16,5 @@ action incubate (amount : Amount) : Action := {
             { name := some "Phyrexian Token", types := [Semantics.CardType.artifact, Semantics.CardType.creature],
               subtypes := [phyrexian], power := some 0, toughness := some 0 } })
       [withCounters amount (printedKind p1p1Counter)
-          .fresh]
+          fresh]
 }

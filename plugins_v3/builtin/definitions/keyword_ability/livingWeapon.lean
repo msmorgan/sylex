@@ -6,6 +6,6 @@ keyword livingWeapon : Ability := {
   body :=
     [ when (does thisEquipment enter)
         (sequentially
-          [ create 1 (creatureToken 0 0 [.black] [phyrexian, germ]),
+          [ create 1 (creatureToken 0 0 [black] [phyrexian, germ]),
             attachTo thisEquipment thatToken ]) ]
 }

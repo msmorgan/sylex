@@ -2,5 +2,5 @@
 -- [CR#208.4b]
 template baseToughnessOf (subject : NounPhrase) : Amount := {
   spelling := "<subject>'s base toughness",
-  body := statOf (.stat .baseToughness) subject
+  body := statOf (.stat baseToughness) subject
 }

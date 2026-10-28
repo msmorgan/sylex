@@ -2,7 +2,7 @@
 subtype book := {
   lexical := { lemma := "Book" },
   spelling := "Book",
-  kind := .artifact,
+  kind := artifact,
   name := "Book",
   confers := []
 }

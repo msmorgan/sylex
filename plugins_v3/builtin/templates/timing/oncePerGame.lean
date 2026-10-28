@@ -1,5 +1,5 @@
 /-- "only once each game" -/
 template oncePerGame : UsageLimit := {
   spelling := "only once each game",
-  body := usageLimit 1 .game
+  body := usageLimit 1 game
 }

@@ -6,5 +6,5 @@ keyword intimidate : Ability := {
   body :=
     [ static (cant any (block thisCreature)
         (except := byObjects (bare (and [isCreature,
-          andOr [isArtifact, shares .color .share thisCreature]])))) ]
+          andOr [isArtifact, shares color share thisCreature]])))) ]
 }

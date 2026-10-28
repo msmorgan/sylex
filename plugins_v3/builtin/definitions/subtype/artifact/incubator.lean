@@ -5,7 +5,7 @@ No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype incubator := {
   lexical := { lemma := "Incubator" },
   spelling := "Incubator",
-  kind := .artifact,
+  kind := artifact,
   name := "Incubator",
   confers := []
 }

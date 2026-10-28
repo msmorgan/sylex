@@ -5,7 +5,7 @@ keyword squad (cost : Cost) : Ability := {
   lexical := { lemma := "squad", parameters := [[Cost], [DashNonManaCost]] },
   spelling := "squad <cost>",
   body :=
-    [static (addedCost cost true .anyNumberOfTimes),
+    [static (addedCost cost true anyNumberOfTimes),
       when
         (does (actor thisCreature) enter)
         (create

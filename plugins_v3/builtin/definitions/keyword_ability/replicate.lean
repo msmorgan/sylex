@@ -6,7 +6,7 @@ keyword replicate (cost : Cost) : Ability := {
   lexical := { lemma := "replicate", parameters := [[Cost], [DashNonManaCost]] },
   spelling := "replicate <cost>",
   body :=
-    [static (addedCost cost true .anyNumberOfTimes),
+    [static (addedCost cost true anyNumberOfTimes),
       when
         (does (actor you)
           (cast thisSpell))
@@ -15,7 +15,7 @@ keyword replicate (cost : Cost) : Ability := {
               (timesPaid (.byKeyword replicate.label)
                 thisSpell),
             may
-              (chooseNewTargets (those .copy))])
+              (chooseNewTargets (those copy))])
         [] [] none none none
         (some
           (keywordCostPaid replicate.label thisSpell))]

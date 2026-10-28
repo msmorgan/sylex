@@ -1,7 +1,7 @@
 subtype archon := {
   lexical := { lemma := "Archon" },
   spelling := "Archon",
-  kind := .creature,
+  kind := creature,
   name := "Archon",
   confers := []
 }

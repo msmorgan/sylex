@@ -4,7 +4,7 @@ template become (subject : NounPhrase) (added : CharacteristicBundle)
   -- TODO(spelling): Include or omit the clauses supplied by duration.
   body :=
     establish
-      (qualityChange subject .adds
+      (qualityChange subject adds
         (bundle added none))
       duration
 }

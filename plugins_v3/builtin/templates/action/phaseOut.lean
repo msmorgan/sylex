@@ -3,5 +3,5 @@
 template phaseOut : Action := {
   spelling := "phases out",
   body :=
-    setStatus .phasedOut theActor
+    setStatus phasedOut theActor
 }

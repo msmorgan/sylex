@@ -9,10 +9,10 @@ template ptDefinition (subject : NounPhrase) (slots : DefinedSlots) (amount : Am
     characteristicDefining subject
       (match slots with
       | Semantics.DefinedSlots.powerAlone =>
-        [stat .sets .power amount]
+        [stat sets power amount]
       | Semantics.DefinedSlots.toughnessAlone =>
-        [stat .sets .toughness amount]
+        [stat sets toughness amount]
       | Semantics.DefinedSlots.bothEach =>
-        [stat .sets .power amount,
-          stat .sets .toughness amount])
+        [stat sets power amount,
+          stat sets toughness amount])
 }

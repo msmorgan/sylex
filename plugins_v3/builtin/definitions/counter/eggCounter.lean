@@ -1,6 +1,6 @@
 counter eggCounter := {
   lexical := { lemma := "egg counter" },
   spelling := "egg counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

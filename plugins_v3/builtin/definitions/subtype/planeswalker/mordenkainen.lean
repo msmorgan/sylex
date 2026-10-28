@@ -2,7 +2,7 @@
 subtype mordenkainen := {
   lexical := { lemma := "Mordenkainen" },
   spelling := "Mordenkainen",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Mordenkainen",
   confers := []
 }

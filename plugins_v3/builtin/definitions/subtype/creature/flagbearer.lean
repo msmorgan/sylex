@@ -1,7 +1,7 @@
 subtype flagbearer := {
   lexical := { lemma := "Flagbearer" },
   spelling := "Flagbearer",
-  kind := .creature,
+  kind := creature,
   name := "Flagbearer",
   confers := []
 }

@@ -1,6 +1,6 @@
 counter rejectionCounter := {
   lexical := { lemma := "rejection counter" },
   spelling := "rejection counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

@@ -1,7 +1,7 @@
 subtype synth := {
   lexical := { lemma := "Synth" },
   spelling := "Synth",
-  kind := .creature,
+  kind := creature,
   name := "Synth",
   confers := []
 }

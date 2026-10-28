@@ -1,6 +1,6 @@
 counter vitalityCounter := {
   lexical := { lemma := "vitality counter" },
   spelling := "vitality counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

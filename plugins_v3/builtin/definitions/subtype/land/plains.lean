@@ -2,7 +2,7 @@
 subtype plains := {
   lexical := { lemma := "Plains", plural := "Plains" },
   spelling := "Plains",
-  kind := .land,
+  kind := land,
   name := "Plains",
   confers := []
 }

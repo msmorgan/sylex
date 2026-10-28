@@ -3,5 +3,5 @@
 template eachCombat : Timing := {
   spelling := "each combat",
   body :=
-    inPart .combat none (eachTime none)
+    inPart combat none (eachTime none)
 }

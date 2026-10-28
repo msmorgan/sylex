@@ -1,6 +1,6 @@
 counter fungusCounter := {
   lexical := { lemma := "fungus counter" },
   spelling := "fungus counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

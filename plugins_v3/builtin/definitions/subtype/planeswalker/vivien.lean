@@ -2,7 +2,7 @@
 subtype vivien := {
   lexical := { lemma := "Vivien" },
   spelling := "Vivien",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Vivien",
   confers := []
 }

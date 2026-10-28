@@ -1,6 +1,6 @@
 counter dreamCounter := {
   lexical := { lemma := "dream counter" },
   spelling := "dream counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

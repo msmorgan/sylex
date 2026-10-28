@@ -43,8 +43,10 @@ elaborator and Rust reader/lowering path, plus a test on each side. Develop test
      - `flip { normal, alternative }`
      - `leveler { inner, bands }`
      - `prototype { inner, alternative }`, where `alternative` is a `PrototypeFrame`.
-   - Decide what replaces the positional `levelBand` and `prototypeAlt` helpers, and record the
-     choice here.
+   - Use existing structure literals for `LevelBand` (`{ range := between 1 2, power := 2,
+     toughness := 3, text := [...] }`) and `PrototypeFrame` (`{ cost := [1, blue, blue],
+     power := 2, toughness := 1 }`). Keep the `levelBand` and `prototypeAlt` template files
+     until canon cleanup migrates their callers; no builtin declaration keys are removed.
    - Remove `body` and `singleFacedCard` from the `card` surface in `Authoring.lean`,
      `reader.rs`, `bundle.rs` and `lower/mod.rs`.
 4. **Numerals for stats.** Add `OfNat (Option Amount) n`, so that `power := 3` works.
@@ -57,13 +59,18 @@ elaborator and Rust reader/lowering path, plus a test on each side. Develop test
    `plugins_v3/canon/cards`. Run `rg -o '(^|[ (\[,])\.[a-z]\w*' plugins_v3/canon/cards` for the
    current list of 137; it includes card types, colors, supertypes, comparators, turn parts,
    roundings and quality ops.
-   - A dot constructor that has no reasonable bare word stays and is listed here with the
-     reason.
+   - Keep `.some` on `ColorSpec`: bare `some` is the prelude Option constructor, so
+     `some []` for colorless would collide with and obscure that meaning.
    - A bare word may share its name with an existing declaration of another return type. For
      example, rounding `up : RoundMode` sits beside `primitive up : Delta Amount` through
      `(name, return_type)` dispatch. Pin that both `half up (powerOf …)` and
      `getsPt it (up 2) (up 2)` elaborate.
-   - Rewrite the builtin's own dot forms for these sorts in the same change.
+   - Rewrite the builtin's own dot forms for these sorts in the same change. Keep
+     `zone .exile none` in `exileZone`: the untyped dependency scan would otherwise create
+     a false cycle with the `exile` action, which depends on `exileZone`.
+     Match-pattern dots remain to distinguish constructors from binders. Internal and
+     semantic-expression constructors, mana constructors, and the qualified
+     `Semantics.QualityOp.sets` computation argument retain their existing spelling.
 
 ## Docs and tests
 
@@ -77,8 +84,8 @@ elaborator and Rust reader/lowering path, plus a test on each side. Develop test
 ## Acceptance
 
 - Every feature above has a Lean pin and a Rust test.
-- The expansion baseline over `plugins_v3/canon` and `plugins_v3/builtin` is unchanged, apart
-  from the builtin dot-form rewrite, which must also show zero changes.
+- All existing expansion samples remain unchanged, including the builtin dot-form rewrite.
+  Only `copyCharacteristics : List CopyExcept` gains samples for default omission.
 - Gates: `cargo xtask lean check`. Run tests and clippy for `deckmaste_semantics_v3`,
   `deckmaste_lowering_v3` and `xtask`.
 
@@ -91,13 +98,17 @@ expanded over builtin:
 cargo xtask expansions --out docs/evidence/plugins-v3-expansions/plugins-v3-canon-authoring-surface/before
 ```
 
-After the change, require zero differences and exit 0:
+After the change, require exactly one reviewed difference, zero renames and exit 0:
 
 ```bash
-cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-canon-authoring-surface/before
+cargo xtask expansions --compare docs/evidence/plugins-v3-expansions/plugins-v3-canon-authoring-surface/before --expect 'copyCharacteristics : List CopyExcept'
 ```
 
-No rename map or expected differences are needed.
+Baseline hardening landed after this ticket was drafted. `sample_invocations` now samples
+omission of every defaulted parameter. Feature 5 therefore adds omission samples for
+`typesAdded : Bool := false`; each must match the corresponding explicit `false` sample.
+No existing sample may change, and the other 2,980 declarations must have zero differences.
+The saved baseline is immutable; do not regenerate it. No rename map is needed.
 
 The saved format is `before/snapshot.json` (version 2). Save commands refuse an
 existing snapshot unless `--force` is deliberately added; unrelated nonempty

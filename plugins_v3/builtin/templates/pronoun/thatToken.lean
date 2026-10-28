@@ -2,5 +2,5 @@
 template thatToken : NounPhrase := {
   spelling := "that token",
   body :=
-    that .token
+    that token
 }

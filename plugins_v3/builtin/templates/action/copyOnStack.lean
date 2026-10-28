@@ -5,5 +5,5 @@ put onto the stack (Twincast's spell, Strionic Resonator's triggered ability, Fo
 template copyOnStack (subject : NounPhrase) (times : Amount := 1)
     (exceptions : List CopyExcept := []) : Action := {
   -- TODO(spelling): Format and coordinate the exceptions list entries, including the empty case.
-  body := copy .fromStack subject times exceptions
+  body := copy fromStack subject times exceptions
 }

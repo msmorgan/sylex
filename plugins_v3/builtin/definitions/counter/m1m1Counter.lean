@@ -3,6 +3,6 @@ stat. -/
 counter m1m1Counter := {
   lexical := { lemma := "-1/-1 counter" },
   spelling := "-1/-1 counter",
-  holder := .object,
+  holder := object,
   confers := [boost (.down 1) (.down 1)]
 }

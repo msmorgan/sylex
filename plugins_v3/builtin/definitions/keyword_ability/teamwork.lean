@@ -8,9 +8,9 @@ keyword teamwork (amount : Amount) : Ability := {
         (addedCost
           (perform
             (tap
-              (withTotal (.stat .power) .atLeast
+              (withTotal (.stat power) atLeast
                 amount
                 (allOf
                   (and [isCreature, youControl])))))
-          true .once)]
+          true once)]
 }

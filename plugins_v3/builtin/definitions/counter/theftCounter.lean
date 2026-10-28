@@ -1,6 +1,6 @@
 counter theftCounter := {
   lexical := { lemma := "theft counter" },
   spelling := "theft counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

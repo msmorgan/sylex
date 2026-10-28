@@ -3,6 +3,6 @@ power, toughness, and abilities. [CR#702.87a,711.2a,711.2b] -/
 counter levelCounter := {
   lexical := { lemma := "level counter" },
   spelling := "level counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

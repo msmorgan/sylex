@@ -1,7 +1,7 @@
 subtype noggle := {
   lexical := { lemma := "Noggle" },
   spelling := "Noggle",
-  kind := .creature,
+  kind := creature,
   name := "Noggle",
   confers := []
 }

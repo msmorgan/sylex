@@ -1,6 +1,6 @@
 counter rallyCounter := {
   lexical := { lemma := "rally counter" },
   spelling := "rally counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

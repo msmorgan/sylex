@@ -1,7 +1,7 @@
 subtype myr := {
   lexical := { lemma := "Myr", plural := "Myr" },
   spelling := "Myr",
-  kind := .creature,
+  kind := creature,
   name := "Myr",
   confers := []
 }

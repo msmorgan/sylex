@@ -8,13 +8,13 @@ card_type planeswalker := {
   spelling := "planeswalker",
   name := "Planeswalker",
   cardClass := some .permanentCard,
-  stats := [.loyalty],
+  stats := [loyalty],
   confers :=
     [castableFrom yourHand asSorcery,
-      .ability
+      ability
         (static
           (entersWithCounters this_
-            (statOf (.stat .loyalty) this_)
+            (statOf (.stat loyalty) this_)
             (.named "loyaltyCounter"))),
       .property (can any (attack this_)),
       damageResult
@@ -24,6 +24,6 @@ card_type planeswalker := {
       .stateBased
         (compareAmt
           (countersOn (.named "loyaltyCounter") this_)
-          .eq 0)
+          eq 0)
         (putInto this_ graveyard)]
 }

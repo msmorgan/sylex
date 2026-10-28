@@ -23,7 +23,7 @@ keyword suspend (amount : Amount) (cost : Cost) : Ability := {
               yourHand))
           cost
           (exileWithCounters thisCard amount timeCounter)),
-      at_ (beginningOfYour .upkeep)
+      at_ (beginningOfYour upkeep)
         (removeCounters (oneThrough 1)
           (some (printedKind timeCounter)) thisCard)
         [] [] none none none
@@ -46,14 +46,14 @@ keyword suspend (amount : Amount) (cost : Cost) : Ability := {
                   (a
                     (and [isCreature, isSpell])))
                 thisWay)
-              (gain (that .spell) haste
+              (gain (that spell) haste
                 (some
                   (forAsLongAs
                     (or
-                      [is (that .spell)
+                      [is (that spell)
                           youControl,
                         is
-                          (becomes (that .spell))
+                          (becomes (that spell))
                           youControl]))))])
         [] [] none none none
         (some

@@ -3,7 +3,7 @@ host becomes unattached. -/
 subtype equipment := {
   lexical := { lemma := "Equipment", plural := "Equipment" },
   spelling := "Equipment",
-  kind := .artifact,
+  kind := artifact,
   name := "Equipment",
   confers :=
     [.property
@@ -11,5 +11,5 @@ subtype equipment := {
           (allOf isCreature)),
       .stateBased
         (not (isAttached thisEquipment))
-        (attachment .unattached thisEquipment none)]
+        (attachment unattached thisEquipment none)]
 }

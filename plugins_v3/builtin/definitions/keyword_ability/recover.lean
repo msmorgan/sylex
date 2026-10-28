@@ -9,7 +9,7 @@ keyword recover (cost : Cost) : Ability := {
         (does any
           (move (a isCreature) battlefield
             (some yourGraveyard) .departure []))
-        (may (pay cost .once)
+        (may (pay cost once)
           (some (returnToHand this_ yourGraveyard))
           (some (exile this_)))]
 }

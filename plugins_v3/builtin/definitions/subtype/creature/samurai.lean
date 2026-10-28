@@ -1,7 +1,7 @@
 subtype samurai := {
   lexical := { lemma := "Samurai", plural := "Samurai" },
   spelling := "Samurai",
-  kind := .creature,
+  kind := creature,
   name := "Samurai",
   confers := []
 }

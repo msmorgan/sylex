@@ -10,7 +10,7 @@ action amass (subtype : Subtype) (count : Amount) : Action := {
           (not (exists_ isArmy))
           (create 1
             (written
-              (creatureToken 0 0 [.black]
+              (creatureToken 0 0 [black]
                 [subtype, army]))),
         choose (a isArmy),
         putCounters count (printedKind p1p1Counter)

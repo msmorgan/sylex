@@ -1,5 +1,5 @@
 /-- "<player>'s hand" -/
 template handOf (player : NounPhrase) : Location := {
   spelling := "<player>'s hand",
-  body := zone .hand (some player)
+  body := zone hand (some player)
 }

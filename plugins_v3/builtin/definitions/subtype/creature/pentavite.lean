@@ -1,7 +1,7 @@
 subtype pentavite := {
   lexical := { lemma := "Pentavite" },
   spelling := "Pentavite",
-  kind := .creature,
+  kind := creature,
   name := "Pentavite",
   confers := []
 }

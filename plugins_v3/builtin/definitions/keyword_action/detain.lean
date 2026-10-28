@@ -12,7 +12,7 @@ action detain (subject : NounPhrase) : Action := {
             (activate
               (allOf
                 (and
-                  [abilityHead .anyActivated,
+                  [abilityHead anyActivated,
                     abilityOf subject])))] none)
       untilYourNextTurn
 }

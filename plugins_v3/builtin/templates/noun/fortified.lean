@@ -1,5 +1,5 @@
 /-- "fortified <w>" -/
 template fortified (w : NounWord) : NounPhrase := {
   spelling := "fortified <w>",
-  body := attachHost .fortified w
+  body := attachHost fortified w
 }

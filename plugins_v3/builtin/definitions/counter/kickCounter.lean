@@ -1,6 +1,6 @@
 counter kickCounter := {
   lexical := { lemma := "kick counter" },
   spelling := "kick counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

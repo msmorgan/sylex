@@ -13,7 +13,7 @@ action regeneration (subject : NounPhrase) : Action := {
           (Semantics.Definitions.tap subject),
         doIf
           (or
-            [is subject (inCombat .attackerOf none),
-              is subject (inCombat .blockerOf none)])
+            [is subject (inCombat attackerOf none),
+              is subject (inCombat blockerOf none)])
           (removeFromCombat subject)]
 }

@@ -506,7 +506,7 @@ theorem okMonarchSteal :
           (gainDesignation (controllerOf it) monarch))
     confer ∈ confersOf monarch_definition ∧
       confer.checkIn monarch_definition.conferralContext = [] :=
-  ⟨by simp [confersOf, monarch_definition], by decide⟩
+  ⟨by simp [confersOf, monarch_definition, Templates.DamageKind.combat], by decide⟩
 
 /-- [CR#726.1,726.2] The one of the initiative's inherent triggered
 abilities the grammar can write checks; the two that venture into Undercity [CR#701.49d] wait on
@@ -524,7 +524,7 @@ theorem okInitiativeSteal :
           (gainDesignation (controllerOf (those creature)) initiative))
     confer ∈ confersOf initiative_definition ∧
       confer.checkIn initiative_definition.conferralContext = [] :=
-  ⟨by simp [confersOf, initiative_definition], by decide⟩
+  ⟨by simp [confersOf, initiative_definition, Templates.DamageKind.combat], by decide⟩
 
 /-- [CR#725.2,726.2] The designations' abilities are controlled by the player who held the
 designation when they triggered; a card type's are its objects' own, controlled as their source

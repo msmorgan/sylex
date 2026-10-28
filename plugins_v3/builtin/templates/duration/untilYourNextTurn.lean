@@ -4,6 +4,6 @@ template untilYourNextTurn : Duration := {
   body :=
     durationBetween none
       (some
-        (beginningOf .turn (some you)
+        (beginningOf turn (some you)
           (nextTime none)))
 }

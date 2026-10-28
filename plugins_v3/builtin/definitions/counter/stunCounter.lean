@@ -3,6 +3,6 @@ from it. [CR#122.1d] -/
 counter stunCounter := {
   lexical := { lemma := "stun counter" },
   spelling := "stun counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

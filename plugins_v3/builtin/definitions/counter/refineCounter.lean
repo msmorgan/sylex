@@ -1,6 +1,6 @@
 counter refineCounter := {
   lexical := { lemma := "refine counter" },
   spelling := "refine counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

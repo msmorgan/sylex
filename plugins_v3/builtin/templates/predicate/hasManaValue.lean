@@ -2,5 +2,5 @@
 template hasManaValue (cmp : Comparator) (amt : Amount) : Predicate := {
   spelling := "with mana value <cmp> <amt>",
   body :=
-    compare cmp amt [.stat .manaValue]
+    compare cmp amt [.stat manaValue]
 }

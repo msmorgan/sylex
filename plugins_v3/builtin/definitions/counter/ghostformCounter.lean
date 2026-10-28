@@ -1,6 +1,6 @@
 counter ghostformCounter := {
   lexical := { lemma := "ghostform counter" },
   spelling := "ghostform counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

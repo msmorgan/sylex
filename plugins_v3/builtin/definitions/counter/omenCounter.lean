@@ -1,6 +1,6 @@
 counter omenCounter := {
   lexical := { lemma := "omen counter" },
   spelling := "omen counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

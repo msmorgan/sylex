@@ -4,5 +4,5 @@ template replaceEvent (clause : WouldClause) (replacement : Replacement)
   -- TODO(spelling): Include or omit the clauses supplied by duration.
   body :=
     establish
-      (replace clause replacement none .repeatedly none) duration
+      (replace clause replacement none repeatedly none) duration
 }

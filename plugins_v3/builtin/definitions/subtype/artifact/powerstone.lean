@@ -5,7 +5,7 @@ No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype powerstone := {
   lexical := { lemma := "Powerstone" },
   spelling := "Powerstone",
-  kind := .artifact,
+  kind := artifact,
   name := "Powerstone",
   confers := []
 }

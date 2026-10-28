@@ -4,6 +4,6 @@ a state-based action, except in Two-Headed Giant, where the team threshold is fi
 counter poison := {
   lexical := { lemma := "poison counter" },
   spelling := "poison counter",
-  holder := .player,
+  holder := player,
   confers := []
 }

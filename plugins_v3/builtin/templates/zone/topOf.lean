@@ -2,5 +2,5 @@
 -- [CR#401.7]
 template topOf (loc : Location) : Location := {
   spelling := "the top of <loc>",
-  body := fromEnd .top (.nth 1) loc
+  body := fromEnd top (nth 1) loc
 }

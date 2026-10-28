@@ -997,7 +997,7 @@ card := flip {
   alternative := { name := "Flipped", types := [artifact] } }
 card := leveler {
   inner := { name := "Leveler", types := [creature], power := 1, toughness := 1 },
-  bands := [{ range := .between 1 2, power := 2, toughness := 3 }] }
+  bands := [{ range := between 1 2, power := 2, toughness := 3 }] }
 card := prototype {
   inner := { name := "Prototype", types := [creature], power := 4, toughness := 4 },
   alternative := { cost := [1, blue, blue], power := 2, toughness := 1 } }
@@ -1211,3 +1211,52 @@ theorem ordinaryNamespaceFunctionKeepsApplication : card 3 = 4 := rfl
 end OrdinaryFunction
 
 end Semantics.Proofs.Authoring
+
+namespace Semantics.Proofs.Authoring.BareWords
+open Semantics Semantics.Templates Semantics.Definitions
+
+theorem supertypeWord : (legendary : Supertype) = .legendary := rfl
+theorem comparatorWord : (atLeast : Comparator) = .atLeast := rfl
+theorem qualityOpWord : (sets : QualityOp) = .sets := rfl
+theorem optionalTurnPartWord : (upkeep : Option TurnPart) = some .upkeep := rfl
+theorem levelRangeWords : (between 1 2 : LevelRange) = .between 1 2 := rfl
+theorem openLevelRangeWord : (plus 3 : LevelRange) = .plus 3 := rfl
+theorem choiceWord : (unmarked : ChoiceMode) = .unmarked := rfl
+theorem statusWord : (tapped : Status) = .tapped := rfl
+theorem possessorWord : (controller : PossessorAxis) = .controller := rfl
+theorem ordinalWord : (nth 2 : Ordinal) = .nth 2 := rfl
+theorem dieSidesWord : (sides 6 : DieSides) = .sides 6 := rfl
+theorem costNamedWord : (ofKeyword cycling : CostNamed) = .ofKeyword cycling := rfl
+theorem projectionWord : (stat power : ProjAxis) = .stat .power := rfl
+theorem nounWord : (ability : NounWord) = .ability := rfl
+theorem roundingUpAndDeltaUp :
+    half up (powerOf thisCreature) = half RoundMode.up (powerOf thisCreature) := rfl
+theorem deltasKeepTheirDeclaration :
+    getsPt it (up 2) (up 2) = getsPt it (Delta.up 2) (Delta.up 2) := rfl
+/--
+warning: Local variable 'up' resembles constructor 'Semantics.RoundMode.up' - write '.up' (with a dot) or 'Semantics.RoundMode.up' to use the constructor.
+
+Note: This linter can be disabled with `set_option linter.constructorNameAsVariable false`
+-/
+#guard_msgs in
+theorem compatibleLocalKeepsItsValue (up : RoundMode) : (up : RoundMode) = up := rfl
+theorem compatibleOptionalLocalKeepsItsValue (up : Option RoundMode) :
+    (up : Option RoundMode) = up := rfl
+theorem incompatibleLocalAllowsWord (power : Amount) :
+    (stat sets power power : CharacteristicEdit) = .stat .sets .power power := rfl
+
+template white : Color := { body := white }
+theorem wordInItsOwnDeclaration : white = Color.white := rfl
+theorem colorSpecKeepsLeadingDot : (.some [white] : ColorSpec) = ColorSpec.some [.white] := rfl
+
+/--
+error: Type mismatch
+  some ?m.2
+has type
+  Option ?m.1
+but is expected to have type
+  ColorSpec
+-/
+#guard_msgs in
+example : ColorSpec := some [white]
+end Semantics.Proofs.Authoring.BareWords

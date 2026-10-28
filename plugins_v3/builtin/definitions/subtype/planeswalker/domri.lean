@@ -2,7 +2,7 @@
 subtype domri := {
   lexical := { lemma := "Domri" },
   spelling := "Domri",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Domri",
   confers := []
 }

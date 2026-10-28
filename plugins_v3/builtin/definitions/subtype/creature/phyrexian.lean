@@ -1,7 +1,7 @@
 subtype phyrexian := {
   lexical := { lemma := "Phyrexian" },
   spelling := "Phyrexian",
-  kind := .creature,
+  kind := creature,
   name := "Phyrexian",
   confers := []
 }

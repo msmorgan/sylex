@@ -1,7 +1,7 @@
 subtype imp := {
   lexical := { lemma := "Imp" },
   spelling := "Imp",
-  kind := .creature,
+  kind := creature,
   name := "Imp",
   confers := []
 }

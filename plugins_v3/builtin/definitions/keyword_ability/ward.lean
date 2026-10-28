@@ -11,8 +11,8 @@ keyword ward (cost : Cost) : Ability := {
               (and
                 [in_ stack, opponentsControl])))
           (target thisPermanent))
-        (instruct (controllerOf (that .stack))
-          (mayOrElse (pay cost .once)
+        (instruct (controllerOf (that stack))
+          (mayOrElse (pay cost once)
             (instruct you
-              (counter (that .stack)))))]
+              (counter (that stack)))))]
 }

@@ -4,7 +4,7 @@ No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype map := {
   lexical := { lemma := "Map" },
   spelling := "Map",
-  kind := .artifact,
+  kind := artifact,
   name := "Map",
   confers := []
 }

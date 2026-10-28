@@ -9,7 +9,7 @@ keyword gift (promise : Action) : Ability := {
   body :=
     [static
         (addedCost (perform (choose anOpponent))
-          true .once),
+          true once),
       byCardClass
         (when
           (does (actor thisPermanent) enter)

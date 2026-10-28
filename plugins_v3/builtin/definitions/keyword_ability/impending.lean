@@ -16,17 +16,17 @@ keyword impending (amount : Amount) (cost : Cost) : Ability := {
             (keywordCostPaid impending.label thisPermanent)
             (withRiders
               [withCounters amount (printedKind timeCounter)
-                  .fresh]))),
+                  fresh]))),
       static
         (onlyWhile
           (characteristicChange thisPermanent
-            [typeLine .loses
+            [typeLine loses
                 { types := some [Semantics.CardType.creature] }])
           (and
             [keywordCostPaid impending.label thisPermanent,
               is thisPermanent
                 (hasCounter (some timeCounter))])),
-      at_ (beginningOfYour .endStep)
+      at_ (beginningOfYour endStep)
         (removeCounters (oneThrough 1)
           (some (printedKind timeCounter))
           thisPermanent)

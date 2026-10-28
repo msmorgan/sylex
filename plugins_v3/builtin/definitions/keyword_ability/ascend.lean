@@ -12,7 +12,7 @@ keyword ascend : Ability := {
               [compareAmt
                   (countOf
                     (and [isPermanent, youControl]))
-                  .atLeast 10,
+                  atLeast 10,
                 not
                   (is you
                     (hasDesignation citysBlessing))])
@@ -24,7 +24,7 @@ keyword ascend : Ability := {
               [compareAmt
                   (countOf
                     (and [isPermanent, youControl]))
-                  .atLeast 10,
+                  atLeast 10,
                 not
                   (is you
                     (hasDesignation citysBlessing))])

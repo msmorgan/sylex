@@ -2,7 +2,7 @@
 subtype ral := {
   lexical := { lemma := "Ral" },
   spelling := "Ral",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Ral",
   confers := []
 }

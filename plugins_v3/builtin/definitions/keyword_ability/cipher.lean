@@ -21,10 +21,10 @@ keyword cipher : Ability := {
           (whenever
             (does (actor thisCreature)
               (dealDamage anyAmount (a isPlayer)
-                (some .combat)))
+                (some combat)))
             (may
               (sequentially
-                [copy .fromCardZone
+                [copy fromCardZone
                     (the
                       (and
                         [isCard,
@@ -32,6 +32,6 @@ keyword cipher : Ability := {
                             (some thisCreature)]))
                     1 [],
                   may
-                    (cast (that .copy) none
+                    (cast (that copy) none
                       withoutPaying)]))))]
 }

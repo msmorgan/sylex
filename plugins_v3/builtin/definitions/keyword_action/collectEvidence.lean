@@ -4,7 +4,7 @@ action collectEvidence (amount : Amount) : Action := {
   spelling := "collect evidence <amount>",
   body :=
     exile
-      (withTotal (.stat .manaValue) .atLeast amount
+      (withTotal (.stat manaValue) atLeast amount
         (allOf
           (and
             [isCard,

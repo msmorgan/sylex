@@ -5,5 +5,5 @@ template returnToBattlefieldWithCounters (subject who : NounPhrase) (amount : Am
   body :=
     zoneChange subject battlefield wherever
       [under who,
-        withCounters amount (printedKind kind) .fresh]
+        withCounters amount (printedKind kind) fresh]
 }

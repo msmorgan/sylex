@@ -2,7 +2,7 @@
 subtype tibalt := {
   lexical := { lemma := "Tibalt" },
   spelling := "Tibalt",
-  kind := .planeswalker,
+  kind := planeswalker,
   name := "Tibalt",
   confers := []
 }

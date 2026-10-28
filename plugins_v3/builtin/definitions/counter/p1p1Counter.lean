@@ -13,6 +13,6 @@ for the bearer of a stat change, a definition's or a card's (`lean-checker-sweep
 counter p1p1Counter := {
   lexical := { lemma := "+1/+1 counter" },
   spelling := "+1/+1 counter",
-  holder := .object,
+  holder := object,
   confers := [boost (.up 1) (.up 1)]
 }

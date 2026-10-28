@@ -1,6 +1,6 @@
 counter bountyCounter := {
   lexical := { lemma := "bounty counter" },
   spelling := "bounty counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

@@ -1,7 +1,7 @@
 subtype cave := {
   lexical := { lemma := "Cave" },
   spelling := "Cave",
-  kind := .land,
+  kind := land,
   name := "Cave",
   confers := []
 }

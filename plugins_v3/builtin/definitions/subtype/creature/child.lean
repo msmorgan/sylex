@@ -2,7 +2,7 @@
 subtype child := {
   lexical := { lemma := "Child", plural := "Children" },
   spelling := "Child",
-  kind := .creature,
+  kind := creature,
   name := "Child",
   confers := []
 }

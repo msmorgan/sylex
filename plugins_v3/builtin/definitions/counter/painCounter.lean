@@ -1,6 +1,6 @@
 counter painCounter := {
   lexical := { lemma := "pain counter" },
   spelling := "pain counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

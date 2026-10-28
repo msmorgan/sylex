@@ -1,6 +1,6 @@
 counter pressureCounter := {
   lexical := { lemma := "pressure counter" },
   spelling := "pressure counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

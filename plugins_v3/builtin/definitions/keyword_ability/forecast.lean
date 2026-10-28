@@ -6,7 +6,7 @@ keyword forecast (ability : Ability) : Ability := {
   body :=
     [qualified ability
         (some
-          (duringPart .upkeep
+          (duringPart upkeep
             (some (ownerOf this_))))
-        (some oncePerTurn) none (some .hand)]
+        (some oncePerTurn) none (some hand)]
 }

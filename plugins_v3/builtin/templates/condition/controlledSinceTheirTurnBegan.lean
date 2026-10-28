@@ -7,6 +7,6 @@ template controlledSinceTheirTurnBegan (subject : NounPhrase) : Condition := {
     heldSince
       (is subject
         (controlledBy (controllerOf it)))
-      (beginningOf .turn none
+      (beginningOf turn none
         (mostRecent they))
 }

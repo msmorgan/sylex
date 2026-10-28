@@ -12,7 +12,7 @@ card_type creature := {
   spelling := "creature",
   name := "Creature",
   cardClass := some .permanentCard,
-  stats := [.power, .toughness],
+  stats := [power, toughness],
   confers :=
     [castableFrom yourHand asSorcery,
       .property (combatant this_),
@@ -21,23 +21,23 @@ card_type creature := {
       .property (onlyUnless (cant this_ attack) (controlledSinceTheirTurnBegan it)),
       .property
         (onlyUnless
-          (cant any (activate (allOf (and [abilityHead .anyActivated, abilityOf this_,
+          (cant any (activate (allOf (and [abilityHead anyActivated, abilityOf this_,
             tapOrUntapInCost]))))
           (controlledSinceTheirTurnBegan this_)),
       damageResult (markDamage this_ thatMuch),
       .stateBased
         (compareAmt (toughnessOf this_)
-          .atMost 0)
+          atMost 0)
         (putInto this_ graveyard),
       .stateBased
         (and
           [compareAmt (toughnessOf this_)
-              .greater 0,
+              greater 0,
             compareAmt
-              (statOf .markedDamage this_)
-              .greater 0,
+              (statOf markedDamage this_)
+              greater 0,
             compareAmt
-              (statOf .markedDamage this_)
-              .atLeast (toughnessOf this_)])
+              (statOf markedDamage this_)
+              atLeast (toughnessOf this_)])
         (destroy this_)]
 }

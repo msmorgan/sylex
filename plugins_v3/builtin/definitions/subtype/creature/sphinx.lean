@@ -1,7 +1,7 @@
 subtype sphinx := {
   lexical := { lemma := "Sphinx" },
   spelling := "Sphinx",
-  kind := .creature,
+  kind := creature,
   name := "Sphinx",
   confers := []
 }

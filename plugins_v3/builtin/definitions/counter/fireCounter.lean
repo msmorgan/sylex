@@ -1,6 +1,6 @@
 counter fireCounter := {
   lexical := { lemma := "fire counter" },
   spelling := "fire counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

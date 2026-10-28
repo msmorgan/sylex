@@ -6,6 +6,6 @@ keyword maxSpeed (ability : Ability) : Ability := {
   body :=
     [static
         (onlyWhile (abilityGrant this_ ability)
-          (compareAmt (speedOf you) .eq
+          (compareAmt (speedOf you) eq
             4))]
 }

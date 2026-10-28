@@ -4,18 +4,18 @@ action discover (amount : Amount) : Action := {
   spelling := "discover <amount>",
   body :=
     have fits :=
-      compare .atMost amount [.stat .manaValue];
+      compare atMost amount [.stat manaValue];
     sequentially
       [exile
-          (run .top
+          (run top
             (and [non isLand, fits])
             (libraryOf actor)),
         withContinuation .optional
-          (castWithoutPaying (that .card) (some fits))
+          (castWithoutPaying (that card) (some fits))
           none
           (some
-            (putInto (that .card) hand)),
+            (putInto (that card) hand)),
         move theRest wherever
           (some onBottom) .arrival
-          [inOrder .randomOrder]]
+          [inOrder randomOrder]]
 }

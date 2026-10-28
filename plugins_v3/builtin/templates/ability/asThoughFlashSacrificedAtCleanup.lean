@@ -11,5 +11,5 @@ template asThoughFlashSacrificedAtCleanup : Ability := {
   body :=
     static (can you (cast thisSpell) (asThough := asThoughHadFlash it)
       (rider := some (doIf (did you (cast it) (within thisGame (some (not asSorcery))))
-        (atNext .cleanup (instruct (controllerOf (becomes it)) (sacrifice it))))))
+        (atNext cleanup (instruct (controllerOf (becomes it)) (sacrifice it))))))
 }

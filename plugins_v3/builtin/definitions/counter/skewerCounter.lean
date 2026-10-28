@@ -1,6 +1,6 @@
 counter skewerCounter := {
   lexical := { lemma := "skewer counter" },
   spelling := "skewer counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

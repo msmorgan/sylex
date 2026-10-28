@@ -1,6 +1,6 @@
 counter cubeCounter := {
   lexical := { lemma := "cube counter" },
   spelling := "cube counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

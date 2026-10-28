@@ -1,7 +1,7 @@
 subtype drone := {
   lexical := { lemma := "Drone" },
   spelling := "Drone",
-  kind := .creature,
+  kind := creature,
   name := "Drone",
   confers := []
 }

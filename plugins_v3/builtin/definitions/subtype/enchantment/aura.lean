@@ -2,12 +2,12 @@
 subtype aura := {
   lexical := { lemma := "Aura" },
   spelling := "Aura",
-  kind := .enchantment,
+  kind := enchantment,
   name := "Aura",
   confers :=
     [.stateBased
         (not (isAttached thisAura))
         (move thisAura
-          (zone .battlefield none) (some graveyard)
+          (zone battlefield none) (some graveyard)
           .arrival [])]
 }

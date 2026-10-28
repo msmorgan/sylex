@@ -10,6 +10,6 @@ template preventAll (to : NounPhrase) (duration : Option Duration)
       (replace
         (would any (dealDamage anyAmount to kind))
         (instead (preventDamage allDamage none none))
-        none .repeatedly none)
+        none repeatedly none)
       duration
 }

@@ -5,7 +5,7 @@ No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
 subtype mutagen := {
   lexical := { lemma := "Mutagen" },
   spelling := "Mutagen",
-  kind := .artifact,
+  kind := artifact,
   name := "Mutagen",
   confers := []
 }

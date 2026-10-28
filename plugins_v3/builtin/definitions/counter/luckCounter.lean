@@ -3,6 +3,6 @@ rules [CR#122.1]. -/
 counter luckCounter := {
   lexical := { lemma := "luck counter" },
   spelling := "luck counter",
-  holder := .object,
+  holder := object,
   confers := []
 }

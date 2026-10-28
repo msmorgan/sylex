@@ -4,6 +4,6 @@ action scry (amount : Amount) : Action := {
   spelling := "scry <amount>",
   body :=
     lookAndSortSlice
-      (slice .top amount (libraryOf actor))
-      onBottom [inOrder .anyOrder]
+      (slice top amount (libraryOf actor))
+      onBottom [inOrder anyOrder]
 }
