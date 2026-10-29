@@ -31,12 +31,18 @@ theorem okTypecycling :
     Ability.check (DRS.ofList []) (typecycling (.hasSubtype (plains)) (.mana [generic 2]))
       = [] := by decide
 
+/-- The label a keyword ability is written under (`.keyword (.named "flying") …`), its
+Definition's own label. -/
+private def keywordOf : Ability → Option KeywordLabel
+  | .keyword label _ _ => some label
+  | _ => none
+
 /-- A typecycling ability is a cycling ability [CR#702.29f]: it carries the cycling label that
 an "abilityHead (.keyword (.named "cycling"))" class names, as plain cycling does. -/
 theorem typecyclingIsCycling :
     keywordOf (typecycling (.hasSubtype (plains)) (.mana [generic 2])) =
-      .the (.named "cycling") ∧
-    keywordOf (cycling (.mana [generic 2])) = .the (.named "cycling") := by decide
+      some (.named "cycling") ∧
+    keywordOf (cycling (.mana [generic 2])) = some (.named "cycling") := by decide
 
 theorem qualityCanReadOuterChoice :
     Ability.check [(ChoiceSort.quality .color).binding]

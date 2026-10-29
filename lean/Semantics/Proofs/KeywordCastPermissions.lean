@@ -112,12 +112,20 @@ theorem badSpellWasThePlayerDesignation :
 
 /-! ## Megamorph is a morph cost; multikicker is a kicker cost -/
 
+/-- The label a keyword ability is written under (`.keyword (.named "flying") …`), its
+Definition's own label. -/
+private def keywordOf : Ability → Option KeywordLabel
+  | .keyword label _ _ => some label
+  | _ => none
+
 /-- A megamorph cost is a morph cost [CR#702.37b]. -/
-theorem megamorphIsMorph : keywordOf (megamorph cost) = .the (.named "morph") := by decide
+theorem megamorphIsMorph : keywordOf (megamorph cost) = some (.named "morph") := by decide
 
 /-- A multikicker cost is a kicker cost, so a multikicked spell is kicked [CR#702.33c,702.33d]:
 "its kicker cost" names it. -/
-theorem multikickerIsKicker : keywordOf (multikicker cost) = keywordOf (kicker cost) := by
+theorem multikickerIsKicker :
+    keywordOf (multikicker cost) = some (.named "kicker") ∧
+      keywordOf (kicker cost) = some (.named "kicker") := by
   decide
 
 /-- Multikicker's body: an additional cost that may be paid any number of times [CR#702.33c]. -/
