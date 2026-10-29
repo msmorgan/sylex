@@ -594,6 +594,18 @@ example (values : List Action) (rider : Location) : containers values rider =
       (sequentially (values.map Action.inCaller ++ [enter (from_ := rider.inCaller)])) :=
   rfl
 
+/-- An optional argument is read in the caller's scope when present: `Option.map` of its
+`inCaller`. -/
+action optionalContainers (values : List Action) (rider : Option Location) := {
+  body := sequentially (values ++ [cast this_ (from_ := rider)]),
+}
+
+example (values : List Action) (rider : Option Location) : optionalContainers values rider =
+    .ownScope (some (.action "optionalContainers" .none))
+      (sequentially
+        (values.map Action.inCaller ++ [cast this_ (from_ := rider.map Location.inCaller)])) :=
+  rfl
+
 action ballotArgument (ballot : Ballot) := { body := vote (ballot := ballot) }
 example (candidate : NounPhrase) : ballotArgument (.byCandidate candidate) =
     .ownScope (some (.action "ballotArgument" .none)) (vote (ballot := .byCandidate (.inCaller candidate))) := rfl
