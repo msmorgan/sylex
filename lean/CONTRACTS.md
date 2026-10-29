@@ -894,7 +894,7 @@ expected child kinds in the incoming `DRS`.
 | `EachStackOk` | A distributive handoff or loop keeps every outer referent with its updates and pluralizes or aggregates only what its body introduced (`instruct`, `doForEach`). |
 | `DeckReadable` | Retired (`lean-v3-authoring-impl-7-checker-and-regime-retirement`): `checkDeckTraitWith` and `checkDeckConditionWith` step a deck condition's predicates from an empty context at object kind; whether a predicate reads a characteristic of a card in a deck is not checked. |
 | `DeckComparable` | Retired (`lean-v3-authoring-impl-7-checker-and-regime-retirement`): which quality a deck's cards agree on is not checked. |
-| `QualityPayload` | An authoring input in `Semantics.Primitives` that expands to edits (below); it is not checked syntax. |
+| `QualityPayload` | Checked syntax under `CharacteristicEdit.payload`; every edit list is read through `CharacteristicEdit.expandAll`, which writes it out as its edits (below). |
 | `TokenSpec` | `stepTokenSpecMetadataWith` steps it. |
 | `StaticSpec` | `stepStaticSpec` (`StaticSpec.check`) steps it. |
 | `Compulsion` | No Lean type: requirements are `StaticSpec.must` clauses, stepped as a deontic. |
@@ -1000,7 +1000,7 @@ expected child kinds in the incoming `DRS`.
 | `Targetable` | `Kind.targetable` at determiner, copying and target consumers (`targetable`). |
 | `Targeter` | `Kind.targeter` in the `targets` predicate case and the deontic patients (`targeter`). |
 | `Phrasal` | `Kind.phrasal` at copying, iteration and noun consumers. |
-| `KnownKeyword` | The authoring boundary: a card names a keyword through its Definition's generated label constant (`elabKeywordName`), and `KeywordLabel.named` and `Ability.keyword` are internal expansions `spelled` refuses. `KeywordTerm.known` refuses only the empty label `keywordOf` gives an ability that is no keyword. |
+| `KnownKeyword` | The authoring boundary: a card names a keyword through its Definition's generated label constant (`elabKeywordName`), and `KeywordLabel.named` and `Ability.keyword` are internal expansions `spelled` refuses. `KeywordTerm.known` refuses only the empty label. |
 | `BasicLandType` | The Idris reference's `basicLandLine` helper has no Lean counterpart. No caller can supply a proof-erased list to that removed API; `SubtypeSpace.basicLand` is a closed constructor. |
 | `BasicLandTypes` | Same removed `basicLandLine` API as `BasicLandType`; a printed face's subtype validation remains `subsFitLine` (the card frame). A token's or an edit's subtypes are not checked against its types (`lean-checker-sweep-game-rules`). |
 | `Delta` | The type parameter survives as `Delta α`; it was not erased. `stepDeltaWith` steps a `Delta Amount`'s carried amount. |
@@ -1082,15 +1082,16 @@ self context. Separate copy exceptions each read the incoming scope.
 `CopyExcept.ability`, `thisAbility`, and `entersWithCounters` retain the copy
 context; sharing edits does not turn copy exceptions into later static effects.
 
-`QualityPayload` is an authoring input in `Semantics.Primitives`, not a
-checked syntax field. It expands to edits, its op written once over them.
+`QualityPayload` is checked syntax under `CharacteristicEdit.payload`, its op written once over
+it; the checker reads every edit list through `CharacteristicEdit.expandAll`, where a payload is
+the edits it writes (`QualityPayload.edits`).
 Ordinary additions add their type line but set every other written value; a
 removal removes each name, color list, ability and mana cost, and writes a number (power,
-toughness, loyalty, defense) as lowered by it, `stat .loses`, there being no removal of a
+toughness, loyalty, defense) as lowered by it, `stat _ (.down _)`, there being no removal of a
 number. A retained type ("It's still
 a land") adds the type line whatever the op [CR#205.1b]; no edit stores the
-retained type. `copyCharacteristics` expands the old
-packed input into one edit block and separate ability exceptions. The former
+retained type. `copyCharacteristics` writes `CopyExcept.characteristics`, which the checker
+reads (`CopyExcept.expanded`) as one edit block and separate ability exceptions. The former
 minimum-two-fields packing rule has no semantic counterpart in an edit list.
 
 `Ability.keyword` takes an ordered `List KeywordParam`. It is an internal
@@ -1323,7 +1324,8 @@ recipient refuses `perMember` only in an instruction.
 ### Template and definition parameters and expanded actions
 
 A `semantic_template` or `semantic_definition` takes ordinary Lean parameters, each
-substituted as written; there are no supplied bodies (`plugins-v3-first-order-templates`). A Definition reads its arguments through `inCaller`
+substituted as written; there are no supplied bodies (`plugins-v3-first-order-templates`). A
+Definition reads its arguments through `inCaller`
 (`CallerScope.caller`: `NounPhrase.inCaller`, `Amount.inCaller`, `Action.inCaller`, …
 for every phrase type that can be an argument). For bare `NounPhrase` parameters the
 elaborator generates `firstMention` at the first textual occurrence and `laterMention`
@@ -1530,8 +1532,10 @@ The verbs `die`, `leave` and `enter`, which move the clause's own subject
 departure patterns observe on departure; ordinary arrivals observe on arrival.
 In particular, graveyard arrival from anywhere is not a battlefield-departure
 pattern [CR#603.6c,603.10a]. The raw observation point retains the distinction.
-The put and return Templates take it from `Location.observedOnDeparture`, which
-classes a written origin list as departure-observed when any of its origins is
+Each put and return Template writes it: `zoneChange` observes on arrival and
+`zoneChangeObservedOnDeparture` (`putIntoFromBattlefield`) on departure, the author choosing by
+the written origin as `Location.observedOnDeparture` classes it: a written origin list is
+departure-observed when any of its origins is
 the battlefield (an ability that watches a permanent leave the battlefield is a
 leaves-the-battlefield ability whatever else it watches [CR#603.6c]), and the
 checker reads a move's own observation point: only a departure-observed move

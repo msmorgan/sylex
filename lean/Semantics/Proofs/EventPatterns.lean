@@ -144,7 +144,9 @@ theorem anywhereAndBattlefieldHaveDifferentObservation :
 ability [CR#603.6c], so it looks back in time [CR#603.10a]: "put into a graveyard from the
 battlefield or your hand" is observed on its departure, like the battlefield alone. -/
 theorem mixedOriginWithTheBattlefieldIsObservedOnDeparture :
-    (match does any (zoneChangeObservedOnDeparture .this graveyard (or [battlefield, yourHand]) []) with
+    (match
+        does any (zoneChangeObservedOnDeparture .this graveyard (or [battlefield, yourHand]) [])
+      with
       | .does _ (.move _ _ _ point _) => point | _ => .arrival) = .departure := by decide
 
 theorem historyDoesNotMoveTheCurrentReference :

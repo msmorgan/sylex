@@ -1679,8 +1679,9 @@ A move is observed on its departure when any positive origin it writes is the ba
 ability that triggers when a permanent moves from the battlefield is a leaves-the-battlefield
 ability whatever else it watches [CR#603.6c]. A move from anywhere is never a
 leaves-the-battlefield ability [CR#603.6c]; it, and a move from a complement, is observed on its
-arrival. The put and return Templates write this classification into the move, and the checker
-reads a departure-observed move's battlefield patient as the permanent it was. -/
+arrival. The author writes this classification by choosing the put or return Template
+(`zoneChange` or `zoneChangeObservedOnDeparture`), and the checker reads a departure-observed
+move's battlefield patient as the permanent it was. -/
 def Location.observedOnDeparture (from_ : Location) : Bool :=
   match from_.positiveZones? with
   | some zones => zones.any fun zone => zone.sort == some .battlefield
