@@ -223,9 +223,6 @@ fn variants(ty: &str, ordinal: usize, limitations: &mut BTreeSet<String>) -> Res
     if ty == "Bool" {
         return Ok(vec!["false".into(), "true".into()]);
     }
-    if let Some(value) = product_sample(&ty, ordinal)? {
-        return Ok(vec![value]);
-    }
     if let Some(inner) = ty.strip_prefix("Option ") {
         let finite = inner == "Bool"
             || shape(inner).is_some_and(|ctors| ctors.iter().all(|ctor| ctor.fields.is_empty()));
@@ -372,9 +369,6 @@ fn sample(ty: &str, ordinal: usize, visiting: &mut BTreeSet<String>) -> Result<S
         "Cost" => return Ok("[2]".into()),
         _ => {}
     }
-    if let Some(value) = product_sample(&ty, ordinal)? {
-        return Ok(value);
-    }
     if ty.starts_with("Option ") {
         return Ok("none".into());
     }
@@ -400,23 +394,4 @@ fn sample(ty: &str, ordinal: usize, visiting: &mut BTreeSet<String>) -> Result<S
         }
     }
     Err(LowerError::new(format!("no finite sample for {ty}")))
-}
-
-fn product_sample(ty: &str, ordinal: usize) -> Result<Option<String>> {
-    let mut depth = 0;
-    for (i, c) in ty.char_indices() {
-        match c {
-            '(' => depth += 1,
-            ')' => depth -= 1,
-            '×' if depth == 0 => {
-                return Ok(Some(format!(
-                    "({}, {})",
-                    sample(&ty[..i], ordinal, &mut BTreeSet::new())?,
-                    sample(&ty[i + c.len_utf8()..], ordinal, &mut BTreeSet::new())?
-                )));
-            }
-            _ => {}
-        }
-    }
-    Ok(None)
 }

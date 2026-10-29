@@ -664,11 +664,17 @@ fn live_canon_cards_elaborate_with_builtin() {
 }
 
 #[test]
-fn anonymous_structures_and_right_associative_application_elaborate() {
+fn anonymous_constructors_are_refused_and_right_associative_application_elaborates() {
     let bundle = builtin();
     let reader = Elaborator::new(&bundle);
+    // The data language writes a structure as a record; `⟨…⟩` is no term of it.
+    assert!(
+        reader
+            .read::<KeywordFamily>("⟨protection, none⟩")
+            .is_err()
+    );
     assert_eq!(
-        reader.read::<KeywordFamily>("⟨protection, none⟩").unwrap(),
+        reader.read::<KeywordFamily>("{ word := protection }").unwrap(),
         reader
             .read::<KeywordFamily>("{ word := protection, sort := none }")
             .unwrap()

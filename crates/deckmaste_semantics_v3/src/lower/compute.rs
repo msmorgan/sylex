@@ -1,4 +1,7 @@
-//! Pure data computation used by authored helpers.
+//! The data evaluation `alsoForKeywords` still needs (`plugins-v3-first-order-templates`): a
+//! function parameter and its lambda arguments, `have`, `match`, `if`, `List.map`,
+//! `List.filterMap`, `List.length` and `==`. Every other plugin declaration is a first-order
+//! constructor tree; this module goes once the owner rules on `alsoForKeywords`.
 use super::Bound;
 use super::BundleKey;
 use super::Elaborator;
@@ -17,18 +20,6 @@ use super::split;
 
 fn word(token: &Token, value: &str) -> bool {
     matches!(token, Token::Ident(n) if n.as_str() == value)
-}
-fn product(ty: &str) -> Option<(&str, &str)> {
-    let mut depth = 0;
-    for (i, c) in ty.char_indices() {
-        match c {
-            '(' => depth += 1,
-            ')' => depth -= 1,
-            '×' if depth == 0 => return Some((&ty[..i], &ty[i + c.len_utf8()..])),
-            _ => {}
-        }
-    }
-    None
 }
 impl Elaborator<'_> {
     fn type_of(&self, tokens: &[Token], scope: &Scope) -> Result<String> {
@@ -98,13 +89,10 @@ impl Elaborator<'_> {
             return Ok(function.output.clone());
         }
         match name.as_str() {
-            "Semantics.Characteristics.valueEdits" => return Ok("List CharacteristicEdit".into()),
-            "Semantics.Characteristics.typeChanges" => return Ok("TypeLineChanges".into()),
             "Option.some" | "some" => {
                 return Ok(format!("Option ({})", self.type_of(&tokens[1..], scope)?));
             }
             "List.length" => return Ok("Nat".into()),
-            "List.isEmpty" => return Ok("Bool".into()),
             "List.map" | "List.filterMap" if tokens.len() == 3 => {
                 let result = self.function_result(&tokens[1..2], scope)?;
                 let result = if name.as_str() == "List.filterMap" {
@@ -120,13 +108,6 @@ impl Elaborator<'_> {
                 return Ok(format!("List ({result})"));
             }
             _ => {}
-        }
-        if let Some(field_name) = name.as_str().strip_prefix("Semantics.Characteristics.")
-            && let Some(field) = shape("Characteristics")
-                .and_then(|cs| cs.into_iter().next())
-                .and_then(|c| c.fields.into_iter().find(|f| f.name.as_str() == field_name))
-        {
-            return Ok(field.ty);
         }
         let candidates = self
             .bundle
@@ -247,43 +228,6 @@ impl Elaborator<'_> {
         scope: &mut Scope,
         stack: &mut Vec<BundleKey>,
     ) -> Result<Option<Value>> {
-        if let [base @ .., Token::Atom(dot), Token::Ident(field)] = tokens
-            && dot == "."
-            && field.as_str() == "plur"
-            && base.len() == 1
-        {
-            let value = self.eval(base, "NounPhrase", scope, stack)?;
-            let np: crate::ast::NounPhrase =
-                serde_json::from_value(value).map_err(|e| LowerError::new(e.to_string()))?;
-            return serde_json::to_value(super::plurality::noun_plurality(&np))
-                .map(Some)
-                .map_err(|e| LowerError::new(e.to_string()));
-        }
-        if let Some((left, right)) = product(ty)
-            && let Some(i) = tokens.iter().position(|t| is_atom(t, ","))
-        {
-            return Ok(Some(Value::Array(vec![
-                self.eval(&tokens[..i], left, scope, stack)?,
-                self.eval(&tokens[i + 1..], right, scope, stack)?,
-            ])));
-        }
-        if tokens.first().is_some_and(|t| is_atom(t, "⟨"))
-            && tokens.last().is_some_and(|t| is_atom(t, "⟩"))
-        {
-            let ctor = shape(ty)
-                .and_then(|cs| cs.into_iter().find(|c| c.name.as_str() == "mk"))
-                .ok_or_else(|| LowerError::new(format!("{ty} has no anonymous constructor")))?;
-            let args = split(&tokens[1..tokens.len() - 1], ",");
-            if args.len() != ctor.fields.len() {
-                return Err(LowerError::new("anonymous constructor arity mismatch"));
-            }
-            let values = args
-                .iter()
-                .zip(&ctor.fields)
-                .map(|(t, f)| self.eval(t, &f.ty, scope, stack))
-                .collect::<Result<_>>()?;
-            return Ok(Some(ctor.value(values)));
-        }
         if tokens
             .first()
             .is_some_and(|t| word(t, "have") || word(t, "let"))
@@ -345,34 +289,12 @@ impl Elaborator<'_> {
             let right = self.eval(&tokens[i + 1..], &operand_type, scope, stack)?;
             return Ok(Some(Value::Bool(left == right)));
         }
-        if ty == "Bool" {
-            if let Some(i) = tokens.iter().position(|t| is_atom(t, "=")) {
-                let left = self.eval(&tokens[..i], "Bool", scope, stack)?;
-                let right = self.eval(&tokens[i + 1..], "Bool", scope, stack)?;
-                return Ok(Some(Value::Bool(left == right)));
-            }
-            for op in ["&&", "||"] {
-                if let Some(i) = tokens.iter().position(|t| is_atom(t, op)) {
-                    let left = self.eval(&tokens[..i], "Bool", scope, stack)? == Value::Bool(true);
-                    let right =
-                        self.eval(&tokens[i + 1..], "Bool", scope, stack)? == Value::Bool(true);
-                    return Ok(Some(Value::Bool(if op == "&&" {
-                        left && right
-                    } else {
-                        left || right
-                    })));
-                }
-            }
-        }
-        if let Some(inner) = ty.strip_prefix("List ")
-            && let Some(i) = tokens.iter().position(|t| is_atom(t, "::"))
+        if ty == "Bool"
+            && let Some(i) = tokens.iter().position(|t| is_atom(t, "="))
         {
-            let head = self.eval(&tokens[..i], inner, scope, stack)?;
-            let Value::Array(mut tail) = self.eval(&tokens[i + 1..], ty, scope, stack)? else {
-                return Err(LowerError::new("cons requires list tail"));
-            };
-            tail.insert(0, head);
-            return Ok(Some(Value::Array(tail)));
+            let left = self.eval(&tokens[..i], "Bool", scope, stack)?;
+            let right = self.eval(&tokens[i + 1..], "Bool", scope, stack)?;
+            return Ok(Some(Value::Bool(left == right)));
         }
         self.helper(tokens, ty, scope, stack)
     }
@@ -455,14 +377,6 @@ impl Elaborator<'_> {
             return Ok(None);
         };
         let args = &tokens[1..];
-        if let Some(field_name) = name.as_str().strip_prefix("Semantics.Characteristics.")
-            && let Some(field) = shape("Characteristics")
-                .and_then(|cs| cs.into_iter().next())
-                .and_then(|c| c.fields.into_iter().find(|f| f.name.as_str() == field_name))
-        {
-            let value = self.eval(args, "Characteristics", scope, stack)?;
-            return Self::coerce(value[field.rust_name.as_str()].clone(), &field.ty, ty).map(Some);
-        }
         match name.as_str() {
             "keyword" | "Semantics.Templates.keyword" if ty == "Ability" && !args.is_empty() => {
                 let label = self.eval(args, "KeywordLabel", scope, stack)?;
@@ -473,66 +387,12 @@ impl Elaborator<'_> {
                 )
                 .map(Some)
             }
-            "List.length" | "List.isEmpty" => {
+            "List.length" => {
                 let (_, value) = self.infer(args, scope, stack)?;
                 let values = value
                     .as_array()
-                    .ok_or_else(|| LowerError::new("list helper requires a list"))?;
-                Ok(Some(if name.as_str() == "List.length" {
-                    Value::from(values.len())
-                } else {
-                    Value::Bool(values.is_empty())
-                }))
-            }
-            "Semantics.Characteristics.typeChanges" => {
-                let value = self.eval(args, "Characteristics", scope, stack)?;
-                let c =
-                    serde_json::from_value(value).map_err(|e| LowerError::new(e.to_string()))?;
-                serde_json::to_value(super::characteristics::type_changes(&c))
-                    .map(Some)
-                    .map_err(|e| LowerError::new(e.to_string()))
-            }
-            "Semantics.Characteristics.valueEdits" if args.len() == 2 => {
-                let c = serde_json::from_value(self.eval(
-                    &args[..1],
-                    "Characteristics",
-                    scope,
-                    stack,
-                )?)
-                .map_err(|e| LowerError::new(e.to_string()))?;
-                let op =
-                    serde_json::from_value(self.eval(&args[1..], "QualityOp", scope, stack)?)
-                        .map_err(|e| LowerError::new(e.to_string()))?;
-                serde_json::to_value(super::characteristics::value_edits(&c, &op))
-                    .map(Some)
-                    .map_err(|e| LowerError::new(e.to_string()))
-            }
-            "Semantics.Location.observedOnDeparture" => {
-                let value = self.eval(args, "Location", scope, stack)?;
-                let location =
-                    serde_json::from_value(value).map_err(|e| LowerError::new(e.to_string()))?;
-                Ok(Some(Value::Bool(observed_departure(&location))))
-            }
-            "Semantics.Cost.asPaid" => {
-                let value = self.eval(args, "Cost", scope, stack)?;
-                let cost =
-                    serde_json::from_value(value).map_err(|e| LowerError::new(e.to_string()))?;
-                Ok(Some(
-                    serde_json::to_value(as_paid(cost))
-                        .map_err(|e| LowerError::new(e.to_string()))?,
-                ))
-            }
-            "Semantics.QualityPayload.edits" if args.len() == 2 => {
-                let op =
-                    serde_json::from_value(self.eval(&args[..1], "QualityOp", scope, stack)?)
-                        .map_err(|e| LowerError::new(e.to_string()))?;
-                let payload: super::characteristics::QualityPayload = serde_json::from_value(
-                    self.eval(&args[1..], "QualityPayload", scope, stack)?,
-                )
-                .map_err(|e| LowerError::new(e.to_string()))?;
-                serde_json::to_value(payload.edits(op))
-                    .map(Some)
-                    .map_err(|e| LowerError::new(e.to_string()))
+                    .ok_or_else(|| LowerError::new("List.length requires a list"))?;
+                Ok(Some(Value::from(values.len())))
             }
             _ => self.collection_helper(name.as_str(), args, ty, scope, stack),
         }
@@ -546,32 +406,6 @@ impl Elaborator<'_> {
         stack: &mut Vec<BundleKey>,
     ) -> Result<Option<Value>> {
         match name {
-            "Option.map" if args.len() == 2 => {
-                let (source_type, source) = self.infer(&args[1..], scope, stack)?;
-                let input = normal(&source_type)
-                    .strip_prefix("Option ")
-                    .map(str::to_owned)
-                    .ok_or_else(|| LowerError::new("Option.map requires an option"))?;
-                let output = ty
-                    .strip_prefix("Option ")
-                    .ok_or_else(|| LowerError::new("Option.map returns an option"))?;
-                if source.is_null() {
-                    return Ok(Some(Value::Null));
-                }
-                self.apply(
-                    &args[..1],
-                    Bound {
-                        ty: input,
-                        value: source,
-                        identity: None,
-                        caller: false,
-                    },
-                    output,
-                    scope,
-                    stack,
-                )
-                .map(Some)
-            }
             "List.map" | "List.filterMap" if args.len() == 2 => {
                 let (source_type, source) = self.infer(&args[1..], scope, stack)?;
                 let input = normal(&source_type)
@@ -613,14 +447,6 @@ impl Elaborator<'_> {
                 };
                 Ok(Some(Value::Array(values)))
             }
-            "Option.getD" if args.len() == 2 => {
-                let option = self.eval(&args[..1], &format!("Option ({ty})"), scope, stack)?;
-                Ok(Some(if option.is_null() {
-                    self.eval(&args[1..], ty, scope, stack)?
-                } else {
-                    option
-                }))
-            }
             _ => Ok(None),
         }
     }
@@ -644,12 +470,6 @@ fn bind_pattern(pattern: &[Token], ty: &str, value: &Value, scope: &mut Scope) -
                 &Value::Array(values[1..].to_vec()),
                 scope,
             )?);
-    }
-    if let Some((left, right)) = product(ty)
-        && let Some(i) = pattern.iter().position(|t| is_atom(t, ","))
-    {
-        return Ok(bind_pattern(&pattern[..i], left, &value[0], scope)?
-            && bind_pattern(&pattern[i + 1..], right, &value[1], scope)?);
     }
     if ty.starts_with("List ") && matches!(pattern, [Token::Group('[', items)] if items.is_empty())
     {
@@ -717,47 +537,4 @@ fn bind_pattern(pattern: &[Token], ty: &str, value: &Value, scope: &mut Scope) -
         );
     }
     Ok(true)
-}
-fn observed_departure(location: &crate::ast::Location) -> bool {
-    use crate::ast::Location;
-    use crate::ast::Zone;
-    match location {
-        Location::InCaller { body } | Location::FromEnd { loc: body, .. } => {
-            observed_departure(body)
-        }
-        Location::Zone { zone, .. } => *zone == Zone::Battlefield,
-        Location::Coord { locs, .. } => locs.iter().any(observed_departure),
-        _ => false,
-    }
-}
-fn as_paid(cost: crate::ast::Cost) -> crate::ast::Cost {
-    use crate::ast::Action;
-    use crate::ast::Cost;
-    use crate::ast::PayTimes;
-    use crate::ast::PaymentOutcome;
-    match cost {
-        Cost::Perform { action } => match *action {
-            Action::Pay {
-                cost,
-                times: PayTimes::Once,
-                outcome: PaymentOutcome::Paid,
-                whose: None,
-                keyword: None,
-            } => *cost,
-            action => Cost::Perform {
-                action: Box::new(action),
-            },
-        },
-        Cost::InCaller { body } => Cost::InCaller {
-            body: Box::new(as_paid(*body)),
-        },
-        Cost::Scaled { cost, amount } => Cost::Scaled {
-            cost: Box::new(as_paid(*cost)),
-            amount,
-        },
-        Cost::Compound { costs } => Cost::Compound {
-            costs: costs.into_iter().map(as_paid).collect(),
-        },
-        other => other,
-    }
 }

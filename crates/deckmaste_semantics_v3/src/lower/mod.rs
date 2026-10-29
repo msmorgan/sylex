@@ -4,9 +4,7 @@
 //! Bundle names are resolved by their result type before arguments are
 //! elaborated, so an overloaded word never selects a declaration by filesystem
 //! order.
-mod characteristics;
 mod compute;
-mod plurality;
 mod schema;
 mod snapshot;
 mod types;
@@ -34,11 +32,6 @@ pub trait SemanticType: DeserializeOwned {
 impl<T: SemanticType> SemanticType for Box<T> {
     fn semantic_type() -> String {
         T::semantic_type()
-    }
-}
-impl<A: SemanticType, B: SemanticType> SemanticType for (A, B) {
-    fn semantic_type() -> String {
-        format!("({}) × ({})", A::semantic_type(), B::semantic_type())
     }
 }
 impl<T: SemanticType> SemanticType for Vec<T> {
@@ -157,25 +150,14 @@ fn normal(ty: &str) -> String {
         ty = ty[1..ty.len() - 1].trim();
     }
     let ty = ty.replace("Semantics.", "");
-    let mut depth = 0;
-    let product = ty.chars().any(|c| {
-        if c == '(' {
-            depth += 1;
-        } else if c == ')' {
-            depth -= 1;
-        }
-        c == '×' && depth == 0
-    });
-    if !product {
-        for head in ["Option", "List", "Delta"] {
-            if let Some(inner) = ty.strip_prefix(&format!("{head} ")) {
-                let inner = normal(inner);
-                return if inner.contains(' ') {
-                    format!("{head} ({inner})")
-                } else {
-                    format!("{head} {inner}")
-                };
-            }
+    for head in ["Option", "List", "Delta"] {
+        if let Some(inner) = ty.strip_prefix(&format!("{head} ")) {
+            let inner = normal(inner);
+            return if inner.contains(' ') {
+                format!("{head} ({inner})")
+            } else {
+                format!("{head} {inner}")
+            };
         }
     }
     schema::alias(&ty).map_or(ty.clone(), normal)
@@ -517,18 +499,6 @@ impl<'a> Elaborator<'a> {
             }
             return self.eval(&tokens[..i], ty, scope, stack);
         }
-        if let Some(i) = tokens.iter().position(|t| is_atom(t, "++")) {
-            let mut left = self.eval(&tokens[..i], ty, scope, stack)?;
-            let right = self.eval(&tokens[i + 1..], ty, scope, stack)?;
-            let Some(a) = left.as_array_mut() else {
-                return Err(LowerError::new("++ requires lists"));
-            };
-            let Some(b) = right.as_array() else {
-                return Err(LowerError::new("++ requires lists"));
-            };
-            a.extend(b.iter().cloned());
-            return Ok(left);
-        }
         if let [Token::Ident(name)] = tokens
             && let Some(bound) = scope.bindings.get(name).cloned()
         {
@@ -586,9 +556,6 @@ impl<'a> Elaborator<'a> {
         }
         if let [Token::Group('{', fields)] = tokens {
             return self.record(fields, ty, scope, stack);
-        }
-        if let [Token::Group('⟨', fields)] = tokens {
-            return self.anonymous_constructor(fields, ty, scope, stack);
         }
         if let [Token::String(s)] = tokens {
             if ty == "String" {
@@ -867,12 +834,6 @@ impl<'a> Elaborator<'a> {
             if i + len > tokens.len() {
                 return Err(LowerError::new("incomplete argument"));
             }
-            let mut len = len;
-            while matches!(tokens.get(i+len), Some(Token::Atom(dot)) if dot == ".")
-                && matches!(tokens.get(i+len+1), Some(Token::Ident(n)) if n.as_str() == "plur")
-            {
-                len += 2;
-            }
             positional.push(&tokens[i..i + len]);
             i += len;
         }
@@ -923,28 +884,6 @@ impl<'a> Elaborator<'a> {
             tokens
         };
         self.eval(value, inner, scope, stack)
-    }
-
-    fn anonymous_constructor(
-        &self,
-        fields: &[Token],
-        ty: &str,
-        scope: &mut Scope,
-        stack: &mut Vec<BundleKey>,
-    ) -> Result<Value> {
-        let constructors =
-            shape(ty).ok_or_else(|| LowerError::new(format!("{ty} has no constructor")))?;
-        if constructors.len() != 1 {
-            return Err(LowerError::new(format!(
-                "{ty} needs an explicit constructor"
-            )));
-        }
-        let ctor = &constructors[0];
-        let arguments: Vec<_> = split(fields, ",")
-            .into_iter()
-            .map(|field| Token::Group('(', field.to_vec()))
-            .collect();
-        Ok(ctor.value(self.arguments(&ctor.fields, &arguments, scope, stack)?))
     }
 
     fn record(
@@ -1392,7 +1331,7 @@ fn coercion_sources(ty: &str) -> &'static [&'static str] {
     match ty {
         "Subject" => &["NounPhrase"],
         "Predicate" => &["Subtype"],
-        "Cost" => &["Action"],
+        "Cost" | "Mode" => &["Action"],
         "TokenSpec" => &["CharacteristicBundle"],
         "CounterKindSource" => &["CounterKind"],
         "NameSource" => &["String"],
@@ -1400,7 +1339,6 @@ fn coercion_sources(ty: &str) -> &'static [&'static str] {
         "ManaSymbol" | "ColorOrColorless" => &["Color"],
         "Ability" => &["StaticSpec"],
         "LookbackSpan" => &["Duration"],
-        "Mode" => &["Action"],
         _ => &[],
     }
 }
