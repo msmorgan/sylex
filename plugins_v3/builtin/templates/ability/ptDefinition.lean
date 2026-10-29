@@ -5,6 +5,6 @@ template ptDefinition (subject : NounPhrase) (amount : Amount) : StaticSpec := {
   spelling := "<subject>'s power and toughness are each equal to <amount>",
   body :=
     characteristicDefining subject
-      [stat sets power amount,
-        stat sets toughness amount]
+      [stat power (set amount),
+        stat toughness (set amount)]
 }

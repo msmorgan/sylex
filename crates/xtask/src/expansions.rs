@@ -1506,13 +1506,13 @@ mod tests {
             .unwrap()
             .clone();
         let before = expand_keys(&bundle, std::iter::once(&key)).outcomes;
-        let marker = "stat sets toughness amount";
+        let marker = "stat toughness (set amount)";
         assert_eq!(original.matches(marker).count(), 1);
-        std::fs::write(&file, original.replace(marker, "stat adds toughness amount")).unwrap();
+        std::fs::write(&file, original.replace(marker, "stat toughness (up amount)")).unwrap();
         let edited = expand_keys(&Bundle::load(&plugin).unwrap(), std::iter::once(&key)).outcomes;
         let comparison = compare(&before, &edited, &[], &[]).unwrap();
         assert_eq!(comparison.differences, [Difference::Changed(key.clone())]);
-        assert!(comparison.report().contains("Adds"));
+        assert!(comparison.report().contains("Up"));
         assert!(comparison.ensure_success().is_err());
         std::fs::write(&file, original.replace(marker, "totallyBogusIdentifier 1 2 3")).unwrap();
         let broken = expand_keys(&Bundle::load(&plugin).unwrap(), std::iter::once(&key)).outcomes;

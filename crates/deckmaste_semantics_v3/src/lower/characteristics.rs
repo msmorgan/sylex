@@ -5,6 +5,7 @@ use crate::ast::CharacteristicEdit;
 use crate::ast::CharacteristicStat;
 use crate::ast::Characteristics;
 use crate::ast::ColorSpec;
+use crate::ast::Delta;
 use crate::ast::QualityOp;
 use crate::ast::TypeLineChanges;
 
@@ -44,10 +45,14 @@ pub(super) fn value_edits(c: &Characteristics, op: &QualityOp) -> Vec<Characteri
         (CharacteristicStat::Defense, &c.defense),
     ] {
         if let Some(amount) = amount {
+            let amount = amount.clone();
             edits.push(CharacteristicEdit::Stat {
-                op: value_op.clone(),
                 axis,
-                amount: amount.clone(),
+                change: if *op == QualityOp::Loses {
+                    Delta::Down { amount }
+                } else {
+                    Delta::Set { amount }
+                },
             });
         }
     }

@@ -93,7 +93,7 @@ def StaticSpec.definedStats (s : StaticSpec) (fuel : Nat := 64) : List Character
   | n + 1, .inCaller b => b.definedStats n
   | _ + 1, .characteristicDefining _ edits =>
     edits.filterMap fun
-      | .stat .sets axis _ => some axis
+      | .stat axis (.set _) => some axis
       | _ => none
   | n + 1, .conjunction _ ps => ps.flatMap (fun p => p.definedStats n)
   | _, _ => []

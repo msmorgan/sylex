@@ -15,8 +15,8 @@ keyword eternalize (cost : Cost) : Ability := {
             [edits
                 [colors sets
                     (.some [black]),
-                  stat sets power 4,
-                  stat sets toughness 4,
+                  stat power (set 4),
+                  stat toughness (set 4),
                   manaCost none,
                   typeLine adds
                     { subtypes := some [zombie] }]]))

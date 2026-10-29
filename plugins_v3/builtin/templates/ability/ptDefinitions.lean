@@ -6,6 +6,6 @@ template ptDefinitions (subject : NounPhrase) (power toughness : Amount) : Stati
   spelling := "<subject>'s power is equal to <power> and its toughness is equal to <toughness>",
   body :=
     characteristicDefining subject
-      [stat sets power power,
-        stat sets toughness toughness]
+      [stat power (set power),
+        stat toughness (set toughness)]
 }

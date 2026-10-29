@@ -2544,9 +2544,8 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
                 "stat",
                 "Stat",
                 vec![
-                    Field::new("op", "op", "QualityOp", None),
                     Field::new("axis", "axis", "CharacteristicStat", None),
-                    Field::new("amount", "amount", "Amount", None),
+                    Field::new("change", "change", "Delta Amount", None),
                 ],
             ),
             Constructor::new("ptSwitch", "PtSwitch", vec![]),

@@ -1,4 +1,3 @@
-primitive stat (op : QualityOp) (axis : CharacteristicStat)
-    (amount : Amount) : CharacteristicEdit := {
-  body := Semantics.Primitives.CharacteristicEdit.stat op axis amount
+primitive stat (axis : CharacteristicStat) (change : Delta Amount) : CharacteristicEdit := {
+  body := Semantics.Primitives.CharacteristicEdit.stat axis change
 }

@@ -1888,9 +1888,8 @@ pub enum CharacteristicEdit {
         colors: ColorSpec,
     },
     Stat {
-        op: QualityOp,
         axis: CharacteristicStat,
-        amount: Box<Amount>,
+        change: Delta<Box<Amount>>,
     },
     PtSwitch,
     Quality {

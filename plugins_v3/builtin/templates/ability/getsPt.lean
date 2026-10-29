@@ -3,6 +3,6 @@ template getsPt (subject : NounPhrase) (power toughness : Delta Amount) : Static
   spelling := "<subject> gets <power>/<toughness>",
   body :=
     characteristicChange subject
-      [statEdit power power,
-        statEdit toughness toughness]
+      [stat power power,
+        stat toughness toughness]
 }

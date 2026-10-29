@@ -12,8 +12,8 @@ action earthbend (amount : Amount) : Action := {
               (and [isLand, actorControls]))
             [typeLine adds
                 { types := some [Semantics.CardType.creature] },
-              stat sets power 0,
-              stat sets toughness 0,
+              stat power (set 0),
+              stat toughness (set 0),
               addedAbilities [haste]])
           none,
         putCounters amount (printedKind p1p1Counter)

@@ -826,12 +826,12 @@ mutual
     | name (op : QualityOp) (name : String)
     | manaCost (cost : Option ManaCost)
     | colors (op : QualityOp) (colors : ColorSpec)
-    /-- A stat set (`sets`), or raised (`adds`) or lowered (`loses`) by `amount`. In a static
+    /-- A stat set to an amount (`set`), or raised (`up`) or lowered (`down`) by it. In a static
     change of power and toughness, a set applies in layer 7b and a change by an amount in layer
     7c [CR#613.4b,613.4c]: "<subject> gets +P/+T" is two of these, the subject written once. A
     set of an object's own power or toughness by a characteristic-defining ability is written
     under `StaticSpec.characteristicDefining`, applied in layer 7a [CR#604.3a,613.4a]. -/
-    | stat (op : QualityOp) (axis : CharacteristicStat) (amount : Amount)
+    | stat (axis : CharacteristicStat) (change : Delta Amount)
     /-- The subject's power and toughness are switched [CR#613.4d]. -/
     | ptSwitch
     | quality (op : QualityOp) (quality : WrittenQuality)

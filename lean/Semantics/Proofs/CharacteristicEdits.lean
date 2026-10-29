@@ -54,18 +54,18 @@ theorem allAbilityRemoval :
 
 theorem numericEditsShareOneLocalScope :
     CopyExcept.check (DRS.ofList []) (.edits
-      [.stat .sets .power (powerOf (target isCreature)),
-       .stat .sets .toughness (powerOf it)]) = [] := by decide
+      [.stat .power (.set (powerOf (target isCreature))),
+       .stat .toughness (.set (powerOf it))]) = [] := by decide
 
 theorem numericEditsDoNotPublishAcrossCopyExceptions :
     CopyExcept.checkAll (DRS.ofList [])
-      [.edits [.stat .sets .power (powerOf (target isCreature))],
-       .edits [.stat .sets .toughness (powerOf it)]] =
+      [.edits [.stat .power (.set (powerOf (target isCreature)))],
+       .edits [.stat .toughness (.set (powerOf it))]] =
       [.anaphor .bare .one 0] := by decide
 
 theorem subjectIsPublishedBeforeItsEdits :
     StaticSpec.check (DRS.ofList []) (.characteristicChange (target isCreature)
-      [.stat .sets .power (powerOf it)]) = [] := by decide
+      [.stat .power (.set (powerOf it))]) = [] := by decide
 
 theorem copySpecificAdditionsRemainSeparate :
     CopyExcept.checkAll (DRS.ofList []) [.ability (keyword (.named "flying")),
@@ -102,7 +102,7 @@ theorem retainedTypeLineIsAdded :
 printed `*` [CR#604.3a,613.4a]; an ordinary set of its power ("has base power 2") does not. -/
 theorem definingAbilityDefinesPower :
     (powerDefinition thisCreature 2).definedStats = [.power] ∧
-      (StaticSpec.characteristicChange thisCreature [.stat .sets .power 2]).definedStats =
+      (StaticSpec.characteristicChange thisCreature [.stat .power (.set 2)]).definedStats =
         [] := by decide
 
 /-- Tarmogoyf is one Characteristic-Defining Ability setting both stats, its toughness reading
@@ -147,7 +147,7 @@ theorem tokenIsCreatedWithADefiningAbility :
 [CR#604.3a]; raising its power defines nothing. -/
 theorem definingAbilityDefinesOnlyColorsSubtypesAndStats :
     StaticSpec.check (DRS.ofList [])
-      (.characteristicDefining thisCreature [.stat .adds .power 1]) = [.cdaEdit] := by
+      (.characteristicDefining thisCreature [.stat .power (.up 1)]) = [.cdaEdit] := by
   decide
 
 /-- Criterion (3): a Characteristic-Defining Ability defines its own object, never another

@@ -4,5 +4,5 @@ alone [CR#604.3a,613.4a]. -/
 template powerDefinition (subject : NounPhrase) (amount : Amount) : StaticSpec := {
   spelling := "<subject>'s power is equal to <amount>",
   body :=
-    characteristicDefining subject [stat sets power amount]
+    characteristicDefining subject [stat power (set amount)]
 }

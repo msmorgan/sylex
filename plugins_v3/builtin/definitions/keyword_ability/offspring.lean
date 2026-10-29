@@ -11,8 +11,8 @@ keyword offspring (cost : Cost) : Ability := {
         (create 1
           (copyOf thisPermanent
             [edits
-                [stat sets power 1,
-                  stat sets toughness 1]]))
+                [stat power (set 1),
+                  stat toughness (set 1)]]))
         [] [] none none none
         (some
           (keywordCostPaid offspring.label thisPermanent))]

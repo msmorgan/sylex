@@ -1714,7 +1714,7 @@ def CharacteristicEdit.definesOk : CharacteristicEdit → Bool
   | .quality op (.chosen (.ofChosen _ .color)) => op != .loses
   | .typeLine op changes =>
     op != .loses && changes.supertypes.isNone && changes.types.isNone && changes.subtypes.isSome
-  | .stat .sets .power _ | .stat .sets .toughness _ => true
+  | .stat .power (.set _) | .stat .toughness (.set _) => true
   | _ => false
 
 /-- Whether a Static Spec writes a Characteristic-Defining Ability. -/
@@ -1930,7 +1930,7 @@ def KeywordParam.writtenLetter? : KeywordParam → Option Letter
 def stepCharacteristicEditWith (ops : StepOps) (drs : DRS) (ed : CharacteristicEdit) : DRS × List Refusal :=
   match ed with
   | .manaCost _ => (drs, [])
-  | .stat _ _ amt => ops.amt drs amt
+  | .stat _ (.up amt) | .stat _ (.down amt) | .stat _ (.set amt) => ops.amt drs amt
   | .quality _ q => stepWrittenQualityWith ops drs q
   | .addedAbilities abs =>
     -- A granted keyword writing a letter for a number ("has toxic X") introduces that letter,
@@ -4545,7 +4545,7 @@ def stepOps : Nat → StepOps
           let (drs2, e2) := edits.foldl (fun (d, es) edit =>
             let (d', e') := stepCharacteristicEditWith ops d edit
             let named := match edit with
-              | .stat .sets _ _ => d'.push (outcomeB .namedNumber) .other false
+              | .stat _ (.set _) => d'.push (outcomeB .namedNumber) .other false
               | _ => d'
             (named, es ++ e')) (drs1, [])
           (drs2, e1 ++ e2 ++ refuse (!edits.isEmpty) .nonEmpty ++

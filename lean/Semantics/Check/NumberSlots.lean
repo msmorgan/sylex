@@ -106,14 +106,15 @@ termination_by structural fuel
 /-- A stat edit's slot: a set stands below zero, as an effect that sets a power and toughness
 does, and a change by an amount reads one below zero as zero [CR#107.1b]. -/
 def CharacteristicEdit.numberSlots : CharacteristicEdit → List (Amount × NumberRegime)
-  | .stat .sets _ amount => [(amount, .signed)]
-  | .stat _ _ amount => [(amount, .clamped)]
+  | .stat _ (.set amount) => [(amount, .signed)]
+  | .stat _ (.up amount) | .stat _ (.down amount) => [(amount, .clamped)]
   | _ => []
 
 /-- A stat edit made by doubling or tripling a power or toughness: signed, the exception
 [CR#107.1b] names. -/
 def CharacteristicEdit.scaledStatSlots : CharacteristicEdit → List (Amount × NumberRegime)
-  | .stat _ _ amount => [(amount, .signed)]
+  | .stat _ (.up amount) | .stat _ (.down amount) | .stat _ (.set amount) =>
+    [(amount, .signed)]
   | _ => []
 
 /-- The static spec's own slots and the regime each is read in [CR#107.1b]. -/

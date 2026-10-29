@@ -34,17 +34,19 @@ def Characteristics.typeChanges (c : Characteristics) : TypeLineChanges :=
 /-- The value characteristics `c` writes, each with `op`: an addition sets a written value,
 as "becomes a 2/2 creature in addition to its other types" does, and a removal removes a name,
 colors, abilities and the mana cost (`manaCost none`). A number is not removed: a removal writes
-a power, toughness, loyalty or defense as lowered by it (`stat .loses`), as "gets −N" is. No
+a power, toughness, loyalty or defense as lowered by it (`stat _ (.down _)`), as "gets −N" is. No
 expansion is checked syntax, so nothing refuses that; no card writes a removed number. -/
 def Characteristics.valueEdits (c : Characteristics) (op : QualityOp) : List CharacteristicEdit :=
   let valueOp := if op == .loses then .loses else .sets
+  let stat (axis : CharacteristicStat) (amount : Amount) : CharacteristicEdit :=
+    .stat axis (if op == .loses then .down amount else .set amount)
   c.name.toList.map (.name valueOp) ++
     c.cost.toList.map (fun cost => .manaCost (if op == .loses then none else some cost)) ++
     (if c.colors.isEmpty then [] else [.colors valueOp (.some c.colors)]) ++
-    c.power.toList.map (.stat valueOp .power) ++
-    c.toughness.toList.map (.stat valueOp .toughness) ++
-    c.loyalty.toList.map (.stat valueOp .loyalty) ++
-    c.defense.toList.map (.stat valueOp .defense) ++
+    c.power.toList.map (stat .power) ++
+    c.toughness.toList.map (stat .toughness) ++
+    c.loyalty.toList.map (stat .loyalty) ++
+    c.defense.toList.map (stat .defense) ++
     (if c.text.isEmpty then []
      else if op == .loses then [.removedAbilities (.specified (c.text.map .written))]
      else [.addedAbilities c.text])

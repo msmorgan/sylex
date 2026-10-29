@@ -522,7 +522,7 @@ theorem meleeCountsAttackedOpponents :
       did you (.attackWith (a isCreature) (some .which)) thisCombat])
     (match melee with
       | .keyword _ _ [.triggered _ _ _ _ _ _ _
-          (.establish (.characteristicChange _ [.stat _ _ power, .stat _ _ toughness]) _)] =>
+          (.establish (.characteristicChange _ [.stat _ (.up power), .stat _ (.up toughness)]) _)] =>
         some (power, toughness)
       | _ => none) = some (perOpponent, perOpponent) := rfl
 

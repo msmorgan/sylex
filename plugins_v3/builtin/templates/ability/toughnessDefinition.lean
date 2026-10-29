@@ -4,5 +4,5 @@ toughness alone [CR#604.3a,613.4a]. -/
 template toughnessDefinition (subject : NounPhrase) (amount : Amount) : StaticSpec := {
   spelling := "<subject>'s toughness is equal to <amount>",
   body :=
-    characteristicDefining subject [stat sets toughness amount]
+    characteristicDefining subject [stat toughness (set amount)]
 }

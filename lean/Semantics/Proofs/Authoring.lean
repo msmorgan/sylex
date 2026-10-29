@@ -1222,7 +1222,7 @@ theorem compatibleLocalKeepsItsValue (up : RoundMode) : (up : RoundMode) = up :=
 theorem compatibleOptionalLocalKeepsItsValue (up : Option RoundMode) :
     (up : Option RoundMode) = up := rfl
 theorem incompatibleLocalAllowsWord (power : Amount) :
-    (stat sets power power : CharacteristicEdit) = .stat .sets .power power := rfl
+    (stat power (set power) : CharacteristicEdit) = .stat .power (.set power) := rfl
 
 template white : Color := { body := white }
 theorem wordInItsOwnDeclaration : white = Color.white := rfl

@@ -103,7 +103,7 @@ theorem okNegativeLetterInComparison :
 toughness is the exception [CR#107.1b] names. -/
 theorem okDefinesPtSigned :
     (StaticSpec.characteristicChange (target isCreature)
-      [.stat .sets .power 0, .stat .sets .toughness 2]).numberSlots
+      [.stat .power (.set 0), .stat .toughness (.set 2)]).numberSlots
       = [(.lit 0, .signed), (.lit 2, .signed)] := by rfl
 
 /-- "This creature's power and toughness are each equal to …": a Characteristic-Defining

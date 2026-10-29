@@ -19,8 +19,8 @@ keyword awaken (amount : Amount) (cost : Cost) : Ability := {
                   [typeLine adds
                       { types := some [Semantics.CardType.creature],
                         subtypes := some [elemental] },
-                    stat sets power 0,
-                    stat sets toughness 0,
+                    stat power (set 0),
+                    stat toughness (set 0),
                     addedAbilities
                       [keyword haste.label]])
                 none]))]

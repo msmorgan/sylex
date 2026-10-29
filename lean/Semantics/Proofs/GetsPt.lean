@@ -29,7 +29,7 @@ private def battleCryStatEdits : List CharacteristicEdit :=
 
 /-- Whether an edit raises `stat` by the literal `n`. -/
 private def raisesBy (stat : CharacteristicStat) (n : Int) : CharacteristicEdit → Bool
-  | .stat .adds stat' (.lit m) => stat' == stat && m == n
+  | .stat stat' (.up (.lit m)) => stat' == stat && m == n
   | _ => false
 
 /-- "Each other attacking creature gets +1/+0" [CR#702.91a]: one change carrying both printed
