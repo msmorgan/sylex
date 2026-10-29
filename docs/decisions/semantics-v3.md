@@ -410,6 +410,16 @@ When the checker evaluates `Predicate.did (did(subj, action, within))`:
 - It opens a local relative-clause DRS box (`§1.3 Box 5`) where `which` is bound to a temporary referent seeded from the outer `TypeEvidence` (`c.selfType` / conjunction evidence: `.player` when filtering a player description, `.object` with the accumulated `CardType`s and expected zone when filtering an object description).
 - It steps `did(subj, action, within)` in that local box (verifying that `which` appears at least once and satisfies `J1` domain compatibility for its verb slot) and discards local indefinite participants and the temporary `which` binder on exit. Definite presuppositional references (`attachHost`: `"enchanted"`, `"equipped"`, or `"fortified"`, `[CR#301.5,301.6,303.4b]`) project to the enclosing ability's DRS box with their identity and zone preserved, without a per-referent `attachmentHost` flag.
 
+- **Same-Is-True-For Abilities (`Ability.sameIsTrueFor`, owner ruling 2026-10-29):** "… The same
+  is true for first strike, double strike, …" is written once, as `sameIsTrueFor frame keywords`.
+  The `frame` contains the placeholder atom `KeywordTerm.thatKeyword`, analogous to `which`. It is
+  not expanded per keyword, because plugin files carry no evaluation
+  (`plugins-v3-first-order-templates`).
+  - The checker checks a static or triggered `frame` once per keyword, with `thatKeyword` bound to
+    that keyword, and refuses any other frame or an empty list.
+  - `thatKeyword` outside a frame is refused.
+  - Lowering distributes the frame over the keywords.
+
 ### 3.5 Pre-Action (`would`) vs. Post-Action (`does` / `did` / Imperative) DRT Stepping
 
 Because `does(subj, action)`, `would(subj, action)`, `did(subj, action, within)`, and imperative `action` all wrap the same `action : Action`, the DRT checker steps `action` under a `StepPhase`:
