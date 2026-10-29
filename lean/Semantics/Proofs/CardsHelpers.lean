@@ -144,8 +144,8 @@ def landwalkAbilities : KeywordTerm := (match (cardNamed "Cairn Wanderer").card 
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.static (StaticSpec.conjunction _ (List.cons _ (List.cons _
         (List.cons _ (List.cons _ (List.cons _ (List.cons _ (List.cons (StaticSpec.conditional
-        (StaticSpec.characteristicChange _ (List.cons (CharacteristicEdit.addedSelectionOf _
-        (AbilitySelection.specified (List.cons (AbilityLost.term part) _))) _)) _ _) _))))))))) _))
+        (StaticSpec.characteristicChange _ (List.cons (CharacteristicEdit.addedKeywordTerm part _)
+        _)) _ _) _))))))))) _))
         => some part
       | _ => none
     | _ => none).get (by decide)

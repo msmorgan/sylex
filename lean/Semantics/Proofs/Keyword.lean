@@ -414,14 +414,14 @@ private def lineOf (card : Spelled) (i : Nat) : Option Ability :=
   | .singleFaced face => face.characteristics.text[i]?
   | _ => none
 
-/-- The characteristic edits of each part a "the same is true for" line joins: each static
-part's, or each `sequentially` step's. -/
+/-- The characteristic edits of each part a "the same is true for" line joins, as the checker
+reads them (`CharacteristicEdit.expandAll`): each static part's, or each `sequentially` step's. -/
 private def partEdits : Ability → List (List CharacteristicEdit)
   | .static (.conjunction _ parts) => parts.map fun
-    | .conditional (.characteristicChange _ edits) _ _ => edits
+    | .conditional (.characteristicChange _ edits) _ _ => CharacteristicEdit.expandAll edits
     | _ => []
   | .triggered _ _ _ _ _ _ _ (.sequentially steps) => steps.map fun
-    | .doIf _ (.establish (.characteristicChange _ edits) _) _ _ => edits
+    | .doIf _ (.establish (.characteristicChange _ edits) _) _ _ => CharacteristicEdit.expandAll edits
     | _ => []
   | _ => []
 
@@ -461,11 +461,15 @@ theorem familyTermsGrantThroughAddedSelectionOf :
           some none, some none, some none, some none ] ∧
       (staticParts (cardNamed "Death-Mask Duplicant") 1)[5]? =
         some (onlyWhile
-          (abilityGrantSelected thisCreature
-            (allOf (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities]))
-            (.specified [.term Cards.landwalkAbilities]))
-          (exists_ (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities]))) :=
-  ⟨by decide, by decide, rfl⟩
+          (keywordGrant thisCreature Cards.landwalkAbilities
+            (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities]))
+          (exists_ (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities]))) ∧
+      CharacteristicEdit.expandAll [.addedKeywordTerm Cards.landwalkAbilities
+          (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities])] =
+        [.addedSelectionOf
+          (allOf (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities]))
+          (.specified [.term Cards.landwalkAbilities])] :=
+  ⟨by decide, by decide, rfl, rfl⟩
 
 /-- Required pin: hexproof is a family term on *Odric, Lunarch Marshal*, *Bleeding Effect* and
 *Urborg Scavengers*: "hexproof from [quality]" is a hexproof ability [CR#702.11d], so each grants

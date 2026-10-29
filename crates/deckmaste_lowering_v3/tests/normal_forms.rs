@@ -134,3 +134,43 @@ fn copied_characteristics_read_as_the_exceptions_they_write() {
         );
     }
 }
+
+fn changed_edits(reader: &Elaborator<'_>, spec: &str) -> Vec<CharacteristicEdit> {
+    let StaticSpec::CharacteristicChange { edits, .. } = reader.read::<StaticSpec>(spec).unwrap()
+    else {
+        panic!("{spec} is no characteristic change")
+    };
+    edits
+}
+
+#[test]
+fn a_granted_keyword_term_reads_as_the_keyword_or_its_family_selection() {
+    let bundle = builtin();
+    let reader = Elaborator::new(&bundle);
+    let bare = changed_edits(&reader, "keywordGrant thisCreature flying [isCreature]");
+    assert!(matches!(bare.as_slice(), [CharacteristicEdit::AddedKeywordTerm { .. }]));
+    assert_eq!(
+        expand_edits(&bare),
+        [CharacteristicEdit::AddedAbilities {
+            abilities: vec![deckmaste_semantics_v3::ast::Ability::Keyword {
+                keyword: reader
+                    .read::<deckmaste_semantics_v3::ast::KeywordLabel>("flying")
+                    .unwrap(),
+                params: Vec::new(),
+                body: Vec::new(),
+            }],
+        }]
+    );
+    let family = changed_edits(
+        &reader,
+        "keywordGrant thisCreature (anyIn { word := landwalk }) [isCreature, in_ graveyard]",
+    );
+    assert_eq!(
+        expand_edits(&family),
+        changed_edits(
+            &reader,
+            "abilityGrantSelected thisCreature (allOf [isCreature, in_ graveyard]) \
+             (specified [abilities (anyIn { word := landwalk })])",
+        )
+    );
+}

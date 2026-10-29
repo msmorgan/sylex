@@ -857,6 +857,11 @@ mutual
     /-- `op` written once over established quality wording ("becomes a 2/2 creature", "is all
     colors"): the edits `payload` writes (`QualityPayload.edits`). -/
     | payload (op : QualityOp) (payload : QualityPayload)
+    /-- The keyword a "the same is true for" list names, added: a keyword named bare is added
+    itself, and a family term ("landwalk", "protection", "hexproof") adds each variant of it that
+    the objects `holders` describes have, "the <term> abilities of those objects" [CR#702.1c]
+    (`CharacteristicEdit.expanded`). -/
+    | addedKeywordTerm (term : KeywordTerm) (holders : Predicate)
 
   inductive AbilitySelection where
     | specified (abilities : List AbilityLost)
@@ -1558,10 +1563,14 @@ def QualityPayload.edits (op : QualityOp) : QualityPayload → List Characterist
   | .quality q => [.quality op q]
   | .colored colors => [.colors op colors]
 
-/-- An edit as the edits it writes: a payload (`CharacteristicEdit.payload`) is its typed edits,
-and any other edit is itself. -/
+/-- An edit as the edits it writes: a payload (`CharacteristicEdit.payload`) is its typed edits, a
+keyword term (`CharacteristicEdit.addedKeywordTerm`) is the keyword added or its family's variants
+selected from their holders, and any other edit is itself. -/
 def CharacteristicEdit.expanded : CharacteristicEdit → List CharacteristicEdit
   | .payload op written => written.edits op
+  | .addedKeywordTerm (.the label) _ => [.addedAbilities [.keyword label [] []]]
+  | .addedKeywordTerm term holders =>
+    [.addedSelectionOf (.described .all holders) (.specified [.term term])]
   | edit => [edit]
 
 /-- An edit list as the edits it writes. -/

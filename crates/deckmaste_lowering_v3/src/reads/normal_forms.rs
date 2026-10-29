@@ -1,5 +1,6 @@
 //! Readings of the authoring constructors whose meaning is a normalization the checker
 //! makes downstream, mirrored from the Lean checker (`plugins-v3-first-order-templates`).
+use deckmaste_semantics_v3::ast::Ability;
 use deckmaste_semantics_v3::ast::AbilityLost;
 use deckmaste_semantics_v3::ast::AbilitySelection;
 use deckmaste_semantics_v3::ast::Action;
@@ -10,6 +11,9 @@ use deckmaste_semantics_v3::ast::ColorSpec;
 use deckmaste_semantics_v3::ast::CopyExcept;
 use deckmaste_semantics_v3::ast::Cost;
 use deckmaste_semantics_v3::ast::Delta;
+use deckmaste_semantics_v3::ast::DetPhrase;
+use deckmaste_semantics_v3::ast::KeywordTerm;
+use deckmaste_semantics_v3::ast::NounPhrase;
 use deckmaste_semantics_v3::ast::PayTimes;
 use deckmaste_semantics_v3::ast::PaymentOutcome;
 use deckmaste_semantics_v3::ast::QualityOp;
@@ -161,7 +165,9 @@ impl QualityPayloadEditsExt for QualityPayload {
     }
 }
 
-/// `CharacteristicEdit.expanded`: a payload is the edits it writes; any other edit is itself.
+/// `CharacteristicEdit.expanded`: a payload is the edits it writes; a keyword term is the keyword
+/// added, or, for a family, its variants selected from all the objects `holders` describes
+/// [CR#702.1c]; any other edit is itself.
 pub trait CharacteristicEditExpansionExt {
     fn expanded(&self) -> Vec<CharacteristicEdit>;
 }
@@ -169,6 +175,27 @@ impl CharacteristicEditExpansionExt for CharacteristicEdit {
     fn expanded(&self) -> Vec<CharacteristicEdit> {
         match self {
             Self::Payload { op, payload } => payload.edits(op),
+            Self::AddedKeywordTerm {
+                term: KeywordTerm::The { keyword },
+                ..
+            } => vec![Self::AddedAbilities {
+                abilities: vec![Ability::Keyword {
+                    keyword: keyword.clone(),
+                    params: Vec::new(),
+                    body: Vec::new(),
+                }],
+            }],
+            Self::AddedKeywordTerm { term, holders } => vec![Self::AddedSelectionOf {
+                source: Box::new(NounPhrase::Described {
+                    determiner: Box::new(DetPhrase::All),
+                    predicate: holders.clone(),
+                }),
+                selection: Box::new(AbilitySelection::Specified {
+                    abilities: vec![AbilityLost::Term {
+                        keyword: term.clone(),
+                    }],
+                }),
+            }],
             edit => vec![edit.clone()],
         }
     }

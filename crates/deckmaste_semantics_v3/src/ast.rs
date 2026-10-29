@@ -1930,6 +1930,10 @@ pub enum CharacteristicEdit {
         op: QualityOp,
         payload: QualityPayload,
     },
+    AddedKeywordTerm {
+        term: KeywordTerm,
+        holders: Box<Predicate>,
+    },
 }
 
 /// Mirrors `Semantics/Abilities.lean:840`.

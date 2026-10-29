@@ -2597,6 +2597,14 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
                     Field::new("payload", "payload", "QualityPayload", None),
                 ],
             ),
+            Constructor::new(
+                "addedKeywordTerm",
+                "AddedKeywordTerm",
+                vec![
+                    Field::new("term", "term", "KeywordTerm", None),
+                    Field::new("holders", "holders", "Predicate", None),
+                ],
+            ),
         ],
         "QualityPayload" => vec![
             Constructor::new(

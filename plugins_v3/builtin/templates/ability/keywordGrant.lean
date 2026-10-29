@@ -7,9 +7,5 @@ template keywordGrant (subject : NounPhrase) (term : KeywordTerm)
   -- TODO(spelling): A bare term grants the keyword; a family term instead names the abilities of
   -- holders.
   body :=
-    match term with
-    | Semantics.KeywordTerm.the label => abilityGrant subject (keyword label)
-    | x =>
-      abilityGrantSelected subject (allOf holders)
-        (specified [abilities term])
+    characteristicChange subject [addedKeywordTerm term holders]
 }
