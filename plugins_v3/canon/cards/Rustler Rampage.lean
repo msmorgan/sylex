@@ -6,8 +6,8 @@ card := {
     spell
       (chooseSpree
          [
-           ([1], untap (allOf [isCreature, controlledBy (target isPlayer)])),
-           ([1], gain (target isCreature) doubleStrike untilEndOfTurn)
+           { cost := [1], action := untap (allOf [isCreature, controlledBy (target isPlayer)]) },
+           { cost := [1], action := gain (target isCreature) doubleStrike untilEndOfTurn }
          ])
   ]
 }

@@ -6,8 +6,8 @@ card := {
     spell
       (chooseSpree
          [
-           ([1], instruct this_ (dealDamage 2 (each [isCreature, isOutlaw]))),
-           ([1], instruct this_ (dealDamage 2 (each [isCreature, non isOutlaw])))
+           { cost := [1], action := instruct this_ (dealDamage 2 (each [isCreature, isOutlaw])) },
+           { cost := [1], action := instruct this_ (dealDamage 2 (each [isCreature, non isOutlaw])) }
          ])
   ]
 }

@@ -188,14 +188,14 @@ description reads, so a `the`-headed description with it uniquifies. -/
 theorem lookbackOrdinalIsAnEventOrdinal :
     relativeCheck .object
         { subj := .actor .you, action := cast .which, within := some (.duration thisGame none),
-          ordinal := some (.nth 1, none) } = [] ∧
+          ordinal := some ⟨.nth 1, none⟩ } = [] ∧
       relativeCheck .object
         { subj := .actor .you, action := cast .which, within := some (.duration thisGame none),
-          ordinal := some (.nth 1, some .thisObject) } = [.eventOrdinalPeriod .thisObject] ∧
+          ordinal := some ⟨.nth 1, some .thisObject⟩ } = [.eventOrdinalPeriod .thisObject] ∧
       NounPhrase.check (DRS.ofList [])
         (the (and [isSpell, .did { subj := .actor .you, action := cast .which,
                                     within := some (.duration thisGame none),
-                                    ordinal := some (.nth 1, none) }])) = [] ∧
+                                    ordinal := some ⟨.nth 1, none⟩ }])) = [] ∧
       NounPhrase.check (DRS.ofList [])
         (the (and [isSpell, .did { subj := .actor .you, action := cast .which,
                                     within := some (.duration thisGame none) }])) =
@@ -244,7 +244,7 @@ theorem okThisObjectPassesTheLookbackChecks :
         (target (and [isSpell, did any (cast which (from_ := graveyard)) thisObject])) = [] ∧
       NounPhrase.check (DRS.ofList [])
         (the (and [isSpell,
-          did you (cast which) thisObject (ordinal := some (.nth 2, some .turn))])) = [] ∧
+          did you (cast which) thisObject (ordinal := some ⟨.nth 2, some .turn⟩)])) = [] ∧
       NounPhrase.check (DRS.ofList [])
         (the (and [isSpell, did you (cast which) thisObject])) = [.uniquifying] := by decide
 

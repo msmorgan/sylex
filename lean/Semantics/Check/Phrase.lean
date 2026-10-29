@@ -1337,9 +1337,9 @@ def lookbackGroundRefusals (drs : DRS) (action : Action) (subject : Option Kind)
 
 /-- An event ordinal counts from one, within a period `Period.eventOrdinalOk`
 admits. -/
-def eventOrdinalRefusals : Option (Ordinal × Option Period) → List Refusal
+def eventOrdinalRefusals : Option EventOrdinal → List Refusal
   | none => []
-  | some (ordinal, per) => refuse ordinal.ok .ordinalNonZero ++
+  | some ⟨ordinal, per⟩ => refuse ordinal.ok .ordinalNonZero ++
     per.toList.flatMap fun period => refuse period.eventOrdinalOk (.eventOrdinalPeriod period)
 
 /-- Whether a move writes no origin ("is put into a graveyard"): its origin is anywhere. -/
@@ -1559,7 +1559,7 @@ def stepWouldClauseWith (ops : StepOps) (drs : DRS) (wc : WouldClause) : DRS × 
     (drs2, errors ++ clauseErrors)
   | _ + 1, .nthOccurrence ordinal per clause =>
     let (out, errors) := ops.would drs clause
-    (out, errors ++ eventOrdinalRefusals (some (ordinal, per)))
+    (out, errors ++ eventOrdinalRefusals (some ⟨ordinal, per⟩))
 
 def stepCombatParticipationWith (ops : StepOps) (drs : DRS) (cp : CombatParticipation) : DRS × List Refusal :=
   match cp with
@@ -2115,8 +2115,8 @@ def stepModeChangeWith (ops : StepOps) (drs : DRS) (mc : ModeChange) : DRS × Li
   | .notChosenBefore dur => stepDurationWith ops drs dur
 
 def stepModeListWith (ops : StepOps) (drs : DRS)
-    (modes : List (Option Cost × Option Nat × Action)) : DRS × List Refusal :=
-  modes.foldl (fun (out, errors) (cost, _, action) =>
+    (modes : List Mode) : DRS × List Refusal :=
+  modes.foldl (fun (out, errors) ⟨cost, _, action⟩ =>
     let branch := { drs with nextId := out.nextId }
     let (afterCost, costErrors) := match cost with
       | some cost => ops.cost branch cost
@@ -3626,7 +3626,7 @@ def stepOps : Nat → StepOps
         | .stateHolds c => ops.cond drs c
         | .nthOccurrence ordinal per ev =>
           let (out, errors) := ops.ev drs ev
-          (out, errors ++ eventOrdinalRefusals (some (ordinal, per)))
+          (out, errors ++ eventOrdinalRefusals (some ⟨ordinal, per⟩))
         | .causes c ev =>
           let (drs1, e1) := stepCausingWith ops drs c
           let (drs2, e2) := ops.ev drs1 ev

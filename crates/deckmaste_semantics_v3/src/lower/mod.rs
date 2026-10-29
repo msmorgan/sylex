@@ -178,9 +178,6 @@ fn normal(ty: &str) -> String {
             }
         }
     }
-    if ty == "Mode" {
-        return "Option Cost × (Option Nat × Action)".into();
-    }
     schema::alias(&ty).map_or(ty.clone(), normal)
 }
 fn shape(ty: &str) -> Option<Vec<Constructor>> {
@@ -843,6 +840,9 @@ impl<'a> Elaborator<'a> {
             ("Duration", "LookbackSpan") => {
                 return construct("LookbackSpan", "duration", vec![value, Value::Null]);
             }
+            ("Action", "Mode") => {
+                return construct("Mode", "mk", vec![Value::Null, Value::Null, value]);
+            }
             _ => return Err(LowerError::new(format!("no coercion from {from} to {to}"))),
         };
         construct(&to, ctor, vec![value])
@@ -1423,6 +1423,7 @@ fn coercion_sources(ty: &str) -> &'static [&'static str] {
         "ManaSymbol" | "ColorOrColorless" => &["Color"],
         "Ability" => &["StaticSpec"],
         "LookbackSpan" => &["Duration"],
+        "Mode" => &["Action"],
         _ => &[],
     }
 }

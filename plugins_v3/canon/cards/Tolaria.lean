@@ -7,7 +7,7 @@ card := {
     activatedOnlyDuring (compound [tapSymbol])
       (establishThroughout
          (abilityLoss (target isCreature)
-            [written banding, abilities (anyIn ⟨bandsWithOther, none⟩)])
+            [written banding, abilities (anyIn { word := bandsWithOther })])
          untilEndOfTurn)
       (duringPart upkeep none)
   ]

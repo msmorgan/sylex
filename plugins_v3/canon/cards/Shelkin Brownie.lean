@@ -6,7 +6,7 @@ card := {
   text := [
     activated (compound [tapSymbol])
       (establishThroughout
-         (abilityLoss (target isCreature) [abilities (anyIn ⟨bandsWithOther, none⟩)]) untilEndOfTurn)
+         (abilityLoss (target isCreature) [abilities (anyIn { word := bandsWithOther })]) untilEndOfTurn)
   ],
   power := 1,
   toughness := 1

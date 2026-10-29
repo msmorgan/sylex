@@ -734,6 +734,13 @@ pub enum Period {
     ThisObject,
 }
 
+/// Mirrors `Semantics/Words.lean` `EventOrdinal`.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct EventOrdinal {
+    pub ordinal: Ordinal,
+    pub per: Option<Period>,
+}
+
 /// Mirrors `Semantics/Words.lean:735`.
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum EventSide {
@@ -938,7 +945,7 @@ pub struct DidClause {
     pub subj: Box<Subject>,
     pub action: Box<Action>,
     pub within: Option<Box<LookbackSpan>>,
-    pub ordinal: Option<(Ordinal, Option<Period>)>,
+    pub ordinal: Option<EventOrdinal>,
 }
 
 /// Mirrors `Semantics/Abilities.lean:167`.
@@ -2878,8 +2885,13 @@ pub struct RulesTables {
     pub conferral: Vec<ConferralRule>,
 }
 
-/// The cost, weight, and action of a mode, matching `Action.chooseModes`.
-pub type Mode = (Option<Box<Cost>>, (Option<u64>, Box<Action>));
+/// Mirrors `Semantics/Abilities.lean` `Mode`: the cost, weight, and action of a mode.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct Mode {
+    pub cost: Option<Box<Cost>>,
+    pub weight: Option<u64>,
+    pub action: Box<Action>,
+}
 
 /// The polymorphic wildcard supplied by the authoring language.
 pub trait AnyValue {

@@ -531,7 +531,7 @@ inductive CopySort where
 /-- A family of keywords ("a landwalk ability"). -/
 structure KeywordFamily where
   word : KeywordLabel
-  sort : Option QualitySort
+  sort : Option QualitySort := none
   deriving DecidableEq, Repr
 
 inductive KeywordTerm where
@@ -732,6 +732,13 @@ inductive Period where
   /-- The object's own existence: "activate only once" counts until the object changes zones,
   when it becomes a new object [CR#602.5b,702.177a,400.7]. -/
   | thisObject
+  deriving DecidableEq, Repr
+
+/-- An event ordinal: the `ordinal`th matching event, counted within each `per` when one is
+written ("the second spell you cast each turn"), as `DidClause.ordinal` writes it. -/
+structure EventOrdinal where
+  ordinal : Ordinal
+  per : Option Period := none
   deriving DecidableEq, Repr
 
 /-- Which side of an event a timing names: "before attackers are declared", "after combat". -/

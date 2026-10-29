@@ -466,10 +466,10 @@ private def callDamageControlModes : Card := .singleFaced
     { name := "Call Damage Control", cost := some [generic 1, pip .green], types := [.sorcery],
       text :=
         [ spell (.chooseModes (upTo 2)
-            [ (none, none, returnToHand (target (and [isArtifact, isCard])) yourGraveyard),
-              (none, none, returnToHand (target (and [isCreature, isCard])) yourGraveyard),
-              (none, none, returnToHand (target (and [isEnchantment, isCard])) yourGraveyard),
-              (none, none, returnToHand (target (and [isLand, isCard])) yourGraveyard) ]) ] } }
+            [ ⟨none, none, returnToHand (target (and [isArtifact, isCard])) yourGraveyard⟩,
+              ⟨none, none, returnToHand (target (and [isCreature, isCard])) yourGraveyard⟩,
+              ⟨none, none, returnToHand (target (and [isEnchantment, isCard])) yourGraveyard⟩,
+              ⟨none, none, returnToHand (target (and [isLand, isCard])) yourGraveyard⟩ ]) ] } }
 
 theorem callDamageControlIsAnOrdinaryChooseModes :
     (cardNamed "Call Damage Control").card = callDamageControlModes := rfl
@@ -488,9 +488,9 @@ private def wildShapeModes : Card :=
       { name := "Wild Shape", cost := some [pip .green], types := [.instant],
         text :=
           [ spell (.chooseModes (exactly 1)
-              [ (none, none, shape turtle hexproof 1 3),
-                (none, none, shape spider reach 1 5),
-                (none, none, shape elephant trample 3 3) ]) ] } }
+              [ ⟨none, none, shape turtle hexproof 1 3⟩,
+                ⟨none, none, shape spider reach 1 5⟩,
+                ⟨none, none, shape elephant trample 3 3⟩ ]) ] } }
 
 theorem wildShapeIsAnOrdinaryChooseModes : (cardNamed "Wild Shape").card = wildShapeModes := rfl
 
@@ -678,7 +678,10 @@ card := {
 }
 card := {
   name := "Authored spree", cost := [white], types := [sorcery],
-  text := [spell (chooseSpree [([generic 1], draw 1), ([generic 2], draw 2)])],
+  text := [
+    spell
+      (chooseSpree
+        [{ cost := [generic 1], action := draw 1 }, { cost := [generic 2], action := draw 2 }])],
 }
 theorem postponedListsRetainAuthorship : (cardNamed "Authored spree").authoring.onlyAuthored = true :=
   (cardNamed "Authored spree").onlyAuthored

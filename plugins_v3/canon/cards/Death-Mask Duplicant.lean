@@ -15,8 +15,8 @@ card := {
         firstStrike,
         doubleStrike,
         haste,
-        (anyIn ⟨landwalk, none⟩),
-        (anyIn ⟨protection, none⟩),
+        (anyIn { word := landwalk }),
+        (anyIn { word := protection }),
         trample
       ]
   ],

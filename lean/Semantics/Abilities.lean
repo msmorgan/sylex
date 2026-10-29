@@ -148,6 +148,14 @@ mutual
     as it is now, not of an earlier object it was before a zone change [CR#400.7]. -/
     | thisObject
 
+  /-- One bulleted mode of a modal spell or ability [CR#700.2]: its cost (spree's and tiered's
+  priced bullets [CR#700.2h]), its weight (a pawprint mode's count of {P} [CR#700.2i]) and its
+  action. A mode with neither is its action alone. -/
+  structure Mode where
+    cost : Option Cost := none
+    weight : Option Nat := none
+    action : Action
+
   /-- A historical action clause ("if you sacrificed a creature this turn", "each card exiled
   this way", "creatures that attacked this turn"), used by `Condition.did`, `Predicate.did`,
   and `Amount.tally`. With no span written (`within = none`) it is an attributive participle
@@ -160,7 +168,7 @@ mutual
     subj : Subject
     action : Action
     within : Option LookbackSpan
-    ordinal : Option (Ordinal × Option Period) := none
+    ordinal : Option EventOrdinal := none
 
   /-- Which turn a timing or duration names. `that` reads back the turn an earlier phrase
   named ("that turn"); there is no "this", which names an object. -/
@@ -1397,10 +1405,8 @@ mutual
     | repeat_ (repetition : Repetition)
     | sequentially (steps : List Action)
     | simultaneously (steps : List Action)
-    /-- "Choose <quantity> —" over bulleted modes [CR#700.2]: each mode is its cost (spree's and
-    tiered's priced bullets [CR#700.2h]), its weight (a pawprint mode's count of {P}
-    [CR#700.2i]) and its action. -/
-    | chooseModes (quantity : Quantity) (modes : List (Option Cost × Option Nat × Action))
+    /-- "Choose <quantity> —" over bulleted modes [CR#700.2]. -/
+    | chooseModes (quantity : Quantity) (modes : List Mode)
     /-- Create a delayed triggered ability that does `body` the next time `event` (or one of
     `alternatives`) occurs, or, with a stated `duration`, each time within it
     [CR#603.7a,603.7b]. No text mentions the ability created, so it is read only by its Binding
@@ -1515,6 +1521,11 @@ termination_by structural fuel
 
 instance : Coe Condition AsThough where
   coe := .condition
+
+/-- An action is the mode that is that action alone, uncosted and unweighted: `chooseModes`'s
+bullets are written as their actions. -/
+instance : Coe Action Mode where
+  coe action := { action }
 
 end Semantics
 

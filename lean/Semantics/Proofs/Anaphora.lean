@@ -302,9 +302,9 @@ theorem badCastByUnresolvedPronoun :
 span an event ordinal counts within [CR#400.7], though it is the span the lookback reads. -/
 theorem ownCastingRankIsAnEventOrdinal :
     Predicate.checkAt .object (DRS.ofList [])
-        (did you (cast which) thisObject (ordinal := some (.nth 2, some .turn))) = [] ∧
+        (did you (cast which) thisObject (ordinal := some ⟨.nth 2, some .turn⟩)) = [] ∧
       Predicate.checkAt .object (DRS.ofList [])
-        (did you (cast which) thisObject (ordinal := some (.nth 2, some .thisObject))) =
+        (did you (cast which) thisObject (ordinal := some ⟨.nth 2, some .thisObject⟩)) =
         [.eventOrdinalPeriod .thisObject] := by decide
 
 /-- "spells cast from their graveyard", with nothing for "their" to read, is refused as "in

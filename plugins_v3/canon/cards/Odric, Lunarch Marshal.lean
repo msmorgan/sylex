@@ -19,7 +19,7 @@ card := {
         deathtouch,
         doubleStrike,
         haste,
-        (anyIn ⟨hexproof, none⟩),
+        (anyIn { word := hexproof }),
         indestructible,
         lifelink,
         menace,

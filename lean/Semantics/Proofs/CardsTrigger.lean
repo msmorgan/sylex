@@ -161,7 +161,7 @@ theorem okKrang : Ability.check (DRS.ofList []) krang = [] := by decide
 
 /-- Once Upon a Time -/
 def onceUponATimeFirstCast : Predicate :=
-  did you (cast which) thisObject (ordinal := some (.nth 1, some .game))
+  did you (cast which) thisObject (ordinal := some ⟨.nth 1, some .game⟩)
 theorem okOnceUponATimeFirstCast : Predicate.checkAt .object (DRS.ofList []) onceUponATimeFirstCast = [] := by
   decide
 
@@ -395,12 +395,12 @@ def troubleInPairsArms : Ability :=
     (draw 1)
 theorem okTroubleInPairsArms : Ability.check (DRS.ofList []) troubleInPairsArms = [] := by decide
 
-private def castRank? : Predicate → Option (Ordinal × Option Period)
+private def castRank? : Predicate → Option EventOrdinal
   | .did clause => clause.ordinal
   | _ => none
 
-private def eventOrdinal? : GameEvent → Option (Ordinal × Option Period)
-  | .nthOccurrence ordinal per _ => (ordinal, per)
+private def eventOrdinal? : GameEvent → Option EventOrdinal
+  | .nthOccurrence ordinal per _ => some ⟨ordinal, per⟩
   | _ => none
 
 private def triggerAlternatives : Ability → List GameEvent
@@ -410,9 +410,9 @@ private def triggerAlternatives : Ability → List GameEvent
 /-- "The first spell you've cast this game" and "your second spell each turn" carry one ordinal
 shape, an `Ordinal` counted within an optional `Period`. -/
 theorem onceUponATimeAndTroubleInPairsShareTheOrdinalShape :
-    castRank? onceUponATimeFirstCast = some (.nth 1, some .game) ∧
+    castRank? onceUponATimeFirstCast = some ⟨.nth 1, some .game⟩ ∧
       (triggerAlternatives troubleInPairsArms).map eventOrdinal? =
-        [some (.nth 2, some .turn), some (.nth 2, some .turn)] := by decide
+        [some ⟨.nth 2, some .turn⟩, some ⟨.nth 2, some .turn⟩] := by decide
 
 /-- Hostile Investigator -/
 def hostileInvestigatorHeader : GameEvent :=

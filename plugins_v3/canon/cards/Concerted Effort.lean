@@ -16,8 +16,8 @@ card := {
         fear,
         firstStrike,
         doubleStrike,
-        (anyIn ⟨landwalk, none⟩),
-        (anyIn ⟨protection, none⟩),
+        (anyIn { word := landwalk }),
+        (anyIn { word := protection }),
         trample,
         vigilance
       ]

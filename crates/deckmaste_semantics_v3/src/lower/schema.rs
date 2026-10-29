@@ -425,7 +425,7 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
             "",
             vec![
                 Field::new("word", "word", "KeywordLabel", None),
-                Field::new("sort", "sort", "Option QualitySort", None),
+                Field::new("sort", "sort", "Option QualitySort", Some("none")),
             ],
         )],
         "KeywordTerm" => vec![
@@ -713,6 +713,23 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
             ),
             Constructor::new("thisObject", "ThisObject", vec![]),
         ],
+        "Mode" => vec![Constructor::new(
+            "mk",
+            "",
+            vec![
+                Field::new("cost", "cost", "Option Cost", Some("none")),
+                Field::new("weight", "weight", "Option Nat", Some("none")),
+                Field::new("action", "action", "Action", None),
+            ],
+        )],
+        "EventOrdinal" => vec![Constructor::new(
+            "mk",
+            "",
+            vec![
+                Field::new("ordinal", "ordinal", "Ordinal", None),
+                Field::new("per", "per", "Option Period", Some("none")),
+            ],
+        )],
         "EventSide" => vec![
             Constructor::new("before", "Before", vec![]),
             Constructor::new("after", "After", vec![]),
@@ -937,7 +954,7 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
                 Field::new(
                     "ordinal",
                     "ordinal",
-                    "Option (Ordinal × Option Period)",
+                    "Option EventOrdinal",
                     Some("none"),
                 ),
             ],
@@ -3769,12 +3786,7 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
                 "ChooseModes",
                 vec![
                     Field::new("quantity", "quantity", "Quantity", None),
-                    Field::new(
-                        "modes",
-                        "modes",
-                        "List (Option Cost × Option Nat × Action)",
-                        None,
-                    ),
+                    Field::new("modes", "modes", "List Mode", None),
                 ],
             ),
             Constructor::new(

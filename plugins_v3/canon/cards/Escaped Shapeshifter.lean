@@ -11,7 +11,7 @@ card := {
                [isCreature, anOpponentControls, hasKeyword k, not (named "Escaped Shapeshifter")])
             (exists_
                [isCreature, anOpponentControls, hasKeyword k, not (named "Escaped Shapeshifter")])))
-      [flying, firstStrike, trample, (anyIn ⟨protection, some color⟩)]
+      [flying, firstStrike, trample, (anyIn { word := protection, sort := some color })]
   ],
   power := 3,
   toughness := 4

@@ -6,9 +6,12 @@ card := {
     spell
       (chooseSpree
          [
-           ([1], destroy (target isArtifact)),
-           ([1], destroy (target isEnchantment)),
-           ([1], putCounters 1 p1p1Counter (each [isCreature, controlledBy (target isPlayer)]))
+           { cost := [1], action := destroy (target isArtifact) },
+           { cost := [1], action := destroy (target isEnchantment) },
+           {
+             cost := [1],
+             action := putCounters 1 p1p1Counter (each [isCreature, controlledBy (target isPlayer)])
+           }
          ])
   ]
 }

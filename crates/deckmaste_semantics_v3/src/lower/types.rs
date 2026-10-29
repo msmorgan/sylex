@@ -94,6 +94,8 @@ syntax_types!(
     ColorSpec,
     TurnPart,
     Period,
+    EventOrdinal,
+    Mode,
     EventSide,
     PaymentOutcome,
     TallyMode,

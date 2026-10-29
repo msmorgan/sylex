@@ -46,7 +46,7 @@ mutual
       b.namesThisDoor n || condition.namesThisDoor n || no.any (fun i => i.namesThisDoor n)
     | n + 1, .sequentially bs | n + 1, .simultaneously bs => bs.any (fun i => i.namesThisDoor n)
     | n + 1, .repeat_ (.fixed _ b) => b.namesThisDoor n
-    | n + 1, .chooseModes _ modes => modes.any (fun (cost, _, body) =>
+    | n + 1, .chooseModes _ modes => modes.any (fun ⟨cost, _, body⟩ =>
       cost.any (fun c => c.namesThisDoor n) || body.namesThisDoor n)
     | n + 1, .delay ev alts duration body =>
       ev.namesThisDoor n || alts.any (fun e => e.namesThisDoor n) ||

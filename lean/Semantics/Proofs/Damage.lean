@@ -1292,7 +1292,7 @@ theorem vedalkenSquirrelWhackerExchangesValues :
     (match Cards.vedalkenSquirrelWhackerReroll with
       | .establish (.replace _ (.instead (.sequentially
           [_, .withContinuation .optional (.chooseModes _
-            [(_, _, power), (_, _, toughness)]) none none])) ..) _ =>
+            [⟨_, _, power⟩, ⟨_, _, toughness⟩]) none none])) ..) _ =>
         power.ownDeed? == some exchangeValues.deed &&
           toughness.ownDeed? == some exchangeValues.deed
       | _ => false : Bool) := by decide

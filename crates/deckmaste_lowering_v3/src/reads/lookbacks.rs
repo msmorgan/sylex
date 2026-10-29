@@ -114,8 +114,11 @@ pub fn step_did_with(ops: &impl StepOps, drs: &DRS, clause: &DidClause) -> StepR
         .clone_from(&drs.historical_referent_ids);
     out.participial_anchor_read
         .clone_from(&drs.participial_anchor_read);
-    if let Some((ordinal, per)) = &clause.ordinal {
-        errors.extend(super::event_ordinal_refusals(ordinal, per.as_ref()));
+    if let Some(ordinal) = &clause.ordinal {
+        errors.extend(super::event_ordinal_refusals(
+            &ordinal.ordinal,
+            ordinal.per.as_ref(),
+        ));
     }
     (out, errors)
 }

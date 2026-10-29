@@ -370,7 +370,7 @@ fn builtin_registries_and_rules_expand() {
 }
 
 #[test]
-fn computed_mode_helpers_preserve_costs_and_actions() {
+fn mode_records_and_bare_actions_preserve_costs_and_actions() {
     let bundle = builtin();
     let reader = Elaborator::new(&bundle);
     let simple = reader
@@ -383,19 +383,21 @@ fn computed_mode_helpers_preserve_costs_and_actions() {
     assert!(
         modes
             .iter()
-            .all(|(cost, (limit, _))| cost.is_none() && limit.is_none())
+            .all(|mode| mode.cost.is_none() && mode.weight.is_none())
     );
-    assert_ne!(modes[0].1.1, modes[1].1.1);
+    assert_ne!(modes[0].action, modes[1].action);
     let spree = reader
-        .read::<Action>("chooseSpree [(some [2, .blue], draw 2), (none, draw 3)]")
+        .read::<Action>(
+            "chooseSpree [{ cost := some [2, .blue], action := draw 2 }, { action := draw 3 }]",
+        )
         .unwrap();
     let Action::ChooseModes { modes: paid, .. } = spree else {
         panic!("expected spree modes")
     };
-    assert!(paid[0].0.is_some());
-    assert!(paid[1].0.is_none());
-    assert_eq!(paid[0].1.1, modes[0].1.1);
-    assert_eq!(paid[1].1.1, modes[1].1.1);
+    assert!(paid[0].cost.is_some());
+    assert!(paid[1].cost.is_none());
+    assert_eq!(paid[0].action, modes[0].action);
+    assert_eq!(paid[1].action, modes[1].action);
 }
 
 #[test]

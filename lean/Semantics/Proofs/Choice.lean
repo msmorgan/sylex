@@ -82,12 +82,12 @@ theorem badZeroGroup :
 theorem okModalTwoModes :
     Action.check (DRS.ofList [])
       (.chooseModes (upTo 1)
-        [(none, none, destroy (target isArtifact)), (none, none, destroy (target isEnchantment))]) = [] := by
+        [⟨none, none, destroy (target isArtifact)⟩, ⟨none, none, destroy (target isEnchantment)⟩]) = [] := by
   decide
 
 /-- "Choose one — Destroy target artifact." -/
 theorem badModalOneMode :
-    Action.check (DRS.ofList []) (.chooseModes (upTo 1) [(none, none, destroy (target isArtifact))])
+    Action.check (DRS.ofList []) (.chooseModes (upTo 1) [⟨none, none, destroy (target isArtifact)⟩])
       = [.atLeastTwo] := by
   decide
 
@@ -95,14 +95,14 @@ theorem badModalOneMode :
 theorem okModalTwoOfTwo :
     Action.check (DRS.ofList [])
       (.chooseModes (exactly 2)
-        [(none, none, destroy (target isArtifact)), (none, none, destroy (target isEnchantment))]) = [] := by
+        [⟨none, none, destroy (target isArtifact)⟩, ⟨none, none, destroy (target isEnchantment)⟩]) = [] := by
   decide
 
 /-- "Choose three — Destroy target artifact; or destroy target enchantment." -/
 theorem badModalOverreach :
     Action.check (DRS.ofList [])
       (.chooseModes (exactly 3)
-        [(none, none, destroy (target isArtifact)), (none, none, destroy (target isEnchantment))])
+        [⟨none, none, destroy (target isArtifact)⟩, ⟨none, none, destroy (target isEnchantment)⟩])
       = [.modesFit] := by
   decide
 
@@ -111,15 +111,15 @@ theorem badModalOverreach :
 theorem okSpreeBothCosted :
     Action.check (DRS.ofList [])
       (chooseSpree
-        [ (some (.mana [generic 1]), destroy (target isArtifact)),
-          (some (.mana [generic 1]), destroy (target isEnchantment)) ]) = [] := by
+        [ { cost := some (.mana [generic 1]), action := destroy (target isArtifact) },
+          { cost := some (.mana [generic 1]), action := destroy (target isEnchantment) } ]) = [] := by
   decide
 
 /-- "Choose one — Destroy target artifact; or tap it." The Idris pin refutes the zone; the
 checker refuses the unresolved `it`. -/
 theorem badModalReadsAcrossModes :
     Action.check (DRS.ofList [])
-      (chooseModes (exactly 1) [destroy (target isArtifact), .setStatus .tapped it])
+      (chooseModes (exactly 1) [destroy (target isArtifact), Action.setStatus .tapped it])
       = [.anaphor (.atSlot .permanent) .one 0] := by
   decide
 
@@ -677,14 +677,14 @@ artifact." [CR#700.2i] -/
 theorem okModalWorth :
     Action.check (DRS.ofList [])
       (.chooseModes (.worth 5)
-        [(none, some 1, draw 1), (none, some 2, destroy (target isArtifact))]) = [] := by
+        [⟨none, some 1, draw 1⟩, ⟨none, some 2, destroy (target isArtifact)⟩]) = [] := by
   decide
 
 /-- "Choose up to zero {P} worth of modes" chooses nothing. -/
 theorem badModalWorthZero :
     Action.check (DRS.ofList [])
       (.chooseModes (.worth 0)
-        [(none, some 1, draw 1), (none, some 2, destroy (target isArtifact))])
+        [⟨none, some 1, draw 1⟩, ⟨none, some 2, destroy (target isArtifact)⟩])
       = [.nonZeroQ] := by
   decide
 
