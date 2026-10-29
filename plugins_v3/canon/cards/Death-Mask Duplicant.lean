@@ -6,9 +6,11 @@ card := {
   text := [
     imprint (activated [1] (exile (target [isCreature, in_ yourGraveyard]))),
     alsoForKeywords
-      (fun k => static
-         (onlyWhile (keywordGrant thisCreature k [in_ (exiledWith thisCreature), hasKeyword k])
-            (exists_ [in_ (exiledWith thisCreature), hasKeyword k])))
+      (static
+         (onlyWhile
+            (keywordGrant thisCreature thatKeyword
+               [in_ (exiledWith thisCreature), hasKeyword thatKeyword])
+            (exists_ [in_ (exiledWith thisCreature), hasKeyword thatKeyword])))
       [
         flying,
         fear,

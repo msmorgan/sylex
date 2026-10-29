@@ -4,7 +4,6 @@
 //! Bundle names are resolved by their result type before arguments are
 //! elaborated, so an overloaded word never selects a declaration by filesystem
 //! order.
-mod compute;
 mod schema;
 mod snapshot;
 mod types;
@@ -244,19 +243,11 @@ struct Bound {
     identity: Option<Ident>,
     caller: bool,
 }
-#[derive(Clone)]
-struct Function {
-    input: String,
-    output: String,
-    tokens: Vec<Token>,
-    scope: Box<Scope>,
-}
 #[derive(Clone, Default)]
 struct Scope {
     bindings: BTreeMap<Ident, Bound>,
     seen: BTreeSet<Ident>,
     actor_identity: Option<Ident>,
-    functions: BTreeMap<Ident, Function>,
     types: BTreeMap<Ident, String>,
 }
 
@@ -487,9 +478,6 @@ impl<'a> Elaborator<'a> {
         if let [Token::Group('(', body)] = tokens {
             return self.eval(body, ty, scope, stack);
         }
-        if let Some(value) = self.compute(tokens, ty, scope, stack)? {
-            return Ok(value);
-        }
         if let Some(i) = tokens.iter().position(|t| is_atom(t, ":")) {
             let annotated = normal(&reader::render(&tokens[i + 1..]));
             if annotated != normal(ty) {
@@ -620,22 +608,6 @@ impl<'a> Elaborator<'a> {
                 return Err(LowerError::new("definition does not name a deed"));
             }
             return Ok(deed);
-        }
-        if let Some(function) = scope.functions.get(&Ident::new(name)).cloned() {
-            let argument = self.eval(rest, &function.input, scope, stack)?;
-            let value = self.apply(
-                &function.tokens,
-                Bound {
-                    ty: function.input,
-                    value: argument,
-                    identity: None,
-                    caller: false,
-                },
-                &function.output,
-                &mut function.scope.clone(),
-                stack,
-            )?;
-            return Self::coerce(value, &function.output, ty);
         }
         if ty == "NounPhrase"
             && bare(name) == "theActor"
@@ -999,23 +971,14 @@ impl<'a> Elaborator<'a> {
             }
         }
         let terms = Self::argument_terms(&fields, &arguments)?;
-        for (field, term) in fields.iter().zip(&terms) {
-            for parameter in decl.parameters.iter().filter(|p| p.implicit) {
-                if field.ty.contains(parameter.name.as_str())
-                    && !local.types.contains_key(&parameter.name)
-                    && !field.ty.contains('→')
-                {
-                    let (actual, _) = self.infer(term, caller, stack)?;
-                    let ty = if normal(&field.ty).starts_with("List ") {
-                        normal(&actual)
-                            .strip_prefix("List ")
-                            .map(str::to_owned)
-                            .ok_or_else(|| LowerError::new("expected generic list argument"))?
-                    } else {
-                        actual
-                    };
-                    local.types.insert(parameter.name, normal(&ty));
-                }
+        // A data term is never evaluated, so a generic parameter is bound only by an explicit
+        // argument or the expected type.
+        for parameter in decl.parameters.iter().filter(|p| p.implicit) {
+            if !local.types.contains_key(&parameter.name) {
+                return Err(LowerError::new(format!(
+                    "generic parameter {} needs an explicit argument or the expected type",
+                    parameter.name
+                )));
             }
         }
         let body = decl.fields.get(&Ident::new("body"));
@@ -1026,17 +989,11 @@ impl<'a> Elaborator<'a> {
                 ty = ty.replace(name.as_str(), &format!("({replacement})"));
             }
             let ty = normal(&ty);
-            if let Some((input, output)) = ty.split_once('→').or_else(|| ty.split_once("->")) {
-                local.functions.insert(
-                    field.name,
-                    Function {
-                        input: normal(input),
-                        output: normal(output),
-                        tokens: term.clone(),
-                        scope: Box::new(caller.clone()),
-                    },
-                );
-                continue;
+            if ty.contains('→') || ty.contains("->") {
+                return Err(LowerError::new(format!(
+                    "parameter {} is a function, which no data term is",
+                    field.name
+                )));
             }
             let mut value = self.eval(term, &ty, caller, stack)?;
             let repeated = body.is_some_and(|ts| count_name(ts, field.name) >= 2);
@@ -1343,24 +1300,6 @@ fn coercion_sources(ty: &str) -> &'static [&'static str] {
     }
 }
 fn count_name(tokens: &[Token], name: Ident) -> usize {
-    if matches!(tokens.first(), Some(Token::Ident(word)) if word.as_str() == "match")
-        && let Some(with) = tokens
-            .iter()
-            .position(|t| matches!(t, Token::Ident(word) if word.as_str() == "with"))
-    {
-        let branches = split(&tokens[with + 1..], "|");
-        let branch_count = branches
-            .into_iter()
-            .filter_map(|branch| {
-                branch
-                    .iter()
-                    .position(|t| is_atom(t, "=>"))
-                    .map(|arrow| count_name(&branch[arrow + 1..], name))
-            })
-            .max()
-            .unwrap_or(0);
-        return count_name(&tokens[1..with], name) + branch_count;
-    }
     let direct = match tokens {
         [Token::Ident(constructor), Token::Ident(argument)] => Some((constructor, argument)),
         [

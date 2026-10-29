@@ -480,15 +480,19 @@ fn parameterized_builtin_keywords_expand() {
 }
 
 #[test]
-fn keyword_family_computation_joins_static_parts() {
+fn a_same_is_true_for_line_holds_its_frame_and_keywords() {
     let bundle = builtin();
-    let value = Elaborator::new(&bundle).read::<Ability>("alsoForKeywords (fun (k : KeywordTerm) => static (keywordGrant this_ k isCreature)) [flying, deathtouch]").unwrap();
-    let Ability::Static { spec } = value else { panic!("expected static ability") };
-    let StaticSpec::Conjunction { parts, .. } = spec.as_ref() else {
-        panic!("expected conjunction")
+    let value = Elaborator::new(&bundle)
+        .read::<Ability>(
+            "alsoForKeywords (static (keywordGrant this_ thatKeyword isCreature)) [flying, deathtouch]",
+        )
+        .unwrap();
+    let Ability::SameIsTrueFor { frame, keywords } = value else {
+        panic!("expected a Same-Is-True-For Ability")
     };
-    assert_eq!(parts.len(), 2);
-    assert_ne!(parts[0], parts[1]);
+    assert_eq!(keywords.len(), 2);
+    assert_ne!(keywords[0], keywords[1]);
+    assert!(format!("{frame:?}").contains("ThatKeyword"));
 }
 
 #[test]
@@ -597,19 +601,22 @@ fn ability_word_preserves_an_existing_ability_word_heading() {
 }
 
 #[test]
-fn mutually_exclusive_match_arms_do_not_repeat_a_template_parameter() {
+fn evaluation_is_refused_naming_its_site() {
     let bundle = declarations(&[
         "template select (flag : Bool) (who : NounPhrase) : NounPhrase := { body := match flag with | true => who | false => who }",
+        "template choose (flag : Bool) (who : NounPhrase) : NounPhrase := { body := if flag then who else who }",
+        "template over (body : NounPhrase → Action) (who : NounPhrase) : Action := { body := body who }",
     ]);
     let reader = Elaborator::new(&bundle);
-    assert_eq!(
-        reader.read::<NounPhrase>("select true .you").unwrap(),
-        NounPhrase::You
-    );
-    assert_eq!(
-        reader.read::<NounPhrase>("select false .you").unwrap(),
-        NounPhrase::You
-    );
+    for (term, site) in [("select true .you", "match"), ("choose true .you", "if")] {
+        let message = reader.read::<NounPhrase>(term).unwrap_err().message;
+        assert!(message.contains(site), "{term}: {message}");
+    }
+    let message = reader
+        .read::<Action>("over (fun x => sacrifice x) .you")
+        .unwrap_err()
+        .message;
+    assert!(message.contains("function"), "{message}");
 }
 
 #[test]
@@ -705,19 +712,21 @@ fn qualified_any_constructors_are_distinct_from_the_any_value_helper() {
 }
 
 #[test]
-fn snapshot_samples_exercise_defaults_and_every_defined_slot() {
+fn snapshot_samples_exercise_defaults_and_every_constructor() {
     let bundle = declarations(&[
-        "template example (flag : Bool := false) (slots : OutcomeVerb) : Nat := { body := if flag then 10 else (match slots with | .winGame => 3 | .loseGame => 4 | .drawGame => 5) }",
-        "template optional (who : Option NounPhrase := none) : Nat := { body := match who with | none => 0 | some x => 1 }",
-        "template listed (items : List Nat := []) : Nat := { body := List.length items }",
+        "template example (flag : Bool := false) (verb : OutcomeVerb) : OutcomeVerb := { body := verb }",
+        "template flagged (flag : Bool := false) : Bool := { body := flag }",
+        "template optional (amount : Option Amount := none) : Option Amount := { body := amount }",
+        "template listed (items : List Predicate := []) : List Predicate := { body := items }",
         "primitive closed : Nat := { body := 9 }",
     ]);
     let reader = Elaborator::new(&bundle);
-    for (name, expected) in [
-        ("example", vec!["3", "4", "5", "10"]),
-        ("optional", vec!["0", "1"]),
-        ("listed", vec!["0", "1"]),
-        ("closed", vec!["9"]),
+    for (name, distinct) in [
+        ("example", 3),
+        ("flagged", 2),
+        ("optional", 2),
+        ("listed", 2),
+        ("closed", 1),
     ] {
         let key = bundle
             .items
@@ -732,11 +741,15 @@ fn snapshot_samples_exercise_defaults_and_every_defined_slot() {
             .collect::<Vec<_>>();
         values.sort();
         values.dedup();
-        let mut expected = expected.into_iter().map(str::to_owned).collect::<Vec<_>>();
-        expected.sort();
-        assert_eq!(values, expected, "{name}");
-        if name != "example" {
-            assert!(samples.arguments.contains(&String::new()));
+        if name == "listed" {
+            assert!(values.len() >= distinct, "{name}: {values:?}");
+        } else {
+            assert_eq!(values.len(), distinct, "{name}: {values:?}");
+        }
+        if name == "example" {
+            assert!(samples.arguments.iter().any(|args| args.contains("(flag := true)")));
+        } else {
+            assert!(samples.arguments.contains(&String::new()), "{name}");
         }
     }
 }

@@ -4,13 +4,13 @@ card := {
   types := [enchantment],
   text := [
     alsoForKeywords
-      (fun k => at_ (beginningOfYour combat)
+      (at_ (beginningOfYour combat)
          (doOnlyIf
             (establishThroughout
-               (keywordGrant (allOf [isCreature, youControl]) k
-                  [isCreature, in_ yourGraveyard, hasKeyword k])
+               (keywordGrant (allOf [isCreature, youControl]) thatKeyword
+                  [isCreature, in_ yourGraveyard, hasKeyword thatKeyword])
                untilEndOfTurn)
-            (exists_ [isCreature, in_ yourGraveyard, hasKeyword k])))
+            (exists_ [isCreature, in_ yourGraveyard, hasKeyword thatKeyword])))
       [
         flying,
         firstStrike,

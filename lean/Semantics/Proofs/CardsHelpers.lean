@@ -132,32 +132,22 @@ def thickSkinnedGoblinEchoPayment : Ability :=
 theorem okThickSkinnedGoblinEchoPayment :
     Ability.check (DRS.ofList []) thickSkinnedGoblinEchoPayment = [] := by decide
 
-def protectionAbilities : KeywordTerm := (match (cardNamed "Concerted Effort").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons _
-        (List.cons _ (List.cons _ (List.cons _ (List.cons (Action.doIf (Condition.exists_
-        (NounPhrase.described _ (Predicate.coord _ (List.cons _ (List.cons _ (List.cons
-        (Predicate.hasKeyword part) _)))))) _ _ _) _)))))))) _) => some part
-      | _ => none
-    | _ => none).get (by decide)
-def landwalkAbilities : KeywordTerm := (match (cardNamed "Cairn Wanderer").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons _ (List.cons (Ability.static (StaticSpec.conjunction _ (List.cons _ (List.cons _
-        (List.cons _ (List.cons _ (List.cons _ (List.cons _ (List.cons (StaticSpec.conditional
-        (StaticSpec.characteristicChange _ (List.cons (CharacteristicEdit.addedKeywordTerm part _)
-        _)) _ _) _))))))))) _))
-        => some part
-      | _ => none
-    | _ => none).get (by decide)
+/-- The keyword family terms of a card's Same-Is-True-For lines, in order. -/
+def sameIsTrueForFamilies (card : Spelled) : List KeywordTerm :=
+  match card.card with
+  | .singleFaced face => face.characteristics.text.flatMap fun
+    | .sameIsTrueFor _ keywords => keywords.filter fun
+      | .anyIn _ => true
+      | _ => false
+    | _ => []
+  | _ => []
+def protectionAbilities : KeywordTerm :=
+  ((sameIsTrueForFamilies (cardNamed "Concerted Effort"))[1]?).get (by decide)
+def landwalkAbilities : KeywordTerm :=
+  ((sameIsTrueForFamilies (cardNamed "Cairn Wanderer"))[0]?).get (by decide)
 /-- Hexproof and each "hexproof from [quality]" [CR#702.11d]. -/
-def hexproofAbilities : KeywordTerm := (match (cardNamed "Odric, Lunarch Marshal").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons _
-        (List.cons _ (List.cons _ (List.cons _ (List.cons (Action.doIf (Condition.exists_
-        (NounPhrase.described _ (Predicate.coord _ (List.cons _ (List.cons _ (List.cons
-        (Predicate.hasKeyword part) _)))))) _ _ _) _)))))))) _) => some part
-      | _ => none
-    | _ => none).get (by decide)
+def hexproofAbilities : KeywordTerm :=
+  ((sameIsTrueForFamilies (cardNamed "Odric, Lunarch Marshal"))[0]?).get (by decide)
 /-- Shay Cormac -/
 def wardAbilities : KeywordTerm := .anyIn ⟨ward, none⟩
 

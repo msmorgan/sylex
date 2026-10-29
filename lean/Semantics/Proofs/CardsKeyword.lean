@@ -324,13 +324,14 @@ def bandsWithOtherAbilities : KeywordTerm := (match (cardNamed "Shelkin Brownie"
         (AbilityLost.term part) _))) _)) _) _ _ _ _) _) => some part
       | _ => none
     | _ => none).get (by decide)
-def protectionFromAnyColor : KeywordTerm := (match (cardNamed "Escaped Shapeshifter").card with
-    | Card.singleFaced face => match face.characteristics.text with
-      | (List.cons (Ability.static (StaticSpec.conjunction _ (List.cons _ (List.cons _ (List.cons _
-        (List.cons (StaticSpec.conditional (StaticSpec.characteristicChange _ (List.cons
-        (CharacteristicEdit.addedKeywordTerm part _) _)) _ _) _)))))) _) => some part
-      | _ => none
-    | _ => none).get (by decide)
+def protectionFromAnyColor : KeywordTerm :=
+  ((match (cardNamed "Escaped Shapeshifter").card with
+    | .singleFaced face => match face.characteristics.text with
+      | .sameIsTrueFor _ keywords :: _ => keywords.filter fun
+        | KeywordTerm.anyIn _ => true
+        | _ => false
+      | _ => []
+    | _ => [])[0]?).get (by decide)
 
 /-- Commander's Plate's equip lines -/
 def commandersPlateEquip : List Ability :=

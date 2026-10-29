@@ -244,35 +244,7 @@ fn variants(ty: &str, ordinal: usize, limitations: &mut BTreeSet<String>) -> Res
         }
         return Ok(values);
     }
-    if let Some((input, output)) = ty.split_once('→').or_else(|| ty.split_once("->")) {
-        let outputs = variants(output, ordinal, limitations)?;
-        let mut values = outputs
-            .iter()
-            .map(|value| format!("fun (sample : {input}) => {value}"))
-            .collect::<Vec<_>>();
-        if let Some(constructors) = shape(input)
-            && let Some(first) = constructors.first()
-            && constructors.len() > 1
-            && outputs.len() > 1
-        {
-            let input = normal(input);
-            let pattern = format!(
-                "Semantics.{input}.{} {}",
-                first.name,
-                vec!["_"; first.fields.len()].join(" ")
-            );
-            for i in 0..outputs.len() {
-                values.push(format!(
-                    "fun (sample : {input}) => match sample with | {pattern} => {} | x => {}",
-                    outputs[i],
-                    outputs[(i + 1) % outputs.len()]
-                ));
-            }
-        }
-        Ok(values)
-    } else {
-        constructor_variants(&ty, ordinal, limitations)
-    }
+    constructor_variants(&ty, ordinal, limitations)
 }
 
 fn constructor_variants(
@@ -374,12 +346,6 @@ fn sample(ty: &str, ordinal: usize, visiting: &mut BTreeSet<String>) -> Result<S
     }
     if ty.starts_with("List ") {
         return Ok("[]".into());
-    }
-    if let Some((input, output)) = ty.split_once('→').or_else(|| ty.split_once("->")) {
-        return Ok(format!(
-            "fun (sample : {input}) => {}",
-            sample(output, ordinal, visiting)?
-        ));
     }
     if !visiting.insert(ty.clone()) {
         return Err(LowerError::new(format!("recursive sample type {ty}")));

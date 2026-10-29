@@ -6,13 +6,13 @@ card := {
   subtypes := [human, soldier],
   text := [
     alsoForKeywords
-      (fun k => at_ (beginningOfPossessed combat eachPlayer)
+      (at_ (beginningOfPossessed combat eachPlayer)
          (doOnlyIf
             (establishThroughout
-               (keywordGrant (allOf [isCreature, youControl]) k
-                  [isCreature, youControl, hasKeyword k])
+               (keywordGrant (allOf [isCreature, youControl]) thatKeyword
+                  [isCreature, youControl, hasKeyword thatKeyword])
                untilEndOfTurn)
-            (exists_ [isCreature, youControl, hasKeyword k])))
+            (exists_ [isCreature, youControl, hasKeyword thatKeyword])))
       [
         firstStrike,
         flying,

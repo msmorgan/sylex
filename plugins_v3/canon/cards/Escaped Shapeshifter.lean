@@ -5,12 +5,14 @@ card := {
   subtypes := [shapeshifter],
   text := [
     alsoForKeywords
-      (fun k => static
+      (static
          (onlyWhile
-            (keywordGrant thisCreature k
-               [isCreature, anOpponentControls, hasKeyword k, not (named "Escaped Shapeshifter")])
+            (keywordGrant thisCreature thatKeyword
+               [isCreature, anOpponentControls, hasKeyword thatKeyword,
+                 not (named "Escaped Shapeshifter")])
             (exists_
-               [isCreature, anOpponentControls, hasKeyword k, not (named "Escaped Shapeshifter")])))
+               [isCreature, anOpponentControls, hasKeyword thatKeyword,
+                 not (named "Escaped Shapeshifter")])))
       [flying, firstStrike, trample, (anyIn { word := protection, sort := some color })]
   ],
   power := 3,

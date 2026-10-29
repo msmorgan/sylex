@@ -14,7 +14,7 @@ keyword blitz (cost : Cost) : Ability := {
           (doIf (keywordCostPaid blitz thisSpell)
             (atNext endStep (sacrifice (becomes thisSpell))))),
       static
-        (onlyWhile (abilityGrant thisPermanent (keyword haste))
+        (onlyWhile (abilityGrant thisPermanent (.keyword haste.label [] []))
           (keywordCostPaid blitz thisPermanent)),
       static
         (onlyWhile

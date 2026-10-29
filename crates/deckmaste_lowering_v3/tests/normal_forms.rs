@@ -174,3 +174,67 @@ fn a_granted_keyword_term_reads_as_the_keyword_or_its_family_selection() {
         )
     );
 }
+
+#[test]
+fn a_same_is_true_for_ability_distributes_as_its_keywords_written_out() {
+    use deckmaste_lowering_v3::reads::AbilityDistributionExt;
+    use deckmaste_semantics_v3::ast::Ability;
+    let bundle = builtin();
+    let reader = Elaborator::new(&bundle);
+    let static_frame = |k: &str| {
+        format!(
+            "static (onlyWhile (keywordGrant thisCreature {k} [isCreature, hasKeyword {k}]) \
+             (exists_ [isCreature, hasKeyword {k}]))"
+        )
+    };
+    let triggered_frame = |k: &str| {
+        format!(
+            "at_ (beginningOfYour combat) (doOnlyIf (establishThroughout (keywordGrant \
+             (allOf [isCreature, youControl]) {k} [isCreature, hasKeyword {k}]) untilEndOfTurn) \
+             (exists_ [isCreature, hasKeyword {k}]))"
+        )
+    };
+    let static_parts = |k: &str| {
+        format!(
+            "onlyWhile (keywordGrant thisCreature {k} [isCreature, hasKeyword {k}]) \
+             (exists_ [isCreature, hasKeyword {k}])"
+        )
+    };
+    let step = |k: &str| {
+        format!(
+            "doOnlyIf (establishThroughout (keywordGrant (allOf [isCreature, youControl]) {k} \
+             [isCreature, hasKeyword {k}]) untilEndOfTurn) (exists_ [isCreature, hasKeyword {k}])"
+        )
+    };
+    let landwalk = "(anyIn { word := landwalk })";
+    for (written, written_out) in [
+        (
+            format!("alsoForKeywords ({}) [flying, {landwalk}]", static_frame("thatKeyword")),
+            format!(
+                "static (conjunction [{}, {}] none)",
+                static_parts("flying"),
+                static_parts(landwalk)
+            ),
+        ),
+        (
+            format!("alsoForKeywords ({}) [flying, {landwalk}]", triggered_frame("thatKeyword")),
+            format!(
+                "triggered (beginningOfYour combat) [] none [] none none none (sequentially [{}, {}])",
+                step("flying"),
+                step(landwalk)
+            ),
+        ),
+        (
+            format!("alsoForKeywords ({}) []", static_frame("thatKeyword")),
+            "static (conjunction [] none)".to_owned(),
+        ),
+    ] {
+        let read = reader.read::<Ability>(&written).unwrap();
+        assert!(matches!(read, Ability::SameIsTrueFor { .. }), "{written}");
+        assert_eq!(
+            read.distributed().unwrap(),
+            reader.read::<Ability>(&written_out).unwrap(),
+            "{written}"
+        );
+    }
+}

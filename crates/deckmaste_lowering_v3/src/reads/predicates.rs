@@ -166,7 +166,8 @@ pub fn step_predicate_with(ops: &impl StepOps, mut drs: DRS, predicate: &Predica
             source: NameSource::Chosen,
         } => step_chosen_name(drs),
         Predicate::HasKeyword { keyword } => {
-            (drs, refuse(keyword.known(), Refusal::KnownKeywordTerm))
+            let known = drs.keyword_term(keyword).known();
+            (drs, refuse(known, Refusal::KnownKeywordTerm))
         }
         Predicate::Other => step_other(drs),
         Predicate::NotChosen => {

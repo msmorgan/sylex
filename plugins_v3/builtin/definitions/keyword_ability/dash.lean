@@ -11,6 +11,6 @@ keyword dash (cost : Cost) : Ability := {
           (doIf (keywordCostPaid dash thisSpell)
             (atNext endStep (returnToHand (becomes thisSpell))))),
       static
-        (onlyWhile (abilityGrant thisPermanent (keyword haste))
+        (onlyWhile (abilityGrant thisPermanent (.keyword haste.label [] []))
           (keywordCostPaid dash thisPermanent)) ]
 }

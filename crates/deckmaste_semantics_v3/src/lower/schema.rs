@@ -447,6 +447,7 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
                     Field::new("number", "number", "Nat", None),
                 ],
             ),
+            Constructor::new("thatKeyword", "ThatKeyword", vec![]),
         ],
         "LinkSource" => vec![
             Constructor::new(
@@ -4039,6 +4040,14 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
                 vec![
                     Field::new("word", "word", "ItalicWord", None),
                     Field::new("ability", "ability", "Ability", None),
+                ],
+            ),
+            Constructor::new(
+                "sameIsTrueFor",
+                "SameIsTrueFor",
+                vec![
+                    Field::new("frame", "frame", "Ability", None),
+                    Field::new("keywords", "keywords", "List KeywordTerm", None),
                 ],
             ),
             Constructor::new(

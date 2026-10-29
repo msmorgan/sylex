@@ -84,6 +84,7 @@ def KeywordLabel.namesKeyword : KeywordLabel → Bool
 def KeywordTerm.known : KeywordTerm → Bool
   | .the k | .theWith k _ => k.namesKeyword
   | .anyIn c => c.word.namesKeyword
+  | .thatKeyword => false
 
 def allKnownKeywordTerms : List KeywordTerm → Bool
   | [] => true

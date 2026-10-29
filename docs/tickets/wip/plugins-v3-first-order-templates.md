@@ -87,20 +87,11 @@ Pick per site, preferring the first option that applies:
    - `theRingTemptsYou` is written out fully inline for now. The owner may later move the Ring
      emblem into a Template.
 
-## Owner decision needed: `alsoForKeywords`
+## `alsoForKeywords`
 
-The printed text is a list: "…flying. The same is true for first strike, double strike, …".
-Writing it out per keyword is unfaithful to that, and long. The options:
-
-- **(a) A placeholder atom expanded per keyword.** A Template takes the frame once, with a
-  `thatKeyword : KeywordTerm` atom, and a `List KeywordTerm`. Expansion substitutes each keyword.
-  - That substitution is a `map` in the expander, which is evaluation.
-- **(b) A constructor holding the frame and the list.** The frame contains the `thatKeyword` atom,
-  and the checker and lowering distribute over the keywords.
-  - This is like the checker's treatment of `which` (`docs/decisions/semantics-v3.md` §3.4).
-    Expansion stays plain substitution.
-
-Recommended: (b). Rule before implementing.
+Ruled (owner, 2026-10-29): (b). A constructor holds the frame and the keyword list
+(`Ability.sameIsTrueFor`); the frame names its keyword by the `thatKeyword` atom, and the checker and
+lowering distribute over the keywords. Expansion stays plain substitution.
 
 ## Acceptance
 

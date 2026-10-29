@@ -6,9 +6,11 @@ card := {
   text := [
     changeling,
     alsoForKeywords
-      (fun k => static
-         (onlyWhile (keywordGrant thisCreature k [isCreature, in_ graveyard, hasKeyword k])
-            (exists_ [isCreature, in_ graveyard, hasKeyword k])))
+      (static
+         (onlyWhile
+            (keywordGrant thisCreature thatKeyword
+               [isCreature, in_ graveyard, hasKeyword thatKeyword])
+            (exists_ [isCreature, in_ graveyard, hasKeyword thatKeyword])))
       [
         flying,
         fear,

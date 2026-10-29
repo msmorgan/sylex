@@ -41,6 +41,7 @@ impl KeywordTermChoiceDomainsExt for KeywordTerm {
         match self {
             Self::The { keyword } | Self::TheWith { keyword, .. } => keyword.names_keyword(),
             Self::AnyIn { family } => family.word.names_keyword(),
+            Self::ThatKeyword => false,
         }
     }
 }
@@ -97,7 +98,7 @@ pub fn step_choice_domain_with(ops: &impl StepOps, drs: DRS, domain: &ChoiceDoma
         ChoiceDomain::AbilitiesAmong { keywords } => {
             let mut errors = refuse(!keywords.is_empty(), Refusal::NonEmpty);
             errors.extend(refuse(
-                keywords.iter().all(KeywordTerm::known),
+                keywords.iter().all(|term| drs.keyword_term(term).known()),
                 Refusal::KnownKeywordTerm,
             ));
             (drs, errors)

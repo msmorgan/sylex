@@ -319,21 +319,19 @@ theorem gatebreakerTriggersOnThisArtifactEntering :
   rfl
 
 /-- Whether a card's first ability, its "… The same is true for …" line, is a trigger with no
-intervening "if" whose action runs one step per keyword `sequentially`, each step conditional. -/
+intervening "if" whose effect, read for each of its keywords, is conditional. -/
 private def conditionIsInTheEffect (card : Spelled) : Bool :=
   match card.card with
   | .singleFaced face =>
     match (face.characteristics.text.head? : Option Ability) with
-    | some (.triggered _ _ _ _ _ _ none (.sequentially steps)) =>
-      !steps.isEmpty && steps.all fun
-        | .doIf _ _ none _ => true
-        | _ => false
+    | some (.sameIsTrueFor (.triggered _ _ _ _ _ _ none (.doIf _ _ none _)) keywords) =>
+      !keywords.isEmpty
     | _ => false
   | _ => false
 
 /-- Required pin: *Odric, Lunarch Marshal*'s "creatures you control gain first strike until end of
 turn if a creature you control has first strike" prints its "if" after the effect, so it is not an
-intervening "if" [CR#603.4] and the condition is part of the effect: each `sequentially` step is a
+intervening "if" [CR#603.4] and the condition is part of the effect: each keyword's effect is a
 `doIf`; so are *Bleeding Effect*'s and *Concerted Effort*'s. -/
 theorem trailingIfIsInTheEffect :
     conditionIsInTheEffect (cardNamed "Odric, Lunarch Marshal") = true ∧
@@ -342,21 +340,21 @@ theorem trailingIfIsInTheEffect :
   decide
 
 /-- The number of keywords a card's lines grant through one triggered ability each, with the
-number of lines: `some (lines, steps)` when the card is single-faced and every line is a trigger
-whose action runs `sequentially`. -/
+number of lines: `some (lines, keywords)` when the card is single-faced and every line is a
+Same-Is-True-For Ability with a triggered frame. -/
 private def triggeredSteps (card : Spelled) : Option (Nat × List Nat) :=
   match card.card with
   | .singleFaced face =>
     let text := face.characteristics.text
     let steps := text.filterMap fun
-      | .triggered _ _ _ _ _ _ _ (.sequentially steps) => some steps.length
+      | .sameIsTrueFor (.triggered ..) keywords => some keywords.length
       | _ => none
     if steps.length == text.length then some (text.length, steps) else none
   | _ => none
 
 /-- Required pin: *Odric, Lunarch Marshal* has one ability (its rulings of 2016-04-08 speak of
-"Odric's ability" [CR#113.2c]): a single triggered ability whose action runs `sequentially` over
-its 13 keywords, first strike and the 12 the same is true for. -/
+"Odric's ability" [CR#113.2c]): a single triggered ability, read for each of its 13 keywords,
+first strike and the 12 the same is true for. -/
 theorem odricIsOneAbility :
     triggeredSteps (cardNamed "Odric, Lunarch Marshal") = some (1, [13]) := by
   decide

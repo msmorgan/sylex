@@ -1278,10 +1278,10 @@ mod tests {
     }
 
     #[test]
-    fn sample_records_round_trip_and_detect_nondefault_branches() {
+    fn sample_records_round_trip_and_detect_changed_values() {
         let make = |yes| {
             Bundle::from_items(vec![BundleItem {
-            declaration: reader::parse(&format!("template value (flag : Bool := false) (items : List Nat := []) (maybe : Option Nat := none) : Nat := {{ body := if flag then {yes} else 3 }}")).unwrap(),
+            declaration: reader::parse(&format!("template value (flag : Bool := false) (items : List Nat := []) (maybe : Option Nat := none) : Nat := {{ body := {yes} }}")).unwrap(),
             file: "example.lean".into(),
         }]).unwrap()
         };

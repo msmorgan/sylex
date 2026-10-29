@@ -1503,6 +1503,12 @@ mutual
     | mayBeginOnBattlefield
     /-- An italic head before an ability: an ability word or a flavor word. -/
     | italicHead (word : ItalicWord) (ability : Ability)
+    /-- A Same-Is-True-For Ability: "<the ability, for the first keyword>. The same is true for
+    <the other keywords>.", one ability [CR#113.2c] that does, for each keyword of `keywords` in
+    order, what `frame` does with that keyword for `thatKeyword` [CR#702.1c]. A triggered frame
+    triggers on the first keyword's trigger and does each keyword's effect in turn; a static frame
+    is each keyword's static ability. -/
+    | sameIsTrueFor (frame : Ability) (keywords : List KeywordTerm)
     /-- "that ability", read off an ability chosen earlier in the same text. -/
     | thatAbility (ref : ChoiceRef)
     /-- `ability` with the restrictions a keyword or a granting effect adds to it: when it may
@@ -1572,6 +1578,14 @@ def CharacteristicEdit.unfolded : CharacteristicEdit → List CharacteristicEdit
   | .addedKeywordTerm term holders =>
     [.addedSelectionOf (.described .all holders) (.specified [.term term])]
   | edit => [edit]
+
+/-- An edit with the keyword term it adds read for the keyword a frame is read for
+(`KeywordTerm.thatKeyword`). -/
+def CharacteristicEdit.forKeyword (keyword : Option KeywordTerm) : CharacteristicEdit →
+    CharacteristicEdit
+  | .addedKeywordTerm .thatKeyword holders =>
+    .addedKeywordTerm (keyword.getD .thatKeyword) holders
+  | edit => edit
 
 /-- An edit list as the edits it writes. -/
 def CharacteristicEdit.unfoldAll (edits : List CharacteristicEdit) : List CharacteristicEdit :=

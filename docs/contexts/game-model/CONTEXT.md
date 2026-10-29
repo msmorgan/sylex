@@ -995,6 +995,14 @@ A named Keyword Ability represented as an ordered collection of component
 Abilities. Its components remain structural parts of the one named Keyword
 Ability rather than independent entries in the visible ability list.
 
+**Same-Is-True-For Ability** (project term):
+One Ability printed once for the first keyword of a list, "The same is true for …" naming the
+rest ([CR#113.2c,702.1c]): it does, for each keyword in turn, what its frame does with that
+keyword in place of the frame's keyword placeholder. A triggered frame triggers once, on the first
+keyword's trigger, and does each keyword's effect in order; a static frame is each keyword's
+static ability.
+_Avoid_: one ability per keyword; a body function over keywords
+
 **Qualified Ability** (project term):
 An ability printed with a keyword, together with the restriction the keyword
 adds to it: when it may be activated, how often (once each turn, or once for

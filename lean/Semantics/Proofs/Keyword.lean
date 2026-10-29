@@ -202,30 +202,33 @@ def whileExiledHas (k : KeywordTerm) : Ability := .static (exiledHas k)
 def flyingWhileExiledFlying : Ability := whileExiledHas (.the (.named "flying"))
 
 /-- "As long as a card exiled with this creature has flying, this creature has flying. The same is
-true for menace and trample.": one static ability whose parts are the three grants
-[CR#113.2c], checked clean. -/
+true for menace and trample.": one static ability [CR#113.2c], its frame read for each keyword
+[CR#702.1c], checked as the static ability whose parts are the three grants is. -/
 theorem okKeywordListOverGrant :
-    alsoForKeywords whileExiledHas
-        [.the (.named "flying"), .the (.named "menace"), .the (.named "trample")]
-      = .static (.conjunction none [exiledHas (.the (.named "flying")),
-          exiledHas (.the (.named "menace")), exiledHas (.the (.named "trample"))]) ∧
-    Ability.check (DRS.ofList []) (alsoForKeywords whileExiledHas
-        [.the (.named "flying"), .the (.named "menace"), .the (.named "trample")]) = [] :=
-  ⟨rfl, by decide⟩
+    let keywords : List KeywordTerm :=
+      [.the (.named "flying"), .the (.named "menace"), .the (.named "trample")]
+    alsoForKeywords (whileExiledHas .thatKeyword) keywords =
+        .sameIsTrueFor (whileExiledHas .thatKeyword) keywords ∧
+      Ability.check (DRS.ofList []) (alsoForKeywords (whileExiledHas .thatKeyword) keywords) =
+        Ability.check (DRS.ofList []) (.static (.conjunction none (keywords.map exiledHas))) ∧
+      Ability.check (DRS.ofList []) (alsoForKeywords (whileExiledHas .thatKeyword) keywords) = [] :=
+  ⟨rfl, by decide, by decide⟩
 
-/-- An empty keyword list joins nothing: the expansion's empty `conjunction` is refused
-`nonEmpty`. -/
+/-- An empty keyword list joins nothing, refused `nonEmpty`. -/
 theorem badEmptyKeywordList :
-    Ability.check (DRS.ofList []) (alsoForKeywords whileExiledHas []) = [.nonEmpty] := by decide
+    Ability.check (DRS.ofList []) (alsoForKeywords (whileExiledHas .thatKeyword) []) =
+      [.nonEmpty] := by decide
 
-/-- A body that is static for one keyword and of another kind for the next has no one ability to
-join into: the expansion is an empty `conjunction`, refused `nonEmpty`. -/
-theorem badMixedKeywordBodies :
+/-- A frame neither triggered nor static has no one ability to join into, refused `nonEmpty`. -/
+theorem badUnjoinableFrame :
     Ability.check (DRS.ofList [])
-      (alsoForKeywords
-        (fun k => if k == .the (.named "flying") then whileExiledHas k else .mayBeginOnBattlefield)
-        [.the (.named "flying"), .the (.named "menace")]) = [.nonEmpty] := by
+      (alsoForKeywords .mayBeginOnBattlefield [.the (.named "flying")]) = [.nonEmpty] := by
   decide
+
+/-- `thatKeyword` outside a frame names no keyword, refused `knownKeywordTerm`. -/
+theorem badThatKeywordOutsideAFrame :
+    (Ability.check (DRS.ofList []) (whileExiledHas .thatKeyword)).contains .knownKeywordTerm :=
+  by decide
 
 /-- "the number of basic land types among lands you control" -/
 theorem okBasicLandTypeAxis :
@@ -414,16 +417,17 @@ private def lineOf (card : Spelled) (i : Nat) : Option Ability :=
   | .singleFaced face => face.characteristics.text[i]?
   | _ => none
 
-/-- The characteristic edits of each part a "the same is true for" line joins, as the checker
-reads them (`CharacteristicEdit.unfoldAll`): each static part's, or each `sequentially` step's. -/
+/-- The characteristic edits of each keyword's reading of a Same-Is-True-For line's frame, as the
+checker reads them (`CharacteristicEdit.forKeyword`, `CharacteristicEdit.unfoldAll`): a static
+frame's condition, or a triggered frame's conditional step. -/
 private def partEdits : Ability → List (List CharacteristicEdit)
-  | .static (.conjunction _ parts) => parts.map fun
-    | .conditional (.characteristicChange _ edits) _ _ => CharacteristicEdit.unfoldAll edits
-    | _ => []
-  | .triggered _ _ _ _ _ _ _ (.sequentially steps) => steps.map fun
-    | .doIf _ (.establish (.characteristicChange _ edits) _) _ _ =>
-      CharacteristicEdit.unfoldAll edits
-    | _ => []
+  | .sameIsTrueFor frame keywords =>
+    let edits := match frame with
+      | .static (.conditional (.characteristicChange _ edits) _ _) => edits
+      | .triggered _ _ _ _ _ _ _ (.doIf _ (.establish (.characteristicChange _ edits) _) _ _) =>
+        edits
+      | _ => []
+    keywords.map fun k => CharacteristicEdit.unfoldAll (edits.map (·.forKeyword (some k)))
   | _ => []
 
 /-- How a part grants its keyword: `some (some t)` for the family term `t`, through
@@ -440,18 +444,18 @@ private def grantForm : List CharacteristicEdit → Option (Option KeywordTerm)
 private def grantForms (card : Spelled) (i : Nat) : List (Option (Option KeywordTerm)) :=
   ((lineOf card i).map partEdits).getD [] |>.map grantForm
 
-/-- The parts of a card's static line `i`. -/
-private def staticParts (card : Spelled) (i : Nat) : List StaticSpec :=
+/-- The frame and keywords of a card's Same-Is-True-For line `i`. -/
+private def sameIsTrueForLine (card : Spelled) (i : Nat) : Option (Ability × List KeywordTerm) :=
   match lineOf card i with
-  | some (.static (.conjunction _ parts)) => parts
-  | _ => []
+  | some (.sameIsTrueFor frame keywords) => some (frame, keywords)
+  | _ => none
 
 /-- Required pin: *Death-Mask Duplicant* and *Cairn Wanderer* gain "all landwalk and protection
 abilities" of the cards their conditions find (their rulings of 2004-12-01 and 2007-10-01): each
 family term is granted through `addedSelectionOf` over those objects with a `.term (anyIn …)`
 selection, each other keyword is granted bare, and no `addedAbilities` holds a family term
-[CR#702.1c]. Death-Mask Duplicant's landwalk part reads off exactly the objects its condition
-finds. -/
+[CR#702.1c]. Death-Mask Duplicant's frame, read for landwalk, reads off exactly the objects its
+condition finds. -/
 theorem familyTermsGrantThroughAddedSelectionOf :
     grantForms (cardNamed "Death-Mask Duplicant") 1 =
         [ some none, some none, some none, some none, some none,
@@ -460,11 +464,13 @@ theorem familyTermsGrantThroughAddedSelectionOf :
         [ some none, some none, some none, some none, some none, some none,
           some (some Cards.landwalkAbilities), some none, some (some Cards.protectionAbilities),
           some none, some none, some none, some none ] ∧
-      (staticParts (cardNamed "Death-Mask Duplicant") 1)[5]? =
-        some (onlyWhile
-          (keywordGrant thisCreature Cards.landwalkAbilities
-            (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities]))
-          (exists_ (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities]))) ∧
+      (sameIsTrueForLine (cardNamed "Death-Mask Duplicant") 1).map
+          (fun (frame, keywords) => (frame, keywords[5]?)) =
+        some (static (onlyWhile
+          (keywordGrant thisCreature .thatKeyword
+            (and [in_ (exiledWith thisCreature), hasKeyword .thatKeyword]))
+          (exists_ (and [in_ (exiledWith thisCreature), hasKeyword .thatKeyword]))),
+          some Cards.landwalkAbilities) ∧
       CharacteristicEdit.unfoldAll [.addedKeywordTerm Cards.landwalkAbilities
           (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities])] =
         [.addedSelectionOf
@@ -483,6 +489,56 @@ theorem odricGrantsHexproofVariants :
       (grantForms (cardNamed "Bleeding Effect") 0).filterMap (·.bind id) = [Cards.hexproofAbilities] ∧
       (grantForms (cardNamed "Urborg Scavengers") 1).all Option.isSome ∧
       (grantForms (cardNamed "Urborg Scavengers") 1).filterMap (·.bind id) = [Cards.hexproofAbilities] := by
+  decide
+
+/-- The ability "the same is true for" made before the frame was a constructor: each keyword's
+ability, joined into one: a triggered first part's trigger doing each part's effect in turn, or
+a static ability whose parts are each part's; anything else joins nothing. -/
+private def joinedParts : List Ability → Ability
+  | parts@(.triggered event alternatives while_ joins timing limit intervening _ :: _) =>
+    let actions := parts.filterMap fun
+      | .triggered _ _ _ _ _ _ _ action => some action
+      | _ => none
+    if actions.length == parts.length then
+      .triggered event alternatives while_ joins timing limit intervening (.sequentially actions)
+    else .static (.conjunction none [])
+  | parts@(.static _ :: _) =>
+    let specs := parts.filterMap fun
+      | .static spec => some spec
+      | _ => none
+    .static (.conjunction none (if specs.length == parts.length then specs else []))
+  | _ => .static (.conjunction none [])
+
+/-- *Odric, Lunarch Marshal*'s frame, for one keyword. -/
+private def odricFor (k : KeywordTerm) : Ability :=
+  at_ (beginningOfPossessed combat eachPlayer)
+    (doOnlyIf
+      (establishThroughout
+        (keywordGrant (allOf (and [isCreature, youControl])) k
+          (and [isCreature, youControl, hasKeyword k]))
+        untilEndOfTurn)
+      (exists_ (and [isCreature, youControl, hasKeyword k])))
+
+/-- *Odric, Lunarch Marshal*'s printed frame is `odricFor` read for `thatKeyword`. -/
+theorem odricFrameIsOdricFor :
+    (sameIsTrueForLine (cardNamed "Odric, Lunarch Marshal") 0).map (·.1) =
+      some (odricFor .thatKeyword) := rfl
+
+/-- Required pin: *Odric, Lunarch Marshal*'s frame, read for each of its keywords, checks as the
+ability the keywords' own abilities join into did [CR#702.1c]: as a whole, and one keyword at a
+time, flying granted itself and hexproof its variants. -/
+theorem odricReadsAsItsJoinedKeywords :
+    Ability.check (DRS.ofList [])
+          (.sameIsTrueFor (odricFor .thatKeyword) [.the (.named "flying"), Cards.hexproofAbilities]) =
+        Ability.check (DRS.ofList [])
+          (joinedParts ([.the (.named "flying"), Cards.hexproofAbilities].map odricFor)) ∧
+      Ability.check { DRS.ofList [] with thatKeyword := some Cards.hexproofAbilities }
+          (odricFor .thatKeyword) =
+        Ability.check (DRS.ofList []) (odricFor Cards.hexproofAbilities) ∧
+      Ability.check { DRS.ofList [] with thatKeyword := some (.the (.named "flying")) }
+          (odricFor .thatKeyword) =
+        Ability.check (DRS.ofList []) (odricFor (.the (.named "flying"))) ∧
+      ((cardNamed "Odric, Lunarch Marshal").card.check = []) := by
   decide
 
 /-- A keyword wants a modal spell when its own Definition writes a Mode Change: entwine,

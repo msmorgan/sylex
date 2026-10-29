@@ -486,6 +486,7 @@ pub enum KeywordTerm {
     The { keyword: KeywordLabel },
     AnyIn { family: KeywordFamily },
     TheWith { keyword: KeywordLabel, number: u64 },
+    ThatKeyword,
 }
 
 /// Mirrors `Semantics/Words.lean:537`.
@@ -2746,6 +2747,10 @@ pub enum Ability {
     ItalicHead {
         word: ItalicWord,
         ability: Box<Ability>,
+    },
+    SameIsTrueFor {
+        frame: Box<Ability>,
+        keywords: Vec<KeywordTerm>,
     },
     ThatAbility {
         ref_: ChoiceRef,

@@ -1,6 +1,7 @@
 //! Readings of the authoring constructors whose meaning is a normalization the checker
 //! makes downstream, mirrored from the Lean checker (`plugins-v3-first-order-templates`).
 use deckmaste_semantics_v3::ast::Ability;
+use deckmaste_semantics_v3::ast::StaticSpec;
 use deckmaste_semantics_v3::ast::AbilityLost;
 use deckmaste_semantics_v3::ast::AbilitySelection;
 use deckmaste_semantics_v3::ast::Action;
@@ -245,5 +246,112 @@ impl CopyExceptUnfoldExt for CopyExcept {
             ability: Box::new(ability.clone()),
         }));
         exceptions
+    }
+}
+
+/// One keyword's reading of a Same-Is-True-For frame: `frame` with `keyword` for each
+/// `thatKeyword` [CR#702.1c].
+///
+/// # Panics
+/// Never for a well-formed frame: substitution keeps every value of its own type.
+#[must_use]
+pub fn frame_for(frame: &Ability, keyword: &KeywordTerm) -> Ability {
+    fn substitute(value: &mut serde_json::Value, keyword: &serde_json::Value) {
+        match value {
+            serde_json::Value::String(word) if word == "ThatKeyword" => {
+                *value = keyword.clone();
+            }
+            serde_json::Value::Array(items) => {
+                for item in items {
+                    substitute(item, keyword);
+                }
+            }
+            serde_json::Value::Object(fields) => {
+                for field in fields.values_mut() {
+                    substitute(field, keyword);
+                }
+            }
+            _ => {}
+        }
+    }
+    let mut value = serde_json::to_value(frame).expect("an Ability serializes");
+    substitute(
+        &mut value,
+        &serde_json::to_value(keyword).expect("a KeywordTerm serializes"),
+    );
+    serde_json::from_value(value).expect("substitution keeps the frame's type")
+}
+
+/// The reading of a Same-Is-True-For Ability the checker distributes: each keyword's reading of
+/// its frame, joined into one ability [CR#113.2c,702.1c]. A triggered first reading triggers on
+/// its own trigger and does each reading's effect in turn; a static first reading is a static
+/// ability whose parts are each reading's. A frame of any other kind, or no keyword, joins
+/// nothing: an empty conjunction.
+pub trait AbilityDistributionExt {
+    /// The distributed ability, or `None` for an ability that is no Same-Is-True-For Ability.
+    fn distributed(&self) -> Option<Ability>;
+}
+impl AbilityDistributionExt for Ability {
+    fn distributed(&self) -> Option<Ability> {
+        let Self::SameIsTrueFor { frame, keywords } = self else {
+            return None;
+        };
+        let parts: Vec<Ability> = keywords.iter().map(|k| frame_for(frame, k)).collect();
+        let nothing = || Self::Static {
+            spec: Box::new(StaticSpec::Conjunction {
+                subject: None,
+                parts: Vec::new(),
+            }),
+        };
+        Some(match parts.first() {
+            Some(Self::Triggered {
+                event,
+                alternatives,
+                while_,
+                joins,
+                timing,
+                limit,
+                intervening,
+                ..
+            }) => {
+                let steps: Vec<Action> = parts
+                    .iter()
+                    .filter_map(|part| match part {
+                        Self::Triggered { action, .. } => Some(action.as_ref().clone()),
+                        _ => None,
+                    })
+                    .collect();
+                if steps.len() == parts.len() {
+                    Self::Triggered {
+                        event: event.clone(),
+                        alternatives: alternatives.clone(),
+                        while_: while_.clone(),
+                        joins: joins.clone(),
+                        timing: timing.clone(),
+                        limit: limit.clone(),
+                        intervening: intervening.clone(),
+                        action: Box::new(Action::Sequentially { steps }),
+                    }
+                } else {
+                    nothing()
+                }
+            }
+            Some(Self::Static { .. }) => {
+                let specs: Vec<StaticSpec> = parts
+                    .iter()
+                    .filter_map(|part| match part {
+                        Self::Static { spec } => Some(spec.as_ref().clone()),
+                        _ => None,
+                    })
+                    .collect();
+                Self::Static {
+                    spec: Box::new(StaticSpec::Conjunction {
+                        subject: None,
+                        parts: if specs.len() == parts.len() { specs } else { Vec::new() },
+                    }),
+                }
+            }
+            _ => nothing(),
+        })
     }
 }

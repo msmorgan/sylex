@@ -22,6 +22,6 @@ keyword awaken (amount : Amount) (cost : Cost) : Ability := {
                     stat power (set 0),
                     stat toughness (set 0),
                     addedAbilities
-                      [keyword haste.label]])
+                      [.keyword haste.label [] []]])
                 none]))]
 }

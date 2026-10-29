@@ -9,5 +9,5 @@ counter flyingCounter := {
   confers :=
     [.property
         (abilityGrant this_
-          (keyword (.named "flying")))]
+          (.keyword (.named "flying") [] []))]
 }

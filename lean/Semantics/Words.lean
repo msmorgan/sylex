@@ -539,6 +539,10 @@ inductive KeywordTerm where
   | anyIn (family : KeywordFamily)
   /-- A keyword named with its number, as "rampage 3" is. -/
   | theWith (keyword : KeywordLabel) (number : Nat)
+  /-- The keyword a Same-Is-True-For Ability's frame is read for (`Ability.sameIsTrueFor`), as
+  `which` stands for the entity a relative clause describes: each keyword of the list in turn
+  [CR#702.1c]. Outside a frame it names no keyword. -/
+  | thatKeyword
   deriving DecidableEq, Repr
 
 /-- A Link Source: the cost a Linked Facet reads back, an additional cost [CR#118.8,607.2i] or an

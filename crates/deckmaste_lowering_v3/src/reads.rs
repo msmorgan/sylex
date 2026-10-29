@@ -90,7 +90,9 @@ pub use choice_domains::step_choice_domain_with;
 pub use choice_domains::step_color_term_with;
 mod lookbacks;
 mod normal_forms;
+pub use normal_forms::AbilityDistributionExt;
 pub use normal_forms::CharacteristicEditUnfoldExt;
+pub use normal_forms::frame_for;
 pub use normal_forms::CopyExceptUnfoldExt;
 pub use normal_forms::CostPaidExt;
 pub use normal_forms::QualityPayloadEditsExt;
@@ -127,6 +129,7 @@ use deckmaste_semantics_v3::ast::BindingId;
 use deckmaste_semantics_v3::ast::CardType;
 use deckmaste_semantics_v3::ast::Deed;
 use deckmaste_semantics_v3::ast::ExposeVerb;
+use deckmaste_semantics_v3::ast::KeywordTerm;
 use deckmaste_semantics_v3::ast::Kind;
 use deckmaste_semantics_v3::ast::Letter;
 use deckmaste_semantics_v3::ast::NounWord;
@@ -445,6 +448,7 @@ pub struct DRS {
     pub caused_events: Vec<CausedEvent>,
     pub trigger_events: Vec<CausedEvent>,
     pub participial_anchor_read: Option<ParticipialAnchor>,
+    pub that_keyword: Option<KeywordTerm>,
 }
 
 impl Referent {
@@ -526,6 +530,7 @@ impl Default for DRS {
             caused_events: Vec::new(),
             trigger_events: Vec::new(),
             participial_anchor_read: None,
+            that_keyword: None,
         }
     }
 }
@@ -547,6 +552,17 @@ impl GramRole {
     }
 }
 
+impl DRS {
+    /// `DRS.keywordTerm`: a keyword term as read here, `thatKeyword` naming the keyword the
+    /// enclosing Same-Is-True-For frame is read for [CR#702.1c].
+    #[must_use]
+    pub fn keyword_term<'a>(&'a self, term: &'a KeywordTerm) -> &'a KeywordTerm {
+        match term {
+            KeywordTerm::ThatKeyword => self.that_keyword.as_ref().unwrap_or(term),
+            term => term,
+        }
+    }
+}
 impl DRS {
     #[must_use]
     pub fn is_visible(&self, id: ReferentId) -> bool {

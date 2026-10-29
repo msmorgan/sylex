@@ -755,7 +755,7 @@ def stepChoiceDomainWith (ops : StepOps) (drs : DRS) (cd : ChoiceDomain) : DRS �
   | .typeOtherThan _ => (drs, [])
   | .abilitiesAmong terms =>
     (drs, refuse (!terms.isEmpty) .nonEmpty ++
-      refuse (allKnownKeywordTerms terms) .knownKeywordTerm)
+      refuse (allKnownKeywordTerms (terms.map drs.keywordTerm)) .knownKeywordTerm)
   | .colorOtherThan _ | .basicTypesOnly | .nonbasicTypesOnly => (drs, [])
 
 def sortedDomainCheckWith (ops : StepOps) (drs : DRS) (sort : ChoiceSort)
@@ -1732,7 +1732,8 @@ keyword, whatever its definition writes. -/
 def Ability.writesDefining (ability : Ability) (fuel : Nat := 64) : Bool :=
   match fuel, ability with
   | n + 1, .static spec => spec.writesDefining n
-  | n + 1, .italicHead _ a | n + 1, .inCaller a | n + 1, .qualified a _ _ _ _ =>
+  | n + 1, .italicHead _ a | n + 1, .sameIsTrueFor a _ | n + 1, .inCaller a
+  | n + 1, .qualified a _ _ _ _ =>
     a.writesDefining n
   | _, _ => false
 termination_by structural fuel
@@ -1783,7 +1784,8 @@ def Ability.removesAttachments (ability : Ability) (fuel : Nat := 64) : Bool :=
   match fuel, ability with
   | n + 1, .static spec => spec.removesAttachments n
   | n + 1, .keyword _ _ body => body.any (fun part => part.removesAttachments n)
-  | n + 1, .italicHead _ a | n + 1, .inCaller a | n + 1, .qualified a _ _ _ _ =>
+  | n + 1, .italicHead _ a | n + 1, .sameIsTrueFor a _ | n + 1, .inCaller a
+  | n + 1, .qualified a _ _ _ _ =>
     a.removesAttachments n
   | _, _ => false
 termination_by structural fuel
@@ -1919,7 +1921,7 @@ def stepAbilitySelectionWith (ops : StepOps) (drs : DRS) (sel : AbilitySelection
     (drs, refuse (!als.isEmpty) .nonEmpty ++ als.foldl (fun es al =>
       match al with
       | .written ab => es ++ ops.ab (grantedContext drs) ab
-      | .term term => es ++ refuse term.known .knownKeywordTerm) [])
+      | .term term => es ++ refuse (drs.keywordTerm term).known .knownKeywordTerm) [])
   | .allExcept (some p) => ops.pred drs p
   | .family _ | .printedAfter _ | .allExcept none => (drs, [])
 
@@ -1964,7 +1966,7 @@ private def stepWrittenCopyExceptWith (ops : StepOps) (drs : DRS) (ce : CopyExce
     DRS × List Refusal :=
   match ce with
   | .characteristicEdits eds =>
-    let eds := CharacteristicEdit.unfoldAll eds
+    let eds := CharacteristicEdit.unfoldAll (eds.map (·.forKeyword drs.thatKeyword))
     let (_, es) := stepCharacteristicEditListWith ops drs eds
     (drs, es ++ refuse (!eds.isEmpty && eds.all CharacteristicEdit.writesLine) .lineNonEmpty ++
       CharacteristicEdit.shapeAll eds)
@@ -2753,6 +2755,11 @@ def Ability.textContextWith (ops : StepOps) (drs : DRS) (ability : Ability) (fue
   | n+1, .italicHead _ body | n+1, .qualified body _ _ _ _
   | n+1, .inCaller body =>
     Ability.textContextWith ops drs body n
+  -- Each keyword's reading of the frame publishes what it introduces, in turn [CR#702.1c].
+  | n+1, .sameIsTrueFor frame keywords =>
+    keywords.foldl (fun context k =>
+      { Ability.textContextWith ops { context with thatKeyword := some k } frame n with
+        thatKeyword := drs.thatKeyword }) drs
   -- The card has one half or the other, and the text after it is checked for either, so
   -- neither half publishes to it.
   | _+1, .byCardClass .. => drs
@@ -2979,7 +2986,7 @@ def stepOps : Nat → StepOps
         | .named .chosen =>
           let count := countChoice (.quality .cardName) drs
           (drs, refuse (count == 1) (.choiceRef .theChoice (.quality .cardName) count))
-        | .hasKeyword term => (drs, refuse term.known .knownKeywordTerm)
+        | .hasKeyword term => (drs, refuse (drs.keywordTerm term).known .knownKeywordTerm)
         | .abilityHead _ => (drs, [])
         | .counterKindOn src | .abilityOf src | .legalAttachment _ src =>
           let (drs', _, errs) := ops.np drs .other false src
@@ -4540,7 +4547,7 @@ def stepOps : Nat → StepOps
           let (drs1, e1) := ops.amt drs amt
           (defineLetter l drs1, e1 ++ refuse (anyOpenLetter l drs) (.openLetter l))
         | .characteristicChange subj edits =>
-          let edits := CharacteristicEdit.unfoldAll edits
+          let edits := CharacteristicEdit.unfoldAll (edits.map (·.forKeyword drs.thatKeyword))
           let (drs1, ids, e1) := stepAgentNounWith ops drs .subj true subj
             (fun d => (stepCharacteristicEditListWith ops d edits).1)
           let (drs2, e2) := withDistributiveSubject subj ids drs1
@@ -4554,7 +4561,7 @@ def stepOps : Nat → StepOps
             refuse (edits.all CharacteristicEdit.writesLine) .lineNonEmpty ++
             CharacteristicEdit.shapeAll edits ++ refuse (!granted) .cdaGranted)
         | .characteristicDefining subj edits =>
-          let edits := CharacteristicEdit.unfoldAll edits
+          let edits := CharacteristicEdit.unfoldAll (edits.map (·.forKeyword drs.thatKeyword))
           let (drs1, _, e1) := ops.np drs .subj true subj
           -- A stat set names its number, which a later edit's "that number" reads back ("its
           -- toughness is equal to that number plus 1").
@@ -4830,6 +4837,16 @@ def stepOps : Nat → StepOps
             | none => (drs, [])
           primaryErrors ++ joinedErrors ++ e2 ++ e3 ++ e4 ++ limitErrors
         | .static spec => (ops.spec drs spec).2
+        | .sameIsTrueFor frame keywords =>
+          -- The frame read for each keyword in turn, `thatKeyword` naming it [CR#702.1c]: a
+          -- triggered frame's trigger and effect, or a static frame's ability. Any other frame,
+          -- or no keyword, joins nothing.
+          let forKeyword (k : KeywordTerm) : DRS := { drs with thatKeyword := some k }
+          match frame with
+          | .triggered .. | .static _ =>
+            refuse (!keywords.isEmpty) .nonEmpty ++
+              keywords.flatMap fun k => ops.ab (forKeyword k) frame
+          | _ => [.nonEmpty]
         | .spell tm inst =>
           let (drs1, e1) := match tm with | some t => stepTimingWith ops drs t | none => (drs, [])
           let (_, e2) := ops.inst .postEvent .obj drs1 inst

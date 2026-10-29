@@ -4,13 +4,13 @@ card := {
   types := [enchantment],
   text := [
     alsoForKeywords
-      (fun k => at_ (beginningOfPossessed upkeep eachPlayer)
+      (at_ (beginningOfPossessed upkeep eachPlayer)
          (doOnlyIf
             (establishThroughout
-               (keywordGrant (allOf [isCreature, youControl]) k
-                  [isCreature, youControl, hasKeyword k])
+               (keywordGrant (allOf [isCreature, youControl]) thatKeyword
+                  [isCreature, youControl, hasKeyword thatKeyword])
                untilEndOfTurn)
-            (exists_ [isCreature, youControl, hasKeyword k])))
+            (exists_ [isCreature, youControl, hasKeyword thatKeyword])))
       [
         flying,
         fear,

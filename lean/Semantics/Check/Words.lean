@@ -602,7 +602,15 @@ structure DRS where
   /-- The anchor of the Participial Description being read, whose anchoring clause reads the
   referents its deed stamped rather than the events recorded (`causedEvents`). -/
   participialAnchorRead : Option ParticipialAnchor := none
+  /-- The keyword a Same-Is-True-For Ability's frame is being read for: what `thatKeyword`
+  names [CR#702.1c]. -/
+  thatKeyword : Option KeywordTerm := none
   deriving DecidableEq, Repr
+
+/-- A keyword term as read here: `thatKeyword` is the keyword the enclosing frame is read for. -/
+def DRS.keywordTerm (drs : DRS) : KeywordTerm → KeywordTerm
+  | .thatKeyword => drs.thatKeyword.getD .thatKeyword
+  | term => term
 
 /-- A context of `rs`, newest first, as stepping would have introduced them: the last is
 referent 0 and the head referent `rs.length - 1`, whatever ids they were written with. -/
