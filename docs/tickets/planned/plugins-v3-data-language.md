@@ -1,5 +1,5 @@
 ---
-needs: [lean-generated-canon-modules, lean-elaborated-value-dump]
+needs: [lean-generated-canon-modules, lean-elaborated-value-dump, plugins-v3-first-order-templates]
 ---
 # [design] `plugins_v3` as a data language whose files are their own AST
 
@@ -29,8 +29,10 @@ simplicity.
   declaration's parameter order carries no meaning, so primitive and Template signatures may
   follow the printed phrase. This replaces the parameter-order rule in §4.5, which 12 primitives
   violate.
-- **No higher-order parameters.** Delete `chooseModesOver`, `splice` and `CallerSplice`. Both
-  users, Call Damage Control and Wild Shape, write their modes out as printed.
+- **No evaluation in plugin files.** No higher-order parameters, `match`, `if`, `fun`, or
+  `List`/`Option` functions; `plugins-v3-first-order-templates` removes the existing sites
+  (including `chooseModesOver`, `splice` and `CallerSplice`) before the conversion. `have` stays as
+  the only local binding.
 - **The existing definitions are converted by script**: a purpose-built script, or a final
   emitter run from the current `deckmaste_semantics_v3`. They are not converted by hand.
 
