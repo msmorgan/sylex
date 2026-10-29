@@ -2589,6 +2589,39 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
                     None,
                 )],
             ),
+            Constructor::new(
+                "payload",
+                "Payload",
+                vec![
+                    Field::new("op", "op", "QualityOp", None),
+                    Field::new("payload", "payload", "QualityPayload", None),
+                ],
+            ),
+        ],
+        "QualityPayload" => vec![
+            Constructor::new(
+                "bundle",
+                "Bundle",
+                vec![
+                    Field::new(
+                        "characteristics",
+                        "characteristics",
+                        "CharacteristicBundle",
+                        None,
+                    ),
+                    Field::new("retained", "retained", "Option CardType", None),
+                ],
+            ),
+            Constructor::new(
+                "quality",
+                "Quality",
+                vec![Field::new("quality", "quality", "WrittenQuality", None)],
+            ),
+            Constructor::new(
+                "colored",
+                "Colored",
+                vec![Field::new("colors", "colors", "ColorSpec", None)],
+            ),
         ],
         "AbilitySelection" => vec![
             Constructor::new(
@@ -3259,6 +3292,14 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
                     Field::new("amount", "amount", "Amount", None),
                     Field::new("kind", "kind", "CounterKind", None),
                     Field::new("mark", "mark", "EntryCounterMark", None),
+                ],
+            ),
+            Constructor::new(
+                "characteristics",
+                "Characteristics",
+                vec![
+                    Field::new("values", "values", "Characteristics", None),
+                    Field::new("typesAdded", "types_added", "Bool", None),
                 ],
             ),
         ],

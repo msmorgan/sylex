@@ -13,51 +13,6 @@ expands through, and the generated constructor wrappers (`declare_semantic_primi
 
 namespace Semantics
 
-/-- Convenience input for established quality wording, `op` written once over it. Expansion
-produces typed edits; this input is not stored in the checked static or copy syntax. -/
-inductive QualityPayload where
-  /-- `characteristics`, each written with `op`. A `retained` type ("It's still a land") keeps
-  every prior type, supertype and subtype [CR#205.1b], so the type line is added, whatever `op`
-  writes the rest; the type it names is wording only. -/
-  | bundle (characteristics : CharacteristicBundle) (retained : Option CardType)
-  | quality (quality : WrittenQuality)
-  | colored (colors : ColorSpec)
-
-attribute [semantic_expression] QualityPayload
-
-private def nonempty {α : Type} (xs : List α) : Option (List α) :=
-  if xs.isEmpty then none else some xs
-
-def Characteristics.typeChanges (c : Characteristics) : TypeLineChanges :=
-  ⟨nonempty c.supertypes, nonempty c.types, nonempty c.subtypes⟩
-
-/-- The value characteristics `c` writes, each with `op`: an addition sets a written value,
-as "becomes a 2/2 creature in addition to its other types" does, and a removal removes a name,
-colors, abilities and the mana cost (`manaCost none`). A number is not removed: a removal writes
-a power, toughness, loyalty or defense as lowered by it (`stat _ (.down _)`), as "gets −N" is. No
-expansion is checked syntax, so nothing refuses that; no card writes a removed number. -/
-def Characteristics.valueEdits (c : Characteristics) (op : QualityOp) : List CharacteristicEdit :=
-  let valueOp := if op == .loses then .loses else .sets
-  let stat (axis : CharacteristicStat) (amount : Amount) : CharacteristicEdit :=
-    .stat axis (if op == .loses then .down amount else .set amount)
-  c.name.toList.map (.name valueOp) ++
-    c.cost.toList.map (fun cost => .manaCost (if op == .loses then none else some cost)) ++
-    (if c.colors.isEmpty then [] else [.colors valueOp (.some c.colors)]) ++
-    c.power.toList.map (stat .power) ++
-    c.toughness.toList.map (stat .toughness) ++
-    c.loyalty.toList.map (stat .loyalty) ++
-    c.defense.toList.map (stat .defense) ++
-    (if c.text.isEmpty then []
-     else if op == .loses then [.removedAbilities (.specified (c.text.map .written))]
-     else [.addedAbilities c.text])
-
-def QualityPayload.edits (op : QualityOp) : QualityPayload → List CharacteristicEdit
-  | .bundle b retained =>
-    .typeLine (if retained.isSome then .adds else op) b.characteristics.typeChanges ::
-      b.characteristics.valueEdits op ++ b.qualities.map (.quality op)
-  | .quality q => [.quality op q]
-  | .colored colors => [.colors op colors]
-
 /-- A ballot read in the caller's Reference Scope: its candidates, when it names them. -/
 def Ballot.inCaller : Ballot → Ballot
   | .byCandidate candidates => .byCandidate (.inCaller candidates)

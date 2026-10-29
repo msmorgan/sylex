@@ -94,7 +94,8 @@ mutual
     | n + 1, .inCaller s | n + 1, .retention s _ => s.namesThisDoor n
     | n + 1, .conditional s condition _ => s.namesThisDoor n || condition.namesThisDoor n
     | n + 1, .conjunction _ parts => parts.any (fun s => s.namesThisDoor n)
-    | n + 1, .characteristicChange _ edits => edits.any (fun edit => match edit with
+    | n + 1, .characteristicChange _ edits =>
+      (CharacteristicEdit.expandAll edits).any (fun edit => match edit with
       | .addedAbilities abilities => abilities.any (fun a => a.namesThisDoor n)
       | _ => false)
     | n + 1, .cant _ i mods => i.namesThisDoor n || (match mods.cause with

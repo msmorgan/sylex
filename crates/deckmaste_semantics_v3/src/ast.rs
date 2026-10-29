@@ -1869,6 +1869,21 @@ pub struct FaceDown {
     pub characteristics: Option<Box<Characteristics>>,
 }
 
+/// Mirrors `Semantics/Abilities.lean` `QualityPayload`.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum QualityPayload {
+    Bundle {
+        characteristics: Box<CharacteristicBundle>,
+        retained: Option<CardType>,
+    },
+    Quality {
+        quality: Box<WrittenQuality>,
+    },
+    Colored {
+        colors: ColorSpec,
+    },
+}
+
 /// Mirrors `Semantics/Abilities.lean:816`.
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CharacteristicEdit {
@@ -1910,6 +1925,10 @@ pub enum CharacteristicEdit {
     },
     RemovedAbilities {
         selection: Box<AbilitySelection>,
+    },
+    Payload {
+        op: QualityOp,
+        payload: QualityPayload,
     },
 }
 
@@ -2310,6 +2329,10 @@ pub enum CopyExcept {
         amount: Box<Amount>,
         kind: CounterKind,
         mark: EntryCounterMark,
+    },
+    Characteristics {
+        values: Box<Characteristics>,
+        types_added: bool,
     },
 }
 

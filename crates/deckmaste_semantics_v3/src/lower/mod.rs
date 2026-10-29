@@ -183,30 +183,7 @@ fn normal(ty: &str) -> String {
 fn shape(ty: &str) -> Option<Vec<Constructor>> {
     let ty = normal(ty);
     let (head, arg) = ty.split_once(' ').unwrap_or((&ty, ""));
-    let mut shape = if head == "QualityPayload" {
-        vec![
-            Constructor::new(
-                "bundle",
-                "Bundle",
-                vec![
-                    Field::new("value", "value", "CharacteristicBundle", None),
-                    Field::new("retained", "retained", "Option CardType", None),
-                ],
-            ),
-            Constructor::new(
-                "quality",
-                "Quality",
-                vec![Field::new("value", "value", "WrittenQuality", None)],
-            ),
-            Constructor::new(
-                "colored",
-                "Colored",
-                vec![Field::new("value", "value", "ColorSpec", None)],
-            ),
-        ]
-    } else {
-        schema::constructors(head)?
-    };
+    let mut shape = schema::constructors(head)?;
     for ctor in &mut shape {
         for field in &mut ctor.fields {
             field.ty = field.ty.replace('α', arg);

@@ -96,6 +96,7 @@ syntax_types!(
     Period,
     EventOrdinal,
     Mode,
+    QualityPayload,
     EventSide,
     PaymentOutcome,
     TallyMode,

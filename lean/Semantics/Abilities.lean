@@ -820,6 +820,16 @@ mutual
   structure FaceDown where
     characteristics : Option Characteristics
 
+  /-- Established quality wording, `op` written once over it (`CharacteristicEdit.payload`): the
+  checker reads it as the typed edits it writes (`QualityPayload.edits`). -/
+  inductive QualityPayload where
+    /-- `characteristics`, each written with `op`. A `retained` type ("It's still a land") keeps
+    every prior type, supertype and subtype [CR#205.1b], so the type line is added, whatever `op`
+    writes the rest; the type it names is wording only. -/
+    | bundle (characteristics : CharacteristicBundle) (retained : Option CardType)
+    | quality (quality : WrittenQuality)
+    | colored (colors : ColorSpec)
+
   /-- Typed characteristic writes; the enclosing static or copy form retains its context. -/
   inductive CharacteristicEdit where
     | typeLine (op : QualityOp) (changes : TypeLineChanges)
@@ -844,6 +854,9 @@ mutual
     abilities of this creature printed below this one" [CR#702.165a]). -/
     | addedSelectionOf (source : NounPhrase) (selection : AbilitySelection)
     | removedAbilities (selection : AbilitySelection)
+    /-- `op` written once over established quality wording ("becomes a 2/2 creature", "is all
+    colors"): the edits `payload` writes (`QualityPayload.edits`). -/
+    | payload (op : QualityOp) (payload : QualityPayload)
 
   inductive AbilitySelection where
     | specified (abilities : List AbilityLost)
@@ -1222,6 +1235,10 @@ mutual
     | ability (ability : Ability)
     | thisAbility
     | entersWithCounters (amount : Amount) (kind : CounterKind) (mark : EntryCounterMark)
+    /-- "Except it has <values>", `values` written as one set of characteristics, the types
+    `typesAdded` "in addition to its other types": the exceptions it writes
+    (`CopyExcept.expanded`), each value set and each ability added. -/
+    | characteristics (values : Characteristics) (typesAdded : Bool)
 
   structure RollRow where
     results : Quantity
@@ -1508,6 +1525,61 @@ end
 @[match_pattern] abbrev NounPhrase.and (phrases : List NounPhrase) : NounPhrase := .coord .and phrases
 @[match_pattern] abbrev NounPhrase.or (phrases : List NounPhrase) : NounPhrase := .coord .or phrases
 
+private def nonempty {α : Type} (xs : List α) : Option (List α) :=
+  if xs.isEmpty then none else some xs
+
+def Characteristics.typeChanges (c : Characteristics) : TypeLineChanges :=
+  ⟨nonempty c.supertypes, nonempty c.types, nonempty c.subtypes⟩
+
+/-- The value characteristics `c` writes, each with `op`: an addition sets a written value,
+as "becomes a 2/2 creature in addition to its other types" does, and a removal removes a name,
+colors, abilities and the mana cost (`manaCost none`). A number is not removed: a removal writes
+a power, toughness, loyalty or defense as lowered by it (`stat _ (.down _)`), as "gets −N" is. No
+expansion is checked syntax, so nothing refuses that; no card writes a removed number. -/
+def Characteristics.valueEdits (c : Characteristics) (op : QualityOp) : List CharacteristicEdit :=
+  let valueOp := if op == .loses then .loses else .sets
+  let stat (axis : CharacteristicStat) (amount : Amount) : CharacteristicEdit :=
+    .stat axis (if op == .loses then .down amount else .set amount)
+  c.name.toList.map (.name valueOp) ++
+    c.cost.toList.map (fun cost => .manaCost (if op == .loses then none else some cost)) ++
+    (if c.colors.isEmpty then [] else [.colors valueOp (.some c.colors)]) ++
+    c.power.toList.map (stat .power) ++
+    c.toughness.toList.map (stat .toughness) ++
+    c.loyalty.toList.map (stat .loyalty) ++
+    c.defense.toList.map (stat .defense) ++
+    (if c.text.isEmpty then []
+     else if op == .loses then [.removedAbilities (.specified (c.text.map .written))]
+     else [.addedAbilities c.text])
+
+def QualityPayload.edits (op : QualityOp) : QualityPayload → List CharacteristicEdit
+  | .bundle b retained =>
+    .typeLine (if retained.isSome then .adds else op) b.characteristics.typeChanges ::
+      b.characteristics.valueEdits op ++ b.qualities.map (.quality op)
+  | .quality q => [.quality op q]
+  | .colored colors => [.colors op colors]
+
+/-- An edit as the edits it writes: a payload (`CharacteristicEdit.payload`) is its typed edits,
+and any other edit is itself. -/
+def CharacteristicEdit.expanded : CharacteristicEdit → List CharacteristicEdit
+  | .payload op written => written.edits op
+  | edit => [edit]
+
+/-- An edit list as the edits it writes. -/
+def CharacteristicEdit.expandAll (edits : List CharacteristicEdit) : List CharacteristicEdit :=
+  edits.flatMap CharacteristicEdit.expanded
+
+/-- A copy exception as the exceptions it writes (`CopyExcept.characteristics`): a type line when
+any type is written (added, or set), the written values set, and each written ability added. Any
+other exception is itself. -/
+def CopyExcept.expanded : CopyExcept → List CopyExcept
+  | .characteristics c typesAdded =>
+    let types :=
+      if c.supertypes.isEmpty && c.types.isEmpty && c.subtypes.isEmpty then []
+      else [CharacteristicEdit.typeLine (if typesAdded then .adds else .sets) c.typeChanges]
+    let edits := types ++ ({ c with text := [] } : Characteristics).valueEdits .sets
+    (if edits.isEmpty then [] else [.edits edits]) ++ c.text.map .ability
+  | exception => [exception]
+
 /-- What paying `cost` pays (`Cost.asPaid`). Paying a cost carries out its instructions
 [CR#118.1], so where the cost is itself one plain payment ("Ward—Pay 5 life", "unless you pay 1
 life"), paying it is that payment, made once: `pay (payLife 5)` is `payLife 5`, never a payment of
@@ -1553,7 +1625,7 @@ attribute [semantic_expression] Semantics.GameEvent Semantics.NounPhrase Semanti
   Semantics.Amount Semantics.Quantity Semantics.Location Semantics.Condition Semantics.Duration
   Semantics.Timing Semantics.Subject Semantics.LookbackSpan Semantics.WouldClause
   Semantics.Replacement Semantics.Action Semantics.StaticSpec Semantics.Cost Semantics.Ability
-  Semantics.TokenSpec
+  Semantics.TokenSpec Semantics.QualityPayload
 
 classify_semantic_syntax
 

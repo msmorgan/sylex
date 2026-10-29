@@ -123,7 +123,8 @@ def StaticSpec.numberSlots (value : StaticSpec) (fuel : Nat := 64) : List (Amoun
   match fuel, value with
   | 0, _ => []
   | _n + 1, .inCaller body => body.numberSlots _n
-  | _n + 1, .characteristicChange _ edits | _n + 1, .characteristicDefining _ edits => edits.flatMap CharacteristicEdit.numberSlots
+  | _n + 1, .characteristicChange _ edits | _n + 1, .characteristicDefining _ edits =>
+    (CharacteristicEdit.expandAll edits).flatMap CharacteristicEdit.numberSlots
   | _n + 1, .combatant _ | _n + 1, .textChange _ _ => []
   | _n + 1, .costShift _ shift => shift.numberSlots
   | _n + 1, .altCost _ _ | _n + 1, .addedCost _ _ _ | _n + 1, .paySubstitute _ _ | _n + 1, .specialAction _ _ _ _ | _n + 1, .modeChoice _
@@ -154,7 +155,7 @@ def Action.numberSlots (value : Action) (fuel : Nat := 64) : List (Amount × Num
   -- stat edits are signed; another amount under the deed, as `doubleCounters`'s counters, is not.
   | _n + 1, .ownScope (some (.action "double" _)) (.establish (.characteristicChange _ edits) _)
   | _n + 1, .ownScope (some (.action "triple" _)) (.establish (.characteristicChange _ edits) _) =>
-    edits.flatMap CharacteristicEdit.scaledStatSlots
+    (CharacteristicEdit.expandAll edits).flatMap CharacteristicEdit.scaledStatSlots
   | _n + 1, .inCaller body | _n + 1, .ownScope _ body | _n + 1, .instruct _ body => body.numberSlots _n
   -- You can't deal negative damage [CR#107.1b].
   | _n + 1, .dealDamage amount _ _ | _n + 1, .markDamage _ amount => [(amount, .clamped)]

@@ -29,7 +29,6 @@ pub(super) fn composite(ty: &str, value: Value) -> Result<Box<dyn Debug>> {
         "Int" => decode::<i64>(value),
         "String" => decode::<Ident>(value),
         "Bool" => decode::<bool>(value),
-        "QualityPayload" => decode::<super::characteristics::QualityPayload>(value),
         "Delta Amount" => decode::<ast::Delta<Box<ast::Amount>>>(value),
         "List CopyExcept" => decode::<Vec<ast::CopyExcept>>(value),
         "List Predicate" => decode::<Vec<ast::Predicate>>(value),

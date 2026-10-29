@@ -764,27 +764,32 @@ mod tests {
         let bundle = Bundle::load(&default_plugin_dir()).unwrap();
         let reader = Elaborator::new(&bundle);
         // Constructor basis checked against Lean's reduction of amass Zombie 3.
+        let creature = r#"({ name := "Creature", cardClass := some .permanentCard, stats := [.power, .toughness] } : CardType)"#;
+        let zombie = r#"(.of __CREATURE__ "Zombie" : Subtype)"#;
+        let army = r#"(.coord .and [
+                .hasSubtype (.of __CREATURE__ "Army"), .hasType __CREATURE__, .hasPossessor .controller .actor] : Predicate)"#;
+        let it = "(.pro .bare .one : NounPhrase)";
         let basis = r#"
-            have creature : CardType := { name := "Creature", cardClass := some .permanentCard, stats := [.power, .toughness] };
-            have zombie : Subtype := .of creature "Zombie";
-            have army : Predicate := .coord .and [
-                .hasSubtype (.of creature "Army"), .hasType creature, .hasPossessor .controller .actor];
-            have it : NounPhrase := .pro .bare .one;
             .ownScope (some (.action "amass" .none)) (.sequentially [
-                .doIf (.not (.exists_ (.described (.a .unmarked) army)))
+                .doIf (.not (.exists_ (.described (.a .unmarked) __ARMY__)))
                     (.ownScope (some (.action "create" .none))
                         (.createObject (.inCaller (.lit 1))
                             (.token (.inCaller (.written { characteristics := {
-                                colors := [.black], types := [creature], subtypes := [zombie, .of creature "Army"],
+                                colors := [.black], types := [__CREATURE__], subtypes := [__ZOMBIE__, .of __CREATURE__ "Army"],
                                 power := some (.lit 0), toughness := some (.lit 0) } })) []) none))
                     none false,
-                .choose none (.described (.a .unmarked) army) .openly none,
+                .choose none (.described (.a .unmarked) __ARMY__) .openly none,
                 .putCounters (.inCaller (.lit __COUNT__)) (.printed (.named "p1p1Counter" .object))
-                    (.pro (.word (.type creature)) .one),
-                .doIf (.not (.matches it (.hasSubtype zombie)))
-                    (.establish (.characteristicChange it [.typeLine .adds { subtypes := some [zombie] }]) none)
+                    (.pro (.word (.type __CREATURE__)) .one),
+                .doIf (.not (.matches __IT__ (.hasSubtype __ZOMBIE__)))
+                    (.establish (.characteristicChange __IT__ [.payload .adds
+                        (.bundle { characteristics := { subtypes := [__ZOMBIE__] } } none)]) none)
                     none false])
-        "#;
+        "#
+        .replace("__ARMY__", army)
+        .replace("__ZOMBIE__", zombie)
+        .replace("__IT__", it)
+        .replace("__CREATURE__", creature);
         let helper = reader.read::<Action>("amass zombie 3").unwrap();
         let raw = reader
             .read::<Action>(&basis.replace("__COUNT__", "3"))

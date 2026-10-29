@@ -2,9 +2,14 @@
 //! (`plugins-v3-first-order-templates`): each reads to what the Template computed before.
 use std::path::Path;
 
+use deckmaste_lowering_v3::reads::CopyExceptExpansionExt;
 use deckmaste_lowering_v3::reads::CostPaymentExt;
+use deckmaste_lowering_v3::reads::expand_edits;
 use deckmaste_semantics_v3::ast::Action;
+use deckmaste_semantics_v3::ast::CharacteristicEdit;
+use deckmaste_semantics_v3::ast::CopyExcept;
 use deckmaste_semantics_v3::ast::Cost;
+use deckmaste_semantics_v3::ast::StaticSpec;
 use deckmaste_semantics_v3::bundle::Bundle;
 use deckmaste_semantics_v3::lower::Elaborator;
 
@@ -47,6 +52,85 @@ fn a_payment_of_a_plain_payment_reads_as_that_payment() {
             paid_cost(&reader, action).payment(),
             reader.read::<Cost>(payment).unwrap(),
             "{action}"
+        );
+    }
+}
+
+#[test]
+fn a_quality_payload_reads_as_the_edits_it_writes() {
+    let bundle = builtin();
+    let reader = Elaborator::new(&bundle);
+    for (spec, edits) in [
+        (
+            "qualityChange thisLand sets (bundle { characteristics := { types := [creature], \
+             power := 2, toughness := 2 }, qualities := [withEveryType creature] } (some land))",
+            "[typeLine adds { types := some [creature] }, stat power (set 2), \
+             stat toughness (set 2), quality sets (withEveryType creature)]",
+        ),
+        (
+            "qualityChange thisLand loses (bundle { name := \"Sample\", colors := [blue], \
+             text := [flying], power := 1 })",
+            "[typeLine loses {}, name loses \"Sample\", colors loses (.some [blue]), \
+             stat power (down 1), removedAbilities (specified [written flying])]",
+        ),
+        (
+            "qualityDefinition thisCreature sets (colored every)",
+            "[colors sets every]",
+        ),
+        (
+            "qualityDefinition thisCreature adds (everyTypeOf creature)",
+            "[quality adds (everyTypeOf creature)]",
+        ),
+    ] {
+        let (StaticSpec::CharacteristicChange { edits: written, .. }
+        | StaticSpec::CharacteristicDefining { edits: written, .. }) =
+            reader.read::<StaticSpec>(spec).unwrap()
+        else {
+            panic!("{spec} is no characteristic edit")
+        };
+        assert!(
+            matches!(written.as_slice(), [CharacteristicEdit::Payload { .. }]),
+            "{spec}"
+        );
+        assert_eq!(
+            expand_edits(&written),
+            reader.read::<Vec<CharacteristicEdit>>(edits).unwrap(),
+            "{spec}"
+        );
+    }
+}
+
+#[test]
+fn copied_characteristics_read_as_the_exceptions_they_write() {
+    let bundle = builtin();
+    let reader = Elaborator::new(&bundle);
+    for (written, exceptions) in [
+        (
+            "copyCharacteristics { subtypes := [spirit], power := 1, toughness := 1 } true",
+            "[edits [typeLine adds { subtypes := some [spirit] }, stat power (set 1), \
+             stat toughness (set 1)]]",
+        ),
+        (
+            "copyCharacteristics { power := 3, text := [flying] }",
+            "[edits [stat power (set 3)], alsoHas flying]",
+        ),
+        (
+            "copyCharacteristics { types := [artifact], cost := [2] }",
+            "[edits [typeLine sets { types := some [artifact] }, manaCost (some [2])]]",
+        ),
+        ("copyCharacteristics {}", "[]"),
+    ] {
+        let read = reader.read::<Vec<CopyExcept>>(written).unwrap();
+        assert!(
+            matches!(read.as_slice(), [CopyExcept::Characteristics { .. }]),
+            "{written}"
+        );
+        assert_eq!(
+            read.iter()
+                .flat_map(CopyExceptExpansionExt::expanded)
+                .collect::<Vec<_>>(),
+            reader.read::<Vec<CopyExcept>>(exceptions).unwrap(),
+            "{written}"
         );
     }
 }

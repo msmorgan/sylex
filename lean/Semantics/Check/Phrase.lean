@@ -1769,6 +1769,7 @@ def StaticSpec.removesAttachments (spec : StaticSpec) (fuel : Nat := 64) : Bool 
   | n + 1, .inCaller body => body.removesAttachments n
   | _ + 1, .cant _ action _ => action.attaches
   | n + 1, .characteristicChange _ edits =>
+    let edits := CharacteristicEdit.expandAll edits
     !edits.isEmpty && edits.all fun
       | .addedAbilities abilities =>
         !abilities.isEmpty && abilities.all (fun ability => ability.removesAttachments n)
@@ -1958,9 +1959,12 @@ def stepCharacteristicEditListWith (ops : StepOps) (drs : DRS) (eds : List Chara
     let (d', e') := stepCharacteristicEditWith ops d ed
     (d', es ++ e')) (drs, [])
 
-def stepCopyExceptWith (ops : StepOps) (drs : DRS) (ce : CopyExcept) : DRS × List Refusal :=
+/-- One copy exception that is no `CopyExcept.characteristics`. -/
+private def stepWrittenCopyExceptWith (ops : StepOps) (drs : DRS) (ce : CopyExcept) :
+    DRS × List Refusal :=
   match ce with
   | .edits eds =>
+    let eds := CharacteristicEdit.expandAll eds
     let (_, es) := stepCharacteristicEditListWith ops drs eds
     (drs, es ++ refuse (!eds.isEmpty && eds.all CharacteristicEdit.writesLine) .lineNonEmpty ++
       CharacteristicEdit.shapeAll eds)
@@ -1969,6 +1973,13 @@ def stepCopyExceptWith (ops : StepOps) (drs : DRS) (ce : CopyExcept) : DRS × Li
   | .entersWithCounters amt _ _ =>
     let (_, es) := ops.amt drs amt
     (drs, es)
+  | .characteristics .. => (drs, [])
+
+/-- A copy exception, read as the exceptions it writes (`CopyExcept.expanded`). -/
+def stepCopyExceptWith (ops : StepOps) (drs : DRS) (ce : CopyExcept) : DRS × List Refusal :=
+  ce.expanded.foldl (fun (d, es) c =>
+    let (d', e') := stepWrittenCopyExceptWith ops d c
+    (d', es ++ e')) (drs, [])
 
 def stepCopyExceptListWith (ops : StepOps) (drs : DRS) (ces : List CopyExcept) : DRS × List Refusal :=
   ces.foldl (fun (d, es) c =>
@@ -4526,6 +4537,7 @@ def stepOps : Nat → StepOps
           let (drs1, e1) := ops.amt drs amt
           (defineLetter l drs1, e1 ++ refuse (anyOpenLetter l drs) (.openLetter l))
         | .characteristicChange subj edits =>
+          let edits := CharacteristicEdit.expandAll edits
           let (drs1, ids, e1) := stepAgentNounWith ops drs .subj true subj
             (fun d => (stepCharacteristicEditListWith ops d edits).1)
           let (drs2, e2) := withDistributiveSubject subj ids drs1
@@ -4539,6 +4551,7 @@ def stepOps : Nat → StepOps
             refuse (edits.all CharacteristicEdit.writesLine) .lineNonEmpty ++
             CharacteristicEdit.shapeAll edits ++ refuse (!granted) .cdaGranted)
         | .characteristicDefining subj edits =>
+          let edits := CharacteristicEdit.expandAll edits
           let (drs1, _, e1) := ops.np drs .subj true subj
           -- A stat set names its number, which a later edit's "that number" reads back ("its
           -- toughness is equal to that number plus 1").
