@@ -81,13 +81,4 @@ instance : CallerScope Ballot where
     | .byCandidate candidates => .byCandidate (CallerScope.caller candidates)
     | ballot => ballot
 
-class CallerSplice (α : Type) where
-  close : α → α
-
-instance (priority := 100) {α : Type} [CallerScope α] : CallerSplice α where
-  close := CallerScope.caller
-
-instance {α β : Type} [CallerSplice β] : CallerSplice (α → β) where
-  close body := fun argument => CallerSplice.close (body argument)
-
 end Semantics

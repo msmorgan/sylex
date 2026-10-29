@@ -11,8 +11,6 @@ abbrev AuthoringContext.root : AuthoringContext := ⟨0⟩
 
 instance : AuthoringContext := AuthoringContext.root
 
-abbrev AuthoringContext.child (context : AuthoringContext) : AuthoringContext := ⟨context.depth + 1⟩
-
 end Semantics
 
 namespace Semantics.Authoring

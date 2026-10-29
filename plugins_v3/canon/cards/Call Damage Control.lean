@@ -1,18 +1,17 @@
-/-- *Call Damage Control*: the header "Return those cards from your graveyard to your hand." is
-the supplied body, written once; each bullet is the target it completes into a mode. -/
+/-- *Call Damage Control*: each mode writes out the printed header, "Return those cards from your
+graveyard to your hand.", with its bullet's target. -/
 card := {
   name := "Call Damage Control",
   cost := [1, green],
   types := [sorcery],
   text := [
     spell
-      (chooseModesOver (upTo 2)
+      (chooseModes (upTo 2)
          [
-           target [isArtifact, isCard],
-           target [isCreature, isCard],
-           target [isEnchantment, isCard],
-           target [isLand, isCard]
-         ]
-         (fun cards => returnToHand cards yourGraveyard))
+           returnToHand (target [isArtifact, isCard]) yourGraveyard,
+           returnToHand (target [isCreature, isCard]) yourGraveyard,
+           returnToHand (target [isEnchantment, isCard]) yourGraveyard,
+           returnToHand (target [isLand, isCard]) yourGraveyard
+         ])
   ]
 }

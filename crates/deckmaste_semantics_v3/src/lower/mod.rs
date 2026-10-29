@@ -140,7 +140,7 @@ impl Constructor {
     }
 }
 fn normal(ty: &str) -> String {
-    let mut ty = ty.trim().strip_prefix("splice ").unwrap_or(ty.trim());
+    let mut ty = ty.trim();
     while ty.starts_with('(') && ty.ends_with(')') {
         let mut depth = 0;
         let outer = ty.char_indices().all(|(i, c)| {
@@ -294,7 +294,6 @@ struct Function {
     output: String,
     tokens: Vec<Token>,
     scope: Box<Scope>,
-    caller: bool,
 }
 #[derive(Clone, Default)]
 struct Scope {
@@ -695,7 +694,6 @@ impl<'a> Elaborator<'a> {
                 &mut function.scope.clone(),
                 stack,
             )?;
-            let value = if function.caller { in_caller(value, &function.output)? } else { value };
             return Self::coerce(value, &function.output, ty);
         }
         if ty == "NounPhrase"
@@ -1120,7 +1118,6 @@ impl<'a> Elaborator<'a> {
                         output: normal(output),
                         tokens: term.clone(),
                         scope: Box::new(caller.clone()),
-                        caller: field.ty.starts_with("splice "),
                     },
                 );
                 continue;

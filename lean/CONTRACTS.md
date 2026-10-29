@@ -218,8 +218,8 @@ bodies need a composite definition: the templates over its actions follow the ac
 keyword's licensed phrasings follow the keyword.
 Defaults retain their calls.
 
-A declaration generates the hidden construction context, splice closures, and
-registration from one ordinary Lean definition body. It returns its semantic
+A declaration generates the hidden construction context and registration from one
+ordinary Lean definition body. It returns its semantic
 type directly; `expand` is a transparent identity, not a trust boundary. An
 `Action` Definition's body must establish its own Reference Scope
 (`Action.ownScope`); the declaration is refused otherwise. Only authored
@@ -1322,12 +1322,8 @@ recipient refuses `perMember` only in an instruction.
 
 ### Template and definition parameters and expanded actions
 
-A `semantic_template` or `semantic_definition` takes ordinary Lean parameters, plus
-`splice T` parameters for supplied bodies. A splice parameter is closed in its
-caller's scope (`CallerSplice.close`, from `CallerScope`): the body the caller wrote
-reads the caller's referents, and a parameterized body (`α → β`) receives the
-receiving declaration's subjects through its noun parameters. Every other parameter
-is substituted as written. A Definition reads its arguments through `inCaller`
+A `semantic_template` or `semantic_definition` takes ordinary Lean parameters, each
+substituted as written; there are no supplied bodies (`plugins-v3-first-order-templates`). A Definition reads its arguments through `inCaller`
 (`CallerScope.caller`: `NounPhrase.inCaller`, `Amount.inCaller`, `Action.inCaller`, …
 for every phrase type that can be an argument). For bare `NounPhrase` parameters the
 elaborator generates `firstMention` at the first textual occurrence and `laterMention`

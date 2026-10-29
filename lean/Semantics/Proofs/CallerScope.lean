@@ -34,10 +34,6 @@ private semantic_template unusedSubject (_chosen : NounPhrase) : Action := .draw
 private semantic_template secondSubject (_left right : NounPhrase) : NounPhrase := right
 private semantic_template moveSubject (subject : NounPhrase) : Action :=
   .move subject .anyLocation (some graveyard) .arrival []
-private semantic_template onChosen (chosen : NounPhrase) (body : splice (NounPhrase → Action)) : Action :=
-  body chosen
-private abbrev SubjectBody := NounPhrase → Action
-private semantic_template withSubjectBody (subject : NounPhrase) (body : splice SubjectBody) : Action := body subject
 private semantic_template configuredDraw (_flag : Bool) : Action := .draw (.exactlyOf 1)
 private structure Flag where
   bit : Bool
@@ -79,24 +75,6 @@ private def explicitExpansion : Spelled := spelled <| .singleFaced
       text := [spell (expand (drawTwice 1))] } }
 theorem explicitExpansionPreservesAuthorship : explicitExpansion.authoring.onlyAuthored = true := explicitExpansion.onlyAuthored
 theorem explicitExpansionChecksItsResult : explicitExpansion.card.check = [] := by decide
-private def explicitBodyParameter : Spelled := spelled <| .singleFaced
-  { characteristics := {
-      name := "Body witness", types := [.sorcery],
-      text := [spell
-      (onChosen (target isCreature) (fun chosen => setStatus .tapped chosen))] } }
-theorem suppliedBodyCanNameTheTemplateSubject : explicitBodyParameter.card.check = [] := by decide
-private def aliasedBodyParameter : Spelled := spelled <| .singleFaced
-  { characteristics := {
-      name := "Aliased body witness", types := [.sorcery],
-      text := [spell
-      (withSubjectBody (target isCreature) (fun subject => setStatus .tapped subject))] } }
-theorem bodyTypeAliasesRetainParameterEvidence : aliasedBodyParameter.card.check = [] := by decide
-private def nestedBodyParameter : Spelled := spelled <| .singleFaced
-  { characteristics := {
-      name := "Nested body witness", types := [.sorcery],
-      text := [spell
-      (onChosen (target isCreature) (fun subject => moveSubject subject))] } }
-theorem parameterizedBodiesForwardSubjectsIntoNestedTemplates : nestedBodyParameter.card.check = [] := by decide
 
 theorem templateArgumentsAreEvaluatedAtTheirTextualUse :
     (unusedSubject it).check (DRS.ofList []) = [] ∧
@@ -279,14 +257,6 @@ example : Spelled := spelled <| .singleFaced
         text := [spell
         (instruct (target isCreature) (@fight ⟨1⟩ (target isCreature)))] } }
 
-/-- error: Semantic parameter outside has no authoring evidence -/
-#guard_msgs in
-example (outside : NounPhrase) : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Unbound callback argument witness", types := [.sorcery],
-        text := [spell
-        (onChosen (target isCreature) (fun _ => moveSubject outside))] } }
-
 /-- error: Card definitions must use semantic templates or definitions; raw constructors: [Semantics.Action.draw] -/
 #guard_msgs in
 example : Spelled := spelled <| .singleFaced
@@ -294,14 +264,6 @@ example : Spelled := spelled <| .singleFaced
     { name := "Discarded projection witness", types := [.sorcery],
         text := [spell
         (configuredDraw (discardedAction (.draw (.exactlyOf 1))).bit)] } }
-
-/-- error: Card definitions must use semantic templates or definitions; raw constructors: [Semantics.Action.setStatus] -/
-#guard_msgs in
-example : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Body witness", types := [.sorcery],
-        text := [spell
-        (onChosen (target isCreature) (fun chosen => .setStatus .tapped chosen))] } }
 
 /-- error: Card definitions must use semantic templates or definitions; raw constructors: [Semantics.Action.draw] -/
 #guard_msgs in
@@ -346,28 +308,12 @@ example : Spelled := spelled <| .singleFaced
     { name := "Function container witness", types := [.sorcery],
         text := [spell (functionListConfig subjectFunctions)] } }
 
-private semantic_template amountBodyInCaller (_subject : NounPhrase)
-    (body : splice Amount) : Amount := body
-private semantic_template predicateBodyInCaller (_subject : NounPhrase)
-    (body : splice Predicate) : Predicate := body
 private semantic_template eventWithSubject (subject : NounPhrase) : GameEvent :=
   .does (.actor subject) (.dealDamage .anyAmount .you)
 private semantic_template playerIgnoringSubject (_subject : NounPhrase) : NounPhrase := .you
 private semantic_template nestedRereadDamage (amount : Amount) : Action :=
   .sequentially [rereadDamage amount, rereadDamage amount]
 
-theorem amountBodyReadsItsCallerSubject :
-    Amount.check callerCreature
-      (amountBodyInCaller (target isArtifact) (.statOf (.stat .power) it)) = [] := by decide
-
-theorem amountBodyPreservesLiteralFacts :
-    let amount := amountBodyInCaller (target isCreature) 1
-    (amount.exact, amount.plur, amount.unit) =
-      (some 1, .one, true) := by decide
-
-theorem predicateBodyPreservesItsCallerReference :
-    Predicate.checkAt .object callerCreature
-      (predicateBodyInCaller (target isCreature) (.otherThan it)) = [] := by decide
 
 theorem eventTemplateAcceptsItsSubject :
     (stepGameEvent 64 (DRS.ofList []) (eventWithSubject (forwardedSubject thisCreature))).2 =

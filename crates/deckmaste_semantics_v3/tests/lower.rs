@@ -399,22 +399,6 @@ fn computed_mode_helpers_preserve_costs_and_actions() {
 }
 
 #[test]
-fn generic_spliced_mode_frames_close_over_the_caller() {
-    let bundle = builtin();
-    let actual = Elaborator::new(&bundle)
-        .read::<Action>(
-            "chooseModesOver (α := Amount) (exactly 1) [2, 3] (fun (n : Amount) => draw n)",
-        )
-        .unwrap();
-    let Action::ChooseModes { modes, .. } = actual else {
-        panic!("expected modes")
-    };
-    assert_eq!(modes.len(), 2);
-    assert!(matches!(modes[0].1.1.as_ref(), Action::InCaller { .. }));
-    assert_ne!(modes[0].1.1, modes[1].1.1);
-}
-
-#[test]
 fn explicit_caller_scope_opts_out_of_parameter_identity() {
     let bundle = declarations(&[
         "primitive take (who : NounPhrase) : Action := { body := .instruct who [] }",

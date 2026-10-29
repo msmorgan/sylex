@@ -50,15 +50,6 @@ mutual
     | form :: forms => form.rawNames ++ Forms.rawNames forms
 end
 
-private def addSpliceSchema (schemas : NameMap (Array Name)) (entry : Name × Array Name) :=
-  schemas.insert entry.1 entry.2
-
-initialize spliceSchemas : SimplePersistentEnvExtension (Name × Array Name) (NameMap (Array Name)) ←
-  registerSimplePersistentEnvExtension {
-    addEntryFn := addSpliceSchema
-    addImportedFn := mkStateFromImportedEntries addSpliceSchema {}
-  }
-
 /-- Expected-result dispatch entries survive module imports. -/
 structure ExpectedTypeEntry where
   bareName : Name
@@ -135,8 +126,6 @@ private def addSortAlias (full : Name) : CommandElabM Unit := do
       for attr in [definitionAttribute, templateAttribute, contextualAuthoringAttribute,
           primitiveAttribute] do
         if attr.hasTag (← getEnv) full then attr.setTag alias
-      let splices := (spliceSchemas.getState (← getEnv) |>.find? full).getD #[]
-      modifyEnv fun env => spliceSchemas.addEntry env (alias, splices)
       for suffix in [`label, `deed] do
         if let some info := (← getEnv).find? (full ++ suffix) then
           liftCoreM <| addAndCompile <| .defnDecl {
@@ -256,16 +245,6 @@ def dispatchOnExpectedType : TermElab := fun stx expected? => do
   let call := stx.setArg 0 (mkCIdentFrom fn target)
   withMacroExpansion stx call <| Term.elabTerm call expected?
 
-/-- A supplied expression or parameterized body retaining its caller's scope. -/
-syntax (name := spliceMode) "splice " term : term
-
-/-- Resolve supplied-body aliases in the declaration's ordinary binder context. -/
-elab "caller_splice_type% " type:term : term => do
-  let type ← Term.elabType type
-  if (← whnf type).isForall then
-    return mkForall .anonymous .instImplicit (mkConst ``AuthoringContext) (type.liftLooseBVars 0 1)
-  return type
-
 /-- Whether `name` is an authored declaration: a `semantic_definition` or a `semantic_template`
 (the generated primitives are templates). -/
 def isAuthored (env : Environment) (name : Name) : Bool :=
@@ -335,45 +314,20 @@ elab "bind_parameters% " declaration:str body:term : term <= expected => do
   return (← (bindParameters (← getEnv) parameters value).run []).1
 
 /-- Declare one named semantic expansion, preserving ordinary Lean binders, with its generated
-lexical context and splice schema. The caller tags it a definition or a template. -/
+lexical context. The caller tags it a definition or a template. -/
 private def elabAuthoredDecl (mods : TSyntax ``Parser.Command.declModifiers)
     (name : TSyntax ``Parser.Command.declId) (signature : TSyntax ``Parser.Command.optDeclSig)
     (value : TSyntax ``Parser.Command.declVal) : CommandElabM Unit := do
     let context ← `(bracketedBinder| [Semantics.AuthoringContext])
     let mut binders := #[context.raw]
-    let mut splices : Array (TSyntax `ident) := #[]
     for binder in signature.raw[0].getArgs do
-      let mut binder := binder
-      if binder[2].getNumArgs == 2 then
-        let annotated := binder[2][1]
-        if annotated.isOfKind ``spliceMode then
-          let resultType : Term := ⟨annotated[1]⟩
-          let type := (← `(term| caller_splice_type% $resultType)).raw
-          binder := binder.setArg 2 (binder[2].setArg 1 type)
-          for identifier in binder[1].getArgs do
-            unless identifier.isIdent do throwErrorAt identifier "Authored parameters must be named"
-            splices := splices.push ⟨identifier⟩
       binders := binders.push binder
     let signature : TSyntax ``Lean.Parser.Command.optDeclSig :=
       ⟨signature.raw.setArg 0 (mkNullNode binders)⟩
-    let mut value := value
-    if !splices.isEmpty then
-      unless value.raw.isOfKind ``Parser.Command.declValSimple do
-        throwErrorAt value "A parameterized template or definition uses `:=` with one expansion body"
-      let closeFn := mkIdent `Semantics.CallerSplice.close
-      let mut body : Term := ⟨value.raw[1]⟩
-      for identifier in splices.reverse do
-        body ← `(term| let $identifier := $closeFn $identifier; $body)
-      body ← `(term|
-        letI : Semantics.AuthoringContext :=
-          Semantics.AuthoringContext.child (inferInstance : Semantics.AuthoringContext)
-        $body)
-      value := ⟨value.raw.setArg 1 body.raw⟩
     elabCommand (← `($mods:declModifiers def $name:declId $signature:optDeclSig $value:declVal))
     let identifier : TSyntax `ident := ⟨name.raw[0]⟩
     elabCommand (← `(attribute [contextual_authoring] $identifier:ident))
     let declaration ← resolveGlobalConstNoOverload identifier
-    modifyEnv fun env => spliceSchemas.addEntry env (declaration, splices.map (·.getId))
     registerExpectedType declaration
 
 /-- The label a keyword ability Definition is written under (`.keyword (.named "kicker") …`), read
@@ -737,16 +691,15 @@ private structure InspectionKey where
   visited : List Name
   context : Expr
   parameters : List FVarId
-  bodyParameter : Bool
   deriving BEq, Hashable
 
 private abbrev InspectionCache := Std.HashMap InspectionKey Form
 
 private partial def inspectCore (cache : IO.Ref InspectionCache)
-    (clean : IO.Ref (Std.HashSet Name)) (term : Expr) (visited : List Name) (context : Expr) (parameters : List FVarId)
-    (bodyParameter : Bool) : MetaM Form := do
+    (clean : IO.Ref (Std.HashSet Name)) (term : Expr) (visited : List Name) (context : Expr)
+    (parameters : List FVarId) : MetaM Form := do
   let term := (← instantiateMVars term).consumeMData
-  let key : InspectionKey := ⟨term, visited, context, parameters, bodyParameter⟩
+  let key : InspectionKey := ⟨term, visited, context, parameters⟩
   if let some form := (← cache.get)[key]? then return form
   let form ← do
     if (← isProof term) || (← isType term) then return .data []
@@ -759,28 +712,21 @@ private partial def inspectCore (cache : IO.Ref InspectionCache)
       return .data []
     | .lam name type body info =>
       withLocalDecl name info type fun arg => do
-        if bodyParameter && (← isDefEq type (mkConst ``AuthoringContext)) then
-          return ← inspectCore cache clean (body.instantiate1 arg) visited arg parameters true
-        -- A supplied body binds a parameter of any type holding semantic content: a noun
-        -- phrase, an ability, or a record of them (`chooseModesOver`'s frame over its items).
-        if bodyParameter && containsExpression (← getEnv) type then
-          return .binder name (← inspectCore cache clean (body.instantiate1 arg) visited context
-            (arg.fvarId! :: parameters) true)
         -- A binder of an ordinary record that only holds semantic expressions (a `KeywordTerm`,
         -- holding a `KeywordLabel`) is filled by the template the function is passed to, from
         -- arguments inspected where they are written: an applied function is beta-reduced
         -- first. Such a record has no Reference Scope to close, so unlike a semantic
-        -- expression's binder (`NounPhrase`) it needs no supplied body.
+        -- expression's binder (`NounPhrase`) it closes no scope.
         let env ← getEnv
         if let .const typeName _ := (← whnf type).getAppFn then
           if !expressionAttribute.hasTag env typeName && containsExpression env type then
             return .binder name (← inspectCore cache clean (body.instantiate1 arg) visited context
-              (arg.fvarId! :: parameters) bodyParameter)
-        inspectCore cache clean (body.instantiate1 arg) visited context parameters bodyParameter
+              (arg.fvarId! :: parameters))
+        inspectCore cache clean (body.instantiate1 arg) visited context parameters
     | .letE _ _ value body _ =>
-      return .data [← inspectCore cache clean value visited context parameters bodyParameter,
-        ← inspectCore cache clean (body.instantiate1 value) visited context parameters bodyParameter]
-    | .proj _ _ object => inspectCore cache clean object visited context parameters bodyParameter
+      return .data [← inspectCore cache clean value visited context parameters,
+        ← inspectCore cache clean (body.instantiate1 value) visited context parameters]
+    | .proj _ _ object => inspectCore cache clean object visited context parameters
     | _ =>
       let fn := term.getAppFn
       let args := term.getAppArgs
@@ -805,32 +751,26 @@ private partial def inspectCore (cache : IO.Ref InspectionCache)
             let expanded := mkAppN (mkConst target) (#[context] ++ args)
             unless ← isDefEq term expanded do
               throwError "Core coercion {name} disagrees with authored primitive {target}"
-            return ← inspectCore cache clean expanded visited context parameters bodyParameter
+            return ← inspectCore cache clean expanded visited context parameters
         if isAuthored env name then
           let mut arguments := []
-          let splices := (spliceSchemas.getState env |>.find? name).getD #[]
-          let mut type := info.type.instantiateLevelParams info.levelParams levels
           for arg in args do
-            let mut isBody := false
-            if let .forallE parameter _ next _ := ← whnf type then
-              type := next.instantiate1 arg
-              isBody := splices.contains parameter.eraseMacroScopes
             if contextualAuthoringAttribute.hasTag env name &&
                 (← isDefEq (← inferType arg) (mkConst ``AuthoringContext)) then
               unless ← isDefEq arg context do
                 throwError "{name} uses a lexical context outside its authoring scope"
             else
-              arguments := arguments ++ [← inspectCore cache clean arg visited context parameters isBody]
+              arguments := arguments ++ [← inspectCore cache clean arg visited context parameters]
           return .call name arguments
         match info with
         | .ctorInfo ctor =>
           if expressionAttribute.hasTag env ctor.induct && !literalAttribute.hasTag env name then
             return .raw name
           return .constructor name (← args.toList.mapM fun arg =>
-            inspectCore cache clean arg visited context parameters bodyParameter)
+            inspectCore cache clean arg visited context parameters)
         | .defnInfo defn =>
           let arguments ← args.toList.mapM fun arg =>
-            inspectCore cache clean arg visited context parameters bodyParameter
+            inspectCore cache clean arg visited context parameters
           if visited.contains name then return .data arguments
           let resultType ← whnf (← inferType term)
           let semanticFunction := resultType.isForall && containsExpression env resultType
@@ -838,16 +778,16 @@ private partial def inspectCore (cache : IO.Ref InspectionCache)
           if !semanticFunction && !(← helperNeedsInspection env expansion clean) then
             return .data arguments
           let body ← inspectCore cache clean expansion
-            (name :: visited) context parameters bodyParameter
+            (name :: visited) context parameters
           return .data (body :: arguments)
         | _ =>
           if containsExpression env (← inferType term) then
             throwError "Definition {name} has no authoring evidence"
-          return .data (← args.toList.mapM fun arg => inspectCore cache clean arg visited context parameters bodyParameter)
+          return .data (← args.toList.mapM fun arg => inspectCore cache clean arg visited context parameters)
       | _ =>
         if args.isEmpty then throwError "Cannot establish authorship for {term}"
-        let arguments ← args.toList.mapM fun arg => inspectCore cache clean arg visited context parameters bodyParameter
-        let body ← inspectCore cache clean (if fn.isLambda then fn.beta args else fn) visited context parameters bodyParameter
+        let arguments ← args.toList.mapM fun arg => inspectCore cache clean arg visited context parameters
+        let body ← inspectCore cache clean (if fn.isLambda then fn.beta args else fn) visited context parameters
         return .data (body :: arguments)
   cache.modify (·.insert key form)
   return form
@@ -855,11 +795,11 @@ private partial def inspectCore (cache : IO.Ref InspectionCache)
 /-- Cache only identical inspections, including lexical context, permitted parameters,
 and the unfolding path. Each occurrence still retains its own place in the authoring tree. -/
 def inspect (term : Expr) (visited : List Name := [])
-    (context : Expr := mkConst ``AuthoringContext.root) (parameters : List FVarId := [])
-    (bodyParameter : Bool := false) : MetaM Form := do
+    (context : Expr := mkConst ``AuthoringContext.root) (parameters : List FVarId := []) :
+    MetaM Form := do
   let cache ← IO.mkRef ({} : InspectionCache)
   let clean ← IO.mkRef ({} : Std.HashSet Name)
-  inspectCore cache clean term visited context parameters bodyParameter
+  inspectCore cache clean term visited context parameters
 
 end Semantics.Authoring
 
@@ -1378,10 +1318,6 @@ private def validateAuthoredDefaults (signature : Syntax) : CommandElabM Unit :=
   let context ← `(bracketedBinder| [Semantics.AuthoringContext])
   let mut binders := #[context.raw]
   for binder in signature[0].getArgs do
-    let mut binder := binder
-    if binder[2].getNumArgs == 2 && binder[2][1].isOfKind ``spliceMode then
-      let resultType : Term := ⟨binder[2][1][1]⟩
-      binder := binder.setArg 2 (binder[2].setArg 1 (← `(term| caller_splice_type% $resultType)).raw)
     binders := binders.push binder
   let checks : Array (TSyntax ``Parser.Term.funBinder) := binders.map (⟨·⟩)
   let check ← `(term| fun $checks* => ())
