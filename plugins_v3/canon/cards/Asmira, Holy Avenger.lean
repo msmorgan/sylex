@@ -8,7 +8,7 @@ card := {
     flying,
     at_ (beginningOfPossessed endStep eachPlayer)
       (putCounters
-         (eventCount (putInto (a isCreature) yourGraveyard (from_ := battlefield)) any soFarThisTurn)
+         (eventCount (putIntoFromBattlefield (a isCreature) yourGraveyard) any soFarThisTurn)
          p1p1Counter thisCreature)
   ],
   power := 2,

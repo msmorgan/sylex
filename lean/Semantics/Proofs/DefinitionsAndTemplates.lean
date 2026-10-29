@@ -149,14 +149,14 @@ Templates keep the two wordings, and they expand to the same move. -/
 theorem putAndReturnExpandToOneTree (subject : NounPhrase) (destination : Location)
     (riders : List MoveRider) (origin : Location) :
     returnToHand subject = putInto subject hand ∧
-    returnToHand subject origin = putInto subject hand (some origin) ∧
+    returnToHand subject origin = putInto subject hand origin ∧
     returnToBattlefield subject = putOntoBattlefield subject ∧
-    returnToBattlefield subject riders (some origin) = putInto subject battlefield (some origin) riders ∧
+    returnToBattlefield subject riders origin = putInto subject battlefield origin riders ∧
     returnTo subject destination riders = put subject destination riders :=
   ⟨rfl, rfl, rfl, rfl, rfl⟩
 
 theorem putTakesRiders (s : NounPhrase) (d : Location) (r : List MoveRider) :
-    put s d r = putInto s d none r := rfl
+    put s d r = putInto s d wherever r := rfl
 
 /-! ## The bare plural
 
@@ -174,7 +174,7 @@ theorem bareAndAllOfExpandToOneTree (p : Predicate) :
 your graveyard" name no deed and expand to the same move, its written origin kept [CR#400.7]. -/
 theorem graveyardToHandVerbsExpandToOneMove :
     returnToHand (target isCreature) yourGraveyard =
-      putInto (target isCreature) hand (some yourGraveyard) := rfl
+      putInto (target isCreature) hand yourGraveyard := rfl
 
 /-- "X and Y", "X or Y" and "X and/or Y" are three encodings of a noun phrase. -/
 theorem nounPhraseCoordinatorsAreDistinct :

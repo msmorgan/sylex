@@ -10,7 +10,7 @@ keyword sunburst : Ability := {
     [static
         (replace
           (would (actor thisPermanent)
-            (enter (some stack)))
+            (enter stack))
           (doIf
             (and
               [is thisPermanent
@@ -22,7 +22,7 @@ keyword sunburst : Ability := {
       static
         (replace
           (would (actor thisPermanent)
-            (enter (some stack)))
+            (enter stack))
           (doIf
             (and
               [not

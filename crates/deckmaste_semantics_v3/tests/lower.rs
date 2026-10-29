@@ -715,7 +715,7 @@ fn qualified_any_constructors_are_distinct_from_the_any_value_helper() {
 #[test]
 fn snapshot_samples_exercise_defaults_and_every_defined_slot() {
     let bundle = declarations(&[
-        "template example (flag : Bool := false) (slots : DefinedSlots) : Nat := { body := if flag then 10 else (match slots with | .powerAlone => 3 | .toughnessAlone => 4 | .bothEach => 5) }",
+        "template example (flag : Bool := false) (slots : OutcomeVerb) : Nat := { body := if flag then 10 else (match slots with | .winGame => 3 | .loseGame => 4 | .drawGame => 5) }",
         "template optional (who : Option NounPhrase := none) : Nat := { body := match who with | none => 0 | some x => 1 }",
         "template listed (items : List Nat := []) : Nat := { body := List.length items }",
         "primitive closed : Nat := { body := 9 }",

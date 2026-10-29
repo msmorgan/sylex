@@ -5,12 +5,8 @@ action empowerJace (amount : Amount) : Action := {
   lexical := { verbs := [{ lemma := "empower Jace", third_singular := "empowers Jace", past := "empowered Jace", gerund := "empowering Jace", frames := [Amount] }] },
   spelling := "empower Jace <amount>",
   body :=
-    have jaceToken :=
-      and
-        [isToken, isPlaneswalker,
-          hasSubtype jace, actorControls];
     sequentially
-      [doIf (not (exists_ jaceToken))
+      [doIf (not (exists_ (and [isToken, isPlaneswalker, hasSubtype jace, actorControls])))
           (create 1
             (written
               {
@@ -23,7 +19,7 @@ action empowerJace (amount : Amount) : Action := {
                         activated (loyaltySymbol (down 3))
                           (draw 1)],
                     loyalty := some 0 } })),
-        choose (a jaceToken),
+        choose (a (and [isToken, isPlaneswalker, hasSubtype jace, actorControls])),
         putCounters amount (printedKind loyaltyCounter)
           it]
 }

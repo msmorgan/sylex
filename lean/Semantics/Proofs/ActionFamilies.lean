@@ -210,7 +210,7 @@ theorem counterPreservesTheAbilityCategory :
 theorem losingCountersPublishesTheSharedRemovalOutcome :
     countOutcomes .countersRemoved (actionResult (DRS.ofList [])
       (loseCounters (some (.printed poison))
-        (some 1) .you)) = 1 := by decide
+        1 .you)) = 1 := by decide
 
 theorem ownPowerCanReadAnExistingReference :
     Action.check (nounResult (DRS.ofList []) (target isCreature)) (dealDamageOwnPower it .you) = [] := by decide
@@ -235,7 +235,7 @@ theorem postposedCounterConditionReadsTheUnmovedSpell :
 
 theorem losingCountersAmountReadsItsPlayer :
     Action.check (DRS.ofList []) (loseCounters
-      (some (.printed poison)) (some (lifeTotalOf they)) (a (.isOpponentOf .you))) = [] := by decide
+      (some (.printed poison)) (lifeTotalOf they) (a (.isOpponentOf .you))) = [] := by decide
 
 theorem regenerationCanProtectANoncreaturePermanent :
     Action.check (DRS.ofList []) (regenerate (target isArtifact)) = [] := by decide

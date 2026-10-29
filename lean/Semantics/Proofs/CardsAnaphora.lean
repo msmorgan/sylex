@@ -552,7 +552,7 @@ def openTheVaults : Action :=
   returnToBattlefield
     (allOf (and [ isCard, or [isArtifact, isEnchantment],
                    in_ (graveyardOf (bare isPlayer)) ]))
-    [under (ownerOf them)] (from_ := some (graveyardOf (bare isPlayer)))
+    [under (ownerOf them)] (from_ := graveyardOf (bare isPlayer))
 theorem okOpenTheVaults : Action.check (DRS.ofList []) openTheVaults = [] := by decide
 
 /-- Codecracker Hound -/

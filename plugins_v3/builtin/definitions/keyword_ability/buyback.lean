@@ -14,7 +14,7 @@ keyword buyback (cost : Cost) : Ability := {
                 (resolve thisSpell)))
             (would any
               (putInto thisSpell graveyard
-                (some stack))))
+                stack)))
           (doIf
             (keywordCostPaid buyback.label thisSpell)
             (instead

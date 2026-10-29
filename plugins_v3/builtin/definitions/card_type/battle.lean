@@ -21,7 +21,7 @@ card_type battle := {
       damageResult
         (loseCounters
           (some (printedKind (.named "defenseCounter")))
-          (some thatMuch) this_),
+          thatMuch this_),
       .stateBased
         (and
           [not

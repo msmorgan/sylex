@@ -8,7 +8,7 @@ card := {
     whenever (does (a [isCreature, isOther]) die)
       (or_ :=
          [
-           does any (putInto (a [isCard, isCreature]) graveyard (from_ := some (not battlefield))),
+           does any (putInto (a [isCard, isCreature]) graveyard (from_ := not battlefield)),
            does (a [isCreature, in_ yourGraveyard]) (leave (from_ := yourGraveyard))
          ])
       (instruct this_ (dealDamage 1 eachOpponent)),

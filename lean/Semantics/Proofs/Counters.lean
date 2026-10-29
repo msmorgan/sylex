@@ -412,7 +412,7 @@ theorem okPutBoostCounterOnCreature :
 
 /-- "Each opponent loses all poison counters." -/
 theorem okLosesAllPoisonCounters :
-    Action.check (DRS.ofList []) (loseCounters (some (.printed poison)) none (agent := each
+    Action.check (DRS.ofList []) (loseAllCounters (some (.printed poison)) (agent := each
         (.isOpponentOf .you)))
       = [] := by
   decide

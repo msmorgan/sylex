@@ -662,14 +662,6 @@ pub enum OutcomeVerb {
     DrawGame,
 }
 
-/// Mirrors `Semantics/Words.lean:658`.
-#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub enum DefinedSlots {
-    PowerAlone,
-    ToughnessAlone,
-    BothEach,
-}
-
 /// Mirrors `Semantics/Words.lean:670`.
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CounterKind {

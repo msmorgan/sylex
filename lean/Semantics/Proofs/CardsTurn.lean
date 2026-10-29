@@ -105,7 +105,7 @@ def saheelisCopy : Action :=
   sequentially
     [ create 1
         (copyOf (target (and [or [isArtifact, isCreature], youControl]))
-          [isAlso [.artifact] []])
+          [isAlso [.artifact]])
         [],
       gainHaste thatToken,
       atNext .endStep (exile it) ]

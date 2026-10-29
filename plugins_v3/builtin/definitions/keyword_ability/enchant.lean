@@ -47,7 +47,7 @@ keyword enchant (subject : Predicate) : Ability := {
       static
         (replace
           (would (actor thisAura)
-            (enter none
+            (enter wherever
               [attachedTo any,
                 not
                   (attachedTo

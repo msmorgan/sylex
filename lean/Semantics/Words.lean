@@ -662,13 +662,6 @@ inductive OutcomeVerb where
   | winGame | loseGame | drawGame
   deriving DecidableEq, Repr
 
-/-- Which of power and toughness a characteristic-defining ability writes ("its power is equal
-to …", "its power and toughness are each equal to …"): an authoring input to `ptDefinition`,
-which expands it to `CharacteristicEdit.stat` sets [CR#604.3a,613.4a]. -/
-inductive DefinedSlots where
-  | powerAlone | toughnessAlone | bothEach
-  deriving DecidableEq, Repr
-
 /-- A counter's kind [CR#122.1]: the NAME of the counter declaration that defines it, verbatim
 (`p1p1Counter`, `flyingCounter`, `chargeCounter`). "Counters with the same name or description
 are interchangeable" [CR#122.1], so the name is all a kind is. What a counter of the kind does

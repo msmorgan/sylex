@@ -267,7 +267,7 @@ theorem okPlaneswalkerLoyaltyDamage :
       damageResult
         (loseCounters
           (some (printedKind (.named "loyaltyCounter")))
-          (some thatMuch) this_)
+          thatMuch this_)
     confer ∈ confersOf planeswalker_definition ∧
       confer.check = [] :=
   ⟨by simp [confersOf, planeswalker_definition], by decide⟩
@@ -316,7 +316,7 @@ theorem okBattleDefenseDamage :
       damageResult
         (loseCounters
           (some (printedKind (.named "defenseCounter")))
-          (some thatMuch) this_)
+          thatMuch this_)
     confer ∈ confersOf battle_definition ∧
       confer.check = [] :=
   ⟨by simp [confersOf, battle_definition], by decide⟩

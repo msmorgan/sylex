@@ -190,7 +190,7 @@ theorem okHollowmurkSiegeSultai : Ability.check (DRS.ofList []) hollowmurkSiegeS
 /-- Sakashima's Student -/
 def sakashimasStudentCopy : Ability :=
   static (enters thisCreature
-    [asCopyOf true (a isCreature) [isAlso [] [ninja]]])
+    [asCopyOf true (a isCreature) [isAlso (subtypes := [ninja])]])
 theorem okSakashimasStudentCopy : Ability.check (DRS.ofList []) sakashimasStudentCopy = [] := by decide
 /-- Chameleon, Master of Disguise -/
 def chameleonCopy : Ability :=
@@ -296,7 +296,7 @@ theorem okAllSeeingArbiterHeader : GameEvent.check (DRS.ofList []) allSeeingArbi
 
 /-- Myth Unbound -/
 def mythUnboundTrigger : Ability :=
-  whenever (does any (putInto yourCommander commandZone (from_ := some any))) (draw 1)
+  whenever (does any (putInto yourCommander commandZone (from_ := any))) (draw 1)
 theorem okMythUnboundTrigger : Ability.check (DRS.ofList []) mythUnboundTrigger = [] := by decide
 
 /-- Oscorp Industries -/
@@ -304,7 +304,7 @@ def oscorpIndustriesReturn : Ability :=
   when (does thisLand (enter (from_ := graveyard))) (loseLife 2)
 theorem okOscorpIndustriesReturn : Ability.check (DRS.ofList []) oscorpIndustriesReturn = [] := by decide
 def theLostAndTheDamnedEntryArm : GameEvent :=
-  does (a (and [isLand, youControl])) (enter (from_ := some (not yourHand)))
+  does (a (and [isLand, youControl])) (enter (from_ := not yourHand))
 theorem okTheLostAndTheDamnedEntryArm :
     GameEvent.check (DRS.ofList []) theLostAndTheDamnedEntryArm = [] := by decide
 /-- Forsaken Wastes -/

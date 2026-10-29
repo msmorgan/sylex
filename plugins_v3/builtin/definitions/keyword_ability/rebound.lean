@@ -13,7 +13,7 @@ keyword rebound : Ability := {
                 (resolve thisSpell)))
             (would any
               (putInto thisSpell graveyard
-                (some stack))))
+                stack)))
           (doIf
             (is thisSpell
               (did any

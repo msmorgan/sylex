@@ -489,10 +489,10 @@ theorem permanentPutIntoAGraveyardReadsItsOrigin :
 returned from a graveyard this way" reads nothing. -/
 theorem zoneChangeReadsItsWrittenOrigin :
     Action.check (DRS.ofList [])
-      (cloudshiftThen (tap (the (was (returnToBattlefield which (from_ := some exileZone))
+      (cloudshiftThen (tap (the (was (returnToBattlefield which (from_ := exileZone))
         thisWay)))) = [] ∧
     Action.check (DRS.ofList [])
-      (cloudshiftThen (tap (the (was (returnToBattlefield which (from_ := some graveyard))
+      (cloudshiftThen (tap (the (was (returnToBattlefield which (from_ := graveyard))
         thisWay)))) = [.participialDescription (.zoneChange (some .graveyard) .battlefield) 0] := by
   decide
 
@@ -791,7 +791,7 @@ exile, so "that artifact" finds nothing, though the card once left the battlefie
 the matched event moved a card from a library. -/
 theorem thatArtifactMilledThisWayStaysRefused :
     Action.check (DRS.ofList [])
-      (sequentially [exile (target isArtifact), putInto it graveyard (some exileZone),
+      (sequentially [exile (target isArtifact), putInto it graveyard exileZone,
         doIf (did (that artifact) (putInto .actor graveyard) thisWay) (draw 1)]) =
       [.anaphor (.word (.type .artifact)) .one 0] ∧
     Action.check (DRS.ofList [])
@@ -812,7 +812,7 @@ theorem writtenOriginStillDecides :
     Action.check (DRS.ofList [])
       (sequentially [destroy (target isArtifact),
         doIf (.did { subj := .any
-                     action := putInto (that artifact) graveyard (from_ := some (.not battlefield))
+                     action := putInto (that artifact) graveyard (from_ := .not battlefield)
                      within := some .thisWay }) (draw 1)]) =
       [.anaphor (.word (.type .artifact)) .one 0] := by decide
 
@@ -820,12 +820,12 @@ theorem writtenOriginStillDecides :
 no leaves-the-battlefield pattern [CR#603.6c], so a lookback over this turn that writes it reads
 no departed permanent, and its pattern is observed on arrival. -/
 theorem fromAnywhereIsNotLeavesTheBattlefield :
-    (match (putInto .actor graveyard (from_ := some .anyLocation)).scopeBody with
+    (match (putInto .actor graveyard (from_ := .anyLocation)).scopeBody with
       | .move _ _ _ point _ => point | _ => .departure) = .arrival ∧
     Action.check (DRS.ofList [])
       (sequentially [destroy (target isArtifact),
         doIf (.did { subj := .any
-                     action := putInto (that artifact) graveyard (from_ := some .anyLocation)
+                     action := putInto (that artifact) graveyard (from_ := .anyLocation)
                      within := some withinThisTurn }) (draw 1)]) =
       [.anaphor (.word (.type .artifact)) .one 0] := by decide
 

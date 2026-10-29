@@ -7,17 +7,6 @@ keyword ninjutsu (cost : Cost) : Ability := {
   },
   spelling := "ninjutsu <cost>",
   body :=
-    have returnedCreaturesDefender :=
-      the
-        (and
-          [or
-              [isPlayer, isPlaneswalker, isBattle],
-            inCombat attackedBy
-              (some
-                (the
-                  (and
-                    [was (returnToHand which),
-                      isCreature])))]);
     [activated
         (compound
           [cost, perform (reveal this_),
@@ -28,5 +17,15 @@ keyword ninjutsu (cost : Cost) : Ability := {
                     [isCreature, isAttacking, isUnblocked,
                       youControl])))])
         (putOntoBattlefieldTappedAttacking this_ yourHand
-          (some returnedCreaturesDefender))]
+          (some
+            (the
+              (and
+                [or
+                    [isPlayer, isPlaneswalker, isBattle],
+                  inCombat attackedBy
+                    (some
+                      (the
+                        (and
+                          [was (returnToHand which),
+                            isCreature])))]))))]
 }

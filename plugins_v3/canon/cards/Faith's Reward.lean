@@ -9,7 +9,7 @@ card := {
             [
               isPermanentCard,
               in_ yourGraveyard,
-              was (putInto which yourGraveyard (from_ := battlefield)) (within soFarThisTurn)
+              was (putIntoFromBattlefield which yourGraveyard) (within soFarThisTurn)
             ]))
   ]
 }

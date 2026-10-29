@@ -9,7 +9,7 @@ card := {
       (may
          [
            returnToBattlefield it
-             [(faceDownAs ⟨some { types := [land], subtypes := [forest] }⟩), (under (ownerOf it))]
+             [(faceDownAs { characteristics := some { types := [land], subtypes := [forest] } }), (under (ownerOf it))]
          ])
   ],
   power := 5,

@@ -6,7 +6,9 @@ card := {
     activated [1]
       (establishThroughout
          (qualityChange thisLand sets
-            (bundle ⟨{ types := [creature], power := 2, toughness := 2 }, [withEveryType creature]⟩
+            (bundle
+               { characteristics := { types := [creature], power := 2, toughness := 2 },
+                 qualities := [withEveryType creature] }
                (some land)))
          untilEndOfTurn)
   ]

@@ -7,7 +7,7 @@ card := {
     activated (compound [[5], tapSymbol])
       (create 1
          (written
-            ⟨{ types := [creature], power := 2, toughness := 2 } ,
-               [withQuality (ofChosen color), withQuality (ofChosen (subtype creature))]⟩))
+            { characteristics := { types := [creature], power := 2, toughness := 2 },
+              qualities := [withQuality (ofChosen color), withQuality (ofChosen (subtype creature))] }))
   ]
 }

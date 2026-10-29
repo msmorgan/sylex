@@ -131,7 +131,7 @@ theorem badStarlessDefinedPt :
     Card.check
       (one
         { name := some "", cost := some [pip .green], types := [.creature],
-          text := [static (ptDefinition thisCreature .bothEach (countOf (and [isCreature, youControl])))],
+          text := [static (ptDefinition thisCreature (countOf (and [isCreature, youControl])))],
           power := stat 2, toughness := stat 2 }) = [.cardBox] := by
   decide
 
@@ -242,12 +242,12 @@ theorem okLoyaltyOnPlaneswalker :
 /-- "a token that's a copy of target creature, except it's an artifact" -/
 theorem okCopyTypeException :
     Action.check (DRS.ofList [])
-      (create 1 (.copyOf (target isCreature) [isAlso [.artifact] []]) []) = []
+      (create 1 (.copyOf (target isCreature) [isAlso [.artifact]]) []) = []
           := by
   decide
 
 theorem badEmptyCopyTypeException :
-    Action.check (DRS.ofList []) (create 1 (.copyOf (target isCreature) [isAlso [] []]) [])
+    Action.check (DRS.ofList []) (create 1 (.copyOf (target isCreature) [isAlso]) [])
       = [.lineNonEmpty] := by
   decide
 

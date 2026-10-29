@@ -135,16 +135,16 @@ theorem arrivalCanBeDescribedAsCard :
       (.does .any (.move (a (.and [.isCard, isCreature])) (.zone .library none) (some graveyard) .arrival [])) = [] := by decide
 
 theorem anywhereAndBattlefieldHaveDifferentObservation :
-    (match does any (putInto .this graveyard (from_ := some .anyLocation)) with
+    (match does any (putInto .this graveyard (from_ := .anyLocation)) with
       | .does _ (.move _ _ _ point _) => point | _ => .departure) = .arrival ∧
-    (match does any (putInto .this graveyard (from_ := some (battlefield))) with
+    (match does any (putIntoFromBattlefield .this graveyard) with
       | .does _ (.move _ _ _ point _) => point | _ => .arrival) = .departure := by decide
 
 /-- A pattern whose origin list names the battlefield beside another zone is a leaves-the-battlefield
 ability [CR#603.6c], so it looks back in time [CR#603.10a]: "put into a graveyard from the
 battlefield or your hand" is observed on its departure, like the battlefield alone. -/
 theorem mixedOriginWithTheBattlefieldIsObservedOnDeparture :
-    (match does any (putInto .this graveyard (from_ := some (or [battlefield, yourHand]))) with
+    (match does any (zoneChangeObservedOnDeparture .this graveyard (or [battlefield, yourHand]) []) with
       | .does _ (.move _ _ _ point _) => point | _ => .arrival) = .departure := by decide
 
 theorem historyDoesNotMoveTheCurrentReference :

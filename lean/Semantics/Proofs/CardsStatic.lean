@@ -91,7 +91,7 @@ def spontaneousMutation : Ability :=
 theorem okSpontaneousMutation : Ability.check (DRS.ofList []) spontaneousMutation = [] := by decide
 
 def scourgeOfTheSkyclaves : Ability :=
-  static (ptDefinition thisCreature .bothEach
+  static (ptDefinition thisCreature
     (minus 20 (aggregate .max (.playerStat .lifeTotal) isPlayer)))
 theorem okScourgeOfTheSkyclaves : Ability.check (DRS.ofList []) scourgeOfTheSkyclaves = [] := by decide
 def aettirAndPriwen : Ability :=
@@ -106,7 +106,7 @@ def cycleOfLife : Action :=
 theorem okCycleOfLife : Action.check (DRS.ofList []) cycleOfLife = [] := by decide
 
 def roilingHorror : Ability :=
-  static (ptDefinition thisCreature .bothEach
+  static (ptDefinition thisCreature
     (minus (lifeTotalOf you)
       (lifeTotalOf
         (a (and [isOpponent, superlative .max (.playerStat .lifeTotal) isOpponent])))))
@@ -240,7 +240,7 @@ def nimbleMongoose : Ability :=
 theorem okNimbleMongoose : Ability.check (DRS.ofList []) nimbleMongoose = [] := by decide
 /-- Anax, Hardened in the Forge -/
 def anaxPowerDefinition : Ability :=
-  static (ptDefinition thisCreature .powerAlone (devotion you (color .red)))
+  static (powerDefinition thisCreature (devotion you (color .red)))
 theorem okAnaxPowerDefinition : Ability.check (DRS.ofList []) anaxPowerDefinition = [] := by decide
 /-- Aspect of Wolf -/
 def aspectOfWolf : Ability :=
@@ -280,7 +280,7 @@ def consumingBlobDefinition : Ability :=
 theorem okConsumingBlobDefinition : Ability.check (DRS.ofList []) consumingBlobDefinition = [] := by decide
 /-- Nighthawk Scavenger's definition -/
 def nighthawkScavengerDefinition : Ability :=
-  static (ptDefinition thisCreature .powerAlone
+  static (powerDefinition thisCreature
     (plus 1
       (distinctCount .cardType (allOf (cardIn (graveyardOf yourOpponents))))))
 theorem okNighthawkScavengerDefinition : Ability.check (DRS.ofList []) nighthawkScavengerDefinition = [] := by

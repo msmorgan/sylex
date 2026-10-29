@@ -425,7 +425,7 @@ def hofriGhostforge (exiled : NounPhrase) : Ability :=
   whenever (does (a (and [isCreature, isNontoken, youControl, isOther])) die)
     (doIfDone (exile it)
       (some (create 1 (copyOf (that creature)
-        [isAlso [] [spirit], alsoHas (hofriTokenAbility exiled)]) [])))
+        [isAlso (subtypes := [spirit]), alsoHas (hofriTokenAbility exiled)]) [])))
 
 /-- Required pin: Hofri Ghostforge's trigger as printed. "A copy of that creature" reads the
 creature that died by its copiable values, its last known information, though it has since been

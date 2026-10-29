@@ -1492,7 +1492,7 @@ mod tests {
     }
 
     #[test]
-    fn both_each_edits_and_bogus_nonfirst_match_arms_are_detected() {
+    fn toughness_edits_and_bogus_nonfirst_list_elements_are_detected() {
         let temp = tempfile::tempdir().unwrap();
         let plugin = temp.path().join("builtin");
         copy_tree(&default_plugin_dir(), &plugin);
@@ -1506,22 +1506,15 @@ mod tests {
             .unwrap()
             .clone();
         let before = expand_keys(&bundle, std::iter::once(&key)).outcomes;
-        let marker = "| Semantics.DefinedSlots.bothEach =>";
-        let (prefix, arm) = original.split_once(marker).unwrap();
-        let edited_arm = arm.replace("stat sets", "stat adds");
-        assert_ne!(edited_arm, arm, "the mutation must change the bothEach arm");
-        std::fs::write(&file, format!("{prefix}{marker}{edited_arm}")).unwrap();
+        let marker = "stat sets toughness amount";
+        assert_eq!(original.matches(marker).count(), 1);
+        std::fs::write(&file, original.replace(marker, "stat adds toughness amount")).unwrap();
         let edited = expand_keys(&Bundle::load(&plugin).unwrap(), std::iter::once(&key)).outcomes;
         let comparison = compare(&before, &edited, &[], &[]).unwrap();
         assert_eq!(comparison.differences, [Difference::Changed(key.clone())]);
         assert!(comparison.report().contains("Adds"));
         assert!(comparison.ensure_success().is_err());
-        let marker = "| Semantics.DefinedSlots.toughnessAlone =>";
-        let (prefix, rest) = original.split_once(marker).unwrap();
-        let (_, suffix) = rest
-            .split_once("| Semantics.DefinedSlots.bothEach =>")
-            .unwrap();
-        std::fs::write(&file, format!("{prefix}{marker} totallyBogusIdentifier 1 2 3\n| Semantics.DefinedSlots.bothEach =>{suffix}")).unwrap();
+        std::fs::write(&file, original.replace(marker, "totallyBogusIdentifier 1 2 3")).unwrap();
         let broken = expand_keys(&Bundle::load(&plugin).unwrap(), std::iter::once(&key)).outcomes;
         assert!(broken[&key].iter().any(|r| matches!(&r.outcome, Outcome::Failed(error) if error.contains("totallyBogusIdentifier"))));
         assert!(

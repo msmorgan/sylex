@@ -19,7 +19,7 @@ keyword haunt : Ability := {
                 (resolve thisSpell)))
             (does any
               (putInto thisSpell graveyard
-                (some stack))))
+                stack)))
           (sequentially
             [exile it,
               relate it haunting

@@ -6,7 +6,7 @@ card := {
   text := [
     at_ (beginningOfYour endStep)
       (if_ := some
-         (was (putInto (a (or [isArtifact, isCreature])) graveyard (from_ := battlefield))
+         (was (putIntoFromBattlefield (a (or [isArtifact, isCreature])) graveyard)
             soFarThisTurn))
       (putCounters 1 p1p1Counter thisCreature)
   ],

@@ -7,8 +7,8 @@ card := {
       (establish
          (qualityChange thisLand sets
             (bundle
-               ⟨{ types := [creature], text := [vigilance], power := 3, toughness := 3 } ,
-                  [withEveryType creature]⟩
+               { characteristics := { types := [creature], text := [vigilance], power := 3, toughness := 3 },
+                 qualities := [withEveryType creature] }
                (some land))))
   ]
 }

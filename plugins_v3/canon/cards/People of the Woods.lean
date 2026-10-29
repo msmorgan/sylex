@@ -3,6 +3,6 @@ card := {
   cost := [green, green],
   types := [creature],
   subtypes := [human],
-  text := [ptDefinition thisCreature toughnessAlone (countOf [forest, youControl])],
+  text := [toughnessDefinition thisCreature (countOf [forest, youControl])],
   power := 1
 }

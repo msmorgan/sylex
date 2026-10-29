@@ -376,7 +376,7 @@ theorem printedThisTurnProhibitionLastsTheTurn :
 the destroyed group, and a pronoun of the other number finds nothing to read, refused once. -/
 theorem regenerationProhibitionBindsTheDestroyed :
     Action.check (DRS.ofList []) (destroyCantRegenerate (target isCreature)) = [] ∧
-      Action.check (DRS.ofList []) (destroyCantRegenerate (allOf isCreature)) = [] ∧
+      Action.check (DRS.ofList []) (destroyPluralCantRegenerate (allOf isCreature)) = [] ∧
       Action.check (DRS.ofList [])
         (doUnderProhibition (destroy (target isCreature)) (regeneration them)) =
         [.anaphor .bare .many 0] := by

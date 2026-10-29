@@ -20,7 +20,7 @@ card_type planeswalker := {
       damageResult
         (loseCounters
           (some (printedKind (.named "loyaltyCounter")))
-          (some thatMuch) this_),
+          thatMuch this_),
       .stateBased
         (compareAmt
           (countersOn (.named "loyaltyCounter") this_)

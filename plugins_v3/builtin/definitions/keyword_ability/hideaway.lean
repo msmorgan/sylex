@@ -7,11 +7,6 @@ keyword hideaway (amount : Amount) : Ability := {
   lexical := { lemma := "hideaway", parameters := [[Amount]] },
   spelling := "hideaway <amount>",
   body :=
-    have exiledCard :=
-      the
-        (and
-          [was (exile which),
-            isCard]);
     [when
         (does (actor thisPermanent) enter)
         (sequentially
@@ -23,10 +18,10 @@ keyword hideaway (amount : Amount) : Ability := {
               [inOrder randomOrder],
             establishThroughout
               (conjunction [visibility lookAt you
-                    (objects exiledCard),
+                    (objects (the (and [was (exile which), isCard]))),
                   visibility lookAt
                     (controllerOf thisPermanent)
-                    (objects exiledCard)] none)
+                    (objects (the (and [was (exile which), isCard])))] none)
               (forAsLongAs
-                (is exiledCard (in_ exileZone)))])]
+                (is (the (and [was (exile which), isCard])) (in_ exileZone)))])]
 }

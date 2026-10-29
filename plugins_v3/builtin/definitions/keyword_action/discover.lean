@@ -3,15 +3,14 @@ action discover (amount : Amount) : Action := {
   lexical := { verbs := [{ lemma := "discover", frames := [Amount, Intransitive] }] },
   spelling := "discover <amount>",
   body :=
-    have fits :=
-      compare atMost amount [.stat manaValue];
     sequentially
       [exile
           (run top
-            (and [non isLand, fits])
+            (and [non isLand, compare atMost amount [.stat manaValue]])
             (libraryOf actor)),
         withContinuation .optional
-          (castWithoutPaying (that card) (some fits))
+          (castWithoutPaying (that card)
+            (some (compare atMost amount [.stat manaValue])))
           none
           (some
             (putInto (that card) hand)),

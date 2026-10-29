@@ -9,7 +9,7 @@ card := {
     spell
       [
         separateIntoPiles (allOf [isCreature, controlledBy (target isPlayer)]) 2,
-        destroyCantRegenerate (allOf [isCreature, inPile (pileOfChoice they)])
+        destroyPluralCantRegenerate (allOf [isCreature, inPile (pileOfChoice they)])
       ]
   ]
 }

@@ -7,7 +7,7 @@ card := {
   text := [
     fear,
     whenever (does (a isCreature) (dealDamage (to := you))) (destroy it),
-    when (does any (putInto this_ graveyard (from_ := some any)))
+    when (does any (putInto this_ graveyard (from_ := any)))
       (instruct (ownerOf it) (shuffleInto it))
   ],
   power := 6,

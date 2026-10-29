@@ -223,7 +223,7 @@ theorem expressionAmountObservesNewOutcomes :
     (rereadDamage .thatMuch).check (DRS.ofList [outcomeB .damageDealt]) = [.quantOutcomeInScope 2] := by decide
 
 private semantic_template definedPower (subject : NounPhrase) : StaticSpec :=
-  ptDefinition subject .powerAlone 1
+  powerDefinition subject 1
 theorem scopedStaticDefinitionsRemainVisibleToPrintedBoxes :
     (definedPower thisCreature).definedStats = [.power] := by decide
 

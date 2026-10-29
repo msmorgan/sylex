@@ -88,7 +88,6 @@ syntax_types!(
     CardFaceSide,
     AttachWord,
     OutcomeVerb,
-    DefinedSlots,
     CounterKind,
     ProjAxis,
     Status,

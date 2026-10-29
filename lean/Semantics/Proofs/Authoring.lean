@@ -667,13 +667,13 @@ example : actorTwice = .ownScope (some (.action "actorTwice" .none))
     (instruct (.firstMention "actorTwice.actor" theActor)
       (sacrifice (.laterMention "actorTwice.actor" theActor))) := rfl
 
-action containers (values : List Action) (rider : Option Location) := {
+action containers (values : List Action) (rider : Location) := {
   body := sequentially (values ++ [enter (from_ := rider)]),
 }
 
-example (values : List Action) (rider : Option Location) : containers values rider =
+example (values : List Action) (rider : Location) : containers values rider =
     .ownScope (some (.action "containers" .none))
-      (sequentially (values.map Action.inCaller ++ [enter (from_ := rider.map Location.inCaller)])) :=
+      (sequentially (values.map Action.inCaller ++ [enter (from_ := rider.inCaller)])) :=
   rfl
 
 action ballotArgument (ballot : Ballot) := { body := vote (ballot := ballot) }

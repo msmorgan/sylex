@@ -101,7 +101,7 @@ theorem retainedTypeLineIsAdded :
 /-- "This creature's power is equal to …" is a Characteristic-Defining Ability, so it fills the
 printed `*` [CR#604.3a,613.4a]; an ordinary set of its power ("has base power 2") does not. -/
 theorem definingAbilityDefinesPower :
-    (ptDefinition thisCreature .powerAlone 2).definedStats = [.power] ∧
+    (powerDefinition thisCreature 2).definedStats = [.power] ∧
       (StaticSpec.characteristicChange thisCreature [.stat .sets .power 2]).definedStats =
         [] := by decide
 
@@ -140,7 +140,7 @@ theorem choiceDependentSubtypeDefinitionIsAccepted :
 theorem tokenIsCreatedWithADefiningAbility :
     Action.check (DRS.ofList [])
       (createObject 1 (.token (.written (creatureTokenOf 0 0 [.green] []
-        [static (ptDefinition thisCreature .bothEach (countOf (and [isLand, youControl])))])) [])) =
+        [static (ptDefinition thisCreature (countOf (and [isLand, youControl])))])) [])) =
       [] := by decide
 
 /-- Criterion (1): a Characteristic-Defining Ability defines colors, subtypes, power or toughness
@@ -154,7 +154,7 @@ theorem definingAbilityDefinesOnlyColorsSubtypesAndStats :
 [CR#604.3a]. -/
 theorem definingAbilityDefinesItsOwnObject :
     StaticSpec.check (DRS.ofList [])
-      (ptDefinition (allOf (and [isCreature, youControl])) .powerAlone 2) =
+      (powerDefinition (allOf (and [isCreature, youControl])) 2) =
       [.cdaSubject] := by decide
 
 /-- Criteria (2) and (4): a granted ability is no Characteristic-Defining Ability, whether the
@@ -162,7 +162,7 @@ object grants it to itself or an effect puts it in force [CR#604.3a]; granting a
 definition is one (changeling) is an ordinary grant. -/
 theorem definingAbilityIsNeverGranted :
     StaticSpec.check (DRS.ofList [])
-      (abilityGrant thisCreature (static (ptDefinition thisCreature .powerAlone 2))) =
+      (abilityGrant thisCreature (static (powerDefinition thisCreature 2))) =
       [.cdaGranted] ∧
     Action.check (DRS.ofList [])
       (establishThroughout (qualityDefinition thisCreature .sets (colored .every))
@@ -173,14 +173,14 @@ theorem definingAbilityIsNeverGranted :
 ("except it has 'This creature's power is equal to …'"), is one [CR#604.3a,707.9a]. -/
 theorem copyExceptionMayGiveADefiningAbility :
     CopyExcept.check (DRS.ofList [])
-      (.edits [.addedAbilities [static (ptDefinition thisCreature .powerAlone 2)]]) =
+      (.edits [.addedAbilities [static (powerDefinition thisCreature 2)]]) =
       [] := by decide
 
 /-- Criterion (5): a Characteristic-Defining Ability sets its values unconditionally
 [CR#604.3a]. -/
 theorem definingAbilityIsUnconditional :
     StaticSpec.check (DRS.ofList [])
-      (onlyWhile (ptDefinition thisCreature .powerAlone 2)
+      (onlyWhile (powerDefinition thisCreature 2)
         (exists_ (and [isCreature, youControl]))) = [.cdaConditional] := by decide
 
 /-- "Switch target creature's power and toughness": a Characteristic Edit [CR#613.4d]. -/

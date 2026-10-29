@@ -84,7 +84,7 @@ theorem alternativeConditionsCannotBorrowOtherBranchParticipants :
 
 theorem powerDefinitionPublishesItsNumber :
     let out := (stepStaticSpec 64 (DRS.ofList [])
-      (ptDefinition thisCreature .powerAlone 2)).1
+      (powerDefinition thisCreature 2)).1
     countOutcomes .namedNumber out = 1 := by decide
 
 theorem grantedKeywordPublishesItsScalarParameter :

@@ -356,7 +356,7 @@ def permanentCardPhrase : Predicate := isPermanentCard
 theorem permanentCardIsPlaceless : permanentCardPhrase.phraseZone .object = none := by decide
 
 /-- Archpriest of Iona -/
-def archpriestOfIonaPower : Ability := static (ptDefinition thisCreature .powerAlone partySize)
+def archpriestOfIonaPower : Ability := static (powerDefinition thisCreature partySize)
 theorem okArchpriestOfIonaPower : Ability.check (DRS.ofList []) archpriestOfIonaPower = [] := by decide
 def archpriestOfIonaFullParty : Ability :=
   at_ (beginningOfYour .combat) (if_ := fullParty)

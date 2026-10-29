@@ -626,11 +626,6 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
             Constructor::new("loseGame", "LoseGame", vec![]),
             Constructor::new("drawGame", "DrawGame", vec![]),
         ],
-        "DefinedSlots" => vec![
-            Constructor::new("powerAlone", "PowerAlone", vec![]),
-            Constructor::new("toughnessAlone", "ToughnessAlone", vec![]),
-            Constructor::new("bothEach", "BothEach", vec![]),
-        ],
         "CounterKind" => vec![Constructor::new(
             "named",
             "Named",

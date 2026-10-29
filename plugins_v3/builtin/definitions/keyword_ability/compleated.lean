@@ -10,7 +10,7 @@ keyword compleated : Ability := {
     [static
         (replace
           (would (actor thisPermanent)
-            (enter none
+            (enter wherever
               [withCounters anyAmount
                   (printedKind loyaltyCounter) fresh]))
           (doIf
