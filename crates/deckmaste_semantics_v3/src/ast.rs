@@ -2279,7 +2279,7 @@ pub enum Cost {
     Perform {
         action: Box<Action>,
     },
-    AsPaid {
+    Payment {
         cost: Box<Cost>,
     },
     Compound {
@@ -2322,7 +2322,7 @@ pub enum ManaRider {
 /// Mirrors `Semantics/Abilities.lean:1207`.
 #[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum CopyExcept {
-    Edits {
+    CharacteristicEdits {
         edits: Vec<CharacteristicEdit>,
     },
     Ability {

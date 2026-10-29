@@ -3,5 +3,5 @@ card := {
   cost := [3, red, red],
   types := [creature],
   subtypes := [goblin],
-  text := [flying, ptDefinition thisCreature (countOf [isCreature, youControl])]
+  text := [flying, definesPt thisCreature (countOf [isCreature, youControl])]
 }

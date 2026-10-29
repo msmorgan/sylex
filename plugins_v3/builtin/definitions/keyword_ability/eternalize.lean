@@ -12,7 +12,7 @@ keyword eternalize (cost : Cost) : Ability := {
               (exileFrom thisCard yourGraveyard)])
         (create 1
           (copyOf this_
-            [edits
+            [characteristicEdits
                 [colors sets
                     (.some [black]),
                   stat power (set 4),

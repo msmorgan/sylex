@@ -8,6 +8,6 @@ card := {
   text := [
     entersChoosingFrom thisCreature number (number (fromTo 0 7)),
     at_ (beginningOfYour upkeep) (may (choose (a (qualityFrom number (number (fromTo 0 7)))))),
-    ptDefinitions thisCreature theLastChosenNumber (minus 7 theLastChosenNumber)
+    definesPowerAndToughness thisCreature theLastChosenNumber (minus 7 theLastChosenNumber)
   ]
 }

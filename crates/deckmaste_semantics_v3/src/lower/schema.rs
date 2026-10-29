@@ -3212,8 +3212,8 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
                 vec![Field::new("action", "action", "Action", None)],
             ),
             Constructor::new(
-                "asPaid",
-                "AsPaid",
+                "payment",
+                "Payment",
                 vec![Field::new("cost", "cost", "Cost", None)],
             ),
             Constructor::new(
@@ -3278,8 +3278,8 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
         ],
         "CopyExcept" => vec![
             Constructor::new(
-                "edits",
-                "Edits",
+                "characteristicEdits",
+                "CharacteristicEdits",
                 vec![Field::new(
                     "edits",
                     "edits",

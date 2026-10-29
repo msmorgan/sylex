@@ -5,6 +5,6 @@ card := {
   subtypes := [human],
   text := [
     addedCost (choose (a (quality (subtype creature)))) false,
-    ptDefinition thisCreature (countOf [isCreature, ofChosen (subtype creature)])
+    definesPt thisCreature (countOf [isCreature, ofChosen (subtype creature)])
   ]
 }

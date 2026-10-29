@@ -2,7 +2,7 @@
 template hasPT (power toughness : Amount) : CopyExcept := {
   spelling := "except it's <power>/<toughness>",
   body :=
-    edits
+    characteristicEdits
       [stat power (set power),
         stat toughness (set toughness)]
 }

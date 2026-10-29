@@ -3,5 +3,5 @@ template isAlso (types : Option (List CardType) := none)
     (subtypes : Option (List Subtype) := none) : CopyExcept := {
   -- TODO(spelling): Format and coordinate the types, subtypes list entries.
   body :=
-    edits [typeLine adds { types := types, subtypes := subtypes }]
+    characteristicEdits [typeLine adds { types := types, subtypes := subtypes }]
 }

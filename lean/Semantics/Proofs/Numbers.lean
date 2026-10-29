@@ -109,7 +109,7 @@ theorem okDefinesPtSigned :
 /-- "This creature's power and toughness are each equal to …": a Characteristic-Defining
 Ability sets them, so a negative it reads stands [CR#107.1b,604.3a]. -/
 theorem okCharacteristicDefiningPtSigned :
-    (ptDefinitions thisCreature 0 2).numberSlots
+    (definesPowerAndToughness thisCreature 0 2).numberSlots
       = [(.lit 0, .signed), (.lit 2, .signed)] := by rfl
 
 /-- "Whenever this creature's power becomes 3": the header watches a game state [CR#603.8], a

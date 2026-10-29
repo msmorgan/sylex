@@ -91,7 +91,7 @@ def spontaneousMutation : Ability :=
 theorem okSpontaneousMutation : Ability.check (DRS.ofList []) spontaneousMutation = [] := by decide
 
 def scourgeOfTheSkyclaves : Ability :=
-  static (ptDefinition thisCreature
+  static (definesPt thisCreature
     (minus 20 (aggregate .max (.playerStat .lifeTotal) isPlayer)))
 theorem okScourgeOfTheSkyclaves : Ability.check (DRS.ofList []) scourgeOfTheSkyclaves = [] := by decide
 def aettirAndPriwen : Ability :=
@@ -106,7 +106,7 @@ def cycleOfLife : Action :=
 theorem okCycleOfLife : Action.check (DRS.ofList []) cycleOfLife = [] := by decide
 
 def roilingHorror : Ability :=
-  static (ptDefinition thisCreature
+  static (definesPt thisCreature
     (minus (lifeTotalOf you)
       (lifeTotalOf
         (a (and [isOpponent, superlative .max (.playerStat .lifeTotal) isOpponent])))))
@@ -240,7 +240,7 @@ def nimbleMongoose : Ability :=
 theorem okNimbleMongoose : Ability.check (DRS.ofList []) nimbleMongoose = [] := by decide
 /-- Anax, Hardened in the Forge -/
 def anaxPowerDefinition : Ability :=
-  static (powerDefinition thisCreature (devotion you (color .red)))
+  static (definesPower thisCreature (devotion you (color .red)))
 theorem okAnaxPowerDefinition : Ability.check (DRS.ofList []) anaxPowerDefinition = [] := by decide
 /-- Aspect of Wolf -/
 def aspectOfWolf : Ability :=
@@ -252,7 +252,7 @@ def aspectOfWolf : Ability :=
 theorem okAspectOfWolf : Ability.check (DRS.ofList []) aspectOfWolf = [] := by decide
 /-- Lhurgoyf -/
 def lhurgoyfDefinition : Ability :=
-  static (ptDefinitions thisCreature (countOf (and [isCreature, in_ graveyard]))
+  static (definesPowerAndToughness thisCreature (countOf (and [isCreature, in_ graveyard]))
     (plus thatMuch 1))
 theorem okLhurgoyfDefinition : Ability.check (DRS.ofList []) lhurgoyfDefinition = [] := by decide
 
@@ -269,18 +269,18 @@ def voltageSurgeAddedCost : Ability :=
 theorem okVoltageSurgeAddedCost : Ability.check (DRS.ofList []) voltageSurgeAddedCost = [] := by decide
 /-- Tarmogoyf -/
 def tarmogoyfDefinition : Ability :=
-  static (ptDefinitions thisCreature
+  static (definesPowerAndToughness thisCreature
     (distinctCount .cardType (allOf (cardIn (graveyardOf (bare isPlayer)))))
     (plus thatMuch 1))
 theorem okTarmogoyfDefinition : Ability.check (DRS.ofList []) tarmogoyfDefinition = [] := by decide
 /-- Consuming Blob's definition -/
 def consumingBlobDefinition : Ability :=
-  static (ptDefinitions thisCreature (distinctCount .cardType (allOf (cardIn yourGraveyard)))
+  static (definesPowerAndToughness thisCreature (distinctCount .cardType (allOf (cardIn yourGraveyard)))
     (plus thatMuch 1))
 theorem okConsumingBlobDefinition : Ability.check (DRS.ofList []) consumingBlobDefinition = [] := by decide
 /-- Nighthawk Scavenger's definition -/
 def nighthawkScavengerDefinition : Ability :=
-  static (powerDefinition thisCreature
+  static (definesPower thisCreature
     (plus 1
       (distinctCount .cardType (allOf (cardIn (graveyardOf yourOpponents))))))
 theorem okNighthawkScavengerDefinition : Ability.check (DRS.ofList []) nighthawkScavengerDefinition = [] := by

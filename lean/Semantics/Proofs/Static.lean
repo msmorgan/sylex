@@ -61,7 +61,7 @@ theorem badDoubleStaticRider :
 
 /-- "power and toughness are each equal to the number of creatures you control" -/
 theorem okSelfDefinedPt :
-    StaticSpec.check (DRS.ofList []) (ptDefinition thisCreature (countOf (and [isCreature, youControl]))) = [] :=
+    StaticSpec.check (DRS.ofList []) (definesPt thisCreature (countOf (and [isCreature, youControl]))) = [] :=
         by
   decide
 

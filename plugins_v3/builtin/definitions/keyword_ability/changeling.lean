@@ -4,5 +4,5 @@ keyword changeling : Ability := {
   lexical := { lemma := "changeling" },
   spelling := "changeling",
   body :=
-    [static (qualityDefinition this_ adds (everyTypeOf creature))]
+    [static (definesQuality this_ adds (everyTypeOf creature))]
 }

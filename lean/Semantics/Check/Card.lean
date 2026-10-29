@@ -38,7 +38,7 @@ def StaticSpec.printedAfterKeywords (s : StaticSpec) (fuel : Nat := 64) : List K
   | n + 1, .inCaller b | n + 1, .conditional b _ _ => b.printedAfterKeywords n
   | n + 1, .conjunction _ ps => ps.flatMap (fun p => p.printedAfterKeywords n)
   | _ + 1, .characteristicChange _ es =>
-    (CharacteristicEdit.expandAll es).filterMap CharacteristicEdit.printedKeyword
+    (CharacteristicEdit.unfoldAll es).filterMap CharacteristicEdit.printedKeyword
   | _, _ => []
 termination_by structural fuel
 
@@ -93,7 +93,7 @@ def StaticSpec.definedStats (s : StaticSpec) (fuel : Nat := 64) : List Character
   match fuel, s with
   | n + 1, .inCaller b => b.definedStats n
   | _ + 1, .characteristicDefining _ edits =>
-    (CharacteristicEdit.expandAll edits).filterMap fun
+    (CharacteristicEdit.unfoldAll edits).filterMap fun
       | .stat axis (.set _) => some axis
       | _ => none
   | n + 1, .conjunction _ ps => ps.flatMap (fun p => p.definedStats n)

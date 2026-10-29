@@ -9,7 +9,7 @@ card := {
   subtypes := [construct],
   text := [
     entersChoosing thisCreature (subtype creature),
-    qualityDefinition thisCreature adds (chosenQuality (ofChosen (subtype creature))),
+    definesQuality thisCreature adds (chosenQuality (ofChosen (subtype creature))),
     getsPt (allOf [isCreature, youControl, isOther, ofChosen (subtype creature)]) (up 1) (up 1)
   ],
   power := 2,

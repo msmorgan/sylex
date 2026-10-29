@@ -416,6 +416,12 @@ all Players pass in succession ([CR#500.2]).
 A rules procedure in which an allowed option or value is selected. Choice names
 the rules-level selection, not the engine boundary that waits for an agent.
 
+**Mode**:
+One option of a modal Spell or Ability, chosen from a bulleted list ([CR#700.2]).
+A mode may carry its own additional cost, paid if it is chosen ([CR#700.2h]),
+or a weight counted by "{P} worth of modes" ([CR#700.2i]).
+_Avoid_: bullet, for the option itself (a bullet is how it is printed)
+
 **Linked Abilities**:
 Two abilities printed on one Object where the second refers only to what the
 first did, chose, or allowed to be paid, and not to any other ability's
@@ -911,6 +917,13 @@ Which Turn a Timing or Duration names: the current Turn, the previous one, a
 Player's next Turn, each of a Player's Turns, a later Turn ([CR#702.170d]), or
 the Turn an earlier phrase named.
 _Avoid_: this turn, as a reference — "this" names an Object
+
+**Event Ordinal** (project term):
+Which matching Event ([CR#700.1]) a description picks out by its position,
+counted within an optional span: "the second spell you cast each turn", "the
+first time a creature dies this turn". It is part of the Event described, so
+Events before the description existed still count; it is not a Usage Limit.
+_Avoid_: rank; Usage Limit, for an Event's position
 
 **Usage Limit** (project term):
 How many times something may be done per Turn, per one of its Player's Turns,

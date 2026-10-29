@@ -15,7 +15,7 @@ keyword epic : Ability := {
           restOfGame
           (sequentially
             [copy fromStack thisSpell 1
-                [edits
+                [characteristicEdits
                     [removedAbilities
                         (specified
                           [abilities (theKeyword epic.label)])]],

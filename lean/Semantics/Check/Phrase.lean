@@ -1769,7 +1769,7 @@ def StaticSpec.removesAttachments (spec : StaticSpec) (fuel : Nat := 64) : Bool 
   | n + 1, .inCaller body => body.removesAttachments n
   | _ + 1, .cant _ action _ => action.attaches
   | n + 1, .characteristicChange _ edits =>
-    let edits := CharacteristicEdit.expandAll edits
+    let edits := CharacteristicEdit.unfoldAll edits
     !edits.isEmpty && edits.all fun
       | .addedAbilities abilities =>
         !abilities.isEmpty && abilities.all (fun ability => ability.removesAttachments n)
@@ -1963,8 +1963,8 @@ def stepCharacteristicEditListWith (ops : StepOps) (drs : DRS) (eds : List Chara
 private def stepWrittenCopyExceptWith (ops : StepOps) (drs : DRS) (ce : CopyExcept) :
     DRS × List Refusal :=
   match ce with
-  | .edits eds =>
-    let eds := CharacteristicEdit.expandAll eds
+  | .characteristicEdits eds =>
+    let eds := CharacteristicEdit.unfoldAll eds
     let (_, es) := stepCharacteristicEditListWith ops drs eds
     (drs, es ++ refuse (!eds.isEmpty && eds.all CharacteristicEdit.writesLine) .lineNonEmpty ++
       CharacteristicEdit.shapeAll eds)
@@ -1975,9 +1975,9 @@ private def stepWrittenCopyExceptWith (ops : StepOps) (drs : DRS) (ce : CopyExce
     (drs, es)
   | .characteristics .. => (drs, [])
 
-/-- A copy exception, read as the exceptions it writes (`CopyExcept.expanded`). -/
+/-- A copy exception, read as the exceptions it writes (`CopyExcept.unfolded`). -/
 def stepCopyExceptWith (ops : StepOps) (drs : DRS) (ce : CopyExcept) : DRS × List Refusal :=
-  ce.expanded.foldl (fun (d, es) c =>
+  ce.unfolded.foldl (fun (d, es) c =>
     let (d', e') := stepWrittenCopyExceptWith ops d c
     (d', es ++ e')) (drs, [])
 
@@ -4540,13 +4540,13 @@ def stepOps : Nat → StepOps
           let (drs1, e1) := ops.amt drs amt
           (defineLetter l drs1, e1 ++ refuse (anyOpenLetter l drs) (.openLetter l))
         | .characteristicChange subj edits =>
-          let edits := CharacteristicEdit.expandAll edits
+          let edits := CharacteristicEdit.unfoldAll edits
           let (drs1, ids, e1) := stepAgentNounWith ops drs .subj true subj
             (fun d => (stepCharacteristicEditListWith ops d edits).1)
           let (drs2, e2) := withDistributiveSubject subj ids drs1
             (stepCharacteristicEditListWith ops · edits)
           -- A grant gives no Characteristic-Defining Ability, to the granting object or another
-          -- [CR#604.3a]; a copy effect's exception may (`CopyExcept.edits`).
+          -- [CR#604.3a]; a copy effect's exception may (`CopyExcept.characteristicEdits`).
           let granted := edits.any fun
             | .addedAbilities abs => abs.any (fun ab => ab.writesDefining)
             | _ => false
@@ -4554,7 +4554,7 @@ def stepOps : Nat → StepOps
             refuse (edits.all CharacteristicEdit.writesLine) .lineNonEmpty ++
             CharacteristicEdit.shapeAll edits ++ refuse (!granted) .cdaGranted)
         | .characteristicDefining subj edits =>
-          let edits := CharacteristicEdit.expandAll edits
+          let edits := CharacteristicEdit.unfoldAll edits
           let (drs1, _, e1) := ops.np drs .subj true subj
           -- A stat set names its number, which a later edit's "that number" reads back ("its
           -- toughness is equal to that number plus 1").
@@ -4747,7 +4747,7 @@ def stepOps : Nat → StepOps
             (out, errors ++ refuse (!change.isSet) .shiftSets)
           | .tapSymbol | .untapSymbol | .itsManaCost => (drs, [])
           -- A payment's cost is read as what paying it pays [CR#118.1].
-          | .asPaid body => ops.cost drs body.payment
+          | .payment body => ops.cost drs body.paidCost
           | .scaled c amt =>
             let (drs1, e1) := ops.cost drs c
             let (drs2, e2) := ops.amt drs1 amt

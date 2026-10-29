@@ -894,7 +894,7 @@ expected child kinds in the incoming `DRS`.
 | `EachStackOk` | A distributive handoff or loop keeps every outer referent with its updates and pluralizes or aggregates only what its body introduced (`instruct`, `doForEach`). |
 | `DeckReadable` | Retired (`lean-v3-authoring-impl-7-checker-and-regime-retirement`): `checkDeckTraitWith` and `checkDeckConditionWith` step a deck condition's predicates from an empty context at object kind; whether a predicate reads a characteristic of a card in a deck is not checked. |
 | `DeckComparable` | Retired (`lean-v3-authoring-impl-7-checker-and-regime-retirement`): which quality a deck's cards agree on is not checked. |
-| `QualityPayload` | Checked syntax under `CharacteristicEdit.payload`; every edit list is read through `CharacteristicEdit.expandAll`, which writes it out as its edits (below). |
+| `QualityPayload` | Checked syntax under `CharacteristicEdit.payload`; every edit list is read through `CharacteristicEdit.unfoldAll`, which writes it out as its edits (below). |
 | `TokenSpec` | `stepTokenSpecMetadataWith` steps it. |
 | `StaticSpec` | `stepStaticSpec` (`StaticSpec.check`) steps it. |
 | `Compulsion` | No Lean type: requirements are `StaticSpec.must` clauses, stepped as a deontic. |
@@ -1040,15 +1040,15 @@ starts to apply [CR#702.16p], are the engine's.
 
 ### Characteristic edits and keyword argument schemas
 
-`StaticSpec.characteristicChange` and `CopyExcept.edits` carry the same typed
+`StaticSpec.characteristicChange` and `CopyExcept.characteristicEdits` carry the same typed
 `CharacteristicEdit` list. A static change of stats ("gets +P/+T", "has base power and
 toughness P/T", "its power is equal to …", "switch its power and toughness") and of abilities
 ("has flying", "has all activated abilities of …", backup's selection) is a
 `characteristicChange` too. "Gets +P/+T" is one `getsPt` carrying both printed deltas, a "+0"
 included; the single-stat `modification` template is only for a change whose text names one
 stat. A Characteristic-Defining Ability is its own form,
-`StaticSpec.characteristicDefining subject edits` [CR#604.3a] (templates `ptDefinition`,
-`ptDefinitions`, `qualityDefinition`; changeling and devoid are written with it): it functions in
+`StaticSpec.characteristicDefining subject edits` [CR#604.3a] (templates `definesPt`,
+`definesPowerAndToughness`, `definesQuality`; changeling and devoid are written with it): it functions in
 all zones [CR#604.3], applies first in layer 4 or 5 [CR#613.3] and in layer 7a for power and
 toughness [CR#613.4a], and its power and toughness sets fill a printed `*`
 (`StaticSpec.definedStats`). It is the one game rule the checker enforces outside the card frame,
@@ -1083,7 +1083,7 @@ self context. Separate copy exceptions each read the incoming scope.
 context; sharing edits does not turn copy exceptions into later static effects.
 
 `QualityPayload` is checked syntax under `CharacteristicEdit.payload`, its op written once over
-it; the checker reads every edit list through `CharacteristicEdit.expandAll`, where a payload is
+it; the checker reads every edit list through `CharacteristicEdit.unfoldAll`, where a payload is
 the edits it writes (`QualityPayload.edits`).
 Ordinary additions add their type line but set every other written value; a
 removal removes each name, color list, ability and mana cost, and writes a number (power,
@@ -1091,7 +1091,7 @@ toughness, loyalty, defense) as lowered by it, `stat _ (.down _)`, there being n
 number. A retained type ("It's still
 a land") adds the type line whatever the op [CR#205.1b]; no edit stores the
 retained type. `copyCharacteristics` writes `CopyExcept.characteristics`, which the checker
-reads (`CopyExcept.expanded`) as one edit block and separate ability exceptions. The former
+reads (`CopyExcept.unfolded`) as one edit block and separate ability exceptions. The former
 minimum-two-fields packing rule has no semantic counterpart in an edit list.
 
 `Ability.keyword` takes an ordered `List KeywordParam`. It is an internal

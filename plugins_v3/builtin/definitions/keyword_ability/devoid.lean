@@ -4,5 +4,5 @@ keyword devoid : Ability := {
   lexical := { lemma := "devoid" },
   spelling := "devoid",
   body :=
-    [static (qualityDefinition this_ sets (colored (.some [])))]
+    [static (definesQuality this_ sets (colored (.some [])))]
 }

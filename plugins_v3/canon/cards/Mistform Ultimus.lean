@@ -4,7 +4,7 @@ card := {
   supertypes := [legendary],
   types := [creature],
   subtypes := [illusion],
-  text := [qualityDefinition thisCreature adds (everyTypeOf creature)],
+  text := [definesQuality thisCreature adds (everyTypeOf creature)],
   power := 3,
   toughness := 3
 }

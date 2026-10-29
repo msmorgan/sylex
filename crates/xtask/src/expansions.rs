@@ -1484,7 +1484,7 @@ mod tests {
             std::fs::read(second.join(INDEX_FILE)).unwrap()
         );
         std::fs::rename(
-            plugin.join("templates/ability/ptDefinition.lean"),
+            plugin.join("templates/ability/definesPt.lean"),
             plugin.join("pt-renamed.lean"),
         )
         .unwrap();
@@ -1501,13 +1501,13 @@ mod tests {
         let temp = tempfile::tempdir().unwrap();
         let plugin = temp.path().join("builtin");
         copy_tree(&default_plugin_dir(), &plugin);
-        let file = plugin.join("templates/ability/ptDefinition.lean");
+        let file = plugin.join("templates/ability/definesPt.lean");
         let original = std::fs::read_to_string(&file).unwrap();
         let bundle = Bundle::load(&plugin).unwrap();
         let key = bundle
             .items
             .keys()
-            .find(|k| k.bare_name.as_str() == "ptDefinition")
+            .find(|k| k.bare_name.as_str() == "definesPt")
             .unwrap()
             .clone();
         let before = expand_keys(&bundle, std::iter::once(&key)).outcomes;

@@ -82,7 +82,7 @@ mutual
   def Cost.namesThisDoor (cost : Cost) (fuel : Nat := 64) : Bool :=
     match fuel, cost with
     | n + 1, .inCaller c | n + 1, .scaled c _ => c.namesThisDoor n
-    | n + 1, .asPaid c => c.payment.namesThisDoor n
+    | n + 1, .payment c => c.paidCost.namesThisDoor n
     | n + 1, .withSubstitute cost substitute => cost.namesThisDoor n || substitute.action.namesThisDoor n
     | n + 1, .compound cs | n + 1, .or cs => cs.any (fun c => c.namesThisDoor n)
     | n + 1, .perform i => i.namesThisDoor n
@@ -95,7 +95,7 @@ mutual
     | n + 1, .conditional s condition _ => s.namesThisDoor n || condition.namesThisDoor n
     | n + 1, .conjunction _ parts => parts.any (fun s => s.namesThisDoor n)
     | n + 1, .characteristicChange _ edits =>
-      (CharacteristicEdit.expandAll edits).any (fun edit => match edit with
+      (CharacteristicEdit.unfoldAll edits).any (fun edit => match edit with
       | .addedAbilities abilities => abilities.any (fun a => a.namesThisDoor n)
       | _ => false)
     | n + 1, .cant _ i mods => i.namesThisDoor n || (match mods.cause with

@@ -87,23 +87,23 @@ theorem payLifeInACostSlotCountsOnce :
   decide
 
 /-- Paying a cost that is itself a payment of life pays that life once, never a payment of a
-payment [CR#118.1,119.4]: "pay" writes its cost `asPaid`, and the checker reads it as its
-`Cost.payment`. "You may pay 1 life", the shape of *Carnophage*'s "unless you pay 1 life"
+payment [CR#118.1,119.4]: "pay" writes its cost `payment`, and the checker reads it as its
+`Cost.paidCost`. "You may pay 1 life", the shape of *Carnophage*'s "unless you pay 1 life"
 (`doUnless`), of ward's "unless that player pays [Pay 5 life]" and of cumulative upkeep's "unless
 you pay [Pay 2 life] for each age counter" each pay the life itself. A cost that is not a payment
 is left as written. -/
 theorem payingALifePaymentPaysItOnce :
-    pay (payLife 1) .once = .pay (.asPaid (payLife 1)) .once .paid none none ∧
+    pay (payLife 1) .once = .pay (.payment (payLife 1)) .once .paid none none ∧
       doUnless (tap thisCreature) (payLife 1) =
-        .withContinuation .optional (.pay (.asPaid (payLife 1)) .once .paid none none) none
+        .withContinuation .optional (.pay (.payment (payLife 1)) .once .paid none none) none
           (tap thisCreature) ∧
-      (Cost.asPaid (payLife 1)).payment = perform (loseLife 1) ∧
-      (Cost.asPaid (.inCaller (payLife 5))).payment = .inCaller (perform (loseLife 5)) ∧
-      (Cost.asPaid (.scaled (.inCaller (payLife 2)) (.lit 1))).payment =
+      (Cost.payment (payLife 1)).paidCost = perform (loseLife 1) ∧
+      (Cost.payment (.inCaller (payLife 5))).paidCost = .inCaller (perform (loseLife 5)) ∧
+      (Cost.payment (.scaled (.inCaller (payLife 2)) (.lit 1))).paidCost =
         .scaled (.inCaller (perform (loseLife 2))) (.lit 1) ∧
-      (Cost.asPaid (.compound [[generic 1], payLife 2])).payment =
+      (Cost.payment (.compound [[generic 1], payLife 2])).paidCost =
         .compound [[generic 1], perform (loseLife 2)] ∧
-      (Cost.asPaid (perform (sacrifice (a isCreature)))).payment =
+      (Cost.payment (perform (sacrifice (a isCreature)))).paidCost =
         perform (sacrifice (a isCreature)) :=
   ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 

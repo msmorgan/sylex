@@ -24,11 +24,11 @@ use deckmaste_semantics_v3::ast::TypeLineChanges;
 /// carries out its instructions [CR#118.1], so a cost that is itself one plain payment is
 /// that payment, made once; a Reference Scope, a scaling and a compound's other parts are
 /// kept.
-pub trait CostPaymentExt {
-    fn payment(&self) -> Cost;
+pub trait CostPaidExt {
+    fn paid_cost(&self) -> Cost;
 }
-impl CostPaymentExt for Cost {
-    fn payment(&self) -> Cost {
+impl CostPaidExt for Cost {
+    fn paid_cost(&self) -> Cost {
         match self {
             Self::Perform { action } => match action.as_ref() {
                 Action::Pay {
@@ -37,19 +37,19 @@ impl CostPaymentExt for Cost {
                     outcome: PaymentOutcome::Paid,
                     whose: None,
                     keyword: None,
-                } => cost.payment(),
+                } => cost.paid_cost(),
                 _ => self.clone(),
             },
-            Self::AsPaid { cost } => cost.payment(),
+            Self::Payment { cost } => cost.paid_cost(),
             Self::InCaller { body } => Self::InCaller {
-                body: Box::new(body.payment()),
+                body: Box::new(body.paid_cost()),
             },
             Self::Scaled { cost, amount } => Self::Scaled {
-                cost: Box::new(cost.payment()),
+                cost: Box::new(cost.paid_cost()),
                 amount: amount.clone(),
             },
             Self::Compound { costs } => Self::Compound {
-                costs: costs.iter().map(CostPaymentExt::payment).collect(),
+                costs: costs.iter().map(CostPaidExt::paid_cost).collect(),
             },
             _ => self.clone(),
         }
@@ -165,13 +165,13 @@ impl QualityPayloadEditsExt for QualityPayload {
     }
 }
 
-/// `CharacteristicEdit.expanded`: a payload is the edits it writes; a keyword term is the keyword
+/// `CharacteristicEdit.unfolded`: a payload is the edits it writes; a keyword term is the keyword
 /// added, or, for a family, its variants selected from all the objects `holders` describes
 /// [CR#702.1c]; any other edit is itself.
-pub trait CharacteristicEditExpansionExt {
+pub trait CharacteristicEditUnfoldExt {
     fn expanded(&self) -> Vec<CharacteristicEdit>;
 }
-impl CharacteristicEditExpansionExt for CharacteristicEdit {
+impl CharacteristicEditUnfoldExt for CharacteristicEdit {
     fn expanded(&self) -> Vec<CharacteristicEdit> {
         match self {
             Self::Payload { op, payload } => payload.edits(op),
@@ -201,21 +201,21 @@ impl CharacteristicEditExpansionExt for CharacteristicEdit {
     }
 }
 
-/// `CharacteristicEdit.expandAll`: an edit list as the edits it writes.
+/// `CharacteristicEdit.unfoldAll`: an edit list as the edits it writes.
 #[must_use]
-pub fn expand_edits(edits: &[CharacteristicEdit]) -> Vec<CharacteristicEdit> {
+pub fn unfold_edits(edits: &[CharacteristicEdit]) -> Vec<CharacteristicEdit> {
     edits
         .iter()
-        .flat_map(CharacteristicEditExpansionExt::expanded)
+        .flat_map(CharacteristicEditUnfoldExt::expanded)
         .collect()
 }
 
-/// `CopyExcept.expanded`: "except it has <values>" is a type line when any type is written,
+/// `CopyExcept.unfolded`: "except it has <values>" is a type line when any type is written,
 /// the written values set, and each written ability added; any other exception is itself.
-pub trait CopyExceptExpansionExt {
+pub trait CopyExceptUnfoldExt {
     fn expanded(&self) -> Vec<CopyExcept>;
 }
-impl CopyExceptExpansionExt for CopyExcept {
+impl CopyExceptUnfoldExt for CopyExcept {
     fn expanded(&self) -> Vec<CopyExcept> {
         let Self::Characteristics {
             values,
@@ -239,7 +239,7 @@ impl CopyExceptExpansionExt for CopyExcept {
         edits.extend(value_edits(&untexted, &QualityOp::Sets));
         let mut exceptions = Vec::new();
         if !edits.is_empty() {
-            exceptions.push(CopyExcept::Edits { edits });
+            exceptions.push(CopyExcept::CharacteristicEdits { edits });
         }
         exceptions.extend(values.text.iter().map(|ability| CopyExcept::Ability {
             ability: Box::new(ability.clone()),

@@ -10,7 +10,7 @@ keyword offspring (cost : Cost) : Ability := {
         (does (actor thisPermanent) enter)
         (create 1
           (copyOf thisPermanent
-            [edits
+            [characteristicEdits
                 [stat power (set 1),
                   stat toughness (set 1)]]))
         [] [] none none none

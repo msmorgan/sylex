@@ -860,7 +860,7 @@ mutual
     /-- The keyword a "the same is true for" list names, added: a keyword named bare is added
     itself, and a family term ("landwalk", "protection", "hexproof") adds each variant of it that
     the objects `holders` describes have, "the <term> abilities of those objects" [CR#702.1c]
-    (`CharacteristicEdit.expanded`). -/
+    (`CharacteristicEdit.unfolded`). -/
     | addedKeywordTerm (term : KeywordTerm) (holders : Predicate)
 
   inductive AbilitySelection where
@@ -1214,8 +1214,8 @@ mutual
     /-- `cost` as what paying it pays, a payment's cost ("pay <cost>", "unless you pay <cost>"):
     paying a cost carries out its instructions [CR#118.1], so a cost that is itself one plain
     payment ("Pay 5 life") is read as that payment, made once, never a payment of a payment
-    (`Cost.payment`). -/
-    | asPaid (cost : Cost)
+    (`Cost.paidCost`). -/
+    | payment (cost : Cost)
     | compound (costs : List Cost)
     | or (costs : List Cost)
     | itsManaCost
@@ -1236,13 +1236,13 @@ mutual
     | onSpent (mode : SpentMode) (only : Bool) (spell : NounPhrase) (says : Action)
 
   inductive CopyExcept where
-    | edits (edits : List CharacteristicEdit)
+    | characteristicEdits (edits : List CharacteristicEdit)
     | ability (ability : Ability)
     | thisAbility
     | entersWithCounters (amount : Amount) (kind : CounterKind) (mark : EntryCounterMark)
     /-- "Except it has <values>", `values` written as one set of characteristics, the types
     `typesAdded` "in addition to its other types": the exceptions it writes
-    (`CopyExcept.expanded`), each value set and each ability added. -/
+    (`CopyExcept.unfolded`), each value set and each ability added. -/
     | characteristics (values : Characteristics) (typesAdded : Bool)
 
   structure RollRow where
@@ -1566,7 +1566,7 @@ def QualityPayload.edits (op : QualityOp) : QualityPayload → List Characterist
 /-- An edit as the edits it writes: a payload (`CharacteristicEdit.payload`) is its typed edits, a
 keyword term (`CharacteristicEdit.addedKeywordTerm`) is the keyword added or its family's variants
 selected from their holders, and any other edit is itself. -/
-def CharacteristicEdit.expanded : CharacteristicEdit → List CharacteristicEdit
+def CharacteristicEdit.unfolded : CharacteristicEdit → List CharacteristicEdit
   | .payload op written => written.edits op
   | .addedKeywordTerm (.the label) _ => [.addedAbilities [.keyword label [] []]]
   | .addedKeywordTerm term holders =>
@@ -1574,33 +1574,33 @@ def CharacteristicEdit.expanded : CharacteristicEdit → List CharacteristicEdit
   | edit => [edit]
 
 /-- An edit list as the edits it writes. -/
-def CharacteristicEdit.expandAll (edits : List CharacteristicEdit) : List CharacteristicEdit :=
-  edits.flatMap CharacteristicEdit.expanded
+def CharacteristicEdit.unfoldAll (edits : List CharacteristicEdit) : List CharacteristicEdit :=
+  edits.flatMap CharacteristicEdit.unfolded
 
 /-- A copy exception as the exceptions it writes (`CopyExcept.characteristics`): a type line when
 any type is written (added, or set), the written values set, and each written ability added. Any
 other exception is itself. -/
-def CopyExcept.expanded : CopyExcept → List CopyExcept
+def CopyExcept.unfolded : CopyExcept → List CopyExcept
   | .characteristics c typesAdded =>
     let types :=
       if c.supertypes.isEmpty && c.types.isEmpty && c.subtypes.isEmpty then []
       else [CharacteristicEdit.typeLine (if typesAdded then .adds else .sets) c.typeChanges]
     let edits := types ++ ({ c with text := [] } : Characteristics).valueEdits .sets
-    (if edits.isEmpty then [] else [.edits edits]) ++ c.text.map .ability
+    (if edits.isEmpty then [] else [.characteristicEdits edits]) ++ c.text.map .ability
   | exception => [exception]
 
-/-- What paying `cost` pays (`Cost.asPaid`). Paying a cost carries out its instructions
+/-- What paying `cost` pays (`Cost.payment`). Paying a cost carries out its instructions
 [CR#118.1], so where the cost is itself one plain payment ("Ward—Pay 5 life", "unless you pay 1
 life"), paying it is that payment, made once: `pay (payLife 5)` is `payLife 5`, never a payment of
 a payment. Its Reference Scope (`inCaller`), its scaling ("for each age counter") and the other
 parts of a compound cost are kept. -/
-def Cost.payment (cost : Cost) (fuel : Nat := 64) : Cost :=
+def Cost.paidCost (cost : Cost) (fuel : Nat := 64) : Cost :=
   match fuel, cost with
-  | n + 1, .perform (.pay inner .once .paid none none) => inner.payment n
-  | n + 1, .asPaid body => body.payment n
-  | n + 1, .inCaller body => .inCaller (body.payment n)
-  | n + 1, .scaled body amount => .scaled (body.payment n) amount
-  | n + 1, .compound costs => .compound (costs.map (·.payment n))
+  | n + 1, .perform (.pay inner .once .paid none none) => inner.paidCost n
+  | n + 1, .payment body => body.paidCost n
+  | n + 1, .inCaller body => .inCaller (body.paidCost n)
+  | n + 1, .scaled body amount => .scaled (body.paidCost n) amount
+  | n + 1, .compound costs => .compound (costs.map (·.paidCost n))
   | _, cost => cost
 termination_by structural fuel
 

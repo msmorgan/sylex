@@ -415,14 +415,14 @@ private def lineOf (card : Spelled) (i : Nat) : Option Ability :=
   | _ => none
 
 /-- The characteristic edits of each part a "the same is true for" line joins, as the checker
-reads them (`CharacteristicEdit.expandAll`): each static part's, or each `sequentially` step's. -/
+reads them (`CharacteristicEdit.unfoldAll`): each static part's, or each `sequentially` step's. -/
 private def partEdits : Ability → List (List CharacteristicEdit)
   | .static (.conjunction _ parts) => parts.map fun
-    | .conditional (.characteristicChange _ edits) _ _ => CharacteristicEdit.expandAll edits
+    | .conditional (.characteristicChange _ edits) _ _ => CharacteristicEdit.unfoldAll edits
     | _ => []
   | .triggered _ _ _ _ _ _ _ (.sequentially steps) => steps.map fun
     | .doIf _ (.establish (.characteristicChange _ edits) _) _ _ =>
-      CharacteristicEdit.expandAll edits
+      CharacteristicEdit.unfoldAll edits
     | _ => []
   | _ => []
 
@@ -465,7 +465,7 @@ theorem familyTermsGrantThroughAddedSelectionOf :
           (keywordGrant thisCreature Cards.landwalkAbilities
             (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities]))
           (exists_ (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities]))) ∧
-      CharacteristicEdit.expandAll [.addedKeywordTerm Cards.landwalkAbilities
+      CharacteristicEdit.unfoldAll [.addedKeywordTerm Cards.landwalkAbilities
           (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities])] =
         [.addedSelectionOf
           (allOf (and [in_ (exiledWith thisCreature), hasKeyword Cards.landwalkAbilities]))

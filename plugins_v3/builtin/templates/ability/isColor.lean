@@ -2,6 +2,6 @@
 template isColor (color : Color) : CopyExcept := {
   spelling := "except it's <color>",
   body :=
-    edits
+    characteristicEdits
       [colors sets (.some [color])]
 }

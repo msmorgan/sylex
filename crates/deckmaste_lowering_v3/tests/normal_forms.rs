@@ -2,9 +2,9 @@
 //! (`plugins-v3-first-order-templates`): each reads to what the Template computed before.
 use std::path::Path;
 
-use deckmaste_lowering_v3::reads::CopyExceptExpansionExt;
-use deckmaste_lowering_v3::reads::CostPaymentExt;
-use deckmaste_lowering_v3::reads::expand_edits;
+use deckmaste_lowering_v3::reads::CopyExceptUnfoldExt;
+use deckmaste_lowering_v3::reads::CostPaidExt;
+use deckmaste_lowering_v3::reads::unfold_edits;
 use deckmaste_semantics_v3::ast::Action;
 use deckmaste_semantics_v3::ast::CharacteristicEdit;
 use deckmaste_semantics_v3::ast::CopyExcept;
@@ -23,11 +23,11 @@ fn builtin() -> Bundle {
         .clone()
 }
 
-fn paid_cost(reader: &Elaborator<'_>, action: &str) -> Cost {
+fn written_cost(reader: &Elaborator<'_>, action: &str) -> Cost {
     let Action::Pay { cost, .. } = reader.read::<Action>(action).unwrap() else {
         panic!("{action} is not a payment")
     };
-    assert!(matches!(cost.as_ref(), Cost::AsPaid { .. }), "{action}");
+    assert!(matches!(cost.as_ref(), Cost::Payment { .. }), "{action}");
     *cost
 }
 
@@ -49,7 +49,7 @@ fn a_payment_of_a_plain_payment_reads_as_that_payment() {
         ),
     ] {
         assert_eq!(
-            paid_cost(&reader, action).payment(),
+            written_cost(&reader, action).paid_cost(),
             reader.read::<Cost>(payment).unwrap(),
             "{action}"
         );
@@ -74,11 +74,11 @@ fn a_quality_payload_reads_as_the_edits_it_writes() {
              stat power (down 1), removedAbilities (specified [written flying])]",
         ),
         (
-            "qualityDefinition thisCreature sets (colored every)",
+            "definesQuality thisCreature sets (colored every)",
             "[colors sets every]",
         ),
         (
-            "qualityDefinition thisCreature adds (everyTypeOf creature)",
+            "definesQuality thisCreature adds (everyTypeOf creature)",
             "[quality adds (everyTypeOf creature)]",
         ),
     ] {
@@ -93,7 +93,7 @@ fn a_quality_payload_reads_as_the_edits_it_writes() {
             "{spec}"
         );
         assert_eq!(
-            expand_edits(&written),
+            unfold_edits(&written),
             reader.read::<Vec<CharacteristicEdit>>(edits).unwrap(),
             "{spec}"
         );
@@ -107,16 +107,16 @@ fn copied_characteristics_read_as_the_exceptions_they_write() {
     for (written, exceptions) in [
         (
             "copyCharacteristics { subtypes := [spirit], power := 1, toughness := 1 } true",
-            "[edits [typeLine adds { subtypes := some [spirit] }, stat power (set 1), \
+            "[characteristicEdits [typeLine adds { subtypes := some [spirit] }, stat power (set 1), \
              stat toughness (set 1)]]",
         ),
         (
             "copyCharacteristics { power := 3, text := [flying] }",
-            "[edits [stat power (set 3)], alsoHas flying]",
+            "[characteristicEdits [stat power (set 3)], alsoHas flying]",
         ),
         (
             "copyCharacteristics { types := [artifact], cost := [2] }",
-            "[edits [typeLine sets { types := some [artifact] }, manaCost (some [2])]]",
+            "[characteristicEdits [typeLine sets { types := some [artifact] }, manaCost (some [2])]]",
         ),
         ("copyCharacteristics {}", "[]"),
     ] {
@@ -127,7 +127,7 @@ fn copied_characteristics_read_as_the_exceptions_they_write() {
         );
         assert_eq!(
             read.iter()
-                .flat_map(CopyExceptExpansionExt::expanded)
+                .flat_map(CopyExceptUnfoldExt::expanded)
                 .collect::<Vec<_>>(),
             reader.read::<Vec<CopyExcept>>(exceptions).unwrap(),
             "{written}"
@@ -150,7 +150,7 @@ fn a_granted_keyword_term_reads_as_the_keyword_or_its_family_selection() {
     let bare = changed_edits(&reader, "keywordGrant thisCreature flying [isCreature]");
     assert!(matches!(bare.as_slice(), [CharacteristicEdit::AddedKeywordTerm { .. }]));
     assert_eq!(
-        expand_edits(&bare),
+        unfold_edits(&bare),
         [CharacteristicEdit::AddedAbilities {
             abilities: vec![deckmaste_semantics_v3::ast::Ability::Keyword {
                 keyword: reader
@@ -166,7 +166,7 @@ fn a_granted_keyword_term_reads_as_the_keyword_or_its_family_selection() {
         "keywordGrant thisCreature (anyIn { word := landwalk }) [isCreature, in_ graveyard]",
     );
     assert_eq!(
-        expand_edits(&family),
+        unfold_edits(&family),
         changed_edits(
             &reader,
             "abilityGrantSelected thisCreature (allOf [isCreature, in_ graveyard]) \

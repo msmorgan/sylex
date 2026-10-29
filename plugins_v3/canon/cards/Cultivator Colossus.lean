@@ -5,7 +5,7 @@ card := {
   subtypes := [plant, beast],
   text := [
     trample,
-    ptDefinition thisCreature (countOf [isLand, youControl]),
+    definesPt thisCreature (countOf [isLand, youControl]),
     when (does thisCreature enter)
       (may (putOntoBattlefieldTapped (a [isLand, in_ yourHand])) [draw 1, repeat_ again])
   ]

@@ -10,7 +10,7 @@ card := {
   subtypes := [shapeshifter],
   text := [
     entersChoosing thisCreature (subtype creature),
-    qualityDefinition thisCreature adds (chosenQuality (ofChosen (subtype creature))),
+    definesQuality thisCreature adds (chosenQuality (ofChosen (subtype creature))),
     entersWithAdditionalCounters
       (each [isCreature, youControl, ofChosen (subtype creature), isOther]) 1 p1p1Counter
   ],

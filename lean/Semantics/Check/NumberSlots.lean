@@ -101,7 +101,7 @@ def Cost.numberSlots (value : Cost) (fuel : Nat := 64) : List (Amount × NumberR
   | _n + 1, .scaled _ amount => [(amount, .clamped)]
   | _n + 1, .tapSymbol | _n + 1, .untapSymbol | _n + 1, .loyaltySymbol _ => []
   | _n + 1, .perform _ | _n + 1, .compound _ | _n + 1, .or _ | _n + 1, .itsManaCost
-  | _n + 1, .withSubstitute _ _ | _n + 1, .asPaid _ => []
+  | _n + 1, .withSubstitute _ _ | _n + 1, .payment _ => []
 termination_by structural fuel
 
 /-- A stat edit's slot: a set stands below zero, as an effect that sets a power and toughness
@@ -124,7 +124,7 @@ def StaticSpec.numberSlots (value : StaticSpec) (fuel : Nat := 64) : List (Amoun
   | 0, _ => []
   | _n + 1, .inCaller body => body.numberSlots _n
   | _n + 1, .characteristicChange _ edits | _n + 1, .characteristicDefining _ edits =>
-    (CharacteristicEdit.expandAll edits).flatMap CharacteristicEdit.numberSlots
+    (CharacteristicEdit.unfoldAll edits).flatMap CharacteristicEdit.numberSlots
   | _n + 1, .combatant _ | _n + 1, .textChange _ _ => []
   | _n + 1, .costShift _ shift => shift.numberSlots
   | _n + 1, .altCost _ _ | _n + 1, .addedCost _ _ _ | _n + 1, .paySubstitute _ _ | _n + 1, .specialAction _ _ _ _ | _n + 1, .modeChoice _
@@ -155,7 +155,7 @@ def Action.numberSlots (value : Action) (fuel : Nat := 64) : List (Amount × Num
   -- stat edits are signed; another amount under the deed, as `doubleCounters`'s counters, is not.
   | _n + 1, .ownScope (some (.action "double" _)) (.establish (.characteristicChange _ edits) _)
   | _n + 1, .ownScope (some (.action "triple" _)) (.establish (.characteristicChange _ edits) _) =>
-    (CharacteristicEdit.expandAll edits).flatMap CharacteristicEdit.scaledStatSlots
+    (CharacteristicEdit.unfoldAll edits).flatMap CharacteristicEdit.scaledStatSlots
   | _n + 1, .inCaller body | _n + 1, .ownScope _ body | _n + 1, .instruct _ body => body.numberSlots _n
   -- You can't deal negative damage [CR#107.1b].
   | _n + 1, .dealDamage amount _ _ | _n + 1, .markDamage _ amount => [(amount, .clamped)]

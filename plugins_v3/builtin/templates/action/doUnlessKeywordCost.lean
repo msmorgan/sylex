@@ -7,7 +7,7 @@ template doUnlessKeywordCost (action : Action) (cost : Cost) (whose : NounPhrase
   spelling := "<action> unless you pay <whose>'s <keyword> cost",
   body :=
     withContinuation .optional
-      (actionPay (asPaid cost) once paid
+      (actionPay (payment cost) once paid
         (some whose) (some keyword))
       none (some action)
 }
