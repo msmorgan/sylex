@@ -31,8 +31,8 @@ simplicity.
   violate.
 - **No evaluation in plugin files.** No higher-order parameters, `match`, `if`, `fun`, or
   `List`/`Option` functions; `plugins-v3-first-order-templates` removes the existing sites
-  (including `chooseModesOver`, `splice` and `CallerSplice`) before the conversion. `have` stays as
-  the only local binding.
+  (including `chooseModesOver`, `splice` and `CallerSplice`) before the conversion, along with
+  `have`, tuples and `⟨…⟩`. The grammar has no local bindings and no bottom-up type inference.
 - **The existing definitions are converted by script**: a purpose-built script, or a final
   emitter run from the current `deckmaste_semantics_v3`. They are not converted by hand.
 
