@@ -256,6 +256,10 @@ pub trait LocationEventHistoryExt: Sized {
     fn positive_zones(&self) -> Option<Vec<&Self>>;
     #[doc(hidden)]
     fn positive_zones_at(&self, fuel: u64) -> Option<Vec<&Self>>;
+    /// `Location.observedOnDeparture`: a move from this origin is observed on its departure,
+    /// some positive origin naming the battlefield [CR#603.6c].
+    #[must_use]
+    fn observed_on_departure(&self) -> bool;
     #[must_use]
     fn reads_departed_permanent(&self, at: &ObservationPoint, recorded: Option<&Zone>) -> bool;
 }
@@ -292,16 +296,18 @@ impl LocationEventHistoryExt for Location {
             }),
         }
     }
+    fn observed_on_departure(&self) -> bool {
+        self.positive_zones().is_some_and(|zones| {
+            zones
+                .iter()
+                .any(|zone| zone.sort() == Some(Zone::Battlefield))
+        })
+    }
     fn reads_departed_permanent(&self, at: &ObservationPoint, recorded: Option<&Zone>) -> bool {
         if self.writes_no_origin() {
             recorded == Some(&Zone::Battlefield)
         } else {
-            *at == ObservationPoint::Departure
-                && self.positive_zones().is_some_and(|zones| {
-                    zones
-                        .iter()
-                        .any(|zone| zone.sort() == Some(Zone::Battlefield))
-                })
+            *at == ObservationPoint::Departure && self.observed_on_departure()
         }
     }
 }

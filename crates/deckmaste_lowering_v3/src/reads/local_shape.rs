@@ -1,4 +1,5 @@
 //! Local shape checks from `Semantics/Check/LocalShape.lean`.
+use deckmaste_semantics_v3::ast::Action;
 use deckmaste_semantics_v3::ast::Amount;
 use deckmaste_semantics_v3::ast::ArithOp;
 use deckmaste_semantics_v3::ast::ChoiceRef;
@@ -11,6 +12,7 @@ use deckmaste_semantics_v3::ast::DieSides;
 use deckmaste_semantics_v3::ast::ManaCostTerm;
 use deckmaste_semantics_v3::ast::ManaHeld;
 use deckmaste_semantics_v3::ast::ManaRider;
+use deckmaste_semantics_v3::ast::ObservationPoint;
 use deckmaste_semantics_v3::ast::OutcomeSort;
 use deckmaste_semantics_v3::ast::ProducedMana;
 use deckmaste_semantics_v3::ast::QualitySort;
@@ -215,6 +217,29 @@ impl ManaHeldLocalShapeExt for ManaHeld {
         match self {
             Self::ThisMana => outcome(drs, OutcomeSort::ManaAdded),
             Self::Unspent { .. } => vec![],
+        }
+    }
+}
+/// The move shape the Lean checker refuses in `Action.move`'s step: a move whose written origin
+/// names the battlefield is observed on its departure [CR#603.6c,603.10a], so one observed on its
+/// arrival is refused `arrivalFromBattlefield`.
+pub trait ActionLocalShapeExt: Sized {
+    #[must_use]
+    fn local_checks(&self) -> Vec<Refusal>;
+}
+
+impl ActionLocalShapeExt for Action {
+    fn local_checks(&self) -> Vec<Refusal> {
+        match self {
+            Self::Move {
+                from_,
+                at_: ObservationPoint::Arrival,
+                ..
+            } => refuse(
+                !crate::reads::LocationEventHistoryExt::observed_on_departure(from_.as_ref()),
+                Refusal::ArrivalFromBattlefield,
+            ),
+            _ => vec![],
         }
     }
 }

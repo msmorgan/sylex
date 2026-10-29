@@ -24,6 +24,7 @@ pub enum Refusal {
     ConcreteBallot,
     RiderNegationPattern,
     ControlChangePattern,
+    ArrivalFromBattlefield,
     KindMismatch {
         expected: Box<Kind>,
         found: Box<Kind>,

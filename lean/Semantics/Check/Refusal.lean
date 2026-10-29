@@ -24,6 +24,10 @@ inductive Refusal where
   /-- A control change (`Action.changeControl`) is named only as an event, lookback or deontic
   pattern; a resolving one is `establish (controlGrant …)` [CR#611.2a,613.1b]. -/
   | controlChangePattern
+  /-- A move whose written origin names the battlefield, alone or in a list, is observed on its
+  departure, a leaves-the-battlefield pattern [CR#603.6c,603.10a]: observed on its arrival it
+  reads the wrong object (`zoneChangeObservedOnDeparture`, `Location.observedOnDeparture`). -/
+  | arrivalFromBattlefield
   /- sorts -/
   /-- A phrase's kind is fixed by two constraints that disagree. -/
   | kindMismatch (expected found : Kind)

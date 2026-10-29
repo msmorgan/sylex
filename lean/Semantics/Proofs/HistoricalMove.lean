@@ -58,7 +58,8 @@ private def mixedOrigin : Location := .coord .or [.zone .battlefield none, .zone
 
 /-- The move's own Observation Point decides the battlefield read. A departure-observed move
 from the battlefield or a hand reads the permanent the creature was [CR#603.6c,603.10a], as
-`Location.observedOnDeparture` classes it; the same move observed on arrival does not. -/
+`Location.observedOnDeparture` classes it; the same move observed on arrival does not, and is
+refused as a move from the battlefield observed on its arrival. -/
 theorem mixedOriginReadsThePermanentOnlyOnDeparture :
     Location.observedOnDeparture mixedOrigin = true ∧
     Condition.check context (.did { subj := .any
@@ -69,6 +70,6 @@ theorem mixedOriginReadsThePermanentOnlyOnDeparture :
                                     action := .move creatureRead mixedOrigin
                                       (some (.zone .graveyard none)) .arrival []
                                     within := some .thisWay }) =
-      [.anaphor (.word (.type .creature)) .one 0] := by decide
+      [.anaphor (.word (.type .creature)) .one 0, .arrivalFromBattlefield] := by decide
 
 end Semantics.Proofs.HistoricalMove

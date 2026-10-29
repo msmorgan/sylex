@@ -355,14 +355,26 @@ theorem okDeathLookbackWithoutOrigin :
                                                       action := (.move .which (battlefield) (some graveyard) .departure [])
                                                       within := some (.duration soFarThisTurn none) }) = [] := by decide
 
-/-- "… that was put into a graveyard from the battlefield this turn." -/
-theorem okPlacementIntoGraveyard :
+/-- "… that was put into a graveyard from the battlefield this turn" is a leaves-the-battlefield
+pattern, observed on its departure [CR#603.6c,603.10a]: written observed on its arrival, it is
+refused, never read as the card in the graveyard. -/
+theorem badPlacementIntoGraveyardObservedOnArrival :
+    Predicate.checkAt .object (DRS.ofList [])
+      (.did { subj := .any
+              action := (.move .which (battlefield) (some graveyard) .departure [])
+              within := some (.duration soFarThisTurn none) }) = [] ∧
     Predicate.checkAt .object (DRS.ofList [])
       (.did { subj := .any
               action := (.move .which (battlefield) (some graveyard) .arrival [])
-              within := some (.duration soFarThisTurn none) }) = [] :=
-          by
+              within := some (.duration soFarThisTurn none) }) = [.arrivalFromBattlefield] := by
   decide
+
+-- The refusal names the move: an instruction moving a permanent from the battlefield, or from a
+-- list naming it, observed on its arrival.
+/-- info: [Semantics.Refusal.arrivalFromBattlefield] -/
+#guard_msgs in
+#eval Action.check (DRS.ofList [])
+  (.move (target isCreature) (.coord .or [battlefield, yourHand]) (some graveyard) .arrival [])
 
 /-- "… that was put into the battlefield this turn." -/
 theorem okPlacementIntoBattlefield :

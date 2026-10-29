@@ -105,7 +105,7 @@ theorem okDiscardHand : Action.check (DRS.ofList []) (discard (a (.and [.isCard,
 
 /-- "Destroy a creature." -/
 theorem okScopedKeywordAction :
-    Action.check (DRS.ofList []) (.ownScope (some destroy) (.move (a isCreature) ((.zone .battlefield none)) (some graveyard) .arrival []))
+    Action.check (DRS.ofList []) (.ownScope (some destroy) (.move (a isCreature) ((.zone .battlefield none)) (some graveyard) .departure []))
       = [] := by
   decide
 
@@ -120,7 +120,7 @@ theorem okAgentedKeywordAction :
 four lands", Burning of Xinye), so its facts row's agent role names a player. -/
 theorem okAgentedDestroy :
     Action.check (DRS.ofList [])
-      (.ownScope (some (.action "destroy")) (.move (target isCreature) ((.zone .battlefield none)) (some graveyard) .arrival []))
+      (.ownScope (some (.action "destroy")) (.move (target isCreature) ((.zone .battlefield none)) (some graveyard) .departure []))
       = [] := by
   decide
 

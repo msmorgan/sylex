@@ -609,6 +609,7 @@ version = "0.1.0"
 dependencies = [
  "deckmaste_semantics_v3",
  "dpsi",
+ "serde_json",
  "syn 2.0.117",
 ]
 

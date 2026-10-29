@@ -27,6 +27,7 @@ pub use events::DidClauseEventsExt;
 pub use events::GameEventEventsExt;
 pub use events::NounPhraseEventsExt;
 pub use events::TallyModeEventsExt;
+pub use local_shape::ActionLocalShapeExt;
 pub use local_shape::AmountLocalShapeExt;
 pub use local_shape::CostLocalShapeExt;
 pub use local_shape::CostShiftLocalShapeExt;

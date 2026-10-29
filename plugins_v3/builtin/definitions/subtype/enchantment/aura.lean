@@ -1,4 +1,5 @@
-/-- [CR#704.5m] An Aura that is not attached is put into its owner's graveyard. -/
+/-- [CR#704.5m] An Aura that is not attached is put into its owner's graveyard. The move is from
+the battlefield, so it is observed on its departure [CR#603.6c,603.10a]. -/
 subtype aura := {
   lexical := { lemma := "Aura" },
   spelling := "Aura",
@@ -9,5 +10,5 @@ subtype aura := {
         (not (isAttached thisAura))
         (move thisAura
           (zone battlefield none) (some graveyard)
-          .arrival [])]
+          .departure [])]
 }

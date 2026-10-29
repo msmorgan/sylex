@@ -3988,7 +3988,10 @@ def stepOps : Nat → StepOps
               else moved
             | none => moved
           else drs5
-          (drs6, e1 ++ e2 ++ e3 ++ e5)
+          let arrivalOk := match at_ with
+            | .arrival => !from_.observedOnDeparture
+            | .departure => true
+          (drs6, e1 ++ e2 ++ e3 ++ e5 ++ refuse arrivalOk .arrivalFromBattlefield)
         | .copy sort subj times exs =>
           let (drs1, sourceIds, e1) := ops.np drs patientRole true subj
           let (drs2, e2) := ops.amt drs1 times

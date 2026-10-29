@@ -1534,7 +1534,8 @@ In particular, graveyard arrival from anywhere is not a battlefield-departure
 pattern [CR#603.6c,603.10a]. The raw observation point retains the distinction.
 Each put and return Template writes it: `zoneChange` observes on arrival and
 `zoneChangeObservedOnDeparture` (`putIntoFromBattlefield`) on departure, the author choosing by
-the written origin as `Location.observedOnDeparture` classes it: a written origin list is
+the written origin as `Location.observedOnDeparture` classes it, and a move from such an origin
+written observed on its arrival is refused `arrivalFromBattlefield`: a written origin list is
 departure-observed when any of its origins is
 the battlefield (an ability that watches a permanent leave the battlefield is a
 leaves-the-battlefield ability whatever else it watches [CR#603.6c]), and the
