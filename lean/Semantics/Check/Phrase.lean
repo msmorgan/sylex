@@ -4730,6 +4730,8 @@ def stepOps : Nat → StepOps
             let (out, errors) := ops.amt drs change.amount
             (out, errors ++ refuse (!change.isSet) .shiftSets)
           | .tapSymbol | .untapSymbol | .itsManaCost => (drs, [])
+          -- A payment's cost is read as what paying it pays [CR#118.1].
+          | .asPaid body => ops.cost drs body.payment
           | .scaled c amt =>
             let (drs1, e1) := ops.cost drs c
             let (drs2, e2) := ops.amt drs1 amt

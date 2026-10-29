@@ -88,6 +88,8 @@ pub use choice_domains::sorted_domain_check_with;
 pub use choice_domains::step_choice_domain_with;
 pub use choice_domains::step_color_term_with;
 mod lookbacks;
+mod normal_forms;
+pub use normal_forms::CostPaymentExt;
 pub use lookbacks::lookback_ground_refusals;
 pub use lookbacks::step_did_with;
 pub use lookbacks::step_relative_did_with;

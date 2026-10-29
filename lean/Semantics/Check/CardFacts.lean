@@ -82,6 +82,7 @@ mutual
   def Cost.namesThisDoor (cost : Cost) (fuel : Nat := 64) : Bool :=
     match fuel, cost with
     | n + 1, .inCaller c | n + 1, .scaled c _ => c.namesThisDoor n
+    | n + 1, .asPaid c => c.payment.namesThisDoor n
     | n + 1, .withSubstitute cost substitute => cost.namesThisDoor n || substitute.action.namesThisDoor n
     | n + 1, .compound cs | n + 1, .or cs => cs.any (fun c => c.namesThisDoor n)
     | n + 1, .perform i => i.namesThisDoor n

@@ -6,5 +6,5 @@ template pay (cost : Cost) (times : PayTimes) (outcome : PaymentOutcome := paid)
     (whose : Option NounPhrase := none) (keyword : Option KeywordLabel := none) : Action := {
   -- TODO(spelling): Include or omit the clauses supplied by whose, keyword.
   body :=
-    actionPay (Semantics.Cost.asPaid cost) times outcome whose keyword
+    actionPay (asPaid cost) times outcome whose keyword
 }

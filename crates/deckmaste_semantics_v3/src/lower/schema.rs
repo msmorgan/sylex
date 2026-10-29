@@ -3171,6 +3171,11 @@ pub(super) fn constructors(ty: &str) -> Option<Vec<Constructor>> {
                 vec![Field::new("action", "action", "Action", None)],
             ),
             Constructor::new(
+                "asPaid",
+                "AsPaid",
+                vec![Field::new("cost", "cost", "Cost", None)],
+            ),
+            Constructor::new(
                 "compound",
                 "Compound",
                 vec![Field::new("costs", "costs", "List Cost", None)],

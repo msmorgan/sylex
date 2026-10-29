@@ -154,20 +154,6 @@ private def coeSubtypePredicate : Subtype → Predicate :=
 
 instance [AuthoringContext] : Coe Subtype Predicate := ⟨coeSubtypePredicate⟩
 
-/-- `cost` as what paying it pays. Paying a cost carries out its instructions [CR#118.1], so where
-the cost is itself one plain payment ("Ward—Pay 5 life", "unless you pay 1 life"), paying it is that
-payment, made once: `pay (payLife 5)` is `payLife 5`, never a payment of a payment. Its Reference
-Scope (`inCaller`), its scaling ("for each age counter") and the other parts of a compound cost
-are kept. -/
-def _root_.Semantics.Cost.asPaid (cost : Cost) (fuel : Nat := 64) : Cost :=
-  match fuel, cost with
-  | _ + 1, .perform (.pay inner .once .paid none none) => inner
-  | n + 1, .inCaller body => .inCaller (body.asPaid n)
-  | n + 1, .scaled body amount => .scaled (body.asPaid n) amount
-  | n + 1, .compound costs => .compound (costs.map (·.asPaid n))
-  | _, cost => cost
-termination_by structural fuel
-
 /-- A keyword ability with no parameters and no written definition, by its label. This and the
 `keyword…` helpers below are not Templates: they spell `Ability.keyword`, an internal expansion
 carrier, so they serve Definitions and fixtures, and `spelled` refuses them in a card, which

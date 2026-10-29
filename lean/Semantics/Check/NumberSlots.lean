@@ -100,7 +100,8 @@ def Cost.numberSlots (value : Cost) (fuel : Nat := 64) : List (Amount × NumberR
   | _n + 1, .anyCost | _n + 1, .mana _ => []
   | _n + 1, .scaled _ amount => [(amount, .clamped)]
   | _n + 1, .tapSymbol | _n + 1, .untapSymbol | _n + 1, .loyaltySymbol _ => []
-  | _n + 1, .perform _ | _n + 1, .compound _ | _n + 1, .or _ | _n + 1, .itsManaCost | _n + 1, .withSubstitute _ _ => []
+  | _n + 1, .perform _ | _n + 1, .compound _ | _n + 1, .or _ | _n + 1, .itsManaCost
+  | _n + 1, .withSubstitute _ _ | _n + 1, .asPaid _ => []
 termination_by structural fuel
 
 /-- A stat edit's slot: a set stands below zero, as an effect that sets a power and toughness

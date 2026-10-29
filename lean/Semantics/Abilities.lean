@@ -1193,6 +1193,11 @@ mutual
     | loyaltySymbol (change : Delta Amount)
     /-- An action performed as a cost ("Sacrifice a creature:") [CR#602.2b,118.1]. -/
     | perform (action : Action)
+    /-- `cost` as what paying it pays, a payment's cost ("pay <cost>", "unless you pay <cost>"):
+    paying a cost carries out its instructions [CR#118.1], so a cost that is itself one plain
+    payment ("Pay 5 life") is read as that payment, made once, never a payment of a payment
+    (`Cost.payment`). -/
+    | asPaid (cost : Cost)
     | compound (costs : List Cost)
     | or (costs : List Cost)
     | itsManaCost
@@ -1502,6 +1507,21 @@ end
 @[match_pattern] abbrev Predicate.or (disjuncts : List Predicate) : Predicate := .coord .or disjuncts
 @[match_pattern] abbrev NounPhrase.and (phrases : List NounPhrase) : NounPhrase := .coord .and phrases
 @[match_pattern] abbrev NounPhrase.or (phrases : List NounPhrase) : NounPhrase := .coord .or phrases
+
+/-- What paying `cost` pays (`Cost.asPaid`). Paying a cost carries out its instructions
+[CR#118.1], so where the cost is itself one plain payment ("Ward—Pay 5 life", "unless you pay 1
+life"), paying it is that payment, made once: `pay (payLife 5)` is `payLife 5`, never a payment of
+a payment. Its Reference Scope (`inCaller`), its scaling ("for each age counter") and the other
+parts of a compound cost are kept. -/
+def Cost.payment (cost : Cost) (fuel : Nat := 64) : Cost :=
+  match fuel, cost with
+  | n + 1, .perform (.pay inner .once .paid none none) => inner.payment n
+  | n + 1, .asPaid body => body.payment n
+  | n + 1, .inCaller body => .inCaller (body.payment n)
+  | n + 1, .scaled body amount => .scaled (body.payment n) amount
+  | n + 1, .compound costs => .compound (costs.map (·.payment n))
+  | _, cost => cost
+termination_by structural fuel
 
 /-- The positive locations `loc` names, as a list of its disjuncts, or none for a complement
 ("anywhere other than …") or anywhere; a "from anywhere" move is never a leaves-the-battlefield

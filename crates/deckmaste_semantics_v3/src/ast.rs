@@ -2256,6 +2256,9 @@ pub enum Cost {
     Perform {
         action: Box<Action>,
     },
+    AsPaid {
+        cost: Box<Cost>,
+    },
     Compound {
         costs: Vec<Cost>,
     },
