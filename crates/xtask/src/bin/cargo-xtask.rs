@@ -11,7 +11,6 @@ use xtask::catalogs::CatalogArgs;
 use xtask::cite::CiteArgs;
 use xtask::derive_cards::DeriveCardsArgs;
 use xtask::english::EnglishArgs;
-use xtask::expansions::ExpansionsArgs;
 use xtask::extract::ExtractArgs;
 use xtask::fidelity::FidelityArgs;
 use xtask::generate::GenerateArgs;
@@ -44,9 +43,6 @@ enum Cmd {
     Validate(ValidateArgs),
     /// Show a card as parsed from a plugin, with its macros expanded.
     Card(CardArgs),
-    /// Write or compare keyed expansion snapshots of `plugins_v3` declarations
-    /// (defaults to `plugins_v3/builtin` into `target/expansions`).
-    Expansions(ExpansionsArgs),
     /// The render-back fidelity gate: diff every finished card's rendered
     /// English against the oracle snapshot (strong form — any unwaivered
     /// difference fails; `--waivers` lists the waiver inventory).
@@ -88,7 +84,6 @@ fn main() -> anyhow::Result<()> {
         Cmd::DeriveCards(args) => xtask::derive_cards::run(&args),
         Cmd::Validate(args) => xtask::validate::run(args),
         Cmd::Card(args) => xtask::card::run(args),
-        Cmd::Expansions(args) => xtask::expansions::run(&args),
         Cmd::Fidelity(args) => xtask::fidelity::run(args),
         Cmd::Generate(args) => xtask::generate::run(&args),
         Cmd::Stubs(args) => xtask::stubs::run(&args),

@@ -604,16 +604,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "deckmaste_lowering_v3"
-version = "0.1.0"
-dependencies = [
- "deckmaste_semantics_v3",
- "dpsi",
- "serde_json",
- "syn 2.0.117",
-]
-
-[[package]]
 name = "deckmaste_migrations"
 version = "0.1.0"
 dependencies = [
@@ -671,18 +661,6 @@ dependencies = [
  "macro_ron",
  "ron",
  "serde",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_semantics_v3"
-version = "0.1.0"
-dependencies = [
- "dpsi",
- "serde",
- "serde_json",
- "syn 2.0.117",
- "tempfile",
  "thiserror",
 ]
 
@@ -2189,7 +2167,6 @@ dependencies = [
  "deckmaste_migrations",
  "deckmaste_plugin",
  "deckmaste_semantics",
- "deckmaste_semantics_v3",
  "deckmaste_syntax",
  "flate2",
  "libc",

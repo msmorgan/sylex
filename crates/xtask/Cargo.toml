@@ -19,7 +19,6 @@ deckmaste_english = { version = "0.1.0", path = "../deckmaste_english" }
 deckmaste_lexical_source = { version = "0.1.0", path = "../deckmaste_lexical_source" }
 deckmaste_lexical = { version = "0.1.0", path = "../deckmaste_lexical" }
 deckmaste_semantics = { version = "0.1.0", path = "../deckmaste_semantics" }
-deckmaste_semantics_v3 = { version = "0.1.0", path = "../deckmaste_semantics_v3" }
 deckmaste_plugin = { version = "0.1.0", path = "../deckmaste_plugin" }
 deckmaste_legacy_render = { version = "0.1.0", path = "../deckmaste_legacy_render" }
 deckmaste_core = { version = "0.1.0", path = "../deckmaste_core" }
