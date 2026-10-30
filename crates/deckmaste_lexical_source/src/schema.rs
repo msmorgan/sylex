@@ -639,12 +639,11 @@ pub struct KeywordAction {
 pub enum KeywordParameter {
     /// A number or `X`: *bushido 2*.
     Amount,
-    /// A mana cost after a space: *equip {2}*.
+    /// A cost: mana-only after a space (*equip {2}*); when final, a cost
+    /// containing words follows an em dash and ends in a period (*ward—Pay 3 life.*).
     Cost,
     /// A mana cost after an em dash: *suspend 4—{1}{U}*.
     DashCost,
-    /// A verbal or composite cost after an em dash, excluding mana-only costs.
-    DashNonManaCost,
     /// A condition after an em dash: *companion—…*.
     DashCondition,
     /// A Keyword Quality, after the preposition named, if any:

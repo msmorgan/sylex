@@ -666,12 +666,13 @@
         Nominal: "BareNominalComplement",
         Amount: "Amount",
         AmountOrNP: "AmountOrNounPhrase",
-        // A Cost slot is a mana cost: a keyword's cost after a space or after
-        // its amount and em dash (*Equip {2}*, *Suspend 4—{1}{U}*), and a
-        // keyword action's (*waterbend {3}*). A verbal or composite keyword
-        // cost follows an em dash in the NonManaCost slot and ends in its own
-        // period (style guide §3 "Em dashes", "Periods"), so no clause is ever
-        // a keyword's Cost (*Equip abilities you activate cost {2} less*).
+        // A final Keyword Parameter Cost lowers to two productions: this
+        // mana-only slot after a space, or Bound em dash + NonManaCost +
+        // Suffix period. Each projects its own FinalParameter (Cost or
+        // SetOffCost); punctuation comes from that production, not a Reading
+        // (style guide §3 "Em dashes", "Periods"). This slot stays mana-only
+        // for DashCost (*Suspend 4—{1}{U}*), non-final keyword costs, and
+        // keyword actions (*waterbend {3}*).
         Cost: "SymbolCosts",
         FiniteClause: "FiniteClause",
         ExpandableClause: "ExpandableClause",

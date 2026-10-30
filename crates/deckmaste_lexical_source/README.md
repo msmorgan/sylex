@@ -159,9 +159,12 @@ Plugin-declared vocabulary arrives when `plugins_v3/` does; at
 `english-v4-final-suffix-cutover` the catalogs move into plugin declaration
 metadata. (The `_v4` suffix is already dropped.)
 
-`DashNonManaCost` distinguishes verbal/composite keyword costs,
-including their terminal period, from the mandatory dash of forms such as
-suspend with a mana cost.
+A keyword's final `Cost` is one Keyword Parameter whose spelling is chosen by
+the cost: mana-only follows a space (`Ward {2}`); a cost containing words
+follows an em dash and ends in a period (`Ward—{2}, Pay 2 life.`). Lowering
+emits both productions, each with its spelling's `FinalParameter` feature.
+`DashCost` retains suspend's mandatory dash after an amount (`Suspend 4—{1}{U}`)
+and takes only mana symbols. A non-final `Cost`, as in prototype, stays mana-only.
 
 Notation symbols declare their classes in `closed_class.ron`; the loader does
 not infer their category from their spelling. Pawprint quantities are distinct

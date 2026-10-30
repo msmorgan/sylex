@@ -12,3 +12,13 @@
 # Only a keyword whose em-dash cost ends in its own period is followed by a sentence on its line
 + <card=Light Up the Night> Flashback—{3}{R}, Remove X loyalty counters from among planeswalkers you control. If you cast this spell this way, X can't be 0. => KeywordParameters "Flashback—{3}{R}, Remove X loyalty counters from among planeswalkers you control."; Sentence "If you cast this spell this way, X can't be 0."
 + <card=Storm Seeker> Storm Seeker deals damage to target player equal to the number of cards in that player's hand. => NounPhrase "Storm Seeker" as Subject of deal; !Sentence "Seeker deals damage to target player equal to the number of cards in that player's hand."
+# Cost spelling is selected by its contents (style guide §3, Periods and Em dashes)
+# from: Gisa, the Hellraiser
+*KeywordPhrase Ward—{2}.
+*KeywordPhrase Ward—{2}
+*KeywordPhrase Ward Pay 3 life.
++ <card=Gisa, the Hellraiser> Ward—{2}, Pay 2 life. => KeywordParameters "Ward—{2}, Pay 2 life."
++ <card=Horobi's Whisper> Splice onto Arcane—Exile four cards from your graveyard. => KeywordParameters "Splice onto Arcane—Exile four cards from your graveyard."
++KeywordParameters <card=Errant Ephemeron> Suspend 4—{1}{U}
+# from: Errant Ephemeron
+*KeywordParameters Suspend 4—Pay 3 life.

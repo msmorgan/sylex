@@ -830,7 +830,6 @@ impl Sources {
                         ));
                     }
                     KeywordParameter::DashCost
-                    | KeywordParameter::DashNonManaCost
                     | KeywordParameter::DashCondition
                     | KeywordParameter::DashAbility
                     | KeywordParameter::DashPowerToughness
@@ -839,9 +838,7 @@ impl Sources {
                             '—',
                             if matches!(
                                 parameter,
-                                KeywordParameter::DashCost
-                                    | KeywordParameter::DashNonManaCost
-                                    | KeywordParameter::DashKeyword
+                                KeywordParameter::DashCost | KeywordParameter::DashKeyword
                             ) {
                                 Binding::Bound
                             } else {
@@ -850,35 +847,46 @@ impl Sources {
                         ));
                         parts.push(ParameterPart::Slot(match parameter {
                             KeywordParameter::DashCost => SlotKind::Cost,
-                            KeywordParameter::DashNonManaCost => SlotKind::NonManaCost,
                             KeywordParameter::DashCondition => SlotKind::Condition,
                             KeywordParameter::DashAbility => SlotKind::Ability,
                             KeywordParameter::DashPowerToughness => SlotKind::Measure,
                             _ => SlotKind::KeywordPhrase,
                         }));
-                        if matches!(parameter, KeywordParameter::DashNonManaCost) {
-                            parts.push(ParameterPart::Mark('.', Binding::Suffix));
-                        }
                     }
                 }
             }
-            // The kind of the final Keyword Parameter decides what may follow
-            // the keyword on its line: an em-dash cost ends in a period of its
-            // own and may be followed by an associated instruction; an
-            // em-dash ability runs to the end of the line.
-            // Only the kinds the grammar reads are projected.
+            // One final Cost has two spellings, selected by the cost's
+            // Category (style guide §3, "Periods" and "Em dashes"). Lower
+            // both to Productions so punctuation is derived, never retained
+            // in a Reading, and FinalParameter follows the selected spelling.
+            // A non-final Cost, as in prototype, remains a mana cost.
+            if matches!(parameters.last(), Some(KeywordParameter::Cost)) {
+                let mut verbal = parts.clone();
+                // Replace the final Cost slot, not its preceding parameters.
+                let cost = verbal.pop();
+                debug_assert!(matches!(cost, Some(ParameterPart::Slot(SlotKind::Cost))));
+                verbal.extend([
+                    ParameterPart::Mark('—', Binding::Bound),
+                    ParameterPart::Slot(SlotKind::NonManaCost),
+                    ParameterPart::Mark('.', Binding::Suffix),
+                    ParameterPart::Feature("FinalParameter".into(), "SetOffCost".into()),
+                ]);
+                parts.push(ParameterPart::Feature(
+                    "FinalParameter".into(),
+                    "Cost".into(),
+                ));
+                return vec![parts, verbal];
+            }
+            // Preserve the fixed set-off forms' existing line behavior.
             let kind = match parameters.last() {
-                Some(KeywordParameter::Cost) => Some("Cost"),
-                Some(KeywordParameter::DashCost | KeywordParameter::DashNonManaCost) => {
-                    Some("SetOffCost")
-                }
+                Some(KeywordParameter::DashCost) => Some("SetOffCost"),
                 Some(KeywordParameter::DashAbility) => Some("SetOffAbility"),
                 _ => None,
             };
             if let Some(kind) = kind {
                 parts.push(ParameterPart::Feature("FinalParameter".into(), kind.into()));
             }
-            parts
+            vec![parts]
         };
         for ability in &self.keyword_abilities {
             for (lemma, parameters) in std::iter::once((&ability.lemma, &ability.parameters))
@@ -887,7 +895,7 @@ impl Sources {
                 let patterns = if parameters.is_empty() {
                     vec![vec![ParameterPart::Head]]
                 } else {
-                    parameters.iter().map(|p| convert(p)).collect()
+                    parameters.iter().flat_map(|p| convert(p)).collect()
                 };
                 frames
                     .parameters

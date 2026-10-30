@@ -105,9 +105,33 @@ fn new_catalog_keyword_parameters_need_no_grammar_change() {
     let shortened = deckmaste_lexical_source::AttestedShortenings::load().unwrap();
     let env = sources.environment(&names, &shortened).unwrap();
     let grammar = deckmaste_english::bind(&env.lexicon, &env.frames).unwrap();
-    let parse = grammar.parse(&env.lexicon, "Testkeyword 2 {W}{U}");
-    assert!(parse.derivation_count() > 0);
-    parse.verify_realization(&env.lexicon).unwrap();
+    for (text, final_parameter) in [
+        ("Testkeyword 2 {W}{U}", "Cost"),
+        ("Testkeyword 2—Pay 3 life.", "SetOffCost"),
+        ("Testkeyword 2—{W}{U}, Pay 3 life.", "SetOffCost"),
+    ] {
+        let document = grammar.parse(&env.lexicon, text);
+        assert!(document.derivation_count() > 0, "{text}");
+        document.verify_realization(&env.lexicon).unwrap();
+        let analyzed = env.lexicon.analyze(text);
+        let parse = grammar
+            .parse_category(&analyzed, "KeywordParameters")
+            .unwrap();
+        assert!(parse.derivation_count() > 0, "{text}");
+        parse.verify_realization(&env.lexicon).unwrap();
+        for reading in parse.readings() {
+            let Reading::Node(node) = &reading else {
+                panic!("expected keyword parameters");
+            };
+            assert_eq!(
+                node.features.get("FinalParameter").map(dpsi::Ident::as_str),
+                Some(final_parameter),
+                "{text}"
+            );
+            assert_eq!(grammar.realize(&reading, &env.lexicon).unwrap(), text);
+            assert!(parse.contains(&reading));
+        }
+    }
     assert_eq!(
         grammar
             .parse(&env.lexicon, "Testkeyword {W}")
