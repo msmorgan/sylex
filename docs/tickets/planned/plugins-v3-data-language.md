@@ -1,10 +1,11 @@
 ---
-needs: [lean-generated-canon-modules, lean-elaborated-value-dump, plugins-v3-first-order-templates]
+needs: [lean-generated-canon-modules, lean-elaborated-value-dump, plugins-v3-first-order-templates, plugins-v3-syl-surface-syntax]
 ---
-# [design] `plugins_v3` as a data language whose files are their own AST
+# `plugins_v3` as a `.syl` data language whose files are their own AST
 
-Standard constraints apply. This ticket needs a design dialogue and an amendment to
-`docs/decisions/semantics-v3.md` before implementation.
+Standard constraints apply. The abstract model and dispatch rules are settled below and recorded in
+`docs/decisions/semantics-v3.md` §§4.4–4.5; `plugins-v3-syl-surface-syntax` settles the concrete
+surface punctuation before implementation.
 
 ## Why
 
@@ -18,65 +19,85 @@ testing the policing.
 `plugins_v2` was a data language, and its files were practically their own AST. Return to that
 simplicity.
 
-## Settled (owner, 2026-10-28)
+## Settled (owner, 2026-10-28..2026-10-30)
 
 - **Lean is a workbench and verifier, never in the hot path of card compilation.** The Rust
   pipeline must parse the DSL itself. It is being rewritten as `semantics` (parser and AST),
   `discourse` (DRT referent resolution, in Rust) and `lowering` (to core); see
   `semantics-rust-rewrite`.
-- **Mentions follow constructor order.** Whether an occurrence is a first or later mention is
+- **Host and `.syl` file extension (Q1).** `plugins_v3` files are standalone `.syl` data files
+  (`plugins_v3/**/*.syl`), not Lean source files. They are parsed natively by Rust (`semantics`)
+  and by the Lake generator in `lean/lakefile.lean`, which emits gitignored `.lean` modules under
+  `lean/.lake/build/gen/` containing plain Lean `def`s. Zero custom Lean `term_elab` hooks or
+  authoring macros remain. One grammar specification in `docs/decisions/semantics-v3.md` §4.4
+  governs both parsers; `plugins-v3-syl-surface-syntax` settles its concrete tokens.
+- **Mentions follow constructor order (Q4).** Whether an occurrence is a first or later mention is
   decided in the order the constructor arguments it reaches are read, after expansion. A
   declaration's parameter order carries no meaning, so primitive and Template signatures may
   follow the printed phrase. This replaces the parameter-order rule in §4.5, which 12 primitives
   violate.
 - **No evaluation in plugin files.** No higher-order parameters, `match`, `if`, `fun`, or
-  `List`/`Option` functions; `plugins-v3-first-order-templates` removes the existing sites
-  (including `chooseModesOver`, `splice` and `CallerSplice`) before the conversion, along with
-  `have`, tuples and `⟨…⟩`. The grammar has no local bindings and no bottom-up type inference.
+  `List`/`Option` functions; `plugins-v3-first-order-templates` removed the existing sites
+  (including `chooseModesOver`, `splice` and `CallerSplice`), along with `have`, tuples and `⟨…⟩`.
+  The grammar has no local bindings and no bottom-up type inference.
+- **Abstract grammar, no coercions, no domain lists, no leading dots (Q2).**
+  - The 5 expression productions are:
+    1. literals (string `"..."`, integer, `true`/`false`);
+    2. list literals (`[...]`, which are only ever `List T` at expected sort `List T`);
+    3. record blocks;
+    4. calls with positional and named arguments;
+    5. bare words (0-argument identifiers).
+  - **All 12 expression-level `Coe` coercions are deleted** (`actor`, `hasSubtype`, `perform`,
+    `mana`, `written`, `printedKind`, `printedName`, `holds`, `static`, `span`, `mode`,
+    `Characteristics → CharacteristicBundle`). Every wrapper is written explicitly in `.syl`.
+  - **All 5 domain-list coercions are deleted** (`sequentially`, `and`, `conjunction`, `compound`
+    and `mana` are always written explicitly; `[...]` is only `List T`).
+  - **No leading dots** (`.foo` becomes bare `foo`), and **no polymorphic `{α : Type}` binders**
+    (`plugins_v3/builtin/templates/noun/bracketed.lean` is deleted).
+- **Deterministic `O(1)` dispatch and `Option` auto-wrapping (Q3).**
+  - Every node is resolved top-down by `(bare_name, expected_sort)` with zero backtracking, in
+    priority order:
+    1. parameter of the enclosing declaration (0 args; declared sort `T`, or `U` when
+       `T = Option U`);
+    2. `none` when `T = Option U`;
+    3. declaration `(head, T)` (or `(head, U)` when `T = Option U`);
+    4. constructor / closed enum word of `T` (or `U` when `T = Option U`).
+  - **`Option U` auto-wrapping:** Presence of a `U` wraps in `some`; omission of an optional
+    argument or optional record field is `none`; `none` remains available as an explicit default or
+    argument; `some` is never written.
+  - **Direct sort atoms:** integer literals at `Nat`, `Int`, `Amount` (`Amount.lit n`) and
+    `ManaSymbol` (`generic n`); color words (`white`, `blue`, `black`, `red`, `green`) at `Color`,
+    `ColorOrColorless` and `ManaSymbol`; `keyword` definition names at `Ability`, `KeywordLabel`
+    and `KeywordTerm`; `action` definition names at `Action` and `Deed`.
+  - Folds in `lean-v3-overloaded-primitive-typeclasses` and `plugins-v3-authoring-loose-ends`
+    item 4: all `Has*` typeclasses and all qualified names are deleted.
+- **Expansion (Q4).** Templates expand to constructor trees by first-order substitution, and
+  Definitions (`action`, `keyword`) expand to `ownScope` with `inCaller` on caller-supplied
+  `NounPhrase` arguments. First and later mentions are inserted after expansion by a single
+  pre-order left-to-right walk over the constructor tree.
+- **`Authoring.Form` is deleted (Q5).** Delete `Authoring.Form`, `Authoring.inspect`,
+  `onlyAuthored`, and `plugins_v3/builtin/templates/noun/bracketed.lean` (along with the
+  `bracketed` pins in `Proofs/TextChanges.lean`, until cleave is redesigned across English and
+  semantics). Rewrite `untapStepCardsUseUntapDuring` in `Proofs/UntapStep.lean` to assert on the
+  expanded `.card` AST directly.
+- **The dependency graph and builtin modules (Q6).** Do not do file discovery or dependency
+  sorting inside a Lean elaborator.
+  - The Lake generator from `lean-generated-canon-modules` (a `lakefile.lean` target behind the
+    `Module.inputFacet` override, ending with `setTrace .nil`) parses `plugins_v3/builtin/**/*.syl`
+    and `plugins_v3/canon/**/*.syl` in the `.syl` grammar. It writes gitignored Lean modules with
+    real `import`s.
+  - One module per component makes module names change as the builtin changes. That also requires
+    overriding `LeanLib.modulesFacet`, so the library awaits the generator before listing its
+    modules. Add a case for it to the generator's regression test.
+  - Each strongly connected component of the possibly over-approximate dependency graph becomes
+    one module, so a false edge only merges two modules instead of failing.
+  - Delete `load_bundle`, `topoSortBundle`, `referencedIdents`, the directory walk and the
+    `builtinBundle` input. Lake then builds the builtin in parallel and rebuilds only the
+    dependents of an edited declaration.
+  - The `exileZone` (`zone .exile none`) and `devourEntry` (`Action.devour`) workarounds disappear,
+    and no qualification is ever needed.
 - **The existing definitions are converted by script**: a purpose-built script, or a final
   emitter run from the current `deckmaste_semantics_v3`. They are not converted by hand.
-
-## Questions for the design dialogue
-
-1. **Host.** Is the data language still parsed by Lean at all, as a closed `declare_syntax_cat`
-   grammar, or is it a standalone format? A standalone format would be parsed natively by Rust and
-   loaded into Lean through a generated or `load_bundle` step. Either way, one grammar document is
-   the spec for both parsers.
-2. **Grammar.** The productions are:
-   - calls with positional and named arguments;
-   - literals;
-   - domain lists;
-   - record blocks;
-   - closed enum words;
-   - the existing domain coercions.
-
-   Settle which productions exist, and how a bare word, a declaration call and a parameter are
-   told apart without Lean's term elaborator.
-3. **Dispatch.** A name is resolved by its bare name together with the expected sort. Settle how
-   that works, how `Option` unwraps, and how list literals map per sort.
-   `lean-v3-overloaded-primitive-typeclasses` and `plugins-v3-authoring-loose-ends` item 4 are
-   folded in here.
-4. **Expansion.** Templates expand to constructor trees, and Definitions (`action`, `keyword`)
-   expand to `ownScope` with `inCaller`. First and later mentions are inserted after expansion,
-   following the ruling above.
-5. **What replaces `Authoring.Form`.** Only Lean self-tests use it; Rust has no use for it. Either
-   build it from the parsed tree for the two call-tree pins (`Proofs/TextChanges.lean`,
-   `Proofs/UntapStep.lean`), or retire those pins in favour of tests on the parse tree.
-6. **The dependency graph and builtin modules.** Do not do file discovery or dependency
-   sorting inside a Lean elaborator.
-   - The Lake generator from `lean-generated-canon-modules` (a `lakefile.lean` target behind the
-     `Module.inputFacet` override, ending with `setTrace .nil`) parses the builtin in the new
-     grammar. It writes gitignored Lean modules with real `import`s.
-   - One module per component makes module names change as the builtin changes. That also
-     requires overriding `LeanLib.modulesFacet`, so the library awaits the generator before
-     listing its modules. Add a case for it to the generator's regression test.
-   - Each strongly connected component of the possibly over-approximate dependency graph becomes
-     one module, so a false edge only merges two modules instead of failing.
-   - Delete `load_bundle`, `topoSortBundle`, `referencedIdents`, the directory walk and the
-     `builtinBundle` input. Lake then builds the builtin in parallel and rebuilds only the
-     dependents of an edited declaration.
-   - The `exileZone` (`zone .exile none`) and `devourEntry` (`Action.devour`) workarounds
-     disappear, and no qualification is ever needed.
 
 ## Implementation, once settled
 
