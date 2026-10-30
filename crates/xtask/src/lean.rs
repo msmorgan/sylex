@@ -24,13 +24,15 @@ enum LeanCmd {
 
 /// Every library in `lean/lakefile.lean`. The default target is only the fast loop, so the gate
 /// names them all.
-const LIBRARIES: [&str; 6] = [
+const LIBRARIES: [&str; 8] = [
     "Semantics",
     "SemanticsDefinitions",
     "SemanticsCheckBuiltin",
     "SemanticsCardsData",
     "SemanticsCards",
     "SemanticsProofs",
+    "SylFixtures",
+    "SylFixturePins",
 ];
 
 pub fn run(args: &LeanArgs) -> anyhow::Result<()> {
@@ -137,6 +139,61 @@ mod generation {
             fixtures.contains("card := 1 * 1"),
             "lake setup-file {PROOF} did not regenerate Semantics/Cards/Data/Fixtures.lean"
         );
+        changing_module_set(lake, &package)?;
+        Ok(())
+    }
+
+    fn changing_module_set(lake: &dyn Fn() -> Command, package: &Path) -> anyhow::Result<()> {
+        // Exercise the production modules-facet override with a library whose glob changes.
+        // The small generator isolates Lake ordering from semantic compilation costs.
+        let config = package.join("lakefile.lean");
+        let mut source = std::fs::read_to_string(&config)?;
+        source.push_str(
+            r#"
+
+target genChanging pkg : Unit := Job.async do
+  let name := (← IO.FS.readFile (pkg.dir / "module-name")).trimAscii.toString
+  let dir := pkg.dir / ".lake/build/gen/Changing"
+  IO.FS.createDirAll dir
+  for entry in ← dir.readDir do
+    if entry.fileName != name ++ ".lean" then IO.FS.removeFile entry.path
+  writeIfChanged (dir / (name ++ ".lean")) ("def " ++ name ++ " : Nat := 1\n")
+  setTrace .nil
+
+lean_lib Changing where
+  srcDir := ".lake/build/gen"
+  roots := #[`Changing]
+  globs := #[.submodules `Changing]
+  needs := #[genChanging]
+"#,
+        );
+        std::fs::write(&config, source)?;
+        for name in ["AddedFirst", "AddedSecond"] {
+            std::fs::write(package.join("module-name"), name)?;
+            let output = lake()
+                .current_dir(package)
+                .args(["build", "-q", "Changing"])
+                .output()
+                .context("building a changing generated-module set")?;
+            anyhow::ensure!(
+                output.status.success(),
+                "changing generated-module set failed: {}{}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+            anyhow::ensure!(
+                package
+                    .join(format!(".lake/build/lib/lean/Changing/{name}.olean"))
+                    .exists(),
+                "new generated module {name} was not built"
+            );
+        }
+        anyhow::ensure!(
+            !package
+                .join(".lake/build/gen/Changing/AddedFirst.lean")
+                .exists(),
+            "removed generated module remained in the source set"
+        );
         Ok(())
     }
 
@@ -230,7 +287,7 @@ mod tests {
         stub(
             "test \"$PWD\" = \"$EXPECTED_WORKBENCH\" && test \"$*\" = \
              'build -q --wfail Semantics SemanticsDefinitions SemanticsCheckBuiltin \
-             SemanticsCardsData SemanticsCards SemanticsProofs'",
+             SemanticsCardsData SemanticsCards SemanticsProofs SylFixtures SylFixturePins'",
         )
         .unwrap();
     }

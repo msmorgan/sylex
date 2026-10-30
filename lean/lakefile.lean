@@ -185,3 +185,56 @@ lean_lib DumpValues where
 lean_exe dumpValues where
   root := `DumpValues.Main
   supportInterpreter := true
+
+lean_lib SylGenerator where
+  roots := #[`SylGen.Parser, `SylGen.Environment, `SylGen.Resolve, `SylGen.Emit]
+
+lean_exe sylGen where
+  root := `SylGen.Main
+  supportInterpreter := true
+
+lean_lib SylFixtureRegistry where
+  roots := #[`SylGen.Tests.Registry]
+
+input_dir sylCorpus where
+  path := "SylGen/Fixtures"
+  text := true
+
+target genSyl pkg : Unit := do
+  let some executable := pkg.findLeanExe? `sylGen | error "missing sylGen executable"
+  let some library := pkg.findLeanLib? `SylFixtureRegistry | error "missing fixture registry"
+  let exe ← executable.exe.fetch
+  let registry ← library.leanArts.fetch
+  let corpus ← sylCorpus.fetch
+  (exe.mix registry |>.mix corpus).mapM fun _ => do
+    let exe ← exe.await
+    let result ← IO.Process.output {
+      cmd := exe.toString
+      env := #[("LEAN_PATH", some (pkg.dir / ".lake/build/lib/lean").toString)]
+      args := #["--fixture", (pkg.dir / "SylGen/Fixtures").toString,
+        (pkg.dir / ".lake/build/gen").toString, "SylFixture"]
+    }
+    unless result.exitCode == 0 do error result.stderr
+    let tests ← IO.Process.output {
+      cmd := "sh"
+      args := #[(pkg.dir / "SylGen/Tests/negative.sh").toString, exe.toString]
+      env := #[("LEAN_PATH", some (pkg.dir / ".lake/build/lib/lean").toString)]
+    }
+    unless tests.exitCode == 0 do error (tests.stdout ++ tests.stderr)
+    setTrace .nil
+
+@[«library_facet»]
+def awaitNeedsBeforeModules : LibraryFacetDecl :=
+  .mk LeanLib.modulesFacet <| mkFacetJobConfig (buildable := false) fun lib => do
+    discard <| (← lib.extraDep.fetch).await
+    let some builtin := LeanLib.initFacetConfigs.get? LeanLib.modulesFacet
+      | error "missing builtin modules facet"
+    builtin.run lib
+
+lean_lib SylFixtures where
+  srcDir := ".lake/build/gen"
+  roots := #[`SylFixtures]
+  needs := #[genSyl]
+
+lean_lib SylFixturePins where
+  roots := #[`SylGen.Tests.Pins]
