@@ -23,6 +23,11 @@ pub fn extract_bracket_rules(text: &str) -> Vec<String> {
         if matches!(body.trim(), "..." | "…") {
             continue;
         }
+        // A body containing a quote is code that parses the format
+        // (`strip_prefix("[CR#")`), not a citation.
+        if body.contains('"') {
+            continue;
+        }
         for tok in body.split(',') {
             let tok = tok.trim();
             if let Some((a, b)) = tok.split_once("..") {
@@ -459,6 +464,13 @@ mod tests {
             extract_bracket_rules("no citations here"),
             [] as [std::string::String; 0]
         );
+    }
+
+    #[test]
+    fn brackets_in_parsing_code_are_ignored() {
+        let source = r#".strip_prefix("[CR#")
+            .and_then(|rest| rest.strip_suffix(']'))"#;
+        assert_eq!(extract_bracket_rules(source), [] as [std::string::String; 0]);
     }
 
     #[test]
