@@ -13,6 +13,21 @@ did.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a)
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.TokenSpec (written)
+
+open Semantics.Definitions.CardType (planeswalker)
+open Semantics.Templates.AbilityLost (written)
+open Semantics.Templates.Action (copy target)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.DetPhrase (a)
+open Semantics.Templates.NounWord (planeswalker)
+
 namespace Semantics.Cards
 
 /-- Display of Power: "this spell can't be copied". -/
@@ -22,7 +37,7 @@ theorem okDisplayOfPowerCopyLock : StaticSpec.check (DRS.ofList []) displayOfPow
 /-- Frontline Heroism -/
 def frontlineHeroismCopy : Ability :=
   whenever
-    (does you (cast (a (and [ isSpell,
+    (does (Semantics.Subject.actor you) (cast (a (and [ isSpell,
                  targeting (a (and [isCreature,
                    youControl]))
                    .soleTarget ]))))
@@ -45,7 +60,7 @@ theorem okFlawlessForgeryLine : Action.check (DRS.ofList []) flawlessForgeryLine
 
 /-- Echo Mage, level 4+ -/
 def echoMagesFourthLevel : Ability :=
-  activated (compound [[pip .blue, pip .blue], tapSymbol])
+  activated (compound [(Semantics.Cost.mana [pip .blue, pip .blue]), tapSymbol])
     (sequentially
       [ copyOnStack (target (and [isInstantOrSorcery, isSpell])) 2,
         may (chooseNewTargets (those .copy)) ])
@@ -53,7 +68,7 @@ theorem okEchoMagesFourthLevel : Ability.check (DRS.ofList []) echoMagesFourthLe
 
 /-- Mister Fantastic -/
 def misterFantasticCopy : Ability :=
-  activated (compound [[pip .red, pip .green, pip .white, pip .blue], tapSymbol])
+  activated (compound [(Semantics.Cost.mana [pip .red, pip .green, pip .white, pip .blue]), tapSymbol])
     (sequentially
       [ copyOnStack (target (and [abilityHead .anyTriggered, youControl])) 2,
         may (chooseNewTargets (those (.copied .ability))) ])
@@ -62,7 +77,7 @@ theorem okMisterFantasticCopy : Ability.check (DRS.ofList []) misterFantasticCop
 /-- Rowan's Talent -/
 def rowansTalentCopy : Ability :=
   whenever
-    (does you (activate (a (and [ abilityHead .loyalty,
+    (does (Semantics.Subject.actor you) (activate (a (and [ abilityHead .loyalty,
                  abilityOf (enchanted planeswalker) ]))))
     (sequentially
       [ copyOnStack (that .ability),

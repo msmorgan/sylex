@@ -18,6 +18,25 @@ the bench items beside them.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and or andOr did quality)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and or andOr)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.StaticSpec (replace)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.CardType (creature land)
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.Action (doIf replace target)
+open Semantics.Templates.Condition (and did or)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.NounPhrase (andOr)
+open Semantics.Templates.NounWord (creature land)
+open Semantics.Templates.QualityPayload (quality)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Cards
 
 def barrageOfBoulders : Action :=
@@ -40,15 +59,15 @@ def deadshot : Action :=
 theorem okDeadshot : Action.check (DRS.ofList []) deadshot = [] := by decide
 def immersturmSkullcairn : Ability :=
   activatedOnlyDuring
-    (compound [[generic 1, pip .black, pip .red, pip .red], tapSymbol,
-      (sacrifice thisLand)])
+    (compound [(Semantics.Cost.mana ([generic 1, pip .black, pip .red, pip .red])), tapSymbol,
+      (Semantics.Cost.perform ((sacrifice thisLand)))])
     (sequentially
       [ instruct this_ (dealDamage 3 (target isPlayer)),
         instruct (that .player) (discard (a (cardIn hand))) ])
     asSorcery
 theorem okImmersturmSkullcairn : Ability.check (DRS.ofList []) immersturmSkullcairn = [] := by decide
 def pyriteSpellbomb : Ability :=
-  activated (compound [[pip .red], sacrifice thisArtifact])
+  activated (compound [(Semantics.Cost.mana ([pip .red])), (Semantics.Cost.perform (sacrifice thisArtifact))])
     (instruct this_ (dealDamage 2 (target isAnyTarget)))
 theorem okPyriteSpellbomb : Ability.check (DRS.ofList []) pyriteSpellbomb = [] := by decide
 
@@ -103,11 +122,11 @@ theorem okUlvenwaldTracker : Action.check (DRS.ofList []) ulvenwaldTracker = [] 
 def botBashingTime : Action :=
   sequentially
     [ instruct this_ (dealDamage 6 (target isCreature)),
-      replaceEvent (would (that creature) die)
+      replaceEvent (would (Semantics.Subject.actor ((that creature))) die)
           (instead (exile it)) thisTurn ]
 theorem okBotBashingTime : Action.check (DRS.ofList []) botBashingTime = [] := by decide
 def wordsOfWar : Action :=
-  replaceNextEvent (would you (draw 1))
+  replaceNextEvent (would (Semantics.Subject.actor (you)) (draw 1))
       (instead (instruct this_ (dealDamage 2 (target isAnyTarget)))) thisTurn
 theorem okWordsOfWar : Action.check (DRS.ofList []) wordsOfWar = [] := by decide
 
@@ -121,27 +140,27 @@ theorem okIndestructibleAura : Action.check (DRS.ofList []) indestructibleAura =
 def shieldmatesBlessing : Action :=
   preventNext (target isAnyTarget) 3 thisTurn
 theorem okShieldmatesBlessing : Action.check (DRS.ofList []) shieldmatesBlessing = [] := by decide
-def moonlitWake : Ability := (match (cardNamed "Moonlit Wake") with
+def moonlitWake : Ability := (match (Semantics.Cards.«Moonlit Wake») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okMoonlitWake : Ability.check (DRS.ofList []) moonlitWake = [] := by decide
 def eliteJavelineer : Ability :=
-  whenever (does thisCreature block)
+  whenever (does (Semantics.Subject.actor (thisCreature)) block)
       (instruct this_
          (dealDamage 1 (target (and [isCreature, isAttacking]))))
 theorem okEliteJavelineer : Ability.check (DRS.ofList []) eliteJavelineer = [] := by decide
 /-- Glacial Chasm -/
 def glacialChasmShield : Ability :=
-  (match (cardNamed "Glacial Chasm") with
+  (match (Semantics.Cards.«Glacial Chasm») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons _ (List.cons part _)))) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okGlacialChasmShield : Ability.check (DRS.ofList []) glacialChasmShield = [] := by decide
 def corneredCrook : Ability :=
-  when (does thisCreature enter)
+  when (does (Semantics.Subject.actor (thisCreature)) enter)
     (offerWhen (sacrifice (a isArtifact)) (instruct this_ (dealDamage 3 (target
         isAnyTarget))))
 theorem okCorneredCrook : Ability.check (DRS.ofList []) corneredCrook = [] := by decide
@@ -152,17 +171,17 @@ def chandrasRevolution : Action :=
       skipUntap (that land) 1 ]
 theorem okChandrasRevolution : Action.check (DRS.ofList []) chandrasRevolution = [] := by decide
 def arbalestElite : Ability :=
-  activated (compound [[generic 2, pip .white], tapSymbol])
+  activated (compound [(Semantics.Cost.mana ([generic 2, pip .white])), tapSymbol])
     (sequentially
       [ instruct thisCreature (dealDamage 3 (target (and [isCreature, or [isAttacking, isBlocking]]))),
         skipUntap thisCreature 1 ])
 theorem okArbalestElite : Ability.check (DRS.ofList []) arbalestElite = [] := by decide
 def sizzlingBarrage : Action :=
   instruct this_ (dealDamage 4 (target
-    (and [isCreature, did which block soFarThisTurn])))
+    (and [isCreature, did (Semantics.Subject.actor (which)) block (Semantics.LookbackSpan.duration (soFarThisTurn) none)])))
 theorem okSizzlingBarrage : Action.check (DRS.ofList []) sizzlingBarrage = [] := by decide
 def goadedAttackTrigger : Ability :=
-  whenever (does (a (and [isCreature, hasDesignation goaded])) attack)
+  whenever (does ((Semantics.Subject.actor (a (and [isCreature, hasDesignation goaded])))) attack)
     (instruct it (dealDamage 1 (controllerOf it)))
 theorem okGoadedAttackTrigger : Ability.check (DRS.ofList []) goadedAttackTrigger = [] := by decide
 
@@ -193,7 +212,7 @@ def firesongJoinEcho : Action :=
 theorem okFiresongJoinEcho : Action.check (DRS.ofList []) firesongJoinEcho = [] := by decide
 
 def glarecasterShield : Ability :=
-  activated [generic 5, pip .white]
+  activated (Semantics.Cost.mana ([generic 5, pip .white]))
     (establishThroughout
       (replace (would any (dealDamage anyAmount (andOr [thisCreature, you])))
         (instead (redirectDamage allDamage (target isAnyTarget))) (use := .nextTimeOnly))
@@ -205,7 +224,7 @@ def saheeliRaiPlusOne : Action :=
 theorem okSaheeliRaiPlusOne : Action.check (DRS.ofList []) saheeliRaiPlusOne = [] := by decide
 def sarkhansUnsealingLine : Ability :=
   whenever
-    (does you (cast (a (and [isCreature, isSpell,
+    (does (Semantics.Subject.actor (you)) (cast (a (and [isCreature, isSpell,
                 or [ hasPower .eq 4, hasPower .eq 5,
                       hasPower .eq 6 ]]))))
     (instruct thisEnchantment (dealDamage 4 (target isAnyTarget)))
@@ -231,9 +250,9 @@ theorem okFuriousReprisal : Action.check (DRS.ofList []) furiousReprisal = [] :=
 /-- Bullseye, Death Dealer -/
 def bullseyeModalCost : Ability :=
   activated
-    (compound [[generic 3], tapSymbol,
-      (chooseOne (sacrifice (a isArtifact))
-                 (discard (a (and [non isLand, in_ yourHand]))))])
+    (compound [(Semantics.Cost.mana ([generic 3])), tapSymbol,
+      (Semantics.Cost.perform ((chooseOne (sacrifice (a isArtifact))
+                 (discard (a (and [non isLand, in_ yourHand]))))))])
     (instruct this_ (dealDamage 2 (target isAnyTarget)))
 theorem okBullseyeModalCost : Ability.check (DRS.ofList []) bullseyeModalCost = [] := by decide
 
@@ -248,14 +267,14 @@ def quakebringerDamage : Ability :=
     (at_ (beginningOfYour .upkeep) (instruct this_ (dealDamage 2 eachOpponent)))
     (guard := some (or [ is this_ (in_ battlefield),
            and [ is this_ (cardIn yourGraveyard),
-                  exists_ (and [isCreature, giant,
+                  exists_ (and [isCreature, (Semantics.Predicate.hasSubtype (giant)),
                                  youControl]) ] ]))
 theorem okQuakebringerDamage : Ability.check (DRS.ofList []) quakebringerDamage = [] := by decide
 /-- Sand Strangler -/
 def sandStranglerDamage : Ability :=
-  when (does thisCreature enter)
-    (if_ := some (or [ exists_ (and [isLand, desert, youControl]),
-           exists_ (and [isLand, desert, in_ yourGraveyard]) ]))
+  when (does (Semantics.Subject.actor (thisCreature)) enter)
+    (if_ := some (or [ exists_ (and [isLand, (Semantics.Predicate.hasSubtype (desert)), youControl]),
+           exists_ (and [isLand, (Semantics.Predicate.hasSubtype (desert)), in_ yourGraveyard]) ]))
     (may (instruct this_ (dealDamage 3 (target isCreature))))
 theorem okSandStranglerDamage : Ability.check (DRS.ofList []) sandStranglerDamage = [] := by decide
 
@@ -393,7 +412,7 @@ def searingBlaze : Ability :=
                                    (and
                                       [isCreature, controlledBy
                                          splitOverPlaneswalker])) ]))
-        (doIf (did (a (and [isLand, youControl])) enter soFarThisTurn)
+        (doIf (did ((Semantics.Subject.actor (a (and [isLand, youControl])))) enter (Semantics.LookbackSpan.duration (soFarThisTurn) none))
           (instead
             (instruct this_ (simultaneously
               [ dealDamage 3 thatJoin,
@@ -403,7 +422,7 @@ theorem okSearingBlaze : Ability.check (DRS.ofList []) searingBlaze = [] := by d
 /-- Explosive Prodigy -/
 def explosiveProdigyTrigger : Ability :=
   vivid
-    (when (does thisCreature enter)
+    (when (does (Semantics.Subject.actor (thisCreature)) enter)
       (sequentially
         [ instruct it
             (dealDamage (letter .x) (target (and [isCreature, anOpponentControls]))),
@@ -411,7 +430,7 @@ def explosiveProdigyTrigger : Ability :=
 theorem okExplosiveProdigyTrigger : Ability.check (DRS.ofList []) explosiveProdigyTrigger = [] := by decide
 /-- Niv-Mizzet, Guildpact -/
 def nivMizzetGuildpactTrigger : Ability :=
-  whenever (does thisCreature (dealDamage (recipient := a isPlayer) (kind := some .combat)))
+  whenever (does (Semantics.Subject.actor (thisCreature)) (dealDamage (recipient := a isPlayer) (kind := some .combat)))
     (sequentially
       [ instruct thisCreature (dealDamage (letter .x) (target isAnyTarget)),
         instruct (target isPlayer) (draw (letter .x)),
@@ -440,12 +459,12 @@ theorem okCracklingDoom : Action.check (DRS.ofList []) cracklingDoom = [] := by 
 def theFallen : Ability :=
   at_ (beginningOfYour .upkeep)
     (instruct thisCreature (dealDamage 1 (each (and [or [isOpponent, isPlaneswalker],
-                   did thisCreature (dealDamage anyAmount which) thisGame]))))
+                   did (Semantics.Subject.actor (thisCreature)) (dealDamage anyAmount which) (Semantics.LookbackSpan.duration (thisGame) none)]))))
 theorem okTheFallen : Ability.check (DRS.ofList []) theFallen = [] := by decide
 /-- Cavalcade of Calamity -/
 def cavalcadeOfCalamity : Ability :=
   whenever
-    (does (a (and [isCreature, youControl, hasPower .atMost 1])) attack)
+    (does ((Semantics.Subject.actor (a (and [isCreature, youControl, hasPower .atMost 1])))) attack)
     (instruct thisEnchantment (dealDamage 1 (the (and [or [isPlayer, isPlaneswalker],
                   inCombat .attackedBy (that creature)]))))
 theorem okCavalcadeOfCalamity : Ability.check (DRS.ofList []) cavalcadeOfCalamity = [] := by decide
@@ -467,13 +486,13 @@ theorem okCryOfContrition : Action.check (DRS.ofList []) cryOfContrition = [] :=
 def cyclingCost : Action := discard this_
 theorem okCyclingCost : Action.check (DRS.ofList []) cyclingCost = [] := by decide
 def raiseTheAlarm : Action :=
-  create 2 (creatureToken 1 1 [.white] [soldier])
+  create 2 (Semantics.TokenSpec.written ((creatureToken 1 1 [.white] [soldier])))
 theorem okRaiseTheAlarm : Action.check (DRS.ofList []) raiseTheAlarm = [] := by decide
 def actOfTreason : Action := gainControl (target isCreature) untilEndOfTurn (controller :=
     you)
 theorem okActOfTreason : Action.check (DRS.ofList []) actOfTreason = [] := by decide
 def wordsOfWorship : Action :=
-  replaceNextEvent (would you (draw 1)) (instead (gainLife 5)) thisTurn
+  replaceNextEvent (would (Semantics.Subject.actor (you)) (draw 1)) (instead (gainLife 5)) thisTurn
 theorem okWordsOfWorship : Action.check (DRS.ofList []) wordsOfWorship = [] := by decide
 def theLastRoninII : Action :=
   triggerReflexively (mill 4)

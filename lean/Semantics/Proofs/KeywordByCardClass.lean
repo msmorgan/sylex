@@ -16,6 +16,20 @@ context the abilities before it leave, and no ability is checked against the car
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (the)
+open Semantics.Templates.Predicate (and not)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Location (and not)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Timing (not)
+
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and not)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (the)
+
 namespace Semantics.Proofs.KeywordByCardClass
 
 /-- A single-faced card with power and toughness on a creature. -/

@@ -12,6 +12,19 @@ composite pin per checker slice. Each pin is closed by `decide`.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a)
+open Semantics.Templates.Predicate (and or)
+open Semantics.Templates.Location (and or)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.StaticSpec (replace)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.Action (replace target)
+open Semantics.Templates.Condition (and or)
+open Semantics.Templates.DetPhrase (a)
+open Semantics.Templates.NounWord (creature)
+
 namespace Semantics.Proofs.CheckerCore
 
 private def targetCreature : NounPhrase := target isCreature
@@ -125,10 +138,10 @@ theorem pronoun_and_demonstrative_split :
 def kalitasReplacement : Ability :=
   static
     (replace
-      (would (a (and [non isToken, isCreature, anOpponentControls])) die)
+      (would (.actor (a (and [non isToken, isCreature, anOpponentControls]))) die)
       (instead (sequentially
         [ exile (that creature),
-          create 1 (creatureToken 2 2 [.black] [zombie]) ])))
+          create 1 (Semantics.TokenSpec.written (creatureToken 2 2 [.black] [zombie])) ])))
 
 theorem kalitas_replacement_sound :
     kalitasReplacement.check = [] := by decide
@@ -155,7 +168,7 @@ theorem own_scope_action_event_head_admitted :
 /-- Slice A pin (*Weeping Angel*-style combat trigger + attachment/status):
 `"Whenever a creature attacks you, tap it and attach target Equipment to that creature."` -/
 def weepingAngelCombatPin : Ability :=
-  whenever (does aCreature (attack (some you)))
+  whenever (does (Semantics.Subject.actor aCreature) (attack (some you)))
     (sequentially
       [ tap it,
         attachTo (target (hasSubtype equipment)) (that creature) ])

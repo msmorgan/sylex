@@ -4,6 +4,21 @@ import Semantics.Proofs.Helpers
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a counted the)
+open Semantics.Templates.Predicate (and or not)
+open Semantics.Templates.Location (and or not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.WouldClause (nthOccurrence)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.StaticSpec (replace)
+
+open Semantics.Templates.Action (replace target)
+open Semantics.Templates.Condition (and not or)
+open Semantics.Templates.CreationSpec (token)
+open Semantics.Templates.DetPhrase (a the)
+open Semantics.Templates.GameEvent (nthOccurrence)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.EventPatterns
 
 theorem unrestrictedDamageEventIsWellFormed :
@@ -115,7 +130,7 @@ theorem entryAndAttachmentChoicesCheckTheirDomain :
   decide
 
 theorem deathPublishesArrival :
-    nounZone (GameEvent.extend (DRS.ofList []) (does (a isCreature) die)) it =
+    nounZone (GameEvent.extend (DRS.ofList []) (does ((Semantics.Subject.actor (a isCreature))) die)) it =
       some .graveyard := by decide
 
 theorem deathInterceptionKeepsDeparture :
@@ -124,7 +139,7 @@ theorem deathInterceptionKeepsDeparture :
       some .battlefield := by decide
 
 theorem unknownDepartureCanBeConstrained :
-    GameEvent.check (DRS.ofList []) (does (a .isCard) die) = [] := by decide
+    GameEvent.check (DRS.ofList []) (does ((Semantics.Subject.actor (a .isCard))) die) = [] := by decide
 
 theorem excludingOnePlayersZoneDoesNotExcludeEveryPlayersZone :
     GameEvent.check (DRS.ofList [])
@@ -275,7 +290,7 @@ theorem controlChangeIsOnlyAPattern :
       GameEvent.check (DRS.ofList [])
         (.does (.actor anOpponent) (gainControlOf (a isPermanent) (some you))) = [] ∧
       StaticSpec.check (DRS.ofList [])
-        (cant (bare (and [isPlayer, isOther])) (gainControlOf thisCreature)) = [] := by decide
+        (cant (Semantics.Subject.actor (bare (and [isPlayer, isOther]))) (gainControlOf thisCreature)) = [] := by decide
 
 /-- The player control is taken from is a player. -/
 theorem controlIsTakenFromAPlayer :
@@ -332,13 +347,13 @@ theorem eventOrdinalPeriodIsSpelledOnce :
           (some (.part .turn))) =
       [.eventOrdinalPeriod (.part .turn)] ∧
     GameEvent.check (DRS.ofList [])
-        (nthOccurrence (.nth 2) (does anOpponent (cast (a isSpell))) (some .thisObject)) =
+        (nthOccurrence (.nth 2) (does (Semantics.Subject.actor anOpponent) (cast (a isSpell))) (some .thisObject)) =
       [.eventOrdinalPeriod .thisObject] ∧
     GameEvent.check (DRS.ofList [])
-        (nthOccurrence (.nth 0) (does anOpponent (cast (a isSpell))) (some .turn)) =
+        (nthOccurrence (.nth 0) (does (Semantics.Subject.actor anOpponent) (cast (a isSpell))) (some .turn)) =
       [.ordinalNonZero] ∧
     GameEvent.check (DRS.ofList [])
-        (nthOccurrence (.nth 2) (does anOpponent (cast (a isSpell))) (some (.part .upkeep))) =
+        (nthOccurrence (.nth 2) (does (Semantics.Subject.actor anOpponent) (cast (a isSpell))) (some (.part .upkeep))) =
       [] := by decide
 
 /-- The primary event followed by the alternatives of a keyword's triggered abilities. -/
@@ -353,7 +368,7 @@ private def keywordTriggerEvents : Ability → List GameEvent
 Blocked status event, `combat … (.participation (.blocked true))` [CR#509.1h,509.3c]. -/
 theorem becomesBlockedIsTheStatusEvent :
     keywordTriggerEvents (bushido 2) =
-      [.does thisCreature (.block .any),
+      [.does (Semantics.Subject.actor thisCreature) (.block .any),
        .does .any (.combat thisCreature (.participation (.blocked true)))] := by rfl
 
 /-- "Becomes blocked by a creature" stays a block with a `by` subject [CR#509.3d]. -/

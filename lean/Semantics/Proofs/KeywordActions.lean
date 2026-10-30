@@ -12,6 +12,13 @@ cost whose generic mana tapping can pay, a rules procedure carried out during re
 named emblem. Each keyword action's Definition checks clean, and each shape has a refusal pin.
 -/
 
+open Semantics.Templates.NounPhrase (a)
+open Semantics.Templates.ManaSymbol (generic)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a)
+
 namespace Semantics.Proofs.KeywordActions
 
 /-- "Collect evidence 3" [CR#701.59a]. -/

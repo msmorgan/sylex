@@ -1,6 +1,18 @@
 import Semantics.Definitions
 import Semantics.Check.Phrase
 
+open Semantics.Templates.NounPhrase (a each the)
+open Semantics.Templates.Predicate (and did was)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.CardType (artifact creature)
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.Condition (and did was)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.NounWord (artifact creature)
+
 namespace Semantics.Proofs.Lookback
 
 open Semantics Semantics.Templates Semantics.Definitions
@@ -144,7 +156,7 @@ theorem castCanCarryExcludedOrigins :
 theorem shuffledGraveyardNamesNoShuffle :
     relativeCheckAfter shuffle .player
       { subj := .actor .which
-        action := .ownScope (some shuffle) (.shuffle (.zone .graveyard (some .you)))
+        action := .ownScope (some shuffle.deed) (.shuffle (.zone .graveyard (some .you)))
         within := some .thisWay } = [.shuffleZone] := by decide
 
 /-- A face-down pile of exiled cards can be shuffled [CR#701.24a]: "Shuffle the exiled cards"
@@ -211,13 +223,13 @@ its duration span. -/
 /-- Foundry Inspector: "Artifact spells you cast cost {1} less to cast." -/
 theorem okArtifactSpellsYouCastReadsItsOwnCasting :
     NounPhrase.check (DRS.ofList [])
-      (allOf (and [isArtifact, isSpell, did you (cast which) thisObject])) = [] := by decide
+      (allOf (and [isArtifact, isSpell, did (Semantics.Subject.actor (you)) (cast which) thisObject])) = [] := by decide
 
 /-- Coal Stoker: "When this creature enters, if you cast it from your hand, …" -/
 theorem okCastItFromYourHandReadsItsOwnCasting :
     Ability.check (DRS.ofList [])
-      (when (does thisCreature enter)
-        (if_ := is it (did you (cast which (from_ := yourHand)) thisObject)) (draw 1)) = [] := by
+      (when (does (Semantics.Subject.actor thisCreature) enter)
+        (if_ := is it (did (Semantics.Subject.actor you) (cast which (from_ := yourHand)) thisObject)) (draw 1)) = [] := by
   decide
 
 /-- Rootcoil Creeper: "Spend this mana only to cast a spell from your graveyard." -/
@@ -231,7 +243,7 @@ theorem okSpendOnlyToCastFromYourGraveyard :
 /-- With no span written, "artifact spells you cast" is an attributive participle, which only a
 Participial Description reads. -/
 theorem badBareDidCastIsParticipial :
-    NounPhrase.check (DRS.ofList []) (allOf (and [isArtifact, isSpell, did you (cast which)])) =
+    NounPhrase.check (DRS.ofList []) (allOf (and [isArtifact, isSpell, did (Semantics.Subject.actor (you)) (cast which)])) =
       [.participialDescription (.deed (.action "cast")) 0] := by decide
 
 /-- A `thisObject` lookback anchors no Participial Description, is no unanchored lookback, and,
@@ -244,9 +256,9 @@ theorem okThisObjectPassesTheLookbackChecks :
         (target (and [isSpell, did any (cast which (from_ := graveyard)) thisObject])) = [] ∧
       NounPhrase.check (DRS.ofList [])
         (the (and [isSpell,
-          did you (cast which) thisObject (ordinal := some ⟨.nth 2, some .turn⟩)])) = [] ∧
+          did (Semantics.Subject.actor (you)) (cast which) thisObject (ordinal := some ⟨.nth 2, some .turn⟩)])) = [] ∧
       NounPhrase.check (DRS.ofList [])
-        (the (and [isSpell, did you (cast which) thisObject])) = [.uniquifying] := by decide
+        (the (and [isSpell, did (Semantics.Subject.actor (you)) (cast which) thisObject])) = [.uniquifying] := by decide
 
 /-! ## Unwritten spans
 
@@ -303,7 +315,7 @@ theorem participialDescriptionWithoutItsDeedRefused :
 sacrificed a permanent this way" describes players. -/
 theorem subjectRelativeClauseAnchorsNoDescription :
     (Predicate.participialAnchor?
-      (and [isPlayer, did which (sacrifice (a isPermanent)) thisWay])).isNone = true := by
+      (and [isPlayer, did (Semantics.Subject.actor (which)) (sacrifice (a isPermanent)) thisWay])).isNone = true := by
   decide
 
 /-! ## Participial groups
@@ -318,7 +330,7 @@ theorem okEachLandCardExiledThisWay :
       (sequentially
         [ exile (topSlice (letter .x)),
           doForEach (each (and [isLand, isCard, was (exile which) thisWay]))
-            (create 1 treasureToken) ]) = [] := by
+            (create 1 (Semantics.TokenSpec.written treasureToken)) ]) = [] := by
   decide
 
 /-- Rally the Horde: "Exile the top card of your library. Exile the top card of your library.
@@ -329,7 +341,7 @@ theorem okEachCardOfSeveralExiles :
       (sequentially
         [ exile (topSlice 1), exile (topSlice 1), exile (topSlice 1),
           doForEach (each (and [non isLand, isCard, was (exile which) thisWay]))
-            (create 1 (creatureToken 1 1 [.red] [warrior])) ]) = [] := by
+            (create 1 (Semantics.TokenSpec.written (creatureToken 1 1 [.red] [warrior]))) ]) = [] := by
   decide
 
 /-- Sinister Concierge: "When this creature dies, you may exile it and put three time counters on
@@ -340,17 +352,17 @@ description reads both exiled cards (owner ruling 2026-10-22). A singular "the" 
 and is refused. (Granting a bare "suspend" has no Definition, so the pin reads the group with
 another body.) -/
 private def sinisterConcierge (rest : Action) : Ability :=
-  when (does thisCreature die)
+  when (does (Semantics.Subject.actor thisCreature) die)
     (sequentially
-      [ may (sequentially [exile it, putCounters 3 timeCounter it])
+      [ may (sequentially [exile it, putCounters 3 (Semantics.CounterKindSource.printed timeCounter) it])
           (some (sequentially
-            [exile (targets (upTo 1) isCreature), putCounters 3 timeCounter it])),
+            [exile (targets (upTo 1) isCreature), putCounters 3 (Semantics.CounterKindSource.printed timeCounter) it])),
         rest ])
 
 theorem eachCardExiledThisWayReadsEveryExile :
     Ability.check (DRS.ofList [])
       (sinisterConcierge (doForEach (each (and [isCard, was (exile which) thisWay]))
-        (putCounters 1 timeCounter it))) = [] ∧
+        (putCounters 1 (Semantics.CounterKindSource.printed timeCounter) it))) = [] ∧
     Ability.check (DRS.ofList [])
       (sinisterConcierge (tap (the (and [isCard, was (exile which) thisWay])))) =
       [.participialDescription (.deed (.action "exile")) 2] := by
@@ -386,7 +398,7 @@ theorem objectStampedOnTwoPathsIsReadOnce :
 You gain life equal to the power of the creature sacrificed this way." -/
 theorem thisWayReadsWhatItsCostDid :
     Ability.check (DRS.ofList [])
-      (activated (sacrifice (a isCreature))
+      (activated (Semantics.Cost.perform (sacrifice (a isCreature)))
         (gainLife (powerOf (the (and [isCreature, was (sacrifice which) thisWay]))))) = [] := by
   decide
 
@@ -396,11 +408,11 @@ theorem participialAgentRead :
     Action.check (DRS.ofList [])
       (sequentially
         [ exile (target (and [isCard, in_ graveyard])),
-          putOntoBattlefield (the (and [isCard, did you (exile which)])) ]) = [] ∧
+          putOntoBattlefield (the (and [isCard, did (Semantics.Subject.actor (you)) (exile which)])) ]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially
         [ exile (target (and [isCard, in_ graveyard])),
-          putOntoBattlefield (the (and [isCard, did anOpponent (exile which)])) ]) =
+          putOntoBattlefield (the (and [isCard, did (Semantics.Subject.actor (anOpponent)) (exile which)])) ]) =
       [.participialAgent] := by
   decide
 
@@ -410,7 +422,7 @@ theorem gapYouReadsAnyPerformer :
     Action.check (DRS.ofList [])
       (sequentially
         [ instruct (target isOpponent) (exile (target (and [isCard, in_ graveyard]))),
-          putOntoBattlefield (the (and [isCard, did you (exile which)])) ]) = [] := by
+          putOntoBattlefield (the (and [isCard, did (Semantics.Subject.actor (you)) (exile which)])) ]) = [] := by
   decide
 
 /-- Cascade's run and the card that stopped it are both exiled: "all cards exiled this way" reads
@@ -506,17 +518,17 @@ reads the event its ability triggers on [CR#603.2]. -/
 sacrificed a permanent this way, draw a card.": nothing earlier searched or sacrificed. -/
 theorem thisWayNamesNoEarlierEvent :
     Action.check (DRS.ofList [])
-      (sequentially [draw 1, doIf (did you (search yourLibrary) thisWay) shuffle]) =
+      (sequentially [draw 1, doIf (did (Semantics.Subject.actor you) (search yourLibrary) thisWay) shuffle]) =
       [.thisWayUngrounded] ∧
     Action.check (DRS.ofList [])
-      (sequentially [draw 1, doIf (did you (sacrifice (a isPermanent)) thisWay) (draw 1)]) =
+      (sequentially [draw 1, doIf (did (Semantics.Subject.actor you) (sacrifice (a isPermanent)) thisWay) (draw 1)]) =
       [.thisWayUngrounded] := by decide
 
 /-- "Search your library for a card. If you search your library this way, shuffle." -/
 theorem searchedThisWayReadsTheSearch :
     Action.check (DRS.ofList [])
       (sequentially
-        [search yourLibrary (a isCard), doIf (did you (search yourLibrary) thisWay) shuffle]) =
+        [search yourLibrary (a isCard), doIf (did (Semantics.Subject.actor you) (search yourLibrary) thisWay) shuffle]) =
       [] := by decide
 
 /-- "Sacrifice a creature. If you sacrificed a permanent this way, draw a card." reads the
@@ -524,12 +536,12 @@ sacrifice [CR#701.21a]; after "Destroy target creature." it reads none. -/
 theorem sacrificedThisWayReadsTheSacrifice :
     Action.check (DRS.ofList [])
       (sequentially
-        [sacrifice (a isCreature), doIf (did you (sacrifice (a isPermanent)) thisWay) (draw 1)]) =
+        [sacrifice (a isCreature), doIf (did (Semantics.Subject.actor you) (sacrifice (a isPermanent)) thisWay) (draw 1)]) =
       [] ∧
     Action.check (DRS.ofList [])
       (sequentially
         [destroy (target isCreature),
-          doIf (did you (sacrifice (a isPermanent)) thisWay) (draw 1)]) =
+          doIf (did (Semantics.Subject.actor you) (sacrifice (a isPermanent)) thisWay) (draw 1)]) =
       [.thisWayUngrounded] := by decide
 
 /-- "Discard a card. If you discarded a card this way, draw a card." reads the discard; after
@@ -537,10 +549,10 @@ theorem sacrificedThisWayReadsTheSacrifice :
 theorem discardedThisWayReadsTheDiscard :
     Action.check (DRS.ofList [])
       (sequentially
-        [discard (a (cardIn hand)), doIf (did you (discard (a isCard)) thisWay) (draw 1)]) =
+        [discard (a (cardIn hand)), doIf (did (Semantics.Subject.actor you) (discard (a isCard)) thisWay) (draw 1)]) =
       [] ∧
     Action.check (DRS.ofList [])
-      (sequentially [mill 2, doIf (did you (discard (a isCard)) thisWay) (draw 1)]) =
+      (sequentially [mill 2, doIf (did (Semantics.Subject.actor you) (discard (a isCard)) thisWay) (draw 1)]) =
       [.thisWayUngrounded] := by decide
 
 /-- "Exile target creature. If a creature was exiled this way, draw a card." reads the exile
@@ -561,19 +573,19 @@ theorem thisWayReadsTheActorItsSubjectNames :
     Action.check (DRS.ofList [])
       (sequentially
         [instruct (target isPlayer) (sacrifice (a isCreature)),
-          doIf (did (that .player) (sacrifice (a isPermanent)) thisWay) (draw 1)]) = [] ∧
+          doIf (did (Semantics.Subject.actor (that .player)) (sacrifice (a isPermanent)) thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially
         [sacrifice (a isCreature),
-          doIf (did thisCreature (sacrifice (a isPermanent)) thisWay) (draw 1)]) =
+          doIf (did (Semantics.Subject.actor thisCreature) (sacrifice (a isPermanent)) thisWay) (draw 1)]) =
       [.thisWayUngrounded] := by decide
 
 /-- A cost's event is the ability's own: "{T}, Sacrifice a creature: If you sacrificed a
 permanent this way, draw a card." -/
 theorem thisWayReadsItsCostsEvent :
     Ability.check (DRS.ofList [])
-      (activated (compound [tapSymbol, sacrifice (a isCreature)])
-        (doIf (did you (sacrifice (a isPermanent)) thisWay) (draw 1))) = [] := by decide
+      (activated (compound [tapSymbol, (Semantics.Cost.perform (sacrifice (a isCreature)))])
+        (doIf (did (Semantics.Subject.actor you) (sacrifice (a isPermanent)) thisWay) (draw 1))) = [] := by decide
 
 /-- The text grounds "this way", not the game: an optional action the player may decline still
 wrote its event, so "You may sacrifice a creature. If you sacrificed a permanent this way, …" is
@@ -582,7 +594,7 @@ theorem optionalBodyEventGroundsThisWay :
     Action.check (DRS.ofList [])
       (sequentially
         [may (sacrifice (a isCreature)),
-          doIf (did you (sacrifice (a isPermanent)) thisWay) (draw 1)]) = [] := by decide
+          doIf (did (Semantics.Subject.actor you) (sacrifice (a isPermanent)) thisWay) (draw 1)]) = [] := by decide
 
 /-- What a reflexive triggered ability does is its own [CR#603.12]: "Sacrifice a creature. When
 you do, draw a card. If you drew a card this way, …" reads no draw of the enclosing ability. -/
@@ -590,18 +602,18 @@ theorem reflexiveAbilityEventsStayItsOwn :
     Action.check (DRS.ofList [])
       (sequentially
         [triggerReflexively (sacrifice (a isCreature)) (draw 1),
-          doIf (did you (draw anyAmount) thisWay) (gainLife 1)]) = [.thisWayUngrounded] := by
+          doIf (did (Semantics.Subject.actor you) (draw anyAmount) thisWay) (gainLife 1)]) = [.thisWayUngrounded] := by
   decide
 
 /-- "When this creature enters, if it entered from your graveyard, …" reads the entry it
 triggered on [CR#603.2]; an attack trigger names no entry. -/
 theorem triggeringReadsItsTriggerEvent :
     Ability.check (DRS.ofList [])
-      (when (does thisCreature enter)
-        (doIf (did it (enter (from_ := yourGraveyard)) triggering) (draw 1))) = [] ∧
+      (when (does (Semantics.Subject.actor thisCreature) enter)
+        (doIf (did (Semantics.Subject.actor it) (enter (from_ := yourGraveyard)) triggering) (draw 1))) = [] ∧
     Ability.check (DRS.ofList [])
-      (when (does thisCreature attack)
-        (doIf (did it (enter (from_ := yourGraveyard)) triggering) (draw 1))) =
+      (when (does (Semantics.Subject.actor thisCreature) attack)
+        (doIf (did (Semantics.Subject.actor it) (enter (from_ := yourGraveyard)) triggering) (draw 1))) =
       [.triggeringUngrounded] := by decide
 
 /-- The subject of "dies" or "enters" is what the event moved, not its Actor [CR#700.4]: "Destroy
@@ -610,17 +622,17 @@ the battlefield. If a land enters this way, …" and "Target player sacrifices a
 dies this way, …" each read the move; a player is no object a destruction moved. -/
 theorem thisWayReadsWhatTheEventMoved :
     Action.check (DRS.ofList [])
-      (sequentially [destroy (target isCreature), doIf (did it die thisWay) (draw 1)]) = [] ∧
+      (sequentially [destroy (target isCreature), doIf (did (Semantics.Subject.actor it) die thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially
         [instruct (target isPlayer) (putOntoBattlefield (a (and [isLand, cardIn hand]))),
-          doIf (did (a isLand) enter thisWay) (draw 1)]) = [] ∧
+          doIf (did ((Semantics.Subject.actor (a isLand))) enter thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially
         [instruct (target isPlayer) (sacrifice (a isCreature)),
-          doIf (did it die thisWay) (draw 1)]) = [] ∧
+          doIf (did (Semantics.Subject.actor it) die thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
-      (sequentially [destroy (target isCreature), doIf (did you die thisWay) (draw 1)]) =
+      (sequentially [destroy (target isCreature), doIf (did (Semantics.Subject.actor you) die thisWay) (draw 1)]) =
       [.kindLte .player (Kind.join .object .pile), .thisWayUngrounded] := by decide
 
 /-- "Destroy target creature. If that creature dies this way, …": a definite noun phrase as the
@@ -628,7 +640,7 @@ subject of the move a lookback reads is the moved patient, read as the permanent
 is (`semantics-v3.md`, the historical read) [CR#700.4,608.2h]. -/
 theorem okThatCreatureDiesThisWay :
     Action.check (DRS.ofList [])
-      (sequentially [destroy (target isCreature), doIf (did (that creature) die thisWay) (draw 1)]) =
+      (sequentially [destroy (target isCreature), doIf (did (Semantics.Subject.actor (that creature)) die thisWay) (draw 1)]) =
       [] := by decide
 
 /-- The subject's historical read keeps its noun: the destroyed creature is no artifact, so "If
@@ -637,15 +649,15 @@ reads no event, and after the lookback the dead creature is no current creature,
 creature" finds none. -/
 theorem thatNounDiesThisWayStaysBounded :
     Action.check (DRS.ofList [])
-      (sequentially [destroy (target isCreature), doIf (did (that artifact) die thisWay) (draw 1)]) =
+      (sequentially [destroy (target isCreature), doIf (did (Semantics.Subject.actor (that artifact)) die thisWay) (draw 1)]) =
       [.anaphor (.word (.type .artifact)) .one 0] ∧
     Action.check (DRS.ofList [])
-      (sequentially [tap (target isCreature), doIf (did (that creature) die thisWay) (draw 1)]) =
+      (sequentially [tap (target isCreature), doIf (did (Semantics.Subject.actor (that creature)) die thisWay) (draw 1)]) =
       [.thisWayUngrounded] ∧
     Action.check (DRS.ofList [])
       (sequentially
         [destroy (target isCreature),
-          doIf (did (that creature) die thisWay) (untap (that creature))]) =
+          doIf (did (Semantics.Subject.actor (that creature)) die thisWay) (untap (that creature))]) =
       [.anaphor (.word (.type .creature)) .one 0] := by decide
 
 /-- "Destroy target artifact. If that artifact is put into a graveyard this way, …" (*Tuktuk
@@ -657,18 +669,18 @@ inside the move ("if you put that artifact into a graveyard this way") is read t
 theorem okThatArtifactPutIntoAGraveyardThisWay :
     Action.check (DRS.ofList [])
       (sequentially [destroy (target isArtifact),
-        doIf (did (that artifact) (.move .actor .anyLocation (some graveyard) .arrival []) thisWay)
+        doIf (did (Semantics.Subject.actor (that artifact)) (.move .actor .anyLocation (some graveyard) .arrival []) thisWay)
           (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially [destroy (target isArtifact),
-        doIf (did (that artifact) (.move .actor .anyLocation (some graveyard) .departure [])
+        doIf (did (Semantics.Subject.actor (that artifact)) (.move .actor .anyLocation (some graveyard) .departure [])
           thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially [destroy (target isArtifact),
-        doIf (did it (putInto .actor graveyard) thisWay) (draw 1)]) = [] ∧
+        doIf (did (Semantics.Subject.actor it) (putInto .actor graveyard) thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially [destroy (target isArtifact),
-        doIf (did you (putInto (that artifact) graveyard) thisWay) (draw 1)]) = [] := by decide
+        doIf (did (Semantics.Subject.actor you) (putInto (that artifact) graveyard) thisWay) (draw 1)]) = [] := by decide
 
 /-- A target an optional body announces is chosen as the spell or ability is put on the stack,
 whether or not the player acts [CR#601.2c,603.3d,115.1], so it is an ordinary referent after the
@@ -677,10 +689,10 @@ and out of one, as announced. -/
 theorem optionalBodyTargetStaysVisible :
     Action.check (DRS.ofList [])
       (sequentially [may (destroy (target isArtifact)),
-        doIf (did it (putInto .actor graveyard) thisWay) (draw 1)]) = [] ∧
+        doIf (did (Semantics.Subject.actor it) (putInto .actor graveyard) thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially [may (destroy (target isCreature)),
-        doIf (did (that creature) die thisWay) (draw 1)]) = [] ∧
+        doIf (did (Semantics.Subject.actor (that creature)) die thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially [may (tap (target isArtifact)),
         instruct this_ (dealDamage 3 (controllerOf (that artifact)))]) = [] := by decide
@@ -691,11 +703,11 @@ in the "if you don't" arm, when the player does not, as well as after both. A "t
 theorem optionalBodyTargetReadOnBothSides :
     Action.check (DRS.ofList [])
       (sequentially [may (destroy (target isArtifact))
-        (some (doIf (did it (putInto .actor graveyard) thisWay) (draw 1)))
+        (some (doIf (did (Semantics.Subject.actor it) (putInto .actor graveyard) thisWay) (draw 1)))
         (some (tap it))]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially [may (destroy (target isCreature))
-        (some (doIf (did (that creature) die thisWay) (draw 1)))
+        (some (doIf (did (Semantics.Subject.actor (that creature)) die thisWay) (draw 1)))
         (some (tap (that creature)))]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially [may (tap (target isArtifact))
@@ -704,7 +716,7 @@ theorem optionalBodyTargetReadOnBothSides :
         untap (that artifact)]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially [may (destroy (target isArtifact)) none
-        (some (doIf (did it (putInto .actor graveyard) thisWay) (draw 1)))]) =
+        (some (doIf (did (Semantics.Subject.actor it) (putInto .actor graveyard) thisWay) (draw 1)))]) =
       [.thisWayUngrounded] := by decide
 
 /-- Only the announcement escapes as an ordinary referent: what the body did to the target stays
@@ -725,7 +737,7 @@ theorem optionalIfDidArmTargetStaysVisible :
         instruct this_ (dealDamage 3 (controllerOf (that artifact)))]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially [may (sacrifice (a isCreature)) (some (destroy (target isArtifact))),
-        doIf (did (that artifact) (putInto .actor graveyard) thisWay) (draw 1)]) = [] := by
+        doIf (did (Semantics.Subject.actor (that artifact)) (putInto .actor graveyard) thisWay) (draw 1)]) = [] := by
   decide
 
 /-- The same for a target of the "if you don't" arm. -/
@@ -752,10 +764,10 @@ creature" reads the target the "if you do" arm announced (*Insatiable Appetite*)
 reads too. -/
 theorem otherwiseReadsTheOtherArmsTarget :
     Action.check (DRS.ofList [])
-      (may (sacrifice (a food)) (some (get (target isCreature) (up 5) (up 5) untilEndOfTurn))
+      (may (sacrifice (a (Semantics.Predicate.hasSubtype (food)))) (some (get (target isCreature) (up 5) (up 5) untilEndOfTurn))
         (some (get (that creature) (up 3) (up 3) untilEndOfTurn))) = [] ∧
     Action.check (DRS.ofList [])
-      (may (sacrifice (a food)) (some (untap (that artifact)))
+      (may (sacrifice (a (Semantics.Predicate.hasSubtype (food)))) (some (untap (that artifact)))
         (some (tap (target isArtifact)))) = [] := by decide
 
 /-- The other arm reads a target under the id it escapes with: after "you may sacrifice a Food. If
@@ -763,7 +775,7 @@ you do, exile target creature. Otherwise, exile that creature", the target is or
 and the two arms' stamps on it escape participial-only once, under 2. -/
 theorem otherArmReadsTheTargetUnderItsEscapedId :
     let out := (stepAction 64 .postEvent .obj (DRS.ofList [])
-      (may (sacrifice (a food)) (some (exile (target isCreature)))
+      (may (sacrifice (a (Semantics.Predicate.hasSubtype (food)))) (some (exile (target isCreature)))
         (some (exile (that creature))))).1
     (out.referents.map fun ref => (ref.id, ref.det == .target)) = [(2, true)] ∧
       (out.participialOnly.map (·.id)).count 2 = 1 := by decide
@@ -772,10 +784,10 @@ theorem otherArmReadsTheTargetUnderItsEscapedId :
 is that arm's own, and "that artifact" in the other arm finds nothing. -/
 theorem otherArmDoesNotReadNonTargets :
     Action.check (DRS.ofList [])
-      (may (sacrifice (a isCreature)) (some (create 1 foodToken))
+      (may (sacrifice (a isCreature)) (some (create 1 (Semantics.TokenSpec.written foodToken)))
         (some (sacrifice (that artifact)))) = [.anaphor (.word artifact) .one 0] ∧
     Action.check (DRS.ofList [])
-      (may (sacrifice (a food)) (some (destroy (a isArtifact)))
+      (may (sacrifice (a (Semantics.Predicate.hasSubtype (food)))) (some (destroy (a isArtifact)))
         (some (tap (that artifact)))) = [.anaphor (.word artifact) .one 0] := by decide
 
 /-- A "when you do" reflexive trigger is a separate ability that chooses its own targets as it is
@@ -792,11 +804,11 @@ the matched event moved a card from a library. -/
 theorem thatArtifactMilledThisWayStaysRefused :
     Action.check (DRS.ofList [])
       (sequentially [exile (target isArtifact), putInto it graveyard exileZone,
-        doIf (did (that artifact) (putInto .actor graveyard) thisWay) (draw 1)]) =
+        doIf (did (Semantics.Subject.actor (that artifact)) (putInto .actor graveyard) thisWay) (draw 1)]) =
       [.anaphor (.word (.type .artifact)) .one 0] ∧
     Action.check (DRS.ofList [])
       (sequentially [mill 1,
-        doIf (did (that artifact) (putInto .actor graveyard) thisWay) (draw 1)]) =
+        doIf (did (Semantics.Subject.actor (that artifact)) (putInto .actor graveyard) thisWay) (draw 1)]) =
       [.anaphor (.word (.type .artifact)) .one 0] := by decide
 
 /-- A written origin decides alone: a recorded move from the battlefield never overrides it. "If
@@ -806,7 +818,7 @@ permanent. -/
 theorem writtenOriginStillDecides :
     Action.check (DRS.ofList [])
       (sequentially [destroy (target isArtifact),
-        doIf (did (that artifact) (.move .actor (.zone .hand none) (some graveyard) .departure [])
+        doIf (did (Semantics.Subject.actor (that artifact)) (.move .actor (.zone .hand none) (some graveyard) .departure [])
           thisWay) (draw 1)]) =
       [.anaphor (.word (.type .artifact)) .one 0, .thisWayUngrounded] ∧
     Action.check (DRS.ofList [])
@@ -833,7 +845,7 @@ theorem fromAnywhereIsNotLeavesTheBattlefield :
 died …" reads the sacrificed creature's move to a graveyard [CR#603.2,701.21a]. -/
 theorem triggeringReadsWhatItsEventMoved :
     Ability.check (DRS.ofList [])
-      (when (does you (sacrifice (a isCreature))) (doIf (did it die triggering) (draw 1))) =
+      (when (does (Semantics.Subject.actor you) (sacrifice (a isCreature))) (doIf (did (Semantics.Subject.actor it) die triggering) (draw 1))) =
       [] := by decide
 
 /-- A permission writes the act it allows: "Exile the top three cards of your library. You may
@@ -845,19 +857,19 @@ theorem thisWayReadsAPermittedAct :
       (sequentially
         [exile (topSlice 3),
           establishThroughout
-            (can you (play (bare (and [isCard, was (exile which) thisWay])))) thisTurn,
-          doIf (did you (cast (a isSpell)) thisWay) (draw 1)]) = [] ∧
+            (can (Semantics.Subject.actor you) (play (bare (and [isCard, was (exile which) thisWay])))) thisTurn,
+          doIf (did (Semantics.Subject.actor you) (cast (a isSpell)) thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially
-        [establishThroughout (can you (cast (a isSpell))) thisTurn,
+        [establishThroughout (can (Semantics.Subject.actor you) (cast (a isSpell))) thisTurn,
           doForEach (each (and [isSpell, was (cast which) thisWay])) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
       (sequentially
-        [establishThroughout (cant you (cast (a isSpell))) thisTurn,
-          doIf (did you (cast (a isSpell)) thisWay) (draw 1)]) = [.thisWayUngrounded] ∧
+        [establishThroughout (cant (Semantics.Subject.actor you) (cast (a isSpell))) thisTurn,
+          doIf (did (Semantics.Subject.actor you) (cast (a isSpell)) thisWay) (draw 1)]) = [.thisWayUngrounded] ∧
     Action.check (DRS.ofList [])
       (sequentially
-        [establishThroughout (cant you (cast (a isSpell))) thisTurn,
+        [establishThroughout (cant (Semantics.Subject.actor you) (cast (a isSpell))) thisTurn,
           doForEach (each (and [isSpell, was (cast which) thisWay])) (draw 1)]) =
       [.participialDescription (.deed (.action "cast")) 0] := by decide
 
@@ -867,19 +879,19 @@ this way, …" reads the cost. Exchanging life totals gains or loses life [CR#70
 exchange life totals with target opponent. If you lost life this way, …" reads the exchange. -/
 theorem thisWayClassesTheEvent :
     Action.check (DRS.ofList [])
-      (sequentially [gainLife 2, doIf (did you (loseLife anyAmount) thisWay) (draw 1)]) =
+      (sequentially [gainLife 2, doIf (did (Semantics.Subject.actor you) (loseLife anyAmount) thisWay) (draw 1)]) =
       [.thisWayUngrounded] ∧
     Action.check (DRS.ofList [])
       (sequentially
         [may (exchangeLifeTotals (youAnd (target isOpponent))),
-          doIf (did you (loseLife anyAmount) thisWay) (draw 1)]) = [] ∧
+          doIf (did (Semantics.Subject.actor you) (loseLife anyAmount) thisWay) (draw 1)]) = [] ∧
     Ability.check (DRS.ofList [])
-      (activated (compound [tapSymbol, payLife 2])
-        (doIf (did you (payLife 2) thisWay) (draw 1))) =
+      (activated (compound [tapSymbol, (Semantics.Cost.perform (payLife 2))])
+        (doIf (did (Semantics.Subject.actor (you)) (payLife 2) thisWay) (draw 1))) =
       [] := by decide
 
 private def tapAndPayLife (cost : Cost) (lookback : Action) : Ability :=
-  activated (compound [tapSymbol, cost]) (doIf (did you lookback thisWay) (draw 1))
+  activated (compound [tapSymbol, cost]) (doIf (did (Semantics.Subject.actor (you)) lookback thisWay) (draw 1))
 
 /-- "{T}, Pay 2 life: Draw a card if you paid life this way." and "… if you lost life this way.":
 paying life is a payment that is a loss of life [CR#119.4], and a later "this way" reads back
@@ -889,12 +901,12 @@ more than once, but a lookback asks only whether such an event was caused: every
 one the bare `perform (loseLife 2)` gives, and the events recorded are the same events. -/
 theorem costPaidLifeGroundsPaidAndLost :
     [payLife anyAmount, loseLife anyAmount, sacrifice (a isCreature)].map (fun lookback =>
-      Ability.check (DRS.ofList []) (tapAndPayLife (payLife 2) lookback)) =
+      Ability.check (DRS.ofList []) (tapAndPayLife (Semantics.Cost.perform ((payLife 2))) lookback)) =
       [[], [], [.thisWayUngrounded]] ∧
     [payLife anyAmount, loseLife anyAmount, sacrifice (a isCreature)].map (fun lookback =>
       Ability.check (DRS.ofList []) (tapAndPayLife (perform (loseLife 2)) lookback)) =
       [[], [], [.thisWayUngrounded]] ∧
-    ((stepCost 64 (DRS.ofList []) (payLife 2)).1.causedEvents.eraseDups ==
+    ((stepCost 64 (DRS.ofList []) (Semantics.Cost.perform ((payLife 2)))).1.causedEvents.eraseDups ==
       (stepCost 64 (DRS.ofList []) (perform (loseLife 2))).1.causedEvents.eraseDups) = true := by
   decide
 
@@ -915,7 +927,7 @@ theorem castStillRecordsCast :
       (sequentially [castSpell,
         doForEach (each (and [isSpell, was (cast which) thisWay])) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
-      (sequentially [castSpell, doIf (did you (cast (a isSpell)) thisWay) (draw 1)]) = [] := by
+      (sequentially [castSpell, doIf (did (Semantics.Subject.actor (you)) (cast (a isSpell)) thisWay) (draw 1)]) = [] := by
   decide
 
 /-- Playing a card is playing it as a land or casting it as a spell [CR#701.18b]. A land play
@@ -938,9 +950,9 @@ theorem playRecordsALandPlayOrASpellCast :
       (sequentially [playSpell,
         doForEach (each (and [isSpell, was (play which) thisWay])) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
-      (sequentially [playLand, doIf (did you (play (a isCard)) thisWay) (draw 1)]) = [] ∧
+      (sequentially [playLand, doIf (did (Semantics.Subject.actor (you)) (play (a isCard)) thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
-      (sequentially [playSpell, doIf (did you (cast (a isSpell)) thisWay) (draw 1)]) = [] := by
+      (sequentially [playSpell, doIf (did (Semantics.Subject.actor (you)) (cast (a isSpell)) thisWay) (draw 1)]) = [] := by
   decide
 
 /-- Activating puts the ability onto the stack [CR#602.2a,701.2a], where it is not a card
@@ -955,9 +967,9 @@ theorem activateRecordsActivateNotCast :
       [.participialDescription (.deed (.action "cast")) 0] ∧
     Action.check (DRS.ofList [])
       (sequentially [activateAbility,
-        doIf (did you (activate (target (.abilityHead .anyActivated))) thisWay) (draw 1)]) = [] ∧
+        doIf (did (Semantics.Subject.actor (you)) (activate (target (.abilityHead .anyActivated))) thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList [])
-      (sequentially [activateAbility, doIf (did you (cast (a isSpell)) thisWay) (draw 1)]) =
+      (sequentially [activateAbility, doIf (did (Semantics.Subject.actor (you)) (cast (a isSpell)) thisWay) (draw 1)]) =
       [.thisWayUngrounded] := by
   decide
 

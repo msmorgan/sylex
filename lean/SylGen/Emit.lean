@@ -3,32 +3,17 @@ import SylGen.Resolve
 open Lean Meta
 namespace SylGen
 
-def declarationName (root : Name) (d : Declaration) (fallback : Registry) : Name :=
-  if !root.isAnonymous && d.kind == "primitive" && d.constructor.isNone then
-    root ++ `Semantics.Primitives ++ d.sort.name.toName ++ Name.mkSimple (declarationWord d.name)
-  else if let some sig := fallback[(d.name, d.sort.text)]? then
-    root ++ sig.constant
-  else
-    let ns := match d.kind with
-      | "primitive" | "template" => `Semantics.Templates
-      | "card" => `Semantics.Cards
-      | _ => `Semantics.Definitions
-    -- These declarations already exposed only their sort-qualified Lean name.
-    -- Preserve that API when the surface language drops qualified identifiers.
-    let originalSort := if ns == `Semantics.Templates then
-      match d.name with
-      | "andOr" | "coord" => some "Location"
-      | "actor" => some "NounPhrase"
-      | "count" => some "DetPhrase"
-      | "ofColor" => some "ManaTypeTerm"
-      | _ => none
-      else none
-    let qualified := root.isAnonymous &&
-      ((d.kind == "ability" && d.name == "splice") ||
-        (d.sort.name == "NounWord" && d.name ∈ ["instant", "sorcery", "kindred"]) ||
-        originalSort.any (· != d.sort.name))
-    let ns := if qualified then ns ++ d.sort.name.toName else ns
-    root ++ ns ++ Name.mkSimple (declarationWord d.name)
+private partial def sortNamespace (sort : SortRef) : Name :=
+  sort.arguments.foldl (fun ns arg => ns ++ sortNamespace arg) sort.name.toName
+
+def declarationName (root : Name) (d : Declaration) (ds : Array Declaration) : Name :=
+  let ns := match d.kind with
+    | "primitive" | "template" => `Semantics.Templates
+    | "card" => `Semantics.Cards
+    | _ => `Semantics.Definitions
+  let shared := ds.any (fun other => other.name == d.name && other.sort != d.sort)
+  root ++ ns ++ (if shared then sortNamespace d.sort else .anonymous) ++
+    Name.mkSimple (declarationWord d.name)
 
 private def allowedFields (kind : String) : List String :=
   ["lexical", "spelling"] ++ match kind with
@@ -48,7 +33,7 @@ private def allowedFields (kind : String) : List String :=
         "power", "toughness", "loyalty", "defense"]
     | _ => []
 
-def loadDeclarations (root : Name) (ds : Array Declaration) (fallback : Registry) :
+def loadDeclarations (root : Name) (ds : Array Declaration) (_fallback : Registry) :
     MetaM Registry := do
   let mut table := {}
   for d in ds do
@@ -57,16 +42,7 @@ def loadDeclarations (root : Name) (ds : Array Declaration) (fallback : Registry
         throwError value.position.error s!"unknown {d.kind} field '{key}'"
     let key := (d.name, d.sort.text)
     if table.contains key then throwError d.pos.error s!"Duplicate bundle declaration {key}"
-    let initialName := declarationName root d fallback
-    let initialName := if d.sort.name == "Option" &&
-        ds.any (fun other => other.name == d.name && other.sort == d.sort.arguments[0]!) then
-        initialName.getPrefix ++ `Option ++ Name.mkSimple (declarationWord d.name)
-      else initialName
-    let name := if table.toArray.any (fun entry => entry.2.constant == initialName) then
-        initialName.getPrefix ++
-          (if d.sort.name == "Option" then d.sort.arguments[0]!.name else d.sort.name).toName ++
-          Name.mkSimple (declarationWord d.name)
-      else initialName
+    let name := declarationName root d ds
     let sig : Signature := { constant := name, result := d.sort, fields := d.parameters.map fun p =>
       { name := leanWord p.name, sort := p.sort, hasDefault := p.defaultValue.isSome,
         emittedName := parameterName p } }
@@ -116,6 +92,8 @@ private def body (d : Declaration) : ResolveM Term := do
     let ctors := (← read).constructors
     let some sig := ctors[(ctor, d.sort.text)]? <|> ctors[(leanWord ctor, d.sort.text)]?
       | throwError d.pos.error "primitive must name a constructor of its result sort"
+    if let some message := sourceConstructorRefusal sig.constant then
+      throwError d.pos.error message
     unless d.parameters.size == sig.fields.size do
       throwError d.pos.error "primitive must bind every constructor field"
     for p in d.parameters do
@@ -164,7 +142,7 @@ private def body (d : Declaration) : ResolveM Term := do
       (none, .word d.pos "named" #[(none, str d "")]), (none, ← required d "body")])
       { name := "Ability" }
     let .call wrapName _ := wrap | throwError d.pos.error "abilityWord must be a Template"
-    return .atom s!"(syl_ability_word% {wrapName} {rendered d label}, ({rendered d content}))"
+    return .atom s!"({wrapName}, ({rendered d label}, ({rendered d content})))"
   | "counter" =>
     return ← direct d `Semantics.CounterKind.named
         #[(none, str d d.name), (none, get "holder" (word d "object"))]
@@ -179,10 +157,10 @@ private def body (d : Declaration) : ResolveM Term := do
       return ← direct d `Semantics.Subtype.spell #[(none, get "name" (str d d.name))]
     else return ← direct d `Semantics.Subtype.of #[(none, kind), (none, get "name" (str d d.name))]
   | "card_type" =>
-    return ← resolve (.record d.pos #[
-        ("name", get "name" (str d d.name)),
-        ("cardClass", get "cardClass" (word d "none")),
-        ("stats", get "stats" (empty d))]) d.sort
+    return ← direct d `Semantics.CardType.mk #[
+      (some "name", get "name" (str d d.name)),
+      (some "cardClass", get "cardClass" (word d "none")),
+      (some "stats", get "stats" (empty d))]
   | "card" =>
     let some value := d.cardValue | throwError d.pos.error "missing card value"
     let discardLexical := fun fields => fields.filter fun f => !(f.1 ∈ ["lexical", "spelling"])
@@ -233,7 +211,9 @@ def emit (d : Declaration) : ResolveM Output := do
   let documentation := if d.documentation.isEmpty then "" else
     "/--" ++ d.documentation.replace "-/" "- /" ++ "-/\n"
   let modifier := if d.kind == "card" then "noncomputable " else ""
-  text := documentation ++ modifier ++ s!"def {leanName name}{binders} : {d.sort.lean} :=\n  {value}\n"
+  text := if d.kind == "ability_word" then
+    s!"syl_ability_word {leanName name}{binders} := {value} doc {repr d.documentation}\n"
+  else documentation ++ modifier ++ s!"def {leanName name}{binders} : {d.sort.lean} :=\n  {value}\n"
   if d.kind ∈ ["counter", "designation", "subtype", "card_type", "relation"] then
     prelude := prelude ++ text
     text := ""
@@ -249,8 +229,7 @@ def emit (d : Declaration) : ResolveM Output := do
     let checkName := name.getPrefix ++ Name.mkSimple ("ok_" ++ name.getString!)
     text := text ++ s!"theorem {leanName checkName} : {d.sort.lean}.check {leanName name} = [] := by decide\n"
   let check := if d.kind == "card" then
-      let checkName := name.getPrefix ++ Name.mkSimple ("ok_" ++ name.getString!)
-      s!"theorem {leanName checkName} : Semantics.Card.check {leanName name} = [] := check_card% {leanName name}\n"
+      s!"check_card {leanName name}\n"
     else ""
   let cardFile := if d.kind == "card" then d.name ++ ".syl" else ""
   text := text ++ s!"syl_register {toString (Json.str d.kind)} {leanName name} {toString (Json.str cardFile)}\n"

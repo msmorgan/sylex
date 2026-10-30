@@ -3,24 +3,24 @@
 The semantics workbench models the card language's syntax and checks its
 structural obligations. `Semantics/*.lean` contains plain inductives;
 `Semantics/Check/*` computes bindings, kinds, zones, and refusals over that
-syntax. `Card.check` returns every refusal, and a `Spelled` card carries a
+syntax. `Card.check` returns every refusal, and each generated card has a separate
 kernel-checked proof that its refusal list is empty. Runtime game execution
 remains in Rust.
 
 Run `lean/scripts/build` from the repository root, or `./scripts/build` from
 this directory. It builds every library (syntax and checker, builtin definitions and their
 `ok_` theorems, the generated card bench, and the pin suites) with warnings treated as failures.
-The inner loops, from this directory, are `lake build Semantics` for checker work, a bare
-`lake build` (the default targets `Semantics`, `SemanticsDefinitions` and
-`SemanticsCheckBuiltin`) for builtin work, `lake build SemanticsCards` for card work, and the
-editor or `lake build SemanticsProofs` for proofs. `lakefile.lean` lists them.
+The inner loops, from this directory, are `lake build -q Semantics` for checker work, a bare
+`lake build -q` (the default targets `Semantics`, `SemanticsDefinitions` and
+`SemanticsCheckBuiltin`) for builtin work, `lake build -q SemanticsCards` for card work, and the
+editor or `lake build -q SemanticsProofs` for proofs. `lakefile.lean` lists them.
 
 Lean is the active workbench. The [succession decision](../docs/decisions/lean-is-the-workbench.md)
 records the frozen Idris reference and migration history.
 
 ## Workbench gate
 
-`cargo xtask lean check` runs `lake build --wfail` over every library in `lean/`, the same
+`cargo xtask lean check` runs `lake build -q --wfail` over every library in `lean/`, the same
 full workbench gate as `lean/scripts/build`, and propagates build failures. It then reruns the
 Lake generation regression (`crates/xtask/src/lean.rs`): the real `lakefile.lean` over the stub
 card tree in `test-fixtures/lake-generation/`, checking that a clean tree builds, that a card
@@ -29,8 +29,8 @@ and the proof importing it, and that `lake setup-file` regenerates.
 
 The obsolete `plugins_v2` card/definition emitters and macro generator have
 been retired. `lean definitions` and `lean macros generate|check|align` are no
-longer commands. The v3 declarations live in `plugins_v3/builtin/`, one authored command
-per file. `Semantics/Definitions.lean` loads that bundle, placing primitives and templates in
+longer commands. The v3 declarations live in `plugins_v3/builtin/`, one `.syl` declaration
+per file. `Semantics/Definitions.lean` imports the generated bundle, placing primitives and templates in
 `Semantics.Templates` and the rules-defined vocabulary in `Semantics.Definitions`.
 v2 RON output must not regenerate them. Existing v2 readers elsewhere remain until their
 consumers are cut over.
@@ -54,11 +54,11 @@ longer apply to the native v3 workbench.
 ## Syntax, templates and definitions
 
 The syntax modules are `Words`, `Events`, `Abilities`, `Card`, and `Rules`;
-`Primitives` supplies constructor wrappers and authoring coercions. The builtin bundle's
+`Primitives` supplies small Lean proof helpers; `.syl` uses explicit wrappers. The builtin bundle's
 `primitives/` files expose individual constructors; `templates/` files compose those bindings
 into phrasings. `definitions/` contains rules-defined vocabulary (card types, keyword actions
 and abilities, counters, tokens and designations), and `rules/` contains rule rows.
-Only `primitive` commands may reference the raw constructor bindings. A constructor earns
+A `primitive` binds a constructor; ordinary calls resolve by expected sort. A constructor earns
 its place through an obligation or structural distinction its expansion would not carry.
 Common phrasings such as "permanent", "colorless", "spell" and "attacking" expand into shared
 predicates.
@@ -105,12 +105,13 @@ write.
 ## Registry facts
 
 There are no registry tables. Keyword actions, keyword abilities, counters, designations,
-relations and subtypes are each a self-contained declaration in `Semantics/Definitions/` whose
+relations and subtypes are each a self-contained declaration in `plugins_v3/builtin/definitions/` whose
 value carries its own columns (a counter's holder, a designation's scope, whether a permanent
-performs a keyword action), and the authoring boundary refuses a raw one in a card. A keyword
-ability's Definition generates the authored label constant a card names it by (`kicker.label`),
-and its typed signature fixes its parameters; an Action Definition generates the deed constant a
-card names its keyword action by (`exile.deed`). The catalog pins
+performs a keyword action). A keyword
+ability's Definition generates its label, and its typed signature fixes its parameters;
+an Action Definition generates its deed. `.syl` uses their bare names at the expected
+sort (`kicker` at `KeywordLabel`, `exile` at `Deed`). Generated Lean exposes
+`kicker.label` and `exile.deed` for proofs and inspection. The catalog pins
 (`Semantics/Proofs/Tables.lean`) remain part of `lean/scripts/build`.
 
 ## Numbers
@@ -150,9 +151,8 @@ also used when a deck condition tests mana values.
    `Check/Card`) check those projections and return named `Refusal` values (`Check/Refusal`);
    `Check/Rules` checks the rules-as-data rows. Laws read structural features and the columns
    a catalog value carries.
-4. **Entry point**: `Card.check : Card → List Refusal`. A `Spelled` value
-   combines a card with a proof of `card.check = []`; `spelled` asks `decide`
-   to construct that proof (see "The authoring boundary").
+4. **Entry point**: `Card.check : Card → List Refusal`. Generated check modules
+   prove `Card.check card = []` separately from the card data modules.
 
 `Predicate.kind?` and `NounPhrase.kind?` infer kinds. A context expecting a
 kind refuses a `kindMismatch` when they disagree. Each disjunct of a joined
@@ -180,73 +180,23 @@ kernel.
 
 ## Cards
 
-`plugins_v3/canon/cards/<name>.lean` contains one declaration per printed card, in the file
-its printed name names (`card_filename`, `crates/deckmaste_core/src/plugin.rs`). The authoring
-surface is `card := { name := "Printed name", ... }`, or `card := transforming { ... }`
-for multipart cards. Named (`card <ident> := …`) and `: Spelled` declarations are rejected.
-`cardNamed "Printed name"` retrieves the `Spelled` value (or its card when `Card` is expected);
-`cardNamedOk "Printed name"` is the proof that its card checks. Printed names,
-including punctuation, are declaration keys; multipart names join with ` // `.
+`plugins_v3/canon/cards/<name>.syl` contains one declaration per printed card.
+`sylGen` parses and resolves the corpus, then emits plain Lean definitions under
+`.lake/build/gen/Generated/`. `Generated.Canon` imports the card data;
+`Generated.CanonChecks` imports their separate checker proofs. Lake tracks the
+resolved dependencies and rebuilds affected modules.
 
-No Lean code reads the card files. `genCanon` in `lakefile.lean` does, on every `lake build`,
-`lake setup-file` (the language server) and `lake lean`, and writes the gitignored modules
-`Semantics/Cards/Data/{Fixtures,Shard00..15}.lean` and `Semantics/Cards/Check/*` with the same
-names, rewriting only what changed:
-
-- A data module holds each card file's text verbatim, wrapped in `canon_card "<file>"` …
-  `end_canon_card` under a `-- source: plugins_v3/canon/cards/<file>:1` line. `canon_card`
-  admits exactly one anonymous `card` declaration whose printed name is the file's, and defines
-  it `noncomputable`. Data modules import `Semantics.Definitions`, never `Semantics.Check`, so a
-  checker edit re-elaborates no card.
-- A check module holds, under the same `-- source:` line, `check_canon_card "<file>"`
-  (`Semantics/CanonCheck.lean`): the card's refusal report and its kernel `decide` theorem
-  `ok_<name>`. A refused card fails there, next to its source line.
-- `Fixtures` holds every card a module under `Semantics/Proofs/` names through `cardNamed` or
-  `cardNamedOk`; the shards hold the rest, each card by an FNV-1a hash of its file name, so
-  adding a card moves no other. Lake must know the module set before it builds, so the names are
-  fixed.
-
-`Semantics.Cards` (`SemanticsCards`) imports every check module. Proofs import
-`Semantics.Cards.Data.Fixtures` for canon cards, never `Semantics.Cards` or a check module;
-`cardNamedOk` on a canon card there checks it in place. A proof module that defines a term from
-a canon card opens a `noncomputable section`. Phrase-level bench items and their named
-acceptance or refusal theorems live in `Semantics/Proofs/Cards<Family>.lean`.
-
-Lake hashes a module's source before it awaits the library's `needs`, so `lakefile.lean`
-replaces the builtin `input` facet with one that runs `genCanon` first; the comment there cites
-the Lake source it depends on, and the regression above guards it.
-
-A refused card identifies a missing template or definition, a missing construct, or a checker
-regression. Keep its sentence and assertion while repairing that boundary.
-The bench follows the repository's Vintage-playable scope; out-of-scope
-formats are not reserved in the syntax.
-
-## The authoring boundary
-
-A `card` declaration expands through `spelled`. The `spelled` elaborator (`Check/Card.lean`) reads the
-elaborated term before reduction erases its Template and Definition calls, and records it as an
-`Authoring.Form` tree (`Semantics/Authoring.lean`): the named calls, data constructors,
-literals and parameters it was written with, and a `raw` leaf for any semantic constructor
-written directly. It refuses the card unless the tree is `onlyAuthored` (it names the raw
-constructors) and `card.check = []`; the resulting `Spelled` carries both proofs, closed by
-`decide`, and its constructor is private, so no record syntax builds one without them. A
-semantic expression in a card is therefore written through a `semantic_template` or a
-`semantic_definition`; `Semantics.Primitives` wraps the syntax constructors as Templates. The
-catalog items (card types, subtypes, counters, designations, relations, keyword labels and
-deeds) are `internal_expansion`, so an undeclared one in a card is refused here, as a raw
-constructor, not by the checker. Authored declarations are trusted: the checker checks a
-Definition's expanded body wherever a card calls it, but nothing proves that the body means
-what the rules say, and an Action Definition is refused at declaration unless its body
-establishes its own Reference Scope (`Action.ownScope`). Card fragments and `Proofs/` terms that
-call the checker directly are fixtures and are not inspected. The full contract is
-[Card authoring and trusted expansion](CONTRACTS.md#card-authoring-and-trusted-expansion); the
-pins are `Proofs/Authoring`.
+`Semantics.Registry` records generated declarations and card source names for the
+dump tool and `check_canon_card`. It also verifies consistent action deeds.
+`SylGen/Tests/Pins.lean` and `SylGen/Tests/negative.sh` test dispatch, defaults,
+scopes, mentions, and rejection of invalid input. See
+[Card authoring and trusted expansion](CONTRACTS.md#card-authoring-and-trusted-expansion).
 
 ## Fuel is load-bearing
 
 `decide` asks the kernel to evaluate the checker, and the kernel cannot unfold
 well-founded recursion. The phrase, trigger and ability grammar is one mutual block in
-`Abilities.lean`, elaborated by the scoped `mutual` elaborator `open scoped Semantics.Authoring`
+`Abilities.lean`, elaborated by the scoped `mutual` elaborator `open scoped Semantics.FastInductives`
 installs, which omits the eager `brecOn`, `SizeOf` and injectivity theorems the block's nested
 occurrences would make expensive. Without `brecOn` nothing recurses structurally on a spine
 type, so every recursive function over the syntax, in `Check/*` and beside the syntax

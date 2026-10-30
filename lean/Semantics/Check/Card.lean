@@ -331,22 +331,22 @@ def Card.check : Card → List Refusal
     inner.check .front ++ refuse (prototypeFrameOk line) .prototypeFrame ++
       prototypeAltCheck line alternative
 
-open Lean Meta Elab Term in
-/-- Evaluate `Card.check` for readable refusals, then construct the kernel `decide` proof.
-A generated canon card is `noncomputable` (it has no compiled code), so the report evaluates its
-unfolded value. -/
-elab "check_card% " cardTerm:term : term => do
-  let value ← elabTermEnsuringType cardTerm (mkConst ``Semantics.Card)
-  synthesizeSyntheticMVarsNoPostponing
-  let value ← instantiateMVars value
-  let verdict := mkApp (mkConst ``Card.check) value
-  let env ← getEnv
-  let evaluated ← deltaExpand verdict (isNoncomputable env)
-  let refusals ← unsafe evalExpr (List Refusal)
-    (mkApp (mkConst ``List [Level.zero]) (mkConst ``Refusal)) evaluated
-  unless refusals.isEmpty do
-    throwError "Card semantic check failed: {repr refusals}"
-  let valid ← mkEq verdict (mkApp (mkConst ``List.nil [Level.zero]) (mkConst ``Refusal))
-  mkDecideProof valid
+open Lean Meta Elab Command in
+/-- Evaluate a generated card for readable refusals and emit its kernel-checked theorem. -/
+elab "check_card " card:ident : command => do
+  let name ← resolveGlobalConstNoOverload card
+  let (valid, proof) ← liftTermElabM do
+    let verdict := mkApp (mkConst ``Card.check) (mkConst name)
+    let env ← getEnv
+    let evaluated ← deltaExpand verdict (isNoncomputable env)
+    let refusals ← unsafe evalExpr (List Refusal)
+      (mkApp (mkConst ``List [Level.zero]) (mkConst ``Refusal)) evaluated
+    unless refusals.isEmpty do
+      throwError "Card semantic check failed: {repr refusals}"
+    let valid ← mkEq verdict (mkApp (mkConst ``List.nil [Level.zero]) (mkConst ``Refusal))
+    return (valid, ← mkDecideProof valid)
+  let checkName := name.getPrefix ++ Name.mkSimple ("ok_" ++ name.getString!)
+  liftCoreM <| addAndCompile <| .thmDecl {
+    name := checkName, levelParams := [], type := valid, value := proof }
 
 end Semantics

@@ -25,20 +25,17 @@ def writeIfChanged (path : FilePath) (text : String) : IO Unit := do
   if let some dir := path.parent then IO.FS.createDirAll dir
   IO.FS.writeFile path text
 
-/-- The printed names a proof module reads through `cardNamed "…"` or `cardNamedOk "…"`. -/
-def cardNamedLiterals (text : String) : List String :=
-  (text.splitOn "cardNamed").drop 1 |>.filterMap fun rest =>
-    let rest := if rest.startsWith "Ok" then rest.drop 2 else rest.toSlice
-    let rest := rest.trimAsciiStart
-    if rest.startsWith "\"" then
-      some ((rest.drop 1).takeWhile (· != '"')).toString
-    else none
+/-- The printed names a proof module reads through `Semantics.Cards.«…»` or `Semantics.Cards.«ok_…»`. -/
+def referencedCards (text : String) : List String :=
+  (text.splitOn "Semantics.Cards.«").drop 1 |>.map fun rest =>
+    let name := (rest.toSlice.takeWhile (· != '»')).toString
+    if name.startsWith "ok_" then (name.drop 3).toString else name
 
 def writeProofImports (root : FilePath) : IO Unit := do
   let mut names : List String := []
   for entry in ← (root / "Semantics/Proofs").readDir do
     if entry.path.extension == some "lean" then
-      names := names ++ cardNamedLiterals (← IO.FS.readFile entry.path)
+      names := names ++ referencedCards (← IO.FS.readFile entry.path)
   let needles := names.eraseDups.map fun name =>
     " " ++ toString (Lean.Json.str (name ++ ".syl")) ++ "\n"
   let mut imports : Array String := #[]
@@ -166,7 +163,7 @@ lean_exe dumpValues where
   supportInterpreter := true
 
 lean_lib SylGenerator where
-  roots := #[`SylGen.Parser, `SylGen.Environment, `SylGen.Resolve, `SylGen.Emit, `SylGen.Ordering, `SylGen.BundleOrdering]
+  roots := #[`SylGen.Parser, `SylGen.Environment, `SylGen.Resolve, `SylGen.Emit]
 
 lean_exe sylGen where
   root := `SylGen.Main

@@ -1,3 +1,4 @@
+import SylFixtures
 import Semantics.Check
 import Semantics.Check.Card
 import Semantics.Definitions
@@ -7,9 +8,24 @@ import Semantics.Proofs.Helpers
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a counted)
+open Semantics.Templates.Predicate (did)
+open Semantics.Templates.StaticSpec (replace)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.Action (doIf replace target)
+open Semantics.Templates.ColorTerm (chosen)
+open Semantics.Templates.Condition (did)
+open Semantics.Templates.DetPhrase (a)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.CallerScope
 
-semantic_definition contextualFight (subject : NounPhrase) : Action := fight subject
+export SylFixture.Semantics.Templates (drawTwice forwardedSubject subjectPower repeatedValueSum
+  literalEcho quantityFor graveyardFor creatureCondition powerEquals lifeCost powerBoost
+  unusedSubject secondSubject moveSubject rereadDamage definedPower eventWithSubject
+  playerIgnoringSubject nestedRereadDamage)
 
 private def selected (drs : DRS) (body : NounPhrase) : List Referent :=
   let result := stepNounPhrase 64 drs .other false body
@@ -19,64 +35,32 @@ private def callerCreature : DRS := DRS.ofList
 private def callerCreatureSpell : DRS := DRS.ofList
   [{ det := .the, plur := .one, payload := .object [.creature] (some .stack) none none none }]
 
-private semantic_template drawTwice (amount : Amount) : Action :=
-  .sequentially [draw amount, draw amount]
-private semantic_template forwardedSubject (subject : NounPhrase) : NounPhrase := subject
-private semantic_template subjectPower (subject : NounPhrase) : Amount := .statOf (.stat .power) subject
-private semantic_template repeatedValueSum (amount : Amount) : Amount := .arith .plus amount amount
-private semantic_template literalEcho (amount : Amount) : Amount := amount
-private semantic_template quantityFor (amount : Amount) : Quantity := .exactlyOf amount
-private semantic_template graveyardFor (owner : NounPhrase) : Location := .zone .graveyard (some owner)
-private semantic_template creatureCondition (subject : NounPhrase) : Condition := .matches subject isCreature
-private semantic_template powerEquals (amount : Amount) : Predicate := .compare [.stat .power] .eq amount
-private semantic_template lifeCost (amount : Amount) : Cost := .perform (.changeLife (.down amount))
-private semantic_template powerBoost (subject : NounPhrase) (amount : Amount) : StaticSpec :=
-  Templates.modification subject .power (.up amount)
-private semantic_template unusedSubject (_chosen : NounPhrase) : Action := .draw (.exactlyOf 1)
-private semantic_template secondSubject (_left right : NounPhrase) : NounPhrase := right
-private semantic_template moveSubject (subject : NounPhrase) : Action :=
-  .move subject .anyLocation (some graveyard) .arrival []
-private semantic_template configuredDraw (_flag : Bool) : Action := .draw (.exactlyOf 1)
-private structure Flag where
-  bit : Bool
-private def discardedAction (_ : Action) : Flag := ⟨true⟩
-private def ordinarySubjectIdentity (subject : NounPhrase) : NounPhrase := subject
-private semantic_template ordinaryFunctionConfig (_function : NounPhrase → NounPhrase) : Action := draw 1
-private def applyWithForgedContext (body : AuthoringContext → NounPhrase → Action)
-    (left right : NounPhrase) : Action := instruct left (body ⟨999⟩ right)
-private def discardedSubjectFunction : Bool :=
-  let _function : NounPhrase → NounPhrase := fun subject => subject
-  true
-private def subjectFunctions : List (NounPhrase → NounPhrase) := [fun subject => subject]
-private semantic_template functionListConfig (_functions : List (NounPhrase → NounPhrase)) : Action := draw 1
-
-private semantic_definition selectThenTap (subject : NounPhrase) : Action :=
+private def selectThenTap (subject : NounPhrase) : Action :=
   .ownScope none (.sequentially
     [.setStatus .tapped (.firstMention "select.subject" (.inCaller subject)),
       .setStatus .untapped (.laterMention "select.subject" .any)])
-private semantic_definition selectThenMove (subject : NounPhrase) : Action :=
+private def selectThenMove (subject : NounPhrase) : Action :=
   .ownScope none (.move (.firstMention "select.subject" (.inCaller subject))
     .anyLocation (some graveyard) .arrival [])
-private semantic_definition announceThen (chosen : NounPhrase) (body : Action) : Action :=
+private def announceThen (chosen : NounPhrase) (body : Action) : Action :=
   .ownScope none (.sequentially [.setStatus .tapped (.firstMention "announce.subject" (.inCaller chosen)),
     .inCaller body])
 
 /-- "Draw a card. If you control three or more artifacts, <replacement> instead", the
 replacement supplied by the caller. -/
-private semantic_definition drawUnlessReplaced (replacement : Replacement) : Action :=
+private def drawUnlessReplaced (replacement : Replacement) : Action :=
   .ownScope none (.replace (draw 1)
     (doIf (compareAmt (countOf isArtifact) .atLeast 3) (.inCaller replacement)))
 /-- The same Definition, forgetting that its replacement is its caller's. -/
-private semantic_definition drawUnlessReplacedHere (replacement : Replacement) : Action :=
+private def drawUnlessReplacedHere (replacement : Replacement) : Action :=
   .ownScope none (.replace (draw 1)
     (doIf (compareAmt (countOf isArtifact) .atLeast 3) replacement))
 
-private def explicitExpansion : Spelled := spelled <| .singleFaced
+private def explicitExpansion : Card := .singleFaced
   { characteristics := {
       name := "Expansion witness", types := [.sorcery],
-      text := [spell (expand (drawTwice 1))] } }
-theorem explicitExpansionPreservesAuthorship : explicitExpansion.authoring.onlyAuthored = true := explicitExpansion.onlyAuthored
-theorem explicitExpansionChecksItsResult : explicitExpansion.card.check = [] := by decide
+      text := [spell (drawTwice 1)] } }
+theorem explicitExpansionChecksItsResult : explicitExpansion.check = [] := by decide
 
 theorem templateArgumentsAreEvaluatedAtTheirTextualUse :
     (unusedSubject it).check (DRS.ofList []) = [] ∧
@@ -197,13 +181,9 @@ theorem sameSelectedSubjectIsReadBackThroughTemplate :
 theorem independentValueSubjectsRemainIndependent :
     (Action.exchange (.values (subjectPower (target isCreature))
       (subjectPower (target isCreature)))).check (DRS.ofList []) = [] := by decide
-private semantic_template rereadDamage (amount : Amount) : Action :=
-  .sequentially [instruct .this (.dealDamage amount .you), instruct .this (.dealDamage amount .you)]
 theorem expressionAmountObservesNewOutcomes :
     (rereadDamage .thatMuch).check (DRS.ofList [outcomeB .damageDealt]) = [.quantOutcomeInScope 2] := by decide
 
-private semantic_template definedPower (subject : NounPhrase) : StaticSpec :=
-  definesPower subject 1
 theorem scopedStaticDefinitionsRemainVisibleToPrintedBoxes :
     (definedPower thisCreature).definedStats = [.power] := by decide
 
@@ -251,70 +231,6 @@ theorem forwardedCoordinationRetainsTwoParties :
     (Action.exchange (.lifeTotals (forwardedSubject (.and [.you, anOpponent])))).check
       (DRS.ofList []) = [] := by decide
 
-/-- error: Semantics.Proofs.CallerScope.contextualFight uses a lexical context outside its authoring scope -/
-#guard_msgs in
-example : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Forged context witness", types := [.sorcery],
-        text := [spell
-        (instruct (target isCreature) (@contextualFight ⟨1⟩ (target isCreature)))] } }
-
-/-- error: Card definitions must use semantic templates or definitions; raw constructors: [Semantics.Action.draw] -/
-#guard_msgs in
-example : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Discarded projection witness", types := [.sorcery],
-        text := [spell
-        (configuredDraw (discardedAction (.draw (.exactlyOf 1))).bit)] } }
-
-/-- error: Card definitions must use semantic templates or definitions; raw constructors: [Semantics.Action.draw] -/
-#guard_msgs in
-example : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Expansion witness", types := [.sorcery],
-        text := [spell (expand (.draw (.exactlyOf 1)))] } }
-
-/-- error: Card definitions must use semantic templates or definitions; raw constructors: [Semantics.NounPhrase.you] -/
-#guard_msgs in
-example : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Expansion witness", types := [.sorcery],
-        text := [spell (expand (instruct .you (drawTwice 1)))] } }
-
-/-- error: Semantic parameter subject has no authoring evidence -/
-#guard_msgs in
-example : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Unannotated function alias witness", types := [.sorcery],
-        text := [spell (ordinaryFunctionConfig ordinarySubjectIdentity)] } }
-
-/-- error: Semantics.Proofs.CallerScope.contextualFight uses a lexical context outside its authoring scope -/
-#guard_msgs in
-example : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Higher order context witness", types := [.sorcery],
-        text := [spell
-        (applyWithForgedContext (@contextualFight) (target isCreature) (target isCreature))] } }
-
-/-- error: Semantic parameter subject has no authoring evidence -/
-#guard_msgs in
-example : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Discarded function witness", types := [.sorcery],
-        text := [spell (configuredDraw discardedSubjectFunction)] } }
-
-/-- error: Semantic parameter subject has no authoring evidence -/
-#guard_msgs in
-example : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Function container witness", types := [.sorcery],
-        text := [spell (functionListConfig subjectFunctions)] } }
-
-private semantic_template eventWithSubject (subject : NounPhrase) : GameEvent :=
-  .does (.actor subject) (.dealDamage .anyAmount .you)
-private semantic_template playerIgnoringSubject (_subject : NounPhrase) : NounPhrase := .you
-private semantic_template nestedRereadDamage (amount : Amount) : Action :=
-  .sequentially [rereadDamage amount, rereadDamage amount]
 
 
 theorem eventTemplateAcceptsItsSubject :
@@ -412,7 +328,7 @@ theorem conditionOverCallerReplacementReadsItsConditionInTheCallersScope :
 /-- "If you sacrificed a creature this turn": a caller's condition introducing the creature its
 action reads. -/
 private def sacrificedACreature : Condition :=
-  did you (sacrifice (a isCreature)) soFarThisTurn
+  did (Semantics.Subject.actor you) (sacrifice (a isCreature)) (.duration soFarThisTurn none)
 
 /-- "… If you sacrificed a creature this turn, return it to its owner's hand instead.", the
 replacement the caller's: its condition and action are read in one caller frame, the action a

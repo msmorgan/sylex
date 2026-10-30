@@ -14,6 +14,20 @@ sentences are the Idris ones.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and andOr did was)
+open Semantics.Templates.Location (and andOr)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Action (target)
+open Semantics.Templates.ColorTerm (chosen)
+open Semantics.Templates.Condition (and did was)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.NounPhrase (andOr)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.Anaphora
 
 
@@ -33,7 +47,7 @@ theorem bareItInACardConditionReadsTheCard :
 
 /-- "Choose two — Draw a card; draw a card." [CR#700.2d] -/
 theorem identicalModesAllowed :
-    Action.check (DRS.ofList []) (chooseModes (exactly 2) [draw 1, draw 1])
+    Action.check (DRS.ofList []) (chooseModes (exactly 2) [{ action := draw 1 }, { action := draw 1 }])
       = [] := by
   decide
 
@@ -130,7 +144,7 @@ theorem okMoveToExile :
 /-- "When this creature enters, if a creature died this turn, draw a card." -/
 theorem okLookbackObjectDied :
     Ability.check (DRS.ofList [])
-      (when (does thisCreature enter)
+      (when (does (Semantics.Subject.actor (thisCreature)) enter)
         (if_ := some (.did { subj := .any
                              action := (.move (a isCreature) (battlefield) (some graveyard) .departure [])
                              within := some (.duration soFarThisTurn none) })) (draw 1))
@@ -140,7 +154,7 @@ theorem okLookbackObjectDied :
 /-- "When this creature enters, if you died this turn, draw a card." -/
 theorem badLookbackPlayerDied :
     Ability.check (DRS.ofList [])
-      (when (does thisCreature enter)
+      (when (does (Semantics.Subject.actor (thisCreature)) enter)
         (if_ := some (.did { subj := .any
                              action := (.move .you (battlefield) (some graveyard) .departure [])
                              within := some (.duration soFarThisTurn none) })) (draw
@@ -150,7 +164,7 @@ theorem badLookbackPlayerDied :
 
 theorem badLookbackObjectCast :
     Ability.check (DRS.ofList [])
-      (when (does thisCreature enter)
+      (when (does (Semantics.Subject.actor (thisCreature)) enter)
         (if_ := some (.did { subj := (.actor (a isCreature))
                              action := (.procedure .cast .any .itsOwnCost none none none)
                              within := some (.duration soFarThisTurn none) })) (draw
@@ -286,15 +300,15 @@ theorem okCastFromGraveyard :
 
 /-- "spells cast by a creature": a player casts a spell [CR#601.2]. -/
 theorem badCastByNonPlayer :
-    Predicate.checkAt .object (DRS.ofList []) (did (a isCreature) (cast which) thisObject) =
+    Predicate.checkAt .object (DRS.ofList []) (did ((Semantics.Subject.actor (a isCreature))) (cast which) thisObject) =
       [.kindMismatch .player .object] := by decide
 
 /-- "spells they cast", with nothing for the pronoun to read, and "spells it cast", whose "it"
 can read only the spell itself, which casts nothing: a player casts a spell [CR#601.2]. -/
 theorem badCastByUnresolvedPronoun :
-    Predicate.checkAt .object (DRS.ofList []) (did they (cast which) thisObject) =
+    Predicate.checkAt .object (DRS.ofList []) (did (Semantics.Subject.actor (they)) (cast which) thisObject) =
         [.anaphor (.word .player) .one 0] ∧
-      Predicate.checkAt .object (DRS.ofList []) (did it (cast which) thisObject) =
+      Predicate.checkAt .object (DRS.ofList []) (did (Semantics.Subject.actor (it)) (cast which) thisObject) =
         [.kindMismatch .player .object] := by
   decide
 
@@ -302,9 +316,9 @@ theorem badCastByUnresolvedPronoun :
 span an event ordinal counts within [CR#400.7], though it is the span the lookback reads. -/
 theorem ownCastingRankIsAnEventOrdinal :
     Predicate.checkAt .object (DRS.ofList [])
-        (did you (cast which) thisObject (ordinal := some ⟨.nth 2, some .turn⟩)) = [] ∧
+        (did (Semantics.Subject.actor (you)) (cast which) thisObject (ordinal := some ⟨.nth 2, some .turn⟩)) = [] ∧
       Predicate.checkAt .object (DRS.ofList [])
-        (did you (cast which) thisObject (ordinal := some ⟨.nth 2, some .thisObject⟩)) =
+        (did (Semantics.Subject.actor (you)) (cast which) thisObject (ordinal := some ⟨.nth 2, some .thisObject⟩)) =
         [.eventOrdinalPeriod .thisObject] := by decide
 
 /-- "spells cast from their graveyard", with nothing for "their" to read, is refused as "in
@@ -318,9 +332,9 @@ theorem badCastFromUnresolvedZone :
 
 /-- "abilities activated by a creature": a player activates an ability [CR#602.2]. -/
 theorem badActivatedByNonPlayer :
-    Predicate.checkAt .object (DRS.ofList []) (did (a isCreature) (activate which) thisObject) =
+    Predicate.checkAt .object (DRS.ofList []) (did ((Semantics.Subject.actor (a isCreature))) (activate which) thisObject) =
         [.kindMismatch .player .object] ∧
-      Predicate.checkAt .object (DRS.ofList []) (did you (activate which) thisObject) = [] := by
+      Predicate.checkAt .object (DRS.ofList []) (did (Semantics.Subject.actor (you)) (activate which) thisObject) = [] := by
   decide
 
 /-- "… that was put somewhere from the battlefield this turn." -/
@@ -394,7 +408,7 @@ private def afterEarlier (earlier : Action) : DRS :=
 theorem okShuffledYourLibraryThisWay :
     Condition.check (afterEarlier shuffle)
       (.did { subj := (.actor .you)
-              action := (.ownScope (some shuffle) (.shuffle (.zone .library (some .you))))
+              action := (.ownScope (some shuffle.deed) (.shuffle (.zone .library (some .you))))
               within := some .thisWay })
       = [] := by
   decide
@@ -412,7 +426,7 @@ theorem searchLookbackCarriesItsScope :
 theorem badShuffledYourGraveyardThisWay :
     Condition.check (afterEarlier shuffle)
       (.did { subj := (.actor .you)
-              action := (.ownScope (some shuffle) (.shuffle (graveyardOf .you)))
+              action := (.ownScope (some shuffle.deed) (.shuffle (graveyardOf .you)))
               within := some .thisWay })
       = [.shuffleZone] := by
   decide

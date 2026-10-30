@@ -3,5 +3,5 @@
 # [CR#702.164b]
 template totalToxicValue(subject: NounPhrase): Amount {
   spelling = "<subject>'s total toxic value",
-  body = amountAggregate(sum, keywordNumber(named("toxic")), subject)
+  body = amountAggregate(sum, keywordNumber(toxic), subject)
 }

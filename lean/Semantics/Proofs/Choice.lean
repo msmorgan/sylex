@@ -11,6 +11,24 @@ form, each closed by `decide`. The names and the sentences are the Idris ones.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and did quality)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Amount (timesPaid)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.ColorTerm (chosen)
+open Semantics.Templates.Condition (and did)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.LinkedFacet (timesPaid)
+open Semantics.Templates.QualityPayload (quality)
+open Semantics.Templates.SliceCount (counted)
+open Semantics.Templates.Subject (actor)
+
 namespace Semantics.Proofs.Choice
 
 /-- "the chosen number", one number choice standing -/
@@ -119,14 +137,14 @@ theorem okSpreeBothCosted :
 checker refuses the unresolved `it`. -/
 theorem badModalReadsAcrossModes :
     Action.check (DRS.ofList [])
-      (chooseModes (exactly 1) [destroy (target isArtifact), Action.setStatus .tapped it])
+      (chooseModes (exactly 1) [{ action := destroy (target isArtifact) }, { action := Action.setStatus .tapped it }])
       = [.anaphor (.atSlot .permanent) .one 0] := by
   decide
 
 theorem badReadsAfterModal :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ chooseModes (exactly 1) [destroy (target isArtifact), destroy (target isEnchantment)],
+        [ chooseModes (exactly 1) [{ action := destroy (target isArtifact) }, { action := destroy (target isEnchantment) }],
           .setStatus .tapped it ]) = [.anaphor (.atSlot .permanent) .one 0] := by
   decide
 
@@ -436,14 +454,14 @@ theorem badOrderedSingularChooser :
 theorem okChoseThisWayAfterChoice :
     Action.check (DRS.ofList [])
       (.sequentially
-        [choose (a isCreature), doIf (did you (choose (a isCreature)) thisWay) (draw 1)])
+        [choose (a isCreature), doIf (did (Semantics.Subject.actor you) (choose (a isCreature)) thisWay) (draw 1)])
       = [] := by
   decide
 
 /-- "If you chose a creature this way, draw a card.": nothing was chosen, so "this way" reads
 back no choice (`okChoseThisWayAfterChoice` is the same read with one standing). -/
 theorem badChoseThisWayWithoutAChoice :
-    Action.check (DRS.ofList []) (doIf (did you (choose (a isCreature)) thisWay) (draw 1))
+    Action.check (DRS.ofList []) (doIf (did (Semantics.Subject.actor you) (choose (a isCreature)) thisWay) (draw 1))
       = [.thisWayUngrounded] := by
   decide
 
@@ -477,15 +495,15 @@ theorem playAndCastFromGraveyardThisTurn :
     Action.check (DRS.ofList [])
       (.establish
         (.conjunction none
-          [ can you (play (allOf isLand) (from_ := some (graveyardOf .you))),
-            can you (cast (bare isSpell) (from_ := some (graveyardOf .you))) ])
+          [ can (Semantics.Subject.actor you) (play (allOf isLand) (from_ := some (graveyardOf .you))),
+            can (Semantics.Subject.actor you) (cast (bare isSpell) (from_ := some (graveyardOf .you))) ])
         (some untilEndOfTurn)) = [] := by
   decide
 
 /-- "Each player may play an additional land on each of their turns." No printed card on the
 bench. -/
 theorem eachPlayerPlaysAdditionalLand :
-    StaticSpec.check (DRS.ofList []) (can (each .isPlayer) (play (counted (additional (exactly 1)) isLand))) = [] := by decide
+    StaticSpec.check (DRS.ofList []) (can ((Semantics.Subject.actor (each .isPlayer))) (play (counted (additional (exactly 1)) isLand))) = [] := by decide
 
 /-- "Mill three cards. You may put an artifact card from among the cards milled this way into
 your hand." No printed card on the bench. -/

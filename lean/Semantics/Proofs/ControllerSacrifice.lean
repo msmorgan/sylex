@@ -4,6 +4,16 @@ import Semantics.Definitions
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a the)
+open Semantics.Templates.Predicate (and did was)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.Condition (and did was)
+open Semantics.Templates.DetPhrase (a the)
+
 namespace Semantics.Proofs.ControllerSacrifice
 
 private def subject : NounPhrase := target (.and [isArtifact, isCreature])
@@ -78,15 +88,6 @@ theorem nestedDescriptionMovesOnlyItsOwnReferentWithoutOuterContext :
     (firstReach (.word (.type .artifact)) .one nestedAfter).map (·.zone) = some (some .battlefield) ∧
     (firstReach (.word .card) .one nestedAfter).map (·.zone) = some (some .graveyard) := by decide
 
-private def authoringWitness : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Controller sacrifice witness", types := [.sorcery], cost := some [generic 1],
-      text := [spell
-        (controllerSacrifices (target (and [isArtifact, isCreature])))] } }
-
-theorem compositionPassesTheAuthoringBoundary :
-    authoringWitness.authoring.onlyAuthored = true := by decide
-
 theorem controlGrantRecordsItsPatientIdentity :
     let (after, errors) := stepAction 64 .postEvent .obj (DRS.ofList [])
       (gainControl (target isCreature) (some untilEndOfTurn))
@@ -104,13 +105,13 @@ theorem thisWayReadsOnlyTheDeedWritten :
     Action.check (DRS.ofList [])
       (sequentially
         [ gainControl (target isCreature) untilEndOfTurn,
-          doIf (did you (draw anyAmount) thisWay) (tap it) ]) = [.thisWayUngrounded] := by decide
+          doIf (did (Semantics.Subject.actor you) (draw anyAmount) thisWay) (tap it) ]) = [.thisWayUngrounded] := by decide
 
 theorem aModeArmPublishesItsCausedEvent :
     Action.check (DRS.ofList [])
       (sequentially
         [ chooseOne (sacrifice (a isCreature)) (gainControl (target isCreature) untilEndOfTurn),
-          doIf (did you (gainControlOf (a isCreature)) thisWay) (tap it) ]) = [] := by decide
+          doIf (did (Semantics.Subject.actor you) (gainControlOf (a isCreature)) thisWay) (tap it) ]) = [] := by decide
 
 private def existingTarget : Referent :=
   { det := .target, plur := .one,
@@ -940,7 +941,7 @@ private theorem controllerSourceAndBody (fuel : Nat) (drs : DRS) :
   dsimp only
   -- Unfold the template in the action alone: a `change` of the whole step would compare the two
   -- steps by unfolding them.
-  rw [show Semantics.Templates.Action.controllerSacrifices nestedSubject =
+  rw [show Semantics.Templates.controllerSacrifices nestedSubject =
       .instruct (controllerOf (.firstMention "controllerSacrifices.subject" nestedSubject))
         (sacrifice (.laterMention "controllerSacrifices.subject" nestedSubject)) from rfl]
   rw [show fuel + 11 = (fuel + 10) + 1 by omega, controllerInstructStep]
@@ -948,7 +949,6 @@ private theorem controllerSourceAndBody (fuel : Nat) (drs : DRS) :
   simp only [sourceCanonical,
     sourceIds, controllerAlreadyInView, performerOutOfView, List.filterMap_cons, List.filterMap_nil,
     selectedController, List.foldl_cons, List.foldl_nil, controllerRecord]
-  simp only [Semantics.Templates.NounPhrase.controllerOf]
   rw [nonDistributiveReferents _ _ _ _ (controllerNotDistributive _)]
   rfl
 

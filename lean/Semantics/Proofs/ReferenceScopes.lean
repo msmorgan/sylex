@@ -3,6 +3,11 @@ import Semantics.Proofs.Helpers
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (each)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.DetPhrase (each)
+
 namespace Semantics.Proofs.ReferenceScopes
 
 private def creatureBinding : Referent :=
@@ -189,11 +194,11 @@ theorem attachKeepsOuterAmbiguity :
 
 theorem blockWithoutOuterLetter :
     Action.check (DRS.ofList [creatureBinding])
-      (establish (must creatureX (block it)) (some untilEndOfTurn)) = [] := by decide
+      (establish (must (Semantics.Subject.actor creatureX) (block it)) (some untilEndOfTurn)) = [] := by decide
 
 theorem blockWithOuterLetter :
     Action.check (DRS.ofList [creatureBinding, playerBinding, letterB .x])
-      (establish (must creatureX (block it)) (some untilEndOfTurn)) = [] := by decide
+      (establish (must (Semantics.Subject.actor creatureX) (block it)) (some untilEndOfTurn)) = [] := by decide
 
 theorem damageOwnPowerWithoutOuter :
     Action.check (DRS.ofList []) (dealDamageOwnPower creatureX (target isCreature)) = [] := by decide

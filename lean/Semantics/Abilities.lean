@@ -84,7 +84,7 @@ inductive Coordinator where
   | andOr
   deriving DecidableEq, Repr
 
-open scoped Semantics.Authoring
+open scoped Semantics.FastInductives
 
 mutual
   -- ## Phrase Grammar
@@ -1638,41 +1638,10 @@ def Location.positiveZones? (loc : Location) (fuel : Nat := 64) : Option (List L
   | _ + 1, .anyLocation | _ + 1, .not _ => none
 termination_by structural fuel
 
-instance : Coe Condition AsThough where
-  coe := .condition
 
-/-- An action is the mode that is that action alone, uncosted and unweighted: `chooseModes`'s
-bullets are written as their actions. -/
-instance : Coe Action Mode where
-  coe action := { action }
 
 end Semantics
 
-attribute [semantic_expression] Semantics.GameEvent Semantics.NounPhrase Semantics.Predicate
-  Semantics.Amount Semantics.Quantity Semantics.Location Semantics.Condition Semantics.Duration
-  Semantics.Timing Semantics.Subject Semantics.LookbackSpan Semantics.WouldClause
-  Semantics.Replacement Semantics.Action Semantics.StaticSpec Semantics.Cost Semantics.Ability
-  Semantics.TokenSpec Semantics.QualityPayload
-
-classify_semantic_syntax
-
--- A keyword ability is written through its typed Definition in `Semantics.Definitions`,
--- whose signature fixes its parameters; `Ability.keyword` is that Definition's expansion carrier.
-attribute [internal_expansion] Semantics.Ability.keyword
-
-attribute [internal_expansion] Semantics.NounPhrase.pro Semantics.NounPhrase.which
-  Semantics.NounPhrase.firstMention Semantics.NounPhrase.laterMention
-  Semantics.Quantity.inCaller Semantics.Location.inCaller Semantics.Condition.inCaller
-  Semantics.NounPhrase.inCaller Semantics.GameEvent.inCaller Semantics.Amount.inCaller
-  Semantics.Predicate.inCaller Semantics.Action.inCaller
-  Semantics.Action.ownScope Semantics.Cost.inCaller Semantics.StaticSpec.inCaller
-  Semantics.Replacement.inCaller Semantics.Ability.inCaller Semantics.TokenSpec.inCaller
-  Semantics.MoveRider.inCaller
-
-attribute [semantic_literal] Semantics.Amount.lit
-
-/-- A numeral is a literal Amount: `3` for `.lit 3`. The numeral stays an `OfNat.ofNat` term
-that `Authoring.inspect` reads through to this literal leaf. -/
 instance (n : Nat) : OfNat Semantics.Amount n := ⟨.lit (Int.ofNat n)⟩
 
 namespace Semantics

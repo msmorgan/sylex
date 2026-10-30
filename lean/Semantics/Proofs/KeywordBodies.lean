@@ -16,6 +16,23 @@ and vigilance the same way; their pins follow the census's.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a the)
+open Semantics.Templates.Predicate (and not)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and not)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.WouldClause (nthOccurrence)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.Ability (saddle)
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.Action (doIf saddle)
+open Semantics.Templates.Condition (and not)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a the)
+open Semantics.Templates.GameEvent (nthOccurrence)
+
 namespace Semantics.Proofs.KeywordBodies
 
 /-- "Saddle 2" checks, including the permanent receiving the saddled designation
@@ -79,24 +96,24 @@ theorem okFrenzyDefinition :
 /-- "Freerunning {1}{U}": an alternative cost [CR#118.9] that applies only while its condition
 holds [CR#702.173a], and it checks. -/
 theorem okFreerunningDefinition :
-    (match firstStatic? (freerunning [generic 1, pip .blue]) with
+    (match firstStatic? (freerunning (Semantics.Cost.mana ([generic 1, pip .blue]))) with
       | some (.conditional (.altCost _ (some _)) (.did _) _) => true
       | _ => false) = true ∧
-      Ability.check (DRS.ofList []) (freerunning [generic 1, pip .blue]) = [] := by decide
+      Ability.check (DRS.ofList []) (freerunning (Semantics.Cost.mana ([generic 1, pip .blue]))) = [] := by decide
 
 /-- "Encore {3}{B}": one activated ability, activated only as a sorcery [CR#702.141a], and it
 checks. -/
 theorem okEncoreDefinition :
-    (match encore [generic 3, pip .black] with
+    (match encore (Semantics.Cost.mana ([generic 3, pip .black])) with
       | .keyword _ _ [.activated (.compound [_, .perform _]) _ (some _) none none none] => true
       | _ => false) = true ∧
-      Ability.check (DRS.ofList []) (encore [generic 3, pip .black]) = [] := by decide
+      Ability.check (DRS.ofList []) (encore (Semantics.Cost.mana ([generic 3, pip .black]))) = [] := by decide
 
 /-- "Partner with Blaring Recruiter": the one ability of the game partner with represents, the
 entering trigger, in which target player may search their library for the named card
 [CR#702.124j], and it checks. -/
 theorem okPartnerWithDefinition :
-    (match partnerWith (named "Blaring Recruiter") with
+    (match partnerWith (named (Semantics.NameSource.printed ("Blaring Recruiter"))) with
       | .keyword _ _
           [.triggered _ [] none [] none none none
             (.instruct (.described (.target _) _)
@@ -104,7 +121,7 @@ theorem okPartnerWithDefinition :
                 (.sequentially [.ownScope (some (.action "search")) _, _, _, _]) none none))] =>
         true
       | _ => false) = true ∧
-      Ability.check (DRS.ofList []) (partnerWith (named "Blaring Recruiter")) = [] := by decide
+      Ability.check (DRS.ofList []) (partnerWith (named (Semantics.NameSource.printed ("Blaring Recruiter")))) = [] := by decide
 
 /-- Vigilance forbids only the tap its creature's attacking causes [CR#702.20b,508.1f]: the
 prohibition carries that cause, and it checks. -/
@@ -171,7 +188,7 @@ continuously since the beginning of your previous upkeep, and its payment is of 
 echo cost, the payment *Thick-Skinned Goblin*'s replacement watches: the echo cost of "permanents
 you control", which this permanent, a permanent its upkeep's player controls, is one of. -/
 theorem okEchoDefinition :
-    echoParts? (echo [generic 2, pip .white]) =
+    echoParts? (echo (Semantics.Cost.mana ([generic 2, pip .white]))) =
         some
           (not (heldSince (is thisPermanent youControl)
               (.beginningOf .upkeep (some .you) (.previous (some .you)))),
@@ -179,7 +196,7 @@ theorem okEchoDefinition :
       replacedPayment? Cards.thickSkinnedGoblinEchoPayment =
         some (some (allOf (and [isPermanent, youControl])), some (.named "echo")) := ⟨rfl, rfl⟩
 
-theorem okEchoChecks : Ability.check (DRS.ofList []) (echo [generic 2, pip .white]) = [] := by
+theorem okEchoChecks : Ability.check (DRS.ofList []) (echo (Semantics.Cost.mana ([generic 2, pip .white]))) = [] := by
   decide
 
 /-- The payment of the cast a keyword's one permission grants. -/
@@ -192,13 +209,13 @@ private def castPayment? : Ability → Option PlayPayment
 prototyped [CR#718.3], transformed [CR#702.146a,712.8c], converted [CR#702.162a] and fused
 [CR#702.102a]. Each checks. -/
 theorem castModeDefinitions :
-    (match castPayment? prototype, castPayment? (disturb [generic 3, pip .white]),
-        castPayment? (moreThanMeetsTheEye [pip .white, pip .blue]), castPayment? fuse with
+    (match castPayment? prototype, castPayment? (disturb (Semantics.Cost.mana ([generic 3, pip .white]))),
+        castPayment? (moreThanMeetsTheEye (Semantics.Cost.mana ([pip .white, pip .blue]))), castPayment? fuse with
       | some .prototyped, some (.transformed _), some (.transformed _), some .fused => true
       | _, _, _, _ => false) = true ∧
       Ability.check (DRS.ofList []) prototype = [] ∧
-      Ability.check (DRS.ofList []) (disturb [generic 3, pip .white]) = [] ∧
-      Ability.check (DRS.ofList []) (moreThanMeetsTheEye [pip .white, pip .blue]) = [] ∧
+      Ability.check (DRS.ofList []) (disturb (Semantics.Cost.mana ([generic 3, pip .white]))) = [] ∧
+      Ability.check (DRS.ofList []) (moreThanMeetsTheEye (Semantics.Cost.mana ([pip .white, pip .blue]))) = [] ∧
       Ability.check (DRS.ofList []) fuse = [] := by decide
 
 /-- Compleated replaces an entry with loyalty counters, lowering them by two for each Phyrexian
@@ -215,29 +232,29 @@ theorem okCompleatedDefinition :
 /-- "Suspend 4—{1}{U}" is its special action, gated on the card's being castable from your hand,
 and its two triggered abilities [CR#702.62a,116.2f], and it checks. -/
 theorem okSuspendDefinition :
-    (match suspend 4 [generic 1, pip .blue] with
+    (match suspend 4 (Semantics.Cost.mana ([generic 1, pip .blue])) with
       | .keyword _ _
           [ .static (.specialAction none (some (.onlyIf (.couldBeginToCast .you _ _))) _ _),
             .triggered .., .triggered (.does .any (.removeCounters (some .theLast) _ _)) .. ] =>
         true
       | _ => false) = true ∧
-      Ability.check (DRS.ofList []) (suspend 4 [generic 1, pip .blue]) = [] := by decide
+      Ability.check (DRS.ofList []) (suspend 4 (Semantics.Cost.mana ([generic 1, pip .blue]))) = [] := by decide
 
 /-- "Miracle {R}": as you draw your first card each turn, if it is this card, revealing it makes
 a linked trigger that may cast it for its miracle cost [CR#702.94a,603.11], and it checks. -/
 theorem okMiracleDefinition :
-    (match miracle [pip .red] with
+    (match miracle (Semantics.Cost.mana ([pip .red])) with
       | .keyword _ _
           [.static (.asEvent (.nthOccurrence (.nth 1) (some .turn) _)
             (.doIf _ (.triggerReflexively _ none _) none _))] => true
       | _ => false) = true ∧
-      Ability.check (DRS.ofList []) (miracle [pip .red]) = [] := by decide
+      Ability.check (DRS.ofList []) (miracle (Semantics.Cost.mana ([pip .red]))) = [] := by decide
 
 /-- Miracle's "that card" is the card the draw drew: an event that draws none leaves it no
 antecedent. -/
 theorem badDrawnCardWithoutADraw :
     Ability.check (DRS.ofList [])
-      (static (asEvent (nthOccurrence (.nth 1) (does you (gainLife 1)) (some .turn))
+      (static (asEvent (nthOccurrence (.nth 1) (does (Semantics.Subject.actor (you)) (gainLife 1)) (some .turn))
         (doIf (is (that .card) (not (otherThan thisCard))) (draw 1) none))) =
       [.anaphor (.word .card) .one 0] := by decide
 
@@ -257,7 +274,7 @@ theorem optionalTextChoiceIsPublished :
       static (.paySubstitute thisSpell
         ⟨ instruct (the isChosenPlayer) (pay (.mana [generic 1]) .once), [.generic] ⟩)
     Ability.checkText (DRS.ofList [])
-        [ static (asEvent (does you (cast thisSpell)) (may (choose (a (and [isPlayer, isOther]))))),
+        [ static (asEvent (does (Semantics.Subject.actor (you)) (cast thisSpell)) (may (choose (a (and [isPlayer, isOther]))))),
           substitute ] = [] ∧
       Ability.checkText (DRS.ofList []) [substitute] = [.choiceRef .theChoice .player 0] := by decide
 
@@ -303,7 +320,7 @@ theorem badThemDoesNotReadGiftOpponent :
 
 /-- The life a cost pays is no result a later ability reads: "that much" finds none. -/
 theorem badThatMuchDoesNotReadCostLife :
-    Ability.checkText (DRS.ofList []) [activated (payLife 2) (draw 1),
+    Ability.checkText (DRS.ofList []) [activated (Semantics.Cost.perform ((payLife 2))) (draw 1),
         spell (gainLife thatMuch)]
       = [.quantOutcomeInScope 0] := by decide
 

@@ -20,6 +20,11 @@ look-back zone changes, so it is observed on arrival [CR#603.10a].
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.ManaSymbol (generic)
+
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a)
+
 namespace Semantics.Proofs.DuringResolution
 
 /-- The trigger events of a keyword's triggered halves, in order. -/

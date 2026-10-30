@@ -3,6 +3,7 @@ import Semantics.Check
 /-! Selection evidence: the referents a selection leaves for a later remainder, choice or loop
 read. -/
 
+
 namespace Semantics.Proofs.SelectionEvidence
 
 open Semantics

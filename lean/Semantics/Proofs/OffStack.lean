@@ -16,6 +16,23 @@ read through their declarations (`Semantics.Definitions`). Each pin is closed by
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted)
+open Semantics.Templates.Predicate (and or not did was quality)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and or not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.StaticSpec (replace)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.Ability (devour)
+open Semantics.Templates.Action (doIf replace target)
+open Semantics.Templates.Condition (and did not or was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each)
+open Semantics.Templates.QualityPayload (quality)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.OffStack
 
 /-! ## The nodes -/
@@ -24,7 +41,7 @@ namespace Semantics.Proofs.OffStack
 entering it replaces, which still happens [CR#614.1c]. -/
 theorem okAsEnteringAlongside :
     StaticSpec.check (DRS.ofList [])
-      (replace (would thisPermanent enter) (alongside (may (draw 1)))) = [] := by
+      (replace (would (Semantics.Subject.actor thisPermanent) enter) (alongside (may (draw 1)))) = [] := by
   decide
 
 /-- "As it becomes night, transform this permanent": an action carried out as an event that is
@@ -146,8 +163,8 @@ theorem amplifyCountsTheCardsRevealedThisWay :
 
 /-- "When this creature enters, draw a card for each creature it devoured." -/
 def drawForEachDevoured : Ability :=
-  when (does thisCreature enter)
-    (doForEach (each (and [isCreature, did it (devour which)])) (draw 1))
+  when (does (Semantics.Subject.actor thisCreature) enter)
+    (doForEach (each (and [isCreature, did (Semantics.Subject.actor (it)) (Definitions.Action.devour which)])) (draw 1))
 
 /-- Skullmulcher: "Devour 1 … When this creature enters, draw a card for each creature it
 devoured." [CR#702.82b]: "it devoured" reads back the creatures devour's entry sacrificed, the
@@ -161,8 +178,8 @@ the number of Goblins it devoured." [CR#702.82b] -/
 theorem okGoblinsItDevoured :
     Ability.checkText (DRS.ofList [])
       [ devour 1,
-        when (does thisCreature enter)
-          (dealDamage (times 2 (countOf (and [hasSubtype goblin, did it (devour which)])))
+        when (does (Semantics.Subject.actor thisCreature) enter)
+          (dealDamage (times 2 (countOf (and [hasSubtype goblin, did (Semantics.Subject.actor (it)) (Definitions.Action.devour which)])))
             (target isAnyTarget)) ] = [] := by
   decide
 
@@ -261,7 +278,7 @@ quality, which protection [CR#702.16c] can overrule. None is an Off-Stack Static
 theorem enchantReplacesTheEntering :
     (offStackStatics (enchant isCreature), replacements (enchant isCreature))
       = ([],
-        [ (would thisAura enter,
+        [ (would (Semantics.Subject.actor thisAura) enter,
             doIf (not (exists_ (legalHostOf thisAura)))
               (instead (doIf (is thisAura (in_ stack)) (putInto thisAura graveyard)))),
           (would .any
@@ -269,7 +286,7 @@ theorem enchantReplacesTheEntering :
             doIf (exists_ (legalHostOf thisAura))
               (before (choose (a (legalHostOf thisAura)))
                 (some (alongside (attachTo thisAura it))))),
-          (would thisAura
+          (would (Semantics.Subject.actor thisAura)
               (enter (riders := [.attachedTo .any, .not (.attachedTo (a (legalHostOf thisAura)))])),
             instead (doIf (is thisAura (in_ stack)) (putInto thisAura graveyard))) ]) := by
   rfl
@@ -315,12 +332,12 @@ theorem sunburstIgnoresTypeChanges :
             (and
               [ is thisPermanent (hasTypeIgnoringTypeChanges .creature),
                 coloredManaSpentToCast thisSpell ])
-            (withRiders [.withCounters (colorsSpentToCast thisSpell) p1p1Counter .fresh]),
+            (withRiders [.withCounters (colorsSpentToCast thisSpell) (Semantics.CounterKindSource.printed p1p1Counter) .fresh]),
           doIf
             (and
               [ not (is thisPermanent (hasTypeIgnoringTypeChanges .creature)),
                 coloredManaSpentToCast thisSpell ])
-            (withRiders [.withCounters (colorsSpentToCast thisSpell) chargeCounter .fresh]) ] := by
+            (withRiders [.withCounters (colorsSpentToCast thisSpell) (Semantics.CounterKindSource.printed chargeCounter) .fresh]) ] := by
   rfl
 
 theorem okSunburst : Ability.check (DRS.ofList []) sunburst = [] := by decide

@@ -4,6 +4,12 @@ import Semantics.Definitions
 
 open Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Templates.Condition (and)
+
 namespace Semantics.Proofs.ComparisonBox
 
 private def outerArtifact : DRS := DRS.ofList [{

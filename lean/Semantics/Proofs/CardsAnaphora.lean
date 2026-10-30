@@ -21,6 +21,22 @@ Not ported: `ichorElixirPlanarDice` (a planar die is Planechase, out of scope).
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and or was)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and or)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.StaticSpec (replace)
+
+open Semantics.Definitions.CardType (creature enchantment)
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.Action (replace target)
+open Semantics.Templates.Condition (and or was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.NounWord (creature enchantment)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Cards
 
 def cloudshift : Action :=
@@ -255,11 +271,11 @@ def contrabandLivestock : Action :=
       rollDice 1 (.sides 20),
       applyResultsTable
         [ rollRow (oneThrough 9)
-            (instruct (controllerOf it) (create 1 (creatureToken 4 4 [.green] [ox]))),
+            (instruct (controllerOf it) (create 1 (Semantics.TokenSpec.written ((creatureToken 4 4 [.green] [ox]))))),
           rollRow (fromTo 10 19)
-            (instruct (controllerOf it) (create 1 (creatureToken 2 2 [.green] [boar]))),
+            (instruct (controllerOf it) (create 1 (Semantics.TokenSpec.written ((creatureToken 2 2 [.green] [boar]))))),
           rollRow (exactly 20)
-            (instruct (controllerOf it) (create 1 (creatureToken 0 1 [.white] [goat]))) ] ]
+            (instruct (controllerOf it) (create 1 (Semantics.TokenSpec.written ((creatureToken 0 1 [.white] [goat]))))) ] ]
 theorem okContrabandLivestock : Action.check (DRS.ofList []) contrabandLivestock = [] := by decide
 
 /-- Hypnotic Specter -/
@@ -269,7 +285,7 @@ theorem okHypnoticSpecterDiscard :
 
 /-- Wyll, Blade of Frontiers -/
 def wyllExtraDie : Action :=
-  replaceEvent (would you (rollDice anyAmount .anyDie))
+  replaceEvent (would (Semantics.Subject.actor (you)) (rollDice anyAmount .anyDie))
     (instead (sequentially
       [ rollDice (plus thatMuch 1) .thoseDice,
         ignoreOutcomes (extreme .lowest) ]))
@@ -278,7 +294,7 @@ theorem okWyllExtraDie : Action.check (DRS.ofList []) wyllExtraDie = [] := by de
 
 /-- Investigator's Journal's count -/
 def greatestCreaturesAPlayerControls : Amount :=
-  (match (cardNamed "Investigator's Journal") with
+  (match (Semantics.Cards.«Investigator's Journal») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.static (StaticSpec.replace _ (Replacement.withRiders (List.cons
         (MoveRider.withCounters part _ _) _)) _ _ _)) _) => some part
@@ -335,14 +351,14 @@ def blessedRespiteShuffle : Action :=
 theorem okBlessedRespiteShuffle : Action.check (DRS.ofList []) blessedRespiteShuffle = [] := by decide
 
 /-- Nekrataal -/
-def nekrataalEntry : GameEvent := (match (cardNamed "Nekrataal") with
+def nekrataalEntry : GameEvent := (match (Semantics.Cards.«Nekrataal») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered part _ _ _ _ _ _ _) _)) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okNekrataalEntry : GameEvent.check (DRS.ofList []) nekrataalEntry = [] := by decide
 def nekrataalDestroy : Action :=
-  (match (cardNamed "Nekrataal") with
+  (match (Semantics.Cards.«Nekrataal») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
         part _))) _)) => some part
@@ -379,7 +395,7 @@ theorem engulfingFlamesNoDestroyStamp :
     (participialCandidates (.deed (.action "destroy")) (some .one) none false engulfingFlamesRider).length = 0 := by decide
 theorem engulfingFlamesBareReadStands : countReach .bare .one engulfingFlamesRider = 1 := by decide
 
-def bioplasmExiledPronoun : NounPhrase := (match (cardNamed "Bioplasm") with
+def bioplasmExiledPronoun : NounPhrase := (match (Semantics.Cards.«Bioplasm») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons
         (Action.doIf (Condition.matches part _) _ _ _) _)))) _) => some part
@@ -414,14 +430,14 @@ theorem bioplasmTypedCardReadWrites :
   decide
 
 /-- Scapeshift -/
-def scapeshiftSacrifice : Action := (match (cardNamed "Scapeshift") with
+def scapeshiftSacrifice : Action := (match (Semantics.Cards.«Scapeshift») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ (Action.sequentially (List.cons part _))) _) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okScapeshiftSacrifice : Action.check (DRS.ofList []) scapeshiftSacrifice = [] := by decide
 def scapeshiftSacrificed : DRS := (stepAction 512 .postEvent .obj (DRS.ofList []) scapeshiftSacrifice).1
-def scapeshiftSearch : Action := (match (cardNamed "Scapeshift") with
+def scapeshiftSearch : Action := (match (Semantics.Cards.«Scapeshift») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ (Action.sequentially (List.cons _ (List.cons part _)))) _) =>
         some part
@@ -432,9 +448,9 @@ theorem okScapeshiftSearch : Action.check scapeshiftSacrificed scapeshiftSearch 
 def scapeshiftAfterSearch : DRS := (stepAction 512 .postEvent .obj scapeshiftSacrificed scapeshiftSearch).1
 theorem scapeshiftTwoGroups : countReach .bare .many scapeshiftAfterSearch = 2 := by decide
 theorem scapeshiftOneSearchedGroup :
-    (participialCandidates (.deed search) (some .many) none false scapeshiftAfterSearch).length = 1 := by decide
+    (participialCandidates (.deed search.deed) (some .many) none false scapeshiftAfterSearch).length = 1 := by decide
 theorem scapeshiftOneSacrificedGroup :
-    (participialCandidates (.deed sacrifice) (some .many) none false scapeshiftAfterSearch).length = 1 := by decide
+    (participialCandidates (.deed sacrifice.deed) (some .many) none false scapeshiftAfterSearch).length = 1 := by decide
 
 /-- Bind to Life, Vastlands Scavenger's adventure -/
 def bindToLife : Action :=
@@ -457,7 +473,7 @@ theorem okTezzeretAllArtifacts : Action.check (DRS.ofList []) tezzeretAllArtifac
 
 def companyContext : DRS := (stepAction 512 .postEvent .obj (DRS.ofList []) (lookAt (topSlice 6))).1
 def companyDescribedSlice : NounPhrase :=
-  (match (cardNamed "Collected Company") with
+  (match (Semantics.Cards.«Collected Company») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ (Action.sequentially (List.cons _ (List.cons (Action.move part _
         _ _ _) _)))) _) => some part
@@ -479,7 +495,7 @@ theorem okExileTopThenPutFromAmong : Action.check (DRS.ofList []) exileTopThenPu
 
 /-- Thought Sponge -/
 def greatestCardsAnOpponentDrew : Amount :=
-  (match (cardNamed "Thought Sponge") with
+  (match (Semantics.Cards.«Thought Sponge») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.static (StaticSpec.replace _ (Replacement.withRiders
         (List.cons (MoveRider.withCounters part _ _) _)) _ _ _)) _)) => some part
@@ -489,7 +505,7 @@ theorem okGreatestCardsAnOpponentDrew : Amount.check (DRS.ofList []) greatestCar
   decide
 def greatestCardsAPlayerDiscardedThisWay : Amount :=
   aggregateOver .max isPlayer
-    (eventTally they (discard (allOf (cardIn hand))) thisWay .events)
+    (eventTally (Semantics.Subject.actor (they)) (discard (allOf (cardIn hand))) thisWay .events)
 /-- Windfall: "Each player discards their hand, then draws cards equal to the greatest number of
 cards a player discarded this way." -/
 def windfallDiscardAndDraw : Action :=
@@ -514,13 +530,13 @@ theorem eachPlayerDoesNotIntroduceASeparateGroup :
 
 /-- Soul Ransom -/
 def soulRansomRansom : Action :=
-  (match (cardNamed "Soul Ransom") with
+  (match (Semantics.Cards.«Soul Ransom») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.activated _ part _ _ _ _) _))) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okSoulRansomRansom : Action.check (DRS.ofList []) soulRansomRansom = [] := by decide
-def thisAurasController : NounPhrase := (match (cardNamed "Soul Ransom") with
+def thisAurasController : NounPhrase := (match (Semantics.Cards.«Soul Ransom») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.activated _ (Action.sequentially (List.cons
         (Action.instruct part _) _)) _ _ _ _) _))) => some part
@@ -592,7 +608,7 @@ theorem okEachPlayerShufflesTheirHandAndGraveyard :
 def unsummon : Action := returnToHand (target isCreature)
 theorem okUnsummon : Action.check (DRS.ofList []) unsummon = [] := by decide
 def grismold : Action :=
-  instruct eachPlayer (create 1 (creatureToken 1 1 [.green] [plant]))
+  instruct eachPlayer (create 1 (Semantics.TokenSpec.written ((creatureToken 1 1 [.green] [plant]))))
 theorem okGrismold : Action.check (DRS.ofList []) grismold = [] := by decide
 /-- Grenzo, Dungeon Warden -/
 def grenzoBottomCard : Action := putInto bottomCard graveyard
@@ -624,7 +640,7 @@ their toughness is half that creature's toughness. Round up each time." The poss
 every later "that creature" read the destroyed creature: step `C` of `AC>R1` only prefers a
 referent no same-clause pronoun took, and here no other creature remains. -/
 def sawInHalfBody : Action :=
-  (match (cardNamed "Saw in Half") with
+  (match (Semantics.Cards.«Saw in Half») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ part) _) => some part
       | _ => none
@@ -642,7 +658,7 @@ shuffle randomizes the card [CR#701.24a], so no later "it" names it as a card in
 "its mana value" reads the permanent by its last known information, as it was moved out of a
 public zone into a hidden one [CR#608.2h] (`DRS.shuffledLastKnown`). -/
 def zoyowasJusticeBody : Action :=
-  (match (cardNamed "Zoyowa's Justice") with
+  (match (Semantics.Cards.«Zoyowa's Justice») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ part) _) => some part
       | _ => none
@@ -650,7 +666,7 @@ def zoyowasJusticeBody : Action :=
 
 /-- Gyome, Master Chef: "{1}, Sacrifice a Food: Target creature gains indestructible until
 end of turn. Tap it." -/
-def gyomeProtectionCost : Cost := compound [mana [generic 1], perform (sacrifice (a food))]
+def gyomeProtectionCost : Cost := compound [mana [generic 1], perform (sacrifice (a (Semantics.Predicate.hasSubtype (food))))]
 def gyomeProtectionBody : Action :=
   sequentially [gain (target isCreature) indestructible untilEndOfTurn, .setStatus .tapped it]
 def gyomeProtection : Ability := activated gyomeProtectionCost gyomeProtectionBody
@@ -684,7 +700,7 @@ theorem prosperityTycoonTapsItself :
 on it." -/
 def grimgrinUntapCost : Cost := perform (sacrifice (a (and [isCreature, isOther])))
 def grimgrinUntapBody : Action :=
-  sequentially [untap thisCreature, putCounters 1 p1p1Counter it]
+  sequentially [untap thisCreature, putCounters 1 (Semantics.CounterKindSource.printed (p1p1Counter)) it]
 def grimgrinUntap : Ability := activated grimgrinUntapCost grimgrinUntapBody
 
 /-- The bare "it" resolves to the source, Grimgrin (`2`), not the sacrificed cost. -/
@@ -713,14 +729,14 @@ which is linked to it at most [CR#607.1,607.2a]; and a spell's targets are its s
 alone, not a later ability of another kind's. -/
 theorem otherAbilitiesTargetsStayTheirOwn :
     Ability.checkText (DRS.ofList [])
-        [when (does thisCreature enter) (tap (target isCreature)), spell (untap (that creature))] =
+        [when (does (Semantics.Subject.actor (thisCreature)) enter) (tap (target isCreature)), spell (untap (that creature))] =
         [.anaphor (.word creature) .one 0] ∧
       Ability.checkText (DRS.ofList [])
         [activated tapSymbol (tap (target isCreature)),
          activated tapSymbol (untap (that creature))] =
         [.anaphor (.word creature) .one 0] ∧
       Ability.checkText (DRS.ofList [])
-        [when (does thisCreature enter) (tap (target isCreature)),
+        [when (does (Semantics.Subject.actor (thisCreature)) enter) (tap (target isCreature)),
          at_ (beginningOfYour .endStep) (untap (that creature))] =
         [.anaphor (.word creature) .one 0] ∧
       Ability.checkText (DRS.ofList [])

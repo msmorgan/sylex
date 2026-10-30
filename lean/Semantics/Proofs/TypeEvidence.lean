@@ -2,6 +2,9 @@ import Semantics.Definitions
 import Semantics.Check.Phrase
 open Semantics Semantics.Templates Semantics.Definitions
 
+
+open Semantics.Templates.Action (target)
+
 namespace Semantics.Proofs.TypeEvidence
 
 /-- Normalizing keeps exactly the declared card types written: the order is the declared one

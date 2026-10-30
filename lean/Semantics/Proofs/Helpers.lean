@@ -1,4 +1,4 @@
-import Semantics.Authoring
+import Semantics.Registry
 import Semantics.Check.Card
 
 /-!
@@ -8,6 +8,7 @@ Scaffolding the pin suites under `Semantics.Proofs` share: projections of a chec
 context (at the fuel the `.check` entry points use, 64), the clause-ranking lemmas behind the
 universally quantified resolution pins, and small card and context fixtures.
 -/
+
 
 namespace Semantics.Proofs
 

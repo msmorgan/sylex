@@ -21,6 +21,23 @@ correction is about, and why the Oracle text and the rules want it.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each)
+open Semantics.Templates.Predicate (and or not was)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and or not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.TokenSpec (written)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.StaticSpec (replace)
+
+open Semantics.Definitions.CardType (creature land)
+open Semantics.Templates.AbilityLost (written)
+open Semantics.Templates.Action (copy replace target)
+open Semantics.Templates.Condition (and not or was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.NounWord (creature land)
+
 namespace Semantics.Proofs.CardFidelity
 
 /-- The text of a single-faced card. -/
@@ -38,7 +55,7 @@ without paying its mana cost." The cast is a one-shot optional instruction carri
 resolution [CR#608.2g], not a durationless permission, which would last for the rest of the game
 [CR#611.2a]. -/
 theorem memoryPlunderCastsDuringResolution :
-    ((faceText (cardNamed "Memory Plunder")).filterMap spellEffect) =
+    ((faceText (Semantics.Cards.«Memory Plunder»)).filterMap spellEffect) =
       [ may (cast (target (and [isInstantOrSorcery, isCard]))
           (from_ := graveyardOf anOpponent) (payment := withoutPaying)) ] := rfl
 
@@ -83,9 +100,9 @@ theorem discardIsHandedToTheDiscardingPlayer :
 payment, and if they don't pay, the counterspell's controller counters it [CR#118.12a,608.2c],
 handed back to `you`. -/
 theorem unlessPaysCountersByTheCounterspellsController :
-    (faceText (cardNamed "Mana Leak")).filterMap spellEffect =
+    (faceText (Semantics.Cards.«Mana Leak»)).filterMap spellEffect =
       [ instruct (controllerOf (target isSpell))
-          (doUnless (instruct you (counter it)) [generic 3]) ] := rfl
+          (doUnless (instruct you (counter it)) (Semantics.Cost.mana ([generic 3]))) ] := rfl
 
 /-- Killing Wave's "sacrifices it unless they pay X life" and Heat Wave's "unless their controller
 pays 1 life for each blocking creature they control" pay life as a cost (`payLife`, [CR#119.4]),
@@ -93,19 +110,19 @@ not a life loss handed to the payer. -/
 theorem lifePaymentsArePayLife :
     Cards.killingWave =
       doForEach (each isCreature)
-        (instruct (controllerOf it) (doUnless (instruct they (sacrifice it)) (payLife (letter .x)))) :=
+        (instruct (controllerOf it) (doUnless (instruct they (sacrifice it)) (Semantics.Cost.perform ((payLife (letter .x)))))) :=
   rfl
 
 /-- Candles' Glow prints "Splice onto Arcane {1}{W}" [CR#702.47a] after its spell ability. -/
 theorem candlesGlowSplicesOntoArcane :
-    (faceText (cardNamed "Candles' Glow")).getLast? =
-      some (Ability.splice (hasSubtype arcane) [generic 1, pip .white]) := rfl
+    (faceText (Semantics.Cards.«Candles' Glow»)).getLast? =
+      some (Ability.splice (hasSubtype arcane) (Semantics.Cost.mana ([generic 1, pip .white]))) := rfl
 
 /-- Giggling Skitterspike triggers "whenever this creature attacks, blocks, or becomes the target
 of a spell": three trigger events [CR#603.2], the attack among them. -/
 theorem gigglingSkitterspikeTriggersOnAttack :
     Cards.gigglingSkitterspikeTriggers =
-      [does thisCreature attack, does thisCreature block, does (a isSpell) (target thisCreature)] :=
+      [does (Semantics.Subject.actor (thisCreature)) attack, does (Semantics.Subject.actor (thisCreature)) block, does ((Semantics.Subject.actor (a isSpell))) (target thisCreature)] :=
   rfl
 
 /-- Cyclone: "sacrifice this enchantment unless you pay {G} for each wind counter on it. If you
@@ -115,7 +132,7 @@ theorem cycloneDealsDamageIfYouPay :
     (match Cards.cycloneUpkeepPayment with
       | .triggered _ _ _ _ _ _ _ (.sequentially [_, payment]) => some payment
       | _ => none) =
-      some (may (pay (scaled [pip .green] (times 1 (countersOn windCounter thisEnchantment))) .once)
+      some (may (pay (scaled (Semantics.Cost.mana ([pip .green])) (times 1 (countersOn windCounter thisEnchantment))) .once)
         (some (instruct thisEnchantment
           (dealDamage (countersOn windCounter thisEnchantment) (each (or [isCreature, isPlayer])))))
         (some (sacrifice thisEnchantment))) := rfl
@@ -184,11 +201,11 @@ theorem graveyardOriginsAreWrittenOnTheMove :
 /-- The same on the spelled cards: Eerie Ultimatum, Rogues' Gallery, Blood Spatter Analysis's
 reflexive return, and Midnight Scavengers' front face, each "from your graveyard". -/
 theorem spelledGraveyardOriginsAreWrittenOnTheMove :
-    written ((faceText (cardNamed "Eerie Ultimatum")).flatMap abilityMoves) = [(yourGraveyard, [])] ∧
-      written ((faceText (cardNamed "Rogues' Gallery")).flatMap abilityMoves) = [(yourGraveyard, [])] ∧
-      (written ((faceText (cardNamed "Blood Spatter Analysis")).flatMap abilityMoves)).getLast? =
+    written ((faceText (Semantics.Cards.«Eerie Ultimatum»)).flatMap abilityMoves) = [(yourGraveyard, [])] ∧
+      written ((faceText (Semantics.Cards.«Rogues' Gallery»)).flatMap abilityMoves) = [(yourGraveyard, [])] ∧
+      (written ((faceText (Semantics.Cards.«Blood Spatter Analysis»)).flatMap abilityMoves)).getLast? =
         some (yourGraveyard, []) ∧
-      written (match (cardNamed "Midnight Scavengers // Chittering Host") with
+      written (match (Semantics.Cards.«Midnight Scavengers // Chittering Host») with
         | .transforming front _ => front.characteristics.text.flatMap abilityMoves
         | _ => []) = [(yourGraveyard, [])] := ⟨rfl, rfl, rfl, rfl⟩
 
@@ -208,12 +225,12 @@ private def triggerEvents (card : Card) : List GameEvent :=
 /-- Darksteel Garrison: "Whenever fortified land becomes tapped" fires on the change from untapped
 to tapped [CR#603.2e], for mana or not (ruling 2007-05-01). -/
 theorem darksteelGarrisonWatchesBecomingTapped :
-    triggerEvents (cardNamed "Darksteel Garrison") = [does (fortified land) (becomeStatus tapped)] := rfl
+    triggerEvents (Semantics.Cards.«Darksteel Garrison») = [does (Semantics.Subject.actor ((fortified land))) (becomeStatus tapped)] := rfl
 
 /-- Lightmine Field deals damage "equal to the number of attacking creatures", not the number of
 the triggering group. -/
 theorem lightmineFieldCountsAttackingCreatures :
-    ((faceText (cardNamed "Lightmine Field")).filterMap fun
+    ((faceText (Semantics.Cards.«Lightmine Field»)).filterMap fun
       | .triggered _ _ _ _ _ _ _ effect => some effect
       | _ => none) =
       [ instruct thisEnchantment
@@ -222,10 +239,10 @@ theorem lightmineFieldCountsAttackingCreatures :
 /-- Temple Altisaur: "another Dinosaur you control", the bare "another" contrasting with the
 source of the ability (ADR semantics-v3 §0.1). -/
 theorem templeAltisaurProtectsAnotherDinosaur :
-    (faceText (cardNamed "Temple Altisaur")) =
-      [ static (replace (would (a isSource)
-          (dealDamage anyAmount (a (and [dinosaur, youControl, isOther]))))
-          (instead (preventDamage (allBut 1)))) ] := rfl
+    (faceText (Semantics.Cards.«Temple Altisaur»)) =
+      [ static (replace (would ((Semantics.Subject.actor (a isSource)))
+          (dealDamage anyAmount (a (and [hasSubtype dinosaur, youControl, isOther]))))
+          (instead (preventDamage (Templates.PreventCut.allBut 1)))) ] := rfl
 
 /-- Aether Gust: "target spell or permanent that's red or green". -/
 theorem aetherGustTargetsRedOrGreenSpellOrPermanent :
@@ -238,7 +255,7 @@ theorem aetherGustTargetsRedOrGreenSpellOrPermanent :
 /-- Archfiend's Vessel: "exile it. If you do, create …" is followed in order [CR#608.2c]; a
 reflexive trigger is only "when [a player] does" or "when … this way" [CR#603.12]. -/
 theorem archfiendsVesselIfYouDoIsNoReflexiveTrigger :
-    ((faceText (cardNamed "Archfiend's Vessel")).filterMap fun
+    ((faceText (Semantics.Cards.«Archfiend's Vessel»)).filterMap fun
       | .triggered _ _ _ _ _ _ _ (.withContinuation .required body (some _) none) => some body
       | _ => none) = [exile it] := rfl
 
@@ -259,14 +276,14 @@ theorem quakebringerRestrictsTriggeringOnly :
         some (intervening.isNone, guard)
       | _ => none) =
       some (true, some (or [ is this_ (in_ battlefield),
-        and [is this_ (cardIn yourGraveyard), exists_ (and [isCreature, giant, youControl])] ])) :=
+        and [is this_ (cardIn yourGraveyard), exists_ (and [isCreature, (Semantics.Predicate.hasSubtype (giant)), youControl])] ])) :=
   rfl
 
 /-- Cult of the Waxing Moon: "Whenever a permanent you control transforms into a non-Human
 creature": the transform deed, which converting also performs, with the characteristic the
 permanent has immediately after [CR#701.27e]. -/
 theorem cultOfTheWaxingMoonWatchesTransformingIntoANonHumanCreature :
-    triggerEvents (cardNamed "Cult of the Waxing Moon") =
+    triggerEvents (Semantics.Cards.«Cult of the Waxing Moon») =
       [ does any (transform (a (and [isPermanent, youControl]))
           (into := some (and [isCreature, not (hasSubtype human)]))) ] := rfl
 
@@ -283,13 +300,13 @@ theorem orTiedForTheMostIsMembership :
       (match dethrone with
         | .keyword _ _ [.triggered event ..] => some event
         | _ => none) =
-        some (does thisCreature (.attack (some
+        some (does (Semantics.Subject.actor (thisCreature)) (.attack (some
           (a (and [.isPlayer, .superlative .max (.playerStat .lifeTotal) .isPlayer]))))) ∧
-      triggerEvents (cardNamed "Seraphic Greatsword") =
-        [ does (equipped creature) (attack (some
+      triggerEvents (Semantics.Cards.«Seraphic Greatsword») =
+        [ does (Semantics.Subject.actor ((equipped creature))) (attack (some
             (a (and [isPlayer, superlative .max (.playerStat .lifeTotal) isPlayer])))) ] ∧
-      triggerEvents (cardNamed "Undercover Butler") =
-        [ does thisCreature (attack (some
+      triggerEvents (Semantics.Cards.«Undercover Butler») =
+        [ does (Semantics.Subject.actor (thisCreature)) (attack (some
             (a (and [isPlayer, superlative .max (.playerStat .lifeTotal) isPlayer])))) ] :=
   ⟨rfl, rfl, rfl, rfl⟩
 
@@ -305,7 +322,7 @@ theorem curieDrawsItsBasePower :
 /-- Baird, Argivian Recruiter: "a creature with power greater than its base power", each creature
 measured against its own base power [CR#208.4b]. -/
 theorem bairdComparesPowerWithItsOwnBasePower :
-    ((faceText (cardNamed "Baird, Argivian Recruiter")).filterMap fun
+    ((faceText (Semantics.Cards.«Baird, Argivian Recruiter»)).filterMap fun
       | .triggered _ _ _ _ _ _ intervening _ => intervening
       | _ => none) =
       [ exists_ (comparesOwnStat .power (and [isCreature, youControl])
@@ -326,7 +343,7 @@ theorem squirrelWhackerExchangesWithBasePowerOrToughness :
 /-- Overgrown Zealot: "Spend this mana only to turn permanents face up", the special action
 [CR#116.2b] whatever its cost, morph, disguise, manifest or cloak. -/
 theorem overgrownZealotSpendsToTurnFaceUp :
-    (match faceText (cardNamed "Overgrown Zealot") with
+    (match faceText (Semantics.Cards.«Overgrown Zealot») with
       | [_, .activated _ (.addMana _ _ riders) ..] => riders
       | _ => []) = [spendOnly [toTurnFaceUp isPermanent]] := rfl
 
@@ -339,6 +356,6 @@ theorem qarsiDeceiverSpendsOnManifestAndMorph :
       [ spendOnly
           [ toCast (and [isCreature, isFaceDown]),
             toTurnFaceUp (and [isCreature, was (manifest which) thisObject]),
-            toPay (.ofKeyword morph) ] ] := rfl
+            toPay (.ofKeyword morph.label) ] ] := rfl
 
 end Semantics.Proofs.CardFidelity

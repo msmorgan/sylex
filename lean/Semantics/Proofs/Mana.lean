@@ -14,6 +14,17 @@ each closed by `decide`. The names and the sentences are the Idris ones.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each the)
+open Semantics.Templates.Predicate (and was)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (and was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each the)
+
 namespace Semantics.Proofs.Mana
 
 /-- "your hand" -/
@@ -377,7 +388,7 @@ theorem cumulativeUpkeepPaymentIsLabelled :
     upkeepPayment? (cumulativeUpkeep (.mana [generic 1]))
         = some (some thisPermanent, some (.named "cumulativeUpkeep")) ∧
       watchedPayment? Cards.hibernationsEndTrigger = some (.named "cumulativeUpkeep") ∧
-      manaPurpose? (cardNamed "Adarkar Unicorn") = some (.named "cumulativeUpkeep") :=
+      manaPurpose? (Semantics.Cards.«Adarkar Unicorn») = some (.named "cumulativeUpkeep") :=
   ⟨rfl, rfl, rfl⟩
 
 end Semantics.Proofs.Mana

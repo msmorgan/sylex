@@ -4,7 +4,7 @@ import Generated.Canon
 import Generated.Builtin
 import Semantics.Primitives
 
-open Lean Meta Semantics.Authoring
+open Lean Meta Semantics.Registry
 
 namespace DumpValues
 
@@ -53,7 +53,6 @@ private def dump (label : String) : MetaM UInt32 := do
   let mut unsampled := 0
   let mut omitted := 0
   let mut aliases := 0
-  let mut coreDispatch := 0
   let mut cardDispatch := 0
   let mut seen : Array (Name × Name × Name) := #[]
   let cardEntries := canonCardsExt.getState env
@@ -71,9 +70,6 @@ private def dump (label : String) : MetaM UInt32 := do
         cardDispatch := cardDispatch + 1
         continue
       let identity := (entry.bareName, entry.returnType, declaration)
-      if declaration.getPrefix == `Semantics.CardType then
-        coreDispatch := coreDispatch + 1
-        continue
       if seen.contains identity then
         aliases := aliases + 1
         continue
@@ -124,7 +120,6 @@ private def dump (label : String) : MetaM UInt32 := do
     s!"unsampled: {unsampled}\nsamples: {samples}\nomitted combinations: {omitted}\n" ++
     s!"unprintable items: {errors.size}\n" ++
     s!"dispatch aliases: {aliases}\n" ++
-    s!"core card-type registrations (not builtins): {coreDispatch}\n" ++
     s!"card declarations skipped (covered by card records): {cardDispatch}\n" ++
     s!"card source files: {cardFiles.size}\n" ++
     String.join ((caps.qsort (· < ·) ++ errors.qsort (· < ·)).toList.map (· ++ "\n"))
@@ -139,7 +134,7 @@ private def validateLabel (label : String) : IO Unit := do
     throw (IO.userError "label must contain only letters, digits, hyphens or underscores")
 
 private unsafe def run (args : List String) : IO UInt32 := do
-  unless ← (System.FilePath.mk "Semantics/Authoring.lean").pathExists do
+  unless ← (System.FilePath.mk "Semantics/Registry.lean").pathExists do
     throw (IO.userError "run dumpValues from lean/")
   let root : System.FilePath := "../docs/evidence/lean-dumps"
   match args with

@@ -10,6 +10,21 @@ form, each closed by `decide`. The names and the sentences are the Idris ones.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and not)
+open Semantics.Templates.Location (and not)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.StaticSpec (replace)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Action (doIf replace target)
+open Semantics.Templates.Condition (and not)
+open Semantics.Templates.CreationSpec (token)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.SliceCount (counted)
+open Semantics.Templates.Subject (actor)
+
 namespace Semantics.Proofs.Static
 
 /-- "This creature gets +2/+0 as long as this creature is attacking." -/
@@ -39,7 +54,7 @@ theorem okEquippedCreature :
 
 /-- "You can't lose the game." -/
 theorem okUntargetedOutcomeGate :
-    Ability.check (DRS.ofList []) (.static (cant you loseGame)) = [] := by decide
+    Ability.check (DRS.ofList []) (.static (cant (Semantics.Subject.actor you) loseGame)) = [] := by decide
 
 /-- "where X is the number of creatures you control." -/
 theorem okSingleStaticXRider :
@@ -129,7 +144,7 @@ theorem okSingleExtension :
 
 /-- "If you would draw a card, draw two cards instead." -/
 theorem okDrawReplacement :
-    StaticSpec.check (DRS.ofList []) (replace (would you (draw 1)) (instead (draw 2)))
+    StaticSpec.check (DRS.ofList []) (replace (would (Semantics.Subject.actor you) (draw 1)) (instead (draw 2)))
       = [] := by
   decide
 
@@ -137,47 +152,6 @@ theorem okDrawReplacement :
 
 "Instead" builds a `Replacement`, the only thing a replacement slot accepts, and nothing else
 accepts one [CR#614.1a]. -/
-
-/--
-error: Application type mismatch: The argument
-  Templates.Replacement.instead (Templates.Action.draw 1)
-has type
-  Replacement
-but is expected to have type
-  Action
-in the application
-  @Templates.Ability.spell (Templates.Replacement.instead (Templates.Action.draw 1))
--/
-#guard_msgs in
-example : Ability := spell (Templates.Replacement.instead (Templates.Action.draw 1))
-
-/--
-error: Application type mismatch: The argument
-  Templates.Replacement.instead (Templates.Action.draw 1)
-has type
-  Replacement
-but is expected to have type
-  Action
-in the application
-  Templates.Replacement.instead (Templates.Replacement.instead (Templates.Action.draw 1))
--/
-#guard_msgs in
-example : Replacement := instead (Templates.Replacement.instead (Templates.Action.draw 1))
-
-/--
-error: Application type mismatch: The argument
-  Templates.Action.draw 2
-has type
-  Action
-but is expected to have type
-  Replacement
-in the application
-  @Templates.StaticSpec.replace
-    (Templates.WouldClause.would (Templates.Subject.actor Templates.NounPhrase.you) (Templates.Action.draw 1))
-    (Templates.Action.draw 2)
--/
-#guard_msgs in
-example : StaticSpec := replace (would (actor you) (draw 1)) (draw 2)
 
 /-- "Draw a card. If you control three or more artifacts, draw two cards instead.": the
 condition is the replacement's own, so the draw happens unreplaced while it fails
@@ -205,7 +179,7 @@ private def nestCallers : Nat → Replacement → Replacement
 than read as a replacement that does nothing. -/
 theorem conditionOverTooDeepReplacementIsRefused :
     StaticSpec.check (DRS.ofList [])
-      (replace (would you (draw 1))
+      (replace (would (Semantics.Subject.actor you) (draw 1))
         (doIf (is you (hasDesignation citysBlessing))
           (nestCallers 64 (instead (draw 2))))) = [.recursionLimit] := by
   decide
@@ -213,7 +187,7 @@ theorem conditionOverTooDeepReplacementIsRefused :
 /-- The former replacement-helper limit of eight no longer rejects a readable replacement. -/
 theorem conditionOverNineCallerWrappersIsAccepted :
     StaticSpec.check (DRS.ofList [])
-      (replace (would you (draw 1))
+      (replace (would (Semantics.Subject.actor you) (draw 1))
         (doIf (is you (hasDesignation citysBlessing))
           (nestCallers 9 (instead (draw 2))))) = [] := by decide
 
@@ -236,7 +210,7 @@ theorem okPluralEnteringRidden :
 [CR#614.1c,614.12]. -/
 theorem badRidersOverADraw :
     StaticSpec.check (DRS.ofList [])
-      (replace (would you (draw 1)) (withRiders [.entersAs .tapped])) =
+      (replace (would (Semantics.Subject.actor you) (draw 1)) (withRiders [.entersAs .tapped])) =
       [.riddenEntering] := by
   decide
 
@@ -250,7 +224,7 @@ theorem badSelfReplacementRidersOverADraw :
 a move to a graveyard [CR#614.12,700.4]. -/
 theorem badRidersOverADying :
     StaticSpec.check (DRS.ofList [])
-      (replace (would thisCreature die) (withRiders [.entersAs .tapped])) =
+      (replace (would (Semantics.Subject.actor thisCreature) die) (withRiders [.entersAs .tapped])) =
       [.riddenEntering] := by
   decide
 
@@ -259,7 +233,7 @@ tapped" [CR#111.1,614.1d]. -/
 theorem okRidersOverATokenCreation :
     StaticSpec.check (DRS.ofList [])
       (replace
-        (would you (createObject anyAmount (token (copyOf (counted (orMore 1) isToken)) [])))
+        (would (Semantics.Subject.actor you) (createObject anyAmount (token (copyOf (counted (orMore 1) isToken)) [])))
         (withRiders [.entersAs .tapped])) = [] := by
   decide
 
@@ -267,7 +241,7 @@ theorem okRidersOverATokenCreation :
 [CR#401.4,614.12]. -/
 theorem badPilePlacementOverAnEntering :
     StaticSpec.check (DRS.ofList [])
-      (replace (would thisCreature enter) (withRiders [.inOrder .anyOrder])) =
+      (replace (would (Semantics.Subject.actor thisCreature) enter) (withRiders [.inOrder .anyOrder])) =
       [.entryRidersOnly] := by
   decide
 
@@ -275,7 +249,7 @@ theorem badPilePlacementOverAnEntering :
 transformed" [CR#702.145b]. -/
 theorem okConditionalRiders :
     StaticSpec.check (DRS.ofList [])
-      (replace (would thisPermanent enter) (doIf (gameIs night) (withRiders [.entersTransformed])))
+      (replace (would (Semantics.Subject.actor thisPermanent) enter) (doIf (gameIs night) (withRiders [.entersTransformed])))
       = [] := by
   decide
 
@@ -284,7 +258,7 @@ counter on it as it enters." (tribute 1): the player chosen before the entering 
 action done as part of it [CR#702.104a,614.12a]. -/
 theorem okAlongsideReadsTheChoiceBefore :
     StaticSpec.check (DRS.ofList [])
-      (replace (would thisCreature enter)
+      (replace (would (Semantics.Subject.actor thisCreature) enter)
         (before (choose anOpponent)
           (some
             (alongside

@@ -3,6 +3,11 @@ import Semantics.Check.Card
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.Predicate (was)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (was)
+
 namespace Semantics.Proofs.DrtWitnesses
 
 private def kalitasBody : Action := .sequentially [

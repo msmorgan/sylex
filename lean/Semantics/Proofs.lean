@@ -5,7 +5,6 @@ import Semantics.Proofs.ActionForms
 import Semantics.Proofs.Actor
 import Semantics.Proofs.Anaphora
 import Semantics.Proofs.Attachments
-import Semantics.Proofs.Authoring
 import Semantics.Proofs.BindingIdentity
 import Semantics.Proofs.CallerScope
 import Semantics.Proofs.CardFidelity

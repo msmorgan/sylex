@@ -4,6 +4,16 @@ import Semantics.Proofs.Helpers
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a)
+open Semantics.Templates.Predicate (and was)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (and was)
+open Semantics.Templates.DetPhrase (a)
+open Semantics.Templates.Exposed (zone)
+
 namespace Semantics.Proofs.ActionFamilies
 
 private def outcomeReferents (drs : DRS) : List Referent :=
@@ -294,6 +304,6 @@ theorem regenerationEventDescribesTheApplicationRatherThanTheShield :
       countOnes .object shield = 0 ∧
       Action.check (DRS.ofList [])
         (.triggerReflexively (regenerate thisCreature) (some event)
-          (putCounters 1 m1m1Counter it)) = [] := by decide
+          (putCounters 1 (Semantics.CounterKindSource.printed m1m1Counter) it)) = [] := by decide
 
 end Semantics.Proofs.ActionFamilies

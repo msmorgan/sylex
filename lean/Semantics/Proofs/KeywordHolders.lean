@@ -15,6 +15,9 @@ closed by `decide` or `rfl`.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+
+open Semantics.Templates.Action (target)
+
 namespace Semantics.Proofs.KeywordHolders
 
 /-- The static clauses a keyword's body holds. -/

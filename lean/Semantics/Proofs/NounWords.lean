@@ -3,6 +3,15 @@ import Semantics.Check.Card
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.Predicate (and did)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.ColorTerm (chosen)
+open Semantics.Templates.Condition (and did)
+open Semantics.Templates.Exposed (zone)
+
 namespace Semantics.Proofs.NounWords
 
 private def creatureCard : Referent :=

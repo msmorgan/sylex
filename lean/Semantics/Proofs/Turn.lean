@@ -13,6 +13,20 @@ form, each closed by `decide`. The names and the sentences are the Idris ones.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each the)
+open Semantics.Templates.Predicate (and or not did was)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and or not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.Timing (duringPart not)
+open Semantics.Templates.StaticSpec (replace)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Action (doIf replace target)
+open Semantics.Templates.Condition (and did duringPart not or was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each the)
+
 namespace Semantics.Proofs.Turn
 
 /-- "at the beginning of the end step" -/
@@ -89,7 +103,7 @@ theorem okSacrificeOnBattlefield :
 
 theorem badDeadCreatureRead :
     Action.check (DRS.ofList [])
-      (.delay (does (target isCreature) die) [] (some thisTurn)
+      (.delay (does ((Semantics.Subject.actor (target isCreature))) die) [] (some thisTurn)
         (putInto (that (.type .creature)) battlefield))
       = [.anaphor (.word (.type .creature)) .one 0] := by
   decide
@@ -642,7 +656,7 @@ theorem sneakEntersTappedAndAttackingTheReturnedCreaturesDefender :
      | .keyword _ _ [_, rider] => some rider
      | _ => none) =
       some (static
-        (replace (would thisPermanent enter)
+        (replace (would (Semantics.Subject.actor thisPermanent) enter)
           (doIf (keywordCostPaid (.named "sneak") thisPermanent)
             (withRiders [.entersAs .tapped, .entersAttacking (some returnedCreaturesDefender)])))) :=
   rfl
@@ -668,12 +682,12 @@ theorem okCastWhenASorceryCouldNotHaveBeen :
 /-- "If you cast it any time a sorcery couldn't have been cast, the controller of the permanent it
 becomes sacrifices it at the beginning of the next cleanup step." [CR#307.5a]. -/
 private def sacrificedAtCleanup : Action :=
-  doIf (did you (cast it) (within thisGame (some (not asSorcery))))
+  doIf (did (Semantics.Subject.actor you) (cast it) (within thisGame (some (not asSorcery))))
     (atNext .cleanup (instruct (controllerOf (becomes it)) (sacrifice it)))
 
 /-- "You may cast this spell as though it had flash." -/
 private def flashPermission : StaticSpec :=
-  can you (cast thisSpell) (asThough := asThoughHadFlash it)
+  can (Semantics.Subject.actor you) (cast thisSpell) (asThough := asThoughHadFlash it)
 
 /-- Mystic Veil's two sentences are one paragraph, so one ability [CR#113.2c]: the permission,
 the second sentence its rider, so the cast-timing check reads the cast it allows and a cast under
@@ -685,19 +699,19 @@ theorem flashSacrificeRidesThePermission :
 /-- Each of the ten cards carries the sentence as the permission's rider, its first ability,
 and no sibling static [CR#113.2c]. -/
 theorem flashSacrificeCardsCarryTheRider :
-    [ (cardNamed "Armor of Thorns"), (cardNamed "Grave Servitude"),
-      (cardNamed "Lightning Reflexes"), (cardNamed "Mystic Veil"), (cardNamed "Necromancy"),
-      (cardNamed "Parapet"), (cardNamed "Relic Ward"), (cardNamed "Soar"),
-      (cardNamed "Spider Climb"), (cardNamed "Ward of Lights") ].map (fun c => match c with
+    [ (Semantics.Cards.«Armor of Thorns»), (Semantics.Cards.«Grave Servitude»),
+      (Semantics.Cards.«Lightning Reflexes»), (Semantics.Cards.«Mystic Veil»), (Semantics.Cards.«Necromancy»),
+      (Semantics.Cards.«Parapet»), (Semantics.Cards.«Relic Ward»), (Semantics.Cards.«Soar»),
+      (Semantics.Cards.«Spider Climb»), (Semantics.Cards.«Ward of Lights») ].map (fun c => match c with
         | .singleFaced face => face.characteristics.text.head?
         | _ => none) =
       List.replicate 10 (some asThoughFlashSacrificedAtCleanup) := rfl
 
-theorem okMysticVeil : (cardNamed "Mystic Veil").check = [] := cardNamedOk "Mystic Veil"
+theorem okMysticVeil : (Semantics.Cards.«Mystic Veil»).check = [] := (by decide)
 
 /-- Ward of Lights: the rider, and protection that doesn't remove it [CR#702.16n]. -/
-theorem okWardOfLights : (cardNamed "Ward of Lights").check = [] :=
-  cardNamedOk "Ward of Lights"
+theorem okWardOfLights : (Semantics.Cards.«Ward of Lights»).check = [] :=
+  (by decide)
 
 /-- The scoping is in the term: the rider reads the permission's clause back, so its "it" is
 this spell and "cast … this way" is the permitted cast [CR#113.2c]. Written as a separate static,
@@ -708,13 +722,13 @@ theorem riderReadsThePermittedCast :
       { asThough := some (asThoughHadFlash it), rider := some sacrificedAtCleanup }) = [] ∧
     Ability.checkText (DRS.ofList [])
       [ static flashPermission,
-        static (whileHolds (did you (cast it) (within thisGame (some (not asSorcery))))
+        static (whileHolds (did (Semantics.Subject.actor you) (cast it) (within thisGame (some (not asSorcery))))
           (sacrifice it)) ] =
       [.anaphor .bare .one 0, .anaphor (.atSlot .permanent) .one 0] ∧
     StaticSpec.check (DRS.ofList []) (.can (.actor .you) (cast thisSpell)
-      { rider := some (doIf (did you (cast it) thisWay) (draw 1)) }) = [] ∧
+      { rider := some (doIf (did (Semantics.Subject.actor you) (cast it) thisWay) (draw 1)) }) = [] ∧
     Ability.checkText (DRS.ofList [])
-      [ static flashPermission, static (whileHolds (did you (cast (a isSpell)) thisWay) (draw 1)) ] =
+      [ static flashPermission, static (whileHolds (did (Semantics.Subject.actor you) (cast (a isSpell)) thisWay) (draw 1)) ] =
       [.thisWayUngrounded] := by
   decide
 
@@ -723,7 +737,7 @@ no act for it to modify. -/
 theorem riderOnlyOnAPermission :
     [ StaticSpec.cant (.actor .you) (cast thisSpell) { rider := some sacrificedAtCleanup },
       .must (.actor .you) (cast thisSpell) { rider := some sacrificedAtCleanup },
-      .gatedBy [generic 2] (.actor .you) (cast thisSpell) { rider := some sacrificedAtCleanup } ].map
+      .gatedBy (Semantics.Cost.mana [generic 2]) (.actor .you) (cast thisSpell) { rider := some sacrificedAtCleanup } ].map
         (StaticSpec.check (DRS.ofList [])) =
       [[.deonticRider], [.deonticRider], [.deonticRider]] := by
   decide

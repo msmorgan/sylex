@@ -20,6 +20,24 @@ clause read forward; else the Source for an Object or "you" for a Player
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each)
+open Semantics.Templates.Predicate (and or attachedTo)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Location (and or)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.StaticSpec (replace)
+
+open Semantics.Definitions.Ability (crew)
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Action (copy crew replace target)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and or)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each)
+open Semantics.Templates.MoveRider (attachedTo)
+open Semantics.Templates.NounWord (creature)
+
 namespace Semantics.Proofs.ContrastAnchor
 
 /-- The Contrast Anchors an action resolves. -/
@@ -112,7 +130,7 @@ player, it deals that much damage plus 1 to that permanent or player instead." "
 player" is no particular, so no participant anchors it: the anchor is the Source. -/
 theorem embermawHellionAnchorsOnTheSource :
     let rule := replace
-      (would (a (and [isSource, hasColor .red, youControl, isOther]))
+      (would ((Semantics.Subject.actor (a (and [isSource, hasColor .red, youControl, isOther]))))
         (dealDamage anyAmount (a (or [isPermanent, isPlayer]))))
       (instead (instruct it (dealDamage (plus thatMuch 1) thatJoin)))
     let after := stepStaticSpec 64 (framed [.creature]) rule
@@ -129,31 +147,31 @@ def probeEquipment : Card := .singleFaced
     { name := some "Probe", cost := some [generic 1], types := [.artifact],
       subtypes := [equipment],
       text :=
-        [ whenever (does (a (and [isCreature, isOther])) die) (draw 1),
+        [ whenever (does ((Semantics.Subject.actor (a (and [isCreature, isOther])))) die) (draw 1),
           equip (mana [generic 1]) ] } }
 
 theorem okCreatureHeadedOtherOnANoncreatureSource :
     probeEquipment.check = [] ∧
       (GameEvent.extend (framed [.artifact])
-        (does (a (and [isCreature, isOther])) die)).contrastAnchors = [.source] := by
+        (does ((Semantics.Subject.actor (a (and [isCreature, isOther])))) die)).contrastAnchors = [.source] := by
   decide
 
 /-- Goliath Truck: "Whenever this Vehicle attacks, put two +1/+1 counters on another target
 attacking creature." Only creatures attack [CR#508.1a], and a Vehicle becomes one by crewing
 [CR#301.7]; its card is no creature, and the anchor is the Source. -/
-def goliathTruck : Spelled := spelled <| .singleFaced
+def goliathTruck : Card := .singleFaced
   { characteristics :=
     { name := "Goliath Truck", cost := some [generic 4], types := [.artifact],
       subtypes := [vehicle],
       text :=
-        [ whenever (does thisVehicle attack)
-            (putCounters 2 p1p1Counter (target (and [isCreature, isAttacking, isOther]))),
+        [ whenever (does (Semantics.Subject.actor (thisVehicle)) attack)
+            (putCounters 2 (Semantics.CounterKindSource.printed (p1p1Counter)) (target (and [isCreature, isAttacking, isOther]))),
           crew 2 ],
       power := stat 4, toughness := stat 4 } }
 
 theorem goliathTruckAnchorsOnTheSource :
-    effectAnchors (whenever (does thisVehicle attack)
-      (putCounters 2 p1p1Counter (target (and [isCreature, isAttacking, isOther]))))
+    effectAnchors (whenever (does (Semantics.Subject.actor (thisVehicle)) attack)
+      (putCounters 2 (Semantics.CounterKindSource.printed (p1p1Counter)) (target (and [isCreature, isAttacking, isOther]))))
       (framed [.artifact]) = [.source] := by
   decide
 
@@ -212,14 +230,14 @@ anchor. -/
 theorem caromAnchorsOnTheFirstTarget :
     let firstTarget := (stepWouldClause 64 (framed [.instant])
       (would any (dealDamage anyAmount (target isCreature)))).1.findById? 0
-    anchorsOf (spellOf (cardNamed "Carom")) (framed [.instant]) = [.mention 0] ∧
+    anchorsOf (spellOf (Semantics.Cards.«Carom»)) (framed [.instant]) = [.mention 0] ∧
       firstTarget.map (fun ref => (ref.det, ref.ty)) = some (.target, [.creature]) := by
   decide
 
 /-- Feral Contest: "Put a +1/+1 counter on target creature you control. Another target creature
 blocks it this turn if able." -/
 theorem feralContestAnchorsOnTheFirstTarget :
-    mentionsOf (spellOf (cardNamed "Feral Contest")) (framed [.sorcery]) = [some (.target, [.creature])]
+    mentionsOf (spellOf (Semantics.Cards.«Feral Contest»)) (framed [.sorcery]) = [some (.target, [.creature])]
     := by
   decide
 
@@ -264,7 +282,7 @@ theorem soulbondAnchorsOnTheSource :
 …" The subject of `is` is no candidate, so the contrast is with this creature, the Source. -/
 theorem backupAnchorsOnTheSourceNotThatCreature :
     let put := (stepAction 64 .postEvent .obj (DRS.ofList [])
-      (putCounters 1 p1p1Counter (target isCreature))).1
+      (putCounters 1 (Semantics.CounterKindSource.printed (p1p1Counter)) (target isCreature))).1
     (stepCondition 64 (nextClause put) (is (that creature) (and [isCreature, isOther]))).1
       |>.contrastAnchors = [.source] := by
   decide
@@ -313,7 +331,7 @@ deals double that damage to equipped creature instead." No creature is mentioned
 anchor is the clause's recipient, the equipped creature. -/
 theorem inquisitorsFlailAnchorsOnTheEquippedCreature :
     let event :=
-      would (a (and [isCreature, isOther]))
+      would ((Semantics.Subject.actor (a (and [isCreature, isOther]))))
         (dealDamage anyAmount (equipped creature) (some .combat))
     let rule :=
       replace event (instead (instruct it (dealDamage (times 2 thatMuch) (equipped creature))))
@@ -350,7 +368,7 @@ other attacking creature." The anchor is the current member of the group the sub
 count would be of attackers you do not control. The affected set is fixed as the effect begins
 [CR#611.2c], but the amount is a function of each member. -/
 theorem runAnchorsOnTheMemberNotTheGroup :
-    let after := (stepAction 64 .postEvent .obj (framed [.instant]) (rightSpellOf (cardNamed "Hit // Run"))).1
+    let after := (stepAction 64 .postEvent .obj (framed [.instant]) (rightSpellOf (Semantics.Cards.«Hit // Run»))).1
     after.contrastAnchors = [.member 1] ∧ after.contrastAnchors ≠ [.mention 1] ∧
       (after.findById? 1).map (fun ref => (ref.det, ref.ty)) = some (.all, [.creature]) := by
   decide

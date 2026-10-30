@@ -3,6 +3,18 @@ import Semantics.Proofs.Helpers
 
 open Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Action (attachment target)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.DrtRecency
 
 -- Eriette introduces the Aura before the permanent it becomes attached to.
@@ -176,7 +188,7 @@ private def damagedVictim (attachment : AttachWord) : NounPhrase :=
            within := some (.duration soFarThisTurn none) }])
 
 private def scytheDeath : GameEvent :=
-  does (damagedVictim .equipped) die
+  does (Semantics.Subject.actor (damagedVictim .equipped)) die
 private def scytheAfterDeath : DRS :=
   (stepGameEvent 64 (DRS.ofList []) scytheDeath).1
 private def scytheReturn : Action :=
@@ -194,7 +206,7 @@ theorem scytheRawDemonstrativeSelectsReturnedCreature :
       selected.map (·.id) = ((headerFreshReferents (nextClause scytheAfterDeath) scytheAfterReturn).filter (·.kind == .object)).map (·.id) := by decide
 
 private def vampiricDeath : GameEvent :=
-  does (damagedVictim .enchanted) die
+  does (Semantics.Subject.actor (damagedVictim .enchanted)) die
 private def vampiricAfterDeath : DRS :=
   (stepGameEvent 64 (DRS.ofList []) vampiricDeath).1
 

@@ -18,31 +18,49 @@ Port of `idris/src/Experimental/Cards/Deontic.idr`: the printed cards of the Deo
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a counted)
+open Semantics.Templates.Predicate (and or not was quality isAttached attachedTo)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and or not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.Condition (and isAttached not or was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a)
+open Semantics.Templates.MoveRider (attachedTo)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.QualityPayload (quality)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Cards
 
 def infiltrate : Action := establishThroughout (cant any (block (target isCreature))) thisTurn
 theorem okInfiltrate : Action.check (DRS.ofList []) infiltrate = [] := by decide
-def changeOfHeart : Action := establishThroughout (cant (target isCreature) attack) thisTurn
+def changeOfHeart : Action := establishThroughout (cant ((Semantics.Subject.actor (target isCreature))) attack) thisTurn
 theorem okChangeOfHeart : Action.check (DRS.ofList []) changeOfHeart = [] := by decide
 def blindblast : Action :=
   sequentially
     [instruct this_ (dealDamage 1 (target isCreature)), establishThroughout
-       (cant (that creature) block) thisTurn]
+       (cant (Semantics.Subject.actor ((that creature))) block) thisTurn]
 theorem okBlindblast : Action.check (DRS.ofList []) blindblast = [] := by decide
 def blindingFlare : Action :=
-  establishThroughout (cant (targets anyNumber isCreature) block) thisTurn
+  establishThroughout (cant (Semantics.Subject.actor ((targets anyNumber isCreature))) block) thisTurn
 theorem okBlindingFlare : Action.check (DRS.ofList []) blindingFlare = [] := by decide
 def cowardKiller : Action :=
   sequentially
-    [ establishThroughout (cant (target isCreature) block) thisTurn,
+    [ establishThroughout (cant ((Semantics.Subject.actor (target isCreature))) block) thisTurn,
       become (that creature) { characteristics := { subtypes := [coward] } }
         untilEndOfTurn ]
 theorem okCowardKiller : Action.check (DRS.ofList []) cowardKiller = [] := by decide
 
 /-- Auriok Siege Sled -/
 def auriokSiegeSledDenial : Ability :=
-  activated [generic 1]
-    (establishThroughout (cant (target (and [isArtifact, isCreature])) (block thisCreature))
+  activated (Semantics.Cost.mana ([generic 1]))
+    (establishThroughout (cant ((Semantics.Subject.actor (target (and [isArtifact, isCreature])))) (block thisCreature))
        thisTurn)
 theorem okAuriokSiegeSledDenial : Ability.check (DRS.ofList []) auriokSiegeSledDenial = [] := by decide
 
@@ -50,19 +68,19 @@ theorem okAuriokSiegeSledDenial : Ability.check (DRS.ofList []) auriokSiegeSledD
 def blindblastWhole : Action :=
   sequentially
     [ instruct this_ (dealDamage 1 (target isCreature)), establishThroughout
-        (cant (that creature) block) thisTurn,
+        (cant (Semantics.Subject.actor ((that creature))) block) thisTurn,
       draw 1 ]
 theorem okBlindblastWhole : Action.check (DRS.ofList []) blindblastWhole = [] := by decide
 
 def sparkmagesGambit : Action :=
   sequentially
     [ instruct this_ (dealDamage 1 (eachOf (targets (upTo 2) isCreature))),
-      establishThroughout (cant (those creature) block) thisTurn ]
+      establishThroughout (cant (Semantics.Subject.actor ((those creature))) block) thisTurn ]
 theorem okSparkmagesGambit : Action.check (DRS.ofList []) sparkmagesGambit = [] := by decide
 
 /-- Glacial Chasm -/
 def glacialChasmCant : Ability :=
-  (match (cardNamed "Glacial Chasm") with
+  (match (Semantics.Cards.«Glacial Chasm») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons part _))) => some part
       | _ => none
@@ -70,68 +88,68 @@ def glacialChasmCant : Ability :=
 theorem okGlacialChasmCant : Ability.check (DRS.ofList []) glacialChasmCant = [] := by decide
 
 def desperateCastaways : Ability :=
-  static (onlyUnless (cant thisCreature attack)
+  static (onlyUnless (cant (Semantics.Subject.actor (thisCreature)) attack)
     (exists_ (and [isArtifact, youControl])))
 theorem okDesperateCastaways : Ability.check (DRS.ofList []) desperateCastaways = [] := by decide
 
 def munghaWurm : Ability :=
-  static (cant you (untap (counted (moreThan 1) isLand)) (timing := duringYourUntapStep))
+  static (cant (Semantics.Subject.actor (you)) (untap (counted (moreThan 1) isLand)) (timing := duringYourUntapStep))
 theorem okMunghaWurm : Ability.check (DRS.ofList []) munghaWurm = [] := by decide
 def dampingField : Ability :=
   static
-      (cant (bare isPlayer) (untap (counted (moreThan 1) isArtifact))
+      (cant (Semantics.Subject.actor ((bare isPlayer))) (untap (counted (moreThan 1) isArtifact))
          (timing := duringTheirUntapSteps))
 theorem okDampingField : Ability.check (DRS.ofList []) dampingField = [] := by decide
 def smoke : Ability := static
-    (cant (bare isPlayer) (untap (counted (moreThan 1) isCreature))
+    (cant (Semantics.Subject.actor ((bare isPlayer))) (untap (counted (moreThan 1) isCreature))
        (timing := duringTheirUntapSteps))
 theorem okSmoke : Ability.check (DRS.ofList []) smoke = [] := by decide
 def winterOrb : Ability :=
   static
       (onlyWhile
-         (cant (bare isPlayer) (untap (counted (moreThan 1) isLand))
+         (cant (Semantics.Subject.actor ((bare isPlayer))) (untap (counted (moreThan 1) isLand))
             (timing := duringTheirUntapSteps))
     (is thisArtifact isUntapped))
 theorem okWinterOrb : Ability.check (DRS.ofList []) winterOrb = [] := by decide
 def staticOrb : Ability :=
   static
       (onlyWhile
-         (cant (bare isPlayer) (untap (counted (moreThan 2) isPermanent))
+         (cant (Semantics.Subject.actor ((bare isPlayer))) (untap (counted (moreThan 2) isPermanent))
             (timing := duringTheirUntapSteps))
     (is thisArtifact isUntapped))
 theorem okStaticOrb : Ability.check (DRS.ofList []) staticOrb = [] := by decide
 
 def winterMoon : Ability :=
   static
-      (cant (bare isPlayer)
+      (cant (Semantics.Subject.actor ((bare isPlayer)))
          (untap (counted (moreThan 1) (and [isLand, non (hasSupertype .basic)])))
       (timing := duringTheirUntapSteps))
 theorem okWinterMoon : Ability.check (DRS.ofList []) winterMoon = [] := by decide
 
 def leitmotifComposer : Ability :=
-  activated [generic 2, pip .blue]
+  activated (Semantics.Cost.mana ([generic 2, pip .blue]))
     (establishThroughout
        (cant any
-          (block (allOf (and [isCreature, named "Leitmotif Composer"])))) thisTurn)
+          (block (allOf (and [isCreature, named (Semantics.NameSource.printed ("Leitmotif Composer"))])))) thisTurn)
 theorem okLeitmotifComposer : Ability.check (DRS.ofList []) leitmotifComposer = [] := by decide
 
 def berserkersOfBloodRidge : Ability :=
-  static (must thisCreature attack)
+  static (must (Semantics.Subject.actor (thisCreature)) attack)
 theorem okBerserkersOfBloodRidge : Ability.check (DRS.ofList []) berserkersOfBloodRidge = [] := by decide
 
 def trumpetingArmodon : Ability :=
-  activated [generic 1, pip .green]
-    (establishThroughout (must (target isCreature) (block thisCreature)) thisTurn)
+  activated (Semantics.Cost.mana ([generic 1, pip .green]))
+    (establishThroughout (must ((Semantics.Subject.actor (target isCreature))) (block thisCreature)) thisTurn)
 theorem okTrumpetingArmodon : Ability.check (DRS.ofList []) trumpetingArmodon = [] := by decide
 
 def loathsomeCatoblepas : Ability :=
-  activated [generic 2, pip .green]
+  activated (Semantics.Cost.mana ([generic 2, pip .green]))
     (establishThroughout (must any (block thisCreature)) thisTurn)
 theorem okLoathsomeCatoblepas : Ability.check (DRS.ofList []) loathsomeCatoblepas = [] := by decide
 
 def hipparion : Ability :=
   static
-      (gatedBy [generic 1] thisCreature
+      (gatedBy (Semantics.Cost.mana ([generic 1])) (Semantics.Subject.actor (thisCreature))
          (block (allOf (and [isCreature, hasPower .atLeast 3]))))
 theorem okHipparion : Ability.check (DRS.ofList []) hipparion = [] := by decide
 
@@ -143,20 +161,20 @@ theorem okFrodoBaggins : Ability.check (DRS.ofList []) frodoBaggins = [] := by d
 /-- Everybody Lives! -/
 def everybodyLivesGateLine : Action :=
   establishThroughout (conjunction
-                         [cant (bare isPlayer) loseGame, cant (bare isPlayer)
+                         [cant (Semantics.Subject.actor ((bare isPlayer))) loseGame, cant (Semantics.Subject.actor ((bare isPlayer)))
                             winGame]) thisTurn
 theorem okEverybodyLivesGateLine : Action.check (DRS.ofList []) everybodyLivesGateLine = [] := by decide
 
 /-- Nowhere to Run -/
 def nowhereToRunWardLine : StaticSpec :=
-  conjunction [ can (by_ (allOf (or [isSpell, abilityHead .anyOnStack]))) (target (allOf (and [isCreature, opponentsControl]))) (asThough := holds (is them (not (hasKeyword hexproof)))),
-      cant (allOf (and [abilityHead (.keyword ward), abilityOf (those creature)]))
+  conjunction [ can (by_ (allOf (or [isSpell, abilityHead .anyOnStack]))) (target (allOf (and [isCreature, opponentsControl]))) (asThough := holds (is them (not (hasKeyword (Semantics.KeywordTerm.the hexproof.label))))),
+      cant (Semantics.Subject.actor ((allOf (and [abilityHead (.keyword ward.label), abilityOf (those creature)]))))
           trigger ]
 theorem okNowhereToRunWardLine : StaticSpec.check (DRS.ofList []) nowhereToRunWardLine = [] := by decide
 
 /-- Mornsong Aria -/
 def mornsongAriaLock : StaticSpec :=
-  conjunction [cant (bare isPlayer) (draw anyAmount), cant (bare isPlayer)
+  conjunction [cant (Semantics.Subject.actor ((bare isPlayer))) (draw anyAmount), cant (Semantics.Subject.actor ((bare isPlayer)))
                  (gainLife anyAmount)]
 theorem okMornsongAriaLock : StaticSpec.check (DRS.ofList []) mornsongAriaLock = [] := by decide
 
@@ -166,7 +184,7 @@ def enkiraHostileScavenger : Ability :=
 theorem okEnkiraHostileScavenger : Ability.check (DRS.ofList []) enkiraHostileScavenger = [] := by decide
 
 def anglerTurtle : Ability :=
-  static (must (allOf (and [isCreature, opponentsControl])) attack)
+  static (must (Semantics.Subject.actor ((allOf (and [isCreature, opponentsControl])))) attack)
 theorem okAnglerTurtle : Ability.check (DRS.ofList []) anglerTurtle = [] := by decide
 
 def whippoorwillImmunity : Action :=
@@ -187,7 +205,7 @@ theorem okWhippoorwillImmunity : Action.check (DRS.ofList []) whippoorwillImmuni
 def complyNameLock : Action :=
   sequentially
     [ choose (a (quality .cardName)),
-      establishThroughout (cant yourOpponents
+      establishThroughout (cant (Semantics.Subject.actor (yourOpponents))
                              (cast (bare (and [isSpell, named chosenName])))) untilYourNextTurn ]
 theorem okComplyNameLock : Action.check (DRS.ofList []) complyNameLock = [] := by decide
 
@@ -195,7 +213,7 @@ theorem okComplyNameLock : Action.check (DRS.ofList []) complyNameLock = [] := b
 def academicProbationNameMode : Action :=
   sequentially
     [ choose (a (qualityFrom .cardName (nameOfCard (non isLand)))),
-      establishThroughout (cant yourOpponents
+      establishThroughout (cant (Semantics.Subject.actor (yourOpponents))
                              (cast (bare (and [isSpell, named chosenName])))) untilYourNextTurn ]
 theorem okAcademicProbationNameMode : Action.check (DRS.ofList []) academicProbationNameMode = [] := by
   decide
@@ -213,12 +231,12 @@ theorem okBattlefrontKrushokEvasion : Ability.check (DRS.ofList []) battlefrontK
 
 /-- Peacekeeper -/
 def peacekeeperCant : Ability :=
-  static (cant (allOf isCreature) attack)
+  static (cant (Semantics.Subject.actor ((allOf isCreature))) attack)
 theorem okPeacekeeperCant : Ability.check (DRS.ofList []) peacekeeperCant = [] := by decide
 
 /-- Blazing Archon -/
 def blazingArchonCant : Ability :=
-  static (cant (allOf isCreature) (attack you))
+  static (cant (Semantics.Subject.actor ((allOf isCreature))) (attack you))
 theorem okBlazingArchonCant : Ability.check (DRS.ofList []) blazingArchonCant = [] := by decide
 
 /-- Canoptek Wraith -/
@@ -229,7 +247,7 @@ theorem okCanoptekWraith : Ability.check (DRS.ofList []) canoptekWraith = [] := 
 
 /-- Gadrak, the Crown-Scourge -/
 def gadrakCantAttack : Ability :=
-  static (onlyUnless (cant thisCreature attack)
+  static (onlyUnless (cant (Semantics.Subject.actor (thisCreature)) attack)
     (compareAmt (countOf (and [isArtifact, youControl])) .atLeast 4))
 theorem okGadrakCantAttack : Ability.check (DRS.ofList []) gadrakCantAttack = [] := by decide
 
@@ -237,7 +255,7 @@ theorem okGadrakCantAttack : Ability.check (DRS.ofList []) gadrakCantAttack = []
 def berserkersFrenzyLowRoll : Action :=
   sequentially
     [ choose (counted anyNumber isCreature),
-      establishThroughout (must them block) thisTurn ]
+      establishThroughout (must (Semantics.Subject.actor (them)) block) thisTurn ]
 theorem okBerserkersFrenzyLowRoll : Action.check (DRS.ofList []) berserkersFrenzyLowRoll = [] := by decide
 
 /-- Damn -/
@@ -252,13 +270,13 @@ def concussiveBolt : Action :=
     [ instruct this_ (dealDamage 4 targetPlayerOrPlaneswalker),
       doIf (compareAmt (countOf (and [isArtifact, youControl])) .atLeast 3)
         (establishThroughout
-           (cant (allOf (and [isCreature, controlledBy splitOverPlaneswalker]))
+           (cant (Semantics.Subject.actor ((allOf (and [isCreature, controlledBy splitOverPlaneswalker]))))
               block) thisTurn) ]
 theorem okConcussiveBolt : Action.check (DRS.ofList []) concussiveBolt = [] := by decide
 
 /-- "attack you unless their controller pays {2} for each" -/
 def attackToll : StaticSpec :=
-  (match (cardNamed "Ghostly Prison") with
+  (match (Semantics.Cards.«Ghostly Prison») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.static part) _) => some part
       | _ => none
@@ -267,13 +285,13 @@ def attackToll : StaticSpec :=
 /-- Archangel of Tithes -/
 def archangelOfTithesBlockToll : Ability :=
   static (onlyWhile
-    (gatedBy (scaledGenericMana (times 1 groupSize)) (allOf isCreature) block)
+    (gatedBy (scaledGenericMana (times 1 groupSize)) (Semantics.Subject.actor ((allOf isCreature))) block)
     (is thisCreature isAttacking))
 theorem okArchangelOfTithesBlockToll : Ability.check (DRS.ofList []) archangelOfTithesBlockToll = [] := by decide
 /-- Archangel of Tithes -/
 def archangelOfTithesAttackToll : Ability :=
   static (onlyWhile
-    (gatedBy (scaledGenericMana (times 1 groupSize)) (allOf isCreature)
+    (gatedBy (scaledGenericMana (times 1 groupSize)) (Semantics.Subject.actor ((allOf isCreature)))
        (attack (youOr (allOf (and [isPlaneswalker, youControl])))))
     (is thisCreature isUntapped))
 theorem okArchangelOfTithesAttackToll : Ability.check (DRS.ofList []) archangelOfTithesAttackToll = [] := by
@@ -290,7 +308,7 @@ theorem okDistortionStrikeLine : Action.check (DRS.ofList []) distortionStrikeLi
 def conquerorsFlailProhibition : StaticSpec :=
   onlyWhile
     (partScope .turn you
-      (cant yourOpponents (cast (bare isSpell))))
+      (cant (Semantics.Subject.actor (yourOpponents)) (cast (bare isSpell))))
     (is this_ (attachedTo (a isCreature)))
 theorem okConquerorsFlailProhibition : StaticSpec.check (DRS.ofList []) conquerorsFlailProhibition = [] := by
   decide
@@ -298,15 +316,15 @@ theorem okConquerorsFlailProhibition : StaticSpec.check (DRS.ofList []) conquero
 /-- Retrace's permission: the land card discarded is an additional cost of casting, not what is
 cast, added to the mana cost or an alternative cost [CR#702.81a,601.2f,601.2h]. -/
 def castFromGraveyardByDiscardingALand : StaticSpec :=
-  can you
+  can (Semantics.Subject.actor (you))
     (cast this_ (from_ := yourGraveyard)
-      (payment := plusAdditional (discard (a (and [isCard, isLand])))))
+      (payment := plusAdditional ((Semantics.Cost.perform (discard (a (and [isCard, isLand])))))))
 theorem okCastFromGraveyardByDiscardingALand :
     StaticSpec.check (DRS.ofList []) castFromGraveyardByDiscardingALand = [] := by decide
 
 /-- "Auras already attached to those artifacts" -/
 def aurasAlreadyAttachedToThoseArtifacts : NounPhrase :=
-  (match (cardNamed "Guardian Beast") with
+  (match (Semantics.Cards.«Guardian Beast») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.static (StaticSpec.conditional (StaticSpec.conjunction _ (List.cons
         (StaticSpec.retention _ part) _)) _ _)) _) => some part
@@ -322,7 +340,7 @@ hypothetical indefinite the prohibition closes, so "they" reads the artifacts, a
 Aura already on such an artifact illegal [CR#303.4c,704.5m], and "already attached" reads the
 host back, as *Benevolent Blessing*'s does. -/
 def guardianBeastProtection : StaticSpec :=
-  (match (cardNamed "Guardian Beast") with
+  (match (Semantics.Cards.«Guardian Beast») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.static part) _) => some part
       | _ => none
@@ -341,9 +359,9 @@ theorem guardianBeastExemptsOnlyTheEnchantProhibition :
       (onlyWhile
         (retention
           (conjunction
-            [ cant any (attachTo (a aura) them),
+            [ cant any (attachTo (a (Semantics.Predicate.hasSubtype (aura))) them),
               abilityGrant them indestructible,
-              cant (bare (and [isPlayer, isOther])) (gainControlOf them) ]
+              cant (Semantics.Subject.actor ((bare (and [isPlayer, isOther])))) (gainControlOf them) ]
             (bare (and [non isCreature, isArtifact, youControl])))
           aurasAlreadyAttachedToThoseArtifacts)
         (is thisCreature isUntapped)) = [.retentionClause, .retentionSubject] := by decide

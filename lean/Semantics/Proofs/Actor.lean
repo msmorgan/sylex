@@ -12,6 +12,18 @@ performs the action it is part of: by default, the player addressed by the text
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each)
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each)
+
 namespace Semantics.Proofs.Actor
 
 private def handoff (drs : DRS) (subject : NounPhrase) : DRS :=
@@ -95,10 +107,10 @@ theorem amassBareItAfterDestroyChecks :
 /-- A literal amass body, written with bare "that creature" and "it". -/
 private def literalAmass : Action :=
   .sequentially
-    [ .doIf (.not (exists_ army))
+    [ .doIf (.not (exists_ (hasSubtype army)))
         (create 1 (.written (creatureToken 0 0 [.black] [orc, Subtype.army])))
         none,
-      choose (a army),
+      choose (a (hasSubtype army)),
       .putCounters 2 (.printed p1p1Counter) (that (.type .creature)),
       .doIf (.not (.matches it (.hasSubtype (orc))))
         (.establish (qualityChange it .adds
@@ -150,10 +162,10 @@ theorem okScopedAmassAfterDestroy :
 view (`inCaller`). -/
 private def scopedAmassOf (amount : Amount) : Action :=
   .ownScope (some (.action "amass")) (.sequentially
-    [ .doIf (.not (exists_ army))
+    [ .doIf (.not (exists_ (hasSubtype army)))
         (create 1 (.written (creatureToken 0 0 [.black] [goblin, Subtype.army])))
         none,
-      choose (a army),
+      choose (a (hasSubtype army)),
       .putCounters (.inCaller amount) (.printed p1p1Counter) (that (.type .creature)),
       .doIf (.not (.matches it (.hasSubtype (goblin))))
         (.establish (qualityChange it .adds
@@ -215,7 +227,7 @@ theorem okActorMatchedPayer :
 
 /-- "Pay 2 life: Draw a card." (`Keyword.okOwnPayerCost` with the actor) -/
 theorem okActorOwnPayerCost :
-    Ability.check (DRS.ofList []) (.activated (payLife 2) (draw 1) none none none none) = [] := by
+    Ability.check (DRS.ofList []) (.activated (.perform (payLife 2)) (draw 1) none none none none) = [] := by
   decide
 
 /-- "Target opponent loses 2 life: Draw a card.": a cost may hand its action to another
@@ -324,12 +336,12 @@ theorem ownPayerCostHandoffTwin :
         none none none none) = [] ∧
       Ability.check (DRS.ofList []) (.activated (.perform (instruct .you (loseLife 2))) drawOne
           none none none none) =
-        Ability.check (DRS.ofList []) (.activated (payLife 2) drawOne none none none none) := by
+        Ability.check (DRS.ofList []) (.activated (.perform (payLife 2)) drawOne none none none none) := by
   decide
 
 /-! ## A captured `theActor` keeps its handoff -/
 
-private semantic_template capturedLifeLoss (who : NounPhrase) : Action :=
+private def capturedLifeLoss (who : NounPhrase) : Action :=
   .instruct who (.changeLife (.down 1))
 
 /-- "You may pay 1 life of <who>. If you do, draw a card.", the payer being "you". -/
@@ -457,10 +469,10 @@ theorem badGrantedAbilityKeepsItsOwnPerformer :
 /-- "You may cast spells from your graveyard.": with no handoff in a static ability the
 permitted player is the controller, and the clause checks as the `you` spelling does. -/
 theorem okStaticActorPermission :
-    Ability.check (DRS.ofList []) (.static (can theActor (cast (bare isSpell) (from_ := some (graveyardOf theActor))))) = [] ∧
-      Ability.check (DRS.ofList []) (.static (can theActor (cast (bare isSpell) (from_ := some (graveyardOf theActor))))) =
+    Ability.check (DRS.ofList []) (.static (can (.actor theActor) (cast (bare isSpell) (from_ := some (graveyardOf theActor))))) = [] ∧
+      Ability.check (DRS.ofList []) (.static (can (.actor theActor) (cast (bare isSpell) (from_ := some (graveyardOf theActor))))) =
         Ability.check (DRS.ofList [])
-          (.static (can you (cast (bare isSpell) (from_ := some (graveyardOf .you))))) := by
+          (.static (can (.actor you) (cast (bare isSpell) (from_ := some (graveyardOf .you))))) := by
   decide
 
 /-- "Exile target creature. Its owner may cast it from exile.": the permission handed to the
@@ -469,7 +481,7 @@ theorem okHandedCastPermission :
     Action.check (DRS.ofList [])
       (.sequentially
         [ exile (target isCreature),
-          instruct (ownerOf it) (.establish (can theActor (cast it (from_ := some exileZone))) none) ]) = [] := by
+          instruct (ownerOf it) (.establish (can (.actor theActor) (cast it (from_ := some exileZone))) none) ]) = [] := by
   decide
 
 /-! ## Named actions carry their performer -/
@@ -791,11 +803,11 @@ stays the self-referent no noun word reads (owner ruling 2026-10-24), so "that c
 the creature that entered: with no other creature in the header it finds none. -/
 theorem terrorOfThePeaksThatCreatureIsTheEnteringCreature :
     Ability.check (DRS.ofList [])
-        (whenever (does (a (and [isCreature, isOther, youControl])) enter)
+        (whenever (does (.actor (a (and [isCreature, isOther, youControl]))) enter)
           (Action.instruct thisCreature
             (.dealDamage (powerOf (that (.type .creature))) (target isAnyTarget) none))) = [] ∧
       Ability.check (DRS.ofList [])
-        (whenever (does thisCreature enter)
+        (whenever (does (.actor thisCreature) enter)
           (Action.instruct thisCreature
             (.dealDamage (powerOf (that (.type .creature))) (target isAnyTarget) none))) =
         [.anaphor (.word (.type .creature)) .one 0] := by
@@ -806,11 +818,11 @@ that creature's controller." As in *Terror of the Peaks*, "that creature" in the
 clause reads the entering creature, never the Source. -/
 theorem rampagingFerocidonThatCreatureIsTheEnteringCreature :
     Ability.check (DRS.ofList [])
-        (whenever (does (a (and [isCreature, isOther])) enter)
+        (whenever (does (.actor (a (and [isCreature, isOther]))) enter)
           (Action.instruct thisCreature
             (.dealDamage 1 (controllerOf (that (.type .creature))) none))) = [] ∧
       Ability.check (DRS.ofList [])
-        (whenever (does thisCreature enter)
+        (whenever (does (.actor thisCreature) enter)
           (Action.instruct thisCreature
             (.dealDamage 1 (controllerOf (that (.type .creature))) none))) =
         [.anaphor (.word (.type .creature)) .one 0] := by

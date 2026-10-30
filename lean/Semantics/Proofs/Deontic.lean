@@ -14,6 +14,24 @@ theorem form, each closed by `decide`. The names and the sentences are the Idris
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted)
+open Semantics.Templates.Predicate (and or was)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Location (and or)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.Ability (crew)
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Action (crew doIf target)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and or was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.Deontic
 
 /-- A cause qualifier narrows the ordinary loss prohibition. -/
@@ -81,9 +99,9 @@ private def costResult (cost : Cost) : DRS := (stepCost 64 (DRS.ofList []) cost)
 `perform (payLife 2)`, and paying it is one payment of 2 life [CR#118.1,119.4]. It publishes one
 life-lost amount and no repeat count, as `perform (loseLife 2)` does, and "that much" reads it. -/
 theorem payLifeInACostSlotCountsOnce :
-    [costResult (payLife 2), costResult (perform (loseLife 2))].map (fun after =>
+    [costResult (Semantics.Cost.perform ((payLife 2))), costResult (perform (loseLife 2))].map (fun after =>
       (countOutcomes .lifeLost after, countOutcomes .repeatCount after)) = [(1, 0), (1, 0)] ∧
-      Ability.check (DRS.ofList []) (activated (payLife 2) (gainLife thatMuch)) = [] := by
+      Ability.check (DRS.ofList []) (activated (Semantics.Cost.perform ((payLife 2))) (gainLife thatMuch)) = [] := by
   decide
 
 /-- Paying a cost that is itself a payment of life pays that life once, never a payment of a
@@ -93,16 +111,16 @@ payment [CR#118.1,119.4]: "pay" writes its cost `payment`, and the checker reads
 you pay [Pay 2 life] for each age counter" each pay the life itself. A cost that is not a payment
 is left as written. -/
 theorem payingALifePaymentPaysItOnce :
-    pay (payLife 1) .once = .pay (.payment (payLife 1)) .once .paid none none ∧
-      doUnless (tap thisCreature) (payLife 1) =
-        .withContinuation .optional (.pay (.payment (payLife 1)) .once .paid none none) none
+    pay (Semantics.Cost.perform ((payLife 1))) .once = .pay (.payment (Semantics.Cost.perform ((payLife 1)))) .once .paid none none ∧
+      doUnless (tap thisCreature) (Semantics.Cost.perform ((payLife 1))) =
+        .withContinuation .optional (.pay (.payment (Semantics.Cost.perform ((payLife 1)))) .once .paid none none) none
           (tap thisCreature) ∧
-      (Cost.payment (payLife 1)).paidCost = perform (loseLife 1) ∧
-      (Cost.payment (.inCaller (payLife 5))).paidCost = .inCaller (perform (loseLife 5)) ∧
-      (Cost.payment (.scaled (.inCaller (payLife 2)) (.lit 1))).paidCost =
+      (Cost.payment (Semantics.Cost.perform ((payLife 1)))).paidCost = perform (loseLife 1) ∧
+      (Cost.payment (.inCaller (Semantics.Cost.perform ((payLife 5))))).paidCost = .inCaller (perform (loseLife 5)) ∧
+      (Cost.payment (.scaled (.inCaller (Semantics.Cost.perform ((payLife 2)))) (.lit 1))).paidCost =
         .scaled (.inCaller (perform (loseLife 2))) (.lit 1) ∧
-      (Cost.payment (.compound [[generic 1], payLife 2])).paidCost =
-        .compound [[generic 1], perform (loseLife 2)] ∧
+      (Cost.payment (.compound [(Semantics.Cost.mana ([generic 1])), (Semantics.Cost.perform (payLife 2))])).paidCost =
+        .compound [(Semantics.Cost.mana ([generic 1])), perform (loseLife 2)] ∧
       (Cost.payment (perform (sacrifice (a isCreature)))).paidCost =
         perform (sacrifice (a isCreature)) :=
   ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
@@ -111,8 +129,8 @@ theorem payingALifePaymentPaysItOnce :
 [CR#119.4,119.8]: it checks clean, and it is not "players can't lose life", which would also forbid
 a *Lightning Bolt*'s. -/
 theorem cantPayLifeIsNotCantLoseLife :
-    Ability.check (DRS.ofList []) (static (cant (a isPlayer) (payLife anyAmount))) = [] ∧
-      cant (a isPlayer) (payLife anyAmount) ≠ cant (a isPlayer) (loseLife anyAmount) := by
+    Ability.check (DRS.ofList []) (static (cant ((Semantics.Subject.actor (a isPlayer))) (payLife anyAmount))) = [] ∧
+      cant ((Semantics.Subject.actor (a isPlayer))) (payLife anyAmount) ≠ cant ((Semantics.Subject.actor (a isPlayer))) (loseLife anyAmount) := by
   refine ⟨by decide, fun h => ?_⟩
   cases h
 
@@ -279,7 +297,7 @@ theorem cantBePreventedIsADeonticOverPreventDamage :
     let cantBePrevented : StaticSpec :=
       cant any
         (preventDamage allDamage (damage := would (by_ thisCreature) (dealDamage anyAmount)))
-    (cardNamed "Excruciator") =
+    (Semantics.Cards.«Excruciator») =
         singleFacedCard
           { name := "Excruciator", cost := [generic 6, pip .red, pip .red], types := [.creature],
             subtypes := [avatar], text := [static cantBePrevented],
@@ -505,16 +523,16 @@ theorem durationConventionWitnesses :
     (match epic with
       | .keyword _ _ [.spell _ (.establish _ d), _] => some d
       | _ => none) = some (some restOfGame) ∧
-    (match printedText (cardNamed "Screaming Nemesis") with
+    (match printedText (Semantics.Cards.«Screaming Nemesis») with
       | [_, .triggered _ _ _ _ _ _ _ (.sequentially [_, .doIf _ (.establish _ d) _ _])] => some d
       | _ => none) = some (some restOfGame) ∧
-    (match printedText (cardNamed "Terror") with
+    (match printedText (Semantics.Cards.«Terror») with
       | [.spell _ (.sequentially [_, .establish _ d])] => some d
       | _ => none) = some (some Duration.modifiesPrecedingAction) ∧
-    (match printedText (cardNamed "Pinpoint Avalanche") with
+    (match printedText (Semantics.Cards.«Pinpoint Avalanche») with
       | [.spell _ (.sequentially [_, .establish _ d])] => some d
       | _ => none) = some (some Duration.modifiesPrecedingAction) ∧
-    (match printedText (cardNamed "Vexing Shusher") with
+    (match printedText (Semantics.Cards.«Vexing Shusher») with
       | [_, .activated _ (.establish _ d) _ _ _ _] => some d
       | _ => none) = some none ∧
     (match Cards.boseijuMana with
@@ -528,30 +546,30 @@ theorem durationConventionWitnesses :
 "as though" statements and their other lines (the life-gain and damage-prevention prohibitions,
 the loses-the-game exception) unchanged. -/
 theorem okAsThoughSourceHadKeywordCards :
-    (cardNamed "Everlasting Torment").check = [] ∧ (cardNamed "Phyrexian Unlife").check = [] :=
-  ⟨cardNamedOk "Everlasting Torment", cardNamedOk "Phyrexian Unlife"⟩
+    (Semantics.Cards.«Everlasting Torment»).check = [] ∧ (Semantics.Cards.«Phyrexian Unlife»).check = [] :=
+  ⟨(by decide), (by decide)⟩
 
 /-- The damage lines name the keywords by reference, as a condition on the damage's source
 ("as though its source had wither"), so they take wither's and infect's own rows
 [CR#702.80a,702.90b]. The condition grants nothing: for a source that has the keyword already it
 is simply true, and the keyword's result happens once [CR#120.3d,702.80d,702.90f]. -/
 theorem asThoughSourceHadKeywordByReference :
-    (match printedText (cardNamed "Everlasting Torment") with
+    (match printedText (Semantics.Cards.«Everlasting Torment») with
       | [_, _, .static (.asThough subj action cond)] => some (subj, action, cond)
       | _ => none) =
-      some (by_ (a isSource), dealDamage anyAmount, holds (is thatSource (hasKeyword wither))) ∧
-    (match printedText (cardNamed "Phyrexian Unlife") with
+      some (by_ (a isSource), dealDamage anyAmount, holds (is thatSource (hasKeyword (Semantics.KeywordTerm.the wither.label)))) ∧
+    (match printedText (Semantics.Cards.«Phyrexian Unlife») with
       | [_, .static (.conditional (.asThough subj action cond) _ _)] => some (subj, action, cond)
       | _ => none) =
       some (by_ (a isSource), dealDamage anyAmount you,
-        holds (is thatSource (hasKeyword infect))) := by
+        holds (is thatSource (hasKeyword (Semantics.KeywordTerm.the infect.label)))) := by
   refine ⟨rfl, rfl⟩
 
 /-- "Its source" reads the passive's agent: with no agent in the clause there is no source for
 it to read. -/
 theorem badAsThoughSourceWithoutAgent :
     StaticSpec.check (DRS.ofList [])
-      (asThough any (dealDamage anyAmount) (holds (is thatSource (hasKeyword wither)))) =
+      (asThough any (dealDamage anyAmount) (holds (is thatSource (hasKeyword (Semantics.KeywordTerm.the wither.label))))) =
       [.anaphor (.word .source) .one 0] := by decide
 
 /-- Whether stepping `spec` records any act it names as permitted. -/
@@ -563,22 +581,22 @@ Vehicles as though its power were 2 greater" records no permitted crew, where "t
 crew Vehicles as though …" does. -/
 theorem asThoughIsNotRecordedAsPermitted :
     recordsPermitted
-        (asThough thisCreature (crew (allOf (hasSubtype vehicle))) (greaterBy .power 2)) = false ∧
+        (asThough (Semantics.Subject.actor (thisCreature)) (crew (allOf (hasSubtype vehicle))) (greaterBy .power 2)) = false ∧
       recordsPermitted
-        (can thisCreature (crew (allOf (hasSubtype vehicle))) (asThough := greaterBy .power 2)) =
+        (can (Semantics.Subject.actor (thisCreature)) (crew (allOf (hasSubtype vehicle))) (asThough := greaterBy .power 2)) =
         true := by
   decide
 
 /-- Hotshot Mechanic and Cloudspire Captain check in the indicative form. -/
 theorem okIndicativeCrewAsThough :
-    (cardNamed "Hotshot Mechanic").check = [] ∧
+    (Semantics.Cards.«Hotshot Mechanic»).check = [] ∧
       StaticSpec.check (DRS.ofList []) Cards.cloudspireCaptainCrewLine = [] :=
-  ⟨cardNamedOk "Hotshot Mechanic", Cards.okCloudspireCaptainCrewLine⟩
+  ⟨(by decide), Cards.okCloudspireCaptainCrewLine⟩
 
 /-- Hotshot Mechanic: "… as though its power were 2 greater." -/
 theorem okLiteralAsThoughAmount :
     StaticSpec.check (DRS.ofList [])
-      (asThough thisCreature (crew (allOf (hasSubtype vehicle))) (greaterBy .power 2)) = [] := by
+      (asThough (Semantics.Subject.actor (thisCreature)) (crew (allOf (hasSubtype vehicle))) (greaterBy .power 2)) = [] := by
   decide
 
 /-- "… as though its power were greater by target creature's power.": an as-though amount reads
@@ -586,7 +604,7 @@ a value and introduces no referent; a static ability is none of the targeted spe
 [CR#115.1a..115.1d,609.4]. -/
 theorem badAnnouncingAsThoughAmount :
     StaticSpec.check (DRS.ofList [])
-      (asThough thisCreature (crew (allOf (hasSubtype vehicle)))
+      (asThough (Semantics.Subject.actor (thisCreature)) (crew (allOf (hasSubtype vehicle)))
         (greaterBy .power (.statOf (.stat .power) (target isCreature)))) = [.bindingless] := by
   decide
 

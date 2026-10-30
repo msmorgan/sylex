@@ -1,6 +1,6 @@
 # File header, not documentation.
 
-template shared: Bool { body = Bool.zz }
+template shared: Bool { body = zz }
 template this: Int { body = 1 }
 template useThis: Int { body = this }
 template words(this: Int, in: Int, from: Int, by: Int, or: Int, exists: Int, where: Int, variable: Int,): List(Int) {

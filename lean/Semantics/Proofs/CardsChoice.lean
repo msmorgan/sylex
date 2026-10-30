@@ -18,6 +18,24 @@ Port of `idris/src/Experimental/Cards/Choice.idr`: the printed cards of the Choi
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and or not was quality attachedTo)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and or not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.Condition (and not or was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.MoveRider (attachedTo)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.QualityPayload (quality)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Cards
 
 def carefulStudy : Action :=
@@ -25,15 +43,15 @@ def carefulStudy : Action :=
 theorem okCarefulStudy : Action.check (DRS.ofList []) carefulStudy = [] := by decide
 
 def zombieInfestation : Ability :=
-  activated (discard (counted (exactly 2) (cardIn yourHand)))
-    (create 1 (creatureToken 2 2 [.black] [zombie]))
+  activated ((Semantics.Cost.perform (discard (counted (exactly 2) (cardIn yourHand)))))
+    (create 1 (Semantics.TokenSpec.written ((creatureToken 2 2 [.black] [zombie]))))
 theorem okZombieInfestation : Ability.check (DRS.ofList []) zombieInfestation = [] := by decide
 
 def fulgentDistraction : Action :=
   sequentially
     [ choose (targets (exactly 2) isCreature),
       tap (those creature),
-      unattach (allOf (and [ equipment,
+      unattach (allOf (and [ (Semantics.Predicate.hasSubtype (equipment)),
                                attachedTo (those creature) ])) ]
 theorem okFulgentDistraction : Action.check (DRS.ofList []) fulgentDistraction = [] := by decide
 
@@ -51,7 +69,7 @@ theorem okChooseCreatureYouControlAndCreatureYouDont :
 /-- The opening the fight-and-bite cards share: "Choose target creature you control and target
 creature you don't control." -/
 def chooseFightPair : Action :=
-  (match (cardNamed "Joust") with
+  (match (Semantics.Cards.«Joust») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ (Action.sequentially (List.cons part _))) _) => some part
       | _ => none
@@ -105,7 +123,7 @@ def kindredDominance : Action :=
 theorem okKindredDominance : Action.check (DRS.ofList []) kindredDominance = [] := by decide
 
 def phantomBlade : Ability :=
-  when (does thisEquipment enter)
+  when (does (Semantics.Subject.actor (thisEquipment)) enter)
     (sequentially
       [ attachTo it
           (targets (upTo 1) (and [isCreature, youControl])),
@@ -125,24 +143,24 @@ theorem okDarettisMinusOne : Action.check (DRS.ofList []) darettisMinusOne = [] 
 
 def rainOfThorns : Action :=
   chooseModes (orMore 1)
-    [destroy (target isArtifact), destroy (target isEnchantment), destroy (target isLand)]
+    [{ action := destroy (target isArtifact) }, { action := destroy (target isEnchantment) }, { action := destroy (target isLand) }]
 theorem okRainOfThorns : Action.check (DRS.ofList []) rainOfThorns = [] := by decide
 
 def rankleMasterOfPranks : Action :=
   chooseModes anyNumber
-    [ instruct eachPlayer (discard (a (cardIn hand))),
-      sequentially [instruct eachPlayer (loseLife 1), instruct (those player)
-                      (draw 1)],
-      instruct eachPlayer (sacrifice (aTheirChoice isCreature)) ]
+    [ { action := instruct eachPlayer (discard (a (cardIn hand))) },
+      { action := sequentially [instruct eachPlayer (loseLife 1), instruct (those player)
+                      (draw 1)] },
+      { action := instruct eachPlayer (sacrifice (aTheirChoice isCreature)) } ]
 theorem okRankleMasterOfPranks : Action.check (DRS.ofList []) rankleMasterOfPranks = [] := by decide
 
 def myrkulsEdict : Action :=
   sequentially [choose anOpponent, instruct (that player) (sacrifice (aTheirChoice isCreature))]
 theorem okMyrkulsEdict : Action.check (DRS.ofList []) myrkulsEdict = [] := by decide
-def moltingHarpy : Action := doUnless (sacrifice thisCreature) [generic
-    2]
+def moltingHarpy : Action := doUnless (sacrifice thisCreature) (Semantics.Cost.mana ([generic
+    2]))
 theorem okMoltingHarpy : Action.check (DRS.ofList []) moltingHarpy = [] := by decide
-def carnophage : Action := doUnless (tap thisCreature) (payLife 1)
+def carnophage : Action := doUnless (tap thisCreature) (Semantics.Cost.perform ((payLife 1)))
 theorem okCarnophage : Action.check (DRS.ofList []) carnophage = [] := by decide
 def solitaryConfinement : Action :=
   mayOrElse (discard (a (cardIn yourHand))) (sacrifice thisEnchantment)
@@ -152,53 +170,53 @@ def yasminKhan : Ability :=
   activated tapSymbol
     (sequentially
       [ exile (topSlice 1),
-        establishThroughout (can you (play it)) untilYourNextEndStep ])
+        establishThroughout (can (Semantics.Subject.actor (you)) (play it)) untilYourNextEndStep ])
 theorem okYasminKhan : Ability.check (DRS.ofList []) yasminKhan = [] := by decide
 
 /-- Brazen Cannonade -/
 def brazenCannonadePermission : Action :=
   sequentially
     [ exile (topSlice 1),
-      establishThroughout (can you (play it)) (untilEvent
+      establishThroughout (can (Semantics.Subject.actor (you)) (play it)) (untilEvent
                                                          (endOf .combat you nextTime)) ]
 theorem okBrazenCannonadePermission : Action.check (DRS.ofList []) brazenCannonadePermission = [] := by
   decide
 
 def thousandMoonsCrackshot : Ability :=
-  whenever (does thisCreature attack)
-    (offerWhen (pay [generic 2, pip .white] .once)
+  whenever (does (Semantics.Subject.actor (thisCreature)) attack)
+    (offerWhen (pay (Semantics.Cost.mana ([generic 2, pip .white])) .once)
       (tap (target isCreature)))
 theorem okThousandMoonsCrackshot : Ability.check (DRS.ofList []) thousandMoonsCrackshot = [] := by decide
 
 def zimoneQuandrixProdigy : Ability :=
-  activated (compound [[generic 1], tapSymbol])
+  activated (compound [(Semantics.Cost.mana ([generic 1])), tapSymbol])
     (may (putOntoBattlefieldTapped (a (and [isLand, in_ yourHand]))))
 theorem okZimoneQuandrixProdigy : Ability.check (DRS.ofList []) zimoneQuandrixProdigy = [] := by decide
 
 def preeminentCaptain : Ability :=
-  whenever (does thisCreature attack)
+  whenever (does (Semantics.Subject.actor (thisCreature)) attack)
     (may (putOntoBattlefieldTappedAttacking
-      (a (and [soldier, isCreature, in_ yourHand]))))
+      (a (and [(Semantics.Predicate.hasSubtype (soldier)), isCreature, in_ yourHand]))))
 theorem okPreeminentCaptain : Ability.check (DRS.ofList []) preeminentCaptain = [] := by decide
 
 def skaabRuinator : Ability :=
-  static (can you (cast this_ (from_ := yourGraveyard)))
+  static (can (Semantics.Subject.actor (you)) (cast this_ (from_ := yourGraveyard)))
 theorem okSkaabRuinator : Ability.check (DRS.ofList []) skaabRuinator = [] := by decide
 
 def escapeToTheWilds : Action :=
   sequentially
     [ exile (topSlice 5),
-      establishThroughout (can you
+      establishThroughout (can (Semantics.Subject.actor (you))
                              (play (bare (and [isCard, was (exile which) thisWay]))))
         (untilEvent (endOf .turn you nextTime)) ]
 theorem okEscapeToTheWilds : Action.check (DRS.ofList []) escapeToTheWilds = [] := by decide
 
 /-- Muse Vessel -/
 def museVesselPlay : Ability :=
-  activated [generic 1]
+  activated (Semantics.Cost.mana ([generic 1]))
     (sequentially
       [ choose (a (cardIn (exiledWith thisArtifact))),
-        establishThroughout (can you (play (that card))) thisTurn ])
+        establishThroughout (can (Semantics.Subject.actor (you)) (play (that card))) thisTurn ])
 theorem okMuseVesselPlay : Ability.check (DRS.ofList []) museVesselPlay = [] := by decide
 
 def demonicConsultationChoice : Action := choose (a (quality .cardName))
@@ -209,7 +227,7 @@ theorem okVoidChoice : Action.check (DRS.ofList []) voidChoice = [] := by decide
 
 /-- Phyrexian Ingester -/
 def phyrexianIngesterPump : Ability :=
-  (match (cardNamed "Phyrexian Ingester") with
+  (match (Semantics.Cards.«Phyrexian Ingester») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -218,7 +236,7 @@ theorem okPhyrexianIngesterPump : Ability.check (DRS.ofList []) phyrexianIngeste
 
 /-- Koh, the Face Stealer -/
 def kohChooser : Ability :=
-  activated (payLife 1) (choose (a (and [isCreature, in_ (exiledWith this_)])))
+  activated (Semantics.Cost.perform ((payLife 1))) (choose (a (and [isCreature, in_ (exiledWith this_)])))
 theorem okKohChooser : Ability.check (DRS.ofList []) kohChooser = [] := by decide
 /-- Forgotten Lore -/
 def forgottenLoreChoice : Action :=
@@ -242,14 +260,14 @@ theorem okNecromentiaChoice : Action.check (DRS.ofList []) necromentiaChoice = [
 
 /-- "play lands from the top of your library" -/
 def playLandsFromTop : StaticSpec :=
-  (match (cardNamed "Oracle of Mul Daya") with
+  (match (Semantics.Cards.«Oracle of Mul Daya») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.static part) _))) => some part
       | _ => none
     | _ => none).get (by decide)
 /-- Future Sight; Magus of the Future -/
 def playLandsAndCastSpellsFromTop : StaticSpec :=
-  (match (cardNamed "Magus of the Future") with
+  (match (Semantics.Cards.«Magus of the Future») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.static part) _)) => some part
       | _ => none
@@ -258,7 +276,7 @@ theorem okPlayLandsAndCastSpellsFromTop :
     StaticSpec.check (DRS.ofList []) playLandsAndCastSpellsFromTop = [] := by decide
 /-- Assemble the Players -/
 def castSmallCreatureFromTopOnceEachTurn : StaticSpec :=
-  (match (cardNamed "Assemble the Players") with
+  (match (Semantics.Cards.«Assemble the Players») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.static part) _)) => some part
       | _ => none
@@ -270,22 +288,22 @@ theorem okCastSmallCreatureFromTopOnceEachTurn :
 def forgottenLoreRepeat : Action :=
   sequentially
     [ instruct (target isOpponent) (choose (a (cardIn yourGraveyard))),
-      may (pay [pip .green] .once) (repeat_
+      may (pay (Semantics.Cost.mana ([pip .green])) .once) (repeat_
           againExcludingChosen) ]
 theorem okForgottenLoreRepeat : Action.check (DRS.ofList []) forgottenLoreRepeat = [] := by decide
 
 def killingWave : Action :=
   doForEach (each isCreature)
-    (instruct (controllerOf it) (doUnless (instruct they (sacrifice it)) (payLife (letter .x))))
+    (instruct (controllerOf it) (doUnless (instruct they (sacrifice it)) (Semantics.Cost.perform ((payLife (letter .x))))))
 theorem okKillingWave : Action.check (DRS.ofList []) killingWave = [] := by decide
 def fadeAway : Action :=
   doForEach (each isCreature)
-    (instruct (controllerOf it) (doUnless (instruct they (sacrifice (a isPermanent))) [generic 1]))
+    (instruct (controllerOf it) (doUnless (instruct they (sacrifice (a isPermanent))) (Semantics.Cost.mana ([generic 1]))))
 theorem okFadeAway : Action.check (DRS.ofList []) fadeAway = [] := by decide
 
 def zimoneAndDina : Ability :=
   activated
-      (compound [tapSymbol, sacrifice (a (and [isCreature, isOther]))])
+      (compound [tapSymbol, (Semantics.Cost.perform (sacrifice (a (and [isCreature, isOther]))))])
     (sequentially
       [ draw 1,
         may (putOntoBattlefieldTapped (a (and [isLand, in_ yourHand]))),
@@ -315,21 +333,21 @@ def aetherGustPlacement : Action :=
       instruct (ownerOf it) (put it (or [onTop, onBottom])) ]
 theorem okAetherGustPlacement : Action.check (DRS.ofList []) aetherGustPlacement = [] := by decide
 /-- Fastbond -/
-def fastbondLands : Ability := static (can you (play (counted (additional anyNumber) isLand)))
+def fastbondLands : Ability := static (can (Semantics.Subject.actor (you)) (play (counted (additional anyNumber) isLand)))
 theorem okFastbondLands : Ability.check (DRS.ofList []) fastbondLands = [] := by decide
 /-- Panglacial Wurm -/
 def panglacialWurmCast : Ability :=
   static
-      (can you (cast this_ (from_ := yourLibrary)) (timing := whileSearchingYourLibrary))
+      (can (Semantics.Subject.actor (you)) (cast this_ (from_ := yourLibrary)) (timing := whileSearchingYourLibrary))
 theorem okPanglacialWurmCast : Ability.check (DRS.ofList []) panglacialWurmCast = [] := by decide
 
 /-- Tranquil Frillback -/
-def tranquilFrillbackOffer : Action := may (pay [pip .green] (.upTo 3))
+def tranquilFrillbackOffer : Action := may (pay (Semantics.Cost.mana ([pip .green])) (.upTo 3))
 theorem okTranquilFrillbackOffer : Action.check (DRS.ofList []) tranquilFrillbackOffer = [] := by decide
 
 /-- Duneblast -/
 def duneblast : Action :=
-  (match (cardNamed "Duneblast") with
+  (match (Semantics.Cards.«Duneblast») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ part) _) => some part
       | _ => none
@@ -342,7 +360,7 @@ theorem okBoreasChargerChoice : Action.check (DRS.ofList []) boreasChargerChoice
 def boreasChargerSpell : Action :=
   sequentially
     [ choose (a opponentWithMoreLands),
-      search yourLibrary (counted (exactlyOf theDifference) plains),
+      search yourLibrary (counted (exactlyOf theDifference) (Semantics.Predicate.hasSubtype (plains))),
       reveal (those card),
       putOntoBattlefieldTapped (someOf (exactly 1) (those card)),
       putInto theRest hand ]
@@ -350,7 +368,7 @@ theorem okBoreasChargerSpell : Action.check (DRS.ofList []) boreasChargerSpell =
 
 /-- Slithermuse -/
 def slithermuseTrigger : Ability :=
-  when (does thisCreature leave)
+  when (does (Semantics.Subject.actor (thisCreature)) leave)
     (sequentially
       [ choose anOpponent,
         doIf (compareAmt (countOf (cardIn (handOf (that player)))) .greater
@@ -379,14 +397,14 @@ theorem okDrawUpToTwoThenGainPerShortfall :
 
 /-- Nautiloid Ship -/
 def nautiloidShipTrigger : Ability :=
-  whenever (does thisVehicle (dealDamage (recipient := a isPlayer) (kind := some .combat)))
+  whenever (does (Semantics.Subject.actor (thisVehicle)) (dealDamage (recipient := a isPlayer) (kind := some .combat)))
     (may (putOntoBattlefieldUnderYourControl (a (and [isCreature, in_ (exiledWith thisVehicle)]))))
 theorem okNautiloidShipTrigger : Ability.check (DRS.ofList []) nautiloidShipTrigger = [] := by decide
 
 /-- Summon: Esper Valigarmanda's II/III/IV body, in part -/
 def summonEsperValigarmandaCast : StaticSpec :=
-  conjunction [ can you (cast (a (and [isInstantOrSorcery, in_ (exiledWith thisSaga)]))),
-      can you (pay anyCost .once)
+  conjunction [ can (Semantics.Subject.actor (you)) (cast (a (and [isInstantOrSorcery, in_ (exiledWith thisSaga)]))),
+      can (Semantics.Subject.actor (you)) (pay anyCost .once)
           (asThough :=
              spendManaAs none .anyType
                 (toCast (and [isInstantOrSorcery, in_ (exiledWith thisSaga)]))) ]
@@ -394,18 +412,18 @@ theorem okSummonEsperValigarmandaCast :
     StaticSpec.check (DRS.ofList []) summonEsperValigarmandaCast = [] := by decide
 /-- Rogue Class's level-3 body -/
 def rogueClassLevelThree : StaticSpec :=
-  conjunction [ can you (play (allOf (in_ (exiledWith thisClass)))),
-      can you (pay anyCost .once)
+  conjunction [ can (Semantics.Subject.actor (you)) (play (allOf (in_ (exiledWith thisClass)))),
+      can (Semantics.Subject.actor (you)) (pay anyCost .once)
           (asThough :=
              spendManaAs none .anyColor (toCast (in_ (exiledWith thisClass)))) ]
 theorem okRogueClassLevelThree : StaticSpec.check (DRS.ofList []) rogueClassLevelThree = [] := by decide
 
 /-- Muldrotha, the Gravetide -/
 def muldrothaLandWindow : StaticSpec :=
-  can you (play (a isLand) (from_ := yourGraveyard)) (timing := onEachOfYourTurns)
+  can (Semantics.Subject.actor (you)) (play (a isLand) (from_ := yourGraveyard)) (timing := onEachOfYourTurns)
 theorem okMuldrothaLandWindow : StaticSpec.check (DRS.ofList []) muldrothaLandWindow = [] := by decide
 /-- Nahiri's Lithoforming -/
-def nahiriExtraLands : StaticSpec := can you
+def nahiriExtraLands : StaticSpec := can (Semantics.Subject.actor (you))
     (play (counted (additional (exactlyOf (letter .x))) isLand))
 theorem okNahiriExtraLands : StaticSpec.check (DRS.ofList [letterB .x]) nahiriExtraLands = [] := by decide
 
@@ -413,7 +431,7 @@ theorem okNahiriExtraLands : StaticSpec.check (DRS.ofList [letterB .x]) nahiriEx
 def apexOfPowerCast : Action :=
   sequentially
     [ exile (topSlice 7),
-      establishThroughout (can you (cast (fromAmong anyNumber isSpell them))) thisTurn ]
+      establishThroughout (can (Semantics.Subject.actor (you)) (cast (fromAmong anyNumber isSpell them))) thisTurn ]
 theorem okApexOfPowerCast : Action.check (DRS.ofList []) apexOfPowerCast = [] := by decide
 /-- Blight Herder -/
 def blightHerderCast : Action :=
@@ -425,27 +443,27 @@ theorem okBlightHerderCast : Action.check (DRS.ofList []) blightHerderCast = [] 
 
 /-- Akiri, Fearless Voyager -/
 def akiriUnattachOffer : Ability :=
-  activated [pip .white]
+  activated (Semantics.Cost.mana ([pip .white]))
     (may
-      (unattach (a (and [ equipment,
+      (unattach (a (and [ (Semantics.Predicate.hasSubtype (equipment)),
                             attachedTo (a (and [isCreature, youControl])) ])))
       (tap (that creature)))
 theorem okAkiriUnattachOffer : Ability.check (DRS.ofList []) akiriUnattachOffer = [] := by decide
 /-- Summoning Materia -/
 def summoningMateriaTopCast : Ability :=
-  static (onlyWhile ((can you (cast (bare (and [isSpell, isCreature])) (from_ := onTop))))
+  static (onlyWhile ((can (Semantics.Subject.actor (you)) (cast (bare (and [isSpell, isCreature])) (from_ := onTop))))
     (is thisEquipment (attachedTo (a isCreature))))
 theorem okSummoningMateriaTopCast : Ability.check (DRS.ofList []) summoningMateriaTopCast = [] := by decide
 /-- Vizier of the Menagerie -/
 def vizierOfTheMenagerieSpend : StaticSpec :=
-  can you (pay anyCost .once)
+  can (Semantics.Subject.actor (you)) (pay anyCost .once)
       (asThough := spendManaAs none .anyType (toCast (and [isCreature, isSpell])))
 theorem okVizierOfTheMenagerieSpend : StaticSpec.check (DRS.ofList []) vizierOfTheMenagerieSpend = [] := by
   decide
 
 /-- Emissary of Grudges -/
 def emissaryOfGrudgesReveal : Ability :=
-  activatedOnlyOnce (expose .reveal (choiceOf .player))
+  activatedOnlyOnce (Semantics.Cost.perform ((expose .reveal (choiceOf .player))))
     (doOnlyIf (chooseNewTargets (target (or [isSpell, abilityHead .anyOnStack])))
       (and
         [ is it (controlledBy (the isChosenPlayer)),
@@ -477,16 +495,16 @@ def stickTogether : Action :=
   sequentially
     [ instruct eachPlayer (choose
         (counted (upTo 1)
-          (and [isCreature, cleric, controlledBy they]))),
+          (and [isCreature, (Semantics.Predicate.hasSubtype (cleric)), controlledBy they]))),
       instruct eachPlayer (choose
         (counted (upTo 1)
-          (and [isCreature, rogue, controlledBy they]))),
+          (and [isCreature, (Semantics.Predicate.hasSubtype (rogue)), controlledBy they]))),
       instruct eachPlayer (choose
         (counted (upTo 1)
-          (and [isCreature, warrior, controlledBy they]))),
+          (and [isCreature, (Semantics.Predicate.hasSubtype (warrior)), controlledBy they]))),
       instruct eachPlayer (choose
         (counted (upTo 1)
-          (and [isCreature, wizard, controlledBy they]))),
+          (and [isCreature, (Semantics.Predicate.hasSubtype (wizard)), controlledBy they]))),
       instruct eachPlayer (sacrifice theRest) ]
 theorem okStickTogether : Action.check (DRS.ofList []) stickTogether = [] := by decide
 
@@ -503,7 +521,7 @@ theorem loxodonPeacekeeperThemReadsTheTiedPlayers :
   decide
 
 private def juxtaposeTie : Action :=
-  (match (cardNamed "Juxtapose") with
+  (match (Semantics.Cards.«Juxtapose») with
     | .singleFaced face => match face.characteristics.text with
       | .spell _ (.sequentially (_ :: _ :: action :: _)) :: _ => some action
       | _ => none

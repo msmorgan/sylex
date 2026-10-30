@@ -4,6 +4,15 @@ import Semantics.Definitions
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each)
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.DetPhrase (a each)
+
 namespace Semantics.Proofs.DrtCards
 
 private def feralContest : Action := .sequentially [
@@ -176,8 +185,8 @@ theorem iterationCanReadDepartedPermanentsWithoutChangingTheirZone :
 
 theorem lookingBackAtAnEntryKeepsTheCurrentReferent :
     let initial := { nextClause ((stepGameEvent 16 (DRS.ofList [])
-      (does thisCreature enter)).1) with
-      triggerEvents := (does thisCreature enter).triggerEvents }
+      (does (Semantics.Subject.actor thisCreature) enter)).1) with
+      triggerEvents := (does (Semantics.Subject.actor thisCreature) enter).triggerEvents }
     let original := initial.referents.head?.map (·.id)
     let out := stepCondition 16 initial
       (.did { subj := .any

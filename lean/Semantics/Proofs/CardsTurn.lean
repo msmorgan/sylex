@@ -20,6 +20,24 @@ Characteristic-Defining Ability sets it.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a the)
+open Semantics.Templates.Predicate (and or not did was)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Location (and or not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.TokenSpec (written)
+open Semantics.Templates.Timing (duringPart not)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.AbilityLost (written)
+open Semantics.Templates.Action (target)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and did duringPart not or was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a the)
+open Semantics.Templates.NounWord (creature)
+
 namespace Semantics.Cards
 
 /-- Through the Breach Splice -/
@@ -38,7 +56,7 @@ def turnToMist : Action :=
 theorem okTurnToMist : Action.check (DRS.ofList []) turnToMist = [] := by decide
 
 def voyagerStaff : Ability :=
-  activated (compound [[generic 2], sacrifice thisArtifact])
+  activated (compound [(Semantics.Cost.mana [generic 2]), (Semantics.Cost.perform (sacrifice thisArtifact))])
     (sequentially
       [ exile (target isCreature),
         atNext .endStep
@@ -50,7 +68,7 @@ def staffOfNin : Ability :=
 theorem okStaffOfNin : Ability.check (DRS.ofList []) staffOfNin = [] := by decide
 
 def silentAssassin : Ability :=
-  activated [generic 3, pip .black]
+  activated (Semantics.Cost.mana [generic 3, pip .black])
     (atNext .endOfCombat (destroy (target (and [isBlocking, isCreature]))))
 theorem okSilentAssassin : Ability.check (DRS.ofList []) silentAssassin = [] := by decide
 
@@ -63,14 +81,14 @@ theorem okKjeldoranFrostbeast : Ability.check (DRS.ofList []) kjeldoranFrostbeas
 
 /-- Tippy-Toe, Terrific Partner -/
 def tippyToe : Ability :=
-  at_ (beginningOfYour .endStep) (if_ := some (did you (gainLife anyAmount) soFarThisTurn))
+  at_ (beginningOfYour .endStep) (if_ := some (did (Semantics.Subject.actor you) (gainLife anyAmount) (.duration soFarThisTurn none)))
     (draw 1)
 theorem okTippyToe : Ability.check (DRS.ofList []) tippyToe = [] := by decide
 
 def brazenCannonade : Ability :=
   raid
     (at_ (beginningOfYour .postcombatMain)
-      (if_ := some (did you attack soFarThisTurn))
+      (if_ := some (did (Semantics.Subject.actor you) attack (Semantics.LookbackSpan.duration (soFarThisTurn) none)))
       (exile (topSlice 1)))
 theorem okBrazenCannonade : Ability.check (DRS.ofList []) brazenCannonade = [] := by decide
 
@@ -79,7 +97,7 @@ def fourKnocks : Ability :=
 theorem okFourKnocks : Ability.check (DRS.ofList []) fourKnocks = [] := by decide
 
 def hammerOfBogardan : Ability :=
-  activatedOnlyDuring [generic 2, pip .red, pip .red, pip .red] (returnToHand this_ yourGraveyard)
+  activatedOnlyDuring (Semantics.Cost.mana [generic 2, pip .red, pip .red, pip .red]) (returnToHand this_ yourGraveyard)
     (duringPart .upkeep you)
 theorem okHammerOfBogardan : Ability.check (DRS.ofList []) hammerOfBogardan = [] := by decide
 
@@ -105,19 +123,19 @@ def saheelisCopy : Action :=
   sequentially
     [ create 1
         (copyOf (target (and [or [isArtifact, isCreature], youControl]))
-          [isAlso [.artifact]])
+          [isAlso (some [.artifact])])
         [],
       gainHaste thatToken,
       atNext .endStep (exile it) ]
 theorem okSaheelisCopy : Action.check (DRS.ofList []) saheelisCopy = [] := by decide
 
-def finalFortuneExtraTurn : Action := (match (cardNamed "Final Fortune") with
+def finalFortuneExtraTurn : Action := (match (Semantics.Cards.«Final Fortune») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ (Action.sequentially (List.cons part _))) _) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okFinalFortuneExtraTurn : Action.check (DRS.ofList []) finalFortuneExtraTurn = [] := by decide
-def finalFortuneThatTurn : TurnRef := (match (cardNamed "Final Fortune") with
+def finalFortuneThatTurn : TurnRef := (match (Semantics.Cards.«Final Fortune») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ (Action.sequentially (List.cons _ (List.cons (Action.delay
         (GameEvent.beginningOf _ _ part) _ _ _) _)))) _) => some part
@@ -138,14 +156,14 @@ theorem okNinthDoctorAdditionalUpkeep :
 
 def chainVeilEndStep : Ability :=
   at_ (beginningOfYour .endStep)
-    (if_ := some (not (did you (activate (a
+    (if_ := some (not (did (Semantics.Subject.actor (you)) (activate (a
       (and [abilityHead .loyalty,
-      abilityOf (a isPlaneswalker)]))) soFarThisTurn)))
+      abilityOf (a isPlaneswalker)]))) (.duration soFarThisTurn none))))
     (loseLife 2)
 theorem okChainVeilEndStep : Ability.check (DRS.ofList []) chainVeilEndStep = [] := by decide
 
 def selfSacrificeThenExile : Ability :=
-  activated (sacrifice thisArtifact)
+  activated (Semantics.Cost.perform (sacrifice thisArtifact))
     (sequentially
       [ exile (target isCreature),
         atNext .endStep (putOntoBattlefield (that card)) ])
@@ -166,7 +184,7 @@ onto the battlefield with [this object]" reads the creature that ability puts, t
 puts it [CR#607.1a,607.2c]. -/
 
 /-- "creature card in a graveyard" -/
-def creatureCardInAGraveyard : Predicate := (match (cardNamed "Necromancy") with
+def creatureCardInAGraveyard : Predicate := (match (Semantics.Cards.«Necromancy») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _
         (List.cons (Action.move (NounPhrase.described _ part) _ _ _ _) _)))) _)) => some part
@@ -176,7 +194,7 @@ def creatureCardInAGraveyard : Predicate := (match (cardNamed "Necromancy") with
 /-- "it loses 'enchant creature card in a graveyard' and gains 'enchant creature put onto the
 battlefield with this Aura.'" -/
 def swapsEnchantForLinkedEntry : Action :=
-  (match (cardNamed "Dance of the Dead") with
+  (match (Semantics.Cards.«Dance of the Dead») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
         part _))) _)) => some part

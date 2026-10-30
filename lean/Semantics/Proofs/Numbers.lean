@@ -19,6 +19,11 @@ the same evaluation without one.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.ManaSymbol (generic)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.CostShift (generic)
+
 namespace Semantics.Proofs.Numbers
 
 /-! ## A printed negative face -/
@@ -160,7 +165,7 @@ put directly under the deed keeps its clamped count [CR#107.1b,701.10e]. This is
 the real `doubleCounters` puts its counters inside a kind loop, which declares no slots of its own,
 and the loop's put declares its own clamped slot when the walk reaches it. -/
 theorem doubleDeedLeavesCounterAmountsClamped :
-    (Action.ownScope (some doubleCounters.deed) (putCounters 2 p1p1Counter thisCreature)).numberSlots
+    (Action.ownScope (some doubleCounters.deed) (putCounters 2 (Semantics.CounterKindSource.printed p1p1Counter) thisCreature)).numberSlots
       = [(.lit 2, .clamped)] := by rfl
 
 /-- Chameleon Colossus: "This creature gets +X/+X until end of turn, where X is its power." This

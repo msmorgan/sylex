@@ -12,14 +12,14 @@ card_type battle {
   stats = [defense],
   confers = [
     castableFrom(yourHand, asSorcery),
-    ability(static(entersWithCounters(this, statOf(stat(defense), this), named("defenseCounter")))),
+    ability(static(entersWithCounters(this, statOf(stat(defense), this), defenseCounter))),
     property(can(any, attack(this))),
-    damageResult(loseCounters(printedKind(named("defenseCounter")), thatMuch, this)),
+    damageResult(loseCounters(printedKind(defenseCounter), thatMuch, this)),
     stateBased(
       and(
         [
           not(is(this, hasSubtype(siege))),
-          compareAmt(countersOn(named("defenseCounter"), this), eq, 0)]),
+          compareAmt(countersOn(defenseCounter, this), eq, 0)]),
       putInto(this, graveyard)),
     property(
       onlyUnless(

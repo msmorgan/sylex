@@ -15,6 +15,16 @@ Deed [CR#701.26b].
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each)
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.StaticSpec (replace)
+
+open Semantics.Templates.Action (replace)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.DetPhrase (a each)
+
 namespace Semantics.Proofs.UntapStep
 
 /-- "<subject> doesn't untap during [<whose>] untap step" forbids the `untap` Definition's Deed,
@@ -29,7 +39,7 @@ theorem doesntUntapForbidsTheUntapDeed (subject : NounPhrase) (whose : Option No
 would become untapped, instead remove a stun counter from it." -/
 private def stunReplacement : Ability :=
   static (replace (would any (untap (a (and [isPermanent, hasCounter (some stunCounter)]))))
-    (instead (removeCounters (exactly 1) stunCounter it)))
+    (instead (removeCounters (exactly 1) (some (Semantics.CounterKindSource.printed (stunCounter))) it)))
 
 /-- UD-14 (`docs/engine-adrs.md`): "doesn't untap" is a prohibition, the engine's choice where
 the CR is silent, not a replacement. It forbids, with `cant`, the very `untap` Deed the stun
@@ -46,19 +56,19 @@ theorem doesntUntapIsNoStunReplacement :
 
 /-- The four untap-step cards contain the expanded `untapDuring` static. -/
 theorem untapStepCardsUseUntapDuring :
-    (match (cardNamed "Seedborn Muse" : Card) with
+    (match (Semantics.Cards.«Seedborn Muse» : Card) with
       | .singleFaced face => face.characteristics.text =
           [static (untapDuring (allOf youControl) (each isOtherPlayer))]
       | _ => False) ∧
-    (match (cardNamed "Unwinding Clock" : Card) with
+    (match (Semantics.Cards.«Unwinding Clock» : Card) with
       | .singleFaced face => face.characteristics.text =
           [static (untapDuring (allOf (and [isArtifact, youControl])) (each isOtherPlayer))]
       | _ => False) ∧
-    (match (cardNamed "Thousand Moons Infantry" : Card) with
+    (match (Semantics.Cards.«Thousand Moons Infantry» : Card) with
       | .singleFaced face => face.characteristics.text =
           [static (untapDuring thisCreature (each isOtherPlayer))]
       | _ => False) ∧
-    (match (cardNamed "Drumbellower" : Card) with
+    (match (Semantics.Cards.«Drumbellower» : Card) with
       | .singleFaced face => face.characteristics.text =
           [flying, static (untapDuring (allOf (and [isCreature, youControl])) (each isOtherPlayer))]
       | _ => False) := by
@@ -81,7 +91,7 @@ theorem soChoosesNeedsAPlayer :
 /-- *Ashnod's Battle Gear* and *Helm of Possession* still check. -/
 theorem mayDeclineUntapCardsCheck :
     Ability.check (DRS.ofList []) Cards.ashnodsBattleGear = [] ∧
-      (cardNamed "Helm of Possession").check = [] :=
-  ⟨Cards.okAshnodsBattleGear, cardNamedOk "Helm of Possession"⟩
+      (Semantics.Cards.«Helm of Possession»).check = [] :=
+  ⟨Cards.okAshnodsBattleGear, (by decide)⟩
 
 end Semantics.Proofs.UntapStep

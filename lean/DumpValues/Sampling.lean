@@ -1,4 +1,4 @@
-import Semantics.Authoring
+import Semantics.Registry
 
 open Lean Meta
 

@@ -29,10 +29,6 @@ private def fail {α : Type} (p : Position) (message : String) : ResolveM α :=
 
 private def findSignature (head : String) (sort : SortRef) : ResolveM (Option Signature) := do
   let ctx ← read
-  let parts := head.splitOn "."
-  let head ← if parts.length == 2 then
-      if parts[0]! == sort.name then pure parts[1]! else return none
-    else pure head
   if let some sig := ctx.declarations[(head, sort.text)]? then
     modify fun s => { s with dependencies := s.dependencies.push sig.constant }
     return some sig
@@ -54,6 +50,8 @@ mutual
   partial def resolve (v : Value) (expected : SortRef) : ResolveM Term := do
     let ctx ← read
     if let .record p fields := v then
+      if expected.name == "CardType" then
+        fail p "raw CardType construction requires a registry declaration"
       if expected.name == "Card" then
         return .call "Semantics.Card.singleFaced"
           #[(none, ← resolve v { name := "CardFace" })]
@@ -71,6 +69,7 @@ mutual
       if head == "some" && expected.name == "Option" then
         fail p "some is implicit; write the value"
       if let some sig ← findSignature head expected then
+        if let some message := sourceConstructorRefusal sig.constant then fail p message
         let args := if expected.name == "Card" && sig.constant.getString! != "singleFaced" then
             match args with
             | #[(none, .record _ fields)] => fields.map (fun (k, v) => (some k, v))

@@ -19,6 +19,20 @@ noncomputable section
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and did)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and did)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.GetsPt
 
 /-- The stat edits of the characteristic change battle cry's trigger establishes. -/
@@ -163,8 +177,8 @@ theorem jeskaiAscendancyUntapsItsPumpedGroup :
 
 /-- Diminish sets one target creature's base power and toughness to 1/1 [CR#613.4b]. -/
 theorem diminishKeepsOneTargetForBothSetDeltas :
-    let result := firstLineTrace (cardNamed "Diminish")
-    singleFaceText (cardNamed "Diminish") =
+    let result := firstLineTrace (Semantics.Cards.«Diminish»)
+    singleFaceText (Semantics.Cards.«Diminish») =
       [.spell none (get (target isCreature) (.set 1) (.set 1)
         (some untilEndOfTurn))] ∧
       result.2 = [] ∧ creatureIdentity result.1 0 = true ∧
@@ -179,7 +193,7 @@ theorem cycleOfLifeKeepsItsCastCreatureTarget :
     let result := stepAction 32 .postEvent .obj (DRS.ofList []) Cards.cycleOfLife
     result.2 = [] ∧ creatureIdentity result.1 2 = true ∧
       (result.1.findById? 2).map (·.det) = some .target ∧
-      Cards.cycleOfLife = get (target (.and [isCreature, did you (cast which) soFarThisTurn]))
+      Cards.cycleOfLife = get (target (.and [isCreature, did (Semantics.Subject.actor (you)) (cast which) (some (.duration soFarThisTurn none))]))
         (.set 0) (.set 1)
         (some (untilEvent (.beginningOf .upkeep (some .you) (.next none)))) := by
   refine ⟨by decide, by decide, by decide, rfl⟩
@@ -198,17 +212,17 @@ theorem builtToSmashConditionAndTrampleReadThePumpedTarget :
 sacrifice cumulative upkeep may make is published to this line for a linked readback, and is no
 pronoun's antecedent. -/
 theorem earthenGooBothCounterDeltasReadItsOwnSubject :
-    let result := cardLineTrace (cardNamed "Earthen Goo") 2
+    let result := cardLineTrace (Semantics.Cards.«Earthen Goo») 2
     let subject := result.1.resolvedIds.headD 0
     result.2 = [] ∧ result.1.resolvedIds.length = 1 ∧ creatureIdentity result.1 subject = true ∧
       (result.1.findById? subject).map (·.pronounResolved) = some true := by decide
 
 theorem nyxathidBothDeltasReadItsUniqueAnnouncedPlayer :
-    let result := cardLineTrace (cardNamed "Nyxathid") 1
+    let result := cardLineTrace (Semantics.Cards.«Nyxathid») 1
     result.2 = [] ∧ countChoice .player result.1 = 1 ∧
       (result.1.findById? 0).map (·.payload) = some (.player true) ∧
       creatureIdentity result.1 1 = true ∧
-      (singleFaceText (cardNamed "Nyxathid"))[1]? = some (.static
+      (singleFaceText (Semantics.Cards.«Nyxathid»))[1]? = some (.static
         (getsPt thisCreature
           (.down (countOf (.and [.isCard, .in_ (handOf (the isChosenPlayer))])))
           (.down (countOf (.and [.isCard, .in_ (handOf (the isChosenPlayer))]))))) := by
@@ -223,7 +237,7 @@ theorem archpriestOfIonaGivesFlyingToItsPumpedTarget :
       (result.1.findById? 4).map (·.ty) = some [.creature] := by decide
 
 theorem nightmarishEndKeepsItsTargetAndDefinesBothDeltaLetters :
-    let result := firstLineTrace (cardNamed "Nightmarish End")
+    let result := firstLineTrace (Semantics.Cards.«Nightmarish End»)
     result.2 = [] ∧ creatureIdentity result.1 0 = true ∧
       (result.1.findById? 0).map (·.det) = some .target ∧
       anyOpenLetter .x result.1 = false := by decide
@@ -245,18 +259,18 @@ theorem distortionStrikeProhibitionReadsItsPumpedTarget :
   decide
 
 theorem awakenTheBearGrantsTrampleToItsPumpedTarget :
-    let result := firstLineTrace (cardNamed "Awaken the Bear")
+    let result := firstLineTrace (Semantics.Cards.«Awaken the Bear»)
     result.2 = [] ∧ result.1.resolvedIds = [0] ∧ creatureIdentity result.1 0 = true ∧
       (result.1.findById? 0).map (·.det) = some .target := by decide
 
 theorem spidersilkArmorGrantsReachToItsPumpedGroup :
-    let result := firstLineTrace (cardNamed "Spidersilk Armor")
+    let result := firstLineTrace (Semantics.Cards.«Spidersilk Armor»)
     result.2 = [] ∧ result.1.resolvedIds = [1] ∧ creatureIdentity result.1 1 = true ∧
       (result.1.findById? 1).map (·.plur) = some .many := by decide
 
 theorem enchantedVanillaChangesOnlyItsAttachmentHost :
     let result := stepStaticSpec 32 (DRS.ofList [])
-      ((match (cardNamed "Frogify") with
+      ((match (Semantics.Cards.«Frogify») with
         | .singleFaced face => match face.characteristics.text with
           | _ :: .static spec :: _ => some spec
           | _ => none
@@ -377,7 +391,7 @@ theorem grantedKeywordLetterIsIntroducedAndClosed :
 /-- "This creature has reinforce X—{2}, where X is …": the letter is introduced whichever of the
 keyword's parameters writes it, here the first of two [CR#702.77a], not only a sole one. -/
 theorem grantedKeywordLetterIsIntroducedBesideACost :
-    let grant := Templates.abilityGrant thisCreature (reinforce (.letter .x) [generic 2])
+    let grant := Templates.abilityGrant thisCreature (reinforce (.letter .x) (Semantics.Cost.mana ([generic 2])))
     anyOpenLetter .x (stepStaticSpec 32 (DRS.ofList []) grant).1 = true ∧
       (stepStaticSpec 32 (DRS.ofList []) (.conjunction none
         [grant, .letterDefinition .x (countOf (and [isCreature, youControl]))])).2 = [] := by
@@ -432,15 +446,15 @@ Inversion* and *Ego Erasure* ("get … and lose all creature types"). -/
 private def getsAndGainsBodies : List (Option Action) :=
   [ abilityBody Cards.ghorClanRampager,
     abilityBody Cards.archpriestOfIonaFullParty,
-    (frontText (cardNamed "Elspeth's Talent"))[2]? >>= abilityBody,
+    (frontText (Semantics.Cards.«Elspeth's Talent»))[2]? >>= abilityBody,
     (faceText Cards.chitteringHost)[2]? >>= abilityBody,
-    (frontText (cardNamed "Awaken the Bear"))[0]? >>= abilityBody,
-    (frontText (cardNamed "Aim High"))[0]? >>= abilityBody,
-    (frontText (cardNamed "Volatile Claws"))[0]? >>= abilityBody,
-    (frontText (cardNamed "Arlinn Kord // Arlinn, Embraced by the Moon"))[0]? >>= abilityBody,
-    (backText (cardNamed "Arlinn Kord // Arlinn, Embraced by the Moon"))[0]? >>= abilityBody,
-    (frontText (cardNamed "Berserk"))[0]? >>= abilityBody,
-    (backText (cardNamed "Garruk Relentless // Garruk, the Veil-Cursed"))[2]? >>= abilityBody,
+    (frontText (Semantics.Cards.«Awaken the Bear»))[0]? >>= abilityBody,
+    (frontText (Semantics.Cards.«Aim High»))[0]? >>= abilityBody,
+    (frontText (Semantics.Cards.«Volatile Claws»))[0]? >>= abilityBody,
+    (frontText (Semantics.Cards.«Arlinn Kord // Arlinn, Embraced by the Moon»))[0]? >>= abilityBody,
+    (backText (Semantics.Cards.«Arlinn Kord // Arlinn, Embraced by the Moon»))[0]? >>= abilityBody,
+    (frontText (Semantics.Cards.«Berserk»))[0]? >>= abilityBody,
+    (backText (Semantics.Cards.«Garruk Relentless // Garruk, the Veil-Cursed»))[2]? >>= abilityBody,
     some Cards.namelessInversionBody,
     some Cards.egoErasureBody ]
 

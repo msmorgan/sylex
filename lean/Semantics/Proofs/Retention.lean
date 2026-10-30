@@ -18,7 +18,18 @@ value [CR#702.16h,702.16i], and the exemption that reaches each of them (*Spectr
 of Loyalty*).
 -/
 
-open Semantics Semantics.Templates Semantics.Definitions Semantics.Cards
+open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Cards
+
+open Semantics.Templates.Predicate (and attachedTo)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.MoveRider (attachedTo)
+open Semantics.Templates.NounWord (creature)
 
 namespace Semantics.Proofs.Retention
 
@@ -42,9 +53,9 @@ theorem retentionAdmitsItsShapes :
     StaticSpec.check emptyContext
       (retention (abilityGrant (equipped creature) (protection (hasColor .black))) thisEquipment)
       = [] ∧
-    StaticSpec.check emptyContext (retention protectionFromBlack (allOf aura)) = [] ∧
+    StaticSpec.check emptyContext (retention protectionFromBlack (allOf (Semantics.Predicate.hasSubtype (aura)))) = [] ∧
     StaticSpec.check emptyContext
-      (retention protectionFromBlack (allOf (and [aura, attachedTo it]))) = [] := by decide
+      (retention protectionFromBlack (allOf (and [(Semantics.Predicate.hasSubtype (aura)), attachedTo it]))) = [] := by decide
 
 /-- The 3a law (owner ruling 2026-10-22): a retention whose clause removes no Attachment is
 refused (`retentionClause`), as "gets +1/+1" and "has flying" remove none; one whose subject is
@@ -61,7 +72,7 @@ theorem retentionLawRefusals :
     StaticSpec.check emptyContext (retention protectionFromBlack (allOf isCreature))
       = [.retentionSubject] ∧
     StaticSpec.check emptyContext
-      (retention protectionFromBlack (allOf (and [aura, attachedTo (target isCreature)])))
+      (retention protectionFromBlack (allOf (and [(Semantics.Predicate.hasSubtype (aura)), attachedTo (target isCreature)])))
       = [.retentionSubject] ∧
     StaticSpec.check emptyContext (retention protectionFromBlack thisEquipment)
       = [.retentionSubject] := by decide
@@ -71,7 +82,7 @@ affect Auras as normal" [CR#702.16n]. The exemption belongs to the clause it wra
 grant of protection from black, written as its own clause, carries none and removes Attachments
 in its own right. Which Aura goes to the graveyard is the engine's to apply. -/
 theorem exemptionDoesNotCoverOtherProtection :
-    retentionOf? (cardNamed "Black Ward") = some (retention protectionFromBlack thisAura) ∧
+    retentionOf? (Semantics.Cards.«Black Ward») = some (retention protectionFromBlack thisAura) ∧
     StaticSpec.check emptyContext
       (conjunction [retention protectionFromBlack thisAura, protectionFromBlack]) = [] ∧
     protectionFromBlack.removesAttachments = true :=
@@ -85,14 +96,14 @@ Aura" by the `attachedTo` it carries; the engine reads it once, as the effect st
 attached after the effect began is not exempt: the exemption leaves its clause whole, and that
 clause forbids such an Aura to become attached at all. -/
 theorem alreadyAttachedIsReadWhenTheEffectStarts :
-    (match retentionOf? (cardNamed "Benevolent Blessing") with
+    (match retentionOf? (Semantics.Cards.«Benevolent Blessing») with
      | some (.retention spec (.described _ p)) =>
        spec.removesAttachments &&
          (match spec.attachmentHost?, p.attachmentHosts with
           | some (.attachHost .enchanted _), [.pro .bare .one] => true
           | _, _ => false)
      | _ => false) = true ∧
-    (match retentionOf? (cardNamed "Black Ward") with
+    (match retentionOf? (Semantics.Cards.«Black Ward») with
      | some (.retention _ (.headed (.subtype _) .this)) => true
      | _ => false) = true := by decide
 
@@ -152,13 +163,13 @@ doesn't remove Auras." The exemption is the grant's conjunction member, beside `
 wraps the grant as a whole, the one protection ability whose quality is "each color", so it
 reaches each of the five abilities that grant is ("this effect" [CR#702.16h,702.16n]). -/
 theorem spectraWardExemptsAurasFromEachColor :
-    memberRetentionOf? (cardNamed "Spectra Ward") =
+    memberRetentionOf? (Semantics.Cards.«Spectra Ward») =
       some (retention (abilityGrant (enchanted creature) (protection (eachKind .color)))
-        (allOf aura)) ∧
-    (exemptClause? (memberRetentionOf? (cardNamed "Spectra Ward"))).map
+        (allOf (Semantics.Predicate.hasSubtype (aura)))) ∧
+    (exemptClause? (memberRetentionOf? (Semantics.Cards.«Spectra Ward»))).map
         (fun spec => (grantedAbilities spec).flatMap (·.keywordInstances?.getD [])) =
       some protectionFromEachOfFiveColors ∧
-    ((exemptClause? (memberRetentionOf? (cardNamed "Spectra Ward"))).map (·.removesAttachments)).getD false
+    ((exemptClause? (memberRetentionOf? (Semantics.Cards.«Spectra Ward»))).map (·.removesAttachments)).getD false
       = true :=
   ⟨rfl, rfl, by decide⟩
 
@@ -169,12 +180,12 @@ applies at each moment to whatever its text indicates [CR#611.3a,702.16i], so th
 fixed instances and the engine reads the colors as it applies. The exemption wraps the whole
 grant. -/
 theorem pledgeOfLoyaltyReadsItsColorsContinuously :
-    memberRetentionOf? (cardNamed "Pledge of Loyalty") =
+    memberRetentionOf? (Semantics.Cards.«Pledge of Loyalty») =
       some (retention
         (abilityGrant (enchanted creature)
           (protection (eachKind .color (some (allOf (and [isPermanent, youControl]))))))
         thisAura) ∧
-    (match exemptClause? (memberRetentionOf? (cardNamed "Pledge of Loyalty")) with
+    (match exemptClause? (memberRetentionOf? (Semantics.Cards.«Pledge of Loyalty»)) with
      | some spec =>
        spec.removesAttachments &&
          (grantedAbilities spec).all (fun ability =>

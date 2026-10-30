@@ -13,6 +13,19 @@ leaves out of the grammar.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each)
+open Semantics.Templates.Predicate (and not was)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and not)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.Condition (and not was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each)
+
 namespace Semantics.Proofs.Piles
 
 private def nounSelected (drs : DRS) (noun : NounPhrase) : List Referent :=
@@ -50,7 +63,7 @@ theorem badSetNamingCandidateBallot :
 
 /-- "Whenever a player votes": a vote watched as an event pattern needs no ballot written. -/
 theorem okWildcardBallotInAPattern :
-    GameEvent.check (DRS.ofList []) (does (a isPlayer) vote) = [] := by decide
+    GameEvent.check (DRS.ofList []) (does ((Semantics.Subject.actor (a isPlayer))) vote) = [] := by decide
 
 /-- "Each player votes.": a performed vote names the choices it is for [CR#701.38a]; only a
 pattern may leave its ballot open. -/

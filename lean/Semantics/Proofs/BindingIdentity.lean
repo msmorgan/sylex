@@ -15,6 +15,15 @@ is closed by `decide`.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each)
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.DetPhrase (a each)
+
 namespace Semantics.Proofs.BindingIdentity
 
 /-- How many targets a context holds. -/

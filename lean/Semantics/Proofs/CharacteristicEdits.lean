@@ -3,6 +3,17 @@ import Semantics.Check.Card
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.StaticSpec (ptSwitch)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.CharacteristicEdit (ptSwitch)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.CostShift (generic)
+
 namespace Semantics.Proofs.CharacteristicEdits
 
 theorem absentAxisAndSetEmptyDiffer :

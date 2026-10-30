@@ -1,5 +1,4 @@
 import SylGen.Emit
-import SylGen.Ordering
 import Lean.Util.SCC
 
 open Lean Meta System

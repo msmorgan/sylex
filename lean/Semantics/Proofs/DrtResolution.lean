@@ -1,5 +1,6 @@
 import Semantics.Check.Words
 
+
 namespace Semantics.Proofs.DrtResolution
 
 private def isCreature (id clause : Nat) (role : GramRole) : Referent :=

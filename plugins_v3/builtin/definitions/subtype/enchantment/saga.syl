@@ -12,19 +12,19 @@ subtype saga {
     ability(
       static(
         onlyUnless(
-          entersWithCounters(thisSaga, 1, named("loreCounter")),
-          is(thisSaga, hasKeyword(the(named("readAhead"))))))),
+          entersWithCounters(thisSaga, 1, loreCounter),
+          is(thisSaga, hasKeyword(the(readAhead)))))),
     turnBased(
       firstMain,
       doIf(
         compareAmt(finalChapterNumber(thisSaga), atLeast, 1),
-        putCounters(1, printedKind(named("loreCounter")), thisSaga))),
+        putCounters(1, printedKind(loreCounter), thisSaga))),
     stateBased(
       and(
         [
           compareAmt(finalChapterNumber(thisSaga), atLeast, 1),
           compareAmt(
-            countersOn(named("loreCounter"), thisSaga),
+            countersOn(loreCounter, thisSaga),
             atLeast,
             finalChapterNumber(thisSaga)),
           not(exists(and([chapterAbilityOf(thisSaga), triggeredNotLeftStack])))]),

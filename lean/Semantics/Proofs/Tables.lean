@@ -14,7 +14,26 @@ declaration in `Semantics.Definitions`, where a duplicate is a Lean error.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+
+
 namespace Semantics.Proofs.Tables
+
+/-- Deeds written literally in the checker agree with generated declarations. -/
+theorem checkerDeedLiteralsMatchDefinitions :
+    (.action "cast" : Deed) = cast.deed ∧
+    (.action "play" : Deed) = play.deed ∧
+    searchDeed = search.deed ∧
+    (.action "tap" : Deed) = tap.deed ∧
+    (.action "activate" : Deed) = activate.deed ∧
+    (.action "double" : Deed) = doublePower.deed ∧
+    (.action "double" : Deed) = doubleToughness.deed ∧
+    (.action "double" : Deed) = doublePowerAndToughness.deed ∧
+    (.action "double" : Deed) = doubleCounters.deed ∧
+    (.action "triple" : Deed) = triplePower.deed ∧
+    (.action "triple" : Deed) = tripleToughness.deed ∧
+    (.action "triple" : Deed) = triplePowerAndToughness.deed ∧
+    (.ofAbility (.named "crew") : Deed) = .ofAbility Definitions.Ability.crew.label ∧
+    (.ofAbility (.named "saddle") : Deed) = .ofAbility Definitions.Ability.saddle.label := by decide
 
 /-! ## Declarations read back -/
 

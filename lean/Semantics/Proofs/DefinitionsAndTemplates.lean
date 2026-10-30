@@ -4,30 +4,21 @@ import Semantics.Definitions
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (the)
+open Semantics.Templates.Predicate (and or andOr not was)
+open Semantics.Templates.Location (and or andOr not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.Condition (and not or was)
+open Semantics.Templates.DetPhrase (the)
+open Semantics.Templates.NounPhrase (andOr)
+
 namespace Semantics.Proofs.DefinitionsAndTemplates
 
-/-- error: An Action Definition must establish its own Reference Scope -/
-#guard_msgs in
-semantic_definition missingReferenceScope : Action := .draw (.exactlyOf 1)
-
-open Lean Elab Command in
-run_cmd do
-  let env ← getEnv
-  unless Authoring.definitionAttribute.hasTag env ``Semantics.Definitions.airbend &&
-      Authoring.definitionAttribute.hasTag env ``Semantics.Definitions.ripple &&
-      Authoring.templateAttribute.hasTag env ``Semantics.Templates.dealDamageOwnPower do
-    throwError "Definition and Template declarations must retain their explicit categories"
-
-/-- error: parameter identity is generated: manualParameterIdentity.subject -/
-#guard_msgs in
-semantic_definition manualParameterIdentity (subject : NounPhrase) : Action :=
-  .ownScope none (.setStatus .tapped
-    (.firstMention "manualParameterIdentity.subject" (.inCaller subject)))
-
-/-- error: NounPhrase parameter requires a semantic constructor or authored declaration -/
-#guard_msgs in
-semantic_definition inspectingParameter (subject : NounPhrase) : Action :=
-  .ownScope none (.draw (.exactlyOf (if subject.plur == .one then 1 else 2)))
 
 theorem destroyBindsItsSubject (subject : NounPhrase) :
     destroy subject =
@@ -194,8 +185,8 @@ theorem locationCoordinatorsAreDistinct :
 
 /-- Flying's "with flying and/or reach" is not "with flying or reach" [CR#702.9b]. -/
 theorem flyingAndOrReachIsNotFlyingOrReach :
-    (andOr [hasKeyword (.the (.named "flying")), hasKeyword reach] : Predicate) ≠
-      (or [hasKeyword (.the (.named "flying")), hasKeyword reach] : Predicate) := by
+    (andOr [hasKeyword (.the (.named "flying")), hasKeyword (Semantics.KeywordTerm.the reach.label)] : Predicate) ≠
+      (or [hasKeyword (.the (.named "flying")), hasKeyword (Semantics.KeywordTerm.the reach.label)] : Predicate) := by
   intro h; cases h
 
 end Semantics.Proofs.DefinitionsAndTemplates

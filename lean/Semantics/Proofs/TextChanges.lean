@@ -13,6 +13,11 @@ Bracketed text awaits `plugins-v3-cleave-bracketed-text`.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.ManaSymbol (generic)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.CostShift (generic)
+
 namespace Semantics.Proofs.TextChanges
 
 /-- "{1}{U}{U}" -/

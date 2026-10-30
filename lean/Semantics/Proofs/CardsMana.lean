@@ -11,17 +11,29 @@ bench items beside them.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a the)
+open Semantics.Templates.Predicate (and or not did was)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and or not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.Timing (not)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (and did not or was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a the)
+
 namespace Semantics.Cards
 
 def boshIronGolem : Ability :=
-  activated (compound [[generic 3, pip .red], sacrifice (a isArtifact)])
+  activated (compound [(Semantics.Cost.mana [generic 3, pip .red]), (Semantics.Cost.perform (sacrifice (a isArtifact)))])
     (instruct this_
        (dealDamage
           (statOf (.stat .manaValue) (the (and [was (sacrifice which), isArtifact])))
         (target isAnyTarget)))
 theorem okBoshIronGolem : Ability.check (DRS.ofList []) boshIronGolem = [] := by decide
 def pyromancy : Ability :=
-  activated (compound [[generic 3], discard (aAtRandom (cardIn yourHand))])
+  activated (compound [(Semantics.Cost.mana [generic 3]), (Semantics.Cost.perform (discard (aAtRandom (cardIn yourHand))))])
     (instruct thisEnchantment
       (dealDamage (statOf (.stat .manaValue) (the (and [was (discard which), isCard])))
         (target isAnyTarget)))
@@ -36,14 +48,14 @@ def overload : Action :=
 theorem okOverload : Action.check (DRS.ofList []) overload = [] := by decide
 def austereCommand : Action :=
   chooseModes (exactly 2)
-    [ destroy (allOf isArtifact),
-      destroy (allOf isEnchantment),
-      destroy (allOf (and [isCreature, hasManaValue .atMost 3])),
-      destroy (allOf (and [isCreature, hasManaValue .atLeast 4])) ]
+    [ { action := destroy (allOf isArtifact) },
+      { action := destroy (allOf isEnchantment) },
+      { action := destroy (allOf (and [isCreature, hasManaValue .atMost 3])) },
+      { action := destroy (allOf (and [isCreature, hasManaValue .atLeast 4])) } ]
 theorem okAustereCommand : Action.check (DRS.ofList []) austereCommand = [] := by decide
 
 def boommobile : Ability :=
-  when (does thisArtifact enter)
+  when (does (Semantics.Subject.actor thisArtifact) enter)
     (addMana 4 (ofAnyColor .sameColor) [spendOnly [toActivate none]])
 theorem okBoommobile : Ability.check (DRS.ofList []) boommobile = [] := by decide
 
@@ -57,7 +69,7 @@ def qarsiDeceiverMorphSpend : Ability :=
       [spendOnly
         [ toCast (and [isCreature, isFaceDown]),
           toTurnFaceUp (and [isCreature, was (manifest which) thisObject]),
-          toPay (.ofKeyword morph) ]])
+          toPay (.ofKeyword morph.label) ]])
 theorem okQarsiDeceiverMorphSpend : Ability.check (DRS.ofList []) qarsiDeceiverMorphSpend = [] := by decide
 
 /-- Rootcoil Creeper -/
@@ -96,7 +108,7 @@ theorem okCausticBroncoLoss : Action.check (DRS.ofList []) causticBroncoLoss = [
 /-- Dark Fortress -/
 def darkFortressMana : Ability :=
   activatedOnlyIf tapSymbol (addMana 1 (manaOf [[.of .black], [.of .red]]))
-    (or [ did thisLand enter soFarThisTurn,
+    (or [ did (Semantics.Subject.actor (thisLand)) enter (Semantics.LookbackSpan.duration (soFarThisTurn) none),
            exists_ (and [isLand, hasSupertype .basic, youControl]) ])
 theorem okDarkFortressMana : Ability.check (DRS.ofList []) darkFortressMana = [] := by decide
 
@@ -108,7 +120,7 @@ theorem okKarametrasAcolyte : Ability.check (DRS.ofList []) karametrasAcolyte = 
 /-- Birthing Pod -/
 def birthingPodSearch : Ability :=
   activated
-    (compound [[generic 1, phyrexianPip .green], tapSymbol, sacrifice (a isCreature)])
+    (compound [(Semantics.Cost.mana [generic 1, phyrexianPip .green]), tapSymbol, (Semantics.Cost.perform (sacrifice (a isCreature)))])
     (search yourLibrary
       (a (and [isCreature,
              hasManaValue .eq (plus 1 (statOf (.stat .manaValue)
@@ -118,7 +130,7 @@ theorem okBirthingPodSearch : Ability.check (DRS.ofList []) birthingPodSearch = 
 /-- Hibernation's End -/
 def hibernationsEndTrigger : Ability :=
   whenever
-      (does you (pay anyCost .once .paid (some thisEnchantment) (some cumulativeUpkeep)))
+      (does (Semantics.Subject.actor you) (pay anyCost .once .paid (some thisEnchantment) (some cumulativeUpkeep.label)))
     (may
       (sequentially
         [ search yourLibrary
@@ -137,7 +149,7 @@ theorem okBloomTenderMana : Ability.check (DRS.ofList []) bloomTenderMana = [] :
 
 /-- Tarnation Vista -/
 def tarnationVistaMana : Ability :=
-  activated (compound [[generic 1], tapSymbol])
+  activated (compound [(Semantics.Cost.mana [generic 1]), tapSymbol])
     (doForEachKind .color (allOf (and [isPermanent, isMonocolored, youControl])) .color
       (addMana 1 ofTheChosenColor))
 theorem okTarnationVistaMana : Ability.check (DRS.ofList []) tarnationVistaMana = [] := by decide
@@ -173,7 +185,7 @@ theorem okThranTurbineMana : Action.check (DRS.ofList []) thranTurbineMana = [] 
 
 /-- Su-Chi Cave Guard -/
 def suChiCaveGuardDies : Ability :=
-  when (does thisCreature die)
+  when (does (Semantics.Subject.actor thisCreature) die)
     (sequentially
       [ addMana 1
           (manaOf [[.colorless, .colorless, .colorless, .colorless,
@@ -190,7 +202,7 @@ theorem okOmnathLocusOfManaPersistence :
 def iceCauldronNotedMana : Ability :=
   activated
     (compound [tapSymbol,
-      (removeCounters (exactly 1) chargeCounter thisArtifact)])
+      (Semantics.Cost.perform ((removeCounters (exactly 1) (some (Semantics.CounterKindSource.printed chargeCounter)) thisArtifact)))])
     (addMana 1 (ofTheLastNotedType thisArtifact)
       [spendOnly [toCast (cardIn (exiledWith thisArtifact))]])
 theorem okIceCauldronNotedMana : Ability.check (DRS.ofList []) iceCauldronNotedMana = [] := by decide
@@ -203,18 +215,18 @@ theorem okFiremindVesselMana : Ability.check (DRS.ofList []) firemindVesselMana 
 /-- Goblin Clearcutter -/
 def goblinClearcutterMana : Ability :=
   activated
-    (compound [tapSymbol, sacrifice (a forest)])
+    (compound [tapSymbol, (Semantics.Cost.perform (sacrifice (a (Semantics.Predicate.hasSubtype (forest)))))])
     (addMana 3 (ofAnyColorAmong [.red, .green]))
 theorem okGoblinClearcutterMana : Ability.check (DRS.ofList []) goblinClearcutterMana = [] := by decide
 
 /-- Psychic Vortex -/
-def psychicVortexUpkeep : Ability := cumulativeUpkeep (draw 1)
+def psychicVortexUpkeep : Ability := cumulativeUpkeep (Semantics.Cost.perform (draw 1))
 theorem okPsychicVortexUpkeep : Ability.check (DRS.ofList []) psychicVortexUpkeep = [] := by decide
 
 /-- Varchild's War-Riders -/
 def varchildsWarRidersUpkeep : Ability :=
   cumulativeUpkeep
-    (instruct anOpponent (create 1 (creatureToken 1 1 [.red] [survivor])))
+    (Semantics.Cost.perform ((instruct anOpponent (create 1 (Semantics.TokenSpec.written (creatureToken 1 1 [.red] [survivor]))))))
 theorem okVarchildsWarRidersUpkeep : Ability.check (DRS.ofList []) varchildsWarRidersUpkeep = [] := by decide
 
 end Semantics.Cards

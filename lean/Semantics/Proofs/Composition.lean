@@ -4,6 +4,17 @@ import Semantics.Proofs.Helpers
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a)
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a)
+
 namespace Semantics.Proofs.Composition
 
 theorem okThreeConjunctsShareEarlierMention :

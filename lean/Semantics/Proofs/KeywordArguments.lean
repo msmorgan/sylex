@@ -3,6 +3,10 @@ import Semantics.Check.Card
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.ManaSymbol (generic)
+
+open Semantics.Templates.CostShift (generic)
+
 namespace Semantics.Proofs.KeywordArguments
 
 /-- "Cycling {2}": a keyword's arguments are its typed Definition's, so their number and order
@@ -46,21 +50,21 @@ theorem typecyclingIsCycling :
 
 theorem qualityCanReadOuterChoice :
     Ability.check [(ChoiceSort.quality .color).binding]
-      (keywordQuality protection (ofChosen .color)) = [] := by decide
+      (keywordQuality protection.label (ofChosen .color)) = [] := by decide
 
 theorem subjectCannotReadOuterChoice :
     Ability.check [(ChoiceSort.quality .color).binding]
-      (keywordSubject enchant (ofChosen .color)) =
+      (keywordSubject enchant.label (ofChosen .color)) =
       [.choiceRef .theChoice (.quality .color) 0] := by decide
 
 theorem amountCannotReadOuterChoice :
     Ability.check [(ChoiceSort.quality .number).binding]
-      (keywordNumber bushido (.chosenNumber .theChoice)) =
+      (keywordNumber bushido.label (.chosenNumber .theChoice)) =
       [.choiceRef .theChoice (.quality .number) 0] := by decide
 
 theorem costCannotReadOuterChoice :
     Ability.check [(ChoiceSort.quality .number).binding]
-      (keywordCosting ward (payLife (.chosenNumber .theChoice))) =
+      (keywordCosting ward.label (Semantics.Cost.perform ((payLife (.chosenNumber .theChoice))))) =
       [.choiceRef .theChoice (.quality .number) 0] := by decide
 
 end Semantics.Proofs.KeywordArguments

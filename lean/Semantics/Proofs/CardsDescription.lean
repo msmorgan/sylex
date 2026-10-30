@@ -20,11 +20,28 @@ the checker on it at the bindings its Idris type named.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and or not did was)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Location (and or not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.StaticSpec (replace)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.Action (doIf replace target)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and did not or was)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.IgnoredOutcomes (allBut)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Cards
 
 /-- Glyph of Destruction -/
 def glyphOfDestruction : Action :=
-  get (target (and [isBlocking, wall, youControl]))
+  get (target (and [isBlocking, (Semantics.Predicate.hasSubtype (wall)), youControl]))
     (up 10) (up 0) untilEndOfCombat
 theorem okGlyphOfDestruction : Action.check (DRS.ofList []) glyphOfDestruction = [] := by decide
 
@@ -69,7 +86,7 @@ theorem okPillarOfLight : Action.check (DRS.ofList []) pillarOfLight = [] := by 
 def unholyAnnex : Action :=
   sequentially
     [ draw 1,
-      doIf (exists_ (and [demon, youControl]))
+      doIf (exists_ (and [(Semantics.Predicate.hasSubtype (demon)), youControl]))
         (sequentially [instruct eachOpponent (loseLife 2), gainLife 2])
         (loseLife 2) ]
 theorem okUnholyAnnex : Action.check (DRS.ofList []) unholyAnnex = [] := by decide
@@ -99,7 +116,7 @@ theorem okBoulderfall : Action.check (DRS.ofList []) boulderfall = [] := by deci
 /-- Banisher Priest -/
 def banisherPriest : Action :=
   exileUntil (target (and [isCreature, anOpponentControls]))
-    (does thisCreature leave)
+    (does (Semantics.Subject.actor (thisCreature)) leave)
 theorem okBanisherPriest : Action.check (DRS.ofList []) banisherPriest = [] := by decide
 
 /-- Tezzeret, Artifice Master -/
@@ -140,14 +157,14 @@ theorem okCorruptedOpponents : NounPhrase.checkAt (some .player) (DRS.ofList [])
 def warTaxScaledPayment : Action :=
   establishThroughout (gatedBy (scaledGenericMana
         (forEach (letter .x) (and [isCreature, isAttacking,
-            controlledBy they]))) (allOf isCreature) attack) thisTurn
+            controlledBy they]))) (Semantics.Subject.actor ((allOf isCreature))) attack) thisTurn
 theorem okWarTaxScaledPayment : Action.check (DRS.ofList [letterB .x]) warTaxScaledPayment = [] := by
   decide
 
 /-- Croaking Counterpart -/
 def croakingCounterpartCopy : Action :=
   create 1
-    (copyOf (target (and [isCreature, non frog]))
+    (copyOf (target (and [isCreature, non (Semantics.Predicate.hasSubtype (frog))]))
       (copyCharacteristics {
                  colors := [.green], subtypes := [frog], power := stat 1,
                  toughness := stat 1 } false))
@@ -156,7 +173,7 @@ theorem okCroakingCounterpartCopy : Action.check (DRS.ofList []) croakingCounter
 
 /-- "a loyalty ability of enchanted planeswalker" -/
 def loyaltyAbilityOfEnchanted : NounPhrase :=
-  (match (cardNamed "Elspeth's Talent") with
+  (match (Semantics.Cards.«Elspeth's Talent») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.triggered (GameEvent.does _ (Action.ownScope _
         (Action.procedure _ (NounPhrase.firstMention _ (NounPhrase.inCaller part)) _ _ _ _))) _ _ _
@@ -208,7 +225,7 @@ def balefulMasteryPaidRead : Ability :=
 theorem okBalefulMasteryPaidRead : Ability.check (DRS.ofList []) balefulMasteryPaidRead = [] := by decide
 
 /-- Karai, Future of the Foot -/
-def karaiSneakPaidThisTurn : Amount := paidCostRead (.byKeyword sneak) thisTurn this_
+def karaiSneakPaidThisTurn : Amount := paidCostRead (.byKeyword sneak.label) thisTurn this_
 theorem okKaraiSneakPaidThisTurn : Amount.check (DRS.ofList []) karaiSneakPaidThisTurn = [] := by decide
 
 /-- Requiting Hex's read -/
@@ -248,7 +265,7 @@ theorem okNongreenSpellsOrAbilities :
 /-- Hot Pursuit -/
 def twoOrMorePlayersHaveLost : Condition :=
   compareAmt (countOf (and
-    [isPlayer, did which loseGame thisGame])) .atLeast 2
+    [isPlayer, did (Semantics.Subject.actor (which)) loseGame (Semantics.LookbackSpan.duration (thisGame) none)])) .atLeast 2
 theorem okTwoOrMorePlayersHaveLost : Condition.check (DRS.ofList []) twoOrMorePlayersHaveLost = [] := by decide
 
 def commanderCreaturesYouOwn : Predicate :=
@@ -263,7 +280,7 @@ theorem okCreatureSpellFromAmongExiled :
     NounPhrase.checkAt (some .object) (DRS.ofList []) creatureSpellFromAmongExiled = [] := by decide
 
 def ringHasTemptedYouTwiceThisGame : Condition :=
-  compareAmt (eventCount theRingTemptsYou you thisGame)
+  compareAmt (eventCount theRingTemptsYou (Semantics.Subject.actor (you)) thisGame)
     .atLeast 2
 theorem okRingHasTemptedYouTwiceThisGame :
     Condition.check (DRS.ofList []) ringHasTemptedYouTwiceThisGame = [] := by decide
@@ -341,8 +358,8 @@ theorem okIronMastiffIgnore : Action.check (DRS.ofList []) ironMastiffIgnore = [
 
 /-- Xenosquirrels -/
 def xenosquirrelsShift : Ability :=
-  after (does you (rollDice 1 .anyDie)) (may
-      (removeCounters (exactly 1) p1p1Counter thisCreature)
+  after (does (Semantics.Subject.actor (you)) (rollDice 1 .anyDie)) (may
+      (removeCounters (exactly 1) (some (Semantics.CounterKindSource.printed (p1p1Counter))) thisCreature)
       (shiftResult 1))
 theorem okXenosquirrelsShift : Ability.check (DRS.ofList []) xenosquirrelsShift = [] := by decide
 
@@ -367,19 +384,19 @@ theorem okArchpriestOfIonaFullParty : Ability.check (DRS.ofList []) archpriestOf
 
 /-- Squad Commander -/
 def squadCommanderTokens : Ability :=
-  when (does thisCreature enter)
-    (create partySize (creatureToken 1 1 [.white] [kor, warrior]))
+  when (does (Semantics.Subject.actor (thisCreature)) enter)
+    (create partySize (Semantics.TokenSpec.written ((creatureToken 1 1 [.white] [kor, warrior]))))
 theorem okSquadCommanderTokens : Ability.check (DRS.ofList []) squadCommanderTokens = [] := by decide
 
 /-- At Knifepoint -/
 def atKnifepointOutlaws : Ability :=
-  (match (cardNamed "At Knifepoint") with
+  (match (Semantics.Cards.«At Knifepoint») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
     | _ => none).get (by decide)
 def atKnifepointCrime : Ability :=
-  (match (cardNamed "At Knifepoint") with
+  (match (Semantics.Cards.«At Knifepoint») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none

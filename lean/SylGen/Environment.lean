@@ -95,6 +95,22 @@ def constructors : MetaM Registry := do
       result := result.insert (ctor.getString!, sig.result.text) sig
   return result
 
+/-- Constructors reserved for generated identities or registry declarations. -/
+def sourceConstructorRefusal (name : Name) : Option String :=
+  if name == `Semantics.NounPhrase.firstMention then
+    some "firstMention is reserved for generated parameter identities"
+  else if name.getString! == "inCaller" && name.getPrefix ∈ [
+      `Semantics.Action, `Semantics.Cost, `Semantics.StaticSpec, `Semantics.Replacement,
+      `Semantics.Amount, `Semantics.Predicate, `Semantics.Quantity, `Semantics.Location,
+      `Semantics.Condition, `Semantics.GameEvent, `Semantics.Ability, `Semantics.TokenSpec,
+      `Semantics.MoveRider] then
+    some s!"{name.getPrefix.getString!}.inCaller is reserved for generated caller scope"
+  else if name.getPrefix ∈ [`Semantics.KeywordLabel, `Semantics.CounterKind,
+      `Semantics.DesignationLabel, `Semantics.RelationLabel,
+      `Semantics.Subtype, `Semantics.CardType, `Semantics.RegistryDefinition] then
+    some s!"raw {name.getPrefix.getString!} construction requires a registry declaration"
+  else none
+
 def structureFields (sort : SortRef) : MetaM (Array Field) := do
   let env ← getEnv
   let name := `Semantics ++ sort.name.toName

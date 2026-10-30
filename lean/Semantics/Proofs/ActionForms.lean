@@ -3,6 +3,9 @@ import Semantics.Check.Phrase
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+
+open Semantics.Templates.Action (target)
+
 namespace Semantics.Proofs.ActionForms
 
 /-- A player mills from their own library [CR#701.17a]: the library is the performer's, so a

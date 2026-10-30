@@ -4,6 +4,18 @@ import Semantics.Proofs.Helpers
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a counted the)
+open Semantics.Templates.Predicate (and was)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (and was)
+open Semantics.Templates.DetPhrase (a the)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.Attachments
 
 private def nounTypes (drs : DRS) (noun : NounPhrase) : List CardType :=

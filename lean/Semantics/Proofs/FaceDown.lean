@@ -13,6 +13,11 @@ listed characteristics [CR#708.2]; a move's riders are of the kind its destinati
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.ManaSymbol (generic)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.CostShift (generic)
+
 namespace Semantics.Proofs.FaceDown
 
 /-- "Exile target creature face down." -/

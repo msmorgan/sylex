@@ -121,140 +121,29 @@ the existence of a checking function.
 
 ## Card authoring and trusted expansion
 
-`spelled <| card` is the checked authoring boundary. It retains an
-`Authoring.Form` tree before unfolding erases named template and definition
-calls, and constructs `Spelled` with `onlyAuthored`. The constructor is private;
-cards emitted by the DSL provide separate `ok_<card>` validity proofs. Record
-construction and record update cannot replace these checks. Unregistered helper definitions
-and nested template and definition arguments are inspected; opaque or variable
-semantic content without authoring evidence is refused, including expressions
-nested in printed-data records.
+The `.syl` parser and expected-sort resolver in `SylGen` validate first-order data
+before emitting plain Lean definitions. Parameters, declarations, and constructors
+resolve in the order specified by `semantics-v3.md` §4.5. Wrapper calls are explicit;
+there are no expression coercions or hooks on Lean identifiers, applications, or
+record notation. The generator
+wraps Action Definitions in their own Reference Scope and Definition parameters in
+the caller's scope. Templates substitute parameters without creating a scope.
 
-The authoring coercions expand before `inspect` reads the term, so `spelled` sees the Template
-they stand for and the retained Form is the one the written-out call gives: core's `α → Option α`
-(`untilEndOfTurn` for `some untilEndOfTurn`), a written mana cost as a `Cost` (`[generic 1]` for
-`mana [generic 1]`), an `Action` as a `Cost` (`sacrifice thisArtifact` for `perform (…)`), a
-catalog `Subtype` as a `Predicate` (`goblin` for `hasSubtype goblin`), and a
-`CharacteristicBundle` as a `TokenSpec` (`t` for `written t`). An anonymous record cannot use
-that coercion: write `create n (written { … })`. Closed word-tag constructors
-(colors, supertypes, comparators, turn parts, roundings, quality ops, statuses,
-possessors, choice modes, level ranges and similar non-expression data sorts)
-resolve bare against the expected sort (`upkeep` for `some .upkeep`, `sets` for
-`.sets`, `half up …` alongside `getsPt it (up 2) (up 2)`). `ColorSpec.some`
-retains its leading dot (`.some [red]`, `.some []`) so bare `some` stays the
-`Option` constructor, and `exileZone` retains `zone .exile none` so the untyped
-bundle dependency scan does not form a cycle with the `exile` action. A
-leading-dot name resolves against the expected type before any coercion applies,
-so `some .combat` and `mana [.snow]` keep their heads. A numeral is an `Amount`
-(`3` for `.lit 3`): it stays an `OfNat.ofNat` term that `inspect` reads through
-to its `Amount.lit` leaf, naming the same Templates and literals. Numerals also
-inhabit `Option Amount`, so printed stats use `power := 3` without an explicit
-wrapper; inspection still reaches `Amount.lit`. A single-faced card is
-`card := { name := …, … }`, elaborated directly as `Card.singleFaced`. The pins
-are `Proofs/Authoring`.
+`Semantics.Registry` retains expected-sort metadata, Lean
+aliases, deed consistency checks, and canon-card source registration. It performs
+no source-expression inspection. Generated card check modules prove
+`Card.check card = []`; registry rules likewise have separate checker proofs.
+Those checks establish structural and reference validity, not fidelity to a
+keyword's rules meaning. Reviewing the expanded meaning remains necessary.
 
-Semantic expressions must use authored declarations: a `semantic_definition`
-(a Definition, the rules-defined vocabulary of a keyword action, keyword
-ability, counter, token or designation) or a `semantic_template` (a Template,
-a transparent phrasing the rules do not define). Printed-data records,
-enumerated leaf values, and numeric literals remain ordinary data; their
-semantic fields are inspected recursively. The modules are layered one way,
-`Semantics.Primitives` ← `Semantics.Templates` ← Definitions ← cards, the Definitions all
-re-exported by `Semantics.Definitions`. Templates name no catalog item and no card type. The card
-types (`Semantics.Definitions.CardTypes`) are the one catalog below the stack: each is a
-`semantic_definition` in `namespace Semantics` (`CardType.creature`) over `Semantics.Words`
-alone, because the checker compares card types by value and reads their fields (`cardClass`,
-`stats`); what a card type confers is its `RegistryDefinition.cardType` row
-(`Semantics.Definitions.CardTypeRules`), above Templates, and what a rules-defined subtype
-confers is its `RegistryDefinition.subtype` row (`Semantics.Definitions.SubtypeRules`, Siege and Saga),
-beside it. The other leaf
-catalogs (`Semantics.Definitions.Counters`, `.Designations`, `.Relations`, `.Subtypes`) are
-spelled over primitives only, except that `.Subtypes` is spelled over the raw `Subtype`
-constructors, which have no primitive; `Semantics.Definitions.Phrasings` holds the Templates that
-name a card type or a leaf catalog entry ("this creature", "your party"), spelled over Templates
-and the leaf catalogs; the composite Definitions (`Semantics.Definitions.Actions`, `.Keywords`)
-are spelled over all of them. The checker sits beside this stack, not under it: Primitives, the
-leaf catalogs, Templates and `Phrasings` import none of `Semantics.Check` (the structural readers
-they need, such as `Location.sort`, live with the Core AST), and only the composite Definitions
-read a checker reader (`NounPhrase.plur`, for "It/They can't be regenerated"). A word a Template
-sort and a Definition share (`crew`, `saddle`) is dispatched on its expected type where the
-Definition is declared, so Templates name nothing above them. A declaration whose bare name another
-declaration or a syntax word already takes is named in its sort's namespace (`Subtype.army`,
-`Subtype.infinity`, `DesignationLabel.solved`, `Ability.splice`).
+Dependency edges come from resolved references. Lake builds one module per strongly
+connected component, with separate card data and check modules. No source-level
+dependency-scan workaround or qualified `.syl` name is needed. Generator contracts
+are pinned in `SylGen/Tests/Pins.lean` and `SylGen/Tests/negative.sh`.
 
-Mutual inductive elaboration of the syntax spine in `Semantics.FastInductives`
-(`runFastInductives`) generates `casesOn`, `ctorIdx`, `ctorElim`, and `noConfusion`, omitting
-`recOn`, `below`, `brecOn`, `SizeOf`, and injectivity theorems across the types. Consequently,
-recursion over the `Abilities.lean` spine uses explicit `fuel : Nat` with
-`termination_by structural fuel`.
-
-`Semantics.Primitives` provides the generated constructor wrappers
-(`declare_semantic_primitives`, `Semantics.Primitives.<Type>.<name>`), which
-have definitionally identical constructor signatures and are registered as
-templates, together with a few worded primitive templates and the
-characteristic inputs. `NounPhrase.pro` and `NounPhrase.which` have no
-primitive wrapper: they are expansion carriers (`internal_expansion`) that only
-templates and definitions write. `Subtype` is a semantic expression with no primitive wrapper
-(`internal_expansion`) either. A subtype in authored content, including one on a printed type
-line, is a leaf catalog entry (`Semantics.Definitions.Subtypes`), so *Mishra's Factory* names
-`assemblyWorker` and cannot misspell Assembly-Worker [CR#205.3m]. `spelled` refuses a raw
-`Subtype.of` or `Subtype.spell` in a card, including one built by an ordinary helper definition
-that the card inspection follows. `CounterKind`, `DesignationLabel` and `RelationLabel` are catalog
-items the same way (`internal_expansion` semantic expressions, entries in
-`Semantics.Definitions.Counters`, `.Designations` and `.Relations`), and each value carries its
-own columns, a counter's holder and a designation's scope, so no checker table names them: an
-undeclared counter, designation or relation is refused at the authoring boundary, as a raw
-constructor, and not by the checker. Card fragments and `Proofs/` terms that call the checker
-directly are fixtures and are not checked against any declaration list (owner ruling,
-2026-10-23). Authored declarations (`semantic_definition`,
-`semantic_template`) are trusted, as for every semantic type. Values that are not `spelled`
-cards are not checked: the pins that build a raw
-subtype on purpose (`badNamelessSubtype` in `Proofs/Rules.lean`, and the refusal pins in
-`Proofs/Authoring.lean`). `Semantics.Templates` holds every
-`semantic_template` that names no card type and no catalog entry; the `Semantics.Definitions`
-submodules hold every `semantic_definition` and the templates that name a card type or a catalog
-entry (`Phrasings`, which names leaf catalog entries rather than spelling their strings) or whose
-bodies need a composite definition: the templates over its actions follow the actions, and a
-keyword's licensed phrasings follow the keyword.
-Defaults retain their calls.
-
-A declaration generates the hidden construction context and registration from one
-ordinary Lean definition body. It returns its semantic
-type directly; `expand` is a transparent identity, not a trust boundary. An
-`Action` Definition's body must establish its own Reference Scope
-(`Action.ownScope`); the declaration is refused otherwise. Only authored
-declarations are trusted. Neither helpers, discarded arguments, nor
-projections may conceal raw semantic syntax, even if their result is ordinary
-data. Inspection skips ordinary helper bodies only after scanning the instantiated
-expansion's reachable definitions for semantic types, constructors, and calls;
-its arguments are still inspected. This includes semantic functions hidden in
-containers and supplied higher-order template or definition calls. Generated
-Binding-identity and caller-scope constructors have no public primitive.
-
-A supplied parameterized body is inspected under evidence for its explicit noun
-parameters. Other semantic free variables remain refused. Callback type aliases
-are resolved during type elaboration; callbacks receive the receiving
-declaration's construction context. A caller cannot substitute a different
-hidden lexical context. The authoring tree records formal body binders and
-their uses as well as the enclosing named call.
-
-The kernel proves that the retained authoring tree contains no raw semantic
-constructor and that the resulting card passes the checker. Correspondence
-between the input expression and that tree is the elaborator's responsibility;
-this is not a kernel proof about Lean source text. Registration establishes a
-trusted authored declaration. The checker validates its expanded body and
-contextual use, but does not prove that a Definition implements its label's
-rules meaning. Extending the Definitions and Templates therefore requires
-reviewing the expansion itself. Raw expanded terms remain available to checker
-diagnostics and proof suites.
-
-The tree retains template and definition names, data constructors and literals
-as a future attachment point for spellings. The separate English project has no
-dependency on this mechanism. No rendering or execution equivalence is claimed.
-
-The anaphora bench's `manifestPlacement` is explicitly a placement-only fragment
-of manifest [CR#701.40a]. It retains that bench's prior semantic value; it does
-not model face-down characteristics or the turn-up special action.
+The independent `Semantics.FastInductives` elaborator supplies `casesOn`, `ctorIdx`,
+`ctorElim`, and `noConfusion` for the mutual syntax spine, omitting eager recursion
+and injectivity machinery. Checker recursion uses explicit fuel.
 
 ## Attachment predicates and current face
 
@@ -480,7 +369,7 @@ agent must be none, "you", the performer, the source, or for a keyword ability's
 the object that has it (`participialAgent`): a stamp records no agent. `Proofs/Lookback.lean`, `Proofs/LinkedReadback.lean`
 and `Proofs/NounWords.lean` pin it.
 
-`NounPhrase.pro` and `NounPhrase.which` are expansion carriers (`internal_expansion`):
+`NounPhrase.pro` and `NounPhrase.which` are expansion carriers:
 cards write the templates (`it`, `that`, …) that expand to them. No template reads a
 position. The scope templates that once carried a numeric or patterned read are
 ordinary phrases now: `attachToIt` writes `it`; `dealDamageOwnPower` and
@@ -531,7 +420,7 @@ in the graveyard with its sacrifice stamp; subsequent player, card and stamped
 permanent reads use those referents. `Proofs/ControllerSacrifice.lean` proves the
 expansion for every subject and for arbitrary outer contexts (the move preserves every
 unrelated outer referent), target multiplicity, the existing-reference case, and later
-reads. Authoring through templates and definitions establishes trusted expansion
+reads. Generation through templates and definitions establishes expansion
 origin; these are checker/reference guarantees, not an engine execution proof.
 
 ## The performer and the handoff
@@ -645,8 +534,7 @@ gives the moved object a fresh referent without the identities [CR#400.7], so a 
 mention of the pre-move parameter is refused; updates in place keep them.
 
 A keyword action body is read in its own Reference Scope: `Action.ownScope deed body`,
-which every `Action` Definition opens with (`semantic_definition` refuses one that does
-not). `enterOwnScope` pushes an `OwnScopeFrame` that masks every referent of the calling
+which the generator supplies for every Action Definition. `enterOwnScope` pushes an `OwnScopeFrame` that masks every referent of the calling
 text except the performer the innermost handoff names, and opens a new clause. The
 body's parameters are written `inCaller`: `enterCaller` pops only the top frame, so the
 argument is read in the immediate caller's view, with any enclosing Definition's masks
@@ -964,7 +852,7 @@ expected child kinds in the incoming `DRS`.
 | `DamageRecipient` | The `dealDamage` action case checks the recipient's kind alone (an object or a player, `kindLte`). Which objects can be dealt damage [CR#120.1a] and where they are are not checked (`lean-checker-sweep-zone`). |
 | `StatusHolder` | The `setStatus` action case requires the object kind; the battlefield zone and the settable status value are not checked (`lean-checker-sweep-zone`). |
 | `NotAnAbility` | Retired at movement: the action-fold ticket explicitly corrects this false blanket prohibition; ending a turn or combat can exile stack abilities [CR#724.1b,724.2b]. |
-| `DiscardOk` | Discard is a move in the discard Definition's own scope. Retired by `lean-checker-sweep-zone` (§7 charter ruling 2026-10-06): its source zone is not checked. The authoring boundary above excludes arbitrary authored tag/body combinations. |
+| `DiscardOk` | Discard is a move in the discard Definition's own scope. Retired by `lean-checker-sweep-zone` (§7 charter ruling 2026-10-06): its source zone is not checked. The generator constructs the Definition scope wrapper. |
 | `Movable` | `Action.move` checks the moved kind against `object ∨ pile` (`kindLte`), so objects (including abilities) and piles move and players and quality values are refused. The destination's riders, arrangement and card types are not checked (`lean-checker-sweep-zone`). |
 
 ### Triggers
@@ -993,14 +881,14 @@ expected child kinds in the incoming `DRS`.
 |---|---|
 | `OptOk` | Optional consumers step a present value and skip an absent one; absence introduces no payload to check. |
 | `Joins` | `joinKinds`, `Predicate.kind?` and `NounPhrase.kind?` derive the resulting kind; there is no independently supplied result index. |
-| `KnownAct` | The authoring boundary: a card names a keyword action through its Action Definition's generated deed constant (`elabDeedName`), and `Deed.action` is an internal expansion `spelled` refuses. Action Definitions sharing a keyword-action label must agree on `DeedPermanent` at declaration (`sharedDeedsAgree` and the mismatch refusals in `Proofs/Authoring.lean`); the Definition is trusted to supply the corresponding expansion. |
+| `KnownAct` | Expected-sort dispatch resolves action names to generated deeds. `Semantics.Registry.checkActionDeed` rejects Definitions whose shared action label disagrees on `DeedPermanent`; the generator tests pin that rejection. The Definition body still requires semantic review. |
 | `Payload` | `Payload.kind` derives the kind from the constructor; `Referent` has no separate kind field that can disagree. A handoff's performer is no `Payload` and no referent: it lives in `DRS.performers` (owner ruling 2026-10-24), so no reflexive, resolution, count or published referent sees it. |
 | `HeadTy` | No Lean type: `NounPhrase.ty` and `Payload.ty` derive lists of known card-type facts; joined kinds retain evidence per half. |
 | `DieSides` | `DieSides.localChecks` ([LocalShape.lean](Semantics/Check/LocalShape.lean)) checks its shape. |
 | `Targetable` | `Kind.targetable` at determiner, copying and target consumers (`targetable`). |
 | `Targeter` | `Kind.targeter` in the `targets` predicate case and the deontic patients (`targeter`). |
 | `Phrasal` | `Kind.phrasal` at copying, iteration and noun consumers. |
-| `KnownKeyword` | The authoring boundary: a card names a keyword through its Definition's generated label constant (`elabKeywordName`), and `KeywordLabel.named` and `Ability.keyword` are internal expansions `spelled` refuses. `KeywordTerm.known` refuses only the empty label. |
+| `KnownKeyword` | Expected-sort dispatch resolves ability names at `Ability`, `KeywordLabel`, and `KeywordTerm`. The generator rejects unknown names. `KeywordTerm.known` refuses only the empty label. |
 | `BasicLandType` | The Idris reference's `basicLandLine` helper has no Lean counterpart. No caller can supply a proof-erased list to that removed API; `SubtypeSpace.basicLand` is a closed constructor. |
 | `BasicLandTypes` | Same removed `basicLandLine` API as `BasicLandType`; a printed face's subtype validation remains `subsFitLine` (the card frame). A token's or an edit's subtypes are not checked against its types (`lean-checker-sweep-game-rules`). |
 | `Delta` | The type parameter survives as `Delta α`; it was not erased. `stepDeltaWith` steps a `Delta Amount`'s carried amount. |
@@ -1022,7 +910,7 @@ expected child kinds in the incoming `DRS`.
 - Other erased implicit binders on functions, templates and definitions refer to these same
   datatype duties; erasing the binder does not remove the obligation at the
   resulting term's consumer. In particular, templates and definitions are not an independent
-  certificate for arbitrary Definition bodies; the authoring boundary above establishes their trusted origin.
+  certificate for arbitrary Definition bodies; the generator validates their first-order syntax; their meaning requires review.
 
 
 ### Retention
@@ -1210,11 +1098,10 @@ left a graveyard) and one two abilities could supply [CR#607.2a]. Where the obje
 when the linked ability resolves (a card that left exile) is the engine's, not the
 checker's.
 
-A Relation (`RelationLabel`) is declared in
-`Semantics/Definitions/Relations.lean`, as a designation is in
-`Designations.lean`, and `RegistryDefinition.relation label` (`Rules.lean`) is its record. A card names a
-declared relation or none: the constructor is an `internal_expansion`, so the authoring boundary
-refuses an undeclared one. `Action.relate` checks both operands as objects, so a player operand is
+A Relation (`RelationLabel`) is declared in a `.syl` file under
+`plugins_v3/builtin/definitions/relation/`, with a generated
+`RegistryDefinition.relation` record. Names resolve at their expected sort.
+`Action.relate` checks both operands as objects, so a player operand is
 refused `kindMismatch`; every relation links two objects, and neither the label nor its record
 gives a side another kind.
 `Predicate.related` steps its counterpart and `NounPhrase.counterpart` its
@@ -1323,33 +1210,24 @@ recipient refuses `perMember` only in an instruction.
 
 ### Template and definition parameters and expanded actions
 
-A `semantic_template` or `semantic_definition` takes ordinary Lean parameters, each
-substituted as written; there are no supplied bodies (`plugins-v3-first-order-templates`). A
-Definition reads its arguments through `inCaller`
-(`CallerScope.caller`: `NounPhrase.inCaller`, `Amount.inCaller`, `Action.inCaller`, …
-for every phrase type that can be an argument). For bare `NounPhrase` parameters the
-elaborator generates `firstMention` at the first textual occurrence and `laterMention`
-at every later one, with `inCaller` inside each identity wrapper
-("Binding identity and a keyword body's own scope" above). An explicitly written
-`NounPhrase.inCaller p` opts that occurrence out and remains unchanged; `search.for_`
-and `searchZonesOf.for_` deliberately retain this spelling pending an owner decision.
-The other `X.inCaller` wrappers, performer identities and non-parameter identities remain
-hand-written. Hand-written identities naming a noun parameter are refused ("parameter
-identity is generated"); a bare parameter passed to an ordinary helper such as `p.plur`
-is refused because wrapping it would change what that helper reads. Binders introduced
-inside a body are untouched. The Binding Identity is named
+A `.syl` Template or Definition takes typed first-order parameters. A Definition reads
+its applicable arguments through `CallerScope.caller`; Templates substitute them
+without that wrapper. Noun parameters receive generated mention identities. There
+is no opt-out for a written caller-scope wrapper. Bodies cannot inspect parameters
+through Lean helpers, create local binders, or evaluate arbitrary Lean expressions.
+The Binding Identity is named
+
 `<last declaration name component>.<parameter>` (`Action.devour` gives `devour.subject`),
 and the identity is outermost:
 `firstMention id (inCaller arg)`, `laterMention id (inCaller arg)`, since the identity is the
 declaration's and only the argument is read in the caller. Where a mention stands in the body
 never changes a role the caller can see (`leaveOwnScope`, below), so "Target creature fights
 target creature. Tap it." reads the fight's source (`fightSourceIsSelectedBySubjectPriority`). A Template that names one
-argument twice writes its own identities (`dealDamageOwnPower`, `controllerSacrifices`). An argument
+argument twice receives generated identities (`dealDamageOwnPower`, `controllerSacrifices`). An argument
 is therefore selected once, at its textual first use, however often the body names it,
 and two identical argument expressions remain two selections. An Amount argument is
 an expression read wherever the body writes it, so it observes outcomes introduced
-before each read. No construction-time context survives in the result: the generated
-`AuthoringContext` only tracks lexical depth.
+before each read. No construction-time context survives in the generated result.
 
 `actor` passed as an argument is read as `actor` itself: it introduces nothing, so
 inside a handoff it is the handed performer (`capturedActorIsTheHandedPlayer`).
@@ -1448,7 +1326,7 @@ an `Ability` or an ability-free property (`Conferral`, as a registry definition'
 whether an ability is one an effect could grant (`grantable`) is retired with the grant rules.
 The results of damage are property conferrals, each an `asEvent` over the damage dealt to what
 the row scopes [CR#120.3a,120.3c,120.3e,120.3g,120.3h], so removing abilities leaves them; a
-result's counter is a declared one when the row is authored (the authoring boundary), and which
+result's counter resolves at its expected sort when the row is generated, and which
 holder the counter's declaration gives it is not checked. Toxic is one row reading the total toxic value
 [CR#702.164b,702.164c].
 
@@ -1456,9 +1334,9 @@ A counter's kind is a name: `CounterKind.named` carries the counter
 declaration's name verbatim (`p1p1Counter`, `flyingCounter`, `chargeCounter`),
 and "counters with the same name or description are interchangeable"
 [CR#122.1], with what the counter is placed on (`holder`, an object unless the declaration
-says a player). Each kind is a declaration in `Semantics/Definitions/Counters.lean`, a +X/+Y
-counter [CR#122.1a] and a keyword counter [CR#122.1b] included, and the constructor is an
-`internal_expansion`, so a card names a declared kind or none; `CounterKind.scope` reads the
+says a player). Each kind is a `.syl` declaration under `plugins_v3/builtin/definitions/counter/`, a +X/+Y
+counter [CR#122.1a] and a keyword counter [CR#122.1b] included. Names resolve at the expected
+sort; `CounterKind.scope` reads the
 value's own holder. A counter definition
 (`RegistryDefinition.counter`, `Rules.lean`) states what ONE counter confers, and the
 model applies it once per counter held: the +1/+1 counter's conferral is
@@ -1488,8 +1366,7 @@ a declaration that lists members, a member's (`day`, `night` [CR#731.1]); the
 phrase a card prints ("the monarch") is the declaration's spelling and never
 reaches the checker. The label also carries its `scope` (who holds it), which gives `holder`,
 `possessorOk`, `heldByItsCard` and `gameWide`; each designation is a declaration in
-`Semantics/Definitions/Designations.lean`, and the constructor is an `internal_expansion`, so a
-card names a declared designation or none. A designation
+`plugins_v3/builtin/definitions/designation/`. Names resolve at the expected sort. A designation
 declaration's bare name means its label, so it reads at a designation
 position; its definition (`RegistryDefinition.designation`) is a separate record the
 registry holds under the name (ruling 2026-10-10).

@@ -19,6 +19,21 @@ but a graveyard [CR#702.127a]; flashback's spell is an instant or sorcery [CR#70
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a the)
+open Semantics.Templates.Predicate (and not did was quality)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and not)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.StaticSpec (replace)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Action (doIf replace target)
+open Semantics.Templates.Condition (and did not was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a the)
+open Semantics.Templates.QualityPayload (quality)
+
 namespace Semantics.Proofs.KeywordCastPermissions
 
 def cost : Cost := .mana [generic 1, pip .blue]
@@ -63,9 +78,9 @@ theorem plottedCardRuleCarriesTheCastRight :
     Definitions.plottedCardCast.confer =
       .ability (static
         (onlyUnless
-          (can you (cast this_ (from_ := exileZone) (payment := withoutPaying))
+          (can (Semantics.Subject.actor (you)) (cast this_ (from_ := exileZone) (payment := withoutPaying))
             (timing := asSorcery))
-          (did any (gainDesignation this_ plotted) soFarThisTurn))) := ⟨rfl, rfl⟩
+          (did any (gainDesignation this_ plotted) (Semantics.LookbackSpan.duration (soFarThisTurn) none)))) := ⟨rfl, rfl⟩
 
 /-- The foretold card's look and cast permissions are keyed on its being foretold
 [CR#702.143a,702.143d]. -/
@@ -75,7 +90,7 @@ theorem foretellPermissionsAreKeyedOnTheForetoldState :
           (forAsLongAs (is it (hasDesignation foretold))),
         establishThroughout
           (onlyWhile
-            (can you
+            (can (Semantics.Subject.actor (you))
               (cast it (from_ := exileZone) (payment := payingInstead (.inCaller cost))))
             (is it (hasDesignation foretold)))
           onALaterTurn ] := rfl
@@ -141,7 +156,7 @@ theorem megamorphCounterIsOnAsItTurnsFaceUp :
         [ static
             (replace (would any (turnFaceUp thisPermanent))
               (doIf (keywordCostPaid (.named "morph") thisPermanent)
-                (alongside (putCounters 1 p1p1Counter thisPermanent)))) ] := rfl
+                (alongside (putCounters 1 (Semantics.CounterKindSource.printed (p1p1Counter)) thisPermanent)))) ] := rfl
 
 theorem okMultikicker : Ability.check (DRS.ofList []) (multikicker cost) = [] := by decide
 
@@ -162,7 +177,7 @@ theorem mutateMergeIsGatedByTheSameChoice :
     (components (mutate cost))[2]? =
       some
         (static
-          (.replace (would thisSpell enter)
+          (.replace (would (Semantics.Subject.actor (thisSpell)) enter)
             (doIf (choiceWasTaken (.byKeyword (.named "mutate")) thisSpell)
               (instead
                 (chooseOne
@@ -173,7 +188,7 @@ theorem mutateMergeIsGatedByTheSameChoice :
 /-- "If you cast this spell for its mutate cost, …", reading the target the spell gains. -/
 def merges (description : NounPhrase) : Ability :=
   static
-    (.replace (would thisSpell enter)
+    (.replace (would (Semantics.Subject.actor (thisSpell)) enter)
       (instead (chooseOne (.merge thisSpell description .top) (.merge thisSpell description .bottom)))
       none .repeatedly none)
 
@@ -193,7 +208,7 @@ an alternative cost [CR#702.81a,118.9a]. -/
 theorem retracePaysPlusAnAdditionalCost :
     components retrace =
       [ static
-          (can you
+          (can (Semantics.Subject.actor (you))
             (cast this_ (from_ := yourGraveyard)
               (payment := plusAdditional (.perform (discard (a (and [.isCard, isLand]))))))) ] :=
   rfl
@@ -208,7 +223,7 @@ theorem jumpStartExileIsGatedOnAJumpStartCast :
     (components jumpStart)[1]? =
       some
         (static
-          (replace (would thisSpell (leave stack))
+          (replace (would (Semantics.Subject.actor (thisSpell)) (leave stack))
             (doIf (choiceWasTaken (.byKeyword (.named "jumpStart")) thisSpell)
               (instead (exile thisSpell))))) := rfl
 
@@ -245,14 +260,14 @@ theorem badRevealedAsAPlayerIsCast :
 [CR#702.127a]. -/
 theorem aftermathExcludesEveryZoneButAGraveyard :
     (components aftermath)[1]? =
-      some (static (cant theActor (cast this_ (from_ := some (not graveyard))))) := rfl
+      some (static (cant (Semantics.Subject.actor (theActor)) (cast this_ (from_ := some (not graveyard))))) := rfl
 
 /-- Flashback casts only an instant or sorcery spell [CR#702.34a]. -/
 theorem flashbackResultingSpellIsAnInstantOrSorcery :
     (components (flashback cost)).head? =
       some
         (static
-          (can you
+          (can (Semantics.Subject.actor (you))
             (cast this_ (from_ := yourGraveyard) (payment := .payingInstead (.inCaller cost))
               (resulting := some isInstantOrSorcery)))) := rfl
 
@@ -309,7 +324,7 @@ theorem castPermissionsKeepPayingInstead :
         some
           (establishThroughout
             (onlyWhile
-              (can you (cast it (from_ := exileZone) (payment := payingInstead (.inCaller cost))))
+              (can (Semantics.Subject.actor (you)) (cast it (from_ := exileZone) (payment := payingInstead (.inCaller cost))))
               (is it (hasDesignation foretold)))
             onALaterTurn) ∧
       (components (madness cost))[1]? =

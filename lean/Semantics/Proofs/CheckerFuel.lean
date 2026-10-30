@@ -4,6 +4,11 @@ import Semantics.Definitions
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.ManaSymbol (generic)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.CostShift (generic)
+
 namespace Semantics.Proofs.CheckerFuel
 
 set_option maxRecDepth 8192

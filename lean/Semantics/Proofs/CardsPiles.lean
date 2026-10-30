@@ -6,10 +6,15 @@ import Semantics.Check.Card
 # Semantics.Cards.Piles
 
 Port of `idris/src/Experimental/Cards/Piles.idr`: the printed cards of the Piles family (votes,
-piles, and the pronouns that read them), each a `Spelled`.
+piles, and the pronouns that read them), each a plain semantic value.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+
+open Semantics.Templates.NounPhrase (counted)
+
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.SliceCount (counted)
 
 namespace Semantics.Cards
 

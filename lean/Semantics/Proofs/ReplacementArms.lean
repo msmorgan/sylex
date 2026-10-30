@@ -17,6 +17,17 @@ is closed by `rfl`.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (counted)
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Definitions.Ability (devour)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.ReplacementArms
 
 /-- The arm a replacement's action lands in. -/
@@ -118,14 +129,14 @@ theorem enchantChoiceIsBeforeItsAttachmentAlongside :
 creature's", text read "As [this permanent] enters" [CR#614.1c], whose effect occurs as part of
 the entering [CR#603.6d]: `alongside`. -/
 theorem deadpoolExchangeIsAlongside :
-    cardArms (cardNamed "Deadpool, Trading Card") = [[.alongside]] := rfl
+    cardArms (Semantics.Cards.«Deadpool, Trading Card») = [[.alongside]] := rfl
 
 /-- *Wolverine, Fierce Fighter*: "If damage would be dealt to Wolverine, instead that damage is
 dealt, but all other damage already dealt to him is healed." Healing removes all damage marked
 on a permanent [CR#701.69a]; the damage the event deals is marked by it [CR#120.3e], so the damage
 "already dealt" is what is marked before the event, and its healing is a `before`
-(`(cardNamed "Wolverine, Fierce Fighter")`). -/
+(`(Semantics.Cards.«Wolverine, Fierce Fighter»)`). -/
 theorem wolverineHealingIsBefore :
-    cardArms (cardNamed "Wolverine, Fierce Fighter") = [[.before]] := rfl
+    cardArms (Semantics.Cards.«Wolverine, Fierce Fighter») = [[.before]] := rfl
 
 end Semantics.Proofs.ReplacementArms

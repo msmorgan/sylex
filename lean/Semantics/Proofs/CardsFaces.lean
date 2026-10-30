@@ -20,6 +20,24 @@ printed-star ruling; there is no printed-box term to write).
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted)
+open Semantics.Templates.Predicate (and or not did)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Location (and or not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and did not or)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Cards
 
 /-- "Turn target creature face down. It's a 2/2 Cyberman artifact creature.": the listed
@@ -36,7 +54,7 @@ def breakOpen : Action :=
 theorem okBreakOpen : Action.check (DRS.ofList []) breakOpen = [] := by decide
 
 def jushiApprentice : Ability :=
-  activated (compound [[generic 2, pip .blue], tapSymbol])
+  activated (compound [(Semantics.Cost.mana [generic 2, pip .blue]), tapSymbol])
     (sequentially
       [ draw 1,
         doIf (compareAmt (countOf (cardIn yourHand)) .atLeast 9)
@@ -45,7 +63,7 @@ theorem okJushiApprentice : Ability.check (DRS.ofList []) jushiApprentice = [] :
 
 /-- Missy -/
 def missyFaceDownReturn : Ability :=
-  whenever (does (a (and [isCreature, non isArtifact, isOther])) die)
+  whenever (does ((Semantics.Subject.actor (a (and [isCreature, non isArtifact, isOther])))) die)
     (sequentially
       [ returnToBattlefield it [(faceDownAs
               { characteristics := some
@@ -68,17 +86,17 @@ def faceDownFlyingCounter : StaticSpec :=
 theorem okFaceDownFlyingCounter : StaticSpec.check (DRS.ofList []) faceDownFlyingCounter = [] := by decide
 
 def goblinArchaeologist : Ability :=
-  activated (compound [[pip .red], tapSymbol])
+  activated (compound [(Semantics.Cost.mana [pip .red]), tapSymbol])
     (sequentially
       [ flipCoins 1,
-        doIf (did you (flipCoins 1 (some .wins)) thisWay)
+        doIf (did (Semantics.Subject.actor you) (flipCoins 1 (some .wins)) thisWay)
           (sequentially [destroy (target isArtifact), untap thisCreature]),
-        doIf (did you (flipCoins 1 (some .loses)) thisWay) (sacrifice thisCreature) ])
+        doIf (did (Semantics.Subject.actor you) (flipCoins 1 (some .loses)) thisWay) (sacrifice thisCreature) ])
 theorem okGoblinArchaeologist : Ability.check (DRS.ofList []) goblinArchaeologist = [] := by decide
 
 /-- Karplusan Minotaur's win arm -/
 def karplusanMinotaurWinFlip : Ability :=
-  whenever (does you (flipCoins anyAmount (some .wins)))
+  whenever (does (Semantics.Subject.actor you) (flipCoins anyAmount (some .wins)))
       (instruct thisCreature (dealDamage 1 (target isAnyTarget)))
 theorem okKarplusanMinotaurWinFlip : Ability.check (DRS.ofList []) karplusanMinotaurWinFlip = [] := by decide
 
@@ -89,7 +107,7 @@ theorem okRalZarekUltimate : Action.check (DRS.ofList []) ralZarekUltimate = [] 
 
 /-- Krark's Thumb -/
 def krarksThumbExtraFlip : Action :=
-  replaceEvent (would you flipCoins)
+  replaceEvent (would (Semantics.Subject.actor you) flipCoins)
     (instead (sequentially [flipCoins 2, ignoreOutcomes (chosenResults none 1)])) none
 theorem okKrarksThumbExtraFlip : Action.check (DRS.ofList []) krarksThumbExtraFlip = [] := by decide
 
@@ -104,9 +122,9 @@ theorem okGoblinAssassinCoinTails : Action.check (DRS.ofList []) goblinAssassinC
 def rakdosShowstopperFlips : Action :=
   sequentially
     [ flipACoinForEach (each (and [ isCreature,
-                            not (or [ demon,
-                                        devil,
-                                        imp ]) ])),
+                            not (or [ (Semantics.Predicate.hasSubtype (demon)),
+                                        (Semantics.Predicate.hasSubtype (devil)),
+                                        (Semantics.Predicate.hasSubtype (imp)) ]) ])),
       destroy (each (and [isCreature, coinCameUp .tails])) ]
 theorem okRakdosShowstopperFlips : Action.check (DRS.ofList []) rakdosShowstopperFlips = [] := by decide
 
@@ -119,7 +137,7 @@ theorem planeswalkerBackWithoutLoyaltyOk :
 
 /-- Garruk Relentless -/
 def garrukRelentlessFlip : Ability :=
-  (match (cardNamed "Garruk Relentless // Garruk, the Veil-Cursed") with
+  (match (Semantics.Cards.«Garruk Relentless // Garruk, the Veil-Cursed») with
     | Card.transforming face _ => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -133,7 +151,7 @@ theorem okManaClashFlip : Action.check (DRS.ofList []) manaClashFlip = [] := by 
 
 /-- Kitsune Mystic -/
 def kitsuneMysticFlip : Ability :=
-  (match (cardNamed "Kitsune Mystic // Autumn-Tail, Kitsune Sage") with
+  (match (Semantics.Cards.«Kitsune Mystic // Autumn-Tail, Kitsune Sage») with
     | Card.flip face _ => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -159,7 +177,7 @@ spell each does not satisfy it. A `DidClause.ordinal` ("cast a second spell") na
 period (`Period` has none), and a counted patient ("cast two or more spells") counts spells, not
 casting events [CR#601.2a]. -/
 def aPlayerCastTwoOrMoreLastTurn : Condition :=
-  (match (cardNamed "Afflicted Deserter // Werewolf Ransacker") with
+  (match (Semantics.Cards.«Afflicted Deserter // Werewolf Ransacker») with
     | Card.transforming _ face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ (Option.some part) _) _)) => some
         part
@@ -172,26 +190,26 @@ theorem okAPlayerCastTwoOrMoreLastTurn :
 bind `they` finds no player to read. -/
 theorem badEventCountWithoutPlayerDomain :
     Condition.check (DRS.ofList [])
-      (compareAmt (eventCount (cast (a isSpell)) they lastTurn) .atLeast 2) =
+      (compareAmt (eventCount (cast (a isSpell)) (Semantics.Subject.actor they) lastTurn) .atLeast 2) =
       [.anaphor (.word .player) .one 0] := by decide
 
 /-- A counted patient of a casting refuses: one casting casts one spell [CR#601.2a]. -/
 theorem badCountedCastPatientLastTurn :
     Condition.check (DRS.ofList [])
-      (did (a isPlayer) (cast (counted (orMore 2) isSpell)) lastTurn) = [.singular] := by decide
+      (did ((Semantics.Subject.actor (a isPlayer))) (cast (counted (orMore 2) isSpell)) (Semantics.LookbackSpan.duration (lastTurn) none)) = [.singular] := by decide
 
 /-- Chittering Host's face, as both melding cards carry it. -/
 def chitteringHost : CardFace :=
-  (match (cardNamed "Midnight Scavengers // Chittering Host") with
+  (match (Semantics.Cards.«Midnight Scavengers // Chittering Host») with
     | (Card.transforming _ part) => some part
     | _ => none).get (by decide)
-def chitteringHostOnScavengers : CardFace := (match (cardNamed "Midnight Scavengers // Chittering Host") with
+def chitteringHostOnScavengers : CardFace := (match (Semantics.Cards.«Midnight Scavengers // Chittering Host») with
     | (Card.transforming _ part) => some part
     | _ => none).get (by decide)
 theorem okChitteringHostOnScavengers : CardFace.check .back chitteringHostOnScavengers = [] := by
   decide
 /-- Chittering Host as the GRAF RATS card carries it -/
-def chitteringHostOnGrafRats : CardFace := (match (cardNamed "Midnight Scavengers // Chittering Host") with
+def chitteringHostOnGrafRats : CardFace := (match (Semantics.Cards.«Midnight Scavengers // Chittering Host») with
     | (Card.transforming _ part) => some part
     | _ => none).get (by decide)
 theorem okChitteringHostOnGrafRats : CardFace.check .back chitteringHostOnGrafRats = [] := by
@@ -201,8 +219,8 @@ def meldThemInto : Action :=
   sequentially
     [ exile
         (allOf (and [ isCreature, youControl,
-                       or [ named "Graf Rats",
-                             named "Midnight Scavengers" ] ])),
+                       or [ named (Semantics.NameSource.printed ("Graf Rats")),
+                             named (Semantics.NameSource.printed ("Midnight Scavengers")) ] ])),
       meldInto them "Chittering Host" ]
 theorem okMeldThemInto : Action.check (DRS.ofList []) meldThemInto = [] := by decide
 
@@ -215,7 +233,7 @@ def titaniaVoiceOfGaeaMeld : Ability :=
   at_ (beginningOfYour .upkeep)
     (if_ := some (and
       [ thereAre (counted (orMore 4) (and [isLand, cardIn yourGraveyard])),
-        is (both thisCreature (a (and [isLand, named "Argoth, Sanctum of Nature"])))
+        is (both thisCreature (a (and [isLand, named (Semantics.NameSource.printed ("Argoth, Sanctum of Nature"))])))
           (and [youOwn, youControl]) ]))
     (sequentially [exile them, meldInto them "Titania, Gaea Incarnate"])
 theorem okTitaniaVoiceOfGaeaMeld :
@@ -226,7 +244,7 @@ theorem okTitaniaVoiceOfGaeaMeld :
 theorem titaniaThemReadsTitaniaAndArgoth :
     let condition : Condition := and
       [ thereAre (counted (orMore 4) (and [isLand, cardIn yourGraveyard])),
-        is (both thisCreature (a (and [isLand, named "Argoth, Sanctum of Nature"])))
+        is (both thisCreature (a (and [isLand, named (Semantics.NameSource.printed ("Argoth, Sanctum of Nature"))])))
           (and [youOwn, youControl]) ]
     let after := nextClause (stepCondition 512 (DRS.ofList []) condition).1
     (resolveCandidates .bare .many after).map (fun ref => (ref.id, ref.groupKey)) =

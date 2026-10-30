@@ -12,6 +12,17 @@ form, each closed by `decide`. The names and the sentences are the Idris ones.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a counted)
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Timing (duringPart)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (and duringPart)
+open Semantics.Templates.DetPhrase (a)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.Trigger
 
 /-- "Whenever you cast a spell, draw a card." -/
@@ -29,20 +40,20 @@ theorem badCastsPluralComplement :
 /-- "Whenever this creature attacks while you're casting a spell, draw a card." -/
 theorem okWhileDoingCast :
     Ability.check (DRS.ofList [])
-      (whenever (does thisCreature attack)
+      (whenever (does (Semantics.Subject.actor thisCreature) attack)
         (while_ := some (.whileDoing (.does (.actor .you) (.procedure .cast (a isSpell) .itsOwnCost none none none))))
         (draw 1)) = [] := by
   decide
 
 /-- "Whenever a creature dies, draw a card." -/
 theorem okNontargetDeathHeader :
-    Ability.check (DRS.ofList []) (whenever (does (a isCreature) die) (draw 1)) = [] := by
+    Ability.check (DRS.ofList []) (whenever (does ((Semantics.Subject.actor (a isCreature))) die) (draw 1)) = [] := by
   decide
 
 /-- "Whenever a creature attacks, that creature gets +2/+0 until end of turn." -/
 theorem okThatCreatureAfterAttack :
     Ability.check (DRS.ofList [])
-      (whenever (does (a isCreature) attack)
+      (whenever (does ((Semantics.Subject.actor (a isCreature))) attack)
         (get (that (.type .creature)) (.up 2) (.up 0) (some untilEndOfTurn)))
       = [] := by
   decide
@@ -51,7 +62,7 @@ theorem okThatCreatureAfterAttack :
 read by "it"; "that creature" never reads the Source, a self-referent (`Determiner.self`; owner
 ruling 2026-10-24). -/
 theorem selfAttackPublishesItsCreature :
-    let event := does thisCreature attack
+    let event := does (Semantics.Subject.actor thisCreature) attack
     let after := GameEvent.extend (DRS.ofList []) event
     Ability.check (DRS.ofList [])
       (whenever event (get it (.up 2) (.up 0) (some untilEndOfTurn))) = [] ∧
@@ -84,12 +95,12 @@ theorem badPluralAttackDefender :
 
 /-- "Whenever you attack, …": the active player declares the attack [CR#508.1], and the ability
 triggers on the creatures they control being declared [CR#508.3d]. -/
-theorem okPlayerAttacksHeader : GameEvent.check (DRS.ofList []) (does you attack) = [] := by decide
+theorem okPlayerAttacksHeader : GameEvent.check (DRS.ofList []) (does (Semantics.Subject.actor you) attack) = [] := by decide
 
 /-- "Whenever a creature enters during your turn, draw a card." -/
 theorem okHeaderOwnTurnWindow :
     Ability.check (DRS.ofList [])
-      (whenever (does (a isCreature) enter) (during := some (duringPart .turn (some .you)))
+      (whenever (does ((Semantics.Subject.actor (a isCreature))) enter) (during := some (duringPart .turn (some .you)))
         (draw 1)) = [] := by
   decide
 
@@ -117,7 +128,7 @@ theorem okPlayerAttackDefender :
     GameEvent.check (DRS.ofList []) (.does (.actor (a isCreature)) (.attack (some (a .isPlayer)))) = [] := by decide
 
 /-- "Whenever a player pays life": a payment of life, `payLife` [CR#119.4]. -/
-def afterLifePayment : DRS := GameEvent.extend (DRS.ofList []) (does (a .isPlayer) (payLife anyAmount))
+def afterLifePayment : DRS := GameEvent.extend (DRS.ofList []) (does ((Semantics.Subject.actor (a .isPlayer))) (payLife anyAmount))
 
 /-- "Whenever a player pays life, that player draws a card." -/
 theorem okLifePaymentPayerReadback :
@@ -267,7 +278,7 @@ theorem okRollModifierOncePerTurn :
 /-- The same body after an event that rolls no die: with no result announced there is nothing
 to increase or decrease. -/
 theorem badShiftWithoutRoll :
-    Ability.check (DRS.ofList []) (after (does thisCreature attack) rollShiftBody)
+    Ability.check (DRS.ofList []) (after (does (Semantics.Subject.actor thisCreature) attack) rollShiftBody)
       = [.outcomeInScope .rollResult 0] := by
   decide
 
@@ -286,7 +297,7 @@ the card prints; each takes every optional part of the header. -/
 This ability triggers only once each turn.": a window, an intervening "if" [CR#603.4] and a limit
 on one header. -/
 def wheneverDuringIfOnlyOnce : Ability :=
-  whenever (does anOpponent (loseLife anyAmount)) (during := some (duringPart .turn (some you)))
+  whenever (does (Semantics.Subject.actor anOpponent) (loseLife anyAmount)) (during := some (duringPart .turn (some you)))
     (if_ := some (exists_ (and [isArtifact, youControl]))) (draw 1)
     (limit := some oncePerTurn)
 
@@ -294,7 +305,7 @@ def wheneverDuringIfOnlyOnce : Ability :=
 ability, and the trigger word is none of them. -/
 theorem wheneverDuringIfOnlyOnceIsOneTrigger :
     wheneverDuringIfOnlyOnce =
-      .triggered (does anOpponent (loseLife anyAmount)) [] none []
+      .triggered (does (Semantics.Subject.actor anOpponent) (loseLife anyAmount)) [] none []
         (some (duringPart .turn (some you))) (some oncePerTurn)
         (some (exists_ (and [isArtifact, youControl]))) (draw 1) :=
   rfl
@@ -315,7 +326,7 @@ private def firstTriggerEvent (card : Card) : Option GameEvent :=
 /-- Required pin: *Tezzeret's Gatebreaker*'s "When this artifact enters" is the intransitive
 `enter` with this artifact as its Actor [CR#603.6a]. -/
 theorem gatebreakerTriggersOnThisArtifactEntering :
-    firstTriggerEvent (cardNamed "Tezzeret's Gatebreaker") = some (.does (.actor thisArtifact) enter) :=
+    firstTriggerEvent (Semantics.Cards.«Tezzeret's Gatebreaker») = some (.does (.actor thisArtifact) enter) :=
   rfl
 
 /-- Whether a card's first ability, its "… The same is true for …" line, is a trigger with no
@@ -334,9 +345,9 @@ turn if a creature you control has first strike" prints its "if" after the effec
 intervening "if" [CR#603.4] and the condition is part of the effect: each keyword's effect is a
 `doIf`; so are *Bleeding Effect*'s and *Concerted Effort*'s. -/
 theorem trailingIfIsInTheEffect :
-    conditionIsInTheEffect (cardNamed "Odric, Lunarch Marshal") = true ∧
-      conditionIsInTheEffect (cardNamed "Bleeding Effect") = true ∧
-      conditionIsInTheEffect (cardNamed "Concerted Effort") = true := by
+    conditionIsInTheEffect (Semantics.Cards.«Odric, Lunarch Marshal») = true ∧
+      conditionIsInTheEffect (Semantics.Cards.«Bleeding Effect») = true ∧
+      conditionIsInTheEffect (Semantics.Cards.«Concerted Effort») = true := by
   decide
 
 /-- The number of keywords a card's lines grant through one triggered ability each, with the
@@ -356,7 +367,7 @@ private def triggeredSteps (card : Card) : Option (Nat × List Nat) :=
 "Odric's ability" [CR#113.2c]): a single triggered ability, read for each of its 13 keywords,
 first strike and the 12 the same is true for. -/
 theorem odricIsOneAbility :
-    triggeredSteps (cardNamed "Odric, Lunarch Marshal") = some (1, [13]) := by
+    triggeredSteps (Semantics.Cards.«Odric, Lunarch Marshal») = some (1, [13]) := by
   decide
 
 end Semantics.Proofs.Trigger

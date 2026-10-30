@@ -14,6 +14,26 @@ too, so the distinction is not a type's to make.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted)
+open Semantics.Templates.Predicate (and did)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Amount (timesPaid)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Timing (duringPart)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and did duringPart)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each)
+open Semantics.Templates.FlipScope (count)
+open Semantics.Templates.LinkedFacet (timesPaid)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.Faces
 
 /-- A single-faced card. -/
@@ -68,7 +88,7 @@ theorem okGhituFire :
       (one
         { name := some "Ghitu Fire", cost := some [.variable, pip .red], types := [.sorcery],
           text :=
-            [ static (gatedBy [generic 2] you (cast thisSpell) (asThough := asThoughHadFlash it)),
+            [ static (gatedBy (Semantics.Cost.mana [generic 2]) (Semantics.Subject.actor (you)) (cast thisSpell) (asThough := asThoughHadFlash it)),
               spell (instruct thisSpell (dealDamage (letter .x) (target isAnyTarget))) ] })
       = [] := by
   decide
@@ -242,7 +262,7 @@ theorem okLoyaltyOnPlaneswalker :
 /-- "a token that's a copy of target creature, except it's an artifact" -/
 theorem okCopyTypeException :
     Action.check (DRS.ofList [])
-      (create 1 (.copyOf (target isCreature) [isAlso [.artifact]]) []) = []
+      (create 1 (.copyOf (target isCreature) [isAlso (some [.artifact])]) []) = []
           := by
   decide
 
@@ -315,9 +335,9 @@ theorem okEscalateWithModes :
             [ keywordCosting (.named "escalate") (.mana [generic 2]),
               spell
                 (chooseModes (.range (some 1) (some 2))
-                  [ get (target isCreature) (.up 1) (.up 1) (some untilEndOfTurn),
-                    get (target isCreature) (.down 1) (.down 1)
-                      (some untilEndOfTurn) ]) ] }) = [] := by
+                  [ { action := get (target isCreature) (.up 1) (.up 1) (some untilEndOfTurn) },
+                    { action := (get (target isCreature) (.down 1) (.down 1)
+                      (some untilEndOfTurn)) } ]) ] }) = [] := by
   decide
 
 /-- "Escalate {2}" -/
@@ -353,7 +373,7 @@ theorem okModeChoiceOnTriggeredModes :
         { name := some "", cost := some [generic 3], types := [.artifact],
           text :=
             [ whenever (.does (.actor .you) (.draw (.exactlyOf .anyAmount)))
-                (chooseModes (exactly 1) [draw 1, destroy (target isArtifact)]),
+                (chooseModes (exactly 1) [{ action := draw 1 }, { action := destroy (target isArtifact) }]),
               static (.modeChoice (.notChosenBefore soFarThisTurn)) ] }) = [] := by
   decide
 
@@ -446,13 +466,13 @@ theorem badThatMuchAfterFlip :
 /-- "Flip a coin. If you win the flip, draw a card." -/
 theorem okFlipArmAfterFlip :
     Action.check (DRS.ofList [])
-      (.sequentially [flipCoins 1, doIf (did you (flipCoins 1 (some .wins)) thisWay) (draw 1)])
+      (.sequentially [flipCoins 1, doIf (did (Semantics.Subject.actor you) (flipCoins 1 (some .wins)) thisWay) (draw 1)])
       = [] := by
   decide
 
 /-- "If you win the flip, draw a card." -/
 theorem badFlipArmWithoutFlip :
-    Action.check (DRS.ofList []) (doIf (did you (flipCoins 1 (some .wins)) thisWay) (draw 1))
+    Action.check (DRS.ofList []) (doIf (did (Semantics.Subject.actor you) (flipCoins 1 (some .wins)) thisWay) (draw 1))
       = [.thisWayUngrounded] := by
   decide
 

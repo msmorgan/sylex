@@ -15,6 +15,16 @@ choice in scope, which holds in gift's body because its cost is the only one the
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (the)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Action (doIf)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (the)
+
 namespace Semantics.Proofs.LinkedChoiceReadback
 
 /-- "its gift cost" -/
@@ -29,7 +39,7 @@ def chosenDraws : Action := instruct (the isChosenPlayer) (draw 1)
 /-- Gift's permanent half: "When this permanent enters, if its gift cost was paid, the chosen
 player draws a card." The cost is its intervening "if" clause [CR#702.174b,702.174e,603.4]. -/
 def permanentHalf : Ability :=
-  when (does thisPermanent enter)
+  when (does (Semantics.Subject.actor thisPermanent) enter)
     (if_ := some (costWasPaid giftCost none .this))
     chosenDraws
 

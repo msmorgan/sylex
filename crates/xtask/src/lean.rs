@@ -123,7 +123,7 @@ lean_lib Proof where
             concat!(
                 "import FixtureOnly\nimport Semantics.Check.Card\n",
                 "example : Semantics.Card.check Regression.Semantics.Cards.«Fixture Card» = [] := ",
-                "check_card% Regression.Semantics.Cards.«Fixture Card»\n"
+                "by decide\n"
             ),
         )?;
         let built = build(lake, package)?;

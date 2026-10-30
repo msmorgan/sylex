@@ -1,11 +1,11 @@
-import Semantics.Authoring
+import Semantics.Registry
 import Semantics.Check.Card
 
 /-!
 # Semantics.CanonCheck
 
 `check_canon_card` finds a generated card by its source file and checks its plain `Card` value
-with `check_card%`. The source registry and the checker remain independent.
+with the `check_card` command. The source registry and the checker remain independent.
 -/
 
 namespace Semantics
@@ -17,11 +17,9 @@ open Lean Elab Command in
 @[command_elab checkCanonCard]
 def elabCheckCanonCard : CommandElab := fun stx => do
   let file := stx[1].isStrLit?.getD ""
-  let some entry := (Authoring.canonCardsExt.getState (← getEnv)).find? (·.file == file)
+  let some entry := (Registry.canonCardsExt.getState (← getEnv)).find? (·.file == file)
     | throwError "No canon card was generated from {file}"
   let name := entry.declaration
-  let ok := mkIdent (`_root_ ++ name.getPrefix ++ Name.mkSimple ("ok_" ++ name.getString!))
-  let card : Lean.Term := ⟨mkIdent (`_root_ ++ name)⟩
-  elabCommand (← `(theorem $ok : $(mkCIdent ``Card.check) ($card) = [] := check_card% ($card)))
+  elabCommand (← `(check_card $(mkIdent (`_root_ ++ name))))
 
 end Semantics

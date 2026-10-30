@@ -11,6 +11,11 @@ group, not a predicate on one member.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (counted)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.Sharing
 
 /-- An object named both "Fire" and "Ice" shares a name with an object named "Fire" and with one

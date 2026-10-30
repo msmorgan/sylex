@@ -3,6 +3,17 @@ import Semantics.Definitions
 import Semantics.Definitions
 import Semantics.Proofs.Helpers
 
+open Semantics.Templates.NounPhrase (counted)
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.StaticSpec (replace)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Action (doIf replace target)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.RefusalReachability
 
 /-- "The number of …" counts a group: a plural universal ("the number of creatures"), not one

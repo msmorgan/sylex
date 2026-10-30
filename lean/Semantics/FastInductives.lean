@@ -1,19 +1,6 @@
 import Lean
 
-namespace Semantics
-
-/-- Expansion-time lexical depth. This argument is eliminated when a template or definition
-constructs its body. -/
-class AuthoringContext where
-  depth : Nat
-
-abbrev AuthoringContext.root : AuthoringContext := ⟨0⟩
-
-instance : AuthoringContext := AuthoringContext.root
-
-end Semantics
-
-namespace Semantics.Authoring
+namespace Semantics.FastInductives
 
 open Lean Meta Elab Command Term
 
@@ -83,41 +70,4 @@ def elabFastMutual : CommandElab := fun stx => do
   else
     throwUnsupportedSyntax
 
-initialize definitionAttribute : TagAttribute ←
-  registerTagAttribute `semantic_definition "A rules-defined semantic declaration."
-
-initialize templateAttribute : TagAttribute ←
-  registerTagAttribute `semantic_template "A transparent semantic phrasing template."
-
-initialize expressionAttribute : TagAttribute ←
-  registerTagAttribute `semantic_expression
-    "Semantic expressions require template or definition authoring."
-
-initialize literalAttribute : TagAttribute ←
-  registerTagAttribute `semantic_literal "A literal leaf value, rather than an authored expression."
-
-initialize internalAttribute : TagAttribute ←
-  registerTagAttribute `internal_expansion
-    "An expansion carrier without an authorable primitive template."
-
-initialize contextualAuthoringAttribute : TagAttribute ←
-  registerTagAttribute `contextual_authoring
-    "A semantic declaration with generated lexical context."
-
-initialize primitiveAttribute : TagAttribute ←
-  registerTagAttribute `semantic_primitive "An authored primitive declaration."
-
-/-- Grammar modules classify their non-record, non-enumeration syntax uniformly. -/
-elab "classify_semantic_syntax" : command => do
-  let env ← getEnv
-  for (name, info) in env.constants.toList do
-    if (env.getModuleIdxFor? name).isNone && !isStructure env name then
-      if let .inductInfo induct := info then
-        let hasFields := induct.ctors.any fun ctor =>
-          match env.find? ctor with
-          | some (.ctorInfo ci) => ci.numFields > 0
-          | _ => false
-        if hasFields && !expressionAttribute.hasTag env name then
-          expressionAttribute.setTag name
-
-end Semantics.Authoring
+end Semantics.FastInductives

@@ -19,6 +19,19 @@ theorem form, each closed by `decide`. The names and the sentences are the Idris
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and was)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.Condition (and was)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.Counters
 
 /-- "a +1/+1 counter", printed. -/
@@ -50,7 +63,7 @@ theorem okCountersOnCreaturesInAPile :
     Action.check (DRS.ofList [])
       (.sequentially
         [ instruct anOpponent (separateIntoPiles (allOf isCreature) 2),
-          putCounters 1 p1p1Counter (each (and [isCreature, .in_ (.pile (pileOfChoice .you))])) ])
+          putCounters 1 (Semantics.CounterKindSource.printed (p1p1Counter)) (each (and [isCreature, .in_ (.pile (pileOfChoice .you))])) ])
       = [] := by
   decide
 
@@ -61,7 +74,7 @@ theorem badCountersOnAPile :
     Action.check (DRS.ofList [])
       (.sequentially
         [ instruct anOpponent (separateIntoPiles (allOf isCreature) 2),
-          putCounters 1 p1p1Counter (pileOfChoice .you) ]) = [.counterHolderKind] := by
+          putCounters 1 (Semantics.CounterKindSource.printed (p1p1Counter)) (pileOfChoice .you) ]) = [.counterHolderKind] := by
   decide
 
 /-- "this creature" -/
@@ -111,7 +124,7 @@ theorem okControlSelfNegation :
 gets −1/−1 until end of turn." -/
 theorem okAltHeaderAgreeingReadback :
     Ability.check (DRS.ofList [])
-      (whenever (does thisCreature (block (a isCreature)))
+      (whenever (does (Semantics.Subject.actor (thisCreature)) (block (a isCreature)))
         (or_ := [does (by_ (a isCreature)) (block thisCreature)])
         (get (that (.type .creature)) (.down 1) (.down 1) (some untilEndOfTurn)))
       = [] := by
@@ -119,7 +132,7 @@ theorem okAltHeaderAgreeingReadback :
 
 theorem agreeingAlternativeHeadersSelectTheOtherCreature :
     let after := (stepTriggerHeaderWith (stepOps 64) (DRS.ofList [])
-      (does thisCreature (block (a isCreature)))
+      (does (Semantics.Subject.actor (thisCreature)) (block (a isCreature)))
       [does (by_ (a isCreature)) (block thisCreature)] none none).1
     (firstReach (.word (.type .creature)) .one after).map (·.id) = some 1 ∧
       (after.findById? 1).map (·.det) = some .a ∧
@@ -130,12 +143,12 @@ theorem agreeingAlternativeHeadersSelectTheOtherCreature :
 never reads the Source, a self-referent (`Determiner.self`; owner ruling 2026-10-24). -/
 theorem alternateHeadersPublishTheirSelf :
     Ability.check (DRS.ofList [])
-      (whenever (does thisCreature block)
+      (whenever (does (Semantics.Subject.actor (thisCreature)) block)
         (or_ := [does (by_ (a isCreature)) (block thisCreature)])
         (get it (.down 1) (.down 1) (some untilEndOfTurn)))
       = [] ∧
       (firstReach .bare .one
-        (nextClause (GameEvent.extend (DRS.ofList []) (does thisCreature block)))).map (·.id) = some 0 := by
+        (nextClause (GameEvent.extend (DRS.ofList []) (does (Semantics.Subject.actor (thisCreature)) block)))).map (·.id) = some 0 := by
   decide
 
 /-- Three headers that each name the Source publish it, read by "its" in the handoff to it. In
@@ -144,24 +157,24 @@ the handoff's own clause the performer stays the self-referent no noun word read
 Source outside the handoff too. -/
 theorem threeHeadersPublishTheirSelf :
     Ability.check (DRS.ofList [])
-      (whenever (does thisCreature attack)
-        (or_ := [does thisCreature block, .does (.by (a isSpell)) (.target thisCreature)])
+      (whenever (does (Semantics.Subject.actor (thisCreature)) attack)
+        (or_ := [does (Semantics.Subject.actor (thisCreature)) block, .does (.by (a isSpell)) (.target thisCreature)])
         (Action.instruct thisCreature (.dealDamage (powerOf it) (each (.isOpponentOf .you)))))
       = [] ∧
       Ability.check (DRS.ofList [])
-        (whenever (does thisCreature attack)
-          (or_ := [does thisCreature block, .does (.by (a isSpell)) (.target thisCreature)])
+        (whenever (does (Semantics.Subject.actor (thisCreature)) attack)
+          (or_ := [does (Semantics.Subject.actor (thisCreature)) block, .does (.by (a isSpell)) (.target thisCreature)])
           (Action.instruct thisCreature
             (.dealDamage (powerOf (that (.type .creature))) (each (.isOpponentOf .you)))))
         = [.anaphor (.word (.type .creature)) .one 0] ∧
       (firstReach .bare .one
-        (nextClause (GameEvent.extend (DRS.ofList []) (does thisCreature attack)))).map (·.id) = some 0 := by
+        (nextClause (GameEvent.extend (DRS.ofList []) (does (Semantics.Subject.actor (thisCreature)) attack)))).map (·.id) = some 0 := by
   decide
 
 theorem badJoinedHeaderReadback :
     Ability.check (DRS.ofList [])
-      (when (does thisCreature enter)
-        (joins := [⟨does (a (and [isCreature, youControl])) die, [], none, none⟩])
+      (when (does (Semantics.Subject.actor (thisCreature)) enter)
+        (joins := [⟨does ((Semantics.Subject.actor (a (and [isCreature, youControl])))) die, [], none, none⟩])
         (.putCounters 1 p11 it)) = [.anaphor (.atSlot .offStack) .one 0] := by
   decide
 
@@ -222,7 +235,7 @@ creature left the battlefield, so it doesn't move counters but puts the same num
 the creature had, read by last known information [CR#122.8,608.2h]: a loop over its counter
 kinds, not a [CR#122.5] move and not one counter of each kind. -/
 theorem starPupilPutsTheSameNumberOfEachKind :
-    (match (cardNamed "Star Pupil") with
+    (match (Semantics.Cards.«Star Pupil») with
       | .singleFaced { characteristics := { text := [_, .triggered _ _ _ _ _ _ _ effect], .. } } =>
         some effect
       | _ => none) =
@@ -240,7 +253,7 @@ theorem denryKlinPutsTheSameNumberOfEachKind :
 
 /-- Celestial Convergence's upkeep effect, after its counter removal. -/
 private def celestialConvergenceAfterRemoval : Option Action :=
-  match (cardNamed "Celestial Convergence") with
+  match (Semantics.Cards.«Celestial Convergence») with
   | .singleFaced { characteristics := { text := [_, .triggered _ _ _ _ _ _ _
       (.sequentially [_, rest]) ], .. } } => some rest
   | _ => none
@@ -429,7 +442,7 @@ theorem badCountersHeldByPlayer :
 /-- "When the last +1/+1 counter is removed from this creature, draw a card." -/
 theorem okLastBoostCounterRemoved :
     Ability.check (DRS.ofList [])
-      (when (does any (removeCounters theLast p1p1Counter thisCreature)) (draw 1))
+      (when (does any (removeCounters theLast (some (Semantics.CounterKindSource.printed (p1p1Counter))) thisCreature)) (draw 1))
       = [] := by
   decide
 
@@ -725,7 +738,7 @@ reads the target creature (3), not the land; the two "you control"s re-mention o
 resolved too (`mentionYou`; with handoff performers taking no id, `DRS.performers`, the ids are
 renumbered from 3 and 5). -/
 theorem thranduilsCompanyItIsTheTargetCreature :
-    let result := match (printedText (cardNamed "Thranduil's Company"))[1]? with
+    let result := match (printedText (Semantics.Cards.«Thranduil's Company»))[1]? with
       | some line => lineTrace line
       | none => (DRS.ofList [], [.nonEmpty])
     result.2 = [] ∧ result.1.resolvedIds = [3, 0, 2] ∧
@@ -737,7 +750,7 @@ theorem thranduilsCompanyItIsTheTargetCreature :
 one target creature an opponent controls and put a stun counter on it." "it" reads the second
 target (4, the tapped creature), not the first (1). -/
 theorem stunningShotItIsTheTappedCreature :
-    let result := match (printedText (cardNamed "Stunning Shot"))[0]? with
+    let result := match (printedText (Semantics.Cards.«Stunning Shot»))[0]? with
       | some line => lineTrace line
       | none => (DRS.ofList [], [.nonEmpty])
     result.2 = [] ∧ result.1.resolvedIds = [4] ∧
@@ -756,40 +769,40 @@ quantity, and "the last counter" is `theLast` [CR#702.62a,310.12b]. -/
 +1/+1 counters are put on this creature" (Herd Baloth) are distinct patterns: only the second
 publishes how many counters were put. -/
 theorem oneCounterAndOneOrMoreCountersAreDistinctPatterns :
-    GameEvent.check (DRS.ofList []) (does any (putCounters 1 p1p1Counter thisCreature)) = [] ∧
-      GameEvent.check (DRS.ofList []) (does any (putCounters anyAmount p1p1Counter thisCreature)) = [] ∧
+    GameEvent.check (DRS.ofList []) (does any (putCounters 1 (Semantics.CounterKindSource.printed (p1p1Counter)) thisCreature)) = [] ∧
+      GameEvent.check (DRS.ofList []) (does any (putCounters anyAmount (Semantics.CounterKindSource.printed (p1p1Counter)) thisCreature)) = [] ∧
       countOutcomes .countersPut
-        (GameEvent.extend (DRS.ofList []) (does any (putCounters 1 p1p1Counter thisCreature))) = 0 ∧
+        (GameEvent.extend (DRS.ofList []) (does any (putCounters 1 (Semantics.CounterKindSource.printed (p1p1Counter)) thisCreature))) = 0 ∧
       countOutcomes .countersPut
-        (GameEvent.extend (DRS.ofList []) (does any (putCounters anyAmount p1p1Counter thisCreature))) = 1 := by
+        (GameEvent.extend (DRS.ofList []) (does any (putCounters anyAmount (Semantics.CounterKindSource.printed (p1p1Counter)) thisCreature))) = 1 := by
   decide
 
 /-- Suspend's "When the last time counter is removed from this card" [CR#702.62a] is the removal
 of `theLast`: a pattern distinct from "a time counter is removed" (`exactly 1`), reading one
 counter and publishing no count. -/
 theorem theLastEncodesSuspendsLastCounterTrigger :
-    GameEvent.check (DRS.ofList []) (does any (removeCounters theLast timeCounter this_)) = [] ∧
+    GameEvent.check (DRS.ofList []) (does any (removeCounters theLast (some (Semantics.CounterKindSource.printed (timeCounter))) this_)) = [] ∧
       countOutcomes .countersRemoved
-        (GameEvent.extend (DRS.ofList []) (does any (removeCounters theLast timeCounter this_))) = 0 ∧
+        (GameEvent.extend (DRS.ofList []) (does any (removeCounters theLast (some (Semantics.CounterKindSource.printed (timeCounter))) this_))) = 0 ∧
       countOutcomes .countersRemoved
-        (GameEvent.extend (DRS.ofList []) (does any (removeCounters (orMore 1) timeCounter this_))) = 1 := by decide
+        (GameEvent.extend (DRS.ofList []) (does any (removeCounters (orMore 1) (some (Semantics.CounterKindSource.printed (timeCounter))) this_))) = 1 := by decide
 
 /-- Midnight Clock's "When the twelfth hour counter is put on Midnight Clock" [CR#122.7] is a put
 of `theNth`: the put that takes it from fewer than twelve hour counters to twelve or more, not the
 twelfth occurrence of a one-counter put (`nthOccurrence` over `1`). It is singular, so it
 publishes no count of counters put. -/
 theorem theNthEncodesTheCounterThreshold :
-    GameEvent.check (DRS.ofList []) (does any (putCounters (theNth (.nth 12)) hourCounter thisArtifact))
+    GameEvent.check (DRS.ofList []) (does any (putCounters (theNth (.nth 12)) (Semantics.CounterKindSource.printed (hourCounter)) thisArtifact))
         = [] ∧
       countOutcomes .countersPut
         (GameEvent.extend (DRS.ofList [])
-          (does any (putCounters (theNth (.nth 12)) hourCounter thisArtifact))) = 0 := by decide
+          (does any (putCounters (theNth (.nth 12)) (Semantics.CounterKindSource.printed (hourCounter)) thisArtifact))) = 0 := by decide
 
 /-- Required pin: *Urborg Scavengers*' "This creature has flying as long as a card exiled with it
 has flying. The same is true for …" is one static ability [CR#113.2c], its frame read for 12
 keywords: flying and the 11 the same is true for. The card has two lines. -/
 theorem urborgScavengersIsOneStatic :
-    (match (cardNamed "Urborg Scavengers") with
+    (match (Semantics.Cards.«Urborg Scavengers») with
       | .singleFaced face =>
         face.characteristics.text.length == 2 &&
           match (face.characteristics.text[1]? : Option Ability) with

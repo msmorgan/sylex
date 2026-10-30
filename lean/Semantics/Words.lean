@@ -55,7 +55,8 @@ inductive CardClass where
 
 /-- A card type [CR#205.2a]: its name, the Card Class it contributes [CR#110.4,110.4a], and the
 characteristic stats its objects have [CR#302.4,306.5,310.4]. A card names a declared card type
-(`CardType.creature` and its peers below), never the raw structure: `spelled` refuses it. What a
+(`CardType.creature` and its peers below). The `.syl` generator refuses raw card-type
+construction outside a card-type declaration. What a
 card type confers on its objects is not a field; it is the type's `RegistryDefinition.cardType` row. -/
 structure CardType where
   /-- The word the type line prints. -/
@@ -70,58 +71,48 @@ structure CardType where
 
 /-- Creature: a permanent type [CR#110.4], whose objects alone have power and toughness
 [CR#302.4]. -/
-@[semantic_definition, contextual_authoring]
-def CardType.creature [AuthoringContext] : CardType :=
+def CardType.creature : CardType :=
   { name := "Creature", cardClass := some .permanentCard, stats := [.power, .toughness] }
 
 /-- Artifact: a permanent type [CR#110.4]. -/
-@[semantic_definition, contextual_authoring]
-def CardType.artifact [AuthoringContext] : CardType :=
+def CardType.artifact : CardType :=
   { name := "Artifact", cardClass := some .permanentCard }
 
 /-- Land: a permanent type [CR#110.4]. -/
-@[semantic_definition, contextual_authoring]
-def CardType.land [AuthoringContext] : CardType :=
+def CardType.land : CardType :=
   { name := "Land", cardClass := some .permanentCard }
 
 /-- Enchantment: a permanent type [CR#110.4]. -/
-@[semantic_definition, contextual_authoring]
-def CardType.enchantment [AuthoringContext] : CardType :=
+def CardType.enchantment : CardType :=
   { name := "Enchantment", cardClass := some .permanentCard }
 
 /-- Instant: not a permanent type [CR#110.4]; an instant card is an instant or sorcery card
 [CR#110.4a,304.1]. -/
-@[semantic_definition, contextual_authoring]
-def CardType.instant [AuthoringContext] : CardType :=
+def CardType.instant : CardType :=
   { name := "Instant", cardClass := some .instantOrSorceryCard }
 
 /-- Sorcery: not a permanent type [CR#110.4]; a sorcery card is an instant or sorcery card
 [CR#110.4a,307.1]. -/
-@[semantic_definition, contextual_authoring]
-def CardType.sorcery [AuthoringContext] : CardType :=
+def CardType.sorcery : CardType :=
   { name := "Sorcery", cardClass := some .instantOrSorceryCard }
 
 /-- Planeswalker: a permanent type [CR#110.4], whose objects alone have loyalty [CR#306.5]. -/
-@[semantic_definition, contextual_authoring]
-def CardType.planeswalker [AuthoringContext] : CardType :=
+def CardType.planeswalker : CardType :=
   { name := "Planeswalker", cardClass := some .permanentCard, stats := [.loyalty] }
 
 /-- Battle: a permanent type [CR#110.4], whose objects have defense [CR#310.4]. -/
-@[semantic_definition, contextual_authoring]
-def CardType.battle [AuthoringContext] : CardType :=
+def CardType.battle : CardType :=
   { name := "Battle", cardClass := some .permanentCard, stats := [.defense] }
 
 /-- Kindred: neither a permanent type nor an instant or sorcery type. A kindred card always has
 another card type, and is cast and resolves by it [CR#308.1], so the other type settles both
 whether it can be a permanent [CR#110.4] and its Card Class. -/
-@[semantic_definition, contextual_authoring]
-def CardType.kindred [AuthoringContext] : CardType :=
+def CardType.kindred : CardType :=
   { name := "Kindred" }
 
 /-- Dungeon: a card type all the same, though a dungeon begins outside the game [CR#309.2] and is
 never a permanent or a spell [CR#309.2c]. -/
-@[semantic_definition, contextual_authoring]
-def CardType.dungeon [AuthoringContext] : CardType :=
+def CardType.dungeon : CardType :=
   { name := "Dungeon" }
 
 /-- The declared card types in canonical order: the order the checker remembers a referent's
@@ -751,30 +742,3 @@ inductive EventSide where
   deriving DecidableEq, Repr
 
 end Semantics
-
-attribute [semantic_expression] Semantics.CardType Semantics.Delta Semantics.Subtype
-  Semantics.CounterKind
-  Semantics.DesignationLabel Semantics.RelationLabel Semantics.KeywordLabel
-  Semantics.AbilityWordLabel
-  Semantics.Deed
-
-attribute [semantic_literal] Semantics.SimpleManaSymbol.generic
-
--- A `CardType`, `Subtype`, `CounterKind`, `DesignationLabel` or `RelationLabel` is a semantic
--- expression with no primitive wrapper: a card names a catalog entry
--- (`Semantics.Definitions.CardTypes`, `.Subtypes`, `.Counters`, `.Designations`, `.Relations`),
--- and `spelled` refuses a raw constructor.
-attribute [internal_expansion] Semantics.CardType Semantics.Subtype Semantics.CounterKind
-  Semantics.DesignationLabel Semantics.RelationLabel
-
--- A `KeywordLabel` is a semantic expression whose one constructor is internal: each keyword
--- ability Definition generates its authored label constant (`kicker.label`,
--- `Authoring.keywordLabelConstant`), which a card names by the Definition's own name, and
--- `spelled` refuses a raw `KeywordLabel.named`. An `AbilityWordLabel` is the same: a card writes
--- the ability word's Template (`landfall`), never the raw label.
-attribute [internal_expansion] Semantics.KeywordLabel.named Semantics.AbilityWordLabel.named
-
--- A `Deed` is a semantic expression whose keyword-action constructor is internal: each Action
--- Definition generates its authored deed constant (`exile.deed`, `Authoring.deedConstant`), which
--- a card names by the Definition's own name, and `spelled` refuses a raw `Deed.action`.
-attribute [internal_expansion] Semantics.Deed.action

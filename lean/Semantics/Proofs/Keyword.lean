@@ -14,6 +14,20 @@ theorem form, each closed by `decide`. The names and the sentences are the Idris
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each the)
+open Semantics.Templates.Predicate (and not did was)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Location (and not)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Timing (not)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and did not was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each the)
+
 namespace Semantics.Proofs.Keyword
 
 theorem persistReturnsWithACounter :
@@ -66,7 +80,7 @@ theorem badNestedCoordination :
 /-- "Whenever a creature enters, destroy that creature." -/
 theorem okThatCreatureAfterAntecedent :
     Ability.check (DRS.ofList [])
-      (whenever (does (a isCreature) enter) (destroy (that (.type .creature))))
+      (whenever (does ((Semantics.Subject.actor (a isCreature))) enter) (destroy (that (.type .creature))))
       = [] := by
   decide
 
@@ -289,7 +303,7 @@ theorem badSharedSubjectEmptyDelta :
   decide
 
 /-- "Pay 2 life: Draw a card." -/
-theorem okOwnPayerCost : Ability.check (DRS.ofList []) (activated (payLife 2) (draw 1)) =
+theorem okOwnPayerCost : Ability.check (DRS.ofList []) (activated (Semantics.Cost.perform ((payLife 2))) (draw 1)) =
     [] := by
   decide
 
@@ -353,11 +367,11 @@ theorem okHexproofFrom : Ability.check (DRS.ofList []) (hexproofFrom (hasColor .
 /-- A keyword ability reads as the keyword it is: "with flying" names flying's keyword, as the
 written label would. -/
 theorem hasKeywordOfAbility :
-    hasKeyword flying = Predicate.hasKeyword (.the (.named "flying")) := by rfl
+    hasKeyword (Semantics.KeywordTerm.the flying.label) = Predicate.hasKeyword (.the (.named "flying")) := by rfl
 
 /-- So does each member of a keyword list: "flying, first strike, or trample". -/
 theorem keywordListOfAbilities :
-    (abilitiesAmong [flying, firstStrike, trample] : ChoiceDomain) =
+    (abilitiesAmong [(Semantics.KeywordTerm.the flying.label), (Semantics.KeywordTerm.the firstStrike.label), (Semantics.KeywordTerm.the trample.label)] : ChoiceDomain) =
       .abilitiesAmong [.the (.named "flying"), .the (.named "firstStrike"), .the (.named "trample")] := by
   rfl
 
@@ -395,19 +409,6 @@ theorem okSplitSecond : Ability.check (DRS.ofList []) splitSecond = [] := by dec
 
 /-- The Ring tempts you, its emblem counting the times it has [CR#701.54a,701.54c]. -/
 theorem okTheRingTemptsYou : Action.check (DRS.ofList []) theRingTemptsYou = [] := by decide
-
-/-- An ability that is no keyword coerces to no keyword: "with Landfall — flying" is refused as
-an unknown keyword term rather than read as a keyword. -/
-theorem badNonKeywordAbilityAsKeyword :
-    Predicate.check (DRS.ofList []) (hasKeyword (landfall flying)) = [.knownKeywordTerm] := by
-  decide
-
-/-- The same in a keyword list. -/
-theorem badNonKeywordAbilityInKeywordList :
-    Action.check (DRS.ofList [])
-        (choose (a (qualityFrom .ability (abilitiesAmong [flying, landfall flying])))) =
-      [.knownKeywordTerm] := by
-  decide
 
 /-! ### "The same is true for …" on the printed cards -/
 
@@ -457,14 +458,14 @@ selection, each other keyword is granted bare, and no `addedAbilities` holds a f
 [CR#702.1c]. Death-Mask Duplicant's frame, read for landwalk, reads off exactly the objects its
 condition finds. -/
 theorem familyTermsGrantThroughAddedSelectionOf :
-    grantForms (cardNamed "Death-Mask Duplicant") 1 =
+    grantForms (Semantics.Cards.«Death-Mask Duplicant») 1 =
         [ some none, some none, some none, some none, some none,
           some (some Cards.landwalkAbilities), some (some Cards.protectionAbilities), some none ] ∧
-      grantForms (cardNamed "Cairn Wanderer") 1 =
+      grantForms (Semantics.Cards.«Cairn Wanderer») 1 =
         [ some none, some none, some none, some none, some none, some none,
           some (some Cards.landwalkAbilities), some none, some (some Cards.protectionAbilities),
           some none, some none, some none, some none ] ∧
-      (sameIsTrueForLine (cardNamed "Death-Mask Duplicant") 1).map
+      (sameIsTrueForLine (Semantics.Cards.«Death-Mask Duplicant») 1).map
           (fun (frame, keywords) => (frame, keywords[5]?)) =
         some (static (onlyWhile
           (keywordGrant thisCreature .thatKeyword
@@ -483,12 +484,12 @@ theorem familyTermsGrantThroughAddedSelectionOf :
 the hexproof variants the objects its condition finds have [CR#702.1c] (Odric's ruling of
 2020-01-24), and every other keyword bare. -/
 theorem odricGrantsHexproofVariants :
-    (grantForms (cardNamed "Odric, Lunarch Marshal") 0).all Option.isSome ∧
-      (grantForms (cardNamed "Odric, Lunarch Marshal") 0).filterMap (·.bind id) = [Cards.hexproofAbilities] ∧
-      (grantForms (cardNamed "Bleeding Effect") 0).all Option.isSome ∧
-      (grantForms (cardNamed "Bleeding Effect") 0).filterMap (·.bind id) = [Cards.hexproofAbilities] ∧
-      (grantForms (cardNamed "Urborg Scavengers") 1).all Option.isSome ∧
-      (grantForms (cardNamed "Urborg Scavengers") 1).filterMap (·.bind id) = [Cards.hexproofAbilities] := by
+    (grantForms (Semantics.Cards.«Odric, Lunarch Marshal») 0).all Option.isSome ∧
+      (grantForms (Semantics.Cards.«Odric, Lunarch Marshal») 0).filterMap (·.bind id) = [Cards.hexproofAbilities] ∧
+      (grantForms (Semantics.Cards.«Bleeding Effect») 0).all Option.isSome ∧
+      (grantForms (Semantics.Cards.«Bleeding Effect») 0).filterMap (·.bind id) = [Cards.hexproofAbilities] ∧
+      (grantForms (Semantics.Cards.«Urborg Scavengers») 1).all Option.isSome ∧
+      (grantForms (Semantics.Cards.«Urborg Scavengers») 1).filterMap (·.bind id) = [Cards.hexproofAbilities] := by
   decide
 
 /-- The ability "the same is true for" made before the frame was a constructor: each keyword's
@@ -511,7 +512,7 @@ private def joinedParts : List Ability → Ability
 
 /-- *Odric, Lunarch Marshal*'s frame, for one keyword. -/
 private def odricFor (k : KeywordTerm) : Ability :=
-  at_ (beginningOfPossessed combat eachPlayer)
+  at_ (beginningOfPossessed .combat eachPlayer)
     (doOnlyIf
       (establishThroughout
         (keywordGrant (allOf (and [isCreature, youControl])) k
@@ -521,7 +522,7 @@ private def odricFor (k : KeywordTerm) : Ability :=
 
 /-- *Odric, Lunarch Marshal*'s printed frame is `odricFor` read for `thatKeyword`. -/
 theorem odricFrameIsOdricFor :
-    (sameIsTrueForLine (cardNamed "Odric, Lunarch Marshal") 0).map (·.1) =
+    (sameIsTrueForLine (Semantics.Cards.«Odric, Lunarch Marshal») 0).map (·.1) =
       some (odricFor .thatKeyword) := rfl
 
 /-- Required pin: *Odric, Lunarch Marshal*'s frame, read for each of its keywords, checks as the
@@ -538,7 +539,7 @@ theorem odricReadsAsItsJoinedKeywords :
       Ability.check { DRS.ofList [] with thatKeyword := some (.the (.named "flying")) }
           (odricFor .thatKeyword) =
         Ability.check (DRS.ofList []) (odricFor (.the (.named "flying"))) ∧
-      ((cardNamed "Odric, Lunarch Marshal").check = []) := by
+      ((Semantics.Cards.«Odric, Lunarch Marshal»).check = []) := by
   decide
 
 /-- A keyword wants a modal spell when its own Definition writes a Mode Change: entwine,
@@ -557,7 +558,7 @@ theorem bloodthirstReadsTheOpponentAsTheDamagedPlayer :
     (match bloodthirst 1 with
       | .keyword _ _ [.static (.replace _ (.onlyIf c _) _ _ _)] => some c
       | _ => none) =
-      some (Condition.was (dealDamage anyAmount anOpponent) soFarThisTurn) := rfl
+      some (Condition.was (dealDamage anyAmount anOpponent) (Semantics.LookbackSpan.duration (soFarThisTurn) none)) := rfl
 
 /-- Reconfigure's second ability unattaches this permanent [CR#702.151a,701.3d]: the `unattach`
 Template, stamped with no attach deed, since unattaching is not attaching. -/
@@ -580,7 +581,7 @@ theorem shadowSecondHalfIsAboutThisCreature :
 each axis gets one per such opponent. -/
 theorem meleeCountsAttackedOpponents :
     let perOpponent : Amount := forEach 1 (and [isOpponent,
-      did you (.attackWith (a isCreature) (some .which)) thisCombat])
+      did (Semantics.Subject.actor (you)) (.attackWith (a isCreature) (some .which)) (Semantics.LookbackSpan.duration (thisCombat) none)])
     (match melee with
       | .keyword _ _ [.triggered _ _ _ _ _ _ _
           (.establish (.characteristicChange _ [.stat _ (.up power), .stat _ (.up toughness)]) _)] =>

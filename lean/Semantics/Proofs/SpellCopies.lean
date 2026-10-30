@@ -15,6 +15,10 @@ re-spelled away, and the extent `TargetExtent.only` ("targets only …" [CR#115.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.ManaSymbol (generic)
+
+open Semantics.Templates.CostShift (generic)
+
 namespace Semantics.Proofs.SpellCopies
 
 /-- Required pin: "a spell that targets only this creature" [CR#115.9c]. -/

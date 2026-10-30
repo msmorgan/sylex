@@ -10,6 +10,17 @@ form, each closed by `decide`. The names and the sentences are the Idris ones.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (and)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.SliceCount (counted)
+open Semantics.Templates.Subject (actor)
+
 namespace Semantics.Proofs.Zone
 
 /-- "Destroy target tapped creature." -/
@@ -52,7 +63,7 @@ theorem okDistributedMovesItsOwn :
 /-- "When target creature dies this turn, return that card to the battlefield." -/
 theorem okDiesBattlefield :
     Action.check (DRS.ofList [])
-      (.delay (does (target isCreature) die) [] (some thisTurn) (.move (that .card) .anyLocation (some battlefield) .arrival []))
+      (.delay (does ((Semantics.Subject.actor (target isCreature))) die) [] (some thisTurn) (.move (that .card) .anyLocation (some battlefield) .arrival []))
       = [] := by
   decide
 
@@ -105,14 +116,14 @@ theorem okDiscardHand : Action.check (DRS.ofList []) (discard (a (.and [.isCard,
 
 /-- "Destroy a creature." -/
 theorem okScopedKeywordAction :
-    Action.check (DRS.ofList []) (.ownScope (some destroy) (.move (a isCreature) ((.zone .battlefield none)) (some graveyard) .departure []))
+    Action.check (DRS.ofList []) (.ownScope (some destroy.deed) (.move (a isCreature) ((.zone .battlefield none)) (some graveyard) .departure []))
       = [] := by
   decide
 
 /-- "You exile a card from your hand." -/
 theorem okAgentedKeywordAction :
     Action.check (DRS.ofList [])
-      (.ownScope (some exile) (.move (a (.and [.isCard, .in_ hand])) .anyLocation (some exileZone) .arrival []))
+      (.ownScope (some exile.deed) (.move (a (.and [.isCard, .in_ hand])) .anyLocation (some exileZone) .arrival []))
       = [] := by
   decide
 
@@ -130,7 +141,7 @@ that read; the printed sentence hands it the first fighting creature,
 `instruct(<first>, fight(<second>))`. -/
 theorem badAgentedAgentlessAct :
     Action.check (DRS.ofList [])
-      (instruct (target (.isOpponentOf .you)) (.ownScope (some fight) (.simultaneously [
+      (instruct (target (.isOpponentOf .you)) (.ownScope (some fight.deed) (.simultaneously [
         instruct theActor (.dealDamage (.statOf (.stat .power) theActor) (.firstMention "fight.other" (target isCreature))),
         instruct (.laterMention "fight.other" (target isCreature))
           (.dealDamage (.statOf (.stat .power) (.laterMention "fight.other" (target isCreature))) theActor)])))
@@ -356,7 +367,7 @@ its owner's hand." The held clause announces the exiled object where it now is
 theorem okHeldUntilExileRetag :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ exileUntil (target isCreature) (does thisCreature leave),
+        [ exileUntil (target isCreature) (does (Semantics.Subject.actor thisCreature) leave),
           (.move (that .card) .anyLocation (some hand) .arrival []) ]) = [] := by
   decide
 
@@ -407,7 +418,7 @@ theorem okUntapCapBattlefieldSet :
 /-- "if this creature is attacking" -/
 theorem okMatchesBattlefieldZone :
     Ability.check (DRS.ofList [])
-      (when (does any (removeCounters theLast (CounterKind.named "timeCounter") thisCreature))
+      (when (does any (removeCounters theLast (some (Semantics.CounterKindSource.printed (CounterKind.named "timeCounter"))) thisCreature))
         (if_ := some (.matches thisCreature isAttacking)) (draw 1)) = [] := by
   decide
 
@@ -426,14 +437,14 @@ theorem badUnlicensedDifference :
 to the difference." -/
 theorem okDifferenceUnderComparisonTrigger :
     Ability.check (DRS.ofList [])
-      (when (does thisCreature enter)
+      (when (does (Semantics.Subject.actor thisCreature) enter)
         (if_ := some (.compareAmt (countOf (and [isCreature, youControl])) .less 7))
         (draw .theDifference)) = [] := by
   decide
 
 theorem badNonComparisonDifference :
     Ability.check (DRS.ofList [])
-      (when (does thisCreature enter)
+      (when (does (Semantics.Subject.actor thisCreature) enter)
         (if_ := some (exists_ (and [isCreature, youControl]))) (draw .theDifference)) = [.differenceInScope 0]
             := by
   decide

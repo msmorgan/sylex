@@ -18,6 +18,25 @@ form, each closed by `decide`. The names and the sentences are the Idris ones.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each the)
+open Semantics.Templates.Predicate (and andOr did was quality)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and andOr)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.StaticSpec (replace)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.Action (combat doIf replace target)
+open Semantics.Templates.ColorTerm (chosen)
+open Semantics.Templates.Condition (and did was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.NounPhrase (andOr)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.QualityPayload (quality)
+
 namespace Semantics.Proofs.Damage
 
 /-- "Target creature fights target creature." -/
@@ -91,14 +110,14 @@ two-creature fight; "this way" with no fight before it is ungrounded, and a play
 fight. -/
 theorem fightEachOtherIsReadBackThisWay :
     Action.check (DRS.ofList []) (sequentially [pairFights,
-      doIf (did (that creature) (fight (a isCreature)) thisWay) (draw 1)]) = [] ∧
+      doIf (did (Semantics.Subject.actor ((that creature))) (fight (a isCreature)) thisWay) (draw 1)]) = [] ∧
     Action.check (DRS.ofList []) (sequentially [pairFights,
-      putCounters 1 p1p1Counter (each (and [isCreature, was (fight which) thisWay]))]) = [] ∧
+      putCounters 1 (Semantics.CounterKindSource.printed (p1p1Counter)) (each (and [isCreature, was (fight which) thisWay]))]) = [] ∧
     Action.check (DRS.ofList []) (sequentially [fightPair,
-      doIf (did (that creature) (fight (a isCreature)) thisWay) (draw 1)]) =
+      doIf (did (Semantics.Subject.actor ((that creature))) (fight (a isCreature)) thisWay) (draw 1)]) =
       [.thisWayUngrounded] ∧
     Action.check (DRS.ofList []) (sequentially [pairFights,
-      doIf (did you (fight (a isCreature)) thisWay) (draw 1)]) = [.thisWayUngrounded] := by
+      doIf (did (Semantics.Subject.actor (you)) (fight (a isCreature)) thisWay) (draw 1)]) = [.thisWayUngrounded] := by
   decide
 
 /-- "Each other" needs a group of two: a single creature names no pair to distribute over, and
@@ -149,7 +168,7 @@ theorem quenchableFireStopsItsTriggerBySpecialAction :
           [ .delay (beginningOf .upkeep you nextTime) [] none
               (instruct this_ (dealDamage 3 thatJoin)),
             .establish
-              (.specialAction (some splitOverPlaneswalker) none [pip .blue]
+              (.specialAction (some splitOverPlaneswalker) none (Semantics.Cost.mana ([pip .blue]))
                 (establish (cant (.actor (.laterMention "delay.trigger" thisAbility)) trigger) none))
               (some (untilEvent (beginningOf .upkeep you nextTime))) ] ] := rfl
 
@@ -175,7 +194,7 @@ theorem cantTriggerReadsTheDelayedTriggerByIdentity :
 kind and determiner: the trigger's damage dealt to "any other target", then the condition, then
 "they" in the branch's clause. -/
 private def screamingNemesisThey : Option (List (Kind × Determiner)) :=
-  match (match (cardNamed "Screaming Nemesis") with
+  match (match (Semantics.Cards.«Screaming Nemesis») with
       | .singleFaced face => face.characteristics.text
       | _ => []) with
   | [_, .triggered _ _ _ _ _ _ _ (.sequentially [first, .doIf condition _ _ _])] =>
@@ -543,7 +562,7 @@ back by `did … thisWay` [CR#615.5,608.2c]. -/
 def redSourcePreventedThisWay : Condition :=
   did any
     (preventDamage .all
-      (damage := would (a (.and [isSource, .colorIs .red])) (dealDamage anyAmount)))
+      (damage := would ((Semantics.Subject.actor (a (.and [isSource, .colorIs .red])))) (dealDamage anyAmount)))
     thisWay
 
 /-- "… If damage from a red source is prevented this way, you gain 3 life." -/
@@ -576,16 +595,16 @@ theorem shadowbaneRiderIsDidPreventDamageThisWay :
     let blackPrevented : Condition :=
       did any
         (preventDamage allDamage
-          (damage := would (a (and [isSource, hasColor .black])) (dealDamage anyAmount)))
+          (damage := would ((Semantics.Subject.actor (a (and [isSource, hasColor .black])))) (dealDamage anyAmount)))
         thisWay
     let rule : StaticSpec :=
       replace
-        (would (aYourChoice isSource)
+        (would (Semantics.Subject.actor ((aYourChoice isSource)))
           (dealDamage anyAmount (andOr [you, allOf (and [isCreature, youControl])])))
         (instead
           (preventDamage allDamage (also := doIf blackPrevented (gainLife thatMuch))))
         (use := .nextTimeOnly)
-    (cardNamed "Shadowbane") =
+    (Semantics.Cards.«Shadowbane») =
         singleFacedCard
           { name := "Shadowbane", cost := [generic 1, pip .white], types := [.instant],
             text := [spell (establishThroughout rule thisTurn)] } ∧
@@ -712,10 +731,10 @@ cut as a shield, `redirectDamage (.shield 2) …`, and the rest is dealt normall
 theorem okShieldedRedirectionSizesItsCut :
     let harmsWay :=
       replace
-        (would (aYourChoice isSource)
+        (would (Semantics.Subject.actor ((aYourChoice isSource)))
           (dealDamage anyAmount (andOr [you, allOf (and [isPermanent, youControl])])))
         (instead (redirectDamage (.shield 2) (target isAnyTarget)))
-    (cardNamed "Harm's Way") =
+    (Semantics.Cards.«Harm's Way») =
         singleFacedCard
           { name := "Harm's Way", cost := [pip .white], types := [.instant],
             text := [spell (establishThroughout harmsWay thisTurn)] } ∧
@@ -752,7 +771,7 @@ permanent or player instead": the source deals twice the damage it would have [C
 the source and "that much" the replaced damage. -/
 theorem okScaleDoubled :
     StaticSpec.check (DRS.ofList [])
-      (replace (would (a isSource) (dealDamage anyAmount (a (.or [isPermanent, .isPlayer]))))
+      (replace (would ((Semantics.Subject.actor (a isSource))) (dealDamage anyAmount (a (.or [isPermanent, .isPlayer]))))
         (instead (instruct it (dealDamage (times 2 thatMuch) thatJoin)))) = [] := by
   decide
 
@@ -760,7 +779,7 @@ theorem okScaleDoubled :
 the one amount in scope. -/
 theorem okScaleShiftByThatMuch :
     StaticSpec.check (DRS.ofList [])
-      (replace (would (a isSource) (dealDamage anyAmount (a (.or [isPermanent, .isPlayer]))))
+      (replace (would ((Semantics.Subject.actor (a isSource))) (dealDamage anyAmount (a (.or [isPermanent, .isPlayer]))))
         (instead (instruct it (dealDamage (plus thatMuch thatMuch) thatJoin)))) = [] := by
   decide
 
@@ -788,7 +807,7 @@ theorem badPreventedThisWayAfterDamageEvent :
 
 theorem badThatMuchAfterDeath :
     Ability.check (DRS.ofList [])
-      (whenever (does (a isCreature) die)
+      (whenever (does ((Semantics.Subject.actor (a isCreature))) die)
         (Action.instruct thisCreature (.dealDamage .thatMuch (target isAnyTarget)))) = [.quantOutcomeInScope 0] := by
   decide
 
@@ -869,7 +888,7 @@ theorem boltSourceIsTheActor :
 loses 1 life." -/
 theorem okThatCreatureAfterTargetedDamage :
     Ability.check (DRS.ofList [])
-      (when (does thisCreature die)
+      (when (does (Semantics.Subject.actor (thisCreature)) die)
         (.sequentially
           [ (Action.instruct thisCreature (.dealDamage 1 (target isCreature))),
             instruct (controllerOf (that (.type .creature))) (loseLife 1) ])) = [] := by
@@ -893,7 +912,7 @@ theorem damagedSelfIsReadableByItNotThatCreature :
 
 /-- "Prevent all damage sources of the last chosen color would deal to you." -/
 def preventLastChosenColor : StaticSpec :=
-  replace (would (allOf (.and [isSource, ofTheLastChosen .color])) (dealDamage anyAmount .you))
+  replace (would (Semantics.Subject.actor ((allOf (.and [isSource, ofTheLastChosen .color])))) (dealDamage anyAmount .you))
     (instead (preventDamage .all))
 
 theorem okLastChosenAfterChooser :
@@ -1024,19 +1043,19 @@ theorem badCombatDamageComplement :
 other conjuncts reads `which` without a marker wrapper. -/
 theorem okConjunctRelativeDamaged :
     Predicate.checkAt .object (DRS.ofList [])
-      (and [isCreature, was (dealDamage anyAmount which) soFarThisTurn]) = [] := by
+      (and [isCreature, was (dealDamage anyAmount which) (Semantics.LookbackSpan.duration (soFarThisTurn) none)]) = [] := by
   decide
 
 /-- "Destroy target creature that blocked this turn." -/
 theorem okConjunctRelativeBlocked :
     Action.check (DRS.ofList [])
-      (destroy (target (and [isCreature, did which block soFarThisTurn]))) = [] := by
+      (destroy (target (and [isCreature, did (Semantics.Subject.actor (which)) block (Semantics.LookbackSpan.duration (soFarThisTurn) none)]))) = [] := by
   decide
 
 /-- A conjunct relative clause's `which` is seeded from its enclosing predicate: "creature that
 …" binds a creature on the battlefield, not a bare object. -/
 theorem conjunctRelativeWhichReadsItsSiblingConjuncts :
-    (relativeSeed .object (and [isCreature, did which block soFarThisTurn])).payload =
+    (relativeSeed .object (and [isCreature, did (Semantics.Subject.actor (which)) block (Semantics.LookbackSpan.duration (soFarThisTurn) none)])).payload =
       .object [.creature] (some .battlefield) none none none := by
   decide
 
@@ -1057,7 +1076,7 @@ private def bodyStatics : Ability → List StaticSpec
 creature, put that many −1/−1 counters on that creature instead" [CR#702.80a,702.90c]. -/
 def markingReplacedByCounters : StaticSpec :=
   replace (causedBy (bySource this_) (would any (markDamage (a isCreature))))
-    (instead (putCounters thatMuch m1m1Counter (that creature)))
+    (instead (putCounters thatMuch (Semantics.CounterKindSource.printed (m1m1Counter)) (that creature)))
 
 /-- A source with both wither and infect puts −1/−1 counters on a creature it damages once
 [CR#120.3d]. Each keyword's creature row replaces the same event, the marking of the damage,
@@ -1066,7 +1085,7 @@ counters are no marking, so the other row has nothing left to replace [CR#616.1f
 theorem witherAndInfectPutCountersOnce :
     (bodyStatics wither).head? = some markingReplacedByCounters ∧
       (bodyStatics infect).head? = some markingReplacedByCounters ∧
-      (putCounters thatMuch m1m1Counter (that creature)).eventVerbs.contains .damageMarked = false ∧
+      (putCounters thatMuch (Semantics.CounterKindSource.printed (m1m1Counter)) (that creature)).eventVerbs.contains .damageMarked = false ∧
       StaticSpec.check (DRS.ofList []) markingReplacedByCounters = [] :=
   ⟨rfl, rfl, by decide, by decide⟩
 
@@ -1080,8 +1099,8 @@ theorem witherFunctionsFromAnyZone :
         | _ => true
       | _ => false) = true ∧
       (bodyStatics wither).head? = some markingReplacedByCounters ∧
-      (cardNamed "Puncture Blast").check = [] :=
-  ⟨by decide, rfl, cardNamedOk "Puncture Blast"⟩
+      (Semantics.Cards.«Puncture Blast»).check = [] :=
+  ⟨by decide, rfl, (by decide)⟩
 
 /-- Infect's player row replaces the life loss its own damage would cause, caused by that damage
 event and not by the source, so other life loss the source causes is not replaced
@@ -1094,15 +1113,15 @@ theorem infectReplacesTheLifeLossItsDamageCauses :
 an `asEvent` over the damage this deals, not a replacement of a result [CR#702.15b,120.3f]. Two
 instances of lifelink are redundant [CR#702.15f], so the body applies once per object. -/
 theorem lifelinkIsAnAdditionalResult :
-    bodyStatics lifelink = [asEvent (does this_ (dealDamage anyAmount)) (gainLife thatMuch)] ∧
+    bodyStatics lifelink = [asEvent (does (Semantics.Subject.actor (this_)) (dealDamage anyAmount)) (gainLife thatMuch)] ∧
       StaticSpec.check (DRS.ofList [])
-        (asEvent (does this_ (dealDamage anyAmount)) (gainLife thatMuch)) = [] :=
+        (asEvent (does (Semantics.Subject.actor (this_)) (dealDamage anyAmount)) (gainLife thatMuch)) = [] :=
   ⟨rfl, by decide⟩
 
 /-! ## A result damage doesn't cause -/
 
 /-- Damage a source deals to you, the cause *Archon of Coronation* names. -/
-private def damageToYou : GameEvent := does (a isSource) (dealDamage anyAmount you)
+private def damageToYou : GameEvent := does ((Semantics.Subject.actor (a isSource))) (dealDamage anyAmount you)
 
 /-- The cause a prohibition is restricted to, if it names one. -/
 private def prohibitionCause? : StaticSpec → Option Causing
@@ -1119,17 +1138,17 @@ private def conditionalStatics (card : Card) : List (StaticSpec × Condition) :=
 
 /-- *Archon of Coronation*: "As long as you're the monarch, damage doesn't cause you to lose life."
 The card checks. -/
-theorem okArchonOfCoronation : (cardNamed "Archon of Coronation").check = [] :=
-  cardNamedOk "Archon of Coronation"
+theorem okArchonOfCoronation : (Semantics.Cards.«Archon of Coronation»).check = [] :=
+  (by decide)
 
 /-- *Archon of Coronation* writes a prohibition of losing life, restricted to a loss the damage
 dealt to you causes [CR#120.3a], while you are the monarch: a cause-qualified prohibition, not a
 replacement, since nothing happens instead [CR#614.1a]. -/
 theorem archonProhibitsTheLifeLossDamageCauses :
-    conditionalStatics (cardNamed "Archon of Coronation") =
-        [(cant you (loseLife anyAmount) (causedBy := byEvent damageToYou),
+    conditionalStatics (Semantics.Cards.«Archon of Coronation») =
+        [(cant (Semantics.Subject.actor (you)) (loseLife anyAmount) (causedBy := byEvent damageToYou),
           is you (hasDesignation monarch))] ∧
-      prohibitionCause? (cant you (loseLife anyAmount) (causedBy := byEvent damageToYou)) =
+      prohibitionCause? (cant (Semantics.Subject.actor (you)) (loseLife anyAmount) (causedBy := byEvent damageToYou)) =
         some (.event damageToYou) ∧
       (loseLife anyAmount).eventVerbs = [.life .lifeLost] :=
   ⟨rfl, rfl, by decide⟩
@@ -1137,7 +1156,7 @@ theorem archonProhibitsTheLifeLossDamageCauses :
 /-- The reminder text of *Archon of Coronation*: "When a creature deals combat damage to you, its
 controller still becomes the monarch" [CR#725.2]. -/
 private def monarchStillChanges : Ability :=
-  whenever (does (a isCreature) (dealDamage anyAmount you (kind := some .combat)))
+  whenever (does ((Semantics.Subject.actor (a isCreature))) (dealDamage anyAmount you (kind := some .combat)))
     (gainDesignation (controllerOf it) monarch)
 
 /-- The damage's other results are untouched: the prohibition names only the loss of life, so the
@@ -1151,19 +1170,19 @@ theorem archonLeavesTheDamagesOtherResults :
     untouched (dealDamage anyAmount you (kind := some .combat)) = true ∧
       Ability.check (DRS.ofList []) monarchStillChanges = [] ∧
       untouched (gainDesignation (controllerOf it) monarch) = true ∧
-      bodyStatics lifelink = [asEvent (does this_ (dealDamage anyAmount)) (gainLife thatMuch)] ∧
+      bodyStatics lifelink = [asEvent (does (Semantics.Subject.actor (this_)) (dealDamage anyAmount)) (gainLife thatMuch)] ∧
       untouched (gainLife thatMuch) = true ∧
-      untouched (putCounters thatMuch poison you) = true :=
+      untouched (putCounters thatMuch (Semantics.CounterKindSource.printed (poison)) you) = true :=
   ⟨by decide, by decide, by decide, rfl, by decide, by decide⟩
 
 /-- With no cause, `cant you (loseLife anyAmount)` is "you can't lose life", a different card and
 a different rule [CR#119.8]: it forbids every loss of life, whatever causes it, and is not
 *Archon of Coronation*'s prohibition. -/
 theorem uncausedProhibitionIsYouCantLoseLife :
-    prohibitionCause? (cant you (loseLife anyAmount)) = none ∧
-      prohibitionCause? (cant you (loseLife anyAmount)) ≠
-        prohibitionCause? (cant you (loseLife anyAmount) (causedBy := byEvent damageToYou)) ∧
-      StaticSpec.check (DRS.ofList []) (cant you (loseLife anyAmount)) = [] := by
+    prohibitionCause? (cant (Semantics.Subject.actor (you)) (loseLife anyAmount)) = none ∧
+      prohibitionCause? (cant (Semantics.Subject.actor (you)) (loseLife anyAmount)) ≠
+        prohibitionCause? (cant (Semantics.Subject.actor (you)) (loseLife anyAmount) (causedBy := byEvent damageToYou)) ∧
+      StaticSpec.check (DRS.ofList []) (cant (Semantics.Subject.actor (you)) (loseLife anyAmount)) = [] := by
   refine And.intro rfl (And.intro ?_ ?_)
   · intro h
     cases h
@@ -1173,8 +1192,8 @@ theorem uncausedProhibitionIsYouCantLoseLife :
 scope, is refused. -/
 theorem badProhibitionCauseAnaphor :
     StaticSpec.check (DRS.ofList [])
-        (cant you (loseLife anyAmount)
-          (causedBy := byEvent (does (a isSource) (dealDamage anyAmount (that creature))))) =
+        (cant (Semantics.Subject.actor (you)) (loseLife anyAmount)
+          (causedBy := byEvent (does ((Semantics.Subject.actor (a isSource))) (dealDamage anyAmount (that creature))))) =
       [.anaphor (.word creature) .one 0] := by
   decide
 
@@ -1194,7 +1213,7 @@ theorem badDeonticCauseOffAProhibition :
 /-- *Deflecting Palm*'s prevention shield with its chosen source written as `chosen`. -/
 private def palmShield (chosen : NounPhrase) : Action :=
   establishThroughout
-    (replace (would chosen (dealDamage anyAmount you))
+    (replace (would (Semantics.Subject.actor (chosen)) (dealDamage anyAmount you))
       (instead
         (preventDamage allDamage
           (also := instruct this_ (dealDamage thatMuch (controllerOf thatSource)))))
@@ -1205,7 +1224,7 @@ private def palmShield (chosen : NounPhrase) : Action :=
 event, then the spell's own mention as the one dealing the damage. -/
 private def palmContext : DRS :=
   let header := nextClause (stepWouldClauseWith (stepOps 64) (DRS.ofList [])
-    (would (aYourChoice isSource) (dealDamage anyAmount you))).1
+    (would (Semantics.Subject.actor ((aYourChoice isSource))) (dealDamage anyAmount you))).1
   nextClause (stepAction 64 .postEvent .obj header (instruct this_ (dealDamage thatMuch you))).1
 
 /-- *Deflecting Palm*: "… Deflecting Palm deals that much damage to that source's controller."
@@ -1237,7 +1256,7 @@ mills that many cards." "That source" reads the trigger event's agent; over "a c
 refused. -/
 theorem belltowerSphinxThatSourceReadsTheEventAgent :
     let trigger (agent : NounPhrase) : Ability :=
-      whenever (does agent (dealDamage anyAmount thisCreature))
+      whenever (does (Semantics.Subject.actor (agent)) (dealDamage anyAmount thisCreature))
         (instruct (controllerOf thatSource) (mill thatMuch))
     Ability.check (DRS.ofList []) (trigger (a isSource)) = [] ∧
       Ability.check (DRS.ofList []) (trigger (a isCreature)) =
@@ -1255,7 +1274,7 @@ theorem inkshieldPreventsCombatDamageForFlyingInklings :
           (instead
             (preventDamage allDamage
               (also :=
-                create preventedThisWay (creatureToken 2 1 [.white, .black] [inkling] [flying])))))
+                create preventedThisWay (Semantics.TokenSpec.written ((creatureToken 2 1 [.white, .black] [inkling] [flying])))))))
         thisTurn := rfl
 
 /-- Phyrexian Infiltrator's "Exchange control of this creature and target creature" is the
@@ -1265,7 +1284,7 @@ theorem phyrexianInfiltratorExchangesControl :
     Cards.phyrexianInfiltrator.ownDeed? == some exchangeControl.deed := by decide
 
 theorem mirrorUniverseExchangesLifeTotals :
-    (match (cardNamed "Mirror Universe") with
+    (match (Semantics.Cards.«Mirror Universe») with
       | .singleFaced face =>
         match face.characteristics.text with
         | [.activated _ exchanging ..] =>
@@ -1274,7 +1293,7 @@ theorem mirrorUniverseExchangesLifeTotals :
       | _ => false : Bool) := by decide
 
 theorem juxtaposeExchangesControl :
-    (match (cardNamed "Juxtapose") with
+    (match (Semantics.Cards.«Juxtapose») with
       | .singleFaced face =>
         match face.characteristics.text with
         | [.spell _ (.sequentially [creatures, artifacts, _])] =>
@@ -1304,7 +1323,7 @@ theorem harnessInfinityExchangesZones :
     Cards.harnessInfinityExchange.ownDeed? == some exchangeZones.deed := by decide
 
 theorem deadpoolTradingCardExchangesTextBoxes :
-    (match (cardNamed "Deadpool, Trading Card") with
+    (match (Semantics.Cards.«Deadpool, Trading Card») with
       | .singleFaced face =>
         match face.characteristics.text with
         | .static (.replace _ (.alongside

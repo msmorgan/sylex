@@ -18,6 +18,26 @@ Battle Squadron prints a `*/*` box: those slots are `none` under the printed-sta
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted)
+open Semantics.Templates.Predicate (and andOr did was)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Location (and andOr)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.TokenSpec (written)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.AbilityLost (written)
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and did was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a each)
+open Semantics.Templates.NounPhrase (andOr)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Cards
 
 def jump : Action := gain (target isCreature) flying untilEndOfTurn
@@ -25,7 +45,7 @@ theorem okJump : Action.check (DRS.ofList []) jump = [] := by decide
 def gabrielAngelfire : Action :=
   sequentially
     [ choose (a (qualityFrom .ability
-        (abilitiesAmong [flying, firstStrike, trample, .theWith rampage 3]))),
+        (abilitiesAmong [(Semantics.KeywordTerm.the flying.label), (Semantics.KeywordTerm.the firstStrike.label), (Semantics.KeywordTerm.the trample.label), .theWith rampage.label 3]))),
       gain thisCreature (thatAbility .theChoice) (untilEvent (beginningOf .upkeep you nextTime)) ]
 theorem okGabrielAngelfire : Action.check (DRS.ofList []) gabrielAngelfire = [] := by decide
 def builtToSmash : Action :=
@@ -41,7 +61,7 @@ def thopterToken : CharacteristicBundle :=
     { types := [.artifact, .creature], subtypes := [thopter],
       text := [flying], power := stat 1, toughness := stat 1 } }
 
-def aviationPioneer : Action := create 1 thopterToken
+def aviationPioneer : Action := create 1 (Semantics.TokenSpec.written thopterToken)
 theorem okAviationPioneer : Action.check (DRS.ofList []) aviationPioneer = [] := by decide
 def fireNavyTrebuchet : Action :=
   createTappedAttacking 1
@@ -95,7 +115,7 @@ def bladeOfTheOniStatic : StaticSpec :=
 theorem okBladeOfTheOniStatic : StaticSpec.check (DRS.ofList []) bladeOfTheOniStatic = [] := by decide
 
 def castCreatureSpellsFromTop : StaticSpec :=
-  (match (cardNamed "Garruk's Horde") with
+  (match (Semantics.Cards.«Garruk's Horde») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.static part) _))) => some part
       | _ => none
@@ -110,7 +130,7 @@ theorem okTayamLine : StaticSpec.check (DRS.ofList []) tayamLine = [] := by deci
 
 /-- Kang the Conqueror -/
 def kangPowerUpLock : StaticSpec :=
-  cant any (activate (allOf (abilityHead (.keyword powerUp))))
+  cant any (activate (allOf (abilityHead (.keyword powerUp.label))))
 theorem okKangPowerUpLock : StaticSpec.check (DRS.ofList []) kangPowerUpLock = [] := by decide
 
 def stormOfSouls : Action :=
@@ -140,7 +160,7 @@ def descentOfTheDragons : Action :=
 theorem okDescentOfTheDragons : Action.check (DRS.ofList []) descentOfTheDragons = [] := by decide
 /-- Brimaz, King of Oreskos -/
 def brimazAttackToken : Ability :=
-  whenever (does thisCreature attack)
+  whenever (does (Semantics.Subject.actor thisCreature) attack)
     (create 1
       (written
         { characteristics :=
@@ -151,7 +171,7 @@ theorem okBrimazAttackToken : Ability.check (DRS.ofList []) brimazAttackToken = 
 /-- Sedris, the Traitor King -/
 def sedrisTheTraitorKing : Ability :=
   static (abilityGrant (each (and [isCreature, in_ yourGraveyard]))
-    (unearth [generic 2, pip .black]))
+    (unearth (Semantics.Cost.mana [generic 2, pip .black])))
 theorem okSedrisTheTraitorKing : Ability.check (DRS.ofList []) sedrisTheTraitorKing = [] := by decide
 /-- Grixis -/
 def grixis : Ability :=
@@ -166,10 +186,10 @@ def dralnuLichLord : Action :=
     (flashback itsManaCost) untilEndOfTurn
 theorem okDralnuLichLord : Action.check (DRS.ofList []) dralnuLichLord = [] := by decide
 /-- Dregscape Zombie -/
-def dregscapeZombie : Ability := unearth [pip .black]
+def dregscapeZombie : Ability := unearth (Semantics.Cost.mana [pip .black])
 theorem okDregscapeZombie : Ability.check (DRS.ofList []) dregscapeZombie = [] := by decide
 /-- Think Twice -/
-def thinkTwice : Ability := flashback [generic 2, pip .blue]
+def thinkTwice : Ability := flashback (Semantics.Cost.mana [generic 2, pip .blue])
 theorem okThinkTwice : Ability.check (DRS.ofList []) thinkTwice = [] := by decide
 /-- Greater Mossdog -/
 def greaterMossdog : Ability := dredge 3
@@ -178,16 +198,16 @@ theorem okGreaterMossdog : Ability.check (DRS.ofList []) greaterMossdog = [] := 
 def ravensCrime : Ability := retrace
 theorem okRavensCrime : Ability.check (DRS.ofList []) ravensCrime = [] := by decide
 /-- Barkhide Mauler -/
-def barkhideMauler : Ability := cycling [generic 2]
+def barkhideMauler : Ability := cycling (Semantics.Cost.mana [generic 2])
 theorem okBarkhideMauler : Ability.check (DRS.ofList []) barkhideMauler = [] := by decide
 /-- Ninja of the New Moon -/
-def ninjaOfTheNewMoon : Ability := ninjutsu [generic 3, pip .black]
+def ninjaOfTheNewMoon : Ability := ninjutsu (Semantics.Cost.mana [generic 3, pip .black])
 theorem okNinjaOfTheNewMoon : Ability.check (DRS.ofList []) ninjaOfTheNewMoon = [] := by decide
 /-- Thunderous Wrath -/
-def thunderousWrath : Ability := miracle [pip .red]
+def thunderousWrath : Ability := miracle (Semantics.Cost.mana [pip .red])
 theorem okThunderousWrath : Ability.check (DRS.ofList []) thunderousWrath = [] := by decide
 /-- Bygone Colossus -/
-def bygoneColossus : Ability := warp [generic 3]
+def bygoneColossus : Ability := warp (Semantics.Cost.mana [generic 3])
 theorem okBygoneColossus : Ability.check (DRS.ofList []) bygoneColossus = [] := by decide
 
 /-- Knight of Grace — "Hexproof from black" [CR#702.11d] -/
@@ -196,7 +216,7 @@ theorem okKnightOfGraceHexproofFromBlack :
     Ability.check (DRS.ofList []) knightOfGraceHexproofFromBlack = [] := by decide
 /-- Eternal Dragon — "Plainscycling {2}" [CR#702.29e] -/
 def eternalDragonPlainscycling : Ability :=
-  typecycling plains [generic 2]
+  typecycling (Semantics.Predicate.hasSubtype plains) (Semantics.Cost.mana ([generic 2]))
 theorem okEternalDragonPlainscycling : Ability.check (DRS.ofList []) eternalDragonPlainscycling = [] := by decide
 /-- Nezumi Ronin -/
 def nezumiRonin : Ability := bushido 1
@@ -207,7 +227,7 @@ def dragonlordOjutaiHexproof : Ability :=
 theorem okDragonlordOjutaiHexproof : Ability.check (DRS.ofList []) dragonlordOjutaiHexproof = [] := by decide
 /-- Monoxa, Midway Manager -/
 def monoxaRollTrigger : Ability :=
-  whenever (does you (rollDice (watch := resultIn (orMore 3))))
+  whenever (does (Semantics.Subject.actor you) (rollDice (watch := resultIn (orMore 3))))
     (sequentially
       [ gain thisCreature firstStrike untilEndOfTurn,
         doIf (compareAmt (theOutcome .rollResult) .atLeast 4)
@@ -226,7 +246,7 @@ theorem okCelebr8000Doubles : Action.check (DRS.ofList []) celebr8000Doubles = [
 than pay cycling costs." Cycling is an activated ability [CR#702.29a], and an alternative cost
 replaces an activation cost as it replaces a spell's mana cost [CR#118.9,602.2b]. -/
 def newPerspectivesCyclingAltCost : Ability :=
-  (match (cardNamed "New Perspectives") with
+  (match (Semantics.Cards.«New Perspectives») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -242,7 +262,7 @@ hand": the card's alternative cost sits under a `conditional … .asLongAs`, whi
 lacks. -/
 theorem badNewPerspectivesWithoutCondition :
     altCostAsLongAs newPerspectivesCyclingAltCost = true ∧
-      altCostAsLongAs (static (altCost (allOf (abilityHead (.keyword cycling))) [generic 0]))
+      altCostAsLongAs (static (altCost (allOf (abilityHead (.keyword cycling.label))) (some (Semantics.Cost.mana ([generic 0])))))
         = false := by decide
 
 /-- Fumiko the Lowblood -/
@@ -253,7 +273,7 @@ theorem okFumikoBushidoX : Ability.check (DRS.ofList []) fumikoBushidoX = [] := 
 
 /-- Tourach, Dread Cantor -/
 def tourachDiscardTrigger : Ability :=
-  (match (cardNamed "Tourach, Dread Cantor") with
+  (match (Semantics.Cards.«Tourach, Dread Cantor») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons part _))) => some part
       | _ => none
@@ -262,7 +282,7 @@ theorem okTourachDiscardTrigger : Ability.check (DRS.ofList []) tourachDiscardTr
 
 /-- Soul of Emancipation -/
 def soulOfEmancipation : Ability :=
-  when (does thisCreature enter)
+  when (does (Semantics.Subject.actor thisCreature) enter)
     (sequentially
       [ destroy (targets (upTo 3) (and [isPermanent, non isLand, isOther])),
         doForEach (those permanent)
@@ -281,12 +301,12 @@ theorem okTalrandsInvocation : Action.check (DRS.ofList []) talrandsInvocation =
 
 /-- Harried Dronesmith -/
 def harriedDronesmithToken : Action :=
-  sequentially [create 1 thopterToken, gainHaste thatToken untilEndOfTurn]
+  sequentially [create 1 (Semantics.TokenSpec.written thopterToken), gainHaste thatToken untilEndOfTurn]
 theorem okHarriedDronesmithToken : Action.check (DRS.ofList []) harriedDronesmithToken = [] := by decide
 
 /-- Veiling Oddity -/
 def veilingOddityLine : Ability :=
-  (match (cardNamed "Veiling Oddity") with
+  (match (Semantics.Cards.«Veiling Oddity») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -298,18 +318,18 @@ def darkbladeAgentGrants : Ability :=
   static (onlyWhile (conjunction [ abilityGrant thisCreature deathtouch,
         abilityGrant thisCreature
           (whenever
-             (does thisCreature (dealDamage (recipient := a isPlayer) (kind := some .combat))) (draw
-                                                                                                  1)) ]) (did you (surveil anyAmount) soFarThisTurn))
+             (does (Semantics.Subject.actor thisCreature) (dealDamage (recipient := a isPlayer) (kind := some .combat))) (draw
+                                                                                                  1)) ]) (did (Semantics.Subject.actor you) (surveil anyAmount) (Semantics.LookbackSpan.duration (soFarThisTurn) none)))
 theorem okDarkbladeAgentGrants : Ability.check (DRS.ofList []) darkbladeAgentGrants = [] := by decide
 /-- Frenzied Gorespawn -/
 def frenziedGorespawnMenaceTrigger : Ability :=
-  whenever (does (counted (orMore 1) isCreature) (attack anOpponent))
+  whenever (does ((Semantics.Subject.actor (counted (orMore 1) isCreature))) (attack anOpponent))
       (gain (those creature) menace untilEndOfTurn)
 theorem okFrenziedGorespawnMenaceTrigger :
     Ability.check (DRS.ofList []) frenziedGorespawnMenaceTrigger = [] := by decide
 /-- Pir, Imaginative Rascal's replacement -/
 def pirDistributive : Ability :=
-  (match (cardNamed "Pir, Imaginative Rascal") with
+  (match (Semantics.Cards.«Pir, Imaginative Rascal») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -317,7 +337,7 @@ def pirDistributive : Ability :=
 theorem okPirDistributive : Ability.check (DRS.ofList []) pirDistributive = [] := by decide
 
 /-- Tolaria, Shelkin Brownie -/
-def bandsWithOtherAbilities : KeywordTerm := (match (cardNamed "Shelkin Brownie") with
+def bandsWithOtherAbilities : KeywordTerm := (match (Semantics.Cards.«Shelkin Brownie») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.activated _ (Action.establish (StaticSpec.characteristicChange _
         (List.cons (CharacteristicEdit.removedAbilities (AbilitySelection.specified (List.cons
@@ -325,7 +345,7 @@ def bandsWithOtherAbilities : KeywordTerm := (match (cardNamed "Shelkin Brownie"
       | _ => none
     | _ => none).get (by decide)
 def protectionFromAnyColor : KeywordTerm :=
-  ((match (cardNamed "Escaped Shapeshifter") with
+  ((match (Semantics.Cards.«Escaped Shapeshifter») with
     | .singleFaced face => match face.characteristics.text with
       | .sameIsTrueFor _ keywords :: _ => keywords.filter fun
         | KeywordTerm.anyIn _ => true
@@ -335,13 +355,13 @@ def protectionFromAnyColor : KeywordTerm :=
 
 /-- Commander's Plate's equip lines -/
 def commandersPlateEquip : List Ability :=
-  [ equipQuality (hasDesignation commander) [generic 3],
-    equip [generic 5] ]
+  [ equipQuality (hasDesignation commander) (Semantics.Cost.mana [generic 3]),
+    equip (Semantics.Cost.mana [generic 5]) ]
 theorem okCommandersPlateEquip : Ability.checkText (DRS.ofList []) commandersPlateEquip = [] := by decide
 /-- Luxior, Giada's Gift's equip lines -/
 def luxiorEquipLines : List Ability :=
-  [ equipQuality isPlaneswalker [generic 1],
-    equip [generic 3] ]
+  [ equipQuality isPlaneswalker (Semantics.Cost.mana [generic 1]),
+    equip (Semantics.Cost.mana [generic 3]) ]
 theorem okLuxiorEquipLines : Ability.checkText (DRS.ofList []) luxiorEquipLines = [] := by decide
 
 /-- Bedrock Tortoise -/
@@ -351,7 +371,7 @@ theorem okBedrockTortoiseWindow : StaticSpec.check (DRS.ofList []) bedrockTortoi
 
 /-- Marit Lage -/
 def maritLage : CharacteristicBundle :=
-  (match (cardNamed "Dark Depths") with
+  (match (Semantics.Cards.«Dark Depths») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _
         (Action.withContinuation _ _ (Option.some (Action.ownScope _ (Action.createObject _
@@ -368,7 +388,7 @@ theorem okAmassZombiesTwo : Action.check (DRS.ofList []) amassZombiesTwo = [] :=
 
 /-- Arcanum Wings -- aura swap [CR#702.65a] -/
 def arcanumWingsAuraSwap : Ability :=
-  auraSwap [generic 2, pip .blue]
+  auraSwap (Semantics.Cost.mana [generic 2, pip .blue])
 theorem okArcanumWingsAuraSwap : Ability.check (DRS.ofList []) arcanumWingsAuraSwap = [] := by decide
 /-- Tovolar, Dire Overlord -/
 def tovolarNightfall : Action := setGameDesignation night
@@ -382,7 +402,7 @@ def pureHalf : Action := destroy (target (and [isPermanent, isMulticolored]))
 theorem okPureHalf : Action.check (DRS.ofList []) pureHalf = [] := by decide
 /-- Korlash -/
 def grandeurDiscardCost : Cost :=
-  (discard (a (and [named "Korlash, Heir to Blackblade", isOther, in_ yourHand])))
+  ((Semantics.Cost.perform (discard (a (and [named (Semantics.NameSource.printed ("Korlash, Heir to Blackblade")), isOther, in_ yourHand])))))
 theorem okGrandeurDiscardCost : Cost.check (DRS.ofList []) grandeurDiscardCost = [] := by decide
 /-- Gyruda, Doom of Depths -/
 def gyrudaCompanion : Ability := companion (everyCardIs isCard (manaValueParity .even))
@@ -394,11 +414,11 @@ theorem okJeganthaCompanion : Ability.check (DRS.ofList []) jeganthaCompanion = 
 def kaheeraCompanion : Ability :=
   companion
     (everyCardIs (and [isCreature, isCard])
-      (anyOf [ aCharacteristic cat,
-                aCharacteristic elemental,
-                aCharacteristic nightmare,
-                aCharacteristic dinosaur,
-                aCharacteristic beast ]))
+      (anyOf [ aCharacteristic (Semantics.Predicate.hasSubtype cat),
+                aCharacteristic (Semantics.Predicate.hasSubtype elemental),
+                aCharacteristic (Semantics.Predicate.hasSubtype nightmare),
+                aCharacteristic (Semantics.Predicate.hasSubtype dinosaur),
+                aCharacteristic (Semantics.Predicate.hasSubtype beast) ]))
 theorem okKaheeraCompanion : Ability.check (DRS.ofList []) kaheeraCompanion = [] := by decide
 /-- Keruga, the Macrosage -/
 def kerugaCompanion : Ability :=

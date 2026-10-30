@@ -25,6 +25,27 @@ reads them, and must find exactly one. A named link between two objects is a dec
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a counted the)
+open Semantics.Templates.Predicate (and or not did was)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+open Semantics.Templates.Location (and or not)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.TokenSpec (written)
+open Semantics.Templates.Timing (not)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.AbilityLost (written)
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.Condition (and did not or was)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a the)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.LinkedReadback
 
 /-- Sacrificing, as the refusals name the deed. -/
@@ -46,15 +67,15 @@ def sacrificeACreature : Ability :=
 
 /-- "When this enters, exile target card from a graveyard." -/
 def exileGraveyardCard : Ability :=
-  when (does thisPermanent enter) (exile (target (and [isCard, in_ graveyard])))
+  when (does (Semantics.Subject.actor (thisPermanent)) enter) (exile (target (and [isCard, in_ graveyard])))
 
 /-- "When this enters, exile up to two target cards from graveyards." -/
 def exileGraveyardCards : Ability :=
-  when (does thisPermanent enter) (exile (counted (upTo 2) (and [isCard, in_ graveyard])))
+  when (does (Semantics.Subject.actor (thisPermanent)) enter) (exile (counted (upTo 2) (and [isCard, in_ graveyard])))
 
 /-- "When this leaves the battlefield, return <subject> to the battlefield." -/
 def returnToTheBattlefield (subject : NounPhrase) : Ability :=
-  when (does thisPermanent leave) (returnToBattlefield subject [])
+  when (does (Semantics.Subject.actor (thisPermanent)) leave) (returnToBattlefield subject [])
 
 /-- Required pin: "the sacrificed creature's mana value" reads back the creature an additional
 cost sacrificed [CR#702.119a,607.2a]. -/
@@ -153,7 +174,7 @@ its owner's control". -/
 theorem okPronounAfterReadBack :
     Ability.checkText (DRS.ofList [])
       [ exileGraveyardCard,
-        when (does thisPermanent leave)
+        when (does (Semantics.Subject.actor (thisPermanent)) leave)
           (returnToBattlefield theExiledCard [.under (ownerOf it)]) ] = [] := by
   decide
 
@@ -180,7 +201,7 @@ theorem thisWayReadsNoLinkedEvent :
 ("whenever you sacrifice a creature") was sacrificed by something else. -/
 theorem badTriggerEventObjectNotLinked :
     Ability.checkText (DRS.ofList [])
-      [ when (does you (sacrifice (a isCreature))) (draw 1),
+      [ when (does (Semantics.Subject.actor (you)) (sacrifice (a isCreature))) (draw 1),
         spell (draw (statOf (.stat .manaValue) theSacrificed)) ] =
       [.participialDescription (.deed sacrificing) 0] := by
   decide
@@ -189,7 +210,7 @@ theorem badTriggerEventObjectNotLinked :
 -/
 theorem okExiledInsideHandoff :
     Ability.checkText (DRS.ofList [])
-      [ when (does thisPermanent enter)
+      [ when (does (Semantics.Subject.actor (thisPermanent)) enter)
           (instruct (target isOpponent) (may (exile (target (and [isCard, in_ graveyard]))))),
         returnToTheBattlefield theExiledCard ] = [] := by
   decide
@@ -198,7 +219,7 @@ theorem okExiledInsideHandoff :
 card from a graveyard; if you don't, exile target card from your hand" exiles one card. -/
 theorem okExclusiveArmsAreOnePlace :
     Ability.checkText (DRS.ofList [])
-      [ when (does thisPermanent enter)
+      [ when (does (Semantics.Subject.actor (thisPermanent)) enter)
           (mayOrElse (exile (target (and [isCard, in_ graveyard])))
             (exile (target (and [isCard, in_ yourHand])))),
         returnToTheBattlefield theExiledCard ] = [] := by
@@ -208,7 +229,7 @@ theorem okExclusiveArmsAreOnePlace :
 arm: after four optional choices, the exile on the first choice's second arm is still read. -/
 theorem okArmAfterManyOptions :
     Ability.checkText (DRS.ofList [])
-      [ when (does thisPermanent enter)
+      [ when (does (Semantics.Subject.actor (thisPermanent)) enter)
           (sequentially
             [ mayOrElse (draw 1) (exile (target (and [isCard, in_ graveyard]))),
               may (draw 1), may (draw 1), may (draw 1) ]),
@@ -220,7 +241,7 @@ what the object was, not as a zone it is in now, since `isPermanent` is that loc
 exiled from the battlefield is read though it is in exile. -/
 theorem gapBattlefieldLocationIsNotAZone :
     Ability.checkText (DRS.ofList [])
-      [ when (does thisPermanent enter) (exile (target isCreature)),
+      [ when (does (Semantics.Subject.actor (thisPermanent)) enter) (exile (target isCreature)),
         returnToTheBattlefield (the (and [was (exile which), in_ battlefield])) ] = [] := by
   decide
 
@@ -247,8 +268,8 @@ Trickery* ("Counter target spell if it was kicked.") and *Merfolk Falconer* ("Wh
 kicked spell, scry 2.") read the kicker cost of a spell neither prints [CR#702.33d], and both are
 spelled and check clean. -/
 theorem kickedReadsAnotherSpellsKicker :
-    (cardNamed "Ertai's Trickery").check = [] ∧ (cardNamed "Merfolk Falconer").check = [] :=
-  ⟨cardNamedOk "Ertai's Trickery", cardNamedOk "Merfolk Falconer"⟩
+    (Semantics.Cards.«Ertai's Trickery»).check = [] ∧ (Semantics.Cards.«Merfolk Falconer»).check = [] :=
+  ⟨(by decide), (by decide)⟩
 
 /-- Required pin: "exile it haunting target creature" relates two objects [CR#702.55a]. -/
 theorem okRelateHaunting :
@@ -354,7 +375,7 @@ namespace MutateTarget
 own", reading the target back as `description` does. -/
 def merges (description : NounPhrase) : Ability :=
   static
-    (.replace (would thisSpell enter)
+    (.replace (would (Semantics.Subject.actor (thisSpell)) enter)
       (instead (chooseOne (.merge thisSpell description .top) (.merge thisSpell description .bottom)))
       none .repeatedly none)
 
@@ -369,7 +390,7 @@ theorem okReadsAddedTarget :
 /-- The same target, read with this spell as the subject that targets it. -/
 theorem okReadsTargetOfThisSpell :
     Ability.checkText (DRS.ofList [])
-      [addsCreatureTarget, merges (the (did thisSpell (target which)))] = [] := by
+      [addsCreatureTarget, merges (the (did (Semantics.Subject.actor (thisSpell)) (target which)))] = [] := by
   decide
 
 /-- Required pin: with no target added, there is none to read. -/
@@ -394,7 +415,7 @@ creature card the first ability put onto the battlefield is no Contrast Anchor f
 ability's bare "another target creature", nor a group "the rest" is taken from. The anchor is
 the Source. -/
 theorem linkedTargetAnchorsNoBareOther :
-    let first := when (does thisCreature enter)
+    let first := when (does (Semantics.Subject.actor (thisCreature)) enter)
       (putOntoBattlefield (target (and [isCreature, in_ yourGraveyard])))
     let tapOther := tap (target (and [isCreature, isOther]))
     let context := Ability.textContext (DRS.ofList []) first
@@ -415,14 +436,14 @@ there, never a pronoun. -/
 
 /-- "When this token leaves the battlefield, return the exiled card to its owner's graveyard." -/
 def hofriTokenAbility (exiled : NounPhrase) : Ability :=
-  when (does thisToken leave) (returnTo exiled (graveyardOf (ownerOf it)) [])
+  when (does (Semantics.Subject.actor (thisToken)) leave) (returnTo exiled (graveyardOf (ownerOf it)) [])
 
 /-- Hofri Ghostforge: "Whenever another nontoken creature you control dies, exile it. If you do,
 create a token that's a copy of that creature, except it's a Spirit in addition to its other
 types and it has 'When this token leaves the battlefield, return the exiled card to its owner's
 graveyard.'" -/
 def hofriGhostforge (exiled : NounPhrase) : Ability :=
-  whenever (does (a (and [isCreature, isNontoken, youControl, isOther])) die)
+  whenever (does ((Semantics.Subject.actor (a (and [isCreature, isNontoken, youControl, isOther])))) die)
     (doIfDone (exile it)
       (some (create 1 (copyOf (that creature)
         [isAlso (subtypes := [spirit]), alsoHas (hofriTokenAbility exiled)]) [])))
@@ -443,11 +464,11 @@ artifact creature in addition to its other types and it has '{2}, {T}, Sacrifice
 gain 3 life.'" The copy reads the creature that died, exiled since [CR#707.2,608.2h]. -/
 theorem okBrenardGingerSculptor :
     Ability.check (DRS.ofList [])
-      (whenever (does (a (and [isCreature, isNontoken, youControl, isOther])) die)
+      (whenever (does ((Semantics.Subject.actor (a (and [isCreature, isNontoken, youControl, isOther])))) die)
         (may (exile it)
           (some (create 1 (copyOf (that creature)
-            [ isAlso [.artifact, .creature] [food, golem], hasPT 1 1,
-              alsoHas (activated (compound [[generic 2], tapSymbol, sacrifice thisToken])
+            [ isAlso (some [.artifact, .creature]) [food, golem], hasPT 1 1,
+              alsoHas (activated (compound [(Semantics.Cost.mana ([generic 2])), tapSymbol, (Semantics.Cost.perform (sacrifice thisToken))])
                 (gainLife 3)) ]) [])))) = [] := by
   decide
 
@@ -455,8 +476,8 @@ theorem okBrenardGingerSculptor :
 copy of that creature, except it has this ability." [CR#707.2,608.2h] -/
 theorem okCemeteryPuca :
     Ability.check (DRS.ofList [])
-      (whenever (does (a isCreature) die)
-        (may (pay [generic 1] .once)
+      (whenever (does ((Semantics.Subject.actor (a isCreature))) die)
+        (may (pay (Semantics.Cost.mana ([generic 1])) .once)
           (some (.establish (copyChange thisCreature (that creature) [exceptThisAbility])
             none)))) = [] := by
   decide
@@ -466,14 +487,14 @@ and exile it. If you do, create a 1/1 black Bat creature token with flying. It g
 token deals combat damage to a player, sacrifice it and return the exiled card to the
 battlefield tapped.'" -/
 def timotharBaronOfBats : Ability :=
-  whenever (does (a (and [vampire, isNontoken, youControl, isOther])) die)
-    (may (sequentially [pay [generic 1] .once, exile it])
+  whenever (does ((Semantics.Subject.actor (a (and [(Semantics.Predicate.hasSubtype (vampire)), isNontoken, youControl, isOther])))) die)
+    (may (sequentially [pay (Semantics.Cost.mana ([generic 1])) .once, exile it])
       (some (sequentially
         [ create 1 (written { characteristics :=
             { colors := [.black], types := [.creature], subtypes := [bat],
               text := [flying], power := stat 1, toughness := stat 1 } }),
           gain it
-            (when (does thisToken (dealDamage (recipient := a isPlayer) (kind := some .combat)))
+            (when (does (Semantics.Subject.actor (thisToken)) (dealDamage (recipient := a isPlayer) (kind := some .combat)))
               (sequentially
                 [ sacrifice it,
                   returnToBattlefield theExiledCard [.entersAs .tapped] ])) ])))
@@ -488,8 +509,8 @@ you do, you get an emblem with 'When this leaves …, return the exiled card …
 card back, and not by a pronoun. -/
 theorem okEmblemReadsTheExiledCard :
     let emblemOver (exiled : NounPhrase) : Ability :=
-      when (does thisCreature die) (doIfDone (exile it)
-        (some (getEmblem [whenever (does you (cast (a isSpell)))
+      when (does (Semantics.Subject.actor (thisCreature)) die) (doIfDone (exile it)
+        (some (getEmblem [whenever (does (Semantics.Subject.actor (you)) (cast (a isSpell)))
           (returnTo exiled (graveyardOf (ownerOf it)) [])])))
     Ability.check (DRS.ofList []) (emblemOver theExiledCard) = [] ∧
       Ability.check (DRS.ofList []) (emblemOver (that card)) = [.anaphor (.word .card) .one 0] := by
@@ -523,20 +544,20 @@ def putTargetCreatureCard : Action :=
 
 /-- "When this enchantment enters, <steps>." -/
 def entering (steps : List Action) : Ability :=
-  when (does thisEnchantment enter) (sequentially steps)
+  when (does (Semantics.Subject.actor (thisEnchantment)) enter) (sequentially steps)
 
 /-- Required pin: Necromancy as printed [CR#607.2c,603.7a]. -/
-theorem okNecromancy : (cardNamed "Necromancy").check = [] :=
-  cardNamedOk "Necromancy"
+theorem okNecromancy : (Semantics.Cards.«Necromancy»).check = [] :=
+  (by decide)
 
 /-- Required pin: Animate Dead as printed; its return puts the creature onto the battlefield
 [CR#607.2c]. -/
-theorem okAnimateDead : (cardNamed "Animate Dead").check = [] :=
-  cardNamedOk "Animate Dead"
+theorem okAnimateDead : (Semantics.Cards.«Animate Dead»).check = [] :=
+  (by decide)
 
 /-- Required pin: Dance of the Dead as printed. -/
-theorem okDanceOfTheDead : (cardNamed "Dance of the Dead").check = [] :=
-  cardNamedOk "Dance of the Dead"
+theorem okDanceOfTheDead : (Semantics.Cards.«Dance of the Dead»).check = [] :=
+  (by decide)
 
 /-- The granted quality reads the put whichever side of the grant it is on [CR#607.1,607.1a]. -/
 theorem okPutBeforeOrAfterTheGrant :
@@ -589,7 +610,7 @@ theorem badTwoLinkedPuts :
 one exiled before [CR#607.1a,607.2a]. -/
 theorem okGrantReadsLaterExile :
     let grant := establish (abilityGrant it
-      (when (does thisEnchantment leave) (returnToBattlefield theExiledCard [])))
+      (when (does (Semantics.Subject.actor (thisEnchantment)) leave) (returnToBattlefield theExiledCard [])))
     let exileCard := exile (target creatureCardInAGraveyard)
     Ability.check (DRS.ofList []) (entering [grant, exileCard]) = [] ∧
       Ability.check (DRS.ofList []) (entering [exileCard, grant]) = [] := by
@@ -601,16 +622,16 @@ end LinkedEntry
 you gain 3 life." [CR#702.33f]. -/
 theorem okFirstKickerRead :
     Ability.check (DRS.ofList [])
-      (when (does thisCreature enter)
-        (if_ := costWasPaid (.byNthKeyword (.nth 1) kicker) none thisCreature) (gainLife 3)) = [] := by
+      (when (does (Semantics.Subject.actor (thisCreature)) enter)
+        (if_ := costWasPaid (.byNthKeyword (.nth 1) kicker.label) none thisCreature) (gainLife 3)) = [] := by
   decide
 
 /-- "… if it was kicked with its zeroth kicker …": a Link Source's ordinal counts from the first
 of its keyword's costs [CR#702.33f], so the zeroth names none. -/
 theorem badZerothKickerRead :
     Ability.check (DRS.ofList [])
-      (when (does thisCreature enter)
-        (if_ := costWasPaid (.byNthKeyword (.nth 0) kicker) none thisCreature) (gainLife 3)) =
+      (when (does (Semantics.Subject.actor (thisCreature)) enter)
+        (if_ := costWasPaid (.byNthKeyword (.nth 0) kicker.label) none thisCreature) (gainLife 3)) =
       [.linkedFacetNamed] := by
   decide
 

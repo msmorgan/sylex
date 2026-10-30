@@ -17,6 +17,12 @@ instant.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Option.Amount (stat)
+
+open Semantics.Templates.CharacteristicEdit (stat)
+open Semantics.Templates.CostShift (generic)
+
 namespace Semantics.Proofs.GiftVariants
 
 /-- Both variants check with no class context. -/

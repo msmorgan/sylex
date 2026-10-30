@@ -2,11 +2,11 @@ import Generated.Canon
 import SylFixtures
 import NormalFixtures
 import LegacyFixtures
-import SylGen.Parser
+import SylGen.Emit
 import Semantics.CanonCheck
 
-example : @SylFixture.Semantics.Primitives.Action.doForEachKind =
-    @Semantics.Primitives.Action.doForEachKind := rfl
+example : @SylFixture.Semantics.Templates.Action.doForEachKind =
+    @Semantics.Templates.doForEachKind := rfl
 example : SylFixture.Semantics.Templates.actionSearch = Semantics.Templates.actionSearch := rfl
 example : SylFixture.Semantics.Templates.actionPay = Semantics.Templates.actionPay := rfl
 
@@ -35,7 +35,7 @@ example : SylFixture.Semantics.Definitions.flying = Semantics.Definitions.flying
 open Semantics in
 example (who : NounPhrase) :
     SylFixture.Semantics.Templates.repeatedNoun who =
-      Templates.and [
+      Templates.Condition.and [
         Templates.is (.firstMention "repeatedNoun.who" who) Templates.isCreature,
         Templates.is (.laterMention "repeatedNoun.who" who) Templates.isCreature] := rfl
 
@@ -49,7 +49,7 @@ example (who : NounPhrase) :
 open Semantics in
 example (who : NounPhrase) :
     SylFixture.Semantics.Templates.eachKind who =
-      Primitives.Action.doForEachKind .color (some (.firstMention "eachKind.who" who)) .color
+      Action.doForEachKind .color (some (.firstMention "eachKind.who" who)) .color
         (Templates.instruct (.laterMention "eachKind.who" who) (Templates.draw 1)) := rfl
 
 example : SylFixture.Semantics.Templates.omittedArgument = (-1 : Int) := rfl
@@ -103,50 +103,40 @@ example : NormalFixture.Semantics.Definitions.withoutDeed =
 example : NormalFixture.Semantics.Definitions.wordDeed.deed =
     Semantics.Deed.action "customWord" := rfl
 
-namespace Round2Expected
-open Semantics Semantics.Templates
-template recordOrder (who : NounPhrase) : DidClause := {
-  body := { action := instruct who (draw 1), within := none, subj := actor who }
-}
-ability_word alreadyWord (ability : Ability) : Ability := {
-  label := "outer", body := italicHead (.abilityWord (.named "inner")) ability
-}
-ability_word repeatedAbilityWord (who : NounPhrase) : Ability := {
-  label := "repeated", body := spell (simultaneously [instruct who (draw 1), instruct who (draw 1)])
-}
-end Round2Expected
-example : SylFixture.Semantics.Templates.recordOrder = Round2Expected.recordOrder := rfl
-example : SylFixture.Semantics.Definitions.alreadyWord = Round2Expected.alreadyWord := rfl
-example : SylFixture.Semantics.Definitions.repeatedAbilityWord = Round2Expected.repeatedAbilityWord := rfl
+open Semantics in
+example (who : NounPhrase) : SylFixture.Semantics.Templates.recordOrder who =
+    { subj := .actor (.firstMention "recordOrder.who" who),
+      action := Templates.instruct (.laterMention "recordOrder.who" who) (Templates.draw 1),
+      within := none } := rfl
+open Semantics in
+example (ability : Ability) : SylFixture.Semantics.Definitions.alreadyWord ability =
+    .italicHead (.abilityWord (.named "inner")) ability := rfl
+open Semantics in
+example (who : NounPhrase) : SylFixture.Semantics.Definitions.repeatedAbilityWord who =
+    Templates.abilityWord (.named "repeated") (Templates.Ability.spell
+      (Templates.simultaneously [
+        Templates.instruct who (Templates.draw 1),
+        Templates.instruct who (Templates.draw 1)])) := rfl
 
 open Lean in
 run_cmd do
   let env ← getEnv
-  let entries := Semantics.Authoring.expectedTypeDispatchExt.getState env
+  let entries := Semantics.Registry.expectedTypeDispatchExt.getState env
   unless ((entries.find? `fight).getD []).any
       (·.declaration == `SylFixture.Semantics.Definitions.fight) do
     throwError "generated declaration missing from dispatch registry"
-  unless (Semantics.Authoring.canonCardsExt.getState env).any
+  unless (Semantics.Registry.canonCardsExt.getState env).any
       (·.declaration == `SylFixture.Semantics.Cards.Forest) do
     throwError "generated card missing from canon registry"
   for name in [`SylFixture.Semantics.Definitions.flying.term,
       `NormalFixture.Semantics.Definitions.withoutDeed.deed,
       `NormalFixture.Semantics.Definitions.abilityDeed.deed] do
     if env.contains name then throwError "unexpected generated constant {name}"
-  unless Semantics.Authoring.templateAttribute.hasTag env
-      `SylFixture.Semantics.Templates.yourHand do throwError "missing template attribute"
-  unless Semantics.Authoring.definitionAttribute.hasTag env
-      `SylFixture.Semantics.Definitions.fight do throwError "missing definition attribute"
-  unless Semantics.Authoring.bundleRegistryAttribute.hasTag env
-      `SylFixture.Semantics.Definitions.aegisCounter do throwError "missing registry attribute"
   unless ((entries.find? `in).getD []).isEmpty do
     throwError "unexpected surface-spelling dispatch entry"
   unless ((entries.find? `in_).getD []).any
       (·.declaration == `NormalFixture.Semantics.Templates.in_) do
     throwError "missing Lean-spelling dispatch entry"
-  unless Semantics.Authoring.primitiveAttribute.hasTag env
-      `SylFixture.Semantics.Primitives.Action.doForEachKind do
-    throwError "missing primitive attribute"
 
 example : (match SylGen.parse "header.syl" "# File header\n\ntemplate x: Int { body = 1 }" with
     | .ok ds => ds[0]!.documentation.isEmpty
@@ -192,7 +182,6 @@ example : NormalFixture.Semantics.Templates.or (value := 5) = (5 : Int) := rfl
 example : NormalFixture.Semantics.Definitions.calledDeed.deed =
     Semantics.Deed.action "customWord" := rfl
 
-example : NormalFixture.Semantics.Primitives.Delta.up 2 = Semantics.Delta.up (Semantics.Amount.lit 2) := rfl
 example : NormalFixture.Semantics.Templates.naturalInteger 3 = (3 : Int) := rfl
 example : NormalFixture.Semantics.Templates.colorSelection = Semantics.ColorSpec.some [.blue] := rfl
 example : NormalFixture.Semantics.Templates.callsWithLocalName .you = Semantics.Subject.actor .you := rfl
@@ -204,14 +193,14 @@ open LegacyFixture.Semantics.Definitions LegacyFixture.Semantics.Templates
 example : LegacyFixture.Semantics.Cards.«Bundle fixture».check = [] := by decide
 example : bundleQuality = bundleAtom := rfl
 example : Action.bundleShared = Semantics.Action.ownScope (some (.action "bundleShared" .none)) bundleDraw := rfl
-example : Ability.bundleShared = .keyword (.named "bundleShared") [] [spell Action.bundleShared] := rfl
+example : Ability.bundleShared = .keyword (.named "bundleShared") [] [Semantics.Templates.Ability.spell Action.bundleShared] := rfl
 example : aQuality = Semantics.Predicate.and [Semantics.Predicate.isToken, Semantics.Predicate.isCard] := rfl
 example : aSubject = Semantics.NounPhrase.you := rfl
 example (subject : NounPhrase) : Action.bundleDevour subject =
     Semantics.Action.ownScope (some (.ofAbility (.named "bundle devour")))
       (Semantics.Definitions.sacrifice (.firstMention "bundleDevour.subject" (.inCaller subject))) := rfl
 example : Ability.bundleDevour = Semantics.Ability.keyword (.named "bundle devour") []
-    [spell (Action.bundleDevour thisCreature)] := rfl
+    [Semantics.Templates.Ability.spell (Action.bundleDevour thisCreature)] := rfl
 theorem registryConferralMayReferToItsCatalogValue : bundleBearer_definition = .subtype bundleBearer [bundleConferral] := rfl
 theorem appliedReturnTypeInBundle : bundlePredicates = [hasSubtype bundleBearer] := rfl
 end LegacyBundlePins
@@ -225,5 +214,63 @@ check_canon_card "checkWitness.syl"
 example : Card.check checkWitness = [] := ok_checkWitness
 theorem canonCardIsCheckedByItsCheckModule :
     Card.check «Canon Witness» = [] := «ok_Canon Witness»
-example : Authoring.cardFileName "Canon Witness: Split" = "Canon Witness{colon} Split.syl" := by native_decide
+example : Registry.cardFileName "Canon Witness: Split" = "Canon Witness{colon} Split.syl" := by native_decide
 end GeneratedCanonPins
+
+namespace DispatchContract
+open Semantics NormalFixture.Semantics.Templates NormalFixture.Semantics.Definitions
+
+theorem parameterShadowsEnum : parameterShadowsWord .red = .red := rfl
+theorem parameterWrapsOption : optionalParameter .red = some .red := rfl
+theorem parameterKeepsExactOption : exactOptionalParameter none = none := rfl
+theorem closedEnumWords : enumWords = [.legendary, .basic] := rfl
+theorem optionalClosedEnum : optionalEnum = some .upkeep := rfl
+theorem directManaAtoms : manaAtoms = [.simple (.generic 2), .simple (.specific (.of .blue))] := rfl
+theorem optionalNumericAtom : optionalAmount = some (.lit 3) := rfl
+theorem abilityAtLabel : definitionLabel = sourceAbility.label := rfl
+theorem abilityAtTerm : definitionTerm = .the sourceAbility.label := rfl
+theorem actionAtDeed : actionDeed = calledDeed.deed := rfl
+theorem definitionWrapsCaller (subject : NounPhrase) : callerWrapped subject =
+    .ownScope (some (.action "callerWrapped"))
+      (.setStatus .tapped (.firstMention "callerWrapped.subject" (.inCaller subject))) := rfl
+theorem templateRepeatsSelection (subject : NounPhrase) : repeatedSelection subject =
+    .sequentially [
+      .setStatus .tapped (.firstMention "repeatedSelection.subject" subject),
+      .setStatus .untapped (.laterMention "repeatedSelection.subject" subject)] := rfl
+end DispatchContract
+
+open Semantics in
+theorem generatedActorKeepsDynamicHandoffReads :
+    SylFixture.Semantics.Definitions.actorAcrossControllerHandoff =
+      .ownScope (some (.action "actorAcrossControllerHandoff"))
+        (Templates.instruct
+          (Templates.controllerOf (.firstMention "actorAcrossControllerHandoff.actor" Templates.theActor))
+          (Templates.instruct .actor
+            (Definitions.sacrifice (.laterMention "actorAcrossControllerHandoff.actor" Templates.theActor)))) := rfl
+
+private def namesFor (root : Lean.Name) (source : String) : Option (List Lean.Name) := do
+  let declarations ← (SylGen.parse "naming.syl" source).toOption
+  return declarations.toList.map (fun d => SylGen.declarationName root d declarations)
+
+example : namesFor .anonymous
+    "template item: Int { body = 1 } template item: Bool { body = true }" =
+    .some [`Semantics.Templates.Int.item, `Semantics.Templates.Bool.item] := by native_decide
+
+/-- The same overloaded declarations receive the same names in either discovery order. -/
+theorem sharedNamesDoNotDependOnLoadOrder :
+    (namesFor .anonymous
+      "template item: Int { body = 1 } template item: Bool { body = true }").map List.reverse =
+    namesFor .anonymous
+      "template item: Bool { body = true } template item: Int { body = 1 }" := by native_decide
+
+/-- A body-less primitive has the same placement under either root. -/
+theorem samePrimitivePlacementForEveryRoot :
+    namesFor .anonymous "primitive lit(value: Int): Amount" =
+      .some [`Semantics.Templates.lit] ∧
+    namesFor `Fixture "primitive lit(value: Int): Amount" =
+      .some [`Fixture.Semantics.Templates.lit] := by native_decide
+
+theorem parameterAbilityWordKeepsItsOuterHeading (ability : Semantics.Ability) :
+    SylFixture.Semantics.Definitions.threshold (.italicHead (.abilityWord (.named "inner")) ability) =
+      .italicHead (.abilityWord (.named "threshold"))
+        (.italicHead (.abilityWord (.named "inner")) ability) := rfl

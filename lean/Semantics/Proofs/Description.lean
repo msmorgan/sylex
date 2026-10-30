@@ -16,6 +16,17 @@ The pins keep the Idris names and docstrings (the sentence each refuses).
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a each counted the)
+open Semantics.Templates.Predicate (and was isAttached)
+open Semantics.Templates.Location (and)
+open Semantics.Templates.NounPhrase (and)
+open Semantics.Templates.Replacement (doIf)
+
+open Semantics.Templates.Action (doIf target)
+open Semantics.Templates.Condition (and isAttached was)
+open Semantics.Templates.DetPhrase (a each the)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Proofs.Description
 
 /-- "a creature target opponent controls" -/
@@ -527,23 +538,23 @@ theorem okTokenAndPermanent : Predicate.checkAt .object (DRS.ofList []) tokenOnT
 
 /-- "Target creature can't attack this turn." -/
 theorem okCantAttackCreature :
-    Action.check (DRS.ofList []) (establish (cant (target isCreature) attack) (some thisTurn)) = [] := by decide
+    Action.check (DRS.ofList []) (establish (cant ((Semantics.Subject.actor (target isCreature))) attack) (some thisTurn)) = [] := by decide
 
 /-- "Target land can't attack this turn." [CR#508.1a,205.1b] -/
 theorem okCantAttackLand :
-    Action.check (DRS.ofList []) (establish (cant (target isLand) attack) (some thisTurn)) = [] := by decide
+    Action.check (DRS.ofList []) (establish (cant ((Semantics.Subject.actor (target isLand))) attack) (some thisTurn)) = [] := by decide
 
 /-- "Target land can't attack." -/
-theorem okCantAttackLandNoSpan : Action.check (DRS.ofList []) (establish (cant (target isLand) attack) none) = [] := by
+theorem okCantAttackLandNoSpan : Action.check (DRS.ofList []) (establish (cant ((Semantics.Subject.actor (target isLand))) attack) none) = [] := by
     decide
 
 /-- "Target creature can't block this turn." -/
 theorem okCantBlockCreature :
-    Action.check (DRS.ofList []) (establish (cant (target isCreature) block) (some thisTurn)) = [] := by decide
+    Action.check (DRS.ofList []) (establish (cant ((Semantics.Subject.actor (target isCreature))) block) (some thisTurn)) = [] := by decide
 
 /-- "Target creature or land can't block this turn." [CR#205.1b,509.1a] -/
 theorem okCantDisjunctSubject :
-    Action.check (DRS.ofList []) (establish (cant (target (.or [isCreature, isLand])) block) (some thisTurn)) = [] := by
+    Action.check (DRS.ofList []) (establish (cant ((Semantics.Subject.actor (target (.or [isCreature, isLand])))) block) (some thisTurn)) = [] := by
         decide
 
 /-- "your party": one each of Cleric, Rogue, Warrior and Wizard [CR#700.8]. -/

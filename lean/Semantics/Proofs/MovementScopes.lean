@@ -3,6 +3,13 @@ import Semantics.Proofs.Helpers
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a)
+
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Ability (spell)
+open Semantics.Templates.DetPhrase (a)
+open Semantics.Templates.NounWord (creature)
+
 namespace Semantics.Proofs.MovementScopes
 
 private def original : DRS := DRS.ofList [

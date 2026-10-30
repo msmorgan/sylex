@@ -13,6 +13,14 @@ qualifier on it (`docs/decisions/semantics-v2.md` §7, ruling 2026-10-09). `Abil
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.Timing (duringPart)
+open Semantics.Definitions.Ability (solved infinity)
+
+open Semantics.Definitions.DesignationLabel (solved)
+open Semantics.Definitions.Subtype (infinity)
+open Semantics.Templates.Action (target)
+open Semantics.Templates.Condition (duringPart)
+
 namespace Semantics.Proofs.AbilityQualifiers
 
 def backupLabel : KeywordLabel := .named "backup"
@@ -22,7 +30,7 @@ def tapToDraw : Ability := activated .tapSymbol (draw 1)
 /-- "This creature gets +1/+0." -/
 def pumpSelf : Ability := .static (Templates.modification thisCreature .power (.up 1))
 /-- "When this creature dies, draw a card." -/
-def drawOnDeath : Ability := when (does thisCreature die) (draw 1)
+def drawOnDeath : Ability := when (does (Semantics.Subject.actor thisCreature) die) (draw 1)
 /-- "this Case is solved" -/
 def caseSolved : Condition := .matches thisCase (.hasDesignation (.named "solved" (.heldBy .object)) none)
 

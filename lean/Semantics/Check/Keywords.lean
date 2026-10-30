@@ -77,7 +77,7 @@ def AbilityWordLabel.known : AbilityWordLabel → Bool
   | .named name => abilityWordNames.contains name
 
 /-- Whether a label names a keyword. Every label a card can write is the authored constant of a
-keyword Definition (`Authoring.keywordLabelConstant`). -/
+keyword Definition (the generated `label` declaration). -/
 def KeywordLabel.namesKeyword : KeywordLabel → Bool
   | .named name => !name.isEmpty
 

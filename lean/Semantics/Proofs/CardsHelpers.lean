@@ -17,9 +17,25 @@ rather than whole card test suites.
 
 open Semantics Semantics.Templates Semantics.Definitions
 
+open Semantics.Templates.NounPhrase (a counted)
+open Semantics.Templates.Predicate (and or)
+open Semantics.Templates.ManaSymbol (generic)
+open Semantics.Templates.Location (and or)
+open Semantics.Templates.NounPhrase (and or)
+open Semantics.Templates.StaticSpec (replace)
+
+open Semantics.Definitions.Ability (crew saddle)
+open Semantics.Definitions.CardType (creature)
+open Semantics.Templates.Action (crew replace saddle target)
+open Semantics.Templates.Condition (and or)
+open Semantics.Templates.CostShift (generic)
+open Semantics.Templates.DetPhrase (a the)
+open Semantics.Templates.NounWord (creature)
+open Semantics.Templates.SliceCount (counted)
+
 namespace Semantics.Cards
 
-def targetPlayerOrPlaneswalker : NounPhrase := (match (cardNamed "Heart of Bogardan") with
+def targetPlayerOrPlaneswalker : NounPhrase := (match (Semantics.Cards.«Heart of Bogardan») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
         (Action.simultaneously (List.cons (Action.instruct _ (Action.dealDamage _ part _)) _)) _)))
@@ -34,13 +50,13 @@ theorem okTargetOpponentOrPlaneswalker :
     NounPhrase.checkAt none (DRS.ofList []) targetOpponentOrPlaneswalker = [] := by decide
 
 /-- Bioplasm -/
-def bioplasmAttack : GameEvent := (match (cardNamed "Bioplasm") with
+def bioplasmAttack : GameEvent := (match (Semantics.Cards.«Bioplasm») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered part _ _ _ _ _ _ _) _) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okBioplasmAttack : GameEvent.check (DRS.ofList []) bioplasmAttack = [] := by decide
-def bioplasmExile : Action := (match (cardNamed "Bioplasm") with
+def bioplasmExile : Action := (match (Semantics.Cards.«Bioplasm») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons part _))) _) =>
         some part
@@ -58,7 +74,7 @@ theorem okPhyrexianInfiltrator : Action.check (DRS.ofList []) phyrexianInfiltrat
 
 /-- Vedalken Squirrel-Whacker -/
 def vedalkenSquirrelWhackerReroll : Action :=
-  replaceEvent (would you (rollDice anyAmount (.sides 6)))
+  replaceEvent (would (Semantics.Subject.actor you) (rollDice anyAmount (.sides 6)))
     (instead (sequentially
       [ rollDice thatMuch .thoseDice,
         may
@@ -71,7 +87,7 @@ theorem okVedalkenSquirrelWhackerReroll :
 
 /-- "each creature that player or that planeswalker's controller controls" -/
 def eachCreatureThatSplitControls : NounPhrase :=
-  (match (cardNamed "Heart of Bogardan") with
+  (match (Semantics.Cards.«Heart of Bogardan») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
         (Action.simultaneously (List.cons _ (List.cons (Action.instruct _ (Action.dealDamage _ part
@@ -81,7 +97,7 @@ def eachCreatureThatSplitControls : NounPhrase :=
 
 /-- Boreas Charger's description -/
 def opponentWithMoreLands : Predicate :=
-  (match (cardNamed "Land Tax") with
+  (match (Semantics.Cards.«Land Tax») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered _ _ _ _ _ _ (Option.some (Condition.exists_
         (NounPhrase.described _ part))) _) _) => some part
@@ -90,7 +106,7 @@ def opponentWithMoreLands : Predicate :=
 theorem okOpponentWithMoreLands :
     Predicate.checkAt .player (DRS.ofList []) opponentWithMoreLands = [] := by decide
 
-def bioplasmCardTest : Condition := (match (cardNamed "Bioplasm") with
+def bioplasmCardTest : Condition := (match (Semantics.Cards.«Bioplasm») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons
         (Action.doIf part _ _ _) _)))) _) => some part
@@ -102,7 +118,7 @@ def bioplasmAfterTest : DRS :=
   (stepCondition 512 (nextClause bioplasmAfterExile) bioplasmCardTest).1
 
 /-- Tahngarth, First Mate -/
-def tahngarthHeader : GameEvent := does anOpponent (attackWith (counted (orMore 1) isCreature))
+def tahngarthHeader : GameEvent := does (Semantics.Subject.actor anOpponent) (attackWith (counted (orMore 1) isCreature))
 theorem okTahngarthHeader : GameEvent.check (DRS.ofList []) tahngarthHeader = [] := by decide
 
 def ashnodsBattleGear : Ability := static (mayDeclineUntap thisArtifact you)
@@ -124,7 +140,7 @@ cost (the `keyword` field) is the event a replacement watches, and paying {0} is
 in its place, the shape an "instead" effect takes [CR#614.1a]. Declining the `may` leaves the
 echo cost to be paid. -/
 def thickSkinnedGoblinEchoPayment : Ability :=
-  (match (cardNamed "Thick-Skinned Goblin") with
+  (match (Semantics.Cards.«Thick-Skinned Goblin») with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -142,14 +158,14 @@ def sameIsTrueForFamilies (card : Card) : List KeywordTerm :=
     | _ => []
   | _ => []
 def protectionAbilities : KeywordTerm :=
-  ((sameIsTrueForFamilies (cardNamed "Concerted Effort"))[1]?).get (by decide)
+  ((sameIsTrueForFamilies (Semantics.Cards.«Concerted Effort»))[1]?).get (by decide)
 def landwalkAbilities : KeywordTerm :=
-  ((sameIsTrueForFamilies (cardNamed "Cairn Wanderer"))[0]?).get (by decide)
+  ((sameIsTrueForFamilies (Semantics.Cards.«Cairn Wanderer»))[0]?).get (by decide)
 /-- Hexproof and each "hexproof from [quality]" [CR#702.11d]. -/
 def hexproofAbilities : KeywordTerm :=
-  ((sameIsTrueForFamilies (cardNamed "Odric, Lunarch Marshal"))[0]?).get (by decide)
+  ((sameIsTrueForFamilies (Semantics.Cards.«Odric, Lunarch Marshal»))[0]?).get (by decide)
 /-- Shay Cormac -/
-def wardAbilities : KeywordTerm := .anyIn ⟨ward, none⟩
+def wardAbilities : KeywordTerm := .anyIn ⟨ward.label, none⟩
 
 /-- Avarice Totem -/
 def avariceTotemExchange : Action :=
@@ -160,15 +176,15 @@ theorem okAvariceTotemExchange : Action.check (DRS.ofList []) avariceTotemExchan
 2 greater.", indicative as Hotshot Mechanic's is [CR#609.4]. -/
 def cloudspireCaptainCrewLine : StaticSpec :=
   conjunction
-    [ asThough thisCreature (saddle (allOf (hasSubtype mount))) (greaterBy .power 2),
-      asThough thisCreature (crew (allOf (hasSubtype vehicle))) (greaterBy .power 2) ]
+    [ asThough (Semantics.Subject.actor thisCreature) (saddle (allOf (hasSubtype mount))) (greaterBy .power 2),
+      asThough (Semantics.Subject.actor thisCreature) (crew (allOf (hasSubtype vehicle))) (greaterBy .power 2) ]
 theorem okCloudspireCaptainCrewLine :
     StaticSpec.check (DRS.ofList []) cloudspireCaptainCrewLine = [] := by
   decide
 
 /-- Soul Conduit -/
 def soulConduitExchange : Ability :=
-  activated (compound [[generic 6], tapSymbol])
+  activated (compound [(Semantics.Cost.mana [generic 6]), tapSymbol])
     (exchangeLifeTotals (targets (exactly 2) isPlayer))
 theorem okSoulConduitExchange : Ability.check (DRS.ofList []) soulConduitExchange = [] := by decide
 
@@ -189,7 +205,7 @@ def inkshieldRider : Action :=
       (instead
         (preventDamage allDamage
           (also :=
-            create preventedThisWay (creatureToken 2 1 [.white, .black] [inkling] [flying])))))
+            create preventedThisWay (Semantics.TokenSpec.written (creatureToken 2 1 [.white, .black] [inkling] [flying]))))))
     thisTurn
 theorem okInkshieldRider : Action.check (DRS.ofList []) inkshieldRider = [] := by decide
 
@@ -198,13 +214,13 @@ def quenchableFire : Action :=
   sequentially
     [ instruct this_ (dealDamage 3 targetPlayerOrPlaneswalker),
       delayUnlessPaid (beginningOf .upkeep you nextTime) (instruct this_ (dealDamage 3 thatJoin))
-        splitOverPlaneswalker [pip .blue] ]
+        splitOverPlaneswalker (Semantics.Cost.mana [pip .blue]) ]
 theorem okQuenchableFire : Action.check (DRS.ofList []) quenchableFire = [] := by decide
 
 /-- Garruk Relentless's first 0: "Garruk Relentless deals 3 damage to target creature. That
 creature deals damage equal to its power to him." -/
 def garrukRelentlessFight : Action :=
-  (match (cardNamed "Garruk Relentless // Garruk, the Veil-Cursed") with
+  (match (Semantics.Cards.«Garruk Relentless // Garruk, the Veil-Cursed») with
     | Card.transforming face _ => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.activated _ part _ _ _ _) _)) => some part
       | _ => none
@@ -219,7 +235,7 @@ theorem okHarnessInfinityExchange : Action.check (DRS.ofList []) harnessInfinity
 
 /-- Boseiju, Who Shelters All -/
 def boseijuMana : Ability :=
-  activated (compound [tapSymbol, payLife 2])
+  activated (compound [tapSymbol, (Semantics.Cost.perform (payLife 2))])
     (addMana 1 (manaOf [[.colorless]])
       [ whenSpentOn .affectsIt false (a (and [isInstantOrSorcery, isSpell]))
           (establish (cant any (counter (that .spell)))) ])

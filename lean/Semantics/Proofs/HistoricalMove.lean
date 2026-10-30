@@ -1,5 +1,6 @@
 import Semantics.Check.AbilityRules
 
+
 namespace Semantics.Proofs.HistoricalMove
 
 private def departedCreature : Referent := {

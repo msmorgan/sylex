@@ -1,4 +1,4 @@
-import Semantics.Authoring
+import Semantics.Registry
 
 open Lean Meta Elab Command
 
@@ -6,40 +6,49 @@ namespace SylGen
 
 private def register (kind : String) (name : Name) (file : String) :
     CommandElabM Unit := do
-  if kind ∈ ["primitive", "template", "ability_word", "action", "ability", "counter",
-      "designation", "subtype", "card_type", "relation"] then
-    Semantics.Authoring.contextualAuthoringAttribute.setTag name
-    if kind ∈ ["primitive", "template", "ability_word"] then
-      Semantics.Authoring.templateAttribute.setTag name
-    else Semantics.Authoring.definitionAttribute.setTag name
-    if kind ∈ ["counter", "designation", "subtype", "card_type", "relation"] then
-      Semantics.Authoring.bundleRegistryAttribute.setTag name
-  if kind == "primitive" then Semantics.Authoring.primitiveAttribute.setTag name
-  if kind == "ability" then
-    Semantics.Authoring.definitionAttribute.setTag (name ++ `label)
   if kind == "action" then
-    if let some deed ← liftTermElabM <| Semantics.Authoring.actionDefinitionDeed? name then
-      liftTermElabM <| Semantics.Authoring.checkActionDeed name deed
-      modifyEnv (Semantics.Authoring.actionDeedsExt.addEntry · (name, deed))
-      Semantics.Authoring.definitionAttribute.setTag (name ++ `deed)
-  Semantics.Authoring.registerExpectedType name
-  Semantics.Authoring.registerSharedAliases name
+    if let some deed ← liftTermElabM <| Semantics.Registry.actionDefinitionDeed? name then
+      liftTermElabM <| Semantics.Registry.checkActionDeed name deed
+      modifyEnv (Semantics.Registry.actionDeedsExt.addEntry · (name, deed))
+  Semantics.Registry.registerExpectedType name
+  Semantics.Registry.registerSharedAliases name
   if kind == "card" then
     let file := if file.isEmpty then file else
-      Semantics.Authoring.cardFileName name.getString!
-    modifyEnv (Semantics.Authoring.canonCardsExt.addEntry · { file, declaration := name })
+      Semantics.Registry.cardFileName name.getString!
+    modifyEnv (Semantics.Registry.canonCardsExt.addEntry · { file, declaration := name })
 
 elab "syl_register " kind:str name:ident file:str : command => do
   register kind.getString (← resolveGlobalConstNoOverload name)
     file.getString
 
-elab "syl_ability_word% " wrap:ident label:term ", " body:term : term <= expected => do
-  let value ← Lean.Elab.Term.elabTermEnsuringType body expected
-  let reduced ← whnf value
-  if reduced.isAppOfArity `Semantics.Ability.italicHead 2 &&
-      reduced.appFn!.appArg!.isAppOfArity `Semantics.ItalicWord.abilityWord 1 then return value
-  let label ← Lean.Elab.Term.elabTermEnsuringType label (mkConst `String)
-  mkAppM (← resolveGlobalConstNoOverload wrap)
-    #[mkApp (mkConst `Semantics.AbilityWordLabel.named) label, value]
+/-- Emit an ability word, preserving an already headed body at declaration time. -/
+elab "syl_ability_word " name:ident binders:bracketedBinder* " := " value:term
+    " doc " documentation:str : command => do
+  let value ← liftTermElabM do
+    let typed ← `(($value : (Semantics.AbilityWordLabel → Semantics.Ability →
+      Semantics.Ability) × String × Semantics.Ability))
+    let binders : TSyntaxArray ``Parser.Term.funBinder := binders.map fun b => ⟨b.raw⟩
+    let termSyntax ← if binders.isEmpty then pure typed else `(fun $binders* => $typed)
+    let expr ← Term.elabTerm termSyntax none
+    Term.synthesizeSyntheticMVarsNoPostponing
+    let expr ← instantiateMVars expr
+    lambdaTelescope expr fun parameters tuple => do
+      let tuple ← whnf tuple
+      let wrap := tuple.getAppArgs[2]!
+      let pair ← whnf tuple.getAppArgs[3]!
+      let label := pair.getAppArgs[2]!
+      let body := pair.getAppArgs[3]!
+      let reduced ← whnf body
+      let headed := reduced.getAppFn.isConstOf `Semantics.Ability.italicHead &&
+        reduced.getAppArgs[0]!.getAppFn.isConstOf `Semantics.ItalicWord.abilityWord
+      let result := if headed then body else
+        mkApp2 wrap (mkApp (mkConst `Semantics.AbilityWordLabel.named) label) body
+      mkLambdaFVars parameters result
+  let type ← liftTermElabM <| inferType value
+  liftCoreM <| addAndCompile <| .defnDecl {
+    name := name.getId, levelParams := [], type := type, value := value,
+    hints := .regular 0, safety := .safe }
+  unless documentation.getString.isEmpty do
+    addDocStringCore name.getId documentation.getString
 
 end SylGen
