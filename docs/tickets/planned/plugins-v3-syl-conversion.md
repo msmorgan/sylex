@@ -15,7 +15,9 @@ change. Specification: `docs/decisions/semantics-v3.md` §4.4–§4.5.
   run from the current `deckmaste_semantics_v3`. It stays untracked, under `docs/evidence/`. It
   writes every `plugins_v3/**/*.lean` declaration and card as `.syl`:
   - every coercion and domain-list coercion written as its explicit wrapper call;
-  - no leading dots; reserved words written plain (`in`, `from`, `this`, ...);
+  - no leading dots, except a primitive naming a differently named constructor
+    (`primitive actionSearch(...): Action = .search`); reserved words written plain (`in`, `from`,
+    `this`, ...);
   - the `keyword` kind written `ability`; result sorts as `): Sort` on `primitive` and `template`;
   - primitives body-less;
   - `timesPaid : Amount` renamed like the 11 prefixed same-sort collisions, and the six
