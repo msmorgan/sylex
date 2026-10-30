@@ -96,7 +96,7 @@ const SKIP_DIRS: &[&str] = &[
     "plugins/wizards",
     "docs/superpowers",
 ];
-const EXTENSIONS: &[&str] = &["rs", "md", "ron", "idr", "lean"];
+const EXTENSIONS: &[&str] = &["rs", "md", "ron", "idr", "lean", "syl"];
 
 /// Classify a repo-relative path into its citation tier: prose (anything
 /// under `docs/`, any `.md`) is `Mentioned`; every other scanned file,
@@ -617,6 +617,23 @@ mod tests {
                 .iter()
                 .any(|r| r.contains("100.1") && r.contains("lost Bound coverage"))
         );
+    }
+
+    #[test]
+    fn syl_conversion_preserves_bound_coverage() {
+        let dir = tempdir_with(&[(
+            "plugins_v3/example.lean",
+            "/-- [CR#100.1] -/\n-- [CR#200.2]",
+        )]);
+        let before = scan_tree(dir.path(), &[]);
+        std::fs::remove_file(dir.path().join("plugins_v3/example.lean")).unwrap();
+        std::fs::write(
+            dir.path().join("plugins_v3/example.syl"),
+            "# [CR#100.1]\n# [CR#200.2]\n",
+        )
+        .unwrap();
+        assert_eq!(scan_tree(dir.path(), &[]), before);
+        assert_eq!(lock_from_scan(&before).bound, ["100.1", "200.2"]);
     }
 
     fn extant_set(rules: &[&str]) -> BTreeSet<String> {

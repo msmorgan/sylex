@@ -2222,6 +2222,33 @@ const CR_FIXTURE: &str = "rule 100.1";
         );
     }
 
+    #[test]
+    fn syl_comments_are_checked_and_selected_for_audit() {
+        let fixture = Fixture::new();
+        fixture.write("data/rules/cr.txt", CR);
+        fixture.write(
+            "cite-config.json",
+            include_str!("../../../cite-config.json"),
+        );
+        let mut repo = Repository::load(fixture.path()).unwrap();
+        repo.config.sources.tracked = false;
+        repo.config.sources.globs = vec!["plugins_v3/*.syl".into()];
+        fixture.write("plugins_v3/A card.syl", "# [CR#100.1]\n# CR 100.1\n");
+        let citations = repo.resolved_citations(&repo.load_cr().unwrap()).unwrap();
+        assert_eq!(citations.len(), 1);
+        assert_eq!(
+            citations[0].resolution,
+            Resolution::Ok(vec!["100.1".into()])
+        );
+        let hits = repo.noncompliant_hits().unwrap();
+        assert_eq!(hits.first().map(|hit| hit.line), Some(2));
+        assert!(hits.iter().all(|hit| hit.line == 2));
+        let lines = added_diff_lines(
+            "+++ b/plugins_v3/A card.syl\n@@ -0,0 +1,2 @@\n+# [CR#100.1]\n+# CR 100.1\n",
+        );
+        assert!(lines.contains(&(citations[0].site.file.clone(), citations[0].site.line)));
+    }
+
     #[cfg(unix)]
     #[test]
     fn a_symlink_to_an_exempt_or_scanned_file_adds_nothing() {
