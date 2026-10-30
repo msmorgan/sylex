@@ -40,5 +40,3 @@ Recorded in `docs/decisions/semantics-v3.md` §4.4 ("Concrete surface syntax"):
 - `cargo xtask cite` scans `.syl` `#` comments before the conversion lands.
 - The conversion preserves the Lean dump oracle (`lean-elaborated-value-dump`) except for the
   changes the rulings in `plugins-v3-data-language` deliberately make.
-- The grammar is covered by a differential test of the Rust parser against the Lake generator on
-  the same corpus.

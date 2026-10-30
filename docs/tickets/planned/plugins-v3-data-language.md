@@ -1,11 +1,11 @@
 ---
-needs: [lean-generated-canon-modules, lean-elaborated-value-dump, plugins-v3-first-order-templates, plugins-v3-syl-surface-syntax]
+needs: [lean-generated-canon-modules, lean-elaborated-value-dump, plugins-v3-first-order-templates]
 ---
 # `plugins_v3` as a `.syl` data language whose files are their own AST
 
 Standard constraints apply. The abstract model and dispatch rules are settled below and recorded in
-`docs/decisions/semantics-v3.md` §§4.4–4.5; `plugins-v3-syl-surface-syntax` settles the concrete
-surface punctuation before implementation.
+`docs/decisions/semantics-v3.md` §§4.4–4.5, including the concrete surface syntax (calls, `=`
+binding, `kind name(param: Sort = default): Sort { fields }` headers, `#` comments).
 
 ## Why
 
@@ -30,7 +30,7 @@ simplicity.
   and by the Lake generator in `lean/lakefile.lean`, which emits gitignored `.lean` modules under
   `lean/.lake/build/gen/` containing plain Lean `def`s. Zero custom Lean `term_elab` hooks or
   authoring macros remain. One grammar specification in `docs/decisions/semantics-v3.md` §4.4
-  governs both parsers; `plugins-v3-syl-surface-syntax` settles its concrete tokens.
+  governs the Rust and Lake parsers, and its "Concrete surface syntax" bullet fixes the tokens.
 - **Mentions follow constructor order.** `firstMention` evaluates a parameter's argument once and
   records its referents; `laterMention` reads them back. Which occurrence is first is decided after
   expansion, in the order the checker evaluates the expanded constructor's fields. Authors write
@@ -132,8 +132,12 @@ simplicity.
   parse-tree form), `onlyAuthored`, `primitive_boundary%`, `splice`/`CallerSplice`, and the scoped
   `term_elab` hooks. Rewrite or retire `Proofs/Authoring.lean` and `Proofs/CallerScope.lean` to
   test the new loader, naming each retirement.
-- **Conformance.** A differential test parses the same corpus with the Rust parser and the Lake
-  generator and requires identical trees.
+- **Citations.** `cargo xtask cite` scans `.syl` `#` comments like `.lean` and `.rs` comments
+  before the conversion lands, so the converted files' `[CR#…]` citations stay checked.
+- **Verification here.** The Lake generator parses every converted `.syl` file without error and
+  the dump comparison shows no differences beyond the deliberate `search` change. The test that
+  the Rust and Lake parsers agree belongs to `semantics-rust-rewrite`, where the second parser
+  appears.
 - **Folded in from earlier tickets:**
   - from `plugins-v3-kept-qualified-sites`: zero qualified names, and no dependency-scan
     workarounds left in CONTRACTS.md or README.md;

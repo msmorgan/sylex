@@ -30,6 +30,9 @@ Start this only after:
 
 ## Verification
 
+The Rust `semantics` parser and the Lake generator parse the same `.syl` corpus to identical
+trees; a differential test over the whole corpus gates this.
+
 The Lean checker is the oracle for `discourse`. Per card, Rust's resolved bindings (first and
 later mentions, `D′`, `AC>R1` choices) must match the bindings Lean's checker produces. Lean can
 export them as a development tool, outside the compile path. The design dialogue settles that
