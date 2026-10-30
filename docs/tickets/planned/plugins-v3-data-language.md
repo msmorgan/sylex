@@ -84,8 +84,15 @@ simplicity.
     typeclasses and all qualified names are deleted.
 - **Expansion.** Templates expand to constructor trees by first-order substitution, and
   Definitions (`action`, `ability`) expand to `ownScope` with `inCaller` on every `CallerScope`
-  parameter. First and later mentions are inserted after expansion by one walk in the checker's
-  read order.
+  parameter. First and later mentions are inserted after expansion by one walk that keeps today's
+  order (the expanded expression's order, each `or` alternative in its own scope), so the
+  conversion changes syntax only; `plugins-v3-mentions-in-read-order` moves to the checker's read
+  order afterwards.
+- **Primitives are body-less.** `primitive name(params): Sort` binds the constructor of that name
+  and sort, matching parameters to fields by name. No two declarations share one `(name, sort)`:
+  rename `timesPaid : Amount` and turn the six record-building primitives (`can`, `cant`, `must`,
+  `gatedBy`, both `did`s) into Templates over renamed primitives. Keyword `lexical.parameters`
+  are kept as written.
 - **`Authoring.Form` is deleted; cleave is backburnered.** Delete
   `Authoring.Form`, `Authoring.inspect`, `onlyAuthored`, and
   `plugins_v3/builtin/templates/noun/bracketed.lean`, with the `bracketed` pins in
@@ -143,9 +150,8 @@ simplicity.
     workarounds left in CONTRACTS.md or README.md;
   - the mention-order pin from the deleted `lean-v3-mention-order-follows-constructors`;
   - from `plugins-v3-authoring-loose-ends`: a bare word that names a parameter at a sort the
-    parameter does not have (today Lean silently resolves it to a same-named enum word, pinned as
-    `incompatibleLocalAllowsWord`), and the `up` pin, which cannot tell the `up` primitive from
-    its constructor. Both wait on owner decisions about parameter dispatch and primitives.
+    parameter does not have is a load error (rewrite `incompatibleLocalAllowsWord` to assert
+    it); the `up` pin is moot once primitives are body-less constructor bindings (ADR §4.5).
 
   For the mention-order pin: a Template that passes one NounPhrase as `conjunction`'s `parts` and
   as its `subject` gives the subject the first mention.
