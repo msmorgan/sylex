@@ -29,6 +29,10 @@ private def fail {α : Type} (p : Position) (message : String) : ResolveM α :=
 
 private def findSignature (head : String) (sort : SortRef) : ResolveM (Option Signature) := do
   let ctx ← read
+  let parts := head.splitOn "."
+  let head ← if parts.length == 2 then
+      if parts[0]! == sort.name then pure parts[1]! else return none
+    else pure head
   if let some sig := ctx.declarations[(head, sort.text)]? then
     modify fun s => { s with dependencies := s.dependencies.push sig.constant }
     return some sig
@@ -187,7 +191,7 @@ partial def render (decl : Declaration) (body : Term) (t : Term) : StateM (Array
     let inner := if isDefinition && callerSort sort then
         s!"(Semantics.CallerScope.caller {quoted (leanWord name)})" else quoted (leanWord name)
     if sort.name == "NounPhrase" && (isDefinition || (decl.kind == "template" && body.count name ≥ 2)) then
-      return ← mention (leanWord decl.name ++ "." ++ leanWord name) inner
+      return ← mention (declarationWord decl.name ++ "." ++ leanWord name) inner
     return inner
   | .list values =>
     return "[" ++ String.intercalate ", " (← values.toList.mapM (render decl body)) ++ "]"
@@ -215,7 +219,7 @@ partial def render (decl : Declaration) (body : Term) (t : Term) : StateM (Array
         | some key => "(" ++ quoted key ++ " := " ++ text ++ ")"
     let text := "(" ++ name ++ " " ++ String.intercalate " " args ++ ")"
     if decl.kind == "action" && actorCall name && body.actorCount ≥ 2 then
-      return ← mention (leanWord decl.name ++ ".actor") text
+      return ← mention (declarationWord decl.name ++ ".actor") text
     return text
 
 end SylGen

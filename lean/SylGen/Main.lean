@@ -31,7 +31,9 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
         let parameters ← d.parameters.mapM fun p => do
           return { p with sort := ← normalizeSort p.pos p.sort }
         ds := ds.push { d with sort, parameters }
-  ds := orderDeclarations ds
+  ds ← match orderDeclarations ds with
+    | .ok sorted => pure sorted
+    | .error message => throwError message
   let ctors ← constructors
   let registry ← loadDeclarations root ds ctors fallback
   let mut outputs := #[]
@@ -58,11 +60,14 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
     for name in component do modules := modules.insert name module
   let mut expected : Array FilePath := #[]
   let mut umbrella := ""
+  let mut checks : Array FilePath := #[]
   for component in components do
     let module := modules[component.head!]!
     let mut imports := if fallback.isEmpty then "import Semantics.Rules\nimport Semantics.CallerScope\n"
       else "import Semantics.Definitions\n"
-    imports := imports ++ "import Semantics.Check.Rules\nimport SylGen.Registration\n"
+    imports := imports ++ "import SylGen.Registration\n"
+    if component.any (fun n => byName[n]!.checksRules) then
+      imports := imports ++ "import Semantics.Check.Rules\n"
     let deps := (component.flatMap dependencies).filterMap (modules[·]?)
       |>.filter (· != module) |>.eraseDups
     for dep in deps do imports := imports ++ s!"import {modulePrefix}.{dep}\n"
@@ -72,10 +77,21 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
     expected := expected.push path
     writeChanged path text
     umbrella := umbrella ++ s!"import {modulePrefix}.{module}\n"
+    let checkText := String.intercalate "\n" ((component.map fun n => byName[n]!.check).filter (!·.isEmpty))
+    if !checkText.isEmpty then
+      let path := output / (modulePrefix.replace "." "/") / "Check" / (module ++ ".lean")
+      checks := checks.push path
+      writeChanged path (s!"import {modulePrefix}.{module}\nimport Semantics.Check.Card\n\n" ++ checkText)
+      umbrella := umbrella ++ s!"import {modulePrefix}.Check.{module}\n"
   let dir := output / (modulePrefix.replace "." "/")
   if ← dir.pathExists then
     for entry in ← dir.readDir do
       if entry.path.extension == some "lean" && !expected.contains entry.path then
+        IO.FS.removeFile entry.path
+  let checkDir := dir / "Check"
+  if ← checkDir.pathExists then
+    for entry in ← checkDir.readDir do
+      if entry.path.extension == some "lean" && !checks.contains entry.path then
         IO.FS.removeFile entry.path
   writeChanged (output / ((modulePrefix.replace "." "/") ++ ".lean")) umbrella
   IO.println s!"sylGen: {ds.size} declarations, {components.length} modules"

@@ -8,7 +8,11 @@ open Lean Meta
 namespace SylGen
 
 def leanWord (s : String) : String :=
-  if s ∈ ["this", "in", "from", "by", "exists", "where"] then s ++ "_" else s
+  if s ∈ ["this", "in", "from", "by", "or", "exists", "where"] then s ++ "_" else s
+
+-- Plugin declarations use `or`; the `or_` spelling belongs to named parameters.
+def declarationWord (s : String) : String :=
+  if s == "or" then s else leanWord s
 
 def quoted (s : String) : String := "«" ++ s ++ "»"
 

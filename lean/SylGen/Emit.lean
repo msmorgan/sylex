@@ -5,7 +5,7 @@ namespace SylGen
 
 def declarationName (root : Name) (d : Declaration) (fallback : Registry) : Name :=
   if d.kind == "primitive" then
-    root ++ `Semantics.Primitives ++ d.sort.name.toName ++ Name.mkSimple (leanWord d.name)
+    root ++ `Semantics.Primitives ++ d.sort.name.toName ++ Name.mkSimple (declarationWord d.name)
   else if let some sig := fallback[(d.name, d.sort.text)]? then
     root ++ sig.constant
   else
@@ -14,7 +14,7 @@ def declarationName (root : Name) (d : Declaration) (fallback : Registry) : Name
       | "template" => `Semantics.Templates
       | "card" => `Semantics.Cards
       | _ => `Semantics.Definitions
-    root ++ ns ++ Name.mkSimple (leanWord d.name)
+    root ++ ns ++ Name.mkSimple (declarationWord d.name)
 
 private def allowedFields (kind : String) : List String :=
   ["lexical", "spelling"] ++ match kind with
@@ -47,7 +47,7 @@ def loadDeclarations (root : Name) (ds : Array Declaration) (ctors fallback : Re
       throwError d.pos.error s!"declaration '{d.name}' collides with constructor at {d.sort.text}"
     let initialName := declarationName root d fallback
     let name := if table.toArray.any (fun entry => entry.2.constant == initialName) then
-        initialName.getPrefix ++ d.sort.name.toName ++ Name.mkSimple (leanWord d.name)
+        initialName.getPrefix ++ d.sort.name.toName ++ Name.mkSimple (declarationWord d.name)
       else initialName
     let sig : Signature := { constant := name, result := d.sort, fields := d.parameters.map fun p =>
       { name := leanWord p.name, sort := p.sort, hasDefault := p.defaultValue.isSome } }
@@ -60,7 +60,7 @@ def loadDeclarations (root : Name) (ds : Array Declaration) (ctors fallback : Re
         { constant := name ++ `label, fields := #[], result := { name := "KeywordLabel" } }
     if d.kind == "action" && !(d.fields.any (·.1 == "ofAbility")) &&
         !(d.fields.any (fun f => match f with
-          | ("deed", .word _ "none" _) => true
+          | ("deed", .word _ "none" #[]) => true
           | _ => false)) then
       if table.contains (d.name, "Deed") then
         throwError d.pos.error s!"duplicate declaration {(d.name, "Deed")}"
@@ -90,7 +90,7 @@ private def body (d : Declaration) : ResolveM Term := do
   let get := fun name defaultValue => (field d name).getD defaultValue
   match d.kind with
   | "primitive" =>
-    let some sig := (← read).constructors[(leanWord d.name, d.sort.text)]?
+    let some sig := (← read).constructors[(declarationWord d.name, d.sort.text)]?
       | throwError d.pos.error "primitive must name a constructor of its result sort"
     unless d.parameters.size == sig.fields.size do
       throwError d.pos.error "primitive must bind every constructor field"
@@ -102,14 +102,14 @@ private def body (d : Declaration) : ResolveM Term := do
   | "template" => return ← resolve (← required d "body") d.sort
   | "action" =>
     let action ← resolve (← required d "body") { name := "Action" }
-    if let some (.word _ "none" _) := field d "deed" then
+    if let some (.word _ "none" #[]) := field d "deed" then
       return .call "Semantics.Action.ownScope" #[(none, .atom "none"), (none, action)]
     let deed ← if let some v := field d "ofAbility" then
         direct d `Semantics.Deed.ofAbility #[(none, v)]
       else
         let label := get "deed" (str d d.name)
         let label := match label with
-          | .word p word _ => Value.string p word
+          | .word p word #[] => Value.string p word
           | other => other
         let mut args := #[(none, label)]
         if let some permanent := field d "permanent" then args := args.push (none, permanent)
@@ -134,7 +134,11 @@ private def body (d : Declaration) : ResolveM Term := do
   | "ability_word" =>
     let label ← resolve (get "label" (str d d.name)) { name := "String" }
     let content ← resolve (← required d "body") { name := "Ability" }
-    return .atom s!"(syl_ability_word% {rendered d label}, ({rendered d content}))"
+    let wrap ← resolve (.word d.pos "abilityWord" #[
+      (none, .word d.pos "named" #[(none, str d "")]), (none, ← required d "body")])
+      { name := "Ability" }
+    let .call wrapName _ := wrap | throwError d.pos.error "abilityWord must be a Template"
+    return .atom s!"(syl_ability_word% {wrapName} {rendered d label}, ({rendered d content}))"
   | "counter" =>
     return ← direct d `Semantics.CounterKind.named
         #[(none, str d d.name), (none, get "holder" (word d "object"))]
@@ -171,6 +175,8 @@ structure Output where
   name : Name
   text : String
   prelude : String := ""
+  check : String := ""
+  checksRules : Bool := false
   dependencies : Array Name
   deriving Inhabited
 
@@ -213,11 +219,18 @@ def emit (d : Declaration) : ResolveM Output := do
     text := text ++ s!"def {leanName row} : Semantics.RegistryDefinition := .{ctor} {leanName name} {rules}\n"
     let checkName := name.getPrefix ++ Name.mkSimple ("ok_" ++ name.getString!)
     text := text ++ s!"theorem {leanName checkName} : Semantics.RegistryDefinition.check {leanName row} = [] := by decide\n"
-  if d.kind ∈ ["sba", "conferral", "token", "card"] then
+  if d.kind ∈ ["sba", "conferral", "token"] then
     let checkName := name.getPrefix ++ Name.mkSimple ("ok_" ++ name.getString!)
     text := text ++ s!"theorem {leanName checkName} : {d.sort.lean}.check {leanName name} = [] := by decide\n"
+  let check := if d.kind == "card" then
+      let checkName := name.getPrefix ++ Name.mkSimple ("ok_" ++ name.getString!)
+      s!"theorem {leanName checkName} : Semantics.Card.check {leanName name} = [] := check_card% {leanName name}\n"
+    else ""
   let cardFile := if d.kind == "card" then d.name ++ ".syl" else ""
-  text := text ++ s!"syl_register {toString (Json.str d.kind)} {leanName name} {toString (Json.str d.name)} {toString (Json.str cardFile)}\n"
-  return { name, text, prelude, dependencies := (← get).dependencies }
+  text := text ++ s!"syl_register {toString (Json.str d.kind)} {leanName name} {toString (Json.str cardFile)}\n"
+  return { name, text, prelude, check
+           checksRules := d.kind ∈ ["counter", "designation", "subtype", "card_type", "relation",
+             "sba", "conferral", "token"]
+           dependencies := (← get).dependencies }
 
 end SylGen

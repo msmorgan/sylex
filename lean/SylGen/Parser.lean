@@ -109,7 +109,7 @@ private def tokenize (file source : String) : Except String (Array Token) := do
         value := "-"
         i := i + 1
         pos := { pos with column := pos.column + 1 }
-      while i < chars.size && (chars[i]!.isAlphanum || chars[i]! == '_') do
+      while i < chars.size && (chars[i]!.isAlphanum || chars[i]! == '_' || chars[i]! == '.') do
         value := value.push chars[i]!
         i := i + 1
         pos := { pos with column := pos.column + 1 }

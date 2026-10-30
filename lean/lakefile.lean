@@ -187,7 +187,7 @@ lean_exe dumpValues where
   supportInterpreter := true
 
 lean_lib SylGenerator where
-  roots := #[`SylGen.Parser, `SylGen.Environment, `SylGen.Resolve, `SylGen.Emit, `SylGen.Ordering]
+  roots := #[`SylGen.Parser, `SylGen.Environment, `SylGen.Resolve, `SylGen.Emit, `SylGen.Ordering, `SylGen.BundleOrdering]
 
 lean_exe sylGen where
   root := `SylGen.Main
@@ -207,11 +207,13 @@ input_file sylNegativeTests where
 target genSyl pkg : Unit := do
   let some executable := pkg.findLeanExe? `sylGen | error "missing sylGen executable"
   let some library := pkg.findLeanLib? `SylFixtureRegistry | error "missing fixture registry"
+  let some registration := pkg.findLeanLib? `SylRegistration | error "missing syl registration"
+  let registration ← registration.leanArts.fetch
   let exe ← executable.exe.fetch
   let registry ← library.leanArts.fetch
   let corpus ← sylCorpus.fetch
   let tests ← sylNegativeTests.fetch
-  (exe.mix registry |>.mix corpus |>.mix tests).mapM fun _ => do
+  (exe.mix registry |>.mix registration |>.mix corpus |>.mix tests).mapM fun _ => do
     let exe ← exe.await
     let stamp := pkg.dir / ".lake/build/gen/syl.stamp"
     buildUnlessUpToDate stamp (← getTrace) (pkg.dir / ".lake/build/gen/syl.trace") do
