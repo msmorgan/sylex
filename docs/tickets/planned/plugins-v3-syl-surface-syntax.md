@@ -37,3 +37,16 @@ first lets the conversion happen in a single pass.
    Lake generator quoting any word that collides with Lean when emitting `.lean` modules.
 5. **Comments and CR citations.** Replace Lean's `/-- … -/` and `--` or keep them? Update
    `cargo xtask cite` so `.syl` comments are scanned and audited like `.lean` and `.rs`.
+6. **Reserved resolution words.** `none`, `true` and `false` resolve before enum words
+   (`docs/decisions/semantics-v3.md` §4.5 item 2). Settle how they are written and whether an enum
+   word may collide with them.
+7. **Parameter opt-out marker.** None: definitions bind every parameter and `inCaller` is an
+   ordinary call (ADR §4.5 item 3). Confirm no surface form is needed.
+
+## Acceptance additions
+
+- `cargo xtask cite` scans `.syl` before the conversion lands (question 5).
+- The conversion preserves the Lean dump oracle (`lean-elaborated-value-dump`) except for the
+  changes the rulings in `plugins-v3-data-language` deliberately make.
+- The concrete grammar is covered by a differential test of the Rust parser against the Lake
+  generator on the same corpus.
