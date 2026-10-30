@@ -1,4 +1,12 @@
+import Semantics.Cards.Data.Shard00
+import Semantics.Cards.Data.Shard03
+import Semantics.Cards.Data.Shard04
+import Semantics.Cards.Data.Shard05
+import Semantics.Cards.Data.Shard11
+import Semantics.Cards.Data.Shard12
 import SylFixtures
+import NormalFixtures
+import SylGen.Parser
 import Semantics.Cards.Data.Shard06
 
 example : @SylFixture.Semantics.Primitives.Action.doForEachKind =
@@ -52,3 +60,97 @@ example : SylFixture.Semantics.Templates.dispatchInteger = (-5 : Int) := rfl
 example : SylFixture.Semantics.Templates.exactOptionalUse = some (-2 : Int) := rfl
 example : SylFixture.Semantics.Templates.innerOptionalUse = some (-4 : Int) := rfl
 example : SylFixture.Semantics.Templates.defaultsInOrderUse = (-1 : Int) := rfl
+
+example : SylFixture.Semantics.Cards.«Branchloft Pathway // Boulderloft Pathway» = Semantics.Cards.«Branchloft Pathway // Boulderloft Pathway».card := rfl
+
+example : SylFixture.Semantics.Cards.«Merfolk Secretkeeper // Venture Deeper» = Semantics.Cards.«Merfolk Secretkeeper // Venture Deeper».card := rfl
+
+example : SylFixture.Semantics.Cards.«Blitz Automaton» = Semantics.Cards.«Blitz Automaton».card := rfl
+
+example : SylFixture.Semantics.Cards.«Student of Warfare» = Semantics.Cards.«Student of Warfare».card := rfl
+
+example : SylFixture.Semantics.Cards.«Profit // Loss» = Semantics.Cards.«Profit // Loss».card := rfl
+
+example : SylFixture.Semantics.Cards.«Glassworks // Shattered Yard» = Semantics.Cards.«Glassworks // Shattered Yard».card := rfl
+
+example : SylFixture.Semantics.Cards.«Neglected Heirloom // Ashmouth Blade» = Semantics.Cards.«Neglected Heirloom // Ashmouth Blade».card := rfl
+
+example : SylFixture.Semantics.Cards.«Bushi Tenderfoot // Kenzo the Hardhearted» = Semantics.Cards.«Bushi Tenderfoot // Kenzo the Hardhearted».card := rfl
+
+example : SylFixture.Semantics.Definitions.fight.deed = Semantics.Definitions.fight.deed := rfl
+example : SylFixture.Semantics.Definitions.flying.label = Semantics.Definitions.flying.label := rfl
+example : SylFixture.Semantics.Definitions.bear_definition = Semantics.Definitions.bear_definition := rfl
+example : SylFixture.Semantics.Definitions.haunting_definition = Semantics.Definitions.haunting_definition := rfl
+
+example : NormalFixture.Semantics.Templates.shared = (-1 : Int) := rfl
+example : NormalFixture.Semantics.Templates.Int.shared = (-1 : Int) := rfl
+example : NormalFixture.Semantics.Templates.Bool.shared = true := rfl
+example : NormalFixture.Semantics.Templates.this_ = (1 : Int) := rfl
+example : NormalFixture.Semantics.Templates.useThis = (1 : Int) := rfl
+example : NormalFixture.Semantics.Templates.named = (2 : Int) := rfl
+example : NormalFixture.Semantics.Templates.words 1 2 3 4 5 6 7 8 = [1,2,3,4,5,6,7,8] := rfl
+example : NormalFixture.Semantics.Definitions.withoutDeed =
+    Semantics.Action.ownScope none (.sequentially []) := rfl
+example : NormalFixture.Semantics.Definitions.wordDeed.deed =
+    Semantics.Deed.action "customWord" := rfl
+
+namespace Round2Expected
+open Semantics Semantics.Templates
+template recordOrder (who : NounPhrase) : DidClause := {
+  body := { action := instruct who (draw 1), within := none, subj := actor who }
+}
+ability_word alreadyWord (ability : Ability) : Ability := {
+  label := "outer", body := italicHead (.abilityWord (.named "inner")) ability
+}
+ability_word repeatedAbilityWord (who : NounPhrase) : Ability := {
+  label := "repeated", body := spell (simultaneously [instruct who (draw 1), instruct who (draw 1)])
+}
+end Round2Expected
+example : SylFixture.Semantics.Templates.recordOrder = Round2Expected.recordOrder := rfl
+example : SylFixture.Semantics.Definitions.alreadyWord = Round2Expected.alreadyWord := rfl
+example : SylFixture.Semantics.Definitions.repeatedAbilityWord = Round2Expected.repeatedAbilityWord := rfl
+
+open Lean in
+run_cmd do
+  let env ← getEnv
+  let entries := Semantics.Authoring.expectedTypeDispatchExt.getState env
+  unless ((entries.find? `fight).getD []).any
+      (·.declaration == `SylFixture.Semantics.Definitions.fight) do
+    throwError "generated declaration missing from dispatch registry"
+  unless (Semantics.Authoring.canonCardsExt.getState env).any
+      (·.declaration == `SylFixture.Semantics.Cards.Forest) do
+    throwError "generated card missing from canon registry"
+  for name in [`SylFixture.Semantics.Definitions.flying.term,
+      `NormalFixture.Semantics.Definitions.withoutDeed.deed,
+      `NormalFixture.Semantics.Definitions.abilityDeed.deed] do
+    if env.contains name then throwError "unexpected generated constant {name}"
+  unless Semantics.Authoring.primitiveAttribute.hasTag env
+      `SylFixture.Semantics.Primitives.Action.doForEachKind do
+    throwError "missing primitive attribute"
+
+example : (match SylGen.parse "header.syl" "# File header\n\ntemplate x: Int { body = 1 }" with
+    | .ok ds => ds[0]!.documentation.isEmpty
+    | .error _ => false) = true := by native_decide
+
+private def conflictingDeed : Semantics.Action :=
+  .ownScope (some (.action "fight" .none)) (.sequentially [])
+open Lean Elab Command in
+run_cmd do
+  let saved ← get
+  let mut rejected := false
+  try
+    elabCommand (← `(syl_register "action" conflictingDeed "conflictingDeed" ""))
+  catch error =>
+    rejected := (← error.toMessageData.toString).contains "must agree on DeedPermanent"
+  for message in (← get).messages.toList do
+    if (← message.toString).contains "must agree on DeedPermanent" then rejected := true
+  set saved
+  unless rejected do throwError "conflicting action deed was accepted"
+
+example : NormalFixture.Semantics.Definitions.outerWord =
+    NormalFixture.Semantics.Templates.innerWord := rfl
+
+example : (match SylGen.parse "docs.syl"
+    "primitive lit(value: Int): Amount\n# Attached documentation\ntemplate x: Int { body = 1 }" with
+    | .ok ds => ds[1]!.documentation == " Attached documentation\n"
+    | .error _ => false) = true := by native_decide

@@ -25,4 +25,14 @@ check 'negative integer at Nat' 'template negative: Nat { body = -1 }'
 check 'empty call' 'template empty: Color { body = blue() }'
 check 'missing argument' 'template missing: Amount { body = lit }'
 check 'duplicate field' 'template duplicate: Nat { body = 1, body = 2 }'
-printf 'sylGen negative cases: 9 passed\n'
+check 'reserved parameter name' 'template bad(none: Int): Int { body = 1 }'
+check 'reserved parameter name' 'template bad(true: Int): Int { body = 1 }'
+check 'reserved parameter name' 'template bad(false: Int): Int { body = 1 }'
+printf 'sylGen negative cases: 12 passed\n'
+
+printf '%s\n' 'template value: Int { body = 1 } template use: Int { body = value }' > "$scratch/input/bad.syl"
+"$exe" "$scratch/input" "$scratch/custom-output" CustomRoot Custom.Generated > "$scratch/log" 2>&1
+test -f "$scratch/custom-output/Custom/Generated.lean"
+grep -F 'import Custom.Generated.' "$scratch/custom-output/Custom/Generated.lean" >/dev/null
+grep -F '«CustomRoot».«Semantics».«Templates»' "$scratch/custom-output/Custom/Generated/"*.lean >/dev/null
+printf 'sylGen configurable output: passed\n'

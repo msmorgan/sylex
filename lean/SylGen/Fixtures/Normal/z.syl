@@ -1,0 +1,7 @@
+# The Int declaration is ready before the Bool declaration despite its file name.
+template shared: Int { body = -1 }
+template zz: Bool { body = true }
+ability sourceAbility { body = [] }
+action abilityDeed { ofAbility = sourceAbility, body = sequentially([]) }
+template innerWord: Ability { body = italicHead(abilityWord(named("inner")), spell(none, sequentially([]))) }
+ability_word outerWord { label = "outer", body = innerWord }

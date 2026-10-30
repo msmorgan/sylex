@@ -25,7 +25,7 @@ template alternatives(who: NounPhrase): Predicate {
 template eachKind(who: NounPhrase): Action {
   body = doForEachKind(color, who, color, instruct(who, draw(1)))
 }
-card { name = "Forest", supertypes = [basic], types = [land], subtypes = [forest] }
+card { name = "Forest", lexical = {}, spelling = "Forest", supertypes = [basic], types = [land], subtypes = [forest] }
 card_type fixtureType { name = "Fixture", cardClass = permanentCard, stats = [] }
 token fixtureToken { name = "Fixture", token = { characteristics = { name = "Fixture" } } }
 sba fixtureSba { scope = isCreature, when = is(thisCreature, isCreature), then_ = draw(1) }
@@ -43,3 +43,14 @@ template innerOptional: Int { body = -4 }
 template innerOptionalUse: Option(Int) { body = innerOptional }
 template defaultsInOrder(x: Int = -1, y: Int = x): Int { body = y }
 template defaultsInOrderUse: Int { body = defaultsInOrder }
+template recordOrder(who: NounPhrase): DidClause {
+  body = { action = instruct(who, draw(1)), within = none, subj = actor(who) }
+}
+ability_word alreadyWord(ability: Ability) {
+  label = "outer",
+  body = italicHead(abilityWord(named("inner")), ability)
+}
+ability_word repeatedAbilityWord(who: NounPhrase) {
+  label = "repeated",
+  body = spell(simultaneously([instruct(who, draw(1)), instruct(who, draw(1))]))
+}

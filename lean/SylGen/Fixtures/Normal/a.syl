@@ -1,0 +1,15 @@
+# File header, not documentation.
+
+template shared: Bool { body = zz }
+template this: Int { body = 1 }
+template useThis: Int { body = this }
+template words(this: Int, in: Int, from: Int, by: Int, or: Int, exists: Int, where: Int, variable: Int,): List(Int) {
+  body = [this, in, from, by, or, exists, where, variable]
+}
+template named: Int { body = wordsResult(
+  # A named argument follows a comment.
+  in = 2)
+}
+template wordsResult(in: Int): Int { body = in }
+action withoutDeed { deed = none, body = sequentially([]) }
+action wordDeed { deed = customWord, body = sequentially([]) }
