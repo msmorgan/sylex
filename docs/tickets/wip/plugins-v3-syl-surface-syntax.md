@@ -20,33 +20,24 @@ parentheses around every nested call, `{ body := … }` wrappers, `/-- … -/` a
 `plugins-v3-data-language` converts every file by script, settling the concrete `.syl` surface form
 first lets the conversion happen in a single pass.
 
-## Questions for the design dialogue
+## Settled (owner, 2026-10-30)
 
-1. **Call and argument syntax.** Curried juxtaposition (`can (actor you) (cast this (from :=
-   yourGraveyard))`) requires parentheses around every non-atomic argument. Should `.syl` keep
-   juxtaposition or switch to explicit call parentheses/commas (`can(actor(you), cast(this, from:
-   yourGraveyard))`) or another concrete form?
-2. **Declaration headers and `{ body := … }` wrapper.** How are declaration headers, parameter
-   binders with defaults, return sorts, and the metadata/meaning sections (`lexical`, `spelling`,
-   `body`/`confers`/`rules`) written?
-3. **Binding punctuation.** What token binds record fields, named arguments, and parameter defaults
-   (`:=`, `:`, or `=`)?
-4. **Unescaping Lean reserved words.** `in_`, `from_`, `by_`, `or_`, `this_`, `exists_`, `where_`,
-   and `«variable»` only carry `_` or `«…»` because of Lean 4's keyword table. Confirm that `.syl`
-   uses the plain words (`in`, `from`, `by`, `or`, `this`, `exists`, `where`, `variable`), with the
-   Lake generator quoting any word that collides with Lean when emitting `.lean` modules.
-5. **Comments and CR citations.** Replace Lean's `/-- … -/` and `--` or keep them? Update
-   `cargo xtask cite` so `.syl` comments are scanned and audited like `.lean` and `.rs`.
-6. **Reserved resolution words.** `none`, `true` and `false` resolve before enum words
-   (`docs/decisions/semantics-v3.md` §4.5 item 2). Settle how they are written and whether an enum
-   word may collide with them.
-7. **Parameter opt-out marker.** None: definitions bind every parameter and `inCaller` is an
-   ordinary call (ADR §4.5 item 3). Confirm no surface form is needed.
+Recorded in `docs/decisions/semantics-v3.md` §4.4 ("Concrete surface syntax"):
 
-## Acceptance additions
+- calls are `head(arg, name = arg)`; `=` binds everywhere (fields, named arguments, defaults) and
+  `:` means only "has sort", in headers;
+- headers are `kind name(param: Sort = default) { fields }`; only `primitive` and `template` write
+  their result sort, in the kind (`template(Duration) name(...)`), and there is no `->`;
+- `lexical`, `spelling`, `body`, `confers` and `rules` are record fields;
+- reserved words are written plain (`in`, `from`, `this`, ...) and the Lake generator quotes
+  collisions; `none`, `true` and `false` are reserved and resolve before enum words;
+- comments are `#` to end of line, doc comments a leading `#` block, with `[CR#…]` citations;
+- no parameter opt-out marker exists (the ADR's `inCaller` ruling).
 
-- `cargo xtask cite` scans `.syl` before the conversion lands (question 5).
+## Acceptance
+
+- `cargo xtask cite` scans `.syl` `#` comments before the conversion lands.
 - The conversion preserves the Lean dump oracle (`lean-elaborated-value-dump`) except for the
   changes the rulings in `plugins-v3-data-language` deliberately make.
-- The concrete grammar is covered by a differential test of the Rust parser against the Lake
-  generator on the same corpus.
+- The grammar is covered by a differential test of the Rust parser against the Lake generator on
+  the same corpus.
