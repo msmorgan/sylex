@@ -49,7 +49,7 @@ pub fn has_keyword_named(view: &LayeredView, object: ObjectId, name: &str) -> bo
         .any(|a| crate::layer::ability_is_named(a, &name))
 }
 
-/// [CR#702.7b,702.4]: whether `object` deals damage in the FIRST combat-damage
+/// [CR#702.7b,702.4,702.4b]: whether `object` deals damage in the FIRST combat-damage
 /// step — true iff it has first strike OR double strike.
 #[must_use]
 pub fn deals_first_strike(view: &LayeredView, object: ObjectId) -> bool {
@@ -57,7 +57,7 @@ pub fn deals_first_strike(view: &LayeredView, object: ObjectId) -> bool {
         || has_keyword(view, object, &KeywordAbility::DoubleStrike)
 }
 
-/// [CR#702.4]: whether `object` deals damage in the REGULAR combat-damage step.
+/// [CR#702.4,702.4b]: whether `object` deals damage in the REGULAR combat-damage step.
 /// A double-striker deals in both steps; a first-striker (without double
 /// strike) deals ONLY in the first step, so it does not deal here; every other
 /// creature deals here. This filter naturally includes everyone when no first

@@ -167,7 +167,7 @@
     (lemma: "turn", frames: [ComplexTransitive]),
     (lemma: "trigger", frames: [Intransitive, Monotransitive]),
     (lemma: "unlock", frames: [Monotransitive]),
-    // *cast using teamwork*
+    // *cast using teamwork* [CR#702.194b]
     (lemma: "use", frames: [Monotransitive, Transitive(KeywordPhrase)]),
     (lemma: "win", past: "won", gerund: "winning", frames: [Intransitive, Monotransitive]),
 ]

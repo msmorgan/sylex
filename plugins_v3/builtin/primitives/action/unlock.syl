@@ -1,4 +1,4 @@
-# Unlock the specified door.
+# Unlock the specified door [CR#709.5f].
 primitive unlock(door: Door): Action {
   spelling = "unlock <door>"
 }

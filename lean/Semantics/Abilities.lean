@@ -845,6 +845,7 @@ mutual
     /-- The subject's power and toughness are switched [CR#613.4d]. -/
     | ptSwitch
     | quality (op : QualityOp) (quality : WrittenQuality)
+    /-- The abilities the subject has or gains [CR#113.10]. -/
     | addedAbilities (abilities : List Ability)
     /-- The abilities of `source` in the families `classes`, but for those `except` describes:
     "<subject> has all activated abilities of <source>". -/
@@ -853,6 +854,7 @@ mutual
     /-- The abilities of `source` the selection picks (backup's "it gains the non-backup
     abilities of this creature printed below this one" [CR#702.165a]). -/
     | addedSelectionOf (source : NounPhrase) (selection : AbilitySelection)
+    /-- The abilities the subject loses [CR#113.10]. -/
     | removedAbilities (selection : AbilitySelection)
     /-- `op` written once over established quality wording ("becomes a 2/2 creature", "is all
     colors"): the edits `payload` writes (`QualityPayload.edits`). -/
@@ -999,6 +1001,7 @@ mutual
     /-- Cost-gated deontic rule ("can't … unless … pays …") [CR#508.1d,509.1c]. -/
     | gatedBy (cost : Cost) (subj : Subject) (action : Action) (mods : DeonticMods)
     | manaRetention (player : NounPhrase) (mana : ManaHeld)
+    /-- Skip a step, phase, or turn [CR#500.11]. -/
     | partSkip (player : NounPhrase) (part : TurnPart)
     /-- A continuous change to `subject`'s characteristics: its stats ("gets +P/+T", "has base
     power and toughness P/T"), the abilities it has or gains, and the rest of its
@@ -1448,6 +1451,7 @@ mutual
     "when [the performer does]" what `body` offers; with `some ev`, "when [ev] this way". -/
     | triggerReflexively (body : Action) (event : Option GameEvent) (trigger : Action)
     | skipUntap (subject : NounPhrase) (steps : Amount)
+    /-- Skip a step, phase, or turn [CR#500.11]. -/
     | skipPart (part : TurnPart) (count : Amount)
     | addTurnPart (part : TurnPart) (anchor : Option TurnPart) (count : Amount)
         (followedBy : Option TurnPart)

@@ -202,8 +202,8 @@ theorem okWheneverItBecomesNight :
     Ability.check (DRS.ofList []) (whenever (gameBecomes night) (draw 1)) = [] := by
   decide
 
-/-- "If it's neither day nor night, it becomes day.": the game reads and gains its own
-designations. -/
+/-- "If it's neither day nor night, it becomes day." [CR#702.145d]: the game reads and gains its own
+designations. The pin covers the effect, not the daybound-permanent condition. -/
 theorem okItBecomesDayIfNeither :
     Action.check (DRS.ofList [])
       (.doIf (.and [.not (gameIs day), .not (gameIs night)]) (setGameDesignation day) none)

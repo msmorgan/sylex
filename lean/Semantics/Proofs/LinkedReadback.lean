@@ -337,7 +337,7 @@ theorem okSoulbond : Ability.check (DRS.ofList []) soulbond = [] := by decide
 theorem okCipher : Ability.check (DRS.ofList []) cipher = [] := by decide
 /-- Required pin: mutate [CR#702.140a]. -/
 theorem okMutate : Ability.check (DRS.ofList []) (mutate cost) = [] := by decide
-/-- Required pin: champion [CR#702.72a,607.2k]: its leaves-the-battlefield ability returns the
+/-- Required pin: champion [CR#702.72a,702.72b,607.2k]: its leaves-the-battlefield ability returns the
 card its enters ability exiled. -/
 theorem okChampion : Ability.check (DRS.ofList []) (champion isCreature) = [] := by decide
 

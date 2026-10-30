@@ -1,4 +1,4 @@
-# "triple <subject>'s power and toughness" (`Definition`, [CR#701.11b,701.11c]).
+# "triple <subject>'s power and toughness" (`Definition`, [CR#701.11a,701.11b,701.11c]).
 action triplePowerAndToughness(subject: NounPhrase, duration: Option(Duration) = none) {
   # TODO(spelling): Include or omit the clauses supplied by duration.
   lexical = {verbs = [{lemma = "triple", frames = [Monotransitive]}]},

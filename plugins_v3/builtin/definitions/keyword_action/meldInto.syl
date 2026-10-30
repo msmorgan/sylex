@@ -1,4 +1,4 @@
-# "meld <subject> into <name>" (`Definition`, [CR#701.42]).
+# "meld <subject> into <name>" (`Definition`, [CR#701.42,701.42a]).
 action meldInto(subject: NounPhrase, into: String) {
   lexical = {verbs = [{lemma = "meld", frames = [TransitiveWithPP(["into"])]}]},
   deed = "meld",

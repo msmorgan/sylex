@@ -1,6 +1,6 @@
 # "Mutate [cost]": "You may pay [cost] rather than pay this spell's mana cost. If you do, it
 # becomes a mutating creature spell and targets a non-Human creature with the same owner as this
-# spell" [CR#702.140a]. One "if you do" gates the added target [CR#601.2c] and the merge alike:
+# spell" [CR#702.140a]. One "if you do" gates the added target [CR#601.2c] and the merge [CR#702.140c] alike:
 # the mutate cost's choice was taken.
 ability mutate(cost: Cost) {
   lexical = {

@@ -26,7 +26,7 @@ inductive LevelRange where
   deriving DecidableEq, Repr
 
 /-- One striation of a leveler's text box: the level symbol's range, the abilities printed in
-that striation, and its power/toughness box [CR#711.2a,711.2b]. -/
+that striation, and its power/toughness box [CR#711.2a,711.2b,711.3]. -/
 structure LevelBand where
   range : LevelRange
   text : List Ability := []
@@ -48,6 +48,7 @@ inductive Card where
   | sharedLineSplit (shared : CardFace) (left right : SharedLineHalf)
   | adventurer (normal adventure : CardFace)
   | flip (normal alternative : CardFace)
+  /-- Abilities in `inner` are not preceded by a level symbol and are treated normally, level up among them [CR#711.4]. -/
   | leveler (inner : CardFace) (bands : List LevelBand)
   /-- [CR#718.1] the inset frame's second set: a mana cost and a power/toughness box. -/
   | prototype (inner : CardFace) (alternative : PrototypeFrame)

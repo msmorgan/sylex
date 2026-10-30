@@ -323,6 +323,7 @@
     (rule: "[CR#702.163]", name: "For Mirrodin!", lemma: "for Mirrodin!"),
     (rule: "[CR#702.164]", name: "Toxic", lemma: "toxic", parameters: [[Amount]]),
     (rule: "[CR#702.165]", name: "Backup", lemma: "backup", parameters: [[Amount]]),
+    // verb: passive "was bargained" [CR#702.166b]
     (rule: "[CR#702.166]", name: "Bargain", lemma: "bargain",
         verbs: [
             (lemma: "bargain", frames: [Monotransitive]),
