@@ -20,7 +20,7 @@ parentheses around every nested call, `{ body := … }` wrappers, `/-- … -/` a
 `plugins-v3-data-language` converts every file by script, settling the concrete `.syl` surface form
 first lets the conversion happen in a single pass.
 
-## Settled (owner, 2026-10-30)
+## Settled
 
 Recorded in `docs/decisions/semantics-v3.md` §4.4 ("Concrete surface syntax"):
 
@@ -37,6 +37,5 @@ Recorded in `docs/decisions/semantics-v3.md` §4.4 ("Concrete surface syntax"):
 
 ## Acceptance
 
-- `cargo xtask cite` scans `.syl` `#` comments before the conversion lands.
-- The conversion preserves the Lean dump oracle (`lean-elaborated-value-dump`): it changes syntax
-  only.
+- The ADR records the concrete syntax. Making `cite` scan `.syl` and keeping the dump oracle are
+  `plugins-v3-data-language`'s acceptance.

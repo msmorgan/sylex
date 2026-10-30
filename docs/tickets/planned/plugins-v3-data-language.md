@@ -40,8 +40,8 @@ simplicity.
   parameter-order rule).
 - **No `inCaller` opt-out.** Definitions always wrap every `CallerScope` parameter. `search` and
   `searchZonesOf` drop their `inCaller for_` opt-outs, so `for_` is bound like any parameter;
-  `madness`'s scope-escape `inCaller` is an ordinary call. Expansion changes this causes are
-  reviewed for correctness, not frozen (see Oracle).
+  `madness`'s scope-escape `inCaller` is an ordinary call. That change already landed in Lean,
+  before the dump is taken.
 - **No evaluation in plugin files.** No higher-order parameters, `match`, `if`, `fun`, or
   `List`/`Option` functions; `plugins-v3-first-order-templates` removed the existing sites
   (including `chooseModesOver`, `splice` and `CallerSplice`), along with `have`, tuples and `⟨…⟩`.
@@ -53,7 +53,7 @@ simplicity.
     3. record blocks;
     4. calls with positional and named arguments;
     5. bare words (0-argument identifiers).
-  - **All coercions are deleted, simplicity first (owner, 2026-10-30).** That includes
+  - **All coercions are deleted, simplicity first.** That includes
     `NounPhrase → Subject` and the 12 expression-level `Coe`s (`actor`, `hasSubtype`, `perform`,
     `mana`, `written`, `printedKind`, `printedName`, `holds`, `static`, `span`, `mode`,
     `Characteristics → CharacteristicBundle`). Every wrapper is written explicitly in `.syl`;
@@ -86,7 +86,7 @@ simplicity.
   Definitions (`action`, `ability`) expand to `ownScope` with `inCaller` on every `CallerScope`
   parameter. First and later mentions are inserted after expansion by one walk in the checker's
   read order.
-- **`Authoring.Form` is deleted; cleave is backburnered (owner, 2026-10-30).** Delete
+- **`Authoring.Form` is deleted; cleave is backburnered.** Delete
   `Authoring.Form`, `Authoring.inspect`, `onlyAuthored`, and
   `plugins_v3/builtin/templates/noun/bracketed.lean`, with the `bracketed` pins in
   `Proofs/TextChanges.lean` (retired: they assert a template that no longer exists; name each).
@@ -129,8 +129,7 @@ simplicity.
 
   If the conversion uses the old crate as its emitter, run it first, then delete. Delete any
   ticket text that still names these crates as live.
-- **Delete** `AuthoringContext`, `Authoring.inspect`, `Authoring.Form` (unless question 5 keeps a
-  parse-tree form), `onlyAuthored`, `primitive_boundary%`, `splice`/`CallerSplice`, and the scoped
+- **Delete** `AuthoringContext`, `Authoring.inspect`, `Authoring.Form`, `onlyAuthored`, `primitive_boundary%`, `splice`/`CallerSplice`, and the scoped
   `term_elab` hooks. Rewrite or retire `Proofs/Authoring.lean` and `Proofs/CallerScope.lean` to
   test the new loader, naming each retirement.
 - **Citations.** `cargo xtask cite` scans `.syl` `#` comments like `.lean` and `.rs` comments
@@ -142,7 +141,11 @@ simplicity.
 - **Folded in from earlier tickets:**
   - from `plugins-v3-kept-qualified-sites`: zero qualified names, and no dependency-scan
     workarounds left in CONTRACTS.md or README.md;
-  - the mention-order pin from the deleted `lean-v3-mention-order-follows-constructors`.
+  - the mention-order pin from the deleted `lean-v3-mention-order-follows-constructors`;
+  - from `plugins-v3-authoring-loose-ends`: a bare word that names a parameter at a sort the
+    parameter does not have (today Lean silently resolves it to a same-named enum word, pinned as
+    `incompatibleLocalAllowsWord`), and the `up` pin, which cannot tell the `up` primitive from
+    its constructor. Both wait on owner decisions about parameter dispatch and primitives.
 
   For the mention-order pin: a Template that passes one NounPhrase as `conjunction`'s `parts` and
   as its `subject` gives the subject the first mention.

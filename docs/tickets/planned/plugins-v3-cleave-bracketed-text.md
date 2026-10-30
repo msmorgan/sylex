@@ -4,7 +4,7 @@ needs: [plugins-v3-data-language]
 # Return `bracketed` text to `.syl` and make cleave work
 
 Standard constraints apply. `plugins-v3-data-language` deletes the `bracketed` template,
-`Authoring.Form` and the `bracketed` pins in `Proofs/TextChanges.lean` (owner, 2026-10-30), so
+`Authoring.Form` and the `bracketed` pins in `Proofs/TextChanges.lean`, so
 cleave is not expected to work through templates until this lands. The first goal there was a
 simple `.syl`; this ticket brings the feature back on top of it.
 
