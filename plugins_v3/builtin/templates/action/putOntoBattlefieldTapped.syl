@@ -1,4 +1,4 @@
-# "put <subject> [from <from_>] onto the battlefield tapped"
+# "put <subject> [from <from>] onto the battlefield tapped"
 template putOntoBattlefieldTapped(subject: NounPhrase, from: Location = wherever): Action {
   # TODO(spelling): Omit the origin phrase when from_ is wherever; otherwise print 'from' and that
   # location.

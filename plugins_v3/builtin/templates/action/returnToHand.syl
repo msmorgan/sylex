@@ -1,4 +1,4 @@
-# "return <subject> [from <from_>] to its owner's hand"
+# "return <subject> [from <from>] to its owner's hand"
 template returnToHand(subject: NounPhrase, from: Location = wherever): Action {
   # TODO(spelling): Omit the origin phrase when from_ is wherever; otherwise print 'from' and that
   # location.

@@ -1,4 +1,4 @@
-# "cast <subject> [from <from_>] [paying <payment>]" (`Definition`, [CR#701.5a]).
+# "cast <subject> [from <from>] [paying <payment>]" (`Definition`, [CR#701.5a]).
 action cast(
   subject: NounPhrase,
   from: Option(Location) = none,

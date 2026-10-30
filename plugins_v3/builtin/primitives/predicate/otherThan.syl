@@ -1,4 +1,4 @@
-# "other than <np>"
+# "other than <anchor>"
 primitive otherThan(anchor: NounPhrase): Predicate {
-  spelling = "other than <np>"
+  spelling = "other than <anchor>"
 }

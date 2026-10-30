@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.hasType`.
 primitive hasType(type: CardType): Predicate {
-  spelling = "<t>"
+  spelling = "<type>"
 }

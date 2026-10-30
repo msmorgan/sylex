@@ -1,6 +1,6 @@
-# "<subject> deals [<amount>] [<kind>] damage [to <to>]"
+# "<subject> deals [<amount>] [<kind>] damage [to <recipient>]"
+# TODO(spelling): Include or omit the clauses supplied by kind.
 primitive dealDamage(
   amount: Amount = anyAmount,
   recipient: NounPhrase = any,
   kind: Option(DamageKind) = none): Action
-# TODO(spelling): Include or omit the clauses supplied by kind.

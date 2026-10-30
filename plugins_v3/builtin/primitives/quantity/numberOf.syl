@@ -1,4 +1,4 @@
-# "the number of <subject>"
+# "the number of <group>"
 primitive numberOf(group: NounPhrase): Amount = .countOf {
-  spelling = "the number of <subject>"
+  spelling = "the number of <group>"
 }

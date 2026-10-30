@@ -1,4 +1,4 @@
-# "activate <subject> [from <from_>] [paying <payment>]" (`Definition`, [CR#701.2a]).
+# "activate <subject> [from <from>] [paying <payment>]" (`Definition`, [CR#701.2a]).
 action activate(
   subject: NounPhrase,
   from: Option(Location) = none,

@@ -1,5 +1,5 @@
 # A joined "whenever <event> while <concurrent>" header.
 template joinedHeadWhile(event: GameEvent, while: Timing): JoinedHeader {
-  spelling = "whenever <event> <while_>",
+  spelling = "whenever <event> <while>",
   body = {event = event, alternatives = [], while = while, timing = none}
 }

@@ -1,5 +1,5 @@
-# "except it's <power>/<toughness>"
+# "except it's <powerValue>/<toughnessValue>"
 template hasPT(powerValue: Amount, toughnessValue: Amount): CopyExcept {
-  spelling = "except it's <power>/<toughness>",
+  spelling = "except it's <powerValue>/<toughnessValue>",
   body = characteristicEdits([stat(power, set(powerValue)), stat(toughness, set(toughnessValue))])
 }

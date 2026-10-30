@@ -1,4 +1,4 @@
-# "an <class_> ability"
+# "an <class> ability"
 primitive hasAbilityOf(class: AbilityClass): DeckTrait {
-  spelling = "an <class_> ability"
+  spelling = "an <class> ability"
 }

@@ -1,4 +1,4 @@
-# "put <subject> into <destination> [from <from_>] [<riders>]", as "in any order" or "under
+# "put <subject> into <destination> [from <from>] [<riders>]", as "in any order" or "under
 # its owner's control". From the battlefield it is `putIntoFromBattlefield`, observed on its
 # departure.
 template putInto(

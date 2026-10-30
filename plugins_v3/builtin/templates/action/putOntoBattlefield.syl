@@ -1,4 +1,4 @@
-# "put <subject> [from <from_>] onto the battlefield"
+# "put <subject> [from <from>] onto the battlefield"
 template putOntoBattlefield(
   subject: NounPhrase,
   from: Location = wherever,

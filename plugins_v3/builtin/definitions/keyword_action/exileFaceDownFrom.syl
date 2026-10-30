@@ -1,9 +1,9 @@
-# "exile <subject> from <from_> face down" (`Definition`, [CR#701.13,406.3]): a move that names
+# "exile <subject> from <from> face down" (`Definition`, [CR#701.13,406.3]): a move that names
 # its origin, so an ability whose cost or effect makes it functions only in that zone
 # [CR#113.6m].
 action exileFaceDownFrom(subject: NounPhrase, from: Location) {
   lexical = {verbs = [{lemma = "exile", frames = [Monotransitive]}]},
   deed = "exile",
-  spelling = "exile <subject> from <from_> face down",
+  spelling = "exile <subject> from <from> face down",
   body = move(subject, from, exileZone, arrival, [faceDownAs(exiledFaceDown)])
 }

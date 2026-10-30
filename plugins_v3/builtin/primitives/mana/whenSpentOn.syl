@@ -1,8 +1,8 @@
 # "When that mana is spent to cast <spell>, <says>"; "that spell <says>" (`mode`).
+# TODO(spelling): The mode and only flag choose cast, activation, or resolution wording and its
 primitive whenSpentOn(
   mode: SpentMode,
   only: Bool,
   spell: NounPhrase,
   says: Action): ManaRider = .onSpent
-# TODO(spelling): The mode and only flag choose cast, activation, or resolution wording and its
 # restriction.

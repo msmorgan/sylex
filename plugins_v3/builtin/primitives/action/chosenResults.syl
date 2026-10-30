@@ -1,3 +1,3 @@
 # "ignore <amount> of the results of [<chooser>'s] choice"
-primitive chosenResults(chooser: Option(NounPhrase), amount: Amount): IgnoredOutcomes = .chosen
 # TODO(spelling): Include or omit the clauses supplied by chooser.
+primitive chosenResults(chooser: Option(NounPhrase), amount: Amount): IgnoredOutcomes = .chosen

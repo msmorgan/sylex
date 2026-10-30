@@ -3,8 +3,8 @@
 # [CR#615.1,615.5]. Under `cant`, "<damage> can't be prevented" [CR#615.12].
 # [CR#615.1,615.5]
 # [CR#615.12]
+# TODO(spelling): Include or omit the clauses supplied by damage, also.
 primitive preventDamage(
   cut: PreventCut,
   damage: Option(WouldClause) = none,
   also: Option(Action) = none): Action
-# TODO(spelling): Include or omit the clauses supplied by damage, also.

@@ -2,6 +2,6 @@
 action exileFrom(subject: NounPhrase, from: Location) {
   lexical = {verbs = [{lemma = "exile", frames = [Monotransitive]}]},
   deed = "exile",
-  spelling = "exile <subject> from <from_>",
+  spelling = "exile <subject> from <from>",
   body = move(subject, from, exileZone, arrival, [])
 }

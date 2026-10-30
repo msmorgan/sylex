@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.hasSubtype`.
 primitive hasSubtype(subtype: Subtype): Predicate {
-  spelling = "<s>"
+  spelling = "<subtype>"
 }

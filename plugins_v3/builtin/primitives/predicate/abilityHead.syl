@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.abilityHead`.
 primitive abilityHead(class: AbilityClass): Predicate {
-  spelling = "<class_> ability"
+  spelling = "<class> ability"
 }

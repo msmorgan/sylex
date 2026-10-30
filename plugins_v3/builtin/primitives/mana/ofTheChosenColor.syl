@@ -1,3 +1,3 @@
 # "mana of the chosen color" [or <alternative>]
-primitive ofTheChosenColor(alternative: Option(ProducedRun) = none): ProducedMana = .ofChosenColor
 # TODO(spelling): Include or omit the clauses supplied by alternative.
+primitive ofTheChosenColor(alternative: Option(ProducedRun) = none): ProducedMana = .ofChosenColor

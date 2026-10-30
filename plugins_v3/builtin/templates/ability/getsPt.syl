@@ -3,6 +3,6 @@ template getsPt(
   subject: NounPhrase,
   powerValue: Delta(Amount),
   toughnessValue: Delta(Amount)): StaticSpec {
-  spelling = "<subject> gets <power>/<toughness>",
+  spelling = "<subject> gets <powerValue>/<toughnessValue>",
   body = characteristicChange(subject, [stat(power, powerValue), stat(toughness, toughnessValue)])
 }

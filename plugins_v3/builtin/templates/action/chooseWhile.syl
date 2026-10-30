@@ -1,5 +1,5 @@
 # "choose <subject> as you <event>"
 template chooseWhile(subject: NounPhrase, while: Timing): Action {
-  spelling = "choose <subject> <while_>",
+  spelling = "choose <subject> <while>",
   body = choose(subject, when = while)
 }

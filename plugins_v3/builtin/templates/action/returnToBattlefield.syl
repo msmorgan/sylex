@@ -1,4 +1,4 @@
-# "return <subject> [from <from_>] to the battlefield [riders]"
+# "return <subject> [from <from>] to the battlefield [riders]"
 template returnToBattlefield(
   subject: NounPhrase,
   riders: List(MoveRider) = [],
