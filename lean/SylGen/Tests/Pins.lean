@@ -1,13 +1,9 @@
-import Semantics.Cards.Data.Shard00
-import Semantics.Cards.Data.Shard03
-import Semantics.Cards.Data.Shard04
-import Semantics.Cards.Data.Shard05
-import Semantics.Cards.Data.Shard11
-import Semantics.Cards.Data.Shard12
+import Generated.Canon
 import SylFixtures
 import NormalFixtures
+import LegacyFixtures
 import SylGen.Parser
-import Semantics.Cards.Data.Shard06
+import Semantics.CanonCheck
 
 example : @SylFixture.Semantics.Primitives.Action.doForEachKind =
     @Semantics.Primitives.Action.doForEachKind := rfl
@@ -62,7 +58,7 @@ example : SylFixture.Semantics.Templates.presentAtom =
 example : SylFixture.Semantics.Templates.optionalList =
     some [SylFixture.Semantics.Definitions.flying] := rfl
 
-example : SylFixture.Semantics.Cards.Forest = Semantics.Cards.Forest.card := rfl
+example : SylFixture.Semantics.Cards.Forest = Semantics.Cards.Forest := rfl
 example : SylFixture.Semantics.Definitions.threshold = Semantics.Definitions.threshold := rfl
 example : SylFixture.Semantics.Definitions.citysBlessing =
     Semantics.Definitions.citysBlessing := rfl
@@ -74,28 +70,27 @@ example : SylFixture.Semantics.Templates.exactOptionalUse = some (-2 : Int) := r
 example : SylFixture.Semantics.Templates.innerOptionalUse = some (-4 : Int) := rfl
 example : SylFixture.Semantics.Templates.defaultsInOrderUse = (-1 : Int) := rfl
 
-example : SylFixture.Semantics.Cards.«Branchloft Pathway // Boulderloft Pathway» = Semantics.Cards.«Branchloft Pathway // Boulderloft Pathway».card := rfl
+example : SylFixture.Semantics.Cards.«Branchloft Pathway // Boulderloft Pathway» = Semantics.Cards.«Branchloft Pathway // Boulderloft Pathway» := rfl
 
-example : SylFixture.Semantics.Cards.«Merfolk Secretkeeper // Venture Deeper» = Semantics.Cards.«Merfolk Secretkeeper // Venture Deeper».card := rfl
+example : SylFixture.Semantics.Cards.«Merfolk Secretkeeper // Venture Deeper» = Semantics.Cards.«Merfolk Secretkeeper // Venture Deeper» := rfl
 
-example : SylFixture.Semantics.Cards.«Blitz Automaton» = Semantics.Cards.«Blitz Automaton».card := rfl
+example : SylFixture.Semantics.Cards.«Blitz Automaton» = Semantics.Cards.«Blitz Automaton» := rfl
 
-example : SylFixture.Semantics.Cards.«Student of Warfare» = Semantics.Cards.«Student of Warfare».card := rfl
+example : SylFixture.Semantics.Cards.«Student of Warfare» = Semantics.Cards.«Student of Warfare» := rfl
 
-example : SylFixture.Semantics.Cards.«Profit // Loss» = Semantics.Cards.«Profit // Loss».card := rfl
+example : SylFixture.Semantics.Cards.«Profit // Loss» = Semantics.Cards.«Profit // Loss» := rfl
 
-example : SylFixture.Semantics.Cards.«Glassworks // Shattered Yard» = Semantics.Cards.«Glassworks // Shattered Yard».card := rfl
+example : SylFixture.Semantics.Cards.«Glassworks // Shattered Yard» = Semantics.Cards.«Glassworks // Shattered Yard» := rfl
 
-example : SylFixture.Semantics.Cards.«Neglected Heirloom // Ashmouth Blade» = Semantics.Cards.«Neglected Heirloom // Ashmouth Blade».card := rfl
+example : SylFixture.Semantics.Cards.«Neglected Heirloom // Ashmouth Blade» = Semantics.Cards.«Neglected Heirloom // Ashmouth Blade» := rfl
 
-example : SylFixture.Semantics.Cards.«Bushi Tenderfoot // Kenzo the Hardhearted» = Semantics.Cards.«Bushi Tenderfoot // Kenzo the Hardhearted».card := rfl
+example : SylFixture.Semantics.Cards.«Bushi Tenderfoot // Kenzo the Hardhearted» = Semantics.Cards.«Bushi Tenderfoot // Kenzo the Hardhearted» := rfl
 
 example : SylFixture.Semantics.Definitions.fight.deed = Semantics.Definitions.fight.deed := rfl
 example : SylFixture.Semantics.Definitions.flying.label = Semantics.Definitions.flying.label := rfl
 example : SylFixture.Semantics.Definitions.bear_definition = Semantics.Definitions.bear_definition := rfl
 example : SylFixture.Semantics.Definitions.haunting_definition = Semantics.Definitions.haunting_definition := rfl
 
-example : NormalFixture.Semantics.Templates.shared = (-1 : Int) := rfl
 example : NormalFixture.Semantics.Templates.Int.shared = (-1 : Int) := rfl
 example : NormalFixture.Semantics.Templates.Bool.shared = true := rfl
 example : NormalFixture.Semantics.Templates.this_ = (1 : Int) := rfl
@@ -196,3 +191,39 @@ example : NormalFixture.Semantics.Templates.or (value := 5) = (5 : Int) := rfl
 
 example : NormalFixture.Semantics.Definitions.calledDeed.deed =
     Semantics.Deed.action "customWord" := rfl
+
+example : NormalFixture.Semantics.Primitives.Delta.up 2 = Semantics.Delta.up (Semantics.Amount.lit 2) := rfl
+example : NormalFixture.Semantics.Templates.naturalInteger 3 = (3 : Int) := rfl
+example : NormalFixture.Semantics.Templates.colorSelection = Semantics.ColorSpec.some [.blue] := rfl
+example : NormalFixture.Semantics.Templates.callsWithLocalName .you = Semantics.Subject.actor .you := rfl
+example : NormalFixture.Semantics.Templates.multiline = "first\nsecond" := rfl
+
+namespace LegacyBundlePins
+open Semantics Semantics.Templates
+open LegacyFixture.Semantics.Definitions LegacyFixture.Semantics.Templates
+example : LegacyFixture.Semantics.Cards.«Bundle fixture».check = [] := by decide
+example : bundleQuality = bundleAtom := rfl
+example : Action.bundleShared = Semantics.Action.ownScope (some (.action "bundleShared" .none)) bundleDraw := rfl
+example : Ability.bundleShared = .keyword (.named "bundleShared") [] [spell Action.bundleShared] := rfl
+example : aQuality = Semantics.Predicate.and [Semantics.Predicate.isToken, Semantics.Predicate.isCard] := rfl
+example : aSubject = Semantics.NounPhrase.you := rfl
+example (subject : NounPhrase) : Action.bundleDevour subject =
+    Semantics.Action.ownScope (some (.ofAbility (.named "bundle devour")))
+      (Semantics.Definitions.sacrifice (.firstMention "bundleDevour.subject" (.inCaller subject))) := rfl
+example : Ability.bundleDevour = Semantics.Ability.keyword (.named "bundle devour") []
+    [spell (Action.bundleDevour thisCreature)] := rfl
+theorem registryConferralMayReferToItsCatalogValue : bundleBearer_definition = .subtype bundleBearer [bundleConferral] := rfl
+theorem appliedReturnTypeInBundle : bundlePredicates = [hasSubtype bundleBearer] := rfl
+end LegacyBundlePins
+
+namespace GeneratedCanonPins
+open Semantics
+open LegacyFixture.Semantics.Cards
+noncomputable def checkWitness : Card := «Canon Witness»
+syl_register "card" checkWitness "checkWitness.syl"
+check_canon_card "checkWitness.syl"
+example : Card.check checkWitness = [] := ok_checkWitness
+theorem canonCardIsCheckedByItsCheckModule :
+    Card.check «Canon Witness» = [] := «ok_Canon Witness»
+example : Authoring.cardFileName "Canon Witness: Split" = "Canon Witness{colon} Split.syl" := by native_decide
+end GeneratedCanonPins

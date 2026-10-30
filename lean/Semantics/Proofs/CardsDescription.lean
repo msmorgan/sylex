@@ -156,7 +156,7 @@ theorem okCroakingCounterpartCopy : Action.check (DRS.ofList []) croakingCounter
 
 /-- "a loyalty ability of enchanted planeswalker" -/
 def loyaltyAbilityOfEnchanted : NounPhrase :=
-  (match (cardNamed "Elspeth's Talent").card with
+  (match (cardNamed "Elspeth's Talent") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.triggered (GameEvent.does _ (Action.ownScope _
         (Action.procedure _ (NounPhrase.firstMention _ (NounPhrase.inCaller part)) _ _ _ _))) _ _ _
@@ -373,13 +373,13 @@ theorem okSquadCommanderTokens : Ability.check (DRS.ofList []) squadCommanderTok
 
 /-- At Knifepoint -/
 def atKnifepointOutlaws : Ability :=
-  (match (cardNamed "At Knifepoint").card with
+  (match (cardNamed "At Knifepoint") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
     | _ => none).get (by decide)
 def atKnifepointCrime : Ability :=
-  (match (cardNamed "At Knifepoint").card with
+  (match (cardNamed "At Knifepoint") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none

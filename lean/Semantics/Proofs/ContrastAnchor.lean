@@ -41,16 +41,16 @@ private def mentionsOf (action : Action) (drs : DRS := DRS.ofList []) :
 private def framed (types : List CardType) : DRS := { DRS.ofList [] with sourceTypes := types }
 
 /-- A spell card's first spell ability. -/
-private def spellOf (card : Spelled) : Action :=
-  match card.card with
+private def spellOf (card : Card) : Action :=
+  match card with
   | .singleFaced face => match face.characteristics.text with
     | .spell _ action :: _ => action
     | _ => .sequentially []
   | _ => .sequentially []
 
 /-- A split card's right half's first spell ability. -/
-private def rightSpellOf (card : Spelled) : Action :=
-  match card.card with
+private def rightSpellOf (card : Card) : Action :=
+  match card with
   | .split _ right => match right.characteristics.text with
     | .spell _ action :: _ => action
     | _ => .sequentially []
@@ -86,7 +86,7 @@ theorem arcTrailAnchorsOnItsFirstTarget :
 any other target." No earlier mention but the Source's own: the anchor is the Source. -/
 theorem screamingNemesisAnchorsOnTheSource :
     let header := GameEvent.extend (framed [.creature])
-      (.does .any (dealDamage (to := thisCreature)))
+      (.does .any (dealDamage (recipient := thisCreature)))
     anchorsOf (instruct it (dealDamage thatMuch (target isAnyOtherTarget))) (nextClause header)
       = [.source] := by
   decide

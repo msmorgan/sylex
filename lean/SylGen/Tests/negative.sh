@@ -43,7 +43,8 @@ check 'none requires Option' 'action bad { deed = none(1), body = sequentially([
 check 'Dependency cycle in bundle' 'template a: Int { body = b } template b: Int { body = a }'
 check 'Dependency cycle in bundle' 'template a: Int { body = Int.b } template b: Int { body = Int.a }'
 check 'Dependency cycle in bundle' 'ability mutualOne { body = [mutualTwo] } ability mutualTwo { body = [mutualOne] }'
-printf 'sylGen negative cases: 27 passed\n'
+check 'ofAbility cannot be combined with deed or permanent' 'action bad { ofAbility = foo, deed = other, body = sequentially([]) }'
+printf 'sylGen negative cases: 28 passed\n'
 
 printf '%s\n' 'template value: Int { body = 1 } template use: Int { body = value }' > "$scratch/input/bad.syl"
 "$exe" "$scratch/input" "$scratch/custom-output" CustomRoot Custom.Generated > "$scratch/log" 2>&1

@@ -247,7 +247,7 @@ Trickery* ("Counter target spell if it was kicked.") and *Merfolk Falconer* ("Wh
 kicked spell, scry 2.") read the kicker cost of a spell neither prints [CR#702.33d], and both are
 spelled and check clean. -/
 theorem kickedReadsAnotherSpellsKicker :
-    (cardNamed "Ertai's Trickery").card.check = [] ∧ (cardNamed "Merfolk Falconer").card.check = [] :=
+    (cardNamed "Ertai's Trickery").check = [] ∧ (cardNamed "Merfolk Falconer").check = [] :=
   ⟨cardNamedOk "Ertai's Trickery", cardNamedOk "Merfolk Falconer"⟩
 
 /-- Required pin: "exile it haunting target creature" relates two objects [CR#702.55a]. -/
@@ -473,7 +473,7 @@ def timotharBaronOfBats : Ability :=
             { colors := [.black], types := [.creature], subtypes := [bat],
               text := [flying], power := stat 1, toughness := stat 1 } }),
           gain it
-            (when (does thisToken (dealDamage (to := a isPlayer) (kind := some .combat)))
+            (when (does thisToken (dealDamage (recipient := a isPlayer) (kind := some .combat)))
               (sequentially
                 [ sacrifice it,
                   returnToBattlefield theExiledCard [.entersAs .tapped] ])) ])))
@@ -526,16 +526,16 @@ def entering (steps : List Action) : Ability :=
   when (does thisEnchantment enter) (sequentially steps)
 
 /-- Required pin: Necromancy as printed [CR#607.2c,603.7a]. -/
-theorem okNecromancy : (cardNamed "Necromancy").card.check = [] :=
+theorem okNecromancy : (cardNamed "Necromancy").check = [] :=
   cardNamedOk "Necromancy"
 
 /-- Required pin: Animate Dead as printed; its return puts the creature onto the battlefield
 [CR#607.2c]. -/
-theorem okAnimateDead : (cardNamed "Animate Dead").card.check = [] :=
+theorem okAnimateDead : (cardNamed "Animate Dead").check = [] :=
   cardNamedOk "Animate Dead"
 
 /-- Required pin: Dance of the Dead as printed. -/
-theorem okDanceOfTheDead : (cardNamed "Dance of the Dead").card.check = [] :=
+theorem okDanceOfTheDead : (cardNamed "Dance of the Dead").check = [] :=
   cardNamedOk "Dance of the Dead"
 
 /-- The granted quality reads the put whichever side of the grant it is on [CR#607.1,607.1a]. -/

@@ -158,13 +158,17 @@ theorem okCreatureCanAttack :
       .property (can this_ attack)
     confer ∈ confersOf creature_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, creature_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, creature_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 theorem okCreatureCanBlock :
     let confer : Conferral :=
       .property (can this_ block)
     confer ∈ confersOf creature_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, creature_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, creature_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#302.6] "A creature can't attack unless it has been under its controller's control
 continuously since their most recent turn began." -/
@@ -173,7 +177,9 @@ theorem okSummoningSicknessAttack :
       .property (onlyUnless (cant this_ attack) (controlledSinceTheirTurnBegan it))
     confer ∈ confersOf creature_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, creature_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, creature_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#302.6] "A creature's activated ability with the tap symbol or the untap symbol in its
 activation cost can't be activated unless the creature has been under its controller's control
@@ -187,7 +193,9 @@ theorem okSummoningSicknessActivation :
           (controlledSinceTheirTurnBegan this_))
     confer ∈ confersOf creature_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, creature_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, creature_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#302.6] The summoning-sickness reading's "their" reads the player its condition names, the
 creature's controller: with no player named before it, "their most recent turn" reads nothing. -/
@@ -203,7 +211,9 @@ theorem okCreatureDamageMarking :
       damageResult (markDamage this_ thatMuch)
     confer ∈ confersOf creature_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, creature_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, creature_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#704.5f] "If a creature has toughness 0 or less, it's put into its owner's graveyard." -/
 theorem okToughnessZero :
@@ -214,7 +224,9 @@ theorem okToughnessZero :
         (putInto this_ graveyard)
     confer ∈ confersOf creature_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, creature_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, creature_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#704.5g] A creature with toughness greater than 0 and damage marked on it greater than or
 equal to its toughness is destroyed. -/
@@ -233,7 +245,9 @@ theorem okLethalDamage :
         (destroy this_)
     confer ∈ confersOf creature_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, creature_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, creature_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#306.1,306.5b,306.6,120.3c,704.5i] A planeswalker card may be cast as a sorcery; a
 planeswalker enters with loyalty, can be attacked, loses loyalty to damage, and the loyalty
@@ -251,7 +265,9 @@ theorem okPlaneswalkerLoyalty :
             (.named "loyaltyCounter")))
     confer ∈ confersOf planeswalker_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, planeswalker_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, planeswalker_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#306.6] "Planeswalkers can be attacked." -/
 theorem okPlaneswalkerCanBeAttacked :
@@ -259,7 +275,9 @@ theorem okPlaneswalkerCanBeAttacked :
       .property (can any (attack this_))
     confer ∈ confersOf planeswalker_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, planeswalker_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, planeswalker_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#120.3c] Damage dealt to a planeswalker removes that many loyalty counters from it. -/
 theorem okPlaneswalkerLoyaltyDamage :
@@ -270,7 +288,9 @@ theorem okPlaneswalkerLoyaltyDamage :
           thatMuch this_)
     confer ∈ confersOf planeswalker_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, planeswalker_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, planeswalker_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#704.5i] "If a planeswalker has loyalty 0, it's put into its owner's graveyard." -/
 theorem okLoyaltyZero :
@@ -282,7 +302,9 @@ theorem okLoyaltyZero :
         (putInto this_ graveyard)
     confer ∈ confersOf planeswalker_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, planeswalker_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, planeswalker_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#310.1,310.4b,310.5,120.3h,704.5w,310.9a] A battle card may be cast as a sorcery; a battle
 enters with defense, can be attacked, loses defense to damage, the non-Siege state-based action
@@ -300,7 +322,9 @@ theorem okBattleDefense :
             (.named "defenseCounter")))
     confer ∈ confersOf battle_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, battle_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, battle_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#310.5] "Battles can be attacked." -/
 theorem okBattleCanBeAttacked :
@@ -308,7 +332,9 @@ theorem okBattleCanBeAttacked :
       .property (can any (attack this_))
     confer ∈ confersOf battle_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, battle_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, battle_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#120.3h] Damage dealt to a battle removes that many defense counters from it. -/
 theorem okBattleDefenseDamage :
@@ -319,7 +345,9 @@ theorem okBattleDefenseDamage :
           thatMuch this_)
     confer ∈ confersOf battle_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, battle_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, battle_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#704.5w,310.8] "If a non-Siege battle has defense 0, it's put into its owner's
 graveyard." Its defense on the battlefield is its defense-counter count [CR#310.4c]. -/
@@ -336,7 +364,9 @@ theorem okBattleDefenseZero :
         (putInto this_ graveyard)
     confer ∈ confersOf battle_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, battle_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, battle_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#310.9a,205.3q] As a battle with no battle type enters, its controller chooses its
 protector, and the only player it may choose is itself. -/
@@ -353,7 +383,9 @@ theorem okBattleProtector :
             (hasSubtype siege)))
     confer ∈ confersOf battle_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, battle_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, battle_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#301.1] An artifact card may be cast as a sorcery. -/
 theorem okArtifactType : RegistryDefinition.check artifact_definition = [] := by decide
@@ -411,7 +443,9 @@ theorem okSiegeProtector :
       .property (entersChoosingPlayer thisSiege anOpponent)
     confer ∈ confersOf siege_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, siege_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, siege_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#310.12b] When the last defense counter is removed from a Siege, it is exiled, and then
 its controller may cast it transformed without paying its mana cost. -/
@@ -424,7 +458,9 @@ theorem okSiegeLastCounter :
               may (cast it (payment := withoutPaying) (resulting := some isTransformed)) ]))
     confer ∈ confersOf siege_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, siege_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, siege_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#704.5v] A Siege with defense 0 that is the source of no ability that has triggered but
 not yet left the stack is put into its owner's graveyard. -/
@@ -439,7 +475,9 @@ theorem okSiegeDefenseZero :
         (putInto this_ graveyard)
     confer ∈ confersOf siege_definition ∧
       confer.check = [] :=
-  ⟨by simp [confersOf, siege_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, siege_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- The lore increment is a turn-based action [CR#714.3c], a game action and no effect
 [CR#703.1,609.1]: the `turnBased` conferral that encloses it says so, and the put itself carries
@@ -496,18 +534,22 @@ theorem okMonarchDraw :
       .ability (at_ (beginningOfPossessed .endStep theMonarch) (instruct (that player) (draw 1)))
     confer ∈ confersOf monarch_definition ∧
       confer.checkIn monarch_definition.conferralContext = [] :=
-  ⟨by simp [confersOf, monarch_definition], by decide⟩
+  ⟨by
+      simp only [confersOf, monarch_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#725.2] "Whenever a creature deals combat damage to the monarch, its controller becomes
 the monarch." -/
 theorem okMonarchSteal :
     let confer : Conferral :=
       .ability
-        (whenever (does (a isCreature) (dealDamage (to := theMonarch) (kind := some .combat)))
+        (whenever (does (a isCreature) (dealDamage (recipient := theMonarch) (kind := some .combat)))
           (gainDesignation (controllerOf it) monarch))
     confer ∈ confersOf monarch_definition ∧
       confer.checkIn monarch_definition.conferralContext = [] :=
-  ⟨by simp [confersOf, monarch_definition, Templates.DamageKind.combat], by decide⟩
+  ⟨by
+      simp only [confersOf, monarch_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#726.1,726.2] The one of the initiative's inherent triggered
 abilities the grammar can write checks; the two that venture into Undercity [CR#701.49d] wait on
@@ -521,11 +563,13 @@ theorem okInitiativeSteal :
       .ability
         (whenever
           (does (counted (orMore 1) (and [isCreature, controlledBy (a isPlayer)]))
-            (dealDamage (to := theInitiativeHolder) (kind := some .combat)))
+            (dealDamage (recipient := theInitiativeHolder) (kind := some .combat)))
           (gainDesignation (controllerOf (those creature)) initiative))
     confer ∈ confersOf initiative_definition ∧
       confer.checkIn initiative_definition.conferralContext = [] :=
-  ⟨by simp [confersOf, initiative_definition, Templates.DamageKind.combat], by decide⟩
+  ⟨by
+      simp only [confersOf, initiative_definition, List.mem_cons]
+      repeat (first | rfl | exact Or.inl rfl | apply Or.inr), by decide⟩
 
 /-- [CR#725.2,726.2] The designations' abilities are controlled by the player who held the
 designation when they triggered; a card type's are its objects' own, controlled as their source

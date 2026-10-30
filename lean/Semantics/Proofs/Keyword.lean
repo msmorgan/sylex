@@ -412,8 +412,8 @@ theorem badNonKeywordAbilityInKeywordList :
 /-! ### "The same is true for …" on the printed cards -/
 
 /-- A card's line `i`. -/
-private def lineOf (card : Spelled) (i : Nat) : Option Ability :=
-  match card.card with
+private def lineOf (card : Card) (i : Nat) : Option Ability :=
+  match card with
   | .singleFaced face => face.characteristics.text[i]?
   | _ => none
 
@@ -441,11 +441,11 @@ private def grantForm : List CharacteristicEdit → Option (Option KeywordTerm)
   | _ => none
 
 /-- The grant form of each part of a card's line `i`. -/
-private def grantForms (card : Spelled) (i : Nat) : List (Option (Option KeywordTerm)) :=
+private def grantForms (card : Card) (i : Nat) : List (Option (Option KeywordTerm)) :=
   ((lineOf card i).map partEdits).getD [] |>.map grantForm
 
 /-- The frame and keywords of a card's Same-Is-True-For line `i`. -/
-private def sameIsTrueForLine (card : Spelled) (i : Nat) : Option (Ability × List KeywordTerm) :=
+private def sameIsTrueForLine (card : Card) (i : Nat) : Option (Ability × List KeywordTerm) :=
   match lineOf card i with
   | some (.sameIsTrueFor frame keywords) => some (frame, keywords)
   | _ => none
@@ -538,7 +538,7 @@ theorem odricReadsAsItsJoinedKeywords :
       Ability.check { DRS.ofList [] with thatKeyword := some (.the (.named "flying")) }
           (odricFor .thatKeyword) =
         Ability.check (DRS.ofList []) (odricFor (.the (.named "flying"))) ∧
-      ((cardNamed "Odric, Lunarch Marshal").card.check = []) := by
+      ((cardNamed "Odric, Lunarch Marshal").check = []) := by
   decide
 
 /-- A keyword wants a modal spell when its own Definition writes a Mode Change: entwine,

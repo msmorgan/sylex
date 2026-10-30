@@ -19,7 +19,7 @@ open Semantics Semantics.Templates Semantics.Definitions
 
 namespace Semantics.Cards
 
-def targetPlayerOrPlaneswalker : NounPhrase := (match (cardNamed "Heart of Bogardan").card with
+def targetPlayerOrPlaneswalker : NounPhrase := (match (cardNamed "Heart of Bogardan") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
         (Action.simultaneously (List.cons (Action.instruct _ (Action.dealDamage _ part _)) _)) _)))
@@ -34,13 +34,13 @@ theorem okTargetOpponentOrPlaneswalker :
     NounPhrase.checkAt none (DRS.ofList []) targetOpponentOrPlaneswalker = [] := by decide
 
 /-- Bioplasm -/
-def bioplasmAttack : GameEvent := (match (cardNamed "Bioplasm").card with
+def bioplasmAttack : GameEvent := (match (cardNamed "Bioplasm") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered part _ _ _ _ _ _ _) _) => some part
       | _ => none
     | _ => none).get (by decide)
 theorem okBioplasmAttack : GameEvent.check (DRS.ofList []) bioplasmAttack = [] := by decide
-def bioplasmExile : Action := (match (cardNamed "Bioplasm").card with
+def bioplasmExile : Action := (match (cardNamed "Bioplasm") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons part _))) _) =>
         some part
@@ -71,7 +71,7 @@ theorem okVedalkenSquirrelWhackerReroll :
 
 /-- "each creature that player or that planeswalker's controller controls" -/
 def eachCreatureThatSplitControls : NounPhrase :=
-  (match (cardNamed "Heart of Bogardan").card with
+  (match (cardNamed "Heart of Bogardan") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons
         (Action.simultaneously (List.cons _ (List.cons (Action.instruct _ (Action.dealDamage _ part
@@ -81,7 +81,7 @@ def eachCreatureThatSplitControls : NounPhrase :=
 
 /-- Boreas Charger's description -/
 def opponentWithMoreLands : Predicate :=
-  (match (cardNamed "Land Tax").card with
+  (match (cardNamed "Land Tax") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered _ _ _ _ _ _ (Option.some (Condition.exists_
         (NounPhrase.described _ part))) _) _) => some part
@@ -90,7 +90,7 @@ def opponentWithMoreLands : Predicate :=
 theorem okOpponentWithMoreLands :
     Predicate.checkAt .player (DRS.ofList []) opponentWithMoreLands = [] := by decide
 
-def bioplasmCardTest : Condition := (match (cardNamed "Bioplasm").card with
+def bioplasmCardTest : Condition := (match (cardNamed "Bioplasm") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.triggered _ _ _ _ _ _ _ (Action.sequentially (List.cons _ (List.cons
         (Action.doIf part _ _ _) _)))) _) => some part
@@ -124,7 +124,7 @@ cost (the `keyword` field) is the event a replacement watches, and paying {0} is
 in its place, the shape an "instead" effect takes [CR#614.1a]. Declining the `may` leaves the
 echo cost to be paid. -/
 def thickSkinnedGoblinEchoPayment : Ability :=
-  (match (cardNamed "Thick-Skinned Goblin").card with
+  (match (cardNamed "Thick-Skinned Goblin") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -133,8 +133,8 @@ theorem okThickSkinnedGoblinEchoPayment :
     Ability.check (DRS.ofList []) thickSkinnedGoblinEchoPayment = [] := by decide
 
 /-- The keyword family terms of a card's Same-Is-True-For lines, in order. -/
-def sameIsTrueForFamilies (card : Spelled) : List KeywordTerm :=
-  match card.card with
+def sameIsTrueForFamilies (card : Card) : List KeywordTerm :=
+  match card with
   | .singleFaced face => face.characteristics.text.flatMap fun
     | .sameIsTrueFor _ keywords => keywords.filter fun
       | .anyIn _ => true
@@ -204,7 +204,7 @@ theorem okQuenchableFire : Action.check (DRS.ofList []) quenchableFire = [] := b
 /-- Garruk Relentless's first 0: "Garruk Relentless deals 3 damage to target creature. That
 creature deals damage equal to its power to him." -/
 def garrukRelentlessFight : Action :=
-  (match (cardNamed "Garruk Relentless // Garruk, the Veil-Cursed").card with
+  (match (cardNamed "Garruk Relentless // Garruk, the Veil-Cursed") with
     | Card.transforming face _ => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.activated _ part _ _ _ _) _)) => some part
       | _ => none

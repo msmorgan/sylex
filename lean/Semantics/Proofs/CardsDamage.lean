@@ -121,7 +121,7 @@ theorem okIndestructibleAura : Action.check (DRS.ofList []) indestructibleAura =
 def shieldmatesBlessing : Action :=
   preventNext (target isAnyTarget) 3 thisTurn
 theorem okShieldmatesBlessing : Action.check (DRS.ofList []) shieldmatesBlessing = [] := by decide
-def moonlitWake : Ability := (match (cardNamed "Moonlit Wake").card with
+def moonlitWake : Ability := (match (cardNamed "Moonlit Wake") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -134,7 +134,7 @@ def eliteJavelineer : Ability :=
 theorem okEliteJavelineer : Ability.check (DRS.ofList []) eliteJavelineer = [] := by decide
 /-- Glacial Chasm -/
 def glacialChasmShield : Ability :=
-  (match (cardNamed "Glacial Chasm").card with
+  (match (cardNamed "Glacial Chasm") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons _ (List.cons part _)))) => some part
       | _ => none
@@ -411,7 +411,7 @@ def explosiveProdigyTrigger : Ability :=
 theorem okExplosiveProdigyTrigger : Ability.check (DRS.ofList []) explosiveProdigyTrigger = [] := by decide
 /-- Niv-Mizzet, Guildpact -/
 def nivMizzetGuildpactTrigger : Ability :=
-  whenever (does thisCreature (dealDamage (to := a isPlayer) (kind := some .combat)))
+  whenever (does thisCreature (dealDamage (recipient := a isPlayer) (kind := some .combat)))
     (sequentially
       [ instruct thisCreature (dealDamage (letter .x) (target isAnyTarget)),
         instruct (target isPlayer) (draw (letter .x)),

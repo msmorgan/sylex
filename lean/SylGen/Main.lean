@@ -31,12 +31,19 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
         let parameters ← d.parameters.mapM fun p => do
           return { p with sort := ← normalizeSort p.pos p.sort }
         ds := ds.push { d with sort, parameters }
-  ds ← match orderDeclarations ds with
-    | .ok sorted => pure sorted
-    | .error message => throwError message
+  -- Register signatures before resolving bodies so only references at the expected sort
+  -- contribute dependency edges.
+  let catalog := fun d => d.kind ∈ ["counter", "designation", "subtype", "card_type", "relation"]
+  ds := ds.filter catalog ++ ds.filter (fun d => d.kind == "primitive") ++
+    ds.filter (fun d => !catalog d && d.kind != "primitive")
   let ctors ← constructors
+  ds := ds.map fun d => { d with parameters := d.parameters.map fun p =>
+    if (ctors.contains (leanWord p.name, p.sort.text)) then
+      { p with binderName := leanWord p.name ++ "Value" }
+    else p }
   let registry ← loadDeclarations root ds fallback
   let mut outputs := #[]
+  let mut errors : Array String := #[]
   for d in ds do
     try
       let (out, _) ← ((emit d).run {
@@ -46,13 +53,23 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
         parameters := d.parameters }).run {}
       outputs := outputs.push out
     catch error =>
-      throwError d.pos.error (← error.toMessageData.toString)
+      errors := errors.push (d.pos.error (← error.toMessageData.toString))
+  unless errors.isEmpty do throwError "{String.intercalate "\n" errors.toList}"
   let owners := outputs.foldl (init := ({} : Std.HashMap Name Name)) fun map out =>
     (map.insert out.name out.name).insert (out.name ++ `label) out.name
       |>.insert (out.name ++ `deed) out.name
   let byName := outputs.foldl (init := ({} : Std.HashMap Name Output)) fun m o => m.insert o.name o
   let dependencies := fun (name : Name) =>
     (byName[name]!.dependencies.toList.filterMap (owners[·]?)).eraseDups.filter (· != name)
+  let registered := ds.filter catalog |>.map fun d => registry[(d.name, d.sort.text)]!.constant
+  let bodyDependencies := fun (name : Name) =>
+    byName[name]!.dependencies.toList.filter fun dep =>
+      byName.contains dep && !registered.contains dep
+  for component in Lean.SCC.scc (outputs.toList.map (·.name)) bodyDependencies do
+    if component.length > 1 || (bodyDependencies component.head!).contains component.head! then
+      for d in ds do
+        if registry[(d.name, d.sort.text)]!.constant == component.head! then
+          throwError d.pos.error s!"Dependency cycle in bundle: {component}"
   let components := Lean.SCC.scc (outputs.toList.map (·.name)) dependencies
   let mut modules : Std.HashMap Name String := {}
   for component in components do
@@ -60,9 +77,14 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
     for name in component do modules := modules.insert name module
   let mut expected : Array FilePath := #[]
   let mut umbrella := ""
+  let mut builtinImports := ""
+  let mut cardImports := ""
+  let mut cardChecks := ""
   let mut checks : Array FilePath := #[]
   for component in components do
     let module := modules[component.head!]!
+    let component := (Lean.SCC.scc component fun name =>
+      (bodyDependencies name).filter (component.contains ·)).flatten
     let mut imports := if fallback.isEmpty then "import Semantics.Rules\nimport Semantics.CallerScope\n"
       else "import Semantics.Definitions\n"
     imports := imports ++ "import SylGen.Registration\n"
@@ -77,13 +99,20 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
     expected := expected.push path
     writeChanged path text
     umbrella := umbrella ++ s!"import {modulePrefix}.{module}\n"
+    if component.any (fun n => (`Semantics.Cards).isPrefixOf n) then
+      cardImports := cardImports ++ s!"import {modulePrefix}.{module}\n"
+    else builtinImports := builtinImports ++ s!"import {modulePrefix}.{module}\n"
     let checkText := String.intercalate "\n" ((component.map fun n => byName[n]!.check).filter (!·.isEmpty))
     if !checkText.isEmpty then
       let path := output / (modulePrefix.replace "." "/") / "Check" / (module ++ ".lean")
       checks := checks.push path
       writeChanged path (s!"import {modulePrefix}.{module}\nimport Semantics.Check.Card\n\n" ++ checkText)
       umbrella := umbrella ++ s!"import {modulePrefix}.Check.{module}\n"
+      cardChecks := cardChecks ++ s!"import {modulePrefix}.Check.{module}\n"
   let dir := output / (modulePrefix.replace "." "/")
+  if root.isAnonymous then
+    for name in ["Builtin", "Canon", "CanonChecks"] do
+      expected := expected.push (dir / (name ++ ".lean"))
   if ← dir.pathExists then
     for entry in ← dir.readDir do
       if entry.path.extension == some "lean" && !expected.contains entry.path then
@@ -94,6 +123,9 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
       if entry.path.extension == some "lean" && !checks.contains entry.path then
         IO.FS.removeFile entry.path
   writeChanged (output / ((modulePrefix.replace "." "/") ++ ".lean")) umbrella
+  if root.isAnonymous then
+    for (name, text) in [("Builtin", builtinImports), ("Canon", cardImports), ("CanonChecks", cardChecks)] do
+      writeChanged (dir / (name ++ ".lean")) text
   IO.println s!"sylGen: {ds.size} declarations, {components.length} modules"
 
 private partial def canonical (name : Name) : MetaM Name := do

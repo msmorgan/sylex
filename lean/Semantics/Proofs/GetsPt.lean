@@ -130,13 +130,13 @@ private def singleFaceText (card : Card) : List Ability :=
   | .singleFaced face => face.characteristics.text
   | _ => []
 
-private def firstLineTrace (card : Spelled) : DRS × List Refusal :=
-  match singleFaceText card.card with
+private def firstLineTrace (card : Card) : DRS × List Refusal :=
+  match singleFaceText card with
   | first :: _ => abilityTrace (DRS.ofList []) first
   | [] => (DRS.ofList [], [.nonEmpty])
 
-private def cardLineTrace (card : Spelled) (index : Nat) : DRS × List Refusal :=
-  let text := singleFaceText card.card
+private def cardLineTrace (card : Card) (index : Nat) : DRS × List Refusal :=
+  let text := singleFaceText card
   let context := (text.take index).foldl Ability.textContext (DRS.ofList [])
   match text[index]? with
   | some line => abilityTrace context line
@@ -164,7 +164,7 @@ theorem jeskaiAscendancyUntapsItsPumpedGroup :
 /-- Diminish sets one target creature's base power and toughness to 1/1 [CR#613.4b]. -/
 theorem diminishKeepsOneTargetForBothSetDeltas :
     let result := firstLineTrace (cardNamed "Diminish")
-    singleFaceText (cardNamed "Diminish").card =
+    singleFaceText (cardNamed "Diminish") =
       [.spell none (get (target isCreature) (.set 1) (.set 1)
         (some untilEndOfTurn))] ∧
       result.2 = [] ∧ creatureIdentity result.1 0 = true ∧
@@ -208,7 +208,7 @@ theorem nyxathidBothDeltasReadItsUniqueAnnouncedPlayer :
     result.2 = [] ∧ countChoice .player result.1 = 1 ∧
       (result.1.findById? 0).map (·.payload) = some (.player true) ∧
       creatureIdentity result.1 1 = true ∧
-      (singleFaceText (cardNamed "Nyxathid").card)[1]? = some (.static
+      (singleFaceText (cardNamed "Nyxathid"))[1]? = some (.static
         (getsPt thisCreature
           (.down (countOf (.and [.isCard, .in_ (handOf (the isChosenPlayer))])))
           (.down (countOf (.and [.isCard, .in_ (handOf (the isChosenPlayer))]))))) := by
@@ -256,7 +256,7 @@ theorem spidersilkArmorGrantsReachToItsPumpedGroup :
 
 theorem enchantedVanillaChangesOnlyItsAttachmentHost :
     let result := stepStaticSpec 32 (DRS.ofList [])
-      ((match (cardNamed "Frogify").card with
+      ((match (cardNamed "Frogify") with
         | .singleFaced face => match face.characteristics.text with
           | _ :: .static spec :: _ => some spec
           | _ => none
@@ -432,15 +432,15 @@ Inversion* and *Ego Erasure* ("get … and lose all creature types"). -/
 private def getsAndGainsBodies : List (Option Action) :=
   [ abilityBody Cards.ghorClanRampager,
     abilityBody Cards.archpriestOfIonaFullParty,
-    (frontText (cardNamed "Elspeth's Talent").card)[2]? >>= abilityBody,
+    (frontText (cardNamed "Elspeth's Talent"))[2]? >>= abilityBody,
     (faceText Cards.chitteringHost)[2]? >>= abilityBody,
-    (frontText (cardNamed "Awaken the Bear").card)[0]? >>= abilityBody,
-    (frontText (cardNamed "Aim High").card)[0]? >>= abilityBody,
-    (frontText (cardNamed "Volatile Claws").card)[0]? >>= abilityBody,
-    (frontText (cardNamed "Arlinn Kord // Arlinn, Embraced by the Moon").card)[0]? >>= abilityBody,
-    (backText (cardNamed "Arlinn Kord // Arlinn, Embraced by the Moon").card)[0]? >>= abilityBody,
-    (frontText (cardNamed "Berserk").card)[0]? >>= abilityBody,
-    (backText (cardNamed "Garruk Relentless // Garruk, the Veil-Cursed").card)[2]? >>= abilityBody,
+    (frontText (cardNamed "Awaken the Bear"))[0]? >>= abilityBody,
+    (frontText (cardNamed "Aim High"))[0]? >>= abilityBody,
+    (frontText (cardNamed "Volatile Claws"))[0]? >>= abilityBody,
+    (frontText (cardNamed "Arlinn Kord // Arlinn, Embraced by the Moon"))[0]? >>= abilityBody,
+    (backText (cardNamed "Arlinn Kord // Arlinn, Embraced by the Moon"))[0]? >>= abilityBody,
+    (frontText (cardNamed "Berserk"))[0]? >>= abilityBody,
+    (backText (cardNamed "Garruk Relentless // Garruk, the Veil-Cursed"))[2]? >>= abilityBody,
     some Cards.namelessInversionBody,
     some Cards.egoErasureBody ]
 

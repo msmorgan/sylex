@@ -38,7 +38,7 @@ without paying its mana cost." The cast is a one-shot optional instruction carri
 resolution [CR#608.2g], not a durationless permission, which would last for the rest of the game
 [CR#611.2a]. -/
 theorem memoryPlunderCastsDuringResolution :
-    ((faceText (cardNamed "Memory Plunder").card).filterMap spellEffect) =
+    ((faceText (cardNamed "Memory Plunder")).filterMap spellEffect) =
       [ may (cast (target (and [isInstantOrSorcery, isCard]))
           (from_ := graveyardOf anOpponent) (payment := withoutPaying)) ] := rfl
 
@@ -83,7 +83,7 @@ theorem discardIsHandedToTheDiscardingPlayer :
 payment, and if they don't pay, the counterspell's controller counters it [CR#118.12a,608.2c],
 handed back to `you`. -/
 theorem unlessPaysCountersByTheCounterspellsController :
-    (faceText (cardNamed "Mana Leak").card).filterMap spellEffect =
+    (faceText (cardNamed "Mana Leak")).filterMap spellEffect =
       [ instruct (controllerOf (target isSpell))
           (doUnless (instruct you (counter it)) [generic 3]) ] := rfl
 
@@ -98,7 +98,7 @@ theorem lifePaymentsArePayLife :
 
 /-- Candles' Glow prints "Splice onto Arcane {1}{W}" [CR#702.47a] after its spell ability. -/
 theorem candlesGlowSplicesOntoArcane :
-    (faceText (cardNamed "Candles' Glow").card).getLast? =
+    (faceText (cardNamed "Candles' Glow")).getLast? =
       some (Ability.splice (hasSubtype arcane) [generic 1, pip .white]) := rfl
 
 /-- Giggling Skitterspike triggers "whenever this creature attacks, blocks, or becomes the target
@@ -184,11 +184,11 @@ theorem graveyardOriginsAreWrittenOnTheMove :
 /-- The same on the spelled cards: Eerie Ultimatum, Rogues' Gallery, Blood Spatter Analysis's
 reflexive return, and Midnight Scavengers' front face, each "from your graveyard". -/
 theorem spelledGraveyardOriginsAreWrittenOnTheMove :
-    written ((faceText (cardNamed "Eerie Ultimatum").card).flatMap abilityMoves) = [(yourGraveyard, [])] ∧
-      written ((faceText (cardNamed "Rogues' Gallery").card).flatMap abilityMoves) = [(yourGraveyard, [])] ∧
-      (written ((faceText (cardNamed "Blood Spatter Analysis").card).flatMap abilityMoves)).getLast? =
+    written ((faceText (cardNamed "Eerie Ultimatum")).flatMap abilityMoves) = [(yourGraveyard, [])] ∧
+      written ((faceText (cardNamed "Rogues' Gallery")).flatMap abilityMoves) = [(yourGraveyard, [])] ∧
+      (written ((faceText (cardNamed "Blood Spatter Analysis")).flatMap abilityMoves)).getLast? =
         some (yourGraveyard, []) ∧
-      written (match (cardNamed "Midnight Scavengers // Chittering Host").card with
+      written (match (cardNamed "Midnight Scavengers // Chittering Host") with
         | .transforming front _ => front.characteristics.text.flatMap abilityMoves
         | _ => []) = [(yourGraveyard, [])] := ⟨rfl, rfl, rfl, rfl⟩
 
@@ -208,12 +208,12 @@ private def triggerEvents (card : Card) : List GameEvent :=
 /-- Darksteel Garrison: "Whenever fortified land becomes tapped" fires on the change from untapped
 to tapped [CR#603.2e], for mana or not (ruling 2007-05-01). -/
 theorem darksteelGarrisonWatchesBecomingTapped :
-    triggerEvents (cardNamed "Darksteel Garrison").card = [does (fortified land) (becomeStatus tapped)] := rfl
+    triggerEvents (cardNamed "Darksteel Garrison") = [does (fortified land) (becomeStatus tapped)] := rfl
 
 /-- Lightmine Field deals damage "equal to the number of attacking creatures", not the number of
 the triggering group. -/
 theorem lightmineFieldCountsAttackingCreatures :
-    ((faceText (cardNamed "Lightmine Field").card).filterMap fun
+    ((faceText (cardNamed "Lightmine Field")).filterMap fun
       | .triggered _ _ _ _ _ _ _ effect => some effect
       | _ => none) =
       [ instruct thisEnchantment
@@ -222,7 +222,7 @@ theorem lightmineFieldCountsAttackingCreatures :
 /-- Temple Altisaur: "another Dinosaur you control", the bare "another" contrasting with the
 source of the ability (ADR semantics-v3 §0.1). -/
 theorem templeAltisaurProtectsAnotherDinosaur :
-    (faceText (cardNamed "Temple Altisaur").card) =
+    (faceText (cardNamed "Temple Altisaur")) =
       [ static (replace (would (a isSource)
           (dealDamage anyAmount (a (and [dinosaur, youControl, isOther]))))
           (instead (preventDamage (allBut 1)))) ] := rfl
@@ -238,7 +238,7 @@ theorem aetherGustTargetsRedOrGreenSpellOrPermanent :
 /-- Archfiend's Vessel: "exile it. If you do, create …" is followed in order [CR#608.2c]; a
 reflexive trigger is only "when [a player] does" or "when … this way" [CR#603.12]. -/
 theorem archfiendsVesselIfYouDoIsNoReflexiveTrigger :
-    ((faceText (cardNamed "Archfiend's Vessel").card).filterMap fun
+    ((faceText (cardNamed "Archfiend's Vessel")).filterMap fun
       | .triggered _ _ _ _ _ _ _ (.withContinuation .required body (some _) none) => some body
       | _ => none) = [exile it] := rfl
 
@@ -266,7 +266,7 @@ theorem quakebringerRestrictsTriggeringOnly :
 creature": the transform deed, which converting also performs, with the characteristic the
 permanent has immediately after [CR#701.27e]. -/
 theorem cultOfTheWaxingMoonWatchesTransformingIntoANonHumanCreature :
-    triggerEvents (cardNamed "Cult of the Waxing Moon").card =
+    triggerEvents (cardNamed "Cult of the Waxing Moon") =
       [ does any (transform (a (and [isPermanent, youControl]))
           (into := some (and [isCreature, not (hasSubtype human)]))) ] := rfl
 
@@ -285,10 +285,10 @@ theorem orTiedForTheMostIsMembership :
         | _ => none) =
         some (does thisCreature (.attack (some
           (a (and [.isPlayer, .superlative .max (.playerStat .lifeTotal) .isPlayer]))))) ∧
-      triggerEvents (cardNamed "Seraphic Greatsword").card =
+      triggerEvents (cardNamed "Seraphic Greatsword") =
         [ does (equipped creature) (attack (some
             (a (and [isPlayer, superlative .max (.playerStat .lifeTotal) isPlayer])))) ] ∧
-      triggerEvents (cardNamed "Undercover Butler").card =
+      triggerEvents (cardNamed "Undercover Butler") =
         [ does thisCreature (attack (some
             (a (and [isPlayer, superlative .max (.playerStat .lifeTotal) isPlayer])))) ] :=
   ⟨rfl, rfl, rfl, rfl⟩
@@ -305,7 +305,7 @@ theorem curieDrawsItsBasePower :
 /-- Baird, Argivian Recruiter: "a creature with power greater than its base power", each creature
 measured against its own base power [CR#208.4b]. -/
 theorem bairdComparesPowerWithItsOwnBasePower :
-    ((faceText (cardNamed "Baird, Argivian Recruiter").card).filterMap fun
+    ((faceText (cardNamed "Baird, Argivian Recruiter")).filterMap fun
       | .triggered _ _ _ _ _ _ intervening _ => intervening
       | _ => none) =
       [ exists_ (comparesOwnStat .power (and [isCreature, youControl])
@@ -326,7 +326,7 @@ theorem squirrelWhackerExchangesWithBasePowerOrToughness :
 /-- Overgrown Zealot: "Spend this mana only to turn permanents face up", the special action
 [CR#116.2b] whatever its cost, morph, disguise, manifest or cloak. -/
 theorem overgrownZealotSpendsToTurnFaceUp :
-    (match faceText (cardNamed "Overgrown Zealot").card with
+    (match faceText (cardNamed "Overgrown Zealot") with
       | [_, .activated _ (.addMana _ _ riders) ..] => riders
       | _ => []) = [spendOnly [toTurnFaceUp isPermanent]] := rfl
 

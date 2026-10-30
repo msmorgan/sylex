@@ -377,7 +377,7 @@ theorem cumulativeUpkeepPaymentIsLabelled :
     upkeepPayment? (cumulativeUpkeep (.mana [generic 1]))
         = some (some thisPermanent, some (.named "cumulativeUpkeep")) ∧
       watchedPayment? Cards.hibernationsEndTrigger = some (.named "cumulativeUpkeep") ∧
-      manaPurpose? (cardNamed "Adarkar Unicorn").card = some (.named "cumulativeUpkeep") :=
+      manaPurpose? (cardNamed "Adarkar Unicorn") = some (.named "cumulativeUpkeep") :=
   ⟨rfl, rfl, rfl⟩
 
 end Semantics.Proofs.Mana

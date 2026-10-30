@@ -17,19 +17,6 @@ open Semantics Semantics.Templates Semantics.Definitions
 
 namespace Semantics.Proofs.UntapStep
 
-mutual
-  /-- The named template and definition calls an authoring tree retains. -/
-  private def Form.calls : Authoring.Form → List Lean.Name
-    | .call name children => name :: Forms.calls children
-    | .data children | .constructor _ children => Forms.calls children
-    | .binder _ body => Form.calls body
-    | .literal _ | .parameter _ | .raw _ => []
-
-  private def Forms.calls : List Authoring.Form → List Lean.Name
-    | [] => []
-    | form :: forms => Form.calls form ++ Forms.calls forms
-end
-
 /-- "<subject> doesn't untap during [<whose>] untap step" forbids the `untap` Definition's Deed,
 so it and a "can't untap" pattern constrain the same Deed. -/
 theorem doesntUntapForbidsTheUntapDeed (subject : NounPhrase) (whose : Option NounPhrase) :
@@ -57,13 +44,25 @@ theorem doesntUntapIsNoStunReplacement :
       Ability.check (DRS.ofList []) stunReplacement = [] :=
   ⟨rfl, by decide⟩
 
-/-- The four untap-step cards are written with `untapDuring`, so each expands through `must`. -/
+/-- The four untap-step cards contain the expanded `untapDuring` static. -/
 theorem untapStepCardsUseUntapDuring :
-    (Form.calls (cardNamed "Seedborn Muse").authoring).contains ``untapDuring ∧
-      (Form.calls (cardNamed "Unwinding Clock").authoring).contains ``untapDuring ∧
-      (Form.calls (cardNamed "Thousand Moons Infantry").authoring).contains ``untapDuring ∧
-      (Form.calls (cardNamed "Drumbellower").authoring).contains ``untapDuring := by
-  decide
+    (match (cardNamed "Seedborn Muse" : Card) with
+      | .singleFaced face => face.characteristics.text =
+          [static (untapDuring (allOf youControl) (each isOtherPlayer))]
+      | _ => False) ∧
+    (match (cardNamed "Unwinding Clock" : Card) with
+      | .singleFaced face => face.characteristics.text =
+          [static (untapDuring (allOf (and [isArtifact, youControl])) (each isOtherPlayer))]
+      | _ => False) ∧
+    (match (cardNamed "Thousand Moons Infantry" : Card) with
+      | .singleFaced face => face.characteristics.text =
+          [static (untapDuring thisCreature (each isOtherPlayer))]
+      | _ => False) ∧
+    (match (cardNamed "Drumbellower" : Card) with
+      | .singleFaced face => face.characteristics.text =
+          [flying, static (untapDuring (allOf (and [isCreature, youControl])) (each isOtherPlayer))]
+      | _ => False) := by
+  exact ⟨rfl, rfl, rfl, rfl⟩
 
 /-- "You may choose not to untap <subject> during [<whose>] untap step" is no permission to untap
 it: it is the "doesn't untap" prohibition, holding only if you so choose. Untapping stays the
@@ -82,7 +81,7 @@ theorem soChoosesNeedsAPlayer :
 /-- *Ashnod's Battle Gear* and *Helm of Possession* still check. -/
 theorem mayDeclineUntapCardsCheck :
     Ability.check (DRS.ofList []) Cards.ashnodsBattleGear = [] ∧
-      (cardNamed "Helm of Possession").card.check = [] :=
+      (cardNamed "Helm of Possession").check = [] :=
   ⟨Cards.okAshnodsBattleGear, cardNamedOk "Helm of Possession"⟩
 
 end Semantics.Proofs.UntapStep

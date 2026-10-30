@@ -95,7 +95,7 @@ def bladeOfTheOniStatic : StaticSpec :=
 theorem okBladeOfTheOniStatic : StaticSpec.check (DRS.ofList []) bladeOfTheOniStatic = [] := by decide
 
 def castCreatureSpellsFromTop : StaticSpec :=
-  (match (cardNamed "Garruk's Horde").card with
+  (match (cardNamed "Garruk's Horde") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.static part) _))) => some part
       | _ => none
@@ -226,7 +226,7 @@ theorem okCelebr8000Doubles : Action.check (DRS.ofList []) celebr8000Doubles = [
 than pay cycling costs." Cycling is an activated ability [CR#702.29a], and an alternative cost
 replaces an activation cost as it replaces a spell's mana cost [CR#118.9,602.2b]. -/
 def newPerspectivesCyclingAltCost : Ability :=
-  (match (cardNamed "New Perspectives").card with
+  (match (cardNamed "New Perspectives") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -253,7 +253,7 @@ theorem okFumikoBushidoX : Ability.check (DRS.ofList []) fumikoBushidoX = [] := 
 
 /-- Tourach, Dread Cantor -/
 def tourachDiscardTrigger : Ability :=
-  (match (cardNamed "Tourach, Dread Cantor").card with
+  (match (cardNamed "Tourach, Dread Cantor") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons part _))) => some part
       | _ => none
@@ -286,7 +286,7 @@ theorem okHarriedDronesmithToken : Action.check (DRS.ofList []) harriedDronesmit
 
 /-- Veiling Oddity -/
 def veilingOddityLine : Ability :=
-  (match (cardNamed "Veiling Oddity").card with
+  (match (cardNamed "Veiling Oddity") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -298,7 +298,7 @@ def darkbladeAgentGrants : Ability :=
   static (onlyWhile (conjunction [ abilityGrant thisCreature deathtouch,
         abilityGrant thisCreature
           (whenever
-             (does thisCreature (dealDamage (to := a isPlayer) (kind := some .combat))) (draw
+             (does thisCreature (dealDamage (recipient := a isPlayer) (kind := some .combat))) (draw
                                                                                                   1)) ]) (did you (surveil anyAmount) soFarThisTurn))
 theorem okDarkbladeAgentGrants : Ability.check (DRS.ofList []) darkbladeAgentGrants = [] := by decide
 /-- Frenzied Gorespawn -/
@@ -309,7 +309,7 @@ theorem okFrenziedGorespawnMenaceTrigger :
     Ability.check (DRS.ofList []) frenziedGorespawnMenaceTrigger = [] := by decide
 /-- Pir, Imaginative Rascal's replacement -/
 def pirDistributive : Ability :=
-  (match (cardNamed "Pir, Imaginative Rascal").card with
+  (match (cardNamed "Pir, Imaginative Rascal") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -317,7 +317,7 @@ def pirDistributive : Ability :=
 theorem okPirDistributive : Ability.check (DRS.ofList []) pirDistributive = [] := by decide
 
 /-- Tolaria, Shelkin Brownie -/
-def bandsWithOtherAbilities : KeywordTerm := (match (cardNamed "Shelkin Brownie").card with
+def bandsWithOtherAbilities : KeywordTerm := (match (cardNamed "Shelkin Brownie") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.activated _ (Action.establish (StaticSpec.characteristicChange _
         (List.cons (CharacteristicEdit.removedAbilities (AbilitySelection.specified (List.cons
@@ -325,7 +325,7 @@ def bandsWithOtherAbilities : KeywordTerm := (match (cardNamed "Shelkin Brownie"
       | _ => none
     | _ => none).get (by decide)
 def protectionFromAnyColor : KeywordTerm :=
-  ((match (cardNamed "Escaped Shapeshifter").card with
+  ((match (cardNamed "Escaped Shapeshifter") with
     | .singleFaced face => match face.characteristics.text with
       | .sameIsTrueFor _ keywords :: _ => keywords.filter fun
         | KeywordTerm.anyIn _ => true
@@ -351,7 +351,7 @@ theorem okBedrockTortoiseWindow : StaticSpec.check (DRS.ofList []) bedrockTortoi
 
 /-- Marit Lage -/
 def maritLage : CharacteristicBundle :=
-  (match (cardNamed "Dark Depths").card with
+  (match (cardNamed "Dark Depths") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.triggered _ _ _ _ _ _ _
         (Action.withContinuation _ _ (Option.some (Action.ownScope _ (Action.createObject _

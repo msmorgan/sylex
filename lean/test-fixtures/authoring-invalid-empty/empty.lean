@@ -1,1 +1,0 @@
--- A bundle file must contain one declaration.

@@ -140,39 +140,41 @@ accepts one [CR#614.1a]. -/
 
 /--
 error: Application type mismatch: The argument
-  instead (draw 1)
+  Templates.Replacement.instead (Templates.Action.draw 1)
 has type
   Replacement
 but is expected to have type
   Action
 in the application
-  @spell instAuthoringContext (instead (draw 1))
+  @Templates.Ability.spell (Templates.Replacement.instead (Templates.Action.draw 1))
 -/
 #guard_msgs in
-example : Ability := spell (instead (draw 1))
+example : Ability := spell (Templates.Replacement.instead (Templates.Action.draw 1))
 
 /--
 error: Application type mismatch: The argument
-  instead (draw 1)
+  Templates.Replacement.instead (Templates.Action.draw 1)
 has type
   Replacement
 but is expected to have type
   Action
 in the application
-  instead (instead (draw 1))
+  Templates.Replacement.instead (Templates.Replacement.instead (Templates.Action.draw 1))
 -/
 #guard_msgs in
-example : Replacement := instead (instead (draw 1))
+example : Replacement := instead (Templates.Replacement.instead (Templates.Action.draw 1))
 
 /--
 error: Application type mismatch: The argument
-  draw 2
+  Templates.Action.draw 2
 has type
   Action
 but is expected to have type
   Replacement
 in the application
-  @Templates.StaticSpec.replace instAuthoringContext (would (Templates.Subject.actor you) (draw 1)) (draw 2)
+  @Templates.StaticSpec.replace
+    (Templates.WouldClause.would (Templates.Subject.actor Templates.NounPhrase.you) (Templates.Action.draw 1))
+    (Templates.Action.draw 2)
 -/
 #guard_msgs in
 example : StaticSpec := replace (would (actor you) (draw 1)) (draw 2)

@@ -1,0 +1,11 @@
+primitive up(amount: Amount): Delta(Amount) {
+  lexical = { lemma = "up" },
+  spelling = "+<amount>"
+}
+template naturalInteger(value: Nat): Int { body = ofNat(value) }
+template colorSelection: ColorSpec { body = some([blue]) }
+primitive triggerReflexively(body: Action, trigger: Action, event: Option(GameEvent) = none): Action
+primitive actor(np: NounPhrase): Subject
+template callsWithLocalName(actor: NounPhrase): Subject { body = actor(actor) }
+template multiline: String { body = "first
+second" }

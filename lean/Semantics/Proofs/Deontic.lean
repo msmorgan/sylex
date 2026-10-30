@@ -279,7 +279,7 @@ theorem cantBePreventedIsADeonticOverPreventDamage :
     let cantBePrevented : StaticSpec :=
       cant any
         (preventDamage allDamage (damage := would (by_ thisCreature) (dealDamage anyAmount)))
-    (cardNamed "Excruciator").card =
+    (cardNamed "Excruciator") =
         singleFacedCard
           { name := "Excruciator", cost := [generic 6, pip .red, pip .red], types := [.creature],
             subtypes := [avatar], text := [static cantBePrevented],
@@ -528,7 +528,7 @@ theorem durationConventionWitnesses :
 "as though" statements and their other lines (the life-gain and damage-prevention prohibitions,
 the loses-the-game exception) unchanged. -/
 theorem okAsThoughSourceHadKeywordCards :
-    (cardNamed "Everlasting Torment").card.check = [] ∧ (cardNamed "Phyrexian Unlife").card.check = [] :=
+    (cardNamed "Everlasting Torment").check = [] ∧ (cardNamed "Phyrexian Unlife").check = [] :=
   ⟨cardNamedOk "Everlasting Torment", cardNamedOk "Phyrexian Unlife"⟩
 
 /-- The damage lines name the keywords by reference, as a condition on the damage's source
@@ -571,7 +571,7 @@ theorem asThoughIsNotRecordedAsPermitted :
 
 /-- Hotshot Mechanic and Cloudspire Captain check in the indicative form. -/
 theorem okIndicativeCrewAsThough :
-    (cardNamed "Hotshot Mechanic").card.check = [] ∧
+    (cardNamed "Hotshot Mechanic").check = [] ∧
       StaticSpec.check (DRS.ofList []) Cards.cloudspireCaptainCrewLine = [] :=
   ⟨cardNamedOk "Hotshot Mechanic", Cards.okCloudspireCaptainCrewLine⟩
 

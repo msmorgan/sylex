@@ -51,7 +51,7 @@ theorem okChooseCreatureYouControlAndCreatureYouDont :
 /-- The opening the fight-and-bite cards share: "Choose target creature you control and target
 creature you don't control." -/
 def chooseFightPair : Action :=
-  (match (cardNamed "Joust").card with
+  (match (cardNamed "Joust") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ (Action.sequentially (List.cons part _))) _) => some part
       | _ => none
@@ -209,7 +209,7 @@ theorem okVoidChoice : Action.check (DRS.ofList []) voidChoice = [] := by decide
 
 /-- Phyrexian Ingester -/
 def phyrexianIngesterPump : Ability :=
-  (match (cardNamed "Phyrexian Ingester").card with
+  (match (cardNamed "Phyrexian Ingester") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -242,14 +242,14 @@ theorem okNecromentiaChoice : Action.check (DRS.ofList []) necromentiaChoice = [
 
 /-- "play lands from the top of your library" -/
 def playLandsFromTop : StaticSpec :=
-  (match (cardNamed "Oracle of Mul Daya").card with
+  (match (cardNamed "Oracle of Mul Daya") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons (Ability.static part) _))) => some part
       | _ => none
     | _ => none).get (by decide)
 /-- Future Sight; Magus of the Future -/
 def playLandsAndCastSpellsFromTop : StaticSpec :=
-  (match (cardNamed "Magus of the Future").card with
+  (match (cardNamed "Magus of the Future") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.static part) _)) => some part
       | _ => none
@@ -258,7 +258,7 @@ theorem okPlayLandsAndCastSpellsFromTop :
     StaticSpec.check (DRS.ofList []) playLandsAndCastSpellsFromTop = [] := by decide
 /-- Assemble the Players -/
 def castSmallCreatureFromTopOnceEachTurn : StaticSpec :=
-  (match (cardNamed "Assemble the Players").card with
+  (match (cardNamed "Assemble the Players") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.static part) _)) => some part
       | _ => none
@@ -329,7 +329,7 @@ theorem okTranquilFrillbackOffer : Action.check (DRS.ofList []) tranquilFrillbac
 
 /-- Duneblast -/
 def duneblast : Action :=
-  (match (cardNamed "Duneblast").card with
+  (match (cardNamed "Duneblast") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.spell _ part) _) => some part
       | _ => none
@@ -379,7 +379,7 @@ theorem okDrawUpToTwoThenGainPerShortfall :
 
 /-- Nautiloid Ship -/
 def nautiloidShipTrigger : Ability :=
-  whenever (does thisVehicle (dealDamage (to := a isPlayer) (kind := some .combat)))
+  whenever (does thisVehicle (dealDamage (recipient := a isPlayer) (kind := some .combat)))
     (may (putOntoBattlefieldUnderYourControl (a (and [isCreature, in_ (exiledWith thisVehicle)]))))
 theorem okNautiloidShipTrigger : Ability.check (DRS.ofList []) nautiloidShipTrigger = [] := by decide
 
@@ -503,7 +503,7 @@ theorem loxodonPeacekeeperThemReadsTheTiedPlayers :
   decide
 
 private def juxtaposeTie : Action :=
-  (match (cardNamed "Juxtapose").card with
+  (match (cardNamed "Juxtapose") with
     | .singleFaced face => match face.characteristics.text with
       | .spell _ (.sequentially (_ :: _ :: action :: _)) :: _ => some action
       | _ => none

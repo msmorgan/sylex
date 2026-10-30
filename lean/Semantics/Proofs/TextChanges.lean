@@ -7,10 +7,8 @@ import Semantics.Check.Card
 A Text Change is a specified rewrite of an object's rules text, applied in layer 3
 [CR#612.1,613.1c]; cleave's Text Change removes all text found within square brackets
 [CR#702.148a,702.148b].
-The brackets are a fact about the wording, not about the meaning: the card is written once with its
-bracketed words inside the identity template `bracketed`, which Core reduces away. The authoring
-tree keeps the call, where lowering reads it to drive the text change. A Text Change is checked by
-kinds only: the rewritten text is not checked again.
+A Text Change is checked by kinds only: the rewritten text is not checked again.
+Bracketed text awaits `plugins-v3-cleave-bracketed-text`.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
@@ -19,61 +17,6 @@ namespace Semantics.Proofs.TextChanges
 
 /-- "{1}{U}{U}" -/
 def cleaveCost : Cost := .mana [generic 1, pip .blue, pip .blue]
-
-mutual
-  /-- The Template and Definition calls a Form names, in order. -/
-  private def formCalls : Authoring.Form → List Lean.Name
-    | .call name arguments => name :: formsCalls arguments
-    | .data children | .constructor _ children => formsCalls children
-    | .binder _ body => formCalls body
-    | .literal _ | .parameter _ | .raw _ => []
-
-  private def formsCalls : List Authoring.Form → List Lean.Name
-    | [] => []
-    | form :: forms => formCalls form ++ formsCalls forms
-end
-
-/-- The refusal a bracketed mismatch shares with its bare form is a real one. -/
-theorem bracketedKindMismatchIsRefused :
-    NounPhrase.checkAt (some .player) (DRS.ofList []) (target (bracketed isCreature)) =
-        [.kindMismatch .player .object] ∧
-      NounPhrase.checkAt (some .player) (DRS.ofList []) (target isCreature) =
-        [.kindMismatch .player .object] := by
-  decide
-
-/-- "Counter target spell [that wasn't cast from a hand]." -/
-theorem okBracketedDescription :
-    NounPhrase.checkAt (some .object) (DRS.ofList [])
-      (target (.and [isSpell,
-        bracketed (.not (did any (cast which (from_ := some (.zone .hand none))) thisObject))])) =
-      [] := by
-  decide
-
-/-- "[Draw a card.]": an action checks as its contents. -/
-theorem okBracketedAction : Action.check (DRS.ofList []) (bracketed (draw 1)) = [] := by
-  decide
-
-/-- "Cleave {1}{U}{U}. Draw a card [for each opponent]." in miniature: a spell with cleave and a
-bracketed action. -/
-private def bracketedSpell : Spelled := spelled <| .singleFaced
-  { characteristics :=
-    { name := "Bracket witness", types := [.sorcery], cost := some [generic 2],
-      text := [cleave [generic 1, pip .blue, pip .blue], spell (bracketed (draw 1))] } }
-
-/-- The authoring tree of a bracketed card records the `bracketed` call, for lowering to read. -/
-theorem bracketedCardRecordsTheCall :
-    (formCalls bracketedSpell.authoring).count ``Templates.bracketed = 1 := by decide
-
-/-- The card with its brackets still checks, and a cleave card still checks. -/
-theorem bracketedCleaveCardChecks : bracketedSpell.card.check = [] := by decide
-
-/-- The card's Core is the unbracketed card: nothing in Core marks the brackets. -/
-theorem bracketedCardCoreIsUnbracketed :
-    bracketedSpell.card = (spelled <| .singleFaced
-      { characteristics :=
-        { name := "Bracket witness", types := [.sorcery], cost := some [generic 2],
-          text := [cleave [generic 1, pip .blue, pip .blue], spell (draw 1)] } }).card := by
-  rfl
 
 /-- Cleave's Text Change on a spell that prints no brackets removes nothing and still checks. -/
 theorem okRemoveBracketedWithoutBrackets :

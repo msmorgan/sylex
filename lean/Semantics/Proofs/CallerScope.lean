@@ -9,6 +9,8 @@ open Semantics Semantics.Templates Semantics.Definitions
 
 namespace Semantics.Proofs.CallerScope
 
+semantic_definition contextualFight (subject : NounPhrase) : Action := fight subject
+
 private def selected (drs : DRS) (body : NounPhrase) : List Referent :=
   let result := stepNounPhrase 64 drs .other false body
   result.2.1.filterMap result.1.findById?
@@ -249,13 +251,13 @@ theorem forwardedCoordinationRetainsTwoParties :
     (Action.exchange (.lifeTotals (forwardedSubject (.and [.you, anOpponent])))).check
       (DRS.ofList []) = [] := by decide
 
-/-- error: Semantics.Definitions.fight uses a lexical context outside its authoring scope -/
+/-- error: Semantics.Proofs.CallerScope.contextualFight uses a lexical context outside its authoring scope -/
 #guard_msgs in
 example : Spelled := spelled <| .singleFaced
   { characteristics :=
     { name := "Forged context witness", types := [.sorcery],
         text := [spell
-        (instruct (target isCreature) (@fight ⟨1⟩ (target isCreature)))] } }
+        (instruct (target isCreature) (@contextualFight ⟨1⟩ (target isCreature)))] } }
 
 /-- error: Card definitions must use semantic templates or definitions; raw constructors: [Semantics.Action.draw] -/
 #guard_msgs in
@@ -286,13 +288,13 @@ example : Spelled := spelled <| .singleFaced
     { name := "Unannotated function alias witness", types := [.sorcery],
         text := [spell (ordinaryFunctionConfig ordinarySubjectIdentity)] } }
 
-/-- error: Semantics.Definitions.fight uses a lexical context outside its authoring scope -/
+/-- error: Semantics.Proofs.CallerScope.contextualFight uses a lexical context outside its authoring scope -/
 #guard_msgs in
 example : Spelled := spelled <| .singleFaced
   { characteristics :=
     { name := "Higher order context witness", types := [.sorcery],
         text := [spell
-        (applyWithForgedContext (@fight) (target isCreature) (target isCreature))] } }
+        (applyWithForgedContext (@contextualFight) (target isCreature) (target isCreature))] } }
 
 /-- error: Semantic parameter subject has no authoring evidence -/
 #guard_msgs in

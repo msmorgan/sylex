@@ -1,23 +1,8 @@
 import DumpValues.Sampling
 import DumpValues.Compare
--- Keep these static imports aligned with canonShardCount in lean/lakefile.lean.
-import Semantics.Cards.Data.Fixtures
-import Semantics.Cards.Data.Shard00
-import Semantics.Cards.Data.Shard01
-import Semantics.Cards.Data.Shard02
-import Semantics.Cards.Data.Shard03
-import Semantics.Cards.Data.Shard04
-import Semantics.Cards.Data.Shard05
-import Semantics.Cards.Data.Shard06
-import Semantics.Cards.Data.Shard07
-import Semantics.Cards.Data.Shard08
-import Semantics.Cards.Data.Shard09
-import Semantics.Cards.Data.Shard10
-import Semantics.Cards.Data.Shard11
-import Semantics.Cards.Data.Shard12
-import Semantics.Cards.Data.Shard13
-import Semantics.Cards.Data.Shard14
-import Semantics.Cards.Data.Shard15
+import Generated.Canon
+import Generated.Builtin
+import Semantics.Primitives
 
 open Lean Meta Semantics.Authoring
 
@@ -75,7 +60,7 @@ private def dump (label : String) : MetaM UInt32 := do
   for entry in cardEntries do
     let name := entry.declaration.getString!
     try
-      let value := mkApp (mkConst ``Semantics.Spelled.card) (mkConst entry.declaration)
+      let value := mkConst entry.declaration
       records := records.push (key ["card", name], ← render value)
       cards := cards + 1
     catch e => errors := errors.push s!"card {name}: {← e.toMessageData.toString}"
@@ -126,20 +111,9 @@ private def dump (label : String) : MetaM UInt32 := do
       !(← entry.path.isDir)
   if cardFiles.size != cards then
     errors := errors.push (s!"card completeness mismatch: {cardFiles.size} source files, " ++
-      s!"{cards} card records; check the static shard imports against canonShardCount")
-  let lakefile ← IO.FS.readFile "lakefile.lean"
-  let countLine? := (lakefile.splitOn "\n").find? fun line =>
-    line.trimAscii.toString.startsWith "def canonShardCount : Nat :="
-  let count? := countLine?.bind fun line =>
-    ((line.splitOn ":=").getLast!).splitOn "--" |>.head! |>.trimAscii.toString.toNat?
-  match count? with
-  | none => errors := errors.push "cannot read literal canonShardCount from lean/lakefile.lean"
-  | some count =>
-    for i in [:count] do
-      let name := `Semantics.Cards.Data ++ (s!"Shard{if i < 10 then "0" else ""}{i}").toName
-      unless env.header.moduleNames.contains name do
-        errors := errors.push (s!"card completeness mismatch: missing import {name}; " ++
-          s!"lean/lakefile.lean declares canonShardCount = {count}")
+      s!"{cards} card records; check the generated canon imports")
+  unless env.header.moduleNames.contains `Generated.Canon do
+    errors := errors.push "card completeness mismatch: missing Generated.Canon import"
   records := records.qsort (fun a b => a.1 < b.1)
   for i in [1:records.size] do
     if records[i-1]!.1 == records[i]!.1 then
@@ -177,8 +151,7 @@ private unsafe def run (args : List String) : IO UInt32 := do
     validateLabel label
     enableInitializersExecution
     initSearchPath (← findSysroot)
-    let imports := #[`Semantics.Cards.Data.Fixtures] ++ (Array.range 16).map fun i =>
-      (`Semantics.Cards.Data ++ (s!"Shard{if i < 10 then "0" else ""}{i}").toName)
+    let imports := #[`Generated.Canon, `Generated.Builtin, `Semantics.Primitives]
     let env ← importModules (imports.map fun n => { module := n }) {} (loadExts := true)
     let (code, _, _) ← (DumpValues.dump label).toIO
       { fileName := "dumpValues", fileMap := default,

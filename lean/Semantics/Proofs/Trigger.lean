@@ -304,8 +304,8 @@ theorem okWheneverDuringIfOnlyOnce :
   decide
 
 /-- The event of a card's first triggered ability. -/
-private def firstTriggerEvent (card : Spelled) : Option GameEvent :=
-  match card.card with
+private def firstTriggerEvent (card : Card) : Option GameEvent :=
+  match card with
   | .singleFaced face =>
     match (face.characteristics.text.head? : Option Ability) with
     | some (.triggered event _ _ _ _ _ _ _) => some event
@@ -320,8 +320,8 @@ theorem gatebreakerTriggersOnThisArtifactEntering :
 
 /-- Whether a card's first ability, its "… The same is true for …" line, is a trigger with no
 intervening "if" whose effect, read for each of its keywords, is conditional. -/
-private def conditionIsInTheEffect (card : Spelled) : Bool :=
-  match card.card with
+private def conditionIsInTheEffect (card : Card) : Bool :=
+  match card with
   | .singleFaced face =>
     match (face.characteristics.text.head? : Option Ability) with
     | some (.sameIsTrueFor (.triggered _ _ _ _ _ _ none (.doIf _ _ none _)) keywords) =>
@@ -342,8 +342,8 @@ theorem trailingIfIsInTheEffect :
 /-- The number of keywords a card's lines grant through one triggered ability each, with the
 number of lines: `some (lines, keywords)` when the card is single-faced and every line is a
 Same-Is-True-For Ability with a triggered frame. -/
-private def triggeredSteps (card : Spelled) : Option (Nat × List Nat) :=
-  match card.card with
+private def triggeredSteps (card : Card) : Option (Nat × List Nat) :=
+  match card with
   | .singleFaced face =>
     let text := face.characteristics.text
     let steps := text.filterMap fun

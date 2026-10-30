@@ -1,0 +1,19 @@
+primitive bundleAtom: Predicate = .isCard
+action bundleDraw { body = draw(1) }
+action bundleShared { body = bundleDraw }
+ability bundleShared { body = [spell(bundleShared)] }
+template bundleQuality: Predicate { body = bundleAtom }
+card { name = "Bundle fixture", types = [sorcery], text = [spell(bundleDraw)] }
+primitive isCard: Predicate = .isToken { lexical = { verbs = [aQuality] }, spelling = "aQuality" }
+primitive isCreature: Predicate = .isCard
+primitive this: NounPhrase = .you { lexical = { nouns = [aSubject] } }
+template aQuality: Predicate { body = and([isCard, isCreature]) }
+template aSubject: NounPhrase { body = this }
+ability bundleDevour { label = "bundle devour", body = [bundleDevourEntry] }
+action bundleDevour(subject: NounPhrase) { ofAbility = bundleDevour, body = sacrifice(subject) }
+template bundleDevourEntry: Ability { body = spell(bundleDevour(thisCreature)) }
+subtype bundleBearer { name = "Bundle Bearer", kind = creature, confers = [bundleConferral] }
+template bundleConferral: Conferral { body = property(can(any, sacrifice(a(hasSubtype(bundleBearer))))) }
+template bundlePredicates: List(Predicate) { body = [hasSubtype(bundleBearer)] }
+card { name = "Canon Witness", types = [sorcery], text = [spell(draw(1))] }
+card { name = "Canon Witness: Split", types = [sorcery] }

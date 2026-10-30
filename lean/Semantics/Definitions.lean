@@ -1,4 +1,5 @@
 import Semantics.Primitives
+import Generated.Builtin
 
 /-!
 # Semantics.Definitions
@@ -11,7 +12,7 @@ namespace Semantics.Definitions
 
 open Semantics.Templates
 
-load_bundle "../plugins_v3/builtin" templatesIn Semantics.Templates
+
 
 end Semantics.Definitions
 

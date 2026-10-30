@@ -940,14 +940,16 @@ private theorem controllerSourceAndBody (fuel : Nat) (drs : DRS) :
   dsimp only
   -- Unfold the template in the action alone: a `change` of the whole step would compare the two
   -- steps by unfolding them.
-  rw [show controllerSacrifices nestedSubject =
+  rw [show Semantics.Templates.Action.controllerSacrifices nestedSubject =
       .instruct (controllerOf (.firstMention "controllerSacrifices.subject" nestedSubject))
         (sacrifice (.laterMention "controllerSacrifices.subject" nestedSubject)) from rfl]
   rw [show fuel + 11 = (fuel + 10) + 1 by omega, controllerInstructStep]
   unfold controllerInstructState
-  simp only [nonDistributiveReferents _ _ _ _ (controllerNotDistributive _), sourceCanonical,
+  simp only [sourceCanonical,
     sourceIds, controllerAlreadyInView, performerOutOfView, List.filterMap_cons, List.filterMap_nil,
     selectedController, List.foldl_cons, List.foldl_nil, controllerRecord]
+  simp only [Semantics.Templates.NounPhrase.controllerOf]
+  rw [nonDistributiveReferents _ _ _ _ (controllerNotDistributive _)]
   rfl
 
 /-- The complete action moves only its selected new creature and preserves every outer

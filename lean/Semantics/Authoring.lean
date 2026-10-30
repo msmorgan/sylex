@@ -413,7 +413,9 @@ private partial def countFVarOccurrences (env : Environment) (fvar : FVarId) (e 
   | _ => 0
 
 private def isTheActorExpr (e : Expr) : Bool :=
-  e.isAppOfArity `Semantics.Templates.theActor 1 ||
+  e.isConstOf `Semantics.Templates.theActor ||
+    e.isConstOf `Semantics.Templates.NounPhrase.theActor ||
+    e.isAppOfArity `Semantics.Templates.theActor 1 ||
     e.isAppOfArity `Semantics.Templates.NounPhrase.theActor 1
 
 private def countActorOccurrences (e : Expr) : Nat :=
@@ -749,10 +751,17 @@ private partial def inspectCore (cache : IO.Ref InspectionCache)
           (`Semantics.Templates.coeStaticSpecAbility, `Semantics.Templates.static)]
         if let some target := coercions.lookup coercion then
           if env.contains target then
-            let expanded := mkAppN (mkConst target) (#[context] ++ args)
+            let targetType ← whnf (← getConstInfo target).type
+            let hasContext := match targetType with
+              | .forallE _ domain _ _ => domain.isConstOf ``AuthoringContext
+              | _ => false
+            let expanded := mkAppN (mkConst target) ((if hasContext then #[context] else #[]) ++ args)
             unless ← isDefEq term expanded do
               throwError "Core coercion {name} disagrees with authored primitive {target}"
             return ← inspectCore cache clean expanded visited context parameters
+        if let .defnInfo defn := info then
+          if defn.hints == .abbrev && defn.value.isConst then
+            return ← inspectCore cache clean (mkAppN defn.value args) visited context parameters
         if isAuthored env name then
           let mut arguments := []
           for arg in args do
@@ -1070,13 +1079,15 @@ private def resolvePrintedCard (key : String) : TermElabM Name := do
     [`Semantics.Cards ++ bare, `Semantics.Cards.Spelled ++ bare]
   for name in candidates.eraseDups do
     if let some info := env.find? name then
-      if (← whnfR info.type).isConstOf `Semantics.Spelled then return name
+      if (← whnfR info.type).isConstOf `Semantics.Spelled ||
+          (← whnfR info.type).isConstOf `Semantics.Card then return name
   throwError "Unknown card {key}"
 
 @[term_elab cardNamedTerm]
 def elabCardNamed : TermElab := fun stx expected? => do
   let name ← resolvePrintedCard (stx[1].isStrLit?.getD "")
   let value := Lean.mkConst name
+  if (← inferType value).isConstOf `Semantics.Card then return value
   if let some expected := expected? then
     if (← whnfR (← instantiateMVars expected)).isConstOf `Semantics.Card then
       return mkApp (mkConst `Semantics.Spelled.card) value
@@ -1089,7 +1100,9 @@ def elabCardNamedOk : TermElab := fun stx expected? => do
   let name ← resolvePrintedCard (stx[1].isStrLit?.getD "")
   let ok := name.getPrefix ++ Name.mkSimple ("ok_" ++ name.getString!)
   if (← getEnv).contains ok then return mkConst ok
-  let card ← `(term| $(mkCIdent ``Semantics.Spelled.card) $(mkIdent (`_root_ ++ name)))
+  let card ← if (← inferType (mkConst name)).isConstOf `Semantics.Card then
+      pure (⟨mkIdent (`_root_ ++ name)⟩ : Term)
+    else `(term| $(mkCIdent ``Semantics.Spelled.card) $(mkIdent (`_root_ ++ name)))
   elabTerm (mkNode `Semantics.«termCheck_card%_» #[mkAtom "check_card%", card]) expected?
 
 private def cardRecordFields (stx : Syntax) : Except String (List (Name × Syntax)) := do
@@ -1230,12 +1243,12 @@ initialize canonCardsExt :
   }
 
 /-- The card file of a printed name: `card_filename` in `crates/deckmaste_core/src/plugin.rs`
-and `canonCardFileName` in `lean/lakefile.lean`. -/
+with the source extension used by the generated registry. -/
 def cardFileName (name : String) : String :=
   name.foldl (init := "") (fun out c => out ++ match c with
     | '<' => "{less}" | '>' => "{greater}" | ':' => "{colon}" | '"' => "{quote}"
     | '/' => "{slash}" | '\\' => "{backslash}" | '|' => "{pipe}" | '?' => "{question}"
-    | '*' => "{star}" | c => c.toString) ++ ".lean"
+    | '*' => "{star}" | c => c.toString) ++ ".syl"
 
 structure PendingCheckEntry where
   thmName : Name
@@ -1326,10 +1339,7 @@ private def validateAuthoredDefaults (signature : Syntax) : CommandElabM Unit :=
     discard <| elabTerm check none
     synthesizeSyntheticMVarsNoPostponing
 
-/-- `canonFile` marks a canon card generated into a data module: its constant is
-`noncomputable`, and its `ok_` theorem is left to the matching check module. -/
-private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax)
-    (canonFile : Option String := none) : CommandElabM Unit := do
+private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax) : CommandElabM Unit := do
   let mods : TSyntax ``Parser.Command.declModifiers := ⟨stx[0]⟩
   let kind := stx[1].getId.eraseMacroScopes
   unless authoredKinds.contains kind do throwUnsupportedSyntax
@@ -1508,16 +1518,8 @@ private def elabAuthoredCommandImpl (registryOnly : Bool) (stx : Syntax)
     if kind == `card then
       body := ⟨mkNode `Semantics.spelledTerm #[mkAtom "spelled", mkAtom "<|", body.raw]⟩
     let value ← `(Parser.Command.declVal| := $body)
-    -- `declModifiers` slot 4 is `meta` or `noncomputable`.
-    let mods : TSyntax ``Parser.Command.declModifiers := if canonFile.isSome then
-        ⟨mods.raw.setArg 4 (mkNullNode #[mkNode ``Parser.Command.«noncomputable»
-          #[mkAtom "noncomputable"]])⟩
-      else mods
     elabCommand (← `($mods:declModifiers def $declId:declId $sig:optDeclSig $value:declVal))
-    if let some file := canonFile then
-      let declaration ← resolveGlobalConstNoOverload name
-      modifyEnv (canonCardsExt.addEntry · { file, declaration })
-    else if kind == `card then
+    if kind == `card then
       let ok := mkIdent (name.getId.getPrefix ++ Name.mkSimple ("ok_" ++ name.getId.getString!))
       let check := mkIdent `Semantics.Card.check
       let cardValue := mkIdent `Semantics.Spelled.card
@@ -1541,148 +1543,6 @@ def elabAnonymousCard : CommandElab := fun stx => do
     | .ok named => pure named
     | .error message => throwError message
   elabAuthoredCommandImpl false named
-
-/-- One canon card file, as `genCanon` (`lean/lakefile.lean`) writes it into a data module: the
-file's text, which must be exactly one anonymous `card` declaration whose printed name is the
-file's. -/
-syntax (name := canonCardCmd) "canon_card " str ppLine command ppLine "end_canon_card" : command
-
-@[command_elab canonCardCmd]
-def elabCanonCard : CommandElab := fun stx => do
-  let file := stx[1].isStrLit?.getD ""
-  let inner := stx[2]
-  if inner.isOfKind ``authoredDeclCmd && inner[1].getId == `card then
-    throwErrorAt inner "Named card declarations are no longer supported; use card := ..."
-  unless inner.isOfKind ``anonymousCardCmd do
-    throwErrorAt inner "Unsupported command in card file {file}"
-  let named ← match namedCardSyntax inner with
-    | .ok named => pure named
-    | .error message => throwErrorAt inner message
-  let printed := named[2].getId.getString!
-  unless cardFileName printed == file do
-    throwErrorAt inner "Card file {file} declares {printed}, whose file is {cardFileName printed}"
-  withRef inner <| elabAuthoredCommandImpl false named (canonFile := some file)
-
-private partial def referencedIdents (bound : List Name) (stx : Syntax) : List Name :=
-  if stx.isOfKind ``declField then
-    if lexicalFields.contains stx[0].getId.eraseMacroScopes || stx[0].getId == `ofAbility then []
-    else referencedIdents bound stx[2]
-  else if stx.isOfKind ``Parser.Term.dotIdent then []
-  else if stx.isOfKind ``Parser.Term.structInstField then
-    referencedIdents bound stx[1]
-  else match stx with
-    | .ident _ _ name _ =>
-      let name := name.eraseMacroScopes
-      if bound.contains name then []
-      else if name == `this then [`this, `this_]
-      else if [`creature, `artifact, `enchantment, `land, `planeswalker, `battle,
-          `instant, `sorcery, `kindred, `card, `permanent, `player, `token, `spell].contains name then
-        [name, Name.mkSimple ("is" ++ name.toString.capitalize)]
-      else [name, name.replacePrefix `Semantics.Templates .anonymous,
-        name.replacePrefix `Templates .anonymous,
-        name.replacePrefix `Semantics.Definitions .anonymous]
-    | .node _ _ args => args.toList.flatMap (referencedIdents bound)
-    | _ => []
-
-private def bundleItem (file : String) (stx : Syntax) : Except String BundleItem := do
-  if stx.isOfKind ``authoredDeclCmd && stx[1].getId == `card then
-    throw "Named card declarations are no longer supported; use card := ..."
-  let stx ← if stx.isOfKind ``anonymousCardCmd then namedCardSyntax stx else pure stx
-  unless stx.isOfKind ``authoredDeclCmd && authoredKinds.contains stx[1].getId do
-    throw s!"Unsupported command in bundle file {file}"
-  let kind := stx[1].getId.eraseMacroScopes
-  let sig := stx[3]
-  let result ← if let some result := commandReturnType? kind then pure result
-    else if sig[1].isNone then
-      throw s!"{file}: {kind} requires a named return type"
-    else if sig[1][0][1].isIdent then pure sig[1][0][1].getId
-    else pure (Name.mkSimple (sig[1][0][1].reprint.getD ""))
-  let returnType := if (`Semantics).isPrefixOf result then result else `Semantics ++ result
-  let declared := stx[2].getId
-  let bareName := if declared.getPrefix.isAnonymous ||
-      declared.getPrefix == Name.mkSimple returnType.getString! then
-    Name.mkSimple declared.getString! else declared
-  let bound := sig[0].getArgs.toList.flatMap fun binder =>
-    binder[1].getArgs.toList.filterMap fun id => if id.isIdent then some id.getId else none
-  return { key := { bareName, returnType }, file, stx,
-           valueRegistered := registryKinds.contains kind,
-           primitive := kind == `primitive,
-           -- Bound names may denote primitive functions in application position.
-           primitiveReferences := referencedIdents [] stx[3] ++ referencedIdents [] stx[5],
-           references := referencedIdents bound stx[3] ++ referencedIdents bound stx[5] ++
-             (if kind == `ability_word then [`abilityWord] else []) }
-
-private def parseBundleFile (env : Environment) (opts : Options) (path : System.FilePath) :
-    IO (List BundleItem) := do
-  let content ← IO.FS.readFile path
-  let input := Parser.mkInputContext content path.toString
-  let mut state : Parser.ModuleParserState := {}
-  let mut items := []
-  repeat
-    let trailing := Parser.whitespace.run input { env, options := opts }
-      (Parser.getTokenTable env) { cache := Parser.initCacheForInput content, pos := state.pos }
-    if trailing.errorMsg.isNone && input.atEnd trailing.pos then break
-    let (stx, next, messages) := Parser.parseCommand input { env, options := opts } state {}
-    if messages.hasErrors then
-      let errors ← messages.toList.mapM (·.toString)
-      throw <| IO.userError ("\n".intercalate errors)
-    state := next
-    if Parser.isTerminalCommand stx then break
-    items := items ++ [← IO.ofExcept (bundleItem path.toString stx)]
-  if items.length != 1 then
-    throw <| IO.userError s!"bundle file '{path}' must contain exactly one declaration, found {items.length}"
-  return items
-
-/-- Load declarations from loose Lean files, independent of their paths and source ordering. -/
-syntax (name := loadBundle) "load_bundle " str (" templatesIn " ident)? : command
-
-@[command_elab loadBundle]
-def elabLoadBundle : CommandElab := fun stx => do
-  let directory : StrLit := ⟨stx[1]⟩
-  let templateNamespace := if stx[2].isNone then none else some stx[2][1].getId
-  let paths ← liftIO <| (System.FilePath.mk directory.getString).walkDir
-  let paths := paths.toList.filter (·.extension == some "lean")
-    |>.mergeSort (fun a b => a.toString < b.toString)
-  let mut items := []
-  for path in paths do
-    items := items ++ (← liftIO <| parseBundleFile (← getEnv) (← getOptions) path)
-  let sorted ← match topoSortBundle items with
-    | .ok sorted => pure sorted
-    | .error error => throwError error
-  -- Catalog values are leaves; their conferrals may refer back through action and noun helpers.
-  for item in sorted do
-    if item.valueRegistered then
-      withRef item.stx <| elabAuthoredCommandImpl true item.stx
-  -- Labels do not depend on bodies. Register them before elaborating an ability's own deed.
-  for item in sorted do
-    if item.stx[1].getId == `keyword then
-      let original := item.stx[2].getId
-      let ns ← getCurrNamespace
-      let full := ns ++ original
-      let name := if (← getEnv).contains full then
-        ns ++ `Ability ++ original else full
-      let fields ← if item.stx[5].isOfKind ``declBlock then blockFields item.stx[5] else pure []
-      let label := (fields.lookup `label).getD (Syntax.mkStrLit original.getString!)
-      registerKeywordLabel (name ++ `label) label
-  for item in sorted do
-    try
-      let messageCount := (← get).messages.toList.length
-      let content ← liftIO <| IO.FS.readFile item.file
-      withReader (fun ctx => { ctx with fileName := item.file, fileMap := FileMap.ofString content }) do
-        let callerNamespace ← getCurrNamespace
-        let ns := templateNamespace
-        if let some ns := ns then
-          if item.stx[1].getId ∈ [`primitive, `template] then
-            withScope (fun scope => { scope with
-                currNamespace := ns
-                openDecls := .simple callerNamespace [] :: scope.openDecls }) do
-              withRef item.stx <| elabAuthoredCommandImpl false item.stx
-          else withRef item.stx <| elabAuthoredCommandImpl false item.stx
-        else withRef item.stx <| elabAuthoredCommandImpl false item.stx
-      if (← get).messages.toList.length > messageCount then
-        logInfo m!"While loading {item.file}"
-    catch error =>
-      throwError "{item.file}: {error.toMessageData}"
 
 /-- Emit the queued `ok_` checks collected while `Semantics.Check` was out of scope. -/
 syntax (name := emitPendingChecks) "emit_pending_checks" : command

@@ -8,11 +8,15 @@ open Lean Meta
 namespace SylGen
 
 def leanWord (s : String) : String :=
-  if s ∈ ["this", "in", "from", "by", "or", "exists", "where"] then s ++ "_" else s
+  if s ∈ ["this", "in", "from", "by", "or", "exists", "where", "at", "repeat", "seal",
+      "class", "as", "end", "for", "if", "of", "then", "while", "with"] then s ++ "_" else s
 
 -- Plugin declarations use `or`; the `or_` spelling belongs to named parameters.
 def declarationWord (s : String) : String :=
   if s == "or" then s else leanWord s
+
+def parameterName (p : Parameter) : String :=
+  if p.binderName.isEmpty then leanWord p.name else p.binderName
 
 def quoted (s : String) : String := "«" ++ s ++ "»"
 
@@ -32,16 +36,16 @@ partial def sortOf (e : Expr) : MetaM SortRef := do
   let e := if e.getOptParamDefault?.isSome then e.getAppArgs[0]! else e
   let e ← whnf e
   if let some name := e.getAppFn.constName? then
-    if name == ``List || name == ``Option then
+    if name == ``List || name == ``Option || name == `Semantics.Delta then
       return { name := name.getString!, arguments := #[← sortOf e.appArg!] }
     return { name := name.getString! }
   throwError "unsupported field sort {e}"
 
 partial def normalizeSort (pos : Position) (sort : SortRef) : MetaM SortRef := do
-  if sort.name ∈ ["Option", "List"] then
-    unless sort.arguments.size == 1 do throwError pos.error "Option and List require one sort"
+  if sort.name ∈ ["Option", "List", "Delta"] then
+    unless sort.arguments.size == 1 do throwError pos.error "Option, List and Delta require one sort"
     return { sort with arguments := #[← normalizeSort pos sort.arguments[0]!] }
-  unless sort.arguments.isEmpty do throwError pos.error "only Option and List accept sort arguments"
+  unless sort.arguments.isEmpty do throwError pos.error "only Option, List and Delta accept sort arguments"
   let name := if sort.name ∈ ["Nat", "Int", "Bool", "String"] then sort.name.toName
     else `Semantics ++ sort.name.toName
   unless (← getEnv).contains name do throwError pos.error s!"unknown sort '{sort.name}'"
@@ -51,6 +55,7 @@ structure Field where
   name : String
   sort : SortRef
   hasDefault : Bool := false
+  emittedName : String := ""
   deriving Inhabited, Repr
 
 structure Signature where
@@ -59,8 +64,8 @@ structure Signature where
   result : SortRef
   deriving Inhabited, Repr
 
-def signature (name : Name) : MetaM Signature := do
-  forallTelescope (← getConstInfo name).type fun args result => do
+def signature (name : Name) (type : Option Expr := none) : MetaM Signature := do
+  forallTelescope (type.getD (← getConstInfo name).type) fun args result => do
     let mut fields := #[]
     for arg in args do
       let decl ← arg.fvarId!.getDecl
@@ -78,11 +83,16 @@ def constructors : MetaM Registry := do
   let mut result := {}
   for (name, info) in env.constants do
     if let .ctorInfo _ := info then
-      if (`Semantics).isPrefixOf name || name.getPrefix == ``Bool then
+      if (`Semantics).isPrefixOf name || name.getPrefix == ``Bool || name.getPrefix == ``Int then
         try
           let sig ← signature name
           result := result.insert (name.getString!, sig.result.text) sig
         catch _ => pure ()
+  for inner in [`Semantics.Amount, `Semantics.ManaCostTerm] do
+    for ctor in [`Semantics.Delta.up, `Semantics.Delta.down, `Semantics.Delta.set] do
+      let value := mkApp (mkConst ctor) (mkConst inner)
+      let sig ← signature ctor (some (← inferType value))
+      result := result.insert (ctor.getString!, sig.result.text) sig
   return result
 
 def structureFields (sort : SortRef) : MetaM (Array Field) := do

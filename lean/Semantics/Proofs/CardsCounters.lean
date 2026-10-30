@@ -85,7 +85,7 @@ def savagebornHydra : Ability :=
     (putCounters 1 p1p1Counter thisCreature) asSorcery
 theorem okSavagebornHydra : Ability.check (DRS.ofList []) savagebornHydra = [] := by decide
 def woeleecher : Ability :=
-  (match (cardNamed "Woeleecher").card with
+  (match (cardNamed "Woeleecher") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -164,7 +164,7 @@ theorem okCorpsejackMenace : Ability.check (DRS.ofList []) corpsejackMenace = []
 /-- Doubling Season's first line: "If an effect would create one or more tokens under your
 control, it creates twice that many of those tokens instead." -/
 def doublingSeasonTokens : Ability :=
-  (match (cardNamed "Doubling Season").card with
+  (match (cardNamed "Doubling Season") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -173,7 +173,7 @@ def doublingSeasonTokens : Ability :=
 /-- Doubling Season's second line: "If an effect would put one or more counters on a permanent
 you control, it puts twice that many of those counters on that permanent instead." -/
 def doublingSeasonCounters : Ability :=
-  (match (cardNamed "Doubling Season").card with
+  (match (cardNamed "Doubling Season") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -242,7 +242,7 @@ def captainMarvelSameKinds : Ability :=
 theorem okCaptainMarvelSameKinds : Ability.check (DRS.ofList []) captainMarvelSameKinds = [] := by decide
 /-- Denry Klin, Editor in Chief -/
 def denryKlinSameKinds : Ability :=
-  (match (cardNamed "Denry Klin, Editor in Chief").card with
+  (match (cardNamed "Denry Klin, Editor in Chief") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -394,7 +394,7 @@ def taintedAdversaryOffer : Ability :=
 theorem okTaintedAdversaryOffer : Ability.check (DRS.ofList []) taintedAdversaryOffer = [] := by decide
 /-- Korvold, Gleeful Glutton -/
 def korvoldCombatTrigger : Ability :=
-  whenever (does thisCreature (dealDamage (to := a isPlayer) (kind := some .combat)))
+  whenever (does thisCreature (dealDamage (recipient := a isPlayer) (kind := some .combat)))
     (sequentially
       [ putCounters (letter .x) p1p1Counter thisCreature,
         draw (letter .x),

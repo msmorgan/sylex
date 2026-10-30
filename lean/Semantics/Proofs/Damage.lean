@@ -175,12 +175,12 @@ theorem cantTriggerReadsTheDelayedTriggerByIdentity :
 kind and determiner: the trigger's damage dealt to "any other target", then the condition, then
 "they" in the branch's clause. -/
 private def screamingNemesisThey : Option (List (Kind × Determiner)) :=
-  match (match (cardNamed "Screaming Nemesis").card with
+  match (match (cardNamed "Screaming Nemesis") with
       | .singleFaced face => face.characteristics.text
       | _ => []) with
   | [_, .triggered _ _ _ _ _ _ _ (.sequentially [first, .doIf condition _ _ _])] =>
     let header := GameEvent.extend { DRS.ofList [] with sourceTypes := [.creature] }
-      (.does .any (dealDamage (to := thisCreature)))
+      (.does .any (dealDamage (recipient := thisCreature)))
     let afterDamage := (stepAction 64 .postEvent .obj (nextClause header) first).1
     let afterCondition := (stepCondition 64 (nextClause afterDamage) condition).1
     let (read, ids, _) := stepNounPhrase 64 (nextClause afterCondition) .subj true they
@@ -585,7 +585,7 @@ theorem shadowbaneRiderIsDidPreventDamageThisWay :
         (instead
           (preventDamage allDamage (also := doIf blackPrevented (gainLife thatMuch))))
         (use := .nextTimeOnly)
-    (cardNamed "Shadowbane").card =
+    (cardNamed "Shadowbane") =
         singleFacedCard
           { name := "Shadowbane", cost := [generic 1, pip .white], types := [.instant],
             text := [spell (establishThroughout rule thisTurn)] } ∧
@@ -715,7 +715,7 @@ theorem okShieldedRedirectionSizesItsCut :
         (would (aYourChoice isSource)
           (dealDamage anyAmount (andOr [you, allOf (and [isPermanent, youControl])])))
         (instead (redirectDamage (.shield 2) (target isAnyTarget)))
-    (cardNamed "Harm's Way").card =
+    (cardNamed "Harm's Way") =
         singleFacedCard
           { name := "Harm's Way", cost := [pip .white], types := [.instant],
             text := [spell (establishThroughout harmsWay thisTurn)] } ∧
@@ -1080,7 +1080,7 @@ theorem witherFunctionsFromAnyZone :
         | _ => true
       | _ => false) = true ∧
       (bodyStatics wither).head? = some markingReplacedByCounters ∧
-      (cardNamed "Puncture Blast").card.check = [] :=
+      (cardNamed "Puncture Blast").check = [] :=
   ⟨by decide, rfl, cardNamedOk "Puncture Blast"⟩
 
 /-- Infect's player row replaces the life loss its own damage would cause, caused by that damage
@@ -1110,8 +1110,8 @@ private def prohibitionCause? : StaticSpec → Option Causing
   | _ => none
 
 /-- The conditional static abilities a single-faced card's text writes. -/
-private def conditionalStatics (card : Spelled) : List (StaticSpec × Condition) :=
-  match card.card with
+private def conditionalStatics (card : Card) : List (StaticSpec × Condition) :=
+  match card with
   | .singleFaced face => face.characteristics.text.filterMap fun
     | .static (.conditional spec condition _) => some (spec, condition)
     | _ => none
@@ -1119,7 +1119,7 @@ private def conditionalStatics (card : Spelled) : List (StaticSpec × Condition)
 
 /-- *Archon of Coronation*: "As long as you're the monarch, damage doesn't cause you to lose life."
 The card checks. -/
-theorem okArchonOfCoronation : (cardNamed "Archon of Coronation").card.check = [] :=
+theorem okArchonOfCoronation : (cardNamed "Archon of Coronation").check = [] :=
   cardNamedOk "Archon of Coronation"
 
 /-- *Archon of Coronation* writes a prohibition of losing life, restricted to a loss the damage
@@ -1265,7 +1265,7 @@ theorem phyrexianInfiltratorExchangesControl :
     Cards.phyrexianInfiltrator.ownDeed? == some exchangeControl.deed := by decide
 
 theorem mirrorUniverseExchangesLifeTotals :
-    (match (cardNamed "Mirror Universe").card with
+    (match (cardNamed "Mirror Universe") with
       | .singleFaced face =>
         match face.characteristics.text with
         | [.activated _ exchanging ..] =>
@@ -1274,7 +1274,7 @@ theorem mirrorUniverseExchangesLifeTotals :
       | _ => false : Bool) := by decide
 
 theorem juxtaposeExchangesControl :
-    (match (cardNamed "Juxtapose").card with
+    (match (cardNamed "Juxtapose") with
       | .singleFaced face =>
         match face.characteristics.text with
         | [.spell _ (.sequentially [creatures, artifacts, _])] =>
@@ -1304,7 +1304,7 @@ theorem harnessInfinityExchangesZones :
     Cards.harnessInfinityExchange.ownDeed? == some exchangeZones.deed := by decide
 
 theorem deadpoolTradingCardExchangesTextBoxes :
-    (match (cardNamed "Deadpool, Trading Card").card with
+    (match (cardNamed "Deadpool, Trading Card") with
       | .singleFaced face =>
         match face.characteristics.text with
         | .static (.replace _ (.alongside

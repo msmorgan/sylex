@@ -60,8 +60,7 @@ mutual
       if expected.name == "CardFace" && !(fields.any (·.1 == "characteristics")) then
         return .record #[("characteristics", ← resolve (.record p fields) { name := "Characteristics" })]
     if let .word p head args := v then
-      if let some param := ctx.parameters.find? (·.name == head) then
-        unless args.isEmpty do fail p "a parameter is not callable"
+      if let some param := ctx.parameters.find? (fun p => args.isEmpty && p.name == head) then
         if param.sort == expected then return .parameter head param.sort
         if expected.name == "Option" && param.sort == underlying expected then
           return .call "some" #[(none, .parameter head param.sort)]
@@ -69,9 +68,10 @@ mutual
       if head == "none" then
         unless expected.name == "Option" && args.isEmpty do fail p "none requires Option"
         return .atom "none"
-      if head == "some" then fail p "some is implicit; write the value"
+      if head == "some" && expected.name == "Option" then
+        fail p "some is implicit; write the value"
       if let some sig ← findSignature head expected then
-        let args := if expected.name == "Card" then
+        let args := if expected.name == "Card" && sig.constant.getString! != "singleFaced" then
             match args with
             | #[(none, .record _ fields)] => fields.map (fun (k, v) => (some k, v))
             | _ => args
@@ -105,10 +105,10 @@ mutual
       let signature ← structureFields expected
       let mut result := #[]
       for (key, value) in fields do
-        unless signature.any (·.name == key) do
+        unless signature.any (fun f => f.name == key || f.name == leanWord key) do
           fail value.position s!"unknown field '{key}' at {expected.text}"
       for f in signature do
-        if let some (_, value) := fields.find? (·.1 == f.name) then
+        if let some (_, value) := fields.find? (fun field => field.1 == f.name || leanWord field.1 == f.name) then
           result := result.push (f.name, ← resolve value f.sort)
         else unless f.hasDefault do
           fail p s!"missing field '{f.name}' at {expected.text}"
@@ -148,8 +148,11 @@ mutual
       unless field.hasDefault || assigned.contains field.name do
         fail p s!"missing argument '{field.name}' for {sig.constant}"
     -- Lean elaborates applications in binder order, even when source named arguments differ.
-    let ordered := sig.fields.filterMap fun f => result.find? (·.1 == some f.name)
-    return .call (leanName sig.constant) ordered
+    let ordered := sig.fields.filterMap fun f =>
+      (result.find? (·.1 == some f.name)).map fun (_, value) =>
+        (some (if f.emittedName.isEmpty then f.name else f.emittedName), value)
+    return .call (leanName sig.constant) (if sig.constant.getPrefix == ``Int then
+      ordered.map fun (_, value) => (none, value) else ordered)
 end
 
 partial def Term.count (name : String) : Term → Nat
@@ -187,9 +190,10 @@ partial def render (decl : Declaration) (body : Term) (t : Term) : StateM (Array
   match t with
   | .atom text => return text
   | .parameter name sort =>
+    let binder :=  (decl.parameters.find? (·.name == name)).map parameterName |>.getD (leanWord name)
     let isDefinition := decl.kind ∈ ["action", "ability"]
     let inner := if isDefinition && callerSort sort then
-        s!"(Semantics.CallerScope.caller {quoted (leanWord name)})" else quoted (leanWord name)
+        s!"(Semantics.CallerScope.caller {quoted binder})" else quoted binder
     if sort.name == "NounPhrase" && (isDefinition || (decl.kind == "template" && body.count name ≥ 2)) then
       return ← mention (declarationWord decl.name ++ "." ++ leanWord name) inner
     return inner

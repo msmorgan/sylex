@@ -688,15 +688,15 @@ theorem flashSacrificeCardsCarryTheRider :
     [ (cardNamed "Armor of Thorns"), (cardNamed "Grave Servitude"),
       (cardNamed "Lightning Reflexes"), (cardNamed "Mystic Veil"), (cardNamed "Necromancy"),
       (cardNamed "Parapet"), (cardNamed "Relic Ward"), (cardNamed "Soar"),
-      (cardNamed "Spider Climb"), (cardNamed "Ward of Lights") ].map (fun c => match c.card with
+      (cardNamed "Spider Climb"), (cardNamed "Ward of Lights") ].map (fun c => match c with
         | .singleFaced face => face.characteristics.text.head?
         | _ => none) =
       List.replicate 10 (some asThoughFlashSacrificedAtCleanup) := rfl
 
-theorem okMysticVeil : (cardNamed "Mystic Veil").card.check = [] := cardNamedOk "Mystic Veil"
+theorem okMysticVeil : (cardNamed "Mystic Veil").check = [] := cardNamedOk "Mystic Veil"
 
 /-- Ward of Lights: the rider, and protection that doesn't remove it [CR#702.16n]. -/
-theorem okWardOfLights : (cardNamed "Ward of Lights").card.check = [] :=
+theorem okWardOfLights : (cardNamed "Ward of Lights").check = [] :=
   cardNamedOk "Ward of Lights"
 
 /-- The scoping is in the term: the rider reads the permission's clause back, so its "it" is

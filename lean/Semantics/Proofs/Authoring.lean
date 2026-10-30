@@ -34,9 +34,8 @@ private def preeminentCaptainWithDefaults : Spelled := spelled <| singleFacedCar
     power := stat 2, toughness := stat 2 }
 
 theorem templateDefaultsAreAuthored :
-    preeminentCaptainWithDefaults.authoring.onlyAuthored = true ∧
-    (cardNamed "Helm of Possession").authoring.onlyAuthored = true :=
-  ⟨preeminentCaptainWithDefaults.onlyAuthored, (cardNamed "Helm of Possession").onlyAuthored⟩
+    preeminentCaptainWithDefaults.authoring.onlyAuthored = true :=
+  preeminentCaptainWithDefaults.onlyAuthored
 
 private def rawKeywordCard : Card := .singleFaced
   { characteristics :=
@@ -410,13 +409,7 @@ private def coldStorageWritten : Spelled := spelled <| .singleFaced
 theorem tokenBundleCoercionIsWritten (t : CharacteristicBundle) (n : Amount) :
     create n t = create n (written t) := rfl
 
-theorem costCoercionsKeepTheCard : (cardNamed "Cold Storage").card = coldStorageWritten.card := rfl
-
-theorem costCoercionsKeepTheAuthoring :
-    faceOf (cardNamed "Cold Storage").authoring = faceOf coldStorageWritten.authoring := rfl
-
-theorem envelopeIsSingleFacedCard :
-    (cardNamed "Cold Storage").authoring = coldStorageWritten.authoring := rfl
+theorem costCoercionsKeepTheCard : (cardNamed "Cold Storage") = coldStorageWritten.card := rfl
 
 /-- *Korlessa, Scale Singer* before the sweep: `hasSubtype dragon` written out. -/
 private def korlessaWritten : Spelled := spelled <| .singleFaced
@@ -429,10 +422,7 @@ private def korlessaWritten : Spelled := spelled <| .singleFaced
           static (can you (cast (bare (and [isSpell, hasSubtype dragon])) (from_ := onTop))) ],
       power := 1, toughness := 4 } }
 
-theorem subtypeCoercionKeepsTheCard : (cardNamed "Korlessa, Scale Singer").card = korlessaWritten.card := rfl
-
-theorem subtypeCoercionKeepsTheAuthoring :
-    faceOf (cardNamed "Korlessa, Scale Singer").authoring = faceOf korlessaWritten.authoring := rfl
+theorem subtypeCoercionKeepsTheCard : (cardNamed "Korlessa, Scale Singer") = korlessaWritten.card := rfl
 
 /-- *Char-Rumbler* before the sweep: `.lit 1`, `.lit 0` and `some untilEndOfTurn` written out. -/
 private def charRumblerWritten : Spelled := spelled <| .singleFaced
@@ -445,14 +435,7 @@ private def charRumblerWritten : Spelled := spelled <| .singleFaced
             (get thisCreature (up (.lit 1)) (up (.lit 0)) (some untilEndOfTurn)) ],
       power := some (lit (-1)), toughness := 3 } }
 
-theorem numeralsKeepTheCard : (cardNamed "Char-Rumbler").card = charRumblerWritten.card := rfl
-
-theorem numeralsKeepTheTemplates :
-    formCalls (faceOf (cardNamed "Char-Rumbler").authoring) = formCalls (faceOf charRumblerWritten.authoring) := rfl
-
-theorem numeralsKeepTheLiterals :
-    runs (formNumerals (faceOf (cardNamed "Char-Rumbler").authoring)) =
-      runs (formNumerals (faceOf charRumblerWritten.authoring)) := rfl
+theorem numeralsKeepTheCard : (cardNamed "Char-Rumbler") = charRumblerWritten.card := rfl
 
 /-! ## A modal header written out per mode
 
@@ -472,7 +455,7 @@ private def callDamageControlModes : Card := .singleFaced
               ⟨none, none, returnToHand (target (and [isLand, isCard])) yourGraveyard⟩ ]) ] } }
 
 theorem callDamageControlIsAnOrdinaryChooseModes :
-    (cardNamed "Call Damage Control").card = callDamageControlModes := rfl
+    (cardNamed "Call Damage Control") = callDamageControlModes := rfl
 
 /-- *Wild Shape* written out as its modes. -/
 private def wildShapeModes : Card :=
@@ -492,7 +475,7 @@ private def wildShapeModes : Card :=
                 ⟨none, none, shape spider reach 1 5⟩,
                 ⟨none, none, shape elephant trample 3 3⟩ ]) ] } }
 
-theorem wildShapeIsAnOrdinaryChooseModes : (cardNamed "Wild Shape").card = wildShapeModes := rfl
+theorem wildShapeIsAnOrdinaryChooseModes : (cardNamed "Wild Shape") = wildShapeModes := rfl
 
 -- A leading-dot name resolves against the expected type before any coercion applies, so an
 -- optional kind keeps its `some` (lean-v3-deal-damage-kind) and a mana cost of leading-dot
@@ -505,7 +488,7 @@ Note: Inferred this name from the expected resulting type of `.combat`:
   Option DamageKind
 -/
 #guard_msgs in
-example : Action := dealDamage (to := a isPlayer) (kind := .combat)
+example : Action := dealDamage (recipient := a isPlayer) (kind := .combat)
 
 example : activated [.snow] (draw 1) = activated (mana [.snow]) (draw 1) := rfl
 
@@ -963,65 +946,12 @@ example : Card := transforming { front := {}, front := {}, back := {} }
 #guard_msgs in
 example : Card := transforming { front := {}, back := {}, extra := {} }
 
-/-! ## Generated canon card files
-
-`genCanon` (`lean/lakefile.lean`) writes each card file into a data module as `canon_card`, and
-its `ok_` theorem into the check module as `check_canon_card`. -/
-
-canon_card "Canon Witness.lean"
-card := { name := "Canon Witness", types := [sorcery], text := [spell (draw 1)] }
-end_canon_card
-
-check_canon_card "Canon Witness.lean"
-
-/-- The data module's card is noncomputable; the check module proves it. -/
-theorem canonCardIsCheckedByItsCheckModule :
-    Card.check (cardNamed "Canon Witness") = [] := cardNamedOk "Canon Witness"
-
-open Lean in
-run_cmd do
-  unless isNoncomputable (← getEnv) ``«Canon Witness» do
-    throwError "a generated canon card must be noncomputable"
-  unless (← getEnv).contains ``«ok_Canon Witness» do
-    throwError "check_canon_card must name the card's ok_ theorem"
-
--- A canon card's file name is its printed name's card file name.
-canon_card "Canon Witness{colon} Split.lean"
-card := { name := "Canon Witness: Split", types := [sorcery] }
-end_canon_card
-
-/-- error: Card file Misnamed.lean declares Canon Elsewhere, whose file is Canon Elsewhere.lean -/
+/-- error: No canon card was generated from Missing.syl -/
 #guard_msgs in
-canon_card "Misnamed.lean"
-card := { name := "Canon Elsewhere", types := [sorcery] }
-end_canon_card
-
-/-- error: Unsupported command in card file Template.lean -/
-#guard_msgs in
-canon_card "Template.lean"
-template canonTemplate : Action := { body := draw 1 }
-end_canon_card
-
-/-- error: Named card declarations are no longer supported; use card := ... -/
-#guard_msgs in
-canon_card "Legacy.lean"
-card legacyCanon := { name := "Legacy", types := [sorcery] }
-end_canon_card
-
-/-- error: No canon card was generated from Missing.lean -/
-#guard_msgs in
-check_canon_card "Missing.lean"
+check_canon_card "Missing.syl"
 
 end BundleDsl
 
-namespace BundleFixture
-load_bundle "test-fixtures/authoring-bundle"
-example : (cardNamed "Bundle fixture").card.check = [] := cardNamedOk "Bundle fixture"
-example : (cardNamed "Bundle fixture").authoring.onlyAuthored = true := (cardNamed "Bundle fixture").onlyAuthored
-example : (bundleQuality : Predicate) = bundleAtom := rfl
-example : Action.bundleShared = Action.ownScope (some (.action "bundleShared" .none)) bundleDraw := rfl
-example : Ability.bundleShared = .keyword (.named "bundleShared") [] [spell Action.bundleShared] := rfl
-end BundleFixture
 
 open BundleDsl in
 example : ([reverseShared 2] : List Ability) = [BundleDsl.Ability.reverseShared 2] := rfl
@@ -1032,36 +962,9 @@ example : (reverseShared : KeywordTerm) = theKeyword (.named "reverse shared") :
 open BundleDsl in
 example : (keywordFirst : KeywordLabel) = KeywordLabel.named "keywordFirst" := rfl
 
-namespace BundleAliases
-load_bundle "test-fixtures/authoring-aliases"
-example : aQuality = Templates.Predicate.and [Semantics.Predicate.isToken, Semantics.Predicate.isCard] := rfl
-example : aSubject = NounPhrase.you := rfl
-end BundleAliases
 
-/-- error: bundle file 'test-fixtures/authoring-invalid-multiple/two.lean' must contain exactly one declaration, found 2 -/
-#guard_msgs (error) in
-load_bundle "test-fixtures/authoring-invalid-multiple"
 
-/-- error: bundle file 'test-fixtures/authoring-invalid-empty/empty.lean' must contain exactly one declaration, found 0 -/
-#guard_msgs (error) in
-load_bundle "test-fixtures/authoring-invalid-empty"
 
-namespace AbilityDeedBundle
-load_bundle "test-fixtures/authoring-ability-deed"
-
-example (subject : NounPhrase) : Action.bundleDevour subject =
-    Action.ownScope (some (.ofAbility (.named "bundle devour")))
-      (sacrifice (.firstMention "bundleDevour.subject" (.inCaller subject))) := rfl
-
-example : bundleDevour = Ability.keyword (.named "bundle devour") []
-    [spell (Action.bundleDevour thisCreature)] := rfl
-
-/-- error: ofAbility cannot be combined with deed or permanent -/
-#guard_msgs in
-action invalidAbilityDeed := {
-  ofAbility := bundleDevour, deed := "other", body := draw 1,
-}
-end AbilityDeedBundle
 
 example (ability : Ability) : fatefulHour ability =
     abilityWord (.named "fateful hour") ability := rfl
@@ -1104,18 +1007,6 @@ example (ability : Ability) : maxSpeed ability =
 
 end Semantics.Proofs.Authoring
 
-namespace Semantics.Proofs.Authoring.RegistryBundle
-
-open Semantics Semantics.Templates Semantics.Definitions
-
-load_bundle "test-fixtures/authoring-registry"
-
-theorem registryConferralMayReferToItsCatalogValue :
-    bundleBearer_definition = .subtype bundleBearer [bundleConferral] := rfl
-
-theorem appliedReturnTypeInBundle : bundlePredicates = [hasSubtype bundleBearer] := rfl
-
-end Semantics.Proofs.Authoring.RegistryBundle
 
 namespace Semantics.Proofs.Authoring.PrimitiveBoundary
 

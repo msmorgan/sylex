@@ -222,7 +222,7 @@ creature left the battlefield, so it doesn't move counters but puts the same num
 the creature had, read by last known information [CR#122.8,608.2h]: a loop over its counter
 kinds, not a [CR#122.5] move and not one counter of each kind. -/
 theorem starPupilPutsTheSameNumberOfEachKind :
-    (match (cardNamed "Star Pupil").card with
+    (match (cardNamed "Star Pupil") with
       | .singleFaced { characteristics := { text := [_, .triggered _ _ _ _ _ _ _ effect], .. } } =>
         some effect
       | _ => none) =
@@ -240,7 +240,7 @@ theorem denryKlinPutsTheSameNumberOfEachKind :
 
 /-- Celestial Convergence's upkeep effect, after its counter removal. -/
 private def celestialConvergenceAfterRemoval : Option Action :=
-  match (cardNamed "Celestial Convergence").card with
+  match (cardNamed "Celestial Convergence") with
   | .singleFaced { characteristics := { text := [_, .triggered _ _ _ _ _ _ _
       (.sequentially [_, rest]) ], .. } } => some rest
   | _ => none
@@ -789,7 +789,7 @@ theorem theNthEncodesTheCounterThreshold :
 has flying. The same is true for …" is one static ability [CR#113.2c], its frame read for 12
 keywords: flying and the 11 the same is true for. The card has two lines. -/
 theorem urborgScavengersIsOneStatic :
-    (match (cardNamed "Urborg Scavengers").card with
+    (match (cardNamed "Urborg Scavengers") with
       | .singleFaced face =>
         face.characteristics.text.length == 2 &&
           match (face.characteristics.text[1]? : Option Ability) with

@@ -4,7 +4,7 @@ open Lean Meta
 namespace SylGen
 
 def declarationName (root : Name) (d : Declaration) (fallback : Registry) : Name :=
-  if d.kind == "primitive" && d.constructor.isNone then
+  if !root.isAnonymous && d.kind == "primitive" && d.constructor.isNone then
     root ++ `Semantics.Primitives ++ d.sort.name.toName ++ Name.mkSimple (declarationWord d.name)
   else if let some sig := fallback[(d.name, d.sort.text)]? then
     root ++ sig.constant
@@ -13,6 +13,21 @@ def declarationName (root : Name) (d : Declaration) (fallback : Registry) : Name
       | "primitive" | "template" => `Semantics.Templates
       | "card" => `Semantics.Cards
       | _ => `Semantics.Definitions
+    -- These declarations already exposed only their sort-qualified Lean name.
+    -- Preserve that API when the surface language drops qualified identifiers.
+    let originalSort := if ns == `Semantics.Templates then
+      match d.name with
+      | "andOr" | "coord" => some "Location"
+      | "actor" => some "NounPhrase"
+      | "count" => some "DetPhrase"
+      | "ofColor" => some "ManaTypeTerm"
+      | _ => none
+      else none
+    let qualified := root.isAnonymous &&
+      ((d.kind == "ability" && d.name == "splice") ||
+        (d.sort.name == "NounWord" && d.name ∈ ["instant", "sorcery", "kindred"]) ||
+        originalSort.any (· != d.sort.name))
+    let ns := if qualified then ns ++ d.sort.name.toName else ns
     root ++ ns ++ Name.mkSimple (declarationWord d.name)
 
 private def allowedFields (kind : String) : List String :=
@@ -27,7 +42,7 @@ private def allowedFields (kind : String) : List String :=
     | "card_type" => ["name", "cardClass", "stats", "confers", "rules"]
     | "relation" => []
     | "token" => ["name", "token", "body"]
-    | "sba" => ["scope", "when", "then_", "body"]
+    | "sba" => ["scope", "when", "then", "then_", "body"]
     | "conferral" => ["scope", "confer", "body"]
     | "card" => ["name", "cost", "colors", "supertypes", "types", "subtypes", "text",
         "power", "toughness", "loyalty", "defense"]
@@ -41,13 +56,20 @@ def loadDeclarations (root : Name) (ds : Array Declaration) (fallback : Registry
       unless (allowedFields d.kind).contains key do
         throwError value.position.error s!"unknown {d.kind} field '{key}'"
     let key := (d.name, d.sort.text)
-    if table.contains key then throwError d.pos.error s!"duplicate declaration {key}"
+    if table.contains key then throwError d.pos.error s!"Duplicate bundle declaration {key}"
     let initialName := declarationName root d fallback
+    let initialName := if d.sort.name == "Option" &&
+        ds.any (fun other => other.name == d.name && other.sort == d.sort.arguments[0]!) then
+        initialName.getPrefix ++ `Option ++ Name.mkSimple (declarationWord d.name)
+      else initialName
     let name := if table.toArray.any (fun entry => entry.2.constant == initialName) then
-        initialName.getPrefix ++ d.sort.name.toName ++ Name.mkSimple (declarationWord d.name)
+        initialName.getPrefix ++
+          (if d.sort.name == "Option" then d.sort.arguments[0]!.name else d.sort.name).toName ++
+          Name.mkSimple (declarationWord d.name)
       else initialName
     let sig : Signature := { constant := name, result := d.sort, fields := d.parameters.map fun p =>
-      { name := leanWord p.name, sort := p.sort, hasDefault := p.defaultValue.isSome } }
+      { name := leanWord p.name, sort := p.sort, hasDefault := p.defaultValue.isSome,
+        emittedName := parameterName p } }
     table := table.insert key sig
     if d.kind == "ability" then
       for sort in ["KeywordLabel", "KeywordTerm"] do
@@ -87,7 +109,8 @@ private def body (d : Declaration) : ResolveM Term := do
   let get := fun name defaultValue => (field d name).getD defaultValue
   match d.kind with
   | "primitive" =>
-    let ctor := d.constructor.getD (declarationWord d.name)
+    if (field d "body").isSome then throwError d.pos.error "primitive must be body-less"
+    let ctor := d.constructor.getD d.name
     if d.constructor.isSome && declarationWord d.name == declarationWord ctor then
       throwError d.pos.error "redundant constructor binding"
     let ctors := (← read).constructors
@@ -102,6 +125,8 @@ private def body (d : Declaration) : ResolveM Term := do
       (d.parameters.map fun p => (some (leanWord p.name), .parameter p.name p.sort))
   | "template" => return ← resolve (← required d "body") d.sort
   | "action" =>
+    if (field d "ofAbility").isSome && ((field d "deed").isSome || (field d "permanent").isSome) then
+      throwError d.pos.error "ofAbility cannot be combined with deed or permanent"
     let action ← resolve (← required d "body") { name := "Action" }
     if let some (.word _ "none" #[]) := field d "deed" then
       return .call "Semantics.Action.ownScope" #[(none, .atom "none"), (none, action)]
@@ -189,7 +214,7 @@ def emit (d : Declaration) : ResolveM Output := do
         let term ← withReader (fun c => { c with parameters := d.parameters.takeWhile (·.name != p.name) }) (resolve v p.sort)
         pure (" := " ++ rendered { d with kind := "primitive" } term)
       else pure ""
-    binders := binders ++ s!" ({quoted (leanWord p.name)} : {p.sort.lean}{defaultText})"
+    binders := binders ++ s!" ({quoted (parameterName p)} : {p.sort.lean}{defaultText})"
   let b ← body d
   let value := rendered d b
   let mut text := ""

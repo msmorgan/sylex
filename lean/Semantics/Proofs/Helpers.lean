@@ -68,8 +68,8 @@ def shape (bs : DRS) : List (Kind × Plurality × Determiner) :=
   bs.referents.map fun b => (b.kind, b.plur, b.det)
 
 /-- A card's printed abilities (a single-faced card). -/
-def printedText (card : Spelled) : List Ability :=
-  match card.card with
+def printedText (card : Card) : List Ability :=
+  match card with
   | .singleFaced face => face.characteristics.text
   | _ => []
 

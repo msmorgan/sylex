@@ -62,7 +62,7 @@ theorem okSparkmagesGambit : Action.check (DRS.ofList []) sparkmagesGambit = [] 
 
 /-- Glacial Chasm -/
 def glacialChasmCant : Ability :=
-  (match (cardNamed "Glacial Chasm").card with
+  (match (cardNamed "Glacial Chasm") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons _ (List.cons part _))) => some part
       | _ => none
@@ -258,7 +258,7 @@ theorem okConcussiveBolt : Action.check (DRS.ofList []) concussiveBolt = [] := b
 
 /-- "attack you unless their controller pays {2} for each" -/
 def attackToll : StaticSpec :=
-  (match (cardNamed "Ghostly Prison").card with
+  (match (cardNamed "Ghostly Prison") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.static part) _) => some part
       | _ => none
@@ -306,7 +306,7 @@ theorem okCastFromGraveyardByDiscardingALand :
 
 /-- "Auras already attached to those artifacts" -/
 def aurasAlreadyAttachedToThoseArtifacts : NounPhrase :=
-  (match (cardNamed "Guardian Beast").card with
+  (match (cardNamed "Guardian Beast") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.static (StaticSpec.conditional (StaticSpec.conjunction _ (List.cons
         (StaticSpec.retention _ part) _)) _ _)) _) => some part
@@ -322,7 +322,7 @@ hypothetical indefinite the prohibition closes, so "they" reads the artifacts, a
 Aura already on such an artifact illegal [CR#303.4c,704.5m], and "already attached" reads the
 host back, as *Benevolent Blessing*'s does. -/
 def guardianBeastProtection : StaticSpec :=
-  (match (cardNamed "Guardian Beast").card with
+  (match (cardNamed "Guardian Beast") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons (Ability.static part) _) => some part
       | _ => none

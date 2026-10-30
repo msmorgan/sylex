@@ -27,8 +27,8 @@ private def protectionFromBlack : StaticSpec :=
   abilityGrant (enchanted creature) (protection (hasColor .black))
 
 /-- The first `retention` a single-faced card's text writes. -/
-private def retentionOf? (card : Spelled) : Option StaticSpec :=
-  match card.card with
+private def retentionOf? (card : Card) : Option StaticSpec :=
+  match card with
   | .singleFaced face => face.characteristics.text.findSome? fun
     | .static (.retention spec subject) => some (.retention spec subject)
     | _ => none
@@ -113,8 +113,8 @@ theorem exemptionReadsTheEffectsOwnHost :
 
 /-- The first `retention` a single-faced card's static abilities write, a member of a conjunction
 included. -/
-private def memberRetentionOf? (card : Spelled) : Option StaticSpec :=
-  match card.card with
+private def memberRetentionOf? (card : Card) : Option StaticSpec :=
+  match card with
   | .singleFaced face => face.characteristics.text.findSome? fun
     | .static (.retention spec subject) => some (.retention spec subject)
     | .static (.conjunction _ parts) => parts.findSome? fun

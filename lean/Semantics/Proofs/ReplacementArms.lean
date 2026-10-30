@@ -118,7 +118,7 @@ theorem enchantChoiceIsBeforeItsAttachmentAlongside :
 creature's", text read "As [this permanent] enters" [CR#614.1c], whose effect occurs as part of
 the entering [CR#603.6d]: `alongside`. -/
 theorem deadpoolExchangeIsAlongside :
-    cardArms (cardNamed "Deadpool, Trading Card").card = [[.alongside]] := rfl
+    cardArms (cardNamed "Deadpool, Trading Card") = [[.alongside]] := rfl
 
 /-- *Wolverine, Fierce Fighter*: "If damage would be dealt to Wolverine, instead that damage is
 dealt, but all other damage already dealt to him is healed." Healing removes all damage marked
@@ -126,6 +126,6 @@ on a permanent [CR#701.69a]; the damage the event deals is marked by it [CR#120.
 "already dealt" is what is marked before the event, and its healing is a `before`
 (`(cardNamed "Wolverine, Fierce Fighter")`). -/
 theorem wolverineHealingIsBefore :
-    cardArms (cardNamed "Wolverine, Fierce Fighter").card = [[.before]] := rfl
+    cardArms (cardNamed "Wolverine, Fierce Fighter") = [[.before]] := rfl
 
 end Semantics.Proofs.ReplacementArms

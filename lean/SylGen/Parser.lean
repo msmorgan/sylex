@@ -36,6 +36,7 @@ structure Parameter where
   name : String
   sort : SortRef
   defaultValue : Option Value := none
+  binderName : String := ""
   deriving Inhabited, Repr
 
 structure Declaration where
@@ -86,7 +87,7 @@ private def tokenize (file source : String) : Except String (Array Token) := do
       let mut value := ""
       while i < chars.size && chars[i]! != '"' do
         let mut c := chars[i]!
-        if c == '\n' then throw (start.error "newline in string literal")
+
         if c == '\\' then
           i := i + 1
           pos := { pos with column := pos.column + 1 }
@@ -95,7 +96,8 @@ private def tokenize (file source : String) : Except String (Array Token) := do
           unless c == '\\' || c == '"' do throw (pos.error "unsupported string escape")
         value := value.push c
         i := i + 1
-        pos := { pos with column := pos.column + 1 }
+        pos := if c == '\n' then { pos with line := pos.line + 1, column := 1 }
+          else { pos with column := pos.column + 1 }
       if i == chars.size then throw (start.error "unterminated string literal")
       i := i + 1
       pos := { pos with column := pos.column + 1 }
@@ -269,7 +271,12 @@ private def declaration : Parser Declaration := do
       pure (some name)
     else pure none
   let cardValue ← if k.text == "card" then pure (some (← value)) else pure none
-  let fields ← if k.text == "card" then pure #[] else if k.text == "primitive" then pure #[] else do
+  let hasFields ← do
+    let saved ← get
+    let next ← peek
+    set saved
+    pure (next.text == "{")
+  let fields ← if k.text == "card" then pure #[] else if k.text == "primitive" && !hasFields then pure #[] else do
     let v ← value
     match v with
     | .record _ fs => pure fs

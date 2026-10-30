@@ -33,7 +33,7 @@ theorem okPromiseOfTomorrow : Ability.check (DRS.ofList []) promiseOfTomorrow = 
 def libraryLarcenist : Ability := whenever (does thisCreature attack) (draw 1)
 theorem okLibraryLarcenist : Ability.check (DRS.ofList []) libraryLarcenist = [] := by decide
 def jhessianThief : Ability :=
-  whenever (does thisCreature (dealDamage (to := a isPlayer) (kind := some .combat)))
+  whenever (does thisCreature (dealDamage (recipient := a isPlayer) (kind := some .combat)))
     (draw 1)
 theorem okJhessianThief : Ability.check (DRS.ofList []) jhessianThief = [] := by decide
 def scholarOfStars : Ability :=
@@ -146,7 +146,7 @@ def lichsMasteryLoss : Ability :=
   when (does thisEnchantment leave) loseGame
 theorem okLichsMasteryLoss : Ability.check (DRS.ofList []) lichsMasteryLoss = [] := by decide
 def phageTheUntouchable : Ability :=
-  whenever (does thisCreature (dealDamage (to := a isPlayer) (kind := some .combat)))
+  whenever (does thisCreature (dealDamage (recipient := a isPlayer) (kind := some .combat)))
       (instruct (that player) loseGame)
 theorem okPhageTheUntouchable : Ability.check (DRS.ofList []) phageTheUntouchable = [] := by decide
 def elderscaleWurm : Ability :=
@@ -166,7 +166,7 @@ theorem okOnceUponATimeFirstCast : Predicate.checkAt .object (DRS.ofList []) onc
   decide
 
 def archivistOfGondor : Ability :=
-  when (does yourCommander (dealDamage (to := a isPlayer) (kind := some .combat)))
+  when (does yourCommander (dealDamage (recipient := a isPlayer) (kind := some .combat)))
       (if_ := thereIsNo monarch)
     (gainDesignation you monarch)
 theorem okArchivistOfGondor : Ability.check (DRS.ofList []) archivistOfGondor = [] := by decide
@@ -205,7 +205,7 @@ theorem okNefariousLichGain : Ability.check (DRS.ofList []) nefariousLichGain = 
 
 /-- Souls of the Faultless -/
 def soulsOfTheFaultlessDrain : Ability :=
-  whenever (does any (dealDamage (to := thisCreature) (kind := some .combat)))
+  whenever (does any (dealDamage (recipient := thisCreature) (kind := some .combat)))
     (instruct (combatPlayer .attacking) (loseLife thatMuch))
 theorem okSoulsOfTheFaultlessDrain : Ability.check (DRS.ofList []) soulsOfTheFaultlessDrain = [] := by decide
 
@@ -272,7 +272,7 @@ def thoughtLashTrigger : Ability :=
 theorem okThoughtLashTrigger : Ability.check (DRS.ofList []) thoughtLashTrigger = [] := by decide
 /-- Heart of Bogardan -/
 def heartOfBogardanHeader : GameEvent :=
-  (match (cardNamed "Heart of Bogardan").card with
+  (match (cardNamed "Heart of Bogardan") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons (Ability.triggered part _ _ _ _ _ _ _) _)) => some part
       | _ => none
@@ -348,7 +348,7 @@ theorem angelicCubPutsTheCounterOnItself :
 
 /-- Debris Beetle -/
 def debrisBeetleTrigger : Ability :=
-  (match (cardNamed "Debris Beetle").card with
+  (match (cardNamed "Debris Beetle") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons _ (List.cons part _)) => some part
       | _ => none
@@ -433,7 +433,7 @@ theorem okDontBlinkReplacement : Action.check (DRS.ofList []) dontBlinkReplaceme
 
 /-- Autarch Mammoth -/
 def autarchMammothLine : Ability :=
-  (match (cardNamed "Autarch Mammoth").card with
+  (match (cardNamed "Autarch Mammoth") with
     | Card.singleFaced face => match face.characteristics.text with
       | (List.cons part _) => some part
       | _ => none
@@ -490,7 +490,7 @@ theorem bioplasmTwoCandidates : countOnes .object bioplasmAfterExile = 2 := by d
 /-- Curie, Emergent Intelligence's first ability: "Whenever Curie deals combat damage to a
 player, draw cards equal to its base power" [CR#208.4b]. -/
 def curieCombatDraw : Ability :=
-  whenever (does thisCreature (dealDamage (to := a isPlayer) (kind := some .combat)))
+  whenever (does thisCreature (dealDamage (recipient := a isPlayer) (kind := some .combat)))
     (draw (basePowerOf thisCreature))
 theorem okCurieCombatDraw : Ability.check (DRS.ofList []) curieCombatDraw = [] := by decide
 

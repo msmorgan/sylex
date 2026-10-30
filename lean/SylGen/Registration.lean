@@ -26,7 +26,7 @@ private def register (kind : String) (name : Name) (file : String) :
   Semantics.Authoring.registerSharedAliases name
   if kind == "card" then
     let file := if file.isEmpty then file else
-      (Semantics.Authoring.cardFileName name.getString!).replace ".lean" ".syl"
+      Semantics.Authoring.cardFileName name.getString!
     modifyEnv (Semantics.Authoring.canonCardsExt.addEntry · { file, declaration := name })
 
 elab "syl_register " kind:str name:ident file:str : command => do
