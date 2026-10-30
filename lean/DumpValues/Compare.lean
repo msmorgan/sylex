@@ -21,6 +21,11 @@ private def readRecords (dir : System.FilePath) : IO (Std.HashMap String String)
     records := records.insert key value
   return records
 
+private def summaryLines (path : System.FilePath) : IO (Array String) := do
+  let text ← IO.FS.readFile path
+  let lines := text.splitOn "\n"
+  return (if text.endsWith "\n" then lines.dropLast else lines).toArray
+
 /-- Compare validated records after applying a simultaneous, one-to-one rename map. -/
 def compareDumps (root : System.FilePath) (a b : String) (rename : Option System.FilePath) :
     IO UInt32 := do
@@ -61,6 +66,16 @@ def compareDumps (root : System.FilePath) (a b : String) (rename : Option System
         IO.println s!"changed {key}"
     | none, none => pure ()
   IO.println s!"added: {added}\nremoved: {removed}\nchanged: {changed}"
-  return if added + removed + changed == 0 then 0 else 1
+  let before ← summaryLines (root / a / "summary.txt")
+  let after ← summaryLines (root / b / "summary.txt")
+  let mut summaryChanges := 0
+  for i in [:max before.size after.size] do
+    if before[i]? != after[i]? then
+      summaryChanges := summaryChanges + 1
+      IO.println s!"summary line {i + 1}:"
+      if let some line := before[i]? then IO.println s!"- {line}"
+      if let some line := after[i]? then IO.println s!"+ {line}"
+  IO.println s!"summary lines changed: {summaryChanges}"
+  return if added + removed + changed + summaryChanges == 0 then 0 else 1
 
 end DumpValues

@@ -13,7 +13,10 @@ lake env lean DumpValues/Tests.lean
 `dumpValues` and its support library are opt-in; neither the default build nor
 `scripts/build` includes them. The executable imports all generated card **data**
 modules, so Lake regenerates and rebuilds affected data before running it.
-Enumeration uses the authoring environment extensions, never a directory scan.
+Enumeration uses the authoring environment extensions. A separate completeness check counts
+`.lean` and `.syl` source files against emitted card records, and checks imported shard modules
+against the literal `canonShardCount` in `lakefile.lean`. A mismatch is an error; the static
+imports must be updated when the shard count changes.
 
 Each `values.txt` line is a JSON pair `[key, value]`, sorted by the key string.
 The key itself encodes a JSON array: `["card", printed_name]` or
@@ -47,7 +50,7 @@ exact omissions per declaration. This is a bounded comparison, not an equivalenc
 Dispatch aliases are resolved and deduplicated; the summary counts them. The ten core
 card-type dispatch registrations are not builtin declarations; their builtin counterparts
 carry the registry rules and receive the records. Canon dispatch aliases are represented
-by the card records. Unexpected key collisions are errors, even when their values agree.
+by the card records, and the summary counts those skipped registrations. Unexpected key collisions are errors, even when their values agree.
 
 `summary.txt` reports record kinds, declarations, samples, omissions and all errors.
 A dump with errors exits 2 and retains its diagnostic output. Starting a new dump
@@ -67,4 +70,6 @@ The rename file is a JSON array of `[old_key, new_key]` string pairs, using the 
 key strings from `values.txt`. Renaming is simultaneous (swaps work), and applies only
 to the old dump. Unknown sources, duplicate sources or targets, collisions, malformed
 records, and incomplete dumps are errors (exit 2). Added, removed and changed keys are
-printed in key order, followed by counts. No differences exits 0; differences exit 1.
+printed in key order, followed by counts. Each differing summary line is also printed with
+its line number and old/new text; counts, omissions and exclusions therefore affect the exit
+status even when values match. No differences exits 0; differences exit 1.

@@ -4,10 +4,12 @@
 Run from lean/ after `lake build -q dumpValues`.
 """
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
 
+os.chdir(Path(__file__).resolve().parents[1])
 ROOT = Path('../docs/evidence/lean-dumps')
 EXE = Path('.lake/build/bin/dumpValues').resolve()
 ROOT.mkdir(parents=True, exist_ok=True)
@@ -52,6 +54,19 @@ with tempfile.TemporaryDirectory(prefix='compare-tests-', dir=ROOT) as scratch:
         write(a, [('a', '1'), ('b', '2')])
         write(b, [('b', '1'), ('a', '2')])
         compare(0, 'changed: 0', [('a', 'b'), ('b', 'a')])
+        write(a, [('same', '1')])
+        write(b, [('same', '1')])
+        (a / 'summary.txt').write_text('unprintable items: 0\nomitted: 4\nexcluded: 2\n')
+        (b / 'summary.txt').write_text('unprintable items: 0\nomitted: 5\nexcluded: 3\n')
+        compare(1, 'summary lines changed: 2')
+        compare(1, '- omitted: 4\n+ omitted: 5')
+        compare(1, '- excluded: 2\n+ excluded: 3')
+        (a / 'summary.txt').write_text('unprintable items: 0\n')
+        (b / 'summary.txt').write_text('unprintable items: 0\nexcluded: 3\n')
+        compare(1, 'summary lines changed: 1')
+        (a / 'summary.txt').write_text('unprintable items: 0\nexcluded: 3\n')
+        (b / 'summary.txt').write_text('unprintable items: 0\n')
+        compare(1, '- excluded: 3')
         write(b, [('a', '1'), ('a', '2')])
         compare(2, 'duplicate record key')
         write(b, [('a', '1')], errors=1)
@@ -60,4 +75,4 @@ with tempfile.TemporaryDirectory(prefix='compare-tests-', dir=ROOT) as scratch:
         (b / 'values.txt').write_text('not json\n')
         compare(2, 'invalid dump/rename JSON')
         invoke(['dump', '../escape'], 2, 'label must contain')
-print('12 compare/CLI regression checks passed')
+print('17 compare/CLI regression checks passed')

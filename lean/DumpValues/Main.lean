@@ -1,5 +1,6 @@
 import DumpValues.Sampling
 import DumpValues.Compare
+-- Keep these static imports aligned with canonShardCount in lean/lakefile.lean.
 import Semantics.Cards.Data.Fixtures
 import Semantics.Cards.Data.Shard00
 import Semantics.Cards.Data.Shard01
@@ -68,6 +69,7 @@ private def dump (label : String) : MetaM UInt32 := do
   let mut omitted := 0
   let mut aliases := 0
   let mut coreDispatch := 0
+  let mut cardDispatch := 0
   let mut seen : Array (Name × Name × Name) := #[]
   let cardEntries := canonCardsExt.getState env
   for entry in cardEntries do
@@ -80,7 +82,9 @@ private def dump (label : String) : MetaM UInt32 := do
   for (_, entries) in (expectedTypeDispatchExt.getState env) do
     for entry in entries do
       let declaration ← canonical entry.declaration
-      if (`Semantics.Cards).isPrefixOf declaration then continue
+      if (`Semantics.Cards).isPrefixOf declaration then
+        cardDispatch := cardDispatch + 1
+        continue
       let identity := (entry.bareName, entry.returnType, declaration)
       if declaration.getPrefix == `Semantics.CardType then
         coreDispatch := coreDispatch + 1
@@ -116,6 +120,26 @@ private def dump (label : String) : MetaM UInt32 := do
           records := records.push (k, result)
           if sample == "unsampled" then unsampled := unsampled + 1 else samples := samples + 1
       catch e => errors := errors.push s!"{id}: {← e.toMessageData.toString}"
+  let sourceEntries ← (System.FilePath.mk "../plugins_v3/canon/cards").readDir
+  let cardFiles ← sourceEntries.filterM fun entry => do
+    return (entry.fileName.endsWith ".lean" || entry.fileName.endsWith ".syl") &&
+      !(← entry.path.isDir)
+  if cardFiles.size != cards then
+    errors := errors.push (s!"card completeness mismatch: {cardFiles.size} source files, " ++
+      s!"{cards} card records; check the static shard imports against canonShardCount")
+  let lakefile ← IO.FS.readFile "lakefile.lean"
+  let countLine? := (lakefile.splitOn "\n").find? fun line =>
+    line.trimAscii.toString.startsWith "def canonShardCount : Nat :="
+  let count? := countLine?.bind fun line =>
+    ((line.splitOn ":=").getLast!).splitOn "--" |>.head! |>.trimAscii.toString.toNat?
+  match count? with
+  | none => errors := errors.push "cannot read literal canonShardCount from lean/lakefile.lean"
+  | some count =>
+    for i in [:count] do
+      let name := `Semantics.Cards.Data ++ (s!"Shard{if i < 10 then "0" else ""}{i}").toName
+      unless env.header.moduleNames.contains name do
+        errors := errors.push (s!"card completeness mismatch: missing import {name}; " ++
+          s!"lean/lakefile.lean declares canonShardCount = {count}")
   records := records.qsort (fun a b => a.1 < b.1)
   for i in [1:records.size] do
     if records[i-1]!.1 == records[i]!.1 then
@@ -127,6 +151,8 @@ private def dump (label : String) : MetaM UInt32 := do
     s!"unprintable items: {errors.size}\n" ++
     s!"dispatch aliases: {aliases}\n" ++
     s!"core card-type registrations (not builtins): {coreDispatch}\n" ++
+    s!"card declarations skipped (covered by card records): {cardDispatch}\n" ++
+    s!"card source files: {cardFiles.size}\n" ++
     String.join ((caps.qsort (· < ·) ++ errors.qsort (· < ·)).toList.map (· ++ "\n"))
   IO.FS.writeFile (dir / "summary.txt") summary
   IO.print summary
