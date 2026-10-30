@@ -140,6 +140,22 @@ mod generation {
             "lake setup-file {PROOF} did not regenerate Semantics/Cards/Data/Fixtures.lean"
         );
         changing_module_set(lake, &package)?;
+        let stamp = workbench.join(".lake/build/gen/syl.stamp");
+        let generated_at = std::fs::metadata(&stamp)?.modified()?;
+        let output = lake()
+            .current_dir(workbench)
+            .args(["build", "-q", "SylFixtures", "SylFixturePins"])
+            .output()
+            .context("checking cached syl generation")?;
+        anyhow::ensure!(
+            output.status.success(),
+            "cached syl build failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        anyhow::ensure!(
+            std::fs::metadata(&stamp)?.modified()? == generated_at,
+            "an unchanged build reran syl generation or its negative cases"
+        );
         Ok(())
     }
 
@@ -256,7 +272,9 @@ lean_lib Changing where
 
     fn copy_dir(from: &Path, to: &Path) -> anyhow::Result<()> {
         std::fs::create_dir_all(to)?;
-        for entry in std::fs::read_dir(from).with_context(|| format!("reading {}", from.display()))? {
+        for entry in
+            std::fs::read_dir(from).with_context(|| format!("reading {}", from.display()))?
+        {
             let entry = entry?;
             let target = to.join(entry.file_name());
             if entry.file_type()?.is_dir() {

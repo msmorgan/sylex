@@ -187,7 +187,7 @@ lean_exe dumpValues where
   supportInterpreter := true
 
 lean_lib SylGenerator where
-  roots := #[`SylGen.Parser, `SylGen.Environment, `SylGen.Resolve, `SylGen.Emit]
+  roots := #[`SylGen.Parser, `SylGen.Environment, `SylGen.Resolve, `SylGen.Emit, `SylGen.Ordering]
 
 lean_exe sylGen where
   root := `SylGen.Main
@@ -200,33 +200,47 @@ input_dir sylCorpus where
   path := "SylGen/Fixtures"
   text := true
 
+input_file sylNegativeTests where
+  path := "SylGen/Tests/negative.sh"
+  text := true
+
 target genSyl pkg : Unit := do
   let some executable := pkg.findLeanExe? `sylGen | error "missing sylGen executable"
   let some library := pkg.findLeanLib? `SylFixtureRegistry | error "missing fixture registry"
   let exe ← executable.exe.fetch
   let registry ← library.leanArts.fetch
   let corpus ← sylCorpus.fetch
-  (exe.mix registry |>.mix corpus).mapM fun _ => do
+  let tests ← sylNegativeTests.fetch
+  (exe.mix registry |>.mix corpus |>.mix tests).mapM fun _ => do
     let exe ← exe.await
-    let result ← IO.Process.output {
-      cmd := exe.toString
-      env := #[("LEAN_PATH", some (pkg.dir / ".lake/build/lib/lean").toString)]
-      args := #["--fixture", (pkg.dir / "SylGen/Fixtures").toString,
-        (pkg.dir / ".lake/build/gen").toString, "SylFixture"]
-    }
-    unless result.exitCode == 0 do error result.stderr
-    let tests ← IO.Process.output {
-      cmd := "sh"
-      args := #[(pkg.dir / "SylGen/Tests/negative.sh").toString, exe.toString]
-      env := #[("LEAN_PATH", some (pkg.dir / ".lake/build/lib/lean").toString)]
-    }
-    unless tests.exitCode == 0 do error (tests.stdout ++ tests.stderr)
+    let stamp := pkg.dir / ".lake/build/gen/syl.stamp"
+    buildUnlessUpToDate stamp (← getTrace) (pkg.dir / ".lake/build/gen/syl.trace") do
+      for (fixture, corpus, root, modulePrefix) in #[
+          (true, "Bundle", "SylFixture", "SylFixtures"),
+          (false, "Normal", "NormalFixture", "NormalFixtures")] do
+        let args := (if fixture then #["--fixture"] else #[]) ++
+          #[(pkg.dir / "SylGen/Fixtures" / corpus).toString,
+            (pkg.dir / ".lake/build/gen").toString, root, modulePrefix]
+        let result ← IO.Process.output {
+          cmd := exe.toString
+          env := #[("LEAN_PATH", some (pkg.dir / ".lake/build/lib/lean").toString)]
+          args
+        }
+        unless result.exitCode == 0 do error result.stderr
+      let tests ← IO.Process.output {
+        cmd := "sh"
+        args := #[(pkg.dir / "SylGen/Tests/negative.sh").toString, exe.toString]
+        env := #[("LEAN_PATH", some (pkg.dir / ".lake/build/lib/lean").toString)]
+      }
+      unless tests.exitCode == 0 do error (tests.stdout ++ tests.stderr)
+      IO.FS.writeFile stamp "generated\n"
     setTrace .nil
 
 @[«library_facet»]
 def awaitNeedsBeforeModules : LibraryFacetDecl :=
   .mk LeanLib.modulesFacet <| mkFacetJobConfig (buildable := false) fun lib => do
-    discard <| (← lib.extraDep.fetch).await
+    if lib.srcDir.toString.endsWith ".lake/build/gen" then
+      discard <| (← lib.extraDep.fetch).await
     let some builtin := LeanLib.initFacetConfigs.get? LeanLib.modulesFacet
       | error "missing builtin modules facet"
     builtin.run lib
@@ -238,3 +252,11 @@ lean_lib SylFixtures where
 
 lean_lib SylFixturePins where
   roots := #[`SylGen.Tests.Pins]
+
+lean_lib SylRegistration where
+  roots := #[`SylGen.Registration]
+
+lean_lib NormalFixtures where
+  srcDir := ".lake/build/gen"
+  roots := #[`NormalFixtures]
+  needs := #[genSyl]
