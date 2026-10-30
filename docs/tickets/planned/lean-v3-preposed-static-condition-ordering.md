@@ -31,4 +31,4 @@ authors only its triggered ability (`angelicCubPutsTheCounterOnItself` in
 ## Acceptance
 
 - `plugins_v3/canon/cards/Angelic Cub.lean` includes both printed abilities and passes `Card.check`.
-- `cargo xtask lean check` and `cargo test -p deckmaste_semantics_v3` pass.
+- `cargo xtask lean check` pass.

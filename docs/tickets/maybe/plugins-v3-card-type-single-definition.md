@@ -9,7 +9,7 @@ Each card type is declared twice, in two different shapes.
   `CardType.dungeon`, plus `cardTypes`. The checker reads these by value: `Check/Words.lean`
   uses `normalizeTypes`, `mergeTypes` and `commonTypes`, and `Check/Card.lean`,
   `Check/Queries.lean`, `Check/AbilityRules.lean` and about 60 proof files use them too.
-- `plugins_v3/builtin/definitions/card_type/*.lean` declares `card_type` items that carry the
+- `plugins_v3/builtin/definitions/card_type/*.syl` declares `card_type` items that carry the
   same fields plus `confers`.
 
 `lean/CONTRACTS.md:154-157` makes the core copies deliberate: card types are "the one catalog
@@ -27,6 +27,5 @@ below the stack". Moving `cardTypes` into `Semantics.Definitions` would create a
 
 ## After the ruling
 
-Whatever is chosen, CONTRACTS.md and `Proofs/Tables.lean` say so. The `/// Mirrors
-Semantics/Words.lean:NN` comments in `deckmaste_semantics_v3/src/ast.rs` are refreshed if lines
-move.
+Whatever is chosen, CONTRACTS.md and `Proofs/Tables.lean` say so. The former Rust mirror was
+deleted by `plugins-v3-syl-conversion`.

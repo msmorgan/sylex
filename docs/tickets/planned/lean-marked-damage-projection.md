@@ -38,7 +38,6 @@ What remains is the [CR#704.5h] row, which goes on the same creature row.
 
 Do: add the axis and the event with their citations, thread both through every
 exhaustive read in `Check/`, pin the two rows as `SbaRule`s in
-`Proofs/Rules.lean` beside the three that already prove, mirror both in
-`crates/deckmaste_semantics_v3` (when created in `semantics-v3-dsl-and-plugins`),
+`Proofs/Rules.lean` beside the three that already prove, carry both into the native Rust pipeline in `semantics-rust-rewrite`,
 and note in `lean/CONTRACTS.md` that the "Rules tables" gap is closed. Standard
 constraints apply.

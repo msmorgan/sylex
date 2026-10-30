@@ -33,7 +33,6 @@ decided above, because off the battlefield a battle's defense already is its pri
 [CR#310.4a].
 
 Do: add `defense` to `Stat` with its citation, thread it through
-`Stat.comparedType` and every exhaustive read in `Check/`, mirror it in
-`crates/deckmaste_semantics_v3` (when created in `semantics-v3-dsl-and-plugins`),
+`Stat.comparedType` and every exhaustive read in `Check/`, carry it into the native Rust pipeline in `semantics-rust-rewrite`,
 and pin the entry conferrals of `battle_definition` and `planeswalker_definition` in
 `lean/Semantics/Proofs/Rules.lean`. Standard constraints apply.

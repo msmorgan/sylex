@@ -44,7 +44,7 @@ requires explicit review rather than an opportunistic refactor.
   `ReferentId`, nested boxes, `J1`, `J2`, `D′`, `AC>R1`), `Definition` vs.
   `Template` split, and Unified Action-Clause Spine (`instruct`, `does`,
   `would`/`instead`, `cant`/`must`/`may`/`gatedBy`, `did`/`tally`, `by`, `any`,
-  `which`), executed Lean-first and mirrored into `deckmaste_semantics_v3` and
+  `which`), executed in `lean/Semantics/` with `.syl` declarations and cards under
   `plugins_v3/`.
 - [Card authoring binds no implicits](card-authoring-binds-no-implicits.md) —
   Card authoring binds no implicit parameters; core constructors take every

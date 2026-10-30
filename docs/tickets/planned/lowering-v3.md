@@ -1,7 +1,7 @@
 ---
 needs: [semantics-rust-rewrite]
 ---
-**Create `crates/deckmaste_lowering_v3`: `semantics_v3` to `core` (updated
+**Implement the `lowering` crate from `semantics-rust-rewrite`: resolved semantics to `core` (updated
 2026-10-14 per [`docs/decisions/semantics-v3.md`](../../decisions/semantics-v3.md)).**
 Sibling of `deckmaste_lowering`; v1 lowering deletes at cutover. Same contract
 as `semantics-spelling-lowering.md` §9 and §17 and `core-explicit-regions.md`:
@@ -9,13 +9,13 @@ one-way compile, the crate is the divergence ledger, and rearrangement,
 hoisting, and register indexing happen here. May fail on a card that breaks a
 Lean law; does not validate. Standard constraints apply.
 
-## Lowering Seams (`deckmaste_semantics_v3` → `deckmaste_core`)
+## Lowering Seams (`discourse` → `deckmaste_core`)
 
 1. **`DRS` / `ReferentId` to `core::Region` (`DefId` / `RefId` / `Param`) without a duplicate antecedent stack:**
    - Whereas `v1` `deckmaste_lowering` (`region.rs`) had to maintain its own
      heuristic `antecedents: Vec<Antecedent>` stack to guess which earlier
-     `DefId` an `it` or `that <noun>` referred to, `deckmaste_lowering_v3`
-     consumes the `DRS` resolution from `deckmaste_semantics_v3::reads`
+     `DefId` an `it` or `that <noun>` referred to, `lowering`
+     consumes the `DRS` resolution from `discourse`
      (`ReferentId`, `firstMention` / `laterMention` `BindingId`, `D′`, `AC>R1`,
      and `.actedOn` participle stamps) directly.
    - Each introduced `ReferentId` maps deterministically to a `core::DefId` (or

@@ -63,9 +63,9 @@ The jj-kata `kata` and `kanban` skills own the lifecycle. Repo specifics:
 ## Crate fates (semantics_v3 and english-v4)
 
 Authorities: `docs/decisions/semantics-v3.md` and `docs/decisions/english-v4.md`.
-- `semantics-v3` is executed Lean-first in `lean/Semantics/` and mirrored into
-  `deckmaste_semantics_v3` and `plugins_v3/` (deleting `deckmaste_semantics_v2` and
-  `plugins_v2/canon/` immediately, and `plugins_v2/builtin/` at `semantics-v3-dsl-and-plugins`).
+- `semantics-v3` executes in `lean/Semantics/`; `sylGen` compiles the `.syl` builtin and canon
+  under `plugins_v3/`. `plugins-v3-syl-conversion` deleted the `.lean`-only Rust mirror and
+  lowering crates; `semantics-rust-rewrite` owns their future Rust replacement.
 - `english-v4` lives in `deckmaste_syntax`, `deckmaste_lexical_source` and `deckmaste_english`.
   `english-v4-cutover-v3` deleted `deckmaste_english_v3`, `deckmaste_construction_v3*` and the
   earlier `deckmaste_lexical_source`; `english-v4-final-suffix-cutover` dropped the `_v4` suffixes
