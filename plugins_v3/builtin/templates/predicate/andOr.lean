@@ -1,4 +1,0 @@
-/-- "<p> and/or <q>": some disjunct holds, as "with flying and/or reach". -/
-template andOr (disjuncts : List Predicate) : Predicate := {
-  body := coord .andOr disjuncts
-}

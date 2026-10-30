@@ -1,5 +1,0 @@
-/-- "the other [one]", "the other [pile]": the one remaining after a choice among two. -/
-template theOther : NounPhrase := {
-  spelling := "the other one",
-  body := theRest .one
-}

@@ -1,0 +1,6 @@
+# "A creature with defender can't attack." [CR#702.3b]
+ability defender {
+  lexical = {lemma = "defender"},
+  spelling = "defender",
+  body = [static(cant(actor(thisCreature), attack))]
+}

@@ -1,0 +1,16 @@
+# *Call Damage Control*: each mode writes out the printed header, "Return those cards from your
+# graveyard to your hand.", with its bullet's target.
+card {
+  name = "Call Damage Control",
+  cost = [1, green],
+  types = [sorcery],
+  text = [
+    spell(
+      chooseModes(
+        upTo(2),
+        [
+          mk(none, none, returnToHand(target(and([isArtifact, isCard])), yourGraveyard)),
+          mk(none, none, returnToHand(target(and([isCreature, isCard])), yourGraveyard)),
+          mk(none, none, returnToHand(target(and([isEnchantment, isCard])), yourGraveyard)),
+          mk(none, none, returnToHand(target(and([isLand, isCard])), yourGraveyard))]))]
+}

@@ -1,0 +1,27 @@
+card {
+  name = "Aya of Alexandria",
+  cost = [2, red, white],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [human, assassin],
+  text = [
+    menace,
+    lifelink,
+    whenever(
+      does(
+        actor(a(and([isHistoric, isCreature, youControl]))),
+        dealDamage(recipient = a(isPlayer), kind = combat)),
+      create(
+        1,
+        written(
+          {
+            characteristics = {
+              colors = [black],
+              types = [creature],
+              subtypes = [assassin],
+              text = [menace],
+              power = 1,
+              toughness = 1}})))],
+  power = 4,
+  toughness = 3
+}

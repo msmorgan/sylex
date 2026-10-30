@@ -1,0 +1,2 @@
+# "<event> causes …"
+primitive byEvent(event: GameEvent): Causing = .event

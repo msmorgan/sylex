@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype nissa := {
-  lexical := { lemma := "Nissa" },
-  spelling := "Nissa",
-  kind := planeswalker,
-  name := "Nissa",
-  confers := []
-}

@@ -1,7 +1,0 @@
-subtype inkling := {
-  lexical := { lemma := "Inkling" },
-  spelling := "Inkling",
-  kind := creature,
-  name := "Inkling",
-  confers := []
-}

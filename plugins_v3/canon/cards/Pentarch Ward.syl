@@ -1,0 +1,11 @@
+card {
+  name = "Pentarch Ward",
+  cost = [2, white],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    static(entersChoosing(thisAura, color)),
+    when(does(actor(thisAura), enter), draw(1)),
+    static(retention(abilityGrant(enchanted(creature), protection(ofChosen(color))), thisAura))]
+}

@@ -1,9 +1,0 @@
-card := {
-  name := "Shu Farmer",
-  cost := [1, white],
-  types := [creature],
-  subtypes := [human],
-  text := [activatedOnlyDuring tapSymbol (gainLife 1) (beforePart declareAttackers you)],
-  power := 1,
-  toughness := 1
-}

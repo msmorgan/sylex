@@ -1,7 +1,0 @@
-subtype pangolin := {
-  lexical := { lemma := "Pangolin" },
-  spelling := "Pangolin",
-  kind := creature,
-  name := "Pangolin",
-  confers := []
-}

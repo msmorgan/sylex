@@ -1,9 +1,0 @@
-/-- Ring-bearer is a permanent designation, at most one for each player
-[CR#701.54a,701.54b]. -/
-designation ringBearer := {
-  lexical := { nouns := ["Ring-bearer"] },
-  spelling := "Ring-bearer",
-  scope := (.heldBy object),
-  sole := false,
-  confers := []
-}

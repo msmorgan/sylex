@@ -1,0 +1,2 @@
+# A cost paid by performing an action.
+primitive perform(action: Action): Cost

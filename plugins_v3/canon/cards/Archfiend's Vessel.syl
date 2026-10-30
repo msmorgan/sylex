@@ -1,0 +1,29 @@
+card {
+  name = "Archfiend's Vessel",
+  cost = [black],
+  types = [creature],
+  subtypes = [human, cleric],
+  text = [
+    lifelink,
+    when(
+      does(actor(thisCreature), enter),
+      if = or(
+        [
+          did(actor(it), enter(from = yourGraveyard), triggering),
+          is(it, did(actor(you), cast(which, from = yourGraveyard), thisObject))]),
+      action = doIfDone(
+        exile(it),
+        create(
+          1,
+          written(
+            {
+              characteristics = {
+                colors = [black],
+                types = [creature],
+                subtypes = [demon],
+                text = [flying],
+                power = 5,
+                toughness = 5}}))))],
+  power = 1,
+  toughness = 1
+}

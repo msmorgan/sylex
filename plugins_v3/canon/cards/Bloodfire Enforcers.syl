@@ -1,0 +1,16 @@
+card {
+  name = "Bloodfire Enforcers",
+  cost = [3, red],
+  types = [creature],
+  subtypes = [human, monk],
+  text = [
+    static(
+      onlyWhile(
+        conjunction([abilityGrant(thisCreature, firstStrike), abilityGrant(it, trample)]),
+        and(
+          [
+            exists(and([isInstant, in(yourGraveyard)])),
+            exists(and([isSorcery, in(yourGraveyard)]))])))],
+  power = 5,
+  toughness = 2
+}

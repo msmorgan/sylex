@@ -1,0 +1,9 @@
+# A player with one or more poison counters is poisoned. Ten or more cause that player to lose as
+# a state-based action, except in Two-Headed Giant, where the team threshold is fifteen.
+# [CR#122.1f,704.5c,704.6b]
+counter poison {
+  lexical = {lemma = "poison counter"},
+  spelling = "poison counter",
+  holder = player,
+  confers = []
+}

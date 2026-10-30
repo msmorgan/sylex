@@ -1,0 +1,14 @@
+card {
+  name = "Gideon's Intervention",
+  cost = [2, white, white],
+  types = [enchantment],
+  text = [
+    static(entersChoosing(thisEnchantment, cardName)),
+    static(cant(actor(yourOpponents), cast(bare(and([isSpell, named(chosenName)]))))),
+    static(
+      replace(
+        would(
+          by(allOf(and([isSource, named(chosenName)]))),
+          dealDamage(recipient = youAnd(allOf(and([isPermanent, youControl]))))),
+        instead(preventDamage(allDamage))))]
+}

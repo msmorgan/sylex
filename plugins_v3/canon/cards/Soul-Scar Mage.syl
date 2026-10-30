@@ -1,0 +1,16 @@
+card {
+  name = "Soul-Scar Mage",
+  cost = [red],
+  types = [creature],
+  subtypes = [human, wizard],
+  text = [
+    prowess,
+    static(
+      replace(
+        would(
+          actor(a(and([isSource, youControl]))),
+          dealDamage(recipient = a(and([isCreature, anOpponentControls])), kind = noncombat)),
+        instead(putCounters(thatMuch, printedKind(m1m1Counter), that(creature)))))],
+  power = 1,
+  toughness = 2
+}

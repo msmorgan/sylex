@@ -1,0 +1,13 @@
+card {
+  name = "Silverquill Silencer",
+  cost = [white, black],
+  types = [creature],
+  subtypes = [human, cleric],
+  text = [
+    static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(isLand)))),
+    whenever(
+      does(actor(anOpponent), cast(a(and([isSpell, named(chosenName)])))),
+      sequentially([instruct(they, loseLife(3)), draw(1)]))],
+  power = 3,
+  toughness = 2
+}

@@ -1,0 +1,10 @@
+card {
+  name = "Steelclaw Lance",
+  cost = [black, red],
+  types = [artifact],
+  subtypes = [equipment],
+  text = [
+    static(getsPt(equipped(creature), up(2), up(2))),
+    equipQuality(hasSubtype(knight), mana([1])),
+    equip(mana([3]))]
+}

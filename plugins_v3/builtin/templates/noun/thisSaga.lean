@@ -1,5 +1,0 @@
-template thisSaga : NounPhrase := {
-  spelling := "this Saga",
-  body :=
-    headed (.subtype saga) this_
-}

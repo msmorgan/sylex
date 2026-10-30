@@ -1,0 +1,1 @@
+primitive generic(change: Delta(Amount), floor: Option(Amount)): CostShift

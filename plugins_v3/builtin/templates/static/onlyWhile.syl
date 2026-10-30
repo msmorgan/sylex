@@ -1,0 +1,5 @@
+# "<spec> as long as <condition>"
+template onlyWhile(spec: StaticSpec, condition: Condition): StaticSpec {
+  spelling = "<spec> as long as <condition>",
+  body = conditional(spec, condition, asLongAs)
+}

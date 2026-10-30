@@ -1,0 +1,11 @@
+card {
+  name = "Force of Will",
+  cost = [3, blue, blue],
+  types = [instant],
+  text = [
+    static(
+      altCost(
+        this,
+        compound([perform(payLife(1)), perform(exile(a(and([hasColor(blue), in(yourHand)]))))]))),
+    spell(counter(target(isSpell)))]
+}

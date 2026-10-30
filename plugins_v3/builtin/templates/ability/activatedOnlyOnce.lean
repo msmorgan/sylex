@@ -1,6 +1,0 @@
-/-- "[cost]: <action>. Activate only once <limit>." -/
-template activatedOnlyOnce (cost : Cost) (action : Action) (limit : UsageLimit) :
-    Ability := {
-  spelling := "<cost>: <action>. Activate only once <limit>.",
-  body := activated cost action none (some limit) none none
-}

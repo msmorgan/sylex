@@ -1,0 +1,11 @@
+card {
+  name = "Mana Matrix",
+  cost = [6],
+  types = [artifact],
+  text = [
+    static(
+      costShift(
+        allOf(
+          and([or([isInstant, isEnchantment]), isSpell, did(actor(you), cast(which), thisObject)])),
+        less(2)))]
+}

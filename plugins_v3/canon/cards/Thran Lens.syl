@@ -1,0 +1,6 @@
+card {
+  name = "Thran Lens",
+  cost = [2],
+  types = [artifact],
+  text = [static(qualityChange(allOf(isPermanent), sets, colored(some([]))))]
+}

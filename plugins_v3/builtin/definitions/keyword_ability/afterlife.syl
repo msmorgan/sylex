@@ -1,0 +1,10 @@
+# "Afterlife N" means "When this permanent is put into a graveyard from the battlefield, create N
+# 1/1 white and black Spirit creature tokens with flying." [CR#702.135a]
+ability afterlife(amount: Amount) {
+  lexical = {lemma = "afterlife", parameters = [[Amount]]},
+  spelling = "afterlife <amount>",
+  body = [
+    when(
+      does(actor(thisPermanent), die),
+      create(amount, written(creatureToken(1, 1, [white, black], [spirit], [flying]))))]
+}

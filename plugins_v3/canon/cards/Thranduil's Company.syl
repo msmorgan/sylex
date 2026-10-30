@@ -1,0 +1,20 @@
+card {
+  name = "Thranduil's Company",
+  cost = [2, green, blue],
+  types = [creature],
+  subtypes = [elf, soldier],
+  text = [
+    static(
+      onlyWhile(
+        can(actor(you), play(counted(additional(exactly(1)), isLand))),
+        exists(and([and([isCreature, isOther]), hasSubtype(elf), youControl])))),
+    landfall(
+      whenever(
+        does(actor(a(and([isLand, youControl]))), enter),
+        sequentially(
+          [
+            putCounters(2, printedKind(p1p1Counter), target(and([isCreature, youControl]))),
+            gain(it, vigilance, untilEndOfTurn)])))],
+  power = 3,
+  toughness = 4
+}

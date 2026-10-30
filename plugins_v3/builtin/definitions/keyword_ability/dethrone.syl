@@ -1,0 +1,12 @@
+# "Dethrone" means "Whenever this creature attacks the player with the most life or tied for most
+# life, put a +1/+1 counter on this creature." [CR#702.105a]
+ability dethrone {
+  lexical = {lemma = "dethrone"},
+  spelling = "dethrone",
+  body = [
+    whenever(
+      does(
+        actor(thisCreature),
+        attack(a(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])))),
+      putCounters(1, printedKind(p1p1Counter), thisCreature))]
+}

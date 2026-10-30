@@ -1,7 +1,0 @@
-subtype homarid := {
-  lexical := { lemma := "Homarid" },
-  spelling := "Homarid",
-  kind := creature,
-  name := "Homarid",
-  confers := []
-}

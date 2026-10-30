@@ -1,0 +1,2 @@
+# The timing constraint does not apply.
+primitive not(timing: Timing): Timing

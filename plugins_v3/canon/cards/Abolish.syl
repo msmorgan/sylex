@@ -1,0 +1,8 @@
+card {
+  name = "Abolish",
+  cost = [1, white, white],
+  types = [instant],
+  text = [
+    static(altCost(this, perform(discard(a(and([hasSubtype(plains), in(yourHand)])))))),
+    spell(destroy(target(or([isArtifact, isEnchantment]))))]
+}

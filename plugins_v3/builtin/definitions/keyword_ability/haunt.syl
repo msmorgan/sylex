@@ -1,0 +1,17 @@
+# "Haunt" on a permanent means "When this permanent is put into a graveyard from the battlefield,
+# exile it haunting target creature," and on an instant or sorcery spell "When this spell is put
+# into a graveyard during its resolution, exile it haunting target creature." [CR#702.55a]
+ability haunt {
+  lexical = {lemma = "haunt", verbs = [{lemma = "haunt", frames = [Monotransitive]}]},
+  spelling = "haunt",
+  body = [
+    byCardClass(
+      when(
+        does(actor(thisPermanent), die),
+        sequentially([exile(it), relate(it, haunting, target(isCreature))])),
+      when(
+        causes(
+          byEvent(does(any, resolve(thisSpell))),
+          does(any, putInto(thisSpell, graveyard, stack))),
+        sequentially([exile(it), relate(it, haunting, target(isCreature))])))]
+}

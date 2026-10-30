@@ -1,0 +1,5 @@
+# "<left> or <right>" as a cost
+template either(left: Cost, right: Cost): Cost {
+  spelling = "<left> or <right>",
+  body = or([left, right])
+}

@@ -1,0 +1,9 @@
+card {
+  name = "Precognition Field",
+  cost = [3, blue],
+  types = [enchantment],
+  text = [
+    static(visibility(lookAt, you, topOfLibrary)),
+    static(can(actor(you), cast(bare(and([isSpell, isInstantOrSorcery])), from = onTop))),
+    activated(mana([3]), exile(topSlice(1)))]
+}

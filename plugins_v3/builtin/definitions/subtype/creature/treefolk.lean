@@ -1,7 +1,0 @@
-subtype treefolk := {
-  lexical := { lemma := "Treefolk", plural := "Treefolk" },
-  spelling := "Treefolk",
-  kind := creature,
-  name := "Treefolk",
-  confers := []
-}

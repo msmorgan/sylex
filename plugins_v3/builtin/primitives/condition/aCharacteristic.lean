@@ -1,6 +1,0 @@
-/-- "has <predicate>" as a starting-deck trait -/
-primitive aCharacteristic (predicate : Predicate) : DeckTrait := {
-  spelling := "has <predicate>",
-  body :=
-    Semantics.Primitives.DeckTrait.aCharacteristic predicate
-}

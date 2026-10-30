@@ -1,0 +1,9 @@
+# Rad counters on a player have an inherent triggered ability: at that player's precombat main
+# phase, they mill that many cards, then lose 1 life and remove a rad counter for each nonland
+# card milled this way. [CR#122.1i,728.1]
+counter radCounter {
+  lexical = {lemma = "rad counter"},
+  spelling = "rad counter",
+  holder = player,
+  confers = []
+}

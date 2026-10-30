@@ -1,0 +1,17 @@
+# Gift represents two abilities. The first is "As an additional cost to cast this spell, you may
+# choose an opponent." [CR#702.174a] The second is "When this permanent enters, if its gift cost
+# was paid, [effect]" on a permanent, and "If this spell’s gift cost was paid, [effect]" on an
+# instant or sorcery spell. [CR#702.174b]
+ability gift(promise: Action) {
+  lexical = {lemma = "gift", parameters = [[Quality(None)]], nouns = ["gift"]},
+  # TODO(spelling): Extract the promised gift's noun phrase from the Action; substituting its
+  # action clause is not gift wording.
+  body = [
+    static(addedCost(perform(choose(anOpponent)), true)),
+    byCardClass(
+      when(
+        does(actor(thisPermanent), enter),
+        instruct(the(isChosenPlayer), promise),
+        if = keywordCostPaid(gift, this)),
+      spell(doIf(keywordCostPaid(gift, this), instruct(the(isChosenPlayer), promise))))]
+}

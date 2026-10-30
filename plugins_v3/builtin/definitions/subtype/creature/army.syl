@@ -1,0 +1,9 @@
+# Army, named apart from the `army` predicate template (an Army the performer controls). Amass
+# chooses an Army creature its performer controls [CR#701.47a].
+subtype army {
+  lexical = {lemma = "Army"},
+  spelling = "Army",
+  kind = creature,
+  name = "Army",
+  confers = []
+}

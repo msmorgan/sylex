@@ -1,0 +1,14 @@
+card {
+  name = "Cultivator Colossus",
+  cost = [4, green, green, green],
+  types = [creature],
+  subtypes = [plant, beast],
+  text = [
+    trample,
+    static(definesPt(thisCreature, countOf(and([isLand, youControl])))),
+    when(
+      does(actor(thisCreature), enter),
+      may(
+        putOntoBattlefieldTapped(a(and([isLand, in(yourHand)]))),
+        sequentially([draw(1), repeat(again)])))]
+}

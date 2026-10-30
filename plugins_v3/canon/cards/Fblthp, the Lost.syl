@@ -1,0 +1,21 @@
+card {
+  name = "Fblthp, the Lost",
+  cost = [1, blue],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [homunculus],
+  text = [
+    when(
+      does(actor(this), enter),
+      replace(
+        draw(1),
+        doIf(
+          or(
+            [
+              did(actor(it), enter(from = yourLibrary), triggering),
+              is(it, did(any, cast(which, from = yourLibrary), thisObject))]),
+          instead(draw(2))))),
+    when(does(actor(a(isSpell)), target(this)), shuffleInto(this))],
+  power = 1,
+  toughness = 1
+}

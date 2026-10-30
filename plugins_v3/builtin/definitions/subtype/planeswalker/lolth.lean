@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype lolth := {
-  lexical := { lemma := "Lolth" },
-  spelling := "Lolth",
-  kind := planeswalker,
-  name := "Lolth",
-  confers := []
-}

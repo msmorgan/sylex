@@ -1,6 +1,0 @@
-/-- "N <p> at random" -/
-template countedAtRandom (q : Quantity) (p : Predicate) : NounPhrase := {
-  spelling := "<q> <p> at random",
-  body :=
-    described (count q (some .atRandom)) p
-}

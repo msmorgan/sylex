@@ -1,0 +1,6 @@
+counter manifestationCounter {
+  lexical = {lemma = "manifestation counter"},
+  spelling = "manifestation counter",
+
+  confers = []
+}

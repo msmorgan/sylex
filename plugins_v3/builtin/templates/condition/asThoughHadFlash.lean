@@ -1,8 +1,0 @@
-/-- "as though <subject> had flash" ("as though they had flash", "as though it had flash"): a
-permission to cast that applies as though its objects had flash, so they may be cast any time an
-instant could [CR#702.8a]. -/
-template asThoughHadFlash (subject : NounPhrase) : AsThough := {
-  spelling := "as though <subject> had flash",
-  body :=
-    holds (is subject (hasKeyword flash))
-}

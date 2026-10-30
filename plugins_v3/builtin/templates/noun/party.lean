@@ -1,6 +1,0 @@
-/-- "your party" -/
-template party : NounPhrase := {
-  spelling := "your party",
-  body :=
-    partyOf you
-}

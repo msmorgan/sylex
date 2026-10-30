@@ -1,0 +1,17 @@
+# Reconfigure [CR#702.151a]: attaching is the `attachTo` Definition; unattaching moves the
+# Equipment away and is no attaching [CR#701.3d], so it is the bare attachment change and names no
+# deed.
+ability reconfigure(cost: Cost) {
+  lexical = {lemma = "reconfigure", parameters = [[Cost]]},
+  spelling = "reconfigure <cost>",
+  body = [
+    activatedOnlyDuring(
+      cost,
+      attachTo(thisPermanent, target(and([isCreature, isOther, youControl]))),
+      asSorcery),
+    activated(
+      cost,
+      unattach(thisPermanent),
+      asSorcery,
+      guard = is(thisPermanent, attachment(attachment, a(isCreature))))]
+}

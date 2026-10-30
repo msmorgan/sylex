@@ -1,0 +1,14 @@
+card {
+  name = "Black Mana Battery",
+  cost = [4],
+  types = [artifact],
+  text = [
+    activated(
+      compound([mana([2]), tapSymbol]),
+      putCounters(1, printedKind(chargeCounter), thisArtifact)),
+    activated(
+      compound(
+        [tapSymbol, perform(removeCounters(anyNumber, printedKind(chargeCounter), thisArtifact))]),
+      sequentially(
+        [addMana(1, manaOf([[of(black)]])), addMana(removedThisWay, manaOf([[of(black)]]))]))]
+}

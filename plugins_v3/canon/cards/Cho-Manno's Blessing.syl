@@ -1,0 +1,11 @@
+card {
+  name = "Cho-Manno's Blessing",
+  cost = [white, white],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    flash,
+    enchant(isCreature),
+    static(entersChoosing(thisAura, color)),
+    static(retention(abilityGrant(enchanted(creature), protection(ofChosen(color))), thisAura))]
+}

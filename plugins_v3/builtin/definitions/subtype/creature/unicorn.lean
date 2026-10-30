@@ -1,7 +1,0 @@
-subtype unicorn := {
-  lexical := { lemma := "Unicorn" },
-  spelling := "Unicorn",
-  kind := creature,
-  name := "Unicorn",
-  confers := []
-}

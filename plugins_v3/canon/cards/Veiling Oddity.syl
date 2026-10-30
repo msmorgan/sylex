@@ -1,0 +1,14 @@
+card {
+  name = "Veiling Oddity",
+  cost = [3, blue],
+  types = [creature],
+  subtypes = [illusion],
+  text = [
+    suspend(4, mana([1, blue])),
+    when(
+      does(any, removeCounters(theLast, printedKind(timeCounter), this)),
+      while = whileTrue(is(this, cardIn(exileZone))),
+      action = establishThroughout(cant(any, block(allOf(isCreature))), thisTurn))],
+  power = 2,
+  toughness = 3
+}

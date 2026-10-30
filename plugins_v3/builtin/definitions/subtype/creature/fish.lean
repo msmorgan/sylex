@@ -1,7 +1,0 @@
-subtype fish := {
-  lexical := { lemma := "Fish", plural := "Fish" },
-  spelling := "Fish",
-  kind := creature,
-  name := "Fish",
-  confers := []
-}

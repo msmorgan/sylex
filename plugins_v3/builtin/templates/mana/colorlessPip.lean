@@ -1,6 +1,0 @@
-/-- "{C}" -/
-template colorlessPip : ManaSymbol := {
-  spelling := "{C}",
-  body :=
-    .simple (.specific colorless)
-}

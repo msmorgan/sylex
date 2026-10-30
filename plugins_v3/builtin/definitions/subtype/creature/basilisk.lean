@@ -1,7 +1,0 @@
-subtype basilisk := {
-  lexical := { lemma := "Basilisk" },
-  spelling := "Basilisk",
-  kind := creature,
-  name := "Basilisk",
-  confers := []
-}

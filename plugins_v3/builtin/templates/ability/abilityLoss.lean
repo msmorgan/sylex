@@ -1,7 +1,0 @@
-/-- "<subject> loses <abilities>" -/
-template abilityLoss (subject : NounPhrase) (abilities : List AbilityLost) : StaticSpec := {
-  spelling := "<subject> loses <abilities>",
-  body :=
-    characteristicChange subject
-      [removedAbilities (specified abilities)]
-}

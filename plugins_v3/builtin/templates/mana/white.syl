@@ -1,0 +1,3 @@
+primitive white: Color {
+  spelling = "white"
+}

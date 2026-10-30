@@ -1,8 +1,0 @@
-/-- Time counters are placed and removed by suspend and vanishing, and can be added or removed by
-time travel. [CR#702.62a,702.63a,701.56a] -/
-counter timeCounter := {
-  lexical := { lemma := "time counter" },
-  spelling := "time counter",
-  holder := object,
-  confers := []
-}

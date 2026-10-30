@@ -1,7 +1,0 @@
-/-- "<subject> saddles <permanent>" [CR#702.171a] -/
--- [CR#702.171a]
-primitive saddle (permanent : NounPhrase) : Action := {
-  spelling := "saddles <permanent>",
-  body :=
-    Semantics.Primitives.Action.saddle permanent
-}

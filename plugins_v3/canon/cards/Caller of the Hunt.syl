@@ -1,0 +1,9 @@
+card {
+  name = "Caller of the Hunt",
+  cost = [2, green],
+  types = [creature],
+  subtypes = [human],
+  text = [
+    static(addedCost(perform(choose(a(quality(subtype(creature))))), false)),
+    static(definesPt(thisCreature, countOf(and([isCreature, ofChosen(subtype(creature))]))))]
+}

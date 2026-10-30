@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype ajani := {
-  lexical := { lemma := "Ajani" },
-  spelling := "Ajani",
-  kind := planeswalker,
-  name := "Ajani",
-  confers := []
-}

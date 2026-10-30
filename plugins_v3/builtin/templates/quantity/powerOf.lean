@@ -1,4 +1,0 @@
-template powerOf (subject : NounPhrase) : Amount := {
-  spelling := "<subject>'s power",
-  body := statOf (.stat power) subject
-}

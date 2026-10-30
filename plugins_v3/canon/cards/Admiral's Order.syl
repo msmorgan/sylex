@@ -1,0 +1,8 @@
+card {
+  name = "Admiral's Order",
+  cost = [1, blue, blue],
+  types = [instant],
+  text = [
+    static(onlyWhile(altCost(this, mana([blue])), did(actor(you), attack, within(soFarThisTurn)))),
+    spell(counter(target(isSpell)))]
+}

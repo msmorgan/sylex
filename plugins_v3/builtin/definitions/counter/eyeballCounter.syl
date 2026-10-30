@@ -1,0 +1,6 @@
+counter eyeballCounter {
+  lexical = {lemma = "eyeball counter"},
+  spelling = "eyeball counter",
+
+  confers = []
+}

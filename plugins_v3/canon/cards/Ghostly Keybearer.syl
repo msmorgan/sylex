@@ -1,0 +1,13 @@
+card {
+  name = "Ghostly Keybearer",
+  cost = [3, blue],
+  types = [creature],
+  subtypes = [spirit],
+  text = [
+    flying,
+    whenever(
+      does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
+      unlock(doorOf(locked, targets(upTo(1), and([hasSubtype(room), youControl])))))],
+  power = 3,
+  toughness = 3
+}

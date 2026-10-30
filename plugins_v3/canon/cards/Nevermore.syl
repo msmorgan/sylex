@@ -1,0 +1,8 @@
+card {
+  name = "Nevermore",
+  cost = [1, white, white],
+  types = [enchantment],
+  text = [
+    static(entersChoosingFrom(thisEnchantment, cardName, nameOfCard(non(isLand)))),
+    static(cant(any, cast(bare(and([isSpell, named(chosenName)])))))]
+}

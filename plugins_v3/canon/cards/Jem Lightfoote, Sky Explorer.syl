@@ -1,0 +1,16 @@
+card {
+  name = "Jem Lightfoote, Sky Explorer",
+  cost = [2, white, blue],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [human, scout],
+  text = [
+    flying,
+    vigilance,
+    at(
+      beginningOfYour(endStep),
+      if = not(did(actor(you), cast(a(isSpell), from = yourHand), within(soFarThisTurn))),
+      action = draw(1))],
+  power = 3,
+  toughness = 3
+}

@@ -1,7 +1,0 @@
-subtype zubera := {
-  lexical := { lemma := "Zubera", plural := "Zubera" },
-  spelling := "Zubera",
-  kind := creature,
-  name := "Zubera",
-  confers := []
-}

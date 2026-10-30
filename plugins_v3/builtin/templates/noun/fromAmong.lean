@@ -1,7 +1,0 @@
-/-- "N <p> from among <group>" -/
-template fromAmong (quantity : Quantity) (p : Predicate) (group : NounPhrase) :
-    NounPhrase := {
-  spelling := "<quantity> <p> from among <group>",
-  body :=
-    nounPhraseSomeOf (counted quantity) (some p) group
-}

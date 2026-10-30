@@ -1,0 +1,13 @@
+card {
+  name = "Edgewalker",
+  cost = [1, white, black],
+  types = [creature],
+  subtypes = [human, cleric],
+  text = [
+    static(
+      costShift(
+        allOf(and([hasSubtype(cleric), isSpell, did(actor(you), cast(which), thisObject)])),
+        lessBySymbols(symbols([white, black]), coloredOnly = true)))],
+  power = 2,
+  toughness = 2
+}

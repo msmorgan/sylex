@@ -1,0 +1,7 @@
+card {
+  name = "Field of Dreams",
+  cost = [blue],
+  supertypes = [world],
+  types = [enchantment],
+  text = [static(visibility(reveal, bare(isPlayer), topOfLibrary))]
+}

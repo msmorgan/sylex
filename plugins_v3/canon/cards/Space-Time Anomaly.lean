@@ -1,6 +1,0 @@
-card := {
-  name := "Space-Time Anomaly",
-  cost := [2, white, blue],
-  types := [sorcery],
-  text := [spell (instruct (target isPlayer) (mill (lifeTotalOf you)))]
-}

@@ -1,0 +1,13 @@
+card {
+  name = "Soul Ransom",
+  cost = [2, blue, black],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    static(controlGrant(you, enchanted(creature))),
+    activatedBy(
+      perform(repeatTimes(2, sequentially([choose(a(cardIn(hand))), discard(that(card))]))),
+      sequentially([instruct(controllerOf(thisAura), sacrifice(it)), instruct(they, draw(2))]),
+      yourOpponents)]
+}

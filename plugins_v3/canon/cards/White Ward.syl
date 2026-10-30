@@ -1,0 +1,9 @@
+card {
+  name = "White Ward",
+  cost = [white],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    static(retention(abilityGrant(enchanted(creature), protection(hasColor(white))), thisAura))]
+}

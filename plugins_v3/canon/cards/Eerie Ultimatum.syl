@@ -1,0 +1,10 @@
+card {
+  name = "Eerie Ultimatum",
+  cost = [white, white, black, black, black, green, green],
+  types = [sorcery],
+  text = [
+    spell(
+      returnToBattlefield(
+        withDifferentNames(counted(anyNumber, and([isPermanentCard, in(yourGraveyard)]))),
+        from = yourGraveyard))]
+}

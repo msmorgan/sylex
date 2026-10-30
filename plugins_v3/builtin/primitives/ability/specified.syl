@@ -1,0 +1,1 @@
+primitive specified(abilities: List(AbilityLost)): AbilitySelection

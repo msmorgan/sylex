@@ -1,0 +1,10 @@
+# "Reinforce N—[cost]" means "[Cost], Discard this card: Put N +1/+1 counters on target creature."
+# [CR#702.77a]
+ability reinforce(amount: Amount, cost: Cost) {
+  lexical = {lemma = "reinforce", parameters = [[Amount, DashCost]]},
+  spelling = "reinforce <amount>—<cost>",
+  body = [
+    activated(
+      compound([cost, perform(discard(this))]),
+      putCounters(amount, printedKind(p1p1Counter), target(isCreature)))]
+}

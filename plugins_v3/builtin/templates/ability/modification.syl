@@ -1,0 +1,9 @@
+# "<subject> gets <delta> to one stat"
+template modification(
+  subject: NounPhrase,
+  axis: CharacteristicStat,
+  delta: Delta(Amount)): StaticSpec {
+  # TODO(spelling): Select the clause for raising, lowering, or setting delta on axis; setting is
+  # not a 'gets' modifier.
+  body = characteristicChange(subject, [stat(axis, delta)])
+}

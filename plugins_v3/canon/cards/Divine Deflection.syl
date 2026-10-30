@@ -1,0 +1,15 @@
+card {
+  name = "Divine Deflection",
+  cost = [variable, white],
+  types = [instant],
+  text = [
+    spell(
+      establishThroughout(
+        replace(
+          would(any, dealDamage(recipient = andOr([you, allOf(and([isPermanent, youControl]))]))),
+          instead(
+            preventDamage(
+              theNext(letter(x)),
+              also = instruct(this, dealDamage(thatMuch, target(isAnyTarget)))))),
+        thisTurn))]
+}

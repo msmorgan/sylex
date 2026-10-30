@@ -1,7 +1,0 @@
-subtype utrom := {
-  lexical := { lemma := "Utrom" },
-  spelling := "Utrom",
-  kind := creature,
-  name := "Utrom",
-  confers := []
-}

@@ -1,4 +1,0 @@
-template theKeyword (label : KeywordLabel) : KeywordTerm := {
-  body :=
-    .the label
-}

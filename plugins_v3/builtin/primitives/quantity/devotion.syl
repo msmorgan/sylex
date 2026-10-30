@@ -1,0 +1,2 @@
+# A player's devotion to one or two colors.
+primitive devotion(player: NounPhrase, color: ColorTerm, second: Option(ColorTerm) = none): Amount

@@ -1,7 +1,0 @@
-subtype ally := {
-  lexical := { lemma := "Ally" },
-  spelling := "Ally",
-  kind := creature,
-  name := "Ally",
-  confers := []
-}

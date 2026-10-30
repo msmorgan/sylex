@@ -1,0 +1,11 @@
+card {
+  name = "Blood Moon",
+  cost = [2, red],
+  types = [enchantment],
+  text = [
+    static(
+      qualityChange(
+        allOf(and([isLand, non(hasSupertype(basic))])),
+        sets,
+        bundle({characteristics = {subtypes = [mountain]}})))]
+}

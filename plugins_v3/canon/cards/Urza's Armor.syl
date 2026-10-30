@@ -1,0 +1,10 @@
+card {
+  name = "Urza's Armor",
+  cost = [6],
+  types = [artifact],
+  text = [
+    static(
+      replace(
+        would(actor(a(isSource)), dealDamage(recipient = you)),
+        instead(preventDamage(ofThatDamage(1)))))]
+}

@@ -1,0 +1,12 @@
+card {
+  name = "Root Greevil",
+  cost = [3, green],
+  types = [creature],
+  subtypes = [beast],
+  text = [
+    activated(
+      compound([mana([2, green]), tapSymbol, perform(sacrifice(thisCreature))]),
+      destroy(allOf(and([isEnchantment, ofYourChoice(color)]))))],
+  power = 2,
+  toughness = 3
+}

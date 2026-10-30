@@ -1,0 +1,11 @@
+card {
+  name = "Twincast",
+  cost = [blue, blue],
+  types = [instant],
+  text = [
+    spell(
+      sequentially(
+        [
+          copyOnStack(target(and([isInstantOrSorcery, isSpell]))),
+          may(chooseNewTargets(that(copy)))]))]
+}

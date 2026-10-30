@@ -1,0 +1,14 @@
+card {
+  name = "Fry",
+  cost = [1, red],
+  types = [instant],
+  text = [
+    static(cant(any, counter(thisSpell))),
+    spell(
+      instruct(
+        this,
+        dealDamage(
+          5,
+          target(
+            and([or([isCreature, isPlaneswalker]), or([hasColor(white), hasColor(blue)])])))))]
+}

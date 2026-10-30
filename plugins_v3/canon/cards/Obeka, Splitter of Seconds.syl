@@ -1,0 +1,14 @@
+card {
+  name = "Obeka, Splitter of Seconds",
+  cost = [1, blue, black, red],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [ogre, warlock],
+  text = [
+    menace,
+    whenever(
+      does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
+      additionalStep(upkeep, none, thatMuch))],
+  power = 2,
+  toughness = 5
+}

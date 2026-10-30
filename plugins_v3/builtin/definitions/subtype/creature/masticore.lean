@@ -1,7 +1,0 @@
-subtype masticore := {
-  lexical := { lemma := "Masticore" },
-  spelling := "Masticore",
-  kind := creature,
-  name := "Masticore",
-  confers := []
-}

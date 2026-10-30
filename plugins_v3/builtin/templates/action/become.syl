@@ -1,0 +1,8 @@
+# "<subject> becomes <added> in addition to its other types [until …]"
+template become(
+  subject: NounPhrase,
+  added: CharacteristicBundle,
+  duration: Option(Duration) = none): Action {
+  # TODO(spelling): Include or omit the clauses supplied by duration.
+  body = establish(qualityChange(subject, adds, bundle(added)), duration)
+}

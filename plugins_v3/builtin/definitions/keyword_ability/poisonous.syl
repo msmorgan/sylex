@@ -1,0 +1,10 @@
+# "Poisonous N" means "Whenever this creature deals combat damage to a player, that player gets N
+# poison counters." [CR#702.70a]
+ability poisonous(amount: Amount) {
+  lexical = {lemma = "poisonous", parameters = [[Amount]]},
+  spelling = "poisonous <amount>",
+  body = [
+    whenever(
+      does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
+      putCounters(amount, printedKind(poison), they))]
+}

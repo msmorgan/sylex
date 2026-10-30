@@ -1,0 +1,4 @@
+# "<amount> of that damage"
+primitive ofThatDamage(amount: Amount): PreventCut = .some {
+  spelling = "<amount> of that damage"
+}

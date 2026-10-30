@@ -1,0 +1,8 @@
+card {
+  name = "Blood Sun",
+  cost = [2, red],
+  types = [enchantment],
+  text = [
+    when(does(actor(thisEnchantment), enter), draw(1)),
+    static(allAbilityLoss(allOf(isLand), isManaAbility))]
+}

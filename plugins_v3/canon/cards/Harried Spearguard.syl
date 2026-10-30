@@ -1,0 +1,23 @@
+card {
+  name = "Harried Spearguard",
+  cost = [red],
+  types = [creature],
+  subtypes = [human, soldier],
+  text = [
+    haste,
+    when(
+      does(actor(thisCreature), die),
+      create(
+        1,
+        written(
+          {
+            characteristics = {
+              colors = [black],
+              types = [creature],
+              subtypes = [rat],
+              text = [static(cant(actor(thisToken), block))],
+              power = 1,
+              toughness = 1}})))],
+  power = 1,
+  toughness = 1
+}

@@ -1,0 +1,2 @@
+# Increase or decrease a die-roll result by the specified changes [CR#706.2].
+primitive actionShiftResult(changes: List(Delta(Amount))): Action = .shiftResult

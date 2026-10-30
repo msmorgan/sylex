@@ -1,0 +1,11 @@
+card {
+  name = "Lashknife Barrier",
+  cost = [2, white],
+  types = [enchantment],
+  text = [
+    when(does(actor(thisEnchantment), enter), draw(1)),
+    static(
+      replace(
+        would(actor(a(isSource)), dealDamage(recipient = a(and([isCreature, youControl])))),
+        instead(instruct(it, dealDamage(minus(thatMuch, 1), that(creature))))))]
+}

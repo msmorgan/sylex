@@ -1,0 +1,5 @@
+# "<subject> has base power and toughness P/T"
+template getsBase(subject: NounPhrase, powerValue: Amount, toughnessValue: Amount): StaticSpec {
+  spelling = "<subject> has base power and toughness <power>/<toughness>",
+  body = getsPt(subject, setTo(powerValue), setTo(toughnessValue))
+}

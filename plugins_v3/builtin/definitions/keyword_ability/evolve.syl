@@ -1,0 +1,15 @@
+# "Evolve" means "Whenever a creature you control enters, if that creature's power is greater than
+# this creature's power and/or that creature's toughness is greater than this creature's
+# toughness, put a +1/+1 counter on this creature." [CR#702.100a]
+ability evolve {
+  lexical = {lemma = "evolve", verbs = [{lemma = "evolve", frames = [Intransitive]}]},
+  spelling = "evolve",
+  body = [
+    whenever(
+      does(actor(a(and([isCreature, youControl]))), enter),
+      putCounters(1, printedKind(p1p1Counter), thisCreature),
+      if = or(
+        [
+          compareAmt(powerOf(that(creature)), greater, powerOf(thisCreature)),
+          compareAmt(toughnessOf(that(creature)), greater, toughnessOf(thisCreature))]))]
+}

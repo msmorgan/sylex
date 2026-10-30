@@ -1,7 +1,0 @@
-/-- "prototyped": with its prototype frame's mana cost, power and toughness [CR#718.3]. -/
--- [CR#718.3]
-primitive prototyped : PlayPayment := {
-  spelling := "prototyped",
-  body :=
-    Semantics.Primitives.PlayPayment.prototyped
-}

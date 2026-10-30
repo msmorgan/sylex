@@ -1,7 +1,0 @@
-subtype phelddagrif := {
-  lexical := { lemma := "Phelddagrif" },
-  spelling := "Phelddagrif",
-  kind := creature,
-  name := "Phelddagrif",
-  confers := []
-}

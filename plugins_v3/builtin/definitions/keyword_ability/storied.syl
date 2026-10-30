@@ -1,0 +1,23 @@
+# "Storied" means "Any time you control three or more permanents that are artifacts, Sagas, and/or
+# legendary and you don't have an enduring story, you have an enduring story for the rest of the
+# game." [CR#702.195a]
+ability storied {
+  lexical = {lemma = "storied"},
+  spelling = "storied",
+  body = [
+    static(
+      whileHolds(
+        and(
+          [
+            compareAmt(
+              countOf(
+                and(
+                  [
+                    isPermanent,
+                    youControl,
+                    andOr([isArtifact, hasSubtype(saga), hasSupertype(legendary)])])),
+              atLeast,
+              3),
+            not(is(you, hasDesignation(enduringStory)))]),
+        gainDesignation(you, enduringStory, restOfGame)))]
+}

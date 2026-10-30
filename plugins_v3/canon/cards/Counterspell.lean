@@ -1,6 +1,0 @@
-card := {
-  name := "Counterspell",
-  cost := [blue, blue],
-  types := [instant],
-  text := [spell (counter (target isSpell))]
-}

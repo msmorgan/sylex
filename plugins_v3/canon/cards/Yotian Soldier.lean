@@ -1,9 +1,0 @@
-card := {
-  name := "Yotian Soldier",
-  cost := [3],
-  types := [artifact, creature],
-  subtypes := [soldier],
-  text := [vigilance],
-  power := 1,
-  toughness := 4
-}

@@ -1,0 +1,15 @@
+# "Emerge from [quality] [cost]", a variant of emerge, so it carries emerge's label, its
+# quality telling it apart, and its cost is an emerge cost [CR#702.119b].
+ability emergeFrom(quality: Predicate, cost: Cost) {
+  lexical = {lemma = "emerge", parameters = [[Cost], [Quality(Some("from")), Cost]]},
+  label = "emerge",
+  spelling = "emerge from <quality> <cost>",
+  body = [
+    static(altCost(this, compound([cost, perform(sacrifice(a(and([quality, isPermanent]))))]))),
+    static(
+      onlyWhile(
+        costShift(
+          thisSpell,
+          less(statOf(stat(manaValue), the(and([was(sacrifice(which)), isPermanent]))))),
+        keywordCostPaid(emerge, thisSpell)))]
+}

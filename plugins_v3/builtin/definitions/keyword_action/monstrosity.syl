@@ -1,0 +1,14 @@
+# "monstrosity N" with its reminder text (`Definition`, [CR#701.37a]): an instruction about
+# "this permanent" (`DeedPermanent.isAbout`), the Source unless a handoff names another, that the
+# ability's controller follows [CR#608.2c,701.37c]; the body reads that permanent as `.actor`.
+action monstrosity(amount: Amount) {
+  lexical = {
+    nouns = [
+      {lemma = "monstrosity", frames = [Complement(Amount)], parameters = [[Head, Slot(Amount)]]}]},
+  permanent = isAbout,
+  spelling = "monstrosity <amount>",
+  body = doIf(
+    not(is(actor, hasDesignation(monstrous))),
+    sequentially(
+      [putCounters(amount, printedKind(p1p1Counter), actor), gainDesignation(actor, monstrous)]))
+}

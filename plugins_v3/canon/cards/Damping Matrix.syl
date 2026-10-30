@@ -1,0 +1,16 @@
+card {
+  name = "Damping Matrix",
+  cost = [3],
+  types = [artifact],
+  text = [
+    static(
+      cant(
+        any,
+        activate(
+          allOf(
+            and(
+              [
+                abilityHead(anyActivated),
+                abilityOf(allOf(or([isArtifact, isCreature]))),
+                not(isManaAbility)])))))]
+}

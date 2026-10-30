@@ -1,0 +1,6 @@
+counter unityCounter {
+  lexical = {lemma = "unity counter"},
+  spelling = "unity counter",
+
+  confers = []
+}

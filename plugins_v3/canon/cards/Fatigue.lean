@@ -1,6 +1,0 @@
-card := {
-  name := "Fatigue",
-  cost := [1, blue],
-  types := [sorcery],
-  text := [spell (instruct (target isPlayer) (skipPart drawStep 1))]
-}

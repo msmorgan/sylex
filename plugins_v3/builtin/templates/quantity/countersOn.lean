@@ -1,4 +1,0 @@
-template countersOn (kind : CounterKind) (holder : NounPhrase) : Amount := {
-  spelling := "the number of <kind> counters on <holder>",
-  body := statOf (.counter kind) holder
-}

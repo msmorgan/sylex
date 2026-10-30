@@ -1,7 +1,0 @@
-/-- "<subject> crews <vehicle>" [CR#702.122a] -/
--- [CR#702.122a]
-primitive crew (vehicle : NounPhrase) : Action := {
-  spelling := "crews <vehicle>",
-  body :=
-    Semantics.Primitives.Action.crew vehicle
-}

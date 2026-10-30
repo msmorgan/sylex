@@ -1,0 +1,21 @@
+card {
+  name = "Termination Facilitator",
+  cost = [1, black],
+  types = [creature],
+  subtypes = [human, assassin],
+  text = [
+    activatedOnlyDuring(
+      tapSymbol,
+      putCounters(1, printedKind(bountyCounter), target(or([isCreature, isPlaneswalker]))),
+      asSorcery),
+    whenever(
+      does(
+        any,
+        dealDamage(
+          recipient = a(
+            and(
+              [or([isCreature, isPlaneswalker]), anOpponentControls, hasCounter(bountyCounter)])))),
+      destroy(it))],
+  power = 1,
+  toughness = 3
+}

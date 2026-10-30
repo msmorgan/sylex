@@ -1,0 +1,4 @@
+template thisEnchantment: NounPhrase {
+  spelling = "this enchantment",
+  body = headed(type(enchantment), this)
+}

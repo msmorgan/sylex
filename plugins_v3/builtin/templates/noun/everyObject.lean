@@ -1,6 +1,0 @@
-/-- "each object" -/
-template everyObject : NounPhrase := {
-  spelling := "each object",
-  body :=
-    allOf (and [])
-}

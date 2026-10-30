@@ -1,6 +1,0 @@
-card := {
-  name := "Duneblast",
-  cost := [4, white, black, green],
-  types := [sorcery],
-  text := [spell [choose (counted (upTo 1) isCreature), destroy theRest]]
-}

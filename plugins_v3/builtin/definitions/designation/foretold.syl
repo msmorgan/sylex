@@ -1,0 +1,10 @@
+# Foretold, a state of a card in exile: a card put into exile by the foretell special action is
+# a foretold card, an effect may make a card in exile become one, and its owner may look at it and
+# cast it for a foretell cost on a later turn [CR#702.143a,702.143c,702.143d].
+designation foretold {
+  lexical = {adjectives = ["foretold"]},
+  spelling = "foretold",
+  scope = heldBy(object),
+
+  confers = []
+}

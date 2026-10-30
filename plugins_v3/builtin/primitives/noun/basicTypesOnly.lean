@@ -1,6 +1,0 @@
-/-- "a basic land type" -/
-primitive basicTypesOnly : ChoiceDomain := {
-  spelling := "a basic land type",
-  body :=
-    Semantics.Primitives.ChoiceDomain.basicTypesOnly
-}

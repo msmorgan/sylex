@@ -1,0 +1,35 @@
+card {
+  name = "Odric, Lunarch Marshal",
+  cost = [3, white],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [human, soldier],
+  text = [
+    alsoForKeywords(
+      at(
+        beginningOfPossessed(combat, eachPlayer),
+        doOnlyIf(
+          establishThroughout(
+            keywordGrant(
+              allOf(and([isCreature, youControl])),
+              thatKeyword,
+              and([isCreature, youControl, hasKeyword(thatKeyword)])),
+            untilEndOfTurn),
+          exists(and([isCreature, youControl, hasKeyword(thatKeyword)])))),
+      [
+        firstStrike,
+        flying,
+        deathtouch,
+        doubleStrike,
+        haste,
+        anyIn({word = hexproof}),
+        indestructible,
+        lifelink,
+        menace,
+        reach,
+        skulk,
+        trample,
+        vigilance])],
+  power = 3,
+  toughness = 3
+}

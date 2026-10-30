@@ -1,5 +1,0 @@
-/-- A single-faced card, written as the characteristics of its one Card Face. -/
-template singleFacedCard (characteristics : Characteristics) : Card := {
-  body :=
-    .singleFaced { characteristics := characteristics }
-}

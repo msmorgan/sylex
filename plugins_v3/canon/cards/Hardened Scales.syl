@@ -1,0 +1,12 @@
+card {
+  name = "Hardened Scales",
+  cost = [green],
+  types = [enchantment],
+  text = [
+    static(
+      replace(
+        would(
+          any,
+          putCounters(anyAmount, printedKind(p1p1Counter), a(and([isCreature, youControl])))),
+        instead(putCounters(plus(thatMuch, 1), printedKind(p1p1Counter), it))))]
+}

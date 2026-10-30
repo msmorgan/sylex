@@ -1,7 +1,0 @@
-/-- "except it's <color>" -/
-template isColor (color : Color) : CopyExcept := {
-  spelling := "except it's <color>",
-  body :=
-    characteristicEdits
-      [colors sets (.some [color])]
-}

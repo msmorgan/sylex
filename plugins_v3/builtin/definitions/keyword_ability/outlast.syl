@@ -1,0 +1,11 @@
+# "Outlast [cost]" means "[Cost], {T}: Put a +1/+1 counter on this creature. Activate only as a
+# sorcery." [CR#702.107a]
+ability outlast(cost: Cost) {
+  lexical = {lemma = "outlast", parameters = [[Cost]]},
+  spelling = "outlast <cost>",
+  body = [
+    activatedOnlyDuring(
+      compound([cost, tapSymbol]),
+      putCounters(1, printedKind(p1p1Counter), thisCreature),
+      asSorcery)]
+}

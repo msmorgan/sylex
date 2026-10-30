@@ -1,0 +1,4 @@
+# "half that damage, rounded <rounding>"
+primitive half(rounding: RoundMode): PreventCut {
+  spelling = "half that damage, rounded <rounding>"
+}

@@ -1,0 +1,7 @@
+# The actor pays the given cost.
+primitive actionPay(
+  cost: Cost,
+  times: PayTimes,
+  outcome: PaymentOutcome,
+  whose: Option(NounPhrase),
+  keyword: Option(KeywordLabel)): Action = .pay

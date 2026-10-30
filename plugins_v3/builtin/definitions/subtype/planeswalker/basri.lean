@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype basri := {
-  lexical := { lemma := "Basri" },
-  spelling := "Basri",
-  kind := planeswalker,
-  name := "Basri",
-  confers := []
-}

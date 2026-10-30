@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype teferi := {
-  lexical := { lemma := "Teferi" },
-  spelling := "Teferi",
-  kind := planeswalker,
-  name := "Teferi",
-  confers := []
-}

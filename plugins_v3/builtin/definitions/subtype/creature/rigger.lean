@@ -1,7 +1,0 @@
-subtype rigger := {
-  lexical := { lemma := "Rigger" },
-  spelling := "Rigger",
-  kind := creature,
-  name := "Rigger",
-  confers := []
-}

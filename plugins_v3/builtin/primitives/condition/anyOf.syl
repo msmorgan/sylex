@@ -1,0 +1,2 @@
+# "<trait> or <trait>"
+primitive anyOf(traits: List(DeckTrait)): DeckTrait

@@ -1,5 +1,0 @@
-/-- "they": the player most recently named. -/
-template they : NounPhrase := {
-  spelling := "they",
-  body := pro (.word player) .one
-}

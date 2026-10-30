@@ -1,0 +1,6 @@
+ability_word disappear(ability: Ability) {
+  lexical = {lemma = "disappear", listed = Rules},
+  label = "disappear",
+  spelling = "disappear — <ability>",
+  body = ability
+}

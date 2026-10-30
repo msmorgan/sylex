@@ -1,7 +1,0 @@
-/-- "except it's <types> in addition to its other types": only the axes written are added. -/
-template isAlso (types : Option (List CardType) := none)
-    (subtypes : Option (List Subtype) := none) : CopyExcept := {
-  -- TODO(spelling): Format and coordinate the types, subtypes list entries.
-  body :=
-    characteristicEdits [typeLine adds { types := types, subtypes := subtypes }]
-}

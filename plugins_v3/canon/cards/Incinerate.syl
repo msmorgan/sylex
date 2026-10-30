@@ -1,0 +1,15 @@
+card {
+  name = "Incinerate",
+  cost = [1, red],
+  types = [instant],
+  text = [
+    spell(
+      sequentially(
+        [
+          instruct(this, dealDamage(3, target(isAnyTarget))),
+          establishThroughout(
+            cant(
+              any,
+              regeneration(a(and([isCreature, was(dealDamage(recipient = which), thisWay)])))),
+            thisTurn)]))]
+}

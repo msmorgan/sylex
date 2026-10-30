@@ -1,0 +1,4 @@
+template thisLand: NounPhrase {
+  spelling = "this land",
+  body = headed(type(land), this)
+}

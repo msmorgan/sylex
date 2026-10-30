@@ -1,0 +1,10 @@
+card {
+  name = "Angelic Gift",
+  cost = [1, white],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    when(does(actor(thisAura), enter), draw(1)),
+    static(abilityGrant(enchanted(creature), flying))]
+}

@@ -1,0 +1,6 @@
+card {
+  name = "Suppression Field",
+  cost = [1, white],
+  types = [enchantment],
+  text = [static(costShift(allOf(and([abilityHead(anyActivated), not(isManaAbility)])), more(2)))]
+}

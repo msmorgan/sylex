@@ -1,7 +1,0 @@
-subtype dragon := {
-  lexical := { lemma := "Dragon" },
-  spelling := "Dragon",
-  kind := creature,
-  name := "Dragon",
-  confers := []
-}

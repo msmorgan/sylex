@@ -1,0 +1,12 @@
+card {
+  name = "Turn the Tables",
+  cost = [3, white, white],
+  types = [instant],
+  text = [
+    spell(
+      establishThroughout(
+        replace(
+          would(any, dealDamage(recipient = you, kind = combat)),
+          instead(redirectDamage(allDamage, target(and([isCreature, isAttacking]))))),
+        thisTurn))]
+}

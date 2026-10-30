@@ -1,0 +1,15 @@
+card {
+  name = "Two-Headed Giant of Foriys",
+  cost = [4, red],
+  types = [creature],
+  subtypes = [giant],
+  text = [
+    trample,
+    static(
+      can(
+        actor(thisCreature),
+        block(counted(additional(exactly(1)), isCreature)),
+        timing = eachCombat))],
+  power = 4,
+  toughness = 4
+}

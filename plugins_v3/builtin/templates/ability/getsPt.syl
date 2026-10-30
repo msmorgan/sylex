@@ -1,0 +1,8 @@
+# "<subject> gets +P/+T [until …]": one change to both stats, the subject written once.
+template getsPt(
+  subject: NounPhrase,
+  powerValue: Delta(Amount),
+  toughnessValue: Delta(Amount)): StaticSpec {
+  spelling = "<subject> gets <power>/<toughness>",
+  body = characteristicChange(subject, [stat(power, powerValue), stat(toughness, toughnessValue)])
+}

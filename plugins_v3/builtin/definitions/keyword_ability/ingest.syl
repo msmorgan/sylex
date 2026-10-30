@@ -1,0 +1,10 @@
+# "Ingest" means "Whenever this creature deals combat damage to a player, that player exiles the
+# top card of their library." [CR#702.115a]
+ability ingest {
+  lexical = {lemma = "ingest"},
+  spelling = "ingest",
+  body = [
+    whenever(
+      does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
+      instruct(they, exile(slice(top, 1, libraryOf(they)))))]
+}

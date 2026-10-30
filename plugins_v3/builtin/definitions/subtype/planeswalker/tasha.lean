@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype tasha := {
-  lexical := { lemma := "Tasha" },
-  spelling := "Tasha",
-  kind := planeswalker,
-  name := "Tasha",
-  confers := []
-}

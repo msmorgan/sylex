@@ -1,0 +1,11 @@
+# `zoneChange` from an origin that is the battlefield or a list naming it: the move is observed
+# on its departure, a leaves-the-battlefield pattern [CR#603.6c,603.10a].
+# [CR#603.6c,603.10a]
+template zoneChangeObservedOnDeparture(
+  subject: NounPhrase,
+  destination: Location,
+  from: Location,
+  riders: List(MoveRider)): Action {
+  # TODO(spelling): Format and coordinate the riders list entries, including the empty case.
+  body = move(subject, from, destination, departure, riders)
+}

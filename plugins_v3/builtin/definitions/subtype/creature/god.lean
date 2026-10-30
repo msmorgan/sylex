@@ -1,7 +1,0 @@
-subtype god := {
-  lexical := { lemma := "God" },
-  spelling := "God",
-  kind := creature,
-  name := "God",
-  confers := []
-}

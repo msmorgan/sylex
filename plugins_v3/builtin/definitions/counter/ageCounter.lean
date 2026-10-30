@@ -1,8 +1,0 @@
-/-- Age counters are placed and counted by cumulative upkeep to determine its increasing payment.
-[CR#702.24a] -/
-counter ageCounter := {
-  lexical := { lemma := "age counter" },
-  spelling := "age counter",
-  holder := object,
-  confers := []
-}

@@ -1,9 +1,0 @@
-card := {
-  name := "Femeref Enchantress",
-  cost := [green, white],
-  types := [creature],
-  subtypes := [human, druid],
-  text := [whenever (does any (putIntoFromBattlefield (a isEnchantment) graveyard)) (draw 1)],
-  power := 1,
-  toughness := 2
-}

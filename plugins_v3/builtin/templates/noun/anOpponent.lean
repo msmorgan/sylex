@@ -1,5 +1,0 @@
-template anOpponent : NounPhrase := {
-  spelling := "an opponent",
-  body :=
-    a (isOpponentOf you)
-}

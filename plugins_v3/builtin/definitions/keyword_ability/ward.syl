@@ -1,0 +1,12 @@
+# "Ward [cost]" means "Whenever this permanent becomes the target of a spell or ability an
+# opponent controls, counter that spell or ability unless that player pays [cost]." [CR#702.21a]
+ability ward(cost: Cost) {
+  lexical = {lemma = "ward", parameters = [[Cost]]},
+  spelling = "ward <cost>",
+  body = [
+    whenever(
+      does(by(a(and([in(stack), opponentsControl]))), target(thisPermanent)),
+      instruct(
+        controllerOf(that(stack)),
+        mayOrElse(pay(cost, once), instruct(you, counter(that(stack))))))]
+}

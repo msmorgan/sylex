@@ -1,0 +1,10 @@
+card {
+  name = "Wall of Shards",
+  cost = [1, white],
+  supertypes = [snow],
+  types = [creature],
+  subtypes = [wall],
+  text = [defender, flying, cumulativeUpkeep(perform(instruct(anOpponent, gainLife(1))))],
+  power = 1,
+  toughness = 8
+}

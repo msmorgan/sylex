@@ -1,0 +1,3 @@
+primitive all: DetPhrase {
+  spelling = "all"
+}

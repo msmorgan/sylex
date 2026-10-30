@@ -1,4 +1,0 @@
-template anyNumber : Quantity := {
-  spelling := "any number of",
-  body := range none none
-}

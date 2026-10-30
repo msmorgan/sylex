@@ -1,0 +1,24 @@
+card {
+  name = "Frostwielder",
+  cost = [2, red, red],
+  types = [creature],
+  subtypes = [human, shaman],
+  text = [
+    static(
+      replace(
+        would(
+          actor(
+            a(
+              and(
+                [
+                  isCreature,
+                  did(
+                    actor(thisCreature),
+                    dealDamage(recipient = which),
+                    within(soFarThisTurn))]))),
+          die),
+        instead(exile(it)))),
+    activated(tapSymbol, instruct(thisCreature, dealDamage(1, target(isAnyTarget))))],
+  power = 1,
+  toughness = 2
+}

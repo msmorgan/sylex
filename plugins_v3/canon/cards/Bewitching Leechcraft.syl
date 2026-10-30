@@ -1,0 +1,20 @@
+card {
+  name = "Bewitching Leechcraft",
+  cost = [1, blue],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    when(does(actor(thisAura), enter), tap(enchanted(creature))),
+    static(
+      abilityGrant(
+        enchanted(creature),
+        static(
+          replace(
+            would(actor(thisCreature), setStatus(untapped, theActor)),
+            instead(
+              doIfDone(
+                removeCounters(exactly(1), printedKind(p1p1Counter), thisCreature),
+                untap(thisCreature))),
+            duringPart(untapStep, you)))))]
+}

@@ -1,0 +1,17 @@
+# "Unearth [cost]" means "[Cost]: Return this card from your graveyard to the battlefield. It
+# gains haste. Exile it at the beginning of the next end step. If it would leave the battlefield,
+# exile it instead of putting it anywhere else. Activate only as a sorcery." [CR#702.84a]
+ability unearth(cost: Cost) {
+  lexical = {lemma = "unearth", parameters = [[Cost]]},
+  spelling = "unearth <cost>",
+  body = [
+    activatedOnlyDuring(
+      cost,
+      sequentially(
+        [
+          returnToBattlefield(thisCard, from = yourGraveyard),
+          gainHaste(thisPermanent),
+          atNext(endStep, exile(thisPermanent)),
+          replaceEvent(would(actor(thisPermanent), leave), instead(exile(thisPermanent)), none)]),
+      asSorcery)]
+}

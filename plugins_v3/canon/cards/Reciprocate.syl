@@ -1,0 +1,13 @@
+card {
+  name = "Reciprocate",
+  cost = [white],
+  types = [instant],
+  text = [
+    spell(
+      exile(
+        target(
+          and(
+            [
+              isCreature,
+              did(actor(which), dealDamage(recipient = you), within(soFarThisTurn))]))))]
+}

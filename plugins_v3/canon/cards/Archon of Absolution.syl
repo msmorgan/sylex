@@ -1,0 +1,16 @@
+card {
+  name = "Archon of Absolution",
+  cost = [3, white],
+  types = [creature],
+  subtypes = [archon],
+  text = [
+    flying,
+    protection(hasColor(white)),
+    static(
+      gatedBy(
+        scaledGenericMana(times(1, groupSize)),
+        actor(allOf(isCreature)),
+        attack(youOr(allOf(and([isPlaneswalker, youControl]))))))],
+  power = 3,
+  toughness = 2
+}

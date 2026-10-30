@@ -1,6 +1,0 @@
-/-- "Up to N {P} worth of modes": modes whose weights total at most N [CR#700.2i]. -/
-primitive worth (n : Nat) : Quantity := {
-  spelling := "<n> worth of",
-  body :=
-    Semantics.Primitives.Quantity.worth n
-}

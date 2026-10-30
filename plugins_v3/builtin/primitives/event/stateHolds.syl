@@ -1,0 +1,2 @@
+# An event described by a condition holding.
+primitive stateHolds(condition: Condition): GameEvent

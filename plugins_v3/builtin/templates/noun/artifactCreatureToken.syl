@@ -1,0 +1,19 @@
+# "a P/T <colors> <subtypes> artifact creature token [with <abilities>]":
+# `creatureToken` with the artifact card type beside creature.
+template artifactCreatureToken(
+  powerValue: Nat,
+  toughnessValue: Nat,
+  colors: List(Color),
+  subtypes: List(Subtype),
+  abilities: List(Ability) = []): CharacteristicBundle {
+  # TODO(spelling): Format and coordinate the colors, subtypes, abilities list entries, including
+  # the empty case.
+  body = {
+    characteristics = {
+      colors = colors,
+      types = [artifact, creature],
+      subtypes = subtypes,
+      text = abilities,
+      power = lit(ofNat(powerValue)),
+      toughness = lit(ofNat(toughnessValue))}}
+}

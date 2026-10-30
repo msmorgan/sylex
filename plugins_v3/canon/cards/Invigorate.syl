@@ -1,0 +1,11 @@
+card {
+  name = "Invigorate",
+  cost = [2, green],
+  types = [instant],
+  text = [
+    static(
+      onlyWhile(
+        altCost(this, perform(instruct(anOpponent, gainLife(3)))),
+        exists(and([isLand, hasSubtype(forest), youControl])))),
+    spell(get(target(isCreature), up(4), up(4), untilEndOfTurn))]
+}

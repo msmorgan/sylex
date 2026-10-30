@@ -1,0 +1,26 @@
+card {
+  name = "Concerted Effort",
+  cost = [2, white, white],
+  types = [enchantment],
+  text = [
+    alsoForKeywords(
+      at(
+        beginningOfPossessed(upkeep, eachPlayer),
+        doOnlyIf(
+          establishThroughout(
+            keywordGrant(
+              allOf(and([isCreature, youControl])),
+              thatKeyword,
+              and([isCreature, youControl, hasKeyword(thatKeyword)])),
+            untilEndOfTurn),
+          exists(and([isCreature, youControl, hasKeyword(thatKeyword)])))),
+      [
+        flying,
+        fear,
+        firstStrike,
+        doubleStrike,
+        anyIn({word = landwalk}),
+        anyIn({word = protection}),
+        trample,
+        vigilance])]
+}

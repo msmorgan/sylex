@@ -1,0 +1,7 @@
+# Trample is a static ability that modifies the rules for assigning an attacking creature’s combat
+# damage. [CR#702.19a]
+ability trample {
+  lexical = {lemma = "trample", parameters = [[], [Quality(Some("over"))]]},
+  spelling = "trample",
+  body = []
+}

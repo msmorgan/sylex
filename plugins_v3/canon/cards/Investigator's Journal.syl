@@ -1,0 +1,20 @@
+card {
+  name = "Investigator's Journal",
+  cost = [2],
+  types = [artifact],
+  subtypes = [book, clue],
+  text = [
+    static(
+      entersWithCounters(
+        thisArtifact,
+        aggregateOver(max, isPlayer, countOf(and([isCreature, controlledBy(they)]))),
+        suspectCounter)),
+    activated(
+      compound(
+        [
+          mana([2]),
+          tapSymbol,
+          perform(removeCounters(exactly(1), printedKind(suspectCounter), thisArtifact))]),
+      draw(1)),
+    activated(compound([mana([2]), perform(sacrifice(thisArtifact))]), draw(1))]
+}

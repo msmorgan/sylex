@@ -1,0 +1,6 @@
+card {
+  name = "Eagle Vision",
+  cost = [4, blue],
+  types = [sorcery],
+  text = [freerunning(mana([1, blue])), spell(draw(3))]
+}

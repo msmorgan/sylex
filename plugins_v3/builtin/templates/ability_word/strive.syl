@@ -1,0 +1,6 @@
+ability_word strive(ability: Ability) {
+  lexical = {lemma = "strive", listed = Rules},
+  label = "strive",
+  spelling = "strive — <ability>",
+  body = ability
+}

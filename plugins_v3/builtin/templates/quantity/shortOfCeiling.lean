@@ -1,5 +1,0 @@
-/-- "the amount by which the ceiling was not reached" -/
-template shortOfCeiling : Amount := {
-  spelling := "the amount by which the ceiling was not reached",
-  body := theOutcome .ceilingShortfall
-}

@@ -1,5 +1,0 @@
-/-- "a token that's …", entering with `riders` -/
-primitive token (spec : TokenSpec) (riders : List MoveRider) : CreationSpec := {
-  body :=
-    Semantics.Primitives.CreationSpec.token spec riders
-}

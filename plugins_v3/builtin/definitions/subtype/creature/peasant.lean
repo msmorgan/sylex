@@ -1,7 +1,0 @@
-subtype peasant := {
-  lexical := { lemma := "Peasant" },
-  spelling := "Peasant",
-  kind := creature,
-  name := "Peasant",
-  confers := []
-}

@@ -1,0 +1,15 @@
+card {
+  name = "Oath of Kaya",
+  cost = [1, white, black],
+  supertypes = [legendary],
+  types = [enchantment],
+  text = [
+    when(
+      does(actor(this), enter),
+      sequentially([instruct(this, dealDamage(3, target(isAnyTarget))), gainLife(3)])),
+    whenever(
+      does(
+        actor(anOpponent),
+        attackWith(counted(orMore(1), isCreature), a(and([isPlaneswalker, youControl])))),
+      sequentially([instruct(this, dealDamage(2, that(player))), gainLife(2)]))]
+}

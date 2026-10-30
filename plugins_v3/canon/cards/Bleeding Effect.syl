@@ -1,0 +1,29 @@
+card {
+  name = "Bleeding Effect",
+  cost = [2, white, black],
+  types = [enchantment],
+  text = [
+    alsoForKeywords(
+      at(
+        beginningOfYour(combat),
+        doOnlyIf(
+          establishThroughout(
+            keywordGrant(
+              allOf(and([isCreature, youControl])),
+              thatKeyword,
+              and([isCreature, in(yourGraveyard), hasKeyword(thatKeyword)])),
+            untilEndOfTurn),
+          exists(and([isCreature, in(yourGraveyard), hasKeyword(thatKeyword)])))),
+      [
+        flying,
+        firstStrike,
+        doubleStrike,
+        deathtouch,
+        anyIn({word = hexproof}),
+        indestructible,
+        lifelink,
+        menace,
+        reach,
+        trample,
+        vigilance])]
+}

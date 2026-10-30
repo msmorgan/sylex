@@ -1,9 +1,0 @@
-card := {
-  name := "Wizened Snitches",
-  cost := [3, blue],
-  types := [creature],
-  subtypes := [faerie, rogue],
-  text := [flying, visibility reveal (bare isPlayer) topOfLibrary],
-  power := 1,
-  toughness := 3
-}

@@ -1,0 +1,6 @@
+counter trapCounter {
+  lexical = {lemma = "trap counter"},
+  spelling = "trap counter",
+
+  confers = []
+}

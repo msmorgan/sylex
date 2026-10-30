@@ -1,7 +1,0 @@
-/-- Exert a permanent: choose to have it not untap during your next untap step. [CR#701.43a] -/
-action exert (subject : NounPhrase) : Action := {
-  lexical := { verbs := [{ lemma := "exert", frames := [Monotransitive] }] },
-  spelling := "exert <subject>",
-  body :=
-    skipUntap subject 1
-}

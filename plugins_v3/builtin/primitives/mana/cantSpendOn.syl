@@ -1,0 +1,4 @@
+# "You can't spend this mana to <purposes>."
+primitive cantSpendOn(purposes: List(SpendPurpose)): ManaRider = .spendNotOn {
+  spelling = "You can't spend this mana to <purposes>."
+}

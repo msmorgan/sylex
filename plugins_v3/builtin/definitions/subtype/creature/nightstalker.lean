@@ -1,7 +1,0 @@
-subtype nightstalker := {
-  lexical := { lemma := "Nightstalker" },
-  spelling := "Nightstalker",
-  kind := creature,
-  name := "Nightstalker",
-  confers := []
-}

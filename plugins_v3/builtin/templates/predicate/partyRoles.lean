@@ -1,9 +1,0 @@
-/-- The four party roles, in rule order [CR#700.8]. -/
-template partyRoles : List Predicate := {
-
-  body :=
-    [hasSubtype cleric,
-      hasSubtype rogue,
-      hasSubtype warrior,
-      hasSubtype wizard]
-}

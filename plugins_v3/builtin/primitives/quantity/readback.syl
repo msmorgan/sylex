@@ -1,0 +1,1 @@
+primitive readback(which: LinkSource, within: Option(Duration)): LinkedFacet

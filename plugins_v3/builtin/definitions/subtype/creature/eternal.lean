@@ -1,7 +1,0 @@
-subtype eternal := {
-  lexical := { lemma := "Eternal" },
-  spelling := "Eternal",
-  kind := creature,
-  name := "Eternal",
-  confers := []
-}

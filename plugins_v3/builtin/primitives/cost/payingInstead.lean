@@ -1,7 +1,0 @@
-/-- "by paying <cost> rather than paying its mana cost": an alternative cost [CR#118.9]. -/
--- [CR#118.9]
-primitive payingInstead (cost : Cost) : PlayPayment := {
-  spelling := "by paying <cost> rather than paying its mana cost",
-  body :=
-    Semantics.Primitives.PlayPayment.payingInstead cost
-}

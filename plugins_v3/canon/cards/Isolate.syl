@@ -1,0 +1,6 @@
+card {
+  name = "Isolate",
+  cost = [white],
+  types = [instant],
+  text = [spell(exile(target(and([isPermanent, hasManaValue(eq, 1)]))))]
+}

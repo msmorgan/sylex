@@ -1,6 +1,0 @@
-counter oreCounter := {
-  lexical := { lemma := "ore counter" },
-  spelling := "ore counter",
-  holder := object,
-  confers := []
-}

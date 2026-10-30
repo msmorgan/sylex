@@ -1,0 +1,5 @@
+# "target …"
+template target(p: Predicate): NounPhrase {
+  spelling = "target <p>",
+  body = described(target(range(1, 1)), p)
+}

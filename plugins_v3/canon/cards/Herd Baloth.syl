@@ -1,0 +1,12 @@
+card {
+  name = "Herd Baloth",
+  cost = [3, green, green],
+  types = [creature],
+  subtypes = [beast],
+  text = [
+    whenever(
+      does(any, putCounters(anyAmount, printedKind(p1p1Counter), thisCreature)),
+      may(create(1, written(creatureToken(4, 4, [green], [beast])))))],
+  power = 4,
+  toughness = 4
+}

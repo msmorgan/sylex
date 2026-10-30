@@ -1,0 +1,17 @@
+card {
+  name = "Éomer of the Riddermark",
+  cost = [4, red],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [human, knight],
+  text = [
+    haste,
+    whenever(
+      does(actor(thisCreature), attack),
+      if = exists(
+        and(
+          [isCreature, youControl, superlative(max, stat(power), and([isCreature, isPermanent]))])),
+      action = create(1, written(creatureToken(1, 1, [white], [human, soldier]))))],
+  power = 5,
+  toughness = 4
+}

@@ -1,0 +1,8 @@
+# No supported Oracle rules-text plural is attested for this proper subtype name.
+subtype lukka {
+  lexical = {lemma = "Lukka"},
+  spelling = "Lukka",
+  kind = planeswalker,
+  name = "Lukka",
+  confers = []
+}

@@ -1,0 +1,15 @@
+card {
+  name = "Dream Thief",
+  cost = [2, blue],
+  types = [creature],
+  subtypes = [faerie, rogue],
+  text = [
+    flying,
+    when(
+      does(actor(thisCreature), enter),
+      doOnlyIf(
+        draw(1),
+        did(actor(you), cast(a(and([isSpell, hasColor(blue), isOther]))), within(soFarThisTurn))))],
+  power = 2,
+  toughness = 1
+}

@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype kasmina := {
-  lexical := { lemma := "Kasmina" },
-  spelling := "Kasmina",
-  kind := planeswalker,
-  name := "Kasmina",
-  confers := []
-}

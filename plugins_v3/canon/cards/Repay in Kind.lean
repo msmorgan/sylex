@@ -1,6 +1,0 @@
-card := {
-  name := "Repay in Kind",
-  cost := [5, black, black],
-  types := [sorcery],
-  text := [spell (instruct eachPlayer (setLife (aggregate min (playerStat lifeTotal) isPlayer)))]
-}

@@ -1,0 +1,20 @@
+card {
+  name = "Linvala, Keeper of Silence",
+  cost = [2, white, white],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [angel],
+  text = [
+    flying,
+    static(
+      cant(
+        any,
+        activate(
+          allOf(
+            and(
+              [
+                abilityHead(anyActivated),
+                abilityOf(allOf(and([isCreature, opponentsControl])))])))))],
+  power = 3,
+  toughness = 4
+}

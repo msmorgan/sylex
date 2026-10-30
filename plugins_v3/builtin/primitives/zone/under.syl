@@ -1,0 +1,4 @@
+# "under <controller>'s control"
+primitive under(controller: NounPhrase): MoveRider {
+  spelling = "under <controller>'s control"
+}

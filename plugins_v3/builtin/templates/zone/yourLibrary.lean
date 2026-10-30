@@ -1,6 +1,0 @@
-/-- "your library" -/
-template yourLibrary : Location := {
-  spelling := "your library",
-  body :=
-    libraryOf you
-}

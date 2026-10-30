@@ -1,7 +1,0 @@
-subtype kirin := {
-  lexical := { lemma := "Kirin", plural := "Kirin" },
-  spelling := "Kirin",
-  kind := creature,
-  name := "Kirin",
-  confers := []
-}

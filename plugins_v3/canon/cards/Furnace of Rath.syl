@@ -1,0 +1,10 @@
+card {
+  name = "Furnace of Rath",
+  cost = [1, red, red, red],
+  types = [enchantment],
+  text = [
+    static(
+      replace(
+        would(actor(a(isSource)), dealDamage(recipient = a(or([isPermanent, isPlayer])))),
+        instead(instruct(it, dealDamage(times(2, thatMuch), thatJoin)))))]
+}

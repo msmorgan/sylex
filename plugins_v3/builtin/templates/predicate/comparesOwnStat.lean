@@ -1,8 +1,0 @@
-/-- "a <dom> with <stat> <r> <bound>": the stat of `member`, the member itself unless written. -/
-template comparesOwnStat (stat : Stat) (domain : Predicate) (comparator : Comparator)
-    (bound : Amount) (member : NounPhrase := ownMember) : Predicate := {
-  -- TODO(spelling): An ownMember reads the described object's stat; another member requires an
-  -- explicit stat possessor.
-  body :=
-    compareOver domain (statOf (.stat stat) member) comparator bound
-}

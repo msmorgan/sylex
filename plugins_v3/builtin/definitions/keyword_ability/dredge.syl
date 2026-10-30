@@ -1,0 +1,14 @@
+# "Dredge N" means "As long as you have at least N cards in your library, if you would draw a
+# card, you may instead mill N cards and return this card from your graveyard to your hand."
+# [CR#702.52a]
+ability dredge(amount: Amount) {
+  lexical = {lemma = "dredge", parameters = [[Amount]]},
+  spelling = "dredge <amount>",
+  body = [
+    static(
+      onlyWhile(
+        replace(
+          would(actor(you), draw(1)),
+          instead(may(sequentially([mill(amount), returnToHand(this, yourGraveyard)])))),
+        compareAmt(countOf(cardIn(yourLibrary)), atLeast, amount)))]
+}

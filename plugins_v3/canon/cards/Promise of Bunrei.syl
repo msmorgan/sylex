@@ -1,0 +1,9 @@
+card {
+  name = "Promise of Bunrei",
+  cost = [2, white],
+  types = [enchantment],
+  text = [
+    when(
+      does(actor(a(and([isCreature, youControl]))), die),
+      doIfDone(sacrifice(thisEnchantment), create(4, written(creatureToken(1, 1, [], [spirit])))))]
+}

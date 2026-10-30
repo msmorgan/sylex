@@ -1,0 +1,17 @@
+card {
+  name = "Kyren Legate",
+  cost = [1, red],
+  types = [creature],
+  subtypes = [goblin],
+  text = [
+    static(
+      onlyWhile(
+        altCost(this),
+        and(
+          [
+            exists(and([isLand, hasSubtype(plains), anOpponentControls])),
+            exists(and([isLand, hasSubtype(mountain), youControl]))]))),
+    haste],
+  power = 1,
+  toughness = 1
+}

@@ -1,0 +1,1 @@
+primitive tally(clause: DidClause, mode: TallyMode): Amount

@@ -1,0 +1,17 @@
+card {
+  name = "Vraska's Scorn",
+  cost = [2, black, black],
+  types = [sorcery],
+  text = [
+    spell(
+      sequentially(
+        [
+          instruct(target(isOpponent), loseLife(4)),
+          may(
+            sequentially(
+              [
+                searchLibraryOrGraveyard(a(named(printedName("Vraska, Scheming Gorgon")))),
+                reveal(it),
+                putInto(it, hand)])),
+          doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))]
+}

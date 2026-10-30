@@ -1,0 +1,10 @@
+card {
+  name = "Shrieking Affliction",
+  cost = [black],
+  types = [enchantment],
+  text = [
+    at(
+      beginningOfPossessed(upkeep, eachOpponent),
+      if = compareAmt(countOf(cardIn(handOf(that(player)))), atMost, 1),
+      action = instruct(they, loseLife(3)))]
+}

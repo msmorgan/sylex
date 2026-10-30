@@ -1,0 +1,24 @@
+card {
+  name = "Seraphic Greatsword",
+  cost = [1, white],
+  types = [artifact],
+  subtypes = [equipment],
+  text = [
+    static(getsPt(equipped(creature), up(2), up(2))),
+    whenever(
+      does(
+        actor(equipped(creature)),
+        attack(a(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])))),
+      createTappedAttacking(
+        1,
+        {
+          characteristics = {
+            colors = [white],
+            types = [creature],
+            subtypes = [angel],
+            text = [flying],
+            power = 4,
+            toughness = 4}},
+        that(player))),
+    equip(mana([4]))]
+}

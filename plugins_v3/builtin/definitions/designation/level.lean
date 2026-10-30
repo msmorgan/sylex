@@ -1,8 +1,0 @@
-/-- A level is a designation any permanent can have [CR#716.2b]. -/
-designation level := {
-  lexical := { nouns := [{ lemma := "level", parameters := [[Head, (Slot Amount)]] }] },
-  spelling := "level",
-  scope := (.heldBy object),
-  sole := false,
-  confers := []
-}

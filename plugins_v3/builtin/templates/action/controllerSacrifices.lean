@@ -1,9 +1,0 @@
-/-- "<subject>'s controller sacrifices it" (`Template` using `firstMention` / `laterMention`
-without `Window` plumbing, [CR#701.21a]). -/
-template controllerSacrifices (subject : NounPhrase) : Action := {
-
-  spelling := "<subject>'s controller sacrifices it",
-  body :=
-    instruct (possessorOf .controller subject)
-      (Semantics.Definitions.sacrifice subject)
-}

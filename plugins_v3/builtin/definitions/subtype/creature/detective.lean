@@ -1,7 +1,0 @@
-subtype detective := {
-  lexical := { lemma := "Detective" },
-  spelling := "Detective",
-  kind := creature,
-  name := "Detective",
-  confers := []
-}

@@ -1,0 +1,5 @@
+# Authoring primitive for `StaticSpec.copyChange`.
+primitive copyChange(
+  subject: NounPhrase,
+  source: NounPhrase,
+  exceptions: List(CopyExcept) = []): StaticSpec

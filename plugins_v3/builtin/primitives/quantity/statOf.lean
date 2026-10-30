@@ -1,5 +1,0 @@
-/-- Read the specified numeric property of the subject. -/
-primitive statOf (axis : ProjAxis) (subject : NounPhrase) : Amount := {
-  body :=
-    Semantics.Primitives.Amount.statOf axis subject
-}

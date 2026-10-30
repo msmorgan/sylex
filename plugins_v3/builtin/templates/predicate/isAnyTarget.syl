@@ -1,0 +1,4 @@
+# "any target" [CR#115.4].
+template isAnyTarget: Predicate {
+  body = or([hasType(creature), hasType(planeswalker), hasType(battle), isPlayer])
+}

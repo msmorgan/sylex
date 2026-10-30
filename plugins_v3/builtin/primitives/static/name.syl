@@ -1,0 +1,1 @@
+primitive name(op: QualityOp, name: String): CharacteristicEdit

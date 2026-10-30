@@ -1,0 +1,6 @@
+card {
+  name = "Eon Hub",
+  cost = [5],
+  types = [artifact],
+  text = [static(partSkip(bare(isPlayer), upkeep))]
+}

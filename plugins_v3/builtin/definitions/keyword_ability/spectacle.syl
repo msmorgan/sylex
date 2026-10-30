@@ -1,0 +1,11 @@
+# "Spectacle [cost]" means "You may pay [cost] rather than pay this spell's mana cost if an
+# opponent lost life this turn." [CR#702.137a]
+ability spectacle(cost: Cost) {
+  lexical = {lemma = "spectacle", parameters = [[Cost]]},
+  spelling = "spectacle <cost>",
+  body = [
+    static(
+      onlyWhile(
+        altCost(this, cost),
+        did(actor(anOpponent), loseLife(anyAmount), within(soFarThisTurn))))]
+}

@@ -1,0 +1,4 @@
+# "those counters": the counters just put.
+primitive thoseCounters: CounterKindSource = .those {
+  spelling = "those counters"
+}

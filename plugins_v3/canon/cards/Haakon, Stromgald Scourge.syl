@@ -1,0 +1,17 @@
+card {
+  name = "Haakon, Stromgald Scourge",
+  cost = [1, black, black],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [zombie, knight],
+  text = [
+    static(can(actor(you), cast(this, from = yourGraveyard))),
+    static(cant(actor(you), cast(this, from = not(yourGraveyard)))),
+    static(
+      onlyWhile(
+        can(actor(you), cast(bare(and([isSpell, hasSubtype(knight)])), from = yourGraveyard)),
+        is(this, in(battlefield)))),
+    when(does(actor(thisCreature), die), loseLife(2))],
+  power = 3,
+  toughness = 3
+}

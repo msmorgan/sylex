@@ -1,0 +1,12 @@
+card {
+  name = "Rites of Flourishing",
+  cost = [2, green],
+  types = [enchantment],
+  text = [
+    at(beginningOfPossessed(drawStep, eachPlayer), instruct(that(player), draw(1))),
+    static(
+      can(
+        actor(eachPlayer),
+        play(counted(additional(exactly(1)), isLand)),
+        timing = onEachOfTheirTurns))]
+}

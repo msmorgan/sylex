@@ -1,0 +1,23 @@
+card {
+  name = "Scythe of the Wretched",
+  cost = [2],
+  types = [artifact],
+  subtypes = [equipment],
+  text = [
+    static(getsPt(equipped(creature), up(2), up(2))),
+    whenever(
+      does(
+        actor(
+          a(
+            and(
+              [
+                isCreature,
+                did(
+                  actor(attachHost(equipped, creature)),
+                  dealDamage(recipient = which),
+                  within = within(soFarThisTurn))]))),
+        die),
+      sequentially(
+        [returnToBattlefield(that(card), [under(you)]), attachTo(thisEquipment, that(creature))])),
+    equip(mana([4]))]
+}

@@ -1,5 +1,0 @@
-/-- The owner or controller of the subject, as selected by the axis. -/
-primitive possessorOf (axis : PossessorAxis) (subject : NounPhrase) : NounPhrase := {
-  body :=
-    Semantics.Primitives.NounPhrase.possessorOf axis subject
-}

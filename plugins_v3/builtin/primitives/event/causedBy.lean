@@ -1,6 +1,0 @@
-/-- "if <cause> would cause <clause>" -/
-primitive causedBy (cause : Causing) (clause : WouldClause) : WouldClause := {
-  spelling := "if <cause> would cause <clause>",
-  body :=
-    Semantics.Primitives.WouldClause.causedBy cause clause
-}

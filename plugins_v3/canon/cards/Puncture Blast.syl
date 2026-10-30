@@ -1,0 +1,6 @@
+card {
+  name = "Puncture Blast",
+  cost = [2, red],
+  types = [instant],
+  text = [wither, spell(instruct(this, dealDamage(3, target(isAnyTarget))))]
+}

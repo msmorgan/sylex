@@ -1,8 +1,0 @@
-/-- "while you're searching your library" -/
-template whileSearchingYourLibrary : Timing := {
-  spelling := "while you're searching your library",
-  body :=
-    whileDoing
-      (does (actor you)
-        (actionSearch yourLibrary any))
-}

@@ -1,7 +1,0 @@
-subtype horror := {
-  lexical := { lemma := "Horror" },
-  spelling := "Horror",
-  kind := creature,
-  name := "Horror",
-  confers := []
-}

@@ -1,5 +1,0 @@
-/-- "<subject> wins the game" -/
-template winGame : Action := {
-  spelling := "wins the game",
-  body := conclude .winGame
-}

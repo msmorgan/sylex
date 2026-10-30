@@ -1,8 +1,0 @@
-/-- Food is an artifact subtype [CR#205.3g], also used by the predefined Food token [CR#111.10b]. -/
-subtype food := {
-  lexical := { lemma := "Food" },
-  spelling := "Food",
-  kind := artifact,
-  name := "Food",
-  confers := []
-}

@@ -1,0 +1,13 @@
+card {
+  name = "Aggravated Assault",
+  cost = [2, red],
+  types = [enchantment],
+  text = [
+    activatedOnlyDuring(
+      mana([3, red, red]),
+      sequentially(
+        [
+          untap(allOf(and([isCreature, youControl]))),
+          additionalPhase(combat, mainPhase, 1, mainPhase)]),
+      asSorcery)]
+}

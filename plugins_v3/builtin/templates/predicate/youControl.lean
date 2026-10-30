@@ -1,6 +1,0 @@
-/-- "you control" -/
-template youControl : Predicate := {
-  spelling := "you control",
-  body :=
-    controlledBy you
-}

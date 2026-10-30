@@ -1,0 +1,2 @@
+# The specified number of cards from one end of a pile.
+primitive slice(end: PileEnd, amount: Amount, pile: Location): NounPhrase

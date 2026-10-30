@@ -1,0 +1,24 @@
+card {
+  name = "Sage of Fables",
+  cost = [2, blue],
+  types = [creature],
+  subtypes = [merfolk, wizard],
+  text = [
+    static(
+      entersWithAdditionalCounters(
+        each(and([isCreature, hasSubtype(wizard), youControl, isOther])),
+        1,
+        p1p1Counter)),
+    activated(
+      compound(
+        [
+          mana([2]),
+          perform(
+            removeCounters(
+              exactly(1),
+              printedKind(p1p1Counter),
+              a(and([isCreature, youControl]))))]),
+      draw(1))],
+  power = 2,
+  toughness = 2
+}

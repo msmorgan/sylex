@@ -1,6 +1,0 @@
-/-- The number of coins showing the specified face. -/
-primitive coinsShowing (face : CoinFace) : Amount := {
-  spelling := "the number of coins that came up <face>",
-  body :=
-    Semantics.Primitives.Amount.coinsShowing face
-}

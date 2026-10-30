@@ -1,9 +1,0 @@
-card := {
-  name := "Helica Glider",
-  cost := [2, white],
-  types := [creature],
-  subtypes := [nightmare, squirrel],
-  text := [enters thisCreature [withCounters 1 (chosenKind [flyingCounter, firstStrikeCounter]) fresh]],
-  power := 2,
-  toughness := 2
-}

@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype elminster := {
-  lexical := { lemma := "Elminster" },
-  spelling := "Elminster",
-  kind := planeswalker,
-  name := "Elminster",
-  confers := []
-}

@@ -1,0 +1,3 @@
+# "the next" occurrence [of <player>'s]
+primitive nextTime(player: Option(NounPhrase) = none): TurnRef = .next
+# TODO(spelling): Include or omit the clauses supplied by player.

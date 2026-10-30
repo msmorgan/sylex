@@ -1,0 +1,4 @@
+# "permanent": an object on the battlefield [CR#110.1].
+primitive permanent: NounWord {
+  spelling = "permanent"
+}

@@ -1,0 +1,13 @@
+card {
+  name = "Rogues' Gallery",
+  cost = [2, black],
+  types = [sorcery],
+  text = [
+    spell(
+      doForEachKind(
+        color,
+        sort = color,
+        body = returnToHand(
+          targets(upTo(1), and([isCreature, ofChosen(color), in(yourGraveyard)])),
+          yourGraveyard)))]
+}

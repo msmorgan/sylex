@@ -1,0 +1,9 @@
+card {
+  name = "Sanguine Bond",
+  cost = [3, black, black],
+  types = [enchantment],
+  text = [
+    whenever(
+      does(actor(you), gainLife(anyAmount)),
+      instruct(target(isOpponent), loseLife(thatMuch)))]
+}

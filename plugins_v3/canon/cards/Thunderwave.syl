@@ -1,0 +1,22 @@
+card {
+  name = "Thunderwave",
+  cost = [2, red, red],
+  types = [sorcery],
+  text = [
+    spell(
+      sequentially(
+        [
+          rollDice(sides = sides(20)),
+          applyResultsTable(
+            [
+              rollRow(oneThrough(9), instruct(this, dealDamage(3, each(isCreature)))),
+              rollRow(
+                fromTo(10, 19),
+                sequentially(
+                  [
+                    may(choose(a(isCreature))),
+                    instruct(this, dealDamage(3, each(and([isCreature, notChosen]))))])),
+              rollRow(
+                exactly(20),
+                instruct(this, dealDamage(6, each(and([isCreature, opponentsControl])))))])]))]
+}

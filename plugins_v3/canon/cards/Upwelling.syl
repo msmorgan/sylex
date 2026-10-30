@@ -1,0 +1,6 @@
+card {
+  name = "Upwelling",
+  cost = [3, green],
+  types = [enchantment],
+  text = [static(manaRetention(eachPlayer, unspent(none)))]
+}

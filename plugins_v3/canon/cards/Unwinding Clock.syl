@@ -1,0 +1,6 @@
+card {
+  name = "Unwinding Clock",
+  cost = [4],
+  types = [artifact],
+  text = [static(untapDuring(allOf(and([isArtifact, youControl])), each(isOtherPlayer)))]
+}

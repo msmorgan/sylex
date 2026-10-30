@@ -1,4 +1,0 @@
-template exileZone : Location := {
-  spelling := "exile",
-  body := zone .exile none
-}

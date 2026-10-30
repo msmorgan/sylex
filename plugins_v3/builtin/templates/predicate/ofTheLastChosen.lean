@@ -1,5 +1,0 @@
-/-- "of the last chosen <quality>" -/
-template ofTheLastChosen (sort : QualitySort) : Predicate := {
-  spelling := "of the last chosen <sort>",
-  body := ofChosen sort .theLatestChoice
-}

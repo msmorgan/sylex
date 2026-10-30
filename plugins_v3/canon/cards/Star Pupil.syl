@@ -1,0 +1,17 @@
+card {
+  name = "Star Pupil",
+  cost = [white],
+  types = [creature],
+  subtypes = [human, wizard],
+  text = [
+    static(entersWithCounters(thisCreature, 1, p1p1Counter)),
+    when(
+      does(actor(thisCreature), die),
+      doForEachKind(
+        counterKind,
+        it,
+        counterKind,
+        putCounters(statOf(boundCounter, it), thatKind, target(and([isCreature, youControl])))))],
+  power = 0,
+  toughness = 0
+}

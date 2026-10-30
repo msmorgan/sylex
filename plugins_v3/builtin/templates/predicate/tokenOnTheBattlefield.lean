@@ -1,5 +1,0 @@
-template tokenOnTheBattlefield : Predicate := {
-  spelling := "token on the battlefield",
-  body :=
-    and [isToken, isPermanent]
-}

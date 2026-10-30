@@ -1,0 +1,4 @@
+# "a counter of the chosen kind"
+primitive thatKind: CounterKindSource = .bound {
+  spelling = "a counter of the chosen kind"
+}

@@ -1,6 +1,0 @@
-/-- A Mana Substitute on a spell, neither an additional nor an alternative cost, applied after
-its total cost is determined. [CR#702.51b,702.66b,702.126b] -/
-primitive paySubstitute (subject : NounPhrase) (substitute : ManaSubstitute) : StaticSpec := {
-  body :=
-    Semantics.Primitives.StaticSpec.paySubstitute subject substitute
-}

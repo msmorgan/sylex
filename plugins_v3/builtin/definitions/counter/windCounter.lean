@@ -1,6 +1,0 @@
-counter windCounter := {
-  lexical := { lemma := "wind counter" },
-  spelling := "wind counter",
-  holder := object,
-  confers := []
-}

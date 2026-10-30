@@ -1,0 +1,16 @@
+# "Vanishing N" means "This permanent enters with N time counters on it," "At the beginning of
+# your upkeep, if this permanent has a time counter on it, remove a time counter from it," and
+# "When the last time counter is removed from this permanent, sacrifice it." [CR#702.63a]
+ability vanishing(amount: Amount) {
+  lexical = {lemma = "vanishing", parameters = [[], [Amount]]},
+  spelling = "vanishing <amount>",
+  body = [
+    static(entersWithCounters(thisPermanent, amount, timeCounter)),
+    at(
+      beginningOfYour(upkeep),
+      removeCounters(oneThrough(1), printedKind(timeCounter), thisPermanent),
+      if = is(thisPermanent, hasCounter(timeCounter))),
+    when(
+      does(any, removeCounters(theLast, printedKind(timeCounter), thisPermanent)),
+      sacrifice(thisPermanent))]
+}

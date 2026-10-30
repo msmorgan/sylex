@@ -1,0 +1,20 @@
+card {
+  name = "Phyrexian Rebirth",
+  cost = [4, white, white],
+  types = [sorcery],
+  text = [
+    spell(
+      sequentially(
+        [
+          destroy(allOf(isCreature)),
+          create(
+            1,
+            written(
+              {
+                characteristics = {
+                  types = [artifact, creature],
+                  subtypes = [phyrexian, horror],
+                  power = letter(x),
+                  toughness = letter(x)}})),
+          define(x, countOf(and([isCreature, was(destroy(which), thisWay)])))]))]
+}

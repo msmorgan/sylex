@@ -1,0 +1,18 @@
+card {
+  name = "Wicked Akuba",
+  cost = [black, black],
+  types = [creature],
+  subtypes = [spirit],
+  text = [
+    activated(
+      mana([black]),
+      instruct(
+        target(
+          and(
+            [
+              isPlayer,
+              did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))])),
+        loseLife(1)))],
+  power = 2,
+  toughness = 2
+}

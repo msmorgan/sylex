@@ -1,0 +1,29 @@
+card {
+  name = "Escaped Shapeshifter",
+  cost = [3, blue, blue],
+  types = [creature],
+  subtypes = [shapeshifter],
+  text = [
+    alsoForKeywords(
+      static(
+        onlyWhile(
+          keywordGrant(
+            thisCreature,
+            thatKeyword,
+            and(
+              [
+                isCreature,
+                anOpponentControls,
+                hasKeyword(thatKeyword),
+                not(named(printedName("Escaped Shapeshifter")))])),
+          exists(
+            and(
+              [
+                isCreature,
+                anOpponentControls,
+                hasKeyword(thatKeyword),
+                not(named(printedName("Escaped Shapeshifter")))])))),
+      [flying, firstStrike, trample, anyIn({word = protection, sort = color})])],
+  power = 3,
+  toughness = 4
+}

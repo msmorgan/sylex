@@ -1,5 +1,0 @@
-/-- "the bottom of <loc>" -/
-template bottomOf (loc : Location) : Location := {
-  spelling := "the bottom of <loc>",
-  body := fromEnd bottom (nth 1) loc
-}

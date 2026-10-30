@@ -1,0 +1,8 @@
+# No supported Oracle rules-text plural is attested for this proper subtype name.
+subtype dack {
+  lexical = {lemma = "Dack"},
+  spelling = "Dack",
+  kind = planeswalker,
+  name = "Dack",
+  confers = []
+}

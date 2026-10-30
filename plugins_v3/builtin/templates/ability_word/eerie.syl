@@ -1,0 +1,6 @@
+ability_word eerie(ability: Ability) {
+  lexical = {lemma = "eerie", listed = Rules},
+  label = "eerie",
+  spelling = "eerie — <ability>",
+  body = ability
+}

@@ -1,7 +1,0 @@
-subtype tyranid := {
-  lexical := { lemma := "Tyranid" },
-  spelling := "Tyranid",
-  kind := creature,
-  name := "Tyranid",
-  confers := []
-}

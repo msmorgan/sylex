@@ -1,0 +1,15 @@
+card {
+  name = "Passageway Seer",
+  cost = [3, black],
+  types = [creature],
+  subtypes = [tiefling, warlock],
+  text = [
+    lifelink,
+    when(does(actor(thisCreature), enter), gainDesignation(you, initiative)),
+    at(
+      beginningOfYour(endStep),
+      if = is(you, hasDesignation(initiative)),
+      action = putCounters(1, printedKind(p1p1Counter), thisCreature))],
+  power = 2,
+  toughness = 2
+}

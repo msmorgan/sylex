@@ -1,6 +1,0 @@
-/-- A further "whenever <event>" header joined onto a trigger. -/
-template joinedHead (event : GameEvent) : JoinedHeader := {
-  spelling := "whenever <event>",
-  body :=
-    { event := event, alternatives := [], while_ := none, timing := none }
-}

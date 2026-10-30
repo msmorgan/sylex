@@ -1,0 +1,4 @@
+# "mana of the last noted type"
+primitive ofTheLastNotedType(subject: NounPhrase): ProducedMana = .lastNoted {
+  spelling = "mana of the last noted type"
+}

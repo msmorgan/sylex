@@ -1,7 +1,0 @@
-subtype triskelavite := {
-  lexical := { lemma := "Triskelavite" },
-  spelling := "Triskelavite",
-  kind := creature,
-  name := "Triskelavite",
-  confers := []
-}

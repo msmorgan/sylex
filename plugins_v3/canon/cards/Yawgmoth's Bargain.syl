@@ -1,0 +1,6 @@
+card {
+  name = "Yawgmoth's Bargain",
+  cost = [4, black, black],
+  types = [enchantment],
+  text = [static(partSkip(you, drawStep)), activated(perform(payLife(1)), draw(1))]
+}

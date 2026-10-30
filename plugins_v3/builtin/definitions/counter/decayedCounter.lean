@@ -1,8 +1,0 @@
-/-- A decayed counter causes its bearer to gain decayed; keyword counters apply in layer 6.
-[CR#122.1b,613.1f] -/
-counter decayedCounter := {
-  lexical := { lemma := "decayed counter" },
-  spelling := "decayed counter",
-  holder := object,
-  confers := []
-}

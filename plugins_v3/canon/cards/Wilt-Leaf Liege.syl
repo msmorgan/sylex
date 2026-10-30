@@ -1,0 +1,17 @@
+card {
+  name = "Wilt-Leaf Liege",
+  cost = [1, hybridPip(green, white), hybridPip(green, white), hybridPip(green, white)],
+  types = [creature],
+  subtypes = [elf, knight],
+  text = [
+    static(getsPt(allOf(and([isCreature, hasColor(green), youControl, isOther])), up(1), up(1))),
+    static(getsPt(allOf(and([isCreature, hasColor(white), youControl, isOther])), up(1), up(1))),
+    static(
+      replace(
+        causedBy(
+          bySource(a(and([or([isSpell, abilityHead(anyOnStack)]), anOpponentControls]))),
+          would(actor(you), discard(thisCard))),
+        instead(putOntoBattlefield(it))))],
+  power = 4,
+  toughness = 4
+}

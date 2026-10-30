@@ -1,6 +1,0 @@
-card := {
-  name := "Defensive Maneuvers",
-  cost := [3, white],
-  types := [instant],
-  text := [spell (get (allOf [isCreature, ofYourChoice (subtype creature)]) (up 0) (up 4) untilEndOfTurn)]
-}

@@ -1,0 +1,6 @@
+card {
+  name = "Disarm",
+  cost = [blue],
+  types = [instant],
+  text = [spell(unattach(allOf(and([hasSubtype(equipment), attachedTo(target(isCreature))]))))]
+}

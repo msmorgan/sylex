@@ -1,7 +1,0 @@
-subtype varmint := {
-  lexical := { lemma := "Varmint" },
-  spelling := "Varmint",
-  kind := creature,
-  name := "Varmint",
-  confers := []
-}

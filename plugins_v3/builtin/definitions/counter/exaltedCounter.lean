@@ -1,8 +1,0 @@
-/-- A exalted counter causes its bearer to gain exalted; keyword counters apply in layer 6.
-[CR#122.1b,613.1f] -/
-counter exaltedCounter := {
-  lexical := { lemma := "exalted counter" },
-  spelling := "exalted counter",
-  holder := object,
-  confers := []
-}

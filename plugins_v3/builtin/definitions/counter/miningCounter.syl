@@ -1,0 +1,6 @@
+counter miningCounter {
+  lexical = {lemma = "mining counter"},
+  spelling = "mining counter",
+
+  confers = []
+}

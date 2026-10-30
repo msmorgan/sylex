@@ -1,6 +1,0 @@
-/-- "the pile of <player>'s choice" -/
-template pileOfChoice (player : NounPhrase) : NounPhrase := {
-  spelling := "the pile of <player>'s choice",
-  body :=
-    pileOf (counted (exactly 1)) (some player)
-}

@@ -1,0 +1,9 @@
+# "Multikicker [cost]": "You may pay an additional [cost] any number of times as you cast this
+# spell", a variant of kicker. A multikicker cost is a kicker cost, so it carries kicker's label
+# and a multikicked spell is kicked [CR#702.33c,702.33d].
+ability multikicker(cost: Cost) {
+  lexical = {lemma = "multikicker", parameters = [[Cost]]},
+  label = "kicker",
+  spelling = "multikicker <cost>",
+  body = [static(addedCost(cost, true, anyNumberOfTimes))]
+}

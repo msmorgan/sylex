@@ -1,0 +1,14 @@
+# ## The results of damage, on cards
+#
+# Lifelink adds a result to its damage [CR#702.15b]; wither and infect replace the result the
+# damage would otherwise have [CR#702.80a,702.90b,702.90c] (`Definitions/Keywords.lean`).
+# *Soul-Scar Mage* replaces the damage itself, not its result [CR#614.1a].
+card {
+  name = "Vampire Nighthawk",
+  cost = [1, black, black],
+  types = [creature],
+  subtypes = [vampire, shaman],
+  text = [flying, deathtouch, lifelink],
+  power = 2,
+  toughness = 3
+}

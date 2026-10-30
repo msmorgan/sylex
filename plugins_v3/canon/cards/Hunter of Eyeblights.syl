@@ -1,0 +1,15 @@
+card {
+  name = "Hunter of Eyeblights",
+  cost = [3, black, black],
+  types = [creature],
+  subtypes = [elf, assassin],
+  text = [
+    when(
+      does(actor(thisCreature), enter),
+      putCounters(1, printedKind(p1p1Counter), target(and([isCreature, youDontControl])))),
+    activated(
+      compound([mana([2, black]), tapSymbol]),
+      destroy(target(and([isCreature, hasCounter]))))],
+  power = 3,
+  toughness = 3
+}

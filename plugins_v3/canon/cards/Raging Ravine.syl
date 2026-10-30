@@ -1,0 +1,27 @@
+card {
+  name = "Raging Ravine",
+  types = [land],
+  text = [
+    static(entersTapped(thisLand)),
+    activated(tapSymbol, addMana(1, manaOf([[of(red)], [of(green)]]))),
+    activated(
+      mana([2, red, green]),
+      establishThroughout(
+        qualityChange(
+          thisLand,
+          sets,
+          bundle(
+            {
+              characteristics = {
+                colors = [red, green],
+                types = [creature],
+                subtypes = [elemental],
+                text = [
+                  whenever(
+                    does(actor(thisCreature), attack),
+                    putCounters(1, printedKind(p1p1Counter), thisCreature))],
+                power = 3,
+                toughness = 3}},
+            land)),
+        untilEndOfTurn))]
+}

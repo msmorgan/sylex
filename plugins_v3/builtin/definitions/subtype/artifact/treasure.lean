@@ -1,9 +1,0 @@
-/-- Treasure is an artifact subtype [CR#205.3g], also used by the predefined Treasure token
-[CR#111.10a]. -/
-subtype treasure := {
-  lexical := { lemma := "Treasure" },
-  spelling := "Treasure",
-  kind := artifact,
-  name := "Treasure",
-  confers := []
-}

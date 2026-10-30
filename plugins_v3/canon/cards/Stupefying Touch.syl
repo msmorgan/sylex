@@ -1,0 +1,13 @@
+card {
+  name = "Stupefying Touch",
+  cost = [1, blue],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    when(does(actor(thisAura), enter), draw(1)),
+    static(
+      cant(
+        any,
+        activate(allOf(and([abilityHead(anyActivated), abilityOf(enchanted(creature))])))))]
+}

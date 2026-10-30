@@ -1,5 +1,0 @@
-/-- "itself": the member a comparison over a domain is measuring (`semantics-v3.md` §1.3 Box 5). -/
-template ownMember : NounPhrase := {
-  spelling := "itself",
-  body := pro .bare .one
-}

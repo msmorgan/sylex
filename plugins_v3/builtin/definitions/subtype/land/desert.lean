@@ -1,7 +1,0 @@
-subtype desert := {
-  lexical := { lemma := "Desert" },
-  spelling := "Desert",
-  kind := land,
-  name := "Desert",
-  confers := []
-}

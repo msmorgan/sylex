@@ -1,0 +1,6 @@
+# "A permanent with indestructible can't be destroyed." [CR#702.12b]
+ability indestructible {
+  lexical = {lemma = "indestructible"},
+  spelling = "indestructible",
+  body = [static(cant(any, destroy(thisPermanent)))]
+}

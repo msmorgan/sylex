@@ -1,0 +1,2 @@
+# The condition does not hold.
+primitive not(condition: Condition): Condition

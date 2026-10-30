@@ -1,0 +1,6 @@
+ability_word sweep(ability: Ability) {
+  lexical = {lemma = "sweep", listed = Rules},
+  label = "sweep",
+  spelling = "sweep — <ability>",
+  body = ability
+}

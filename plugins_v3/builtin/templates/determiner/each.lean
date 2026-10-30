@@ -1,6 +1,0 @@
-/-- "each …" -/
-template each (p : Predicate) : NounPhrase := {
-  spelling := "each <p>",
-  body :=
-    described each p
-}

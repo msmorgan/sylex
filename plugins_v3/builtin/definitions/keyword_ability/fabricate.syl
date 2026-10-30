@@ -1,0 +1,12 @@
+# "Fabricate N" means "When this permanent enters, you may put N +1/+1 counters on it. If you
+# don't, create N 1/1 colorless Servo artifact creature tokens." [CR#702.123a]
+ability fabricate(amount: Amount) {
+  lexical = {lemma = "fabricate", parameters = [[Amount]]},
+  spelling = "fabricate <amount>",
+  body = [
+    when(
+      does(actor(thisPermanent), enter),
+      mayOrElse(
+        putCounters(amount, printedKind(p1p1Counter), thisPermanent),
+        create(amount, written(artifactCreatureToken(1, 1, [], [servo])))))]
+}

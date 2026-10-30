@@ -1,0 +1,20 @@
+card {
+  name = "Deepway Navigator",
+  cost = [white, blue],
+  types = [creature],
+  subtypes = [merfolk, wizard],
+  text = [
+    flash,
+    when(
+      does(actor(thisCreature), enter),
+      untap(each(and([hasSubtype(merfolk), youControl, isOther])))),
+    static(
+      onlyWhile(
+        getsPt(allOf(and([hasSubtype(merfolk), youControl])), up(1), up(0)),
+        did(
+          actor(you),
+          attackWith(counted(orMore(3), hasSubtype(merfolk))),
+          within(soFarThisTurn))))],
+  power = 2,
+  toughness = 2
+}

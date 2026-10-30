@@ -1,0 +1,12 @@
+card split(
+  {
+    left = {
+      name = "Wax",
+      cost = [green],
+      types = [instant],
+      text = [spell(get(target(isCreature), up(2), up(2), untilEndOfTurn))]},
+    right = {
+      name = "Wane",
+      cost = [white],
+      types = [instant],
+      text = [spell(destroy(target(isEnchantment)))]}})

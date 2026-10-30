@@ -1,5 +1,0 @@
-/-- A noun phrase composed from a determiner and predicate. -/
-primitive described (determiner : DetPhrase) (predicate : Predicate) : NounPhrase := {
-  body :=
-    Semantics.Primitives.NounPhrase.described determiner predicate
-}

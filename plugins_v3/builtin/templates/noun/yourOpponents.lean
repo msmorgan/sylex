@@ -1,6 +1,0 @@
-/-- "your opponents" -/
-template yourOpponents : NounPhrase := {
-  spelling := "your opponents",
-  body :=
-    allOf isOpponent
-}

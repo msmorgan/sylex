@@ -1,0 +1,8 @@
+card {
+  name = "Fall of the Titans",
+  cost = [variable, variable, red],
+  types = [instant],
+  text = [
+    surge(mana([variable, red])),
+    spell(instruct(this, dealDamage(letter(x), eachOf(targets(upTo(2), isAnyTarget)))))]
+}

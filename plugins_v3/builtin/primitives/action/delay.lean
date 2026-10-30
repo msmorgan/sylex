@@ -1,7 +1,0 @@
-/-- "When <event>, <action>" as a delayed trigger. -/
-primitive delay (event : GameEvent) (action : Action) (alternatives : List GameEvent := [])
-    (duration : Option Duration := none) : Action := {
-  -- TODO(spelling): Include or omit the clauses supplied by duration. Format and coordinate the
-  -- alternatives list entries, including the empty case.
-  body := Semantics.Primitives.Action.delay event alternatives duration action
-}

@@ -1,0 +1,1 @@
+primitive allExcept(except: Option(Predicate)): AbilitySelection

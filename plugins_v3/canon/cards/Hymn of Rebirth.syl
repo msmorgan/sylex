@@ -1,0 +1,10 @@
+card {
+  name = "Hymn of Rebirth",
+  cost = [3, green, white],
+  types = [sorcery],
+  text = [
+    spell(
+      putOntoBattlefieldUnderYourControl(
+        target(and([isCreature, in(graveyard)])),
+        from = graveyard))]
+}

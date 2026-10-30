@@ -1,6 +1,0 @@
-/-- "a … of your choice" -/
-template aYourChoice (p : Predicate) : NounPhrase := {
-  spelling := "a <p> of your choice",
-  body :=
-    described (a .yourChoice) p
-}

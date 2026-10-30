@@ -1,0 +1,19 @@
+# "Plot [cost]": "Any time you have priority during your main phase while the stack is empty,
+# you may exile this card from your hand and pay [cost]. It becomes a plotted card." [CR#702.170a]
+# The exile names the hand, so the ability functions only there [CR#113.6m]; exiling it is the
+# special action [CR#702.170b], and its becoming plotted a separate event. The plotted card's cast
+# right is no part of plot's text: it is the rule for every plotted card, with plot or without
+# [CR#702.170d].
+ability plot(cost: Cost) {
+  lexical = {
+    lemma = "plot",
+    parameters = [[Cost]],
+    verbs = [{lemma = "plot", past = "plotted", gerund = "plotting", frames = [Monotransitive]}]},
+  spelling = "plot <cost>",
+  body = [
+    static(
+      specialAction(
+        asSorcery,
+        cost,
+        sequentially([exileFrom(thisCard, yourHand), gainDesignation(it, plotted)])))]
+}

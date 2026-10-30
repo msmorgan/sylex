@@ -1,8 +1,0 @@
-/-- Suspect a creature: it becomes suspected until it leaves the battlefield or an effect makes it
-no longer suspected. [CR#701.60a] -/
-action suspect (subject : NounPhrase) : Action := {
-  lexical := { verbs := [{ lemma := "suspect", frames := [Monotransitive] }] },
-  spelling := "suspect <subject>",
-  body :=
-    gainDesignation subject suspected
-}

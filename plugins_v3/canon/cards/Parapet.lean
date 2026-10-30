@@ -1,6 +1,0 @@
-card := {
-  name := "Parapet",
-  cost := [1, white],
-  types := [enchantment],
-  text := [asThoughFlashSacrificedAtCleanup, getsPt (allOf [isCreature, youControl]) (up 0) (up 1)]
-}

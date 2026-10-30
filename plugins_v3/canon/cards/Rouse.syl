@@ -1,0 +1,11 @@
+card {
+  name = "Rouse",
+  cost = [1, black],
+  types = [instant],
+  text = [
+    static(
+      onlyWhile(
+        altCost(this, perform(payLife(2))),
+        exists(and([isLand, hasSubtype(swamp), youControl])))),
+    spell(get(target(isCreature), up(2), up(0), untilEndOfTurn))]
+}

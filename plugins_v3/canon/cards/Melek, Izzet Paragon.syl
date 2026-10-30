@@ -1,0 +1,15 @@
+card {
+  name = "Melek, Izzet Paragon",
+  cost = [4, blue, red],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [weird, wizard],
+  text = [
+    static(visibility(reveal, you, topOfLibrary)),
+    static(can(actor(you), cast(bare(and([isSpell, isInstantOrSorcery])), from = onTop))),
+    whenever(
+      does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])), from = yourLibrary)),
+      sequentially([copyOnStack(it), may(chooseNewTargets(that(copy)))]))],
+  power = 2,
+  toughness = 4
+}

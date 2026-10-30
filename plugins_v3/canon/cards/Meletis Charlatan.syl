@@ -1,0 +1,15 @@
+card {
+  name = "Meletis Charlatan",
+  cost = [2, blue],
+  types = [creature],
+  subtypes = [human, wizard],
+  text = [
+    activated(
+      compound([mana([2, blue]), tapSymbol]),
+      sequentially(
+        [
+          instruct(controllerOf(target(and([isInstantOrSorcery, isSpell]))), copyOnStack(it)),
+          instruct(that(player), may(chooseNewTargets(that(copy))))]))],
+  power = 2,
+  toughness = 3
+}

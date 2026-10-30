@@ -1,0 +1,8 @@
+card {
+  name = "Prism Ring",
+  cost = [1],
+  types = [artifact],
+  text = [
+    static(entersChoosing(thisArtifact, color)),
+    whenever(does(actor(you), cast(a(and([isSpell, ofChosen(color)])))), gainLife(1))]
+}

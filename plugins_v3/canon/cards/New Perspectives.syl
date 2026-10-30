@@ -1,0 +1,11 @@
+card {
+  name = "New Perspectives",
+  cost = [5, blue],
+  types = [enchantment],
+  text = [
+    when(does(actor(thisEnchantment), enter), draw(3)),
+    static(
+      onlyWhile(
+        altCost(allOf(abilityHead(keyword(cycling))), mana([0])),
+        compareAmt(countOf(cardIn(yourHand)), atLeast, 7)))]
+}

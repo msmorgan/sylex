@@ -1,0 +1,14 @@
+card {
+  name = "Mogg Salvage",
+  cost = [2, red],
+  types = [instant],
+  text = [
+    static(
+      onlyWhile(
+        altCost(this),
+        and(
+          [
+            exists(and([isLand, hasSubtype(island), anOpponentControls])),
+            exists(and([isLand, hasSubtype(mountain), youControl]))]))),
+    spell(destroy(target(isArtifact)))]
+}

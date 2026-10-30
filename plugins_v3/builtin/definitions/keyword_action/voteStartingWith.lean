@@ -1,9 +1,0 @@
-/-- "Starting with <first>, vote for <ballot>" (`Definition`, [CR#701.38]). -/
-action voteStartingWith (first : NounPhrase) (disclosure : Disclosure)
-    (ballot : Ballot) : Action := {
-  -- TODO(spelling): The disclosure selects whether 'secretly' precedes the vote instruction.
-  lexical := { verbs := [{ lemma := "vote", frames := [(Prepositional ["for"]), Intransitive] }] },
-  deed := "vote",
-  body :=
-    actionVote (some first) disclosure ballot none
-}

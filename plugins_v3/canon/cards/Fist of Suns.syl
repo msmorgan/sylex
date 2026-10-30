@@ -1,0 +1,10 @@
+card {
+  name = "Fist of Suns",
+  cost = [3],
+  types = [artifact],
+  text = [
+    static(
+      altCost(
+        allOf(and([isSpell, did(actor(you), cast(which), thisObject)])),
+        mana([white, blue, black, red, green])))]
+}

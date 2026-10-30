@@ -1,0 +1,9 @@
+card {
+  name = "Labyrinth of Skophos",
+  types = [land],
+  text = [
+    activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
+    activated(
+      compound([mana([4]), tapSymbol]),
+      removeFromCombat(target(and([isCreature, or([isAttacking, isBlocking])]))))]
+}

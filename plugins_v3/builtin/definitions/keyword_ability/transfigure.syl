@@ -1,0 +1,18 @@
+# "Transfigure [cost]" means "[Cost], Sacrifice this permanent: Search your library for a creature
+# card with the same mana value as this permanent and put it onto the battlefield. Then shuffle
+# your library. Activate only as a sorcery." [CR#702.71a]
+ability transfigure(cost: Cost) {
+  lexical = {lemma = "transfigure", parameters = [[Cost]]},
+  spelling = "transfigure <cost>",
+  body = [
+    activatedOnlyDuring(
+      compound([cost, perform(sacrifice(thisPermanent))]),
+      sequentially(
+        [
+          search(
+            yourLibrary,
+            a(and([isCard, isCreature, hasManaValue(eq, statOf(stat(manaValue), thisPermanent))]))),
+          putOntoBattlefield(that(card)),
+          shuffle]),
+      asSorcery)]
+}

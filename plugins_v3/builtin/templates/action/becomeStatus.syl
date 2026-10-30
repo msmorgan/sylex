@@ -1,0 +1,6 @@
+# "<subject> becomes <status>" [CR#603.2e]
+# [CR#603.2e]
+template becomeStatus(status: Status): Action {
+  spelling = "becomes <status>",
+  body = setStatus(status, theActor)
+}

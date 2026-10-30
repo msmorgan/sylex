@@ -1,0 +1,2 @@
+# Set to the given amount.
+primitive set(amount: Amount): Delta(Amount)

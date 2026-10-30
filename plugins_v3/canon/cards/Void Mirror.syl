@@ -1,0 +1,10 @@
+card {
+  name = "Void Mirror",
+  cost = [2],
+  types = [artifact],
+  text = [
+    whenever(
+      does(actor(a(isPlayer)), cast(a(isSpell))),
+      if = noColoredManaSpentToCast(it),
+      action = counter(that(spell)))]
+}

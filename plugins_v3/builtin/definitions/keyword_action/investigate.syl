@@ -1,0 +1,6 @@
+# Investigate: create a Clue token. [CR#701.16a]
+action investigate {
+  lexical = {verbs = [{lemma = "investigate", frames = [Intransitive]}]},
+  spelling = "investigate",
+  body = create(1, written(clueToken))
+}

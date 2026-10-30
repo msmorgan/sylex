@@ -1,0 +1,15 @@
+card {
+  name = "Magus of the Future",
+  cost = [2, blue, blue, blue],
+  types = [creature],
+  subtypes = [human, wizard],
+  text = [
+    static(visibility(reveal, you, topOfLibrary)),
+    static(
+      conjunction(
+        [
+          can(actor(you), play(allOf(isLand), from = onTop)),
+          can(actor(you), cast(bare(isSpell), from = onTop))]))],
+  power = 2,
+  toughness = 3
+}

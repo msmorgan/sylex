@@ -1,9 +1,0 @@
-card := {
-  name := "Eyetwitch",
-  cost := [black],
-  types := [creature],
-  subtypes := [eye, bat],
-  text := [flying, when (does thisCreature die) learn],
-  power := 1,
-  toughness := 1
-}

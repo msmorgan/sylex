@@ -1,6 +1,0 @@
-/-- A Same-Is-True-For Ability: `frame` read for each keyword of `keywords` in turn, `thatKeyword`
-naming it [CR#702.1c]. -/
--- [CR#702.1c]
-primitive sameIsTrueFor (frame : Ability) (keywords : List KeywordTerm) : Ability := {
-  body := Semantics.Primitives.Ability.sameIsTrueFor frame keywords
-}

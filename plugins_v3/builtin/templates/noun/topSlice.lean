@@ -1,6 +1,0 @@
-/-- "the top N cards of your library" -/
-template topSlice (amount : Amount) : NounPhrase := {
-  spelling := "the top <amount> cards of your library",
-  body :=
-    slice top amount (libraryOf you)
-}

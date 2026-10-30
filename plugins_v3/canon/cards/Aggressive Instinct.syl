@@ -1,0 +1,10 @@
+card {
+  name = "Aggressive Instinct",
+  cost = [1, green],
+  types = [sorcery],
+  text = [
+    spell(
+      dealDamageOwnPower(
+        target(and([isCreature, youControl])),
+        target(and([isCreature, youDontControl]))))]
+}

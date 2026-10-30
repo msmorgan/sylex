@@ -1,0 +1,15 @@
+card {
+  name = "Quick Sliver",
+  cost = [1, green],
+  types = [creature],
+  subtypes = [sliver],
+  text = [
+    flash,
+    static(
+      can(
+        actor(a(isPlayer)),
+        cast(bare(and([isSpell, hasSubtype(sliver)]))),
+        asThough = asThoughHadFlash(them)))],
+  power = 1,
+  toughness = 1
+}

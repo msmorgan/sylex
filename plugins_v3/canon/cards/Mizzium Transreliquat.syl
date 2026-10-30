@@ -1,0 +1,12 @@
+card {
+  name = "Mizzium Transreliquat",
+  cost = [3],
+  types = [artifact],
+  text = [
+    activated(
+      mana([3]),
+      establishThroughout(copyChange(thisArtifact, target(isArtifact)), untilEndOfTurn)),
+    activated(
+      mana([1, blue, red]),
+      establish(copyChange(thisArtifact, target(isArtifact), [exceptThisAbility])))]
+}

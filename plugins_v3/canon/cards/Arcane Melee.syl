@@ -1,0 +1,6 @@
+card {
+  name = "Arcane Melee",
+  cost = [4, blue],
+  types = [enchantment],
+  text = [static(costShift(allOf(and([isInstantOrSorcery, isSpell])), less(2)))]
+}

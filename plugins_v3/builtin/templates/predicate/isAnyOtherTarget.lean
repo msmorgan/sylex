@@ -1,6 +1,0 @@
-/-- "any other target" -/
-template isAnyOtherTarget : Predicate := {
-
-  body :=
-    and [isAnyTarget, isOther]
-}

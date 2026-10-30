@@ -1,0 +1,11 @@
+card {
+  name = "Pacifism",
+  cost = [1, white],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    static(
+      conjunction(
+        [cant(actor(enchanted(creature)), attack), cant(actor(enchanted(creature)), block)]))]
+}

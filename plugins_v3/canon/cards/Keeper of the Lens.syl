@@ -1,0 +1,10 @@
+card {
+  name = "Keeper of the Lens",
+  cost = [1],
+  types = [artifact, creature],
+  subtypes = [golem],
+  text = [
+    static(visibility(lookAt, you, objects(allOf(and([isCreature, isFaceDown, youDontControl])))))],
+  power = 1,
+  toughness = 2
+}

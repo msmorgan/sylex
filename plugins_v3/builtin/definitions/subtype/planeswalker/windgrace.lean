@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype windgrace := {
-  lexical := { lemma := "Windgrace" },
-  spelling := "Windgrace",
-  kind := planeswalker,
-  name := "Windgrace",
-  confers := []
-}

@@ -1,0 +1,3 @@
+primitive entersTransformed: MoveRider {
+  spelling = "transformed"
+}

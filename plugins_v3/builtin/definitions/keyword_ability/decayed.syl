@@ -1,0 +1,9 @@
+# "Decayed" means "This creature can't block" and "When this creature attacks, sacrifice it at end
+# of combat." [CR#702.147a]
+ability decayed {
+  lexical = {lemma = "decayed"},
+  spelling = "decayed",
+  body = [
+    static(cant(actor(thisCreature), block)),
+    when(does(actor(thisCreature), attack), atNext(endOfCombat, sacrifice(thisPermanent)))]
+}

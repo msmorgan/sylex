@@ -1,5 +1,0 @@
-/-- Turn the subject face down with the specified characteristics [CR#701.40a,708.2]. -/
-primitive turnFaceDown (subject : NounPhrase) (spec : FaceDown) : Action := {
-  body :=
-    Semantics.Primitives.Action.turnFaceDown subject spec
-}

@@ -1,0 +1,7 @@
+card {
+  name = "Concordant Crossroads",
+  cost = [green],
+  supertypes = [world],
+  types = [enchantment],
+  text = [static(abilityGrant(allOf(isCreature), haste))]
+}

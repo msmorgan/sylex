@@ -1,5 +1,0 @@
-/-- "those <word>s", e.g. `those .card`. -/
-template those (w : NounWord) : NounPhrase := {
-  spelling := "those <w>",
-  body := pro (.word w) .many
-}

@@ -1,0 +1,9 @@
+card {
+  name = "Platinum Angel",
+  cost = [7],
+  types = [artifact, creature],
+  subtypes = [angel],
+  text = [flying, static(cant(actor(you), loseGame)), static(cant(actor(yourOpponents), winGame))],
+  power = 4,
+  toughness = 4
+}

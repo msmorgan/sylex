@@ -1,0 +1,13 @@
+card {
+  name = "Reflect Damage",
+  cost = [3, red, white],
+  types = [instant],
+  text = [
+    spell(
+      establishThroughout(
+        replace(
+          would(actor(aYourChoice(isSource)), dealDamage),
+          instead(redirectDamage(allDamage, controllerOf(thatSource))),
+          use = nextTimeOnly),
+        thisTurn))]
+}

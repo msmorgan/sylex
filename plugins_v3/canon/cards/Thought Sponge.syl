@@ -1,0 +1,16 @@
+card {
+  name = "Thought Sponge",
+  cost = [3, blue],
+  types = [creature],
+  subtypes = [sponge],
+  text = [
+    flash,
+    static(
+      entersWithCounters(
+        thisCreature,
+        aggregateOver(max, isOpponent, eventCount(draw(anyAmount), actor(they), soFarThisTurn)),
+        p1p1Counter)),
+    when(does(actor(thisCreature), die), draw(powerOf(thisCreature)))],
+  power = 1,
+  toughness = 1
+}

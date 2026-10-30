@@ -1,0 +1,12 @@
+card {
+  name = "Future Sight",
+  cost = [2, blue, blue, blue],
+  types = [enchantment],
+  text = [
+    static(visibility(reveal, you, topOfLibrary)),
+    static(
+      conjunction(
+        [
+          can(actor(you), play(allOf(isLand), from = onTop)),
+          can(actor(you), cast(bare(isSpell), from = onTop))]))]
+}

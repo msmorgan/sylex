@@ -1,0 +1,4 @@
+# "<color>" as a color term, as "devotion to black"
+primitive color(color: Color): ColorTerm = .lit {
+  spelling = "<color>"
+}

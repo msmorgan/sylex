@@ -1,0 +1,2 @@
+# Apply the arithmetic operator to two amounts.
+primitive arith(op: ArithOp, left: Amount, right: Amount): Amount

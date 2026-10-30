@@ -1,9 +1,0 @@
-/-- The number of loyalty counters on a planeswalker on the battlefield is its loyalty. A
-planeswalker with zero loyalty is put into its owner's graveyard as a state-based action.
-[CR#122.1e] -/
-counter loyaltyCounter := {
-  lexical := { lemma := "loyalty counter" },
-  spelling := "loyalty counter",
-  holder := object,
-  confers := []
-}

@@ -1,0 +1,27 @@
+# Tuktuk Scrapper: "Whenever this creature or another Ally you control enters, you may destroy
+# target artifact. If that artifact is put into a graveyard this way, this creature deals damage to
+# that artifact's controller equal to the number of Allies you control." The target is chosen as the
+# ability is put on the stack, whether or not its controller destroys it [CR#601.2c,603.3d,115.1]:
+# "that artifact" reads it after the optional body, in the lookback and as the damage's possessor
+# (owner ruling 2026-10-23).
+card {
+  name = "Tuktuk Scrapper",
+  cost = [3, red],
+  types = [creature],
+  subtypes = [goblin, artificer, ally],
+  text = [
+    whenever(
+      does(actor(eitherOf(thisCreature, a(and([hasSubtype(ally), youControl, isOther])))), enter),
+      sequentially(
+        [
+          may(destroy(target(isArtifact))),
+          doIf(
+            did(actor(that(artifact)), putInto(theActor, graveyard), thisWay),
+            instruct(
+              thisCreature,
+              dealDamage(
+                countOf(and([hasSubtype(ally), youControl])),
+                controllerOf(that(artifact)))))]))],
+  power = 2,
+  toughness = 2
+}

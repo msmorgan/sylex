@@ -1,0 +1,2 @@
+# "the …"
+primitive the(plur: Plurality = one): DetPhrase

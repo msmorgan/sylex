@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype jaya := {
-  lexical := { lemma := "Jaya" },
-  spelling := "Jaya",
-  kind := planeswalker,
-  name := "Jaya",
-  confers := []
-}

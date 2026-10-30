@@ -1,0 +1,15 @@
+card {
+  name = "Glorious Enforcer",
+  cost = [5, white, white],
+  types = [creature],
+  subtypes = [angel],
+  text = [
+    flying,
+    lifelink,
+    at(
+      beginningOfPossessed(combat, eachPlayer),
+      if = compareAmt(lifeTotalOf(you), greater, lifeTotalOf(anOpponent)),
+      action = gain(thisCreature, doubleStrike, untilEndOfTurn))],
+  power = 5,
+  toughness = 5
+}

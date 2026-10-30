@@ -1,4 +1,0 @@
-/-- "<p> and <q>": every conjunct holds. -/
-template and (conjuncts : List Predicate) : Predicate := {
-  body := coord .and conjuncts
-}

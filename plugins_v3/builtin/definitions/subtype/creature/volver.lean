@@ -1,7 +1,0 @@
-subtype volver := {
-  lexical := { lemma := "Volver" },
-  spelling := "Volver",
-  kind := creature,
-  name := "Volver",
-  confers := []
-}

@@ -1,0 +1,25 @@
+card {
+  name = "Shadowbane",
+  cost = [1, white],
+  types = [instant],
+  text = [
+    spell(
+      establishThroughout(
+        replace(
+          would(
+            actor(aYourChoice(isSource)),
+            dealDamage(recipient = andOr([you, allOf(and([isCreature, youControl]))]))),
+          instead(
+            preventDamage(
+              allDamage,
+              also = doIf(
+                did(
+                  any,
+                  preventDamage(
+                    allDamage,
+                    damage = would(actor(a(and([isSource, hasColor(black)]))), dealDamage)),
+                  thisWay),
+                gainLife(thatMuch)))),
+          use = nextTimeOnly),
+        thisTurn))]
+}

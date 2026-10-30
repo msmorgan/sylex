@@ -1,0 +1,13 @@
+card {
+  name = "Chief Engineer",
+  cost = [1, blue],
+  types = [creature],
+  subtypes = [vedalken, artificer],
+  text = [
+    static(
+      abilityGrant(
+        allOf(and([isArtifact, isSpell, did(actor(you), cast(which), thisObject)])),
+        convoke))],
+  power = 1,
+  toughness = 3
+}

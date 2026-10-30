@@ -1,0 +1,11 @@
+card {
+  name = "Vernal Equinox",
+  cost = [3, green],
+  types = [enchantment],
+  text = [
+    static(
+      can(
+        actor(a(isPlayer)),
+        cast(bare(and([isSpell, or([isCreature, isEnchantment])]))),
+        asThough = asThoughHadFlash(them)))]
+}

@@ -1,8 +1,0 @@
-/-- One or more finality counters on a permanent replace its move from the battlefield to a
-graveyard with exile. [CR#122.1h] -/
-counter finalityCounter := {
-  lexical := { lemma := "finality counter" },
-  spelling := "finality counter",
-  holder := object,
-  confers := []
-}

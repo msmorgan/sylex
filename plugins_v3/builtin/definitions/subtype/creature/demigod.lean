@@ -1,7 +1,0 @@
-subtype demigod := {
-  lexical := { lemma := "Demigod" },
-  spelling := "Demigod",
-  kind := creature,
-  name := "Demigod",
-  confers := []
-}

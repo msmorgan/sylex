@@ -1,0 +1,9 @@
+card {
+  name = "Mana Chains",
+  cost = [blue],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    static(abilityGrant(enchanted(creature), cumulativeUpkeep(mana([1]))))]
+}

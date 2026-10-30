@@ -1,0 +1,11 @@
+card {
+  name = "Mercadian Bazaar",
+  types = [land],
+  text = [
+    static(entersTapped(thisLand)),
+    activated(tapSymbol, putCounters(1, printedKind(storageCounter), thisLand)),
+    activated(
+      compound(
+        [tapSymbol, perform(removeCounters(anyNumber, printedKind(storageCounter), thisLand))]),
+      addMana(removedThisWay, manaOf([[of(red)]])))]
+}

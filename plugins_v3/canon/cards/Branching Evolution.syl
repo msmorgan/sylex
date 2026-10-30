@@ -1,0 +1,12 @@
+card {
+  name = "Branching Evolution",
+  cost = [2, green],
+  types = [enchantment],
+  text = [
+    static(
+      replace(
+        would(
+          any,
+          putCounters(anyAmount, printedKind(p1p1Counter), a(and([isCreature, youControl])))),
+        instead(putCounters(times(2, thatMuch), printedKind(p1p1Counter), that(creature)))))]
+}

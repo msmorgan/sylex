@@ -1,0 +1,12 @@
+card {
+  name = "Grievous Wound",
+  cost = [3, black, black],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isPlayer),
+    static(cant(actor(enchanted(player)), gainLife(anyAmount))),
+    whenever(
+      does(any, dealDamage(recipient = enchanted(player))),
+      instruct(they, loseLife(half(up, lifeTotalOf(they)))))]
+}

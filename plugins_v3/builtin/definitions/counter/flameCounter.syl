@@ -1,0 +1,6 @@
+counter flameCounter {
+  lexical = {lemma = "flame counter"},
+  spelling = "flame counter",
+
+  confers = []
+}

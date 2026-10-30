@@ -1,0 +1,2 @@
+# Increase by the given amount.
+primitive up(amount: Amount): Delta(Amount)

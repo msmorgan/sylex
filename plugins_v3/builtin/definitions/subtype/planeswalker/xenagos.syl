@@ -1,0 +1,8 @@
+# No supported Oracle rules-text plural is attested for this proper subtype name.
+subtype xenagos {
+  lexical = {lemma = "Xenagos"},
+  spelling = "Xenagos",
+  kind = planeswalker,
+  name = "Xenagos",
+  confers = []
+}

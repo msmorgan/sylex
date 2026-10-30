@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype tyvar := {
-  lexical := { lemma := "Tyvar" },
-  spelling := "Tyvar",
-  kind := planeswalker,
-  name := "Tyvar",
-  confers := []
-}

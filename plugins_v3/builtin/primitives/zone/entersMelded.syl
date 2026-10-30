@@ -1,0 +1,3 @@
+primitive entersMelded(into: String): MoveRider {
+  spelling = "melded into <into>"
+}

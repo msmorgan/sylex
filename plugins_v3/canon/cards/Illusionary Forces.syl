@@ -1,0 +1,9 @@
+card {
+  name = "Illusionary Forces",
+  cost = [3, blue],
+  types = [creature],
+  subtypes = [illusion],
+  text = [flying, cumulativeUpkeep(mana([blue]))],
+  power = 4,
+  toughness = 4
+}

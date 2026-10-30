@@ -1,0 +1,14 @@
+card {
+  name = "Bristlepack Sentry",
+  cost = [1, green],
+  types = [creature],
+  subtypes = [plant, wolf],
+  text = [
+    defender,
+    static(
+      onlyWhile(
+        can(actor(thisCreature), attack, asThough = holds(is(it, not(hasKeyword(defender))))),
+        exists(and([isCreature, youControl, hasPower(atLeast, 4)]))))],
+  power = 3,
+  toughness = 3
+}

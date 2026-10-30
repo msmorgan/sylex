@@ -1,0 +1,6 @@
+counter infectionCounter {
+  lexical = {lemma = "infection counter"},
+  spelling = "infection counter",
+
+  confers = []
+}

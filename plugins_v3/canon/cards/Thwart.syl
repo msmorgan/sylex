@@ -1,0 +1,11 @@
+card {
+  name = "Thwart",
+  cost = [2, blue, blue],
+  types = [instant],
+  text = [
+    static(
+      altCost(
+        this,
+        perform(returnToHand(counted(exactly(3), and([isLand, hasSubtype(island), youControl])))))),
+    spell(counter(target(isSpell)))]
+}

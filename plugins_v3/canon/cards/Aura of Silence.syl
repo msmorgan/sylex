@@ -1,0 +1,18 @@
+card {
+  name = "Aura of Silence",
+  cost = [1, white, white],
+  types = [enchantment],
+  text = [
+    static(
+      costShift(
+        allOf(
+          and(
+            [
+              or([isArtifact, isEnchantment]),
+              isSpell,
+              did(actor(yourOpponents), cast(which), thisObject)])),
+        more(2))),
+    activated(
+      perform(sacrifice(thisEnchantment)),
+      destroy(target(or([isArtifact, isEnchantment]))))]
+}

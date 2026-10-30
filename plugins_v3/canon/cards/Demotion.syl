@@ -1,0 +1,13 @@
+card {
+  name = "Demotion",
+  cost = [white],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    static(
+      conjunction(
+        [
+          cant(actor(enchanted(creature)), block),
+          cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(it)]))))]))]
+}

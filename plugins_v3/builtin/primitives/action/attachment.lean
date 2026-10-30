@@ -1,6 +1,0 @@
-/-- Change the attachment between the subject and its host. -/
-primitive attachment (move : AttachMove) (subject : NounPhrase)
-    (host : Option NounPhrase := none) : Action := {
-  body :=
-    Semantics.Primitives.Action.attachment move subject host
-}

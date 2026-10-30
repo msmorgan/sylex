@@ -1,0 +1,5 @@
+primitive staticSpecGatedBy(
+  cost: Cost,
+  subj: Subject,
+  action: Action,
+  mods: DeonticMods): StaticSpec = .gatedBy

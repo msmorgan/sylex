@@ -1,0 +1,4 @@
+# Authoring primitive for `Predicate.colorIs`.
+primitive hasColor(color: Color): Predicate = .colorIs {
+  spelling = "<c>"
+}

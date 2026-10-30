@@ -1,0 +1,4 @@
+# "one mana of any of <subject>'s colors"
+primitive ofAnyColorOf(subject: NounPhrase): ProducedMana = .amongColorsOf {
+  spelling = "one mana of any of <subject>'s colors"
+}

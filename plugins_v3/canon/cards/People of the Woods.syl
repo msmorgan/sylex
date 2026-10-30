@@ -1,0 +1,8 @@
+card {
+  name = "People of the Woods",
+  cost = [green, green],
+  types = [creature],
+  subtypes = [human],
+  text = [static(definesToughness(thisCreature, countOf(and([hasSubtype(forest), youControl]))))],
+  power = 1
+}

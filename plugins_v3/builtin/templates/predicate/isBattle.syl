@@ -1,0 +1,4 @@
+template isBattle: Predicate {
+  spelling = "battle",
+  body = hasType(battle)
+}

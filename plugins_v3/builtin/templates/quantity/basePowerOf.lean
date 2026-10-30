@@ -1,6 +1,0 @@
-/-- "<subject>'s base power" [CR#208.4b] -/
--- [CR#208.4b]
-template basePowerOf (subject : NounPhrase) : Amount := {
-  spelling := "<subject>'s base power",
-  body := statOf (.stat basePower) subject
-}

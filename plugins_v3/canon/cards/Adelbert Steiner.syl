@@ -1,0 +1,16 @@
+card {
+  name = "Adelbert Steiner",
+  cost = [1, white],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [human, knight],
+  text = [
+    lifelink,
+    static(
+      getsPt(
+        thisCreature,
+        up(forEach(1, and([hasSubtype(equipment), youControl]))),
+        up(forEach(1, and([hasSubtype(equipment), youControl])))))],
+  power = 2,
+  toughness = 1
+}

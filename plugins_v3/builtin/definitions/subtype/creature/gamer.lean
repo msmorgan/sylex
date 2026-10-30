@@ -1,7 +1,0 @@
-subtype gamer := {
-  lexical := { lemma := "Gamer" },
-  spelling := "Gamer",
-  kind := creature,
-  name := "Gamer",
-  confers := []
-}

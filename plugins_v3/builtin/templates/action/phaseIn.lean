@@ -1,7 +1,0 @@
-/-- "<subject> phases in" [CR#702.26c] -/
--- [CR#702.26c]
-template phaseIn : Action := {
-  spelling := "phases in",
-  body :=
-    setStatus phasedIn theActor
-}

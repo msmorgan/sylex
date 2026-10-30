@@ -1,7 +1,0 @@
-subtype primarch := {
-  lexical := { lemma := "Primarch" },
-  spelling := "Primarch",
-  kind := creature,
-  name := "Primarch",
-  confers := []
-}

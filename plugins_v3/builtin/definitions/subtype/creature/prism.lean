@@ -1,7 +1,0 @@
-subtype prism := {
-  lexical := { lemma := "Prism" },
-  spelling := "Prism",
-  kind := creature,
-  name := "Prism",
-  confers := []
-}

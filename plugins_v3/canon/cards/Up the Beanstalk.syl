@@ -1,0 +1,10 @@
+card {
+  name = "Up the Beanstalk",
+  cost = [1, green],
+  types = [enchantment],
+  text = [
+    when(
+      does(actor(this), enter),
+      joins = [joinedHead(does(actor(you), cast(a(and([isSpell, hasManaValue(atLeast, 5)])))))],
+      action = draw(1))]
+}

@@ -1,8 +1,0 @@
-/-- "that has triggered but not yet left the stack": waiting to be put on the stack, or on it
-[CR#113.7,603.3]. -/
--- [CR#113.7,603.3]
-primitive triggeredNotLeftStack : Predicate := {
-  spelling := "that has triggered but not yet left the stack",
-  body :=
-    Semantics.Primitives.Predicate.triggeredNotLeftStack
-}

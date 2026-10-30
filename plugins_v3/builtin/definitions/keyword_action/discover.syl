@@ -1,0 +1,14 @@
+# "<performer> discovers N" (`Definition`, [CR#701.57a]).
+action discover(amount: Amount) {
+  lexical = {verbs = [{lemma = "discover", frames = [Amount, Intransitive]}]},
+  spelling = "discover <amount>",
+  body = sequentially(
+    [
+      exile(
+        run(top, and([non(isLand), compare(atMost, amount, [stat(manaValue)])]), libraryOf(actor))),
+      withContinuation(
+        optional,
+        castWithoutPaying(that(card), compare(atMost, amount, [stat(manaValue)])),
+        ifNot = putInto(that(card), hand)),
+      move(theRest, wherever, onBottom, arrival, [inOrder(randomOrder)])])
+}

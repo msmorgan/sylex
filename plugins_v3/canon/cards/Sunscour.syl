@@ -1,0 +1,9 @@
+card {
+  name = "Sunscour",
+  cost = [5, white, white],
+  types = [sorcery],
+  text = [
+    static(
+      altCost(this, perform(exile(counted(exactly(2), and([hasColor(white), in(yourHand)])))))),
+    spell(destroy(allOf(isCreature)))]
+}

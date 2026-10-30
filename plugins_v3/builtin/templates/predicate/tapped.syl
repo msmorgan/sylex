@@ -1,0 +1,5 @@
+# [CR#110.5]
+primitive tapped: Status {
+  lexical = {adjectives = ["tapped"]},
+  spelling = "tapped"
+}

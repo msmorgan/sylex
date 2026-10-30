@@ -1,0 +1,4 @@
+# "except it doesn't have this ability"
+primitive exceptThisAbility: CopyExcept = .thisAbility {
+  spelling = "except it doesn't have this ability"
+}

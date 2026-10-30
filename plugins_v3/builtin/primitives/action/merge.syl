@@ -1,0 +1,2 @@
+# Merge the subject on top of or under the permanent [CR#730.2].
+primitive merge(subject: NounPhrase, onto: NounPhrase, position: MergePosition): Action

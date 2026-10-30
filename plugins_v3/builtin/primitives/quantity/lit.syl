@@ -1,0 +1,4 @@
+# A literal integer amount.
+primitive lit(value: Int): Amount {
+  spelling = "<value>"
+}

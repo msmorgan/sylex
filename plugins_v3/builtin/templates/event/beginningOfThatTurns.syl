@@ -1,0 +1,5 @@
+# "at the beginning of that turn's <part>"
+template beginningOfThatTurns(part: TurnPart): GameEvent {
+  spelling = "at the beginning of that turn's <part>",
+  body = beginningOf(part, none, thatTime)
+}

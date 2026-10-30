@@ -1,0 +1,7 @@
+# "Undaunted" means "This spell costs {1} less to cast for each opponent you have."
+# [CR#702.125a]
+ability undaunted {
+  lexical = {lemma = "undaunted"},
+  spelling = "undaunted",
+  body = [static(costShift(thisSpell, generic(down(forEach(1, isOpponent)), none)))]
+}

@@ -1,7 +1,0 @@
-/-- "before <whose> <part>" -/
-template beforePart (part : TurnPart) (whose : Option NounPhrase := none) : Timing := {
-  spelling := "before <whose> <part>",
-  body :=
-    relativeToEvent .before
-      (beginningOf part whose current)
-}

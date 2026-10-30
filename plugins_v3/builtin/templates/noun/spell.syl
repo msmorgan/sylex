@@ -1,0 +1,4 @@
+# "spell": the Spell head noun [CR#112.1].
+primitive spell: NounWord {
+  spelling = "spell"
+}

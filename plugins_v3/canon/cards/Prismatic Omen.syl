@@ -1,0 +1,6 @@
+card {
+  name = "Prismatic Omen",
+  cost = [1, green],
+  types = [enchantment],
+  text = [static(qualityChange(allOf(and([isLand, youControl])), adds, everyTypeOf(basicLand)))]
+}

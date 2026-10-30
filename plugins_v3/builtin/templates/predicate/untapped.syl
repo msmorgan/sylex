@@ -1,0 +1,5 @@
+# [CR#110.5]
+primitive untapped: Status {
+  lexical = {adjectives = ["untapped"]},
+  spelling = "untapped"
+}

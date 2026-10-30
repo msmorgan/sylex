@@ -1,0 +1,14 @@
+# Essence Backlash: "Counter target creature spell. Essence Backlash deals damage equal to
+# that spell's power to its controller." Both information reads name the departed spell
+# [CR#608.2h].
+card {
+  name = "Essence Backlash",
+  cost = [2, blue, red],
+  types = [instant],
+  text = [
+    spell(
+      sequentially(
+        [
+          counter(target(and([isCreature, isSpell]))),
+          instruct(thisSpell, dealDamage(statOf(stat(power), that(spell)), controllerOf(it)))]))]
+}

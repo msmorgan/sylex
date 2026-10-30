@@ -1,0 +1,9 @@
+card {
+  name = "Drumbellower",
+  cost = [2, white],
+  types = [creature],
+  subtypes = [spirit],
+  text = [flying, static(untapDuring(allOf(and([isCreature, youControl])), each(isOtherPlayer)))],
+  power = 2,
+  toughness = 1
+}

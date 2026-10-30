@@ -1,7 +1,0 @@
-/-- "fully unlock <room>": both its halves unlocked [CR#709.5i]. -/
--- [CR#709.5i]
-primitive fullyUnlock (room : NounPhrase) : Action := {
-  spelling := "fully unlock <room>",
-  body :=
-    Semantics.Primitives.Action.fullyUnlock room
-}

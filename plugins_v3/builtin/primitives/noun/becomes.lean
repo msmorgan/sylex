@@ -1,6 +1,0 @@
-/-- The new object the subject becomes at its next zone change, named before the change happens:
-"the permanent this spell becomes" [CR#400.7]. -/
-primitive becomes (subject : NounPhrase) : NounPhrase := {
-  body :=
-    Semantics.Primitives.NounPhrase.becomes subject
-}

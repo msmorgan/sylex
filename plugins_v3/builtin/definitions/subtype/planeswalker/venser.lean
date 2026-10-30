@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype venser := {
-  lexical := { lemma := "Venser" },
-  spelling := "Venser",
-  kind := planeswalker,
-  name := "Venser",
-  confers := []
-}

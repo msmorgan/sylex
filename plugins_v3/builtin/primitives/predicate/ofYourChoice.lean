@@ -1,7 +1,0 @@
-/-- Authoring primitive for `Predicate.ofYourChoice`. -/
-primitive ofYourChoice (sort : QualitySort) (domain : Option ChoiceDomain := none) :
-    Predicate := {
-  -- TODO(spelling): Include or omit the clauses supplied by domain.
-  body :=
-    Semantics.Primitives.Predicate.ofYourChoice sort domain
-}

@@ -1,7 +1,0 @@
-/-- "<quantity> <what> at random": the Actor chooses a Selection whose determiner
-specifies random choice. -/
-template selectRandom (quantity : Quantity) (what : Predicate) : Action := {
-  spelling := "choose <quantity> <what> at random",
-  body :=
-    choose (countedAtRandom quantity what)
-}

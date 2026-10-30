@@ -1,6 +1,0 @@
-/-- "the <p> [from] among <group>": every member the description picks. -/
-template allFromAmong (p : Predicate) (group : NounPhrase) : NounPhrase := {
-  spelling := "the <p> from among <group>",
-  body :=
-    nounPhraseSomeOf whole (some p) group
-}

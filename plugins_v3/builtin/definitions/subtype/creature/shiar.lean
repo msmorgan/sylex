@@ -1,7 +1,0 @@
-subtype shiar := {
-  lexical := { lemma := "Shi'ar", plural := "Shi'ar" },
-  spelling := "Shi'ar",
-  kind := creature,
-  name := "Shi'ar",
-  confers := []
-}

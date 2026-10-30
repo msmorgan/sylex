@@ -1,0 +1,14 @@
+# "detain <subject>": until the next turn of the controller of the detaining spell or ability,
+# "your next turn" [CR#701.35a,109.5], which is not its source's controller once the source has
+# changed control [CR#113.8].
+action detain(subject: NounPhrase) {
+  lexical = {verbs = [{lemma = "detain", frames = [Monotransitive]}]},
+  spelling = "detain <subject>",
+  body = establishThroughout(
+    conjunction(
+      [
+        cant(actor(subject), attack),
+        cant(actor(subject), block),
+        cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(subject)]))))]),
+    untilYourNextTurn)
+}

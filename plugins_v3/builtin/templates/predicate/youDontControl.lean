@@ -1,6 +1,0 @@
-/-- "you don't control" -/
-template youDontControl : Predicate := {
-  spelling := "you don't control",
-  body :=
-    not (controlledBy you)
-}

@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype dellian := {
-  lexical := { lemma := "Dellian" },
-  spelling := "Dellian",
-  kind := planeswalker,
-  name := "Dellian",
-  confers := []
-}

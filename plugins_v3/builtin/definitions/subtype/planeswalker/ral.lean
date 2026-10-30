@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype ral := {
-  lexical := { lemma := "Ral" },
-  spelling := "Ral",
-  kind := planeswalker,
-  name := "Ral",
-  confers := []
-}

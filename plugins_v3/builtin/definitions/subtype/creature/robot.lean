@@ -1,7 +1,0 @@
-subtype robot := {
-  lexical := { lemma := "Robot" },
-  spelling := "Robot",
-  kind := creature,
-  name := "Robot",
-  confers := []
-}

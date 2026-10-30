@@ -1,0 +1,4 @@
+# "again, excluding the chosen"
+primitive againExcludingChosen: Repetition {
+  spelling = "again, excluding the chosen"
+}

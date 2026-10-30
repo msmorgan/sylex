@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype liliana := {
-  lexical := { lemma := "Liliana" },
-  spelling := "Liliana",
-  kind := planeswalker,
-  name := "Liliana",
-  confers := []
-}

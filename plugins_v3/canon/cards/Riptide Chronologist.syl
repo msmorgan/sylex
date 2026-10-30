@@ -1,0 +1,12 @@
+card {
+  name = "Riptide Chronologist",
+  cost = [3, blue, blue],
+  types = [creature],
+  subtypes = [human, wizard],
+  text = [
+    activated(
+      compound([mana([blue]), perform(sacrifice(thisCreature))]),
+      untap(allOf(and([isCreature, ofYourChoice(subtype(creature))]))))],
+  power = 1,
+  toughness = 3
+}

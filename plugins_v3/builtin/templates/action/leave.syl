@@ -1,0 +1,5 @@
+# "<subject> leaves <from_>", the battlefield unless said.
+template leave(from: Location = battlefield): Action {
+  spelling = "leaves <from_>",
+  body = move(theActor, from, none, departure, [])
+}

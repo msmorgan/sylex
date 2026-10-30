@@ -1,7 +1,0 @@
-/-- "a teammate of <who>" [CR#102.3]. -/
--- [CR#102.3]
-primitive isTeammateOf (who : NounPhrase) : Predicate := {
-  spelling := "a teammate of <who>",
-  body :=
-    Semantics.Primitives.Predicate.isTeammateOf who
-}

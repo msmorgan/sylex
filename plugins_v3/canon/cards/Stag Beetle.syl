@@ -1,0 +1,14 @@
+card {
+  name = "Stag Beetle",
+  cost = [3, green, green],
+  types = [creature],
+  subtypes = [insect],
+  text = [
+    static(
+      conjunction(
+        [
+          entersWithCounters(thisCreature, letter(x), p1p1Counter),
+          letterDefinition(x, countOf(and([isCreature, isOther])))]))],
+  power = 0,
+  toughness = 0
+}

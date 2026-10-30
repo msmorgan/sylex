@@ -1,0 +1,12 @@
+# "Craft with [materials] [cost]" means "[Cost], Exile this permanent, Exile [materials] from
+# among permanents you control and/or cards in your graveyard: Return this card to the battlefield
+# transformed under its owner’s control. Activate only as a sorcery." [CR#702.167a]
+ability craft(cost: Cost) {
+  lexical = {
+    lemma = "craft",
+    parameters = [[Quality(Some("with")), Cost]],
+    verbs = [{lemma = "craft", frames = [Monotransitive]}]},
+  # TODO(spelling): The cost must be decomposed into the materials after 'with' and the remaining
+  # payment.
+  body = []
+}

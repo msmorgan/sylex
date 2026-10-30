@@ -1,0 +1,16 @@
+# "Split second" means "As long as this spell is on the stack, players can't cast other spells or
+# activate abilities that aren't mana abilities." [CR#702.61a]
+ability splitSecond {
+  lexical = {lemma = "split second"},
+  spelling = "split second",
+  body = [
+    static(
+      onlyWhile(
+        conjunction(
+          [
+            cant(actor(bare(isPlayer)), cast(bare(anotherSpell))),
+            cant(
+              actor(bare(isPlayer)),
+              activate(allOf(and([abilityHead(anyActivated), non(isManaAbility)]))))]),
+        is(thisSpell, in(stack))))]
+}

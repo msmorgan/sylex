@@ -1,1 +1,0 @@
-card := { name := "Time Walk", cost := [1, blue], types := [sorcery], text := [spell (extraTurn 1)] }

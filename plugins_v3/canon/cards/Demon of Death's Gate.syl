@@ -1,0 +1,18 @@
+card {
+  name = "Demon of Death's Gate",
+  cost = [6, black, black, black],
+  types = [creature],
+  subtypes = [demon],
+  text = [
+    static(
+      altCost(
+        this,
+        compound(
+          [
+            perform(payLife(6)),
+            perform(sacrifice(counted(exactly(3), and([isCreature, hasColor(black)]))))]))),
+    flying,
+    trample],
+  power = 9,
+  toughness = 9
+}

@@ -1,0 +1,5 @@
+# "until your next end step"
+template untilYourNextEndStep: Duration {
+  spelling = "until your next end step",
+  body = durationBetween(none, beginningOf(endStep, you, nextTime))
+}

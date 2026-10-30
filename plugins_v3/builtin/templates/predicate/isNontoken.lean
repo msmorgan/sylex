@@ -1,5 +1,0 @@
-template isNontoken : Predicate := {
-  spelling := "nontoken",
-  body :=
-    not isToken
-}

@@ -1,0 +1,7 @@
+# A creature with flying cannot be blocked except by creatures with flying and/or reach.
+# [CR#702.17b]
+ability reach {
+  lexical = {lemma = "reach"},
+  spelling = "reach",
+  body = []
+}

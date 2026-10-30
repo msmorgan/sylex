@@ -1,7 +1,0 @@
-subtype fractal := {
-  lexical := { lemma := "Fractal" },
-  spelling := "Fractal",
-  kind := creature,
-  name := "Fractal",
-  confers := []
-}

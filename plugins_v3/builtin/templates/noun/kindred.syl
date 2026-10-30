@@ -1,0 +1,4 @@
+template kindred: NounWord {
+  spelling = "kindred",
+  body = type(kindred)
+}

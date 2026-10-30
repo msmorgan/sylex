@@ -1,0 +1,1 @@
+primitive cardsAcross(left: NounPhrase, right: NounPhrase): Exchanged

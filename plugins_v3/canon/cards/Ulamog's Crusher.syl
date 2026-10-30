@@ -1,0 +1,9 @@
+card {
+  name = "Ulamog's Crusher",
+  cost = [8],
+  types = [creature],
+  subtypes = [eldrazi],
+  text = [annihilator(2), static(must(actor(thisCreature), attack))],
+  power = 8,
+  toughness = 8
+}

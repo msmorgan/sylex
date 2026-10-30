@@ -1,0 +1,8 @@
+card {
+  name = "Crash",
+  cost = [2, red],
+  types = [instant],
+  text = [
+    static(altCost(this, perform(sacrifice(a(and([isLand, hasSubtype(mountain)])))))),
+    spell(destroy(target(isArtifact)))]
+}

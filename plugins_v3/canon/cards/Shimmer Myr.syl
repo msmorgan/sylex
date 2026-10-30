@@ -1,0 +1,12 @@
+card {
+  name = "Shimmer Myr",
+  cost = [3],
+  types = [artifact, creature],
+  subtypes = [myr],
+  text = [
+    flash,
+    static(
+      can(actor(you), cast(bare(and([isSpell, isArtifact]))), asThough = asThoughHadFlash(them)))],
+  power = 2,
+  toughness = 2
+}

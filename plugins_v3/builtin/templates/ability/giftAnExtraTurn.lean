@@ -1,7 +1,0 @@
-/-- "Gift an extra turn" means the effect is "The chosen player takes an extra turn after
-this one." [CR#702.174g] -/
-template giftAnExtraTurn : Ability := {
-  spelling := "gift an extra turn",
-  body :=
-    gift (extraTurn 1)
-}

@@ -1,0 +1,11 @@
+card {
+  name = "Verity Circle",
+  cost = [2, blue],
+  types = [enchantment],
+  text = [
+    whenever(
+      does(actor(a(and([isCreature, anOpponentControls]))), setStatus(tapped, theActor)),
+      if = is(it, not(inCombat(declaredAttacker))),
+      action = may(draw(1))),
+    activated(mana([4, blue]), tap(target(and([isCreature, not(hasKeyword(flying))]))))]
+}

@@ -1,0 +1,9 @@
+card {
+  name = "Defang",
+  cost = [1, white],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    static(replace(would(by(enchanted(creature)), dealDamage), instead(preventDamage(allDamage))))]
+}

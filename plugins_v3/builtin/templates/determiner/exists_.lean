@@ -1,7 +1,0 @@
-/-- "if there is a …", "if you control a …": the indefinite is published for the consequent
-(`semantics-v3.md` §1.3, box 2). -/
-template exists_ (p : Predicate) : Condition := {
-  spelling := "there is a <p>",
-  body :=
-    thereAre (described (a .unmarked) p)
-}

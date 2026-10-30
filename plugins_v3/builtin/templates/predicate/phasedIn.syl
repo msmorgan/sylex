@@ -1,0 +1,7 @@
+# [CR#110.5]
+primitive phasedIn: Status {
+  lexical = {
+    prepositions = [
+      {lemma = "phased in", frames = [{complement = Intransitive, hosts = NominalAndPredicate}]}]},
+  spelling = "phased in"
+}

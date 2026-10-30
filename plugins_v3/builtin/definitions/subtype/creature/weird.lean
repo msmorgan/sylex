@@ -1,7 +1,0 @@
-subtype weird := {
-  lexical := { lemma := "Weird" },
-  spelling := "Weird",
-  kind := creature,
-  name := "Weird",
-  confers := []
-}

@@ -1,0 +1,6 @@
+ability_word enrage(ability: Ability) {
+  lexical = {lemma = "enrage", listed = Rules},
+  label = "enrage",
+  spelling = "enrage — <ability>",
+  body = ability
+}

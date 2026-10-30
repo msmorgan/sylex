@@ -1,5 +1,0 @@
-/-- "[cost]: <action>. Only <who> may activate this ability." -/
-template activatedBy (cost : Cost) (action : Action) (who : NounPhrase) : Ability := {
-  spelling := "<cost>: <action>. Only <who> may activate this ability.",
-  body := activated cost action none none none (some who)
-}

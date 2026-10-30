@@ -1,0 +1,12 @@
+card {
+  name = "Strionic Resonator",
+  cost = [2],
+  types = [artifact],
+  text = [
+    activated(
+      compound([mana([2]), tapSymbol]),
+      sequentially(
+        [
+          copyOnStack(target(and([abilityHead(anyTriggered), youControl]))),
+          may(chooseNewTargets(that(copied(ability))))]))]
+}

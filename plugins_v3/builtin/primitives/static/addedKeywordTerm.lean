@@ -1,6 +1,0 @@
-/-- The keyword a "the same is true for" list names, added: itself when named bare, each variant
-the objects `holders` describes have when a family [CR#702.1c]. -/
--- [CR#702.1c]
-primitive addedKeywordTerm (term : KeywordTerm) (holders : Predicate) : CharacteristicEdit := {
-  body := Semantics.Primitives.CharacteristicEdit.addedKeywordTerm term holders
-}

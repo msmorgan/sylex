@@ -1,9 +1,0 @@
-card := {
-  name := "Drudge Skeletons",
-  cost := [1, black],
-  types := [creature],
-  subtypes := [skeleton],
-  text := [activated [black] (regenerate thisCreature)],
-  power := 1,
-  toughness := 1
-}

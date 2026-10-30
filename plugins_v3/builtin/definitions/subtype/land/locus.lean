@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
-subtype locus := {
-  lexical := { lemma := "Locus", plural := "Loci" },
-  spelling := "Locus",
-  kind := land,
-  name := "Locus",
-  confers := []
-}

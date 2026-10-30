@@ -1,0 +1,14 @@
+card {
+  name = "Bloodline Pretender",
+  cost = [3],
+  types = [artifact, creature],
+  subtypes = [shapeshifter],
+  text = [
+    changeling,
+    static(entersChoosing(thisCreature, subtype(creature))),
+    whenever(
+      does(actor(a(and([isCreature, youControl, isOther, ofChosen(subtype(creature))]))), enter),
+      putCounters(1, printedKind(p1p1Counter), thisCreature))],
+  power = 2,
+  toughness = 2
+}

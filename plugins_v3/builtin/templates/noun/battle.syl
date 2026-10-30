@@ -1,0 +1,4 @@
+template battle: NounWord {
+  spelling = "battle",
+  body = type(battle)
+}

@@ -1,6 +1,0 @@
-card := {
-  name := "Fellwar Stone",
-  cost := [2],
-  types := [artifact],
-  text := [activated tapSymbol (addMana 1 (ofTypeProducibleBy (a [isLand, anOpponentControls])))]
-}

@@ -1,0 +1,16 @@
+card {
+  name = "Heat Wave",
+  cost = [2, red],
+  types = [enchantment],
+  text = [
+    cumulativeUpkeep(mana([red])),
+    static(
+      cant(
+        actor(allOf(and([isCreature, hasColor(blue)]))),
+        block(allOf(and([isCreature, youControl]))))),
+    static(
+      gatedBy(
+        perform(payLife(forEach(1, and([isCreature, isBlocking, controlledBy(they)])))),
+        actor(allOf(and([isCreature, non(hasColor(blue))]))),
+        block(allOf(and([isCreature, youControl])))))]
+}

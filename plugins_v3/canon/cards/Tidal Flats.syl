@@ -1,0 +1,20 @@
+card {
+  name = "Tidal Flats",
+  cost = [blue],
+  types = [enchantment],
+  text = [
+    activated(
+      mana([blue, blue]),
+      doForEach(
+        each(and([isCreature, isAttacking, not(hasKeyword(flying))])),
+        instruct(
+          controllerOf(it),
+          doUnless(
+            instruct(
+              you,
+              gain(
+                allOf(and([isCreature, youControl, inCombat(blockerOf, that(creature))])),
+                firstStrike,
+                untilEndOfTurn)),
+            mana([1])))))]
+}

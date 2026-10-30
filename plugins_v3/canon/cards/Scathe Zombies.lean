@@ -1,8 +1,0 @@
-card := {
-  name := "Scathe Zombies",
-  cost := [2, black],
-  types := [creature],
-  subtypes := [zombie],
-  power := 2,
-  toughness := 2
-}

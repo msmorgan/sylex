@@ -1,0 +1,10 @@
+# "Bushido N" with its definition, a triggered ability [CR#702.45a].
+ability bushido(count: Amount) {
+  lexical = {lemma = "bushido", parameters = [[Amount]]},
+  spelling = "bushido <count>",
+  body = [
+    whenever(
+      does(actor(thisCreature), block),
+      or = [does(any, becomeBlocked(thisCreature))],
+      action = get(thisCreature, up(count), up(count), untilEndOfTurn))]
+}

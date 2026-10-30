@@ -1,7 +1,0 @@
-subtype necron := {
-  lexical := { lemma := "Necron" },
-  spelling := "Necron",
-  kind := creature,
-  name := "Necron",
-  confers := []
-}

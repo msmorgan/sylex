@@ -1,0 +1,12 @@
+card {
+  name = "Psychic Purge",
+  cost = [blue],
+  types = [sorcery],
+  text = [
+    spell(instruct(this, dealDamage(1, target(isAnyTarget)))),
+    when(
+      causes(
+        bySource(a(and([or([isSpell, abilityHead(anyOnStack)]), anOpponentControls]))),
+        does(actor(you), discard(this))),
+      instruct(that(player), loseLife(5)))]
+}

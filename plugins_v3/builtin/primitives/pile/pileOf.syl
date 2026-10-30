@@ -1,0 +1,2 @@
+# A pile described by its count, optionally naming the player who chooses it.
+primitive pileOf(count: SliceCount, by: Option(NounPhrase) = none): NounPhrase

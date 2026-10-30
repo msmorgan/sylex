@@ -1,0 +1,15 @@
+card {
+  name = "Katara, the Fearless",
+  cost = [green, white, blue],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [human, warrior, ally],
+  text = [
+    static(
+      additionalTriggers(
+        triggers(
+          a(and([abilityHead(anyTriggered), abilityOf(a(and([hasSubtype(ally), youControl])))]))),
+        exactly(1)))],
+  power = 3,
+  toughness = 3
+}

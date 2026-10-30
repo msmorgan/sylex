@@ -1,0 +1,10 @@
+card {
+  name = "Explosive Singularity",
+  cost = [8, red, red],
+  types = [sorcery],
+  text = [
+    static(
+      addedCost(perform(tap(counted(anyNumber, and([isCreature, youControl, isUntapped])))), true)),
+    static(costShift(this, less(times(1, groupSize)))),
+    spell(instruct(this, dealDamage(10, target(isAnyTarget))))]
+}

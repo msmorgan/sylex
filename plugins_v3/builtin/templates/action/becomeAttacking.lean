@@ -1,7 +1,0 @@
-/-- "<subject> becomes attacking [<defender>]" -/
-template becomeAttacking (subject : NounPhrase) (defender : Option NounPhrase) : Action := {
-  -- TODO(spelling): Include or omit the clauses supplied by defender.
-  body :=
-    combat subject
-      (participation (attacking defender))
-}

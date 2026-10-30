@@ -1,0 +1,6 @@
+counter intelCounter {
+  lexical = {lemma = "intel counter"},
+  spelling = "intel counter",
+
+  confers = []
+}

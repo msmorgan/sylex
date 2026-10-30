@@ -1,0 +1,6 @@
+counter rejectionCounter {
+  lexical = {lemma = "rejection counter"},
+  spelling = "rejection counter",
+
+  confers = []
+}

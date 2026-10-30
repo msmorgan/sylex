@@ -1,7 +1,0 @@
-/-- "<subject> phases out" [CR#702.26b] -/
--- [CR#702.26b]
-template phaseOut : Action := {
-  spelling := "phases out",
-  body :=
-    setStatus phasedOut theActor
-}

@@ -1,0 +1,8 @@
+# "<spec>. This effect doesn't remove <subject>.": an exemption from the one state-based
+# consequence of `spec`, a protection grant or a "can't be enchanted" clause, that would remove
+# the Attachments `subject` names from its host [CR#702.16n,702.16p,303.4c,704.5m]
+# (`StaticSpec.retention`).
+# [CR#702.16n,702.16p,303.4c,704.5m]
+primitive retention(spec: StaticSpec, subject: NounPhrase): StaticSpec {
+  spelling = "<spec>. This effect doesn't remove <subject>."
+}

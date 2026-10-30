@@ -1,6 +1,0 @@
-/-- "the number of times <subject>'s <keyword> cost was paid" -/
-template timesPaid (which : LinkSource) (subject : NounPhrase) : Amount := {
-  spelling := "the number of times <subject>'s <which> cost was paid",
-  body :=
-    paid (timesPaid which) subject
-}

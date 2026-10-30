@@ -1,0 +1,6 @@
+card {
+  name = "Mindlock Orb",
+  cost = [3, blue],
+  types = [artifact],
+  text = [static(cant(actor(bare(isPlayer)), search(libraries)))]
+}

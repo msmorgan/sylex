@@ -1,0 +1,14 @@
+card {
+  name = "Candles' Glow",
+  cost = [1, white],
+  types = [instant],
+  subtypes = [arcane],
+  text = [
+    spell(
+      establishThroughout(
+        replace(
+          would(any, dealDamage(recipient = target(isAnyTarget))),
+          instead(preventDamage(theNext(3), also = gainLife(preventedThisWay)))),
+        thisTurn)),
+    splice(hasSubtype(arcane), mana([1, white]))]
+}

@@ -1,0 +1,12 @@
+card {
+  name = "Xenograft",
+  cost = [4, blue],
+  types = [enchantment],
+  text = [
+    static(entersChoosing(thisEnchantment, subtype(creature))),
+    static(
+      qualityChange(
+        allOf(and([isCreature, youControl])),
+        adds,
+        chosenQuality(ofChosen(subtype(creature)))))]
+}

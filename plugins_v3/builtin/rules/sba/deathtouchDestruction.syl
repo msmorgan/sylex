@@ -1,0 +1,16 @@
+# [CR#702.2b,704.5h] "If a creature has toughness greater than 0, and it's been dealt damage by
+# a source with deathtouch since the last time state-based actions were checked, that creature is
+# destroyed." The source is read as it dealt the damage, from any zone [CR#702.2d]; "is destroyed"
+# is the destroy action, which regeneration can replace.
+sba deathtouchDestruction {
+  body = {
+    scope = isCreature,
+    when = and(
+      [
+        compareAmt(toughnessOf(this), greater, 0),
+        did(
+          by(a(and([isSource, hasKeyword(theKeyword(deathtouch))]))),
+          dealDamage(recipient = this),
+          within(durationBetween(stateBasedActionsChecked, now)))]),
+    then = destroy(this)}
+}

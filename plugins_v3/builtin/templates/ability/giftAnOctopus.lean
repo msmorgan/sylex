@@ -1,7 +1,0 @@
-/-- "Gift an Octopus" means the effect is "The chosen player creates an 8/8
-blue Octopus creature token." [CR#702.174i] -/
-template giftAnOctopus : Ability := {
-  spelling := "gift an Octopus",
-  body :=
-    gift (create 1 (creatureToken 8 8 [blue] [octopus]))
-}

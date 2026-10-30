@@ -1,8 +1,0 @@
-/-- A door of a Room permanent is one half of that permanent. [CR#709.5j] -/
-subtype room := {
-  lexical := { lemma := "Room" },
-  spelling := "Room",
-  kind := enchantment,
-  name := "Room",
-  confers := []
-}

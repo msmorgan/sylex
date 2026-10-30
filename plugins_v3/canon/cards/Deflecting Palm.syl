@@ -1,0 +1,16 @@
+card {
+  name = "Deflecting Palm",
+  cost = [red, white],
+  types = [instant],
+  text = [
+    spell(
+      establishThroughout(
+        replace(
+          would(actor(aYourChoice(isSource)), dealDamage(recipient = you)),
+          instead(
+            preventDamage(
+              allDamage,
+              also = instruct(this, dealDamage(thatMuch, controllerOf(thatSource))))),
+          use = nextTimeOnly),
+        thisTurn))]
+}

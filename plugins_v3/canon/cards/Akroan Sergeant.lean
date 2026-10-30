@@ -1,9 +1,0 @@
-card := {
-  name := "Akroan Sergeant",
-  cost := [2, red],
-  types := [creature],
-  subtypes := [human, soldier],
-  text := [firstStrike, renown 1],
-  power := 2,
-  toughness := 2
-}

@@ -1,9 +1,0 @@
-/-- "vote for <ballot> [<times> times]" (`Definition`, [CR#701.38]). -/
-action vote (disclosure : Disclosure := openly)
-    (ballot : Ballot := anyBallot)
-    (times : Option Quantity := none) : Action := {
-  -- TODO(spelling): Include or omit the clauses supplied by times.
-  lexical := { verbs := [{ lemma := "vote", frames := [(Prepositional ["for"]), Intransitive] }] },
-  body :=
-    actionVote none disclosure ballot times
-}

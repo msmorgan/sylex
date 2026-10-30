@@ -1,5 +1,0 @@
-template thisSpell : NounPhrase := {
-  spelling := "this spell",
-  body :=
-    headed spell this_
-}

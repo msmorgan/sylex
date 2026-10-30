@@ -1,6 +1,0 @@
-/-- Paying the spell's or ability's own cost [CR#601.2f]. -/
--- [CR#601.2f]
-primitive itsOwnCost : PlayPayment := {
-  body :=
-    Semantics.Primitives.PlayPayment.itsOwnCost
-}

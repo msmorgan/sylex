@@ -1,8 +1,0 @@
-/-- A vigilance counter causes its bearer to gain vigilance; keyword counters apply in layer 6.
-[CR#122.1b,613.1f] -/
-counter vigilanceCounter := {
-  lexical := { lemma := "vigilance counter" },
-  spelling := "vigilance counter",
-  holder := object,
-  confers := []
-}

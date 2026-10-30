@@ -1,8 +1,0 @@
-/-- Solved is a permanent designation [CR#719.3b]. -/
-designation solved := {
-  lexical := { adjectives := ["solved"] },
-  spelling := "solved",
-  scope := (.heldBy object),
-  sole := false,
-  confers := []
-}

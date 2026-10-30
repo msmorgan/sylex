@@ -1,0 +1,14 @@
+# "Modular N" with its definition, a static ability and a triggered one [CR#702.43a].
+ability modular(count: Amount) {
+  lexical = {lemma = "modular", parameters = [[Amount], [DashKeyword]]},
+  spelling = "modular <count>",
+  body = [
+    static(entersWithCounters(thisPermanent, count, p1p1Counter)),
+    when(
+      does(actor(thisPermanent), die),
+      may(
+        putCounters(
+          countersOn(p1p1Counter, thisPermanent),
+          printedKind(p1p1Counter),
+          target(and([isArtifact, isCreature])))))]
+}

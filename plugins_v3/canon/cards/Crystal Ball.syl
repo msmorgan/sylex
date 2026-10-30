@@ -1,0 +1,6 @@
+card {
+  name = "Crystal Ball",
+  cost = [3],
+  types = [artifact],
+  text = [activated(compound([mana([1]), tapSymbol]), scry(2))]
+}

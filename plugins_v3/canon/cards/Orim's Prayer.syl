@@ -1,0 +1,9 @@
+card {
+  name = "Orim's Prayer",
+  cost = [1, white, white],
+  types = [enchantment],
+  text = [
+    whenever(
+      does(actor(counted(orMore(1), isCreature)), attack(you)),
+      gainLife(forEach(1, and([isAttacking, isCreature]))))]
+}

@@ -1,0 +1,9 @@
+# "<performer> cloaks <subject>" (`Definition`, [CR#701.58a]).
+action cloak(subject: NounPhrase) {
+  lexical = {verbs = [{lemma = "cloak", frames = [Monotransitive]}]},
+  spelling = "cloak <subject>",
+  body = sequentially(
+    [
+      turnFaceDown(subject, faceDownWardedCreature),
+      move(subject, wherever, battlefield, arrival, [faceDownAs(faceDownWardedCreature)])])
+}

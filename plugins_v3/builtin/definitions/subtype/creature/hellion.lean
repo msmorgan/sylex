@@ -1,7 +1,0 @@
-subtype hellion := {
-  lexical := { lemma := "Hellion" },
-  spelling := "Hellion",
-  kind := creature,
-  name := "Hellion",
-  confers := []
-}

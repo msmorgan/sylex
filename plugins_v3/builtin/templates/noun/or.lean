@@ -1,4 +1,0 @@
-/-- A disjunction of Noun Phrases. -/
-template or (phrases : List NounPhrase := []) : NounPhrase := {
-  body := coord .or phrases
-}

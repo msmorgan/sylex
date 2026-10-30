@@ -1,0 +1,9 @@
+card {
+  name = "Aboroth",
+  cost = [4, green, green],
+  types = [creature],
+  subtypes = [elemental],
+  text = [cumulativeUpkeep(perform(putCounters(1, printedKind(m1m1Counter), thisCreature)))],
+  power = 9,
+  toughness = 9
+}

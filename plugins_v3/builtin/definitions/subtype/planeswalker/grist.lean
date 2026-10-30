@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype grist := {
-  lexical := { lemma := "Grist" },
-  spelling := "Grist",
-  kind := planeswalker,
-  name := "Grist",
-  confers := []
-}

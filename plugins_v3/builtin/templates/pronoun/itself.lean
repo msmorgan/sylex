@@ -1,5 +1,0 @@
-/-- "itself" / "himself" / "herself" -/
-template itself : NounPhrase := {
-  spelling := "itself",
-  body := refl .one
-}

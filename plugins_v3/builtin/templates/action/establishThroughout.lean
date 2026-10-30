@@ -1,5 +1,0 @@
-/-- "<spec> <duration>": a clause holding for a stated duration. -/
-template establishThroughout (spec : StaticSpec) (duration : Duration) : Action := {
-  spelling := "<spec> <duration>",
-  body := establish spec (some duration)
-}

@@ -1,0 +1,17 @@
+# "Replicate [cost]" means "As an additional cost to cast this spell, you may pay [cost] any
+# number of times" and "When you cast this spell, if a replicate cost was paid for it, copy it for
+# each time its replicate cost was paid. If the spell has any targets, you may choose new targets
+# for any of the copies." [CR#702.56a]
+ability replicate(cost: Cost) {
+  lexical = {lemma = "replicate", parameters = [[Cost]]},
+  spelling = "replicate <cost>",
+  body = [
+    static(addedCost(cost, true, anyNumberOfTimes)),
+    when(
+      does(actor(you), cast(thisSpell)),
+      sequentially(
+        [
+          copyOnStack(thisSpell, timesPaid(byKeyword(replicate), thisSpell)),
+          may(chooseNewTargets(those(copy)))]),
+      if = keywordCostPaid(replicate, thisSpell))]
+}

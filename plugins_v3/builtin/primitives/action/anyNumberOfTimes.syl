@@ -1,0 +1,4 @@
+# "any number of times"
+primitive anyNumberOfTimes: Repetition = .anyNumber {
+  spelling = "any number of times"
+}

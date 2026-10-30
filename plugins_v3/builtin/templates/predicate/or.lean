@@ -1,4 +1,0 @@
-/-- "<p> or <q>": some disjunct holds. -/
-template or (disjuncts : List Predicate) : Predicate := {
-  body := coord .or disjuncts
-}

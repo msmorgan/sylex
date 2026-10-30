@@ -1,6 +1,0 @@
-/-- "a … of their choice", the chooser being the last-mentioned player. -/
-template aTheirChoice (p : Predicate) : NounPhrase := {
-  spelling := "a <p> of their choice",
-  body :=
-    described (a .theirChoice) p
-}

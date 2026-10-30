@@ -1,7 +1,0 @@
-subtype warlock := {
-  lexical := { lemma := "Warlock" },
-  spelling := "Warlock",
-  kind := creature,
-  name := "Warlock",
-  confers := []
-}

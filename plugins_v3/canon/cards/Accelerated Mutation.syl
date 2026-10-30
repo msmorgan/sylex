@@ -1,0 +1,11 @@
+card {
+  name = "Accelerated Mutation",
+  cost = [3, green, green],
+  types = [instant],
+  text = [
+    spell(
+      sequentially(
+        [
+          get(target(isCreature), up(letter(x)), up(letter(x)), untilEndOfTurn),
+          define(x, aggregate(max, stat(manaValue), and([isPermanent, youControl])))]))]
+}

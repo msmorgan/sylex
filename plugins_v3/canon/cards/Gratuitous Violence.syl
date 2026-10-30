@@ -1,0 +1,12 @@
+card {
+  name = "Gratuitous Violence",
+  cost = [2, red, red, red],
+  types = [enchantment],
+  text = [
+    static(
+      replace(
+        would(
+          actor(a(and([isCreature, youControl]))),
+          dealDamage(recipient = a(or([isPermanent, isPlayer])))),
+        instead(instruct(it, dealDamage(times(2, thatMuch))))))]
+}

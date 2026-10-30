@@ -1,0 +1,13 @@
+card {
+  name = "Scapeshift",
+  cost = [2, green, green],
+  types = [sorcery],
+  text = [
+    spell(
+      sequentially(
+        [
+          sacrifice(counted(anyNumber, isLand)),
+          search(yourLibrary, counted(upToOf(groupSize), isLand)),
+          putOntoBattlefieldTapped(them),
+          shuffle]))]
+}

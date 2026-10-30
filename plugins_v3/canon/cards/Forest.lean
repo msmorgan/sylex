@@ -1,1 +1,0 @@
-card := { name := "Forest", supertypes := [basic], types := [land], subtypes := [forest] }

@@ -1,0 +1,5 @@
+# "until your next turn"
+template untilYourNextTurn: Duration {
+  spelling = "until your next turn",
+  body = durationBetween(none, beginningOf(turn, you, nextTime))
+}

@@ -1,0 +1,14 @@
+card {
+  name = "Pledge of Loyalty",
+  cost = [1, white],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    static(
+      retention(
+        abilityGrant(
+          enchanted(creature),
+          protection(eachKind(color, allOf(and([isPermanent, youControl]))))),
+        thisAura))]
+}

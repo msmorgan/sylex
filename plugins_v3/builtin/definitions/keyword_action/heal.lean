@@ -1,7 +1,0 @@
-/-- Heal damage already dealt to a permanent by removing that marked damage. [CR#701.69a] -/
-action heal (subject : NounPhrase) : Action := {
-  lexical := { verbs := [{ lemma := "heal", frames := [Monotransitive] }] },
-  spelling := "heal <subject>",
-  body :=
-    clearDamage subject
-}

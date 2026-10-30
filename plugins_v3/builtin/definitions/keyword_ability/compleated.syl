@@ -1,0 +1,23 @@
+# "Compleated": "If this permanent would enter with one or more loyalty counters on it and the
+# player who cast it chose to pay life for any part of its cost represented by Phyrexian mana
+# symbols, it instead enters the battlefield with that many loyalty counters minus two for each of
+# those mana symbols." [CR#702.150a] Two fewer for each is the entry's loyalty counters lowered by
+# twice their number.
+ability compleated {
+  lexical = {lemma = "compleated"},
+  spelling = "compleated",
+  body = [
+    static(
+      replace(
+        would(
+          actor(thisPermanent),
+          enter(riders = [withCounters(anyAmount, printedKind(loyaltyCounter), fresh)])),
+        doIf(
+          compareAmt(phyrexianPaidWithLife(thisSpell), atLeast, 1),
+          withRiders(
+            [
+              withCounters(
+                times(2, phyrexianPaidWithLife(thisSpell)),
+                printedKind(loyaltyCounter),
+                fewer)]))))]
+}

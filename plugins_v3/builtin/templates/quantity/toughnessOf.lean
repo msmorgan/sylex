@@ -1,4 +1,0 @@
-template toughnessOf (subject : NounPhrase) : Amount := {
-  spelling := "<subject>'s toughness",
-  body := statOf (.stat toughness) subject
-}

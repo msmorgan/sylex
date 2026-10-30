@@ -1,0 +1,1 @@
+primitive staticSpecMust(subj: Subject, action: Action, mods: DeonticMods): StaticSpec = .must

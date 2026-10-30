@@ -1,0 +1,16 @@
+card {
+  name = "Centaur of Attention",
+  cost = [3, green, green],
+  types = [creature],
+  subtypes = [centaur, performer],
+  text = [
+    when(does(actor(thisCreature), enter), sequentially([rollDice(5), storeResults(thisCreature)])),
+    at(beginningOfYour(combat), may(rerollStored(anyNumber, thisCreature))),
+    static(
+      conjunction(
+        [
+          getsPt(thisCreature, up(letter(x)), up(letter(x))),
+          letterDefinition(x, greatestStoredMatch(thisCreature))]))],
+  power = 3,
+  toughness = 3
+}

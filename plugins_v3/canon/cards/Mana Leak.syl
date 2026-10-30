@@ -1,0 +1,10 @@
+# Pins the unless-payment construction with the targeted spell’s controller
+# as the payer [CR#118.12a].
+card {
+  name = "Mana Leak",
+  cost = [1, blue],
+  types = [instant],
+  text = [
+    spell(
+      instruct(controllerOf(target(isSpell)), doUnless(instruct(you, counter(it)), mana([3]))))]
+}

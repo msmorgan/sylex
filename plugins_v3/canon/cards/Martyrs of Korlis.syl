@@ -1,0 +1,15 @@
+card {
+  name = "Martyrs of Korlis",
+  cost = [3, white, white],
+  types = [creature],
+  subtypes = [human],
+  text = [
+    static(
+      onlyWhile(
+        replace(
+          would(by(allOf(isArtifact)), dealDamage(recipient = you)),
+          instead(redirectDamage(allDamage, thisCreature))),
+        is(thisCreature, isUntapped)))],
+  power = 1,
+  toughness = 6
+}

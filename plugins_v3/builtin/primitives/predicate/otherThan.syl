@@ -1,0 +1,4 @@
+# "other than <np>"
+primitive otherThan(anchor: NounPhrase): Predicate {
+  spelling = "other than <np>"
+}

@@ -1,7 +1,0 @@
-/-- The Actor gets an Emblem with the specified name and Abilities [CR#114.1].
-The Ring is an example of a named Emblem [CR#701.54c]. -/
-template getNamedEmblem (name : String) (abilities : List Ability) : Action := {
-  -- TODO(spelling): Format and coordinate the abilities list entries, including the empty case.
-  body :=
-    createObject 1 (emblem (some name) abilities)
-}

@@ -1,8 +1,0 @@
-/-- "<subject> loses all abilities [except <except>]" -/
-template allAbilityLoss (subject : NounPhrase) (except : Option Predicate := none) :
-    StaticSpec := {
-  -- TODO(spelling): Include or omit the clauses supplied by except.
-  body :=
-    characteristicChange subject
-      [removedAbilities (allExcept except)]
-}

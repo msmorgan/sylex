@@ -1,0 +1,15 @@
+card {
+  name = "Indigo Faerie",
+  cost = [1, blue],
+  types = [creature],
+  subtypes = [faerie, wizard],
+  text = [
+    flying,
+    activated(
+      mana([blue]),
+      establishThroughout(
+        qualityChange(target(isPermanent), adds, colored(some([blue]))),
+        untilEndOfTurn))],
+  power = 1,
+  toughness = 1
+}

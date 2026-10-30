@@ -1,8 +1,0 @@
-/-- Renowned is a permanent designation [CR#702.112b]. -/
-designation renowned := {
-  lexical := { adjectives := ["renowned"] },
-  spelling := "renowned",
-  scope := (.heldBy object),
-  sole := false,
-  confers := []
-}

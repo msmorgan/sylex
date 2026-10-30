@@ -1,0 +1,13 @@
+card {
+  name = "Oracle of Mul Daya",
+  cost = [3, green],
+  types = [creature],
+  subtypes = [elf, shaman],
+  text = [
+    static(
+      can(actor(you), play(counted(additional(exactly(1)), isLand)), timing = onEachOfYourTurns)),
+    static(visibility(reveal, you, topOfLibrary)),
+    static(can(actor(you), play(allOf(isLand), from = onTop)))],
+  power = 2,
+  toughness = 2
+}

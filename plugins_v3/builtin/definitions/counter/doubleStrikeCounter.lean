@@ -1,8 +1,0 @@
-/-- A double strike counter causes its bearer to gain double strike; keyword counters apply in layer
-6. [CR#122.1b,613.1f] -/
-counter doubleStrikeCounter := {
-  lexical := { lemma := "double strike counter" },
-  spelling := "double strike counter",
-  holder := object,
-  confers := []
-}

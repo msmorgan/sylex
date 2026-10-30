@@ -1,0 +1,8 @@
+# "gain control of <subject> [from <from_>]" as an event or a forbidden act: "whenever an
+# opponent gains control of a permanent from you", a trigger that looks back in time [CR#603.10d],
+# or "can't gain control of them". The imperative is `gainControl`.
+# [CR#603.10d]
+primitive gainControlOf(
+  subject: NounPhrase,
+  from: Option(NounPhrase) = none): Action = .changeControl
+# TODO(spelling): Include or omit the clauses supplied by from_.

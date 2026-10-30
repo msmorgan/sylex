@@ -1,7 +1,0 @@
-/-- "During [<whose>] <part>, <spec>" -/
-template partScope (part : TurnPart) (whose : Option NounPhrase) (spec : StaticSpec) :
-    StaticSpec := {
-  -- TODO(spelling): Include or omit the clauses supplied by whose.
-  body :=
-    conditional spec (duringPart part whose) .asLongAs
-}

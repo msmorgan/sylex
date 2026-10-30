@@ -1,7 +1,0 @@
-subtype beeble := {
-  lexical := { lemma := "Beeble" },
-  spelling := "Beeble",
-  kind := creature,
-  name := "Beeble",
-  confers := []
-}

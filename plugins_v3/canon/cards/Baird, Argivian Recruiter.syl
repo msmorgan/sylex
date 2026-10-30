@@ -1,0 +1,17 @@
+# Baird, Argivian Recruiter: "if you control a creature with power greater than its base
+# power", each creature measured against its own base power [CR#208.4b].
+card {
+  name = "Baird, Argivian Recruiter",
+  cost = [red, white],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [human, soldier],
+  text = [
+    at(
+      beginningOfYour(endStep),
+      if = exists(
+        comparesOwnStat(power, and([isCreature, youControl]), greater, basePowerOf(ownMember))),
+      action = create(1, written(creatureToken(1, 1, [white], [soldier]))))],
+  power = 2,
+  toughness = 2
+}

@@ -1,0 +1,8 @@
+card {
+  name = "Abrupt Decay",
+  cost = [black, green],
+  types = [instant],
+  text = [
+    static(cant(any, counter(thisSpell))),
+    spell(destroy(target(and([isPermanent, non(isLand), hasManaValue(atMost, 3)]))))]
+}

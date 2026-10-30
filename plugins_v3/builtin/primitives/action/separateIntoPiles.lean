@@ -1,6 +1,0 @@
-/-- The actor separates the group into the specified number of piles. -/
-primitive separateIntoPiles (group : NounPhrase) (piles : Nat)
-    (faces : List PileFace := []) : Action := {
-  body :=
-    Semantics.Primitives.Action.separateIntoPiles group piles faces
-}

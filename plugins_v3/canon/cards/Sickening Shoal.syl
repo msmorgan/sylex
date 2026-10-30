@@ -1,0 +1,12 @@
+card {
+  name = "Sickening Shoal",
+  cost = [variable, black, black],
+  types = [instant],
+  subtypes = [arcane],
+  text = [
+    static(
+      altCost(
+        this,
+        perform(exile(a(and([hasColor(black), hasManaValue(eq, letter(x)), in(yourHand)])))))),
+    spell(get(target(isCreature), down(letter(x)), down(letter(x)), untilEndOfTurn))]
+}

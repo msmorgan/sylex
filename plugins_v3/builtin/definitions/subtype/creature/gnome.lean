@@ -1,7 +1,0 @@
-subtype gnome := {
-  lexical := { lemma := "Gnome" },
-  spelling := "Gnome",
-  kind := creature,
-  name := "Gnome",
-  confers := []
-}

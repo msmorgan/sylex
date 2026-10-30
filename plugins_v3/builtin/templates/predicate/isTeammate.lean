@@ -1,6 +1,0 @@
-/-- "teammate": a teammate of yours. -/
-template isTeammate : Predicate := {
-  spelling := "teammate",
-  body :=
-    isTeammateOf you
-}

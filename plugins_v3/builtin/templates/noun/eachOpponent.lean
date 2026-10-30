@@ -1,6 +1,0 @@
-/-- "each opponent" -/
-template eachOpponent : NounPhrase := {
-  spelling := "each opponent",
-  body :=
-    each isOpponent
-}

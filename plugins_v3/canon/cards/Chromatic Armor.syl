@@ -1,0 +1,23 @@
+card {
+  name = "Chromatic Armor",
+  cost = [1, white, blue],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    static(entersChoosing(thisAura, color)),
+    static(entersWithCounters(thisAura, 1, sleightCounter)),
+    static(
+      replace(
+        would(
+          by(allOf(and([isSource, ofTheLastChosen(color)]))),
+          dealDamage(recipient = enchanted(creature))),
+        instead(preventDamage(allDamage)))),
+    activated(
+      mana([variable]),
+      sequentially(
+        [
+          putCounters(1, printedKind(sleightCounter), thisAura),
+          choose(a(quality(color))),
+          define(x, countersOn(sleightCounter, thisAura))]))]
+}

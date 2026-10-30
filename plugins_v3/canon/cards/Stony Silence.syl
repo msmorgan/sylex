@@ -1,0 +1,8 @@
+card {
+  name = "Stony Silence",
+  cost = [1, white],
+  types = [enchantment],
+  text = [
+    static(
+      cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(allOf(isArtifact))])))))]
+}

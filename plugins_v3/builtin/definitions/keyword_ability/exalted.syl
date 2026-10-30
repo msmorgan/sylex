@@ -1,0 +1,11 @@
+# "Whenever a creature you control attacks alone" [CR#702.83a]: a creature attacks alone when it
+# is the only creature declared as an attacker [CR#702.83b], so the trigger event is you attacking
+# with exactly one creature, not a check made again on resolution.
+ability exalted {
+  lexical = {lemma = "exalted"},
+  spelling = "exalted",
+  body = [
+    whenever(
+      does(actor(you), attackWith(counted(exactly(1), and([isCreature, youControl])))),
+      get(that(creature), up(1), up(1), untilEndOfTurn))]
+}

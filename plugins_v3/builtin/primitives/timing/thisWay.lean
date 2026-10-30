@@ -1,6 +1,0 @@
-/-- "… this way": the event the enclosing action caused. -/
-primitive thisWay : LookbackSpan := {
-  spelling := "this way",
-  body :=
-    Semantics.Primitives.LookbackSpan.thisWay
-}

@@ -1,0 +1,14 @@
+card {
+  name = "Faith's Reward",
+  cost = [3, white],
+  types = [instant],
+  text = [
+    spell(
+      returnToBattlefield(
+        allOf(
+          and(
+            [
+              isPermanentCard,
+              in(yourGraveyard),
+              was(putIntoFromBattlefield(which, yourGraveyard), within(soFarThisTurn))]))))]
+}

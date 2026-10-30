@@ -1,0 +1,4 @@
+# "the rest [of them]"
+primitive theRest(plurality: Plurality = many): NounPhrase {
+  spelling = "the rest"
+}

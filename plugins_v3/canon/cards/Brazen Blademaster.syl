@@ -1,0 +1,13 @@
+card {
+  name = "Brazen Blademaster",
+  cost = [2, red],
+  types = [creature],
+  subtypes = [orc, pirate],
+  text = [
+    whenever(
+      does(actor(thisCreature), attack),
+      while = whileTrue(compareAmt(countOf(and([isArtifact, youControl])), atLeast, 2)),
+      action = get(it, up(2), up(1), untilEndOfTurn))],
+  power = 2,
+  toughness = 3
+}

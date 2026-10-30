@@ -1,0 +1,5 @@
+# "on the bottom of its owner's library"
+template onBottom: Location {
+  spelling = "on the bottom of its owner's library",
+  body = fromEnd(bottom, loc = zone(library, none))
+}

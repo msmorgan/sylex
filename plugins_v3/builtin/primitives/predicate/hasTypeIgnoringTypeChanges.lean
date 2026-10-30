@@ -1,7 +1,0 @@
-/-- "<type>, ignoring any type-changing effects that would affect it" [CR#702.44a,613.1d] -/
--- [CR#702.44a,613.1d]
-primitive hasTypeIgnoringTypeChanges (type : CardType) : Predicate := {
-  spelling := "<type>, ignoring any type-changing effects that would affect it",
-  body :=
-    Semantics.Primitives.Predicate.hasTypeIgnoringTypeChanges type
-}

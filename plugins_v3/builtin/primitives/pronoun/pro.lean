@@ -1,5 +1,0 @@
-primitive pro (reach : Reach) (plurality : Plurality) : NounPhrase := {
-  -- TODO(spelling): Select the pronoun from reach, plurality, and the antecedent's grammatical
-  -- role.
-  body := Semantics.Primitives.NounPhrase.pro reach plurality
-}

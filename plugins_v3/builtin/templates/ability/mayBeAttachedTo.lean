@@ -1,7 +1,0 @@
-/-- "<subject> may be attached to <host>": the legal-host permission over the attach deed's host
-role [CR#701.3a,301.5]. -/
-template mayBeAttachedTo (subject host : NounPhrase) : StaticSpec := {
-  spelling := "<subject> may be attached to <host>",
-  body :=
-    can any (attachTo subject host)
-}

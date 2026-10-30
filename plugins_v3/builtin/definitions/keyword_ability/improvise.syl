@@ -1,0 +1,12 @@
+# "Improvise" means "For each generic mana in this spell's total cost, you may tap an untapped
+# artifact you control rather than pay that mana." [CR#702.126a] It is neither an additional nor
+# an alternative cost. [CR#702.126b]
+ability improvise {
+  lexical = {lemma = "improvise"},
+  spelling = "improvise",
+  body = [
+    static(
+      paySubstitute(
+        thisSpell,
+        {action = tap(a(and([isUntapped, isArtifact, youControl]))), pays = [generic]}))]
+}

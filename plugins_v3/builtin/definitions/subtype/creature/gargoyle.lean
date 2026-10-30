@@ -1,9 +1,0 @@
-/-- Subtypes are type-line vocabulary [CR#205.3a,205.3b]. This catalog row supplies the word
-without an intrinsic conferral. -/
-subtype gargoyle := {
-  lexical := { lemma := "Gargoyle" },
-  spelling := "Gargoyle",
-  kind := creature,
-  name := "Gargoyle",
-  confers := []
-}

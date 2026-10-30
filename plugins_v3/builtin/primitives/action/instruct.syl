@@ -1,0 +1,4 @@
+# "<performer> <body>": the handoff (`Action.instruct`), to a player or a permanent.
+primitive instruct(subj: NounPhrase, action: Action): Action {
+  spelling = "<performer> <body>"
+}

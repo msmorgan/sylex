@@ -1,5 +1,0 @@
-/-- Perform the action for each member of the group. -/
-primitive doForEach (group : NounPhrase) (body : Action) : Action := {
-  body :=
-    Semantics.Primitives.Action.doForEach group body
-}

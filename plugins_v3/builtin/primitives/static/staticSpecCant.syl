@@ -1,0 +1,1 @@
+primitive staticSpecCant(subj: Subject, action: Action, mods: DeonticMods): StaticSpec = .cant

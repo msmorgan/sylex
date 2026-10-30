@@ -1,7 +1,0 @@
-/-- "the Phyrexian mana symbols in <spell>'s cost its caster paid life for" [CR#107.4f,702.150a] -/
--- [CR#107.4f,702.150a]
-template phyrexianPaidWithLife (spell : NounPhrase) : Amount := {
-  spelling := "the Phyrexian mana symbols in <spell>'s cost its caster paid life for",
-  body :=
-    paid phyrexianPaidWithLife spell
-}

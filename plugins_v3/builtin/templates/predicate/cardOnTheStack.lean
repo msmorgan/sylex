@@ -1,5 +1,0 @@
-template cardOnTheStack : Predicate := {
-  spelling := "card on the stack",
-  body :=
-    and [isCard, isSpell]
-}

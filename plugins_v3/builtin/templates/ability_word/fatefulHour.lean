@@ -1,7 +1,0 @@
-ability_word fatefulHour (ability : Ability) : Ability := {
-  lexical := { lemma := "fateful hour", listed := Rules },
-  label := "fateful hour",
-  spelling := "fateful hour — <ability>",
-  body :=
-    ability
-}

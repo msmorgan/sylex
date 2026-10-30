@@ -1,0 +1,7 @@
+card {
+  name = "Entrancing Melody",
+  cost = [variable, blue, blue],
+  types = [sorcery],
+  text = [
+    spell(establish(controlGrant(you, target(and([isCreature, hasManaValue(eq, letter(x))])))))]
+}

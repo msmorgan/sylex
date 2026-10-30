@@ -1,6 +1,0 @@
-/-- "a …" -/
-template a (p : Predicate) : NounPhrase := {
-  spelling := "a <p>",
-  body :=
-    described (a .unmarked) p
-}

@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text or Comprehensive Rules plural is attested. -/
-subtype cartouche := {
-  lexical := { lemma := "Cartouche" },
-  spelling := "Cartouche",
-  kind := enchantment,
-  name := "Cartouche",
-  confers := []
-}

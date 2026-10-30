@@ -1,0 +1,4 @@
+# "the chosen number"
+primitive chosenNumber(ref: ChoiceRef = theChoice): Amount {
+  spelling = "the chosen number"
+}

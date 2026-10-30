@@ -1,6 +1,0 @@
-/-- A duration that lasts while its condition holds. -/
-primitive forAsLongAs (condition : Condition) : Duration := {
-  spelling := "for as long as <condition>",
-  body :=
-    Semantics.Primitives.Duration.forAsLongAs condition
-}

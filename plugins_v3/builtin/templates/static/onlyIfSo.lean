@@ -1,5 +1,0 @@
-/-- "<spec> if <condition>" -/
-template onlyIfSo (spec : StaticSpec) (condition : Condition) : StaticSpec := {
-  spelling := "<spec> if <condition>",
-  body := conditional spec condition .ifSo
-}

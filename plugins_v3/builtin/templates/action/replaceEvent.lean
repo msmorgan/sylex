@@ -1,8 +1,0 @@
-/-- "If <clause> would happen, <replacement> instead [duration]." -/
-template replaceEvent (clause : WouldClause) (replacement : Replacement)
-    (duration : Option Duration) : Action := {
-  -- TODO(spelling): Include or omit the clauses supplied by duration.
-  body :=
-    establish
-      (replace clause replacement none repeatedly none) duration
-}

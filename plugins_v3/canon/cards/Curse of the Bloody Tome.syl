@@ -1,0 +1,9 @@
+card {
+  name = "Curse of the Bloody Tome",
+  cost = [2, blue],
+  types = [enchantment],
+  subtypes = [aura, curse],
+  text = [
+    enchant(isPlayer),
+    at(beginningOfPossessed(upkeep, enchanted(player)), instruct(that(player), mill(2)))]
+}

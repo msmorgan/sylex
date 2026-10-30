@@ -1,0 +1,4 @@
+# "you"
+primitive you: NounPhrase {
+  spelling = "you"
+}

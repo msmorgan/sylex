@@ -1,6 +1,0 @@
-/-- "As <subject> becomes attached, choose a <quality>." -/
-template attachChoosing (subject : NounPhrase) (sort : QualitySort) : StaticSpec := {
-  spelling := "As <subject> becomes attached, choose a <sort>.",
-  body :=
-    attachmentChoice subject (a (quality sort))
-}

@@ -1,0 +1,17 @@
+card {
+  name = "Autarch Mammoth",
+  cost = [4, green, green],
+  types = [creature],
+  subtypes = [elephant, mount],
+  text = [
+    when(
+      does(actor(thisCreature), enter),
+      joins = [
+        joinedHeadWhile(
+          does(actor(thisCreature), attack),
+          whileTrue(is(thisCreature, hasDesignation(saddled))))],
+      action = create(1, written(creatureToken(3, 3, [green], [elephant])))),
+    saddle(5)],
+  power = 5,
+  toughness = 5
+}

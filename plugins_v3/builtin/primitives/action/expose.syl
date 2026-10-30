@@ -1,0 +1,2 @@
+# Reveal or look at the specified cards or zone.
+primitive expose(verb: ExposeVerb, exposed: Exposed): Action

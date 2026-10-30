@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype zariel := {
-  lexical := { lemma := "Zariel" },
-  spelling := "Zariel",
-  kind := planeswalker,
-  name := "Zariel",
-  confers := []
-}

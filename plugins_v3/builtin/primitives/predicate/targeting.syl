@@ -1,0 +1,2 @@
+# Authoring primitive for `Predicate.targets`.
+primitive targeting(subject: NounPhrase, extent: TargetExtent): Predicate = .targets

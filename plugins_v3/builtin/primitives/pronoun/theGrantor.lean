@@ -1,5 +1,0 @@
-/-- The object that granted this ability, identified by its head noun. -/
-primitive theGrantor (head : NounWord) : NounPhrase := {
-  body :=
-    Semantics.Primitives.NounPhrase.theGrantor head
-}

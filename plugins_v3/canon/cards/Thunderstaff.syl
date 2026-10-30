@@ -1,0 +1,15 @@
+card {
+  name = "Thunderstaff",
+  cost = [3],
+  types = [artifact],
+  text = [
+    static(
+      onlyWhile(
+        replace(
+          would(actor(a(isCreature)), dealDamage(recipient = you, kind = combat)),
+          instead(preventDamage(ofThatDamage(1)))),
+        is(thisArtifact, isUntapped))),
+    activated(
+      compound([mana([2]), tapSymbol]),
+      get(allOf(and([isCreature, isAttacking])), up(1), up(0), untilEndOfTurn))]
+}

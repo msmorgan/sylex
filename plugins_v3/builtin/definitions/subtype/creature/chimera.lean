@@ -1,7 +1,0 @@
-subtype chimera := {
-  lexical := { lemma := "Chimera" },
-  spelling := "Chimera",
-  kind := creature,
-  name := "Chimera",
-  confers := []
-}

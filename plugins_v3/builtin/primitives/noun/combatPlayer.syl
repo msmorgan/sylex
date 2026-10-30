@@ -1,0 +1,2 @@
+# The player identified by their combat role.
+primitive combatPlayer(role: CombatRole): NounPhrase

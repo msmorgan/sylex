@@ -1,0 +1,12 @@
+card {
+  name = "Voice of All",
+  cost = [2, white, white],
+  types = [creature],
+  subtypes = [angel],
+  text = [
+    flying,
+    static(entersChoosing(thisCreature, color)),
+    static(abilityGrant(thisCreature, protection(ofChosen(color))))],
+  power = 2,
+  toughness = 2
+}

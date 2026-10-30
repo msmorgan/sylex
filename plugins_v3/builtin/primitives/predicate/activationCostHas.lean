@@ -1,8 +1,0 @@
-/-- "with <cost> in its activation cost": an activated ability whose cost includes `cost`
-[CR#602.1a]. -/
--- [CR#602.1a]
-primitive activationCostHas (cost : Cost) : Predicate := {
-  spelling := "with <cost> in its activation cost",
-  body :=
-    Semantics.Primitives.Predicate.activationCostHas cost
-}

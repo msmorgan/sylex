@@ -1,6 +1,0 @@
-counter despairCounter := {
-  lexical := { lemma := "despair counter" },
-  spelling := "despair counter",
-  holder := object,
-  confers := []
-}

@@ -1,0 +1,11 @@
+card {
+  name = "Primal Surge",
+  cost = [8, green, green],
+  types = [sorcery],
+  text = [
+    spell(
+      sequentially(
+        [
+          exile(topSlice(1)),
+          doIf(is(it, isPermanentCard), may(putOntoBattlefield(it), repeat(again)))]))]
+}

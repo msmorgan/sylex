@@ -1,0 +1,4 @@
+# "a number <quantity>"
+primitive number(quantity: Quantity): ChoiceDomain {
+  spelling = "a number <quantity>"
+}

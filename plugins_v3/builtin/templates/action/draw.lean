@@ -1,6 +1,0 @@
-/-- "draw <amount> cards" -/
-template draw (amount : Amount) : Action := {
-  spelling := "draw <amount> cards",
-  body :=
-    drawCount (exactlyOf amount)
-}

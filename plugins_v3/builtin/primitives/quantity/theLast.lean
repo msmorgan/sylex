@@ -1,7 +1,0 @@
-/-- "the last": the removal that empties the object of counters [CR#702.62a,310.12b]. -/
--- [CR#702.62a,310.12b]
-primitive theLast : Quantity := {
-  spelling := "the last",
-  body :=
-    Semantics.Primitives.Quantity.theLast
-}

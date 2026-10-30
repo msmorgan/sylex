@@ -1,8 +1,0 @@
-/-- "<amount> damage is marked on <subject>": the result of damage dealt to a creature by a source
-with neither wither nor infect [CR#120.3e]. -/
--- [CR#120.3e]
-primitive markDamage (subject : NounPhrase) (amount : Amount := anyAmount) : Action := {
-  spelling := "<amount> damage is marked on <subject>",
-  body :=
-    Semantics.Primitives.Action.markDamage subject amount
-}

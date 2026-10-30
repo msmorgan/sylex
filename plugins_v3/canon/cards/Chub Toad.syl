@@ -1,0 +1,13 @@
+card {
+  name = "Chub Toad",
+  cost = [2, green],
+  types = [creature],
+  subtypes = [frog],
+  text = [
+    whenever(
+      does(actor(thisCreature), block),
+      or = [does(any, becomeBlocked(thisCreature))],
+      action = get(it, up(2), up(2), untilEndOfTurn))],
+  power = 1,
+  toughness = 1
+}

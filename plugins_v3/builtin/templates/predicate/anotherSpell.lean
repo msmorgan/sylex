@@ -1,6 +1,0 @@
-/-- "another spell" -/
-template anotherSpell : Predicate := {
-  spelling := "another spell",
-  body :=
-    and [isSpell, isOther]
-}

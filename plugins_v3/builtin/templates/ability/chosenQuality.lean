@@ -1,6 +1,0 @@
-/-- "the chosen <quality>" -/
-template chosenQuality (quality : Predicate) : QualityPayload := {
-  spelling := "the chosen <quality>",
-  body :=
-    quality (withQuality quality)
-}

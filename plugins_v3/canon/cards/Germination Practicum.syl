@@ -1,0 +1,9 @@
+card {
+  name = "Germination Practicum",
+  cost = [3, green, green],
+  types = [sorcery],
+  subtypes = [lesson],
+  text = [
+    spell(putCounters(2, printedKind(p1p1Counter), each(and([isCreature, youControl])))),
+    paradigm]
+}

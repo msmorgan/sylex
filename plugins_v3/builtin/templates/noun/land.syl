@@ -1,0 +1,4 @@
+template land: NounWord {
+  spelling = "land",
+  body = type(land)
+}

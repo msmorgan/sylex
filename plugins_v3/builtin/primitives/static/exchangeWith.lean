@@ -1,6 +1,0 @@
-/-- Exchange the subject's rules text with `other`'s [CR#612.5,701.12h]. -/
--- [CR#612.5,701.12h]
-primitive exchangeWith (other : NounPhrase) : TextChange := {
-  body :=
-    Semantics.Primitives.TextChange.exchangeWith other
-}

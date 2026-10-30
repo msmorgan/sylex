@@ -1,6 +1,0 @@
-/-- "increase or decrease the result by <amount>" -/
-template shiftResult (amount : Amount) : Action := {
-  spelling := "increase or decrease the result by <amount>",
-  body :=
-    actionShiftResult [up amount, down amount]
-}

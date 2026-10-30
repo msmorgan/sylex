@@ -1,0 +1,17 @@
+card {
+  name = "Stormwild Capridor",
+  cost = [2, white],
+  types = [creature],
+  subtypes = [bird, goat],
+  text = [
+    flying,
+    static(
+      replace(
+        would(any, dealDamage(recipient = thisCreature, kind = noncombat)),
+        instead(
+          preventDamage(
+            allDamage,
+            also = putCounters(preventedThisWay, printedKind(p1p1Counter), thisCreature)))))],
+  power = 1,
+  toughness = 3
+}

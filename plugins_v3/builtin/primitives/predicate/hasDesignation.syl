@@ -1,0 +1,4 @@
+# Authoring primitive for `Predicate.hasDesignation`.
+primitive hasDesignation(
+  designation: DesignationLabel,
+  holder: Option(NounPhrase) = none): Predicate

@@ -1,0 +1,22 @@
+card {
+  name = "Grand Arbiter Augustin IV",
+  cost = [2, white, blue],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [human, advisor],
+  text = [
+    static(
+      costShift(
+        allOf(and([hasColor(white), isSpell, did(actor(you), cast(which), thisObject)])),
+        less(1))),
+    static(
+      costShift(
+        allOf(and([hasColor(blue), isSpell, did(actor(you), cast(which), thisObject)])),
+        less(1))),
+    static(
+      costShift(
+        allOf(and([isSpell, did(actor(yourOpponents), cast(which), thisObject)])),
+        more(1)))],
+  power = 2,
+  toughness = 3
+}

@@ -1,6 +1,0 @@
-card := {
-  name := "Time Stretch",
-  cost := [8, blue, blue],
-  types := [sorcery],
-  text := [spell (instruct (target isPlayer) (extraTurn 2))]
-}

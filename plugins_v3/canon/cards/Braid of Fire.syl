@@ -1,0 +1,6 @@
+card {
+  name = "Braid of Fire",
+  cost = [1, red],
+  types = [enchantment],
+  text = [cumulativeUpkeep(perform(addMana(1, manaOf([[of(red)]]))))]
+}

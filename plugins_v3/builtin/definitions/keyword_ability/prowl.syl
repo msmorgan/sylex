@@ -1,0 +1,14 @@
+# "Prowl <cost>": cast for <cost> if a player was dealt combat damage this turn by a source
+# you controlled that shared a creature type with this spell [CR#702.76a].
+ability prowl(cost: Cost) {
+  lexical = {lemma = "prowl", parameters = [[Cost]]},
+  spelling = "prowl <cost>",
+  body = [
+    static(
+      onlyWhile(
+        altCost(this, cost),
+        did(
+          actor(a(and([shares(subtype(creature), share, thisSpell), youControl]))),
+          dealDamage(recipient = a(isPlayer), kind = combat),
+          within(soFarThisTurn))))]
+}

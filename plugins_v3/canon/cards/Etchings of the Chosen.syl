@@ -1,0 +1,11 @@
+card {
+  name = "Etchings of the Chosen",
+  cost = [1, white, black],
+  types = [enchantment],
+  text = [
+    static(entersChoosing(thisEnchantment, subtype(creature))),
+    static(getsPt(allOf(and([isCreature, youControl, ofChosen(subtype(creature))])), up(1), up(1))),
+    activated(
+      compound([mana([1]), perform(sacrifice(a(and([isCreature, ofChosen(subtype(creature))]))))]),
+      gain(target(and([isCreature, youControl])), indestructible, untilEndOfTurn))]
+}

@@ -1,9 +1,0 @@
-/-- "return <subject> [from <from_>] to the battlefield [riders]" -/
-template returnToBattlefield (subject : NounPhrase) (riders : List MoveRider := [])
-    (from_ : Location := wherever) : Action := {
-  -- TODO(spelling): Omit the origin phrase when from_ is wherever; otherwise print 'from' and that
-  -- location. Format and coordinate the riders list entries, including the empty case.
-  body :=
-    zoneChange subject battlefield
-      from_ riders
-}

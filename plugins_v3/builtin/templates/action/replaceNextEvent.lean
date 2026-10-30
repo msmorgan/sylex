@@ -1,8 +1,0 @@
-/-- "The next time <clause> would happen, <replacement> instead [duration]." -/
-template replaceNextEvent (clause : WouldClause) (replacement : Replacement)
-    (duration : Option Duration) : Action := {
-  -- TODO(spelling): Include or omit the clauses supplied by duration.
-  body :=
-    establish
-      (replace clause replacement none nextTimeOnly none) duration
-}

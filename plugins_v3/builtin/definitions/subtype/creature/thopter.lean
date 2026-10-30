@@ -1,7 +1,0 @@
-subtype thopter := {
-  lexical := { lemma := "Thopter" },
-  spelling := "Thopter",
-  kind := creature,
-  name := "Thopter",
-  confers := []
-}

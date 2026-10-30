@@ -1,0 +1,14 @@
+card {
+  name = "Leonin Bola",
+  cost = [1],
+  types = [artifact],
+  subtypes = [equipment],
+  text = [
+    static(
+      abilityGrant(
+        equipped(creature),
+        activated(
+          compound([tapSymbol, perform(unattach(theGrantor(permanent)))]),
+          tap(target(isCreature))))),
+    equip(mana([1]))]
+}

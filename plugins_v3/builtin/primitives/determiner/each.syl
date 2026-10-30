@@ -1,0 +1,4 @@
+# "each …"
+primitive each: DetPhrase {
+  spelling = "each"
+}

@@ -1,0 +1,13 @@
+# "shuffle <subject> into its owner's library": the move, then the shuffle of that library,
+# which happens even if nothing moved (`Definition`, [CR#701.24c,701.24d]).
+action shuffleInto(subject: NounPhrase) {
+  spelling = "shuffle <subject> into its owner's library",
+  lexical = {
+    verbs = [
+      {lemma = "shuffle", frames = [Intransitive, Monotransitive, TransitiveWithPP(["into"])]}]},
+  deed = "shuffle",
+  body = sequentially(
+    [
+      move(subject, wherever, zone(library, none), arrival, []),
+      actionShuffle(zone(library, none))])
+}

@@ -1,6 +1,0 @@
-/-- "<subject> becomes blocking <blocked>" -/
-template becomeBlocking (subject blocked : NounPhrase) : Action := {
-  spelling := "<subject> becomes blocking <blocked>",
-  body :=
-    combat subject (blocking attached blocked)
-}

@@ -1,9 +1,0 @@
-/-- "Doctor’s companion" means "You may designate two legendary creature cards as your commander
-rather than one if one of them is this card and the other is a legendary Time Lord Doctor
-creature card that has no other creature types." [CR#702.124m] -/
-keyword doctorsCompanion : Ability := {
-  lexical := { lemma := "doctor's companion" },
-  spelling := "doctor's companion",
-  body :=
-    []
-}

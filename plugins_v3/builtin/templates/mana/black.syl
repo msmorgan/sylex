@@ -1,0 +1,3 @@
+primitive black: Color {
+  spelling = "black"
+}

@@ -1,0 +1,3 @@
+primitive red: Color {
+  spelling = "red"
+}

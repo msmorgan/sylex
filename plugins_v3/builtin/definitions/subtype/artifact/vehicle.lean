@@ -1,9 +1,0 @@
-/-- Vehicles have printed power and toughness but have those characteristics only while they are
-creatures. [CR#301.7a,301.7b] -/
-subtype vehicle := {
-  lexical := { lemma := "Vehicle" },
-  spelling := "Vehicle",
-  kind := artifact,
-  name := "Vehicle",
-  confers := []
-}

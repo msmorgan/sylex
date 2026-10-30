@@ -1,6 +1,0 @@
-/-- A card exiled by a haunt ability "haunts" the creature that ability
-targeted, whether or not that object is still a creature [CR#702.55b]: the
-exiled card is the first side, the haunted object the second. -/
-relation haunting := {
-
-}

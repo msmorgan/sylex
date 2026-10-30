@@ -1,0 +1,6 @@
+ability_word eminence(ability: Ability) {
+  lexical = {lemma = "eminence", listed = Rules},
+  label = "eminence",
+  spelling = "eminence — <ability>",
+  body = ability
+}

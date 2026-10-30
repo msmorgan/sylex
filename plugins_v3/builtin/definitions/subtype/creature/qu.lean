@@ -1,7 +1,0 @@
-subtype qu := {
-  lexical := { lemma := "Qu", plural := "Qu" },
-  spelling := "Qu",
-  kind := creature,
-  name := "Qu",
-  confers := []
-}

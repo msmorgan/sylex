@@ -1,0 +1,22 @@
+card {
+  name = "Denry Klin, Editor in Chief",
+  cost = [2, white, blue],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [cat, advisor],
+  text = [
+    static(
+      enters(
+        thisCreature,
+        [withCounters(1, chosenKind([p1p1Counter, firstStrikeCounter, vigilanceCounter]), fresh)])),
+    whenever(
+      does(actor(a(and([isNontoken, and([isCreature, youControl])]))), enter),
+      if = is(thisCreature, hasCounter),
+      action = doForEachKind(
+        counterKind,
+        thisCreature,
+        counterKind,
+        putCounters(statOf(boundCounter, thisCreature), thatKind, that(creature))))],
+  power = 2,
+  toughness = 2
+}

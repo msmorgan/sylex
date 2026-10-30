@@ -1,9 +1,0 @@
-/-- "put <subject> [from <from_>] onto the battlefield" -/
-template putOntoBattlefield (subject : NounPhrase) (from_ : Location := wherever)
-    (riders : List MoveRider := []) : Action := {
-  -- TODO(spelling): Omit the origin phrase when from_ is wherever; otherwise print 'from' and that
-  -- location. Format and coordinate the riders list entries, including the empty case.
-  body :=
-    zoneChange subject battlefield
-      from_ riders
-}

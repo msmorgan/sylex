@@ -1,0 +1,6 @@
+counter interventionCounter {
+  lexical = {lemma = "intervention counter"},
+  spelling = "intervention counter",
+
+  confers = []
+}

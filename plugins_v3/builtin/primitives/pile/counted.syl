@@ -1,0 +1,1 @@
+primitive counted(quantity: Quantity): SliceCount

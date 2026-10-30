@@ -1,0 +1,4 @@
+# "not <p>"
+primitive not(predicate: Predicate): Predicate {
+  spelling = "not <p>"
+}

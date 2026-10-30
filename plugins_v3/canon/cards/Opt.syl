@@ -1,0 +1,6 @@
+card {
+  name = "Opt",
+  cost = [blue],
+  types = [instant],
+  text = [spell(sequentially([scry(1), draw(1)]))]
+}

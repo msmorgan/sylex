@@ -1,0 +1,17 @@
+card {
+  name = "Bureau Headmaster",
+  cost = [red, white],
+  types = [creature],
+  subtypes = [human, assassin],
+  text = [
+    static(
+      costShift(
+        allOf(and([isSpell, hasSubtype(equipment), did(actor(you), cast(which), thisObject)])),
+        less(1))),
+    static(
+      costShift(
+        allOf(and([abilityHead(keyword(equip)), did(actor(you), activate(which), thisObject)])),
+        less(1)))],
+  power = 2,
+  toughness = 2
+}

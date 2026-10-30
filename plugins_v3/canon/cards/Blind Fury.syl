@@ -1,0 +1,15 @@
+card {
+  name = "Blind Fury",
+  cost = [2, red, red],
+  types = [instant],
+  text = [
+    spell(
+      sequentially(
+        [
+          establishThroughout(abilityLoss(allOf(isCreature), [written(trample)]), untilEndOfTurn),
+          establishThroughout(
+            replace(
+              would(actor(a(isCreature)), dealDamage(recipient = a(isCreature), kind = combat)),
+              instead(instruct(it, dealDamage(times(2, thatMuch), that(creature))))),
+            thisTurn)]))]
+}

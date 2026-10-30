@@ -1,7 +1,0 @@
-/-- "distribute N <kind> counters among <among>" -/
-template distributeCounters (amount : Amount) (kind : CounterKind) (among : NounPhrase) :
-    Action := {
-  spelling := "distribute <amount> <kind> counters among <among>",
-  body :=
-    distribute (counters kind) amount among
-}

@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype karn := {
-  lexical := { lemma := "Karn" },
-  spelling := "Karn",
-  kind := planeswalker,
-  name := "Karn",
-  confers := []
-}

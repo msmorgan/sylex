@@ -1,6 +1,0 @@
-/-- "every <space> type" -/
-template everyTypeOf (space : SubtypeSpace) : QualityPayload := {
-  spelling := "every <space> type",
-  body :=
-    quality (withEveryType space)
-}

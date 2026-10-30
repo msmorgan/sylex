@@ -1,6 +1,0 @@
-/-- Repeat an Action for each distinct Kind of a Sort in a Domain. -/
-primitive doForEachKind (axis : KindAxis) (domain : Option NounPhrase := none)
-    (sort : QualitySort) (body : Action) : Action := {
-  body :=
-    Semantics.Primitives.Action.doForEachKind axis domain sort body
-}

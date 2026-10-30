@@ -1,5 +1,0 @@
-/-- "non<p>", as "nonland" or "noncreature". -/
-template non (p : Predicate) : Predicate := {
-  spelling := "non<p>",
-  body := not p
-}

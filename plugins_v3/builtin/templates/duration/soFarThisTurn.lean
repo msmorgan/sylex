@@ -1,8 +1,0 @@
-/-- "this turn", as a lookback reads it: from the turn's beginning to now. -/
-template soFarThisTurn : Duration := {
-  spelling := "this turn",
-  body :=
-    durationBetween
-      (some (beginningOf turn none current))
-      (some now)
-}

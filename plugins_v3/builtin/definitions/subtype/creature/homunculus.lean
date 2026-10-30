@@ -1,7 +1,0 @@
-subtype homunculus := {
-  lexical := { lemma := "Homunculus", plural := "Homunculi" },
-  spelling := "Homunculus",
-  kind := creature,
-  name := "Homunculus",
-  confers := []
-}

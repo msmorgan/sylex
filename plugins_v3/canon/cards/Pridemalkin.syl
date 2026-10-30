@@ -1,0 +1,13 @@
+card {
+  name = "Pridemalkin",
+  cost = [2, green],
+  types = [creature],
+  subtypes = [cat],
+  text = [
+    when(
+      does(actor(thisCreature), enter),
+      putCounters(1, printedKind(p1p1Counter), target(and([isCreature, youControl])))),
+    static(abilityGrant(each(and([isCreature, youControl, hasCounter(p1p1Counter)])), trample))],
+  power = 2,
+  toughness = 1
+}

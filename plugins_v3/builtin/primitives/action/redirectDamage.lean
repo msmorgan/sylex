@@ -1,9 +1,0 @@
-/-- "<cut> [of <damage>] is dealt to <to> instead": a redirection effect [CR#614.9]. Under
-`cant`, "<damage> can't be dealt instead to <to>". -/
--- [CR#614.9]
-primitive redirectDamage (cut : PreventCut) (to : NounPhrase)
-    (damage : Option WouldClause := none) : Action := {
-  -- TODO(spelling): Include or omit the clauses supplied by damage.
-  body :=
-    Semantics.Primitives.Action.redirectDamage cut to damage
-}

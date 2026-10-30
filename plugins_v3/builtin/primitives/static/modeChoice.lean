@@ -1,6 +1,0 @@
-/-- A Mode Change modifying how the modes of the spell are chosen: for example, choosing all
-modes with entwine or paying for extra modes with escalate. [CR#700.2,702.42a,702.120a] -/
-primitive modeChoice (change : ModeChange) : StaticSpec := {
-  body :=
-    Semantics.Primitives.StaticSpec.modeChoice change
-}

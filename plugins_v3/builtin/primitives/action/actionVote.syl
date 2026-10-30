@@ -1,0 +1,7 @@
+# The actor votes for a choice from the ballot, with the specified starting player when supplied
+# [CR#701.38a].
+primitive actionVote(
+  first: Option(NounPhrase),
+  disclosure: Disclosure,
+  ballot: Ballot,
+  times: Option(Quantity)): Action = .vote

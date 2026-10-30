@@ -1,0 +1,6 @@
+counter shellCounter {
+  lexical = {lemma = "shell counter"},
+  spelling = "shell counter",
+
+  confers = []
+}

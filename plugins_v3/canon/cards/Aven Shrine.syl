@@ -1,0 +1,12 @@
+card {
+  name = "Aven Shrine",
+  cost = [1, white, white],
+  types = [enchantment],
+  text = [
+    whenever(
+      does(actor(a(isPlayer)), cast(a(isSpell))),
+      sequentially(
+        [
+          instruct(they, gainLife(letter(x))),
+          define(x, countOf(and([in(graveyard), shares(cardName, share, that(spell))])))]))]
+}

@@ -1,4 +1,0 @@
-template controllerOf (subject : NounPhrase) : NounPhrase := {
-  spelling := "<subject>'s controller",
-  body := possessorOf .controller subject
-}

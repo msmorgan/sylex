@@ -1,9 +1,0 @@
-/-- "<ability> triggers": the ability is the subject of `trigger` [CR#603.2]; whose ability it is
-("a triggered ability of a creature you control") is `Predicate.abilityOf` in its description.
-What made it trigger is `triggersBy`. -/
--- [CR#603.2]
-template triggers (ability : NounPhrase) : GameEvent := {
-  spelling := "<ability> triggers",
-  body :=
-    does (actor ability) trigger
-}

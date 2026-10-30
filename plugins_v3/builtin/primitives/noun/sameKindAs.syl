@@ -1,0 +1,4 @@
+# "a counter of each kind on <source>"
+primitive sameKindAs(source: NounPhrase): CounterKindSource = .sameAs {
+  spelling = "a counter of each kind on <source>"
+}

@@ -1,0 +1,29 @@
+card {
+  name = "Tromell, Seymour's Butler",
+  cost = [2, green],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [elf, advisor],
+  text = [
+    static(
+      entersWithAdditionalCounters(
+        each(and([isCreature, isNontoken, youControl, isOther])),
+        1,
+        p1p1Counter)),
+    activated(
+      compound([mana([1]), tapSymbol]),
+      sequentially(
+        [
+          repeatTimes(letter(x), proliferate),
+          define(
+            x,
+            countOf(
+              and(
+                [
+                  isNontoken,
+                  isCreature,
+                  youControl,
+                  did(actor(which), enter, within(soFarThisTurn))])))]))],
+  power = 2,
+  toughness = 3
+}

@@ -1,6 +1,0 @@
-/-- "if <clause> or <clause> would happen": any of several events [CR#614.1]. -/
--- [CR#614.1]
-primitive wouldAny (clauses : List WouldClause) : WouldClause := {
-  body :=
-    Semantics.Primitives.WouldClause.wouldAny clauses
-}

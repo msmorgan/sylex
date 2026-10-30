@@ -1,0 +1,18 @@
+card {
+  name = "Mild-Mannered Librarian",
+  cost = [green],
+  types = [creature],
+  subtypes = [human],
+  text = [
+    activatedOnlyOnce(
+      mana([3, green]),
+      sequentially(
+        [
+          establish(
+            qualityChange(thisCreature, sets, bundle({characteristics = {subtypes = [werewolf]}}))),
+          putCounters(2, printedKind(p1p1Counter), it),
+          draw(1)]),
+      oncePerGame)],
+  power = 1,
+  toughness = 1
+}

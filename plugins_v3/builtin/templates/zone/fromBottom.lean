@@ -1,5 +1,0 @@
-/-- "<n>th from the bottom of <loc>" -/
-template fromBottom (n : Nat) (loc : Location) : Location := {
-  spelling := "<n>th from the bottom of <loc>",
-  body := fromEnd bottom (nth n) loc
-}

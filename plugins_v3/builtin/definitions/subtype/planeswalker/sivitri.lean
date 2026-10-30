@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype sivitri := {
-  lexical := { lemma := "Sivitri" },
-  spelling := "Sivitri",
-  kind := planeswalker,
-  name := "Sivitri",
-  confers := []
-}

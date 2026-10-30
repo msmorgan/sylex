@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype sorin := {
-  lexical := { lemma := "Sorin" },
-  spelling := "Sorin",
-  kind := planeswalker,
-  name := "Sorin",
-  confers := []
-}

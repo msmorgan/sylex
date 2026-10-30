@@ -1,0 +1,4 @@
+# "mana of any color", "any one color", "any combination of colors"
+primitive ofAnyColor(freedom: ColorFreedom): ProducedMana = .anyColor
+# TODO(spelling): The freedom selects one shared color or a combination of colors, changing the
+# phrase.

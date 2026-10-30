@@ -1,0 +1,19 @@
+card {
+  name = "Tower Winder",
+  cost = [1, green],
+  types = [creature],
+  subtypes = [snake],
+  text = [
+    reach,
+    deathtouch,
+    when(
+      does(actor(thisCreature), enter),
+      sequentially(
+        [
+          searchLibraryOrGraveyard(a(named(printedName("Command Tower")))),
+          reveal(it),
+          putInto(it, hand),
+          doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],
+  power = 1,
+  toughness = 1
+}

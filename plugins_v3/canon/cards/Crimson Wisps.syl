@@ -1,0 +1,14 @@
+card {
+  name = "Crimson Wisps",
+  cost = [red],
+  types = [instant],
+  text = [
+    spell(
+      sequentially(
+        [
+          establishFor(
+            target(isCreature),
+            [qualityChange(it, sets, colored(some([red]))), abilityGrant(it, haste)],
+            untilEndOfTurn),
+          draw(1)]))]
+}

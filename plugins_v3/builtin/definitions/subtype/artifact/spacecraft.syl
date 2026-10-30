@@ -1,0 +1,9 @@
+# Spacecraft is an artifact subtype [CR#205.3g]. A legendary Spacecraft card with one or more
+# power/toughness boxes can be designated as a commander [CR#903.3].
+subtype spacecraft {
+  lexical = {lemma = "Spacecraft", plural = "Spacecraft"},
+  spelling = "Spacecraft",
+  kind = artifact,
+  name = "Spacecraft",
+  confers = []
+}

@@ -1,0 +1,12 @@
+card {
+  name = "Fiend Binder",
+  cost = [3, white],
+  types = [creature],
+  subtypes = [human, soldier],
+  text = [
+    whenever(
+      does(actor(thisCreature), attack),
+      tap(target(and([isCreature, controlledBy(defendingPlayer)]))))],
+  power = 3,
+  toughness = 2
+}

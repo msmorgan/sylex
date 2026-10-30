@@ -1,9 +1,0 @@
-/-- One or more shield counters create a single replacement effect that removes a shield counter
-instead of destruction by an effect, and a single prevention effect that prevents damage and
-removes a shield counter. [CR#122.1c] -/
-counter shieldCounter := {
-  lexical := { lemma := "shield counter" },
-  spelling := "shield counter",
-  holder := object,
-  confers := []
-}

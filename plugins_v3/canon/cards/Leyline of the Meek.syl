@@ -1,0 +1,6 @@
+card {
+  name = "Leyline of the Meek",
+  cost = [2, white, white],
+  types = [enchantment],
+  text = [mayBeginOnBattlefield, static(getsPt(allOf(and([isCreature, isToken])), up(1), up(1)))]
+}

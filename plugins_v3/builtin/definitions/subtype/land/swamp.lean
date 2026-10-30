@@ -1,8 +1,0 @@
-/-- A land with the basic land subtype Swamp has the intrinsic ability "{T}: Add {B}." [CR#305.6] -/
-subtype swamp := {
-  lexical := { lemma := "Swamp" },
-  spelling := "Swamp",
-  kind := land,
-  name := "Swamp",
-  confers := []
-}

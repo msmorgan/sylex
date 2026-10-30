@@ -1,0 +1,4 @@
+# "the chosen <sort>", revealed
+primitive choiceOf(sort: ChoiceSort): Exposed = .choice {
+  spelling = "the chosen <sort>"
+}

@@ -1,0 +1,6 @@
+card {
+  name = "Squelch",
+  cost = [1, blue],
+  types = [instant],
+  text = [spell(sequentially([counter(target(abilityHead(anyActivated))), draw(1)]))]
+}

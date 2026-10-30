@@ -1,8 +1,0 @@
-/-- No supported Oracle rules-text plural is attested for this proper subtype name. -/
-subtype dakkon := {
-  lexical := { lemma := "Dakkon" },
-  spelling := "Dakkon",
-  kind := planeswalker,
-  name := "Dakkon",
-  confers := []
-}

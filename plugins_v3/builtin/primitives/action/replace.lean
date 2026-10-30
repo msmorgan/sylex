@@ -1,8 +1,0 @@
-/-- "<replaced>. <replacement>": a self-replacement, the spell's or ability's own `replaced`
-action replaced by `replacement`, as "draw a card; if …, draw two cards instead" [CR#614.15]. -/
--- [CR#614.15]
-primitive replace (replaced : Action) (replacement : Replacement) : Action := {
-  spelling := "<replaced>. <replacement>",
-  body :=
-    Semantics.Primitives.Action.replace replaced replacement
-}

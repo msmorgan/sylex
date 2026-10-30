@@ -1,5 +1,0 @@
-/-- The results of damage dealt to `this`, `result` reading the damage dealt as `thatMuch`. -/
-template damageResult (result : Action) : Conferral := {
-  body :=
-    .property (asEvent (does any (dealDamage anyAmount this_)) result)
-}

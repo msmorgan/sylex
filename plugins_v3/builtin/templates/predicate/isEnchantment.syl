@@ -1,0 +1,4 @@
+template isEnchantment: Predicate {
+  spelling = "enchantment",
+  body = hasType(enchantment)
+}

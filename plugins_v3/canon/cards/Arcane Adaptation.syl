@@ -1,0 +1,16 @@
+card {
+  name = "Arcane Adaptation",
+  cost = [2, blue],
+  types = [enchantment],
+  text = [
+    static(entersChoosing(thisEnchantment, subtype(creature))),
+    static(
+      qualityChange(
+        and(
+          [
+            allOf(and([isCreature, youControl])),
+            allOf(and([isCreature, isSpell, youControl])),
+            allOf(and([isCard, isCreature, youOwn, not(in(battlefield))]))]),
+        adds,
+        chosenQuality(ofChosen(subtype(creature)))))]
+}

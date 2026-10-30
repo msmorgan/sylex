@@ -1,0 +1,8 @@
+card {
+  name = "Omniscience",
+  cost = [7, blue, blue, blue],
+  types = [enchantment],
+  text = [
+    static(
+      altCost(allOf(and([isSpell, did(actor(you), cast(which, from = yourHand), thisObject)]))))]
+}

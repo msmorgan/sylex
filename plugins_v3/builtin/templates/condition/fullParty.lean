@@ -1,5 +1,0 @@
-template fullParty : Condition := {
-  spelling := "you have a full party",
-  body :=
-    fullPartyOf you
-}

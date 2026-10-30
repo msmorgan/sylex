@@ -1,0 +1,7 @@
+# "during <player>'s next turn" (`firstMention` / `laterMention` so `player` is not duplicated
+# [CR#115.1,608.2c]).
+# [CR#115.1,608.2c]
+template duringNextTurnOf(player: NounPhrase): Duration {
+  spelling = "during <player>'s next turn",
+  body = durationBetween(beginningOf(turn, player, nextTime), endOf(turn, player, nextTime))
+}

@@ -1,0 +1,12 @@
+card {
+  name = "Keldon Warcaller",
+  cost = [1, red],
+  types = [creature],
+  subtypes = [human, warrior],
+  text = [
+    whenever(
+      does(actor(thisCreature), attack),
+      putCounters(1, printedKind(loreCounter), target(and([hasSubtype(saga), youControl]))))],
+  power = 2,
+  toughness = 2
+}

@@ -1,9 +1,0 @@
-/-- Contraption is an artifact subtype [CR#205.3g]; the assemble action puts Contraptions onto the
-battlefield [CR#701.45a]. -/
-subtype contraption := {
-  lexical := { lemma := "Contraption" },
-  spelling := "Contraption",
-  kind := artifact,
-  name := "Contraption",
-  confers := []
-}

@@ -1,0 +1,16 @@
+# "Dash [cost]" [CR#702.109a]. "If this spell's dash cost was paid, return the permanent this
+# spell becomes to its owner's hand at the beginning of the next end step" is a Resolution Delayed
+# Trigger, as blitz's is [CR#608.3g,603.7d].
+ability dash(cost: Cost) {
+  lexical = {lemma = "dash", parameters = [[Cost]]},
+  spelling = "dash <cost>",
+  body = [
+    static(altCost(this, cost)),
+    static(
+      resolutionDelayedTrigger(
+        doIf(keywordCostPaid(dash, thisSpell), atNext(endStep, returnToHand(becomes(thisSpell)))))),
+    static(
+      onlyWhile(
+        abilityGrant(thisPermanent, keyword(haste, [], [])),
+        keywordCostPaid(dash, thisPermanent)))]
+}

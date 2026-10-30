@@ -1,0 +1,4 @@
+# "<cost>" written out as mana symbols
+primitive symbols(cost: ManaCost): ManaCostTerm = .lit {
+  spelling = "<cost>"
+}

@@ -1,0 +1,13 @@
+card {
+  name = "Goblin Electromancer",
+  cost = [blue, red],
+  types = [creature],
+  subtypes = [goblin, wizard],
+  text = [
+    static(
+      costShift(
+        allOf(and([isInstantOrSorcery, isSpell, did(actor(you), cast(which), thisObject)])),
+        less(1)))],
+  power = 2,
+  toughness = 2
+}

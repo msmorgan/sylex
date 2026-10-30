@@ -1,0 +1,1 @@
+primitive damage(source: NounPhrase): DividedVerb

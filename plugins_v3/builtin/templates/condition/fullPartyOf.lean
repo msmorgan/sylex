@@ -1,7 +1,0 @@
-/-- "<player> has a full party": four creatures in that party [CR#700.8c]. -/
-template fullPartyOf (player : NounPhrase) : Condition := {
-
-  spelling := "<player> has a full party",
-  body :=
-    compareAmt (partySizeOf player) eq 4
-}

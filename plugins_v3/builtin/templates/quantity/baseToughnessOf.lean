@@ -1,6 +1,0 @@
-/-- "<subject>'s base toughness" [CR#208.4b] -/
--- [CR#208.4b]
-template baseToughnessOf (subject : NounPhrase) : Amount := {
-  spelling := "<subject>'s base toughness",
-  body := statOf (.stat baseToughness) subject
-}

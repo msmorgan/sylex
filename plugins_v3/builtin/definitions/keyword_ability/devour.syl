@@ -1,0 +1,9 @@
+# "Devour N": devour over creatures [CR#702.82a].
+ability devour(amount: Amount) {
+  lexical = {
+    lemma = "devour",
+    parameters = [[Amount], [Quality(None), Amount]],
+    verbs = [{lemma = "devour", frames = [Monotransitive]}]},
+  spelling = "devour <amount>",
+  body = [devourEntry(isCreature, isCreature, amount)]
+}

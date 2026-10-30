@@ -1,6 +1,0 @@
-counter crystalCounter := {
-  lexical := { lemma := "crystal counter" },
-  spelling := "crystal counter",
-  holder := object,
-  confers := []
-}

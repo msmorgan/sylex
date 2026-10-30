@@ -1,0 +1,7 @@
+card {
+  name = "Maro",
+  cost = [2, green, green],
+  types = [creature],
+  subtypes = [elemental],
+  text = [static(definesPt(thisCreature, countOf(cardIn(yourHand))))]
+}

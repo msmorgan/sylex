@@ -1,8 +1,0 @@
-/-- A quality change: `op` applied to `written` on `subject`'s characteristics. -/
-template qualityChange (subject : NounPhrase) (op : QualityOp) (written : QualityPayload) :
-    StaticSpec := {
-  -- TODO(spelling): The op and written payload select replacement, addition, or removal wording
-  -- and any retained-type clause.
-  body :=
-    characteristicChange subject [payload op written]
-}

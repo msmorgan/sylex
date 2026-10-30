@@ -1,0 +1,13 @@
+card {
+  name = "Aisling Leprechaun",
+  cost = [green],
+  types = [creature],
+  subtypes = [faerie],
+  text = [
+    whenever(
+      does(actor(thisCreature), block(a(isCreature))),
+      or = [does(by(a(isCreature)), block(thisCreature))],
+      action = becomeColor(that(creature), some([green])))],
+  power = 1,
+  toughness = 1
+}

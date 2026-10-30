@@ -1,0 +1,13 @@
+card {
+  name = "Plea for Power",
+  cost = [3, blue],
+  types = [sorcery],
+  text = [
+    willOfTheCouncil(
+      spell(
+        sequentially(
+          [
+            instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["time", "knowledge"]))),
+            doIf(voteLead("time", false), extraTurn(1)),
+            doIf(voteLead("knowledge", true), draw(3))])))]
+}

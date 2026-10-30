@@ -1,0 +1,18 @@
+card {
+  name = "Delivery Moogle",
+  cost = [3, white],
+  types = [creature],
+  subtypes = [moogle],
+  text = [
+    flying,
+    when(
+      does(actor(thisCreature), enter),
+      sequentially(
+        [
+          searchLibraryOrGraveyard(a(and([isArtifact, hasManaValue(atMost, 2)]))),
+          reveal(it),
+          putInto(it, hand),
+          doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],
+  power = 3,
+  toughness = 2
+}

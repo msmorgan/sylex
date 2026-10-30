@@ -1,7 +1,0 @@
-subtype skrull := {
-  lexical := { lemma := "Skrull" },
-  spelling := "Skrull",
-  kind := creature,
-  name := "Skrull",
-  confers := []
-}

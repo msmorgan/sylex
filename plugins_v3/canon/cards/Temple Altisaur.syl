@@ -1,0 +1,15 @@
+card {
+  name = "Temple Altisaur",
+  cost = [4, white],
+  types = [creature],
+  subtypes = [dinosaur],
+  text = [
+    static(
+      replace(
+        would(
+          actor(a(isSource)),
+          dealDamage(recipient = a(and([hasSubtype(dinosaur), youControl, isOther])))),
+        instead(preventDamage(allBut(1)))))],
+  power = 3,
+  toughness = 4
+}

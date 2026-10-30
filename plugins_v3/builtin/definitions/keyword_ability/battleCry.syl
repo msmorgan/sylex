@@ -1,0 +1,12 @@
+# "Battle cry" means "Whenever this creature attacks, each other attacking creature gets +1/+0
+# until end of turn." [CR#702.91a]
+ability battleCry {
+  lexical = {lemma = "battle cry"},
+  spelling = "battle cry",
+  body = [
+    whenever(
+      does(actor(thisCreature), attack),
+      establishThroughout(
+        getsPt(each(and([isCreature, isAttacking, isOther])), up(1), up(0)),
+        untilEndOfTurn))]
+}

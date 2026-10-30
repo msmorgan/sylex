@@ -1,0 +1,6 @@
+card {
+  name = "Crumbling Ashes",
+  cost = [1, black],
+  types = [enchantment],
+  text = [at(beginningOfYour(upkeep), destroy(target(and([isCreature, hasCounter(m1m1Counter)]))))]
+}

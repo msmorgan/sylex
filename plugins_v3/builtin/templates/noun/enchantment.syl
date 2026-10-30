@@ -1,0 +1,4 @@
+template enchantment: NounWord {
+  spelling = "enchantment",
+  body = type(enchantment)
+}

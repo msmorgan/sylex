@@ -1,0 +1,13 @@
+# "Echo [cost]": "At the beginning of your upkeep, if this permanent came under your control
+# since the beginning of your last upkeep, sacrifice it unless you pay [cost]." [CR#702.30a] It came
+# under your control since then unless you have controlled it continuously since then. The payment
+# is of this permanent's echo cost, which a replacement or a trigger on paying it reads.
+ability echo(cost: Cost) {
+  lexical = {lemma = "echo", parameters = [[Cost]]},
+  spelling = "echo <cost>",
+  body = [
+    at(
+      beginningOfYour(upkeep),
+      doUnlessKeywordCost(sacrifice(thisPermanent), cost, thisPermanent, echo),
+      if = not(heldSince(is(thisPermanent, youControl), beginningOf(upkeep, you, previous(you)))))]
+}

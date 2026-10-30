@@ -1,0 +1,12 @@
+card {
+  name = "Ashes of the Fallen",
+  cost = [2],
+  types = [artifact],
+  text = [
+    static(entersChoosing(thisArtifact, subtype(creature))),
+    static(
+      qualityChange(
+        each(and([isCreature, in(yourGraveyard)])),
+        adds,
+        chosenQuality(ofChosen(subtype(creature)))))]
+}

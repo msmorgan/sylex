@@ -1,6 +1,0 @@
-/-- "you own" -/
-template youOwn : Predicate := {
-  spelling := "you own",
-  body :=
-    ownedBy you
-}

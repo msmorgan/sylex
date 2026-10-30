@@ -1,0 +1,14 @@
+card {
+  name = "Repeated Reverberation",
+  cost = [2, red, red],
+  types = [instant],
+  text = [
+    spell(
+      delayWithin(
+        does(actor(you), cast(a(and([isInstant, isSpell])))),
+        thisTurn,
+        sequentially([copyOnStack(that(stack), 2), may(chooseNewTargets(those(copy)))]),
+        [
+          does(actor(you), cast(a(and([isSorcery, isSpell])))),
+          does(actor(you), activate(a(abilityHead(loyalty))))]))]
+}

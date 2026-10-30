@@ -1,0 +1,4 @@
+# The subject's mana cost.
+primitive itsManaCost: Cost {
+  spelling = "its mana cost"
+}

@@ -1,5 +1,0 @@
-/-- Aggregate a list of amounts with the specified operator. -/
-primitive aggregateOf (op : AggregateOp) (amounts : List Amount := []) : Amount := {
-  body :=
-    Semantics.Primitives.Amount.aggregateOf op amounts
-}

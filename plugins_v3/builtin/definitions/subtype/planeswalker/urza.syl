@@ -1,0 +1,8 @@
+# No supported Oracle rules-text plural is attested for this proper subtype name.
+subtype urza {
+  lexical = {lemma = "Urza"},
+  spelling = "Urza",
+  kind = planeswalker,
+  name = "Urza",
+  confers = []
+}

@@ -1,0 +1,2 @@
+# Full-arity binding for `NounPhrase.refl`.
+primitive refl(plurality: Plurality): NounPhrase

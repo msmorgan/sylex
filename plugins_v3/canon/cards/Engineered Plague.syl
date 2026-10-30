@@ -1,0 +1,8 @@
+card {
+  name = "Engineered Plague",
+  cost = [2, black],
+  types = [enchantment],
+  text = [
+    static(entersChoosing(thisEnchantment, subtype(creature))),
+    static(getsPt(allOf(and([isCreature, ofChosen(subtype(creature))])), down(1), down(1)))]
+}

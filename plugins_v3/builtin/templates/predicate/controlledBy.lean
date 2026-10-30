@@ -1,5 +1,0 @@
-/-- "<who> controls" -/
-template controlledBy (who : NounPhrase) : Predicate := {
-  spelling := "<who> controls",
-  body := hasPossessor .controller who
-}

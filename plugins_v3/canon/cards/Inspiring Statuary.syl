@@ -1,0 +1,10 @@
+card {
+  name = "Inspiring Statuary",
+  cost = [3],
+  types = [artifact],
+  text = [
+    static(
+      abilityGrant(
+        allOf(and([non(isArtifact), isSpell, did(actor(you), cast(which), thisObject)])),
+        improvise))]
+}

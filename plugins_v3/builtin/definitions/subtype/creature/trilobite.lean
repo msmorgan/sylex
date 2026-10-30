@@ -1,7 +1,0 @@
-subtype trilobite := {
-  lexical := { lemma := "Trilobite" },
-  spelling := "Trilobite",
-  kind := creature,
-  name := "Trilobite",
-  confers := []
-}

@@ -1,7 +1,0 @@
-subtype tiefling := {
-  lexical := { lemma := "Tiefling" },
-  spelling := "Tiefling",
-  kind := creature,
-  name := "Tiefling",
-  confers := []
-}

@@ -1,0 +1,12 @@
+card {
+  name = "Death or Glory",
+  cost = [4, white],
+  types = [sorcery],
+  text = [
+    spell(
+      sequentially(
+        [
+          separateIntoPiles(allOf(and([isCreature, in(yourGraveyard)])), 2),
+          exile(pileOfChoice(anOpponent)),
+          returnToBattlefield(theOther)]))]
+}

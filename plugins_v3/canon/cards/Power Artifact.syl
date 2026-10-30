@@ -1,0 +1,12 @@
+card {
+  name = "Power Artifact",
+  cost = [blue, blue],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isArtifact),
+    static(
+      costShift(
+        allOf(and([abilityHead(anyActivated), abilityOf(enchanted(artifact))])),
+        less(2, 1)))]
+}

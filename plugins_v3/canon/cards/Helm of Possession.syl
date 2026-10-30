@@ -1,0 +1,12 @@
+card {
+  name = "Helm of Possession",
+  cost = [4],
+  types = [artifact],
+  text = [
+    static(mayDeclineUntap(thisArtifact, you)),
+    activated(
+      compound([mana([2]), tapSymbol, perform(sacrifice(a(isCreature)))]),
+      gainControl(
+        target(isCreature),
+        forAsLongAs(and([is(thisArtifact, youControl), is(thisArtifact, isTapped)]))))]
+}

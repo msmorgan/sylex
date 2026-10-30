@@ -1,7 +1,0 @@
-subtype deserter := {
-  lexical := { lemma := "Deserter" },
-  spelling := "Deserter",
-  kind := creature,
-  name := "Deserter",
-  confers := []
-}

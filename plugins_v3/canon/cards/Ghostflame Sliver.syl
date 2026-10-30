@@ -1,0 +1,9 @@
+card {
+  name = "Ghostflame Sliver",
+  cost = [black, red],
+  types = [creature],
+  subtypes = [sliver],
+  text = [static(qualityChange(allOf(hasSubtype(sliver)), sets, colored(some([]))))],
+  power = 2,
+  toughness = 2
+}

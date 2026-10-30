@@ -1,0 +1,20 @@
+card {
+  name = "Gaea's Revenge",
+  cost = [5, green, green],
+  types = [creature],
+  subtypes = [elemental],
+  text = [
+    static(cant(any, counter(thisSpell))),
+    haste,
+    static(
+      cant(
+        by(
+          allOf(
+            or(
+              [
+                and([isSpell, non(hasColor(green))]),
+                abilityOf(allOf(and([isSource, non(hasColor(green))])))]))),
+        target(thisCreature)))],
+  power = 8,
+  toughness = 5
+}

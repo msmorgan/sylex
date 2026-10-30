@@ -1,0 +1,4 @@
+# Authoring primitive for `Predicate.hasSupertype`.
+primitive hasSupertype(supertype: Supertype): Predicate {
+  spelling = "<s>"
+}

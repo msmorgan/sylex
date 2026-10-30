@@ -1,0 +1,4 @@
+# "with every <space> type"
+primitive withEveryType(space: SubtypeSpace): WrittenQuality = .everyTypeOf {
+  spelling = "with every <space> type"
+}

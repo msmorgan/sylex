@@ -1,8 +1,0 @@
-/-- "search <scope>", or "search <scope> for <for_>" (`Definition`, [CR#701.23a]).
-The `for_` parameter is bound like any other (there is no opt-out). -/
-action search (scope : Location) (for_ : NounPhrase := any) : Action := {
-  -- TODO(spelling): Omit the 'for' phrase when for_ is any; otherwise print the search selection.
-  lexical := { verbs := [{ lemma := "search", frames := [(TransitiveWithPP ["for"]), Monotransitive, (Prepositional ["for"])] }] },
-  body :=
-    actionSearch scope for_
-}

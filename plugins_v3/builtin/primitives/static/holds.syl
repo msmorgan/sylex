@@ -1,0 +1,4 @@
+# "as though <cond>": the rule applies as though the condition held.
+primitive holds(cond: Condition): AsThough = .condition {
+  spelling = "as though <cond>"
+}

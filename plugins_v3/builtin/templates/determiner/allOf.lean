@@ -1,6 +1,0 @@
-/-- "all …" -/
-template allOf (p : Predicate) : NounPhrase := {
-  spelling := "all <p>",
-  body :=
-    described all p
-}

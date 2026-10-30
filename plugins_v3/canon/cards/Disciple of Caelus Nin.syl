@@ -1,0 +1,20 @@
+# Disciple of Caelus Nin: "starting with you" overrides the default APNAP choice order
+# [CR#101.1,101.4].
+card {
+  name = "Disciple of Caelus Nin",
+  cost = [4, white],
+  types = [creature],
+  subtypes = [human, wizard],
+  text = [
+    when(
+      does(actor(thisCreature), enter),
+      sequentially(
+        [
+          instruct(
+            eachPlayer,
+            chooseStartingWith(you, counted(upTo(5), and([isPermanent, controlledBy(they)])))),
+          instruct(allOf(and([isPermanent, otherThan(thisCreature), notChosen])), phaseOut)])),
+    static(cant(actor(bare(isPermanent)), phaseIn))],
+  power = 3,
+  toughness = 4
+}

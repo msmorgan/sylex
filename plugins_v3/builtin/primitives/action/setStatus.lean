@@ -1,5 +1,0 @@
-/-- Set the specified status on the subject. -/
-primitive setStatus (status : Status) (subject : NounPhrase) : Action := {
-  body :=
-    Semantics.Primitives.Action.setStatus status subject
-}

@@ -1,7 +1,0 @@
-/-- "<subject> commits a crime" [CR#700.13] -/
--- [CR#700.13]
-primitive commitCrime : Action := {
-  spelling := "commits a crime",
-  body :=
-    Semantics.Primitives.Action.commitCrime
-}

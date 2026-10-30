@@ -1,7 +1,0 @@
-/-- "an opponent of <who>" [CR#102.2..102.3]. -/
--- [CR#102.2..102.3]
-primitive isOpponentOf (who : NounPhrase) : Predicate := {
-  spelling := "an opponent of <who>",
-  body :=
-    Semantics.Primitives.Predicate.isOpponentOf who
-}

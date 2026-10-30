@@ -1,5 +1,0 @@
-/-- A loyalty-symbol cost with the specified change. -/
-primitive loyaltySymbol (change : Delta Amount) : Cost := {
-  body :=
-    Semantics.Primitives.Cost.loyaltySymbol change
-}

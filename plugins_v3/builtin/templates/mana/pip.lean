@@ -1,5 +1,0 @@
-template pip (color : Color) : ManaSymbol := {
-  spelling := "{<color>}",
-  body :=
-    .simple (.specific (.of color))
-}

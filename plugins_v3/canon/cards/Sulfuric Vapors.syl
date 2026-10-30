@@ -1,0 +1,12 @@
+card {
+  name = "Sulfuric Vapors",
+  cost = [3, red],
+  types = [enchantment],
+  text = [
+    static(
+      replace(
+        would(
+          actor(a(and([isSpell, hasColor(red)]))),
+          dealDamage(recipient = a(or([isPermanent, isPlayer])))),
+        instead(instruct(it, dealDamage(plus(thatMuch, 1), thatJoin)))))]
+}

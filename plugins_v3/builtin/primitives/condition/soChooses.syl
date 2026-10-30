@@ -1,0 +1,3 @@
+primitive soChooses(chooser: NounPhrase): Condition {
+  spelling = "<chooser> so chooses"
+}

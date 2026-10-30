@@ -1,0 +1,12 @@
+card {
+  name = "Fuming Effigy",
+  cost = [3, red],
+  types = [creature],
+  subtypes = [spirit],
+  text = [
+    whenever(
+      does(actor(counted(orMore(1), cardIn(yourGraveyard))), leave(from = yourGraveyard)),
+      instruct(this, dealDamage(1, eachOpponent)))],
+  power = 4,
+  toughness = 3
+}

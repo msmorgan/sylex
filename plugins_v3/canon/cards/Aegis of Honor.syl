@@ -1,0 +1,14 @@
+card {
+  name = "Aegis of Honor",
+  cost = [white],
+  types = [enchantment],
+  text = [
+    activated(
+      mana([1]),
+      establishThroughout(
+        replace(
+          would(actor(a(isInstantOrSorcery)), dealDamage(recipient = you)),
+          instead(redirectDamage(allDamage, controllerOf(it))),
+          use = nextTimeOnly),
+        thisTurn))]
+}

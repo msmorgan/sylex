@@ -1,0 +1,3 @@
+primitive copy: NounWord {
+  spelling = "copy"
+}

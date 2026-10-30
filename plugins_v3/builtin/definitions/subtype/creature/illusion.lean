@@ -1,7 +1,0 @@
-subtype illusion := {
-  lexical := { lemma := "Illusion" },
-  spelling := "Illusion",
-  kind := creature,
-  name := "Illusion",
-  confers := []
-}

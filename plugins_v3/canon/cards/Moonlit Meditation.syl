@@ -1,0 +1,15 @@
+card {
+  name = "Moonlit Meditation",
+  cost = [2, blue],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(and([or([isArtifact, isCreature]), youControl])),
+    static(
+      replace(
+        nthOccurrence(
+          nth(1),
+          would(by(you), createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []))),
+          turn),
+        instead(may(create(groupSize, copyOf(enchanted(permanent)))))))]
+}

@@ -1,0 +1,18 @@
+card {
+  name = "Highspire Bell-Ringer",
+  cost = [2, blue],
+  types = [creature],
+  subtypes = [djinn, monk],
+  text = [
+    flying,
+    static(
+      costShift(
+        the(
+          and(
+            [
+              isSpell,
+              did(actor(you), cast(which), thisObject, ordinal = {ordinal = nth(2), per = turn})])),
+        less(1)))],
+  power = 1,
+  toughness = 4
+}

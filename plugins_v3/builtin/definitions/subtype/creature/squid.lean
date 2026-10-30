@@ -1,7 +1,0 @@
-subtype squid := {
-  lexical := { lemma := "Squid", plural := "Squid" },
-  spelling := "Squid",
-  kind := creature,
-  name := "Squid",
-  confers := []
-}

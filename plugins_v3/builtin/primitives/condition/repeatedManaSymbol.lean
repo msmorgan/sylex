@@ -1,6 +1,0 @@
-/-- "more than one of the same mana symbol in its mana cost" -/
-primitive repeatedManaSymbol : DeckTrait := {
-  spelling := "more than one of the same mana symbol in its mana cost",
-  body :=
-    Semantics.Primitives.DeckTrait.repeatedManaSymbol
-}

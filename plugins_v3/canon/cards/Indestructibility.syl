@@ -1,0 +1,7 @@
+card {
+  name = "Indestructibility",
+  cost = [3, white],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [enchant(isPermanent), static(abilityGrant(enchanted(permanent), indestructible))]
+}

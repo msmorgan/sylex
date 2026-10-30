@@ -1,0 +1,3 @@
+primitive isPlayer: Predicate {
+  spelling = "player"
+}

@@ -1,6 +1,0 @@
-/-- "the …" -/
-template the (p : Predicate) : NounPhrase := {
-  spelling := "the <p>",
-  body :=
-    described the p
-}

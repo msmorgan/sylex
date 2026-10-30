@@ -1,0 +1,14 @@
+card {
+  name = "Lens of Clarity",
+  cost = [1],
+  types = [artifact],
+  text = [
+    static(
+      conjunction(
+        [
+          visibility(lookAt, you, topOfLibrary),
+          visibility(
+            lookAt,
+            you,
+            objects(allOf(and([isCreature, isFaceDown, youDontControl]))))]))]
+}

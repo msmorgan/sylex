@@ -1,7 +1,0 @@
-/-- "return <subject> to <zone>" -/
-template returnTo (subject : NounPhrase) (destination : Location)
-    (riders : List MoveRider) : Action := {
-  -- TODO(spelling): Format and coordinate the riders list entries, including the empty case.
-  body :=
-    zoneChange subject destination wherever riders
-}

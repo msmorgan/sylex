@@ -1,0 +1,6 @@
+counter dreamCounter {
+  lexical = {lemma = "dream counter"},
+  spelling = "dream counter",
+
+  confers = []
+}

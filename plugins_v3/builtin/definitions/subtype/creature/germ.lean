@@ -1,7 +1,0 @@
-subtype germ := {
-  lexical := { lemma := "Germ" },
-  spelling := "Germ",
-  kind := creature,
-  name := "Germ",
-  confers := []
-}

@@ -1,0 +1,20 @@
+# "Cumulative upkeep [cost]" with its reminder text [CR#702.24a].
+ability cumulativeUpkeep(cost: Cost) {
+  lexical = {
+    lemma = "cumulative upkeep",
+    parameters = [[Cost]],
+    nouns = [{lemma = "cumulative upkeep", countability = [Mass]}]},
+  spelling = "cumulative upkeep <cost>",
+  body = [
+    at(
+      beginningOf(upkeep, you, eachTime),
+      sequentially(
+        [
+          putCounters(1, printedKind(ageCounter), thisPermanent),
+          doUnlessKeywordCost(
+            sacrifice(thisPermanent),
+            scaled(cost, times(1, countersOn(ageCounter, thisPermanent))),
+            thisPermanent,
+            cumulativeUpkeep)]),
+      if = is(thisPermanent, isPermanent))]
+}

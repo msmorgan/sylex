@@ -1,0 +1,14 @@
+card {
+  name = "Harbinger of the Seas",
+  cost = [1, blue, blue],
+  types = [creature],
+  subtypes = [merfolk, wizard],
+  text = [
+    static(
+      qualityChange(
+        allOf(and([isLand, non(hasSupertype(basic))])),
+        sets,
+        bundle({characteristics = {subtypes = [island]}})))],
+  power = 2,
+  toughness = 2
+}

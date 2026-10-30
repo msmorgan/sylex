@@ -1,0 +1,20 @@
+card {
+  name = "Curator of Destinies",
+  cost = [4, blue, blue],
+  types = [creature],
+  subtypes = [sphinx],
+  text = [
+    static(cant(any, counter(thisSpell))),
+    flying,
+    when(
+      does(actor(thisCreature), enter),
+      sequentially(
+        [
+          lookAt(topSlice(5)),
+          separateIntoPiles(them, 2, [faceDown, faceUp]),
+          instruct(anOpponent, choose(onePile)),
+          putInto(that(pile), hand),
+          putInto(theOther, graveyard)]))],
+  power = 5,
+  toughness = 5
+}

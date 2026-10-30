@@ -1,0 +1,5 @@
+# "transformed by paying <cost> rather than its mana cost" [CR#712.8c,702.146a].
+# [CR#712.8c,702.146a]
+primitive transformedPaying(cost: Cost): PlayPayment = .transformed {
+  spelling = "transformed by paying <cost> rather than its mana cost"
+}

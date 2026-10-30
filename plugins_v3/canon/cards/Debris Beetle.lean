@@ -1,9 +1,0 @@
-card := {
-  name := "Debris Beetle",
-  cost := [2, black, green],
-  types := [artifact],
-  subtypes := [vehicle],
-  text := [trample, when (does thisVehicle enter) [instruct eachOpponent (loseLife 3), gainLife 3], crew 2],
-  power := 6,
-  toughness := 6
-}

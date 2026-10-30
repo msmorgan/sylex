@@ -1,6 +1,0 @@
-counter corpseCounter := {
-  lexical := { lemma := "corpse counter" },
-  spelling := "corpse counter",
-  holder := object,
-  confers := []
-}

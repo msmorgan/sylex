@@ -1,0 +1,14 @@
+card {
+  name = "Benevolent Blessing",
+  cost = [1, white],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    flash,
+    enchant(isCreature),
+    static(entersChoosing(thisAura, color)),
+    static(
+      retention(
+        abilityGrant(enchanted(creature), protection(ofChosen(color))),
+        allOf(and([or([hasSubtype(aura), hasSubtype(equipment)]), youControl, attachedTo(it)]))))]
+}

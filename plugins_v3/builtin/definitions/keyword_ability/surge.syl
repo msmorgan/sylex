@@ -1,0 +1,11 @@
+# "Surge [cost]" means "You may pay [cost] rather than pay this spell's mana cost as you cast this
+# spell if you or one of your teammates has cast another spell this turn." [CR#702.117a]
+ability surge(cost: Cost) {
+  lexical = {lemma = "surge", parameters = [[Cost]]},
+  spelling = "surge <cost>",
+  body = [
+    static(
+      onlyWhile(
+        altCost(this, cost),
+        did(actor(or([you, a(isTeammate)])), cast(a(anotherSpell)), within(soFarThisTurn))))]
+}

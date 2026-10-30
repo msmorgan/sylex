@@ -1,0 +1,4 @@
+# "any amount"
+primitive anyAmount: Amount {
+  spelling = "any amount"
+}

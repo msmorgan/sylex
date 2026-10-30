@@ -1,0 +1,15 @@
+card {
+  name = "Patrician Geist",
+  cost = [2, blue],
+  types = [creature],
+  subtypes = [spirit, knight],
+  text = [
+    flying,
+    static(getsPt(allOf(and([hasSubtype(spirit), youControl, isOther])), up(1), up(1))),
+    static(
+      costShift(
+        allOf(and([isSpell, did(actor(you), cast(which, from = yourGraveyard), thisObject)])),
+        less(1)))],
+  power = 2,
+  toughness = 2
+}
