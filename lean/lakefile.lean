@@ -177,3 +177,11 @@ lean_lib SemanticsCardsData where
 /-- The pin suites; canon cards come from `Semantics.Cards.Data.Fixtures` only. -/
 lean_lib SemanticsProofs where
   roots := #[`Semantics.Proofs]
+
+lean_lib DumpValues where
+  roots := #[`DumpValues.Sampling, `DumpValues.Compare]
+
+/-- Opt-in elaborated values; excluded from the default build and the Lean check gate. -/
+lean_exe dumpValues where
+  root := `DumpValues.Main
+  supportInterpreter := true
