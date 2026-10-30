@@ -33,7 +33,8 @@ simplicity.
   governs the Rust and Lake parsers, and its "Concrete surface syntax" bullet fixes the tokens.
 - **Mentions follow constructor order.** `firstMention` evaluates a parameter's argument once and
   records its referents; `laterMention` reads them back. Which occurrence is first is decided after
-  expansion, in the order the checker evaluates the expanded constructor's fields. Authors write
+  expansion, in the order the checker reads the occurrences (usually field order; not for an
+  explicit-agent passive, which reads the promoted patient first). Authors write
   arguments in printed-card order, and a declaration's parameter order carries no meaning, so
   primitive and Template signatures may follow the printed phrase (12 primitives violated the old
   parameter-order rule).
@@ -58,7 +59,7 @@ simplicity.
     `Characteristics → CharacteristicBundle`). Every wrapper is written explicitly in `.syl`;
     coercions may be reintroduced deliberately once the language is simple enough to refactor.
   - **All 5 domain-list coercions are deleted** (`sequentially`, `and`, `conjunction`, `compound`
-    and `mana` are always written explicitly; `[...]` is only `List T`).
+    and `mana` are always written explicitly; `[...]` is only a list literal).
   - **No leading dots** (`.foo` becomes bare `foo`), and **no polymorphic `{α : Type}` binders**
     (`plugins_v3/builtin/templates/noun/bracketed.lean` is deleted).
 - **Deterministic `O(1)` dispatch and `Option` auto-wrapping.**
@@ -72,9 +73,9 @@ simplicity.
 
     A declaration `(head, T)` that shares its name with a constructor or enum word of `T` is a
     load error.
-  - **`Option U` auto-wrapping:** Presence of a `U` wraps in `some`; omission of an argument
-    or record field declared with a default (including `none`) takes that default; `none` remains available as an explicit default or
-    argument; `some` is never written.
+  - **`Option U` auto-wrapping:** Presence of a `U` wraps in `some`; omission of an argument or
+    record field declared with a default (including `none`) takes that default; `none` remains
+    available as an explicit default or argument; `some` is never written.
   - **Direct sort atoms:** integer literals at `Nat`, `Int`, `Amount` (`Amount.lit n`) and
     `ManaSymbol` (`generic n`); color words (`white`, `blue`, `black`, `red`, `green`) at `Color`,
     `ColorOrColorless` and `ManaSymbol`; `ability` definition names at `Ability`, `KeywordLabel`
@@ -83,15 +84,15 @@ simplicity.
     typeclasses and all qualified names are deleted.
 - **Expansion.** Templates expand to constructor trees by first-order substitution, and
   Definitions (`action`, `ability`) expand to `ownScope` with `inCaller` on every `CallerScope`
-  parameter. First and later mentions are inserted after expansion by one walk in constructor field
-  order.
+  parameter. First and later mentions are inserted after expansion by one walk in the checker's
+  read order.
 - **`Authoring.Form` is deleted; cleave is backburnered (owner, 2026-10-30).** Delete
   `Authoring.Form`, `Authoring.inspect`, `onlyAuthored`, and
   `plugins_v3/builtin/templates/noun/bracketed.lean`, with the `bracketed` pins in
   `Proofs/TextChanges.lean` (retired: they assert a template that no longer exists; name each).
   Cleave is not expected to work through templates until `plugins-v3-cleave-bracketed-text`
-  returns `bracketed` in the new language. Rewrite `untapStepCardsUseUntapDuring` in `Proofs/UntapStep.lean` to assert on the
-  expanded `.card` AST directly.
+  returns `bracketed` in the new language. Rewrite `untapStepCardsUseUntapDuring` in
+  `Proofs/UntapStep.lean` to assert on the expanded `.card` AST directly.
 - **The dependency graph and builtin modules.** Do not do file discovery or dependency
   sorting inside a Lean elaborator.
   - The Lake generator from `lean-generated-canon-modules` (a `lakefile.lean` target behind the
@@ -114,10 +115,10 @@ simplicity.
 ## Implementation, once settled
 
 - **Oracle.** Save the Lean dump (`lean-elaborated-value-dump`) before converting. Afterwards it
-  must show 0 differences under the conversion's rename map, except the changes the rulings
-  above deliberately make (the `search`/`searchZonesOf` opt-out); each such difference is reviewed
-  for correctness and the oracle is updated, not the ruling bent to fit it. The Rust `xtask expansions` cannot
-  read the converted files, so it is no oracle here.
+  must show 0 differences under the conversion's rename map. The conversion changes syntax only;
+  the one deliberate expansion change (dropping the `search`/`searchZonesOf` opt-out) landed in
+  Lean before the dump is taken. The rename map is generated and gitignored, never tracked. The
+  Rust `xtask expansions` cannot read the converted files, so it is no oracle here.
 - **Delete the old Rust crates in this same change, right after the conversion.** The old Rust
   parser cannot read the converted files, so these would fail `cargo test` from the moment the
   files change:
@@ -133,9 +134,9 @@ simplicity.
   `term_elab` hooks. Rewrite or retire `Proofs/Authoring.lean` and `Proofs/CallerScope.lean` to
   test the new loader, naming each retirement.
 - **Citations.** `cargo xtask cite` scans `.syl` `#` comments like `.lean` and `.rs` comments
-  before the conversion lands, so the converted files' `[CR#…]` citations stay checked.
+  before the conversion lands, so the converted files' CR citations stay checked.
 - **Verification here.** The Lake generator parses every converted `.syl` file without error and
-  the dump comparison shows no differences beyond the deliberate `search` change. The test that
+  the dump comparison shows no differences under the rename map. The test that
   the Rust and Lake parsers agree belongs to `semantics-rust-rewrite`, where the second parser
   appears.
 - **Folded in from earlier tickets:**

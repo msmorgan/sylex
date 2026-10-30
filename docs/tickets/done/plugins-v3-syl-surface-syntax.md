@@ -32,11 +32,11 @@ Recorded in `docs/decisions/semantics-v3.md` §4.4 ("Concrete surface syntax"):
 - `lexical`, `spelling`, `body`, `confers` and `rules` are record fields;
 - reserved words are written plain (`in`, `from`, `this`, ...) and the Lake generator quotes
   collisions; `none`, `true` and `false` are reserved and resolve before enum words;
-- comments are `#` to end of line, doc comments a leading `#` block, with `[CR#…]` citations;
+- comments are `#` to end of line, doc comments a leading `#` block, with bracketed CR citations;
 - no parameter opt-out marker exists (the ADR's `inCaller` ruling).
 
 ## Acceptance
 
 - `cargo xtask cite` scans `.syl` `#` comments before the conversion lands.
-- The conversion preserves the Lean dump oracle (`lean-elaborated-value-dump`) except for the
-  changes the rulings in `plugins-v3-data-language` deliberately make.
+- The conversion preserves the Lean dump oracle (`lean-elaborated-value-dump`): it changes syntax
+  only.
