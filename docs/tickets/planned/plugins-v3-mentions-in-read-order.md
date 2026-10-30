@@ -4,7 +4,8 @@ needs: [plugins-v3-data-language]
 # Insert first and later mentions in the checker's read order
 
 Standard constraints apply. `docs/decisions/semantics-v3.md` §4.5 item 3 says a parameter's first
-mention is the occurrence the checker reads first. `plugins-v3-data-language` keeps today's
+mention is the occurrence the checker reads first. The `.syl` generator and conversion (`plugins-v3-syl-generator`,
+`plugins-v3-syl-conversion`) keep today's
 insertion order instead (the expanded expression's order, each `or` alternative in its own
 scope), so that the conversion changes syntax only.
 

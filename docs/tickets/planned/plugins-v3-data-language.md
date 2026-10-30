@@ -1,158 +1,44 @@
 ---
-needs: [lean-generated-canon-modules, lean-elaborated-value-dump, plugins-v3-first-order-templates]
+needs: [plugins-v3-syl-conversion]
 ---
-# `plugins_v3` as a `.syl` data language whose files are their own AST
+# `plugins_v3` as a `.syl` data language: delete the Lean authoring machinery
 
-Standard constraints apply. The abstract model and dispatch rules are settled below and recorded in
-`docs/decisions/semantics-v3.md` §§4.4–4.5, including the concrete surface syntax (calls, `=`
-binding, `kind name(param: Sort = default): Sort { fields }` headers, `#` comments).
+Standard constraints apply. Third of three tickets (after `plugins-v3-syl-generator` and
+`plugins-v3-syl-conversion`). The data language itself is specified in
+`docs/decisions/semantics-v3.md` §4.4–§4.5. Once the conversion lands, nothing in `plugins_v3`
+is elaborated by the authoring machinery; this ticket deletes it.
 
 ## Why
 
-The `plugins_v3` DSL is written in Lean syntax, but it no longer behaves like Lean. `load_bundle`,
+The `plugins_v3` DSL was written in Lean syntax but no longer behaved like Lean. `load_bundle`,
 expected-type dispatch, scoped `term_elab` hooks on `ident`/`app`/`structInst`, `AuthoringContext`
-threaded through 2,073 declarations, `primitive_boundary%`, and `Authoring.inspect` / `Authoring.Form`
-/ `onlyAuthored` all exist to police an open term language into behaving like a closed data
-language. Together that is more than 1,000 lines of `Authoring.lean`, plus a 1,272-line proof file
-testing the policing.
+threaded through 2,073 declarations, `primitive_boundary%`, and `Authoring.inspect` /
+`Authoring.Form` / `onlyAuthored` all existed to police an open term language into behaving like a
+closed data language: more than 1,000 lines of `Authoring.lean`, plus a 1,272-line proof file
+testing the policing. `plugins_v2` was a data language whose files were practically their own
+AST; `.syl` returns to that simplicity.
 
-`plugins_v2` was a data language, and its files were practically their own AST. Return to that
-simplicity.
+## Change
 
-## Settled (owner, 2026-10-28..2026-10-30)
+- **Delete** `AuthoringContext`, `Authoring.inspect`, `Authoring.Form`, `onlyAuthored`,
+  `primitive_boundary%`, `splice`/`CallerSplice`, the scoped `term_elab` hooks, every authoring
+  coercion instance (§4.4 "No coercions"), and the `inCaller` opt-out handling.
+- **Rewrite or retire** `Proofs/Authoring.lean` and `Proofs/CallerScope.lean` to test the
+  generator, naming each retirement. In particular:
+  - `incompatibleLocalAllowsWord` is rewritten to assert that a parameter used at the wrong sort
+    is a generator error;
+  - `untapStepCardsUseUntapDuring` (`Proofs/UntapStep.lean`) asserts on the expanded `.card`
+    value directly;
+  - the `up` pin is retired as moot: a body-less primitive is its constructor's binding.
+- **Mention-order pin** (from the deleted `lean-v3-mention-order-follows-constructors`): a Template
+  that passes one `NounPhrase` as `conjunction`'s `parts` and as its `subject` gives the subject the
+  first mention.
+- **Zero qualified names** (from `plugins-v3-kept-qualified-sites`), and no dependency-scan
+  workarounds left in `lean/CONTRACTS.md` or a README.
 
-- **Lean is a workbench and verifier, never in the hot path of card compilation.** The Rust
-  pipeline must parse the DSL itself. It is being rewritten as `semantics` (parser and AST),
-  `discourse` (DRT referent resolution, in Rust) and `lowering` (to core); see
-  `semantics-rust-rewrite`.
-- **Host and `.syl` file extension.** `plugins_v3` files are standalone `.syl` data files
-  (`plugins_v3/**/*.syl`), not Lean source files. They are parsed natively by Rust (`semantics`)
-  and by the Lake generator in `lean/lakefile.lean`, which emits gitignored `.lean` modules under
-  `lean/.lake/build/gen/` containing plain Lean `def`s. Zero custom Lean `term_elab` hooks or
-  authoring macros remain. One grammar specification in `docs/decisions/semantics-v3.md` §4.4
-  governs the Rust and Lake parsers, and its "Concrete surface syntax" bullet fixes the tokens.
-- **Mentions follow constructor order.** `firstMention` evaluates a parameter's argument once and
-  records its referents; `laterMention` reads them back. Which occurrence is first is decided after
-  expansion, in the order the checker reads the occurrences (usually field order; not for an
-  explicit-agent passive, which reads the promoted patient first). Authors write
-  arguments in printed-card order, and a declaration's parameter order carries no meaning, so
-  primitive and Template signatures may follow the printed phrase (12 primitives violated the old
-  parameter-order rule).
-- **No `inCaller` opt-out.** Definitions always wrap every `CallerScope` parameter. `search` and
-  `searchZonesOf` drop their `inCaller for_` opt-outs, so `for_` is bound like any parameter;
-  `madness`'s scope-escape `inCaller` is an ordinary call. That change already landed in Lean,
-  before the dump is taken.
-- **No evaluation in plugin files.** No higher-order parameters, `match`, `if`, `fun`, or
-  `List`/`Option` functions; `plugins-v3-first-order-templates` removed the existing sites
-  (including `chooseModesOver`, `splice` and `CallerSplice`), along with `have`, tuples and `⟨…⟩`.
-  The grammar has no local bindings and no bottom-up type inference.
-- **Abstract grammar, no coercions, no domain lists, no leading dots.**
-  - The 5 expression productions are:
-    1. literals (string `"..."`, integer, `true`/`false`);
-    2. list literals (`[...]`, valid at expected sort `List T` or `Option (List T)`);
-    3. record blocks;
-    4. calls with positional and named arguments;
-    5. bare words (0-argument identifiers).
-  - **All coercions are deleted, simplicity first.** That includes
-    `NounPhrase → Subject` and the 12 expression-level `Coe`s (`actor`, `hasSubtype`, `perform`,
-    `mana`, `written`, `printedKind`, `printedName`, `holds`, `static`, `span`, `mode`,
-    `Characteristics → CharacteristicBundle`). Every wrapper is written explicitly in `.syl`;
-    coercions may be reintroduced deliberately once the language is simple enough to refactor.
-  - **All 5 domain-list coercions are deleted** (`sequentially`, `and`, `conjunction`, `compound`
-    and `mana` are always written explicitly; `[...]` is only a list literal).
-  - **No leading dots** (`.foo` becomes bare `foo`), and **no polymorphic `{α : Type}` binders**
-    (`plugins_v3/builtin/templates/noun/bracketed.lean` is deleted).
-- **Deterministic `O(1)` dispatch and `Option` auto-wrapping.**
-  - Every node is resolved top-down by `(bare_name, expected_sort)` with zero backtracking, in
-    priority order:
-    1. parameter of the enclosing declaration (0 args; declared sort `T`, or `U` when
-       `T = Option U`);
-    2. `none` when `T = Option U`;
-    3. declaration `(head, T)`, then `(head, U)` when `T = Option U` (the exact sort wins);
-    4. constructor / closed enum word of `T` (or `U` when `T = Option U`).
+## Acceptance
 
-    A declaration `(head, T)` that shares its name with a constructor or enum word of `T` is a
-    load error.
-  - **`Option U` auto-wrapping:** Presence of a `U` wraps in `some`; omission of an argument or
-    record field declared with a default (including `none`) takes that default; `none` remains
-    available as an explicit default or argument; `some` is never written.
-  - **Direct sort atoms:** integer literals at `Nat`, `Int`, `Amount` (`Amount.lit n`) and
-    `ManaSymbol` (`generic n`); color words (`white`, `blue`, `black`, `red`, `green`) at `Color`,
-    `ColorOrColorless` and `ManaSymbol`; `ability` definition names at `Ability`, `KeywordLabel`
-    and `KeywordTerm`; `action` definition names at `Action` and `Deed`.
-  - Supersedes the deleted `lean-v3-overloaded-primitive-typeclasses` (`kknnrqss`): all `Has*`
-    typeclasses and all qualified names are deleted.
-- **Expansion.** Templates expand to constructor trees by first-order substitution, and
-  Definitions (`action`, `ability`) expand to `ownScope` with `inCaller` on every `CallerScope`
-  parameter. First and later mentions are inserted after expansion by one walk that keeps today's
-  order (the expanded expression's order, each `or` alternative in its own scope), so the
-  conversion changes syntax only; `plugins-v3-mentions-in-read-order` moves to the checker's read
-  order afterwards.
-- **Primitives are body-less.** `primitive name(params): Sort` binds the constructor of that name
-  and sort, matching parameters to fields by name. No two declarations share one `(name, sort)`:
-  rename `timesPaid : Amount` and turn the six record-building primitives (`can`, `cant`, `must`,
-  `gatedBy`, both `did`s) into Templates over renamed primitives. Keyword `lexical.parameters`
-  are kept as written.
-- **`Authoring.Form` is deleted; cleave is backburnered.** Delete
-  `Authoring.Form`, `Authoring.inspect`, `onlyAuthored`, and
-  `plugins_v3/builtin/templates/noun/bracketed.lean`, with the `bracketed` pins in
-  `Proofs/TextChanges.lean` (retired: they assert a template that no longer exists; name each).
-  Cleave is not expected to work through templates until `plugins-v3-cleave-bracketed-text`
-  returns `bracketed` in the new language. Rewrite `untapStepCardsUseUntapDuring` in
-  `Proofs/UntapStep.lean` to assert on the expanded `.card` AST directly.
-- **The dependency graph and builtin modules.** Do not do file discovery or dependency
-  sorting inside a Lean elaborator.
-  - The Lake generator from `lean-generated-canon-modules` (a `lakefile.lean` target behind the
-    `Module.inputFacet` override, ending with `setTrace .nil`) parses `plugins_v3/builtin/**/*.syl`
-    and `plugins_v3/canon/**/*.syl` in the `.syl` grammar. It writes gitignored Lean modules with
-    real `import`s.
-  - One module per component makes module names change as the builtin changes. That also requires
-    overriding `LeanLib.modulesFacet`, so the library awaits the generator before listing its
-    modules. Add a case for it to the generator's regression test.
-  - Each strongly connected component of the possibly over-approximate dependency graph becomes
-    one module, so a false edge only merges two modules instead of failing.
-  - Delete `load_bundle`, `topoSortBundle`, `referencedIdents`, the directory walk and the
-    `builtinBundle` input. Lake then builds the builtin in parallel and rebuilds only the
-    dependents of an edited declaration.
-  - The `exileZone` (`zone .exile none`) and `devourEntry` (`Action.devour`) workarounds disappear,
-    and no qualification is ever needed.
-- **The existing definitions are converted by script**: a purpose-built script, or a final
-  emitter run from the current `deckmaste_semantics_v3`. They are not converted by hand.
-
-## Implementation, once settled
-
-- **Oracle.** Save the Lean dump (`lean-elaborated-value-dump`) before converting. Afterwards it
-  must show 0 differences under the conversion's rename map. The conversion changes syntax only;
-  the one deliberate expansion change (dropping the `search`/`searchZonesOf` opt-out) landed in
-  Lean before the dump is taken. The rename map is generated and gitignored, never tracked. The
-  Rust `xtask expansions` cannot read the converted files, so it is no oracle here.
-- **Delete the old Rust crates in this same change, right after the conversion.** The old Rust
-  parser cannot read the converted files, so these would fail `cargo test` from the moment the
-  files change:
-  - `deckmaste_semantics_v3` and `deckmaste_lowering_v3`, including their tests
-    (`tests/bundle.rs`, `tests/lower.rs`);
-  - `xtask expansions`;
-  - `crates/xtask/tests/suite/plugins_v3_declarations.rs`.
-
-  If the conversion uses the old crate as its emitter, run it first, then delete. Delete any
-  ticket text that still names these crates as live.
-- **Delete** `AuthoringContext`, `Authoring.inspect`, `Authoring.Form`, `onlyAuthored`, `primitive_boundary%`, `splice`/`CallerSplice`, and the scoped
-  `term_elab` hooks. Rewrite or retire `Proofs/Authoring.lean` and `Proofs/CallerScope.lean` to
-  test the new loader, naming each retirement.
-- **Citations.** `cargo xtask cite` scans `.syl` `#` comments like `.lean` and `.rs` comments
-  before the conversion lands, so the converted files' CR citations stay checked.
-- **Verification here.** The Lake generator parses every converted `.syl` file without error and
-  the dump comparison shows no differences under the rename map. The test that
-  the Rust and Lake parsers agree belongs to `semantics-rust-rewrite`, where the second parser
-  appears.
-- **Folded in from earlier tickets:**
-  - from `plugins-v3-kept-qualified-sites`: zero qualified names, and no dependency-scan
-    workarounds left in CONTRACTS.md or README.md;
-  - the mention-order pin from the deleted `lean-v3-mention-order-follows-constructors`;
-  - from `plugins-v3-authoring-loose-ends`: a bare word that names a parameter at a sort the
-    parameter does not have is a load error (rewrite `incompatibleLocalAllowsWord` to assert
-    it); the `up` pin is moot once primitives are body-less constructor bindings (ADR §4.5).
-
-  For the mention-order pin: a Template that passes one NounPhrase as `conjunction`'s `parts` and
-  as its `subject` gives the subject the first mention.
-- Additive `lean-v3-*` tickets that land before the conversion are carried over by the script.
+- `cargo xtask lean check` passes; the Lean dump shows 0 differences against the one saved after
+  `plugins-v3-syl-conversion`.
+- The test that the Rust and Lake parsers agree belongs to `semantics-rust-rewrite`, where the
+  second parser appears.

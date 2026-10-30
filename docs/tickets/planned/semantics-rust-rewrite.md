@@ -6,11 +6,11 @@ needs: [plugins-v3-data-language, lean-v3-active-player-term, lean-v3-binding-ac
 Standard constraints apply. This is an epic, and needs a design dialogue before it is split into
 tickets.
 
-`plugins-v3-data-language` deletes `deckmaste_semantics_v3`, `deckmaste_lowering_v3` and
+`plugins-v3-syl-conversion` deletes `deckmaste_semantics_v3`, `deckmaste_lowering_v3` and
 `xtask expansions` when it converts the files. This epic starts from that state and builds three
 crates:
 
-- **`semantics`** parses the `plugins-v3-data-language` grammar into its AST and expands
+- **`semantics`** parses the `.syl` grammar (`docs/decisions/semantics-v3.md` §4.4) into its AST and expands
   Templates and Definitions. It does no reference resolution.
 - **`discourse`** implements the DRT referent resolution of `docs/decisions/semantics-v3.md` §1
   and §3 in Rust. Lean is never in the hot path of card compilation, so this is a

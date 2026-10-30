@@ -6,7 +6,7 @@ needs: [lean-generated-canon-modules]
 Standard constraints apply. `deckmaste_semantics_v3` and `deckmaste_lowering_v3` are going to be
 deleted and rewritten (`semantics-rust-rewrite`). With them goes the only meaning-preservation
 check: `cargo xtask expansions`. Lean needs its own, so that plugin rewrites can be compared
-before and after once the Rust is gone, including the conversion in `plugins-v3-data-language`.
+before and after once the Rust is gone, including the conversion in `plugins-v3-syl-conversion`.
 
 ## Change
 
@@ -30,7 +30,7 @@ before and after once the Rust is gone, including the conversion in `plugins-v3-
     `Amount.half` and others).
 
   A cap per declaration is allowed, but the summary reports what it leaves out. Without this,
-  the `plugins-v3-data-language` conversion would leave every builtin Template that no canon
+  the `plugins-v3-syl-conversion` conversion would leave every builtin Template that no canon
   card uses unchecked.
 
 ## Acceptance
