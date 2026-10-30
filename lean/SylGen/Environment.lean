@@ -7,10 +7,16 @@ import Semantics.CallerScope
 open Lean Meta
 namespace SylGen
 
+def leanWord (s : String) : String :=
+  if s ∈ ["this", "in", "from", "by", "exists", "where"] then s ++ "_" else s
+
 def quoted (s : String) : String := "«" ++ s ++ "»"
 
 def leanName (n : Name) : String :=
-  String.intercalate "." (n.components.map fun n => quoted n.getString!)
+  String.intercalate "." (n.components.map fun n => match n with
+    | .str _ s => quoted s
+    | .num _ i => toString i
+    | .anonymous => "")
 
 partial def SortRef.lean (s : SortRef) : String :=
   let name := if s.name ∈ ["List", "Option", "Nat", "Int", "Bool", "String"] then s.name

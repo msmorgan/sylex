@@ -1,4 +1,5 @@
 import SylGen.Emit
+import SylGen.Ordering
 import Lean.Util.SCC
 
 open Lean Meta System
@@ -16,7 +17,7 @@ private def writeChanged (path : FilePath) (text : String) : IO Unit := do
   if let some parent := path.parent then IO.FS.createDirAll parent
   IO.FS.writeFile path text
 
-private def generate (input output : FilePath) (root : Name) (fallback : Registry) : MetaM Unit := do
+private def generate (input output : FilePath) (root : Name) (modulePrefix : String) (fallback : Registry) : MetaM Unit := do
   let paths := (← input.walkDir).filter (·.extension == some "syl")
     |>.qsort (fun a b => a.toString < b.toString)
   let mut ds := #[]
@@ -30,6 +31,7 @@ private def generate (input output : FilePath) (root : Name) (fallback : Registr
         let parameters ← d.parameters.mapM fun p => do
           return { p with sort := ← normalizeSort p.pos p.sort }
         ds := ds.push { d with sort, parameters }
+  ds := orderDeclarations ds
   let ctors ← constructors
   let registry ← loadDeclarations root ds ctors fallback
   let mut outputs := #[]
@@ -45,7 +47,7 @@ private def generate (input output : FilePath) (root : Name) (fallback : Registr
       throwError d.pos.error (← error.toMessageData.toString)
   let owners := outputs.foldl (init := ({} : Std.HashMap Name Name)) fun map out =>
     (map.insert out.name out.name).insert (out.name ++ `label) out.name
-      |>.insert (out.name ++ `term) out.name |>.insert (out.name ++ `deed) out.name
+      |>.insert (out.name ++ `deed) out.name
   let byName := outputs.foldl (init := ({} : Std.HashMap Name Output)) fun m o => m.insert o.name o
   let dependencies := fun (name : Name) =>
     (byName[name]!.dependencies.toList.filterMap (owners[·]?)).eraseDups.filter (· != name)
@@ -60,22 +62,22 @@ private def generate (input output : FilePath) (root : Name) (fallback : Registr
     let module := modules[component.head!]!
     let mut imports := if fallback.isEmpty then "import Semantics.Rules\nimport Semantics.CallerScope\n"
       else "import Semantics.Definitions\n"
-    imports := imports ++ "import Semantics.Check.Rules\n"
+    imports := imports ++ "import Semantics.Check.Rules\nimport SylGen.Registration\n"
     let deps := (component.flatMap dependencies).filterMap (modules[·]?)
       |>.filter (· != module) |>.eraseDups
-    for dep in deps do imports := imports ++ s!"import SylFixtures.{dep}\n"
+    for dep in deps do imports := imports ++ s!"import {modulePrefix}.{dep}\n"
     let text := imports ++ "\n" ++ String.intercalate "\n" (component.map fun n => byName[n]!.prelude) ++
       "\n" ++ String.intercalate "\n" (component.map fun n => byName[n]!.text)
-    let path := output / "SylFixtures" / (module ++ ".lean")
+    let path := output / (modulePrefix.replace "." "/") / (module ++ ".lean")
     expected := expected.push path
     writeChanged path text
-    umbrella := umbrella ++ s!"import SylFixtures.{module}\n"
-  let dir := output / "SylFixtures"
+    umbrella := umbrella ++ s!"import {modulePrefix}.{module}\n"
+  let dir := output / (modulePrefix.replace "." "/")
   if ← dir.pathExists then
     for entry in ← dir.readDir do
       if entry.path.extension == some "lean" && !expected.contains entry.path then
         IO.FS.removeFile entry.path
-  writeChanged (output / "SylFixtures.lean") umbrella
+  writeChanged (output / ((modulePrefix.replace "." "/") ++ ".lean")) umbrella
   IO.println s!"sylGen: {ds.size} declarations, {components.length} modules"
 
 private partial def canonical (name : Name) : MetaM Name := do
@@ -86,8 +88,9 @@ private partial def canonical (name : Name) : MetaM Name := do
 
 private unsafe def run (args : List String) : IO UInt32 := do
   let (fixture, args) := if args.head? == some "--fixture" then (true, args.tail!) else (false, args)
-  let [input, output, root] := args
-    | throw (IO.userError "usage: sylGen [--fixture] CORPUS OUTPUT ROOT_NAMESPACE")
+  let args := if args.length == 3 then args ++ ["SylFixtures"] else args
+  let [input, output, root, modulePrefix] := args
+    | throw (IO.userError "usage: sylGen [--fixture] CORPUS OUTPUT ROOT_NAMESPACE [MODULE_PREFIX]")
   enableInitializersExecution
   initSearchPath (← findSysroot)
   let imports := if fixture then #[`SylGen.Tests.Registry] else #[`SylGen.Environment]
@@ -102,7 +105,7 @@ private unsafe def run (args : List String) : IO UInt32 := do
     for (name, sort, constant) in entries do
       let sig ← signature (← canonical constant)
       fallback := fallback.insert (name, sort) sig
-    generate input output root.toName fallback
+    generate input output root.toName modulePrefix fallback
   discard <| task.toIO {
     fileName := "sylGen"
     fileMap := default

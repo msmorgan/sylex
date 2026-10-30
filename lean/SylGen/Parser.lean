@@ -45,6 +45,7 @@ structure Declaration where
   parameters : Array Parameter := #[]
   sort : SortRef
   fields : Array (String × Value) := #[]
+  cardValue : Option Value := none
   documentation : String := ""
   deriving Inhabited, Repr
 
@@ -132,8 +133,10 @@ private def take : Parser Token := do
   return t
 
 private def accept (s : String) : Parser Bool := do
+  let saved ← get
   let t ← peek
   if !t.quoted && t.text == s then discard take; return true
+  set saved
   return false
 
 private def expect (s : String) : Parser Unit := do
@@ -176,6 +179,7 @@ private partial def value : Parser Value := do
   if ← accept "(" then
     if ← accept ")" then throw (t.pos.error "empty call: write a bare word")
     repeat
+      discard peek
       let (ts, i) ← get
       let name ← if !ts[i]!.quoted && ts[i+1]!.text == "=" then do
           let key ← word
@@ -206,6 +210,27 @@ def kindSort (kind : String) : Option String :=
   | "sba" => some "SbaRule" | "conferral" => some "ConferralRule" | "card" => some "Card"
   | _ => none
 
+private partial def printedName (v : Value) : Except String String := do
+  let fields ← match v with
+    | .record _ fields => pure fields
+    | .word p ctor #[(none, .record _ fields)] =>
+      let parts ← match ctor with
+        | "transforming" | "modalDfc" => pure ["front", "back"]
+        | "split" | "sharedLineSplit" => pure ["left", "right"]
+        | "adventurer" => pure ["normal", "adventure"]
+        | "flip" => pure ["normal", "alternative"]
+        | "leveler" | "prototype" => pure ["inner"]
+        | _ => throw (p.error "unknown card form")
+      let names ← parts.mapM fun part => do
+        let some (_, value) := fields.find? (·.1 == part)
+          | throw (p.error s!"missing card part '{part}'")
+        printedName value
+      return " // ".intercalate names
+    | _ => throw (v.position.error "expected named card parts")
+  match fields.find? (·.1 == "name") with
+  | some (_, .string _ name) => pure name
+  | _ => throw (v.position.error "card face requires a string name")
+
 private def declaration : Parser Declaration := do
   let k ← word
   unless k.text ∈ ["primitive", "template"] || (kindSort k.text).isSome do
@@ -216,6 +241,8 @@ private def declaration : Parser Declaration := do
   if ← accept "(" then
     repeat
       let p ← word
+      if p.text ∈ ["none", "true", "false"] then
+        throw (p.pos.error "reserved parameter name")
       if parameters.any (·.name == p.text) then throw (p.pos.error "duplicate parameter")
       expect ":"
       let s ← sort
@@ -223,21 +250,23 @@ private def declaration : Parser Declaration := do
       parameters := parameters.push { pos := p.pos, name := p.text, sort := s, defaultValue := d }
       if ← accept ")" then break
       expect ","
+      if ← accept ")" then break
   let result ← if k.text ∈ ["primitive", "template"] then do
       expect ":"
       sort
     else pure { name := (kindSort k.text).getD "" }
-  let fields ← if k.text == "primitive" then pure #[] else do
+  let cardValue ← if k.text == "card" then pure (some (← value)) else pure none
+  let fields ← if k.text == "card" then pure #[] else if k.text == "primitive" then pure #[] else do
     let v ← value
     match v with
     | .record _ fs => pure fs
     | _ => throw (v.position.error "expected declaration block")
-  let n ← if k.text == "card" then
-      match fields.find? (·.1 == "name") with
-      | some (_, .string _ s) => pure s
-      | _ => throw (k.pos.error "card requires a string name")
+  let n ← if let some v := cardValue then
+      match printedName v with
+      | .ok name => pure name
+      | .error message => throw message
     else pure n
-  return { pos := k.pos, kind := k.text, name := n, parameters, sort := result, fields }
+  return { pos := k.pos, kind := k.text, name := n, parameters, sort := result, fields, cardValue }
 
 def parse (file source : String) : Except String (Array Declaration) := do
   let tokens ← tokenize file source
@@ -245,10 +274,15 @@ def parse (file source : String) : Except String (Array Declaration) := do
     let mut out := #[]
     repeat
       let mut documentation := ""
+      let mut lastLine := 0
       while (← peekRaw).comment do
-        documentation := documentation ++ (← peekRaw).text ++ "\n"
+        let comment ← peekRaw
+        if comment.pos.line > lastLine + 1 then documentation := ""
+        documentation := documentation ++ comment.text ++ "\n"
+        lastLine := comment.pos.line
         modify fun (ts, i) => (ts, i + 1)
       if ← accept "<eof>" then break
+      if (← peekRaw).pos.line > lastLine + 1 then documentation := ""
       let d ← declaration
       out := out.push { d with documentation }
     return out

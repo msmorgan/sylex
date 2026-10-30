@@ -41,7 +41,7 @@ private def findSignature (head : String) (sort : SortRef) : ResolveM (Option Si
     if let some action := ctx.fallback[(head, "Action")]? then
       if (← getEnv).contains (action.constant ++ `deed) then
         return some (← signature (action.constant ++ `deed))
-  return ctx.constructors[(head, sort.text)]?
+  return ctx.constructors[(head, sort.text)]? <|> ctx.constructors[(leanWord head, sort.text)]?
 
 private def underlying (s : SortRef) : SortRef :=
   if s.name == "Option" then s.arguments[0]! else s
@@ -49,6 +49,12 @@ private def underlying (s : SortRef) : SortRef :=
 mutual
   partial def resolve (v : Value) (expected : SortRef) : ResolveM Term := do
     let ctx ← read
+    if let .record p fields := v then
+      if expected.name == "Card" then
+        return .call "Semantics.Card.singleFaced"
+          #[(none, ← resolve v { name := "CardFace" })]
+      if expected.name == "CardFace" && !(fields.any (·.1 == "characteristics")) then
+        return .record #[("characteristics", ← resolve (.record p fields) { name := "Characteristics" })]
     if let .word p head args := v then
       if let some param := ctx.parameters.find? (·.name == head) then
         unless args.isEmpty do fail p "a parameter is not callable"
@@ -61,6 +67,11 @@ mutual
         return .atom "none"
       if head == "some" then fail p "some is implicit; write the value"
       if let some sig ← findSignature head expected then
+        let args := if expected.name == "Card" then
+            match args with
+            | #[(none, .record _ fields)] => fields.map (fun (k, v) => (some k, v))
+            | _ => args
+          else args
         return ← resolveCall p sig args
       if expected.name == "KeywordTerm" && args.isEmpty then
         if let some sig ← findSignature head { name := "KeywordLabel" } then
@@ -90,11 +101,12 @@ mutual
       let signature ← structureFields expected
       let mut result := #[]
       for (key, value) in fields do
-        let some field := signature.find? (·.name == key)
-          | fail value.position s!"unknown field '{key}' at {expected.text}"
-        result := result.push (key, ← resolve value field.sort)
+        unless signature.any (·.name == key) do
+          fail value.position s!"unknown field '{key}' at {expected.text}"
       for f in signature do
-        unless f.hasDefault || fields.any (·.1 == f.name) do
+        if let some (_, value) := fields.find? (·.1 == f.name) then
+          result := result.push (f.name, ← resolve value f.sort)
+        else unless f.hasDefault do
           fail p s!"missing field '{f.name}' at {expected.text}"
       return .record result
     | .word p head args =>
@@ -116,7 +128,7 @@ mutual
     for (key, value) in args do
       let field ← if let some key := key then do
           named := true
-          let some f := sig.fields.find? (·.name == key)
+          let some f := sig.fields.find? (fun f => f.name == key || f.name == leanWord key)
             | fail value.position s!"unknown argument '{key}'"
           pure f
         else do
@@ -173,9 +185,9 @@ partial def render (decl : Declaration) (body : Term) (t : Term) : StateM (Array
   | .parameter name sort =>
     let isDefinition := decl.kind ∈ ["action", "ability"]
     let inner := if isDefinition && callerSort sort then
-        s!"(Semantics.CallerScope.caller {quoted name})" else quoted name
-    if sort.name == "NounPhrase" && (isDefinition || body.count name ≥ 2) then
-      return ← mention (decl.name ++ "." ++ name) inner
+        s!"(Semantics.CallerScope.caller {quoted (leanWord name)})" else quoted (leanWord name)
+    if sort.name == "NounPhrase" && (isDefinition || (decl.kind == "template" && body.count name ≥ 2)) then
+      return ← mention (leanWord decl.name ++ "." ++ leanWord name) inner
     return inner
   | .list values =>
     return "[" ++ String.intercalate ", " (← values.toList.mapM (render decl body)) ++ "]"
@@ -203,7 +215,7 @@ partial def render (decl : Declaration) (body : Term) (t : Term) : StateM (Array
         | some key => "(" ++ quoted key ++ " := " ++ text ++ ")"
     let text := "(" ++ name ++ " " ++ String.intercalate " " args ++ ")"
     if decl.kind == "action" && actorCall name && body.actorCount ≥ 2 then
-      return ← mention (decl.name ++ ".actor") text
+      return ← mention (leanWord decl.name ++ ".actor") text
     return text
 
 end SylGen

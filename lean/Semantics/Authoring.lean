@@ -81,7 +81,7 @@ private def authoredResultSort? (type : Expr) : MetaM (Option Name) := do
   let type := if type.isAppOfArity ``Option 1 then type.appArg! else type
   return (← whnfR type).getAppFn.constName?
 
-private def registerExpectedType (declaration : Name) : CommandElabM Unit := do
+def registerExpectedType (declaration : Name) : CommandElabM Unit := do
   let result ← liftTermElabM do
     forallTelescopeReducing (← getConstInfo declaration).type fun _ result =>
       authoredResultSort? result
@@ -136,7 +136,7 @@ private def addSortAlias (full : Name) : CommandElabM Unit := do
           definitionAttribute.setTag (alias ++ suffix)
       registerExpectedType alias
 
-private def registerSharedAliases (declaration : Name) : CommandElabM Unit := do
+def registerSharedAliases (declaration : Name) : CommandElabM Unit := do
   addSortAlias declaration
   let result? ← liftTermElabM <| forallTelescopeReducing (← getConstInfo declaration).type
     fun _ type => authoredResultSort? type
@@ -377,7 +377,7 @@ initialize actionDeedsExt : SimplePersistentEnvExtension (Name × Expr) (List (N
 
 /-- Definitions sharing a keyword-action label must agree on what the deed says of a
 Permanent, including Definitions imported from other modules. -/
-private def checkActionDeed (declaration : Name) (deed : Expr) : MetaM Unit := do
+def checkActionDeed (declaration : Name) (deed : Expr) : MetaM Unit := do
   let env ← getEnv
   for (name, other) in actionDeedsExt.getState env do
     if name != declaration then
