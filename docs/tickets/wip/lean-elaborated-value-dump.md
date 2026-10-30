@@ -38,6 +38,7 @@ before and after once the Rust is gone, including the conversion in `plugins-v3-
 - Two runs on an unchanged tree are byte-identical.
 - An edit that changes the meaning of one card (for example a cost pip) shows exactly that
   card's record as changed.
-- An edit in a non-first `match` arm of a builtin Template, and in an arm on a recursive
-  constructor, is reported as changed.
+- An edit to a builtin Template that no canon card uses, and to one whose parameter has a
+  recursive sort (sampled at depth 1), is reported as changed. (Templates have no `match` arms
+  since `plugins-v3-first-order-templates`.)
 - Nothing the tool writes is tracked.
