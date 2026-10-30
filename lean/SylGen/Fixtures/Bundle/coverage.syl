@@ -30,8 +30,6 @@ card_type fixtureType { name = "Fixture", cardClass = permanentCard, stats = [] 
 token fixtureToken { name = "Fixture", token = { characteristics = { name = "Fixture" } } }
 sba fixtureSba { scope = isCreature, when = is(thisCreature, isCreature), then_ = draw(1) }
 conferral fixtureConferral { scope = isCreature, confer = ability(flying) }
-ability mutualOne { body = [static(cant(any, block(thisCreature), except = byObjects(bare(hasKeyword(mutualTwo)))))] }
-ability mutualTwo { body = [static(cant(any, block(thisCreature), except = byObjects(bare(hasKeyword(mutualOne)))))] }
 template dispatchAtom: Nat { body = 5 }
 template dispatchAtom: Int { body = -5 }
 template dispatchNatural: Nat { body = dispatchAtom }

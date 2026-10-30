@@ -88,7 +88,8 @@ example : NormalFixture.Semantics.Templates.Bool.shared = true := rfl
 example : NormalFixture.Semantics.Templates.this_ = (1 : Int) := rfl
 example : NormalFixture.Semantics.Templates.useThis = (1 : Int) := rfl
 example : NormalFixture.Semantics.Templates.named = (2 : Int) := rfl
-example : NormalFixture.Semantics.Templates.words 1 2 3 4 5 6 7 8 = [1,2,3,4,5,6,7,8] := rfl
+example : NormalFixture.Semantics.Templates.words (this_ := 1) (in_ := 2) (from_ := 3) (by_ := 4)
+    (or_ := 5) (exists_ := 6) (where_ := 7) («variable» := 8) = [1,2,3,4,5,6,7,8] := rfl
 example : NormalFixture.Semantics.Definitions.withoutDeed =
     Semantics.Action.ownScope none (.sequentially []) := rfl
 example : NormalFixture.Semantics.Definitions.wordDeed.deed =
@@ -124,6 +125,17 @@ run_cmd do
       `NormalFixture.Semantics.Definitions.withoutDeed.deed,
       `NormalFixture.Semantics.Definitions.abilityDeed.deed] do
     if env.contains name then throwError "unexpected generated constant {name}"
+  unless Semantics.Authoring.templateAttribute.hasTag env
+      `SylFixture.Semantics.Templates.yourHand do throwError "missing template attribute"
+  unless Semantics.Authoring.definitionAttribute.hasTag env
+      `SylFixture.Semantics.Definitions.fight do throwError "missing definition attribute"
+  unless Semantics.Authoring.bundleRegistryAttribute.hasTag env
+      `SylFixture.Semantics.Definitions.aegisCounter do throwError "missing registry attribute"
+  unless ((entries.find? `in).getD []).isEmpty do
+    throwError "unexpected surface-spelling dispatch entry"
+  unless ((entries.find? `in_).getD []).any
+      (·.declaration == `NormalFixture.Semantics.Templates.in_) do
+    throwError "missing Lean-spelling dispatch entry"
   unless Semantics.Authoring.primitiveAttribute.hasTag env
       `SylFixture.Semantics.Primitives.Action.doForEachKind do
     throwError "missing primitive attribute"
@@ -139,7 +151,7 @@ run_cmd do
   let saved ← get
   let mut rejected := false
   try
-    elabCommand (← `(syl_register "action" conflictingDeed "conflictingDeed" ""))
+    elabCommand (← `(syl_register "action" conflictingDeed ""))
   catch error =>
     rejected := (← error.toMessageData.toString).contains "must agree on DeedPermanent"
   for message in (← get).messages.toList do
@@ -154,3 +166,20 @@ example : (match SylGen.parse "docs.syl"
     "primitive lit(value: Int): Amount\n# Attached documentation\ntemplate x: Int { body = 1 }" with
     | .ok ds => ds[1]!.documentation == " Attached documentation\n"
     | .error _ => false) = true := by native_decide
+
+example : NormalFixture.Semantics.Definitions.wrappedWord =
+    NormalFixture.Semantics.Templates.abilityWord (.named "fresh")
+      (.spell none (.sequentially [])) := rfl
+
+open Lean Meta Elab Command in
+run_cmd do
+  let some value := (← getConstInfo `SylFixture.Semantics.Definitions.threshold).value?
+    | throwError "missing ability word"
+  liftTermElabM <| lambdaTelescope value fun _ body => do
+    unless body.getAppFn.isConstOf `Semantics.Templates.abilityWord do
+      throwError "ability word did not retain its Template application"
+
+example : NormalFixture.Semantics.Templates.or (value := 5) = (5 : Int) := rfl
+
+example : NormalFixture.Semantics.Definitions.calledDeed.deed =
+    Semantics.Deed.action "customWord" := rfl
