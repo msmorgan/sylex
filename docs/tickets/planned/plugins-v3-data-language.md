@@ -77,12 +77,12 @@ simplicity.
     argument; `some` is never written.
   - **Direct sort atoms:** integer literals at `Nat`, `Int`, `Amount` (`Amount.lit n`) and
     `ManaSymbol` (`generic n`); color words (`white`, `blue`, `black`, `red`, `green`) at `Color`,
-    `ColorOrColorless` and `ManaSymbol`; `keyword` definition names at `Ability`, `KeywordLabel`
+    `ColorOrColorless` and `ManaSymbol`; `ability` definition names at `Ability`, `KeywordLabel`
     and `KeywordTerm`; `action` definition names at `Action` and `Deed`.
   - Supersedes the deleted `lean-v3-overloaded-primitive-typeclasses` (`kknnrqss`): all `Has*`
     typeclasses and all qualified names are deleted.
 - **Expansion.** Templates expand to constructor trees by first-order substitution, and
-  Definitions (`action`, `keyword`) expand to `ownScope` with `inCaller` on every `CallerScope`
+  Definitions (`action`, `ability`) expand to `ownScope` with `inCaller` on every `CallerScope`
   parameter. First and later mentions are inserted after expansion by one walk in constructor field
   order.
 - **`Authoring.Form` is deleted; cleave is backburnered (owner, 2026-10-30).** Delete

@@ -26,8 +26,9 @@ Recorded in `docs/decisions/semantics-v3.md` §4.4 ("Concrete surface syntax"):
 
 - calls are `head(arg, name = arg)`; `=` binds everywhere (fields, named arguments, defaults) and
   `:` means only "has sort", in headers;
-- headers are `kind name(param: Sort = default) { fields }`; only `primitive` and `template` write
-  their result sort, in the kind (`template(Duration) name(...)`), and there is no `->`;
+- headers are `kind name(param: Sort = default): Sort { fields }`; only `primitive` and `template`
+  write a result sort, after the parameters, and there is no `->`; the `keyword` kind is renamed
+  `ability` (`action` and `ability` declare Keyword Actions and Keyword Abilities);
 - `lexical`, `spelling`, `body`, `confers` and `rules` are record fields;
 - reserved words are written plain (`in`, `from`, `this`, ...) and the Lake generator quotes
   collisions; `none`, `true` and `false` are reserved and resolve before enum words;
