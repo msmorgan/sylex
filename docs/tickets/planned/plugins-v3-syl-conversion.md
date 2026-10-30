@@ -25,6 +25,11 @@ change. Specification: `docs/decisions/semantics-v3.md` §4.4–§4.5.
 - **Delete** `plugins_v3/builtin/templates/noun/bracketed.lean` and the `bracketed` pins in
   `Proofs/TextChanges.lean`, naming each retired pin (they assert a template that no longer
   exists). Cleave stays backburnered until `plugins-v3-cleave-bracketed-text`.
+- **Cards are plain `Card` values.** The generator emits a canon card as its `Card`, not as a
+  `Spelled` value carrying `Authoring.Form` evidence (that machinery goes in
+  `plugins-v3-data-language`). Adapt `lean/Semantics/CanonCheck.lean` (it reads `Spelled.card`),
+  and rewrite `untapStepCardsUseUntapDuring` (`Proofs/UntapStep.lean`) to assert on the cards' values
+  directly instead of their authoring calls.
 - **Switch the build.** The builtin and canon are built from the generator's modules. Delete
   `load_bundle`, `topoSortBundle`, `referencedIdents`, the directory walk and the `builtinBundle`
   input. The `exileZone` (`zone .exile none`) and `devourEntry` (`Action.devour`) workarounds

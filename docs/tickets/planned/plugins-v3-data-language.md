@@ -27,8 +27,6 @@ AST; `.syl` returns to that simplicity.
   generator, naming each retirement. In particular:
   - `incompatibleLocalAllowsWord` is rewritten to assert that a parameter used at the wrong sort
     is a generator error;
-  - `untapStepCardsUseUntapDuring` (`Proofs/UntapStep.lean`) asserts on the expanded `.card`
-    value directly;
   - the `up` pin is retired as moot: a body-less primitive is its constructor's binding.
 - **Mention-order pin** (from the deleted `lean-v3-mention-order-follows-constructors`): a Template
   that passes one `NounPhrase` as `conjunction`'s `parts` and as its `subject` gives the subject the
