@@ -20,8 +20,7 @@ change. Specification: `docs/decisions/semantics-v3.md` §4.4–§4.5.
     `this`, ...);
   - the `keyword` kind written `ability`; result sorts as `): Sort` on `primitive` and `template`;
   - primitives body-less;
-  - `timesPaid : Amount` renamed like the 11 prefixed same-sort collisions, and the six
-    record-building primitives (`can`, `cant`, `must`, `gatedBy`, both `did`s) turned into
+  - the six record-building primitives (`can`, `cant`, `must`, `gatedBy`, both `did`s) turned into
     Templates over renamed primitives, so no two declarations share one `(name, sort)`;
   - keyword `lexical.parameters` kept as written; comments and doc comments as `#` lines.
 - **Delete** `plugins_v3/builtin/templates/noun/bracketed.lean` and the `bracketed` pins in
