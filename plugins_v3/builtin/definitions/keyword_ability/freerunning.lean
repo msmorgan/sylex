@@ -3,7 +3,7 @@ was dealt combat damage this turn by a creature that, at the time it dealt that 
 Assassin creature or a commander under your control." [CR#702.173a] The lookback's description
 reads the creature as it dealt the damage, as prowl's does. -/
 keyword freerunning (cost : Cost) : Ability := {
-  lexical := { lemma := "freerunning", parameters := [[Cost], [DashNonManaCost]] },
+  lexical := { lemma := "freerunning", parameters := [[Cost]] },
   spelling := "freerunning <cost>",
   body :=
     [static

@@ -5,7 +5,7 @@ Turning it face up for its morph cost is a special action any time you have prio
 keyword morph (cost : Cost) : Ability := {
   lexical := {
     lemma := "morph",
-    parameters := [[Cost], [DashNonManaCost]],
+    parameters := [[Cost]],
     variants := [{ lemma := "megamorph", parameters := [[Cost]] }]
   },
   spelling := "morph <cost>",

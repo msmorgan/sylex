@@ -5,7 +5,7 @@ battlefield as the spell resolves [CR#608.3g], controlled by the spell's control
 [CR#603.7d], so a countered spell creates none, and a copy's token permanent [CR#608.3f] creates
 its own. -/
 keyword blitz (cost : Cost) : Ability := {
-  lexical := { lemma := "blitz", parameters := [[Cost], [DashNonManaCost]] },
+  lexical := { lemma := "blitz", parameters := [[Cost]] },
   spelling := "blitz <cost>",
   body :=
     [ static (altCost this_ (some cost)),

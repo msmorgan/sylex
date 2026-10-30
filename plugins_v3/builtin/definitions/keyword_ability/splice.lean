@@ -8,7 +8,7 @@ its sort, `Ability.splice`, as a declaration whose bare name is taken is (`Subty
 keyword Ability.splice (quality : Predicate) (cost : Cost) : Ability := {
   lexical := {
     lemma := "splice",
-    parameters := [[Quality (Some ("onto")), Cost], [Quality (Some ("onto")), DashNonManaCost]],
+    parameters := [[Quality (Some ("onto")), Cost]],
     verbs := [{ lemma := "splice", frames := [TransitiveWithPP (["onto"])] }]
   },
   spelling := "splice onto <quality> <cost>",

@@ -7,7 +7,7 @@ as long as it remains exiled" is a Resolution Delayed Trigger, as blitz's is [CR
 keyword warp (cost : Cost) : Ability := {
   lexical := {
     lemma := "warp",
-    parameters := [[Cost], [DashNonManaCost]],
+    parameters := [[Cost]],
     verbs := [{ lemma := "warp", frames := [Monotransitive] }]
   },
   spelling := "warp <cost>",

@@ -3,7 +3,7 @@ instant or sorcery spell by paying [cost] rather than paying its mana cost" and 
 cost was paid, exile this card instead of putting it anywhere else any time it would leave the
 stack" [CR#702.34a]. -/
 keyword flashback (cost : Cost) : Ability := {
-  lexical := { lemma := "flashback", parameters := [[Cost], [DashNonManaCost]] },
+  lexical := { lemma := "flashback", parameters := [[Cost]] },
   spelling := "flashback <cost>",
   body :=
     [static

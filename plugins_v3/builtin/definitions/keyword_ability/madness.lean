@@ -3,7 +3,7 @@ it instead of putting it into their graveyard" and "When this card is exiled thi
 may cast it by paying [cost] rather than paying its mana cost. If that player doesn't, they put
 this card into their graveyard." [CR#702.35a] -/
 keyword madness (cost : Cost) : Ability := {
-  lexical := { lemma := "madness", parameters := [[Cost], [DashNonManaCost]] },
+  lexical := { lemma := "madness", parameters := [[Cost]] },
   spelling := "madness <cost>",
   body :=
     [static

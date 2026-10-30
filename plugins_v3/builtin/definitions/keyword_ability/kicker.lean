@@ -2,7 +2,7 @@
 keyword kicker (cost : Cost) : Ability := {
   lexical := {
     lemma := "kicker",
-    parameters := [[Cost], [DashNonManaCost]],
+    parameters := [[Cost]],
     nouns := ["kicker"],
     variants := [{ lemma := "multikicker", parameters := [[Cost]] }],
     verbs := [{ lemma := "kick", frames := [Monotransitive] }]

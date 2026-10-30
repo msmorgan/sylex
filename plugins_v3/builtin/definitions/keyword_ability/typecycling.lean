@@ -5,7 +5,7 @@ shuffle your library." [CR#702.29e] -/
 keyword typecycling (quality : Predicate) (cost : Cost) : Ability := {
   lexical := {
     lemma := "cycling",
-    parameters := [[Cost], [DashNonManaCost]],
+    parameters := [[Cost]],
     bound := { surface := "cycling", stems := [Subtype, CardType, Supertype] },
     verbs := [{ lemma := "cycle", frames := [Monotransitive] }]
   },

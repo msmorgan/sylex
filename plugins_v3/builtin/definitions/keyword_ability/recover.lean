@@ -2,7 +2,7 @@
 pay [cost]. If you do, return this card from your graveyard to your hand. Otherwise, exile this
 card." [CR#702.59a] -/
 keyword recover (cost : Cost) : Ability := {
-  lexical := { lemma := "recover", parameters := [[Cost], [DashNonManaCost]] },
+  lexical := { lemma := "recover", parameters := [[Cost]] },
   spelling := "recover <cost>",
   body :=
     [when

@@ -3,7 +3,7 @@ paying its mana cost." [CR#702.138a] -/
 keyword escape (cost : Cost) : Ability := {
   lexical := {
     lemma := "escape",
-    parameters := [[DashNonManaCost]],
+    parameters := [[Cost]],
     verbs := [{ lemma := "escape", frames := [Intransitive, Prepositional (["with"])] }]
   },
   spelling := "escape—<cost>.",

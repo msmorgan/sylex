@@ -2,7 +2,7 @@
 keyword cumulativeUpkeep (cost : Cost) : Ability := {
   lexical := {
     lemma := "cumulative upkeep",
-    parameters := [[Cost], [DashNonManaCost]],
+    parameters := [[Cost]],
     nouns := [{ lemma := "cumulative upkeep", countability := [Mass] }]
   },
   spelling := "cumulative upkeep <cost>",

@@ -2,7 +2,7 @@
 gains haste. Exile it at the beginning of the next end step. If it would leave the battlefield,
 exile it instead of putting it anywhere else. Activate only as a sorcery." [CR#702.84a] -/
 keyword unearth (cost : Cost) : Ability := {
-  lexical := { lemma := "unearth", parameters := [[Cost], [DashNonManaCost]] },
+  lexical := { lemma := "unearth", parameters := [[Cost]] },
   spelling := "unearth <cost>",
   body :=
     [ activatedOnlyDuring cost

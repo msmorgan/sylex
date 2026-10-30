@@ -3,7 +3,7 @@ only as a sorcery." [CR#702.6a] -/
 keyword equip (cost : Cost) : Ability := {
   lexical := {
     lemma := "equip",
-    parameters := [[Cost], [Quality (None), Cost], [DashNonManaCost]],
+    parameters := [[Cost], [Quality (None), Cost]],
     determinatives := [{ number := Singular, countability := Count, lemma := "equipped" }],
     verbs := [
                {

@@ -669,7 +669,7 @@ The transition to `semantics-v3` is decomposed into the following ordered ticket
   retiring separate files such as `Counters.lean` + `Proofs/Rules.lean` and `Subtypes.lean` + `SubtypeRules.lean`.
 - Lean codegen discards `lexical` and `spelling` without elaborating or retaining their contents. Nested catalog structures and identifiers need no Lean declarations and create no bundle dependencies.
 - **No `rule:` data field:** CR citations live in comments (e.g. `[CR#701.47a]`) checked by `cargo xtask cite`.
-- **Keyword `parameters` stay in `lexical`:** they list a keyword's printed frames, which the meaning signature cannot express. `madness(cost: Cost)` prints both `Madness {1}{R}` and `Madness—Pay six {C}.`, so its `lexical.parameters` are `[[Cost], [DashNonManaCost]]`. The signature's sorts are the meaning; frames such as `DashNonManaCost` are spelling only.
+- **Keyword `parameters` stay in `lexical`:** they list a keyword's printed frames, which the meaning signature cannot express. `modular(count : Amount)` prints both `Modular 2` and `Modular—Sunburst`, so its `lexical.parameters` are `[[Amount], [DashKeyword]]`. A frame is not a spelling choice the parameter itself decides: `madness(cost: Cost)` prints `Madness {1}{R}` and `Madness—Pay six {C}.` from its one `[[Cost]]` frame, the cost selecting the spelling. The signature's sorts are the meaning; frames are spelling only.
 
 ### 4.5 Expected-Sort Dispatch, Constructor-Order Mentions, and Lake Module Generation
 
