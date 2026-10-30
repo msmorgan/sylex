@@ -11,6 +11,19 @@ import Semantics.Cards.Data.Shard06
 
 example : @SylFixture.Semantics.Primitives.Action.doForEachKind =
     @Semantics.Primitives.Action.doForEachKind := rfl
+example : SylFixture.Semantics.Templates.actionSearch = Semantics.Templates.actionSearch := rfl
+example : SylFixture.Semantics.Templates.actionPay = Semantics.Templates.actionPay := rfl
+
+example : NormalFixture.Semantics.Templates.declaredWhite = Semantics.Color.blue := rfl
+example : NormalFixture.Semantics.Templates.constructorWhite = Semantics.Color.white := rfl
+example : NormalFixture.Semantics.Templates.optionalWhite = some Semantics.Color.blue := rfl
+example : NormalFixture.Semantics.Templates.declaredSearch = Semantics.Action.sequentially [] := rfl
+example (scope : Semantics.Location) (for_ : Semantics.NounPhrase) :
+    NormalFixture.Semantics.Templates.actionSearch for_ scope =
+      Semantics.Action.search scope for_ := rfl
+example (scope : Semantics.Location) (for_ : Semantics.NounPhrase) :
+    NormalFixture.Semantics.Templates.constructorSearch scope for_ =
+      Semantics.Action.search scope for_ := rfl
 example : SylFixture.Semantics.Definitions.aegisCounter =
     Semantics.Definitions.aegisCounter := rfl
 example : SylFixture.Semantics.Definitions.aegisCounter_definition =

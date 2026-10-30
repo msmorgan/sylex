@@ -1,5 +1,7 @@
 # A body-less primitive, with the constructor's field names.
 primitive doForEachKind(axis: KindAxis, domain: Option(NounPhrase) = none, sort: QualitySort, body: Action): Action
+primitive actionSearch(scope: Location, for_: NounPhrase): Action = .search
+primitive actionPay(cost: Cost, times: PayTimes, outcome: PaymentOutcome, whose: Option(NounPhrase), keyword: Option(KeywordLabel)): Action = .pay
 
 counter aegisCounter {
   lexical = { lemma = "aegis counter", variants = [in, from, by, or, this, exists, where, variable,] },

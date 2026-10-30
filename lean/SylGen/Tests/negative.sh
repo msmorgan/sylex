@@ -16,7 +16,17 @@ check() {
     exit 1
   fi
 }
-check 'collides with constructor' 'template white: Color { body = blue }'
+check 'expected expression' 'template dotted: Color { body = .white }'
+check 'expected expression' 'template dotted: Nat { lexical = { word = .white }, body = 1 }'
+check 'expected expression' 'primitive dotted(value: Color = .white): Color = .white'
+check 'only a primitive may name a constructor' 'template white: Color = .white'
+check 'only a primitive may name a constructor' 'action search = .search'
+check 'redundant constructor binding' 'primitive white: Color = .white'
+check 'primitive must name a constructor' 'primitive missing: Color = .nonexistent'
+check "expected '.constructor'" 'primitive colorWhite: Color = white'
+check "expected '.constructor'" 'primitive colorWhite: Color = .Color.white'
+check 'primitive must bind every constructor field' 'primitive actionSearch(scope: Location): Action = .search'
+check 'primitive parameter does not match' 'primitive actionSearch(scope: Location, wrong: NounPhrase): Action = .search'
 check 'Duplicate bundle declaration' 'template item: Nat { body = 1 } template item: Nat { body = 2 }'
 check "parameter 'x' has sort" 'template mismatch(x: Color): Nat { body = x }'
 check 'unsupported string escape' 'template bad: String { body = "\n" }'
@@ -33,7 +43,7 @@ check 'none requires Option' 'action bad { deed = none(1), body = sequentially([
 check 'Dependency cycle in bundle' 'template a: Int { body = b } template b: Int { body = a }'
 check 'Dependency cycle in bundle' 'template a: Int { body = Int.b } template b: Int { body = Int.a }'
 check 'Dependency cycle in bundle' 'ability mutualOne { body = [mutualTwo] } ability mutualTwo { body = [mutualOne] }'
-printf 'sylGen negative cases: 17 passed\n'
+printf 'sylGen negative cases: 27 passed\n'
 
 printf '%s\n' 'template value: Int { body = 1 } template use: Int { body = value }' > "$scratch/input/bad.syl"
 "$exe" "$scratch/input" "$scratch/custom-output" CustomRoot Custom.Generated > "$scratch/log" 2>&1
