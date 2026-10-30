@@ -4,14 +4,13 @@ open Lean Meta
 namespace SylGen
 
 def declarationName (root : Name) (d : Declaration) (fallback : Registry) : Name :=
-  if d.kind == "primitive" then
+  if d.kind == "primitive" && d.constructor.isNone then
     root ++ `Semantics.Primitives ++ d.sort.name.toName ++ Name.mkSimple (declarationWord d.name)
   else if let some sig := fallback[(d.name, d.sort.text)]? then
     root ++ sig.constant
   else
     let ns := match d.kind with
-      | "primitive" => `Semantics.Primitives ++ d.sort.name.toName
-      | "template" => `Semantics.Templates
+      | "primitive" | "template" => `Semantics.Templates
       | "card" => `Semantics.Cards
       | _ => `Semantics.Definitions
     root ++ ns ++ Name.mkSimple (declarationWord d.name)
@@ -34,7 +33,7 @@ private def allowedFields (kind : String) : List String :=
         "power", "toughness", "loyalty", "defense"]
     | _ => []
 
-def loadDeclarations (root : Name) (ds : Array Declaration) (ctors fallback : Registry) :
+def loadDeclarations (root : Name) (ds : Array Declaration) (fallback : Registry) :
     MetaM Registry := do
   let mut table := {}
   for d in ds do
@@ -43,8 +42,6 @@ def loadDeclarations (root : Name) (ds : Array Declaration) (ctors fallback : Re
         throwError value.position.error s!"unknown {d.kind} field '{key}'"
     let key := (d.name, d.sort.text)
     if table.contains key then throwError d.pos.error s!"duplicate declaration {key}"
-    if d.kind != "primitive" && ctors.contains key then
-      throwError d.pos.error s!"declaration '{d.name}' collides with constructor at {d.sort.text}"
     let initialName := declarationName root d fallback
     let name := if table.toArray.any (fun entry => entry.2.constant == initialName) then
         initialName.getPrefix ++ d.sort.name.toName ++ Name.mkSimple (declarationWord d.name)
@@ -90,7 +87,11 @@ private def body (d : Declaration) : ResolveM Term := do
   let get := fun name defaultValue => (field d name).getD defaultValue
   match d.kind with
   | "primitive" =>
-    let some sig := (← read).constructors[(declarationWord d.name, d.sort.text)]?
+    let ctor := d.constructor.getD (declarationWord d.name)
+    if d.constructor.isSome && declarationWord d.name == declarationWord ctor then
+      throwError d.pos.error "redundant constructor binding"
+    let ctors := (← read).constructors
+    let some sig := ctors[(ctor, d.sort.text)]? <|> ctors[(leanWord ctor, d.sort.text)]?
       | throwError d.pos.error "primitive must name a constructor of its result sort"
     unless d.parameters.size == sig.fields.size do
       throwError d.pos.error "primitive must bind every constructor field"

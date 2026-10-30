@@ -45,6 +45,7 @@ structure Declaration where
   parameters : Array Parameter := #[]
   sort : SortRef
   fields : Array (String × Value) := #[]
+  constructor : Option String := none
   cardValue : Option Value := none
   documentation : String := ""
   deriving Inhabited, Repr
@@ -255,6 +256,18 @@ private def declaration : Parser Declaration := do
       expect ":"
       sort
     else pure { name := (kindSort k.text).getD "" }
+  let constructor ← if ← accept "=" then do
+      unless k.text == "primitive" do
+        throw (k.pos.error "only a primitive may name a constructor")
+      let t ← take
+      let name := (t.text.drop 1).toString
+      unless !t.quoted && t.text.startsWith "." &&
+          (name.toList.head?.any fun c => c.isAlpha || c == '_') &&
+          name.toList.all (fun c => c.isAlphanum || c == '_') do
+        throw (t.pos.error "expected '.constructor'")
+      if name == n then throw (t.pos.error "redundant constructor binding")
+      pure (some name)
+    else pure none
   let cardValue ← if k.text == "card" then pure (some (← value)) else pure none
   let fields ← if k.text == "card" then pure #[] else if k.text == "primitive" then pure #[] else do
     let v ← value
@@ -266,7 +279,8 @@ private def declaration : Parser Declaration := do
       | .ok name => pure name
       | .error message => throw message
     else pure n
-  return { pos := k.pos, kind := k.text, name := n, parameters, sort := result, fields, cardValue }
+  return { pos := k.pos, kind := k.text, name := n, parameters, sort := result,
+           fields, constructor, cardValue }
 
 def parse (file source : String) : Except String (Array Declaration) := do
   let tokens ← tokenize file source

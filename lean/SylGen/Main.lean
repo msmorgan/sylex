@@ -35,7 +35,7 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
     | .ok sorted => pure sorted
     | .error message => throwError message
   let ctors ← constructors
-  let registry ← loadDeclarations root ds ctors fallback
+  let registry ← loadDeclarations root ds fallback
   let mut outputs := #[]
   for d in ds do
     try
