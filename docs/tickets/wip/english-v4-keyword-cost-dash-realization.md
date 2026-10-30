@@ -32,3 +32,10 @@ variants and escape's dash-only list.
 
 - No face loses its Reading: every printed keyword cost in both forms still reads.
 - The judgment set holds.
+
+## Landing
+
+1. **Census delta** (`knyywssp`): faces read 32,825 → 32,825; total Readings 326,905 → 326,905; no
+   face's Reading count changed. Lost faces: none.
+2. **Judgment set** (`knyywssp`): all 3,389 judgments hold (six harness tests pass), including the
+   new cost-spelling entries in `keyword_dash_cost_line.txt`.
