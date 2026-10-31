@@ -126,7 +126,7 @@ theorem okFlyingCounter : RegistryDefinition.check flyingCounter_definition = []
 /-- A keyword counter's conferral written with `grants` is the one `flyingCounter_definition`
 writes, the keyword gained by its bearer [CR#122.1b,613.1f]. -/
 theorem grantsIsTheKeywordConferral :
-    flyingCounter_definition = .counter flyingCounter [grants (.named "flying")] := rfl
+    flyingCounter_definition = .counter flyingCounter [grants flying] := rfl
 
 theorem p1p1CounterDefinitionZone :
     RegistryDefinition.check p1p1Counter_definition = [] := by decide

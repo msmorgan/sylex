@@ -169,26 +169,35 @@ theorem quenchableFireStopsItsTriggerBySpecialAction :
               (instruct this_ (dealDamage 3 thatJoin)),
             .establish
               (.specialAction (some splitOverPlaneswalker) none (Semantics.Cost.mana ([pip .blue]))
-                (establish (cant (.actor (.laterMention "delay.trigger" thisAbility)) trigger) none))
+                (establish (cant (.actor (.delayedTrigger)) trigger) none))
               (some (untilEvent (beginningOf .upkeep you nextTime))) ] ] := rfl
 
 /-- The special action stops the delayed trigger by establishing that it can't trigger, naming it
-by its Binding Identity, the only reading of it: no text mentions the ability, so a word ("that
-ability") finds nothing, and with no delayed trigger the identity is unbound [CR#116.2c].
+by the delayed-trigger reference: no text mentions the ability, so a word ("that
+ability") finds nothing, and the dedicated reference requires a preceding delayed trigger [CR#116.2c].
 Quenchable Fire checks with it. -/
-theorem cantTriggerReadsTheDelayedTriggerByIdentity :
+theorem cantTriggerReadsTheLatestDelayedTrigger :
     Action.check (DRS.ofList [])
       (.sequentially [delay (beginningOfNext .endStep) (draw 1),
-        establish (cant (.actor (.laterMention "delay.trigger" thisAbility)) trigger) none]) = [] ∧
+        establish (cant (.actor (.delayedTrigger)) trigger) none]) = [] ∧
     Action.check (DRS.ofList [])
       (.sequentially [delay (beginningOfNext .endStep) (draw 1),
         establish (cant (.actor (that .ability)) trigger) none])
       = [.anaphor (.word .ability) .one 0] ∧
     Action.check (DRS.ofList [])
-      (establish (cant (.actor (.laterMention "delay.trigger" thisAbility)) trigger) none) =
-      [.bindingIdentity "delay.trigger"] ∧
+      (establish (cant (.actor (.delayedTrigger)) trigger) none) =
+      [.missingDelayedTrigger] ∧
     Action.check (DRS.ofList []) Cards.quenchableFire = [] := by
   decide
+
+/-- With two delayed triggers, the dedicated reference selects the latest one. -/
+theorem delayedTriggerSelectsLatest :
+    let after := (stepAction 64 .postEvent .obj (DRS.ofList [])
+      (.sequentially [delay (beginningOfNext .endStep) (draw 1),
+        delay (beginningOfNext .endStep) (draw 2)])).1
+    after.delayedTriggers.length = 2 ∧
+      (stepNounPhrase 64 after .subj true .delayedTrigger).2.1 =
+        [after.nextId - 1] := by decide
 
 /-- What "they" reads in the branch of Screaming Nemesis's triggered ability, as its referent's
 kind and determiner: the trigger's damage dealt to "any other target", then the condition, then

@@ -97,10 +97,10 @@ theorem participialRefinementsKeepCarrierTypeAndOrigin :
       (some (.copied (.ofType .card .creature))) false
       [movedCopy (.action "exile") (some .copy)]).length = 1 := by decide
 
-theorem participialRefinementsRejectWrongDeed :
+theorem participialRefinementsReadExileDestination :
     (participialCandidates (.deed (.action "exile")) (some .one)
       (some (.copied (.ofType .card .creature))) false
-      [movedCopy (.action "destroy") (some .copy)]).length = 0 := by decide
+      [movedCopy (.action "destroy") (some .copy)]).length = 1 := by decide
 
 theorem participialRefinementsRejectOriginal :
     (participialCandidates (.deed (.action "exile")) (some .one)
@@ -118,9 +118,23 @@ theorem participialWithHeadNounReachesTheStampedObject :
     (participialCandidates (.deed (.action "exile")) (some .one) (some .card) false
       [movedCopy (.action "exile") none]).length = 1 := by decide
 
-theorem participialRejectsWrongDeed :
+theorem participialReadsExileDestination :
     (participialCandidates (.deed (.action "exile")) (some .one) none false
+      [movedCopy (.action "destroy") none]).length = 1 := by decide
+
+theorem participialRejectsUnrelatedDeed :
+    (participialCandidates (.deed (.action "discard")) (some .one) none false
+      [movedCopy (.action "destroy") none]).length = 0 ∧
+    (participialCandidates (.deed (.action "discard")) (some .one) (some .card) false
       [movedCopy (.action "destroy") none]).length = 0 := by decide
+
+theorem participialExileDoesNotSurviveAnotherMove :
+    let moved : Referent := {
+      det := .target, plur := .one, idents := [],
+      payload := .object [.creature] (some .graveyard)
+        (some (moveStamp (some (.action "put")) (some .exile) (some .graveyard))) none none }
+    (participialCandidates (.deed (.action "exile")) (some .one) none false [moved]).length = 0 := by
+  decide
 
 theorem typeAndCopyRefinementsCommute (word : NounWord) (ty : CardType) (b : Referent) :
     wordReaches (.copied (.ofType word ty)) b =

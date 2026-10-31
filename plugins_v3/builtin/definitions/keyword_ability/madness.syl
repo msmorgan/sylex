@@ -9,9 +9,7 @@ ability madness(cost: Cost) {
     static(
       replace(
         would(actor(a(isPlayer)), discard(thisCard)),
-        instead(
-          # This escape crosses the nested discard scope, rather than wrapping a parameter.
-          ownScope(discard, exileFrom(inCaller(thisCard), hand))))),
+        instead(discard(thisCard, destination = exile)))),
     when(
       causes(byEvent(does(any, discard(thisCard))), does(any, exileFrom(thisCard, hand))),
       instruct(

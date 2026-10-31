@@ -17,7 +17,8 @@ def declarationName (root : Name) (d : Declaration) (ds : Array Declaration) : N
 
 private def allowedFields (kind : String) : List String :=
   ["lexical", "spelling"] ++ match kind with
-    | "primitive" | "template" => ["body"]
+    | "primitive" => ["body"]
+    | "template" => ["body", "identity"]
     | "action" => ["body", "deed", "permanent", "ofAbility"]
     | "ability" => ["body", "label", "cost", "reminder"]
     | "ability_word" => ["body", "label"]
@@ -35,7 +36,7 @@ private def allowedFields (kind : String) : List String :=
 
 def loadDeclarations (root : Name) (ds : Array Declaration) (_fallback : Registry) :
     MetaM Registry := do
-  let mut table := {}
+  let mut table : Registry := {}
   for d in ds do
     for (key, value) in d.fields do
       unless (allowedFields d.kind).contains key do
@@ -43,7 +44,15 @@ def loadDeclarations (root : Name) (ds : Array Declaration) (_fallback : Registr
     let key := (d.name, d.sort.text)
     if table.contains key then throwError d.pos.error s!"Duplicate bundle declaration {key}"
     let name := declarationName root d ds
-    let sig : Signature := { constant := name, result := d.sort, fields := d.parameters.map fun p =>
+    let identity : Option String ← match (d.fields.find? (·.1 == "identity")).map (·.2) with
+      | none => pure none
+      | some (Value.string _ value) =>
+        unless d.kind == "template" && d.sort.name == "NounPhrase" &&
+            d.parameters.isEmpty && !value.isEmpty do
+          throwError d.pos.error "identity requires a parameterless NounPhrase template and a nonempty string"
+        pure (some value)
+      | some v => throwError v.position.error "identity must be a string"
+    let sig : Signature :=  { constant := name, result := d.sort, identity, fields := d.parameters.map fun p =>
       { name := leanWord p.name, sort := p.sort, hasDefault := p.defaultValue.isSome,
         emittedName := parameterName p } }
     table := table.insert key sig
@@ -92,7 +101,7 @@ private def body (d : Declaration) : ResolveM Term := do
     let ctors := (← read).constructors
     let some sig := ctors[(ctor, d.sort.text)]? <|> ctors[(leanWord ctor, d.sort.text)]?
       | throwError d.pos.error "primitive must name a constructor of its result sort"
-    if let some message := sourceConstructorRefusal sig.constant then
+    if let some message := sourceConstructorRefusal sig.constant (← read).legacyScope then
       throwError d.pos.error message
     unless d.parameters.size == sig.fields.size do
       throwError d.pos.error "primitive must bind every constructor field"
@@ -213,6 +222,8 @@ def emit (d : Declaration) : ResolveM Output := do
   let modifier := if d.kind == "card" then "noncomputable " else ""
   text := if d.kind == "ability_word" then
     s!"syl_ability_word {leanName name}{binders} := {value} doc {repr d.documentation}\n"
+  else if d.kind ∈ ["template", "action", "ability"] then
+    s!"syl_def {leanName name}{binders} : {d.sort.lean} := {value} doc {repr d.documentation}\n"
   else documentation ++ modifier ++ s!"def {leanName name}{binders} : {d.sort.lean} :=\n  {value}\n"
   if d.kind ∈ ["counter", "designation", "subtype", "card_type", "relation"] then
     prelude := prelude ++ text
@@ -232,6 +243,8 @@ def emit (d : Declaration) : ResolveM Output := do
       s!"check_card {leanName name}\n"
     else ""
   let cardFile := if d.kind == "card" then d.name ++ ".syl" else ""
+  if let some identity := (← read).declarations[(d.name, d.sort.text)]!.identity then
+    text := text ++ s!"syl_identity {leanName name} {repr identity}\n"
   text := text ++ s!"syl_register {toString (Json.str d.kind)} {leanName name} {toString (Json.str cardFile)}\n"
   return { name, text, prelude, check
            checksRules := d.kind ∈ ["counter", "designation", "subtype", "card_type", "relation",

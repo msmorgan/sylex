@@ -4,6 +4,18 @@ open Lean Meta Elab Command
 
 namespace Semantics.Registry
 
+/-- A declaration's generated reference identity, independent of its Lean namespace. -/
+initialize referenceIdentities : SimplePersistentEnvExtension (Name × String) (NameMap String) ←
+  registerSimplePersistentEnvExtension {
+    addEntryFn := fun entries (name, identity) => entries.insert name identity
+    addImportedFn := fun entries => entries.foldl (fun out es =>
+      es.foldl (fun out (name, identity) => out.insert name identity) out) {}
+  }
+
+elab "syl_identity " name:ident identity:str : command => do
+  let name ← resolveGlobalConstNoOverload name
+  modifyEnv (referenceIdentities.addEntry · (name, identity.getString))
+
 /-- Expected-result dispatch entries survive module imports. -/
 structure ExpectedTypeEntry where
   bareName : Name

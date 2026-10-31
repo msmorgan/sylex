@@ -274,3 +274,41 @@ theorem parameterAbilityWordKeepsItsOuterHeading (ability : Semantics.Ability) :
     SylFixture.Semantics.Definitions.threshold (.italicHead (.abilityWord (.named "inner")) ability) =
       .italicHead (.abilityWord (.named "threshold"))
         (.italicHead (.abilityWord (.named "inner")) ability) := rfl
+
+open Semantics in
+theorem conjunctionReadsSubjectBeforeParts (subject : NounPhrase) :
+    SylFixture.Semantics.Templates.conjunctionMentions subject =
+      .conjunction (some (.firstMention "conjunctionMentions.subject" subject))
+        [.combatant (.laterMention "conjunctionMentions.subject" subject)] := rfl
+
+open Semantics in
+theorem passiveReadsPatientBeforeAgent (subject : NounPhrase) :
+    SylFixture.Semantics.Templates.passiveMentions subject =
+      .does (.by (.laterMention "passiveMentions.subject" subject))
+        (.block (.firstMention "passiveMentions.subject" subject)) := rfl
+
+open Semantics in
+theorem fixtureIdentityDoesNotDependOnItsLeanName :
+    SylFixture.Semantics.Definitions.fixtureActorHandoff =
+      .ownScope (some (.action "fixtureActorHandoff"))
+        (Templates.instruct
+          (Templates.controllerOf (.firstMention "fixtureActorHandoff.actor"
+            SylFixture.Semantics.Templates.fixtureActor))
+          (Templates.instruct .actor
+            (Definitions.sacrifice (.laterMention "fixtureActorHandoff.actor"
+              SylFixture.Semantics.Templates.fixtureActor)))) := rfl
+
+open Semantics in
+theorem enclosingClauseOrdersHelperMentions (subject : NounPhrase) :
+    SylFixture.Semantics.Templates.prohibitionMentions subject = .cant .any .trigger {
+      timing := some (.inPart .turn
+        (some (.laterMention "readOrderModifiers.subject" subject)) .current),
+      cause := some (.source (.firstMention "readOrderModifiers.subject" subject)) } := rfl
+
+open Semantics in
+theorem expandedHelperInvocationsKeepSeparateIdentities (subject : NounPhrase) :
+    SylFixture.Semantics.Templates.repeatedProhibitionMentions subject = .conjunction none [
+      SylFixture.Semantics.Templates.prohibitionMentions
+        (.firstMention "repeatedProhibitionMentions.subject" subject),
+      SylFixture.Semantics.Templates.prohibitionMentions
+        (.laterMention "repeatedProhibitionMentions.subject" subject)] := rfl

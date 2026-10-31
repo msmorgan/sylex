@@ -3,6 +3,7 @@ import Semantics.Card
 import Semantics.Events
 import Semantics.Rules
 import Semantics.CallerScope
+import Semantics.Registry
 
 open Lean Meta
 namespace SylGen
@@ -62,6 +63,7 @@ structure Signature where
   constant : Name
   fields : Array Field
   result : SortRef
+  identity : Option String := none
   deriving Inhabited, Repr
 
 def signature (name : Name) (type : Option Expr := none) : MetaM Signature := do
@@ -74,7 +76,9 @@ def signature (name : Name) (type : Option Expr := none) : MetaM Signature := do
           name := decl.userName.toString
           sort := (← sortOf decl.type)
           hasDefault := decl.type.getOptParamDefault?.isSome }
-    return { constant := name, fields, result := (← sortOf result) }
+    return {
+      constant := name, fields := fields, result := (← sortOf result),
+      identity := (Semantics.Registry.referenceIdentities.getState (← getEnv)).find? name }
 
 abbrev Registry := Std.HashMap (String × String) Signature
 
@@ -96,9 +100,15 @@ def constructors : MetaM Registry := do
   return result
 
 /-- Constructors reserved for generated identities or registry declarations. -/
-def sourceConstructorRefusal (name : Name) : Option String :=
-  if name == `Semantics.NounPhrase.firstMention then
-    some "firstMention is reserved for generated parameter identities"
+def sourceConstructorRefusal (name : Name) (legacyScope : Bool := false) : Option String :=
+  if name == `Semantics.Ability.keyword then
+    some "raw Ability.keyword construction requires an ability declaration"
+  else if name ∈ [`Semantics.NounPhrase.firstMention, `Semantics.NounPhrase.laterMention,
+      `Semantics.Action.ownScope, `Semantics.Deed.action, `Semantics.NounPhrase.inCaller] then
+    if legacyScope then none else
+      some (if name.getString! ∈ ["firstMention", "laterMention"] then
+        s!"{name.getString!} is reserved for generated parameter identities"
+      else s!"{name.getPrefix.getString!}.{name.getString!} is reserved for generated scope and deeds")
   else if name.getString! == "inCaller" && name.getPrefix ∈ [
       `Semantics.Action, `Semantics.Cost, `Semantics.StaticSpec, `Semantics.Replacement,
       `Semantics.Amount, `Semantics.Predicate, `Semantics.Quantity, `Semantics.Location,

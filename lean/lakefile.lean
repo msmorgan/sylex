@@ -230,10 +230,10 @@ lean_lib SylFixtures where
   needs := #[genSyl]
 
 lean_lib SylFixturePins where
-  roots := #[`SylGen.Tests.Pins]
+  roots := #[`SylGen.Tests.Pins, `SylGen.Tests.ReadOrder]
 
 lean_lib SylRegistration where
-  roots := #[`SylGen.Registration]
+  roots := #[`SylGen.Registration, `SylGen.ReadOrder]
 
 lean_lib NormalFixtures where
   srcDir := ".lake/build/gen"

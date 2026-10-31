@@ -4,6 +4,7 @@ open Lean Meta
 namespace SylGen
 
 inductive Term where
+  | marked (identity : String) (body : Term)
   | atom (text : String)
   | parameter (name : String) (sort : SortRef)
   | call (name : String) (args : Array (Option String × Term))
@@ -16,6 +17,7 @@ structure Context where
   declarations : Registry
   fallback : Registry := {}
   parameters : Array Parameter := #[]
+  legacyScope : Bool := false
   deriving Inhabited
 
 structure Resolution where
@@ -69,7 +71,7 @@ mutual
       if head == "some" && expected.name == "Option" then
         fail p "some is implicit; write the value"
       if let some sig ← findSignature head expected then
-        if let some message := sourceConstructorRefusal sig.constant then fail p message
+        if let some message := sourceConstructorRefusal sig.constant ctx.legacyScope then fail p message
         let args := if expected.name == "Card" && sig.constant.getString! != "singleFaced" then
             match args with
             | #[(none, .record _ fields)] => fields.map (fun (k, v) => (some k, v))
@@ -150,27 +152,24 @@ mutual
     let ordered := sig.fields.filterMap fun f =>
       (result.find? (·.1 == some f.name)).map fun (_, value) =>
         (some (if f.emittedName.isEmpty then f.name else f.emittedName), value)
-    return .call (leanName sig.constant) (if sig.constant.getPrefix == ``Int then
+    let call := Term.call (leanName sig.constant) (if sig.constant.getPrefix == ``Int then
       ordered.map fun (_, value) => (none, value) else ordered)
+    return sig.identity.elim call (fun identity => .marked identity call)
 end
 
 partial def Term.count (name : String) : Term → Nat
+  | .marked _ body => body.count name
   | .parameter n _ => if n == name then 1 else 0
   | .atom _ => 0
   | .call _ args => (args.toList.map fun a => a.2.count name).foldl (· + ·) 0
   | .list args => (args.toList.map (Term.count name)).foldl (· + ·) 0
   | .record args => (args.toList.map fun a => a.2.count name).foldl (· + ·) 0
 
-private def actorCall (name : String) : Bool :=
-  name == leanName `Semantics.Templates.theActor ||
-    name == leanName `Semantics.Templates.NounPhrase.theActor
-
-partial def Term.actorCount : Term → Nat
-  | .call name args =>
-    if actorCall name then 1
-    else (args.toList.map fun a => a.2.actorCount).foldl (· + ·) 0
-  | .list args => (args.toList.map Term.actorCount).foldl (· + ·) 0
-  | .record args => (args.toList.map fun a => a.2.actorCount).foldl (· + ·) 0
+partial def Term.identityCount (identity : String) : Term → Nat
+  | .marked mark body => (if mark == identity then 1 else 0) + body.identityCount identity
+  | .call _ args => (args.toList.map fun a => a.2.identityCount identity).foldl (· + ·) 0
+  | .list args => (args.toList.map (Term.identityCount identity)).foldl (· + ·) 0
+  | .record args => (args.toList.map fun a => a.2.identityCount identity).foldl (· + ·) 0
   | _ => 0
 
 partial def callerSort (s : SortRef) : Bool :=
@@ -187,6 +186,11 @@ private def mention (identity inner : String) : StateM (Array String) String := 
 
 partial def render (decl : Declaration) (body : Term) (t : Term) : StateM (Array String) String := do
   match t with
+  | .marked identity inner =>
+    let text ← render decl body inner
+    if decl.kind == "action" && body.identityCount identity ≥ 2 then
+      return ← mention (declarationWord decl.name ++ "." ++ identity) text
+    return text
   | .atom text => return text
   | .parameter name sort =>
     let binder :=  (decl.parameters.find? (·.name == name)).map parameterName |>.getD (leanWord name)
@@ -203,26 +207,12 @@ partial def render (decl : Declaration) (body : Term) (t : Term) : StateM (Array
       return quoted key ++ " := " ++ (← render decl body value)
     return "{ " ++ String.intercalate ", " fields ++ " }"
   | .call name args =>
-    let isOr := name == leanName `Semantics.Predicate.or ||
-      name == leanName `Semantics.Templates.Predicate.or
     let args ← args.toList.mapM fun (key, value) => do
-      let text ← if isOr then
-          match value with
-          | .list values => do
-            let incoming ← get
-            let texts ← values.toList.mapM fun v => do
-              set incoming
-              render decl body v
-            set incoming
-            pure ("[" ++ String.intercalate ", " texts ++ "]")
-          | _ => render decl body value
-        else render decl body value
+      let text ← render decl body value
       return match key with
         | none => "(" ++ text ++ ")"
         | some key => "(" ++ quoted key ++ " := " ++ text ++ ")"
     let text := "(" ++ name ++ " " ++ String.intercalate " " args ++ ")"
-    if decl.kind == "action" && actorCall name && body.actorCount ≥ 2 then
-      return ← mention (declarationWord decl.name ++ ".actor") text
     return text
 
 end SylGen

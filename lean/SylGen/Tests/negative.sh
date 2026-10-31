@@ -90,7 +90,24 @@ check 'raw KeywordLabel construction requires a registry declaration' 'template 
 check 'raw CounterKind construction requires a registry declaration' 'template noRawCounterKind: CounterKind { body = named("loyatlyCounter") }'
 check 'raw KeywordLabel construction requires a registry declaration' 'primitive noKeywordLabelAlias(name: String): KeywordLabel = .named'
 check 'raw CounterKind construction requires a registry declaration' 'primitive noCounterKindAlias(name: String, holder: Kind): CounterKind = .named'
-printf 'sylGen negative cases: 74 passed\n' 
+check 'laterMention is reserved for generated parameter identities' 'template noWrittenLater(subject: NounPhrase): NounPhrase { body = laterMention("manual", subject) }'
+check 'Action.ownScope is reserved for generated scope and deeds' 'template noWrittenScope: Action { body = ownScope(none, sequentially([])) }'
+check 'NounPhrase.inCaller is reserved for generated scope and deeds' 'template noNounCaller(subject: NounPhrase): NounPhrase { body = inCaller(subject) }'
+check 'Deed.action is reserved for generated scope and deeds' 'template noRawDeed: Deed { body = action("discard") }'
+check 'raw Ability.keyword construction requires an ability declaration' 'ability flying { body = [] } template noEmptyKeyword: Ability { body = keyword(flying, [], []) }'
+check 'Action.ownScope is reserved for generated scope and deeds' 'template theRingTemptsYou: Action { body = ownScope(none, sequentially([])) }'
+mv "$scratch/input/bad.syl" "$scratch/input/theRingTemptsYou.syl"
+if "$exe" "$scratch/input" "$scratch/out" Negative > "$scratch/log" 2>&1; then
+  echo 'unexpected success: copied Ring filename' >&2
+  exit 1
+fi
+grep -F 'Action.ownScope is reserved for generated scope and deeds' "$scratch/log" >/dev/null
+rm "$scratch/input/theRingTemptsYou.syl"
+check 'identity requires a parameterless NounPhrase template and a nonempty string' 'template bad(value: NounPhrase): NounPhrase { identity = "actor", body = value }'
+check 'identity requires a parameterless NounPhrase template and a nonempty string' 'template bad: Color { identity = "actor", body = white }'
+check 'identity requires a parameterless NounPhrase template and a nonempty string' 'template bad: NounPhrase { identity = "", body = actor }'
+check 'identity must be a string' 'template bad: NounPhrase { identity = actor, body = actor }'
+printf 'sylGen negative cases: 85 passed\n' 
 
 printf '%s\n' 'template value: Int { body = 1 } template use: Int { body = value }' > "$scratch/input/bad.syl"
 "$exe" "$scratch/input" "$scratch/custom-output" CustomRoot Custom.Generated > "$scratch/log" 2>&1
@@ -129,3 +146,12 @@ export LEAN_PATH="$scratch/bad-output:$LEAN_PATH"
   done
 )
 printf 'sylGen separate card refusal report: passed\n'
+
+mkdir -p "$scratch/corpus/builtin/definitions/keyword_action" "$scratch/elsewhere"
+printf '%s\n' 'action theRingTemptsYou { body = ownScope(action("theRingTemptsYou"), sequentially([])) }' > "$scratch/corpus/builtin/definitions/keyword_action/theRingTemptsYou.syl"
+(
+  cd "$scratch/elsewhere"
+  "$exe" "$scratch/corpus" "$scratch/ring-output" RingFixture Ring.Generated > "$scratch/log" 2>&1
+)
+test -f "$scratch/ring-output/Ring/Generated.lean"
+printf 'sylGen corpus-relative Ring exception: passed\n'

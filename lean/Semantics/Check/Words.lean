@@ -585,9 +585,8 @@ structure DRS where
   id, if it is one). -/
   participialOnly : List Referent := []
   /-- The delayed triggered abilities a resolving `delay` created, latest first, each recorded
-  under the Binding Identity `delay.trigger`. They are not `referents`: no card prints a mention
-  of one, so no pronoun, word, group or count reads them; only a later mention of that identity
-  does (`laterMention`), as the special action that stops one from triggering names it
+  separately from ordinary referents. No pronoun, word, group or count reads them; the
+  delayed-trigger reference does, as the special action that stops one from triggering names it
   [CR#116.2c]. -/
   delayedTriggers : List Referent := []
   /-- The events the current spell or ability's text caused so far, latest first, its costs
@@ -1244,7 +1243,12 @@ def Reach.kind : Reach → Kind
   | .unionHalf w => w.kind
   | _ => .object
 
-def stampedBy (v : Deed) (s : Stamp) : Bool := s.deeds.contains v
+/-- Moving to exile is exiling, including a discard with a replaced destination [CR#701.13a]. -/
+def deedMatchesDestination (deed : Deed) (change : Option ZoneChange) : Bool :=
+  deed == .action "exile" && change.any (·.destination == some .exile)
+
+def stampedBy (v : Deed) (s : Stamp) : Bool :=
+  s.deeds.contains v || deedMatchesDestination v s.zoneChange
 
 /-- Whether `word` names a stamped object by what it was when its deed acted on it: a Card Type
 or "permanent" reads the permanent it is, if it is on the battlefield now, or the permanent it
@@ -1370,13 +1374,15 @@ def resolveCandidates (r : Reach) (pl : Plurality) (drs : DRS) (inArgSlot : Bool
 Deed and writing no Zone Change, by its classes `verbs`) looks back at: the same Deed, or casting
 a card one played, since playing a card casts it unless it is a land ("You may play those cards
 this turn. If you cast a spell this way, …" [CR#701.18b]); a Zone Change into the anchor's
-destination, from its origin if both name one; or a shared class. -/
+destination, from its origin if both name one; or a shared class. Exiling also reads any move
+into exile [CR#701.13a]. -/
 def CausedEvent.readBy (event : CausedEvent) (anchor : Option ParticipialAnchor)
     (verbs : List EventVerb) : Bool :=
   match anchor with
   | some (.deed deed) =>
     event.deed == some deed ||
-      (deed == .action "cast" && event.deed == some (.action "play"))
+      (deed == .action "cast" && event.deed == some (.action "play")) ||
+      deedMatchesDestination deed event.zoneChange
   | some (.zoneChange origin destination) =>
     event.zoneChange.any fun change =>
       change.destination == some destination &&

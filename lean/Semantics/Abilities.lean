@@ -422,6 +422,8 @@ mutual
     structural facts (its kind, whether it is "you" or the source); it is never checked or
     introduced a second time, so it selects nothing. -/
     | laterMention (id : BindingId) (phrase : NounPhrase)
+    /-- The latest delayed triggered ability created in this resolution [CR#116.2c,603.7]. -/
+    | delayedTrigger
     | attachHost (word : AttachWord) (head : NounWord)
     | possessorOf (axis : PossessorAxis) (subject : NounPhrase)
     | designated (designation : DesignationLabel) (whose : NounPhrase)
@@ -1439,8 +1441,8 @@ mutual
     | chooseModes (quantity : Quantity) (modes : List Mode)
     /-- Create a delayed triggered ability that does `body` the next time `event` (or one of
     `alternatives`) occurs, or, with a stated `duration`, each time within it
-    [CR#603.7a,603.7b]. No text mentions the ability created, so it is read only by its Binding
-    Identity, `delay.trigger` (`delayUnlessPaid`). -/
+    [CR#603.7a,603.7b]. No text mentions the ability created; `delayedTrigger` reads the latest
+    one, as used by `delayUnlessPaid`. -/
     | delay (event : GameEvent) (alternatives : List GameEvent) (duration : Option Duration)
         (body : Action)
     /-- A self-replacement: the spell's or ability's own `replaced` action, replaced by

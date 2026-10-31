@@ -1,0 +1,100 @@
+template parallelAlternatives(x: NounPhrase): Ability {
+  body = triggered(does(actor(x), enter), [does(actor(x), attack)], none, [], none, none, none, draw(1))
+}
+template parallelJoinedHeaders(x: NounPhrase): Ability {
+  body = triggered(does(actor(x), enter), [], none,
+    [{event = does(actor(x), attack), alternatives = [], while_ = none, timing = none}],
+    none, none, none, draw(1))
+}
+template parallelHeaderModifiers(x: NounPhrase): Ability {
+  body = triggered(does(actor(thisCreature), enter), [], none,
+    [{event = does(actor(thisCreature), attack), alternatives = [],
+      while_ = inPart(turn, x, current), timing = inPart(turn, x, current)}],
+    none, none, none, draw(1))
+}
+template parallelActivatedModifiers(x: NounPhrase): Ability {
+  body = activated(mana([0]), draw(1), timing = inPart(turn, x, current), guard = is(x, isPlayer))
+}
+template parallelTriggerLimit(x: NounPhrase): Ability {
+  body = triggered(does(actor(x), enter), [], none, [], none,
+    usageLimit(numberOf(x), turn), none, draw(1))
+}
+template parallelDeonticException(x: NounPhrase): StaticSpec {
+  body = staticSpecCan(any, attack,
+    {asThough = condition(is(x, isCreature)), except = byObjects(x)})
+}
+template parallelQualified(x: NounPhrase): Ability {
+  body = qualified(static(combatant(x)), timing = onlyIf(is(x, isCreature)), guard = is(x, isCreature))
+}
+template parallelCardClasses(x: NounPhrase): Ability {
+  body = byCardClass(static(combatant(x)), static(combatant(x)))
+}
+template parallelDelayedAlternatives(x: NounPhrase): Action {
+  body = delay(does(actor(x), enter), draw(1), alternatives = [does(actor(x), attack)])
+}
+template orderPrevent(x: NounPhrase): Action {
+  body = preventDamage(ofThatDamage(numberOf(x)), would(any, dealDamage(1, x)))
+}
+template orderRedirect(x: NounPhrase): Action {
+  body = redirectDamage(allDamage, x, would(any, dealDamage(1, x)))
+}
+template orderVote(x: NounPhrase): Action {
+  body = instruct(eachPlayer, actionVote(x, openly, byLabel(["yes", "no"]), exactlyOf(lifeTotalOf(x))))
+}
+template orderRemoveCounters(x: NounPhrase): Action {
+  body = removeCounters(exactlyOf(numberOf(x)), none, x)
+}
+template orderMoveCounters(x: NounPhrase): Action {
+  body = moveCounters(numberOf(x), x, thisCreature)
+}
+template orderPay(x: NounPhrase): Action {
+  body = pay(perform(instruct(x, draw(1))), once, whose = x)
+}
+
+template parallelCharacteristics(x: NounPhrase): Characteristics {
+  body = {power = numberOf(x), text = [static(combatant(x))]}
+}
+template parallelFaces(x: NounPhrase): TokenSpec {
+  body = doubleFaced({characteristics = {power = numberOf(x)}},
+    {characteristics = {power = numberOf(x)}})
+}
+template parallelModes(x: NounPhrase): Action {
+  body = chooseModes(exactlyOf(1), [{action = instruct(x, draw(1))}, {action = instruct(x, draw(1))}])
+}
+template parallelGrantedAbilities(x: NounPhrase): StaticSpec {
+  body = characteristicChange(thisCreature,
+    [addedAbilities([static(combatant(x)), static(combatant(x))])])
+}
+template orderActivator(x: NounPhrase): Ability {
+  body = activated(perform(instruct(x, draw(1))), draw(1), activator = x)
+}
+template orderTriggerBodyTiming(x: NounPhrase): Ability {
+  body = triggered(does(actor(thisCreature), enter), [], none, [], onlyIf(is(x, isCreature)), none, none, choose(x))
+}
+template orderModifiers(x: NounPhrase): StaticSpec {
+  body = staticSpecCan(any, draw(1),
+    {timing = inPart(turn, x, current), asThough = condition(is(x, isPlayer))})
+}
+template orderCause(x: NounPhrase): StaticSpec {
+  body = staticSpecCant(actor(x), attack, {cause = source(x)})
+}
+template orderGatedCost(x: NounPhrase): StaticSpec {
+  body = staticSpecGatedBy(perform(instruct(x, draw(1))), actor(x), draw(1), {})
+}
+template orderPassive(x: NounPhrase): GameEvent {
+  body = does(by(x), block(x))
+}
+template orderConjunction(x: NounPhrase): StaticSpec {
+  body = conjunction([combatant(x)], x)
+}
+
+template parallelComparison(x: NounPhrase): Predicate {
+  body = compareOver(isCreature, numberOf(x), eq, numberOf(x))
+}
+template parallelCopyExceptions(x: NounPhrase): List(CopyExcept) {
+  body = [entersWithCounters(numberOf(x), p1p1Counter, fresh),
+    entersWithCounters(numberOf(x), p1p1Counter, fresh)]
+}
+template parallelKeywordParameters(x: NounPhrase): Ability {
+  body = ward(perform(sequentially([instruct(x, draw(1)), instruct(x, draw(1))])))
+}

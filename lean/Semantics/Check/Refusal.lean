@@ -92,6 +92,8 @@ inductive Refusal where
   /-- A Definition or Template body's later mention of a referent parameter finds no binding recorded under its
   Binding Identity, and its phrase would introduce one: reading it again would select anew. -/
   | bindingIdentity (id : BindingId)
+  /-- No delayed triggered ability has been created in this resolution. -/
+  | missingDelayedTrigger
   | choiceRef (ref : ChoiceRef) (sort : ChoiceSort) (found : Nat)
   | choiceInScope (k : Kind)
   /-- "the chosen <object>" reads back the one object `ref` names among those a "choose" in scope

@@ -45,10 +45,17 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
   let mut errors : Array String := #[]
   for d in ds do
     try
+      -- Temporary exception for the separately owned Ring modeling correction. Compare
+      -- canonical paths, so another bundle cannot opt in by copying the basename.
+      let legacyFile := input / "builtin/definitions/keyword_action/theRingTemptsYou.syl"
+      let legacyScope ← try
+        pure ((← IO.FS.realPath d.pos.file) == (← IO.FS.realPath legacyFile))
+      catch _ => pure false
       let (out, _) ← ((emit d).run {
         constructors := ctors
         declarations := registry
         fallback
+        legacyScope
         parameters := d.parameters }).run {}
       outputs := outputs.push out
     catch error =>

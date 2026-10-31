@@ -21,6 +21,7 @@ namespace Semantics.Proofs.Tables
 /-- Deeds written literally in the checker agree with generated declarations. -/
 theorem checkerDeedLiteralsMatchDefinitions :
     (.action "cast" : Deed) = cast.deed ∧
+    (.action "exile" : Deed) = exile.deed ∧
     (.action "play" : Deed) = play.deed ∧
     searchDeed = search.deed ∧
     (.action "tap" : Deed) = tap.deed ∧

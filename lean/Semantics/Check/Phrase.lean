@@ -85,7 +85,7 @@ def NounPhrase.kind? (np : NounPhrase) (fuel : Nat := 64) : Option Kind :=
       | some left, some right => some (joinKinds left right)
       | some left, none => some left
       | none, right => right) none
-  | _ + 1, .designated _ _ => some .object
+  | _ + 1, .designated _ _ | _ + 1, .delayedTrigger => some .object
   | _ + 1, .described _ p => p.kind?
   | _ + 1, .pro r _ => some r.kind
   | _ + 1, .theRest _ => none
@@ -3066,14 +3066,15 @@ def stepOps : Nat → StepOps
         | .laterMention id _ =>
           let matching := drs.visibleReferents.filter (fun r => r.idents.elem id)
           match matching with
-          | [] =>
-            match drs.delayedTriggers.find? (·.idents.elem id) with
-            | some delayed => (drs, [delayed.id], [])
-            | none => (drs, [], if drs.unboundIdentities.contains id then [] else [.bindingIdentity id])
+          | [] => (drs, [], if drs.unboundIdentities.contains id then [] else [.bindingIdentity id])
           | rs =>
             let ids := rs.map (·.id)
             let drs' := if inArgSlot then ids.foldl (fun d rid => d.recordMention rid role true) drs else drs
             (drs', ids, [])
+        | .delayedTrigger =>
+          match drs.delayedTriggers.head? with
+          | some delayed => (drs, [delayed.id], [])
+          | none => (drs, [], [.missingDelayedTrigger])
         | .pro reach plur =>
           let winners := resolvePronoun reach plur drs inArgSlot
           match winners with
@@ -4465,12 +4466,12 @@ def stepOps : Nat → StepOps
             { nextClause (settleTargets drs2) with
               triggerEvents := (ev :: alts).flatMap (·.triggerEvents) } body
           -- The delayed triggered ability it creates is no card and in no zone, and no text
-          -- mentions it: only its Binding Identity reads it, as the special action that stops it
-          -- from triggering does [CR#116.2c].
+          -- mentions it: the delayed-trigger reference reads it, as the special action that
+          -- stops it from triggering does [CR#116.2c].
           let after := { drs with nextId := drs3.nextId, contrastAnchors := drs3.contrastAnchors }
           let delayed : Referent := {
             det := .the, plur := .one, payload := .ability none none, id := after.nextId,
-            idents := ["delay.trigger"], clause := after.currentClause }
+            clause := after.currentClause }
           (if phase == .postEvent then
               { after with nextId := after.nextId + 1
                            delayedTriggers := delayed :: after.delayedTriggers }

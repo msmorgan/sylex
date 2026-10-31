@@ -1,4 +1,5 @@
 import Semantics.Registry
+import SylGen.ReadOrder
 
 open Lean Meta Elab Command
 
@@ -20,6 +21,23 @@ private def register (kind : String) (name : Name) (file : String) :
 elab "syl_register " kind:str name:ident file:str : command => do
   register kind.getString (← resolveGlobalConstNoOverload name)
     file.getString
+
+elab "syl_def " name:ident binders:bracketedBinder* " : " result:term " := " value:term
+    " doc " documentation:str : command => do
+  let value ← liftTermElabM do
+    let typed ← `(($value : $result))
+    let binders : TSyntaxArray ``Parser.Term.funBinder := binders.map fun b => ⟨b.raw⟩
+    let termSyntax ← if binders.isEmpty then pure typed else `(fun $binders* => $typed)
+    let expr ← Term.elabTerm termSyntax none
+    Term.synthesizeSyntheticMVarsNoPostponing
+    instantiateMVars expr
+  let value ← liftTermElabM <| ReadOrder.assign value
+  let type ← liftTermElabM <| inferType value
+  liftCoreM <| addAndCompile <| .defnDecl {
+    name := name.getId, levelParams := [], type := type, value := value,
+    hints := .regular 0, safety := .safe }
+  unless documentation.getString.isEmpty do
+    addDocStringCore name.getId documentation.getString
 
 /-- Emit an ability word, preserving an already headed body at declaration time. -/
 elab "syl_ability_word " name:ident binders:bracketedBinder* " := " value:term
@@ -44,6 +62,7 @@ elab "syl_ability_word " name:ident binders:bracketedBinder* " := " value:term
       let result := if headed then body else
         mkApp2 wrap (mkApp (mkConst `Semantics.AbilityWordLabel.named) label) body
       mkLambdaFVars parameters result
+  let value ← liftTermElabM <| ReadOrder.assign value
   let type ← liftTermElabM <| inferType value
   liftCoreM <| addAndCompile <| .defnDecl {
     name := name.getId, levelParams := [], type := type, value := value,

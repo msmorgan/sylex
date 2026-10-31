@@ -2,7 +2,7 @@
 # special action `player` may take until it would trigger, paying `cost` to stop it from triggering
 # [CR#116.2c]: the special action establishes that the delayed trigger can't trigger, with no
 # Duration, since the text states none. Once it has triggered, paying no longer stops it. The text names the delayed trigger nowhere, so the special action reads
-# it by its Binding Identity (`delay.trigger`).
+# the most recently created delayed trigger directly.
 # [CR#116.2c]
 template delayUnlessPaid(
   event: GameEvent,
@@ -17,7 +17,7 @@ template delayUnlessPaid(
         specialAction(
           none,
           cost,
-          establish(cant(actor(laterMention("delay.trigger", thisAbility)), trigger)),
+          establish(cant(actor(delayedTrigger), trigger)),
           player),
         durationBetween(none, event))])
 }
