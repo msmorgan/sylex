@@ -17,10 +17,12 @@ inductive Value where
   | integer (pos : Position) (text : String)
   | list (pos : Position) (items : Array Value)
   | record (pos : Position) (fields : Array (String × Value))
+  /-- `$name`, a read of an enclosing declaration's parameter. -/
+  | parameter (pos : Position) (name : String)
   deriving Inhabited, Repr
 
 def Value.position : Value → Position
-  | .word p .. | .string p .. | .integer p .. | .list p .. | .record p .. => p
+  | .word p .. | .string p .. | .integer p .. | .list p .. | .record p .. | .parameter p .. => p
 
 structure SortRef where
   name : String
@@ -106,6 +108,18 @@ private def tokenize (file source : String) : Except String (Array Token) := do
       out := out.push { pos := start, text := c.toString }
       i := i + 1
       pos := { pos with column := pos.column + 1 }
+    else if c == '$' then
+      i := i + 1
+      pos := { pos with column := pos.column + 1 }
+      unless i < chars.size && (chars[i]!.isAlpha || chars[i]! == '_') do
+        throw (start.error "'$' must be directly followed by a parameter name")
+      let mut value := "$"
+      while i < chars.size && (chars[i]!.isAlphanum || chars[i]! == '_' || chars[i]! == '.') do
+        value := value.push chars[i]!
+        i := i + 1
+        pos := { pos with column := pos.column + 1 }
+      if value.contains '.' then throw (start.error s!"dotted word '{value}'")
+      out := out.push { pos := start, text := value }
     else
       let mut value := ""
       if c == '-' then
@@ -184,6 +198,9 @@ private partial def value : Parser Value := do
         if ← accept "}" then break
     return .record t.pos fields
   if t.text.toInt?.isSome then return .integer t.pos t.text
+  if t.text.startsWith "$" then
+    if ← accept "(" then throw (t.pos.error "a parameter reference takes no arguments")
+    return .parameter t.pos (t.text.drop 1).toString
   unless t.text.toList.head?.any (fun c => c.isAlpha || c == '_') do
     throw (t.pos.error "expected expression")
   let mut args := #[]

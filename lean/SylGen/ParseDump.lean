@@ -20,6 +20,7 @@ private partial def valueJson : Value → Json
   | .integer _ text => Json.mkObj [("integer", text)]
   | .list _ items => Json.mkObj [("list", Json.arr (items.map valueJson))]
   | .record _ fields => Json.mkObj [("record", fieldsJson fields)]
+  | .parameter _ name => Json.mkObj [("parameter", name)]
 where
   fieldsJson (fields : Array (String × Value)) : Json :=
     Json.arr (fields.map fun (key, value) => Json.mkObj [("name", key), ("value", valueJson value)])

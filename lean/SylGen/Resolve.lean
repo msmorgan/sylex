@@ -59,12 +59,14 @@ mutual
           #[(none, ← resolve v { name := "CardFace" })]
       if expected.name == "CardFace" && !(fields.any (·.1 == "characteristics")) then
         return .record #[("characteristics", ← resolve (.record p fields) { name := "Characteristics" })]
+    if let .parameter p name := v then
+      let some param := ctx.parameters.find? (·.name == name)
+        | fail p s!"unknown parameter '${name}'"
+      if param.sort == expected then return .parameter name param.sort
+      if expected.name == "Option" && param.sort == underlying expected then
+        return .call "some" #[(none, .parameter name param.sort)]
+      fail p s!"parameter '${name}' has sort {param.sort.text}, expected {expected.text}"
     if let .word p head args := v then
-      if let some param := ctx.parameters.find? (fun p => args.isEmpty && p.name == head) then
-        if param.sort == expected then return .parameter head param.sort
-        if expected.name == "Option" && param.sort == underlying expected then
-          return .call "some" #[(none, .parameter head param.sort)]
-        fail p s!"parameter '{head}' has sort {param.sort.text}, expected {expected.text}"
       if head == "none" then
         unless expected.name == "Option" && args.isEmpty do fail p "none requires Option"
         return .atom "none"
@@ -123,6 +125,7 @@ mutual
           return .call "Semantics.ManaSymbol.simple"
             #[(none, .call "Semantics.SimpleManaSymbol.specific" #[(none, color)])]
       fail p s!"unknown word '{head}' at {expected.text}"
+    | .parameter p name => fail p s!"unknown parameter '${name}'"
 
   partial def resolveCall (p : Position) (sig : Signature)
       (args : Array (Option String × Value)) : ResolveM Term := do
