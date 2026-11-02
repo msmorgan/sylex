@@ -96,7 +96,10 @@ and card that `semantics`'s expansion equals the value Lean elaborates
 Building on the topological order computed in `semantics-rust-resolve`, `semantics` expands every
 resolved declaration into concrete `Arc` AST values, allocating a fresh `CallId` for each expanded
 call and recording `CallId → CallSiteInfo` (with `args` ordered by `decl.spelling_order`):
-- **`primitive`**: Constructs the bound AST variant/struct directly.
+- **`primitive`**: Constructs the bound AST variant/struct directly; the registry maps each
+  primitive constructor 1-to-1 to its `primitive` declaration `DeclId` so `discourse` reads its
+  `spelling_order` from the declaration (for primitives such as `removeCounters`, `moveCounters`,
+  `preventDamage`, and `redirectDamage`) without a separate per-constructor `fieldOrders` table.
 - **`template`**: Wraps every `CallerScope` argument in
   `Param(ParamBinding { id: BindingId { call, param }, value })`, substitutes arguments into the
   body, and (when the return sort is a `CallerScope` enum) wraps the result in

@@ -5,8 +5,8 @@ needs: [lean-retirement]
 
 Standard constraints apply. Follow-up after `lean-retirement`: once the AST is unfrozen and
 `spelling` syntax supports optional clauses, replace the seeded `spelling_order` overrides in
-`semantics` with `.syl` `spelling` strings (or reordered parameters under the settled optional-argument
-naming rule) and delete the frozen-AST `Action::DoIf.postposed` field.
+`semantics` with `.syl` `spelling` strings (or reordered parameters if the optional-argument
+naming rule is adopted) and delete the frozen-AST `Action::DoIf.postposed` field.
 
 - Add `spelling` strings (or align parameter order) for every declaration in `plugins_v3/builtin/`
   whose printed argument order differs from its parameter declaration order and currently carries
