@@ -81,7 +81,8 @@ theorem exiledAbilityRemainsAnAbilityReference :
     NounPhrase.checkAt none exiledAbility (that .ability) = [] := by decide
 
 theorem exiledAbilityIsNotAStackReference :
-    NounPhrase.checkAt none exiledAbility (that .stack) = [.anaphor (.word .stack) .one 0] := by decide
+    NounPhrase.checkAt none exiledAbility (that .stackObject) =
+      [.anaphor (.word .stackObject) .one 0] := by decide
 
 theorem exiledAbilityIsNotASpellOrCard :
     NounPhrase.checkAt none exiledAbility (that .spell) = [.anaphor (.word .spell) .one 0] ∧

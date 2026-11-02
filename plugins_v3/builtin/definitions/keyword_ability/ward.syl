@@ -7,6 +7,6 @@ ability ward(cost: Cost) {
     whenever(
       does(by(a(and([in(stack), opponentsControl]))), target(thisPermanent)),
       instruct(
-        controllerOf(that(stack)),
-        mayOrElse(pay(cost, once), instruct(you, counter(that(stack))))))]
+        controllerOf(that(stackObject)),
+        mayOrElse(pay(cost, once), instruct(you, counter(that(stackObject))))))]
 }

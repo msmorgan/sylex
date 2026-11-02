@@ -10,7 +10,7 @@ card {
         nth(1),
         does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
         turn),
-      counter(that(stack)))],
+      counter(that(stackObject)))],
   power = 2,
   toughness = 3
 }

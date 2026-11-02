@@ -1191,7 +1191,7 @@ def wordReaches (w : NounWord) (b : Referent) : Bool :=
       | .token => onFieldZone zn && isTokenOrigin og
       | .emblem => zn == some .command
       | .copy => isCopyOrigin og
-      | .stack => onStackZone zn
+      | .stackObject => onStackZone zn
       | _ => false
     | .player _ => w == .player
     | pl@(.join _ _) =>
@@ -1200,18 +1200,18 @@ def wordReaches (w : NounWord) (b : Referent) : Bool :=
       | .player => halfReaches .player pl
       | .permanent => halfReaches .permanent pl
       | .join => Kind.lte .player b.kind
-      | .stack => onStackZone pl.zone
+      | .stackObject => onStackZone pl.zone
       | _ => false
     | .ability _ zn =>
       match w with
       | .ability => true
-      | .stack => onStackZone zn
+      | .stackObject => onStackZone zn
       | _ => false
     | .pile _ _ _ => w == .pile
     | pl =>
       match w with
       | .join => pl.joined && Kind.lte .player b.kind
-      | .stack => onStackZone pl.zone
+      | .stackObject => onStackZone pl.zone
       | _ => false
 
 /-- A self-referent is never read by a noun word. -/

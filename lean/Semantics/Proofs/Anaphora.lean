@@ -237,8 +237,8 @@ reach it [CR#701.6a]. -/
 theorem badStackAnaphorAfterCounteringAbility :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ counter (target (.abilityHead .anyActivated)), counter (that .stack) ])
-      = [.anaphor (.word .stack) .one 0] := by
+        [ counter (target (.abilityHead .anyActivated)), counter (that .stackObject) ])
+      = [.anaphor (.word .stackObject) .one 0] := by
   decide
 
 def afterAnyTargetDamage : DRS :=
@@ -253,8 +253,8 @@ theorem okUnionAnaphorAfterAnyTarget :
 union is not on the stack. `that .join` spells the permanent-or-player read
 (`okUnionAnaphorAfterJoin`). -/
 theorem badStackAnaphorOnPlayerUnion :
-    NounPhrase.checkAt (some .object) afterAnyTargetDamage (that .stack)
-      = [.anaphor (.word .stack) .one 0] := by
+    NounPhrase.checkAt (some .object) afterAnyTargetDamage (that .stackObject)
+      = [.anaphor (.word .stackObject) .one 0] := by
   decide
 
 /-- "a creature with protection from a color" -/

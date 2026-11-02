@@ -462,7 +462,7 @@ inductive NounWord where
   | copy
   | join
   /-- "Counter target spell or ability. … THAT SPELL OR ABILITY" -/
-  | stack
+  | stackObject
   /-- "Whenever you activate an ability, … copy THAT ABILITY" -/
   | ability
   /-- A written type narrows the word without replacing its carrier requirement. -/
