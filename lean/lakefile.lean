@@ -169,6 +169,11 @@ lean_exe sylGen where
   root := `SylGen.Main
   supportInterpreter := true
 
+/-- Dumps `SylGen.parse`'s declarations for `cargo xtask dsl differential`; outside the default
+build and the Lean check gate. -/
+lean_exe sylParseDump where
+  root := `SylGen.ParseDump
+
 lean_lib SylFixtureRegistry where
   roots := #[`SylGen.Tests.Registry]
 
