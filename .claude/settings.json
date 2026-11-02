@@ -4,7 +4,6 @@
   },
   "enabledPlugins": {
     "mtg-rules@mtg-rules": true,
-    "idris2-guide@idris2-guide": true,
     "jj-sensei@msmorgan": true,
     "jj-kata@msmorgan": true
   },

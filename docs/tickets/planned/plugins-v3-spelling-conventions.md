@@ -69,7 +69,7 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
     `spelling`, but must parse it).
   - `semantics` checks that no two patterns share a set of holes, and that every call's set of
     non-default arguments has a pattern. `semantics` is used because it resolves every call.
-    (Not SylGen: after `semantics-rust-rewrite` it is only a mirror of the DSL.)
+    (Not SylGen, which `semantics-rust-rewrite` deletes.)
   - `semantics` also refuses an argument written equal to its default.
   - Add negative cases for all three errors.
 - **Corpus, in its own commits:**

@@ -4,7 +4,7 @@ needs: [plugins-v3-data-language, semantics-rust-rewrite]
 # `at_` takes a turn point; `when` and `whenever` take an event
 
 Standard constraints apply. Implement in the `plugins-v3-data-language` grammar, in `.syl` and
-Rust `semantics` (after `semantics-rust-rewrite`; the Lean checker is retired).
+Rust `semantics` (after `semantics-rust-rewrite`; Lean is retired).
 
 ## The defect
 

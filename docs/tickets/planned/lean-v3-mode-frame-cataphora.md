@@ -63,7 +63,7 @@ leave your graveyard" trigger would fire once for the card and twice for the enc
 
 ## Change
 
-- **AST (Rust `semantics`, and the Lean mirror of the DSL):** add the construct, the reserved word for the bound filler, and "at
+- **AST (Rust `semantics`):** add the construct, the reserved word for the bound filler, and "at
   random".
 - **`discourse`:** resolve the bound argument by its sort; refuse a characteristics filler under a
   plural choice.

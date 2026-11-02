@@ -59,7 +59,7 @@ An effect's Duration is a field (`establish (spec) (duration : Option Duration)`
 
 ## Change
 
-- **AST (Rust `semantics`, and the Lean mirror of the DSL, which `semantics-rust-rewrite` keeps):**
+- **AST (Rust `semantics`):**
   - Add the adjunct nodes.
   - Split `move`'s `riders`: Pile Placements stay in a field of their own, and every other rider
     becomes a node.

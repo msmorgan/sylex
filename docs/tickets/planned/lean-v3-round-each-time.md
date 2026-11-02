@@ -37,7 +37,7 @@ only way out would be single-purpose Templates like `basePtHalfRoundedUpOf`.
 
 ## Change
 
-- **AST (Rust `semantics`, and the Lean mirror of the DSL):** add an unrounded fraction amount (half, a third) and the wrapping
+- **AST (Rust `semantics`):** add an unrounded fraction amount (half, a third) and the wrapping
   rounding construct.
 - **`discourse`:** the refusals above.
 - **Templates:**
