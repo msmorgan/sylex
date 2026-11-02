@@ -38,7 +38,7 @@ Usage: [--check | --stdin] [style flags] [paths...]
   --trailing-commas T        never (default), bodies, or own-line (wherever a
                              closer has its own line)
   --record-spaces[=BOOL]     `{ a = b }` for flat records (default false)
-  --hug-sole-list[=BOOL]     Hug a call's sole list or record argument: `and([`
+  --hug-first-list[=BOOL]    Hug a call's first list or record argument: `and([`
                              (default true)
   -h, --help                 Print this help
 ";
@@ -125,7 +125,7 @@ pub fn parse_args(args: impl IntoIterator<Item = String>) -> Result<Args, String
                 };
             }
             "--record-spaces" => style.record_spaces = boolean(&flag, joined.as_deref())?,
-            "--hug-sole-list" => style.hug_sole_list = boolean(&flag, joined.as_deref())?,
+            "--hug-first-list" => style.hug_first_list = boolean(&flag, joined.as_deref())?,
             _ => return Err(format!("unknown flag {arg:?}")),
         }
     }

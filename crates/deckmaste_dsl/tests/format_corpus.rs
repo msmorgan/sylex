@@ -34,12 +34,12 @@ fn styles() -> Vec<Style> {
             TrailingCommas::OwnLine,
         ] {
             for record_spaces in [false, true] {
-                for hug_sole_list in [false, true] {
+                for hug_first_list in [false, true] {
                     styles.push(Style {
                         closers,
                         trailing_commas,
                         record_spaces,
-                        hug_sole_list,
+                        hug_first_list,
                         ..Style::default()
                     });
                 }

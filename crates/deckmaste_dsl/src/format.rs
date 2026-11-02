@@ -11,9 +11,10 @@
 //! - Inner closers hug the last child (`...)]))`); a declaration body's `}`
 //!   goes on its own line. A sequence whose last item is a comment always ends
 //!   with its closer on its own line.
-//! - A list or record that is a call's only (positional) argument hugs the
-//!   call's `(`, as in `and([`, unless hugging takes more lines. See
-//!   [`Style::hug_sole_list`] for the exact rule.
+//! - A list or record that is a call's first argument, unnamed, hugs the call's
+//!   `(`, as in `and([`, unless hugging takes more lines. Only the opener
+//!   moves: everything else keeps its unhugged place. See
+//!   [`Style::hug_first_list`] for the exact rule.
 //! - Sorts are never broken.
 //! - Comments print verbatim on their own line at their sequence's indent. A
 //!   comment or a recorded blank line inside a sequence forces it to break.
@@ -52,20 +53,35 @@ pub struct Style {
     /// Whether a flat, non-empty record has spaces inside its braces:
     /// `{ a = b }` rather than `{a = b}`.
     pub record_spaces: bool,
-    /// Whether a list or record that is a call's only positional argument
-    /// hugs the call's `(` when the call breaks: `and([` on one line, the
-    /// list's items one level in, and the closers together (`])`).
+    /// Whether a list or record that is a broken call's first argument, when
+    /// that argument is unnamed, hugs the call's `(`: `and([` on one line.
+    ///
+    /// Hugging only moves the opener up; indentation still tracks nesting
+    /// depth. The hugged layout is the unhugged one with the list broken and
+    /// the line break between `head(` and `[` removed: the items stay two
+    /// levels past the call's line, and the list's closer stays where the
+    /// unhugged one goes. With hugged closers that is right after the last
+    /// item, followed by the call's `)` when the list is its last argument
+    /// (`])`) or by `,` and the remaining arguments, one level past the call's
+    /// line. With closers on their own line, the list's `]` gets its own line
+    /// one level past the call's line, and the call's `)` its own line at the
+    /// call's indent. A named argument (`f(x = [`) and a list after the first
+    /// argument never hug.
     ///
     /// The unhugged layout is used instead when it takes strictly fewer
-    /// lines. Both layouts give the call its own line for `head(`; hugged, the
-    /// list breaks and each item takes at least one line, while unhugged the
-    /// list may stay flat on the one line after `head(`. Items of a hugged list
-    /// are one level shallower than unhugged, so they never need more lines
-    /// there. Unhugged is therefore shorter exactly when the list fits flat on
-    /// its own line (followed by the call's closers when they hug, or by
-    /// the trailing comma, if any, when they do not) and has two or more items,
-    /// and that is the test the printer applies.
-    pub hug_sole_list: bool,
+    /// lines. Both layouts share the call's first line and everything after
+    /// the list. If the list breaks unhugged too, hugging saves the line of
+    /// its `[`, so hugging is shorter. Otherwise the unhugged list takes one
+    /// line, flat one level in, followed by what follows it there (a comma,
+    /// or for a last argument the call's closers when they hug, or the
+    /// trailing comma, if any, when they do not). Hugged, each item takes a
+    /// line of its own two levels in, at most as wide as the flat list
+    /// (which has the extra `[` and `]`), and the `]` takes one more line when
+    /// closers go on their own line. Unhugged is therefore shorter exactly
+    /// when the list fits flat on its own line and either has two or more
+    /// items or closers go on their own line; that is the test the printer
+    /// applies. A one-item list under hugged closers ties, and hugs.
+    pub hug_first_list: bool,
 }
 
 impl Default for Style {
@@ -75,7 +91,7 @@ impl Default for Style {
             closers: Closers::Hugged,
             trailing_commas: TrailingCommas::Never,
             record_spaces: false,
-            hug_sole_list: true,
+            hug_first_list: true,
         }
     }
 }
@@ -165,20 +181,18 @@ impl SeqKind {
 }
 
 impl Seq {
-    /// The sole list or record argument this call may hug: its only item,
-    /// when that is a positional list or record argument.
+    /// The list or record argument this call may hug: its first item, when
+    /// that is an unnamed list or record argument.
     fn huggable(&self) -> Option<&Seq> {
-        match self.items.as_slice() {
-            [
-                Element {
-                    kind:
-                        ElementKind::Node {
-                            prefix,
-                            layout: Layout::Seq(inner),
-                        },
-                    ..
-                },
-            ] if self.kind == SeqKind::Call
+        match self.items.first() {
+            Some(Element {
+                kind:
+                    ElementKind::Node {
+                        prefix,
+                        layout: Layout::Seq(inner),
+                    },
+                ..
+            }) if self.kind == SeqKind::Call
                 && prefix.is_empty()
                 && matches!(inner.kind, SeqKind::List | SeqKind::Record) =>
             {
@@ -412,7 +426,7 @@ impl Printer<'_> {
         let builder = self.builder();
         let elements = elements(&record.fields, |f| builder.field(f));
         self.text("{");
-        self.elements(&elements, 0, "}", 0, true);
+        self.elements(&elements, 0, "}", 0, true, false);
     }
 
     /// Prints `layout` at the current column. `indent` is the indent of the
@@ -434,30 +448,52 @@ impl Printer<'_> {
     }
 
     fn broken(&mut self, seq: &Seq, indent: usize, suffix: usize) {
-        if self.style.hug_sole_list
-            && let Some(inner) = seq.huggable()
-            && !self.unhugged_is_shorter(inner, indent, seq.kind.close(), suffix)
-        {
-            self.text(&format!("{}{}", seq.open, inner.open));
-            let close = format!("{}{}", inner.kind.close(), seq.kind.close());
-            self.elements(&inner.items, indent, &close, suffix, false);
-            return;
-        }
+        let hug = self.style.hug_first_list
+            && seq
+                .huggable()
+                .is_some_and(|inner| !self.unhugged_is_shorter(seq, inner, indent, suffix));
         self.text(&seq.open);
-        self.elements(&seq.items, indent, seq.kind.close(), suffix, false);
+        self.elements(&seq.items, indent, seq.kind.close(), suffix, false, hug);
     }
 
-    /// Whether `inner`, a call's sole list or record argument, takes fewer
-    /// lines unhugged: it has two or more items and fits flat on its own line
-    /// one level in, followed by what the unhugged call puts after its last
-    /// item (see [`Printer::last_item_suffix`]).
-    fn unhugged_is_shorter(&self, inner: &Seq, indent: usize, close: &str, suffix: usize) -> bool {
-        let suffix = self.last_item_suffix(close, suffix, false, false);
-        inner.items.len() >= 2
-            && inner
-                .flat
-                .as_ref()
-                .is_some_and(|flat| indent + INDENT + width(flat) + suffix <= self.style.width)
+    /// Whether `inner`, the list or record `seq` may hug, takes fewer lines
+    /// unhugged: it fits flat on its own line one level in, followed by what
+    /// follows it there (see [`Printer::node_end`]), and either has two or
+    /// more items or its closer would go on its own line when hugged. See
+    /// [`Style::hug_first_list`].
+    fn unhugged_is_shorter(&self, seq: &Seq, inner: &Seq, indent: usize, suffix: usize) -> bool {
+        let (_, after) = self.node_end(&seq.items, 0, seq.kind.close(), suffix, false);
+        let fits = inner
+            .flat
+            .as_ref()
+            .is_some_and(|flat| indent + INDENT + width(flat) + after <= self.style.width);
+        fits && (inner.items.len() >= 2 || self.style.closers == Closers::OwnLine)
+    }
+
+    /// Whether node `index` of a broken sequence takes a comma, and the width
+    /// of what follows it on its line: its comma, or, for the last node, what
+    /// [`Printer::last_item_suffix`] gives.
+    fn node_end(
+        &self,
+        elements: &[Element],
+        index: usize,
+        close: &str,
+        suffix: usize,
+        body: bool,
+    ) -> (bool, usize) {
+        let last_node = elements
+            .iter()
+            .rposition(|e| matches!(e.kind, ElementKind::Node { .. }));
+        let ends_with_comment = last_node.is_none_or(|last| last + 1 < elements.len());
+        if Some(index) == last_node {
+            let (_, trailing) = self.sequence_end(body, ends_with_comment);
+            (
+                trailing,
+                self.last_item_suffix(close, suffix, body, ends_with_comment),
+            )
+        } else {
+            (true, 1)
+        }
     }
 
     /// Whether a broken sequence's closer goes on its own line, and whether its
@@ -490,7 +526,8 @@ impl Printer<'_> {
 
     /// Prints a broken sequence's items, one per line one level past
     /// `indent`, then `close`. `suffix` is the width of what follows `close`
-    /// on its line.
+    /// on its line. With `hug`, the first item, a list or record, stays on
+    /// the opener's line and breaks (see [`Style::hug_first_list`]).
     fn elements(
         &mut self,
         elements: &[Element],
@@ -498,30 +535,31 @@ impl Printer<'_> {
         close: &str,
         suffix: usize,
         body: bool,
+        hug: bool,
     ) {
         let inner = indent + INDENT;
         let last_node = elements
             .iter()
             .rposition(|e| matches!(e.kind, ElementKind::Node { .. }));
         let ends_with_comment = last_node.is_none_or(|last| last + 1 < elements.len());
-        let (closer_own_line, trailing) = self.sequence_end(body, ends_with_comment);
+        let (closer_own_line, _) = self.sequence_end(body, ends_with_comment);
         for (index, element) in elements.iter().enumerate() {
+            let hugged = hug && index == 0;
             if index > 0 && element.blank_line_before {
                 self.out.push('\n');
             }
-            self.newline(inner);
+            if !hugged {
+                self.newline(inner);
+            }
             match &element.kind {
                 ElementKind::Comment(text) => self.text(&format!("#{text}")),
                 ElementKind::Node { prefix, layout } => {
-                    let is_last = Some(index) == last_node;
-                    let comma = !is_last || trailing;
-                    let after = if is_last {
-                        self.last_item_suffix(close, suffix, body, ends_with_comment)
-                    } else {
-                        1
-                    };
+                    let (comma, after) = self.node_end(elements, index, close, suffix, body);
                     self.text(prefix);
-                    self.layout(layout, inner, after);
+                    match layout {
+                        Layout::Seq(seq) if hugged => self.broken(seq, inner, after),
+                        _ => self.layout(layout, inner, after),
+                    }
                     if comma {
                         self.text(",");
                     }

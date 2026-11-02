@@ -42,7 +42,7 @@ fn style_flags_set_every_option() {
         "own-line",
         "--trailing-commas=own-line",
         "--record-spaces",
-        "--hug-sole-list=false",
+        "--hug-first-list=false",
     ])
     .unwrap();
     assert_eq!(
@@ -52,7 +52,7 @@ fn style_flags_set_every_option() {
             closers: Closers::OwnLine,
             trailing_commas: TrailingCommas::OwnLine,
             record_spaces: true,
-            hug_sole_list: false,
+            hug_first_list: false,
         }
     );
     let parsed = args(&[
@@ -61,7 +61,7 @@ fn style_flags_set_every_option() {
         "--trailing-commas",
         "bodies",
         "--record-spaces=false",
-        "--hug-sole-list=true",
+        "--hug-first-list=true",
     ])
     .unwrap();
     assert_eq!(
@@ -80,9 +80,9 @@ fn style_flags_set_every_option() {
 
 #[test]
 fn a_bare_bool_flag_does_not_take_the_next_path() {
-    let parsed = args(&["--record-spaces", "cards", "--hug-sole-list", "more"]).unwrap();
+    let parsed = args(&["--record-spaces", "cards", "--hug-first-list", "more"]).unwrap();
     assert!(parsed.style.record_spaces);
-    assert!(parsed.style.hug_sole_list);
+    assert!(parsed.style.hug_first_list);
     assert_eq!(
         parsed.paths,
         [PathBuf::from("cards"), PathBuf::from("more")]
