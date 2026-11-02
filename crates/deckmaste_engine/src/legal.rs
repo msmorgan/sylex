@@ -1054,13 +1054,13 @@ fn target_rows(
     rows
 }
 
-/// Whether `actor` (a targeting stack object / in-flight announce) matches
-/// the two-slot deed agent: both PRESENT arms must hold —
-/// `stack_object` against the actor itself, `source` against the actor's
-/// source ([CR#113.7] an ability's generator; [CR#609.7a] a spell is itself
-/// a source) — so hexproof-from-red's one row covers "red spells … or
-/// abilities … from red sources" ([CR#702.11d]). The EMPTY agent (which the
-/// Idris re-emit gate rejects) defensively matches nothing.
+/// Whether `actor` (a targeting stack object / in-flight announce) matches the
+/// two-slot deed agent: both PRESENT arms must hold — `stack_object` against
+/// the actor itself, `source` against the actor's source ([CR#113.7] an
+/// ability's generator; [CR#609.7a] a spell is itself a source) — so
+/// hexproof-from-red's one row covers "red spells … or abilities … from red
+/// sources" ([CR#702.11d]). The EMPTY agent (ill-formed) defensively matches
+/// nothing.
 pub(crate) fn deed_agent_matches(
     state: &GameState,
     agent: &DeedAgent,

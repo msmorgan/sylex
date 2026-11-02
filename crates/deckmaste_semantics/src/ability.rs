@@ -201,7 +201,7 @@ pub enum Ability {
     /// `Static(Cant(...))`). Duration is implicit ("while it functions",
     /// [CR#611.3]); conditionality/other qualifiers compose as `StaticEffect`
     /// wrappers ([`Conditionally`](crate::StaticEffect::Conditionally)), never
-    /// a struct field. Mirrors Idris `Static : StaticEffect -> Ability`.
+    /// a struct field.
     Static(Arc<StaticEffect>),
     #[macro_ron(spliced)]
     Activated(Arc<ActivatedAbility>),

@@ -10,9 +10,9 @@ use crate::SupportsMacros;
 use crate::Zone;
 
 /// The binder feeding [`OneShotEffect::With`](crate::With),
-/// [`Each`](crate::Each), and [`Distribute`](crate::Distribute) — the Idris
-/// `Bindable`, collapsed (cardinality is encoded by the variant, not a type
-/// index). A one-binder (`TheRef`/`ChooseOne`) binds a single object read as
+/// [`Each`](crate::Each), and [`Distribute`](crate::Distribute) — its
+/// cardinality is encoded by the variant, not a type index. A one-binder
+/// (`TheRef`/`ChooseOne`) binds a single object read as
 /// [`Reference::That`](crate::Reference::That); a many-binder
 /// (`Choose`/`Existing`) binds a group read as
 /// [`Selection::That`](crate::Selection::That). `Each`/`Distribute` take a
@@ -42,12 +42,11 @@ pub enum Binder {
     /// `That`.
     TheRef(Reference),
     /// The chooser picks exactly one match — One → `That`. ("sacrifice a
-    /// creature") `by` names who chooses, mirroring the Idris `{default You
-    /// by}`: the default is the controller; a foreign chooser ("that player
-    /// sacrifices a creature of their choice", [CR#608.2d,701.21a]) overrides
-    /// it.
+    /// creature") `by` names who chooses: the default is the controller; a
+    /// foreign chooser ("that player sacrifices a creature of their choice",
+    /// [CR#608.2d,701.21a]) overrides it.
     ChooseOne {
-        /// What may be picked (the Idris `Predicate`).
+        /// What may be picked.
         filter: Predicate,
         /// Who chooses (default `You`).
         #[serde(default = "ref_you", skip_serializing_if = "ref_is_you")]
@@ -55,17 +54,16 @@ pub enum Binder {
     },
     /// Run an [`Action`] for effect and bind its product — the moved/created
     /// object — as the singular [`Reference::That`](crate::Reference::That) —
-    /// One → `That`. The Idris `Produce : Action b -> Bindable b One AnObject`
-    /// (Cavern-of-Souls-style "exile it":
+    /// One → `That`. (Cavern-of-Souls-style "exile it":
     /// `With(Produce(Move(It, Exile)), …)`). Boxed: an open [`Action`] is the
     /// largest leaf enum (`clippy::large_enum_variant`).
     Produce(Arc<Action>),
     /// Search `whose`'s `from`-zones (hidden libraries/graveyards) for exactly
-    /// ONE match, bound as `That` — One → `That`. The Idris `SearchOne`;
+    /// ONE match, bound as `That` — One → `That`.
     /// `by`/`whose` default to `You`, `from` to `[Library]` (each omitted on
     /// write when default).
     SearchOne {
-        /// The card sought (the Idris `Predicate`).
+        /// The card sought.
         filter: Predicate,
         /// Who performs the search (default `You`).
         #[serde(default = "ref_you", skip_serializing_if = "ref_is_you")]
@@ -79,11 +77,11 @@ pub enum Binder {
         #[serde(default = "from_library", skip_serializing_if = "is_from_library")]
         from: Arc<[Zone]>,
         /// The explicit WHIFF branch ([CR#701.23b] — a search may fail to
-        /// find): what happens when nothing is found. Whiff semantics are
-        /// DATA — a whiffed search skips the product-dependent body, and the
-        /// branch here runs instead; it runs WITHOUT the product
-        /// binding, so reading the search's `That` inside it is unsound
-        /// (rejected by the Idris re-emit gate).
+        /// find): what happens when nothing is found. Whiff semantics are DATA
+        /// — a whiffed search skips the product-dependent body, and the branch
+        /// here runs instead; it runs WITHOUT the product binding, so reading
+        /// the search's `That` inside it is unsound (an authoring invariant no
+        /// checker enforces any more).
         #[serde(default, skip_serializing_if = "Option::is_none")]
         if_none: Option<Arc<crate::OneShotEffect>>,
     },
@@ -91,9 +89,9 @@ pub enum Binder {
     /// ("choose two cards") Same `by` default as
     /// [`ChooseOne`](Self::ChooseOne).
     Choose {
-        /// How many to pick (the Idris `Quantity`).
+        /// How many to pick.
         quantity: Quantity,
-        /// What may be picked (the Idris `Predicate`).
+        /// What may be picked.
         filter: Predicate,
         /// Who chooses (default `You`).
         #[serde(default = "ref_you", skip_serializing_if = "ref_is_you")]
@@ -102,14 +100,14 @@ pub enum Binder {
     /// An existing group/selection — Many → `That` (group).
     Existing(Selection),
     /// Search `whose`'s `from`-zones for a [`Quantity`] of matches, bound as a
-    /// group `That` (`Each`-iterated) — Many → `That`. The Idris `Search`,
-    /// like [`Choose`](Self::Choose) but over (hidden) searched zones the
-    /// engine reveals/shuffles. Same `by`/`whose`/`from` defaults as
+    /// group `That` (`Each`-iterated) — Many → `That`. Like
+    /// [`Choose`](Self::Choose) but over (hidden) searched zones the engine
+    /// reveals/shuffles. Same `by`/`whose`/`from` defaults as
     /// [`SearchOne`](Self::SearchOne).
     Search {
-        /// How many cards to find (the Idris `Quantity`).
+        /// How many cards to find.
         quantity: Quantity,
-        /// The cards sought (the Idris `Predicate`).
+        /// The cards sought.
         filter: Predicate,
         /// Who performs the search (default `You`).
         #[serde(default = "ref_you", skip_serializing_if = "ref_is_you")]
@@ -132,8 +130,7 @@ pub enum Binder {
 }
 
 /// The `by`/`whose` default — the searching/choosing player is the controller
-/// ([`Reference::You`]). Mirrors the Idris `{default You by}` / `{default You
-/// whose}` on `ChooseOne`/`Choose`/`Search`/`SearchOne`.
+/// ([`Reference::You`]).
 fn ref_you() -> Reference {
     Reference::You
 }
@@ -143,8 +140,7 @@ fn ref_is_you(r: &Reference) -> bool {
     matches!(r, Reference::You)
 }
 
-/// The default search domain — a player's library. Mirrors the Idris
-/// `{default [Library] from}` on `Search`/`SearchOne`.
+/// The default search domain — a player's library.
 fn from_library() -> Arc<[Zone]> {
     vec![Zone::Library].into()
 }

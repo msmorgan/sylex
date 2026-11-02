@@ -206,8 +206,7 @@ pub enum StatePredicate {
     WasPaidWith(crate::CostTag),
     /// The object was cast using the named alternative base cost
     /// ([CR#118.9,702.34a]) — the filter-language channel of the alt-cost
-    /// linkage; the twin of `WasPaidWith` (optional/additional costs). Idris
-    /// `WasCastWith`.
+    /// linkage; the twin of `WasPaidWith` (optional/additional costs).
     WasCastWith(crate::CostTag),
     /// The object was PUT into its current zone directly from this zone
     /// (move provenance) — the move-provenance twin of `WasCastFrom`;
@@ -305,9 +304,8 @@ pub enum Predicate {
     /// within one zone's own order).
     Adjacent(Adjacency, Reference),
     /// A player whose attribute compares to the bound ([CR#107.1] numbers) —
-    /// the player-scope twin of `Characteristic(Stat(..))`: "a player has 13
-    /// or less life" = `PlayerStatCmp(Life, AtMost, 13)`. Mirrors the Idris
-    /// `PlayerStatCmp : PlayerAttr -> Cmp -> Count -> Predicate APlayer`.
+    /// the player-scope twin of `Characteristic(Stat(..))`: "a player has 13 or
+    /// less life" = `PlayerStatCmp(Life, AtMost, 13)`.
     PlayerStatCmp(PlayerAttr, Cmp, Count),
     /// Lifts a quality to a stack ABILITY's source ([CR#702.11d] "abilities
     /// … from [quality] sources"): matches an activated/triggered ability on

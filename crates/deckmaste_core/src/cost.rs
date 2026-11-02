@@ -393,22 +393,22 @@ pub enum CostComponent {
     Tap,
     /// The {Q} symbol.
     Untap,
-    /// Pay by performing an action ([CR#118.3]) — the Idris `Do : Action b
-    /// -> Cost b`. The payer is `You` in cost context — spelled explicitly on
-    /// every agent-bearing verb (`Do(Sacrifice(You, This))`, Law 2: no
-    /// read-time default). `dest` names the PAID PRODUCT ([CR#400.7]) — the
-    /// exiled or moved object the ability body later reads — mirroring
-    /// [`Instruction::Act`](crate::Instruction::Act)'s optional destination; a payment
-    /// nothing reads back leaves it `None`. [`RunnableCostAction`] retains the
-    /// full action so a keyword-action composite can be a cost — "Discard a
-    /// card:" lifts its chooser into a preceding
+    /// Pay by performing an action ([CR#118.3]). The payer is `You` in cost
+    /// context — spelled explicitly on every agent-bearing verb
+    /// (`Do(Sacrifice(You, This))`, Law 2: no read-time default). `dest` names
+    /// the PAID PRODUCT ([CR#400.7]) — the exiled or moved object the ability
+    /// body later reads — mirroring
+    /// [`Instruction::Act`](crate::Instruction::Act)'s optional destination; a
+    /// payment nothing reads back leaves it `None`. [`RunnableCostAction`]
+    /// retains the full action so a keyword-action composite can be a cost —
+    /// "Discard a card:" lifts its chooser into a preceding
     /// [`Choose`](CostComponent::Choose) instruction, while cycling's "Discard
     /// this card:" keeps the bound
     /// [`discard_what`](crate::Action::discard_what) action
     /// ([CR#701.9,702.29a]). Its private checked constructor enforces both
     /// [`Action::is_cost_eligible`](crate::Action::is_cost_eligible) and the
-    /// absence of unresolved chooser/random subjects. The wrapper owns a
-    /// shared action allocation, keeping this list element compact.
+    /// absence of unresolved chooser/random subjects. The wrapper owns a shared
+    /// action allocation, keeping this list element compact.
     Act {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         dest: Option<crate::DefId>,

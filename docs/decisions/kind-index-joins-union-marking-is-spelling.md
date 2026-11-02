@@ -85,7 +85,8 @@ authoring-time error rather than model unsoundness.
 
 ## Tracked references
 
-- [Workbench closure tables](../archive/idris-workbench-closure-tables.md) — the
+- Workbench closure tables (`docs/archive/idris-workbench-closure-tables.md`,
+  deleted with `idris/` by `idris-retirement`; in version-control history) — the
   campaign's measured closure and slot inventory; the per-site union
   translation is carried by the workbench union-family tickets.
 - [Semantics v3](semantics-v3.md) (superseding [Semantics v2](../archive/decisions/semantics-v2.md)) — the workbench contract this shape lands in.

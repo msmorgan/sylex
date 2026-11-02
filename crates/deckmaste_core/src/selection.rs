@@ -37,11 +37,11 @@ pub enum Selection {
     Pile(crate::RefId),
     /// All matching objects as one set ("every creature you control") — the
     /// group a distributor ([`Each`](crate::Each) / `StaticSpec::Each`)
-    /// iterates. Mirrors Idris `SelectAll : Predicate -> Selection`.
+    /// iterates.
     SelectAll(Arc<crate::Region<Predicate>>),
-    /// Several selections combined as ONE group ("each X and each Y") — the
-    /// Idris `Union`. Order-preserving concatenation of the member groups; an
-    /// object in more than one member appears once (first position wins).
+    /// Several selections combined as ONE group ("each X and each Y").
+    /// Order-preserving concatenation of the member groups; an object in more
+    /// than one member appears once (first position wins).
     Union(Vec<Selection>),
     /// The elements of a selection, sequenced by a player's CHOICE — the
     /// ordered-selection combinator for iterations whose order is
@@ -66,8 +66,7 @@ pub enum Selection {
     /// default `You` writes bare. Feeds the scry `Each` over the peeked
     /// top-N ([CR#701.22a]).
     TopOfLibrary { count: Count, whose: Reference },
-    /// The bottom `count` cards of a library, bottom → up (ordered) — the
-    /// Idris `BottomOfLibrary`, mirroring
+    /// The bottom `count` cards of a library, bottom → up (ordered), mirroring
     /// [`TopOfLibrary`](Self::TopOfLibrary). `whose` names the library's
     /// player; the default `You` writes bare.
     BottomOfLibrary { count: Count, whose: Reference },

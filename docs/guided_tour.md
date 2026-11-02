@@ -79,9 +79,10 @@ per-plugin baseline. `lean/scripts/build` proves the terms hand-supplied to
 Lean; `lean check` certifies the loaded card data beside it, and
 `cargo xtask lean definitions` does the same for every counter, subtype and
 designation definition `plugins_v2/builtin` declares. The v1
-`plugins/canon` corpus stays on `cargo xtask idris-check` until it has a v2
-counterpart. The [succession decision](decisions/lean-is-the-workbench.md)
-records that boundary and the frozen Idris reference.
+`plugins/canon` corpus has no card gate: the Idris one was retired without a
+successor, and `semantics-v3-parity` is the v3 cross-check. The
+[succession decision](decisions/lean-is-the-workbench.md) records the
+succession.
 
 ## Run the whole path
 

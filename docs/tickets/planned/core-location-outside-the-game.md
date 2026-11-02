@@ -42,19 +42,9 @@ The concrete driver is the family of effects that reach out-of-game cards:
 Wishes (Burning/Living Wish), Companion, Learn/Lesson, and Venture/Dungeon
 ([CR#309.2] dungeons begin outside the game). They fetch/reveal a **card**
 that has no `Zone` — it lives in a `Location::OutsideTheGame`. Modeling that
-today would force a fake `Zone::Sideboard`, which is exactly what this ticket
-removes.
+today would force a fake `Zone::Sideboard`, which this ticket rules out.
 
 ## Scope
-
-**Retire the Sideboard zone (idris side — Rust `core::Zone` already omits it):**
-- `idris/src/Semantics.idr` — drop the `Sideboard` `Zone` constructor and its
-  comment (currently the only place asserting sideboard-is-a-zone).
-- `idris/src/Semantics.idr` `zoneSort` — drop the `Sideboard` arm.
-- `idris/src/Spec.idr` `tZoneSorts` — drop `Sideboard` from the zone list.
-- `idris/src/EmitTables.idr` `zoneName` — drop the `Sideboard` arm.
-- Mirror the new `Location` sum in idris (nullary `OutsideTheGame`, transparent
-  `Zone` arm) so the soundness gate covers it.
 
 **Add `Location` (Rust `core`):**
 - New type beside `Zone`, flatten-lifting the zone names as above.

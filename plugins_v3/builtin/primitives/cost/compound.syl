@@ -1,2 +1,2 @@
-# A cost composed of all the listed costs.
+# A cost composed of all the listed costs [CR#118].
 primitive compound(costs: List(Cost) = []): Cost

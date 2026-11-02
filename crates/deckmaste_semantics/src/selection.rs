@@ -28,11 +28,11 @@ use crate::SupportsMacros;
 pub enum Selection {
     /// All matching objects as one set ("every creature you control") — the
     /// group a distributor ([`Each`](crate::Each) / `StaticEffect::Each`)
-    /// iterates. Mirrors Idris `SelectAll : Predicate -> Selection`.
+    /// iterates.
     SelectAll(Predicate),
-    /// Several selections combined as ONE group ("each X and each Y") — the
-    /// Idris `Union`. Order-preserving concatenation of the member groups; an
-    /// object in more than one member appears once (first position wins).
+    /// Several selections combined as ONE group ("each X and each Y").
+    /// Order-preserving concatenation of the member groups; an object in more
+    /// than one member appears once (first position wins).
     Union(Vec<Selection>),
     /// The elements of a selection, sequenced by a player's CHOICE — the
     /// ordered-selection combinator for iterations whose order is
@@ -63,8 +63,7 @@ pub enum Selection {
         #[serde(default = "ref_you", skip_serializing_if = "ref_is_you")]
         whose: Reference,
     },
-    /// The bottom `count` cards of a library, bottom → up (ordered) — the
-    /// Idris `BottomOfLibrary`, mirroring
+    /// The bottom `count` cards of a library, bottom → up (ordered), mirroring
     /// [`TopOfLibrary`](Self::TopOfLibrary). `whose` names the library's
     /// player; the default `You` writes bare.
     BottomOfLibrary {
@@ -229,7 +228,7 @@ mod tests {
         assert_eq!(read(&to_string(&v)), v);
     }
 
-    /// `BottomOfLibrary` mirrors `TopOfLibrary` (the Idris constructor):
+    /// `BottomOfLibrary` mirrors `TopOfLibrary`:
     /// same fields, same bare-default `whose`.
     #[test]
     fn bottom_of_library_round_trips() {
@@ -260,8 +259,8 @@ mod tests {
         assert_eq!(read(&to_string(&named)), named);
     }
 
-    /// `Union` combines member selections as one group (the Idris `Union` —
-    /// "each X and each Y") and round-trips.
+    /// `Union` combines member selections as one group ("each X and each Y")
+    /// and round-trips.
     #[test]
     fn union_round_trips() {
         let v = Selection::Union(vec![

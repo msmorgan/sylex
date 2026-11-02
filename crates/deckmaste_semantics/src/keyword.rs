@@ -103,15 +103,15 @@ impl<'de> serde::Deserialize<'de> for KeywordRef {
 }
 
 /// The closed vocabulary of keyword parameter SHAPES ([CR#702] — every
-/// parameterized keyword's printed one-liner takes typed args from this
-/// set): nothing (`flying`), a count (`bloodthirst 2`), a cost (`ward {2}`,
-/// `flashback {1}{R}`), a count and a cost (`awaken 3—{5}{W}`,
-/// `suspend 4—{1}{U}`), a quality (`landwalk`, `hexproof from red`), a
-/// quality and a cost (`splice onto Arcane {1}{R}`), or a name
-/// (`partner with N`). The registry ROW (`KeywordDecl`) carries the shape
-/// as data; a use whose args don't fit the declared shape is unrepresentable
-/// in the Idris model and so rejected by the re-emit gate (a bare
-/// `Keyword(Composite(name: "Ward", …))` with its cost lost).
+/// parameterized keyword's printed one-liner takes typed args from this set):
+/// nothing (`flying`), a count (`bloodthirst 2`), a cost (`ward {2}`,
+/// `flashback {1}{R}`), a count and a cost (`awaken 3—{5}{W}`, `suspend
+/// 4—{1}{U}`), a quality (`landwalk`, `hexproof from red`), a quality and a
+/// cost (`splice onto Arcane {1}{R}`), or a name (`partner with N`). The
+/// registry ROW (`KeywordDecl`) carries the shape as data; a use whose args
+/// don't fit the declared shape is ill-formed, an authoring invariant no
+/// checker enforces any more (a bare `Keyword(Composite(name: "Ward", …))` with
+/// its cost lost).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub enum ParamShape {
     None,

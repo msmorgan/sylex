@@ -3,7 +3,7 @@
 // devotion (a Theros-block mechanic never printed in the slice), so this
 // fixture isolates `Count::Aggregate(SumOf, Project(<permanents you
 // control>, CountOf(ManaSymbols(It, CountsAs(Green)))))` end to end: engine
-// fold, render ("your devotion to green"), and the Idris re-emit gate.
+// fold and render ("your devotion to green").
 Normal(
     name: "Devotion Creature",
     mana_cost: [Generic(1), Green],

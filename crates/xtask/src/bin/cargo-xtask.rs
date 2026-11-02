@@ -17,7 +17,6 @@ use xtask::extract::ExtractArgs;
 use xtask::fidelity::FidelityArgs;
 use xtask::generate::GenerateArgs;
 use xtask::graduate::GraduateArgs;
-use xtask::idris_check::IdrisCheckArgs;
 use xtask::lean::LeanArgs;
 use xtask::lexical::LexicalArgs;
 use xtask::map::MapArgs;
@@ -69,16 +68,12 @@ enum Cmd {
     Entailments(EntailmentsArgs),
     /// Analyze supported raw Oracle text against the independent lexicon.
     Lexical(LexicalArgs),
-    /// The anaphora-soundness gate: re-emit each expanded card as a raw
-    /// Idris `Core.idr` expression and typecheck it with `idris2 --check`.
-    /// One card name = single-card mode; omitted = batch-check the plugin.
-    IdrisCheck(IdrisCheckArgs),
     /// Build the native Lean workbench with warnings treated as errors.
     Lean(LeanArgs),
     /// `.syl` tooling: check `deckmaste_dsl` against `SylGen`'s parser over
     /// `plugins_v3`, or format `.syl` files.
     Dsl(DslArgs),
-    /// On-demand "bearings" dumps of current code shape (`enums`/`idris`).
+    /// On-demand "bearings" dumps of current code shape (`enums`).
     Map(MapArgs),
     /// Write one identity-macro scaffold per reachable variant that needs
     /// one and has no def yet (spec §5); never overwrites an existing def.
@@ -108,7 +103,6 @@ fn main() -> anyhow::Result<()> {
             let mut stdout = std::io::stdout().lock();
             xtask::lexical::run(&args, &mut stdout)
         }
-        Cmd::IdrisCheck(args) => xtask::idris_check::run(&args),
         Cmd::Lean(args) => xtask::lean::run(&args),
         Cmd::Dsl(args) => xtask::dsl::run(&args),
         Cmd::Map(args) => xtask::map::run(&args),

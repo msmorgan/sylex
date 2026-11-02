@@ -115,18 +115,18 @@ pub enum Card {
         front: CardFace,
         back: CardFace,
     },
-    /// A split card: two Card Faces on one side ([CR#709.1]).
+    /// A split card ([CR#709]): two Card Faces on one side ([CR#709.1]).
     Split {
         left: CardFace,
         right: CardFace,
     },
-    /// A flip card: one Card Face plus Alternative Characteristics used
-    /// according to flipped status, never a second face ([CR#710.1]).
+    /// A flip card ([CR#710]): one Card Face plus Alternative Characteristics
+    /// used according to flipped status, never a second face ([CR#710.1]).
     Flip {
         normal: CardFace,
         alternative: Characteristics,
     },
-    /// An adventurer card: normal characteristics plus the Alternative
+    /// An adventurer card ([CR#715]): normal characteristics plus the Alternative
     /// Characteristics of its Adventure spell — not an Adventure face
     /// ([CR#715.2]).
     Adventurer {

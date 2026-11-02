@@ -63,9 +63,8 @@ pub enum AsThough {
     ///   `May(Cast(InstantSpeed))` row appears, lifting cast timing (Leyline of
     ///   Anticipation). The keyword is INVOKED, never inlined.
     ///
-    /// Mirrors Idris `AsThough : Condition -> StaticEffect -> StaticEffect`:
-    /// `AsThough (Matches This premise) then`. `then` is `Arc`-boxed to keep
-    /// this variant small (a `Deontic` dwarfs `Expanded`, `clippy::
+    /// `then` is `Arc`-boxed to keep this variant small (a `Deontic` dwarfs
+    /// `Expanded`, `clippy::
     /// large_enum_variant`).
     Counterfactual {
         premise: Predicate,
@@ -135,9 +134,9 @@ impl CountBound {
 ///   ColorIs(Red)` ([CR#702.11d]: red spells, or abilities from red sources),
 ///   protection's targeted clause is `source: Param(quality)` ([CR#702.16b]).
 ///
-/// The empty agent (neither arm) is spellable but meaningless — ill-formed,
-/// so the Idris re-emit gate rejects it. Omitting the whole slot
-/// yields the shroud default (`stack_object: Any`).
+/// The empty agent (neither arm) is spellable but meaningless — ill-formed.
+/// That is an authoring invariant no checker enforces any more. Omitting the
+/// whole slot yields the shroud default (`stack_object: Any`).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Expand, Serialize)]
 pub struct DeedAgent {
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -165,9 +164,9 @@ impl DeedAgent {
         *self == DeedAgent::default()
     }
 
-    /// Whether NO arm is present — the ill-formed shape the Idris re-emit
-    /// gate rejects (an agent that constrains nothing matches nothing
-    /// meaningfully).
+    /// Whether NO arm is present — the ill-formed shape (an agent that
+    /// constrains nothing matches nothing meaningfully), which no checker
+    /// rejects any more.
     #[must_use]
     pub fn is_empty(&self) -> bool {
         self.stack_object.is_none() && self.source.is_none()
@@ -241,10 +240,9 @@ pub enum DeonticAction {
         /// "you may cast … without paying its mana cost".
         #[serde(default, skip_serializing_if = "Option::is_none")]
         cost: Option<AlternativeCost>,
-        /// Names the alternative cost this permission carries, so a rider
-        /// can ask `CastWith(tag)` — "if its flashback/evoke cost was paid"
-        /// ([CR#702.34a,702.74a]). Mirrors Idris `MayCastFor.tag`. The
-        /// alt-cost twin of `OptionalCost.tag`.
+        /// Names the alternative cost this permission carries, so a rider can
+        /// ask `CastWith(tag)` — "if its flashback/evoke cost was paid"
+        /// ([CR#702.34a,702.74a]). The alt-cost twin of `OptionalCost.tag`.
         #[serde(default, skip_serializing_if = "Option::is_none")]
         tag: Option<crate::CostTag>,
     },
@@ -271,12 +269,11 @@ pub enum DeonticAction {
         cost: Option<CostPredicate>,
     },
     /// `by` regenerates `on` ([CR#701.19]) — the deed behind "can't be
-    /// regenerated": a `Cant` row over it causes regeneration shields not
-    /// to be APPLIED to `on` ([CR#701.19c] — activating/casting the
-    /// shield-creators stays legal). Mirrors the Idris
-    /// `Relation.Regenerate`. The `DestroyNoRegen` macro scopes one to its
-    /// own destroy event via `Duration::ForThisEvent`; engine enforcement
-    /// (the shield-application pass consulting deontic rows) is a seam.
+    /// regenerated": a `Cant` row over it causes regeneration shields not to be
+    /// APPLIED to `on` ([CR#701.19c] — activating/casting the shield-creators
+    /// stays legal). The `DestroyNoRegen` macro scopes one to its own destroy
+    /// event via `Duration::ForThisEvent`; engine enforcement (the
+    /// shield-application pass consulting deontic rows) is a seam.
     Regenerate {
         #[serde(default = "Predicate::any")]
         by: Predicate,
@@ -285,12 +282,11 @@ pub enum DeonticAction {
     },
     /// `by` (a stack object — a spell or ability, the countering source)
     /// counters `on` (the spell/ability on the stack being countered)
-    /// ([CR#701.6a]). The deed behind "can't be countered": a `Cant` row
-    /// over it — `Cant(Counter(on: Ref(This)))` — causes the countering
-    /// instruction not to affect `on`. Both slots default to match-anything;
+    /// ([CR#701.6a]). The deed behind "can't be countered": a `Cant` row over
+    /// it — `Cant(Counter(on: Ref(This)))` — causes the countering instruction
+    /// not to affect `on`. Both slots default to match-anything;
     /// the agent needs no restriction for the common self-referential form
-    /// (only spells/abilities counter anything). Mirrors the Idris
-    /// `Relation.Counter` (agent `AnObject`, patient `AnObject`).
+    /// (only spells/abilities counter anything).
     Counter {
         #[serde(default = "Predicate::any")]
         by: Predicate,
@@ -464,10 +460,10 @@ mod tests {
         assert_eq!(read(&written), untagged);
     }
 
-    /// The two-slot deed agent ([CR#702.11d,702.16b]): the omitted slot is
-    /// the shroud default (any spell or ability, [CR#702.18a]) and is
-    /// omitted on write; the hexproof-from shape sets both arms; the EMPTY
-    /// agent is spellable (the Idris re-emit gate rejects it, not serde).
+    /// The two-slot deed agent ([CR#702.11d,702.16b]): the omitted slot is the
+    /// shroud default (any spell or ability, [CR#702.18a]) and is omitted on
+    /// write; the hexproof-from shape sets both arms; the EMPTY agent is
+    /// spellable (refusing it is not serde's job).
     #[test]
     fn deed_agent_two_slots_read_and_round_trip() {
         use crate::CharacteristicPredicate;
@@ -504,8 +500,8 @@ mod tests {
         let written = crate::ron::options().to_string(&hexproof).unwrap();
         assert_eq!(read(&written), hexproof);
 
-        // The empty agent parses (both arms absent) — refusing it is the
-        // Idris re-emit gate's job, not serde's.
+        // The empty agent parses (both arms absent) — refusing it is not
+        // serde's job.
         let empty = read("Cant(Target(on: Ref(This), by: ()))");
         let Deontic::Cant(DeonticAction::Target { by, .. }) = &empty else {
             panic!("expected Cant(Target), got {empty:?}");

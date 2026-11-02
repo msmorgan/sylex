@@ -745,7 +745,7 @@ fn fall_throughs(input: &Input) -> Vec<TokenStream> {
 fn fall_through(inner: &Type, construct: &TokenStream, exclude: &[Ident]) -> TokenStream {
     // An excluded payload name never dispatches here — `from_variant` returns
     // `None` for it (a bare `Library` is not a `Destination::Zone`), so the
-    // caller reports it as unknown, mirroring the Idris `DestinationOk` gate.
+    // caller reports it as unknown gate.
     let guard = if exclude.is_empty() {
         quote!()
     } else {

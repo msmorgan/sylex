@@ -108,22 +108,20 @@ pub enum OneShotEffect {
     #[macro_ron(spliced)]
     If(If),
     /// "As an additional cost, [pay]; then [body]" ([CR#601.2f,118.8]) —
-    /// imposes an additional cost whose paid object the body reads through
-    /// the event references (`EventObject`/`EventActor`/`EventPatient`):
+    /// imposes an additional cost whose paid object the body reads through the
+    /// event references (`EventObject`/`EventActor`/`EventPatient`):
     /// "sacrifice a creature: ~ deals damage equal to its power" (Fling,
-    /// Momentous Fall). The payment is an event, so
-    /// [`AdditionalCost::body`] reads the sacrificed/exiled object with the
-    /// SAME anaphors a trigger uses. At a spell/ability root the engine
-    /// hoists it to cast/activation time (the printed additional cost,
-    /// [CR#601.2f]); nested, it is an extra resolution-time cost. Mirrors
-    /// the Idris `AdditionalCost (pay : Cost) body`.
+    /// Momentous Fall). The payment is an event, so [`AdditionalCost::body`]
+    /// reads the sacrificed/exiled object with the SAME anaphors a trigger
+    /// uses. At a spell/ability root the engine hoists it to cast/activation
+    /// time (the printed additional cost, [CR#601.2f]); nested, it is an extra
+    /// resolution-time cost.
     #[macro_ron(spliced)]
     AdditionalCost(AdditionalCost),
     /// "For each [element of `binder`], [do]" — iterates the many-binder
     /// ([`Binder`](crate::Binder), cardinality Many), binding each element in
     /// turn as the iteration anaphor [`Reference::It`](crate::Reference::It),
-    /// then runs the body once per element ([CR#608]). Mirrors the Idris
-    /// `Each : Bindable b Many k -> …`.
+    /// then runs the body once per element ([CR#608]).
     #[macro_ron(spliced)]
     Each(Each),
     /// `With(binder, body)` — binds what `binder` yields into the frame as the
@@ -133,10 +131,9 @@ pub enum OneShotEffect {
     /// read as [`Reference::That`](crate::Reference::That); a many-binder
     /// ([`Binder::Choose`](crate::Binder::Choose) /
     /// [`Binder::Existing`](crate::Binder::Existing)) binds a group read as
-    /// [`Selection::That`](crate::Selection::That). Never distributes (that
-    /// is `Each`, which exposes [`Reference::It`](crate::Reference::It) per
-    /// element); `This` never rebinds. Mirrors the Idris
-    /// `With : Bindable b card k -> …`.
+    /// [`Selection::That`](crate::Selection::That). Never distributes (that is
+    /// `Each`, which exposes [`Reference::It`](crate::Reference::It) per
+    /// element); `This` never rebinds.
     #[macro_ron(spliced)]
     With(With),
     /// Divide an `amount` among the elements of a many-binder
@@ -146,11 +143,10 @@ pub enum OneShotEffect {
     /// running `body` once per element ([CR#601.2d]). The split is
     /// resolution-time (≥1 each, summing to `amount`). "Divide" and
     /// "distribute" are ONE mechanic, not two — [CR#115.7f] quotes both words
-    /// for the same effect — so one primitive subsumes divided damage
-    /// (`body: DealDamage(This, Allotment, It)`) AND distributed counters
-    /// (`body: PutCounters(It, <kind>, Allotment)`); the body reads the
-    /// allotment anaphor. Named for the Idris north-star `Distribute : Count b
-    /// -> Bindable b Many k -> …`, the general divide-or-distribute primitive.
+    /// for the same effect — so one primitive subsumes divided damage (`body:
+    /// DealDamage(This, Allotment, It)`) AND distributed counters (`body:
+    /// PutCounters(It, <kind>, Allotment)`); the body reads the allotment
+    /// anaphor. The general divide-or-distribute primitive.
     #[macro_ron(spliced)]
     Distribute(Distribute),
     /// Note the object set the inner effect moves/touches under `key`
@@ -172,42 +168,34 @@ pub enum OneShotEffect {
     /// (`It`/`That(Sort)`/`They`, or `Target(n)` for the nth announced slot).
     #[macro_ron(spliced)]
     Targeted(Targeted),
-    /// "[body], [count] times": resolution follows the general
-    /// spell/ability resolution walk ([CR#608.2]) — there is no dedicated CR
-    /// rule defining a "do N times" quantifier; this is engine-side
-    /// shorthand, sibling to [`Each`](OneShotEffect::Each)/
-    /// [`Distribute`](OneShotEffect::Distribute) rather than the
-    /// manner-adverb family
+    /// "[body], [count] times": resolution follows the general spell/ability
+    /// resolution walk ([CR#608.2]) — there is no dedicated CR rule defining a
+    /// "do N times" quantifier; this is engine-side shorthand, sibling to
+    /// [`Each`](OneShotEffect::Each)/ [`Distribute`](OneShotEffect::Distribute)
+    /// rather than the manner-adverb family
     /// ([`Simultaneously`](OneShotEffect::Simultaneously)/
-    /// [`Continuously`](OneShotEffect::Continuously)): a `Count` over ONE
-    /// body, not a manner over a list. `body` elaborates in the SAME
-    /// context every iteration — no iteration-index binder; Storm/Replicate
-    /// per-iteration semantics are engine-side. `body` is boxed to break
-    /// the `OneShotEffect` → `Repeat` → `OneShotEffect` size cycle. Mirrors
-    /// the Idris `Repeat : (count : Count b) -> OneShotEffect
-    /// b -> OneShotEffect b`.
+    /// [`Continuously`](OneShotEffect::Continuously)): a `Count` over ONE body,
+    /// not a manner over a list. `body` elaborates in the SAME context every
+    /// iteration — no iteration-index binder; Storm/Replicate per-iteration
+    /// semantics are engine-side. `body` is boxed to break the `OneShotEffect`
+    /// → `Repeat` → `OneShotEffect` size cycle.
     Repeat(Count, Arc<OneShotEffect>),
-    /// `Repeat`'s BATCHING twin ([CR#616.1g]): performs `body` `count` times
-    /// as ONE aggregate containing event — the count tier where "twice that
-    /// many" replacements bite ([CR#121.2a,616.1g]) and aggregate triggers
-    /// read. THIS shape is the shell only: it currently resolves purely
-    /// sequentially, identically to [`Repeat`](OneShotEffect::Repeat) — a
-    /// later pass rebuilds it into the true aggregate-count tier. Boxed for
-    /// the same `OneShotEffect` → `Batch` → `OneShotEffect` size-cycle
-    /// reason as `Repeat`. Mirrors the Idris `Batch : (count : Count b) ->
-    /// OneShotEffect b -> OneShotEffect b`.
+    /// `Repeat`'s BATCHING twin ([CR#616.1g]): performs `body` `count` times as
+    /// ONE aggregate containing event — the count tier where "twice that many"
+    /// replacements bite ([CR#121.2a,616.1g]) and aggregate triggers read. THIS
+    /// shape is the shell only: it currently resolves purely sequentially,
+    /// identically to [`Repeat`](OneShotEffect::Repeat) — a later pass rebuilds
+    /// it into the true aggregate-count tier. Boxed for the same
+    /// `OneShotEffect` → `Batch` → `OneShotEffect` size-cycle reason as
+    /// `Repeat`.
     Batch(Count, Arc<OneShotEffect>),
     /// The variable-length DIG-UNTIL ([CR#702.85] cascade, [CR#701.57]
     /// discover): `whose` reveals cards off the top of their library one at a
     /// time until one matches `matches`; `body` then runs with the found card
     /// bound as [`Reference::It`](crate::Reference::It) and the passed-over
     /// prefix bound as the plural anaphor
-    /// ([`Selection::They`](crate::Selection::They)) — the Idris
-    /// `bindFound` binding. Reveal-nothing (no match in the
-    /// library) degrades at runtime, never a compile-time gate. Mirrors the
-    /// Idris `RevealUntil : (whose : Reference b APlayer) -> (match :
-    /// Predicate b AnObject) -> OneShotEffect (bindFound match b) ->
-    /// OneShotEffect b`.
+    /// ([`Selection::They`](crate::Selection::They)). Reveal-nothing (no match
+    /// in the library) degrades at runtime, never a compile-time gate.
     #[macro_ron(spliced)]
     RevealUntil(RevealUntil),
     /// A remembered `OneShotEffect` macro invocation (declared compound verbs
@@ -343,7 +331,7 @@ pub struct AdditionalCost {
 /// `Each { binder, do }` — `do` is a keyword, so the field is `effect`.
 /// `binder` is the many-cardinality [`Binder`](crate::Binder) iterated; each
 /// element binds in turn as [`Reference::It`](crate::Reference::It) for one run
-/// of `effect` ([CR#608]). Mirrors the Idris `Each : Bindable b Many k -> …`.
+/// of `effect` ([CR#608]).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Expand, MacroFields, Serialize)]
 pub struct Each {
     pub binder: crate::Binder,
@@ -788,8 +776,7 @@ mod tests {
     }
 
     /// `Each` iterates a many-`Binder`, exposing each element as
-    /// [`Reference::It`]; it reads flat and round-trips (the Idris
-    /// `Each : Bindable b Many k -> …`).
+    /// [`Reference::It`]; it reads flat and round-trips.
     #[test]
     fn each_binds_via_binder() {
         let v =

@@ -1,6 +1,8 @@
 # Lean is the workbench
 
-Decision: 2026-09-05.
+Decision: 2026-09-05. Amended 2026-11-02: `idris-retirement` deleted `idris/`,
+the Rust-to-Idris emitter and `cargo xtask idris-check`; the Idris model survives
+only in version-control history.
 
 ## Decision
 
@@ -9,11 +11,9 @@ laws, macros, cards and proof pins belong in `lean/Semantics/`. The model
 checks the card language's structural obligations; Rust remains the runtime
 game engine. The separate English Lean model is retired.
 
-Idris is reference only: reread its sentences, earlier obligations and
-migration evidence, but do not extend its handwritten workbench. Shared
-registry tooling may continue to regenerate the existing reference facts
-module while that compatibility output remains supported. That maintenance
-is not a second workbench-development lane.
+Idris was reference only until its deletion: its sentences, earlier
+obligations and migration evidence remain readable in version-control history,
+and nothing extends or regenerates it.
 
 ## Checking and assurance
 
@@ -45,8 +45,9 @@ moved with
 [lean-card-soundness-gate](../tickets/done/lean-card-soundness-gate.md)
 (2026-09-06): `cargo xtask lean check` emits each expanded `plugins_v2/` card as
 a Lean term and proves `Card.check = []` by `decide`, ratcheted per plugin. The
-Rust-to-Idris emitter remains the legacy check for the v1 `plugins/canon`
-corpus; it retires with Idris and v1 (`semantics-v1-cutover`). Validation examines the expanded semantic data on both sides.
+Rust-to-Idris emitter, the legacy check for the v1 `plugins/canon` corpus,
+retired with Idris (`idris-retirement`) without a successor; `semantics-v3-parity`
+is the v3 cross-check.
 
 Historical ADRs retain their original arguments and evidence paths. A dated
 note points readers to the current Lean workbench without silently rewriting

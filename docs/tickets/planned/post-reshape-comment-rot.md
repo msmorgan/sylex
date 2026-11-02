@@ -20,11 +20,8 @@ during the 2026-08-02 semantics-program recon; none block anything.
   comment says announced slots are "read back by the anaphors
   (`It`/`That(Sort)`/`They`, or `Target(n)`)" — contradicting the
   targets-are-never-anaphors invariant documented in `reference.rs` /
-  `target_spec.rs` and proven Idris-side. Rewrite to the indexed-channel
+  `target_spec.rs`. Rewrite to the indexed-channel
   reading.
-- `crates/deckmaste_core/src/action.rs` (~61-63): `EnterRider`'s claim
-  that non-battlefield riders are "rejected by the Idris re-emit gate" is
-  false and references the retired Idris gate — correct this prose.
 
 Line numbers are as of 2026-08-02 — re-grep at claim time.
 

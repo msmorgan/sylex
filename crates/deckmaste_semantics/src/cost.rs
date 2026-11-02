@@ -36,20 +36,18 @@ pub enum CostComponent {
     Tap,
     /// The {Q} symbol.
     Untap,
-    /// Pay by performing an action ([CR#118.3]) — the Idris `Do : Action b
-    /// -> Cost b`. The payer is `You` in cost context — spelled explicitly on
-    /// every agent-bearing verb (`Do(Sacrifice(You, This))`, Law 2: no
-    /// read-time default); holding the full [`Action`](crate::Action) is
-    /// what lets a keyword-action composite be a cost — "Discard a card:" is
-    /// `Do(Discard(1))`, cycling's "Discard this card:" the bound
-    /// [`discard_what`](crate::Action::discard_what) form
+    /// Pay by performing an action ([CR#118.3]). The payer is `You` in cost
+    /// context — spelled explicitly on every agent-bearing verb
+    /// (`Do(Sacrifice(You, This))`, Law 2: no read-time default); holding the
+    /// full [`Action`](crate::Action) is what lets a keyword-action composite
+    /// be a cost — "Discard a card:" is `Do(Discard(1))`, cycling's "Discard
+    /// this card:" the bound [`discard_what`](crate::Action::discard_what) form
     /// ([CR#701.9,702.29a]). This authoring layer stays open enough to carry
     /// the choice-bearing discard composite; lowering lifts that choice and
     /// admits the remainder only through core's checked runnable-action
-    /// boundary. Boxed: `Action` dwarfs the other variants, and
-    /// `CostComponent` rides in `Vec<CostComponent>` cost lists, so an
-    /// unboxed variant would size every element to it
-    /// (`clippy::large_enum_variant`).
+    /// boundary. Boxed: `Action` dwarfs the other variants, and `CostComponent`
+    /// rides in `Vec<CostComponent>` cost lists, so an unboxed variant would
+    /// size every element to it (`clippy::large_enum_variant`).
     Do(Arc<crate::Action>),
     /// A *nested* cost list. It exists only to let a macro splice a
     /// list-valued cost param into a larger cost list — the body writes

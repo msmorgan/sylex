@@ -49,22 +49,21 @@ pub(super) fn triggered(t: &TriggeredAbility, view: &CardView) -> String {
         named: None,
     };
     let (lead, clause) = event_clause(&t.event, &ctx);
-    // Inside the body the oracle refers to the (already-named) source as
-    // "it" — "When ~ dies, it deals 1 damage …", "…, sacrifice it." — EXCEPT
-    // a non-battlefield function-zone ([CR#113.6]), whose self-references
-    // print "this card" instead (Flashback's "you may cast this card from
-    // your graveyard" convention; Death Spark's "return this card to your
-    // hand"), since the source has no permanent identity to be "it".
+    // Inside the body the oracle refers to the (already-named) source as "it" —
+    // "When ~ dies, it deals 1 damage …", "…, sacrifice it." — EXCEPT a
+    // non-battlefield function-zone ([CR#113.6]), whose self-references print
+    // "this card" instead (Flashback's "you may cast this card from your
+    // graveyard" convention; Death Spark's "return this card to your hand"),
+    // since the source has no permanent identity to be "it".
     // Some triggering events introduce no object antecedent at all (only an
     // actor and/or amount, e.g. `CoinFlipped`/`DiceRolled`/`RollPlanarDie`/
-    // `StepBegins` — mirroring Idris `EventCaps.hasObject = False`): there
-    // is no "it" for the body to point back to, so it must name itself
-    // ("this enchantment", Chance Encounter's "put a luck counter on this
-    // enchantment") the way [CR#603.4]-family bodies conventionally do when
-    // the trigger itself supplies no distinguished object. Every other
-    // event (`ZoneChange`/`StateBecame`/…) already established `This` reads
-    // as the plain anaphor "it" for real cards, so only the object-less
-    // events change here — no regression to the existing convention.
+    // `StepBegins`): there is no "it" for the body to point back to, so it must
+    // name itself ("this enchantment", Chance Encounter's "put a luck counter
+    // on this enchantment") the way [CR#603.4]-family bodies conventionally do
+    // when the trigger itself supplies no distinguished object. Every other
+    // event (`ZoneChange`/`StateBecame`/…) already established `This` reads as
+    // the plain anaphor "it" for real cards, so only the object-less events
+    // change here — no regression to the existing convention.
     // ASSUMES a single `body_subject` for the whole body: every `This` read
     // renders with the SAME phrase. Real oracle names the object once (in the
     // intervening-if `condition`, rendered via `self_type_phrase` below) then
@@ -2266,14 +2265,13 @@ mod tests {
     }
 
     /// `EventFilter::StepBegins` bodies get NO antecedent to call "it" — the
-    /// step names itself, not an object ([CR#603.2b]; mirrors Idris
-    /// `EventCaps.hasObject = False`), so a self-referencing body must name
-    /// itself the [CR#603.4]-family way (`self_type_phrase`), same as the
-    /// `CoinFlipped`/`DiceRolled`/`RollPlanarDie`/`TapForMana` family just
-    /// above. Round-trips the WHOLE oracle sentence — not just the event
-    /// clause — for the "at the beginning of your upkeep, sacrifice ~[
-    /// unless you pay <cost>]" family end to end (parse-shape construction
-    /// -> full `triggered()` render), against REAL printed Oracle text:
+    /// step names itself, not an object ([CR#603.2b]), so a self-referencing
+    /// body must name itself the [CR#603.4]-family way (`self_type_phrase`),
+    /// same as the `CoinFlipped`/`DiceRolled`/`RollPlanarDie`/`TapForMana`
+    /// family just above. Round-trips the WHOLE oracle sentence — not just the
+    /// event clause — for the "at the beginning of your upkeep, sacrifice ~[
+    /// unless you pay <cost>]" family end to end (parse-shape construction ->
+    /// full `triggered()` render), against REAL printed Oracle text:
     /// Necrotic Plague's granted "At the beginning of your upkeep, sacrifice
     /// this creature." and Aura Flux's granted "At the beginning of your
     /// upkeep, sacrifice this enchantment unless you pay {2}."

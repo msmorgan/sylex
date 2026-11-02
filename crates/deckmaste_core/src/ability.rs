@@ -227,8 +227,8 @@ pub enum Ability {
     /// POSITIONALLY bare (`Static(Each(SelectAll(...), Modify(It, ...)))`,
     /// `Static(Cant(...))`). Duration is implicit ("while it functions",
     /// [CR#611.3]); conditionality/other qualifiers compose as `StaticSpec`
-    /// wrappers ([`Conditionally`](crate::StaticSpec::Conditionally)), never
-    /// a struct field. Mirrors Idris `Static : StaticSpec -> Ability`.
+    /// wrappers ([`Conditionally`](crate::StaticSpec::Conditionally)), never a
+    /// struct field.
     Static(Arc<Region<StaticSpec>>),
     Activated(Arc<ActivatedAbility>),
     Triggered(Arc<TriggeredAbility>),

@@ -453,13 +453,12 @@ pub(crate) fn gather_applicable(state: &GameState, e: &GameEvent) -> Vec<Applica
     // emit real `CoinFlipped`/`DieRolled` resolution events through the
     // cant→replace→apply pipeline, so there IS now a live event for
     // `ReplaceRoll` to intercept — this is no longer the "nothing live to
-    // intercept" gap it once was. Gathering it here,
-    // routing the flip/roll batches through the replacement registry, and
-    // surfacing the ignore selection as a decision is scoped to the
-    // `engine-replace-roll` ticket. A `StaticSpec::ReplaceRoll` on the
-    // battlefield is simply never matched by either `if let` above, so it
-    // contributes nothing — never a panic. Krark's Thumb round-trips
-    // (`idris-check`) and renders; its replacement is a documented no-op
+    // intercept" gap it once was. Gathering it here, routing the flip/roll
+    // batches through the replacement registry, and surfacing the ignore
+    // selection as a decision is scoped to the `engine-replace-roll` ticket. A
+    // `StaticSpec::ReplaceRoll` on the battlefield is simply never matched by
+    // either `if let` above, so it contributes nothing — never a panic. Krark's
+    // Thumb round-trips and renders; its replacement is a documented no-op
     // until `engine-replace-roll` lands.
     out
 }

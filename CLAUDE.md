@@ -74,8 +74,8 @@ Authorities: `docs/decisions/semantics-v3.md` and `docs/decisions/english-v4.md`
 - Deletion-bound at parity (`semantics-v1-cutover` and the remainder of
   `english-v4-final-suffix-cutover`): `deckmaste_semantics`, `deckmaste_lowering`,
   `deckmaste_legacy_render`, `deckmaste_plugin` (`deck.rs` and `provenance.rs` rehomed),
-  `deckmaste_features`, `plugins/builtin`, `plugins/canon`. `idris/` goes earlier, with
-  `idris-retirement`, before `semantics-rust-rewrite` retires the Lean checker. The v1 English crate,
+  `deckmaste_features`, `plugins/builtin`, `plugins/canon`. `idris/` is already gone
+  (`idris-retirement`). The v1 English crate,
   `deckmaste_construction_compiler`, `deckmaste_constructions_macro` and xtask's v1 `english` and
   `macro` tools are already gone, and `deckmaste_spelling` is a stub crate (no implementation).
   Never copy v2/v3/v4 work back into v1, and add no new v1 registries.

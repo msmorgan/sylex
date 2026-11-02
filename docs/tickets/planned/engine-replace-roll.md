@@ -3,7 +3,7 @@ needs: [engine-randomness]
 ---
 Replacement interception for the randomness events. `StaticEffect::ReplaceRoll`
 (the Krark's Thumb family — "flip/roll that many plus N, then ignore …") is
-authorable and idris-checks but is deliberately not gathered by the collector;
+authorable but is deliberately not gathered by the collector;
 now that `FlipCoins`/`RollDice` execute (emitting `CoinFlipped`/`DieRolled`
 batches through the cant→replace→apply pipeline), there is a live event for it
 to intercept. Scope: gather `ReplaceRoll` in the collector; route the flip/roll

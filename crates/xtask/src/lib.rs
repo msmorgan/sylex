@@ -23,7 +23,6 @@ pub mod extract;
 pub mod fidelity;
 pub mod generate;
 pub mod graduate;
-pub mod idris_check;
 pub mod lean;
 pub mod lexical;
 pub mod map;

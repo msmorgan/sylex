@@ -261,7 +261,7 @@ fn accept_allowlist() -> Vec<(Node, &'static str)> {
             n("Action", "Cease"),
             "ENGINE-INTERNAL: the cease-to-exist verb the copy-cease SBA \
             ([CR#704.5d,707.10a], sba.rs) speaks through — no card will ever spell it \
-            directly (it has no Idris counterpart either, same gap() shape as ExtraPhase); \
+            directly; \
             it exists purely so the SBA's removal routes through the \
             data-usable Action grammar (unit-testable, reusable) instead of building its \
             GameEvent inline. Not a DEFERRED buildable-someday gap — see the \
@@ -723,7 +723,7 @@ fn accept_allowlist() -> Vec<(Node, &'static str)> {
             n("Count", "ManaAvailable"),
             "STRATEGY-ONLY: the floated-mana-pool reader senses a player's \
             unspent mana for data-driven strategy ramp gates; card text never reads it, so it has \
-            no card fixture (and no Idris counterpart).",
+            no card fixture.",
         ),
         (
             n("AggregateOp", "MinOf"),
@@ -839,7 +839,7 @@ fn accept_allowlist() -> Vec<(Node, &'static str)> {
         (
             n("Selection", "Union"),
             "DEFERRED: no covered real card groups two selections as ONE \
-            set ('each X and each Y' — the Idris Union); canon's multi-group effects iterate each \
+            set ('each X and each Y'); canon's multi-group effects iterate each \
             group separately. Buildable.",
         ),
         (
@@ -1060,9 +1060,9 @@ fn accept_allowlist() -> Vec<(Node, &'static str)> {
         (
             n("StatePredicate", "SummoningSick"),
             "PERMANENT (not dead grammar): `SummoningSick` appears only in the \
-            Idris-invisible `Creature` type confer (`Conditionally(Matches(This, SummoningSick), \
+            `Creature` type confer (`Conditionally(Matches(This, SummoningSick), \
             Cant(...))` on `Creature.ron`), never in any card's oracle text — so it has no \
-            card-text accept fixture BY DESIGN, like the `idris_emit` gap. It is exercised by \
+            card-text accept fixture BY DESIGN. It is exercised by \
             the engine's combat/tap gating and the layer-confer tests ([CR#302.6]).",
         ),
     ]

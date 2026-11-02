@@ -112,14 +112,12 @@ pub enum Instruction {
     Each(Each),
     /// Divide an `amount` among the elements of `over` "as you choose",
     /// entering `body` with `LoopElement` and `Allotment` parameters for each
-    /// element ([CR#601.2d]). The split is
-    /// resolution-time (≥1 each, summing to `amount`). "Divide" and
-    /// "distribute" are ONE mechanic, not two — [CR#115.7f] quotes both words
-    /// for the same effect — so one primitive subsumes divided damage
-    /// (`body: DealDamage(This, Allotment, It)`) AND distributed counters
-    /// (`body: PutCounters(It, <kind>, Allotment)`); the body reads the
-    /// allotment parameter. Named for the Idris north-star `Distribute : Count
-    /// b -> Bindable b Many k -> …`, the general divide-or-distribute
+    /// element ([CR#601.2d]). The split is resolution-time (≥1 each, summing to
+    /// `amount`). "Divide" and "distribute" are ONE mechanic, not two —
+    /// [CR#115.7f] quotes both words for the same effect — so one primitive
+    /// subsumes divided damage (`body: DealDamage(This, Allotment, It)`) AND
+    /// distributed counters (`body: PutCounters(It, <kind>, Allotment)`); the
+    /// body reads the allotment parameter. The general divide-or-distribute
     /// primitive.
     Distribute(Distribute),
     /// A delayed triggered ability created on resolution ([CR#603.7]).
@@ -130,40 +128,32 @@ pub enum Instruction {
     Reflexive(Arc<TriggeredAbility>),
     /// A modal effect: choose modes, then apply them ([CR#700.2]).
     Modal(Modal),
-    /// "[body], [count] times": resolution follows the general
-    /// spell/ability resolution walk ([CR#608.2]) — there is no dedicated CR
-    /// rule defining a "do N times" quantifier; this is engine-side
-    /// shorthand, sibling to [`Each`](Instruction::Each)/
-    /// [`Distribute`](Instruction::Distribute) rather than the
-    /// manner-adverb family
+    /// "[body], [count] times": resolution follows the general spell/ability
+    /// resolution walk ([CR#608.2]) — there is no dedicated CR rule defining a
+    /// "do N times" quantifier; this is engine-side shorthand, sibling to
+    /// [`Each`](Instruction::Each)/ [`Distribute`](Instruction::Distribute)
+    /// rather than the manner-adverb family
     /// ([`Simultaneously`](Instruction::Simultaneously)/
-    /// [`Continuously`](Instruction::Continuously)): a `Count` over ONE
-    /// body, not a manner over a list. `body` elaborates in the SAME
-    /// context every iteration — no iteration-index binder; Storm/Replicate
-    /// per-iteration semantics are engine-side. `body` is boxed to break
-    /// the `Instruction` → `Repeat` → `Instruction` size cycle. Mirrors
-    /// the Idris `Repeat : (count : Count b) -> Instruction
-    /// b -> Instruction b`.
+    /// [`Continuously`](Instruction::Continuously)): a `Count` over ONE body,
+    /// not a manner over a list. `body` elaborates in the SAME context every
+    /// iteration — no iteration-index binder; Storm/Replicate per-iteration
+    /// semantics are engine-side. `body` is boxed to break the `Instruction` →
+    /// `Repeat` → `Instruction` size cycle.
     Repeat(Count, Arc<Instruction>),
-    /// `Repeat`'s BATCHING twin ([CR#616.1g]): performs `body` `count` times
-    /// as ONE aggregate containing event — the count tier where "twice that
-    /// many" replacements bite ([CR#121.2a,616.1g]) and aggregate triggers
-    /// read. THIS shape is the shell only: it currently resolves purely
-    /// sequentially, identically to [`Repeat`](Instruction::Repeat) — a
-    /// later pass rebuilds it into the true aggregate-count tier. Boxed for
-    /// the same `Instruction` → `Batch` → `Instruction` size-cycle
-    /// reason as `Repeat`. Mirrors the Idris `Batch : (count : Count b) ->
-    /// Instruction b -> Instruction b`.
+    /// `Repeat`'s BATCHING twin ([CR#616.1g]): performs `body` `count` times as
+    /// ONE aggregate containing event — the count tier where "twice that many"
+    /// replacements bite ([CR#121.2a,616.1g]) and aggregate triggers read. THIS
+    /// shape is the shell only: it currently resolves purely sequentially,
+    /// identically to [`Repeat`](Instruction::Repeat) — a later pass rebuilds
+    /// it into the true aggregate-count tier. Boxed for the same `Instruction`
+    /// → `Batch` → `Instruction` size-cycle reason as `Repeat`.
     Batch(Count, Arc<Instruction>),
     /// The variable-length DIG-UNTIL ([CR#702.85] cascade, [CR#701.57]
     /// discover): `whose` reveals cards off the top of their library one at a
     /// time until one matches `matches`; `body` then runs with the found card
-    /// and passed-over prefix supplied through explicit body parameters — the
-    /// Idris `bindFound` binding. Reveal-nothing (no match in the
-    /// library) degrades at runtime, never a compile-time gate. Mirrors the
-    /// Idris `RevealUntil : (whose : Reference b APlayer) -> (match :
-    /// Predicate b AnObject) -> Instruction (bindFound match b) ->
-    /// Instruction b`.
+    /// and passed-over prefix supplied through explicit body parameters.
+    /// Reveal-nothing (no match in the library) degrades at runtime, never a
+    /// compile-time gate.
     RevealUntil(RevealUntil),
 }
 

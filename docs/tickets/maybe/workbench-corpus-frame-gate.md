@@ -3,8 +3,9 @@ needs: [lean-v3-proofs-and-cards]
 ---
 **[port-required: semantics-v3] Add a read-only xtask check that compares every
 Lean workbench card witness's printed frame to `data/derived/cards.jsonl`.**
-Cleanroom review 2026-09-03, R7, ruled in scope now; port from Idris
-`Macros.card` to Lean card witnesses in `lean/Semantics/Cards/` (`semantics-v3`).
+Cleanroom review 2026-09-03, R7, ruled in scope now; the frames once written with the
+deleted Idris `Macros.card` are now Lean card witnesses in `lean/Semantics/Cards/`
+(`semantics-v3`).
 
 Nothing today compares a Lean card witness in `lean/Semantics/Cards/` to the
 corpus, so wrong printed frames in bench witnesses typecheck. The check

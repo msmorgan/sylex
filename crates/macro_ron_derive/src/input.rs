@@ -64,10 +64,10 @@ pub struct Variant {
     pub marker: Option<Marker>,
     pub shape: Shape,
     /// `#[macro_ron(flatten, exclude(A, B))]` — payload variant names the
-    /// compartment must NOT lift into the parent, so a name the parent
-    /// forbids (e.g. `Destination` excludes `Library`/`Stack`, mirroring the
-    /// Idris `DestinationOk` gate) is rejected on read instead of read as a
-    /// `Zone`. Empty unless the variant is a `flatten` carrying `exclude(...)`.
+    /// compartment must NOT lift into the parent, so a name the parent forbids
+    /// (e.g. `Destination` excludes `Library`/`Stack` gate) is rejected on read
+    /// instead of read as a `Zone`. Empty unless the variant is a `flatten`
+    /// carrying `exclude(...)`.
     pub flatten_exclude: Vec<Ident>,
 }
 

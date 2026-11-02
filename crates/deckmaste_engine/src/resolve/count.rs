@@ -386,38 +386,36 @@ impl GameState {
                     }
                 }
                 // None of these is a forced distinct-union path ([CR#700.5]
-                // devotion has no distinct-union reading; Idris's
-                // `readableOn` doesn't gate `ManaSpentMatching` either, but
-                // the engine has no mana-spent tracking to read; `readableOn`
-                // never grants `Players` a characteristic axis at all — a
-                // player has no printed characteristic to distinctly union)
+                // devotion has no distinct-union reading; the engine has no
+                // mana-spent tracking to read for `ManaSpentMatching`;
+                // `Players` has no characteristic axis at all — a player has no
+                // printed characteristic to distinctly union)
                 // — fizzle to 0.
                 Countable::ManaSymbols(..)
                 | Countable::ManaSpentMatching(..)
                 | Countable::Players(..) => 0,
             },
             // The amount fixed by an earlier instruction of this resolution —
-            // recorded at the apply funnel (so it reads what actually
-            // happened, post-replacement) — or, for a triggered ability, the
-            // firing event's magnitude seeded through the `EventAmount` parameter
-            // by `resolve_object`. Still loud when neither fixed an amount:
+            // recorded at the apply funnel (so it reads what actually happened,
+            // post-replacement) — or, for a triggered ability, the firing
+            // event's magnitude seeded through the `EventAmount` parameter by
+            // `resolve_object`. Still loud when neither fixed an amount:
             // that is a semantic-input error (a `ThatMuch` with no antecedent
             // magnitude), not an engine seam.
             // [CR#601.2d]: the per-element share in scope inside a `Distribute`
-            // body — `Distribute` puts it in the `allotment` slot per element
-            // (the Idris `bindAllot`), and an inner `Each`/`Distribute` clears
-            // it (the Idris allotment-clearing `bindIt`), so reading it outside a
-            // `Distribute` body — or inside a nested loop that rebound `It` — is
-            // a malformed card.
+            // body — `Distribute` puts it in the `allotment` slot per element,
+            // and an inner `Each`/`Distribute` clears it, so reading it outside
+            // a `Distribute` body — or inside a nested loop that rebound `It` —
+            // is a malformed card.
             // [CR#107.3a]: while a spell/ability is on the stack, X equals the
-            // value announced as it was cast (engine-x-costs threads it onto the
-            // resolution frame). [CR#107.3f] text-X chosen at resolution is a
-            // separate seam.
-            // [CR#608.2i]: count history facts matching `event` within `within` —
-            // the count-valued twin of `Condition::Happened`, through the one
+            // value announced as it was cast (engine-x-costs threads it onto
+            // the resolution frame). [CR#107.3f] text-X chosen at resolution is
+            // a separate seam.
+            // [CR#608.2i]: count history facts matching `event` within `within`
+            // — the count-valued twin of `Condition::Happened`, through the one
             // evaluator's History lane over per-fact LKI views ([CR#603.10a]).
-            // The frame rides the bindings, so `Ref(This)`/`Ref(You)` anchor
-            // on the evaluating source and a `Used(of: …)` resolves its
+            // The frame rides the bindings, so `Ref(This)`/`Ref(You)` anchor on
+            // the evaluating source and a `Used(of: …)` resolves its
             // object-scoped identity ([CR#400.7]) — no per-form special case.
             Count::EventCount(event, within) => {
                 let bindings = crate::eval::Bindings {
@@ -497,20 +495,20 @@ impl GameState {
             // cross-player fold = `Aggregate(MaxOf, Project(<all players>,
             // PlayerStatOf(It, Life)))` ([CR#119.1] — "the highest life total
             // among all players", Arbiter of Knollridge). `Countable::Objects`
-            // and `Countable::Players` are the two `Projectable` sources
-            // (Idris's own gate); a `ManaSymbols`/`Singleton`/
-            // `ManaSpentMatching` source fizzles to the empty set. Each
-            // candidate — object OR player proxy, `candidates_with` doesn't
-            // distinguish (both are Entities) — binds `It` in a cloned
-            // sub-frame, exactly as `Selection::Pick` does. Unlike `Pick`'s
-            // frameless `candidates` (it has no real card needing a
-            // carrier-relative `of` yet), a devotion-shaped `of` ("permanents
-            // YOU control") needs `Ref(You)`/`Ref(This)` anchored, so this
-            // passes the frame's watcher, same as `CountOf`/`CountDistinct`
-            // above. Empty folds are 0 (never-crash); `Min`/`Max`/`Average`
-            // over ∅ are 0 by convention (`Iterator::min`/`max`'s `None`
-            // mapped to 0 below — safe on any input, not just the ≥1-player
-            // case every real fixture happens to hit).
+            // and `Countable::Players` are the two projectable sources; a
+            // `ManaSymbols`/`Singleton`/ `ManaSpentMatching` source fizzles to
+            // the empty set. Each candidate — object OR player proxy,
+            // `candidates_with` doesn't distinguish (both are Entities) — binds
+            // `It` in a cloned sub-frame, exactly as `Selection::Pick` does.
+            // Unlike `Pick`'s frameless `candidates` (it has no real card
+            // needing a carrier-relative `of` yet), a devotion-shaped `of`
+            // ("permanents YOU control") needs `Ref(You)`/`Ref(This)` anchored,
+            // so this passes the frame's watcher, same as
+            // `CountOf`/`CountDistinct` above. Empty folds are 0 (never-crash);
+            // `Min`/`Max`/`Average` over ∅ are 0 by convention
+            // (`Iterator::min`/`max`'s `None` mapped to 0 below — safe on any
+            // input, not just the ≥1-player case every real fixture happens to
+            // hit).
             Count::Aggregate(op, proj) => {
                 let ids = match &proj.of {
                     Countable::Objects(filter) | Countable::Players(filter) => {
@@ -522,9 +520,9 @@ impl GameState {
                             frame.activation,
                         )
                     }
-                    // Not a `Projectable` source (Idris gates
-                    // `Aggregate`/`Project` to `Objects`/`Players`) — fizzle
-                    // to the empty set.
+                    // Not a projectable source (`Aggregate`/`Project` take only
+                    // `Objects`/`Players`)
+                    // — fizzle to the empty set.
                     Countable::ManaSymbols(..)
                     | Countable::Singleton(..)
                     | Countable::ManaSpentMatching(..) => Vec::new(),
@@ -649,11 +647,11 @@ impl GameState {
     /// The magnitude carried by an amount-bearing history fact — the
     /// event-amount channel `Count::EventSum` sums ([CR#608.2i]): damage and
     /// life amounts ([CR#120.1,119.3]), counter deltas ([CR#122.1]), one per
-    /// draw fact ([CR#121.2] — drawn one at a time), and one per moved card
-    /// on a cause-amount zone change (a discard's/mill's card count,
-    /// [CR#701.9a,701.17a]). A fact kind outside this set trips loudly: the
-    /// Idris re-emit gate rejects `EventSum` over an event that guarantees no
-    /// amount, so no sound card reaches the fallback.
+    /// draw fact ([CR#121.2] — drawn one at a time), and one per moved card on
+    /// a cause-amount zone change (a discard's/mill's card count,
+    /// [CR#701.9a,701.17a]). A fact kind outside this set trips loudly:
+    /// `EventSum` over an event that guarantees no amount is an authoring error
+    /// no checker catches any more, so no sound card reaches the fallback.
     fn game_event_amount(fact: &GameEvent) -> Uint {
         match fact {
             GameEvent::LifeLost(LifeLost { amount, .. })

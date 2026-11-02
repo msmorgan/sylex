@@ -3,8 +3,7 @@
 // target." The printed additional cost ([CR#601.2f,118.8]): the sacrifice
 // choice binds via `With(ChooseOne, Sacrifice(You, That))`, and `body` reads the
 // sacrificed creature back through the event reference `EventObject` (the
-// SAME anaphor a trigger uses), exactly like an `AdditionalCost` body's
-// Idris mirror.
+// SAME anaphor a trigger uses), exactly like an `AdditionalCost` body.
 Normal(
   name: "Fling",
   mana_cost: [

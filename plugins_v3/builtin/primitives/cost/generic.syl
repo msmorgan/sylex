@@ -1,1 +1,3 @@
+# A change to the generic mana component of a cost: a reduction by an amount of generic mana
+# affects only that component, never the colored or colorless symbols [CR#118.7a].
 primitive generic(change: Delta(Amount), floor: Option(Amount)): CostShift

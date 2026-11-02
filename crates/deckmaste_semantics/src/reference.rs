@@ -28,8 +28,7 @@ mod tests {
     }
 
     /// The event roles read as bare variant names and round-trip — the
-    /// object/patient/actor split plus the first-class defending player,
-    /// mirroring the Idris `EventObject`/`EventPatient`/`EventActor`
+    /// object/patient/actor split plus the first-class defending player
     /// ([CR#603.2e,608.2k,506.2]).
     #[test]
     fn event_roles_round_trip() {
@@ -46,7 +45,7 @@ mod tests {
     }
 
     /// `It` — the iteration / projection element ("it") — reads bare and
-    /// round-trips (the Idris `Reference.It`).
+    /// round-trips.
     #[test]
     fn it_round_trips() {
         assert_eq!(read("It"), Reference::It);
@@ -127,8 +126,8 @@ mod tests {
 pub enum Reference {
     /// The object this ability is printed on / the resolving spell.
     This,
-    /// Demote a selection to its sole element. Empty and ambiguous
-    /// selections fail closed. Rust counterpart of Idris `Reference.Single`.
+    /// Demote a selection to its sole element. Empty and ambiguous selections
+    /// fail closed.
     Single(Arc<crate::Selection>),
     /// The controller of this ability ([CR#109.5]).
     You,
@@ -143,12 +142,12 @@ pub enum Reference {
     /// continuous modifier reads, the candidate a per-object filter
     /// ([`Predicate::Where`](crate::Predicate::Where)) or extremal projection
     /// ([`Selection::Pick`](crate::Selection::Pick)) is currently testing —
-    /// subsuming the old `Subject` role (candidate-relative predicates spell
-    /// as `SharesColor(It, This)`, "with the same name as ~"). OUTSIDE every
+    /// subsuming the old `Subject` role (candidate-relative predicates spell as
+    /// `SharesColor(It, This)`, "with the same name as ~"). OUTSIDE every
     /// binder it resolves over the antecedent stack — the nearest singular
-    /// antecedent of ANY sort (R1), refused when a second compatible
-    /// antecedent makes it a guess (the R2 uniqueness gate; both are
-    /// soundness invariants proven by the Idris re-emit gate).
+    /// antecedent of ANY sort (R1), refused when a second compatible antecedent
+    /// makes it a guess (the R2 uniqueness gate; both are authoring invariants
+    /// no checker enforces any more).
     ///
     /// NEVER an announced target: a target is not an anaphor but an indexed
     /// entry in the announce list, read only as
@@ -175,8 +174,7 @@ pub enum Reference {
     Target(usize),
     /// The triggering event's OBJECT — the doer/source ("that card"): the
     /// moving object of a zone change, the source of damage
-    /// ([CR#603.2e,608.2k]). Mirrors the Idris `Reference.EventObject`
-    /// (`hasObject`); distinct from the
+    /// ([CR#603.2e,608.2k]). Distinct from the
     /// [`EventPatient`](Reference::EventPatient) it acts upon and the
     /// [`EventActor`](Reference::EventActor) player.
     EventObject,
@@ -189,8 +187,7 @@ pub enum Reference {
     /// [`DefendingPlayer`](Reference::DefendingPlayer) (always a player).
     EventPatient,
     /// The triggering event's responsible player ("that player") — the event's
-    /// ACTOR ([CR#603.2e]). Mirrors the Idris `Reference.EventActor`
-    /// (`hasActor`).
+    /// ACTOR ([CR#603.2e]).
     EventActor,
     /// The defending player of an attack/combat — ALWAYS a player, even versus
     /// a planeswalker or battle ([CR#506.2,508.5]). Reachable today otherwise
@@ -202,13 +199,13 @@ pub enum Reference {
     /// player": the nearest singular antecedent of this [`Sort`](crate::Sort)
     /// on the antecedent stack (R1 nearest-compatible, R2 uniqueness gate).
     /// Antecedents are pushed by producing clauses (the moved/created object,
-    /// [CR#400.7]), event bodies ([CR#603.2e]), and binders ([CR#608.2d]) —
-    /// NOT by target slots, which are read positionally as
+    /// [CR#400.7]), event bodies ([CR#603.2e]), and binders ([CR#608.2d]) — NOT
+    /// by target slots, which are read positionally as
     /// [`Target(n)`](Reference::Target). This is the read for a move's PRODUCT
-    /// ("exile target creature … return that **card**"): the returned card is
-    /// a new object [CR#400.7], so `Target(0)` cannot name it and `That(Card)`
-    /// does. Resolution is dynamic at engine eval time (over
-    /// the frame), and its soundness is proven by the Idris re-emit gate. A
+    /// ("exile target creature … return that **card**"): the returned card is a
+    /// new object [CR#400.7], so `Target(0)` cannot name it and `That(Card)`
+    /// does. Resolution is dynamic at engine eval time (over the frame); its
+    /// soundness is an authoring invariant no checker enforces any more. A
     /// many-antecedent is read instead as
     /// [`Selection::They`](crate::Selection::They) /
     /// [`Selection::Them`](crate::Selection::Them).
@@ -229,18 +226,17 @@ pub enum Reference {
     /// direction ([CR#301.5,303.4]).  Covers Equipment hosts, Aura
     /// enchantees, and Fortification hosts alike.
     AttachHostOf(Arc<Reference>),
-    /// The sources of marked damage on the object under evaluation (the
-    /// frame's [`This`](Reference::This) — the creature an SBA rule's scope
-    /// binds) — a SET-valued binding over each source *as it was when it dealt
-    /// the damage* ([CR#120.3,702.2c]): its deal-time abilities are captured
-    /// with the mark, since the source may since have lost the ability or left
-    /// the battlefield. Meaningful only inside [`Is(Source, …)`](
+    /// The sources of marked damage on the object under evaluation (the frame's
+    /// [`This`](Reference::This) — the creature an SBA rule's scope binds) — a
+    /// SET-valued binding over each source *as it was when it dealt the damage*
+    /// ([CR#120.3,702.2c]): its deal-time abilities are captured with the mark,
+    /// since the source may since have lost the ability or left the
+    /// battlefield. Meaningful only inside [`Is(Source, …)`](
     /// crate::Condition::Matches), which reads existentially — "was dealt
     /// damage by a source matching F" tests F against each mark's captured
     /// abilities. The lethal-damage SBA's deathtouch clause ([CR#704.5h])
-    /// is `Is(Source, Has(Deathtouch))`. No live-object resolution exists
-    /// (the binding is over stored deal-time records), so it has no Idris
-    /// counterpart.
+    /// is `Is(Source, Has(Deathtouch))`. No live-object resolution exists (the
+    /// binding is over stored deal-time records).
     Source,
     /// A remembered `Reference` macro invocation.
     #[macro_ron(expanded)]

@@ -9,7 +9,7 @@ transitions fire triggered abilities.
 
 The mechanic-specific action variant has been retired. A future venture
 builtin macro will expand to `Action::Composite` over the dungeon subsystem;
-there is no parse/render arm or Idris spec yet, and zero live corpus cards
+there is no parse/render arm yet, and zero live corpus cards
 (candidates sit in `wizards.bak`). `Type::Dungeon` + the `Dungeon.ron` TypeDef
 macro exist.
 
@@ -33,9 +33,5 @@ you move your venture marker into this room" [CR#309.4c].
 3. Room-ability trigger sourcing wired to marker movement.
 4. Completed-dungeon history for "if you've completed a dungeon" conditionals
    (Acererak-family).
-
-Add an idris constructor alongside, or record the asymmetry in
-`idris-mirror-enum-gaps` — the `Type::Dungeon` entry there resolves with this
-ticket either way.
 
 Note (2026-09-07): the "future venture builtin macro" is a v2 declaration under `plugins_v2/builtin/macros/stubs/keyword_actions/`, routed by `semantics-v2-keyword-action-residues`; the engine primitives above are unchanged.

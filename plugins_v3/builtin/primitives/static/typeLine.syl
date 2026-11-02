@@ -1,1 +1,3 @@
+# A change to the type line: the card types, subtypes and supertypes [CR#205.1]. An object can't
+# gain a subtype that corresponds to none of its types [CR#205.3d].
 primitive typeLine(op: QualityOp, changes: TypeLineChanges): CharacteristicEdit

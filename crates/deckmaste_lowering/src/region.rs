@@ -843,7 +843,7 @@ pub(crate) fn scoped_antecedents<T>(f: impl FnOnce() -> T) -> T {
 /// Whether an antecedent of sort `have` can answer a mention of `want`.
 ///
 /// This is the semantic discourse relation: exact matches plus the three
-/// widened nouns supported by the Idris model.
+/// widened nouns.
 fn compatible(want: Sort, have: Sort) -> bool {
     use deckmaste_semantics::Sort;
 

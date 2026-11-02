@@ -1574,9 +1574,9 @@ fn eval_count(
             }
             // None of these is a forced distinct-union path ([CR#700.5]
             // devotion has no distinct-union reading; `ManaSpentMatching` has
-            // no engine tracking either; Idris's `readableOn` never grants
-            // `Players` a characteristic axis — a player has no printed
-            // characteristic to distinctly union) — fizzle to 0.
+            // no engine tracking either; `Players` has no characteristic axis —
+            // a player has no printed characteristic to distinctly union) —
+            // fizzle to 0.
             Countable::ManaSymbols(..)
             | Countable::ManaSpentMatching(..)
             | Countable::Players(..) => 0,

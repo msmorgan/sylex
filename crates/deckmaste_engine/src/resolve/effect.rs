@@ -1101,23 +1101,22 @@ impl GameState {
             // front-scheduled BEFORE the body so the payment precedes it.
             //
             // SEAMS (deferred, see the ticket): (1) ROOT-level HOISTING to
-            // cast/activation time ([CR#601.2f]) — a resolution node can't reach
-            // back into the announce-time cost pipeline; this arm interprets only
-            // the nested form. (2) A cost whose moved object is an INTERACTIVE
-            // choice (`Sacrifice(Choose …)`) — the paid object isn't known until
-            // the choice resolves, so `EventObject` is left unbound here (it needs
-            // a payment-time capture continuation).
+            // cast/activation time ([CR#601.2f]) — a resolution node can't
+            // reach back into the announce-time cost pipeline; this arm
+            // interprets only the nested form. (2) A cost whose moved object is
+            // an INTERACTIVE choice (`Sacrifice(Choose …)`) — the paid object
+            // isn't known until the choice resolves, so `EventObject` is left
+            // unbound here (it needs a payment-time capture continuation).
             // "[body], [count] times": resolution of a `Repeat` node follows
-            // the general spell/ability resolution walk ([CR#608.2]); there
-            // is no dedicated CR rule for a "do N times" quantifier — this
-            // is engine-side shorthand, sibling to `Each`/`Distribute` rather
-            // than the manner-adverb family (`Simultaneously`/
-            // `Continuously`). `count` is evaluated ONCE, up front, to a
-            // concrete number (Storm/Replicate-style per-iteration semantics
-            // are engine-side, per the Idris comment) — never re-evaluated
-            // against the ORIGINAL count expression, so a body that changes
-            // game state mid-loop (e.g. proliferating counters) can't skew
-            // how many iterations remain.
+            // the general spell/ability resolution walk ([CR#608.2]); there is
+            // no dedicated CR rule for a "do N times" quantifier — this is
+            // engine-side shorthand, sibling to `Each`/`Distribute` rather than
+            // the manner-adverb family (`Simultaneously`/ `Continuously`).
+            // `count` is evaluated ONCE, up front, to a concrete number
+            // (Storm/Replicate-style per-iteration semantics are engine-side) —
+            // never re-evaluated against the ORIGINAL count expression, so a
+            // body that changes game state mid-loop (e.g. proliferating
+            // counters) can't skew how many iterations remain.
             //
             // Scheduled as a LAZY self-rescheduling continuation, not an
             // eager `(0..n)` materialization: `eval_count` returns a `Uint`
@@ -1251,17 +1250,16 @@ impl GameState {
             // [CR#702.85,701.57] dig-until (cascade/discover's shape): reveal
             // cards off the top of `whose`'s library one at a time until one
             // matches, binding the found card as `It` and the passed-over
-            // prefix as `They` (the Idris `bindFound`/`bindIt`+`bindThat`),
-            // then run `body`. GENUINELY ABSENT SUBSYSTEM — but NOT the
-            // single-reveal seam, which is now built: `Action::Reveal` /
-            // `GameEvent::Revealed` are live (the `Explore` keyword action
-            // [CR#701.44a] reveals its top card through them), and the
-            // predicate-match (`target::matches`) plus `It`/`They`
+            // prefix as `They`, then run `body`. GENUINELY ABSENT SUBSYSTEM —
+            // but NOT the single-reveal seam, which is now built:
+            // `Action::Reveal` / `GameEvent::Revealed` are live (the `Explore`
+            // keyword action [CR#701.44a] reveals its top card through them),
+            // and the predicate-match (`target::matches`) plus `It`/`They`
             // anaphora-binding machinery are built and reusable. What has no
             // engine home yet is the VARIABLE-LENGTH reveal-until-match LOOP:
-            // minting and closing a reveal window per card ([CR#701.20a]) as
-            // it walks the top of the library, accumulating the passed-over
-            // prefix as `They`, and degrading gracefully when nothing matches.
+            // minting and closing a reveal window per card ([CR#701.20a]) as it
+            // walks the top of the library, accumulating the passed-over prefix
+            // as `They`, and degrading gracefully when nothing matches.
             // That bounded iteration is a real subsystem of its own (cascade /
             // discover), out of scope here; this arm fizzles to a graceful
             // no-op instead (nothing revealed, `body` never runs) — never a
@@ -2857,10 +2855,9 @@ mod tests {
 
     /// Avarice Totem's own body ([CR#701.12a,701.12b]): a `Simultaneously` of
     /// two mirrored `Continuously(EndOfGame, Modify(_, SetController(
-    /// ControllerOf(_))))` halves, the Idris `exchangeControl` macro's exact
-    /// shape — deliberately NOT the `Action::GainControl`-based
-    /// `ExchangeControl` builtin macro `same_controller_exchange_does_nothing`
-    /// above exercises.
+    /// ControllerOf(_))))` halves, deliberately NOT the
+    /// `Action::GainControl`-based `ExchangeControl` builtin macro
+    /// `same_controller_exchange_does_nothing` above exercises.
     fn avarice_totem_body(this: &Reference, target: &Reference) -> Instruction {
         let half = |subject: &Reference, other: &Reference| {
             Instruction::Continuously(deckmaste_core::Continuously {
@@ -3801,12 +3798,11 @@ mod tests {
     /// (which acted on only the first) is unrepresentable now that the binder
     /// surfaces its choice and `Each` iterates the whole group ([CR#608.2]).
 
-    /// Ticket: a nested `Each` CLEARS the outer `Distribute` allotment (the
-    /// Idris allotment-clearing `bindIt`), so an outer per-element share cannot
-    /// leak into the inner loop ([CR#601.2d]). Once the inner `Each` rebinds
-    /// `It`, the share is gone, and the inner body's `Count::Allotment` read
-    /// has nothing in scope and is rejected — proving threading is
-    /// add-AND-clear.
+    /// Ticket: a nested `Each` CLEARS the outer `Distribute` allotment, so an
+    /// outer per-element share cannot leak into the inner loop ([CR#601.2d]).
+    /// Once the inner `Each` rebinds `It`, the share is gone, and the inner
+    /// body's `Count::Allotment` read has nothing in scope and is rejected —
+    /// proving threading is add-AND-clear.
 
     /// [CR#608.2c]: `Instruction::If` evaluates its condition WHEN it resolves and
     /// runs the taken branch — `then` on true, `otherwise` on false, and
@@ -5213,8 +5209,7 @@ mod tests {
 
     /// `BottomOfLibrary` mirrors `TopOfLibrary` from the other end (bottom→up
     /// order), and `Union` concatenates member groups order-preserved with an
-    /// object in more than one member appearing once (the Idris `Union` /
-    /// `BottomOfLibrary` constructors).
+    /// object in more than one member appearing once.
     #[test]
     fn bottom_of_library_and_union_resolve_as_groups() {
         use deckmaste_card::CardFace;

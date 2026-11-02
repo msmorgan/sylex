@@ -38,7 +38,6 @@ players" clause, and [CR#810.1] as the team-game instance); [CR#102.3,102.4] for
   `resolve/count.rs:225-226`; `layer.rs:1412`
 - `crates/deckmaste_semantics/src/reference.rs:135`;
   `crates/deckmaste_legacy_render/src/render/fragment.rs:97`;
-  `crates/deckmaste_plugin/src/idris_emit.rs:1123`;
   `crates/deckmaste_migrations/src/parsers/replacement.rs:198`, `:705`
 - `crates/deckmaste_core/src/filter.rs:259`,
   `crates/deckmaste_semantics/src/filter.rs:163` (the section cite)
@@ -71,7 +70,6 @@ Sites: `crates/deckmaste_core/src/event.rs:353`,
 `crates/deckmaste_engine/src/eval.rs:898`, `replace_registry.rs:1296`,
 `resolve/action.rs:643, 801, 2209, 2218, 2394, 2428, 2437, 2738, 2810, 3046,
 6385, 6452`, `agenda.rs:24, 29`, `step/mod.rs:988`,
-`crates/deckmaste_plugin/src/idris_emit.rs:3042`,
 `plugins/builtin/macros/keyword/Madness.ron:30`.
 
 The mill half of the `agenda.rs:24/29` and `step/mod.rs:988` cites

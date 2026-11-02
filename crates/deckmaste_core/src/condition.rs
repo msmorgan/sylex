@@ -48,7 +48,6 @@ pub enum Condition {
     /// At least one object matches ([CR#603.4], "if you control a …").
     Exists(Predicate),
     /// A referenced object matches a predicate ([CR#603.4], "if it is a …").
-    /// Idris `Matches`.
     Matches(Reference, Predicate),
     /// The referenced object has marked damage from at least one source whose
     /// deal-time abilities match the predicate ([CR#704.5h]). The query reads
@@ -104,10 +103,10 @@ pub enum Condition {
     /// ([CR#702.33e,607.2]): the tag names the declaring `CostOption` on the
     /// same object. Replaces the bespoke `WasKicked` flag.
     PaidCost(crate::CostTag),
-    /// "if its [keyword] cost was paid" — the alt-cost read, gating a rider
-    /// on the alt base cost used to cast the resolving/source object
+    /// "if its [keyword] cost was paid" — the alt-cost read, gating a rider on
+    /// the alt base cost used to cast the resolving/source object
     /// ([CR#702.34a,702.74a]). The alt-cost twin of `PaidCost` (which reads
-    /// optional/additional costs). Idris `WasCastWith`.
+    /// optional/additional costs).
     CastWith(crate::CostTag),
     /// It is the evaluating player's turn (the `you` of the evaluation
     /// context — an ability's controller). Sugar for `TurnOf(Ref(You))`, kept

@@ -189,10 +189,10 @@ impl GameState {
                             frame.activation,
                         )
                     }
-                    // Idris's `Pick` is pinned to `Projection b AnObject`
-                    // ([CR#107.1] — no player-`Pick` consumer exists), so a
-                    // `Players`-sourced `proj` here is semantics-invalid, like
-                    // the non-`Projectable` `ManaSymbols`/`Singleton`/
+                    // `Pick` is pinned to object projections ([CR#107.1] — no
+                    // player-`Pick` consumer exists), so a `Players`-sourced
+                    // `proj` here is semantics-invalid, like the
+                    // non-`Projectable` `ManaSymbols`/`Singleton`/
                     // `ManaSpentMatching` sources — fizzle to the empty group
                     // (never-crash on a semantic-input error).
                     Countable::Players(..)
@@ -287,7 +287,7 @@ impl GameState {
                     .collect()
             }
             // The bottom `count` cards of `whose`'s library, bottom→up — the
-            // mirror of `TopOfLibrary` (the Idris `BottomOfLibrary`).
+            // mirror of `TopOfLibrary`.
             Selection::BottomOfLibrary { count, whose } => {
                 let proxy = self.eval_reference(whose, frame);
                 let pid = match self.objects.get(proxy).map(|o| o.source) {
@@ -321,16 +321,16 @@ impl GameState {
                     _ => Vec::new(),
                 }
             }
-            // The top `count` cards of `of`'s graveyard, top→down
-            // ([CR#404.2] — a graveyard is a single face-up pile in a fixed
-            // order). `zones.graveyards` is push-appended as cards are put
-            // into it, so the LAST-pushed card sits physically on top; a
-            // front-to-back `Vec` read is bottom→up, so this reads from the
-            // END, reversed. Unlike `TopOfLibrary`/`BottomOfLibrary`
-            // (which panic on a non-player `of` — an established baseline
-            // this arm does not repeat), an `of` that fails to resolve to a
-            // player proxy fizzles to the empty group: a card-semantics
-            // mistake must never crash the engine.
+            // The top `count` cards of `of`'s graveyard, top→down ([CR#404.2] —
+            // a graveyard is a single face-up pile in a fixed order). Cards are
+            // put on top of a graveyard ([CR#404.1]) and `zones.graveyards` is
+            // push-appended as they are, so the LAST-pushed card sits
+            // physically on top; a front-to-back `Vec` read is bottom→up, so
+            // this reads from the END, reversed. Unlike
+            // `TopOfLibrary`/`BottomOfLibrary` (which panic on a non-player
+            // `of` — an established baseline this arm does not repeat), an `of`
+            // that fails to resolve to a player proxy fizzles to the empty
+            // group: a card-semantics mistake must never crash the engine.
             Selection::TopOfGraveyard { count, of } => {
                 let proxy = self.eval_reference(of, frame);
                 match self.objects.get(proxy).map(|o| o.source) {
@@ -481,9 +481,8 @@ impl GameState {
     /// that never maps to a live object, so the effect fizzles exactly as a
     /// reference to a departed/zone-changed object does — leaving an
     /// `eprintln!` breadcrumb. Soundness (a well-formed card's references
-    /// always resolving) is the Idris re-emit gate's job, not a runtime
-    /// panic; skipping that gate is UB whose worst case here is a silent
-    /// no-op, never a crash.
+    /// always resolving) is an authoring invariant no checker enforces any
+    /// more; its worst case here is a silent no-op, never a crash.
     fn unbound_ref(reference: &Reference, why: &str) -> ObjectId {
         eprintln!(
             "deckmaste: reference {reference:?} did not resolve ({why}); treating as unbound — effect fizzles"
@@ -493,8 +492,7 @@ impl GameState {
 
     /// The group twin of [`Self::unbound_ref`]: a selection that names nothing
     /// resolvable fizzles to the EMPTY group, so its verb no-ops. A semantic-
-    /// input error never crashes the engine — the Idris re-emit gate is what
-    /// refuses the shape.
+    /// input error never crashes the engine.
     fn unbound_group(selection: &Selection, why: &str) -> Vec<ObjectId> {
         eprintln!(
             "deckmaste: selection {selection:?} did not resolve ({why}); treating as unbound — effect fizzles"

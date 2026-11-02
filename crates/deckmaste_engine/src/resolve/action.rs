@@ -708,9 +708,9 @@ impl GameState {
 
         // Dispatch on the verb NAME ([CR#701]); each verb reads its own
         // performer/patient references off the stored `body` (the same body
-        // facets the renderer and Idris emitter read), so no typed atom is
-        // needed. An unknown/mistyped verb name fizzles to no window — never a
-        // panic (the Invalid semantic input fizzles decision,
+        // facets the renderer reads), so no typed atom is needed. An
+        // unknown/mistyped verb name fizzles to no window — never a panic (the
+        // Invalid semantic input fizzles decision,
         // `docs/decisions/invalid-semantic-input-fizzles.md`).
         match name.as_str() {
             // ── Destroy: single Battlefield → Graveyard move ([CR#701.8a]) ──
@@ -998,8 +998,7 @@ pub(crate) fn composite_body_group(
 /// The single-move patient a `Destroy` / bound-`Discard` body names — its
 /// stored `Move`'s source reference ([CR#701.8a,702.29a]). Shares
 /// [`discard_body_what`](deckmaste_core::discard_body_what)'s descent, so the
-/// resolve lane reads the patient off the body exactly as the renderer and
-/// Idris emitter do.
+/// resolve lane reads the patient off the body exactly as the renderer does.
 pub(crate) fn composite_move_src(
     body: &deckmaste_core::Instruction,
 ) -> Option<&deckmaste_core::Reference> {

@@ -3,7 +3,7 @@
 // (of: Players(Player), by: PlayerStatOf(It, Life)))` folded over EVERY
 // player, then applied to each player in turn via the enclosing `Each` —
 // exercises `Countable::Players`/`Count::Aggregate`'s player-source path end
-// to end (engine fold, render, Idris re-emit).
+// to end (engine fold, render).
 Normal(
   name: "Arbiter of Knollridge",
   mana_cost: [

@@ -306,8 +306,8 @@ pub enum Action {
     Pass,
     /// Concede ([CR#104.3a]) — immediate and UNSTOPPABLE: the single
     /// exception to card-beats-rules ([CR#101.1]); no `CantLose` gate
-    /// touches it and a controlled player's controller can't prevent it
-    /// ([CR#723.6]). ENUMERATED in every priority legal list and accepted
+    /// touches it and the controller of a controlled player ([CR#723]) can't
+    /// prevent it ([CR#723.6]). ENUMERATED in every priority legal list and accepted
     /// as the answer to EVERY pending decision (the `submit_decision`
     /// pre-check) — "at any time" means the engine always offers it;
     /// filtering is the runner's problem. The conceder is the pending

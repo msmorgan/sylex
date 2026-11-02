@@ -101,7 +101,7 @@ const SKIP_DIRS: &[&str] = &[
     "plugins/wizards",
     "docs/superpowers",
 ];
-const EXTENSIONS: &[&str] = &["rs", "md", "ron", "idr", "lean", "syl"];
+const EXTENSIONS: &[&str] = &["rs", "md", "ron", "lean", "syl"];
 
 /// Classify a repo-relative path into its citation tier: prose (anything
 /// under `docs/`, any `.md`) is `Mentioned`; every other scanned file,
@@ -470,7 +470,10 @@ mod tests {
     fn brackets_in_parsing_code_are_ignored() {
         let source = r#".strip_prefix("[CR#")
             .and_then(|rest| rest.strip_suffix(']'))"#;
-        assert_eq!(extract_bracket_rules(source), [] as [std::string::String; 0]);
+        assert_eq!(
+            extract_bracket_rules(source),
+            [] as [std::string::String; 0]
+        );
     }
 
     #[test]
@@ -520,7 +523,6 @@ mod tests {
             tier_for_path("plugins/builtin/rules/sba/toughness-zero.ron"),
             Tier::Bound
         );
-        assert_eq!(tier_for_path("idris/src/Core.idr"), Tier::Bound);
         assert_eq!(tier_for_path("docs/tickets/done/foo.md"), Tier::Mentioned);
         // any markdown is prose regardless of dir
         assert_eq!(tier_for_path("README.md"), Tier::Mentioned);
@@ -530,7 +532,7 @@ mod tests {
     #[test]
     fn tier_docs_nonmd_is_mentioned() {
         assert_eq!(
-            tier_for_path("docs/superpowers/reviews/x/Attack.idr"),
+            tier_for_path("docs/superpowers/reviews/x/Attack.lean"),
             Tier::Mentioned
         );
         assert_eq!(tier_for_path("docs/tickets/done/foo.md"), Tier::Mentioned);

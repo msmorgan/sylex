@@ -1,4 +1,4 @@
-# "the number of <group>"
+# "the number of <group>": how many objects the group holds, a number [CR#107].
 primitive numberOf(group: NounPhrase): Amount = .countOf {
   spelling = "the number of <group>"
 }

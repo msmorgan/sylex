@@ -121,8 +121,8 @@ mod tests {
 pub enum Reference {
     /// An indexed read from the current region's activation record.
     Reg(crate::RefId),
-    /// Demote a selection to its sole element. Empty and ambiguous
-    /// selections fail closed. Rust counterpart of Idris `Reference.Single`.
+    /// Demote a selection to its sole element. Empty and ambiguous selections
+    /// fail closed.
     Single(Arc<crate::Selection>),
     /// An opponent of the player produced by the inner expression.
     OpponentOf(Arc<Reference>),

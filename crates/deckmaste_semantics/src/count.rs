@@ -76,11 +76,11 @@ pub enum Characteristic {
 /// (layer/resolve distinct-key evaluation).
 pub const BASIC_LAND_TYPES: [&str; 5] = ["Plains", "Island", "Swamp", "Mountain", "Forest"];
 
-/// The domain a count ranges over ([CR#107.3]) — the Idris `Countable`. Wired
-/// today: a set of objects (the common case), a set of players (a
-/// cross-player fold, [CR#119.1] — Arbiter of Knollridge/Balance), and the
-/// mana symbols in an object's mana cost (devotion). Plain `Events`/
-/// unfiltered `ManaSpent` are deferred until a card forces them.
+/// The domain a count ranges over ([CR#107.3]). Wired today: a set of objects
+/// (the common case), a set of players (a cross-player fold, [CR#119.1] —
+/// Arbiter of Knollridge/Balance), and the mana symbols in an object's mana
+/// cost (devotion). Plain `Events`/ unfiltered `ManaSpent` are deferred until a
+/// card forces them.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Expand, Serialize)]
 pub enum Countable {
     /// Objects matching a filter — the common count domain. Boxed `Predicate`
@@ -92,12 +92,11 @@ pub enum Countable {
     /// players" (Arbiter of Knollridge). The boxed `Predicate` is the SAME
     /// unified type `Objects` boxes — the v1 kind axis carries a `Player`
     /// member ([`crate::ObjectKind::Player`]) even though a player is not an
-    /// object ([CR#109.1]) — boxed for the same size reason.
-    /// Idris's `Projectable`/`readableOn` gate what a `Players` source can
-    /// feed (`Aggregate`/`CountOf`, never `CountDistinct`/`Pick` — those stay
-    /// pinned to `Objects`/`Singleton`); the engine mirrors that by fizzling
-    /// the ungated combinations rather than enforcing it at the Rust type
-    /// level (never-crash on a semantic-input error).
+    /// object ([CR#109.1]) — boxed for the same size reason. A `Players` source
+    /// can feed only `Aggregate`/`CountOf`, never `CountDistinct`/`Pick` —
+    /// those stay pinned to `Objects`/`Singleton`; the engine fizzles the
+    /// ungated combinations rather than enforcing it at the Rust type level
+    /// (never-crash on a semantic-input error).
     Players(Arc<Predicate>),
     /// The mana symbols in a referenced object's mana cost, filtered by a
     /// [`SymbolPred`](crate::SymbolPred) ([CR#700.5] devotion) —
@@ -123,7 +122,7 @@ pub enum Countable {
     ManaSpentMatching(Arc<Reference>, crate::SymbolPred),
 }
 
-/// A fold operator over a projected set ([CR#107.1]) — the Idris `AggregateOp`.
+/// A fold operator over a projected set ([CR#107.1]).
 /// The extremal ops (`MinOf`/`MaxOf`) are also the only ones `Selection::Pick`
 /// admits (an extremal ELEMENT is well-defined; a sum/average element is not).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Expand, Serialize)]
@@ -138,15 +137,15 @@ pub enum AggregateOp {
     AverageOf(RoundMode),
 }
 
-/// A per-element numeric projection over a set ([CR#107.1]) — the Idris
-/// `Project`. Each element of `of` binds [`Reference::It`] while `by` is
-/// read. Shared by [`Count::Aggregate`] (the value fold) and
+/// A per-element numeric projection over a set ([CR#107.1]). Each element of
+/// `of` binds [`Reference::It`] while `by` is read. Shared by
+/// [`Count::Aggregate`] (the value fold) and
 /// [`Selection::Pick`](crate::Selection::Pick) (the extremal element).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Expand, Serialize)]
 pub struct Projection {
     /// The folded set. `Countable::Objects` (the per-permanent fold) and
-    /// `Countable::Players` (the cross-player fold, [CR#119.1]) are
-    /// projectable today — Idris's `Projectable` proof.
+    /// `Countable::Players` (the cross-player fold, [CR#119.1]) are projectable
+    /// today.
     pub of: Countable,
     /// The per-element read, over `Reference::It`.
     pub by: Arc<Count>,
@@ -182,19 +181,18 @@ pub enum Count {
     CountDistinct(Characteristic, Countable),
     /// A referenced object's stat ([CR#107.3], "equal to its power").
     StatOf(Reference, Stat),
-    /// A referenced player's numeric attribute ([CR#119.1] life,
-    /// [CR#402.2] hand size) — the player-side twin of
-    /// [`StatOf`](Count::StatOf), mirroring the Idris `PlayerStatOf`. "a
-    /// player's life total" = `PlayerStatOf(<player>, Life)`. The
-    /// `Reference` resolves to a player proxy; a non-player reference
-    /// fizzles to 0 (never-crash). Held unboxed, like its `StatOf` peer
-    /// (`Reference` + a `Copy` [`PlayerAttr`]).
+    /// A referenced player's numeric attribute ([CR#119.1] life, [CR#402.2]
+    /// hand size) — the player-side twin of [`StatOf`](Count::StatOf). "a
+    /// player's life total" = `PlayerStatOf(<player>, Life)`. The `Reference`
+    /// resolves to a player proxy; a non-player reference fizzles to 0
+    /// (never-crash). Held unboxed, like its `StatOf` peer (`Reference` + a
+    /// `Copy` [`PlayerAttr`]).
     PlayerStatOf(Reference, PlayerAttr),
-    /// How many opponents a referenced player has ([CR#102.1]) — "the number
-    /// of opponents you have" = `Opponents(You)`. The count of the live
-    /// players NOT on the referenced player's team ([CR#102.4,810.1]); the
-    /// Idris twin is `CountOf (Players OpponentOf)`. The `Reference` resolves
-    /// to a player proxy; a non-player reference fizzles to 0 (never-crash).
+    /// How many opponents a referenced player has ([CR#102.1]) — "the number of
+    /// opponents you have" = `Opponents(You)`. The count of the live players
+    /// NOT on the referenced player's team ([CR#102.4,810.1]). The `Reference`
+    /// resolves to a player proxy; a non-player reference fizzles to 0
+    /// (never-crash).
     Opponents(Reference),
     /// How many counters of the named kind sit on a referenced object or
     /// player proxy ([CR#122.1]) — "for each +1/+1 counter on ~", and the

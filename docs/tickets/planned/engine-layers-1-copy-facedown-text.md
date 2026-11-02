@@ -7,7 +7,7 @@ copiable values from a copy source — the `base_values` seam, gated on
 layer-3 text-changing effects.
 
 Also owns the **Clone consumer-macro authoring** deferred from `core-copy-grammar`
-Task 9. The copy grammar (`EnterRider::AsCopy`, render arms, idris `BecomeCopyOf`)
+Task 9. The copy grammar (`EnterRider::AsCopy`, render arms)
 landed, but the Clone macro itself — plus its full-sentence render arm and behavioral
 copy tests — waits on this ticket's AsCopy runtime seam: AsCopy currently fizzles at
 runtime by design, and Clone's "enters as a copy … except it's not legendary" shape

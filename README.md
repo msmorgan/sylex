@@ -296,7 +296,8 @@ declaration in `lean/Semantics/Definitions/`, and a card names one only through
 the authored constant its declaration generates.
 
 [Lean is the workbench](docs/decisions/lean-is-the-workbench.md) records the
-succession. Idris is retained as a frozen reference and legacy emitter target.
+succession. The earlier Idris workbench and its card emitter were deleted by
+`idris-retirement`.
 The Rust-to-Lean card-soundness gate is still
 [tracked work](docs/tickets/planned/lean-card-soundness-gate.md), rather than a
 claim made by the current workbench build.

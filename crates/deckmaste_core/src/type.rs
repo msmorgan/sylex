@@ -50,6 +50,8 @@ pub enum Supertype {
 #[derive(Debug, Clone, Eq, Deserialize, Serialize)]
 pub struct Subtype {
     pub name: Ident,
+    /// The card types this subtype is correlated to; on a card with several
+    /// card types, each subtype belongs to its own ([CR#205.3c]).
     pub types: Arc<[Type]>,
     #[serde(default, skip_serializing_if = "crate::slice_is_empty")]
     pub confers: Arc<[Property]>,

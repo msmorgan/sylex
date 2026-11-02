@@ -2,8 +2,7 @@
 // this enchantment. / At the beginning of your upkeep, if this enchantment
 // has ten or more luck counters on it, you win the game."
 // [CR#705.1,705.2,122.1,104.2b] — exercises `EventFilter::CoinFlipped`
-// (pre-existing variant, newly wired to an Idris `FlipCoin` emission this
-// task) via its `won: true` narrowing.
+// via its `won: true` narrowing.
 Normal(
     name: "Chance Encounter",
     mana_cost: [Generic(2), Red, Red],

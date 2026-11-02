@@ -24,7 +24,7 @@ requires explicit review rather than an opportunistic refactor.
 - [Types grant capabilities](types-grant-capabilities.md) — Current
   characteristics positively grant the capabilities subsystems consume.
 - [Lean is the workbench](lean-is-the-workbench.md) — Active semantics modeling
-  and theorem-form pins; Idris is reference only.
+  and theorem-form pins; the Idris workbench is deleted.
 - [Macro templates are bidirectional](macro-templates-are-bidirectional.md) —
   One typed template drives both rendering and parsing.
 - [State-based actions are data](state-based-actions-are-data.md) — Ordinary

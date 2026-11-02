@@ -1,14 +1,10 @@
 // The "exchange control" fixture ([CR#701.12a,701.12b]): a mana-only
 // activated ability whose body is the `Simultaneously` pair of mirrored
 // `Continuously(EndOfGame, Modify(_, SetController(ControllerOf(_))))`
-// halves — the Idris `exchangeControl` macro's exact shape (`Macros.idr`).
-// Deliberately NOT the pre-existing `ExchangeControl` builtin macro
+// halves. Deliberately NOT the pre-existing `ExchangeControl` builtin macro
 // (`plugins/builtin/macros/effect/ExchangeControl.ron`): that one expands to
-// the one-shot `Action::GainControl`, which `idris_emit` explicitly declines
-// ("has no Idris one-shot Action counterpart — only the continuous
-// Modification"). The continuous-modification spelling here is the one form
-// with a real Idris emit path, so it's what an idris-check-passing fixture
-// has to use.
+// the one-shot `Action::GainControl`; this fixture exercises the
+// continuous-modification spelling.
 //
 // The self-reference in the body ("this artifact") is a battlefield-context
 // type-noun, not the printed name — `ability::activated`'s `Ctx.subject`

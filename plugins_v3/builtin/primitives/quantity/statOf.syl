@@ -1,2 +1,3 @@
-# Read the specified numeric property of the subject.
+# Read the specified numeric property of the subject. A noncreature permanent has no power or
+# toughness [CR#208.3].
 primitive statOf(axis: ProjAxis, subject: NounPhrase): Amount

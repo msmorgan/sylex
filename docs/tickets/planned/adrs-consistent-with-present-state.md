@@ -55,7 +55,8 @@ the lines below are where to look, not a finished audit.
 - `card-authoring-binds-no-implicits.md`: cites `Experimental/Macros.idr` and
   `idris/src/Experimental/Cards.idr` as live; superseded for the Lean workbench
   already, and the remaining Idris greps need a historical marker.
-- `lean-is-the-workbench.md`: names `idris/src/Experimental.idr` as the origin;
-  check it against the `idris/` deletion scheduled at `semantics-v1-cutover`.
+- `lean-is-the-workbench.md`: `idris-retirement` amended its status lines for the
+  `idris/` deletion; its migration appendix still names `idris/src/Experimental.idr`
+  as the origin, which is history.
 
 Standard constraints apply.

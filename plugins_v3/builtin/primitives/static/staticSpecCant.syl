@@ -1,1 +1,3 @@
+# "<subject> can't <action>": a restriction; on attacking, the attack declaration checks it
+# [CR#508.1c].
 primitive staticSpecCant(subj: Subject, action: Action, mods: DeonticMods): StaticSpec = .cant

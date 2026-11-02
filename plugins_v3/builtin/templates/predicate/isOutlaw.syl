@@ -1,4 +1,5 @@
-# An outlaw: an Assassin, Mercenary, Pirate, Rogue, and/or Warlock [CR#700.12].
+# An outlaw: an Assassin, Mercenary, Pirate, Rogue, and/or Warlock [CR#700.12]. The outlaws a
+# player controls are outlaw permanents unless otherwise specified [CR#700.12a].
 template isOutlaw: Predicate {
   spelling = "outlaw",
   body = coord(

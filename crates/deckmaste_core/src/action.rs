@@ -10,8 +10,7 @@ use crate::mana::ManaProduction;
 
 /// A position within a library ([CR#401.7]): an offset counted from the top or
 /// from the bottom. `FromTop(0)` is the very top, `FromBottom(0)` the very
-/// bottom; larger offsets index inward. The Idris `Anchor = FromTop Count |
-/// FromBottom Count`.
+/// bottom; larger offsets index inward.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
 pub enum Anchor {
     /// `n` cards from the top (`0` = on top).
@@ -23,10 +22,9 @@ pub enum Anchor {
 
 /// Where a relocation puts an object ([CR#400.7]). A plain zone (the object's
 /// *owner's* graveyard/hand/library, the shared exile, the battlefield), or the
-/// library at an anchored position ([CR#401.7]). The Idris `Destination =
-/// ToZone Zone | ToLibrary Anchor`; this unifies `Move`'s zone change and the
-/// former `PutInLibrary`'s library-position placement into one notion (and adds
-/// bottom-of-library by construction).
+/// library at an anchored position ([CR#401.7]). This unifies `Move`'s zone
+/// change and the former `PutInLibrary`'s library-position placement into one
+/// notion (and adds bottom-of-library by construction).
 ///
 /// Core RON keeps ordinary zones explicit as `Zone(Graveyard)`. The library is
 /// an ordered destination only at an [`Anchor`](crate::Anchor), and the stack
@@ -254,16 +252,15 @@ pub enum Action {
     /// whose meaning IS its `body` effect, run when this resolves (the discard
     /// IS the Hand → Graveyard move, named "Discard"). The keyword-action
     /// macros (`Destroy`, `Scry`, `Discard`, …) desugar to a `Composite` so
-    /// there are no bespoke `Scry`/`Surveil` verbs; the engine dispatches
-    /// on the NAME plus the body's shape, not a typed atom. Mirrors the
-    /// Idris `Composite : KeywordActionSpec b -> Instruction b -> Action
-    /// b` and the [`KeywordAbility::Composite`](crate::KeywordAbility) `{
-    /// name, abilities }` precedent (a struct variant, read all-named).
-    /// Resolving runs `body`, then (when the body actually acts — scry 0
-    /// does nothing, [CR#701.22b]) commits the present-tense `Act`
-    /// name-fact a "whenever you scry/surveil/discard" trigger reads.
-    /// `body` is boxed to break the `Action` → `Instruction` →
-    /// `Action` size cycle.
+    /// there are no bespoke `Scry`/`Surveil` verbs; the engine dispatches on
+    /// the NAME plus the body's shape, not a typed atom. Mirrors the
+    /// [`KeywordAbility::Composite`](crate::KeywordAbility) `{ name, abilities
+    /// }` precedent (a struct variant, read all-named).
+    /// Resolving runs `body`, then (when the body actually acts — scry 0 does
+    /// nothing, [CR#701.22b]) commits the present-tense `Act` name-fact a
+    /// "whenever you scry/surveil/discard" trigger reads.
+    /// `body` is boxed to break the `Action` → `Instruction` → `Action` size
+    /// cycle.
     Composite {
         name: crate::VerbName,
         body: Arc<crate::Instruction>,
@@ -760,15 +757,13 @@ fn hand_owner_ref(filter: &crate::Predicate) -> Option<&Reference> {
     }
 }
 
-/// The BOUND-form patient of a discard composite's stored body
-/// ([CR#702.29a] "discard this card"): the reference its body's HEAD moves,
-/// when that head is a single relocation (`Move(This, Graveyard)` →
-/// `Some(This)`). The chosen/random form (an explicit choose or random
-/// selection followed by an action, [`Action::discard`]) → `None`. Read off
-/// the stored body ("matches the
-/// expanded body") — shared by the engine's resolve lane, the renderer, and
-/// the Idris emitter, so the three can never disagree on which form a
-/// discard is.
+/// The BOUND-form patient of a discard composite's stored body ([CR#702.29a]
+/// "discard this card"): the reference its body's HEAD moves, when that head is
+/// a single relocation (`Move(This, Graveyard)` → `Some(This)`). The
+/// chosen/random form (an explicit choose or random selection followed by an
+/// action, [`Action::discard`]) → `None`. Read off the stored body ("matches
+/// the expanded body") — shared by the engine's resolve lane and the renderer,
+/// so the two can never disagree on which form a discard is.
 #[must_use]
 pub fn discard_body_what(body: &crate::Instruction) -> Option<&Reference> {
     use crate::Instruction as Ose;
@@ -832,14 +827,13 @@ pub fn discard_body_count(body: &crate::Instruction) -> Option<&Count> {
     }
 }
 
-/// The discarding performer of a CHOSEN/RANDOM discard composite's stored
-/// body ([CR#701.9b]) — [`crate::Choose`]'s `by` (the chooser IS the
-/// discarding player by default), or, for the at-random
-/// form (which carries no `by`), the hand-owning `who` its
-/// [`Selection::Random`] filter names ([`hand_owner_ref`]). `None` for a
-/// bound single-move body (its performer rides the patient, not a separate
-/// slot) or any other shape. Read off the stored body — shared by the
-/// engine's resolve lane, the renderer, and the Idris emitter.
+/// The discarding performer of a CHOSEN/RANDOM discard composite's stored body
+/// ([CR#701.9b]) — [`crate::Choose`]'s `by` (the chooser IS the discarding
+/// player by default), or, for the at-random form (which carries no `by`), the
+/// hand-owning `who` its [`Selection::Random`] filter names
+/// ([`hand_owner_ref`]). `None` for a bound single-move body (its performer
+/// rides the patient, not a separate slot) or any other shape. Read off the
+/// stored body — shared by the engine's resolve lane and the renderer.
 #[must_use]
 pub fn discard_body_whose(body: &crate::Instruction) -> Option<&Reference> {
     use crate::Instruction as Ose;
@@ -863,8 +857,8 @@ pub fn discard_body_whose(body: &crate::Instruction) -> Option<&Reference> {
 /// The two fighters a `Fight` body names — the sources of its reciprocal
 /// `DealDamage` halves under the `If`-guard's `then` batch ([CR#701.14a]).
 /// ONE shared read-off-the-body facet (the `discard_body_what` precedent):
-/// the engine's resolve lane and the Idris emitter both consume this, so
-/// the fighters are read off the stored body identically everywhere.
+/// the engine's resolve lane consumes this, so the fighters are read off the
+/// stored body in one place.
 #[must_use]
 pub fn fight_body_fighters(body: &crate::Instruction) -> Option<(&Reference, &Reference)> {
     use crate::Action as A;
@@ -897,20 +891,18 @@ impl Action {
     /// pay with — sacrifice, relocate (`Move`, e.g. self-exile to pay —
     /// [CR#701.13]), tap, untap, discard (the keyword-action composite),
     /// change-life (pay-life; [CR#119.7] — Invigorate, Skyshroud Cutter print
-    /// gain-life costs, so the WHOLE `ChangeLife` family is eligible, not
-    /// just the losing direction), reveal ("reveal a blue card from your
-    /// hand:" — a reveal that is part of a cost stays shown until the spell
-    /// leaves the stack, [CR#701.20a]), and put/remove counters. Counter
-    /// costs ride these two verbs rather than a dedicated cost verb: "remove a
-    /// +1/+1 counter:" is `RemoveCounters`, "pay {E}" is `RemoveCounters` on a
-    /// player, and a planeswalker loyalty ability's `+N`/`−N` cost is
+    /// gain-life costs, so the WHOLE `ChangeLife` family is eligible, not just
+    /// the losing direction), reveal ("reveal a blue card from your hand:" — a
+    /// reveal that is part of a cost stays shown until the spell leaves the
+    /// stack, [CR#701.20a]), and put/remove counters. Counter costs ride these
+    /// two verbs rather than a dedicated cost verb: "remove a +1/+1 counter:"
+    /// is `RemoveCounters`, "pay {E}" is `RemoveCounters` on a player, and a
+    /// planeswalker loyalty ability's `+N`/`−N` cost is
     /// `PutCounters`/`RemoveCounters` of the loyalty counter on its source
     /// ([CR#606.4] — the cost to activate a loyalty ability is to put on or
-    /// remove that many loyalty counters). The Idris grammar makes the same
-    /// call: loyalty costs reuse `Do (PutCounters/RemoveCounters
-    /// loyaltyCounter N This)`, "so there is no duplicate counter-cost
-    /// verb" (`idris/src/Semantics.idr`, the `Cost` `Do` and
-    /// `PutCounters`/`RemoveCounters` doc comments).
+    /// remove that many loyalty counters). Loyalty costs reuse `Do
+    /// (PutCounters/RemoveCounters loyaltyCounter N This)`; there is no
+    /// duplicate counter-cost verb.
     #[must_use]
     pub fn is_cost_eligible(&self) -> bool {
         match self {

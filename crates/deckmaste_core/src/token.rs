@@ -330,6 +330,8 @@ pub struct Token {
     /// [CR#111.4] (subtypes + "Token") the way an unnamed token always has.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<Arc<str>>,
+    /// The colors the token's color indicator denotes; it is each of them
+    /// ([CR#204.2]).
     #[serde(default, skip_serializing_if = "crate::slice_is_empty")]
     pub color_indicator: Arc<[Color]>,
     #[serde(default, skip_serializing_if = "crate::slice_is_empty")]

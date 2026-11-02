@@ -63,6 +63,5 @@ non-compliant over the full citation set, and the doc build joins the gate
 battery so that deleting a type can never again leave dead links behind a green
 run.
 
-Related: [[ci-idris-gate]] (the other structural gate this repo runs),
-[[comment-discipline-sweep]] (doc-comment hygiene at scale),
+Related: [[comment-discipline-sweep]] (doc-comment hygiene at scale),
 [[core-pay-player-action]] (the effort that surfaced the three silent breaks).

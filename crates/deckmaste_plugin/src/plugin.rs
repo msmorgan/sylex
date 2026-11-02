@@ -23,7 +23,6 @@ use deckmaste_core::plugin::card_path;
 use deckmaste_core::plugin::token_path;
 use deckmaste_lowering::Lower;
 
-use crate::loaded::CardResolution;
 use crate::loaded::LoadedCard;
 use crate::loaded::LoadedToken;
 use crate::macros::InsertError;
@@ -66,8 +65,7 @@ pub struct Plugin {
     /// The counter kinds defined by `macros/`, fully expanded — keyed by the
     /// counter's identity (`P1P1Counter`), which is what a `CounterRef`
     /// resolves to. No load-time pass validates semantic `CounterRef`s against
-    /// this registry yet — only the Idris emitter flags unknown counter refs
-    /// yet.
+    /// this registry yet.
     pub counters: HashMap<Ident, Counter>,
     /// The designations declared by `macros/` (`DesignationDecl`-kind,
     /// nullary), keyed by the designation's identity. The designation-scope
@@ -402,33 +400,6 @@ impl Plugin {
             .map_err(|diagnostic| anyhow::anyhow!("lowering {diagnostic}"))?;
         validate_card_regions(&core)?;
         Ok(LoadedCard { semantic, core })
-    }
-
-    /// The RESOLVER half of the certifier/resolver differential
-    /// (`semantics-spelling-lowering.md` §17): read a card through the same
-    /// restricted entry as [`Plugin::card_from_str`], but hand back lowering's
-    /// VERDICT as data instead of propagating a refusal.
-    ///
-    /// A `lowered` of `Err` is a card whose text the resolver refuses (an
-    /// ambiguous or unbound anaphor); the differential gate pairs that verdict
-    /// against the Idris mirror's certification of the same card. A plain
-    /// `Err` return is still a read failure — a card that does not parse has
-    /// no resolver verdict to compare. The card's printed name comes back with
-    /// the verdict so a caller never needs a second read to identify it.
-    ///
-    /// This is not a second read path: it runs the identical restricted read
-    /// and the identical `lower_card`, and differs only in whether a refusal
-    /// is returned or raised.
-    ///
-    /// # Errors
-    /// If the source doesn't expand to a card.
-    pub fn card_resolution_from_str(&self, source: &str) -> anyhow::Result<CardResolution> {
-        let semantic: deckmaste_semantics::Card = self.macros.read_str_restricted(source)?;
-        let name = crate::idris_emit::card_display_name(&semantic).to_owned();
-        Ok(CardResolution {
-            name,
-            lowered: deckmaste_lowering::lower_card(semantic),
-        })
     }
 
     /// A semantic card WITHOUT identity-macro invocation provenance: the value

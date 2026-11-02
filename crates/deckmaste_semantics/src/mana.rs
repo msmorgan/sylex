@@ -55,23 +55,19 @@ pub enum ManaSpec {
     OneOfRuns(Arc<[Vec<ColorOrColorless>]>),
     /// One mana of any of a referenced object's colors ([CR#105.2]) — the
     /// producer picks AMONG that object's colors, not a fixed semantic set
-    /// (distinct from [`OneOf`](ManaSpec::OneOf)): Chrome Mox's imprint,
-    /// "add one mana of any of the exiled card's colors". Mirrors the Idris
-    /// `ProducedMana.AmongColorsOf`.
+    /// (distinct from [`OneOf`](ManaSpec::OneOf)): Chrome Mox's imprint, "add
+    /// one mana of any of the exiled card's colors".
     AmongColorsOf(Reference),
     /// The type the ambient mana-producing event actually produced
-    /// ([CR#106.1b,106.12a]) — Dictate of Karametra/Vorinclex's "add one
-    /// mana of any type that land produced". Idris gates this behind
-    /// `producesMana (eventCaps b) = True` (sound only inside a
-    /// [`TapForMana`](crate::EventFilter::TapForMana)-triggered body, the
-    /// `EventObject`/`EventAmount` pattern) via an ERASED auto-proof; Rust
-    /// has no dependent types to carry that obligation, so this mirrors as
-    /// a plain nullary variant — a semantic-input error that reaches for it
-    /// outside a `TapForMana` body simply fails `idris-check` (the
-    /// soundness gate), and the engine fizzles gracefully if ever evaluated
-    /// without a live `TapForMana` context (see
-    /// `deckmaste_engine::resolve`). Mirrors the Idris
-    /// `ProducedMana.ProducedByEvent`.
+    /// ([CR#106.1b,106.12a]) — Dictate of Karametra/Vorinclex's "add one mana
+    /// of any type that land produced". Sound only inside a
+    /// [`TapForMana`](crate::EventFilter::TapForMana)-triggered body (the
+    /// `EventObject`/`EventAmount` pattern); Rust carries no compile-time gate
+    /// for that, so this is a plain nullary variant. A semantic-input error
+    /// that reaches for it outside a `TapForMana` body is an authoring
+    /// invariant no checker enforces any more, and the engine fizzles
+    /// gracefully if ever evaluated without a live `TapForMana` context (see
+    /// `deckmaste_engine::resolve`).
     ProducedByEvent,
     #[macro_ron(embed)]
     Specific(ColorOrColorless),
@@ -187,9 +183,7 @@ impl From<crate::Uint> for ManaSymbol {
 /// A predicate over mana symbols — both the SPEND-time payment-freedom slot of
 /// `StaticEffect::SpendAsThough` ([CR#609.4b]) and the devotion/pip matcher
 /// under `Countable::ManaSymbols` ([CR#700.5]). Grown from the spend-time
-/// subset (`AnyColor`/`AnyType`) into the Idris `SymbolPred` matcher algebra;
-/// Rust stays a permissive superset (the spend-time spellings have no Idris
-/// twin).
+/// subset (`AnyColor`/`AnyType`) into a matcher algebra.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Expand, Serialize)]
 pub enum SymbolPred {
     /// "as though it were mana of any color" — matches any COLORED pip

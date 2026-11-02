@@ -358,7 +358,7 @@ fn delver_look_top(f: &deckmaste_semantics::If, ctx: &Ctx) -> Option<String> {
     ))
 }
 
-/// Whether `r` names the sole top card of YOUR library — the Idris
+/// Whether `r` names the sole top card of YOUR library — the
 /// `Single(TopOfLibrary(^1))` the Delver peek reads twice (condition + reveal).
 fn is_single_top_of_your_library(r: &Reference) -> bool {
     let Reference::Single(sel) = r else {

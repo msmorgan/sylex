@@ -22,7 +22,8 @@ use crate::Zone;
 pub enum PhaseKind {
     /// The beginning phase ([CR#501]).
     Beginning,
-    /// The precombat main phase ([CR#505]).
+    /// The precombat main phase ([CR#505]): only the turn's first main phase
+    /// ([CR#505.1a]).
     PrecombatMain,
     /// The combat phase ([CR#506]).
     Combat,
@@ -257,12 +258,11 @@ pub enum Cause {
 /// these forms. Omitted filter fields default to match-anything; omitted
 /// `Option` refinements are unconstrained.
 ///
-/// The algebra tail (`AllOf`/`OneOf`/`Not`/`OneOrMore`/`Nth`/`When`/
-/// `Within`) is LANE-GATED by the Idris model (an ill-placed atom is
-/// unrepresentable there): live lanes
-/// (trigger/replacement/duration) refuse `Within`; history lanes
-/// (`Happened`/`EventCount`) refuse `OneOrMore`; disjunction pairs kind
-/// with filters per-disjunct and must bottom out in master forms in
+/// The algebra tail (`AllOf`/`OneOf`/`Not`/`OneOrMore`/`Nth`/`When`/ `Within`)
+/// is LANE-GATED (an ill-placed atom is an authoring error no checker catches
+/// any more): live lanes (trigger/replacement/duration) refuse `Within`;
+/// history lanes (`Happened`/`EventCount`) refuse `OneOrMore`; disjunction
+/// pairs kind with filters per-disjunct and must bottom out in master forms in
 /// kind-anchored lanes.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
 pub enum EventFilter {
@@ -569,19 +569,17 @@ pub enum EventFilter {
         #[serde(default = "Predicate::any")]
         by: Predicate,
     },
-    /// A land was tapped for mana ([CR#106.12]) — the ONE event whose Idris
-    /// `EventCaps.producesMana` cap is `True` (it IS a mana ability
-    /// resolving), gating
-    /// [`ManaSpec::ProducedByEvent`](crate::ManaSpec::ProducedByEvent)
-    /// (Dictate of Karametra/Vorinclex's "add one mana of any type that land
-    /// produced", [CR#106.12a]). `what` narrows the tapped permanent
-    /// (almost always left `Any` in practice — the event kind itself is
-    /// already land-scoped); `by` narrows the tapper (its controller). Rust
-    /// has no compile-time gate mirroring Idris's `producesMana` auto-proof
-    /// (the soundness check is re-emit + `idris-check`, per this repo's
-    /// established "sound data SHAPE, not soundness to Rust" policy) — an
-    /// semantic-input error that reaches for `ProducedByEvent` outside a
-    /// `TapForMana` body simply fails to typecheck on the Idris side.
+    /// A land was tapped for mana ([CR#106.12]) — the ONE event that licenses
+    /// [`ManaSpec::ProducedByEvent`](crate::ManaSpec::ProducedByEvent), since
+    /// it IS a mana ability resolving (Dictate of Karametra/Vorinclex's "add
+    /// one mana of any type that land produced", [CR#106.12a]). `what` narrows
+    /// the tapped permanent (almost always left `Any` in practice — the event
+    /// kind itself is already land-scoped);
+    /// `by` narrows the tapper (its controller). Rust has no compile-time gate
+    /// (this repo's established policy is "sound data SHAPE, not soundness to
+    /// Rust"): a semantic-input error that reaches for `ProducedByEvent`
+    /// outside a `TapForMana` body is an authoring invariant no checker
+    /// enforces any more.
     TapForMana {
         #[serde(default = "Predicate::any")]
         what: Predicate,
@@ -599,8 +597,8 @@ pub enum EventFilter {
         face: Option<crate::PlanarFace>,
     },
     /// Every sub-pattern matches the same occurrence ([CR#603.2]) — a
-    /// refinement conjunction. All conjuncts must agree on one master-form
-    /// kind (a disagreement is unrepresentable in the Idris model).
+    /// refinement conjunction. All conjuncts must agree on one master-form kind
+    /// (a disagreement is an authoring error no checker catches any more).
     AllOf(Arc<[EventFilter]>),
     /// Any of several events ([CR#603.2], "whenever … or …"); still fires
     /// once per matching occurrence ([CR#603.2c]). Kind↔filter pairing is
@@ -615,9 +613,10 @@ pub enum EventFilter {
     /// BATCH: the pattern matches the occurrence once, not per member
     /// ([CR#603.2c]). Trigger/replacement lanes only.
     OneOrMore(Arc<EventFilter>),
-    /// The nth matching occurrence within a lookback ([CR#603.2]; a dead
-    /// 0th occurrence never happens, [CR#603.2g]) — "the second spell you
-    /// cast this turn". `n` is 1-based (≥ 1, gated by the Idris model).
+    /// The nth matching occurrence within a lookback ([CR#603.2]; a dead 0th
+    /// occurrence never happens, [CR#603.2g]) — "the second spell you cast this
+    /// turn". `n` is 1-based (≥ 1, an authoring invariant no checker enforces
+    /// any more).
     Nth {
         n: Uint,
         of: Arc<EventFilter>,

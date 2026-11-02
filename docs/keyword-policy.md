@@ -117,9 +117,8 @@ Parameterized keywords live entirely in the `Composite` macro layer:
 expanded semantic data: a named composite keeps its keyword identity and
 expanded abilities. The [Lean checker](../lean/Semantics/Check/Card.lean)
 and its declared-feature laws are the workbench reference for that data;
-macro parameterization describes how the invocation supplies it. The existing
-Rust-to-Idris emitter is legacy tooling, pending the Lean card gate described
-in §14.
+macro parameterization describes how the invocation supplies it. The
+Rust-to-Idris emitter is gone; §14 describes the Lean card gate.
 
 ## 5. Typed cycling — mirror Landwalk
 
@@ -325,9 +324,9 @@ pins. It is the active workbench gate. Card data is checked beside it by
 ([lean-card-soundness-gate](tickets/done/lean-card-soundness-gate.md)), which
 re-emits every `plugins_v2/` card as a Lean term and proves `Card.check = []`;
 the workbench build itself still makes no claim about loaded card data. The v1
-`plugins/canon` corpus stays on the Rust-to-Idris emitter until it has a v2
-counterpart. [Lean is the workbench](decisions/lean-is-the-workbench.md) records
-the succession; the handwritten Idris model is reference only.
+`plugins/canon` corpus has no card gate since the Rust-to-Idris emitter was
+retired. [Lean is the workbench](decisions/lean-is-the-workbench.md) records
+the succession; the handwritten Idris model was deleted by `idris-retirement`.
 
 ---
 

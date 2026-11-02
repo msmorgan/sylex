@@ -1,7 +1,8 @@
 # "roll <count> <sides>-sided dice [and watch for <watch>]": as a pattern, "roll a die" is the
 # default `1` and "roll one or more dice" `anyAmount`.
 # TODO(spelling): The watch selects an unqualified roll or a required outcome clause; sides may
-# name planar dice.
+# name planar dice. Rolling the planar die triggers "whenever you roll one or more dice", but an
+# effect that reads a numerical result ignores it [CR#706.7].
 primitive rollDice(
   count: Amount = 1,
   sides: DieSides = sides(6),

@@ -64,8 +64,7 @@ impl<'de> Deserialize<'de> for CounterRef {
 }
 
 /// Which counters a [`MoveCounters`](crate::Action::MoveCounters) operation
-/// relocates ([CR#122] — counters move object→object as one operation). The
-/// Idris `CounterSpec = Some CounterKind Count | AllKinds`.
+/// relocates ([CR#122] — counters move object→object as one operation).
 ///
 /// `Named` names a specific kind and how many (Power Conduit / Leech Bonder);
 /// `AllKinds` moves every counter of every kind at once (Ozolith / Fate
@@ -80,10 +79,9 @@ pub enum CounterSpec {
 }
 
 /// A counter kind's carrier scope ([CR#122.1]): most kinds sit on objects;
-/// poison/energy/experience are player-borne ([CR#122.1f] poison). The
-/// registry ROW carries this dependent index as data; the counter-scope
-/// soundness check (in the Idris model) reads the loaded declaration, not a
-/// hardcoded list.
+/// poison/energy/experience are player-borne ([CR#122.1f] poison). The registry
+/// ROW carries this dependent index as data; the counter-scope soundness rule
+/// reads the loaded declaration, not a hardcoded list.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub enum CounterScope {
     /// Object-borne — the [CR#122.1] default (counters sit on objects

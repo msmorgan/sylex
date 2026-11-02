@@ -1,7 +1,6 @@
 // The "exchange life totals" fixture ([CR#701.12a,701.12c]): a `May`-wrapped,
 // two-target upkeep trigger whose body is the `Simultaneously` pair of
-// mirrored `SetLife`/`PlayerStatOf` reads — the Idris `exchangeLife` macro's
-// exact shape (`Macros.idr`). Both targets share the bare `Player` predicate,
+// mirrored `SetLife`/`PlayerStatOf` reads. Both targets share the bare `Player` predicate,
 // so the render collapses them to "two target players" rather than repeating
 // the announce phrase twice.
 Normal(

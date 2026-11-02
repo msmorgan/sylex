@@ -4061,16 +4061,14 @@ mod tests {
 
     /// Delver of Secrets' REAL front ability ([CR#701.27a]) driven end-to-end
     /// through the whole conditional resolve path — the behavior the canon
-    /// `Delver of Secrets.ron` encodes. The effect mirrors the retired Idris
-    /// model of Delver of Secrets:
+    /// `Delver of Secrets.ron` encodes. The effect is
     /// `If(Matches(Single(TopOfLibrary 1), Or([Instant, Sorcery])),
-    ///     May(Sequentially([Reveal(Single(TopOfLibrary 1)),
-    /// Transform(This)])))` — the top card is read DIRECTLY
-    /// (`Single(TopOfLibrary(1))`), no binder, so this also proves the
-    /// engine resolves that reference in BOTH `Matches` and `Reveal`.
-    /// Unlike `delver_transforms_end_to_end` (a bare `Act(Transform)`), the
-    /// top card's card TYPE decides whether the optional transform even
-    /// offers:
+    /// May(Sequentially([Reveal(Single(TopOfLibrary 1)), Transform(This)])))` —
+    /// the top card is read DIRECTLY (`Single(TopOfLibrary(1))`), no binder, so
+    /// this also proves the engine resolves that reference in BOTH `Matches`
+    /// and `Reveal`.
+    /// Unlike `delver_transforms_end_to_end` (a bare `Act(Transform)`), the top
+    /// card's card TYPE decides whether the optional transform even offers:
     ///  1. an INSTANT on top → the condition holds, the reveal is accepted, and
     ///     ~ transforms to the 3/2 back ([CR#712.18]);
     ///  2. a CREATURE on top → the condition fails, nothing offers, and ~ stays

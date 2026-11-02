@@ -2057,7 +2057,7 @@ const OTHER_FIXTURE: usize = 100;\n\
 const CR_FIXTURE: &str = \"rule 100.1\";
 // cite: noncompliant end
 ";
-        for file in ["notes.md", "data.ron", "proof.idr"] {
+        for file in ["notes.md", "data.ron", "proof.lean"] {
             let error = noncompliant_source_hits(file, prose).unwrap_err();
             assert!(
                 error.to_string().contains("Rust source"),

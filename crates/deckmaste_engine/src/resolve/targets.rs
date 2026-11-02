@@ -224,8 +224,7 @@ pub(crate) fn announced_prefix_len(specs: &[TargetSpec]) -> usize {
 /// [`TargetSpec::Distinct`] slot's chosen set is disjoint from the union of its
 /// named sibling slots' sets. Malformed semantic input — a sibling index out of
 /// range or naming the slot itself — is treated as a violation (`false`), so
-/// the spec is unsatisfiable and fizzles rather than panicking (Idris proves
-/// `distinctOk` statically; Rust catches it at runtime). Shared by
+/// the spec is unsatisfiable and fizzles rather than panicking. Shared by
 /// [`validate_target_set`] and the resolution re-check so both read the same
 /// rule. Departed targets can only SHRINK a set, never create an overlap, so a
 /// set valid at announce stays valid here.
@@ -503,8 +502,7 @@ mod target_set_tests {
     }
 
     /// Malformed semantic input — a sibling index out of range or naming the
-    /// slot itself — is a rejected set, never a panic (Idris proves
-    /// `distinctOk`; Rust catches it at runtime).
+    /// slot itself — is a rejected set, never a panic.
     #[test]
     fn malformed_sibling_index_rejected_not_panicking() {
         let out_of_range = [t_one(), distinct(vec![5], t_one())];

@@ -12,7 +12,7 @@ conferrals precedent violated: conferral-shaped data belongs in RON, never
 hardcoded.
 
 Evidence the enum should die: [CR#111.10] is explicitly a lookup table ("use
-the definition below"); idris has no predefined-token constructor (blesses
+the definition below"); the retired Idris model had no predefined-token constructor (blessed
 inline `TokenSpec` only — soundness-safe); the 15+ CR predefined tokens not
 yet implemented (Walker, Shard, Powerstone, Incubator, the eight Roles, Map,
 Junk, Lander, Mutagen) each become "add a `.ron` file" instead of "add a Rust

@@ -48,13 +48,12 @@ pub struct CardFace {
     pub defense: Option<StatValue>,
 }
 
-/// How a two-faced card's faces are arranged — the Idris `FaceLayout`. The
-/// layouts share ONE card shape (two full faces, [CR#712.8] — each face has
-/// its own characteristics); what differs per layout — transforming, casting
-/// either face, casting halves, the adventure exile state, flipping — is the
-/// engine's job, not the grammar's. Single-faced "layouts" (saga, class,
-/// leveler, …) are NOT here: their mechanics ride subtypes and abilities on a
-/// `Normal` card.
+/// How a two-faced card's faces are arranged. The layouts share ONE card shape
+/// (two full faces, [CR#712.8] — each face has its own characteristics); what
+/// differs per layout — transforming, casting either face, casting halves, the
+/// adventure exile state, flipping — is the engine's job, not the grammar's.
+/// Single-faced "layouts" (saga, class, leveler, …) are NOT here: their
+/// mechanics ride subtypes and abilities on a `Normal` card.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Expand, Serialize)]
 pub enum FaceLayout {
     /// A transforming (nonmodal) double-faced card ([CR#712.2]).
@@ -83,8 +82,8 @@ pub enum Card {
     #[macro_ron(spliced)]
     Normal(CardFace),
     /// A TWO-faced card: `front` (the primary/default face) and `back`,
-    /// arranged per `layout` — the Idris `TwoFaced`. Each face is a full
-    /// [`CardFace`] with its own characteristics ([CR#712.8]).
+    /// arranged per `layout`. Each face is a full [`CardFace`] with its own
+    /// characteristics ([CR#712.8]).
     TwoFaced {
         layout: FaceLayout,
         front: CardFace,

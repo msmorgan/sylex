@@ -311,9 +311,8 @@ fn lint_card_subtypes(
 }
 
 /// For each printed type on a face, check its name resolves in the plugin's
-/// declared type registry. The Rust-side analogue of Idris's structural type
-/// check; a typo lints here and fizzles at runtime (`resolve_type` → name-only
-/// `TypeDef`), never crashing.
+/// declared type registry. A typo lints here and fizzles at runtime
+/// (`resolve_type` → name-only `TypeDef`), never crashing.
 fn lint_card_types(
     path: &Path,
     types: &[deckmaste_core::TypeDef],

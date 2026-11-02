@@ -56,8 +56,6 @@ the overlay uses to materialize the premise keyword on the candidate.
   `Has(K)` → add K (new, needs the resolver).
 - Render arm for the positive premise ("as though they had flash") in
   `render/ability.rs::asthough_counterfactual` (the negative arm is in place).
-- Idris re-emit already handles it generically (`AsThough (Matches This (Has
-  Flash)) (Can (Enact Cast ...))` via the landed `emit_static_effect` arm).
 - Semantic test: a sorcery-speed spell is uncastable at instant speed normally,
   castable under the granter, and still sorcery-speed for a player without it.
 

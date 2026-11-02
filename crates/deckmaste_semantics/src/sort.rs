@@ -2,10 +2,10 @@
 //! carries (`That(Card)` = "that card", `Them(Token)` = "those tokens").
 //! Sorts drive the nearest-compatible-antecedent resolution (R1) and the
 //! ambiguity gate (R2): an anaphor reaches an antecedent whose sort is
-//! compatible (the Idris model's `compat` relation), and the sort
-//! is why "exile target **creature** … return that **card**" resolves — the
-//! exile clause's product sits in exile, so its sort is [`Sort::Card`]
-//! ([CR#400.7] — the new object the effect tracks across the move).
+//! compatible, and the sort is why "exile target **creature** … return that
+//! **card**" resolves — the exile clause's product sits in exile, so its sort
+//! is [`Sort::Card`] ([CR#400.7] — the new object the effect tracks across the
+//! move).
 
 use serde::Deserialize;
 use serde::Serialize;
@@ -49,9 +49,9 @@ pub enum Sort {
 }
 
 impl Sort {
-    /// The stable key of this sort's shape — `OfType(_)` collapses to
-    /// one key; the Idris model's `compat` relation pairs these keys, with the
-    /// same-`t` refinement on `OfType`/`OfType` applied by the consumer.
+    /// The stable key of this sort's shape — `OfType(_)` collapses to one key;
+    /// the compatibility relation pairs these keys, with the same-`t`
+    /// refinement on `OfType`/`OfType` applied by the consumer.
     #[must_use]
     pub fn key(self) -> &'static str {
         match self {

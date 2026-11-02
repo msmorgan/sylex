@@ -2,8 +2,7 @@
 // regenerated." rider ([CR#701.19c]: a can't-be-regenerated effect causes
 // regeneration SHIELDS not to be applied to that destruction — activating
 // or casting shield-creators stays legal). The rider is the deontic
-// `Cant(Regenerate(on: <it>))` row (the Idris `cant (Enact Regenerate …)`
-// spelling) scoped by `Duration::ForThisEvent` — in force only while this
+// `Cant(Regenerate(on: <it>))` row scoped by `Duration::ForThisEvent` — in force only while this
 // instruction's destroy event executes, exactly the [CR#701.19c] window.
 //
 // SEAM — engine enforcement: the replacement pipeline does not yet consult

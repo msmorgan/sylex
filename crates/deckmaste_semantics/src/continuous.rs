@@ -56,8 +56,8 @@ pub enum Duration {
 /// defense, base loyalty. `Set` overwrites the base value (layer 7b, or 7a when
 /// CDA-flagged), `Up`/`Down` are the ±N modifications (layer 7c)
 /// ([CR#613.4a..613.4c]). The op↔axis pairing is the soundness gate: a numeric
-/// axis variant (`Modification::Power`, …) takes a `NumericOp`, recovering
-/// Idris's `Numeric` type-class gate (`idris/src/Semantics.idr`) structurally.
+/// axis variant (`Modification::Power`, …) takes a `NumericOp`, so the pairing
+/// holds structurally.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Expand, Serialize)]
 pub enum NumericOp {
     /// Overwrite the base value — layer 7b, or 7a when CDA-flagged
@@ -73,11 +73,10 @@ pub enum NumericOp {
 }
 
 /// A shared op for the SET-shaped characteristic axes — colors, card types,
-/// subtypes, supertypes. `Set` overwrites the whole list; `Add`/`Remove`
-/// affect a SINGLE element ([CR#613.1d,613.1e]). The op↔axis pairing is the
-/// soundness gate: a collection axis variant (`Modification::Colors`, …) takes
-/// a `CollectionOp`, which has no `Up`/`Down`, recovering Idris's `Collection`
-/// type-class gate (`idris/src/Semantics.idr`) structurally.
+/// subtypes, supertypes. `Set` overwrites the whole list; `Add`/`Remove` affect
+/// a SINGLE element ([CR#613.1d,613.1e]). The op↔axis pairing is the soundness
+/// gate: a collection axis variant (`Modification::Colors`, …) takes a
+/// `CollectionOp`, which has no `Up`/`Down`, so the pairing holds structurally.
 ///
 /// Generic over the element type, so it can't `#[derive(Expand)]` (that derive
 /// rejects generics); the `Expand` impl is hand-written just below. serde's
@@ -113,12 +112,10 @@ impl<T: Expand + Clone> Expand for CollectionOp<T> {
 ///
 /// The per-axis ops are factored into the two shared op enums ([`NumericOp`],
 /// [`CollectionOp`]) but the AXIS stays named at the variant level — a
-/// deliberately-partial unification of Idris's fully-unified `Alter
-/// (Characteristic) (ModificationOp)` (`idris/src/Semantics.idr`): the
-/// variant↔op pairing recovers the op↔axis soundness gate structurally (a
-/// `Colors` takes a `CollectionOp`, which has no `Up`, so "raise a color" is
-/// unrepresentable), while keeping RON readable (`Power(Up(1))`,
-/// `Colors(Add(Blue))`).
+/// deliberately-partial unification of axis and op: the variant↔op pairing
+/// recovers the op↔axis soundness gate structurally (a `Colors` takes a
+/// `CollectionOp`, which has no `Up`, so "raise a color" is unrepresentable),
+/// while keeping RON readable (`Power(Up(1))`, `Colors(Add(Blue))`).
 ///
 /// `SupportsMacros` (not plain `Expand`) so a change-bundling macro can stand
 /// in a `changes: [...]` slot — the keystone being `PowerAndToughnessUp(p, t)`,
@@ -286,8 +283,7 @@ pub enum StaticEffect {
     /// [`Modification::Several`]); the meaning is unambiguous, so no field
     /// names. Plurality is NEVER implicit here: to affect a set, distribute a
     /// single-object `Modify` with [`Each`](StaticEffect::Each) over a
-    /// [`Selection`]. Mirrors Idris `Modify : Reference AnObject ->
-    /// Modification -> StaticEffect`.
+    /// [`Selection`].
     Modify(Reference, Modification),
     /// "[object] becomes a copy of [source]" ([CR#707.4]) — a CONTINUOUS
     /// layer-1a copy effect: the object stays on the battlefield (no
@@ -319,11 +315,10 @@ pub enum StaticEffect {
     BecomesCopy(Reference, crate::CopySpec),
     /// Distribute an inner static effect over a [`Selection`] — "for each
     /// object in the selection, bind it as [`Reference::It`](crate::Reference)
-    /// and apply the inner effect." The ONLY way a static reaches many
-    /// objects (there is no implicit whole-set scope). The selection is
-    /// re-evaluated every layer pass, so the affected set tracks state changes
-    /// live ([CR#613.6]). Mirrors Idris `Each : Bindable Many -> StaticEffect
-    /// -> StaticEffect`; `Each(SelectAll(F), Modify(It, Δ))` is the anthem.
+    /// and apply the inner effect." The ONLY way a static reaches many objects
+    /// (there is no implicit whole-set scope). The selection is re-evaluated
+    /// every layer pass, so the affected set tracks state changes live
+    /// ([CR#613.6]). `Each(SelectAll(F), Modify(It, Δ))` is the anthem.
     Each(crate::Selection, Arc<StaticEffect>),
     /// A conditional static ([CR#611.3a]) — "as long as [condition],
     /// [effect]." Wraps an inner static effect with a game-state predicate; the
@@ -442,18 +437,12 @@ pub enum StaticEffect {
     /// ignore-result semantics): "if you would roll/flip `query`, instead
     /// roll/flip `extra` more and ignore per `ignore`." Krark's Thumb =
     /// `ReplaceRoll { query: CoinFlipped(by: Ref(You)), extra: 1, ignore:
-    /// IgnoreChosen(1) }`. Mirrors Idris `ReplaceRoll : (q : EventQuery b) ->
-    /// {auto 0 rnd : isRandomnessQuery q = True} -> (extra : Count b) ->
-    /// (ignore : IgnoreRule) -> StaticEffect b` — the `isRandomnessQuery`
-    /// erased auto-proof (gating `query` to a `FlipCoin`/`RollDice` kind
-    /// only, never the planar die, [CR#901.9d]) is Idris-ONLY, same as the
-    /// `EventCaps` proofs `EventFilter::TapForMana`/`ManaSpec::
-    /// ProducedByEvent` document: Rust holds no compile-time gate, so an
-    /// semantic-input error that reaches for `ReplaceRoll` over a
-    /// non-randomness query simply fails to typecheck on the Idris side
-    /// (`idris-check`), the intended soundness gate. Held unboxed like its
-    /// `TriggerMultiplier` sibling (same `EventFilter` + `Count` shape,
-    /// already unboxed).
+    /// IgnoreChosen(1) }`. `query` must be a `FlipCoin`/`RollDice` kind only,
+    /// never the planar die ([CR#901.9d]); Rust holds no compile-time gate for
+    /// that, so a semantic-input error that reaches for `ReplaceRoll` over a
+    /// non-randomness query is an authoring invariant no checker enforces any
+    /// more. Held unboxed like its `TriggerMultiplier` sibling (same
+    /// `EventFilter` + `Count` shape, already unboxed).
     ReplaceRoll {
         query: EventFilter,
         extra: Count,
@@ -492,13 +481,12 @@ pub enum OutcomeGateKind {
 }
 
 /// Which flip(s)/roll(s) a [`StaticEffect::ReplaceRoll`] discards, once the
-/// extras have been rolled ([CR#706.6]: "if a player is instructed to
-/// ignore a roll ... the player chooses one of those rolls to be ignored"
-/// when multiple tie for lowest). `IgnoreLowest` = an automatic
-/// ignore-the-lower-result rule; `IgnoreChosen(n)` = the player picks which
-/// `n` of the extras to discard (Krark's Thumb's own "ignore one" —
-/// [CR#706.6] settles this as the flipper's choice, not a forced-lowest
-/// rule). Mirrors Idris `IgnoreRule = IgnoreLowest | IgnoreChosen Nat`.
+/// extras have been rolled ([CR#706.6]: "if a player is instructed to ignore a
+/// roll ... the player chooses one of those rolls to be ignored" when multiple
+/// tie for lowest). `IgnoreLowest` = an automatic ignore-the-lower-result rule;
+/// `IgnoreChosen(n)` = the player picks which `n` of the extras to discard
+/// (Krark's Thumb's own "ignore one" — [CR#706.6] settles this as the flipper's
+/// choice, not a forced-lowest rule).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Expand, Serialize)]
 pub enum IgnoreRule {
     IgnoreLowest,
@@ -509,10 +497,9 @@ pub enum IgnoreRule {
 /// alternative may pay ([CR#601.2g]). `Generic` matches a generic pip (delve /
 /// improvise / convoke's generic clause); `Colored` a colored pip of the named
 /// color (convoke's per-color clause — "an untapped creature of that color",
-/// [CR#702.51a]). Spelled `Colored(Color)` rather than the Idris `ColorPip`'s
-/// implicit color-match: the color is named here, and a convoke keyword expands
-/// to one variant per color so the tapped creature's color is enforced
-/// structurally.
+/// [CR#702.51a]). Spelled `Colored(Color)` so the color is named here, and a
+/// convoke keyword expands to one variant per color so the tapped creature's
+/// color is enforced structurally.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Expand, Serialize)]
 pub enum PipClass {
     /// A generic pip ({1}) — delve, improvise, convoke's generic clause.

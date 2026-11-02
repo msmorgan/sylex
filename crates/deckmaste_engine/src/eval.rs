@@ -75,11 +75,10 @@ use crate::player::PlayerId;
 use crate::stack::ExecutionFrame;
 use crate::state::GameState;
 
-/// The consumer position a pattern is evaluated in. Per-atom lane admission
-/// is a soundness property of the Idris model (an ill-placed atom is
-/// unrepresentable there), not a load-time check; the lane here selects only
-/// the residual semantic differences the evaluator itself owns — today, how
-/// [`EventFilter::Nth`] counts the current occurrence.
+/// The consumer position a pattern is evaluated in. Per-atom lane admission is
+/// an authoring invariant no checker enforces any more, not a load-time check;
+/// the lane here selects only the residual semantic differences the evaluator
+/// itself owns — today, how [`EventFilter::Nth`] counts the current occurrence.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Lane {
     /// `Triggered.event` — a live fact scanned in its own wake ([CR#603.2]);
@@ -796,13 +795,13 @@ impl GameState {
     /// fact record `fact`, evaluated in `lane` with `bindings`?
     ///
     /// Master forms map onto [`FactKind`]s; verb-view forms (`Played`) match
-    /// through their emitted entailment row; object-valued atoms evaluate
-    /// their embedded `Predicate` against the participant's [`Part`] candidate
-    /// view (live object, player proxy, or LKI snapshot) — snapshot
-    /// semantics are a participant value, not a second matcher. Coordinates
-    /// the fact record cannot supply (`TokenCreated:what` pre-mint specs,
-    /// `BecomesTarget:source`) read `false` — each is unrepresentable in the
-    /// Idris model, so no card carries one and `false` is a defensive floor.
+    /// through their emitted entailment row; object-valued atoms evaluate their
+    /// embedded `Predicate` against the participant's [`Part`] candidate view
+    /// (live object, player proxy, or LKI snapshot) — snapshot semantics are a
+    /// participant value, not a second matcher. Coordinates the fact record
+    /// cannot supply (`TokenCreated:what` pre-mint specs,
+    /// `BecomesTarget:source`) read `false` — each is an ill-formed authoring
+    /// shape, so no card should carry one and `false` is a defensive floor.
     #[expect(
         clippy::too_many_lines,
         reason = "one arm per EventFilter node — the grammar's full surface in one dispatch"
@@ -916,11 +915,11 @@ impl GameState {
             } => {
                 let name_ok = fact.kind == FactKind::Act
                     && fact.act_name.as_deref().map(Ident::as_str) == Some(verb.as_str());
-                // ONE uniform mapping ([CR#701]; the Idris emitter's
-                // Actor/Agent facets): `who` narrows the performing player,
-                // `on` the object subject(s) — ∃ over the fact's subject
-                // set, so a symmetric verb (Fight, [CR#701.14a]) matches on
-                // EITHER combatant; an empty set ≙ no subject (only `Any`).
+                // ONE uniform mapping ([CR#701]): `who` narrows the performing
+                // player, `on` the object subject(s) — ∃ over the fact's
+                // subject set, so a symmetric verb (Fight, [CR#701.14a])
+                // matches on EITHER combatant; an empty set ≙ no subject (only
+                // `Any`).
                 let coords_ok = self.actor_matches(who, fact.actor, bindings)
                     && self.subjects_match(on, &fact.subjects, bindings);
                 let cause_ok = cause
@@ -1141,12 +1140,12 @@ impl GameState {
                     && self.subjects_match(what, &fact.subjects, bindings)
             }
 
-            // [CR#608.2i,400.7]: object-scoped identity — `of` resolves
-            // through the frame when the consumer holds one, else through
-            // the watcher's live object (the self-scoped `This`). A bound
-            // non-`This` reference outside any frame is unrepresentable in
-            // the Idris model (the binder is required; frameless lanes stay
-            // `This`).
+            // [CR#608.2i,400.7]: object-scoped identity — `of` resolves through
+            // the frame when the consumer holds one, else through the watcher's
+            // live object (the self-scoped `This`). A bound non-`This`
+            // reference outside any frame is ill-formed, an authoring invariant
+            // no checker enforces any more (the binder is required; frameless
+            // lanes stay `This`).
             EventFilter::Used { of } => {
                 if fact.kind != FactKind::Used {
                     return false;
@@ -1252,10 +1251,10 @@ impl GameState {
                 }
             }
 
-            // [CR#608.2i]: the history window refinement — the fact's
-            // recorded turn against the lookback (a live fact's time is the
-            // current turn; live lanes REFUSE `Within` as vacuous — a
-            // soundness property of the Idris model).
+            // [CR#608.2i]: the history window refinement — the fact's recorded
+            // turn against the lookback (a live fact's time is the current
+            // turn; live lanes REFUSE `Within` as vacuous — an authoring
+            // invariant no checker enforces any more).
             EventFilter::Within(inner, within) => {
                 let controller = bindings
                     .frame

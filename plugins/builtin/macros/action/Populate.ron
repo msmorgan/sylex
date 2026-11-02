@@ -12,11 +12,8 @@
 // A `With` one-binder (`ChooseOne`) binds its pick as `Reference::That` (the
 // engine's `resolve/effect.rs` sets only `anaphora.that`, never `it`, for a
 // `With`; `It` would fizzle unbound here). The copy source therefore reads
-// `Object(That(Token))`: the `That` SORT must match what the Idris re-emit gate
-// derives for this filter — `filterSort` pins `Kind(Token)` to the `Token` sort
-// on the battlefield (`Core.idr`), and `compat` accepts `That(Token)` but NOT
-// `That(Creature)` against it (the sort is verified only by Idris; the engine
-// ignores it at runtime). An `OneShotEffect`-kind macro, so `Populate` stands as
+// `Object(That(Token))`: the `That` SORT is the filter's `Token` sort, not
+// `Creature` (the engine ignores the sort at runtime). An `OneShotEffect`-kind macro, so `Populate` stands as
 // the effect body of any shell (a spell, an ETB, an activated ability), plus
 // `KeywordAction` so it's recognized as one ([CR#701]).
 (

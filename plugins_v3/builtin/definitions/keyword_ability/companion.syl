@@ -2,7 +2,8 @@
 # the stack is empty during a main phase of your turn, you may pay {3} and put this card from
 # outside the game into your hand, a special action [CR#116.2g]. Revealing it before the game, if
 # your starting deck fulfils the condition, is a start-of-game rule [CR#103.2b]
-# (`lean-v3-companion-pregame-rule`).
+# (`lean-v3-companion-pregame-rule`). The starting deck the condition reads is the deck after any
+# sideboard cards are set aside [CR#702.139b].
 ability companion(condition: DeckCondition) {
   lexical = {lemma = "companion", parameters = [[DashCondition]]},
   spelling = "companion — <condition>",
