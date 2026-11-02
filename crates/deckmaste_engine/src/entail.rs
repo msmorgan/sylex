@@ -1,5 +1,5 @@
 //! The emitted cause-verb ENTAILMENT table ([CR#701] keyword actions),
-//! computed from the Idris model (`EmitTables.idr`): each closed
+//! rendered by `cargo xtask entailments emit`: each closed
 //! [`deckmaste_core::VerbName`]'s fact form — its master-form kind and the
 //! zone coordinates it fixes. `Sacrifice` entails a Battlefield→Graveyard
 //! `ZoneChange` [CR#701.21a], so "dies" matches a sacrifice STRUCTURALLY
@@ -8,9 +8,9 @@
 //! their fact shape from a row here instead of hardcoding it.
 //!
 //! One source of truth: `crates/deckmaste_plugin/tables/entailments.ron` is
-//! emitted by `idris/src/EmitTables.idr` and `include_str!`-shared — the
-//! Idris model (which computes these rows) and the engine's matching can
-//! never disagree on a verb's fact form.
+//! emitted by `crates/xtask/src/entailments.rs` and `include_str!`-shared — the
+//! emitter's rows and the engine's matching can never disagree on a verb's
+//! fact form (CI runs `cargo xtask entailments check`).
 
 use std::collections::HashMap;
 use std::sync::LazyLock;

@@ -28,11 +28,8 @@ self-checking regression suite — every `failing "<message>"` block must fail
 WITH its pinned message (the same soundness invariants the `cargo xtask
 idris-check` re-emit gate enforces on the Rust corpus); `Cards.idr` is the
 worked corpus. Exit 0 means the whole model — including every card term —
-typechecks. (`./scripts/build` wraps this command; `./scripts/emit-tables`
-regenerates `crates/deckmaste_plugin/tables/entailments.ron`, the one table the
-Rust engine still loads independently — `deckmaste_engine::entail`; the twelve
-other tables the old elaborator consumed, and the per-card resolution
-fixtures, were deleted with it.)
+typechecks. (`./scripts/build` wraps this command. `entailments.ron`, the one table the
+Rust engine loads independently, is emitted by `cargo xtask entailments emit`.)
 
 ## The `Experimental.*` workbench
 

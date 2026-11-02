@@ -12,6 +12,7 @@ use xtask::cite::CiteArgs;
 use xtask::derive_cards::DeriveCardsArgs;
 use xtask::dsl::DslArgs;
 use xtask::english::EnglishArgs;
+use xtask::entailments::EntailmentsArgs;
 use xtask::extract::ExtractArgs;
 use xtask::fidelity::FidelityArgs;
 use xtask::generate::GenerateArgs;
@@ -64,6 +65,8 @@ enum Cmd {
     Cite(CiteArgs),
     /// Stratify the corpus and run the English census.
     English(EnglishArgs),
+    /// Emit or check the engine's cause-verb entailment table (`entailments.ron`).
+    Entailments(EntailmentsArgs),
     /// Analyze supported raw Oracle text against the independent lexicon.
     Lexical(LexicalArgs),
     /// The anaphora-soundness gate: re-emit each expanded card as a raw
@@ -100,6 +103,7 @@ fn main() -> anyhow::Result<()> {
             let mut stdout = std::io::stdout().lock();
             xtask::english::run(&args, &mut stdout)
         }
+        Cmd::Entailments(args) => xtask::entailments::run(&args),
         Cmd::Lexical(args) => {
             let mut stdout = std::io::stdout().lock();
             xtask::lexical::run(&args, &mut stdout)

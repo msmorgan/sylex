@@ -1038,7 +1038,7 @@ sortFromPins (MkPins k z t) =
 -- ([CR#400.7e] — a moved object's noun follows the zone it moved to; a
 -- sacrificed/destroyed/discarded object went to a graveyard, an exiled one
 -- to exile — the entailment rows). The `object_sort` column this once drove
--- was deleted from EmitTables; kept as model documentation of each row's noun.
+-- was deleted from the table emitter; kept as model documentation of each row's noun.
 public export
 eventKindObjectSort : EventKind -> Sort
 eventKindObjectSort Sacrifice = Card                       -- [CR#701.21a] battlefield -> graveyard

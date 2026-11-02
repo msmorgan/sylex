@@ -1254,7 +1254,7 @@ fn no_dead_grammar_nodes() {
 /// The cause-verb typo gate: with
 /// the closed `CauseVerb` enum retired into the bareword [`VerbName`] newtype,
 /// the type no longer rejects an unknown verb (any bareword parses) — so this
-/// gate does, by MEMBERSHIP against the closed vocabulary the Idris model emits
+/// gate does, by MEMBERSHIP against the closed vocabulary the entailments emitter renders
 /// (`crates/deckmaste_plugin/tables/entailments.ron`). Every `Cause(verb: X)`
 /// spelled anywhere in the corpus must name a verb the entailment table
 /// carries; a typo (`Desroy`) or an out-of-vocab verb fails here, recovering

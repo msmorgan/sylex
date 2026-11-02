@@ -48,6 +48,5 @@ modules = Semantics
         , Experimental.Proofs.Turn
         , Experimental.Proofs.Faces
         , Experimental.Proofs.Piles
-        , EmitTables
 
 sourcedir = "src"

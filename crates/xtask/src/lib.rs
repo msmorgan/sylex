@@ -18,6 +18,7 @@ pub mod derive_cards;
 pub mod dsl;
 pub mod dsl_fmt;
 pub mod english;
+pub mod entailments;
 pub mod extract;
 pub mod fidelity;
 pub mod generate;

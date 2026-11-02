@@ -140,6 +140,8 @@ jobs:
         run: |
           cargo xtask cite check
           cargo xtask cite check --list-noncompliant
+      - name: entailments table drift
+        run: cargo xtask entailments check
 
   lean:
     name: Lean workbench
@@ -221,8 +223,3 @@ jobs:
         run: ./scripts/build
       - name: check canon Idris baseline
         run: cargo xtask idris-check plugins/canon
-      - name: regenerate entailments and reject drift
-        run: |
-          cp crates/deckmaste_plugin/tables/entailments.ron "$RUNNER_TEMP/entailments.ron"
-          idris/scripts/emit-tables
-          diff -u "$RUNNER_TEMP/entailments.ron" crates/deckmaste_plugin/tables/entailments.ron

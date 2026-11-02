@@ -48,6 +48,5 @@ modules = Semantics
         , Experimental.Cards.Copy
         , Experimental.Cards.Piles
         , Experimental.Unspellable
-        , EmitTables
 
 sourcedir = "src"
