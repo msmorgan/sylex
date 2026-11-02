@@ -3,5 +3,4 @@ subtype chimera {
   spelling = "Chimera",
   kind = creature,
   name = "Chimera",
-  confers = []
 }

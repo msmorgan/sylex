@@ -4,5 +4,4 @@ subtype forest {
   spelling = "Forest",
   kind = land,
   name = "Forest",
-  confers = []
 }

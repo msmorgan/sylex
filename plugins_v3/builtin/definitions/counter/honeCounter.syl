@@ -3,6 +3,4 @@
 counter honeCounter {
   lexical = {lemma = "hone counter"},
   spelling = "hone counter",
-
-  confers = []
 }

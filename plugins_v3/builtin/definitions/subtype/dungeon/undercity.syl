@@ -5,5 +5,4 @@ subtype undercity {
   spelling = "Undercity",
   kind = dungeon,
   name = "Undercity",
-  confers = []
 }

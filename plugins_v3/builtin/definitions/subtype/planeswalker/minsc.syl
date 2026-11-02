@@ -4,5 +4,4 @@ subtype minsc {
   spelling = "Minsc",
   kind = planeswalker,
   name = "Minsc",
-  confers = []
 }

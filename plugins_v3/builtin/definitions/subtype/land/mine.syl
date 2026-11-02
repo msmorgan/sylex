@@ -4,5 +4,4 @@ subtype mine {
   spelling = "Mine",
   kind = land,
   name = "Mine",
-  confers = []
 }

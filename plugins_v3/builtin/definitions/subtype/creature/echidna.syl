@@ -3,5 +3,4 @@ subtype echidna {
   spelling = "Echidna",
   kind = creature,
   name = "Echidna",
-  confers = []
 }

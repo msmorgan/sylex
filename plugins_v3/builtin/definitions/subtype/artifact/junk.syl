@@ -6,5 +6,4 @@ subtype junk {
   spelling = "Junk",
   kind = artifact,
   name = "Junk",
-  confers = []
 }

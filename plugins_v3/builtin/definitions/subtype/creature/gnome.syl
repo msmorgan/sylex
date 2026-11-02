@@ -3,5 +3,4 @@ subtype gnome {
   spelling = "Gnome",
   kind = creature,
   name = "Gnome",
-  confers = []
 }

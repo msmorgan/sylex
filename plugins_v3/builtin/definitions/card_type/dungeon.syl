@@ -6,6 +6,4 @@ card_type dungeon {
   lexical = {lemma = "dungeon"},
   spelling = "dungeon",
   name = "Dungeon",
-
-  confers = []
 }

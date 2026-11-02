@@ -4,6 +4,4 @@ designation night {
     nouns = [{lemma = "day", countability = [Mass]}, {lemma = "night", countability = [Mass]}]},
   spelling = "night",
   scope = heldByGame,
-
-  confers = []
 }

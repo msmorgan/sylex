@@ -3,5 +3,4 @@ subtype beholder {
   spelling = "Beholder",
   kind = creature,
   name = "Beholder",
-  confers = []
 }

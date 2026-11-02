@@ -3,6 +3,4 @@
 counter reachCounter {
   lexical = {lemma = "reach counter"},
   spelling = "reach counter",
-
-  confers = []
 }

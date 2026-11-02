@@ -7,5 +7,4 @@ subtype heartwood {
   spelling = "Heartwood",
   kind = artifact,
   name = "Heartwood",
-  confers = []
 }

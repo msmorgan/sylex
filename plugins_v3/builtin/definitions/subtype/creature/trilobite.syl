@@ -3,5 +3,4 @@ subtype trilobite {
   spelling = "Trilobite",
   kind = creature,
   name = "Trilobite",
-  confers = []
 }

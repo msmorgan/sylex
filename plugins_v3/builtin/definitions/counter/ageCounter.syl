@@ -3,6 +3,4 @@
 counter ageCounter {
   lexical = {lemma = "age counter"},
   spelling = "age counter",
-
-  confers = []
 }

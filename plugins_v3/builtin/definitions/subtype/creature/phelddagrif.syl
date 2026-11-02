@@ -3,5 +3,4 @@ subtype phelddagrif {
   spelling = "Phelddagrif",
   kind = creature,
   name = "Phelddagrif",
-  confers = []
 }

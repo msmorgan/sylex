@@ -6,5 +6,4 @@ subtype role {
   spelling = "Role",
   kind = enchantment,
   name = "Role",
-  confers = []
 }

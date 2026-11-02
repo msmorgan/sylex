@@ -3,5 +3,4 @@ subtype flagbearer {
   spelling = "Flagbearer",
   kind = creature,
   name = "Flagbearer",
-  confers = []
 }

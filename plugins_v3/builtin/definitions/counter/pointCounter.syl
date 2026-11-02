@@ -1,6 +1,4 @@
 counter pointCounter {
   lexical = {lemma = "point counter"},
   spelling = "point counter",
-
-  confers = []
 }

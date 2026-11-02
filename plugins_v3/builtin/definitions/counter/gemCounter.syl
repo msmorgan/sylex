@@ -1,6 +1,4 @@
 counter gemCounter {
   lexical = {lemma = "gem counter"},
   spelling = "gem counter",
-
-  confers = []
 }

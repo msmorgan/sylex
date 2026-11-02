@@ -4,5 +4,4 @@ subtype lair {
   spelling = "Lair",
   kind = land,
   name = "Lair",
-  confers = []
 }

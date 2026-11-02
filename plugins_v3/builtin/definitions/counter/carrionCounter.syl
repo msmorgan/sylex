@@ -1,6 +1,4 @@
 counter carrionCounter {
   lexical = {lemma = "carrion counter"},
   spelling = "carrion counter",
-
-  confers = []
 }

@@ -4,5 +4,4 @@ subtype ctan {
   spelling = "C'tan",
   kind = creature,
   name = "C'tan",
-  confers = []
 }

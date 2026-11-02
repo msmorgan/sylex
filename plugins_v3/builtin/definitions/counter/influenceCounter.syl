@@ -1,6 +1,4 @@
 counter influenceCounter {
   lexical = {lemma = "influence counter"},
   spelling = "influence counter",
-
-  confers = []
 }

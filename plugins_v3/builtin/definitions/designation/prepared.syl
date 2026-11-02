@@ -3,6 +3,4 @@ designation prepared {
   lexical = {adjectives = ["prepared", "unprepared"]},
   spelling = "prepared",
   scope = heldBy(object),
-
-  confers = []
 }

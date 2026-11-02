@@ -4,5 +4,4 @@ subtype ugin {
   spelling = "Ugin",
   kind = planeswalker,
   name = "Ugin",
-  confers = []
 }

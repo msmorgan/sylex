@@ -4,5 +4,4 @@ subtype arcane {
   spelling = "Arcane",
   kind = spell,
   name = "Arcane",
-  confers = []
 }

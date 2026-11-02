@@ -5,5 +5,4 @@ subtype gargoyle {
   spelling = "Gargoyle",
   kind = creature,
   name = "Gargoyle",
-  confers = []
 }

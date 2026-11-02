@@ -3,5 +3,4 @@ subtype licid {
   spelling = "Licid",
   kind = creature,
   name = "Licid",
-  confers = []
 }

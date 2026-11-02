@@ -7,5 +7,4 @@ subtype mutagen {
   spelling = "Mutagen",
   kind = artifact,
   name = "Mutagen",
-  confers = []
 }

@@ -3,5 +3,4 @@ subtype assemblyWorker {
   spelling = "Assembly-Worker",
   kind = creature,
   name = "Assembly-Worker",
-  confers = []
 }

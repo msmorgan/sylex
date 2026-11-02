@@ -4,5 +4,4 @@ subtype dihada {
   spelling = "Dihada",
   kind = planeswalker,
   name = "Dihada",
-  confers = []
 }

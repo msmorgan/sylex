@@ -3,5 +3,4 @@ subtype necron {
   spelling = "Necron",
   kind = creature,
   name = "Necron",
-  confers = []
 }

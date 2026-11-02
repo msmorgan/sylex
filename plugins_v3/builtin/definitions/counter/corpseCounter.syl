@@ -1,6 +1,4 @@
 counter corpseCounter {
   lexical = {lemma = "corpse counter"},
   spelling = "corpse counter",
-
-  confers = []
 }

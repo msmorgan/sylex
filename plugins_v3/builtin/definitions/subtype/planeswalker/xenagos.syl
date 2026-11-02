@@ -4,5 +4,4 @@ subtype xenagos {
   spelling = "Xenagos",
   kind = planeswalker,
   name = "Xenagos",
-  confers = []
 }

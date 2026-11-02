@@ -1,6 +1,4 @@
 counter furyCounter {
   lexical = {lemma = "fury counter"},
   spelling = "fury counter",
-
-  confers = []
 }

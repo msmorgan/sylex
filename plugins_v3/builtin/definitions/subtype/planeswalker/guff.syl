@@ -4,5 +4,4 @@ subtype guff {
   spelling = "Guff",
   kind = planeswalker,
   name = "Guff",
-  confers = []
 }

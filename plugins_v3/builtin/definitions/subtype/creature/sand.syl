@@ -3,5 +3,4 @@ subtype sand {
   spelling = "Sand",
   kind = creature,
   name = "Sand",
-  confers = []
 }

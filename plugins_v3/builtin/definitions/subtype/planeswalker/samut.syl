@@ -4,5 +4,4 @@ subtype samut {
   spelling = "Samut",
   kind = planeswalker,
   name = "Samut",
-  confers = []
 }

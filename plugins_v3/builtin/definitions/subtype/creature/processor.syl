@@ -3,5 +3,4 @@ subtype processor {
   spelling = "Processor",
   kind = creature,
   name = "Processor",
-  confers = []
 }

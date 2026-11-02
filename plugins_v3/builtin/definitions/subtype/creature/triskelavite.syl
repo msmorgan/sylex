@@ -3,5 +3,4 @@ subtype triskelavite {
   spelling = "Triskelavite",
   kind = creature,
   name = "Triskelavite",
-  confers = []
 }

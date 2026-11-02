@@ -3,5 +3,4 @@ subtype mount {
   spelling = "Mount",
   kind = creature,
   name = "Mount",
-  confers = []
 }

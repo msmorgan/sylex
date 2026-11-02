@@ -1,6 +1,4 @@
 counter magnetCounter {
   lexical = {lemma = "magnet counter"},
   spelling = "magnet counter",
-
-  confers = []
 }

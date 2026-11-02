@@ -4,5 +4,4 @@ subtype tamiyo {
   spelling = "Tamiyo",
   kind = planeswalker,
   name = "Tamiyo",
-  confers = []
 }

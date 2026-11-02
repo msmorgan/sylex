@@ -4,6 +4,4 @@
 counter loreCounter {
   lexical = {lemma = "lore counter"},
   spelling = "lore counter",
-
-  confers = []
 }

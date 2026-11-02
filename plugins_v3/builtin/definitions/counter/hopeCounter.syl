@@ -1,6 +1,4 @@
 counter hopeCounter {
   lexical = {lemma = "hope counter"},
   spelling = "hope counter",
-
-  confers = []
 }

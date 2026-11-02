@@ -4,5 +4,4 @@ subtype trap {
   spelling = "Trap",
   kind = spell,
   name = "Trap",
-  confers = []
 }

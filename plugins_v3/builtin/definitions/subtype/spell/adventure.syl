@@ -8,5 +8,4 @@ subtype adventure {
   spelling = "Adventure",
   kind = spell,
   name = "Adventure",
-  confers = []
 }

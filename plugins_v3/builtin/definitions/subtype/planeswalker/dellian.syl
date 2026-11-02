@@ -4,5 +4,4 @@ subtype dellian {
   spelling = "Dellian",
   kind = planeswalker,
   name = "Dellian",
-  confers = []
 }

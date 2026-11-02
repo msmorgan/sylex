@@ -8,5 +8,4 @@ subtype class {
   spelling = "Class",
   kind = enchantment,
   name = "Class",
-  confers = []
 }

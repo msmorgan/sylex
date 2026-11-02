@@ -3,5 +3,4 @@ subtype shrine {
   spelling = "Shrine",
   kind = enchantment,
   name = "Shrine",
-  confers = []
 }

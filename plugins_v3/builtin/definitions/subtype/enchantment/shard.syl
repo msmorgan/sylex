@@ -5,5 +5,4 @@ subtype shard {
   spelling = "Shard",
   kind = enchantment,
   name = "Shard",
-  confers = []
 }

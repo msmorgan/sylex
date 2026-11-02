@@ -4,5 +4,4 @@ subtype quintorius {
   spelling = "Quintorius",
   kind = planeswalker,
   name = "Quintorius",
-  confers = []
 }

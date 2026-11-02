@@ -3,5 +3,4 @@ subtype utrom {
   spelling = "Utrom",
   kind = creature,
   name = "Utrom",
-  confers = []
 }

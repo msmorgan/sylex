@@ -4,5 +4,4 @@ subtype book {
   spelling = "Book",
   kind = artifact,
   name = "Book",
-  confers = []
 }

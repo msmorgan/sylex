@@ -4,5 +4,4 @@ subtype rune {
   spelling = "Rune",
   kind = enchantment,
   name = "Rune",
-  confers = []
 }

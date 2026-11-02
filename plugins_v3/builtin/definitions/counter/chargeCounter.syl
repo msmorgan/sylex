@@ -3,6 +3,4 @@
 counter chargeCounter {
   lexical = {lemma = "charge counter"},
   spelling = "charge counter",
-
-  confers = []
 }

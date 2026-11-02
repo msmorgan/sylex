@@ -4,5 +4,4 @@ subtype cartouche {
   spelling = "Cartouche",
   kind = enchantment,
   name = "Cartouche",
-  confers = []
 }

@@ -3,6 +3,4 @@
 counter menaceCounter {
   lexical = {lemma = "menace counter"},
   spelling = "menace counter",
-
-  confers = []
 }

@@ -1,6 +1,4 @@
 counter acornCounter {
   lexical = {lemma = "acorn counter"},
   spelling = "acorn counter",
-
-  confers = []
 }

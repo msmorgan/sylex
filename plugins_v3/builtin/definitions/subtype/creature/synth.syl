@@ -3,5 +3,4 @@ subtype synth {
   spelling = "Synth",
   kind = creature,
   name = "Synth",
-  confers = []
 }

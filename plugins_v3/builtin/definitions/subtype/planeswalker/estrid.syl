@@ -4,5 +4,4 @@ subtype estrid {
   spelling = "Estrid",
   kind = planeswalker,
   name = "Estrid",
-  confers = []
 }

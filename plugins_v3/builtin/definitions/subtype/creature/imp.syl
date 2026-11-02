@@ -3,5 +3,4 @@ subtype imp {
   spelling = "Imp",
   kind = creature,
   name = "Imp",
-  confers = []
 }

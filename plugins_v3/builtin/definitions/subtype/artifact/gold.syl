@@ -6,5 +6,4 @@ subtype gold {
   spelling = "Gold",
   kind = artifact,
   name = "Gold",
-  confers = []
 }

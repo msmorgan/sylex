@@ -3,6 +3,4 @@
 counter exaltedCounter {
   lexical = {lemma = "exalted counter"},
   spelling = "exalted counter",
-
-  confers = []
 }

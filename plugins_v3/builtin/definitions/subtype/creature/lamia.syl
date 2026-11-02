@@ -3,5 +3,4 @@ subtype lamia {
   spelling = "Lamia",
   kind = creature,
   name = "Lamia",
-  confers = []
 }

@@ -4,5 +4,4 @@ subtype yanggu {
   spelling = "Yanggu",
   kind = planeswalker,
   name = "Yanggu",
-  confers = []
 }

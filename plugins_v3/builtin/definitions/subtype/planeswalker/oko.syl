@@ -4,5 +4,4 @@ subtype oko {
   spelling = "Oko",
   kind = planeswalker,
   name = "Oko",
-  confers = []
 }

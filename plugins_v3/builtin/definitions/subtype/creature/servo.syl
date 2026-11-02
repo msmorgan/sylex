@@ -3,5 +3,4 @@ subtype servo {
   spelling = "Servo",
   kind = creature,
   name = "Servo",
-  confers = []
 }

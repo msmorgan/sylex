@@ -5,6 +5,4 @@ designation plotted {
   lexical = {adjectives = ["plotted"]},
   spelling = "plotted",
   scope = heldBy(object),
-
-  confers = []
 }

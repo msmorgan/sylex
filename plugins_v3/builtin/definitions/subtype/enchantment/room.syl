@@ -4,5 +4,4 @@ subtype room {
   spelling = "Room",
   kind = enchantment,
   name = "Room",
-  confers = []
 }

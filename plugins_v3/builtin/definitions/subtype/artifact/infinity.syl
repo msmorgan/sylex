@@ -4,5 +4,4 @@ subtype infinity {
   spelling = "Infinity",
   kind = artifact,
   name = "Infinity",
-  confers = []
 }

@@ -5,5 +5,4 @@ subtype spacecraft {
   spelling = "Spacecraft",
   kind = artifact,
   name = "Spacecraft",
-  confers = []
 }

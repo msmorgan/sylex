@@ -3,5 +3,4 @@ subtype shapeshifter {
   spelling = "Shapeshifter",
   kind = creature,
   name = "Shapeshifter",
-  confers = []
 }

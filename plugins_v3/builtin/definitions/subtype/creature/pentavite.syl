@@ -3,5 +3,4 @@ subtype pentavite {
   spelling = "Pentavite",
   kind = creature,
   name = "Pentavite",
-  confers = []
 }

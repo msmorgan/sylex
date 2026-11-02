@@ -5,5 +5,4 @@ subtype treasure {
   spelling = "Treasure",
   kind = artifact,
   name = "Treasure",
-  confers = []
 }

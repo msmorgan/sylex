@@ -4,5 +4,4 @@ subtype urzas {
   spelling = "Urza's",
   kind = land,
   name = "Urza's",
-  confers = []
 }

@@ -5,5 +5,4 @@ subtype contraption {
   spelling = "Contraption",
   kind = artifact,
   name = "Contraption",
-  confers = []
 }

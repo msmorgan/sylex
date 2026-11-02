@@ -7,5 +7,4 @@ subtype background {
   spelling = "Background",
   kind = enchantment,
   name = "Background",
-  confers = []
 }

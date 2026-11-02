@@ -3,5 +3,4 @@ subtype carrier {
   spelling = "Carrier",
   kind = creature,
   name = "Carrier",
-  confers = []
 }

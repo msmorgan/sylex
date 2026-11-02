@@ -1,6 +1,4 @@
 counter matrixCounter {
   lexical = {lemma = "matrix counter"},
   spelling = "matrix counter",
-
-  confers = []
 }

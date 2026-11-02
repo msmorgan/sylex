@@ -7,5 +7,4 @@ subtype vibranium {
   spelling = "Vibranium",
   kind = artifact,
   name = "Vibranium",
-  confers = []
 }

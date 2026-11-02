@@ -3,5 +3,4 @@ subtype eternal {
   spelling = "Eternal",
   kind = creature,
   name = "Eternal",
-  confers = []
 }

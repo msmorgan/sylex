@@ -3,5 +3,4 @@ subtype badger {
   spelling = "Badger",
   kind = creature,
   name = "Badger",
-  confers = []
 }

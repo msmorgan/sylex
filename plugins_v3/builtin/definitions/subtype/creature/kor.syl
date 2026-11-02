@@ -3,5 +3,4 @@ subtype kor {
   spelling = "Kor",
   kind = creature,
   name = "Kor",
-  confers = []
 }

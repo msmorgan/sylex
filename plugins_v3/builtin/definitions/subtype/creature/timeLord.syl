@@ -5,5 +5,4 @@ subtype timeLord {
   spelling = "Time Lord",
   kind = creature,
   name = "Time Lord",
-  confers = []
 }

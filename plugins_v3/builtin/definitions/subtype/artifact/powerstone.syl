@@ -7,5 +7,4 @@ subtype powerstone {
   spelling = "Powerstone",
   kind = artifact,
   name = "Powerstone",
-  confers = []
 }

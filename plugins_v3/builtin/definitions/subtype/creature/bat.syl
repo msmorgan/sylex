@@ -3,5 +3,4 @@ subtype bat {
   spelling = "Bat",
   kind = creature,
   name = "Bat",
-  confers = []
 }

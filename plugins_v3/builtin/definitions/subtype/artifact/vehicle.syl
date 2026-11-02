@@ -5,5 +5,4 @@ subtype vehicle {
   spelling = "Vehicle",
   kind = artifact,
   name = "Vehicle",
-  confers = []
 }

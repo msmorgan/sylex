@@ -1,6 +1,4 @@
 counter collectionCounter {
   lexical = {lemma = "collection counter"},
   spelling = "collection counter",
-
-  confers = []
 }

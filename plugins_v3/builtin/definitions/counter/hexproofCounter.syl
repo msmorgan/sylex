@@ -3,6 +3,4 @@
 counter hexproofCounter {
   lexical = {lemma = "hexproof counter"},
   spelling = "hexproof counter",
-
-  confers = []
 }

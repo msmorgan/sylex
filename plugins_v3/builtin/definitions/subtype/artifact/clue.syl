@@ -4,5 +4,4 @@ subtype clue {
   spelling = "Clue",
   kind = artifact,
   name = "Clue",
-  confers = []
 }

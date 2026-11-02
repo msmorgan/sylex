@@ -4,5 +4,4 @@ subtype grist {
   spelling = "Grist",
   kind = planeswalker,
   name = "Grist",
-  confers = []
 }

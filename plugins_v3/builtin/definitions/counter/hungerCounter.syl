@@ -1,6 +1,4 @@
 counter hungerCounter {
   lexical = {lemma = "hunger counter"},
   spelling = "hunger counter",
-
-  confers = []
 }

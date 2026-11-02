@@ -7,5 +7,4 @@ subtype omen {
   spelling = "Omen",
   kind = spell,
   name = "Omen",
-  confers = []
 }

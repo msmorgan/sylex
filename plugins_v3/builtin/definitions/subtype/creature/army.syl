@@ -5,5 +5,4 @@ subtype army {
   spelling = "Army",
   kind = creature,
   name = "Army",
-  confers = []
 }

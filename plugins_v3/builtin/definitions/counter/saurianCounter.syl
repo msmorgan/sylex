@@ -1,6 +1,4 @@
 counter saurianCounter {
   lexical = {lemma = "saurian counter"},
   spelling = "saurian counter",
-
-  confers = []
 }

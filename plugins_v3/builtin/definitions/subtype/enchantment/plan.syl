@@ -4,5 +4,4 @@ subtype plan {
   spelling = "Plan",
   kind = enchantment,
   name = "Plan",
-  confers = []
 }

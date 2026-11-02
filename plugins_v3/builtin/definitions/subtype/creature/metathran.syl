@@ -3,5 +3,4 @@ subtype metathran {
   spelling = "Metathran",
   kind = creature,
   name = "Metathran",
-  confers = []
 }

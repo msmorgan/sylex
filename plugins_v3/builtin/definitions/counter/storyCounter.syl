@@ -1,6 +1,4 @@
 counter storyCounter {
   lexical = {lemma = "story counter"},
   spelling = "story counter",
-
-  confers = []
 }

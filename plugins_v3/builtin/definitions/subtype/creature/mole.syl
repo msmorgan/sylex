@@ -3,5 +3,4 @@ subtype mole {
   spelling = "Mole",
   kind = creature,
   name = "Mole",
-  confers = []
 }

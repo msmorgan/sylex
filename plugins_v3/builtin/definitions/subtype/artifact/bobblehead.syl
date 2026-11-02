@@ -3,5 +3,4 @@ subtype bobblehead {
   spelling = "Bobblehead",
   kind = artifact,
   name = "Bobblehead",
-  confers = []
 }

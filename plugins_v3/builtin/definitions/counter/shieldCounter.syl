@@ -4,6 +4,4 @@
 counter shieldCounter {
   lexical = {lemma = "shield counter"},
   spelling = "shield counter",
-
-  confers = []
 }

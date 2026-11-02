@@ -3,5 +3,4 @@ subtype nephilim {
   spelling = "Nephilim",
   kind = creature,
   name = "Nephilim",
-  confers = []
 }

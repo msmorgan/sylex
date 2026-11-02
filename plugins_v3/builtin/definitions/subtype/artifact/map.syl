@@ -6,5 +6,4 @@ subtype map {
   spelling = "Map",
   kind = artifact,
   name = "Map",
-  confers = []
 }

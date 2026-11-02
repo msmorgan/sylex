@@ -1,6 +1,4 @@
 counter nestCounter {
   lexical = {lemma = "nest counter"},
   spelling = "nest counter",
-
-  confers = []
 }

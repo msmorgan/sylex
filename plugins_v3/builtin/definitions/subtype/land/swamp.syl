@@ -4,5 +4,4 @@ subtype swamp {
   spelling = "Swamp",
   kind = land,
   name = "Swamp",
-  confers = []
 }

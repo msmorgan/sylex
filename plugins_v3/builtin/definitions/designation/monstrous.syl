@@ -3,6 +3,4 @@ designation monstrous {
   lexical = {adjectives = ["monstrous"]},
   spelling = "monstrous",
   scope = heldBy(object),
-
-  confers = []
 }

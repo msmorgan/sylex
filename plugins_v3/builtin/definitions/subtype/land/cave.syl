@@ -3,5 +3,4 @@ subtype cave {
   spelling = "Cave",
   kind = land,
   name = "Cave",
-  confers = []
 }

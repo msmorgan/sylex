@@ -4,5 +4,4 @@ subtype dovin {
   spelling = "Dovin",
   kind = planeswalker,
   name = "Dovin",
-  confers = []
 }

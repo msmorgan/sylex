@@ -4,5 +4,4 @@ subtype kaya {
   spelling = "Kaya",
   kind = planeswalker,
   name = "Kaya",
-  confers = []
 }

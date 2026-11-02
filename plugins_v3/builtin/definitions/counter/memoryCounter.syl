@@ -1,6 +1,4 @@
 counter memoryCounter {
   lexical = {lemma = "memory counter"},
   spelling = "memory counter",
-
-  confers = []
 }

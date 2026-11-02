@@ -3,6 +3,4 @@ designation harnessed {
   lexical = {adjectives = ["harnessed"]},
   spelling = "harnessed",
   scope = heldBy(object),
-
-  confers = []
 }

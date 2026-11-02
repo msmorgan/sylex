@@ -1,6 +1,4 @@
 counter aegisCounter {
   lexical = {lemma = "aegis counter"},
   spelling = "aegis counter",
-
-  confers = []
 }

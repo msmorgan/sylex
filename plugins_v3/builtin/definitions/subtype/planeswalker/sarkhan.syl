@@ -4,5 +4,4 @@ subtype sarkhan {
   spelling = "Sarkhan",
   kind = planeswalker,
   name = "Sarkhan",
-  confers = []
 }

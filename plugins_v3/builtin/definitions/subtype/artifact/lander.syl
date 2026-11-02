@@ -7,5 +7,4 @@ subtype lander {
   spelling = "Lander",
   kind = artifact,
   name = "Lander",
-  confers = []
 }

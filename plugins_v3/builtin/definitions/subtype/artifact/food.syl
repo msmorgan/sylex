@@ -4,5 +4,4 @@ subtype food {
   spelling = "Food",
   kind = artifact,
   name = "Food",
-  confers = []
 }

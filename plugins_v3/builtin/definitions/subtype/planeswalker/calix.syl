@@ -4,5 +4,4 @@ subtype calix {
   spelling = "Calix",
   kind = planeswalker,
   name = "Calix",
-  confers = []
 }

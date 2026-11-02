@@ -3,5 +3,4 @@ subtype merfolk {
   spelling = "Merfolk",
   kind = creature,
   name = "Merfolk",
-  confers = []
 }

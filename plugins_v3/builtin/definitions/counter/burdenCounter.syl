@@ -1,6 +1,4 @@
 counter burdenCounter {
   lexical = {lemma = "burden counter"},
   spelling = "burden counter",
-
-  confers = []
 }

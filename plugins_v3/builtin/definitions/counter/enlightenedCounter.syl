@@ -1,6 +1,4 @@
 counter enlightenedCounter {
   lexical = {lemma = "enlightened counter"},
   spelling = "enlightened counter",
-
-  confers = []
 }

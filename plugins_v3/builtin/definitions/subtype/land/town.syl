@@ -3,5 +3,4 @@ subtype town {
   spelling = "Town",
   kind = land,
   name = "Town",
-  confers = []
 }

@@ -3,5 +3,4 @@ subtype gate {
   spelling = "Gate",
   kind = land,
   name = "Gate",
-  confers = []
 }

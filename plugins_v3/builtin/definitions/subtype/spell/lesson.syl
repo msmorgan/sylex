@@ -7,5 +7,4 @@ subtype lesson {
   spelling = "Lesson",
   kind = spell,
   name = "Lesson",
-  confers = []
 }

@@ -3,5 +3,4 @@ subtype illusion {
   spelling = "Illusion",
   kind = creature,
   name = "Illusion",
-  confers = []
 }

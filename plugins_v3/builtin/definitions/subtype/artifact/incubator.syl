@@ -7,5 +7,4 @@ subtype incubator {
   spelling = "Incubator",
   kind = artifact,
   name = "Incubator",
-  confers = []
 }

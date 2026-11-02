@@ -3,6 +3,4 @@
 counter decayedCounter {
   lexical = {lemma = "decayed counter"},
   spelling = "decayed counter",
-
-  confers = []
 }

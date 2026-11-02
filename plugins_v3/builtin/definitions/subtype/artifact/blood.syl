@@ -6,5 +6,4 @@ subtype blood {
   spelling = "Blood",
   kind = artifact,
   name = "Blood",
-  confers = []
 }

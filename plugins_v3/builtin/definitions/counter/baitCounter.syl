@@ -1,6 +1,4 @@
 counter baitCounter {
   lexical = {lemma = "bait counter"},
   spelling = "bait counter",
-
-  confers = []
 }

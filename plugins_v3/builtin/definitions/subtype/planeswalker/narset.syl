@@ -4,5 +4,4 @@ subtype narset {
   spelling = "Narset",
   kind = planeswalker,
   name = "Narset",
-  confers = []
 }

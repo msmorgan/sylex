@@ -4,5 +4,4 @@ subtype planet {
   spelling = "Planet",
   kind = land,
   name = "Planet",
-  confers = []
 }

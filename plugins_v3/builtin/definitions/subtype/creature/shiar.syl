@@ -3,5 +3,4 @@ subtype shiar {
   spelling = "Shi'ar",
   kind = creature,
   name = "Shi'ar",
-  confers = []
 }

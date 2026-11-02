@@ -4,5 +4,4 @@ subtype locus {
   spelling = "Locus",
   kind = land,
   name = "Locus",
-  confers = []
 }

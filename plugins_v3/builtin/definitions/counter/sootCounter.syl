@@ -1,6 +1,4 @@
 counter sootCounter {
   lexical = {lemma = "soot counter"},
   spelling = "soot counter",
-
-  confers = []
 }

@@ -3,5 +3,4 @@ subtype employee {
   spelling = "Employee",
   kind = creature,
   name = "Employee",
-  confers = []
 }

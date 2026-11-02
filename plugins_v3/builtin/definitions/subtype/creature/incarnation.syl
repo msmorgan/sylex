@@ -3,5 +3,4 @@ subtype incarnation {
   spelling = "Incarnation",
   kind = creature,
   name = "Incarnation",
-  confers = []
 }

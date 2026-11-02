@@ -1,6 +1,4 @@
 counter boreCounter {
   lexical = {lemma = "bore counter"},
   spelling = "bore counter",
-
-  confers = []
 }
