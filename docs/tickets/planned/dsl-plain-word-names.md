@@ -1,10 +1,11 @@
 ---
-needs: [semantics-rust-rewrite]
+needs: []
 ---
 # No trailing-underscore names in `.syl`
 
-The trailing underscores exist because the words are Lean keywords; with Lean deleted by
-`semantics-rust-rewrite` nothing needs them. Semantics-v3 §4.5 already says plain words (`in`,
+The trailing underscores exist because the words are Lean keywords. `sylGen` quotes any word that
+collides with Lean when it emits `.lean`, so nothing needs them even while Lean is the oracle; this
+lands before `semantics-rust-crate`, so the Rust crates never see the old names. Semantics-v3 §4.5 already says plain words (`in`,
 `from`, `by`, `or`, `this`, …) are written as themselves.
 
 What remains:
@@ -15,8 +16,8 @@ What remains:
 - Comments and `TODO(spelling)` markers naming parameters by their old underscored names
   (`from_`, `for_`, `this_`, `by_`, `while_`, `if_`, `or_`): they now read `from`, `for`, `this`,
   `by`, `while`, `if`, `or`. Fix them to the current names.
-- Anything in the Rust `semantics` AST or `deckmaste_dsl` that kept an underscored field or
-  constructor name only to mirror Lean.
+- Anything in `deckmaste_dsl` that kept an underscored name only to mirror Lean. Lean's own field
+  names (`from_`, `for_`, …) stay until Lean is deleted; `sylGen` maps between them.
 
-Check: `grep -rnE '\b[a-z][A-Za-z0-9]*_\b' plugins_v3` finds nothing but words that are not names
-(none expected), and `cargo xtask dsl fmt --check` and the `semantics` tests pass.
+Check: `grep -rnE '\b[a-z][A-Za-z0-9]*_\b' plugins_v3` finds nothing, and `cargo xtask dsl fmt
+--check` and `cargo xtask lean check` pass.

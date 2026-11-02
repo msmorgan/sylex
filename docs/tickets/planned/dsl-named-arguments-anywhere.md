@@ -1,5 +1,5 @@
 ---
-needs: [semantics-rust-rewrite]
+needs: []
 ---
 # Named arguments may stand between positional ones
 
@@ -14,27 +14,18 @@ when(
   sequentially([...]))
 ```
 
-Today `sylGen` refuses a positional argument after a named one (`lean/SylGen/Resolve.lean`,
-"positional argument after named argument"); it goes with Lean in `semantics-rust-rewrite`.
-
-Settled (owner, 2026-11-02): with every argument in its printed position, discourse order is
-simply the written order. `discourse` steps a call's arguments, positional and named, in the
-order they are written, and needs no per-constructor rules to recover the printed order (such as
-`doIf`'s `postposed` flag, which reads the branch before a condition printed after it). Those
-rules and flags are deleted once the calls that needed them are written in printed order.
+This ticket only makes the language accept it; `syl-printed-order` reorders the corpus, and
+`semantics-rust-rewrite`'s `discourse` steps arguments in written order.
 
 ## Change
 
-- `deckmaste_dsl` parses and Rust `semantics` resolves calls whose named and positional arguments
-  interleave. Positional arguments still bind in order, to the parameters not named; naming a
-  parameter twice, or naming one a positional argument already filled, is an error.
+- `deckmaste_dsl` parses calls whose named and positional arguments interleave. Positional
+  arguments still bind in order, to the parameters not named; naming a parameter twice, or naming
+  one a positional argument already filled, is an error.
 - `cargo xtask dsl fmt` keeps the written order, so an interleaved call round-trips.
+- `sylGen` accepts the same calls: drop its "positional argument after named argument" refusal
+  (`lean/SylGen/Resolve.lean`). It already sorts named arguments into binder order, so the Lean it
+  emits, and Lean's checker, are unchanged; Lean stays the oracle for reordered `.syl`.
 - Semantics-v3 §4.4 ("Calls") says so.
-- Reorder the canon and builtin calls whose named arguments have a printed position, the
-  intervening-"if" triggers first (`when`, `whenever`, `at` with `if =`). Reordering does not
-  change any expansion: check that `semantics` expands every touched file identically before and
-  after.
-- `discourse` steps arguments in written order; delete the order-recovering flags and rules
-  (`postposed` and any like it), rewriting their callers in printed order. Their reference
-  results must not change: the carried-over tests for them stay green.
-- Tests in `deckmaste_dsl` and `semantics` for the interleaved forms and the two errors.
+- Tests in `deckmaste_dsl` for the interleaved forms and the two errors; `cargo xtask lean check`
+  passes on an interleaved fixture.
