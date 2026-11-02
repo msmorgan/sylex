@@ -1,5 +1,5 @@
 ---
-needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-v3-monstrosity-adapt-name-the-source, lean-v3-sacrifice-performer-controls]
+needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-v3-monstrosity-adapt-name-the-source, lean-v3-sacrifice-performer-controls, lean-proofs-spec-catalog]
 ---
 # [design] Rewrite the Rust semantics pipeline: `semantics`, `discourse`, `lowering`
 
@@ -40,9 +40,12 @@ is settled; what remained was mostly AST breadth, which done in Lean first is wr
 This epic ends by deleting `lean/` and `sylGen`, once:
 
 - per card, `discourse`'s bindings agree with the Lean oracle (below) across the whole corpus;
-- the Lean proof suites are carried over as Rust tests, refusals included: after retirement they
-  are the only record of what must and must not check, and nothing else oracles the tickets that
-  follow.
+- the exported fixture snapshot (below) passes;
+- `lean-proofs-spec-catalog`'s catalog exists as native Rust tests. After retirement it and the
+  canon corpus are the only record of what must and must not check.
+
+The snapshot is then deleted, not maintained: its expected outputs are frozen once Lean is gone,
+and the first AST change after the port would break fixtures nothing can regenerate.
 
 ## Verification
 
@@ -53,3 +56,12 @@ The Lean checker is the oracle for `discourse`. Per card, Rust's resolved bindin
 later mentions, `D′`, `AC>R1` choices) must match the bindings Lean's checker produces. Lean can
 export them as a development tool, outside the compile path. The design dialogue settles that
 export and how per-card agreement is gated.
+
+The same export also evaluates the closed `*.check … = …` equations in `lean/Semantics/Proofs/`
+into an (input, expected) fixture snapshot that Rust runs as one data-driven test. A fixture
+compares accepted against refused and the set of refusal kinds, never the exact refusal list:
+matching Lean's multiplicity and order would carry its plumbing into Rust. Keep the exporter
+disposable: it handles the plain equations over the public entry points (`Card.check`,
+`Ability.check`, `Action.check`, the binding results) and emits the names of every other theorem
+(statements with `∧`, `≠`, `.all` or `let`, and those over checker internals such as `stepAction`
+or `causedEvents`) as a checklist for `lean-proofs-spec-catalog`.
