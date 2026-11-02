@@ -7,8 +7,7 @@ card {
   types = [sorcery],
   text = [
     spell(
-      sequentially(
-        [
-          separateIntoPiles(allOf(and([isCreature, controlledBy(target(isPlayer))])), 2),
-          destroyPluralCantRegenerate(allOf(and([isCreature, inPile(pileOfChoice(they))])))]))]
+      sequentially([
+        separateIntoPiles(allOf(and([isCreature, controlledBy(target(isPlayer))])), 2),
+        destroyPluralCantRegenerate(allOf(and([isCreature, inPile(pileOfChoice(they))])))]))]
 }

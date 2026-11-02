@@ -16,10 +16,7 @@ card_type battle {
     property(can(any, attack(this))),
     damageResult(loseCounters(printedKind(defenseCounter), thatMuch, this)),
     stateBased(
-      and(
-        [
-          not(is(this, hasSubtype(siege))),
-          compareAmt(countersOn(defenseCounter, this), eq, 0)]),
+      and([not(is(this, hasSubtype(siege))), compareAmt(countersOn(defenseCounter, this), eq, 0)]),
       putInto(this, graveyard)),
     property(
       onlyUnless(

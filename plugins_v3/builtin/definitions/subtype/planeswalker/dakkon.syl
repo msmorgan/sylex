@@ -3,5 +3,5 @@ subtype dakkon {
   lexical = {lemma = "Dakkon"},
   spelling = "Dakkon",
   kind = planeswalker,
-  name = "Dakkon",
+  name = "Dakkon"
 }

@@ -15,15 +15,13 @@ ability soulbond {
           thisCreature,
           paired,
           a(and([and([isCreature, youControl, isOther]), not(related(paired))])))),
-      if = and(
-        [
-          is(thisCreature, and([youControl, not(related(paired))])),
-          exists(and([and([isCreature, youControl, isOther]), not(related(paired))]))])),
+      if = and([
+        is(thisCreature, and([youControl, not(related(paired))])),
+        exists(and([and([isCreature, youControl, isOther]), not(related(paired))]))])),
     whenever(
       does(actor(a(and([isCreature, youControl, isOther]))), enter),
       may(relate(that(creature), paired, thisCreature)),
-      if = and(
-        [
-          is(thisCreature, and([youControl, not(related(paired))])),
-          is(that(creature), and([youControl, not(related(paired))]))]))]
+      if = and([
+        is(thisCreature, and([youControl, not(related(paired))])),
+        is(that(creature), and([youControl, not(related(paired))]))]))]
 }

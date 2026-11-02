@@ -6,11 +6,10 @@ card {
   text = [
     enchant(isPlayer),
     static(
-      conjunction(
-        [
-          getsBase(
-            allOf(and([isCreature, non(hasSupertype(legendary)), controlledBy(enchanted(player))])),
-            3,
-            3),
-          qualityChange(them, loses, everyTypeOf(creature))]))]
+      conjunction([
+        getsBase(
+          allOf(and([isCreature, non(hasSupertype(legendary)), controlledBy(enchanted(player))])),
+          3,
+          3),
+        qualityChange(them, loses, everyTypeOf(creature))]))]
 }

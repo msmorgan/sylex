@@ -7,11 +7,10 @@ card {
     imprint(
       when(does(actor(thisCreature), enter), may(exile(target(and([isCreature, isNontoken])))))),
     static(
-      conjunction(
-        [
-          getsPt(thisCreature, up(letter(x)), up(letter(y))),
-          letterDefinition(x, powerOf(the(and([isCreature, in(exiledWith(thisCreature))])))),
-          letterDefinition(y, toughnessOf(that(card)))]))],
+      conjunction([
+        getsPt(thisCreature, up(letter(x)), up(letter(y))),
+        letterDefinition(x, powerOf(the(and([isCreature, in(exiledWith(thisCreature))])))),
+        letterDefinition(y, toughnessOf(that(card)))]))],
   power = 3,
   toughness = 3
 }

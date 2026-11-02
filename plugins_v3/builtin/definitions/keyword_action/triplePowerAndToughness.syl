@@ -3,5 +3,9 @@ action triplePowerAndToughness(subject: NounPhrase, duration: Option(Duration) =
   # TODO(spelling): Include or omit the clauses supplied by duration.
   lexical = {verbs = [{lemma = "triple", frames = [Monotransitive]}]},
   deed = "triple",
-  body = get($subject, up(times(2, powerOf($subject))), up(times(2, toughnessOf($subject))), $duration)
+  body = get(
+    $subject,
+    up(times(2, powerOf($subject))),
+    up(times(2, toughnessOf($subject))),
+    $duration)
 }

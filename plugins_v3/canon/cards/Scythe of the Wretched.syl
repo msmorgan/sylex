@@ -9,13 +9,12 @@ card {
       does(
         actor(
           a(
-            and(
-              [
-                isCreature,
-                did(
-                  actor(attachHost(equipped, creature)),
-                  dealDamage(recipient = which),
-                  within = within(soFarThisTurn))]))),
+            and([
+              isCreature,
+              did(
+                actor(attachHost(equipped, creature)),
+                dealDamage(recipient = which),
+                within = within(soFarThisTurn))]))),
         die),
       sequentially(
         [returnToBattlefield(that(card), [under(you)]), attachTo(thisEquipment, that(creature))])),

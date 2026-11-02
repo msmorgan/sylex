@@ -2,5 +2,5 @@
 # [CR#702.24a]
 counter ageCounter {
   lexical = {lemma = "age counter"},
-  spelling = "age counter",
+  spelling = "age counter"
 }

@@ -6,7 +6,5 @@ card {
     activated(mana([3]), exile(target(and([isCreature, youControl])))),
     activated(
       perform(sacrifice(thisArtifact)),
-      returnToBattlefield(
-        each(and([isCreature, cardIn(exiledWith(thisArtifact))])),
-        [under(you)]))]
+      returnToBattlefield(each(and([isCreature, cardIn(exiledWith(thisArtifact))])), [under(you)]))]
 }

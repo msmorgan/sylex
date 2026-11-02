@@ -7,12 +7,11 @@ card {
     haste,
     whenever(
       does(any, dealDamage(recipient = thisCreature)),
-      sequentially(
-        [
-          instruct(it, dealDamage(thatMuch, target(isAnyOtherTarget))),
-          doIf(
-            was(dealDamage(recipient = a(isPlayer)), thisWay),
-            establishThroughout(cant(actor(they), gainLife(anyAmount)), restOfGame))]))],
+      sequentially([
+        instruct(it, dealDamage(thatMuch, target(isAnyOtherTarget))),
+        doIf(
+          was(dealDamage(recipient = a(isPlayer)), thisWay),
+          establishThroughout(cant(actor(they), gainLife(anyAmount)), restOfGame))]))],
   power = 3,
   toughness = 3
 }

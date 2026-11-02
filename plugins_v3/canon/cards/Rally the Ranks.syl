@@ -4,6 +4,5 @@ card {
   types = [enchantment],
   text = [
     static(entersChoosing(thisEnchantment, subtype(creature))),
-    static(
-      getsPt(allOf(and([isCreature, youControl, ofChosen(subtype(creature))])), up(1), up(1)))]
+    static(getsPt(allOf(and([isCreature, youControl, ofChosen(subtype(creature))])), up(1), up(1)))]
 }

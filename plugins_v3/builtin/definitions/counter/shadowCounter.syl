@@ -2,5 +2,5 @@
 # [CR#122.1b,613.1f]
 counter shadowCounter {
   lexical = {lemma = "shadow counter"},
-  spelling = "shadow counter",
+  spelling = "shadow counter"
 }

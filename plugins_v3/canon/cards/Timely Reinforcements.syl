@@ -4,13 +4,12 @@ card {
   types = [sorcery],
   text = [
     spell(
-      sequentially(
-        [
-          doIf(compareAmt(lifeTotalOf(you), less, lifeTotalOf(anOpponent)), gainLife(6)),
-          doIf(
-            compareAmt(
-              countOf(and([isCreature, youControl])),
-              less,
-              countOf(and([isCreature, anOpponentControls]))),
-            create(3, written(creatureToken(1, 1, [white], [soldier]))))]))]
+      sequentially([
+        doIf(compareAmt(lifeTotalOf(you), less, lifeTotalOf(anOpponent)), gainLife(6)),
+        doIf(
+          compareAmt(
+            countOf(and([isCreature, youControl])),
+            less,
+            countOf(and([isCreature, anOpponentControls]))),
+          create(3, written(creatureToken(1, 1, [white], [soldier]))))]))]
 }

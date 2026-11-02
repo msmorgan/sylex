@@ -8,13 +8,12 @@ card {
     flying,
     when(
       does(actor(thisCreature), enter),
-      sequentially(
-        [
-          lookAt(topSlice(5)),
-          separateIntoPiles(them, 2, [faceDown, faceUp]),
-          instruct(anOpponent, choose(onePile)),
-          putInto(that(pile), hand),
-          putInto(theOther, graveyard)]))],
+      sequentially([
+        lookAt(topSlice(5)),
+        separateIntoPiles(them, 2, [faceDown, faceUp]),
+        instruct(anOpponent, choose(onePile)),
+        putInto(that(pile), hand),
+        putInto(theOther, graveyard)]))],
   power = 5,
   toughness = 5
 }

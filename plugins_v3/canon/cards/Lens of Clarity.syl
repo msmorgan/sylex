@@ -4,11 +4,7 @@ card {
   types = [artifact],
   text = [
     static(
-      conjunction(
-        [
-          visibility(lookAt, you, topOfLibrary),
-          visibility(
-            lookAt,
-            you,
-            objects(allOf(and([isCreature, isFaceDown, youDontControl]))))]))]
+      conjunction([
+        visibility(lookAt, you, topOfLibrary),
+        visibility(lookAt, you, objects(allOf(and([isCreature, isFaceDown, youDontControl]))))]))]
 }

@@ -9,12 +9,10 @@ card {
     activated(loyaltySymbol(down(3)), destroy(allOf(and([isCreature, hasPower(atLeast, 4)])))),
     activated(
       loyaltySymbol(down(7)),
-      getEmblem(
-        [
-          static(
-            conjunction(
-              [
-                getsPt(allOf(and([isCreature, youControl])), up(2), up(2)),
-                abilityGrant(them, flying)]))]))],
+      getEmblem([
+        static(
+          conjunction([
+            getsPt(allOf(and([isCreature, youControl])), up(2), up(2)),
+            abilityGrant(them, flying)]))]))],
   loyalty = 4
 }

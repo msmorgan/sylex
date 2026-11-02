@@ -5,9 +5,8 @@ card {
   text = [
     spell(
       establishThroughout(
-        conjunction(
-          [
-            qualityChange(allOf(isCreature), sets, colored(some([black]))),
-            qualityChange(allOf(isLand), sets, bundle({characteristics = {subtypes = [swamp]}}))]),
+        conjunction([
+          qualityChange(allOf(isCreature), sets, colored(some([black]))),
+          qualityChange(allOf(isLand), sets, bundle({characteristics = {subtypes = [swamp]}}))]),
         untilEndOfTurn))]
 }

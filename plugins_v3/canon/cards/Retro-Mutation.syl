@@ -7,13 +7,9 @@ card {
     flash,
     enchant(isCreature),
     static(
-      conjunction(
-        [
-          qualityChange(
-            enchanted(creature),
-            sets,
-            bundle({characteristics = {subtypes = [turtle]}})),
-          getsBase(it, 0, 1),
-          cant(actor(it), attack),
-          allAbilityLoss(it)]))]
+      conjunction([
+        qualityChange(enchanted(creature), sets, bundle({characteristics = {subtypes = [turtle]}})),
+        getsBase(it, 0, 1),
+        cant(actor(it), attack),
+        allAbilityLoss(it)]))]
 }

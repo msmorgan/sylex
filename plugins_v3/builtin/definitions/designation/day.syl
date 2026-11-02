@@ -4,5 +4,5 @@ designation day {
   lexical = {
     nouns = [{lemma = "day", countability = [Mass]}, {lemma = "night", countability = [Mass]}]},
   spelling = "day",
-  scope = heldByGame,
+  scope = heldByGame
 }

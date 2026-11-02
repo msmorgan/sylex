@@ -4,8 +4,7 @@ card {
   types = [sorcery],
   text = [
     spell(
-      sequentially(
-        [
-          putInto(target(isCreature), fromTop(2, library)),
-          instruct(controllerOf(it), gainLife(3))]))]
+      sequentially([
+        putInto(target(isCreature), fromTop(2, library)),
+        instruct(controllerOf(it), gainLife(3))]))]
 }

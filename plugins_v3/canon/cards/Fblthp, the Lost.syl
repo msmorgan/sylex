@@ -10,10 +10,9 @@ card {
       replace(
         draw(1),
         doIf(
-          or(
-            [
-              did(actor(it), enter(from = yourLibrary), triggering),
-              is(it, did(any, cast(which, from = yourLibrary), thisObject))]),
+          or([
+            did(actor(it), enter(from = yourLibrary), triggering),
+            is(it, did(any, cast(which, from = yourLibrary), thisObject))]),
           instead(draw(2))))),
     when(does(actor(a(isSpell)), target(this)), shuffleInto(this))],
   power = 1,

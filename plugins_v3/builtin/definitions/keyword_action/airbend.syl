@@ -5,14 +5,13 @@ action airbend(subject: NounPhrase) {
   lexical = {
     verbs = [{lemma = "airbend", past = "airbent", frames = [Monotransitive, Intransitive]}]},
   spelling = "airbend <subject>",
-  body = sequentially(
-    [
-      exile($subject),
-      doForEach(
-        allOf(and([isCard, did(any, exile(which), within = thisWay)])),
-        instruct(
-          ownerOf(it),
-          establish(
-            can(actor(ownerOf(it)), cast(it, exileZone, payingInstead(mana([generic(2)])))),
-            forAsLongAs(is(it, in(exileZone))))))])
+  body = sequentially([
+    exile($subject),
+    doForEach(
+      allOf(and([isCard, did(any, exile(which), within = thisWay)])),
+      instruct(
+        ownerOf(it),
+        establish(
+          can(actor(ownerOf(it)), cast(it, exileZone, payingInstead(mana([generic(2)])))),
+          forAsLongAs(is(it, in(exileZone))))))])
 }

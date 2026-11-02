@@ -8,16 +8,14 @@ ability ascend {
     byCardClass(
       static(
         whileHolds(
-          and(
-            [
-              compareAmt(countOf(and([isPermanent, youControl])), atLeast, 10),
-              not(is(you, hasDesignation(citysBlessing)))]),
+          and([
+            compareAmt(countOf(and([isPermanent, youControl])), atLeast, 10),
+            not(is(you, hasDesignation(citysBlessing)))]),
           gainDesignation(you, citysBlessing, restOfGame))),
       spell(
         doIf(
-          and(
-            [
-              compareAmt(countOf(and([isPermanent, youControl])), atLeast, 10),
-              not(is(you, hasDesignation(citysBlessing)))]),
+          and([
+            compareAmt(countOf(and([isPermanent, youControl])), atLeast, 10),
+            not(is(you, hasDesignation(citysBlessing)))]),
           gainDesignation(you, citysBlessing, restOfGame))))]
 }

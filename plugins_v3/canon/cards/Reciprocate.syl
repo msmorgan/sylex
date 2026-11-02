@@ -7,7 +7,5 @@ card {
       exile(
         target(
           and(
-            [
-              isCreature,
-              did(actor(which), dealDamage(recipient = you), within(soFarThisTurn))]))))]
+            [isCreature, did(actor(which), dealDamage(recipient = you), within(soFarThisTurn))]))))]
 }

@@ -7,9 +7,8 @@ card {
       beginningOfYour(upkeep),
       destroy(
         target(
-          and(
-            [
-              isPermanent,
-              non(isLand),
-              superlative(min, stat(manaValue), and([isPermanent, non(isLand)]))]))))]
+          and([
+            isPermanent,
+            non(isLand),
+            superlative(min, stat(manaValue), and([isPermanent, non(isLand)]))]))))]
 }

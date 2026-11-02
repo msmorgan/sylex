@@ -4,9 +4,5 @@ card {
   types = [instant],
   text = [
     spell(
-      get(
-        allOf(and([isCreature, ofYourChoice(subtype(creature))])),
-        up(0),
-        up(4),
-        untilEndOfTurn))]
+      get(allOf(and([isCreature, ofYourChoice(subtype(creature))])), up(0), up(4), untilEndOfTurn))]
 }

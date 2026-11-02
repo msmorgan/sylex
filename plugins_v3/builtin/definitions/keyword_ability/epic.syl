@@ -10,12 +10,11 @@ ability epic {
       delayWithin(
         beginningOfYour(upkeep),
         restOfGame,
-        sequentially(
-          [
-            copy(
-              fromStack,
-              thisSpell,
-              1,
-              [characteristicEdits([removedAbilities(specified([abilities(theKeyword(epic))]))])]),
-            may(chooseNewTargets(that(copy)))])))]
+        sequentially([
+          copy(
+            fromStack,
+            thisSpell,
+            1,
+            [characteristicEdits([removedAbilities(specified([abilities(theKeyword(epic))]))])]),
+          may(chooseNewTargets(that(copy)))])))]
 }

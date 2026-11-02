@@ -10,10 +10,9 @@ card {
         any,
         activate(
           allOf(
-            and(
-              [
-                abilityHead(anyActivated),
-                abilityOf(allOf(or([isArtifact, isCreature, isPlaneswalker])))])))))],
+            and([
+              abilityHead(anyActivated),
+              abilityOf(allOf(or([isArtifact, isCreature, isPlaneswalker])))])))))],
   power = 3,
   toughness = 3
 }

@@ -8,5 +8,7 @@ action searchZonesOf(whose: NounPhrase, for: NounPhrase) {
         lemma = "search",
         frames = [TransitiveWithPP(["for"]), Monotransitive, Prepositional(["for"])]}]},
   deed = "search",
-  body = actionSearch(and([zone(graveyard, $whose), zone(hand, $whose), zone(library, $whose)]), $for)
+  body = actionSearch(
+    and([zone(graveyard, $whose), zone(hand, $whose), zone(library, $whose)]),
+    $for)
 }

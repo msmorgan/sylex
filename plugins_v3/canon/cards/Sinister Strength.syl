@@ -6,8 +6,7 @@ card {
   text = [
     enchant(isCreature),
     static(
-      conjunction(
-        [
-          getsPt(enchanted(creature), up(3), up(1)),
-          qualityChange(it, sets, colored(some([black])))]))]
+      conjunction([
+        getsPt(enchanted(creature), up(3), up(1)),
+        qualityChange(it, sets, colored(some([black])))]))]
 }

@@ -4,8 +4,7 @@ card {
   types = [sorcery],
   text = [
     spell(
-      sequentially(
-        [
-          choose(a(qualityFrom(number, number(fromTo(0, 10))))),
-          destroy(allOf(and([isCreature, hasPower(atLeast, chosenNumber)])))]))]
+      sequentially([
+        choose(a(qualityFrom(number, number(fromTo(0, 10))))),
+        destroy(allOf(and([isCreature, hasPower(atLeast, chosenNumber)])))]))]
 }

@@ -4,8 +4,7 @@ card {
   types = [sorcery],
   text = [
     spell(
-      sequentially(
-        [
-          exile(topSlice(1)),
-          doIf(is(it, isPermanentCard), may(putOntoBattlefield(it), repeat(again)))]))]
+      sequentially([
+        exile(topSlice(1)),
+        doIf(is(it, isPermanentCard), may(putOntoBattlefield(it), repeat(again)))]))]
 }

@@ -3,5 +3,5 @@ subtype bahamut {
   lexical = {lemma = "Bahamut"},
   spelling = "Bahamut",
   kind = planeswalker,
-  name = "Bahamut",
+  name = "Bahamut"
 }

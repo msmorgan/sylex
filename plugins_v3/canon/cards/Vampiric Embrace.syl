@@ -11,13 +11,12 @@ card {
       does(
         actor(
           a(
-            and(
-              [
-                isCreature,
-                did(
-                  actor(attachHost(enchanted, creature)),
-                  dealDamage(recipient = which),
-                  within = within(soFarThisTurn))]))),
+            and([
+              isCreature,
+              did(
+                actor(attachHost(enchanted, creature)),
+                dealDamage(recipient = which),
+                within = within(soFarThisTurn))]))),
         die),
       putCounters(1, printedKind(p1p1Counter), that(creature)))]
 }

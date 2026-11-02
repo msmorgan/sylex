@@ -6,8 +6,7 @@ card {
     static(entersChoosingPlayer(thisArtifact, anOpponent)),
     at(
       beginningOfPossessed(upkeep, the(isChosenPlayer)),
-      sequentially(
-        [
-          instruct(thisArtifact, dealDamage(letter(x), that(player))),
-          define(x, minus(countOf(cardIn(handOf(they))), 4))]))]
+      sequentially([
+        instruct(thisArtifact, dealDamage(letter(x), that(player))),
+        define(x, minus(countOf(cardIn(handOf(they))), 4))]))]
 }

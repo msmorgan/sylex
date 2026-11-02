@@ -7,8 +7,7 @@ ability gravestorm {
   body = [
     when(
       does(actor(you), cast(thisSpell)),
-      sequentially(
-        [
-          copyOnStack(thisSpell, eventCount(die, actor(a(isPermanent)), soFarThisTurn)),
-          may(chooseNewTargets(those(copy)))]))]
+      sequentially([
+        copyOnStack(thisSpell, eventCount(die, actor(a(isPermanent)), soFarThisTurn)),
+        may(chooseNewTargets(those(copy)))]))]
 }

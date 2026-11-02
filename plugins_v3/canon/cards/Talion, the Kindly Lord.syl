@@ -12,13 +12,12 @@ card {
         actor(anOpponent),
         cast(
           a(
-            and(
-              [
-                isSpell,
-                compare(
-                  eq,
-                  chosenNumber,
-                  axes = [stat(manaValue), stat(power), stat(toughness)])])))),
+            and([
+              isSpell,
+              compare(
+                eq,
+                chosenNumber,
+                axes = [stat(manaValue), stat(power), stat(toughness)])])))),
       sequentially([instruct(that(player), loseLife(2)), draw(1)]))],
   power = 3,
   toughness = 4

@@ -4,12 +4,11 @@ card {
   types = [instant],
   text = [
     spell(
-      sequentially(
-        [
-          establishThroughout(
-            replace(
-              would(any, dealDamage(recipient = target(isCreature))),
-              instead(redirectDamage(theNext(1), target(and([isCreature, isOther]))))),
-            thisTurn),
-          draw(1)]))]
+      sequentially([
+        establishThroughout(
+          replace(
+            would(any, dealDamage(recipient = target(isCreature))),
+            instead(redirectDamage(theNext(1), target(and([isCreature, isOther]))))),
+          thisTurn),
+        draw(1)]))]
 }

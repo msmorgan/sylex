@@ -8,7 +8,5 @@ ability shadow {
     static(
       cant(by(allOf(and([isCreature, not(hasKeyword(theKeyword(shadow)))]))), block(thisCreature))),
     static(
-      cant(
-        by(thisCreature),
-        block(allOf(and([isCreature, not(hasKeyword(theKeyword(shadow)))])))))]
+      cant(by(thisCreature), block(allOf(and([isCreature, not(hasKeyword(theKeyword(shadow)))])))))]
 }

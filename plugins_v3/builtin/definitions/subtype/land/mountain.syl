@@ -3,5 +3,5 @@ subtype mountain {
   lexical = {lemma = "Mountain"},
   spelling = "Mountain",
   kind = land,
-  name = "Mountain",
+  name = "Mountain"
 }

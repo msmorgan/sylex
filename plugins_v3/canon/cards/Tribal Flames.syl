@@ -7,10 +7,7 @@ card {
   text = [
     domain(
       spell(
-        sequentially(
-          [
-            instruct(this, dealDamage(letter(x), target(isAnyTarget))),
-            define(
-              x,
-              distinctCount(subtype(land, basicOnly), allOf(and([isLand, youControl]))))])))]
+        sequentially([
+          instruct(this, dealDamage(letter(x), target(isAnyTarget))),
+          define(x, distinctCount(subtype(land, basicOnly), allOf(and([isLand, youControl]))))])))]
 }

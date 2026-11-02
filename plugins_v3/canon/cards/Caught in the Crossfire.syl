@@ -4,12 +4,11 @@ card {
   types = [instant],
   text = [
     spell(
-      chooseSpree(
-        [
-          {
-            cost = mana([1]),
-            action = instruct(this, dealDamage(2, each(and([isCreature, isOutlaw]))))},
-          {
-            cost = mana([1]),
-            action = instruct(this, dealDamage(2, each(and([isCreature, non(isOutlaw)]))))}]))]
+      chooseSpree([
+        {
+          cost = mana([1]),
+          action = instruct(this, dealDamage(2, each(and([isCreature, isOutlaw]))))},
+        {
+          cost = mana([1]),
+          action = instruct(this, dealDamage(2, each(and([isCreature, non(isOutlaw)]))))}]))]
 }

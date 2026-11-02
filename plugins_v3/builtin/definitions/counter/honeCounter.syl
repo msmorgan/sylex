@@ -2,5 +2,5 @@
 # [CR#122.1j]
 counter honeCounter {
   lexical = {lemma = "hone counter"},
-  spelling = "hone counter",
+  spelling = "hone counter"
 }

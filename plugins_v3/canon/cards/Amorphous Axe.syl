@@ -5,9 +5,8 @@ card {
   subtypes = [equipment],
   text = [
     static(
-      conjunction(
-        [
-          getsPt(equipped(creature), up(3), up(0)),
-          qualityChange(equipped(creature), adds, everyTypeOf(creature))])),
+      conjunction([
+        getsPt(equipped(creature), up(3), up(0)),
+        qualityChange(equipped(creature), adds, everyTypeOf(creature))])),
     equip(mana([3]))]
 }

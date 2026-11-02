@@ -7,19 +7,17 @@ ability transmute(cost: Cost) {
   body = [
     activatedOnlyDuring(
       compound([$cost, perform(discard(this))]),
-      sequentially(
-        [
-          search(
-            yourLibrary,
-            a(
-              and(
-                [
-                  isCard,
-                  hasManaValue(
-                    eq,
-                    statOf(stat(manaValue), the(and([was(discard(which)), isCard]))))]))),
-          reveal(that(card)),
-          putInto(it, hand),
-          shuffle]),
+      sequentially([
+        search(
+          yourLibrary,
+          a(
+            and([
+              isCard,
+              hasManaValue(
+                eq,
+                statOf(stat(manaValue), the(and([was(discard(which)), isCard]))))]))),
+        reveal(that(card)),
+        putInto(it, hand),
+        shuffle]),
       asSorcery)]
 }

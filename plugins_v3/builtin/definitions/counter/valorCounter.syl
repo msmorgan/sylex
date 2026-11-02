@@ -1,4 +1,4 @@
 counter valorCounter {
   lexical = {lemma = "valor counter"},
-  spelling = "valor counter",
+  spelling = "valor counter"
 }

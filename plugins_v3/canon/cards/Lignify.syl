@@ -6,12 +6,11 @@ card {
   text = [
     enchant(isCreature),
     static(
-      conjunction(
-        [
-          qualityChange(
-            enchanted(creature),
-            sets,
-            bundle({characteristics = {subtypes = [treefolk]}})),
-          getsBase(it, 0, 4),
-          allAbilityLoss(it)]))]
+      conjunction([
+        qualityChange(
+          enchanted(creature),
+          sets,
+          bundle({characteristics = {subtypes = [treefolk]}})),
+        getsBase(it, 0, 4),
+        allAbilityLoss(it)]))]
 }

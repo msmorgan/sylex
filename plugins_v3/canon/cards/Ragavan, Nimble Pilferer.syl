@@ -9,11 +9,10 @@ card {
   text = [
     whenever(
       does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-      sequentially(
-        [
-          create(1, written(treasureToken)),
-          exile(slice(top, 1, libraryOf(that(player)))),
-          establishThroughout(can(actor(you), cast(that(card))), untilEndOfTurn)])),
+      sequentially([
+        create(1, written(treasureToken)),
+        exile(slice(top, 1, libraryOf(that(player)))),
+        establishThroughout(can(actor(you), cast(that(card))), untilEndOfTurn)])),
     dash(mana([1, red]))],
   power = 2,
   toughness = 1

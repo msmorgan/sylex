@@ -8,17 +8,15 @@ card {
       partScope(
         turn,
         you,
-        conjunction(
-          [
-            cant(actor(yourOpponents), cast(bare(isSpell))),
-            cant(
-              actor(yourOpponents),
-              activate(
-                allOf(
-                  and(
-                    [
-                      abilityHead(anyActivated),
-                      abilityOf(allOf(or([isArtifact, isCreature, isEnchantment])))]))))])))],
+        conjunction([
+          cant(actor(yourOpponents), cast(bare(isSpell))),
+          cant(
+            actor(yourOpponents),
+            activate(
+              allOf(
+                and([
+                  abilityHead(anyActivated),
+                  abilityOf(allOf(or([isArtifact, isCreature, isEnchantment])))]))))])))],
   power = 2,
   toughness = 2
 }

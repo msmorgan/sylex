@@ -14,13 +14,12 @@ card {
         instead(
           create(
             groupSize,
-            written(
-              {
-                characteristics = {
-                  colors = [white],
-                  types = [creature],
-                  subtypes = [angel],
-                  text = [flying, vigilance],
-                  power = 4,
-                  toughness = 4}})))))]
+            written({
+              characteristics = {
+                colors = [white],
+                types = [creature],
+                subtypes = [angel],
+                text = [flying, vigilance],
+                power = 4,
+                toughness = 4}})))))]
 }

@@ -7,10 +7,9 @@ card {
     static(
       altCost(
         this,
-        compound(
-          [
-            perform(payLife(6)),
-            perform(sacrifice(counted(exactly(3), and([isCreature, hasColor(black)]))))]))),
+        compound([
+          perform(payLife(6)),
+          perform(sacrifice(counted(exactly(3), and([isCreature, hasColor(black)]))))]))),
     flying,
     trample],
   power = 9,

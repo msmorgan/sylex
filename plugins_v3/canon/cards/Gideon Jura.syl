@@ -15,21 +15,20 @@ card {
     activated(loyaltySymbol(down(2)), destroy(target(and([isCreature, isTapped])))),
     activated(
       loyaltySymbol(up(0)),
-      sequentially(
-        [
-          establishThroughout(
-            qualityChange(
-              thisPlaneswalker,
-              sets,
-              bundle(
-                {
-                  characteristics = {
-                    types = [creature],
-                    subtypes = [human, soldier],
-                    power = 6,
-                    toughness = 6}},
-                planeswalker)),
-            untilEndOfTurn),
-          preventAll(it, thisTurn)]))],
+      sequentially([
+        establishThroughout(
+          qualityChange(
+            thisPlaneswalker,
+            sets,
+            bundle(
+              {
+                characteristics = {
+                  types = [creature],
+                  subtypes = [human, soldier],
+                  power = 6,
+                  toughness = 6}},
+              planeswalker)),
+          untilEndOfTurn),
+        preventAll(it, thisTurn)]))],
   loyalty = 6
 }

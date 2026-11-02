@@ -5,9 +5,8 @@ card {
   text = [
     willOfTheCouncil(
       spell(
-        sequentially(
-          [
-            instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["time", "knowledge"]))),
-            doIf(voteLead("time", false), extraTurn(1)),
-            doIf(voteLead("knowledge", true), draw(3))])))]
+        sequentially([
+          instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["time", "knowledge"]))),
+          doIf(voteLead("time", false), extraTurn(1)),
+          doIf(voteLead("knowledge", true), draw(3))])))]
 }

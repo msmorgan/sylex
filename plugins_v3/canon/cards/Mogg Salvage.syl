@@ -6,9 +6,8 @@ card {
     static(
       onlyWhile(
         altCost(this),
-        and(
-          [
-            exists(and([isLand, hasSubtype(island), anOpponentControls])),
-            exists(and([isLand, hasSubtype(mountain), youControl]))]))),
+        and([
+          exists(and([isLand, hasSubtype(island), anOpponentControls])),
+          exists(and([isLand, hasSubtype(mountain), youControl]))]))),
     spell(destroy(target(isArtifact)))]
 }

@@ -9,12 +9,11 @@ card {
   types = [instant],
   text = [
     spell(
-      sequentially(
-        [
-          choose(
-            both(target(and([isCreature, youControl])), target(and([isCreature, youDontControl])))),
-          doIf(
-            did(actor(you), cast(thisSpell), within(soFarThisTurn, duringPart(mainPhase, you))),
-            get(the(and([isCreature, youControl])), up(1), up(1), untilEndOfTurn)),
-          fightEachOther(those(creature))]))]
+      sequentially([
+        choose(
+          both(target(and([isCreature, youControl])), target(and([isCreature, youDontControl])))),
+        doIf(
+          did(actor(you), cast(thisSpell), within(soFarThisTurn, duringPart(mainPhase, you))),
+          get(the(and([isCreature, youControl])), up(1), up(1), untilEndOfTurn)),
+        fightEachOther(those(creature))]))]
 }

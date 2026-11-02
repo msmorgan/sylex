@@ -6,10 +6,9 @@ card {
   subtypes = [elder, dinosaur],
   text = [
     static(
-      conjunction(
-        [
-          costShift(this, less(letter(x))),
-          letterDefinition(x, aggregate(sum, stat(power), and([isCreature, youControl])))])),
+      conjunction([
+        costShift(this, less(letter(x))),
+        letterDefinition(x, aggregate(sum, stat(power), and([isCreature, youControl])))])),
     trample],
   power = 12,
   toughness = 12

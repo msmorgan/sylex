@@ -7,10 +7,9 @@ card {
   types = [instant],
   text = [
     spell(
-      sequentially(
-        [
-          counter(target(isSpell)),
-          delay(
-            beginningOf(mainPhase, you, nextTime(you)),
-            addMana(statOf(stat(manaValue), that(spell)), manaOf([[colorless]])))]))]
+      sequentially([
+        counter(target(isSpell)),
+        delay(
+          beginningOf(mainPhase, you, nextTime(you)),
+          addMana(statOf(stat(manaValue), that(spell)), manaOf([[colorless]])))]))]
 }

@@ -14,10 +14,9 @@ ability compleated {
           enter(riders = [withCounters(anyAmount, printedKind(loyaltyCounter), fresh)])),
         doIf(
           compareAmt(phyrexianPaidWithLife(thisSpell), atLeast, 1),
-          withRiders(
-            [
-              withCounters(
-                times(2, phyrexianPaidWithLife(thisSpell)),
-                printedKind(loyaltyCounter),
-                fewer)]))))]
+          withRiders([
+            withCounters(
+              times(2, phyrexianPaidWithLife(thisSpell)),
+              printedKind(loyaltyCounter),
+              fewer)]))))]
 }

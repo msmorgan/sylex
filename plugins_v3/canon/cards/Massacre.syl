@@ -6,9 +6,8 @@ card {
     static(
       onlyWhile(
         altCost(this),
-        and(
-          [
-            exists(and([isLand, hasSubtype(plains), anOpponentControls])),
-            exists(and([isLand, hasSubtype(swamp), youControl]))]))),
+        and([
+          exists(and([isLand, hasSubtype(plains), anOpponentControls])),
+          exists(and([isLand, hasSubtype(swamp), youControl]))]))),
     spell(get(allOf(isCreature), down(2), down(2), untilEndOfTurn))]
 }

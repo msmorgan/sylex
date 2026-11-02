@@ -2,5 +2,5 @@
 # [CR#122.1b,613.1f]
 counter lifelinkCounter {
   lexical = {lemma = "lifelink counter"},
-  spelling = "lifelink counter",
+  spelling = "lifelink counter"
 }

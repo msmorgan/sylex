@@ -4,8 +4,7 @@ card {
   types = [sorcery],
   text = [
     spell(
-      sequentially(
-        [
-          putCounters(letter(x), printedKind(p1p1Counter), target(isCreature)),
-          define(x, powerOf(that(creature)))]))]
+      sequentially([
+        putCounters(letter(x), printedKind(p1p1Counter), target(isCreature)),
+        define(x, powerOf(that(creature)))]))]
 }

@@ -8,9 +8,8 @@ card {
       compound([tapSymbol, perform(sacrifice(thisArtifact))]),
       destroy(
         each(
-          and(
-            [
-              non(isLand),
-              isPermanent,
-              hasManaValue(eq, countersOn(chargeCounter, thisArtifact))]))))]
+          and([
+            non(isLand),
+            isPermanent,
+            hasManaValue(eq, countersOn(chargeCounter, thisArtifact))]))))]
 }

@@ -9,10 +9,9 @@ card {
   text = [
     when(
       does(actor(thisCreature), enter),
-      sequentially(
-        [
-          gainDesignation(target(isOpponent), monarch),
-          establishThroughout(cant(actor(you), gainDesignation(you, monarch)), thisTurn)])),
+      sequentially([
+        gainDesignation(target(isOpponent), monarch),
+        establishThroughout(cant(actor(you), gainDesignation(you, monarch)), thisTurn)])),
     static(
       onlyWhile(
         replace(

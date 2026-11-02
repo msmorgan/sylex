@@ -6,7 +6,5 @@ card {
   text = [
     enchant(isLand),
     static(
-      abilityGrant(
-        enchanted(land),
-        activated(tapSymbol, instruct(target(isPlayer), loseLife(3)))))]
+      abilityGrant(enchanted(land), activated(tapSymbol, instruct(target(isPlayer), loseLife(3)))))]
 }

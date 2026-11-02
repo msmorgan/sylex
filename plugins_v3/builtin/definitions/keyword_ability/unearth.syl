@@ -7,11 +7,10 @@ ability unearth(cost: Cost) {
   body = [
     activatedOnlyDuring(
       $cost,
-      sequentially(
-        [
-          returnToBattlefield(thisCard, from = yourGraveyard),
-          gainHaste(thisPermanent),
-          atNext(endStep, exile(thisPermanent)),
-          replaceEvent(would(actor(thisPermanent), leave), instead(exile(thisPermanent)), none)]),
+      sequentially([
+        returnToBattlefield(thisCard, from = yourGraveyard),
+        gainHaste(thisPermanent),
+        atNext(endStep, exile(thisPermanent)),
+        replaceEvent(would(actor(thisPermanent), leave), instead(exile(thisPermanent)), none)]),
       asSorcery)]
 }

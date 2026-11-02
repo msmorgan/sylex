@@ -5,15 +5,13 @@ card {
   text = [
     when(
       does(actor(thisArtifact), enter),
-      sequentially(
-        [
-          lookAt(topSlice(5)),
-          may(
-            sequentially(
-              [
-                reveal(fromAmong(exactly(1), or([hasColor(blue), isArtifact]), them)),
-                putInto(that(card), hand)])),
-          putInto(theRest, onBottom, riders = [inOrder(randomOrder)])])),
+      sequentially([
+        lookAt(topSlice(5)),
+        may(
+          sequentially([
+            reveal(fromAmong(exactly(1), or([hasColor(blue), isArtifact]), them)),
+            putInto(that(card), hand)])),
+        putInto(theRest, onBottom, riders = [inOrder(randomOrder)])])),
     activated(
       compound([mana([5, blue]), tapSymbol, perform(sacrifice(thisArtifact))]),
       establishThroughout(cant(any, block(allOf(and([isCreature, youControl])))), thisTurn))]

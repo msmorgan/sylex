@@ -8,12 +8,11 @@ card {
   text = [
     when(
       does(actor(thisCreature), enter),
-      sequentially(
-        [
-          instruct(
-            eachPlayer,
-            chooseStartingWith(you, counted(upTo(5), and([isPermanent, controlledBy(they)])))),
-          instruct(allOf(and([isPermanent, otherThan(thisCreature), notChosen])), phaseOut)])),
+      sequentially([
+        instruct(
+          eachPlayer,
+          chooseStartingWith(you, counted(upTo(5), and([isPermanent, controlledBy(they)])))),
+        instruct(allOf(and([isPermanent, otherThan(thisCreature), notChosen])), phaseOut)])),
     static(cant(actor(bare(isPermanent)), phaseIn))],
   power = 3,
   toughness = 4

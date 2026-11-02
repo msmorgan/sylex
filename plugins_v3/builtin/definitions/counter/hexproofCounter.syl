@@ -2,5 +2,5 @@
 # [CR#122.1b,613.1f]
 counter hexproofCounter {
   lexical = {lemma = "hexproof counter"},
-  spelling = "hexproof counter",
+  spelling = "hexproof counter"
 }

@@ -11,16 +11,13 @@ card {
       "Midnight Entity",
       whenever(
         does(actor(thisVehicle), attack),
-        sequentially(
-          [
-            faceAVillainousChoice(
-              instruct(defendingPlayer, sacrifice(a(isCreature))),
-              gainControl(
-                target(and([isCreature, controlledBy(defendingPlayer)])),
-                untilEndOfTurn)),
-            doIf(
-              did(actor(you), gainControlOf(a(isCreature)), thisWay),
-              sequentially([tap(it), becomeAttacking(it, defendingPlayer)]))]))),
+        sequentially([
+          faceAVillainousChoice(
+            instruct(defendingPlayer, sacrifice(a(isCreature))),
+            gainControl(target(and([isCreature, controlledBy(defendingPlayer)])), untilEndOfTurn)),
+          doIf(
+            did(actor(you), gainControlOf(a(isCreature)), thisWay),
+            sequentially([tap(it), becomeAttacking(it, defendingPlayer)]))]))),
     crew(2)],
   power = 3,
   toughness = 4

@@ -12,17 +12,18 @@ ability warp(cost: Cost) {
   spelling = "warp <cost>",
   body = [
     static(
-      onlyWhile(altCost(this, $cost), is(this, did(any, cast(which, from = yourHand), thisObject)))),
+      onlyWhile(
+        altCost(this, $cost),
+        is(this, did(any, cast(which, from = yourHand), thisObject)))),
     static(
       resolutionDelayedTrigger(
         doIf(
           keywordCostPaid(warp, thisSpell),
           atNext(
             endStep,
-            sequentially(
-              [
-                exile(becomes(thisSpell)),
-                establishThroughout(
-                  can(actor(ownerOf(it)), cast(it, from = exileZone)),
-                  onALaterTurn)])))))]
+            sequentially([
+              exile(becomes(thisSpell)),
+              establishThroughout(
+                can(actor(ownerOf(it)), cast(it, from = exileZone)),
+                onALaterTurn)])))))]
 }

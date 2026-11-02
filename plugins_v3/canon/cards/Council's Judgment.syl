@@ -5,13 +5,12 @@ card {
   text = [
     willOfTheCouncil(
       spell(
-        sequentially(
-          [
-            instruct(
-              eachPlayer,
-              voteStartingWith(
-                you,
-                openly,
-                byCandidate(a(and([isPermanent, non(isLand), youDontControl]))))),
-            exile(allOf(and([isPermanent, withMostVotes])))])))]
+        sequentially([
+          instruct(
+            eachPlayer,
+            voteStartingWith(
+              you,
+              openly,
+              byCandidate(a(and([isPermanent, non(isLand), youDontControl]))))),
+          exile(allOf(and([isPermanent, withMostVotes])))])))]
 }

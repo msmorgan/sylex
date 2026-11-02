@@ -5,12 +5,11 @@
 sba deathtouchDestruction {
   body = {
     scope = isCreature,
-    when = and(
-      [
-        compareAmt(toughnessOf(this), greater, 0),
-        did(
-          by(a(and([isSource, hasKeyword(theKeyword(deathtouch))]))),
-          dealDamage(recipient = this),
-          within(durationBetween(stateBasedActionsChecked, now)))]),
+    when = and([
+      compareAmt(toughnessOf(this), greater, 0),
+      did(
+        by(a(and([isSource, hasKeyword(theKeyword(deathtouch))]))),
+        dealDamage(recipient = this),
+        within(durationBetween(stateBasedActionsChecked, now)))]),
     then = destroy(this)}
 }

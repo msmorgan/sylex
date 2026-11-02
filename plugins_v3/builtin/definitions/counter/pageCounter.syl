@@ -1,4 +1,4 @@
 counter pageCounter {
   lexical = {lemma = "page counter"},
-  spelling = "page counter",
+  spelling = "page counter"
 }

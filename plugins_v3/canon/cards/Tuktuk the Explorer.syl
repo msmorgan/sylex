@@ -10,15 +10,14 @@ card {
       does(actor(thisCreature), die),
       create(
         1,
-        written(
-          {
-            characteristics = {
-              name = "Tuktuk the Returned",
-              supertypes = [legendary],
-              types = [artifact, creature],
-              subtypes = [goblin, golem],
-              power = 5,
-              toughness = 5}})))],
+        written({
+          characteristics = {
+            name = "Tuktuk the Returned",
+            supertypes = [legendary],
+            types = [artifact, creature],
+            subtypes = [goblin, golem],
+            power = 5,
+            toughness = 5}})))],
   power = 1,
   toughness = 1
 }

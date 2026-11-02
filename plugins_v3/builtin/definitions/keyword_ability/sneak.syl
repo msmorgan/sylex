@@ -22,15 +22,11 @@ ability sneak(cost: Cost) {
         doIf(
           keywordCostPaid(sneak, thisPermanent),
           # It enters tapped and attacking what the returned creature was attacking [CR#702.190b].
-          withRiders(
-            [
-              entersAs(tapped),
-              entersAttacking(
-                the(
-                  and(
-                    [
-                      or([isPlayer, isPlaneswalker, isBattle]),
-                      inCombat(
-                        attackedBy,
-                        the(and([was(returnToHand(which)), isCreature])))])))]))))]
+          withRiders([
+            entersAs(tapped),
+            entersAttacking(
+              the(
+                and([
+                  or([isPlayer, isPlaneswalker, isBattle]),
+                  inCombat(attackedBy, the(and([was(returnToHand(which)), isCreature])))])))]))))]
 }

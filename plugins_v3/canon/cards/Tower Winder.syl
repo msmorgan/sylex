@@ -8,12 +8,11 @@ card {
     deathtouch,
     when(
       does(actor(thisCreature), enter),
-      sequentially(
-        [
-          searchLibraryOrGraveyard(a(named(printedName("Command Tower")))),
-          reveal(it),
-          putInto(it, hand),
-          doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],
+      sequentially([
+        searchLibraryOrGraveyard(a(named(printedName("Command Tower")))),
+        reveal(it),
+        putInto(it, hand),
+        doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],
   power = 1,
   toughness = 1
 }

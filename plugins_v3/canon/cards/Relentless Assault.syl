@@ -4,8 +4,7 @@ card {
   types = [sorcery],
   text = [
     spell(
-      sequentially(
-        [
-          untap(allOf(and([isCreature, did(actor(which), attack, within(soFarThisTurn))]))),
-          additionalPhase(combat, mainPhase, 1, mainPhase)]))]
+      sequentially([
+        untap(allOf(and([isCreature, did(actor(which), attack, within(soFarThisTurn))]))),
+        additionalPhase(combat, mainPhase, 1, mainPhase)]))]
 }

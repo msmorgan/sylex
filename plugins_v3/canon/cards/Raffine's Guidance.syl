@@ -7,7 +7,5 @@ card {
     enchant(isCreature),
     static(getsPt(enchanted(creature), up(1), up(1))),
     static(
-      can(
-        actor(you),
-        cast(this, from = yourGraveyard, payment = payingInstead(mana([2, white])))))]
+      can(actor(you), cast(this, from = yourGraveyard, payment = payingInstead(mana([2, white])))))]
 }

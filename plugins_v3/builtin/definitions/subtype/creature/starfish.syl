@@ -3,5 +3,5 @@ subtype starfish {
   lexical = {lemma = "Starfish", plural = "Starfish"},
   spelling = "Starfish",
   kind = creature,
-  name = "Starfish",
+  name = "Starfish"
 }

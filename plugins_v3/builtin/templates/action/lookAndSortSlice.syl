@@ -5,9 +5,8 @@ template lookAndSortSlice(
   spill: Location,
   spillRiders: List(MoveRider) = []): Action {
   # TODO(spelling): Format and coordinate the spillRiders list entries, including the empty case.
-  body = sequentially(
-    [
-      expose(lookAt, cards($slice)),
-      move(someOf(anyNumber, $slice), anywhere, $spill, arrival, $spillRiders),
-      move(theRest, anywhere, onTop, arrival, [inOrder(anyOrder)])])
+  body = sequentially([
+    expose(lookAt, cards($slice)),
+    move(someOf(anyNumber, $slice), anywhere, $spill, arrival, $spillRiders),
+    move(theRest, anywhere, onTop, arrival, [inOrder(anyOrder)])])
 }

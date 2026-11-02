@@ -1,4 +1,4 @@
 counter fateCounter {
   lexical = {lemma = "fate counter"},
-  spelling = "fate counter",
+  spelling = "fate counter"
 }

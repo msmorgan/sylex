@@ -9,9 +9,8 @@ card {
       compound([mana([2]), perform(sacrifice(thisArtifact))]),
       destroy(
         each(
-          and(
-            [
-              isPermanent,
-              non(isLand),
-              hasManaValue(eq, countersOn(chargeCounter, thisArtifact))]))))]
+          and([
+            isPermanent,
+            non(isLand),
+            hasManaValue(eq, countersOn(chargeCounter, thisArtifact))]))))]
 }

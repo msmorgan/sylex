@@ -2,5 +2,5 @@
 # marker and nothing else: the CR gives it no behavior of its own, so it confers nothing.
 counter chargeCounter {
   lexical = {lemma = "charge counter"},
-  spelling = "charge counter",
+  spelling = "charge counter"
 }

@@ -9,6 +9,5 @@ card {
         this,
         dealDamage(
           5,
-          target(
-            and([or([isCreature, isPlaneswalker]), or([hasColor(white), hasColor(blue)])])))))]
+          target(and([or([isCreature, isPlaneswalker]), or([hasColor(white), hasColor(blue)])])))))]
 }

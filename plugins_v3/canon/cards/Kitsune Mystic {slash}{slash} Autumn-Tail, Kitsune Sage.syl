@@ -1,27 +1,26 @@
-card flip(
-  {
-    normal = {
-      name = "Kitsune Mystic",
-      cost = [3, white],
-      types = [creature],
-      subtypes = [fox, wizard],
-      text = [
-        at(
-          beginningOfEach(endStep),
-          if = is(thisCreature, attachedBy(enchanted, counted(orMore(2), hasSubtype(aura)))),
-          action = flip(thisCreature))],
-      power = 2,
-      toughness = 3},
-    alternative = {
-      name = "Autumn-Tail, Kitsune Sage",
-      supertypes = [legendary],
-      types = [creature],
-      subtypes = [fox, wizard],
-      text = [
-        activated(
-          mana([1]),
-          attachTo(
-            target(and([hasSubtype(aura), attachedTo(a(isCreature))])),
-            a(and([isCreature, isOther]))))],
-      power = 4,
-      toughness = 5}})
+card flip({
+  normal = {
+    name = "Kitsune Mystic",
+    cost = [3, white],
+    types = [creature],
+    subtypes = [fox, wizard],
+    text = [
+      at(
+        beginningOfEach(endStep),
+        if = is(thisCreature, attachedBy(enchanted, counted(orMore(2), hasSubtype(aura)))),
+        action = flip(thisCreature))],
+    power = 2,
+    toughness = 3},
+  alternative = {
+    name = "Autumn-Tail, Kitsune Sage",
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [fox, wizard],
+    text = [
+      activated(
+        mana([1]),
+        attachTo(
+          target(and([hasSubtype(aura), attachedTo(a(isCreature))])),
+          a(and([isCreature, isOther]))))],
+    power = 4,
+    toughness = 5}})

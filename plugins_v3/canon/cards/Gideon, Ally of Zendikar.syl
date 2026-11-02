@@ -7,23 +7,22 @@ card {
   text = [
     activated(
       loyaltySymbol(up(1)),
-      sequentially(
-        [
-          establishThroughout(
-            qualityChange(
-              thisPlaneswalker,
-              sets,
-              bundle(
-                {
-                  characteristics = {
-                    types = [creature],
-                    subtypes = [human, soldier, ally],
-                    text = [indestructible],
-                    power = 5,
-                    toughness = 5}},
-                planeswalker)),
-            untilEndOfTurn),
-          preventAll(it, thisTurn)])),
+      sequentially([
+        establishThroughout(
+          qualityChange(
+            thisPlaneswalker,
+            sets,
+            bundle(
+              {
+                characteristics = {
+                  types = [creature],
+                  subtypes = [human, soldier, ally],
+                  text = [indestructible],
+                  power = 5,
+                  toughness = 5}},
+              planeswalker)),
+          untilEndOfTurn),
+        preventAll(it, thisTurn)])),
     activated(
       loyaltySymbol(up(0)),
       create(1, written(creatureToken(2, 2, [white], [knight, ally])))),

@@ -8,11 +8,10 @@ card {
   types = [instant],
   text = [
     spell(
-      sequentially(
-        [
-          choose(
-            both(
-              target(and([isCreature, youControl])),
-              target(and([isCreature, anOpponentControls])))),
-          instruct(eachOf(those(creature)), dealDamage(toughnessOf(it), theOther))]))]
+      sequentially([
+        choose(
+          both(
+            target(and([isCreature, youControl])),
+            target(and([isCreature, anOpponentControls])))),
+        instruct(eachOf(those(creature)), dealDamage(toughnessOf(it), theOther))]))]
 }

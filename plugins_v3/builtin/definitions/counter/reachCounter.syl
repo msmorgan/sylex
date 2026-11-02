@@ -2,5 +2,5 @@
 # [CR#122.1b,613.1f]
 counter reachCounter {
   lexical = {lemma = "reach counter"},
-  spelling = "reach counter",
+  spelling = "reach counter"
 }

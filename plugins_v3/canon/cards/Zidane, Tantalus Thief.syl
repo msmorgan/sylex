@@ -10,14 +10,10 @@ card {
   text = [
     when(
       does(actor(thisCreature), enter),
-      sequentially(
-        [
-          gainControl(target(and([isCreature, anOpponentControls])), untilEndOfTurn),
-          untap(it),
-          establishFor(
-            it,
-            [abilityGrant(it, lifelink), abilityGrant(it, haste)],
-            untilEndOfTurn)])),
+      sequentially([
+        gainControl(target(and([isCreature, anOpponentControls])), untilEndOfTurn),
+        untap(it),
+        establishFor(it, [abilityGrant(it, lifelink), abilityGrant(it, haste)], untilEndOfTurn)])),
     whenever(
       does(actor(anOpponent), gainControlOf(a(isPermanent), you)),
       create(1, written(treasureToken)))],

@@ -3,5 +3,5 @@
 # [CR#122.1e]
 counter loyaltyCounter {
   lexical = {lemma = "loyalty counter"},
-  spelling = "loyalty counter",
+  spelling = "loyalty counter"
 }

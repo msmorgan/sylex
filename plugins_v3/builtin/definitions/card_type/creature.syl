@@ -28,10 +28,9 @@ card_type creature {
     damageResult(markDamage(this, thatMuch)),
     stateBased(compareAmt(toughnessOf(this), atMost, 0), putInto(this, graveyard)),
     stateBased(
-      and(
-        [
-          compareAmt(toughnessOf(this), greater, 0),
-          compareAmt(statOf(markedDamage, this), greater, 0),
-          compareAmt(statOf(markedDamage, this), atLeast, toughnessOf(this))]),
+      and([
+        compareAmt(toughnessOf(this), greater, 0),
+        compareAmt(statOf(markedDamage, this), greater, 0),
+        compareAmt(statOf(markedDamage, this), atLeast, toughnessOf(this))]),
       destroy(this))]
 }

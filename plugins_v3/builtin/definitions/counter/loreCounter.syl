@@ -3,5 +3,5 @@
 # [CR#714.4].
 counter loreCounter {
   lexical = {lemma = "lore counter"},
-  spelling = "lore counter",
+  spelling = "lore counter"
 }

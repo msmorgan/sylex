@@ -7,12 +7,11 @@ ability training {
     whenever(
       does(
         actor(
-          and(
-            [
-              thisCreature,
-              counted(
-                orMore(1),
-                and([isCreature, isOther, hasPower(greater, powerOf(thisCreature))]))])),
+          and([
+            thisCreature,
+            counted(
+              orMore(1),
+              and([isCreature, isOther, hasPower(greater, powerOf(thisCreature))]))])),
         attack),
       putCounters(1, printedKind(p1p1Counter), thisCreature))]
 }

@@ -12,8 +12,7 @@ card {
         asThough = holds(is(them, not(hasKeyword(hexproof)))))),
     activated(
       compound([mana([3]), perform(sacrifice(thisArtifact))]),
-      sequentially(
-        [
-          gain(allOf(and([isCreature, youControl])), hexproof, untilEndOfTurn),
-          establishThroughout(cant(any, block(allOf(and([isCreature, youControl])))), thisTurn)]))]
+      sequentially([
+        gain(allOf(and([isCreature, youControl])), hexproof, untilEndOfTurn),
+        establishThroughout(cant(any, block(allOf(and([isCreature, youControl])))), thisTurn)]))]
 }

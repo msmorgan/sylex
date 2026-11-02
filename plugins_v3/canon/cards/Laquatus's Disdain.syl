@@ -4,8 +4,7 @@ card {
   types = [instant],
   text = [
     spell(
-      sequentially(
-        [
-          counter(target(and([isSpell, did(any, cast(which, from = graveyard), thisObject)]))),
-          draw(1)]))]
+      sequentially([
+        counter(target(and([isSpell, did(any, cast(which, from = graveyard), thisObject)]))),
+        draw(1)]))]
 }

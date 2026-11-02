@@ -4,8 +4,7 @@ card {
   types = [instant],
   text = [
     spell(
-      sequentially(
-        [
-          instruct(this, dealDamage(4, target(isCreature))),
-          establish(cant(any, preventDamage(allDamage)), modifiesPrecedingAction)]))]
+      sequentially([
+        instruct(this, dealDamage(4, target(isCreature))),
+        establish(cant(any, preventDamage(allDamage)), modifiesPrecedingAction)]))]
 }

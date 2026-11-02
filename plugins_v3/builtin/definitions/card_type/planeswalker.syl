@@ -14,7 +14,5 @@ card_type planeswalker {
     ability(static(entersWithCounters(this, statOf(stat(loyalty), this), loyaltyCounter))),
     property(can(any, attack(this))),
     damageResult(loseCounters(printedKind(loyaltyCounter), thatMuch, this)),
-    stateBased(
-      compareAmt(countersOn(loyaltyCounter, this), eq, 0),
-      putInto(this, graveyard))]
+    stateBased(compareAmt(countersOn(loyaltyCounter, this), eq, 0), putInto(this, graveyard))]
 }

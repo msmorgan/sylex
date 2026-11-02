@@ -6,9 +6,8 @@ card {
     spell(
       returnToBattlefield(
         allOf(
-          and(
-            [
-              isPermanentCard,
-              in(yourGraveyard),
-              was(putIntoFromBattlefield(which, yourGraveyard), within(soFarThisTurn))]))))]
+          and([
+            isPermanentCard,
+            in(yourGraveyard),
+            was(putIntoFromBattlefield(which, yourGraveyard), within(soFarThisTurn))]))))]
 }

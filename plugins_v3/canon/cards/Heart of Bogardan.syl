@@ -6,15 +6,11 @@ card {
     cumulativeUpkeep(mana([2])),
     when(
       does(actor(a(isPlayer)), pay(anyCost, once, unpaid, thisEnchantment, cumulativeUpkeep)),
-      sequentially(
-        [
-          simultaneously(
-            [
-              instruct(this, dealDamage(letter(x), target(or([isPlaneswalker, isPlayer])))),
-              instruct(
-                this,
-                dealDamage(
-                  letter(x),
-                  each(and([isCreature, controlledBy(splitOverPlaneswalker)]))))]),
-          define(x, minus(times(2, countersOn(ageCounter, thisEnchantment)), 2))]))]
+      sequentially([
+        simultaneously([
+          instruct(this, dealDamage(letter(x), target(or([isPlaneswalker, isPlayer])))),
+          instruct(
+            this,
+            dealDamage(letter(x), each(and([isCreature, controlledBy(splitOverPlaneswalker)]))))]),
+        define(x, minus(times(2, countersOn(ageCounter, thisEnchantment)), 2))]))]
 }

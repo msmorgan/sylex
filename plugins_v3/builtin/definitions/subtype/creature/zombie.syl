@@ -2,5 +2,5 @@ subtype zombie {
   lexical = {lemma = "Zombie"},
   spelling = "Zombie",
   kind = creature,
-  name = "Zombie",
+  name = "Zombie"
 }

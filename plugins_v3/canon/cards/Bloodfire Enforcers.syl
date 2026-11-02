@@ -7,10 +7,9 @@ card {
     static(
       onlyWhile(
         conjunction([abilityGrant(thisCreature, firstStrike), abilityGrant(it, trample)]),
-        and(
-          [
-            exists(and([isInstant, in(yourGraveyard)])),
-            exists(and([isSorcery, in(yourGraveyard)]))])))],
+        and([
+          exists(and([isInstant, in(yourGraveyard)])),
+          exists(and([isSorcery, in(yourGraveyard)]))])))],
   power = 5,
   toughness = 2
 }

@@ -2,8 +2,7 @@
 action manifest(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "manifest", frames = [Monotransitive]}]},
   spelling = "manifest <subject>",
-  body = sequentially(
-    [
-      turnFaceDown($subject, faceDownCreature),
-      move($subject, anywhere, battlefield, arrival, [faceDownAs(faceDownCreature)])])
+  body = sequentially([
+    turnFaceDown($subject, faceDownCreature),
+    move($subject, anywhere, battlefield, arrival, [faceDownAs(faceDownCreature)])])
 }

@@ -9,9 +9,8 @@ ability replicate(cost: Cost) {
     static(addedCost($cost, true, anyNumberOfTimes)),
     when(
       does(actor(you), cast(thisSpell)),
-      sequentially(
-        [
-          copyOnStack(thisSpell, timesPaid(byKeyword(replicate), thisSpell)),
-          may(chooseNewTargets(those(copy)))]),
+      sequentially([
+        copyOnStack(thisSpell, timesPaid(byKeyword(replicate), thisSpell)),
+        may(chooseNewTargets(those(copy)))]),
       if = keywordCostPaid(replicate, thisSpell))]
 }

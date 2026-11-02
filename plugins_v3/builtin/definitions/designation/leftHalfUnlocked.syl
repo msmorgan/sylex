@@ -3,5 +3,5 @@
 designation leftHalfUnlocked {
   lexical = {adjectives = ["unlocked"]},
   spelling = "left half unlocked",
-  scope = heldBy(object),
+  scope = heldBy(object)
 }

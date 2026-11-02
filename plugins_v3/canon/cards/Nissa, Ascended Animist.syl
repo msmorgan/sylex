@@ -8,10 +8,9 @@ card {
     compleated,
     activated(
       loyaltySymbol(up(1)),
-      sequentially(
-        [
-          create(1, written(creatureTokenOf(letter(x), letter(x), [green], [phyrexian, horror]))),
-          define(x, statOf(stat(loyalty), thisPlaneswalker))])),
+      sequentially([
+        create(1, written(creatureTokenOf(letter(x), letter(x), [green], [phyrexian, horror]))),
+        define(x, statOf(stat(loyalty), thisPlaneswalker))])),
     activated(loyaltySymbol(down(1)), destroy(target(or([isArtifact, isEnchantment])))),
     activated(
       loyaltySymbol(down(7)),

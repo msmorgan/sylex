@@ -1,4 +1,4 @@
 counter pinCounter {
   lexical = {lemma = "pin counter"},
-  spelling = "pin counter",
+  spelling = "pin counter"
 }

@@ -4,5 +4,5 @@
 designation foretold {
   lexical = {adjectives = ["foretold"]},
   spelling = "foretold",
-  scope = heldBy(object),
+  scope = heldBy(object)
 }

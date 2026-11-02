@@ -5,10 +5,9 @@ card {
   subtypes = [avatar],
   text = [
     static(
-      conjunction(
-        [
-          getsPt(thisCreature, down(letter(x)), down(letter(x))),
-          letterDefinition(x, lifeTotalOf(you))]))],
+      conjunction([
+        getsPt(thisCreature, down(letter(x)), down(letter(x))),
+        letterDefinition(x, lifeTotalOf(you))]))],
   power = 13,
   toughness = 13
 }

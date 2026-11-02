@@ -14,10 +14,9 @@ ability rebound {
         doIf(
           is(thisSpell, did(any, cast(which, yourHand), thisObject)),
           instead(
-            sequentially(
-              [
-                exile(thisSpell),
-                delay(
-                  beginningOf(upkeep, you, nextTime),
-                  may(cast(this, payment = withoutPaying)))])))))]
+            sequentially([
+              exile(thisSpell),
+              delay(
+                beginningOf(upkeep, you, nextTime),
+                may(cast(this, payment = withoutPaying)))])))))]
 }

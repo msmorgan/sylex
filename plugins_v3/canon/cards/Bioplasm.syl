@@ -6,16 +6,15 @@ card {
   text = [
     whenever(
       does(actor(thisCreature), attack),
-      sequentially(
-        [
-          exile(topSlice(1)),
-          doIf(
-            is(it, and([isCard, isCreature])),
-            get(
-              thisCreature,
-              up(powerOf(the(and([was(exile(which)), isCreature, isCard])))),
-              up(toughnessOf(it)),
-              thisTurn))]))],
+      sequentially([
+        exile(topSlice(1)),
+        doIf(
+          is(it, and([isCard, isCreature])),
+          get(
+            thisCreature,
+            up(powerOf(the(and([was(exile(which)), isCreature, isCard])))),
+            up(toughnessOf(it)),
+            thisTurn))]))],
   power = 4,
   toughness = 4
 }

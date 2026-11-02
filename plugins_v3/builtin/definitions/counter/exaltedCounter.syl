@@ -2,5 +2,5 @@
 # [CR#122.1b,613.1f]
 counter exaltedCounter {
   lexical = {lemma = "exalted counter"},
-  spelling = "exalted counter",
+  spelling = "exalted counter"
 }

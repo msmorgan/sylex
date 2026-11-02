@@ -12,10 +12,7 @@ ability blitz(cost: Cost) {
     static(
       resolutionDelayedTrigger(
         doIf(keywordCostPaid(blitz, thisSpell), atNext(endStep, sacrifice(becomes(thisSpell)))))),
-    static(
-      onlyWhile(
-        abilityGrant(thisPermanent, haste),
-        keywordCostPaid(blitz, thisPermanent))),
+    static(onlyWhile(abilityGrant(thisPermanent, haste), keywordCostPaid(blitz, thisPermanent))),
     static(
       onlyWhile(
         abilityGrant(thisPermanent, when(does(actor(thisPermanent), die), draw(1))),

@@ -4,10 +4,9 @@ card {
   types = [sorcery],
   text = [
     spell(
-      sequentially(
-        [
-          putCounters(1, printedKind(p1p1Counter), target(and([isCreature, youControl]))),
-          establishThroughout(
-            must(actor(target(and([isCreature, isOther]))), block(it)),
-            thisTurn)]))]
+      sequentially([
+        putCounters(1, printedKind(p1p1Counter), target(and([isCreature, youControl]))),
+        establishThroughout(
+          must(actor(target(and([isCreature, isOther]))), block(it)),
+          thisTurn)]))]
 }

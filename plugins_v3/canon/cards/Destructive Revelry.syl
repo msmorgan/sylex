@@ -4,8 +4,7 @@ card {
   types = [instant],
   text = [
     spell(
-      sequentially(
-        [
-          destroy(target(or([isArtifact, isEnchantment]))),
-          instruct(this, dealDamage(2, controllerOf(that(permanent))))]))]
+      sequentially([
+        destroy(target(or([isArtifact, isEnchantment]))),
+        instruct(this, dealDamage(2, controllerOf(that(permanent))))]))]
 }

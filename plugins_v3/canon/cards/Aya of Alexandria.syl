@@ -13,15 +13,14 @@ card {
         dealDamage(recipient = a(isPlayer), kind = combat)),
       create(
         1,
-        written(
-          {
-            characteristics = {
-              colors = [black],
-              types = [creature],
-              subtypes = [assassin],
-              text = [menace],
-              power = 1,
-              toughness = 1}})))],
+        written({
+          characteristics = {
+            colors = [black],
+            types = [creature],
+            subtypes = [assassin],
+            text = [menace],
+            power = 1,
+            toughness = 1}})))],
   power = 4,
   toughness = 3
 }

@@ -4,10 +4,9 @@ card {
   types = [sorcery],
   text = [
     spell(
-      sequentially(
-        [
-          establishThroughout(
-            can(actor(you), play(counted(additional(exactly(1)), isLand))),
-            thisTurn),
-          draw(1)]))]
+      sequentially([
+        establishThroughout(
+          can(actor(you), play(counted(additional(exactly(1)), isLand))),
+          thisTurn),
+        draw(1)]))]
 }

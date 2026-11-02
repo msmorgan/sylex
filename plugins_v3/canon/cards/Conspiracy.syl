@@ -6,11 +6,10 @@ card {
     static(entersChoosing(thisEnchantment, subtype(creature))),
     static(
       qualityChange(
-        and(
-          [
-            allOf(and([isCreature, youControl])),
-            allOf(and([isCreature, isSpell, youControl])),
-            allOf(and([isCard, isCreature, youOwn, not(in(battlefield))]))]),
+        and([
+          allOf(and([isCreature, youControl])),
+          allOf(and([isCreature, isSpell, youControl])),
+          allOf(and([isCard, isCreature, youOwn, not(in(battlefield))]))]),
         sets,
         chosenQuality(ofChosen(subtype(creature)))))]
 }

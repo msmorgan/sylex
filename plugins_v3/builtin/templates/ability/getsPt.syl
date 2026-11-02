@@ -4,5 +4,7 @@ template getsPt(
   powerValue: Delta(Amount),
   toughnessValue: Delta(Amount)): StaticSpec {
   spelling = "<subject> gets <powerValue>/<toughnessValue>",
-  body = characteristicChange($subject, [stat(power, $powerValue), stat(toughness, $toughnessValue)])
+  body = characteristicChange(
+    $subject,
+    [stat(power, $powerValue), stat(toughness, $toughnessValue)])
 }

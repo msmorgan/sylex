@@ -2,5 +2,5 @@
 # [CR#122.1b,613.1f]
 counter deathtouchCounter {
   lexical = {lemma = "deathtouch counter"},
-  spelling = "deathtouch counter",
+  spelling = "deathtouch counter"
 }

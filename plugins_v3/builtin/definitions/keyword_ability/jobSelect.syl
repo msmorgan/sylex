@@ -7,7 +7,5 @@ ability jobSelect {
     when(
       does(actor(thisEquipment), enter),
       sequentially(
-        [
-          create(1, written(creatureToken(1, 1, [], [hero]))),
-          attachTo(thisEquipment, thatToken)]))]
+        [create(1, written(creatureToken(1, 1, [], [hero]))), attachTo(thisEquipment, thatToken)]))]
 }

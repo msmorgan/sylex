@@ -8,12 +8,11 @@ card {
     storm,
     enchant(isCreature),
     static(
-      conjunction(
-        [
-          allAbilityLoss(enchanted(creature)),
-          qualityChange(
-            it,
-            sets,
-            bundle({characteristics = {colors = [blue], types = [creature], subtypes = [frog]}})),
-          getsBase(it, lit(1), lit(1))]))]
+      conjunction([
+        allAbilityLoss(enchanted(creature)),
+        qualityChange(
+          it,
+          sets,
+          bundle({characteristics = {colors = [blue], types = [creature], subtypes = [frog]}})),
+        getsBase(it, lit(1), lit(1))]))]
 }

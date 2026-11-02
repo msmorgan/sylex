@@ -8,9 +8,8 @@ card {
         controllerOf(target(isSpell)),
         doUnless(
           instruct(you, counter(it)),
-          compound(
-            [
-              mana([2]),
-              scaledGenericMana(
-                forEach(2, and([named(printedName("Rune Snag")), in(graveyard)])))]))))]
+          compound([
+            mana([2]),
+            scaledGenericMana(
+              forEach(2, and([named(printedName("Rune Snag")), in(graveyard)])))]))))]
 }

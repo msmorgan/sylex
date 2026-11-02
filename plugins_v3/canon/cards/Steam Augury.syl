@@ -4,11 +4,10 @@ card {
   types = [instant],
   text = [
     spell(
-      sequentially(
-        [
-          reveal(topSlice(5)),
-          separateIntoPiles(them, 2),
-          instruct(anOpponent, choose(onePile)),
-          putInto(that(pile), hand),
-          putInto(theOther, graveyard)]))]
+      sequentially([
+        reveal(topSlice(5)),
+        separateIntoPiles(them, 2),
+        instruct(anOpponent, choose(onePile)),
+        putInto(that(pile), hand),
+        putInto(theOther, graveyard)]))]
 }

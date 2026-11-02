@@ -4,10 +4,9 @@ card {
   types = [instant],
   text = [
     spell(
-      chooseSpree(
-        [
-          {
-            cost = mana([1]),
-            action = untap(allOf(and([isCreature, controlledBy(target(isPlayer))])))},
-          {cost = mana([1]), action = gain(target(isCreature), doubleStrike, untilEndOfTurn)}]))]
+      chooseSpree([
+        {
+          cost = mana([1]),
+          action = untap(allOf(and([isCreature, controlledBy(target(isPlayer))])))},
+        {cost = mana([1]), action = gain(target(isCreature), doubleStrike, untilEndOfTurn)}]))]
 }

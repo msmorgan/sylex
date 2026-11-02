@@ -6,11 +6,10 @@ action regeneration(subject: NounPhrase) {
   spelling = "the regeneration of <subject>",
   lexical = {verbs = [{lemma = "regenerate", frames = [Intransitive, Monotransitive]}]},
   deed = "regenerate",
-  body = sequentially(
-    [
-      clearDamage($subject),
-      instruct(possessorOf(controller, $subject), tap($subject)),
-      doIf(
-        or([is($subject, inCombat(attackerOf)), is($subject, inCombat(blockerOf))]),
-        removeFromCombat($subject))])
+  body = sequentially([
+    clearDamage($subject),
+    instruct(possessorOf(controller, $subject), tap($subject)),
+    doIf(
+      or([is($subject, inCombat(attackerOf)), is($subject, inCombat(blockerOf))]),
+      removeFromCombat($subject))])
 }

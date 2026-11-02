@@ -2,5 +2,5 @@
 # 6. [CR#122.1b,613.1f]
 counter firstStrikeCounter {
   lexical = {lemma = "first strike counter"},
-  spelling = "first strike counter",
+  spelling = "first strike counter"
 }

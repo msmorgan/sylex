@@ -4,12 +4,11 @@ card {
   types = [sorcery],
   text = [
     spell(
-      sequentially(
-        [
-          choose(a(quality(subtype(creature)))),
-          get(
-            allOf(and([isCreature, not(ofChosen(subtype(creature)))])),
-            down(3),
-            down(3),
-            untilEndOfTurn)]))]
+      sequentially([
+        choose(a(quality(subtype(creature)))),
+        get(
+          allOf(and([isCreature, not(ofChosen(subtype(creature)))])),
+          down(3),
+          down(3),
+          untilEndOfTurn)]))]
 }

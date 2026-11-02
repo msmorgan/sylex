@@ -4,11 +4,10 @@ card {
   types = [instant],
   text = [
     spell(
-      sequentially(
-        [
-          establishThroughout(cant(actor(bare(isPlayer)), gainLife(anyAmount)), thisTurn),
-          establishThroughout(
-            cant(any, preventDamage(allDamage, damage = would(any, dealDamage))),
-            thisTurn),
-          instruct(this, dealDamage(3, target(isAnyTarget)))]))]
+      sequentially([
+        establishThroughout(cant(actor(bare(isPlayer)), gainLife(anyAmount)), thisTurn),
+        establishThroughout(
+          cant(any, preventDamage(allDamage, damage = would(any, dealDamage))),
+          thisTurn),
+        instruct(this, dealDamage(3, target(isAnyTarget)))]))]
 }

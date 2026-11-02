@@ -11,13 +11,12 @@ card {
           counted(orMore(2), and([isPermanent, non(isLand), isNontoken, youControl])))),
       action = create(
         1,
-        written(
-          {
-            characteristics = {
-              types = [artifact, creature],
-              subtypes = [construct],
-              power = 4,
-              toughness = 4}})))],
+        written({
+          characteristics = {
+            types = [artifact, creature],
+            subtypes = [construct],
+            power = 4,
+            toughness = 4}})))],
   power = 4,
   toughness = 4
 }

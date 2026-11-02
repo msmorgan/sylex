@@ -14,15 +14,14 @@ card {
     disguise(mana([1, blue])),
     when(
       does(any, turnFaceUp(thisCreature)),
-      sequentially(
-        [
-          instruct(
-            target(isOpponent),
-            gainControl(targets(anyNumber, and([isPermanent, youControl])))),
-          draw(
-            forEach(
-              eventTally(actor(they), gainControlOf(those(permanent)), thisWay, events),
-              isPermanent))]))],
+      sequentially([
+        instruct(
+          target(isOpponent),
+          gainControl(targets(anyNumber, and([isPermanent, youControl])))),
+        draw(
+          forEach(
+            eventTally(actor(they), gainControlOf(those(permanent)), thisWay, events),
+            isPermanent))]))],
   power = 1,
   toughness = 4
 }

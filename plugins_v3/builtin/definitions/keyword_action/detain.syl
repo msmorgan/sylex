@@ -5,10 +5,9 @@ action detain(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "detain", frames = [Monotransitive]}]},
   spelling = "detain <subject>",
   body = establishThroughout(
-    conjunction(
-      [
-        cant(actor($subject), attack),
-        cant(actor($subject), block),
-        cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf($subject)]))))]),
+    conjunction([
+      cant(actor($subject), attack),
+      cant(actor($subject), block),
+      cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf($subject)]))))]),
     untilYourNextTurn)
 }

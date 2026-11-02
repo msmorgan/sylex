@@ -12,12 +12,11 @@ ability eternalize(cost: Cost) {
         copyOf(
           this,
           [
-            characteristicEdits(
-              [
-                colors(sets, some([black])),
-                stat(power, set(4)),
-                stat(toughness, set(4)),
-                manaCost(none),
-                typeLine(adds, {subtypes = [zombie]})])])),
+            characteristicEdits([
+              colors(sets, some([black])),
+              stat(power, set(4)),
+              stat(toughness, set(4)),
+              manaCost(none),
+              typeLine(adds, {subtypes = [zombie]})])])),
       asSorcery)]
 }

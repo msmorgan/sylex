@@ -11,15 +11,14 @@ card {
         sacrifice(thisLand),
         create(
           1,
-          written(
-            {
-              characteristics = {
-                name = "Marit Lage",
-                colors = [black],
-                supertypes = [legendary],
-                types = [creature],
-                subtypes = [avatar],
-                text = [flying, indestructible],
-                power = 20,
-                toughness = 20}}))))]
+          written({
+            characteristics = {
+              name = "Marit Lage",
+              colors = [black],
+              supertypes = [legendary],
+              types = [creature],
+              subtypes = [avatar],
+              text = [flying, indestructible],
+              power = 20,
+              toughness = 20}}))))]
 }

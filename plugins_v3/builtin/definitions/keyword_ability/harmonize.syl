@@ -14,11 +14,10 @@ ability harmonize(cost: Cost) {
           this,
           yourGraveyard,
           payingInstead(
-            compound(
-              [
-                $cost,
-                perform(
-                  tap(counted(upTo(1), and([isUntapped, and([isCreature, youControl])]))))]))))),
+            compound([
+              $cost,
+              perform(
+                tap(counted(upTo(1), and([isUntapped, and([isCreature, youControl])]))))]))))),
     static(
       onlyWhile(
         costShift(thisSpell, generic(down(powerOf(the(and([was(tap(which)), isCreature])))), none)),

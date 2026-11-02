@@ -8,9 +8,8 @@ card {
         any,
         activate(
           allOf(
-            and(
-              [
-                abilityHead(anyActivated),
-                abilityOf(allOf(or([isArtifact, isCreature]))),
-                not(isManaAbility)])))))]
+            and([
+              abilityHead(anyActivated),
+              abilityOf(allOf(or([isArtifact, isCreature]))),
+              not(isManaAbility)])))))]
 }

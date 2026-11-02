@@ -9,18 +9,16 @@ ability hideaway(amount: Amount) {
   body = [
     when(
       does(actor(thisPermanent), enter),
-      sequentially(
-        [
-          lookAt(topSlice($amount)),
-          exileFaceDown(someOf(oneThrough(1), them)),
-          move(theRest, anywhere, onBottom, arrival, [inOrder(randomOrder)]),
-          establishThroughout(
-            conjunction(
-              [
-                visibility(lookAt, you, objects(the(and([was(exile(which)), isCard])))),
-                visibility(
-                  lookAt,
-                  controllerOf(thisPermanent),
-                  objects(the(and([was(exile(which)), isCard]))))]),
-            forAsLongAs(is(the(and([was(exile(which)), isCard])), in(exileZone))))]))]
+      sequentially([
+        lookAt(topSlice($amount)),
+        exileFaceDown(someOf(oneThrough(1), them)),
+        move(theRest, anywhere, onBottom, arrival, [inOrder(randomOrder)]),
+        establishThroughout(
+          conjunction([
+            visibility(lookAt, you, objects(the(and([was(exile(which)), isCard])))),
+            visibility(
+              lookAt,
+              controllerOf(thisPermanent),
+              objects(the(and([was(exile(which)), isCard]))))]),
+          forAsLongAs(is(the(and([was(exile(which)), isCard])), in(exileZone))))]))]
 }

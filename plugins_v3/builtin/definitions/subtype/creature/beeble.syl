@@ -2,5 +2,5 @@ subtype beeble {
   lexical = {lemma = "Beeble"},
   spelling = "Beeble",
   kind = creature,
-  name = "Beeble",
+  name = "Beeble"
 }

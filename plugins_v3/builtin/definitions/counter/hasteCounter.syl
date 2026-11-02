@@ -2,5 +2,5 @@
 # [CR#122.1b,613.1f]
 counter hasteCounter {
   lexical = {lemma = "haste counter"},
-  spelling = "haste counter",
+  spelling = "haste counter"
 }

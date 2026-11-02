@@ -6,9 +6,8 @@ card {
   text = [
     enchant(isCreature),
     static(
-      conjunction(
-        [
-          cant(actor(enchanted(creature)), attack),
-          cant(actor(enchanted(creature)), block),
-          cant(actor(enchanted(creature)), crew(allOf(hasSubtype(vehicle))))]))]
+      conjunction([
+        cant(actor(enchanted(creature)), attack),
+        cant(actor(enchanted(creature)), block),
+        cant(actor(enchanted(creature)), crew(allOf(hasSubtype(vehicle))))]))]
 }

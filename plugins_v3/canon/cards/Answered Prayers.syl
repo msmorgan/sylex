@@ -5,19 +5,18 @@ card {
   text = [
     when(
       does(actor(a(and([isCreature, youControl]))), enter),
-      sequentially(
-        [
-          gainLife(1),
-          doIf(
-            not(is(thisEnchantment, isCreature)),
-            become(
-              thisEnchantment,
-              {
-                characteristics = {
-                  types = [creature],
-                  subtypes = [angel],
-                  text = [flying],
-                  power = 3,
-                  toughness = 3}},
-              untilEndOfTurn))]))]
+      sequentially([
+        gainLife(1),
+        doIf(
+          not(is(thisEnchantment, isCreature)),
+          become(
+            thisEnchantment,
+            {
+              characteristics = {
+                types = [creature],
+                subtypes = [angel],
+                text = [flying],
+                power = 3,
+                toughness = 3}},
+            untilEndOfTurn))]))]
 }

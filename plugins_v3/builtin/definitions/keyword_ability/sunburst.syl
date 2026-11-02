@@ -11,20 +11,18 @@ ability sunburst {
       replace(
         would(actor(thisPermanent), enter(stack)),
         doIf(
-          and(
-            [
-              is(thisPermanent, hasTypeIgnoringTypeChanges(creature)),
-              coloredManaSpentToCast(thisSpell)]),
-          withRiders(
-            [withCounters(colorsSpentToCast(thisSpell), printedKind(p1p1Counter), fresh)])))),
+          and([
+            is(thisPermanent, hasTypeIgnoringTypeChanges(creature)),
+            coloredManaSpentToCast(thisSpell)]),
+          withRiders([
+            withCounters(colorsSpentToCast(thisSpell), printedKind(p1p1Counter), fresh)])))),
     static(
       replace(
         would(actor(thisPermanent), enter(stack)),
         doIf(
-          and(
-            [
-              not(is(thisPermanent, hasTypeIgnoringTypeChanges(creature))),
-              coloredManaSpentToCast(thisSpell)]),
-          withRiders(
-            [withCounters(colorsSpentToCast(thisSpell), printedKind(chargeCounter), fresh)]))))]
+          and([
+            not(is(thisPermanent, hasTypeIgnoringTypeChanges(creature))),
+            coloredManaSpentToCast(thisSpell)]),
+          withRiders([
+            withCounters(colorsSpentToCast(thisSpell), printedKind(chargeCounter), fresh)]))))]
 }

@@ -7,5 +7,5 @@
 card_type kindred {
   lexical = {lemma = "kindred"},
   spelling = "kindred",
-  name = "Kindred",
+  name = "Kindred"
 }

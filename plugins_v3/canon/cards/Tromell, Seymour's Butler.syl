@@ -12,18 +12,16 @@ card {
         p1p1Counter)),
     activated(
       compound([mana([1]), tapSymbol]),
-      sequentially(
-        [
-          repeatTimes(letter(x), proliferate),
-          define(
-            x,
-            countOf(
-              and(
-                [
-                  isNontoken,
-                  isCreature,
-                  youControl,
-                  did(actor(which), enter, within(soFarThisTurn))])))]))],
+      sequentially([
+        repeatTimes(letter(x), proliferate),
+        define(
+          x,
+          countOf(
+            and([
+              isNontoken,
+              isCreature,
+              youControl,
+              did(actor(which), enter, within(soFarThisTurn))])))]))],
   power = 2,
   toughness = 3
 }

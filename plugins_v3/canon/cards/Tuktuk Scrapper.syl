@@ -12,16 +12,15 @@ card {
   text = [
     whenever(
       does(actor(eitherOf(thisCreature, a(and([hasSubtype(ally), youControl, isOther])))), enter),
-      sequentially(
-        [
-          may(destroy(target(isArtifact))),
-          doIf(
-            did(actor(that(artifact)), putInto(theActor, graveyard), thisWay),
-            instruct(
-              thisCreature,
-              dealDamage(
-                countOf(and([hasSubtype(ally), youControl])),
-                controllerOf(that(artifact)))))]))],
+      sequentially([
+        may(destroy(target(isArtifact))),
+        doIf(
+          did(actor(that(artifact)), putInto(theActor, graveyard), thisWay),
+          instruct(
+            thisCreature,
+            dealDamage(
+              countOf(and([hasSubtype(ally), youControl])),
+              controllerOf(that(artifact)))))]))],
   power = 2,
   toughness = 2
 }

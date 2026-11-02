@@ -4,9 +4,8 @@ card {
   types = [sorcery],
   text = [
     spell(
-      sequentially(
-        [
-          reveal(topSlice(5)),
-          may(putInto(fromAmong(exactly(1), or([isCreature, isEnchantment]), them), hand)),
-          putInto(theRest, graveyard)]))]
+      sequentially([
+        reveal(topSlice(5)),
+        may(putInto(fromAmong(exactly(1), or([isCreature, isEnchantment]), them), hand)),
+        putInto(theRest, graveyard)]))]
 }

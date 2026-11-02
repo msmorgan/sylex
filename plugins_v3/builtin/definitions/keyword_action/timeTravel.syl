@@ -5,24 +5,21 @@
 action timeTravel {
   lexical = {verbs = [{lemma = "time travel", frames = [Intransitive]}]},
   spelling = "time travel",
-  body = sequentially(
-    [
-      choose(
-        counted(
-          anyNumber,
-          andOr(
-            [
-              and([isPermanent, actorControls, hasCounter(timeCounter)]),
-              and(
-                [
-                  isCard,
-                  in(exileZone),
-                  ownedBy(actor),
-                  hasKeyword(theKeyword(suspend)),
-                  hasCounter(timeCounter)])]))),
-      doForEach(
-        them,
-        chooseOne(
-          putCounters(1, printedKind(timeCounter), it),
-          removeCounters(oneThrough(1), printedKind(timeCounter), it)))])
+  body = sequentially([
+    choose(
+      counted(
+        anyNumber,
+        andOr([
+          and([isPermanent, actorControls, hasCounter(timeCounter)]),
+          and([
+            isCard,
+            in(exileZone),
+            ownedBy(actor),
+            hasKeyword(theKeyword(suspend)),
+            hasCounter(timeCounter)])]))),
+    doForEach(
+      them,
+      chooseOne(
+        putCounters(1, printedKind(timeCounter), it),
+        removeCounters(oneThrough(1), printedKind(timeCounter), it)))])
 }

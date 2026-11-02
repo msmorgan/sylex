@@ -8,13 +8,12 @@ card {
       instruct(thisEnchantment, dealDamage(3, target(and([isCreature, anOpponentControls]))))),
     whenever(
       does(actor(counted(orMore(1), isCreature)), die),
-      sequentially(
-        [
-          mill(1),
-          putCounters(1, printedKind(bloodstainCounter), thisEnchantment),
-          triggerReflexively(
-            doOnlyIf(
-              sacrifice(thisEnchantment),
-              compareAmt(countersOn(bloodstainCounter, thisEnchantment), atLeast, 5)),
-            returnToHand(target(and([isCreature, isCard, in(yourGraveyard)])), yourGraveyard))]))]
+      sequentially([
+        mill(1),
+        putCounters(1, printedKind(bloodstainCounter), thisEnchantment),
+        triggerReflexively(
+          doOnlyIf(
+            sacrifice(thisEnchantment),
+            compareAmt(countersOn(bloodstainCounter, thisEnchantment), atLeast, 5)),
+          returnToHand(target(and([isCreature, isCard, in(yourGraveyard)])), yourGraveyard))]))]
 }
