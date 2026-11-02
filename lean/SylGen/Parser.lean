@@ -117,6 +117,14 @@ private def tokenize (file source : String) : Except String (Array Token) := do
         i := i + 1
         pos := { pos with column := pos.column + 1 }
       if value.isEmpty || value == "-" then throw (start.error s!"unexpected character '{c}'")
+      if ((value.drop 1).toString.contains '.') then throw (start.error s!"dotted word '{value}'")
+      if let some n := value.toInt? then
+        let digits := if value.startsWith "-" then (value.drop 1).toString else value
+        unless digits.all Char.isDigit do throw (start.error s!"invalid integer '{value}'")
+        if (digits.length > 1 && digits.startsWith "0") || value == "-0" then
+          throw (start.error s!"non-canonical integer '{value}'")
+        unless -9223372036854775808 ≤ n && n ≤ 9223372036854775807 do
+          throw (start.error s!"integer out of range '{value}'")
       out := out.push { pos := start, text := value }
   return out.push { pos := pos, text := "<eof>" }
 
