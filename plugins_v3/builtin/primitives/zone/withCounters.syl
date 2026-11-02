@@ -1,4 +1,4 @@
 # "with N <kind> counters on it"
 # TODO(spelling): The mark selects ordinary, additional, or fewer counters, changing the
-primitive withCounters(amount: Amount, kind: CounterKindSource, mark: EntryCounterMark): MoveRider
 # placement of amount and kind.
+primitive withCounters(amount: Amount, kind: CounterKindSource, mark: EntryCounterMark): MoveRider
