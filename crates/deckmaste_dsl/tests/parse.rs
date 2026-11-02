@@ -68,6 +68,7 @@ fn value(value: &Value) -> String {
                 self::value(&f.value)
             ))
         ),
+        ValueKind::Parameter(name) => format!("${}", name.ident),
         ValueKind::Call(call) if call.is_bare() => call.head.ident.to_string(),
         ValueKind::Call(call) => format!(
             "{}({})",
@@ -219,6 +220,91 @@ fn arguments_keep_written_order_and_names() {
     check(
         "template t: X { body = f(a, to = b, c, from = g(h)) }",
         "template t: X {body = f(a; to = b; c; from = g(h))}",
+    );
+}
+
+#[test]
+fn parameter_references_are_values() {
+    check(
+        "template t(a: X, b: X = $a): X { body = f($a, to = [$b], c = { d = $_e1 }) }",
+        "template t(a: X; b: X = $a): X {body = f($a; to = [$b]; c = {d = $_e1})}",
+    );
+}
+
+#[test]
+fn parameter_reference_span_includes_the_sigil() {
+    let source = "template t(a: X): X { body = f( $amount ) }";
+    let file = ok(source);
+    let Shape::Named(named) = &file.declarations().next().unwrap().shape else {
+        panic!("expected a named declaration");
+    };
+    let body = &named.body.as_ref().unwrap().nodes().next().unwrap().value;
+    let ValueKind::Call(call) = &body.kind else {
+        panic!("expected a call");
+    };
+    let arg = &call.args[0].node().unwrap().value;
+    let ValueKind::Parameter(name) = &arg.kind else {
+        panic!("expected a parameter reference");
+    };
+    assert_eq!(name.ident.as_str(), "amount");
+    assert_eq!(name.span.text(source), "$amount");
+    assert_eq!(arg.span.text(source), "$amount");
+}
+
+#[test]
+fn lone_dollar_is_an_error() {
+    check_err("card { a = $ }", &ErrorKind::LoneDollar, "$");
+    check_err("card { a = $", &ErrorKind::LoneDollar, "$");
+    check_err("card { a = $ name }", &ErrorKind::LoneDollar, "$");
+    check_err("card { a = $1 }", &ErrorKind::LoneDollar, "$");
+    check_err("card { a = $\"x\" }", &ErrorKind::LoneDollar, "$");
+    check_err("card { a = $.x }", &ErrorKind::LoneDollar, "$");
+}
+
+#[test]
+fn parameter_reference_takes_no_arguments() {
+    check_err("card { a = $f(1) }", &ErrorKind::ParameterArguments, "(");
+    check_err("card { a = $f() }", &ErrorKind::ParameterArguments, "(");
+}
+
+#[test]
+fn parameter_reference_follows_the_word_rule() {
+    check_err("card { a = $x.y }", &ErrorKind::DottedWord, "$x.y");
+}
+
+#[test]
+fn labels_field_names_and_headers_are_plain_words() {
+    check_err(
+        "card { a = f($x = 1) }",
+        &ErrorKind::Expected {
+            expected: "',' or ')'",
+            found: "'='".to_owned(),
+        },
+        "=",
+    );
+    check_err(
+        "card { $a = 1 }",
+        &ErrorKind::Expected {
+            expected: "a field name",
+            found: "parameter `$a`".to_owned(),
+        },
+        "$a",
+    );
+    check_err(
+        "template t($a: X): X",
+        &ErrorKind::Expected {
+            expected: "a parameter name",
+            found: "parameter `$a`".to_owned(),
+        },
+        "$a",
+    );
+    check_err(
+        "template t(a: X, $b: X): X",
+        &ErrorKind::Expected {
+            expected: "a parameter name",
+            found: "parameter `$b`".to_owned(),
+        },
+        "$b",
     );
 }
 

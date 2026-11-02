@@ -185,6 +185,9 @@ pub enum ValueKind {
     Record(Record),
     /// `head(args)`, or a bare word `head`.
     Call(Call),
+    /// `$name`, a read of a parameter's value. It takes no arguments. The
+    /// name's span includes the `$`.
+    Parameter(Name),
 }
 
 /// `{ name = value, ... }`.

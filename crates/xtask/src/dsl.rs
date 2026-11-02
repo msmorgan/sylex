@@ -381,6 +381,7 @@ fn value(v: &Value) -> Json {
             json!({ "list": items.iter().filter_map(|i| i.node()).map(value).collect::<Vec<_>>() })
         }
         ValueKind::Record(record) => json!({ "record": fields(record.nodes()) }),
+        ValueKind::Parameter(name) => json!({ "parameter": name.ident.as_str() }),
         ValueKind::Call(call) => json!({
             "word": call.head.ident.as_str(),
             "args": call.args.iter().filter_map(|a| a.node()).map(|a| json!({
@@ -403,7 +404,7 @@ card_type artifact { name = \"Artifact\", count = 3 }
 
 # Detached.
 
-primitive cost(x: Option(Mana) = none): Cost = .mk
+primitive cost(x: Option(Mana) = none, y: Option(Mana) = $x): Cost = .mk
 card split({ left = { name = \"Fire\" }, right = { name = \"Ice\" } })
 ";
 
@@ -431,6 +432,10 @@ card split({ left = { name = \"Fire\" }, right = { name = \"Ice\" } })
                     "name": "x",
                     "sort": { "name": "Option", "args": [{ "name": "Mana", "args": [] }] },
                     "default": { "word": "none", "args": [] },
+                }, {
+                    "name": "y",
+                    "sort": { "name": "Option", "args": [{ "name": "Mana", "args": [] }] },
+                    "default": { "parameter": "x" },
                 }],
                 "sort": { "name": "Cost", "args": [] },
                 "fields": [], "constructor": "mk", "cardValue": null, "documentation": "",

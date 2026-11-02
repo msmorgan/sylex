@@ -27,7 +27,7 @@ fn count_items<T>(items: &[Item<T>], nested: impl Fn(&T) -> usize) -> usize {
 
 fn value_comments(value: &Value) -> usize {
     match &value.kind {
-        ValueKind::String(_) | ValueKind::Integer(_) => 0,
+        ValueKind::String(_) | ValueKind::Integer(_) | ValueKind::Parameter(_) => 0,
         ValueKind::List(items) => count_items(items, value_comments),
         ValueKind::Record(record) => count_items(&record.fields, |f| value_comments(&f.value)),
         ValueKind::Call(call) => count_items(&call.args, |a| value_comments(&a.value)),

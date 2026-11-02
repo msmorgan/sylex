@@ -26,6 +26,8 @@ pub enum TokenKind {
     Word(Ident),
     /// `.word`, naming a constructor; the dot is not part of the ident.
     Constructor(Ident),
+    /// `$word`, reading a parameter's value; the `$` is not part of the ident.
+    Parameter(Ident),
     /// A double-quoted string, unescaped.
     String(String),
     /// `-?[0-9]+`, written without leading zeros and never as `-0`.
@@ -52,6 +54,7 @@ impl TokenKind {
         match self {
             TokenKind::Word(w) => format!("word `{w}`"),
             TokenKind::Constructor(w) => format!("constructor `.{w}`"),
+            TokenKind::Parameter(w) => format!("parameter `${w}`"),
             TokenKind::String(_) => "a string".to_owned(),
             TokenKind::Integer(n) => format!("integer `{n}`"),
             TokenKind::Comment(_) => "a comment".to_owned(),
@@ -82,8 +85,9 @@ fn is_word_continue(b: u8) -> bool {
 /// # Errors
 ///
 /// On a character no token can start with, a `-` not followed by a digit, a
-/// word containing `.`, an integer that is malformed, non-canonical or out of
-/// `i64` range, an unterminated string, or an escape other than `\"` and `\\`.
+/// `$` not directly followed by a word, a word containing `.`, an integer that
+/// is malformed, non-canonical or out of `i64` range, an unterminated string,
+/// or an escape other than `\"` and `\\`.
 pub fn lex(file: FileId, source: &str) -> Result<Vec<Token>, Error> {
     let bytes = source.as_bytes();
     let span = |start: usize, end: usize| Span::new(file, start, end);
@@ -184,6 +188,20 @@ pub fn lex(file: FileId, source: &str) -> Result<Vec<Token>, Error> {
                     return Err(dotted_word(bytes, start, i, span));
                 }
                 TokenKind::Constructor(Ident::new(&source[word_start..i]))
+            }
+            b'$' => {
+                i += 1;
+                if !bytes.get(i).copied().is_some_and(is_word_start) {
+                    return Err(Error::new(span(start, i), ErrorKind::LoneDollar));
+                }
+                let word_start = i;
+                while bytes.get(i).copied().is_some_and(is_word_continue) {
+                    i += 1;
+                }
+                if bytes.get(i) == Some(&b'.') {
+                    return Err(dotted_word(bytes, start, i, span));
+                }
+                TokenKind::Parameter(Ident::new(&source[word_start..i]))
             }
             b if is_word_start(b) => {
                 while bytes.get(i).copied().is_some_and(is_word_continue) {

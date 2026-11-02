@@ -239,8 +239,8 @@ impl Parser<'_> {
     }
 
     /// Whether the tokens after a kind word start a named header: a word
-    /// followed by `(` and then `ident :` (or `)`), or by `:`, `=`, `{`, the
-    /// next declaration's kind word, or the end of the file.
+    /// followed by `(` and then `ident :` or `$ident :` (or `)`), or by `:`,
+    /// `=`, `{`, the next declaration's kind word, or the end of the file.
     fn named_header_follows(&self) -> bool {
         if !matches!(self.peek().kind, TokenKind::Word(_)) {
             return false;
@@ -252,7 +252,9 @@ impl Parser<'_> {
             | TokenKind::Word(_)
             | TokenKind::Eof => true,
             TokenKind::LParen => match self.peek_nth(2).kind {
-                TokenKind::Word(_) => self.peek_nth(3).kind == TokenKind::Colon,
+                TokenKind::Word(_) | TokenKind::Parameter(_) => {
+                    self.peek_nth(3).kind == TokenKind::Colon
+                }
                 TokenKind::RParen => true,
                 _ => false,
             },
@@ -379,6 +381,13 @@ impl Parser<'_> {
                 ValueKind::Record(self.record(open)?)
             }
             TokenKind::Word(_) => ValueKind::Call(self.call()?),
+            &TokenKind::Parameter(ident) => {
+                let span = self.bump().span;
+                if self.at(&TokenKind::LParen) {
+                    return Err(Error::new(self.peek().span, ErrorKind::ParameterArguments));
+                }
+                ValueKind::Parameter(Name { ident, span })
+            }
             _ => return Err(self.error_here("a value")),
         };
         Ok(Value {

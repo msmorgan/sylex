@@ -29,6 +29,8 @@ pub enum ErrorKind {
     UnexpectedChar(char),
     #[error("'-' must begin an integer")]
     StrayMinus,
+    #[error("'$' must be directly followed by a parameter name")]
+    LoneDollar,
     #[error("words may not contain '.'")]
     DottedWord,
     #[error("invalid integer")]
@@ -46,6 +48,8 @@ pub enum ErrorKind {
         expected: &'static str,
         found: String,
     },
+    #[error("a parameter reference takes no arguments")]
+    ParameterArguments,
     #[error("empty argument list: write a bare word instead")]
     EmptyCall,
     #[error("empty parameter list: omit the parentheses instead")]
