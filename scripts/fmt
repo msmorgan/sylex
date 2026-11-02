@@ -1,12 +1,15 @@
 #!/usr/bin/env fish
 # Formats the workspace: rustfmt on nightly (rustfmt.toml uses unstable
 # options), then `cargo sort-derives` (the listed traits first, the rest
-# alphabetical — the order this codebase uses). A cargo alias can only run a
-# single cargo command, so this script is what "cargo fmt" means here.
-# scripts/jj-repo-config gives `jj fix` the same two passes; keep the derive
-# order in step with it.
+# alphabetical — the order this codebase uses), then `sylfmt` over the
+# `plugins_v3` `.syl` corpus. A cargo alias can only run a single cargo
+# command, so this script is what "cargo fmt" means here.
+# scripts/jj-repo-config gives `jj fix` the same passes; keep the derive order
+# and the `.syl` style flags in step with it.
 
 cd (dirname (status filename))/..; or exit
 
 cargo +nightly fmt --all $argv; or exit
-cargo sort-derives --order Debug,Clone,Copy,Default,PartialEq,Eq,Hash
+cargo sort-derives --order Debug,Clone,Copy,Default,PartialEq,Eq,Hash; or exit
+cargo run -q -p deckmaste_dsl --bin sylfmt -- --width 100 --closers hugged --trailing-commas never \
+    --record-spaces=false --hug-sole-list=true plugins_v3

@@ -9,13 +9,18 @@ function set_repo
     jj --no-pager config set --repo $argv; or exit
 end
 
-# `jj fix`: the same two passes as scripts/fmt, in the same order (jj runs
-# tools in name order, hence the numeric prefixes). Keep the derive order in
-# step with scripts/fmt.
+# `jj fix`: the same passes as scripts/fmt, in the same order (jj runs tools
+# in name order, hence the numeric prefixes). Keep the derive order and the
+# `.syl` style flags in step with scripts/fmt.
 set_repo fix.tools.1-rustfmt.command '["rustfmt", "+nightly", "--emit", "stdout", "--edition", "2024", "--config-path", "$root/rustfmt.toml"]'
 set_repo fix.tools.1-rustfmt.patterns '["glob:**/*.rs"]'
 set_repo fix.tools.2-sort-derives.command '["cargo", "sort-derives", "--stdin", "--order", "Debug,Clone,Copy,Default,PartialEq,Eq,Hash"]'
 set_repo fix.tools.2-sort-derives.patterns '["glob:**/*.rs"]'
+# `.syl` files in the plugin corpus (the Lean fixtures keep their hand layout).
+# The style is spelled out in full: switching styles means editing these flags
+# (and scripts/fmt's), then `jj fix` over the corpus.
+set_repo fix.tools.3-syl-fmt.command '["cargo", "run", "-q", "-p", "deckmaste_dsl", "--bin", "sylfmt", "--", "--stdin", "--width", "100", "--closers", "hugged", "--trailing-commas", "never", "--record-spaces=false", "--hug-sole-list=true", "$path"]'
+set_repo fix.tools.3-syl-fmt.patterns '["glob:plugins_v3/**/*.syl"]'
 
 # Workspace boundaries: the four aliases jj-sensei's boundaries skill installs
 # (see CLAUDE.md "Version control"). jj-kata checks them by exact text, so if
