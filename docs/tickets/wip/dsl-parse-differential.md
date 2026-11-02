@@ -19,7 +19,8 @@ parser, this ticket closes that gate before the epic starts.
   - the result sort Lean fills in from the kind (`kindSort`) when none is written;
   - for a nameless `card`, Lean's `name` (`printedName`, which joins multi-face names with
     `" // "`) and its `cardValue`, with `fields` left empty;
-  - Lean's `documentation`: comment texts joined with `"\n"`, reset at a blank line.
+  - Lean's `documentation`: each comment text followed by `"\n"` (so it ends in a newline),
+    reset at a blank line.
 
   Positions, comments other than the doc comment, and anything else outside `Declaration` are left out. The check reads
   the Lean dump from its gitignored path at runtime.
