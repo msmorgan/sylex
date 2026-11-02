@@ -17,6 +17,12 @@ when(
 Today `sylGen` refuses a positional argument after a named one (`lean/SylGen/Resolve.lean`,
 "positional argument after named argument"); it goes with Lean in `semantics-rust-rewrite`.
 
+Settled (owner, 2026-11-02): with every argument in its printed position, discourse order is
+simply the written order. `discourse` steps a call's arguments, positional and named, in the
+order they are written, and needs no per-constructor rules to recover the printed order (such as
+`doIf`'s `postposed` flag, which reads the branch before a condition printed after it). Those
+rules and flags are deleted once the calls that needed them are written in printed order.
+
 ## Change
 
 - `deckmaste_dsl` parses and Rust `semantics` resolves calls whose named and positional arguments
@@ -28,4 +34,7 @@ Today `sylGen` refuses a positional argument after a named one (`lean/SylGen/Res
   intervening-"if" triggers first (`when`, `whenever`, `at` with `if =`). Reordering does not
   change any expansion: check that `semantics` expands every touched file identically before and
   after.
+- `discourse` steps arguments in written order; delete the order-recovering flags and rules
+  (`postposed` and any like it), rewriting their callers in printed order. Their reference
+  results must not change: the carried-over tests for them stay green.
 - Tests in `deckmaste_dsl` and `semantics` for the interleaved forms and the two errors.
