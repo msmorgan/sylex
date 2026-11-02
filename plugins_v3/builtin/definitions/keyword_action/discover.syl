@@ -10,5 +10,5 @@ action discover(amount: Amount) {
         optional,
         castWithoutPaying(that(card), compare(atMost, amount, [stat(manaValue)])),
         ifNot = putInto(that(card), hand)),
-      move(theRest, wherever, onBottom, arrival, [inOrder(randomOrder)])])
+      move(theRest, anywhere, onBottom, arrival, [inOrder(randomOrder)])])
 }

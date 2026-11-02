@@ -5,7 +5,7 @@ action exileWithCounters(subject: NounPhrase, amount: Amount, kind: CounterKind)
   deed = "exile",
   body = move(
     subject,
-    wherever,
+    anywhere,
     exileZone,
     arrival,
     [withCounters(amount, printedKind(kind), fresh)])

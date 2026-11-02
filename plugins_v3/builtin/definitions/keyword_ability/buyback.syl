@@ -13,5 +13,5 @@ ability buyback(cost: Cost) {
           would(any, putInto(thisSpell, graveyard, stack))),
         doIf(
           keywordCostPaid(buyback, thisSpell),
-          instead(move(thisSpell, wherever, hand, arrival, [])))))]
+          instead(move(thisSpell, anywhere, hand, arrival, [])))))]
 }

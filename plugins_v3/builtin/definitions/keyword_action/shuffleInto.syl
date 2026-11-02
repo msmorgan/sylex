@@ -8,6 +8,6 @@ action shuffleInto(subject: NounPhrase) {
   deed = "shuffle",
   body = sequentially(
     [
-      move(subject, wherever, zone(library, none), arrival, []),
+      move(subject, anywhere, zone(library, none), arrival, []),
       actionShuffle(zone(library, none))])
 }

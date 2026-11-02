@@ -8,6 +8,6 @@ template returnToBattlefieldWithCounters(
   body = zoneChange(
     subject,
     battlefield,
-    wherever,
+    anywhere,
     [under(who), withCounters(amount, printedKind(kind), fresh)])
 }

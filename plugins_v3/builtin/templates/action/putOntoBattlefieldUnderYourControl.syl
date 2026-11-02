@@ -1,8 +1,8 @@
 # "put <subject> [from <from>] onto the battlefield under your control"
 template putOntoBattlefieldUnderYourControl(
   subject: NounPhrase,
-  from: Location = wherever): Action {
-  # TODO(spelling): Omit the origin phrase when from_ is wherever; otherwise print 'from' and that
+  from: Location = anywhere): Action {
+  # TODO(spelling): Omit the origin phrase when from_ is anywhere; otherwise print 'from' and that
   # location.
   body = zoneChange(subject, battlefield, from, [under(you)])
 }

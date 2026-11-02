@@ -8,6 +8,6 @@ template lookAndSortSlice(
   body = sequentially(
     [
       expose(lookAt, cards(slice)),
-      move(someOf(anyNumber, slice), wherever, spill, arrival, spillRiders),
-      move(theRest, wherever, onTop, arrival, [inOrder(anyOrder)])])
+      move(someOf(anyNumber, slice), anywhere, spill, arrival, spillRiders),
+      move(theRest, anywhere, onTop, arrival, [inOrder(anyOrder)])])
 }

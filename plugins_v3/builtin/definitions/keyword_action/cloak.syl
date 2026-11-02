@@ -5,5 +5,5 @@ action cloak(subject: NounPhrase) {
   body = sequentially(
     [
       turnFaceDown(subject, faceDownWardedCreature),
-      move(subject, wherever, battlefield, arrival, [faceDownAs(faceDownWardedCreature)])])
+      move(subject, anywhere, battlefield, arrival, [faceDownAs(faceDownWardedCreature)])])
 }

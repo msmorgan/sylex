@@ -147,7 +147,7 @@ theorem putAndReturnExpandToOneTree (subject : NounPhrase) (destination : Locati
   ⟨rfl, rfl, rfl, rfl, rfl⟩
 
 theorem putTakesRiders (s : NounPhrase) (d : Location) (r : List MoveRider) :
-    put s d r = putInto s d wherever r := rfl
+    put s d r = putInto s d anywhere r := rfl
 
 /-! ## The bare plural
 

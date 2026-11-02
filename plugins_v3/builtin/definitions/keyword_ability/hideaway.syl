@@ -13,7 +13,7 @@ ability hideaway(amount: Amount) {
         [
           lookAt(topSlice(amount)),
           exileFaceDown(someOf(oneThrough(1), them)),
-          move(theRest, wherever, onBottom, arrival, [inOrder(randomOrder)]),
+          move(theRest, anywhere, onBottom, arrival, [inOrder(randomOrder)]),
           establishThroughout(
             conjunction(
               [
