@@ -1,4 +1,4 @@
-# "enchanted by <by>", "equipped by <by>": the host of an attachment `by_` names.
+# "enchanted by <by>", "equipped by <by>": the host of an attachment `by` names.
 template attachedBy(word: Option(AttachWord), by: NounPhrase): Predicate {
   # TODO(spelling): Include or omit the clauses supplied by word.
   body = attachment(host, $by, $word)

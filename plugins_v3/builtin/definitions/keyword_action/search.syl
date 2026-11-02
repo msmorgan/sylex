@@ -1,7 +1,7 @@
 # "search <scope>", or "search <scope> for <for>" (`Definition`, [CR#701.23a]).
-# The `for_` parameter is bound like any other (there is no opt-out).
+# The `for` parameter is bound like any other (there is no opt-out).
 action search(scope: Location, for: NounPhrase = any) {
-  # TODO(spelling): Omit the 'for' phrase when for_ is any; otherwise print the search selection.
+  # TODO(spelling): Omit the 'for' phrase when for is any; otherwise print the search selection.
   lexical = {
     verbs = [
       {

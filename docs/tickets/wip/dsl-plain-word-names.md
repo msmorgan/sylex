@@ -3,8 +3,8 @@ needs: []
 ---
 # No trailing-underscore names in `.syl`
 
-The trailing underscores exist because the words are Lean keywords. `sylGen` quotes any word that
-collides with Lean when it emits `.lean`, so nothing needs them even while Lean is the oracle; this
+The trailing underscores exist because the words are Lean keywords. `sylGen` maps a fixed table of 19 Lean-keyword words to
+`name_` (wrapped in `«»`) when it emits `.lean`, so nothing in `.syl` needs them even while Lean is the oracle; this
 lands before `semantics-rust-crate`, so the Rust crates never see the old names. Semantics-v3 §4.5 already says plain words (`in`,
 `from`, `by`, `or`, `this`, …) are written as themselves.
 

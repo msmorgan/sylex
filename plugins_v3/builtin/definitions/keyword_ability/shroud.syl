@@ -1,5 +1,5 @@
 # "Shroud": "This permanent or player can't be the target of spells or abilities"
-# [CR#702.18a], written over its holder (`this_`).
+# [CR#702.18a], written over its holder (`this`).
 ability shroud {
   lexical = {lemma = "shroud"},
   spelling = "shroud",

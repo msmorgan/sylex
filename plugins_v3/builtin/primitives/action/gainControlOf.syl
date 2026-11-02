@@ -2,7 +2,7 @@
 # opponent gains control of a permanent from you", a trigger that looks back in time [CR#603.10d],
 # or "can't gain control of them". The imperative is `gainControl`.
 # [CR#603.10d]
-# TODO(spelling): Include or omit the clauses supplied by from_.
+# TODO(spelling): Include or omit the clauses supplied by from.
 primitive gainControlOf(
   subject: NounPhrase,
   from: Option(NounPhrase) = none): Action = .changeControl

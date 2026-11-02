@@ -1,5 +1,5 @@
 # "Protection from [quality]". Targeting, enchanting and damage are a "permanent or player"'s
-# [CR#702.16b,702.16c,702.16e], so those clauses are written over the holder (`this_`); equipping
+# [CR#702.16b,702.16c,702.16e], so those clauses are written over the holder (`this`); equipping
 # and fortifying are a permanent's [CR#702.16d] and blocking a creature's [CR#702.16f].
 ability protection(quality: Predicate) {
   lexical = {lemma = "protection", parameters = [[Quality(Some("from"))]]},

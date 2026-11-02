@@ -1,4 +1,4 @@
-# The Zone Change the put and return Templates write: `subject` moves from `from_` to
+# The Zone Change the put and return Templates write: `subject` moves from `from` to
 # `destination` with `riders` [CR#400.7], observed on its arrival. "Put" and "return" name no deed,
 # so the two verbs expand to the same move; each Template keeps its own wording. The written origin,
 # not the verb, decides the Observation Point: observation follows the pattern, not an individual

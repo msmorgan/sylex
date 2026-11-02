@@ -4,7 +4,7 @@ action play(
   from: Option(Location) = none,
   payment: PlayPayment = itsOwnCost,
   resulting: Option(Predicate) = none) {
-  # TODO(spelling): Include or omit the clauses supplied by from_, resulting.
+  # TODO(spelling): Include or omit the clauses supplied by from, resulting.
   lexical = {verbs = [{lemma = "play", frames = [Monotransitive, Intransitive]}]},
   body = procedure(play, $subject, $payment, $resulting, $from)
 }

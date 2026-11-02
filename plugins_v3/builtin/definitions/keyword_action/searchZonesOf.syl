@@ -1,5 +1,5 @@
 # "search <whose> graveyard, hand, and library for <for>", the owner written once
-# (`Definition`, [CR#701.23]). The `for_` parameter is bound like any other (there is no opt-out).
+# (`Definition`, [CR#701.23]). The `for` parameter is bound like any other (there is no opt-out).
 action searchZonesOf(whose: NounPhrase, for: NounPhrase) {
   spelling = "search <whose>'s graveyard, hand, and library for <for>",
   lexical = {
