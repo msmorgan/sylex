@@ -211,15 +211,24 @@ mod tests {
         let bundle = Bundle::from_sources(
             "root",
             [
-                (PathBuf::from("b.syl"), "template b: Int { body = 1 }".to_string()),
-                (PathBuf::from("a.syl"), "template a: Int { body = 1 }".to_string()),
+                (
+                    PathBuf::from("b.syl"),
+                    "template b: Int { body = 1 }".to_string(),
+                ),
+                (
+                    PathBuf::from("a.syl"),
+                    "template a: Int { body = 1 }".to_string(),
+                ),
             ],
             FileId(5),
         )
         .unwrap();
         let ids: Vec<_> = bundle.files().values().map(|f| f.id).collect();
         assert_eq!(ids, [FileId(5), FileId(6)]);
-        assert_eq!(bundle.file(FileId(6)).unwrap().path, Path::new("root/b.syl"));
+        assert_eq!(
+            bundle.file(FileId(6)).unwrap().path,
+            Path::new("root/b.syl")
+        );
         assert!(bundle.file(FileId(4)).is_none());
         assert!(bundle.file(FileId(7)).is_none());
         assert_eq!(bundle.next_file_id(), FileId(7));
@@ -230,8 +239,14 @@ mod tests {
         let error = Bundle::from_sources(
             "root",
             [
-                (PathBuf::from("a.syl"), "template a: Int { body = $ }".to_string()),
-                (PathBuf::from("b.syl"), "template b: Int {\n  body = -}".to_string()),
+                (
+                    PathBuf::from("a.syl"),
+                    "template a: Int { body = $ }".to_string(),
+                ),
+                (
+                    PathBuf::from("b.syl"),
+                    "template b: Int {\n  body = -}".to_string(),
+                ),
             ],
             FileId(0),
         )
