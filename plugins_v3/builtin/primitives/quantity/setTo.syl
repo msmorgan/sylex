@@ -1,2 +1,0 @@
-# Set a numeric property to the given amount.
-primitive setTo(amount: Amount): Delta(Amount) = .set
