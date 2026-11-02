@@ -1,5 +1,5 @@
 ---
-needs: [syl-parameter-sigil]
+needs: [syl-parameter-sigil, semantics-rust-rewrite]
 ---
 # Settle the `spelling` conventions and apply them to the corpus
 
@@ -54,10 +54,11 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
   - Amend `semantics-spelling-lowering.md` §3 as above.
 - **Glossary:** add entries for the terms this introduces (a spelling's pattern and its holes) to
   the owning glossary, via the `domain-modeling` skill.
-- **SylGen and `deckmaste_dsl`:**
+- **Rust `semantics` and `deckmaste_dsl`:**
   - `spelling` accepts a string or a list of strings.
-  - SylGen checks that no two patterns share a set of holes, and that every call's set of
-    non-default arguments has a pattern. SylGen is used because it already resolves every call.
+  - `semantics` checks that no two patterns share a set of holes, and that every call's set of
+    non-default arguments has a pattern. `semantics` is used because it resolves every call.
+    (Not SylGen, which is deleted with Lean by `semantics-rust-rewrite`.)
   - Add negative cases for both errors.
 - **Corpus, in its own commits:**
   - Rewrite every Action spelling to the bare Verb Phrase.
@@ -69,7 +70,8 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
 
 - No Action spelling is in a finite form. No marker carries generated text, and every remaining
   marker names something specific.
-- The SylGen checks pass over `builtin/` and `canon/`, and their negative cases fail as expected.
-- The Lean modules generated under `lean/.lake/build/gen/` are byte-identical before and after the
-  corpus rewrite, since SylGen discards `spelling`. `cargo xtask lean check` passes.
-- Per-crate tests and clippy for `deckmaste_dsl` if it changes.
+- The `semantics` checks pass over `builtin/` and `canon/`, and their negative cases fail as
+  expected.
+- The expansions `semantics` produces are identical before and after the corpus rewrite, since
+  spelling carries no meaning.
+- Per-crate tests and clippy for `deckmaste_dsl` and `semantics`.

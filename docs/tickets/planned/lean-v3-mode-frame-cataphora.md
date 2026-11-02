@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-entry-rider-and-duration-adjuncts]
+needs: [lean-v3-entry-rider-and-duration-adjuncts, semantics-rust-rewrite]
 ---
 # A shared frame over modal fillers, read cataphorically
 
@@ -78,5 +78,5 @@ leave your graveyard" trigger would fire once for the card and twice for the enc
 
 - Each of the four cards checks clean, and its demonstratives resolve to the bound filler.
 - *Call Damage Control* is one return over the chosen targets.
-- A characteristics filler under "choose two" is refused (pin).
-- `cargo xtask lean check` passes.
+- A characteristics filler under "choose two" is refused (test).
+- The `semantics` and `discourse` tests pass.

@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-spelling-conventions]
+needs: [plugins-v3-spelling-conventions, semantics-rust-rewrite]
 ---
 # "Round up each time." as a construct in its own position
 
@@ -46,8 +46,8 @@ only way out would be single-purpose Templates like `basePtHalfRoundedUpOf`.
 ## Acceptance
 
 - *Saw in Half* and the added witness check clean.
-- Pins for:
+- Tests for:
   - an uncovered unrounded fraction;
   - an "each time" with no fraction before it;
   - a rounded fraction under an "each time".
-- `cargo xtask lean check` passes.
+- The `semantics` and `discourse` tests pass.

@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-spelling-conventions]
+needs: [plugins-v3-spelling-conventions, semantics-rust-rewrite]
 ---
 # Entry Riders and Durations as surface adjunct nodes
 
@@ -41,12 +41,12 @@ does not attach them that way:
 
 ## Change
 
-- **Lean AST:**
+- **AST (Rust `semantics`):**
   - Add the adjunct nodes.
   - Remove `move`'s `riders` and every Action field that holds a printed effect Duration. Audit
     each `duration : Option Duration` on an Action: `delay`'s window is a different thing.
   - Remove the riders on Token creation, if any.
-- **Checker:** the attachment refusals, and stepping in surface order.
+- **`discourse`:** the attachment refusals, and stepping in surface order.
 - **Templates:**
   - Rewrite the Templates that took `riders` or `duration` (`putOntoBattlefield`,
     `returnToBattlefield`, `enter`, `create`, `gain`, `gainHaste`, `getsPt`, `becomes`, …) as bare
@@ -64,5 +64,5 @@ does not attach them that way:
 
 - Each witness reads to its intended nodes. Vivid Marsh and Sphere of the Suns expand to an
   identical AST.
-- Pins for the attachment refusals.
-- `cargo xtask lean check` passes. Report the canon cards whose encoding changed.
+- Tests for the attachment refusals.
+- The `semantics` and `discourse` tests pass. Report the canon cards whose encoding changed.
