@@ -1,0 +1,6 @@
+card {
+  name = "Electrolyze",
+  cost = [1, blue, red],
+  types = [instant],
+  text = [spell(sequentially([dealDivided(this, 2, targets(oneThrough(2), isAnyTarget)), draw(1)]))]
+}

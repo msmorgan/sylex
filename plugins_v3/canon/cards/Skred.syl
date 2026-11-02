@@ -1,0 +1,12 @@
+card {
+  name = "Skred",
+  cost = [red],
+  types = [instant],
+  text = [
+    spell(
+      instruct(
+        this,
+        dealDamage(
+          countOf(and([hasSupertype(snow), isPermanent, youControl])),
+          target(isCreature))))]
+}

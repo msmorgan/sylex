@@ -1,0 +1,15 @@
+card {
+  name = "Flickerwisp",
+  cost = [1, white, white],
+  types = [creature],
+  subtypes = [elemental],
+  text = [
+    flying,
+    when(
+      does(actor(thisCreature), enter),
+      sequentially([
+        exile(target(and([isPermanent, isOther]))),
+        atNext(endStep, returnToBattlefield(that(card), [under(ownerOf(it))]))]))],
+  power = 3,
+  toughness = 1
+}

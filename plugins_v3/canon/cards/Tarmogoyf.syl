@@ -1,0 +1,12 @@
+card {
+  name = "Tarmogoyf",
+  cost = [1, green],
+  types = [creature],
+  subtypes = [lhurgoyf],
+  text = [
+    static(
+      definesPowerAndToughness(
+        thisCreature,
+        distinctCount(cardType, allOf(cardIn(graveyard))),
+        plus(distinctCount(cardType, allOf(cardIn(graveyard))), 1)))]
+}

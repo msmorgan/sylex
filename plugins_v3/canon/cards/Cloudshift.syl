@@ -1,0 +1,10 @@
+card {
+  name = "Cloudshift",
+  cost = [white],
+  types = [instant],
+  text = [
+    spell(
+      sequentially([
+        exile(target(and([isCreature, youControl]))),
+        returnToBattlefield(that(card), [under(you)])]))]
+}

@@ -1,0 +1,18 @@
+card adventurer({
+  normal = {
+    name = "Brazen Borrower",
+    cost = [1, blue, blue],
+    types = [creature],
+    subtypes = [faerie, rogue],
+    text = [
+      flash,
+      flying,
+      static(cant(actor(thisCreature), block(allOf(and([isCreature, not(hasKeyword(flying))])))))],
+    power = 3,
+    toughness = 1},
+  adventure = {
+    name = "Petty Theft",
+    cost = [1, blue],
+    types = [instant],
+    subtypes = [adventure],
+    text = [spell(returnToHand(target(and([non(isLand), isPermanent, anOpponentControls]))))]}})

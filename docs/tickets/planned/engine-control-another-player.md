@@ -17,3 +17,8 @@ honoring the documented `DeciderSpec` nominal→actual contract
 (Word of Command, Opposition Agent) and all turn-STRUCTURE alteration (extra
 turns/skips — see engine-turn-modification) are out of scope. Split out of
 engine-win-alterations.
+
+The `.syl` model has no player-control construct yet, so Mindslaver ("{4}, {T}, Sacrifice
+Mindslaver: You control target player during that player's next turn.") has no canon file. The
+retired `idris/src/Cards.idr` modeled the effect as one action naming the targeted player, with
+the next-turn duration left to the engine.

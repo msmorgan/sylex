@@ -1,0 +1,6 @@
+card {
+  name = "Midnight Haunting",
+  cost = [2, white],
+  types = [instant],
+  text = [spell(create(2, written(creatureToken(1, 1, [white], [spirit], [flying]))))]
+}

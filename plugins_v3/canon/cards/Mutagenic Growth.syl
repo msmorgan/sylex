@@ -1,0 +1,6 @@
+card {
+  name = "Mutagenic Growth",
+  cost = [phyrexianPip(green)],
+  types = [instant],
+  text = [spell(get(target(isCreature), up(2), up(2), untilEndOfTurn))]
+}

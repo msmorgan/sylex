@@ -1,0 +1,15 @@
+card {
+  name = "Smuggler's Copter",
+  cost = [2],
+  types = [artifact],
+  subtypes = [vehicle],
+  text = [
+    flying,
+    whenever(
+      does(actor(thisVehicle), attack),
+      or = [does(actor(thisVehicle), block)],
+      action = may(draw(1), discard(a(cardIn(yourHand))))),
+    crew(1)],
+  power = 3,
+  toughness = 3
+}

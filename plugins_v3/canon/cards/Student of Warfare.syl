@@ -1,3 +1,5 @@
+# A leveler card [CR#711]: each band is a level symbol's static ability, the abilities and base
+# power and toughness this creature has while its level counters are in that range.
 card leveler({
   inner = {
     name = "Student of Warfare",

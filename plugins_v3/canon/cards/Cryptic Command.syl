@@ -1,0 +1,14 @@
+card {
+  name = "Cryptic Command",
+  cost = [1, blue, blue, blue],
+  types = [instant],
+  text = [
+    spell(
+      chooseModes(
+        exactly(2),
+        [
+          mk(none, none, counter(target(isSpell))),
+          mk(none, none, returnToHand(target(isPermanent))),
+          mk(none, none, tap(allOf(and([isCreature, opponentsControl])))),
+          mk(none, none, draw(1))]))]
+}

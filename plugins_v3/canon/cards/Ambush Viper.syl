@@ -1,0 +1,9 @@
+card {
+  name = "Ambush Viper",
+  cost = [1, green],
+  types = [creature],
+  subtypes = [snake],
+  text = [flash, deathtouch],
+  power = 2,
+  toughness = 1
+}

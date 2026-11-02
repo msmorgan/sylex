@@ -1,0 +1,13 @@
+card {
+  name = "Iona, Shield of Emeria",
+  cost = [6, white, white, white],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [angel],
+  text = [
+    flying,
+    static(entersChoosing(thisCreature, color)),
+    static(cant(actor(yourOpponents), cast(bare(and([isSpell, ofChosen(color)])))))],
+  power = 7,
+  toughness = 7
+}

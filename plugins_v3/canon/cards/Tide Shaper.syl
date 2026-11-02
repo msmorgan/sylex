@@ -1,0 +1,20 @@
+card {
+  name = "Tide Shaper",
+  cost = [blue],
+  types = [creature],
+  subtypes = [merfolk, wizard],
+  text = [
+    kicker(mana([1])),
+    when(
+      does(actor(thisCreature), enter),
+      if = keywordCostPaid(kicker, thisCreature),
+      action = establish(
+        qualityChange(target(isLand), sets, bundle({characteristics = {subtypes = [island]}})),
+        forAsLongAs(is(thisCreature, in(battlefield))))),
+    static(
+      onlyWhile(
+        getsPt(thisCreature, up(1), up(1)),
+        exists(and([hasSubtype(island), opponentsControl]))))],
+  power = 1,
+  toughness = 1
+}

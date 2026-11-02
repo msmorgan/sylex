@@ -1,0 +1,12 @@
+card {
+  name = "Rancor",
+  cost = [green],
+  types = [enchantment],
+  subtypes = [aura],
+  text = [
+    enchant(isCreature),
+    static(
+      conjunction(
+        [getsPt(enchanted(creature), up(2), up(0)), abilityGrant(enchanted(creature), trample)])),
+    when(does(any, putIntoFromBattlefield(thisAura, graveyard)), returnToHand(it))]
+}

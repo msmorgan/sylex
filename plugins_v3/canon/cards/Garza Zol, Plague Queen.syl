@@ -1,0 +1,24 @@
+card {
+  name = "Garza Zol, Plague Queen",
+  cost = [4, blue, black, red],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [vampire, noble],
+  text = [
+    flying,
+    haste,
+    whenever(
+      does(
+        actor(
+          a(
+            and([
+              isCreature,
+              did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))]))),
+        die),
+      putCounters(1, printedKind(p1p1Counter), thisCreature)),
+    whenever(
+      does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
+      may(draw(1)))],
+  power = 5,
+  toughness = 5
+}

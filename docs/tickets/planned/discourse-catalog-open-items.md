@@ -31,3 +31,8 @@ sources pin or document these as gaps; the catalog does not carry them as spec. 
    Angelfire, Celebr-8000, Boommobile, Atomwheel Acrobats, Contractual Safeguard, Frontline Heroism
    and Don't Blink as possibly Alchemy or Un-set. Drop the Alchemy ones (not Vintage-legal); keep
    Un-set ones deferred.
+7. **A coordinated trigger subject loses its anaphor.** *Pine Walker*: "Whenever this creature or
+   another creature you control is turned face up, untap that creature." With the two subjects
+   written as a coordination, "that creature" does not resolve, so the canon card is spelled with
+   the equivalent "a creature you control" (`idris-retire-cards-idr`). `discourse` resolves "that
+   creature" to whichever coordinated subject the event matched; respell the card then.

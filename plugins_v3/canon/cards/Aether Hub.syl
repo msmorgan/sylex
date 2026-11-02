@@ -1,0 +1,11 @@
+# "You get {E}" puts an energy counter on you; paying {E} removes one [CR#107.14].
+card {
+  name = "Aether Hub",
+  types = [land],
+  text = [
+    when(does(actor(thisLand), enter), putCounters(1, printedKind(energy), you)),
+    activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
+    activated(
+      compound([tapSymbol, perform(removeCounters(exactly(1), printedKind(energy), you))]),
+      addMana(1, ofAnyColor(sameColor)))]
+}

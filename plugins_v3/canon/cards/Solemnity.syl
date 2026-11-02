@@ -1,0 +1,14 @@
+card {
+  name = "Solemnity",
+  cost = [2, white],
+  types = [enchantment],
+  text = [
+    static(cant(any, putCounters(anyAmount, anyKind, bare(isPlayer)))),
+    static(
+      cant(
+        any,
+        putCounters(
+          anyAmount,
+          anyKind,
+          bare(or([isArtifact, isCreature, isEnchantment, isLand])))))]
+}

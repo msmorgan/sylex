@@ -1,0 +1,12 @@
+card {
+  name = "Oblivion Ring",
+  cost = [2, white],
+  types = [enchantment],
+  text = [
+    when(
+      does(actor(thisEnchantment), enter),
+      exile(target(and([non(isLand), isPermanent, isOther])))),
+    when(
+      does(actor(thisEnchantment), leave),
+      returnToBattlefield(the(cardIn(exiledWith(thisEnchantment))), [under(ownerOf(it))]))]
+}

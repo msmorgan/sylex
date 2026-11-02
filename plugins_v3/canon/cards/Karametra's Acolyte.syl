@@ -1,0 +1,9 @@
+card {
+  name = "Karametra's Acolyte",
+  cost = [3, green],
+  types = [creature],
+  subtypes = [human, druid],
+  text = [activated(tapSymbol, addMana(devotion(you, color(green)), manaOf([[of(green)]])))],
+  power = 1,
+  toughness = 4
+}

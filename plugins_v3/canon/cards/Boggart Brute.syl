@@ -1,0 +1,9 @@
+card {
+  name = "Boggart Brute",
+  cost = [2, red],
+  types = [creature],
+  subtypes = [goblin, warrior],
+  text = [menace],
+  power = 3,
+  toughness = 2
+}

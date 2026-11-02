@@ -1,0 +1,9 @@
+card {
+  name = "Invisible Stalker",
+  cost = [1, blue],
+  types = [creature],
+  subtypes = [human, rogue],
+  text = [hexproof, static(cant(any, block(thisCreature)))],
+  power = 1,
+  toughness = 1
+}

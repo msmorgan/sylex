@@ -1,0 +1,13 @@
+card {
+  name = "Necropotence",
+  cost = [black, black, black],
+  types = [enchantment],
+  text = [
+    static(partSkip(you, drawStep)),
+    whenever(does(actor(you), discard(a(isCard))), exileFrom(that(card), yourGraveyard)),
+    activated(
+      perform(payLife(1)),
+      sequentially([
+        exileFaceDown(topSlice(1)),
+        delay(beginningOf(endStep, you, nextTime(you)), putInto(that(card), hand))]))]
+}

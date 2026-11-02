@@ -1,0 +1,16 @@
+card {
+  name = "Snapcaster Mage",
+  cost = [1, blue],
+  types = [creature],
+  subtypes = [human, wizard],
+  text = [
+    flash,
+    when(
+      does(actor(thisCreature), enter),
+      gain(
+        target(and([isInstantOrSorcery, cardIn(yourGraveyard)])),
+        flashback(itsManaCost),
+        untilEndOfTurn))],
+  power = 2,
+  toughness = 1
+}

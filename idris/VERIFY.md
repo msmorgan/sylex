@@ -26,9 +26,8 @@ total` (`src/Bridge.idr` — the new⇄old translation pairs — is parked out o
 the build for now and catches up when the lowering work resumes). `Spec.idr` is the
 self-checking regression suite — every `failing "<message>"` block must fail
 WITH its pinned message (the same soundness invariants the `cargo xtask
-idris-check` re-emit gate enforces on the Rust corpus); `Cards.idr` is the
-worked corpus. Exit 0 means the whole model — including every card term —
-typechecks. (`./scripts/build` wraps this command. `entailments.ron`, the one table the
+idris-check` re-emit gate enforces on the Rust corpus). Exit 0 means the whole
+model typechecks. (`./scripts/build` wraps this command. `entailments.ron`, the one table the
 Rust engine loads independently, is emitted by `cargo xtask entailments emit`.)
 
 ## The `Experimental.*` workbench

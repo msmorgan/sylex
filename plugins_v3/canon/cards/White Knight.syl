@@ -1,0 +1,9 @@
+card {
+  name = "White Knight",
+  cost = [white, white],
+  types = [creature],
+  subtypes = [human, knight],
+  text = [firstStrike, protection(hasColor(black))],
+  power = 2,
+  toughness = 2
+}

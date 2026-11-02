@@ -1,0 +1,9 @@
+card {
+  name = "Giant Spider",
+  cost = [3, green],
+  types = [creature],
+  subtypes = [spider],
+  text = [reach],
+  power = 2,
+  toughness = 4
+}

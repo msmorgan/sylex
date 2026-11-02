@@ -1,0 +1,12 @@
+card {
+  name = "Through the Breach",
+  cost = [4, red],
+  types = [instant],
+  subtypes = [arcane],
+  text = [
+    spell(
+      may(
+        putOntoBattlefield(a(and([isCreature, cardIn(yourHand)]))),
+        ifDid = sequentially([gainHaste(that(creature)), atNext(endStep, sacrifice(that(creature)))]))),
+    splice(hasSubtype(arcane), mana([2, red, red]))]
+}

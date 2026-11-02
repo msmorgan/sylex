@@ -1,0 +1,8 @@
+card {
+  name = "Steely Resolve",
+  cost = [1, green],
+  types = [enchantment],
+  text = [
+    static(entersChoosing(thisEnchantment, subtype(creature))),
+    static(abilityGrant(allOf(and([isCreature, ofChosen(subtype(creature))])), shroud))]
+}

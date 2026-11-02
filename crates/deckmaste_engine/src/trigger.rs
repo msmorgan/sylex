@@ -4061,8 +4061,8 @@ mod tests {
 
     /// Delver of Secrets' REAL front ability ([CR#701.27a]) driven end-to-end
     /// through the whole conditional resolve path — the behavior the canon
-    /// `Delver of Secrets.ron` encodes. The effect mirrors the blessed Idris
-    /// model (Cards.idr `card_DelverOfSecrets`):
+    /// `Delver of Secrets.ron` encodes. The effect mirrors the retired Idris
+    /// model of Delver of Secrets:
     /// `If(Matches(Single(TopOfLibrary 1), Or([Instant, Sorcery])),
     ///     May(Sequentially([Reveal(Single(TopOfLibrary 1)),
     /// Transform(This)])))` — the top card is read DIRECTLY

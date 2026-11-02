@@ -2383,7 +2383,7 @@ mutual
       Move : Reference b AnObject -> (d : Destination b) -> {auto 0 dOk : DestinationOk d} -> {default Nothing enteringAttacking : Maybe (Reference b APlayer)} -> {auto 0 eOk : EnteringOk d enteringAttacking} -> {default Nothing from : Maybe Zone} -> Action b
       -- (There is no "exile until ~" verb. A duration-bounded zone change is `Relocate` (a
       --  StaticEffect) under a `Continuously`/`While` duration — see `Relocate` and
-      --  card_BanishingLight. Permanent exile is just `Move … (ToZone Exile)`.)
+      --  Banishing Light. Permanent exile is just `Move … (ToZone Exile)`.)
       -- counter a stack object [CR#701.6a]. (Destroy [CR#701.8] is NOT a primitive verb:
       -- it composites as `Composite (Destroy r) (Move r Graveyard)` via the `destroy` macro,
       -- like scry/mill. Return-to-hand is just `Move … Hand` — `Move` is owner-relative —
@@ -3386,7 +3386,7 @@ typeConfers _            = []
 -- (`deckmaste_plugin::idris_emit`) authors card expressions mechanically and
 -- MUST NOT write curly-brace named-argument syntax (`{field = val}`). The
 -- constructors below carry ergonomic `{default …}` params for HAND authoring
--- (Cards/Macros/Spec keep using them terse, untouched); these thin aliases
+-- (Macros/Spec keep using them terse, untouched); these thin aliases
 -- expose each emitter-overridden param POSITIONALLY so the generated
 -- expression is a plain fully-parenthesized application. Purely additive —
 -- no existing signature or default changes.

@@ -1,0 +1,6 @@
+card {
+  name = "Glorious Anthem",
+  cost = [1, white, white],
+  types = [enchantment],
+  text = [static(getsPt(allOf(and([isCreature, youControl])), up(1), up(1)))]
+}

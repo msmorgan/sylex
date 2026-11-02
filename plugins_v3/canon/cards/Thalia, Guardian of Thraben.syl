@@ -1,0 +1,10 @@
+card {
+  name = "Thalia, Guardian of Thraben",
+  cost = [1, white],
+  supertypes = [legendary],
+  types = [creature],
+  subtypes = [human, soldier],
+  text = [firstStrike, static(costShift(allOf(and([non(isCreature), isSpell])), more(1)))],
+  power = 2,
+  toughness = 1
+}

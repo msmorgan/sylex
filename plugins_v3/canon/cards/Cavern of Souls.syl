@@ -1,0 +1,18 @@
+card {
+  name = "Cavern of Souls",
+  types = [land],
+  text = [
+    static(entersChoosing(thisLand, subtype(creature))),
+    activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
+    activated(
+      tapSymbol,
+      addMana(
+        1,
+        ofAnyColor(sameColor),
+        [
+          whenSpentOn(
+            affectsIt,
+            true,
+            a(and([isCreature, isSpell, ofChosen(subtype(creature))])),
+            establish(cant(any, counter(that(spell)))))]))]
+}

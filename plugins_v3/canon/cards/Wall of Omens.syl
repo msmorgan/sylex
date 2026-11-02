@@ -1,0 +1,9 @@
+card {
+  name = "Wall of Omens",
+  cost = [1, white],
+  types = [creature],
+  subtypes = [wall],
+  text = [defender, when(does(actor(thisCreature), enter), draw(1))],
+  power = 0,
+  toughness = 4
+}

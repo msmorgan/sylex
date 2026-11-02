@@ -1,0 +1,9 @@
+# The two targets are of different kinds, a player and a permanent. The control change states no
+# duration, so it lasts until the end of the game [CR#611.2a]; it applies in layer 2 [CR#613.1b],
+# and the permanent it affects is fixed when the effect begins [CR#611.2c].
+card {
+  name = "Donate",
+  cost = [2, blue],
+  types = [sorcery],
+  text = [spell(instruct(target(isPlayer), gainControl(target(and([isPermanent, youControl])))))]
+}
