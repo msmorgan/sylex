@@ -5,9 +5,7 @@ card {
   subtypes = [elemental],
   text = [
     morph(mana([4, green])),
-    whenever(
-      does(any, turnFaceUp(a(and([isCreature, youControl])))),
-      untap(that(creature)))],
+    whenever(does(any, turnFaceUp(a(and([isCreature, youControl])))), untap(that(creature)))],
   power = 5,
   toughness = 5
 }

@@ -3,7 +3,5 @@ card {
   supertypes = [legendary],
   types = [land],
   text = [
-    activated(
-      tapSymbol,
-      addMana(forEach(1, and([isCreature, youControl])), manaOf([[of(green)]])))]
+    activated(tapSymbol, addMana(forEach(1, and([isCreature, youControl])), manaOf([[of(green)]])))]
 }
