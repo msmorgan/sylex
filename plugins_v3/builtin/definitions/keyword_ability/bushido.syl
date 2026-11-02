@@ -6,5 +6,5 @@ ability bushido(count: Amount) {
     whenever(
       does(actor(thisCreature), block),
       or = [does(any, becomeBlocked(thisCreature))],
-      action = get(thisCreature, up(count), up(count), untilEndOfTurn))]
+      action = get(thisCreature, up($count), up($count), untilEndOfTurn))]
 }

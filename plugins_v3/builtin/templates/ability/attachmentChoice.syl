@@ -2,5 +2,5 @@
 # it becomes attached.
 template attachmentChoice(subject: NounPhrase, chosen: NounPhrase): StaticSpec {
   spelling = "As <subject> becomes attached, choose <chosen>",
-  body = asEvent(does(any, attachment(attached, subject)), choose(chosen))
+  body = asEvent(does(any, attachment(attached, $subject)), choose($chosen))
 }

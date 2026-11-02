@@ -5,5 +5,5 @@ template delayWithin(
   action: Action,
   alternatives: List(GameEvent) = []): Action {
   # TODO(spelling): Format and coordinate the alternatives list entries, including the empty case.
-  body = delay(event, action, alternatives, duration)
+  body = delay($event, $action, $alternatives, $duration)
 }

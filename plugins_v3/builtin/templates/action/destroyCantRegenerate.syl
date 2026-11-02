@@ -3,5 +3,5 @@
 # replaces it [CR#608.2c,701.19c]. A plural subject is `destroyPluralCantRegenerate`.
 template destroyCantRegenerate(subject: NounPhrase): Action {
   spelling = "Destroy <subject>. It can't be regenerated.",
-  body = doUnderProhibition(destroy(subject), regeneration(pro(bare, one)))
+  body = doUnderProhibition(destroy($subject), regeneration(pro(bare, one)))
 }

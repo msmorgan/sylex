@@ -5,7 +5,7 @@ ability evoke(cost: Cost) {
   lexical = {lemma = "evoke", parameters = [[Cost]]},
   spelling = "evoke <cost>",
   body = [
-    static(altCost(this, cost)),
+    static(altCost(this, $cost)),
     when(
       does(actor(thisPermanent), enter),
       if = keywordCostPaid(evoke, thisPermanent),

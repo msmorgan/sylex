@@ -5,5 +5,5 @@
 template convert(subject: NounPhrase): Action {
   lexical = {verbs = [{lemma = "convert", frames = [Monotransitive]}]},
   spelling = "convert <subject>",
-  body = transform(subject)
+  body = transform($subject)
 }

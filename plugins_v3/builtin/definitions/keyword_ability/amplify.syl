@@ -16,7 +16,7 @@ ability amplify(amount: Amount) {
               and([cardIn(yourHand), shares(subtype(creature), share, thisPermanent)]))),
           alongside(
             putCounters(
-              forEach(amount, and([isCard, was(reveal(which), thisWay)])),
+              forEach($amount, and([isCard, was(reveal(which), thisWay)])),
               printedKind(p1p1Counter),
               thisPermanent)))))]
 }

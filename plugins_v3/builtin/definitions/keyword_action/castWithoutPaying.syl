@@ -4,5 +4,5 @@ action castWithoutPaying(subject: NounPhrase, resulting: Option(Predicate)) {
   # TODO(spelling): Include or omit the clauses supplied by resulting.
   lexical = {verbs = [{lemma = "cast", past = "cast", frames = [Monotransitive]}]},
   deed = "cast",
-  body = procedure(cast, subject, withoutPaying, resulting)
+  body = procedure(cast, $subject, withoutPaying, $resulting)
 }

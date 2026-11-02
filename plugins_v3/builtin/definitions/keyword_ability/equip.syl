@@ -10,7 +10,7 @@ ability equip(cost: Cost) {
   spelling = "equip <cost>",
   body = [
     activatedOnlyDuring(
-      cost,
+      $cost,
       attachTo(thisPermanent, target(and([isCreature, youControl]))),
       asSorcery)]
 }

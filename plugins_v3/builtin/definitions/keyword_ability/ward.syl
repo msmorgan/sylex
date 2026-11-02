@@ -8,5 +8,5 @@ ability ward(cost: Cost) {
       does(by(a(and([in(stack), opponentsControl]))), target(thisPermanent)),
       instruct(
         controllerOf(that(stackObject)),
-        mayOrElse(pay(cost, once), instruct(you, counter(that(stackObject))))))]
+        mayOrElse(pay($cost, once), instruct(you, counter(that(stackObject))))))]
 }

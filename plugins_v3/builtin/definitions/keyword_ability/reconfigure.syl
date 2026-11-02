@@ -6,11 +6,11 @@ ability reconfigure(cost: Cost) {
   spelling = "reconfigure <cost>",
   body = [
     activatedOnlyDuring(
-      cost,
+      $cost,
       attachTo(thisPermanent, target(and([isCreature, isOther, youControl]))),
       asSorcery),
     activated(
-      cost,
+      $cost,
       unattach(thisPermanent),
       asSorcery,
       guard = is(thisPermanent, attachment(attachment, a(isCreature))))]

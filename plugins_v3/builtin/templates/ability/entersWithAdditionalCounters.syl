@@ -4,5 +4,5 @@ template entersWithAdditionalCounters(
   amount: Amount,
   kind: CounterKind): StaticSpec {
   spelling = "<subject> enters with an additional <amount> <kind> counters on it",
-  body = enters(subject, [withCounters(amount, printedKind(kind), additional)])
+  body = enters($subject, [withCounters($amount, printedKind($kind), additional)])
 }

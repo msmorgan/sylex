@@ -1,5 +1,5 @@
 # "<who> owns"
 template ownedBy(who: NounPhrase): Predicate {
   spelling = "<who> owns",
-  body = hasPossessor(owner, who)
+  body = hasPossessor(owner, $who)
 }

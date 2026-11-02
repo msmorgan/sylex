@@ -3,5 +3,5 @@
 action create(count: Amount, token: TokenSpec, riders: List(MoveRider) = []) {
   # TODO(spelling): Format and coordinate the riders list entries, including the empty case.
   lexical = {verbs = [{lemma = "create", frames = [Monotransitive]}]},
-  body = createObject(count, token(token, riders))
+  body = createObject($count, token($token, $riders))
 }

@@ -3,5 +3,5 @@
 ability moreThanMeetsTheEye(cost: Cost) {
   lexical = {lemma = "More Than Meets the Eye", parameters = [[Cost]]},
   spelling = "More Than Meets the Eye <cost>",
-  body = [static(can(actor(you), cast(thisCard, payment = convertedPaying(cost))))]
+  body = [static(can(actor(you), cast(thisCard, payment = convertedPaying($cost))))]
 }

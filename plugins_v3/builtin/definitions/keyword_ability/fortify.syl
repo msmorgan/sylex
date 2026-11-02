@@ -9,7 +9,7 @@ ability fortify(cost: Cost) {
   spelling = "fortify <cost>",
   body = [
     activatedOnlyDuring(
-      cost,
+      $cost,
       attachTo(thisPermanent, target(and([isLand, youControl]))),
       asSorcery)]
 }

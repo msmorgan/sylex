@@ -4,5 +4,5 @@ template replaceEvent(
   replacement: Replacement,
   duration: Option(Duration)): Action {
   # TODO(spelling): Include or omit the clauses supplied by duration.
-  body = establish(replace(clause, replacement), duration)
+  body = establish(replace($clause, $replacement), $duration)
 }

@@ -7,5 +7,5 @@ template zoneChangeObservedOnDeparture(
   from: Location,
   riders: List(MoveRider)): Action {
   # TODO(spelling): Format and coordinate the riders list entries, including the empty case.
-  body = move(subject, from, destination, departure, riders)
+  body = move($subject, $from, $destination, departure, $riders)
 }

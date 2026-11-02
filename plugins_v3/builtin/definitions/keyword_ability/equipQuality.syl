@@ -12,7 +12,7 @@ ability equipQuality(quality: Predicate, cost: Cost) {
   spelling = "equip <quality> <cost>",
   body = [
     activatedOnlyDuring(
-      cost,
-      attachTo(thisPermanent, target(and([quality, isCreature, youControl]))),
+      $cost,
+      attachTo(thisPermanent, target(and([$quality, isCreature, youControl]))),
       asSorcery)]
 }

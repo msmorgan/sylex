@@ -1,5 +1,5 @@
 # "on top of <pile>", "on the bottom of <pile>": a destination at one end of a pile.
 template place(end: PileEnd, pile: Location): Location {
   spelling = "the <end> of <pile>",
-  body = fromEnd(end, loc = pile)
+  body = fromEnd($end, loc = $pile)
 }

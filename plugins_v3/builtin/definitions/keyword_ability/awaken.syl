@@ -6,13 +6,13 @@ ability awaken(amount: Amount, cost: Cost) {
   lexical = {lemma = "awaken", parameters = [[Amount, DashCost]]},
   spelling = "awaken <amount>—<cost>",
   body = [
-    static(altCost(this, cost)),
+    static(altCost(this, $cost)),
     spell(
       doIf(
         keywordCostPaid(awaken, this),
         sequentially(
           [
-            putCounters(amount, printedKind(p1p1Counter), target(and([isLand, youControl]))),
+            putCounters($amount, printedKind(p1p1Counter), target(and([isLand, youControl]))),
             establish(
               characteristicChange(
                 that(land),

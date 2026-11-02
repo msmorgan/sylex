@@ -6,6 +6,6 @@ ability infinity(ability: Ability) {
   body = [
     static(
       onlyWhile(
-        abilityGrant(thisPermanent, ability),
+        abilityGrant(thisPermanent, $ability),
         is(thisPermanent, hasDesignation(harnessed))))]
 }

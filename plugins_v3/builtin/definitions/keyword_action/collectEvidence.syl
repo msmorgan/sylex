@@ -3,5 +3,5 @@ action collectEvidence(amount: Amount) {
   lexical = {verbs = [{lemma = "collect", frames = [TransitiveAmount, Monotransitive]}]},
   spelling = "collect evidence <amount>",
   body = exile(
-    withTotal(stat(manaValue), atLeast, amount, allOf(and([isCard, in(graveyardOf(actor))]))))
+    withTotal(stat(manaValue), atLeast, $amount, allOf(and([isCard, in(graveyardOf(actor))]))))
 }

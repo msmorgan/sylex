@@ -3,5 +3,5 @@
 action suspect(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "suspect", frames = [Monotransitive]}]},
   spelling = "suspect <subject>",
-  body = gainDesignation(subject, suspected)
+  body = gainDesignation($subject, suspected)
 }

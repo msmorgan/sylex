@@ -5,7 +5,7 @@ ability emergeFrom(quality: Predicate, cost: Cost) {
   label = "emerge",
   spelling = "emerge from <quality> <cost>",
   body = [
-    static(altCost(this, compound([cost, perform(sacrifice(a(and([quality, isPermanent]))))]))),
+    static(altCost(this, compound([$cost, perform(sacrifice(a(and([$quality, isPermanent]))))]))),
     static(
       onlyWhile(
         costShift(

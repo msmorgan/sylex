@@ -2,5 +2,5 @@
 # [CR#208.4b]
 template basePowerOf(subject: NounPhrase): Amount {
   spelling = "<subject>'s base power",
-  body = statOf(stat(basePower), subject)
+  body = statOf(stat(basePower), $subject)
 }

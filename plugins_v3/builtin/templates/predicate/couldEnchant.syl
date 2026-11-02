@@ -2,5 +2,5 @@
 # [CR#701.3a]
 template couldEnchant(host: NounPhrase): Predicate {
   spelling = "that could enchant <host>",
-  body = legalAttachment(attachment, host)
+  body = legalAttachment(attachment, $host)
 }

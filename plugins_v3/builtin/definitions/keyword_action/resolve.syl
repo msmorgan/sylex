@@ -13,5 +13,5 @@
 # caused by no resolution [CR#701.6a], so none of the three applies to it.
 action resolve(subject: NounPhrase) {
   spelling = "<subject> resolves",
-  body = procedure(resolve, subject, itsOwnCost)
+  body = procedure(resolve, $subject, itsOwnCost)
 }

@@ -6,6 +6,6 @@ ability surge(cost: Cost) {
   body = [
     static(
       onlyWhile(
-        altCost(this, cost),
+        altCost(this, $cost),
         did(actor(or([you, a(isTeammate)])), cast(a(anotherSpell)), within(soFarThisTurn))))]
 }

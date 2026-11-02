@@ -10,10 +10,10 @@ template creatureTokenOf(
   # the empty case.
   body = {
     characteristics = {
-      colors = colors,
+      colors = $colors,
       types = [creature],
-      subtypes = subtypes,
-      text = abilities,
-      power = powerValue,
-      toughness = toughnessValue}}
+      subtypes = $subtypes,
+      text = $abilities,
+      power = $powerValue,
+      toughness = $toughnessValue}}
 }

@@ -7,5 +7,5 @@ template additionalPhase(
   count: Amount,
   followedBy: Option(TurnPart) = none): Action {
   # TODO(spelling): Include or omit the clauses supplied by anchor, followedBy.
-  body = addTurnPart(part, count, anchor, followedBy)
+  body = addTurnPart($part, $count, $anchor, $followedBy)
 }

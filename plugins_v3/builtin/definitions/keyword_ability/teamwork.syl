@@ -6,6 +6,6 @@ ability teamwork(amount: Amount) {
   body = [
     static(
       addedCost(
-        perform(tap(withTotal(stat(power), atLeast, amount, allOf(and([isCreature, youControl]))))),
+        perform(tap(withTotal(stat(power), atLeast, $amount, allOf(and([isCreature, youControl]))))),
         true))]
 }

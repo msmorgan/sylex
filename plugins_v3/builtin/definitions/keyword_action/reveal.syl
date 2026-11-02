@@ -2,5 +2,5 @@
 action reveal(cards: NounPhrase) {
   lexical = {verbs = [{lemma = "reveal", frames = [Monotransitive]}]},
   spelling = "reveal <cards>",
-  body = expose(reveal, cards(cards))
+  body = expose(reveal, cards($cards))
 }

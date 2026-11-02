@@ -1,5 +1,5 @@
 # "the greater of <a> and <b>", "<a> or <b>, whichever is greater".
 template greaterOf(a: Amount, b: Amount): Amount {
   spelling = "the greater of <a> and <b>",
-  body = aggregateOf(max, [a, b])
+  body = aggregateOf(max, [$a, $b])
 }

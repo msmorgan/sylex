@@ -8,5 +8,5 @@ action surveil(amount: Amount) {
         gerund = "surveilling",
         frames = [Amount, Intransitive, Monotransitive]}]},
   spelling = "surveil <amount>",
-  body = lookAndSortSlice(slice(top, amount, libraryOf(actor)), graveyard)
+  body = lookAndSortSlice(slice(top, $amount, libraryOf(actor)), graveyard)
 }

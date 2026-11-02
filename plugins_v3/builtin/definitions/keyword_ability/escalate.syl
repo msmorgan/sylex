@@ -3,5 +3,5 @@
 ability escalate(cost: Cost) {
   lexical = {lemma = "escalate", parameters = [[Cost]]},
   spelling = "escalate <cost>",
-  body = [static(modeChoice(extraModesCost(cost)))]
+  body = [static(modeChoice(extraModesCost($cost)))]
 }

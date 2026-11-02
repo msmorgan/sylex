@@ -6,7 +6,7 @@ ability unearth(cost: Cost) {
   spelling = "unearth <cost>",
   body = [
     activatedOnlyDuring(
-      cost,
+      $cost,
       sequentially(
         [
           returnToBattlefield(thisCard, from = yourGraveyard),

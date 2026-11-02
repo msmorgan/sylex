@@ -6,5 +6,5 @@ action cast(
   resulting: Option(Predicate) = none) {
   # TODO(spelling): Include or omit the clauses supplied by from_, resulting.
   lexical = {verbs = [{lemma = "cast", past = "cast", frames = [Monotransitive]}]},
-  body = procedure(cast, subject, payment, resulting, from)
+  body = procedure(cast, $subject, $payment, $resulting, $from)
 }

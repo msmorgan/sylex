@@ -5,5 +5,5 @@
 # [CR#119.8]
 template payLife(amount: Amount = anyAmount): Action {
   spelling = "pay <amount> life",
-  body = pay(perform(loseLife(amount)), once)
+  body = pay(perform(loseLife($amount)), once)
 }

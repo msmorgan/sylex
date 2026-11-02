@@ -6,5 +6,5 @@ template entryChoice(
   chosen: NounPhrase,
   disclosure: Disclosure = openly): StaticSpec {
   # TODO(spelling): The disclosure selects whether 'secretly' precedes the choice instruction.
-  body = replace(would(actor(subject), enter), before(choose(chosen, disclosure)))
+  body = replace(would(actor($subject), enter), before(choose($chosen, $disclosure)))
 }

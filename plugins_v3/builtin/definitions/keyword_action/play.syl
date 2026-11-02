@@ -6,5 +6,5 @@ action play(
   resulting: Option(Predicate) = none) {
   # TODO(spelling): Include or omit the clauses supplied by from_, resulting.
   lexical = {verbs = [{lemma = "play", frames = [Monotransitive, Intransitive]}]},
-  body = procedure(play, subject, payment, resulting, from)
+  body = procedure(play, $subject, $payment, $resulting, $from)
 }

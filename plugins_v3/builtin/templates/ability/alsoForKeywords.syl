@@ -8,5 +8,5 @@
 # [CR#702.1c]
 template alsoForKeywords(frame: Ability, keywords: List(KeywordTerm) = []): Ability {
   # TODO(spelling): Format and coordinate the keywords list entries, including the empty case.
-  body = sameIsTrueFor(frame, keywords)
+  body = sameIsTrueFor($frame, $keywords)
 }

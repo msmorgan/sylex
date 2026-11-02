@@ -7,5 +7,5 @@ ability recover(cost: Cost) {
   body = [
     when(
       does(any, move(a(isCreature), battlefield, yourGraveyard, departure, [])),
-      may(pay(cost, once), returnToHand(this, yourGraveyard), exile(this)))]
+      may(pay($cost, once), returnToHand(this, yourGraveyard), exile(this)))]
 }

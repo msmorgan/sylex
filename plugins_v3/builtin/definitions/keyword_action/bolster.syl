@@ -12,5 +12,5 @@ action bolster(amount: Amount) {
               isCreature,
               actorControls,
               superlative(min, stat(toughness), and([isCreature, actorControls]))]))),
-      putCounters(amount, printedKind(p1p1Counter), that(creature))])
+      putCounters($amount, printedKind(p1p1Counter), that(creature))])
 }

@@ -6,5 +6,5 @@ action attachTo(subject: NounPhrase, host: NounPhrase) {
       {lemma = "unattach", frames = [Monotransitive, TransitiveWithPP(["from"])]}]},
   deed = "attach",
   spelling = "attach <subject> to <host>",
-  body = attachment(attached, subject, host)
+  body = attachment(attached, $subject, $host)
 }

@@ -28,5 +28,5 @@ action empowerJace(amount: Amount) {
                   activated(loyaltySymbol(down(3)), draw(1))],
                 loyalty = 0}}))),
       choose(a(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
-      putCounters(amount, printedKind(loyaltyCounter), it)])
+      putCounters($amount, printedKind(loyaltyCounter), it)])
 }

@@ -12,12 +12,12 @@ template delayUnlessPaid(
   spelling = "<action> at <event> unless <player> pays <cost> before that step",
   body = sequentially(
     [
-      delay(event, action),
+      delay($event, $action),
       establish(
         specialAction(
           none,
-          cost,
+          $cost,
           establish(cant(actor(delayedTrigger), trigger)),
-          player),
-        durationBetween(none, event))])
+          $player),
+        durationBetween(none, $event))])
 }

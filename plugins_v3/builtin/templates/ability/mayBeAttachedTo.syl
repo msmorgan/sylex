@@ -2,5 +2,5 @@
 # role [CR#701.3a,301.5].
 template mayBeAttachedTo(subject: NounPhrase, host: NounPhrase): StaticSpec {
   spelling = "<subject> may be attached to <host>",
-  body = can(any, attachTo(subject, host))
+  body = can(any, attachTo($subject, $host))
 }

@@ -5,5 +5,5 @@ template getsBoth(
   delta: Delta(Amount),
   duration: Option(Duration) = none): Action {
   # TODO(spelling): Include or omit the clauses supplied by duration.
-  body = get(subject, delta, delta, duration)
+  body = get($subject, $delta, $delta, $duration)
 }

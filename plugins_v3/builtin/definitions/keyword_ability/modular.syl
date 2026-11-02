@@ -3,7 +3,7 @@ ability modular(count: Amount) {
   lexical = {lemma = "modular", parameters = [[Amount], [DashKeyword]]},
   spelling = "modular <count>",
   body = [
-    static(entersWithCounters(thisPermanent, count, p1p1Counter)),
+    static(entersWithCounters(thisPermanent, $count, p1p1Counter)),
     when(
       does(actor(thisPermanent), die),
       may(

@@ -6,7 +6,7 @@ ability powerUp(ability: Ability) {
   lexical = {lemma = "power-up", parameters = [[DashAbility]]},
   spelling = "power-up — <ability>",
   body = [
-    qualified(ability, limit = oncePerObject),
+    qualified($ability, limit = oncePerObject),
     static(
       onlyWhile(
         reducedBySymbols(thisAbility, manaCostOf(thisPermanent)),

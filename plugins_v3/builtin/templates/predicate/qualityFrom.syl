@@ -2,5 +2,5 @@
 template qualityFrom(sort: QualitySort, domain: ChoiceDomain): Predicate {
   # TODO(spelling): The domain selects an enumeration, exclusion, or named-card restriction after
   # the quality noun.
-  body = qualityNoun(sort, domain)
+  body = qualityNoun($sort, $domain)
 }

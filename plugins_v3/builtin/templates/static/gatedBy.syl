@@ -8,8 +8,8 @@ template gatedBy(
   except: Option(DeonticExcept) = none): StaticSpec {
   # TODO(spelling): Include or omit the clauses supplied by timing, asThough, except.
   body = staticSpecGatedBy(
-    cost,
-    subj,
-    action,
-    {timing = timing, asThough = asThough, except = except})
+    $cost,
+    $subj,
+    $action,
+    {timing = $timing, asThough = $asThough, except = $except})
 }

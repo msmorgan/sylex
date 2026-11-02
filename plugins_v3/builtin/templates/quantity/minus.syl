@@ -1,4 +1,4 @@
 template minus(left: Amount, right: Amount): Amount {
   spelling = "<left> minus <right>",
-  body = arith(minus, left, right)
+  body = arith(minus, $left, $right)
 }

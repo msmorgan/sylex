@@ -4,5 +4,5 @@
 # [CR#603.2]
 template triggers(ability: NounPhrase): GameEvent {
   spelling = "<ability> triggers",
-  body = does(actor(ability), trigger)
+  body = does(actor($ability), trigger)
 }

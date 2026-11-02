@@ -2,5 +2,5 @@
 # The Ring is an example of a named Emblem [CR#701.54c].
 template getNamedEmblem(name: String, abilities: List(Ability)): Action {
   # TODO(spelling): Format and coordinate the abilities list entries, including the empty case.
-  body = createObject(1, emblem(name, abilities))
+  body = createObject(1, emblem($name, $abilities))
 }

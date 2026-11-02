@@ -14,7 +14,7 @@ ability sneak(cost: Cost) {
           thisSpell,
           payment = payingInstead(
             compound(
-              [cost, perform(returnToHand(a(and([isCreature, isUnblocked, youControl]))))]))),
+              [$cost, perform(returnToHand(a(and([isCreature, isUnblocked, youControl]))))]))),
         and([asInstant, duringPart(declareBlockers, you)]))),
     static(
       replace(

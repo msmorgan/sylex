@@ -3,5 +3,5 @@
 # [CR#603.2h]
 template doOnlyOnceEachTurn(action: Action): Action {
   spelling = "<action>. Do this only once each turn.",
-  body = limited(action, oncePerTurn)
+  body = limited($action, oncePerTurn)
 }

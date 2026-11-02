@@ -4,5 +4,5 @@ ability afflict(amount: Amount) {
   lexical = {lemma = "afflict", parameters = [[Amount]]},
   spelling = "afflict <amount>",
   body = [
-    whenever(does(any, becomeBlocked(thisCreature)), instruct(defendingPlayer, loseLife(amount)))]
+    whenever(does(any, becomeBlocked(thisCreature)), instruct(defendingPlayer, loseLife($amount)))]
 }

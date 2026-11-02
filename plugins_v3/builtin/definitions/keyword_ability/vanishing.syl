@@ -5,7 +5,7 @@ ability vanishing(amount: Amount) {
   lexical = {lemma = "vanishing", parameters = [[], [Amount]]},
   spelling = "vanishing <amount>",
   body = [
-    static(entersWithCounters(thisPermanent, amount, timeCounter)),
+    static(entersWithCounters(thisPermanent, $amount, timeCounter)),
     at(
       beginningOfYour(upkeep),
       removeCounters(oneThrough(1), printedKind(timeCounter), thisPermanent),

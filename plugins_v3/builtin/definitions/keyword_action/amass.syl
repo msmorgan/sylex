@@ -7,10 +7,10 @@ action amass(subtype: Subtype, count: Amount) {
     [
       doIf(
         not(exists(and([hasSubtype(army), isCreature, actorControls]))),
-        create(1, written(creatureToken(0, 0, [black], [subtype, army])))),
+        create(1, written(creatureToken(0, 0, [black], [$subtype, army])))),
       choose(a(and([hasSubtype(army), isCreature, actorControls]))),
-      putCounters(count, printedKind(p1p1Counter), that(type(creature))),
+      putCounters($count, printedKind(p1p1Counter), that(type(creature))),
       doIf(
-        not(is(it, hasSubtype(subtype))),
-        become(it, {characteristics = {subtypes = [subtype]}}))])
+        not(is(it, hasSubtype($subtype))),
+        become(it, {characteristics = {subtypes = [$subtype]}}))])
 }

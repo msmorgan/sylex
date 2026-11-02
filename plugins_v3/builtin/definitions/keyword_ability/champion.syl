@@ -11,7 +11,7 @@ ability champion(subject: Predicate) {
     when(
       does(actor(thisPermanent), enter),
       mayOrElse(
-        pay(perform(exile(a(and([subject, youControl, isOther])))), once),
+        pay(perform(exile(a(and([$subject, youControl, isOther])))), once),
         sacrifice(thisPermanent))),
     when(
       does(actor(thisPermanent), leave),

@@ -8,5 +8,5 @@ action untap(subject: NounPhrase) {
         gerund = "untapping",
         frames = [Monotransitive, Intransitive]}]},
   spelling = "untap <subject>",
-  body = setStatus(untapped, subject)
+  body = setStatus(untapped, $subject)
 }

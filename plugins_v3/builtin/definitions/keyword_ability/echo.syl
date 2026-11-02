@@ -8,6 +8,6 @@ ability echo(cost: Cost) {
   body = [
     at(
       beginningOfYour(upkeep),
-      doUnlessKeywordCost(sacrifice(thisPermanent), cost, thisPermanent, echo),
+      doUnlessKeywordCost(sacrifice(thisPermanent), $cost, thisPermanent, echo),
       if = not(heldSince(is(thisPermanent, youControl), beginningOf(upkeep, you, previous(you)))))]
 }

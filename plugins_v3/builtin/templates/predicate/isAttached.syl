@@ -2,5 +2,5 @@
 # attachment when `word` is none.
 template isAttached(word: Option(AttachWord) = none): Predicate {
   # TODO(spelling): Include or omit the clauses supplied by word.
-  body = attachment(host, word = word)
+  body = attachment(host, word = $word)
 }

@@ -5,6 +5,6 @@ action regenerate(subject: NounPhrase) {
   deed = none,
   spelling = "regenerate <subject>",
   body = establish(
-    replace(would(any, destroy(subject)), instead(regeneration(subject)), use = nextTimeOnly),
+    replace(would(any, destroy($subject)), instead(regeneration($subject)), use = nextTimeOnly),
     thisTurn)
 }

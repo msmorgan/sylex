@@ -5,10 +5,10 @@ action discover(amount: Amount) {
   body = sequentially(
     [
       exile(
-        run(top, and([non(isLand), compare(atMost, amount, [stat(manaValue)])]), libraryOf(actor))),
+        run(top, and([non(isLand), compare(atMost, $amount, [stat(manaValue)])]), libraryOf(actor))),
       withContinuation(
         optional,
-        castWithoutPaying(that(card), compare(atMost, amount, [stat(manaValue)])),
+        castWithoutPaying(that(card), compare(atMost, $amount, [stat(manaValue)])),
         ifNot = putInto(that(card), hand)),
       move(theRest, anywhere, onBottom, arrival, [inOrder(randomOrder)])])
 }

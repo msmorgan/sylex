@@ -7,5 +7,5 @@ template entersUnless(
   riders: List(MoveRider),
   condition: Condition): StaticSpec {
   spelling = "<subject> enters <riders> unless <condition>",
-  body = replace(would(actor(subject), enter), doIf(not(condition), withRiders(riders)))
+  body = replace(would(actor($subject), enter), doIf(not($condition), withRiders($riders)))
 }

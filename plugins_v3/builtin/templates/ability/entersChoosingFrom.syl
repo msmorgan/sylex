@@ -4,5 +4,5 @@ template entersChoosingFrom(
   sort: QualitySort,
   domain: ChoiceDomain): StaticSpec {
   spelling = "As <subject> enters, choose a <sort> from <domain>.",
-  body = entryChoice(subject, a(qualityFrom(sort, domain)))
+  body = entryChoice($subject, a(qualityFrom($sort, $domain)))
 }

@@ -3,5 +3,5 @@
 action mill(amount: Amount) {
   spelling = "mill <amount> cards",
   lexical = {verbs = [{lemma = "mill", frames = [Monotransitive]}]},
-  body = move(slice(top, amount, libraryOf(actor)), zone(library, none), graveyard, arrival, [])
+  body = move(slice(top, $amount, libraryOf(actor)), zone(library, none), graveyard, arrival, [])
 }

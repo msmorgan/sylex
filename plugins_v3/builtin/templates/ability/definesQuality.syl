@@ -5,5 +5,5 @@
 template definesQuality(subject: NounPhrase, op: QualityOp, written: QualityPayload): StaticSpec {
   # TODO(spelling): The op and written payload select the characteristic definition's quality
   # clause, including type or color structure.
-  body = characteristicDefining(subject, [payload(op, written)])
+  body = characteristicDefining($subject, [payload($op, $written)])
 }

@@ -2,5 +2,5 @@
 action blight(amount: Amount) {
   lexical = {verbs = [{lemma = "blight", frames = [Amount]}]},
   spelling = "blight <amount>",
-  body = putCounters(amount, printedKind(m1m1Counter), a(and([isCreature, actorControls])))
+  body = putCounters($amount, printedKind(m1m1Counter), a(and([isCreature, actorControls])))
 }

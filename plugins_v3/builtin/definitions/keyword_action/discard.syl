@@ -3,5 +3,5 @@
 action discard(subject: NounPhrase, destination: Zone = graveyard) {
   lexical = {verbs = [{lemma = "discard", frames = [Monotransitive]}]},
   spelling = "discard <subject>",
-  body = move(subject, zone(hand, actor), zone(destination, none), arrival, [])
+  body = move($subject, zone(hand, actor), zone($destination, none), arrival, [])
 }

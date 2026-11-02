@@ -1,5 +1,5 @@
 # "<source> deals N damage divided as you choose among <among>"
 template dealDivided(source: NounPhrase, amount: Amount, among: NounPhrase): Action {
   spelling = "<source> deals <amount> damage divided as you choose among <among>",
-  body = distribute(damage(source), amount, among)
+  body = distribute(damage($source), $amount, $among)
 }

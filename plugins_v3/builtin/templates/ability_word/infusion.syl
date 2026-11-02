@@ -2,5 +2,5 @@ ability_word infusion(ability: Ability) {
   lexical = {lemma = "infusion", listed = Rules},
   label = "infusion",
   spelling = "infusion — <ability>",
-  body = ability
+  body = $ability
 }

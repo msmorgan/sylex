@@ -1,5 +1,5 @@
 # "if <action> was done <within>", the passive with no agent.
 template was(action: Action, within: LookbackSpan): Condition {
   spelling = "if <action> was done <within>",
-  body = did(any, action, within)
+  body = did(any, $action, $within)
 }

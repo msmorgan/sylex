@@ -9,7 +9,7 @@ ability ripple(amount: Amount) {
     when(
       does(actor(you), cast(thisSpell)),
       may(
-        reveal(slice(top, amount, libraryOf(you))),
+        reveal(slice(top, $amount, libraryOf(you))),
         sequentially(
           [
             castWithoutPaying(

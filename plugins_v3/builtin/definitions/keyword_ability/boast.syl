@@ -8,7 +8,7 @@ ability boast(ability: Ability) {
   spelling = "boast — <ability>",
   body = [
     qualified(
-      ability,
+      $ability,
       limit = oncePerTurn,
       guard = is(thisCreature, did(actor(which), attack, within(soFarThisTurn))))]
 }

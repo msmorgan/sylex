@@ -2,5 +2,5 @@
 ability exhaust(ability: Ability) {
   lexical = {lemma = "exhaust", parameters = [[DashAbility]]},
   spelling = "exhaust — <ability>",
-  body = [qualified(ability, limit = oncePerObject)]
+  body = [qualified($ability, limit = oncePerObject)]
 }

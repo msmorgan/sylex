@@ -10,5 +10,5 @@ action monstrosity(amount: Amount) {
   body = doIf(
     not(is(actor, hasDesignation(monstrous))),
     sequentially(
-      [putCounters(amount, printedKind(p1p1Counter), actor), gainDesignation(actor, monstrous)]))
+      [putCounters($amount, printedKind(p1p1Counter), actor), gainDesignation(actor, monstrous)]))
 }

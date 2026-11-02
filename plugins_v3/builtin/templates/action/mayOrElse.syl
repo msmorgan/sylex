@@ -1,5 +1,5 @@
 # "You may <body>. If you don't, <otherwise>.": an optional Action with only a failure branch.
 template mayOrElse(body: Action, otherwise: Action): Action {
   spelling = "You may <body>. If you don't, <otherwise>.",
-  body = may(body, ifNot = otherwise)
+  body = may($body, ifNot = $otherwise)
 }

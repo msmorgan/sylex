@@ -5,5 +5,5 @@ ability disturb(cost: Cost) {
   lexical = {lemma = "disturb", parameters = [[Cost]]},
   spelling = "disturb <cost>",
   body = [
-    static(can(actor(you), cast(this, from = yourGraveyard, payment = transformedPaying(cost))))]
+    static(can(actor(you), cast(this, from = yourGraveyard, payment = transformedPaying($cost))))]
 }

@@ -5,6 +5,6 @@ ability auraSwap(cost: Cost) {
   spelling = "aura swap <cost>",
   body = [
     activated(
-      cost,
+      $cost,
       may(exchangeCards(thisPermanent, a(and([isCard, hasSubtype(aura), in(yourHand)])))))]
 }

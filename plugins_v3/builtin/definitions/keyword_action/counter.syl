@@ -2,5 +2,5 @@
 action counter(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "counter", frames = [Monotransitive]}]},
   spelling = "counter <subject>",
-  body = move(subject, zone(stack, none), zone(graveyard, none), arrival, [])
+  body = move($subject, zone(stack, none), zone(graveyard, none), arrival, [])
 }

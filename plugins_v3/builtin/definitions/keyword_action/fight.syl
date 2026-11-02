@@ -4,9 +4,9 @@ action fight(other: NounPhrase) {
   permanent = performs,
   spelling = "fight <other>",
   body = doIf(
-    and([is(other, isCreature), is(theActor, isCreature)]),
+    and([is($other, isCreature), is(theActor, isCreature)]),
     simultaneously(
       [
-        dealDamage(statOf(stat(power), theActor), other),
-        instruct(other, dealDamage(statOf(stat(power), other), theActor))]))
+        dealDamage(statOf(stat(power), theActor), $other),
+        instruct($other, dealDamage(statOf(stat(power), $other), theActor))]))
 }

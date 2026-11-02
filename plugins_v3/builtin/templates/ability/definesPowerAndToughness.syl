@@ -8,6 +8,6 @@ template definesPowerAndToughness(
   toughnessValue: Amount): StaticSpec {
   spelling = "<subject>'s power is equal to <powerValue> and its toughness is equal to <toughnessValue>",
   body = characteristicDefining(
-    subject,
-    [stat(power, set(powerValue)), stat(toughness, set(toughnessValue))])
+    $subject,
+    [stat(power, set($powerValue)), stat(toughness, set($toughnessValue))])
 }

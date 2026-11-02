@@ -6,5 +6,5 @@ ability escape(cost: Cost) {
     parameters = [[Cost]],
     verbs = [{lemma = "escape", frames = [Intransitive, Prepositional(["with"])]}]},
   spelling = "escape—<cost>.",
-  body = [static(can(actor(you), cast(this, yourGraveyard, payingInstead(cost))))]
+  body = [static(can(actor(you), cast(this, yourGraveyard, payingInstead($cost))))]
 }

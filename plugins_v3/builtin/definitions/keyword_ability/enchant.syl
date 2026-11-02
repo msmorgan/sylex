@@ -15,8 +15,8 @@ ability enchant(subject: Predicate) {
     verbs = [{lemma = "enchant", frames = [Monotransitive]}]},
   spelling = "enchant <subject>",
   body = [
-    static(addsTarget(thisAura, subject)),
-    static(mayBeAttachedTo(thisAura, allOf(subject))),
+    static(addsTarget(thisAura, $subject)),
+    static(mayBeAttachedTo(thisAura, allOf($subject))),
     static(
       replace(
         would(actor(thisAura), enter),

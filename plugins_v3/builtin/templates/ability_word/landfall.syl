@@ -2,5 +2,5 @@ ability_word landfall(ability: Ability) {
   lexical = {lemma = "landfall", listed = Rules},
   label = "landfall",
   spelling = "landfall — <ability>",
-  body = ability
+  body = $ability
 }

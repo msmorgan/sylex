@@ -9,5 +9,5 @@ template pay(
   whose: Option(NounPhrase) = none,
   keyword: Option(KeywordLabel) = none): Action {
   # TODO(spelling): Include or omit the clauses supplied by whose, keyword.
-  body = actionPay(payment(cost), times, outcome, whose, keyword)
+  body = actionPay(payment($cost), $times, $outcome, $whose, $keyword)
 }

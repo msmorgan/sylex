@@ -5,5 +5,5 @@ ability devour(amount: Amount) {
     parameters = [[Amount], [Quality(None), Amount]],
     verbs = [{lemma = "devour", frames = [Monotransitive]}]},
   spelling = "devour <amount>",
-  body = [devourEntry(isCreature, isCreature, amount)]
+  body = [devourEntry(isCreature, isCreature, $amount)]
 }

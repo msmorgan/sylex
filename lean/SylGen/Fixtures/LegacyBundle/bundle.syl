@@ -10,7 +10,7 @@ primitive this: NounPhrase = .you { lexical = { nouns = [aSubject] } }
 template aQuality: Predicate { body = and([isCard, isCreature]) }
 template aSubject: NounPhrase { body = this }
 ability bundleDevour { label = "bundle devour", body = [bundleDevourEntry] }
-action bundleDevour(subject: NounPhrase) { ofAbility = bundleDevour, body = sacrifice(subject) }
+action bundleDevour(subject: NounPhrase) { ofAbility = bundleDevour, body = sacrifice($subject) }
 template bundleDevourEntry: Ability { body = spell(bundleDevour(thisCreature)) }
 subtype bundleBearer { name = "Bundle Bearer", kind = creature, confers = [bundleConferral] }
 template bundleConferral: Conferral { body = property(can(any, sacrifice(a(hasSubtype(bundleBearer))))) }

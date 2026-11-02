@@ -6,5 +6,5 @@ ability annihilator(amount: Amount) {
   body = [
     whenever(
       does(actor(thisCreature), attack),
-      instruct(defendingPlayer, sacrifice(counted(exactlyOf(amount), isPermanent))))]
+      instruct(defendingPlayer, sacrifice(counted(exactlyOf($amount), isPermanent))))]
 }

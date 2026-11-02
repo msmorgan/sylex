@@ -11,5 +11,5 @@ template must(
   asThough: Option(AsThough) = none,
   except: Option(DeonticExcept) = none): StaticSpec {
   # TODO(spelling): Include or omit the clauses supplied by timing, asThough, except.
-  body = staticSpecMust(subj, action, {timing = timing, asThough = asThough, except = except})
+  body = staticSpecMust($subj, $action, {timing = $timing, asThough = $asThough, except = $except})
 }

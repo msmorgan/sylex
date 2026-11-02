@@ -8,7 +8,7 @@ ability freerunning(cost: Cost) {
   body = [
     static(
       onlyWhile(
-        altCost(this, cost),
+        altCost(this, $cost),
         did(
           actor(
             a(

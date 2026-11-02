@@ -10,5 +10,5 @@ ability disguise(cost: Cost) {
       can(
         actor(you),
         cast(thisCard, payment = faceDown(faceDownWardedCreature, mana([generic(3)]))))),
-    static(specialAction(none, cost, turnFaceUp(this)))]
+    static(specialAction(none, $cost, turnFaceUp(this)))]
 }

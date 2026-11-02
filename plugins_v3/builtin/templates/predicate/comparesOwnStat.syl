@@ -7,5 +7,5 @@ template comparesOwnStat(
   member: NounPhrase = ownMember): Predicate {
   # TODO(spelling): An ownMember reads the described object's stat; another member requires an
   # explicit stat possessor.
-  body = compareOver(domain, statOf(stat(stat), member), comparator, bound)
+  body = compareOver($domain, statOf(stat($stat), $member), $comparator, $bound)
 }

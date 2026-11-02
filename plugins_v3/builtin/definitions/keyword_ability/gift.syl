@@ -11,7 +11,7 @@ ability gift(promise: Action) {
     byCardClass(
       when(
         does(actor(thisPermanent), enter),
-        instruct(the(isChosenPlayer), promise),
+        instruct(the(isChosenPlayer), $promise),
         if = keywordCostPaid(gift, this)),
-      spell(doIf(keywordCostPaid(gift, this), instruct(the(isChosenPlayer), promise))))]
+      spell(doIf(keywordCostPaid(gift, this), instruct(the(isChosenPlayer), $promise))))]
 }

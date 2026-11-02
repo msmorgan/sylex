@@ -2,5 +2,5 @@
 # [CR#607.2a]
 template thePlural(p: Predicate): NounPhrase {
   spelling = "the <p>",
-  body = described(the(many), p)
+  body = described(the(many), $p)
 }

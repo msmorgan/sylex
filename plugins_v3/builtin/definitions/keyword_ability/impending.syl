@@ -7,13 +7,13 @@ ability impending(amount: Amount, cost: Cost) {
   lexical = {lemma = "impending", parameters = [[Amount, DashCost]]},
   spelling = "impending <amount>—<cost>",
   body = [
-    static(altCost(this, cost)),
+    static(altCost(this, $cost)),
     static(
       replace(
         would(actor(thisPermanent), enter),
         doIf(
           keywordCostPaid(impending, thisPermanent),
-          withRiders([withCounters(amount, printedKind(timeCounter), fresh)])))),
+          withRiders([withCounters($amount, printedKind(timeCounter), fresh)])))),
     static(
       onlyWhile(
         characteristicChange(thisPermanent, [typeLine(loses, {types = [creature]})]),

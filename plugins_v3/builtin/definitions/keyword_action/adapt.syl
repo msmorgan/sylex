@@ -8,5 +8,5 @@ action adapt(amount: Amount) {
   spelling = "adapt <amount>",
   body = doIf(
     not(is(actor, hasCounter(p1p1Counter))),
-    putCounters(amount, printedKind(p1p1Counter), actor))
+    putCounters($amount, printedKind(p1p1Counter), actor))
 }

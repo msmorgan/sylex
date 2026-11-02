@@ -2,5 +2,5 @@
 # referent are those of "all creatures" (`allOf`), whose tree it shares.
 template bare(p: Predicate): NounPhrase {
   spelling = "<p>",
-  body = described(all, p)
+  body = described(all, $p)
 }

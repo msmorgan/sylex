@@ -6,6 +6,6 @@ ability mayhem(cost: Cost) {
   body = [
     static(
       onlyWhile(
-        can(actor(you), cast(thisCard, yourGraveyard, payingInstead(cost))),
+        can(actor(you), cast(thisCard, yourGraveyard, payingInstead($cost))),
         did(actor(you), discard(thisCard), within(soFarThisTurn))))]
 }

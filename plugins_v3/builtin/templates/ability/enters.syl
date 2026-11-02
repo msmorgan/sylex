@@ -4,5 +4,5 @@
 # [CR#603.6d,614.1c,614.1d]
 template enters(subject: NounPhrase, riders: List(MoveRider)): StaticSpec {
   spelling = "<subject> enters <riders>",
-  body = replace(would(actor(subject), enter), withRiders(riders))
+  body = replace(would(actor($subject), enter), withRiders($riders))
 }

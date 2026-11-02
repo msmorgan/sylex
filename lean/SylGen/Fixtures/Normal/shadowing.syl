@@ -8,5 +8,5 @@ primitive actionSearch(for_: NounPhrase, scope: Location): Action = .search
 template search: Action { body = sequentially([]) }
 template declaredSearch: Action { body = search }
 template constructorSearch(scope: Location, for_: NounPhrase): Action {
-  body = actionSearch(for_, scope)
+  body = actionSearch($for_, $scope)
 }

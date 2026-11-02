@@ -5,5 +5,5 @@
 # [CR#712.8c,702.162a]
 template convertedPaying(cost: Cost): PlayPayment {
   spelling = "converted by paying <cost> rather than its mana cost",
-  body = transformedPaying(cost)
+  body = transformedPaying($cost)
 }

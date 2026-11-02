@@ -8,9 +8,9 @@ action regeneration(subject: NounPhrase) {
   deed = "regenerate",
   body = sequentially(
     [
-      clearDamage(subject),
-      instruct(possessorOf(controller, subject), tap(subject)),
+      clearDamage($subject),
+      instruct(possessorOf(controller, $subject), tap($subject)),
       doIf(
-        or([is(subject, inCombat(attackerOf)), is(subject, inCombat(blockerOf))]),
-        removeFromCombat(subject))])
+        or([is($subject, inCombat(attackerOf)), is($subject, inCombat(blockerOf))]),
+        removeFromCombat($subject))])
 }

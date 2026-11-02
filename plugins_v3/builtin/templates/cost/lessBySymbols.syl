@@ -3,5 +3,5 @@
 template lessBySymbols(cost: ManaCostTerm, coloredOnly: Bool = false): CostShift {
   # TODO(spelling): The coloredOnly flag adds the restriction to the colored portion of the mana
   # cost.
-  body = bySymbols(down(cost), coloredOnly)
+  body = bySymbols(down($cost), $coloredOnly)
 }

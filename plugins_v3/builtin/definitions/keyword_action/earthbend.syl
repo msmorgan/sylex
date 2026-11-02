@@ -14,7 +14,7 @@ action earthbend(amount: Amount) {
             stat(power, set(0)),
             stat(toughness, set(0)),
             addedAbilities([haste])])),
-      putCounters(amount, printedKind(p1p1Counter), that(land)),
+      putCounters($amount, printedKind(p1p1Counter), that(land)),
       delay(
         does(actor(that(land)), die),
         returnToBattlefield(that(land), [entersAs(tapped), under(actor)]),

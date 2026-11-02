@@ -5,5 +5,5 @@
 ability solved(ability: Ability) {
   lexical = {lemma = "solved", parameters = [[DashAbility]]},
   spelling = "solved — <ability>",
-  body = [qualified(ability, guard = is(thisCase, hasDesignation(solved)))]
+  body = [qualified($ability, guard = is(thisCase, hasDesignation(solved)))]
 }

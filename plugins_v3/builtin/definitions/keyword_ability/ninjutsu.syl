@@ -9,7 +9,7 @@ ability ninjutsu(cost: Cost) {
     activated(
       compound(
         [
-          cost,
+          $cost,
           perform(reveal(this)),
           perform(returnToHand(a(and([isCreature, isAttacking, isUnblocked, youControl]))))]),
       putOntoBattlefieldTappedAttacking(

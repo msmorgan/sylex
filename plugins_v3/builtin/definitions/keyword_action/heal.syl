@@ -2,5 +2,5 @@
 action heal(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "heal", frames = [Monotransitive]}]},
   spelling = "heal <subject>",
-  body = clearDamage(subject)
+  body = clearDamage($subject)
 }

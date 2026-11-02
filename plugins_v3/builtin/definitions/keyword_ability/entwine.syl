@@ -3,5 +3,5 @@
 ability entwine(cost: Cost) {
   lexical = {lemma = "entwine", parameters = [[Cost]]},
   spelling = "entwine <cost>",
-  body = [static(modeChoice(allInstead(cost)))]
+  body = [static(modeChoice(allInstead($cost)))]
 }

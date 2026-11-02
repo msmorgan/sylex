@@ -2,5 +2,5 @@
 # [CR#207.2c]
 template abilityWord(word: AbilityWordLabel, ability: Ability): Ability {
   spelling = "<word> — <ability>",
-  body = italicHead(abilityWord(word), ability)
+  body = italicHead(abilityWord($word), $ability)
 }

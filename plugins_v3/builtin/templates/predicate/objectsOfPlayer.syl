@@ -3,5 +3,5 @@
 # [CR#702.16k]
 template objectsOfPlayer(player: NounPhrase): Predicate {
   spelling = "<player>",
-  body = or([controlledBy(player), and([ownedBy(player), not(controlledBy(a(isPlayer)))])])
+  body = or([controlledBy($player), and([ownedBy($player), not(controlledBy(a(isPlayer)))])])
 }

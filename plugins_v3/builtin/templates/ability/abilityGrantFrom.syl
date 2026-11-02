@@ -6,5 +6,5 @@ template abilityGrantFrom(
   except: Option(Predicate) = none): StaticSpec {
   # TODO(spelling): Include or omit the clauses supplied by except. Format and coordinate the
   # classes list entries, including the empty case.
-  body = characteristicChange(subject, [addedAbilitiesOf(source, classes, except)])
+  body = characteristicChange($subject, [addedAbilitiesOf($source, $classes, $except)])
 }

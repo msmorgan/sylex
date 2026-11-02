@@ -5,7 +5,7 @@ ability offspring(cost: Cost) {
   lexical = {lemma = "offspring", parameters = [[Cost]]},
   spelling = "offspring <cost>",
   body = [
-    static(addedCost(cost, true)),
+    static(addedCost($cost, true)),
     when(
       does(actor(thisPermanent), enter),
       create(

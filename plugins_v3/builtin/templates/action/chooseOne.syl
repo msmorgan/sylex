@@ -3,5 +3,5 @@ template chooseOne(first: Action, second: Action): Action {
   spelling = "Choose one —
 • <first>
 • <second>",
-  body = actionChooseModes(exactly(1), [mk(none, none, first), mk(none, none, second)])
+  body = actionChooseModes(exactly(1), [mk(none, none, $first), mk(none, none, $second)])
 }

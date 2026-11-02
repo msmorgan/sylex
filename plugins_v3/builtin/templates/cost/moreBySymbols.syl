@@ -2,5 +2,5 @@
 # [CR#702.48c,118.7]
 template moreBySymbols(cost: ManaCostTerm): CostShift {
   spelling = "costs <cost> more",
-  body = bySymbols(up(cost), false)
+  body = bySymbols(up($cost), false)
 }

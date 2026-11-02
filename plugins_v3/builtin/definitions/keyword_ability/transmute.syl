@@ -6,7 +6,7 @@ ability transmute(cost: Cost) {
   spelling = "transmute <cost>",
   body = [
     activatedOnlyDuring(
-      compound([cost, perform(discard(this))]),
+      compound([$cost, perform(discard(this))]),
       sequentially(
         [
           search(

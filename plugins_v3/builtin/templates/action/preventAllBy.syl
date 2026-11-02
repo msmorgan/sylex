@@ -8,7 +8,7 @@ template preventAllBy(
   # TODO(spelling): Include or omit the clauses supplied by duration, kind.
   body = establish(
     replace(
-      would(by(source), dealDamage(recipient = to, kind = kind)),
+      would(by($source), dealDamage(recipient = $to, kind = $kind)),
       instead(preventDamage(allDamage))),
-    duration)
+    $duration)
 }

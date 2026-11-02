@@ -9,7 +9,7 @@ ability mutate(cost: Cost) {
     verbs = [{lemma = "mutate", frames = [Intransitive]}]},
   spelling = "mutate <cost>",
   body = [
-    static(altCost(this, cost)),
+    static(altCost(this, $cost)),
     static(
       onlyWhile(
         addsTarget(

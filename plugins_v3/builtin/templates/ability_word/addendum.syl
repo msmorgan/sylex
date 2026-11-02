@@ -2,5 +2,5 @@ ability_word addendum(ability: Ability) {
   lexical = {lemma = "addendum", listed = Rules},
   label = "addendum",
   spelling = "addendum — <ability>",
-  body = ability
+  body = $ability
 }

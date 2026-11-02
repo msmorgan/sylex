@@ -4,5 +4,5 @@ action faceAVillainousChoice(first: Action, second: Action) {
   lexical = {
     verbs = [{lemma = "face", frames = [Monotransitive, TransitiveWithComplement(SetOffClause)]}]},
   spelling = "face a villainous choice — <first> or <second>",
-  body = chooseOne(first, second)
+  body = chooseOne($first, $second)
 }

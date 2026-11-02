@@ -5,7 +5,7 @@ ability fading(amount: Amount) {
   lexical = {lemma = "fading", parameters = [[Amount]]},
   spelling = "fading <amount>",
   body = [
-    static(entersWithCounters(thisPermanent, amount, fadeCounter)),
+    static(entersWithCounters(thisPermanent, $amount, fadeCounter)),
     at(
       beginningOfYour(upkeep),
       doIfDone(

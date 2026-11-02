@@ -11,7 +11,7 @@ template can(
   rider: Option(Action) = none): StaticSpec {
   # TODO(spelling): Include or omit the clauses supplied by timing, asThough, except, rider.
   body = staticSpecCan(
-    subj,
-    action,
-    {timing = timing, asThough = asThough, except = except, rider = rider})
+    $subj,
+    $action,
+    {timing = $timing, asThough = $asThough, except = $except, rider = $rider})
 }

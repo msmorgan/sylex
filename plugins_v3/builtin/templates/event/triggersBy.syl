@@ -3,5 +3,5 @@
 # [CR#603.2]
 template triggersBy(ability: NounPhrase, cause: NounPhrase): GameEvent {
   # TODO(spelling): Word the cause clause.
-  body = causes(bySource(cause), does(actor(ability), trigger))
+  body = causes(bySource($cause), does(actor($ability), trigger))
 }

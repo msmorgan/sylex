@@ -17,5 +17,5 @@ action incubate(amount: Amount) {
           subtypes = [phyrexian],
           power = 0,
           toughness = 0}}),
-    [withCounters(amount, printedKind(p1p1Counter), fresh)])
+    [withCounters($amount, printedKind(p1p1Counter), fresh)])
 }

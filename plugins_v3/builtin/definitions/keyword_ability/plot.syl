@@ -14,6 +14,6 @@ ability plot(cost: Cost) {
     static(
       specialAction(
         asSorcery,
-        cost,
+        $cost,
         sequentially([exileFrom(thisCard, yourHand), gainDesignation(it, plotted)])))]
 }

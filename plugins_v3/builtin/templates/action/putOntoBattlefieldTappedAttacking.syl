@@ -6,5 +6,5 @@ template putOntoBattlefieldTappedAttacking(
   from: Location = anywhere,
   defender: Option(NounPhrase) = none): Action {
   # TODO(spelling): Include or omit the clauses supplied by defender.
-  body = zoneChange(subject, battlefield, from, [entersAs(tapped), entersAttacking(defender)])
+  body = zoneChange($subject, battlefield, $from, [entersAs(tapped), entersAttacking($defender)])
 }

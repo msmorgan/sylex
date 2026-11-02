@@ -9,6 +9,6 @@ ability dredge(amount: Amount) {
       onlyWhile(
         replace(
           would(actor(you), draw(1)),
-          instead(may(sequentially([mill(amount), returnToHand(this, yourGraveyard)])))),
-        compareAmt(countOf(cardIn(yourLibrary)), atLeast, amount)))]
+          instead(may(sequentially([mill($amount), returnToHand(this, yourGraveyard)])))),
+        compareAmt(countOf(cardIn(yourLibrary)), atLeast, $amount)))]
 }

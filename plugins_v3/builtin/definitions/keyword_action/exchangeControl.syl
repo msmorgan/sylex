@@ -6,5 +6,5 @@ action exchangeControl(left: NounPhrase, right: NounPhrase) {
   lexical = {verbs = [{lemma = "exchange", frames = [Monotransitive, TransitiveWithPP(["with"])]}]},
   deed = "exchange",
   spelling = "exchange control of <left> and <right>",
-  body = exchange(controlOf(left, right))
+  body = exchange(controlOf($left, $right))
 }

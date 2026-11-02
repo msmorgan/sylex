@@ -16,7 +16,7 @@ ability harmonize(cost: Cost) {
           payingInstead(
             compound(
               [
-                cost,
+                $cost,
                 perform(
                   tap(counted(upTo(1), and([isUntapped, and([isCreature, youControl])]))))]))))),
     static(

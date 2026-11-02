@@ -1,5 +1,5 @@
 # "the bottom of <loc>"
 template bottomOf(loc: Location): Location {
   spelling = "the bottom of <loc>",
-  body = fromEnd(bottom, loc = loc)
+  body = fromEnd(bottom, loc = $loc)
 }

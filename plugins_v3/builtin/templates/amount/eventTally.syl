@@ -3,5 +3,5 @@
 template eventTally(subj: Subject, action: Action, within: LookbackSpan, mode: TallyMode): Amount {
   # TODO(spelling): The mode selects an occurrence count or accumulated magnitude, requiring
   # different historical clauses.
-  body = tally({subj = subj, action = action, within = within}, mode)
+  body = tally({subj = $subj, action = $action, within = $within}, $mode)
 }

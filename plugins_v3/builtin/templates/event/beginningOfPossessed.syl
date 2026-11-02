@@ -1,5 +1,5 @@
 # "at the beginning of <possessor>'s <part>", each time it comes
 template beginningOfPossessed(part: TurnPart, possessor: NounPhrase): GameEvent {
   spelling = "at the beginning of <possessor>'s <part>",
-  body = beginningOf(part, possessor, eachTime)
+  body = beginningOf($part, $possessor, eachTime)
 }

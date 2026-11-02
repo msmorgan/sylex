@@ -5,5 +5,5 @@
 # [CR#701.1]
 template flip(subject: NounPhrase): Action {
   spelling = "flip <subject>",
-  body = setStatus(flipped, subject)
+  body = setStatus(flipped, $subject)
 }

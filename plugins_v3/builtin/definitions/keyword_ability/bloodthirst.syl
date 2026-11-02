@@ -9,5 +9,5 @@ ability bloodthirst(amount: Amount) {
         would(actor(thisPermanent), enter),
         doIf(
           was(dealDamage(recipient = anOpponent), within(soFarThisTurn)),
-          withRiders([withCounters(amount, printedKind(p1p1Counter), fresh)]))))]
+          withRiders([withCounters($amount, printedKind(p1p1Counter), fresh)]))))]
 }

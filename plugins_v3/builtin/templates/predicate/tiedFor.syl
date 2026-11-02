@@ -3,5 +3,5 @@
 # a tie.
 template tiedFor(op: AggregateOp, axis: ProjAxis, domain: Predicate): Predicate {
   spelling = "tied for the <op> <axis> among <domain>",
-  body = superlative(op, axis, domain)
+  body = superlative($op, $axis, $domain)
 }

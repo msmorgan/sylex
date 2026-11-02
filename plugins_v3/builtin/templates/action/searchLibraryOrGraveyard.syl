@@ -1,5 +1,5 @@
 # "search your library and/or graveyard for <for>", "your" written once.
 template searchLibraryOrGraveyard(for: NounPhrase): Action {
   spelling = "search your library and/or graveyard for <for>",
-  body = search(andOr([yourLibrary, yourGraveyard]), for)
+  body = search(andOr([yourLibrary, yourGraveyard]), $for)
 }

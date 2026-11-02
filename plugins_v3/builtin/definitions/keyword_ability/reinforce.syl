@@ -5,6 +5,6 @@ ability reinforce(amount: Amount, cost: Cost) {
   spelling = "reinforce <amount>—<cost>",
   body = [
     activated(
-      compound([cost, perform(discard(this))]),
-      putCounters(amount, printedKind(p1p1Counter), target(isCreature)))]
+      compound([$cost, perform(discard(this))]),
+      putCounters($amount, printedKind(p1p1Counter), target(isCreature)))]
 }

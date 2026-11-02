@@ -3,5 +3,5 @@
 # writes, holding only if you so choose. Untapping stays the default.
 template mayDeclineUntap(subject: NounPhrase, whose: Option(NounPhrase)): StaticSpec {
   # TODO(spelling): Include or omit the clauses supplied by whose.
-  body = duringUntapStep(whose, onlyIfSo(cant(any, untap(subject)), soChooses(you)))
+  body = duringUntapStep($whose, onlyIfSo(cant(any, untap($subject)), soChooses(you)))
 }

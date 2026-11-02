@@ -5,5 +5,5 @@ action exileFaceDownFrom(subject: NounPhrase, from: Location) {
   lexical = {verbs = [{lemma = "exile", frames = [Monotransitive]}]},
   deed = "exile",
   spelling = "exile <subject> from <from> face down",
-  body = move(subject, from, exileZone, arrival, [faceDownAs(exiledFaceDown)])
+  body = move($subject, $from, exileZone, arrival, [faceDownAs(exiledFaceDown)])
 }

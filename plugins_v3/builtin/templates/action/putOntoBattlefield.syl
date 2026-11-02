@@ -5,5 +5,5 @@ template putOntoBattlefield(
   riders: List(MoveRider) = []): Action {
   # TODO(spelling): Omit the origin phrase when from_ is anywhere; otherwise print 'from' and that
   # location. Format and coordinate the riders list entries, including the empty case.
-  body = zoneChange(subject, battlefield, from, riders)
+  body = zoneChange($subject, battlefield, $from, $riders)
 }

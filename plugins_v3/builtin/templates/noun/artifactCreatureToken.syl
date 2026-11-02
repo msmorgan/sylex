@@ -10,10 +10,10 @@ template artifactCreatureToken(
   # the empty case.
   body = {
     characteristics = {
-      colors = colors,
+      colors = $colors,
       types = [artifact, creature],
-      subtypes = subtypes,
-      text = abilities,
-      power = lit(ofNat(powerValue)),
-      toughness = lit(ofNat(toughnessValue))}}
+      subtypes = $subtypes,
+      text = $abilities,
+      power = lit(ofNat($powerValue)),
+      toughness = lit(ofNat($toughnessValue))}}
 }

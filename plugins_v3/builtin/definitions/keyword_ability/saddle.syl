@@ -14,7 +14,7 @@ ability saddle(amount: Amount) {
           withTotal(
             stat(power),
             atLeast,
-            amount,
+            $amount,
             allOf(and([isUntapped, and([isCreature, youControl, isOther])]))))),
       gainDesignation(thisPermanent, saddled, untilEndOfTurn),
       asSorcery)]

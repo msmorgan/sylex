@@ -9,5 +9,5 @@ template did(
   within: Option(LookbackSpan) = none,
   ordinal: Option(EventOrdinal) = none): Predicate {
   # TODO(spelling): Include or omit the clauses supplied by within, ordinal.
-  body = predicateDid({subj = subj, action = action, within = within, ordinal = ordinal})
+  body = predicateDid({subj = $subj, action = $action, within = $within, ordinal = $ordinal})
 }

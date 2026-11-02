@@ -4,6 +4,6 @@ action cloak(subject: NounPhrase) {
   spelling = "cloak <subject>",
   body = sequentially(
     [
-      turnFaceDown(subject, faceDownWardedCreature),
-      move(subject, anywhere, battlefield, arrival, [faceDownAs(faceDownWardedCreature)])])
+      turnFaceDown($subject, faceDownWardedCreature),
+      move($subject, anywhere, battlefield, arrival, [faceDownAs(faceDownWardedCreature)])])
 }

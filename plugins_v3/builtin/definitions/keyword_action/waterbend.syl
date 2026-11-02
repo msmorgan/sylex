@@ -4,7 +4,7 @@ action waterbend(cost: Cost) {
   spelling = "waterbend <cost>",
   body = actionPay(
     withSubstitute(
-      cost,
+      $cost,
       substitute(
         tap(a(and([isUntapped, or([isArtifact, isCreature]), actorControls]))),
         [generic])),

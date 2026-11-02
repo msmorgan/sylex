@@ -2,5 +2,5 @@
 # (`semantics-v3.md` §1.3, box 2).
 template exists(p: Predicate): Condition {
   spelling = "there is a <p>",
-  body = thereAre(described(a(unmarked), p))
+  body = thereAre(described(a(unmarked), $p))
 }

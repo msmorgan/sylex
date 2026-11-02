@@ -12,7 +12,7 @@ ability typecycling(quality: Predicate, cost: Cost) {
   spelling = "<quality>cycling <cost>",
   body = [
     activated(
-      compound([cost, perform(discard(this))]),
+      compound([$cost, perform(discard(this))]),
       sequentially(
-        [search(yourLibrary, a(and([isCard, quality]))), reveal(it), putInto(it, hand), shuffle]))]
+        [search(yourLibrary, a(and([isCard, $quality]))), reveal(it), putInto(it, hand), shuffle]))]
 }

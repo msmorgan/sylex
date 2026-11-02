@@ -11,5 +11,5 @@ ability morph(cost: Cost) {
   body = [
     static(
       can(actor(you), cast(thisCard, payment = faceDown(faceDownCreature, mana([generic(3)]))))),
-    static(specialAction(none, cost, turnFaceUp(this)))]
+    static(specialAction(none, $cost, turnFaceUp(this)))]
 }

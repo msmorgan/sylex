@@ -6,6 +6,6 @@ action abilityDeed { ofAbility = sourceAbility, body = sequentially([]) }
 template innerWord: Ability { body = italicHead(abilityWord(named("inner")), spell(none, sequentially([]))) }
 ability_word outerWord { label = "outer", body = innerWord }
 template abilityWord(word: AbilityWordLabel, ability: Ability): Ability {
-  body = italicHead(abilityWord(word), ability)
+  body = italicHead(abilityWord($word), $ability)
 }
 ability_word wrappedWord { label = "fresh", body = spell(none, sequentially([])) }

@@ -1,5 +1,5 @@
 # "between N and M"
 template fromTo(low: Nat, high: Nat): Quantity {
   spelling = "between <low> and <high>",
-  body = range(low, high)
+  body = range($low, $high)
 }

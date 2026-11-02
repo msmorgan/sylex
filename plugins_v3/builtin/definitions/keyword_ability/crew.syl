@@ -13,7 +13,7 @@ ability crew(amount: Amount) {
           withTotal(
             stat(power),
             atLeast,
-            amount,
+            $amount,
             allOf(and([isUntapped, and([isCreature, youControl, isOther])]))))),
       establishThroughout(
         characteristicChange(thisPermanent, [typeLine(adds, {types = [artifact, creature]})]),

@@ -13,5 +13,5 @@ ability miracle(cost: Cost) {
           is(that(card), not(otherThan(thisCard))),
           triggerReflexively(
             may(reveal(thisCard)),
-            may(cast(thisCard, payment = payingInstead(cost)))))))]
+            may(cast(thisCard, payment = payingInstead($cost)))))))]
 }

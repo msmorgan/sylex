@@ -15,5 +15,5 @@ ability tribute(amount: Amount) {
           alongside(
             instruct(
               the(isChosenPlayer),
-              may(putCounters(amount, printedKind(p1p1Counter), thisCreature)))))))]
+              may(putCounters($amount, printedKind(p1p1Counter), thisCreature)))))))]
 }

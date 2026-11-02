@@ -6,5 +6,5 @@ action exchangeValues(left: Amount, right: Amount) {
   lexical = {verbs = [{lemma = "exchange", frames = [Monotransitive, TransitiveWithPP(["with"])]}]},
   deed = "exchange",
   spelling = "exchange <left> and <right>",
-  body = exchange(values(left, right))
+  body = exchange(values($left, $right))
 }

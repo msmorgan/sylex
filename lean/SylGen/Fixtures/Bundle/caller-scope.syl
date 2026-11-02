@@ -1,59 +1,59 @@
 template drawTwice(amount: Amount): Action {
-  body = sequentially([draw(amount), draw(amount)])
+  body = sequentially([draw($amount), draw($amount)])
 }
 template forwardedSubject(subject: NounPhrase): NounPhrase {
-  body = subject
+  body = $subject
 }
 template subjectPower(subject: NounPhrase): Amount {
-  body = statOf(stat(power), subject)
+  body = statOf(stat(power), $subject)
 }
 template repeatedValueSum(amount: Amount): Amount {
-  body = arith(plus, amount, amount)
+  body = arith(plus, $amount, $amount)
 }
 template literalEcho(amount: Amount): Amount {
-  body = amount
+  body = $amount
 }
 template quantityFor(amount: Amount): Quantity {
-  body = exactlyOf(amount)
+  body = exactlyOf($amount)
 }
 template graveyardFor(owner: NounPhrase): Location {
-  body = zone(graveyard, owner)
+  body = zone(graveyard, $owner)
 }
 template creatureCondition(subject: NounPhrase): Condition {
-  body = matches(subject, isCreature)
+  body = matches($subject, isCreature)
 }
 template powerEquals(amount: Amount): Predicate {
-  body = compare(eq, amount, axes = [stat(power)])
+  body = compare(eq, $amount, axes = [stat(power)])
 }
 template lifeCost(amount: Amount): Cost {
-  body = perform(changeLife(down(amount)))
+  body = perform(changeLife(down($amount)))
 }
 template powerBoost(subject: NounPhrase, amount: Amount): StaticSpec {
-  body = modification(subject, power, up(amount))
+  body = modification($subject, power, up($amount))
 }
 template unusedSubject(_chosen: NounPhrase): Action {
   body = draw(1)
 }
 template secondSubject(_left: NounPhrase, right: NounPhrase): NounPhrase {
-  body = right
+  body = $right
 }
 template moveSubject(subject: NounPhrase): Action {
-  body = move(subject, anyLocation, graveyard, arrival, [])
+  body = move($subject, anyLocation, graveyard, arrival, [])
 }
 template rereadDamage(amount: Amount): Action {
-  body = sequentially([instruct(this, dealDamage(amount, you)), instruct(this, dealDamage(amount, you))])
+  body = sequentially([instruct(this, dealDamage($amount, you)), instruct(this, dealDamage($amount, you))])
 }
 template definedPower(subject: NounPhrase): StaticSpec {
-  body = definesPower(subject, 1)
+  body = definesPower($subject, 1)
 }
 template eventWithSubject(subject: NounPhrase): GameEvent {
-  body = does(actor(subject), dealDamage(anyAmount, you))
+  body = does(actor($subject), dealDamage(anyAmount, you))
 }
 template playerIgnoringSubject(_subject: NounPhrase): NounPhrase {
   body = you
 }
 template nestedRereadDamage(amount: Amount): Action {
-  body = sequentially([rereadDamage(amount), rereadDamage(amount)])
+  body = sequentially([rereadDamage($amount), rereadDamage($amount)])
 }
 primitive dynamicActor: NounPhrase = .actor
 action actorAcrossControllerHandoff {

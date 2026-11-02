@@ -3,5 +3,5 @@
 # instant could [CR#702.8a].
 template asThoughHadFlash(subject: NounPhrase): AsThough {
   spelling = "as though <subject> had flash",
-  body = holds(is(subject, hasKeyword(flash)))
+  body = holds(is($subject, hasKeyword(flash)))
 }

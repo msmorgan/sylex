@@ -12,18 +12,18 @@ template falseAtom: Bool { body = false }
 template absentAtom: Option(NounPhrase) { body = none }
 template presentAtom: Option(NounPhrase) { body = thisCreature }
 template optionalList: Option(List(Ability)) { body = [flying,] }
-template sameOption(x: Option(NounPhrase)): Option(NounPhrase) { body = x }
-template liftOption(x: NounPhrase): Option(NounPhrase) { body = x }
-template defaultArgument(x: Int = -1): Int { body = x }
+template sameOption(x: Option(NounPhrase)): Option(NounPhrase) { body = $x }
+template liftOption(x: NounPhrase): Option(NounPhrase) { body = $x }
+template defaultArgument(x: Int = -1): Int { body = $x }
 template omittedArgument: Int { body = defaultArgument }
 template repeatedNoun(who: NounPhrase): Condition {
-  body = and([is(who, isCreature), is(who, isCreature)])
+  body = and([is($who, isCreature), is($who, isCreature)])
 }
 template alternatives(who: NounPhrase): Predicate {
-  body = or([controlledBy(who), controlledBy(who)])
+  body = or([controlledBy($who), controlledBy($who)])
 }
 template eachKind(who: NounPhrase): Action {
-  body = doForEachKind(color, who, color, instruct(who, draw(1)))
+  body = doForEachKind(color, $who, color, instruct($who, draw(1)))
 }
 card { name = "Forest", lexical = {}, spelling = "Forest", supertypes = [basic], types = [land], subtypes = [forest] }
 card_type fixtureType { name = "Fixture", cardClass = permanentCard, stats = [] }
@@ -39,16 +39,16 @@ template exactOptional: Int { body = -3 }
 template exactOptionalUse: Option(Int) { body = exactOptional }
 template innerOptional: Int { body = -4 }
 template innerOptionalUse: Option(Int) { body = innerOptional }
-template defaultsInOrder(x: Int = -1, y: Int = x): Int { body = y }
+template defaultsInOrder(x: Int = -1, y: Int = $x): Int { body = $y }
 template defaultsInOrderUse: Int { body = defaultsInOrder }
 template recordOrder(who: NounPhrase): DidClause {
-  body = { action = instruct(who, draw(1)), within = none, subj = actor(who) }
+  body = { action = instruct($who, draw(1)), within = none, subj = actor($who) }
 }
 ability_word alreadyWord(ability: Ability) {
   label = "outer",
-  body = italicHead(abilityWord(named("inner")), ability)
+  body = italicHead(abilityWord(named("inner")), $ability)
 }
 ability_word repeatedAbilityWord(who: NounPhrase) {
   label = "repeated",
-  body = spell(simultaneously([instruct(who, draw(1)), instruct(who, draw(1))]))
+  body = spell(simultaneously([instruct($who, draw(1)), instruct($who, draw(1))]))
 }

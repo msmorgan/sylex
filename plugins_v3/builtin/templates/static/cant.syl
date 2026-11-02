@@ -13,7 +13,7 @@ template cant(
   causedBy: Option(Causing) = none): StaticSpec {
   # TODO(spelling): Include or omit the clauses supplied by timing, asThough, except, causedBy.
   body = staticSpecCant(
-    subj,
-    action,
-    {timing = timing, asThough = asThough, except = except, cause = causedBy})
+    $subj,
+    $action,
+    {timing = $timing, asThough = $asThough, except = $except, cause = $causedBy})
 }

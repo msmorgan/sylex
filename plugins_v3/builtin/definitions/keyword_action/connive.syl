@@ -9,8 +9,8 @@ action connive(amount: Amount = 1) {
     controllerOf(theActor),
     sequentially(
       [
-        draw(amount),
-        discard(counted(exactlyOf(amount), isCard)),
+        draw($amount),
+        discard(counted(exactlyOf($amount), isCard)),
         doForEach(
           allOf(and([non(isLand), isCard, did(any, discard(which), within = thisWay)])),
           putCounters(1, printedKind(p1p1Counter), theActor))]))

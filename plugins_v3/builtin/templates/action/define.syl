@@ -2,5 +2,5 @@
 # definition.
 template define(letter: Letter, amount: Amount): Action {
   spelling = "<letter> is <amount>",
-  body = establish(letterDefinition(letter, amount))
+  body = establish(letterDefinition($letter, $amount))
 }

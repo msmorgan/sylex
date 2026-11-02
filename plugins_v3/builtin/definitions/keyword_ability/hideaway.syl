@@ -11,7 +11,7 @@ ability hideaway(amount: Amount) {
       does(actor(thisPermanent), enter),
       sequentially(
         [
-          lookAt(topSlice(amount)),
+          lookAt(topSlice($amount)),
           exileFaceDown(someOf(oneThrough(1), them)),
           move(theRest, anywhere, onBottom, arrival, [inOrder(randomOrder)]),
           establishThroughout(

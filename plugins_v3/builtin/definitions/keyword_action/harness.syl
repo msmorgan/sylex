@@ -2,5 +2,5 @@
 action harness(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "harness", frames = [Monotransitive]}]},
   spelling = "harness <subject>",
-  body = doIf(not(is(subject, hasDesignation(harnessed))), gainDesignation(subject, harnessed))
+  body = doIf(not(is($subject, hasDesignation(harnessed))), gainDesignation($subject, harnessed))
 }

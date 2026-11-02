@@ -7,6 +7,6 @@ action endure(amount: Amount) {
   body = instruct(
     controllerOf(theActor),
     chooseOne(
-      putCounters(amount, printedKind(p1p1Counter), theActor),
-      create(1, written(creatureTokenOf(amount, amount, [white], [spirit])))))
+      putCounters($amount, printedKind(p1p1Counter), theActor),
+      create(1, written(creatureTokenOf($amount, $amount, [white], [spirit])))))
 }

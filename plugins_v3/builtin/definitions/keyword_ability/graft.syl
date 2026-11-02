@@ -5,7 +5,7 @@ ability graft(amount: Amount) {
   lexical = {lemma = "graft", parameters = [[Amount]]},
   spelling = "graft <amount>",
   body = [
-    static(entersWithCounters(thisPermanent, amount, p1p1Counter)),
+    static(entersWithCounters(thisPermanent, $amount, p1p1Counter)),
     whenever(
       does(actor(a(and([isCreature, isOther]))), enter),
       may(moveCounters(1, thisPermanent, that(creature), printedKind(p1p1Counter))),

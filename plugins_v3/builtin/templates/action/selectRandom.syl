@@ -2,5 +2,5 @@
 # specifies random choice.
 template selectRandom(quantity: Quantity, what: Predicate): Action {
   spelling = "choose <quantity> <what> at random",
-  body = choose(countedAtRandom(quantity, what))
+  body = choose(countedAtRandom($quantity, $what))
 }

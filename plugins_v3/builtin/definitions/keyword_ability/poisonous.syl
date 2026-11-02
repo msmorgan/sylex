@@ -6,5 +6,5 @@ ability poisonous(amount: Amount) {
   body = [
     whenever(
       does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-      putCounters(amount, printedKind(poison), they))]
+      putCounters($amount, printedKind(poison), they))]
 }

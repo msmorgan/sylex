@@ -3,5 +3,5 @@ action voteStartingWith(first: NounPhrase, disclosure: Disclosure, ballot: Ballo
   # TODO(spelling): The disclosure selects whether 'secretly' precedes the vote instruction.
   lexical = {verbs = [{lemma = "vote", frames = [Prepositional(["for"]), Intransitive]}]},
   deed = "vote",
-  body = actionVote(first, disclosure, ballot, none)
+  body = actionVote($first, $disclosure, $ballot, none)
 }

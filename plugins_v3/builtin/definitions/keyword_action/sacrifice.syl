@@ -2,5 +2,5 @@
 action sacrifice(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "sacrifice", frames = [Monotransitive]}]},
   spelling = "sacrifice <subject>",
-  body = move(subject, zone(battlefield, none), graveyard, departure, [])
+  body = move($subject, zone(battlefield, none), graveyard, departure, [])
 }

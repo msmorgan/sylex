@@ -4,5 +4,5 @@ template putOntoBattlefieldUnderYourControl(
   from: Location = anywhere): Action {
   # TODO(spelling): Omit the origin phrase when from_ is anywhere; otherwise print 'from' and that
   # location.
-  body = zoneChange(subject, battlefield, from, [under(you)])
+  body = zoneChange($subject, battlefield, $from, [under(you)])
 }

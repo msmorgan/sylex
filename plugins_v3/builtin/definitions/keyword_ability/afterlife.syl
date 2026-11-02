@@ -6,5 +6,5 @@ ability afterlife(amount: Amount) {
   body = [
     when(
       does(actor(thisPermanent), die),
-      create(amount, written(creatureToken(1, 1, [white, black], [spirit], [flying]))))]
+      create($amount, written(creatureToken(1, 1, [white, black], [spirit], [flying]))))]
 }

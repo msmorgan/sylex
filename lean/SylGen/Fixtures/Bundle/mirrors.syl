@@ -12,19 +12,19 @@ counter aegisCounter {
 relation haunting {}
 subtype bear { kind = creature, name = "Bear", confers = [] }
 template yourHand: Location { body = handOf(you) }
-template libraryOf(player: NounPhrase): Location { body = zone(library, player) }
+template libraryOf(player: NounPhrase): Location { body = zone(library, $player) }
 template thisCreature: NounPhrase { body = headed(type(creature), this) }
 action fight(other: NounPhrase) {
   permanent = performs,
-  body = doIf(and([is(other, isCreature), is(theActor, isCreature)]),
+  body = doIf(and([is($other, isCreature), is(theActor, isCreature)]),
     simultaneously([
-      dealDamage(statOf(stat(power), theActor), other),
-      instruct(other, dealDamage(statOf(stat(power), other), theActor))
+      dealDamage(statOf(stat(power), theActor), $other),
+      instruct($other, dealDamage(statOf(stat(power), $other), theActor))
     ]))
 }
 ability flying {
   body = [static(cant(any, block(thisCreature),
     except = byObjects(bare(and([isCreature, andOr([hasKeyword(flying), hasKeyword(reach)])])))))]
 }
-ability_word threshold(ability: Ability) { label = "threshold", body = ability }
+ability_word threshold(ability: Ability) { label = "threshold", body = $ability }
 designation citysBlessing { scope = heldBy(player), sole = false, confers = [] }

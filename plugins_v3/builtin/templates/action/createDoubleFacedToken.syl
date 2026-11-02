@@ -6,5 +6,5 @@ template createDoubleFacedToken(
   back: CharacteristicBundle,
   riders: List(MoveRider) = []): Action {
   # TODO(spelling): Format and coordinate the riders list entries, including the empty case.
-  body = createObject(1, token(doubleFaced(front, back), riders))
+  body = createObject(1, token(doubleFaced($front, $back), $riders))
 }

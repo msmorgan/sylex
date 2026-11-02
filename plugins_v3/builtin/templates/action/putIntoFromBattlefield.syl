@@ -6,5 +6,5 @@ template putIntoFromBattlefield(
   destination: Location,
   riders: List(MoveRider) = []): Action {
   # TODO(spelling): Format and coordinate the riders list entries, including the empty case.
-  body = zoneChangeObservedOnDeparture(subject, destination, battlefield, riders)
+  body = zoneChangeObservedOnDeparture($subject, $destination, battlefield, $riders)
 }

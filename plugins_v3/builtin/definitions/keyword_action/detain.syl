@@ -7,8 +7,8 @@ action detain(subject: NounPhrase) {
   body = establishThroughout(
     conjunction(
       [
-        cant(actor(subject), attack),
-        cant(actor(subject), block),
-        cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(subject)]))))]),
+        cant(actor($subject), attack),
+        cant(actor($subject), block),
+        cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf($subject)]))))]),
     untilYourNextTurn)
 }
