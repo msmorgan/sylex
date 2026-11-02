@@ -1,17 +1,17 @@
 ---
 needs: [semantics-rust-resolve, lean-elaborated-value-dump]
 ---
-# [design] Stage 1b of `semantics-rust-rewrite`: typed AST, expansion, and Lean value-dump parity
+# Stage 1b of `semantics-rust-rewrite`: typed AST, expansion, and Lean value-dump parity
 
 Standard constraints apply. Second half of Stage 1 of `semantics-rust-rewrite`, building on
-`semantics-rust-resolve` (bundle loader, signature registry, expected-sort resolution to `Term`,
-and SCC cycle checking): define the typed Semantics AST in `crates/semantics`, expand resolved
-`Template` and `Definition` declarations into concrete `Arc` AST values, and verify per declaration
-and card that `semantics`'s expansion equals the value Lean elaborates (`lean-elaborated-value-dump`).
+`semantics-rust-resolve` (bundle loader, signature registry, `spelling_order`, expected-sort
+resolution to `Term`, and SCC cycle checking): define the typed Semantics AST in
+`crates/semantics`, expand resolved `Template` and `Definition` declarations into concrete `Arc`
+AST values while preserving call boundaries and parameter substitutions, and verify per declaration
+and card that `semantics`'s expansion equals the value Lean elaborates
+(`lean-elaborated-value-dump`).
 
 - Lean stays in the tree and in CI throughout.
-- Spelling-order argument stepping is deferred to `discourse-spelling-order` (after `lean/` is
-  retired) so `discourse` steps in the same order as the live Lean oracle during Stage 2.
 
 ---
 
@@ -19,20 +19,21 @@ and card that `semantics`'s expansion equals the value Lean elaborates (`lean-el
 
 ### 1. Plain Rust AST Representation & Traversal Traits (`crates/semantics/src/ast`)
 
-`semantics` defines the 183 AST types mirroring `lean/Semantics/{Words,Events,Abilities,Card,Rules}.lean`
-(10 main recursive enums with 275 variants, plus 173 supporting enums/structs totaling 857 variants):
+`semantics` defines every AST type in `lean/Semantics/{Words,Events,Abilities,Card,Rules}.lean`:
 
 - **Checked-in plain Rust `pub enum` / `pub struct` declarations**:
   - Bootstrapped via a disposable generator script from the Lean inductives (to prevent field or
     variant transcription drift) and checked in as ordinary, readable Rust types rather than
-    wrapping the type definitions inside a giant `macro_rules!`.
+    wrapping the type definitions inside a `macro_rules!`.
   - Uses plain Rust field and variant names (`from`, `to`, `then`, `class`, `end`; `r#where`,
     `r#match`), dropping Lean's keyword-collision trailing underscores (`dsl-plain-word-names`).
-    Only the disposable `DumpRender` test formatter maps those 7 names back to Lean's underscored
+    Only the disposable `DumpRender` test formatter maps those names back to Lean's underscored
     names when rendering strings for `values.txt`.
   - **Frozen-AST parity note (`Action::DoIf.postposed`)**: `Action::DoIf` retains `postposed: bool`
-    while the AST is frozen for `values.txt` parity and for `discourse`'s initial parity against
-    the Lean oracle; it is removed in `discourse-spelling-order` once `lean/` is retired.
+    only while the AST is frozen so `doOnlyIf`'s expanded tree matches `values.txt`; `discourse`
+    must not read `postposed` (it steps `doOnlyIf` in `doOnlyIf`'s `spelling_order` via its
+    preserved call boundary), and the field is deleted in `discourse-spelling-order` after
+    `lean-retirement`.
 - **`Arc` everywhere for size and $O(1)$ expansion cloning**:
   - **List fields**: Explicit `Arc<[T]>` across all AST types (`sequentially`, `and`, `or`,
     `types`, `subtypes`, `text`, etc.). Never alias `type Vec<T> = Arc<[T]>`.
@@ -43,13 +44,13 @@ and card that `semantics`'s expansion equals the value Lean elaborates (`lean-el
     `Subtype`, `KeywordLabel`, `AbilityWordLabel`, `CounterKind`, `DesignationLabel`,
     `RelationLabel`, `Deed::Action`, `VoteLabel`, `NameSource::PrintedName`, predefined token
     names) use `dpsi::Ident` (`Copy`, interned, $O(1)$ equality/hashing).
-- **Generic `ParamBinding<T>` on the 16 `CallerScope` enums (`CallerScopeNode` trait)**:
-  - Rather than porting Lean's 16 `.inCaller` constructors, `NounPhrase.firstMention`,
-    `NounPhrase.laterMention`, or `SylGen/ReadOrder.lean`, the 16 `CallerScope` AST enums
-    (`Action`, `Cost`, `StaticSpec`, `Replacement`, `Amount`, `Predicate`, `Quantity`, `Location`,
+- **Generic `ExpandedCall<T>` & `ParamBinding<T>` on every `CallerScope` enum (`CallerScopeNode` trait)**:
+  - Rather than porting Lean's `.inCaller` constructors, `NounPhrase.firstMention`,
+    `NounPhrase.laterMention`, or `SylGen/ReadOrder.lean`, every `CallerScope` AST enum (`Action`,
+    `Cost`, `StaticSpec`, `Replacement`, `Amount`, `Predicate`, `Quantity`, `Location`,
     `Condition`, `NounPhrase`, `GameEvent`, `Ability`, `TokenSpec`, `MoveRider`, `PlayPayment`,
-    `Ballot`) implement a shared `CallerScopeNode` trait and carry a single uniform parameter
-    wrapper variant `Param(ParamBinding<Self>)`:
+    `Ballot`) implements a shared `CallerScopeNode` trait and carries two generic structural
+    variants `Call(ExpandedCall<Self>)` and `Param(ParamBinding<Self>)`:
     ```rust
     #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
     pub struct BindingId {
@@ -62,18 +63,29 @@ and card that `semantics`'s expansion equals the value Lean elaborates (`lean-el
         pub id: BindingId,
         pub value: Arc<T>,
     }
+
+    #[derive(Clone, Debug, PartialEq, Eq, Hash)]
+    pub struct ExpandedCall<T> {
+        pub call: CallId,
+        pub decl: DeclId,
+        pub args: Arc<[(ParamIdx, ValueAst)]>, // Ordered by decl's spelling_order
+        pub body: Arc<T>,
+    }
     ```
   - **Policy-free facts**: Every `CallerScope` parameter substitution in both `Template` and
     `Definition` (`action`, `ability`) bodies wraps uniformly in `Param(ParamBinding<Self>)`
-    (with no `in_caller: bool` flag and no `≥ 2` mention threshold), and the expanded environment
-    maps `CallId → CallSiteInfo` (`{ decl: DeclId, kind: DeclarationKind }`). This leaves the open
-    opacity and call-site binding questions (`semantics-rust-rewrite`,
-    `discourse-parameter-argument-resolution`, `discourse-catalog-open-items`) entirely to
-    `discourse`, while `lowering` peels `Param` via `CallerScopeNode::peel`.
+    (with no `in_caller: bool` flag and no `≥ 2` mention threshold), and every expanded
+    `CallerScope` call wraps in `Call(ExpandedCall<Self>)` (plus a `CallId → CallSiteInfo` table
+    on the expanded environment recording `decl`, `DeclarationKind`, and `args` in `spelling_order`
+    for all calls). This lets `discourse` step arguments in `spelling_order` from the start and
+    decide the open opacity and call-site binding questions (`semantics-rust-rewrite`,
+    `discourse-parameter-argument-resolution`, `discourse-catalog-open-items`), while `lowering`
+    peels `Call` and `Param` via `CallerScopeNode::peel`.
 - **Generated `AstWalk` / `AstVisit` and `DumpRender` traits**:
   - `AstWalk` / `AstVisit` provides default structural child recursion across all AST types so
     downstream `discourse` passes (`NumberSlots`, `PredicateShape`, `LocalShape`, `CardFacts`,
-    `Events`) override only the variants they inspect instead of repeating 2,000+ match arms.
+    `Events`) override only the variants they inspect instead of repeating exhaustive match arms
+    in every pass.
   - `DumpRender` formats any expanded AST value into `DumpValues`'s deterministic constructor-tree
     string `ConstructorName{TypeArg,...}(field1,field2,...)`.
 
@@ -83,17 +95,20 @@ and card that `semantics`'s expansion equals the value Lean elaborates (`lean-el
 
 Building on the topological order computed in `semantics-rust-resolve`, `semantics` expands every
 resolved declaration into concrete `Arc` AST values, allocating a fresh `CallId` for each expanded
-call and recording `CallId → CallSiteInfo`:
+call and recording `CallId → CallSiteInfo` (with `args` ordered by `decl.spelling_order`):
 - **`primitive`**: Constructs the bound AST variant/struct directly.
 - **`template`**: Wraps every `CallerScope` argument in
-  `Param(ParamBinding { id: BindingId { call, param }, value })` and substitutes arguments into the
-  body.
+  `Param(ParamBinding { id: BindingId { call, param }, value })`, substitutes arguments into the
+  body, and (when the return sort is a `CallerScope` enum) wraps the result in
+  `Call(ExpandedCall { call, decl, args, body })`.
 - **`action`**: Wraps every `CallerScope` argument in `Param(ParamBinding { id, value })` (plus
-  every occurrence of `theActor`'s `identity = "actor"` in its synthetic actor parameter slot) and
-  wraps the body in `Action::OwnScope { deed, body }`.
+  every occurrence of `theActor`'s `identity = "actor"` in its synthetic actor parameter slot), and
+  wraps the body in `Action::OwnScope { deed, body }` and
+  `Action::Call(ExpandedCall { call, decl, args, body })`.
 - **`ability`**: Wraps every `CallerScope` argument in `Param(ParamBinding { id, value })`,
   collects `KeywordParam`s (`Cost`, `Amount`, `Predicate` subject/quality, `DeckCondition`,
-  `Ability`), and constructs `Ability::Keyword { label, params, body }`.
+  `Ability`), and constructs `Ability::Keyword { label, params, body }` wrapped in
+  `Ability::Call(ExpandedCall { call, decl, args, body })`.
 - **`ability_word`**: Expands through the `abilityWord` template (`Emit.lean:147–154`).
 - **`counter`, `designation`, `subtype`, `card_type`, `relation`**: Constructs both the primary
   value (`CounterKind`, `DesignationLabel`, `Subtype`, `CardType`, `RelationLabel`) and its
@@ -109,8 +124,9 @@ A test in `crates/semantics` reads the gitignored Lean dump at
 `docs/evidence/lean-dumps/<label>/values.txt` (`lean-elaborated-value-dump`) and verifies
 wrapper-erased tree equality:
 
-- Peels `Param(ParamBinding)` on the Rust side via `CallerScopeNode::peel`, and strips
-  `Semantics.<Sort>.inCaller(...)`, `Semantics.NounPhrase.firstMention("<id>", ...)`, and
+- Peels `Call(ExpandedCall)` and `Param(ParamBinding)` on the Rust side via
+  `CallerScopeNode::peel`, and strips `Semantics.<Sort>.inCaller(...)`,
+  `Semantics.NounPhrase.firstMention("<id>", ...)`, and
   `Semantics.NounPhrase.laterMention("<id>", ...)` on the Lean dump string.
 - Formats the peeled `semantics` AST via `DumpRender` into `DumpValues`'s deterministic
   constructor-tree string `ConstructorName{TypeArg,...}(field1,field2,...)` and asserts exact

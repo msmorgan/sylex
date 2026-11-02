@@ -4,12 +4,15 @@ needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-proof
 # Stage 1a of `semantics-rust-rewrite`: `deckmaste_dsl::bundle` and `semantics` resolution
 
 Standard constraints apply. First half of Stage 1 of `semantics-rust-rewrite`: load and cache
-preparsed `.syl` bundles in `deckmaste_dsl::bundle`, register declaration signatures, resolve names
-and arguments by expected sort (`docs/decisions/semantics-v3.md` §4.5) into a resolved `Term` tree
-in `crates/semantics`, check dependency cycles, and expose `cargo xtask semantics check`.
+preparsed `.syl` bundles in `deckmaste_dsl::bundle`, register declaration signatures and their
+fixed argument stepping order, resolve names and arguments by expected sort
+(`docs/decisions/semantics-v3.md` §4.5) into a resolved `Term` tree in `crates/semantics`, check
+dependency cycles, and expose `cargo xtask semantics check`.
 
 - Calls with interleaved named and positional arguments resolve as `deckmaste_dsl` parses them
   (`dsl-named-arguments-anywhere`).
+- A call's written argument order carries no meaning: arguments bind to parameters, and each
+  declaration records its fixed argument stepping order for `discourse` (`semantics-rust-rewrite`).
 - Lean stays in the tree and in CI throughout.
 
 ---
@@ -22,14 +25,11 @@ The v3 pipeline has no separate top-level `deckmaste_plugin` crate (v1 `deckmast
 deletion-bound at `semantics-v1-cutover` per `CLAUDE.md`):
 
 - `deckmaste_dsl::bundle::Bundle::load` walks a plugin directory (`plugins_v3/builtin`,
-  `plugins_v3/canon`), reads each `.syl` file into memory (closing the OS file handle immediately;
-  no `std::fs::File` handles are retained), parses it once into `Arc<SourceFile>`
+  `plugins_v3/canon`), parses each `.syl` file once into `Arc<SourceFile>`
   (`{ id: FileId, path: PathBuf, source: String, ast: dsl::File }`), and returns an `Arc<Bundle>`
   exposing both a deterministic path map (`BTreeMap<PathBuf, Arc<SourceFile>>`) and a
-  `FileId → Arc<SourceFile>` table for resolving `Span`s to `path:line:col`.
-- Positioning `Bundle` in `deckmaste_dsl` lets `semantics` (and later `deckmaste_lexical_source`
-  and `deckmaste_spelling`) share the exact same `Arc<SourceFile>` allocations without re-reading
-  disk or introducing cross-layer dependencies.
+  `FileId → Arc<SourceFile>` table for resolving `Span`s to `path:line:col` so downstream layers
+  share preparsed ASTs without re-reading disk.
 
 ### 2. `crates/semantics` Dependencies & CLI Entry Point
 
@@ -42,9 +42,9 @@ deletion-bound at `semantics-v1-cutover` per `CLAUDE.md`):
 
 Enforces all declaration-level checks deferred from `deckmaste_dsl` (`dsl-parser.md`) and populates
 the signature registry (`SylGen/Emit.lean`):
-- **Declaration kinds**: Validates the 14 kinds (`primitive`, `template`, `action`, `ability`,
-  `ability_word`, `counter`, `designation`, `subtype`, `card_type`, `relation`, `token`, `sba`,
-  `conferral`, `card`).
+- **Declaration kinds**: Validates the `.syl` declaration kinds (`primitive`, `template`, `action`,
+  `ability`, `ability_word`, `counter`, `designation`, `subtype`, `card_type`, `relation`, `token`,
+  `sba`, `conferral`, `card`).
 - **Header shape & derived sort**:
   - Only `card` may use the nameless header shape; derives `printedName` for `card` (joining
     multi-face names with `" // "`).
@@ -56,12 +56,16 @@ the signature registry (`SylGen/Emit.lean`):
   - Only `primitive` may write `= .constructor`, must have no `body`, must not write a redundant
     `= .<same_name>`, and its parameters must match the target constructor's fields 1-to-1 in
     count, name, and sort.
-- **Name & field hygiene**:
+- **Name, field, and spelling-order hygiene**:
   - Rejects reserved words (`none`, `true`, `false`) as declaration or parameter names.
   - Rejects duplicate parameter names, duplicate record fields, and record fields not in
     `allowedFields(kind)` (`Emit.lean:18–35`).
   - Validates `identity` (allowed only on a parameterless `NounPhrase` template with a non-empty
     string, i.e. `theActor`).
+  - Records each declaration's fixed argument stepping order `spelling_order: Arc<[ParamIdx]>`
+    (parsed from the `<param>` holes in `spelling` when present, seeded with the printed argument
+    order for declarations whose `spelling` is still `# TODO(spelling)` and whose printed order
+    differs from parameter order, and falling back to parameter order otherwise).
 - **Registry insertion**:
   - Registers `(name, result_sort) → DeclId`, rejecting duplicates within a bundle.
   - Secondary sort registrations:
@@ -121,5 +125,9 @@ and recording directed body dependencies `decl_id → callee_decl_id`:
 
 - `cargo xtask semantics check` resolves all declarations across `plugins_v3/builtin` and
   `plugins_v3/canon` with zero errors.
+- A unit test verifies `spelling_order` across all declarations whose printed order differs from
+  their parameter declaration order (declarations with reordered `<param>` holes in `spelling`,
+  `ReadOrder.fieldOrders`, `doOnlyIf` / `unless`, `when` / `whenever` / `at` / `Ability::Triggered`
+  intervening `if`, and `gatedBy` / `StaticSpec::GatedBy`).
 - Focused negative unit tests in `crates/semantics` cover every header, resolution, argument-binding,
   constructor-refusal, and cycle error in Passes 1–3a (mirroring `lean/SylGen/tests/negative.sh`).
