@@ -79,6 +79,10 @@ impl Bundle {
     ///
     /// If a directory or file cannot be read, or any file fails to parse; a
     /// parse failure reports every file that failed.
+    ///
+    /// # Panics
+    ///
+    /// If the file ids would overflow `u32`.
     pub fn load(root: impl AsRef<Path>, first: FileId) -> Result<Arc<Bundle>, LoadError> {
         let root = root.as_ref();
         let mut paths = Vec::new();
@@ -104,6 +108,10 @@ impl Bundle {
     /// # Errors
     ///
     /// If any source fails to parse.
+    ///
+    /// # Panics
+    ///
+    /// If the file ids would overflow `u32`.
     pub fn from_sources(
         root: impl AsRef<Path>,
         sources: impl IntoIterator<Item = (PathBuf, String)>,
@@ -168,6 +176,10 @@ impl Bundle {
 
     /// The first [`FileId`] after this bundle's: where the next bundle's
     /// numbering may start.
+    ///
+    /// # Panics
+    ///
+    /// If the file ids would overflow `u32`.
     #[must_use]
     pub fn next_file_id(&self) -> FileId {
         FileId(self.first.0 + u32::try_from(self.by_id.len()).expect("fewer than 2^32 files"))
