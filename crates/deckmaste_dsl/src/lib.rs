@@ -7,16 +7,27 @@
 //! carries a [`Span`].
 //!
 //! Lexing ([`lex()`]) is separate from building the tree ([`parse()`]).
+//! [`format()`] prints a tree back in a canonical layout, and
+//! [`same_meaning`] checks that a reformatted file still means the same.
+//! [`cli`] is the formatter's command line, run by the `sylfmt` binary.
 
+pub mod cli;
 mod error;
+mod format;
 pub mod lex;
+mod meaning;
 mod parse;
 mod span;
 mod tree;
 
 pub use error::Error;
 pub use error::ErrorKind;
+pub use format::Closers;
+pub use format::Style;
+pub use format::TrailingCommas;
+pub use format::format;
 pub use lex::lex;
+pub use meaning::same_meaning;
 pub use parse::parse;
 pub use span::FileId;
 pub use span::LineCol;
