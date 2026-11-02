@@ -500,6 +500,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "deckmaste_dsl"
+version = "0.1.0"
+dependencies = [
+ "dpsi",
+ "thiserror",
+]
+
+[[package]]
 name = "deckmaste_engine"
 version = "0.1.0"
 dependencies = [
