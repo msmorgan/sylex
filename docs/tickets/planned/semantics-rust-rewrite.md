@@ -1,5 +1,5 @@
 ---
-needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-v3-monstrosity-adapt-name-the-source, lean-v3-sacrifice-performer-controls, lean-proofs-spec-catalog]
+needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-v3-monstrosity-adapt-name-the-source, lean-proofs-spec-catalog]
 ---
 # [design] Rewrite the Rust semantics pipeline: `semantics`, `discourse`, `lowering`
 
@@ -27,8 +27,9 @@ architecture (the action-clause spine, the Definition/Template split, DRT refere
 is settled; what remained was mostly AST breadth, which done in Lean first is written twice.
 
 - `semantics` and `discourse` start once `dsl-parse-differential` lands, against the current AST,
-  after only the two tickets that remove or simplify what would otherwise be ported
-  (`lean-v3-monstrosity-adapt-name-the-source`, `lean-v3-sacrifice-performer-controls`).
+  after only `lean-v3-monstrosity-adapt-name-the-source`, which removes what would otherwise be
+  ported. (`lean-v3-sacrifice-performer-controls` was meant to go first too; it needs a new
+  restrictor, so it follows.)
 - The AST is frozen while they are built: a representation ticket that lands mid-port is done in
   both languages.
 - The representation tickets and the open reference-resolution tickets need this epic and are
