@@ -3,11 +3,18 @@ needs: [plugins-v3-spelling-conventions, semantics-rust-rewrite]
 ---
 # Entry Riders and Durations as surface adjunct nodes
 
-Standard constraints apply. Lean first, in `lean/Semantics/`.
+Standard constraints apply. Done in `.syl` and Rust (`semantics`, `discourse`) after
+`semantics-rust-rewrite`; the Lean names below are the current AST, which that epic ports.
 
-Today an Entry Rider is an entry in `Action.move`'s `riders` list, and an effect's Duration is a
-field (`establish (spec) (duration : Option Duration)`, `gainDesignation … duration`). Oracle text
-does not attach them that way:
+Today Entry Riders are entries in a `MoveRider` list in four places:
+- `Action.move`'s `riders`;
+- a Token's creation;
+- a replaced entering, `Replacement.withRiders`. *Vivid Marsh* and *Sphere of the Suns* are
+  statics of this kind, "This land enters tapped …";
+- an event pattern that matches an entering by its riders (`MoveRider.not` exists only there).
+
+An effect's Duration is a field (`establish (spec) (duration : Option Duration)`,
+`gainDesignation … duration`). Oracle text does not attach either of them that way:
 
 - **Order varies.** "tapped under your control" appears on 45 cards, "under your control tapped"
   on 9.
@@ -22,30 +29,44 @@ does not attach them that way:
 ## Decisions already made
 
 - **Adjunct nodes.** Entry Riders (Oracle English: Depictive Adjunct, or a PP Adjunct) and effect
-  Durations (Duration Phrase) become Action nodes in their printed position. They wrap the Action
-  they modify, or the Coordination they scope over. This follows semantics-v3 §0.1: constructions
+  Durations (Duration Phrase) become nodes in their printed position. They wrap the Action they
+  modify, or the Coordination they scope over. This follows semantics-v3 §0.1: constructions
   occupy their surface positions.
+  - The same rider nodes serve all four places above. A replaced entering's riders wrap the
+    entering the replacement describes, and a pattern's riders wrap the entering it matches. So
+    the static *Vivid Marsh* and an instruction "put it onto the battlefield tapped" share one
+    representation of "tapped".
 - **Nesting records order.** Riders wrap in printed order, so the checker steps them left to right
   and a rider's Anaphor ("on it") follows its Antecedent.
 - **Wording differences live in Template choice, not nodes.** There is no `and` node over riders.
   A coordinated wording ("tapped and with …") and the side-by-side one ("tapped with …") are two
   Templates over the same nodes, so both expand to an identical AST. A fronted and a trailing
   Duration over the same scope are likewise two Templates.
-- **Pile Placements** (`inOrder`, `randomOrder`) stay as they are. A move carries the Entry Riders
-  or the Pile Placements its destination allows, never both (game-model glossary, Pile
-  Placement).
+- **Pile Placements stay a field on `move`.** `inOrder` ("in any order", "in a random order")
+  keeps its fixed position at the end of the move, so it stays a field: `riders` is split, not
+  removed. A move carries the Entry Riders or the Pile Placements its destination allows, never
+  both (game-model glossary, Pile Placement).
+- **Riders on other moves are nodes too.** `withCounters` and `faceDown` also ride moves that do
+  not go to the battlefield ("exile it with three time counters on it", "exile it face down").
+  They are printed adjuncts like the rest, so they take the same nodes, and the attachment check
+  allows them on those moves. The game-model glossary's Entry Rider says it rides "a move to the
+  battlefield, a Token's creation, or a static ability, and nothing else". Amend it, or add a term
+  beside it, with CR citations, via `domain-modeling`.
 - **The checker checks attachment by sort.** It refuses:
-  - an Entry Rider on anything but a move to the battlefield or a Token's creation;
+  - a rider on a move, creation, entering or pattern whose destination does not allow it;
   - a Duration on anything that establishes no Continuous Effect [CR#611.2a].
 - **No lowering work.** semantics_v3 is disconnected from other layers.
 
 ## Change
 
-- **AST (Rust `semantics`):**
+- **AST (Rust `semantics`, and the Lean mirror of the DSL, which `semantics-rust-rewrite` keeps):**
   - Add the adjunct nodes.
-  - Remove `move`'s `riders` and every Action field that holds a printed effect Duration. Audit
-    each `duration : Option Duration` on an Action: `delay`'s window is a different thing.
-  - Remove the riders on Token creation, if any.
+  - Split `move`'s `riders`: Pile Placements stay in a field of their own, and every other rider
+    becomes a node.
+  - Move the rider lists of Token creation, `Replacement.withRiders` and event patterns to the
+    same nodes.
+  - Remove every Action field that holds a printed effect Duration. Audit each
+    `duration : Option Duration` on an Action: `delay`'s window is a different thing.
 - **`discourse`:** the attachment refusals, and stepping in surface order.
 - **Templates:**
   - Rewrite the Templates that took `riders` or `duration` (`putOntoBattlefield`,
@@ -58,7 +79,10 @@ does not attach them that way:
   - Re-encode every card that used `riders` or a `duration` field.
   - Add witnesses for each shape above: Vivid Marsh, Sphere of the Suns, Phoenix Chick,
     Anavolver, and a fronted Duration over a Coordination.
-- **ADR:** update semantics-v3 where `move`, `establish` and Entry Riders are described.
+- **ADR:** update semantics-v3 where `move`, `establish`, `Replacement.withRiders` and Entry
+  Riders are described.
+- **Glossary:** amend the game-model entries Entry Rider, Pile Placement and Duration for their new
+  attachment, and the Entry Rider scope above, via `domain-modeling`.
 
 ## Acceptance
 

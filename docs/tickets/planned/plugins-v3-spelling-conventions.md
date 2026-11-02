@@ -13,11 +13,18 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
 
 ## Decisions already made
 
-- **Uninflected.** Spellings are written uninflected wherever agreement depends on a hole or on
-  the performer. An Action's spelling is the bare Verb Phrase: the performer stays outside it, and
-  agreement is solved when a clause is rendered. So `die` is `"die"`, `crew` is
-  `"crew <vehicle>"`, `win` is `"win the game"`, and `becomeBlocked` is
-  `"<subject> become blocked"`.
+- **Uninflected.** A verb is written uninflected wherever its agreement depends on a hole or on the
+  performer. Agreement is solved when the clause is rendered. There are three cases:
+  - **The performer is outside the template** (`theActor`). The spelling is the bare Verb Phrase:
+    `die` is `"die"`, `crew` is `"crew <vehicle>"`, `win` is `"win the game"`.
+  - **The grammatical Subject is a parameter.** The hole stays in the spelling and the verb is
+    still uninflected: `becomeBlocked(subject)` is `"<subject> become blocked"`, and likewise
+    `becomeBlocking`, `stopBlocking` and `phaseOutUntil`. The parse with typed holes leaves the
+    hole's agreement open (`deckmaste_spelling`). These Templates keep `subject`. Their Subject is
+    the patient, not the performer (`does(any, becomeBlocked(this))`, semantics-v3 §3.1), so
+    `theActor` would misstate it.
+  - **The Subject is fixed inside the template**, and no hole decides agreement. The verb is
+    written as printed: `controllerSacrifices` stays `"<subject>'s controller sacrifices it"`.
 - **Holes are `<name>`.** Angle brackets are the only markup, because they never appear in Oracle
   text. Square brackets do appear in Oracle text, so no bracket markup is used for optional text.
 - **Optional parameters list their wordings.** A declaration with a defaulted or `Option`
@@ -27,6 +34,9 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
   - Two patterns with the same set of holes are a load error.
   - Every call in `builtin/` and `canon/` must have a pattern for its set of non-default
     arguments.
+  - Writing an argument equal to its parameter's default is a load error (`connive(1)`,
+    `returnToHand(it, from = wherever)`). So a call's set of holes is exactly the arguments it
+    writes, and each meaning has one spelling in `.syl`.
   - `connive(amount = 1)` becomes `["connive", "connive <amount>"]`.
   - A later drop rule may merge pattern lists semi-mechanically. That is not part of this ticket.
 - **List holes coordinate with "and".** A list hole spells as a Coordination of its entries, with
@@ -55,21 +65,24 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
 - **Glossary:** add entries for the terms this introduces (a spelling's pattern and its holes) to
   the owning glossary, via the `domain-modeling` skill.
 - **Rust `semantics` and `deckmaste_dsl`:**
-  - `spelling` accepts a string or a list of strings.
+  - `spelling` accepts a string or a list of strings, in SylGen's mirror too (it discards
+    `spelling`, but must parse it).
   - `semantics` checks that no two patterns share a set of holes, and that every call's set of
     non-default arguments has a pattern. `semantics` is used because it resolves every call.
     (Not SylGen: after `semantics-rust-rewrite` it is only a mirror of the DSL.)
-  - Add negative cases for both errors.
+  - `semantics` also refuses an argument written equal to its default.
+  - Add negative cases for all three errors.
 - **Corpus, in its own commits:**
-  - Rewrite every Action spelling to the bare Verb Phrase.
+  - Rewrite every spelling to the three uninflected cases above.
+  - Remove arguments written equal to their default.
   - Write pattern lists for optional parameters.
   - Resolve every marker this ticket owns: write the spelling, or replace generated text with the
     specific wording or realization that is missing.
 
 ## Acceptance
 
-- No Action spelling is in a finite form. No marker carries generated text, and every remaining
-  marker names something specific.
+- No verb whose agreement depends on a hole or on the performer is inflected. No marker carries
+  generated text, and every remaining marker names something specific.
 - The `semantics` checks pass over `builtin/` and `canon/`, and their negative cases fail as
   expected.
 - The expansions `semantics` produces are identical before and after the corpus rewrite, since

@@ -3,8 +3,9 @@ needs: [lean-v3-entry-rider-and-duration-adjuncts, semantics-rust-rewrite]
 ---
 # A shared frame over modal fillers, read cataphorically
 
-Standard constraints apply. Lean first, in `lean/Semantics/`. This reverses the "no cataphora in
-the checker" design of `lean-v3-modal-shared-frame`.
+Standard constraints apply. Done in `.syl` and Rust (`semantics`, `discourse`) after
+`semantics-rust-rewrite`; the Lean names below are the current AST, which that epic ports. This
+reverses the "no cataphora in the checker" design of `lean-v3-modal-shared-frame`.
 
 Four Vintage-legal cards print one frame sentence between the mode header and Modes that are not
 clauses. The frame's demonstratives refer forward to the chosen Mode:
@@ -30,8 +31,10 @@ leave your graveyard" trigger would fire once for the card and twice for the enc
 
 - **One construct, `chooseModesOver`:**
   - the choice: a quantity plus mode-choice modifiers;
-  - a frame, which is an ordinary Template call with one argument bound to the chosen Mode
-    through a reserved word, as `theActor` is bound;
+  - a frame, which is an Action expression. A reserved word stands at the filler's site in it, the
+    way `theActor` stands for the performer, and resolves by expected sort (§4.5): a NounPhrase or
+    a characteristics bundle. Templates expand before resolution, so the frame may be written
+    with any Template whose argument is that word;
   - the fillers.
 - **Fillers are of a closed sort:** a NounPhrase (*Call Damage Control*) or a characteristics
   bundle (the other three). The checker steps the bound argument by its sort, as it does any
@@ -60,10 +63,10 @@ leave your graveyard" trigger would fire once for the card and twice for the enc
 
 ## Change
 
-- **Lean:**
-  - Add the construct, the reserved word for the bound filler, and "at random".
-  - Checker: resolve the bound argument by its sort; refuse a characteristics filler under a
-    plural choice.
+- **AST (Rust `semantics`, and the Lean mirror of the DSL):** add the construct, the reserved word for the bound filler, and "at
+  random".
+- **`discourse`:** resolve the bound argument by its sort; refuse a characteristics filler under a
+  plural choice.
 - **Templates:** add the frame Templates with spellings following
   `plugins-v3-spelling-conventions`.
 - **Canon:**
@@ -71,6 +74,8 @@ leave your graveyard" trigger would fire once for the card and twice for the enc
   - Add *Outlaws' Merriment* and *Genku, Future Shaper*.
 - **ADR and glossary:**
   - Record the construct in semantics-v3.
+  - Amend §0.1 item 2, "There is no cataphora, apart from the clause-internal Contrast Anchor",
+    to name this construct as the second scoped exception.
   - Note in the oracle-english glossary that this Antecedent follows its Anaphor (cataphora), via
     `domain-modeling`.
 
