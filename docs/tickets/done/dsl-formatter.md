@@ -27,9 +27,11 @@ it. The style keeps that rule and adds one change, list hugging (candidate C).
   and outer nodes break first. A broken node's first child goes on the next line.
 - Inner closers hug the last child, Lisp style (`...)]))`). A declaration body's `}` goes on its
   own line.
-- A list or record that is a call's only argument hugs the call's `(`, as in `and([` and
-  `sequentially([`, and its children are indented one level. A sole call argument does not hug.
-  The printer falls back to the unhugged layout when hugging would force worse breaks.
+- A list or record that is a call's first positional argument hugs the call's `(`, as in
+  `and([` and `conjunction([`. Only the opener moves: the children stay at their true depth, two
+  levels below the call line, and any later arguments follow one level in, as in any broken
+  call. A call argument does not hug. The printer falls back to the unhugged layout only when
+  that takes strictly fewer lines.
 - No trailing commas inside nodes, since hugged closers rule them out.
 - Flat records have no inner spaces: `{a = b}`. Separators are `, `, `: ` and ` = `.
 - A broken parameter list follows the call rule.
@@ -44,7 +46,7 @@ it. The style keeps that rule and adds one change, list hugging (candidate C).
   - closers hugged or on their own line;
   - trailing commas (never, in declaration bodies only, or wherever a closer has its own line);
   - inner spaces in flat records;
-  - sole list/record hugging.
+  - first-argument list/record hugging.
 
   The xtask entry point takes them as flags, and the `jj fix` tool entry passes them on its
   command line. Switching styles later means editing that entry and running `jj fix` over
