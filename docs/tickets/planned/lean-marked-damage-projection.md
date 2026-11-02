@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-action-clause-spine, lean-generated-canon-modules, semantics-rust-rewrite]
+needs: [lean-v3-action-clause-spine, lean-generated-canon-modules, lean-retirement]
 ---
 **The deathtouch state-based action [CR#704.5h] is not on the creature row.** Found by
 `lean-rules-tables` (2026-09-07): [CR#704.5h] reads whether a source with deathtouch has dealt a

@@ -1,5 +1,5 @@
 ---
-needs: [lean-generated-canon-modules, semantics-rust-rewrite]
+needs: [lean-generated-canon-modules, lean-retirement]
 ---
 # Preposed condition ordering on `StaticSpec.conditional` and Angelic Cub's second ability
 

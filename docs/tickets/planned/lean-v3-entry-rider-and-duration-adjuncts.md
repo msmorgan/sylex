@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-spelling-conventions, semantics-rust-rewrite]
+needs: [plugins-v3-spelling-conventions, lean-retirement]
 ---
 # Entry Riders and Durations as surface adjunct nodes
 

@@ -1,5 +1,5 @@
 ---
-needs: [syl-parameter-sigil, semantics-rust-rewrite]
+needs: [syl-parameter-sigil, lean-retirement]
 ---
 # Settle the `spelling` conventions and apply them to the corpus
 

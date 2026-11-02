@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-checker-and-drt-fixes, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
+needs: [lean-v3-checker-and-drt-fixes, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
 ---
 # "Its owner's hand" introduces the owner
 

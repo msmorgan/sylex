@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-spell-abilities-share-targets, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
+needs: [lean-v3-spell-abilities-share-targets, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
 ---
 # A later spell ability's "instead" replaces an earlier spell ability's effect
 

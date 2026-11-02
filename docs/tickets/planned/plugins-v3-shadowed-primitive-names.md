@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-data-language, semantics-rust-rewrite]
+needs: [plugins-v3-data-language, lean-retirement]
 ---
 # Remove the remaining sort-prefixed structural primitive names
 

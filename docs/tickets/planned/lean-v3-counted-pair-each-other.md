@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-reciprocal-each-other, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
+needs: [lean-v3-reciprocal-each-other, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
 ---
 # "Two target creatures … fight each other": a counted pair
 

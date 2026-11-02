@@ -1,5 +1,5 @@
 ---
-needs: [semantics-rust-rewrite]
+needs: [lean-retirement]
 ---
 # Sacrifice is limited to what its performer controls
 

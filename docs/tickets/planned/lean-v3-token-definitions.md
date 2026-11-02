@@ -1,5 +1,5 @@
 ---
-needs: [semantics-rust-rewrite]
+needs: [lean-retirement]
 ---
 # Predefined tokens are `token` Definitions
 

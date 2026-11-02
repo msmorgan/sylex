@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-data-language, semantics-rust-rewrite]
+needs: [plugins-v3-data-language, lean-retirement]
 ---
 # Return `bracketed` text to `.syl` and make cleave work
 

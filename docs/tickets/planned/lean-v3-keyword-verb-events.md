@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-monstrosity-adapt-name-the-source, semantics-rust-rewrite]
+needs: [lean-v3-monstrosity-adapt-name-the-source, lean-retirement]
 ---
 # Events for the verbs keyword abilities define
 

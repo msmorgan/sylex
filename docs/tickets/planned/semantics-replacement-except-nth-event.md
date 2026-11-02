@@ -1,5 +1,5 @@
 ---
-needs: [semantics-rust-rewrite]
+needs: [lean-retirement]
 ---
 # A replacement that excepts the nth event
 
