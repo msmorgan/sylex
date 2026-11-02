@@ -14,18 +14,19 @@ when(
   sequentially([...]))
 ```
 
-This ticket only makes the language accept it; `syl-printed-order` reorders the corpus, and
-`semantics-rust-rewrite`'s `discourse` steps arguments in written order.
+Written order is for readability only; `semantics-rust-rewrite`'s `discourse` steps a call's
+arguments in the order its declaration's spelling fixes.
 
 ## Change
 
 - `deckmaste_dsl` parses calls whose named and positional arguments interleave. Positional
-  arguments still bind in order, to the parameters not named; naming a parameter twice, or naming
-  one a positional argument already filled, is an error.
+  arguments bind in written order, each to the next parameter not yet bound; a parameter bound
+  twice, by name or by position, is an error. Interleaving is for readability only: argument order
+  carries no meaning, since a template's parameter order is fixed by its spelling.
 - `cargo xtask dsl fmt` keeps the written order, so an interleaved call round-trips.
 - `sylGen` accepts the same calls: drop its "positional argument after named argument" refusal
   (`lean/SylGen/Resolve.lean`). It already sorts named arguments into binder order, so the Lean it
-  emits, and Lean's checker, are unchanged; Lean stays the oracle for reordered `.syl`.
+  emits, and Lean's checker, are unchanged.
 - Semantics-v3 §4.4 ("Calls") says so.
-- Tests in `deckmaste_dsl` for the interleaved forms and the two errors; `cargo xtask lean check`
-  passes on an interleaved fixture.
+- Tests in `deckmaste_dsl` for the interleaved forms (it only parses; the error is `sylGen`'s, tested
+  in `negative.sh`); `cargo xtask lean check` passes on an interleaved fixture.

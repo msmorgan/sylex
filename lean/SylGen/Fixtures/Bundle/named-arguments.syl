@@ -1,0 +1,12 @@
+# Named arguments may stand anywhere among positional ones; each positional argument binds the
+# next parameter not yet bound. Lean elaborates the emitted calls in binder order.
+
+template namedFirst(x: NounPhrase): Ability {
+  body = activated(timing = inPart(turn, $x, current), mana([0]), draw(1))
+}
+template namedBetween(x: NounPhrase): Ability {
+  body = activated(mana([0]), timing = inPart(turn, $x, current), draw(1), guard = is($x, isPlayer))
+}
+template namedBetweenDelay(x: NounPhrase): Action {
+  body = delay(does(actor($x), enter), alternatives = [does(actor($x), attack)], draw(1))
+}

@@ -131,19 +131,17 @@ mutual
       (args : Array (Option String × Value)) : ResolveM Term := do
     let mut result := #[]
     let mut assigned : Array String := #[]
-    let mut positional := 0
-    let mut named := false
+    -- Arguments bind in written order. A named argument binds its parameter; a positional one
+    -- binds the first parameter not yet bound, so it skips parameters named before it. Naming a
+    -- parameter that an earlier argument bound, by name or position, is a duplicate.
     for (key, value) in args do
       let field ← if let some key := key then do
-          named := true
           let some f := sig.fields.find? (fun f => f.name == key || f.name == leanWord key)
             | fail value.position s!"unknown argument '{key}'"
           pure f
         else do
-          if named then fail value.position "positional argument after named argument"
-          let some f := sig.fields[positional]?
+          let some f := sig.fields.find? (fun f => !assigned.contains f.name)
             | fail value.position "too many arguments"
-          positional := positional + 1
           pure f
       if assigned.contains field.name then fail value.position s!"duplicate argument '{field.name}'"
       assigned := assigned.push field.name

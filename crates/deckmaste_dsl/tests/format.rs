@@ -209,6 +209,23 @@ fn a_sole_call_or_named_argument_does_not_hug() {
 }
 
 #[test]
+fn interleaved_named_and_positional_arguments_keep_their_order() {
+    assert_eq!(
+        fmt(
+            "card { x = when(does(actor(thisAura), enter), if = is(it, in(battlefield)), draw(1)) }"
+        ),
+        "card {\n  x = when(does(actor(thisAura), enter), if = is(it, in(battlefield)), draw(1))\n}\n"
+    );
+    let long = word(45);
+    assert_eq!(
+        fmt(&format!(
+            "card {{ x = f(to = {long}, {long}, from = g, h) }}"
+        )),
+        format!("card {{\n  x = f(\n    to = {long},\n    {long},\n    from = g,\n    h)\n}}\n")
+    );
+}
+
+#[test]
 fn a_list_holding_one_call_does_not_hug_it() {
     let long = word(46);
     assert_eq!(

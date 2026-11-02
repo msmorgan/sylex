@@ -224,6 +224,20 @@ fn arguments_keep_written_order_and_names() {
 }
 
 #[test]
+fn named_arguments_may_stand_anywhere_among_positional_ones() {
+    // Binding positional arguments to parameters is `sylGen`'s job; the
+    // parser only keeps each argument, named or not, where it was written.
+    check(
+        "template t: X { body = when(does(actor(thisAura), enter), if = is(it, in(battlefield)), sequentially([a])) }",
+        "template t: X {body = when(does(actor(thisAura); enter); if = is(it; in(battlefield)); sequentially([a]))}",
+    );
+    check(
+        "template t: X { body = f(to = b, a, from = c, d) }",
+        "template t: X {body = f(to = b; a; from = c; d)}",
+    );
+}
+
+#[test]
 fn parameter_references_are_values() {
     check(
         "template t(a: X, b: X = $a): X { body = f($a, to = [$b], c = { d = $_e1 }) }",
