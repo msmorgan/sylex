@@ -16,8 +16,8 @@ ability embalm(cost: Cost) {
           this,
           [
             characteristicEdits([
-              colors(sets, some([white])),
-              manaCost(none),
-              typeLine(adds, {subtypes = [zombie]})])])),
+                colors(sets, some([white])),
+                manaCost(none),
+                typeLine(adds, {subtypes = [zombie]})])])),
       asSorcery)]
 }

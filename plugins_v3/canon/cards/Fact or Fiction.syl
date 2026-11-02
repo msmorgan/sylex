@@ -5,8 +5,8 @@ card {
   text = [
     spell(
       sequentially([
-        reveal(topSlice(5)),
-        instruct(anOpponent, separateIntoPiles(them, 2)),
-        putInto(onePile, hand),
-        putInto(theOther, graveyard)]))]
+          reveal(topSlice(5)),
+          instruct(anOpponent, separateIntoPiles(them, 2)),
+          putInto(onePile, hand),
+          putInto(theOther, graveyard)]))]
 }

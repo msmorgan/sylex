@@ -21,8 +21,8 @@ subtype saga {
         putCounters(1, printedKind(loreCounter), thisSaga))),
     stateBased(
       and([
-        compareAmt(finalChapterNumber(thisSaga), atLeast, 1),
-        compareAmt(countersOn(loreCounter, thisSaga), atLeast, finalChapterNumber(thisSaga)),
-        not(exists(and([chapterAbilityOf(thisSaga), triggeredNotLeftStack])))]),
+          compareAmt(finalChapterNumber(thisSaga), atLeast, 1),
+          compareAmt(countersOn(loreCounter, thisSaga), atLeast, finalChapterNumber(thisSaga)),
+          not(exists(and([chapterAbilityOf(thisSaga), triggeredNotLeftStack])))]),
       sacrifice(thisSaga))]
 }

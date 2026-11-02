@@ -6,11 +6,11 @@ action explore {
   body = instruct(
     controllerOf(theActor),
     sequentially([
-      reveal(slice(top, 1, libraryOf(actor))),
-      doIf(
-        is(that(card), isLand),
-        putInto(that(card), zone(hand, ownerOf(that(card)))),
-        sequentially([
-          putCounters(1, printedKind(p1p1Counter), theActor),
-          may(putInto(that(card), graveyard))]))]))
+        reveal(slice(top, 1, libraryOf(actor))),
+        doIf(
+          is(that(card), isLand),
+          putInto(that(card), zone(hand, ownerOf(that(card)))),
+          sequentially([
+              putCounters(1, printedKind(p1p1Counter), theActor),
+              may(putInto(that(card), graveyard))]))]))
 }

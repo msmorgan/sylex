@@ -6,7 +6,7 @@ card {
     spell(
       establishThroughout(
         conjunction([
-          qualityChange(allOf(isCreature), sets, colored(some([black]))),
-          qualityChange(allOf(isLand), sets, bundle({characteristics = {subtypes = [swamp]}}))]),
+            qualityChange(allOf(isCreature), sets, colored(some([black]))),
+            qualityChange(allOf(isLand), sets, bundle({characteristics = {subtypes = [swamp]}}))]),
         untilEndOfTurn))]
 }

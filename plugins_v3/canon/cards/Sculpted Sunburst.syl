@@ -8,12 +8,17 @@ card {
   text = [
     spell(
       sequentially([
-        choose(a(and([isCreature, youControl]))),
-        instruct(
-          eachOpponent,
-          choose(
-            a(comparesOwnStat(power, and([isCreature, controlledBy(they)]), atMost, powerOf(it))))),
-        doIf(
-          did(actor(you), choose(a(isCreature)), thisWay),
-          exile(each(and([isCreature, notChosen]))))]))]
+          choose(a(and([isCreature, youControl]))),
+          instruct(
+            eachOpponent,
+            choose(
+              a(
+                comparesOwnStat(
+                  power,
+                  and([isCreature, controlledBy(they)]),
+                  atMost,
+                  powerOf(it))))),
+          doIf(
+            did(actor(you), choose(a(isCreature)), thisWay),
+            exile(each(and([isCreature, notChosen]))))]))]
 }

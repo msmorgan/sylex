@@ -5,6 +5,6 @@ card {
   text = [
     spell(
       sequentially([
-        get(target(isCreature), down(letter(x)), down(letter(x)), untilEndOfTurn),
-        define(x, countOf(cardIn(yourHand)))]))]
+          get(target(isCreature), down(letter(x)), down(letter(x)), untilEndOfTurn),
+          define(x, countOf(cardIn(yourHand)))]))]
 }

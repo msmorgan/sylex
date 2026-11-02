@@ -6,11 +6,11 @@ card {
     spell(
       doIf(
         and([
-          is(this, did(any, cast(which, from = yourHand), thisObject)),
-          did(
-            actor(you),
-            cast(a(and([isSpell, isOther, named(printedName("Approach of the Second Sun"))]))),
-            within(thisGame))]),
+            is(this, did(any, cast(which, from = yourHand), thisObject)),
+            did(
+              actor(you),
+              cast(a(and([isSpell, isOther, named(printedName("Approach of the Second Sun"))]))),
+              within(thisGame))]),
         winGame,
         sequentially([putInto(this, fromTop(7, library)), gainLife(7)])))]
 }

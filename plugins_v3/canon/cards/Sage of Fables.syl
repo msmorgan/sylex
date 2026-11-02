@@ -11,9 +11,12 @@ card {
         p1p1Counter)),
     activated(
       compound([
-        mana([2]),
-        perform(
-          removeCounters(exactly(1), printedKind(p1p1Counter), a(and([isCreature, youControl]))))]),
+          mana([2]),
+          perform(
+            removeCounters(
+              exactly(1),
+              printedKind(p1p1Counter),
+              a(and([isCreature, youControl]))))]),
       draw(1))],
   power = 2,
   toughness = 2

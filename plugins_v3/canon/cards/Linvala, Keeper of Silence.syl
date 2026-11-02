@@ -12,8 +12,8 @@ card {
         activate(
           allOf(
             and([
-              abilityHead(anyActivated),
-              abilityOf(allOf(and([isCreature, opponentsControl])))])))))],
+                abilityHead(anyActivated),
+                abilityOf(allOf(and([isCreature, opponentsControl])))])))))],
   power = 3,
   toughness = 4
 }

@@ -5,10 +5,10 @@ card {
   text = [
     spell(
       sequentially([
-        instruct(this, dealDamage(3, target(isAnyTarget))),
-        establishThroughout(
-          cant(
-            any,
-            regeneration(a(and([isCreature, was(dealDamage(recipient = which), thisWay)])))),
-          thisTurn)]))]
+          instruct(this, dealDamage(3, target(isAnyTarget))),
+          establishThroughout(
+            cant(
+              any,
+              regeneration(a(and([isCreature, was(dealDamage(recipient = which), thisWay)])))),
+            thisTurn)]))]
 }

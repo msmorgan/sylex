@@ -9,9 +9,9 @@ card {
   text = [
     spell(
       sequentially([
-        choose(
-          both(
-            target(and([isCreature, youControl])),
-            target(and([isCreature, anOpponentControls])))),
-        instruct(eachOf(those(creature)), dealDamage(toughnessOf(it), theOther))]))]
+          choose(
+            both(
+              target(and([isCreature, youControl])),
+              target(and([isCreature, anOpponentControls])))),
+          instruct(eachOf(those(creature)), dealDamage(toughnessOf(it), theOther))]))]
 }

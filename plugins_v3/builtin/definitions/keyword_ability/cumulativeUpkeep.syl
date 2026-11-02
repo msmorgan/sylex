@@ -9,11 +9,11 @@ ability cumulativeUpkeep(cost: Cost) {
     at(
       beginningOf(upkeep, you, eachTime),
       sequentially([
-        putCounters(1, printedKind(ageCounter), thisPermanent),
-        doUnlessKeywordCost(
-          sacrifice(thisPermanent),
-          scaled($cost, times(1, countersOn(ageCounter, thisPermanent))),
-          thisPermanent,
-          cumulativeUpkeep)]),
+          putCounters(1, printedKind(ageCounter), thisPermanent),
+          doUnlessKeywordCost(
+            sacrifice(thisPermanent),
+            scaled($cost, times(1, countersOn(ageCounter, thisPermanent))),
+            thisPermanent,
+            cumulativeUpkeep)]),
       if = is(thisPermanent, isPermanent))]
 }

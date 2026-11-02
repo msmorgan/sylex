@@ -7,7 +7,7 @@ card {
     enchant(isCreature),
     static(
       conjunction([
-        getsPt(enchanted(creature), up(2), up(2)),
-        abilityGrant(enchanted(creature), reach),
-        qualityChange(enchanted(creature), adds, everyTypeOf(creature))]))]
+          getsPt(enchanted(creature), up(2), up(2)),
+          abilityGrant(enchanted(creature), reach),
+          qualityChange(enchanted(creature), adds, everyTypeOf(creature))]))]
 }

@@ -5,6 +5,6 @@ card {
   text = [
     spell(
       sequentially([
-        putCounters(letter(x), printedKind(p1p1Counter), target(isCreature)),
-        define(x, powerOf(that(creature)))]))]
+          putCounters(letter(x), printedKind(p1p1Counter), target(isCreature)),
+          define(x, powerOf(that(creature)))]))]
 }

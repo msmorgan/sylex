@@ -5,7 +5,7 @@ card {
   text = [
     spell(
       sequentially([
-        separateIntoPiles(allOf(and([isCreature, in(yourGraveyard)])), 2),
-        exile(pileOfChoice(anOpponent)),
-        returnToBattlefield(theOther)]))]
+          separateIntoPiles(allOf(and([isCreature, in(yourGraveyard)])), 2),
+          exile(pileOfChoice(anOpponent)),
+          returnToBattlefield(theOther)]))]
 }

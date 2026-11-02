@@ -9,8 +9,7 @@ card {
     static(costShift(this, less(forEach(1, and([isCreature, isAttacking, youControl]))))),
     when(does(actor(thisEquipment), enter), attachTo(it, target(and([isCreature, youControl])))),
     static(
-      conjunction(
-        [
+      conjunction([
           getsPt(equipped(creature), up(1), up(1)),
           abilityGrant(equipped(creature), doubleStrike),
           abilityGrant(equipped(creature), trample)],

@@ -7,7 +7,7 @@ card {
       returnToBattlefield(
         allOf(
           and([
-            isPermanentCard,
-            in(yourGraveyard),
-            was(putIntoFromBattlefield(which, yourGraveyard), within(soFarThisTurn))]))))]
+              isPermanentCard,
+              in(yourGraveyard),
+              was(putIntoFromBattlefield(which, yourGraveyard), within(soFarThisTurn))]))))]
 }

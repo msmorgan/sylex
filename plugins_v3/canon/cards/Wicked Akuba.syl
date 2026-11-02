@@ -9,8 +9,8 @@ card {
       instruct(
         target(
           and([
-            isPlayer,
-            did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))])),
+              isPlayer,
+              did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))])),
         loseLife(1)))],
   power = 2,
   toughness = 2

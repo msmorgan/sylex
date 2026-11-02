@@ -5,9 +5,9 @@ card {
   text = [
     spell(
       sequentially([
-        establishFor(
-          target(isCreature),
-          [qualityChange(it, sets, colored(some([red]))), abilityGrant(it, haste)],
-          untilEndOfTurn),
-        draw(1)]))]
+          establishFor(
+            target(isCreature),
+            [qualityChange(it, sets, colored(some([red]))), abilityGrant(it, haste)],
+            untilEndOfTurn),
+          draw(1)]))]
 }

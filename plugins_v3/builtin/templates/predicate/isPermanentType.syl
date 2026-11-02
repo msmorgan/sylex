@@ -4,10 +4,10 @@ template isPermanentType: Predicate {
   # TODO(spelling): Select and coordinate the applicable permanent-type nouns within the enclosing
   # description.
   body = or([
-    hasType(artifact),
-    hasType(battle),
-    hasType(creature),
-    hasType(enchantment),
-    hasType(land),
-    hasType(planeswalker)])
+      hasType(artifact),
+      hasType(battle),
+      hasType(creature),
+      hasType(enchantment),
+      hasType(land),
+      hasType(planeswalker)])
 }

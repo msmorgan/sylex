@@ -5,7 +5,7 @@ card {
     activated(
       compound([tapSymbol, perform(payLife(1)), perform(sacrifice(thisLand))]),
       sequentially([
-        search(yourLibrary, a(and([isCard, or([hasSubtype(plains), hasSubtype(island)])]))),
-        putOntoBattlefield(it),
-        shuffle]))]
+          search(yourLibrary, a(and([isCard, or([hasSubtype(plains), hasSubtype(island)])]))),
+          putOntoBattlefield(it),
+          shuffle]))]
 }

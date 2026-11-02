@@ -16,7 +16,7 @@ card {
     activated(
       mana([variable]),
       sequentially([
-        putCounters(1, printedKind(sleightCounter), thisAura),
-        choose(a(quality(color))),
-        define(x, countersOn(sleightCounter, thisAura))]))]
+          putCounters(1, printedKind(sleightCounter), thisAura),
+          choose(a(quality(color))),
+          define(x, countersOn(sleightCounter, thisAura))]))]
 }

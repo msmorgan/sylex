@@ -12,7 +12,7 @@ card {
       putCounters(1, printedKind(revCounter), thisEquipment)),
     static(
       conjunction([
-        getsPt(equipped(creature), up(letter(x)), up(0)),
-        letterDefinition(x, countersOn(revCounter, thisEquipment))])),
+          getsPt(equipped(creature), up(letter(x)), up(0)),
+          letterDefinition(x, countersOn(revCounter, thisEquipment))])),
     equip(mana([3]))]
 }

@@ -10,8 +10,8 @@ card {
         actor(
           a(
             and([
-              isCreature,
-              did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))]))),
+                isCreature,
+                did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))]))),
         die),
       putCounters(1, printedKind(p1p1Counter), thisCreature))],
   power = 4,

@@ -6,8 +6,8 @@ card {
   text = [
     static(
       conjunction([
-        entersWithCounters(thisCreature, letter(x), p1p1Counter),
-        letterDefinition(x, countOf(and([isCreature, isOther])))]))],
+          entersWithCounters(thisCreature, letter(x), p1p1Counter),
+          letterDefinition(x, countOf(and([isCreature, isOther])))]))],
   power = 0,
   toughness = 0
 }

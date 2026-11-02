@@ -29,13 +29,13 @@ ability suspend(amount: Amount, cost: Cost) {
     when(
       does(any, removeCounters(theLast, printedKind(timeCounter), thisCard)),
       sequentially([
-        may(play(thisCard, payment = withoutPaying)),
-        doIf(
-          did(actor(you), cast(a(and([isCreature, isSpell]))), thisWay),
-          gain(
-            that(spell),
-            haste,
-            forAsLongAs(
-              or([is(that(spell), youControl), is(becomes(that(spell)), youControl)]))))]),
+          may(play(thisCard, payment = withoutPaying)),
+          doIf(
+            did(actor(you), cast(a(and([isCreature, isSpell]))), thisWay),
+            gain(
+              that(spell),
+              haste,
+              forAsLongAs(
+                or([is(that(spell), youControl), is(becomes(that(spell)), youControl)]))))]),
       if = is(thisCard, in(exileZone)))]
 }

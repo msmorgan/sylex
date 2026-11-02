@@ -5,9 +5,9 @@ card {
   text = [
     spell(
       sequentially([
-        replaceEvent(
-          would(actor(a(and([isCreature, not(did(any, cast(which), thisObject))]))), enter),
-          instead(exile(it)),
-          untilEndOfTurn),
-        draw(1)]))]
+          replaceEvent(
+            would(actor(a(and([isCreature, not(did(any, cast(which), thisObject))]))), enter),
+            instead(exile(it)),
+            untilEndOfTurn),
+          draw(1)]))]
 }

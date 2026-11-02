@@ -6,8 +6,7 @@ card {
   text = [
     static(
       onlyWhile(
-        conjunction(
-          [
+        conjunction([
             retention(
               cant(any, attachTo(a(hasSubtype(aura)), them)),
               allOf(and([hasSubtype(aura), attachedTo(those(artifact))]))),

@@ -9,8 +9,7 @@ card {
         qualityChange(
           thisLand,
           sets,
-          bundle(
-            {
+          bundle({
               characteristics = {types = [creature], text = [vigilance], power = 3, toughness = 3},
               qualities = [withEveryType(creature)]},
             land))))]

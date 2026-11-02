@@ -22,8 +22,8 @@ ability partnerWith(quality: Predicate) {
         target(isPlayer),
         may(
           sequentially([
-            search(libraryOf(actor), a(and([isCard, $quality]))),
-            reveal(it),
-            putInto(it, hand),
-            shuffle]))))]
+              search(libraryOf(actor), a(and([isCard, $quality]))),
+              reveal(it),
+              putInto(it, hand),
+              shuffle]))))]
 }

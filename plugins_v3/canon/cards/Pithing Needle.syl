@@ -10,7 +10,7 @@ card {
         activate(
           allOf(
             and([
-              abilityHead(anyActivated),
-              abilityOf(allOf(and([isSource, named(chosenName)]))),
-              not(isManaAbility)])))))]
+                abilityHead(anyActivated),
+                abilityOf(allOf(and([isSource, named(chosenName)]))),
+                not(isManaAbility)])))))]
 }

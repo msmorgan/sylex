@@ -10,8 +10,8 @@ card {
     when(
       does(actor(thisCreature), enter),
       sequentially([
-        gainDesignation(target(isOpponent), monarch),
-        establishThroughout(cant(actor(you), gainDesignation(you, monarch)), thisTurn)])),
+          gainDesignation(target(isOpponent), monarch),
+          establishThroughout(cant(actor(you), gainDesignation(you, monarch)), thisTurn)])),
     static(
       onlyWhile(
         replace(

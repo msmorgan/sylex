@@ -5,6 +5,6 @@ card {
   text = [
     spell(
       sequentially([
-        exile(topSlice(1)),
-        doIf(is(it, isPermanentCard), may(putOntoBattlefield(it), repeat(again)))]))]
+          exile(topSlice(1)),
+          doIf(is(it, isPermanentCard), may(putOntoBattlefield(it), repeat(again)))]))]
 }

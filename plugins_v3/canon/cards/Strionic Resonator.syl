@@ -6,6 +6,6 @@ card {
     activated(
       compound([mana([2]), tapSymbol]),
       sequentially([
-        copyOnStack(target(and([abilityHead(anyTriggered), youControl]))),
-        may(chooseNewTargets(that(copied(ability))))]))]
+          copyOnStack(target(and([abilityHead(anyTriggered), youControl]))),
+          may(chooseNewTargets(that(copied(ability))))]))]
 }

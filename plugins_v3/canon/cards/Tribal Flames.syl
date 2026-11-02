@@ -8,6 +8,8 @@ card {
     domain(
       spell(
         sequentially([
-          instruct(this, dealDamage(letter(x), target(isAnyTarget))),
-          define(x, distinctCount(subtype(land, basicOnly), allOf(and([isLand, youControl]))))])))]
+            instruct(this, dealDamage(letter(x), target(isAnyTarget))),
+            define(
+              x,
+              distinctCount(subtype(land, basicOnly), allOf(and([isLand, youControl]))))])))]
 }

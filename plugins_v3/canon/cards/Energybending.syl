@@ -6,8 +6,8 @@ card {
   text = [
     spell(
       sequentially([
-        establishThroughout(
-          qualityChange(allOf(and([isLand, youControl])), adds, everyTypeOf(basicLand)),
-          untilEndOfTurn),
-        draw(1)]))]
+          establishThroughout(
+            qualityChange(allOf(and([isLand, youControl])), adds, everyTypeOf(basicLand)),
+            untilEndOfTurn),
+          draw(1)]))]
 }

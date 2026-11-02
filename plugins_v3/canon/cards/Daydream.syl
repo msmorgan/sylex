@@ -5,7 +5,7 @@ card {
   text = [
     spell(
       sequentially([
-        exile(target(and([isCreature, youControl]))),
-        returnToBattlefieldWithCounters(that(card), ownerOf(that(card)), 1, p1p1Counter)])),
+          exile(target(and([isCreature, youControl]))),
+          returnToBattlefieldWithCounters(that(card), ownerOf(that(card)), 1, p1p1Counter)])),
     flashback(mana([2, white]))]
 }

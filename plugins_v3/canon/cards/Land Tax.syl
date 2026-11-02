@@ -13,8 +13,8 @@ card {
           countOf(and([isLand, youControl])))),
       action = may(
         sequentially([
-          search(yourLibrary, counted(upTo(3), and([isLand, hasSupertype(basic)]))),
-          reveal(those(card)),
-          putInto(those(card), hand),
-          shuffle])))]
+            search(yourLibrary, counted(upTo(3), and([isLand, hasSupertype(basic)]))),
+            reveal(those(card)),
+            putInto(those(card), hand),
+            shuffle])))]
 }

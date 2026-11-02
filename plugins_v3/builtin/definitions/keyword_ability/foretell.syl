@@ -16,14 +16,14 @@ ability foretell(cost: Cost) {
         duringPart(turn, you),
         mana([generic(2)]),
         sequentially([
-          exileFaceDownFrom(thisCard, yourHand),
-          gainDesignation(it, foretold),
-          establishThroughout(
-            visibility(lookAt, you, objects(it)),
-            forAsLongAs(is(it, hasDesignation(foretold)))),
-          establishThroughout(
-            onlyWhile(
-              can(actor(you), cast(it, from = exileZone, payment = payingInstead($cost))),
-              is(it, hasDesignation(foretold))),
-            onALaterTurn)])))]
+            exileFaceDownFrom(thisCard, yourHand),
+            gainDesignation(it, foretold),
+            establishThroughout(
+              visibility(lookAt, you, objects(it)),
+              forAsLongAs(is(it, hasDesignation(foretold)))),
+            establishThroughout(
+              onlyWhile(
+                can(actor(you), cast(it, from = exileZone, payment = payingInstead($cost))),
+                is(it, hasDesignation(foretold))),
+              onALaterTurn)])))]
 }

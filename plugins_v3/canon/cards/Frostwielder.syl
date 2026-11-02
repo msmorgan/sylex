@@ -10,8 +10,11 @@ card {
           actor(
             a(
               and([
-                isCreature,
-                did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))]))),
+                  isCreature,
+                  did(
+                    actor(thisCreature),
+                    dealDamage(recipient = which),
+                    within(soFarThisTurn))]))),
           die),
         instead(exile(it)))),
     activated(tapSymbol, instruct(thisCreature, dealDamage(1, target(isAnyTarget))))],

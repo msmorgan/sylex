@@ -5,7 +5,11 @@ card {
   text = [
     spell(
       sequentially([
-        get(target(and([isCreature, or([isAttacking, isBlocking])])), up(4), up(0), untilEndOfTurn),
-        atNext(endStep, destroy(that(creature)))]),
+          get(
+            target(and([isCreature, or([isAttacking, isBlocking])])),
+            up(4),
+            up(0),
+            untilEndOfTurn),
+          atNext(endStep, destroy(that(creature)))]),
       timing = beforePart(combatDamage))]
 }

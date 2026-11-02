@@ -10,8 +10,8 @@ card {
       costShift(
         allOf(
           and([
-            abilityHead(keyword(equip)),
-            abilityOf(this),
-            targeting(a(and([isCreature, isColorless])), someTarget)])),
+              abilityHead(keyword(equip)),
+              abilityOf(this),
+              targeting(a(and([isCreature, isColorless])), someTarget)])),
         less(2)))]
 }

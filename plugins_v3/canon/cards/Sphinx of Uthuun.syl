@@ -8,10 +8,10 @@ card {
     when(
       does(actor(thisCreature), enter),
       sequentially([
-        reveal(topSlice(5)),
-        instruct(anOpponent, separateIntoPiles(them, 2)),
-        putInto(onePile, hand),
-        putInto(theOther, graveyard)]))],
+          reveal(topSlice(5)),
+          instruct(anOpponent, separateIntoPiles(them, 2)),
+          putInto(onePile, hand),
+          putInto(theOther, graveyard)]))],
   power = 5,
   toughness = 6
 }

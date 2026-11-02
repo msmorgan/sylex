@@ -11,23 +11,23 @@ card {
     activated(
       loyaltySymbol(down(2)),
       sequentially([
-        create(
-          2,
-          written({
-            characteristics = {
-              types = [artifact, creature],
-              subtypes = [thopter],
-              text = [flying],
-              power = 1,
-              toughness = 1}})),
-        gainHaste(them, untilEndOfTurn)])),
+          create(
+            2,
+            written({
+                characteristics = {
+                  types = [artifact, creature],
+                  subtypes = [thopter],
+                  text = [flying],
+                  power = 1,
+                  toughness = 1}})),
+          gainHaste(them, untilEndOfTurn)])),
     activated(
       loyaltySymbol(down(4)),
       getEmblem([
-        static(getsPt(allOf(and([isArtifact, isCreature, youControl])), up(1), up(1))),
-        static(
-          costShift(
-            allOf(and([isArtifact, isSpell, did(actor(you), cast(which), thisObject)])),
-            less(1)))]))],
+          static(getsPt(allOf(and([isArtifact, isCreature, youControl])), up(1), up(1))),
+          static(
+            costShift(
+              allOf(and([isArtifact, isSpell, did(actor(you), cast(which), thisObject)])),
+              less(1)))]))],
   loyalty = 3
 }

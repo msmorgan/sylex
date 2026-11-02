@@ -8,16 +8,16 @@ card {
     enchant(or([isCreature, hasSubtype(food)])),
     static(
       conjunction([
-        qualityChange(
-          enchanted(permanent),
-          sets,
-          bundle({
-            characteristics = {
-              types = [artifact],
-              subtypes = [food],
-              text = [
-                activated(
-                  compound([mana([2]), tapSymbol, perform(sacrifice(thisArtifact))]),
-                  gainLife(3))]}})),
-        allAbilityLoss(it)]))]
+          qualityChange(
+            enchanted(permanent),
+            sets,
+            bundle({
+                characteristics = {
+                  types = [artifact],
+                  subtypes = [food],
+                  text = [
+                    activated(
+                      compound([mana([2]), tapSymbol, perform(sacrifice(thisArtifact))]),
+                      gainLife(3))]}})),
+          allAbilityLoss(it)]))]
 }

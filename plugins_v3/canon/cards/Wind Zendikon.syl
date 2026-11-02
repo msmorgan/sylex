@@ -9,8 +9,7 @@ card {
       qualityChange(
         enchanted(land),
         sets,
-        bundle(
-          {
+        bundle({
             characteristics = {
               colors = [blue],
               types = [creature],

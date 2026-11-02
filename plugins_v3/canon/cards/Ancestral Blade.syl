@@ -7,8 +7,8 @@ card {
     when(
       does(actor(thisEquipment), enter),
       sequentially([
-        create(1, written(creatureToken(1, 1, [white], [soldier]))),
-        attachTo(thisEquipment, thatToken)])),
+          create(1, written(creatureToken(1, 1, [white], [soldier]))),
+          attachTo(thisEquipment, thatToken)])),
     static(getsPt(equipped(creature), up(1), up(1))),
     equip(mana([1]))]
 }

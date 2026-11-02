@@ -12,13 +12,18 @@ card {
     coven(
       spell(
         sequentially([
-          choose(
-            both(target(and([isCreature, youControl])), target(and([isCreature, youDontControl])))),
-          doIf(
-            compareAmt(
-              distinctCount(value(power), allOf(and([isCreature, youControl]))),
-              atLeast,
-              3),
-            putCounters(1, printedKind(p1p1Counter), the(and([isCreature, isChosen, youControl])))),
-          fightEachOther(thePlural(and([isCreature, isChosen])))])))]
+            choose(
+              both(
+                target(and([isCreature, youControl])),
+                target(and([isCreature, youDontControl])))),
+            doIf(
+              compareAmt(
+                distinctCount(value(power), allOf(and([isCreature, youControl]))),
+                atLeast,
+                3),
+              putCounters(
+                1,
+                printedKind(p1p1Counter),
+                the(and([isCreature, isChosen, youControl])))),
+            fightEachOther(thePlural(and([isCreature, isChosen])))])))]
 }

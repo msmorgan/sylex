@@ -7,9 +7,9 @@ card {
       costShift(
         allOf(
           and([
-            or([isArtifact, isEnchantment]),
-            isSpell,
-            did(actor(yourOpponents), cast(which), thisObject)])),
+              or([isArtifact, isEnchantment]),
+              isSpell,
+              did(actor(yourOpponents), cast(which), thisObject)])),
         more(2))),
     activated(
       perform(sacrifice(thisEnchantment)),

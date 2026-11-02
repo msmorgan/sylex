@@ -5,12 +5,12 @@ card {
   text = [
     spell(
       chooseSpree([
-        {cost = mana([1]), action = destroy(target(isArtifact))},
-        {cost = mana([1]), action = destroy(target(isEnchantment))},
-        {
-          cost = mana([1]),
-          action = putCounters(
-            1,
-            printedKind(p1p1Counter),
-            each(and([isCreature, controlledBy(target(isPlayer))])))}]))]
+          {cost = mana([1]), action = destroy(target(isArtifact))},
+          {cost = mana([1]), action = destroy(target(isEnchantment))},
+          {
+            cost = mana([1]),
+            action = putCounters(
+              1,
+              printedKind(p1p1Counter),
+              each(and([isCreature, controlledBy(target(isPlayer))])))}]))]
 }

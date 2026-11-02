@@ -13,13 +13,13 @@ ability melee {
           forEach(
             1,
             and([
-              isOpponent,
-              did(actor(you), attackWith(a(isCreature), which), within(thisCombat))]))),
+                isOpponent,
+                did(actor(you), attackWith(a(isCreature), which), within(thisCombat))]))),
         up(
           forEach(
             1,
             and([
-              isOpponent,
-              did(actor(you), attackWith(a(isCreature), which), within(thisCombat))]))),
+                isOpponent,
+                did(actor(you), attackWith(a(isCreature), which), within(thisCombat))]))),
         untilEndOfTurn))]
 }

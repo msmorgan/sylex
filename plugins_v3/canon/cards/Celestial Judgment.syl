@@ -5,10 +5,10 @@ card {
   text = [
     spell(
       sequentially([
-        doForEachKind(
-          value(power),
-          allOf(isCreature),
-          number,
-          choose(a(and([isCreature, hasPower(eq, chosenNumber)])))),
-        destroy(each(and([isCreature, notChosen])))]))]
+          doForEachKind(
+            value(power),
+            allOf(isCreature),
+            number,
+            choose(a(and([isCreature, hasPower(eq, chosenNumber)])))),
+          destroy(each(and([isCreature, notChosen])))]))]
 }

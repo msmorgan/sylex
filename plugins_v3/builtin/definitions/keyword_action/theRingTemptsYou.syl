@@ -5,81 +5,83 @@ action theRingTemptsYou {
   lexical = {verbs = [{lemma = "tempt", frames = [Monotransitive]}], nouns = ["Ring"]},
   spelling = "The Ring tempts you",
   body = sequentially([
-    doIf(
-      not(exists(and([isEmblem, named(printedName("The Ring")), ownedBy(theActor)]))),
-      getNamedEmblem(
-        "The Ring",
-        [
-          static(
-            characteristicChange(
-              allOf(and([hasDesignation(ringBearer), youControl])),
-              [typeLine(adds, {supertypes = [legendary]})])),
-          static(
-            cant(
-              by(
-                allOf(
-                  and([
-                    isCreature,
-                    hasPower(
-                      greater,
-                      powerOf(a(and([hasDesignation(ringBearer), youControl]))))]))),
-              block(allOf(and([hasDesignation(ringBearer), youControl]))))),
-          static(
-            onlyWhile(
-              abilityGrant(
-                this,
-                whenever(
-                  does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
-                  sequentially([draw(1), discard(a(cardIn(hand)))]))),
-              compareAmt(
-                eventCount(
-                  ownScope(
-                    action("theRingTemptsYou"),
-                    sequentially([
-                      choose(a(and([isCreature, actorControls]))),
-                      gainDesignation(that(creature), ringBearer)])),
-                  actor(you),
-                  thisGame),
-                atLeast,
-                2))),
-          static(
-            onlyWhile(
-              abilityGrant(
-                this,
-                whenever(
-                  does(by(a(isCreature)), block(a(and([hasDesignation(ringBearer), youControl])))),
-                  atNext(endOfCombat, controllerSacrifices(that(creature))))),
-              compareAmt(
-                eventCount(
-                  ownScope(
-                    action("theRingTemptsYou"),
-                    sequentially([
-                      choose(a(and([isCreature, actorControls]))),
-                      gainDesignation(that(creature), ringBearer)])),
-                  actor(you),
-                  thisGame),
-                atLeast,
-                3))),
-          static(
-            onlyWhile(
-              abilityGrant(
-                this,
-                whenever(
-                  does(
-                    actor(a(and([hasDesignation(ringBearer), youControl]))),
-                    dealDamage(recipient = a(isPlayer), kind = combat)),
-                  instruct(eachOpponent, loseLife(3)))),
-              compareAmt(
-                eventCount(
-                  ownScope(
-                    action("theRingTemptsYou"),
-                    sequentially([
-                      choose(a(and([isCreature, actorControls]))),
-                      gainDesignation(that(creature), ringBearer)])),
-                  actor(you),
-                  thisGame),
-                atLeast,
-                4)))])),
-    choose(a(and([isCreature, actorControls]))),
-    gainDesignation(that(creature), ringBearer)])
+      doIf(
+        not(exists(and([isEmblem, named(printedName("The Ring")), ownedBy(theActor)]))),
+        getNamedEmblem(
+          "The Ring",
+          [
+            static(
+              characteristicChange(
+                allOf(and([hasDesignation(ringBearer), youControl])),
+                [typeLine(adds, {supertypes = [legendary]})])),
+            static(
+              cant(
+                by(
+                  allOf(
+                    and([
+                        isCreature,
+                        hasPower(
+                          greater,
+                          powerOf(a(and([hasDesignation(ringBearer), youControl]))))]))),
+                block(allOf(and([hasDesignation(ringBearer), youControl]))))),
+            static(
+              onlyWhile(
+                abilityGrant(
+                  this,
+                  whenever(
+                    does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
+                    sequentially([draw(1), discard(a(cardIn(hand)))]))),
+                compareAmt(
+                  eventCount(
+                    ownScope(
+                      action("theRingTemptsYou"),
+                      sequentially([
+                          choose(a(and([isCreature, actorControls]))),
+                          gainDesignation(that(creature), ringBearer)])),
+                    actor(you),
+                    thisGame),
+                  atLeast,
+                  2))),
+            static(
+              onlyWhile(
+                abilityGrant(
+                  this,
+                  whenever(
+                    does(
+                      by(a(isCreature)),
+                      block(a(and([hasDesignation(ringBearer), youControl])))),
+                    atNext(endOfCombat, controllerSacrifices(that(creature))))),
+                compareAmt(
+                  eventCount(
+                    ownScope(
+                      action("theRingTemptsYou"),
+                      sequentially([
+                          choose(a(and([isCreature, actorControls]))),
+                          gainDesignation(that(creature), ringBearer)])),
+                    actor(you),
+                    thisGame),
+                  atLeast,
+                  3))),
+            static(
+              onlyWhile(
+                abilityGrant(
+                  this,
+                  whenever(
+                    does(
+                      actor(a(and([hasDesignation(ringBearer), youControl]))),
+                      dealDamage(recipient = a(isPlayer), kind = combat)),
+                    instruct(eachOpponent, loseLife(3)))),
+                compareAmt(
+                  eventCount(
+                    ownScope(
+                      action("theRingTemptsYou"),
+                      sequentially([
+                          choose(a(and([isCreature, actorControls]))),
+                          gainDesignation(that(creature), ringBearer)])),
+                    actor(you),
+                    thisGame),
+                  atLeast,
+                  4)))])),
+      choose(a(and([isCreature, actorControls]))),
+      gainDesignation(that(creature), ringBearer)])
 }

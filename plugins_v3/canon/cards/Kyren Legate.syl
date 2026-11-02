@@ -8,8 +8,8 @@ card {
       onlyWhile(
         altCost(this),
         and([
-          exists(and([isLand, hasSubtype(plains), anOpponentControls])),
-          exists(and([isLand, hasSubtype(mountain), youControl]))]))),
+            exists(and([isLand, hasSubtype(plains), anOpponentControls])),
+            exists(and([isLand, hasSubtype(mountain), youControl]))]))),
     haste],
   power = 1,
   toughness = 1

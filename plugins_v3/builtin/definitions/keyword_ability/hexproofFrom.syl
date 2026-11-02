@@ -11,7 +11,7 @@ ability hexproofFrom(quality: Predicate) {
         by(
           allOf(
             and([
-              or([and([isSpell, $quality]), abilityOf(allOf(and([isSource, $quality])))]),
-              opponentsControl]))),
+                or([and([isSpell, $quality]), abilityOf(allOf(and([isSource, $quality])))]),
+                opponentsControl]))),
         target(thisPermanent)))]
 }

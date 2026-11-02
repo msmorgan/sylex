@@ -8,8 +8,8 @@ card {
   text = [
     spell(
       sequentially([
-        counter(target(isSpell)),
-        delay(
-          beginningOf(mainPhase, you, nextTime(you)),
-          addMana(statOf(stat(manaValue), that(spell)), manaOf([[colorless]])))]))]
+          counter(target(isSpell)),
+          delay(
+            beginningOf(mainPhase, you, nextTime(you)),
+            addMana(statOf(stat(manaValue), that(spell)), manaOf([[colorless]])))]))]
 }

@@ -3,6 +3,6 @@ action cloak(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "cloak", frames = [Monotransitive]}]},
   spelling = "cloak <subject>",
   body = sequentially([
-    turnFaceDown($subject, faceDownWardedCreature),
-    move($subject, anywhere, battlefield, arrival, [faceDownAs(faceDownWardedCreature)])])
+      turnFaceDown($subject, faceDownWardedCreature),
+      move($subject, anywhere, battlefield, arrival, [faceDownAs(faceDownWardedCreature)])])
 }

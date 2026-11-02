@@ -11,13 +11,13 @@ ability awaken(amount: Amount, cost: Cost) {
       doIf(
         keywordCostPaid(awaken, this),
         sequentially([
-          putCounters($amount, printedKind(p1p1Counter), target(and([isLand, youControl]))),
-          establish(
-            characteristicChange(
-              that(land),
-              [
-                typeLine(adds, {types = [creature], subtypes = [elemental]}),
-                stat(power, set(0)),
-                stat(toughness, set(0)),
-                addedAbilities([haste])]))])))]
+            putCounters($amount, printedKind(p1p1Counter), target(and([isLand, youControl]))),
+            establish(
+              characteristicChange(
+                that(land),
+                [
+                  typeLine(adds, {types = [creature], subtypes = [elemental]}),
+                  stat(power, set(0)),
+                  stat(toughness, set(0)),
+                  addedAbilities([haste])]))])))]
 }

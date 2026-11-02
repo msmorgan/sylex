@@ -7,10 +7,10 @@ card {
   text = [
     spell(
       sequentially([
-        counter(target(isSpell)),
-        doIf(
-          did(any, counter(that(spell)), thisWay),
-          sequentially([
-            create(letter(x), written(treasureToken)),
-            define(x, statOf(stat(manaValue), that(spell)))]))]))]
+          counter(target(isSpell)),
+          doIf(
+            did(any, counter(that(spell)), thisWay),
+            sequentially([
+                create(letter(x), written(treasureToken)),
+                define(x, statOf(stat(manaValue), that(spell)))]))]))]
 }

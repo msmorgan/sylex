@@ -10,9 +10,9 @@ card {
         eachOpponent,
         may(
           sequentially([
-            search(libraryOf(they), a(and([isLand, hasSupertype(basic)]))),
-            putOntoBattlefieldTapped(it),
-            shuffle]))))],
+              search(libraryOf(they), a(and([isLand, hasSupertype(basic)]))),
+              putOntoBattlefieldTapped(it),
+              shuffle]))))],
   power = 3,
   toughness = 3
 }

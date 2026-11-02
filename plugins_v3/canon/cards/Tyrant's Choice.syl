@@ -6,9 +6,9 @@ card {
     willOfTheCouncil(
       spell(
         sequentially([
-          instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["death", "torture"]))),
-          doIf(
-            voteLead("death", false),
-            instruct(eachOpponent, sacrifice(aTheirChoice(isCreature)))),
-          doIf(voteLead("torture", true), instruct(eachOpponent, loseLife(4)))])))]
+            instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["death", "torture"]))),
+            doIf(
+              voteLead("death", false),
+              instruct(eachOpponent, sacrifice(aTheirChoice(isCreature)))),
+            doIf(voteLead("torture", true), instruct(eachOpponent, loseLife(4)))])))]
 }

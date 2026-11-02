@@ -5,8 +5,8 @@ card {
   text = [
     spell(
       sequentially([
-        search(yourLibrary, counted(upToOf(letter(x)), and([isLand, hasSupertype(basic)]))),
-        define(x, distinctCount(value(power), allOf(and([isCreature, youControl])))),
-        putOntoBattlefieldTapped(those(card)),
-        shuffle]))]
+          search(yourLibrary, counted(upToOf(letter(x)), and([isLand, hasSupertype(basic)]))),
+          define(x, distinctCount(value(power), allOf(and([isCreature, youControl])))),
+          putOntoBattlefieldTapped(those(card)),
+          shuffle]))]
 }

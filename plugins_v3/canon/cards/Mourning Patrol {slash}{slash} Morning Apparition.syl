@@ -1,20 +1,20 @@
 card transforming({
-  front = {
-    name = "Mourning Patrol",
-    cost = [2, white],
-    types = [creature],
-    subtypes = [human, soldier],
-    text = [vigilance, disturb(mana([3, white]))],
-    power = 2,
-    toughness = 3},
-  back = {
-    name = "Morning Apparition",
-    colors = [white],
-    types = [creature],
-    subtypes = [spirit, soldier],
-    text = [
-      flying,
-      vigilance,
-      static(replace(would(any, putInto(thisCreature, graveyard)), instead(exile(it))))],
-    power = 2,
-    toughness = 1}})
+    front = {
+      name = "Mourning Patrol",
+      cost = [2, white],
+      types = [creature],
+      subtypes = [human, soldier],
+      text = [vigilance, disturb(mana([3, white]))],
+      power = 2,
+      toughness = 3},
+    back = {
+      name = "Morning Apparition",
+      colors = [white],
+      types = [creature],
+      subtypes = [spirit, soldier],
+      text = [
+        flying,
+        vigilance,
+        static(replace(would(any, putInto(thisCreature, graveyard)), instead(exile(it))))],
+      power = 2,
+      toughness = 1}})

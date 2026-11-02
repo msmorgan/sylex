@@ -9,12 +9,12 @@ ability encore(cost: Cost) {
     activatedOnlyDuring(
       compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),
       sequentially([
-        doForEach(
-          eachOpponent,
-          sequentially([
-            create(1, copyOf(this)),
-            establishThroughout(must(actor(thatToken), attack(that(player))), thisTurn)])),
-        gain(thoseTokens, haste),
-        atNext(endStep, sacrifice(thoseTokens))]),
+          doForEach(
+            eachOpponent,
+            sequentially([
+                create(1, copyOf(this)),
+                establishThroughout(must(actor(thatToken), attack(that(player))), thisTurn)])),
+          gain(thoseTokens, haste),
+          atNext(endStep, sacrifice(thoseTokens))]),
       asSorcery)]
 }

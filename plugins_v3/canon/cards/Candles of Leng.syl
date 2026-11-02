@@ -6,9 +6,9 @@ card {
     activated(
       compound([mana([4]), tapSymbol]),
       sequentially([
-        reveal(topSlice(1)),
-        doIf(
-          is(it, shares(cardName, share, a(cardIn(yourGraveyard)))),
-          putInto(it, graveyard),
-          draw(1))]))]
+          reveal(topSlice(1)),
+          doIf(
+            is(it, shares(cardName, share, a(cardIn(yourGraveyard)))),
+            putInto(it, graveyard),
+            draw(1))]))]
 }

@@ -8,7 +8,7 @@ card {
       destroy(
         target(
           and([
-            isPermanent,
-            non(isLand),
-            superlative(min, stat(manaValue), and([isPermanent, non(isLand)]))]))))]
+              isPermanent,
+              non(isLand),
+              superlative(min, stat(manaValue), and([isPermanent, non(isLand)]))]))))]
 }

@@ -7,6 +7,6 @@ card {
     enchant(isCreature),
     static(
       conjunction([
-        cant(actor(enchanted(creature)), block),
-        cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(it)]))))]))]
+          cant(actor(enchanted(creature)), block),
+          cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(it)]))))]))]
 }

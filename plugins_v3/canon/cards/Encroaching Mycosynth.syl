@@ -6,13 +6,13 @@ card {
     static(
       qualityChange(
         and([
-          allOf(and([isPermanent, non(isLand), youControl])),
-          allOf(
-            and([
-              or([isArtifact, isBattle, isCreature, isEnchantment, isPlaneswalker]),
-              isSpell,
-              youControl])),
-          allOf(and([isCard, isPermanentCard, non(isLand), youOwn, not(in(battlefield))]))]),
+            allOf(and([isPermanent, non(isLand), youControl])),
+            allOf(
+              and([
+                  or([isArtifact, isBattle, isCreature, isEnchantment, isPlaneswalker]),
+                  isSpell,
+                  youControl])),
+            allOf(and([isCard, isPermanentCard, non(isLand), youOwn, not(in(battlefield))]))]),
         adds,
         bundle({characteristics = {types = [artifact]}})))]
 }

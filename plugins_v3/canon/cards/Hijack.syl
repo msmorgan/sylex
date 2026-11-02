@@ -5,7 +5,7 @@ card {
   text = [
     spell(
       sequentially([
-        gainControl(target(or([isArtifact, isCreature])), untilEndOfTurn),
-        untap(it),
-        gainHaste(it, untilEndOfTurn)]))]
+          gainControl(target(or([isArtifact, isCreature])), untilEndOfTurn),
+          untap(it),
+          gainHaste(it, untilEndOfTurn)]))]
 }

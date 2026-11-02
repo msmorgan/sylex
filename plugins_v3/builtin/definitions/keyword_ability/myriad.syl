@@ -9,16 +9,16 @@ ability myriad {
     whenever(
       does(actor(thisCreature), attack),
       sequentially([
-        doForEach(
-          each(and([isOpponent, otherThan(defendingPlayer)])),
-          may(
-            create(
-              1,
-              copyOf(thisCreature),
-              [
-                entersAs(tapped),
-                entersAttacking(or([they, a(and([isPlaneswalker, controlledBy(they)]))]))]))),
-        doIf(
-          compareAmt(numberOf(thoseTokens), atLeast, 1),
-          atNext(endOfCombat, exile(thoseTokens)))]))]
+          doForEach(
+            each(and([isOpponent, otherThan(defendingPlayer)])),
+            may(
+              create(
+                1,
+                copyOf(thisCreature),
+                [
+                  entersAs(tapped),
+                  entersAttacking(or([they, a(and([isPlaneswalker, controlledBy(they)]))]))]))),
+          doIf(
+            compareAmt(numberOf(thoseTokens), atLeast, 1),
+            atNext(endOfCombat, exile(thoseTokens)))]))]
 }

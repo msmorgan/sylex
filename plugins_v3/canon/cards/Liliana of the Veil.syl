@@ -10,7 +10,7 @@ card {
     activated(
       loyaltySymbol(down(6)),
       sequentially([
-        separateIntoPiles(allOf(and([isPermanent, controlledBy(target(isPlayer))])), 2),
-        instruct(they, sacrifice(allOf(and([isPermanent, inPile(pileOfChoice(they))]))))]))],
+          separateIntoPiles(allOf(and([isPermanent, controlledBy(target(isPlayer))])), 2),
+          instruct(they, sacrifice(allOf(and([isPermanent, inPile(pileOfChoice(they))]))))]))],
   loyalty = 3
 }

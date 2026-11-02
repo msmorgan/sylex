@@ -8,8 +8,8 @@ card {
       does(actor(thisCreature), enter),
       or = [does(actor(thisCreature), attack)],
       action = sequentially([
-        exile(target(cardIn(graveyard))),
-        putCounters(1, printedKind(p1p1Counter), thisCreature)])),
+          exile(target(cardIn(graveyard))),
+          putCounters(1, printedKind(p1p1Counter), thisCreature)])),
     alsoForKeywords(
       static(
         onlyWhile(

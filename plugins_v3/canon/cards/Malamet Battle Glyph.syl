@@ -5,10 +5,10 @@ card {
   text = [
     spell(
       sequentially([
-        choose(
-          both(target(and([isCreature, youControl])), target(and([isCreature, youDontControl])))),
-        doIf(
-          did(actor(the(and([isCreature, youControl]))), enter, within(soFarThisTurn)),
-          putCounters(1, printedKind(p1p1Counter), it)),
-        fightEachOther(those(creature))]))]
+          choose(
+            both(target(and([isCreature, youControl])), target(and([isCreature, youDontControl])))),
+          doIf(
+            did(actor(the(and([isCreature, youControl]))), enter, within(soFarThisTurn)),
+            putCounters(1, printedKind(p1p1Counter), it)),
+          fightEachOther(those(creature))]))]
 }

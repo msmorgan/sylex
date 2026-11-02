@@ -7,9 +7,9 @@ ability splitSecond {
     static(
       onlyWhile(
         conjunction([
-          cant(actor(bare(isPlayer)), cast(bare(anotherSpell))),
-          cant(
-            actor(bare(isPlayer)),
-            activate(allOf(and([abilityHead(anyActivated), non(isManaAbility)]))))]),
+            cant(actor(bare(isPlayer)), cast(bare(anotherSpell))),
+            cant(
+              actor(bare(isPlayer)),
+              activate(allOf(and([abilityHead(anyActivated), non(isManaAbility)]))))]),
         is(thisSpell, in(stack))))]
 }

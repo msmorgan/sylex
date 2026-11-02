@@ -5,7 +5,7 @@ card {
   text = [
     spell(
       sequentially([
-        establish(abilityGrant(allOf(and([isCreature, youControl])), indestructible)),
-        extraTurn(1),
-        delay(beginningOfThatTurns(endStep), loseGame)]))]
+          establish(abilityGrant(allOf(and([isCreature, youControl])), indestructible)),
+          extraTurn(1),
+          delay(beginningOfThatTurns(endStep), loseGame)]))]
 }

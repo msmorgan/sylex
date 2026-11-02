@@ -5,6 +5,6 @@ card {
   text = [
     spell(
       sequentially([
-        counter(target(and([isSpell, did(any, cast(which, from = graveyard), thisObject)]))),
-        draw(1)]))]
+          counter(target(and([isSpell, did(any, cast(which, from = graveyard), thisObject)]))),
+          draw(1)]))]
 }

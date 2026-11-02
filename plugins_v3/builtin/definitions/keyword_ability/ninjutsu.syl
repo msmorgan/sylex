@@ -8,14 +8,14 @@ ability ninjutsu(cost: Cost) {
   body = [
     activated(
       compound([
-        $cost,
-        perform(reveal(this)),
-        perform(returnToHand(a(and([isCreature, isAttacking, isUnblocked, youControl]))))]),
+          $cost,
+          perform(reveal(this)),
+          perform(returnToHand(a(and([isCreature, isAttacking, isUnblocked, youControl]))))]),
       putOntoBattlefieldTappedAttacking(
         this,
         yourHand,
         the(
           and([
-            or([isPlayer, isPlaneswalker, isBattle]),
-            inCombat(attackedBy, the(and([was(returnToHand(which)), isCreature])))]))))]
+              or([isPlayer, isPlaneswalker, isBattle]),
+              inCombat(attackedBy, the(and([was(returnToHand(which)), isCreature])))]))))]
 }

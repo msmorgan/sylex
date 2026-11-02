@@ -9,11 +9,11 @@ card {
       does(actor(a(and([isNontoken, and([isCreature, youControl]), isOther]))), die),
       may(
         sequentially([
-          returnToBattlefield(
-            it,
-            [
-              faceDownAs({characteristics = {types = [land], subtypes = [forest]}}),
-              under(ownerOf(it))])])))],
+            returnToBattlefield(
+              it,
+              [
+                faceDownAs({characteristics = {types = [land], subtypes = [forest]}}),
+                under(ownerOf(it))])])))],
   power = 5,
   toughness = 5
 }

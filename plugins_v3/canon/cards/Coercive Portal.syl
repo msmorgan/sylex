@@ -7,10 +7,10 @@ card {
       at(
         beginningOfYour(upkeep),
         sequentially([
-          instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["carnage", "homage"]))),
-          doIf(
-            voteLead("carnage", false),
-            sequentially(
-              [sacrifice(thisArtifact), destroy(allOf(and([isPermanent, non(isLand)])))])),
-          doIf(voteLead("homage", true), draw(1))])))]
+            instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["carnage", "homage"]))),
+            doIf(
+              voteLead("carnage", false),
+              sequentially(
+                [sacrifice(thisArtifact), destroy(allOf(and([isPermanent, non(isLand)])))])),
+            doIf(voteLead("homage", true), draw(1))])))]
 }

@@ -7,10 +7,10 @@ card {
         would(actor(thisLand), enter),
         instead(
           sequentially([
-            sacrifice(
-              each(
-                and([isPermanent, isOther, named(printedName("Sheltered Valley")), youControl]))),
-            putOntoBattlefield(thisLand)])))),
+              sacrifice(
+                each(
+                  and([isPermanent, isOther, named(printedName("Sheltered Valley")), youControl]))),
+              putOntoBattlefield(thisLand)])))),
     at(
       beginningOfYour(upkeep),
       if = compareAmt(countOf(and([isLand, youControl])), atMost, 3),

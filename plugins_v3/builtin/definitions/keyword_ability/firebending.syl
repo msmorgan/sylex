@@ -10,6 +10,6 @@ ability firebending(amount: Amount) {
     whenever(
       does(actor(thisCreature), attack),
       sequentially([
-        addMana($amount, manaOf([[of(red)]])),
-        establishThroughout(manaRetention(you, thisMana), untilEndOfCombat)]))]
+          addMana($amount, manaOf([[of(red)]])),
+          establishThroughout(manaRetention(you, thisMana), untilEndOfCombat)]))]
 }

@@ -5,8 +5,8 @@ card {
   text = [
     spell(
       sequentially([
-        destroy(target(and([isCreature, hasManaValue(eq, letter(x))]))),
-        doIf(
-          did(actor(that(creature)), die, thisWay),
-          instruct(this, dealDamage(powerOf(that(creature)), controllerOf(that(creature)))))]))]
+          destroy(target(and([isCreature, hasManaValue(eq, letter(x))]))),
+          doIf(
+            did(actor(that(creature)), die, thisWay),
+            instruct(this, dealDamage(powerOf(that(creature)), controllerOf(that(creature)))))]))]
 }

@@ -5,6 +5,6 @@ card {
   text = [
     spell(
       sequentially([
-        putInto(target(isCreature), fromTop(2, library)),
-        instruct(controllerOf(it), gainLife(3))]))]
+          putInto(target(isCreature), fromTop(2, library)),
+          instruct(controllerOf(it), gainLife(3))]))]
 }

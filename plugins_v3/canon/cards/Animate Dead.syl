@@ -8,19 +8,18 @@ card {
     when(
       does(actor(thisAura), enter),
       sequentially([
-        establish(
-          conjunction(
-            [
-              abilityLoss(it, [written(enchant(and([isCreature, isCard, in(graveyard)])))]),
-              abilityGrant(
-                it,
-                enchant(and([isCreature, did(by(thisAura), putOntoBattlefield(which))])))],
-            subject = it)),
-        returnToBattlefield(enchanted(ofType(card, creature)), [under(you)]),
-        attachTo(thisAura, it),
-        delay(
-          does(actor(thisAura), leave),
-          instruct(controllerOf(that(creature)), sacrifice(it)))]),
+          establish(
+            conjunction([
+                abilityLoss(it, [written(enchant(and([isCreature, isCard, in(graveyard)])))]),
+                abilityGrant(
+                  it,
+                  enchant(and([isCreature, did(by(thisAura), putOntoBattlefield(which))])))],
+              subject = it)),
+          returnToBattlefield(enchanted(ofType(card, creature)), [under(you)]),
+          attachTo(thisAura, it),
+          delay(
+            does(actor(thisAura), leave),
+            instruct(controllerOf(that(creature)), sacrifice(it)))]),
       if = is(it, in(battlefield))),
     static(getsPt(enchanted(creature), down(1), up(0)))]
 }

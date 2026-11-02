@@ -13,10 +13,10 @@ card {
     whenever(
       does(actor(eitherOf(thisCreature, a(and([hasSubtype(sphinx), youControl, isOther])))), enter),
       sequentially([
-        reveal(topSlice(4)),
-        instruct(anOpponent, separateIntoPiles(them, 2)),
-        putInto(onePile, hand),
-        putInto(theOther, graveyard)]))],
+          reveal(topSlice(4)),
+          instruct(anOpponent, separateIntoPiles(them, 2)),
+          putInto(onePile, hand),
+          putInto(theOther, graveyard)]))],
   power = 4,
   toughness = 4
 }

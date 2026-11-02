@@ -8,10 +8,10 @@ card {
     when(
       does(actor(thisCreature), enter),
       sequentially([
-        choose(anOpponent),
-        doIf(
-          compareAmt(countOf(cardIn(handOf(that(player)))), greater, countOf(cardIn(yourHand))),
-          draw(theDifference))]))],
+          choose(anOpponent),
+          doIf(
+            compareAmt(countOf(cardIn(handOf(that(player)))), greater, countOf(cardIn(yourHand))),
+            draw(theDifference))]))],
   power = 4,
   toughness = 4
 }

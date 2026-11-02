@@ -5,12 +5,12 @@ card {
   text = [
     spell(
       sequentially([
-        choose(target(isAnyTarget)),
-        draw(3),
-        discard(a(cardIn(yourHand))),
-        instruct(
-          this,
-          dealDamage(
-            statOf(stat(manaValue), the(and([was(discard(which)), isCard]))),
-            thatJoin))]))]
+          choose(target(isAnyTarget)),
+          draw(3),
+          discard(a(cardIn(yourHand))),
+          instruct(
+            this,
+            dealDamage(
+              statOf(stat(manaValue), the(and([was(discard(which)), isCard]))),
+              thatJoin))]))]
 }

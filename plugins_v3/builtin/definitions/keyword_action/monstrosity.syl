@@ -8,6 +8,6 @@ action monstrosity(amount: Amount) {
   body = doIf(
     not(is(thisPermanent, hasDesignation(monstrous))),
     sequentially([
-      putCounters($amount, printedKind(p1p1Counter), thisPermanent),
-      gainDesignation(thisPermanent, monstrous)]))
+        putCounters($amount, printedKind(p1p1Counter), thisPermanent),
+        gainDesignation(thisPermanent, monstrous)]))
 }

@@ -8,14 +8,14 @@ ability storied {
     static(
       whileHolds(
         and([
-          compareAmt(
-            countOf(
-              and([
-                isPermanent,
-                youControl,
-                andOr([isArtifact, hasSubtype(saga), hasSupertype(legendary)])])),
-            atLeast,
-            3),
-          not(is(you, hasDesignation(enduringStory)))]),
+            compareAmt(
+              countOf(
+                and([
+                    isPermanent,
+                    youControl,
+                    andOr([isArtifact, hasSubtype(saga), hasSupertype(legendary)])])),
+              atLeast,
+              3),
+            not(is(you, hasDesignation(enduringStory)))]),
         gainDesignation(you, enduringStory, restOfGame)))]
 }

@@ -7,8 +7,8 @@ card {
     enchant(isCreature),
     static(
       conjunction([
-        gatedBy(mana([3]), actor(enchanted(creature)), attack),
-        gatedBy(mana([3]), actor(enchanted(creature)), block)])),
+          gatedBy(mana([3]), actor(enchanted(creature)), attack),
+          gatedBy(mana([3]), actor(enchanted(creature)), block)])),
     static(
       costShift(allOf(and([abilityHead(anyActivated), abilityOf(enchanted(creature))])), more(3)))]
 }

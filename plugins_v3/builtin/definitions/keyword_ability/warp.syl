@@ -22,8 +22,8 @@ ability warp(cost: Cost) {
           atNext(
             endStep,
             sequentially([
-              exile(becomes(thisSpell)),
-              establishThroughout(
-                can(actor(ownerOf(it)), cast(it, from = exileZone)),
-                onALaterTurn)])))))]
+                exile(becomes(thisSpell)),
+                establishThroughout(
+                  can(actor(ownerOf(it)), cast(it, from = exileZone)),
+                  onALaterTurn)])))))]
 }

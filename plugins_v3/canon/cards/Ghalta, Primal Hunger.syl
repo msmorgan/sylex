@@ -7,8 +7,8 @@ card {
   text = [
     static(
       conjunction([
-        costShift(this, less(letter(x))),
-        letterDefinition(x, aggregate(sum, stat(power), and([isCreature, youControl])))])),
+          costShift(this, less(letter(x))),
+          letterDefinition(x, aggregate(sum, stat(power), and([isCreature, youControl])))])),
     trample],
   power = 12,
   toughness = 12

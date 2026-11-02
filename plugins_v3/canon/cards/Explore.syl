@@ -5,8 +5,8 @@ card {
   text = [
     spell(
       sequentially([
-        establishThroughout(
-          can(actor(you), play(counted(additional(exactly(1)), isLand))),
-          thisTurn),
-        draw(1)]))]
+          establishThroughout(
+            can(actor(you), play(counted(additional(exactly(1)), isLand))),
+            thisTurn),
+          draw(1)]))]
 }

@@ -8,8 +8,8 @@ card {
     when(
       does(actor(thisCreature), enter),
       sequentially([
-        exile(target(and([isPermanent, isOther]))),
-        atNext(endStep, returnToBattlefield(that(card), [under(ownerOf(it))]))]))],
+          exile(target(and([isPermanent, isOther]))),
+          atNext(endStep, returnToBattlefield(that(card), [under(ownerOf(it))]))]))],
   power = 3,
   toughness = 1
 }

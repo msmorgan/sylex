@@ -1,34 +1,34 @@
 card transforming({
-  front = {
-    name = "Afflicted Deserter",
-    cost = [3, red],
-    types = [creature],
-    subtypes = [human, werewolf],
-    text = [
-      at(
-        beginningOfEach(upkeep),
-        if = not(did(any, cast(a(isSpell)), within(lastTurn))),
-        action = transform(thisCreature))],
-    power = 3,
-    toughness = 2},
-  back = {
-    name = "Werewolf Ransacker",
-    types = [creature],
-    subtypes = [werewolf],
-    text = [
-      whenever(
-        does(any, transform(thisCreature, into = named(printedName("Werewolf Ransacker")))),
-        sequentially([
-          may(destroy(target(isArtifact))),
-          doIf(
-            did(actor(that(artifact)), putInto(theActor, graveyard), thisWay),
-            instruct(thisCreature, dealDamage(3, controllerOf(that(artifact)))))])),
-      at(
-        beginningOfEach(upkeep),
-        if = compareAmt(
-          aggregateOver(max, isPlayer, eventCount(cast(a(isSpell)), actor(they), lastTurn)),
-          atLeast,
-          2),
-        action = transform(thisCreature))],
-    power = 5,
-    toughness = 4}})
+    front = {
+      name = "Afflicted Deserter",
+      cost = [3, red],
+      types = [creature],
+      subtypes = [human, werewolf],
+      text = [
+        at(
+          beginningOfEach(upkeep),
+          if = not(did(any, cast(a(isSpell)), within(lastTurn))),
+          action = transform(thisCreature))],
+      power = 3,
+      toughness = 2},
+    back = {
+      name = "Werewolf Ransacker",
+      types = [creature],
+      subtypes = [werewolf],
+      text = [
+        whenever(
+          does(any, transform(thisCreature, into = named(printedName("Werewolf Ransacker")))),
+          sequentially([
+              may(destroy(target(isArtifact))),
+              doIf(
+                did(actor(that(artifact)), putInto(theActor, graveyard), thisWay),
+                instruct(thisCreature, dealDamage(3, controllerOf(that(artifact)))))])),
+        at(
+          beginningOfEach(upkeep),
+          if = compareAmt(
+            aggregateOver(max, isPlayer, eventCount(cast(a(isSpell)), actor(they), lastTurn)),
+            atLeast,
+            2),
+          action = transform(thisCreature))],
+      power = 5,
+      toughness = 4}})

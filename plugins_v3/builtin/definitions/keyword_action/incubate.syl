@@ -4,8 +4,7 @@ action incubate(amount: Amount) {
   spelling = "incubate <amount>",
   body = create(
     1,
-    doubleFaced(
-      {
+    doubleFaced({
         characteristics = {
           types = [artifact],
           subtypes = [incubator],

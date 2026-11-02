@@ -10,7 +10,7 @@ ability demonstrate {
       may(
         sequentially([copyOnStack(thisSpell), may(chooseNewTargets(that(copy)))]),
         sequentially([
-          choose(anOpponent),
-          instruct(the(isChosenPlayer), copyOnStack(thisSpell)),
-          instruct(the(isChosenPlayer), may(chooseNewTargets(that(copy))))])))]
+            choose(anOpponent),
+            instruct(the(isChosenPlayer), copyOnStack(thisSpell)),
+            instruct(the(isChosenPlayer), may(chooseNewTargets(that(copy))))])))]
 }

@@ -14,13 +14,14 @@ card {
       does(actor(thisCreature), attack),
       or = [does(actor(thisCreature), block)],
       action = sequentially([
-        may(attachTo(counted(anyNumber, and([hasSubtype(aura), in(battlefield)])), it)),
-        may(
-          putOntoBattlefieldAttachedTo(
-            counted(
-              anyNumber,
-              and([hasSubtype(aura), cardIn(andOr([yourGraveyard, yourHand])), couldEnchant(it)])),
-            it))]))],
+          may(attachTo(counted(anyNumber, and([hasSubtype(aura), in(battlefield)])), it)),
+          may(
+            putOntoBattlefieldAttachedTo(
+              counted(
+                anyNumber,
+                and(
+                  [hasSubtype(aura), cardIn(andOr([yourGraveyard, yourHand])), couldEnchant(it)])),
+              it))]))],
   power = 5,
   toughness = 5
 }

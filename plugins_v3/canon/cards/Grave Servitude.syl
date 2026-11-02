@@ -7,8 +7,7 @@ card {
     asThoughFlashSacrificedAtCleanup,
     enchant(isCreature),
     static(
-      conjunction(
-        [
+      conjunction([
           getsPt(enchanted(creature), up(3), down(1)),
           qualityChange(it, sets, colored(some([black])))],
         subject = enchanted(creature)))]

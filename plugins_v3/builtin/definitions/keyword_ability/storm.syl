@@ -8,10 +8,10 @@ ability storm {
     when(
       does(actor(you), cast(thisSpell)),
       sequentially([
-        copy(
-          fromStack,
-          thisSpell,
-          eventCount(cast(a(and([isSpell, isOther]))), actor(a(isPlayer)), earlierThisTurn),
-          []),
-        may(chooseNewTargets(pro(word(copy), many)))]))]
+          copy(
+            fromStack,
+            thisSpell,
+            eventCount(cast(a(and([isSpell, isOther]))), actor(a(isPlayer)), earlierThisTurn),
+            []),
+          may(chooseNewTargets(pro(word(copy), many)))]))]
 }

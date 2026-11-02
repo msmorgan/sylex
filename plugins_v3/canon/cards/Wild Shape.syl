@@ -19,11 +19,11 @@ card {
                 target(and([isCreature, youControl])),
                 sets,
                 bundle({
-                  characteristics = {
-                    subtypes = [turtle],
-                    text = [hexproof],
-                    power = 1,
-                    toughness = 3}})),
+                    characteristics = {
+                      subtypes = [turtle],
+                      text = [hexproof],
+                      power = 1,
+                      toughness = 3}})),
               untilEndOfTurn)),
           mk(
             none,
@@ -33,11 +33,11 @@ card {
                 target(and([isCreature, youControl])),
                 sets,
                 bundle({
-                  characteristics = {
-                    subtypes = [spider],
-                    text = [reach],
-                    power = 1,
-                    toughness = 5}})),
+                    characteristics = {
+                      subtypes = [spider],
+                      text = [reach],
+                      power = 1,
+                      toughness = 5}})),
               untilEndOfTurn)),
           mk(
             none,
@@ -47,10 +47,10 @@ card {
                 target(and([isCreature, youControl])),
                 sets,
                 bundle({
-                  characteristics = {
-                    subtypes = [elephant],
-                    text = [trample],
-                    power = 3,
-                    toughness = 3}})),
+                    characteristics = {
+                      subtypes = [elephant],
+                      text = [trample],
+                      power = 3,
+                      toughness = 3}})),
               untilEndOfTurn))]))]
 }

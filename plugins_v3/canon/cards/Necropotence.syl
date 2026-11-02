@@ -8,6 +8,6 @@ card {
     activated(
       perform(payLife(1)),
       sequentially([
-        exileFaceDown(topSlice(1)),
-        delay(beginningOf(endStep, you, nextTime(you)), putInto(that(card), hand))]))]
+          exileFaceDown(topSlice(1)),
+          delay(beginningOf(endStep, you, nextTime(you)), putInto(that(card), hand))]))]
 }

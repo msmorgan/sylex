@@ -13,6 +13,6 @@ card {
     activated(
       compound([mana([3]), perform(sacrifice(thisArtifact))]),
       sequentially([
-        gain(allOf(and([isCreature, youControl])), hexproof, untilEndOfTurn),
-        establishThroughout(cant(any, block(allOf(and([isCreature, youControl])))), thisTurn)]))]
+          gain(allOf(and([isCreature, youControl])), hexproof, untilEndOfTurn),
+          establishThroughout(cant(any, block(allOf(and([isCreature, youControl])))), thisTurn)]))]
 }

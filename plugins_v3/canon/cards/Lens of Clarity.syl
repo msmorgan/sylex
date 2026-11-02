@@ -5,6 +5,6 @@ card {
   text = [
     static(
       conjunction([
-        visibility(lookAt, you, topOfLibrary),
-        visibility(lookAt, you, objects(allOf(and([isCreature, isFaceDown, youDontControl]))))]))]
+          visibility(lookAt, you, topOfLibrary),
+          visibility(lookAt, you, objects(allOf(and([isCreature, isFaceDown, youDontControl]))))]))]
 }

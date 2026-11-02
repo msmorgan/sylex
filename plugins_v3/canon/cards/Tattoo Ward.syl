@@ -6,8 +6,7 @@ card {
   text = [
     enchant(isCreature),
     static(
-      conjunction(
-        [
+      conjunction([
           getsPt(enchanted(creature), up(1), up(1)),
           retention(abilityGrant(enchanted(creature), protection(isEnchantment)), thisAura)],
         subject = enchanted(creature))),

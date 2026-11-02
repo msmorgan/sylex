@@ -12,11 +12,11 @@ card {
       action = create(
         1,
         written({
-          characteristics = {
-            types = [artifact, creature],
-            subtypes = [construct],
-            power = 4,
-            toughness = 4}})))],
+            characteristics = {
+              types = [artifact, creature],
+              subtypes = [construct],
+              power = 4,
+              toughness = 4}})))],
   power = 4,
   toughness = 4
 }

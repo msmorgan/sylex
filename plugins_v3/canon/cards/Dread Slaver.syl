@@ -9,12 +9,12 @@ card {
         actor(
           a(
             and([
-              isCreature,
-              did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))]))),
+                isCreature,
+                did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))]))),
         die),
       sequentially([
-        returnToBattlefield(it, [under(you)]),
-        become(that(creature), {characteristics = {colors = [black], subtypes = [zombie]}})]))],
+          returnToBattlefield(it, [under(you)]),
+          become(that(creature), {characteristics = {colors = [black], subtypes = [zombie]}})]))],
   power = 3,
   toughness = 5
 }

@@ -10,8 +10,7 @@ card {
         qualityChange(
           thisLand,
           sets,
-          bundle(
-            {
+          bundle({
               characteristics = {
                 colors = [red, green],
                 types = [creature],

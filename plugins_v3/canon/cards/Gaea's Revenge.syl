@@ -11,8 +11,8 @@ card {
         by(
           allOf(
             or([
-              and([isSpell, non(hasColor(green))]),
-              abilityOf(allOf(and([isSource, non(hasColor(green))])))]))),
+                and([isSpell, non(hasColor(green))]),
+                abilityOf(allOf(and([isSource, non(hasColor(green))])))]))),
         target(thisCreature)))],
   power = 8,
   toughness = 5

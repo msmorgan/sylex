@@ -9,17 +9,17 @@ card {
       costShift(
         allOf(
           and([
-            isSpell,
-            did(actor(yourOpponents), cast(which), thisObject),
-            targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
+              isSpell,
+              did(actor(yourOpponents), cast(which), thisObject),
+              targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
         more(2))),
     static(
       costShift(
         allOf(
           and([
-            abilityHead(anyActivated),
-            did(actor(yourOpponents), activate(which), thisObject),
-            targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
+              abilityHead(anyActivated),
+              did(actor(yourOpponents), activate(which), thisObject),
+              targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
         more(2)))],
   power = 2,
   toughness = 2

@@ -9,12 +9,12 @@ card {
     when(
       does(actor(thisCreature), enter),
       sequentially([
-        instruct(eachPlayer, choose(disclosure = secretly, chosen = a(quality(number)))),
-        revealChoices(numbers),
-        instruct(each(and([isPlayer, choseExtreme(max)])), loseLife(thatMuch)),
-        doIf(
-          is(you, choseExtreme(max)),
-          putCounters(2, printedKind(p1p1Counter), thisCreature))]))],
+          instruct(eachPlayer, choose(disclosure = secretly, chosen = a(quality(number)))),
+          revealChoices(numbers),
+          instruct(each(and([isPlayer, choseExtreme(max)])), loseLife(thatMuch)),
+          doIf(
+            is(you, choseExtreme(max)),
+            putCounters(2, printedKind(p1p1Counter), thisCreature))]))],
   power = 3,
   toughness = 3
 }

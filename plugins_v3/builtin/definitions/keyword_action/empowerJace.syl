@@ -12,19 +12,19 @@ action empowerJace(amount: Amount) {
         frames = [Amount]}]},
   spelling = "empower Jace <amount>",
   body = sequentially([
-    doIf(
-      not(exists(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
-      create(
-        1,
-        written({
-          characteristics = {
-            colors = [blue],
-            types = [planeswalker],
-            subtypes = [jace],
-            text = [
-              activated(loyaltySymbol(down(1)), surveil(1)),
-              activated(loyaltySymbol(down(3)), draw(1))],
-            loyalty = 0}}))),
-    choose(a(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
-    putCounters($amount, printedKind(loyaltyCounter), it)])
+      doIf(
+        not(exists(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
+        create(
+          1,
+          written({
+              characteristics = {
+                colors = [blue],
+                types = [planeswalker],
+                subtypes = [jace],
+                text = [
+                  activated(loyaltySymbol(down(1)), surveil(1)),
+                  activated(loyaltySymbol(down(3)), draw(1))],
+                loyalty = 0}}))),
+      choose(a(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
+      putCounters($amount, printedKind(loyaltyCounter), it)])
 }

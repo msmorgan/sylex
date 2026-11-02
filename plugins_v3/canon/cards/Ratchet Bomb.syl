@@ -9,7 +9,7 @@ card {
       destroy(
         each(
           and([
-            non(isLand),
-            isPermanent,
-            hasManaValue(eq, countersOn(chargeCounter, thisArtifact))]))))]
+              non(isLand),
+              isPermanent,
+              hasManaValue(eq, countersOn(chargeCounter, thisArtifact))]))))]
 }

@@ -5,6 +5,6 @@ card {
   text = [
     spell(
       sequentially([
-        choose(a(quality(subtype(creature)))),
-        draw(forEach(1, and([isPermanent, youControl, ofChosen(subtype(creature))])))]))]
+          choose(a(quality(subtype(creature)))),
+          draw(forEach(1, and([isPermanent, youControl, ofChosen(subtype(creature))])))]))]
 }

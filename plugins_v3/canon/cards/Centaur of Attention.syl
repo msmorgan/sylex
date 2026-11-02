@@ -8,8 +8,8 @@ card {
     at(beginningOfYour(combat), may(rerollStored(anyNumber, thisCreature))),
     static(
       conjunction([
-        getsPt(thisCreature, up(letter(x)), up(letter(x))),
-        letterDefinition(x, greatestStoredMatch(thisCreature))]))],
+          getsPt(thisCreature, up(letter(x)), up(letter(x))),
+          letterDefinition(x, greatestStoredMatch(thisCreature))]))],
   power = 3,
   toughness = 3
 }

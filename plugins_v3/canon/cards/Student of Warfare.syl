@@ -1,14 +1,14 @@
 # A leveler card [CR#711]: each band is a level symbol's static ability, the abilities and base
 # power and toughness this creature has while its level counters are in that range.
 card leveler({
-  inner = {
-    name = "Student of Warfare",
-    cost = [white],
-    types = [creature],
-    subtypes = [human, knight],
-    text = [levelUp(mana([white]))],
-    power = 1,
-    toughness = 1},
-  bands = [
-    {range = between(2, 6), power = 3, toughness = 3, text = [firstStrike]},
-    {range = plus(7), power = 4, toughness = 4, text = [doubleStrike]}]})
+    inner = {
+      name = "Student of Warfare",
+      cost = [white],
+      types = [creature],
+      subtypes = [human, knight],
+      text = [levelUp(mana([white]))],
+      power = 1,
+      toughness = 1},
+    bands = [
+      {range = between(2, 6), power = 3, toughness = 3, text = [firstStrike]},
+      {range = plus(7), power = 4, toughness = 4, text = [doubleStrike]}]})

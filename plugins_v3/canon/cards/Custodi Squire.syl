@@ -9,14 +9,14 @@ card {
       when(
         does(actor(thisCreature), enter),
         sequentially([
-          instruct(
-            eachPlayer,
-            voteStartingWith(
-              you,
-              openly,
-              byCandidate(
-                a(and([or([isArtifact, isCreature, isEnchantment]), in(yourGraveyard)]))))),
-          returnToHand(allOf(and([isCard, withMostVotes])))])))],
+            instruct(
+              eachPlayer,
+              voteStartingWith(
+                you,
+                openly,
+                byCandidate(
+                  a(and([or([isArtifact, isCreature, isEnchantment]), in(yourGraveyard)]))))),
+            returnToHand(allOf(and([isCard, withMostVotes])))])))],
   power = 3,
   toughness = 3
 }

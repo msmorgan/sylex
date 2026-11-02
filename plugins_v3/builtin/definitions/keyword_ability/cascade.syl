@@ -6,20 +6,21 @@ ability cascade {
     when(
       does(actor(you), cast(thisSpell)),
       sequentially([
-        exile(
-          run(
-            top,
-            and(
-              [non(isLand), compare(less, statOf(stat(manaValue), thisSpell), [stat(manaValue)])]),
-            libraryOf(you))),
-        may(
-          castWithoutPaying(
-            that(card),
-            compare(less, statOf(stat(manaValue), thisSpell), [stat(manaValue)]))),
-        move(
-          allOf(and([isCard, was(exile(which), thisWay), not(was(cast(which), thisWay))])),
-          anywhere,
-          onBottom,
-          arrival,
-          [inOrder(randomOrder)])]))]
+          exile(
+            run(
+              top,
+              and([
+                  non(isLand),
+                  compare(less, statOf(stat(manaValue), thisSpell), [stat(manaValue)])]),
+              libraryOf(you))),
+          may(
+            castWithoutPaying(
+              that(card),
+              compare(less, statOf(stat(manaValue), thisSpell), [stat(manaValue)]))),
+          move(
+            allOf(and([isCard, was(exile(which), thisWay), not(was(cast(which), thisWay))])),
+            anywhere,
+            onBottom,
+            arrival,
+            [inOrder(randomOrder)])]))]
 }

@@ -7,9 +7,9 @@ card {
     static(
       qualityChange(
         and([
-          allOf(and([isCreature, youControl])),
-          allOf(and([isCreature, isSpell, youControl])),
-          allOf(and([isCard, isCreature, youOwn, not(in(battlefield))]))]),
+            allOf(and([isCreature, youControl])),
+            allOf(and([isCreature, isSpell, youControl])),
+            allOf(and([isCard, isCreature, youOwn, not(in(battlefield))]))]),
         adds,
         chosenQuality(ofChosen(subtype(creature)))))]
 }

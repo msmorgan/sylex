@@ -6,6 +6,6 @@ card {
     static(visibility(reveal, you, topOfLibrary)),
     static(
       conjunction([
-        can(actor(you), play(allOf(isLand), from = onTop)),
-        can(actor(you), cast(bare(isSpell), from = onTop))]))]
+          can(actor(you), play(allOf(isLand), from = onTop)),
+          can(actor(you), cast(bare(isSpell), from = onTop))]))]
 }

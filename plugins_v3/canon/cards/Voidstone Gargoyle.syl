@@ -13,8 +13,8 @@ card {
         activate(
           allOf(
             and([
-              abilityHead(anyActivated),
-              abilityOf(allOf(and([isSource, named(chosenName)])))])))))],
+                abilityHead(anyActivated),
+                abilityOf(allOf(and([isSource, named(chosenName)])))])))))],
   power = 3,
   toughness = 3
 }
