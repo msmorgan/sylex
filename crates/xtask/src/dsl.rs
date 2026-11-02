@@ -1,4 +1,6 @@
-//! `cargo xtask dsl differential`: check that `deckmaste_dsl` and `SylGen`'s
+//! `cargo xtask dsl`: `.syl` tooling. `fmt` lives in [`crate::dsl_fmt`].
+//!
+//! `cargo xtask dsl differential` checks that `deckmaste_dsl` and `SylGen`'s
 //! parser (`lean/SylGen/Parser.lean`) read every `plugins_v3/**/*.syl` file
 //! identically.
 //!
@@ -41,14 +43,18 @@ enum DslCmd {
     /// Parse every `plugins_v3` `.syl` file with both `deckmaste_dsl` and
     /// `SylGen`'s parser, and fail on any difference between the trees.
     Differential,
+    /// Format `.syl` files (default: every `plugins_v3` file) in place, check
+    /// them, or format standard input.
+    Fmt(crate::dsl_fmt::FmtArgs),
 }
 
 /// Where `sylParseDump` writes, relative to `lean/`.
 const DUMP: &str = ".lake/build/syl-parse-dump.json";
 
 pub fn run(args: &DslArgs) -> anyhow::Result<()> {
-    match args.command {
+    match &args.command {
         DslCmd::Differential => differential(),
+        DslCmd::Fmt(args) => crate::dsl_fmt::run(args),
     }
 }
 

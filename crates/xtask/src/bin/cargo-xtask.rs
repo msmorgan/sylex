@@ -72,8 +72,8 @@ enum Cmd {
     IdrisCheck(IdrisCheckArgs),
     /// Build the native Lean workbench with warnings treated as errors.
     Lean(LeanArgs),
-    /// Check `deckmaste_dsl` against `SylGen`'s `.syl` parser over
-    /// `plugins_v3`.
+    /// `.syl` tooling: check `deckmaste_dsl` against `SylGen`'s parser over
+    /// `plugins_v3`, or format `.syl` files.
     Dsl(DslArgs),
     /// On-demand "bearings" dumps of current code shape (`enums`/`idris`).
     Map(MapArgs),
