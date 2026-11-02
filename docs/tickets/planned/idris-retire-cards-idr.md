@@ -2,7 +2,9 @@
 needs: [semantics-v3-dsl-and-plugins, plugins-v3-builtin-primitives-and-templates]
 ---
 **[port-required: semantics-v3] Retire `idris/src/Cards.idr` by migrating its
-71-card coverage inventory into `lean/Semantics/Cards/` and `plugins_v3/`.**
+71-card coverage inventory into `plugins_v3/canon/cards/` (`.syl`).** Updated 2026-11-02: not into
+`lean/`, whose checker is retired after Idris; a card the `.syl` model cannot express yet is listed in its
+mechanic's open ticket instead.
 Preserves the 38-canonizable / 22-blocked card breakdown (including the 13
 unbuilt-mechanic cards — Time Walk, Mindslaver, Vodalian Illusionist, Pine
 Walker, Iona, Steely Resolve, Cavern of Souls, Meddling Mage, Citadel Siege,
@@ -57,47 +59,24 @@ Of the 60 not-yet-canon Idris-modeled cards:
 
 ## Do (this ticket)
 
-1. **Stand up a non-strict acceptance corpus.** House migrated cards in a
-   fidelity-`strict=false` plugin (`plugins/testing/cards/`, or a dedicated
-   `plugins/acceptance/`). Non-strict = no oracle entry required, render diffs
-   waived — so the artifact needs only to **parse + lint + emit-typecheck**, the
-   exact role `Cards.idr` filled, now routed through the real Rust→Idris bridge.
-   Wire `cargo xtask idris-check <plugin>` over it (local gate; CI has no idris2).
-2. **Migrate the 38 CANONIZABLE cards** to that corpus as RON. Each must parse,
-   lint clean, and pass `idris-check`. The 4 complex-path cards (Liliana
-   loyalty-cost emit, Midnight Haunting / Smuggler's Copter player-action actor
-   slot, Snapcaster cost-of-reference) may trip an emit gap on authoring — if so,
-   demote them to BLOCKED and file the gap.
-3. **Retire `Cards.idr`** once the 38 (+ the 11 already canon) are migrated:
-   delete `idris/src/Cards.idr`, drop `Cards` from `idris/mtg.ipkg`, fix the two
-   stale comments and `VERIFY.md`. The 22 BLOCKED defs either stay as a
-   `Cards.idr` remnant until unblocked, or drop with their intent preserved in
-   the mechanic tickets above (decide at retire time — prefer dropping, since the
-   arms are unreachable Rust-side anyway and the tickets carry the intent).
+Updated 2026-11-02 (owner): the earlier plan routed these cards through the v1 bridge (a RON
+acceptance corpus checked by `idris-check`, emit-bridge arms, renderer arms). The bridge and
+`idris-check` are deleted with Idris in `idris-retirement`, so that route is gone.
 
-## Follow-on (separate tickets, not this one)
-
-- **Emit-bridge arms** for the 9 gap cards — mint per arm; `Card::TwoFaced` first
-  (recovers 3 cards). These belong with `idris-mirror-enum-gaps` (Rust→Idris
-  emit asymmetries) or their own bridge tickets.
-- **Renderer arms** for real-canon promotion. Only ~20 of the 38 render back to
-  oracle cleanly today; ~14 need a render arm or waiver (vs the historical ~9%
-  waiver rate over 78 canon cards). The gaps are concentrated and real:
-  `StaticEffect::CostModifier` has **no render arm at all** (Goblin
-  Electromancer / Thalia / Frogmite), modal renders only "Choose one" (no
-  "Choose two" — Cryptic Command), plus kicker, leveler bands, and the
-  produced-object / loyalty / CDA / control-shift / complex-anthem seams that
-  already account for the existing 7 waivers. File these as renderer tickets
-  (`CostModifier` first) and promote acceptance-corpus cards into fidelity-gated
-  canon as their render arm lands. **Real-canon promotion is not required for the
-  coverage goal** — the acceptance corpus reaches every emit arm without it.
+1. **Author the canonizable cards as `.syl`** under `plugins_v3/canon/cards/`, each passing the
+   current `.syl` checks. The inventory above was measured against the v1 bridge; re-sort it by
+   what the `.syl` model expresses today.
+2. **A card the `.syl` model cannot express yet** is named, with its intent, in its mechanic's open
+   ticket (the list above names them), so nothing lives only in `Cards.idr`.
+3. **Delete `idris/src/Cards.idr`**, drop `Cards` from `idris/mtg.ipkg`, and fix the two stale
+   comments and `VERIFY.md` (all of which `idris-retirement` then deletes).
 
 ## Donate — the sole true orphan
 
 **Donate** (`{2}{U}` Sorcery — "Target player gains control of target permanent
 you control.") is the one not-yet-canon card whose design intent had **no ticket
-anywhere**; it lives only at `Cards.idr:389`. Migrate it in step 2 (it is
-CANONIZABLE). Two intents it is the worked example for:
+anywhere**; it lives only at `Cards.idr:389` (it is
+CANONIZABLE): author it in step 1. Two intents it is the worked example for:
 
 - **Mixed-kind multi-target** — slot 0 a player (`APlayer`), slot 1 an object
   ("permanent you control"); the two sorted anaphors disambiguate by noun, no
@@ -111,18 +90,4 @@ CANONIZABLE). Two intents it is the worked example for:
   separate `idris_emit` gap at `:1738` — a decision for `idris-mirror-enum-gaps`,
   not needed by Donate.)
 
-## Converge Draw as part of the retire
-
-Retiring `Cards.idr` dissolves the standing justification for the **Draw
-divergence** (idris `Action.Draw` was kept only because retiring it "forces
-migrating ~20 Cards.idr sites"). Per the mirror policy (user ruling 2026-07-19:
-prefer mirror over sanctioned divergence — no more Draw-style asymmetries "if we
-can help it"), with those sites gone the plan is to **converge**: retire idris
-`Action.Draw` to Rust's Composite-only form as part of this cleanup, not to
-re-sanction it. The `{default …}` grammar-arg sites are the same shape — fold
-their removal in or spin a sibling cleanup. Do NOT retire idris `Action.Draw`
-before the `Cards.idr` sites are actually gone (it still has ~20 callers).
-
-Standard constraints apply. Deltas: `idris-check` is a local-only gate (no idris2
-in CI); the acceptance plugin must be registered in the fidelity `COVERED` list
-as non-strict; retire step must update `idris/mtg.ipkg` or the Idris build breaks.
+Standard constraints apply.

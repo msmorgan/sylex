@@ -1,7 +1,12 @@
 ---
 needs: [ci-lean-gate, lean-card-soundness-gate, idris-retire-cards-idr, entailments-table-without-idris, docs-lean-is-the-workbench, tickets-idris-sweep]
 ---
-**Retire the Idris workbench.** Decision (2026-09-05): the Lean 4 workbench
+**Retire the Idris workbench.** Updated 2026-11-02 (owner): Idris is deleted before Lean, which
+`semantics-rust-rewrite` retires, so nothing here may hand work to Lean. The Idris card gate
+(`idris_emit.rs`, `cargo xtask idris-check`, the per-plugin baselines, the CI `idris` job) goes in
+this landing too, without a successor: it checks the v1 plugins, which are deletion-bound, and
+`semantics-v3-parity` is the v3 cross-check. This moves the gate's retirement forward from
+`semantics-v1-cutover` (ruling of 2026-09-06). Decision (2026-09-05): the Lean 4 workbench
 under `lean/` is the successor of the Idris 2 workbench under `idris/`; the
 Idris tree is a reference only, reread when a Lean port needs its evidence,
 and is deleted once nothing else depends on it. This ticket is the
@@ -29,9 +34,9 @@ into the same landing), the `idr` entry in `cite-config.json` and
 The `rs`-side doc comments that cite `idris/src/Semantics.idr` constructors
 (`deckmaste_core` and `deckmaste_semantics` `action.rs`, `continuous.rs`,
 `stat_value.rs`; `deckmaste_engine` `activate.rs`, `trigger.rs`) are
-re-pointed at the Lean declarations; `core-idris-prose-sweep` covers the
+re-pointed at the `.syl` definitions they correspond to, or dropped; `core-idris-prose-sweep` covers the
 larger `deckmaste_core` set and should land before or with this.
 
 Landing record must list every CR citation that lived only in `.idr` files
 (the coverage ratchet will otherwise drop them silently) and where each now
-lives in Lean.
+lives outside Lean (`.syl`, Rust or docs), since the Lean checker is retired next.

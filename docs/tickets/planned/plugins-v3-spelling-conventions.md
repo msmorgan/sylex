@@ -58,7 +58,7 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
   - `spelling` accepts a string or a list of strings.
   - `semantics` checks that no two patterns share a set of holes, and that every call's set of
     non-default arguments has a pattern. `semantics` is used because it resolves every call.
-    (Not SylGen, which is deleted with Lean by `semantics-rust-rewrite`.)
+    (Not SylGen: after `semantics-rust-rewrite` it is only a mirror of the DSL.)
   - Add negative cases for both errors.
 - **Corpus, in its own commits:**
   - Rewrite every Action spelling to the bare Verb Phrase.

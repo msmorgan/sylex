@@ -1,5 +1,5 @@
 ---
-needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-v3-monstrosity-adapt-name-the-source, lean-proofs-spec-catalog]
+needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-v3-monstrosity-adapt-name-the-source, lean-proofs-spec-catalog, idris-retirement]
 ---
 # [design] Rewrite the Rust semantics pipeline: `semantics`, `discourse`, `lowering`
 
@@ -36,16 +36,24 @@ is settled; what remained was mostly AST breadth, which done in Lean first is wr
   done afterwards, in `.syl` and Rust only.
 - `lowering` follows as `lowering-v3`.
 
-## Retiring Lean
+## Retiring the Lean checker
 
-This epic ends by deleting `lean/` and `sylGen`, once:
+This epic ends by deleting the Lean checker and its proofs (`lean/Semantics/Check/`,
+`lean/Semantics/Proofs/`, and whatever only they use), after `idris-retirement` has deleted
+`idris/` (the older workbench goes first; owner, 2026-11-02), and once:
 
 - per card, `discourse`'s bindings agree with the Lean oracle (below) across the whole corpus;
 - the exported fixture snapshot (below) passes;
 - `lean-proofs-spec-catalog`'s catalog exists as native Rust tests. After retirement it and the
   canon corpus are the only record of what must and must not check.
 
-The snapshot is then deleted, not maintained: its expected outputs are frozen once Lean is gone,
+The Lean mirror of the DSL stays (owner, 2026-11-02): the AST declarations and `sylGen`, which
+still compiles the `.syl` corpus into Lean, kept in case a later use for them turns up. Without the
+checker and the `decide` proofs it builds quickly. It is deleted too if that use does not
+materialise. Until then it is a second copy of the AST: a representation ticket that changes the
+AST updates it, and the design dialogue settles whether CI still builds it.
+
+The snapshot is deleted once the checker is, not maintained: its expected outputs are frozen then,
 and the first AST change after the port would break fixtures nothing can regenerate.
 
 ## Verification
