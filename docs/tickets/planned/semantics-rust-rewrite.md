@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-data-language, lean-v3-active-player-term, lean-v3-binding-across-or-arms, lean-v3-caller-argument-refusal-multiplicity, lean-v3-card-head-noun-sweep, lean-v3-cast-spell-anaphora-and-noted-mana, lean-v3-clash, lean-v3-colored-mana-spent-count, lean-v3-combat-damage-rule-rows, lean-v3-companion-pregame-rule, lean-v3-counted-pair-each-other, lean-v3-craft-materials, lean-v3-crewed-and-saddled-lookbacks, lean-v3-cross-ability-self-replacement, lean-v3-enlist-optional-attack-cost, lean-v3-hand-written-own-scope-bodies, lean-v3-keyword-body-spelling-gaps, lean-v3-later-ability-acts-before-earlier, lean-v3-literal-referent-id-pins, lean-v3-lose-control-event, lean-v3-owner-zone-introduces-owner, lean-v3-phasing-direct-phase-out, lean-v3-player-speed-rules, lean-v3-preposed-static-condition-ordering, lean-v3-regenerate-target-readback, lean-v3-same-color-mana-spent-count, lean-v3-single-use-as-though, lean-v3-turn-face-up-spend-cost, lean-v3-venture-dungeon, lean-defense-projection, lean-marked-damage-projection]
+needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-v3-active-player-term, lean-v3-binding-across-or-arms, lean-v3-caller-argument-refusal-multiplicity, lean-v3-card-head-noun-sweep, lean-v3-cast-spell-anaphora-and-noted-mana, lean-v3-clash, lean-v3-colored-mana-spent-count, lean-v3-combat-damage-rule-rows, lean-v3-companion-pregame-rule, lean-v3-counted-pair-each-other, lean-v3-craft-materials, lean-v3-crewed-and-saddled-lookbacks, lean-v3-cross-ability-self-replacement, lean-v3-enlist-optional-attack-cost, lean-v3-hand-written-own-scope-bodies, lean-v3-keyword-body-spelling-gaps, lean-v3-later-ability-acts-before-earlier, lean-v3-literal-referent-id-pins, lean-v3-lose-control-event, lean-v3-owner-zone-introduces-owner, lean-v3-phasing-direct-phase-out, lean-v3-player-speed-rules, lean-v3-preposed-static-condition-ordering, lean-v3-regenerate-target-readback, lean-v3-same-color-mana-spent-count, lean-v3-single-use-as-though, lean-v3-turn-face-up-spend-cost, lean-v3-venture-dungeon, lean-defense-projection, lean-marked-damage-projection]
 ---
 # [design] Rewrite the Rust semantics pipeline: `semantics`, `discourse`, `lowering`
 
@@ -10,8 +10,8 @@ tickets.
 `xtask expansions` when it converts the files. This epic starts from that state and builds three
 crates:
 
-- **`semantics`** parses the `.syl` grammar (`docs/decisions/semantics-v3.md` §4.4) into its AST and expands
-  Templates and Definitions. It does no reference resolution.
+- **`semantics`** resolves names by expected sort (§4.5) and expands Templates and Definitions over the `.syl` syntax tree
+  that `deckmaste_dsl` parses (`dsl-parser`; grammar in `docs/decisions/semantics-v3.md` §4.4). It does no reference resolution.
 - **`discourse`** implements the DRT referent resolution of `docs/decisions/semantics-v3.md` §1
   and §3 in Rust. Lean is never in the hot path of card compilation, so this is a
   reimplementation, not a reader of Lean output. The deleted `deckmaste_lowering_v3` had part of it; recover what is useful from jj history.
@@ -30,8 +30,8 @@ Start this only after:
 
 ## Verification
 
-The Rust `semantics` parser and the Lake generator parse the same `.syl` corpus to identical
-trees; a differential test over the whole corpus gates this.
+`deckmaste_dsl` and the Lake generator parse the same `.syl` corpus to identical trees;
+`dsl-parse-differential` gates this before the epic starts.
 
 The Lean checker is the oracle for `discourse`. Per card, Rust's resolved bindings (first and
 later mentions, `D′`, `AC>R1` choices) must match the bindings Lean's checker produces. Lean can
