@@ -2168,6 +2168,7 @@ dependencies = [
  "deckmaste_catalogs",
  "deckmaste_core",
  "deckmaste_data",
+ "deckmaste_dsl",
  "deckmaste_english",
  "deckmaste_legacy_render",
  "deckmaste_lexical",

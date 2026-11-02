@@ -10,6 +10,7 @@ use xtask::card::CardArgs;
 use xtask::catalogs::CatalogArgs;
 use xtask::cite::CiteArgs;
 use xtask::derive_cards::DeriveCardsArgs;
+use xtask::dsl::DslArgs;
 use xtask::english::EnglishArgs;
 use xtask::extract::ExtractArgs;
 use xtask::fidelity::FidelityArgs;
@@ -71,6 +72,9 @@ enum Cmd {
     IdrisCheck(IdrisCheckArgs),
     /// Build the native Lean workbench with warnings treated as errors.
     Lean(LeanArgs),
+    /// Check `deckmaste_dsl` against `SylGen`'s `.syl` parser over
+    /// `plugins_v3`.
+    Dsl(DslArgs),
     /// On-demand "bearings" dumps of current code shape (`enums`/`idris`).
     Map(MapArgs),
     /// Write one identity-macro scaffold per reachable variant that needs
@@ -102,6 +106,7 @@ fn main() -> anyhow::Result<()> {
         }
         Cmd::IdrisCheck(args) => xtask::idris_check::run(&args),
         Cmd::Lean(args) => xtask::lean::run(&args),
+        Cmd::Dsl(args) => xtask::dsl::run(&args),
         Cmd::Map(args) => xtask::map::run(&args),
         Cmd::ScaffoldIdentity(args) => xtask::authoring::run(&args),
     }
