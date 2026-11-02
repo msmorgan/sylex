@@ -109,13 +109,6 @@ def Deed.permanentActor : Deed → Bool
   | .action _ .performs => true
   | _ => false
 
-/-- Whether `v` is an instruction about "this permanent" that the ability's controller follows
-(`DeedPermanent.isAbout`): the permanent is what the deed is done to, not its performer
-[CR#701.46a,608.2c]. -/
-def Deed.aboutAPermanent : Deed → Bool
-  | .action _ .isAbout => true
-  | _ => false
-
 /-- The deed a search (`Action.search`) stamps on what it finds [CR#701.23a]: a card found by
 searching a library is read back as searched for, and survives the shuffle that follows, whatever
 later deeds stamp it. -/

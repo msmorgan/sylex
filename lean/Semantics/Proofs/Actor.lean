@@ -681,28 +681,8 @@ No table says which deeds a permanent performs. A keyword action a permanent per
 performer in its Definition body, so a player handed one is refused by ordinary reference
 resolution and kind agreement in that body: explore and endure ask for the performer's
 controller [CR#701.44a,701.63a], and fight reads its power [CR#701.14a]. Adapt and monstrosity
-are instructions about "this permanent" [CR#701.46a,701.37a] (`DeedPermanent.isAbout`): a
-handoff names the permanent they are about, which the body reads, so a player handed one is
-refused the same way, while the controller follows them [CR#608.2c,701.37c]. -/
-
-/-- "Target opponent adapts 2": the adapt is about a permanent, and a player is none; the body's
-counter read of it is refused [CR#701.46a]. -/
-theorem badAdaptHandedToOpponent :
-    Action.check (DRS.ofList []) (instruct (target (.isOpponentOf .you)) (adapt 2))
-      = [.kindMismatch .object .player] := by
-  decide
-
-/-- "Target creature adapts 2" and "This creature adapts 2": the adapt is about the creature the
-handoff names, so the counters go on it and it is what the adapt acted on, while the controller
-performs it [CR#701.46a,608.2c]. -/
-theorem okAdaptHandedToAPermanent :
-    let out := stepAction 64 .postEvent .obj (DRS.ofList []) (instruct (target isCreature) (adapt 2))
-    out.2 = [] ∧
-      (out.1.referents.filter (·.stampedBy adapt.deed)).map (·.det) = [.target] ∧
-      (out.1.causedEvents.filter (·.deed == some adapt.deed)).map (fun e => (e.performer, e.patient))
-        = [(some .player, some .object)] ∧
-      Action.check (DRS.ofList []) (instruct thisCreature (adapt 2)) = [] := by
-  decide
+are instructions about "this permanent", the Source, that the controller follows
+[CR#701.46a,701.37a,608.2c,701.37c]: their bodies name `thisPermanent`, so no handoff renames it. -/
 
 /-- "Target opponent explores", with the authored `explore`: the body asks for the player's
 controller. -/
@@ -720,16 +700,6 @@ theorem badEndureHandedToOpponent :
       Action.check (DRS.ofList []) (instruct (target isCreature) (endure 1)) = [] := by
   decide
 
-/-- "Target opponent monstrosities 2": the monstrosity is about a permanent [CR#701.37a], and the
-body reads the player's designation, which "monstrous" is not. Bare, or handed a creature, it
-checks. -/
-theorem badMonstrosityHandedToOpponent :
-    Action.check (DRS.ofList []) (instruct (target (.isOpponentOf .you)) (monstrosity 2))
-      = [.kindMismatch .object .player, .designationScope (.named "monstrous" (.heldBy .object))] ∧
-      Action.check (DRS.ofList []) (monstrosity 2) = [] ∧
-      Action.check (DRS.ofList []) (instruct (target isCreature) (monstrosity 2)) = [] := by
-  decide
-
 /-- "Target opponent fights target creature": the body reads the player's power for the damage
 it deals and as the creature's recipient. -/
 theorem badFightHandedToOpponent :
@@ -737,13 +707,11 @@ theorem badFightHandedToOpponent :
       = [.kindMismatch .object .player, .kindMismatch .object .player] := by
   decide
 
-/-- "Players can't explore" and "Players can't adapt": the prohibited deed's body is checked
-with the players as the permanent it performs or is about, and refused the same way. -/
-theorem badPlayersCantExploreOrAdapt :
+/-- "Players can't explore": the prohibited deed's body is checked with the players as the
+permanent it performs, and refused the same way. -/
+theorem badPlayersCantExplore :
     StaticSpec.check (DRS.ofList []) (.cant (.actor (allOf .isPlayer)) explore {})
         = [.possessorKind .controller .player] ∧
-      StaticSpec.check (DRS.ofList []) (.cant (.actor (allOf .isPlayer)) (adapt 1) {})
-        = [.kindMismatch .object .player] ∧
       StaticSpec.check (DRS.ofList []) (.cant (.actor (allOf isCreature)) explore {}) = [] := by
   decide
 

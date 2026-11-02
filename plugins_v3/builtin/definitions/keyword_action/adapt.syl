@@ -1,12 +1,9 @@
 # "adapt N" with its reminder text (`Definition`, [CR#701.46a]): an instruction about "this
-# permanent" (`DeedPermanent.isAbout`), the Source unless a handoff names another ("target creature
-# adapts"), that the ability's controller follows [CR#608.2c]; the body reads that permanent as
-# `.actor`.
+# permanent", the Source, that the ability's controller follows [CR#608.2c].
 action adapt(amount: Amount) {
   lexical = {verbs = [{lemma = "adapt", frames = [Amount, Intransitive]}]},
-  permanent = isAbout,
   spelling = "adapt <amount>",
   body = doIf(
-    not(is(actor, hasCounter(p1p1Counter))),
-    putCounters($amount, printedKind(p1p1Counter), actor))
+    not(is(thisPermanent, hasCounter(p1p1Counter))),
+    putCounters($amount, printedKind(p1p1Counter), thisPermanent))
 }

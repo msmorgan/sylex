@@ -75,16 +75,14 @@ theorem hexproofAndCyclingVariantsShareTheirKeyword :
 
 /-- A permanent is instructed to perform these four keyword actions, so each Definition's
 generated deed says a Permanent performs it [CR#701.14a,701.44a,701.50a,701.63a]; adapt and
-monstrosity are instructions about "this permanent" that the ability's controller follows
-[CR#701.46a,701.37a,608.2c], so their deeds say they are about one; harness names its subject
+monstrosity are instructions about "this permanent", the Source, that the ability's controller
+follows [CR#701.46a,701.37a,608.2c], so no permanent performs them; harness names its subject
 [CR#701.64a], and a player performs a search, an exile, a scry, a sacrifice, a destroy and a
 shuffle. -/
 theorem permanentPerformedActions :
     [connive.deed, endure.deed, explore.deed, fight.deed].all (·.permanentActor) = true ∧
-      [adapt.deed, monstrosity.deed].all (·.aboutAPermanent) = true ∧
       [adapt.deed, harness.deed, monstrosity.deed, search.deed, exile.deed, scry.deed,
-        sacrifice.deed, destroy.deed, shuffle.deed].all (!·.permanentActor) = true ∧
-      [explore.deed, harness.deed, search.deed].all (!·.aboutAPermanent) = true := by decide
+        sacrifice.deed, destroy.deed, shuffle.deed].all (!·.permanentActor) = true := by decide
 
 /-! ## Card types read back -/
 

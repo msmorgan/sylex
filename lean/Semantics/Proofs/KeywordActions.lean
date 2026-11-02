@@ -97,6 +97,11 @@ theorem okManifestDread : Action.check (DRS.ofList []) manifestDread = [] := by 
 /-- "Support 2" [CR#701.41a]. -/
 theorem okSupport : Action.check (DRS.ofList []) (support 2) = [] := by decide
 
+/-- "Support 2" on an instant: with no other anchor in scope, `isOther` contrasts with the Source,
+so every creature is "other" [CR#701.41a]. -/
+theorem okSupportOnAnInstant :
+    Action.check { DRS.ofList [] with sourceTypes := [.instant] } (support 2) = [] := by decide
+
 /-- "Cast target instant or sorcery card" [CR#701.5a], "play target land card without paying"
 [CR#701.18a] and "activate target activated ability" [CR#701.2a]: the procedures as
 actions. -/

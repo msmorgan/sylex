@@ -221,31 +221,13 @@ def docSamsonDistributive : Ability :=
     (instead (putCounters (plus thatMuch 1) thoseCounters (that permanent))))
 theorem okDocSamsonDistributive : Ability.check (DRS.ofList []) docSamsonDistributive = [] := by decide
 
-/-- Adapt is an instruction about "this permanent" that you, its controller, follow
+/-- Adapt is an instruction about "this permanent", the Source, that you, its controller, follow
 [CR#701.46a,608.2c], so the counters it puts are ones you put: Doc Samson's "if you would put"
 watches them. -/
 theorem docSamsonWatchesAdaptsCounters :
     let watched := docSamsonWatched.describedEvents (some .player)
     let adapted := (stepAction 64 .postEvent .obj (DRS.ofList []) (adapt 2)).1.causedEvents
     watched ≠ [] ∧ watched.all adapted.contains = true := by
-  decide
-
-/-- *Biomancer's Familiar*: "{T}: The next time target creature adapts this turn, it adapts as
-though it had no +1/+1 counters on it." Its "target creature adapts" describes the adapt the
-creature undergoes, done by a player, as a resolving "target creature adapts 2" causes it: the
-creature is what the adapt acts on and carries its stamp, not the Source [CR#701.46a,608.2c].
-The card itself is unspelled until `lean-v3-single-use-as-though` gives an as-though statement
-its single use. -/
-theorem biomancersFamiliarWatchesTheCreatureThatAdapts :
-    let described := (adapt anyAmount).describedEvents (some .object)
-    let adapted := (stepGameEvent 64 (DRS.ofList []) (.does (.actor (target isCreature)) (adapt 2))).1
-    let resolved := (stepAction 64 .postEvent .obj (DRS.ofList [])
-      (instruct (target isCreature) (adapt 2))).1.causedEvents
-    described.map (fun e => (e.deed, e.performer, e.patient)) =
-        [(some adapt.deed, none, some .object)] ∧
-      (adapted.referents.filter (·.stampedBy adapt.deed)).map (·.det) = [.target] ∧
-      resolved.any (fun e => e.deed == some adapt.deed && e.performer == some .player &&
-        e.subjectFits (some .object) true) = true := by
   decide
 
 /-- Aragorn, Company Leader -/

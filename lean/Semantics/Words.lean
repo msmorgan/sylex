@@ -387,10 +387,6 @@ inductive DeedPermanent where
   | none
   /-- A permanent is instructed to perform it [CR#701.14a,701.44a,701.50a,701.63a]. -/
   | performs
-  /-- It is an instruction about "this permanent" that the ability's controller follows
-  [CR#701.46a,701.37a,608.2c]: "target creature adapts" is the adapt whose "this permanent" is the
-  creature. -/
-  | isAbout
   deriving DecidableEq, Repr
 
 /-- A deed: something a card's text says is done. Three sources define one, and only the middle

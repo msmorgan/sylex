@@ -1214,7 +1214,7 @@ dies" [CR#700.4], "a land enters", "it phases out". -/
 def Action.subjectIsPatient (action : Action) : Bool :=
   match action.canonicalPatient with
   | some .actor => true
-  | _ => action.ownDeed?.any (·.aboutAPermanent)
+  | _ => false
 
 /-- The event `inst` describes, by the Deed that names it, the Zone Change it writes and its
 classes (`CausedEvent`), done by an Actor of kind `performer` to something of kind `patient`, if
@@ -1247,28 +1247,19 @@ def Action.describedEvents (action : Action) (subject : Option Kind) : List Caus
     if layer.subjectIsPatient then layer.causedEvent none subject
     else layer.causedEvent subject (layer.scopeBody.canonicalPatient.bind (·.kind?))
 
-/-- The kind of the Actor who does `inst` in `drs`: the controller, a player, for an instruction
-about "this permanent" and for each step of its body, whatever permanent it is about (its frame
-names that permanent, which the body reads as `.actor`) [CR#608.2c,701.46a]; otherwise the
-innermost handoff's performer, the source permanent for a deed a permanent performs with no
-handoff to one ([CR#701.44a]), or else the controller [CR#109.5]. -/
+/-- The kind of the Actor who does `inst` in `drs`: the innermost handoff's
+performer, the source permanent for a deed a permanent performs with no handoff to one
+([CR#701.44a]), or else the controller [CR#109.5]. -/
 def causedPerformer (drs : DRS) (inst : Action) : Kind :=
   let actor := actorShape? drs
-  if inst.ownDeed?.any (·.aboutAPermanent) ||
-      drs.scopeStack.any (·.deed.any (·.aboutAPermanent)) then .player
-  else if (inst.ownDeed?.any (·.permanentActor)) && actor.all (·.isYou) then .object
+  if (inst.ownDeed?.any (·.permanentActor)) && actor.all (·.isYou) then .object
   else actor.elim .player (·.kind)
 
-/-- The kind of what `inst` acts on in `drs`, if known: its written patient, or, for an
-instruction about "this permanent" (`Deed.aboutAPermanent`), the permanent the handoff names, the
-Source with none [CR#701.46a]. -/
+/-- The kind of what `inst` acts on in `drs`, if known: its written patient, if any. -/
 def causedPatient (drs : DRS) (inst : Action) : Option Kind :=
   match inst.scopeBody.canonicalPatient with
   | some patient => some (patient.kindIn drs .object)
-  | none =>
-    if inst.ownDeed?.any (·.aboutAPermanent) then
-      some ((actorShape? drs).filter (!·.isYou) |>.elim .object (·.kind))
-    else none
+  | none => none
 
 /-- `after`, what stepping `inst` from `before` produced, with the event `inst` caused recorded
 when it is a resolving or paid action, not a pattern a lookback, trigger or replacement
@@ -3665,7 +3656,7 @@ def stepOps : Nat → StepOps
           -- it, and a resolving or paid step stamps it on what the body acts on.
           let innerDrs := enterOwnScope drs (some verb)
           let actor := actorShape? innerDrs
-          let defaultsToSource := (verb.permanentActor || verb.aboutAPermanent) &&
+          let defaultsToSource := verb.permanentActor &&
             actor.all (·.isYou)
           let (inner, selves, sourceErrors) := if defaultsToSource then
             let (out, ids, errors) := ops.np innerDrs .subj true (.headed .permanent .this)
