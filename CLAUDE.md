@@ -100,9 +100,8 @@ them.
 
 ## Assurance
 
-- Never make a change pass by removing or weakening the check that would fail. If a test fails
-  and what it asserts is still wanted, fix the code. A genuine regression is a successful find:
-  fix it; stop only if the fix fails, leaves the ticket, or needs a decision.
+- If a test fails and what it asserts is still wanted, fix the code. A genuine regression is a
+  successful find: fix it; stop only if the fix fails, leaves the ticket, or needs a decision.
 - Never enshrine preliminary-investigation misses or model/grammar/checker defects in an ADR,
   contract, ticket, or test as "known-wrong", accepted silent errors, or permanent manual
   workarounds/escape hatches. Fix the underlying defect or ticket the fix.
