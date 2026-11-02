@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
 ---
 # Enlist: an optional cost to attack and its linked trigger
 
@@ -10,7 +10,7 @@ you didn't choose to attack with and that either has haste or has been under you
 continuously since this turn began. When you do, this creature gets +X/+0 until end of turn,
 where X is the tapped creature's power." [CR#702.154a]. Its static ability is an optional cost
 to attack [CR#508.1g,702.154b], and its triggered ability is linked to it [CR#607.2h]. `enlist`
-(`Definitions/Keywords.lean`) is bodiless.
+(`plugins_v3/builtin/definitions/keyword_ability/enlist.syl`) is bodiless.
 
 Decided (from ADR `semantics-v3.md` §0.1 items 4 and 5): extend the cost-to-attack form,
 `StaticSpec.gatedBy`, with an `offered` flag. An offered gate is a cost the player may pay as

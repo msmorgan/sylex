@@ -1,12 +1,14 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
 ---
 # Restore the printed head nouns that card spellings drop
 
 Standard constraints apply. Found by the 2026-10-25 triage of an external audit ("Atraxa"),
-verified against the tree at `wmyykqnv`. Fragment paths are under `lean/Semantics/`; line numbers are historical, as
-of that change. Whole-card declarations now use anonymous `card :=` syntax in
-`plugins_v3/canon/cards/`, with the current paths listed below.
+verified against the tree at `wmyykqnv`. Fragment paths are Lean proof-suite files under
+`lean/Semantics/`, which `semantics-rust-rewrite` carries to Rust tests; edit each fragment where
+it lives then, finding it by its identifier (line numbers are historical, as of that change).
+Whole-card declarations are `.syl` in `plugins_v3/canon/cards/`, with the current paths listed
+below. Test names below are the Lean pin names.
 
 A Head Noun narrows what a phrase is known to be (`docs/contexts/game-model/CONTEXT.md`, **Head
 Noun**, [CR#109.1,205.2a]). Where Oracle prints "permanent", "card" or "creature", the spelling
@@ -14,9 +16,11 @@ writes the matching predicate. The rulings already in force: `lean-v3-authoring-
 (`docs/tickets/done/lean-v3-authoring-surface.md:552`) gives the canonical spellings
 `and [isCard, in_ yourGraveyard]`, `and [isCreature, isCard, in_ yourHand]` and
 `and [isCard, in_ (exiledWith thisArtifact)]`, and `lean-v3-typed-verbed-deeds` rewrote sites "to
-match their Oracle text … actual head nouns". The Templates are `isPermanent` (`Templates.lean:390`,
-`.in_ battlefield`), `isCard` (`:393`) and `cardIn` (`:616`, `and [isCard, in_ zone]`).
-`youControl` and `controlledBy` (`:469`, `:467`) are possessor tests only and do not imply the
+match their Oracle text … actual head nouns". The Templates are `isPermanent`
+(`plugins_v3/builtin/templates/predicate/isPermanent.syl`, `.in_ battlefield`), `isCard` (primitive,
+`plugins_v3/builtin/primitives/predicate/isCard.syl`) and `cardIn`
+(`plugins_v3/builtin/templates/predicate/cardIn.syl`, `and [isCard, in_ zone]`). `youControl` and
+`controlledBy` (`youControl.syl`, `controlledBy.syl` in the same directory) are possessor tests only and do not imply the
 battlefield, so dropping "permanent" widens the set to spells you control.
 
 The sites using `exiledWithThisArtifact` (Muse Vessel, Synod Sanctum, Chrome Mox, Ice Cauldron,
@@ -110,15 +114,15 @@ pinned by `okFiresongAndSunspeaker` (`Proofs/CardsKeyword.lean:166`). If `thatJo
 
 ## What must not change
 
-- No Template, Definition, Core constructor or checker code changes. This ticket edits canon card declarations and their proof fragments
-  only.
+- No Template, Definition, Core constructor or `discourse` code changes. This ticket edits canon
+  card declarations and the carried-over fragment tests only.
 - Do not change a site's determiner, quantity, zone or any other conjunct beyond what is listed.
-- No pin may be weakened. Every `spelled` card and `ok…` pin named or implied above must stay
+- No test may be weakened. Every spelled card and `ok…` test named or implied above must stay
   green. If a head-noun insertion makes a pin fail (for example a later "that card" or "it" now
   resolves differently), STOP and report the site, the pin and the refusal; do not drop the
   head noun to make it pass.
 
-## Pins
+## Tests
 
 - Rewritten in place by the edits (their trees change, their claims stay): `okAlaundoTheSeer`
   (`Proofs/CardsCounters.lean:48`), `okMyrWelderBorrowedAbilities` (`Proofs/CardsStatic.lean:780`),
@@ -134,76 +138,75 @@ pinned by `okFiresongAndSunspeaker` (`Proofs/CardsKeyword.lean:166`). If `thatJo
   `Proofs/Counters.lean:781`, `costCoercionsKeepTheCard` (`Proofs/Authoring.lean:414`) and
   `Proofs/Mana.lean:385`. Where a pin states a term equality against a copied tree, update the
   copy in lockstep.
-- Add one pin: `seedbornMuseUntapsOnlyPermanents` in `Proofs/CardFidelity.lean`, asserting that
-  Seedborn Muse's untap patient carries `isPermanent` (a `decide` or `rfl` over the spelled
-  card's static).
+- Add one test: `seedbornMuseUntapsOnlyPermanents`, beside the carried-over
+  `Proofs/CardFidelity.lean` tests, asserting that Seedborn Muse's untap patient carries
+  `isPermanent` (over the spelled card's static).
 - Retired: `okFiresongJoinEcho` (§3), because it asserts a non-card.
 
 ## Acceptance
 
-- `./lean/scripts/build` passes with `--wfail`, no `sorry`.
-- `cargo xtask lean check`.
-- `rg 'allOf youControl' plugins_v3/canon/cards lean/Semantics/Proofs/Cards*.lean` is empty; the 20 §1 rows and every §2 line
-  carry the head noun.
+- `cargo test` and `cargo clippy --tests -- -D warnings` for `semantics` and `discourse`.
+- `rg 'allOf\(youControl\)' plugins_v3/canon/cards` is empty, and no carried-over fragment test
+  writes `allOf youControl`; the 20 §1 rows and every §2 line carry the head noun.
 - CR citation gates: `cargo xtask cite check --list-noncompliant` empty, `cargo xtask cite check`
   0 stale.
 
 ## Not in this ticket
 
 - Rogue Class's and Summon: Esper Valigarmanda's `toCast (in_ (exiledWith …))`
-  (`Proofs/CardsChoice.lean:1292`, `:1280-1285`) re-describe "those spells" without anaphora; that is an
-  open question for the owner, not a head-noun fix.
-- Ice Cauldron (`Proofs/CardsMana.lean:1026-1031`) adds 1 mana for "this artifact's last noted type and
-  amount of mana" and drops "last" from "the last card exiled with this artifact". It needs a
-  spelling decision; it is reported to the owner.
+  (`Proofs/CardsChoice.lean`) re-describe "those spells" without anaphora; that is
+  `discourse-cast-permission-publishes-spell`, not a head-noun fix.
+- Ice Cauldron (`Proofs/CardsMana.lean`) adds 1 mana for "this artifact's last noted type and
+  amount of mana" and drops "last" from "the last card exiled with this artifact"; that is
+  `lean-v3-cast-spell-anaphora-and-noted-mana` Part 2.
 
 ## Current whole-card paths
 
-Fragment definitions keep their identifiers. Whole-card identifiers have been replaced by
-printed-name lookup. Edit the anonymous declarations at the following paths and read them with
-`cardNamed "<Printed Name>"`. Multipart keys include both printed names.
+Fragment definitions keep their identifiers. Whole cards are looked up by printed name (Lean's
+`cardNamed "<Printed Name>"` above). Edit the declarations at the following paths. Multipart keys
+include both printed names.
 
 | Printed name | Canon file |
 |---|---|
-| Abolish | `plugins_v3/canon/cards/Abolish.lean` |
-| Ashes of the Fallen | `plugins_v3/canon/cards/Ashes of the Fallen.lean` |
-| Aven Shrine | `plugins_v3/canon/cards/Aven Shrine.lean` |
-| Blatant Thievery | `plugins_v3/canon/cards/Blatant Thievery.lean` |
-| Blazing Shoal | `plugins_v3/canon/cards/Blazing Shoal.lean` |
-| Bleeding Effect | `plugins_v3/canon/cards/Bleeding Effect.lean` |
-| Bloodfire Enforcers | `plugins_v3/canon/cards/Bloodfire Enforcers.lean` |
-| Cairn Wanderer | `plugins_v3/canon/cards/Cairn Wanderer.lean` |
-| Carrion Grub | `plugins_v3/canon/cards/Carrion Grub.lean` |
-| Celebrate the Harvest | `plugins_v3/canon/cards/Celebrate the Harvest.lean` |
-| Charnel Troll | `plugins_v3/canon/cards/Charnel Troll.lean` |
-| Chrome Mox | `plugins_v3/canon/cards/Chrome Mox.lean` |
-| Cold Storage | `plugins_v3/canon/cards/Cold Storage.lean` |
-| Crypt Lurker | `plugins_v3/canon/cards/Crypt Lurker.lean` |
-| Cultivator Colossus | `plugins_v3/canon/cards/Cultivator Colossus.lean` |
-| Custodi Squire | `plugins_v3/canon/cards/Custodi Squire.lean` |
-| Death or Glory | `plugins_v3/canon/cards/Death or Glory.lean` |
-| Death-Mask Duplicant | `plugins_v3/canon/cards/Death-Mask Duplicant.lean` |
-| Delivery Moogle | `plugins_v3/canon/cards/Delivery Moogle.lean` |
-| Disrupting Shoal | `plugins_v3/canon/cards/Disrupting Shoal.lean` |
-| Drach'Nyen | `plugins_v3/canon/cards/Drach'Nyen.lean` |
-| Force of Will | `plugins_v3/canon/cards/Force of Will.lean` |
-| Garruk Relentless // Garruk, the Veil-Cursed | `plugins_v3/canon/cards/Garruk Relentless {slash}{slash} Garruk, the Veil-Cursed.lean` |
-| Land Tax | `plugins_v3/canon/cards/Land Tax.lean` |
-| Midnight Scavengers // Chittering Host | `plugins_v3/canon/cards/Midnight Scavengers {slash}{slash} Chittering Host.lean` |
-| Mox Diamond | `plugins_v3/canon/cards/Mox Diamond.lean` |
-| Nourishing Shoal | `plugins_v3/canon/cards/Nourishing Shoal.lean` |
-| Old-Growth Dryads | `plugins_v3/canon/cards/Old-Growth Dryads.lean` |
-| Rogues' Gallery | `plugins_v3/canon/cards/Rogues' Gallery.lean` |
-| Rune Snag | `plugins_v3/canon/cards/Rune Snag.lean` |
-| Scapeshift | `plugins_v3/canon/cards/Scapeshift.lean` |
-| Seedborn Muse | `plugins_v3/canon/cards/Seedborn Muse.lean` |
-| Shining Shoal | `plugins_v3/canon/cards/Shining Shoal.lean` |
-| Sickening Shoal | `plugins_v3/canon/cards/Sickening Shoal.lean` |
-| Sphinx of the Chimes | `plugins_v3/canon/cards/Sphinx of the Chimes.lean` |
-| Sunscour | `plugins_v3/canon/cards/Sunscour.lean` |
-| Syr Konrad, the Grim | `plugins_v3/canon/cards/Syr Konrad, the Grim.lean` |
-| Thawing Glaciers | `plugins_v3/canon/cards/Thawing Glaciers.lean` |
-| Tower Winder | `plugins_v3/canon/cards/Tower Winder.lean` |
-| Urborg Scavengers | `plugins_v3/canon/cards/Urborg Scavengers.lean` |
-| Voracious Brood | `plugins_v3/canon/cards/Voracious Brood.lean` |
-| Vraska's Scorn | `plugins_v3/canon/cards/Vraska's Scorn.lean` |
+| Abolish | `plugins_v3/canon/cards/Abolish.syl` |
+| Ashes of the Fallen | `plugins_v3/canon/cards/Ashes of the Fallen.syl` |
+| Aven Shrine | `plugins_v3/canon/cards/Aven Shrine.syl` |
+| Blatant Thievery | `plugins_v3/canon/cards/Blatant Thievery.syl` |
+| Blazing Shoal | `plugins_v3/canon/cards/Blazing Shoal.syl` |
+| Bleeding Effect | `plugins_v3/canon/cards/Bleeding Effect.syl` |
+| Bloodfire Enforcers | `plugins_v3/canon/cards/Bloodfire Enforcers.syl` |
+| Cairn Wanderer | `plugins_v3/canon/cards/Cairn Wanderer.syl` |
+| Carrion Grub | `plugins_v3/canon/cards/Carrion Grub.syl` |
+| Celebrate the Harvest | `plugins_v3/canon/cards/Celebrate the Harvest.syl` |
+| Charnel Troll | `plugins_v3/canon/cards/Charnel Troll.syl` |
+| Chrome Mox | `plugins_v3/canon/cards/Chrome Mox.syl` |
+| Cold Storage | `plugins_v3/canon/cards/Cold Storage.syl` |
+| Crypt Lurker | `plugins_v3/canon/cards/Crypt Lurker.syl` |
+| Cultivator Colossus | `plugins_v3/canon/cards/Cultivator Colossus.syl` |
+| Custodi Squire | `plugins_v3/canon/cards/Custodi Squire.syl` |
+| Death or Glory | `plugins_v3/canon/cards/Death or Glory.syl` |
+| Death-Mask Duplicant | `plugins_v3/canon/cards/Death-Mask Duplicant.syl` |
+| Delivery Moogle | `plugins_v3/canon/cards/Delivery Moogle.syl` |
+| Disrupting Shoal | `plugins_v3/canon/cards/Disrupting Shoal.syl` |
+| Drach'Nyen | `plugins_v3/canon/cards/Drach'Nyen.syl` |
+| Force of Will | `plugins_v3/canon/cards/Force of Will.syl` |
+| Garruk Relentless // Garruk, the Veil-Cursed | `plugins_v3/canon/cards/Garruk Relentless {slash}{slash} Garruk, the Veil-Cursed.syl` |
+| Land Tax | `plugins_v3/canon/cards/Land Tax.syl` |
+| Midnight Scavengers // Chittering Host | `plugins_v3/canon/cards/Midnight Scavengers {slash}{slash} Chittering Host.syl` |
+| Mox Diamond | `plugins_v3/canon/cards/Mox Diamond.syl` |
+| Nourishing Shoal | `plugins_v3/canon/cards/Nourishing Shoal.syl` |
+| Old-Growth Dryads | `plugins_v3/canon/cards/Old-Growth Dryads.syl` |
+| Rogues' Gallery | `plugins_v3/canon/cards/Rogues' Gallery.syl` |
+| Rune Snag | `plugins_v3/canon/cards/Rune Snag.syl` |
+| Scapeshift | `plugins_v3/canon/cards/Scapeshift.syl` |
+| Seedborn Muse | `plugins_v3/canon/cards/Seedborn Muse.syl` |
+| Shining Shoal | `plugins_v3/canon/cards/Shining Shoal.syl` |
+| Sickening Shoal | `plugins_v3/canon/cards/Sickening Shoal.syl` |
+| Sphinx of the Chimes | `plugins_v3/canon/cards/Sphinx of the Chimes.syl` |
+| Sunscour | `plugins_v3/canon/cards/Sunscour.syl` |
+| Syr Konrad, the Grim | `plugins_v3/canon/cards/Syr Konrad, the Grim.syl` |
+| Thawing Glaciers | `plugins_v3/canon/cards/Thawing Glaciers.syl` |
+| Tower Winder | `plugins_v3/canon/cards/Tower Winder.syl` |
+| Urborg Scavengers | `plugins_v3/canon/cards/Urborg Scavengers.syl` |
+| Voracious Brood | `plugins_v3/canon/cards/Voracious Brood.syl` |
+| Vraska's Scorn | `plugins_v3/canon/cards/Vraska's Scorn.syl` |

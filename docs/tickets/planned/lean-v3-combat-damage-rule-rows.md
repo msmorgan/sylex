@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
 ---
 # Combat damage rules as rows: first strike, double strike, trample, banding, deathtouch
 
@@ -14,10 +14,7 @@ modifies declaring attackers and who assigns a banded creature's damage
 
 Rules are DSL data (`docs/decisions/semantics-v3.md` §0.1 item 4), so these are rules-table rows,
 not engine procedure and not keyword bodies: each keyword stays bodiless, and its row reads it
-with `hasKeyword`, as toxic's damage-result row reads toxic (`Proofs/Rules.lean`, `toxicPoison`).
+with `hasKeyword`, as toxic's damage-result row reads toxic (`plugins_v3/builtin/rules/conferral/toxicPoison.syl`).
 Compose the rows from existing primitives first (ADR item 5b); a turn-based action is a
 `Conferral.turnBased` row. Which creature assigns damage when, the order among simultaneous
 assignments and APNAP order stay the engine's.
-
-`lean/CONTRACTS.md` "Keyword abilities with no body" points here for these keywords; update it
-when the rows land.

@@ -7,7 +7,7 @@ Sibling of `deckmaste_lowering`; v1 lowering deletes at cutover. Same contract
 as `semantics-spelling-lowering.md` §9 and §17 and `core-explicit-regions.md`:
 one-way compile, the crate is the divergence ledger, and rearrangement,
 hoisting, and register indexing happen here. May fail on a card that breaks a
-Lean law; does not validate. Standard constraints apply.
+`discourse` law; does not validate. Standard constraints apply.
 
 ## Lowering Seams (`discourse` → `deckmaste_core`)
 
@@ -37,7 +37,7 @@ Lean law; does not validate. Standard constraints apply.
      corresponding primitive `core::EventFilter` / `core::DeonticAction`).
 3. **Unified Action-Clause Spine (`does`, `would`, `did`, `cant`/`must`/`may`/`gatedBy`) to `core::EventFilter`, `core::Replacement`, `core::Lookback`, and `core::Deontic`:**
    - Compiles `GameEvent.does(subj, action)` (over the closed set of
-     event-capable `Instruction` heads enforced by `Check/Events.lean`,
+     event-capable `Instruction` heads enforced by `discourse`,
      `semantics-v3.md` §3.6) to `core::EventFilter`, routing `Subject.actor np`,
      `Subject.any`, and `Subject.by np` into the event filter's actor/source/cause
      fields and the `Instruction`'s patient/destination fields into the event
@@ -47,7 +47,7 @@ Lean law; does not validate. Standard constraints apply.
      `core::Replacement` (`[CR#614.1,614.6]`), `DidClause` (`Condition.did`,
      `Predicate.did` with `NounPhrase.which`, `Amount.tally`) to `core::Lookback`,
      and `StaticSpec.cant` / `must` / `may` / `gatedBy` (over the closed set of
-     deontic-capable `Instruction` heads enforced by `Check/Abilities.lean`,
+     deontic-capable `Instruction` heads enforced by `discourse`,
      `semantics-v3.md` §3.7) to `core::Deontic` (`core::DeonticAction`).
 4. **Action Costs (`Cost.perform(action)`) across `cost : effect`:**
    - Compiles `Cost.perform(action)` to `core::CostComponent` /

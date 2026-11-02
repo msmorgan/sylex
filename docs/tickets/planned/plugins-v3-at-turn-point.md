@@ -1,14 +1,14 @@
 ---
-needs: [plugins-v3-data-language]
+needs: [plugins-v3-data-language, semantics-rust-rewrite]
 ---
 # `at_` takes a turn point; `when` and `whenever` take an event
 
-Standard constraints apply. Implement in the `plugins-v3-data-language` grammar, in Lean only:
-the Rust crates are being rewritten (`semantics-rust-rewrite`).
+Standard constraints apply. Implement in the `plugins-v3-data-language` grammar, in `.syl` and
+Rust `semantics` (after `semantics-rust-rewrite`; Lean is retired).
 
 ## The defect
 
-`templates/ability/{when,whenever,at_}.lean` have identical signatures and bodies: all three
+`plugins_v3/builtin/templates/ability/{when,whenever,at_}.syl` have identical signatures and bodies: all three
 take `event : GameEvent` and expand to the single `triggered` primitive. So `at_ (does it enter)`
 type-checks, even though no card is printed that way.
 
@@ -41,8 +41,8 @@ same kind of thing:
 
 ## Acceptance
 
-- `at_ (does it enter)` and `whenever (beginningOfYour upkeep)` fail to elaborate, pinned by
-  negative Lean tests.
-- The Lean dump (`lean-elaborated-value-dump`) shows 0 differences, apart from keys this
-  ticket renames, each listed.
-- Gate: `cargo xtask lean check`.
+- `at_ (does it enter)` and `whenever (beginningOfYour upkeep)` are refused, pinned by negative
+  Rust `semantics` tests.
+- Rust `semantics` expansions of the corpus, compared before and after, show 0 differences, apart
+  from keys this ticket renames, each listed.
+- Gate: `cargo test` and `cargo clippy --tests -- -D warnings` for `semantics`.

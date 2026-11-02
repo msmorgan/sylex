@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
 ---
 # Companion's pregame reveal as a start-of-game rule
 
@@ -9,7 +9,7 @@ Standard constraints apply.
 ability whose condition is fulfilled by your starting deck" [CR#702.139a,103.2b]. This is a
 start-of-game rule, a rules-table row (`docs/decisions/semantics-v3.md` §0.1 item 4), not part
 of the keyword's in-game body. `companion`'s body writes the in-game special action
-[CR#116.2g] (`Definitions/Keywords.lean`). It does not yet restrict it to the card revealed
+[CR#116.2g] (`plugins_v3/builtin/definitions/keyword_ability/companion.syl`). It does not yet restrict it to the card revealed
 this way.
 
 Write the row: the reveal, its condition read through the keyword's `DeckCondition` against the

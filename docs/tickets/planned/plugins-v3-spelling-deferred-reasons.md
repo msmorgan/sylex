@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [semantics-rust-rewrite]
 ---
 # Replace the generated bucket-3 `TODO(spelling)` reasons with real ones
 
@@ -34,5 +34,5 @@ Revisit each of the 123 markers:
 
 - Zero remaining markers carry either generated text.
 - Every remaining marker names something specific.
-- The expansion baseline shows only `spelling` differences, each one `--expect`ed and its diff
-  read.
+- Rust `semantics` expansions of the corpus, compared before and after, differ only in
+  `spelling`, each difference read.

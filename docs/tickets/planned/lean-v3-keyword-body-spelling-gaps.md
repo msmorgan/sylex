@@ -1,14 +1,15 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
 ---
 # Daybound and reconfigure say all of what their CR text means
 
 Standard constraints apply. Found by the 2026-10-25 triage of an external audit ("Atraxa"),
-verified against `wmyykqnv`. Paths are under `lean/Semantics/`. Keyword Definitions carry their
-full bodies, so a body that drops part of its "means" text is a fidelity gap. Both bodies below
-were probed on 2026-10-25 (`cd lean && lake env lean` on scratch files
-`/tmp/claude-1000/-home-msmorgan-Projects-deckmaste-rs/4e5532ee-6640-4aad-9769-888a72f918d1/scratchpad/probe/Probe.lean`
-and `Probe2.lean`) and check `[]`.
+verified against `wmyykqnv`. Keyword Definitions carry their full bodies, so a body that drops
+part of its "means" text is a fidelity gap. Both bodies below were probed in Lean on 2026-10-25
+and check `[]`. Keyword Definitions are under `plugins_v3/builtin/definitions/keyword_ability/`;
+AST types are in Rust `semantics` (`lean/Semantics/Abilities.lean` today). Test names below are
+the Lean proof-suite names (`lean/Semantics/Proofs/`), carried to Rust tests by
+`semantics-rust-rewrite`. The `.syl` below follows the live files; match their syntax.
 
 Two parts, each separately committable.
 
@@ -20,112 +21,111 @@ only if this permanent is attached to a creature and only as a sorcery." [CR#702
 "Attaching an Equipment with reconfigure to another creature causes the Equipment to stop being
 a creature until it becomes unattached from that creature." The Oracle reminder (*Lizard
 Blades*, *Lion Sash*) prints "While attached, this isn't a creature." The body
-(`Definitions/Keywords.lean:1486-1498`) writes only [CR#702.151a].
+(`reconfigure.syl`) writes only [CR#702.151a].
 
 Write:
-```lean
-semantic_definition reconfigure (cost : Cost) : Ability :=
-  .keyword (.named "reconfigure") [.cost (.inCaller cost)]
-    [ activatedOnlyDuring (.inCaller cost)
-        (attachTo thisPermanent (target (and [isCreature, isOther, youControl])))
-        asSorcery,
-      .activated (.inCaller cost)
-        (unattach thisPermanent)
-        asSorcery none
-        (is thisPermanent (attachedTo (a isCreature)))
-        none,
-      static
-        (onlyWhile
-          (characteristicChange thisPermanent [.typeLine .loses { types := some [.creature] }])
-          (is thisPermanent (attachedTo (a isCreature)))) ]
 ```
-- The second ability's condition is respelled through `attachedTo` (`Templates.lean:39`); it is
-  `rfl`-equal to today's raw `.attachment .attachment none (some (a isCreature))`.
-- The third static follows impending's type removal (`Definitions/Keywords.lean:1029-1030`).
-- Add [CR#702.151b] to the docstring (`:1486-1488`).
+body = [
+  activatedOnlyDuring(
+    cost,
+    attachTo(thisPermanent, target(and([isCreature, isOther, youControl]))),
+    asSorcery),
+  activated(
+    cost,
+    unattach(thisPermanent),
+    asSorcery,
+    guard = is(thisPermanent, attachedTo(a(isCreature)))),
+  static(
+    onlyWhile(
+      characteristicChange(thisPermanent, [typeLine(loses, {types = [creature]})]),
+      is(thisPermanent, attachedTo(a(isCreature)))))]
+```
+- The second ability's condition is respelled through `attachedTo`
+  (`plugins_v3/builtin/templates/predicate/attachedTo.syl`); it expands to today's raw
+  `attachment(attachment, a(isCreature))`.
+- The third static follows impending's type removal (`impending.syl`).
+- Add [CR#702.151b] to the header comment.
 
-Pins:
-- Added: *Lizard Blades* (Vintage-legal) in
-  `plugins_v3/canon/cards/Lizard Blades.lean`, as an anonymous declaration:
-  ```lean
-  card :=
-    { name := "Lizard Blades", cost := [1, red],
-      types := [artifact, creature], subtypes := [equipment, lizard],
-      text :=
-        [ doubleStrike,
-          abilityGrant (equipped creature) doubleStrike,
-          reconfigure [2] ],
-      power := 1, toughness := 1 }
+Tests:
+- Added: *Lizard Blades* (Vintage-legal) as `plugins_v3/canon/cards/Lizard Blades.syl`:
+  ```
+  card {
+    name = "Lizard Blades",
+    cost = [1, red],
+    types = [artifact, creature],
+    subtypes = [equipment, lizard],
+    text = [doubleStrike, static(abilityGrant(equipped(creature), doubleStrike)), reconfigure(mana([2]))],
+    power = 1,
+    toughness = 1
+  }
   ```
   Confirm its Oracle text in `data/derived/cards.jsonl` first.
 - Rewritten if its pattern no longer matches: `reconfigureUnattachesWithoutTheAttachDeed`
-  (`Proofs/Keyword.lean:505-508`) matches on the ability list; extend the pattern to the third
-  element, keeping the claim about the second.
-- Must stay green: `reconfigureAnchorsOnTheSource` (`Proofs/ContrastAnchor.lean:106-107`),
-  `keywordBodiesKeepTheirActionDeeds` (`Proofs/Keyword.lean:551`).
+  (`Keyword.lean`) matches on the ability list; extend the pattern to the third element, keeping
+  the claim about the second.
+- Must stay green: `reconfigureAnchorsOnTheSource` (`ContrastAnchor.lean`),
+  `keywordBodiesKeepTheirActionDeeds` (`Keyword.lean`).
 
 ## Part 2: daybound [CR#702.145b]
 
 [CR#702.145b]: "Daybound" means "If it is night and this permanent is represented by a
 double-faced card, it enters transformed," "As it becomes night, if this permanent is front face
 up, transform it," and "This permanent can't transform except due to its daybound ability."
-The first static (`Definitions/Keywords.lean:497-499`) omits "this permanent is represented by a
-double-faced card". A copy of a daybound creature, or a creature granted daybound, is the case
-the clause is for [CR#701.27a,701.27c].
+The first static (`daybound.syl`) omits "this permanent is represented by a double-faced card". A
+copy of a daybound creature, or a creature granted daybound, is the case the clause is for
+[CR#701.27a,701.27c].
 
-No existing construct says it: `Predicate.currentFace` (`Abilities.lean:294`) is a permanent's
-face; `isTransformed` (`Templates.lean:441`) is `.currentFace .back`; `Card.transforming` and
-`Card.modalDfc` (`Card.lean:44-45`) are the printed frame, not a predicate; `TokenSpec.doubleFaced`
-is token creation.
+No existing construct says it: `Predicate.currentFace`
+(`plugins_v3/builtin/primitives/predicate/currentFace.syl`) is a permanent's face;
+`isTransformed` (`plugins_v3/builtin/templates/predicate/isTransformed.syl`) is
+`currentFace(back)`; `Card.transforming` and `Card.modalDfc` are the printed frame, not a
+predicate; `TokenSpec.doubleFaced` is token creation.
 
 Change:
-1. Add a nullary Predicate beside `isCopyOfACard` (`Abilities.lean:288`):
-   ```lean
-   /-- The member is represented by a double-faced card [CR#712.1,702.145b]. -/
-   | isDoubleFacedCard
-   ```
-   and its Template beside `isCopyOfACard` (`Templates.lean:396`):
-   `semantic_template isDoubleFacedCard : Predicate := .isDoubleFacedCard`.
-   `.isCopyOfACard` has no checker arm (every Predicate match falls through a wildcard to kind
-   `.object`); the build confirms whether the new atom needs one.
+1. Add a nullary Predicate beside `isCopyOfACard`, documented "The member is represented by a
+   double-faced card [CR#712.1,702.145b]", and its primitive beside
+   `plugins_v3/builtin/primitives/predicate/isCopyOfACard.syl`. `.isCopyOfACard` has no checker
+   arm (every Predicate match falls through a wildcard to kind `.object`); the `discourse` tests
+   confirm whether the new atom needs one.
 2. Glossary: add **Double-Faced Card** to `docs/contexts/game-model/CONTEXT.md` beside
-   **Card Face** (`:587`) with [CR#712.1], through the `domain-modeling` skill, before naming the
+   **Card Face** with [CR#712.1], through the `domain-modeling` skill, before naming the
    identifier; if the glossary entry settles on another name, use that name for the constructor
-   and Template.
+   and primitive.
 3. Daybound's first static becomes
-   ```lean
-   static
-     (replace (would thisPermanent enter)
-       (doIf (and [gameIs night, is thisPermanent isDoubleFacedCard])
-         (withRiders [.entersTransformed]))),
    ```
-   The other two statics are unchanged, except that `:502` writes `is thisPermanent (currentFace
-   .front)` through the Template (`rfl`-equal).
-4. Nightbound (`Definitions/Keywords.lean:1271-1279`, "As it becomes day, if this permanent is
-   back face up, transform it" [CR#702.145e]): write `:1275` as `is thisPermanent (currentFace
-   .back)` instead of `isTransformed`, which is `rfl`-equal and names the CR's "back face up".
+   static(
+     replace(
+       would(actor(thisPermanent), enter),
+       doIf(
+         and([gameIs(night), is(thisPermanent, isDoubleFacedCard)]),
+         withRiders([entersTransformed]))))
+   ```
+   The other two statics are unchanged.
+4. Nightbound (`nightbound.syl`, "As it becomes day, if this permanent is back face up, transform
+   it" [CR#702.145e]): write `is(thisPermanent, currentFace(back))` instead of `isTransformed`,
+   which expands to the same and names the CR's "back face up".
 
-Pins:
-- Added: *Tavern Ruffian // Tavern Smasher* (Vintage-legal) in
-  `plugins_v3/canon/cards/Tavern Ruffian {slash}{slash} Tavern Smasher.lean`. The existing
-  transforming-card example is
-  `plugins_v3/canon/cards/Afflicted Deserter {slash}{slash} Werewolf Ransacker.lean`:
-  ```lean
-  card := transforming {
-    front := {
-      name := "Tavern Ruffian", cost := [3, red], types := [creature],
-      subtypes := [human, warrior, werewolf], text := [daybound],
-      power := 2, toughness := 5 },
-    back := {
-      name := "Tavern Smasher", types := [creature], subtypes := [werewolf],
-      text := [nightbound], power := 6, toughness := 5 } }
+Tests:
+- Added: *Tavern Ruffian // Tavern Smasher* (Vintage-legal) as
+  `plugins_v3/canon/cards/Tavern Ruffian {slash}{slash} Tavern Smasher.syl`, following
+  `plugins_v3/canon/cards/Afflicted Deserter {slash}{slash} Werewolf Ransacker.syl`:
+  ```
+  card transforming(
+    {
+      front = {
+        name = "Tavern Ruffian", cost = [3, red], types = [creature],
+        subtypes = [human, warrior, werewolf], text = [daybound],
+        power = 2, toughness = 5},
+      back = {
+        name = "Tavern Smasher", types = [creature], subtypes = [werewolf],
+        text = [nightbound], power = 6, toughness = 5}})
   ```
   Confirm both faces in `data/derived/cards.jsonl` first.
-- Added: `dayboundEntersTransformedOnlyAsADoubleFacedCard` in `Proofs/OffStack.lean`, asserting by
-  `rfl` that daybound's first replacement condition is `and [gameIs night, is thisPermanent
-  isDoubleFacedCard]`, modelled on `enchantReplacesTheEntering` (`:261`).
-- Must stay green: `okDaybound` (`Proofs/OffStack.lean:100`), `okNightbound` (`:103`), and the
-  nightbound pin at `Proofs/Attachments.lean:95`.
+- Added: `dayboundEntersTransformedOnlyAsADoubleFacedCard`, asserting that daybound's first
+  replacement condition is `and([gameIs(night), is(thisPermanent, isDoubleFacedCard)])`, modelled
+  on `enchantReplacesTheEntering` (`OffStack.lean`).
+- Must stay green: `okDaybound`, `okNightbound` (`OffStack.lean`), and the nightbound pin in
+  `Attachments.lean`.
 
 ## What must not change
 
@@ -134,5 +134,5 @@ stay out of these bodies.
 
 ## Acceptance
 
-`./lean/scripts/build` (`--wfail`), `cargo xtask lean check`, the CR citation gates (bless
-[CR#702.151b] and [CR#712.1] if newly cited).
+`cargo test` and `cargo clippy --tests -- -D warnings` for `semantics` and `discourse`, the CR
+citation gates (bless [CR#702.151b] and [CR#712.1] if newly cited).

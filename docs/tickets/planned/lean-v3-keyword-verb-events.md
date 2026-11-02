@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-monstrosity-adapt-name-the-source]
+needs: [lean-v3-monstrosity-adapt-name-the-source, semantics-rust-rewrite]
 ---
 # Events for the verbs keyword abilities define
 
@@ -36,7 +36,8 @@ evolves" cannot be written.
   the Source: "Whenever equipped creature mentors a creature" (Source, patient), "When a Faerie is
   championed with this creature" (patient, passive).
 - The subject kind belongs to the event: "players can't adapt" is refused because adapt's event
-  subject is a creature. This takes over the adapt half of `badPlayersCantExploreOrAdapt`.
+  subject is a creature. This takes over the adapt half of `badPlayersCantExploreOrAdapt` (a Lean pin, carried to a
+  Rust test by `semantics-rust-rewrite`).
 
 ## Cards
 

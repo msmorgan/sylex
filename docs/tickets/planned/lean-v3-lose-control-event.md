@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
 ---
 # "When you lose control of <object>" has no event
 
@@ -23,12 +23,14 @@ Approved.
 
 ## Change
 
-Either extend `Action.changeControl` (`Abilities.lean:1251`, currently the gaining side only) with
-a direction, or add `Action.loseControl (subject : NounPhrase)` with template `loseControl`. The
+Either extend `Action.changeControl` (AST in Rust `semantics`, currently the gaining side only) with
+a direction, or add `Action.loseControl (subject : NounPhrase)` with primitive `loseControl`. The
 owner leaves the choice between the two to the implementer; record the choice and why in the
 landing. Admit it in event and lookback patterns alongside `gainControlOf`
-(`Templates.lean:1444`).
+(`plugins_v3/builtin/primitives/action/gainControlOf.syl`).
 
 ## Tests
 
-- Extend `stolenUniformOpening` (`Cards/Choice.lean`) to the whole card.
+- Extend `stolenUniformOpening` (a fragment in `lean/Semantics/Proofs/CardsChoice.lean`, carried to
+  a Rust test by `semantics-rust-rewrite`) to the whole card, as
+  `plugins_v3/canon/cards/Stolen Uniform.syl`.

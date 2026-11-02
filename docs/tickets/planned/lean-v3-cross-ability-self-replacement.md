@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-spell-abilities-share-targets, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
+needs: [lean-v3-spell-abilities-share-targets, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
 ---
 # A later spell ability's "instead" replaces an earlier spell ability's effect
 
@@ -13,7 +13,8 @@ but the text can be a separate ability, particularly when preceded by an ability
 [CR#614.15]. The word "instead" marks it as a replacement effect [CR#614.1a].
 
 The checker cannot spell that separate-ability form. `Action.replace replaced replacement`
-(`lean/Semantics/Abilities.lean`, "the spell's or ability's own `replaced` action") holds the
+(the AST, `lean/Semantics/Abilities.lean` today, Rust `semantics` after the port; "the spell's or
+ability's own `replaced` action") holds the
 replaced action inside itself. So the replaced action and the replacement have to be one
 `Action`, inside one spell ability. Each paragraph is its own ability [CR#113.2c], and a
 `Replacement` (`instead`, `Replacement.doIf`) is not an `Action`, so a later spell ability has no
@@ -46,11 +47,11 @@ after an ability word) is a separate spell ability whose body is a `Replacement`
 
 ## Change
 
-- Add `Ability.spellReplacement (replacement : Replacement)` with template `spellReplacement`
-  (beside `spell`, `Templates.lean:2101`). It replaces the effect of the immediately preceding
+- Add `Ability.spellReplacement (replacement : Replacement)` with primitive `spellReplacement`
+  (beside `spell`, `plugins_v3/builtin/primitives/ability/spell.syl`). It replaces the effect of the immediately preceding
   spell ability of the same spell.
-- The checker steps it as the `.replace` arm of `ops.inst` does (`Check/Phrase.lean`, the
-  `stepReplacementWith` path): from the state the replaced spell ability read, per
+- `discourse` steps it as it steps the `.replace` action arm (Lean's `stepReplacementWith`
+  path, `lean/Semantics/Check/Phrase.lean`): from the state the replaced spell ability read, per
   `lean-v3-self-replacement-remainder`, plus the targets that earlier spell abilities of the same
   spell published.
 - It refuses a `spellReplacement` that has no preceding spell ability to replace. "Preceding" is
@@ -60,7 +61,7 @@ after an ability word) is a separate spell ability whose body is a `Replacement`
 
 - Each witness spelled in full, with the later paragraph's "instead" as a self-replacement of the
   earlier paragraph's effect.
-- A refusal pin: a `spellReplacement` with no preceding spell ability to replace (first ability of
+- A refusal test: a `spellReplacement` with no preceding spell ability to replace (first ability of
   the card, or preceded only by a non-spell ability).
-- A pin that the replacement reads the earlier paragraph's published targets ("that creature",
+- A test that the replacement reads the earlier paragraph's published targets ("that creature",
   "that spell").

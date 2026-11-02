@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
 ---
 # A later spell ability that acts "before" an earlier one's action
 
@@ -23,13 +23,14 @@ Kept separate from `lean-v3-cross-ability-self-replacement`; one design does not
 
 ## Change
 
-- Add `Action.beforeEvent (action : Action) (event : GameEvent)` with template `beforeEvent`.
-- Step it like `holdUntil` (`Action.holdUntil`, `Abilities.lean:1370`; checker arm
-  `Check/Phrase.lean:4307`, which steps `inst` then `ev` in the output DRS): `action` first, then
+- Add `Action.beforeEvent (action : Action) (event : GameEvent)` with primitive `beforeEvent`.
+- `discourse` steps it like `holdUntil` (`Action.holdUntil`; Lean's checker arm in
+  `lean/Semantics/Check/Phrase.lean` steps `inst` then `ev` in the output DRS): `action` first, then
   `event` in `action`'s output DRS [CR#608.2c]. The event is the earlier action the pump precedes.
 - *Savage Punch*'s second paragraph is
   `italicHead ferocious (spell (doOnlyIf (beforeEvent (get …) (does it (fight any))) (exists_ …)))`
-  (`doOnlyIf`, `Templates.lean:1520`; `italicHead`, `:2018`; `spell`, `:2101`).
+  (`plugins_v3/builtin/templates/action/doOnlyIf.syl`, and the primitives
+  `plugins_v3/builtin/primitives/ability/italicHead.syl` and `spell.syl`).
 - "It" reads back "the creature you control" through the landed
   [lean-v3-spell-abilities-share-targets](../done/lean-v3-spell-abilities-share-targets.md) and
   [lean-v3-anaphoric-definite-description](../done/lean-v3-anaphoric-definite-description.md)

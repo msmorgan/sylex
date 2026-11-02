@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-checker-and-drt-fixes, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules]
+needs: [lean-v3-checker-and-drt-fixes, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, semantics-rust-rewrite]
 ---
 # "Its owner's hand" introduces the owner
 
@@ -21,7 +21,7 @@ later "that player" that reads the owner has no antecedent, and this family is u
   that player's next turn, that player plays with that card revealed in their hand and can't play
   it."
 
-Review probe (2026-10-24), *Recoil*:
+Review probe (2026-10-24, Lean checker, which `discourse` ports), *Recoil*:
 
 ```lean
 #eval Action.check (DRS.ofList [])
@@ -29,12 +29,17 @@ Review probe (2026-10-24), *Recoil*:
 -- [Refusal.anaphor (Reach.word NounWord.player) Plurality.one 0]
 ```
 
-Proposal: the owner's zones written "its owner's <zone>" introduce the owner, by stepping the
-destination as `handOf (ownerOf it)` (or giving `returnToHand` and its siblings an owner
-possessor read after the subject), so "that player" reads the owner and each card above checks.
-The move already steps its subject before its destination, so a "that player" inside the subject
-still reads an earlier player: *Noetic Scales*' pin
-(`Proofs/DrtRecency.lean` `noeticScalesRawDemonstrativeSelectsTheUpkeepPlayer`) already
-checks the owner-written spelling. Settle, before implementing: whether the owner is introduced
-for every move to an owned zone or only where the text writes "its owner's", and how a plural
-("return all creatures to their owners' hands") introduces the owners.
+Proposal, a requirement on `discourse`: the owner's zones written "its owner's <zone>" introduce
+the owner, by stepping the destination as `handOf (ownerOf it)` (or giving `returnToHand`,
+`plugins_v3/builtin/templates/action/returnToHand.syl`, and its siblings an owner possessor read
+after the subject), so "that player" reads the owner and each card above checks. The move already
+steps its subject before its destination, so a "that player" inside the subject still reads an
+earlier player: *Noetic Scales*' owner-written spelling already checks (Lean pin
+`noeticScalesRawDemonstrativeSelectsTheUpkeepPlayer`, `lean/Semantics/Proofs/DrtRecency.lean`,
+carried to a Rust test by `semantics-rust-rewrite`) and must keep checking. Settle, before
+implementing: whether the owner is introduced for every move to an owned zone or only where the
+text writes "its owner's", and how a plural ("return all creatures to their owners' hands")
+introduces the owners.
+
+Tests (`discourse`): each card above spelled in full checks clean, with "that player" resolved to
+the owner; the *Noetic Scales* test stays green.

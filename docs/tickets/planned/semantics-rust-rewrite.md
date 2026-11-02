@@ -1,5 +1,5 @@
 ---
-needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-v3-active-player-term, lean-v3-binding-across-or-arms, lean-v3-caller-argument-refusal-multiplicity, lean-v3-card-head-noun-sweep, lean-v3-cast-spell-anaphora-and-noted-mana, lean-v3-clash, lean-v3-colored-mana-spent-count, lean-v3-combat-damage-rule-rows, lean-v3-companion-pregame-rule, lean-v3-counted-pair-each-other, lean-v3-craft-materials, lean-v3-crewed-and-saddled-lookbacks, lean-v3-cross-ability-self-replacement, lean-v3-enlist-optional-attack-cost, lean-v3-hand-written-own-scope-bodies, lean-v3-keyword-body-spelling-gaps, lean-v3-later-ability-acts-before-earlier, lean-v3-literal-referent-id-pins, lean-v3-lose-control-event, lean-v3-owner-zone-introduces-owner, lean-v3-phasing-direct-phase-out, lean-v3-player-speed-rules, lean-v3-preposed-static-condition-ordering, lean-v3-regenerate-target-readback, lean-v3-same-color-mana-spent-count, lean-v3-single-use-as-though, lean-v3-turn-face-up-spend-cost, lean-v3-venture-dungeon, lean-defense-projection, lean-marked-damage-projection]
+needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-v3-monstrosity-adapt-name-the-source, lean-v3-sacrifice-performer-controls]
 ---
 # [design] Rewrite the Rust semantics pipeline: `semantics`, `discourse`, `lowering`
 
@@ -19,14 +19,30 @@ crates:
   are as already designed in `lowering-v3`: regions, `ownScope` to `Action::Composite`, the
   action-clause spine, and so on.
 
-## Sequencing (owner, 2026-10-28)
+## Sequencing (owner, 2026-11-02)
 
-Start this only after:
+This replaces the 2026-10-28 ruling, which put every remaining `lean-v3-*` ticket first so that
+the Lean workbench's semantics would settle before Rust reimplemented them. The workbench's
+architecture (the action-clause spine, the Definition/Template split, DRT reference resolution)
+is settled; what remained was mostly AST breadth, which done in Lean first is written twice.
 
-- `lean-module-layering` and `lean-generated-canon-modules`;
-- `plugins-v3-data-language`;
-- the remaining `lean-v3-*` tickets, so that the Lean workbench's semantics are settled before
-  Rust reimplements them.
+- `semantics` and `discourse` start once `dsl-parse-differential` lands, against the current AST,
+  after only the two tickets that remove or simplify what would otherwise be ported
+  (`lean-v3-monstrosity-adapt-name-the-source`, `lean-v3-sacrifice-performer-controls`).
+- The AST is frozen while they are built: a representation ticket that lands mid-port is done in
+  both languages.
+- The representation tickets and the open reference-resolution tickets need this epic and are
+  done afterwards, in `.syl` and Rust only.
+- `lowering` follows as `lowering-v3`.
+
+## Retiring Lean
+
+This epic ends by deleting `lean/` and `sylGen`, once:
+
+- per card, `discourse`'s bindings agree with the Lean oracle (below) across the whole corpus;
+- the Lean proof suites are carried over as Rust tests, refusals included: after retirement they
+  are the only record of what must and must not check, and nothing else oracles the tickets that
+  follow.
 
 ## Verification
 
