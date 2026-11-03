@@ -36,8 +36,11 @@ in Lean, and cards, templates and Definitions use them.
 - Update §4.4 (bare words, the leading dot) and §4.5 (the primitive rule, names, dispatch steps)
   of `docs/decisions/semantics-v3.md`.
 
-- **Color words get primitives too:** `white`, `blue`, `black`, `red` and `green` are declared at
-  each sort they build (`Color`, `ColorOrColorless`, `ManaSymbol`), like any other constructor.
+- **Color words get primitives too, once each:** `white`, `blue`, `black`, `red` and `green` are
+  primitives at `Color` only. Where a `ColorOrColorless` or a mana symbol is expected, the wrapping
+  constructors are written explicitly through their own primitives (a mana cost `[1, blue, blue]`
+  writes its colored symbols with the mana-symbol wrapper); bring the wrapper words' names to the
+  owner before respelling the corpus. Declared implicit wrapping is `syl-implicit-coercions`, later.
   Integer literals stay literals, and a Definition name still stands for its keyword at
   `Ability`, `KeywordLabel`, `KeywordTerm` and `Deed` (§4.5's direct sort atoms, less the colors).
 
