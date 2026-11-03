@@ -7,7 +7,7 @@ hooks (`Semantics/Check/Trace.lean`).
 From `lean/`:
 
 ```sh
-lake build -q discourseExport
+lake build -q Generated.Canon SemanticsProofs discourseExport
 lake exe discourseExport <label>             # both parts
 lake exe discourseExport bindings <label>    # per-card bindings only
 lake exe discourseExport fixtures <label>    # proof fixtures only
@@ -17,7 +17,8 @@ Output goes to the gitignored `../docs/evidence/lean-discourse/<label>/`. Any ca
 alignment failure or unmatched catalog name is listed in `summary.txt` and exits 2.
 `DISCOURSE_DEBUG=<printed name>` also prints that card's positions and raw trace to stderr.
 The executable is opt-in: neither the default build nor `scripts/build` (the Lean check
-gate) includes it.
+gate) includes it. It imports `Generated.Canon` and `Semantics.Proofs` as built, so build them
+first: `lake build discourseExport` alone leaves a stale card corpus in place.
 
 ## `fixtures.jsonl` and `checklist.jsonl`
 
