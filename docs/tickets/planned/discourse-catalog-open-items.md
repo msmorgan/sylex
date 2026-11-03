@@ -36,3 +36,10 @@ sources pin or document these as gaps; the catalog does not carry them as spec. 
    written as a coordination, "that creature" does not resolve, so the canon card is spelled with
    the equivalent "a creature you control" (`idris-retire-cards-idr`). `discourse` resolves "that
    creature" to whichever coordinated subject the event matched; respell the card then.
+8. **Lean's line context reaches a sacrificed land's successor.** `lean-discourse-export` found that
+   Lean's `context` pass (`lineTextContextWith`) steps a later sequence step before earlier ones
+   on *Flooded Strand* and *Afflicted Deserter // Werewolf Ransacker*: the pronoun or demonstrative
+   there resolves to the sacrificed land's (or artifact's) moved successor, while the `check` pass
+   correctly resolves *Flooded Strand*'s "it" to the searched card. The context a line leaves for
+   later lines is stepped in order in `discourse`; the export's readings whose `lastIn` holds only
+   `context` are not expected to match.
