@@ -162,6 +162,15 @@ lean_exe dumpValues where
   root := `DumpValues.Main
   supportInterpreter := true
 
+lean_lib DiscourseExport where
+  roots := #[`DiscourseExport.Paths, `DiscourseExport.Bindings, `DiscourseExport.Fixtures]
+
+/-- Opt-in discourse oracle for `discourse` (`DiscourseExport/README.md`); excluded from the
+default build and the Lean check gate, and deleted with Lean (`lean-retirement`). -/
+lean_exe discourseExport where
+  root := `DiscourseExport.Main
+  supportInterpreter := true
+
 lean_lib SylGenerator where
   roots := #[`SylGen.Parser, `SylGen.Environment, `SylGen.Resolve, `SylGen.Emit]
 
