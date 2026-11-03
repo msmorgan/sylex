@@ -29,6 +29,8 @@ structure Fixture where
   module : Name
   entry : Name
   args : Array (String × String)
+  /-- The proof suite's own wrappers unfolded to reach `entry`. -/
+  via : Array Name := #[]
   accepted : Bool
   refusals : Array String
 
@@ -97,6 +99,18 @@ unsafe def classify (name module : Name) (type : Expr) :
   let some (α, lhs, rhs) := type.eq? | return ← other "not an equation"
   unless α == mkApp (mkConst ``List [Level.zero]) (mkConst ``Semantics.Refusal) do
     return ← other "not an equation over List Refusal"
+  -- `{ x with … }` elaborates through `let`; a proof suite's own wrapper (`relativeCheck`) is
+  -- unfolded to the entry point it applies.
+  let mut lhs ← zetaReduce lhs
+  let mut via : Array Name := #[]
+  for _ in [:8] do
+    let some fn := lhs.getAppFn.constName? | break
+    if isEntryPoint (← getEnv) fn then break
+    let some idx := (← getEnv).getModuleIdxFor? fn | break
+    unless (`Semantics.Proofs).isPrefixOf (← getEnv).header.moduleNames[idx.toNat]! do break
+    let some unfolded ← unfoldDefinition? lhs | break
+    lhs ← zetaReduce unfolded.headBeta
+    via := via.push (privateToUserName? fn |>.getD fn)
   if lhs.hasLooseBVars || (lhs.find? (·.isLet)).isSome then return ← other "let in statement"
   let some fn := lhs.getAppFn.constName? | return ← other "left side is not an application"
   unless isEntryPoint (← getEnv) fn do return ← other s!"not an entry point: {fn}"
@@ -112,7 +126,7 @@ unsafe def classify (name module : Name) (type : Expr) :
     let args ← args.mapM fun (n, a) => return (n, ← renderArgument a)
     let refusals ← refusalKinds rhs
     return .ok {
-      theoremName := name, module := module, entry := fn, args := args
+      theoremName := name, module := module, entry := fn, args := args, via := via
       accepted := refusals.isEmpty, refusals := refusals }
   catch e => other s!"unrenderable: {← e.toMessageData.toString}"
 

@@ -29,6 +29,7 @@ private unsafe def exportBindings (dir : System.FilePath) : MetaM (Array String 
   let mut cards := 0
   let mut flagged := 0
   let mut withBindings := 0
+  let mut flaggedCards := 0
   let pairType := mkApp2 (mkConst ``Prod [Level.zero, Level.zero]) (mkConst ``Semantics.Card)
     (mkApp (mkConst ``List [Level.zero]) (mkConst ``USize))
   let mut declared : Std.HashSet Name := {}
@@ -50,11 +51,13 @@ private unsafe def exportBindings (dir : System.FilePath) : MetaM (Array String 
       if (← held.get).isNone then throwError "card released early"
       if (← IO.getEnv "DISCOURSE_DEBUG") == some name then
         for (slot, addr) in slots.toList.zip addresses do
-          IO.eprintln s!"pos {slot} {addr} {positions[slot]!.type} {positions[slot]!.ctor} {(toJson positions[slot]!.path).compress}"
+          let p := positions[slot]!
+          IO.eprintln s!"pos {slot} {addr} {p.type} {p.ctor} {(toJson p.path).compress}"
         for e in events do IO.eprintln (reprStr e)
       cards := cards + 1
       if !a.bindings.isEmpty then withBindings := withBindings + 1
       flagged := flagged + (a.bindings.filter (·.flagDefect)).size
+      if a.verdictFlagDefect then flaggedCards := flaggedCards + 1
       totals := { totals with
         bindings := totals.bindings ++ a.bindings, frames := totals.frames + a.frames
         aligned := totals.aligned + a.aligned, scalars := totals.scalars + a.scalars
@@ -67,22 +70,34 @@ private unsafe def exportBindings (dir : System.FilePath) : MetaM (Array String 
       for f in a.failures.toList.eraseDups do errors := errors.push s!"card {name}: {f}"
       let kinds := (refusals.map refusalKind).eraseDups.toArray.qsort (· < ·)
       records := records.push (name, line <| Json.mkObj [("card", toJson name),
-        ("refusals", toJson kinds),
+        ("refusals", toJson kinds), ("verdictFlagDefect", toJson a.verdictFlagDefect),
         ("bindings", Json.arr (a.bindings.map (·.toJson))),
         ("alignmentFailures", toJson a.failures.toList.eraseDups)])
     catch e => errors := errors.push s!"card {name}: {← e.toMessageData.toString}"
   records := records.qsort (fun a b => a.1 < b.1)
   for i in [1:records.size] do
-    if records[i-1]!.1 == records[i]!.1 then errors := errors.push s!"duplicate card: {records[i]!.1}"
+    if records[i-1]!.1 == records[i]!.1 then
+      errors := errors.push s!"duplicate card: {records[i]!.1}"
   let sourceEntries ← (System.FilePath.mk "../plugins_v3/canon/cards").readDir
   let cardFiles ← sourceEntries.filterM fun entry => do
     return (entry.fileName.endsWith ".lean" || entry.fileName.endsWith ".syl") &&
       !(← entry.path.isDir)
   if cardFiles.size != cards then
-    errors := errors.push s!"card completeness mismatch: {cardFiles.size} source files, {cards} cards"
+    errors := errors.push
+      s!"card completeness mismatch: {cardFiles.size} source files, {cards} cards"
   IO.FS.writeFile (dir / "bindings.jsonl") (String.join (records.toList.map (·.2)))
   let summary := s!"cards exported: {cards}\ncards with bindings: {withBindings}\n" ++
-    s!"bindings: {totals.bindings.size}\nFLAG DEFECT bindings: {flagged}\n" ++
+    s!"mentions: {totals.bindings.size}\nFLAG DEFECT mentions: {flagged}\n" ++
+    s!"cards with verdictFlagDefect: {flaggedCards}\n" ++
+    s!"readings: {(totals.bindings.map (·.readings.size)).foldl (· + ·) 0}\n" ++
+    s!"mentions with several readings: {(totals.bindings.filter (·.readings.size > 1)).size}\n" ++
+    s!"mentions with no in-order reading: " ++
+      s!"{(totals.bindings.filter (fun b => !b.readings.any (·.inOrder))).size}\n" ++
+    s!"mentions with several in-order readings: " ++
+      s!"{(totals.bindings.filter (fun b => (b.readings.filter (·.inOrder)).size > 1)).size}\n" ++
+    s!"mentions whose check-final reading is not in order: " ++
+      s!"{(totals.bindings.filter (fun b => b.readings.any fun r =>
+        r.lastIn.contains "check" && !r.inOrder)).size}\n" ++
     s!"frames: {totals.frames}\naligned by address: {totals.aligned}\n" ++
     s!"aligned scalar nodes: {totals.scalars}\n" ++
     s!"  of which placed by reading order: {totals.scalarsByOrder}\n" ++
@@ -108,6 +123,7 @@ private unsafe def exportFixtures (dir : System.FilePath) : MetaM (Array String 
     seen := seen.insert cname
     fixtureLines := fixtureLines.push <| line <| Json.mkObj [("theorem", toJson cname),
       ("declaration", toJson f.theoremName.toString), ("entry", toJson f.entry.toString),
+      ("via", toJson (f.via.map (·.toString))),
       ("args", Json.arr (f.args.map fun (n, v) => Json.arr #[toJson n, toJson v])),
       ("accepted", toJson f.accepted), ("refusals", toJson f.refusals),
       ("flagDefect", toJson flag)]

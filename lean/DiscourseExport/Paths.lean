@@ -50,6 +50,8 @@ structure Position where
   /-- The stepped type's short name, as the frame kind names it. -/
   type : String
   ctor : Name
+  /-- A pronoun's reach constructor (`bare`, …), or a first or later mention's Binding Identity. -/
+  detail : String := ""
   deriving Inhabited
 
 private structure WalkState where
@@ -92,7 +94,7 @@ private def readOrder (ctor : Name) (fields : Array (String × Expr)) : MetaM (A
 
 mutual
   /-- Rebuild the value of field `step` (a list, an option or a node). -/
-  private partial def walkField (path : Path) (step : Step) (value : Expr) : WalkM Expr := do
+  private unsafe def walkField (path : Path) (step : Step) (value : Expr) : WalkM Expr := do
     let value ← withTransparency .all <| whnf value
     if value.isAppOfArity ``List.cons 3 then
       let args := value.getAppArgs
@@ -114,7 +116,7 @@ mutual
     walkNode (path.push step) value
 
   /-- Rebuild `value` (already reduced or not) at `path`. -/
-  private partial def walkNode (path : Path) (value : Expr) : WalkM Expr := do
+  private unsafe def walkNode (path : Path) (value : Expr) : WalkM Expr := do
     let value ← withTransparency .all <| whnf value
     if value.hasFVar || value.hasMVar then throwError "open value"
     if value.rawNatLit?.isSome then return value
@@ -133,7 +135,17 @@ mutual
     let stepped := steppedTypes.contains info.induct
     let slot := (← get).positions.size
     if stepped then
-      let position : Position := { path := path, type := info.induct.getString!, ctor := name }
+      let detail ← if name == ``Semantics.NounPhrase.pro then
+          pure ((← withTransparency .all <| whnf fieldArgs[0]!).getAppFn.constName?.map
+            (·.getString!) |>.getD "")
+        else if name == ``Semantics.NounPhrase.firstMention ||
+            name == ``Semantics.NounPhrase.laterMention then
+          match ← withTransparency .all <| whnf fieldArgs[0]! with
+          | .lit (.strVal id) => pure id
+          | _ => evalExpr String (mkConst ``String) fieldArgs[0]! (safety := .unsafe)
+        else pure ""
+      let position : Position :=
+        { path := path, type := info.induct.getString!, ctor := name, detail := detail }
       modify fun s => { s with positions := s.positions.push position }
     for i in order do
       let (field, proof) := fs[i]!
@@ -156,7 +168,7 @@ end
 /-- A card's positions, and the closed term `(card, addresses)` with `slots`: the evaluated
 `addresses[j]` is the node of position `slots[j]`. Positions are numbered parent first, in the
 checker's reading order. -/
-def walk (card : Expr) : MetaM (Expr × Array Position × Array Nat) := do
+unsafe def walk (card : Expr) : MetaM (Expr × Array Position × Array Nat) := do
   let (root, state) ← (walkNode #[] card).run {}
   let usize := mkConst ``USize
   let addresses := state.lets.foldr (fun (fv, ty, _) acc =>

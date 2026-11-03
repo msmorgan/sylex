@@ -10,8 +10,9 @@ antecedents it resolved to, keyed by the path of the node that introduced each a
 
 A frame's node is found by its address, which `walk` made unique per position, or through the
 checker's logged rewrite of a node (`Trace.rewrite`). A node with no fields is a boxed scalar
-shared by every such node; it is placed among the positions of its constructor (`locate`). A frame whose node is in no position is one the checker built
-itself (`synthesized`); what it introduces belongs to the nearest aligned frame.
+shared by every such node; it is placed among the positions of its constructor (`locate`). A
+frame whose node is in no position is one the checker built itself (`synthesized`); what it
+introduces belongs to the nearest aligned frame.
 -/
 
 open Lean Semantics
@@ -25,25 +26,60 @@ structure Key where
   via : Option String := none
   /-- The key of the referent a moved successor continues. -/
   source : Option Json := none
+  /-- The introducing node is a scalar placed by reading order among equal candidates. -/
+  placedByOrder : Bool := false
   deriving Inhabited
 
 def Key.toJson (k : Key) : Json :=
   Json.mkObj <| [("path", ToJson.toJson k.path), ("role", ToJson.toJson k.role)] ++
     (k.via.toList.map fun v => ("via", ToJson.toJson v)) ++
-    (k.source.toList.map fun s => ("from", s))
+    (k.source.toList.map fun s => ("from", s)) ++
+    (if k.placedByOrder then [("placedByOrder", Json.bool true)] else [])
 
+/-- One way a mention resolved: its rule and antecedents, with the passes that stepped it so. -/
+structure Reading where
+  rule : String
+  antecedents : Array Key
+  /-- `check` (the line's refusals, `ops.ab`) and/or `context` (the context the line leaves for
+  the lines after it, `lineTextContextWith`). -/
+  passes : Array String := #[]
+  /-- Where each stepping that read the mention so began, below the line (its ability): the
+  first node the pass stepped. The line's own top node is the in-order reading; a deeper one is a
+  node read again out of order, such as a `doIf`'s then-branch read ahead of its condition for
+  the targets it announces [CR#601.2c]. -/
+  entries : Array Path := #[]
+  /-- Some stepping began at the ability's own top node (its `action`, `spec`, …), with no other
+  stepped node between: an in-order stepping rather than a node read ahead. -/
+  inOrder : Bool := false
+  /-- The passes whose last stepping of the mention read it so. Each pass's last stepping is the
+  one whose context the pass goes on with: a `doIf`'s then-branch is stepped to announce its
+  targets and to reserve its ids before the stepping whose refusals count. The reading with
+  `check` here is the one Lean's verdict rests on, and the one `discourse` is expected to
+  produce. -/
+  lastIn : Array String := #[]
+  deriving Inhabited
+
+def Reading.toJson (r : Reading) : Json :=
+  Json.mkObj [("rule", ToJson.toJson r.rule),
+    ("antecedents", Json.arr (r.antecedents.map (·.toJson))),
+    ("passes", ToJson.toJson r.passes), ("entries", ToJson.toJson r.entries),
+    ("inOrder", ToJson.toJson r.inOrder), ("lastIn", ToJson.toJson r.lastIn)]
+
+/-- A mention: a referring noun phrase, with each distinct way the checker resolved it. -/
 structure Binding where
   mention : Path
   node : Name
-  rule : String
-  antecedents : Array Key
-  flagDefect : Bool
+  placedByOrder : Bool := false
+  readings : Array Reading := #[]
+  flagDefect : Bool := false
+  deriving Inhabited
 
 def Binding.toJson (b : Binding) : Json :=
   Json.mkObj [
-    ("mention", Json.mkObj [("path", ToJson.toJson b.mention),
-      ("node", ToJson.toJson b.node.toString)]),
-    ("rule", ToJson.toJson b.rule), ("antecedents", Json.arr (b.antecedents.map (·.toJson))),
+    ("mention", Json.mkObj <| [("path", ToJson.toJson b.mention),
+      ("node", ToJson.toJson b.node.toString)] ++
+      (if b.placedByOrder then [("placedByOrder", Json.bool true)] else [])),
+    ("readings", Json.arr (b.readings.map (·.toJson))),
     ("flagDefect", ToJson.toJson b.flagDefect)]
 
 private structure Frame where
@@ -59,6 +95,9 @@ private structure Frame where
 
 structure Alignment where
   bindings : Array Binding := #[]
+  /-- The card has a stepped `laterMention`, whose use the checker never checks against its own
+  slot (`discourse-parameter-argument-resolution`, defect 2), so its verdict may differ. -/
+  verdictFlagDefect : Bool := false
   frames : Nat := 0
   aligned : Nat := 0
   scalars : Nat := 0
@@ -75,9 +114,6 @@ structure Alignment where
 
 def Alignment.fail (a : Alignment) (message : String) : Alignment :=
   { a with failures := a.failures.push message }
-
-private def defectStep (s : Step) : Bool :=
-  s.ctor == ``Semantics.NounPhrase.firstMention || s.ctor == ``Semantics.NounPhrase.laterMention
 
 /-- Where each `enter` event's node is: its position, and whether reading order placed it. -/
 private structure Located where
@@ -232,9 +268,48 @@ def align (env : Environment) (positions : Array Position) (slots : Array Nat)
     byAddress := byAddress.insert key slot
   let located := locate env positions byAddress events out
   out := located.out
+  let pathKey := fun (p : Path) => (ToJson.toJson p).compress
+  let mut byPath : Std.HashMap String Nat := {}
+  for h : q in [:positions.size] do
+    byPath := byPath.insert (pathKey positions[q].path) q
+  -- Binding Identities with a stepped later mention.
+  let mut steppedLater : Std.HashSet String := {}
+  for p in located.pos do
+    if let some p := p then
+      if positions[p]!.ctor == ``Semantics.NounPhrase.laterMention then
+        steppedLater := steppedLater.insert positions[p]!.detail
+  out := { out with verdictFlagDefect := !steppedLater.isEmpty }
+  let child := fun (q : Nat) (field : String) =>
+    byPath[pathKey (positions[q]!.path.push { ctor := positions[q]!.ctor, field })]?
+  -- A mention's argument: its `phrase`, through `inCaller`.
+  let argument := fun (q : Nat) => (child q "phrase").bind fun a =>
+    if positions[a]!.ctor == ``Semantics.NounPhrase.inCaller then child a "body" else some a
+  let barePro := fun (q : Nat) =>
+    positions[q]!.ctor == ``Semantics.NounPhrase.pro && positions[q]!.detail == "bare"
+  let isMention := fun (q : Nat) =>
+    positions[q]!.ctor == ``Semantics.NounPhrase.firstMention ||
+      positions[q]!.ctor == ``Semantics.NounPhrase.laterMention
+  -- A twice-used parameter's bare pronoun argument resolves at its first use only
+  -- (`discourse-parameter-argument-resolution`): the mention, or the pronoun directly in it.
+  let flagged := fun (q : Nat) =>
+    let twiceUsed := fun (m : Nat) => isMention m && steppedLater.contains positions[m]!.detail &&
+      (argument m).any barePro
+    if isMention q then twiceUsed q
+    else if !barePro q then false
+    else
+      let path := positions[q]!.path
+      let parent := byPath[pathKey path.pop]?
+      let mention := parent.bind fun a =>
+        if isMention a then some a
+        else if positions[a]!.ctor == ``Semantics.NounPhrase.inCaller then
+          byPath[pathKey path.pop.pop]?.filter isMention
+        else none
+      mention.any fun m => twiceUsed m && argument m == some q
   let mut stack : Array Frame := #[{ kind := "root" }]
   let mut ids : Std.HashMap Nat Key := {}
-  let mut seen : Std.HashSet String := {}
+  let mut mentions : Array Binding := #[]
+  let mut mentionIndex : Std.HashMap String Nat := {}
+  let mut lastReading : Std.HashMap (Nat × String) Nat := {}
   -- The nearest placed frame (the root counts as placed at the empty path).
   let owner := fun (stack : Array Frame) => Id.run do
     let mut i := stack.size
@@ -274,37 +349,90 @@ def align (env : Environment) (positions : Array Position) (slots : Array Nat)
         | none =>
           out := out.fail
             s!"{rule} at {(toJson positions[p]!.path).compress}: unknown antecedent {id}"
+      let pass := match stack.find? (·.kind.startsWith "Ability") with
+        | some f => if f.kind == "Ability/text" then "context" else "check"
+        | none => "card"
+      -- The innermost ability stepping the mention, and the first node it stepped toward it.
+      let abilityAt := stack.size - 1 -
+        ((stack.reverse.findIdx? (·.kind.startsWith "Ability")).getD (stack.size - 1))
+      let chain := ((stack.extract abilityAt stack.size).push frame).filterMap (·.pos)
+      let entry : Path := match chain[1]? <|> chain[0]? with
+        | some q => positions[q]!.path
+        | none => #[]
+      let ordered := match chain[0]? with
+        | some a =>
+          let top := positions[a]!.path.size
+          entry.size > top && (List.range (entry.size - top - 1)).all fun j =>
+            !byPath.contains (pathKey (entry.extract 0 (top + 1 + j)))
+        | none => false
       let path := positions[p]!.path
-      let binding : Binding := {
-        mention := path, node := positions[p]!.ctor, rule, antecedents := keys
-        flagDefect := path.any defectStep || rule == "firstMention" || rule == "laterMention" }
-      if frame.byOrder then out := { out with mentionsByOrder := out.mentionsByOrder + 1 }
-      let text := binding.toJson.compress
-      unless seen.contains text do
-        seen := seen.insert text
-        out := { out with bindings := out.bindings.push binding }
+      let k := pathKey path
+      let index ← match mentionIndex[k]? with
+        | some index => pure index
+        | none =>
+          let b : Binding := {
+            mention := path, node := positions[p]!.ctor
+            placedByOrder := frame.byOrder, flagDefect := flagged p }
+          mentions := mentions.push b
+          if frame.byOrder then out := { out with mentionsByOrder := out.mentionsByOrder + 1 }
+          mentionIndex := mentionIndex.insert k (mentions.size - 1)
+          pure (mentions.size - 1)
+      let antecedentsText := (Json.arr (keys.map (·.toJson))).compress
+      let readingAt := mentions[index]!.readings.findIdx? fun r => r.rule == rule &&
+        (Json.arr (r.antecedents.map (·.toJson))).compress == antecedentsText
+      lastReading := lastReading.insert (index, pass)
+        (readingAt.getD mentions[index]!.readings.size)
+      mentions := mentions.modify index fun b =>
+        match b.readings.findIdx? (fun r => r.rule == rule &&
+            (Json.arr (r.antecedents.map (·.toJson))).compress == antecedentsText) with
+        | some r => { b with readings := b.readings.modify r fun r => { r with
+            passes := if r.passes.contains pass then r.passes else r.passes.push pass
+            entries := if r.entries.contains entry then r.entries else r.entries.push entry
+            inOrder := r.inOrder || ordered } }
+        | none =>
+          let reading : Reading := {
+            rule, antecedents := keys, passes := #[pass], entries := #[entry]
+            inOrder := ordered }
+          { b with readings := b.readings.push reading }
     | .mint entries =>
       let o := owner stack
       let top := stack.back!
-      let scope := (stack.extract (o + 1) stack.size).toList.findSome? (·.scope)
+      let scopes := (stack.extract (o + 1) stack.size).toList.filterMap (·.scope)
       let via := if top.synthesized then some top.kind else none
       if via.isSome then out := { out with mintsViaSynthesized := out.mintsViaSynthesized + 1 }
+      if scopes.contains "RelativeHead" then
+        -- The head a relative clause's `which` binds is the noun phrase the clause restricts.
+        let head := (stack.reverse.find? fun f =>
+          f.kind == "NounPhrase" && f.pos.isSome).getD stack[o]!
+        for (id, _) in entries do
+          let key : Key := {
+            path := pathOf head, role := "RelativeHead", placedByOrder := head.byOrder }
+          ids := ids.insert id key
+        continue
       for (id, tag) in entries do
         let k := stack[o]!.mints
         stack := stack.modify o fun f => { f with mints := f.mints + 1 }
-        let role := match scope with
+        let role := match scopes.head? with
           | some label => label
           | none => if tag == "Intro" || tag == "Created" then s!"{tag}({k})" else tag
-        ids := ids.insert id { path := pathOf stack[o]!, role, via }
+        let key : Key := {
+          path := pathOf stack[o]!, role, via, placedByOrder := stack[o]!.byOrder }
+        ids := ids.insert id key
     | .successors moves =>
       let o := owner stack
       for (old, new) in moves do
         let k := stack[o]!.moves
         stack := stack.modify o fun f => { f with moves := f.moves + 1 }
-        ids := ids.insert new {
+        let key : Key := {
           path := pathOf stack[o]!, role := s!"MovedSuccessor({k})"
-          source := ids[old]?.map (·.toJson) }
+          source := ids[old]?.map (·.toJson), placedByOrder := stack[o]!.byOrder }
+        ids := ids.insert new key
     | .rewritten .. => pure ()
-  return out
+  for ((index, pass), r) in lastReading.toList do
+    mentions := mentions.modify index fun b =>
+      { b with readings := b.readings.modify r fun r => { r with lastIn := r.lastIn.push pass } }
+  mentions := mentions.map fun b =>
+    { b with readings := b.readings.map fun r => { r with lastIn := r.lastIn.qsort (· < ·) } }
+  return { out with bindings := mentions }
 
 end DiscourseExport
