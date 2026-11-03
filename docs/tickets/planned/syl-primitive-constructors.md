@@ -7,7 +7,7 @@ Standard constraints apply. Step 0 of the semantics-v3 rewrite: `.syl` carries n
 naming. Today a primitive either takes its constructor's Lean name (`primitive activated(…):
 Ability` is `Ability.activated`) or names it with a leading dot (`primitive abilities(keyword:
 KeywordTerm): AbilityLost = .term`), and a bare word anywhere may resolve straight to a constructor
-or closed enum word of the expected sort (`docs/decisions/semantics-v3.md` §4.5 item 2, step 4;
+or closed enum word of the expected sort (`docs/decisions/semantics-v3.md` §5.2 item 2, step 4;
 `stat(power)` reaches `Stat.power` with no declaration). The AST's constructor names therefore live
 in Lean, and cards, templates and Definitions use them.
 
@@ -28,7 +28,7 @@ what the Lake generator emits.
   (`other: NounPhrase`, `Option(List(Cost))`). Cards, templates, Definitions and rules never write a
   constructor; they reach every constructor through its primitive. The loader refuses a capitalized
   identifier anywhere else.
-- **No bare constructor fallback.** Step 4 of §4.5 item 2 is deleted: every constructor or enum word
+- **No bare constructor fallback.** Step 4 of §5.2 item 2 is deleted: every constructor or enum word
   a declaration uses today without a primitive (`power`, `battlefield`, …) gets a primitive file,
   `primitive power: Stat = Power`, with a `spelling` where it has a printed word. Many of these are
   one-line renames; that is intended.
@@ -39,12 +39,13 @@ what the Lake generator emits.
   trailing underscore and no leading dot remains in `.syl`.
 - `deckmaste_dsl` parses and formats the constructor clause, and enforces the capitalization rule
   (or `semantics` does, at load; say which).
-- Update §4.4 (bare words, the leading dot) and §4.5 (the primitive rule, names, dispatch steps)
-  of `docs/decisions/semantics-v3.md`.
+- Update §5.1 and §5.2 of `docs/decisions/semantics-v3.md`: the primitive rule, the dispatch
+  steps (step 4 goes), and the direct-sort-atoms paragraph (it goes; "optional positions" stays the
+  one implicit wrap).
 
 - **No implicit conversions, with one exception.** A value stands only at its own sort; every wrap
   into another sort is a primitive written at the call site. Uniformity first, convenience later
-  (`syl-implicit-coercions`), whatever the corpus churn. This retires §4.5's direct sort atoms;
+  (`syl-implicit-coercions`), whatever the corpus churn. This retires §5.2's direct sort atoms;
   `Option` is the exception:
   - **Color words** are primitives at `Color` only, once each. A `ColorOrColorless` or a mana
     symbol wraps one explicitly (a mana cost `[1, blue, blue]` writes each symbol with its
