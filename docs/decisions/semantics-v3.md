@@ -72,6 +72,8 @@ as others are pushed and removed.
 - A referent records the clause it was last foregrounded in and its role there: subject, object or
   other. Possessor mentions foreground their referent with role other, but they are never
   clause-mates of the verb.
+- A re-mention in a direct argument slot is a clause-mate for J2 and Principle A, and D′ ranks
+  it in the current clause.
 - **Actors are not referents.** A Handoff makes its Actor the innermost for the Action it contains.
   Pronouns, groups and counts never read an Actor; only the `actor` word does.
 - A disjunctive noun phrase exports only the referents common to every branch. A coordination bound
@@ -89,7 +91,10 @@ spell or ability is put on the stack ([CR#601.2c,115.1]).
 2. **Duplex** (a trigger, a replacement, a positive conditional). Antecedent referents are
    accessible in the consequent and closed after it. A `doIf` with no else branch lets its branch's
    output continue: in "Create a token if you control a creature. Put a counter on it.", "it" is
-   the token. With an else branch, branch-local non-targets are closed.
+   the token. With an else branch, branch-local non-targets are closed. An existential
+   ("there is …", `exists`) publishes its indefinite subject to the consequent. Inside a
+   replacement's condition, that subject ranks below earlier mentions for a plural pronoun and for
+   "the rest".
 3. **Negated or modal** (`cant`/`must`/`can`/`gatedBy`, `not`, an else branch). Hypothetical
    indefinite, counted and partitive participants are closed. Targets, definite references and
    universal domains stay accessible under their identities ([CR#101.2]).
@@ -150,6 +155,8 @@ description with no zone or "card" reads the permanent as it is.
   pronoun resolved to, but only when one exists. Then take the most recent.
 - **Participial Descriptions** ("the exiled card") require the unique referent the deed stamped.
   They are the only references that reach objects a linked ability published ([CR#607.2a]).
+  "This way" reads only the current ability's stamps, since it is no linking phrase ([CR#607.1]).
+  Only a Participial Description written without "this way" reaches a linked ability's objects.
 
 ### 2.5 The Contrast Anchor
 
@@ -352,7 +359,11 @@ A lookback is `did(subj, action, within)`, with an optional Event Ordinal.
    3. the declaration `(name, T)`;
    4. a constructor or enum word of `T`.
 
-   Declarations therefore shadow constructors. `some` is never written.
+   Declarations therefore shadow constructors.
+
+   **Optional positions.** A value at an `Option(T)` position is written as a `T`, `some` is never
+   written, and an omitted argument takes its declared default. This is the one implicit wrap the
+   language keeps.
 
    **Direct sort atoms** are integers; color words; and keyword names at `Ability`, `KeywordLabel`,
    `KeywordTerm`, `Action` and `Deed`.
