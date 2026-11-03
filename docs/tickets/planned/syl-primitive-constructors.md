@@ -42,13 +42,20 @@ what the Lake generator emits.
 - Update §4.4 (bare words, the leading dot) and §4.5 (the primitive rule, names, dispatch steps)
   of `docs/decisions/semantics-v3.md`.
 
-- **Color words get primitives too, once each:** `white`, `blue`, `black`, `red` and `green` are
-  primitives at `Color` only. Where a `ColorOrColorless` or a mana symbol is expected, the wrapping
-  constructors are written explicitly through their own primitives (a mana cost `[1, blue, blue]`
-  writes its colored symbols with the mana-symbol wrapper); bring the wrapper words' names to the
-  owner before respelling the corpus. Declared implicit wrapping is `syl-implicit-coercions`, later.
-  Integer literals stay literals, and a Definition name still stands for its keyword at
-  `Ability`, `KeywordLabel`, `KeywordTerm` and `Deed` (§4.5's direct sort atoms, less the colors).
+- **No implicit conversions of any kind.** A value stands only at its own sort; every wrap into
+  another sort is a primitive written at the call site. Uniformity first, convenience later
+  (`syl-implicit-coercions`), whatever the corpus churn. This retires §4.5's direct sort atoms
+  and `Option` auto-wrapping:
+  - **Color words** are primitives at `Color` only, once each. A `ColorOrColorless` or a mana
+    symbol wraps one explicitly (a mana cost `[1, blue, blue]` writes each symbol with its
+    wrapper).
+  - **Integer literals** are values only at the integer sorts. An `Amount` or a generic mana
+    symbol wraps one explicitly.
+  - **A Definition's name** stands for that Definition only (its `Action` or `Ability`). Its
+    keyword label, keyword term and Deed are each reached through a wrapper.
+  - **`Option`:** a value at an `Option` position is wrapped explicitly; an argument or field left
+    out still takes its declared default, which is not a conversion.
+  - Bring the wrapper words' names to the owner before respelling the corpus.
 
 ## Tests
 
