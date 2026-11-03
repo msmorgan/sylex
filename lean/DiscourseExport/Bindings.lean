@@ -97,6 +97,9 @@ private structure Region where
   pos : Option Nat := none
   aligned : Bool := false
   rewrites : Std.HashMap USize USize := {}
+  /-- The address a frame over a rewritten node entered with: the rewrite ends with the last
+  frame over it, after which the address may be reused. -/
+  rewrittenAt : Option USize := none
   pending : Array Pending := #[]
   /-- Positions of the aligned non-scalar frames this frame owns. -/
   children : Array Nat := #[]
@@ -159,6 +162,7 @@ private def locate (env : Environment) (positions : Array Position)
             stack := stack.modify o fun f => { f with pending := f.pending.push pending }
           stack := stack.push { kind }
         else
+          let raw := addr
           let mut addr := addr
           let mut hops := 0
           let rewriteOf := fun (a : USize) => stack.reverse.findSome? (·.rewrites[a]?)
@@ -172,9 +176,12 @@ private def locate (env : Environment) (positions : Array Position)
             out := { out with aligned := out.aligned + 1 }
             unless region.isPrefixOf positions[p]!.path do
               out := { out with outOfRegion := out.outOfRegion + 1 }
+              out := out.fail
+                s!"{kind} at {(toJson positions[p]!.path).compress} outside {(toJson region).compress}"
             located := located.set! i (some p)
             stack := stack.modify o fun f => { f with children := f.children.push p }
-            stack := stack.push { kind, pos := some p, aligned := true }
+            stack := stack.push { kind, pos := some p, aligned := true
+                                  rewrittenAt := if hops > 0 then some raw else none }
           | none =>
             out := { out with synthesized := out.synthesized + 1 }
             stack := stack.push { kind }
@@ -184,6 +191,9 @@ private def locate (env : Environment) (positions : Array Position)
       else
         let frame := stack.back!
         if !closing then stack := stack.pop
+        if let some raw := frame.rewrittenAt then
+          unless stack.any (·.rewrittenAt == some raw) do
+            stack := stack.map fun f => { f with rewrites := f.rewrites.erase raw }
         let mut keys : Array String := #[]
         for p in frame.pending do
           unless keys.contains p.key do keys := keys.push p.key

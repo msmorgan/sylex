@@ -106,7 +106,7 @@ unsafe def classify (name module : Name) (type : Expr) :
     for b in binders, a in lhs.getAppArgs do
       let decl ← b.fvarId!.getDecl
       if decl.binderInfo.isExplicit then
-        out := out.push (decl.userName.toString, a)
+        out := out.push (decl.userName.eraseMacroScopes.toString, a)
     return out
   try
     let args ← args.mapM fun (n, a) => return (n, ← renderArgument a)

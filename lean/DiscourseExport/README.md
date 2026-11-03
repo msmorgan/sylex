@@ -81,4 +81,6 @@ every such node: one candidate in its nearest aligned frame places it at once; o
 that frame ends, its visits of the constructor are placed in reading order
 (`SylGen.ReadOrder.fieldOrders`) on the candidates outside the nodes its other frames covered,
 and the two counts must agree. Any disagreement, unknown antecedent id, mention of a node not in
-the card, or shared allocation is an alignment failure.
+the card, frame placed outside the node of the frame that stepped it, or shared allocation is an
+alignment failure. A rewrite counts only inside the frame that made it and until the last frame
+over the rewritten node ends, since its address may then be reused.

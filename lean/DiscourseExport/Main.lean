@@ -42,8 +42,12 @@ private unsafe def exportBindings (dir : System.FilePath) : MetaM (Array String 
       let (term, positions, slots) ← walk (mkConst entry.declaration)
       let (card, addresses) ← withOptions (fun o => o.set `compiler.extract_closed false) <|
         evalExpr (Semantics.Card × List USize) pairType term (safety := .unsafe)
+      -- Hold the card while it is checked: given its last reference, the compiled checker
+      -- would reuse its nodes' memory in place (`narrowBareTo`), and addresses would lie.
+      let held ← IO.mkRef (some card)
       let (refusals, events) ← Semantics.Trace.collect fun _ => Semantics.Card.check card
       let a := align env positions slots addresses events
+      if (← held.get).isNone then throwError "card released early"
       if (← IO.getEnv "DISCOURSE_DEBUG") == some name then
         for (slot, addr) in slots.toList.zip addresses do
           IO.eprintln s!"pos {slot} {addr} {positions[slot]!.type} {positions[slot]!.ctor} {(toJson positions[slot]!.path).compress}"
