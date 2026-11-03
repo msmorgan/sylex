@@ -40,12 +40,11 @@ requires explicit review rather than an opportunistic refactor.
   `deckmaste_lexical_source_v4`: data-driven schema/production engine,
   frame-driven complementation, CR-catalog separation, stratified buildout, and
   two-stage cutover.
-- [Semantics v3](semantics-v3.md) — Clean-sheet DRT checker (`DRS`,
-  `ReferentId`, nested boxes, `J1`, `J2`, `D′`, `AC>R1`), `Definition` vs.
-  `Template` split, and Unified Action-Clause Spine (`instruct`, `does`,
-  `would`/`instead`, `cant`/`must`/`may`/`gatedBy`, `did`/`tally`, `by`, `any`,
-  `which`), executed in `lean/Semantics/` with `.syl` declarations and cards under
-  `plugins_v3/`.
+- [Semantics v3](semantics-v3.md) — The design authority for semantics: DRT
+  reference resolution (the DRS, boxes, `J1`, `J2`, `D′`, `AC>R1`, Contrast
+  Anchors), the Definition/Template split, the action-clause spine (`instruct`,
+  `does`, `would`/`instead`, `cant`/`must`/`can`/`gatedBy`, `did`/`tally`, `by`,
+  `any`, `which`), and the `.syl` data language under `plugins_v3/`.
 - [Card authoring binds no implicits](card-authoring-binds-no-implicits.md) —
   Card authoring binds no implicit parameters; core constructors take every
   field required. Superseded for the Lean workbench (2026-10-21): Templates may

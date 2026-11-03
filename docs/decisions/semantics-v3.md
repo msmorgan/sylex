@@ -1,757 +1,1283 @@
-# ADR: Semantics v3 — Clean-Sheet DRT Checker, Definition/Template Split, and Unified Action-Clause Spine
+# ADR: Semantics v3 — DRT Reference Resolution, the Definition/Template Split, and the Action-Clause Spine
 
-> 2026-10-26: `deckmaste_english_v4` and `deckmaste_lexical_source_v4` are now `deckmaste_english` and `deckmaste_lexical_source`; the census command is `cargo xtask english`.
+- **Status:** Promoted (accepted by owner).
+- **Supersedes (archived in `docs/archive/decisions/`):** `semantics-v2.md`,
+  `oracle-text-is-forward-anaphoric.md`, `idris-is-a-soundness-gate.md`. Their rulings that remain in
+  force are restated here (§6), so this ADR is self-contained. Never copy v2 or v3 work back into
+  v1, and add no new v1 registries.
 
-- **Status:** Promoted (accepted by owner 2026-10-13 / 2026-10-14)
-- **Supersedes (archived in `docs/archive/decisions/`):**
-  - `docs/archive/decisions/semantics-v2.md`
-  - `docs/archive/decisions/oracle-text-is-forward-anaphoric.md`
-  - `docs/archive/decisions/idris-is-a-soundness-gate.md`
+## Overview
+
+Semantics v3 is the project's model of what card text means. A card's meaning is a `.syl` term: a
+first-order tree of words (primitives, Templates and Definitions) that stays close to the card's
+English. Each phrase sits where the card prints it and is read in printed order. Semantics v3
+checks that a term is a faithful reading of its English, and lowering compiles the term to the
+engine's core.
+
+It replaces three earlier designs with one each: an explicit Discourse Representation Theory (DRT)
+model of reference replaces positional binding stacks; rules-defined vocabulary (Definitions) is
+kept apart from phrasing helpers (Templates); and each verb is defined once, as an Action, instead
+of once per clause mood.
+
+### Principles
+
+The detail is in §1.
+
+1. **Surface-faithful.** A construction stands where the English puts it. There are no hoisted
+   binders and no target slot lists; lowering does all rearrangement.
+2. **Read forward.** Every argument is read in the discourse context of everything printed before
+   it. The only exception is one clause-internal step of the Contrast Anchor (§2.5).
+3. **The checker reads text, not game state.** It decides whether a term is a faithful reading of
+   its English. Whether an object can be found at runtime, and in what order effects apply, is the
+   engine's concern.
+4. **Rules are data.** Every decomposable game rule is a declaration, not engine code.
+5. **The CR decides structure.** The model distinguishes what the Comprehensive Rules distinguish,
+   composes existing parts before it adds new ones, and adds nothing to work around a check of
+   runtime state.
+6. **One source of truth.** Each word is declared once, in one `.syl` file, with its spelling,
+   signature, lexical frames and meaning together. Everything else is derived from it.
+
+### Pipeline
+
+1. **`.syl` files (§5.1).** Every declaration and card is a `.syl` file whose text is its own
+   first-order syntax tree. `deckmaste_dsl` parses it.
+2. **Name resolution and expansion (§5.2).** Each word resolves by its name and the sort expected
+   where it stands. Templates expand inline. A Definition expands into its own Reference Scope,
+   under its Deed. Binding Identities are assigned in the order the checker reads the expanded
+   tree.
+3. **Discourse (§2, §4).** The expanded term is read left to right against a Discourse
+   Representation Structure (DRS). Each mention introduces a referent or resolves to an existing
+   one. Boxes govern which referents stay accessible, and the anaphor rules pick antecedents.
+4. **Lowering.** The checked term compiles to the engine's core. Hoisting, target slot lists and
+   register indexing all happen here ([`core-explicit-regions.md`](./core-explicit-regions.md)).
+   The Rust rewrite (`semantics-rust-rewrite`) owns this step.
+
+Lean is a workbench and verifier for this model. It is never in the hot path of card compilation:
+the Rust pipeline reads `.syl` natively.
+
+### Main concepts
+
+- **Definition vs Template (§3).** A Definition is vocabulary the rules define (a keyword action or
+  ability [CR#701.1,702.1], a Counter, a Designation), read in its own Reference Scope under its
+  Deed. A Template is a printed phrasing that expands transparently in its caller.
+- **The action-clause spine (§4).** Each verb is one Action. Imperatives, Handoffs, costs, triggers,
+  replacements, deontic rules and lookbacks all embed that same Action, under a Subject that states
+  its voice.
+- **The DRS and reference resolution (§2).** Mentions introduce referents with a stable identity, a
+  clause and a grammatical role. Anaphors and bare "another" resolve against the referents
+  accessible in the current box.
+- **Read order (§1 item 2, §5.2 item 3).** Arguments are read in printed order. A parameter used
+  several times is bound where the checker first reads it and read back elsewhere.
 
 ---
 
-## 0. Layer Contract, Charter, and Execution Strategy
+## 1. Principles
 
-### 0.1 Standing Layer Contract and Forward-Anaphoric Reading Order
-
-1. **In-situ surface constructions (no prenex hoisting):** Semantics v3 encodes the Magic card grammar as a reduced, surface-faithful form of English translated from the `deckmaste_english_v4` AST ([`semantics-spelling-lowering.md`](./semantics-spelling-lowering.md) §17; [`english-v4.md`](./english-v4.md)). Constructions occupy their surface positions: no prenex target slot lists, no hoisted binders, and no positional slot reads. All rearrangement, hoisting, and register indexing belong to lowering (the deleted `deckmaste_lowering_v3` is superseded by `semantics-rust-rewrite`; [`core-explicit-regions.md`](./core-explicit-regions.md)).
-2. **Strictly forward-anaphoric reading order:** Every constructor argument position is checked in the discourse context of everything textually earlier; constructor argument order is textual order, and `DRS` state threads left to right. There is no cataphora, apart from the clause-internal Contrast Anchor of step 3 below, and no out-of-band target/announce channel:
-   - **A bare `"another"` / `"other"` contrasts with a Contrast Anchor, not necessarily with an earlier target:** `"another target creature you control"` in reconfigure (`[CR#702.151a]`) and Olivia Voldaren's `"deals 1 damage to another target creature"` (the example under `[CR#707.11]`) have no earlier target; they exclude the source. `Predicate.other` (`isOther`) is the only encoding of a bare printed `"another"` / `"other"` (`"any other target"` is `isAnyOtherTarget`, `and [isAnyTarget, isOther]`); `Predicate.otherThan <NP>` is reserved for a printed `"other than <NP>"`. The checker resolves the anchor in this order. A mention of the source coordinated with the `"other"` phrase is that phrase's anchor (Slimefoot and Squee's `"Return this card and up to one other target creature card"`). Otherwise:
-     1. the current member of the distributive group the subject of the `"other"` phrase's clause names (`"each …"`, `"all …"`, a bare plural or another plural group), when compatible as in step 2: Run's (*Hit // Run*) `"Attacking creatures you control get +1/+0 until end of turn for each other attacking creature"` counts, for each affected creature, the attacking creatures other than that creature, not those other than the whole group. The affected set is fixed when the effect begins (`[CR#611.2c]`), but the amount is a function of each member. The checker records this anchor as the member of the group's mention (`ContrastAnchor.member`), so the engine evaluates the amount per member. An `"other"` phrase in a different clause, or in a nested clause whose subject names no such group, skips this step;
-     2. the nearest earlier mention in scope compatible with the head in kind, card type, zone and controller, target or not (`"Choose a player. Each other player…"`); recency is the DRS's, so on Arc Trail (`"deals 2 damage to any target and 1 damage to any other target"`) the first target beats the source. Mentions of the source and of `you` are never step-1, step-2 or step-3 candidates: they are the step-4 fallback only. A referent a condition introduces (an intervening `"if"`, a `doIf`/`doOnlyIf` condition, `exists_`) is a hypothetical and never a candidate, though targets the action branch announces are (`[CR#601.2c]`): Flames of the Raze-Boar's `"each other creature that player controls if you control a creature with power 4 or greater"` contrasts with the target. The zone check keeps a cast spell (Hulkling, Young Avenger) or a revealed card (Invasion of Tarkir) from anchoring a phrase on the battlefield. The controller check (coordinator clarification of "compatible", 2026-10-21) applies at every step: a candidate whose controller restriction contradicts the head's (`"you control"` against `"an opponent controls"`) is never the anchor, so Bartz and Boko's `"each other Bird you control deals damage equal to its power to target creature an opponent controls"` contrasts with the source, not the target. The exclusion of the `is` subject covers only the predicate's own `"another"`, not a noun phrase nested in it: Unexpected Allies' `"if it has the same name as another creature you control"` contrasts with `"it"`. The thing `"another"` describes, including the subject of the `is` condition it is predicated of, is never its own anchor, so backup's `"If that's another creature"` (`[CR#702.165a]`) contrasts with `"this creature"`, not with `"that creature"`;
-     3. failing that, a compatible particular of the same clause or event, read forward: when `"another <X>"` is the agent of a clause (a `would`, event, deontic, handoff, copy or characteristic-change clause), that clause's compatible target, definite description or attachment host is the anchor; a generic indefinite (`"a permanent or player"`, `"each creature"`) never is, so Embermaw Hellion's `"another red source you control would deal damage to a permanent or player"` falls through to the source. Inquisitor's Flail's `"If another creature would deal combat damage to equipped creature, it deals double that damage to equipped creature instead"` contrasts with the equipped creature, so a redirection effect (`[CR#614.9]`) that makes the equipped creature deal combat damage to itself is doubled once by the Flail's first ability, not twice (`[CR#614.1a,616.1f]`); Mirrorweave's `"Each other creature becomes a copy of target nonlegendary creature"` contrasts with the target;
-     4. otherwise the source, for an object head in a zone the source may be in and not restricted to a controller other than `you`, whatever its card types (Ebony Fly, Restless Ridgeline, Gideon Blackblade and Vehicles are creatures when their `"another"` applies), or `you`, for a player head (`[CR#109.5]`). A head that may be an object or a player (`"any other target"`) falls back to the source, never to `you`.
-   - A delayed trigger or continuous effect reads previously announced targets as settled particulars (`[CR#603.7c]`). They are not its own targets, which are chosen per ability (`[CR#603.3d,601.2c]`), but they are earlier mentions in scope, so under step 2 they can be the Contrast Anchor of an `"other"` in it.
-   - Across an activated ability's colon (`cost : effect`), the effect reads every cost referent its text can name, wherever the cost moved it, a hidden zone included; whether the engine can find the object at runtime, or must use its last known information, is the engine's concern (`[CR#400.7j,608.2h]`; item 4 below).
-   - **A moved referent is read back by anaphora (`[CR#400.7,400.7j]`):** When a `Definition` or `Template` body moves a parameter's referent to another zone, the object in the new zone is a new object; subsequent clauses read it back by anaphora (`it`, `that card`, `"each card exiled this way"`), never by `laterMention` of the pre-move parameter.
-3. **Checker Charter (faithful English reading, not runtime engine simulation):** The Lean checker (`lean/Semantics/Check/`) verifies that a written semantic term is a faithful reading of the card's English: its discourse referents, pronouns, demonstratives, outcomes, choices, stamps, reference scopes, plurality, and `instruct` performers resolve, its terms are well-kinded, and its card frame (`cardLine` through `prototypeFrame`) is well-formed. It is not a runtime rules engine (`[CR#101.3,609.3]`).
-4. **Engine boundary: rules are data, runtime state is the engine's:** Every decomposable game rule is modelled as data in the DSL: lifelink's damage result (`[CR#702.15b]`), the +1/+1 and −1/−1 counter annihilation state-based action (`[CR#704.5q]`), turn-based actions (`[CR#703.1]`), and intrinsic type rules such as a planeswalker's or battle's entry with counters (`[CR#306.5b,310.4b]`). `lean/Semantics/Rules.lean` (Rules Tables and Registry Definitions) is the prototype for those definitions. Lean does not check that such a rule is defined correctly; its CR citations carry that. The checker's job is the meaning of text: compositional denotation, discourse and reference resolution (anaphora, scope, binders), and sort and binder well-formedness. It does not simulate runtime game state. Whether an object in a hidden zone is visible at runtime, whether last known information is available (`[CR#608.2h]`), timing, and the order in which state-based actions or replacement effects apply (`[CR#704.3,616.1]`) are the engine's. A reference with a well-formed textual antecedent is admitted: "the creature returned this way" names the creature a cost returned to its owner's hand. Reference resolution therefore applies no public-zone filter: not across an activated ability's colon (step 2), not in box 1 of §1.3, not in §1.5's Last Known Information paragraph, and not on what `Ability.textContext` publishes (`lean-v3-ninjutsu-defender-lki`). The runtime-state audit (`lean-v3-checker-runtime-state-audit`) supersedes the former current-stack requirement for information reads of departed spells (§1.5). Shuffle discourse rules and action-slot reach remain; the unused `Location.face` helper and its pin are retired. Rules-as-data checks remain well-formedness checks.
-5. **The CR is authoritative on rules structure:** This refines the 2026-10-21 governing principle that a Core AST distinction exists only where the CR or the checker's anaphora resolution distinguishes it. It has three parts:
-   - (a) **Encode the structure the CR states.** Where the CR distinguishes two rules structures, the Core AST distinguishes them: an intervening `"if"` from a plain condition (`[CR#603.4]`), a replacement from a trigger (`[CR#614.1,603.1]`), an additional from an alternative cost (`[CR#118.8,118.9]`), a turn-based action from an effect (`[CR#703.1]`). A structural distinction is never dropped on the theory that no card notices it. Gift's second ability is an intervening `"if"` (`[CR#702.174b]`), and `[CR#702.174c]`'s "gives a gift" triggers, Jolly Gerbils among them, depend on it.
-   - (b) **Compose before minting.** A CR definition is expressed by composing existing primitives, with Templates carrying the printed wording, rather than by a one-off constructor. A planeswalker's or battle's entry with counters reads `statOf (.stat .loyalty|.defense) .this`, because off the battlefield loyalty and defense already are the printed number (`[CR#306.5a,310.4a]`); there is no printed-number projection.
-   - (c) **No AST workaround for a runtime-state check.** Where a checker rule simulates runtime state (item 4), the check is removed; the AST gains no node, field or variant to satisfy it. Reading the entry conferrals' count as timing-dependent was such a case.
-   The audit of earlier rulings and recently added Core constructors against these three parts is `lean-v3-cr-structure-principle-audit`.
-
-### 0.2 Motivation for Semantics v3
-
-During the `semantics-v2` work and the anaphora measurement in `semantics-v2-anaphor-resolution-heuristics`, three structural invariants converged:
-
-1. **Piecemeal DRT reinvention in the checker:** `lean/Semantics/Check/` inherited its positional `Bindings = List Binding` stack (`address : Option (List Nat)`, `shiftAddress`, `operandAddress`, `closeOperandAddress`, `Payload.parameterFrame`, `Payload.masked`, `Payload.hidden`), `Window` (`whole`, `parameter`, `top`, `below`, `introduced`, `outsideIntroduced`), `withBindings` / `CaptureInput`, and two-pass `MoveProfile` / `StepProfile` machinery from the Idris prototype. Meanwhile, the measured anaphor rules accepted by the owner (`D′` for bare pronouns `it`/`them`/`they`, and `AC>R1` for demonstratives `that <noun>`/`those <nouns>`) require explicit Discourse Representation Theory (DRT) constructs: stable discourse-referent identities, clause boundaries, grammatical roles (`.subj | .obj | .other`), pronoun-resolution tracking within the current clause, and nested DRS accessibility boxes.
-2. **Conflation of rules-defined `Definition`s and syntactic `Template`s:** `plugins_v2/` and `lean/Semantics/Macros.lean` treated keyword actions/abilities (`[CR#701,702]`) and syntactic Oracle phrasing helpers as the same mechanism, inferring `ownScope` / `inCaller` from directory paths or omitting them on hand-written Lean macros (`31` of the `48` alignment drifts in `lean-macros-cutover`).
-3. **3–4× verb duplication across clause moods:** Every game action was encoded separately as an imperative `Instruction`, a triggered/replacement `GameEvent` (`21` of `29` constructors), a deontic `StaticSpec.deonticRule` (`Deeds` + `Role` + `DeonticPatient`), and a historical `LookbackClause` (`Condition.happened`, `Predicate.happenedTo`, `Amount.eventTally`), each with its own subject/patient plumbing and checker pass.
-
-### 0.3 Honest `v3` Naming, Lean-First Execution, and Crate Fates
-
-Rather than retrofitting these changes incrementally onto `semantics_v2` and `plugins_v2/` in lockstep with `macro_ron`, **Semantics v3** (`semantics-v3`) is executed **Lean-first**:
-
-1. **Phase 1 — Lean-Only Specification and Proofs (`lean/Semantics/`):**
-   - To avoid migrating downstream Lean files three times across intermediate tickets, Ticket 1 (`lean-v3-action-clause-spine`) relocates the `v2` Lean modules into an inert reference directory `lean/archive/SemanticsV2/` (outside `lean/lakefile.toml`'s `roots` and `defaultTargets`) and activates `lakefile.toml` targets progressively layer by layer:
-     1. `lean-v3-action-clause-spine`: syntax layer (`roots = ["Semantics"]`, `defaultTargets = ["Semantics"]`).
-     2. `lean-v3-drt-checker`: adds `"Semantics.Check"` to `roots`.
-     3. `lean-v3-definitions-and-templates`: adds `"Semantics.Macros"` and `"Semantics.Macros.Declared"` to `roots`.
-     4. `lean-v3-proofs-and-cards`: ports `SemanticsCards` and `SemanticsProofs` once from `lean/archive/SemanticsV2/`, restores `defaultTargets = ["Semantics", "SemanticsCards", "SemanticsProofs"]`, and **deletes `lean/archive/SemanticsV2/`**.
-2. **Phase 2 — `deckmaste_semantics_v3` and `plugins_v3/` Cutover:**
-   - Once the Lean specification and proof suite are settled and green, `semantics-v3-dsl-and-plugins` creates `crates/deckmaste_semantics_v3` and `plugins_v3/` mirroring the proven `lean/Semantics/` AST and `Definition` / `Template` declarations, re-points `xtask` (`lean`, `facts`) at `v3`, and **immediately deletes `crates/deckmaste_semantics_v2` and `plugins_v2/canon/`**, and deletes `plugins_v2/builtin/` once its readers (`deckmaste_macro_def`, xtask `expansions.rs`, `plugins_v2_declarations.rs`) are repointed at `plugins_v3/builtin/`.
-   - Evaluate replacing `macro_ron` with a purpose-built `v3` DSL parser (`deckmaste_dsl_v3`) if cleaner for `Definition(...)` / `Template(...)` headers, polymorphic `any`, bare literals, and positional/named arguments without RON's structural workarounds.
-   - Build `crates/deckmaste_lowering_v3` (`semantics-v3` → `deckmaste_core`), pass the `semantics-v3-parity` ratchet and slow-test suite, and execute `semantics-v1-cutover`.
-   - **Deletion-bound:** `lean/archive/SemanticsV2/` is deleted at `lean-v3-proofs-and-cards`; `deckmaste_semantics_v2`, `plugins_v2/canon/`, and `plugins_v2/builtin/` are deleted at `semantics-v3-dsl-and-plugins`; `v1` (`deckmaste_semantics`, `deckmaste_lowering`, `deckmaste_legacy_render`, `deckmaste_plugin` with `deck.rs` and `provenance.rs` rehomed, `idris/`, `plugins/builtin`, `plugins/canon`) is deleted at `semantics-v1-cutover`. Never copy `v2`/`v3` work back into `v1`, and add no new `v1` registries.
+1. **In-situ surface constructions (no prenex hoisting).** Semantics v3 encodes Magic card grammar
+   as a reduced, surface-faithful form of English, translated from the `deckmaste_english` syntax
+   tree ([`semantics-spelling-lowering.md`](./semantics-spelling-lowering.md) §17;
+   [`english-v4.md`](./english-v4.md)). A construction occupies its surface position. There are no
+   prenex target slot lists, no hoisted binders and no positional slot reads. All rearrangement,
+   hoisting and register indexing belong to lowering.
+2. **Strictly forward-anaphoric reading order.** Every argument position is checked in the
+   discourse context of everything textually earlier. Argument order is textual order, and the DRS
+   is threaded left to right. There is no cataphora apart from the Contrast Anchor's clause-internal
+   step (§2.5 step 3), and there is no out-of-band target or announcement channel.
+   - A delayed trigger or continuous effect reads previously announced targets as settled
+     particulars ([CR#603.7c]). They are not its own targets, which are chosen per ability
+     ([CR#603.3d,601.2c]). They are earlier mentions in scope, though, so they can be the Contrast
+     Anchor of an "other" in it (§2.5 step 2).
+   - Across an activated ability's colon (`cost : effect`), the effect reads every cost referent its
+     text can name, wherever the cost moved it, a hidden zone included. Whether the engine can find
+     the object at runtime, or must use its last known information, is the engine's concern
+     ([CR#400.7j,608.2h]; item 4).
+   - **A moved referent is read back by anaphora ([CR#400.7,400.7j]).** When a Definition or
+     Template body moves a parameter's referent to another zone, the object in the new zone is a
+     new object. Later clauses read it back by anaphora ("it", "that card", "each card exiled this
+     way"), never by the parameter's Binding Identity.
+3. **Checker charter: a faithful English reading, not a runtime simulation.** The checker verifies
+   that a written term is a faithful reading of the card's English. Its discourse referents,
+   pronouns, demonstratives, outcomes, choices, deed stamps, Reference Scopes, plurality and
+   Handoff Actors resolve. Its terms are well-kinded. Its card frame is well-formed, from its card
+   lines to frames such as prototype. A Characteristic-Defining Ability meets the criteria of
+   [CR#604.3a] (what it edits, its subject, what it grants, and its conditions). A retention
+   qualifies one clause that removes Attachments, for Attachments of that clause's host
+   ([CR#702.16n,702.16p,303.4c,704.5m]). The checker is not a runtime rules engine and does not
+   judge impossible instructions ([CR#101.3,609.3]).
+4. **Engine boundary: rules are data, runtime state is the engine's.** Every decomposable game rule
+   is modeled as data in `.syl`: lifelink's damage result ([CR#702.15b]), the +1/+1 and −1/−1
+   counter annihilation state-based action ([CR#704.5q]), turn-based actions ([CR#703.1]), and
+   intrinsic type rules such as a planeswalker's or battle's entry with counters
+   ([CR#306.5b,310.4b]). Rules Tables and Registry Definitions hold those rules. The checker does not
+   check that a rule is defined correctly; its CR citations carry that.
+   - The checker's job is the meaning of text: compositional denotation, discourse and reference
+     resolution (anaphora, scope, binders), and sort and binder well-formedness. Rules-as-data checks
+     are well-formedness checks.
+   - It does not simulate runtime state. These belong to the engine: whether an object in a hidden
+     zone is visible at runtime, whether last known information is available ([CR#608.2h]), timing,
+     and the order in which state-based actions or replacement effects apply ([CR#704.3,616.1]).
+   - A reference with a well-formed textual antecedent is admitted: "the creature returned this way"
+     names the creature a cost returned to its owner's hand. So reference resolution applies no
+     public-zone filter anywhere: not across an activated ability's colon (item 2), not in box 1 of
+     §2.2, not to Last Known Information reads (§2.4), and not to what an ability's text publishes to
+     the abilities after it (§6).
+   - Information reads of a departed spell do not require it to be on the stack (§2.4). The shuffle
+     discourse rules and action-slot reach (§2.4 J1 item 4) remain.
+5. **The CR is authoritative on rules structure.** A model distinction exists where the CR or
+   anaphora resolution distinguishes it. This has three parts:
+   - (a) **Encode the structure the CR states.** Where the CR distinguishes two rules structures,
+     the model distinguishes them: an intervening "if" from a plain condition ([CR#603.4]), a
+     replacement from a trigger ([CR#614.1,603.1]), an additional from an alternative cost
+     ([CR#118.8,118.9]), a turn-based action from an effect ([CR#703.1]). A structural distinction is
+     never dropped on the theory that no card notices it. Gift's second ability is an intervening
+     "if" ([CR#702.174b]), and the "gives a gift" triggers of [CR#702.174c], Jolly Gerbils among
+     them, depend on it.
+   - (b) **Compose before minting.** A CR definition is expressed by composing existing primitives,
+     with Templates carrying the printed wording, rather than by a one-off constructor. A
+     planeswalker's or battle's entry with counters reads `statOf(stat(loyalty|defense), this)`,
+     because off the battlefield loyalty and defense already are the printed number
+     ([CR#306.5a,310.4a]). There is no printed-number projection.
+   - (c) **No workaround for a runtime-state check.** Where a checker rule simulates runtime state
+     (item 4), the check is removed. The model gains no node, field or variant to satisfy it. Reading
+     the entry conferrals' count as depending on when the entering object is read was such a case.
 
 ---
 
-## 1. Pillar 1: Clean-Sheet DRT Checker (`lean/Semantics/Check/`)
+## 2. Discourse and Reference Resolution
 
-### 1.1 Retired `Bindings` and `Window` Machinery
+### 2.1 The DRS and Its Referents
 
-The following Idris-ported structures and passes are **deleted** from `lean/Semantics/Words.lean`, `lean/Semantics/Phrase.lean`, `lean/Semantics/Events.lean`, `lean/Semantics/MacroParameters.lean`, and `lean/Semantics/Check/`:
+Every mention that introduces an entity, quantity, choice or outcome into discourse creates a
+**referent** with a stable identity in the current Discourse Representation Structure (DRS). A
+mention that resolves to an existing referent re-mentions it; it creates nothing.
 
-- `Bindings = List Binding` with positional stack indices (`address : Option (List Nat)`), `shiftAddress`, `operandAddress`, `closeOperandAddress`, `bindingAt`, and `setBindingAt`.
-- `Payload.parameterFrame`, `Payload.masked`, and `Payload.hidden`.
-- `Instruction.withBindings`, `StaticSpec.withBindings`, `Cost.withBindings`, `CaptureInput`, `Amount.parameter` (`MacroParameters.lean:29`), and `Window` (`whole`, `parameter`, `top`, `below`, `introduced`, `outsideIntroduced`), including `Window` on `NounPhrase.pro` and `ChoiceMode.theirChoice` (`Events.lean:61`).
-- `Refusal.unusedCapture`: a `Definition` parameter wrapped in `firstMention` that is mentioned only once (or moved in Step 1 and read back by anaphora in Step 2, like `airbend` `[CR#701.65a]`) is legal and never triggers an unused-capture refusal.
-- The nine hand-coded window macros in `lean/Semantics/Macros.lean` (`itPrior`, `itCondSubject`, `attachToIt`, `requireBlockIt`, `agentRef`, `itsOther`, `ownSubject`, `controllerSacrifices`, `lookedCards`).
-- The `MoveProfile` and `StepProfile` pre-passes that pre-computed positional stack shifts before stepping instructions.
+A referent records:
 
-### 1.2 Discourse Referents (`ReferentId`, `Referent`, `OwnScopeFrame`, `DRS`)
+- its identity, and the Binding Identities of the parameters bound to it (§2.3);
+- its determiner (a partitive sub-selection, from `choose` or `someOf`, is marked as partitive) and
+  its number (one or many);
+- the clause it was introduced or last foregrounded in, and its **grammatical role** there:
+  *subject* (the clause subject: the active Actor, or the promoted patient of a passive), *object*
+  (the direct object or primary patient of an active clause), or *other* (an oblique argument such
+  as a destination, source, instrument or passive `by` phrase);
+- whether a bare pronoun ("it", "them", "they") resolved to it in the current clause;
+- its sort and facts. The sorts are: **object** (Card Types, zone, deed stamps, origin, size);
+  **player**; **quality** (a chosen color, type, creature type or name); **outcome** ("that much",
+  "that many", the mana produced, a roll result, the damage marked [CR#120.3d], the shortfall of
+  "draw up to N cards", and so on); **difference** (the difference a comparison names); **letter**
+  (a defined variable `X`); **turn** ("that turn"); **ability** (an ability object and its
+  remembered location [CR#113.1c]); **pile**; and **join** (§6, joined kinds).
 
-Every mention that introduces an entity, quantity, choice, or outcome into discourse creates a `Referent` with a stable `ReferentId` in the current Discourse Representation Structure (`DRS`):
+The DRS also holds the current clause, the Actors of the enclosing Handoffs, the stack of active
+Definition Reference Scopes (§2.3), and the direct-argument mentions of the current clause.
 
-```lean
-abbrev ReferentId := Nat
+**Actors.** A Handoff (`instruct`, a clause's subject, or the Source performing a deed with no
+Handoff) makes its Actor the innermost on entry and restores the outer one on exit. An Actor
+records its kind, whether it is "you", whether a quality can be ascribed to it, the referents it
+names (none for an Actor of a kind only, several for a group) and its number. Actors are not
+referents: they have no identity, and no pronoun, word, group or count reads them, except that the
+`actor` word reads the innermost.
 
-inductive GramRole where
-  | subj   -- Clause subject (active actor, or promoted patient in a passive clause)
-  | obj    -- Direct object / primary patient of an active clause
-  | other  -- Oblique argument (destination, source, instrument, passive `by`-agent, etc.)
-  deriving DecidableEq, Repr
+**Coordinated noun phrases.** A conjunction (`and([target artifact, target enchantment])`) threads
+introductions in order and introduces one referent per conjunct. A disjunction ("you or a white
+creature you control" on *Mangara's Equity*) reads each branch independently from the incoming DRS.
+It exports only the referents common to every branch, plus a joined head referent where one
+applies, so a branch-local indefinite does not leak out as an unconditional referent. When a
+coordination is bound to a parameter, the Binding Identity attaches to every exported member, so
+later mentions and zone or status changes after the action update all of them alike
+([CR#608.2c]).
 
-structure Referent where
-  id              : ReferentId
-  idents          : List BindingId   -- Parameter identities bound via firstMention
-  det             : Determiner       -- Includes `.part` for partitive sub-selections
-  plur            : Plurality
-  clause          : Nat              -- Clause index where introduced or last foregrounded
-  role            : GramRole         -- Grammatical role in that clause
-  pronounResolved : Bool             -- True if a bare pronoun (`it`/`them`/`they`) resolved to this referent in `currentClause`
-  payload         : Payload          -- One of the live Payload variants (.object, .player, .quality, .outcome, .difference, .letter, .turnRef, .ability, .pile, .join)
-  deriving DecidableEq, Repr
+**Clause-mates and clause advancement.**
 
-structure OwnScopeFrame where
-  preEntryIds  : List ReferentId     -- Immutable snapshot of all ReferentIds present before entering this ownScope
-  maskedIds    : List ReferentId     -- Currently masked ReferentIds in this ownScope (preEntryIds minus the innermost performer's referents and unmasked parameter IDs)
-  callerReferentIds : List ReferentId := [] -- Arguments evaluated in caller scope and their successors
-  callerClause : Nat                 -- Caller's currentClause saved on entry
-  deriving DecidableEq, Repr
+- A referent introduced or re-mentioned in a **direct verb argument slot** (subject, object or
+  other) is recorded as a pending role of the current clause.
+- Possessor mentions ("its controller", "its power", "target creature's", "that creature's owner")
+  and nested modifier mentions are not recorded as pending roles, so J2 does not exclude them as
+  clause-mates of the verb. A possessor introduction or re-mention does move the referent to the
+  current clause with role *other*, so a later bare pronoun in the same clause sees the
+  foregrounded possessor (D′).
+- J2 (clause-mate exclusion) and Principle A reflexives consult the pending roles as well as each
+  referent's clause (§2.4).
+- At the end of the clause, pending roles are committed to their referents (clause and role), the
+  pending set is cleared, the clause advances, and every "pronoun resolved here" mark is reset.
+- Until then, D′ already ranks a pending referent in the current clause by its best pending role
+  (§2.4, D′ step 3).
 
-structure DRS where
-  referents     : List Referent
-  nextId        : ReferentId := 0
-  currentClause : Nat := 0
-  performers    : List ActorShape := []                -- Performers of the enclosing handoffs, innermost first; no referents
-  scopeStack    : List OwnScopeFrame := []           -- Stack of active Definition reference scopes (head = innermost ownScope)
-  pendingRoles  : List (ReferentId × GramRole) := [] -- Direct-argument mentions in currentClause (consulted by J2 and reflexives)
-  deriving DecidableEq, Repr
-```
+**A zone change clears identity ([CR#400.7,400.7j]).** When an object referent changes zone, the
+referent after the move gets a fresh identity with no Binding Identities, and the departed referent
+loses its Binding Identities too. A later mention of the pre-move parameter by its Binding Identity
+is therefore refused.
 
-- **The Live Domain `Payload` Variants in `DRS.referents`:** `Payload` holds `.object` (card types, zone, `Stamp`, origin, size), `.player`, `.quality` (`chosen` color/type/creature type/name), `.outcome (sort : OutcomeSort)` (`thatMuch`, `thatMany`, `manaProduced`, `rollOutcome`, `.damageMarked` `[CR#120.3d]`, …), `.difference` (the difference a comparison names), `.letter` (defined variable `X`), `.turnRef` (`that turn`), `.ability` (an ability object and its remembered location `[CR#113.1c]`), `.pile`, and `.join` (the members of a group of different sorts taken together), while deleting `.parameterFrame`, `.masked`, `.hidden` and the handoff frame `.actor`. Partitive sub-selections are identified by `r.det == .part`.
-- **Performers (`DRS.performers : List ActorShape`):** A handoff (`Action.instruct`, a clause's subject, or the source permanent performing a deed with no handoff) pushes its performer, innermost first, and pops it on exit. An `ActorShape` records the performer's kind, whether it is "you", whether a quality can be ascribed to it, the referents it names (none for a performer of a kind only, several for a group) and its number. Performers are not referents: they take no `ReferentId`, and no pronoun, word, group or count reads them; `NounPhrase.actor` reads the innermost.
-- **Coordinated Noun Phrases (`.and` / `.or`):** Evaluating a conjunctive noun phrase (`.and [target artifact, target enchantment]`) threads introductions in order, introducing one `Referent` per conjunct into the active DRS and returning `List ReferentId`. Evaluating a disjunctive noun phrase (`.or`, e.g. `"you or a white creature you control"` on *Mangara's Equity*) steps each branch independently from the incoming DRS and exports only referents common to every branch (`commonHeaderContext`) plus a joined head referent when applicable, so branch-local indefinites do not leak into the outer DRS as unconditional referents. When bound to a parameter via `firstMention id`, `id` is attached to every exported member of `List ReferentId` so `laterMention id` and post-action zone/status mutations update all coordinated referents uniformly (`[CR#608.2c]`).
-- **Direct-Argument Tracking (`pendingRoles`), Clause-Mates, and Clause Advancement (`nextClause`):**
-  - When a referent `r` is introduced or re-mentioned in a **direct verb argument slot** (`.subj`, `.obj`, or `.other`), the checker records `(r.id, slotRole)` in `drs.pendingRoles`.
-  - Possessor mentions (`its controller`, `ownerOf(it)`, `its power`, `"Target creature's"`, `"that creature's owner"`) and nested modifier mentions do **not** record in `drs.pendingRoles` (so `J2` does not exclude them as clause-mates of the verb), while a possessor introduction or re-mention (`inArgSlot = false`) sets `r.clause := drs.currentClause` and `r.role := .other` so subsequent bare pronouns in the same clause see the foregrounded possessor (`D′`).
-  - **Both `J2` (clause-mate exclusion) and Principle A reflexives (`itself`, `themselves`, `yourself`) consult `drs.pendingRoles` as well as `r.clause == drs.currentClause`:**
-    - If a previously introduced creature `r` is re-mentioned as the `.subj` of a new clause (`"It deals 2 damage to itself"` / `"It deals 2 damage to it"`), evaluating `"It"` in the `.subj` slot records `(r.id, .subj)` in `drs.pendingRoles`. When the `.obj` slot is evaluated in the same clause, `r` is recognized via `drs.pendingRoles` as the current clause's `.subj`—so `"itself"` succeeds (`Principle A`) and `"it"` excludes `r` as a clause-mate (`J2`).
-    - Conversely, in `"Target creature's controller sacrifices it"`, `"Target creature"` is introduced inside a possessor NP (not a direct verb argument slot, so `(r_creature.id, _)` is not in `drs.pendingRoles`, whereas `(r_controller.id, .subj)` is), so `"it"` in the `.obj` slot does not treat `r_creature` as a clause-mate and resolves to `r_creature`.
-  - At the end of the clause (`nextClause`), buffered `pendingRoles` updates are committed to `drs.referents` (`r.clause := drs.currentClause`, `r.role := slotRole`), `drs.pendingRoles` is cleared, `drs.currentClause` is incremented, and `pronounResolved := false` is reset on all referents.
-  - Until then, `D′` already ranks a buffered referent at `drs.currentClause`, by the best of its buffered slot roles (`DRS.rankingClause`, `DRS.rankingRole`). A pronoun in a direct argument slot never sees the difference, because `J2` excludes that referent as a clause-mate first. A possessor or amount pronoun does: in *Karplusan Yeti*'s "That creature deals damage equal to its power to this creature", "its" reads the re-mentioned subject "that creature", not the earlier clause's subject.
-- **Zone-Change Identity Clearing (`moveIntro`, `[CR#400.7,400.7j]`):** When an object referent changes zone (`moveIntro`), the post-move referent receives a fresh `ReferentId` with `r.idents := []` (and `r.idents` is cleared on the departed referent), so any illegal post-move `laterMention` of the pre-move parameter `BindingId` is deterministically refused by the checker.
-- **Decidability contract and `by decide` reduction budget:** `DRS` uses `List` and decidable equality throughout (`no` `Std.HashMap`), preserving `by decide` across all Lean proofs and `cargo xtask lean check`. Before re-spelling the full proof and card bench in `lean-v3-proofs-and-cards`, `lean-v3-drt-checker` measures kernel `by decide` reduction on a representative multi-clause card and multi-step definition (`airbend`, `connive`, `explore`) to verify fast per-declaration reduction with zero `maxRecDepth` or `maxHeartbeats` increases.
+### 2.2 Boxes and Quantifier Force
 
-### 1.3 Nested DRS Boxes and Quantifier Polarity
+In DRT (Kamp & Reyle 1993), an indefinite's logical force (`a(creature)`) and its forward
+accessibility depend on the **box** it is introduced in, not on separate determiner words.
 
-In DRT (Kamp & Reyle 1993), the logical force and forward accessibility of an indefinite (`a(creature)`) depend on the **DRS box** in which it is introduced, not on separate determiner constructors. A universal bare plural ("creatures you control get +1/+1") is written with the `bare` Template, which expands to `all`. A measured domain is an antecedent only where the consequent reads it: "the number of …" (`countOf`) and "the greatest … among …" (`aggregate`) measure a plural universal (`all`) and close it like a relative-clause box (box 5), so no later pronoun reads it back (*Tears of Rage*), while a target announced inside the measured domain survives the closure, being chosen as the spell or ability is put on the stack (`[CR#601.2c,115.1]`: *Tibalt, the Fiend-Blooded*'s "the number of cards in target player's hand … to that player"); "there is …" / "there are …" (`exists_`) publishes its subject, a plain, counted or coordinated indefinite ("a creature", "two or more creatures"), for the consequent, which reads it as box 2 reads an antecedent's indefinite (*Purging Scythe*, *Loxodon Peacekeeper*), and a `doIf` with no other branch, or a replacement's condition, closes it after the consequent. The domain a replacement's existential condition publishes ranks below ordinary earlier mentions for a plural pronoun and for the group "the rest" and "the other" are taken from, since the replacement does instead what the replaced action would have done, to what that action read: in *Flow State*'s self-replacement "instead put two of them into your hand and the rest …", "them" and "the rest" read the cards looked at. Any other existential's domain ranks as an ordinary mention, the nearest, so in *Juxtapose*'s "If two or more permanents a player controls are tied for greatest, their controller chooses one of them", "them" reads the tied permanents. A self-replacement's replacement starts from the state the replaced action read, without the part and remainder that action introduced, since a replaced event never happens (`[CR#614.6,614.15]`); the targets it announced stay, chosen as the spell or ability is put on the stack (*Galvanic Blast*'s "4 damage to that permanent or player instead"). A property test's coordinated subject may hold an indefinite conjunct, read existentially, and publishes its group ("you both own and control Titania, Voice of Gaea and a land named Argoth, Sanctum of Nature, exile them"). No separate measured-domain determiner remains:
+- A universal bare plural ("creatures you control get +1/+1") is written with the `bare` Template,
+  which expands to `all`.
+- **A measured domain is an antecedent only where the consequent reads it.**
+  - "The number of …" (`countOf`) and "the greatest … among …" (`aggregate`) measure a plural
+    universal (`all`) and close it like a relative-clause box (box 5), so no later pronoun reads it
+    back (*Tears of Rage*). A target announced inside the measured domain survives the closure,
+    because it is chosen as the spell or ability is put on the stack ([CR#601.2c,115.1]): *Tibalt,
+    the Fiend-Blooded*'s "the number of cards in target player's hand … to that player".
+  - "There is …" / "there are …" (`exists`) publishes its subject for the consequent: a plain,
+    counted or coordinated indefinite ("a creature", "two or more creatures"). The consequent reads
+    it as box 2 reads an antecedent's indefinite (*Purging Scythe*). A `doIf` with no other branch,
+    or a replacement's condition, closes it after the consequent.
+  - The domain a replacement's existential condition publishes ranks below ordinary earlier mentions
+    for a plural pronoun, and for the group "the rest" and "the other" are taken from. The
+    replacement does instead what the replaced action would have done, to what that action read: in
+    *Flow State*'s self-replacement "instead put two of them into your hand and the rest …", "them"
+    and "the rest" read the cards looked at. Any other existential's domain ranks as an ordinary
+    mention, the nearest: in *Juxtapose*'s "If two or more permanents a player controls are tied
+    for greatest, their controller chooses one of them", "them" reads the tied permanents.
+  - There is no separate measured-domain determiner.
+- **A self-replacement starts from the state the replaced action read**, without the part and
+  remainder that action introduced, since a replaced event never happens ([CR#614.6,614.15]). The
+  targets it announced stay, chosen as the spell or ability is put on the stack (*Galvanic
+  Blast*'s "4 damage to that permanent or player instead").
+- A property test's coordinated subject may hold an indefinite conjunct, read existentially, and
+  publishes its group ("you both own and control Titania, Voice of Gaea and a land named Argoth,
+  Sanctum of Nature, exile them").
 
-| DRS Box | Introducing Constructions | Indefinite (`a(...)`) Semantics | Accessibility Out of Box |
+| Box | Introduced by | Force of an indefinite | Accessibility out of the box |
 |---|---|---|---|
-| **1. Top-Level Imperative & Activated Cost→Effect Box** | Spell abilities, activated/triggered effect instructions (`sacrifice(a(creature))`), and `Cost.perform(action)` across `cost : effect` (`Ability.activated`, `StaticSpec.specialAction`) | Action-time existential choice (`[CR#608.2c,602.2b]`) | Accessible to all subsequent clauses in the same paragraph (`drs` threads forward). Across an activated ability's colon (`cost : effect`), `Cost.perform(action)` steps `action` in `StepPhase.postEvent` (with the activator the innermost of `drs.performers`), keeps every cost-introduced referent wherever the cost moved it (§0.1 item 4; runtime visibility `[CR#400.2,608.2h]` is the engine's), and runs `nextClause` at `:` so `"Sacrifice a creature: Draw cards equal to its power"` resolves `"its"`, `"that creature"`, and `"the sacrificed creature"` via `D′`, `AC>R1`, and `.actedOn`. |
-| **2. Duplex / Implicational Box (`K₁ ⇒ K₂`)** | Trigger event → effect (`when`/`whenever`), replacement event → replacement (`replace(would(...), instead(...))`), positive conditional → consequent (`if(did(...), thenBranch)`) | Universal quantification (`∀`) over matching events and participants (`[CR#603.2,614.1]`) | Referents introduced in the antecedent box `K₁` are **accessible** inside the consequent box `K₂` (`"Whenever a creature enters, it gets..."`, `"If you sacrificed a creature this turn, return it..."`), and closed after `K₂`. In an `if/then(/else)` instruction (`doIf` / `doOnlyIf`), announced targets (chosen at stack announcement `[CR#601.2c,115.1]`) and mutations to pre-existing outer referents survive in the enclosing DRS. With an else-branch, branch-local non-target introductions are closed on exit; with none, the branch's output continues, so in "Create a token if you control a creature. Put a counter on it." "it" is the token (`conditionalArmAntecedentIsTheToken`), and only an existential condition's domain is closed after it. |
-| **3. Negated / Modal Prohibition Box (`¬K` / `¬◇K`)** | Deontic rule (`cant(subj, action)`, and likewise `must`, `can` and `gatedBy`), negated condition (`not(...)`, which "unless" writes), `else` branch of `if(cond, thenBranch, elseBranch)` with respect to `cond` | Universal prohibition ($\neg\Diamond\exists x = \Box\forall x\,\neg$, `[CR#101.2]`) | Referents introduced inside a negated or `cant` box are **closed** on exit and inaccessible to following sentences (nor accessible in `elseBranch` from a negated `cond`). A definite source reference in a negated property test (`"if this enchantment is not a creature"`) remains available; the negated predicate introduces no accessible participants or positive type refinements. In a deontic rule (`cant`, `can`, `must`, `gatedBy`), announced targets, definite references (the source, "you", an attachment host) and universal domains (`det .all`/`.each`: *Nowhere to Run*'s "Creatures your opponents control can be the targets … as though they didn't have hexproof. Ward abilities of those creatures don't trigger.") are established in the enclosing ability scope and remain accessible by their original IDs (a domain published with `det .each` is singular, read by "it" as after "Tap each creature. Untap it."; one with `det .all` is plural); hypothetical indefinite participants (`det .a`, `.count`, `.part`) introduced by the rule's clause are closed, so after "You may cast a creature card from your graveyard", "Exile it" finds nothing. The box keeps the events a permission or requirement writes (§3.8) and the resolution bookkeeping (`resolvedIds`, `contrastAnchors`) (`closeModalBox`). An explicit `by` phrase still denotes an agent, never an attachment host. |
-| **4. Distributive Loop Box (`∀x ∈ S : K`)** | `doForEach(collection, body)` | Universal distribution over the bound collection; introduces a singular loop referent (`plur = .one`, `role = .subj`) at quantifier header clause `C`, then advances `drs.currentClause` to `C + 1` before stepping `body` | Because the loop header is at clause `C` and `body` starts at clause `C + 1`, `it` in a direct verb argument slot inside `body` (e.g., `cast(it)` in `airbend`) is not excluded as a clause-mate (`J2`) and uniquely selects the loop referent (`clause = C`) over any outer antecedent (`clause < C`). Loop-local referents are closed on exit while mutations to outer referents survive, and plural abstraction ($\Sigma X$) exports plural aggregates for loop-internal target announcements and token creations (see below). |
-| **5. Relative-Clause / Comparison Box** | `Predicate.did` (`did(..., which, ...)`), `Predicate.compareOver` (`comparesOwnStat`), the domain `Amount.countOf` and `Amount.aggregate` measure | Binds `which` (or the comparison candidate) in a subordinate clause box (`currentClause + 1`) | Local to the relative/comparison clause; `ownMember` inside `compareOver` resolves to the outer candidate without needing `Window.top 1`; closed on exit, while definite presuppositional references (`attachHost`: `"enchanted"`, `"equipped"`, `"fortified"`, `[CR#301.5,301.6,303.4b]`) project to the enclosing ability's DRS box. |
-| **6. Definition Reference Scope (`ownScope` / `inCaller`)** | Every `Definition` invocation (`[CR#701,702]`) | Evaluates arguments in caller's box (`inCaller`), masks caller referents during body execution, exports mutations and primary outcome on exit | See §1.4 below. |
+| **1. Top-level imperative, and activated cost→effect** | Spell abilities; activated and triggered effects (`sacrifice(a(creature))`); a performed cost (`perform(action)`) across `cost : effect` in an activated ability or special action | Existential choice at action time ([CR#608.2c,602.2b]) | Accessible to every later clause in the paragraph. Across the colon, the cost's action is read after its event, with the activator as the innermost Actor. Every referent the cost introduced is kept, wherever the cost moved it (§1 item 4; runtime visibility [CR#400.2,608.2h] is the engine's). A clause ends at the colon, so in "Sacrifice a creature: Draw cards equal to its power", "its", "that creature" and "the sacrificed creature" resolve by D′, AC>R1 and the sacrifice's deed stamp. |
+| **2. Duplex / implicational (`K₁ ⇒ K₂`)** | Trigger event → effect (`when`/`whenever`); replacement event → replacement (`replace(would(…), instead(…))`); positive conditional → consequent | Universal over matching events and participants ([CR#603.2,614.1]) | Referents introduced in the antecedent are accessible in the consequent ("Whenever a creature enters, it gets …", "If you sacrificed a creature this turn, return it …") and closed after it. In an if/then(/else) instruction (`doIf` / `doOnlyIf`), announced targets (chosen at announcement [CR#601.2c,115.1]) and changes to earlier outer referents survive. With an else branch, branch-local non-target introductions are closed on exit. With none, the branch's output continues: in "Create a token if you control a creature. Put a counter on it.", "it" is the token, and only an existential condition's domain is closed after it. |
+| **3. Negated / modal prohibition (`¬K` / `¬◇K`)** | Deontic rules (`cant`, `must`, `can`, `gatedBy`); a negated condition (`not(…)`, which "unless" writes); the else branch of `doIf(cond, then, else)` with respect to `cond` | Universal prohibition ($\neg\Diamond\exists x = \Box\forall x\,\neg$, [CR#101.2]) | Referents introduced inside are closed on exit and inaccessible to later sentences (nor accessible in the else branch from a negated `cond`). A definite Source reference in a negated property test ("if this enchantment is not a creature") stays available; the negated predicate introduces no accessible participants or positive type refinements. In a deontic rule, announced targets, definite references (the Source, "you", an Attachment Host) and universal domains are established in the enclosing ability's scope and stay accessible under their identities: *Nowhere to Run*'s "Creatures your opponents control can be the targets … as though they didn't have hexproof. Ward abilities of those creatures don't trigger." A domain published with `each` is singular, read by "it" as after "Tap each creature. Untap it."; one with `all` is plural. Hypothetical indefinite, counted and partitive participants the rule's clause introduces are closed, so after "You may cast a creature card from your graveyard", "Exile it" finds nothing. The box keeps the events a permission or requirement writes (§4.8) and the resolution bookkeeping (resolved pronouns, Contrast Anchors). An explicit `by` phrase still denotes the passive's agent, never an Attachment Host. |
+| **4. Distributive loop (`∀x ∈ S : K`)** | `doForEach(collection, body)` | Universal distribution over the collection. A singular loop referent (number one, role subject) is introduced at the header's clause C, and the body starts at clause C + 1. | Because the body starts a clause after the header, "it" in a direct argument slot of the body (`cast(it)` in `airbend`) is no clause-mate (J2) and selects the loop referent (clause C) over any outer antecedent (clause < C). Loop-local referents are closed on exit; changes to outer referents survive; plural abstraction exports plural aggregates (below). |
+| **5. Relative clause / comparison** | A relative lookback (`did(…, which, …)`), a comparison over candidates (`compareOver`, `comparesOwnStat`), the domain `countOf` and `aggregate` measure | Binds `which` (or the comparison candidate) in a subordinate clause (current clause + 1) | Local to the relative or comparison clause. Inside `compareOver`, `ownMember` reads the outer candidate. Closed on exit, while definite presuppositional references (an Attachment Host: "enchanted", "equipped", "fortified", [CR#301.5,301.6,303.4b]) project to the enclosing ability's box. |
+| **6. Definition Reference Scope** | Every Definition use ([CR#701.1,702.1]) | Arguments are read in the caller's box; caller referents are hidden while the body runs; changes and outcomes are exported on exit | §2.3. |
 
-**Plural Abstraction ($\Sigma X$) on Distributive Loop Exit (`doForEach`):**
-- In DRT (Kamp & Reyle 1993), exiting a distributive quantifier box (`doForEach`) closes the singular loop variable and fresh local indefinites, and abstracts plural discourse referents (`plur = .many`, with no local `BindingId` or exact member count) over:
-  1. **Explicit target selections (`Referent.announcedTargetResult`):** A resolving `Action.choose` publishes a plural target referent per announcement, retaining its post-iteration zone, types, deed stamps and origin (so *Vaevictis Asmadi, the Dire* reads "those permanents" after choosing a target permanent for each player). A target determiner alone does not identify this publication: "reveal target creature" is an ordinary local mention, and a target inside an optional branch stays closed. `SelectionEvidence.ordinaryLocalsAndOptionalTargetsRemainClosed` pins both limits.
-  2. **Post-event object creations (`Referent.createdResult`):** The loop body publishes a plural referent for objects it created, retaining their actual post-iteration zone, types and stamps (so *Hate Mirage* reads "those tokens"). `Origin.token` alone includes mere token mentions; deriving the fact from a create stamp loses a created token after a move replaces that stamp ([CR#400.7]). `DrtCards.creationResultsKeepTheirActualDestinationAfterAMove`, `movingAnOuterCreationInsideALoopDoesNotCreateAPluralResult` and `aTokenMentionIsNotACreationResult` pin the distinction.
-  **Owner ruling 2026-10-25:** Keep both flags on `Referent` as distinct discourse facts of what a loop body announced or created. This supersedes the earlier requirement to derive both from the determiner, origin and stamps. `attachmentHost` remains a separate presupposition flag read only by `leaveRelative`; it does not classify loop results.
-- **Partitive Sub-Selection and Ceiling Shortfall:** Partitive choices (`r.det == .part` from `choose` / `someOf`, consulted by `Predicate.notChosen` for `"not chosen this way"`) and `.outcome .ceilingShortfall` (from `"draw up to N cards"`) are tracked as standard `DRS` referents and `.outcome` payloads.
+**Plural abstraction on leaving a loop.** Leaving a distributive box (`doForEach`) closes the
+singular loop variable and fresh local indefinites, and abstracts plural referents (number many,
+with no Binding Identity or exact member count) over two things the body did:
 
-### 1.4 Definition Reference Scope (`enterOwnScope`, `inCaller`, `leaveOwnScope`)
+1. **Announced targets.** A resolving `choose` publishes a plural target referent per announcement,
+   keeping its zone, types, deed stamps and origin after the iteration (so *Vaevictis Asmadi, the
+   Dire* reads "those permanents" after choosing a target permanent for each player). A target
+   determiner alone does not make this publication: "reveal target creature" is an ordinary local
+   mention, and a target inside an optional branch stays closed.
+2. **Created objects.** The body publishes a plural referent for the objects it created, keeping
+   their actual zone, types and stamps after the iteration (*Hate Mirage* reads "those tokens"). A
+   token origin alone would include mere mentions of tokens, and deriving the fact from a create
+   stamp would lose a created token after a move replaces that stamp ([CR#400.7]).
 
-In the AST, a `Definition` body is wrapped in `Action.ownScope (deed : Option Deed) (body : Action)` (with `firstMention id (NounPhrase.inCaller arg)` around each first-mentioned `NounPhrase` parameter and `laterMention id (NounPhrase.inCaller arg)` around each later mention: the Binding Identity is the `Definition`'s own and outermost, and only the argument is read in the caller). Carrying `deed : Option Deed` (e.g., `some (.action "scry")`, `some (.action "forage")`, `some (.action "destroy")`) on `Action.ownScope` preserves the keyword action's `Deed` identity alongside its expanded body for `does`/`would`/`did`/`cant`; it was also used by `deckmaste_lowering_v3` (`core::Action::Composite` `[CR#701.22b]` and `core::EventFilter::Act`). `deckmaste_lowering_v3` was deleted; its replacement belongs to `semantics-rust-rewrite`. The `.syl` generator supplies these wrappers using the declaration name and parameter
-name (`devour` gives `devour.subject`). Every such parameter is wrapped (§4.5 item 3).
-A Template receives generated identities for every `NounPhrase` parameter it mentions
-twice or more. The first-order data language has no ordinary Lean helpers that can
-inspect parameters. Explicit scope-escape calls for non-parameter expressions remain
-ordinary declarations. Nested `Definition` calls (e.g., `connive` calling `draw` and `discard`, or
-`forage` calling `exile` and `sacrifice`) push and pop `OwnScopeFrame` records on `drs.scopeStack`:
+Both are distinct discourse facts the referent records: what a loop body announced, and what it
+created (owner ruling). They are not derived from the determiner, origin and stamps. Being an
+Attachment Host is a separate presupposition fact, read only when a relative clause closes; it
+does not classify loop results.
 
-1. **Scope Entry (`enterOwnScope` on entering `Action.ownScope`):**
-   - Captures `preEntryIds := drs.referents.map (·.id)` (an immutable snapshot of all referents existing prior to this `Definition` call) and `maskedIds`, the ids in `preEntryIds` other than those of the innermost performer (`drs.performers`).
-   - Pushes `{ preEntryIds, maskedIds, callerClause := drs.currentClause }` onto `drs.scopeStack` and advances `drs.currentClause` (`drs.currentClause + 1`).
-2. **Caller-Scoped Argument Evaluation (`NounPhrase.inCaller`):**
-   - When `.inCaller arg` is encountered while `drs.scopeStack = topFrame :: outerFrames`, the checker temporarily pops **only `topFrame`** (`drs.scopeStack := outerFrames`) to evaluate `arg` in the immediate caller's visibility (so any referents masked by an enclosing `outerFrames` definition remain masked!).
-   - The enclosing `firstMention id (inCaller arg)` then attaches `id : BindingId`, in the body's own scope, to all `ReferentId`s (`List ReferentId`) `arg` introduced or resolved; `laterMention id (inCaller arg)` reads them back.
-   - When `topFrame` is restored onto `drs.scopeStack`, those bound `ReferentId`s are removed from `topFrame.maskedIds` (while `topFrame.preEntryIds` remains untouched) so the parameter referents are visible inside the `Definition` body while all other caller referents remain masked. The frame records these caller-owned arguments in `callerReferentIds`, including arguments first introduced during this evaluation; zone changes carry this ownership to successor referents.
-3. **Scope Exit (`leaveOwnScope` on exiting `Action.ownScope`):**
-   - Pops `topFrame` from `drs.scopeStack` (restoring `outerFrames` directly if nested inside an outer `Definition`).
-   - **Restores the caller's roles:** a mention in the body never changes a role the caller can see. The caller's pending roles become `topFrame.entryPending`, the ones it had when the body was entered, and each argument read through `inCaller` (`topFrame.callerReferentIds`) is pending as the call's object, whatever role its mentions in the body took ("Target creature fights target creature. Tap it." reads the fight's source).
-   - **Closes definition-internal scratch referents:** Any definition-internal referent (`r.id ∉ topFrame.preEntryIds` and `r.id ∉ topFrame.callerReferentIds`) that is a partitive sub-selection (`r.det == .part` from `someOf` / `choose`) or a definition-local player binding (`Payload.player`) is dropped on exit—using the immutable `topFrame.preEntryIds` rather than `maskedIds` so a player passed as a parameter (`r.id ∈ topFrame.preEntryIds`) is never misclassified as a disposable local player binding.
-   - **Preserves argument mutations:** Any zone changes, status changes, or `.actedOn deed` stamps applied to the passed argument referents (or their post-zone-change successor objects `[CR#400.7,400.7j]`) remain in `drs.referents`.
-   - **Exports outcome referents:** All non-scratch referents produced during `topFrame` (`r.id ∉ topFrame.preEntryIds`)—including `.outcome` (all 15 `OutcomeSort`s), `.pile`, `.quality`, `.letter`, `.turnRef`, and primary `.object` outcomes (tokens from `create`/`investigate`/`amass`/`incubate`, cards moved/revealed/searched/milled/drawn/scried)—remain in `drs.referents` with `clause := topFrame.callerClause` and `role := .obj`, ready for downstream anaphora (`"Investigate. Sacrifice that token..."`, `"Destroy target creature. It can't be regenerated."`).
+**Partitive sub-selections and ceiling shortfalls** are ordinary referents. A partitive choice (from
+`choose` or `someOf`) is what `notChosen` reads for "not chosen this way"; the shortfall of "draw up
+to N cards" is an outcome.
 
-`TokenSpec.inCaller` applies the same caller-scope boundary to a token specification passed
-into a definition. `create` wraps its token argument so chosen characteristics and copy-source
-references resolve in the caller. The checker steps a copy source once and carries that selected
-source’s types into the created token. Embedded ability text inherits announced choices only;
-ordinary participants and the enclosing performer remain outside that text’s discourse context.
+### 2.3 Definition Reference Scope
 
-Type views (`headed`, a Head Noun over its subject, and `becomes`, the permanent a spell becomes) refine their selected referent in
-place. They do not create a second discourse object merely by describing the same object’s type
-or rules role.
+A Definition body is read in its **own Reference Scope**. The caller's referents are hidden from it,
+except its arguments and the innermost Actor. Each argument is read in the caller's scope. On exit,
+what the body did to its arguments, and the outcomes it produced, are exported to the caller.
 
-### 1.5 Anaphor Resolution Rules (`J1`, `J2`, `D′`, `AC>R1`, and Reflexives)
+The expansion (§5.2 item 3) carries the Definition's Deed on its body, so `does`, `would`, `did`
+and `cant` can name it (§3.1), and wraps every parameter: bound to a Binding Identity at its first
+mention and read back by it at later ones. The identity is the Definition's own and outermost,
+named by the declaration and parameter (`devour.subject`); only the argument is read in the caller.
 
-Every anaphoric `NounPhrase` (`it`, `them`, `they`, `itself`, `themselves`, `yourself`, `that <noun>`, `those <nouns>`) resolves against the visible `referents` in the current `DRS` in two stages. A Participial Description (`the <verbed> <noun>`, §3.8) instead requires the unique referent its deed stamped, and is the only reference that reaches an object a linked ability published (`Referent.linked`):
+A Template gets generated Binding Identities for every NounPhrase parameter it mentions twice or
+more (§3.2). `.syl` has no helpers that can inspect parameters. A call that escapes scope
+explicitly, for an expression that is not a parameter, is an ordinary declaration. Nested
+Definitions (`connive` calling `draw` and `discard`, `forage` calling `exile` and `sacrifice`) nest
+their scopes.
 
-#### Stage 1: Accessibility Filter (`J1`)
+1. **Entering the scope.** The checker snapshots the referents that exist before the call. It hides
+   all of them except those of the innermost Actor, records the caller's clause, and advances the
+   clause.
+2. **Reading an argument in the caller.** An argument is read in the immediate caller's visibility
+   only. Referents hidden by an enclosing Definition stay hidden.
+   - The first mention binds the Binding Identity to every referent the argument introduced or
+     resolved to, inside the body's scope. A later mention reads them back.
+   - Those bound referents become visible inside the body; every other caller referent stays
+     hidden. The scope records the arguments it owns on the caller's behalf, including those first
+     introduced while reading them. A zone change carries that ownership to the successor referent.
+   - A parameter mentioned only once, or moved and read back by anaphora (`airbend` [CR#701.65a]),
+     is legal. There is no unused-parameter refusal.
+3. **Leaving the scope.**
+   - The outer scope is restored (the enclosing Definition's, when nested).
+   - **The caller's roles are restored.** A mention in the body never changes a role the caller can
+     see. The caller's pending roles become the ones it had on entry, and each argument read in the
+     caller is pending as the call's object, whatever role its mentions in the body took. So
+     "Target creature fights target creature. Tap it." reads the fight's source.
+   - **Scratch referents are closed.** A referent the body introduced, one that neither existed
+     before the call nor is caller-owned, is dropped if it is a partitive sub-selection or a
+     definition-local player binding. The test uses the snapshot taken on entry, not the hidden
+     set, so a player passed as a parameter is never mistaken for a disposable local player.
+   - **Changes to arguments are kept.** Zone changes, status changes and deed stamps applied to the
+     arguments, or to their successors after a zone change ([CR#400.7,400.7j]), remain.
+   - **Outcomes are exported.** Every non-scratch referent the body produced remains: outcomes of
+     every sort, piles, qualities, letters, turns, and primary object outcomes (tokens from
+     `create`, `investigate`, `amass` or `incubate`; cards moved, revealed, searched for, milled,
+     drawn or scried). They take the caller's clause, with role object, ready for later anaphora
+     ("Investigate. Sacrifice that token …", "Destroy target creature. It can't be regenerated.").
 
-A referent `r ∈ drs.referents` is **accessible** to an anaphor in a consuming verb slot iff:
-1. `r.id` is not masked by any active `OwnScopeFrame` on `drs.scopeStack` (`∀ f ∈ drs.scopeStack, r.id ∉ f.maskedIds`);
-2. `r.plur` agrees with the anaphor's grammatical number (`.one` for `it` / `itself` / `that <noun>`, `.many` for `them` / `they` / `themselves` / `those <nouns>`, or unfixed when reading a number-neutral description);
-3. `r.payload` matches the anaphor's sort, carrier-word zone (`[CR#109.2,109.2a..109.2c,110.1]`: e.g., a bare permanent type requires `.battlefield`, `spell` requires `.stack`, `card` requires a non-battlefield/non-stack zone or zone-transition readback), and `<noun>` filter; and
-4. **Consuming-verb applicability (`[CR#109.2,701.21a]`):** The consuming verb or prepositional slot can apply to `r` in `r.payload.zone` and `r.payload.kind` (e.g., a creature that died is in `.graveyard` and cannot have counters put on it as a battlefield permanent or be sacrificed; this settles *Vampiric Embrace* by `J1` before ranking runs). The action stepper narrows bare pronouns to the patient slot's carrier before resolution: battlefield actions and performed moves whose written origin is the battlefield require a permanent; counter placement retains other zones [CR#122.1] and excludes the stack. A description demanding "card", or a performed move's written card-zone origin, narrows a bare pronoun to the card carrier [CR#109.2a]. Unknown zones remain accessible. Pattern and lookback moves do not narrow: their patient is read after the event in its current zone.
+**Token specifications and Entry Riders.** A token specification passed into a Definition is read
+in the caller's Reference Scope, and the callee's scope is restored afterward. A whole Entry Rider
+argument is read the same way, an attacking defender included. `create` wraps its token
+specification and each Entry Rider this way, so chosen characteristics and copy-source references
+resolve in the caller. A copy source is read once, and the selected source's types are carried into
+the created token. Embedded or granted ability text receives only the announced choices: visible
+chosen-quality and chosen-player referents. Ordinary participants and the enclosing Actor stay
+outside that text's discourse context.
 
-**Characteristic reads and Last Known Information ([CR#608.2h]):** The carrier-word zone
-restriction in item 3 describes action slots. A characteristic read such as “its power” or
-“that creature’s toughness” may also select a departed permanent using its last battlefield
-type information, whatever zone it left for, a hidden one included (§0.1 item 4): ninjutsu's
-“the creature that was returned to its owner's hand” ([CR#702.49c]) is admitted, and whether its
-last known information is available at runtime is the engine's concern ([CR#608.2h]). This does
-not change the referent’s current zone or admit it as the patient of a battlefield action. Ordinary `D′` and `AC>R1` ranking still applies:
-in *Kalitas, Bloodchief of Ghet* and *Broken Visage*, “its” selects the token and
-“that creature’s” selects the destroyed creature. *Vampiric Embrace* still excludes the dead
-creature from its counter-placement action. Clarified with the owner during the proof/card
-port: this is ordinary LKI phrasing, including “Destroy target creature. You gain life equal
-to its power.”
+**Type views.** `headed` (a Head Noun over its subject) and `becomes` (the permanent a spell
+becomes) refine the referent they select in place. Describing an object's type or rules role does
+not create a second discourse object.
 
-The former restriction that "spell" must still be on the stack for an information read is
-**superseded**. A stamped Zone Change whose origin is the stack
-admits "that spell" and Spell Type words in characteristic and possessor reads
-([CR#608.2h]): *Mana Drain*, *Spell Swindle* and *Essence Backlash*. It does not admit
-"counter that spell" after countering it, or broaden Participial Descriptions.
+### 2.4 Anaphor Resolution (J1, J2, D′, AC>R1 and Reflexives)
 
-The same information-read boundary covers possessors: after destroying a permanent,
-“that permanent’s controller” may read its last known controller. The enclosing damage
-instruction acts on that player; the lookup does not make the destroyed permanent available
-to a later battlefield action. *Destructive Revelry* exercises this distinction. After countering a spell, the same boundary
-admits "that spell’s controller"; an action on that player does not act on the departed spell.
+Every anaphor ("it", "them", "they", "itself", "themselves", "yourself", "that <noun>", "those
+<nouns>") resolves against the visible referents in two stages. First an accessibility filter (J1)
+removes impossible candidates. Then a rule for the anaphor's form (J2, D′, AC>R1, Principle A)
+picks the antecedent or refuses. A Participial Description (§4.8) instead requires the unique
+referent its deed stamped. It is the only reference that reaches an object a linked ability
+published.
 
-A resolution-time guard is no characteristic read. Fight's guard (`matches … isCreature` on both
-participants) tests them as they are when the fight happens: if either is no longer on the
-battlefield or no longer a creature, neither fights ([CR#701.14b]; `lean/CONTRACTS.md`, "Template
-and definition parameters and expanded actions"). That is fight's rule, not a general one: the
-general rule is [CR#608.2h]. Elsewhere a present-tense guard over a description that names no
-zone and no "card" (“if it's a creature”) reads the permanent as it is, since Oracle text writes
-a departed object's information in the past tense (“if it was a creature”); a description that
-names a zone or “card” tests the object where it is, so *Bioplasm*'s “if it's a creature card”
-holds of the exiled creature card. Evaluating a guard at runtime is the engine's (item 4 of §0.1).
+#### Stage 1: accessibility (J1)
 
-A historical movement pattern such as “that creature dies this way” reads a previously
-introduced participant against the movement's written origin zone when selecting the movement
-patient in a `DidClause` (without a dedicated one-purpose flag on `DRS`). The read covers a
-definite noun phrase as well as a mention written inside the move: where the clause's subject is
-the move's patient ("that creature dies", [CR#700.4]), that subject is read the same way, so
-"Destroy target creature. If that creature dies this way, …" reads the destroyed creature as
-"it" does. The noun still constrains the read: "that artifact" finds no destroyed creature. The
-selected referent retains its current zone, identity, and stamp. `HistoricalMove` proves the read
-and subsequent ordinary-action refusals; `Lookback.okThatCreatureDiesThisWay` the subject read.
+A referent is **accessible** to an anaphor in a consuming verb slot if and only if:
 
-Where the move writes no origin ("If that artifact is put into a graveyard this way"), a grounded
-"this way" lookback takes the origin from the Zone Change recorded by the event it reads back
-(`DRS.causedEvents` [CR#608.2c]): after "Destroy target artifact" that is the battlefield, so
-"that artifact" reads the destroyed artifact as the permanent it was [CR#608.2h]. A recorded
-origin other than the battlefield reads no permanent. The rule is limited to grounded "this way"
-lookbacks, which read back an event their own text caused. A written origin, a negated one
-("from anywhere other than the battlefield") included, decides alone, and a recorded event never
-overrides it. A lookback over another span, or a trigger, takes no recorded origin: "from
-anywhere" is no leaves-the-battlefield pattern [CR#603.6c].
-`Lookback.okThatArtifactPutIntoAGraveyardThisWay` proves the read,
-`Lookback.thatArtifactMilledThisWayStaysRefused`, `Lookback.writtenOriginStillDecides` and
-`Lookback.fromAnywhereIsNotLeavesTheBattlefield` its limits.
+1. it is not hidden by any active Definition Reference Scope (§2.3);
+2. its number agrees with the anaphor's (one for "it", "itself", "that <noun>"; many for "them",
+   "they", "themselves", "those <nouns>"; unfixed for a number-neutral description);
+3. its sort matches the anaphor's sort, carrier-word zone and `<noun>` filter
+   ([CR#109.2,109.2a..109.2c,110.1]): a bare permanent type requires the battlefield, "spell"
+   requires the stack, and "card" requires a zone other than the battlefield or stack, or a
+   read-back across a zone change; and
+4. **the consuming verb can apply to it ([CR#109.2,701.21a]).** The verb or prepositional slot must
+   be able to apply to the referent in its zone and kind. A creature that died is in the graveyard
+   and cannot have counters put on it as a battlefield permanent, or be sacrificed; this settles
+   *Vampiric Embrace* by J1 before ranking runs.
+   - Before resolution, a bare pronoun is narrowed to the patient slot's carrier. Battlefield
+     actions, and performed moves whose written origin is the battlefield, require a permanent.
+     Counter placement keeps other zones [CR#122.1] but excludes the stack.
+   - A description demanding "card", or a performed move's written card-zone origin, narrows a bare
+     pronoun to the card carrier [CR#109.2a].
+   - Unknown zones stay accessible. Patterns and lookback moves do not narrow: their patient is read
+     after the event, in its current zone.
 
-Counter removal cannot read counters across a zone change: the new object's identity may be
-available, but its old counters ceased to exist ([CR#400.7,122.2]). Removal or transfer from
-that moved referent is refused until an instruction or entry/placement rider establishes new
-counters on it. This does not impose a battlefield-only restriction on counters.
+**Characteristic reads and Last Known Information ([CR#608.2h]).** Item 3's carrier-word zone
+restriction describes action slots. A characteristic read such as "its power" or "that creature's
+toughness" may select a departed permanent by its last battlefield type information, whatever zone
+it went to, a hidden one included (§1 item 4). Ninjutsu's "the creature that was returned to its
+owner's hand" ([CR#702.49c]) is admitted; whether its last known information is available at
+runtime is the engine's concern. Such a read does not change the referent's current zone, or admit
+it as the patient of a battlefield action. Ordinary D′ and AC>R1 ranking still applies: in *Kalitas,
+Bloodchief of Ghet*, "its" selects the token and "that creature's" the destroyed creature. *Vampiric
+Embrace* still excludes the dead creature from its counter placement. This is ordinary LKI phrasing,
+including "Destroy target creature. You gain life equal to its power."
 
-#### Stage 2: Form-Specific Resolution Gate (`J2`, `D′`, `AC>R1`, and Principle A Reflexives)
+- **Departed spells.** An information read of "spell" does not need the spell still on the stack. A
+  stamped Zone Change whose origin is the stack admits "that spell" and Spell Type words in
+  characteristic and possessor reads ([CR#608.2h]), as on *Mana Drain*. It does not admit "counter
+  that spell" after countering it, or broaden Participial Descriptions.
+- **Possessors.** After a permanent is destroyed, "that permanent's controller" may read its last
+  known controller (*Destructive Revelry*). The enclosing damage instruction acts on that player;
+  the lookup does not make the destroyed permanent available to a later battlefield action. After a
+  spell is countered, "that spell's controller" is admitted in the same way; an action on that
+  player does not act on the departed spell.
+- **Resolution-time guards are not characteristic reads.** Fight's guard (both participants
+  `matches … isCreature`) tests them as they are when the fight happens: if either is no longer on
+  the battlefield or no longer a creature, neither fights ([CR#701.14b]). That is fight's rule, not a
+  general one; the general rule is [CR#608.2h]. Elsewhere, a present-tense guard over a description
+  that names no zone and no "card" ("if it's a creature") reads the permanent as it is, since Oracle
+  text puts a departed object's information in the past tense ("if it was a creature"). A
+  description that names a zone or "card" tests the object where it is, so *Bioplasm*'s "if it's a
+  creature card" holds of the exiled creature card. Evaluating a guard at runtime is the engine's
+  (§1 item 4).
+- **Historical movement patterns.** "That creature dies this way" reads a previously introduced
+  participant against the move's written origin zone when selecting the move's patient in a
+  lookback, without a dedicated mark on the DRS. The read covers a definite noun phrase as well as a
+  mention written inside the move. Where the clause's subject is the move's patient ("that creature
+  dies", [CR#700.4]), that subject is read the same way, so "Destroy target creature. If that
+  creature dies this way, …" reads the destroyed creature as "it" does. The noun still constrains
+  the read: "that artifact" finds no destroyed creature. The selected referent keeps its current
+  zone, identity and stamp.
+- **A recorded origin.** Where the move writes no origin ("If that artifact is put into a graveyard
+  this way"), a grounded "this way" lookback takes the origin from the Zone Change recorded by the
+  event it reads back ([CR#608.2c]). After "Destroy target artifact" that is the battlefield, so
+  "that artifact" reads the destroyed artifact as the permanent it was [CR#608.2h]. A recorded
+  origin other than the battlefield reads no permanent. The rule is limited to grounded "this way"
+  lookbacks, which read back an event their own text caused. A written origin decides alone, a
+  negated one ("from anywhere other than the battlefield") included, and a recorded event never
+  overrides it. A lookback over another range, or a trigger, takes no recorded origin: "from
+  anywhere" is no leaves-the-battlefield pattern [CR#603.6c].
+- **Counters do not survive a zone change.** The new object's identity may be available, but its old
+  counters ceased to exist ([CR#400.7,122.2]). Removing or transferring counters from a moved
+  referent is refused until an instruction or an entry or placement rider puts new counters on it.
+  This imposes no battlefield-only restriction on counters.
 
-- **Clause-mates (`J2`, `docs/contexts/oracle-english/CONTEXT.md`):** Referent `r` is a **clause-mate** of an anaphor iff the anaphor occupies a direct argument slot (subject, direct object, or oblique complement) of the current verb and `(r.id, _) ∈ drs.pendingRoles` (i.e., `r` was introduced or re-mentioned as a direct co-argument of the same verb in `drs.currentClause`). Possessors (`controllerOf it`, `ownerOf it`, `its power`, `"Target creature's controller"`) and objects of small clauses (`counters on it`) are **not** direct co-arguments of the matrix verb (`DrtCards.countersOnItReadsTheStatSubjectInsideTheSmallClause` and
-  `DrtCards.weepingAngelNestedPossessorDoesNotMakeItsCreatureAClauseMate`).
-  Re-mentioning a referent in a possessor slot (`"that creature's owner"`, `inArgSlot = false`) updates its `r.clause := drs.currentClause` and `r.role := .other` (matching a newly introduced possessor NP) without recording in `drs.pendingRoles`, so *Weeping Angel*'s subsequent `"it"` in `"that creature's owner shuffles it into their library"` resolves directly to the damaged creature under `D′` without any explicit binding identity.
-- **Reflexive Pronouns (`NounPhrase.refl (pl : Plurality)` — `itself`, `themselves`, `yourself`, Principle A):**
-  - Exact complement of `J2`: requires an accessible clause-mate subject (`(r.id, .subj) ∈ drs.pendingRoles`) agreeing with `pl` (covering both newly introduced subjects like `"Target creature deals 2 damage to itself"` and re-mentioned subjects like `"It deals 2 damage to itself"`). Refuses with `.anaphor` if no clause-mate `.subj` matches.
-- **Rule `D′` — Bare Non-Reflexive Pronouns (`it`, `them`, `they`):**
-  1. Exclude clause-mates (`J2`, i.e., any `r` with `(r.id, _) ∈ drs.pendingRoles` when the pronoun is in a direct verb argument slot).
-  2. Among remaining accessible referents, select those in the **nearest clause** (maximizing `r.clause`, except that a referent re-mentioned in a direct argument slot of the current clause, `(r.id, slotRole) ∈ drs.pendingRoles`, counts as in `drs.currentClause`).
-  3. Within that clause, rank by `GramRole`: `.subj` beats `.obj`, which beats `.other`. A re-mentioned referent ranks by its best buffered slot role. Steps 2 and 3 change nothing for a pronoun in a direct argument slot, since step 1 has already excluded every buffered referent. They foreground a re-mentioned subject for possessor and amount pronouns: "That creature deals damage equal to its power …" reads "its" as that creature (`Proofs/Damage.lean`, `karplusanYetiItsReadsThatCreature`).
-  4. If a single referent strictly wins (`winners.length == 1`), resolve to `r`, mark `r.pronounResolved := true` in `drs.currentClause`, and buffer `(r.id, slotRole)` in `drs.pendingRoles` if in a direct argument slot.
-  5. Otherwise (`winners.length == 0` when no accessible candidate exists, or `winners.length ≥ 2` on a true tie under `D′`), **refuse** with `Refusal.anaphor reach plur winners.length`.
-- **Rule `AC>R1` — Demonstratives (`that <noun>`, `those <nouns>`):**
-  1. Filter accessible referents by `<noun>`.
-  2. **Clause-mate exclusion (`A`):** Exclude clause-mates (`J2`).
-  3. **Anti-coreference with same-clause pronoun (`C`), a preference:** Exclude any referent with `r.pronounResolved == true` in `drs.currentClause` only when another candidate remains; otherwise keep it, and the demonstrative corefers with the pronoun. So in *Kalitas, Bloodchief of Ghet*, `"Its power is equal to that creature's power"`, `"Its"` resolves to the newly created token and `"that creature"` takes the remaining older creature, while in *Saw in Half*, `"its controller creates two tokens that are copies of that creature"`, no other creature remains and `"that creature"` reads the destroyed creature `"its"` took. The preference turns on whether a second candidate exists, not on syntax: a possessor `"its"` does not c-command `"that creature"` in either card, yet only *Kalitas* reads them as disjoint.
-  4. **Recency (`R1`):** Among remaining candidates, pick the most recently introduced referent (maximizing `r.id`); refuse with `Refusal.anaphor reach plur 0` only if zero candidates remain.
-- **Stamped Action-Participle Referents (`the exiled card`, `the sacrificed creature`):**
-  - Filter accessible referents by `<noun>`, plurality, and `.actedOn deed` stamp; require a unique match (`count == 1`), refusing with `Refusal.anaphor reach plur count` otherwise.
-- **Required Pins for the 11 Previously Measured `AC>R1` Sites:**
-  - All 11 corpus sites that failed flat surface-token `AC>R1` in the preliminary measurement **must** resolve to their intended referent from raw wording in `lean/Semantics/Proofs/` with zero explicit-selector workarounds:
-    - Cards 1–9 resolve directly via stable introduction `ReferentId`s on re-mention (`DRS.recordMention`), compositional bottom-up NP evaluation (`stepOps.np`), post-move `ReferentId` allocation (`[CR#400.7]`), and closed `Predicate.or` branches.
-    - Card 10 (*Mangara's Equity*) resolves directly once `NounPhrase.or` (`stepNounAlternativesWith`) closes branch-local indefinites so `"a white creature you control"` inside `"you or a white creature you control"` does not leak as an unconditional top-level creature referent.
-    - Card 11 (*Noetic Scales*) resolves directly when stepped as its actual `Action.move` / `returnToHand` AST (which evaluates the moved subject NP `"each creature that player controls..."` before the destination `"to its owner's hand"`, rather than the surface Heavy-NP-Shift token order).
+#### Stage 2: the rule for each form
 
-    1. *Tahngarth, First Mate*
-    2. *Unpredictable Cyclone*
-    3. *Eriette, the Beguiler*
-    4. *Runesword*
-    5. *Scythe of the Wretched*
-    6. *Bronze Bombshell*
-    7. *Gisela, Blade of Goldnight*
-    8. *Solphim, Mayhem Dominus*
-    9. *Ram Through*
-    10. *Mangara's Equity*
-    11. *Noetic Scales*
+- **Clause-mates (J2; see Clause-mate in `docs/contexts/oracle-english/CONTEXT.md`).** A referent is
+  a clause-mate of an anaphor if and only if the anaphor occupies a direct argument slot (subject,
+  direct object or oblique complement) of the current verb and the referent has a pending role in
+  the current clause, that is, it was introduced or re-mentioned as a direct co-argument of the same
+  verb. Possessors ("its controller", "its owner", "its power", "target creature's controller") and
+  objects of small clauses ("counters on it") are not direct co-arguments of the matrix verb.
+  A referent introduced or re-mentioned as a possessor has no pending role (§2.1): in "Target
+  creature's controller sacrifices it", "it" resolves to the creature, and in
+  *Weeping Angel*'s "that creature's owner shuffles it into their library", "it" resolves to the
+  damaged creature by D′, with no explicit Binding Identity.
+- **Reflexives (Principle A: "itself", "themselves", "yourself").** The exact complement of J2. A
+  reflexive requires an accessible clause-mate subject, one with a pending subject role, agreeing in
+  number. This covers newly introduced subjects ("Target creature deals 2 damage to itself") and
+  re-mentioned ones: in "It deals 2 damage to itself", "It" records a pending subject role, so
+  "itself" succeeds, while "it" in the same slot would be excluded by J2. With no matching
+  clause-mate subject, it is refused.
+- **D′: bare non-reflexive pronouns ("it", "them", "they").**
+  1. Exclude clause-mates (J2), when the pronoun is in a direct argument slot.
+  2. Among the remaining accessible referents, keep those in the **nearest clause**. A referent
+     re-mentioned in a direct argument slot of the current clause counts as in the current clause.
+  3. Within that clause, rank by role: subject beats object, which beats other. A re-mentioned
+     referent ranks by its best pending role. Steps 2 and 3 change nothing for a pronoun in a direct
+     argument slot, since step 1 has already excluded every pending referent. They foreground a
+     re-mentioned subject for possessor and amount pronouns: in *Karplusan Yeti*'s "That creature
+     deals damage equal to its power to this creature", "its" reads the re-mentioned "that
+     creature", not the earlier clause's subject.
+  4. If one referent strictly wins, resolve to it, mark it "pronoun resolved here" in the current
+     clause, and record its pending role if the pronoun is in a direct argument slot.
+  5. Otherwise, with no accessible candidate or a true tie, refuse.
+- **AC>R1: demonstratives ("that <noun>", "those <nouns>").**
+  1. Filter the accessible referents by `<noun>`.
+  2. **A**: exclude clause-mates (J2).
+  3. **C**, a preference for anti-coreference with a same-clause pronoun: exclude any referent a
+     pronoun resolved to in the current clause, but only when another candidate remains; otherwise
+     keep it, and the demonstrative corefers with the pronoun. In *Kalitas, Bloodchief of Ghet*,
+     "Its power is equal to that creature's power": "Its" is the newly created token and "that
+     creature" takes the remaining older creature. In *Saw in Half*, "its controller creates two
+     tokens that are copies of that creature": no other creature remains, and "that creature" reads
+     the destroyed creature "its" took. The preference turns on whether a second candidate exists,
+     not on syntax: a possessor "its" c-commands "that creature" in neither card, yet only *Kalitas*
+     reads them as disjoint.
+  4. **R1**, recency: among the remaining candidates, pick the most recently introduced referent.
+     Refuse only if none remains.
+- **Stamped action participles ("the exiled card", "the sacrificed creature").** Filter the
+  accessible referents by `<noun>`, number and deed stamp, and require a unique match; refuse
+  otherwise.
+
+**The eleven measured AC>R1 sites.** These cards failed flat surface-token AC>R1 in the original
+measurement. Each must resolve to its intended referent from its raw wording, with no explicit
+selector: *Tahngarth, First Mate*; *Unpredictable Cyclone*; *Eriette, the Beguiler*; *Runesword*;
+*Scythe of the Wretched*; *Bronze Bombshell*; *Gisela, Blade of Goldnight*; *Solphim, Mayhem
+Dominus*; *Ram Through*; *Mangara's Equity*; *Noetic Scales*.
+
+- *Mangara's Equity* resolves once a disjunctive noun phrase closes branch-local indefinites
+  (§2.1): "a white creature you control", inside "you or a white creature you control", does not
+  leak out as an unconditional creature referent.
+- *Noetic Scales* resolves when read as its actual move, which reads the moved subject "each
+  creature that player controls …" before the destination "to its owner's hand", not in the surface
+  order produced by heavy-NP shift.
+
+### 2.5 The Contrast Anchor of "another" and "other"
+
+**A bare "another" or "other" contrasts with a Contrast Anchor, which need not be an earlier
+target.** "Another target creature you control" in reconfigure ([CR#702.151a]) and Olivia
+Voldaren's "deals 1 damage to another target creature" (the example under [CR#707.11]) have no
+earlier target; they exclude the Source. A bare printed "another"/"other" is written only with
+`isOther` ("any other target" is `isAnyOtherTarget`, any target that `isOther`). `otherThan <NP>`
+is only for a printed "other than <NP>".
+
+A mention of the Source coordinated with the "other" phrase is that phrase's anchor (*Slimefoot and
+Squee*'s "Return this card and up to one other target creature card"). Otherwise the checker tries,
+in order:
+
+1. **The current member of a distributive group.** This is the group the subject of the phrase's
+   clause names ("each …", "all …", a bare plural or another plural group), when it is compatible
+   as in step 2. Run's (*Hit // Run*) "Attacking creatures you control get +1/+0 until end of turn
+   for each other attacking creature" counts, for each affected creature, the attacking creatures
+   other than that creature, not those other than the whole group. The affected set is fixed when
+   the effect begins ([CR#611.2c]), but the amount is a function of each member. The checker records
+   the anchor as the member of the group's mention, so the engine evaluates the amount per member.
+   An "other" phrase in a different clause, or in a nested clause whose subject names no such
+   group, skips this step.
+2. **The nearest earlier mention in scope compatible with the head** in kind, Card Type, zone and
+   controller, whether a target or not ("Choose a player. Each other player …"). Recency is the
+   DRS's: on *Arc Trail* ("deals 2 damage to any target and 1 damage to any other target"), the
+   first target beats the Source.
+   - Mentions of the Source and of "you" are never candidates in steps 1 to 3; they are step 4's
+     fallback only.
+   - A referent a condition introduces (an intervening "if", a `doIf` or `doOnlyIf` condition,
+     `exists`) is hypothetical and never a candidate. Targets the action branch announces are
+     candidates ([CR#601.2c]): *Flames of the Raze-Boar*'s "each other creature that player controls
+     if you control a creature with power 4 or greater" contrasts with the target.
+   - The zone check keeps a cast spell (*Hulkling, Young Avenger*) or a revealed card from anchoring
+     a phrase on the battlefield.
+   - The controller check applies at every step. A candidate whose controller restriction
+     contradicts the head's ("you control" against "an opponent controls") is never the anchor, so
+     *Bartz and Boko*'s "each other Bird you control deals damage equal to its power to target
+     creature an opponent controls" contrasts with the Source, not the target.
+   - The subject of an `is` condition is excluded only for the predicate's own "another", not for a
+     noun phrase nested in it: *Unexpected Allies*' "if it has the same name as another creature you
+     control" contrasts with "it".
+   - The thing "another" describes, including the subject of the `is` condition it is predicated
+     of, is never its own anchor, so backup's "If that's another creature" ([CR#702.165a]) contrasts
+     with "this creature", not with "that creature".
+3. **A compatible particular of the same clause or event, read forward.** When "another <X>" is
+   the agent of a clause (a `would`, event, deontic, Handoff, copy or characteristic-change clause),
+   that clause's compatible target, definite description or Attachment Host is the anchor. A generic
+   indefinite ("a permanent or player", "each creature") never is, so *Embermaw Hellion*'s "another
+   red source you control would deal damage to a permanent or player" falls through to the Source.
+   *Inquisitor's Flail*'s "If another creature would deal combat damage to equipped creature, it
+   deals double that damage to equipped creature instead" contrasts with the equipped creature. A
+   redirection effect ([CR#614.9]) that makes the equipped creature deal combat damage to itself is
+   therefore doubled once by the Flail's first ability, not twice ([CR#614.1a,616.1f]).
+4. **Otherwise the Source**, for an object head in a zone the Source may be in and not restricted to
+   a controller other than "you", whatever the Source's Card Types (Vehicles are creatures when
+   their "another" applies); or **"you"**, for a player head ([CR#109.5]). A head that may be an
+   object or a player ("any other target") falls back to the Source, never to "you".
 
 ---
 
-## 2. Pillar 2: `Definition` vs. `Template` Split
+## 3. Definitions and Templates
 
-File role is declared explicitly by the top-level wrapper in each file, never inferred from directory location.
+**A declaration's kind says whether it is a Definition or a Template; its file path never does.** A
+Definition is vocabulary the rules define, read in its own Reference Scope under its Deed. A Template
+is a printed phrasing, expanded transparently in its caller.
 
-| Property | `Definition(...)` | `Template(...)` |
+| | Definition | Template |
 |---|---|---|
-| **Domain** | Rules-defined vocabulary: CR §701 keyword actions, CR §702 keyword abilities, plus registry definitions (`CounterKind`, `Subtype`, `Designation`, `Relation`, `FlavorWord`, `Type`). An ability word has no rules meaning (`[CR#207.2c]`), so it is a Template over `abilityWord`, its label checked against the CR's list; a turn part is a closed `TurnPart` constructor, declared by no one. | Reusable Oracle phrasing patterns, multi-clause shorthands, and AST constructor aliases. |
-| **Top-level file wrapper** | `Definition(...)` (or registry-specific `CounterDefinition(...)`, etc.) | `Template(...)` |
-| **Reference Scope** | **Own Reference Scope (`ownScope (deed) (body)`):** Masks caller referents via `enterOwnScope` / `leaveOwnScope`, preserves the keyword action's `Deed` identity (`some (.action name)`), and evaluates arguments in caller's DRS (`inCaller`). | **Transparent caller scope:** Expands inline in the caller's active DRS without masking (`no` `ownScope`, `no` `inCaller`). |
-| **Parameter Identity (`firstMention` / `laterMention`)** | Generated by the elaborator for unwrapped `NounPhrase` parameters (supporting `List ReferentId` for coordinated NPs); there is no opt-out (§4.5 item 3). Performer identities are hand-written. | Generated whenever a `NounPhrase` parameter is mentioned $>1$ time in the template body (`firstMention` on first occurrence, `laterMention` on subsequent occurrences before any zone change); hand-written ones are refused. |
-| **Law Gate** | Trusted, as every authored declaration is (`lean/CONTRACTS.md`, "Card authoring and trusted expansion"); the generated Definition is checked at its uses, and `cargo xtask lean definitions` is retired. The generator wraps an Action Definition in its own Reference Scope (`Action.ownScope`, `lean/SylGen/Emit.lean`); its body is checked at every card or `Definition` call site that expands it, and a Registry Definition's conferrals by `RegistryDefinition.check`, proved empty by `decide` in `lean/Semantics/Proofs/Rules.lean`. | Checked at every card or `Definition` call site that expands it. |
+| **Domain** | Rules-defined vocabulary: [CR#701] keyword actions, [CR#702] keyword abilities, and registry definitions (Counter kinds, Subtypes, Designations, Relations, Flavor Words, Card Types). An ability word has no rules meaning ([CR#207.2c]), so it is a Template over `abilityWord`, its label checked against the CR's list. A turn part is a closed set, declared by no one. | Reusable Oracle phrasing patterns, multi-clause shorthands, and aliases of primitives. |
+| **Declaration kind** | `action`, `ability`, and the registry kinds (`counter`, `designation`, `subtype`, `card_type`, `relation`, `token`, …) | `template` |
+| **Reference Scope** | Its own (§2.3). It hides the caller's referents, keeps the keyword's Deed, and reads its arguments in the caller's DRS. | The caller's. It expands inline in the caller's DRS and hides nothing. |
+| **Binding Identity** | Generated for every NounPhrase parameter (supporting several referents for a coordination); there is no opt-out (§5.2 item 3). Actor identities are written by hand. | Generated for each NounPhrase parameter mentioned more than once in the body: bound at the first occurrence and read back at later ones before any zone change. Hand-written ones are refused. |
+| **Checking** | Trusted, as every authored declaration is. An action Definition's body is checked at every card or Definition use that expands it. A Registry Definition's conferrals are checked by the registry check. | Checked at every card or Definition use that expands it. |
 
-### 2.1 Complete Classification of In-Scope Keyword Actions as `Definition`s
+### 3.1 Keyword Actions Are Definitions
 
-Every Vintage-playable CR §701 keyword action—whether its body is a single atomic step or a multi-step expansion—is a **`Definition`** (Planechase/Archenemy actions remain permanently out of scope and Un-set Contraption/Attraction actions remain deferred per `CLAUDE.md` "Scope"), except one the rules define as another action under another verb: it is a **`Template`** over that action and adds no Deed of its own, because printed wording lives on Templates, not on Core AST nodes or Deed stamps (`convert` below):
+**Every Vintage-playable [CR#701] keyword action is a Definition, whether its body is one step or
+many.** The exception is an action the rules define as another action under another verb. It is a
+Template over that action and adds no Deed of its own, because printed wording lives on Templates,
+not on model nodes or deed stamps (`convert`, below). Planechase and Archenemy actions are
+permanently out of scope; Un-set Contraption and Attraction actions are deferred (`CLAUDE.md`,
+"Scope").
 
-- **Atomic CR §701 keyword actions (promoted from `Template`/macro to `Definition`):** `activate` `[CR#701.2]`, `attach` `[CR#701.3]`, `cast` `[CR#701.5]`, `counter` `[CR#701.6]`, `create` `[CR#701.7]`, `destroy` `[CR#701.8]`, `discard` `[CR#701.9]`, `exchange` `[CR#701.12]`, `exile` `[CR#701.13]`, `fight` `[CR#701.14]`, `goad` `[CR#701.15]`, `regenerate` `[CR#701.19]`, `reveal` `[CR#701.20]`, `sacrifice` `[CR#701.21]`, `search` `[CR#701.23]`, `shuffle` `[CR#701.24]`, `tap` `[CR#701.26a]`, `untap` `[CR#701.26b]`, `transform` `[CR#701.27]`, `fateseal` `[CR#701.29]`, `clash` `[CR#701.30]`, `proliferate` `[CR#701.34]`, `detain` `[CR#701.35]`, `populate` `[CR#701.36]`, `monstrosity` `[CR#701.37]`, `vote` `[CR#701.38]`, `meld` `[CR#701.42]`, `exert` `[CR#701.43]`, `cloak` `[CR#701.58]`, `suspect` `[CR#701.60]`. (`plot` is a keyword ability, not a keyword action `[CR#702.170a]`.) `convert` `[CR#701.28]` is a Template over `transform`: converting follows the transform rules, a "transforms into" trigger sees it and "can't transform" forbids it `[CR#701.27e,701.28a,701.28f]`.
-- **Regeneration (`Definition`):** a regeneration shield's application, removing damage, tapping and removing from combat, is the one `regeneration` Definition (`[CR#701.19a]`); the deed "can't be regenerated" forbids it, and the shield `regenerate` installs applies it (`[CR#701.19c]`). It emits the keyword action's deed, so it is no Template.
-- **Composite / multi-step CR §701 keyword actions (`Definition`):** `doublePower` / `doubleToughness` / `doublePT` / `doubleLifeTotal` / `doubleCountersOn` `[CR#701.10]`, `triplePower` / `tripleToughness` / `triplePT` `[CR#701.11]`, `investigate` `[CR#701.16]`, `mill` `[CR#701.17]`, `play` `[CR#701.18]`, `scry` `[CR#701.22]`, `surveil` `[CR#701.25]`, `bolster` `[CR#701.39]`, `manifest` `[CR#701.40]`, `support` `[CR#701.41]`, `explore` `[CR#701.44]`, `amass` `[CR#701.47]`, `learn` `[CR#701.48]`, `connive` `[CR#701.50]`, `incubate` `[CR#701.53]`, `theRingTemptsYou` `[CR#701.54]`, `faceVillainousChoice` `[CR#701.55]`, `timeTravel` `[CR#701.56]`, `discover` `[CR#701.57]`, `collectEvidence` `[CR#701.59]`, `forage` `[CR#701.61]`, `manifestDread` `[CR#701.62]`, `endure` `[CR#701.63]`, `airbend` `[CR#701.65]`, `earthbend` `[CR#701.66]`, `waterbend` `[CR#701.67]`. (`firebending` is a keyword ability, not a keyword action `[CR#702.189a]`.)
-- **Preserved `Deed` Identity on `Action.ownScope` (`[CR#701.22b]`):** Every CR §701 keyword-action `Definition` wraps its body in `Action.ownScope (some (.action name)) body`.
-  - The header's deed is the action's one deed: no `Definition` wraps its body in a second deed-carrying node (the retired `.enact`). Stepping the `ownScope` reads it as the head gates and lookbacks do: with no Handoff to a Permanent, a deed a permanent performs is performed by the source permanent (`[CR#701.14a,701.44a]`); post-event, the body's patients receive the deed's stamp, and what the body moves carries it (`DRS.scopeDeed`), so an exile's move is exiling (`[CR#701.13a]`). A keyword ability's verb done by doing another deed is a `Definition` the same way, over that deed (`devour` over `sacrifice` `[CR#702.82b]`). The checker does not guess a deed from a body's shape.
-  - When a composite `Definition` (`scry`, `surveil`, `mill`, `forage`, `explore`, `connive`, `investigate`, etc.) appears in imperative position (`scry(2)`), the checker steps `ownScope (some (.action name)) body` and the deleted `deckmaste_lowering_v3` compiled it to `core::Action::Composite { name: VerbName, body }` (`[CR#701.22b]`). When it appears inside `does`, `would`, `cant`, or `did` (`does(you, scry(any))`, `does(you, forage)`), `Check/Events.lean` reads the `Deed.action name` and `inCaller` arguments directly from the `ownScope` header (formerly lowered to `core::EventFilter::Act { verb: VerbName, who, on, cause }`; its replacement belongs to `semantics-rust-rewrite`).
+- **Single-step:** `activate` [CR#701.2], `attach` [CR#701.3], `cast` [CR#701.5], `counter`
+  [CR#701.6], `create` [CR#701.7], `destroy` [CR#701.8], `discard` [CR#701.9], `exchange`
+  [CR#701.12], `exile` [CR#701.13], `fight` [CR#701.14], `goad` [CR#701.15], `regenerate`
+  [CR#701.19], `reveal` [CR#701.20], `sacrifice` [CR#701.21], `search` [CR#701.23], `shuffle`
+  [CR#701.24], `tap` [CR#701.26a], `untap` [CR#701.26b], `transform` [CR#701.27], `fateseal`
+  [CR#701.29], `clash` [CR#701.30], `proliferate` [CR#701.34], `detain` [CR#701.35], `populate`
+  [CR#701.36], `monstrosity` [CR#701.37], `vote` [CR#701.38], `meld` [CR#701.42], `exert`
+  [CR#701.43], `cloak` [CR#701.58], `suspect` [CR#701.60]. (`plot` is a keyword ability, not a
+  keyword action [CR#702.170a].) `convert` [CR#701.28] is a Template over `transform`: converting
+  follows the transform rules, so a "transforms into" trigger sees it and "can't transform" forbids
+  it [CR#701.27e,701.28a,701.28f].
+- **Regeneration:** a regeneration shield's application (removing damage, tapping, removing from
+  combat) is the one `regeneration` Definition ([CR#701.19a]). The deed "can't be regenerated"
+  forbids it, and the shield `regenerate` installs applies it ([CR#701.19c]). It carries the
+  keyword action's Deed, so it is no Template.
+- **Multi-step:** `doublePower` / `doubleToughness` / `doublePT` / `doubleLifeTotal` /
+  `doubleCountersOn` [CR#701.10], `triplePower` / `tripleToughness` / `triplePT` [CR#701.11],
+  `investigate` [CR#701.16], `mill` [CR#701.17], `play` [CR#701.18], `scry` [CR#701.22], `surveil`
+  [CR#701.25], `bolster` [CR#701.39], `manifest` [CR#701.40], `support` [CR#701.41], `explore`
+  [CR#701.44], `amass` [CR#701.47], `learn` [CR#701.48], `connive` [CR#701.50], `incubate`
+  [CR#701.53], `theRingTemptsYou` [CR#701.54], `faceVillainousChoice` [CR#701.55], `timeTravel`
+  [CR#701.56], `discover` [CR#701.57], `collectEvidence` [CR#701.59], `forage` [CR#701.61],
+  `manifestDread` [CR#701.62], `endure` [CR#701.63], `airbend` [CR#701.65], `earthbend` [CR#701.66],
+  `waterbend` [CR#701.67]. (`firebending` is a keyword ability, not a keyword action
+  [CR#702.189a].)
 
-Monstrosity (and adapt, whose addition to the list above is `docs-keyword-classification-corrections`) is stated over "this permanent" and says nothing of who performs it (`[CR#701.37a,701.46a]`): its body names the Source (`thisPermanent`), the ability's controller follows it like any instruction (`[CR#608.2c,701.37c]`), and no Handoff renames "this permanent". Its Definition carries no permanent-performer deed header.
+**The Deed.** Every keyword-action Definition's body carries its action's Deed ([CR#701.22b]), and
+that is its one Deed: no Definition wraps its body in a second Deed-carrying node.
 
-### 2.2 Multi-Mention `Template`s
+- The checker reads the Deed as the head gates and lookbacks do. With no Handoff to a Permanent, a
+  deed a permanent performs is performed by the Source permanent ([CR#701.14a,701.44a]). After the
+  event, the body's patients receive the Deed's stamp, and what the body moves carries it, so an
+  exile's move is exiling ([CR#701.13a]).
+- A keyword ability's verb that is done by doing another deed is a Definition the same way, over
+  that deed (`devour` over `sacrifice` [CR#702.82b]).
+- The checker never guesses a deed from a body's shape.
+- In imperative position (`scry(2)`), a multi-step Definition is read as its body under its Deed,
+  and lowering keeps it as one composite action named by the Deed ([CR#701.22b]). Inside `does`,
+  `would`, `cant` or `did` (`does(you, scry(any))`, `does(you, forage)`), it is matched by its Deed
+  and its caller-read arguments.
 
-A `Template` is a transparent phrasing helper in the caller's DRS scope, but any `Template` that mentions a `NounPhrase` parameter more than once before a zone change binds `firstMention` on its first occurrence and `laterMention` on subsequent occurrences (generated, not hand-written) so targets and indefinites are not duplicated (`[CR#115.1,608.2c]`):
-- Examples: `duringNextTurnOf`, `discardThenForEachNonland` (or re-spelled via `"discarded this way"` per `[CR#701.50a]`), `lookAndSortSlice`, `controllerSacrifices`, `comparesOwnStat`.
+Monstrosity and adapt are stated over "this permanent" and say nothing of who performs them
+([CR#701.37a,701.46a]). Their bodies name the Source (`thisPermanent`); the ability's controller
+follows them as it follows any instruction ([CR#608.2c,701.37c]); and no Handoff renames "this
+permanent". Their Definitions carry no Deed marked as performed by a permanent.
+
+### 3.2 Templates That Mention a Parameter Twice
+
+A Template is transparent, but a Template that mentions a NounPhrase parameter more than once before
+a zone change binds it at its first occurrence and reads it back at the later ones (generated, never
+hand-written), so targets and indefinites are not duplicated ([CR#115.1,608.2c]). Examples:
+`duringNextTurnOf`, `discardThenForEachNonland` (or reworded through "discarded this way",
+[CR#701.50a]), `lookAndSortSlice`, `controllerSacrifices`, `comparesOwnStat`.
 
 ---
 
-## 3. Pillar 3: Unified Action-Clause Spine
+## 4. The Action-Clause Spine
 
-### 3.1 Core Principle: Every Verb Defined Once as an `Action`
+### 4.1 Every Verb Is Defined Once, as an Action
 
-Every game action or verb phrase is defined **once** as an `Action` (representing the bare infinitive verb phrase: `sacrifice(a(creature))`, `destroy(this)`, `attack()`, `block(this)`, `draw(2)`, `dealDamage(3, anyTarget)`, `putCounters(1, p1p1, this)`, `move(this, battlefield, none)`).
+**Every game action or verb phrase is defined once, as an Action: the bare infinitive verb phrase.**
+Examples: `sacrifice(a(creature))`, `destroy(this)`, `attack()`, `block(this)`, `draw(2)`,
+`dealDamage(3, anyTarget)`, `putCounters(1, p1p1, this)`, `move(this, battlefield, none)`.
 
-All seven action-clause contexts embed `action : Action` directly—with **no** double-wrapping (`replace(would(subj, action), ...)` rather than `replace(does(would(...)))`):
+All seven clause contexts embed the Action directly, with no double wrapping
+(`replace(would(subj, action), …)`, not `replace(does(would(…)))`). The examples below abbreviate:
+they write an active subject as a bare noun phrase, where `.syl` writes `actor(np)` (§5.1, no
+coercions).
 
-| Clause Mood / Context | AST / DSL Form | Active Voice (`subj = np`) | Unspecified-Agent Passive (`subj = any`) | Explicit-Agent Passive (`subj = by(np)`) |
+| Clause context | Form | Active (`subj = np`) | Passive, unspecified agent (`subj = any`) | Passive, explicit agent (`subj = by(np)`) |
 |---|---|---|---|---|
-| **1. 2p Imperative (`Action`)** | `action` | `"Sacrifice a creature."` → `sacrifice(a(creature))` | — | — |
-| **2. 3p Imperative (`Action`)** | `instruct(subj, action)` | `"Target opponent sacrifices a creature."` → `instruct(target(opponent), sacrifice(a(creature)))`<br>`"That creature explores."` → `instruct(that(creature), explore)` | — | — |
-| **3. Action Cost (`Cost`)** | `Cost.perform(action)` | `"Sacrifice a creature: Draw a card."` → `activated(perform(sacrifice(a(creature))), draw(a(card)))` | — | — |
-| **4. Trigger / Event (`GameEvent`)** | `does(subj, action)` | `"Whenever you sacrifice a creature"` → `does(you, sacrifice(a(creature)))` | `"Whenever this creature becomes blocked"` → `does(any, becomeBlocked(this))`, the Blocked status event `combat(this, participation(blocked(true)))` `[CR#509.1h,509.3c]` | `"Whenever this creature becomes blocked by a creature"` → `does(by(a(creature)), block(this))` |
-| **5. Replacement (`StaticSpec`)** | `replace(would(subj, action), repl, ...)`, where `repl` is `instead(a)` (`a` in the event's place), `before(a, body)` (`a` done before the event, which still happens, modified by `body` if one is written: the choices a replacement of an entering requires `[CR#614.12a]`), `alongside(a)` (`a` done as part of the event, which still happens, "enters with" and "as it enters" `[CR#603.6d]`), or `withRiders(riders)` (the replaced entering happens with Entry Riders `riders`), and `doIf(cond, repl)` builds `onlyIf(cond, repl)`, which applies only while `cond` holds | `"If you would draw a card"` → `replace(would(you, draw(a(card))), ...)` | `"If this creature would be destroyed"` → `replace(would(any, destroy(this)), ...)` | `"If this creature would become blocked by a creature"` → `replace(would(by(a(creature)), block(this)), ...)` |
-| **6. Deontic (`StaticSpec`)** | `cant(subj, action)`<br>`must(subj, action)`<br>`can(subj, action)`<br>`gatedBy(cost, subj, action)` | `"This creature can't block."` → `cant(this, block(any))` | `"This creature can't be blocked."` → `cant(any, block(this))` | `"This creature can't be blocked by Goblins."` → `cant(by(a(goblin)), block(this))` |
-| **7. Lookback (`Condition` / `Predicate` / `Amount`)** | `did(subj, action, within)` | `"if you sacrificed a creature this turn"` → `did(you, sacrifice(a(creature)), thisTurn)` | `"if this creature was blocked this turn"` → `did(any, becomeBlocked(this), thisTurn)` | `"if this creature was blocked by a creature this turn"` → `did(by(a(creature)), block(this), thisTurn)` |
+| **1. Second-person imperative** | `action` | "Sacrifice a creature." → `sacrifice(a(creature))` | — | — |
+| **2. Third-person imperative (Handoff)** | `instruct(subj, action)` | "Target opponent sacrifices a creature." → `instruct(target(opponent), sacrifice(a(creature)))`; "That creature explores." → `instruct(that(creature), explore)` | — | — |
+| **3. Action cost** | `perform(action)` | "Sacrifice a creature: Draw a card." → `activated(perform(sacrifice(a(creature))), draw(a(card)))` | — | — |
+| **4. Trigger event** | `does(subj, action)` | "Whenever you sacrifice a creature" → `does(you, sacrifice(a(creature)))` | "Whenever this creature becomes blocked" → `does(any, becomeBlocked(this))`, the Blocked status event [CR#509.1h,509.3c] | "Whenever this creature becomes blocked by a creature" → `does(by(a(creature)), block(this))` |
+| **5. Replacement** | `replace(would(subj, action), repl, …)`; `repl` is `instead(a)` (`a` in the event's place), `before(a, body)` (`a` done before the event, which still happens, modified by `body` if one is written: the choices a replacement of an entering requires [CR#614.12a]), `alongside(a)` (`a` done as part of the event, which still happens: "enters with" and "as it enters" [CR#603.6d]), or `withRiders(riders)` (the entering happens with those Entry Riders); `doIf(cond, repl)` builds `onlyIf(cond, repl)`, which applies only while `cond` holds | "If you would draw a card" → `replace(would(you, draw(a(card))), …)` | "If this creature would be destroyed" → `replace(would(any, destroy(this)), …)` | "If this creature would become blocked by a creature" → `replace(would(by(a(creature)), block(this)), …)` |
+| **6. Deontic** | `cant(subj, action)`, `must(subj, action)`, `can(subj, action)`, `gatedBy(cost, subj, action)` | "This creature can't block." → `cant(this, block(any))` | "This creature can't be blocked." → `cant(any, block(this))` | "This creature can't be blocked by Goblins." → `cant(by(a(goblin)), block(this))` |
+| **7. Lookback** | `did(subj, action, within)` | "if you sacrificed a creature this turn" → `did(you, sacrifice(a(creature)), thisTurn)` | "if this creature was blocked this turn" → `did(any, becomeBlocked(this), thisTurn)` | "if this creature was blocked by a creature this turn" → `did(by(a(creature)), block(this), thisTurn)` |
 
-The checker steps contexts 4–7 through one shared action-clause spine (`stepActionClauseWith`, `Check/Phrase.lean`): the head gate (§3.6, the event gate `Action.eventHeadOk`, used alike by events, lookbacks and deontic rules, which read a `Definition` by its `ownScope` header; the separate closed deontic gate of §3.7 was retired 2026-10-25), the subject before the action, the performer's kind as the action needs it (refused once, by the head itself where it checks its own performer, as a draw does `[CR#121.1]`), the action as a pattern in its phase (§3.5), then a passive's agent. A context adds only what is its own, through the spine's hooks: a lookback's history, ground and span (§3.8), a deontic rule's modifiers, cost and box (§1.3, box 3), an `asThough` condition; an event clause alone checks its voice and a procedure's number.
+**Contexts 4 to 7 are read through one shared spine:** the head gate (§4.6, shared by events,
+lookbacks and deontic rules, which match a Definition by its Deed); then the subject, before the
+action; the Actor's kind as the action needs it (refused once, by the head itself where the head
+checks its own Actor, as a draw does [CR#121.1]); the action, as a pattern in its phase (§4.5); and
+then a passive's agent. A context adds only what is its own: a lookback's history, grounding and
+range (§4.8); a deontic rule's modifiers, cost and box (§2.2 box 3); an `asThough` condition. Only an
+event clause checks its voice and a procedure's number.
 
-### 3.2 Voice, `Subject`, and Grammatical-Role Promotion in DRT
+### 4.2 Voice and Grammatical Roles
 
-The `Subject` of `does`, `would`, `cant`, `must`, `can`, `gatedBy`, and `did` has three constructors:
+**The Subject of `does`, `would`, `cant`, `must`, `can`, `gatedBy` and `did` has three forms**:
+active (`actor(np)`, `np` performs the action), unspecified-agent passive (`any`), and
+explicit-agent passive (`by(np)`, `np` is the oblique agent). They assign roles as follows:
 
-```lean
-inductive Subject where
-  | actor (np : NounPhrase)  -- Active voice: `np` is the agent/performer
-  | any                      -- Passive voice without `by`-phrase: unspecified agent
-  | by    (np : NounPhrase)  -- Passive voice with `by`-phrase: `np` is the oblique agent
-  deriving DecidableEq, Repr
-```
+1. **Active (`actor(np)`):** `np` is read first in the clause, with role subject, and is the
+   innermost Actor while the action is read. The action's primary patient takes role object. Any
+   other noun phrases in the action (destinations, instruments, secondary targets) take role other.
+2. **Unspecified-agent passive (`any`):** introduces no agent referent. The action's primary patient
+   is promoted to role subject, matching the English surface, where the patient is the grammatical
+   subject ("Whenever a creature is destroyed, it …").
+3. **Explicit-agent passive (`by(np)`):** the action's primary patient is promoted to role subject
+   and read **first**, matching English word order ("Whenever this creature becomes blocked by a
+   creature …"). `np` is read second, with role other. So a later bare "it" in the same or the next
+   clause resolves by D′ (subject over object over other) to the passive subject ("this creature")
+   when both match in kind and zone, while "that creature" resolves by AC>R1 (recency) to the agent
+   ("a creature").
 
-How the DRT checker evaluates `(subj : Subject, action : Action)`:
+### 4.3 One Wildcard Word, `any`
 
-1. **Active voice (`Subject.actor np`, written as bare `np` in the DSL):**
-   - `np` is evaluated first in the clause and stamped with `role := .subj` (and pushed onto `drs.performers` while stepping `action`).
-   - The primary patient inside `action` is stamped with `role := .obj`.
-   - Any remaining noun phrases inside `action` (destinations, instruments, secondary targets) are stamped with `role := .other`.
-2. **Unspecified-agent passive (`Subject.any`, written as `any`):**
-   - Introduces **no** agent referent into `drs.referents`.
-   - Promotes the primary patient inside `action` to `role := .subj` (matching English surface syntax where the patient is the grammatical subject: `"Whenever a creature is destroyed, it..."`).
-3. **Explicit-agent passive (`Subject.by np`, written as `by(np)`):**
-   - Promotes the primary patient inside `action` to `role := .subj` and evaluates it **first** (matching English word order: `"Whenever this creature becomes blocked by a creature..."`).
-   - Evaluates `np` second and stamps it with `role := .other` (oblique `by`-agent).
-   - Consequently, a subsequent bare pronoun `it` in the same or next clause resolves by `D′` (`.subj < .obj < .other`) to the passive subject (`this creature`) when both match in kind and zone, while `that creature` resolves by `AC>R1` (recency) to the `by`-agent (`a creature`)!
+**There is one wildcard word, `any`, at every sort that has a wildcard,** instead of a separate
+wildcard word per sort. The sorts are: Subject (the passive's unspecified agent), NounPhrase (an
+unspecified target, object or defender: `cant(this, block(any))` for "This creature can't block"),
+Amount (`cant(any, putCounters(any, any, this))` for "can't have counters put on it"), the counter
+kind, die sides and roll result, zone, and Timing.
 
-### 3.3 Polymorphic `any : α` (`AnyValue` Typeclass)
+### 4.4 Transitive and Intransitive Actions, and Relative Clauses
 
-Instead of separate per-type wildcard constructors (`Subject.any`, `NounPhrase.any`, `Amount.anyAmount`, `CounterKindSource.anyKind`, `DieSides.anyDie`), Lean defines a polymorphic typeclass:
+- **Intransitive or Actor-only actions** (`attack`, `loseTheGame`, `commitCrime`) take no patient
+  noun phrase, or only an optional defender or companion. The Actor comes from the enclosing
+  clause's Subject, or is implicitly "you" or the innermost Actor in an imperative.
+- **Transitive actions** always keep their primary patient inside the Action. Examples:
+  `exile(patient)`, `destroy(patient)`, `sacrifice(patient)`, `tap(patient)`, `untap(patient)`,
+  `discard(patient)`, `block(attacker)`, `target(objectOrPlayer)`, `move(patient, from, to, obs)`,
+  `dealDamage(amount, recipient, kind)`, `putCounters(count, kind, target)`,
+  `removeCounters(quantity, kind, target)`. The Subject of `does`, `would`, `cant`, `did` or
+  `instruct` supplies the performer (`actor(np)`), an unspecified passive agent (`any`), or an
+  oblique agent (`by(np)`).
+- **Relative clauses use `which`.** A relative clause that filters a noun by an event (a relative
+  lookback, `did`) uses the relative pronoun `which` directly inside `did(subj, action, within)`,
+  in whatever argument slot is relativized:
 
-```lean
-class AnyValue (α : Type) where
-  any : α
-```
-
-with instances for:
-- `Subject` (`.any` — passive voice / unspecified actor)
-- `NounPhrase` (`.any` — unspecified target/object/defender, e.g., `cant(this, block(any))` for *"This creature can't block"*)
-- `Amount` (`.anyAmount` — e.g., `cant(any, putCounters(any, any, this))` for *"can't have counters put on it"*)
-- `CounterKindSource` (`.anyKind`)
-- `DieSides` (`.anyDie`) and `RollWatch` (`.anyResult`)
-- `ZoneExpr` (`.anyZone`)
-- `Timing` (`.anyTiming`)
-
-### 3.4 Transitive vs. Intransitive `Action` Conventions and Relative Clauses (`which`)
-
-- **Transitive vs. Intransitive Argument Convention:**
-  - **Intransitive / actor-only actions** (`attack`, `loseTheGame`, `commitCrime`) take no patient `NounPhrase` (or an optional defender/companion); the actor is supplied by the enclosing clause's `subj : Subject` (or is implicit `"you"` / the innermost of `drs.performers` in a 2p/3p imperative).
-  - **Transitive actions** (`exile(patient)`, `destroy(patient)`, `sacrifice(patient)`, `tap(patient)`, `untap(patient)`, `discard(patient)`, `block(attacker)`, `target(objectOrPlayer)`, `move(patient, from, to, obs)`, `dealDamage(amount, recipient, kind)`, `putCounters(count, kind, target)`, `removeCounters(quantity, kind, target)`) always keep their primary `patient` inside the `Action`, while `subj : Subject` on `does`/`would`/`cant`/`did`/`instruct` supplies the performer (`Subject.actor np`), unspecified passive agent (`Subject.any`), or oblique passive `by`-agent (`Subject.by np`).
-- **Relative Clauses with `which` (`NounPhrase.which`, replacing `NounPhrase.gap`):**
-  - Relative clauses that filter a noun by an event (`Predicate.did`) use the relative pronoun **`which`** (`NounPhrase.which`, replacing `NounPhrase.gap`) directly inside `did(subj, action, within)` in whatever argument slot is relativized:
-
-| English Noun Phrase | `semantics-v3` Encoding |
+| English noun phrase | Encoding |
 |---|---|
-| `"all creatures that attacked this turn"` | `allOf(and([creature, did(which, attack, thisTurn)]))` |
-| `"each card exiled this way"` | `allOf(and([card, did(any, exile(which), thisWay)]))` |
-| `"a card you discarded this turn"` | `a(and([card, did(you, discard(which), thisTurn)]))` |
-| `"a creature dealt damage by this creature this turn"` | `a(and([creature, did(by(this), dealDamage(any, which), thisTurn)]))` |
+| "all creatures that attacked this turn" | `allOf(and([creature, did(which, attack, thisTurn)]))` |
+| "each card exiled this way" | `allOf(and([card, did(any, exile(which), thisWay)]))` |
+| "a card you discarded this turn" | `a(and([card, did(you, discard(which), thisTurn)]))` |
+| "a creature dealt damage by this creature this turn" | `a(and([creature, did(by(this), dealDamage(any, which), thisTurn)]))` |
 
-When the checker evaluates `Predicate.did (did(subj, action, within))`:
-- It opens a local relative-clause DRS box (`§1.3 Box 5`) where `which` is bound to a temporary referent seeded from the outer `TypeEvidence` (`c.selfType` / conjunction evidence: `.player` when filtering a player description, `.object` with the accumulated `CardType`s and expected zone when filtering an object description).
-- It steps `did(subj, action, within)` in that local box (verifying that `which` appears at least once and satisfies `J1` domain compatibility for its verb slot) and discards local indefinite participants and the temporary `which` binder on exit. Definite presuppositional references (`attachHost`: `"enchanted"`, `"equipped"`, or `"fortified"`, `[CR#301.5,301.6,303.4b]`) project to the enclosing ability's DRS box with their identity and zone preserved, without a per-referent `attachmentHost` flag.
+A relative lookback opens a local relative-clause box (§2.2 box 5). `which` is bound there to a
+temporary referent seeded from the outer Type Evidence: a player when filtering a player
+description, or an object with the Card Types and expected zone gathered so far when filtering an
+object description. The lookback is read in that box. `which` must appear at least once and pass J1
+for its verb slot. Local indefinite participants and the temporary `which` are discarded on exit.
+Definite presuppositional references (an Attachment Host: "enchanted", "equipped", "fortified",
+[CR#301.5,301.6,303.4b]) project to the enclosing ability's box with their identity and zone
+preserved, without a per-referent Attachment Host mark.
 
-- **Same-Is-True-For Abilities (`Ability.sameIsTrueFor`):** "… The same
-  is true for first strike, double strike, …" is written once, as `sameIsTrueFor frame keywords`.
-  The `frame` contains the placeholder atom `KeywordTerm.thatKeyword`, analogous to `which`. It is
-  not expanded per keyword, because plugin files carry no evaluation
-  (`plugins-v3-first-order-templates`).
-  - The checker checks a static or triggered `frame` once per keyword, with `thatKeyword` bound to
-    that keyword, and refuses any other frame or an empty list.
-  - `thatKeyword` outside a frame is refused.
-  - Lowering distributes the frame over the keywords.
+**Same-Is-True-For Abilities.** "… The same is true for first strike, double strike, …" is written
+once, as `sameIsTrueFor(frame, keywords)`. The frame contains the placeholder word `thatKeyword`,
+analogous to `which`. It is not expanded per keyword, because `.syl` files carry no evaluation.
 
-### 3.5 Pre-Action (`would`) vs. Post-Action (`does` / `did` / Imperative) DRT Stepping
+- The checker checks a static or triggered frame once per keyword, with `thatKeyword` bound to that
+  keyword. It refuses any other frame, and an empty keyword list.
+- `thatKeyword` outside a frame is refused.
+- Lowering distributes the frame over the keywords.
 
-Because `does(subj, action)`, `would(subj, action)`, `did(subj, action, within)`, and imperative `action` all wrap the same `action : Action`, the DRT checker steps `action` under a `StepPhase`:
+### 4.5 Before the Event (`would`) and After It (`does`, `did`, Imperatives)
 
-```lean
-inductive StepPhase where
-  | preEvent   -- Used by `would(subj, action)` in replacement effects [CR#614.1]
-  | postEvent  -- Used by imperative `action`, `instruct`, `does`, and `did`
-  deriving DecidableEq, Repr
-```
+**`would` reads its Action before the event; imperatives, `instruct`, `does` and `did` read it
+after.** All four wrap the same Action, so the checker reads it in one of two phases:
 
-- **`StepPhase.preEvent` (`would`):**
-  - Introduces the subject and object referents of `action` in their **pre-action** zone and status (`"If a creature would die, exile it instead"` leaves the dying creature on `.battlefield` so `exile(it)` can legally exile it from the battlefield `[CR#614.6]`).
-  - Introduces prospective magnitudes (`thatMuch` damage, `thatMany` counters/tokens/cards) so replacement instructions can read them (`"prevent that much damage"`, `"put twice that many counters on it instead"`).
-  - Does **not** introduce post-completion product referents (e.g., `would(you, draw(a(card)))` does not introduce a drawn card in hand).
-- **`StepPhase.postEvent` (`does` / `did` / imperative):**
-  - Transitions patient referents to their **post-action** zone and status, stamps them with `.actedOn deed`, and creates new post-zone-change referents where `[CR#400.7]` applies.
-  - Introduces post-completion product referents (`drawn` cards, `created` tokens, `manaProduced`, `rollOutcome`).
+- **Before the event (`would`, [CR#614.1]):**
+  - The action's subject and object referents are introduced in their zone and status before the
+    action. In "If a creature would die, exile it instead", the dying creature is still on the
+    battlefield, so `exile(it)` can exile it from there ([CR#614.6]).
+  - Prospective magnitudes are introduced ("that much" damage; "that many" counters, tokens or
+    cards), so a replacement can read them ("prevent that much damage", "put twice that many
+    counters on it instead").
+  - Products of completion are **not** introduced: `would(you, draw(a(card)))` introduces no card
+    drawn into a hand.
+- **After the event (imperatives, `instruct`, `does`, `did`):**
+  - Patient referents move to their zone and status after the action, are stamped with the deed,
+    and are replaced by new referents where [CR#400.7] applies.
+  - Products of completion are introduced: cards drawn, tokens created, the mana produced, a roll
+    result.
 
-### 3.6 Complete `GameEvent` Constructor Mapping (All 27 Domain Constructors Accounted For)
+### 4.6 Events
 
-Of the 27 domain `GameEvent` constructors in `semantics-v2` (`lean/Semantics/Phrase.lean:392-441`, excluding the 2 parameter escapes `parameter` and `macroParam`), **17 action events collapse into `does(subj, action)`** and **10 non-action/structural events remain** alongside `does` (plus `stateBasedActionsChecked` `[CR#704.3]` from the 2026-10-13 ruling Q90):
+**An event is `does(subj, action)` over an event-capable Action head, or one of a small set of
+structural events.** The event-capable heads, and what each pattern watches:
 
-#### A. Action `GameEvent` Constructors Replaced by `does(subj, action)`
-
-| Old `GameEvent` Constructor | `semantics-v3` `does(subj, action)` Encoding | Exact Field & `Action` Mapping |
+| Event | Encoding | Ruling |
 |---|---|---|
-| `verbedEvent (deed, subject, by, becomes, locus)` | `does(subj, action)` | Covers the keyword actions (`tap`, `untap`, `destroy`, `sacrifice`, `exile`, `discard`, `mill`, `scry`, `surveil`, `explore`, `connive`, `forage`, `bolster`, `adapt`, `amass`, `populate`, `proliferate`, `regenerate`, `reveal`, `search`, `shuffle`, `vote`, etc.) and `Deed.ofAbility` (`crew`, `saddle`, `mutate`, `devour`), each deed named by its `Definition`'s `ownScope` header or by its dedicated head (`crew`, `saddle`); "transforms into" writes the result face on `turnOver`'s `into` `[CR#701.27e]`, and a shuffle names its library itself. |
-| `casts (caster, spell, from_)` | `does(caster, cast(spell, from_))` | `cast` is a Definition over `Action.procedure .cast`, whose `from_ : Option Location` is the written origin. |
-| `activates (actor, ability, of_)` | `does(actor, activate(ability, of_))` | Uses the `activate` Definition, over `Action.procedure .activate`. |
-| `tappedForMana (permanent, by)` | `does(by, tapForMana(permanent))` | Uses the `Action.tapForMana` head (`subj = any` when `by = none`, `subj = by(p)` when `by = some p`). |
-| `commitsCrime (actor)` | `does(actor, commitCrime)` | `[CR#700.13]` crime action primitive. |
-| `losesGame (player)` | `does(player, loseGame)` | Uses the `loseGame` Template, over `Action.conclude .loseGame`. |
-| `paysCost (payer, cost, outcome)` | `does(payer, pay(cost, outcome))` | `Action.pay` carries `outcome : PaymentOutcome := .paid` (`.paid | .unpaid`). |
-| `paysLife (player, amount)` | `does(player, payLife(amount))` | `payLife` is a Template, `pay(perform(loseLife(amount)), .once)`: a cost payment that subtracts life `[CR#119.4]`, so a player who can't lose life can't pay it `[CR#119.8]`. There is no life `Cost`; in a cost slot `payLife` is coerced to `perform(payLife(amount))`, and `pay` of a cost that is itself one such payment pays it once (`Cost.payment`, `lean-v3-pay-life-action`). |
-| `attacksWith (player, attackers, defender)` | `does(player, attackWith(attackers, defender))` | Player-subject combat action (`"Whenever you attack with one or more creatures"`). |
-| `combat (subject, role)` | `does(attacker, attack(defender))`<br>`does(blocker, block(attacker))`<br>`does(attacker, attackUnblocked(defender))` | Active (`does(b, block(a))`), status (`does(any, becomeBlocked(a))` = *"becomes blocked"*, the Blocked status, which an effect can also give `[CR#509.1h,509.3c]`), or `by`-passive (`does(by(b), block(a))` = *"becomes blocked by B"* `[CR#509.3d]`); `attackUnblocked` `[CR#509.1h]`. |
-| `becomesTarget (subject, by)` | `does(by, target(subject))` | Adds `Action.target (subject : NounPhrase)` (`[CR#115.1]`), used by both `"Whenever ~ becomes the target of..."` (`does(by(src), target(this))`) and deontic shroud/hexproof (`cant(by(src), target(this))`). |
-| `zoneChange (subject, from_, to, at)` | `does(any, move(subject, from_, to, at))` | `MoveMode` carries `from_ : EventSource` (`.anywhere`, `.zones`, `.anywhereBut`) and `at : ObservationPoint` (`.arrival` for `enters` vs `.departure` for `dies` / `leaves`, `[CR#700.4,603.6a,603.6c,603.10a]`). A move carries no cause of its own: a caused move is written `GameEvent.causes` or `WouldClause.causedBy` around it. `die(subject)` (`[CR#700.4]`), `enter(subject)`, and `leave(subject)` are `Template`s expanding to `move(subject, .zones [.battlefield], .graveyard, .departure)` etc., so both triggers (`does(any, die(a(creature)))`) and lookbacks (`did(any, die(a(creature)), thisTurn)`) share the single `Action.move` AST primitive. |
-| `damage (kind, source, recipient, amount)` | `does(source, dealDamage(amount, recipient, kind))` | `dealDamage` carries `kind : Option DamageKind := none`, the explicit qualifier (`some .combat` for *"combat damage"* `[CR#120.2a]`, `some .noncombat` for *"noncombat damage"* `[CR#120.2b]`); `none` is unqualified *"damage"*, which in an instruction is the effect's own (noncombat) damage `[CR#120.2b]` and in an event, replacement, deontic or lookback matches all damage. The prevention templates carry the same slot after their required arguments; a prevention, redirection or scaling replacement writes it on the `dealDamage` of the event it replaces, and the `dealDamage` of a replacement's `instead` keeps that event's kind (`[CR#614.6]`). Active (`does(src, ...)`), passive (`does(any, ...)` = *"is dealt damage"*), or `by`-passive (`does(by(src), ...)`). |
-| `lifeChange (direction, player, amount)` | `does(player, changeLife(direction, amount))` | `gainLife` / `loseLife` templates expand to `changeLife`. |
-| `draws (player, cards)` | `does(player, draw(cards))` | Uses `Action.draw`. |
-| `searchesLibrary (searcher, libraryOwner)` | `does(searcher, search(libraryOf(libraryOwner), any))` | Uses `search` definition. |
-| `createsTokens (creator, tokens)` | `does(creator, create(tokens))` | Uses `create` definition. |
-| `counterEvent (dir, batch, target, by)` | `countersPut(kind, amount, subject)` / `countersRemoved(kind, quantity, subject)`, templates over `does(any, putCounters(…))` / `does(any, removeCounters(…))` | A `Delta`-free pair: the direction is which action the event names. There is no batch field: the amount or quantity the action already carries is what the pattern watches. "A counter is put" is `.lit 1`, matched by each counter, since one event can contain several occurrences (`[CR#603.2c]`); "one or more counters are put" is `.anyAmount`, matched by the event (`[CR#714.2b]`); a removal reads its `Quantity`, and "the last counter" is `Quantity.theLast` (`[CR#310.12b,702.62a]`); "the Nth counter is put" is `Amount.theNth`, the put that crosses N (`[CR#122.7]`), not an `nthOccurrence` count. Only a plural amount or quantity publishes the count a `would` clause's "that many" reads. `Action.moveCounters` stays distinct for moving counters between two objects (`[CR#122.5]`). |
-| `statusEvent (edge, subject, status, by)` | `does(by, setStatus(edge, subject, status))` | Covers `"becomes tapped"`, `"is turned face up"`, `"phases out"`. |
-| `attaches (attachment, object, dir)` | `does(any, attach(attachment, object, dir))` | Uses `attach` / `unattach`. |
-| `gainsControl (player, object)` | `does(player, gainControlOf(object, from))` | Uses `Action.changeControl`, with the player control is taken from when written ("from you", `[CR#603.10d]`). It is the head of event, lookback and deontic patterns only (`controlChangePattern`, as `Cost.anyCost` and `Ballot.anyBallot` are, §3.7); the imperative "gain control of" is one tree, `establish(controlGrant(player, object), duration)`, the layer-2 effect (`[CR#611.2a,613.1b]`), and the pattern stamps its patient as that effect does. |
-| `rollsDice (roller, dice, watch)` | `does(roller, rollDice(count, sides, watch))` | Carries `count : Amount`, `sides : DieSides` and `watch : RollWatch`. As for counters, `count` is what the pattern watches: "roll a die" is `.lit 1`, matched by each die (`[CR#603.2c]`), and "roll one or more dice" is `.anyAmount`, matched by the roll. |
-| `flipsCoin (flipper, call, outcome)` | `does(flipper, flipCoin(call, outcome))` | Carries `call : Option FlipCall` and `outcome : Option CoinOutcome`. |
-| Triggered ability triggering | `does(ability, trigger)` | The automatic triggering occurrence [CR#603.2]. |
-| A creature crews or saddles another permanent | `does(creature, crew(vehicle))` / `does(creature, saddle(permanent))` | Cost participation [CR#702.122b,702.122d,702.171c]; the ability's activation and resolution retain their own events. |
-| A Room becomes fully unlocked | `does(player, fullyUnlock(room))` | The designation transition specified by [CR#709.5i]. |
+| A keyword action or keyword ability's deed (`tap`, `untap`, `destroy`, `sacrifice`, `exile`, `discard`, `mill`, `scry`, `surveil`, `explore`, `connive`, `forage`, `bolster`, `adapt`, `amass`, `populate`, `proliferate`, `regenerate`, `reveal`, `search`, `shuffle`, `vote`, …; `crew`, `saddle`, `mutate`, `devour`) | `does(subj, action)` | Each deed is named by its Definition's Deed, or by its own head (`crew`, `saddle`). "Transforms into" writes the result face on `turnOver`'s `into` [CR#701.27e]. A shuffle names its library itself. |
+| Casting | `does(caster, cast(spell, from))` | `cast` is a Definition over the cast procedure; `from` is the written origin. |
+| Activating | `does(actor, activate(ability, of))` | The `activate` Definition, over the activate procedure. |
+| Tapping for mana | `does(by, tapForMana(permanent))` | `subj` is `any` when no tapper is written, `by(p)` when one is. |
+| Paying a cost | `does(payer, pay(cost, outcome))` | `pay` carries whether the cost was paid (paid, the default, or unpaid). |
+| Paying life | `does(player, payLife(amount))` | `payLife` is a Template, `pay(perform(loseLife(amount)), once)`: a cost payment that subtracts life [CR#119.4], so a player who can't lose life can't pay it [CR#119.8]. There is no life Cost. In a cost slot `payLife` stands for `perform(payLife(amount))`, and `pay` of a cost that is itself one such payment pays it once. |
+| Attacking with creatures | `does(player, attackWith(attackers, defender))` | The player-subject combat action ("Whenever you attack with one or more creatures"). |
+| Combat | `does(attacker, attack(defender))`, `does(blocker, block(attacker))`, `does(attacker, attackUnblocked(defender))` | Active (`does(b, block(a))`); status (`does(any, becomeBlocked(a))`, "becomes blocked": the Blocked status, which an effect can also give [CR#509.1h,509.3c]); or `by`-passive (`does(by(b), block(a))`, "becomes blocked by B" [CR#509.3d]). `attackUnblocked` [CR#509.1h]. |
+| Becoming a target | `does(by, target(subject))` | `target(subject)` [CR#115.1] serves both "Whenever ~ becomes the target of …" (`does(by(src), target(this))`) and shroud and hexproof (`cant(by(src), target(this))`). |
+| Other heads | `does(player, draw(cards))`; `does(searcher, search(libraryOf(owner), any))`; `does(creator, create(tokens))`; `does(by, setStatus(edge, subject, status))` ("becomes tapped", "is turned face up", "phases out"); `does(any, attach(attachment, object, dir))` (`attach`, `unattach`); `does(flipper, flipCoin(call, outcome))`; `does(actor, commitCrime)` [CR#700.13]; `does(player, loseGame)`; `does(player, changeLife(direction, amount))` | `loseGame` is a Template over the game-concluding action; `gainLife` and `loseLife` are Templates over `changeLife`. |
+| A Zone Change | `does(any, move(subject, from, to, at))` | The origin is anywhere, listed zones, or anywhere but listed zones; the Observation Point is arrival for "enters" and departure for "dies" and "leaves" [CR#700.4,603.6a,603.6c,603.10a]. A move carries no cause of its own: a caused move is written inside `causes` or `causedBy`. `die(subject)` [CR#700.4], `enter(subject)` and `leave(subject)` are Templates over `move`, so triggers (`does(any, die(a(creature)))`) and lookbacks (`did(any, die(a(creature)), thisTurn)`) share the one move. |
+| Damage | `does(source, dealDamage(amount, recipient, kind))` | `kind` is the explicit qualifier: combat damage [CR#120.2a], noncombat damage [CR#120.2b], or none written. Unqualified "damage" in an instruction is the effect's own (noncombat) damage [CR#120.2b], and in an event, replacement, deontic rule or lookback matches all damage. The prevention Templates carry the same slot after their required arguments. A prevention, redirection or scaling replacement writes it on the `dealDamage` of the event it replaces, and the `dealDamage` of a replacement's `instead` keeps that event's kind ([CR#614.6]). Active, passive ("is dealt damage") or `by`-passive. |
+| Counters | `countersPut(kind, amount, subject)` and `countersRemoved(kind, quantity, subject)`, Templates over `does(any, putCounters(…))` and `does(any, removeCounters(…))` | No Delta: the direction is which action the event names. There is no batch field: the amount or quantity the action already carries is what the pattern watches. "A counter is put" is `1`, matched by each counter, since one event can contain several occurrences ([CR#603.2c]); "one or more counters are put" is `anyAmount`, matched by the event ([CR#714.2b]). A removal reads its Quantity, and "the last counter" is `theLast` ([CR#310.12b,702.62a]). "The Nth counter is put" is `theNth`, the put that crosses N ([CR#122.7]), not an Event Ordinal. Only a plural amount or quantity publishes the count a `would` clause's "that many" reads. `moveCounters` stays distinct, for moving counters between two objects ([CR#122.5]). |
+| Gaining control | `does(player, gainControlOf(object, from))` | With the player control is taken from, when written ("from you", [CR#603.10d]). It is the head of event, lookback and deontic patterns only, as `anyCost` and `anyBallot` are (§4.7). The imperative "gain control of" is one tree, `establish(controlGrant(player, object), duration)`, the layer-2 effect ([CR#611.2a,613.1b]), and the pattern stamps its patient as that effect does. |
+| Rolling dice | `does(roller, rollDice(count, sides, watch))` | As for counters, `count` is what the pattern watches: "roll a die" is `1`, matched by each die ([CR#603.2c]), and "roll one or more dice" is `anyAmount`, matched by the roll. |
+| A triggered ability triggering | `does(ability, trigger)` | The automatic triggering occurrence [CR#603.2]. |
+| Crewing or saddling | `does(creature, crew(vehicle))`, `does(creature, saddle(permanent))` | Taking part in the cost [CR#702.122b,702.122d,702.171c]; the ability's activation and resolution keep their own events. |
+| Fully unlocking a Room | `does(player, fullyUnlock(room))` | The Designation transition of [CR#709.5i]. |
 
+**The event head gate.** The engine's core compiles events, replacements and lookbacks to a closed
+set of event filters. So `does`, `would` and `did` admit only the event-capable heads above, plus a
+keyword-action Definition matched by its Deed. Control-flow and compound instructions
+(`sequentially`, `doIf`, `doForEach`, `chooseModes`, `establish`, …) are refused.
 
-- **Closed Event Head-Gating on `does`, `would`, and `did` (`Check/Events.lean`):** Because `deckmaste_core` compiles events, replacements, and lookbacks to the closed `core::EventFilter` enum, `Check/Events.lean` explicitly gates `action` inside `does(subj, action)`, `would(subj, action)`, and `did(subj, action, within)` to the event-capable `Action` heads in Table 3.6A above plus `Action.ownScope (some (.action name)) body` (CR §701 keyword actions, lowered to `core::EventFilter::Act`), deterministically refusing control-flow and compound imperative instructions (`sequentially`, `doIf`, `doForEach`, `chooseModes`, `establish`, etc.).
+**Structural events:**
 
-#### B. The Remaining Non-Action `GameEvent` Constructors in `semantics-v3`
+- `beginningOf(part, whose, which)` and `endOf(part, whose)`;
+- `now`, the immediate event for a self-replacement ("As this enters …");
+- `stateHolds(condition)`, a state trigger ("When this has no counters on it …", "when its power
+  becomes 20" as a comparison) [CR#603.8];
+- `gameBecomes(designation)`, "Whenever it becomes day / night" [CR#731.1];
+- `chapterMark(chapters)`, Saga chapter triggers [CR#714.2];
+- `triggers(ability, of, by)`, "Whenever a triggered ability of … triggers";
+- `nthOccurrence(ordinal, per, event)`, "Whenever you cast your second spell each turn";
+- `causes(cause, event)`, "Whenever an ability you control causes you to …";
+- `stateBasedActionsChecked`, the state-based check boundary for lookbacks [CR#704.3,704.5h].
 
-```lean
-inductive GameEvent where
-  | does                     (subj : Subject) (action : Action)
-  | beginningOf              (part : TurnPart) (whose : Option NounPhrase) (which : TurnRef)
-  | endOf                    (part : TurnPart) (whose : Option NounPhrase)
-  | now                                                                 -- Immediate event for self-replacement ("As this enters...")
-  | stateHolds               (condition : Condition)                    -- State triggers ("When this has no counters on it...", "when its power becomes 20" as a comparison) [CR#603.8]
-  | gameBecomes              (designation : DesignationName)            -- "Whenever it becomes day / night" [CR#731.1]
-  | chapterMark              (chapters : List ChapterNumber)            -- Saga chapter triggers [CR#714.2]
-  | triggers                 (ability : NounPhrase) (of_ : NounPhrase) (by : Option NounPhrase) -- "Whenever a triggered ability of ... triggers"
-  | nthOccurrence            (ordinal : Ordinal) (per : Option Period) (event : GameEvent)      -- "Whenever you cast your second spell each turn"
-  | causes                   (cause : Causing) (event : GameEvent)      -- "Whenever an ability you control causes you to..."
-  | stateBasedActionsChecked                                            -- State-based check boundary for lookback [CR#704.3,704.5h] (Ruling 2026-10-13, Q90)
-```
+### 4.7 Static Specs: Deontic Rules, Replacements, Retention and Damage
 
-### 3.7 Complete `StaticSpec` Deontic, Replacement, Projection, and Damage Unification
+**A deontic rule is `cant`, `must`, `can` or `gatedBy` over a Subject, an Action and optional
+modifiers.** Each Template takes each modifier as an optional argument:
 
-`StaticSpec.deonticRule`, `Role` (`agent` vs `patient`), `DeonticPatient` (`noPatient`, `defendingPlayer`, `counterpart`, `targetedBy`, `counterpartsAt`, `host`), `DeedComplement`, and `CoreDeed.haveCountersPutOn` are **deleted** and replaced by unified deontic constructors taking `(subj : Subject, action : Action, mods : DeonticMods)`, whose Templates (`cant`, `can`, `must`, `gatedBy`) take each modifier as an optional argument:
+- `timing`: when or how often it applies ("each turn", "during each of your turns");
+- `asThough`: "as though it had flash", "as though it didn't have defender";
+- `except`: a Deontic Exception, a keyword or the objects exempted
+  [CR#702.13b,702.111b,702.145b];
+- `cause` (`cant` only): the cause the prohibited event must have [CR#120.3a];
+- `rider` (`can` only): a Permission Rider, the rest of the permission's ability [CR#113.2c].
 
-```lean
-structure DeonticMods where
-  timing   : Option Timing        := none  -- when or how often it applies: "each turn", "during each of your turns"
-  asThough : Option AsThough      := none  -- e.g., "as though it had flash", "as though it didn't have defender"
-  except   : Option DeonticExcept := none  -- Deontic Exception: a keyword or the objects exempted [CR#702.13b,702.111b,702.145b]
-  cause    : Option Causing       := none  -- `cant` only: the cause the prohibited event must have [CR#120.3a]
-  rider    : Option Action        := none  -- `can` only: a Permission Rider, the rest of the permission's ability [CR#113.2c]
-```
+Rulings:
 
-- **Compound deontics (`"can't attack or block"`):** Coordinated prohibitions/requirements use `StaticSpec.conjunction [cant(this, attack(any)), cant(this, block(any))]` (with a `cantBoth` template helper where desired), eliminating the single-purpose `Deeds = List Deed` wrapper.
-- **Token specification arguments:** `TokenSpec.inCaller` evaluates a token specification in the immediate caller's Reference Scope and restores the callee's scope afterward. `EntryRider.inCaller` applies the same boundary to a whole entry-rider argument, including an attacking defender. The `create` Definition wraps its token-specification parameter and each entry rider, so caller arguments remain caller reads rather than definition-internal reads. Embedded or granted ability text receives only visible chosen-quality and chosen-player referents; ordinary surrounding discourse does not become an antecedent inside that text.
-- **Deontic Head-Gating on `cant`, `must`, `can`, `gatedBy`, and `asThough` (`Check/Events.lean`, `Check/Phrase.lean`):** Deontic clauses gate their action with the event gate, `Action.eventHeadOk` (§3.6), and have no head gate of their own (the closed deontic list, narrower than the event heads, was retired 2026-10-25; it refused printed text such as "can't become the monarch"). A "can't" effect takes precedence over an effect that allows or directs the thing `[CR#101.2]`, so a prohibition is gated like an event and admits every action the checker knows as an event: `gainDesignation` ("can't become the monarch" `[CR#725.1]`), `preventDamage` and `redirectDamage` ("can't be prevented", "can't be dealt instead" `[CR#615.12,614.9]`), any `setStatus`, and any `move` ("can't be returned to its owner's hand"; `leave`, `putInto`, `returnTo*` are Templates over the move). Compound and control-flow actions (`sequentially`, `doIf`, `doForEach`, `chooseModes`, `establish`, a `replace`) are refused by the event gate here as there. An Action Definition is admitted by its `ownScope` header, whatever its deed (`Action.headGate`). Copy and vote permissions are required by Display of Power and additional-vote clauses; payment permissions use `pay .anyCost` with the spend-as-though modifier. `Cost.anyCost` is a wildcard restricted to event, lookback, prospective, and deontic action patterns; performed costs require a specified cost. Likewise, `Ballot.anyBallot` is an action-pattern wildcard for additional-vote permissions; a performed vote requires actual labels or a candidate, and an empty label list remains invalid. `changeControl` is a pattern head only ("other players can't gain control of them"); a performed control change is `establish(controlGrant …)` (`[CR#613.1b]`). Pattern entry restores the caller’s mode before checking subsequent effects. The 2026-10-14 bench extension preserves the distinctions between triggering [CR#603.2], crewing and saddling [CR#702.122b,702.171c], phase-in status [CR#702.26c], and fully unlocking [CR#709.5i].
+- **Compound deontics.** "Can't attack or block" is a conjunction of prohibitions,
+  `conjunction([cant(this, attack(any)), cant(this, block(any))])`. There is no list-of-deeds
+  wrapper.
+- **The deontic gate is the event gate (§4.6).** Deontic rules have no head gate of their own. A
+  "can't" effect takes precedence over an effect that allows or directs the thing [CR#101.2], so a
+  prohibition is gated like an event and admits every action the checker knows as an event:
+  `gainDesignation` ("can't become the monarch" [CR#725.1]), `preventDamage` and `redirectDamage`
+  ("can't be prevented", "can't be dealt instead" [CR#615.12,614.9]), any `setStatus`, and any
+  `move` ("can't be returned to its owner's hand"; `leave`, `putInto` and the `returnTo…` words
+  are Templates over the move). Compound and control-flow actions are refused here as there. An
+  action Definition is admitted by its Deed, whatever the Deed.
+- **Permissions and wildcards.** Copy and vote permissions are required by *Display of Power* and
+  by additional-vote clauses. Payment permissions use `pay(anyCost)` with the spend-as-though
+  modifier. `anyCost` is a wildcard only in event, lookback, prospective and deontic action
+  patterns; a performed cost must be specified. Likewise `anyBallot` is an action-pattern wildcard
+  for additional-vote permissions; a performed vote requires actual labels or a candidate, and an
+  empty label list is invalid. `gainControlOf` is a pattern head only ("other players can't gain
+  control of them"); a performed control change is `establish(controlGrant(…))` ([CR#613.1b]).
+  After reading a pattern, the checker returns to the caller's reading mode for the effects that
+  follow.
+- **Distinct occurrences stay distinct:** triggering [CR#603.2], crewing and saddling
+  [CR#702.122b,702.171c], the phase-in status [CR#702.26c], and fully unlocking [CR#709.5i].
 
-- **Retention: "This effect doesn't remove …" (`lean-v3-effect-keeps-existing-attachments`):** `StaticSpec.retention(spec, subject)` is an exemption from one state-based consequence of `spec`, a clause that removes Attachments already on its host: a protection grant, whose Auras with the quality go to the graveyard and whose Equipment and Fortifications become unattached (`[CR#702.16c,702.16d,704.5m,704.5n]`), or a prohibition on attaching ("can't be enchanted"), which leaves an Aura already attached enchanting an illegal object (`[CR#303.4c,704.5m]`). It is the same shape as the zero-life exemption, a carve-out limited to one State-Based Cause, and applying it is the engine's. It wraps the one clause it limits, never a conjunction: *Guardian Beast*'s exemption is its "can't be enchanted" clause's, not "have indestructible"'s or "can't gain control of"'s. `subject` is "this Aura" (or "this Equipment", "this Fortification") on the clause's host, or a description of Attachments whose "attached to …" reads that host back by an anaphor (*Benevolent Blessing*'s "attached to it", *Guardian Beast*'s "attached to those artifacts"). The checker refuses any other clause (`retentionClause`) or subject (`retentionSubject`). Engine notes: the exemption covers this effect only, so another protection from the same quality still removes the Aura (`[CR#702.16n,702.16p]`); "already attached to" is read once, as the effect starts to apply, and an Attachment arriving later is not exempt, the clause still forbidding it to attach (`[CR#702.16p]`). The term carries no onset marker: *Black Ward*'s "this Aura" and *Benevolent Blessing*'s "already attached to it" are told apart by the `attachedTo` the latter's subject carries.
+| Printed | Encoding |
+|---|---|
+| "This creature can't block." | `cant(this, block(any))` |
+| "This permanent can't be sacrificed." | `cant(any, sacrifice(this))` |
+| "doesn't untap" | `cant(any, untap(this))`: the CR leaves its classification open, and `cant` is the engine's choice (UD-14 in `docs/engine-adrs.md`) |
+| "This creature can't be blocked by Goblins." | `cant(by(a(goblin)), block(this))` |
+| "can't have counters put on it" | `cant(any, putCounters(any, any, s))` |
+| "can't be the target of spells or abilities your opponents control" (shroud, hexproof, protection) | `cant(by(src), target(s))` |
+| "attacks each combat if able" | `must(this, attack(any))` |
+| "All creatures able to block this creature do so." | `must(by(allOf(creature)), block(this))` |
+| A permission with a rider | `can(you, play(it), rider = …)` |
+| *Ghostly Prison* | `gatedBy(mana([2]), any, attack(you))` |
+| A replacement | `replace(would(any, destroy(this)), instead(regeneration(this)))`, with `wouldAny([would(…), …])` for a disjunction of replaced events; `repl` is one of `instead(a)`, `before(a, body)`, `alongside(a)`, `withRiders(riders)`, `onlyIf(cond, repl)` |
 
-- **Causal Replacement Patterns (2026-10-14 bench extension):** `WouldClause.causedBy (cause : Causing) (clause : WouldClause)` wraps a prospective action clause with the source, event, or effect that causes it [CR#700.1,614.1a]. "If an effect would create … / put … counters" is `causedBy .anEffect` [CR#614.16]; whether an imperative, a cost or a turn-based action is an effect follows from the node that encloses it, so a Saga's turn-based lore counter is no effect [CR#703.1,714.3c] and no Action carries an effect flag. A performer and a cause are orthogonal: *Wilt-Leaf Liege*'s "If a spell or ability an opponent controls causes you to discard this card" has both. The cause is read before the nested clause. Rain of Gore retains both its spell-or-ability source and the controller of that source as the prospective life-gain subject. Its official ruling excluding life gain from combat damage with lifelink provides a distinguishing example; a bare life-gain replacement would lose that restriction.
+**Causal replacements.** `causedBy(cause, clause)` wraps a prospective action clause with the
+source, event or effect that causes it [CR#700.1,614.1a]. "If an effect would create … / put …
+counters" is `causedBy(anEffect, …)` [CR#614.16]. Whether an imperative, a cost or a turn-based
+action is an effect follows from the node that encloses it, so a Saga's turn-based lore counter is
+no effect [CR#703.1,714.3c], and no Action carries an effect flag. A performer and a cause are
+independent: *Wilt-Leaf Liege*'s "If a spell or ability an opponent controls causes you to discard
+this card" has both. The cause is read before the nested clause. *Rain of Gore* keeps both its
+spell-or-ability source and that source's controller as the prospective life-gain subject; its
+official ruling excluding life gain from combat damage with lifelink shows why a bare life-gain
+replacement would lose that restriction.
 
+**Retention: "This effect doesn't remove …".** `retention(spec, subject)` exempts something from one
+state-based consequence of `spec`, a clause that removes Attachments already on its host. That
+clause is either a protection grant, whose Auras with the quality go to the graveyard and whose
+Equipment and Fortifications become unattached ([CR#702.16c,702.16d,704.5m,704.5n]), or a
+prohibition on attaching ("can't be enchanted"), which leaves an Aura already attached enchanting an
+illegal object ([CR#303.4c,704.5m]).
 
-| Old `StaticSpec` Form | `semantics-v3` Form | Example |
-|---|---|---|
-| `deonticRule(s, .prohibit, deeds, .agent, ...)` | `cant(s, action, mods)` | `cant(this, block(any))` (*"This creature can't block."*) |
-| `deonticRule(s, .prohibit, deeds, .patient, .noPatient, ...)` | `cant(any, action, mods)` | `cant(any, sacrifice(this))` (*"This permanent can't be sacrificed."*), `cant(any, untap(this))` (*"doesn't untap"*: the CR leaves its classification open, and `cant` is the engine's choice, UD-14 in `docs/engine-adrs.md`) |
-| `deonticRule(s, .prohibit, deeds, .patient, .counterpart b, ...)` | `cant(by(b), action, mods)` | `cant(by(a(goblin)), block(this))` (*"This creature can't be blocked by Goblins."*) |
-| `deonticRule(s, .prohibit, [.core .haveCountersPutOn], .agent, ...)` | `cant(any, putCounters(any, any, s), mods)` | *"can't have counters put on it"* |
-| `deonticRule(s, .prohibit, [.target], .patient, .targetedBy src, ...)` | `cant(by(src), target(s), mods)` | *"can't be the target of spells or abilities your opponents control"* (shroud/hexproof/protection) |
-| `deonticRule(s, .require, deeds, .agent, ...)` | `must(s, action, mods)` | `must(this, attack(any))` (*"attacks each combat if able"*) |
-| `deonticRule(s, .require, deeds, .patient, .counterpart b, ...)` | `must(by(b), action, mods)` | `must(by(allOf(creature)), block(this))` (*"All creatures able to block this creature do so."*) |
-| `deonticRule(s, .permit, deeds, .agent, ...)` | `can(s, action, mods)` | `can(you, play(it), rider := ...)` |
-| `deonticRule(s, .gatedBy cost, deeds, ...)` | `gatedBy(cost, subj, action, mods)` | `gatedBy(mana([2]), any, attack(you))` (*Ghostly Prison*) |
-| `replacement(event, alternatives, timing, repl, use, limit)` | `replace(would(subj, action), repl, ...)` with `repl` one of `instead(a)`, `before(a, body)`, `alongside(a)`, `withRiders(riders)`, `onlyIf(cond, repl)` | `replace(would(any, destroy(this)), instead(regeneration(this)))` (with `wouldAny([would(...), ...])` for disjunctive replacement events) |
+- It has the same shape as the zero-life exemption: a carve-out limited to one State-Based Cause.
+  Applying it is the engine's.
+- It wraps the one clause it limits, never a conjunction: *Guardian Beast*'s exemption belongs to
+  its "can't be enchanted" clause, not to "have indestructible" or "can't gain control of".
+- `subject` is "this Aura" (or "this Equipment", "this Fortification") on the clause's host, or a
+  description of Attachments whose "attached to …" reads that host back by an anaphor (*Benevolent
+  Blessing*'s "attached to it"). The checker refuses any other clause or subject.
+- For the engine: the exemption covers this effect only, so another protection from the same quality
+  still removes the Aura ([CR#702.16n,702.16p]). "Already attached to" is read once, as the effect
+  starts to apply. An Attachment that arrives later is not exempt, and the clause still forbids it to
+  attach ([CR#702.16p]).
+- The term carries no onset marker. *Black Ward*'s "this Aura" and *Benevolent Blessing*'s "already
+  attached to it" are told apart by the `attachedTo` the latter's subject carries.
 
-- **2026-10-13 Owner Rulings Preserved on the `semantics-v3` Spine (Q81–Q90):**
-  - **`Stat.defense` and battle entry conferral (Q81, Q82):** `Stat` gains `defense` (`[CR#310.4,310.4a]`, carried in the `battle` card type's `stats` field); `Stat` and `CharacteristicStat` remain distinct enums (`[CR#109.3]`). `[CR#310.4b]` is written as a conferral on the `battle` card-type definition (`enters with defense counters equal to statOf(stat(defense), this)`). Refined (`lean-v3-stat-reads-and-number-regimes`): `statOf(stat(loyalty|defense), …)` reads by zone, counters on the battlefield and the printed number elsewhere (`[CR#306.5a,306.5c,310.4a,310.4c]`). The planeswalker and battle entry conferrals (`[CR#306.5b,310.4b]`) keep the 2026-10-13 form `statOf(stat(loyalty|defense), this)`, because off the battlefield the stat already is the printed number (§0.1 item 5(b)). The interim projection `ProjAxis.printed`, minted on the theory that the count depended on when an entering object is read, is retired (§0.1 item 5(c)).
-  - **`ProjAxis.markedDamage` and `GameEvent.stateBasedActionsChecked` (Q83, Q90):** `ProjAxis.markedDamage` reads damage marked on an object (`[CR#120.3e,120.6,704.5g]`). `GameEvent.stateBasedActionsChecked` (`[CR#704.3]`) bounds the deathtouch SBA lookback (`[CR#704.5h]`): `did(by(a(withKeyword(deathtouch))), dealDamage(any, this), .duration (.between .stateBasedActionsChecked .now))`.
-  - **`DamageResult` and `StaticSpec.damageResult` (Q86, Q87, Q88), superseded by the damage composition (`lean-v3-damage-composition`):** no damage-only `StaticSpec` remains. The results of damage are rules conferred as properties, each an `asEvent` over the damage dealt (`[CR#120.3a,120.3c,120.3e,120.3h,120.4c]`), and toxic is one such row reading the total toxic value (`[CR#702.164b,702.164c]`); lifelink's additional result is its keyword's body (`[CR#702.15b]`). Wither and infect replace the marking and the life-loss results, so a source with both puts counters once (`[CR#120.3d,614.6,702.80a,702.90b,702.90c]`). Prevention, redirection and scaling replace the damage event, `replace(would(src, dealDamage(…)), instead(preventDamage(cut) | redirectDamage(cut, to) | instruct(it, dealDamage(…))))` (`[CR#615.1,614.9]`; scaling `[CR#614.1a,614.6]`, doubling `[CR#701.10g]`), and "can't be prevented" is `cant(any, preventDamage(all, damage := …))` (`[CR#615.12]`). `OutcomeSort.damageMarked` (`[CR#120.3d]`) is what `markDamage` publishes.
+**Stats.**
 
-### 3.8 Lookback (`did` and `which`)
+- `Stat` includes `defense` ([CR#310.4,310.4a], carried in the `battle` card type's stats). `Stat`
+  and the characteristic stat stay distinct ([CR#109.3]).
+- [CR#310.4b] is a conferral on the `battle` card-type definition: it enters with defense counters
+  equal to `statOf(stat(defense), this)`.
+- `statOf(stat(loyalty|defense), …)` reads by zone: counters on the battlefield, the printed number
+  elsewhere ([CR#306.5a,306.5c,310.4a,310.4c]). So the planeswalker and battle entry conferrals
+  ([CR#306.5b,310.4b]) read `statOf(stat(loyalty|defense), this)` (§1 item 5(b)). There is no
+  printed-number projection (§1 item 5(c)).
+- The marked-damage projection reads the damage marked on an object ([CR#120.3e,120.6,704.5g]).
+- `stateBasedActionsChecked` ([CR#704.3]) bounds the deathtouch state-based lookback
+  ([CR#704.5h]): `did(by(a(withKeyword(deathtouch))), dealDamage(any, this),
+  between(stateBasedActionsChecked, now))`.
 
-`LookbackClause` is replaced by `DidClause`:
+**Damage is composed, not special.** There is no damage-only Static Spec.
 
-```lean
-inductive LookbackSpan where
-  | duration (d : Duration) (timing : Option Timing := none)
-  | thisWay
-  | triggering
-  | thisObject
-  deriving DecidableEq, Repr
+- The results of damage are rules conferred as properties, each an `asEvent` over the damage dealt
+  ([CR#120.3a,120.3c,120.3e,120.3h,120.4c]). Toxic is one such row, reading the total toxic value
+  ([CR#702.164b,702.164c]). Lifelink's additional result is its keyword's body ([CR#702.15b]).
+- Wither and infect replace the marking and the life-loss results, so a source with both puts
+  counters once ([CR#120.3d,614.6,702.80a,702.90b,702.90c]).
+- Prevention, redirection and scaling replace the damage event:
+  `replace(would(src, dealDamage(…)), instead(preventDamage(cut) | redirectDamage(cut, to) |
+  instruct(it, dealDamage(…))))` ([CR#615.1,614.9]; scaling [CR#614.1a,614.6]; doubling
+  [CR#701.10g]).
+- "Can't be prevented" is `cant(any, preventDamage(all, damage = …))` ([CR#615.12]).
+- The damage-marked outcome ([CR#120.3d]) is what `markDamage` publishes.
 
-structure DidClause where
-  subj    : Subject
-  action  : Action
-  within  : Option LookbackSpan
-  ordinal : Option (Ordinal × Option Period) := none
-  deriving DecidableEq, Repr
-```
+### 4.8 Lookback (`did` and `which`)
 
-`ordinal` is an event ordinal ("the first spell you've cast this game"), the shape
-`GameEvent.nthOccurrence` and `WouldClause.nthOccurrence` carry; it is what makes a `the`-headed
-lookback unique (`lean-v3-cast-predicates-and-ordinals`).
+**A lookback is `did(subj, action, within)`: the same Action as everywhere else, looked at in the
+past.** A lookback clause has a Subject, an Action, an optional `within` (a Duration with an
+optional Timing, `thisWay`, `triggering`, or `thisObject`), and an optional Event Ordinal ("the
+first spell you've cast this game", the ordinal `nthOccurrence` carries on events and `would`
+clauses). The ordinal is what makes a "the"-headed lookback unique.
 
-The templates mirror `does` and `would`, subject first: `did(subj, action, within)` and its
-agentless passive `was(action, within)` (`Subject.any`), each dispatched on the expected type to
-`Predicate` or `Condition`. A bare `Duration` coerces to its span. `Condition.did`, `Condition.was`
-and the tally templates take a non-optional `LookbackSpan`; only `Predicate.did`/`Predicate.was`
-may leave it unwritten (`within = none`), and the checker refuses that
-(`Refusal.unanchoredLookback`) anywhere but a Participial Description (below). `happened`,
-`happenedThisWay`, `happenedTo` and `wasCast` are retired.
+- The Templates mirror `does` and `would`, subject first: `did(subj, action, within)` and its
+  agentless passive `was(action, within)` (subject `any`). Each is dispatched on the expected sort
+  to a Predicate or a Condition. A bare Duration coerces to its range.
+- A Condition lookback and a tally always write `within`. Only a Predicate lookback may leave it
+  unwritten, and the checker refuses that anywhere but a Participial Description (below).
+- **`thisWay` and `triggering` must be grounded.** `thisWay` reads back an event that the earlier
+  text of its own spell or ability caused, its costs included ([CR#608.2c]); `triggering` reads
+  an event its ability triggers on ([CR#603.2]). The checker refuses either with no such event to
+  read. The grounding is textual: an optional action a player may decline, a branch not taken, or an
+  act a permission allows ("You may play those cards this turn. If you cast a spell this way, …")
+  still grounds it. Whether the event happened is the engine's (§1 item 4).
+- **`thisObject`** reads the described object's own casting or activation in its current existence
+  ([CR#400.7]): "artifact spells you cast", "if you cast it from your hand" and "spend this mana
+  only to cast a spell from your graveyard" are `did(…, cast(which …), thisObject)`, and "abilities
+  you activate" is `did(…, activate(which), thisObject)`. A cast rank is the clause's ordinal. A
+  history window ("a spell you cast this turn") keeps its Duration.
 
-A `thisWay` span reads back an event the earlier text of its own spell or ability caused, its
-costs included (`[CR#608.2c]`), and `triggering` an event its ability triggers on (`[CR#603.2]`);
-the checker refuses either with no such event to read (`lean-v3-this-way-lookback-grounding`).
-The grounding is textual: an optional action a player may decline, a branch not taken, or an act
-a permission allows ("You may play those cards this turn. If you cast a spell this way, …") still
-grounds it, and whether the event happened is the engine's (§0.1 item 4).
+The three lookback sites:
 
-A `thisObject` span reads the described object's own casting or activation in its current
-existence, the span `Period.thisObject` names (`[CR#400.7]`): "artifact spells you cast", "if you
-cast it from your hand" and "spend this mana only to cast a spell from your graveyard" are
-`did(…, cast(which …), thisObject)`, and "abilities you activate" is `did(…, activate(which),
-thisObject)`; `Predicate.castBy`, `castFrom` and `activatedBy` are retired into them, and a cast
-rank is the clause's `ordinal` (`lean-v3-own-casting-lookback-span`). A
-history window ("a spell you cast this turn") keeps its `duration`.
+1. **Condition:** "if you sacrificed a creature this turn" → `did(you, sacrifice(a(creature)),
+   thisTurn)`; "if a creature died this turn" → `did(any, die(a(creature)), thisTurn)`, where the
+   `die` Template [CR#700.4] is the move from the battlefield to a graveyard, observed at
+   departure, the same move as `does(any, die(a(creature)))` in §4.6.
+2. **Predicate,** with `which` in the relativized slot: "creatures that attacked this turn" →
+   `and([creature, did(which, attack(any), thisTurn)])`; "each card exiled this way" →
+   `and([card, was(exile(which), thisWay)])`.
+3. **Amount (`tally`):** counting events ("the number of times …": `tally(did(you,
+   cast(yourCommander), thisGame), events)`) or quantity ("the number of cards …", "the amount of
+   life …": `tally(did(you, draw(a(card)), thisTurn), quantity)`).
 
-Used uniformly across all three lookback sites:
-1. **`Condition.did (clause : DidClause)`** (replaces `Condition.happened`, dropping the unused `gap : Option Duration` parameter):
-   - `"if you sacrificed a creature this turn"` → `did(you, sacrifice(a(creature)), thisTurn)`
-   - `"if a creature died this turn"` → `did(any, die(a(creature)), thisTurn)` (where the `die(subject)` template `[CR#700.4]` expands to `Action.move(subject, .zones [.battlefield], .graveyard, .departure, none)`, matching `does(any, die(a(creature)))` in §3.6)
-2. **`Predicate.did (clause : DidClause)`** (replaces `Predicate.happenedTo`, using `NounPhrase.which` in the relativized argument slot):
-   - `"creatures that attacked this turn"` → `and([creature, did(which, attack(any), thisTurn)])`
-   - `"each card exiled this way"` → `and([card, was(exile(which), thisWay)])`
-3. **`Amount.tally (clause : DidClause) (mode : TallyMode)`** (replaces `Amount.eventTally`):
-   - `TallyMode.events` (`"the number of times..."`): `tally(did(you, cast(yourCommander), thisGame), .events)`
-   - `TallyMode.quantity` (`"the number of cards..."` / `"the amount of life..."`): `tally(did(you, draw(a(card)), thisTurn), .quantity)`, `tally(did(you, gainLife(any), thisTurn), .quantity)`
+**Participial Descriptions.** A description whose determiner is "the" (number one, or many for "the
+exiled cards"), "all", "each" or the bare plural, and whose predicate has a relative lookback
+conjunct with `thisWay` or nothing written, with `which` relativizing what the deed acted on,
+introduces no referent. It resolves to the one referent in scope that deed stamped, filtered by the
+other conjuncts' Head Noun as the object was when acted on ("card", a battlefield location as
+"permanent", Card Types [CR#608.2h]). Otherwise it is refused.
 
-**Participial Descriptions** (`lean-v3-typed-verbed-deeds`). A `NounPhrase.described` with
-determiner `the` (`DetPhrase.the (plur := .one)`, `.many` for "the exiled cards"), `all`, `each`
-or the bare plural, whose predicate has a conjunct `Predicate.did` with no span written or `thisWay`,
-`which` relativizing what the deed acted on, introduces no referent: it resolves to the one
-referent in scope that deed stamped, filtered by the other conjuncts' Head Noun read as the object
-was when acted on (`card`, a battlefield location as "permanent", Card Types `[CR#608.2h]`), and
-refuses with `Refusal.participialDescription deed n` when `n ≠ 1`. `thisWay` reads only referents
-the current ability stamped, since "this way" is no linking phrase `[CR#607.1,607.2a]`, including
-those stamped inside an optional (`withContinuation`) body or arm, which escape it to Participial
-Descriptions only, never to pronouns ("this way" ranges over the events
-that happened). The exception is what the body acted on other than the targets it announced: a
-target written in an optional body is chosen as the spell or ability is put on the stack, whether
-or not the player acts `[CR#601.2c,603.3d,115.1]`, so it is an ordinary referent after the body and
-in its "if you don't" arm, read as announced, while the body's stamp on it stays participial-only;
-inside a per-player loop it is a loop-local the loop abstracts. A target
-written in either arm escapes the same way, as the arms are part of the same ability: it is an
-ordinary referent after the whole `may`, whichever arm runs, and in the other arm ("Otherwise,
-that creature"), under the same id, while the arm's stamp on it stays participial-only; an arm's
-non-target referents stay its own; a "when you do" reflexive trigger is a separate ability that
-chooses its own targets `[CR#603.12,603.3d]`, and its targets do not escape; no span also reads those a linked ability published
-`[CR#607.2a]`, where a singular `the` reads a published group `[CR#607.3]`. `Reach.verbed`,
-`VerbedMarking` and `theVerbed` are retired; "it"/"them"/"that card" are ordinary pronouns.
-Linked and self-linked abilities share one authored AST (`deckmaste_spelling` needs one AST per
-printed wording); lowering finds the link from the same resolution, and game-time zone filtering
-(a card leaving exile before champion's return resolves) belongs to the lowering/core rewrite
-`[CR#607.2a]`.
+- `thisWay` reads only referents the current ability stamped, since "this way" is no linking phrase
+  [CR#607.1,607.2a]. That includes referents stamped inside an optional body or arm
+  (`withContinuation`), which escape it to Participial Descriptions only, never to pronouns: "this
+  way" ranges over the events that happened.
+- The exception is a target the optional body announced. A target written in an optional body is
+  chosen as the spell or ability is put on the stack, whether or not the player acts
+  [CR#601.2c,603.3d,115.1]. So it is an ordinary referent after the body and in its "if you don't"
+  arm, read as announced, while the body's stamp on it stays participial-only. Inside a per-player
+  loop it is a loop-local the loop abstracts (§2.2).
+- A target written in either arm escapes the same way, since the arms are part of the same ability.
+  It is an ordinary referent after the whole `may`, whichever arm runs, and in the other arm
+  ("Otherwise, that creature"), under the same identity, while the arm's stamp on it stays
+  participial-only. An arm's non-target referents stay its own.
+- A "when you do" reflexive trigger is a separate ability that chooses its own targets
+  [CR#603.12,603.3d]; its targets do not escape.
+- With nothing written, a Participial Description also reads what a linked ability published
+  [CR#607.2a], where a singular "the" reads a published group [CR#607.3].
+- "It", "them" and "that card" are ordinary pronouns.
+- Linked and self-linked abilities share one authored syntax tree (one tree per printed wording).
+  Lowering finds the link from the same resolution, and game-time zone filtering (a card leaving
+  exile before champion's return resolves) belongs to the lowering and core rewrite [CR#607.2a].
 
 ---
 
-## 4. Roadmap and Ticket Decomposition
+## 5. The `.syl` Data Language
 
-The transition to `semantics-v3` is decomposed into the following ordered tickets in `docs/tickets/planned/` and `docs/tickets/wip/`:
+### 5.1 Files and Syntax
 
-1. **`lean-v3-action-clause-spine`**: Relocate the `v2` Lean tree to an inert reference directory `lean/archive/SemanticsV2/` (outside `lakefile.toml`), set `lakefile.toml` to build only the syntax root (`roots = ["Semantics"]`, `defaultTargets = ["Semantics"]`), and refactor `lean/Semantics/` AST (`Words.lean`, `Phrase.lean`, `Events.lean`, `Triggers.lean`, `Abilities.lean`, `Rules.lean`, `MacroParameters.lean`) to introduce `Subject` (`actor`, `any`, `by`), `AnyValue` (`any : α`), `NounPhrase.which`, `instruct(subj, action)`, `does(subj, action)` (collapsing 17 action `GameEvent` constructors), `would(subj, action)` + `instead`, `cant`/`must`/`may`/`gatedBy`, and `did(subj, action, within)` + `tally`. Absorbs `lean-constructor-collapse` and `plugins-v2-menace-bound-helper`.
-2. **`lean-v3-drt-checker`**: Port `lean/Semantics/Check/` from `lean/archive/SemanticsV2/Check/` onto the `v3` AST, replacing `Bindings`, positional stack addresses, `Window`, `withBindings`, `CaptureInput`, `Refusal.unusedCapture`, and `MoveProfile`/`StepProfile` with the clean-sheet `DRS` (`ReferentId`, `Referent`, `GramRole`, `pendingRoles`, `OwnScopeFrame`, nested DRS boxes, `StepPhase.preEvent` vs `.postEvent`, `J1` accessibility, `J2` clause-mates, Principle A reflexives `NounPhrase.refl`, `D′` bare-pronoun resolution, and `AC>R1` demonstrative resolution), and add `"Semantics.Check"` to `roots` in `lakefile.toml`. Absorbs `lean-checker-binding-ids`.
-3. **`lean-v3-definitions-and-templates`**: Port `lean/Semantics/Macros.lean`, `Macros/Primitives.lean`, `Macros/Declared.lean`, and `Authoring.lean` from `lean/archive/SemanticsV2/` onto the `v3` AST and `DRS` checker, enforcing the explicit `Definition` vs. `Template` split, promoting atomic CR §701 keyword actions to `Definition`s (`ownScope` + `inCaller`), stripping outer `ownScope` on intrinsic `.enact`, retiring the 9 hand-coded window macros, resolving `airbend` (`[CR#701.65a]`, absorbing `semantics-v2-per-member-handoff`) and `ripple` (`[CR#702.60a]`), and adding `"Semantics.Macros"` and `"Semantics.Macros.Declared"` back to `roots` in `lakefile.toml`.
-4. **`lean-v3-proofs-and-cards`**: Port `lean/Semantics/Proofs/` and `lean/Semantics/Cards/` once from `lean/archive/SemanticsV2/` onto the finished `semantics-v3` spine, checker, and macros, restore `defaultTargets = ["Semantics", "SemanticsCards", "SemanticsProofs"]` in `lakefile.toml`, prove the `D′` and `AC>R1` witness lemmas, flip the 6 resolved ambiguity pins, prove the 11 `AC>R1` corpus-recency witness pins, and **delete `lean/archive/SemanticsV2/`**.
-5. **`lean-v3-bundle-loader-and-dsl`**: Implement loose-bundle DAG loading (`load_bundle`), Kahn's topological sort with lexicographically ordered ready queue (`BTreeSet` by declaration name), cycle reporting, Genuine Lean 4 `{ field := val, ... }` brace-and-comma declarations (`primitive`, `template`, `action`, `keyword`, `ability_word`, `counter`, `designation`, `subtype`, `card_type`, `relation`, `token`, `sba`, `conferral`, `card`), authoring coercions (`elabDomainList`, bare colors/mana, bare nouns, keyword term/label dispatch), and auto-wrapping (`inCaller`, `firstMention`/`laterMention`, `.ownScope`, `Ability.keyword`).
-6. **`plugins-v3-builtin-keywords`**: Extract `lean/Semantics/Definitions/Keywords.lean` into individual `.lean` files under `plugins_v3/builtin/definitions/keyword_ability/` (and its 3 templates into `plugins_v3/builtin/templates/`) and wire `load_bundle "../plugins_v3/builtin"` at the bottom of `Definitions.lean`.
-7. **`plugins-v3-builtin-actions-and-definitions`**: Extract `Actions.lean`, `Counters.lean`, `Subtypes.lean` + `SubtypeRules.lean`, `Designations.lean` + `DesignationRules.lean`, `Relations.lean`, `CardTypes.lean` + `CardTypeRules.lean`, `Phrasings.lean`, and the `RegistryDefinition` rows in `Proofs/Rules.lean` into `plugins_v3/builtin/{definitions,templates,rules}/` (with `earthbend` referencing `haste` and `timeTravel` referencing `suspend` directly).
-8. **`plugins-v3-builtin-primitives-and-templates`**: Split `lean/Semantics/Templates.lean` into `plugins_v3/builtin/primitives/` (1-to-1 `Semantics.Primitives.*` bindings) and `plugins_v3/builtin/templates/` (composite phrasings), enforce that non-`primitive` declarations do not reference raw `Semantics.Primitives.*` constructors, and delete `Templates.lean`.
-9. **`semantics-v3-dsl-and-plugins`**: Create `crates/deckmaste_semantics_v3` with the balanced-delimiter reader for the Genuine Lean 4 `{ field := val, ... }` DSL, re-point `xtask` (`lean`, `facts`) at `v3`, and **delete `crates/deckmaste_semantics_v2` and `plugins_v2/canon/`** (`plugins_v2/builtin/` deletes once its readers, `deckmaste_macro_def`, xtask `expansions.rs` and `plugins_v2_declarations.rs`, are repointed at `plugins_v3/`). Absorbs `lean-macros-cutover`, `plugins-v2-bodies-through-helpers`, and `semantics-v2-embed-candidates`.
-10. **`plugins-v3-canon`** (targeting `plugins_v3/canon/cards/`): Extract the hand-authored exemplar card bench from `lean/Semantics/Cards/*.lean` into individual `.lean` files in `plugins_v3/canon/cards/`, loaded by `load_bundle "../plugins_v3/canon"`, and retire the hand-written `lean/Semantics/Cards/` modules (`lean-hand-bench-retirement`).
-11. **`lowering-v3`** (building `crates/deckmaste_lowering_v3`) and **`semantics-v3-parity`** (comparing `v1` vs. `v3`), culminating in **`semantics-v1-cutover`** (retiring `v1` and renaming `_v3` to the canonical names).
+**Declarations and cards are standalone `.syl` files (`plugins_v3/**/*.syl`), and each file's text
+is its own first-order syntax tree.** The Rust pipeline (`semantics-rust-rewrite`: `semantics`,
+`discourse`, `lowering`) reads `.syl` natively: `deckmaste_dsl` parses it into a syntax tree that
+`semantics` consumes. For Lean verification, a generator emits Lean modules from the same files;
+no Lean elaborator hooks or authoring contexts remain.
 
-### 4.4 The `.syl` Data Language (`plugins-v3-data-language`, `plugins-v3-syl-surface-syntax`)
-
-`plugins_v3` declarations and cards are standalone `.syl` data files (`plugins_v3/**/*.syl`) whose files are their own first-order AST:
-
-- **Lean is a workbench and verifier, never in the hot path of card compilation.** The Rust pipeline (`semantics-rust-rewrite`: `semantics`, `discourse`, `lowering`) reads `.syl` files natively: `deckmaste_dsl` parses them to a syntax tree that `semantics` consumes. For Lean verification, the Lake generator in `lean/lakefile.lean` (behind `Module.inputFacet` and `LeanLib.modulesFacet`, ending with `setTrace .nil`) parses `plugins_v3/builtin/**/*.syl` and `plugins_v3/canon/**/*.syl` and emits gitignored `.lean` modules under `lean/.lake/build/gen/` containing plain Lean `def`s. Zero custom Lean `term_elab` hooks, authoring contexts, or retained authoring-tree inspection remain (`plugins-v3-data-language`). The concrete surface syntax is the next bullet (`plugins-v3-syl-surface-syntax`).
-- **Declaration kinds:** `primitive`, `action`, `ability`, `ability_word`, `counter`, `designation`, `subtype`, `card_type`, `relation`, `token`, `sba`, `conferral`, `template`, `card`.
-- **No evaluation and no local bindings (`plugins-v3-first-order-templates`):** Every declaration body is a first-order constructor/call tree. There are no higher-order parameters, `fun`, `match`, `if`, `List`/`Option` helpers, `::`/`++`, `have` bindings, tuples (`×`), anonymous constructor brackets (`⟨…⟩`), or polymorphic `{α : Type}` binders, and no bottom-up type inference.
-- **Abstract expression grammar (6 productions):**
+- **Declaration kinds:** `primitive`, `action`, `ability`, `ability_word`, `counter`,
+  `designation`, `subtype`, `card_type`, `relation`, `token`, `sba`, `conferral`, `template`,
+  `card`.
+- **No evaluation and no local bindings.** Every declaration body is a first-order tree of
+  constructor and declaration calls. There are no higher-order parameters, functions, `match`, `if`,
+  list or option helpers, list operators, local bindings, tuples, anonymous constructor brackets or
+  polymorphic sort binders, and no bottom-up type inference.
+- **Expression grammar (six productions):**
   1. **Literals:** string `"..."`, integer, `true`/`false`.
-  2. **List literals (`[...]`):** valid only at expected sort `List T` or `Option (List T)` (the latter unwraps like any `Option U`; `some` is never written). All 5 domain-list coercions (`sequentially`, `and`, `conjunction`, `compound`, `mana`) are deleted and written explicitly.
+  2. **Lists (`[...]`):** valid only at an expected sort `List T` or `Option (List T)` (the latter
+     unwraps like any `Option U`; `some` is never written). A list is never coerced into a domain
+     wrapper: `sequentially`, `and`, `conjunction`, `compound` and `mana` are written explicitly.
   3. **Record blocks:** `{ field = val, ... }`.
-  4. **Calls:** `<head>` applied to positional and named arguments.
-  5. **Bare words:** 0-argument identifiers, never with a leading `.` (the one leading dot in `.syl` names a primitive's constructor, §4.5 item 1). A bare word never names a parameter.
-  6. **Parameter references:** `$name`, a read of the value of a parameter of the enclosing declaration (§4.5 item 2, step 1).
-- **Concrete surface syntax:**
-  - **Calls:** `head(arg, arg, name = arg)`, with explicit parentheses and commas. Nested calls need no extra parentheses. A bare word is a 0-argument identifier; `head()` is not written. A named argument may stand anywhere among the positional ones, for readability only, so a call can follow the printed order of its text (`when(does(actor(thisAura), enter), if = is(it, in(battlefield)), sequentially([...]))`). Positional arguments bind in written order, each to the next parameter not yet bound; a parameter bound twice, by name or by position, is an error. Argument order carries no meaning: a template's parameter order is fixed by its spelling, and the generated Lean applies arguments in binder order whatever their written order.
-  - **Parameter references:** `$` means "the value of": `$name` reads a parameter, so parameters stand out and what a word refers to can be read from its spelling (`exileWithCounters(thisCard, $amount, timeCounter)`). Only reads carry `$`: parameter declarations in headers (`ability suspend(amount: Amount, cost: Cost)`), argument labels (`play(thisCard, payment = withoutPaying)`) and record field names stay plain. The part after `$` follows the word rule, with no space between them; `$name` takes no arguments, so `$name(...)`, a lone `$` and `$ name` are parse errors. A parameter default may read only the parameters before it. Holes in `spelling` templates (`"suspend <amount>—<cost>"`) are strings, not parameter references.
-  - **One token per meaning:** `=` binds (record fields `{ body = x }`, named arguments `from = x`, parameter defaults `p: Sort = x`); `:` means only "has sort", and appears only in declaration headers. Lists are `[a, b]`; trailing commas are allowed; whitespace and newlines are otherwise insignificant.
-  - **Headers:** `kind name(param: Sort, param: Sort = default) { field = val, ... }`. Kinds without parameters omit the parentheses (`counter aegisCounter { ... }`, `card { ... }`). A kind that fixes its result sort writes none: `action` is Action and `ability` is Ability. `action` and `ability` declare a Keyword Action [CR#701.1] and a Keyword Ability [CR#702.1] (the former `keyword` kind); ordinary Actions and Abilities are built by templates. Only `primitive` and `template` write a result sort, after the parameters: `template duringNextTurnOf(player: NounPhrase): Duration { ... }`, `primitive doForEachKind(axis: KindAxis, ...): Action { ... }`, and `template giftACard: Ability { ... }` when parameterless. `:` is therefore only ever "has sort". The pair `(name, sort)` is the dispatch key of §4.5 item 2. There is no `->`.
-  - **Sections:** `lexical`, `spelling`, `body`, `confers` and `rules` are ordinary record fields of the declaration block.
-  - **Sorts in headers** are written like calls: `Option(NounPhrase)`, `List(Ability)`, `Option(List(Cost))`.
-  - **Kind words** (`primitive`, `template`, `action`, `ability`, `card`, `counter`, `token`, ...) are keywords only as the first word of a declaration; everywhere else they are ordinary identifiers (`token` and `card` are also Template names).
-  - **Literals:** negative integers are written `-1`; strings are double-quoted and escape only `\"` and `\\`.
-  - **Plain words:** `in`, `from`, `by`, `or`, `this`, `exists`, `where` and `variable` are written as themselves in `.syl`. The Lake generator quotes any word that collides with Lean when it emits `.lean` modules. `none`, `true` and `false` are reserved: they resolve before enum words, and no enum word may use them.
-  - **Comments:** `#` to end of line, with no block form. A doc comment is a leading `#` block. CR citations in them keep the bracketed form (`[CR#702.9b]`), and `cargo xtask cite` scans `.syl` comments like `.rs` ones.
-- **No coercions:** The direct sort atoms of §4.5 item 2 (integers, colour words, `ability` and `action` names) are the only implicit resolutions, and they stay. Every expression-level `Coe` is deleted, including `NounPhrase → Subject` and the 12 Lean `Coe` instances (`actor`, `hasSubtype`, `perform`, `mana`, `written`, `printedKind`, `printedName`, `holds`, `static`, `span`, `mode`, `Characteristics → CharacteristicBundle`). Every wrapper call is written explicitly in `.syl`. Uglier but simpler is the point: coercions may be reintroduced deliberately once the language is simple enough to refactor.
-- **Unified 3-layer declaration blocks:** A single self-contained block unifies:
-  1. *Layer 2 lexical catalog fields inside `lexical`* (`lemma`, `plural`, `parameters`, `verbs`, `nouns`, `adjectives`, `determinatives`, `bound`, `variants`, `bracketed_text_removable` matching `crates/deckmaste_lexical_source/src/schema.rs`),
-  2. *Layer 3 top-level `spelling` string templates* (the foundation for the Construction Grammar `deckmaste_spelling` crate), and
-  3. *`semantics_v3` meaning* (`body`, `confers`, `rules`),
-  retiring separate files such as `Counters.lean` + `Proofs/Rules.lean` and `Subtypes.lean` + `SubtypeRules.lean`.
-- Lean codegen discards `lexical` and `spelling` without elaborating or retaining their contents. Nested catalog structures and identifiers need no Lean declarations and create no bundle dependencies.
-- **No `rule:` data field:** CR citations live in comments (e.g. `[CR#701.47a]`) checked by `cargo xtask cite`.
-- **Keyword `parameters` stay in `lexical`:** they list a keyword's printed frames, which the meaning signature cannot express. `modular(count : Amount)` prints both `Modular 2` and `Modular—Sunburst`, so its `lexical.parameters` are `[[Amount], [DashKeyword]]`. A frame is not a spelling choice the parameter itself decides: `madness(cost: Cost)` prints `Madness {1}{R}` and `Madness—Pay six {C}.` from its one `[[Cost]]` frame, the cost selecting the spelling. The signature's sorts are the meaning; frames are spelling only.
+  4. **Calls:** a head applied to positional and named arguments.
+  5. **Bare words:** identifiers with no arguments, never with a leading `.` (the one leading dot in
+     `.syl` names a primitive's constructor, §5.2 item 1). A bare word never names a parameter.
+  6. **Parameter references:** `$name`, a read of the value of a parameter of the enclosing
+     declaration (§5.2 item 2, step 1).
+- **Concrete syntax:**
+  - **Calls:** `head(arg, arg, name = arg)`, with explicit parentheses and commas. Nested calls need
+    no extra parentheses. A bare word is a call with no arguments; `head()` is not written. A named
+    argument may stand anywhere among the positional ones, for readability only, so a call can
+    follow its text's printed order (`when(does(actor(thisAura), enter), if = is(it,
+    in(battlefield)), sequentially([...]))`). Positional arguments bind in written order, each to
+    the next parameter not yet bound; a parameter bound twice, by name or by position, is an error.
+    Argument order carries no meaning: a Template's parameter order is fixed by its spelling, and
+    arguments apply in parameter order whatever their written order.
+  - **Parameter references:** `$` means "the value of", so parameters stand out and what a word
+    refers to can be read from its spelling (`exileWithCounters(thisCard, $amount, timeCounter)`).
+    Only reads carry `$`: parameter declarations in headers (`ability suspend(amount: Amount, cost:
+    Cost)`), argument labels (`play(thisCard, payment = withoutPaying)`) and record field names stay
+    plain. The part after `$` follows the word rule, with no space between them; `$name` takes no
+    arguments, so `$name(...)`, a lone `$` and `$ name` are parse errors. A parameter default may
+    read only the parameters before it. Holes in `spelling` templates (`"suspend
+    <amount>—<cost>"`) are strings, not parameter references.
+  - **One token per meaning:** `=` binds (record fields `{ body = x }`, named arguments `from = x`,
+    parameter defaults `p: Sort = x`); `:` means only "has sort", and appears only in declaration
+    headers. Lists are `[a, b]`; trailing commas are allowed; whitespace and newlines are otherwise
+    insignificant.
+  - **Headers:** `kind name(param: Sort, param: Sort = default) { field = val, ... }`. Kinds without
+    parameters omit the parentheses (`counter aegisCounter { ... }`, `card { ... }`). A kind that
+    fixes its result sort writes none: `action` is Action and `ability` is Ability. `action` and
+    `ability` declare a Keyword Action [CR#701.1] and a Keyword Ability [CR#702.1]; ordinary Actions
+    and Abilities are built by Templates. Only `primitive` and `template` write a result sort, after
+    the parameters: `template duringNextTurnOf(player: NounPhrase): Duration { ... }`, `primitive
+    doForEachKind(axis: KindAxis, ...): Action { ... }`, and `template giftACard: Ability { ... }`
+    when parameterless. The pair `(name, sort)` is the dispatch key of §5.2 item 2. There is no
+    `->`.
+  - **Sections:** `lexical`, `spelling`, `body`, `confers` and `rules` are ordinary record fields of
+    the declaration block.
+  - **Sorts in headers** are written like calls: `Option(NounPhrase)`, `List(Ability)`,
+    `Option(List(Cost))`.
+  - **Kind words** (`primitive`, `template`, `action`, `ability`, `card`, `counter`, `token`, …) are
+    keywords only as the first word of a declaration; elsewhere they are ordinary identifiers
+    (`token` and `card` are also Template names).
+  - **Literals:** negative integers are written `-1`; strings are double-quoted and escape only `\"`
+    and `\\`.
+  - **Plain words:** `in`, `from`, `by`, `or`, `this`, `exists`, `where` and `variable` are written
+    as themselves. `none`, `true` and `false` are reserved: they resolve before enum words, and no
+    enum word may use them.
+  - **Comments:** `#` to end of line, with no block form. A doc comment is a leading `#` block. CR
+    citations in comments keep the bracketed form (`[CR#702.9b]`), and `cargo xtask cite` scans
+    `.syl` comments as it scans `.rs` ones.
+- **No coercions.** The direct sort atoms of §5.2 item 2 (integers, color words, `ability` and
+  `action` names) are the only implicit resolutions. There is no other implicit conversion between
+  sorts: every wrapper call is written explicitly, a Subject's `actor(…)` included. Uglier but
+  simpler is the point; coercions may be reintroduced deliberately once the language is simple
+  enough to refactor.
+- **One block per declaration, three layers:**
+  1. the lexical catalog fields, inside `lexical` (`lemma`, `plural`, `parameters`, `verbs`,
+     `nouns`, `adjectives`, `determinatives`, `bound`, `variants`, `bracketed_text_removable`,
+     matching `crates/deckmaste_lexical_source/src/schema.rs`);
+  2. the `spelling` string templates;
+  3. the meaning (`body`, `confers`, `rules`).
+  The meaning side ignores `lexical` and `spelling`: their nested structures and identifiers need no
+  semantic declarations and create no dependencies.
+- **No `rule` data field.** CR citations live in comments (`[CR#701.47a]`), checked by `cargo xtask
+  cite`.
+- **Keyword `parameters` stay in `lexical`.** They list a keyword's printed frames, which the meaning
+  signature cannot express. `modular(count: Amount)` prints both `Modular 2` and
+  `Modular—Sunburst`, so its `lexical.parameters` are `[[Amount], [DashKeyword]]`. A frame is not a
+  spelling choice the parameter itself decides: `madness(cost: Cost)` prints `Madness {1}{R}` and
+  `Madness—Pay six {C}.` from its one `[[Cost]]` frame, the cost selecting the spelling. The
+  signature's sorts are the meaning; frames are spelling only.
 
-### 4.5 Expected-Sort Dispatch, Constructor-Order Mentions, and Lake Module Generation
+### 5.2 Name Resolution, Expansion and Read Order
 
-1. **Directory Layout (`plugins_v3/builtin/` and `plugins_v3/canon/`):**
-   - Each declaration and card lives in its own individual `.syl` file (`.lean` prior to `plugins-v3-syl-conversion`), organized by role (`primitives/`, `definitions/`, `templates/`, `rules/`, `cards/`) and category:
-     - `plugins_v3/builtin/primitives/{action,ability,condition,cost,determiner,event,mana,noun,pile,predicate,pronoun,quantity,static,timing,zone}/<name>.syl` (one body-less binding per exposed constructor; see the primitive rule below)
-     - `plugins_v3/builtin/definitions/{keyword_action,keyword_ability,counter,designation,relation,token,card_type,subtype/{creature,artifact,enchantment,land,planeswalker,battle,spell}}/<name>.syl`
-     - `plugins_v3/builtin/templates/{ability,ability_word,action,amount,condition,cost,determiner,duration,event,mana,noun,pile,predicate,pronoun,quantity,timing,zone}/<name>.syl`
-     - `plugins_v3/builtin/rules/{sba,conferral,...}/<name>.syl`
-     - `plugins_v3/canon/cards/<name>.syl` (hand-authored exemplar cards, one file per card)
-   - **Folder and file names are for human organization only, never semantically significant.** The loader never infers `primitive` vs. `Definition` vs. `Template` or grammatical category from the file path.
-   - **Primitive/template boundary:** `primitives/` contains one full-arity, body-less declaration per exposed constructor. `primitive doForEachKind(axis: KindAxis, domain: NounPhrase = none, sort: QualitySort, body: Action): Action` *is* the binding of the constructor with the same name and sort. A primitive whose name differs from its constructor's names the constructor after its signature with a leading dot, `primitive actionSearch(scope: Location, for_: NounPhrase): Action = .search`; this is the only place `.syl` writes a leading dot. Its parameters are matched to the constructor's fields by name, so its signature may follow the printed phrase. Only a primitive names a constructor, and only by being its binding. Defaults belong on binders; fixed literal, enum, `none`, or list arguments and expression-building helpers belong in Templates that call the primitive. The six promoted `can`, `cant`, `must`, `gatedBy`, `did : Condition` and `did : Predicate` bindings assemble `DeonticMods` or `DidClause` records, which a body-less primitive cannot do; the conversion makes each a Template over a renamed primitive (see Names), preserving the records' field defaults. `when`, `whenever` and `at_` remain separate Templates over `triggered`, retaining distinct spelling attachment points.
-   - **Names:** Non-colliding primitives use the bare constructor name. No two declarations share one `(name, sort)`: the 11 same-return-type two-layer collisions retain their existing prefixes pending `plugins-v3-shadowed-primitive-names`. (`timesPaid` is a primitive at `LinkedFacet` and a Template at `Amount`: different sorts, no collision.)
+1. **Files, primitives and names.**
+   - Each declaration and card lives in its own `.syl` file under `plugins_v3/builtin/` (organized
+     into `primitives/`, `definitions/`, `templates/` and `rules/`, then by category) or
+     `plugins_v3/canon/cards/`. **Folder and file names are for human organization only, never
+     semantically significant.** The loader never infers primitive, Definition or Template, or a
+     grammatical category, from a path.
+   - **The primitive/template boundary.** `primitives/` holds one full-arity declaration without a
+     body per exposed constructor. `primitive doForEachKind(axis: KindAxis, domain: NounPhrase =
+     none, sort: QualitySort, body: Action): Action` *is* the binding of the constructor with the
+     same name and sort. A primitive whose name differs from its constructor's names the
+     constructor after its signature with a leading dot, `primitive actionSearch(scope: Location,
+     for_: NounPhrase): Action = .search`; this is the only place `.syl` writes a leading dot. Its
+     parameters are matched to the constructor's fields by name, so its signature may follow the
+     printed phrase. Only a primitive names a constructor, and only by being its binding.
+   - Defaults belong on parameters. Fixed literal, enum, `none` or list arguments, and helpers that
+     build expressions, belong in Templates that call the primitive. `can`, `cant`, `must`,
+     `gatedBy`, and the Condition and Predicate `did`, assemble a deontic modifier record or a
+     lookback clause record, which a primitive without a body cannot do; each is a Template over a
+     renamed primitive, keeping the records' field defaults. `when`, `whenever` and `at_` stay
+     separate Templates over `triggered`, as distinct spelling attachment points.
+   - **Names.** A primitive that collides with nothing uses its constructor's name. No two
+     declarations share one `(name, sort)`: the eleven primitives that would collide with a
+     declaration of the same name and sort keep their existing prefixes until they are renamed.
+     (`timesPaid` is a primitive at Linked Facet and a Template at Amount: different sorts, no
+     collision.)
 
-2. **Deterministic `O(1)` Expected-Sort Dispatch and `Option` Auto-Wrapping:**
-   - Multiple declarations may share the same bare name when they build different return sorts (`and`, `or`, `andOr`, `not`, `target`, `attachment`, `duringPart`, `did`, `was`, `allBut`, `half`, `token`, `written`, `ofColor`, `copy`, `doIf`, `replace`, `nthOccurrence`, `crew`, `saddle`, `devour`, `creature`, etc.). No `Has*` typeclasses and no qualified names exist.
-   - At expected sort `T` with enclosing parameter map `Γ`, a head name resolves in `O(1)` with zero backtracking in priority order:
-     1. **`$name` is a parameter in `Γ`** (declared sort `T`, or `U` when `T = Option U`). `$name` naming no parameter of the enclosing declaration, or one at any other sort, is a load error. Bare words never consult `Γ`, so a parameter does not hide a same-named word, and the remaining steps resolve bare words and calls only (Lean's silent fallback to a same-named word, pinned as `incompatibleLocalAllowsWord`, stays retired).
-     2. **`none`** when `T = Option U`.
-     3. **Declaration `(head, T)`**, then **`(head, U)`** when `T = Option U` (the exact sort wins). A primitive found here stands for its constructor.
-     4. **Constructor / closed enum word of `T`** (or of `U` when `T = Option U`).
-   - **Declarations shadow constructors:** A declaration `(head, T)` may share its name with a constructor or closed enum word of `T` (the keyword action `search` and the constructor `Action.search`). Dispatch tries the declaration first (step 3 before step 4), so the constructor is then reached only through its primitive (`actionSearch`).
-   - **`Option U` auto-wrapping:** Presence of a `U` wraps in `some`; omission of an argument or record field that is declared with a default (including `none`) takes that default; `none` stays available for explicit defaults and arguments; `some` is never written.
+2. **Expected-sort dispatch and `Option` wrapping.**
+   - Several declarations may share a bare name when they build different sorts (`and`, `not`,
+     `target`, `did`, `token`, `doIf`, `replace`, `crew`, `creature`, …). There are no qualified names.
+   - At expected sort `T`, a head resolves in constant time, with no backtracking, in this order:
+     1. **`$name` is a parameter of the enclosing declaration** (declared at sort `T`, or `U` when
+        `T = Option U`). `$name` naming no parameter of the enclosing declaration, or one at any
+        other sort, is a load error. Bare words never consult the parameters, so a parameter never
+        hides a same-named word; the remaining steps resolve bare words and calls only.
+     2. **`none`**, when `T = Option U`.
+     3. **The declaration `(head, T)`**, then **`(head, U)`** when `T = Option U` (the exact sort
+        wins). A primitive found here stands for its constructor.
+     4. **A constructor or closed enum word of `T`** (or of `U` when `T = Option U`).
+   - **Declarations shadow constructors.** A declaration `(head, T)` may share its name with a
+     constructor or closed enum word of `T` (the keyword action `search` and the search
+     constructor). Dispatch tries the declaration first (step 3 before step 4), so the constructor
+     is then reached only through its primitive (`actionSearch`).
+   - **`Option U` wrapping.** A `U` where an `Option U` is expected is wrapped as present. An omitted
+     argument or record field declared with a default (including `none`) takes that default. `none`
+     stays available for explicit defaults and arguments; `some` is never written.
    - **Direct sort atoms:**
-     - Integer literals `n`: valid at `Nat`, `Int`, `Amount` (`Amount.lit n`), and `ManaSymbol` (`generic n`).
-     - Color words (`white`, `blue`, `black`, `red`, `green`): valid at `Color`, `ColorOrColorless`, and `ManaSymbol`.
-     - Definition names: an `ability` definition registers its name at `Ability`, `KeywordLabel`, and `KeywordTerm` (including self-reference, e.g. `hasKeyword flying` inside `flying` `[CR#702.9b]`); an `action` definition registers its name at `Action` and `Deed`.
+     - integer literals `n`: valid at `Nat`, `Int`, `Amount` (the literal amount `n`) and
+       `ManaSymbol` (generic mana `n`);
+     - color words (`white`, `blue`, `black`, `red`, `green`): valid at `Color`, `ColorOrColorless`
+       and `ManaSymbol`;
+     - Definition names: an `ability` Definition registers its name at `Ability`, `KeywordLabel` and
+       `KeywordTerm` (including self-reference, as `hasKeyword(flying)` inside `flying`
+       [CR#702.9b]); an `action` Definition registers its name at `Action` and `Deed`.
 
-3. **Expansion and Constructor-Order Mentions:**
+3. **Expansion and read-order mentions.**
    - **Templates** expand to constructor trees by first-order parameter substitution.
-   - **Definitions (`action`, `ability`)** wrap every parameter whose sort implements `CallerScope` (`Action`, `Cost`, `StaticSpec`, `Replacement`, `Amount`, `Predicate`, `Quantity`, `Location`, `Condition`, `NounPhrase`, `GameEvent`, `Ability`, `TokenSpec`, `MoveRider`, `PlayPayment`, `Ballot`, plus `Option α` and `List α`; `lean/Semantics/CallerScope.lean`) in `inCaller`, and wrap the expanded body in `.ownScope (some (.action name))` / `Ability.keyword`. There is no opt-out: a parameter is always wrapped. Source cannot construct `ownScope`, `inCaller`, `firstMention`, `laterMention`, a raw `Deed.action`, or `Ability.keyword`. The temporary exception for scope and deed constructors is exactly `plugins_v3/builtin/definitions/keyword_action/theRingTemptsYou.syl`, pending its separate modeling fix; it does not permit raw `Ability.keyword`. `search` and `searchZonesOf` therefore bind `for_` like any other parameter; with the opt-out dropped, `lean check` passes and the only expansion change is an unread `firstMention` id on `for_` (2026-10-30).
-   - `delayedTrigger` is an ordinary `NounPhrase` primitive referring to the latest delayed triggered ability created by `delay` in the current resolution. It requires a preceding creation and does not make that ability available to ordinary pronouns or word anaphors. `delayUnlessPaid` uses it for the special action that stops that trigger [CR#116.2c,603.7].
-   - A parameterless `NounPhrase` template may declare `identity = "actor"` (for example `template theActor: NounPhrase { identity = "actor", body = actor }`). The mark belongs to its signature, independent of its generated Lean name or bundle root. Repeated uses in an action share the declaration-local identity and preserve the original actor across controller handoffs.
-   - **Mentions follow constructor order:** A `firstMention id arg` evaluates the argument once where it stands and records its referents under `id`; a `laterMention id arg` reads them back by `id` and never re-evaluates `arg`, so a parameter used several times in a body does not introduce several referents. Which occurrence is first is decided **after** expansion, in the order the checker reads the occurrences, never by the order the author wrote arguments or by the declaration's parameter order. That is usually the constructor's field order, but not always: an explicit-agent passive (`Subject.by np`) reads the promoted patient inside its action before `np` (§3.2). Authors write arguments in printed-card order, and primitive and Template signatures may follow the printed phrase. The generator assigns mentions after elaboration and transparent expansion, using constructor field order plus the checker traversal policy in `SylGen.ReadOrder`. Independent alternatives retain separate mention scopes. Example: `doForEachKind(axis, domain, sort, body)` reads `domain` before `body`, so the `NounPhrase` in `domain` is the `firstMention` and the one in `body` the `laterMention`, whatever order a wrapping Template lists them.
-
-4. **Lake Dependency Graph and Generated Modules (`lean-generated-canon-modules`, `plugins-v3-syl-generator`):**
-   - File discovery and dependency sorting happen in the `lakefile.lean` generator (behind `Module.inputFacet` and `LeanLib.modulesFacet`, ending with `setTrace .nil`), never inside a Lean elaborator (`load_bundle`, `topoSortBundle`, `referencedIdents`, and `builtinBundle` are deleted).
-   - Each strongly connected component of the builtin dependency graph becomes one gitignored `.lean` module with real `import`s, so Lake builds the builtin in parallel and rebuilds only the dependents of an edited declaration.
+   - **Definitions (`action`, `ability`)** wrap every parameter of a sort that can be read in the
+     caller's scope (`Action`, `Cost`, `StaticSpec`, `Replacement`, `Amount`, `Predicate`,
+     `Quantity`, `Location`, `Condition`, `NounPhrase`, `GameEvent`, `Ability`, `TokenSpec`,
+     `MoveRider`, `PlayPayment`, `Ballot`, and options and lists of them) so it is read in the
+     caller (§2.3), and wrap the expanded body in the Definition's own Reference Scope under its
+     Deed, or as its keyword ability. There is no opt-out: a parameter is always wrapped, so
+     `search` and `searchZonesOf` bind `for_` like any other parameter.
+   - `.syl` cannot write a Reference Scope, a caller-scope read, a first or later mention, a raw
+     Deed, or a keyword-ability wrapper. The one temporary exception, for scope and Deed
+     constructors only, is `plugins_v3/builtin/definitions/keyword_action/theRingTemptsYou.syl`,
+     pending its separate modeling fix; it does not permit a raw keyword-ability wrapper.
+   - `delayedTrigger` is an ordinary NounPhrase word for the latest delayed triggered ability that
+     `delay` created in the current resolution. It requires a preceding creation, and does not make
+     that ability available to ordinary pronouns or word anaphors. `delayUnlessPaid` uses it for the
+     special action that stops that trigger [CR#116.2c,603.7].
+   - A parameterless NounPhrase Template may declare `identity = "actor"` (`template theActor:
+     NounPhrase { identity = "actor", body = actor }`). The mark belongs to its signature,
+     independent of any generated name or bundle root. Repeated uses in an action share one
+     declaration-local identity and keep the original Actor across controller Handoffs.
+   - **Mentions follow read order.** A first mention reads its argument once, where it stands, and
+     records its referents under the Binding Identity. A later mention reads them back by that
+     identity and never reads the argument again, so a parameter used several times in a body does
+     not introduce several referents. Which occurrence is first is decided **after** expansion, in
+     the order the checker reads the occurrences. It is never decided by the order the author wrote
+     the arguments, or by the declaration's parameter order. That order is usually the
+     constructor's field order, but not always: an explicit-agent passive (`by(np)`) reads the
+     promoted patient inside its action before `np` (§4.2). Authors write arguments in printed-card
+     order, and primitive and Template signatures may follow the printed phrase. Independent
+     alternatives keep separate mention scopes. Example: `doForEachKind(axis, domain, sort, body)`
+     reads `domain` before `body`, so the NounPhrase in `domain` is the first mention and the one in
+     `body` the later mention, whatever order a wrapping Template lists them in.
 
 ---
 
-## 5. Standing Domain Mechanisms Carried Forward from `semantics-v2`
+## 6. Standing Domain Mechanisms
 
-Because `docs/archive/` is excluded from agent search, the domain mechanisms and rulings settled during `semantics-v2` that remain in force unchanged (modulo the `semantics-v3` spine and DRT checker above) are recorded here so this ADR is self-contained:
+These rulings were settled under `semantics-v2` and remain in force on the v3 spine and discourse
+model.
 
-- **Layer Contract & Left-to-Right Discourse Threading (`semantics-v2` §§1–3, §7):**
-  - Constructions occupy their surface English positions with no prenex target hoisting or positional slot indices; all hoisting and slot indexing belong to lowering.
-  - Constructor arguments are evaluated in textual left-to-right order. Delayed triggers read prior referents as settled particulars (`[CR#603.7c]`) while targeting in their own event (`[CR#603.3d,601.2c]`). Activated-ability effects read every cost mention, wherever the cost moved it (§0.1 item 4, `[CR#400.7j,608.2h]`).
-  - **Joined-kind bindings (`Payload.join`, `semantics-v2` §3):** A binding at a joined kind holds both halves' records side by side so its kind is the join of its halves' kinds and demonstrative echoes copy the pair (`kind-index-joins-union-marking-is-spelling.md`).
-  - **Checker Charter (`[CR#101.3,609.3]`):** The Lean checker verifies that references resolve, terms are well-kinded, and card frames are well-formed (the 14 card-frame rules `cardLine` through `prototypeFrame`), that a Characteristic-Defining Ability meets the criteria of `[CR#604.3a]` (`cdaEdit`, `cdaSubject`, `cdaGranted`, `cdaConditional`), and that a retention qualifies one clause that removes Attachments, for Attachments of that clause's host (`retentionClause`, `retentionSubject`, `[CR#702.16n,702.16p,303.4c,704.5m]`); it is not a runtime rules engine for impossible instructions.
-  - **Stat Changes (`StaticSpec.characteristicChange`, `[CR#613.4b,613.4c]`):** Two-stat P/T changes (`"<subject> gets +P/+T"`, `"has base power and toughness P/T"`) use one `characteristicChange subject [stat …, stat …]` node (templates `getsPt`, `getsBase`) so the subject is written and evaluated once. `getsPt` always carries both printed deltas: `"+X/+0"` is `getsPt subject (up X) (up 0)`, because the printed `"+0"` is part of the encoding and spelling must render it back. The single-stat `modification` template is only for a change whose text names one stat. A Characteristic-Defining Ability is `StaticSpec.characteristicDefining subject edits` (`definesPt`, `definesQuality`), applied in layer 7a for power and toughness and first in its layer otherwise (`[CR#604.3a,613.3,613.4a]`).
-  - **Counter Kinds, Designations, and Deeds as Declared Names (`[CR#122.1,122.1a,122.1b,731.1]`):** `CounterKind.named name`, `DesignationLabel.named name`, `Deed.action name`, and `Deed.ofAbility name` carry their declaration's name verbatim. A counter declaration states what **one** counter confers (`boost(up(1), up(1))`, `grants(flying)`). Each declaration registers its name as a term-level macro while the registry holds its `RegistryDefinition` record apart for facts generation and `cargo xtask lean definitions` (Ruling 2026-10-10, Q80).
-  - **No Chooser on `choose` and No Taker on `addTurnPart` (`[CR#500.7..500.9]`):** Both `choose` and `addTurnPart` (`extraTurn`, `additionalPhase`, `additionalStep`) are performed by the active performer (the innermost of `drs.performers` / `"you"`).
-- **Cost Substitutes (`ManaSubstitute`, `[CR#702.51a,702.66a,702.126a,701.67a]`):**
-  - `ManaSubstitute (action : Action) (pays : List PipPaid)` (`PipPaid = generic | ofColor (color)`) models `"For each [generic | colored] mana in ..., you may <act> rather than pay that mana"` (convoke, delve, improvise, waterbend), carried by `StaticSpec.paySubstitute` on a spell or `Cost.withSubstitute` on a named cost.
-- **Piles (`Pile`, `PileFace`, `[CR#700.3b,700.3c,401.2,404.2,406.4]`):**
-  - A `Pile` is a library (face down), a graveyard (face up), `"that pile"`, or a face-down exile pile, supporting `slice (end) (amount) (pile)`, `run (end) (stop) (pile)`, `place (end) (pile)`, and `shuffle (pile)` (with bare `"shuffle"` = `shuffle(library(actor))` `[CR#701.24a]`).
-- **Temporal Suite (`Timing`, `Duration`, `UsageLimit`, `TurnRef`, `[CR#307.5,117.1d,611.2b,602.5b]`):**
-  - `TurnRef = current | previous | next (player) | each (player) | later | that`.
-  - `Timing` combines `inPart (part) (whose) (which)`, `relativeToEvent (before | after) (event)`, `whileDoing (event)`, and `onlyIf (condition)` under `and`/`or`/`not` (with `asSorcery` over priority + main phase + your turn + empty stack `[CR#307.5]`, and instant speed `onlyIf(hasPriority(you))` `[CR#117.1d]`).
-  - `Duration` is `between (start : Option GameEvent) (end : Option GameEvent)` (using `beginningOf`, `endOf`, `now`, `stateBasedActionsChecked`) or `forAsLongAs (condition)` `[CR#611.2b]`, or `modifiesPrecedingAction`, later text that modifies the meaning of the action before it, in force only for that action's event and no separate continuous effect ("Destroy target creature. It can't be regenerated." `[CR#608.2c,701.19c]`).
-  - `UsageLimit` is `(times) (per : Period)` where `Period = turn | yourTurn | game | part (TurnPart) | thisObject` `[CR#602.5b,702.177a]`. An event ordinal (`nthOccurrence`, `DidClause.ordinal`) counts within the same `Period`, which subsumes `TurnPart`, but not within `thisObject`, and spells "each turn" `turn`, never `part .turn` (`Refusal.eventOrdinalPeriod`).
-- **Face-Down Specs, Special Actions, and Move Riders (`[CR#406.3a,708.2,702.37a,702.168a,116.1,614.1c]`):**
-  - `FaceDown (characteristics : Option Characteristics)` is `none` for face-down exile and `some` for face-down spells/permanents (morph, disguise, manifest, cloak), used by `Action.turnFaceDown`, `EntryRider.faceDown`, `PilePlacement.faceDown`, and `PlayPayment.faceDown`.
-  - `StaticSpec.specialAction (player : Option NounPhrase) (when : Option Timing) (cost : Cost) (does : Action)` models special actions `[CR#116.1]`; `player` is written when an effect allows a player other than you one, and a delayed triggered ability `delay` created is stopped from triggering by a special action whose instruction establishes `cant (.actor ability) trigger` with no duration (*Quenchable Fire*, `[CR#116.2c]`).
-  - `MoveRider = entry (EntryRider) | placement (PilePlacement)` separates battlefield entry riders from non-battlefield pile placements (`[CR#614.1c,401.4,406.3]`).
-- **Modal Choices (`StaticSpec.modeChoice`, `[CR#700.2d,700.2h,700.2i,702.42a,702.120a,702.172a,702.183a]`):**
-  - `chooseModes` carries mode quantity, per-mode costs (spree, tiered), and optional pawprint weights (`Quantity.worth`). `StaticSpec.modeChoice (change : ModeChange)` modifies a spell's `chooseModes` via `allInstead` (entwine), `extraModesCost` (escalate), `setQuantity` (spree, tiered), `repeatable`, and `notChosenBefore`.
-- **Off-Stack Statics (`StaticSpec.asEvent`, `StaticSpec.whileHolds`, `[CR#113.9]`) and Resolution Delayed Triggers (`StaticSpec.resolutionDelayedTrigger`, `[CR#608.3g,603.7d]`):**
-  - `StaticSpec.resolutionDelayedTrigger (does)` models a permanent spell's static ability that functions on the stack and creates a delayed trigger, created as the permanent is put onto the battlefield as the spell resolves, with the spell as its source and the spell's controller as it resolved as its controller `[CR#608.3g,603.7d]`: dash's, blitz's and warp's, each its own ability `[CR#702.109a,702.152a,702.185a,113.2c]`, naming "the permanent this spell becomes" as `becomes(thisSpell)`.
-  - `StaticSpec.asEvent (event) (does)` models printed `"As [event], do"`; "As [this] enters" text (entry choices, devour, riot, tribute, unleash, amplify) instead replaces the entering with `before` for what is done before it (an entry choice, devour's sacrifice, amplify's reveal, tribute's choice, an Aura's choice of what it will enchant `[CR#614.12a,303.4f]`) and `alongside` for what is done as part of it (riot's, unleash's, tribute's, amplify's and devour's counters, an Aura's attachment): `replace(would(this, enter), before(choose(...), alongside(...)))`; megamorph's counter is `alongside` its turning face up `[CR#614.1e]`. An Aura's staying where it is when it has nothing to enchant replaces the entering too (`[CR#303.4g]`), and "enters tapped / with / as / transformed" replaces it with `withRiders(...)` (`[CR#603.6d,614.1c,614.12]`), and `StaticSpec.whileHolds (condition) (does)` models state statics (ascend, storied, daybound/nightbound `[CR#702.131b,702.145b,702.195a]`).
-- **Characteristic Sharing & Group Agreement (`Predicate.shares`, `NounPhrase.agree`, `[CR#201.2a,201.2c,105.2,205.3m]`):**
-  - `Predicate.shares (axis) (agreement : share | differ) (with)` checks whether an object shares at least one value (`share`) or none (`differ`) on `axis` with `with`. `NounPhrase.agree (axis) (agreement) (group)` constrains a group selection to mutually share or differ on `axis`.
-- **Linked-Ability Readback & Declared Relations (`LinkedFacet`, `LinkSource`, `Ability.textContext`, `[CR#607.2a,607.2d,607.2i,702.33e,702.55b,702.95b,702.99b]`):**
-  - `LinkSource` names a linked cost (`byKeyword`, `byNthKeyword`, `theAlternative`, `theAdditional`), and `LinkedFacet` reads back its payment: `colorsSpent`, `manaValueSpent`, `timesPaid`, `readback`, and `taken`. Named object-to-object links (haunt, soulbond, cipher) use `RegistryDefinition.relation` with `relate`, `related`, and `counterpart`.
-  - The objects a linked ability acted on and the player its cost chose are read as the ability would read its own: a Participial Description (§3.8) and `the isChosenPlayer` (exactly one player choice in scope). `Ability.textContext` publishes, to the abilities after it (a card's text, and a keyword's `body`): choices, additional- and alternative-cost results (`.altCost _ (some cost)`, emerge's `[CR#702.119a]`; `.can _ (.procedure .cast _ (.payingInstead cost) ..) _`, harmonize's `[CR#702.180a]`; and `.plusAdditional cost`, retrace's and jump-start's discard `[CR#702.81a,702.133a]`), the target `addsTarget` adds, stamped by targeting, through a condition on it too (mutate's, required once its cost is chosen `[CR#601.2c,702.140a]`), what a replacement does `before` its event or `alongside` it (devour, whose "it devoured" is a Deed done by sacrificing `[CR#702.82b]`), and the objects a printed triggered or activated ability itself introduces, in whatever zone it put them (§0.1 item 4), along each arm it may take (champion `[CR#702.72a,607.2k]`), never what its trigger event names `[CR#607.1]`. Published objects are `linked`: no pronoun or demonstrative reaches them. `LinkSource.byDeed`, `LinkedFacet.objects`/`chosenPlayer`, `NounPhrase.paid`, `linkedObject(s)` and `chosenAsPaid` are retired (`lean-v3-typed-verbed-deeds`).
-- **Spell Copies, Text-Changing Effects, and Ability Qualifiers (`[CR#707.10c,702.40a,702.56a,612.1,613.1c,113.10a,702.165c,702.169b]`):**
-  - Spell-copy keywords write `may(chooseNewTargets(...))` (`[CR#707.10c]`), guarded by `matches_ thisSpell (targeting any .someTarget)` where the keyword's CR definition specifies `"If the spell has any targets"` (`storm` `[CR#702.40a]`, `replicate` `[CR#702.56a]`).
-  - Text-changing effects (cleave, overload, splice, word replacements `[CR#612.1,613.1c,612.2,612.2a,702.47a,702.96a,702.148a]`) use `StaticSpec.textChange (subject) (change)` (`removeBracketed`, `targetToEach`, `appendTextOf`, `replaceWord`); `bracketed` is retired in `plugins-v3-syl-conversion` and the Lean authoring tree in `plugins-v3-data-language`, pending cleave's redesign across English and semantics, and `replaceWord` takes `TextWordSort`s (`color`, `landType`, `creatureType`) `[CR#612.2,612.2a]`, so a card name or any other sort is unrepresentable. Splice grants its text change and additional cost through `StaticSpec.revealedAsCast (spell) (grants)`, a reveal made as the spell is cast `[CR#601.2b,702.47b]`, not a replacement of the cast.
-  - `KeywordParam.ability` and `Ability.qualified (ability) (timing) (limit) (guard) (from)` model abilities printed with and restricted by a keyword (backup `printedAfter`, saddle, exhaust `[CR#113.10a,702.165c,702.169b..702.169d,702.177a]`).
-- **Subtype Rules, Conferrals, and Counter Annihilation (`[CR#301.5,301.6,303.4a,303.4c,310.7,704.5m,704.5n,704.5q,704.5s,704.5v,714.2d,714.3a,714.3c,714.4]`):**
-  - `Enchant` owns its spell target restriction, legal-host permission, and entry, attached to a legal host or not at all `[CR#702.5a,303.4a,303.4c,303.4f,303.4g]`.
-  - Subtype and counter state-based actions live as `Conferral.stateBased (when) (then_)` on their definitions (Aura `[CR#704.5m]`, Equipment/Fortification `[CR#704.5n]`, Saga `[CR#704.5s,714.4]` using `ProjAxis.chapter` `[CR#714.2d]`, `chapterAbilityOf` + `in_ stack`, and `Conferral.turnBased` `[CR#714.3c]`, Siege `[CR#310.7,704.5v]` using `abilityOf` + `in_ stack`, and `+1/+1`/`-1/-1` counter annihilation on `m1m1Counter` `[CR#704.5q,122.3]` using `Amount.aggregateOf .min` / `smallerOf`).
-
+- **Joined kinds.** A binding at a joined kind holds both halves' records side by side, so its kind
+  is the join of its halves' kinds, and a demonstrative echo copies the pair
+  ([`kind-index-joins-union-marking-is-spelling.md`](./kind-index-joins-union-marking-is-spelling.md)).
+- **Stat changes ([CR#613.4b,613.4c]).** A two-stat change ("<subject> gets +P/+T", "has base power
+  and toughness P/T") is one characteristic change over both stats (Templates `getsPt`, `getsBase`),
+  so the subject is written and read once. `getsPt` always carries both printed deltas: "+X/+0" is
+  `getsPt(subject, up(X), up(0))`, because the printed "+0" is part of the encoding and spelling
+  must render it back. The single-stat `modification` Template is only for a change whose text names
+  one stat. A Characteristic-Defining Ability is its own Static Spec (`definesPt`,
+  `definesQuality`), applied in layer 7a for power and toughness and first in its layer otherwise
+  ([CR#604.3a,613.3,613.4a]).
+- **Counter kinds, Designations and Deeds are declared names ([CR#122.1,122.1a,122.1b,731.1]).** A
+  counter kind, a Designation label and a Deed carry their declaration's name verbatim. A counter
+  declaration states what **one** counter confers (`boost(up(1), up(1))`, `grants(flying)`). The
+  declared name means the defined term, while the registry holds its Registry Definition apart for
+  facts generation and `cargo xtask lean definitions`.
+- **No chooser on `choose` and no taker on added turn parts ([CR#500.7..500.9]).** `choose` and the
+  turn-part additions (`extraTurn`, `additionalPhase`, `additionalStep`) are performed by the
+  innermost Actor, or "you".
+- **Mana Substitutes ([CR#702.51a,702.66a,702.126a,701.67a]).** A Mana Substitute (an action, and
+  which pips it pays: generic, or of a color) models "For each [generic | colored] mana in …, you
+  may <act> rather than pay that mana" (convoke, delve, improvise, waterbend). A spell carries it as
+  a Static Spec; a named cost carries it on the cost.
+- **Piles ([CR#700.3b,700.3c,401.2,404.2,406.4]).** A Pile is a library (face down), a graveyard
+  (face up), "that pile", or a face-down exile pile. It supports `slice(end, amount, pile)`,
+  `run(end, stop, pile)`, `place(end, pile)` and `shuffle(pile)`; a bare "shuffle" is
+  `shuffle(library(actor))` [CR#701.24a].
+- **Timing, Durations, Usage Limits and Turn References ([CR#307.5,117.1d,611.2b,602.5b]).**
+  - A Turn Reference is the current turn, the previous one, a player's next, each of a player's, a
+    later one, or "that" turn.
+  - A Timing is a phase or step of a turn (part, whose, which), before or after an event, while an
+    event is underway, or only if a condition holds, combined with and, or and not. "As a sorcery"
+    is priority, a main phase, your turn and an empty stack [CR#307.5]; instant speed is
+    `onlyIf(hasPriority(you))` [CR#117.1d].
+  - A Duration is `between(start, end)`, both optional events (`beginningOf`, `endOf`, `now`,
+    `stateBasedActionsChecked`); or `forAsLongAs(condition)` [CR#611.2b]; or
+    `modifiesPrecedingAction`, later text that modifies the meaning of the action before it, in
+    force only for that action's event and no separate continuous effect ("Destroy target creature.
+    It can't be regenerated." [CR#608.2c,701.19c]).
+  - A Usage Limit is a count per period, where a period is a turn, your turn, the game, a part of a
+    turn, or this object's existence [CR#602.5b,702.177a]. An Event Ordinal (`nthOccurrence`, a
+    lookback's ordinal) counts within the same periods, which subsume turn parts, but not within
+    this object's existence; "each turn" is a turn, never the turn part "turn". The checker refuses
+    any other period.
+- **Face-down specifications, special actions and move riders
+  ([CR#406.3a,708.2,702.37a,702.168a,116.1,614.1c]).**
+  - A face-down specification has no characteristics for face-down exile, and has them for
+    face-down spells and permanents (morph, disguise, manifest, cloak). Turning face down, Entry
+    Riders, Pile Placements and play payments use it.
+  - A special action ([CR#116.1]) carries an optional player, an optional Timing, a cost and the
+    action. The player is written when an effect allows a player other than you one. A delayed
+    triggered ability `delay` created is stopped from triggering by a special action whose
+    instruction establishes `cant(actor(ability), trigger)` with no Duration (*Quenchable Fire*,
+    [CR#116.2c]).
+  - A move rider is either an Entry Rider (onto the battlefield) or a Pile Placement (elsewhere)
+    ([CR#614.1c,401.4,406.3]).
+- **Modal choices ([CR#700.2d,700.2h,700.2i,702.42a,702.120a,702.172a,702.183a]).** `chooseModes`
+  carries the number of modes, per-mode costs (spree, tiered) and optional pawprint weights. A Mode
+  Change modifies a spell's `chooseModes`: all modes instead (entwine), a cost for extra modes
+  (escalate), a set number (spree, tiered), repeatable modes, and modes not chosen before.
+- **Off-Stack Statics ([CR#113.9]) and Resolution Delayed Triggers ([CR#608.3g,603.7d]).**
+  - A Resolution Delayed Trigger is a permanent spell's static ability that functions on the stack
+    and creates a delayed trigger. The trigger is created as the permanent is put onto the
+    battlefield as the spell resolves, with the spell as its source and the spell's controller as it
+    resolved as its controller [CR#608.3g,603.7d]. Dash's, blitz's and warp's are each its own
+    ability [CR#702.109a,702.152a,702.185a,113.2c], naming "the permanent this spell becomes" as
+    `becomes(thisSpell)`.
+  - `asEvent(event, does)` models a printed "As [event], do". "As [this] enters" text (entry
+    choices, devour, riot, tribute, unleash, amplify) instead replaces the entering. `before` holds
+    what is done before it (an entry choice, devour's sacrifice, amplify's reveal, tribute's choice,
+    an Aura's choice of what it will enchant [CR#614.12a,303.4f]). `alongside` holds what is done as
+    part of it (riot's, unleash's, tribute's, amplify's and devour's counters, an Aura's
+    attachment): `replace(would(this, enter), before(choose(…), alongside(…)))`. Megamorph's counter
+    is `alongside` its turning face up [CR#614.1e].
+  - An Aura's staying where it is, when it has nothing to enchant, replaces the entering too
+    ([CR#303.4g]), and "enters tapped / with / as / transformed" replaces it with `withRiders(…)`
+    ([CR#603.6d,614.1c,614.12]).
+  - `whileHolds(condition, does)` models state statics (ascend, storied, daybound and nightbound
+    [CR#702.131b,702.145b,702.195a]).
+- **Sharing and Agreement ([CR#201.2a,201.2c,105.2,205.3m]).** `shares(axis, agreement, with)` tests
+  whether an object shares at least one value (share) or none (differ) on `axis` with `with`.
+  `agree(axis, agreement, group)` constrains a group selection to mutually share or differ on
+  `axis`.
+- **Linked abilities and declared Relations ([CR#607.2a,607.2d,607.2i,702.33e,702.55b,702.95b,702.99b]).**
+  - A Link Source names a linked cost (by keyword, by the Nth keyword, the alternative cost, the
+    additional cost), and a Linked Facet reads back its payment: the colors spent, the mana value
+    spent, the times paid, a readback, and what was taken. Named object-to-object links (haunt,
+    soulbond, cipher) are Relation Registry Definitions, with `relate`, `related` and
+    `counterpart`.
+  - The objects a linked ability acted on, and the player its cost chose, are read as the ability
+    would read its own: by a Participial Description (§4.8), and by `the(isChosenPlayer)` (exactly
+    one player choice in scope).
+  - An ability's text publishes to the abilities after it (a card's text, and a keyword's `body`):
+    its choices; its additional and alternative cost results (emerge's alternative cost
+    [CR#702.119a]; harmonize's permission to cast paying another cost instead [CR#702.180a];
+    retrace's and jump-start's additional discard [CR#702.81a,702.133a]); the target `addsTarget`
+    adds, stamped by targeting, through a condition on it too (mutate's, required once its cost is
+    chosen [CR#601.2c,702.140a]); what a replacement does `before` or `alongside` its event (devour,
+    whose "it devoured" is a Deed done by sacrificing [CR#702.82b]); and the objects a printed
+    triggered or activated ability itself introduces, in whatever zone it put them (§1 item 4),
+    along each arm it may take (champion [CR#702.72a,607.2k]). It never publishes what its trigger
+    event names [CR#607.1]. Published objects are linked: no pronoun or demonstrative reaches them.
+- **Spell copies, text changes and Qualified Abilities
+  ([CR#707.10c,702.40a,702.56a,612.1,613.1c,113.10a,702.165c,702.169b]).**
+  - Spell-copy keywords write `may(chooseNewTargets(…))` ([CR#707.10c]), guarded by
+    `matches(thisSpell, targeting(any, someTarget))` where the keyword's CR definition says "If the
+    spell has any targets" (`storm` [CR#702.40a], `replicate` [CR#702.56a]).
+  - Text-changing effects (cleave, overload, splice, word replacements
+    [CR#612.1,613.1c,612.2,612.2a,702.47a,702.96a,702.148a]) use a Text Change Static Spec over a
+    subject and a change (removing bracketed text, target to each, appending the text of, replacing a
+    word). Bracketed text has no model until cleave is redesigned across English and semantics. A
+    word replacement takes the replaceable word sorts (color, land type, creature type)
+    [CR#612.2,612.2a], so a card name or any other sort is unrepresentable. Splice grants its text
+    change and additional cost through a reveal made as the spell is cast [CR#601.2b,702.47b], not a
+    replacement of the cast.
+  - A keyword's ability parameter, and a Qualified Ability (an ability with its timing, limit, guard
+    and zone), model abilities printed with and restricted by a keyword (backup's printed-after,
+    saddle, exhaust [CR#113.10a,702.165c,702.169b..702.169d,702.177a]).
+- **Subtype rules, conferrals and counter annihilation
+  ([CR#301.5,301.6,303.4a,303.4c,310.7,704.5m,704.5n,704.5q,704.5s,704.5v,714.2d,714.3a,714.3c,714.4]).**
+  - `Enchant` owns its spell target restriction, its legal-host permission, and its entry, attached
+    to a legal host or not at all [CR#702.5a,303.4a,303.4c,303.4f,303.4g].
+  - Subtype and counter state-based actions are state-based Conferrals on their definitions: Aura
+    [CR#704.5m]; Equipment and Fortification [CR#704.5n]; Saga [CR#704.5s,714.4], using the chapter
+    projection [CR#714.2d], `chapterAbilityOf` with `in_(stack)`, and a turn-based Conferral
+    [CR#714.3c]; Siege [CR#310.7,704.5v], using `abilityOf` with `in_(stack)`; and the +1/+1 and
+    −1/−1 counter annihilation on `m1m1Counter` [CR#704.5q,122.3], using the minimum aggregate and
+    `smallerOf`.
