@@ -42,10 +42,10 @@ what the Lake generator emits.
 - Update §4.4 (bare words, the leading dot) and §4.5 (the primitive rule, names, dispatch steps)
   of `docs/decisions/semantics-v3.md`.
 
-- **No implicit conversions of any kind.** A value stands only at its own sort; every wrap into
-  another sort is a primitive written at the call site. Uniformity first, convenience later
-  (`syl-implicit-coercions`), whatever the corpus churn. This retires §4.5's direct sort atoms
-  and `Option` auto-wrapping:
+- **No implicit conversions, with one exception.** A value stands only at its own sort; every wrap
+  into another sort is a primitive written at the call site. Uniformity first, convenience later
+  (`syl-implicit-coercions`), whatever the corpus churn. This retires §4.5's direct sort atoms;
+  `Option` is the exception:
   - **Color words** are primitives at `Color` only, once each. A `ColorOrColorless` or a mana
     symbol wraps one explicitly (a mana cost `[1, blue, blue]` writes each symbol with its
     wrapper).
@@ -53,8 +53,9 @@ what the Lake generator emits.
     symbol wraps one explicitly.
   - **A Definition's name** stands for that Definition only (its `Action` or `Ability`). Its
     keyword label, keyword term and Deed are each reached through a wrapper.
-  - **`Option`:** a value at an `Option` position is wrapped explicitly; an argument or field left
-    out still takes its declared default, which is not a conversion.
+  - **`Option` stays as it is:** a value at an `Option(T)` position is a `T`, `some` is never
+    written, and an argument or field left out takes its declared default. This is how `.syl`
+    writes optional arguments, the one implicit wrap the language keeps.
   - Bring the wrapper words' names to the owner before respelling the corpus.
 
 ## Tests
