@@ -33,6 +33,8 @@ structure Fixture where
   via : Array Name := #[]
   accepted : Bool
   refusals : Array String
+  /-- The right side's refusals, each a value in the `DumpValues` constructor encoding, in order. -/
+  refusalValues : Array String := #[]
 
 structure ChecklistEntry where
   theoremName : Name
@@ -90,6 +92,15 @@ private unsafe def renderArgument (value : Expr) : MetaM String := do
   try DumpValues.render value
   catch _ => renderValue value
 
+/-- The right side's refusals as values, in order (`renderArgument`). -/
+private unsafe def refusalValues (rhs : Expr) : MetaM (Array String) := do
+  let mut out := #[]
+  let mut rest ← withTransparency .all <| whnf rhs
+  while rest.isAppOfArity ``List.cons 3 do
+    out := out.push (← renderArgument rest.getAppArgs[1]!)
+    rest ← withTransparency .all <| whnf rest.getAppArgs[2]!
+  return out
+
 /-- Classify the theorem `name` of `module`. -/
 unsafe def classify (name module : Name) (type : Expr) :
     MetaM (Except ChecklistEntry Fixture) := do
@@ -125,9 +136,10 @@ unsafe def classify (name module : Name) (type : Expr) :
   try
     let args ← args.mapM fun (n, a) => return (n, ← renderArgument a)
     let refusals ← refusalKinds rhs
+    let values ← refusalValues rhs
     return .ok {
       theoremName := name, module := module, entry := fn, args := args, via := via
-      accepted := refusals.isEmpty, refusals := refusals }
+      accepted := refusals.isEmpty, refusals := refusals, refusalValues := values }
   catch e => other s!"unrenderable: {← e.toMessageData.toString}"
 
 /-- Every theorem under `Semantics.Proofs`, as a fixture or a checklist entry. -/

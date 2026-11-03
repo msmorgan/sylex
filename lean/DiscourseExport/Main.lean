@@ -126,6 +126,7 @@ private unsafe def exportFixtures (dir : System.FilePath) : MetaM (Array String 
       ("via", toJson (f.via.map (·.toString))),
       ("args", Json.arr (f.args.map fun (n, v) => Json.arr #[toJson n, toJson v])),
       ("accepted", toJson f.accepted), ("refusals", toJson f.refusals),
+      ("refusalValues", toJson f.refusalValues),
       ("flagDefect", toJson flag)]
   let mut checklistLines := #[]
   let mut flaggedChecklist := 0

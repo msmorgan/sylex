@@ -29,15 +29,16 @@ defined under `Semantics.Check`, is one fixture line:
 ```json
 {"theorem":"File.name","declaration":"…","entry":"Semantics.Action.check","via":[],
  "args":[["drs","<value>"],["i","<value>"]],"accepted":false,"refusals":["choiceClause"],
- "flagDefect":false}
+ "refusalValues":["Semantics.Refusal.choiceClause()"],"flagDefect":false}
 ```
 
 The left side is zeta-reduced first (`{ x with … }` elaborates through `let`), and a wrapper the
 proof suite defines itself (`Lookback.relativeCheck`) is unfolded to the entry point it applies;
 `via` names the wrappers unfolded. `args` are the entry point's explicit arguments in the
 `DumpValues` constructor encoding (`DumpValues/README.md`); a computed string (`operandKey 0`) is
-written as its literal. A fixture compares accepted against refused and the sorted set of
-refusal kinds (constructor names), never Lean's refusal list itself. Every other theorem
+written as its literal. `refusals` is the sorted set of the right side's refusal kinds
+(constructor names); `refusalValues` is the right side's refusal list itself, each refusal with
+its payload in the same encoding, in Lean's order. Every other theorem
 (quantified, `∧`, `≠`, `let`, statements over checker internals) is one checklist line with
 the reason it is not a fixture; `docs/semantics-spec-catalog.md` covers those. `theorem` is
 the catalog's `File.theorem` spelling. `flagDefect` marks the names the catalog marks FLAG
