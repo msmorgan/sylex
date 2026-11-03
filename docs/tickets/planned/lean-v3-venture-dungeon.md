@@ -12,7 +12,7 @@ Undercity" triggers on the initiative designation
 beside the inlined combat-damage conferral. Moved here from
 `lean-v3-keyword-bodies-and-catalog-sync`, which declared learn and empower Jace.
 
-Design (from ADR `semantics-v3.md` §0.1 items 4 and 5):
+Design (from ADR `semantics-v3.md` §1 items 4 and 5):
 
 - A dungeon card is a card frame of its own: rooms, each a room ability, joined by arrows
   [CR#309.4,309.4c]. Add it to `Card` beside the other frames, with the check its frame needs.

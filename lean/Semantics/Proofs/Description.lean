@@ -395,7 +395,7 @@ theorem otherwiseReadsSubjectIntroducedByCondition :
 
 /-- "Tap target creature. If you control an artifact, exile that creature. Otherwise, sacrifice
 it. Return the exiled card to the battlefield." Whichever branch is taken, what it did to a
-referent in scope before the `doIf` stands after it (`semantics-v3.md` §1.3, box 2): "the exiled
+referent in scope before the `doIf` stands after it (`semantics-v3.md` §2.2, box 2): "the exiled
 card" and "the sacrificed card" each read the target as the branch that moved it left it; a deed
 neither branch did is still no antecedent. -/
 theorem otherwiseKeepsWhatEitherBranchDidToAnOuterReferent :

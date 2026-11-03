@@ -154,7 +154,7 @@ private theorem unionHalfControllerUsesTheSelectedKindWithoutChangingIdentity :
         (.possessorOf .controller (.pro (.word .join) .one))).2.2 =
           [.possessorKind .controller (.join .object .player)] := by decide
 
-/-- "The number of creatures" is closed after the count (`semantics-v3.md` §1.3): it leaves no
+/-- "The number of creatures" is closed after the count (`semantics-v3.md` §2.2): it leaves no
 referent, so "the rest" after "one of the top N cards" takes the slice's group. -/
 private theorem countDomainDoesNotCompeteWithTheRemainderGroup :
     let count : Amount := .countOf (.described .all (.hasType .creature))

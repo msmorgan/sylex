@@ -12,7 +12,7 @@ import Semantics.Check.Rules
 /-!
 # Semantics.Check
 
-Root entry point for the Clean-Sheet DRT Checker (`docs/decisions/semantics-v3.md` §1, §3). Its
+Root entry point for the Clean-Sheet DRT Checker (`docs/decisions/semantics-v3.md` §2, §4). Its
 core pins are `Semantics.Proofs.CheckerCore`.
 -/
 

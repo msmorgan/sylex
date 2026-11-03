@@ -11,7 +11,7 @@ Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-docs.md`
 entries 16, 17 (the ADR part) and 47 (gitignored; read it from the default
 checkout). All are confirmed at head as of 2026-10-21.
 
-## `docs/decisions/semantics-v3.md` §2.1, "Complete Classification" (lines 262, 264)
+## `docs/decisions/semantics-v3.md` §3.1, "Keyword Actions Are Definitions"
 
 - Five cites are off by one, because behold is [CR#701.4]. Correct them:
   `cast` [CR#701.5], `counter` [CR#701.6], `create` [CR#701.7],

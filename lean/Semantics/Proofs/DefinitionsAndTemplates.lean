@@ -112,7 +112,7 @@ theorem headerDeedIsReadByTheGateAndTheStepper :
 
 /-- No deed is guessed from a body's shape: a bare move to exile, a bare status change and a bare
 creation name none. The checker reads a keyword action's deed only from its Definition's
-`ownScope` header (`semantics-v3.md` §2.1, "The checker does not guess a deed from a body's
+`ownScope` header (`semantics-v3.md` §3.1, "The checker does not guess a deed from a body's
 shape"). -/
 theorem bareShapesNameNoDeed :
     (Action.move (target isCreature) .anyLocation (some exileZone) .arrival []).namedDeed = none ∧

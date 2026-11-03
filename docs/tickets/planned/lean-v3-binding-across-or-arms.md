@@ -8,7 +8,7 @@ Standard constraints apply. Split from `lean-v3-authoring-default-leaks` §3 (20
 `objectsOfPlayer` (`plugins_v3/builtin/templates/predicate/objectsOfPlayer.syl`, "…that <player>
 controls or owns but no player controls", its only caller *True-Name Nemesis*,
 `plugins_v3/canon/cards/True-Name Nemesis.syl`) writes `player` twice, once in each arm of an
-`.or`. ADR `docs/decisions/semantics-v3.md` §2.2 binds a Template
+`.or`. ADR `docs/decisions/semantics-v3.md` §3.2 binds a Template
 parameter mentioned more than once with `.firstMention`/`.laterMention`. Writing
 
 ```lean

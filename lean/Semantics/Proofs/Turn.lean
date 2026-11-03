@@ -39,7 +39,7 @@ theorem okSacrificeBattlefield : Action.check (DRS.ofList []) (sacrifice (a isCr
 
 /-- A delayed trigger reads the earlier target as a settled particular [CR#603.7c]: an earlier
 mention in scope, so the delayed "any other target" contrasts with it, not with the Source
-(`semantics-v3.md` §0.1). -/
+(`semantics-v3.md` §2.5). -/
 theorem okDelayedOtherAnchorsOnTheSettledTarget :
     let action := Action.sequentially
       [ (Action.instruct .this (.dealDamage 2 (target isAnyTarget))),
@@ -62,7 +62,7 @@ theorem okActivatedCostAndEffect :
 
 /-- An effect reads the creature its cost returned to a hand: "the returned creature" has a
 textual antecedent, and whether its last known information is available is the engine's concern
-[CR#608.2h] (`semantics-v3.md` §0.1 item 4). -/
+[CR#608.2h] (`semantics-v3.md` §1 item 4). -/
 theorem okEffectReadsTheCreatureItsCostReturned :
     let returned := fun (word : Predicate) (stamp : Predicate) =>
       Ability.check (DRS.ofList [])
@@ -116,7 +116,7 @@ theorem okParticipialDiscardedCard :
   decide
 
 /-- "Exile target creature. Reveal it. Return the exiled card to the battlefield." A deed stamps
-an object beside the deeds already on it (`Stamp.deeds`, `semantics-v3.md` §1.2), so revealing
+an object beside the deeds already on it (`Stamp.deeds`, `semantics-v3.md` §2.1), so revealing
 the exiled card leaves it read back as exiled, and as revealed; a deed that never acted on it
 still finds nothing. -/
 theorem deedsAccumulateOnAReferent :

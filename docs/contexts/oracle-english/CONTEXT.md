@@ -1324,7 +1324,7 @@ The expression or discourse introduction on which an Anaphor depends.
 Of an Anaphor, another argument of the same verb: its Subject, Object, or a
 Complement. A Genitive's possessor ("its power") and the noun phrase of a small
 clause ("counters on it") are not clause-mates of the verb (`docs/decisions/semantics-v3.md`
-§1.5).
+§2.4).
 _Avoid_: co-argument for possessors or small-clause objects
 
 **Referent**:

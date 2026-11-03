@@ -23,7 +23,7 @@ hypothetical box, so its target never reaches the following text. The pin
 A target is chosen as the spell is cast [CR#601.2c,115.1], not when the shield applies, and
 "that creature" names it. The ADR already admits this for conditions: "A referent a condition
 introduces … is a hypothetical and never a candidate, though targets the action branch announces
-are ([CR#601.2c])" (`docs/decisions/semantics-v3.md` §0.1 item 2, step 2).
+are ([CR#601.2c])" (`docs/decisions/semantics-v3.md` §2.5 step 2).
 
 ## Change
 
@@ -31,7 +31,7 @@ are ([CR#601.2c])" (`docs/decisions/semantics-v3.md` §0.1 item 2, step 2).
    form), a mention with the `target` determiner inside the replacement's `would` pattern is
    announced in the box enclosing the `establish`, with its `.target` stamp, so later text reads
    it by D′ ("it") and AC>R1 ("that creature"). Non-target mentions in the pattern stay
-   hypothetical. Add no AST node, field or variant ([CR#701.19a] is unchanged; §0.1 item 5(c)).
+   hypothetical. Add no AST node, field or variant ([CR#701.19a] is unchanged; §1 item 5(c)).
 2. Add *Debt of Loyalty* to canon as `plugins_v3/canon/cards/Debt of Loyalty.syl`, its text
    following *Matopi Golem*'s reflexive "When it regenerates this way"
    (`plugins_v3/canon/cards/Matopi Golem.syl`, tested by

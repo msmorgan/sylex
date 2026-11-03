@@ -10,7 +10,7 @@ among permanents you control and/or cards in your graveyard: Return this card to
 transformed under its owner's control. Activate only as a sorcery." [CR#702.167a]. `craft`
 (`plugins_v3/builtin/definitions/keyword_ability/craft.syl`) takes only the cost and is bodiless.
 
-Decided (from ADR `semantics-v3.md` §0.1 items 4 and 5): write the body as it composes. Add a
+Decided (from ADR `semantics-v3.md` §1 items 4 and 5): write the body as it composes. Add a
 materials parameter that holds a counted or coordinated noun phrase, and keep the [CR#702.167b]
 exception in the body: a material described only by a card type or subtype, without "card",
 is a permanent of that type on the battlefield or a card of it in a graveyard.

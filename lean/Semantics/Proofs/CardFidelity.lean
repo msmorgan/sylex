@@ -237,7 +237,7 @@ theorem lightmineFieldCountsAttackingCreatures :
           (dealDamage (countOf (and [isCreature, isAttacking])) (eachOf (those creature))) ] := rfl
 
 /-- Temple Altisaur: "another Dinosaur you control", the bare "another" contrasting with the
-source of the ability (ADR semantics-v3 §0.1). -/
+source of the ability (ADR semantics-v3 §2.5). -/
 theorem templeAltisaurProtectsAnotherDinosaur :
     (faceText (Semantics.Cards.«Temple Altisaur»)) =
       [ static (replace (would ((Semantics.Subject.actor (a isSource)))

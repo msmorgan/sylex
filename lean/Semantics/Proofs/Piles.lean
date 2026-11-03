@@ -311,7 +311,7 @@ theorem oneWayResultShift :
       = [] := by
   decide
 
-/-- The counter-placement slot excludes the stack (`semantics-v3.md` §1.5 `J1` item 4):
+/-- The counter-placement slot excludes the stack (`semantics-v3.md` §2.4 `J1` item 4):
 "For each ability on the stack, put a counter of each kind on it on it" has no off-stack
 antecedent for its patient. The counter-kind read remains available. -/
 theorem abilityOnStackIsNotCounterRecipient :

@@ -6,7 +6,7 @@ needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-proof
 Standard constraints apply. First half of Stage 1 of `semantics-rust-rewrite`: load and cache
 preparsed `.syl` bundles in `deckmaste_dsl::bundle`, register declaration signatures and their
 fixed argument stepping order, resolve names and arguments by expected sort
-(`docs/decisions/semantics-v3.md` §4.5) into a resolved `Term` tree in `crates/semantics`, check
+(`docs/decisions/semantics-v3.md` §5.2) into a resolved `Term` tree in `crates/semantics`, check
 dependency cycles, and expose `cargo xtask semantics check`.
 
 - Calls with interleaved named and positional arguments resolve as `deckmaste_dsl` parses them
@@ -95,7 +95,7 @@ and recording directed body dependencies `decl_id → callee_decl_id`:
      instantiated at `Amount` and `ManaCostTerm`).
    - Enforces `sourceConstructorRefusal` (`Environment.lean:103–122`), preserving the temporary
      canonical-path exception for `builtin/definitions/keyword_action/theRingTemptsYou.syl` while
-     the AST is frozen (`semantics-v3.md` §4.5 item 3, `macro-ring-emblem`).
+     the AST is frozen (`semantics-v3.md` §5.2 item 3, `macro-ring-emblem`).
 4. **Card & CardFace record shorthands (`Resolve.lean:57–61, 77–81`)**:
    - A record at expected sort `Card` wraps in `Card::SingleFaced`.
    - A non-`singleFaced` `Card` call with a single positional record argument unpacks the record's

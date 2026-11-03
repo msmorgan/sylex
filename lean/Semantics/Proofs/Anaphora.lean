@@ -32,7 +32,7 @@ namespace Semantics.Proofs.Anaphora
 
 
 /-- An unknown zone supplies no contradiction to any slot carrier; runtime applicability
-remains the engine's (`semantics-v3.md` §1.5 `J1` item 4). -/
+remains the engine's (`semantics-v3.md` §2.4 `J1` item 4). -/
 theorem unknownZoneRemainsAccessible (carrier : SlotCarrier) :
     slotZoneOk carrier none = true := by
   cases carrier <;> rfl

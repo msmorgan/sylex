@@ -7,7 +7,7 @@ Standard constraints apply.
 
 "Before the game begins, you may reveal one card you own from outside the game with a companion
 ability whose condition is fulfilled by your starting deck" [CR#702.139a,103.2b]. This is a
-start-of-game rule, a rules-table row (`docs/decisions/semantics-v3.md` §0.1 item 4), not part
+start-of-game rule, a rules-table row (`docs/decisions/semantics-v3.md` §1 item 4), not part
 of the keyword's in-game body. `companion`'s body writes the in-game special action
 [CR#116.2g] (`plugins_v3/builtin/definitions/keyword_ability/companion.syl`). It does not yet restrict it to the card revealed
 this way.

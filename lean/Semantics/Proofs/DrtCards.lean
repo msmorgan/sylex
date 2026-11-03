@@ -296,7 +296,7 @@ theorem weepingAngelOwnerCanShuffleItsCreatureIntoTheirLibrary :
 
 /-- *Weeping Angel*'s raw "it" in "that creature's owner shuffles it into their library" reads
 the damaged creature: re-mentioned as a possessor, "that creature" is foregrounded in the current
-clause (`DRS.recordMention`, `semantics-v3.md` §1.5) without becoming a clause-mate, so `D′`
+clause (`DRS.recordMention`, `semantics-v3.md` §2.4) without becoming a clause-mate, so `D′`
 prefers it to the Source, mentioned in the earlier clause. -/
 theorem weepingAngelRawPronounSelectsTheDamagedCreature :
     let owner := stepNounPhrase 16 (nextClause weepingAngelRecipientContext)

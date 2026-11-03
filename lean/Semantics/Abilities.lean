@@ -11,7 +11,7 @@ headers and bounds (`UsageLimit`, `JoinedHeader`), actions (`Action`), static sp
 
 Because `GameEvent.does` and `DidClause` (`Predicate.did`, `Amount.tally`, `Condition.did`)
 embed `action : Action` directly, the phrase, trigger, and ability grammars form a single
-mutually recursive block (`docs/decisions/semantics-v3.md` §3).
+mutually recursive block (`docs/decisions/semantics-v3.md` §4).
 -/
 
 namespace Semantics
@@ -186,7 +186,7 @@ mutual
     | that
     /-- `player`'s most recent turn: the current turn while it is `player`'s, and otherwise the
     last turn `player` took ("their most recent turn" [CR#302.6]). Which turn that is at runtime
-    is the engine's (ADR `semantics-v3.md` §0.1 item 4). -/
+    is the engine's (ADR `semantics-v3.md` §1 item 4). -/
     | mostRecent (player : NounPhrase)
 
   /-- When a player may act, or when a trigger or replacement applies. With no timing written,
@@ -322,7 +322,7 @@ mutual
     | not (predicate : Predicate)
     /-- A bare printed "another" or "other" ("another target creature you control", "each other
     player"): other than its Contrast Anchor, which the checker resolves (`semantics-v3.md`
-    §0.1). It need not contrast with a target. -/
+    §2.5). It need not contrast with a target. -/
     | other
     | notChosen
     /-- A printed "other than <anchor>": not `anchor` itself, nor one of it ("all permanents other
@@ -535,7 +535,7 @@ mutual
     throughout. An object that became a new object after `since` held nothing before it
     existed [CR#400.7]. `since` follows `condition`, so its pronouns read the condition's
     referents ("their"). Whether the condition held throughout is the engine's (ADR
-    `semantics-v3.md` §0.1 item 4). -/
+    `semantics-v3.md` §1 item 4). -/
     | heldSince (condition : Condition) (since : GameEvent)
     /-- `player` could begin to cast `subject` by putting it onto the stack from `from_`, taking
     into account any effect that would prohibit the cast: suspend's special action

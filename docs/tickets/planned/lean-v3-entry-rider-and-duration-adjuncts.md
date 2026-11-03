@@ -30,7 +30,7 @@ An effect's Duration is a field (`establish (spec) (duration : Option Duration)`
 
 - **Adjunct nodes.** Entry Riders (Oracle English: Depictive Adjunct, or a PP Adjunct) and effect
   Durations (Duration Phrase) become nodes in their printed position. They wrap the Action they
-  modify, or the Coordination they scope over. This follows semantics-v3 §0.1: constructions
+  modify, or the Coordination they scope over. This follows semantics-v3 §1: constructions
   occupy their surface positions.
   - The same rider nodes serve all four places above. A replaced entering's riders wrap the
     entering the replacement describes, and a pattern's riders wrap the entering it matches. So

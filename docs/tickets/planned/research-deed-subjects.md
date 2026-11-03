@@ -10,4 +10,4 @@ the rule's definition names an agent. Output: a table in
 `docs/memory/scratch/2026-09-04-deed-subjects.md`. Informs the `actFacts` agent
 column in `lean/Semantics/Check/Words.lean` under the `semantics-v3` Unified
 Action-Clause Spine (`does` / `would` / `cant` / `did` / `instruct` subject
-validation, `docs/decisions/semantics-v3.md` §3).
+validation, `docs/decisions/semantics-v3.md` §4).

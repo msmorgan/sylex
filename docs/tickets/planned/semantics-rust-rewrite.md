@@ -41,12 +41,12 @@ and `crates/deckmaste_discourse` DRT endophor resolution):
 The pipeline it belongs to:
 
 - **`deckmaste_semantics_v3`** (`semantics-rust-crate` and `semantics-card-facts`) resolves names by
-  expected sort (§4.5), expands Templates and Definitions over the `.syl` syntax tree
+  expected sort (§5.2), expands Templates and Definitions over the `.syl` syntax tree
   `deckmaste_dsl` parses, and provides the shared `Refusal` type, context-free AST queries
   (`number_slots`, `defines_pt`, `Ability::category`, `keyword_instances`), and `DRS`-free
   card-frame/shape checks. It does no DRT endophor resolution.
 - **`deckmaste_discourse`** (this epic) implements the context-sensitive DRT endophor resolution of
-  `docs/decisions/semantics-v3.md` §1 and §3 in Rust. Lean is never in the hot path of card
+  `docs/decisions/semantics-v3.md` §2 and §4 in Rust. Lean is never in the hot path of card
   compilation, so this is a reimplementation, not a reader of Lean output. The deleted
   `deckmaste_lowering_v3` had part of it; recover what is useful from jj history.
 - **`deckmaste_lowering_v3`** (`lowering-v3`) translates the `deckmaste_semantics_v3` AST and

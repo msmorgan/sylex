@@ -21,7 +21,7 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
     still uninflected: `becomeBlocked(subject)` is `"<subject> become blocked"`, and likewise
     `becomeBlocking`, `stopBlocking` and `phaseOutUntil`. The parse with typed holes leaves the
     hole's agreement open (`deckmaste_spelling`). These Templates keep `subject`. Their Subject is
-    the patient, not the performer (`does(any, becomeBlocked(this))`, semantics-v3 §3.1), so
+    the patient, not the performer (`does(any, becomeBlocked(this))`, semantics-v3 §4.1), so
     `theActor` would misstate it.
   - **The Subject is fixed inside the template**, and no hole decides agreement. The verb is
     written as printed: `controllerSacrifices` stays `"<subject>'s controller sacrifices it"`.
@@ -60,7 +60,7 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
 ## Change
 
 - **ADR:**
-  - Record the conventions where `spelling` is defined (`docs/decisions/semantics-v3.md` §4.4).
+  - Record the conventions where `spelling` is defined (`docs/decisions/semantics-v3.md` §5.1).
   - Amend `semantics-spelling-lowering.md` §3 as above.
 - **Glossary:** add entries for the terms this introduces (a spelling's pattern and its holes) to
   the owning glossary, via the `domain-modeling` skill.

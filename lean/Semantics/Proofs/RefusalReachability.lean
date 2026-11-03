@@ -33,7 +33,7 @@ theorem existentialRequiresAnExistentialMention :
 
 open Semantics.Templates Semantics.Definitions in
 /-- The domain "the number of …" counts and "the greatest … among …" ranges over is closed after
-the measure (`semantics-v3.md` §1.3): no later pronoun reads it back. In *Tears of Rage*, *Mishra,
+the measure (`semantics-v3.md` §2.2): no later pronoun reads it back. In *Tears of Rage*, *Mishra,
 Claimed by Gix* and *Highcliff Felidar* the reference after the measure reads something else. -/
 theorem measuredDomainIsNotAnAntecedent :
     Action.check emptyContext

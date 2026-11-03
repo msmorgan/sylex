@@ -6,7 +6,7 @@ import Semantics.Proofs.Helpers
 
 A Definition's or Template's referent parameter is bound at the body's first mention, and every later
 mention refers back to that binding by its Binding Identity, not by a pronoun search
-(`docs/decisions/semantics-v3.md` §§1.2,1.4). The `plugins_v3` loader writes the
+(`docs/decisions/semantics-v3.md` §§2.1,2.3). The `plugins_v3` loader writes the
 first mention `firstMention id argument` and each later one `laterMention id argument`; the
 terms below are written the way it writes them. The identity is a name, never a stack position:
 other bindings pushed between the mentions do not change what a later mention reads. Each pin
@@ -230,7 +230,7 @@ for as long as it remains exiled, its owner may cast it by paying {2} rather tha
 The per-card spelling binds the objects where it exiles them and loops over each card exiled
 this way, handing each card's permission to that card's own owner. The exile makes them new
 objects [CR#400.7,400.7j], so the loop reads them back by anaphora, never by the parameter
-(`docs/decisions/semantics-v3.md` §§0.1,1.3). The loop's singular referent remains
+(`docs/decisions/semantics-v3.md` §1 item 2, §2.2). The loop's singular referent remains
 available through the handoff to its owner. -/
 
 private def airbendByCard := airbend

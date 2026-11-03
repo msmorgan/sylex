@@ -10,7 +10,7 @@ def Action.scopeBody (i : Action) (fuel : Nat := 64) : Action :=
 termination_by structural fuel
 
 /-- The one deed `i` performs: the header of its own Reference Scope (`Action.ownScope`,
-`semantics-v3.md` §1.4), read through caller scopes. -/
+`semantics-v3.md` §2.3), read through caller scopes. -/
 def Action.ownDeed? (i : Action) (fuel : Nat := 64) : Option Deed :=
   match fuel, i with
   | n + 1, .inCaller b | n + 1, .ownScope none b => b.ownDeed? n

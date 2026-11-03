@@ -32,7 +32,7 @@ leave your graveyard" trigger would fire once for the card and twice for the enc
 - **One construct, `chooseModesOver`:**
   - the choice: a quantity plus mode-choice modifiers;
   - a frame, which is an Action expression. A reserved word stands at the filler's site in it, the
-    way `theActor` stands for the performer, and resolves by expected sort (§4.5): a NounPhrase or
+    way `theActor` stands for the performer, and resolves by expected sort (§5.2): a NounPhrase or
     a characteristics bundle. Templates expand before resolution, so the frame may be written
     with any Template whose argument is that word;
   - the fillers.
@@ -74,7 +74,7 @@ leave your graveyard" trigger would fire once for the card and twice for the enc
   - Add *Outlaws' Merriment* and *Genku, Future Shaper*.
 - **ADR and glossary:**
   - Record the construct in semantics-v3.
-  - Amend §0.1 item 2, "There is no cataphora, apart from the clause-internal Contrast Anchor",
+  - Amend §1 item 2, "There is no cataphora, apart from the clause-internal Contrast Anchor",
     to name this construct as the second scoped exception.
   - Note in the oracle-english glossary that this Antecedent follows its Anaphor (cataphora), via
     `domain-modeling`.
