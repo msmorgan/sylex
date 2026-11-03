@@ -39,8 +39,8 @@ natively.
    last known information ([CR#608.2h]), timing, and the order of state-based actions and
    replacements ([CR#704.3,616.1]). So reference resolution applies no public-zone filter: a
    well-formed textual antecedent is admitted. Why: what a text means is decidable from the text,
-   but runtime state is not. Every attempt to simulate it in the checker ended in model nodes added
-   only to satisfy the simulation (item 5(c)).
+   but runtime state is not. A check of runtime state can only be satisfied by adding model
+   structure that the text does not contain (item 5(c)).
 4. **Rules are data.** Every decomposable game rule is a declaration, not engine code: damage
    results, state-based actions, turn-based actions, intrinsic type rules ([CR#702.15b,704.5q,703.1]).
    Their CR citations, not the checker, vouch for their correctness. Why: a rule written as data is
@@ -170,10 +170,11 @@ Source coordinated with the phrase is its anchor. Otherwise the anchor is, in or
 
 The language has three kinds of named word, because there are three different jobs:
 
-- **A primitive** is the one binding between a word and a model constructor. The model's own
-  vocabulary is therefore named in exactly one place, and everything else is built from words.
-  Without primitives, constructor names leak into cards and Templates, and the model cannot change
-  without editing them.
+- **A primitive** is where a model constructor's spelling is attached. It is the one declaration
+  that binds a word to a constructor, and it does the wrapping: it names the constructor the word
+  builds. Without primitives, there is nowhere to attach a constructor's spelling. The wording
+  would have to live somewhere other than the declaration that binds the word, which makes a
+  second source of truth for spelling.
 - **A Definition** is vocabulary the rules define: a keyword action or ability ([CR#701.1,702.1]),
   a Counter, a Designation. It carries rules meaning: a Deed that triggers, lookbacks and
   prohibitions can name ("whenever you scry", "can't be regenerated"), and its own Reference Scope
@@ -185,8 +186,8 @@ They are kept apart because conflating them goes wrong both ways. A phrasing giv
 scope invents a rules distinction the CR does not make: an event then matches it, and referents it
 should see are hidden from it. A rules-defined keyword treated as a phrasing loses its identity, so
 "can't X" and "whenever X" can no longer name it. So a declaration's kind decides which it is; its
-file path never does, since inferring the role from location is what let the two drift apart under
-v2. Definitions are trusted, and their bodies are checked at every use that expands them.
+file path never does: a role inferred from location is not stated by the declaration, and it can
+disagree with what the declaration is. Definitions are trusted, and their bodies are checked at every use that expands them.
 
 ### 3.1 Keyword Actions and Deeds
 
