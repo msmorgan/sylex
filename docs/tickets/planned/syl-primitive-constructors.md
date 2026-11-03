@@ -11,6 +11,12 @@ or closed enum word of the expected sort (`docs/decisions/semantics-v3.md` §4.5
 `stat(power)` reaches `Stat.power` with no declaration). The AST's constructor names therefore live
 in Lean, and cards, templates and Definitions use them.
 
+The goal: every identifier in a card, template or Definition is easy to trace to the AST
+constructor it stands for. It names a declaration at its expected sort; a template or Definition
+leads on to the words in its body; a primitive ends the trail with its capitalized constructor,
+which is the Rust AST's variant name, letter for letter. Lean's constructor names appear only in
+what the Lake generator emits.
+
 ## Change
 
 - **Every primitive names its constructor, capitalized,** after its signature:
