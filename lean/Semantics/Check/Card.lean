@@ -236,15 +236,18 @@ def Characteristics.check (drs : DRS) (c : Characteristics) : List Refusal :=
 /-- The context a face's text is read in: its cost's letters, and its own Card Types as the
 Source's type evidence. -/
 def faceContext (types : List CardType) (cost : Option ManaCost) : DRS :=
-  { DRS.ofList (costLetters cost) with sourceTypes := types }
+  let drs := { DRS.ofList (costLetters cost) with sourceTypes := types }
+  Trace.emit (fun _ => .mint (drs.referents.map fun r => (r.id, r.traceTag))) drs
 
 def CardFace.check (side : FaceSide) (f : CardFace) : List Refusal :=
+  Trace.frame "CardFace" f fun _ =>
   let c := f.characteristics
   refuse c.name.isSome .cardName ++ Ability.checkText (faceContext c.types c.cost) c.text ++
     c.lineLaws ++ textLaws c.text ++ refuse (cardBoxOk side c.types c.text c) .cardBox ++
     refuse (cardCostOk side c.types c.cost) .cardCost
 
 def SharedLineHalf.check (shared : CardFace) (h : SharedLineHalf) : List Refusal :=
+  Trace.frame "SharedLineHalf" h fun _ =>
   let line := shared.characteristics
   Ability.checkText (faceContext line.types h.cost) h.text ++ halfTextLaws h.text ++
     refuse (cardBoxOk .front line.types h.text line) .cardBox ++
@@ -287,6 +290,7 @@ def LevelBand.box (b : LevelBand) : Characteristics :=
 
 /-- A level band writes a power and toughness and text [CR#711.2]. -/
 def LevelBand.check (inner : Characteristics) (b : LevelBand) : List Refusal :=
+  Trace.frame "LevelBand" b fun _ =>
   refuse b.range.ok .levelRange ++ Ability.checkText (faceContext inner.types none) b.text ++
     textLaws b.text ++
     refuse b.box.ptWritten .levelerFrame ++

@@ -530,6 +530,18 @@ def applyZoneMove (drs : DRS) (refIds : List ReferentId) (deed : Option Deed)
             { shape with refIds := shape.refIds.map remap },
           relativeBinder := state.relativeBinder.map remap }) drs
 
+/-- `applyZoneMove`, logging each moved referent's fresh identity for the discourse exporter
+(`Semantics.Trace`). -/
+def applyZoneMoveTraced (drs : DRS) (refIds : List ReferentId) (deed : Option Deed)
+    (destZone : Option Zone) : DRS :=
+  let out := applyZoneMove drs refIds deed destZone
+  Trace.emit (fun _ => .successors (out.referents.filterMap fun r =>
+    if r.id ≥ drs.nextId then
+      match r.movedFrom with
+      | old :: _ => if refIds.contains old then some (old, r.id) else none
+      | [] => none
+    else none).reverse) out
+
 /-- What a search found (`refIds`): in the zone searched, if the search names one, and stamped
 with the search. -/
 def applySearchFound (drs : DRS) (refIds : List ReferentId) (zone : Option Zone) : DRS :=
@@ -598,16 +610,16 @@ def applyProcedureDeed (drs : DRS) (kind : Procedure) (refIds : List ReferentId)
     | .ability .. => true
     | _ => false
   match kind with
-  | .cast => applyZoneMove drs refIds (some (.action "cast")) (some .stack)
+  | .cast => applyZoneMoveTraced drs refIds (some (.action "cast")) (some .stack)
   | .play =>
     let spells := refIds.filter (!isLand ·)
-    let cast := applyZoneMove (applyZoneMove drs (refIds.filter isLand) (some (.action "play"))
+    let cast := applyZoneMoveTraced (applyZoneMoveTraced drs (refIds.filter isLand) (some (.action "play"))
       (some .battlefield)) spells (some (.action "cast")) (some .stack)
     -- The spell is played as well as cast: both deeds stand ("each spell played this way").
     applyInPlaceStamp cast (cast.referents.filter (fun r => r.movedFrom.head?.any spells.contains)
       |>.map (·.id)) (some (.action "play"))
   | .activate =>
-    applyZoneMove (applyInPlaceStamp drs (refIds.filter (!isAbility ·)) (some (.action "activate")))
+    applyZoneMoveTraced (applyInPlaceStamp drs (refIds.filter (!isAbility ·)) (some (.action "activate")))
       (refIds.filter isAbility) (some (.action "activate")) (some .stack)
   | .resolve => drs
 
@@ -627,6 +639,30 @@ unmarked [CR#601.2c]. -/
 def markFromCondition (before : DRS) (result : DRS × List Refusal) : DRS × List Refusal :=
   ({ result.1 with referents := result.1.referents.map fun r =>
       if r.id ≥ before.nextId then { r with fromCondition := true } else r }, result.2)
+
+/-- The rule a referring noun phrase resolves by, for the discourse exporter
+(`Semantics.Trace`): `D′` for bare pronouns, `AC>R1` for demonstratives, either falling back to
+the objects a shuffle randomized; empty for a phrase that refers to nothing earlier. -/
+def NounPhrase.traceRule (drs : DRS) (inArgSlot : Bool) : NounPhrase → String
+  | .pro reach plur =>
+    if (resolveCandidates reach plur drs inArgSlot).isEmpty then "shuffledLastKnown"
+    else if reach.isBarePronoun then "D′" else "AC>R1"
+  | .refl _ => "PrincipleA"
+  | .which => "relative"
+  | .firstMention _ _ => "firstMention"
+  | .laterMention _ _ => "laterMention"
+  | .delayedTrigger => "delayedTrigger"
+  | .described detP pred =>
+    match detP.participialNumber?, pred.participialAnchor? with
+    | some _, some _ => "participial"
+    | _, _ => "definite"
+  | _ => ""
+
+/-- Step `np` as a traced frame, summarised by the ids it returns and its rule. -/
+@[inline] def traceNounPhrase (drs : DRS) (inArgSlot : Bool) (np : NounPhrase)
+    (body : Unit → DRS × List ReferentId × List Refusal) : DRS × List ReferentId × List Refusal :=
+  Trace.frameWith "NounPhrase" np
+    (fun _ out => (out.2.1, np.traceRule drs inArgSlot, drs.nextId)) body
 
 structure StepOps where
   /-- Remaining checker depth, also used by the recursive stepping helpers. -/
@@ -707,10 +743,12 @@ termination_by structural fuel
 def NounPhrase.narrowBareTo (carrier : SlotCarrier) (np : NounPhrase) (fuel : Nat := 64) :
     NounPhrase :=
   match fuel, np with
-  | _ + 1, .pro .bare pl => .pro (.atSlot carrier) pl
-  | n + 1, .inCaller body => .inCaller (body.narrowBareTo carrier n)
-  | n + 1, .firstMention id body => .firstMention id (body.narrowBareTo carrier n)
-  | n + 1, .laterMention id body => .laterMention id (body.narrowBareTo carrier n)
+  | _ + 1, .pro .bare pl => Trace.rewrite np (.pro (.atSlot carrier) pl)
+  | n + 1, .inCaller body => Trace.rewrite np (.inCaller (body.narrowBareTo carrier n))
+  | n + 1, .firstMention id body =>
+    Trace.rewrite np (.firstMention id (body.narrowBareTo carrier n))
+  | n + 1, .laterMention id body =>
+    Trace.rewrite np (.laterMention id (body.narrowBareTo carrier n))
   | _, np => np
 termination_by structural fuel
 
@@ -2776,6 +2814,7 @@ extends `drs` whole. Any other ability is stepped without the spell's targets, w
 reads nor hides: they stay in the context it leaves, for any later spell ability. A line's
 context prepends what it adds to the referents it is given, as it leaves them. -/
 def lineTextContextWith (ops : StepOps) (drs : DRS) (ability : Ability) : DRS :=
+  Trace.frame "Ability/text" ability fun _ =>
   if ability.category == some .spell then Ability.textContextWith ops drs ability else
   let seen := drs.withoutSpellTargets
   let out := Ability.textContextWith ops seen ability
@@ -2836,15 +2875,17 @@ def stepOps : Nat → StepOps
     let ops := stepOps fuel
     {
       fuel := fuel + 1
-      quantity := stepQuantityWith ops
-      timing := stepTimingWith ops
-      location := stepLocationWith ops
-      would := stepWouldClauseWith ops
-      replacement := fun drs replacement entering => stepReplacementWith ops drs replacement entering
-      rider := stepMoveRiderWith ops
-      tokenMetadata := stepTokenSpecMetadataWith ops
-      deckTrait := checkDeckTraitWith ops
-      pred := fun drs p =>
+      quantity := fun drs q => Trace.frame "Quantity" q fun _ => stepQuantityWith ops drs q
+      timing := fun drs t => Trace.frame "Timing" t fun _ => stepTimingWith ops drs t
+      location := fun drs l => Trace.frame "Location" l fun _ => stepLocationWith ops drs l
+      would := fun drs w => Trace.frame "WouldClause" w fun _ => stepWouldClauseWith ops drs w
+      replacement := fun drs replacement entering => Trace.frame "Replacement" replacement fun _ =>
+        stepReplacementWith ops drs replacement entering
+      rider := fun drs r => Trace.frame "MoveRider" r fun _ => stepMoveRiderWith ops drs r
+      tokenMetadata := fun drs t => Trace.frame "TokenSpec" t fun _ =>
+        stepTokenSpecMetadataWith ops drs t
+      deckTrait := fun t => Trace.frame "DeckTrait" t fun _ => checkDeckTraitWith ops t
+      pred := fun drs p => Trace.frame "Predicate" p fun _ =>
         match p with
         | .inCaller body =>
           let (callerDrs, errs) := ops.pred (enterCaller drs) body
@@ -3039,7 +3080,7 @@ def stepOps : Nat → StepOps
           ({ drs with nextId }, errors ++ shapeErrors)
         | _ => (drs, []),
 
-      np := fun drs role inArgSlot np =>
+      np := fun drs role inArgSlot np => traceNounPhrase drs inArgSlot np fun _ =>
         match np with
         | .inCaller body =>
           let callerDrs := enterCaller drs
@@ -3370,7 +3411,7 @@ def stepOps : Nat → StepOps
         | .this => mentionThis drs role inArgSlot
         | .any => (drs, [], []),
 
-      amt := fun drs a =>
+      amt := fun drs a => Trace.frame "Amount" a fun _ =>
         match a with
         | .inCaller body =>
           let (callerDrs, errs) := ops.amt (enterCaller drs) body
@@ -3476,7 +3517,7 @@ def stepOps : Nat → StepOps
             let (d', e') := ops.amt d x
             (d', es ++ e')) (drs, []),
 
-      cond := fun drs c =>
+      cond := fun drs c => Trace.frame "Condition" c fun _ =>
         markFromCondition drs <|
         match c with
         | .inCaller body =>
@@ -3616,7 +3657,7 @@ def stepOps : Nat → StepOps
               let (out, errs) := ops.cond (nextClause d) part
               (out, es ++ errs)) (drs, shapeErrors),
 
-      ev := fun drs ev =>
+      ev := fun drs ev => Trace.frame "GameEvent" ev fun _ =>
         match ev with
         | .inCaller body =>
           let (callerDrs, errs) := ops.ev (enterCaller drs) body
@@ -3642,7 +3683,8 @@ def stepOps : Nat → StepOps
           let (drs2, e2) := ops.ev drs1 ev
           (drs2, e1 ++ e2),
 
-      inst := fun phase patientRole drs inst => recordCaused phase drs inst <|
+      inst := fun phase patientRole drs inst => Trace.frame "Action" inst fun _ =>
+        recordCaused phase drs inst <|
         match inst with
         | .inCaller body =>
           let callerDrs := enterCaller drs
@@ -3980,7 +4022,7 @@ def stepOps : Nat → StepOps
           let (drs5, e5) := stepMoveRiderListWith ops drs3 riders
           let destZone := to.bind (·.sort)
           let drs6 := if phase == .postEvent then
-            let moved := applyZoneMove drs5 refIds drs.scopeDeed destZone
+            let moved := applyZoneMoveTraced drs5 refIds drs.scopeDeed destZone
             match subj.restContext? drs with
             | some (kind, plurality, source) =>
               if theRestFits kind plurality source then moved.consumeRest source kind
@@ -4401,8 +4443,10 @@ def stepOps : Nat → StepOps
             pendingRoles := drs3.pendingRoles.filter (fun mention => keptIds.contains mention.1)
             resolvedIds := drs3.resolvedIds.filter keptIds.contains }
           let closed := publishLoopChoiceHistory (leaveSelectionScope drs1 closedDrs) drs3
-          let targets := publishLoopTargetResults closed drs3 outerIds
-          let output := publishLoopCreatedResults targets drs3 outerIds
+          let targets := Trace.scope "LoopAggregate(target)" fun _ =>
+            publishLoopTargetResults closed drs3 outerIds
+          let output := Trace.scope "LoopAggregate(created)" fun _ =>
+            publishLoopCreatedResults targets drs3 outerIds
           (output, e1 ++ pluralityErrors ++ e2)
         | .doForEachKind axis dom q body =>
           let (drs1, e1) := match dom with
@@ -4419,9 +4463,12 @@ def stepOps : Nat → StepOps
             pendingRoles := drs3.pendingRoles.filter (fun mention => outerIds.contains mention.1)
             resolvedIds := drs3.resolvedIds.filter outerIds.contains }
           let closed := publishLoopChoiceHistory (leaveSelectionScope drs1 closedDrs) drs3
-          let targets := publishLoopTargetResults closed drs3 outerIds
-          let created := publishLoopCreatedResults targets drs3 outerIds
-          let output := publishLoopOutcomes created drs3 outerIds
+          let targets := Trace.scope "LoopAggregate(target)" fun _ =>
+            publishLoopTargetResults closed drs3 outerIds
+          let created := Trace.scope "LoopAggregate(created)" fun _ =>
+            publishLoopCreatedResults targets drs3 outerIds
+          let output := Trace.scope "LoopAggregate(outcome)" fun _ =>
+            publishLoopOutcomes created drs3 outerIds
           (output, e1 ++ e2 ++ refuse (axis.sort == some q) .kindAxisSort ++
             refuse (dom.isSome || axis.closed) .kindDomainOk)
         | .repeat_ rep => stepRepetitionWith ops drs rep
@@ -4511,7 +4558,7 @@ def stepOps : Nat → StepOps
           let drs6 := if phase == .postEvent then applyProcedureDeed drs5 kind refIds else drs5
           (drs6, e1 ++ e2 ++ e3 ++ e4 ++ e5),
 
-      spec := fun drs s =>
+      spec := fun drs s => Trace.frame "StaticSpec" s fun _ =>
         match s with
         | .inCaller body =>
           let (callerDrs, errs) := ops.spec (enterCaller drs) body
@@ -4730,7 +4777,7 @@ def stepOps : Nat → StepOps
             | none => (drs2, [])
           (drs3, e1 ++ e2 ++ e3),
 
-      cost := fun drs c =>
+      cost := fun drs c => Trace.frame "Cost" c fun _ =>
         let (out, errors) :=
           match c with
           | .inCaller body =>
@@ -4781,7 +4828,7 @@ def stepOps : Nat → StepOps
             (drs2, e1 ++ e2)
         (out, errors ++ c.localChecks),
 
-      ab := fun drs ab =>
+      ab := fun drs ab => Trace.frame "Ability" ab fun _ =>
         match ab with
         | .inCaller body => ops.ab (enterCaller drs) body
         | .keyword _ params body =>

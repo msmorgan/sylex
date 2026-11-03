@@ -1,4 +1,5 @@
 import Semantics.Words
+import Semantics.Check.Trace
 
 /-!
 # Semantics.Check.Words
@@ -668,6 +669,13 @@ def DRS.updateById (drs : DRS) (id : ReferentId) (f : Referent → Referent) : D
         { updated with id := r.id, idents := mergeIdents r.idents updated.idents }
       else r }
 
+/-- The discourse exporter's tag for what a minted referent is (`Semantics.Trace`). -/
+def Referent.traceTag (r : Referent) : String :=
+  match r.payload with
+  | .outcome s => s!"Outcome({reprStr s})"
+  | .letter l => s!"Letter({reprStr l})"
+  | _ => if r.createdResult then "Created" else "Intro"
+
 /-- Assign fresh monotonic `ReferentId`s and `drs.currentClause` to newly introduced referents
 and prepend them to `drs.referents`. -/
 def DRS.prepend (drs : DRS) (additions : List Referent) (role : GramRole := .other)
@@ -682,10 +690,11 @@ def DRS.prepend (drs : DRS) (additions : List Referent) (role : GramRole := .oth
       if inArgSlot then (head.id, role) :: drs.pendingRoles
       else drs.pendingRoles
     | [] => drs.pendingRoles
-  ({ drs with
-     referents := stamped ++ drs.referents
-     nextId := drs.nextId + n
-     pendingRoles := pending }, stamped)
+  Trace.emit (fun _ => .mint (stamped.map fun r => (r.id, r.traceTag)))
+    ({ drs with
+       referents := stamped ++ drs.referents
+       nextId := drs.nextId + n
+       pendingRoles := pending }, stamped)
 
 def DRS.push (r : Referent) (drs : DRS) (role : GramRole := .other)
     (inArgSlot : Bool := false) : DRS :=
