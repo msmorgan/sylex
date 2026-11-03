@@ -34,7 +34,9 @@ natively.
    - A referent a body moves is a new object ([CR#400.7]). Later text reads it back by anaphora,
      never by the pre-move parameter.
 3. **The checker reads text, not game state.** It verifies that a term is a faithful reading of
-   its English: references resolve, sorts are right, and frames are well-formed. It is not a rules
+   its English: references resolve, sorts are right, and frames are well-formed. Whether an ability is
+   characteristic-defining is fixed by the textual criteria of [CR#604.3a], so the checker decides
+   it, not the engine. It is not a rules
    engine ([CR#101.3,609.3]). These belong to the engine: runtime visibility, the availability of
    last known information ([CR#608.2h]), timing, and the order of state-based actions and
    replacements ([CR#704.3,616.1]). So reference resolution applies no public-zone filter: a
@@ -245,6 +247,11 @@ pronoun resolution (§2.4). A Subject is one of three:
 - `any`: passive with no agent. The patient is promoted to subject.
 - `by(np)`: passive with an agent. The patient is promoted and read first, then `np` with role
   other.
+
+"Becomes blocked" is therefore not the agentless passive of `block`. It is its own event head,
+`becomeBlocked`: the Blocked status beginning, once per combat, even when an effect blocks the
+creature with no blocker ([CR#509.1h,509.3c]). "Becomes blocked by <B>" is `by(B)` over `block`,
+one event per blocker ([CR#509.3d]).
 
 ### 4.3 `any`
 
