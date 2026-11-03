@@ -23,7 +23,9 @@ natively.
 
 1. **Surface-faithful.** A construction stands where the English puts it. Nothing is hoisted:
    there are no prenex target lists and no positional slot reads. Lowering does all rearrangement
-   ([`core-explicit-regions.md`](./core-explicit-regions.md)).
+   ([`core-explicit-regions.md`](./core-explicit-regions.md)). Why: a term that mirrors the text
+   can be checked against the text and spelled back into it. A hoisted term needs a second,
+   hidden mapping to the wording, and that mapping is where readings go wrong.
 2. **Forward reading order.** Every argument is read in the discourse context of everything
    textually earlier. There is no cataphora, except one clause-internal step of the Contrast Anchor
    (§2.5), and no out-of-band announcement channel.
@@ -36,10 +38,14 @@ natively.
    engine ([CR#101.3,609.3]). These belong to the engine: runtime visibility, the availability of
    last known information ([CR#608.2h]), timing, and the order of state-based actions and
    replacements ([CR#704.3,616.1]). So reference resolution applies no public-zone filter: a
-   well-formed textual antecedent is admitted.
+   well-formed textual antecedent is admitted. Why: what a text means is decidable from the text,
+   but runtime state is not. Every attempt to simulate it in the checker ended in model nodes added
+   only to satisfy the simulation (item 5(c)).
 4. **Rules are data.** Every decomposable game rule is a declaration, not engine code: damage
    results, state-based actions, turn-based actions, intrinsic type rules ([CR#702.15b,704.5q,703.1]).
-   Their CR citations, not the checker, vouch for their correctness.
+   Their CR citations, not the checker, vouch for their correctness. Why: a rule written as data is
+   written once and read by every tool. A rule in engine code is a second source of truth that the
+   model cannot see.
 5. **The CR decides structure.**
    - (a) Where the CR distinguishes two structures, the model does too: an intervening "if" from a
      plain condition ([CR#603.4]), a replacement from a trigger ([CR#614.1,603.1]), an additional
@@ -53,6 +59,11 @@ natively.
      instead.
 
 ## 2. Discourse and Reference Resolution
+
+Reference is modeled explicitly with Discourse Representation Theory (DRT). Why: the measured
+anaphora rules (§2.4) need stable referent identities, clause boundaries, grammatical roles and
+nested boxes. Positional binding stacks cannot supply these, because a binding's position shifts
+as others are pushed and removed.
 
 ### 2.1 The DRS
 
@@ -96,7 +107,9 @@ happens ([CR#614.6,614.15]).
 
 ### 2.3 Definition Reference Scope
 
-A Definition body runs in its own Reference Scope:
+A Definition body runs in its own Reference Scope. Why: the rules define a keyword independently
+of the sentence that uses it. So a pronoun inside the body must not find the caller's referents,
+and the body's own scratch referents must not leak out to the caller's pronouns.
 
 - The caller's referents are hidden from it, except its arguments and the innermost Actor. A
   referent hidden by an enclosing Definition stays hidden.
@@ -155,8 +168,25 @@ Source coordinated with the phrase is its anchor. Otherwise the anchor is, in or
 
 ## 3. Definitions and Templates
 
-A declaration's kind decides whether it is a Definition or a Template; its file path never does.
-Definitions are trusted, and their bodies are checked at every use that expands them.
+The language has three kinds of named word, because there are three different jobs:
+
+- **A primitive** is the one binding between a word and a model constructor. The model's own
+  vocabulary is therefore named in exactly one place, and everything else is built from words.
+  Without primitives, constructor names leak into cards and Templates, and the model cannot change
+  without editing them.
+- **A Definition** is vocabulary the rules define: a keyword action or ability ([CR#701.1,702.1]),
+  a Counter, a Designation. It carries rules meaning: a Deed that triggers, lookbacks and
+  prohibitions can name ("whenever you scry", "can't be regenerated"), and its own Reference Scope
+  (§2.3).
+- **A Template** is printed wording only. It expands transparently into the expressions its parts
+  would be written as, and it adds no meaning.
+
+They are kept apart because conflating them goes wrong both ways. A phrasing given a Deed or a
+scope invents a rules distinction the CR does not make: an event then matches it, and referents it
+should see are hidden from it. A rules-defined keyword treated as a phrasing loses its identity, so
+"can't X" and "whenever X" can no longer name it. So a declaration's kind decides which it is; its
+file path never does, since inferring the role from location is what let the two drift apart under
+v2. Definitions are trusted, and their bodies are checked at every use that expands them.
 
 ### 3.1 Keyword Actions and Deeds
 
@@ -177,7 +207,11 @@ The binding is generated, never hand-written, so targets are not duplicated ([CR
 
 ### 4.1 One Action Per Verb
 
-Every verb is one Action, its bare infinitive verb phrase. Seven contexts embed that Action
+Every verb is one Action, its bare infinitive verb phrase. Why: otherwise each verb is encoded once
+per clause mood (as an instruction, an event, a prohibition and a lookback), each copy with its own
+subject and patient plumbing, and the copies drift apart. With one Action, "sacrifice" means the same
+thing in "sacrifice a creature", "whenever you sacrifice", "can't be sacrificed" and "if you
+sacrificed". Seven contexts embed that Action
 directly, with no double wrapping:
 
 | Context | Form |
@@ -195,7 +229,9 @@ subject, action and agent. A context adds only what is its own.
 
 ### 4.2 Voice
 
-A Subject is one of three:
+Voice belongs to the Subject, not to the Action, so the passive needs no separate event. The
+passive matters only because it promotes the patient to grammatical subject, and roles drive
+pronoun resolution (§2.4). A Subject is one of three:
 
 - `actor(np)`: active. `np` is read first and is the Actor.
 - `any`: passive with no agent. The patient is promoted to subject.
@@ -216,7 +252,8 @@ word of its own.
 
 ### 4.5 Before and After the Event
 
-`would` reads its Action **before** the event. Its patients are still in their old zone, and
+A replacement must see the world the replaced event would change, so `would` reads its Action
+**before** the event. Its patients are still in their old zone, and
 prospective amounts such as "that many" exist, but products such as a drawn card do not
 ([CR#614.6]). Every other context reads its Action **after** the event: patients have moved, are
 stamped with the deed, and become new objects where [CR#400.7] applies.
@@ -283,16 +320,21 @@ A lookback is `did(subj, action, within)`, with an optional Event Ordinal.
 ### 5.1 Files and Syntax
 
 - **First-order data.** Every declaration body is a tree of calls. There is no evaluation, there
-  are no local bindings or higher-order parameters, and there is no type inference.
+  are no local bindings or higher-order parameters, and there is no type inference. Why: every
+  tool (the Rust pipeline, the Lean generator, the formatter, the citation checker) can read a file
+  without an evaluator, and what a file says is what it means.
 - **No coercions.** Only the direct sort atoms of §5.2 resolve implicitly. Every wrapper is written,
-  `actor(…)` included.
-- **Reads are marked.** `$name` reads a parameter; a bare word never does.
+  `actor(…)` included. Why: a coercion hides which word was meant. Uglier but simpler is the
+  point; coercions may return deliberately once the language is simple enough to refactor.
+- **Reads are marked.** `$name` reads a parameter; a bare word never does. Why: what a word refers
+  to can be read from its spelling, and a parameter can never shadow a word.
 - **Argument order carries no meaning.** Named arguments may stand anywhere, so a call can follow
   printed order.
 - **Notation.** `=` binds and `:` means "has sort". A leading `.` appears only where a primitive
   names its constructor.
 - **One block per declaration** holds three layers: `lexical`, `spelling` and the meaning (`body`,
-  `confers`, `rules`). Keyword `parameters` are spelling frames and live in `lexical`.
+  `confers`, `rules`). Why: a word's frames, spelling and meaning are one fact, so they have one
+  source. Keyword `parameters` are spelling frames and live in `lexical`.
 - **Citations live in comments.** There is no `rule` field; `cargo xtask cite` checks the comments.
 - **Paths are for people.** Folder and file names never carry meaning.
 
@@ -300,7 +342,9 @@ A lookback is `did(subj, action, within)`, with an optional Event Ordinal.
 
 1. **Primitives.** A primitive is a constructor's only binding. Fixed arguments and helpers belong
    in Templates over it.
-2. **Expected-sort dispatch.** No two declarations share a `(name, sort)`. At expected sort `T`, a
+2. **Expected-sort dispatch.** One printed word may build different sorts (`and`, `target`,
+   `did`), so names are keyed by `(name, sort)` instead of being qualified. No two declarations
+   share a `(name, sort)`. At expected sort `T`, a
    word resolves in constant time, with no backtracking, in this order:
    1. `$name`: a parameter of the enclosing declaration;
    2. `none`, if `T` is optional;
@@ -317,7 +361,8 @@ A lookback is `did(subj, action, within)`, with an optional Event Ordinal.
      in its Reference Scope under its Deed.
    - `.syl` cannot write a scope, a mention, a raw Deed or a keyword wrapper.
    - Which occurrence of a parameter is its first mention is decided after expansion, in the order
-     the checker reads. It is never decided by written argument order. For example, a passive
+     the checker reads. Why: the first mention is the one that introduces referents, so it must be
+     the occurrence actually read first. It is never decided by written argument order. For example, a passive
      `by(np)` reads the patient before `np` (§4.2).
 
 ## 6. Standing Mechanisms
