@@ -143,7 +143,7 @@ private def mangaraContext : DRS :=
 /-- *Mangara's Equity*: "Whenever a creature of the chosen color deals damage to you or a white
 creature you control, this enchantment deals that much damage to that creature." The disjunction
 "you or a white creature you control" keeps no alternative's participant
-(`stepNounAlternativesWith`, `semantics-v3.md` §2.1, §2.4, the eleven measured sites), so the raw "that creature"
+(`stepNounAlternativesWith`, `semantics-v3.md` §2.1, §2.4), so the raw "that creature"
 reads the damage source, and the whole line checks with no explicit selector. -/
 theorem mangarasEquityRawDemonstrativeSelectsTheDamageSource :
     selected (.type .creature) mangaraContext = [["mangara.source"]] ∧

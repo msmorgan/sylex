@@ -1661,7 +1661,7 @@ def stepNounAlternativesWith (ops : StepOps) (drs : DRS) (role : GramRole)
   -- Each alternative is stepped from the enclosing context, and only what every alternative
   -- introduces is kept (`commonHeaderContext`): one alternative's participant is no antecedent of
   -- the text after it, so after "deals damage to you or a white creature you control", "that
-  -- creature" reads the source (*Mangara's Equity*, `semantics-v3.md` §2.1, §2.4, the eleven measured sites). An
+  -- creature" reads the source (*Mangara's Equity*, `semantics-v3.md` §2.1, §2.4). An
   -- alternative that reads an earlier mention reads it as any mention does.
   let common := (commonHeaderContext drs (branches.map (·.1))).referents.filter (·.id ≥ drs.nextId)
   let kept := fun (id : ReferentId) => id < drs.nextId || common.any (·.id == id)
