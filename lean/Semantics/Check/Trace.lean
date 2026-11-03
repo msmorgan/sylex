@@ -5,9 +5,10 @@ A default-off side channel for the discourse exporter (`lean/DiscourseExport/`).
 calls `Trace.frame` (or `frameWith`, which also summarises what a referring phrase resolved to) at
 its stepping closures, `Trace.emit` where it mints or moves a referent, and `Trace.rewrite` where
 it steps a rewritten copy of a card's node. All are the identity on their result (`emit_eq`,
-`rewrite_eq`, `frameWith_eq`); while no exporter has switched the log on (`Trace.log` is `none`)
-their compiled forms only read the switch. The log lives outside the `DRS`, so a branch that rolls
-the context back cannot drop its events.
+`rewrite_eq`, `frame_eq`, `frameWith_eq`, `scope_eq`); while no exporter has switched the log on
+(`Trace.log` is `none`) their compiled forms only read the switch. The log lives outside the
+`DRS`, so a branch that rolls the context back cannot drop its events. The implementations are
+`never_extract` too, as the compiler checks the callee after the `implemented_by` swap.
 
 Disposable: deleted with Lean (`lean-retirement`).
 -/
@@ -35,7 +36,8 @@ its place. -/
 /-- The log; `none` while tracing is off. -/
 initialize log : IO.Ref (Option (Array Event)) ← IO.mkRef none
 
-@[noinline] private unsafe def emitImpl {α : Type} (event : Unit → Event) (value : α) : α :=
+@[noinline, never_extract]
+private unsafe def emitImpl {α : Type} (event : Unit → Event) (value : α) : α :=
   unsafeBaseIO do
     log.modify fun state => state.map (·.push (event ()))
     return value
@@ -44,7 +46,8 @@ initialize log : IO.Ref (Option (Array Event)) ← IO.mkRef none
 @[implemented_by emitImpl, never_extract]
 def emit {α : Type} (_event : Unit → Event) (value : α) : α := value
 
-@[noinline] private unsafe def rewriteImpl {α : Type} (original result : α) : α :=
+@[noinline, never_extract]
+private unsafe def rewriteImpl {α : Type} (original result : α) : α :=
   unsafeBaseIO do
     log.modify fun state =>
       state.map (·.push (.rewritten (ptrAddrUnsafe result) (ptrAddrUnsafe original)))
@@ -54,7 +57,8 @@ def emit {α : Type} (_event : Unit → Event) (value : α) : α := value
 @[implemented_by rewriteImpl, never_extract]
 def rewrite {α : Type} (_original result : α) : α := result
 
-@[noinline] private unsafe def frameImpl {α : Type} {β : Type} (kind : String) (node : α)
+@[noinline, never_extract]
+private unsafe def frameImpl {α : Type} {β : Type} (kind : String) (node : α)
     (summary : Unit → β → List Nat × String × Nat) (body : Unit → β) : β :=
   unsafeBaseIO do
     let on ← log.modifyGet fun state => match state with
@@ -84,6 +88,12 @@ def frameWith {α : Type} {β : Type} (_kind : String) (_node : α)
 
 @[simp] theorem rewrite_eq {α : Type} (original result : α) :
     rewrite original result = result := rfl
+
+@[simp] theorem frame_eq {α : Type} {β : Type} (kind : String) (node : α) (body : Unit → β) :
+    frame kind node body = body () := rfl
+
+@[simp] theorem scope_eq {β : Type} (label : String) (body : Unit → β) :
+    scope label body = body () := rfl
 
 @[simp] theorem frameWith_eq {α : Type} {β : Type} (kind : String) (node : α)
     (summary : Unit → β → List Nat × String × Nat) (body : Unit → β) :

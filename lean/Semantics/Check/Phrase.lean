@@ -1551,7 +1551,8 @@ def stepRelativeDidWith (ops : StepOps) (drs : DRS) (whichRef : Referent) (claus
     DRS × List Refusal :=
   let subDrs := nextClause drs
   let binderId := subDrs.nextId
-  let subDrs' := { subDrs.push whichRef .other false with
+  -- The head `which` binds: the discourse exporter keys it to the described noun phrase.
+  let subDrs' := { Trace.scope "RelativeHead" (fun _ => subDrs.push whichRef .other false) with
     relativeBinder := some binderId, relativeUses := 0 }
   let (out, errs) := stepDidClauseWith ops subDrs' clause
   (leaveRelative drs out, errs ++ refuse (out.relativeUses != 0) .whichUnused ++
