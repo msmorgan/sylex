@@ -20,8 +20,8 @@ and so can a bare "sacrifice a creature".
   any plurality by a predicate while mentioning it once. A partitive over the subject is refused
   for a singular one (`partitiveBase`; a Saga's `sacrifice(thisSaga)`), and
   `doIf(is(subject, actorControls), move(subject, …))` mentions the subject twice and exposed
-  `discourse-parameter-argument-resolution`. Add that restrictor in Rust `semantics`, then write
-  sacrifice with it: one mention of the subject.
+  Lean's multi-use parameter resolution defect (fixed in `discourse-core`). Add that restrictor in
+  `deckmaste_semantics_v3`, then write sacrifice with it: one mention of the subject.
 - The body then reads its performer, so a Handoff ("target opponent sacrifices a creature") binds
   whose permanents are eligible.
 - Bare `graveyard` is `zone(graveyard, none)`, a bare zone name; nothing in the model contradicts

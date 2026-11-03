@@ -12,8 +12,9 @@ already retired, and `deckmaste_spelling` is now a stub crate;
 `deckmaste_semantics_v2`,
 `plugins_v2/canon/`, and `plugins_v2/builtin/` are retired in
 `semantics-v3-dsl-and-plugins`, and the pre-v4 `deckmaste_lexical_source` was
-retired in `english-v4-cutover-v3`), use the `semantics`, `discourse`, and `lowering`
-crates from `semantics-rust-rewrite`, move `plugins_v3/` to `plugins/`, drop the symlink, and re-point
+retired in `english-v4-cutover-v3`), use the `deckmaste_semantics_v3`, `deckmaste_discourse`, and
+`deckmaste_lowering_v3` crates from `semantics-rust-rewrite` (dropping the `_v3` suffixes), move
+`plugins_v3/` to `plugins/`, drop the symlink, and re-point
 `deckmaste_migrations`. Coordinate with `idris-retirement` and
 `english-v4-final-suffix-cutover` (whose remaining scope moves
 `catalogs/*.ron` into `plugins/` metadata and deletes `deckmaste_features`;

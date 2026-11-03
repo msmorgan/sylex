@@ -95,8 +95,9 @@ private structure Frame where
 
 structure Alignment where
   bindings : Array Binding := #[]
-  /-- The card has a stepped `laterMention`, whose use the checker never checks against its own
-  slot (`discourse-parameter-argument-resolution`, defect 2), so its verdict may differ. -/
+  /-- The card has a stepped `laterMention`, whose use the Lean checker never checks against its
+  own slot (Lean multi-use parameter defect, which `discourse-core` fixes), so its verdict may
+  differ. -/
   verdictFlagDefect : Bool := false
   frames : Nat := 0
   aligned : Nat := 0
@@ -290,7 +291,7 @@ def align (env : Environment) (positions : Array Position) (slots : Array Nat)
     positions[q]!.ctor == ``Semantics.NounPhrase.firstMention ||
       positions[q]!.ctor == ``Semantics.NounPhrase.laterMention
   -- A twice-used parameter's bare pronoun argument resolves at its first use only
-  -- (`discourse-parameter-argument-resolution`): the mention, or the pronoun directly in it.
+  -- (`discourse-core`): the mention, or the pronoun directly in it.
   let flagged := fun (q : Nat) =>
     let twiceUsed := fun (m : Nat) => isMention m && steppedLater.contains positions[m]!.detail &&
       (argument m).any barePro

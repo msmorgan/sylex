@@ -15,6 +15,11 @@ the trailing-underscore names) and an AST that records no written order. `idris/
 - Delete `cargo xtask lean` and every other Lean-only xtask command, the Lean CI job, the Lean
   cache provisioning in `scripts/provision-workspace`, and Lean-only settings, skills and hooks
   references the repo carries.
+- Before deleting, port the Lean AST's doc comments onto the Rust types in
+  `crates/deckmaste_semantics_v3/src/ast` (their only doc line points into `lean/Semantics/`), with
+  every CR citation audited. The generator `semantics-rust-crate` describes runs only while
+  `lean/` exists. `cr-coverage.lock` is not lowered: every rule cited only in `.lean` files must be
+  cited again where it now lives.
 - Update `CLAUDE.md` (crate fates, Bearings, Tests for a landing), `docs/decisions/semantics-v3.md`
   and the memory index entries that name Lean as current.
 - The `lean-v3-*` and `plugins-v3-*` tickets that need this one are then done in `.syl` and Rust

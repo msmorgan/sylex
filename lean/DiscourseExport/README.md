@@ -40,8 +40,8 @@ refusal kinds (constructor names), never Lean's refusal list itself. Every other
 (quantified, `∧`, `≠`, `let`, statements over checker internals) is one checklist line with
 the reason it is not a fixture; `docs/semantics-spec-catalog.md` covers those. `theorem` is
 the catalog's `File.theorem` spelling. `flagDefect` marks the names the catalog marks FLAG
-DEFECT (`discourse-parameter-argument-resolution`): those in a marked entry's `from:` clause,
-and all of section 5 (Binding identity), whose heading marks its entries.
+DEFECT (Lean's multi-use parameter defect, which `discourse-core` fixes): those in a marked entry's
+`from:` clause, and all of section 5 (Binding identity), whose heading marks its entries.
 
 ## `bindings.jsonl`
 
@@ -86,12 +86,12 @@ began at the ability's own top node. `lastIn` names the passes whose last steppi
 mention so: the reading with `check` there is the one Lean's verdict rests on, and the one
 `discourse` is expected to produce.
 
-**FLAG DEFECT** (`discourse-parameter-argument-resolution`). A mention's `flagDefect` is set when
-it is a `firstMention` or `laterMention`, or the pronoun directly inside one (through
-`inCaller`), whose argument is a bare pronoun and whose Binding Identity has a stepped
-`laterMention` in the card: the argument then resolves at its first use only (defect 1). A
-card's `verdictFlagDefect` is set when the card has any stepped `laterMention`, whose use Lean
-never checks against its own slot (defect 2), so its verdict may differ.
+**FLAG DEFECT** (Lean's multi-use parameter defect, which `discourse-core` fixes). A mention's
+`flagDefect` is set when it is a `firstMention` or `laterMention`, or the pronoun directly inside
+one (through `inCaller`), whose argument is a bare pronoun and whose Binding Identity has a stepped
+`laterMention` in the card: the argument then resolves at its first use only. A card's
+`verdictFlagDefect` is set when the card has any stepped `laterMention`, whose use Lean never
+checks against its own slot, so its verdict may differ.
 
 ## How bindings are found
 

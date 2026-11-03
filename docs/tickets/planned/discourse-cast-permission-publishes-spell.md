@@ -1,5 +1,5 @@
 ---
-needs: [semantics-rust-rewrite]
+needs: [discourse-events-deontics]
 ---
 # `discourse`: a card a cast permission names is "that spell" to the text after it
 

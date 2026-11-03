@@ -6,10 +6,10 @@ obligation, a minimal setup, the expected result, and the Lean theorem(s) it cam
 as of this catalog. Positive fragments are carried only where they are the sole evidence for a
 constructor; the canon `.syl` cards are the positive corpus.
 
-Entries marked FLAG DEFECT may depend on the Lean defect in
-`docs/tickets/planned/discourse-parameter-argument-resolution.md`; verify them against that fix
-rather than porting their expected results as they are. Behaviour the sources record as wrong or
-unchecked is not carried as spec; it is listed in `discourse-catalog-open-items`.
+Entries marked FLAG DEFECT may depend on the Lean multi-use parameter resolution defect which
+`docs/tickets/planned/discourse-core.md` fixes; verify them against that fix rather than porting their
+expected results blindly. Behaviour the sources record as wrong or unchecked is not carried as spec;
+it is fixed across the `discourse-*` tickets of `semantics-rust-rewrite`.
 
 # Part 1: Core reference resolution
 
@@ -29,10 +29,10 @@ Reading aids (terms the setups use):
   creature`, `that player`, `that card` (resolved by most recently introduced compatible Referent).
 - "refuses X" = the checker returns exactly that refusal kind and nothing else.
 - Expected-result shorthand `[]` = no refusals.
-- FLAG DEFECT = depends on, or is exposed to, the Lean defect in
-  `docs/tickets/planned/discourse-parameter-argument-resolution.md` (a Definition parameter used twice
-  resolves its caller argument at its first use only). Such entries are marked and their setups are
-  accepted only because later uses are unchecked, or the check is order dependent.
+- FLAG DEFECT = depends on, or is exposed to, the Lean multi-use parameter resolution defect which
+  `docs/tickets/planned/discourse-core.md` fixes (a Definition parameter used twice resolves its caller
+  argument at its first use only). Such entries are marked and their setups are accepted only
+  because later uses are unchecked, or the check is order dependent.
 
 ### 1. Pronoun resolution (bare `it`/`them`)
 
@@ -903,7 +903,7 @@ Scope: all Proofs files except DrtResolution, DrtRecency, DrtWitnesses, Contrast
 - **A clause-mate pronoun cannot read its own clause's subject; re-mentioned subject excludes clause-mate pronoun** — setup: `instruct targetCreature (dealDamage 2 it)`; `tap target creature` then `instruct it (dealDamage 2 it)` — expect: `.anaphor .bare .one 0` each — from: CheckerCore.clause_mate_pronoun_refused, CheckerCore.rementioned_subject_excludes_clause_mate_pronoun
 - **Compound actions are not event heads** (semantics-v3 §3.6) — setup: `sequentially` inside `does`/`would`/`did`/`cant`; a Definition's `ownScope` header is admitted — expect: `.eventHead` — from: CheckerCore.compound_event_head_refused
 - **A keyword body cannot read its caller; a Definition cannot read an unpassed caller** — setup: `flying` keyword with `.static (.cant .any (.block it) {})`; `tap target creature` then `ownScope (.setStatus .tapped it)` — expect: `.anaphor .bare .one 0`; `.anaphor (.atSlot .permanent) .one 0` — from: DefinitionsAndTemplates.keywordBodyCannotReadCaller, DefinitionsAndTemplates.definitionCannotReadUnpassedCaller
-- **A template keeps its target count** — setup: `dealDamageOwnPower (target creature) (target creature)` — expect: two targets (see ticket `discourse-parameter-argument-resolution` caveat: each parameter is resolved at first use only — do not port this entry's single-use assumption to repeated parameters) — from: DefinitionsAndTemplates.templateKeepsSingleTarget
+- **A template keeps its target count** — setup: `dealDamageOwnPower (target creature) (target creature)` — expect: two targets (Lean multi-use parameter defect, which ticket `discourse-core` fixes: each parameter is resolved at first use only — do not port this entry's single-use assumption to repeated parameters) — from: DefinitionsAndTemplates.templateKeepsSingleTarget
 - **A Definition's header is its one deed; bare shapes name no deed** — setup: action Definition header; bare move to exile / status change / creation — expect: header deed read by the gate, the caused event and the stamp; bare shapes name none — from: DefinitionsAndTemplates.headerDeedIsReadByTheGateAndTheStepper, DefinitionsAndTemplates.bareShapesNameNoDeed
 - **Graveyard-to-hand verbs expand to the same move** — setup: `Return <subject> from your graveyard to your hand` / `put <subject> into your hand from your graveyard` — expect: same move, origin kept — from: DefinitionsAndTemplates.graveyardToHandVerbsExpandToOneMove
 - **"and", "or", "and/or" are three encodings** (noun phrases, locations; `flying and/or reach` ≠ `flying or reach` [CR#702.9b]) — from: DefinitionsAndTemplates.nounPhraseCoordinatorsAreDistinct, DefinitionsAndTemplates.locationCoordinatorsAreDistinct, DefinitionsAndTemplates.flyingAndOrReachIsNotFlyingOrReach
@@ -1008,7 +1008,7 @@ Method: constructors from the `inductive` blocks of `lean/Semantics/*.lean` (913
 
 ## Caveats flagged in entries
 
-- **Definition parameter used twice resolves its caller argument at its first use only** (ticket `discourse-parameter-argument-resolution`): no entry is stated to depend on it. The closest is DefinitionsAndTemplates.templateKeepsSingleTarget (two distinct argument phrases, so two targets); the entry carries an explicit "do not port" caveat for repeated parameters. Templates with a repeated parameter (the `dealDamageOwnPower`-style "its power" templates, controller-sacrifices) were not audited for this; a porter should check any entry whose setup repeats a Template parameter.
+- **Definition parameter used twice resolves its caller argument at its first use only** (which ticket `discourse-core` fixes): no entry is stated to depend on it. The closest is DefinitionsAndTemplates.templateKeepsSingleTarget (two distinct argument phrases, so two targets); the entry carries an explicit "do not port" caveat for repeated parameters. Templates with a repeated parameter (the `dealDamageOwnPower`-style "its power" templates, controller-sacrifices) were not audited for this; a porter should check any entry whose setup repeats a Template parameter.
 - **Unchecked areas the sources document**: Actor.badHandedOffLifeCost, Actor.badNestedHandoffInnermost and Actor.badGrantedAbilityKeepsItsOwnPerformer note "who pays a cost is not checked (`lean-checker-sweep-costs`)", and Static.badGainsCommander notes that a rule conferring the commander designation is not asserted (`lean-checker-sweep-game-rules`). The entries state only what is refused today; the porter should not read them as saying the unchecked cases are acceptable.
 
 ## Counts
