@@ -1,7 +1,7 @@
 # sylex_vocabulary
 
-The core English lexicon and the Catalogs of English v4
-([`docs/decisions/english.md`](../../docs/decisions/english.md) §§2, 5),
+The core English lexicon and the Catalogs of the English layer
+([`docs/decisions/english.md`](../../docs/decisions/english.md) §2),
 loaded as one Lexical Environment: a `sylex_lexicon::Lexicon` and the
 `sylex_syntax::FrameCatalog` of its Subcategorization Frames.
 
@@ -157,7 +157,7 @@ scope and the loader's rejections. The grammar-leak lint lives with the grammar,
 
 Plugin-declared vocabulary arrives when `plugins/` does; at
 `english-v4-final-suffix-cutover` the catalogs move into plugin declaration
-metadata. (The `_v4` suffix is already dropped.)
+metadata.
 
 A keyword's final `Cost` is one Keyword Parameter whose spelling is chosen by
 the cost: mana-only follows a space (`Ward {2}`); a cost containing words

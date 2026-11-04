@@ -9,5 +9,4 @@ construct is used. Card rulings are never recorded here.
 - [Syl](syl.md): the `.syl` data language.
 - [Core](core.md): the compiled core that the engine executes.
 - [Engine](engine.md): the engine's laws.
-- [English](english.md): the data-driven syntax engine, domain catalogs and stratified buildout.
-- [English lexical analysis](english-lexical-analysis.md): Readings and keeping the grammar small.
+- [English](english.md): the English grammar and parser: crate split, Catalog constraint, admission, ranking and the round-trip contract.

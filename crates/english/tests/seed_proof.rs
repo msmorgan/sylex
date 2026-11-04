@@ -502,7 +502,7 @@ fn normal_form_identifies_clause_and_verb_phrase_coordination_of_imperatives() {
 fn normal_form_identifies_bare_noun_phrase_and_nominal_coordination() {
     let s = seed();
     // With nothing outside it to share, a bare coordination is of Noun
-    // Phrases (`english-lexical-analysis.md` §2, bare coordination).
+    // Phrases (`docs/decisions/english.md` §8).
     let readings = s.readings("Destroy creatures and permanents.");
     assert_eq!(readings.len(), 1);
     let phrases = &readings[0];

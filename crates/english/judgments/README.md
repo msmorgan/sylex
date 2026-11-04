@@ -1,7 +1,6 @@
 # Judgment set
 
-The hand-written linguistic judgments of `sylex_english`
-([`docs/decisions/english-lexical-analysis.md`](../../../docs/decisions/english-lexical-analysis.md) §5).
+The hand-written linguistic judgments of `sylex_english`.
 It is the only tracked linguistic test evidence: one line per entry, no tree
 dumps, nothing a tool emitted. Each `*.txt` file here holds the entries for one
 topic. `seed.txt` is evaluated against the seed lexicon of
@@ -70,7 +69,7 @@ endorsed constituent structure is admitted, and a `!` assertion or a `*` entry
 that a form is not. No entry fails because a well-formed alternative ties
 with the endorsed Reading or ranks ahead of it: the Ranking Key is a heuristic
 traversal and presentation order, not a correctness gate
-(`docs/decisions/english.md` §4.4, principle 4). Assert a count only when the
+(`docs/decisions/english.md` §5). Assert a count only when the
 count is the claim: exactly one Reading, or exactly the set of analyses each
 of which is endorsed. Where English grammar admits a dispreferred analysis
 beside the intended one, assert the intended analysis, not that the other
@@ -78,19 +77,19 @@ analysis is absent.
 
 ## What a negative entry may claim
 
-The grammar parses Oracle text into Readings that keep the legitimate
-Ambiguity and no more; it does not validate templating. Text that Oracle
-would template differently (digits for a spelled number, a capital, a glyph,
-a missing comma, *if possible* for *if able*) may parse incidentally, and
-that is fine. The grammar does not police strings that no card contains. A `*`
-entry is a minimal ungrammatical variant of a real or cited construction. It
-pins a formation rule that generation needs: agreement in Person, Number or
-Countability (*a creatures*, *You draws cards.*), Case (*Draw cards from
-they.*), verb form (*choose not untap this creature*), order or selection. Cite
-its source card where one exists. A constraint that keeps a spurious Reading off real
-Oracle text is witnessed by a `+` entry on that text, with a `!` assertion or
-a Reading count. A rule, feature or production that would exist only to reject
-some text is never added, and no entry asks for one.
+The grammar parses Oracle text into Readings that keep the legitimate Ambiguity
+and no more; it does not validate templating. Text that Oracle would template
+differently (digits for a spelled number, a capital, a glyph, a missing comma,
+*if possible* for *if able*) may parse incidentally, and that is fine. The
+grammar does not police strings that no card contains. A `*` entry is a minimal
+ungrammatical variant of a real or cited construction. It pins a formation rule
+that generation needs: agreement in Person, Number or Countability (*a
+creatures*, *You draws cards.*), Case (*Draw cards from they.*), verb form
+(*choose not untap this creature*). It never pins an unprinted word order or
+combination. Cite its source card where one exists. A constraint that keeps a
+spurious Reading off real Oracle text is witnessed by a `+` entry on that text,
+with a `!` assertion or a Reading count. A rule, feature or production that
+would exist only to reject some text is never added, and no entry asks for one.
 
 An entry's text is real Oracle text (a corpus unit, or a contiguous span of one
 under a Category mark), or a simplification of a named card's text that keeps
@@ -175,28 +174,3 @@ Each was settled while adjudicating the migrated judgments.
 * You draws cards.
 +NounPhrase target creature with flying => PrepositionPhrase "with flying" as Modifier of creature
 ```
-
-The state adjectives `tapped` and `untapped` coexist with the verbal participles.
-The premodifier judgments require both analyses; the depictive `enters tapped`
-requires the adjective. Transform also explicitly declares the state adjective
-`transformed`; the Garland and Startled Awake judgments require its depictive
-Adjunct reading. Short focused Objects may be postposed after a PP.
-Temporal/manner Objects are not globally forbidden by their game meaning.
-The scalar complement in `base power 0` attaches to `power`, with `base`
-modifying that headed nominal. `until counter spells` retains the noun-premodifier
-reading of `counter spells`, while rejecting a subjectless finite Clause.
-
-Independent genitives agree with the possessed referent, not the possessor.
-Quantity nominals use general determination, including `an additional two
-creatures` and `every two turns`. Articles select modified quantities; `a two creatures` remains rejected.
-Distributive quantities have singular external agreement. `each two turns` and
-`every two creatures` now assert the quantity nominal instead of rejection.
-The Targeting Marker is `det:target`, the last word of its Determiner
-(`DeterminerPhrase "target" as Determiner of creature` in `target creature`,
-`DeterminerPhrase "two target" as Determiner of creature` in `two target
-creatures`); the Target Noun has no attributive noun use. Bare numeric arguments select Amount
-complements rather than becoming arbitrary recipient or object Noun Phrases;
-numeric subjects and predicatives retain their Noun Phrase analyses.
-The `vocabulary_batch_1` judgment for `different kinds of counters` requires
-the noun-headed nominal and its selected `of` Complement, without pinning a
-separate intermediate `kinds` projection.

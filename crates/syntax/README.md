@@ -1,8 +1,7 @@
 # sylex_syntax
 
-The unversioned, data-driven syntax engine of English v4
-([`docs/decisions/english.md`](../../docs/decisions/english.md),
-[`docs/decisions/english-lexical-analysis.md`](../../docs/decisions/english-lexical-analysis.md)).
+The data-driven syntax engine of the English layer
+([`docs/decisions/english.md`](../../docs/decisions/english.md)).
 It has no proc macros and no generated code: a grammar is data.
 
 ## Data flow
@@ -20,7 +19,7 @@ It has no proc macros and no generated code: a grammar is data.
    Category's features, its Gap, and the engine-derived facts a parent may check.
 4. `Parse::best_readings(k) -> impl Iterator<Item = Reading> + '_` yields
    up to `k` Readings by Ranking Key
-   (`RankingKey`, `docs/decisions/english.md` §4.3): Attachment Class,
+   (`RankingKey`, `docs/decisions/english.md` §5): Attachment Class,
    then Right Association words, then summed Production Cost, compared in that
    order, with the Reading's own order as the final tie-break, so the best
    Reading is unique. Enumeration uses Huang & Chiang (2005),
@@ -374,7 +373,7 @@ adjunct whose object a relative clause binds).
 ## The lexicon-to-syntax interface
 
 The engine never names a grammar feature, value or Category
-(`docs/decisions/english.md` §4.4, principle 6), with one exception: the lexicon
+(`docs/decisions/english.md` §1), with one exception: the lexicon
 feature-bundle mapping table, the single declared interface through which
 lexical facts reach the grammar's features. It is `PROJECTED` in
 `compile.rs` (the grammar features the engine projects onto leaves: `Number`,
@@ -397,8 +396,8 @@ Gap kinds and its reserved child names are not grammar names.
 `typed_classes` names classes whose membership comes from the lexical
 environment's declared properties, including Catalog entries. Empty and
 singleton classes are reported. The grammar never enumerates their members.
-Binding reports features the same way (`english-lexical-analysis.md` §3,
-`english.md` §4.4, principle 3): a feature with no value, and a value with fewer than
+Binding reports features the same way (`docs/decisions/lexicon.md`,
+`english.md` §4): a feature with no value, and a value with fewer than
 two holders. A feature may declare one, privative, value, which is reported
 only by its holders. A value's holders are the lexemes that carry it and those
 that hold it through a Production setting it on its mother: the lexemes its
@@ -475,7 +474,7 @@ modal's bare infinitival is a Category of its own. When such a phrase is
 Production of its own Category whose later children are all `adjunct`s: a
 post-verbal Adjunct attaches to the lexical participial Verb Phrase inside it
 (*was [put there from the battlefield this turn]*, *have [lost this turn]*), so
-the duplicate site above it is never built (`english-lexical-analysis.md` §2).
+the duplicate site above it is never built (`docs/decisions/english.md` §8).
 A coordination of auxiliary Verb Phrases still hosts an Adjunct its conjuncts
 share.
 

@@ -8,7 +8,8 @@ feature bundles, frame signatures and lexical values); declaration provenance,
 morphology, binding, tokenization, indexes, occurrences, numeral codecs, and
 realization stay in this deep module. This crate has no construction,
 catalog-I/O, game-model or grammar-compiler dependency. The governing contract is
-[independent lexical analysis](../../docs/decisions/english-lexical-analysis.md).
+the parser contract in
+[English](../../docs/decisions/english.md) §7.
 
 ## Input and morphology
 

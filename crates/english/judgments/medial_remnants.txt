@@ -6,8 +6,7 @@
 + <card=Hearth Elemental> This spell costs {X} less to cast, where X is the number of cards in your graveyard that are instant cards, sorcery cards, and/or have an Adventure. => PredicativeRemnant "sorcery cards"; NounPhrase "instant cards" as PredicativeComplement of be
 + <card=Frantic Firebolt> Frantic Firebolt deals X damage to target creature, where X is 2 plus the number of cards in your graveyard that are instant cards, sorcery cards, and/or have an Adventure. => PredicativeRemnant "sorcery cards"
 # A coordination of Predicatives under one copula is one tree: no later
-# conjunct of it is a remnant (`english-lexical-analysis.md` §2, medial
-# remnants; CGEL, Ch. 15 §3.2, pp. 1326–1327).
+# conjunct of it is a remnant (`docs/decisions/english.md` §8; CGEL, Ch. 15 §3.2, pp. 1326–1327).
 +Clause it is a creature, an artifact, and an enchantment => readings 1
 # The remnant's elided copula is the initial conjunct's, which agrees with the
 # Subject, as the other conjuncts do.

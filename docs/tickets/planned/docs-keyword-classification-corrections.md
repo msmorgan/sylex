@@ -1,11 +1,11 @@
 ---
 needs: []
 ---
-# Fix keyword-action numbers and misclassified mechanics in the ADRs
+# Fix keyword-action numbers and misclassified mechanics in `semantics.md`
 
-Two documents misnumber keyword actions or file a mechanic under the wrong
+`semantics.md` misnumbers keyword actions and files a mechanic under the wrong
 kind of rule. The Lean citations are already right in each case. Only the
-documents need fixing.
+document needs fixing.
 
 Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-docs.md`
 entries 16, 17 (the ADR part) and 47 (gitignored; read it from the default
@@ -42,15 +42,6 @@ checkout). All are confirmed at head as of 2026-10-21.
   under `asEvent` plus the entry replacement. Ascend and storied stay
   [CR#702.131b,702.195a]. Lean's `Keywords.lean` already uses
   replace/asEvent/cant here.
-
-## `docs/decisions/english.md` §2 (line 40)
-
-- The keyword-action catalog list includes `firebend`, which is a triggered
-  keyword ability [CR#702.189a]. Remove it from the list. (`earthbend`,
-  `waterbend` and `airbend` are keyword actions [CR#701.66,701.67,701.65].)
-  The lexical catalog already files firebending as a keyword ability
-  (`crates/vocabulary/catalogs/keyword_abilities.ron`).
-  Only the ADR is wrong.
 
 ## Out of this ticket
 

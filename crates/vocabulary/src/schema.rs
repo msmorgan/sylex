@@ -486,7 +486,7 @@ pub enum DeterminativeDistribution {
     /// whole class: never a bare quantified plural (*\*a three creatures*),
     /// and never the determiner of a temporal location Noun Phrase (*\*a
     /// day*; Ch. 8 §6.3, p. 698), an admission gate on `TemporalLocation`
-    /// (`docs/decisions/english.md` §4.5).
+    /// (`docs/decisions/english.md` §6).
     IndefiniteArticle,
     Distributive,
     /// Deictic *this*, *that*, *last* and *next*, which with a period noun form
@@ -508,7 +508,7 @@ pub enum DeterminativeDistribution {
     /// Ch. 5 §3.3, pp. 349–351), which keeps out *any number of target
     /// creatures becomes*, and keeps it out of the general ones, which would
     /// build a second tree of the same analysis
-    /// (`docs/decisions/english-lexical-analysis.md` §2).
+    /// (`docs/decisions/english.md` §8).
     FreeChoice,
     /// A fraction or multiplier before a determined Noun Phrase (*half their
     /// life*, *double that damage*; CGEL, Ch. 5 §7.3, p. 434).

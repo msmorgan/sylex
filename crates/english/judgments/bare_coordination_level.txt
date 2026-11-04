@@ -1,4 +1,4 @@
-# A coordination of bare Noun Phrases with nothing outside it to share is one coordination of Noun Phrases; a shared determiner or dependent takes a coordination of Nominals (english-lexical-analysis.md §2, bare coordination; CGEL, Ch. 15 §2.1, p. 1291)
+# A coordination of bare Noun Phrases with nothing outside it to share is one coordination of Noun Phrases; a shared determiner or dependent takes a coordination of Nominals (`docs/decisions/english.md` §8; CGEL, Ch. 15 §2.1, p. 1291)
 + Destroy creatures and lands. => NounPhrase "creatures"; NounPhrase "lands"; readings 1
 +NounPhrase damage and life => NounPhrase "damage"; NounPhrase "life"; readings 1
 +NounPhrase your devotion to white and black => NounPhrase "white"; NounPhrase "black"; readings 1

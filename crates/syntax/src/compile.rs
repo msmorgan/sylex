@@ -44,7 +44,7 @@ const FORBIDDEN_SUFFIXES: [&str; 5] = ["Use", "Licence", "License", "Present", "
 /// ([`CompiledGrammar::leaf_facts`]), this is the lexicon feature-bundle
 /// mapping table: the one declared lexicon-to-syntax interface, and the only
 /// place the engine names a grammar feature or value
-/// (`docs/decisions/english.md` §4.4, principle 6).
+/// (`docs/decisions/english.md` §1).
 pub(crate) const PROJECTED: [&str; 8] = [
     "Number",
     "Person",
@@ -952,7 +952,7 @@ impl<'a> Binder<'a> {
     /// Complement of its own Category, the participial Verb Phrase Complement
     /// of perfect *have* or of passive or progressive *be*, never a modal's
     /// bare infinitival. It hosts no post-verbal Adjunct
-    /// (`english-lexical-analysis.md` §2).
+    /// (`docs/decisions/english.md` §8).
     fn auxiliaries(&mut self) -> Result<(), LoadError> {
         let mut complements = BTreeMap::new();
         for (name, declaration) in &self.grammar.categories {
@@ -1462,8 +1462,8 @@ impl<'a> Binder<'a> {
     }
 
     /// Reports, as findings, a declared feature with no value and a feature
-    /// value with fewer than two holders (`english-lexical-analysis.md` §3,
-    /// `english.md` §4.4, principle 3). A feature may declare one value, a
+    /// value with fewer than two holders (`docs/decisions/lexicon.md`,
+    /// `english.md` §4). A feature may declare one value, a
     /// privative one, whose unvalued feature is the unmarked default; the
     /// value is still a finding unless it has two or more holders. A
     /// value's holders are the lexemes whose feature bundles carry it and

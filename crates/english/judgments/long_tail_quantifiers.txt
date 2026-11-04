@@ -18,7 +18,7 @@
 # Contrastive *but* joins Clauses as it joins Verb Phrases (CGEL, Ch. 15 §2.5, p. 1310).
 + <card=Wolverine, Fierce Fighter> If damage would be dealt to Wolverine, instead that damage is dealt, but all other damage already dealt to him is healed. => Clause "instead that damage is dealt, but all other damage already dealt to him is healed"
 + That damage is dealt, but all other damage is prevented. => Clause "That damage is dealt, but all other damage is prevented"
-# A frequency adverb and a temporal Noun Phrase are separate Adjuncts of the Verb Phrase, as in *once each turn* (`english-lexical-analysis.md` §2, frequency interval); *twice* multiplies a quantity only (*twice that many*).
+# A frequency adverb and a temporal Noun Phrase are separate Adjuncts of the Verb Phrase, as in *once each turn* (`docs/decisions/english.md` §8); *twice* multiplies a quantity only (*twice that many*).
 + Draw a card twice this turn. => AdverbPhrase "twice" as Adjunct of draw; NounPhrase "this turn" as Adjunct of draw; readings 1
 + Draw a card twice each turn. => AdverbPhrase "twice" as Adjunct of draw; NounPhrase "each turn" as Adjunct of draw; readings 1
 +NounPhrase twice that many cards => readings 1

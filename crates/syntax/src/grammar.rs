@@ -40,7 +40,7 @@ pub struct Grammar {
     pub slot_equations: BTreeMap<SlotKind, Vec<Equation>>,
     /// `(Category, feature, value)`: a dependent of that Category carrying
     /// that value attaches high by its Attachment Class, as a comma-set
-    /// Supplement does (`docs/decisions/english.md` §4.3): it counts its
+    /// Supplement does (`docs/decisions/english.md` §5): it counts its
     /// distance from its host's head reversed.
     #[serde(default)]
     pub high_attachment: Vec<(Ident, Ident, Ident)>,
@@ -168,7 +168,7 @@ pub struct ProductionDecl {
     /// Children that do not end, through their edge line, in a trailing
     /// Adjunct of one of these Categories: a dependent after the child that
     /// is coordinate with such an Adjunct is a basic coordination of the two,
-    /// never also attached beside it (`english-lexical-analysis.md` §2).
+    /// never also attached beside it (`docs/decisions/english.md` §8).
     #[serde(default)]
     pub unadjoined: Vec<(Ident, Vec<Ident>)>,
     /// Children through which a Gap may pass to the mother.
@@ -183,8 +183,8 @@ pub struct ProductionDecl {
     /// like that follower's lexical head has one of those forms: a phrase
     /// right after the site that could be the omitted Complement is that
     /// Complement, so no ellipsis is there (p. 1519), as with a bare noun's
-    /// omitted Complement (`english-lexical-analysis.md` §2, same-head
-    /// complement priority).
+    /// omitted Complement (`docs/decisions/english.md`
+    /// §8).
     #[serde(default)]
     pub elliptical: Option<Vec<sylex_lexicon::WordForm>>,
     /// The phrase opens with a single dash that only the end of its
@@ -297,7 +297,7 @@ pub enum Equation {
 /// Slot with no Adjunct is a Cluster only where it alone breaks parallelism,
 /// never last and before or between at least two Clusters that end in as many
 /// Adjuncts: a coordination of single Slots is their own coordination
-/// (`english-lexical-analysis.md` §2).
+/// (`docs/decisions/english.md` §8).
 /// The coordinates are parallel: every Cluster of one coordination is of the
 /// head's frame (p. 1341, [17ii]). The head takes the coordination as the
 /// child `clusters`, which bears no function; each dependent in a Cluster

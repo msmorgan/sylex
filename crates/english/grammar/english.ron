@@ -101,13 +101,13 @@
         // `FreeChoice` has one holder, *any*, and that is the whole class, as
         // `Serial` is *time*. Determined and DeterminedModifiedQuantity
         // exclude it, two admission gates (`docs/decisions/english.md`
-        // §4.5): Determined's routes *any* to FreeChoiceDetermined,
+        // §6): Determined's routes *any* to FreeChoiceDetermined,
         // TransparentQuantity and TemporalQuantity, which carry number
         // transparency (CGEL, Ch. 5 §3.3, pp. 349–351: never *any number of
         // target creatures becomes*); and with
         // DeterminedModifiedQuantity's, neither Production builds a second
         // tree of an analysis FreeChoiceDetermined or AgreeingModifiedQuantity
-        // builds (`docs/decisions/english-lexical-analysis.md` §2).
+        // builds (`docs/decisions/english.md` §8).
         // `IndefiniteArticle` (*a*) and `SingularOrQuantified` (*another*) each
         // have one holder, and each is the whole of its class. *A* alone
         // selects a singular head (CGEL, Ch. 5 §3.4, p. 353, set (a) [67]);
@@ -116,7 +116,7 @@
         // with *further* or *additional*, read by DeterminedModifiedQuantity.
         // The two also part in temporal location: *another day*, never *a
         // day* (Ch. 8 §6.3, p. 698), an admission gate on TemporalLocation
-        // (`docs/decisions/english.md` §4.5).
+        // (`docs/decisions/english.md` §6).
         // `Targeting` has one holder, the Targeting Marker *target* (project
         // term, `docs/contexts/oracle-english/CONTEXT.md`): a determinative
         // that only determines a nominal, so it is kept apart from
@@ -141,14 +141,14 @@
         // Phrase (*draw a card twice*): it modifies a Noun Phrase or a
         // measure only, never a Preposition Phrase or a temporal Noun Phrase,
         // where it would build a second tree for the frequency adverb's
-        // Adjunct (`english-lexical-analysis.md` §2, frequency interval).
+        // Adjunct (`docs/decisions/english.md` §8).
         "AdjunctPosition": ["Front", "Central", "End", "Phrasal", "Multiplying", "Bounding", "Linking"],
         // A Clause whose front position holds a dependent set off by a comma
         // (*If you do, ...*, *Once each turn, ...*). Front dependents that
         // share one comma are siblings in one Production (*Then if ...*,
         // *Once during each of your turns, ...*), so a front Adverb Phrase
         // without a comma never also precedes such a Clause: one tree per
-        // analysis (`english-lexical-analysis.md` §2). A Clause coordination
+        // analysis (`docs/decisions/english.md` §8). A Clause coordination
         // takes it from its first conjunct, where its front position is:
         // front dependents sharing one comma are siblings whether they scope
         // over the first conjunct or the whole (*Once each turn, C1, and
@@ -160,7 +160,7 @@
         // front Adjunct (*Also draw a card*, *Then [draw a card and discard
         // a card]*), as a chain of bare imperatives is coordinated Clauses,
         // and never also a central Adjunct of its Verb Phrase: one tree per
-        // analysis (`english-lexical-analysis.md` §2).
+        // analysis (`docs/decisions/english.md` §8).
         "CentralPosition": ["Occupied"],
         // A fused-head adjective that names a Quality with no noun of its own
         // (*protection from multicolored*), as the lexicon declares it.
@@ -226,7 +226,7 @@
         "AdjunctGapClause": (category: Some("Clause"), features: ["VerbForm"], gap: true),
         // A finite clause that opens with its Subject, as a bare relative's
         // does: no preposed adjunct comes before it (CGEL, Ch. 12 §3.5.5,
-        // p. 1055). An admission gate (ADR english.md §4.5): "Bare
+        // p. 1055). An admission gate (`docs/decisions/english.md` §6): "Bare
         // relatives always have the subject in initial position", so the
         // Category restates the Clause Productions that open with the Subject
         // and omits those that front an adjunct.
@@ -287,7 +287,7 @@
         "QuantifiedNominal": (category: Some("Nominal"), features: ["QuantityNumber", "NounKind", "Determination", "NounDistribution"]),
         "ModifiedQuantifiedNominal": (category: Some("Nominal"), features: ["QuantityNumber", "NounKind", "Determination", "NounDistribution"]),
         // A temporal nominal bounded by a relative clause (*next time you cast a
-        // spell*). An admission gate (`docs/decisions/english.md` §4.5),
+        // spell*). An admission gate (`docs/decisions/english.md` §6),
         // a formation rule: a Noun Phrase is a temporal Adjunct only
         // in restricted forms (CGEL, Ch. 8 §6.3, p. 698), and a temporal
         // nominal in one takes a *when*-less adverbial relative clause, then at
@@ -304,7 +304,7 @@
         // A Word-Part Coordination of Compound Nouns that share their head
         // word (*a +1/+1, first strike, or vigilance counter*), and each of
         // its Conjuncts: a first base alone, or, last, the whole Compound
-        // Noun, which never splits (`english-lexical-analysis.md` §2).
+        // Noun, which never splits (`docs/decisions/lexicon.md`).
         "CompoundCoordination": (category: Some("Nominal"), features: ["Number", "Countability", "NounKind", "NounDistribution"]),
         "CompoundConjunct": (category: Some("Nominal"), features: ["Number", "Countability", "NounKind", "NounDistribution", "CompoundPart"]),
         // A conjunct of a coordination of noun premodifiers: a noun premodifier,
@@ -320,7 +320,7 @@
         "TargetedNounPhrase": (category: Some("NounPhrase"), features: ["Number", "NounKind", "Countability"]),
         "BareNominalComplement": (category: Some("Nominal")),
         // A genitive's possessor: a Noun Phrase that ends in its head. An
-        // admission gate (`docs/decisions/english.md` §4.5), a
+        // admission gate (`docs/decisions/english.md` §6), a
         // register formation rule: English has the phrasal genitive (*the King
         // of England's daughter*; CGEL, Ch. 5 §16.6, p. 479), but Oracle never
         // postmodifies a possessor, and fronts the player noun instead "to
@@ -446,7 +446,7 @@
         "PostmodifierCoordination": (category: Some("Postmodifier"), function: true, features: ["ComplementKind"]),
         "Attribute": (category: Some("Attributes"), function: true, features: ["ComplementKind", "Polarity"]),
         // An asyndetic chain of premodifiers. An admission gate
-        // (`docs/decisions/english.md` §4.5), a register formation
+        // (`docs/decisions/english.md` §6), a register formation
         // rule: Oracle sets off with commas only independent *non-*
         // premodifiers of one head (`docs/oracle-style-guide.md` §6,
         // Determiners and modifier order), so the chain never holds an
@@ -698,7 +698,7 @@
     },
     // A distributive adjunct, whose Complement has a Distributive
     // determinative (*for each …*), anchors to the outermost eligible clause,
-    // as a comma-set Supplement does (`docs/decisions/english.md` §4.3,
+    // as a comma-set Supplement does (`docs/decisions/english.md` §5,
     // AttachmentClass).
     high_attachment: [("PrepositionPhrase", "DeterminativeDistribution", "Distributive")],
     productions: [
@@ -885,14 +885,14 @@
         // *protection from snow* [CR#205.4a]; CGEL, Ch. 5 §9.3, p. 417). A colour word is not: its
         // conversion to a noun is the Quality (*protection from red*; Ch. 19
         // §3.3, p. 1642), so the fused-head adjective of the same word would
-        // be a second tree for it (`docs/decisions/english-lexical-analysis.md`
-        // §2).
+        // be a second tree for it (`docs/decisions/english.md`
+        // §8).
         (name: "AdjectivalQuality", lhs: "Quality", rhs: [Cat("head", "AdjectivePhrase")], equations: [Carry("head.QualityHead", "Fused")], cost: 1),
         // Another card's full name costs one more than the face's own name,
         // so the face's own Shortened Name [CR#201.5c] ranks first where the
         // two are spelled alike (*Nicol Bolas* on Nicol Bolas, the Ravager).
         // Both stay Readings: full names are in scope everywhere
-        // (english-lexical-analysis.md §1).
+        // (`docs/decisions/lexicon.md`).
         (name: "NamedParameter", lhs: "Name", rhs: [Lex("head", Catalog)], scoped: ["head"]),
         (name: "SlashMeasure", lhs: "Measure", rhs: [Cat("first", "SignedAmount"), Mark('/', Bound), Cat("second", "SignedAmount")]),
         (name: "MeasureHeader", lhs: "Header", rhs: [Cat("head", "Measure")]),
@@ -1181,7 +1181,7 @@
         // non-final Conjunct of a Nominal Coordination: before a coordinated
         // Compound Noun it is a Word-Part Coordination's base (*a +2/+0,
         // +1/+1, or +0/+2 counter*), one tree per analysis
-        // (`english-lexical-analysis.md` §2).
+        // (`docs/decisions/english.md` §8).
         (name: "MeasureNominal", lhs: "BareNominal", rhs: [Cat("head", "Measure")], equations: [Require("$.CompoundPart", "Base"), Require("$.Determination", "Overt"), Require("$.Number", "Singular"), Require("$.Countability", "Count"), Require("$.NounKind", "Ordinary"), Require("$.NounDistribution", "Ordinary")]),
         (name: "MeasureNounPhrase", lhs: "MeasureNounPhrase", rhs: [Cat("head", "Measure")]),
         // A Word-Part Coordination of Compound Nouns: the first bases of the
@@ -1251,7 +1251,7 @@
         // (*[untap target creature and gain control of it] until end of
         // turn*), never as its Verb Phrase coordination's: the Imperative
         // heads no coordination, nor one a post-verbal Adjunct follows
-        // (`english-lexical-analysis.md` §2).
+        // (`docs/decisions/english.md` §8).
         (name: "CoordinatedClauseAdjunct", lhs: "Clause", rhs: [Cat("head", "Clause"), Hosted("adjunct", "PrepositionPhrase", Predicate)], coordinated: ["head"], cost: 1),
         (name: "TemporalNounAdjunct", lhs: "PredicateAdjunct", rhs: [Cat("filler", "TemporalNounPhrase")], equations: [Require("$.ComplementKind", "NP")]),
         (name: "AdverbialAdjunct", lhs: "PredicateAdjunct", rhs: [Cat("filler", "AdverbPhrase")], equations: [Require("filler.AdjunctPosition", "End"), Require("$.ComplementKind", "AdvP")]),
@@ -1377,7 +1377,7 @@
         // [CR#603.1,603.7]) or a relative clause's (*For each creature that
         // entered this turn, ...*), ranks first there: the second of two
         // preposed dependents violates an Attachment Class
-        // (`docs/decisions/english.md` §4.3).
+        // (`docs/decisions/english.md` §5).
         (name: "PreposedPrepositionAndTemporal", lhs: "Clause", rhs: [Hosted("adjunct", "PrepositionPhrase", Predicate), Cat("adjunct", "TemporalNounPhrase"), Punct(','), Cat("head", "Clause")], equations: [Require("adjunct.ComplementKind", "NP"), Require("$.FrontPosition", "Occupied")], transparent: ["head"], cost: 2),
         // Two preposed Preposition Phrases set off by one comma, a delayed
         // trigger's timing and its duration (*At the beginning of each of
@@ -1389,7 +1389,7 @@
         // belong inside the first ranks first there, as in the fixed phrase
         // *at the beginning of combat on your turn* (oracle-style-guide §11,
         // Turn-structure names): the second of two preposed dependents
-        // violates an Attachment Class (`docs/decisions/english.md` §4.3).
+        // violates an Attachment Class (`docs/decisions/english.md` §5).
         (name: "PreposedPrepositionPair", lhs: "Clause", rhs: [Hosted("adjunct", "PrepositionPhrase", Predicate), Hosted("adjunct", "PrepositionPhrase", Predicate), Punct(','), Cat("head", "Clause")], equations: [Require("adjunct.ComplementKind", "NP"), Require("$.FrontPosition", "Occupied")], transparent: ["head"], cost: 2),
         // *the first time each turn*: a temporal Noun Phrase modifies a
         // temporal nominal.
@@ -1859,7 +1859,7 @@
         // same analysis one level up; a Nominal coordination is for what
         // something outside it shares (*all [creatures and lands]*,
         // *[creatures and lands] you control*; CGEL, Ch. 15 §2.1, p. 1291;
-        // `english-lexical-analysis.md` §2, bare coordination). BarePlural too.
+        // `docs/decisions/english.md` §8). BarePlural too.
         (name: "BareMass", lhs: "NounPhrase", rhs: [Cat("head", "Nominal")], uncoordinated: ["head"],
             equations: [Require("$.Determination", "Bare"), Require("$.Case", "Plain"), Require("head.Countability", "Mass"), Require("head.Number", "Singular"), Require("$.Person", "Third")],
             transparent: ["head"]),
@@ -2300,7 +2300,7 @@
         // *reduce* and *increase* select (*reduced by {2}*, *increased by
         // two*; Ch. 8 §5.2, p. 692): both Readings are well-formed, and
         // semantics rejects the agent one by type (`docs/decisions/english.md`
-        // §4.4, principle 1). A *by* gerund is a means Adjunct (p. 1428).
+        // §4). A *by* gerund is a means Adjunct (p. 1428).
         // Voice is a verb's: another head's phrase takes its Voice from the
         // head (a declared Adjectival Passive). A passive is headed by a past
         // participle. An auxiliary verb derives no
@@ -2342,7 +2342,7 @@
         // enchantment card* is an artifact card or a non-Aura enchantment
         // card. A preposed dependent at the start of the first conjunct
         // scopes over the whole coordination instead (*non-Lesson [instant and
-        // sorcery] card*; `english-lexical-analysis.md` §2).
+        // sorcery] card*; `docs/decisions/english.md` §8).
         Adjunct(host: "NounPremodifierConjunct", adjunct: "NounPremodifier", side: Before, host_kind: Nominal, cost: 1, equations: [Carry("modifier.Polarity", "Negative")]),
         // An attributive adjective can modify a noun premodifier within a
         // conjunct under a shared carrier noun (*Knight, Aura, Equipment, or
@@ -2355,7 +2355,7 @@
         // A complement costs nothing. A Preposition Phrase Adjunct costs the
         // same whether it postmodifies a Nominal or modifies a Predicate: the
         // Ranking Key's Right Association, not a Production Cost, prefers one
-        // host to another (`docs/decisions/english.md` §4.3).
+        // host to another (`docs/decisions/english.md` §5).
         Adjunct(host: "QuantifiedNominal", adjunct: "PrepositionPhrase", side: After, host_kind: Nominal, cost: 1),
         Adjunct(host: "LocativeHead", adjunct: "PrepositionPhrase", side: After, host_kind: Nominal, cost: 1),
         Adjunct(host: "PartitiveHead", adjunct: "PrepositionPhrase", side: After, host_kind: Nominal, cost: 1),
@@ -2379,7 +2379,7 @@
         // *instead* from the end of a long or coordinated replacement
         // (`docs/oracle-style-guide.md` §13, Would and instead). Like a
         // comma-fronted dependent it attaches outermost, outside a comma-set
-        // post-dependent (`english-lexical-analysis.md` §2).
+        // post-dependent (`docs/decisions/english.md` §8).
         Adjunct(host: "Clause", adjunct: "PrepositionPhrase", side: Before, host_kind: Predicate, cost: 1, equations: [Require("adjunct.ComplementKind", "Intransitive")]),
         // A comma-set post-adjunct (*, except it has flying*, *, unless ...*)
         // or Supplement (*, where X is its power*) is anchored to a finite
@@ -2400,7 +2400,7 @@
         // instruction. A Supplement anchors to a Clause or line (Oracle
         // English glossary, "Host Category"), never to a Keyword Phrase in a
         // sentence, which takes only its catalog-declared parameters
-        // (english.md §4.2).
+        // (english.md §2).
         Adjunct(host: "KeywordLineItem", adjunct: "PrepositionPhrase", side: After, host_kind: Supplement, delimiter: Some(','), cost: 2),
         Adjunct(host: "IndexedNominal", adjunct: "PrepositionPhrase", side: After, host_kind: Supplement, delimiter: Some(','), cost: 2),
         // A preposed gerund-participial adjunct (*Starting with you, ...*).
@@ -2516,7 +2516,7 @@
         // rule [1]), and a number fills no Noun Phrase Complement slot, so
         // never *is dealt [3] or [more damage]*. Numbers alone are an Amount
         // coordination (*2 or 3*). An admission gate
-        // (`docs/decisions/english.md` §4.5).
+        // (`docs/decisions/english.md` §6).
         Coordination(category: "NounPhrase", coordinators: "Alternative", unshared: ["DeterminativeDistribution", "FirstConjunctNumber"], resolve: [("Determination", "Bare")], equations: [ExcludeTogether([("first.Determination", "Overt"), ("last.Determination", "Bare"), ("last.Countability", "Mass")]), Exclude("first.NounKind", "Numeric"), Exclude("first.NounKind", "Quantity"), Exclude("last.NounKind", "Quantity")], proximate: ["Number", "Person", "Case", "NounKind", "Countability", "NounDistribution"]),
         Coordination(category: "Nominal", coordinators: "And", unshared: ["ObliqueNumber", "ObliqueNounKind", "ConjunctNumber", "CompoundPart"], equations: [Exclude("first.CompoundPart", "Base"), Require("$.Number", "Plural"), Agree("$.ConjunctNumber", "first.Number")], proximate: ["NounDistribution"]),
         Coordination(category: "Nominal", coordinators: "Disjunctive", unshared: ["ObliqueNumber", "ObliqueNounKind", "ConjunctNumber", "CompoundPart"], equations: [Exclude("first.CompoundPart", "Base"), Agree("$.ConjunctNumber", "$.Number")], proximate: ["NounDistribution"]),
@@ -2532,7 +2532,7 @@
         // 15 §2.1, p. 1292), each conjunct bearing the head's Adjunct Gap. The
         // coordination is its own Category, so that RelativeAdjunctGap states
         // the Gap once per conjunct and never again over their coordination
-        // (`docs/decisions/english-lexical-analysis.md` §2).
+        // (`docs/decisions/english.md` §8).
         Coordination(category: "SubjectInitialCoordination", conjunct: Some("SubjectInitialClause"), coordinators: "Coordinator", unshared: ["Inflection"]),
         // Interrogative clauses coordinate (*which creatures block and how
         // those creatures block*; CGEL, Ch. 5 §18.4, p. 508).
@@ -2579,8 +2579,8 @@
         // or more cards*, *one or more of them*; CGEL, Ch. 15 §3.3, p. 1330).
         Coordination(category: "DeterminerPhrase", coordinators: "Coordinator", proximate: ["Number", "Countability", "DeterminativeDistribution", "NounKind"], resolve: [("Cardinality", "Cardinal")]),
         // Numbers alone are an Amount coordination (*X is 2 or 3*), never also
-        // a fused quantity over them (`docs/decisions/english-lexical-analysis.md`
-        // §2).
+        // a fused quantity over them (`docs/decisions/english.md`
+        // §8).
         Coordination(category: "FusedQuantity", conjunct: Some("FusableDeterminer"), coordinators: "Disjunctive", equations: [ExcludeTogether([("first.NounKind", "Numeric"), ("last.NounKind", "Numeric")])], proximate: ["Number", "Countability", "NounKind"]),
     ],
     correlatives: [("Both", "And"), ("Either", "Or"), ("Neither", "Nor")],

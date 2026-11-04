@@ -33,8 +33,8 @@ Rules enumerate. `sylex_syntax` is the data-driven syntax engine, and
 English and Oracle's conventions, not Magic: it parses "exile target creature"
 as a verb and its object, and nothing in it knows what exiling does. Its
 round-trip laws carry the system's exact round trip at this layer
-([English grammar: lexical analysis](english-lexical-analysis.md) §1; the crate
-split and the Catalog constraint are in [English](english.md) §1–2).
+([English](english.md) §7; the crate split and the Catalog constraint are in
+§1–2).
 
 **Spelling** relates Readings to resolved terms. Recovery reads the parse forest
 and assembles the resolved terms whose spellings match it. Spelling a resolved
@@ -131,7 +131,7 @@ linked, in the manner of a synchronous tree-substitution grammar (STSG). A
 derivation builds both sides at once, so the same grammar recovers a resolved term from a
 Reading and spells a resolved term as English. It is not a bijection: several terms may
 word identically, and one sentence has several grammatical Readings, which the
-parser keeps rather than choosing ([English](english.md) §4.4). Meaning
+parser keeps rather than choosing ([English](english.md) §4). Meaning
 resolves the ambiguity, never rank or rule order: recovery expands each
 candidate and reads its discourse, and a candidate the checker or discourse
 refuses drops out. The goal is exactly one surviving candidate per card; a card
@@ -141,7 +141,7 @@ with more is reported, never stored as a choice.
 
 The goal is an exact round trip over the analyzed Oracle text, the text English
 analysis produces with reminder text removed
-([English grammar: lexical analysis](english-lexical-analysis.md) §1): it goes
+([Lexicon](lexicon.md)): it goes
 to its resolved term and back to the identical analyzed text. That is what
 faithful means here, and it is the easy, visible demonstration that the system
 works: a card whose rendering is not its own text has a wrong term, found

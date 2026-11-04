@@ -17,7 +17,7 @@
 + Put any number of them on the bottom of that library in any order and the rest on top of the library in any order. => ComplementCluster "any number of them on the bottom of that library in any order"; ComplementCluster "the rest on top of the library in any order"; PredicateAdjunct "in any order" as Adjunct of put
 + Put any number of them on the bottom of that library in any order and the rest on top of the library in any order. => ComplementCluster "any number of them on the bottom of that library in any order"; ComplementCluster "the rest on top of the library in any order"
 # Single Objects coordinate as themselves, never also as Clusters
-# (english-lexical-analysis.md §2).
+# (`docs/decisions/english.md` §8).
 # from: Haunted Cloak
 + Equipped creature has lifelink, deathtouch, and flying. => !ComplementCluster "lifelink"; !ComplementCluster "deathtouch"
 # The Clusters of one coordination have the shape of the head's frame: an
@@ -39,13 +39,13 @@
 + <card=Semester's End> Each of them enters with an additional +1/+1 counter on it if it's a creature and an additional loyalty counter on it if it's a planeswalker. => AdjunctCluster "with an additional +1/+1 counter on it if it's a creature"; AdjunctCluster "an additional loyalty counter on it if it's a planeswalker"; PrepositionRemnant "an additional loyalty counter on it"
 # A single Object with no Adjunct is a Cluster where it alone breaks
 # parallelism, before Clusters that each end in two Adjuncts
-# (english-lexical-analysis.md §2; CGEL, Ch. 15 §4.3, p. 1342, note 64).
+# (`docs/decisions/english.md` §8; CGEL, Ch. 15 §4.3, p. 1342, note 64).
 # from: Crabomination
 + Target opponent exiles the top card of their library, a card at random from their graveyard, and a card at random from their hand. => ComplementCluster "the top card of their library"; ComplementCluster "a card at random from their graveyard"; ComplementCluster "a card at random from their hand"; NounPhrase "the top card of their library" as Object of exile; NounPhrase "a card" as Object of exile; PredicateAdjunct "at random" as Adjunct of exile; PredicateAdjunct "from their graveyard" as Adjunct of exile; PredicateAdjunct "from their hand" as Adjunct of exile; !NounPhrase "a card at random"
 # The Clusters beside a bare one are Clusters of necessity, each holding an
 # Adjunct no Nominal hosts. Where every Adjunct could be its Object's
 # Modifier, the Objects coordinate in parallel, and a bare Cluster beside
-# them is the breach CGEL stars (english-lexical-analysis.md §2; CGEL,
+# them is the breach CGEL stars (`docs/decisions/english.md` §8; CGEL,
 # Ch. 15 §4.3, p. 1341, [17iia]).
 # from: Sphere of Annihilation
 + <card=Sphere of Annihilation> At the beginning of your upkeep, exile this artifact, all creatures and planeswalkers with mana value less than or equal to the number of void counters on it, and all creature and planeswalker cards in graveyards with mana value less than or equal to the number of void counters on it. => NounPhrase "this artifact, all creatures and planeswalkers with mana value less than or equal to the number of void counters on it, and all creature and planeswalker cards in graveyards with mana value less than or equal to the number of void counters on it" as Object of exile; !ComplementCluster "this artifact"

@@ -1,5 +1,5 @@
 //! The Syntactic Skeleton profiler: assigns each Corpus Unit its Complexity
-//! Stratum (`docs/decisions/english.md` §6.1).
+//! Stratum (`docs/contexts/oracle-english/CONTEXT.md`).
 //!
 //! A unit is read as a sequence of lexical tokens, each the longest declared
 //! analysis at its position. Its Syntactic Skeleton replaces every open-class

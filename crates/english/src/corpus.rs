@@ -2,7 +2,7 @@
 //!
 //! The supported corpus is every Vintage-playable (legal or restricted) Oracle
 //! record outside Scryfall `set_type: funny`
-//! (`docs/decisions/english-lexical-analysis.md` §1). Each Card Face record
+//! (`docs/decisions/lexicon.md`). Each Card Face record
 //! yields one Type Line unit and one unit per paragraph line of its rules text
 //! after balanced reminder text is removed (a line break inside a quotation
 //! does not end a line); a face's count is a sum over its units. The split
@@ -62,7 +62,7 @@ pub struct EditorialCorrection {
     pub card: &'static str,
     pub oracle: &'static str,
     pub corrected: &'static str,
-    /// The printed card, or the template update, that the correction cites.
+    /// The printed card, or the grammar, that shows the text's error.
     pub evidence: &'static str,
 }
 

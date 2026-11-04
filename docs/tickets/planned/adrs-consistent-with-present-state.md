@@ -27,16 +27,6 @@ the lines below are where to look, not a finished audit.
 
 ## ADRs the ticket covers
 
-- `english.md`: §1 and the layer table name `deckmaste_lexical_source_v4`
-  and `deckmaste_english_v4` as live crates; §7 Cutover 2 still lists the suffix
-  drop as future work, though it is done, and keeps the catalog move and the
-  `sylex_features_v1` deletion; Cutover 1 says `plugins_v2/builtin/` stays
-  until `semantics-v3-dsl-and-plugins`, which must match the actual schedule;
-  §5 contrasts the crate with "`deckmaste_lexical_source`'s 4-layer salvage
-  pipeline", which now reads as the crate itself because the old crate's name
-  was reused.
-- `english-lexical-analysis.md`: the header says it pairs with
-  `deckmaste_english_v4`; names the v4 crate throughout.
 - `semantics.md`: cites `deckmaste_spelling` (since deleted as a stub) as the consumer of linked
   abilities (§ on linked abilities), `plugins_v2/` and `deckmaste_semantics_v2`
   deletion timing, and the v1 `deckmaste_english` translation path; the

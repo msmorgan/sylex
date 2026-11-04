@@ -1,6 +1,36 @@
 //! Reading Normal Form: identifies only the reviewed structural alternatives
 //! as one analysis. It never endorses a Reading; it only lets two sets of
 //! Readings be compared under exactly the approved canonicalizations.
+//!
+//! Every canonicalization is built structurally in the chart, so the parser
+//! never builds the second tree. [`CompiledGrammar::normal_form`] re-applies a
+//! listed subset of them to a `Reading`, so that a census taken before a
+//! canonicalization existed can be compared tree for tree with one taken
+//! after. The full set, with where each is built:
+//!
+//! - the grouping within a chain joined by the same coordinator, or linked by
+//!   the same connective: the Coordination schemas' serial tails and the
+//!   Linked Coordination's identity (`Summary::link`); re-applied;
+//! - clause versus verb-phrase coordination of bare imperatives: `uncoordinated`
+//!   children; re-applied;
+//! - a bare coordination is of Noun Phrases, never of Nominals under one bare
+//!   Noun Phrase: `uncoordinated` children;
+//! - a dependent that scopes over a whole coordination where a single conjunct
+//!   has a site of its own: `coordinated` children;
+//! - an adverb before a bare imperative is its Clause's front Adjunct: the
+//!   grammar data's `CentralPosition` and `FrontPosition` features;
+//! - same-head complement priority: frame `Extension`s (`step.rs`) and a bare
+//!   head's `omitted_complement`; re-applied for a Preposition Phrase;
+//! - adjuncts below a non-modal auxiliary: `Production::auxiliary` and the
+//!   `auxiliary` summary fact; re-applied;
+//! - fronted dependent outermost: the `fronted` summary fact; re-applied;
+//! - added element versus coordination, and frequency interval: `unadjoined`
+//!   children;
+//! - an existential's Extension after its Displaced Subject: `unextended`
+//!   children;
+//! - medial remnants: a Valence schema's `remnants` and a Coordination's
+//!   `remnant`;
+//! - single Objects in Complement Clusters: the `Bare` summary fact.
 
 use dpsi::Ident;
 use sylex_lexicon::LexicalReading;
@@ -15,8 +45,8 @@ use crate::reading::Reading;
 use crate::reading::ReadingNode;
 
 impl CompiledGrammar {
-    /// The Reading Normal Form of `reading` under the approved
-    /// canonicalizations this engine derives:
+    /// The Reading Normal Form of `reading`: the canonicalizations the
+    /// module doc marks re-applied, applied to an existing tree:
     ///
     /// - the grouping within a chain joined by the same coordinator: every
     ///   grouping, binary or serial, becomes one node listing the conjuncts and

@@ -1,5 +1,5 @@
 //! The second of two dependents before their head violates an Attachment
-//! Class (`docs/decisions/english.md` §4.3): where the dependent before it
+//! Class (`docs/decisions/english.md` §5): where the dependent before it
 //! can hold it, that Reading ranks first, and the stacked Reading stays a
 //! costlier alternative.
 

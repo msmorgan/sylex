@@ -1,6 +1,6 @@
 //! The census: every Corpus Unit profiled into its Complexity Stratum and
 //! parsed, each reported as read, known-wrong-only or unread
-//! (`docs/decisions/english.md` §6.2).
+//! (`docs/contexts/oracle-english/CONTEXT.md`, "Census").
 //!
 //! A unit is read when it has a Reading and round-trip law 1 holds over the
 //! whole Packed Forest ([`sylex_syntax::Parse::verify_realization`]).

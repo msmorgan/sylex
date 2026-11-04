@@ -678,7 +678,7 @@ pub(crate) struct Summary {
     /// [`CompiledGrammar::extension_sets`] (0: none). A Preposition Phrase
     /// right after it headed by one of their prepositions is that head's
     /// Complement, never a dependent of another host
-    /// (`english-lexical-analysis.md` §2, same-head complement priority).
+    /// (`docs/decisions/english.md` §8).
     pub omitted_complement: u16,
     /// The word forms the omitted Complement of the ellipsis site it ends in
     /// takes, through its last child, as a mask (0: none;
@@ -729,7 +729,7 @@ pub(crate) struct Summary {
     /// Whether it begins with a fronted dependent of its head, and how that
     /// dependent scopes over a coordination it would begin. Such a Clause
     /// hosts no comma-set post-dependent, which attaches inside the fronted
-    /// one (`english-lexical-analysis.md` §2).
+    /// one (`docs/decisions/english.md` §8).
     pub fronted: Fronting,
     /// It contains a delimiting comma that no bracket closes: it is, or has at
     /// any depth, the host of a comma-set post-dependent (*[this creature
@@ -756,7 +756,7 @@ pub(crate) struct Summary {
     pub open_comma: bool,
     /// It is an uncoordinated auxiliary Verb Phrase (`Production::auxiliary`):
     /// it hosts no post-verbal Adjunct, which attaches to the lexical
-    /// participial Verb Phrase it ends in (`english-lexical-analysis.md` §2).
+    /// participial Verb Phrase it ends in (`docs/decisions/english.md` §8).
     pub auxiliary: bool,
     /// It ends in a period that is not written: a quotation's final period
     /// (`chart::quotations`), or one after a word whose spelling ends in
@@ -817,7 +817,7 @@ pub(crate) struct Summary {
 /// card of their library], [a card at random from their graveyard], and [a
 /// card at random from their hand]*). A coordination of single Objects is the
 /// coordination of the Objects, never also of Clusters
-/// (`english-lexical-analysis.md` §2). Each Cluster with Adjuncts beside it
+/// (`docs/decisions/english.md` §8). Each Cluster with Adjuncts beside it
 /// holds one that no Nominal hosts (*at random*), so it is a Cluster of
 /// necessity: where every Adjunct could be its Object's Modifier, the
 /// coordination of Objects is parallel, and a bare Cluster beside them is
@@ -1686,7 +1686,7 @@ impl Production {
     /// inside the post-dependent's host, and, unless it is a Predicate
     /// Adjunct preposed without a comma (`Fronting::Ambiguous`), over
     /// a whole coordination, never its initial conjunct
-    /// (`english-lexical-analysis.md` §2). The initial conjunct of a
+    /// (`docs/decisions/english.md` §8). The initial conjunct of a
     /// coordination delimited before its coordinator may have its own (*[If
     /// you do, …], and [if you don't, …]*), and so may a middle conjunct of a
     /// serial one, since a fronted dependent there cannot scope over the

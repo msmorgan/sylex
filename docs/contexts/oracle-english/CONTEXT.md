@@ -174,10 +174,11 @@ still listed.
 _Avoid_: known failure, expected failure
 
 **Editorial Correction** (project term):
-A recorded replacement for part of one face's Oracle text that breaks a
-convention its printed card keeps, which the census reads instead. It cites the
-printed card, or a template update the printed card predates and current Oracle
-texts already carry. It never relaxes the grammar.
+A recorded replacement for part of one face's Oracle text that is in error,
+which the census reads instead: the text disagrees with its printed card through
+a data error, such as a dropped character or a wrong symbol, or it is
+ungrammatical English. A template difference is never one. It never relaxes the
+grammar.
 _Avoid_: erratum (an official Oracle change), override
 
 **Syntactic Family** (project term):

@@ -60,7 +60,7 @@ impl Reading {
     }
 }
 
-/// The Ranking Key (`docs/decisions/english.md` §4.3): the Preference that
+/// The Ranking Key (`docs/decisions/english.md` §5): the Preference that
 /// orders a Parse's Readings, compared component by component in field order,
 /// lower first. A Reading's own order is the final tie-break, so the cheapest
 /// Reading is unique. Every component is a sum over the Reading's Productions
@@ -75,7 +75,9 @@ pub struct RankingKey {
     /// Right Association: the words between unselected dependents and the
     /// heads of their hosts, reversed for a dependent that attaches high.
     pub right_association_words: i64,
-    /// The summed Production Cost.
+    /// The summed Production Cost, with one more for each `scoped` lexical
+    /// child admitted outside the parsed face's scope
+    /// ([`crate::grammar::ProductionDecl::scoped`]).
     pub production_cost: u64,
 }
 
@@ -872,7 +874,7 @@ impl CompiledGrammar {
     }
 
     /// The Attachment Class and Right Association words
-    /// (`docs/decisions/english.md` §4.3) a child adds at position `index`
+    /// (`docs/decisions/english.md` §5) a child adds at position `index`
     /// of a Production. `head` gives the phrase's head's words; `first` a
     /// coordination's first conjunct's words and whether it ends in its head;
     /// `before` the words from the phrase's start to the child.
@@ -1064,7 +1066,7 @@ impl CompiledGrammar {
     }
 
     /// Lexical atomicity, decided on the Reading's own structure as the chart
-    /// decides it (`docs/decisions/english-lexical-analysis.md` §2): a word
+    /// decides it (`docs/decisions/lexicon.md`): a word
     /// inside a multiword noun of `atomic` stands alone only where the term's
     /// words may stand apart, and then only where they straddle a constituent
     /// boundary. In the smallest Constituent spanning the term, the child

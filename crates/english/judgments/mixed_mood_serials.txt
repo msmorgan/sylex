@@ -1,7 +1,7 @@
 # Mixed-mood coordinations of Clauses: an imperative first, a declarative
 # last, and either between (*gain control of that permanent, it loses all
 # abilities, and it can't attack or block*). A fronted dependent scopes over
-# the whole coordination (`english-lexical-analysis.md` §2).
+# the whole coordination (`docs/decisions/english.md` §8).
 + When this creature enters, choose target Human or artifact an opponent controls. For as long as this creature remains on the battlefield, gain control of that permanent, it loses all abilities, and it can't attack or block. => Clause "gain control of that permanent, it loses all abilities, and it can't attack or block"; PrepositionPhrase "For as long as this creature remains on the battlefield"
 + Whenever you cast a spell with mana value 5 or greater, each opponent reveals the top card of their library. If any of those cards shares a card type with that spell, copy that spell, you may choose new targets for the copy, and each opponent draws a card. Otherwise, you draw a card. => Clause "copy that spell, you may choose new targets for the copy, and each opponent draws a card"; PrepositionPhrase "If any of those cards shares a card type with that spell"
 + Whenever another creature you control enters, you may discard a card. If you do, put a +1/+1 counter on that creature, it gains haste until end of turn, and it becomes a Vampire in addition to its other types. => Clause "put a +1/+1 counter on that creature, it gains haste until end of turn, and it becomes a Vampire in addition to its other types"
