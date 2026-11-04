@@ -6,7 +6,7 @@ import Semantics.Check.Rules
 # Semantics.Proofs.SpellCopies
 
 A spell copy's target guard is not written: copy keywords offer new targets unconditionally
-(`docs/decisions/semantics-v2.md` §7, ruling 2026-10-09), because writing "if the spell has any
+(ruling 2026-10-09), because writing "if the spell has any
 targets" would need a new constructor. The guard is inert: a player who may choose new targets may
 leave every target unchanged [CR#707.10c].
 Casualty, replicate, epic and conspire are pinned here with gravestorm, whose narrow guard is

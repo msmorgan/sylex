@@ -49,7 +49,7 @@ Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #15
 2. When an effect reorders looked-at or revealed library cards (scry, surveil's top
    pile, fateseal, random-bottom remainders), remint them in place, with no zone
    change and no `ZoneChange` event; their grants end with the old ids. Record the
-   put-back-in-the-same-position case in the UD register (`docs/engine-adrs.md`),
+   put-back-in-the-same-position reading in the doc comment of the code that remints,
    since the CR chain is interpretive.
 3. Cite peeks and reveals to [CR#701.20e,701.20a], end reveal grants when the
    revealing effect finishes, and document the remaining entries as the engine's

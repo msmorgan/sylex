@@ -128,8 +128,7 @@ theorem okLiteralAmassHandedOff : Action.check (DRS.ofList []) (instruct (target
 /-! ## A keyword body's own reference scope
 
 A keyword action body is read in its own Reference Scope: it sees the performer, its parameters
-and what it introduces, never the calling text's other mentions (`docs/decisions/semantics-v2.md`
-§7, ruling 2026-10-06). A keyword action's Definition writes the scope (`Action.ownScope`) with the action's
+and what it introduces, never the calling text's other mentions (ruling 2026-10-06). A keyword action's Definition writes the scope (`Action.ownScope`) with the action's
 deed as its header and each parameter `inCaller`, read in the caller's view. -/
 
 /-- The literal amass body in its own scope, under the amass deed. -/

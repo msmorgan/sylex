@@ -12,8 +12,7 @@ After every dependency is done:
   intentional survivors;
 - verify the extracted engine functions retained test counts, citations, and
   behavior; the deletion-bound v1 English extraction was cancelled by the
-  lexical-analysis rewrite, with replacement obligations retained in
-  [the migration register](../../english-grammar-migration-obligations.md);
+  lexical-analysis rewrite;
 - run `fish tests/fetch_data_test.fish` through the same path CI uses; and
 - record any genuinely ad-hoc cleanup from the review, including the
   `replace.rs` test-import placement nit, rather than minting lifecycle work

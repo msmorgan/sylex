@@ -469,10 +469,6 @@ both separators, checks multiline document boundaries, and proves that a new
 catalog keyword's parameters bind without changing the grammar. The census uses the same entries
 to find known-wrong-only units.
 
-The judgments migrated from `deckmaste_english_v3`'s test suite, and the reason
-each remaining v3 test retires, are recorded in
-[`docs/english-v3-test-audit.md`](../../docs/english-v3-test-audit.md).
-
 Modal headers take an imperative verb phrase followed by a dash (*Choose one —*),
 with ordinary verb frames selecting their objects. Keyword catalogs distinguish
 dashed verbal/composite costs from space-separated mana costs; mandatory dash

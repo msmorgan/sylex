@@ -1306,8 +1306,9 @@ impl GameState {
     ///
     /// Seam (no trip point exists yet): the mandatory-loop draw
     /// ([CR#104.4b]) needs a loop MONITOR, and the monitor needs a
-    /// game-state equality predicate — UD-11, still OPEN (no rule defines
-    /// when two states are "the same"; see docs/engine-adrs.md).
+    /// game-state equality predicate, which does not exist yet (no rule
+    /// defines when two states are "the same"; the `rules-state-equality`
+    /// ticket owns it).
     ///
     /// [CR#104.2a]: the last-player-standing win OVERRIDES all effects that
     /// would preclude winning — it pierces `CantWin`. This derived win must

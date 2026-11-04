@@ -84,7 +84,7 @@ from a source with deathtouch" ([CR#704.5g,704.5h]). Reword "the other is the
 lethal-damage SBA" to "state-based destruction (lethal damage [CR#704.5g] or
 deathtouch damage [CR#704.5h])", and "the lethal-damage SBA's deathtouch
 clause" to "the deathtouch-damage SBA ([CR#704.5h])". Sites:
-`crates/engine/src/event.rs:95-96`, `docs/conformance.md:67`,
+`crates/engine/src/event.rs:95-96`,
 `crates/core/src/filter.rs:228`,
 `v1/crates/semantics/src/reference.rs:240`,
 `v1/plugins/builtin/macros/event/Destroyed.ron:2-3`,

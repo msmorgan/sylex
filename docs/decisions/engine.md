@@ -16,6 +16,7 @@ executes [core](core.md).
 5. **State-based actions that need a choice are engine code today**, and the
    check repeats only after a batch changed state.
 6. **Broken state fails loudly; what the rules make impossible is ignored.**
+7. **Members of one simultaneous batch are unordered.**
 
 ## Detail
 
@@ -84,3 +85,20 @@ loudly, naming the defect. Everything the rules make impossible is ignored:
 [CR#101.3], and that part does nothing. A departed object is one case: an
 illegal target is not affected, and a spell or ability whose every target is
 illegal doesn't resolve [CR#608.2b].
+
+### 7. Members of one simultaneous batch are unordered
+
+Members of one simultaneous batch are unordered for rules purposes: the event
+log's commit order within a batch is representational only, and a rule that
+reads it is an encoding defect. A batch is one simultaneous event
+[CR#704.3,510.2], which can contain several occurrences [CR#603.2c]. Every
+consumer that is sensitive to order is settled by its own rule, never by
+position inside the batch: timestamps [CR#613.7m], the order of triggered
+abilities [CR#603.3b], and last known information [CR#704.8]. Where the rules
+make order matter, they say how: individual card draws are sequential events
+[CR#121.2], and the owner arranges cards put into one graveyard at once
+[CR#404.3], or into one position in a library at once [CR#401.4]. An
+`Occurrence::Batch` is applied and matched as one occurrence, and every fact it
+records in the history log shares one `HistEntry.batch` id; the log still stores
+those facts one after another, so each also has a log position, and that
+position means nothing between members of the same batch.

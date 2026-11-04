@@ -15,8 +15,7 @@ The inner loops, from this directory, are `lake build -q Semantics` for checker 
 `SemanticsCheckBuiltin`) for builtin work, `lake build -q SemanticsCards` for card work, and the
 editor or `lake build -q SemanticsProofs` for proofs. `lakefile.lean` lists them.
 
-Lean is the active workbench. The [succession decision](../docs/decisions/lean-is-the-workbench.md)
-records the frozen Idris reference and migration history.
+Lean is the active workbench.
 
 ## Workbench gate
 

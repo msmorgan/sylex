@@ -10,8 +10,7 @@ creature damage *since the last time state-based actions were checked*. `ProjAxi
 `sba` rule, `plugins/builtin/rules/sba/deathtouchDestruction.syl` (scope `isCreature`), not on
 the creature row as decided below. What remains is moving it there.
 
-Decided (2026-10-13, owner; `semantics.md` §§4.6, 4.8; archived
-`semantics-v2.md` §7, Q83, Q90):
+Decided (2026-10-13, owner; `semantics.md` §§4.6, 4.8):
 
 - `GameEvent.stateBasedActionsChecked` names the check [CR#704.3]. Under the
   `semantics-v3` spine (`docs/decisions/semantics.md` §4.8), the [CR#704.5h]

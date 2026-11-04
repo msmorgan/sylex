@@ -4,7 +4,7 @@ import Semantics.Check.Card
 /-!
 # Semantics.Proofs.OffStack
 
-Off-Stack Statics (`semantics-v2-off-stack-statics`, `docs/decisions/semantics-v2.md` §7, ruling
+Off-Stack Statics (`semantics-v2-off-stack-statics`, ruling
 2026-10-09): "as [event], do" (`StaticSpec.asEvent`) and "any time [condition] holds, do"
 (`StaticSpec.whileHolds`), which carry an action that never uses the stack [CR#113.9]; the delayed
 triggers dash, blitz and warp create as the permanent is put onto the battlefield, each a

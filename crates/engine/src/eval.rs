@@ -1220,6 +1220,12 @@ impl GameState {
             // yet, so it counts as one past its recorded predecessors; a
             // history fact counts its predecessors up to its own log
             // position.
+            //
+            // Nth counts sequential occurrences. Real Nth wordings ("your
+            // second card each turn") count events that can't co-occur,
+            // because draws are individual [CR#121.2], so an ordinal within
+            // one simultaneous batch is unreachable. It must not be relied
+            // on (`docs/decisions/engine.md` law 7).
             EventFilter::Nth { n, of, within } => {
                 if !self.eval(of, fact, lane, bindings) {
                     return false;

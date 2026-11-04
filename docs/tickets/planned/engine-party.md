@@ -37,9 +37,7 @@ party.**
   Together, `[CR#700.8d]`), more surface.
 - **B — where the 4 class names live.** Hardcoded const (precedent
   `BASIC_LAND_TYPES` in `count.rs`) vs data-driven from the RON subtype registry.
-  [Conferrals come from registries](../../decisions/conferrals-come-from-registries.md)
-  favors data over hardcoded name matches. Party classes are not a data flag today, so the data route needs a
-  new source.
+  Party classes are not a data flag today, so the data route needs a new source.
 - **C — surface shape.** A scalar `Count` covers "for each creature in your
   party" / X = party. Full-party (`[CR#700.8c]`) is likely a separate
   `Condition` / ability-word (`Compare(PartySize(You), AtLeast, 4)`) — decide

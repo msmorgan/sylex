@@ -1,6 +1,6 @@
 # v1/plugins/testing — mocks for combos real Magic never printed
 
-Engine tests use real cards from `v1/plugins/canon` (see `docs/card-data.md`).
+Engine tests use real cards from `v1/plugins/canon`.
 A fake belongs here ONLY when the behavior under test exists in no real card —
 verified against the full corpus, not vibes. Current residents:
 

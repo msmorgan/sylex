@@ -1483,7 +1483,7 @@ mutual
     | number (amount : Amount)
     | deckCondition (condition : DeckCondition)
     /-- The ability printed with the keyword ("Boast — [Cost]: [Effect]"), which the keyword's
-    definition restricts (`docs/decisions/semantics-v2.md` §7, ruling 2026-10-09). -/
+    definition restricts (ruling 2026-10-09). -/
     | ability (ability : Ability)
 
   inductive AbilityLost where

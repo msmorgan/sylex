@@ -1,55 +1,13 @@
-# Project decisions
+# Decisions
 
-> 2026-10-26: `deckmaste_english_v4` and `deckmaste_lexical_source_v4` are now `sylex_english` and `sylex_vocabulary`; the census command is `cargo xtask english`.
+A decision is recorded here only if it shapes the whole design and an implementer would get it
+wrong without being told. A decision local to one construct lives in a doc comment where that
+construct is used. Card rulings are never recorded here.
 
-These documents record durable project contracts for contributors. They describe
-the intended design rather than a dated implementation inventory; current code
-wins if an incidental implementation description drifts. Changing a decision
-requires explicit review rather than an opportunistic refactor.
-
-- [Architecture](architecture.md) — The whole system and why it is shaped so:
-  English ⇄ spelling ⇄ semantics → lowering → core → engine; Oracle text is the
-  authority, the semantic term the canonical meaning, core a compiled artifact.
-- [Authored card surface](authored-card-surface.md) — Keep card RON terse,
-  structural, and stable.
-- [Minimal core and data-driven rules](minimal-core-data-driven-rules.md) —
-  Compose named mechanics from primitives and declared data.
-- [Macros are declarative](macros-are-declarative.md) — Plugin macros are typed
-  templates, not a control-flow language.
-- [Conferrals come from registries](conferrals-come-from-registries.md) —
-  Registries are the authority for open named behavior.
-- [Lean is the workbench](lean-is-the-workbench.md) — Active semantics modeling
-  and theorem-form pins; the Idris workbench is deleted.
-- [Macro templates are bidirectional](macro-templates-are-bidirectional.md) —
-  One typed template drives both rendering and parsing.
-- [English grammar: lexical analysis, Readings, and how the grammar is kept small](english-lexical-analysis.md)
-  — Engine contract, round-trip laws, Reading normal forms, and how words reach
-  the grammar.
-- [English](english.md) — The governing record for
-  `sylex_syntax`, `deckmaste_english_v4`, and
-  `deckmaste_lexical_source_v4`: data-driven schema/production engine,
-  frame-driven complementation, CR-catalog separation, stratified buildout, and
-  two-stage cutover.
-- [Semantics](semantics.md) — The design authority for semantics: DRT
-  reference resolution (the DRS, boxes, `J1`, `J2`, `D′`, `AC>R1`, Contrast
-  Anchors), the Definition/Template split, the action-clause spine (`instruct`,
-  `does`, `would`/`instead`, `cant`/`must`/`can`/`gatedBy`, `did`/`tally`, `by`,
-  `any`, `which`), and the standing mechanisms.
-- [The `.syl` data language](syl.md) — How the vocabulary and cards under
-  `plugins/` are written: primitives, Templates and Definitions as a language
-  design, first-order files and syntax, name resolution by expected sort,
-  expansion, and read order.
-- [Card authoring binds no implicits](card-authoring-binds-no-implicits.md) —
-  Card authoring binds no implicit parameters; core constructors take every
-  field required. Superseded for the Lean workbench (2026-10-21): Templates may
-  take optional named parameters after the required ones.
-- [Workbench RON-shaped and label rulings](workbench-ron-shaped-and-label-rulings.md)
-  — Registry label and RON-shaped syntax rulings.
-- [Core](core.md) — The contract of `sylex_core` and `sylex_card`: closed
-  regions with declared parameters and register reads, captures, linked
-  memory, validate at load, and Card Faces.
-- [Engine](engine.md) — The contract of `sylex_engine`: the activation record,
-  Decisions, operands, Conferrals, state-based actions and failure.
-
-Superseded historical decision records live in [`docs/archive/decisions/`](../archive/decisions/)
-and are not active authority.
+- [Architecture](architecture.md): the layers of the system and how they connect.
+- [Semantics](semantics.md): reference resolution, Definitions, Templates and the action-clause spine.
+- [Syl](syl.md): the `.syl` data language.
+- [Core](core.md): the compiled core that the engine executes.
+- [Engine](engine.md): the engine's laws.
+- [English](english.md): the data-driven syntax engine, domain catalogs and stratified buildout.
+- [English lexical analysis](english-lexical-analysis.md): Readings and keeping the grammar small.

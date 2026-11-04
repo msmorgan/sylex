@@ -57,9 +57,9 @@ objects from the library to a public zone … Then they pay all remaining costs.
 element is first-tier; a search that includes a shuffle has a random element.
 
 **Change:** defer a library-origin `Move` or `Search` only when its destination is a
-public zone or the cost includes a shuffle or other randomness. Register `DrawCard`
-(is an unknown top card a "random element"?) in the UD register
-(`docs/engine-adrs.md`).
+public zone or the cost includes a shuffle or other randomness. Answer for `DrawCard`
+whether an unknown top card is a "random element", in the doc comment of the code that
+decides it.
 
 ## 4. Stated-quality search floor in public zones (#35)
 

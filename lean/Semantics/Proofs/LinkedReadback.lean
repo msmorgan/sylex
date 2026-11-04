@@ -19,7 +19,7 @@ write it of its own deed ("the exiled card", "the sacrificed creature"). The obj
 triggered or activated ability, an additional or alternative cost, or an added target acted on are
 published to the abilities after it (`Ability.textContext`); a description with no span written
 reads them, and must find exactly one. A named link between two objects is a declared Relation
-(`docs/decisions/semantics-v2.md` §7, ruling 2026-10-09). The three relation forms, `merge`,
+(ruling 2026-10-09). The three relation forms, `merge`,
 `addsTarget`, and the mana-cost term of `CostShift.bySymbols` are pinned here too.
 -/
 

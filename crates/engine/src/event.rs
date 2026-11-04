@@ -912,7 +912,9 @@ impl GameEvent {
 }
 
 /// A scheduled occurrence: one event, or a set of simultaneous events applied
-/// and matched together ([CR#603.2c], [CR#700.1]).
+/// and matched together ([CR#603.2c], [CR#700.1]). A `Batch`'s members are
+/// unordered for rules purposes: its `Vec` order is representational only
+/// (`docs/decisions/engine.md` law 7).
 // `GameEvent` (~288B) rides the hot `step()` path one-at-a-time; wrapping it in
 // `Arc`/`Box` here adds a per-event allocation and splits event producers from
 // consumers workspace-wide (see the `WorkItem` note in `agenda.rs`, same

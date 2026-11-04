@@ -1,10 +1,7 @@
 //! The native keyword abilities ([CR#702]) the engine implements directly:
 //! a closed enum the combat code pattern-matches on, rather than plugin macros.
-//! The normative rule for what belongs in this enum (the graduation rule, the
-//! template-param conventions, and the `ParamShape`/`KeywordDecl` prune) is
-//! `docs/keyword-policy.md`.
-//! Per the keyword classification (intrinsic / composite / composite-given —
-//! docs/rules-taxonomy.md §10, pinned to the mtg-rules skill v1.7.0), the
+//! Per the keyword classification (intrinsic / composite / composite-given,
+//! pinned to the mtg-rules skill v1.7.0), the
 //! variants are exactly the five implemented true intrinsics: first/double
 //! strike, deathtouch, and trample own prospective combat-damage machinery
 //! ([CR#510.1]); vigilance owns dedicated declare-attackers text

@@ -1,4 +1,4 @@
-// Hand-written canon entry (see docs/card-data.md): exercises the collapsed
+// Hand-written canon entry: exercises the collapsed
 // `May(Pay(cost))` MustPay shape (`if_did` absent) over the full `Cost`
 // algebra — "counter target spell unless its controller pays {3}"
 // ([CR#118.12a]). The migrations parser has no production for a non-`You`

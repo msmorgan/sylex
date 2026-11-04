@@ -89,8 +89,8 @@ pub(crate) fn handle_token_ceased(g: &mut GameState, id: ObjectId) -> Option<Gam
 
 /// `Shuffled` carries a bare `PlayerId` — see `handle_token_ceased`.
 ///
-/// [CR#701.24a]: randomize so NO player knows the order — the seeded rng
-/// (UD-8). Revealed-state reset ([CR#701.20d]) is unbuilt (no reveal
+/// [CR#701.24a]: randomize so NO player knows the order — the seeded rng.
+/// Revealed-state reset ([CR#701.20d]) is unbuilt (no reveal
 /// windows exist yet).
 pub(crate) fn handle_shuffled(g: &mut GameState, player: PlayerId) -> Option<GameEvent> {
     let image = &mut **g;

@@ -345,7 +345,7 @@ pub enum Action {
     /// Untap the referenced object ([CR#701.26b]).
     Untap(Reference),
     /// "`recipient` gets an emblem with [abilities]" — a command-zone object
-    /// that never touches the battlefield (rules-taxonomy §6: a degenerate
+    /// that never touches the battlefield (a degenerate
     /// token definition; [CR#114.1,114.4]).
     GetEmblem(Reference, Arc<[crate::Ability]>),
     /// "`recipient` gets the named designation" ([CR#702.131c] — the city's

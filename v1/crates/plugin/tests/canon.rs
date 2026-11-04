@@ -1,5 +1,5 @@
 //! The canon cards (real cards — pipeline output plus marked hand-finished
-//! entries, see docs/card-data.md) parsed through the macro-aware reader, on
+//! entries) parsed through the macro-aware reader, on
 //! top of the builtin prelude they depend on. Run by plain `cargo test`;
 //! wizards is the explicit `cargo xtask validate v1/plugins/wizards`.
 
@@ -46,8 +46,7 @@ fn canon_cards_are_valid() {
         validation.lint_failures,
         [] as [(std::path::PathBuf, std::string::String); 0]
     );
-    // The canon slice: 25 cards at the time of writing, growing per
-    // docs/card-data.md.
+    // The canon slice: 25 cards at the time of writing.
     assert!(
         validation.valid >= 25,
         "only {} items checked",

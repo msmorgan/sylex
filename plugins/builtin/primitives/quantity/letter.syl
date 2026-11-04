@@ -1,4 +1,6 @@
-# An amount named by a variable letter.
+# An amount named by a variable letter. A letter is introduced by its first mention (an {X} in a
+# cost included), and every later X on the object reads that same referent [CR#107.3a,107.3i];
+# "where X is" is a later definition of it (`define`).
 primitive letter(letter: Letter): Amount {
   spelling = "<letter>"
 }

@@ -19,7 +19,7 @@ The needs list covers three claims the capstone must be able to defend:
 
 Final pass:
 
-1. **Disposable fresh-clone verification.** Re-run `docs/publish-prep.md` §6
+1. **Disposable fresh-clone verification.** Verify a fresh clone
    in an environment with no pre-existing `data/`, `target/`, mtg-rules skill,
    or repository-specific environment variables. Follow the README literally:
    build, first-run `cargo run`, `cargo test`, and every newly wired gate.

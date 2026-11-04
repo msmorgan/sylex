@@ -42,9 +42,6 @@ checkout). All are confirmed at head as of 2026-10-21.
   under `asEvent` plus the entry replacement. Ascend and storied stay
   [CR#702.131b,702.195a]. Lean's `Keywords.lean` already uses
   replace/asEvent/cant here.
-- `docs/archive/decisions/semantics-v2.md` (line 624) makes the same claim.
-  That file is archived, so add an erratum note that points to the corrected
-  `semantics.md` text rather than editing the archived ruling.
 
 ## `docs/decisions/english.md` §2 (line 40)
 

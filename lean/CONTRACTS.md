@@ -26,7 +26,7 @@ consistency, not compatibility with previous checker behavior. Tests that encode
 obsolete shapes or incorrect laws must be corrected with an explanation and
 meaningful replacement coverage (user clarification, 2026-09-06).
 
-The checker's charter (`docs/archive/decisions/semantics-v2.md` §7, ruling 2026-10-06)
+The checker's charter (ruling 2026-10-06)
 is that a written term is a faithful reading of the card's English: its
 references resolve (anaphora, outcomes, choices, stamps, reference scopes,
 plurality, the handoff performer) and its terms are well-kinded. It is not a
@@ -1065,7 +1065,7 @@ one player choice in scope (`countChoice .player`), refused
 ### Linked Facets of a Link Source, linked objects, and declared Relations
 
 `PaidFacet` and `PaidCostName` are `LinkedFacet` and `LinkSource`
-(`docs/archive/decisions/semantics-v2.md` §7, ruling 2026-10-09, "A linked ability reads back a
+(ruling 2026-10-09, "A linked ability reads back a
 Linked Facet of a Link Source"). A Link Source names a cost; the facets read its
 payment, among them `LinkedFacet.taken which`, whether the choice `which` offered
 was taken ("if tribute wasn't paid" [CR#702.104b]), an amount facet named when its
@@ -1111,7 +1111,7 @@ Pins: `Semantics/Proofs/LinkedReadback.lean`.
 The ability a keyword is printed with ("Boast — [Cost]: [Effect]") is the
 keyword's parameter, `KeywordParam.ability`, and the restriction the keyword
 adds is a qualifier on it, `Ability.qualified ability timing limit guard
-from_` (`docs/archive/decisions/semantics-v2.md` §7, ruling 2026-10-09)
+from_` (ruling 2026-10-09)
 [CR#113.10a,113.6b]. A qualified ability keeps the wrapped ability's category
 (`Ability.category`).
 

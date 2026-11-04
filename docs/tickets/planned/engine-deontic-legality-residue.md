@@ -16,8 +16,7 @@ polarities (May / Cant / Must) over them.
 
 Fix: enumerate `DeonticAction` × polarity, decide which combinations the
 corpus actually produces, and evaluate those; keep the guard loud for the
-rest. See `docs/conformance.md` for the four-polarity model — full
-constraint arbitration (maximize-without-violating) is a separate, later
-concern.
+rest. Full constraint arbitration (maximize-without-violating) is a
+separate, later concern.
 
 Effort: **M**.

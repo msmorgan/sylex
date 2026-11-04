@@ -41,7 +41,7 @@ private def stunReplacement : Ability :=
   static (replace (would any (untap (a (and [isPermanent, hasCounter (some stunCounter)]))))
     (instead (removeCounters (exactly 1) (some (Semantics.CounterKindSource.printed (stunCounter))) it)))
 
-/-- UD-14 (`docs/engine-adrs.md`): "doesn't untap" is a prohibition, the engine's choice where
+/-- "Doesn't untap" is a prohibition, the engine's choice where
 the CR is silent, not a replacement. It forbids, with `cant`, the very `untap` Deed the stun
 counter's replacement watches, so on a tapped permanent with both the untap can't happen, the
 stun replacement can't apply to it [CR#614.17c], and the stun counter stays; as a replacement

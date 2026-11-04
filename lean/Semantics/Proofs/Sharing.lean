@@ -4,7 +4,7 @@ import Semantics.Check.Card
 /-!
 # Semantics.Proofs.Sharing
 
-Pins of Sharing and Agreement (`docs/decisions/semantics-v2.md` §7, 2026-10-09): `shares` is at
+Pins of Sharing and Agreement (2026-10-09): `shares` is at
 least one value in common on an axis, never equality, and `agree` is a constraint on a plural
 group, not a predicate on one member.
 -/

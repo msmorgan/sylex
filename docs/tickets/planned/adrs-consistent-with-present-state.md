@@ -42,16 +42,3 @@ the lines below are where to look, not a finished audit.
   deletion timing, and the v1 `deckmaste_english` translation path; the
   deletion-bound and cutover bullets (lines near 54-57 and 608-610) predate
   `retire-v1-english-and-spelling`.
-- `README.md` (the index): its English v4 entry names the renamed crates and
-  describes a "two-stage cutover" whose first stage and suffix drop are done.
-- `workbench-ron-shaped-and-label-rulings.md`: cites `plugins_v2/builtin/macros/`
-  and `idris/src/Experimental/` paths as live evidence, but the workbench is Lean
-  now.
-- `card-authoring-binds-no-implicits.md`: cites `Experimental/Macros.idr` and
-  `idris/src/Experimental/Cards.idr` as live; superseded for the Lean workbench
-  already, and the remaining Idris greps need a historical marker.
-- `lean-is-the-workbench.md`: `idris-retirement` amended its status lines for the
-  `idris/` deletion; its migration appendix still names `idris/src/Experimental.idr`
-  as the origin, which is history.
-
-Standard constraints apply.

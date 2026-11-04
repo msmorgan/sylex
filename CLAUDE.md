@@ -74,6 +74,7 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 - Per changed crate (code or consumed data): `cargo test -p <crate>` and
   `cargo clippy -p <crate> --tests -- -D warnings`. `cargo xtask lean check` only when `lean/` or
   `plugins/` changed.
+- Engine tests are grounded in real cards: use the real card when it exercises the case; to isolate one interaction, a minimal repro card is fine if it is derived from a named real card.
 - If a test fails and what it asserts is still wanted, fix the code.
 - A test that asserts something wrong or pins incidental behavior is rewritten to assert what is
   wanted, or retired. Never write a known defect into a test or ticket as accepted; fix it or

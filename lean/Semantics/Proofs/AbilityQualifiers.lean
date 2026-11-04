@@ -6,7 +6,7 @@ import Semantics.Check.Rules
 # Semantics.Proofs.AbilityQualifiers
 
 The ability printed with a keyword is a keyword parameter, and the keyword's restriction is a
-qualifier on it (`docs/decisions/semantics-v2.md` §7, ruling 2026-10-09). `Ability.qualified`,
+qualifier on it (ruling 2026-10-09). `Ability.qualified`,
 `KeywordParam.ability`, `Period.thisObject`, `AbilitySelection.printedAfter` and
 `PlayerStat.speed` are pinned here, with the eight keyword bodies they write.
 -/

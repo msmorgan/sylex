@@ -14,8 +14,7 @@ Why not now:
   representation for that fork.
 - The structured `TypeKind`'s only real payoff — capabilities as struct fields
   (`Permanent{combatant, …}`) — belongs instead in conferred registry data
-  ([Engine](../../decisions/engine.md), law 4;
-  [Conferrals come from registries](../../decisions/conferrals-come-from-registries.md)).
+  ([Engine](../../decisions/engine.md), law 4).
   Reintroducing the Combatant role as a struct field creates a second source of
   truth competing with `TypeDef.confers` (folded in `layer.rs
   fold_conferred_abilities`). The planned `engine-combatant-role` correction

@@ -1,7 +1,7 @@
 //! P0.W0 conformance rail: the keyword-classification drift-guard.
 //!
 //! The mtg-rules skill's `keywords-classified.json` is the pinned
-//! authoritative classification (docs/rules-taxonomy.md §10): the
+//! authoritative classification: the
 //! `KeywordAbility` enum may contain ONLY keywords it classes `intrinsic`,
 //! and every `KeywordAbility`-kind plugin macro must be a NON-intrinsic
 //! class (composite / composite-given / marker). Containment, not equality
@@ -77,7 +77,7 @@ fn ron_files_under(dir: &Path, out: &mut Vec<PathBuf>) {
 }
 
 /// A keyword macro under `keyword/derived/` is a parameterized instance of a
-/// base composite (rules-taxonomy §10), classified by its delegate rather than
+/// base composite, classified by its delegate rather than
 /// by its own name — the skill enumerates only the umbrella keyword.
 fn is_derived(path: &Path) -> bool {
     path.components().any(|c| c.as_os_str() == "derived")
@@ -161,7 +161,7 @@ fn keyword_macros_match_the_classification() {
             // Base composites are classified by their own name. Per-type
             // *variant* macros under `keyword/derived/` (landwalk-by-subtype,
             // typecycling, …) are parameterized instances of a base composite:
-            // rules-taxonomy §10 models "landwalk [type-expression]" as ONE
+            // the classification models "landwalk [type-expression]" as ONE
             // composite, so the skill classifies only the umbrella. A derived
             // macro therefore inherits the class of the base keyword its body
             // delegates to (`Landwalk` from `Landwalk(quality: …)`). A derived

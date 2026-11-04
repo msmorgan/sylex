@@ -1,4 +1,5 @@
-// Designations (docs/designations.md) that Vintage-playable cards can hold.
+// Designations (the Designation entry of docs/contexts/game-model/CONTEXT.md) that
+// Vintage-playable cards can hold.
 // Out of scope: planar controller [CR#311.5] (Plane cards) and archenemy [CR#904.2a]
 // (Archenemy format). A lemma is declared once, as a noun or as an adjective.
 [

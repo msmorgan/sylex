@@ -293,8 +293,7 @@ Keyword actions and keyword abilities have no facts table: each is a typed
 declaration in `lean/Semantics/Definitions/`, and a card names one only through
 the authored constant its declaration generates.
 
-[Lean is the workbench](docs/decisions/lean-is-the-workbench.md) records the
-succession. The earlier Idris workbench and its card emitter were deleted by
+The earlier Idris workbench and its card emitter were deleted by
 `idris-retirement`.
 The Rust-to-Lean card-soundness gate is still
 [tracked work](docs/tickets/planned/lean-card-soundness-gate.md), rather than a
@@ -308,8 +307,7 @@ The implemented card set is a deliberate vertical slice rather than a complete
 pool: development has prioritized the correctness of the rules systems over
 breadth of card coverage. A curated cache of real cards is encoded and verified
 by hand while Oracle recovery expands toward producing it directly, and the
-grammar continues to cover the remaining mechanics (`docs/rules-taxonomy.md`
-records that plan). The near-term work runs in three strands:
+grammar continues to cover the remaining mechanics. The near-term work runs in three strands:
 
 1. **Completing the grammar split.** Landed: the crate splits and renames, the
    semantics fork, the lowering crate, and the loader repoint. Remaining, in

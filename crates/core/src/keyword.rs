@@ -1,11 +1,10 @@
 //! The native keyword abilities ([CR#702]) the engine implements directly:
 //! a closed enum the combat code pattern-matches on, rather than plugin macros.
-//! The normative rule for what belongs in this enum (the graduation rule, the
-//! template-param conventions, and the `ParamShape`/`KeywordDecl` prune) is
-//! `docs/keyword-policy.md`.
-//! Per the keyword classification (primitive / composite / composite-given —
-//! docs/keyword-policy.md §1..§2; the descriptive catalog it derives from
-//! spells the class *intrinsic*, a name [CR#305.6] already owns), the
+//! What a keyword ability is and how one is defined are
+//! `docs/decisions/semantics.md` §3 and the Keyword Ability and Keyword Action
+//! entries of `docs/contexts/game-model/CONTEXT.md`.
+//! Per the keyword classification (primitive / composite / composite-given;
+//! never *intrinsic*, a name [CR#305.6] already owns), the
 //! variants are exactly the five implemented true primitives: first/double
 //! strike, deathtouch, and trample own prospective combat-damage machinery
 //! ([CR#510.1]); vigilance owns dedicated declare-attackers text

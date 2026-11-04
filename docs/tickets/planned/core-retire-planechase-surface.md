@@ -23,8 +23,8 @@ and `EventFilter::RollPlanarDie { by, face }` in both crates' `action.rs` and
 - `v1/crates/semantics/src/identity_registry.rs`: the three
   `RollPlanarDie` identity rows.
 - Citations: the deleted comments cite [CR#901.3a,901.8,901.9,901.9a..901.9c,311.7];
-  every one of those is also cited by a `done/` ticket or `docs/designations.md`, so
-  nothing leaves `cr-citations.lock`. The dice-roll comments in both crates'
+  `cargo xtask cite bless` drops from `cr-citations.lock` any of these that nothing else still
+  cites. The dice-roll comments in both crates'
   `continuous.rs`, `event.rs` and `action.rs` cite [CR#901.9d] to say the
   planar die is not a numeric roll; with no planar die in the model that
   sentence goes too. `cargo xtask cite check` must report 0 stale and
