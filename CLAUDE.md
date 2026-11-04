@@ -2,132 +2,81 @@
 
 ## Scope
 
-Vintage-playable Magic only: whatever is legal in Vintage. No set is out of scope as a set:
-Vintage-legal cards printed in Conspiracy or Planechase products must parse like any other.
+A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (its
+`cardLegalities.vintage` column in `data/mtgjson/AllPrintings.sqlite`), whatever product printed it.
 
 - Permanently out of scope: the Conspiracy and Plane card types, Vanguard, Scheme cards and ante.
   Do not ask about them, model them, or reserve room for them.
 - Deferred, not permanently out: Un-sets (some Un-cards are Vintage-legal).
 
+## Ground rules
+
+- Solo research project: no users or teammates. Add no backward compatibility, deprecation paths
+  or shims; change or delete freely. The docs are AI-written guidance: the owner's stated intent
+  wins, and you report a contradiction instead of resolving it by invention.
+- Fix a stale, broken or wrong thing when you notice it, in its own commit, and never copy a
+  legacy wart into new code. "Already failing on default" and "unrelated to my change" are never
+  reasons to leave a failure. Fix the cause, not just the instance (add the missing `.gitignore`
+  entry, not only delete the stray file); telling the owner to clean something up is leaving it.
+- Crash early: fail with an error that names the defect. Never swallow unexpected state or
+  missing data with silent fallbacks, dummy values, `unwrap_or_default()`, catch-all `_ =>` arms
+  or an early `return`.
+- Declare a schema once and derive the rest in the build (macro, derive, build step). Never check
+  in repetitive expanded code that no in-repo source regenerates; one-off scripts that edit the
+  source are fine. Don't couple distinct concepts because their code looks alike.
+- Write a decision into the document or code it governs, as plain current fact. No "Decided:"
+  notes, decision logs, dates or owner labels.
+- Size, count and coverage numbers are evidence, never targets: add no enforced thresholds and
+  don't optimize a number. When a change grows an already-large file, consider whether it splits
+  along natural concept boundaries, and if it does, split it fearlessly.
+
+## Where things are
+
+- `crates/`: the current crates. `v1/`: the old line, deleted once the new one reaches parity;
+  never extend it or copy newer work into it.
+- `lean/`: the Lean prototype that runs the `.syl` corpus in `plugins/`; it is due for deletion.
+- `docs/decisions/`: ADRs; `semantics-v3.md` is the semantics design.
+
+## Writing
+
+- American spelling everywhere (code, identifiers, docs, tickets, messages); verbatim quotations
+  keep theirs.
+- Before naming a public item or coining a term, check `docs/contexts/game-model/CONTEXT.md` or
+  `docs/contexts/oracle-english/CONTEXT.md`; rename the identifier to match, never the entry.
+
 ## Version control
 
-- This repo uses **jj**, never git. The jj-sensei skills are the reference (`wisdom` first,
-  `knowledge` for command semantics, `harmony` for stale/divergent/conflicted state, `boundaries`
-  for the immutability aliases). Refer to changes by change id; keep descriptions brief; no
-  `Co-Authored-By:` trailers.
-- **Off limits:** `jj op ...`, `jj undo`, `jj redo` (the user's alone), and `--ignore-immutable`,
-  `--config`, `--config-file`. Normal rewrites (`edit`, `abandon`, `squash`, `split`, `rebase`,
-  `describe`) are fine: from a feature workspace, everything outside your own work is immutable, so
-  an immutability refusal means you targeted the wrong rev.
-- Stale working copy → `jj workspace update-stale`. Divergence → `harmony`; keep the half with
-  your work, found by content, and re-run `jj fix` if a formatter raced you.
-- STOP and ask only when the evidence runs out: you cannot tell what a divergent half contains,
-  `@` is somewhere you cannot account for, or a refusal makes no sense.
-- **Never track session scratch.** `.superpowers/` and `docs/superpowers/` stay untracked, and no
-  per-task evidence, progress TSVs or plan-scoped verifier code enters `crates/`. Gates read such
-  evidence from gitignored paths at runtime; the citation-coverage lock (`cr-coverage.lock`, a
-  Bound floor) is the only tracked gate authority.
+- This repo uses **jj**, never git; the jj-sensei skills govern it. Keep change descriptions
+  brief.
+- Run jj as a top-level command, never inside scripts, `python -c` or shell functions; piping its
+  output is fine.
+- Per-task evidence, progress files and plan-scoped verifier code go in the gitignored
+  `docs/evidence/` or `.superpowers/`, never in `crates/`.
 
-## Feature workflow
+## Workflow
 
-The jj-kata `kata` and `kanban` skills own the lifecycle. Repo specifics:
-
-- **Claim or start before any exploration, design or subagents**, then work in
-  `.workspaces/NAME`. Unprovisioned workspaces lack `data`, local `docs/` dirs and the generated
-  `v1/plugins/wizards`. A hand-built workspace needs `scripts/provision-workspace .workspaces/NAME`
-  run from `default`; verify with a real `jj st` (no changes).
-- **Never `kata refresh --all`** (human-only).
-- Tickets: `docs/tickets/<status>/<slug>.md`; `docs/tickets/README.md` is the model.
-  `kata kanban ready` lists claimable items. Name your session after the item.
-- English grammar tickets end with the two-line note in `docs/tickets/README.md`. Other tickets
-  carry no landing record.
-- A ticket-vs-ruling contradiction resolved without a STOP is a HIGH finding, even when disclosed.
-- If another feature moved a ticket you also hold to `done/`, reconcile the meaning (move or mint
-  tickets), not just the conflict markers.
-
-## English grammar
-
-- Authorities: `docs/decisions/english-lexical-analysis.md` and `docs/decisions/english-v4.md`.
-  Read them before implementing, planning, reviewing or accounting for the English grammar
-  (`sylex_english`), syntax engine (`sylex_syntax`), or lexical catalogs
-  (`sylex_vocabulary`).
-- `docs/oracle-style-guide.md` is the authority on Oracle register. Before that same work, read its
-  front matter (through "The shortest useful checklist"), then read in full every section your
-  change touches, and cite it when a ruling depends on it. Briefs name those sections.
-- No word enumerated by the CR as a catalog item (including all `[CR#701.1]` keyword actions) may
-  appear directly in grammar declarations (`schema` or `production`); vocabulary and complement
-  frames live in the domain catalogs of `sylex_vocabulary` (and later `plugins/`).
-- The v1 English crate and its xtask tools are gone; `sylex_english` is now the english-v4
-  grammar. Do not recreate v1.
-
-## Crate fates (semantics_v3 and english-v4)
-
-Authorities: `docs/decisions/semantics-v3.md` and `docs/decisions/english-v4.md`.
-- `semantics-v3` executes in `lean/Semantics/`; `sylGen` compiles the `.syl` builtin and canon
-  under `plugins/`. `plugins-v3-syl-conversion` deleted the `.lean`-only Rust mirror and
-  lowering crates; `semantics-rust-rewrite` owns their future Rust replacement.
-- `english-v4` lives in `sylex_syntax`, `sylex_vocabulary` and `sylex_english`.
-  `english-v4-cutover-v3` deleted `deckmaste_english_v3`, `deckmaste_construction_v3*` and the
-  earlier `deckmaste_lexical_source`; `english-v4-final-suffix-cutover` dropped the `_v4` suffixes
-  and renamed `cargo xtask english-v4` to `cargo xtask english`. What remains of it, gated on
-  `semantics-v1-cutover`, is moving the catalogs into `plugins/` and deleting `sylex_features_v1`.
-- Deletion-bound at parity (`semantics-v1-cutover` and the remainder of
-  `english-v4-final-suffix-cutover`): `sylex_semantics_v1`, `sylex_lowering_v1`,
-  `sylex_render_v1`, `sylex_plugin_v1` (`deck.rs` and `provenance.rs` rehomed),
-  `sylex_features_v1`, `v1/plugins/builtin`, `v1/plugins/canon`. `idris/` is already gone
-  (`idris-retirement`). The v1 English crate,
-  `deckmaste_construction_compiler`, `deckmaste_constructions_macro` and xtask's v1 `english` and
-  `macro` tools are already gone, and the `spelling` stub crate is deleted (recreated as `sylex_spelling` when spelling starts).
-  Never copy v2/v3/v4 work back into v1, and add no new v1 registries.
-
-## Terminology
-
-Before naming a public item, writing an explanatory doc comment, or drafting a ticket, plan or
-ADR, read `CONTEXT-MAP.md` and the owning glossary (`docs/contexts/game-model/CONTEXT.md` or
-`docs/contexts/oracle-english/CONTEXT.md`). One Game Model term per concept; honour `_Avoid_`
-lines. Missing or flawed terms are amended in the glossary (with CR citation) via the
-`domain-modeling` skill as part of the landing. Rename identifiers; never reword entries to fit
-them.
+- The jj-kata `kata` and `kanban` skills own the lifecycle. **Claim or start before any
+  exploration, design or subagents**, then work in `.workspaces/NAME`.
+- **Never `kata refresh --all`** (owner only).
+- Ticket form: `docs/tickets/README.md`.
 
 ## CR citations
 
-- Format: `[CR#704.5g]`, `[CR#601.2g,106.4]`, `[CR#601.2a..601.2b]`. Never a bare `CR 704.5g` or
-  `704.5g`.
-- After changes: `cargo xtask cite check --list-noncompliant` empty, `cargo xtask cite check`
-  0 stale, `cargo xtask cite bless` for newly cited rules.
-- Rule numbers come from the CR, never memory. Before committing, run
-  `jj diff --git | cargo xtask cite audit --diff` (it reads STDIN; bare, it silently audits
-  nothing) and read each rule's text against its claim, including `bless`'s new registrations.
+- Format: `[CR#704.5g]`, `[CR#601.2g,106.4]`, `[CR#601.2a..601.2b]`; never a bare `704.5g`.
+- Rule numbers come from the CR (`data/rules/`), never memory.
+- After changes: `cargo xtask cite check --list-noncompliant` empty; `cargo xtask cite check`
+  0 stale; `cargo xtask cite bless` for newly cited rules.
+- Before committing, run `jj diff --git | cargo xtask cite audit --diff` (it reads stdin; run bare,
+  it audits nothing) and read each cited rule's text against its claim.
 
-## Assurance
+## Tests
 
-- If a test fails and what it asserts is still wanted, fix the code. A genuine regression is a
-  successful find: fix it; stop only if the fix fails, leaves the ticket, or needs a decision.
-- Never enshrine preliminary-investigation misses or model/grammar/checker defects in an ADR,
-  contract, ticket, or test as "known-wrong", accepted silent errors, or permanent manual
-  workarounds/escape hatches. Fix the underlying defect or ticket the fix.
-- A test that asserts something wrong, or pins incidental behaviour (a reading count that
-  includes wrong readings, an exact tree for an analysis nobody endorses), is retired or
-  rewritten to assert what is wanted. Say which, by name, and why.
-- A grammar test asserts the intended analysis. It asserts a count only when the count is the
-  claim: exactly one, or exactly the set of analyses each of which is endorsed.
+- Per changed crate (code or consumed data): `cargo test -p <crate>` and
+  `cargo clippy -p <crate> --tests -- -D warnings`. `cargo xtask lean check` only when `lean/` or
+  `plugins/` changed.
+- If a test fails and what it asserts is still wanted, fix the code.
+- A test that asserts something wrong or pins incidental behavior is rewritten to assert what is
+  wanted, or retired. Never write a known defect into a test or ticket as accepted; fix it or
+  ticket the fix.
 - Never `#[ignore]` without naming the exact blocker.
 - Report tests added, rewritten and retired, with a reason for each retirement.
-
-## Tests for a landing
-
-- `cargo test -p <crate>` and `cargo clippy -p <crate> --tests -- -D warnings` for every crate
-  whose code or consumed data changed.
-- `cargo xtask lean check` only when `lean/` or plugin definitions changed.
-- `cargo test --workspace` excludes `slow-tests` (TUI whole-game simulations); CI runs them.
-
-## Bearings
-
-- Symbol questions → rust-analyzer LSP first, grep second (subagents load it via ToolSearch
-  `select:LSP`).
-- Lean work → load the `lean4:*` skills and Lean LSP MCP tools (ToolSearch
-  `select:mcp__lean-lsp__…`) before the first edit; subagent briefs must say so. Always pass `-q`
-  (`--quiet`) to `lake build` so its progress spinner does not flood context.
-- Code shape: `cargo xtask map enums`; for Lean, `lean/Semantics/Words.lean` and
-  `lean/Semantics/Abilities.lean`. Current declarations beat inventories in old plans.
-- Plans and specs write "standard constraints apply" plus deltas; never restate this file.
