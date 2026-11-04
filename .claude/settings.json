@@ -3,7 +3,7 @@
     "JJ_EDITOR": "false"
   },
   "enabledPlugins": {
-    "mtg-rules@mtg-rules": true,
+    "mtg-rules@msmorgan": true,
     "jj-sensei@msmorgan": true,
     "jj-kata@msmorgan": true
   },
