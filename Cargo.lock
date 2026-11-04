@@ -1607,10 +1607,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sylex_spelling"
-version = "0.1.0"
-
-[[package]]
 name = "sylex_syl"
 version = "0.1.0"
 dependencies = [

@@ -12,7 +12,6 @@ members = [
     "crates/syl",
     "crates/engine",
     "crates/features",
-    "crates/spelling",
     "crates/syntax",
     "crates/render",
     "crates/lowering",
