@@ -323,9 +323,9 @@ records that plan). The near-term work runs in three strands:
    migration above, alongside the frame-coverage rounds — with the regex
    pipeline and legacy renderer as shadow oracles until recovery replaces them
    family by family.
-3. **Engine breadth.** `docs/tickets/census.md` tracks the open card shapes
-   (transform, saga, adventure, split, and the rest of the layout table),
-   keyword abilities, keyword actions, and ability words. Priority order:
+3. **Engine breadth.** The open card shapes (transform, saga, adventure,
+   split, and the other layouts), keyword abilities, keyword actions, and
+   ability words. Priority order:
    the engine happy path (the normal resolution path of ~90% of abilities),
    then oracle-text coverage, keyword authoring, and convenience macros, with
    the noncanon suite growing alongside.

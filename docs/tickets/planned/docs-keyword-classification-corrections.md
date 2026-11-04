@@ -1,9 +1,9 @@
 ---
 needs: []
 ---
-# Fix keyword-action numbers and misclassified mechanics in the ADRs and census
+# Fix keyword-action numbers and misclassified mechanics in the ADRs
 
-Three documents misnumber keyword actions or file a mechanic under the wrong
+Two documents misnumber keyword actions or file a mechanic under the wrong
 kind of rule. The Lean citations are already right in each case. Only the
 documents need fixing.
 
@@ -54,14 +54,6 @@ checkout). All are confirmed at head as of 2026-10-21.
   The lexical catalog already files firebending as a keyword ability
   (`crates/vocabulary/catalogs/keyword_abilities.ron`).
   Only the ADR is wrong.
-
-## `docs/tickets/census.md` (line 64)
-
-- The Ninjutsu row reads "special action: swap unblocked attacker". Ninjutsu
-  is an activated ability that functions from the hand and uses the stack
-  [CR#702.49a]. Reword the row: activated ability (from hand) that returns an
-  unblocked attacker you control and puts this card onto the battlefield
-  tapped and attacking.
 
 ## Out of this ticket
 
