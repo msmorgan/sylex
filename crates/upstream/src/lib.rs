@@ -123,8 +123,10 @@ impl<'de: 'a, 'a> Deserialize<'de> for DataStr<'a> {
 
 #[cfg(test)]
 mod error_tests {
-    use super::{DataError, DataRoot};
     use std::error::Error;
+
+    use super::DataError;
+    use super::DataRoot;
 
     #[test]
     fn missing_snapshot_preserves_path_and_io_source() {

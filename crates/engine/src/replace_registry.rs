@@ -1408,13 +1408,13 @@ mod tests {
         // A spell object per caster (the fact record's actor is its
         // controller).
         let mut spell = |controller: crate::player::PlayerId| {
-            let card = Arc::new(sylex_card::Card::Normal(
-                sylex_card::CardFace::from(sylex_card::Characteristics {
+            let card = Arc::new(sylex_card::Card::Normal(sylex_card::CardFace::from(
+                sylex_card::Characteristics {
                     name: "Test Spell".into(),
                     types: vec![sylex_core::Type::Sorcery.def()],
                     ..sylex_card::Characteristics::default()
-                }),
-            ));
+                },
+            )));
             let cid = state.cards.push(card, controller);
             state
                 .objects

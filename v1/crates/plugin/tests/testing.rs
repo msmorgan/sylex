@@ -1,7 +1,7 @@
-//! The mock cards in `v1/plugins/testing` parsed through the macro-aware reader,
-//! on top of the builtin prelude. A mock exists ONLY for a combo no real card
-//! carries (see that plugin's cards/README.md); engine tests take everything
-//! else from `v1/plugins/canon` (covered by tests/canon.rs).
+//! The mock cards in `v1/plugins/testing` parsed through the macro-aware
+//! reader, on top of the builtin prelude. A mock exists ONLY for a combo no
+//! real card carries (see that plugin's cards/README.md); engine tests take
+//! everything else from `v1/plugins/canon` (covered by tests/canon.rs).
 
 use std::path::Path;
 use std::path::PathBuf;

@@ -24,10 +24,10 @@
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
-use sylex_lexicon::AnalyzedText;
-use sylex_vocabulary::LexicalEnvironment;
-use sylex_syntax::CompiledGrammar;
 use rayon::prelude::*;
+use sylex_lexicon::AnalyzedText;
+use sylex_syntax::CompiledGrammar;
+use sylex_vocabulary::LexicalEnvironment;
 
 use crate::cleave::CleaveText;
 use crate::corpus::Corpus;

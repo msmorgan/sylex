@@ -4,12 +4,12 @@
 //! vocabulary, one CR-cited fact form each ([CR#701] keyword actions): the
 //! normal form that makes Dies-matches-sacrifice structural.
 //!
-//! This table is the source of truth for the rows; `check` (run by CI) fails when
-//! the committed file differs from the rendering, so a row edit here must land
-//! with a regenerated file. Each row fixes the verb's fact form (master-form
-//! `kind` plus the `from`/`to` zone coordinates) and the three caps a
-//! cause-narrowed pattern inherits (`object`, `actor`, `amount`); the engine reads
-//! only `verb`, `kind`, `from`, `to` and `amount`.
+//! This table is the source of truth for the rows; `check` (run by CI) fails
+//! when the committed file differs from the rendering, so a row edit here must
+//! land with a regenerated file. Each row fixes the verb's fact form
+//! (master-form `kind` plus the `from`/`to` zone coordinates) and the three
+//! caps a cause-narrowed pattern inherits (`object`, `actor`, `amount`); the
+//! engine reads only `verb`, `kind`, `from`, `to` and `amount`.
 //!
 //! Row citations: Sacrifice [CR#701.21a], Destroy [CR#701.8a], Discard
 //! [CR#701.9a], Exile [CR#701.13a], Mill [CR#701.17a], Play [CR#701.18a], Fight
@@ -208,7 +208,8 @@ pub fn run(args: &EntailmentsArgs) -> anyhow::Result<()> {
 mod tests {
     use super::*;
 
-    /// The committed table is exactly the rendering: the gate CI runs as `check`.
+    /// The committed table is exactly the rendering: the gate CI runs as
+    /// `check`.
     #[test]
     fn committed_table_equals_the_rendering() {
         let committed = std::fs::read_to_string(table_path()).expect("read entailments.ron");

@@ -8,22 +8,6 @@ use std::sync::Arc;
 
 pub use coverage::ManaCoverage;
 pub use coverage::ManaPayment;
-use sylex_core::Action;
-use sylex_core::Cmp;
-use sylex_core::Cost;
-use sylex_core::CostComponent;
-use sylex_core::LifeOp;
-use sylex_core::ManaCost;
-use sylex_core::ManaSymbol;
-use sylex_core::PayAct;
-use sylex_core::PipClass;
-use sylex_core::Predicate;
-use sylex_core::Reference;
-use sylex_core::RunnableCostAction;
-use sylex_core::SimpleManaSymbol;
-use sylex_core::Stat;
-use sylex_core::Uint;
-use sylex_core::Zone;
 pub use iou::FulfillmentWitness;
 pub use iou::IouId;
 pub use iou::IouKind;
@@ -43,6 +27,22 @@ pub use replay::ReversalBarrier;
 pub use replay::TransactionRecord;
 pub(crate) use replay::contextual_barriers_for;
 pub use replay::reconstruct;
+use sylex_core::Action;
+use sylex_core::Cmp;
+use sylex_core::Cost;
+use sylex_core::CostComponent;
+use sylex_core::LifeOp;
+use sylex_core::ManaCost;
+use sylex_core::ManaSymbol;
+use sylex_core::PayAct;
+use sylex_core::PipClass;
+use sylex_core::Predicate;
+use sylex_core::Reference;
+use sylex_core::RunnableCostAction;
+use sylex_core::SimpleManaSymbol;
+use sylex_core::Stat;
+use sylex_core::Uint;
+use sylex_core::Zone;
 
 use crate::object::ObjectId;
 use crate::player::ManaActionId;
@@ -3053,9 +3053,7 @@ mod tests {
                     sylex_core::Ability::r#static(StaticSpec::Replacement(Arc::new(
                         replacement.clone(),
                     ))),
-                    sylex_core::Ability::r#static(StaticSpec::Replacement(Arc::new(
-                        replacement,
-                    ))),
+                    sylex_core::Ability::r#static(StaticSpec::Replacement(Arc::new(replacement))),
                 ],
                 ..Characteristics::default()
             }))),
@@ -3239,10 +3237,7 @@ mod tests {
 
         let Some(FulfillmentWitness::Objects(chosen)) = super::automatic_step_witness(
             &state,
-            &choose_creatures(sylex_core::Quantity::Range(
-                Some(Count::Literal(2)),
-                None,
-            )),
+            &choose_creatures(sylex_core::Quantity::Range(Some(Count::Literal(2)), None)),
             &frame,
         ) else {
             panic!("three candidates satisfy a lower bound of two");
@@ -3262,10 +3257,7 @@ mod tests {
         assert_eq!(
             super::automatic_step_witness(
                 &state,
-                &choose_creatures(sylex_core::Quantity::Range(
-                    Some(Count::Literal(2)),
-                    None,
-                )),
+                &choose_creatures(sylex_core::Quantity::Range(Some(Count::Literal(2)), None,)),
                 &frame,
             ),
             None,

@@ -7,6 +7,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use macro_ron::Expand;
 use sylex_card::Card;
 use sylex_core::Ability;
 use sylex_core::Action;
@@ -19,7 +20,6 @@ use sylex_core::TargetSpec;
 use sylex_core::Type;
 use sylex_lowering_v1::Lower;
 use sylex_plugin_v1::plugin::Plugin;
-use macro_ron::Expand;
 
 fn canon_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/canon")
@@ -64,10 +64,10 @@ fn grizzly_bears_expand_the_creature_type_macro() {
     let Card::Normal(face) = card else {
         panic!("Grizzly Bears should be single-faced");
     };
-    // The `Creature` cardtype macro now expands to the full conferring `TypeDef`
-    // — the combat-capability confers ([CR#508.1a,509.1a]) ride the type. Read
-    // the SAME expansion the card's `types: [Creature]` produced, not the
-    // empty-confer `Type::Creature.def()`.
+    // The `Creature` cardtype macro now expands to the full conferring
+    // `TypeDef` — the combat-capability confers ([CR#508.1a,509.1a]) ride
+    // the type. Read the SAME expansion the card's `types: [Creature]`
+    // produced, not the empty-confer `Type::Creature.def()`.
     let creature_type: sylex_core::TypeDef = plugin
         .macros
         .read_str::<sylex_semantics_v1::TypeDef>("Creature")
@@ -165,10 +165,7 @@ fn do_or_die_lowers_pile_labels_to_registers() {
     let Instruction::Each(each) = choice.then.as_ref() else {
         panic!("expected Each, got {:?}", choice.then);
     };
-    assert_eq!(
-        each.over,
-        sylex_core::Selection::Pile(sylex_core::RefId(6))
-    );
+    assert_eq!(each.over, sylex_core::Selection::Pile(sylex_core::RefId(6)));
     assert_eq!(
         each.over.collection_domain(),
         sylex_core::CollectionDomain::Pile
@@ -316,8 +313,9 @@ fn mana_leak_reads_to_a_must_pay_punisher() {
 /// `Choose(Exactly(2), …)` used to re-serialize with `Exactly(2)` intact (the
 /// no-card-churn guarantee, pre-erasure); now the loaded card carries
 /// `Exactly(2)`'s BODY, so the plain-serde core RON shows the explicit
-/// `Range(Literal(2), Literal(2))` primitive instead — the invocation spelling no longer lives in the
-/// compiled card at all (it is still on the `Exactly` macro definition).
+/// `Range(Literal(2), Literal(2))` primitive instead — the invocation spelling
+/// no longer lives in the compiled card at all (it is still on the `Exactly`
+/// macro definition).
 #[test]
 fn brainstorm_exactly_two_round_trips() {
     let card = canon().card("Brainstorm").unwrap().core;
@@ -378,7 +376,8 @@ fn arc_lightning_targets_any_target() {
     let TargetSpec::Target(count, filter) = &spell.targets[0] else {
         panic!("expected Target variant, got {:?}", spell.targets[0]);
     };
-    // Between(1, 3): one, two, or three targets — never zero (the AnyNumber bug).
+    // Between(1, 3): one, two, or three targets — never zero (the AnyNumber
+    // bug).
     assert_eq!(
         count.bounds(),
         (Some(&Count::Literal(1)), Some(&Count::Literal(3))),

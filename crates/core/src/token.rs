@@ -101,8 +101,8 @@ impl<'de> Deserialize<'de> for TokenName {
 /// restricted `{C}`, Map/Junk's explore/play, double-faced Incubator, the Aura
 /// Role tokens, …) are deliberately absent and resolve to `None` until their
 /// primitives land. Each token's defined characteristics ([CR#111.3]) match the
-/// builtin `v1/plugins/builtin/tokens/<Name>.ron` file (a colorless artifact whose
-/// only subtype is its own name).
+/// builtin `v1/plugins/builtin/tokens/<Name>.ron` file (a colorless artifact
+/// whose only subtype is its own name).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PredefinedToken {
     /// [CR#111.10a]

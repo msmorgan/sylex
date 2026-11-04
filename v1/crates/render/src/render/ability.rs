@@ -2646,9 +2646,9 @@ mod tests {
                     vec![
                         Predicate::Kind(ObjectKind::Spell),
                         Predicate::Characteristic(CharacteristicPredicate::Subtype(
-                            sylex_semantics_v1::SubtypeRef::named(
-                                sylex_semantics_v1::Ident::from("Elf")
-                            )
+                            sylex_semantics_v1::SubtypeRef::named(sylex_semantics_v1::Ident::from(
+                                "Elf"
+                            ))
                         )),
                     ]
                     .into()

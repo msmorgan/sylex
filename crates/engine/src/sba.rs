@@ -157,17 +157,16 @@ pub fn sweep(state: &GameState) -> Vec<GameEvent> {
 /// both keyed on conferred data + the `attached_to` relation only; NEVER on
 /// the Aura/Equipment/Fortification subtype:
 ///
-/// 1. **Firing state-checked SBA rows.** Two sources, both `{when, then}`:
-///    the type/subtype-conferred `Property::StateBased` flavor — the Aura
-///    graveyard rule ([CR#704.5m]) is `StateBased(Not(LegallyAttached(
-///    Ref(This))), Move(Ref(This), Graveyard))`, an ability-free conferral
-///    because a [CR#704] game action is not an ability ([CR#704.1,704.1a])
-///    — and the `StaticSpec::ConditionallyDo` statics an OBJECT carries,
-///    which still spell card-level state-checked statics such as ascend
-///    ([CR#702.131b]). For each battlefield object, evaluate `when`
-///    with `This` = the object; if true, run `then`'s events. Objects a
-///    firing row removes this sweep are tracked so pass 2 doesn't
-///    double-handle them.
+/// 1. **Firing state-checked SBA rows.** Two sources, both `{when, then}`: the
+///    type/subtype-conferred `Property::StateBased` flavor — the Aura graveyard
+///    rule ([CR#704.5m]) is `StateBased(Not(LegallyAttached( Ref(This))),
+///    Move(Ref(This), Graveyard))`, an ability-free conferral because a
+///    [CR#704] game action is not an ability ([CR#704.1,704.1a]) — and the
+///    `StaticSpec::ConditionallyDo` statics an OBJECT carries, which still
+///    spell card-level state-checked statics such as ascend ([CR#702.131b]).
+///    For each battlefield object, evaluate `when` with `This` = the object; if
+///    true, run `then`'s events. Objects a firing row removes this sweep are
+///    tracked so pass 2 doesn't double-handle them.
 /// 2. **Generic illegal-attachment cleanup.** Any object attached to an illegal
 ///    host (per `attachment_legal`) that no firing row removed → becomes
 ///    unattached and stays ([CR#704.5n] Equipment/Fortification; [CR#704.5p]
@@ -480,7 +479,8 @@ mod tests {
     use crate::step::StepOutcome;
 
     fn builtin() -> Plugin {
-        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap()
+        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
+            .unwrap()
     }
 
     fn canon() -> Plugin {
@@ -578,12 +578,13 @@ mod tests {
 
     /// End-to-end through the WIZARDS load path ([CR#704.5m]): a graduated
     /// wizards Aura (Angelic Gift) carries the Aura subtype's ability-free
-    /// `StateBased` graveyard rule *via the data*, not in-Rust scaffolding. Loaded over the
-    /// builtin sibling prelude, put on the battlefield UNATTACHED, the generic
-    /// SBA sweep fires its battlefield→graveyard move. This is the regression
-    /// the fix targets: the Aura `confers:` lives in builtin and the generator
-    /// emits no confers-less wizards stub to shadow it, so a fresh wizards card
-    /// inherits the attachment rule.
+    /// `StateBased` graveyard rule *via the data*, not in-Rust scaffolding.
+    /// Loaded over the builtin sibling prelude, put on the battlefield
+    /// UNATTACHED, the generic SBA sweep fires its battlefield→graveyard
+    /// move. This is the regression the fix targets: the Aura `confers:`
+    /// lives in builtin and the generator emits no confers-less wizards
+    /// stub to shadow it, so a fresh wizards card inherits the attachment
+    /// rule.
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
@@ -664,8 +665,8 @@ mod tests {
 
         // Grizzly Bears has toughness 2; set lethal damage. The sweep emits
         // the destroy as a replaceable `Act(Destroy)` intent (its apply commits
-        // the battlefield→graveyard move when nothing replaces it), cause-tagged
-        // as the SBA destruction verb ([CR#701.8b]).
+        // the battlefield→graveyard move when nothing replaces it),
+        // cause-tagged as the SBA destruction verb ([CR#701.8b]).
         state.objects.obj_mut(bear).set_marked_damage(2);
         let actions = sba::sweep(&state);
         assert!(
@@ -1079,7 +1080,8 @@ mod tests {
         state.objects.obj_mut(bear).set_marked_damage(2);
         let actions = sba::sweep(&state);
         state.schedule_front(vec![WorkItem::Emit(Occurrence::Batch(actions))]);
-        // Act(Destroy) applies (nothing replaces it) → future-form ZoneChange remints.
+        // Act(Destroy) applies (nothing replaces it) → future-form ZoneChange
+        // remints.
         let _ = state.step();
         let _ = state.step();
         assert!(
@@ -1099,7 +1101,8 @@ mod tests {
         assert_ne!(new, bear, "graveyard object must have a fresh ObjectId");
     }
 
-    // --- Attachment SBAs ([CR#704.5m..704.5p]) ---------------------------------
+    // --- Attachment SBAs ([CR#704.5m..704.5p])
+    // ---------------------------------
 
     use sylex_card::CardFace;
     use sylex_card::Characteristics;
@@ -1132,9 +1135,7 @@ mod tests {
                 sylex_core::Param {
                     def: sylex_core::DefId(0),
                     kind: sylex_core::Kind::Entity,
-                    provenance: sylex_core::Provenance::Candidate(
-                        sylex_core::Domain::Entity,
-                    ),
+                    provenance: sylex_core::Provenance::Candidate(sylex_core::Domain::Entity),
                 },
                 sylex_core::Param {
                     def: sylex_core::DefId(1),
@@ -1590,7 +1591,8 @@ mod tests {
         );
     }
 
-    // --- Ascend (permanent form) e2e ([CR#702.131b,702.131c]) ------------------
+    // --- Ascend (permanent form) e2e ([CR#702.131b,702.131c])
+    // ------------------
 
     /// [CR#702.131b]: the Ascend static grants the city's blessing once the
     /// controller has ten permanents, exactly once (idempotent / no sweep
@@ -1608,7 +1610,8 @@ mod tests {
         let name: sylex_core::Ident = "CitysBlessing".into();
         let p0 = PlayerId(0);
 
-        // The Ascend static, built typed (mirrors the builtin macro's expansion).
+        // The Ascend static, built typed (mirrors the builtin macro's
+        // expansion).
         let gate = Condition::And(
             vec![
                 Condition::Compare(
@@ -1704,8 +1707,8 @@ mod tests {
 
         // The Ascend static, built typed (mirrors the builtin macro's
         // expansion). `ControlledBy(Ref(You))` resolves `You` to the carrying
-        // object's controller via the static's frame, so each ascender counts ITS
-        // controller's permanents and grants to that controller.
+        // object's controller via the static's frame, so each ascender counts
+        // ITS controller's permanents and grants to that controller.
         let ascend = || {
             Ability::r#static(StaticSpec::ConditionallyDo {
                 when: Arc::new(Condition::And(
@@ -1843,7 +1846,8 @@ mod tests {
             "toughness-0 creature should be put into its graveyard (a Move, not a destroy); \
              got {actions:?}"
         );
-        // Must NOT be an Act(Destroy) — regeneration/indestructible must not save it.
+        // Must NOT be an Act(Destroy) — regeneration/indestructible must not
+        // save it.
         assert!(
             !actions
                 .iter()
@@ -2013,7 +2017,8 @@ mod tests {
         let _actions = sba::sweep(&state);
     }
 
-    // --- Legend rule [CR#704.5j] -----------------------------------------------
+    // --- Legend rule [CR#704.5j]
+    // -----------------------------------------------
 
     use sylex_core::Supertype;
 
@@ -2023,14 +2028,13 @@ mod tests {
         name: &str,
         controller: PlayerId,
     ) -> crate::object::ObjectId {
-        let card = sylex_card::Card::Normal(sylex_card::CardFace::from(
-            sylex_card::Characteristics {
+        let card =
+            sylex_card::Card::Normal(sylex_card::CardFace::from(sylex_card::Characteristics {
                 name: name.into(),
                 types: vec![Type::Creature.def()],
                 supertypes: vec![Supertype::Legendary],
                 ..sylex_card::Characteristics::default()
-            },
-        ));
+            }));
         let card_id = state.cards.push(Arc::new(card), controller);
         let id = state.objects.mint(
             ObjectSource::Card(card_id),
@@ -2048,14 +2052,13 @@ mod tests {
         name: &str,
         controller: PlayerId,
     ) -> crate::object::ObjectId {
-        let card = sylex_card::Card::Normal(sylex_card::CardFace::from(
-            sylex_card::Characteristics {
+        let card =
+            sylex_card::Card::Normal(sylex_card::CardFace::from(sylex_card::Characteristics {
                 name: name.into(),
                 types: vec![Type::Creature.def()],
                 supertypes: vec![],
                 ..sylex_card::Characteristics::default()
-            },
-        ));
+            }));
         let card_id = state.cards.push(Arc::new(card), controller);
         let id = state.objects.mint(
             ObjectSource::Card(card_id),
@@ -2201,7 +2204,8 @@ mod tests {
         );
     }
 
-    // --- lethal-damage rule [CR#704.5g,704.5h] ----------------------------------
+    // --- lethal-damage rule [CR#704.5g,704.5h]
+    // ----------------------------------
 
     /// [CR#704.5g]: a creature with lethal marked damage is destroyed via the
     /// rules-SBA rule, with `StateBasedAction` cause and verb "Destroy".
@@ -2275,7 +2279,8 @@ mod tests {
         let (mut state, bear) = bear_on_field();
         state.sba_rules = builtin().sba_rules;
 
-        // A deathtouch source (Typhoid Rats, 1/1 deathtouch) on the battlefield.
+        // A deathtouch source (Typhoid Rats, 1/1 deathtouch) on the
+        // battlefield.
         let rats = Arc::new(canon().card("Typhoid Rats").unwrap().core);
         let rats_card = state.cards.push(Arc::clone(&rats), PlayerId(1));
         let source = state.objects.mint(
@@ -2501,7 +2506,8 @@ mod tests {
             "Platinum Angel suppresses the life-zero loss"
         );
 
-        // Remove the Angel → the loss fires the next sweep (standing predicate).
+        // Remove the Angel → the loss fires the next sweep (standing
+        // predicate).
         state.zones.battlefield.retain(|&o| o != angel_obj);
         state.objects.obj_mut(angel_obj).zone = None;
         let actions = sba::sweep(&state);
@@ -2562,7 +2568,8 @@ mod tests {
             "Platinum Angel suppresses the poison loss"
         );
 
-        // Remove the Angel → the loss fires the next sweep (standing predicate).
+        // Remove the Angel → the loss fires the next sweep (standing
+        // predicate).
         state.zones.battlefield.retain(|&o| o != angel_obj);
         state.objects.obj_mut(angel_obj).zone = None;
         let actions = sba::sweep(&state);

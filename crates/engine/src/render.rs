@@ -136,7 +136,8 @@ impl GameState {
                 },
             },
             Action::ActivateAbility { object, ability } => {
-                // One layer build for both reads (mana flag + the ability itself).
+                // One layer build for both reads (mana flag + the ability
+                // itself).
                 let abilities = self.abilities(object);
                 let entry = abilities.get(ability);
                 let mana = entry.and_then(crate::derive::tap_mana_ability).is_some();

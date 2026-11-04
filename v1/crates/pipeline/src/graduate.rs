@@ -19,13 +19,13 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::sync::LazyLock;
 
+use rayon::prelude::*;
+use regex::Regex;
 use sylex_core::plugin::CARDS_DIR;
 use sylex_core::plugin::graduated_name;
 use sylex_core::plugin::is_ron_todo_file;
 use sylex_plugin_v1::plugin::Plugin;
 use sylex_plugin_v1::plugin::read;
-use rayon::prelude::*;
-use regex::Regex;
 
 /// Outcome of a graduation run.
 #[derive(Debug)]

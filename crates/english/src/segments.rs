@@ -5,13 +5,13 @@ use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::ops::Range;
 
+use serde::Serialize;
 use sylex_syntax::ChildRef;
 use sylex_syntax::CompiledGrammar;
 use sylex_syntax::LoadError;
 use sylex_syntax::Parse;
 use sylex_syntax::walk::ForestMemo;
 use sylex_syntax::walk::Visit;
-use serde::Serialize;
 
 /// The Oracle English outer structure, resolved in a bound grammar.
 ///

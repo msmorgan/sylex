@@ -276,8 +276,8 @@ fn in_ability_region<T>(f: impl FnOnce(u32) -> T) -> T {
 }
 
 /// Push this ability region's declared linked-memory parameters ([CR#607.1]).
-/// They follow the engine-supplied prefix and precede any capture, so the parameter
-/// order stays a function of the region's kind plus its plan.
+/// They follow the engine-supplied prefix and precede any capture, so the
+/// parameter order stays a function of the region's kind plus its plan.
 fn declare_linked(context: &mut Context, ability: u32) {
     let cells = PLAN.with(|slot| {
         slot.borrow()
@@ -434,8 +434,9 @@ pub(crate) fn is_active() -> bool {
 }
 
 /// Enter an ability region carried by a value built inside another region.
-/// Its engine-supplied ABI remains its own (source/controller/event roles/targets),
-/// followed by explicit captures of the enclosing register file.
+/// Its engine-supplied ABI remains its own (source/controller/event
+/// roles/targets), followed by explicit captures of the enclosing register
+/// file.
 pub(crate) fn in_carried_region<T>(
     kind: RegionKind,
     target_count: usize,
@@ -494,9 +495,9 @@ fn remap(reference: RefId, captures: &[Option<RefId>]) -> Option<RefId> {
     captures.get(reference.0 as usize).copied().flatten()
 }
 
-/// Enter a nested region. Engine-supplied parameters come first; outer registers
-/// are captured in definition order. The stable ABI is more valuable here
-/// than minimizing a serialized capture list.
+/// Enter a nested region. Engine-supplied parameters come first; outer
+/// registers are captured in definition order. The stable ABI is more valuable
+/// here than minimizing a serialized capture list.
 pub(crate) fn in_child<T>(
     supplied: impl IntoIterator<Item = (Kind, Provenance)>,
     f: impl FnOnce() -> T,
@@ -1181,9 +1182,9 @@ mod tests {
         assert_eq!(defs, [DefId(3), DefId(4), DefId(5)]);
     }
 
-    /// A nested region declares its own engine-supplied parameters FIRST and then
-    /// captures the enclosing register file in definition order (ADR law 7),
-    /// so a body reads nothing it did not declare.
+    /// A nested region declares its own engine-supplied parameters FIRST and
+    /// then captures the enclosing register file in definition order (ADR
+    /// law 7), so a body reads nothing it did not declare.
     #[test]
     fn a_nested_region_declares_supplied_params_then_captures_the_enclosing_file() {
         let (_, inner) = super::in_region(RegionKind::Spell, 1, || {
@@ -1231,8 +1232,8 @@ mod tests {
     }
 
     /// A carried body (a delayed trigger, a floating replacement) keeps its OWN
-    /// engine-supplied ABI and takes the enclosing registers as explicit captures
-    /// afterwards ([CR#603.7,603.12], ADR law 7).
+    /// engine-supplied ABI and takes the enclosing registers as explicit
+    /// captures afterwards ([CR#603.7,603.12], ADR law 7).
     #[test]
     fn a_carried_region_keeps_its_own_abi_then_captures() {
         let (_, carried) = super::in_region(RegionKind::Spell, 0, || {
@@ -1592,9 +1593,10 @@ mod tests {
     /// Drift guard for the Entity boundary: the SAME predicate must declare
     /// the same candidate domain whichever path builds its region
     /// ([CR#109.1,102.1] — ADR law 2). The two paths are lowering's
-    /// [`super::predicate_region`] and core's `Region::over`/`Region::candidate`;
-    /// the first case is the Ascend gate's count, an Object-domain census on
-    /// both. A hand-written region that disagrees with either is drift.
+    /// [`super::predicate_region`] and core's
+    /// `Region::over`/`Region::candidate`; the first case is the Ascend
+    /// gate's count, an Object-domain census on both. A hand-written region
+    /// that disagrees with either is drift.
     #[test]
     fn both_predicate_region_paths_declare_the_same_candidate_domain() {
         use crate::Lower as _;

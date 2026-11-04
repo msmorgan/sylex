@@ -528,12 +528,7 @@ impl crate::state::GameState {
 
     /// [CR#607.1]: write one linked memory cell of `owner` — the runtime half
     /// of `Instruction::Remember`.
-    pub(crate) fn remember_cell(
-        &mut self,
-        owner: ObjectId,
-        cell: sylex_core::Ident,
-        value: Value,
-    ) {
+    pub(crate) fn remember_cell(&mut self, owner: ObjectId, cell: sylex_core::Ident, value: Value) {
         self.memory.insert((owner, cell), value);
     }
 

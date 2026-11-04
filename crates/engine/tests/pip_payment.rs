@@ -102,14 +102,15 @@ fn run_to_priority(state: &mut GameState, player: PlayerId, phase: PhaseStep) ->
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player: p, legal },
-            )) if p == player && state.turn.current == phase => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player: p,
+                legal,
+            })) if p == player && state.turn.current == phase => {
                 return legal;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::Payment(_)) => {
@@ -283,9 +284,9 @@ fn convoke_taps_a_creature_to_pay_a_pip_without_changing_mana_value() {
                     .expect("automatic payment decision");
                 state.submit_decision(decision).unwrap();
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 if state.stack.is_empty() && !state.zones.hands[0].contains(&spell) {
                     break;
                 }
@@ -387,9 +388,9 @@ fn delve_exiles_a_graveyard_card_to_pay_a_pip_without_changing_mana_value() {
                     .expect("automatic payment decision");
                 state.submit_decision(decision).unwrap();
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 if state.stack.is_empty() && !state.zones.hands[0].contains(&spell) {
                     break;
                 }
@@ -450,7 +451,8 @@ fn convoke_resources_do_not_gate_a_spell_proposal() {
 
     // Put a creature onto the battlefield: convoke can now cover the {1} by
     // tapping it ([CR#702.51a]), so mana ({G}) plus the pip resource together
-    // cover the locked-in cost and the cast becomes legal ([CR#601.2g..601.2h]).
+    // cover the locked-in cost and the cast becomes legal
+    // ([CR#601.2g..601.2h]).
     force_onto_battlefield(&mut state, bear);
     assert!(
         cast_is_offered(&mut state, spell),
@@ -585,9 +587,9 @@ fn improvise_taps_an_artifact_to_pay_a_pip_without_changing_mana_value() {
                     .expect("automatic payment decision");
                 state.submit_decision(decision).unwrap();
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 if state.stack.is_empty() && !state.zones.hands[0].contains(&spell) {
                     break;
                 }
@@ -628,8 +630,8 @@ fn improvise_resources_do_not_gate_a_spell_proposal() {
     );
 
     // Put an artifact onto the battlefield: improvise can now cover one generic
-    // pip by tapping it ([CR#702.126a]); {1} of mana plus that pip resource then
-    // cover {2} ([CR#601.2g..601.2h]).
+    // pip by tapping it ([CR#702.126a]); {1} of mana plus that pip resource
+    // then cover {2} ([CR#601.2g..601.2h]).
     force_onto_battlefield(&mut state, myr);
     assert!(
         cast_is_offered(&mut state, spell),

@@ -30,9 +30,7 @@ impl Lower for sylex_semantics_v1::CopyException {
         match self {
             Self::Modify(f0) => sylex_core::CopyException::Modify(f0.lower()),
             Self::Retain(f0) => sylex_core::CopyException::Retain(f0.lower()),
-            Self::AdditionalEffect(f0) => {
-                sylex_core::CopyException::AdditionalEffect(f0.lower())
-            }
+            Self::AdditionalEffect(f0) => sylex_core::CopyException::AdditionalEffect(f0.lower()),
         }
     }
 }
@@ -90,9 +88,7 @@ mod tests {
     fn lowers_copy_source_object() {
         assert_matches!(
             sylex_semantics_v1::CopySource::Object(minimal_reference()).lower(),
-            sylex_core::CopySource::Object(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::CopySource::Object(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 

@@ -1,9 +1,9 @@
 use std::collections::HashSet;
 use std::sync::Arc;
 
+use rand::RngExt;
 use sylex_core::Uint;
 use sylex_core::Zone;
-use rand::RngExt;
 
 use crate::agenda::WorkItem;
 use crate::decide::Decision;
@@ -264,10 +264,11 @@ impl DecisionHandler for ChooseNoteNumber {
             return Err(DecisionError::WrongKind);
         };
         // [CR#608.2c,607.2]: record the chosen number in the destination
-        // register for indexed reads within THIS resolution. Any value >= 0 is legal (unbounded,
-        // like the X-announce), so no re-validation gate is needed.
-        // The answer reuses `Decision::XValue` — a chosen non-negative
-        // number — rather than mint a note-only twin.
+        // register for indexed reads within THIS resolution. Any value >= 0 is
+        // legal (unbounded, like the X-announce), so no re-validation
+        // gate is needed. The answer reuses `Decision::XValue` — a
+        // chosen non-negative number — rather than mint a note-only
+        // twin.
         g.pending = None;
         let Some(crate::state::DecisionContinuation::BindNumber { dest, activation }) =
             g.choice.take()

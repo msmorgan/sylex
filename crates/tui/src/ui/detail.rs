@@ -10,19 +10,19 @@
 //! prose, but it must not quietly show a shorter card than the object has.
 use std::fmt::Write as _;
 
+use ratatui::text::Text;
 use sylex_engine::GameState;
 use sylex_engine::LayeredView;
 use sylex_engine::ObjectId;
 use sylex_engine::ObjectSource;
 use sylex_engine::StackObject;
 use sylex_engine::face;
+use sylex_plugin_v1::provenance::raise_supertype;
 use sylex_render_v1::render::CardView;
 use sylex_render_v1::render::RenderedCard;
 use sylex_render_v1::render::render as render_card_view;
-use sylex_plugin_v1::provenance::raise_supertype;
 use sylex_semantics_v1::Expand;
 use sylex_semantics_v1::StatValue as SemanticStatValue;
-use ratatui::text::Text;
 
 use crate::game::ProvenanceRefs;
 use crate::ui::board::Selected;

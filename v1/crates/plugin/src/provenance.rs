@@ -173,10 +173,7 @@ impl ProvenanceIndex {
 
     /// The type-def twin of [`subtype`](Self::subtype).
     #[must_use]
-    pub fn type_def(
-        &self,
-        core: &sylex_core::TypeDef,
-    ) -> Option<&sylex_semantics_v1::TypeDef> {
+    pub fn type_def(&self, core: &sylex_core::TypeDef) -> Option<&sylex_semantics_v1::TypeDef> {
         self.type_defs.get(&core.name)
     }
 }

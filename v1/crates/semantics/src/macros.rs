@@ -101,8 +101,8 @@ pub fn param_types() -> ParamTypeSet {
     param_types.add_typed::<da::Subtype>("Subtype");
     // The card-TYPE arg of the `PermanentOfType(T)` / bare `Type(T)` filter
     // forms — a `TypeDef`-kind macro name (`Creature`), validated by reading it
-    // as a `TypeDef` with macros in scope (an undeclared type is rejected at the
-    // call site).
+    // as a `TypeDef` with macros in scope (an undeclared type is rejected at
+    // the call site).
     param_types.add_typed::<da::TypeDef>("TypeDef");
     param_types.add_typed::<da::Zone>("Zone");
     // No `Preference` row: strategy RON is outside the semantics program

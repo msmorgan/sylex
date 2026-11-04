@@ -14,6 +14,7 @@
 use std::path::Path;
 use std::sync::Arc;
 
+use rayon::prelude::*;
 use sylex_engine::GameOutcome;
 use sylex_engine::PlayerId;
 use sylex_engine::StrategyEvaluator;
@@ -21,7 +22,6 @@ use sylex_engine::sim::DeckCards;
 use sylex_engine::sim::Summary;
 use sylex_engine::sim::{self};
 use sylex_plugin_v1::plugin::Plugin;
-use rayon::prelude::*;
 
 /// Fixed seed for the focused/deterministic games.
 const SEED: u64 = 1;
@@ -34,7 +34,8 @@ fn matchup() -> DeckCards {
     )
     .unwrap();
     let builtin =
-        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap();
+        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
+            .unwrap();
     DeckCards {
         p0_spell: Arc::new(canon.card("Grizzly Bears").unwrap().core),
         p0_land: Arc::new(builtin.card("Forest").unwrap().core),

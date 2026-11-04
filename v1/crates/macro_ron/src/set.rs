@@ -21,12 +21,12 @@
 //! named `params: {"cost": String}` is invoked `Boast(cost: "{1}")` with
 //! `Param(cost)` holes. When positional argument reading is enabled, a named
 //! signature may also be invoked in its declaration order. A named param may
-//! carry a default — `{"template": Default(String, Param(name))}` — filled (and validated)
-//! when the invocation omits it; defaults may reference only always-supplied
-//! params of the same signature. Either shape of param may instead be
-//! declared `Elidable(String)`: an omitted argument is then filled with
-//! nothing, and the body entry holding its hole is dropped before the body is
-//! read, so the destination's own serde default applies. Elidable positional
+//! carry a default — `{"template": Default(String, Param(name))}` — filled (and
+//! validated) when the invocation omits it; defaults may reference only
+//! always-supplied params of the same signature. Either shape of param may
+//! instead be declared `Elidable(String)`: an omitted argument is then filled
+//! with nothing, and the body entry holding its hole is dropped before the body
+//! is read, so the destination's own serde default applies. Elidable positional
 //! params must be the trailing ones, since a call supplies a prefix.
 //!
 //! Bodies are raw RON source, read in place of the invocation with the

@@ -8,6 +8,7 @@
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
+use dpsi::Ident;
 use sylex_lexicon::AnalyzedText;
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
@@ -32,7 +33,6 @@ use sylex_syntax::Grammar;
 use sylex_syntax::LoadError;
 use sylex_syntax::Reading;
 use sylex_syntax::ReadingNode;
-use dpsi::Ident;
 
 fn core() -> Source {
     Source {

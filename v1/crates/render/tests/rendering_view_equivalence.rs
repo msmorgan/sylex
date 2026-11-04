@@ -19,18 +19,23 @@
 use std::path::Path;
 use std::path::PathBuf;
 
+use macro_ron::Expand;
 use sylex_plugin_v1::layout::CARDS_DIR;
 use sylex_plugin_v1::layout::is_todo_source;
 use sylex_plugin_v1::plugin::Plugin;
 use sylex_plugin_v1::plugin::read;
 use sylex_plugin_v1::plugin::ron_files_recursive;
-use macro_ron::Expand;
 
 fn workspace_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../..")
 }
 
-const COVERED: [&str; 4] = ["v1/plugins/builtin", "v1/plugins/canon", "v1/plugins/testing", "v1/plugins/demo"];
+const COVERED: [&str; 4] = [
+    "v1/plugins/builtin",
+    "v1/plugins/canon",
+    "v1/plugins/testing",
+    "v1/plugins/demo",
+];
 
 #[test]
 fn the_loaded_card_and_the_rendering_view_agree_on_every_card() {

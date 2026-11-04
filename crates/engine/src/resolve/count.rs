@@ -33,11 +33,7 @@ impl GameState {
     /// knowable about it; continuous effects that were applying when it left
     /// are not recorded, which is the same degradation the snapshot already
     /// documents for its other fields.
-    fn last_known_stat(
-        &self,
-        snapshot: &crate::lki::LkiSnapshot,
-        stat: sylex_core::Stat,
-    ) -> Uint {
+    fn last_known_stat(&self, snapshot: &crate::lki::LkiSnapshot, stat: sylex_core::Stat) -> Uint {
         let crate::object::ObjectSource::Card(card) = snapshot.source else {
             return 0;
         };
@@ -1200,9 +1196,9 @@ mod tests {
         );
         assert_eq!(
             state.eval_count(
-                &Count::CountOf(Countable::Objects(Arc::new(
-                    sylex_core::Region::candidate(creatures.clone()),
-                ))),
+                &Count::CountOf(Countable::Objects(Arc::new(sylex_core::Region::candidate(
+                    creatures.clone()
+                ),))),
                 &frame
             ),
             2
@@ -1220,9 +1216,9 @@ mod tests {
         );
         assert_eq!(
             state.eval_count(
-                &Count::CountOf(Countable::Objects(Arc::new(
-                    sylex_core::Region::candidate(yours),
-                ))),
+                &Count::CountOf(Countable::Objects(Arc::new(sylex_core::Region::candidate(
+                    yours
+                ),))),
                 &frame,
             ),
             1
@@ -1377,13 +1373,9 @@ mod tests {
         state.player_mut(PlayerId(1)).life = 10;
 
         let count_at_most = |threshold| {
-            Count::CountOf(Countable::Players(Arc::new(
-                sylex_core::Region::candidate(Predicate::PlayerStatCmp(
-                    PlayerAttr::Life,
-                    Cmp::AtMost,
-                    Count::Literal(threshold),
-                )),
-            )))
+            Count::CountOf(Countable::Players(Arc::new(sylex_core::Region::candidate(
+                Predicate::PlayerStatCmp(PlayerAttr::Life, Cmp::AtMost, Count::Literal(threshold)),
+            ))))
         };
 
         assert_eq!(
@@ -1440,9 +1432,9 @@ mod tests {
             timestamp,
             controller: PlayerId(0),
             scope: crate::layer::ScopeResolved::Locked(vec![bear]),
-            changes: vec![sylex_core::Modification::Power(
-                sylex_core::NumericOp::Up(Count::Literal(1)),
-            )],
+            changes: vec![sylex_core::Modification::Power(sylex_core::NumericOp::Up(
+                Count::Literal(1),
+            ))],
             duration: sylex_core::Duration::EndOfGame,
             rows: vec![],
             origin: None,
@@ -1951,9 +1943,7 @@ mod tests {
         let frame = frame_for(&state, PlayerId(0));
 
         let lose_life_pattern = EventFilter::LifeLost {
-            who: sylex_core::Predicate::Ref(sylex_core::Reference::Reg(
-                sylex_core::RefId(1),
-            )),
+            who: sylex_core::Predicate::Ref(sylex_core::Reference::Reg(sylex_core::RefId(1))),
             amount: None,
         };
 
@@ -2205,10 +2195,7 @@ mod tests {
         assert_eq!(ev(&Count::Minus(lit(2), lit(5))), 0, "a count floors at 0");
         assert_eq!(ev(&Count::Times(lit(2), lit(3))), 6);
         assert_eq!(ev(&Count::Max(lit(2), lit(3))), 3);
-        assert_eq!(
-            ev(&Count::Half(sylex_core::RoundMode::RoundUp, lit(3))),
-            2,
-        );
+        assert_eq!(ev(&Count::Half(sylex_core::RoundMode::RoundUp, lit(3))), 2,);
         assert_eq!(
             ev(&Count::Half(sylex_core::RoundMode::RoundDown, lit(3))),
             1,
@@ -2237,9 +2224,7 @@ mod tests {
         let frame = frame_for(&state, PlayerId(0));
         let powers = Count::CountDistinct(
             sylex_core::Characteristic::Power,
-            Countable::Objects(Arc::new(sylex_core::Region::candidate(
-                creatures_in_play(),
-            ))),
+            Countable::Objects(Arc::new(sylex_core::Region::candidate(creatures_in_play()))),
         );
         assert_eq!(
             state.eval_count(&powers, &frame),
@@ -2248,9 +2233,7 @@ mod tests {
         );
         let toughnesses = Count::CountDistinct(
             sylex_core::Characteristic::Toughness,
-            Countable::Objects(Arc::new(sylex_core::Region::candidate(
-                creatures_in_play(),
-            ))),
+            Countable::Objects(Arc::new(sylex_core::Region::candidate(creatures_in_play()))),
         );
         assert_eq!(
             state.eval_count(&toughnesses, &frame),
@@ -2268,9 +2251,7 @@ mod tests {
                 sylex_core::Param {
                     def: sylex_core::DefId(0),
                     kind: sylex_core::Kind::Entity,
-                    provenance: sylex_core::Provenance::Candidate(
-                        sylex_core::Domain::Entity,
-                    ),
+                    provenance: sylex_core::Provenance::Candidate(sylex_core::Domain::Entity),
                 },
                 sylex_core::Param {
                     def: sylex_core::DefId(1),

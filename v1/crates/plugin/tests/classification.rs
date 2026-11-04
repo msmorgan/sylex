@@ -128,10 +128,7 @@ fn keyword_macros_match_the_classification() {
     for plugin in ["builtin", "canon", "testing"] {
         let base = "v1/plugins";
         let mut files = Vec::new();
-        ron_files_under(
-            &root.join(base).join(plugin).join("macros"),
-            &mut files,
-        );
+        ron_files_under(&root.join(base).join(plugin).join("macros"), &mut files);
         // Meta-macro invocation files (KeywordAbility(name: "Flying", …),
         // subtype templates) don't parse as a literal MacroDef — resolve
         // those through the LOADED set instead, which also proves the

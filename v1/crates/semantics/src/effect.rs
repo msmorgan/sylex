@@ -497,9 +497,10 @@ mod tests {
         );
         // Discard is now the `Composite { name, body }` the `Action::discard`
         // ctor builds ([CR#701.9]), like Destroy — the struct-variant spelling
-        // reads all-named. The chosen form's body is a `With(Choose(..InHand..),
-        // Each(They, ..))` choose-then-act step (Task 8: the discard choice
-        // rides the ordinary `Choose` binder, not a bespoke selection).
+        // reads all-named. The chosen form's body is a
+        // `With(Choose(..InHand..), Each(They, ..))` choose-then-act
+        // step (Task 8: the discard choice rides the ordinary `Choose`
+        // binder, not a bespoke selection).
         assert_eq!(
             read(
                 "Composite(name: Discard, body: With(binder: Choose(quantity: Range(1, 1), \

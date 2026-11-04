@@ -1,6 +1,10 @@
 use std::collections::VecDeque;
 use std::sync::Arc;
 
+use rand::RngExt;
+use rand::SeedableRng;
+use rand::seq::SliceRandom;
+use rand_chacha::ChaCha8Rng;
 use sylex_card::Card;
 use sylex_core::BeginningStep;
 use sylex_core::EndingStep;
@@ -8,10 +12,6 @@ use sylex_core::Int;
 use sylex_core::PhaseStep;
 use sylex_core::Uint;
 use sylex_core::Zone;
-use rand::RngExt;
-use rand::SeedableRng;
-use rand::seq::SliceRandom;
-use rand_chacha::ChaCha8Rng;
 
 use crate::agenda::WorkItem;
 use crate::combat::CombatState;
@@ -61,8 +61,7 @@ pub struct DesignationInstance {
 pub struct DesignationStore {
     pub game: std::collections::HashMap<sylex_core::Ident, DesignationValue>,
     pub players: std::collections::HashMap<(PlayerId, sylex_core::Ident), DesignationValue>,
-    pub objects:
-        std::collections::HashMap<(ObjectId, sylex_core::Ident), Vec<DesignationInstance>>,
+    pub objects: std::collections::HashMap<(ObjectId, sylex_core::Ident), Vec<DesignationInstance>>,
 }
 
 /// Transient combat-damage assignment ([CR#510.1]): the partial state that
@@ -136,9 +135,9 @@ pub struct GameConfig {
     /// a `TypeDef`'s confers normally ride the card value — but a layer-4
     /// `CardTypes(...)` modification carries only bare `Ident` names, so the
     /// engine needs this registry to resolve them back to `TypeDef` structs
-    /// (with their `permanent_type`/`confers`). Populated from the loaded plugin's
-    /// `types` at construction; empty means a granted type resolves to a
-    /// minimal name-only `TypeDef` (no inherent rules).
+    /// (with their `permanent_type`/`confers`). Populated from the loaded
+    /// plugin's `types` at construction; empty means a granted type
+    /// resolves to a minimal name-only `TypeDef` (no inherent rules).
     pub types: std::collections::HashMap<sylex_core::Ident, sylex_core::TypeDef>,
 }
 

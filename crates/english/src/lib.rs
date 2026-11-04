@@ -8,11 +8,11 @@
 use std::sync::LazyLock;
 
 use sylex_lexicon::Lexicon;
-use sylex_vocabulary::data_text;
 use sylex_syntax::CompiledGrammar;
 use sylex_syntax::FrameCatalog;
 use sylex_syntax::Grammar;
 use sylex_syntax::LoadError;
+use sylex_vocabulary::data_text;
 
 /// The Oracle English grammar data file: compiled in for release and wasm
 /// builds, read from `grammar/english.ron` at run time in dev builds, so a

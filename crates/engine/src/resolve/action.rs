@@ -1,5 +1,6 @@
 //! `action_items`: lower an object-verb [`Action`] to events and work items.
 
+use slotmap::Key;
 use sylex_core::Action;
 use sylex_core::Agency;
 use sylex_core::Anchor;
@@ -8,7 +9,6 @@ use sylex_core::EnterRider;
 use sylex_core::Reference;
 use sylex_core::Uint;
 use sylex_core::Zone;
-use slotmap::Key;
 
 use super::occurrence_of;
 use crate::agenda::FinalizeWatch;
@@ -63,10 +63,7 @@ impl GameState {
                 let lki_can_deal = match source {
                     Reference::Reg(register) => matches!(
                         self.activation_provenance(frame.activation, *register),
-                        Some(
-                            sylex_core::Provenance::Source
-                                | sylex_core::Provenance::EventObject
-                        )
+                        Some(sylex_core::Provenance::Source | sylex_core::Provenance::EventObject)
                     ),
                     _ => false,
                 };
@@ -218,8 +215,9 @@ impl GameState {
                         // [CR#701.3b]: no-op on an illegal (what, host) pair —
                         // `attachment_legal` reads the attach deontics
                         // generically (default-deny: the attachment's own
-                        // enchant / type-rule `May(Attach)` grant must permit, the
-                        // host's protection `Cant` subtracts), never the
+                        // enchant / type-rule `May(Attach)` grant must permit,
+                        // the host's protection `Cant`
+                        // subtracts), never the
                         // subtype.
                         if !crate::legal::attachment_legal(self, attachment, host) {
                             continue;
@@ -999,9 +997,7 @@ pub(crate) fn composite_body_group(
 /// stored `Move`'s source reference ([CR#701.8a,702.29a]). Shares
 /// [`discard_body_what`](sylex_core::discard_body_what)'s descent, so the
 /// resolve lane reads the patient off the body exactly as the renderer does.
-pub(crate) fn composite_move_src(
-    body: &sylex_core::Instruction,
-) -> Option<&sylex_core::Reference> {
+pub(crate) fn composite_move_src(body: &sylex_core::Instruction) -> Option<&sylex_core::Reference> {
     sylex_core::discard_body_what(body)
 }
 
@@ -1632,10 +1628,7 @@ mod tests {
 
         // By(You, Tap(This)) -> one Single(Tapped(src)) carrying the
         // effect-instruction cause triple (events.md §3).
-        let items = state.action_items(
-            &Action::Tap(Reference::Reg(sylex_core::RefId(0))),
-            &frame,
-        );
+        let items = state.action_items(&Action::Tap(Reference::Reg(sylex_core::RefId(0))), &frame);
         assert_eq!(
             items,
             vec![WorkItem::Emit(Occurrence::Single(GameEvent::Tapped(
@@ -1704,10 +1697,7 @@ mod tests {
         let (mut state, src) = bear_on_field();
         state.objects.obj_mut(src).tapped = true;
         let frame = frame_src(&state, src);
-        let items = state.action_items(
-            &Action::Tap(Reference::Reg(sylex_core::RefId(0))),
-            &frame,
-        );
+        let items = state.action_items(&Action::Tap(Reference::Reg(sylex_core::RefId(0))), &frame);
         assert_eq!(
             items,
             vec![],
@@ -1721,10 +1711,8 @@ mod tests {
     fn untap_effect_skips_already_untapped() {
         let (state, src) = bear_on_field();
         let frame = frame_src(&state, src);
-        let items = state.action_items(
-            &Action::Untap(Reference::Reg(sylex_core::RefId(0))),
-            &frame,
-        );
+        let items =
+            state.action_items(&Action::Untap(Reference::Reg(sylex_core::RefId(0))), &frame);
         assert_eq!(
             items,
             vec![],
@@ -1783,10 +1771,7 @@ mod tests {
         );
         let frame = frame_src(&state, a);
         state.run_effect(
-            Instruction::mill(
-                Reference::Reg(sylex_core::RefId(1)),
-                Count::Literal(100),
-            ),
+            Instruction::mill(Reference::Reg(sylex_core::RefId(1)), Count::Literal(100)),
             &frame,
         );
         run_injected(&mut state);
@@ -2344,16 +2329,12 @@ mod tests {
                     assert_eq!(
                         cost,
                         sylex_core::ManaCost::from(Arc::from(vec![
-                            sylex_core::ManaSymbol::Simple(
-                                sylex_core::SimpleManaSymbol::Generic(1)
-                            ),
-                            sylex_core::ManaSymbol::Simple(
-                                sylex_core::SimpleManaSymbol::Specific(
-                                    sylex_core::ColorOrColorless::Color(
-                                        sylex_core::Color::Red
-                                    )
-                                )
-                            ),
+                            sylex_core::ManaSymbol::Simple(sylex_core::SimpleManaSymbol::Generic(
+                                1
+                            )),
+                            sylex_core::ManaSymbol::Simple(sylex_core::SimpleManaSymbol::Specific(
+                                sylex_core::ColorOrColorless::Color(sylex_core::Color::Red)
+                            )),
                         ])),
                         "the madness cast pays {{1}}{{R}}, not the printed {{3}}{{R}}"
                     );
@@ -2407,9 +2388,7 @@ mod tests {
         // source IS the hand card, so `This` = the discarded card.
         let frame = frame_src(&state, card);
         state.run_effect(
-            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(
-                0,
-            )))),
+            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(0)))),
             &frame,
         );
         run_injected(&mut state);
@@ -2470,9 +2449,7 @@ mod tests {
         let card = mint_in_hand_with(&mut state, PlayerId(0), madness_creature("Madcap Skills"));
         let frame = frame_src(&state, card);
         state.run_effect(
-            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(
-                0,
-            )))),
+            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(0)))),
             &frame,
         );
         run_injected(&mut state);
@@ -2517,9 +2494,7 @@ mod tests {
                 mint_in_hand_with(&mut state, PlayerId(0), madness_creature("Madcap Skills"));
             let frame = frame_src(&state, card);
             state.run_effect(
-                Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(
-                    0,
-                )))),
+                Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(0)))),
                 &frame,
             );
             run_injected(&mut state);
@@ -2580,9 +2555,7 @@ mod tests {
         );
         let frame = frame_src(&state, card);
         state.run_effect(
-            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(
-                0,
-            )))),
+            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(0)))),
             &frame,
         );
         run_injected(&mut state);
@@ -2692,9 +2665,7 @@ mod tests {
         let card = mint_in_hand_with(&mut state, PlayerId(0), madness_creature("Madcap Skills"));
         let frame = frame_src(&state, card);
         state.run_effect(
-            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(
-                0,
-            )))),
+            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(0)))),
             &frame,
         );
         run_injected(&mut state);
@@ -2788,9 +2759,7 @@ mod tests {
         // Bound discard ("discard this card"): the frame's source IS the card.
         let frame = frame_src(&state, card);
         state.run_effect(
-            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(
-                0,
-            )))),
+            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(0)))),
             &frame,
         );
         run_injected(&mut state);
@@ -2922,9 +2891,7 @@ mod tests {
         let card = mint_in_hand(&mut state, PlayerId(0), "Fodder");
         let frame = frame_src(&state, card);
         state.run_effect(
-            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(
-                0,
-            )))),
+            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(0)))),
             &frame,
         );
         run_injected(&mut state);
@@ -2983,9 +2950,7 @@ mod tests {
         );
         let frame = frame_src(&state, vampire);
         state.run_effect(
-            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(
-                0,
-            )))),
+            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(0)))),
             &frame,
         );
         run_injected(&mut state);
@@ -3120,18 +3085,14 @@ mod tests {
         // redirects its Hand → Graveyard to Exile ([CR#702.35a]).
         let frame = frame_src(&state, mine);
         state.run_effect(
-            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(
-                0,
-            )))),
+            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(0)))),
             &frame,
         );
         run_injected(&mut state);
         // Discard P1's Vampire: P1 controls no Gorger, so no window opens.
         let frame = frame_src(&state, theirs);
         state.run_effect(
-            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(
-                0,
-            )))),
+            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(0)))),
             &frame,
         );
         run_injected(&mut state);
@@ -3232,9 +3193,7 @@ mod tests {
         // Cycling's frame: the ability's source IS the hand card (`This`).
         let frame = frame_src(&state, card);
         state.run_effect(
-            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(
-                0,
-            )))),
+            Instruction::act(Action::discard_what(Reference::Reg(sylex_core::RefId(0)))),
             &frame,
         );
         run_injected(&mut state);
@@ -3956,10 +3915,8 @@ mod tests {
             )))]
         );
 
-        let items = state.action_items(
-            &Action::Untap(Reference::Reg(sylex_core::RefId(0))),
-            &frame,
-        );
+        let items =
+            state.action_items(&Action::Untap(Reference::Reg(sylex_core::RefId(0))), &frame);
         assert_eq!(
             items,
             vec![WorkItem::Emit(Occurrence::Single(GameEvent::Untapped(
@@ -5239,9 +5196,9 @@ mod tests {
         mint_in_hand(&mut state, p0, "H2");
         let frame = frame_for(&state, p0);
         let effect = Instruction::act(Action::MoveGroup {
-            group: Selection::SelectAll(Arc::new(sylex_core::Region::candidate(
-                Predicate::State(sylex_core::StatePredicate::InZone(Zone::Hand)),
-            ))),
+            group: Selection::SelectAll(Arc::new(sylex_core::Region::candidate(Predicate::State(
+                sylex_core::StatePredicate::InZone(Zone::Hand),
+            )))),
             arrangement: sylex_core::Arrangement::AnyOrder,
             to: Destination::Library(Anchor::FromTop(Count::Literal(0))),
             riders: vec![].into(),
@@ -5297,9 +5254,9 @@ mod tests {
         let before: std::collections::HashSet<ObjectId> =
             state.zones.battlefield.iter().copied().collect();
         let effect = Instruction::act(Action::MoveGroup {
-            group: Selection::SelectAll(Arc::new(sylex_core::Region::candidate(
-                Predicate::State(StatePredicate::InZone(Zone::Hand)),
-            ))),
+            group: Selection::SelectAll(Arc::new(sylex_core::Region::candidate(Predicate::State(
+                StatePredicate::InZone(Zone::Hand),
+            )))),
             arrangement: sylex_core::Arrangement::SameOrder,
             to: Destination::Zone(Zone::Battlefield),
             riders: vec![sylex_core::EnterRider::Tapped].into(),
@@ -6096,9 +6053,7 @@ mod tests {
                 sylex_core::Param {
                     def: sylex_core::DefId(2),
                     kind: sylex_core::Kind::Entities,
-                    provenance: sylex_core::Provenance::Linked(sylex_core::Ident::from(
-                        "milled",
-                    )),
+                    provenance: sylex_core::Provenance::Linked(sylex_core::Ident::from("milled")),
                 },
             ]),
             Instruction::Each(sylex_core::Each {
@@ -6309,9 +6264,7 @@ mod tests {
             Instruction::Each(sylex_core::Each {
                 over: Selection::Random(
                     sylex_core::Quantity::one(),
-                    std::sync::Arc::new(sylex_core::Region::over(
-                        creatures_on_the_battlefield(),
-                    )),
+                    std::sync::Arc::new(sylex_core::Region::over(creatures_on_the_battlefield())),
                 ),
                 body: loop_region(Instruction::act(Action::destroy(Reference::Reg(ELEMENT)))),
             }),

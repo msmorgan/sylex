@@ -67,11 +67,7 @@ impl Cause {
     /// The internal verb+agency+agent packing — every named constructor below
     /// routes through here so the only `Cause { … }` literal in the engine is
     /// this one.
-    fn verb(
-        verb: &str,
-        agency: sylex_core::Agency,
-        agent: Option<(ObjectId, PlayerId)>,
-    ) -> Self {
+    fn verb(verb: &str, agency: sylex_core::Agency, agent: Option<(ObjectId, PlayerId)>) -> Self {
         Cause {
             verb: verb.into(),
             agency,
@@ -164,10 +160,7 @@ impl Cause {
     /// distinct verb from the spell-/ability-"Counter" above ([CR#701.6a]):
     /// these mark a permanent, they don't remove it from the stack.
     #[must_use]
-    pub fn put_counters(
-        agency: sylex_core::Agency,
-        agent: Option<(ObjectId, PlayerId)>,
-    ) -> Self {
+    pub fn put_counters(agency: sylex_core::Agency, agent: Option<(ObjectId, PlayerId)>) -> Self {
         Self::verb("PutCounters", agency, agent)
     }
 

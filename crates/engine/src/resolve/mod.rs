@@ -675,10 +675,7 @@ mod tests {
         let element = |id| {
             let mut sub = frame.clone();
             sub.activation = state.enter_loop_region(&body, &frame, id, None);
-            state.eval_reference_product(
-                &sylex_core::Reference::Reg(sylex_core::RefId(0)),
-                &sub,
-            )
+            state.eval_reference_product(&sylex_core::Reference::Reg(sylex_core::RefId(0)), &sub)
         };
 
         let object = element(creature);

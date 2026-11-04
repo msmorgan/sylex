@@ -826,16 +826,18 @@ impl GameState {
                 to,
                 cause,
             } => {
-                // Dual-facet ([CR#603.6,616.1]): a plain `ZoneChange` fact, OR —
-                // in the REPLACEMENT lane only — a keyword-action `Act` carrying
-                // a body-facet zone shape (a move-verb: `from`/`to` present). So
+                // Dual-facet ([CR#603.6,616.1]): a plain `ZoneChange` fact, OR
+                // — in the REPLACEMENT lane only — a
+                // keyword-action `Act` carrying a body-facet
+                // zone shape (a move-verb: `from`/`to` present). So
                 // a `→Graveyard` replacement (Rest in Peace) bites the destroy
                 // composite's BODY facet, gathered with regeneration (the TAG
                 // facet, matched by the `Act` arm) into ONE applicable-set. The
                 // relaxation is Replacement-only: the committed past-form
-                // `ZoneChange` fact still carries the dies/enters TRIGGER, so matching the
-                // `Act` there too would double-fire. A reorder `Act` (from/to
-                // `None`) never matches — `zone_ok` fails, and a shapeless
+                // `ZoneChange` fact still carries the dies/enters TRIGGER, so
+                // matching the `Act` there too would
+                // double-fire. A reorder `Act` (from/to `None`)
+                // never matches — `zone_ok` fails, and a shapeless
                 // `ZoneChange` query is gated out by the facet check.
                 let body_facet = lane == Lane::Replacement
                     && fact.kind == FactKind::Act

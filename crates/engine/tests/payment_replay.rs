@@ -60,9 +60,7 @@ use sylex_engine::ReversalBarrier;
 use sylex_engine::StartingPlayer;
 use sylex_engine::StepOutcome;
 
-fn activation_fixture(
-    cost: Vec<CostComponent>,
-) -> (GameState, PlayerId, sylex_engine::ObjectId) {
+fn activation_fixture(cost: Vec<CostComponent>) -> (GameState, PlayerId, sylex_engine::ObjectId) {
     activation_fixture_with_extras(cost, Vec::new())
 }
 
@@ -752,10 +750,7 @@ fn colored_legendary_artifact() -> Arc<Card> {
 }
 
 fn omnath_fixture() -> Arc<Card> {
-    let green = Count::ManaAvailableKind(
-        Reference::Reg(sylex_core::RefId(1)),
-        Color::Green.into(),
-    );
+    let green = Count::ManaAvailableKind(Reference::Reg(sylex_core::RefId(1)), Color::Green.into());
     Arc::new(Card::Normal(CardFace::from(Characteristics {
         name: "Omnath, Locus of Mana".into(),
         mana_cost: "{2}{G}".parse().unwrap(),
@@ -822,9 +817,7 @@ fn bighorner_rancher_fixture() -> Arc<Card> {
     let greatest_power = Count::Aggregate(
         AggregateOp::MaxOf,
         Projection {
-            of: Countable::Objects(Arc::new(sylex_core::Region::candidate(
-                controlled_creature,
-            ))),
+            of: Countable::Objects(Arc::new(sylex_core::Region::candidate(controlled_creature))),
             by: Arc::new(sylex_core::Region::candidate(Count::StatOf(
                 Reference::Reg(sylex_core::RefId(0)),
                 sylex_core::Stat::Power,
@@ -856,11 +849,7 @@ fn bighorner_rancher_fixture() -> Arc<Card> {
     })))
 }
 
-fn put_named_in_play(
-    state: &mut GameState,
-    payer: PlayerId,
-    name: &str,
-) -> sylex_engine::ObjectId {
+fn put_named_in_play(state: &mut GameState, payer: PlayerId, name: &str) -> sylex_engine::ObjectId {
     let object = state.zones.hands[payer.index()]
         .iter()
         .copied()
@@ -914,9 +903,7 @@ fn mana_dependencies_qualify_pool_local_ids_by_player() {
         "Opponent producer",
         Cost(vec![CostComponent::Tap].into()),
         Color::Green,
-        Reference::OpponentOf(std::sync::Arc::new(Reference::Reg(sylex_core::RefId(
-            1,
-        )))),
+        Reference::OpponentOf(std::sync::Arc::new(Reference::Reg(sylex_core::RefId(1)))),
     );
     let self_source = green_source("Self producer");
     let costed_source = mana_source(
@@ -2647,9 +2634,9 @@ fn decline_replays_a_retained_fulfillment_that_creates_then_remints_a_token() {
                 }),
                 Instruction::act(CoreAction::Move(
                     Reference::Single(
-                        sylex_core::Selection::SelectAll(Arc::new(
-                            sylex_core::Region::candidate(token_on_battlefield.clone()),
-                        ))
+                        sylex_core::Selection::SelectAll(Arc::new(sylex_core::Region::candidate(
+                            token_on_battlefield.clone(),
+                        )))
                         .into(),
                     ),
                     Destination::Zone(Zone::Battlefield),
@@ -2658,9 +2645,9 @@ fn decline_replays_a_retained_fulfillment_that_creates_then_remints_a_token() {
                 )),
                 Instruction::act(CoreAction::Move(
                     Reference::Single(
-                        sylex_core::Selection::SelectAll(Arc::new(
-                            sylex_core::Region::candidate(token_on_battlefield),
-                        ))
+                        sylex_core::Selection::SelectAll(Arc::new(sylex_core::Region::candidate(
+                            token_on_battlefield,
+                        )))
                         .into(),
                     ),
                     Destination::Library(Anchor::FromBottom(Count::Literal(0))),
@@ -3642,9 +3629,7 @@ fn filter_mana_spent_in_a_child_reduces_omnath_before_rancher_produces() {
     for iou in &prompt.outstanding {
         let mana = match iou.kind {
             IouKind::ManaPip(sylex_engine::ManaPip::Colored(Color::Black)) => black,
-            IouKind::ManaPip(sylex_engine::ManaPip::Colored(Color::Green)) => {
-                green.next().unwrap()
-            }
+            IouKind::ManaPip(sylex_engine::ManaPip::Colored(Color::Green)) => green.next().unwrap(),
             IouKind::ManaPip(sylex_engine::ManaPip::Generic) if mapped_generics < 4 => {
                 mapped_generics += 1;
                 green.next().unwrap()
@@ -3775,8 +3760,7 @@ fn rancher_before_cylix_produces_exact_coverage_and_omnath_tracks_each_green_spe
         let (mana, spends_green) = match iou.kind {
             IouKind::ManaPip(sylex_engine::ManaPip::Colored(Color::Black)) => (black, false),
             IouKind::ManaPip(
-                sylex_engine::ManaPip::Colored(Color::Green)
-                | sylex_engine::ManaPip::Generic,
+                sylex_engine::ManaPip::Colored(Color::Green) | sylex_engine::ManaPip::Generic,
             ) => (green.next().unwrap(), true),
             ref other => panic!("unexpected IOU {other:?}"),
         };

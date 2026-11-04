@@ -3,6 +3,7 @@
 
 use std::sync::Arc;
 
+use slotmap::Key;
 use sylex_core::Action;
 use sylex_core::Count;
 use sylex_core::Deontic;
@@ -16,7 +17,6 @@ use sylex_core::Selection;
 use sylex_core::StaticSpec;
 use sylex_core::Uint;
 use sylex_core::Zone;
-use slotmap::Key;
 
 use super::action::composite_body_group;
 use super::action::composite_body_whose;
@@ -752,8 +752,9 @@ impl GameState {
                 // frame: `UntilEvent`'s filter and `ForAsLongAs`'s condition
                 // read `This`/`You` through it in their sweeps ([CR#603.10a]).
                 let origin = match &e.duration {
-                    sylex_core::Duration::UntilEvent(_)
-                    | sylex_core::Duration::ForAsLongAs(_) => Some(Box::new(frame.clone())),
+                    sylex_core::Duration::UntilEvent(_) | sylex_core::Duration::ForAsLongAs(_) => {
+                        Some(Box::new(frame.clone()))
+                    }
                     _ => None,
                 };
                 // [CR#611.2b]: a `ForAsLongAs` whose condition is already FALSE
@@ -2338,16 +2339,14 @@ mod tests {
         };
         mint_on_field(
             &mut state,
-            Card::Normal(sylex_card::CardFace::from(
-                sylex_card::Characteristics {
-                    name: "Archive Stand-In".into(),
-                    types: vec![Type::Enchantment.def()],
-                    abilities: vec![sylex_core::Ability::r#static(
-                        sylex_core::StaticSpec::Replacement(Arc::new(archive)),
-                    )],
-                    ..sylex_card::Characteristics::default()
-                },
-            )),
+            Card::Normal(sylex_card::CardFace::from(sylex_card::Characteristics {
+                name: "Archive Stand-In".into(),
+                types: vec![Type::Enchantment.def()],
+                abilities: vec![sylex_core::Ability::r#static(
+                    sylex_core::StaticSpec::Replacement(Arc::new(archive)),
+                )],
+                ..sylex_card::Characteristics::default()
+            })),
         );
 
         let frame = frame_for(&state, p0);
@@ -2380,34 +2379,32 @@ mod tests {
         }
         mint_on_field(
             &mut state,
-            Card::Normal(sylex_card::CardFace::from(
-                sylex_card::Characteristics {
-                    name: "Mill Watcher".into(),
-                    types: vec![Type::Enchantment.def()],
-                    abilities: vec![sylex_core::Ability::triggered(
-                        sylex_core::TriggeredAbility {
-                            ability_word: None,
-                            where_x: None,
-                            targets: [].into(),
-                            from: None,
-                            condition: None,
-                            limits: Vec::new().into(),
-                            event: sylex_core::EventFilter::Act {
-                                verb: sylex_core::VerbName::from("Mill"),
-                                who: Predicate::Any,
-                                on: Predicate::Any,
-                                cause: None,
-                            },
-                            effect: Instruction::act(Action::ChangeLife(
-                                Reference::Reg(sylex_core::RefId(1)),
-                                LifeOp::Up(Count::Literal(1)),
-                            ))
-                            .into(),
+            Card::Normal(sylex_card::CardFace::from(sylex_card::Characteristics {
+                name: "Mill Watcher".into(),
+                types: vec![Type::Enchantment.def()],
+                abilities: vec![sylex_core::Ability::triggered(
+                    sylex_core::TriggeredAbility {
+                        ability_word: None,
+                        where_x: None,
+                        targets: [].into(),
+                        from: None,
+                        condition: None,
+                        limits: Vec::new().into(),
+                        event: sylex_core::EventFilter::Act {
+                            verb: sylex_core::VerbName::from("Mill"),
+                            who: Predicate::Any,
+                            on: Predicate::Any,
+                            cause: None,
                         },
-                    )],
-                    ..sylex_card::Characteristics::default()
-                },
-            )),
+                        effect: Instruction::act(Action::ChangeLife(
+                            Reference::Reg(sylex_core::RefId(1)),
+                            LifeOp::Up(Count::Literal(1)),
+                        ))
+                        .into(),
+                    },
+                )],
+                ..sylex_card::Characteristics::default()
+            })),
         );
 
         let frame = frame_for(&state, p0);
@@ -2440,15 +2437,13 @@ mod tests {
     fn batch_fight_records_one_aggregate_fact_per_fighter() {
         let mut state = game();
         let fighter = |name: &str| {
-            Card::Normal(sylex_card::CardFace::from(
-                sylex_card::Characteristics {
-                    name: name.into(),
-                    types: vec![Type::Creature.def()],
-                    power: Some(sylex_core::StatValue::Number(2)),
-                    toughness: Some(sylex_core::StatValue::Number(5)),
-                    ..sylex_card::Characteristics::default()
-                },
-            ))
+            Card::Normal(sylex_card::CardFace::from(sylex_card::Characteristics {
+                name: name.into(),
+                types: vec![Type::Creature.def()],
+                power: Some(sylex_core::StatValue::Number(2)),
+                toughness: Some(sylex_core::StatValue::Number(5)),
+                ..sylex_card::Characteristics::default()
+            }))
         };
         let a = mint_on_field(&mut state, fighter("Batch Fighter A"));
         let b = mint_on_field(&mut state, fighter("Batch Fighter B"));
@@ -2505,15 +2500,13 @@ mod tests {
     fn batch_fight_with_zero_power_still_records_its_aggregate_fact() {
         let mut state = game();
         let fighter = |name: &str| {
-            Card::Normal(sylex_card::CardFace::from(
-                sylex_card::Characteristics {
-                    name: name.into(),
-                    types: vec![Type::Creature.def()],
-                    power: Some(sylex_core::StatValue::Number(0)),
-                    toughness: Some(sylex_core::StatValue::Number(1)),
-                    ..sylex_card::Characteristics::default()
-                },
-            ))
+            Card::Normal(sylex_card::CardFace::from(sylex_card::Characteristics {
+                name: name.into(),
+                types: vec![Type::Creature.def()],
+                power: Some(sylex_core::StatValue::Number(0)),
+                toughness: Some(sylex_core::StatValue::Number(1)),
+                ..sylex_card::Characteristics::default()
+            }))
         };
         let a = mint_on_field(&mut state, fighter("Zero Fighter A"));
         let b = mint_on_field(&mut state, fighter("Zero Fighter B"));
@@ -2751,9 +2744,9 @@ mod tests {
         assert!(crate::target::matches_with_activation(
             &state,
             a,
-            &sylex_core::Predicate::Characteristic(
-                sylex_core::CharacteristicPredicate::NamedReg(NAME.into()),
-            ),
+            &sylex_core::Predicate::Characteristic(sylex_core::CharacteristicPredicate::NamedReg(
+                NAME.into()
+            ),),
             Some(state.objects.obj(a).source),
             frame.activation,
         ));
@@ -2863,9 +2856,9 @@ mod tests {
             Instruction::Continuously(sylex_core::Continuously {
                 effect: Arc::new(sylex_core::StaticSpec::Modify(
                     subject.clone(),
-                    sylex_core::Modification::SetController(
-                        sylex_core::Reference::ControllerOf(Arc::new(other.clone())),
-                    ),
+                    sylex_core::Modification::SetController(sylex_core::Reference::ControllerOf(
+                        Arc::new(other.clone()),
+                    )),
                 )),
                 duration: sylex_core::Duration::EndOfGame,
             })
@@ -3261,23 +3254,21 @@ mod tests {
         );
         let fixture = mint_on_field(
             &mut state,
-            Card::Normal(sylex_card::CardFace::from(
-                sylex_card::Characteristics {
-                    name: "Grant Capture Fixture".into(),
-                    types: vec![Type::Creature.def()],
-                    abilities: vec![Ability::activated(ActivatedAbility {
-                        ability_word: None,
-                        cost: Cost::default(),
-                        from: None,
-                        window: None,
-                        condition: None,
-                        limits: Arc::from([]),
-                        targets: Arc::from([]),
-                        effect: grant_region.clone(),
-                    })],
-                    ..sylex_card::Characteristics::default()
-                },
-            )),
+            Card::Normal(sylex_card::CardFace::from(sylex_card::Characteristics {
+                name: "Grant Capture Fixture".into(),
+                types: vec![Type::Creature.def()],
+                abilities: vec![Ability::activated(ActivatedAbility {
+                    ability_word: None,
+                    cost: Cost::default(),
+                    from: None,
+                    window: None,
+                    condition: None,
+                    limits: Arc::from([]),
+                    targets: Arc::from([]),
+                    effect: grant_region.clone(),
+                })],
+                ..sylex_card::Characteristics::default()
+            })),
         );
         let bare = frame_src(&state, fixture);
         let activation = state.enter_region(&grant_region, &bare);
@@ -4262,9 +4253,9 @@ mod tests {
         let frame = frame_for(&state, p0);
         state.run_effect(
             Instruction::May(May {
-                who: Reference::OpponentOf(std::sync::Arc::new(Reference::Reg(
-                    sylex_core::RefId(1),
-                ))),
+                who: Reference::OpponentOf(std::sync::Arc::new(Reference::Reg(sylex_core::RefId(
+                    1,
+                )))),
                 effect: Arc::new(Instruction::act(Action::ChangeLife(
                     Reference::Reg(sylex_core::RefId(1)),
                     LifeOp::Up(Count::Literal(3)),
@@ -4743,8 +4734,8 @@ mod tests {
         Condition::And(
             vec![
                 Condition::Compare(
-                    Count::CountOf(Countable::Objects(Arc::new(
-                        sylex_core::Region::candidate(Predicate::And(
+                    Count::CountOf(Countable::Objects(Arc::new(sylex_core::Region::candidate(
+                        Predicate::And(
                             vec![
                                 Predicate::State(StatePredicate::InZone(Zone::Battlefield)),
                                 Predicate::Relation(RelationPredicate::ControlledBy(Arc::new(
@@ -4752,8 +4743,8 @@ mod tests {
                                 ))),
                             ]
                             .into(),
-                        )),
-                    ))),
+                        ),
+                    )))),
                     Cmp::AtLeast,
                     Count::Literal(10),
                 ),
@@ -5112,13 +5103,11 @@ mod tests {
     fn explorer_on_field(state: &mut GameState) -> ObjectId {
         mint_on_field(
             state,
-            Card::Normal(sylex_card::CardFace::from(
-                sylex_card::Characteristics {
-                    name: "Explorer".into(),
-                    types: vec![Type::Creature.def()],
-                    ..sylex_card::Characteristics::default()
-                },
-            )),
+            Card::Normal(sylex_card::CardFace::from(sylex_card::Characteristics {
+                name: "Explorer".into(),
+                types: vec![Type::Creature.def()],
+                ..sylex_card::Characteristics::default()
+            })),
         )
     }
 
@@ -5380,11 +5369,7 @@ mod tests {
                     sylex_core::Kind::Entity,
                     sylex_core::Provenance::LoopElement,
                 ),
-                param(
-                    1,
-                    sylex_core::Kind::Entity,
-                    sylex_core::Provenance::Source,
-                ),
+                param(1, sylex_core::Kind::Entity, sylex_core::Provenance::Source),
                 param(
                     2,
                     sylex_core::Kind::Entity,
@@ -5410,11 +5395,7 @@ mod tests {
                     sylex_core::Kind::Number,
                     sylex_core::Provenance::Allotment,
                 ),
-                param(
-                    2,
-                    sylex_core::Kind::Entity,
-                    sylex_core::Provenance::Source,
-                ),
+                param(2, sylex_core::Kind::Entity, sylex_core::Provenance::Source),
                 param(
                     3,
                     sylex_core::Kind::Entity,
@@ -5426,9 +5407,7 @@ mod tests {
     }
 
     /// A per-candidate predicate region.
-    fn candidate_region<T: sylex_core::CandidateBody>(
-        body: T,
-    ) -> Arc<sylex_core::Region<T>> {
+    fn candidate_region<T: sylex_core::CandidateBody>(body: T) -> Arc<sylex_core::Region<T>> {
         Arc::new(sylex_core::Region::candidate(body))
     }
 
@@ -5684,11 +5663,7 @@ mod tests {
                     sylex_core::Kind::Entity,
                     sylex_core::Provenance::Capture(sylex_core::RefId(0)),
                 ),
-                param(
-                    2,
-                    sylex_core::Kind::Entity,
-                    sylex_core::Provenance::Source,
-                ),
+                param(2, sylex_core::Kind::Entity, sylex_core::Provenance::Source),
                 param(
                     3,
                     sylex_core::Kind::Entity,
@@ -6618,16 +6593,14 @@ mod tests {
         };
         mint_on_field(
             &mut state,
-            Card::Normal(sylex_card::CardFace::from(
-                sylex_card::Characteristics {
-                    name: "Bruvac Stand-In".into(),
-                    types: vec![Type::Enchantment.def()],
-                    abilities: vec![sylex_core::Ability::r#static(
-                        sylex_core::StaticSpec::Replacement(Arc::new(bruvac)),
-                    )],
-                    ..sylex_card::Characteristics::default()
-                },
-            )),
+            Card::Normal(sylex_card::CardFace::from(sylex_card::Characteristics {
+                name: "Bruvac Stand-In".into(),
+                types: vec![Type::Enchantment.def()],
+                abilities: vec![sylex_core::Ability::r#static(
+                    sylex_core::StaticSpec::Replacement(Arc::new(bruvac)),
+                )],
+                ..sylex_card::Characteristics::default()
+            })),
         );
 
         let frame = player_frame(&state, p0);
@@ -7180,11 +7153,7 @@ mod tests {
                             sylex_core::Kind::Entity,
                             sylex_core::Provenance::LoopElement,
                         ),
-                        param(
-                            1,
-                            sylex_core::Kind::Entity,
-                            sylex_core::Provenance::Source,
-                        ),
+                        param(1, sylex_core::Kind::Entity, sylex_core::Provenance::Source),
                         param(
                             2,
                             sylex_core::Kind::Entity,
@@ -7273,11 +7242,7 @@ mod tests {
         // to ability one's — declares the cell.
         let reader: sylex_core::Region = sylex_core::Region::new(
             Arc::from([
-                param(
-                    0,
-                    sylex_core::Kind::Entity,
-                    sylex_core::Provenance::Source,
-                ),
+                param(0, sylex_core::Kind::Entity, sylex_core::Provenance::Source),
                 param(
                     1,
                     sylex_core::Kind::Entity,
@@ -7349,11 +7314,7 @@ mod tests {
         let other = state.player(PlayerId(1)).object;
         let reader: sylex_core::Region = sylex_core::Region::new(
             Arc::from([
-                param(
-                    0,
-                    sylex_core::Kind::Entity,
-                    sylex_core::Provenance::Source,
-                ),
+                param(0, sylex_core::Kind::Entity, sylex_core::Provenance::Source),
                 param(
                     1,
                     sylex_core::Kind::Entity,

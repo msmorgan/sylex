@@ -906,13 +906,13 @@ fn const_count(count: &sylex_core::Count) -> Uint {
 
 /// A `Count` bound for the live matcher, general enough to cover a dynamic
 /// bound: a literal evaluates directly; anything else resolves through the
-/// full evaluator ([`GameState::eval_count`]) via a bare [`ExecutionFrame`] anchored on
-/// the watcher's live carrier — `This`/`You` inside the bound read that
-/// carrier, mirroring the `Ref(This)`/`Ref(You)` arms above. Reachable: Skulk
-/// ([CR#702.118b]) is `Stat(Power, Greater, StatOf(This, Power))`, evaluated
-/// live via `filter_matches_live` with the ability's source as watcher. No
-/// watcher, or a watcher whose carrier has already left, falls back to
-/// [`const_count`]'s frameless seam.
+/// full evaluator ([`GameState::eval_count`]) via a bare [`ExecutionFrame`]
+/// anchored on the watcher's live carrier — `This`/`You` inside the bound read
+/// that carrier, mirroring the `Ref(This)`/`Ref(You)` arms above. Reachable:
+/// Skulk ([CR#702.118b]) is `Stat(Power, Greater, StatOf(This, Power))`,
+/// evaluated live via `filter_matches_live` with the ability's source as
+/// watcher. No watcher, or a watcher whose carrier has already left, falls back
+/// to [`const_count`]'s frameless seam.
 fn resolve_count(
     state: &GameState,
     count: &sylex_core::Count,
@@ -941,11 +941,7 @@ fn resolve_count(
 /// ([CR#107.1b]); a missing stat (a land has no power) never satisfies the
 /// predicate.
 #[must_use]
-fn stat_satisfies_bound(
-    value: Option<sylex_core::Int>,
-    cmp: sylex_core::Cmp,
-    bound: Uint,
-) -> bool {
+fn stat_satisfies_bound(value: Option<sylex_core::Int>, cmp: sylex_core::Cmp, bound: Uint) -> bool {
     value.is_some_and(|v| {
         cmp.apply(
             Uint::try_from(v.max(0)).expect("clamped stat fits Uint"),
@@ -1076,7 +1072,8 @@ mod tests {
     use crate::state::StartingPlayer;
 
     fn builtin() -> Plugin {
-        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap()
+        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
+            .unwrap()
     }
 
     /// A bare two-player game with empty decks — for tests that hand-mint
@@ -1131,13 +1128,7 @@ mod tests {
         // Force a Grizzly Bears from player 0's hand onto the battlefield.
         let bear = *state.zones.hands[0]
             .iter()
-            .find(|&&o| {
-                matches(
-                    &state,
-                    o,
-                    &Predicate::r#type(sylex_core::Type::Creature),
-                )
-            })
+            .find(|&&o| matches(&state, o, &Predicate::r#type(sylex_core::Type::Creature)))
             .expect("a Grizzly Bears in the opening hand (10-card mono deck)");
         state.remove_from_hand(PlayerId(0), bear);
         state.objects.obj_mut(bear).zone = Some(Zone::Battlefield);
@@ -2154,9 +2145,7 @@ mod tests {
                 sylex_core::Param {
                     def: sylex_core::DefId(0),
                     kind: sylex_core::Kind::Entity,
-                    provenance: sylex_core::Provenance::Candidate(
-                        sylex_core::Domain::Entity,
-                    ),
+                    provenance: sylex_core::Provenance::Candidate(sylex_core::Domain::Entity),
                 },
                 sylex_core::Param {
                     def: sylex_core::DefId(1),
@@ -2359,9 +2348,7 @@ mod tests {
                 sylex_core::Param {
                     def: sylex_core::DefId(0),
                     kind: sylex_core::Kind::Entity,
-                    provenance: sylex_core::Provenance::Candidate(
-                        sylex_core::Domain::Entity,
-                    ),
+                    provenance: sylex_core::Provenance::Candidate(sylex_core::Domain::Entity),
                 },
                 sylex_core::Param {
                     def: sylex_core::DefId(1),
@@ -2423,9 +2410,9 @@ mod tests {
     fn derived_controller_ref_in_filter_resolves_against_the_carrier() {
         let (state, bear) = game_with_a_bear_on_the_field();
         let watcher = Some(state.objects.obj(bear).source);
-        let controller_of_source = Predicate::Ref(sylex_core::Reference::ControllerOf(
-            Arc::new(sylex_core::Reference::source_parameter()),
-        ));
+        let controller_of_source = Predicate::Ref(sylex_core::Reference::ControllerOf(Arc::new(
+            sylex_core::Reference::source_parameter(),
+        )));
 
         assert!(
             matches_with(

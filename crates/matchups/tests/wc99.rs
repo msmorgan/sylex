@@ -108,7 +108,10 @@ fn assert_matchup_activity(records: &[GameRecord], red: u64, green: u64, probes:
 /// A deterministic, bounded slice of the exact 60-card Worlds 1999 matchup.
 /// Seed 0 exercises both combat and RON-driven burn targeting.
 #[test]
-#[cfg_attr(not(wizards_corpus), ignore = "needs generated v1/plugins/wizards corpus")]
+#[cfg_attr(
+    not(wizards_corpus),
+    ignore = "needs generated v1/plugins/wizards corpus"
+)]
 fn fixed_seed_gate() {
     let (src, decks) = load_matchup();
     let records = run_batch(&decks, &src.engine_rules(), [0]);

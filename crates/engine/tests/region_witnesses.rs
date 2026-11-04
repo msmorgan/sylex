@@ -742,10 +742,7 @@ fn bloodtithe_collector_discards_only_after_an_opponent_lost_life() {
         quiet_hand,
         "no opponent lost life this turn, so the trigger did nothing"
     );
-    assert_eq!(
-        quiet.zones.graveyards[1],
-        [] as [sylex_engine::ObjectId; 0]
-    );
+    assert_eq!(quiet.zones.graveyards[1], [] as [sylex_engine::ObjectId; 0]);
 
     // Leg two: the same trigger, after a drain has put a `LifeLost` fact for an
     // opponent into this turn's history.
@@ -1956,8 +1953,8 @@ fn cross_target_retarget_rederives_later_slots_from_the_proposed_prefix() {
 /// [CR#115.7d] separately permits an unchanged target that was ALREADY
 /// illegal. Here control of slot 1 changes after announcement, making it
 /// illegal under the current P0 slot 0. Changing slot 0 to another P0 creature
-/// leaves slot 1 illegal, but does not CAUSE that illegality, so the retarget is
-/// legal and the current target remains in place.
+/// leaves slot 1 illegal, but does not CAUSE that illegality, so the retarget
+/// is legal and the current target remains in place.
 #[test]
 fn cross_target_retarget_keeps_a_later_target_that_was_already_illegal() {
     let CrossRetargetFixture {

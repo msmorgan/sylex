@@ -163,8 +163,7 @@ impl Driver {
                 continue;
             }
             // Feature 2: per-player pass mode on a priority window.
-            if let DecisionPointKind::Priority(sylex_engine::Priority { player, .. }) = pending
-            {
+            if let DecisionPointKind::Priority(sylex_engine::Priority { player, .. }) = pending {
                 let player = *player;
                 if let (Some(mode), Some(armed)) = (pass.mode(player), pass.armed(player)) {
                     let now = crate::shortcuts::Snapshot::of(&self.state);
@@ -176,7 +175,8 @@ impl Driver {
             }
             // Feature 3: auto-play the oldest land you can on your own main
             // (land drop unused). Reached only after the pass-mode check, so a
-            // yielding player still plays their land when their main is reached.
+            // yielding player still plays their land when their main is
+            // reached.
             if crate::shortcuts::AUTOPLAY_LANDS
                 && let DecisionPointKind::Priority(sylex_engine::Priority { player, legal }) =
                     pending
@@ -190,7 +190,8 @@ impl Driver {
                     continue;
                 }
             }
-            // Genuine human decision: clear the decider's mode, then surface it.
+            // Genuine human decision: clear the decider's mode, then surface
+            // it.
             let decider = pending.decider_player();
             pass.clear(decider);
             return Ok(stop);
@@ -382,17 +383,16 @@ mod tests {
             match stop {
                 Stop::GameOver(_) | Stop::Budget => return, // terminated → guard works
                 Stop::Decision(ref pending) => {
-                    let decision =
-                        if let DecisionPointKind::Priority(sylex_engine::Priority {
-                            player,
-                            ..
-                        }) = pending
-                        {
-                            pass.arm(*player, PassMode::Turn, &driver.state);
-                            Decision::Act(Action::Pass)
-                        } else {
-                            answer(&driver.state, pending)
-                        };
+                    let decision = if let DecisionPointKind::Priority(sylex_engine::Priority {
+                        player,
+                        ..
+                    }) = pending
+                    {
+                        pass.arm(*player, PassMode::Turn, &driver.state);
+                        Decision::Act(Action::Pass)
+                    } else {
+                        answer(&driver.state, pending)
+                    };
                     stop = driver
                         .submit_and_advance(decision, &mut pass)
                         .expect("no decision error");

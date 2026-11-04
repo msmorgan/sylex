@@ -537,8 +537,8 @@ mod tests {
         );
         // A BARE creature-type subtype noun ("a Human") carries the implicit
         // `Permanent` scope atom — a macro-provenance `Expanded` value, the
-        // exact shape `sylex_pipeline_v1::parsers::filter::parse_phrase` emits —
-        // which must NOT print as "a Human permanent".
+        // exact shape `sylex_pipeline_v1::parsers::filter::parse_phrase` emits
+        // — which must NOT print as "a Human permanent".
         let permanent = Predicate::Expanded(sylex_semantics_v1::Expansion {
             name: sylex_semantics_v1::Ident::from("Permanent"),
             args: sylex_semantics_v1::ExpansionArgs::none(),
@@ -551,9 +551,7 @@ mod tests {
             vec![
                 permanent,
                 Predicate::Characteristic(CharacteristicPredicate::Subtype(
-                    sylex_semantics_v1::SubtypeRef::named(sylex_semantics_v1::Ident::from(
-                        "Human",
-                    )),
+                    sylex_semantics_v1::SubtypeRef::named(sylex_semantics_v1::Ident::from("Human")),
                 )),
             ]
             .into(),

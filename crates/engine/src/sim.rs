@@ -368,8 +368,8 @@ fn greedy_priority(
     }) {
         return a.clone();
     }
-    // 3. Ramp: float one mana toward the cheapest castable card, but only when the
-    //    untapped lands can actually reach its cost.
+    // 3. Ramp: float one mana toward the cheapest castable card, but only when
+    //    the untapped lands can actually reach its cost.
     if let Some(mv) = cheapest_in_hand(state, player, want)
         && have < mv as usize
         && have + usable_mana_sources >= mv as usize
@@ -574,8 +574,8 @@ pub(crate) fn keep_current_targets(
         return e.targets.clone();
     }
     // The entry left the stack between surfacing and answer ([CR#707.10c]) —
-    // the write is a no-op, but the submission is still shape-validated, so hand
-    // back a valid minimum set (within-slot + Distinct respected).
+    // the write is a no-op, but the submission is still shape-validated, so
+    // hand back a valid minimum set (within-slot + Distinct respected).
     pick_target_set(specs, legal)
 }
 

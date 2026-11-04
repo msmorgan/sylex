@@ -29,8 +29,8 @@ pub(crate) mod test_ctx {
     use std::path::Path;
     use std::sync::LazyLock;
 
-    use sylex_render_v1::template::index::TemplateIndex;
     use sylex_plugin_v1::plugin::Plugin;
+    use sylex_render_v1::template::index::TemplateIndex;
 
     use crate::resolve::CardKind;
     use crate::resolve::ResolveCtx;

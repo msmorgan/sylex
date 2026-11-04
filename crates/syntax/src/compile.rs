@@ -4,12 +4,12 @@
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
+use dpsi::Ident;
 use sylex_lexicon::Binding;
 use sylex_lexicon::Category as LexicalCategory;
 use sylex_lexicon::LexemeId;
 use sylex_lexicon::Lexicon;
 use sylex_lexicon::SourceKind;
-use dpsi::Ident;
 
 use crate::LoadError;
 use crate::chart::QUOTATION_MARK;

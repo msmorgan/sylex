@@ -513,12 +513,12 @@ mod tests {
             tier_for_path("crates/engine/tests/activate.rs"),
             Tier::Bound
         );
-        assert_eq!(tier_for_path("v1/plugins/testing/cards/Foo.ron"), Tier::Bound);
-        assert_eq!(tier_for_path("lean/Proofs/Foo.lean"), Tier::Bound);
         assert_eq!(
-            tier_for_path("crates/engine/src/step/mod.rs"),
+            tier_for_path("v1/plugins/testing/cards/Foo.ron"),
             Tier::Bound
         );
+        assert_eq!(tier_for_path("lean/Proofs/Foo.lean"), Tier::Bound);
+        assert_eq!(tier_for_path("crates/engine/src/step/mod.rs"), Tier::Bound);
         assert_eq!(
             tier_for_path("v1/plugins/builtin/rules/sba/toughness-zero.ron"),
             Tier::Bound
@@ -635,10 +635,7 @@ mod tests {
 
     #[test]
     fn syl_conversion_preserves_bound_coverage() {
-        let dir = tempdir_with(&[(
-            "plugins/example.lean",
-            "/-- [CR#100.1] -/\n-- [CR#200.2]",
-        )]);
+        let dir = tempdir_with(&[("plugins/example.lean", "/-- [CR#100.1] -/\n-- [CR#200.2]")]);
         let before = scan_tree(dir.path(), &[]);
         std::fs::remove_file(dir.path().join("plugins/example.lean")).unwrap();
         std::fs::write(

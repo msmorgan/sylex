@@ -5,6 +5,7 @@ use std::collections::BTreeSet;
 use std::fmt;
 use std::path::Path;
 
+use dpsi::Ident;
 use sylex_lexicon::LexemeId;
 use sylex_lexicon::Lexicon;
 use sylex_syntax::CompiledGrammar;
@@ -12,7 +13,6 @@ use sylex_syntax::Constituent;
 use sylex_syntax::Gap;
 use sylex_syntax::Parse;
 use sylex_syntax::Reading;
-use dpsi::Ident;
 
 use crate::corpus::card_name_lexeme;
 

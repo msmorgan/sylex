@@ -18,9 +18,9 @@ impl Lower for sylex_semantics_v1::Reference {
                 sylex_core::Reference::Reg,
             ),
             Self::Opponent => crate::region::controller().map_or(
-                sylex_core::Reference::OpponentOf(std::sync::Arc::new(
-                    sylex_core::Reference::Reg(sylex_core::RefId(1)),
-                )),
+                sylex_core::Reference::OpponentOf(std::sync::Arc::new(sylex_core::Reference::Reg(
+                    sylex_core::RefId(1),
+                ))),
                 |controller| {
                     sylex_core::Reference::OpponentOf(std::sync::Arc::new(
                         sylex_core::Reference::Reg(controller),
@@ -130,8 +130,7 @@ mod tests {
     #[test]
     fn lowers_reference_single() {
         assert_matches!(
-            sylex_semantics_v1::Reference::Single(std::sync::Arc::new(minimal_selection()))
-                .lower(),
+            sylex_semantics_v1::Reference::Single(std::sync::Arc::new(minimal_selection())).lower(),
             sylex_core::Reference::Single(_)
         );
     }
@@ -201,10 +200,7 @@ mod tests {
             crate::region::bind_named("X".into(), sylex_core::RefId(1));
             sylex_semantics_v1::Reference::Bound("X".into()).lower()
         });
-        assert_matches!(
-            lowered,
-            sylex_core::Reference::Reg(sylex_core::RefId(1))
-        );
+        assert_matches!(lowered, sylex_core::Reference::Reg(sylex_core::RefId(1)));
     }
 
     /// An unbound role is a LOWERING error, never a runtime fizzle
@@ -322,10 +318,7 @@ mod tests {
             );
             sylex_semantics_v1::Reference::It.lower()
         });
-        assert_eq!(
-            lowered,
-            sylex_core::Reference::Reg(sylex_core::RefId(3))
-        );
+        assert_eq!(lowered, sylex_core::Reference::Reg(sylex_core::RefId(3)));
     }
 
     /// A sorted anaphor ("that player") reads the register of the nearest

@@ -6,6 +6,7 @@
 
 use std::collections::BTreeMap;
 
+use serde::Deserialize;
 use sylex_lexicon::Binding;
 use sylex_lexicon::Case;
 use sylex_lexicon::Countability;
@@ -13,7 +14,6 @@ use sylex_lexicon::Number;
 use sylex_lexicon::Person;
 use sylex_lexicon::WordForm;
 use sylex_syntax::frames::Hosts;
-use serde::Deserialize;
 
 /// One spelling, or several Spelling Variants.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
@@ -640,7 +640,8 @@ pub enum KeywordParameter {
     /// A number or `X`: *bushido 2*.
     Amount,
     /// A cost: mana-only after a space (*equip {2}*); when final, a cost
-    /// containing words follows an em dash and ends in a period (*ward—Pay 3 life.*).
+    /// containing words follows an em dash and ends in a period (*ward—Pay 3
+    /// life.*).
     Cost,
     /// A mana cost after an em dash: *suspend 4—{1}{U}*.
     DashCost,

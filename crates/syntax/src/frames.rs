@@ -2,10 +2,10 @@
 
 use std::collections::BTreeMap;
 
-use sylex_lexicon::LexemeId;
 use dpsi::Ident;
 use serde::Deserialize;
 use serde::Serialize;
+use sylex_lexicon::LexemeId;
 
 use crate::LoadError;
 

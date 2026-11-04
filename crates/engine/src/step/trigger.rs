@@ -52,19 +52,17 @@ impl EventApply for TriggerFired {
         if let Some(obj) = obj {
             for limit in &limits {
                 let window = match limit {
-                    sylex_core::UseLimit::OncePerTurn => sylex_core::Lookback::ThisTurn,
-                    sylex_core::UseLimit::OncePerGame => sylex_core::Lookback::ThisGame,
                     // `LoyaltyOncePerTurn` ([CR#606.3]) is an
                     // ACTIVATED-ability limit (it names loyalty
                     // abilities SHARED across a permanent, gated in
                     // `GameState::can_activate`) — no authoring path
                     // puts it on a `TriggeredAbility`. Exhaustiveness
-                    // only: fall back to the per-ability `ThisTurn`
+                    // only: it falls back to the per-ability `ThisTurn`
                     // window `OncePerTurn` uses, rather than panicking
                     // on a malformed card.
-                    sylex_core::UseLimit::LoyaltyOncePerTurn => {
-                        sylex_core::Lookback::ThisTurn
-                    }
+                    sylex_core::UseLimit::OncePerTurn
+                    | sylex_core::UseLimit::LoyaltyOncePerTurn => sylex_core::Lookback::ThisTurn,
+                    sylex_core::UseLimit::OncePerGame => sylex_core::Lookback::ThisGame,
                 };
                 if g.ability_used_count(obj, ability, window) >= 1 {
                     // The limit is spent: the trigger does NOT fire —

@@ -36,8 +36,9 @@ pub fn object_row(state: &GameState, view: &LayeredView, id: ObjectId) -> String
     if obj.tapped {
         marks.push("T".to_string());
     }
-    // Summoning sickness only matters for creatures (attacking / {T} abilities);
-    // showing it on lands and other non-creatures is just noise.
+    // Summoning sickness only matters for creatures (attacking / {T}
+    // abilities); showing it on lands and other non-creatures is just
+    // noise.
     if obj.summoning_sick && chars.has_type(Type::Creature) {
         marks.push("sick".to_string());
     }
@@ -270,12 +271,12 @@ mod tests {
                         }
                     }
                 }
-                DecisionPointKind::DeclareAttackers(sylex_engine::DeclareAttackers {
-                    ..
-                }) => Decision::Attackers(vec![]),
-                DecisionPointKind::DeclareBlockers(sylex_engine::DeclareBlockers {
-                    ..
-                }) => Decision::Blocks(vec![]),
+                DecisionPointKind::DeclareAttackers(sylex_engine::DeclareAttackers { .. }) => {
+                    Decision::Attackers(vec![])
+                }
+                DecisionPointKind::DeclareBlockers(sylex_engine::DeclareBlockers { .. }) => {
+                    Decision::Blocks(vec![])
+                }
                 other => panic!("unexpected surfaced kind: {other:?}"),
             };
             stop = driver.submit(decision).expect("legal decision");

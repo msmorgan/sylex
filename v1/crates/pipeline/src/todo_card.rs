@@ -10,15 +10,15 @@
 //! card-content container, so what is written back to disk is semantic text
 //! (`docs/decisions/semantics-spelling-lowering.md` §4).
 
-use sylex_semantics_v1::Color;
-use sylex_semantics_v1::ManaCost;
-use sylex_semantics_v1::StatValue;
 use ron::value::RawValue;
 use serde::Deserialize;
 use serde::Serialize;
 use serde::de::Deserializer;
 use serde::ser::Error as _;
 use serde::ser::Serializer;
+use sylex_semantics_v1::Color;
+use sylex_semantics_v1::ManaCost;
+use sylex_semantics_v1::StatValue;
 
 /// One ability slot in a `.ron.todo`: either a not-yet-rewritten oracle line,
 /// or a structured ability captured verbatim (so resolve preserves it and the
@@ -164,9 +164,7 @@ mod tests {
         // can't read it. No macros are registered here (that is graduation's
         // `Plugin::card_from_str`), which is what keeps the verbatim captures
         // verbatim.
-        sylex_semantics_v1::ron::options()
-            .from_str(source)
-            .unwrap()
+        sylex_semantics_v1::ron::options().from_str(source).unwrap()
     }
 
     /// An `Unparsed("…")` ability reads as the placeholder; a bare structured

@@ -658,8 +658,8 @@ pub(super) fn filter_noun(filter: &Predicate) -> String {
     if let Some(base) = base_noun {
         // A negated-subtype/-card-type exclusion rides the noun as a prefix
         // ([CR#205.2,205.3] — subtype "non-Brushwagg creature"; a card-type
-        // exclusion elides the hyphen, "nonland permanent"), ahead of any controller
-        // suffix.
+        // exclusion elides the hyphen, "nonland permanent"), ahead of any
+        // controller suffix.
         let base = match subtype_exclusion_prefix(filter).or_else(|| type_exclusion_prefix(filter))
         {
             Some(prefix) => format!("{prefix} {base}"),

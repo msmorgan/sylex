@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use serde::Deserialize;
+use serde::Serialize;
 use sylex_core::Ability;
 use sylex_core::Color;
 use sylex_core::ManaCost;
@@ -7,8 +9,6 @@ use sylex_core::StatValue;
 use sylex_core::Subtype;
 use sylex_core::Supertype;
 use sylex_core::TypeDef;
-use serde::Deserialize;
-use serde::Serialize;
 
 /// The printed characteristics [CR#109.3] shared by a Card Face and by a
 /// rules-defined set of Alternative Characteristics (a flip card's upside-down
@@ -126,9 +126,9 @@ pub enum Card {
         normal: CardFace,
         alternative: Characteristics,
     },
-    /// An adventurer card ([CR#715]): normal characteristics plus the Alternative
-    /// Characteristics of its Adventure spell — not an Adventure face
-    /// ([CR#715.2]).
+    /// An adventurer card ([CR#715]): normal characteristics plus the
+    /// Alternative Characteristics of its Adventure spell — not an
+    /// Adventure face ([CR#715.2]).
     Adventurer {
         normal: CardFace,
         adventure: Characteristics,

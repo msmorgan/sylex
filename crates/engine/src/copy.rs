@@ -68,8 +68,8 @@ use crate::ObjectId;
 /// evaluation (`GameState::eval_reference`, the engine's single-object read —
 /// see `resolve/query.rs`, consumed throughout `resolve/player_action.rs`).
 /// `CopySource::SelfCard` reads "the card doing the copying... from its own
-/// zone" (its doc comment) — exactly `frame.source(self)`, the exophoric binding
-/// that the region's source parameter itself reads in a spell frame.
+/// zone" (its doc comment) — exactly `frame.source(self)`, the exophoric
+/// binding that the region's source parameter itself reads in a spell frame.
 #[must_use]
 pub fn resolve_source(
     state: &GameState,
@@ -412,8 +412,9 @@ fn apply_numeric_field(field: &mut Option<StatValue>, op: &NumericOp) {
     match op {
         NumericOp::Set(value) => {
             // Apply only a `Set` this stateless fold can resolve to a scalar (a
-            // printed `Number`, or a literal-count embed); a dynamic count / `X`
-            // / CDA marker has no `&GameState` here and stays a no-op.
+            // printed `Number`, or a literal-count embed); a dynamic count /
+            // `X` / CDA marker has no `&GameState` here and stays a
+            // no-op.
             if let Some(n) = value.literal_value() {
                 *field = Some(StatValue::Number(n));
             }
@@ -668,29 +669,24 @@ mod tests {
     /// try to re-derive a value it no longer supplies [CR#707.9d].
     #[test]
     fn modify_set_power_drops_pt_defining_cda() {
-        let cda =
-            Ability::r#static(StaticSpec::Modify(
-                Reference::Reg(sylex_core::RefId(0)),
-                Modification::Several(
-                    vec![
-                        Modification::Power(NumericOp::Set(StatValue::Count(Count::CountOf(
-                            sylex_core::Countable::Objects(Arc::new(
-                                sylex_core::Region::candidate(
-                                    sylex_core::Predicate::creature(),
-                                ),
-                            )),
-                        )))),
-                        Modification::Toughness(NumericOp::Set(StatValue::Count(Count::CountOf(
-                            sylex_core::Countable::Objects(Arc::new(
-                                sylex_core::Region::candidate(
-                                    sylex_core::Predicate::creature(),
-                                ),
-                            )),
-                        )))),
-                    ]
-                    .into(),
-                ),
-            ));
+        let cda = Ability::r#static(StaticSpec::Modify(
+            Reference::Reg(sylex_core::RefId(0)),
+            Modification::Several(
+                vec![
+                    Modification::Power(NumericOp::Set(StatValue::Count(Count::CountOf(
+                        sylex_core::Countable::Objects(Arc::new(sylex_core::Region::candidate(
+                            sylex_core::Predicate::creature(),
+                        ))),
+                    )))),
+                    Modification::Toughness(NumericOp::Set(StatValue::Count(Count::CountOf(
+                        sylex_core::Countable::Objects(Arc::new(sylex_core::Region::candidate(
+                            sylex_core::Predicate::creature(),
+                        ))),
+                    )))),
+                ]
+                .into(),
+            ),
+        ));
         let base = CopiableValues {
             name: "Tarmogoyf".into(),
             power: Some(StatValue::DefinedByAbility),

@@ -183,10 +183,10 @@ impl GameState {
         }
     }
 
-    /// The minimal resolution `ExecutionFrame` for an enters-replacement fold: source =
-    /// the entering object, controller = its controller (the "you" a gate
-    /// condition reads), no targets/bindings/chosen/x/subject. Shared by the
-    /// counter-count and conditional-gate folds.
+    /// The minimal resolution `ExecutionFrame` for an enters-replacement fold:
+    /// source = the entering object, controller = its controller (the "you"
+    /// a gate condition reads), no targets/bindings/chosen/x/subject.
+    /// Shared by the counter-count and conditional-gate folds.
     fn enters_frame<T>(
         &self,
         entering: crate::object::ObjectId,
@@ -543,9 +543,9 @@ mod tests {
         let other_lands_you_control = Predicate::And(
             vec![
                 Predicate::r#type(Type::Land),
-                Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(
-                    sylex_core::RefId(1),
-                )))),
+                Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(sylex_core::RefId(
+                    1,
+                ))))),
                 Predicate::Relation(RelationPredicate::ControlledBy(Arc::new(Predicate::Ref(
                     Reference::Reg(sylex_core::RefId(2)),
                 )))),
@@ -566,16 +566,12 @@ mod tests {
                         sylex_core::Param {
                             def: sylex_core::DefId(1),
                             kind: sylex_core::Kind::Entity,
-                            provenance: sylex_core::Provenance::Capture(sylex_core::RefId(
-                                0,
-                            )),
+                            provenance: sylex_core::Provenance::Capture(sylex_core::RefId(0)),
                         },
                         sylex_core::Param {
                             def: sylex_core::DefId(2),
                             kind: sylex_core::Kind::Entity,
-                            provenance: sylex_core::Provenance::Capture(sylex_core::RefId(
-                                1,
-                            )),
+                            provenance: sylex_core::Provenance::Capture(sylex_core::RefId(1)),
                         },
                     ]),
                     other_lands_you_control,
@@ -976,18 +972,15 @@ mod tests {
             kind: sylex_core::Kind::Entity,
             provenance: sylex_core::Provenance::Candidate(sylex_core::Domain::Entity),
         }];
-        params.extend(
-            sylex_core::event_region_params()
-                .iter()
-                .enumerate()
-                .map(|(index, param)| sylex_core::Param {
-                    def: sylex_core::DefId(
-                        u32::try_from(index + 1).expect("region parameter count fits u32"),
-                    ),
-                    kind: param.kind,
-                    provenance: param.provenance.clone(),
-                }),
-        );
+        params.extend(sylex_core::event_region_params().iter().enumerate().map(
+            |(index, param)| sylex_core::Param {
+                def: sylex_core::DefId(
+                    u32::try_from(index + 1).expect("region parameter count fits u32"),
+                ),
+                kind: param.kind,
+                provenance: param.provenance.clone(),
+            },
+        ));
         Arc::new(sylex_core::Region::new(params.into(), body))
     }
 

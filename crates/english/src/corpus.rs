@@ -16,9 +16,9 @@
 use std::collections::BTreeSet;
 use std::io::BufRead;
 
+use sylex_lexicon::LexemeId;
 use sylex_upstream::oracle_text::strip_reminder_text;
 use sylex_upstream::scryfall::OracleCardReader;
-use sylex_lexicon::LexemeId;
 
 /// One Card Face record of the supported corpus.
 #[derive(Debug, Clone, PartialEq, Eq)]

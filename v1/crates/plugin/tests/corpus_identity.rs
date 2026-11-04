@@ -22,11 +22,11 @@ use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
+use serde::de::DeserializeOwned;
 use sylex_lowering_v1::Lower;
 use sylex_plugin_v1::layout::CARDS_DIR;
 use sylex_plugin_v1::macros::MacroSet;
 use sylex_plugin_v1::plugin::Plugin;
-use serde::de::DeserializeOwned;
 
 fn workspace_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -219,12 +219,12 @@ fn builtin_rules_tables_lower() {
 }
 
 /// The generated corpus, every card of which must load. The count exists
-/// because `v1/plugins/wizards` is gitignored and regenerated, so a checkout holds
-/// whatever vintage it last generated; it is REPORTED with the failure rather
-/// than tolerated. A regeneration that introduces genuinely unparseable shapes
-/// is a signal worth seeing, not a tolerance worth keeping silent — and without
-/// this assertion a loader change that broke nearly the whole corpus would
-/// still report green.
+/// because `v1/plugins/wizards` is gitignored and regenerated, so a checkout
+/// holds whatever vintage it last generated; it is REPORTED with the failure
+/// rather than tolerated. A regeneration that introduces genuinely unparseable
+/// shapes is a signal worth seeing, not a tolerance worth keeping silent — and
+/// without this assertion a loader change that broke nearly the whole corpus
+/// would still report green.
 #[test]
 #[cfg_attr(
     not(wizards_corpus),
@@ -588,10 +588,7 @@ fn pair_subterms<'a>(
     source: &std::path::Path,
     semantic: &'a sylex_semantics_v1::Ability,
     core: &'a sylex_core::Ability,
-    out: &mut Vec<(
-        &'a sylex_semantics_v1::Ability,
-        &'a sylex_core::Ability,
-    )>,
+    out: &mut Vec<(&'a sylex_semantics_v1::Ability, &'a sylex_core::Ability)>,
 ) {
     if let sylex_semantics_v1::Ability::Expanded(expanded) = semantic {
         pair_subterms(source, &expanded.value, core, out);

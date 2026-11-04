@@ -109,16 +109,10 @@ fn opening_state() {
     for p in 0..2 {
         assert_eq!(state.zones.hands[p].len(), 7);
         assert_eq!(state.zones.libraries[p].len(), 13);
-        assert_eq!(
-            state.zones.graveyards[p],
-            [] as [sylex_engine::ObjectId; 0]
-        );
+        assert_eq!(state.zones.graveyards[p], [] as [sylex_engine::ObjectId; 0]);
         assert_eq!(state.players[p].life, 20);
     }
-    assert_eq!(
-        state.zones.battlefield,
-        [] as [sylex_engine::ObjectId; 0]
-    );
+    assert_eq!(state.zones.battlefield, [] as [sylex_engine::ObjectId; 0]);
     assert_eq!(state.cards.len(), 40);
     assert_eq!(state.turn.turn_number, 0);
     assert!(state.pending.is_none());
@@ -209,8 +203,8 @@ fn turn_one_walks_to_upkeep_priority_one_event_at_a_time() {
         ))))
     ));
 
-    // Empty battlefield: no untap events; untap grants no priority ([CR#502.4]),
-    // so the next transition is straight into upkeep.
+    // Empty battlefield: no untap events; untap grants no priority
+    // ([CR#502.4]), so the next transition is straight into upkeep.
     assert!(matches!(
         state.step(),
         StepOutcome::Progress(Progress::Advanced(PhaseStep::Beginning(
@@ -250,9 +244,7 @@ fn turn_one_walks_to_upkeep_priority_one_event_at_a_time() {
     assert_eq!(player, PlayerId(0));
     assert!(matches!(
         state.step(),
-        StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-            sylex_engine::Priority { .. }
-        ))
+        StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority { .. }))
     ));
 }
 
@@ -264,9 +256,9 @@ fn pass_to_stop(state: &mut GameState) -> StepOutcome {
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::DeclareAttackers(
@@ -291,9 +283,9 @@ fn step_until(
         if pred(state, &outcome) {
             return outcome;
         }
-        if let StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-            sylex_engine::Priority { .. },
-        )) = outcome
+        if let StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+            ..
+        })) = outcome
         {
             state.submit_decision(Decision::Act(Action::Pass)).unwrap();
         } else if let StepOutcome::NeedsDecision(DecisionPointKind::DeclareAttackers(
@@ -322,9 +314,7 @@ fn submission_errors() {
     let (_, stop) = step_to_stop(&mut state);
     assert!(matches!(
         stop,
-        StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-            sylex_engine::Priority { .. }
-        ))
+        StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority { .. }))
     ));
     assert_eq!(
         state.submit_decision(Decision::Discard(vec![])),
@@ -566,9 +556,7 @@ fn runner_recovers_the_auto_stepping_ergonomics() {
     let (_, mut stop) = runner.run();
     loop {
         match stop {
-            RunStop::Decision(DecisionPointKind::Priority(sylex_engine::Priority {
-                ..
-            })) => {
+            RunStop::Decision(DecisionPointKind::Priority(sylex_engine::Priority { .. })) => {
                 (_, stop) = runner.submit(Decision::Act(Action::Pass)).unwrap();
             }
             RunStop::Decision(DecisionPointKind::DeclareAttackers(
@@ -636,9 +624,10 @@ fn state_is_assertable_between_two_untap_events() {
                 break; // turn 5 has begun; its untap events are next.
             }
             StepOutcome::Progress(_) => {}
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { legal, .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                legal,
+                ..
+            })) => {
                 let action = script(&state, &legal);
                 state.submit_decision(Decision::Act(action)).unwrap();
             }
@@ -814,7 +803,8 @@ fn bear_on_field() -> (GameState, ObjectId) {
 #[test]
 fn cleanup_clears_marked_damage_on_battlefield_creatures() {
     let (mut state, bear) = bear_on_field();
-    // Mark sublethal damage (1 < toughness 2) so the creature survives to Cleanup.
+    // Mark sublethal damage (1 < toughness 2) so the creature survives to
+    // Cleanup.
     state.objects.obj_mut(bear).set_marked_damage(1);
     assert_eq!(state.objects.obj(bear).total_damage(), 1);
 
@@ -1140,7 +1130,8 @@ fn resolving_bolt_deals_three_then_leaves_for_graveyard() {
         .agenda
         .push_front(sylex_engine::WorkItem::Resolve(bolt));
     // Resolve → RunEffect(DealDamage) → Emit(DamageDealt) →
-    // Emit(future-form ZoneChange Stack→Graveyard) → Emit(past-form ZoneChange).
+    // Emit(future-form ZoneChange Stack→Graveyard) → Emit(past-form
+    // ZoneChange).
     let trace = drain_progress(&mut state, 10);
     assert!(
         trace.iter().any(|p| matches!(

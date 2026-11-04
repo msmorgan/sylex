@@ -36,9 +36,7 @@ mod tests {
             }
             .lower(),
             sylex_core::ConferralRule {
-                scope: sylex_core::Predicate::Class(
-                    sylex_core::ObjectClass::AbilityOnStack
-                ),
+                scope: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
                 confer: sylex_core::Property::Ability(_)
             }
         );

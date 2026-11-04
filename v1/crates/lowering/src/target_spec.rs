@@ -38,8 +38,7 @@ mod tests {
     #[test]
     fn lowers_target_spec_target() {
         assert_matches!(
-            sylex_semantics_v1::TargetSpec::Target(minimal_quantity(), minimal_predicate())
-                .lower(),
+            sylex_semantics_v1::TargetSpec::Target(minimal_quantity(), minimal_predicate()).lower(),
             sylex_core::TargetSpec::Target(sylex_core::Quantity::Range(None, None), _)
         );
     }

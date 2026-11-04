@@ -316,8 +316,7 @@ mod tests {
                 Stop::Decision(p) => p.clone(),
             };
             if let DecisionPointKind::DeclareBlockers(sylex_engine::DeclareBlockers {
-                legal,
-                ..
+                legal, ..
             }) = &pending
                 && !legal.is_empty()
             {
@@ -389,9 +388,8 @@ mod tests {
                 Stop::GameOver(_) | Stop::Budget => break,
                 Stop::Decision(p) => p.clone(),
             };
-            if let DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
-                legal, ..
-            }) = &pending
+            if let DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets { legal, .. }) =
+                &pending
                 && legal.iter().any(|spec| !spec.is_empty())
             {
                 let mut it = Interaction::for_decision(&pending).expect("interactive");
@@ -407,8 +405,9 @@ mod tests {
                     other => panic!("expected an object selection, got {other:?}"),
                 }
 
-                // Pick one candidate per spec through the Targets state machine;
-                // the result must be a legal decision the engine accepts.
+                // Pick one candidate per spec through the Targets state
+                // machine; the result must be a legal decision
+                // the engine accepts.
                 let decision = loop {
                     if let Some(&cand) = it.candidates().first() {
                         it.toggle(cand);

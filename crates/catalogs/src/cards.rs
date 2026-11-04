@@ -1,8 +1,9 @@
-use crate::CatalogError;
 use std::collections::BTreeSet;
 use std::io::BufRead;
 
 use sylex_upstream::scryfall::OracleCardReader;
+
+use crate::CatalogError;
 
 pub(crate) fn extract(oracle_cards: impl BufRead) -> Result<BTreeSet<String>, CatalogError> {
     let mut names = BTreeSet::new();

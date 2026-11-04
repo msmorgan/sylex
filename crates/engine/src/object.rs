@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use slotmap::SlotMap;
 use sylex_card::Card;
 use sylex_card::CardFace;
 use sylex_card::Characteristics;
@@ -10,7 +11,6 @@ use sylex_core::Subtype;
 use sylex_core::Token;
 use sylex_core::Uint;
 use sylex_core::Zone;
-use slotmap::SlotMap;
 
 use crate::player::PlayerId;
 
@@ -76,8 +76,9 @@ pub struct CardInstance {
     pub is_token: bool,
     /// [CR#114.5]: an emblem is neither a card nor a permanent, and "Emblem"
     /// isn't a card type. Set for entries synthesized by `EmblemCreated`; the
-    /// def carries only the emblem's abilities ([CR#114.3]), and `is_object_class`
-    /// reports `Emblem` so every card/type/permanent filter excludes it.
+    /// def carries only the emblem's abilities ([CR#114.3]), and
+    /// `is_object_class` reports `Emblem` so every card/type/permanent
+    /// filter excludes it.
     pub is_emblem: bool,
     /// Base copiable values for the FRONT face ([CR#712.8d]) — the face every
     /// object presents off the battlefield ([CR#712.8a]) and the default on it.

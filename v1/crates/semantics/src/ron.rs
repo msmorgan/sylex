@@ -46,10 +46,11 @@ pub fn kinds() -> KindSet {
     kinds.add(crate::ManaSpec::kind());
     // The mana-symbol leaves embed their inner value untagged too, so a bare
     // `White`/`Generic(2)` reads at a symbol slot: `ColorOrColorless` embeds
-    // `Color`, `SimpleManaSymbol` embeds `ColorOrColorless`, `ManaSymbol` embeds
-    // `SimpleManaSymbol`. `Color` is the terminal payload (no embed), and is
-    // registered as a spec §4 straggler so the ban reaches it: a macro of kind
-    // `Color` was undefinable while it was unregistered.
+    // `Color`, `SimpleManaSymbol` embeds `ColorOrColorless`, `ManaSymbol`
+    // embeds `SimpleManaSymbol`. `Color` is the terminal payload (no
+    // embed), and is registered as a spec §4 straggler so the ban reaches
+    // it: a macro of kind `Color` was undefinable while it was
+    // unregistered.
     kinds.add(crate::Color::kind());
     kinds.add(crate::ColorOrColorless::kind());
     kinds.add(crate::SimpleManaSymbol::kind());

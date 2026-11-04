@@ -459,9 +459,10 @@ pub enum StaticSpec {
 pub enum Role {
     /// The creature-like combat role: power governs combat and fight damage
     /// ([CR#510.1a,701.14a]), damage is marked on it and compared with its
-    /// toughness ([CR#120.3e,704.5g]), it is in the attacking and blocking domains
-    /// ([CR#508.1a,509.1a]), and the summoning-sickness rule applies to its
-    /// attacks and its tap/untap-symbol activations ([CR#302.6]).
+    /// toughness ([CR#120.3e,704.5g]), it is in the attacking and blocking
+    /// domains ([CR#508.1a,509.1a]), and the summoning-sickness rule
+    /// applies to its attacks and its tap/untap-symbol activations
+    /// ([CR#302.6]).
     Combatant,
 }
 

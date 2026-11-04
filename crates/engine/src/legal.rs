@@ -49,14 +49,9 @@ pub(crate) fn object_has_static<F: Fn(&StaticSpec) -> bool>(
     // A presence scan: look THROUGH `Conditionally` unconditionally (pass
     // `|_| true`), so this stays a pure characteristic-free read of the derived
     // view and never re-enters `layers()` via a condition.
-    statics_on(
-        view,
-        id,
-        &mut |_: &sylex_core::Condition| true,
-        &mut |e| {
-            if pred(e) { ControlFlow::Break(()) } else { ControlFlow::Continue(()) }
-        },
-    )
+    statics_on(view, id, &mut |_: &sylex_core::Condition| true, &mut |e| {
+        if pred(e) { ControlFlow::Break(()) } else { ControlFlow::Continue(()) }
+    })
     .is_break()
 }
 
@@ -447,12 +442,10 @@ static COMBATANT_RULES: LazyLock<[StaticSpec; 4]> = LazyLock::new(|| {
                     sylex_core::Reference::source_parameter(),
                     Predicate::State(sylex_core::StatePredicate::SummoningSick),
                 ),
-                sylex_core::Condition::Not(std::sync::Arc::new(
-                    sylex_core::Condition::Matches(
-                        sylex_core::Reference::source_parameter(),
-                        Predicate::Characteristic(CharacteristicPredicate::Has("Haste".into())),
-                    ),
-                )),
+                sylex_core::Condition::Not(std::sync::Arc::new(sylex_core::Condition::Matches(
+                    sylex_core::Reference::source_parameter(),
+                    Predicate::Characteristic(CharacteristicPredicate::Has("Haste".into())),
+                ))),
             ]
             .into(),
         )
@@ -1773,14 +1766,10 @@ mod tests {
     fn walk_no_match_runs_to_completion() {
         let tree = sample_tree();
         let mut visited = 0usize;
-        let res = walk_abilities(
-            &tree,
-            &mut |_: &sylex_core::Condition| true,
-            &mut |_e| {
-                visited += 1;
-                ControlFlow::<()>::Continue(())
-            },
-        );
+        let res = walk_abilities(&tree, &mut |_: &sylex_core::Condition| true, &mut |_e| {
+            visited += 1;
+            ControlFlow::<()>::Continue(())
+        });
         assert!(res.is_continue());
         assert_eq!(
             visited, 4,
@@ -2313,16 +2302,16 @@ mod tests {
         sylex_core::TypeDef {
             name: "Instant".into(),
             permanent_type: false,
-            confers: vec![sylex_core::Property::Ability(Arc::new(
-                Ability::r#static(StaticSpec::Deontic(Deontic::May(DeonticAction::Cast {
+            confers: vec![sylex_core::Property::Ability(Arc::new(Ability::r#static(
+                StaticSpec::Deontic(Deontic::May(DeonticAction::Cast {
                     what: Predicate::Ref(Reference::Reg(sylex_core::RefId(0))),
                     by: Predicate::Any,
                     from: None,
                     window: Some(Timing::InstantSpeed),
                     cost: None,
                     tag: None,
-                }))),
-            ))]
+                })),
+            )))]
             .into(),
         }
     }
@@ -2621,13 +2610,13 @@ mod tests {
         sylex_core::TypeDef {
             name: "Land".into(),
             permanent_type: true,
-            confers: vec![sylex_core::Property::Ability(Arc::new(
-                Ability::r#static(StaticSpec::Deontic(Deontic::May(DeonticAction::Play {
+            confers: vec![sylex_core::Property::Ability(Arc::new(Ability::r#static(
+                StaticSpec::Deontic(Deontic::May(DeonticAction::Play {
                     what: Predicate::Ref(Reference::Reg(sylex_core::RefId(0))),
                     by: Predicate::Any,
                     from: None,
-                }))),
-            ))]
+                })),
+            )))]
             .into(),
         }
     }
@@ -2763,8 +2752,8 @@ mod tests {
         sylex_core::TypeDef {
             name: "Creature".into(),
             permanent_type: true,
-            confers: vec![Property::Static(Arc::new(
-                sylex_core::Region::candidate(StaticSpec::Conditionally(
+            confers: vec![Property::Static(Arc::new(sylex_core::Region::candidate(
+                StaticSpec::Conditionally(
                     Condition::Matches(
                         Reference::Reg(sylex_core::RefId(0)),
                         Predicate::Class(sylex_core::ObjectClass::Permanent),
@@ -2773,8 +2762,8 @@ mod tests {
                         who: Predicate::Ref(Reference::Reg(sylex_core::RefId(0))),
                         role: sylex_core::Role::Combatant,
                     }),
-                )),
-            ))]
+                ),
+            )))]
             .into(),
         }
     }

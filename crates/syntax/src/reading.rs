@@ -6,14 +6,14 @@ use std::collections::BTreeSet;
 use std::ops::Add;
 use std::ops::Range;
 
+use dpsi::Ident;
+use serde::Deserialize;
+use serde::Serialize;
 use sylex_lexicon::Binding;
 use sylex_lexicon::LexemeId;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::LexicalValue;
 use sylex_lexicon::Lexicon;
-use dpsi::Ident;
-use serde::Deserialize;
-use serde::Serialize;
 
 use crate::chart::ChildRef;
 use crate::chart::Parse;
@@ -162,7 +162,8 @@ impl Parse<'_> {
         self.best_readings(usize::MAX)
     }
 
-    /// The `k` best Readings, enumerated lazily over an internal flyweight arena.
+    /// The `k` best Readings, enumerated lazily over an internal flyweight
+    /// arena.
     pub fn best_readings(&self, k: usize) -> impl Iterator<Item = Reading> + '_ {
         self.best_ranked(k).map(|(_, reading)| reading)
     }

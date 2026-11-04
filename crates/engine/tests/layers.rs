@@ -1,6 +1,6 @@
 //! The layer system ([CR#613]): derived characteristics. Fixtures are real
-//! cards from `v1/plugins/canon`, plus `v1/plugins/testing` mocks for the two layer
-//! shapes no real card carries (see that plugin's cards/README.md).
+//! cards from `v1/plugins/canon`, plus `v1/plugins/testing` mocks for the two
+//! layer shapes no real card carries (see that plugin's cards/README.md).
 
 use std::path::Path;
 use std::sync::Arc;
@@ -538,7 +538,8 @@ fn layer_added_subtype_confers_its_keyword() {
     use sylex_engine::has_keyword;
 
     let mut state = two_player_with("Grizzly Bears", 1, 10);
-    // Register a Creature subtype whose membership confers Trample ([CR#305.6]).
+    // Register a Creature subtype whose membership confers Trample
+    // ([CR#305.6]).
     state.subtypes.insert(
         "Trampler".into(),
         Subtype {
@@ -583,11 +584,11 @@ fn layer_added_subtype_confers_its_keyword() {
 #[test]
 fn animated_enchantment_can_attack() {
     let mut state = game_with_p0_cards(&["Animate enchantments", "Moonlit Wake"], 1);
-    // The layer-4 `CardTypes(Set(["Creature"]))` carries only the bare `Creature`
-    // name; the engine recovers the type's combat-capability `confers` (its
-    // `May(Attack)` grant) from the type registry, so wire it in ([CR#300.1]).
-    // Without it the animator adds a name-only Creature type with no confers and
-    // the fold has nothing to contribute.
+    // The layer-4 `CardTypes(Set(["Creature"]))` carries only the bare
+    // `Creature` name; the engine recovers the type's combat-capability
+    // `confers` (its `May(Attack)` grant) from the type registry, so wire
+    // it in ([CR#300.1]). Without it the animator adds a name-only Creature
+    // type with no confers and the fold has nothing to contribute.
     state.types = plugin("canon").types;
     let _animator = force_onto_battlefield(&mut state, PlayerId(0), "Animate enchantments");
     let ench = force_onto_battlefield(&mut state, PlayerId(0), "Moonlit Wake");
@@ -862,9 +863,9 @@ fn dependency_orders_dependent_effect_after_its_dependency() {
     state.continuous.push(ContinuousEffect {
         timestamp: Timestamp(2_000),
         controller: PlayerId(0),
-        scope: ScopeResolved::Floating(Arc::new(sylex_core::Region::candidate(
-            Predicate::r#type(Type::Creature),
-        ))),
+        scope: ScopeResolved::Floating(Arc::new(sylex_core::Region::candidate(Predicate::r#type(
+            Type::Creature,
+        )))),
         changes: vec![Modification::CardTypes(sylex_core::CollectionOp::Add(
             Type::Enchantment.name(),
         ))],
@@ -877,9 +878,9 @@ fn dependency_orders_dependent_effect_after_its_dependency() {
     state.continuous.push(ContinuousEffect {
         timestamp: Timestamp(1_000),
         controller: PlayerId(0),
-        scope: ScopeResolved::Floating(Arc::new(sylex_core::Region::candidate(
-            Predicate::r#type(Type::Enchantment),
-        ))),
+        scope: ScopeResolved::Floating(Arc::new(sylex_core::Region::candidate(Predicate::r#type(
+            Type::Enchantment,
+        )))),
         changes: vec![Modification::CardTypes(sylex_core::CollectionOp::Add(
             Type::Artifact.name(),
         ))],
@@ -973,9 +974,9 @@ fn dependency_loop_falls_back_to_timestamp() {
     state.continuous.push(ContinuousEffect {
         timestamp: Timestamp(1_000),
         controller: PlayerId(0),
-        scope: ScopeResolved::Floating(Arc::new(sylex_core::Region::candidate(
-            Predicate::r#type(Type::Creature),
-        ))),
+        scope: ScopeResolved::Floating(Arc::new(sylex_core::Region::candidate(Predicate::r#type(
+            Type::Creature,
+        )))),
         changes: vec![Modification::CardTypes(sylex_core::CollectionOp::Add(
             Type::Enchantment.name(),
         ))],
@@ -988,9 +989,9 @@ fn dependency_loop_falls_back_to_timestamp() {
     state.continuous.push(ContinuousEffect {
         timestamp: Timestamp(2_000),
         controller: PlayerId(0),
-        scope: ScopeResolved::Floating(Arc::new(sylex_core::Region::candidate(
-            Predicate::r#type(Type::Enchantment),
-        ))),
+        scope: ScopeResolved::Floating(Arc::new(sylex_core::Region::candidate(Predicate::r#type(
+            Type::Enchantment,
+        )))),
         changes: vec![Modification::CardTypes(sylex_core::CollectionOp::Add(
             Type::Creature.name(),
         ))],

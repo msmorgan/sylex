@@ -1,15 +1,14 @@
-use crate::CatalogError;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::fs;
 use std::io::BufRead;
 use std::path::Path;
 
-use crate::error::IoContext;
-
 use sylex_upstream::scryfall::OracleCardReader;
 
+use crate::CatalogError;
 use crate::cr;
+use crate::error::IoContext;
 use crate::io;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]

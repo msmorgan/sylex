@@ -6,10 +6,10 @@
 use std::path::Path;
 
 use anyhow::Context as _;
-use sylex_core::plugin::is_ron_todo_file;
-use sylex_render_v1::template::index::TemplateIndex;
-use sylex_plugin_v1::plugin::Plugin;
 use rayon::prelude::*;
+use sylex_core::plugin::is_ron_todo_file;
+use sylex_plugin_v1::plugin::Plugin;
+use sylex_render_v1::template::index::TemplateIndex;
 
 use crate::todo_card::RawIdent;
 use crate::todo_card::TodoAbility;
@@ -199,17 +199,20 @@ pub fn resolve_cards(plugin_dir: &Path) -> anyhow::Result<()> {
         .par_iter()
         .filter(|path| path.is_file() && is_ron_todo_file(path))
         .try_for_each(|path| -> anyhow::Result<()> {
-            // A malformed `.ron.todo` aborts the run (via `?`): it means a bug in
-            // the step that wrote it, which the engineer should fix before resolving.
+            // A malformed `.ron.todo` aborts the run (via `?`): it means a bug
+            // in the step that wrote it, which the engineer should
+            // fix before resolving.
             let source = std::fs::read_to_string(path)?;
-            // Read through the literal-aware SEMANTICS facade: a bare `power: 2`
-            // is a `StatValue::Number` `#[macro_ron(literal)]`, spliced by the
-            // literal reader — raw `ron` sees `StatValue` as an enum and rejects
-            // the bare numeral ("invalid std identifier"). That splice is all it
+            // Read through the literal-aware SEMANTICS facade: a bare `power:
+            // 2` is a `StatValue::Number` `#[macro_ron(literal)]`,
+            // spliced by the literal reader — raw `ron` sees
+            // `StatValue` as an enum and rejects the bare numeral
+            // ("invalid std identifier"). That splice is all it
             // adds: `sylex_semantics_v1::ron::options()` registers NO macros,
-            // unlike graduation's `Plugin::card_from_str`, and that is what this
-            // layer wants — `RawIdent` and `TodoAbility::Parsed` capture their
-            // text verbatim, so expanding it here would destroy what resolve
+            // unlike graduation's `Plugin::card_from_str`, and that is what
+            // this layer wants — `RawIdent` and
+            // `TodoAbility::Parsed` capture their text verbatim, so
+            // expanding it here would destroy what resolve
             // must write back unchanged.
             let mut card: TodoCard = sylex_semantics_v1::ron::options()
                 .from_str(&source)
@@ -305,7 +308,8 @@ mod tests {
                 if r == "Spell(effect: Targeted(targets: [AnyTarget], effect: DealDamage(This, 3, Target(0))))"
         ));
 
-        // The same line on a creature is NOT a spell ability: it stays Unparsed.
+        // The same line on a creature is NOT a spell ability: it stays
+        // Unparsed.
         let mut creature = TodoCard::Normal(TodoCardFace {
             name: "X".into(),
             types: vec![RawIdent("Creature".into())],
@@ -318,7 +322,8 @@ mod tests {
         let TodoCard::Normal(face) = &creature else { panic!() };
         assert!(matches!(&face.abilities[0], TodoAbility::Unparsed(_)));
 
-        // A Sorcery resolves an untargeted effect to a `Spell` with no targets field.
+        // A Sorcery resolves an untargeted effect to a `Spell` with no targets
+        // field.
         let mut divination = TodoCard::Normal(TodoCardFace {
             name: "Divination".into(),
             types: vec![RawIdent("Sorcery".into())],
@@ -419,16 +424,18 @@ mod tests {
     #[test]
     fn ascend_on_spell_folds_into_spell_effect() {
         // A Sorcery with Ascend + a life-gain effect, both already
-        // line-resolved. `<E>` = `ChangeLife(You, Up(1))` — a BARE-PARSEABLE effect:
-        // this is route (a) from the task. The migrations spell parser may emit
-        // macro-flavored atoms (e.g. `Draws(2)`), but the round-trip assertion
-        // below uses the BARE `sylex_semantics_v1::ron::options()` reader —
-        // macro-free, unlike the `Plugin::card_from_str` path graduation takes —
-        // so the fixture must be one the bare reader accepts. A bare one-token
-        // player verb (`ChangeLife(You, Up(1))`) is exactly such a form; draw/mill are
-        // no longer bare-parseable (mill lowers to `Composite(Mill(who), …)` and
-        // draw to `Batch(n, By(who, DrawCard))`), so the Ascend fold is
-        // exercised with a surviving bare `PlayerAction`.
+        // line-resolved. `<E>` = `ChangeLife(You, Up(1))` — a BARE-PARSEABLE
+        // effect: this is route (a) from the task. The migrations spell
+        // parser may emit macro-flavored atoms (e.g. `Draws(2)`), but
+        // the round-trip assertion below uses the BARE
+        // `sylex_semantics_v1::ron::options()` reader — macro-free,
+        // unlike the `Plugin::card_from_str` path graduation takes — so
+        // the fixture must be one the bare reader accepts. A bare one-token
+        // player verb (`ChangeLife(You, Up(1))`) is exactly such a form;
+        // draw/mill are no longer bare-parseable (mill lowers to
+        // `Composite(Mill(who), …)` and draw to `Batch(n, By(who,
+        // DrawCard))`), so the Ascend fold is exercised with a
+        // surviving bare `PlayerAction`.
         let mut face = TodoCardFace {
             name: "Test Spell".into(),
             types: vec![RawIdent("Sorcery".into())],
@@ -519,10 +526,11 @@ mod tests {
         use sylex_core::Zone;
         use sylex_lowering_v1::Lower as _;
 
-        // `ASCEND_GATE` is spliced into card RON, so it is SEMANTIC text: read it
-        // through the literal-aware SEMANTICS reader (the bare `10` literal needs
-        // the `literal` macro layer; the raw reader would reject it), then lower
-        // — the claim is about the condition the ENGINE ends up with.
+        // `ASCEND_GATE` is spliced into card RON, so it is SEMANTIC text: read
+        // it through the literal-aware SEMANTICS reader (the bare `10`
+        // literal needs the `literal` macro layer; the raw reader would
+        // reject it), then lower — the claim is about the condition the
+        // ENGINE ends up with.
         let parsed: sylex_semantics_v1::Condition = sylex_semantics_v1::ron::options()
             .from_str(ASCEND_GATE)
             .expect("ASCEND_GATE parses as a Condition");

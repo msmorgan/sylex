@@ -34,10 +34,7 @@ const FRAMES: &str = r#"(
     },
 )"#;
 
-fn grammar(
-    lexicon: &Lexicon,
-    extended: &str,
-) -> Result<CompiledGrammar, sylex_syntax::LoadError> {
+fn grammar(lexicon: &Lexicon, extended: &str) -> Result<CompiledGrammar, sylex_syntax::LoadError> {
     let text = format!(
         r#"(
         root: "Sentence",

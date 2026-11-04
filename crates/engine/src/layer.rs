@@ -400,9 +400,9 @@ fn layer_of(m: &Modification, is_cda: bool) -> Option<Layer> {
         // and strips before the layer pass, so it never reaches it — defensive.
         Modification::BaseLoyalty(_) | Modification::BaseDefense(_) | Modification::Several(_) => {
             None
-        } // Provenance is erased at `lower` (`sylex_lowering_v1`), so no
-          // loaded value reaches here wrapped. The arm survives only because
-          // the variant does; `core-demacro` deletes both.
+        } /* Provenance is erased at `lower` (`sylex_lowering_v1`), so no
+           * loaded value reaches here wrapped. The arm survives only because
+           * the variant does; `core-demacro` deletes both. */
     }
 }
 
@@ -509,21 +509,22 @@ fn gather(
             continue; // player proxy — no static abilities
         }
         // Static abilities function only on the battlefield ([CR#611.3b]) —
-        // EXCEPT an emblem's, which function from the command zone ([CR#114.4]).
-        // Gate the command admittance on "emblem" so an ordinary command-zone
-        // object (none today) isn't swept in.
+        // EXCEPT an emblem's, which function from the command zone
+        // ([CR#114.4]). Gate the command admittance on "emblem" so an
+        // ordinary command-zone object (none today) isn't swept in.
         let emblem_in_command = obj.zone == Some(Zone::Command)
             && obj.card_id().is_some_and(|c| state.cards.get(c).is_emblem);
         if obj.zone != Some(Zone::Battlefield) && !emblem_in_command {
             continue;
         }
         let timestamp = obj.timestamp;
-        // Instruction-source abilities come from the DERIVED list once the fixpoint
-        // is running ([CR#613.7]): the first iteration reads the PRINTED list
-        // (the cycle-safe base that breaks the `layers() → derive::abilities →
-        // layers()` recursion), and every later iteration reads the working
-        // derived map the previous iteration produced — so a static ability
-        // GRANTED by a layer-6 `GainAbility` is gathered as its own effect
+        // Instruction-source abilities come from the DERIVED list once the
+        // fixpoint is running ([CR#613.7]): the first iteration reads
+        // the PRINTED list (the cycle-safe base that breaks the
+        // `layers() → derive::abilities → layers()` recursion), and
+        // every later iteration reads the working derived map the
+        // previous iteration produced — so a static ability GRANTED by
+        // a layer-6 `GainAbility` is gathered as its own effect
         // source (a lord that grants a lord; [CR#613.7] dependency
         // re-evaluation). Reading the derived list is NOT recursive: it indexes
         // the already-computed `working` map, never re-entering `layers()`.
@@ -537,10 +538,8 @@ fn gather(
         // continuous effect (devoid → colorless, changeling → every creature
         // type) would silently do nothing. This mirrors the flat ability space
         // `abilities_of_source` builds for the trigger scan.
-        let mut sources: Vec<(
-            Ability,
-            Vec<(sylex_core::RefId, crate::activation::Value)>,
-        )> = Vec::new();
+        let mut sources: Vec<(Ability, Vec<(sylex_core::RefId, crate::activation::Value)>)> =
+            Vec::new();
         match derived.and_then(|d| d.get(&obj.id)) {
             // Later iterations: the derived ability list (granted statics
             // included). `Arc<Vec<Ability>>`, indexed not re-derived.
@@ -612,9 +611,10 @@ fn gather(
         // [CR#122.1]: counter-conferred continuous effects (the boost flavor) —
         // strip-immune, gathered from the object's counter map + the registry,
         // NOT from its abilities (a +1/+1 counter still pumps under
-        // `LoseAllAbilities`). A self-scoped `CounterCount(This, k)` is BAKED to
-        // the holder's live count here, since the layer-side `eval_count` is
-        // literal-only and a counter boost is self-scoped.
+        // `LoseAllAbilities`). A self-scoped `CounterCount(This, k)` is BAKED
+        // to the holder's live count here, since the layer-side
+        // `eval_count` is literal-only and a counter boost is
+        // self-scoped.
         for kind in obj.counters.keys() {
             let Some(decl) = state.counter_decls.get(kind) else {
                 continue;
@@ -691,7 +691,8 @@ fn gather(
 /// Resolve one gathered `StaticSpec` (a static ability's `effect`, or a
 /// counter's conferred `Property::Continuous` lowered to the same shape by the
 /// caller) into a `(ScopeResolved, flattened changes)` pair, SOURCE-RELATIVE
-/// (no [`ExecutionFrame`](crate::resolve::ExecutionFrame); mirrors [`resolve_source_relative`]).
+/// (no [`ExecutionFrame`](crate::resolve::ExecutionFrame); mirrors
+/// [`resolve_source_relative`]).
 ///
 /// `Modify(reference, change)` — the single-object shape — resolves the one
 /// reference and LOCKS it ([CR#613.6]: the affected set is fixed at first
@@ -762,14 +763,15 @@ fn static_spec_scope(
 /// Resolve a `Reference` inside a static ability's effect (its `Modify`/`Each`
 /// references) to concrete object ids, SOURCE-RELATIVE: `This` is the static's
 /// source object `source` (the carrying permanent), and `gather` has **no**
-/// [`ExecutionFrame`], so only the references whose value is fixed by the source's own
-/// relations are resolvable here. The rest are a documented seam (see below)
-/// and resolve to the empty set.
+/// [`ExecutionFrame`], so only the references whose value is fixed by the
+/// source's own relations are resolvable here. The rest are a documented seam
+/// (see below) and resolve to the empty set.
 ///
-/// Returns a (possibly empty) vec — the empty set both for an ExecutionFrame-dependent
-/// reference and for a relation that isn't established (an unattached
-/// attachment's `AttachHostOf(This)` has no host yet). The caller LOCKS the
-/// result ([CR#613.6]: the affected set is fixed at first application).
+/// Returns a (possibly empty) vec — the empty set both for an
+/// ExecutionFrame-dependent reference and for a relation that isn't established
+/// (an unattached attachment's `AttachHostOf(This)` has no host yet). The
+/// caller LOCKS the result ([CR#613.6]: the affected set is fixed at first
+/// application).
 ///
 /// [`ExecutionFrame`]: crate::resolve::ExecutionFrame
 fn resolve_source_relative(
@@ -782,19 +784,19 @@ fn resolve_source_relative(
     use sylex_core::Reference;
     match reference {
         // The carrying object itself.
-        &Reference::Reg(reference) => match params
-            .and_then(|params| params.get(reference.0 as usize))
-        {
-            Some(param) if param.provenance == sylex_core::Provenance::Source => vec![source],
-            Some(param) if matches!(param.provenance, sylex_core::Provenance::Capture(_)) => {
-                captures
-                    .iter()
-                    .find(|(here, _)| *here == reference)
-                    .map_or_else(Vec::new, |(_, value)| captured_objects(value))
+        &Reference::Reg(reference) => {
+            match params.and_then(|params| params.get(reference.0 as usize)) {
+                Some(param) if param.provenance == sylex_core::Provenance::Source => vec![source],
+                Some(param) if matches!(param.provenance, sylex_core::Provenance::Capture(_)) => {
+                    captures
+                        .iter()
+                        .find(|(here, _)| *here == reference)
+                        .map_or_else(Vec::new, |(_, value)| captured_objects(value))
+                }
+                None if params.is_none() => vec![source],
+                _ => Vec::new(),
             }
-            None if params.is_none() => vec![source],
-            _ => Vec::new(),
-        },
+        }
         // The host an attachment is attached to ([CR#301.5,303.4]) — read the
         // attachment→host link off the resolved inner object. No host (an
         // unattached attachment) → empty, so nothing is buffed.
@@ -940,16 +942,14 @@ fn matches_derived(
             crate::target::stat_satisfies(value, *cmp, count)
         }
         Predicate::Ref(_) => static_reference_matches(state, id, filter, watcher, params),
-        Predicate::Relation(sylex_core::RelationPredicate::ControlledBy(inner)) => {
-            matches_derived(
-                state,
-                working,
-                state.player(state.objects.obj(id).controller).object,
-                inner,
-                watcher,
-                params,
-            )
-        }
+        Predicate::Relation(sylex_core::RelationPredicate::ControlledBy(inner)) => matches_derived(
+            state,
+            working,
+            state.player(state.objects.obj(id).controller).object,
+            inner,
+            watcher,
+            params,
+        ),
         Predicate::Relation(sylex_core::RelationPredicate::Owner(inner)) => matches_derived(
             state,
             working,
@@ -1143,10 +1143,10 @@ fn effect_conditions_hold(
 /// pass, anchoring carrier refs (`This`, `AttachHostOf(This)`, …) to the
 /// effect's `watcher` ([CR#611.2c]). The watcher's live carrier object (the one
 /// whose `source == watcher`) is the `This` `resolve_source_relative` resolves
-/// from. A `ExecutionFrame`-only reference (`Target`, bindings, the player-valued
-/// `You`/`ControllerOf`/`OwnerOf`) yields nothing here — the same documented
-/// seam `resolve_source_relative` carries — so a count built on it defaults to
-/// `0`.
+/// from. A `ExecutionFrame`-only reference (`Target`, bindings, the
+/// player-valued `You`/`ControllerOf`/`OwnerOf`) yields nothing here — the same
+/// documented seam `resolve_source_relative` carries — so a count built on it
+/// defaults to `0`.
 fn resolve_count_ref(
     state: &GameState,
     working: &BTreeMap<ObjectId, DerivedObject>,
@@ -1219,10 +1219,10 @@ fn eval_divide(mode: sylex_core::RoundMode, a: Int, b: Int) -> Int {
 
 /// Evaluate a `Count` to an `Int` against the IN-PROGRESS derived map
 /// (`working`) being built this pass — never `self.layers()` (that would
-/// recurse the layer build) and never an `ExecutionFrame` (which the layer pass lacks).
-/// This is the layer-side sibling of `resolve.rs::eval_count`, mirroring each
-/// variant's meaning but sourcing derived P/T from `working` instead of a
-/// rebuilt view.
+/// recurse the layer build) and never an `ExecutionFrame` (which the layer pass
+/// lacks). This is the layer-side sibling of `resolve.rs::eval_count`,
+/// mirroring each variant's meaning but sourcing derived P/T from `working`
+/// instead of a rebuilt view.
 ///
 /// FIXPOINT BOUNDARY: counts are evaluated against `working` exactly as applied
 /// so far this pass. The MTG layer order ([CR#613.3,613.7]) guarantees a count
@@ -1649,8 +1649,7 @@ fn distinct_keys_derived(
         Ch::Name => vec![face.characteristics.name.to_string()],
         Ch::ManaCost => vec![format!("{}", face.characteristics.mana_cost.mana_value())],
         Ch::Colors => {
-            let mut colors: Vec<sylex_core::Color> =
-                face.characteristics.color_indicator.clone();
+            let mut colors: Vec<sylex_core::Color> = face.characteristics.color_indicator.clone();
             for sym in face.characteristics.mana_cost.iter() {
                 colors.extend(symbol_colors(sym));
             }
@@ -2001,10 +2000,11 @@ fn retain_abilities(d: &mut DerivedObject, mut keep: impl FnMut(&Ability) -> boo
 
 /// Resolve a control-change effect's new controller ([CR#613.1b]) to a concrete
 /// player. Per [CR#611.2c] the effect's references are locked when it is
-/// created, so the controller parameter resolves to the effect's controller (the happy
-/// path: "you gain control of …"). General `Reference` resolution needs the
-/// resolve-time `ExecutionFrame` machinery (`engine-resolve-effects`); any other
-/// reference is a documented seam that leaves the controller unchanged.
+/// created, so the controller parameter resolves to the effect's controller
+/// (the happy path: "you gain control of …"). General `Reference` resolution
+/// needs the resolve-time `ExecutionFrame` machinery
+/// (`engine-resolve-effects`); any other reference is a documented seam that
+/// leaves the controller unchanged.
 fn resolve_new_controller(
     reference: &sylex_core::Reference,
     effect_controller: PlayerId,
@@ -2012,8 +2012,9 @@ fn resolve_new_controller(
     if reference == &sylex_core::Reference::controller_parameter() {
         Some(effect_controller)
     } else {
-        // SEAM: opponent / each-player / bound references need an `ExecutionFrame` to
-        // resolve a specific player; not reachable by current control fixtures.
+        // SEAM: opponent / each-player / bound references need an
+        // `ExecutionFrame` to resolve a specific player; not reachable
+        // by current control fixtures.
         None
     }
 }
@@ -2356,16 +2357,17 @@ impl GameState {
         // incorrect per the layer note above.
         const MAX_FIXPOINT_ITERS: usize = 16;
 
-        // Iteration 0: gather from printed abilities (`derived = None`), run the
-        // full pass from base.
+        // Iteration 0: gather from printed abilities (`derived = None`), run
+        // the full pass from base.
         let mut effects = gather(self, None);
         let mut signature = effect_signature(&effects);
         let mut working = run_layer_pass(self, base_map(self), &mut effects);
 
-        // Iterations 1..: re-gather from the derived map. If the gathered effect
-        // set is unchanged, derivation has converged ([CR#613.7]) and `working`
-        // already reflects it — done. Otherwise re-derive the full pass from
-        // base with the augmented set and repeat.
+        // Iterations 1..: re-gather from the derived map. If the gathered
+        // effect set is unchanged, derivation has converged
+        // ([CR#613.7]) and `working` already reflects it — done.
+        // Otherwise re-derive the full pass from base with the
+        // augmented set and repeat.
         let mut converged = false;
         for _ in 1..MAX_FIXPOINT_ITERS {
             let mut next_effects = gather(self, Some(&working));
@@ -2458,9 +2460,9 @@ mod tests {
     /// reference needed).
     fn pump_static() -> Ability {
         Ability::r#static(StaticSpec::Each(
-            Selection::SelectAll(Arc::new(sylex_core::Region::candidate(
-                Predicate::r#type(Type::Creature),
-            ))),
+            Selection::SelectAll(Arc::new(sylex_core::Region::candidate(Predicate::r#type(
+                Type::Creature,
+            )))),
             Arc::new(sylex_core::Region::candidate(StaticSpec::Modify(
                 Reference::Reg(sylex_core::RefId(0)),
                 Modification::Several(
@@ -2475,7 +2477,11 @@ mod tests {
     }
 
     fn static_candidate_filter(body: Predicate) -> sylex_core::Region<Predicate> {
-        use sylex_core::{DefId, Kind, Param, Provenance, Region};
+        use sylex_core::DefId;
+        use sylex_core::Kind;
+        use sylex_core::Param;
+        use sylex_core::Provenance;
+        use sylex_core::Region;
 
         Region::new(
             Arc::from([
@@ -2500,7 +2506,11 @@ mod tests {
     }
 
     fn controller_candidate_filter(body: Predicate) -> sylex_core::Region<Predicate> {
-        use sylex_core::{DefId, Kind, Param, Provenance, Region};
+        use sylex_core::DefId;
+        use sylex_core::Kind;
+        use sylex_core::Param;
+        use sylex_core::Provenance;
+        use sylex_core::Region;
 
         Region::new(
             Arc::from([
@@ -2874,14 +2884,12 @@ mod tests {
         let rule_subtype = || Subtype {
             name: "Equipment".into(),
             types: Vec::new().into(),
-            confers: vec![Property::Static(Arc::new(
-                sylex_core::Region::candidate(StaticSpec::Deontic(Deontic::May(
-                    DeonticAction::Attach {
-                        what: Predicate::Ref(Reference::Reg(sylex_core::RefId(0))),
-                        to: Predicate::r#type(Type::Creature),
-                    },
-                ))),
-            ))]
+            confers: vec![Property::Static(Arc::new(sylex_core::Region::candidate(
+                StaticSpec::Deontic(Deontic::May(DeonticAction::Attach {
+                    what: Predicate::Ref(Reference::Reg(sylex_core::RefId(0))),
+                    to: Predicate::r#type(Type::Creature),
+                })),
+            )))]
             .into(),
         };
 
@@ -3114,7 +3122,8 @@ mod tests {
     )]
     fn devoid_derives_colorless() {
         // Havoc Sower: a Black creature with `Keyword(Devoid)` — Devoid's CDA
-        // `Modify(of: Of(This), changes: [Colors(Set([]))])` makes it colorless.
+        // `Modify(of: Of(This), changes: [Colors(Set([]))])` makes it
+        // colorless.
         let (state, id) = wizards_permanent("Havoc Sower");
 
         let view = state.layers();
@@ -3174,9 +3183,9 @@ mod tests {
             Selection::SelectAll(Arc::new(static_candidate_filter(Predicate::And(
                 vec![
                     Predicate::creature(),
-                    Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(
-                        sylex_core::RefId(1),
-                    )))),
+                    Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(sylex_core::RefId(
+                        1,
+                    ))))),
                     Predicate::Characteristic(CharacteristicPredicate::Subtype(
                         sylex_core::SubtypeRef::named("Goblin".into()),
                     )),
@@ -3356,9 +3365,9 @@ mod tests {
     /// gather, not of the layer number.
     fn creature_count_cda() -> Ability {
         use sylex_core::Reference;
-        let count = Count::CountOf(Countable::Objects(Arc::new(
-            sylex_core::Region::candidate(Predicate::creature()),
-        )));
+        let count = Count::CountOf(Countable::Objects(Arc::new(sylex_core::Region::candidate(
+            Predicate::creature(),
+        ))));
         Ability::r#static(StaticSpec::Modify(
             Reference::Reg(sylex_core::RefId(0)),
             Modification::Several(
@@ -3386,7 +3395,8 @@ mod tests {
         );
         assert_eq!(view.toughness(goyf), Some(1), "…and toughness 1");
 
-        // Add a second (plain) creature: now two creatures → the CDA derives 2/2.
+        // Add a second (plain) creature: now two creatures → the CDA derives
+        // 2/2.
         let (state, _other) = creature_on_field(state, vec![]);
         let view = state.layers();
         assert_eq!(
@@ -3403,9 +3413,9 @@ mod tests {
     /// `Of(This)`.
     fn creature_count_pump() -> Ability {
         use sylex_core::Reference;
-        let count = Count::CountOf(Countable::Objects(Arc::new(
-            sylex_core::Region::candidate(Predicate::creature()),
-        )));
+        let count = Count::CountOf(Countable::Objects(Arc::new(sylex_core::Region::candidate(
+            Predicate::creature(),
+        ))));
         Ability::r#static(StaticSpec::Modify(
             Reference::Reg(sylex_core::RefId(0)),
             Modification::Several(
@@ -3666,9 +3676,9 @@ mod tests {
             Selection::SelectAll(Arc::new(static_candidate_filter(Predicate::And(
                 vec![
                     Predicate::creature(),
-                    Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(
-                        sylex_core::RefId(1),
-                    )))),
+                    Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(sylex_core::RefId(
+                        1,
+                    ))))),
                 ]
                 .into(),
             )))),
@@ -3691,7 +3701,8 @@ mod tests {
         // Grantor G grants every OTHER creature the self-pump.
         let (state, grantor) =
             creature_on_field(game(), vec![lord_granting_static(self_pump_static())]);
-        // A plain creature B — should gain the granted self-pump and become 3/3.
+        // A plain creature B — should gain the granted self-pump and become
+        // 3/3.
         let (state, beneficiary) = creature_on_field(state, vec![]);
 
         let view = state.layers();

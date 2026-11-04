@@ -256,8 +256,9 @@ fn try_conditional<F>(
 where
     F: FnMut(&str, &str) -> Option<(String, usize)>,
 {
-    // prefix/suffix are ASCII template literals; byte-length arithmetic below is
-    // panic-safe (`input.get(..)?`) and a non-ASCII literal would simply decline.
+    // prefix/suffix are ASCII template literals; byte-length arithmetic below
+    // is panic-safe (`input.get(..)?`) and a non-ASCII literal would simply
+    // decline.
     let after_prefix = cursor + prefix.len();
     if !input
         .get(cursor..after_prefix)?
@@ -321,8 +322,9 @@ where
                 slot,
                 suffix,
             } => {
-                // An absent fragment never fails the pattern — the caller checks
-                // full-line consumption, so a conditional template can't over-claim.
+                // An absent fragment never fails the pattern — the caller
+                // checks full-line consumption, so a
+                // conditional template can't over-claim.
                 if let Some((arg, new_cursor)) =
                     try_conditional(prefix, slot, suffix, input, cursor, slot_reader)
                 {
@@ -334,8 +336,9 @@ where
             Segment::Repeat { slot, literal } => {
                 // Match a run of `literal` (case-folded) at the cursor and fold
                 // the run length back into the slot as a plain number — the
-                // parse twin of `render::template`'s repeat branch. A zero-length
-                // run declines (the literal isn't present at all).
+                // parse twin of `render::template`'s repeat branch. A
+                // zero-length run declines (the literal isn't
+                // present at all).
                 let (count, new_cursor) = match_repeat(input, cursor, literal)?;
                 args.push(fmt_arg(&slot.key, &count.to_string()));
                 cursor = new_cursor;
@@ -437,8 +440,8 @@ mod tests {
 
     #[test]
     fn nullary_does_not_prefix_match_a_longer_word() {
-        // A slot-bearing "flashback ${0}" is skipped; a nullary "flash" (if any)
-        // must not eat the start of "flashback {2}".
+        // A slot-bearing "flashback ${0}" is skipped; a nullary "flash" (if
+        // any) must not eat the start of "flashback {2}".
         assert!(
             builtin()
                 .match_kind("KeywordAbility", "flashback {2}")
@@ -449,8 +452,9 @@ mod tests {
 
     #[test]
     fn fills_a_typed_slot_via_reader() {
-        // Protection is now `params: [Predicate]`; the slot reader is handed the
-        // declared type and the remaining input, and returns the arg RON.
+        // Protection is now `params: [Predicate]`; the slot reader is handed
+        // the declared type and the remaining input, and returns the
+        // arg RON.
         let m = builtin()
             .match_with("KeywordAbility", "protection from black", |ty, rest| {
                 assert_eq!(ty, "Predicate");

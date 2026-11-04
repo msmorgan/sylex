@@ -24,9 +24,10 @@ pub fn contents(
     match zone {
         Zone::Battlefield(player) => {
             // The permanents this player controls by *derived* controller, with
-            // lands sorted to the bottom of the column. `sort_by_key` is stable,
-            // so play order is preserved within the non-land and land groups, and
-            // `false` (non-land) sorts before `true` (land).
+            // lands sorted to the bottom of the column. `sort_by_key` is
+            // stable, so play order is preserved within the
+            // non-land and land groups, and `false` (non-land)
+            // sorts before `true` (land).
             let mut perms: Vec<ObjectId> = state
                 .zones
                 .battlefield
@@ -104,7 +105,8 @@ mod tests {
         let view = state.layers();
         for player in [PlayerId(0), PlayerId(1)] {
             let items = contents(&state, &view, player, Zone::Battlefield(player));
-            // The column leads with that player's own proxy (the targetable face).
+            // The column leads with that player's own proxy (the targetable
+            // face).
             assert_eq!(items[0], Selected::Object(state.player(player).object));
             // The rest are permanents that player controls.
             for sel in &items[1..] {
@@ -145,9 +147,9 @@ mod tests {
 
         use crate::driver::Stop;
 
-        // Drive the demo (which develops both boards) until some player controls
-        // both a land and a non-land, then assert every land sits below every
-        // non-land in their column.
+        // Drive the demo (which develops both boards) until some player
+        // controls both a land and a non-land, then assert every land
+        // sits below every non-land in their column.
         let strat = GreedyDemo;
         let mut driver = Driver::new(game::build_game().expect("build"), Box::new(GreedyDemo));
         let mut stop = driver.run_to_decision().expect("first stop");

@@ -2,6 +2,7 @@
 
 use std::collections::BTreeSet;
 
+use dpsi::Ident;
 use sylex_lexicon::Binding;
 use sylex_lexicon::Capitalization;
 use sylex_lexicon::Category;
@@ -28,7 +29,6 @@ use sylex_syntax::frames::SlotRelation::Complement;
 use sylex_syntax::frames::SlotRelation::IndirectObject;
 use sylex_syntax::frames::SlotRelation::Object;
 use sylex_syntax::frames::SlotRelation::PredicativeComplement;
-use dpsi::Ident;
 
 use crate::SourceError;
 use crate::schema::AdjectiveEntry;
@@ -48,8 +48,7 @@ use crate::schema::VerbEntry;
 /// prepositions by lemma until every preposition is known.
 #[derive(Default)]
 pub(crate) struct Builder {
-    parameters:
-        std::collections::BTreeMap<LexemeId, Vec<Vec<sylex_syntax::frames::ParameterPart>>>,
+    parameters: std::collections::BTreeMap<LexemeId, Vec<Vec<sylex_syntax::frames::ParameterPart>>>,
     pub(crate) lexemes: Vec<Lexeme>,
     frames: Vec<(LexemeId, Category, Vec<FrameSpec>, String)>,
     /// Verbs whose every frame is restricted to active voice.

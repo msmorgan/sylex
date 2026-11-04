@@ -46,8 +46,8 @@ fn slot_reader(ty: &str, input: &str) -> Option<(String, usize)> {
 mod tests {
     use std::path::Path;
 
-    use sylex_render_v1::template::index::TemplateIndex;
     use sylex_plugin_v1::plugin::Plugin;
+    use sylex_render_v1::template::index::TemplateIndex;
 
     use super::*;
     use crate::resolve::CardKind;
@@ -110,7 +110,8 @@ mod tests {
     #[test]
     fn routes_parameterized_keyword_through_slots() {
         // The `${0}` slot is filled by the declared-type reader: Predicate for
-        // Protection, Cost for Ward — same invocations the bespoke parser emits.
+        // Protection, Cost for Ward — same invocations the bespoke parser
+        // emits.
         let idx = builtin_index();
         assert_eq!(
             run("Protection from black", &idx).as_deref(),

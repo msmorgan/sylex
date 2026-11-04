@@ -21,12 +21,14 @@ use crate::reference::Reference;
 /// "A copy of SOURCE, except EXCEPTIONS" ([CR#707.2,707.9]) — the
 /// copiable-value spec shared by every copy delivery site.
 ///
-/// Embedded as an ordinary payload field in the `serde::Deserialize, serde::Serialize` enums that
-/// reference it (`TokenSpec`/`EnterRider`/`PlayerAction`), the way
-/// `NumericOp`/`Characteristic` are embedded in `Modification`/`Count` —
-/// `#[derive(serde::Deserialize, serde::Serialize)]` applies to enums only (a struct target is a
-/// compile error directing to `#[derive(Expand)]`), so this struct derives
-/// `Expand` + serde like those embedded types, not `serde::Deserialize, serde::Serialize` itself.
+/// Embedded as an ordinary payload field in the `serde::Deserialize,
+/// serde::Serialize` enums that reference it
+/// (`TokenSpec`/`EnterRider`/`PlayerAction`), the way `NumericOp`/
+/// `Characteristic` are embedded in `Modification`/`Count` —
+/// `#[derive(serde::Deserialize, serde::Serialize)]` applies to enums only (a
+/// struct target is a compile error directing to `#[derive(Expand)]`), so this
+/// struct derives `Expand` + serde like those embedded types, not
+/// `serde::Deserialize, serde::Serialize` itself.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub struct CopySpec {
     pub source: CopySource,

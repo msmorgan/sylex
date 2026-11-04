@@ -4,8 +4,8 @@
 //! this checks the Readings directly.
 
 use sylex_lexicon::LexicalReading;
-use sylex_vocabulary::LexicalEnvironment;
 use sylex_syntax::Reading;
+use sylex_vocabulary::LexicalEnvironment;
 
 /// Whether some Constituent has the Targeting Marker as a leaf of its own.
 fn marked(reading: &Reading) -> bool {

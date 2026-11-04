@@ -100,7 +100,8 @@ impl DecisionHandler for DeclareAttackers {
         };
         // The surfaced `player`/`legal`/`legal_targets` are informational:
         // `validate_attacks` recomputes them from live state, so this
-        // enforcement can't drift from the proposal query ([CR#508.1a..508.1d]).
+        // enforcement can't drift from the proposal query
+        // ([CR#508.1a..508.1d]).
         g.validate_attacks(&chosen)?;
         g.pending = None;
         // [CR#508.1f]: declaring taps the attacker. The whole declaration

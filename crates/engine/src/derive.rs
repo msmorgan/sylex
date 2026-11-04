@@ -200,9 +200,7 @@ pub fn abilities_of_source(state: &GameState, source: ObjectSource) -> Vec<Abili
             let live = state
                 .objects
                 .iter()
-                .find(|ob| {
-                    ob.source == source && ob.zone == Some(sylex_core::Zone::Battlefield)
-                })
+                .find(|ob| ob.source == source && ob.zone == Some(sylex_core::Zone::Battlefield))
                 .map(|ob| ob.id);
             let current = match live {
                 Some(id) => face_of(state, id),

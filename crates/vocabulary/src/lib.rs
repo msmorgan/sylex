@@ -15,6 +15,8 @@ pub mod schema;
 use std::path::PathBuf;
 use std::sync::LazyLock;
 
+use dpsi::Ident;
+use serde::de::DeserializeOwned;
 use sylex_lexicon::Binding;
 use sylex_lexicon::Category;
 use sylex_lexicon::Lexeme;
@@ -23,8 +25,6 @@ use sylex_lexicon::Lexicon;
 use sylex_lexicon::SourceKind;
 use sylex_lexicon::SurfaceStructure;
 use sylex_syntax::FrameCatalog;
-use dpsi::Ident;
-use serde::de::DeserializeOwned;
 
 use crate::build::Builder;
 use crate::build::bound;
@@ -805,9 +805,9 @@ impl Sources {
     }
 
     fn parameter_patterns(&self, frames: &mut FrameCatalog) {
+        use schema::KeywordParameter;
         use sylex_syntax::frames::ParameterPart;
         use sylex_syntax::frames::SlotKind;
-        use schema::KeywordParameter;
         let convert = |parameters: &[KeywordParameter]| {
             let mut parts = vec![ParameterPart::Head];
             for parameter in parameters {

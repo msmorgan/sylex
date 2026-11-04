@@ -87,10 +87,7 @@ mod tests {
 
     #[test]
     fn lowers_cmp_eq() {
-        assert_matches!(
-            sylex_semantics_v1::Cmp::Eq.lower(),
-            sylex_core::Cmp::Eq
-        );
+        assert_matches!(sylex_semantics_v1::Cmp::Eq.lower(), sylex_core::Cmp::Eq);
     }
 
     #[test]
@@ -119,21 +116,14 @@ mod tests {
 
     #[test]
     fn lowers_cmp_less() {
-        assert_matches!(
-            sylex_semantics_v1::Cmp::Less.lower(),
-            sylex_core::Cmp::Less
-        );
+        assert_matches!(sylex_semantics_v1::Cmp::Less.lower(), sylex_core::Cmp::Less);
     }
 
     #[test]
     fn lowers_condition_compare() {
         assert_matches!(
-            sylex_semantics_v1::Condition::Compare(
-                minimal_count(),
-                minimal_cmp(),
-                minimal_count()
-            )
-            .lower(),
+            sylex_semantics_v1::Condition::Compare(minimal_count(), minimal_cmp(), minimal_count())
+                .lower(),
             sylex_core::Condition::Compare(
                 sylex_core::Count::Literal(0),
                 sylex_core::Cmp::Eq,
@@ -198,9 +188,9 @@ mod tests {
     fn lowers_condition_legally_attached() {
         assert_matches!(
             sylex_semantics_v1::Condition::LegallyAttached(minimal_reference()).lower(),
-            sylex_core::Condition::LegallyAttached(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Condition::LegallyAttached(sylex_core::Reference::Reg(sylex_core::RefId(
+                0
+            )))
         );
     }
 

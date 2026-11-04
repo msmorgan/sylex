@@ -198,9 +198,7 @@ mod tests {
             }
             .lower(),
             sylex_core::AsThough::Counterfactual {
-                premise: sylex_core::Predicate::Class(
-                    sylex_core::ObjectClass::AbilityOnStack
-                ),
+                premise: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
                 then: _
             }
         );
@@ -217,9 +215,7 @@ mod tests {
             })
             .lower(),
             sylex_core::AsThough::Counterfactual {
-                premise: sylex_core::Predicate::Class(
-                    sylex_core::ObjectClass::AbilityOnStack
-                ),
+                premise: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
                 then: _
             }
         );
@@ -501,12 +497,8 @@ mod tests {
             sylex_semantics_v1::Deontic::Gate(minimal_deontic_action(), [].into()).lower(),
             sylex_core::Deontic::Gate(
                 sylex_core::DeonticAction::Attack {
-                    by: sylex_core::Predicate::Class(
-                        sylex_core::ObjectClass::AbilityOnStack
-                    ),
-                    on: sylex_core::Predicate::Class(
-                        sylex_core::ObjectClass::AbilityOnStack
-                    )
+                    by: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
+                    on: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack)
                 },
                 _
             )

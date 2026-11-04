@@ -48,9 +48,7 @@ pub(crate) fn frame_src_targets(
     let params: std::sync::Arc<[sylex_core::Param]> = provenances
         .enumerate()
         .map(|(index, provenance)| sylex_core::Param {
-            def: sylex_core::DefId(
-                u32::try_from(index).expect("fixture parameter count fits u32"),
-            ),
+            def: sylex_core::DefId(u32::try_from(index).expect("fixture parameter count fits u32")),
             kind: match provenance {
                 sylex_core::Provenance::AnnouncedTarget(_) => sylex_core::Kind::Entities,
                 sylex_core::Provenance::AnnouncedX => sylex_core::Kind::Number,

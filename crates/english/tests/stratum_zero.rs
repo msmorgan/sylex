@@ -7,10 +7,10 @@ use sylex_lexicon::LexicalReading;
 use sylex_lexicon::LexicalValue;
 use sylex_lexicon::SurfaceCase;
 use sylex_lexicon::WordForm;
-use sylex_vocabulary::LexicalEnvironment;
 use sylex_syntax::Gap;
 use sylex_syntax::Reading;
 use sylex_syntax::ReadingNode;
+use sylex_vocabulary::LexicalEnvironment;
 
 fn node(production: &str, category: &str, children: Vec<Reading>) -> Reading {
     Reading::Node(ReadingNode {

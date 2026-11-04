@@ -64,7 +64,8 @@ pub enum ObjectClass {
 }
 
 /// The Entity domain a predicate region's candidate ranges over — the typed
-/// provenance rider on [`Provenance::Candidate(Domain::Entity)`](crate::Provenance::Candidate(Domain::Entity))
+/// provenance rider on
+/// [`Provenance::Candidate(Domain::Entity)`](crate::Provenance::Candidate(Domain::Entity))
 /// (ADR law 2). It fixes what the engine enumerates before any predicate runs:
 /// `Player` enumerates the players, `Object` the objects, `Entity` both.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
@@ -322,7 +323,8 @@ pub enum Predicate {
     /// it — the bridge that lets a per-object filter slot reach the whole
     /// condition language ([CR#603.4] predicates) against the object being
     /// matched. The region's candidate register inside the condition reads
-    /// that candidate; `Ref(This)`/`Ref(You)` still anchor to the carrier. Boxed to break the `Predicate` → `Condition` → `Predicate` size
+    /// that candidate; `Ref(This)`/`Ref(You)` still anchor to the carrier.
+    /// Boxed to break the `Predicate` → `Condition` → `Predicate` size
     /// cycle. The one candidate-relative escape hatch: "shares a color with ~",
     /// "has the same name as ~", etc., expressed as
     /// `Where(SharesColor(It, This))` and kin.

@@ -151,14 +151,15 @@ fn run_to_priority(state: &mut GameState, player: PlayerId, phase: PhaseStep) ->
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player: p, legal },
-            )) if p == player && state.turn.current == phase => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player: p,
+                legal,
+            })) if p == player && state.turn.current == phase => {
                 return legal;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::Payment(_)) => {
@@ -180,9 +181,7 @@ fn resurface_priority(state: &mut GameState) {
     assert!(
         matches!(
             state.pending,
-            Some(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. }
-            ))
+            Some(DecisionPointKind::Priority(sylex_engine::Priority { .. }))
         ),
         "resurface_priority expects a Priority decision in flight"
     );
@@ -238,14 +237,15 @@ fn run_to_priority_through_combat(
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player: p, legal },
-            )) if p == player && state.turn.current == phase => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player: p,
+                legal,
+            })) if p == player && state.turn.current == phase => {
                 return legal;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::Payment(_)) => {
@@ -386,7 +386,8 @@ fn snow_source_mana_carries_snow_rider() {
     let plain = find(&state, "Forest");
 
     // Tap the snow source first, then the plain source. The pool ends with two
-    // green units, in tap order: the snow one carries `Snow`, the plain one not.
+    // green units, in tap order: the snow one carries `Snow`, the plain one
+    // not.
     tap_for_mana(&mut state, snow);
     tap_for_mana(&mut state, plain);
 

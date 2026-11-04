@@ -36,7 +36,8 @@ pub(super) fn replacement(r: &Replacement, ctx: &Ctx) -> String {
                     effect::counter_phrase(kind, count)
                 );
             }
-            // "As <subject> enters, <also>." — the also-effect refers to the host as "it".
+            // "As <subject> enters, <also>." — the also-effect refers to the
+            // host as "it".
             let (_lead, when) = ability::event_clause(would, ctx);
             let it = Ctx {
                 subject: "it",

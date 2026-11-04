@@ -66,10 +66,7 @@ fn activated_ability(cost: Cost, effect: Instruction) -> ActivatedAbility {
         window: None,
         condition: None,
         limits: Arc::from([]),
-        effect: sylex_core::Region::new(
-            sylex_core::announced_region_params(0),
-            effect.into(),
-        ),
+        effect: sylex_core::Region::new(sylex_core::announced_region_params(0), effect.into()),
     }
 }
 
@@ -1674,9 +1671,9 @@ fn mixed_modal_mana_profile_rechecks_blanket_lockout_after_modes() {
 fn mixed_modal_mana_profile_rejects_an_unsatisfiable_ordinary_mode() {
     let missing_targets: Arc<[TargetSpec]> = vec![TargetSpec::Target(
         Quantity::one(),
-        Arc::new(sylex_core::Region::candidate(
-            Predicate::Characteristic(CharacteristicPredicate::Named("Missing target".into())),
-        )),
+        Arc::new(sylex_core::Region::candidate(Predicate::Characteristic(
+            CharacteristicPredicate::Named("Missing target".into()),
+        ))),
     )]
     .into();
     let missing_target = Instruction::Sequentially(Arc::from([]));

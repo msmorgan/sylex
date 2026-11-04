@@ -80,8 +80,8 @@ fn classify_header(line: &str, mode_count: u32) -> Option<ChooseShape> {
             _ => None,
         };
     }
-    // Sentence form with the repeat clause ([CR#700.2d]): "Choose three. You may
-    // choose the same mode more than once."
+    // Sentence form with the repeat clause ([CR#700.2d]): "Choose three. You
+    // may choose the same mode more than once."
     let repeat_clause = ". You may choose the same mode more than once.";
     if let Some(head) = line.strip_suffix(repeat_clause)
         && let Some(n) = head.strip_prefix("Choose ").and_then(word_to_count)

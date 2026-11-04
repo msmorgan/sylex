@@ -480,9 +480,7 @@ pub fn minimal_lookback() -> sylex_semantics_v1::Lookback {
 }
 
 pub fn minimal_mana_cost() -> sylex_semantics_v1::ManaCost {
-    sylex_semantics_v1::ManaCost::from(std::sync::Arc::<[sylex_semantics_v1::ManaSymbol]>::from(
-        [],
-    ))
+    sylex_semantics_v1::ManaCost::from(std::sync::Arc::<[sylex_semantics_v1::ManaSymbol]>::from([]))
 }
 
 pub fn minimal_mana_production() -> sylex_semantics_v1::ManaProduction {

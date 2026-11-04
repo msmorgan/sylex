@@ -210,8 +210,9 @@ fn rules(view: &CardView) -> Vec<String> {
         match ability {
             Ability::Keyword(k) => kw_line.push(keyword::keyword_name(k)),
             Ability::Spell(s) => {
-                // Targeting lives on an `OneShotEffect::Targeted` wrapper, which the
-                // effect walk rebinds `ctx.targets` from ([CR#115.1]).
+                // Targeting lives on an `OneShotEffect::Targeted` wrapper,
+                // which the effect walk rebinds `ctx.targets`
+                // from ([CR#115.1]).
                 let ctx = Ctx {
                     subject: view.name,
                     targets: &[],

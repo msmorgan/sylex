@@ -40,8 +40,8 @@ pub fn auto_answer(pending: &DecisionPointKind) -> Option<Decision> {
         DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets { legal, .. })
         | DecisionPointKind::Retarget(sylex_engine::Retarget { legal, .. }) => {
             single_each(legal)
-            // Each forced slot becomes a singleton chosen set ([CR#601.2c]).
-            .map(|picks| Decision::Targets(picks.into_iter().map(|p| vec![p]).collect()))
+                // Each forced slot becomes a singleton chosen set ([CR#601.2c]).
+                .map(|picks| Decision::Targets(picks.into_iter().map(|p| vec![p]).collect()))
         }
         _ => None,
     }
@@ -95,10 +95,11 @@ pub struct Snapshot {
 #[must_use]
 pub fn keep_passing(mode: PassMode, armed: &Snapshot, now: &Snapshot, player: PlayerId) -> bool {
     let stack_grew = now.stack > armed.stack;
-    // The stack emptied since arming — your spell (cast just before you yielded)
-    // resolved. Yield hands priority back rather than passing through the rest
-    // of the turn. Guarded on `armed.stack > 0` so arming Yield with an already
-    // empty stack (pass until something happens) does not stop immediately.
+    // The stack emptied since arming — your spell (cast just before you
+    // yielded) resolved. Yield hands priority back rather than passing
+    // through the rest of the turn. Guarded on `armed.stack > 0` so arming
+    // Yield with an already empty stack (pass until something happens) does
+    // not stop immediately.
     let stack_emptied = armed.stack > 0 && now.stack == 0;
     let entered_combat =
         matches!(now.phase, PhaseStep::Combat(_)) && !matches!(armed.phase, PhaseStep::Combat(_));

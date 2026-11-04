@@ -71,9 +71,10 @@ fn main() -> Result<(), Box<dyn Error + Sync + Send>> {
     let mut server = Server::new(root.as_deref());
     server.run(&connection)?;
 
-    // Drop `connection` (and its writer-channel sender) before joining. Otherwise
-    // the writer thread never sees the channel close and `io_threads.join()` hangs,
-    // leaving the process alive after the client's `exit`.
+    // Drop `connection` (and its writer-channel sender) before joining.
+    // Otherwise the writer thread never sees the channel close and
+    // `io_threads.join()` hangs, leaving the process alive after the
+    // client's `exit`.
     drop(connection);
     io_threads.join()?;
     Ok(())
@@ -246,8 +247,8 @@ impl Server {
 
     fn references(&mut self, params: &ReferenceParams) -> Option<Vec<LspLocation>> {
         let pos = &params.text_document_position;
-        // Resolve the name under an immutable borrow first; `references` needs a
-        // mutable one to build its cache.
+        // Resolve the name under an immutable borrow first; `references` needs
+        // a mutable one to build its cache.
         let name = {
             let text = self.documents.get(&pos.text_document.uri)?;
             let index = self.index.as_ref()?;
@@ -260,7 +261,8 @@ impl Server {
             .filter_map(workspace::Location::to_lsp)
             .collect();
         if params.context.include_declaration {
-            // Every declaration, not just one — a name can be defined more than once.
+            // Every declaration, not just one — a name can be defined more than
+            // once.
             locations.extend(
                 index
                     .definitions(&name)
@@ -283,8 +285,8 @@ impl Server {
         let text = self.documents.get(&pos.text_document.uri)?;
         let index = self.index.as_ref()?;
         let name = pick_name(index, text, convert::src_position(pos.position))?;
-        // A name can have several definitions (kind-scoped macros); show them all
-        // rather than an arbitrary one.
+        // A name can have several definitions (kind-scoped macros); show them
+        // all rather than an arbitrary one.
         let symbols = index.symbols_named(name);
         if symbols.is_empty() {
             return None;

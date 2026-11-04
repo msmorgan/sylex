@@ -37,10 +37,7 @@ fn lower_activated_cost(cost: sylex_semantics_v1::Cost) -> sylex_core::Cost {
     .cost
 }
 
-fn assert_mana_then_discard_this(
-    actual: &sylex_core::Cost,
-    printed: sylex_semantics_v1::Cost,
-) {
+fn assert_mana_then_discard_this(actual: &sylex_core::Cost, printed: sylex_semantics_v1::Cost) {
     use sylex_core::Action;
     use sylex_core::CostComponent;
     use sylex_core::Destination;
@@ -522,7 +519,8 @@ fn ascend_macro_expands_to_static_conditionally_do() {
     use sylex_core::Ability;
     use sylex_core::StaticSpec;
 
-    // Walk every Static effect (peel Expanded) and look for a state-checked row.
+    // Walk every Static effect (peel Expanded) and look for a state-checked
+    // row.
     fn statics(a: &Ability, out: &mut Vec<StaticSpec>) {
         if let Ability::Static(s) = a {
             out.push(s.body.clone());

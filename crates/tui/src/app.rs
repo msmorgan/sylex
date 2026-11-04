@@ -4,18 +4,18 @@ use std::time::Instant;
 
 use anyhow::Result;
 use clap::Parser;
-use sylex_engine::Action;
-use sylex_engine::DecisionPointKind;
-use sylex_engine::GameState;
-use sylex_engine::LayeredView;
-use sylex_engine::PlayerId;
-use sylex_engine::sim::GreedyDemo;
 use ratatui::DefaultTerminal;
 use ratatui::crossterm::event::Event;
 use ratatui::crossterm::event::KeyCode;
 use ratatui::crossterm::event::KeyEvent;
 use ratatui::crossterm::event::KeyEventKind;
 use ratatui::crossterm::event::{self};
+use sylex_engine::Action;
+use sylex_engine::DecisionPointKind;
+use sylex_engine::GameState;
+use sylex_engine::LayeredView;
+use sylex_engine::PlayerId;
+use sylex_engine::sim::GreedyDemo;
 
 use crate::driver::Driver;
 use crate::driver::HEADLESS_BUDGET;
@@ -326,10 +326,7 @@ fn handle_global_key(
 fn interaction_for(stop: &Stop, state: &GameState) -> Option<Interaction> {
     match stop {
         Stop::Decision(
-            DecisionPointKind::DiscardToHandSize(sylex_engine::DiscardToHandSize {
-                player,
-                count,
-            })
+            DecisionPointKind::DiscardToHandSize(sylex_engine::DiscardToHandSize { player, count })
             | DecisionPointKind::DiscardCards(sylex_engine::DiscardCards { player, count }),
         ) => Some(Interaction::for_discard(
             &state.zones.hands[player.index()],
@@ -343,9 +340,9 @@ fn interaction_for(stop: &Stop, state: &GameState) -> Option<Interaction> {
 /// The legal priority action list, if the stop is a priority decision.
 fn priority_legal(stop: &Stop) -> Option<&[Action]> {
     match stop {
-        Stop::Decision(DecisionPointKind::Priority(sylex_engine::Priority {
-            legal, ..
-        })) => Some(legal),
+        Stop::Decision(DecisionPointKind::Priority(sylex_engine::Priority { legal, .. })) => {
+            Some(legal)
+        }
         _ => None,
     }
 }
@@ -353,9 +350,9 @@ fn priority_legal(stop: &Stop) -> Option<&[Action]> {
 /// The player holding priority, if the stop is a priority decision.
 fn priority_player(stop: &Stop) -> Option<PlayerId> {
     match stop {
-        Stop::Decision(DecisionPointKind::Priority(sylex_engine::Priority {
-            player, ..
-        })) => Some(*player),
+        Stop::Decision(DecisionPointKind::Priority(sylex_engine::Priority { player, .. })) => {
+            Some(*player)
+        }
         _ => None,
     }
 }

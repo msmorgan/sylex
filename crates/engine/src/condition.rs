@@ -282,7 +282,8 @@ mod tests {
     }
 
     fn builtin() -> Plugin {
-        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap()
+        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
+            .unwrap()
     }
     fn canon() -> Plugin {
         Plugin::load_with_sibling_prelude(
@@ -722,8 +723,7 @@ mod tests {
         use sylex_core::RelationPredicate;
 
         let your_turn = Condition::YourTurn;
-        let turn_of_you =
-            Condition::TurnOf(Predicate::Ref(Reference::Reg(sylex_core::RefId(1))));
+        let turn_of_you = Condition::TurnOf(Predicate::Ref(Reference::Reg(sylex_core::RefId(1))));
         let turn_of_opp = Condition::TurnOf(Predicate::Relation(RelationPredicate::OpponentOf(
             Arc::new(Predicate::Ref(Reference::Reg(sylex_core::RefId(1)))),
         )));

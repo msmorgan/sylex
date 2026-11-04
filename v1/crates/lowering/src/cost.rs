@@ -172,13 +172,11 @@ fn lower_cost_binder(
             let filter = Arc::new(crate::region::predicate_region(|| filter.lower()));
             let dest = crate::region::define(sylex_core::Kind::Entities);
             (
-                vec![sylex_core::CostComponent::Sample(
-                    sylex_core::Sample {
-                        dest,
-                        quantity,
-                        filter,
-                    },
-                )],
+                vec![sylex_core::CostComponent::Sample(sylex_core::Sample {
+                    dest,
+                    quantity,
+                    filter,
+                })],
                 BoundValue {
                     reference: dest.into(),
                     kind: sylex_core::Kind::Entities,
@@ -312,9 +310,7 @@ mod tests {
             )]);
         assert_matches!(
             lowered[0],
-            sylex_core::CostComponent::ManaCostOf(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::CostComponent::ManaCostOf(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -417,9 +413,7 @@ mod tests {
     /// One payment binder, lowered as the cost instruction it becomes.
     /// Payment binders lower inside a region (their destinations continue the
     /// ability's definition sequence), so each case runs in one.
-    fn lower_payment_binder(
-        binder: sylex_semantics_v1::Binder,
-    ) -> Vec<sylex_core::CostComponent> {
+    fn lower_payment_binder(binder: sylex_semantics_v1::Binder) -> Vec<sylex_core::CostComponent> {
         let (_, (lowered, _)) =
             crate::region::in_region(crate::region::RegionKind::Activated, 0, || {
                 super::lower_cost_block(&[sylex_semantics_v1::CostComponent::With {
@@ -458,9 +452,7 @@ mod tests {
                 .as_slice(),
             [sylex_core::CostComponent::Let(sylex_core::Let {
                 dest: FIRST_PAYMENT_DEF,
-                expr: sylex_core::Expr::Object(sylex_core::Reference::Reg(
-                    sylex_core::RefId(0)
-                )),
+                expr: sylex_core::Expr::Object(sylex_core::Reference::Reg(sylex_core::RefId(0))),
             })]
         );
     }
@@ -475,10 +467,7 @@ mod tests {
             panic!("a payment-time single choice is one Choose instruction");
         };
         assert_eq!(choice.dest, FIRST_PAYMENT_DEF);
-        assert_eq!(
-            choice.by,
-            sylex_core::Reference::Reg(sylex_core::RefId(0))
-        );
+        assert_eq!(choice.by, sylex_core::Reference::Reg(sylex_core::RefId(0)));
         assert_eq!(
             choice.quantity,
             sylex_core::Quantity::Range(
@@ -531,10 +520,7 @@ mod tests {
             panic!("a payment-time single search is one Search instruction");
         };
         assert_eq!(search.dest, FIRST_PAYMENT_DEF);
-        assert_eq!(
-            search.by,
-            sylex_core::Reference::Reg(sylex_core::RefId(0))
-        );
+        assert_eq!(search.by, sylex_core::Reference::Reg(sylex_core::RefId(0)));
         assert_eq!(
             search.whose,
             sylex_core::Reference::Reg(sylex_core::RefId(0))
@@ -562,10 +548,7 @@ mod tests {
             panic!("a payment-time plural choice is one Choose instruction");
         };
         assert_eq!(choice.dest, FIRST_PAYMENT_DEF);
-        assert_eq!(
-            choice.by,
-            sylex_core::Reference::Reg(sylex_core::RefId(0))
-        );
+        assert_eq!(choice.by, sylex_core::Reference::Reg(sylex_core::RefId(0)));
         assert_eq!(choice.quantity, sylex_core::Quantity::Range(None, None));
         assert!(pins_minimal_filter(&choice.filter));
     }
@@ -574,14 +557,12 @@ mod tests {
     fn lowers_binder_existing() {
         let lowered =
             lower_payment_binder(sylex_semantics_v1::Binder::Existing(minimal_selection()));
-        let [sylex_core::CostComponent::Let(sylex_core::Let { dest, expr })] =
-            lowered.as_slice()
+        let [sylex_core::CostComponent::Let(sylex_core::Let { dest, expr })] = lowered.as_slice()
         else {
             panic!("an existing group is pinned by one Let instruction");
         };
         assert_eq!(*dest, FIRST_PAYMENT_DEF);
-        let sylex_core::Expr::Objects(sylex_core::Selection::SelectAll(filter)) = expr
-        else {
+        let sylex_core::Expr::Objects(sylex_core::Selection::SelectAll(filter)) = expr else {
             panic!("the pinned expression is the authored group query");
         };
         assert!(pins_minimal_filter(filter));
@@ -601,10 +582,7 @@ mod tests {
             panic!("a payment-time plural search is one Search instruction");
         };
         assert_eq!(search.dest, FIRST_PAYMENT_DEF);
-        assert_eq!(
-            search.by,
-            sylex_core::Reference::Reg(sylex_core::RefId(0))
-        );
+        assert_eq!(search.by, sylex_core::Reference::Reg(sylex_core::RefId(0)));
         assert_eq!(
             search.whose,
             sylex_core::Reference::Reg(sylex_core::RefId(0))
@@ -620,35 +598,30 @@ mod tests {
     #[test]
     fn lowers_binder_expanded() {
         assert_eq!(
-            lower_payment_binder(sylex_semantics_v1::Binder::Expanded(
-                macro_ron::Expansion {
-                    name: "X".into(),
-                    args: macro_ron::ExpansionArgs::none(),
-                    template: None,
-                    value: Box::new(minimal_binder()),
-                }
-            ))
+            lower_payment_binder(sylex_semantics_v1::Binder::Expanded(macro_ron::Expansion {
+                name: "X".into(),
+                args: macro_ron::ExpansionArgs::none(),
+                template: None,
+                value: Box::new(minimal_binder()),
+            }))
             .as_slice(),
             [sylex_core::CostComponent::Let(sylex_core::Let {
                 dest: FIRST_PAYMENT_DEF,
-                expr: sylex_core::Expr::Object(sylex_core::Reference::Reg(
-                    sylex_core::RefId(0)
-                )),
+                expr: sylex_core::Expr::Object(sylex_core::Reference::Reg(sylex_core::RefId(0))),
             })]
         );
     }
 
     #[test]
     fn lowers_cost_component_expanded() {
-        let (lowered, _) =
-            super::lower_cost_block(&[sylex_semantics_v1::CostComponent::Expanded(
-                macro_ron::Expansion {
-                    name: "X".into(),
-                    args: macro_ron::ExpansionArgs::none(),
-                    template: None,
-                    value: Box::new(minimal_cost_component()),
-                },
-            )]);
+        let (lowered, _) = super::lower_cost_block(&[sylex_semantics_v1::CostComponent::Expanded(
+            macro_ron::Expansion {
+                name: "X".into(),
+                args: macro_ron::ExpansionArgs::none(),
+                template: None,
+                value: Box::new(minimal_cost_component()),
+            },
+        )]);
         assert_matches!(lowered[0], sylex_core::CostComponent::Mana(_));
     }
 
@@ -774,17 +747,16 @@ mod tests {
             panic!("the sampled subject precedes the one runnable action cost");
         };
         let sampled = match first {
-            sylex_core::CostComponent::Sample(sylex_core::Sample {
-                dest, filter, ..
-            }) => {
+            sylex_core::CostComponent::Sample(sylex_core::Sample { dest, filter, .. }) => {
                 assert!(matches!(
                     filter.params[0].provenance,
                     sylex_core::Provenance::Candidate(_)
                 ));
                 assert!(
-                    filter.params.iter().any(|param| {
-                        param.provenance == sylex_core::Provenance::Controller
-                    }),
+                    filter
+                        .params
+                        .iter()
+                        .any(|param| { param.provenance == sylex_core::Provenance::Controller }),
                     "sample filter params: {:?}",
                     filter.params,
                 );

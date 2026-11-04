@@ -11,13 +11,13 @@
 use std::io::BufRead;
 use std::io::Write;
 
-use sylex_render_v1::template::index::TemplateIndex;
 use sylex_pipeline_v1::resolve::resolve_card;
 use sylex_pipeline_v1::todo_card::RawIdent;
 use sylex_pipeline_v1::todo_card::TodoAbility;
 use sylex_pipeline_v1::todo_card::TodoCard;
 use sylex_pipeline_v1::todo_card::TodoCardFace;
 use sylex_plugin_v1::plugin::Plugin;
+use sylex_render_v1::template::index::TemplateIndex;
 use sylex_semantics_v1::ManaCost;
 
 fn parses(line: &str, kind: &str, index: &TemplateIndex) -> bool {

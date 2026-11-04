@@ -372,9 +372,9 @@ mod tests {
         assert_eq!(write(&Count::Literal(3)), "3");
     }
 
-    /// `mentions_x` sees the `X` variant directly and nested inside an arithmetic
-    /// combinator ([CR#107.3a]), and says no for an X-free count — the check
-    /// the non-mana X-cost announce trigger relies on.
+    /// `mentions_x` sees the `X` variant directly and nested inside an
+    /// arithmetic combinator ([CR#107.3a]), and says no for an X-free count
+    /// — the check the non-mana X-cost announce trigger relies on.
     #[test]
     fn mentions_x_detects_direct_and_nested_x() {
         assert!(SemValue::X.mentions_x(), "bare X");

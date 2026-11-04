@@ -65,8 +65,9 @@ pub(super) fn fill_with(
                     content.push(d);
                 }
                 if content.matches('#').count() == 2 {
-                    // Conditional fragment: render prefix+value+suffix iff the value
-                    // param is present; absent renders to nothing. The value part
+                    // Conditional fragment: render prefix+value+suffix iff the
+                    // value param is present; absent
+                    // renders to nothing. The value part
                     // may itself carry a `:modifier` codec.
                     let mut parts = content.splitn(3, '#');
                     let prefix = parts.next().unwrap_or("");
@@ -79,14 +80,18 @@ pub(super) fn fill_with(
                         out.push_str(suffix);
                     }
                 } else if let Some((key, literal)) = content.split_once('*') {
-                    // Count-driven literal repetition (`${slot*\{E\}}`): emit the
-                    // (already-unescaped) `literal` `slot`-many times — the render
-                    // twin of `pattern::Segment::Repeat`. `n == 0` emits nothing;
-                    // a missing or non-numeric count declines to the structural
-                    // fallback. Past five glyphs the energy convention ([CR#107.14]
-                    // — the printed `{E}` count) spells the number and prints a
-                    // single glyph ("six {E}", "fifty {E}"), so a large count reads
-                    // rather than sprawling; `fidelity::normalize` folds either form
+                    // Count-driven literal repetition (`${slot*\{E\}}`): emit
+                    // the (already-unescaped) `literal`
+                    // `slot`-many times — the render
+                    // twin of `pattern::Segment::Repeat`. `n == 0` emits
+                    // nothing; a missing or non-numeric
+                    // count declines to the structural
+                    // fallback. Past five glyphs the energy convention
+                    // ([CR#107.14] — the printed `{E}`
+                    // count) spells the number and prints a
+                    // single glyph ("six {E}", "fifty {E}"), so a large count
+                    // reads rather than sprawling;
+                    // `fidelity::normalize` folds either form
                     // to a run, so the diff is clean either way.
                     let raw = lookup_arg(args, key.trim())?;
                     let n: usize = raw.trim().parse().ok()?;
@@ -103,12 +108,14 @@ pub(super) fn fill_with(
                     let (key, modifier) = split_modifier(content.trim());
                     let val = resolve(lookup_arg(args, key)?, modifier)?;
                     // Sentence-initial capitalization: a slot that opens a new
-                    // sentence (its render directly follows ". ") is capitalized,
-                    // the way a baked-capital literal ("It can't be regenerated")
+                    // sentence (its render directly follows ". ") is
+                    // capitalized, the way a baked-capital
+                    // literal ("It can't be regenerated")
                     // used to carry it. This is what lets a multi-sentence
                     // template pronominalize an earlier mention through a slot
-                    // (`${0:pro}` → "It"/"They") instead of a hardcoded pronoun,
-                    // while a mid-sentence slot stays lowercase.
+                    // (`${0:pro}` → "It"/"They") instead of a hardcoded
+                    // pronoun, while a mid-sentence slot
+                    // stays lowercase.
                     if at_sentence_start(&out) {
                         out.push_str(&capitalize_first(&val));
                     } else {
@@ -252,8 +259,7 @@ fn render_arg(raw: &str) -> Option<String> {
     }
     // A Count arg (ward-{X}'s `where_x`, quantity slots): the shared count
     // fragment, declining when it has no clean phrase.
-    if let Ok(count) = sylex_semantics_v1::ron::options().from_str::<sylex_semantics_v1::Count>(t)
-    {
+    if let Ok(count) = sylex_semantics_v1::ron::options().from_str::<sylex_semantics_v1::Count>(t) {
         let phrase = super::fragment::count(&count);
         if !phrase.contains("[unrendered") {
             return Some(phrase);
@@ -445,8 +451,9 @@ mod tests {
 
     #[test]
     fn expanded_prefers_a_nullary_template() {
-        // The AnyTarget shape: nullary, no `~`, no `{i}` — the template *is* the
-        // text, used in preference to reconstructing it from `value`.
+        // The AnyTarget shape: nullary, no `~`, no `{i}` — the template *is*
+        // the text, used in preference to reconstructing it from
+        // `value`.
         let e = exp(Some("any target"), ExpansionArgs::none());
         assert_eq!(expanded(&e, "ignored").as_deref(), Some("any target"));
     }
@@ -529,7 +536,8 @@ mod tests {
 
     #[test]
     fn single_brace_passes_through_literally() {
-        // Single-brace `{…}` is a literal game symbol (mana), not a placeholder.
+        // Single-brace `{…}` is a literal game symbol (mana), not a
+        // placeholder.
         let args = ExpansionArgs::Positional(vec![]);
         let s = fill("add {C}{C}", "x", &args);
         assert_eq!(s.as_deref(), Some("add {C}{C}"));
@@ -537,7 +545,8 @@ mod tests {
 
     #[test]
     fn dollar_index_against_named_args_is_none() {
-        // Named signatures have no indices: `${0}` can't resolve against named args.
+        // Named signatures have no indices: `${0}` can't resolve against named
+        // args.
         let args = ExpansionArgs::Named(vec![("x".into(), "1".into())]);
         let s = fill("~ gets +${0}", "it", &args);
         assert_eq!(s, None);

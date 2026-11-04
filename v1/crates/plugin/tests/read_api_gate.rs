@@ -54,9 +54,9 @@
 //! - a `type MyCard = Card;` alias. Deliberate: *following* an alias to its use
 //!   sites is name resolution, not parsing, so flagging the declaration alone
 //!   would be a partial measure. (Distinguishing it from the associated type
-//!   every `Lower` impl writes — `type Target = sylex_card::Card;` — is not
-//!   the obstacle: `syn` visits standalone aliases through `visit_item_type`
-//!   and associated ones through `visit_impl_item_type`.)
+//!   every `Lower` impl writes — `type Target = sylex_card::Card;` — is not the
+//!   obstacle: `syn` visits standalone aliases through `visit_item_type` and
+//!   associated ones through `visit_impl_item_type`.)
 //! - a read at a generic parameter, `let v: A = macros.read_str(s)?` with `A`
 //!   chosen by the caller — what `tests/corpus_identity.rs`'s core-reader
 //!   oracle does. Knowing `A` is `Card` here is monomorphisation, not parsing.
@@ -514,9 +514,9 @@ impl<'ast> syn::visit::Visit<'ast> for ReadStrVisitor {
     }
 }
 
-/// Every `.rs` under `crates/`, `v1/crates/` and the root binary's `src/`, sorted. Skips
-/// `target/` — build artifacts are not source and would make the gate depend
-/// on whether you had built.
+/// Every `.rs` under `crates/`, `v1/crates/` and the root binary's `src/`,
+/// sorted. Skips `target/` — build artifacts are not source and would make the
+/// gate depend on whether you had built.
 fn rust_sources(root: &Path) -> Vec<PathBuf> {
     fn walk(dir: &Path, out: &mut Vec<PathBuf>) {
         let Ok(entries) = std::fs::read_dir(dir) else {

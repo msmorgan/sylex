@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
-use crate::Ident;
 use serde::Deserialize;
 use serde::Serialize;
 
+use crate::Ident;
 use crate::Property;
 
 // [CR#300.1]
@@ -58,10 +58,11 @@ pub struct Subtype {
 }
 
 // A subtype's identity is its NAME: semantic lowering resolves it from one
-// declaration, so `types`/`confers` are redundant to compare — they ride along in the
-// `Arc` for free, and equality never touches them. (A same-name value that
-// *drifts* from its declaration is a future, essentially test-only concern; the
-// load-time subtype lint still catches an UNdeclared name via the registry.)
+// declaration, so `types`/`confers` are redundant to compare — they ride along
+// in the `Arc` for free, and equality never touches them. (A same-name value
+// that *drifts* from its declaration is a future, essentially test-only
+// concern; the load-time subtype lint still catches an UNdeclared name via the
+// registry.)
 impl PartialEq for Subtype {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
@@ -285,8 +286,8 @@ mod tests {
             }
         );
         assert_eq!(Type::Land.name(), Ident::from("Land"));
-        // Every permanent type flags true; the two spell types + Kindred + Dungeon
-        // false.
+        // Every permanent type flags true; the two spell types + Kindred +
+        // Dungeon false.
         for t in [
             Type::Artifact,
             Type::Battle,

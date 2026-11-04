@@ -211,10 +211,7 @@ impl ManaPool {
 }
 
 /// [CR#514.2,511.2]: has `marker` elapsed by the end of `ending`?
-fn marker_expired_at(
-    marker: sylex_core::TurnMarker,
-    ending: sylex_core::PhaseStep,
-) -> bool {
+fn marker_expired_at(marker: sylex_core::TurnMarker, ending: sylex_core::PhaseStep) -> bool {
     use sylex_core::CombatStep;
     use sylex_core::EndingStep;
     use sylex_core::PhaseStep;

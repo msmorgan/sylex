@@ -121,10 +121,12 @@ pub(crate) fn compile(
             }
             '$' if chars.peek() == Some(&'{') => {
                 chars.next(); // consume the '{'
-                // Escape-aware body read, mirroring `render::template::fill_with`:
-                // a backslash escapes the next char (`\{`/`\}` are a literal brace
-                // inside the body), and only an unescaped `}` closes the hole. The
-                // backslash is dropped, the escaped char kept.
+                // Escape-aware body read, mirroring
+                // `render::template::fill_with`: a backslash
+                // escapes the next char (`\{`/`\}` are a literal brace
+                // inside the body), and only an unescaped `}` closes the hole.
+                // The backslash is dropped, the escaped char
+                // kept.
                 let mut key = String::new();
                 while let Some(d) = chars.next() {
                     if d == '\\' {
@@ -151,16 +153,19 @@ pub(crate) fn compile(
                     });
                 } else if let Some((slot_spec, literal)) = key.split_once('*') {
                     // Count-driven literal repetition (`${slot*\{E\}}`): the
-                    // (already-unescaped) `literal` after `*` repeats `slot`-many
-                    // times — the parse twin of `render::template`'s repeat branch.
+                    // (already-unescaped) `literal` after `*` repeats
+                    // `slot`-many times — the parse twin of
+                    // `render::template`'s repeat branch.
                     segments.push(Segment::Repeat {
                         slot: slot_for(slot_spec.trim(), params),
                         literal: literal.to_owned(),
                     });
                 } else {
-                    // 0 `#` = an ordinary slot. A malformed count (1 or 3+) degrades to a
-                    // slot whose key won't resolve — builtin templates are author-controlled
-                    // and covered by the `keywords.rs` "every builtin macro expands" test.
+                    // 0 `#` = an ordinary slot. A malformed count (1 or 3+)
+                    // degrades to a slot whose key won't
+                    // resolve — builtin templates are author-controlled
+                    // and covered by the `keywords.rs` "every builtin macro
+                    // expands" test.
                     segments.push(Segment::Slot(slot_for(key.trim(), params)));
                 }
             }

@@ -50,17 +50,17 @@ use std::io;
 use std::path::Path;
 use std::path::PathBuf;
 
+use ron::value::RawValue;
+use serde::Deserialize;
+use serde::Deserializer;
+use serde::Serialize;
+use serde::Serializer;
 /// Spelling-owned roles for frame occurrences. They intentionally remain absent
 /// from the chart and construction matcher.
 pub use sylex_features_v1::MentionKind;
 /// Spelling-owned roles for frame occurrences. They intentionally remain absent
 /// from the chart and construction matcher.
 pub use sylex_features_v1::OccurrenceRole;
-use ron::value::RawValue;
-use serde::Deserialize;
-use serde::Deserializer;
-use serde::Serialize;
-use serde::Serializer;
 
 use crate::MacroSet;
 

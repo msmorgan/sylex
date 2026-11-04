@@ -58,8 +58,7 @@ fn builtin_sba_rules() -> Vec<sylex_core::SbaRule> {
 /// Load the builtin plugin's counter declarations — `M1M1Counter`'s
 /// conferred -1/-1 rides them ([CR#122.1a]; consumer-injected like
 /// `sba_rules`).
-fn builtin_counter_decls()
--> std::collections::HashMap<sylex_core::Ident, sylex_core::Counter> {
+fn builtin_counter_decls() -> std::collections::HashMap<sylex_core::Ident, sylex_core::Counter> {
     Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
         .unwrap()
         .counters
@@ -116,8 +115,8 @@ fn combatant_creature_def() -> sylex_core::TypeDef {
     sylex_core::TypeDef {
         name: "Creature".into(),
         permanent_type: true,
-        confers: vec![Property::Static(Arc::new(
-            sylex_core::Region::candidate(StaticSpec::Conditionally(
+        confers: vec![Property::Static(Arc::new(sylex_core::Region::candidate(
+            StaticSpec::Conditionally(
                 Condition::Matches(
                     sylex_core::Reference::Reg(sylex_core::RefId(0)),
                     Predicate::Class(sylex_core::ObjectClass::Permanent),
@@ -126,8 +125,8 @@ fn combatant_creature_def() -> sylex_core::TypeDef {
                     who: Predicate::Ref(sylex_core::Reference::Reg(sylex_core::RefId(0))),
                     role: sylex_core::Role::Combatant,
                 }),
-            )),
-        ))]
+            ),
+        )))]
         .into(),
     }
 }
@@ -425,8 +424,7 @@ fn two_applicable_replacements_surface_choice() {
     // Drive to the ChooseReplacement decision.
     let dec = drive_to_decision(&mut state);
     let DecisionPointKind::ChooseReplacement(sylex_engine::ChooseReplacement {
-        applicable,
-        ..
+        applicable, ..
     }) = dec
     else {
         panic!("expected ChooseReplacement, got {dec:?}");
@@ -461,8 +459,7 @@ fn two_applicable_replacements_second_choice_also_survives() {
 
     let dec = drive_to_decision(&mut state);
     let DecisionPointKind::ChooseReplacement(sylex_engine::ChooseReplacement {
-        applicable,
-        ..
+        applicable, ..
     }) = dec
     else {
         panic!("expected ChooseReplacement, got {dec:?}");
@@ -602,9 +599,7 @@ fn regenerate_effect(subject_ref: Reference) -> Instruction {
     let instead = Instruction::Sequentially(
         vec![
             // [CR#701.19a]: remove all damage from the regenerated permanent.
-            Instruction::act(Action::RemoveDamage(Reference::Reg(sylex_core::RefId(
-                2,
-            )))),
+            Instruction::act(Action::RemoveDamage(Reference::Reg(sylex_core::RefId(2)))),
             // [CR#701.19a]: its controller taps it.
             Instruction::act(Action::Tap(Reference::Reg(sylex_core::RefId(2)))),
         ]
@@ -839,8 +834,7 @@ fn regenerate_target_creature_heals_the_subject_not_the_source() {
     // effect pins the subject with a leading `Let`; this test builds the shield
     // instance directly, so it peels that instruction off to reach the
     // replacement (the shield's subject is set explicitly below).
-    let Instruction::Sequentially(steps) =
-        regenerate_effect(Reference::Reg(sylex_core::RefId(0)))
+    let Instruction::Sequentially(steps) = regenerate_effect(Reference::Reg(sylex_core::RefId(0)))
     else {
         unreachable!("regenerate_effect builds a Let + CreateReplacement sequence")
     };

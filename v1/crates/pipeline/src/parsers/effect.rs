@@ -758,7 +758,8 @@ fn parse_may_reflexive(line: &str, ctx: &ResolveCtx) -> anyhow::Result<Option<Pa
             and_then.functional_zone,
         )
     } else {
-        // May path. Offer targets carry through; a branch's own targets decline.
+        // May path. Offer targets carry through; a branch's own targets
+        // decline.
         let Some(offer_parsed) = parse_clause(&format!("{offer}."), ctx)? else {
             return Ok(None);
         };
@@ -836,8 +837,9 @@ fn parse_pump(line: &str, ctx: &ResolveCtx) -> anyhow::Result<Option<ParsedEffec
     // The required "until end of turn" marker may sit on EITHER side of a "for
     // each" count tail: "gets +1/+1 for each … until end of turn" (marker last)
     // or "gets +2/+0 until end of turn for each …" (marker mid, the
-    // Piledriver/Rabblemaster order). Strip a trailing marker first; if it isn't
-    // trailing, peel the count and strip the marker off the count's head.
+    // Piledriver/Rabblemaster order). Strip a trailing marker first; if it
+    // isn't trailing, peel the count and strip the marker off the count's
+    // head.
     let (body, scaled) = if let Some(head) = body.strip_suffix(" until end of turn") {
         // Marker last — peel any "for each" count off what precedes it.
         match count::strip(head) {
@@ -954,8 +956,8 @@ fn pump_scope(subj: &str) -> Option<(modify::Target, Vec<String>)> {
             vec![format!("TargetOne({filter})")],
         ));
     }
-    // "it" — the resolving source pumping itself (trigger anaphor); same scope as
-    // a "~ gets …" self-pump.
+    // "it" — the resolving source pumping itself (trigger anaphor); same scope
+    // as a "~ gets …" self-pump.
     if subj.trim().eq_ignore_ascii_case("it") {
         return Some((modify::Target::Ref("This".to_owned()), Vec::new()));
     }
@@ -1595,8 +1597,8 @@ fn parse_return_to_hand(line: &str) -> Option<ParsedEffect> {
     }
     // Graveyard recursion: "target <subject> card from your graveyard to your
     // hand." — peeled first so the battlefield arm's "to its owner's hand"
-    // suffix can't shadow it. "<subject> card" is the noun phrase; a bare "card"
-    // (no type qualifier) leaves an empty subject.
+    // suffix can't shadow it. "<subject> card" is the noun phrase; a bare
+    // "card" (no type qualifier) leaves an empty subject.
     if let Some(noun) = body
         .strip_suffix(" from your graveyard to your hand")
         .and_then(|s| s.strip_prefix("target "))
@@ -2294,15 +2296,15 @@ fn parse_deal_damage(line: &str, slot: usize) -> Option<ParsedEffect> {
     if amount == "X" && !matches!(patient, DamagePatient::EachOf { .. }) {
         return None;
     }
-    // A verb takes a single `Reference`; a "to each / to all" shape's patient is
-    // a `SelectAll(...)` SELECTION, which can't ride the verb directly — that
-    // shape is the `DealsDamageToEach` macro
-    // (`v1/plugins/builtin/macros/effect/DealsDamageToEach.ron`): `Each` over the
-    // many-`Binder` `Existing(SelectAll(<filter>))`, binding each member in
-    // turn as the iteration anaphor `It` per element ([CR#608.2d] to-each),
-    // with `DealDamage` taking that anaphor. Emitting the macro invocation
-    // (rather than inlining the `Each`/`SelectAll` shell here) is what lets
-    // this shape render back through its own template
+    // A verb takes a single `Reference`; a "to each / to all" shape's patient
+    // is a `SelectAll(...)` SELECTION, which can't ride the verb directly —
+    // that shape is the `DealsDamageToEach` macro
+    // (`v1/plugins/builtin/macros/effect/DealsDamageToEach.ron`): `Each` over
+    // the many-`Binder` `Existing(SelectAll(<filter>))`, binding each
+    // member in turn as the iteration anaphor `It` per element ([CR#608.2d]
+    // to-each), with `DealDamage` taking that anaphor. Emitting the macro
+    // invocation (rather than inlining the `Each`/`SelectAll` shell here)
+    // is what lets this shape render back through its own template
     // ([`crate::parsers::filter`]'s recipient filter is the invocation's
     // second argument) — the same "production emits the macro" pattern the
     // trigger families use for their `EventFilter` macros. A targeted
@@ -2552,7 +2554,8 @@ fn parse_create_token(line: &str) -> Option<ParsedEffect> {
                     .is_some_and(|w| super::filter::color_ident(w).is_some() || *w == "colorless"))
         {
             // "colorless" is an explicit no-color marker; "and" connects color
-            // words — both advance past a non-subtype word without recording a color.
+            // words — both advance past a non-subtype word without recording a
+            // color.
             i += 1;
         } else {
             break;
@@ -2562,8 +2565,9 @@ fn parse_create_token(line: &str) -> Option<ParsedEffect> {
     // Every remaining word must be a plausible single creature subtype
     // (uppercase-initial, ASCII-alphabetic). Anything else means the line is
     // richer than this v1 production: a multi-token sentence ("…, a 2/2 …"
-    // leaves comma/digit-bearing words), a card-type word ("artifact creature"),
-    // or a trailing clause. Decline cleanly rather than emit junk RON.
+    // leaves comma/digit-bearing words), a card-type word ("artifact
+    // creature"), or a trailing clause. Decline cleanly rather than emit
+    // junk RON.
     if subtypes.iter().any(|word| !is_subtype_word(word)) {
         return None;
     }
@@ -3334,8 +3338,8 @@ mod tests {
         ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
     )]
     fn destroy_target_with_keyword_quality() {
-        // "with <keyword>" now resolves to a `Has(<Keyword>)` filter clause, so a
-        // keyword-quality target parses (shared filter grammar gain).
+        // "with <keyword>" now resolves to a `Has(<Keyword>)` filter clause, so
+        // a keyword-quality target parses (shared filter grammar gain).
         assert_eq!(
             parsed("Destroy target creature with flying."),
             Some((
@@ -3380,7 +3384,8 @@ mod tests {
                     .to_owned()
             ))
         );
-        // Single-target pump ("target creature gets …"): TargetOne + bare `Target(0)`.
+        // Single-target pump ("target creature gets …"): TargetOne + bare
+        // `Target(0)`.
         assert_eq!(
             parsed("Target creature gets +3/+3 until end of turn."),
             Some((
@@ -3404,8 +3409,8 @@ mod tests {
 
     #[test]
     fn durational_combat_restriction_can_block() {
-        // Single-target: "Target creature can't block this turn." -> TargetOne +
-        // bare `Target(0)` anchored on `by:`.
+        // Single-target: "Target creature can't block this turn." -> TargetOne
+        // + bare `Target(0)` anchored on `by:`.
         assert_eq!(
             parsed("Target creature can't block this turn."),
             Some((
@@ -3425,8 +3430,9 @@ mod tests {
                     .to_owned()
             ))
         );
-        // "That creature" anaphor (Chandra, Torch of Defiance's corpus phrasing):
-        // the sorted anaphor `That(Creature)`, no target of its own.
+        // "That creature" anaphor (Chandra, Torch of Defiance's corpus
+        // phrasing): the sorted anaphor `That(Creature)`, no target of
+        // its own.
         assert_eq!(
             parsed("That creature can't block this turn."),
             Some((
@@ -3444,7 +3450,8 @@ mod tests {
     #[test]
     fn durational_combat_restriction_cant_be_blocked() {
         // Single-target: "Target creature can't be blocked this turn." ->
-        // TargetOne + bare `Target(0)` anchored on `on:` — the evasion/passive form.
+        // TargetOne + bare `Target(0)` anchored on `on:` — the evasion/passive
+        // form.
         assert_eq!(
             parsed("Target creature can't be blocked this turn."),
             Some((
@@ -3498,8 +3505,8 @@ mod tests {
         // parses — see `destroy_target_with_keyword_quality`; pick a phrase the
         // filter grammar still rejects here.)
         assert!(declines("Destroy target creature wearing hats."));
-        // A pump without the durational marker isn't an effect-grammar pump (it's
-        // a static anthem's job on a permanent).
+        // A pump without the durational marker isn't an effect-grammar pump
+        // (it's a static anthem's job on a permanent).
         assert!(declines("Creatures you control get +1/+1."));
     }
 
@@ -3813,7 +3820,8 @@ mod tests {
         assert!(declines(
             "Create a 1/1 red Dinosaur creature token with haste and a 1/1 white Human Soldier creature token."
         ));
-        // Artifact creature token — the "artifact" card-type word is out of scope.
+        // Artifact creature token — the "artifact" card-type word is out of
+        // scope.
         assert!(declines(
             "Create a 3/3 colorless Phyrexian Golem artifact creature token."
         ));
@@ -4066,7 +4074,8 @@ mod tests {
         assert!(declines(
             "Creatures you control get +01/+01 for each Goblin you control until end of turn."
         ));
-        // A numeral too large for u32 fails the wildcard arm's parse -> decline.
+        // A numeral too large for u32 fails the wildcard arm's parse ->
+        // decline.
         assert!(declines(
             "Creatures you control get +99999999999/+0 for each Goblin you control until end of turn."
         ));
@@ -4078,8 +4087,9 @@ mod tests {
         ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
     )]
     fn gain_life_for_each_attacking_filter() {
-        // Dwynen lifegain: "you gain 1 life for each attacking Elf you control."
-        // The "attacking" status rides the shared filter grammar; base must be 1.
+        // Dwynen lifegain: "you gain 1 life for each attacking Elf you
+        // control." The "attacking" status rides the shared filter
+        // grammar; base must be 1.
         assert_eq!(
             parsed("you gain 1 life for each attacking Elf you control."),
             Some((
@@ -4093,7 +4103,8 @@ mod tests {
             parsed("You gain 3 life."),
             Some((String::new(), "ChangeLife(You, Up(3))".to_owned()))
         );
-        // A non-unit base under "for each" has no Count product form -> declines.
+        // A non-unit base under "for each" has no Count product form ->
+        // declines.
         assert!(declines(
             "you gain 2 life for each attacking Elf you control."
         ));
@@ -4101,7 +4112,8 @@ mod tests {
 
     #[test]
     fn may_wraps_inner_effect() {
-        // Lys Alana rider: "you may create a 1/1 green Elf Warrior creature token."
+        // Lys Alana rider: "you may create a 1/1 green Elf Warrior creature
+        // token."
         assert_eq!(
             parsed("you may create a 1/1 green Elf Warrior creature token."),
             Some((
@@ -4279,7 +4291,8 @@ mod tests {
     #[test]
     fn macro_effect_declines_on_trailing_text() {
         let ctx = crate::parsers::test_ctx::builtin_ctx(CardKind::Permanent);
-        // "investigate twice" is a repeated-action shape, not the bare template.
+        // "investigate twice" is a repeated-action shape, not the bare
+        // template.
         assert!(parse_clause("investigate twice.", &ctx).unwrap().is_none());
         // An unknown action word still declines.
         assert!(parse_clause("teleport.", &ctx).unwrap().is_none());
@@ -4298,9 +4311,10 @@ mod tests {
 
     #[test]
     fn conditional_instead_at_end() {
-        // Secrets of the Golden City: base draw, override draw, "instead" at the
-        // end of the conditional sentence. The conditional branch is `then`; the
-        // base is `otherwise` (the branch when the condition is false).
+        // Secrets of the Golden City: base draw, override draw, "instead" at
+        // the end of the conditional sentence. The conditional branch
+        // is `then`; the base is `otherwise` (the branch when the
+        // condition is false).
         assert_eq!(
             parsed_with_macros(
                 "Draw two cards. If you have the city's blessing, draw three cards instead."
@@ -4315,8 +4329,8 @@ mod tests {
 
     #[test]
     fn conditional_instead_at_front() {
-        // "If you have the city's blessing, instead <override>." — the "instead"
-        // leads the override clause.
+        // "If you have the city's blessing, instead <override>." — the
+        // "instead" leads the override clause.
         assert_eq!(
             parsed_with_macros(
                 "Creatures you control get +1/+1 until end of turn. \
@@ -4335,8 +4349,9 @@ mod tests {
 
     #[test]
     fn conditional_no_instead() {
-        // "If you have the city's blessing, <override>." with no "instead" word —
-        // still a conditional branch (the override is `then`, base is `otherwise`).
+        // "If you have the city's blessing, <override>." with no "instead" word
+        // — still a conditional branch (the override is `then`, base is
+        // `otherwise`).
         assert_eq!(
             parsed_with_macros("Draw a card. If you have the city's blessing, draw two cards."),
             Some((
@@ -4349,12 +4364,13 @@ mod tests {
 
     #[test]
     fn conditional_declines_unknown_condition() {
-        // An ungrounded condition phrase declines the whole production (the line
-        // stays Unparsed rather than emit an unverified condition). ("you
-        // control a creature" no longer qualifies as ungrounded — the
-        // `YouControl` condition macro, authored for the `Conditionally`
-        // composition, grounds it too; the shared routing means `parse_if`
-        // benefits from every condition macro, not just its own.)
+        // An ungrounded condition phrase declines the whole production (the
+        // line stays Unparsed rather than emit an unverified
+        // condition). ("you control a creature" no longer qualifies as
+        // ungrounded — the `YouControl` condition macro, authored for
+        // the `Conditionally` composition, grounds it too; the shared
+        // routing means `parse_if` benefits from every condition macro,
+        // not just its own.)
         assert!(
             parsed_with_macros("Draw a card. If the moon is full, draw two cards instead.")
                 .is_none()
@@ -4383,9 +4399,10 @@ mod tests {
 
     #[test]
     fn conditional_declines_targeted_branch() {
-        // v1 declines when a branch declares targets: both branches would emit a
-        // `It` with no shared announce list, which the `If` node can't
-        // express yet. Decline cleanly rather than emit colliding targets.
+        // v1 declines when a branch declares targets: both branches would emit
+        // a `It` with no shared announce list, which the `If` node
+        // can't express yet. Decline cleanly rather than emit colliding
+        // targets.
         assert!(
             parsed_with_macros(
                 "Destroy target creature. If you have the city's blessing, destroy target artifact instead."
@@ -4396,8 +4413,8 @@ mod tests {
 
     #[test]
     fn counter_target_spell_bare() {
-        // The spell on the stack is the target (Spell filter); the body counters
-        // it ([CR#701.6a]).
+        // The spell on the stack is the target (Spell filter); the body
+        // counters it ([CR#701.6a]).
         assert_eq!(
             parsed("Counter target spell."),
             Some((
@@ -5246,7 +5263,8 @@ mod tests {
                 "Untap(Target(0))".to_owned()
             ))
         );
-        // A trailing rider sentence leaves text past the period — declines here.
+        // A trailing rider sentence leaves text past the period — declines
+        // here.
         assert!(declines(
             "Tap target creature. Target(0) doesn't untap during its controller's next untap step."
         ));
@@ -5294,7 +5312,8 @@ mod tests {
         // Catalog subtype heads are not card-type nouns. The distinction is
         // retained by `ParsedFilter`, never recovered from its RON spelling.
         assert!(parsed("Destroy target Goblin or Elf.").is_none());
-        // Single-type "permanent" still parses through the shared phrase grammar.
+        // Single-type "permanent" still parses through the shared phrase
+        // grammar.
         assert_eq!(
             parsed("Destroy target permanent."),
             Some((
@@ -5394,8 +5413,9 @@ mod tests {
 
     #[test]
     fn put_counter_on_self() {
-        // "Put a +1/+1 counter on it." / "on ~." — the resolving source counters
-        // itself (combat-damage triggers); no target, `This` selection.
+        // "Put a +1/+1 counter on it." / "on ~." — the resolving source
+        // counters itself (combat-damage triggers); no target, `This`
+        // selection.
         assert_eq!(
             parsed_with_macros("put a +1/+1 counter on it."),
             Some((
@@ -5480,8 +5500,8 @@ mod tests {
 
     #[test]
     fn put_counter_declines_out_of_scope() {
-        // An unmodeled counter kind (no `+2/+2`/`+1/+0` macro) declines cleanly —
-        // the named-counter vocabulary doesn't carry it yet.
+        // An unmodeled counter kind (no `+2/+2`/`+1/+0` macro) declines cleanly
+        // — the named-counter vocabulary doesn't carry it yet.
         assert!(parsed_with_macros("Put a +2/+2 counter on target creature.").is_none());
         assert!(parsed_with_macros("put a +1/+0 counter on ~.").is_none());
         // `X` and "that many" counts aren't v1 productions.

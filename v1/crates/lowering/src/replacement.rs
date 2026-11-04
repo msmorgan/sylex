@@ -200,12 +200,10 @@ impl Lower for sylex_semantics_v1::Prevention {
                 to: to.lower(),
                 duration: duration.lower(),
             },
-            Self::PreventNextInstance { from, to } => {
-                sylex_core::Prevention::PreventNextInstance {
-                    from: from.lower(),
-                    to: to.lower(),
-                }
-            }
+            Self::PreventNextInstance { from, to } => sylex_core::Prevention::PreventNextInstance {
+                from: from.lower(),
+                to: to.lower(),
+            },
             Self::PreventAll { from, to, duration } => sylex_core::Prevention::PreventAll {
                 from: from.lower(),
                 to: to.lower(),

@@ -1695,9 +1695,7 @@ mod tests {
             Instruction::act(Action::Create {
                 agent: Reference::Reg(sylex_core::RefId(1)),
                 count: Count::Literal(1),
-                token: sylex_core::TokenSpec::Named(sylex_core::TokenName::from(
-                    "Treasure",
-                )),
+                token: sylex_core::TokenSpec::Named(sylex_core::TokenName::from("Treasure")),
                 riders: vec![].into(),
             }),
             &frame,
@@ -2462,11 +2460,8 @@ mod tests {
                 },
                 condition: None,
                 limits: Vec::new().into(),
-                effect: Instruction::draw(
-                    Reference::Reg(sylex_core::RefId(1)),
-                    Count::Literal(1),
-                )
-                .into(),
+                effect: Instruction::draw(Reference::Reg(sylex_core::RefId(1)), Count::Literal(1))
+                    .into(),
             })],
             ..Characteristics::default()
         });
@@ -2532,9 +2527,9 @@ mod tests {
         use sylex_core::NumericOp;
         use sylex_core::StatValue;
         use sylex_core::StaticSpec;
-        let count = Count::CountOf(Countable::Objects(Arc::new(
-            sylex_core::Region::candidate(Predicate::creature()),
-        )));
+        let count = Count::CountOf(Countable::Objects(Arc::new(sylex_core::Region::candidate(
+            Predicate::creature(),
+        ))));
         Ability::r#static(StaticSpec::Modify(
             Reference::Reg(sylex_core::RefId(0)),
             Modification::Several(
@@ -3131,11 +3126,8 @@ mod tests {
                 event,
                 condition: None,
                 limits: Vec::new().into(),
-                effect: Instruction::draw(
-                    Reference::Reg(sylex_core::RefId(1)),
-                    Count::Literal(1),
-                )
-                .into(),
+                effect: Instruction::draw(Reference::Reg(sylex_core::RefId(1)), Count::Literal(1))
+                    .into(),
             })],
             ..Characteristics::default()
         }));
@@ -3834,19 +3826,15 @@ mod tests {
             &mut state,
             sylex_semantics_v1::OneShotEffect::Sequentially(
                 [
-                    sylex_semantics_v1::OneShotEffect::Act(
-                        sylex_semantics_v1::Action::FlipCoins(
-                            sylex_semantics_v1::Reference::You,
-                            sylex_semantics_v1::Count::Literal(50),
-                            false,
-                        ),
-                    ),
-                    sylex_semantics_v1::OneShotEffect::Act(
-                        sylex_semantics_v1::Action::ChangeLife(
-                            sylex_semantics_v1::Reference::You,
-                            sylex_semantics_v1::LifeOp::Up(sylex_semantics_v1::Count::ThatMany),
-                        ),
-                    ),
+                    sylex_semantics_v1::OneShotEffect::Act(sylex_semantics_v1::Action::FlipCoins(
+                        sylex_semantics_v1::Reference::You,
+                        sylex_semantics_v1::Count::Literal(50),
+                        false,
+                    )),
+                    sylex_semantics_v1::OneShotEffect::Act(sylex_semantics_v1::Action::ChangeLife(
+                        sylex_semantics_v1::Reference::You,
+                        sylex_semantics_v1::LifeOp::Up(sylex_semantics_v1::Count::ThatMany),
+                    )),
                 ]
                 .into(),
             ),
@@ -3893,12 +3881,10 @@ mod tests {
                         sylex_semantics_v1::Count::Literal(2),
                         true,
                     )),
-                    sylex_semantics_v1::OneShotEffect::Act(
-                        sylex_semantics_v1::Action::ChangeLife(
-                            sylex_semantics_v1::Reference::You,
-                            sylex_semantics_v1::LifeOp::Up(sylex_semantics_v1::Count::ThatMany),
-                        ),
-                    ),
+                    sylex_semantics_v1::OneShotEffect::Act(sylex_semantics_v1::Action::ChangeLife(
+                        sylex_semantics_v1::Reference::You,
+                        sylex_semantics_v1::LifeOp::Up(sylex_semantics_v1::Count::ThatMany),
+                    )),
                 ]
                 .into(),
             ),

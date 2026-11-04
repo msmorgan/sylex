@@ -2,7 +2,9 @@
 //! data directories.
 
 mod error;
-pub use error::{ExtractError, LayoutError, StubError};
+pub use error::ExtractError;
+pub use error::LayoutError;
+pub use error::StubError;
 
 pub mod extract;
 pub mod graduate;

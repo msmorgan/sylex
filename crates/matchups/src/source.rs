@@ -49,8 +49,8 @@ impl CardSource {
     pub fn load() -> Self {
         let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins");
         let builtin = Plugin::load(root.join("builtin")).expect("v1/plugins/builtin loads");
-        let canon =
-            Plugin::load_with_prelude(&builtin, root.join("canon")).expect("v1/plugins/canon loads");
+        let canon = Plugin::load_with_prelude(&builtin, root.join("canon"))
+            .expect("v1/plugins/canon loads");
         let wizards = Plugin::load_with_prelude(&builtin, root.join("wizards"))
             .expect("v1/plugins/wizards loads");
         Self {

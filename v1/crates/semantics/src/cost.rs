@@ -346,7 +346,8 @@ mod tests {
             "Cost([…]) reads as the Cost variant, got {comp:?}"
         );
 
-        // Faithful read: the nested Cost SURVIVES verbatim — no read-time flatten.
+        // Faithful read: the nested Cost SURVIVES verbatim — no read-time
+        // flatten.
         let lumpy: Cost = crate::ron::options()
             .from_str(
                 "[Cost([Mana([Generic(2)])]), \

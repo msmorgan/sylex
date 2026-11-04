@@ -182,9 +182,7 @@ mod tests {
     fn lowers_selection_library_of() {
         assert_matches!(
             sylex_semantics_v1::Selection::LibraryOf(minimal_reference()).lower(),
-            sylex_core::Selection::LibraryOf(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Selection::LibraryOf(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -215,9 +213,9 @@ mod tests {
     fn lowers_selection_valid_targets_for() {
         assert_matches!(
             sylex_semantics_v1::Selection::ValidTargetsFor(minimal_reference()).lower(),
-            sylex_core::Selection::ValidTargetsFor(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Selection::ValidTargetsFor(sylex_core::Reference::Reg(sylex_core::RefId(
+                0
+            )))
         );
     }
 
@@ -289,10 +287,7 @@ mod tests {
             );
             sylex_semantics_v1::Selection::They.lower()
         });
-        assert_eq!(
-            lowered,
-            sylex_core::Selection::Reg(sylex_core::RefId(3))
-        );
+        assert_eq!(lowered, sylex_core::Selection::Reg(sylex_core::RefId(3)));
     }
 
     /// A sorted plural anaphor ("those players") picks the group register
@@ -338,9 +333,6 @@ mod tests {
             )
             .lower()
         });
-        assert_eq!(
-            lowered,
-            sylex_core::Selection::Reg(sylex_core::RefId(2))
-        );
+        assert_eq!(lowered, sylex_core::Selection::Reg(sylex_core::RefId(2)));
     }
 }

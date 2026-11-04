@@ -603,9 +603,7 @@ mod tests {
             effect: sylex_semantics_v1::OneShotEffect::Targeted(sylex_semantics_v1::Targeted {
                 targets: vec![minimal_target_spec()].into(),
                 effect: std::sync::Arc::new(sylex_semantics_v1::OneShotEffect::Act(
-                    sylex_semantics_v1::Action::DrawCard(sylex_semantics_v1::Reference::Target(
-                        0,
-                    )),
+                    sylex_semantics_v1::Action::DrawCard(sylex_semantics_v1::Reference::Target(0)),
                 )),
             }),
             cost: None,
@@ -670,9 +668,9 @@ mod tests {
     #[test]
     fn lowers_ability_activated() {
         assert_matches!(
-            sylex_semantics_v1::Ability::Activated(std::sync::Arc::new(
-                minimal_activated_ability()
-            ))
+            sylex_semantics_v1::Ability::Activated(
+                std::sync::Arc::new(minimal_activated_ability())
+            )
             .lower(),
             sylex_core::Ability::Activated(_)
         );
@@ -681,9 +679,9 @@ mod tests {
     #[test]
     fn lowers_ability_triggered() {
         assert_matches!(
-            sylex_semantics_v1::Ability::Triggered(std::sync::Arc::new(
-                minimal_triggered_ability()
-            ))
+            sylex_semantics_v1::Ability::Triggered(
+                std::sync::Arc::new(minimal_triggered_ability())
+            )
             .lower(),
             sylex_core::Ability::Triggered(_)
         );
@@ -815,11 +813,10 @@ mod tests {
 
     #[test]
     fn does_not_classify_targeted_or_loyalty_mana_producers() {
-        let targeted =
-            sylex_semantics_v1::OneShotEffect::Targeted(sylex_semantics_v1::Targeted {
-                targets: vec![minimal_target_spec()].into(),
-                effect: std::sync::Arc::new(semantic_mana_effect()),
-            });
+        let targeted = sylex_semantics_v1::OneShotEffect::Targeted(sylex_semantics_v1::Targeted {
+            targets: vec![minimal_target_spec()].into(),
+            effect: std::sync::Arc::new(semantic_mana_effect()),
+        });
         assert!(
             !semantic_mana_activation(targeted)
                 .lower()
@@ -842,11 +839,10 @@ mod tests {
 
     #[test]
     fn compiles_modal_mana_profile_for_announced_modes() {
-        let targeted =
-            sylex_semantics_v1::OneShotEffect::Targeted(sylex_semantics_v1::Targeted {
-                targets: vec![minimal_target_spec()].into(),
-                effect: std::sync::Arc::new(semantic_mana_effect()),
-            });
+        let targeted = sylex_semantics_v1::OneShotEffect::Targeted(sylex_semantics_v1::Targeted {
+            targets: vec![minimal_target_spec()].into(),
+            effect: std::sync::Arc::new(semantic_mana_effect()),
+        });
         let modal = sylex_semantics_v1::OneShotEffect::Modal(sylex_semantics_v1::Modal {
             choose: minimal_choose_spec(),
             modes: vec![

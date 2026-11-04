@@ -487,20 +487,18 @@ impl GameState {
                     watcher,
                     activation,
                 ),
-            Predicate::Relation(sylex_core::RelationPredicate::Owner(f)) => {
-                match snapshot.source {
-                    ObjectSource::Card(c) => {
-                        let owner = self.cards.get(c).owner;
-                        self.filter_matches_live_with_activation(
-                            f,
-                            self.player(owner).object,
-                            watcher,
-                            activation,
-                        )
-                    }
-                    ObjectSource::Player(_) => false,
+            Predicate::Relation(sylex_core::RelationPredicate::Owner(f)) => match snapshot.source {
+                ObjectSource::Card(c) => {
+                    let owner = self.cards.get(c).owner;
+                    self.filter_matches_live_with_activation(
+                        f,
+                        self.player(owner).object,
+                        watcher,
+                        activation,
+                    )
                 }
-            }
+                ObjectSource::Player(_) => false,
+            },
             // A snapshot subject is a card, never a player proxy — the
             // player-side relations never match.
             Predicate::Relation(
@@ -1609,9 +1607,7 @@ fn snapshot_stat(
         // [CR#209.1,306.5a]: loyalty is the PRINTED loyalty characteristic off
         // the snapshot's face — never the counter count (current loyalty is
         // `CounterCount(This, LoyaltyCounter)`), mirroring the P/T arms above.
-        sylex_core::Stat::Loyalty => {
-            crate::layer::base_stat(face.characteristics.loyalty.as_ref())
-        }
+        sylex_core::Stat::Loyalty => crate::layer::base_stat(face.characteristics.loyalty.as_ref()),
         sylex_core::Stat::Defense => Some(
             sylex_core::Int::try_from(
                 snapshot
@@ -1677,7 +1673,8 @@ mod tests {
     }
 
     fn builtin() -> Plugin {
-        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap()
+        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
+            .unwrap()
     }
 
     fn canon() -> Plugin {
@@ -4092,10 +4089,11 @@ mod tests {
         use crate::object::Side;
         use crate::step::StepOutcome;
 
-        // Delver as a real DoubleFaced permanent (front 1/1, back 3/2 Flying) so
-        // `Transform(This)` has a back face to flip to. The ability under test
-        // is supplied to `run_effect` directly — the trigger-fire path is
-        // covered by `delver_transforms_end_to_end` and the StepBegins tests.
+        // Delver as a real DoubleFaced permanent (front 1/1, back 3/2 Flying)
+        // so `Transform(This)` has a back face to flip to. The ability
+        // under test is supplied to `run_effect` directly — the
+        // trigger-fire path is covered by
+        // `delver_transforms_end_to_end` and the StepBegins tests.
         fn delver() -> Card {
             Card::DoubleFaced {
                 layout: DoubleFacedLayout::Transforming,
@@ -4164,9 +4162,9 @@ mod tests {
                                 what: top_ref(),
                                 to: None,
                             }),
-                            Instruction::act(Action::Transform(Reference::Reg(
-                                sylex_core::RefId(0),
-                            ))),
+                            Instruction::act(Action::Transform(Reference::Reg(sylex_core::RefId(
+                                0,
+                            )))),
                         ]
                         .into(),
                     )),
@@ -4696,11 +4694,8 @@ mod tests {
                 },
                 condition: None,
                 limits: Vec::new().into(),
-                effect: Instruction::draw(
-                    Reference::Reg(sylex_core::RefId(1)),
-                    Count::Literal(1),
-                )
-                .into(),
+                effect: Instruction::draw(Reference::Reg(sylex_core::RefId(1)), Count::Literal(1))
+                    .into(),
             })],
             ..Characteristics::default()
         }))
@@ -4957,8 +4952,7 @@ mod tests {
     /// moves the back trigger into section 1 (`idx < printed_len`) of
     /// `derived_abilities_of`. Active player = P0 so `WhoseTurn::Your`
     /// matches. Returns the object id and the back trigger body.
-    fn back_up_dfc_on_field_upkeep_draw() -> (GameState, ObjectId, sylex_core::TriggeredAbility)
-    {
+    fn back_up_dfc_on_field_upkeep_draw() -> (GameState, ObjectId, sylex_core::TriggeredAbility) {
         use sylex_card::Card;
         use sylex_card::CardFace;
         use sylex_card::Characteristics;
@@ -6398,9 +6392,9 @@ mod tests {
         let saga = put_bf(&mut state, card, PlayerId(0));
         let saga_source = state.objects.obj(saga).source;
         state.agenda.clear();
-        state.agenda.push_back(WorkItem::BeginStep(
-            sylex_core::PhaseStep::PrecombatMain,
-        ));
+        state
+            .agenda
+            .push_back(WorkItem::BeginStep(sylex_core::PhaseStep::PrecombatMain));
 
         let fired_chapters =
             |state: &mut GameState, amount: sylex_core::Uint| -> Vec<sylex_core::Uint> {
@@ -6431,9 +6425,9 @@ mod tests {
                     })
                     .collect();
                 state.agenda.clear();
-                state.agenda.push_back(WorkItem::BeginStep(
-                    sylex_core::PhaseStep::PrecombatMain,
-                ));
+                state
+                    .agenda
+                    .push_back(WorkItem::BeginStep(sylex_core::PhaseStep::PrecombatMain));
                 fired
             };
 
@@ -6530,9 +6524,7 @@ mod tests {
                 sylex_core::Param {
                     def: sylex_core::DefId(0),
                     kind: sylex_core::Kind::Entity,
-                    provenance: sylex_core::Provenance::Candidate(
-                        sylex_core::Domain::Entity,
-                    ),
+                    provenance: sylex_core::Provenance::Candidate(sylex_core::Domain::Entity),
                 },
                 sylex_core::Param {
                     def: sylex_core::DefId(1),

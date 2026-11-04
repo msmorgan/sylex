@@ -1,4 +1,3 @@
-use crate::CatalogError;
 use std::collections::BTreeSet;
 use std::ffi::OsString;
 use std::fmt;
@@ -6,6 +5,7 @@ use std::fs;
 use std::path::Path;
 use std::path::PathBuf;
 
+use crate::CatalogError;
 use crate::error::IoContext;
 
 /// Differences between immediate entries in two catalog directories.

@@ -72,9 +72,7 @@ fn activated_card(cost: Vec<CostComponent>) -> Arc<Card> {
     })))
 }
 
-fn activation_fixture(
-    cost: Vec<CostComponent>,
-) -> (GameState, PlayerId, sylex_engine::ObjectId) {
+fn activation_fixture(cost: Vec<CostComponent>) -> (GameState, PlayerId, sylex_engine::ObjectId) {
     activation_fixture_with_extras(cost, Vec::new())
 }
 
@@ -139,8 +137,9 @@ fn crew_fixture() -> (
     sylex_engine::ObjectId,
     sylex_engine::ObjectId,
 ) {
-    let plugin = Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
-        .expect("the builtin plugin loads");
+    let plugin =
+        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
+            .expect("the builtin plugin loads");
     let semantic: sylex_semantics_v1::KeywordAbility =
         plugin.macros.read_str("Crew(3)").expect("Crew expands");
     let KeywordAbility::Composite { abilities, .. } = semantic.lower() else {
@@ -1024,10 +1023,7 @@ fn random_library_exile_two_cost() -> Vec<CostComponent> {
     vec![
         CostComponent::Sample(sylex_core::Sample {
             dest: PAID,
-            quantity: sylex_core::Quantity::Range(
-                Some(Count::Literal(2)),
-                Some(Count::Literal(2)),
-            ),
+            quantity: sylex_core::Quantity::Range(Some(Count::Literal(2)), Some(Count::Literal(2))),
             filter: random_sample_filter(filter),
         }),
         CostComponent::do_action(CoreAction::Composite {

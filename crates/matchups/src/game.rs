@@ -183,7 +183,10 @@ mod tests {
     /// One complete game over the exact Worlds 1999 Sped Red and Stompy
     /// maindecks.
     #[test]
-    #[cfg_attr(not(wizards_corpus), ignore = "needs generated v1/plugins/wizards corpus")]
+    #[cfg_attr(
+        not(wizards_corpus),
+        ignore = "needs generated v1/plugins/wizards corpus"
+    )]
     fn sped_red_vs_stompy99_completes() {
         let src = CardSource::load();
         let red = deck::build_full(&wc99::SPED_RED, &src);

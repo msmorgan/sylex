@@ -1,5 +1,6 @@
-use sylex_lexicon::*;
 use std::collections::BTreeSet;
+
+use sylex_lexicon::*;
 
 fn noun(surface: &str) -> Lexeme {
     let mut noun = Lexeme::noun(

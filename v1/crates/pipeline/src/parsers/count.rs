@@ -188,7 +188,8 @@ mod tests {
     fn no_clause_or_bad_filter_declines() {
         assert!(strip("{G}{G}").is_none());
         assert!(strip("Draw 3 cards").is_none());
-        // Predicate that filter::parse_phrase can't handle -> whole clause declines.
+        // Predicate that filter::parse_phrase can't handle -> whole clause
+        // declines.
         assert!(strip("Add {G} for each creature wearing a hat").is_none());
     }
 }

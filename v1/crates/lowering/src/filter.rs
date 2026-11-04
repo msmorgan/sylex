@@ -502,9 +502,9 @@ mod tests {
         assert_matches!(
             sylex_semantics_v1::Predicate::Characteristic(minimal_characteristic_predicate())
                 .lower(),
-            sylex_core::Predicate::Characteristic(
-                sylex_core::CharacteristicPredicate::Type(sylex_core::TypeRef(_))
-            )
+            sylex_core::Predicate::Characteristic(sylex_core::CharacteristicPredicate::Type(
+                sylex_core::TypeRef(_)
+            ))
         );
     }
 
@@ -530,9 +530,7 @@ mod tests {
     fn lowers_predicate_ref() {
         assert_matches!(
             sylex_semantics_v1::Predicate::Ref(minimal_reference()).lower(),
-            sylex_core::Predicate::Ref(sylex_core::Reference::Reg(sylex_core::RefId(
-                0
-            )))
+            sylex_core::Predicate::Ref(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 

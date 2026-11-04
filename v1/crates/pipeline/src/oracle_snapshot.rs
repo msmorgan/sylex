@@ -16,9 +16,9 @@ pub enum SnapshotError {
     #[error("writing snapshot output: {0}")]
     Output(#[from] std::io::Error),
 }
+use serde::Serialize;
 use sylex_catalogs::CatalogSet;
 use sylex_upstream::scryfall::OracleCardReader;
-use serde::Serialize;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]

@@ -11,15 +11,15 @@ use std::io::BufReader;
 use std::path::Path;
 use std::sync::LazyLock;
 
-use crate::ExtractError;
+use regex::Regex;
 use sylex_catalogs::CatalogSet;
 use sylex_core::plugin::card_file;
-use sylex_upstream::DataStr;
-use sylex_upstream::scryfall::OracleCardReader;
 use sylex_semantics_v1::Color;
 use sylex_semantics_v1::StatValue;
-use regex::Regex;
+use sylex_upstream::DataStr;
+use sylex_upstream::scryfall::OracleCardReader;
 
+use crate::ExtractError;
 use crate::ident::to_rust_ident;
 use crate::todo_card::RawIdent;
 use crate::todo_card::TodoAbility;

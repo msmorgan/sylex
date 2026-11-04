@@ -1,13 +1,13 @@
 //! Productions as compiled, and the one step function shared by the chart
 //! and by Admission: adding a child to a partial Production.
 
+use dpsi::Ident;
+use serde::Deserialize;
+use serde::Serialize;
 use sylex_lexicon::Category as LexicalCategory;
 use sylex_lexicon::LexemeId;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::WordForm;
-use dpsi::Ident;
-use serde::Deserialize;
-use serde::Serialize;
 
 use crate::compile::CompiledGrammar;
 use crate::compile::LexemeFacts;
@@ -2248,8 +2248,7 @@ impl CompiledGrammar {
                 features: {
                     let number = matches!(
                         notation,
-                        sylex_lexicon::Numeral::Cardinal
-                            | sylex_lexicon::Numeral::Arabic(_)
+                        sylex_lexicon::Numeral::Cardinal | sylex_lexicon::Numeral::Arabic(_)
                     )
                     .then_some(if *value == 1 { "Singular" } else { "Plural" });
                     let sign = match value.cmp(&0) {

@@ -304,10 +304,10 @@ fn object_filter(subject: &str, controller: &str) -> Option<String> {
             "And([{type_atom}, Supertype({supertype}), {controller}])"
         ));
     }
-    // Otherwise the shared phrase parser, with the controller clause appended so
-    // its postfix grammar emits the same `ControlledBy(...)` atom (and "other"
-    // is handled by its prefix grammar). The controller suffix is re-derived
-    // from the atom we already chose.
+    // Otherwise the shared phrase parser, with the controller clause appended
+    // so its postfix grammar emits the same `ControlledBy(...)` atom (and
+    // "other" is handled by its prefix grammar). The controller suffix is
+    // re-derived from the atom we already chose.
     let suffix = controller_suffix(controller)?;
     filter::parse_phrase(&format!("{subject} {suffix}"))
 }
@@ -511,8 +511,8 @@ mod tests {
 
     #[test]
     fn declines_bare_enters_tapped() {
-        // Already structured by the mana-ability parser; this module abstains so
-        // the two never both match the same line.
+        // Already structured by the mana-ability parser; this module abstains
+        // so the two never both match the same line.
         assert!(rep("~ enters tapped.").is_none());
     }
 
@@ -529,7 +529,8 @@ mod tests {
 
     #[test]
     fn unless_control_count_lands() {
-        // "two or more other lands" → Compare(other lands you control, AtLeast, 2).
+        // "two or more other lands" → Compare(other lands you control, AtLeast,
+        // 2).
         assert_eq!(
             rep("~ enters tapped unless you control two or more other lands.").as_deref(),
             Some(
@@ -743,7 +744,8 @@ mod tests {
         assert!(rep("If ~ would be exiled, draw a card instead.").is_none());
         // Unknown effect ("exile it" is not in the effect grammar yet).
         assert!(rep("If ~ would die, exile it instead.").is_none());
-        // A targeting effect has nowhere to declare its target in a replacement.
+        // A targeting effect has nowhere to declare its target in a
+        // replacement.
         assert!(rep("As ~ enters, destroy target creature.").is_none());
         // Not a replacement line at all.
         assert!(rep("Draw a card.").is_none());

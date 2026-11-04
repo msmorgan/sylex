@@ -2,8 +2,8 @@
 //! as one analysis. It never endorses a Reading; it only lets two sets of
 //! Readings be compared under exactly the approved canonicalizations.
 
-use sylex_lexicon::LexicalReading;
 use dpsi::Ident;
+use sylex_lexicon::LexicalReading;
 
 use crate::compile::CompiledGrammar;
 use crate::compile::frame_name;

@@ -1208,9 +1208,10 @@ mod tests {
         );
 
         // Guarded spelling: the trailing fizzle-guard slot (after the rider
-        // list) reads and writes back. `IMPLICIT_SOME` ([`crate::ron::options`])
-        // writes a present `Option` bare (no `Some(...)` wrapper), so the
-        // written guard is just the zone name.
+        // list) reads and writes back. `IMPLICIT_SOME`
+        // ([`crate::ron::options`]) writes a present `Option` bare (no
+        // `Some(...)` wrapper), so the written guard is just the zone
+        // name.
         let guarded = Action::move_if_in(Reference::This, Zone::Hand, Zone::Graveyard);
         let written = write(&guarded);
         assert_eq!(read(&written), guarded);

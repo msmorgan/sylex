@@ -8,9 +8,9 @@
 //! (`Up(LandPlaysPerTurn, 1)`, [CR#305.2]) and Reliquary Tower
 //! (`NoMax(HandSizeLimit)`, [CR#402.2]).
 //!
-//! Scope today: the controller parameter resolves to the source permanent's controller
-//! (the "you" default both cards use); other player references and dynamic
-//! (non-literal) `Count` magnitudes are documented seams that need the
+//! Scope today: the controller parameter resolves to the source permanent's
+//! controller (the "you" default both cards use); other player references and
+//! dynamic (non-literal) `Count` magnitudes are documented seams that need the
 //! resolve-time `ExecutionFrame` machinery (`engine-resolve-effects`).
 
 use sylex_core::Ability;
@@ -29,8 +29,8 @@ use crate::state::GameState;
 /// Evaluate a `ModifyPlayer` magnitude. Only `Count::Literal` is supported
 /// here (the canonical cards are literal `1`s); a dynamic count is a documented
 /// seam — it contributes `0` to an `Up`/`Down` and an unevaluated `0` to a
-/// `Set`, which is the conservative no-op until the `ExecutionFrame`-bearing evaluator
-/// is threaded in.
+/// `Set`, which is the conservative no-op until the `ExecutionFrame`-bearing
+/// evaluator is threaded in.
 fn literal(count: &Count) -> Int {
     match count {
         Count::Literal(v) => (*v).cast_signed(),

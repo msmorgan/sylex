@@ -31,10 +31,11 @@ pub(crate) fn resolve_line(line: &str, ctx: &ResolveCtx) -> anyhow::Result<Optio
     // metadata the emitted ability keeps (`ability_word:`), so the render
     // side prints the oracle line back.
     let (ability_word, line) = split_ability_word(line);
-    // "At the beginning of …" is a step-entry trigger whose event clause carries
-    // an internal comma ("on your turn,"), so it can't share the "When/Whenever
-    // … , …" split. Route it to a dedicated event parser that consumes the whole
-    // "of … turn" run and returns the residual effect clause.
+    // "At the beginning of …" is a step-entry trigger whose event clause
+    // carries an internal comma ("on your turn,"), so it can't share the
+    // "When/Whenever … , …" split. Route it to a dedicated event parser
+    // that consumes the whole "of … turn" run and returns the residual
+    // effect clause.
     if let Some(rest) = line.strip_prefix("At the beginning of ") {
         let Some((event, effect_clause)) = parse_beginning_of(rest) else {
             return Ok(None);
@@ -360,9 +361,9 @@ fn parse_event_atom(clause: &str) -> Option<String> {
     // Becomes-target trigger: "<subject> becomes the target of a spell or
     // ability" — the `BecomesTarget` event ([CR#601.2c] announce-time; ward is
     // the family exemplar). "a spell or ability" carries no controller
-    // restriction, so `by` is omitted (matches any targeting source); a narrowed
-    // "… an opponent controls" rider is the Ward shape, not this bare form, and
-    // declines here.
+    // restriction, so `by` is omitted (matches any targeting source); a
+    // narrowed "… an opponent controls" rider is the Ward shape, not this
+    // bare form, and declines here.
     if let Some(subject) = clause.strip_suffix(" becomes the target of a spell or ability") {
         return Some(if subject == "~" {
             "BecomesTarget(what: Ref(This))".to_owned()
@@ -1071,10 +1072,11 @@ mod tests {
     #[test]
     fn two_slot_block_filtered_non_self_subject_declines() {
         // The two-slot forms are RESTRICTED to the self subject `~`: the render
-        // side narrows a two-sided block only when one side is `Ref(This)`, so a
-        // filtered non-self subject would drop the `of` narrowing (active) or
-        // invert the sentence (passive) on render. Both voices decline rather
-        // than emit an unrenderable filter ([CR#509.3b],[CR#509.3d]).
+        // side narrows a two-sided block only when one side is `Ref(This)`, so
+        // a filtered non-self subject would drop the `of` narrowing
+        // (active) or invert the sentence (passive) on render. Both
+        // voices decline rather than emit an unrenderable filter
+        // ([CR#509.3b],[CR#509.3d]).
         assert!(trig("Whenever a creature you control blocks a creature, draw a card.").is_none());
         assert!(
             trig(
@@ -1147,9 +1149,9 @@ mod tests {
 
     #[test]
     fn cast_subtype_spell_with_may_rider() {
-        // Lys Alana Huntmaster: "Whenever you cast an Elf spell, you may create a
-        // 1/1 green Elf Warrior creature token." — a filtered-cast trigger
-        // carrying a `you may` rider over a token-maker.
+        // Lys Alana Huntmaster: "Whenever you cast an Elf spell, you may create
+        // a 1/1 green Elf Warrior creature token." — a filtered-cast
+        // trigger carrying a `you may` rider over a token-maker.
         assert_eq!(
             trig("Whenever you cast an Elf spell, you may create a 1/1 green Elf Warrior creature token.")
                 .as_deref(),
@@ -1362,8 +1364,8 @@ mod tests {
         ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
     )]
     fn beginning_of_combat_your_turn_create_token() {
-        // Goblin Rabblemaster: "At the beginning of combat on your turn, create a
-        // 1/1 red Goblin creature token with haste."
+        // Goblin Rabblemaster: "At the beginning of combat on your turn, create
+        // a 1/1 red Goblin creature token with haste."
         assert_eq!(
             trig("At the beginning of combat on your turn, create a 1/1 red Goblin creature token with haste.")
                 .as_deref(),
@@ -1379,7 +1381,8 @@ mod tests {
     fn beginning_of_declines_unmodeled_step_or_turn() {
         // An unmodeled step declines.
         assert!(trig("At the beginning of the cleanup step, draw a card.").is_none());
-        // A non-"your" turn declines for the combat form (v1 covers your-turn only).
+        // A non-"your" turn declines for the combat form (v1 covers your-turn
+        // only).
         assert!(trig("At the beginning of combat on each player's turn, draw a card.").is_none());
     }
 
@@ -1461,7 +1464,8 @@ mod tests {
     #[test]
     fn becomes_target_self_sacrifice() {
         // Illusion-family drawback: "When ~ becomes the target of a spell or
-        // ability, sacrifice it." => BecomesTarget(what: Ref(This)) + Sacrifice.
+        // ability, sacrifice it." => BecomesTarget(what: Ref(This)) +
+        // Sacrifice.
         assert_eq!(
             trig("When ~ becomes the target of a spell or ability, sacrifice it.").as_deref(),
             Some("Triggered(event: BecomesTarget(what: Ref(This)), effect: Sacrifice(You, This))")

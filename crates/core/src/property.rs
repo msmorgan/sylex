@@ -51,12 +51,12 @@ pub enum Property {
     /// A static rule of the object, conferred WITHOUT an ability ([CR#113.12]:
     /// an effect that "states a quality of that object" is neither granting an
     /// ability nor setting a characteristic). THE home for a type's or
-    /// subtype's deontic rules: the Land play permission ([CR#116.2a,305.9]), the
-    /// Creature attack/block permissions and their summoning-sickness `Cant`
-    /// pair ([CR#508.1a,509.1a,302.6]), and the Equipment ([CR#301.5]) /
-    /// Fortification ([CR#301.6]) legal-host rule — "an Equipment can be
-    /// attached to a creature" is a quality of Equipment, not an ability of
-    /// one.
+    /// subtype's deontic rules: the Land play permission ([CR#116.2a,305.9]),
+    /// the Creature attack/block permissions and their summoning-sickness
+    /// `Cant` pair ([CR#508.1a,509.1a,302.6]), and the Equipment
+    /// ([CR#301.5]) / Fortification ([CR#301.6]) legal-host rule — "an
+    /// Equipment can be attached to a creature" is a quality of Equipment,
+    /// not an ability of one.
     ///
     /// Same payload as [`Ability::Static`], so the RON text of a rule that
     /// moves here is unchanged apart from dropping the `Ability(…)` wrapper.

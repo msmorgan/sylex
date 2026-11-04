@@ -77,9 +77,9 @@ pub fn build_game() -> Result<BuiltGame> {
 /// live play varies); tests use the fixed-seed `build_game`.
 ///
 /// The demo's cards are produced locally (not shipped): `wizards` is the
-/// gitignored generated corpus (`cargo xtask generate v1/plugins/wizards`), so the
-/// decklists resolve against canon staples (Lightning Bolt, basics) plus the
-/// rest of each card materialized from bulk data.
+/// gitignored generated corpus (`cargo xtask generate v1/plugins/wizards`), so
+/// the decklists resolve against canon staples (Lightning Bolt, basics) plus
+/// the rest of each card materialized from bulk data.
 ///
 /// # Errors
 /// If a plugin or decklist fails to load, or a listed card can't be resolved.
@@ -98,10 +98,8 @@ pub fn build_game_with_seed(seed: u64) -> Result<BuiltGame> {
     // semantic half becomes the provenance the renderer needs, because lowering
     // erases invocation provenance and a core value carries no template
     // (docs/decisions/semantics-spelling-lowering.md §12).
-    let p0: Vec<Arc<sylex_card::Card>> =
-        loaded0.iter().map(|l| Arc::new(l.core.clone())).collect();
-    let p1: Vec<Arc<sylex_card::Card>> =
-        loaded1.iter().map(|l| Arc::new(l.core.clone())).collect();
+    let p0: Vec<Arc<sylex_card::Card>> = loaded0.iter().map(|l| Arc::new(l.core.clone())).collect();
+    let p1: Vec<Arc<sylex_card::Card>> = loaded1.iter().map(|l| Arc::new(l.core.clone())).collect();
 
     // `CardId` is a dense index assigned at setup in deck order, pre-shuffle:
     // each player's deck in player order, then the library is shuffled. So

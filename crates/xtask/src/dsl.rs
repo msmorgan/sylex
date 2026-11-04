@@ -23,14 +23,14 @@ use std::process::Command;
 use anyhow::Context as _;
 use clap::Args;
 use clap::Subcommand;
+use serde_json::Value as Json;
+use serde_json::json;
 use sylex_syl::File;
 use sylex_syl::FileId;
 use sylex_syl::Shape;
 use sylex_syl::Sort;
 use sylex_syl::Value;
 use sylex_syl::ValueKind;
-use serde_json::Value as Json;
-use serde_json::json;
 
 #[derive(Debug, Args)]
 pub struct DslArgs {

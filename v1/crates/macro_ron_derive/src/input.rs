@@ -80,7 +80,8 @@ pub struct Input {
 }
 
 /// A spelling that also reads at this type's position and DENOTES a value of
-/// it: `#[macro_ron(denoted_by(Counter, term = crate::rules::Definition::counter_term))]`.
+/// it: `#[macro_ron(denoted_by(Counter, term =
+/// crate::rules::Definition::counter_term))]`.
 ///
 /// The spelling is a variant of another type `D` — the argument type of
 /// `term`, a `fn(&D) -> Option<&Self>` the consumer supplies — and the

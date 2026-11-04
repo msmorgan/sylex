@@ -13,8 +13,8 @@ use sylex_english::corpus::UnitKind;
 use sylex_english::judgment::Judge;
 use sylex_english::judgment::Outcome;
 use sylex_english::profile::Profiler;
-use sylex_vocabulary::LexicalEnvironment;
 use sylex_syntax::CompiledGrammar;
+use sylex_vocabulary::LexicalEnvironment;
 
 fn environment() -> &'static (LexicalEnvironment, CompiledGrammar) {
     static ENVIRONMENT: OnceLock<(LexicalEnvironment, CompiledGrammar)> = OnceLock::new();

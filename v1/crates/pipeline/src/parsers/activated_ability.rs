@@ -315,7 +315,8 @@ mod tests {
 
     #[test]
     fn declines_unknown_costs() {
-        // Loyalty costs are a different frame (extraction keeps them bracketed).
+        // Loyalty costs are a different frame (extraction keeps them
+        // bracketed).
         assert!(act("[0]: Draw a card.").is_none());
         // A sacrifice subject the filter grammar can't parse declines.
         assert!(act("Sacrifice a creature wearing hats: Draw a card.").is_none());

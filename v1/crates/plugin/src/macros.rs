@@ -13,15 +13,15 @@
 // The kind registry, param-type registry, and default macro set are
 // `sylex_semantics_v1`'s — see `sylex_semantics_v1::macros` for the
 // definitions and their docs.
-pub use sylex_semantics_v1::macros::kinds;
-pub use sylex_semantics_v1::macros::macro_set;
-pub use sylex_semantics_v1::macros::param_types;
 pub use macro_ron::InsertError;
 pub use macro_ron::MacroDef;
 pub use macro_ron::MacroSet;
 pub use macro_ron::ParamType;
 pub use macro_ron::ParamTypeSet;
 pub use macro_ron::Params;
+pub use sylex_semantics_v1::macros::kinds;
+pub use sylex_semantics_v1::macros::macro_set;
+pub use sylex_semantics_v1::macros::param_types;
 
 #[cfg(test)]
 mod tests {
@@ -70,9 +70,7 @@ mod tests {
     /// `macro_ron`, so file-shaped source is the construction path here —
     /// which is also what real definitions are.)
     fn def(source: &str) -> MacroDef {
-        sylex_semantics_v1::ron::options()
-            .from_str(source)
-            .unwrap()
+        sylex_semantics_v1::ron::options().from_str(source).unwrap()
     }
 
     /// The semantics grammar owns the kind registry
@@ -321,9 +319,7 @@ mod tests {
 
         let down: Modification = macros.read_str("PowerAndToughnessDown(2, 2)").unwrap();
         assert_eq!(
-            sylex_semantics_v1::ron::options()
-                .to_string(&down)
-                .unwrap(),
+            sylex_semantics_v1::ron::options().to_string(&down).unwrap(),
             "PowerAndToughnessDown(2,2)"
         );
         assert_eq!(
@@ -655,9 +651,7 @@ mod tests {
         // The predicate atom on its own expands to the same `And([...])`.
         let pred: Predicate = macros.read_str("OtherCreatureYouControl").unwrap();
         assert_eq!(
-            sylex_semantics_v1::ron::options()
-                .to_string(&pred)
-                .unwrap(),
+            sylex_semantics_v1::ron::options().to_string(&pred).unwrap(),
             "OtherCreatureYouControl"
         );
         assert_eq!(pred.expand_all(), expected_atom);

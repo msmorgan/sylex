@@ -631,8 +631,8 @@ fn skip_trivia(text: &str) -> &str {
 /// `check_struct_type` and `handle_any_struct`).
 ///
 /// So the form is classified here instead, from the argument list's own text.
-/// `macro_ron`'s value capture takes the list — the deserializer sits INSIDE the
-/// variant's parens, so what comes back is `group: x` or `x` — and the
+/// `macro_ron`'s value capture takes the list — the deserializer sits INSIDE
+/// the variant's parens, so what comes back is `group: x` or `x` — and the
 /// argument list is handed straight back to ron in the parentheses it was
 /// written in, read as the named struct when it is binder-led and as a
 /// one-element tuple when it is not. Nothing is rewritten: the only text this
@@ -2030,7 +2030,8 @@ impl<'de, D: Deserializer<'de>> Deserializer<'de> for MacroAware<'de, '_, D> {
             let ctx = self.ctx;
             let owner = variant.unwrap_or_else(|| name.into());
             let wrapped = self.wrap_struct(owner, fields, visitor);
-            // Positional application (`MacroSet::reading_positional_arguments`):
+            // Positional application
+            // (`MacroSet::reading_positional_arguments`):
             // a struct variant's arguments may come in the constructor's
             // declared binder order. ron decides which form is written by
             // lookahead inside `deserialize_any` (`handle_any_struct`), handing
@@ -2634,7 +2635,8 @@ impl<'de, V: Visitor<'de>> Visitor<'de> for EnumIntercept<'de, '_, V> {
             });
         }
 
-        // if not_a_real_variant(next_ident) { expand_macro(next_ident); try_again(); }
+        // if not_a_real_variant(next_ident) { expand_macro(next_ident);
+        // try_again(); }
         let def = self.ctx.read.macros.get(self.name, &ident).ok_or_else(|| {
             // A suppressed variant with no identity macro is the restricted
             // case: the spelling exists in the grammar but is not author
@@ -2811,7 +2813,8 @@ struct Wrap<'de, 'f, V> {
 }
 
 /// A struct position's owner and its declared field names, in declaration
-/// order — what [`MacroSet::denying_unknown_fields`](crate::MacroSet::denying_unknown_fields)
+/// order — what
+/// [`MacroSet::denying_unknown_fields`](crate::MacroSet::denying_unknown_fields)
 /// checks a written key against.
 #[derive(Clone, Copy)]
 struct Declared {

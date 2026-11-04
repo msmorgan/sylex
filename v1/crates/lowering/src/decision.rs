@@ -91,9 +91,7 @@ mod tests {
     fn lowers_decider_spec_named() {
         assert_matches!(
             sylex_semantics_v1::DeciderSpec::Named(minimal_reference()).lower(),
-            sylex_core::DeciderSpec::Named(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::DeciderSpec::Named(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 

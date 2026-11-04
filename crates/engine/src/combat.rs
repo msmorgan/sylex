@@ -279,7 +279,8 @@ mod tests {
         cs.declare_attacker(a, id(0));
         cs.declare_block(b, a);
         cs.remove_object(b);
-        // The lone blocker is gone, but the attacker is still a blocked creature.
+        // The lone blocker is gone, but the attacker is still a blocked
+        // creature.
         assert!(cs.is_blocked(a));
         assert_eq!(cs.blockers_of(a), &[] as &[ObjectId]);
         assert_eq!(cs.attacker_of(b), None);

@@ -1,5 +1,5 @@
-// Detects the generated `v1/plugins/wizards` corpus at build time and, when it is
-// present, sets the `wizards_corpus` cfg. Tests that need the corpus carry
+// Detects the generated `v1/plugins/wizards` corpus at build time and, when it
+// is present, sets the `wizards_corpus` cfg. Tests that need the corpus carry
 // `#[cfg_attr(not(wizards_corpus), ignore = "…")]`, so they run locally (where
 // `cargo xtask generate v1/plugins/wizards` has populated it) and on CI (which
 // fetches upstream inputs and generates the corpus before building) and report

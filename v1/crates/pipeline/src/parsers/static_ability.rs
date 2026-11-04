@@ -123,8 +123,8 @@ fn parse_pt(subj: &str, pred: &str, ctx: &ResolveCtx) -> anyhow::Result<Option<S
         Some(_) => return Ok(None),
         None => (pred, None),
     };
-    // Optional combo tail: "+N/+M and have/has/gain/gains <kw…>" → the P/T changes
-    // followed by one GainAbility per granted keyword.
+    // Optional combo tail: "+N/+M and have/has/gain/gains <kw…>" → the P/T
+    // changes followed by one GainAbility per granted keyword.
     let (pt_part, grant_tail) = modify::split_grant_tail(pred);
     let parsed_pt = match scaled.as_deref() {
         Some(count) => modify::parse_pt_changes_scaled(pt_part.trim(), count),
@@ -546,8 +546,9 @@ mod tests {
     fn pt_scaled_for_each_card_in_graveyard() {
         // "~ gets +1/+1 for each creature card in your graveyard." — a
         // graveyard-zone count ([CR#400.7]): the selection is a card you own in
-        // your graveyard, spelled with the printed card type (`Type(Creature)`),
-        // not the battlefield-scoped `Creature` macro.
+        // your graveyard, spelled with the printed card type
+        // (`Type(Creature)`), not the battlefield-scoped `Creature`
+        // macro.
         assert_eq!(
             stat("~ gets +1/+1 for each creature card in your graveyard.").as_deref(),
             Some(
@@ -602,12 +603,14 @@ mod tests {
 
     #[test]
     fn pt_scaled_declines_negative_and_where_binder() {
-        // A negative scaled side is meaningless — object counts are non-negative
-        // ([CR#107.1b]) — so a "-N" side declines the whole.
+        // A negative scaled side is meaningless — object counts are
+        // non-negative ([CR#107.1b]) — so a "-N" side declines the
+        // whole.
         assert!(stat("~ gets +1/-1 for each artifact you control.").is_none());
         // A `where … is the number of` binder is not a static-pump amount form.
         assert!(stat("~ gets +1/+1, where X is the number of artifacts you control.").is_none());
-        // An unparseable count filter declines rather than graduate a wrong card.
+        // An unparseable count filter declines rather than graduate a wrong
+        // card.
         assert!(stat("~ gets +1/+1 for each creature wearing a hat.").is_none());
     }
 
@@ -801,8 +804,9 @@ mod tests {
 
     #[test]
     fn cant_be_countered_grant_creature_spells() {
-        // Gaea's Herald. Capture the EXACT string spell_subject("Creature spells")
-        // produces (run once, read the assert's left value) and put it here.
+        // Gaea's Herald. Capture the EXACT string spell_subject("Creature
+        // spells") produces (run once, read the assert's left value)
+        // and put it here.
         assert_eq!(
             stat("Creature spells can't be countered.").as_deref(),
             Some("Static(Cant(Counter(on: And([Kind(Spell), Type(Creature)]))))"),
@@ -811,9 +815,10 @@ mod tests {
 
     #[test]
     fn cant_be_countered_grant_declines_bare_spells_you_control() {
-        // "Spells you control" has no adjective and uses "you control" (not "you
-        // cast"); spell_subject declines it, so the line stays Unparsed. Out of
-        // scope for this ticket (those cards are multi-Unparsed).
+        // "Spells you control" has no adjective and uses "you control" (not
+        // "you cast"); spell_subject declines it, so the line stays
+        // Unparsed. Out of scope for this ticket (those cards are
+        // multi-Unparsed).
         assert_eq!(stat("Spells you control can't be countered."), None);
     }
 
@@ -831,7 +836,8 @@ mod tests {
                 "Static(Must(Attack(by: And([Creature, Not(Ref(This)), Subtype(Goblin), ControlledBy(Ref(You))]))))"
             )
         );
-        // A self-ref subject ("~ attacks each combat if able") → Must over This.
+        // A self-ref subject ("~ attacks each combat if able") → Must over
+        // This.
         assert_eq!(
             stat("~ attacks each combat if able.").as_deref(),
             Some("Static(Must(Attack(by: Ref(This))))")
@@ -840,8 +846,9 @@ mod tests {
 
     #[test]
     fn requirement_declines_partial_phrase() {
-        // The bare " attack " marker must not swallow non-requirement prose; only
-        // the exact "each combat if able" tail (singular or plural verb) qualifies.
+        // The bare " attack " marker must not swallow non-requirement prose;
+        // only the exact "each combat if able" tail (singular or plural
+        // verb) qualifies.
         assert!(stat("Creatures you control attack this turn if able.").is_none());
         assert!(stat("Creatures you control attack a player.").is_none());
         // A targeted subject still declines (no class filter).
@@ -854,7 +861,8 @@ mod tests {
         ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
     )]
     fn pt_anthem_subtype_adjective() {
-        // Elvish Archdruid's anthem: a subtype-adjective subject ("Elf creatures").
+        // Elvish Archdruid's anthem: a subtype-adjective subject ("Elf
+        // creatures").
         assert_eq!(
             stat("Other Elf creatures you control get +1/+1.").as_deref(),
             Some(
@@ -936,7 +944,8 @@ mod tests {
     fn grant_declines() {
         // unknown keyword
         assert!(stat("Creatures you control have wibble.").is_none());
-        // parameterized keyword (leftover) — deferred to macro-keyword-templates
+        // parameterized keyword (leftover) — deferred to
+        // macro-keyword-templates
         assert!(stat("Creatures you control have protection from red.").is_none());
         // durational gain
         assert!(

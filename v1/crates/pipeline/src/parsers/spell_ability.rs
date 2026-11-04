@@ -125,11 +125,12 @@ mod tests {
         // The Ascend reader: a conditional branch on the city's blessing. The
         // condition is a `Condition`-kind macro INVOCATION
         // (`YouHaveTheCitysBlessing`), the parse-via-macros form the plugin
-        // loader expands at graduation — exactly as the `OneShotEffect` action macro
-        // `Investigate` stands as an effect body. The bare `core::ron` reader
-        // does NOT expand macros, so the macro-aware graduation gate (not a
-        // core re-parse) is what validates this; resolved against the real
-        // builtin index so the condition template matches.
+        // loader expands at graduation — exactly as the `OneShotEffect` action
+        // macro `Investigate` stands as an effect body. The bare
+        // `core::ron` reader does NOT expand macros, so the macro-aware
+        // graduation gate (not a core re-parse) is what validates this;
+        // resolved against the real builtin index so the condition
+        // template matches.
         let ron = resolve_line(
             "Draw two cards. If you have the city's blessing, draw three cards instead.",
             &crate::parsers::test_ctx::builtin_ctx(CardKind::Spell),

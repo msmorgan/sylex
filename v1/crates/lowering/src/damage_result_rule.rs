@@ -36,9 +36,7 @@ mod tests {
             }
             .lower(),
             sylex_core::DamageResultRule {
-                recipient: sylex_core::Predicate::Class(
-                    sylex_core::ObjectClass::AbilityOnStack
-                ),
+                recipient: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
                 remove: sylex_core::CounterRef(_)
             }
         );

@@ -122,10 +122,11 @@ impl GameState {
         if verb.0.as_str() == "Mill" {
             // [CR#701.17a,603.3b,616.1]: the aggregate Mill window PASSED —
             // commit its top-`n` library slice as ONE simultaneous batch of
-            // per-card Library → Graveyard FUTURES. `Occurrence::Batch` replaces
-            // each member on its OWN ([CR#616.1]: Rest in Peace redirects each
-            // milled card to exile), and the destination rides the EVENT (an
-            // Instead rewrites it), NOT a body re-read. `n` is the aggregate
+            // per-card Library → Graveyard FUTURES. `Occurrence::Batch`
+            // replaces each member on its OWN ([CR#616.1]: Rest in
+            // Peace redirects each milled card to exile), and the
+            // destination rides the EVENT (an Instead rewrites it),
+            // NOT a body re-read. `n` is the aggregate
             // count a count-multiplier already bit at the ONE window
             // ([CR#121.2a]); the slice clamps to library size ([CR#701.17b]).
             // The one trigger-visible `Act(Mill)` fact lands AFTER the cards

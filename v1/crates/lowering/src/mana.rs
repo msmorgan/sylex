@@ -46,9 +46,7 @@ impl Lower for sylex_semantics_v1::ManaSymbol {
             Self::Variable => sylex_core::ManaSymbol::Variable,
             Self::Snow => sylex_core::ManaSymbol::Snow,
             Self::Hybrid(f0, f1) => sylex_core::ManaSymbol::Hybrid(f0.lower(), f1.lower()),
-            Self::Phyrexian(f0, f1) => {
-                sylex_core::ManaSymbol::Phyrexian(f0.lower(), f1.lower())
-            }
+            Self::Phyrexian(f0, f1) => sylex_core::ManaSymbol::Phyrexian(f0.lower(), f1.lower()),
             Self::Simple(f0) => sylex_core::ManaSymbol::Simple(f0.lower()),
         }
     }
@@ -184,9 +182,7 @@ mod tests {
     fn lowers_mana_spec_among_colors_of() {
         assert_matches!(
             sylex_semantics_v1::ManaSpec::AmongColorsOf(minimal_reference()).lower(),
-            sylex_core::ManaSpec::AmongColorsOf(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::ManaSpec::AmongColorsOf(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -317,8 +313,7 @@ mod tests {
     #[test]
     fn lowers_symbol_pred_not() {
         assert_matches!(
-            sylex_semantics_v1::SymbolPred::Not(std::sync::Arc::new(minimal_symbol_pred()))
-                .lower(),
+            sylex_semantics_v1::SymbolPred::Not(std::sync::Arc::new(minimal_symbol_pred())).lower(),
             sylex_core::SymbolPred::Not(_)
         );
     }
@@ -411,10 +406,12 @@ mod tests {
     #[test]
     fn lowers_mana_rider_trigger_on_spend() {
         assert_matches!(
-            in_spell_region(|| sylex_semantics_v1::ManaRider::TriggerOnSpend(
-                std::sync::Arc::new(minimal_one_shot_effect())
-            )
-            .lower()),
+            in_spell_region(
+                || sylex_semantics_v1::ManaRider::TriggerOnSpend(std::sync::Arc::new(
+                    minimal_one_shot_effect()
+                ))
+                .lower()
+            ),
             sylex_core::ManaRider::TriggerOnSpend(_)
         );
     }

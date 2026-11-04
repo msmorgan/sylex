@@ -2,11 +2,11 @@ use std::path::Path;
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use sylex_plugin_v1::plugin::Plugin;
 use sylex_render_v1::render::CardView;
 use sylex_render_v1::render::RenderedCard;
 use sylex_render_v1::render::render;
 use sylex_render_v1::render::render_card_face;
-use sylex_plugin_v1::plugin::Plugin;
 use sylex_semantics_v1::Ability;
 use sylex_semantics_v1::Card;
 use sylex_semantics_v1::CardFace;
@@ -1111,9 +1111,9 @@ fn renders_graveyard_static_from_zone() {
                     Reference::It,
                     Modification::Several(
                         vec![
-                            Modification::Power(sylex_semantics_v1::NumericOp::Up(
-                                Count::Literal(1),
-                            )),
+                            Modification::Power(sylex_semantics_v1::NumericOp::Up(Count::Literal(
+                                1,
+                            ))),
                             Modification::Toughness(sylex_semantics_v1::NumericOp::Up(
                                 Count::Literal(1),
                             )),
@@ -1148,10 +1148,10 @@ fn renders_trigger_with_turnof_intervening_if() {
     use sylex_semantics_v1::RelationPredicate;
     use sylex_semantics_v1::TriggeredAbility;
     use sylex_semantics_v1::Zone;
-    // `Draw(1)` is a verb macro (`Batch(1, Act(By(You, DrawCard)))` — [CR#121] is
-    // a game action, so no `Composite`) that renders via its template — build it
-    // through the real plugin so it carries that `Expanded` provenance rather
-    // than an unrendered raw `Batch`.
+    // `Draw(1)` is a verb macro (`Batch(1, Act(By(You, DrawCard)))` — [CR#121]
+    // is a game action, so no `Composite`) that renders via its template —
+    // build it through the real plugin so it carries that `Expanded`
+    // provenance rather than an unrendered raw `Batch`.
     let plugin = Plugin::load(builtin_path()).unwrap();
     let draw: OneShotEffect = plugin.macros.read_str("Draw(1)").unwrap();
     let face = CardFace {

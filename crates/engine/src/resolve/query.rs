@@ -1,11 +1,11 @@
 //! Reference/selection evaluation: resolve `Reference`s and `Selection`s to
 //! object sets against a frame.
 
+use slotmap::Key;
 use sylex_core::Count;
 use sylex_core::Reference;
 use sylex_core::Selection;
 use sylex_core::Uint;
-use slotmap::Key;
 
 use crate::object::ObjectId;
 use crate::object::ObjectSource;
@@ -510,8 +510,7 @@ impl GameState {
 pub(crate) fn search_is_bare_quantity(filter: &sylex_core::Predicate) -> bool {
     matches!(
         filter,
-        sylex_core::Predicate::Class(sylex_core::ObjectClass::Card)
-            | sylex_core::Predicate::Any
+        sylex_core::Predicate::Class(sylex_core::ObjectClass::Card) | sylex_core::Predicate::Any
     )
 }
 
@@ -523,6 +522,7 @@ mod tests {
     )]
     use std::sync::Arc;
 
+    use slotmap::Key;
     use sylex_core::Action;
     use sylex_core::Instruction;
     use sylex_core::Predicate;
@@ -530,7 +530,6 @@ mod tests {
     use sylex_core::Selection;
     use sylex_core::StatePredicate;
     use sylex_core::Zone;
-    use slotmap::Key;
 
     use crate::agenda::WorkItem;
     use crate::event::Occurrence;
@@ -716,9 +715,7 @@ mod tests {
             "a player target falls back to the player itself"
         );
         let only_you = Reference::Single(Arc::new(Selection::SelectAll(Arc::new(
-            sylex_core::Region::candidate(Predicate::Ref(Reference::Reg(
-                sylex_core::RefId(1),
-            ))),
+            sylex_core::Region::candidate(Predicate::Ref(Reference::Reg(sylex_core::RefId(1)))),
         ))));
         assert_eq!(
             state.eval_reference(&only_you, &frame),
@@ -726,9 +723,7 @@ mod tests {
             "Single resolves a singleton selection"
         );
         let ambiguous_players = Reference::Single(Arc::new(Selection::SelectAll(Arc::new(
-            sylex_core::Region::candidate(Predicate::Entity(
-                sylex_core::EntityClass::Player,
-            )),
+            sylex_core::Region::candidate(Predicate::Entity(sylex_core::EntityClass::Player)),
         ))));
         assert!(
             state.eval_reference(&ambiguous_players, &frame).is_null(),
@@ -827,10 +822,7 @@ mod tests {
         assert!(!direct.is_empty(), "fixture leaves a non-empty library");
         assert_eq!(
             state.eval_selection_set(
-                &Selection::InChosenOrder(
-                    Arc::new(inner),
-                    Reference::Reg(sylex_core::RefId(1))
-                ),
+                &Selection::InChosenOrder(Arc::new(inner), Reference::Reg(sylex_core::RefId(1))),
                 &frame,
             ),
             direct,
@@ -846,9 +838,7 @@ mod tests {
                 sylex_core::Param {
                     def: sylex_core::DefId(0),
                     kind: sylex_core::Kind::Entity,
-                    provenance: sylex_core::Provenance::Candidate(
-                        sylex_core::Domain::Entity,
-                    ),
+                    provenance: sylex_core::Provenance::Candidate(sylex_core::Domain::Entity),
                 },
                 sylex_core::Param {
                     def: sylex_core::DefId(1),
@@ -1165,8 +1155,8 @@ mod tests {
     /// and that must fizzle.
     #[test]
     fn unbound_reference_degrades_to_null_not_panic() {
-        use sylex_core::Reference;
         use slotmap::Key;
+        use sylex_core::Reference;
 
         let state = game();
         let frame = frame_for(&state, PlayerId(0));
@@ -1178,10 +1168,7 @@ mod tests {
                 .is_null()
         );
         assert_eq!(
-            state.eval_selection_set(
-                &sylex_core::Selection::Reg(sylex_core::RefId(6)),
-                &frame
-            ),
+            state.eval_selection_set(&sylex_core::Selection::Reg(sylex_core::RefId(6)), &frame),
             [] as [crate::object::ObjectId; 0]
         );
         // A register far past any declared parameter — the shape a stale
@@ -1192,10 +1179,7 @@ mod tests {
                 .is_null()
         );
         assert_eq!(
-            state.eval_selection_set(
-                &sylex_core::Selection::Reg(sylex_core::RefId(20)),
-                &frame
-            ),
+            state.eval_selection_set(&sylex_core::Selection::Reg(sylex_core::RefId(20)), &frame),
             [] as [crate::object::ObjectId; 0]
         );
         // Event roles read outside any trigger — were `.expect()` panics.

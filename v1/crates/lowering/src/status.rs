@@ -142,10 +142,7 @@ mod tests {
 
     #[test]
     fn lowers_face_up() {
-        assert_matches!(
-            sylex_semantics_v1::Face::Up.lower(),
-            sylex_core::Face::Up
-        );
+        assert_matches!(sylex_semantics_v1::Face::Up.lower(), sylex_core::Face::Up);
     }
 
     #[test]

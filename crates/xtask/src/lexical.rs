@@ -12,6 +12,8 @@ use std::time::Instant;
 use anyhow::Context;
 use anyhow::Result;
 use anyhow::ensure;
+use rayon::prelude::*;
+use serde::Serialize;
 use sylex_english::corpus::card_name_lexeme;
 use sylex_lexicon::AnalyzedText;
 use sylex_lexicon::Category;
@@ -21,8 +23,6 @@ use sylex_lexicon::LexicalReading;
 use sylex_lexicon::Lexicon;
 use sylex_lexicon::Source;
 use sylex_lexicon::SourceKind;
-use rayon::prelude::*;
-use serde::Serialize;
 
 use crate::raw_corpus::CorpusSelectionArgs;
 use crate::raw_corpus::SelectedCorpus;

@@ -698,8 +698,8 @@ mod tests {
         assert_eq!(read(&write(&wb)), wb);
         assert_eq!(read("AnyColor"), SymbolPred::AnyColor); // spend-time spelling preserved
 
-        // matches: hybrid {G/W} counts as each of its colors; Phyrexian {G/P} as its
-        // color.
+        // matches: hybrid {G/W} counts as each of its colors; Phyrexian {G/P}
+        // as its color.
         let hybrid_gw = ManaSymbol::Hybrid(
             SimpleManaSymbol::Specific(Color::Green.into()),
             Color::White,

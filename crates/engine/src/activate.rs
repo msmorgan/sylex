@@ -314,9 +314,7 @@ impl GameState {
                 // variant. So a stolen forecast-style card's window follows
                 // its controller's turn, not its owner's, until `WhoseTurn`
                 // grows an owner-relative arm.
-                sylex_core::Timing::DuringTurn(whose) => {
-                    self.whose_turn_matches(*whose, player)
-                }
+                sylex_core::Timing::DuringTurn(whose) => self.whose_turn_matches(*whose, player),
                 // [CR#602.5d..602.5e,500.1]: as `DuringTurn`, plus the
                 // current step must be the named one exactly
                 // (forecast-style, [CR#702.57b] — see the DIVERGENCE note
@@ -345,15 +343,13 @@ impl GameState {
         for limit in ability.limits.iter() {
             match limit {
                 UseLimit::OncePerTurn => {
-                    if self.ability_used_count(object, index_u, sylex_core::Lookback::ThisTurn)
-                        >= 1
+                    if self.ability_used_count(object, index_u, sylex_core::Lookback::ThisTurn) >= 1
                     {
                         return false;
                     }
                 }
                 UseLimit::OncePerGame => {
-                    if self.ability_used_count(object, index_u, sylex_core::Lookback::ThisGame)
-                        >= 1
+                    if self.ability_used_count(object, index_u, sylex_core::Lookback::ThisGame) >= 1
                     {
                         return false;
                     }
@@ -789,15 +785,15 @@ mod tests {
     }
 
     fn creature_card(power: i32, toughness: i32) -> Arc<sylex_card::Card> {
-        Arc::new(sylex_card::Card::Normal(
-            sylex_card::CardFace::from(sylex_card::Characteristics {
+        Arc::new(sylex_card::Card::Normal(sylex_card::CardFace::from(
+            sylex_card::Characteristics {
                 name: "Activation fixture".into(),
                 types: vec![sylex_core::Type::Creature.def()],
                 power: Some(sylex_core::StatValue::Number(power)),
                 toughness: Some(sylex_core::StatValue::Number(toughness)),
                 ..sylex_card::Characteristics::default()
-            }),
-        ))
+            },
+        )))
     }
 
     fn announce_activation_to_payment(
@@ -877,9 +873,7 @@ mod tests {
     #[test]
     fn non_eligible_do_cost_cannot_cross_the_core_boundary() {
         assert_eq!(
-            CostComponent::try_do_action(Action::DrawCard(Reference::Reg(sylex_core::RefId(
-                1
-            )))),
+            CostComponent::try_do_action(Action::DrawCard(Reference::Reg(sylex_core::RefId(1)))),
             Err(sylex_core::RunnableCostActionError::Ineligible),
         );
     }
@@ -1035,12 +1029,12 @@ mod tests {
         // `ObjectSource::Player` synthetic was absent from the view, so
         // the battlefield-wide `Cant(Activate)` collector's `view.get`
         // could not resolve it.
-        let card = Arc::new(sylex_card::Card::Normal(
-            sylex_card::CardFace::from(sylex_card::Characteristics {
+        let card = Arc::new(sylex_card::Card::Normal(sylex_card::CardFace::from(
+            sylex_card::Characteristics {
                 name: "Gate Fixture".into(),
                 ..sylex_card::Characteristics::default()
-            }),
-        ));
+            },
+        )));
         let card_id = state.cards.push(card, player);
         let id = state
             .objects
@@ -1523,9 +1517,7 @@ mod tests {
                 sylex_core::Param {
                     def: sylex_core::DefId(0),
                     kind: sylex_core::Kind::Entity,
-                    provenance: sylex_core::Provenance::Candidate(
-                        sylex_core::Domain::Entity,
-                    ),
+                    provenance: sylex_core::Provenance::Candidate(sylex_core::Domain::Entity),
                 },
                 sylex_core::Param {
                     def: sylex_core::DefId(1),
@@ -1540,9 +1532,9 @@ mod tests {
             ]),
             Predicate::And(Arc::from(vec![
                 Predicate::creature(),
-                Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(
-                    sylex_core::RefId(1),
-                )))),
+                Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(sylex_core::RefId(
+                    1,
+                ))))),
             ])),
         );
         let choose = CostComponent::Choose(sylex_core::Choose {
@@ -1718,8 +1710,8 @@ mod tests {
     // In-module fixture: no macro/serde path exercised, so no plugin round-trip
     // needed.
     fn card_with_activated(act: ActivatedAbility) -> Arc<sylex_card::Card> {
-        Arc::new(sylex_card::Card::Normal(
-            sylex_card::CardFace::from(sylex_card::Characteristics {
+        Arc::new(sylex_card::Card::Normal(sylex_card::CardFace::from(
+            sylex_card::Characteristics {
                 name: "Activated Fixture".into(),
                 mana_cost: ManaCost::from(Arc::from(vec![])),
                 color_indicator: vec![],
@@ -1731,8 +1723,8 @@ mod tests {
                 toughness: None,
                 loyalty: None,
                 defense: None,
-            }),
-        ))
+            },
+        )))
     }
 
     /// A card with the given printed mana cost whose only ability is `act`
@@ -1741,8 +1733,8 @@ mod tests {
         mana_cost: ManaCost,
         act: ActivatedAbility,
     ) -> Arc<sylex_card::Card> {
-        Arc::new(sylex_card::Card::Normal(
-            sylex_card::CardFace::from(sylex_card::Characteristics {
+        Arc::new(sylex_card::Card::Normal(sylex_card::CardFace::from(
+            sylex_card::Characteristics {
                 name: "ManaCostOf Fixture".into(),
                 mana_cost,
                 color_indicator: vec![],
@@ -1754,8 +1746,8 @@ mod tests {
                 toughness: None,
                 loyalty: None,
                 defense: None,
-            }),
-        ))
+            },
+        )))
     }
 
     /// `ManaCostOf(This)` resolves to the source object's printed mana cost

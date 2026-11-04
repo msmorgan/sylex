@@ -2627,13 +2627,13 @@ impl GameState {
     /// creature's power" ([CR#702.134a]). Filters that never reference the
     /// carrier ignore it.
     ///
-    /// Delegates predicate extraction to `resolve::target_spec_predicate` so that
-    /// announce-time and resolution-time `TargetSpec` handling stay in sync.
-    /// That helper is a TOTAL match over all three `TargetSpec` variants
-    /// (`Distinct` peels to its inner `Target`'s predicate, `Expanded` to the
-    /// remembered invocation's), so this function is panic-free — the former
-    /// "panics on variants other than Target or Expanded" note described a
-    /// partial match that no longer exists.
+    /// Delegates predicate extraction to `resolve::target_spec_predicate` so
+    /// that announce-time and resolution-time `TargetSpec` handling stay in
+    /// sync. That helper is a TOTAL match over all three `TargetSpec`
+    /// variants (`Distinct` peels to its inner `Target`'s predicate,
+    /// `Expanded` to the remembered invocation's), so this function is
+    /// panic-free — the former "panics on variants other than Target or
+    /// Expanded" note described a partial match that no longer exists.
     #[must_use]
     pub(crate) fn legal_targets(
         &self,
@@ -2690,9 +2690,7 @@ impl GameState {
     ) -> bool {
         let watcher = self.objects.obj(subject).source;
         unit.riders.iter().all(|r| match r {
-            sylex_core::ManaRider::SpendOnly(f) => {
-                self.filter_matches_live(f, subject, watcher)
-            }
+            sylex_core::ManaRider::SpendOnly(f) => self.filter_matches_live(f, subject, watcher),
             _ => true,
         })
     }
@@ -3728,18 +3726,16 @@ mod tests {
         sylex_core::TypeDef {
             name: "Instant".into(),
             permanent_type: false,
-            confers: vec![sylex_core::Property::Ability(Arc::new(
-                Ability::r#static(StaticSpec::Deontic(sylex_core::Deontic::May(
-                    sylex_core::DeonticAction::Cast {
-                        what: Predicate::Ref(Reference::Reg(sylex_core::RefId(0))),
-                        by: Predicate::Any,
-                        from: None,
-                        window: Some(Timing::InstantSpeed),
-                        cost: None,
-                        tag: None,
-                    },
-                ))),
-            ))]
+            confers: vec![sylex_core::Property::Ability(Arc::new(Ability::r#static(
+                StaticSpec::Deontic(sylex_core::Deontic::May(sylex_core::DeonticAction::Cast {
+                    what: Predicate::Ref(Reference::Reg(sylex_core::RefId(0))),
+                    by: Predicate::Any,
+                    from: None,
+                    window: Some(Timing::InstantSpeed),
+                    cost: None,
+                    tag: None,
+                })),
+            )))]
             .into(),
         }
     }
@@ -3815,15 +3811,13 @@ mod tests {
         sylex_core::TypeDef {
             name: "Land".into(),
             permanent_type: true,
-            confers: vec![sylex_core::Property::Ability(Arc::new(
-                Ability::r#static(StaticSpec::Deontic(sylex_core::Deontic::May(
-                    sylex_core::DeonticAction::Play {
-                        what: Predicate::Ref(Reference::Reg(sylex_core::RefId(0))),
-                        by: Predicate::Any,
-                        from: None,
-                    },
-                ))),
-            ))]
+            confers: vec![sylex_core::Property::Ability(Arc::new(Ability::r#static(
+                StaticSpec::Deontic(sylex_core::Deontic::May(sylex_core::DeonticAction::Play {
+                    what: Predicate::Ref(Reference::Reg(sylex_core::RefId(0))),
+                    by: Predicate::Any,
+                    from: None,
+                })),
+            )))]
             .into(),
         }
     }

@@ -134,9 +134,7 @@ impl GameState {
         }
     }
 
-    fn pending_root_modal_mana_activation(
-        &self,
-    ) -> Option<(ObjectId, usize, sylex_core::Ability)> {
+    fn pending_root_modal_mana_activation(&self) -> Option<(ObjectId, usize, sylex_core::Ability)> {
         let controller = self.payment.as_ref()?;
         if controller.frames.len() != 1
             || controller
@@ -694,9 +692,7 @@ impl GameState {
             && triggered.limits.iter().any(|limit| {
                 let lookback = match limit {
                     sylex_core::UseLimit::OncePerTurn
-                    | sylex_core::UseLimit::LoyaltyOncePerTurn => {
-                        sylex_core::Lookback::ThisTurn
-                    }
+                    | sylex_core::UseLimit::LoyaltyOncePerTurn => sylex_core::Lookback::ThisTurn,
                     sylex_core::UseLimit::OncePerGame => sylex_core::Lookback::ThisGame,
                 };
                 self.ability_used_count(source, ability_u, lookback) >= 1

@@ -85,9 +85,9 @@ mod tests {
     fn lowers_enter_rider_under_control_of() {
         assert_matches!(
             sylex_semantics_v1::EnterRider::UnderControlOf(minimal_reference()).lower(),
-            sylex_core::EnterRider::UnderControlOf(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::EnterRider::UnderControlOf(sylex_core::Reference::Reg(sylex_core::RefId(
+                0
+            )))
         );
     }
 
@@ -136,9 +136,7 @@ mod tests {
     fn lowers_arrangement_chosen_order() {
         assert_matches!(
             sylex_semantics_v1::Arrangement::ChosenOrder(minimal_reference()).lower(),
-            sylex_core::Arrangement::ChosenOrder(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Arrangement::ChosenOrder(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -187,9 +185,7 @@ mod tests {
     fn lowers_action_counter() {
         assert_matches!(
             sylex_semantics_v1::Action::Counter(minimal_reference()).lower(),
-            sylex_core::Action::Counter(sylex_core::Reference::Reg(sylex_core::RefId(
-                0
-            )))
+            sylex_core::Action::Counter(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -197,9 +193,7 @@ mod tests {
     fn lowers_action_transform() {
         assert_matches!(
             sylex_semantics_v1::Action::Transform(minimal_reference()).lower(),
-            sylex_core::Action::Transform(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Action::Transform(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -230,9 +224,7 @@ mod tests {
     fn lowers_action_unattach() {
         assert_matches!(
             sylex_semantics_v1::Action::Unattach(minimal_reference()).lower(),
-            sylex_core::Action::Unattach(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Action::Unattach(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -267,9 +259,9 @@ mod tests {
             .lower(),
             sylex_core::Action::MoveGroup {
                 group: sylex_core::Selection::SelectAll(_),
-                arrangement: sylex_core::Arrangement::ChosenOrder(
-                    sylex_core::Reference::Reg(sylex_core::RefId(0))
-                ),
+                arrangement: sylex_core::Arrangement::ChosenOrder(sylex_core::Reference::Reg(
+                    sylex_core::RefId(0)
+                )),
                 to: sylex_core::Destination::Zone(sylex_core::Zone::Battlefield),
                 riders: _
             }
@@ -373,8 +365,7 @@ mod tests {
     #[test]
     fn lowers_action_sacrifice() {
         assert_matches!(
-            sylex_semantics_v1::Action::Sacrifice(minimal_reference(), minimal_reference())
-                .lower(),
+            sylex_semantics_v1::Action::Sacrifice(minimal_reference(), minimal_reference()).lower(),
             sylex_core::Action::Sacrifice(
                 sylex_core::Reference::Reg(sylex_core::RefId(0)),
                 sylex_core::Reference::Reg(sylex_core::RefId(0))
@@ -386,9 +377,7 @@ mod tests {
     fn lowers_action_draw_card() {
         assert_matches!(
             sylex_semantics_v1::Action::DrawCard(minimal_reference()).lower(),
-            sylex_core::Action::DrawCard(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Action::DrawCard(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -412,10 +401,7 @@ mod tests {
     fn lowers_action_get_emblem() {
         assert_matches!(
             sylex_semantics_v1::Action::GetEmblem(minimal_reference(), [].into()).lower(),
-            sylex_core::Action::GetEmblem(
-                sylex_core::Reference::Reg(sylex_core::RefId(0)),
-                _
-            )
+            sylex_core::Action::GetEmblem(sylex_core::Reference::Reg(sylex_core::RefId(0)), _)
         );
     }
 
@@ -423,10 +409,7 @@ mod tests {
     fn lowers_action_get_designation() {
         assert_matches!(
             sylex_semantics_v1::Action::GetDesignation(minimal_reference(), "X".into()).lower(),
-            sylex_core::Action::GetDesignation(
-                sylex_core::Reference::Reg(sylex_core::RefId(0)),
-                _
-            )
+            sylex_core::Action::GetDesignation(sylex_core::Reference::Reg(sylex_core::RefId(0)), _)
         );
     }
 
@@ -553,9 +536,7 @@ mod tests {
     fn lowers_action_roll_planar_die() {
         assert_matches!(
             sylex_semantics_v1::Action::RollPlanarDie(minimal_reference()).lower(),
-            sylex_core::Action::RollPlanarDie(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Action::RollPlanarDie(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -597,9 +578,7 @@ mod tests {
     fn lowers_action_win_game() {
         assert_matches!(
             sylex_semantics_v1::Action::WinGame(minimal_reference()).lower(),
-            sylex_core::Action::WinGame(sylex_core::Reference::Reg(sylex_core::RefId(
-                0
-            )))
+            sylex_core::Action::WinGame(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -607,9 +586,7 @@ mod tests {
     fn lowers_action_lose_game() {
         assert_matches!(
             sylex_semantics_v1::Action::LoseGame(minimal_reference()).lower(),
-            sylex_core::Action::LoseGame(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Action::LoseGame(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -648,9 +625,7 @@ mod tests {
     fn lowers_action_remove_damage() {
         assert_matches!(
             sylex_semantics_v1::Action::RemoveDamage(minimal_reference()).lower(),
-            sylex_core::Action::RemoveDamage(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Action::RemoveDamage(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -756,9 +731,7 @@ mod tests {
     fn lowers_copy_retarget_targets_that() {
         assert_matches!(
             sylex_semantics_v1::CopyRetarget::TargetsThat(minimal_reference()).lower(),
-            sylex_core::CopyRetarget::TargetsThat(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::CopyRetarget::TargetsThat(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -789,9 +762,7 @@ mod tests {
             sylex_core::Action::CreateReplacement {
                 subject: sylex_core::Reference::Reg(_),
                 replacement: _,
-                duration: sylex_core::Duration::FixedUntil(
-                    sylex_core::TurnMarker::EndOfTurn
-                ),
+                duration: sylex_core::Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
                 one_shot: false
             }
         );
@@ -909,11 +880,9 @@ impl Lower for sylex_semantics_v1::Action {
             Self::ChangeLife(patient, operation) => {
                 sylex_core::Action::ChangeLife(patient.lower(), operation.lower())
             }
-            Self::AddMana(recipient, count, production) => sylex_core::Action::AddMana(
-                recipient.lower(),
-                count.lower(),
-                production.lower(),
-            ),
+            Self::AddMana(recipient, count, production) => {
+                sylex_core::Action::AddMana(recipient.lower(), count.lower(), production.lower())
+            }
             Self::Create {
                 agent,
                 count,

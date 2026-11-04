@@ -253,13 +253,11 @@ impl Lower for sylex_semantics_v1::EventFilter {
                 becomes: becomes.lower(),
                 cause: cause.lower(),
             },
-            Self::BecomesTarget { what, by, source } => {
-                sylex_core::EventFilter::BecomesTarget {
-                    what: what.lower(),
-                    by: by.lower(),
-                    source: source.lower(),
-                }
-            }
+            Self::BecomesTarget { what, by, source } => sylex_core::EventFilter::BecomesTarget {
+                what: what.lower(),
+                by: by.lower(),
+                source: source.lower(),
+            },
             Self::StepBegins { at, whose } => sylex_core::EventFilter::StepBegins {
                 at: at.lower(),
                 whose: whose.lower(),
@@ -685,9 +683,7 @@ mod tests {
             }
             .lower(),
             sylex_core::EventFilter::Damage {
-                source: sylex_core::Predicate::Class(
-                    sylex_core::ObjectClass::AbilityOnStack
-                ),
+                source: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
                 to: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
                 combat: None,
                 amount: None
@@ -867,9 +863,7 @@ mod tests {
             .lower(),
             sylex_core::EventFilter::AttackDeclared {
                 by: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
-                against: sylex_core::Predicate::Class(
-                    sylex_core::ObjectClass::AbilityOnStack
-                )
+                against: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack)
             }
         );
     }
@@ -1125,10 +1119,8 @@ mod tests {
     #[test]
     fn lowers_event_filter_one_or_more() {
         assert_matches!(
-            sylex_semantics_v1::EventFilter::OneOrMore(
-                std::sync::Arc::new(minimal_event_filter())
-            )
-            .lower(),
+            sylex_semantics_v1::EventFilter::OneOrMore(std::sync::Arc::new(minimal_event_filter()))
+                .lower(),
             sylex_core::EventFilter::OneOrMore(_)
         );
     }
@@ -1178,9 +1170,7 @@ mod tests {
     fn lowers_event_filter_before() {
         assert_matches!(
             sylex_semantics_v1::EventFilter::Before(minimal_reference()).lower(),
-            sylex_core::EventFilter::Before(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::EventFilter::Before(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 

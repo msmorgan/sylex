@@ -265,10 +265,8 @@ mod tests {
     #[test]
     fn lowers_designation_def_derived_if() {
         assert_matches!(
-            sylex_semantics_v1::DesignationDef::DerivedIf(
-                std::sync::Arc::new(minimal_condition())
-            )
-            .lower(),
+            sylex_semantics_v1::DesignationDef::DerivedIf(std::sync::Arc::new(minimal_condition()))
+                .lower(),
             sylex_core::DesignationDef::DerivedIf(_)
         );
     }

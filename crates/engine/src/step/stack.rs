@@ -46,7 +46,8 @@ impl EventApply for Copied {
                 // removes it from the store ([CR#400.7]). A stale id
                 // here is a semantic-input-adjacent runtime state, not a
                 // reason to crash: fizzle (the Invalid semantic input fizzles
-                // decision, `docs/decisions/invalid-semantic-input-fizzles.md`).
+                // decision, `docs/decisions/invalid-semantic-input-fizzles.
+                // md`).
                 g.objects.get(*source)?.source
             }
         };

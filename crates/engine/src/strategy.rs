@@ -1,7 +1,7 @@
-//! Strategy evaluation context: the `ExecutionFrame` a data-driven strategy's sensing
-//! (`Condition`/`Count`/`Reference`) is evaluated against. The controller
-//! parameter binds to the deciding seat; the source parameter binds to the
-//! candidate option being scored. The engine's existing
+//! Strategy evaluation context: the `ExecutionFrame` a data-driven strategy's
+//! sensing (`Condition`/`Count`/`Reference`) is evaluated against. The
+//! controller parameter binds to the deciding seat; the source parameter binds
+//! to the candidate option being scored. The engine's existing
 //! `eval_count`/`condition_holds`/`eval_reference` do the rest — there is no
 //! second evaluator. `strategy-evaluator-core` builds the `StrategyEvaluator`
 //! on top of this.
@@ -964,9 +964,9 @@ mod tests {
 
         let impossible_target = TargetSpec::Target(
             Quantity::one(),
-            Arc::new(sylex_core::Region::candidate(
-                Predicate::Characteristic(CharacteristicPredicate::Named("Missing target".into())),
-            )),
+            Arc::new(sylex_core::Region::candidate(Predicate::Characteristic(
+                CharacteristicPredicate::Named("Missing target".into()),
+            ))),
         );
         let card = Arc::new(Card::Normal(CardFace::from(Characteristics {
             name: "Modal strategy fixture".into(),

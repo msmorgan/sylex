@@ -68,12 +68,11 @@ fn strata(args: &StrataArgs, output: &mut dyn Write) -> Result<()> {
                 .iter()
                 .any(|c| *c == face.card || *c == face.name)
     })?;
-    let judgments: Vec<_> =
-        sylex_english::judgment::load_dir(&sylex_english::judgments_dir())?
-            .into_iter()
-            .filter(|(name, _)| name != "seed.txt")
-            .flat_map(|(_, entries)| entries)
-            .collect();
+    let judgments: Vec<_> = sylex_english::judgment::load_dir(&sylex_english::judgments_dir())?
+        .into_iter()
+        .filter(|(name, _)| name != "seed.txt")
+        .flat_map(|(_, entries)| entries)
+        .collect();
     let report = census::run(&corpus, &env, &judgments);
     if let Some(parent) = args.output.parent() {
         std::fs::create_dir_all(parent)?;

@@ -203,14 +203,15 @@ fn run_to_priority(state: &mut GameState, player: PlayerId, phase: PhaseStep) ->
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player: p, legal },
-            )) if p == player && state.turn.current == phase => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player: p,
+                legal,
+            })) if p == player && state.turn.current == phase => {
                 return legal;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::PayMana(sylex_engine::PayMana {
@@ -251,14 +252,14 @@ fn activate_and_drive(state: &mut GameState, object: ObjectId, ability: usize) -
             // Pass priorities while the loyalty ability is still resolving; once
             // it (and any cast it put on the stack) has left, an empty-stack
             // priority means resolution settled with no YesNo — return it.
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) if state.stack.is_empty() => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) if state.stack.is_empty() => {
                 return stop;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::PayMana(sylex_engine::PayMana {
@@ -352,8 +353,7 @@ fn impulse_decline_deals_two_and_card_stays_exiled() {
     float(&mut state, PlayerId(0), Color::Green, 2);
 
     let stop = activate_and_drive(&mut state, chandra, 0);
-    let StepOutcome::NeedsDecision(DecisionPointKind::YesNo(sylex_engine::YesNo { player })) =
-        stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::YesNo(sylex_engine::YesNo { player })) = stop
     else {
         panic!("expected the impulse's may-cast YesNo, got {stop:?}");
     };
@@ -420,8 +420,7 @@ fn impulse_unfunded_cast_is_offered_and_can_be_declined() {
     // No mana floated: the proposal is still legal, but cannot be completed.
 
     let stop = activate_and_drive(&mut state, chandra, 0);
-    let StepOutcome::NeedsDecision(DecisionPointKind::YesNo(sylex_engine::YesNo { player })) =
-        stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::YesNo(sylex_engine::YesNo { player })) = stop
     else {
         panic!("expected the unfunded cast proposal, got {stop:?}");
     };
@@ -462,8 +461,8 @@ fn full_card_abilities_activate() {
     let mut p0 = chandra_deck(10);
     p0.extend(deck(&centaur, 10));
     let mut state = game_with_rules(p0, deck(&bears, 20), 9);
-    // Enter with a creature on the board (so the −3 has a legal target) — placed
-    // before the priority's `legal` is computed.
+    // Enter with a creature on the board (so the −3 has a legal target) —
+    // placed before the priority's `legal` is computed.
     let chandra = enter_chandra_then(&mut state, |state, _| {
         force_onto_battlefield(state, PlayerId(0), CENTAUR);
     });
@@ -500,14 +499,15 @@ fn full_card_abilities_activate() {
     let legal = loop {
         let (_, stop) = step_to_stop(&mut state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player, legal },
-            )) if player == PlayerId(0) && state.stack.is_empty() => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player,
+                legal,
+            })) if player == PlayerId(0) && state.stack.is_empty() => {
                 break legal;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::Payment(_)) => {
@@ -575,14 +575,14 @@ fn minus_three_kills_a_creature() {
                     .submit_decision(Decision::Targets(vec![vec![victim]]))
                     .unwrap();
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) if state.stack.is_empty() => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) if state.stack.is_empty() => {
                 break;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::Payment(_)) => {
@@ -623,9 +623,7 @@ fn ultimate_mints_an_emblem() {
     assert!(
         matches!(
             stop,
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. }
-            ))
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority { .. }))
         ),
         "the ultimate resolves to priority, got {stop:?}"
     );

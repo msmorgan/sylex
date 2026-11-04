@@ -228,9 +228,9 @@ fn turn_start_clears_summoning_sickness_for_the_active_player_only() {
     assert_eq!(state.turn.turn_number, 0, "no turn has begun yet");
 
     // Step until turn 1's untap step has begun — `begin_turn` (and its clear)
-    // runs inside `begin_step(Untap)` before this `Advanced` is returned, so the
-    // post-clear state is what we observe. Turn 1's untap is the very first step,
-    // before any draw/discard, so no discard decision arises.
+    // runs inside `begin_step(Untap)` before this `Advanced` is returned, so
+    // the post-clear state is what we observe. Turn 1's untap is the very
+    // first step, before any draw/discard, so no discard decision arises.
     loop {
         match state.step() {
             StepOutcome::Progress(Progress::Advanced(PhaseStep::Beginning(
@@ -239,9 +239,9 @@ fn turn_start_clears_summoning_sickness_for_the_active_player_only() {
                 break;
             }
             StepOutcome::Progress(_) => {}
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(other) => panic!("unexpected decision: {other:?}"),
@@ -309,9 +309,9 @@ fn pass_to_stop(state: &mut GameState) -> (Vec<Progress>, StepOutcome) {
         let (chunk, stop) = step_to_stop(state);
         trace.extend(chunk);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             other => return (trace, other),
@@ -342,8 +342,8 @@ fn attack_player(state: &GameState, attackers: &[ObjectId]) -> Decision {
 #[test]
 fn declare_attackers_taps_records_and_fires_attacking() {
     let mut state = two_player_with("Grizzly Bears", 7, 20);
-    // A creature on P0's battlefield BEFORE the game runs: turn 1's begin clears
-    // its summoning sickness, so it is a legal attacker this combat.
+    // A creature on P0's battlefield BEFORE the game runs: turn 1's begin
+    // clears its summoning sickness, so it is a legal attacker this combat.
     let bear = force_onto_battlefield(&mut state, PlayerId(0), "Grizzly Bears");
 
     // Drive (passing priorities) to the Declare Attackers step's decision.
@@ -827,9 +827,7 @@ fn greedy_demo_divides_a_multi_blocked_attacker() {
         vec![(b1, attacker), (b2, attacker)],
     );
     let StepOutcome::NeedsDecision(
-        pending @ DecisionPointKind::AssignCombatDamage(sylex_engine::AssignCombatDamage {
-            ..
-        }),
+        pending @ DecisionPointKind::AssignCombatDamage(sylex_engine::AssignCombatDamage { .. }),
     ) = stop
     else {
         panic!(
@@ -837,8 +835,7 @@ fn greedy_demo_divides_a_multi_blocked_attacker() {
         );
     };
     let DecisionPointKind::AssignCombatDamage(sylex_engine::AssignCombatDamage {
-        recipients,
-        ..
+        recipients, ..
     }) = &pending
     else {
         unreachable!()
@@ -907,9 +904,9 @@ fn pass_to_postcombat_main(state: &mut GameState) {
         match state.step() {
             StepOutcome::Progress(Progress::Advanced(PhaseStep::PostcombatMain)) => return,
             StepOutcome::Progress(_) => {}
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::DeclareBlockers(
@@ -952,9 +949,7 @@ fn drive_to_combat_damage_done(
         if state.turn.current == PhaseStep::Combat(CombatStep::CombatDamage)
             && matches!(
                 state.pending,
-                Some(DecisionPointKind::Priority(
-                    sylex_engine::Priority { .. }
-                ))
+                Some(DecisionPointKind::Priority(sylex_engine::Priority { .. }))
             )
         {
             return;
@@ -967,9 +962,9 @@ fn drive_to_combat_damage_done(
                     .submit_decision(Decision::Blocks(blocks.take().unwrap()))
                     .unwrap();
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::Progress(_) => {}
@@ -1007,8 +1002,8 @@ fn end_of_combat_clears_combat_state() {
         "the blocked designation is set during combat"
     );
 
-    // Run the End of Combat step's clear by passing priority into the post-combat
-    // main phase.
+    // Run the End of Combat step's clear by passing priority into the
+    // post-combat main phase.
     pass_to_postcombat_main(&mut state);
 
     // [CR#511.3]: every designation is gone.
@@ -1047,8 +1042,8 @@ fn mid_combat_death_prunes_combat_state() {
     assert!(!on_battlefield(&state, blocker), "the blocker traded away");
 
     // [CR#506.4]: each was pruned from combat the moment it left the battlefield,
-    // even before End of Combat. The dead ids are stale (death remints), so check
-    // by id that they are absent.
+    // even before End of Combat. The dead ids are stale (death remints), so
+    // check by id that they are absent.
     assert!(
         !state.combat.attackers().contains(&attacker),
         "the dead attacker is pruned from the attacker list ([CR#506.4])"
@@ -1103,8 +1098,8 @@ fn attacks_trigger_fires_and_resolves() {
         "the attacks-trigger fired (the Attacking event reached the trigger stage): {trace:?}"
     );
 
-    // Pass priority through the trigger's placement + resolution; the controller
-    // (P0) draws a card.
+    // Pass priority through the trigger's placement + resolution; the
+    // controller (P0) draws a card.
     pass_to_postcombat_main(&mut state);
     assert_eq!(
         state.zones.hands[0].len(),
@@ -1182,9 +1177,11 @@ fn becomes_tapped_trigger_fires_on_attack_tap() {
     // The cause-tagged Tapped fact fires the trigger; placement surfaces
     // its target choice.
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { player, legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        player,
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected the trigger's ChooseTargets, got {stop:?}");
     };
@@ -1398,8 +1395,8 @@ fn trample_over_one_blocker_spills_excess_to_player() {
         "can't assign to the player until each blocker has lethal ([CR#702.19b])"
     );
 
-    // The decision is still pending after the rejection; the canonical legal 2+2
-    // split drives to the end state.
+    // The decision is still pending after the rejection; the canonical legal
+    // 2+2 split drives to the end state.
     let (_t, _stop) = pass_to_stop_after(
         &mut state,
         Decision::Assignment(vec![(blocker, 2), (player_proxy, 2)]),
@@ -1520,9 +1517,9 @@ fn trample_no_live_blockers_assigns_all_to_player() {
     // Blockers (before the Combat Damage step).
     loop {
         match state.step() {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => break,
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => break,
             StepOutcome::Progress(_) => {}
             other => panic!("unexpected stop before combat damage: {other:?}"),
         }
@@ -1537,8 +1534,9 @@ fn trample_no_live_blockers_assigns_all_to_player() {
     // future-form `ZoneChange`), which prunes it from combat as it leaves the
     // battlefield ([CR#506.4]). We clear the open priority, front-schedule the
     // destroy + an SBA pass + a fresh `OpenPriority` (re-surfacing the same
-    // round), and step it through. This mirrors a removal spell resolving in the
-    // post-block priority window, but is set up directly via the public agenda.
+    // round), and step it through. This mirrors a removal spell resolving in
+    // the post-block priority window, but is set up directly via the public
+    // agenda.
     state.pending = None;
     state.agenda.push_front(WorkItem::OpenPriority);
     state.agenda.push_front(WorkItem::CheckSbas);
@@ -1837,8 +1835,9 @@ fn unblocked_attacker_whose_planeswalker_left_deals_no_damage() {
         .submit_decision(Decision::Attackers(vec![(attacker, pw)]))
         .unwrap();
 
-    // The planeswalker leaves the battlefield BEFORE combat damage (moved to its
-    // owner's graveyard) — mimicking a removal spell that resolved first.
+    // The planeswalker leaves the battlefield BEFORE combat damage (moved to
+    // its owner's graveyard) — mimicking a removal spell that resolved
+    // first.
     state.zones.battlefield.retain(|&o| o != pw);
     state.objects.obj_mut(pw).zone = Some(Zone::Graveyard);
     state.zones.graveyards[1].push(pw);
@@ -1911,9 +1910,9 @@ fn planeswalker_leaving_battlefield_clears_its_attackers_target_not_its_attackin
     // Blockers step.
     loop {
         match state.step() {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => break,
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => break,
             StepOutcome::Progress(_) => {}
             other => panic!("unexpected stop before declare blockers: {other:?}"),
         }
@@ -2139,7 +2138,8 @@ fn first_strike_kills_before_taking_damage() {
         !on_battlefield(&state, blocker),
         "the 2/2 blocker took 2 first-strike damage and is destroyed before the regular step"
     );
-    // The first-striker survives — its blocker was dead before the regular step.
+    // The first-striker survives — its blocker was dead before the regular
+    // step.
     assert!(
         on_battlefield(&state, attacker),
         "the first-striker killed its blocker in the first step and took no damage back ([CR#510.4])"
@@ -2184,7 +2184,8 @@ fn double_strike_deals_twice() {
         !on_battlefield(&state, blocker),
         "the 2/2 took 1+1=2 across both steps and is destroyed ([CR#702.4])"
     );
-    // In the regular step the 2/2 dealt its 2 back simultaneously → the 1/2 dies.
+    // In the regular step the 2/2 dealt its 2 back simultaneously → the 1/2
+    // dies.
     assert!(
         !on_battlefield(&state, attacker),
         "the double-striker took the 2/2's 2 back in the second pass and dies (mutual kill, [CR#510.4])"
@@ -2729,9 +2730,8 @@ fn must_attack_waived_when_unable() {
     // Tap the carrier AFTER the untap step (at the first priority window),
     // so it is still tapped when attackers are declared.
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
-        ..
-    })) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority { .. })) =
+        stop
     else {
         panic!("expected a priority window before combat, got {stop:?}");
     };

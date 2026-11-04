@@ -6,8 +6,8 @@
 //! allowlist below.
 //!
 //! MECHANICAL, not hand-maintained: the inventory comes from parsing the
-//! actual `sylex_semantics_v1` source (`syn`), so a newly-minted grammar node is
-//! swept in automatically the moment it exists — no second list to update.
+//! actual `sylex_semantics_v1` source (`syn`), so a newly-minted grammar node
+//! is swept in automatically the moment it exists — no second list to update.
 //! Coverage is a plain whole-word text search over the corpus (never a typed
 //! AST walk): a card that reaches a node only through MACRO EXPANSION is
 //! still credited, because macro *bodies* (`plugins/*/macros/**/*.ron`) are
@@ -1254,9 +1254,9 @@ fn no_dead_grammar_nodes() {
 /// The cause-verb typo gate: with
 /// the closed `CauseVerb` enum retired into the bareword [`VerbName`] newtype,
 /// the type no longer rejects an unknown verb (any bareword parses) — so this
-/// gate does, by MEMBERSHIP against the closed vocabulary the entailments emitter renders
-/// (`crates/plugin/tables/entailments.ron`). Every `Cause(verb: X)`
-/// spelled anywhere in the corpus must name a verb the entailment table
+/// gate does, by MEMBERSHIP against the closed vocabulary the entailments
+/// emitter renders (`crates/plugin/tables/entailments.ron`). Every `Cause(verb:
+/// X)` spelled anywhere in the corpus must name a verb the entailment table
 /// carries; a typo (`Desroy`) or an out-of-vocab verb fails here, recovering
 /// the safety the enum used to give at compile time.
 #[test]
@@ -1277,19 +1277,19 @@ fn cause_verbs_are_entailment_rows() {
         "entailments table should carry the closed cause-verb vocab; got {known:?}"
     );
 
-    // The `Act` master form's `verb:` slot shares this field name but carries an
-    // ACT-FACT verb name, a vocabulary that supersets the cause verbs: the
-    // reorder keyword actions (scry/surveil/fateseal, [CR#701.22a]) and draw
-    // ([CR#121.1]) entail no cause-narrowed fact view, so they carry NO
-    // entailments.ron row (the would-lane shape guard is simply vacuous for a
-    // rowless verb) — yet remain valid `verb:` spellings. Admit them alongside
-    // the cause-verb rows; the typo/dead-verb check still bites every
-    // genuinely-unknown spelling.
+    // The `Act` master form's `verb:` slot shares this field name but carries
+    // an ACT-FACT verb name, a vocabulary that supersets the cause verbs:
+    // the reorder keyword actions (scry/surveil/fateseal, [CR#701.22a]) and
+    // draw ([CR#121.1]) entail no cause-narrowed fact view, so they carry
+    // NO entailments.ron row (the would-lane shape guard is simply vacuous
+    // for a rowless verb) — yet remain valid `verb:` spellings. Admit them
+    // alongside the cause-verb rows; the typo/dead-verb check still bites
+    // every genuinely-unknown spelling.
     //
     // NB `Draw` is in this set as an act-fact NAME, not as a keyword action:
     // [CR#701] enumerates the keyword actions and drawing is not among them (it
-    // is [CR#121]). The name is historical; the set means "act-fact verb with no
-    // entailments row".
+    // is [CR#121]). The name is historical; the set means "act-fact verb with
+    // no entailments row".
     let act_fact_only: BTreeSet<&str> = BTreeSet::from(["Draw", "Fateseal", "Scry", "Surveil"]);
 
     // Every corpus cause/act-struct `verb:` field must be a known row or a

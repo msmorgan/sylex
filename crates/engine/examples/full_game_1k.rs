@@ -24,7 +24,8 @@ fn matchup() -> DeckCards {
     )
     .unwrap();
     let builtin =
-        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap();
+        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
+            .unwrap();
     DeckCards {
         p0_spell: Arc::new(canon.card("Grizzly Bears").unwrap().core),
         p0_land: Arc::new(builtin.card("Forest").unwrap().core),

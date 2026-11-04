@@ -126,7 +126,11 @@ mod tests {
 
     #[test]
     fn lowers_collection_op_remove() {
-        assert_matches!(sylex_semantics_v1::CollectionOp::<sylex_semantics_v1::Color>::Remove(minimal_color()).lower(), sylex_core::CollectionOp::Remove(_));
+        assert_matches!(
+            sylex_semantics_v1::CollectionOp::<sylex_semantics_v1::Color>::Remove(minimal_color())
+                .lower(),
+            sylex_core::CollectionOp::Remove(_)
+        );
     }
 
     #[test]
@@ -238,9 +242,9 @@ mod tests {
     fn lowers_modification_set_controller() {
         assert_matches!(
             sylex_semantics_v1::Modification::SetController(minimal_reference()).lower(),
-            sylex_core::Modification::SetController(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Modification::SetController(sylex_core::Reference::Reg(sylex_core::RefId(
+                0
+            )))
         );
     }
 
@@ -371,11 +375,8 @@ mod tests {
     #[test]
     fn lowers_static_effect_becomes_copy() {
         assert_matches!(
-            sylex_semantics_v1::StaticEffect::BecomesCopy(
-                minimal_reference(),
-                minimal_copy_spec()
-            )
-            .lower(),
+            sylex_semantics_v1::StaticEffect::BecomesCopy(minimal_reference(), minimal_copy_spec())
+                .lower(),
             sylex_core::StaticSpec::BecomesCopy(
                 sylex_core::Reference::Reg(sylex_core::RefId(0)),
                 sylex_core::CopySpec {
@@ -425,12 +426,8 @@ mod tests {
             sylex_semantics_v1::StaticEffect::Deontic(minimal_deontic()).lower(),
             sylex_core::StaticSpec::Deontic(sylex_core::Deontic::May(
                 sylex_core::DeonticAction::Attack {
-                    by: sylex_core::Predicate::Class(
-                        sylex_core::ObjectClass::AbilityOnStack
-                    ),
-                    on: sylex_core::Predicate::Class(
-                        sylex_core::ObjectClass::AbilityOnStack
-                    )
+                    by: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
+                    on: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack)
                 }
             ))
         );
@@ -474,17 +471,13 @@ mod tests {
             .lower(),
             sylex_core::StaticSpec::TriggerMultiplier {
                 cause: sylex_core::EventFilter::ZoneChange {
-                    what: sylex_core::Predicate::Class(
-                        sylex_core::ObjectClass::AbilityOnStack
-                    ),
+                    what: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
                     from: None,
                     to: None,
                     cause: None
                 },
                 extra: sylex_core::Count::Literal(0),
-                affected: sylex_core::Predicate::Class(
-                    sylex_core::ObjectClass::AbilityOnStack
-                )
+                affected: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack)
             }
         );
     }
@@ -510,10 +503,8 @@ mod tests {
     #[test]
     fn lowers_static_effect_prevention() {
         assert_matches!(
-            sylex_semantics_v1::StaticEffect::Prevention(
-                std::sync::Arc::new(minimal_prevention())
-            )
-            .lower(),
+            sylex_semantics_v1::StaticEffect::Prevention(std::sync::Arc::new(minimal_prevention()))
+                .lower(),
             sylex_core::StaticSpec::Prevention(_)
         );
     }
@@ -542,9 +533,7 @@ mod tests {
             }
             .lower(),
             sylex_core::StaticSpec::SpendAsThough {
-                mana_from: sylex_core::Predicate::Class(
-                    sylex_core::ObjectClass::AbilityOnStack
-                ),
+                mana_from: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
                 as_: sylex_core::SymbolPred::AnyColor
             }
         );
@@ -555,9 +544,7 @@ mod tests {
         assert_matches!(
             sylex_semantics_v1::StaticEffect::AsThough(minimal_as_though()).lower(),
             sylex_core::StaticSpec::AsThough(sylex_core::AsThough::Counterfactual {
-                premise: sylex_core::Predicate::Class(
-                    sylex_core::ObjectClass::AbilityOnStack
-                ),
+                premise: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
                 then: _
             })
         );
@@ -602,9 +589,7 @@ mod tests {
             .lower(),
             sylex_core::StaticSpec::ReplaceRoll {
                 query: sylex_core::EventFilter::ZoneChange {
-                    what: sylex_core::Predicate::Class(
-                        sylex_core::ObjectClass::AbilityOnStack
-                    ),
+                    what: sylex_core::Predicate::Class(sylex_core::ObjectClass::AbilityOnStack),
                     from: None,
                     to: None,
                     cause: None
@@ -752,10 +737,7 @@ mod tests {
     fn lowers_player_mod_set_to() {
         assert_matches!(
             sylex_semantics_v1::PlayerMod::SetTo(minimal_player_attr(), minimal_count()).lower(),
-            sylex_core::PlayerMod::Set(
-                sylex_core::PlayerAttr::Life,
-                sylex_core::Count::Literal(0)
-            )
+            sylex_core::PlayerMod::Set(sylex_core::PlayerAttr::Life, sylex_core::Count::Literal(0))
         );
     }
 
@@ -763,10 +745,7 @@ mod tests {
     fn lowers_player_mod_raise() {
         assert_matches!(
             sylex_semantics_v1::PlayerMod::Raise(minimal_player_attr(), minimal_count()).lower(),
-            sylex_core::PlayerMod::Up(
-                sylex_core::PlayerAttr::Life,
-                sylex_core::Count::Literal(0)
-            )
+            sylex_core::PlayerMod::Up(sylex_core::PlayerAttr::Life, sylex_core::Count::Literal(0))
         );
     }
 
@@ -792,10 +771,12 @@ mod tests {
     #[test]
     fn lowers_static_effect_replacement() {
         assert_matches!(
-            in_spell_region(|| sylex_semantics_v1::StaticEffect::Replacement(
-                std::sync::Arc::new(minimal_replacement())
-            )
-            .lower()),
+            in_spell_region(
+                || sylex_semantics_v1::StaticEffect::Replacement(std::sync::Arc::new(
+                    minimal_replacement()
+                ))
+                .lower()
+            ),
             sylex_core::StaticSpec::Replacement(_)
         );
     }

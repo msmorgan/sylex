@@ -292,11 +292,8 @@ mod tests {
     #[test]
     fn lowers_count_count_distinct() {
         assert_matches!(
-            sylex_semantics_v1::Count::CountDistinct(
-                minimal_characteristic(),
-                minimal_countable()
-            )
-            .lower(),
+            sylex_semantics_v1::Count::CountDistinct(minimal_characteristic(), minimal_countable())
+                .lower(),
             sylex_core::Count::CountDistinct(
                 sylex_core::Characteristic::Colors,
                 sylex_core::Countable::Objects(_)
@@ -331,9 +328,7 @@ mod tests {
     fn lowers_count_opponents() {
         assert_matches!(
             sylex_semantics_v1::Count::Opponents(minimal_reference()).lower(),
-            sylex_core::Count::Opponents(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Count::Opponents(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -462,9 +457,7 @@ mod tests {
     fn lowers_count_targets_of() {
         assert_matches!(
             sylex_semantics_v1::Count::TargetsOf(minimal_reference()).lower(),
-            sylex_core::Count::TargetsOf(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Count::TargetsOf(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -500,10 +493,7 @@ mod tests {
             crate::region::bind_named("X".into(), sylex_core::RefId(0));
             SemValue::Noted("X".into()).lower()
         });
-        assert_eq!(
-            lowered,
-            sylex_core::Count::Reg(sylex_core::RefId(0))
-        );
+        assert_eq!(lowered, sylex_core::Count::Reg(sylex_core::RefId(0)));
     }
 
     #[test]
@@ -526,9 +516,7 @@ mod tests {
     fn lowers_count_mana_available() {
         assert_matches!(
             sylex_semantics_v1::Count::ManaAvailable(minimal_reference()).lower(),
-            sylex_core::Count::ManaAvailable(sylex_core::Reference::Reg(
-                sylex_core::RefId(0)
-            ))
+            sylex_core::Count::ManaAvailable(sylex_core::Reference::Reg(sylex_core::RefId(0)))
         );
     }
 
@@ -601,10 +589,7 @@ mod tests {
             );
             sylex_semantics_v1::Count::ThatMany.lower()
         });
-        assert_eq!(
-            lowered,
-            sylex_core::Count::Reg(sylex_core::RefId(3))
-        );
+        assert_eq!(lowered, sylex_core::Count::Reg(sylex_core::RefId(3)));
     }
 
     /// "That much" is the same register read as "that many" — one amount
@@ -623,10 +608,7 @@ mod tests {
             );
             sylex_semantics_v1::Count::ThatMuch.lower()
         });
-        assert_eq!(
-            lowered,
-            sylex_core::Count::Reg(sylex_core::RefId(3))
-        );
+        assert_eq!(lowered, sylex_core::Count::Reg(sylex_core::RefId(3)));
     }
 
     /// A distributed share reads the loop body's allotment parameter
@@ -644,10 +626,7 @@ mod tests {
             );
             sylex_semantics_v1::Count::Allotment.lower()
         });
-        assert_eq!(
-            lowered,
-            sylex_core::Count::Reg(sylex_core::RefId(1))
-        );
+        assert_eq!(lowered, sylex_core::Count::Reg(sylex_core::RefId(1)));
     }
 
     /// The allotment channel is its own site: an ordinary pinned amount in
@@ -708,9 +687,7 @@ impl Lower for sylex_semantics_v1::Countable {
             Self::Players(f0) => sylex_core::Countable::Players(std::sync::Arc::new(
                 crate::region::predicate_region(|| std::sync::Arc::unwrap_or_clone(f0).lower()),
             )),
-            Self::ManaSymbols(f0, f1) => {
-                sylex_core::Countable::ManaSymbols(f0.lower(), f1.lower())
-            }
+            Self::ManaSymbols(f0, f1) => sylex_core::Countable::ManaSymbols(f0.lower(), f1.lower()),
             Self::Singleton(f0) => sylex_core::Countable::Singleton(f0.lower()),
             Self::ManaSpentMatching(f0, f1) => {
                 sylex_core::Countable::ManaSpentMatching(f0.lower(), f1.lower())
@@ -751,17 +728,11 @@ impl Lower for sylex_semantics_v1::Count {
                 crate::region::x().expect("X count outside a region with an announced-X parameter"),
             ),
             Self::CountOf(f0) => sylex_core::Count::CountOf(f0.lower()),
-            Self::CountDistinct(f0, f1) => {
-                sylex_core::Count::CountDistinct(f0.lower(), f1.lower())
-            }
+            Self::CountDistinct(f0, f1) => sylex_core::Count::CountDistinct(f0.lower(), f1.lower()),
             Self::StatOf(f0, f1) => sylex_core::Count::StatOf(f0.lower(), f1.lower()),
-            Self::PlayerStatOf(f0, f1) => {
-                sylex_core::Count::PlayerStatOf(f0.lower(), f1.lower())
-            }
+            Self::PlayerStatOf(f0, f1) => sylex_core::Count::PlayerStatOf(f0.lower(), f1.lower()),
             Self::Opponents(f0) => sylex_core::Count::Opponents(f0.lower()),
-            Self::CounterCount(f0, f1) => {
-                sylex_core::Count::CounterCount(f0.lower(), f1.lower())
-            }
+            Self::CounterCount(f0, f1) => sylex_core::Count::CounterCount(f0.lower(), f1.lower()),
             Self::Min(f0, f1) => sylex_core::Count::Min(f0.lower(), f1.lower()),
             Self::Max(f0, f1) => sylex_core::Count::Max(f0.lower(), f1.lower()),
             Self::Plus(f0, f1) => sylex_core::Count::Plus(f0.lower(), f1.lower()),

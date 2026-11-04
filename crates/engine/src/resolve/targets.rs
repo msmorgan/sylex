@@ -159,7 +159,8 @@ pub(crate) fn distinct_siblings(spec: &TargetSpec) -> &[usize] {
 
 /// A LITERAL target-count bound the count check can evaluate frameless — the
 /// count twin of the frameless `target::const_count`. A dynamic bound (`X`,
-/// `CountOf`, …) would need a carrier `ExecutionFrame` the set-level sites don't hold.
+/// `CountOf`, …) would need a carrier `ExecutionFrame` the set-level sites
+/// don't hold.
 ///
 /// AUDITED invariant (engine-candidate-frame-context), not a guess: every
 /// `TargetSpec` `Quantity` bound across the corpus (canon, builtin, demo,
@@ -209,10 +210,7 @@ pub(crate) fn announced_prefix_len(specs: &[TargetSpec]) -> usize {
                 .params
                 .iter()
                 .filter(|param| {
-                    matches!(
-                        param.provenance,
-                        sylex_core::Provenance::AnnouncedTarget(_)
-                    )
+                    matches!(param.provenance, sylex_core::Provenance::AnnouncedTarget(_))
                 })
                 .count()
         })

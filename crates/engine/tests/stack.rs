@@ -20,6 +20,7 @@ use sylex_core::Zone;
 use sylex_engine::Act;
 use sylex_engine::Action;
 use sylex_engine::BecameTarget;
+use sylex_engine::ChooseTargets;
 use sylex_engine::Copied;
 use sylex_engine::DamageDealt;
 use sylex_engine::Decision;
@@ -267,9 +268,11 @@ fn bolt_legal_targets_from(caster: PlayerId) -> (GameState, Vec<ObjectId>) {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { player, legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        player,
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}")
     };
@@ -371,14 +374,15 @@ fn run_to_priority(state: &mut GameState, player: PlayerId, phase: PhaseStep) ->
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player: p, legal },
-            )) if p == player && state.turn.current == phase => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player: p,
+                legal,
+            })) if p == player && state.turn.current == phase => {
                 return legal;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::PayMana(sylex_engine::PayMana {
@@ -424,14 +428,15 @@ fn run_to_priority_traced(
         let (t, stop) = step_to_stop(state);
         trace.extend(t);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player: p, legal },
-            )) if p == player && state.turn.current == phase => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player: p,
+                legal,
+            })) if p == player && state.turn.current == phase => {
                 return (trace, legal);
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::PayMana(sylex_engine::PayMana {
@@ -542,9 +547,10 @@ fn bolt_kills_grizzly_bears() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -607,8 +613,8 @@ fn bolt_kills_grizzly_bears() {
     assert_eq!(state.stack, [] as [sylex_engine::StackEntry; 0]);
 }
 
-/// A `v1/plugins/testing` mock card (macro-aware, builtin prelude) — the home of
-/// fixtures for mechanics no canon card carries (e.g. Ward, [CR#702.21a]).
+/// A `v1/plugins/testing` mock card (macro-aware, builtin prelude) — the home
+/// of fixtures for mechanics no canon card carries (e.g. Ward, [CR#702.21a]).
 fn testing_card(name: &str) -> Arc<Card> {
     Arc::new(
         Plugin::load_with_sibling_prelude(
@@ -676,9 +682,10 @@ fn ward_counters_targeting_spell_via_that_object() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -728,9 +735,9 @@ fn ward_counters_targeting_spell_via_that_object() {
                 }
                 state.submit_decision(decision).unwrap();
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 if state.stack.is_empty() {
                     break;
                 }
@@ -818,9 +825,8 @@ fn kicker_announce_records_and_paid_cost_reads() {
             .unwrap();
         // [CR#601.2b]: the optional-cost YesNo surfaces first.
         let (_, stop) = step_to_stop(&mut state);
-        let StepOutcome::NeedsDecision(DecisionPointKind::YesNo(sylex_engine::YesNo {
-            player,
-        })) = stop
+        let StepOutcome::NeedsDecision(DecisionPointKind::YesNo(sylex_engine::YesNo { player })) =
+            stop
         else {
             panic!("expected the kicker YesNo, got {stop:?}");
         };
@@ -830,9 +836,10 @@ fn kicker_announce_records_and_paid_cost_reads() {
         loop {
             let (_t, stop) = step_to_stop(&mut state);
             match stop {
-                StepOutcome::NeedsDecision(DecisionPointKind::PayMana(
-                    sylex_engine::PayMana { cost, .. },
-                )) => {
+                StepOutcome::NeedsDecision(DecisionPointKind::PayMana(sylex_engine::PayMana {
+                    cost,
+                    ..
+                })) => {
                     if kick {
                         assert_eq!(
                             cost.mana_value(),
@@ -895,9 +902,8 @@ fn multikicker_times_paid_counts_payments() {
     // each yes).
     for answer in [true, true, false] {
         let (_t, stop) = step_to_stop(&mut state);
-        let StepOutcome::NeedsDecision(DecisionPointKind::YesNo(sylex_engine::YesNo {
-            player,
-        })) = stop
+        let StepOutcome::NeedsDecision(DecisionPointKind::YesNo(sylex_engine::YesNo { player })) =
+            stop
         else {
             panic!("expected a multikicker YesNo, got {stop:?}");
         };
@@ -934,9 +940,9 @@ fn multikicker_times_paid_counts_payments() {
                     .expect("the multikicker cast has an automatic payment answer");
                 state.submit_decision(decision).unwrap();
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 if state.stack.is_empty() {
                     break;
                 }
@@ -972,9 +978,9 @@ fn ward_x_prices_where_x_at_toll_resolution() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -1019,11 +1025,9 @@ fn ward_x_prices_where_x_at_toll_resolution() {
                 assert_eq!(player, PlayerId(0));
                 assert_eq!(
                     cost,
-                    sylex_core::ManaCost::from(Arc::<[sylex_core::ManaSymbol]>::from(
-                        vec![sylex_core::ManaSymbol::Simple(
-                            sylex_core::SimpleManaSymbol::Generic(3),
-                        )],
-                    )),
+                    sylex_core::ManaCost::from(Arc::<[sylex_core::ManaSymbol]>::from(vec![
+                        sylex_core::ManaSymbol::Simple(sylex_core::SimpleManaSymbol::Generic(3),)
+                    ],)),
                     "the ward-X toll is priced {{3}} from where_x at resolution \
                      ([CR#702.21b])"
                 );
@@ -1046,9 +1050,9 @@ fn ward_x_prices_where_x_at_toll_resolution() {
                     .expect("the Bolt cast has an automatic payment answer");
                 state.submit_decision(decision).unwrap();
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             other => panic!("unexpected stop while resolving the ward-X toll: {other:?}"),
@@ -1117,9 +1121,9 @@ fn prowess_fires_and_pumps_on_own_noncreature_cast() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -1183,9 +1187,10 @@ fn becomes_target_trigger_sacrifices_phantasmal_bear_and_bolt_fizzles() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -1266,9 +1271,10 @@ fn bolt_to_the_face_costs_three_life() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -1481,9 +1487,10 @@ fn drive_to_off_turn_priority(state: &mut GameState) -> Vec<Action> {
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player, legal },
-            )) if player == PlayerId(0)
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player,
+                legal,
+            })) if player == PlayerId(0)
                 && state.turn.active_player == PlayerId(1)
                 && matches!(
                     state.turn.current,
@@ -1508,9 +1515,9 @@ fn drive_to_off_turn_priority(state: &mut GameState) -> Vec<Action> {
                     return legal;
                 }
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::DiscardToHandSize(
@@ -1660,9 +1667,7 @@ fn payment_protocol_surfaces_for_every_cast() {
             .find(|iou| {
                 matches!(
                     iou.kind,
-                    sylex_engine::IouKind::ManaPip(sylex_engine::ManaPip::Colored(
-                        Color::Green
-                    ))
+                    sylex_engine::IouKind::ManaPip(sylex_engine::ManaPip::Colored(Color::Green))
                 )
             })
             .expect("one green pip")
@@ -1745,9 +1750,9 @@ fn second_bolt_fizzles_when_its_target_is_already_dead() {
                 damage_events += 1;
             }
             StepOutcome::Progress(_) => {}
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(other) => panic!("unexpected decision: {other:?}"),
@@ -1857,9 +1862,9 @@ fn illegal_target_and_payment_submissions_are_rejected_and_retryable() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_through_payment(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -1935,9 +1940,7 @@ fn illegal_target_and_payment_submissions_are_rejected_and_retryable() {
         .find(|iou| {
             matches!(
                 iou.kind,
-                sylex_engine::IouKind::ManaPip(sylex_engine::ManaPip::Colored(
-                    Color::Green
-                ))
+                sylex_engine::IouKind::ManaPip(sylex_engine::ManaPip::Colored(Color::Green))
             )
         })
         .expect("one green pip")
@@ -2053,9 +2056,10 @@ fn dies_trigger_deals_damage_from_the_dead_source() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the bolt, got {stop:?}");
     };
@@ -2077,12 +2081,10 @@ fn dies_trigger_deals_damage_from_the_dead_source() {
         let (_, stop) = step_to_stop(&mut state);
         match stop {
             // P1's priority over the (still empty) stack: pass it along.
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority {
-                    player: PlayerId(1),
-                    ..
-                },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player: PlayerId(1),
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             other => break (Vec::<Progress>::new(), other),
@@ -2090,9 +2092,11 @@ fn dies_trigger_deals_damage_from_the_dead_source() {
     };
 
     // The trigger's target choice surfaces (placement, [CR#603.3d]).
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { player, legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        player,
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected the dies-trigger's ChooseTargets, got {stop:?}");
     };
@@ -2135,9 +2139,9 @@ fn dies_trigger_deals_damage_from_the_dead_source() {
                 damage_source = Some(source);
             }
             StepOutcome::Progress(_) => {}
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(other) => panic!("unexpected decision: {other:?}"),
@@ -2272,9 +2276,10 @@ fn etb_trigger_draws_a_card() {
                 card_drawn = true;
             }
             StepOutcome::Progress(_) => {}
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player, .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player,
+                ..
+            })) => {
                 // Once both the trigger has fired and the card was drawn, stop.
                 if card_drawn {
                     break;
@@ -2586,9 +2591,9 @@ fn occurrence_batch_and_apnap_ordering() {
             }
 
             // Priority windows: pass them through to drive to resolution.
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 // Stop once all creatures are dead and the stack is clear (all
                 // triggers resolved).
                 if state.objects.get(fiend_obj).is_none()
@@ -2744,9 +2749,9 @@ fn simultaneous_loss_is_a_draw() {
         match state.step() {
             StepOutcome::GameOver(o) => break o,
             StepOutcome::Progress(_) => {}
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(other) => panic!("unexpected decision: {other:?}"),
@@ -2861,9 +2866,9 @@ fn two_triggers_same_player_order_triggers_surfaces() {
                 state.submit_decision(Decision::Order(vec![1, 0])).unwrap();
                 order_accepted = true;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 // After ordering, let triggers resolve.
                 if order_accepted && state.pending_triggers.is_empty() && state.stack.is_empty() {
                     break;
@@ -3099,9 +3104,10 @@ fn hexproof_excludes_it_from_opposing_targets() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -3244,9 +3250,10 @@ fn flagbearer_constrains_opposing_target_choice() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -3306,9 +3313,9 @@ fn flagbearer_does_not_constrain_its_controllers_spells() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -3388,9 +3395,9 @@ fn flagbearer_does_not_constrain_a_triggered_abilitys_target_choice() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the bolt, got {stop:?}");
     };
@@ -3406,18 +3413,20 @@ fn flagbearer_does_not_constrain_a_triggered_abilitys_target_choice() {
     let stop = loop {
         let (_, stop) = step_to_stop(&mut state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             other => break other,
         }
     };
 
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { player, legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        player,
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected the dies-trigger's ChooseTargets, got {stop:?}");
     };
@@ -3514,49 +3523,45 @@ fn inline_blink() -> Card {
         },
     ]);
 
-    Card::Normal(sylex_card::CardFace::from(
-        sylex_card::Characteristics {
-            name: "Blink".into(),
-            mana_cost: "{W}".parse().unwrap(),
-            types: vec![sylex_core::Type::Instant.def()],
-            abilities: vec![sylex_core::Ability::spell(
-                sylex_core::SpellAbility {
-                    ability_word: None,
-                    cost: sylex_core::Cost::default(),
-                    targets: vec![TargetSpec::Target(
-                        Quantity::one(),
-                        Arc::new(Region::candidate(Predicate::creature())),
-                    )]
+    Card::Normal(sylex_card::CardFace::from(sylex_card::Characteristics {
+        name: "Blink".into(),
+        mana_cost: "{W}".parse().unwrap(),
+        types: vec![sylex_core::Type::Instant.def()],
+        abilities: vec![sylex_core::Ability::spell(sylex_core::SpellAbility {
+            ability_word: None,
+            cost: sylex_core::Cost::default(),
+            targets: vec![TargetSpec::Target(
+                Quantity::one(),
+                Arc::new(Region::candidate(Predicate::creature())),
+            )]
+            .into(),
+            effect: Region::new(
+                params,
+                Instruction::Sequentially(
+                    vec![
+                        Instruction::producing(
+                            exiled,
+                            Action::Move(
+                                Reference::Reg(RefId(2)),
+                                Destination::Zone(Zone::Exile),
+                                vec![].into(),
+                                None,
+                            ),
+                        ),
+                        Instruction::act(Action::Move(
+                            Reference::Reg(exiled.into()),
+                            Destination::Zone(Zone::Battlefield),
+                            vec![].into(),
+                            None,
+                        )),
+                    ]
                     .into(),
-                    effect: Region::new(
-                        params,
-                        Instruction::Sequentially(
-                            vec![
-                                Instruction::producing(
-                                    exiled,
-                                    Action::Move(
-                                        Reference::Reg(RefId(2)),
-                                        Destination::Zone(Zone::Exile),
-                                        vec![].into(),
-                                        None,
-                                    ),
-                                ),
-                                Instruction::act(Action::Move(
-                                    Reference::Reg(exiled.into()),
-                                    Destination::Zone(Zone::Battlefield),
-                                    vec![].into(),
-                                    None,
-                                )),
-                            ]
-                            .into(),
-                        )
-                        .into(),
-                    ),
-                },
-            )],
-            ..sylex_card::Characteristics::default()
-        },
-    ))
+                )
+                .into(),
+            ),
+        })],
+        ..sylex_card::Characteristics::default()
+    }))
 }
 
 /// Cloudshift end-to-end ([CR#400.7j,110.2a]): a REAL canon card (unlike
@@ -3603,9 +3608,10 @@ fn cloudshift_returns_the_exiled_creature_under_the_casters_control() {
         .submit_decision(Decision::Act(Action::CastSpell { object: cloudshift }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -3697,9 +3703,10 @@ fn blink_exiles_and_returns_the_target_in_one_resolution() {
         .submit_decision(Decision::Act(Action::CastSpell { object: blink }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -3832,9 +3839,10 @@ fn copied_bolt_shares_targets_and_controller() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -3859,9 +3867,10 @@ fn copied_bolt_shares_targets_and_controller() {
     state.submit_decision(Decision::Act(activate)).unwrap();
 
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the copy ability, got {stop:?}");
     };
@@ -3990,9 +3999,9 @@ fn cast_and_copy_bolt_at_face(state: &mut GameState) -> (ObjectId, ObjectId, Obj
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -4011,9 +4020,9 @@ fn cast_and_copy_bolt_at_face(state: &mut GameState) -> (ObjectId, ObjectId, Obj
     state.submit_decision(Decision::Act(activate)).unwrap();
 
     let (_, stop) = step_to_stop(state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the copy ability, got {stop:?}");
     };
@@ -4060,9 +4069,9 @@ fn resolved_copy_vanishes_without_zone_move() {
         let (t, stop) = step_to_stop(&mut state);
         trace.extend(t);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             other => panic!("unexpected stop while draining the stack: {other:?}"),
@@ -4121,9 +4130,10 @@ fn countered_copy_vanishes() {
         .submit_decision(Decision::Act(Action::CastSpell { object: mana_leak }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for Mana Leak, got {stop:?}");
     };
@@ -4176,9 +4186,9 @@ fn countered_copy_vanishes() {
                 }
                 state.submit_decision(decision).unwrap();
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 if declined {
                     break;
                 }
@@ -4336,9 +4346,10 @@ fn resolved_permanent_copy_vanishes_without_entering_battlefield() {
     state.submit_decision(Decision::Act(activate)).unwrap();
 
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the copy ability, got {stop:?}");
     };
@@ -4385,9 +4396,9 @@ fn resolved_permanent_copy_vanishes_without_entering_battlefield() {
     while !state.stack.is_empty() {
         let (_t, stop) = step_to_stop(&mut state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             other => panic!("unexpected stop while draining the stack: {other:?}"),
@@ -4427,10 +4438,7 @@ fn resolved_permanent_copy_vanishes_without_entering_battlefield() {
         state.zones.graveyards[0].is_empty(),
         "no graveyard entry for the copy — it left no card behind"
     );
-    assert_eq!(
-        state.zones.graveyards[1],
-        [] as [sylex_engine::ObjectId; 0]
-    );
+    assert_eq!(state.zones.graveyards[1], [] as [sylex_engine::ObjectId; 0]);
 }
 
 // --- Retarget (Task 5, [CR#707.10c,115.7d])
@@ -4514,9 +4522,10 @@ fn drive_to_choose_new_targets(state: &mut GameState) -> (ObjectId, ObjectId, Ob
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for Bolt, got {stop:?}");
     };
@@ -4546,9 +4555,10 @@ fn drive_to_choose_new_targets(state: &mut GameState) -> (ObjectId, ObjectId, Ob
     state.submit_decision(Decision::Act(activate)).unwrap();
 
     let (_, stop) = step_to_stop(state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the retargeter's own ability, got {stop:?}");
     };
@@ -4696,9 +4706,9 @@ fn choose_new_targets_fizzles_on_vanished_entry() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for Bolt, got {stop:?}");
     };
@@ -4717,9 +4727,9 @@ fn choose_new_targets_fizzles_on_vanished_entry() {
     state.submit_decision(Decision::Act(activate)).unwrap();
 
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the retargeter's own ability, got {stop:?}");
     };
@@ -4842,9 +4852,9 @@ fn copied_filter_fires_on_copy_and_cast_filter_does_not() {
         .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for Bolt, got {stop:?}");
     };
@@ -4900,9 +4910,10 @@ fn copied_filter_fires_on_copy_and_cast_filter_does_not() {
         .expect("the copier's tap ability is offered");
     state.submit_decision(Decision::Act(activate)).unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the copy ability, got {stop:?}");
     };
@@ -4960,9 +4971,9 @@ fn copied_filter_fires_on_copy_and_cast_filter_does_not() {
     while !state.stack.is_empty() {
         let (_, stop) = step_to_stop(&mut state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             other => panic!("unexpected stop while draining the stack: {other:?}"),
@@ -5039,9 +5050,9 @@ fn ability_copy_same_source_resolves_and_vanishes() {
         .submit_decision(Decision::Act(activate_pinger))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(ChooseTargets {
+        legal, ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the pinger, got {stop:?}");
     };
@@ -5066,9 +5077,9 @@ fn ability_copy_same_source_resolves_and_vanishes() {
         .submit_decision(Decision::Act(activate_copier))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(ChooseTargets {
+        legal, ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the copy ability, got {stop:?}");
     };
@@ -5123,9 +5134,9 @@ fn ability_copy_same_source_resolves_and_vanishes() {
         let (t, stop) = step_to_stop(&mut state);
         trace.extend(t);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             other => panic!("unexpected stop while draining the stack: {other:?}"),
@@ -5208,9 +5219,11 @@ fn fate_transfer_two_distinct_targets_cast_to_resolution() {
 
     // Announce ([CR#601.2c]): targets are chosen before the cost is paid.
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { spec, legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        spec,
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -5327,9 +5340,11 @@ fn arc_lightning_announces_one_to_three_targets() {
         .unwrap();
 
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { spec, legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        spec,
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -5417,9 +5432,9 @@ fn fate_transfer_partial_fizzle_when_destination_dies() {
         .submit_decision(Decision::Act(Action::CastSpell { object: spell }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -5498,9 +5513,8 @@ fn a_kicked_permanents_etb_recheck_reads_the_record_after_the_spell_left_the_sta
             .submit_decision(Decision::Act(Action::CastSpell { object: beast }))
             .unwrap();
         let (_, stop) = step_to_stop(&mut state);
-        let StepOutcome::NeedsDecision(DecisionPointKind::YesNo(sylex_engine::YesNo {
-            player,
-        })) = stop
+        let StepOutcome::NeedsDecision(DecisionPointKind::YesNo(sylex_engine::YesNo { player })) =
+            stop
         else {
             panic!("expected the kicker YesNo, got {stop:?}");
         };
@@ -5512,9 +5526,9 @@ fn a_kicked_permanents_etb_recheck_reads_the_record_after_the_spell_left_the_sta
             }
             let (_t, stop) = step_to_stop(&mut state);
             match stop {
-                StepOutcome::NeedsDecision(DecisionPointKind::PayMana(
-                    sylex_engine::PayMana { .. },
-                )) => {
+                StepOutcome::NeedsDecision(DecisionPointKind::PayMana(sylex_engine::PayMana {
+                    ..
+                })) => {
                     let pay = state.auto_pay_pending();
                     state.submit_decision(Decision::Pay(pay)).unwrap();
                 }

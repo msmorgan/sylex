@@ -74,8 +74,9 @@ fn a_frame_names_declared_prepositions() {
 #[test]
 fn a_frame_belongs_to_its_head_category() {
     let mut sources = Sources::load().unwrap();
-    sources.nouns.push(NounDecl::Entry(
-        sylex_vocabulary::schema::NounEntry {
+    sources
+        .nouns
+        .push(NounDecl::Entry(sylex_vocabulary::schema::NounEntry {
             distribution: sylex_vocabulary::schema::NounDistribution::Ordinary,
             kind: sylex_vocabulary::schema::NounKind::Ordinary,
             parameters: Vec::new(),
@@ -84,8 +85,7 @@ fn a_frame_belongs_to_its_head_category() {
             plural: None,
             frames: vec![FrameSpec::Monotransitive],
             variable: false,
-        },
-    ));
+        }));
     rejects(&sources, "is not a frame of a Noun");
 }
 

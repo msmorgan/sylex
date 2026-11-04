@@ -85,14 +85,15 @@ fn run_to_priority(state: &mut GameState, player: PlayerId, phase: PhaseStep) ->
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player: p, legal },
-            )) if p == player && state.turn.current == phase => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player: p,
+                legal,
+            })) if p == player && state.turn.current == phase => {
                 return legal;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::PayMana(sylex_engine::PayMana {
@@ -131,9 +132,7 @@ fn resurface_priority(state: &mut GameState) {
     assert!(
         matches!(
             state.pending,
-            Some(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. }
-            ))
+            Some(DecisionPointKind::Priority(sylex_engine::Priority { .. }))
         ),
         "resurface_priority expects a Priority decision in flight"
     );
@@ -144,8 +143,9 @@ fn resurface_priority(state: &mut GameState) {
 // --- testing plugin ----------------------------------------------------------
 
 fn testing() -> Plugin {
-    // `load_with_sibling_prelude` so builtin target macros (`AnyTarget`) resolve
-    // in testing fixtures — the same loader activate.rs/enumerate.rs use.
+    // `load_with_sibling_prelude` so builtin target macros (`AnyTarget`)
+    // resolve in testing fixtures — the same loader
+    // activate.rs/enumerate.rs use.
     Plugin::load_with_sibling_prelude(
         Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/testing"),
     )
@@ -203,9 +203,9 @@ fn cast_x_draw_announces_pays_and_draws_x() {
 
     // [CR#601.2b]: X is announced first.
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(
-        sylex_engine::ChooseXValue { player },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(sylex_engine::ChooseXValue {
+        player,
+    })) = stop
     else {
         panic!("expected ChooseXValue, got {stop:?}");
     };
@@ -241,9 +241,9 @@ fn cast_x_draw_announces_pays_and_draws_x() {
                     .submit_decision(Decision::ManaReversals(reversals))
                     .expect("automatic reversal succeeds");
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 if state.stack.is_empty() && !state.zones.hands[0].contains(&xdraw) {
                     break;
                 }
@@ -278,9 +278,9 @@ fn unpayable_x_reaches_payment_and_can_be_declined() {
         .unwrap();
 
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(
-        sylex_engine::ChooseXValue { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(sylex_engine::ChooseXValue {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseXValue, got {stop:?}");
     };
@@ -353,9 +353,9 @@ fn x_zero_draws_nothing_and_resolves() {
         .unwrap();
 
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(
-        sylex_engine::ChooseXValue { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(sylex_engine::ChooseXValue {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseXValue, got {stop:?}");
     };
@@ -389,9 +389,9 @@ fn x_zero_draws_nothing_and_resolves() {
                     .submit_decision(Decision::ManaReversals(reversals))
                     .expect("automatic reversal succeeds");
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 if state.stack.is_empty() && !state.zones.hands[0].contains(&xdraw) {
                     break;
                 }
@@ -496,7 +496,8 @@ fn activate_x_draw_announces_pays_and_draws_x() {
     state.zones.hands[0].retain(|&o| o != art);
     state.objects.obj_mut(art).zone = Some(Zone::Battlefield);
     state.zones.battlefield.push(art);
-    // Float two generic-payable mana, re-derive priority with the artifact in play.
+    // Float two generic-payable mana, re-derive priority with the artifact in
+    // play.
     state
         .player_mut(PlayerId(0))
         .mana_pool
@@ -518,9 +519,9 @@ fn activate_x_draw_announces_pays_and_draws_x() {
 
     // [CR#601.2b]: X is announced first — on the activation slot too.
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(
-        sylex_engine::ChooseXValue { player },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(sylex_engine::ChooseXValue {
+        player,
+    })) = stop
     else {
         panic!("expected ChooseXValue, got {stop:?}");
     };
@@ -556,9 +557,9 @@ fn activate_x_draw_announces_pays_and_draws_x() {
                     .submit_decision(Decision::ManaReversals(reversals))
                     .expect("automatic reversal succeeds");
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 if state.stack.is_empty() {
                     break;
                 }
@@ -625,9 +626,9 @@ fn cast_x_burn_announces_x_then_targets_then_deals_x() {
 
     // [CR#601.2b]: X is announced FIRST...
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(
-        sylex_engine::ChooseXValue { player },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(sylex_engine::ChooseXValue {
+        player,
+    })) = stop
     else {
         panic!("expected ChooseXValue first, got {stop:?}");
     };
@@ -638,9 +639,10 @@ fn cast_x_burn_announces_x_then_targets_then_deals_x() {
     // `AnyTarget` candidate.
     let opp = state.players[1].object;
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets after X, got {stop:?}");
     };
@@ -682,9 +684,9 @@ fn cast_x_burn_announces_x_then_targets_then_deals_x() {
                     .submit_decision(Decision::ManaReversals(reversals))
                     .expect("automatic reversal succeeds");
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 if state.stack.is_empty() && !state.zones.hands[0].contains(&burn) {
                     break;
                 }
@@ -693,7 +695,8 @@ fn cast_x_burn_announces_x_then_targets_then_deals_x() {
             other => panic!("unexpected stop: {other:?}"),
         }
     }
-    // The declared-X register read inside DealDamage dealt exactly 3 to the opponent.
+    // The declared-X register read inside DealDamage dealt exactly 3 to the
+    // opponent.
     assert_eq!(
         state.players[1].life,
         life_before - 3,

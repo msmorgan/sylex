@@ -21,11 +21,11 @@
 
 use std::sync::Arc;
 
+use serde::Deserialize;
+use serde::Serialize;
 use sylex_core::Condition;
 use sylex_core::Count;
 use sylex_core::Predicate;
-use serde::Deserialize;
-use serde::Serialize;
 
 /// Which end of a ranked candidate set a selector picks.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]

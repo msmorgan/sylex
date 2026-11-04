@@ -1,15 +1,16 @@
 //! The pure, in-progress human choice servicing the current interactive
-//! `DecisionPointKind`. No engine mutation, no ratatui — unit-tested headlessly.
-//! Owns every selection invariant (target caps, blocker pairing); the driver
-//! uses [`is_interactive`] to decide what to surface vs auto-resolve.
+//! `DecisionPointKind`. No engine mutation, no ratatui — unit-tested
+//! headlessly. Owns every selection invariant (target caps, blocker pairing);
+//! the driver uses [`is_interactive`] to decide what to surface vs
+//! auto-resolve.
+use ratatui::crossterm::event::KeyCode;
+use ratatui::crossterm::event::KeyEvent;
 use sylex_engine::Action;
 use sylex_engine::Decision;
 use sylex_engine::DecisionPointKind;
 use sylex_engine::GameState;
 use sylex_engine::LayeredView;
 use sylex_engine::ObjectId;
-use ratatui::crossterm::event::KeyCode;
-use ratatui::crossterm::event::KeyEvent;
 
 use crate::shortcuts::PassMode;
 use crate::shortcuts::PassState;
@@ -143,12 +144,8 @@ pub fn is_interactive(pending: &DecisionPointKind) -> bool {
         // The human picks which cards to discard — cleanup hand-size and
         // effect-instructed discards alike. `count` is always > 0 when the
         // engine surfaces one; guard anyway so a degenerate 0 auto-resolves.
-        DecisionPointKind::DiscardToHandSize(sylex_engine::DiscardToHandSize {
-            count, ..
-        })
-        | DecisionPointKind::DiscardCards(sylex_engine::DiscardCards { count, .. }) => {
-            *count > 0
-        }
+        DecisionPointKind::DiscardToHandSize(sylex_engine::DiscardToHandSize { count, .. })
+        | DecisionPointKind::DiscardCards(sylex_engine::DiscardCards { count, .. }) => *count > 0,
         _ => false,
     }
 }
@@ -292,9 +289,10 @@ impl Interaction {
                 if !legal.get(active).is_some_and(|c| c.contains(&id)) {
                     return;
                 }
-                // Add/remove `id` in the active slot's set — a plural slot takes
-                // several. The engine enforces count/distinctness at submit, so
-                // the picker doesn't cap.
+                // Add/remove `id` in the active slot's set — a plural slot
+                // takes several. The engine enforces
+                // count/distinctness at submit, so the picker
+                // doesn't cap.
                 let slot = &mut chosen[active];
                 if let Some(pos) = slot.iter().position(|&c| c == id) {
                     slot.remove(pos);
@@ -663,7 +661,8 @@ mod tests {
         });
         assert!(!is_interactive(&empty));
         assert!(Interaction::for_decision(&empty).is_none());
-        // Discards now surface to the human — the picker is built from the hand.
+        // Discards now surface to the human — the picker is built from the
+        // hand.
         let discard = DecisionPointKind::DiscardCards(sylex_engine::DiscardCards {
             player: PlayerId(0),
             count: 1,
@@ -989,9 +988,7 @@ mod tests {
                     it.confirm().expect("attackers confirm")
                 }
                 // Blockers: declare no blocks, built through Interaction.
-                DecisionPointKind::DeclareBlockers(sylex_engine::DeclareBlockers {
-                    ..
-                }) => {
+                DecisionPointKind::DeclareBlockers(sylex_engine::DeclareBlockers { .. }) => {
                     let it = Interaction::for_decision(&pending).expect("interactive");
                     it.confirm().expect("blocks confirm")
                 }
@@ -1000,10 +997,7 @@ mod tests {
                     player,
                     count,
                 })
-                | DecisionPointKind::DiscardCards(sylex_engine::DiscardCards {
-                    player,
-                    count,
-                }) => {
+                | DecisionPointKind::DiscardCards(sylex_engine::DiscardCards { player, count }) => {
                     let hand: Vec<_> = driver.state.zones.hands[player.index()].clone();
                     let mut it = Interaction::for_discard(&hand, *count as usize);
                     for &id in hand.iter().take(*count as usize) {

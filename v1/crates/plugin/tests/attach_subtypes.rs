@@ -3,12 +3,12 @@
 //!   - **Aura** confers `StateBased(Not(LegallyAttached(This)), Move(This,
 //!     Graveyard))` ([CR#704.5m]) — a [CR#704] game action is not an ability
 //!     ([CR#704.1a]).
-//!   - **Equipment** confers `Static(May(Attach(This, Creature)))`
-//!     ([CR#301.5]) — under default-deny, being attachable to a creature is a
-//!     granted capability, and [CR#113.12] makes stating that quality no
-//!     ability at all.
-//!   - **Fortification** confers `Static(May(Attach(This, Land)))`
-//!     ([CR#301.6]) — the granted attachable-to-a-land capability.
+//!   - **Equipment** confers `Static(May(Attach(This, Creature)))` ([CR#301.5])
+//!     — under default-deny, being attachable to a creature is a granted
+//!     capability, and [CR#113.12] makes stating that quality no ability at
+//!     all.
+//!   - **Fortification** confers `Static(May(Attach(This, Land)))` ([CR#301.6])
+//!     — the granted attachable-to-a-land capability.
 //!
 //! Because none of them is an ability, they cannot be reached by "loses all
 //! abilities" and never appear in a card-facing ability list, while the SBA

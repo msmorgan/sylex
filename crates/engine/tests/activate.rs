@@ -260,14 +260,15 @@ fn run_to_priority(state: &mut GameState, player: PlayerId, phase: PhaseStep) ->
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player: p, legal },
-            )) if p == player && state.turn.current == phase => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player: p,
+                legal,
+            })) if p == player && state.turn.current == phase => {
                 return legal;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::PayMana(sylex_engine::PayMana {
@@ -333,18 +334,19 @@ fn advance_to_next_own_main(state: &mut GameState) -> Vec<Action> {
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player, legal },
-            )) if player == PlayerId(0)
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player,
+                legal,
+            })) if player == PlayerId(0)
                 && state.turn.active_player == PlayerId(0)
                 && state.turn.current == PhaseStep::PrecombatMain
                 && state.turn.turn_number > start_turn =>
             {
                 return legal;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::DiscardToHandSize(
@@ -403,9 +405,10 @@ fn tap_pinger_damages_target_through_stack() {
 
     // Announce: the target choice surfaces.
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -472,9 +475,9 @@ fn activation_announce_carries_a_minted_stack_identity() {
     let activate = activate_action(&legal, pinger).expect("the pinger's tap ability is offered");
     state.submit_decision(Decision::Act(activate)).unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
@@ -640,9 +643,10 @@ fn sorcery_speed_drawer_gated() {
         .submit_decision(Decision::Act(Action::CastSpell { object: instant }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the instant, got {stop:?}");
     };
@@ -909,9 +913,10 @@ fn loyalty_ability_gated_at_sorcery_speed() {
         .submit_decision(Decision::Act(Action::CastSpell { object: instant }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the instant, got {stop:?}");
     };
@@ -1109,9 +1114,9 @@ fn pinger_fizzles_when_target_dies() {
     let activate = activate_action(&legal, pinger).expect("the pinger is offered");
     state.submit_decision(Decision::Act(activate)).unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the pinger, got {stop:?}");
     };
@@ -1131,9 +1136,10 @@ fn pinger_fizzles_when_target_dies() {
         .submit_decision(Decision::Act(Action::CastSpell { object: instant }))
         .unwrap();
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets for the instant, got {stop:?}");
     };
@@ -1158,9 +1164,9 @@ fn pinger_fizzles_when_target_dies() {
                 GameEvent::DamageDealt(DamageDealt { target, amount, .. }),
             ))) => damage.push((target, amount)),
             StepOutcome::Progress(_) => {}
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 if state.stack.is_empty() {
                     // The game continues: a further priority decision arrived.
                     break;
@@ -1519,9 +1525,9 @@ fn activated_ability_announces_and_pays_nonmana_x_cost() {
 
     // [CR#601.2b]: X is announced first — driven by the cost verb, not mana.
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(
-        sylex_engine::ChooseXValue { player },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(sylex_engine::ChooseXValue {
+        player,
+    })) = stop
     else {
         panic!("expected ChooseXValue for the non-mana X cost, got {stop:?}");
     };
@@ -1573,9 +1579,7 @@ fn activated_ability_pays_choose_sacrifice_cost() {
     // Creature filter: battlefield creatures (zone check + type check).
     let creature_filter = sylex_core::Predicate::And(
         vec![
-            sylex_core::Predicate::State(sylex_core::StatePredicate::InZone(
-                Zone::Battlefield,
-            )),
+            sylex_core::Predicate::State(sylex_core::StatePredicate::InZone(Zone::Battlefield)),
             sylex_core::Predicate::creature(),
         ]
         .into(),
@@ -1658,12 +1662,10 @@ fn activated_ability_pays_choose_sacrifice_cost() {
         .expect("a payment-time choice IOU")
         .id;
     state
-        .submit_decision(Decision::Payment(
-            sylex_engine::PaymentCommand::Fulfill {
-                iou: choose,
-                witness: sylex_engine::FulfillmentWitness::Objects(vec![bear_a]),
-            },
-        ))
+        .submit_decision(Decision::Payment(sylex_engine::PaymentCommand::Fulfill {
+            iou: choose,
+            witness: sylex_engine::FulfillmentWitness::Objects(vec![bear_a]),
+        }))
         .unwrap();
 
     // Drive the ready prompt through submission and back to priority.
@@ -1738,9 +1740,8 @@ fn mana_ability_stays_stackless() {
             stop => break stop,
         }
     };
-    let StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
-        ..
-    })) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority { .. })) =
+        stop
     else {
         panic!("expected to return straight to priority, got {stop:?}");
     };
@@ -1875,9 +1876,7 @@ fn activated_ability_hybrid_picks_a_color() {
     assert!(matches!(
         prompt.outstanding.as_slice(),
         [sylex_engine::PaymentIou {
-            kind: sylex_engine::IouKind::ManaPip(sylex_engine::ManaPip::Colored(
-                Color::Blue
-            )),
+            kind: sylex_engine::IouKind::ManaPip(sylex_engine::ManaPip::Colored(Color::Blue)),
             ..
         }]
     ));
@@ -2087,9 +2086,7 @@ fn legal_with_float(state: &mut GameState, pool: &[(ColorOrColorless, Uint)]) ->
     assert!(
         matches!(
             state.pending,
-            Some(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. }
-            ))
+            Some(DecisionPointKind::Priority(sylex_engine::Priority { .. }))
         ),
         "expected a Priority decision to resurface"
     );
@@ -2275,9 +2272,9 @@ fn x_plus_hybrid_announces_x_concretizes_hybrid_pays_composed_cost() {
 
     // [CR#601.2b]: X is announced FIRST (engine-x-costs' `AnnounceX` step).
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(
-        sylex_engine::ChooseXValue { player },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseXValue(sylex_engine::ChooseXValue {
+        player,
+    })) = stop
     else {
         panic!("expected ChooseXValue first, got {stop:?}");
     };
@@ -2506,9 +2503,9 @@ fn another_creature() -> Arc<sylex_core::Region<sylex_core::Predicate>> {
         Predicate::And(Arc::from(vec![
             Predicate::r#type(Type::Creature),
             Predicate::State(sylex_core::StatePredicate::InZone(Zone::Battlefield)),
-            Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(
-                sylex_core::RefId(1),
-            )))),
+            Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(sylex_core::RefId(
+                1,
+            ))))),
         ])),
     ))
 }

@@ -3,6 +3,7 @@
 
 use std::sync::Arc;
 
+use rand::RngExt;
 use sylex_core::BeginningStep;
 use sylex_core::ColorOrColorless;
 use sylex_core::CombatStep;
@@ -12,7 +13,6 @@ use sylex_core::PhaseStep;
 use sylex_core::Type;
 use sylex_core::Uint;
 use sylex_core::Zone;
-use rand::RngExt;
 
 use crate::agenda::FinalizeMark;
 use crate::agenda::FinalizeWatch;
@@ -1752,8 +1752,8 @@ impl GameState {
     /// scope, groups its landings into piles by (library, end), and for each
     /// pile of more than one card surfaces one arrange decision (the arranger
     /// orders it) — walked one pile at a time via
-    /// [`DecisionContinuation::ArrangePiles`]. Piles of ≤1 card need no order and
-    /// surface nothing (the reposition already placed them).
+    /// [`DecisionContinuation::ArrangePiles`]. Piles of ≤1 card need no order
+    /// and surface nothing (the reposition already placed them).
     fn arrange_piles(&mut self) -> Progress {
         let Some(scope) = self.arrange_scope.take() else {
             return Progress::PilesArranged { deciding: 0 };
@@ -1835,7 +1835,8 @@ impl GameState {
 
     /// Surface the next pending pile's arrange decision (or nothing when the
     /// walk is done), stashing the walk state in
-    /// [`DecisionContinuation::ArrangePiles`]. `arranger` is the ordering player.
+    /// [`DecisionContinuation::ArrangePiles`]. `arranger` is the ordering
+    /// player.
     pub(crate) fn open_next_arrange(
         &mut self,
         arranger: PlayerId,
@@ -1939,11 +1940,7 @@ impl GameState {
     /// `ChooseAndNote(key, NotedKind::Number)` ("choose a number"). Always
     /// surfaces (engine policy: every choice is explicit); the submit stores
     /// the answer in the armed activation register.
-    fn open_choose_note_number(
-        &mut self,
-        player: PlayerId,
-        key: sylex_core::Ident,
-    ) -> Progress {
+    fn open_choose_note_number(&mut self, player: PlayerId, key: sylex_core::Ident) -> Progress {
         self.pending = Some(DecisionPointKind::ChooseNoteNumber(
             crate::decide::pending::ChooseNoteNumber { player, key },
         ));
@@ -2483,12 +2480,12 @@ mod tests {
     /// `apply_zone_will_change` requires, since it reads the card's owner
     /// ([CR#108.3]) via `ObjectSource::Card` on the way out.
     fn mint_card_backed(state: &mut GameState, controller: PlayerId) -> ObjectId {
-        let card = Arc::new(sylex_card::Card::Normal(
-            sylex_card::CardFace::from(sylex_card::Characteristics {
+        let card = Arc::new(sylex_card::Card::Normal(sylex_card::CardFace::from(
+            sylex_card::Characteristics {
                 name: "Test Card".into(),
                 ..sylex_card::Characteristics::default()
-            }),
-        ));
+            },
+        )));
         let card_id = state.cards.push(card, controller);
         let id = state.objects.mint(
             ObjectSource::Card(card_id),
@@ -2680,11 +2677,7 @@ mod tests {
             WorkItem::Emit(Occurrence::single(place(2))),
             WorkItem::Emit(Occurrence::single(place(3))),
         ]);
-        let facts: Vec<(
-            sylex_core::Uint,
-            sylex_core::Uint,
-            sylex_core::Uint,
-        )> = (0..2)
+        let facts: Vec<(sylex_core::Uint, sylex_core::Uint, sylex_core::Uint)> = (0..2)
             .map(|_| match state.step() {
                 crate::step::StepOutcome::Progress(crate::step::Progress::Applied(
                     Occurrence::Single(GameEvent::CounterPlaced(CounterPlaced {
@@ -3113,13 +3106,13 @@ mod tests {
         controller: PlayerId,
         abilities: Vec<sylex_core::Ability>,
     ) -> ObjectId {
-        let card = Arc::new(sylex_card::Card::Normal(
-            sylex_card::CardFace::from(sylex_card::Characteristics {
+        let card = Arc::new(sylex_card::Card::Normal(sylex_card::CardFace::from(
+            sylex_card::Characteristics {
                 name: "Untap Fixture".into(),
                 abilities,
                 ..sylex_card::Characteristics::default()
-            }),
-        ));
+            },
+        )));
         let card_id = state.cards.push(card, controller);
         let id = state.objects.mint(
             ObjectSource::Card(card_id),
@@ -3366,13 +3359,13 @@ mod tests {
         let frame = crate::test_support::frame_src(&state, source);
         // Two cards in hand to discard.
         for name in ["Discard A", "Discard B"] {
-            let card = Arc::new(sylex_card::Card::Normal(
-                sylex_card::CardFace::from(sylex_card::Characteristics {
+            let card = Arc::new(sylex_card::Card::Normal(sylex_card::CardFace::from(
+                sylex_card::Characteristics {
                     name: name.into(),
                     types: vec![sylex_core::Type::Sorcery.def()],
                     ..sylex_card::Characteristics::default()
-                }),
-            ));
+                },
+            )));
             let cid = state.cards.push(card, PlayerId(0));
             let id = state
                 .objects

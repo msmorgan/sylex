@@ -7,13 +7,13 @@ use std::io::Cursor;
 use std::io::Read;
 use std::path::Path;
 
-use sylex_upstream::scryfall::OracleCardReader;
-use sylex_lexicon::Numeral;
-use sylex_lexicon::NumeralCodec;
 use serde::Deserialize;
 use serde::Serialize;
 use sha2::Digest;
 use sha2::Sha256;
+use sylex_lexicon::Numeral;
+use sylex_lexicon::NumeralCodec;
+use sylex_upstream::scryfall::OracleCardReader;
 
 use crate::CatalogError;
 use crate::error::IoContext;

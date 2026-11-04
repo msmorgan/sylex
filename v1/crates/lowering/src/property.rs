@@ -9,9 +9,7 @@ impl Lower for sylex_semantics_v1::Property {
     fn lower(self) -> <Self as Lower>::Target {
         match self {
             Self::Ability(f0) => ability_conferral(f0.lower()),
-            Self::Continuous(f0, f1) => {
-                sylex_core::Property::Continuous(f0.lower(), f1.lower())
-            }
+            Self::Continuous(f0, f1) => sylex_core::Property::Continuous(f0.lower(), f1.lower()),
             Self::StateBased { condition, effect } => sylex_core::Property::StateBased {
                 condition: condition.lower(),
                 effect: effect.lower(),

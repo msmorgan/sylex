@@ -7,9 +7,9 @@
     reason = "generated lowering tests remain adjacent to the constructor families they cover"
 )]
 
-use crate::Lower;
-
 use sylex_core::Instruction;
+
+use crate::Lower;
 
 fn one(instructions: Vec<Instruction>) -> Instruction {
     match instructions.as_slice() {
@@ -52,9 +52,7 @@ mod tests {
             sylex_semantics_v1::OneShotEffect::Continuously(minimal_continuously()).lower(),
             sylex_core::Instruction::Continuously(sylex_core::Continuously {
                 effect: _,
-                duration: sylex_core::Duration::FixedUntil(
-                    sylex_core::TurnMarker::EndOfTurn
-                )
+                duration: sylex_core::Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn)
             })
         );
     }
@@ -134,9 +132,7 @@ mod tests {
             .lower(),
             sylex_core::Continuously {
                 effect: _,
-                duration: sylex_core::Duration::FixedUntil(
-                    sylex_core::TurnMarker::EndOfTurn
-                )
+                duration: sylex_core::Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn)
             }
         );
     }
@@ -193,16 +189,14 @@ mod tests {
                 by: minimal_reference(),
                 note: None,
                 then: Some(std::sync::Arc::new(
-                    sylex_semantics_v1::OneShotEffect::ChoosePile(
-                        sylex_semantics_v1::ChoosePile {
-                            from: sylex_semantics_v1::PileSource::Labels(
-                                ["left".into(), "right".into()].into(),
-                            ),
-                            by: minimal_reference(),
-                            random: false,
-                            then: std::sync::Arc::new(minimal_one_shot_effect()),
-                        },
-                    ),
+                    sylex_semantics_v1::OneShotEffect::ChoosePile(sylex_semantics_v1::ChoosePile {
+                        from: sylex_semantics_v1::PileSource::Labels(
+                            ["left".into(), "right".into()].into(),
+                        ),
+                        by: minimal_reference(),
+                        random: false,
+                        then: std::sync::Arc::new(minimal_one_shot_effect()),
+                    }),
                 )),
             })
             .lower()
@@ -576,9 +570,9 @@ mod tests {
             [
                 sylex_core::Instruction::Let(sylex_core::Let {
                     dest: sylex_core::DefId(3),
-                    expr: sylex_core::Expr::Object(sylex_core::Reference::Reg(
-                        sylex_core::RefId(0)
-                    )),
+                    expr: sylex_core::Expr::Object(sylex_core::Reference::Reg(sylex_core::RefId(
+                        0
+                    ))),
                 }),
                 sylex_core::Instruction::Let(_),
                 sylex_core::Instruction::Act { dest: None, .. },
@@ -620,8 +614,8 @@ mod tests {
         );
     }
 
-    /// `Distribute` is a region with two engine-supplied parameters — the recipient
-    /// and its allotted share ([CR#601.2d]). Re-spelled from
+    /// `Distribute` is a region with two engine-supplied parameters — the
+    /// recipient and its allotted share ([CR#601.2d]). Re-spelled from
     /// `lowers_distribute` / `lowers_one_shot_effect_distribute`.
     #[test]
     fn lowers_distribute_to_a_region_with_element_and_allotment_parameters() {
@@ -639,10 +633,7 @@ mod tests {
             panic!("the binder's definition precedes the distribution that reads it");
         };
         assert_eq!(distribute.amount, sylex_core::Count::Literal(0));
-        assert_eq!(
-            distribute.over,
-            sylex_core::Selection::Reg((*dest).into())
-        );
+        assert_eq!(distribute.over, sylex_core::Selection::Reg((*dest).into()));
         assert_eq!(
             distribute.body.params[0].provenance,
             sylex_core::Provenance::LoopElement
@@ -693,10 +684,9 @@ mod tests {
     #[test]
     fn lowers_one_shot_effect_choose_pile() {
         assert_matches!(
-            in_spell_region(|| sylex_semantics_v1::OneShotEffect::ChoosePile(
-                minimal_choose_pile()
-            )
-            .lower()),
+            in_spell_region(|| {
+                sylex_semantics_v1::OneShotEffect::ChoosePile(minimal_choose_pile()).lower()
+            }),
             sylex_core::Instruction::ChoosePile(sylex_core::ChoosePile {
                 dest: sylex_core::DefId(3),
                 from: _,
@@ -1202,9 +1192,7 @@ fn lower_optional_arc(
     effect.map(lower_arc)
 }
 
-fn each_over_they(
-    effect: &sylex_semantics_v1::OneShotEffect,
-) -> Option<&sylex_semantics_v1::Each> {
+fn each_over_they(effect: &sylex_semantics_v1::OneShotEffect) -> Option<&sylex_semantics_v1::Each> {
     match effect {
         sylex_semantics_v1::OneShotEffect::Each(each)
             if matches!(
@@ -1250,9 +1238,7 @@ fn destination_sort(destination: &sylex_core::Destination) -> sylex_semantics_v1
         sylex_core::Destination::Zone(sylex_core::Zone::Battlefield) => {
             sylex_semantics_v1::Sort::Permanent
         }
-        sylex_core::Destination::Zone(sylex_core::Zone::Stack) => {
-            sylex_semantics_v1::Sort::Spell
-        }
+        sylex_core::Destination::Zone(sylex_core::Zone::Stack) => sylex_semantics_v1::Sort::Spell,
         _ => sylex_semantics_v1::Sort::Card,
     }
 }
@@ -1774,10 +1760,7 @@ fn lower_instructions(effect: sylex_semantics_v1::OneShotEffect) -> Vec<Instruct
                             sylex_core::Kind::Entity,
                             sylex_core::Provenance::LoopElement,
                         ),
-                        (
-                            sylex_core::Kind::Number,
-                            sylex_core::Provenance::Allotment,
-                        ),
+                        (sylex_core::Kind::Number, sylex_core::Provenance::Allotment),
                     ],
                     || {
                         crate::region::push_antecedent(
@@ -1811,10 +1794,7 @@ fn lower_instructions(effect: sylex_semantics_v1::OneShotEffect) -> Vec<Instruct
                         sylex_core::Kind::Entity,
                         sylex_core::Provenance::LoopElement,
                     ),
-                    (
-                        sylex_core::Kind::Number,
-                        sylex_core::Provenance::Allotment,
-                    ),
+                    (sylex_core::Kind::Number, sylex_core::Provenance::Allotment),
                 ],
                 || {
                     crate::region::push_antecedent(

@@ -591,7 +591,8 @@ fn keyword_shape(params: &crate::macros::Params) -> Option<sylex_semantics_v1::P
         Params::Positional(list) => list.iter().map(|p| p.name.as_str()).collect(),
         Params::Named(map) => {
             let mut names: Vec<&str> = map.iter().map(|(_, p)| p.name.as_str()).collect();
-            // v1's keyword shape is order-insensitive; canonicalize before matching.
+            // v1's keyword shape is order-insensitive; canonicalize before
+            // matching.
             names.sort_unstable();
             names
         }
@@ -875,10 +876,7 @@ mod tests {
                 sylex_core::CharacteristicPredicate::Type(ref n)
             ) if n.name() == Type::Planeswalker.name()
         ));
-        assert_eq!(
-            rule.remove,
-            sylex_core::CounterRef::from("LoyaltyCounter")
-        );
+        assert_eq!(rule.remove, sylex_core::CounterRef::from("LoyaltyCounter"));
     }
 
     /// A plugin with no `rules/damage/` dir loads with an empty

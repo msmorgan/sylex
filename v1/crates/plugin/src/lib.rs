@@ -16,6 +16,7 @@ pub mod validate;
 
 pub use deck::Deck;
 pub use deck::DeckEntry;
-pub use deck::{DeckError, DeckParseError};
+pub use deck::DeckError;
+pub use deck::DeckParseError;
 pub use loaded::LoadedCard;
 pub use loaded::LoadedToken;

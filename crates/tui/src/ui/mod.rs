@@ -11,9 +11,6 @@ use std::fmt::Write as _;
 pub use board::BoardState;
 pub use board::Selected;
 pub use board::zone_for_key;
-use sylex_engine::GameState;
-use sylex_engine::LayeredView;
-use sylex_engine::PlayerId;
 use ratatui::Frame;
 use ratatui::crossterm::event::KeyCode;
 use ratatui::layout::Constraint;
@@ -31,6 +28,9 @@ use ratatui::widgets::ListItem;
 use ratatui::widgets::ListState;
 use ratatui::widgets::Paragraph;
 use ratatui::widgets::Wrap;
+use sylex_engine::GameState;
+use sylex_engine::LayeredView;
+use sylex_engine::PlayerId;
 
 use crate::driver::Stop;
 use crate::game::ProvenanceRefs;
@@ -679,10 +679,10 @@ fn centered_rect(full: Rect, width: u16, height: u16) -> Rect {
 
 #[cfg(test)]
 mod tests {
-    use sylex_engine::sim::GreedyCreatures;
     use ratatui::Terminal;
     use ratatui::backend::TestBackend;
     use ratatui::buffer::Buffer;
+    use sylex_engine::sim::GreedyCreatures;
 
     use super::*;
     use crate::driver::Driver;
@@ -757,7 +757,8 @@ mod tests {
         let mut board = BoardState::new();
         board.sync(&driver.state);
         let view = driver.state.layers();
-        // A synthetic attacker pick over a real battlefield id (or empty legal).
+        // A synthetic attacker pick over a real battlefield id (or empty
+        // legal).
         let legal: Vec<_> = driver.state.zones.battlefield.clone();
         let it = Interaction::Attackers {
             legal,

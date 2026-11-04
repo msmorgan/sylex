@@ -1096,11 +1096,7 @@ fn each_collective_batch(
 /// renderer half the `core-many-binder-group-move` seam calls for. Returns
 /// `None` for any body the collapse does not recognise, so the caller falls
 /// back to the per-element "For each <group>, …" form.
-fn each_collective(
-    act: &Action,
-    binder: &sylex_semantics_v1::Binder,
-    ctx: &Ctx,
-) -> Option<String> {
+fn each_collective(act: &Action, binder: &sylex_semantics_v1::Binder, ctx: &Ctx) -> Option<String> {
     // "each <bare group noun>" — the recipient/patient of a set-wide verb.
     let each_group = || format!("each {}", binder_group_noun(binder, ctx));
     match act {
@@ -3116,10 +3112,7 @@ mod tests {
         };
         let other_ref = Action::DealDamage(
             Reference::This,
-            Count::StatOf(
-                Reference::That(sylex_semantics_v1::Sort::Card),
-                Stat::Power,
-            ),
+            Count::StatOf(Reference::That(sylex_semantics_v1::Sort::Card), Stat::Power),
             Reference::EventActor,
         );
         assert_eq!(
@@ -3499,9 +3492,10 @@ mod tests {
             &sylex_semantics_v1::OneShotEffect::Distribute(Distribute {
                 amount: Count::Literal(3),
                 binder: Binder::Existing(Selection::SelectAll(Predicate::creature())),
-                body: Arc::new(sylex_semantics_v1::OneShotEffect::Act(
-                    Action::deal_damage(Reference::It, Count::Allotment),
-                )),
+                body: Arc::new(sylex_semantics_v1::OneShotEffect::Act(Action::deal_damage(
+                    Reference::It,
+                    Count::Allotment,
+                ))),
             }),
             &ctx,
         );

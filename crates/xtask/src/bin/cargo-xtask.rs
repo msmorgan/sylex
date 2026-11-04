@@ -40,7 +40,8 @@ enum Cmd {
     Catalogs(CatalogArgs),
     /// Derive the flat Oracle snapshot from Scryfall Oracle Cards JSONL.
     DeriveCards(DeriveCardsArgs),
-    /// Validate every finished card in a plugin (defaults to v1/plugins/builtin).
+    /// Validate every finished card in a plugin (defaults to
+    /// v1/plugins/builtin).
     Validate(ValidateArgs),
     /// Show a card as parsed from a plugin, with its macros expanded.
     Card(CardArgs),
@@ -64,7 +65,8 @@ enum Cmd {
     Cite(CiteArgs),
     /// Stratify the corpus and run the English census.
     English(EnglishArgs),
-    /// Emit or check the engine's cause-verb entailment table (`entailments.ron`).
+    /// Emit or check the engine's cause-verb entailment table
+    /// (`entailments.ron`).
     Entailments(EntailmentsArgs),
     /// Analyze supported raw Oracle text against the independent lexicon.
     Lexical(LexicalArgs),
@@ -130,9 +132,7 @@ mod tests {
         for command in ["definitions", "macros"] {
             assert!(Cli::try_parse_from(["cargo xtask", "lean", command]).is_err());
         }
-        assert!(
-            Cli::try_parse_from(["cargo xtask", "lean", "check", "plugins/testing"]).is_err()
-        );
+        assert!(Cli::try_parse_from(["cargo xtask", "lean", "check", "plugins/testing"]).is_err());
         assert!(Cli::try_parse_from(["cargo xtask", "lean"]).is_err());
         assert!(Cli::try_parse_from(["cargo xtask", "lean-check"]).is_err());
         assert!(Cli::try_parse_from(["cargo xtask", "definition-check"]).is_err());

@@ -25,8 +25,7 @@ fn lexicon() -> Lexicon {
     let mut tap = Lexeme::verb("v:tap", "tap", core());
     for slot in &mut tap.forms {
         match slot.form {
-            sylex_lexicon::WordForm::Preterite
-            | sylex_lexicon::WordForm::PastParticiple => {
+            sylex_lexicon::WordForm::Preterite | sylex_lexicon::WordForm::PastParticiple => {
                 slot.surfaces = Some(vec!["tapped".to_owned()]);
             }
             sylex_lexicon::WordForm::GerundParticiple => {

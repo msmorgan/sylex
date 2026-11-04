@@ -58,8 +58,8 @@ fn combatant_creature_def() -> sylex_core::TypeDef {
     sylex_core::TypeDef {
         name: "Creature".into(),
         permanent_type: true,
-        confers: vec![Property::Static(Arc::new(
-            sylex_core::Region::candidate(StaticSpec::Conditionally(
+        confers: vec![Property::Static(Arc::new(sylex_core::Region::candidate(
+            StaticSpec::Conditionally(
                 Condition::Matches(
                     sylex_core::Reference::Reg(sylex_core::RefId(0)),
                     Predicate::Class(sylex_core::ObjectClass::Permanent),
@@ -68,8 +68,8 @@ fn combatant_creature_def() -> sylex_core::TypeDef {
                     who: Predicate::Ref(sylex_core::Reference::Reg(sylex_core::RefId(0))),
                     role: sylex_core::Role::Combatant,
                 }),
-            )),
-        ))]
+            ),
+        )))]
         .into(),
     }
 }
@@ -222,8 +222,8 @@ fn creature_planeswalker_takes_marked_damage_and_loyalty_loss() {
 fn lethal_to_creature_planeswalker_feeds_both_sbas() {
     let mut state = game_with(creature_walker_card(), vec![loyalty_rule()]);
     let source = state.players[1].object;
-    // 4 toughness, 5 loyalty. Deal 5: lethal to the creature, and clamps loyalty
-    // to 0 (5 − 5).
+    // 4 toughness, 5 loyalty. Deal 5: lethal to the creature, and clamps
+    // loyalty to 0 (5 − 5).
     let pw = walker_on_field(&mut state, 5);
     deal(&mut state, source, pw, 5);
     assert!(

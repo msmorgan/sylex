@@ -2227,10 +2227,8 @@ mod tests {
             objects: HashMap::from([(logical, reminted)]),
             ..ReplayMap::default()
         };
-        let expected_cause = crate::event::Cause::tap(
-            sylex_core::Agency::CostPayment,
-            Some((old, PlayerId(0))),
-        );
+        let expected_cause =
+            crate::event::Cause::tap(sylex_core::Agency::CostPayment, Some((old, PlayerId(0))));
         let actual_cause = crate::event::Cause::tap(
             sylex_core::Agency::CostPayment,
             Some((reminted, PlayerId(0))),

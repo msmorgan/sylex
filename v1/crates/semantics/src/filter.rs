@@ -404,8 +404,9 @@ mod tests {
         assert!(msg.contains("Bogus"), "unexpected error: {msg}");
         assert!(msg.contains("TypeDef"), "unexpected error: {msg}");
 
-        // IN-FRAME: a `Type(Param(0))` body forwarding a bare type name through a
-        // parameterized macro's expansion frame must expand identically.
+        // IN-FRAME: a `Type(Param(0))` body forwarding a bare type name through
+        // a parameterized macro's expansion frame must expand
+        // identically.
         let permof: macro_ron::MacroDef = crate::ron::options()
             .from_str(
                 r#"(name: "PermOfType", kinds: [Predicate], params: [Any], body: And([Type(Param(0))]))"#,

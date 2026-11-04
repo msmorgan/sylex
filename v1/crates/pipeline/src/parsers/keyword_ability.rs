@@ -283,8 +283,9 @@ mod tests {
     fn macro_keywords_render_wrapped_too() {
         // Non-intrinsics are KeywordAbility-kind macros invoked INSIDE the
         // wrapper — keyword-ness is always explicit on the card. (The
-        // macro-template parser leads the registry for these as keyword *lines*;
-        // this catalog still backs `match_keyword_name` static grants.)
+        // macro-template parser leads the registry for these as keyword
+        // *lines*; this catalog still backs `match_keyword_name` static
+        // grants.)
         assert_eq!(bare("Flying").as_deref(), Some("Keyword(Flying)"));
         assert_eq!(bare("Lifelink").as_deref(), Some("Keyword(Lifelink)"));
     }
@@ -511,8 +512,8 @@ mod tests {
         // Reference form (for `Has(<name>)`): bare unit ident.
         assert_eq!(match_keyword_name("hexproof").as_deref(), Some("Hexproof"));
         assert_eq!(match_keyword_name("flying").as_deref(), Some("Flying"));
-        // Invocation form (for `Keyword(<invocation>)`): a defaulted-param macro
-        // needs its parens; a unit keyword stays bare.
+        // Invocation form (for `Keyword(<invocation>)`): a defaulted-param
+        // macro needs its parens; a unit keyword stays bare.
         assert_eq!(
             match_keyword_invocation("hexproof").as_deref(),
             Some("Hexproof()")

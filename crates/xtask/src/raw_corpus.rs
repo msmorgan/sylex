@@ -12,13 +12,13 @@ use std::path::PathBuf;
 use anyhow::Context;
 use anyhow::ensure;
 use clap::Args;
-use sylex_upstream::scryfall::OracleCard;
-use sylex_upstream::scryfall::OracleCardReader;
-use sylex_upstream::scryfall::OracleUnitKind;
 use serde::Deserialize;
 use serde::Serialize;
 use sha2::Digest;
 use sha2::Sha256;
+use sylex_upstream::scryfall::OracleCard;
+use sylex_upstream::scryfall::OracleCardReader;
+use sylex_upstream::scryfall::OracleUnitKind;
 
 pub(crate) const SUPPORT_FILTER: &str =
     "Scryfall legalities.vintage is exactly legal or restricted AND set_type is not funny";

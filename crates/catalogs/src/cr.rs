@@ -1,9 +1,9 @@
-use crate::CatalogError;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
 use regex::Regex;
 
+use crate::CatalogError;
 use crate::CatalogKind;
 
 pub(crate) struct ExtractedCatalogs {

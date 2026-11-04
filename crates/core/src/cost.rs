@@ -447,8 +447,8 @@ pub enum CostComponent {
     /// the same block, and the ability body, read it by register. Keeps
     /// choosing OUT of the verb: the paying action receives an already-bound
     /// reference. The same node the effect grammar uses
-    /// ([`Instruction::Choose`](crate::Instruction::Choose)) — a cost block is a block of
-    /// instructions, not a second grammar.
+    /// ([`Instruction::Choose`](crate::Instruction::Choose)) — a cost block is
+    /// a block of instructions, not a second grammar.
     Choose(crate::Choose),
     /// A payment-time random object sample ([CR#601.2h]) writing its result to
     /// `dest`. The payer surfaces no choice; the engine records the sampled
@@ -459,8 +459,9 @@ pub enum CostComponent {
     /// [`Instruction::Search`](crate::Instruction::Search).
     Search(crate::Search),
     /// Pin a pure read as a payment subject ([CR#608.2h]) — the cost twin of
-    /// [`Instruction::Let`](crate::Instruction::Let). Spells "an existing group/reference
-    /// pays this" without a decision: the register the paying action reads.
+    /// [`Instruction::Let`](crate::Instruction::Let). Spells "an existing
+    /// group/reference pays this" without a decision: the register the
+    /// paying action reads.
     Let(crate::Let),
 }
 

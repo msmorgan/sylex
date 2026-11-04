@@ -7,8 +7,8 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
-use sylex_upstream::scryfall;
 use regex::Regex;
+use sylex_upstream::scryfall;
 
 /// Controller restriction recorded while parsing a filter phrase. Consumers
 /// that need a particular controller inspect this typed fact rather than the
@@ -170,13 +170,15 @@ pub(crate) fn parse_phrase_detailed(phrase: &str) -> Option<ParsedFilter> {
             continue;
         }
         // Designation adjective before a type noun: "Commander creatures" →
-        // Designated("Commander") (checked before subtype — it's not a subtype).
+        // Designated("Commander") (checked before subtype — it's not a
+        // subtype).
         if let Some((atom, r)) = strip_designation_adjective(rest) {
             prefix_atoms.push(atom);
             rest = r;
             continue;
         }
-        // Subtype adjective before a type noun: "Elf creatures" → Subtype("Elf").
+        // Subtype adjective before a type noun: "Elf creatures" →
+        // Subtype("Elf").
         if let Some((atom, r)) = strip_subtype_adjective(rest) {
             prefix_atoms.push(atom);
             rest = r;
@@ -186,8 +188,8 @@ pub(crate) fn parse_phrase_detailed(phrase: &str) -> Option<ParsedFilter> {
     }
 
     // Postfix relative clauses (peel off the END).
-    // Peels right-to-left off the end, so with multiple postfix clauses the atoms
-    // land in reverse source order.
+    // Peels right-to-left off the end, so with multiple postfix clauses the
+    // atoms land in reverse source order.
     let mut postfix_atoms: Vec<String> = Vec::new();
     let mut controllers = Vec::new();
     loop {
@@ -656,9 +658,9 @@ fn head_noun(word: &str) -> Option<HeadNoun> {
     }
     // Otherwise a lone word is a subtype only if it validates against the
     // catalog ([`subtype_head`], plural-aware) — a non-subtype (anaphor, object
-    // kind, legend name) declines like an unknown designation, so a wrong filter
-    // never graduates a wrong card. `Permanent` ([CR#109.2]) scopes it to the
-    // battlefield, matching the type-noun heads' built-in scope.
+    // kind, legend name) declines like an unknown designation, so a wrong
+    // filter never graduates a wrong card. `Permanent` ([CR#109.2]) scopes
+    // it to the battlefield, matching the type-noun heads' built-in scope.
     if let Some(subtype) = subtype_head(w) {
         return Some(HeadNoun {
             atoms: vec![
@@ -810,9 +812,10 @@ mod tests {
         ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
     )]
     fn with_hexproof_is_a_bare_keyword_reference() {
-        // `Has(...)` is a KeywordRef (bare unit ident) — a defaulted-param keyword
-        // must NOT acquire invocation parens here (that wouldn't read).
-        // Mirror the existing "creatures with flying" test's call shape.
+        // `Has(...)` is a KeywordRef (bare unit ident) — a defaulted-param
+        // keyword must NOT acquire invocation parens here (that
+        // wouldn't read). Mirror the existing "creatures with flying"
+        // test's call shape.
         assert_eq!(
             parse_phrase("creatures with hexproof").as_deref(),
             Some("And([Creature, Has(Hexproof)])")
@@ -877,9 +880,9 @@ mod tests {
     #[test]
     fn non_subtype_words_before_a_type_noun_decline() {
         // Only catalog subtypes are adjectives. Card types, supertypes, attach
-        // anaphors, and negations are NOT subtypes — decline (never mint a wrong
-        // Subtype atom). These are the real corpus offenders the catalog gate
-        // rules out.
+        // anaphors, and negations are NOT subtypes — decline (never mint a
+        // wrong Subtype atom). These are the real corpus offenders the
+        // catalog gate rules out.
         assert!(parse_phrase("Artifact creatures").is_none()); // card type
         assert!(parse_phrase("Legendary creatures").is_none()); // supertype
         assert!(parse_phrase("Equipped creature").is_none()); // attach anaphor
@@ -932,7 +935,8 @@ mod tests {
             parse_phrase("Locus").as_deref(),
             Some("And([Permanent, Subtype(Locus)])")
         );
-        // `-ies` that is really `<stem>ie` + `s` (Faerie), and `-ies→-y` (Ally).
+        // `-ies` that is really `<stem>ie` + `s` (Faerie), and `-ies→-y`
+        // (Ally).
         assert_eq!(
             parse_phrase("Faeries").as_deref(),
             Some("And([Permanent, Subtype(Faerie)])")
@@ -946,7 +950,8 @@ mod tests {
     #[test]
     fn non_subtype_lone_words_decline() {
         // Anaphors, object kinds, and legend names are NOT subtypes — the
-        // catalog gate declines them so a bogus `Subtype("It")` never graduates.
+        // catalog gate declines them so a bogus `Subtype("It")` never
+        // graduates.
         assert!(parse_phrase("It").is_none());
         assert!(parse_phrase("You").is_none());
         assert!(parse_phrase("Token").is_none());
@@ -979,7 +984,8 @@ mod tests {
             Some("Type(Planeswalker)")
         );
         assert_eq!(type_filter("sorcery").as_deref(), Some("Type(Sorcery)"));
-        // `permanent` is a builtin filter, not a card type — no `Type(...)` form.
+        // `permanent` is a builtin filter, not a card type — no `Type(...)`
+        // form.
         assert_eq!(type_filter("permanent"), None);
         assert_eq!(type_filter("goblin"), None);
         // …whereas the filter-head atom for the same nouns is the bare macro.

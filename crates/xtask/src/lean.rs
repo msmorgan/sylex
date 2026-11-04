@@ -1,5 +1,5 @@
-//! `cargo xtask lean check`: build the native Lean workbench, then rerun the Lake generation
-//! regression against its lakefile.
+//! `cargo xtask lean check`: build the native Lean workbench, then rerun the
+//! Lake generation regression against its lakefile.
 
 use std::collections::BTreeSet;
 use std::path::Path;
@@ -17,13 +17,14 @@ pub struct LeanArgs {
 
 #[derive(Debug, Subcommand)]
 enum LeanCmd {
-    /// Build every library (syntax, checker, builtin, card bench, proofs) with warnings as
-    /// errors, then check that Lake regenerates the canon card modules.
+    /// Build every library (syntax, checker, builtin, card bench, proofs) with
+    /// warnings as errors, then check that Lake regenerates the canon card
+    /// modules.
     Check,
 }
 
-/// Every library in `lean/lakefile.lean`. The default target is only the fast loop, so the gate
-/// names them all.
+/// Every library in `lean/lakefile.lean`. The default target is only the fast
+/// loop, so the gate names them all.
 const LIBRARIES: [&str; 8] = [
     "Semantics",
     "SemanticsDefinitions",
@@ -56,11 +57,13 @@ fn check(lake: &mut Command, workbench: &Path) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Exercise the production generator and Lake facet overrides in a disposable package.
+/// Exercise the production generator and Lake facet overrides in a disposable
+/// package.
 mod generation {
-    use super::*;
     use std::collections::BTreeMap;
     use std::time::SystemTime;
+
+    use super::*;
 
     pub fn regression(lake: &dyn Fn() -> Command, workbench: &Path) -> anyhow::Result<()> {
         let scratch = tempfile::tempdir().context("creating the Lake regression package")?;
@@ -301,8 +304,9 @@ lean_lib Proof where
             .collect())
     }
     fn changing_module_set(lake: &dyn Fn() -> Command, package: &Path) -> anyhow::Result<()> {
-        // Exercise the production modules-facet override with a library whose glob changes.
-        // The small generator isolates Lake ordering from semantic compilation costs.
+        // Exercise the production modules-facet override with a library whose
+        // glob changes. The small generator isolates Lake ordering from
+        // semantic compilation costs.
         let config = package.join("lakefile.lean");
         let mut source = std::fs::read_to_string(&config)?;
         source.push_str(

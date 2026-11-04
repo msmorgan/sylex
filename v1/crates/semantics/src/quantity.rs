@@ -8,9 +8,9 @@ use crate::SupportsMacros;
 /// One canonical primitive — `Range(lo, hi)`, each bound optional (`None` =
 /// unbounded that side) — with the readable named forms (`Exactly`, `AtLeast`,
 /// `AtMost`, `Between`, `AnyNumber`) recovered as builtin **macros** at the
-/// `Quantity` position (`v1/plugins/builtin/macros/quantity/`). Because the kind
-/// remembers its expansions, an `Exactly(1)` invocation round-trips back to
-/// `Exactly(1)` rather than the bare `Range(1, 1)`.
+/// `Quantity` position (`v1/plugins/builtin/macros/quantity/`). Because the
+/// kind remembers its expansions, an `Exactly(1)` invocation round-trips back
+/// to `Exactly(1)` rather than the bare `Range(1, 1)`.
 ///
 /// Bound ordering and non-zero validity are runtime concerns: an inverted
 /// `Range(Some(5), Some(2))` and a degenerate "up to 0" are equally

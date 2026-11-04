@@ -253,16 +253,15 @@ fn a_composite_body_granted_inside_a_region_declares_a_capture_list() {
 fn carried_keyword_abilities(ability: &sylex_core::Ability) -> Vec<&sylex_core::Ability> {
     fn from_static(effect: &sylex_core::StaticSpec) -> Vec<&sylex_core::Ability> {
         match effect {
-            sylex_core::StaticSpec::Modify(
-                _,
-                sylex_core::Modification::GainAbility(granted),
-            ) => match granted.as_ref() {
-                sylex_core::Ability::Keyword(sylex_core::KeywordAbility::Composite {
-                    abilities,
-                    ..
-                }) => abilities.iter().collect(),
-                other => vec![other],
-            },
+            sylex_core::StaticSpec::Modify(_, sylex_core::Modification::GainAbility(granted)) => {
+                match granted.as_ref() {
+                    sylex_core::Ability::Keyword(sylex_core::KeywordAbility::Composite {
+                        abilities,
+                        ..
+                    }) => abilities.iter().collect(),
+                    other => vec![other],
+                }
+            }
             _ => Vec::new(),
         }
     }

@@ -1,5 +1,4 @@
 /// One of the five colors of Magic ([CR#105.1]). Colorless is not a color.
-///
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
 pub enum Color {
     White,

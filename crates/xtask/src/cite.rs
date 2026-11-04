@@ -1778,8 +1778,7 @@ const CR_FIXTURE: &str = \"rule 200.1\";
 // cite: noncompliant end
 }
 ";
-        let hits =
-            noncompliant_source_hits("crates/catalogs/src/cr.rs", line_source).unwrap();
+        let hits = noncompliant_source_hits("crates/catalogs/src/cr.rs", line_source).unwrap();
         assert_eq!(
             hits.iter()
                 .map(|hit| hit.matched.as_str())
@@ -1787,8 +1786,7 @@ const CR_FIXTURE: &str = \"rule 200.1\";
             ["CR 100.1", "100.1", "rule 400.1", "400.1"]
         );
         assert_eq!(
-            noncompliant_source_hits("crates/catalogs/src/lib.rs", scope_source,)
-                .unwrap(),
+            noncompliant_source_hits("crates/catalogs/src/lib.rs", scope_source,).unwrap(),
             [] as [crate::cite::NoncompliantHit; 0]
         );
     }
@@ -1836,8 +1834,7 @@ const CR_FIXTURE: &str = \"rule 200.1\"; // rule 900.1\n\
 // cite: noncompliant end\n\
 }";
         let fixture_hits =
-            noncompliant_source_hits("crates/catalogs/src/lib.rs", fixture_source)
-                .unwrap();
+            noncompliant_source_hits("crates/catalogs/src/lib.rs", fixture_source).unwrap();
         assert_eq!(
             fixture_hits
                 .iter()
@@ -1864,10 +1861,7 @@ numbered_rule((), \"100.1\", // cite: noncompliant-line -- machine-readable pars
 \"catalog\");\n\
 }";
 
-        assert!(
-            noncompliant_source_hits("crates/catalogs/src/cr.rs", imported_source)
-                .is_err()
-        );
+        assert!(noncompliant_source_hits("crates/catalogs/src/cr.rs", imported_source).is_err());
     }
 
     #[test]
@@ -1897,9 +1891,7 @@ numbered_rule((), \"100.1\", // cite: noncompliant-line -- machine-readable pars
         );
 
         for source in [nested_definition, nested_glob_import] {
-            assert!(
-                noncompliant_source_hits("crates/catalogs/src/cr.rs", &source).is_err()
-            );
+            assert!(noncompliant_source_hits("crates/catalogs/src/cr.rs", &source).is_err());
         }
     }
 
@@ -1916,9 +1908,7 @@ const LICENSE_FIXTURE: &str = \"rule 100.1\";\n\
         let source = "// cite: noncompliant begin -- verbatim CR parser fixture, not prose claims\n\
 const PARSER_FIXTURE: &str = \"rule 100.1\";\n\
 // cite: noncompliant end\n";
-        assert!(
-            noncompliant_source_hits("crates/catalogs/src/legacy.rs", source).is_err()
-        );
+        assert!(noncompliant_source_hits("crates/catalogs/src/legacy.rs", source).is_err());
     }
 
     #[test]

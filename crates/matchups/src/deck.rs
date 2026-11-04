@@ -65,7 +65,10 @@ mod tests {
     }
 
     #[test]
-    #[cfg_attr(not(wizards_corpus), ignore = "needs generated v1/plugins/wizards corpus")]
+    #[cfg_attr(
+        not(wizards_corpus),
+        ignore = "needs generated v1/plugins/wizards corpus"
+    )]
     fn historical_matchup_full_lists_resolve() {
         let src = CardSource::load();
         for spec in [&wc99::SPED_RED, &wc99::STOMPY] {

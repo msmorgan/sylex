@@ -15,8 +15,8 @@
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
-use sylex_core::Zone;
 use serde::Deserialize;
+use sylex_core::Zone;
 
 /// One entailment row: the verb's canonical spelling, its entailed
 /// master-form KIND and the zone coordinates it fixes (`None` = the verb

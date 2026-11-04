@@ -3,8 +3,7 @@
 //! instead of re-reading the source wholesale.
 //!
 //!  - `map enums [DIR]` — every `pub enum` under a Rust source tree (default
-//!    `crates/core/src`), with each variant's shape and first doc
-//!    line.
+//!    `crates/core/src`), with each variant's shape and first doc line.
 
 use std::fs;
 use std::path::Path;
@@ -51,9 +50,10 @@ pub fn run(args: &MapArgs) -> anyhow::Result<()> {
 /// # Errors
 /// If DIR isn't a directory, a `.rs` file can't be read, or fails to parse.
 fn run_enums(args: &EnumsArgs) -> anyhow::Result<()> {
-    let dir = args.dir.clone().unwrap_or_else(|| {
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../crates/core/src")
-    });
+    let dir = args
+        .dir
+        .clone()
+        .unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")).join("../../crates/core/src"));
     anyhow::ensure!(dir.is_dir(), "not a directory: {}", dir.display());
 
     let mut rs_files = Vec::new();

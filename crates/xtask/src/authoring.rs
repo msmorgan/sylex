@@ -46,16 +46,16 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use clap::Args;
-use sylex_semantics_v1::authoring::Coverage;
-use sylex_semantics_v1::authoring::UNCOVERABLE as UNSCAFFOLDABLE;
-use sylex_semantics_v1::authoring::classify;
-use sylex_semantics_v1::authoring::embed_safe;
-use sylex_semantics_v1::authoring::reachable_rows;
 use macro_ron::KindSet;
 use macro_ron::MacroDef;
 use macro_ron::NamedParam;
 use macro_ron::ParamDefault;
 use macro_ron::VariantSignature;
+use sylex_semantics_v1::authoring::Coverage;
+use sylex_semantics_v1::authoring::UNCOVERABLE as UNSCAFFOLDABLE;
+use sylex_semantics_v1::authoring::classify;
+use sylex_semantics_v1::authoring::embed_safe;
+use sylex_semantics_v1::authoring::reachable_rows;
 
 #[derive(Debug, Args)]
 pub struct ScaffoldIdentityArgs {
@@ -856,11 +856,11 @@ mod elision_gap {
     /// skipped.
     #[test]
     fn every_droppable_default_row_is_scaffolded_as_elidable() {
+        use macro_ron::ParamDefault;
+        use macro_ron::VariantSignature;
         use sylex_semantics_v1::authoring::Coverage;
         use sylex_semantics_v1::authoring::classify;
         use sylex_semantics_v1::authoring::reachable_rows;
-        use macro_ron::ParamDefault;
-        use macro_ron::VariantSignature;
 
         let kind_set = sylex_semantics_v1::ron::kinds();
         let droppable = |signature: &VariantSignature| match signature {
@@ -1041,8 +1041,8 @@ mod field_splice {
     /// whether another type is a struct or an enum).
     #[test]
     fn every_newtype_over_a_crate_struct_is_marked_spliced() {
-        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../../v1/crates/semantics/src");
+        let dir =
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/crates/semantics/src");
         let mut sources = Vec::new();
         crate::map::collect_rs_files(&dir, &mut sources).expect("semantics sources are readable");
         sources.sort();
@@ -1188,11 +1188,11 @@ mod field_splice {
 /// one by one.
 #[cfg(test)]
 mod restricted_read {
+    use macro_ron::Expand;
+    use macro_ron::MacroDef;
     use sylex_semantics_v1::Action;
     use sylex_semantics_v1::Card;
     use sylex_semantics_v1::ManaProduction;
-    use macro_ron::Expand;
-    use macro_ron::MacroDef;
 
     /// The real semantics macro registry (kinds + param types) with every
     /// real, currently-committed scaffold loaded — see the module doc.

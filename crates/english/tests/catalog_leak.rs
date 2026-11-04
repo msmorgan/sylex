@@ -7,10 +7,10 @@ use std::collections::BTreeSet;
 use sylex_lexicon::Category;
 use sylex_lexicon::LexemeId;
 use sylex_lexicon::SourceKind;
-use sylex_vocabulary::Sources;
 use sylex_syntax::Grammar;
 use sylex_syntax::grammar::SchemaDecl;
 use sylex_syntax::grammar::SymbolDecl;
+use sylex_vocabulary::Sources;
 
 /// Grammatical terms that happen to spell a catalog item, each the standard
 /// name of a grammatical concept rather than a use of the catalog word.

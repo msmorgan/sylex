@@ -109,8 +109,8 @@ impl<'de> Deserialize<'de> for TokenName {
 /// restricted `{C}`, Map/Junk's explore/play, double-faced Incubator, the Aura
 /// Role tokens, …) are deliberately absent and resolve to `None` until their
 /// primitives land. Each token's defined characteristics ([CR#111.3]) match the
-/// builtin `v1/plugins/builtin/tokens/<Name>.ron` file (a colorless artifact whose
-/// only subtype is its own name).
+/// builtin `v1/plugins/builtin/tokens/<Name>.ron` file (a colorless artifact
+/// whose only subtype is its own name).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PredefinedToken {
     /// [CR#111.10a]
@@ -597,9 +597,10 @@ mod tests {
 
     #[test]
     fn treasure_like_token_parses() {
-        // Mirrors the structure of v1/plugins/builtin/tokens/Treasure.ron with the
-        // macro-expanded forms: `SacrificeThis` -> `Do(Sacrifice(This))`,
-        // subtypes omitted (Subtype is a struct requiring plugin expansion).
+        // Mirrors the structure of v1/plugins/builtin/tokens/Treasure.ron with
+        // the macro-expanded forms: `SacrificeThis` ->
+        // `Do(Sacrifice(This))`, subtypes omitted (Subtype is a struct
+        // requiring plugin expansion).
         let source = "Token(\
             types: [TypeDef(name: \"Artifact\", permanent: true)],\
             abilities: [\

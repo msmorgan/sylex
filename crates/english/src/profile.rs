@@ -16,6 +16,7 @@
 
 use std::collections::BTreeSet;
 
+use dpsi::Ident;
 use sylex_lexicon::AnalyzedText;
 use sylex_lexicon::Category;
 use sylex_lexicon::ItalicHead;
@@ -23,13 +24,12 @@ use sylex_lexicon::Lexeme;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::Numeral;
 use sylex_lexicon::WordForm;
-use sylex_vocabulary::LexicalEnvironment;
 use sylex_syntax::frames::ClauseKind;
 use sylex_syntax::frames::Frame;
 use sylex_syntax::frames::FrameFamily;
 use sylex_syntax::frames::PrepositionFrame;
 use sylex_syntax::frames::SlotFill;
-use dpsi::Ident;
+use sylex_vocabulary::LexicalEnvironment;
 
 use crate::corpus::UnitKind;
 

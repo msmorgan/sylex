@@ -218,14 +218,15 @@ fn run_to_priority(state: &mut GameState, player: PlayerId, phase: PhaseStep) ->
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { player: p, legal },
-            )) if p == player && state.turn.current == phase => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player: p,
+                legal,
+            })) if p == player && state.turn.current == phase => {
                 return legal;
             }
-            StepOutcome::NeedsDecision(DecisionPointKind::Priority(
-                sylex_engine::Priority { .. },
-            )) => {
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
                 state.submit_decision(Decision::Act(Action::Pass)).unwrap();
             }
             StepOutcome::NeedsDecision(DecisionPointKind::PayMana(sylex_engine::PayMana {
@@ -317,8 +318,9 @@ fn mana_cost_is_publicly_reachable_for_a_castable_spell() {
 
 #[test]
 fn abilities_index_matches_activate_ability_action() {
-    // PINGER is a creature with a tap-activated non-mana ability; activation_game
-    // forces one Mountain onto p0's battlefield and stocks the deck with PINGER.
+    // PINGER is a creature with a tap-activated non-mana ability;
+    // activation_game forces one Mountain onto p0's battlefield and stocks
+    // the deck with PINGER.
     let mut state = activation_game(7, PINGER, 1);
     let pinger = force_into_play(&mut state, PlayerId(0), PINGER);
     let _legal = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
@@ -572,7 +574,8 @@ fn priority_enumerates_all_action_kinds_at_one_window() {
     let land = force_into_hand(&mut state, PlayerId(0), "Mountain");
 
     let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
-    // Float one red: taps the first untapped Mountain, leaving the other untapped.
+    // Float one red: taps the first untapped Mountain, leaving the other
+    // untapped.
     float_mana(&mut state, PlayerId(0), 1);
 
     let StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
@@ -622,9 +625,9 @@ fn priority_enumerates_all_action_kinds_at_one_window() {
 
 #[test]
 fn choose_targets_candidates_resolve_to_names() {
-    // Cast Lightning Bolt; the ChooseTargets candidates are object ids a renderer
-    // resolves to names via def()/face_name — confirming that decision kind is
-    // already renderable with no engine change.
+    // Cast Lightning Bolt; the ChooseTargets candidates are object ids a
+    // renderer resolves to names via def()/face_name — confirming that
+    // decision kind is already renderable with no engine change.
     let mut state = bolt_game(4);
     force_into_play(&mut state, PlayerId(0), "Mountain");
     let target = force_into_play(&mut state, PlayerId(1), "Grizzly Bears");
@@ -633,9 +636,8 @@ fn choose_targets_candidates_resolve_to_names() {
     let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
     float_mana(&mut state, PlayerId(0), 1);
     // Drain to the priority where Bolt is castable, then cast it.
-    let StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
-        ..
-    })) = state.step()
+    let StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority { .. })) =
+        state.step()
     else {
         panic!("expected priority");
     };
@@ -646,9 +648,10 @@ fn choose_targets_candidates_resolve_to_names() {
     // Step until ChooseTargets surfaces; its candidate ids include the bears,
     // and each id resolves to a renderable name.
     let (_, stop) = step_to_stop(&mut state);
-    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(
-        sylex_engine::ChooseTargets { legal, .. },
-    )) = stop
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets {
+        legal,
+        ..
+    })) = stop
     else {
         panic!("expected ChooseTargets, got {stop:?}");
     };
