@@ -34,15 +34,14 @@ natively.
    - A referent a body moves is a new object ([CR#400.7]). Later text reads it back by anaphora,
      never by the pre-move parameter.
 3. **The checker reads text, not game state.** It verifies that a term is a faithful reading of
-   its English: references resolve, sorts are right, and frames are well-formed. Whether an ability is
-   characteristic-defining is fixed by the textual criteria of [CR#604.3a], so the checker decides
-   it, not the engine. It is not a rules
-   engine ([CR#101.3,609.3]). These belong to the engine: runtime visibility, the availability of
-   last known information ([CR#608.2h]), timing, and the order of state-based actions and
-   replacements ([CR#704.3,616.1]). So reference resolution applies no public-zone filter: a
-   well-formed textual antecedent is admitted. Why: what a text means is decidable from the text,
-   but runtime state is not. A check of runtime state can only be satisfied by adding model
-   structure that the text does not contain (item 5(c)).
+   its English: references resolve, sorts are right, and frames are well-formed. Whether an ability
+   is characteristic-defining is fixed by the textual criteria of [CR#604.3a], so the checker
+   decides it. The checker is not a rules engine. These belong to the engine: runtime visibility,
+   the availability of last known information ([CR#608.2h]), timing, and the order of state-based
+   actions and replacements ([CR#704.3,616.1]). So reference resolution applies no public-zone
+   filter: a well-formed textual antecedent is admitted. Why: what a text means is decidable from
+   the text, but runtime state is not. A check of runtime state can only be satisfied by adding
+   model structure that the text does not contain (item 5(c)).
 4. **Rules are data.** Every decomposable game rule is a declaration, not engine code: damage
    results, state-based actions, turn-based actions, intrinsic type rules ([CR#702.15b,704.5q,703.1]).
    Their CR citations, not the checker, vouch for their correctness. Why: a rule written as data is
@@ -79,7 +78,7 @@ as others are pushed and removed.
 - **Actors are not referents.** A Handoff makes its Actor the innermost for the Action it contains.
   Pronouns, groups and counts never read an Actor; only the `actor` word does.
 - A disjunctive noun phrase exports only the referents common to every branch. A coordination bound
-  to a parameter binds every member under the parameter's one Binding Identity ([CR#608.2c]).
+  to a parameter binds every member under the parameter's one Binding Identity.
 - A zone change gives the object a fresh referent with no Binding Identity ([CR#400.7]).
 
 ### 2.2 Boxes
@@ -92,8 +91,8 @@ spell or ability is put on the stack ([CR#601.2c,115.1]).
    action time. It is accessible to the rest of the paragraph, across the colon too.
 2. **Duplex** (a trigger, a replacement, a positive conditional). Antecedent referents are
    accessible in the consequent and closed after it. A `doIf` with no else branch lets its branch's
-   output continue: in "Create a token if you control a creature. Put a counter on it.", "it" is
-   the token. With an else branch, branch-local non-targets are closed. An existential
+   output, such as a token it creates, continue to later text, while its condition's referents
+   close. With an else branch, branch-local non-targets are closed. An existential
    ("there is …", `exists`) publishes its indefinite subject to the consequent. Inside a
    replacement's condition, that subject ranks below earlier mentions for a plural pronoun and for
    "the rest".
@@ -103,7 +102,7 @@ spell or ability is put on the stack ([CR#601.2c,115.1]).
 4. **Distributive loop** (`doForEach`). The body starts one clause after the header, so "it" in the
    body selects the loop referent. On exit, the loop exports plural referents for the targets the
    body announced and the objects it created. Each is a recorded discourse fact, not derived from
-   determiners or stamps (owner ruling).
+   determiners or stamps.
 5. **Relative clause or comparison**, including the domain `countOf` and `aggregate` measure. It is
    closed on exit, so no later pronoun reads a measured domain. Attachment Hosts ("enchanted",
    "equipped") project to the ability's box ([CR#303.4b]).
@@ -196,7 +195,9 @@ scope invents a rules distinction the CR does not make: an event then matches it
 should see are hidden from it. A rules-defined keyword treated as a phrasing loses its identity, so
 "can't X" and "whenever X" can no longer name it. So a declaration's kind decides which it is; its
 file path never does: a role inferred from location is not stated by the declaration, and it can
-disagree with what the declaration is. Definitions are trusted, and their bodies are checked at every use that expands them.
+disagree with what the declaration is. That a Definition's body is the rules' meaning of its
+keyword is trusted, vouched for by its CR citation like any rule declaration (§1 item 4). Its
+reference resolution and sorts are checked in each context that expands it.
 
 ### 3.1 Keyword Actions and Deeds
 
@@ -276,9 +277,10 @@ stamped with the deed, and become new objects where [CR#400.7] applies.
 ### 4.6 The Event Gate
 
 Events, lookbacks and deontic rules admit only the event-capable Action heads, plus a keyword-action
-Definition matched by its Deed. The gate is closed because the core's event filters are closed.
-Control-flow and compound actions are refused. A deontic rule has no gate of its own, since a
-"can't" outranks anything that allows the thing ([CR#101.2]).
+Definition matched by its Deed. An event pattern, a lookback or a prohibition must name something
+that happens as one event; control flow (`sequentially`, `doIf`, `doForEach`, `chooseModes`, …)
+and compound actions are not events, so they are refused. A deontic rule has no gate of its own,
+since a "can't" outranks anything that allows the thing ([CR#101.2]).
 
 Event decisions:
 
