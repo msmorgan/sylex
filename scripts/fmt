@@ -11,5 +11,5 @@ cd (dirname (status filename))/..; or exit
 
 cargo +nightly fmt --all $argv; or exit
 cargo sort-derives --order Debug,Clone,Copy,Default,PartialEq,Eq,Hash; or exit
-cargo run -q -p deckmaste_dsl --bin sylfmt -- --width 100 --closers hugged --trailing-commas never \
+cargo run -q -p sylex_syl --bin sylfmt -- --width 100 --closers hugged --trailing-commas never \
     --record-spaces=false --hug-first-list=true plugins_v3

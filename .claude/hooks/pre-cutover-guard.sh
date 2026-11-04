@@ -18,12 +18,12 @@ path=$(printf '%s' "$input" | jq -r '.tool_input.file_path // .tool_input.path /
 [ -n "$path" ] || exit 0
 
 case "$path" in
-  */crates/deckmaste_legacy_render/*)
-    key="deckmaste_legacy_render"
-    why="LEGACY; deletion-bound at semantics-v1-cutover, and deckmaste_migrations must shed its dependency on it by then. Do not build new work on this crate." ;;
-  */crates/deckmaste_migrations/*)
-    key="deckmaste_migrations"
-    why="SURVIVES the cutovers as a function (card extract/resolve/graduate, snapshot ingestion), but its oracle-text extraction is its own regex pipeline that does NOT consume the english-v4 parser, and it still depends on deletion-slated deckmaste_legacy_render. Do not home new English infrastructure here without recording the deviation in docs/decisions/english-v4.md. Re-pointing extraction at english-v4 is a separate, not-yet-scheduled decision." ;;
+  */crates/render/*)
+    key="sylex_render_v1"
+    why="LEGACY; deletion-bound at semantics-v1-cutover, and sylex_pipeline_v1 must shed its dependency on it by then. Do not build new work on this crate." ;;
+  */crates/pipeline/*)
+    key="sylex_pipeline_v1"
+    why="SURVIVES the cutovers as a function (card extract/resolve/graduate, snapshot ingestion), but its oracle-text extraction is its own regex pipeline that does NOT consume the english-v4 parser, and it still depends on deletion-slated sylex_render_v1. Do not home new English infrastructure here without recording the deviation in docs/decisions/english-v4.md. Re-pointing extraction at english-v4 is a separate, not-yet-scheduled decision." ;;
   *)
     exit 0 ;;
 esac

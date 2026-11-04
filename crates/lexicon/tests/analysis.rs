@@ -1,0 +1,1373 @@
+use std::collections::BTreeSet;
+
+use sylex_lexicon::*;
+
+fn source(owner: &str) -> Source {
+    Source {
+        kind: SourceKind::Core,
+        path: "tests/declared-lexicon.ron".to_owned(),
+        owner: owner.to_owned(),
+    }
+}
+
+fn invariant(id: &str, surface: &str, category: Category) -> Lexeme {
+    Lexeme::invariant(id, surface, category, source(id))
+}
+
+fn multiword(id: &str, surface: &str, category: Category) -> Lexeme {
+    let mut lexeme = invariant(id, surface, category);
+    lexeme.surface_structure = SurfaceStructure::Multiword;
+    lexeme
+}
+
+fn noun(id: &str, lemma: &str) -> Lexeme {
+    Lexeme::noun(id, lemma, vec![Countability::Count], source(id))
+}
+
+fn verb(id: &str, lemma: &str) -> Lexeme {
+    Lexeme::verb(id, lemma, source(id))
+}
+
+fn nominal(number: Number) -> FeatureBundle {
+    FeatureBundle {
+        number: Some(number),
+        ..FeatureBundle::default()
+    }
+}
+
+fn finite(person: Person, number: Number, tense: Tense) -> FeatureBundle {
+    FeatureBundle {
+        number: Some(number),
+        person: Some(person),
+        tense: Some(tense),
+        finiteness: Some(Finiteness::Finite),
+        case: None,
+    }
+}
+
+fn nonfinite() -> FeatureBundle {
+    FeatureBundle {
+        finiteness: Some(Finiteness::Nonfinite),
+        ..FeatureBundle::default()
+    }
+}
+
+fn word(id: &str, form: WordForm, features: FeatureBundle) -> LexicalReading {
+    LexicalReading::Word(LexicalValue {
+        lexeme: id.into(),
+        form,
+        features,
+        variant: 0,
+        capitalization: SurfaceCase::Declared,
+    })
+}
+
+fn numeral(value: i32, notation: Numeral) -> LexicalReading {
+    LexicalReading::Numeral {
+        value,
+        notation,
+        capitalization: SurfaceCase::Declared,
+    }
+}
+
+fn initial(reading: LexicalReading) -> LexicalReading {
+    match reading {
+        LexicalReading::Word(value) => LexicalReading::Word(LexicalValue {
+            capitalization: SurfaceCase::Initial,
+            ..value
+        }),
+        LexicalReading::FlavorWord { .. } => unreachable!(),
+        LexicalReading::Numeral {
+            value, notation, ..
+        } => LexicalReading::Numeral {
+            value,
+            notation,
+            capitalization: SurfaceCase::Initial,
+        },
+    }
+}
+
+fn at(text: &AnalyzedText, start: usize, end: usize) -> BTreeSet<LexicalReading> {
+    text.matches
+        .iter()
+        .filter(|m| m.start == start && m.end == end)
+        .map(|m| m.reading.clone())
+        .collect()
+}
+
+fn complete(lexicon: &Lexicon, text: &str) -> BTreeSet<LexicalReading> {
+    at(&lexicon.analyze(text), 0, text.chars().count())
+}
+
+fn override_form(lexeme: &mut Lexeme, form: WordForm, surfaces: &[&str]) {
+    for declaration in &mut lexeme.forms {
+        if declaration.form == form {
+            declaration.surfaces = Some(surfaces.iter().map(|s| (*s).to_owned()).collect());
+        }
+    }
+}
+
+#[test]
+fn counters_preserves_noun_and_correlated_finite_verb() {
+    let lexicon =
+        Lexicon::new([noun("n:counter", "counter"), verb("v:counter", "counter")]).unwrap();
+    assert_eq!(
+        complete(&lexicon, "counters"),
+        BTreeSet::from([
+            word("n:counter", WordForm::Plural, nominal(Number::Plural)),
+            word(
+                "v:counter",
+                WordForm::Present,
+                finite(Person::Third, Number::Singular, Tense::Present)
+            ),
+        ])
+    );
+}
+
+#[test]
+fn cast_preserves_plain_present_preterite_and_participle_alternatives() {
+    let mut cast = verb("v:cast", "cast");
+    override_form(&mut cast, WordForm::Preterite, &["cast"]);
+    override_form(&mut cast, WordForm::PastParticiple, &["cast"]);
+    let lexicon = Lexicon::new([cast]).unwrap();
+    let readings = complete(&lexicon, "cast");
+
+    for expected in [
+        word("v:cast", WordForm::Plain, FeatureBundle::default()),
+        word(
+            "v:cast",
+            WordForm::Present,
+            finite(Person::First, Number::Singular, Tense::Present),
+        ),
+        word(
+            "v:cast",
+            WordForm::Preterite,
+            finite(Person::Third, Number::Plural, Tense::Past),
+        ),
+        word("v:cast", WordForm::PastParticiple, nonfinite()),
+    ] {
+        assert!(readings.contains(&expected), "missing {expected:?}");
+    }
+    assert!(!readings.contains(&word(
+        "v:cast",
+        WordForm::Present,
+        finite(Person::Third, Number::Singular, Tense::Present),
+    )));
+    assert_eq!(readings.len(), 13);
+}
+
+#[test]
+fn declarations_roundtrip_with_shared_frame_and_feature_values() {
+    let mut cast = verb("v:cast", "cast");
+    cast.properties.frames = vec![Frame {
+        kind: dpsi::Ident::new("Predicate"),
+        items: vec![FrameItem::Marked {
+            vocabulary: dpsi::Ident::new("Preposition"),
+            member: dpsi::Ident::new("At"),
+            slot: FrameSlot {
+                relation: Relation::Object,
+                category: dpsi::Ident::new("NounPhrase"),
+            },
+        }],
+    }];
+    override_form(&mut cast, WordForm::Preterite, &["cast"]);
+    override_form(&mut cast, WordForm::PastParticiple, &["cast"]);
+
+    let serialized = ron::to_string(&cast).unwrap();
+    let restored: Lexeme = ron::from_str(&serialized).unwrap();
+    assert_eq!(restored, cast);
+
+    let lexicon = Lexicon::new([restored]).unwrap();
+    let readings = complete(&lexicon, "cast");
+    assert!(readings.contains(&word(
+        "v:cast",
+        WordForm::Preterite,
+        finite(Person::Third, Number::Plural, Tense::Past),
+    )));
+    assert!(readings.contains(&word("v:cast", WordForm::PastParticiple, nonfinite(),)));
+}
+
+#[test]
+fn one_or_two_targets_retains_each_word_and_numeral_reading() {
+    let lexicon = Lexicon::new([
+        noun("n:one", "one"),
+        invariant("d:one", "one", Category::Determinative),
+        invariant("c:or", "or", Category::Coordinator),
+        invariant("d:target", "target", Category::Determinative),
+        noun("n:creature", "creature"),
+    ])
+    .unwrap();
+    let plain_one = BTreeSet::from([
+        word("n:one", WordForm::Singular, nominal(Number::Singular)),
+        word("d:one", WordForm::Invariant, FeatureBundle::default()),
+        numeral(1, Numeral::Cardinal),
+    ]);
+    assert_eq!(complete(&lexicon, "one"), plain_one);
+    let text = lexicon.analyze("One or two target creatures");
+    assert_eq!(
+        at(&text, 0, 3),
+        plain_one.into_iter().map(initial).collect()
+    );
+    assert_eq!(
+        at(&text, 7, 10),
+        BTreeSet::from([numeral(2, Numeral::Cardinal)])
+    );
+    assert_eq!(
+        at(&text, 11, 17),
+        BTreeSet::from([word(
+            "d:target",
+            WordForm::Invariant,
+            FeatureBundle::default()
+        ),])
+    );
+    assert_eq!(
+        at(&text, 18, 27),
+        BTreeSet::from([word(
+            "n:creature",
+            WordForm::Plural,
+            nominal(Number::Plural)
+        ),])
+    );
+    assert_eq!(text.unknown_words(), [] as [std::ops::Range<usize>; 0]);
+    assert!(!text.matches.iter().any(|m| m.start == 0 && m.end > 3));
+}
+
+#[test]
+fn numeric_prefixes_survive_longer_numeric_phrases() {
+    let lexicon = Lexicon::new([noun("n:one", "one")]).unwrap();
+    let text = lexicon.analyze("one hundred");
+    assert_eq!(
+        at(&text, 0, 3),
+        BTreeSet::from([
+            word("n:one", WordForm::Singular, nominal(Number::Singular)),
+            numeral(1, Numeral::Cardinal),
+        ])
+    );
+    assert_eq!(
+        at(&text, 0, 11),
+        BTreeSet::from([numeral(100, Numeral::Cardinal)])
+    );
+}
+
+#[test]
+fn initial_variants_do_not_case_fold_exact_catalog_entries() {
+    let mut catalog = invariant("name:ThreeDog", "Three Dog", Category::Catalog);
+    catalog.capitalization = Capitalization::Exact;
+    catalog.source = Source {
+        kind: SourceKind::Catalog,
+        path: "tests/card-names.txt".to_owned(),
+        owner: "Three Dog".to_owned(),
+    };
+    let lexicon = Lexicon::new([noun("n:counter", "counter"), catalog]).unwrap();
+    assert_eq!(
+        complete(&lexicon, "Counters"),
+        BTreeSet::from([initial(word(
+            "n:counter",
+            WordForm::Plural,
+            nominal(Number::Plural)
+        )),])
+    );
+    assert!(complete(&lexicon, "COUNTERS").is_empty());
+    assert_eq!(
+        complete(&lexicon, "Three Dog"),
+        BTreeSet::from([word(
+            "name:ThreeDog",
+            WordForm::Invariant,
+            FeatureBundle::default()
+        ),])
+    );
+    assert!(complete(&lexicon, "three Dog").is_empty());
+    assert!(complete(&lexicon, "Three dog").is_empty());
+}
+
+#[test]
+fn default_morphology_handles_y_sibilants_e_and_ie() {
+    let lexicon = Lexicon::new([
+        noun("n:ability", "ability"),
+        noun("n:box", "box"),
+        verb("v:copy", "copy"),
+        verb("v:watch", "watch"),
+        verb("v:exile", "exile"),
+        verb("v:die", "die"),
+    ])
+    .unwrap();
+    for (surface, reading) in [
+        (
+            "abilities",
+            word("n:ability", WordForm::Plural, nominal(Number::Plural)),
+        ),
+        (
+            "boxes",
+            word("n:box", WordForm::Plural, nominal(Number::Plural)),
+        ),
+        (
+            "copies",
+            word(
+                "v:copy",
+                WordForm::Present,
+                finite(Person::Third, Number::Singular, Tense::Present),
+            ),
+        ),
+        (
+            "watches",
+            word(
+                "v:watch",
+                WordForm::Present,
+                finite(Person::Third, Number::Singular, Tense::Present),
+            ),
+        ),
+        (
+            "copying",
+            word("v:copy", WordForm::GerundParticiple, nonfinite()),
+        ),
+        (
+            "exiling",
+            word("v:exile", WordForm::GerundParticiple, nonfinite()),
+        ),
+        (
+            "dying",
+            word("v:die", WordForm::GerundParticiple, nonfinite()),
+        ),
+    ] {
+        assert_eq!(complete(&lexicon, surface), BTreeSet::from([reading]));
+    }
+    for (surface, id) in [("copied", "v:copy"), ("exiled", "v:exile")] {
+        assert_eq!(complete(&lexicon, surface), past_readings(id, 0));
+    }
+    for malformed in [
+        "abilitys", "boxs", "copys", "watchs", "copyed", "exileed", "exileing", "dieing",
+    ] {
+        assert!(complete(&lexicon, malformed).is_empty(), "{malformed}");
+    }
+}
+
+fn past_readings(id: &str, variant: usize) -> BTreeSet<LexicalReading> {
+    let mut readings: BTreeSet<_> = [
+        (Person::First, Number::Singular),
+        (Person::Second, Number::Singular),
+        (Person::Third, Number::Singular),
+        (Person::First, Number::Plural),
+        (Person::Second, Number::Plural),
+        (Person::Third, Number::Plural),
+    ]
+    .into_iter()
+    .map(|(person, number)| word(id, WordForm::Preterite, finite(person, number, Tense::Past)))
+    .collect();
+    readings.insert(word(id, WordForm::PastParticiple, nonfinite()));
+    readings
+        .into_iter()
+        .map(|reading| match reading {
+            LexicalReading::Word(value) => LexicalReading::Word(LexicalValue { variant, ..value }),
+            LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => unreachable!(),
+        })
+        .collect()
+}
+
+#[test]
+fn overrides_replace_defaults_and_keep_explicit_syncretic_variants() {
+    let mut tap = verb("v:tap", "tap");
+    override_form(&mut tap, WordForm::GerundParticiple, &["tapping"]);
+    let mut draw = verb("v:draw", "draw");
+    override_form(&mut draw, WordForm::Preterite, &["drew"]);
+    override_form(&mut draw, WordForm::PastParticiple, &["drawn"]);
+    let mut burn = verb("v:burn", "burn");
+    override_form(&mut burn, WordForm::Preterite, &["burned", "burnt"]);
+    override_form(&mut burn, WordForm::PastParticiple, &["burned", "burnt"]);
+    let lexicon = Lexicon::new([tap, draw, burn]).unwrap();
+    assert_eq!(
+        complete(&lexicon, "tapping"),
+        BTreeSet::from([word("v:tap", WordForm::GerundParticiple, nonfinite()),])
+    );
+    assert_eq!(
+        complete(&lexicon, "drawn"),
+        BTreeSet::from([word("v:draw", WordForm::PastParticiple, nonfinite()),])
+    );
+    let expected_drew: BTreeSet<_> = past_readings("v:draw", 0).into_iter().filter(|reading| {
+        matches!(reading, LexicalReading::Word(value) if value.form == WordForm::Preterite)
+    }).collect();
+    assert_eq!(complete(&lexicon, "drew"), expected_drew);
+    assert_eq!(complete(&lexicon, "burned"), past_readings("v:burn", 0));
+    assert_eq!(complete(&lexicon, "burnt"), past_readings("v:burn", 1));
+    for obsolete in ["taping", "drawed"] {
+        assert!(complete(&lexicon, obsolete).is_empty(), "{obsolete}");
+    }
+}
+
+#[test]
+fn be_agreement_keeps_complete_bundles_instead_of_crossing_features() {
+    let mut be = invariant("v:be", "be", Category::Verb);
+    be.forms = [
+        ("am", Person::First, Number::Singular),
+        ("is", Person::Third, Number::Singular),
+        ("are", Person::Second, Number::Singular),
+        ("are", Person::First, Number::Plural),
+        ("are", Person::Second, Number::Plural),
+        ("are", Person::Third, Number::Plural),
+    ]
+    .into_iter()
+    .map(|(surface, person, number)| FormDeclaration {
+        form: WordForm::Present,
+        features: finite(person, number, Tense::Present),
+        surfaces: Some(vec![surface.to_owned()]),
+    })
+    .collect();
+    let lexicon = Lexicon::new([be]).unwrap();
+    assert_eq!(
+        complete(&lexicon, "am"),
+        BTreeSet::from([word(
+            "v:be",
+            WordForm::Present,
+            finite(Person::First, Number::Singular, Tense::Present)
+        ),])
+    );
+    assert_eq!(
+        complete(&lexicon, "is"),
+        BTreeSet::from([word(
+            "v:be",
+            WordForm::Present,
+            finite(Person::Third, Number::Singular, Tense::Present)
+        ),])
+    );
+    assert_eq!(
+        complete(&lexicon, "are"),
+        BTreeSet::from([
+            word(
+                "v:be",
+                WordForm::Present,
+                finite(Person::Second, Number::Singular, Tense::Present)
+            ),
+            word(
+                "v:be",
+                WordForm::Present,
+                finite(Person::First, Number::Plural, Tense::Present)
+            ),
+            word(
+                "v:be",
+                WordForm::Present,
+                finite(Person::Second, Number::Plural, Tense::Present)
+            ),
+            word(
+                "v:be",
+                WordForm::Present,
+                finite(Person::Third, Number::Plural, Tense::Present)
+            ),
+        ])
+    );
+    assert!(complete(&lexicon, "bes").is_empty());
+}
+
+#[test]
+fn multiword_and_bound_forms_keep_overlapping_analyses() {
+    let mut swamp = invariant("type:Swamp", "Swamp", Category::Catalog);
+    swamp.capitalization = Capitalization::Exact;
+    swamp.binding = Binding::Prefix;
+    let mut walk = invariant("bound:walk", "walk", Category::Keyword);
+    walk.binding = Binding::Suffix;
+    let lexicon = Lexicon::new([
+        multiword("term:mana-value", "mana value", Category::Noun),
+        invariant("n:mana", "mana", Category::Noun),
+        noun("n:value", "value"),
+        swamp,
+        walk,
+        invariant("keyword:Swampwalk", "Swampwalk", Category::Keyword),
+    ])
+    .unwrap();
+    let phrase = lexicon.analyze("mana value");
+    assert_eq!(
+        at(&phrase, 0, 10),
+        BTreeSet::from([word(
+            "term:mana-value",
+            WordForm::Invariant,
+            FeatureBundle::default()
+        ),])
+    );
+    assert_eq!(
+        at(&phrase, 0, 4),
+        BTreeSet::from([word(
+            "n:mana",
+            WordForm::Invariant,
+            FeatureBundle::default()
+        ),])
+    );
+    assert_eq!(
+        at(&phrase, 5, 10),
+        BTreeSet::from([word(
+            "n:value",
+            WordForm::Singular,
+            nominal(Number::Singular)
+        ),])
+    );
+    let bound = lexicon.analyze("Swampwalk");
+    for (start, end, id) in [
+        (0, 5, "type:Swamp"),
+        (5, 9, "bound:walk"),
+        (0, 9, "keyword:Swampwalk"),
+    ] {
+        assert_eq!(
+            at(&bound, start, end),
+            BTreeSet::from([word(id, WordForm::Invariant, FeatureBundle::default()),])
+        );
+    }
+    assert_eq!(bound.unknown_words(), [] as [std::ops::Range<usize>; 0]);
+    assert!(complete(&lexicon, "mana  value").is_empty());
+    assert!(!lexicon.analyze("Swampwalker").matches.iter().any(|m| {
+        m.reading == word("bound:walk", WordForm::Invariant, FeatureBundle::default())
+    }));
+}
+
+#[test]
+fn unicode_positions_and_normalization_preserve_distinct_provenance() {
+    let lexeme = invariant("name:Ae", "Æther", Category::Catalog);
+    let expected_source = lexeme.source.clone();
+    let lexicon = Lexicon::new([lexeme, noun("n:counter", "counter")]).unwrap();
+    let text = lexicon.analyze_source("Æther\u{a0}counter", Some("Æther counter"));
+    assert_eq!(text.raw, "Æther\u{a0}counter");
+    assert_eq!(text.normalized.as_deref(), Some("Æther counter"));
+    assert_eq!(text.tokens.iter().collect::<String>(), "Æther counter");
+    assert_eq!(text.byte_range(6, 13), Some(7..14));
+    assert_eq!(&text.text()[7..14], "counter");
+    assert_eq!(
+        at(&text, 6, 13),
+        BTreeSet::from([word(
+            "n:counter",
+            WordForm::Singular,
+            nominal(Number::Singular)
+        ),])
+    );
+    assert_eq!(
+        at(&text, 0, 5),
+        BTreeSet::from([word(
+            "name:Ae",
+            WordForm::Invariant,
+            FeatureBundle::default()
+        ),])
+    );
+    let name = text
+        .matches
+        .iter()
+        .find(|m| m.start == 0 && m.end == 5)
+        .unwrap();
+    let LexicalReading::Word(value) = &name.reading else {
+        panic!("expected declared name");
+    };
+    assert_eq!(lexicon.lexemes()[&value.lexeme].source, expected_source);
+    assert_eq!(text.byte_range(14, 15), None);
+    assert_eq!(text.byte_range(8, 2), None);
+    assert_eq!(lexicon.analyze("Æther counter").normalized, None);
+}
+
+#[test]
+fn undeclared_words_and_parts_of_speech_are_not_guessed() {
+    let lexicon = Lexicon::new([noun("n:counter", "counter")]).unwrap();
+    let text = lexicon.analyze("counters countering unknown");
+    assert_eq!(
+        at(&text, 0, 8),
+        BTreeSet::from([word("n:counter", WordForm::Plural, nominal(Number::Plural)),])
+    );
+    assert_eq!(text.unknown_words(), vec![9..19, 20..27]);
+    assert!(!text.matches.iter().any(|m| m.start >= 9));
+}
+
+#[test]
+fn independently_constructed_readings_roundtrip_through_realization() {
+    let lexicon = Lexicon::new([noun("n:counter", "counter")]).unwrap();
+    for (reading, expected_surface) in [
+        (
+            word("n:counter", WordForm::Plural, nominal(Number::Plural)),
+            "counters",
+        ),
+        (
+            initial(word(
+                "n:counter",
+                WordForm::Singular,
+                nominal(Number::Singular),
+            )),
+            "Counter",
+        ),
+        (numeral(100, Numeral::Cardinal), "one hundred"),
+        (initial(numeral(2, Numeral::Cardinal)), "Two"),
+        (numeral(1_001, Numeral::Cardinal), "one thousand, one"),
+        (numeral(-2, Numeral::Ordinal), "second to last"),
+        (numeral(-1_000, Numeral::Arabic(true)), "-1,000"),
+        (numeral(4, Numeral::Roman), "IV"),
+    ] {
+        assert_eq!(lexicon.realize(&reading).unwrap(), expected_surface);
+        assert!(
+            complete(&lexicon, expected_surface).contains(&reading),
+            "{reading:?} from {expected_surface}"
+        );
+    }
+}
+
+#[test]
+fn every_returned_reading_realizes_its_exact_source_occurrence() {
+    let lexicon = Lexicon::new([
+        noun("n:counter", "counter"),
+        verb("v:counter", "counter"),
+        multiword("term:mana-value", "mana value", Category::Noun),
+    ])
+    .unwrap();
+    let text = lexicon.analyze("Counters: one hundred mana value; countered.");
+    assert!(
+        text.matches
+            .iter()
+            .any(|m| m.reading == numeral(100, Numeral::Cardinal))
+    );
+    for found in &text.matches {
+        let range = text.byte_range(found.start, found.end).unwrap();
+        assert_eq!(
+            lexicon.realize(&found.reading).unwrap(),
+            &text.text()[range]
+        );
+    }
+}
+
+#[test]
+fn invalid_constructed_values_are_rejected() {
+    let lexicon = Lexicon::new([noun("n:counter", "counter")]).unwrap();
+    for reading in [
+        word("n:counter", WordForm::Plural, nominal(Number::Singular)),
+        word("v:counter", WordForm::Plain, FeatureBundle::default()),
+        numeral(4_000, Numeral::Roman),
+        numeral(2, Numeral::Arabic(true)),
+        initial(numeral(4, Numeral::Roman)),
+    ] {
+        assert!(
+            matches!(
+                lexicon.realize(&reading),
+                Err(LexicalError::UnlicensedValue)
+            ),
+            "{reading:?}"
+        );
+    }
+    assert_eq!(
+        lexicon.realize(&numeral(i32::MAX, Numeral::Roman)).unwrap(),
+        "infinitum"
+    );
+}
+
+#[test]
+fn normalized_numerals_roundtrip_without_erasing_visible_notation() {
+    let lexicon = Lexicon::new([]).unwrap();
+    for value in [i32::MIN, -1000, -999, -1, 0, 1, 999, 1000, i32::MAX] {
+        for requested in [Numeral::Arabic(false), Numeral::Arabic(true)] {
+            let notation = requested.canonical_notation(value);
+            let reading = numeral(value, notation);
+            let surface = requested.try_format(value).unwrap();
+            assert_eq!(lexicon.realize(&reading).unwrap(), surface);
+            assert_eq!(complete(&lexicon, &surface), BTreeSet::from([reading]));
+            assert_eq!(notation.canonical_notation(value), notation);
+        }
+        assert_eq!(
+            Numeral::Arabic(true).canonical_notation(value) == Numeral::Arabic(false),
+            value.unsigned_abs() < 1000,
+        );
+    }
+    for (notation, surface) in [(Numeral::Cardinal, "one"), (Numeral::Roman, "I")] {
+        let value = numeral(1, notation);
+        assert_eq!(lexicon.realize(&value).unwrap(), surface);
+        assert!(complete(&lexicon, surface).contains(&value));
+    }
+}
+
+#[test]
+fn invariant_categories_reject_inapplicable_nominal_features() {
+    let features = FeatureBundle {
+        number: Some(Number::Plural),
+        person: Some(Person::First),
+        case: Some(Case::Nominative),
+        ..FeatureBundle::default()
+    };
+    let mut pronoun = invariant("pro:we", "we", Category::Pronoun);
+    pronoun.forms[0].features = features.clone();
+    let lexicon = Lexicon::new([pronoun]).unwrap();
+    assert_eq!(
+        complete(&lexicon, "we"),
+        BTreeSet::from([word("pro:we", WordForm::Invariant, features.clone()),])
+    );
+    let mut preposition = invariant("p:with", "with", Category::Preposition);
+    preposition.forms[0].features = features;
+    assert!(matches!(Lexicon::new([preposition]),
+        Err(LexicalError::Declaration { lexeme, .. }) if lexeme == "p:with"));
+}
+
+#[test]
+fn combining_marks_do_not_create_false_free_word_boundaries() {
+    let lexicon = Lexicon::new([invariant("n:e", "e", Category::Noun)]).unwrap();
+    let text = lexicon.analyze("e\u{301}");
+    assert_eq!(text.words(), vec![0..2]);
+    assert_eq!(text.unknown_words(), vec![0..2]);
+    assert_eq!(text.byte_range(0, 2), Some(0..3));
+    assert_eq!(text.matches, [] as [sylex_lexicon::LexicalMatch; 0]);
+    assert_eq!(
+        complete(&lexicon, "e"),
+        BTreeSet::from([word("n:e", WordForm::Invariant, FeatureBundle::default()),])
+    );
+}
+
+#[test]
+fn crossing_bound_matches_do_not_hide_unsegmentable_words() {
+    let bound = |id: &str, surface: &str| {
+        let mut lexeme = invariant(id, surface, Category::Noun);
+        lexeme.binding = Binding::Bound;
+        lexeme
+    };
+    let crossing = Lexicon::new([bound("piece:ab", "ab"), bound("piece:bc", "bc")]).unwrap();
+    let text = crossing.analyze("abc");
+    assert_eq!(
+        at(&text, 0, 2),
+        BTreeSet::from([word(
+            "piece:ab",
+            WordForm::Invariant,
+            FeatureBundle::default()
+        ),])
+    );
+    assert_eq!(
+        at(&text, 1, 3),
+        BTreeSet::from([word(
+            "piece:bc",
+            WordForm::Invariant,
+            FeatureBundle::default()
+        ),])
+    );
+    assert_eq!(text.unknown_words(), vec![0..3]);
+    let adjacent = Lexicon::new([bound("piece:a", "a"), bound("piece:bc", "bc")]).unwrap();
+    let text = adjacent.analyze("abc");
+    assert_eq!(
+        at(&text, 0, 1),
+        BTreeSet::from([word(
+            "piece:a",
+            WordForm::Invariant,
+            FeatureBundle::default()
+        ),])
+    );
+    assert_eq!(
+        at(&text, 1, 3),
+        BTreeSet::from([word(
+            "piece:bc",
+            WordForm::Invariant,
+            FeatureBundle::default()
+        ),])
+    );
+    assert_eq!(text.unknown_words(), [] as [std::ops::Range<usize>; 0]);
+}
+
+/// The ability words are a listed inventory [CR#207.2c]; flavor words are
+/// listed nowhere [CR#207.2d], so an italic head no declaration spells is one
+/// and the run itself is the label.
+#[test]
+fn an_italic_run_no_declaration_spells_is_a_flavor_word() {
+    let mut battalion = invariant(
+        "lexeme:ability_word/battalion",
+        "Battalion",
+        Category::Keyword,
+    );
+    battalion
+        .properties
+        .features
+        .insert("LabelKind".into(), "AbilityWord".into());
+    let lexicon =
+        Lexicon::new([battalion, verb("lexeme:keyword_action/attack", "attack")]).unwrap();
+
+    assert_eq!(
+        lexicon.analyze_italic_head("Battalion"),
+        ItalicHead::AbilityWord(LexicalValue {
+            lexeme: "lexeme:ability_word/battalion".into(),
+            form: WordForm::Invariant,
+            features: FeatureBundle::default(),
+            variant: 0,
+            capitalization: SurfaceCase::Declared,
+        }),
+        "a declared ability word is not a flavor word",
+    );
+
+    for run in ["Kowabunga", "Blade Beam", "A Test of Your Reflexes"] {
+        assert_eq!(
+            lexicon.analyze_italic_head(run),
+            ItalicHead::FlavorWord {
+                label: run.to_owned()
+            },
+            "{run:?} is a flavor word whose label is the run verbatim",
+        );
+    }
+
+    assert_eq!(
+        lexicon.analyze_italic_head("Attack"),
+        ItalicHead::FlavorWord {
+            label: "Attack".to_owned()
+        },
+        "only a listed ability word displaces a flavor word; a declared verb does not",
+    );
+}
+
+#[test]
+fn declared_alphabetic_slash_compounds_preserve_identity_without_guessing_parts() {
+    let lexicon = Lexicon::new([
+        invariant("coordinator:inclusive", "and/or", Category::Coordinator),
+        invariant("coordinator:translated", "oui/non", Category::Coordinator),
+    ])
+    .unwrap();
+    for (owner, surface) in [
+        ("coordinator:inclusive", "and/or"),
+        ("coordinator:translated", "oui/non"),
+    ] {
+        let expected = word(owner, WordForm::Invariant, FeatureBundle::default());
+        assert_eq!(lexicon.realize(&expected).unwrap(), surface);
+        assert_eq!(complete(&lexicon, surface), BTreeSet::from([expected]));
+    }
+    for surface in [
+        "and", "or", "and / or", "and/ or", "and /or", "and/nor", "and//or",
+    ] {
+        assert!(complete(&lexicon, surface).is_empty(), "{surface}");
+    }
+    for surface in ["/word", "word/", "word//word", "1/2", "word/2", "2/word"] {
+        for binding in [Binding::Free, Binding::Bound] {
+            let mut entry = invariant("invalid", surface, Category::Coordinator);
+            entry.binding = binding;
+            assert!(Lexicon::new([entry]).is_err(), "{surface} {binding:?}");
+        }
+        let mut entry = invariant("invalid-variant", "ordinary", Category::Coordinator);
+        entry.forms[0].surfaces = Some(vec![surface.into()]);
+        assert!(Lexicon::new([entry]).is_err(), "override {surface}");
+    }
+    let notation = Lexicon::new([invariant("notation", "1/2", Category::Symbol)]).unwrap();
+    let expected = word("notation", WordForm::Invariant, FeatureBundle::default());
+    assert_eq!(notation.realize(&expected).unwrap(), "1/2");
+    assert_eq!(complete(&notation, "1/2"), BTreeSet::from([expected]));
+}
+
+#[test]
+fn ordinary_recipes_reject_separator_and_quote_boundaries() {
+    for surface in [
+        "two words",
+        "two\nwords",
+        "word\t",
+        "a,b",
+        "\"word\"",
+        "“word”",
+        "'word'",
+        "word;next",
+    ] {
+        assert!(
+            Lexicon::new([invariant("word", surface, Category::Noun)]).is_err(),
+            "{surface:?}"
+        );
+        let mut lexeme = noun("noun", "card");
+        lexeme.forms[0].surfaces = Some(vec![surface.into()]);
+        assert!(Lexicon::new([lexeme]).is_err(), "override {surface:?}");
+    }
+    for surface in [
+        "two\nwords",
+        "two\twords",
+        "two  words",
+        "two \"words\"",
+        "two, words",
+    ] {
+        assert!(
+            Lexicon::new([multiword("phrase", surface, Category::Noun)]).is_err(),
+            "{surface:?}"
+        );
+    }
+    let lexicon = Lexicon::new([
+        multiword("phrase", "two words", Category::Noun),
+        invariant("catalog", "A, \"Name\"", Category::Catalog),
+        invariant("symbol", "{W/U}", Category::Symbol),
+        invariant("contraction", "y'all", Category::Pronoun),
+    ])
+    .unwrap();
+    for surface in ["two words", "A, \"Name\"", "{W/U}", "y'all"] {
+        assert!(!complete(&lexicon, surface).is_empty());
+    }
+    let mut disguised = invariant("noun", "two words", Category::Noun);
+    disguised.surface_structure = SurfaceStructure::Opaque;
+    assert!(Lexicon::new([disguised]).is_err());
+}
+
+#[test]
+fn bound_forms_expose_adjacent_hosts_without_guessing_unknown_hosts() {
+    let mut prefix = invariant("prefix:non", "non", Category::Affix);
+    prefix.binding = Binding::Prefix;
+    let mut suffix = invariant("suffix:walk", "walk", Category::Keyword);
+    suffix.binding = Binding::Suffix;
+    let lexicon = Lexicon::new([prefix, suffix, noun("noun:land", "land")]).unwrap();
+    for text in ["nonland", "landwalk", "nonlandwalk", "nonnonland"] {
+        let analyzed = lexicon.analyze(text);
+        assert!(analyzed.unknown_words().is_empty(), "{text}");
+        let start = text.find("land").unwrap();
+        assert_eq!(
+            at(&analyzed, start, start + 4),
+            BTreeSet::from([word(
+                "noun:land",
+                WordForm::Singular,
+                nominal(Number::Singular)
+            )])
+        );
+    }
+    for text in ["unknownland", "landunknown", "nonunknown", "unknownwalk"] {
+        assert!(!lexicon.analyze(text).unknown_words().is_empty(), "{text}");
+    }
+    assert_eq!(
+        lexicon.analyze("outlandish").matches,
+        [] as [sylex_lexicon::LexicalMatch; 0]
+    );
+}
+
+#[test]
+fn plain_forms_do_not_assign_finiteness_but_participles_do() {
+    let lexicon = Lexicon::new([verb("v:draw", "draw")]).unwrap();
+    let plain = word("v:draw", WordForm::Plain, FeatureBundle::default());
+    assert!(complete(&lexicon, "draw").contains(&plain));
+    assert_eq!(lexicon.realize(&plain).unwrap(), "draw");
+    for finiteness in [Finiteness::Finite, Finiteness::Nonfinite] {
+        let falsely_classified = word(
+            "v:draw",
+            WordForm::Plain,
+            FeatureBundle {
+                finiteness: Some(finiteness),
+                ..FeatureBundle::default()
+            },
+        );
+        assert!(matches!(
+            lexicon.realize(&falsely_classified),
+            Err(LexicalError::UnlicensedValue)
+        ));
+        let mut declaration = verb("v:draw", "draw");
+        declaration
+            .forms
+            .iter_mut()
+            .find(|slot| slot.form == WordForm::Plain)
+            .unwrap()
+            .features
+            .finiteness = Some(finiteness);
+        assert!(matches!(
+            Lexicon::new([declaration]),
+            Err(LexicalError::Declaration { .. })
+        ));
+    }
+    assert!(complete(&lexicon, "drawing").contains(&word(
+        "v:draw",
+        WordForm::GerundParticiple,
+        nonfinite()
+    )));
+    assert!(complete(&lexicon, "drawed").contains(&word(
+        "v:draw",
+        WordForm::PastParticiple,
+        nonfinite()
+    )));
+}
+
+#[test]
+fn flavor_heads_are_lossless_open_labels_at_line_starts() {
+    // Title casing leaves function words lowercase (*of the*).
+    let lexicon = Lexicon::new([
+        invariant("prep:of", "of", Category::Preposition),
+        invariant("det:the", "the", Category::Determinative),
+    ])
+    .unwrap();
+    for (label, body) in [
+        // Astrologian's Planisphere and Blue Mage's Cane.
+        ("Diana", "Equip {2}"),
+        ("Spirit of the Whalaqee", "Equip {2}"),
+        // Deliberately unseen label establishes the open lexical class.
+        ("An Unlisted Label Ω!", "Equip {2}"),
+    ] {
+        let text = format!("{label} — {body}");
+        let expected = LexicalReading::FlavorWord {
+            label: label.into(),
+        };
+        let end = label.chars().count() + 2;
+        assert_eq!(
+            at(&lexicon.analyze(&text), 0, end),
+            BTreeSet::from([expected.clone()])
+        );
+        assert_eq!(lexicon.realize(&expected).unwrap(), format!("{label} —"));
+        let surface = lexicon.surface_features(&expected).unwrap();
+        assert!(surface.initial);
+        assert!(!surface.interior);
+        assert_eq!(surface.onset, None);
+        let prefixed = format!("Trample\n{text}");
+        assert_eq!(
+            at(&lexicon.analyze(&prefixed), 8, 8 + end),
+            BTreeSet::from([expected])
+        );
+    }
+    for text in [
+        " — Equip {2}",
+        "Diana— Equip {2}",
+        "Diana - Equip {2}",
+        "Diana\t — Equip {2}",
+        "Diana\n — Equip {2}",
+    ] {
+        assert!(
+            !lexicon
+                .analyze(text)
+                .matches
+                .iter()
+                .any(|found| matches!(found.reading, LexicalReading::FlavorWord { .. })),
+            "{text:?}"
+        );
+    }
+    let analyzed = lexicon.analyze("prefix Diana — Equip {2}");
+    assert!(!analyzed.matches.iter().any(
+        |found| found.start == 7 && matches!(found.reading, LexicalReading::FlavorWord { .. })
+    ));
+    for label in ["", "Diana\nOther", "Diana\tOther", "Diana — Other"] {
+        let reading = LexicalReading::FlavorWord {
+            label: label.into(),
+        };
+        assert!(lexicon.realize(&reading).is_err());
+        assert!(lexicon.surface_features(&reading).is_err());
+    }
+}
+
+/// A Flavor Word has natural title casing (`docs/oracle-style-guide.md` §14,
+/// Ability words and flavor words): a label with a lowercase word that is
+/// not a function word is a clause before an em dash, never a Flavor Word.
+#[test]
+fn a_label_without_title_casing_is_no_flavor_word() {
+    let lexicon = Lexicon::new([
+        invariant("pro:it", "it", Category::Pronoun),
+        invariant("det:a", "a", Category::Determinative),
+    ])
+    .unwrap();
+    let flavor = |text: &str| {
+        lexicon
+            .analyze(text)
+            .matches
+            .iter()
+            .any(|found| matches!(found.reading, LexicalReading::FlavorWord { .. }))
+    };
+    // Company Commander's flavor word.
+    assert!(flavor("Bring it Down! — Draw a card."));
+    // Ensnared by the Mara: the keyword action's options follow the dash.
+    assert!(!flavor(
+        "Each opponent faces a villainous choice — They discard a card, or you draw a card."
+    ));
+    for label in [
+        "Each opponent faces a villainous choice",
+        "Uncharted marvel",
+    ] {
+        let reading = LexicalReading::FlavorWord {
+            label: label.into(),
+        };
+        assert!(lexicon.realize(&reading).is_err(), "{label}");
+    }
+}
+
+/// A registered ability word [CR#207.2c] or keyword [CR#702.1] is never
+/// also emitted as an open flavor-word label [CR#207.2d].
+#[test]
+fn a_registered_label_is_never_also_a_flavor_word() {
+    let mut channel = invariant("lexeme:ability_word/channel", "Channel", Category::Keyword);
+    channel
+        .properties
+        .features
+        .insert("LabelKind".into(), "AbilityWord".into());
+    let equip = invariant("lexeme:keyword_ability/equip", "Equip", Category::Keyword);
+    let lexicon = Lexicon::new([channel, equip]).unwrap();
+    // Mnemonic Sphere's ability head.
+    for text in [
+        "Channel — {U}, Discard this card: Draw a card.",
+        "Equip — {U}, Discard this card: Draw a card.",
+    ] {
+        let analyzed = lexicon.analyze(text);
+        assert!(
+            !analyzed
+                .matches
+                .iter()
+                .any(|found| matches!(found.reading, LexicalReading::FlavorWord { .. })),
+            "{text:?}"
+        );
+        assert!(
+            at(&analyzed, 0, if text.starts_with('C') { 7 } else { 5 })
+                .iter()
+                .any(|reading| matches!(reading, LexicalReading::Word(_)))
+        );
+    }
+    assert!(matches!(
+        lexicon.analyze_italic_head("Channel"),
+        ItalicHead::AbilityWord(_)
+    ));
+    assert!(matches!(
+        lexicon.analyze_italic_head("Equip"),
+        ItalicHead::Keyword(_)
+    ));
+
+    assert_eq!(
+        lexicon
+            .analyze("Diana — Equip {2}")
+            .matches
+            .iter()
+            .find_map(|found| match &found.reading {
+                LexicalReading::FlavorWord { label } => Some(label.as_str()),
+                _ => None,
+            }),
+        Some("Diana"),
+        "an unregistered label is still a flavor word",
+    );
+    for label in ["Channel", "Equip"] {
+        let reading = LexicalReading::FlavorWord {
+            label: label.into(),
+        };
+        assert!(lexicon.realize(&reading).is_err(), "{label}");
+        assert!(lexicon.surface_features(&reading).is_err(), "{label}");
+    }
+}
+
+#[test]
+fn an_anchor_word_is_a_registered_label_on_the_cards_that_admit_it() {
+    let mut khans = invariant("anchor_word:Khans", "Khans", Category::Keyword);
+    khans.capitalization = Capitalization::Exact;
+    khans
+        .properties
+        .features
+        .insert("LabelKind".into(), "AnchorWord".into());
+    khans.card_scoped_surfaces.insert("Khans".into());
+    khans.card_scope = BTreeSet::from([LexemeId::new("name:Citadel Siege")]);
+    let lexicon = Lexicon::new([khans]).unwrap();
+    assert!(matches!(
+        lexicon.analyze_italic_head("Khans"),
+        ItalicHead::AnchorWord(_)
+    ));
+    let text = "• Khans — At the beginning of combat on your turn, draw a card.";
+    let readings = |scope: &[&str]| {
+        let scope = scope.iter().map(|card| LexemeId::new(card)).collect();
+        let analyzed = lexicon.analyze_source_scoped(text, None, &scope);
+        (
+            at(&analyzed, 2, 7)
+                .iter()
+                .any(|reading| matches!(reading, LexicalReading::Word(_))),
+            analyzed
+                .matches
+                .iter()
+                .any(|found| matches!(found.reading, LexicalReading::FlavorWord { .. })),
+        )
+    };
+    // On its own card, the anchor word is the label and never a Flavor Word.
+    assert_eq!(readings(&["name:Citadel Siege"]), (true, false));
+    // Elsewhere nothing declares the run, so it is an open Flavor Word.
+    assert_eq!(readings(&[]), (false, true));
+}
+
+#[test]
+fn lexical_ids_are_interned_across_declarations_values_and_wire_formats() {
+    fn copied<T: Copy>(value: T) -> T {
+        value
+    }
+    let declared = noun("lexical-id-wire/card", "card");
+    let id = copied(declared.id);
+    let json = serde_json::to_value(&declared).unwrap();
+    assert_eq!(json["id"], "lexical-id-wire/card");
+    let restored: Lexeme = serde_json::from_value(json.clone()).unwrap();
+    assert_eq!(restored, declared);
+    assert!(std::ptr::eq(restored.id.as_str(), id.as_str()));
+    assert_eq!(serde_json::to_value(&restored).unwrap(), json);
+    let ron = ron::to_string(&declared).unwrap();
+    let restored: Lexeme = ron::from_str(&ron).unwrap();
+    assert_eq!(restored, declared);
+    assert!(std::ptr::eq(restored.id.as_str(), id.as_str()));
+
+    let lexicon = Lexicon::new([declared.clone()]).unwrap();
+    assert_eq!(lexicon.lexemes()["lexical-id-wire/card"], declared);
+    let analyzed = lexicon.analyze("card");
+    let LexicalReading::Word(value) = &analyzed.matches[0].reading else {
+        panic!("declared word")
+    };
+    assert_eq!(value.lexeme, id);
+    assert!(std::ptr::eq(value.lexeme.as_str(), id.as_str()));
+    let json = serde_json::to_value(&analyzed.matches[0].reading).unwrap();
+    assert_eq!(json["Word"]["lexeme"], "lexical-id-wire/card");
+    let restored: LexicalReading = serde_json::from_value(json).unwrap();
+    assert_eq!(restored, analyzed.matches[0].reading);
+    assert_eq!(lexicon.realize(&restored).unwrap(), "card");
+    let LexicalReading::Word(value) = restored else { panic!("declared word") };
+    assert!(std::ptr::eq(value.lexeme.as_str(), id.as_str()));
+
+    let absent = "lexical-id-lookup-never-interned";
+    assert!(LexemeId::get(absent).is_none());
+    assert!(!lexicon.lexemes().contains_key(absent));
+    assert_eq!(
+        lexicon.analyze(absent).matches,
+        [] as [sylex_lexicon::LexicalMatch; 0]
+    );
+    assert!(LexemeId::get(absent).is_none());
+    assert!(matches!(
+        Lexicon::new([declared.clone(), declared]),
+        Err(LexicalError::Declaration { .. })
+    ));
+}
+
+#[test]
+fn serialized_surface_scope_filters_matching_and_keeps_realization() {
+    let mut card = invariant(
+        "card:Chandra, Pyromaster",
+        "Chandra, Pyromaster",
+        Category::Catalog,
+    );
+    card.capitalization = Capitalization::Exact;
+    card.forms[0].surfaces = Some(vec!["Chandra, Pyromaster".into(), "Chandra".into()]);
+    card.card_scoped_surfaces.insert("Chandra".into());
+    let decoded: Lexeme = ron::from_str(&ron::to_string(&card).unwrap()).unwrap();
+    assert_eq!(decoded, card);
+    let lexicon = Lexicon::new([decoded, noun("subtype:Chandra", "Chandra")]).unwrap();
+    let scope = BTreeSet::from([card.id]);
+    for (scope, expected) in [
+        (BTreeSet::new(), 0),
+        (BTreeSet::from([LexemeId::new("another-card")]), 0),
+        (scope, 1),
+    ] {
+        let input = lexicon.analyze_source_scoped("raw metadata", Some("Chandra"), &scope);
+        assert_eq!(input.raw, "raw metadata");
+        assert_eq!(input.text(), "Chandra");
+        let words: Vec<_> = input
+            .matches
+            .iter()
+            .filter_map(|m| match &m.reading {
+                LexicalReading::Word(v) if v.lexeme == card.id => Some(v),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(words.len(), expected);
+        for value in words {
+            assert_eq!(value.variant, 1);
+            assert_eq!(
+                lexicon
+                    .realize(&LexicalReading::Word(value.clone()))
+                    .unwrap(),
+                "Chandra"
+            );
+        }
+        assert!(input.matches.iter().any(
+            |m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == "subtype:Chandra")
+        ));
+        let full = lexicon.analyze_source_scoped("Chandra, Pyromaster", None, &scope);
+        assert!(full.matches.iter().any(|m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == card.id && v.variant == 0)));
+    }
+    card.card_scoped_surfaces
+        .insert("undeclared spelling".into());
+    assert!(Lexicon::new([card]).is_err());
+}
+
+#[test]
+fn a_card_scope_admits_spellings_on_the_cards_it_names() {
+    let mut token = invariant(
+        "introduced_name:Marit Lage",
+        "Marit Lage",
+        Category::Catalog,
+    );
+    token.capitalization = Capitalization::Exact;
+    token.card_scoped_surfaces.insert("Marit Lage".into());
+    token.card_scope = BTreeSet::from([
+        LexemeId::new("name:Dark Depths"),
+        LexemeId::new("name:Marit Lage's Slumber"),
+    ]);
+    let lexicon = Lexicon::new([token.clone()]).unwrap();
+    let found = |scope: &[&str]| {
+        let scope = scope.iter().map(|card| LexemeId::new(card)).collect();
+        lexicon
+            .analyze_source_scoped("Marit Lage", None, &scope)
+            .matches
+            .iter()
+            .any(|m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == token.id))
+    };
+    assert!(found(&["name:Dark Depths"]));
+    assert!(found(&["name:Marit Lage's Slumber"]));
+    assert!(!found(&[]));
+    assert!(!found(&["name:Vampire Hexmage"]));
+    // The Lexeme's own identity is not one of the cards that admit it.
+    assert!(!found(&["introduced_name:Marit Lage"]));
+    token.card_scoped_surfaces.clear();
+    assert!(Lexicon::new([token]).is_err());
+}
+
+#[test]
+fn mode_bullets_stay_outside_open_flavor_word_labels() {
+    let lexicon = Lexicon::new([]).unwrap();
+    for label in [
+        "Cure Wounds",
+        "Dispel Magic",
+        "Gentle Repose",
+        "An Unlisted Label Ω!",
+    ] {
+        let expected = LexicalReading::FlavorWord {
+            label: label.into(),
+        };
+        for prefix in ["• ", "Choose one —\n• "] {
+            let text = format!("{prefix}{label} — You gain 2 life.");
+            let start = prefix.chars().count();
+            let end = start + label.chars().count() + 2;
+            assert_eq!(
+                at(&lexicon.analyze(&text), start, end),
+                BTreeSet::from([expected.clone()])
+            );
+            assert_eq!(lexicon.realize(&expected).unwrap(), format!("{label} —"));
+            assert!(at(&lexicon.analyze(&text), start - 2, end).is_empty());
+        }
+    }
+    let invalid = LexicalReading::FlavorWord {
+        label: "• Cure Wounds".into(),
+    };
+    assert!(lexicon.realize(&invalid).is_err());
+    assert!(lexicon.surface_features(&invalid).is_err());
+}
+
+#[test]
+fn independent_genitive_is_a_declared_pronoun_paradigm_cell() {
+    let features = FeatureBundle {
+        number: Some(Number::Singular),
+        person: Some(Person::Second),
+        case: Some(Case::Genitive),
+        ..FeatureBundle::default()
+    };
+    let mut pronoun = invariant("you", "you", Category::Pronoun);
+    pronoun.forms = vec![FormDeclaration {
+        form: WordForm::IndependentGenitive,
+        features: features.clone(),
+        surfaces: Some(vec!["yours".into()]),
+    }];
+    let lexicon = Lexicon::new([pronoun]).unwrap();
+    let expected = word("you", WordForm::IndependentGenitive, features);
+    assert_eq!(
+        at(&lexicon.analyze("yours"), 0, 5),
+        BTreeSet::from([expected.clone()])
+    );
+    assert_eq!(lexicon.realize(&expected).unwrap(), "yours");
+}
+
+#[test]
+fn independent_genitive_requires_pronoun_genitive_features_and_explicit_spelling() {
+    let features = FeatureBundle {
+        number: Some(Number::Singular),
+        person: Some(Person::Second),
+        case: Some(Case::Genitive),
+        ..FeatureBundle::default()
+    };
+    let mut pronoun = invariant("you", "you", Category::Pronoun);
+    pronoun.forms = vec![FormDeclaration {
+        form: WordForm::IndependentGenitive,
+        features,
+        surfaces: Some(vec!["yours".into()]),
+    }];
+    let mut wrong_category = pronoun.clone();
+    wrong_category.category = Category::Noun;
+    let mut wrong_case = pronoun.clone();
+    wrong_case.forms[0].features.case = Some(Case::Accusative);
+    let mut verbal = pronoun.clone();
+    verbal.forms[0].features.finiteness = Some(Finiteness::Finite);
+    let mut missing_person = pronoun.clone();
+    missing_person.forms[0].features.person = None;
+    let mut missing_number = pronoun.clone();
+    missing_number.forms[0].features.number = None;
+    let mut missing_spelling = pronoun;
+    missing_spelling.forms[0].surfaces = None;
+    for invalid in [
+        wrong_category,
+        wrong_case,
+        verbal,
+        missing_person,
+        missing_number,
+        missing_spelling,
+    ] {
+        assert!(Lexicon::new([invalid]).is_err());
+    }
+}

@@ -70,7 +70,7 @@ enum Cmd {
     Lexical(LexicalArgs),
     /// Build the native Lean workbench with warnings treated as errors.
     Lean(LeanArgs),
-    /// `.syl` tooling: check `deckmaste_dsl` against `SylGen`'s parser over
+    /// `.syl` tooling: check `sylex_syl` against `SylGen`'s parser over
     /// `plugins_v3`, or format `.syl` files.
     Dsl(DslArgs),
     /// On-demand "bearings" dumps of current code shape (`enums`).

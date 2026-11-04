@@ -1,0 +1,874 @@
+//! `extract` — emit every supported card as a Card-shaped `<name>.ron.todo`
+//! (a `TodoCard`) whose abilities are `Unparsed` oracle lines. Owns the oracle
+//! normalization helpers (`strip_reminder_text`, `expand_keyword_lines`,
+//! `expand_repeated_from_lines`, `self_ref_to_tilde`) and Scryfall field
+//! accessors. Covers the `normal` and `modal_dfc` layouts (the two semantic
+//! `Card` variants); other layouts are skipped until the semantic `Card` grows
+//! variants for them.
+
+use std::fs::File;
+use std::io::BufReader;
+use std::path::Path;
+use std::sync::LazyLock;
+
+use crate::ExtractError;
+use sylex_catalogs::CatalogSet;
+use sylex_core::plugin::card_file;
+use sylex_upstream::DataStr;
+use sylex_upstream::scryfall::OracleCardReader;
+use sylex_semantics_v1::Color;
+use sylex_semantics_v1::StatValue;
+use regex::Regex;
+
+use crate::ident::to_rust_ident;
+use crate::todo_card::RawIdent;
+use crate::todo_card::TodoAbility;
+use crate::todo_card::TodoCard;
+use crate::todo_card::TodoCardFace;
+use crate::todo_card::render;
+
+/// Uppercases the first character (ASCII only, like jq's `ascii_upcase`).
+fn capitalize(text: &str) -> String {
+    let mut chars = text.chars();
+    match chars.next() {
+        Some(first) => first.to_ascii_uppercase().to_string() + chars.as_str(),
+        None => String::new(),
+    }
+}
+
+/// Removes single-line parentheticals (reminder text), keeping at most one
+/// of the surrounding spaces. Lines that consisted solely of reminder text
+/// are dropped entirely.
+fn strip_reminder_text(text: &str) -> String {
+    static PARENTHETICAL: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r" ?\([^)\n]+\)( ?)").unwrap());
+
+    text.split('\n')
+        .filter_map(|line| {
+            let stripped = PARENTHETICAL.replace_all(line, "$1");
+            (!stripped.is_empty() || line.is_empty()).then(|| stripped.into_owned())
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+/// `item.starts_with(keyword)`, ASCII-case-insensitively: oracle keyword
+/// lines are sentence case ("First strike, deathtouch") while the data's
+/// names are Title Case ("First Strike"), so every position needs the fold,
+/// not just the first.
+fn starts_with_keyword(item: &str, keyword: &str) -> bool {
+    item.is_char_boundary(keyword.len()) && item[..keyword.len()].eq_ignore_ascii_case(keyword)
+}
+
+/// Splits lines that are separator-joined lists of keyword abilities into one
+/// keyword per line, e.g. "Flying, vigilance" -> "Flying\nVigilance". Keyword
+/// abilities chain on ", " — or, when a keyword carries reminder text
+/// ("First strike; reach (…)"), on "; ". Reminder text is stripped before
+/// this, so the separator is bare. Most lines aren't keyword lists, so nothing
+/// is allocated until one is.
+fn expand_keyword_lines(text: &str, keyword_abilities: &[DataStr<'_>]) -> String {
+    static SEPARATOR: LazyLock<Regex> = LazyLock::new(|| Regex::new(r", |; ").unwrap());
+    let is_keyword = |item: &str| {
+        keyword_abilities
+            .iter()
+            .any(|keyword| starts_with_keyword(item, keyword))
+    };
+    text.split('\n')
+        .flat_map(|line| {
+            if SEPARATOR.split(line).all(is_keyword) {
+                SEPARATOR.split(line).map(capitalize).collect()
+            } else {
+                vec![line.to_owned()]
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+/// Splits a multi-quality protection/hexproof keyword line into one line per
+/// quality: "Protection from [quality A] and from [quality B]" is shorthand
+/// for "protection from [quality A]" and "protection from [quality B]" — two
+/// separate abilities ([CR#702.16g]; hexproof: [CR#702.11f]). Only the
+/// repeated-"from" form (with or without the serial comma) is that shorthand;
+/// a single "from" over a compound quality ("Hexproof from artifacts and
+/// enchantments") passes through untouched.
+fn expand_repeated_from_lines(text: &str) -> String {
+    fn qualities<'a>(line: &'a str, head: &str) -> Option<Vec<&'a str>> {
+        let rest = line.strip_prefix(head)?.strip_prefix(" from ")?;
+        let split: Vec<&str> = rest
+            .split(", and from ")
+            .flat_map(|piece| piece.split(" and from "))
+            .flat_map(|piece| piece.split(", from "))
+            .collect();
+        (split.len() > 1).then_some(split)
+    }
+    text.split('\n')
+        .flat_map(|line| {
+            ["Protection", "Hexproof"]
+                .iter()
+                .find_map(|head| {
+                    Some(
+                        qualities(line, head)?
+                            .iter()
+                            .map(|q| format!("{head} from {q}"))
+                            .collect::<Vec<_>>(),
+                    )
+                })
+                .unwrap_or_else(|| vec![line.to_owned()])
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+/// Replaces every whole-word, case-sensitive occurrence of `name` with `~`.
+/// The substring pre-check skips building a regex for the common case of a
+/// card that never mentions the name at all.
+fn replace_whole_word(text: &str, name: &str) -> String {
+    if name.is_empty() || !text.contains(name) {
+        return text.to_owned();
+    }
+    let pattern = format!(r"\b{}\b", regex::escape(name));
+    // Always valid: an escaped literal wrapped in word boundaries.
+    let re = Regex::new(&pattern).expect("escaped name is a valid regex");
+    re.replace_all(text, "~").into_owned()
+}
+
+/// Replaces a card's references to *itself* with the `~` self-reference sigil.
+///
+/// Replaces every whole-word, case-sensitive occurrence of `face_name`. For a
+/// legendary face whose name has a comma, the pre-comma short name (e.g.
+/// "Boromir" from "Boromir, Gondor's Hope") is also collapsed -- unless it is
+/// a keyword ability ("Storm") or shorter than three characters ("Me"), both
+/// too collision-prone to replace blindly.
+fn self_ref_to_tilde(
+    text: &str,
+    face_name: &str,
+    is_legendary: bool,
+    keyword_abilities: &[DataStr<'_>],
+) -> String {
+    let out = replace_whole_word(text, face_name);
+
+    let short = is_legendary
+        .then(|| face_name.split_once(',').map(|(short, _)| short.trim()))
+        .flatten()
+        .filter(|short| short.chars().count() >= 3)
+        .filter(|short| {
+            !keyword_abilities
+                .iter()
+                .any(|kw| kw.as_str().eq_ignore_ascii_case(short))
+        });
+
+    let named = match short {
+        Some(short) => replace_whole_word(&out, short),
+        None => out,
+    };
+    this_self_ref_to_tilde(&named)
+}
+
+/// Collapses generic "this `<noun>`" / "This `<noun>`" self-references to `~`,
+/// independent of the card's name. `~` denotes the object the text belongs to
+/// -- the card itself, or, inside a granted (quoted) ability, the token gaining
+/// it -- so this is a blind whole-phrase substitution: `WotC` templating
+/// reserves "this X" for the source object (any other object is
+/// "that"/"it"/"the X"), so one line may legitimately yield two `~`s (a card
+/// and a token it makes).
+///
+/// The noun set is fixed and **case-sensitive**: lowercase card-type and
+/// generic nouns, plus the capitalized permanent-subtype nouns that occur in
+/// the corpus. Case-sensitivity is load-bearing -- it keeps lowercase English
+/// ("in this case", "this way") from matching the subtype `Case`. Nouns that
+/// never denote the object stay literal (turn, way, mana, ability, combat,
+/// effect, phase, step, game).
+///
+/// `door` is deliberately left out for now: very borderline -- "this door" is
+/// one half of a Room, not the whole card, and a lowercase common word risks
+/// collisions. (Capitalized `Room` is included -- it self-refs the whole card.)
+fn this_self_ref_to_tilde(text: &str) -> String {
+    static THIS_NOUN: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(
+            r"\b[Tt]his (creature|land|artifact|enchantment|planeswalker|battle|permanent|spell|card|token|Aura|Equipment|Vehicle|Saga|Siege|Class|Spacecraft|Case|Room)\b",
+        )
+        .expect("self-reference noun pattern is valid")
+    });
+    THIS_NOUN.replace_all(text, "~").into_owned()
+}
+
+fn ron_color(code: &str) -> Result<Color, ExtractError> {
+    Color::from_code(code).ok_or_else(|| ExtractError::ColorIndicator { code: code.into() })
+}
+
+/// One derived type/subtype/supertype name → a bare-ident `RawIdent`
+/// (`"Time Lord"` → `TimeLord`), matching the macro-invocation name the
+/// macro-aware reader expands at graduation.
+fn ident(name: &str) -> RawIdent {
+    RawIdent(to_rust_ident(name))
+}
+
+/// Scryfall stat string → semantic `StatValue`: integers (incl. negative) are
+/// `Number`; `X` is `Variable`; anything else (`*`, `1+*`) is
+/// `DefinedByAbility`.
+fn stat_value(text: &str) -> StatValue {
+    if let Ok(n) = text.parse::<sylex_semantics_v1::Int>() {
+        StatValue::Number(n)
+    } else if text == "X" {
+        // `X` is loyalty defined by the casting cost (the only place `X` stats
+        // appear on standard-legal cards); `*`/`1+*` take the DefinedByAbility
+        // arm.
+        StatValue::Variable
+    } else {
+        StatValue::DefinedByAbility
+    }
+}
+
+#[derive(Debug, Clone)]
+struct ExtractFace {
+    name: String,
+    mana_cost: Option<String>,
+    color_indicator: Option<Vec<String>>,
+    supertypes: Vec<String>,
+    types: Vec<String>,
+    subtypes: Vec<String>,
+    text: Option<String>,
+    power: Option<String>,
+    toughness: Option<String>,
+    loyalty: Option<String>,
+    defense: Option<String>,
+}
+
+impl ExtractFace {
+    fn from_unit(
+        unit: sylex_upstream::scryfall::OracleUnit<'_>,
+        catalogs: &CatalogSet,
+    ) -> Result<Self, ExtractError> {
+        let type_line = unit
+            .type_line()
+            .ok_or_else(|| ExtractError::MissingTypeLine {
+                name: unit.display_name().into(),
+            })?;
+        let parts = catalogs.parse_type_line(type_line)?;
+        Ok(Self {
+            name: unit.display_name().to_owned(),
+            mana_cost: unit.mana_cost().map(str::to_owned),
+            color_indicator: unit.color_indicator().map(<[String]>::to_vec),
+            supertypes: parts.supertypes,
+            types: parts.card_types,
+            subtypes: parts.subtypes,
+            text: unit.oracle_text().map(str::to_owned),
+            power: unit.power().map(str::to_owned),
+            toughness: unit.toughness().map(str::to_owned),
+            loyalty: unit.loyalty().map(str::to_owned),
+            defense: unit.defense().map(str::to_owned),
+        })
+    }
+}
+
+/// Builds a `TodoCardFace` from one Scryfall unit: structured fields plus one
+/// `Unparsed` ability per normalized oracle line (strip reminder text, split
+/// comma-joined keyword lines, `~` self-refs).
+///
+/// # Errors
+/// If the mana cost or a color indicator fails to parse.
+fn face(
+    card: &ExtractFace,
+    keyword_abilities: &[DataStr<'_>],
+) -> Result<TodoCardFace, ExtractError> {
+    let face_name = card.name.as_str();
+    let is_legendary = card.supertypes.iter().any(|t| t == "Legendary");
+    let abilities = card.text.as_deref().map_or_else(Vec::new, |text| {
+        let text = sylex_upstream::academyruins::normalize_quotes(text);
+        // Fold spelled-number energy ("Pay six {E}") into a `{E}` run so the
+        // `${0*\{E\}}` matcher graduates it as `PayEnergy(6)`; the same fold
+        // runs in `fidelity::normalize` so the diff meets the spelled
+        // render form.
+        let text = sylex_plugin_v1::energy::normalize_spelled_energy(&text);
+        let text = expand_keyword_lines(&strip_reminder_text(&text), keyword_abilities);
+        let text = expand_repeated_from_lines(&text);
+        let text = self_ref_to_tilde(&text, face_name, is_legendary, keyword_abilities);
+        text.split('\n')
+            .map(str::trim)
+            .filter(|line| !line.is_empty())
+            .map(|line| TodoAbility::Unparsed(line.to_owned()))
+            .collect()
+    });
+    Ok(TodoCardFace {
+        name: face_name.to_owned(),
+        mana_cost: card
+            .mana_cost
+            .as_deref()
+            .map(str::parse)
+            .transpose()
+            .map_err(|source| ExtractError::ManaCost {
+                name: face_name.into(),
+                source,
+            })?
+            .unwrap_or_default(),
+        color_indicator: card
+            .color_indicator
+            .as_deref()
+            .unwrap_or_default()
+            .iter()
+            .map(|c| ron_color(c))
+            .collect::<Result<_, ExtractError>>()?,
+        supertypes: card.supertypes.iter().map(|t| ident(t)).collect(),
+        types: card.types.iter().map(|t| ident(t)).collect(),
+        subtypes: card.subtypes.iter().map(|t| ident(t)).collect(),
+        abilities,
+        power: card.power.as_deref().map(stat_value),
+        toughness: card.toughness.as_deref().map(stat_value),
+        loyalty: card.loyalty.as_deref().map(stat_value),
+        defense: card.defense.as_deref().map(stat_value),
+    })
+}
+
+/// The `TodoCard` for a card's supported faces, or `None` if its layout isn't
+/// extracted yet. The grammar (`Card::TwoFaced`) admits every two-faced
+/// layout; extraction still reads only `normal` / `modal_dfc` — widening the
+/// Scryfall layout coverage is `pipeline-layout-extraction`.
+///
+/// # Errors
+/// If a face fails to build (see [`face`]).
+fn todo_card(
+    layout: &str,
+    faces: &[ExtractFace],
+    keyword_abilities: &[DataStr<'_>],
+) -> Result<Option<TodoCard>, ExtractError> {
+    Ok(match (layout, faces) {
+        ("normal", [f]) => Some(TodoCard::Normal(face(f, keyword_abilities)?)),
+        ("modal_dfc", [front, back]) => Some(TodoCard::TwoFaced {
+            layout: sylex_semantics_v1::FaceLayout::ModalDfc,
+            front: face(front, keyword_abilities)?,
+            back: face(back, keyword_abilities)?,
+        }),
+        _ => None,
+    })
+}
+
+/// Writes a `<name>.ron.todo` for every supported card that isn't already
+/// finished (`<name>.ron`) or in progress (`<name>.ron.todo`).
+///
+/// # Errors
+/// If the Scryfall/keyword data is unreadable or a card fails to render.
+pub fn extract_cards(plugin_dir: &Path) -> Result<(), ExtractError> {
+    let layout = crate::layout::PluginLayout::new(plugin_dir)?;
+    let cards_dir = layout.cards_dir()?;
+    let data_root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../data");
+    let oracle_path = data_root.join("scryfall/oracle-cards.jsonl");
+    let oracle = File::open(&oracle_path).map_err(|source| ExtractError::Io {
+        operation: "opening",
+        path: oracle_path.clone(),
+        source,
+    })?;
+    let catalogs = CatalogSet::load(data_root.join("gen/catalogs"))?;
+    let keywords_bytes = sylex_upstream::academyruins::keywords_bytes()?;
+    let keyword_abilities =
+        sylex_upstream::academyruins::Keywords::parse(&keywords_bytes)?.keyword_abilities;
+
+    for card in OracleCardReader::new(BufReader::new(oracle)) {
+        let card = card.map_err(|source| ExtractError::Oracle {
+            path: oracle_path.clone(),
+            source,
+        })?;
+        if !card.supported() {
+            continue;
+        }
+        let final_path = cards_dir.join(card_file(&card.name));
+        let todo_path = cards_dir.join(format!("{}.todo", card_file(&card.name)));
+        if final_path.exists() || todo_path.exists() {
+            continue;
+        }
+        let faces = card
+            .oracle_units()
+            .map(|unit| ExtractFace::from_unit(unit, &catalogs))
+            .collect::<Result<Vec<_>, ExtractError>>()?;
+        let Some(card) = todo_card(&card.layout, &faces, &keyword_abilities)? else {
+            continue;
+        };
+        std::fs::write(&todo_path, render(&card)?).map_err(|source| ExtractError::Io {
+            operation: "writing",
+            path: todo_path.clone(),
+            source,
+        })?;
+        eprintln!("wrote {}", todo_path.display());
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A minimal normal-layout creature fixture; `text` is the oracle text.
+    fn creature(text: Option<&str>) -> ExtractFace {
+        ExtractFace {
+            name: "Test Bear".into(),
+            mana_cost: None,
+            color_indicator: Some(vec![]),
+            types: vec!["Creature".into()],
+            supertypes: vec![],
+            subtypes: vec!["Bear".into()],
+            text: text.map(Into::into),
+            power: Some("2".into()),
+            toughness: Some("2".into()),
+            loyalty: None,
+            defense: None,
+        }
+    }
+
+    /// `stat_value` is the only branchy conversion; pin every arm.
+    #[test]
+    fn invalid_face_fields_are_structured_errors() {
+        let mut card = creature(None);
+        card.color_indicator = Some(vec!["invalid".into()]);
+        match face(&card, &[]).unwrap_err() {
+            ExtractError::ColorIndicator { code } => assert_eq!(code, "invalid"),
+            other => panic!("{other:?}"),
+        }
+        card.color_indicator = None;
+        card.mana_cost = Some("{invalid}".into());
+        let error = face(&card, &[]).unwrap_err();
+        match &error {
+            ExtractError::ManaCost { name, .. } => assert_eq!(name, &card.name),
+            other => panic!("{other:?}"),
+        }
+        assert!(
+            std::error::Error::source(&error)
+                .unwrap()
+                .is::<sylex_semantics_v1::ParseManaError>()
+        );
+    }
+
+    #[test]
+    fn stat_value_branches() {
+        assert_eq!(stat_value("2"), StatValue::Number(2));
+        assert_eq!(stat_value("-1"), StatValue::Number(-1));
+        assert_eq!(stat_value("*"), StatValue::DefinedByAbility);
+        assert_eq!(stat_value("1+*"), StatValue::DefinedByAbility);
+        assert_eq!(stat_value("X"), StatValue::Variable);
+    }
+
+    /// A bare-`normal` creature with one keyword line: structured fields become
+    /// `RawIdent`s, the oracle line becomes a single `Unparsed` ability.
+    #[test]
+    fn normal_creature_builds() {
+        let card = creature(Some("Flying"));
+
+        let todo = todo_card("normal", std::slice::from_ref(&card), &[])
+            .unwrap()
+            .unwrap();
+        let TodoCard::Normal(face) = &todo else {
+            panic!("expected Normal");
+        };
+        assert_eq!(face.types, [RawIdent("Creature".into())]);
+        assert_eq!(face.subtypes, [RawIdent("Bear".into())]);
+        assert_eq!(face.power, Some(StatValue::Number(2)));
+        assert_eq!(face.toughness, Some(StatValue::Number(2)));
+        // Empty keyword list: "Flying" stays one non-keyword line -> one
+        // ability.
+        assert!(
+            matches!(&face.abilities[..], [TodoAbility::Unparsed(s)] if s == "Flying"),
+            "abilities = {:?}",
+            face.abilities
+        );
+
+        // Render round-trip: the on-disk house style carries the bare subtype
+        // ident and the Unparsed oracle line.
+        let rendered = render(&todo).unwrap();
+        assert!(
+            rendered.contains("subtypes: [\n    Bear,\n  ]"),
+            "{rendered}"
+        );
+        assert!(rendered.contains(r#"Unparsed("Flying")"#), "{rendered}");
+    }
+
+    /// `text: None` → no oracle text → empty `abilities` vec; the rendered
+    /// output omits the `abilities` field entirely.
+    #[test]
+    fn no_text_yields_empty_abilities() {
+        let card = creature(None);
+        let TodoCard::Normal(face) = todo_card("normal", std::slice::from_ref(&card), &[])
+            .unwrap()
+            .unwrap()
+        else {
+            panic!("expected Normal");
+        };
+        assert_eq!(face.abilities, [] as [TodoAbility; 0]);
+        // The rendered card omits the abilities field entirely.
+        let rendered = render(&TodoCard::Normal(face)).unwrap();
+        assert!(!rendered.contains("abilities"));
+    }
+
+    /// A non-core layout (`split`) yields no `TodoCard`.
+    #[test]
+    fn unsupported_layout_is_skipped() {
+        let card = ExtractFace {
+            name: "Whatever".into(),
+            mana_cost: None,
+            color_indicator: Some(vec![]),
+            types: vec!["Instant".into()],
+            supertypes: vec![],
+            subtypes: vec![],
+            text: None,
+            power: None,
+            toughness: None,
+            loyalty: None,
+            defense: None,
+        };
+        assert!(
+            todo_card("split", std::slice::from_ref(&card), &[])
+                .unwrap()
+                .is_none()
+        );
+    }
+
+    #[test]
+    fn reminder_text() {
+        assert_eq!(
+            strip_reminder_text("Flying (This creature can't be blocked except by...)"),
+            "Flying"
+        );
+        // Matches the jq behavior: the captured trailing space survives
+        // when the parenthetical starts the line.
+        assert_eq!(strip_reminder_text("(Reminder) Foo"), " Foo");
+        assert_eq!(strip_reminder_text("A (b) c"), "A c");
+        // Lines that are nothing but reminder text disappear entirely.
+        assert_eq!(
+            strip_reminder_text("({R/P} can be paid with {R} or 2 life.)\nGain control."),
+            "Gain control."
+        );
+    }
+
+    /// A reminder-only oracle line that collapses to a lone space after
+    /// `strip_reminder_text` (pattern: `"(text) "` → `" "`) must NOT produce an
+    /// `Unparsed(" ")` ability slot — that would keep the card as `.ron.todo`
+    /// forever. The `.map(str::trim)` in `face()` prevents this.
+    #[test]
+    fn whitespace_only_line_yields_no_ability() {
+        // "(reminder) " → strip → " " (lone space, non-empty without trim).
+        // Without `.map(str::trim)` this would produce Unparsed(" ").
+        let card = creature(Some("(This is reminder text.) "));
+        let TodoCard::Normal(face) = todo_card("normal", std::slice::from_ref(&card), &[])
+            .unwrap()
+            .unwrap()
+        else {
+            panic!("expected Normal");
+        };
+        assert!(
+            face.abilities.is_empty(),
+            "expected no abilities, got: {:?}",
+            face.abilities
+        );
+    }
+
+    #[test]
+    fn keyword_lines() {
+        let keywords: Vec<DataStr> = vec!["Flying".into(), "Vigilance".into(), "Equip".into()];
+        assert_eq!(
+            expand_keyword_lines("flying, vigilance", &keywords),
+            "Flying\nVigilance"
+        );
+        assert_eq!(expand_keyword_lines("Equip {2}", &keywords), "Equip {2}");
+        assert_eq!(
+            expand_keyword_lines("Draw a card, then discard a card.", &keywords),
+            "Draw a card, then discard a card."
+        );
+        // The data's names are Title Case ("First Strike") while oracle lines
+        // are sentence case ("First strike") — matching is case-insensitive
+        // past the first word too.
+        let keywords: Vec<DataStr> = vec![
+            "First Strike".into(),
+            "Deathtouch".into(),
+            "Protection".into(),
+        ];
+        assert_eq!(
+            expand_keyword_lines("First strike, deathtouch", &keywords),
+            "First strike\nDeathtouch"
+        );
+        assert_eq!(
+            expand_keyword_lines(
+                "First strike, protection from black and from red",
+                &keywords
+            ),
+            "First strike\nProtection from black and from red"
+        );
+        // Keyword abilities also chain on "; " — the form oracle text uses when
+        // a keyword carries reminder text ("First strike; reach (…)"). Reminder
+        // text is already stripped before this, so the separator is bare.
+        assert_eq!(
+            expand_keyword_lines("First strike; deathtouch", &keywords),
+            "First strike\nDeathtouch"
+        );
+        // A line may mix both separators.
+        assert_eq!(
+            expand_keyword_lines("First strike; deathtouch, protection from red", &keywords),
+            "First strike\nDeathtouch\nProtection from red"
+        );
+        // A "; " inside non-keyword prose is left alone (not every piece is a
+        // keyword, so the line isn't a keyword list).
+        assert_eq!(
+            expand_keyword_lines("Draw a card; then discard a card.", &keywords),
+            "Draw a card; then discard a card."
+        );
+    }
+
+    /// "From [quality A] and from [quality B]" is shorthand for separate
+    /// abilities — one line per quality ([CR#702.16g]; hexproof:
+    /// [CR#702.11f]).
+    #[test]
+    fn repeated_from_lines() {
+        assert_eq!(
+            expand_repeated_from_lines("Protection from black and from red"),
+            "Protection from black\nProtection from red"
+        );
+        // The serial-comma form, three qualities.
+        assert_eq!(
+            expand_repeated_from_lines("Protection from blue, from black, and from red"),
+            "Protection from blue\nProtection from black\nProtection from red"
+        );
+        assert_eq!(
+            expand_repeated_from_lines("Hexproof from white and from black"),
+            "Hexproof from white\nHexproof from black"
+        );
+        // Mixed quality nouns split the same way.
+        assert_eq!(
+            expand_repeated_from_lines("Protection from planeswalkers and from Wizards"),
+            "Protection from planeswalkers\nProtection from Wizards"
+        );
+        // No repeated "from": one compound quality, not the CR shorthand.
+        assert_eq!(
+            expand_repeated_from_lines("Hexproof from artifacts and enchantments"),
+            "Hexproof from artifacts and enchantments"
+        );
+        // Mid-prose grants aren't keyword lines.
+        assert_eq!(
+            expand_repeated_from_lines(
+                "Target creature gains protection from red and from white until end of turn."
+            ),
+            "Target creature gains protection from red and from white until end of turn."
+        );
+        assert_eq!(expand_repeated_from_lines("Flying"), "Flying");
+    }
+
+    /// The expansion is wired into `face()`: a joint protection line becomes
+    /// one `Unparsed` ability per quality.
+    #[test]
+    fn multi_quality_protection_becomes_two_abilities() {
+        let card = creature(Some("Protection from black and from red"));
+        let TodoCard::Normal(face) = todo_card("normal", std::slice::from_ref(&card), &[])
+            .unwrap()
+            .unwrap()
+        else {
+            panic!("expected Normal");
+        };
+        assert!(
+            matches!(
+                &face.abilities[..],
+                [TodoAbility::Unparsed(a), TodoAbility::Unparsed(b)]
+                    if a == "Protection from black" && b == "Protection from red"
+            ),
+            "abilities = {:?}",
+            face.abilities
+        );
+    }
+
+    #[test]
+    fn self_reference() {
+        let no_kw: &[DataStr] = &[];
+
+        // Full name -> ~, every occurrence, case-sensitive whole words.
+        assert_eq!(
+            self_ref_to_tilde(
+                "Storm of Steel deals 2 damage.",
+                "Storm of Steel",
+                false,
+                no_kw
+            ),
+            "~ deals 2 damage."
+        );
+        assert_eq!(
+            self_ref_to_tilde(
+                "Exile Long Rest. Return Long Rest.",
+                "Long Rest",
+                false,
+                no_kw
+            ),
+            "Exile ~. Return ~."
+        );
+        // Possessive: the apostrophe is a word boundary, so the name still
+        // matches.
+        assert_eq!(
+            self_ref_to_tilde(
+                "Norman Osborn's controller draws.",
+                "Norman Osborn",
+                false,
+                no_kw
+            ),
+            "~'s controller draws."
+        );
+        // "named <self>" collapses to "named ~".
+        assert_eq!(
+            self_ref_to_tilde(
+                "A deck can have any number of cards named Rat Colony.",
+                "Rat Colony",
+                false,
+                no_kw
+            ),
+            "A deck can have any number of cards named ~."
+        );
+        // Only the card's own name is touched, not another card's.
+        assert_eq!(
+            self_ref_to_tilde(
+                "Norman Osborn can't be blocked.",
+                "Green Goblin",
+                false,
+                no_kw
+            ),
+            "Norman Osborn can't be blocked."
+        );
+
+        // Legendary: pre-comma short name also collapses.
+        assert_eq!(
+            self_ref_to_tilde(
+                "Boromir can't be blocked.",
+                "Boromir, Gondor's Hope",
+                true,
+                no_kw
+            ),
+            "~ can't be blocked."
+        );
+        // Short name matches whole words only -- "Gut" leaves "guts" alone.
+        assert_eq!(
+            self_ref_to_tilde(
+                "Gut attacks. The guts spill.",
+                "Gut, True Soul Zealot",
+                true,
+                no_kw
+            ),
+            "~ attacks. The guts spill."
+        );
+        // Short-name pass is legendary-only: a comma'd non-legend keeps its
+        // prefix.
+        assert_eq!(
+            self_ref_to_tilde(
+                "Borrowing 100 arrows.",
+                "Borrowing 100,000 Arrows",
+                false,
+                no_kw
+            ),
+            "Borrowing 100 arrows."
+        );
+        // Guard: short name shorter than three chars is too risky -- skip it.
+        assert_eq!(
+            self_ref_to_tilde("Me draws a card.", "Me, the Immortal", true, no_kw),
+            "Me draws a card."
+        );
+        // Guard: short name that is a keyword ability is skipped.
+        let storm: &[DataStr] = &["Storm".into()];
+        assert_eq!(
+            self_ref_to_tilde("Storm gets +1/+1.", "Storm, the Tempest", true, storm),
+            "Storm gets +1/+1."
+        );
+        // ...but a distinctive short name still collapses even when other text
+        // happens to contain a keyword.
+        assert_eq!(
+            self_ref_to_tilde(
+                "Ral deals 1 damage to any target.",
+                "Ral, Storm Conduit",
+                true,
+                storm
+            ),
+            "~ deals 1 damage to any target."
+        );
+
+        // No self-reference: text is returned unchanged.
+        assert_eq!(
+            self_ref_to_tilde("Draw a card.", "Some Other Card", false, no_kw),
+            "Draw a card."
+        );
+    }
+
+    /// The generic "this <noun>" pass is name-independent, so an unrelated
+    /// face name exercises it in isolation. `~` is the object the text belongs
+    /// to — the card, or, inside a granted (quoted) ability, the token.
+    #[test]
+    fn generic_self_reference() {
+        let no_kw: &[DataStr] = &[];
+        let tilde = |text: &str| self_ref_to_tilde(text, "Unrelated Name", false, no_kw);
+
+        // Card-type nouns (lowercase), leading and mid-sentence.
+        assert_eq!(tilde("This land enters tapped."), "~ enters tapped.");
+        assert_eq!(tilde("Sacrifice this creature."), "Sacrifice ~.");
+        assert_eq!(tilde("This creature can't block."), "~ can't block.");
+        assert_eq!(
+            tilde("Return this artifact to its owner's hand."),
+            "Return ~ to its owner's hand."
+        );
+        assert_eq!(tilde("When this enchantment enters"), "When ~ enters");
+        assert_eq!(tilde("Exile this permanent."), "Exile ~.");
+
+        // Generic nouns: spell / card.
+        assert_eq!(
+            tilde("When you cast this spell, draw a card."),
+            "When you cast ~, draw a card."
+        );
+        assert_eq!(
+            tilde("Discard this card: Draw a card."),
+            "Discard ~: Draw a card."
+        );
+
+        // Capitalized permanent-subtype nouns.
+        assert_eq!(tilde("Sacrifice this Saga."), "Sacrifice ~.");
+        assert_eq!(tilde("When this Vehicle attacks"), "When ~ attacks");
+        assert_eq!(
+            tilde("Solved — Sacrifice this Case:"),
+            "Solved — Sacrifice ~:"
+        );
+        assert_eq!(tilde("When this Room is unlocked"), "When ~ is unlocked");
+
+        // A token's granted (quoted) ability self-refs the token, so it tildes.
+        assert_eq!(
+            tilde(
+                r#"create a 0/1 Eldrazi Spawn creature token with "Sacrifice this token: Add {C}.""#
+            ),
+            r#"create a 0/1 Eldrazi Spawn creature token with "Sacrifice ~: Add {C}.""#
+        );
+        // Two ~ on one line: the card, then the token it makes.
+        assert_eq!(
+            tilde(
+                r#"When this creature dies, create a 1/1 token with "this creature can't block.""#
+            ),
+            r#"When ~ dies, create a 1/1 token with "~ can't block.""#
+        );
+
+        // Possessive keeps the trailing 's (apostrophe is a word boundary).
+        assert_eq!(
+            tilde("this creature's controller draws a card."),
+            "~'s controller draws a card."
+        );
+
+        // Non-matches: the bare word (no "this"), excluded nouns, lowercase
+        // "case".
+        assert_eq!(tilde("Destroy all creatures."), "Destroy all creatures.");
+        assert_eq!(
+            tilde("Draw two cards this turn."),
+            "Draw two cards this turn."
+        );
+        assert_eq!(tilde("In this case, you win."), "In this case, you win.");
+        assert_eq!(tilde("Add this much mana."), "Add this much mana.");
+        assert_eq!(
+            tilde("Activate this ability only once each turn."),
+            "Activate this ability only once each turn."
+        );
+
+        // Composes with the name pass: both the name and the "this land"
+        // collapse.
+        assert_eq!(
+            self_ref_to_tilde(
+                "Coastal Tower enters tapped. This land taps for mana.",
+                "Coastal Tower",
+                false,
+                no_kw
+            ),
+            "~ enters tapped. ~ taps for mana."
+        );
+    }
+}

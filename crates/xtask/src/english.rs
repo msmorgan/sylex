@@ -1,4 +1,4 @@
-//! `cargo xtask english`: a thin CLI over `deckmaste_english`'s corpus,
+//! `cargo xtask english`: a thin CLI over `sylex_english`'s corpus,
 //! stratum profiler and census.
 
 use std::fs::File;
@@ -10,9 +10,9 @@ use anyhow::Context;
 use anyhow::Result;
 use clap::Args;
 use clap::Subcommand;
-use deckmaste_english::census;
-use deckmaste_english::corpus::Corpus;
-use deckmaste_lexical_source::LexicalEnvironment;
+use sylex_english::census;
+use sylex_english::corpus::Corpus;
+use sylex_vocabulary::LexicalEnvironment;
 
 #[derive(Debug, Args)]
 pub struct EnglishArgs {
@@ -69,7 +69,7 @@ fn strata(args: &StrataArgs, output: &mut dyn Write) -> Result<()> {
                 .any(|c| *c == face.card || *c == face.name)
     })?;
     let judgments: Vec<_> =
-        deckmaste_english::judgment::load_dir(&deckmaste_english::judgments_dir())?
+        sylex_english::judgment::load_dir(&sylex_english::judgments_dir())?
             .into_iter()
             .filter(|(name, _)| name != "seed.txt")
             .flat_map(|(_, entries)| entries)
@@ -145,10 +145,10 @@ struct ParseArgs {
 }
 
 fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
-    use deckmaste_english::corpus::UnitKind;
-    use deckmaste_english::judgment;
-    use deckmaste_english::judgment::Judge;
-    use deckmaste_english::profile::Profiler;
+    use sylex_english::corpus::UnitKind;
+    use sylex_english::judgment;
+    use sylex_english::judgment::Judge;
+    use sylex_english::profile::Profiler;
 
     let entries = args
         .inputs
@@ -168,8 +168,8 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
         })
         .collect::<Result<Vec<_>>>()?;
     let env = LexicalEnvironment::load().context("loading the lexical environment")?;
-    let grammar = deckmaste_english::bind(&env.lexicon, &env.frames)?;
-    let frame = deckmaste_english::segments::segment_frame(&grammar)?;
+    let grammar = sylex_english::bind(&env.lexicon, &env.frames)?;
+    let frame = sylex_english::segments::segment_frame(&grammar)?;
     let judge = Judge {
         grammar: &grammar,
         lexicon: &env.lexicon,
@@ -177,7 +177,7 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
     let profiler = Profiler::new(&env);
     for (entry, evaluate) in entries {
         writeln!(output, "{}: {:?}", entry.location, entry.text)?;
-        let text = deckmaste_data::oracle_text::strip_reminder_text(&entry.text);
+        let text = sylex_upstream::oracle_text::strip_reminder_text(&entry.text);
         let analyzed = env
             .lexicon
             .analyze_source_scoped(&text, None, &judgment::scope(&entry));
@@ -212,14 +212,14 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
         writeln!(output, "Vocabulary gaps: {:?}", parse.vocabulary_gaps)?;
         let derivations = parse.derivation_count();
         writeln!(output, "Packed Forest derivations: {derivations}")?;
-        let segmentation = deckmaste_english::segments::segments(&parse, &frame);
+        let segmentation = sylex_english::segments::segments(&parse, &frame);
         let segments = match &segmentation {
-            deckmaste_english::segments::Segmentation::Segments(segments) => segments
+            sylex_english::segments::Segmentation::Segments(segments) => segments
                 .iter()
                 .map(|s| format!("{} {:?}", s.derivations, s.text))
                 .collect::<Vec<_>>()
                 .join(" | "),
-            deckmaste_english::segments::Segmentation::NotSegmentable(why) => {
+            sylex_english::segments::Segmentation::NotSegmentable(why) => {
                 format!("not segmentable: {why:?}")
             }
         };
@@ -243,10 +243,10 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
 }
 
 fn dump_reading(
-    grammar: &deckmaste_syntax::CompiledGrammar,
+    grammar: &sylex_syntax::CompiledGrammar,
     env: &LexicalEnvironment,
-    key: deckmaste_syntax::RankingKey,
-    reading: &deckmaste_syntax::Reading,
+    key: sylex_syntax::RankingKey,
+    reading: &sylex_syntax::Reading,
     number: usize,
     output: &mut dyn Write,
 ) -> Result<()> {
@@ -292,7 +292,7 @@ fn dump_reading(
 
 /// A Ranking Key as `class/association/cost`, its components in comparison
 /// order.
-fn format_key(key: deckmaste_syntax::RankingKey) -> String {
+fn format_key(key: sylex_syntax::RankingKey) -> String {
     format!(
         "{}/{}/{}",
         key.attachment_class, key.right_association_words, key.production_cost
@@ -302,8 +302,8 @@ fn format_key(key: deckmaste_syntax::RankingKey) -> String {
 /// A Reading's nodes in preorder, as [`CompiledGrammar::constituents`]
 /// lists their Constituents.
 fn preorder_nodes<'a>(
-    reading: &'a deckmaste_syntax::Reading,
-    out: &mut Vec<&'a deckmaste_syntax::Reading>,
+    reading: &'a sylex_syntax::Reading,
+    out: &mut Vec<&'a sylex_syntax::Reading>,
 ) {
     if let Some(node) = reading.node() {
         out.push(reading);

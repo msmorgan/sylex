@@ -1,0 +1,416 @@
+//! Runner-layer convenience over the decision loop (tui-shortcuts):
+//! single-legal auto-resolve + per-player "pass" modes. Pure logic + small
+//! state; no engine mutation, no ratatui — unit-tested headlessly. The engine
+//! stays full-info and pure; what to auto-answer vs. surface is a runner
+//! concern (like the autotapper).
+use sylex_core::PhaseStep;
+use sylex_core::Uint;
+use sylex_engine::Action;
+use sylex_engine::Decision;
+use sylex_engine::DecisionPointKind;
+use sylex_engine::GameState;
+use sylex_engine::ObjectId;
+use sylex_engine::PlayerId;
+
+/// If every inner slice has exactly one element, the vector of those elements;
+/// otherwise `None`. Generic so the "one candidate per slot" rule is testable
+/// without constructing opaque `ObjectId`s.
+#[must_use]
+pub fn single_each<T: Copy>(legal: &[Vec<T>]) -> Option<Vec<T>> {
+    if !legal.is_empty() && legal.iter().all(|slot| slot.len() == 1) {
+        Some(legal.iter().map(|slot| slot[0]).collect())
+    } else {
+        None
+    }
+}
+
+/// The forced answer to `pending` when exactly one legal answer exists and it
+/// is not a priority window; otherwise `None`. Priority is never auto-resolved
+/// here (passing is a timing choice, and auto-passing every pass-only window
+/// globally would have no per-turn guard → both players pass to a decking
+/// loss). The only interactive kind this changes is fully-forced targets; other
+/// single-legal kinds (e.g. a lone trigger ordering) already auto-resolve via
+/// the driver's `Strategy` partition (`is_interactive` returns false for them).
+#[must_use]
+pub fn auto_answer(pending: &DecisionPointKind) -> Option<Decision> {
+    match pending {
+        // [CR#707.10c]: a `Retarget` slot is force-single exactly like
+        // a `ChooseTargets` one when its unioned `legal` set collapses to one
+        // candidate (e.g. the current target is the only object in play).
+        DecisionPointKind::ChooseTargets(sylex_engine::ChooseTargets { legal, .. })
+        | DecisionPointKind::Retarget(sylex_engine::Retarget { legal, .. }) => {
+            single_each(legal)
+            // Each forced slot becomes a singleton chosen set ([CR#601.2c]).
+            .map(|picks| Decision::Targets(picks.into_iter().map(|p| vec![p]).collect()))
+        }
+        _ => None,
+    }
+}
+
+/// Compile-time toggle: when set, the runner auto-plays the oldest land in a
+/// player's hand whenever that player holds priority and a land play is legal
+/// (their main phase, land drop still available). Flip to `false` to restore
+/// fully-manual land plays.
+pub const AUTOPLAY_LANDS: bool = false;
+
+/// The oldest (front-of-hand) land the player may play right now, as its
+/// `PlayLand` action, or `None` if no card in `hand` has a legal land play in
+/// `legal`. "Oldest" is the hand's own order — drawn cards enter the back, so
+/// the front is the longest-held. With basic-land-only decks any land is
+/// interchangeable, so the oldest is as good a choice as any.
+#[must_use]
+pub fn oldest_playable_land(hand: &[ObjectId], legal: &[Action]) -> Option<Action> {
+    hand.iter().find_map(|&id| {
+        let act = Action::PlayLand { object: id };
+        legal.contains(&act).then_some(act)
+    })
+}
+
+/// A player's armed convenience pass.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PassMode {
+    /// Reactive: auto-pass priority until something needs you (stack grew,
+    /// combat entered, your main, or a forced decision). MTGO F4.
+    Yield,
+    /// Long skip: auto-pass priority until your next turn's precombat main.
+    /// MTGO F6.
+    Turn,
+}
+
+/// The turn coordinates a stop condition reads. Captured at arm time and
+/// compared against the live value each time the armed player regains priority.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Snapshot {
+    pub active: PlayerId,
+    pub phase: PhaseStep,
+    pub turn: Uint,
+    pub stack: usize,
+}
+
+/// Whether `player`'s armed `mode` should keep auto-passing this priority
+/// window (`true`) or stop and surface to the human (`false`). `armed` is the
+/// arm-time snapshot, `now` the live one. All "reached/entered" stops are
+/// *since arming*, which composes with clear-on-stop so re-arming inside a
+/// boundary won't re-stop.
+#[must_use]
+pub fn keep_passing(mode: PassMode, armed: &Snapshot, now: &Snapshot, player: PlayerId) -> bool {
+    let stack_grew = now.stack > armed.stack;
+    // The stack emptied since arming — your spell (cast just before you yielded)
+    // resolved. Yield hands priority back rather than passing through the rest
+    // of the turn. Guarded on `armed.stack > 0` so arming Yield with an already
+    // empty stack (pass until something happens) does not stop immediately.
+    let stack_emptied = armed.stack > 0 && now.stack == 0;
+    let entered_combat =
+        matches!(now.phase, PhaseStep::Combat(_)) && !matches!(armed.phase, PhaseStep::Combat(_));
+    let at_my_main = now.active == player
+        && matches!(
+            now.phase,
+            PhaseStep::PrecombatMain | PhaseStep::PostcombatMain
+        );
+    let entered_my_main = at_my_main && now.phase != armed.phase;
+    let next_precombat_main =
+        now.active == player && now.phase == PhaseStep::PrecombatMain && now.turn > armed.turn;
+    match mode {
+        PassMode::Yield => {
+            !(stack_grew
+                || stack_emptied
+                || entered_combat
+                || entered_my_main
+                || next_precombat_main)
+        }
+        PassMode::Turn => !next_precombat_main,
+    }
+}
+
+impl Snapshot {
+    /// Read the live turn coordinates from the game.
+    #[must_use]
+    pub fn of(state: &GameState) -> Self {
+        Self {
+            active: state.turn.active_player,
+            phase: state.turn.current,
+            turn: state.turn.turn_number,
+            stack: state.stack.len(),
+        }
+    }
+}
+
+/// Per-player armed pass state. Indexed by `PlayerId::index()`.
+#[derive(Debug, Clone)]
+pub struct PassState {
+    modes: [Option<PassMode>; 2],
+    armed: [Option<Snapshot>; 2],
+}
+
+impl PassState {
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            modes: [None, None],
+            armed: [None, None],
+        }
+    }
+
+    /// Arm `mode` for `player`, snapshotting the current turn coordinates.
+    pub fn arm(&mut self, player: PlayerId, mode: PassMode, state: &GameState) {
+        self.modes[player.index()] = Some(mode);
+        self.armed[player.index()] = Some(Snapshot::of(state));
+    }
+
+    /// Disarm `player`'s mode (clear-on-stop).
+    pub fn clear(&mut self, player: PlayerId) {
+        self.modes[player.index()] = None;
+        self.armed[player.index()] = None;
+    }
+
+    /// `player`'s armed mode, if any.
+    #[must_use]
+    pub fn mode(&self, player: PlayerId) -> Option<PassMode> {
+        self.modes[player.index()]
+    }
+
+    /// `player`'s arm-time snapshot (only meaningful while a mode is armed).
+    #[must_use]
+    pub fn armed(&self, player: PlayerId) -> Option<&Snapshot> {
+        self.armed[player.index()].as_ref()
+    }
+}
+
+impl Default for PassState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn single_each_extracts_forced_slots() {
+        assert_eq!(single_each(&[vec![1]]), Some(vec![1]));
+        assert_eq!(single_each(&[vec![1], vec![2]]), Some(vec![1, 2]));
+    }
+
+    #[test]
+    fn single_each_rejects_multi_empty_and_none() {
+        assert_eq!(single_each(&[vec![1], vec![2, 3]]), None);
+        assert_eq!(single_each::<i32>(&[vec![]]), None);
+        assert_eq!(single_each::<i32>(&[]), None);
+    }
+
+    #[test]
+    fn auto_answer_never_resolves_priority() {
+        let p = DecisionPointKind::Priority(sylex_engine::Priority {
+            player: PlayerId(0),
+            legal: vec![],
+        });
+        assert_eq!(auto_answer(&p), None);
+    }
+
+    #[test]
+    fn auto_answer_ignores_non_target_kinds() {
+        let p = DecisionPointKind::DiscardToHandSize(sylex_engine::DiscardToHandSize {
+            player: PlayerId(0),
+            count: 1,
+        });
+        assert_eq!(auto_answer(&p), None);
+    }
+
+    /// A few distinct real `ObjectId`s (no public constructor exists).
+    fn ids() -> Vec<ObjectId> {
+        let state = game::build_game().expect("build").state;
+        state.zones.libraries[0].iter().copied().collect()
+    }
+
+    #[test]
+    #[cfg_attr(
+        not(wizards_corpus),
+        ignore = "requires generated plugins/wizards corpus"
+    )]
+    fn oldest_playable_land_picks_the_front_of_hand() {
+        // hand = [a, b, c]; only b and c have a legal land play. The oldest
+        // playable land is b — a is older but has no legal play.
+        let v = ids();
+        let (a, b, c) = (v[0], v[1], v[2]);
+        let legal = vec![
+            Action::Pass,
+            Action::PlayLand { object: b },
+            Action::PlayLand { object: c },
+        ];
+        assert_eq!(
+            oldest_playable_land(&[a, b, c], &legal),
+            Some(Action::PlayLand { object: b })
+        );
+    }
+
+    #[test]
+    #[cfg_attr(
+        not(wizards_corpus),
+        ignore = "requires generated plugins/wizards corpus"
+    )]
+    fn oldest_playable_land_is_none_without_a_playable_land() {
+        let v = ids();
+        let (a, b) = (v[0], v[1]);
+        assert_eq!(oldest_playable_land(&[a, b], &[Action::Pass]), None);
+    }
+
+    fn snap(active: Uint, phase: PhaseStep, turn: Uint, stack: usize) -> Snapshot {
+        Snapshot {
+            active: PlayerId(active),
+            phase,
+            turn,
+            stack,
+        }
+    }
+
+    #[test]
+    fn yield_keeps_passing_when_nothing_changed() {
+        let s = snap(1, PhaseStep::Ending(sylex_core::EndingStep::End), 1, 0);
+        assert!(keep_passing(PassMode::Yield, &s, &s, PlayerId(0)));
+    }
+
+    #[test]
+    fn yield_stops_on_stack_growth() {
+        let armed = snap(1, PhaseStep::PrecombatMain, 1, 0);
+        let now = snap(1, PhaseStep::PrecombatMain, 1, 1);
+        assert!(!keep_passing(PassMode::Yield, &armed, &now, PlayerId(0)));
+    }
+
+    #[test]
+    fn yield_stops_when_combat_entered_but_not_when_armed_in_combat() {
+        let pre = snap(1, PhaseStep::PrecombatMain, 1, 0);
+        let atk = snap(
+            1,
+            PhaseStep::Combat(sylex_core::CombatStep::DeclareAttackers),
+            1,
+            0,
+        );
+        assert!(!keep_passing(PassMode::Yield, &pre, &atk, PlayerId(0)));
+        let begin = snap(
+            1,
+            PhaseStep::Combat(sylex_core::CombatStep::BeginningOfCombat),
+            1,
+            0,
+        );
+        let blk = snap(
+            1,
+            PhaseStep::Combat(sylex_core::CombatStep::DeclareBlockers),
+            1,
+            0,
+        );
+        assert!(keep_passing(PassMode::Yield, &begin, &blk, PlayerId(0)));
+    }
+
+    #[test]
+    fn yield_stops_at_my_next_precombat_main() {
+        let armed = snap(1, PhaseStep::Ending(sylex_core::EndingStep::End), 1, 0);
+        let now = snap(0, PhaseStep::PrecombatMain, 2, 0);
+        assert!(!keep_passing(PassMode::Yield, &armed, &now, PlayerId(0)));
+    }
+
+    #[test]
+    fn yield_stops_when_the_stack_empties_after_arming() {
+        // Arm Yield right after casting (your spell is on the stack), on a
+        // window that triggers no other stop. When your spell resolves and the
+        // stack empties, Yield must stop and hand priority back — not keep
+        // passing through the rest of the turn.
+        let armed = snap(1, PhaseStep::Ending(sylex_core::EndingStep::End), 1, 1);
+        let now = snap(1, PhaseStep::Ending(sylex_core::EndingStep::End), 1, 0);
+        assert!(!keep_passing(PassMode::Yield, &armed, &now, PlayerId(0)));
+    }
+
+    #[test]
+    fn yield_keeps_passing_when_the_stack_was_already_empty_at_arming() {
+        // Arming Yield with an empty stack (the reactive "pass until something
+        // happens" use) must NOT stop just because the stack is empty now —
+        // only a stack that *emptied since arming* (a resolution) stops it.
+        let s = snap(1, PhaseStep::Ending(sylex_core::EndingStep::End), 1, 0);
+        assert!(keep_passing(PassMode::Yield, &s, &s, PlayerId(0)));
+    }
+
+    #[test]
+    fn turn_ignores_the_stack_emptying() {
+        // Pass-until-your-turn deliberately ignores the stack; an emptying
+        // stack must not stop it (only your next precombat main does).
+        let armed = snap(1, PhaseStep::Ending(sylex_core::EndingStep::End), 1, 1);
+        let now = snap(1, PhaseStep::Ending(sylex_core::EndingStep::End), 1, 0);
+        assert!(keep_passing(PassMode::Turn, &armed, &now, PlayerId(0)));
+    }
+
+    #[test]
+    fn turn_ignores_stack_and_combat() {
+        let armed = snap(1, PhaseStep::PrecombatMain, 1, 0);
+        let stack = snap(1, PhaseStep::PrecombatMain, 1, 5);
+        let combat = snap(
+            1,
+            PhaseStep::Combat(sylex_core::CombatStep::DeclareAttackers),
+            1,
+            0,
+        );
+        assert!(keep_passing(PassMode::Turn, &armed, &stack, PlayerId(0)));
+        assert!(keep_passing(PassMode::Turn, &armed, &combat, PlayerId(0)));
+    }
+
+    #[test]
+    fn turn_stops_only_at_my_next_precombat_main() {
+        let armed = snap(
+            0,
+            PhaseStep::Beginning(sylex_core::BeginningStep::Upkeep),
+            2,
+            0,
+        );
+        let same_turn_main = snap(0, PhaseStep::PrecombatMain, 2, 0);
+        let next_turn_main = snap(0, PhaseStep::PrecombatMain, 4, 0);
+        assert!(keep_passing(
+            PassMode::Turn,
+            &armed,
+            &same_turn_main,
+            PlayerId(0)
+        ));
+        assert!(!keep_passing(
+            PassMode::Turn,
+            &armed,
+            &next_turn_main,
+            PlayerId(0)
+        ));
+    }
+
+    use crate::game;
+
+    #[test]
+    #[cfg_attr(
+        not(wizards_corpus),
+        ignore = "requires generated plugins/wizards corpus"
+    )]
+    fn arm_records_mode_and_snapshot_then_clear_removes_it() {
+        let state = game::build_game().expect("build demo game").state;
+        let mut pass = PassState::new();
+        assert_eq!(pass.mode(PlayerId(0)), None);
+
+        pass.arm(PlayerId(0), PassMode::Yield, &state);
+        assert_eq!(pass.mode(PlayerId(0)), Some(PassMode::Yield));
+        assert_eq!(
+            pass.armed(PlayerId(0)).map(|s| s.turn),
+            Some(state.turn.turn_number)
+        );
+        assert_eq!(pass.mode(PlayerId(1)), None, "arming P0 leaves P1 alone");
+
+        pass.clear(PlayerId(0));
+        assert_eq!(pass.mode(PlayerId(0)), None);
+        assert!(pass.armed(PlayerId(0)).is_none());
+    }
+
+    #[test]
+    #[cfg_attr(
+        not(wizards_corpus),
+        ignore = "requires generated plugins/wizards corpus"
+    )]
+    fn snapshot_of_reads_live_turn_coordinates() {
+        let state = game::build_game().expect("build demo game").state;
+        let s = Snapshot::of(&state);
+        assert_eq!(s.active, state.turn.active_player);
+        assert_eq!(s.turn, state.turn.turn_number);
+        assert_eq!(s.stack, state.stack.len());
+    }
+}

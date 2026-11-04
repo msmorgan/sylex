@@ -162,7 +162,7 @@ initialize canonCardsExt :
     addImportedFn := fun imports => imports.foldl (· ++ ·) #[]
   }
 
-/-- The card file of a printed name: `card_filename` in `crates/deckmaste_core/src/plugin.rs`
+/-- The card file of a printed name: `card_filename` in `crates/core/src/plugin.rs`
 with the source extension used by the generated registry. -/
 def cardFileName (name : String) : String :=
   name.foldl (init := "") (fun out c => out ++ match c with

@@ -1,5 +1,5 @@
 #!/usr/bin/env fish
-# Drive the deckmaste TUI under tmux for smoke testing.
+# Drive the sylex TUI under tmux for smoke testing.
 #
 #   scripts/tui-pilot start         — build + launch in a detached 120x40 session
 #   scripts/tui-pilot keys <keys…>  — send keystrokes (tmux send-keys syntax; e.g. Space y Enter)
@@ -8,11 +8,11 @@
 
 set -l session tui_pilot
 set -l root (status dirname)/..
-set -l binary $root/target/debug/deckmaste_tui
+set -l binary $root/target/debug/sylex_tui
 
 switch $argv[1]
     case start
-        cargo build -p deckmaste_tui --manifest-path $root/Cargo.toml; or exit 1
+        cargo build -p sylex_tui --manifest-path $root/Cargo.toml; or exit 1
         tmux kill-session -t $session 2>/dev/null
         tmux new-session -d -s $session -x 120 -y 40 $binary
         sleep 1.5

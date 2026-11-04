@@ -2,15 +2,15 @@
 //! render every finished card back to templated English and diff it against
 //! the oracle snapshot. xtask owns the CLI; the oracle loading, diffing,
 //! waiver policy, and normalization live in
-//! `deckmaste_legacy_render::fidelity`.
+//! `sylex_render_v1::fidelity`.
 
 use std::path::Path;
 use std::path::PathBuf;
 
 use clap::Args;
-use deckmaste_legacy_render::fidelity;
-use deckmaste_legacy_render::fidelity::Oracle;
-use deckmaste_legacy_render::fidelity::Outcome;
+use sylex_render_v1::fidelity;
+use sylex_render_v1::fidelity::Oracle;
+use sylex_render_v1::fidelity::Outcome;
 
 /// The plugins the gate covers by default, with canon's stricter oracle
 /// policy (every canon card must exist in the oracle — canon encodes real

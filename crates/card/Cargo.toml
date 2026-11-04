@@ -1,0 +1,14 @@
+[package]
+publish = false
+name = "sylex_card"
+version = "0.1.0"
+edition = "2024"
+
+[lints]
+workspace = true
+
+[dependencies]
+sylex_core = { version = "0.1.0", path = "../core" }
+# No `macro_ron`: cards are read as semantic terms by `sylex_semantics_v1` and
+# lowered here, so nothing reads THIS `Card` through a macro set any more.
+serde = { version = "1.0.228", features = ["derive", "rc"] }

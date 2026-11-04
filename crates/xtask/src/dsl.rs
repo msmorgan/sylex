@@ -1,12 +1,12 @@
 //! `cargo xtask dsl`: `.syl` tooling. `fmt` lives in [`crate::dsl_fmt`].
 //!
-//! `cargo xtask dsl differential` checks that `deckmaste_dsl` and `SylGen`'s
+//! `cargo xtask dsl differential` checks that `sylex_syl` and `SylGen`'s
 //! parser (`lean/SylGen/Parser.lean`) read every `plugins_v3/**/*.syl` file
 //! identically.
 //!
 //! The Lean executable `sylParseDump` writes `SylGen`'s `Declaration`s, before
 //! resolution, as JSON to a gitignored path under `lean/.lake/build`. This
-//! command builds and runs it, parses the same files with `deckmaste_dsl`,
+//! command builds and runs it, parses the same files with `sylex_syl`,
 //! projects each Rust tree onto the dump's shape and compares file by file. The
 //! projection rebuilds what `SylGen`'s parser derives rather than reads: the
 //! sort it fills in from the kind (`kindSort`), a nameless `card`'s printed
@@ -23,12 +23,12 @@ use std::process::Command;
 use anyhow::Context as _;
 use clap::Args;
 use clap::Subcommand;
-use deckmaste_dsl::File;
-use deckmaste_dsl::FileId;
-use deckmaste_dsl::Shape;
-use deckmaste_dsl::Sort;
-use deckmaste_dsl::Value;
-use deckmaste_dsl::ValueKind;
+use sylex_syl::File;
+use sylex_syl::FileId;
+use sylex_syl::Shape;
+use sylex_syl::Sort;
+use sylex_syl::Value;
+use sylex_syl::ValueKind;
 use serde_json::Value as Json;
 use serde_json::json;
 
@@ -40,7 +40,7 @@ pub struct DslArgs {
 
 #[derive(Debug, Subcommand)]
 enum DslCmd {
-    /// Parse every `plugins_v3` `.syl` file with both `deckmaste_dsl` and
+    /// Parse every `plugins_v3` `.syl` file with both `sylex_syl` and
     /// `SylGen`'s parser, and fail on any difference between the trees.
     Differential,
     /// Format `.syl` files (default: every `plugins_v3` file) in place, check
@@ -102,7 +102,7 @@ fn differential() -> anyhow::Result<()> {
     }
 }
 
-/// Parses every `plugins_v3/**/*.syl` file under `root` with `deckmaste_dsl`,
+/// Parses every `plugins_v3/**/*.syl` file under `root` with `sylex_syl`,
 /// keyed by its `/`-separated path relative to `root`; each entry is the
 /// projected declarations or the rendered parse error.
 fn parse_corpus(root: &Path) -> anyhow::Result<BTreeMap<String, Result<Json, String>>> {
@@ -118,7 +118,7 @@ fn parse_corpus(root: &Path) -> anyhow::Result<BTreeMap<String, Result<Json, Str
             .collect::<Vec<_>>()
             .join("/");
         let source = std::fs::read_to_string(path)?;
-        let projected = deckmaste_dsl::parse(FileId(u32::try_from(index)?), &source)
+        let projected = sylex_syl::parse(FileId(u32::try_from(index)?), &source)
             .map_err(|error| error.render(&relative, &source))
             .and_then(|file| {
                 project(&file).map_err(|error| format!("{relative}: cannot project: {error}"))
@@ -140,9 +140,9 @@ fn collect(dir: &Path, out: &mut Vec<PathBuf>) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Compares `SylGen`'s dump with the projected `deckmaste_dsl` trees, one
+/// Compares `SylGen`'s dump with the projected `sylex_syl` trees, one
 /// message per failing file. Every corpus file must parse, so a file either
-/// side rejects (or `deckmaste_dsl` parses but cannot project) fails, even
+/// side rejects (or `sylex_syl` parses but cannot project) fails, even
 /// when both reject it.
 #[must_use]
 pub fn compare(
@@ -155,21 +155,21 @@ pub fn compare(
     }
     for (path, rust) in rust {
         let Some(lean) = lean.get(path) else {
-            differences.push(format!("{path}: only deckmaste_dsl read this file"));
+            differences.push(format!("{path}: only sylex_syl read this file"));
             continue;
         };
         let lean_error = lean.get("error").and_then(Json::as_str);
         match (lean_error, rust) {
             (Some(lean), Err(rust)) => {
                 differences.push(format!(
-                    "{path}: both parsers reject it\n  SylGen:        {lean}\n  deckmaste_dsl: {rust}"
+                    "{path}: both parsers reject it\n  SylGen:        {lean}\n  sylex_syl: {rust}"
                 ));
             }
             (Some(lean), Ok(_)) => {
                 differences.push(format!("{path}: only SylGen rejects it: {lean}"));
             }
             (None, Err(rust)) => {
-                differences.push(format!("{path}: only deckmaste_dsl rejects it: {rust}"));
+                differences.push(format!("{path}: only sylex_syl rejects it: {rust}"));
             }
             (None, Ok(rust)) => {
                 let lean =
@@ -231,12 +231,12 @@ fn first_mismatch(lean: &Json, rust: &Json, path: &str) -> Option<String> {
             }
             (l.len() != r.len()).then(|| {
                 let mut message = format!(
-                    "{path}: SylGen has {} items, deckmaste_dsl has {}",
+                    "{path}: SylGen has {} items, sylex_syl has {}",
                     l.len(),
                     r.len()
                 );
                 let extra = l.get(r.len()).map_or_else(
-                    || format!("deckmaste_dsl's next: {}", r[l.len()]),
+                    || format!("sylex_syl's next: {}", r[l.len()]),
                     |item| format!("SylGen's next: {item}"),
                 );
                 let _ = write!(message, "\n  {extra}");
@@ -250,7 +250,7 @@ fn first_mismatch(lean: &Json, rust: &Json, path: &str) -> Option<String> {
 fn show(path: &str, lean: Option<&Json>, rust: Option<&Json>) -> String {
     let side = |j: Option<&Json>| j.map_or_else(|| "(absent)".to_owned(), Json::to_string);
     format!(
-        "{path} differs\n  SylGen:        {}\n  deckmaste_dsl: {}",
+        "{path} differs\n  SylGen:        {}\n  sylex_syl: {}",
         side(lean),
         side(rust)
     )
@@ -373,7 +373,7 @@ fn sort(sort_ref: &Sort) -> Json {
     })
 }
 
-fn fields<'a>(fields: impl Iterator<Item = &'a deckmaste_dsl::Field>) -> Vec<Json> {
+fn fields<'a>(fields: impl Iterator<Item = &'a sylex_syl::Field>) -> Vec<Json> {
     fields
         .map(|f| json!({ "name": f.name.ident.as_str(), "value": value(&f.value) }))
         .collect()
@@ -415,7 +415,7 @@ card split({ left = { name = \"Fire\" }, right = { name = \"Ice\" } })
 ";
 
     fn rust_side() -> BTreeMap<String, Result<Json, String>> {
-        let file = deckmaste_dsl::parse(FileId(0), SOURCE).unwrap();
+        let file = sylex_syl::parse(FileId(0), SOURCE).unwrap();
         BTreeMap::from([("a.syl".to_owned(), project(&file))])
     }
 
@@ -520,7 +520,7 @@ card split({ left = { name = \"Fire\" }, right = { name = \"Ice\" } })
             "{differences:?}"
         );
         assert!(
-            differences[1].contains("only deckmaste_dsl read"),
+            differences[1].contains("only sylex_syl read"),
             "{differences:?}"
         );
 
@@ -537,12 +537,12 @@ card split({ left = { name = \"Fire\" }, right = { name = \"Ice\" } })
         assert!(differences[0].contains("rust says no"), "{differences:?}");
 
         lean.insert("c.syl".to_owned(), json!({ "declarations": [] }));
-        assert!(compare(&lean, &rust)[1].contains("only deckmaste_dsl rejects"));
+        assert!(compare(&lean, &rust)[1].contains("only sylex_syl rejects"));
     }
 
     #[test]
     fn projection_failure_is_reported() {
-        let file = deckmaste_dsl::parse(FileId(0), "card { types = [] }\n").unwrap();
+        let file = sylex_syl::parse(FileId(0), "card { types = [] }\n").unwrap();
         let projected = project(&file);
         assert!(projected.is_err(), "{projected:?}");
         let lean = BTreeMap::from([("d.syl".to_owned(), json!({ "declarations": [] }))]);

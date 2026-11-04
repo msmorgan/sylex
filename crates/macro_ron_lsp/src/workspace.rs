@@ -73,7 +73,7 @@ impl WorkspaceIndex {
         index.scan_named(&plugins, "keyword_abilities", SymbolKind::Keyword);
         index.scan_named(&plugins, "keyword_actions", SymbolKind::Keyword);
         index.scan_named(&plugins, "ability_words", SymbolKind::AbilityWord);
-        index.scan_rust(&root.join("crates/deckmaste_core/src"));
+        index.scan_rust(&root.join("crates/core/src"));
         index
     }
 
@@ -217,7 +217,7 @@ impl WorkspaceIndex {
                 let location = span_location(&path, &text, offset, name.len());
                 self.push_symbol(
                     name.to_owned(),
-                    "deckmaste_core".to_owned(),
+                    "sylex_core".to_owned(),
                     SymbolKind::RustType,
                     location,
                     None,

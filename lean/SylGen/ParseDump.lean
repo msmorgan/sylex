@@ -4,7 +4,7 @@ import SylGen.Parser
 `sylParseDump ROOT OUTPUT`: parse every `ROOT/plugins_v3/**/*.syl` file with `SylGen.parse` (no
 resolution) and write the declarations as one JSON object to `OUTPUT`, keyed by the path relative
 to `ROOT`. Positions are left out. `cargo xtask dsl differential` compares the dump with
-`deckmaste_dsl`'s trees.
+`sylex_syl`'s trees.
 -/
 
 open Lean System

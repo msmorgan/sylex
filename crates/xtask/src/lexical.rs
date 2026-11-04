@@ -12,15 +12,15 @@ use std::time::Instant;
 use anyhow::Context;
 use anyhow::Result;
 use anyhow::ensure;
-use deckmaste_english::corpus::card_name_lexeme;
-use deckmaste_lexical::AnalyzedText;
-use deckmaste_lexical::Category;
-use deckmaste_lexical::LexemeId;
-use deckmaste_lexical::LexicalProperties;
-use deckmaste_lexical::LexicalReading;
-use deckmaste_lexical::Lexicon;
-use deckmaste_lexical::Source;
-use deckmaste_lexical::SourceKind;
+use sylex_english::corpus::card_name_lexeme;
+use sylex_lexicon::AnalyzedText;
+use sylex_lexicon::Category;
+use sylex_lexicon::LexemeId;
+use sylex_lexicon::LexicalProperties;
+use sylex_lexicon::LexicalReading;
+use sylex_lexicon::Lexicon;
+use sylex_lexicon::Source;
+use sylex_lexicon::SourceKind;
 use rayon::prelude::*;
 use serde::Serialize;
 
@@ -204,8 +204,8 @@ struct Report {
     supported_faces: usize,
     supported_faces_without_text: usize,
     independent_values_checked: usize,
-    lexeme_sources: BTreeMap<deckmaste_lexical::LexemeId, Source>,
-    lexeme_inventory: BTreeMap<deckmaste_lexical::LexemeId, LexemeInventory>,
+    lexeme_sources: BTreeMap<sylex_lexicon::LexemeId, Source>,
+    lexeme_inventory: BTreeMap<sylex_lexicon::LexemeId, LexemeInventory>,
     /// Declared frame signatures belong to lexical identities; they are not
     /// stand-alone surface readings or constructed grammar values.
     declared_frame_signatures: usize,
@@ -218,7 +218,7 @@ struct Report {
 pub fn run(args: &LexicalArgs, output: &mut dyn Write) -> Result<()> {
     let started = Instant::now();
     let corpus = args.selection.load(&args.data)?;
-    let lexicon = deckmaste_lexical_source::LexicalEnvironment::load()
+    let lexicon = sylex_vocabulary::LexicalEnvironment::load()
         .context("loading the v4 lexical environment")?
         .lexicon;
     // The environment loader builds the lexicon index as part of loading, so
@@ -437,8 +437,8 @@ fn merge_nested_count_map<K: Ord, J: Ord>(
     }
 }
 
-fn lexeme_inventory(lexicon: &Lexicon) -> BTreeMap<deckmaste_lexical::LexemeId, LexemeInventory> {
-    let mut counts = BTreeMap::<deckmaste_lexical::LexemeId, usize>::new();
+fn lexeme_inventory(lexicon: &Lexicon) -> BTreeMap<sylex_lexicon::LexemeId, LexemeInventory> {
+    let mut counts = BTreeMap::<sylex_lexicon::LexemeId, usize>::new();
     for value in lexicon.values() {
         *counts.entry(value.lexeme).or_default() += 1;
     }
@@ -644,8 +644,8 @@ fn account_text(
 
 #[cfg(test)]
 mod tests {
-    use deckmaste_lexical::Countability;
-    use deckmaste_lexical::Lexeme;
+    use sylex_lexicon::Countability;
+    use sylex_lexicon::Lexeme;
 
     use super::*;
 

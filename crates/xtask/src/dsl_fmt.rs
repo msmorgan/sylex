@@ -1,6 +1,6 @@
-//! `cargo xtask dsl fmt`: format `.syl` files with `deckmaste_dsl`'s printer.
+//! `cargo xtask dsl fmt`: format `.syl` files with `sylex_syl`'s printer.
 //!
-//! The command line is `deckmaste_dsl::cli`'s, the same as the `sylfmt`
+//! The command line is `sylex_syl::cli`'s, the same as the `sylfmt`
 //! binary's (`cargo xtask dsl fmt --help` lists it); this command only
 //! supplies the default path, every `plugins_v3/**/*.syl` file.
 
@@ -23,7 +23,7 @@ pub fn run(args: &FmtArgs) -> anyhow::Result<()> {
         .join("../..")
         .canonicalize()?;
     let default_paths: [PathBuf; 1] = [root.join("plugins_v3")];
-    if deckmaste_dsl::cli::main(args.args.iter().cloned(), &default_paths) == ExitCode::SUCCESS {
+    if sylex_syl::cli::main(args.args.iter().cloned(), &default_paths) == ExitCode::SUCCESS {
         Ok(())
     } else {
         anyhow::bail!("dsl fmt failed")

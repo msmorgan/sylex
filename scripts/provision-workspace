@@ -9,7 +9,7 @@
 # sharing ignored local dirs such as `docs/superpowers` and `docs/memory` while
 # leaving tracked documentation alone. `plugins/wizards` is reflinked from
 # `default`'s copy (generated there first if missing) as a real dir, never a
-# symlink (deckmaste_plugin's suite loads it, and a symlink would make a
+# symlink (sylex_plugin_v1's suite loads it, and a symlink would make a
 # workspace's generate write into the main checkout). `default`'s `target/` is
 # CoW-reflinked (btrfs-snapshotted if it is a subvolume) as a best-effort
 # build-cache pre-warm, then every tracked file

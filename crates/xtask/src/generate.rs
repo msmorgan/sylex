@@ -27,10 +27,10 @@ pub struct GenerateArgs {
 pub fn run(args: &GenerateArgs) -> anyhow::Result<()> {
     std::fs::create_dir_all(&args.plugin_dir)
         .with_context(|| format!("creating plugin dir {}", args.plugin_dir.display()))?;
-    deckmaste_migrations::stubs::generate_stubs(&args.plugin_dir)?;
-    deckmaste_migrations::extract::extract_cards(&args.plugin_dir)?;
-    deckmaste_migrations::resolve::resolve_cards(&args.plugin_dir)?;
-    let report = deckmaste_migrations::graduate::graduate_plugin(&args.plugin_dir)?;
+    sylex_pipeline_v1::stubs::generate_stubs(&args.plugin_dir)?;
+    sylex_pipeline_v1::extract::extract_cards(&args.plugin_dir)?;
+    sylex_pipeline_v1::resolve::resolve_cards(&args.plugin_dir)?;
+    let report = sylex_pipeline_v1::graduate::graduate_plugin(&args.plugin_dir)?;
     print_report(&args.plugin_dir, &report);
     Ok(())
 }

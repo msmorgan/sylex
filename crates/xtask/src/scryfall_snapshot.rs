@@ -196,7 +196,7 @@ fn reconcile(args: &ReconcileArgs) -> anyhow::Result<()> {
         .with_context(|| format!("opening new snapshot {}", args.new_oracle_cards.display()))?;
     let mut new_by_identity = BTreeMap::new();
     let mut new_by_oracle = BTreeMap::<String, Vec<String>>::new();
-    for card in deckmaste_data::scryfall::OracleCardReader::new(BufReader::new(new_file)) {
+    for card in sylex_upstream::scryfall::OracleCardReader::new(BufReader::new(new_file)) {
         let card = card.context("reading new Scryfall snapshot for reconciliation")?;
         let supported = card.supported();
         for unit in card.oracle_units() {
@@ -498,7 +498,7 @@ fn prepare(args: &PrepareArgs) -> anyhow::Result<()> {
     let temporary = tempfile::NamedTempFile::new_in(output_parent)
         .with_context(|| format!("staging snapshot beside {}", args.output.display()))?;
     let tee = TeeReader::new(GzDecoder::new(BufReader::new(compressed)), temporary);
-    let mut cards = deckmaste_data::scryfall::OracleCardReader::new(BufReader::new(tee));
+    let mut cards = sylex_upstream::scryfall::OracleCardReader::new(BufReader::new(tee));
     let mut records = 0usize;
     for card in cards.by_ref() {
         card.context("validating decompressed Scryfall Oracle Cards record")?;

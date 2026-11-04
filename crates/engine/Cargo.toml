@@ -1,0 +1,33 @@
+[package]
+publish = false
+name = "sylex_engine"
+version = "0.1.0"
+edition = "2024"
+
+[lints]
+workspace = true
+
+[dependencies]
+sylex_card = { version = "0.1.0", path = "../card" }
+sylex_core = { version = "0.1.0", path = "../core" }
+rand = "0.10.1"
+rand_chacha = "0.10.0"
+# The emitted entailment table (crates/plugin/tables/entailments.ron)
+# is `include_str!`-shared; these parse it (see src/entail.rs).
+ron = "0.12.1"
+serde = { version = "1.0.228", features = ["derive"] }
+slotmap = { version = "1.1.1", features = ["serde"] }
+thiserror = { workspace = true }
+
+
+[dev-dependencies]
+sylex_semantics_v1 = { version = "0.1.0", path = "../semantics" }
+sylex_lowering_v1 = { version = "0.1.0", path = "../lowering" }
+sylex_plugin_v1 = { version = "0.1.0", path = "../plugin" }
+criterion = "0.8"
+rayon = "1"
+tempfile = "3.27.0"
+
+[[bench]]
+name = "full_game"
+harness = false

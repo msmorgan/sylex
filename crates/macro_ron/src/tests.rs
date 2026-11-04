@@ -25,7 +25,7 @@ use crate::ParamTypeSet;
 use crate::Params;
 use crate::VariantSignature;
 
-/// The deckmaste dialect, for parity with the real consumer: the intercept
+/// The sylex dialect, for parity with the real consumer: the intercept
 /// layer has to coexist with `implicit_some` and `unwrap_variant_newtypes`
 /// (`Intercept::SkipStructs` exists because of the latter).
 fn options() -> ron::Options {
@@ -71,7 +71,7 @@ fn kinds() -> KindSet {
             .with_variants(EMBED_REF_VARIANTS),
     );
     // A non-remembering position kind (no `Expanded` variant), like
-    // deckmaste's `Modification`: exercises nested-macro param forwarding —
+    // sylex's `Modification`: exercises nested-macro param forwarding —
     // a body invoking another macro can forward its own `Param`s into that
     // invocation's arguments (eager pre-substitution in `read_args`).
     kinds.add(Kind::new("Modification"));
@@ -163,7 +163,7 @@ const FILTER_SIGNATURES: &[(&str, VariantSignature)] = &[
     ),
 ];
 
-/// A name-erasing struct kind, like deckmaste's `Subtype`.
+/// A name-erasing struct kind, like sylex's `Subtype`.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 struct Subtype {
     name: Ident,
@@ -270,7 +270,7 @@ enum SimpleManaSymbol {
     Specific(Color),
 }
 
-/// Mirrors deckmaste's `ManaSymbol`: partially untagged, so its contents
+/// Mirrors sylex's `ManaSymbol`: partially untagged, so its contents
 /// buffer through `deserialize_any` — the `Param` splicing path.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
 enum ManaSymbol {
@@ -288,7 +288,7 @@ struct CardFace {
     types: Vec<Type>,
 }
 
-/// A `NumericOp`-shaped param type, like deckmaste's own: the payload a
+/// A `NumericOp`-shaped param type, like sylex's own: the payload a
 /// nested-macro invocation forwards a caller's numeric `Param` into.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 enum NumericOp {
@@ -2574,7 +2574,7 @@ mod derived {
     }
 
     /// Tuple-variant fixture mirroring `Action::Move`'s real shape (see
-    /// `deckmaste_core::action::Action::Move`): two required fields, then two
+    /// `sylex_core::action::Action::Move`): two required fields, then two
     /// trailing `#[macro_ron(default = ...)]` fields.
     #[derive(Debug, Clone, PartialEq, crate::SupportsMacros)]
     enum Move {

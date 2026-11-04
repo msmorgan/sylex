@@ -1,0 +1,270 @@
+//! Data-driven play strategies: a semantic RON play policy expressed over
+//! core's own expression vocabulary.
+//!
+//! A strategy is RON *data*, not a macro (the macro language has no control
+//! flow): its "sensing" half reuses [`Condition`] / [`Predicate`] / [`Count`] /
+//! `Reference` verbatim, and its branching is an ordered rule list an evaluator
+//! walks — the same way the engine walks `Vec<Ability>`. The types here are
+//! pure data; the evaluator that turns a strategy + game state into a decision
+//! lives alongside them in this crate, in [`crate::strategy`].
+//!
+//! Named `strategy_def` (not `strategy`) because `crate::strategy` is already
+//! the evaluator module, and `crate::sim::Strategy` is a seat trait — three
+//! things named "strategy" in one crate. Strategy RON is engine
+//! configuration, not card content, so it plays no part in the macro layer:
+//! these types are plain serde, read raw via
+//! [`sylex_core::ron::options()`](sylex_core::ron::options).
+//!
+//! [`Condition`]: sylex_core::Condition
+//! [`Predicate`]: sylex_core::Predicate
+//! [`Count`]: sylex_core::Count
+
+use std::sync::Arc;
+
+use sylex_core::Condition;
+use sylex_core::Count;
+use sylex_core::Predicate;
+use serde::Deserialize;
+use serde::Serialize;
+
+/// Which end of a ranked candidate set a selector picks.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
+pub enum Extremum {
+    /// The minimum by the selector's ranking count.
+    Min,
+    /// The maximum by the selector's ranking count.
+    Max,
+    /// First in enumeration order — no ranking applied.
+    First,
+}
+
+/// Picks one option from the legal candidates by ranking them on a core
+/// [`Count`] and taking the [`Extremum`] end, optionally narrowed to those
+/// matching `among`. The workhorse of a strategy: most decisions reduce to
+/// "the X-est legal option".
+///
+/// [`Count`]: sylex_core::Count
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub struct Selector {
+    /// Which end of the ranking to take.
+    pub pick: Extremum,
+    /// The per-candidate quantity to rank by, evaluated with the candidate
+    /// bound as `This`.
+    pub by: Count,
+    /// Narrowing of the legal set; `None` (omitted) = the whole legal set.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub among: Option<Predicate>,
+}
+
+/// How a strategy declares blocks. Coarse for v1; grows as block math matures.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
+pub enum BlockPolicy {
+    /// Block as many attackers as possible.
+    BlockAll,
+    /// Declare no blocks.
+    NoBlocks,
+    /// Chump-block the single biggest attacker.
+    ChumpBiggest,
+}
+
+/// A chosen play at a decision point — the genuinely new "choose a play" half
+/// of the strategy language. Cards never choose their controller's plays, so
+/// this has no card analog; but every option it carries reuses [`Selector`]
+/// (and through it core's `Count`/`Predicate`).
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub enum Preference {
+    /// Pass priority.
+    Pass,
+    /// Concede the game (available; rarely authored).
+    Concede,
+    /// Play a land chosen by `what`.
+    Play {
+        /// Which land to play.
+        what: Selector,
+    },
+    /// Cast a spell chosen by `what`, optionally targeting via `target`.
+    Cast {
+        /// Which spell to cast.
+        what: Selector,
+        /// How to pick its target(s); `None` = no targets / engine default.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        target: Option<Selector>,
+    },
+    /// Activate an ability chosen by `what`, optionally targeting via `target`.
+    Activate {
+        /// Which ability to activate.
+        what: Selector,
+        /// How to pick its target(s); `None` = no targets / engine default.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        target: Option<Selector>,
+    },
+    /// Declare the attackers chosen by `what`.
+    Attack {
+        /// Which creatures attack.
+        what: Selector,
+    },
+    /// Declare blocks per the given policy.
+    Block(BlockPolicy),
+    /// Discard an object chosen by `what`.
+    Discard {
+        /// Which card to discard.
+        what: Selector,
+    },
+}
+
+/// One rule of a strategy: when `when` holds (and `prefer` resolves to a legal
+/// play), the evaluator applies `prefer`. Rules are tried in order — the first
+/// applicable one wins.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub struct Rule {
+    /// The gating condition, in core's `Condition` vocabulary (reused verbatim;
+    /// boolean composition via `And`/`Or`/`Not`).
+    pub when: Condition,
+    /// The play to prefer when this rule fires.
+    pub prefer: Preference,
+}
+
+/// A complete play policy: a name and an ordered list of [`Rule`]s the
+/// evaluator walks top-to-bottom. Authored as RON.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub struct Strategy {
+    /// Human-facing name.
+    pub name: Arc<str>,
+    /// Ordered rules; the first whose `when` holds and whose `prefer` is legal
+    /// wins.
+    pub rules: Vec<Rule>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn read<T: serde::de::DeserializeOwned>(src: &str) -> T {
+        sylex_core::ron::options().from_str(src).unwrap()
+    }
+
+    #[test]
+    fn extremum_reads_variants() {
+        assert_eq!(read::<Extremum>("Min"), Extremum::Min);
+        assert_eq!(read::<Extremum>("Max"), Extremum::Max);
+        assert_eq!(read::<Extremum>("First"), Extremum::First);
+    }
+
+    /// The central thesis: a strategy type embeds core's `Count` and
+    /// `Predicate` verbatim — the "sensing" vocabulary is reused, not
+    /// re-invented.
+    #[test]
+    fn selector_embeds_core_count_and_filter() {
+        use sylex_core::Reference;
+        use sylex_core::Stat;
+        let s: Selector = read("(pick: Max, by: StatOf(Reg(0), Power), among: Some(Any))");
+        assert_eq!(s.pick, Extremum::Max);
+        assert_eq!(
+            s.by,
+            Count::StatOf(Reference::Reg(sylex_core::RefId(0)), Stat::Power)
+        );
+        assert_eq!(s.among, Some(Predicate::Any));
+    }
+
+    /// `among` is optional — omitting it means "the whole legal set".
+    #[test]
+    fn selector_among_defaults_to_none_when_omitted() {
+        let s: Selector = read("(pick: First, by: Literal(1))");
+        assert_eq!(s.among, None);
+    }
+
+    #[test]
+    fn preference_nullary_variants_read() {
+        assert_eq!(read::<Preference>("Pass"), Preference::Pass);
+        assert_eq!(read::<Preference>("Concede"), Preference::Concede);
+    }
+
+    /// The object-picking preferences each carry a `Selector` to choose which
+    /// object to act on; `Cast`/`Activate` also carry an optional target.
+    #[test]
+    fn preference_object_picking_variants_read() {
+        let cast: Preference = read("Cast(what: (pick: Min, by: StatOf(Reg(0), ManaValue)))");
+        let Preference::Cast { what, target } = cast else {
+            panic!("expected Cast");
+        };
+        assert_eq!(what.pick, Extremum::Min);
+        assert_eq!(target, None);
+
+        let activate: Preference = read(
+            "Activate(what: (pick: First, by: Literal(1)), target: Some((pick: Max, by: StatOf(Reg(0), Power))))",
+        );
+        let Preference::Activate { target, .. } = activate else {
+            panic!("expected Activate");
+        };
+        assert_eq!(target.expect("target present").pick, Extremum::Max);
+
+        assert!(matches!(
+            read::<Preference>("Play(what: (pick: First, by: Literal(1)))"),
+            Preference::Play { .. }
+        ));
+        assert!(matches!(
+            read::<Preference>("Attack(what: (pick: Max, by: StatOf(Reg(0), Power)))"),
+            Preference::Attack { .. }
+        ));
+        assert!(matches!(
+            read::<Preference>("Discard(what: (pick: Min, by: StatOf(Reg(0), ManaValue)))"),
+            Preference::Discard { .. }
+        ));
+    }
+
+    #[test]
+    fn preference_block_reads_a_block_policy() {
+        assert_eq!(
+            read::<Preference>("Block(BlockAll)"),
+            Preference::Block(BlockPolicy::BlockAll),
+        );
+        assert_eq!(read::<BlockPolicy>("NoBlocks"), BlockPolicy::NoBlocks);
+        assert_eq!(
+            read::<BlockPolicy>("ChumpBiggest"),
+            BlockPolicy::ChumpBiggest
+        );
+    }
+
+    /// A whole strategy file: a name and an ordered list of rules, each pairing
+    /// a core `Condition` (`when`) with a `Preference` (`prefer`).
+    #[test]
+    fn strategy_reads_full_with_ordered_rules() {
+        let s: Strategy = read(
+            r#"(
+                name: "Test Aggro",
+                rules: [
+                    (when: YourTurn, prefer: Cast(what: (pick: Min, by: StatOf(Reg(0), ManaValue)))),
+                    (when: And([]), prefer: Pass),
+                ],
+            )"#,
+        );
+        assert_eq!(&*s.name, "Test Aggro");
+        assert_eq!(s.rules.len(), 2);
+        assert_eq!(s.rules[0].when, Condition::YourTurn);
+        assert!(matches!(s.rules[0].prefer, Preference::Cast { .. }));
+        assert_eq!(s.rules[1].when, Condition::And(vec![].into()));
+        assert_eq!(s.rules[1].prefer, Preference::Pass);
+    }
+
+    /// Serialize → parse is identity: an authored strategy survives a
+    /// round-trip through RON unchanged (the render side of the contract).
+    #[test]
+    fn strategy_round_trips_through_ron() {
+        let s: Strategy = read(
+            r#"(
+                name: "Round Trip",
+                rules: [
+                    (when: YourTurn, prefer: Cast(
+                        what: (pick: Min, by: StatOf(Reg(0), ManaValue), among: Some(Any)),
+                        target: Some((pick: Max, by: StatOf(Reg(0), Power))),
+                    )),
+                    (when: And([]), prefer: Block(BlockAll)),
+                    (when: And([]), prefer: Pass),
+                ],
+            )"#,
+        );
+        let written = sylex_core::ron::options().to_string(&s).unwrap();
+        let again: Strategy = read(&written);
+        assert_eq!(s, again);
+    }
+}

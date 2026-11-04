@@ -93,7 +93,7 @@ check '200 replaces destination atomically' 'fresh response' \
     (string trim < $catalogs_dir/creature-types.json)
 check_arg 'Scryfall sends an explicit Accept header' 'Accept: application/json'
 check_arg 'Scryfall sends an explicit User-Agent' \
-    'deckmaste.rs/0.1 (+https://github.com/msmorgan/deckmaste.rs)'
+    'sylex/0.1 (+https://github.com/msmorgan/deckmaste.rs)'
 check_arg 'downloads retry transient upstream failures' '--retry'
 check 'catalog request waits 100 ms' 0.1 (string trim <$sleep_log)
 

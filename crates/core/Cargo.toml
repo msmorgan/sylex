@@ -1,0 +1,14 @@
+[package]
+publish = false
+name = "sylex_core"
+version = "0.1.0"
+edition = "2024"
+
+[lints]
+workspace = true
+
+[dependencies]
+dpsi = { version = "0.1.0", features = ["serde"] }
+ron = "0.12.1"
+serde = { version = "1.0.228", features = ["derive", "rc"] }
+thiserror = { workspace = true }

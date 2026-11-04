@@ -6,5 +6,5 @@ fn main() -> ExitCode {
         eprintln!("error: {e}");
         return ExitCode::FAILURE;
     }
-    deckmaste_tui::run()
+    sylex_tui::run()
 }

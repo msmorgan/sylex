@@ -11,22 +11,22 @@ workspace = true
 anyhow = { version = "1.0.102" }
 clap = { version = "4.6.1", features = ["derive"] }
 flate2 = "1.1.2"
-deckmaste_card = { version = "0.1.0", path = "../deckmaste_card" }
-deckmaste_catalogs = { version = "0.1.0", path = "../deckmaste_catalogs" }
-deckmaste_data = { version = "0.1.0", path = "../deckmaste_data" }
-deckmaste_dsl = { version = "0.1.0", path = "../deckmaste_dsl" }
-deckmaste_syntax = { version = "0.1.0", path = "../deckmaste_syntax" }
-deckmaste_english = { version = "0.1.0", path = "../deckmaste_english" }
-deckmaste_lexical_source = { version = "0.1.0", path = "../deckmaste_lexical_source" }
-deckmaste_lexical = { version = "0.1.0", path = "../deckmaste_lexical" }
-deckmaste_semantics = { version = "0.1.0", path = "../deckmaste_semantics" }
-deckmaste_plugin = { version = "0.1.0", path = "../deckmaste_plugin" }
-deckmaste_legacy_render = { version = "0.1.0", path = "../deckmaste_legacy_render" }
-deckmaste_core = { version = "0.1.0", path = "../deckmaste_core" }
+sylex_card = { version = "0.1.0", path = "../card" }
+sylex_catalogs = { version = "0.1.0", path = "../catalogs" }
+sylex_upstream = { version = "0.1.0", path = "../upstream" }
+sylex_syl = { version = "0.1.0", path = "../syl" }
+sylex_syntax = { version = "0.1.0", path = "../syntax" }
+sylex_english = { version = "0.1.0", path = "../english" }
+sylex_vocabulary = { version = "0.1.0", path = "../vocabulary" }
+sylex_lexicon = { version = "0.1.0", path = "../lexicon" }
+sylex_semantics_v1 = { version = "0.1.0", path = "../semantics" }
+sylex_plugin_v1 = { version = "0.1.0", path = "../plugin" }
+sylex_render_v1 = { version = "0.1.0", path = "../render" }
+sylex_core = { version = "0.1.0", path = "../core" }
 # Reuse the locked substring scanner for JSONL name candidates.
 memchr = "2.8.2"
 libc = "0.2.186"
-deckmaste_migrations = { version = "0.1.0", path = "../deckmaste_migrations" }
+sylex_pipeline_v1 = { version = "0.1.0", path = "../pipeline" }
 macro_ron = { version = "0.1.0", path = "../macro_ron" }
 # `map enums`: parse Rust sources to find `pub enum` shapes; span-locations
 # lets `syn`'s spans report real source line numbers outside a proc-macro.

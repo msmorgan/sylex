@@ -10,7 +10,7 @@ function __scryfall_download
         download_file \
             --tag 'scryfall' \
             --accept 'application/json' \
-            --user-agent 'deckmaste.rs/0.1 (+https://github.com/msmorgan/deckmaste.rs)' \
+            --user-agent 'sylex/0.1 (+https://github.com/msmorgan/deckmaste.rs)' \
             $url $out
         set -l download_status $status
 
@@ -37,7 +37,7 @@ function __scryfall_oracle_cards
     download_file \
         --tag 'scryfall oracle descriptor' \
         --accept 'application/json' \
-        --user-agent 'deckmaste.rs/0.1 (+https://github.com/msmorgan/deckmaste.rs)' \
+        --user-agent 'sylex/0.1 (+https://github.com/msmorgan/deckmaste.rs)' \
         $__scryfall_base_url/bulk-data/oracle-cards $descriptor
     or return
     sleep 0.1
@@ -49,7 +49,7 @@ function __scryfall_oracle_cards
     download_file \
         --tag 'scryfall oracle cards' \
         --accept 'application/gzip' \
-        --user-agent 'deckmaste.rs/0.1 (+https://github.com/msmorgan/deckmaste.rs)' \
+        --user-agent 'sylex/0.1 (+https://github.com/msmorgan/deckmaste.rs)' \
         $uri $compressed
     or return
     sleep 0.1

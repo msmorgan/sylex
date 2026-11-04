@@ -1,0 +1,989 @@
+//! English object description → `Predicate` RON string (the shared subject
+//! parser used by `static_ability`, and the home of future target/selection
+//! filter parsing). Strict: an unrecognized head noun or any unconsumed token
+//! declines (`None`) — a wrong filter would graduate a wrong card.
+
+use std::collections::HashMap;
+use std::collections::HashSet;
+use std::sync::LazyLock;
+
+use sylex_upstream::scryfall;
+use regex::Regex;
+
+/// Controller restriction recorded while parsing a filter phrase. Consumers
+/// that need a particular controller inspect this typed fact rather than the
+/// English suffix or the rendered `Predicate` RON.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum FilterController {
+    You,
+    Opponent,
+}
+
+/// Grammatical identity of the filter's head noun. The rendered predicate is
+/// intentionally not used to recover this distinction.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum FilterHead {
+    TypeNoun,
+    Subtype,
+    Other,
+}
+
+/// A parsed object-description phrase together with the semantic facts that
+/// downstream grammar gates need.
+pub(crate) struct ParsedFilter {
+    predicate: String,
+    head: FilterHead,
+    controllers: Vec<FilterController>,
+}
+
+impl ParsedFilter {
+    pub(crate) fn into_predicate(self) -> String {
+        self.predicate
+    }
+
+    pub(crate) fn head(&self) -> FilterHead {
+        self.head
+    }
+
+    pub(crate) fn is_controlled_by(&self, controller: FilterController) -> bool {
+        self.controllers.as_slice() == [controller]
+    }
+}
+
+/// Every printed subtype name across the Scryfall subtype catalogs (creature,
+/// artifact, enchantment, land, planeswalker, battle, spell). Used to validate
+/// a subtype-adjective ("Elf creatures") so a Title-Case non-subtype at a
+/// sentence start (an anaphor like "Equipped", a negation like "Nontoken") is
+/// never minted as a `Subtype`. Empty if the catalogs can't be read — then the
+/// subtype-adjective production simply declines, never mis-parses.
+static SUBTYPES: LazyLock<HashSet<String>> = LazyLock::new(|| {
+    let mut set = HashSet::new();
+    for category in [
+        "creature",
+        "artifact",
+        "enchantment",
+        "land",
+        "planeswalker",
+        "battle",
+        "spell",
+    ] {
+        let Ok(bytes) = scryfall::catalog_bytes(&format!("{category}-types")) else {
+            continue;
+        };
+        let Ok(catalog) = scryfall::Catalog::parse(&bytes) else {
+            continue;
+        };
+        set.extend(catalog.data.iter().map(ToString::to_string));
+    }
+    // Catalog gap: Vibranium is a new artifact subtype ([CR#205.3g]) that
+    // Scryfall's `artifact-types` catalog does not list yet (unlike the other
+    // June 2026 subtypes — Plan and the Marvel creature types — which flow
+    // through the catalogs above automatically). Supplement it so the
+    // "Vibranium" adjective and the Vibranium token's type line resolve; drop
+    // this once a `scripts/fetch_data` picks up the catalog entry.
+    set.insert("Vibranium".to_string());
+    set
+});
+
+/// Subtype name -> its parent card-type category ("Land", "Artifact",
+/// "Creature", "Enchantment", "Planeswalker", "Battle"). Used by the
+/// library-search family ([`crate::parsers::effect`]) to reconstruct the
+/// implicit card type a bare subtype phrase names ("a Forest card" -> a LAND
+/// card with the Forest subtype; "an Equipment card" -> an ARTIFACT card with
+/// the Equipment subtype) — the oracle text never spells the redundant type
+/// word, but the `Predicate` needs it (a subtype alone doesn't determine a
+/// card type without the catalog). "spell" has no per-word card-type
+/// spelling (Arcane/Trap/… name no single `Type`), so it's excluded — a spell
+/// subtype used bare is presently unmodeled. A subtype present in more than
+/// one catalog keeps its FIRST (declaration-order) category; none of the
+/// catalogs currently overlap in practice.
+static SUBTYPE_CATEGORY: LazyLock<HashMap<String, &'static str>> = LazyLock::new(|| {
+    let mut map = HashMap::new();
+    for (category, type_name) in [
+        ("creature", "Creature"),
+        ("artifact", "Artifact"),
+        ("enchantment", "Enchantment"),
+        ("land", "Land"),
+        ("planeswalker", "Planeswalker"),
+        ("battle", "Battle"),
+    ] {
+        let Ok(bytes) = scryfall::catalog_bytes(&format!("{category}-types")) else {
+            continue;
+        };
+        let Ok(catalog) = scryfall::Catalog::parse(&bytes) else {
+            continue;
+        };
+        for entry in &catalog.data {
+            map.entry(entry.to_string()).or_insert(type_name);
+        }
+    }
+    map
+});
+
+/// The parent card-type category for a known catalog subtype ("Forest" ->
+/// "Land", "Equipment" -> "Artifact"), or `None` if `word` names no subtype
+/// in a category with a per-word card type. Case-sensitive, like
+/// [`is_subtype`].
+pub(crate) fn subtype_category(word: &str) -> Option<&'static str> {
+    SUBTYPE_CATEGORY.get(word).copied()
+}
+
+/// Parse an object-description phrase into a `Predicate` RON string, or `None`.
+pub(crate) fn parse_phrase(phrase: &str) -> Option<String> {
+    parse_phrase_detailed(phrase).map(ParsedFilter::into_predicate)
+}
+
+/// Parse an object-description phrase while retaining grammatical facts that
+/// are otherwise lost when its predicate is rendered to RON.
+pub(crate) fn parse_phrase_detailed(phrase: &str) -> Option<ParsedFilter> {
+    let mut rest = phrase.trim();
+    let mut prefix_atoms: Vec<String> = Vec::new();
+
+    loop {
+        // Determiners — consumed, no atom.
+        if let Some(r) = strip_word(rest, &["a", "an", "each", "all", "any"]) {
+            rest = r;
+            continue;
+        }
+        // Self-exclusion.
+        if let Some(r) = strip_word(rest, &["other", "another"]) {
+            prefix_atoms.push("Not(Ref(This))".into());
+            rest = r;
+            continue;
+        }
+        // Status adjectives.
+        if let Some((atom, r)) = strip_status(rest) {
+            prefix_atoms.push(atom);
+            rest = r;
+            continue;
+        }
+        // Color / type negation: `non<color>` / `non<type>`.
+        if let Some((atom, r)) = strip_negation(rest) {
+            prefix_atoms.push(atom);
+            rest = r;
+            continue;
+        }
+        // Color adjective.
+        if let Some((atom, r)) = strip_color(rest) {
+            prefix_atoms.push(atom);
+            rest = r;
+            continue;
+        }
+        // Designation adjective before a type noun: "Commander creatures" →
+        // Designated("Commander") (checked before subtype — it's not a subtype).
+        if let Some((atom, r)) = strip_designation_adjective(rest) {
+            prefix_atoms.push(atom);
+            rest = r;
+            continue;
+        }
+        // Subtype adjective before a type noun: "Elf creatures" → Subtype("Elf").
+        if let Some((atom, r)) = strip_subtype_adjective(rest) {
+            prefix_atoms.push(atom);
+            rest = r;
+            continue;
+        }
+        break;
+    }
+
+    // Postfix relative clauses (peel off the END).
+    // Peels right-to-left off the end, so with multiple postfix clauses the atoms
+    // land in reverse source order.
+    let mut postfix_atoms: Vec<String> = Vec::new();
+    let mut controllers = Vec::new();
+    loop {
+        // "on the battlefield" is the default scope: consume, emit no atom.
+        if let Some(r) = rest.trim_end().strip_suffix(" on the battlefield") {
+            rest = r;
+            continue;
+        }
+        if let Some((atom, r, controller)) = strip_postfix(rest) {
+            postfix_atoms.push(atom);
+            controllers.extend(controller);
+            rest = r;
+            continue;
+        }
+        break;
+    }
+
+    // What's left must be exactly the head noun.
+    let head = head_noun(rest)?;
+    let mut atoms = head.atoms;
+    atoms.extend(prefix_atoms);
+    atoms.extend(postfix_atoms);
+    Some(ParsedFilter {
+        predicate: combine(atoms),
+        head: head.kind,
+        controllers,
+    })
+}
+
+/// A damage-event RECIPIENT phrase ("a player", "an opponent", "you", "a
+/// player or planeswalker") → a `Predicate` RON string, or `None`. The
+/// restricted "any target" family a combat/noncombat damage event's `to:`
+/// draws from ([CR#115.4]: player, planeswalker, battle, or creature) plus
+/// the player-identity pronouns ("you", "an opponent") [`parse_phrase`]'s
+/// noun-phrase grammar doesn't model (no article, no head noun — a
+/// relational/self reference instead). An "X or Y" disjunction (Lava
+/// Spike's "a player or planeswalker") recurses on each half and wraps the
+/// pair in `Or([...])`, mirroring the hardcoded `Or([Player, Planeswalker])`
+/// spelling `effect::damage_target`'s "target player or planeswalker" arm
+/// already emits. Anything else (a bare object description like "a
+/// creature", "a planeswalker") falls through to [`parse_phrase`].
+pub(crate) fn recipient_phrase(phrase: &str) -> Option<String> {
+    let phrase = phrase.trim();
+    if let Some((a, b)) = phrase.split_once(" or ") {
+        return Some(format!(
+            "Or([{}, {}])",
+            recipient_phrase(a)?,
+            recipient_phrase(b)?
+        ));
+    }
+    match phrase {
+        "a player" => Some("Player".to_owned()),
+        "you" => Some("Ref(You)".to_owned()),
+        // "an opponent" ([CR#102.2]) / "one of your opponents" — the same
+        // recipient predicate either way, matching `effect::damage_target`'s
+        // "each opponent"/"target opponent" spelling.
+        "an opponent" | "one of your opponents" => Some("OpponentOf(Ref(You))".to_owned()),
+        _ => parse_phrase(phrase),
+    }
+}
+
+/// Whether `word` is a known catalog subtype (any case-sensitive catalog
+/// entry). The dual-land subtype-disjunction grammar
+/// ([`crate::parsers::replacement`]) gates on this so "a Swamp or a Mountain"
+/// mints `Subtype` atoms only for real subtypes — the same catalog
+/// [`strip_subtype_adjective`] validates against.
+pub(crate) fn is_subtype(word: &str) -> bool {
+    SUBTYPES.contains(word)
+}
+
+/// A spell-subject phrase ("Goblin spells you cast", "creature spells") → a
+/// `Predicate` matching a SPELL on the stack ([CR#112.1] — a card on the
+/// stack). The `of` filter of a
+/// [`CostModifier`](sylex_semantics_v1::StaticEffect) reducer/ taxer. Always
+/// leads with `Kind(Spell)`; then one characteristic atom from the leading
+/// adjective (a card type, a color, or a catalog subtype); then, if the phrase
+/// ends "… you cast", `ControlledBy(Ref(You))` — the caster controls the spell
+/// on the stack ([CR#108.4]). A missing "spell(s)" head noun, an unknown
+/// adjective, or leftover tokens decline.
+pub(crate) fn spell_subject(phrase: &str) -> Option<String> {
+    let mut rest = phrase.trim();
+    let controlled = rest.strip_suffix(" you cast").map(|head| {
+        rest = head.trim_end();
+        true
+    });
+    let adj = rest
+        .strip_suffix(" spells")
+        .or_else(|| rest.strip_suffix(" spell"))?
+        .trim();
+    let mut atoms = vec!["Kind(Spell)".to_string(), spell_adjective(adj)?];
+    if controlled.is_some() {
+        atoms.push("ControlledBy(Ref(You))".to_string());
+    }
+    Some(combine(atoms))
+}
+
+/// The characteristic atom for a spell-subject adjective — a color
+/// (`ColorIs(Red)`), a card type (`Type(Creature)`), or a catalog subtype
+/// (`Subtype("Goblin")`), in that precedence. A multi-word or unknown adjective
+/// declines. The subtype is validated case-sensitively against the same catalog
+/// [`strip_subtype_adjective`] gates on, so a non-subtype never mints a bogus
+/// atom.
+fn spell_adjective(word: &str) -> Option<String> {
+    if word.contains(' ') {
+        return None;
+    }
+    if let Some(color) = color_ident(word) {
+        return Some(format!("ColorIs({color})"));
+    }
+    if let Some(ty) = type_filter(&singularize(word).to_ascii_lowercase()) {
+        return Some(ty);
+    }
+    if is_subtype(word) {
+        return Some(format!("Subtype({})", crate::ident::to_rust_ident(word)));
+    }
+    None
+}
+
+/// The head atom for a singular/plural type noun ("land" → `Type(Land)`,
+/// "creature" → `Creature`), or `None` if `word` is not a type noun. The
+/// supertype-adjective dual-land grammar pairs this with a `Supertype(...)`
+/// atom ("basic land", "legendary creature").
+pub(crate) fn type_head_atom(word: &str) -> Option<String> {
+    type_noun_atom(&singularize(word.trim()).to_ascii_lowercase()).map(ToOwned::to_owned)
+}
+
+/// Trailing "with power/toughness N or greater/less" stat clause. Compiled
+/// once, not per call — `strip_postfix` runs on every ability line during
+/// `resolve`.
+static STAT_CLAUSE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?i) with (power|toughness) (\d+) or (greater|less)$").unwrap());
+
+/// Peel one trailing relative clause off `s`, returning its predicate atom,
+/// head remainder, and any controller restriction it establishes.
+fn strip_postfix(s: &str) -> Option<(String, &str, Option<FilterController>)> {
+    let s = s.trim_end();
+    for (suffix, atom, controller) in [
+        (
+            " you control",
+            "ControlledBy(Ref(You))",
+            Some(FilterController::You),
+        ),
+        (
+            " an opponent controls",
+            "ControlledBy(OpponentOf(Ref(You)))",
+            Some(FilterController::Opponent),
+        ),
+        (
+            " your opponents control",
+            "ControlledBy(OpponentOf(Ref(You)))",
+            Some(FilterController::Opponent),
+        ),
+        (" you own", "Owner(Ref(You))", None),
+    ] {
+        if let Some(head) = s.strip_suffix(suffix) {
+            return Some((atom.to_string(), head, controller));
+        }
+    }
+    // Stat clauses via regex (power/toughness, greater/less).
+    if let Some(caps) = STAT_CLAUSE.captures(s) {
+        let stat = if caps[1].eq_ignore_ascii_case("power") { "Power" } else { "Toughness" };
+        let n = &caps[2];
+        let cmp = if caps[3].eq_ignore_ascii_case("greater") { "AtLeast" } else { "AtMost" };
+        let head = &s[..caps.get(0).unwrap().start()];
+        return Some((format!("Stat({stat}, {cmp}, {n})"), head, None));
+    }
+    if let Some(head) = s.strip_suffix(" with a +1/+1 counter on it") {
+        // Counter kinds are bare `CounterRef` idents, not strings.
+        return Some(("HasCounter(P1P1Counter)".to_string(), head, None));
+    }
+    // "… with <keyword>" → Has(<Keyword>) (a keyword-quality clause, e.g.
+    // "creatures with flying"). Only a catalog keyword qualifies — a "with …"
+    // tail naming anything else (a counter handled above, a stat clause caught
+    // by the regex) falls through and the head declines.
+    if let Some((head, kw)) = s.rsplit_once(" with ")
+        && let Some(name) = crate::parsers::keyword_ability::match_keyword_name(kw)
+    {
+        return Some((format!("Has({name})"), head, None));
+    }
+    None
+}
+
+/// Strip a leading whole word (case-insensitive) from `s`, returning the rest.
+fn strip_word<'a>(s: &'a str, words: &[&str]) -> Option<&'a str> {
+    let (first, rest) = s.split_once(' ')?;
+    words
+        .iter()
+        .any(|w| first.eq_ignore_ascii_case(w))
+        .then(|| rest.trim_start())
+}
+
+fn strip_status(s: &str) -> Option<(String, &str)> {
+    let (first, rest) = s.split_once(' ')?;
+    let atom = match first.to_ascii_lowercase().as_str() {
+        "tapped" => "Status(Tapped)",
+        "untapped" => "Status(Untapped)",
+        "attacking" => "Attacking",
+        "blocking" => "Blocking",
+        _ => return None,
+    };
+    Some((atom.to_string(), rest.trim_start()))
+}
+
+/// An English color word -> its `Color` ident, else `None`. Case-insensitive:
+/// oracle text lowercases colors in this position, but a silent
+/// misclassification as a subtype is worse than tolerating case. The single
+/// English color-word map shared across the parsers (distinct from core
+/// `Color::from_code`, which maps single-letter codes).
+pub(super) fn color_ident(word: &str) -> Option<&'static str> {
+    Some(match word.to_ascii_lowercase().as_str() {
+        "white" => "White",
+        "blue" => "Blue",
+        "black" => "Black",
+        "red" => "Red",
+        "green" => "Green",
+        _ => return None,
+    })
+}
+
+/// A singular type noun -> its bare `Type` RON identifier ("creature" ->
+/// "Creature"). Shared beyond this module by the `That(<Type>)` sorted-anaphor
+/// production (`effect::combat_restriction_scope`) — the same bare identifier
+/// IS the `Sort::OfType(Type)` RON spelling ([CR#205.2a]), unlike
+/// [`type_filter`]'s always-`Type(<T>)` wrapper (a `Predicate`, not a `Sort`).
+pub(super) fn type_code(word: &str) -> Option<&'static str> {
+    Some(match word.to_ascii_lowercase().as_str() {
+        "creature" => "Creature",
+        "artifact" => "Artifact",
+        "enchantment" => "Enchantment",
+        "land" => "Land",
+        "planeswalker" => "Planeswalker",
+        _ => return None,
+    })
+}
+
+/// A supertype word ([CR#205.4a]) -> its `Supertype` enum ident, else `None`.
+/// Case-insensitive, mirroring [`type_code`]/[`color_ident`]. The type-gated
+/// look-at-top slot reader (`macro_slot_reader`, [`crate::parsers::effect`])
+/// uses this for a bare supertype standing alone as a card descriptor ("a snow
+/// card"), where the supertype atom IS the whole filter (no accompanying
+/// `Type`) — the fallback for the words `search_card_descriptor` doesn't take
+/// standalone.
+pub(super) fn supertype_ident(word: &str) -> Option<&'static str> {
+    Some(match word.to_ascii_lowercase().as_str() {
+        "basic" => "Basic",
+        "legendary" => "Legendary",
+        "ongoing" => "Ongoing",
+        "snow" => "Snow",
+        "world" => "World",
+        _ => return None,
+    })
+}
+
+/// A leading color/color-count adjective ("black", "colorless",
+/// "multicolored") -> its atom (`ColorIs(<C>)`, or the bare `Colorless`/
+/// `Multicolored`), plus the remaining head. `pub(crate)` beyond
+/// [`parse_phrase`]'s own prefix loop: the library-search filter grammar
+/// ([`crate::parsers::effect`]) reuses it directly for "a colorless creature
+/// card" / "a multicolored creature card", which need the same
+/// color-or-color-count adjective this shares with battlefield-object
+/// descriptions.
+pub(crate) fn strip_color(s: &str) -> Option<(String, &str)> {
+    let (first, rest) = s.split_once(' ')?;
+    let atom = match first.to_ascii_lowercase().as_str() {
+        "colorless" => "Colorless".to_string(),
+        "multicolored" => "Multicolored".to_string(),
+        other => format!("ColorIs({})", color_ident(other)?),
+    };
+    Some((atom, rest.trim_start()))
+}
+
+/// A known subtype used as an adjective before a type noun: "Elf creatures" →
+/// (`Subtype("Elf")`, "creatures …"). Fires only when `first` is a catalog
+/// subtype (so anaphors like "Equipped", negations like "Nontoken", and
+/// card-type/supertype words decline rather than mint a wrong atom) AND a type
+/// noun follows (so a bare "Goblins" stays a head noun, and a plural like
+/// "Goblins" — absent from the singular-keyed catalog — falls through too).
+fn strip_subtype_adjective(s: &str) -> Option<(String, &str)> {
+    let (first, rest) = s.split_once(' ')?;
+    if !SUBTYPES.contains(first) || !is_type_noun(rest.split_whitespace().next()?) {
+        return None;
+    }
+    Some((
+        format!("Subtype({})", crate::ident::to_rust_ident(first)),
+        rest.trim_start(),
+    ))
+}
+
+/// A known designation (taxonomy §8) → its `Designated` ident, else `None`.
+/// "commander" is a designation (an attribute of the card, not a
+/// characteristic), NOT a creature subtype ([CR#903.3]). There's
+/// no designation catalog yet (`DesignationDecl` is an open `Ident` with no
+/// loader), so the recognized set is explicit and grows as designations
+/// surface. Matches singular or plural, any case.
+fn designation_ident(word: &str) -> Option<&'static str> {
+    match word.trim_end_matches('s').to_ascii_lowercase().as_str() {
+        "commander" => Some("Commander"),
+        _ => None,
+    }
+}
+
+/// A known designation used as an adjective before a type noun:
+/// "Commander creatures" → (`Designated("Commander")`, "creatures …"). Like
+/// [`strip_subtype_adjective`], but for designations.
+fn strip_designation_adjective(s: &str) -> Option<(String, &str)> {
+    let (first, rest) = s.split_once(' ')?;
+    let ident = designation_ident(first)?;
+    if !is_type_noun(rest.split_whitespace().next()?) {
+        return None;
+    }
+    Some((format!("Designated(\"{ident}\")"), rest.trim_start()))
+}
+
+/// Singularize an English type noun: the `-ies → -y` irregular plural first
+/// (so "sorceries" → "sorcery"), then the plain trailing `-s`. The shared
+/// singularizer the type-noun maps key on ([`head_noun`], [`is_type_noun`], and
+/// `keyword_ability::quality_filter`).
+pub(super) fn singularize(word: &str) -> String {
+    word.strip_suffix("ies").map_or_else(
+        || word.strip_suffix('s').unwrap_or(word).to_string(),
+        |stem| format!("{stem}y"),
+    )
+}
+
+/// The shared English type-noun vocabulary: singular (lowercase) → the atom
+/// [`head_noun`] emits — a battlefield-scoped builtin filter macro (`Creature`,
+/// `Permanent`, …) or a `Type(<T>)` for the card types that have no dedicated
+/// macro. The one map both filter-head parsing and `quality_filter` consult;
+/// each applies its own wrapper (see [`type_filter`] for `quality_filter`'s
+/// always-`Type(<T>)` view).
+const TYPE_NOUN_ATOMS: &[(&str, &str)] = &[
+    ("creature", "Creature"),
+    ("permanent", "Permanent"),
+    ("planeswalker", "Planeswalker"),
+    ("battle", "Battle"),
+    ("artifact", "Type(Artifact)"),
+    ("enchantment", "Type(Enchantment)"),
+    ("land", "Type(Land)"),
+    ("instant", "Type(Instant)"),
+    ("sorcery", "Type(Sorcery)"),
+];
+
+/// The [`head_noun`] atom for a singular type-noun key, or `None` if `singular`
+/// is not a known type noun.
+fn type_noun_atom(singular: &str) -> Option<&'static str> {
+    TYPE_NOUN_ATOMS
+        .iter()
+        .find(|(noun, _)| *noun == singular)
+        .map(|(_, atom)| *atom)
+}
+
+/// The `Type(<T>)` filter for a singular type-noun key that names a real card
+/// type — `quality_filter`'s divergent wrapper. Declines the builtin-only
+/// `Permanent` (not a card type, so `Type(Permanent)` would be wrong) and the
+/// macro-rendered card types share the same `<T>` spelling either way.
+pub(super) fn type_filter(singular: &str) -> Option<String> {
+    let atom = type_noun_atom(singular)?;
+    // The atom is either a bare predicate-macro name (`Creature`) or an already
+    // wrapped `Type(X)` form; extract the plain type name either way, then
+    // re-wrap with a BARE ident (`Type(Creature)` — the macro-aware reader
+    // expands it; `Type` filters by name, [CR#300.1]).
+    let ty = atom
+        .strip_prefix("Type(")
+        .and_then(|t| t.strip_suffix(')'))
+        .unwrap_or(atom);
+    // `Permanent` has no `Type(...)` form — it is a builtin filter, not a card
+    // type.
+    (ty != "Permanent").then(|| format!("Type({ty})"))
+}
+
+/// A card-type noun (singular or plural) that can anchor a filter head:
+/// `creature(s)`, `permanent(s)`, `artifact(s)`, `sorcer(y|ies)`, … Mirrors
+/// the type set [`head_noun`] recognizes.
+fn is_type_noun(word: &str) -> bool {
+    type_noun_atom(&singularize(word).to_ascii_lowercase()).is_some()
+}
+
+/// `nonblack` → `Not(ColorIs(Black))`, `noncreature` → `Not(Type(Creature))`.
+fn strip_negation(s: &str) -> Option<(String, &str)> {
+    let (first, rest) = s.split_once(' ')?;
+    let lower = first.to_ascii_lowercase();
+    let stem = lower.strip_prefix("non")?;
+    let atom = if let Some(c) = color_ident(stem) {
+        format!("Not(ColorIs({c}))")
+    } else {
+        let t = type_code(stem)?;
+        format!("Not(Type({t}))")
+    };
+    Some((atom, rest.trim_start()))
+}
+
+/// Resolve a lone head word to its canonical catalog subtype (plural-aware), or
+/// `None` if it names no known subtype. Oracle text writes subtypes Title-Case
+/// and pluralizes irregularly, so the naive `-ies→-y`/trailing-`-s`
+/// singularizer mis-derives (`Elves`→`Elve`, `Zombies`→`Zomby`) and wrongly
+/// strips a bare `-s` singular (`Locus`→`Locu`). Instead, try the word as-is (a
+/// singular subtype, incl. `-s` singulars like `Locus` and the one spaced
+/// subtype via its stem), then depluralized candidates (`-ves→-f`, `-ies→-y`,
+/// trailing `-s`), and return the first that is a real catalog subtype —
+/// validated case-sensitively against [`SUBTYPES`], the same catalog
+/// [`strip_subtype_adjective`] gates on. Candidate order is immaterial to
+/// correctness: only the genuine catalog form is ever contained (e.g. `Faeries`
+/// → `-ies→-y` yields the absent `Faery`, so the trailing-`-s` `Faerie` wins),
+/// so a non-subtype lone word (`It`, `You`, `Token`, a legend name) matches
+/// nothing and declines rather than minting a bogus `Subtype` atom.
+fn subtype_head(word: &str) -> Option<String> {
+    if SUBTYPES.contains(word) {
+        return Some(word.to_string());
+    }
+    [
+        word.strip_suffix("ves").map(|stem| format!("{stem}f")),
+        word.strip_suffix("ies").map(|stem| format!("{stem}y")),
+        word.strip_suffix('s').map(str::to_string),
+    ]
+    .into_iter()
+    .flatten()
+    .find(|candidate| SUBTYPES.contains(candidate))
+}
+
+/// Map a singular/plural type word to its head atom(s): a builtin filter macro
+/// (battlefield-scoped) or `Type(<T>)` for a card type, a `Subtype(<S>)` paired
+/// with a `Permanent` zone scope for a subtype, or a `Designated(<D>)` for a
+/// designation. Returns the atoms `parse_phrase` flattens into the conjunction.
+///
+/// The subtype head carries an explicit `Permanent` scope ([CR#109.2]): a
+/// description that includes a subtype but no zone/"card"/"spell"/"source"
+/// qualifier means a permanent on the battlefield. Without it the bare subtype
+/// is zone-agnostic — the live count matcher ([`crate::target::matches`]) would
+/// also count the source's own on-stack copy (which reuses its card id),
+/// over-counting "Goblins/Elves you control" by one. The type-noun heads are
+/// already battlefield-scoped through their `Permanent`/`Creature` macros; this
+/// gives the subtype head the same scope.
+struct HeadNoun {
+    atoms: Vec<String>,
+    kind: FilterHead,
+}
+
+fn head_noun(word: &str) -> Option<HeadNoun> {
+    let w = word.trim();
+    // "worthy" / "worthy creature(s)" — the named compound predicate
+    // [CR#700.16]. Both forms emit the `Worthy` macro invocation: worthy is
+    // creature-only by definition, so the explicit "creature" is redundant.
+    let lower = w.to_ascii_lowercase();
+    if lower == "worthy"
+        || lower
+            .strip_prefix("worthy ")
+            .is_some_and(|tail| singularize(tail.trim()) == "creature")
+    {
+        return Some(HeadNoun {
+            atoms: vec!["Worthy".to_string()],
+            kind: FilterHead::Other,
+        });
+    }
+    // A designation head ("commander") is not a subtype ([CR#903.3]).
+    if let Some(ident) = designation_ident(w) {
+        return Some(HeadNoun {
+            atoms: vec![format!("Designated(\"{ident}\")")],
+            kind: FilterHead::Other,
+        });
+    }
+    if let Some(atom) = type_noun_atom(&singularize(w).to_ascii_lowercase()) {
+        return Some(HeadNoun {
+            atoms: vec![atom.to_string()],
+            kind: FilterHead::TypeNoun,
+        });
+    }
+    // Otherwise a lone word is a subtype only if it validates against the
+    // catalog ([`subtype_head`], plural-aware) — a non-subtype (anaphor, object
+    // kind, legend name) declines like an unknown designation, so a wrong filter
+    // never graduates a wrong card. `Permanent` ([CR#109.2]) scopes it to the
+    // battlefield, matching the type-noun heads' built-in scope.
+    if let Some(subtype) = subtype_head(w) {
+        return Some(HeadNoun {
+            atoms: vec![
+                "Permanent".to_string(),
+                format!("Subtype({})", crate::ident::to_rust_ident(&subtype)),
+            ],
+            kind: FilterHead::Subtype,
+        });
+    }
+    None
+}
+
+fn combine(atoms: Vec<String>) -> String {
+    if atoms.len() == 1 {
+        atoms.into_iter().next().unwrap()
+    } else {
+        format!("And([{}])", atoms.join(", "))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[cfg_attr(
+        not(scryfall_catalogs),
+        ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
+    )]
+    fn head_nouns() {
+        assert_eq!(parse_phrase("creatures").as_deref(), Some("Creature"));
+        assert_eq!(parse_phrase("permanents").as_deref(), Some("Permanent"));
+        assert_eq!(parse_phrase("artifacts").as_deref(), Some("Type(Artifact)"));
+        // A bare subtype head is battlefield-scoped ([CR#109.2]) — `Permanent`,
+        // the same scope the type-noun heads carry through their macros.
+        assert_eq!(
+            parse_phrase("Goblins").as_deref(),
+            Some("And([Permanent, Subtype(Goblin)])")
+        );
+        assert_eq!(parse_phrase("sorceries").as_deref(), Some("Type(Sorcery)"));
+        let type_noun = parse_phrase_detailed("creatures you control").unwrap();
+        assert_eq!(type_noun.head(), FilterHead::TypeNoun);
+        assert!(type_noun.is_controlled_by(FilterController::You));
+
+        let subtype = parse_phrase_detailed("Goblins an opponent controls").unwrap();
+        assert_eq!(subtype.head(), FilterHead::Subtype);
+        assert!(subtype.is_controlled_by(FilterController::Opponent));
+    }
+
+    #[test]
+    fn worthy_named_predicate() {
+        // "worthy" and "worthy creature(s)" both emit the `Worthy` macro
+        // invocation ([CR#700.16]) — the explicit "creature" is redundant.
+        assert_eq!(parse_phrase("worthy").as_deref(), Some("Worthy"));
+        assert_eq!(parse_phrase("worthy creature").as_deref(), Some("Worthy"));
+        assert_eq!(parse_phrase("worthy creatures").as_deref(), Some("Worthy"));
+        assert_eq!(parse_phrase("a worthy creature").as_deref(), Some("Worthy"));
+        assert_eq!(
+            parse_phrase("other worthy creatures").as_deref(),
+            Some("And([Worthy, Not(Ref(This))])")
+        );
+    }
+
+    #[test]
+    #[cfg_attr(
+        not(scryfall_catalogs),
+        ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
+    )]
+    fn prefix_adjectives() {
+        assert_eq!(
+            parse_phrase("other Goblins").as_deref(),
+            Some("And([Permanent, Subtype(Goblin), Not(Ref(This))])")
+        );
+        assert_eq!(
+            parse_phrase("nonblack creatures").as_deref(),
+            Some("And([Creature, Not(ColorIs(Black))])")
+        );
+        assert_eq!(
+            parse_phrase("black creatures").as_deref(),
+            Some("And([Creature, ColorIs(Black)])")
+        );
+        assert_eq!(
+            parse_phrase("tapped creatures").as_deref(),
+            Some("And([Creature, Status(Tapped)])")
+        );
+        assert_eq!(parse_phrase("a creature").as_deref(), Some("Creature"));
+        assert_eq!(
+            parse_phrase("colorless creatures").as_deref(),
+            Some("And([Creature, Colorless])")
+        );
+        assert_eq!(
+            parse_phrase("other nonblack creatures").as_deref(),
+            Some("And([Creature, Not(Ref(This)), Not(ColorIs(Black))])")
+        );
+    }
+
+    #[test]
+    #[cfg_attr(
+        not(scryfall_catalogs),
+        ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
+    )]
+    fn postfix_clauses() {
+        assert_eq!(
+            parse_phrase("creatures you control").as_deref(),
+            Some("And([Creature, ControlledBy(Ref(You))])")
+        );
+        assert_eq!(
+            parse_phrase("artifacts an opponent controls").as_deref(),
+            Some("And([Type(Artifact), ControlledBy(OpponentOf(Ref(You)))])")
+        );
+        assert_eq!(
+            parse_phrase("creatures your opponents control").as_deref(),
+            Some("And([Creature, ControlledBy(OpponentOf(Ref(You)))])")
+        );
+        assert_eq!(
+            parse_phrase("creatures with power 3 or greater").as_deref(),
+            Some("And([Creature, Stat(Power, AtLeast, 3)])")
+        );
+        assert_eq!(
+            parse_phrase("other creatures you control").as_deref(),
+            Some("And([Creature, Not(Ref(This)), ControlledBy(Ref(You))])")
+        );
+        assert_eq!(
+            parse_phrase("creatures you own").as_deref(),
+            Some("And([Creature, Owner(Ref(You))])")
+        );
+        assert_eq!(
+            parse_phrase("creatures with toughness 2 or less").as_deref(),
+            Some("And([Creature, Stat(Toughness, AtMost, 2)])")
+        );
+        assert_eq!(
+            parse_phrase("creatures with a +1/+1 counter on it").as_deref(),
+            Some("And([Creature, HasCounter(P1P1Counter)])")
+        );
+        // word-number is out of the regex's \d+ scope → declines
+        assert!(parse_phrase("creatures with power three or greater").is_none());
+        // "with <keyword>" → Has(<Keyword>).
+        assert_eq!(
+            parse_phrase("creatures with flying").as_deref(),
+            Some("And([Creature, Has(Flying)])")
+        );
+        // A non-keyword "with …" tail still declines (no Has atom minted).
+        assert!(parse_phrase("creatures with hats").is_none());
+    }
+
+    #[test]
+    #[cfg_attr(
+        not(scryfall_catalogs),
+        ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
+    )]
+    fn with_hexproof_is_a_bare_keyword_reference() {
+        // `Has(...)` is a KeywordRef (bare unit ident) — a defaulted-param keyword
+        // must NOT acquire invocation parens here (that wouldn't read).
+        // Mirror the existing "creatures with flying" test's call shape.
+        assert_eq!(
+            parse_phrase("creatures with hexproof").as_deref(),
+            Some("And([Creature, Has(Hexproof)])")
+        );
+        // Also confirm the parens form does NOT appear.
+        assert_ne!(
+            parse_phrase("creatures with hexproof").as_deref(),
+            Some("And([Creature, Has(Hexproof())])")
+        );
+    }
+
+    #[test]
+    #[cfg_attr(
+        not(scryfall_catalogs),
+        ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
+    )]
+    fn on_the_battlefield_is_consumed() {
+        // "on the battlefield" is the default scope — consumed, no atom. The
+        // battlefield scope still rides the head atom ([CR#109.2]): `Permanent`
+        // for a subtype head, the builtin macro for a type-noun head.
+        assert_eq!(
+            parse_phrase("Elf on the battlefield").as_deref(),
+            Some("And([Permanent, Subtype(Elf)])")
+        );
+        assert_eq!(
+            parse_phrase("creatures on the battlefield").as_deref(),
+            Some("Creature")
+        );
+    }
+
+    #[test]
+    #[cfg_attr(
+        not(scryfall_catalogs),
+        ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
+    )]
+    fn subtype_adjective_before_type_noun() {
+        // "Elf creatures" → a creature with the Elf subtype.
+        assert_eq!(
+            parse_phrase("Elf creatures").as_deref(),
+            Some("And([Creature, Subtype(Elf)])")
+        );
+        // Elvish Archdruid's anthem subject.
+        assert_eq!(
+            parse_phrase("Other Elf creatures you control").as_deref(),
+            Some("And([Creature, Not(Ref(This)), Subtype(Elf), ControlledBy(Ref(You))])")
+        );
+        // A bare subtype head still parses as the head (not an adjective),
+        // carrying the battlefield scope ([CR#109.2]).
+        assert_eq!(
+            parse_phrase("Goblins").as_deref(),
+            Some("And([Permanent, Subtype(Goblin)])")
+        );
+        // Krenko, Mob Boss / Elvish Archdruid's "you control" count: the
+        // `Permanent` scope keeps the live count off the source's own on-stack
+        // copy, so it no longer over-counts by one.
+        assert_eq!(
+            parse_phrase("Goblins you control").as_deref(),
+            Some("And([Permanent, Subtype(Goblin), ControlledBy(Ref(You))])")
+        );
+    }
+
+    #[test]
+    fn non_subtype_words_before_a_type_noun_decline() {
+        // Only catalog subtypes are adjectives. Card types, supertypes, attach
+        // anaphors, and negations are NOT subtypes — decline (never mint a wrong
+        // Subtype atom). These are the real corpus offenders the catalog gate
+        // rules out.
+        assert!(parse_phrase("Artifact creatures").is_none()); // card type
+        assert!(parse_phrase("Legendary creatures").is_none()); // supertype
+        assert!(parse_phrase("Equipped creature").is_none()); // attach anaphor
+        assert!(parse_phrase("Nontoken creatures").is_none()); // negation
+    }
+
+    #[test]
+    fn commander_is_a_designation_not_a_subtype() {
+        // Head: "target commander" → Designated, not Subtype.
+        assert_eq!(
+            parse_phrase("commander").as_deref(),
+            Some("Designated(\"Commander\")")
+        );
+        // Adjective: Bastion Protector / Bloodsworn Steward anthem subject.
+        assert_eq!(
+            parse_phrase("Commander creatures you control").as_deref(),
+            Some("And([Creature, Designated(\"Commander\"), ControlledBy(Ref(You))])")
+        );
+        // Plural head.
+        assert_eq!(
+            parse_phrase("commanders you control").as_deref(),
+            Some("And([Designated(\"Commander\"), ControlledBy(Ref(You))])")
+        );
+    }
+
+    #[test]
+    fn declines_unparsable() {
+        assert!(parse_phrase("creatures wearing hats").is_none());
+        assert!(parse_phrase("xyzzy plover blorp").is_none());
+    }
+
+    #[test]
+    #[cfg_attr(
+        not(scryfall_catalogs),
+        ignore = "needs data/catalogs (gitignored); catalog-dependent subtype/keyword parse"
+    )]
+    fn subtype_head_is_plural_aware_and_catalog_gated() {
+        // Irregular plurals resolve to the canonical catalog subtype, not the
+        // naive singularizer's mis-derivation (`Elve`/`Zomby`).
+        assert_eq!(
+            parse_phrase("Elves").as_deref(),
+            Some("And([Permanent, Subtype(Elf)])")
+        );
+        assert_eq!(
+            parse_phrase("Zombies").as_deref(),
+            Some("And([Permanent, Subtype(Zombie)])")
+        );
+        // A singular `-s` land type is left intact (not stripped to `Locu`).
+        assert_eq!(
+            parse_phrase("Locus").as_deref(),
+            Some("And([Permanent, Subtype(Locus)])")
+        );
+        // `-ies` that is really `<stem>ie` + `s` (Faerie), and `-ies→-y` (Ally).
+        assert_eq!(
+            parse_phrase("Faeries").as_deref(),
+            Some("And([Permanent, Subtype(Faerie)])")
+        );
+        assert_eq!(
+            parse_phrase("Allies").as_deref(),
+            Some("And([Permanent, Subtype(Ally)])")
+        );
+    }
+
+    #[test]
+    fn non_subtype_lone_words_decline() {
+        // Anaphors, object kinds, and legend names are NOT subtypes — the
+        // catalog gate declines them so a bogus `Subtype("It")` never graduates.
+        assert!(parse_phrase("It").is_none());
+        assert!(parse_phrase("You").is_none());
+        assert!(parse_phrase("Token").is_none());
+        assert!(parse_phrase("Tivadar").is_none());
+        assert!(parse_phrase("Veldrane").is_none());
+    }
+
+    #[test]
+    fn shared_color_ident_is_case_insensitive() {
+        assert_eq!(color_ident("white"), Some("White"));
+        assert_eq!(color_ident("Blue"), Some("Blue"));
+        assert_eq!(color_ident("GREEN"), Some("Green"));
+        assert_eq!(color_ident("teal"), None);
+    }
+
+    #[test]
+    fn shared_singularizer() {
+        assert_eq!(singularize("creatures"), "creature");
+        assert_eq!(singularize("sorceries"), "sorcery");
+        assert_eq!(singularize("land"), "land");
+    }
+
+    #[test]
+    fn type_filter_keeps_qualitys_divergent_wrapper() {
+        // `quality_filter`'s view: always `Type(<T>)`, even for the nouns
+        // `head_noun` renders as a bare builtin macro.
+        assert_eq!(type_filter("creature").as_deref(), Some("Type(Creature)"));
+        assert_eq!(
+            type_filter("planeswalker").as_deref(),
+            Some("Type(Planeswalker)")
+        );
+        assert_eq!(type_filter("sorcery").as_deref(), Some("Type(Sorcery)"));
+        // `permanent` is a builtin filter, not a card type — no `Type(...)` form.
+        assert_eq!(type_filter("permanent"), None);
+        assert_eq!(type_filter("goblin"), None);
+        // …whereas the filter-head atom for the same nouns is the bare macro.
+        assert_eq!(type_noun_atom("creature"), Some("Creature"));
+        assert_eq!(type_noun_atom("permanent"), Some("Permanent"));
+    }
+}

@@ -1,0 +1,12 @@
+[package]
+name = "sylex_lexical_model"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+dpsi = { version = "0.1.0", features = ["serde"] }
+serde = { version = "1.0.228", features = ["derive"] }

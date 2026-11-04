@@ -1,26 +1,26 @@
 [workspace]
 members = [
     ".",
-    "crates/deckmaste_semantics",
-    "crates/deckmaste_card",
-    "crates/deckmaste_catalogs",
-    "crates/deckmaste_english",
-    "crates/deckmaste_lexical",
-    "crates/deckmaste_lexical_model",
-    "crates/deckmaste_lexical_source",
-    "crates/deckmaste_core",
-    "crates/deckmaste_data",
-    "crates/deckmaste_dsl",
-    "crates/deckmaste_engine",
-    "crates/deckmaste_features",
-    "crates/deckmaste_spelling",
-    "crates/deckmaste_syntax",
-    "crates/deckmaste_legacy_render",
-    "crates/deckmaste_lowering",
-    "crates/deckmaste_migrations",
-    "crates/deckmaste_noncanon",
-    "crates/deckmaste_plugin",
-    "crates/deckmaste_tui",
+    "crates/semantics",
+    "crates/card",
+    "crates/catalogs",
+    "crates/english",
+    "crates/lexicon",
+    "crates/lexical_model",
+    "crates/vocabulary",
+    "crates/core",
+    "crates/upstream",
+    "crates/syl",
+    "crates/engine",
+    "crates/features",
+    "crates/spelling",
+    "crates/syntax",
+    "crates/render",
+    "crates/lowering",
+    "crates/pipeline",
+    "crates/matchups",
+    "crates/plugin",
+    "crates/tui",
     "crates/macro_ron",
     "crates/macro_ron_derive",
     "crates/macro_ron_lsp",
@@ -44,18 +44,18 @@ allow_attributes_without_reason = "warn"
 
 [package]
 publish = false
-name = "deckmaste"
+name = "sylex"
 version = "0.1.0"
 edition = "2024"
 license = "PolyForm-Noncommercial-1.0.0"
 # `cargo run` from the workspace root launches the TUI via this bin.
-default-run = "deckmaste"
+default-run = "sylex"
 
 [lints]
 workspace = true
 
 [dependencies]
-deckmaste_tui = { version = "0.1.0", path = "crates/deckmaste_tui" }
+sylex_tui = { version = "0.1.0", path = "crates/tui" }
 ron = "0.12.1"
 serde = { version = "1.0.228", features = ["derive", "rc"] }
 slotmap = { version = "1.1.1", features = ["serde"] }
@@ -75,20 +75,20 @@ slotmap = { version = "1.1.1", features = ["serde"] }
 # source parsing and token emission the macro and `map` tooling run. Profile
 # overrides only take effect from the workspace root manifest, which is why
 # they live here.
-[profile.dev.package.deckmaste_migrations]
+[profile.dev.package.sylex_pipeline_v1]
 opt-level = 2
 
 # Optimize the v4 chart parser, packed forest, and round-trip verification.
-[profile.dev.package.deckmaste_syntax]
+[profile.dev.package.sylex_syntax]
 opt-level = 2
 
-[profile.dev.package.deckmaste_english]
+[profile.dev.package.sylex_english]
 opt-level = 2
 
-[profile.dev.package.deckmaste_lexical_source]
+[profile.dev.package.sylex_vocabulary]
 opt-level = 2
 
-[profile.dev.package.deckmaste_lexical]
+[profile.dev.package.sylex_lexicon]
 opt-level = 2
 
 [profile.dev.package.xtask]
@@ -121,10 +121,10 @@ opt-level = 2
 [profile.dev.package.sha2]
 opt-level = 2
 
-[profile.dev.package.deckmaste_data]
+[profile.dev.package.sylex_upstream]
 opt-level = 2
 
-[profile.dev.package.deckmaste_catalogs]
+[profile.dev.package.sylex_catalogs]
 opt-level = 2
 
 [profile.dev.package.syn]

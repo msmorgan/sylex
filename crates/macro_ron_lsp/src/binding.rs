@@ -1,4 +1,4 @@
-//! Lexical binder resolution for deckmaste's `It` anaphor.
+//! Lexical binder resolution for sylex's `It` anaphor.
 
 use lsp_types::DocumentHighlight;
 use lsp_types::DocumentHighlightKind;

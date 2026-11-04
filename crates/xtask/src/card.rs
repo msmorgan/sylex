@@ -1,11 +1,11 @@
 //! The `card` command: show a card as parsed from a plugin, with its macro
 //! references expanded. xtask owns the CLI; the loading lives in
-//! `deckmaste_plugin`.
+//! `sylex_plugin_v1`.
 
 use std::path::PathBuf;
 
 use clap::Args;
-use deckmaste_plugin::plugin::Plugin;
+use sylex_plugin_v1::plugin::Plugin;
 
 #[derive(Debug, Args)]
 pub struct CardArgs {

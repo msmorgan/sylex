@@ -12,7 +12,7 @@ function __academyruins_download
         download_file \
             --tag 'academyruins' \
             --accept $accept \
-            --user-agent 'deckmaste.rs/0.1 (+https://github.com/msmorgan/deckmaste.rs)' \
+            --user-agent 'sylex/0.1 (+https://github.com/msmorgan/deckmaste.rs)' \
             $url $out
         or return
     end

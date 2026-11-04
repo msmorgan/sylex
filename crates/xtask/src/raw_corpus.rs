@@ -12,9 +12,9 @@ use std::path::PathBuf;
 use anyhow::Context;
 use anyhow::ensure;
 use clap::Args;
-use deckmaste_data::scryfall::OracleCard;
-use deckmaste_data::scryfall::OracleCardReader;
-use deckmaste_data::scryfall::OracleUnitKind;
+use sylex_upstream::scryfall::OracleCard;
+use sylex_upstream::scryfall::OracleCardReader;
+use sylex_upstream::scryfall::OracleUnitKind;
 use serde::Deserialize;
 use serde::Serialize;
 use sha2::Digest;
@@ -164,7 +164,7 @@ pub(crate) struct SelectedFace {
     pub toughness: Option<String>,
     pub loyalty: Option<String>,
     pub defense: Option<String>,
-    pub related_cards: Vec<deckmaste_data::scryfall::RelatedCard>,
+    pub related_cards: Vec<sylex_upstream::scryfall::RelatedCard>,
 }
 
 #[derive(Debug, Serialize)]
@@ -386,7 +386,7 @@ fn ensure_found(
 }
 
 fn selected_face(
-    unit: deckmaste_data::scryfall::OracleUnit<'_>,
+    unit: sylex_upstream::scryfall::OracleUnit<'_>,
     card_names: &BTreeSet<String>,
 ) -> SelectedFace {
     let identity = unit.identity();

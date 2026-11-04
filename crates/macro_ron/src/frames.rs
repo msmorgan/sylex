@@ -1,19 +1,19 @@
 //! The frame authoring schema: [`FrameSpec`] (English templates with typed
 //! holes, plus the guard that decides when one applies) and
-//! [`ConstructorFrames`] (the parallel catalog for raw `deckmaste_core`
+//! [`ConstructorFrames`] (the parallel catalog for raw `sylex_core`
 //! constructors — canon RON is 83.5% raw constructors, so this catalog is
 //! most of the lexicon, not an appendix).
 //!
-//! Lives in `macro_ron`, not the `deckmaste_spelling` bridge crate: schema
+//! Lives in `macro_ron`, not the `sylex_spelling` bridge crate: schema
 //! lives with the data (`MacroDef.frames` needs this type; see
-//! [`crate::set::MacroDef`]), and the engine (`deckmaste_spelling`, which will
+//! [`crate::set::MacroDef`]), and the engine (`sylex_spelling`, which will
 //! need `macro_ron::MacroSet` itself to actually expand macro bodies)
 //! depends on the schema, not the other way around — the reverse arrow
 //! would cycle. This module has no dependency beyond `serde` and `ron`
 //! (already `macro_ron` dependencies) and no English/rendering knowledge.
 //!
 //! A frame's text carries two hole sigils, read by a later stage
-//! (`deckmaste_spelling`): `~` (self-reference) and `<Param(i)>` (positional).
+//! (`sylex_spelling`): `~` (self-reference) and `<Param(i)>` (positional).
 //! This module only carries the strings through serde — it never parses
 //! them — so they must round-trip byte-for-byte.
 //!
@@ -52,10 +52,10 @@ use std::path::PathBuf;
 
 /// Spelling-owned roles for frame occurrences. They intentionally remain absent
 /// from the chart and construction matcher.
-pub use deckmaste_features::MentionKind;
+pub use sylex_features_v1::MentionKind;
 /// Spelling-owned roles for frame occurrences. They intentionally remain absent
 /// from the chart and construction matcher.
-pub use deckmaste_features::OccurrenceRole;
+pub use sylex_features_v1::OccurrenceRole;
 use ron::value::RawValue;
 use serde::Deserialize;
 use serde::Deserializer;
@@ -118,7 +118,7 @@ pub struct FrameSpec {
     /// ```
     ///
     /// It is a restriction on the *filler*, not a change to the hole's own
-    /// structural class (`deckmaste_spelling`'s `HoleClass`, which the parse
+    /// structural class (`sylex_spelling`'s `HoleClass`, which the parse
     /// decides): the same hole is a whole-subtree hole either way, and both
     /// wordings above and below stay one authored English string. The
     /// restriction runs in both directions — a listed param's hole rejects a
@@ -253,11 +253,11 @@ impl Serialize for FrameSpec {
 
 /// The English category a constructor entry's frames are parsed at and
 /// registered under. A schema-owned mirror of
-/// `deckmaste_english::FragmentKind` — duplicated, not imported, because
+/// `sylex_english::FragmentKind` — duplicated, not imported, because
 /// this module has no dependency beyond `serde`/`ron` (see the module doc)
 /// and must not gain one merely to name the category a frame belongs to.
 /// The bridge crate carries the exhaustive conversion
-/// (`deckmaste_spelling::lexicon::fragment_kind_of`; not a `From` impl —
+/// (`sylex_spelling::lexicon::fragment_kind_of`; not a `From` impl —
 /// both this type and `FragmentKind` are foreign to that crate, and to
 /// every crate that could host one); this module never interprets the
 /// variant, only carries it through serde, exactly as it already does for
@@ -271,7 +271,7 @@ pub enum FrameKind {
     Ability,
 }
 
-/// One raw `deckmaste_core` constructor's entry in the frame catalog:
+/// One raw `sylex_core` constructor's entry in the frame catalog:
 /// `constructor` is the bare variant name as written in RON (`"DealDamage"`,
 /// `"GainLife"`), `params` names each positional hole's type in the order
 /// the catalog's frames reference them (`<Param(0)>` is `params[0]`, and so
@@ -284,7 +284,7 @@ pub enum FrameKind {
 /// [`MacroDef`](crate::set::MacroDef)), so there is nothing to guess it
 /// from, and registering an entry at every category it happens to parse
 /// cleanly at costs several entries where one is meant — see
-/// `deckmaste_spelling::lexicon::Lexicon::assemble`.
+/// `sylex_spelling::lexicon::Lexicon::assemble`.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct ConstructorFrames {
     pub constructor: String,
@@ -462,7 +462,7 @@ pub enum LoadError {
 /// holds a `[...]`-list of [`ConstructorFrames`], exactly like
 /// `plugins/builtin/frames/constructors.ron`) and concatenates their
 /// entries. An absent directory reads as empty, matching the macro loader's
-/// own convention (`deckmaste_plugin::plugin::ron_files_recursive`) for a
+/// own convention (`sylex_plugin_v1::plugin::ron_files_recursive`) for a
 /// plugin layer that hasn't opted in yet.
 ///
 /// # Errors
@@ -486,9 +486,9 @@ pub fn load_constructor_frames(dir: &Path) -> Result<Vec<ConstructorFrames>, Loa
 }
 
 /// The `.ron` files under `dir` at any depth, sorted; an absent directory is
-/// empty. Mirrors `deckmaste_plugin::plugin::ron_files_recursive` (kept as a
+/// empty. Mirrors `sylex_plugin_v1::plugin::ron_files_recursive` (kept as a
 /// private copy rather than a shared dependency: `macro_ron` must not
-/// depend on `deckmaste_plugin`, which itself depends on `macro_ron` — that
+/// depend on `sylex_plugin_v1`, which itself depends on `macro_ron` — that
 /// would cycle just as surely as the arrow this module's relocation was
 /// fixing).
 fn ron_files_recursive(dir: &Path) -> Result<Vec<PathBuf>, LoadError> {
@@ -614,7 +614,7 @@ mod tests {
         );
     }
 
-    /// The `deckmaste_core` kinds and param types a body term is read in the
+    /// The `sylex_core` kinds and param types a body term is read in the
     /// dialect of. No macros are registered, so nothing here depends on the
     /// plugin corpus — [`substitute_body`] needs a [`MacroSet`] only for its
     /// RON options.

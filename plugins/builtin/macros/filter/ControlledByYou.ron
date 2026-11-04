@@ -7,7 +7,7 @@
 // parameterized over the base predicate instead of fixing it to `Creature`.
 // `Predicate::And(Arc<[Predicate]>)` and
 // `RelationPredicate::ControlledBy(Arc<Predicate>)`
-// (`crates/deckmaste_core/src/filter.rs`) are the exact pairing
+// (`crates/core/src/filter.rs`) are the exact pairing
 // `OtherCreatureYouControl.ron`/`CreatureOpponentControls.ron` already use.
 //
 // In `<Param(0)> you control`, the hole aligns with M01's recursive

@@ -4,7 +4,7 @@
 // - `gen_catalogs`  — `data/gen/catalogs-legacy`, the CR-derived bare-text
 //   catalogs `cargo xtask catalogs text` writes from `data/rules/cr.txt`.
 // - `derived_cards` — `data/derived/cards.jsonl`, the Scryfall-derived Oracle
-//   snapshot (`deckmaste_plugin::fidelity::ORACLE_SNAPSHOT`).
+//   snapshot (`sylex_plugin_v1::fidelity::ORACLE_SNAPSHOT`).
 //
 // Neither exists in a bare checkout: the whole `data/` tree is gitignored by
 // the no-committed-corpus policy. CI fetches and caches the upstream inputs,

@@ -3,7 +3,7 @@
 #
 # Dev profile, so iterating on xtask stays fast to compile. `generate`
 # deserializes the ~150 MB AtomicCards.json, which is slow unoptimized -- the
-# root Cargo.toml raises the dev opt-level of deckmaste_migrations + serde_json
+# root Cargo.toml raises the dev opt-level of sylex_pipeline_v1 + serde_json
 # so it stays fast to run without a release build of the whole tree.
 [alias]
 xtask = "run -p xtask --"

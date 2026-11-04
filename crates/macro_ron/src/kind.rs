@@ -182,7 +182,7 @@ impl Kind {
     /// kinds. `macro_ron` only honors the list.
     #[must_use]
     /// EXTENDS rather than replaces: a carve-out assembled from more than one
-    /// source (deckmaste builds this from two separate whitelists) must not
+    /// source (sylex builds this from two separate whitelists) must not
     /// depend on which call came last.
     pub fn natively_spellable(mut self, variants: impl IntoIterator<Item = &'static str>) -> Self {
         self.natively_spellable.extend(variants);
@@ -204,7 +204,7 @@ impl Kind {
     /// without hand-listing them: an identifier that is one of this kind's
     /// own variants stays safe to self-reference there, but one only
     /// inherited transitively through the embed recurses (see
-    /// `deckmaste_semantics::authoring`'s embed-host ruling).
+    /// `sylex_semantics_v1::authoring`'s embed-host ruling).
     #[must_use]
     pub fn embeds(&self) -> bool {
         self.embeds

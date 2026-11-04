@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::Path;
 
-use deckmaste_catalogs::CardNameNicknames;
+use sylex_catalogs::CardNameNicknames;
 
 #[test]
 fn nickname_catalog_matches_its_generator() {

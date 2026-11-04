@@ -124,11 +124,11 @@ jobs:
       - name: test
         run: cargo test --workspace
       - name: slow TUI simulation test
-        run: cargo test -p deckmaste_tui --features slow-tests
+        run: cargo test -p sylex_tui --features slow-tests
       # Exercise the data-driven WC99 strategy gate with its fixed seed. The
       # 50-game matchup in the same test target is ignored and stays opt-in.
       - name: noncanon WC99 fixed-seed gate
-        run: cargo test -p deckmaste_noncanon --features noncanon_tests --test wc99
+        run: cargo test -p sylex_matchups --features noncanon_tests --test wc99
       # The coverage ratchet self-scans committed sources and compares the set
       # of Bound rules to the floor in the committed cr-coverage.lock.
       - name: cr coverage ratchet

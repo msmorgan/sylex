@@ -1,6 +1,6 @@
 //! `cargo xtask resolve <plugin>` — rewrite resolvable `Unparsed` ability lines
 //! in every `cards/*.ron.todo`. Thin wrapper over
-//! [`deckmaste_migrations::resolve::resolve_cards`].
+//! [`sylex_pipeline_v1::resolve::resolve_cards`].
 
 use std::path::PathBuf;
 
@@ -17,5 +17,5 @@ pub struct ResolveArgs {
 /// # Errors
 /// If a `.ron.todo` isn't readable/parsable/writable.
 pub fn run(args: &ResolveArgs) -> anyhow::Result<()> {
-    deckmaste_migrations::resolve::resolve_cards(&args.plugin_dir)
+    sylex_pipeline_v1::resolve::resolve_cards(&args.plugin_dir)
 }

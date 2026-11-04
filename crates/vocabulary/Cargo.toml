@@ -1,0 +1,17 @@
+[package]
+name = "sylex_vocabulary"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+sylex_lexicon = { version = "0.1.0", path = "../lexicon" }
+sylex_syntax = { version = "0.1.0", path = "../syntax" }
+dpsi = { version = "0.1.0", features = ["serde"] }
+serde = { version = "1.0.228", features = ["derive"] }
+thiserror = { workspace = true }
+ron = "0.12.1"
+serde_json = "1.0.150"

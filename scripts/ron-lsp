@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# deckmaste RON language server over stdio, for Claude Code / editors.
+# sylex RON language server over stdio, for Claude Code / editors.
 #
 # Pin the manifest to THIS checkout so a server launched from a jj feature
 # workspace (.workspaces/NAME) builds and indexes that workspace, not `default`.

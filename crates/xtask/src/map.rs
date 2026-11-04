@@ -3,7 +3,7 @@
 //! instead of re-reading the source wholesale.
 //!
 //!  - `map enums [DIR]` — every `pub enum` under a Rust source tree (default
-//!    `crates/deckmaste_core/src`), with each variant's shape and first doc
+//!    `crates/core/src`), with each variant's shape and first doc
 //!    line.
 
 use std::fs;
@@ -31,7 +31,7 @@ enum MapCmd {
 #[derive(Debug, Args)]
 pub struct EnumsArgs {
     /// Directory to walk recursively for `.rs` files. Defaults to
-    /// `crates/deckmaste_core/src`.
+    /// `crates/core/src`.
     dir: Option<PathBuf>,
 }
 
@@ -52,7 +52,7 @@ pub fn run(args: &MapArgs) -> anyhow::Result<()> {
 /// If DIR isn't a directory, a `.rs` file can't be read, or fails to parse.
 fn run_enums(args: &EnumsArgs) -> anyhow::Result<()> {
     let dir = args.dir.clone().unwrap_or_else(|| {
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../crates/deckmaste_core/src")
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../crates/core/src")
     });
     anyhow::ensure!(dir.is_dir(), "not a directory: {}", dir.display());
 

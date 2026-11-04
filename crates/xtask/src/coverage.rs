@@ -510,13 +510,13 @@ mod tests {
     #[test]
     fn tier_by_path() {
         assert_eq!(
-            tier_for_path("crates/deckmaste_engine/tests/activate.rs"),
+            tier_for_path("crates/engine/tests/activate.rs"),
             Tier::Bound
         );
         assert_eq!(tier_for_path("plugins/testing/cards/Foo.ron"), Tier::Bound);
         assert_eq!(tier_for_path("lean/Proofs/Foo.lean"), Tier::Bound);
         assert_eq!(
-            tier_for_path("crates/deckmaste_engine/src/step/mod.rs"),
+            tier_for_path("crates/engine/src/step/mod.rs"),
             Tier::Bound
         );
         assert_eq!(

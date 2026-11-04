@@ -14,7 +14,7 @@ pub struct StubsArgs {
 /// # Errors
 /// If the plugin layout is unusable or a generator fails.
 pub fn run(args: &StubsArgs) -> anyhow::Result<()> {
-    Ok(deckmaste_migrations::stubs::generate_stubs(
+    Ok(sylex_pipeline_v1::stubs::generate_stubs(
         &args.plugin_dir,
     )?)
 }

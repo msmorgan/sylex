@@ -448,262 +448,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "deckmaste"
-version = "0.1.0"
-dependencies = [
- "deckmaste_tui",
- "ron",
- "serde",
- "slotmap",
-]
-
-[[package]]
-name = "deckmaste_card"
-version = "0.1.0"
-dependencies = [
- "deckmaste_core",
- "serde",
-]
-
-[[package]]
-name = "deckmaste_catalogs"
-version = "0.1.0"
-dependencies = [
- "deckmaste_data",
- "deckmaste_lexical",
- "regex",
- "serde",
- "serde_json",
- "sha2",
- "tempfile",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_core"
-version = "0.1.0"
-dependencies = [
- "dpsi",
- "ron",
- "serde",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_data"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "tempfile",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_dsl"
-version = "0.1.0"
-dependencies = [
- "dpsi",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_engine"
-version = "0.1.0"
-dependencies = [
- "criterion",
- "deckmaste_card",
- "deckmaste_core",
- "deckmaste_lowering",
- "deckmaste_plugin",
- "deckmaste_semantics",
- "rand 0.10.1",
- "rand_chacha 0.10.0",
- "rayon",
- "ron",
- "serde",
- "slotmap",
- "tempfile",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_english"
-version = "0.1.0"
-dependencies = [
- "deckmaste_data",
- "deckmaste_lexical",
- "deckmaste_lexical_source",
- "deckmaste_syntax",
- "dpsi",
- "rayon",
- "ron",
- "serde",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_features"
-version = "0.1.0"
-dependencies = [
- "serde",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_legacy_render"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "deckmaste_plugin",
- "deckmaste_semantics",
- "macro_ron",
- "regex",
- "ron",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "deckmaste_lexical"
-version = "0.1.0"
-dependencies = [
- "clap",
- "deckmaste_lexical_model",
- "dpsi",
- "proptest",
- "ron",
- "serde",
- "serde_json",
- "thiserror",
- "unicode-ident",
-]
-
-[[package]]
-name = "deckmaste_lexical_model"
-version = "0.1.0"
-dependencies = [
- "dpsi",
- "serde",
-]
-
-[[package]]
-name = "deckmaste_lexical_source"
-version = "0.1.0"
-dependencies = [
- "deckmaste_lexical",
- "deckmaste_syntax",
- "dpsi",
- "ron",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_lowering"
-version = "0.1.0"
-dependencies = [
- "deckmaste_card",
- "deckmaste_core",
- "deckmaste_semantics",
- "macro_ron",
- "serde",
-]
-
-[[package]]
-name = "deckmaste_migrations"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "deckmaste_catalogs",
- "deckmaste_core",
- "deckmaste_data",
- "deckmaste_legacy_render",
- "deckmaste_lowering",
- "deckmaste_plugin",
- "deckmaste_semantics",
- "rayon",
- "regex",
- "ron",
- "serde",
- "serde_json",
- "tempfile",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_noncanon"
-version = "0.1.0"
-dependencies = [
- "deckmaste_card",
- "deckmaste_core",
- "deckmaste_engine",
- "deckmaste_plugin",
-]
-
-[[package]]
-name = "deckmaste_plugin"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "deckmaste_card",
- "deckmaste_core",
- "deckmaste_lowering",
- "deckmaste_semantics",
- "macro_ron",
- "regex",
- "ron",
- "serde",
- "serde_json",
- "sha2",
- "syn 2.0.117",
- "tempfile",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_semantics"
-version = "0.1.0"
-dependencies = [
- "macro_ron",
- "ron",
- "serde",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_spelling"
-version = "0.1.0"
-
-[[package]]
-name = "deckmaste_syntax"
-version = "0.1.0"
-dependencies = [
- "deckmaste_lexical",
- "deckmaste_syntax",
- "dpsi",
- "ron",
- "serde",
- "thiserror",
-]
-
-[[package]]
-name = "deckmaste_tui"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "deckmaste_card",
- "deckmaste_core",
- "deckmaste_engine",
- "deckmaste_legacy_render",
- "deckmaste_plugin",
- "deckmaste_semantics",
- "ratatui",
-]
-
-[[package]]
 name = "digest"
 version = "0.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1047,12 +791,12 @@ dependencies = [
 name = "macro_ron"
 version = "0.1.0"
 dependencies = [
- "deckmaste_features",
  "dpsi",
  "elsa",
  "macro_ron_derive",
  "ron",
  "serde",
+ "sylex_features_v1",
  "tempfile",
  "thiserror",
 ]
@@ -1678,6 +1422,262 @@ dependencies = [
 ]
 
 [[package]]
+name = "sylex"
+version = "0.1.0"
+dependencies = [
+ "ron",
+ "serde",
+ "slotmap",
+ "sylex_tui",
+]
+
+[[package]]
+name = "sylex_card"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "sylex_core",
+]
+
+[[package]]
+name = "sylex_catalogs"
+version = "0.1.0"
+dependencies = [
+ "regex",
+ "serde",
+ "serde_json",
+ "sha2",
+ "sylex_lexicon",
+ "sylex_upstream",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
+name = "sylex_core"
+version = "0.1.0"
+dependencies = [
+ "dpsi",
+ "ron",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "sylex_engine"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "rand 0.10.1",
+ "rand_chacha 0.10.0",
+ "rayon",
+ "ron",
+ "serde",
+ "slotmap",
+ "sylex_card",
+ "sylex_core",
+ "sylex_lowering_v1",
+ "sylex_plugin_v1",
+ "sylex_semantics_v1",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
+name = "sylex_english"
+version = "0.1.0"
+dependencies = [
+ "dpsi",
+ "rayon",
+ "ron",
+ "serde",
+ "sylex_lexicon",
+ "sylex_syntax",
+ "sylex_upstream",
+ "sylex_vocabulary",
+ "thiserror",
+]
+
+[[package]]
+name = "sylex_features_v1"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "sylex_lexical_model"
+version = "0.1.0"
+dependencies = [
+ "dpsi",
+ "serde",
+]
+
+[[package]]
+name = "sylex_lexicon"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "dpsi",
+ "proptest",
+ "ron",
+ "serde",
+ "serde_json",
+ "sylex_lexical_model",
+ "thiserror",
+ "unicode-ident",
+]
+
+[[package]]
+name = "sylex_lowering_v1"
+version = "0.1.0"
+dependencies = [
+ "macro_ron",
+ "serde",
+ "sylex_card",
+ "sylex_core",
+ "sylex_semantics_v1",
+]
+
+[[package]]
+name = "sylex_matchups"
+version = "0.1.0"
+dependencies = [
+ "sylex_card",
+ "sylex_core",
+ "sylex_engine",
+ "sylex_plugin_v1",
+]
+
+[[package]]
+name = "sylex_pipeline_v1"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "rayon",
+ "regex",
+ "ron",
+ "serde",
+ "serde_json",
+ "sylex_catalogs",
+ "sylex_core",
+ "sylex_lowering_v1",
+ "sylex_plugin_v1",
+ "sylex_render_v1",
+ "sylex_semantics_v1",
+ "sylex_upstream",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
+name = "sylex_plugin_v1"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "macro_ron",
+ "regex",
+ "ron",
+ "serde",
+ "serde_json",
+ "sha2",
+ "sylex_card",
+ "sylex_core",
+ "sylex_lowering_v1",
+ "sylex_semantics_v1",
+ "syn 2.0.117",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
+name = "sylex_render_v1"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "macro_ron",
+ "regex",
+ "ron",
+ "serde",
+ "serde_json",
+ "sylex_plugin_v1",
+ "sylex_semantics_v1",
+]
+
+[[package]]
+name = "sylex_semantics_v1"
+version = "0.1.0"
+dependencies = [
+ "macro_ron",
+ "ron",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "sylex_spelling"
+version = "0.1.0"
+
+[[package]]
+name = "sylex_syl"
+version = "0.1.0"
+dependencies = [
+ "dpsi",
+ "thiserror",
+]
+
+[[package]]
+name = "sylex_syntax"
+version = "0.1.0"
+dependencies = [
+ "dpsi",
+ "ron",
+ "serde",
+ "sylex_lexicon",
+ "sylex_syntax",
+ "thiserror",
+]
+
+[[package]]
+name = "sylex_tui"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "ratatui",
+ "sylex_card",
+ "sylex_core",
+ "sylex_engine",
+ "sylex_plugin_v1",
+ "sylex_render_v1",
+ "sylex_semantics_v1",
+]
+
+[[package]]
+name = "sylex_upstream"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
+name = "sylex_vocabulary"
+version = "0.1.0"
+dependencies = [
+ "dpsi",
+ "ron",
+ "serde",
+ "serde_json",
+ "sylex_lexicon",
+ "sylex_syntax",
+ "thiserror",
+]
+
+[[package]]
 name = "syn"
 version = "2.0.117"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2164,19 +2164,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
- "deckmaste_card",
- "deckmaste_catalogs",
- "deckmaste_core",
- "deckmaste_data",
- "deckmaste_dsl",
- "deckmaste_english",
- "deckmaste_legacy_render",
- "deckmaste_lexical",
- "deckmaste_lexical_source",
- "deckmaste_migrations",
- "deckmaste_plugin",
- "deckmaste_semantics",
- "deckmaste_syntax",
  "flate2",
  "libc",
  "macro_ron",
@@ -2189,6 +2176,19 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+ "sylex_card",
+ "sylex_catalogs",
+ "sylex_core",
+ "sylex_english",
+ "sylex_lexicon",
+ "sylex_pipeline_v1",
+ "sylex_plugin_v1",
+ "sylex_render_v1",
+ "sylex_semantics_v1",
+ "sylex_syl",
+ "sylex_syntax",
+ "sylex_upstream",
+ "sylex_vocabulary",
  "syn 2.0.117",
  "tempfile",
 ]

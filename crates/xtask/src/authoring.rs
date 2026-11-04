@@ -46,11 +46,11 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use clap::Args;
-use deckmaste_semantics::authoring::Coverage;
-use deckmaste_semantics::authoring::UNCOVERABLE as UNSCAFFOLDABLE;
-use deckmaste_semantics::authoring::classify;
-use deckmaste_semantics::authoring::embed_safe;
-use deckmaste_semantics::authoring::reachable_rows;
+use sylex_semantics_v1::authoring::Coverage;
+use sylex_semantics_v1::authoring::UNCOVERABLE as UNSCAFFOLDABLE;
+use sylex_semantics_v1::authoring::classify;
+use sylex_semantics_v1::authoring::embed_safe;
+use sylex_semantics_v1::authoring::reachable_rows;
 use macro_ron::KindSet;
 use macro_ron::MacroDef;
 use macro_ron::NamedParam;
@@ -69,19 +69,19 @@ fn identity_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin/macros/identity")
 }
 
-// Rows `deckmaste_semantics::authoring::classify` marks `NeedsIdentityMacro`
+// Rows `sylex_semantics_v1::authoring::classify` marks `NeedsIdentityMacro`
 // that this generator can't actually scaffold, because a downstream consumer
 // rejects any macro def of that shape regardless of how it's typed —
 // `UNSCAFFOLDABLE` (imported above as an alias of
-// `deckmaste_semantics::authoring::UNCOVERABLE`, the coverage gate's own
+// `sylex_semantics_v1::authoring::UNCOVERABLE`, the coverage gate's own
 // reason this same row is exempt, not just unscaffoldable; see its doc for
 // the `(KeywordAbility, Composite)` detail).
 
-/// `embed_safe` (`deckmaste_semantics::authoring::embed_safe`) is what filters
+/// `embed_safe` (`sylex_semantics_v1::authoring::embed_safe`) is what filters
 /// out an unsafe scaffold below. A bare self-referencing identity-macro body
 /// (`body: Green`) is safe ONLY at a kind where the name is one of its own
 /// direct declarations: reread there resolves as a genuine native variant and
-/// stops. At an embedding kind, `deckmaste_plugin`'s embed-untagged
+/// stops. At an embedding kind, `sylex_plugin_v1`'s embed-untagged
 /// fallthrough treats "a macro of this name is registered at this kind" as
 /// reason enough to skip the embedded type's own lookup
 /// (`macro_ron::expand`'s embed-candidacy check), so the macro's own
@@ -92,9 +92,9 @@ fn identity_dir() -> PathBuf {
 /// tokens/basics. `embed_safe` used to be a hand-listed table here
 /// (`ColorOrColorless`, `SimpleManaSymbol`, `ManaSymbol`, `ManaSpec`,
 /// `ManaProduction`, `StatValue`, each paired with its own directly-declared
-/// variant names, hand-verified against `deckmaste_semantics`'s source);
+/// variant names, hand-verified against `sylex_semantics_v1`'s source);
 /// retired once `Kind::embeds`/`Kind::own_variants` made the same fact
-/// computable, and moved to `deckmaste_semantics::authoring` so the coverage
+/// computable, and moved to `sylex_semantics_v1::authoring` so the coverage
 /// gate can share it.
 ///
 /// Every reachable row an identity macro must cover and this generator can
@@ -155,12 +155,12 @@ pub fn run(args: &ScaffoldIdentityArgs) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// `crates/deckmaste_semantics/src/identity_registry.rs` — the compiled trust
+/// `crates/semantics/src/identity_registry.rs` — the compiled trust
 /// channel `is_identity_exempt` consults (spec §6). Regenerated in full every
 /// run from whatever `.ron` defs are actually committed under
 /// `plugins/builtin/macros/identity/`, never hand-edited.
 fn identity_registry_path() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../deckmaste_semantics/src/identity_registry.rs")
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../semantics/src/identity_registry.rs")
 }
 
 /// Every `(kind, variant, signature)` row the REAL, currently-committed
@@ -178,7 +178,7 @@ fn identity_registry_path() -> PathBuf {
 /// use this column for a REAL check: whether a def's declared shape still
 /// matches its variant's true signature.
 fn read_committed_rows(dir: &Path) -> anyhow::Result<Vec<(String, String, String)>> {
-    let macros = deckmaste_semantics::macros::macro_set();
+    let macros = sylex_semantics_v1::macros::macro_set();
     let mut rows = Vec::new();
     if !dir.exists() {
         return Ok(rows);
@@ -240,7 +240,7 @@ fn render_identity_registry(rows: &[(String, String, String)]) -> String {
          //! that directory.\n\
          //!\n\
          //! This is the compiled half of the identity-macro exemption: a Rust\n\
-         //! `const` slice, never serialized into RON. `deckmaste_semantics::authoring`\n\
+         //! `const` slice, never serialized into RON. `sylex_semantics_v1::authoring`\n\
          //! consults it (never the RON files directly) to decide whether a\n\
          //! `(kind, variant)` row is covered.\n\n\
          /// One row of the compiled identity registry: an identity-macro def named\n\
@@ -335,7 +335,7 @@ fn plan(dir: &Path, rows: &[(String, String)]) -> (Vec<Scaffold>, Vec<(String, S
             .push(kind.as_str());
     }
 
-    let kind_set = deckmaste_semantics::ron::kinds();
+    let kind_set = sylex_semantics_v1::ron::kinds();
     let mut planned = Vec::new();
     let mut conflicts = Vec::new();
     for (variant, kinds) in by_variant {
@@ -712,7 +712,7 @@ mod drift {
         from_disk.sort();
 
         let mut from_registry: Vec<(String, String, String)> =
-            deckmaste_semantics::identity_registry::IDENTITY_ROWS
+            sylex_semantics_v1::identity_registry::IDENTITY_ROWS
                 .iter()
                 .map(|row| {
                     (
@@ -750,7 +750,7 @@ mod identity_shape {
     /// params, whose validator accepts anything.
     #[test]
     fn every_identity_def_mirrors_its_own_variant() {
-        let macros = deckmaste_semantics::macros::macro_set();
+        let macros = sylex_semantics_v1::macros::macro_set();
         let dir = super::identity_dir();
         let mut checked = 0usize;
         let mut offenders = Vec::new();
@@ -815,15 +815,15 @@ mod coverage_gap {
     /// Every `NeedsIdentityMacro` row this generator declines to scaffold is
     /// accounted for by one of the two documented exclusions
     /// ([`super::UNSCAFFOLDABLE`], [`super::embed_safe`]) — never a silent
-    /// third reason. The gap itself (currently real: `deckmaste_plugin`'s
+    /// third reason. The gap itself (currently real: `sylex_plugin_v1`'s
     /// `keyword_shape` closed vocabulary for `Composite`, and the
     /// embed-untagged recursion hazard for names only reachable at an
     /// embedding kind transitively) is reported upstream, not hidden here.
     #[test]
     fn every_excluded_row_is_an_explained_exclusion() {
-        use deckmaste_semantics::authoring::Coverage;
-        use deckmaste_semantics::authoring::classify;
-        use deckmaste_semantics::authoring::reachable_rows;
+        use sylex_semantics_v1::authoring::Coverage;
+        use sylex_semantics_v1::authoring::classify;
+        use sylex_semantics_v1::authoring::reachable_rows;
 
         let all_needs: Vec<(String, String)> = reachable_rows()
             .into_iter()
@@ -856,13 +856,13 @@ mod elision_gap {
     /// skipped.
     #[test]
     fn every_droppable_default_row_is_scaffolded_as_elidable() {
-        use deckmaste_semantics::authoring::Coverage;
-        use deckmaste_semantics::authoring::classify;
-        use deckmaste_semantics::authoring::reachable_rows;
+        use sylex_semantics_v1::authoring::Coverage;
+        use sylex_semantics_v1::authoring::classify;
+        use sylex_semantics_v1::authoring::reachable_rows;
         use macro_ron::ParamDefault;
         use macro_ron::VariantSignature;
 
-        let kind_set = deckmaste_semantics::ron::kinds();
+        let kind_set = sylex_semantics_v1::ron::kinds();
         let droppable = |signature: &VariantSignature| match signature {
             VariantSignature::Unit => false,
             VariantSignature::Named(params) => params
@@ -937,7 +937,7 @@ mod elision_gap {
 
         // And what it renders actually loads — the point of the guard is that
         // the alternative (`Elidable(Any)`) would NOT.
-        let mut macros = deckmaste_semantics::macros::macro_set();
+        let mut macros = sylex_semantics_v1::macros::macro_set();
         let def: macro_ron::MacroDef = macros.read_str(&text).unwrap();
         macros.replace(&def).unwrap();
 
@@ -962,7 +962,7 @@ mod field_splice {
         use macro_ron::ParamDefault;
         use macro_ron::VariantSignature;
 
-        let kind_set = deckmaste_semantics::ron::kinds();
+        let kind_set = sylex_semantics_v1::ron::kinds();
         let signature = super::signature_of(&kind_set, "OneShotEffect", "May");
         let VariantSignature::Named(params) = signature else {
             panic!("OneShotEffect::May should carry a named signature, got {signature:?}");
@@ -1005,7 +1005,7 @@ mod field_splice {
         use macro_ron::ParamDefault;
         use macro_ron::VariantSignature;
 
-        let kind_set = deckmaste_semantics::ron::kinds();
+        let kind_set = sylex_semantics_v1::ron::kinds();
         let signature = super::signature_of(&kind_set, "Card", "Normal");
         let VariantSignature::Named(params) = signature else {
             panic!("Card::Normal should carry a named signature, got {signature:?}");
@@ -1042,7 +1042,7 @@ mod field_splice {
     #[test]
     fn every_newtype_over_a_crate_struct_is_marked_spliced() {
         let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../../crates/deckmaste_semantics/src");
+            .join("../../crates/semantics/src");
         let mut sources = Vec::new();
         crate::map::collect_rs_files(&dir, &mut sources).expect("semantics sources are readable");
         sources.sort();
@@ -1173,7 +1173,7 @@ mod field_splice {
 /// which is the only path (besides the embed-candidacy check that caught
 /// Finding 3) that consults `macros.get` before a native variant shadows it
 /// — see `macro_ron::expand`'s `native_variant_ok`. These tests build the
-/// real `deckmaste_semantics::macros::macro_set()` registry, load EVERY
+/// real `sylex_semantics_v1::macros::macro_set()` registry, load EVERY
 /// scaffold under `plugins/builtin/macros/identity/` (the actual generated
 /// files, not a synthetic stand-in — a nested argument position, e.g. the
 /// `Reference` a `Cast`/`Attach` call carries, needs ITS OWN identity-macro
@@ -1188,16 +1188,16 @@ mod field_splice {
 /// one by one.
 #[cfg(test)]
 mod restricted_read {
-    use deckmaste_semantics::Action;
-    use deckmaste_semantics::Card;
-    use deckmaste_semantics::ManaProduction;
+    use sylex_semantics_v1::Action;
+    use sylex_semantics_v1::Card;
+    use sylex_semantics_v1::ManaProduction;
     use macro_ron::Expand;
     use macro_ron::MacroDef;
 
     /// The real semantics macro registry (kinds + param types) with every
     /// real, currently-committed scaffold loaded — see the module doc.
     fn real_scaffolds() -> macro_ron::MacroSet {
-        let mut macros = deckmaste_semantics::macros::macro_set();
+        let mut macros = sylex_semantics_v1::macros::macro_set();
         for entry in std::fs::read_dir(super::identity_dir()).unwrap() {
             let path = entry.unwrap().path();
             let text = std::fs::read_to_string(&path).unwrap();
@@ -1288,7 +1288,7 @@ mod restricted_read {
             "Cast(what: Any)",
             "Cast()",
         ] {
-            assert_restricted_matches_native::<deckmaste_semantics::EventFilter>(&macros, source);
+            assert_restricted_matches_native::<sylex_semantics_v1::EventFilter>(&macros, source);
         }
     }
 
@@ -1325,7 +1325,7 @@ mod restricted_read {
              effect: RestartGame)",
             "Spell(effect: RestartGame)",
         ] {
-            assert_restricted_matches_native::<deckmaste_semantics::Ability>(&macros, source);
+            assert_restricted_matches_native::<sylex_semantics_v1::Ability>(&macros, source);
         }
         for source in [
             "Continuously(effect: Modify(It, SwitchPowerToughness), \
@@ -1351,7 +1351,7 @@ mod restricted_read {
             "Reflexive(event: StepBegins(at: Ending(End), whose: EachPlayers), \
              effect: RestartGame)",
         ] {
-            assert_restricted_matches_native::<deckmaste_semantics::OneShotEffect>(&macros, source);
+            assert_restricted_matches_native::<sylex_semantics_v1::OneShotEffect>(&macros, source);
         }
         // `StaticEffect::CostOption` — the row the MECHANICAL survey caught
         // that two hand surveys missed, and spelled 4 times in canon.
@@ -1359,7 +1359,7 @@ mod restricted_read {
             "CostOption(components: [Tap], tag: Kicker)",
             "CostOption(components: [Tap], tag: Kicker, repeatable: true)",
         ] {
-            assert_restricted_matches_native::<deckmaste_semantics::StaticEffect>(&macros, source);
+            assert_restricted_matches_native::<sylex_semantics_v1::StaticEffect>(&macros, source);
         }
     }
 

@@ -26,7 +26,7 @@ pub struct DeriveCardsArgs {
 pub fn run(args: &DeriveCardsArgs) -> anyhow::Result<()> {
     let oracle_cards = File::open(&args.oracle_cards)
         .with_context(|| format!("opening {}", args.oracle_cards.display()))?;
-    let catalogs = deckmaste_catalogs::CatalogSet::load(&args.catalogs)
+    let catalogs = sylex_catalogs::CatalogSet::load(&args.catalogs)
         .with_context(|| format!("loading catalogs from {}", args.catalogs.display()))?;
     if let Some(parent) = args.output.parent() {
         std::fs::create_dir_all(parent)
@@ -34,7 +34,7 @@ pub fn run(args: &DeriveCardsArgs) -> anyhow::Result<()> {
     }
     let output = File::create(&args.output)
         .with_context(|| format!("creating {}", args.output.display()))?;
-    let count = deckmaste_migrations::oracle_snapshot::write(
+    let count = sylex_pipeline_v1::oracle_snapshot::write(
         BufReader::new(oracle_cards),
         &catalogs,
         BufWriter::new(output),

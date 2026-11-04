@@ -184,7 +184,7 @@ fn embed_construct(ty: &Ident, v: &Variant) -> TokenStream {
 /// IS the struct name serde passes to `deserialize_struct`, which the
 /// unknown-field refusal would otherwise name. It is NOT renamed to the
 /// variant's own name: ron writes a struct's serde name whenever
-/// `struct_names` is on (`deckmaste_migrations` reads such output back), and
+/// `struct_names` is on (`sylex_pipeline_v1` reads such output back), and
 /// a rename to a bare variant name can also collide with a registered kind,
 /// which turns a mid-stream newtype-variant body into a capture position.
 /// The refusal gets the variant's real name threaded down from the variant
@@ -772,7 +772,7 @@ fn gen_serialize(input: &Input) -> TokenStream {
             // Invocation write-back, compartment transparency, the bare-numeral
             // literal, and the name-erased newtype embed: all delegate to the
             // payload — so a literal writes `3`, never `Literal(3)`. (The read
-            // side is the literal-aware reader in `deckmaste_core::ron`.)
+            // side is the literal-aware reader in `sylex_core::ron`.)
             (Some(Marker::Expanded | Marker::Flatten), _)
             | (Some(Marker::Literal | Marker::Embed), Shape::Newtype(_)) => arms.push(quote! {
                 #ty::#v_ident(__f0) => ::serde::Serialize::serialize(__f0, serializer),

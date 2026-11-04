@@ -20,7 +20,7 @@ function __mtgjson_download
         download_file \
             --tag 'mtgjson' \
             --accept 'application/x-xz' \
-            --user-agent 'deckmaste.rs/0.1 (+https://github.com/msmorgan/deckmaste.rs)' \
+            --user-agent 'sylex/0.1 (+https://github.com/msmorgan/deckmaste.rs)' \
             $url $cached
         or return
 

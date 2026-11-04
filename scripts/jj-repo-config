@@ -19,7 +19,7 @@ set_repo fix.tools.2-sort-derives.patterns '["glob:**/*.rs"]'
 # `.syl` files in the plugin corpus (the Lean fixtures keep their hand layout).
 # The style is spelled out in full: switching styles means editing these flags
 # (and scripts/fmt's), then `jj fix` over the corpus.
-set_repo fix.tools.3-syl-fmt.command '["cargo", "run", "-q", "-p", "deckmaste_dsl", "--bin", "sylfmt", "--", "--stdin", "--width", "100", "--closers", "hugged", "--trailing-commas", "never", "--record-spaces=false", "--hug-first-list=true", "$path"]'
+set_repo fix.tools.3-syl-fmt.command '["cargo", "run", "-q", "-p", "sylex_syl", "--bin", "sylfmt", "--", "--stdin", "--width", "100", "--closers", "hugged", "--trailing-commas", "never", "--record-spaces=false", "--hug-first-list=true", "$path"]'
 set_repo fix.tools.3-syl-fmt.patterns '["glob:plugins_v3/**/*.syl"]'
 
 # Workspace boundaries: the four aliases jj-sensei's boundaries skill installs

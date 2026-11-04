@@ -1,6 +1,6 @@
 //! `cargo xtask entailments emit|check`: render the cause-verb entailment table
-//! (`crates/deckmaste_plugin/tables/entailments.ron`) the engine `include_str!`s
-//! (`deckmaste_engine::entail`). The rows are the closed `VerbName` cause-verb
+//! (`crates/plugin/tables/entailments.ron`) the engine `include_str!`s
+//! (`sylex_engine::entail`). The rows are the closed `VerbName` cause-verb
 //! vocabulary, one CR-cited fact form each ([CR#701] keyword actions): the
 //! normal form that makes Dies-matches-sacrifice structural.
 //!
@@ -34,7 +34,7 @@ pub struct EntailmentsArgs {
 
 #[derive(Debug, Subcommand)]
 enum EntailmentsCmd {
-    /// Write the entailment table to `crates/deckmaste_plugin/tables/entailments.ron`.
+    /// Write the entailment table to `crates/plugin/tables/entailments.ron`.
     Emit,
     /// Fail when the committed entailment table differs from the rendering.
     Check,
@@ -180,7 +180,7 @@ pub fn render() -> String {
 }
 
 fn table_path() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../deckmaste_plugin/tables/entailments.ron")
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../plugin/tables/entailments.ron")
 }
 
 pub fn run(args: &EntailmentsArgs) -> anyhow::Result<()> {

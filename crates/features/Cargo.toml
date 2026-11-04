@@ -1,0 +1,16 @@
+[package]
+publish = false
+name = "sylex_features_v1"
+version = "0.1.0"
+edition = "2024"
+
+[lints]
+workspace = true
+
+[dependencies]
+serde = { version = "1.0.228", features = ["derive"] }
+
+[dev-dependencies]
+# The serializer shims the unit tests drive `Serialize` through need an error
+# type; nothing in the crate proper is fallible.
+thiserror = { workspace = true }

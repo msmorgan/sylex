@@ -1,0 +1,22 @@
+[package]
+name = "sylex_syntax"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lints]
+workspace = true
+
+[features]
+# The tree-side Ranking Key (`CompiledGrammar::ranking_key`), which only tests use.
+tree-ranking-key = []
+
+[dependencies]
+sylex_lexicon = { version = "0.1.0", path = "../lexicon" }
+dpsi = { version = "0.1.0", features = ["serde"] }
+serde = { version = "1.0.228", features = ["derive"] }
+thiserror = { workspace = true }
+ron = "0.12.1"
+
+[dev-dependencies]
+sylex_syntax = { path = ".", features = ["tree-ranking-key"] }

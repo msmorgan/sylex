@@ -1,0 +1,1247 @@
+use std::collections::HashSet;
+
+use sylex_core::DeciderSpec;
+use sylex_core::KeywordAbility;
+use sylex_core::LockPoint;
+use sylex_core::Uint;
+use sylex_core::Visibility;
+
+use crate::object::ObjectId;
+use crate::player::PlayerId;
+
+pub(crate) mod pending;
+
+use pending::ArrangePile;
+use pending::AssignCombatDamage;
+use pending::CallFlip;
+use pending::ChooseCostOptions;
+use pending::ChooseManaColor;
+use pending::ChooseManaMode;
+use pending::ChooseManaReversals;
+use pending::ChooseModes;
+use pending::ChooseNoteCardName;
+use pending::ChooseNoteNumber;
+use pending::ChooseObjects;
+use pending::ChooseReplacement;
+use pending::ChooseTargets;
+use pending::ChooseXValue;
+use pending::DeclareAttackers;
+use pending::DeclareBlockers;
+use pending::DiscardCards;
+use pending::DiscardToHandSize;
+use pending::Division;
+use pending::LegendRule;
+use pending::OrderReplacements;
+use pending::OrderTriggers;
+use pending::PayMana;
+use pending::PreGame;
+use pending::Priority;
+use pending::Retarget;
+use pending::Vote;
+use pending::YesNo;
+
+/// A pre-game decision ([CR#103]) — surfaced before turn one.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PreGameKind {
+    /// Who takes the first turn ([CR#103.1]).
+    FirstTurn,
+    /// Keep or mulligan; London bottoming is the committed-hidden part
+    /// ([CR#103.5]).
+    Mulligan,
+    /// Reveal a companion ([CR#103.2b]).
+    Companion,
+    /// Opening-hand (Leyline-style) actions, turn order ([CR#103.6]).
+    OpeningHand,
+}
+
+/// A special action ([CR#116.2]) — taken with priority, no stack; the
+/// closed CR list (land play is already `Action::PlayLand`). All arms are
+/// a shell: `legal_actions` never offers them yet (owner:
+/// engine-special-actions).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SpecialAction {
+    /// Turn a face-down creature face up ([CR#116.2b]).
+    TurnFaceUp(ObjectId),
+    /// End a continuous/delayed effect that allows it ([CR#116.2c]).
+    EndEffect(ObjectId),
+    /// Ignore a static ability's effect for a duration ([CR#116.2d]).
+    IgnoreStatic(ObjectId),
+    /// Exile a suspend card from hand ([CR#116.2f]).
+    SuspendCast(ObjectId),
+    /// Pay {3} to bring the companion to hand ([CR#116.2g]).
+    CompanionToHand,
+    /// Pay {2} to foretell ([CR#116.2h]).
+    Foretell(ObjectId),
+    /// Exile a plot card from hand ([CR#116.2k]).
+    PlotExile(ObjectId),
+    /// Pay an unlock cost ([CR#116.2m]).
+    UnlockHalf(ObjectId),
+}
+
+/// The boundary record of a pending decision (mtg-rules choices.md §6):
+/// the kind plus its schema row — nominal decider, lock stage, visibility.
+/// Derived from the kind by the schema methods below (the choices table is
+/// encoded once); UI/AI/replay consumers read THIS, while
+/// `Progress::NeedsDecision` stays the kind-only notification.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DecisionPoint {
+    pub pending: DecisionPointKind,
+    pub decider: DeciderSpec,
+    pub lock: LockPoint,
+    pub visibility: Visibility,
+}
+
+impl DecisionPoint {
+    /// The concrete player this decision is waiting on — convenience over
+    /// `self.pending.decider_player()` so callers needn't reach through the
+    /// `pending` field.
+    #[must_use]
+    pub fn decider_player(&self) -> PlayerId {
+        self.pending.decider_player()
+    }
+}
+
+impl DecisionPointKind {
+    /// The choices.md §2 schema row: nominal decider. Refinements
+    /// (delegation, APNAP per-combatant) arrive with the kinds' behavior.
+    #[must_use]
+    pub fn decider_spec(&self) -> DeciderSpec {
+        match self {
+            DecisionPointKind::Priority(_) => DeciderSpec::PriorityHolder,
+            DecisionPointKind::DeclareAttackers(_) => DeciderSpec::ActivePlayer,
+            DecisionPointKind::DeclareBlockers(_) => DeciderSpec::DefendingPlayer,
+            DecisionPointKind::Vote(_) => DeciderSpec::EachInTurnOrder,
+            _ => DeciderSpec::Controller,
+        }
+    }
+
+    /// The CONCRETE player this decision is waiting on (every kind
+    /// carries one) — the nominal-role view is [`Self::decider_spec`].
+    #[must_use]
+    pub fn decider_player(&self) -> PlayerId {
+        match self {
+            DecisionPointKind::Priority(h) => h.player,
+            DecisionPointKind::DiscardToHandSize(h) => h.player,
+            DecisionPointKind::DiscardCards(h) => h.player,
+            DecisionPointKind::CallFlip(h) => h.player,
+            DecisionPointKind::ChooseManaColor(h) => h.player,
+            DecisionPointKind::ChooseManaMode(h) => h.player,
+            DecisionPointKind::ChooseTargets(h) => h.player,
+            DecisionPointKind::Retarget(h) => h.player,
+            DecisionPointKind::PayMana(h) => h.player,
+            DecisionPointKind::Payment(h) => h.payer,
+            DecisionPointKind::ChooseManaReversals(h) => h.player,
+            DecisionPointKind::OrderTriggers(h) => h.player,
+            DecisionPointKind::DeclareAttackers(h) => h.player,
+            DecisionPointKind::DeclareBlockers(h) => h.player,
+            DecisionPointKind::AssignCombatDamage(h) => h.player,
+            DecisionPointKind::ChooseModes(h) => h.player,
+            DecisionPointKind::Division(h) => h.player,
+            DecisionPointKind::Vote(h) => h.player,
+            DecisionPointKind::YesNo(h) => h.player,
+            DecisionPointKind::OrderReplacements(h) => h.player,
+            DecisionPointKind::ChooseCostOptions(h) => h.player,
+            DecisionPointKind::ChooseXValue(h) => h.player,
+            DecisionPointKind::ChooseNoteNumber(h) => h.player,
+            DecisionPointKind::ChooseNoteCardName(h) => h.player,
+            DecisionPointKind::ChooseObjects(h) => h.player,
+            DecisionPointKind::PreGame(h) => h.player,
+            DecisionPointKind::LegendRule(h) => h.player,
+            DecisionPointKind::ArrangePile(h) => h.player,
+            DecisionPointKind::ChooseReplacement(h) => h.chooser,
+        }
+    }
+
+    /// The choices.md §2 lock stage on the shared `LockPoint` axis.
+    #[must_use]
+    pub fn lock(&self) -> LockPoint {
+        match self {
+            DecisionPointKind::ChooseTargets(_)
+            | DecisionPointKind::ChooseModes(_)
+            | DecisionPointKind::ChooseCostOptions(_)
+            | DecisionPointKind::ChooseXValue(_)
+            | DecisionPointKind::Division(_) => LockPoint::Announce,
+            DecisionPointKind::PayMana(_)
+            | DecisionPointKind::Payment(_)
+            | DecisionPointKind::ChooseManaReversals(_) => LockPoint::Payment,
+            DecisionPointKind::OrderTriggers(_) => LockPoint::StackPlacement,
+            DecisionPointKind::DeclareAttackers(_)
+            | DecisionPointKind::DeclareBlockers(_)
+            | DecisionPointKind::AssignCombatDamage(_) => LockPoint::Declaration,
+            DecisionPointKind::PreGame(_) => LockPoint::PreGame,
+            // Priority actions and resolution-stage choices bind as applied.
+            _ => LockPoint::Resolution,
+        }
+    }
+
+    /// The choices.md §3 visibility class. London bottoming is the one
+    /// committed-hidden pre-game payload ([CR#103.5]).
+    #[must_use]
+    pub fn visibility(&self) -> Visibility {
+        match self {
+            DecisionPointKind::PreGame(PreGame {
+                kind: PreGameKind::Mulligan,
+                ..
+            }) => Visibility::CommittedHidden,
+            _ => Visibility::Open,
+        }
+    }
+}
+
+/// What the engine is waiting on. `step()` returns `NeedsDecision` (without
+/// mutating) until `submit_decision` answers it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DecisionPointKind {
+    Priority(Priority),
+    DiscardToHandSize(DiscardToHandSize),
+    DiscardCards(DiscardCards),
+    CallFlip(CallFlip),
+    ChooseManaColor(ChooseManaColor),
+    ChooseManaMode(ChooseManaMode),
+    ChooseTargets(ChooseTargets),
+    Retarget(Retarget),
+    PayMana(PayMana),
+    Payment(crate::payment::PaymentPrompt),
+    ChooseManaReversals(ChooseManaReversals),
+    OrderTriggers(OrderTriggers),
+    DeclareAttackers(DeclareAttackers),
+    DeclareBlockers(DeclareBlockers),
+    AssignCombatDamage(AssignCombatDamage),
+    ChooseModes(ChooseModes),
+    Division(Division),
+    Vote(Vote),
+    YesNo(YesNo),
+    ChooseCostOptions(ChooseCostOptions),
+    ChooseXValue(ChooseXValue),
+    ChooseNoteNumber(ChooseNoteNumber),
+    ChooseNoteCardName(ChooseNoteCardName),
+    OrderReplacements(OrderReplacements),
+    ChooseReplacement(ChooseReplacement),
+    PreGame(PreGame),
+    ChooseObjects(ChooseObjects),
+    LegendRule(LegendRule),
+    ArrangePile(ArrangePile),
+}
+
+/// One pending-decision kind's answer-validate-and-apply behavior, dispatched
+/// by `submit_decision`'s routing match — the whole dispatch, one arm per
+/// `DecisionPointKind` variant. Each newtype payload struct under `pending/`
+/// implements exactly this one method.
+pub(crate) trait DecisionHandler {
+    /// Validate `answer` against this pending decision and apply it. On success
+    /// the handler sets `g.pending = None`; on ANY error it leaves `g.pending`
+    /// untouched (`submit_decision`'s contract: a rejected decision stays
+    /// open).
+    fn resolve(self, g: &mut GameState, answer: Decision) -> Result<(), DecisionError>;
+}
+
+/// An answer to the pending decision.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Decision {
+    /// Modes chosen, by option index ([CR#700.2]) — a shell: `legal_actions`
+    /// never offers it yet.
+    Modes(Vec<Uint>),
+    /// A division among targets ([CR#601.2d]) — shell.
+    Divide(Vec<(ObjectId, Uint)>),
+    /// A vote, by option index ([CR#701.38a]) — shell.
+    VoteFor(Uint),
+    /// A yes/no answer ([CR#608.2d]) — shell.
+    Answer(bool),
+    /// Answers `ChooseCostOptions`: one chosen reading per choosable symbol, in
+    /// the order they appear in the cost ([CR#601.2b]).
+    CostOptions(crate::cost_options::CostOptionChoices),
+    /// Answers `Priority`.
+    Act(Action),
+    /// Answers `DiscardToHandSize` and `DiscardCards`: which cards to discard.
+    Discard(Vec<ObjectId>),
+    /// Answers `ChooseManaColor`: the chosen mana.
+    ManaColor(sylex_core::ColorOrColorless),
+    /// Answers `ChooseManaMode`: the chosen multi-symbol run, by option index
+    /// into the offered runs ([CR#106.1b]).
+    ManaMode(Uint),
+    /// Answers `ChooseTargets`: one chosen SET per `TargetSpec` slot (singleton
+    /// for a quantity-one slot, several for a plural slot). The submission
+    /// carries the per-slot counts, so `submit_decision` locks them
+    /// ([CR#601.2c]).
+    Targets(Vec<Vec<ObjectId>>),
+    /// Answers `PayMana`: how the pool covers the cost.
+    Pay(crate::cast::Payment),
+    /// Answers the staged payment-obligation protocol.
+    Payment(crate::payment::PaymentCommand),
+    /// Answers `ChooseManaReversals` with one complete legal action set.
+    ManaReversals(Vec<crate::player::ManaActionId>),
+    /// Answers `OrderTriggers`: a permutation of `0..triggers.len()` giving the
+    /// placement order ([CR#603.3b]).
+    Order(Vec<usize>),
+    /// Answers `DeclareAttackers` ([CR#508.1a,508.1b]): `(attacker, target)`
+    /// pairs (possibly empty). Each `target` is what that attacker is attacking
+    /// — the defending player's proxy object or a planeswalker they control
+    /// ([CR#506.3,508.1b]).
+    Attackers(Vec<(ObjectId, ObjectId)>),
+    /// Answers `DeclareBlockers`: `(blocker, the attacker it blocks)` pairs
+    /// (possibly empty). Each blocker blocks exactly one attacker
+    /// ([CR#509.1a]).
+    Blocks(Vec<(ObjectId, ObjectId)>),
+    /// Answers `AssignCombatDamage`: `(recipient, amount)` pairs whose amounts
+    /// sum to the source's power, each recipient drawn from the offered set
+    /// ([CR#510.1c]).
+    Assignment(Vec<(ObjectId, Uint)>),
+    /// Answers `ChooseObjects`: the chosen objects ([CR#608.2d]).
+    Chosen(Vec<ObjectId>),
+    /// Answers `ArrangePile` ([CR#401.4]): the pile's cards in the chosen order
+    /// (top → down) — a permutation of the offered pile.
+    Arranged(Vec<ObjectId>),
+    /// Answers `ChooseXValue`: the chosen value of X ([CR#601.2b]).
+    XValue(Uint),
+    /// Answers `ChooseNoteCardName`.
+    CardName(String),
+    /// Answers `ChooseReplacement` ([CR#616.1]): which replacement the affected
+    /// player applies first. The key must be in the `applicable` list.
+    ReplacementChoice(crate::replace_registry::ReplacementKey),
+}
+
+/// What a priority holder can do in the skeleton.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Action {
+    Pass,
+    /// Concede ([CR#104.3a]) — immediate and UNSTOPPABLE: the single
+    /// exception to card-beats-rules ([CR#101.1]); no `CantLose` gate
+    /// touches it and the controller of a controlled player ([CR#723]) can't
+    /// prevent it ([CR#723.6]). ENUMERATED in every priority legal list and accepted
+    /// as the answer to EVERY pending decision (the `submit_decision`
+    /// pre-check) — "at any time" means the engine always offers it;
+    /// filtering is the runner's problem. The conceder is the pending
+    /// decision's decider; out-of-band concession by a player who is NOT
+    /// being asked anything is a runner-API seam.
+    Concede,
+    /// A special action ([CR#116.2]) — a shell: never offered in the
+    /// legal list yet, so submissions reject as Illegal (owner:
+    /// engine-special-actions).
+    Special(SpecialAction),
+    /// Special action, no stack ([CR#116.2a,305]).
+    PlayLand {
+        object: ObjectId,
+    },
+    /// Activate an ability of a permanent the player controls ([CR#602]).
+    /// Mana abilities resolve stacklessly ([CR#605.3a]); all other activated
+    /// abilities go on the stack via the announce flow ([CR#602.2]). `ability`
+    /// indexes the object's derived ability list.
+    ActivateAbility {
+        object: ObjectId,
+        ability: usize,
+    },
+    /// Cast a spell from hand ([CR#601]). The announce block (targets, cost) is
+    /// reified onto the agenda by `take_priority_action`.
+    CastSpell {
+        object: ObjectId,
+    },
+}
+
+/// Why a submission was rejected.
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+pub enum DecisionError {
+    #[error("no decision is pending")]
+    NothingPending,
+    /// The decision kind doesn't answer the pending decision.
+    #[error("decision doesn't answer what's pending")]
+    WrongKind,
+    #[error("illegal: {reason}")]
+    Illegal { reason: String },
+}
+
+/// The action one `unless` cost component performs, paid by `who`
+/// ([CR#118.12a]). v1 covers verb costs (`Do`) and {T}/{Q}; a mid-resolution
+/// mana cost is a loud seam (the PayCost/PayMana flow is announce-slot-bound).
+pub(crate) fn unless_cost_action(
+    component: &sylex_core::CostComponent,
+    who: &sylex_core::Reference,
+) -> sylex_core::Action {
+    use sylex_core::Action;
+    use sylex_core::CostComponent;
+    use sylex_core::Reference;
+    match component {
+        // A verb cost is paid by `who` performing it ([CR#601.2h]) — re-agent
+        // the action onto `who`: the two agent-BEARING cost-eligible verbs
+        // (Sacrifice, ChangeLife) swap their agent slot; the agent-SILENT
+        // ones (Tap/Untap/PutCounters/RemoveCounters/Reveal/Move) have no
+        // slot to swap and pass through unchanged (their resolve arm never
+        // reads an agent anyway); the chosen discard composite ([CR#701.9])
+        // is rebuilt around `who` (who rides the body's `With` binder's
+        // `filter`/`by`), while the bound "discard this card" form
+        // ([CR#702.29a]) is paid by its patient's own controller, so it
+        // needs only the named card.
+        CostComponent::Act { action, .. } => match action.as_action() {
+            Action::Sacrifice(_, what) => Action::Sacrifice(who.clone(), what.clone()),
+            Action::ChangeLife(_, op) => Action::ChangeLife(who.clone(), op.clone()),
+            Action::Composite { name, body } if name.as_str() == "Discard" => {
+                match sylex_core::discard_body_what(body) {
+                    // The bound form's performer is its patient's controller
+                    // (`who` discards their own named card), so the re-agented
+                    // rebuild needs only the card ([CR#702.29a]).
+                    Some(what) => Action::discard_what(what.clone()),
+                    None => Action::discard(
+                        who.clone(),
+                        sylex_core::discard_body_count(body)
+                            .cloned()
+                            .unwrap_or(sylex_core::Count::Literal(0)),
+                        sylex_core::discard_body_random(body),
+                    ),
+                }
+            }
+            other => other.clone(),
+        },
+        // {T}/{Q} tap/untap the source permanent the cost rides on — both
+        // agent-silent ([CR#701.26a..701.26b]), so `who` has no slot to ride.
+        CostComponent::Tap => Action::Tap(Reference::source_parameter()),
+        CostComponent::Untap => Action::Untap(Reference::source_parameter()),
+        // Provenance is erased at `lower` (`sylex_lowering_v1`), so no
+        // loaded value reaches here wrapped. The arm survives only because
+        // the variant does; `core-demacro` deletes both.
+        // A payment-time subject instruction has no single-`Action` rendering:
+        // it may surface a choice and it writes a register. Every caller that
+        // can see one routes through `unless_cost_effect`, which renders it as
+        // the matching instruction.
+        CostComponent::Choose(_)
+        | CostComponent::Sample(_)
+        | CostComponent::Search(_)
+        | CostComponent::Let(_) => {
+            unreachable!(
+                "a payment-time subject instruction is rendered by unless_cost_effect as \
+                 its own instruction, never as a single Action"
+            )
+        }
+        // The `unless` cost list is `Cost::normalize`d at the `Instruction::Unless`
+        // boundary (see `resolve.rs`), which splices every nested `Cost` flat,
+        // so a `Cost` component never survives to here.
+        CostComponent::Cost(_) => {
+            unreachable!("nested Cost is spliced away by normalize at the Unless boundary")
+        }
+        // An aggregate-stat (tap-total) cost ([CR#702.122a] Crew) as an
+        // 'unless' cost needs the payer's subset choice, which has no single
+        // `Action` rendering. Crew-family costs are activation costs, never
+        // 'unless' costs, so this seam is unreached today.
+        CostComponent::TapTotal { .. } => todo!(
+            "engine-resolve-effects seam: an aggregate-stat (tap-total) 'unless' cost \
+             ([CR#118.12a,702.122a]) needs a payment-time subset choice; \
+             owner: engine-resolve-effects"
+        ),
+        // `May(Pay(cost))` routes through the payment protocol before this
+        // action-only renderer. A caller that reaches here with mana (the
+        // `AdditionalCost` arm) is still the announce-slot-bound seam, like
+        // "equal to its mana cost" ([CR#202.1]).
+        CostComponent::Mana(_) | CostComponent::ManaCostOf(_) => todo!(
+            "engine-resolve-effects seam: a mid-resolution mana cost outside the \
+             optional payment protocol ([CR#118.12a]) — announce-slot-bound; \
+             owner: engine-resolve-effects"
+        ),
+    }
+}
+
+/// One cost component rendered as the effect `who` runs to pay it
+/// ([CR#118.12a,601.2b]) — the entry point every cost-to-effect payment walk
+/// outside the optional-payment protocol (`AdditionalCost` and the activation
+/// cost-`With` step) uses. Most components are a single payer
+/// `Action`, so they wrap [`unless_cost_action`] in [`Instruction::Act`]; a
+/// cost-side [`With`](sylex_core::CostComponent::With) is a choose-then-pay
+/// step with no single-`Action` rendering, so it becomes an
+/// [`Instruction::With`]: the binder surfaces the controller's
+/// `ChooseObjects` choice (bound as `That`/`Those`), then the body pays against
+/// it — exactly the effect-side `With` machinery, reused here so cost choosing
+/// stays OUT of the verb.
+pub(crate) fn unless_cost_effect(
+    component: &sylex_core::CostComponent,
+    who: &sylex_core::Reference,
+) -> sylex_core::Instruction {
+    use sylex_core::CostComponent;
+    use sylex_core::Instruction;
+    match component {
+        // [CR#601.2b]: a payment-time decision IS an instruction — the same
+        // node the effect grammar uses — so it runs through the ordinary
+        // interpreter and writes its register in the announce activation.
+        CostComponent::Choose(choice) => Instruction::Choose(choice.clone()),
+        CostComponent::Sample(_) => unreachable!(
+            "a random payment sample runs only through the payment protocol ([CR#601.2h])"
+        ),
+        CostComponent::Search(search) => Instruction::Search(search.clone()),
+        CostComponent::Let(binding) => Instruction::Let(binding.clone()),
+        // [CR#400.7]: a producing payment writes its product for the ability
+        // body to read.
+        CostComponent::Act {
+            dest: Some(dest),
+            action,
+        } => Instruction::producing(*dest, unless_cost_action_of(action, who)),
+        other => Instruction::act(unless_cost_action(other, who)),
+    }
+}
+
+/// The re-agented [`Action`](sylex_core::Action) a paying component runs
+/// ([CR#601.2h]) — the `Act` half of [`unless_cost_action`], reused by the
+/// producing arm.
+fn unless_cost_action_of(
+    action: &sylex_core::RunnableCostAction,
+    who: &sylex_core::Reference,
+) -> sylex_core::Action {
+    unless_cost_action(
+        &sylex_core::CostComponent::Act {
+            dest: None,
+            action: action.clone(),
+        },
+        who,
+    )
+}
+
+use sylex_core::Agency;
+use sylex_core::Zone;
+
+use crate::agenda::FinalizeWatch;
+use crate::agenda::WorkItem;
+use crate::derive;
+use crate::event::AbilityActivated;
+use crate::event::Act;
+use crate::event::Cause;
+use crate::event::DamageDealt;
+use crate::event::GameEvent;
+use crate::event::Occurrence;
+use crate::event::PlayerLost;
+use crate::event::ZoneChange;
+use crate::state::GameState;
+
+impl GameState {
+    /// Answers the pending decision: validates, does the decision's
+    /// bookkeeping, schedules the continuation at the agenda front, and
+    /// clears `pending`. On error the decision stays pending.
+    ///
+    /// # Errors
+    ///
+    /// `NothingPending` with no decision open, `WrongKind` when the answer
+    /// doesn't match the question, `Illegal` when it fails validation.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a `ChooseTargets` decision is answered while no announce is in
+    /// flight — an engine invariant (the announce slot is open across the
+    /// decision), not caller input.
+    pub fn submit_decision(&mut self, decision: Decision) -> Result<(), DecisionError> {
+        let Some(pending) = self.pending.clone() else {
+            return Err(DecisionError::NothingPending);
+        };
+        // Declining exits the whole payment transaction even when an emitted
+        // cost action has temporarily replaced the payment prompt with an
+        // ordinary replacement/selection decision.
+        if matches!(
+            decision,
+            Decision::Payment(crate::payment::PaymentCommand::DeclinePayment)
+        ) && self.payment.is_some()
+        {
+            return self.submit_payment_command(crate::payment::PaymentCommand::DeclinePayment);
+        }
+        // [CR#104.3a] "at any time": conceding answers EVERY decision —
+        // the decider walks away mid-discard, mid-targeting, mid-payment.
+        // The conceder is the pending decision's decider.
+        if matches!(decision, Decision::Act(Action::Concede)) {
+            let player = pending.decider_player();
+            if self.payment.is_some() {
+                let active = self.active().clone();
+                self.committed = active;
+                self.payment = None;
+                self.clear_payment_metadata();
+            }
+            self.pending = None;
+            self.concede(player);
+            return Ok(());
+        }
+        // Clone the complete image BEFORE a legal spell/non-mana-ability
+        // proposal mutates it. The priority handler then runs unchanged
+        // through `DerefMut`, against the isolated working image.
+        if let (DecisionPointKind::Priority(priority), Decision::Act(action)) =
+            (&pending, &decision)
+            && priority.legal.contains(action)
+            && self.action_starts_payment_proposal(action)
+        {
+            self.begin_payment_proposal(priority.player);
+        }
+        // The whole dispatch: one arm per `DecisionPointKind` variant, each
+        // routing to that kind's `DecisionHandler::resolve`. `.clone()` is
+        // needed because `self.pending` can't be moved out of while `self`
+        // is passed to `h.resolve` mutably.
+        let recorded = decision.clone();
+        let result = match pending {
+            DecisionPointKind::Priority(h) => h.resolve(self, decision),
+            DecisionPointKind::DiscardToHandSize(h) => h.resolve(self, decision),
+            DecisionPointKind::DiscardCards(h) => h.resolve(self, decision),
+            DecisionPointKind::CallFlip(h) => h.resolve(self, decision),
+            DecisionPointKind::ChooseManaColor(h) => h.resolve(self, decision),
+            DecisionPointKind::ChooseManaMode(h) => h.resolve(self, decision),
+            DecisionPointKind::ChooseTargets(h) => h.resolve(self, decision),
+            DecisionPointKind::Retarget(h) => h.resolve(self, decision),
+            DecisionPointKind::PayMana(h) => h.resolve(self, decision),
+            DecisionPointKind::Payment(h) => h.resolve(self, decision),
+            DecisionPointKind::ChooseManaReversals(h) => h.resolve(self, decision),
+            DecisionPointKind::OrderTriggers(h) => h.resolve(self, decision),
+            DecisionPointKind::DeclareAttackers(h) => h.resolve(self, decision),
+            DecisionPointKind::DeclareBlockers(h) => h.resolve(self, decision),
+            DecisionPointKind::AssignCombatDamage(h) => h.resolve(self, decision),
+            DecisionPointKind::ChooseModes(h) => h.resolve(self, decision),
+            DecisionPointKind::Division(h) => h.resolve(self, decision),
+            DecisionPointKind::Vote(h) => h.resolve(self, decision),
+            DecisionPointKind::YesNo(h) => h.resolve(self, decision),
+            DecisionPointKind::ChooseCostOptions(h) => h.resolve(self, decision),
+            DecisionPointKind::ChooseXValue(h) => h.resolve(self, decision),
+            DecisionPointKind::ChooseNoteNumber(h) => h.resolve(self, decision),
+            DecisionPointKind::ChooseNoteCardName(h) => h.resolve(self, decision),
+            DecisionPointKind::OrderReplacements(h) => h.resolve(self, decision),
+            DecisionPointKind::ChooseReplacement(h) => h.resolve(self, decision),
+            DecisionPointKind::PreGame(h) => h.resolve(self, decision),
+            DecisionPointKind::ChooseObjects(h) => h.resolve(self, decision),
+            DecisionPointKind::LegendRule(h) => h.resolve(self, decision),
+            DecisionPointKind::ArrangePile(h) => h.resolve(self, decision),
+        };
+        if result.is_ok() {
+            self.record_payment_decision(&recorded);
+        }
+        result
+    }
+
+    fn action_starts_payment_proposal(&self, action: &Action) -> bool {
+        match action {
+            Action::CastSpell { .. } => true,
+            Action::ActivateAbility { object, ability } => {
+                let abilities = derive::usable_abilities(self, *object);
+                abilities
+                    .get(*ability)
+                    .and_then(crate::activate::as_activated)
+                    .is_some()
+            }
+            Action::Pass | Action::Concede | Action::Special(_) | Action::PlayLand { .. } => false,
+        }
+    }
+
+    /// [CR#514.1]: cleanup's hand-size discard — validate that exactly
+    /// `count` distinct in-hand cards were chosen, then emit one `Discarded`
+    /// per card. (The keyword-action discard's own chosen-form choice rides
+    /// the general `With`+`Choose` binder machinery instead, Task 8 —
+    /// `DiscardCards` is this decision's now-unreachable sibling.)
+    ///
+    /// # Errors
+    ///
+    /// `Illegal` when the chosen cards are not exactly `count` distinct cards
+    /// from the player's hand.
+    fn submit_discards(
+        &mut self,
+        player: PlayerId,
+        count: Uint,
+        objects: Vec<ObjectId>,
+    ) -> Result<(), DecisionError> {
+        let hand = &self.zones.hands[player.index()];
+        let distinct: HashSet<_> = objects.iter().copied().collect();
+        if objects.len() != count as usize
+            || distinct.len() != objects.len()
+            || !objects.iter().all(|o| hand.contains(o))
+        {
+            return Err(DecisionError::Illegal {
+                reason: format!("discard exactly {count} distinct cards from hand"),
+            });
+        }
+        self.pending = None;
+        // [CR#701.9a]: discard = Hand→Graveyard carrying its cause triple
+        // (the named "Discard" view; agency per demand site — this decision
+        // serves effect-instructed and cleanup discards alike, so the
+        // turn-based flavor rides the cleanup caller's context for now).
+        // ONE simultaneous batch: a multi-discard's moves commit together
+        // ([CR#603.2c]), and the clause's amount — its card count, the
+        // entailment row's `amount` — fixes "that many" for a following
+        // draw ([CR#107.3]; the `apply_occurrence` funnel counts the batch).
+        self.schedule_discard_acts(player, objects);
+        Ok(())
+    }
+
+    /// [CR#701.9a]: schedule cleanup's hand-size discard as PER-CARD
+    /// `Act(Discard)` windows — ONE simultaneous batch (the choice was
+    /// batched, [CR#603.2c]) but minted per-card, because each card's
+    /// discard is its own replaceable/cantable moment ([CR#616.1]): madness
+    /// reroutes ITS card's Hand→Graveyard to exile and no other's
+    /// ([CR#702.35a]), and "whenever a player discards a card" fires once
+    /// per card. Each surviving `Act` is dual-facet (performer + patient +
+    /// the Hand→Graveyard body facet) and COMMITS its move atomically at
+    /// apply — the destroy shape, no second replaceable future-form
+    /// `ZoneChange` below it — plus its own `FinalizeAct` watcher, so a
+    /// redirected discard still records its name-fact and a suppressed one
+    /// records none. (The keyword-action discard's per-card events now come
+    /// from the SAME bound single-move construction the macro-driven
+    /// `With`+`Choose`/`Random` lane recurses into — this helper is
+    /// cleanup's own, [CR#514.1], not semantic card data.)
+    pub(crate) fn schedule_discard_acts(&mut self, player: PlayerId, objects: Vec<ObjectId>) {
+        if objects.is_empty() {
+            return;
+        }
+        let acts: Vec<GameEvent> = objects
+            .into_iter()
+            .map(|object| {
+                GameEvent::Act(Act {
+                    verb: sylex_core::VerbName::from("Discard"),
+                    who: Some(player),
+                    on: vec![object],
+                    from: Some(Zone::Hand),
+                    to: Some(Zone::Graveyard),
+                    cause: Some(Cause::discard(Agency::EffectInstruction, None)),
+                    // Each per-card discard is a FUTURE window ([CR#616.1]) whose
+                    // apply commits the single Hand → Graveyard move; a bound
+                    // single move needs no `contents`.
+                    committed: false,
+                    contents: None,
+                    batch: None,
+                    inherited: std::collections::HashSet::new(),
+                    contained: false,
+                })
+            })
+            .collect();
+        let mark = self.finalize_mark();
+        let mut items = Vec::with_capacity(acts.len() + 1);
+        items.push(WorkItem::Emit(Occurrence::Batch(acts.clone())));
+        for act in acts {
+            if let GameEvent::Act(Act { on, .. }) = &act
+                && let Some(&on) = on.first()
+            {
+                items.push(WorkItem::FinalizeAct {
+                    act,
+                    watch: FinalizeWatch::Patients(vec![on]),
+                    mark,
+                });
+            }
+        }
+        self.schedule_front(items);
+    }
+
+    /// [CR#603.3b]: apply an `OrderTriggers` answer — validate `order` is a
+    /// permutation of `0..triggers.len()`, reorder this player's noted
+    /// triggers, and immediately place the FIRST one. Placement of subsequent
+    /// triggers is deferred to future `PlaceTriggers` barrier passes (one per
+    /// `step()`), each preceded by a `CheckSbas` re-sweep.
+    ///
+    /// Placing the first trigger here (instead of rescheduling `PlaceTriggers`
+    /// and letting it see `mine.len() > 1` again) avoids the `OrderTriggers`
+    /// re-surface loop.
+    ///
+    /// # Errors
+    ///
+    /// `Illegal` when `order` is not a permutation of the offered indices.
+    fn submit_order_triggers(
+        &mut self,
+        player: PlayerId,
+        triggers: &[crate::trigger::NotedTrigger],
+        order: &[usize],
+    ) -> Result<(), DecisionError> {
+        let len = triggers.len();
+        let distinct: HashSet<usize> = order.iter().copied().collect();
+        if order.len() != len || distinct.len() != len || order.iter().any(|&i| i >= len) {
+            return Err(DecisionError::Illegal {
+                reason: format!("order must be a permutation of 0..{len}"),
+            });
+        }
+        // Reorder this player's noted triggers to the chosen order, leaving
+        // other players' notes untouched.
+        let ordered: Vec<crate::trigger::NotedTrigger> =
+            order.iter().map(|&i| triggers[i].clone()).collect();
+        self.pending = None;
+        self.reorder_pending_triggers(player, ordered);
+        // Immediately place the FIRST trigger in the ordered sequence so the
+        // next `PlaceTriggers` call sees one fewer trigger and does not
+        // re-surface `OrderTriggers`. Schedule CheckSbas + PlaceTriggers so
+        // subsequent triggers (and any new SBA state) are handled normally.
+        let noted = self.take_first_trigger_of(player);
+        let placed = self.place_one_trigger(noted);
+        self.schedule_front(vec![WorkItem::CheckSbas, WorkItem::PlaceTriggers]);
+        let _ = placed; // placement success is tracked by CheckSbas/PlaceTriggers
+        Ok(())
+    }
+
+    /// [CR#510.1c]: apply an `AssignCombatDamage` answer for the queue's front
+    /// source. Validates that the amounts sum to the source's power and every
+    /// named target is one of its recipients. Ordinary (non-trample) division
+    /// is free — *any* such split is legal ([CR#510.1c]). For a **trample**
+    /// source, [CR#702.19b] additionally requires that the player or
+    /// planeswalker it's attacking be assigned damage only once every blocker
+    /// recipient has at least lethal —
+    /// `lethal` is 1 when the source has deathtouch ([CR#702.2c]) and the
+    /// blocker's toughness otherwise (less any damage already marked). On
+    /// success it appends one `DamageDealt` per nonzero amount to the
+    /// buffer, pops the source off the queue, and surfaces
+    /// the next decision (or deals the batch when the queue empties) via
+    /// `open_next_assignment`.
+    ///
+    /// # Errors
+    ///
+    /// `Illegal` when the amounts don't sum to the source's power, name a
+    /// creature that isn't one of the source's recipients, repeat a recipient,
+    /// or (trample) assign the player/planeswalker it's attacking while a
+    /// blocker recipient is below lethal.
+    ///
+    /// # Panics
+    ///
+    /// Panics if no combat-damage assignment is in flight, or the front source
+    /// doesn't match `source` — engine invariants (the pending decision pins
+    /// both), not caller input.
+    fn submit_assign_combat_damage(
+        &mut self,
+        source: ObjectId,
+        recipients: &[ObjectId],
+        amounts: Vec<(ObjectId, Uint)>,
+    ) -> Result<(), DecisionError> {
+        let power = {
+            let cd = self
+                .combat_damage
+                .as_ref()
+                .expect("combat-damage in flight");
+            let front = cd.queue.first().expect("a queued assignment");
+            debug_assert_eq!(
+                front.source, source,
+                "front source matches the pending decision"
+            );
+            front.power
+        };
+        let total: Uint = amounts.iter().map(|&(_, n)| n).sum();
+        if total != power {
+            return Err(DecisionError::Illegal {
+                reason: format!(
+                    "assigned damage ({total}) must sum to the source's power ({power})"
+                ),
+            });
+        }
+        if !amounts.iter().all(|(t, _)| recipients.contains(t)) {
+            return Err(DecisionError::Illegal {
+                reason: "every assignment target must be one of the source's recipients".into(),
+            });
+        }
+        let distinct: HashSet<ObjectId> = amounts.iter().map(|&(t, _)| t).collect();
+        if distinct.len() != amounts.len() {
+            return Err(DecisionError::Illegal {
+                reason: "each recipient may appear at most once in a damage assignment".into(),
+            });
+        }
+        // [CR#702.19b]: a trample source may assign damage to what it's
+        // attacking (a player OR a planeswalker) only after every blocker
+        // recipient has lethal. The spill target is whatever recipient is NOT a
+        // blocker of this source — so this holds uniformly whether the source
+        // is trampling over a player proxy or a planeswalker
+        // ([CR#702.19f]).
+        let view = self.layers();
+        if crate::combat::has_keyword(&view, source, &KeywordAbility::Trample) {
+            let blockers = self.combat.blockers_of(source);
+            let assigned = |id: ObjectId| {
+                amounts
+                    .iter()
+                    .find(|&&(t, _)| t == id)
+                    .map_or(0, |&(_, n)| n)
+            };
+            let to_spill: Uint = recipients
+                .iter()
+                .filter(|&r| !blockers.contains(r))
+                .map(|&r| assigned(r))
+                .sum();
+            if to_spill > 0 {
+                for &b in blockers {
+                    if assigned(b) < self.lethal_for(&view, source, b) {
+                        return Err(DecisionError::Illegal {
+                            reason: "trample: each blocker must be assigned lethal before the \
+                                     player or planeswalker it's attacking ([CR#702.19b])"
+                                .into(),
+                        });
+                    }
+                }
+            }
+        }
+        self.pending = None;
+        let cd = self
+            .combat_damage
+            .as_mut()
+            .expect("combat-damage in flight");
+        for (target, amount) in amounts {
+            if amount > 0 {
+                cd.buffer.push(GameEvent::DamageDealt(DamageDealt {
+                    source,
+                    target,
+                    amount,
+                    // The combat-damage step's assignment ([CR#510.1]).
+                    combat: true,
+                }));
+            }
+        }
+        cd.queue.remove(0);
+        self.open_next_assignment();
+        Ok(())
+    }
+
+    /// [CR#702.19b]: how much damage `source` must assign to the creature
+    /// `blocker` before any excess may spill to the defending player. With
+    /// deathtouch on the source, any nonzero amount is lethal, so `1`
+    /// ([CR#702.2c]); otherwise the blocker's printed toughness, less any
+    /// damage already marked on it (undamaged at assignment time in v1, but
+    /// subtracted for correctness). A non-`Number` toughness (CDA / `*`) is
+    /// treated as needing the source's whole power — effectively
+    /// unsatisfiable below full assignment — by returning `Uint::MAX`;
+    /// layers and `*`-toughness are a later stage.
+    #[must_use]
+    fn lethal_for(
+        &self,
+        view: &crate::layer::LayeredView,
+        source: ObjectId,
+        blocker: ObjectId,
+    ) -> Uint {
+        if crate::combat::has_keyword(view, source, &KeywordAbility::Deathtouch) {
+            return 1; // [CR#702.2c]: any nonzero amount is lethal.
+        }
+        match view.toughness(blocker) {
+            Some(t) if t > 0 => {
+                #[expect(clippy::cast_sign_loss, reason = "t > 0 in this arm")]
+                let toughness = t as Uint;
+                toughness.saturating_sub(self.objects.obj(blocker).total_damage())
+            }
+            // toughness ≤ 0 is already a destroy SBA; None is a non-creature
+            // or unmodeled case — require the full amount so the player can't
+            // be reached.
+            _ => Uint::MAX,
+        }
+    }
+
+    /// The priority bookkeeping ([CR#117.3c,117.4]): a pass rotates or ends
+    /// the round; an action emits, re-runs the barrier, and re-opens
+    /// priority for the actor. Legality was checked by the caller.
+    ///
+    /// # Panics
+    ///
+    /// Panics if no priority round is open — engine invariant, not caller
+    /// input.
+    /// [CR#104.3a]: the loss is immediate and unstoppable ([CR#101.1]);
+    /// `check_game_end` then terminalizes ([CR#104.1] — in two-player, the
+    /// first loss ends the whole game). The multiplayer leave-game cleanup
+    /// ([CR#800.4a]: owned objects leave, control effects end, residue
+    /// exiled) is unbuilt — loud rather than a half-departed player
+    /// haunting the table.
+    fn concede(&mut self, player: PlayerId) {
+        if self.live_count() > 2 {
+            todo!(
+                "engine seam: multiplayer leave-game cleanup ([CR#800.4a]) \
+                 — owned objects leave, control effects end, residue exiled; \
+                 owner: engine-multiplayer-leave-game"
+            );
+        }
+        self.schedule_front(vec![WorkItem::Emit(Occurrence::single(
+            GameEvent::PlayerLost(PlayerLost {
+                player,
+                reason: crate::event::LossReason::Conceded,
+            }),
+        ))]);
+    }
+
+    fn take_priority_action(&mut self, player: PlayerId, action: &Action) {
+        match action {
+            // A shell: `legal_actions` never offers special actions, so
+            // submission already rejected them as Illegal; loud if reached.
+            Action::Special(_) => todo!(
+                "engine seam: special actions ([CR#116.2]) — legal_actions \
+                 never offers them, so submission machinery is unbuilt; \
+                 owner: engine-special-actions"
+            ),
+            // Normally short-circuited by the `submit_decision` pre-check;
+            // kept for exhaustiveness and direct callers.
+            Action::Concede => self.concede(player),
+            Action::Pass => {
+                // Compute before borrowing the round mutably.
+                let live = self.live_count();
+                let next = self.next_live_after(player);
+                let round = self.turn.priority.as_mut().expect("open priority round");
+                round.consecutive_passes += 1;
+                let all_passed = round.consecutive_passes >= live;
+                if all_passed {
+                    self.turn.priority = None;
+                    if let Some(top) = self.stack.last() {
+                        // [CR#608]: resolve the top; AP gets priority after
+                        // ([CR#117.3b]). Keyed on `StackEntry.id` so a
+                        // triggered ability (no backing
+                        // object) resolves like a spell.
+                        let id = top.id;
+                        self.schedule_front(vec![
+                            WorkItem::Resolve(id),
+                            WorkItem::CheckSbas,
+                            WorkItem::PlaceTriggers,
+                            WorkItem::OpenPriority,
+                        ]);
+                    } else {
+                        // [CR#117.4]: all-pass on an empty stack ends the step.
+                        let items = self.end_of_step_items();
+                        self.schedule_front(items);
+                    }
+                } else {
+                    self.turn
+                        .priority
+                        .as_mut()
+                        .expect("open priority round")
+                        .holder = next;
+                    self.schedule_front(vec![WorkItem::OpenPriority]);
+                }
+            }
+            Action::PlayLand { object } => {
+                self.reset_passes();
+                // [CR#305.2,116.2a]: the land drop is recorded by the "Play"
+                // cause on the move (special action — Agency::SpecialAction; an
+                // effect putting a land onto the battlefield is NOT a play,
+                // [CR#701.18a]). `LandsPlayedThisTurn` counts those Play-caused
+                // battlefield entries in the history log.
+                let mut items = vec![WorkItem::Emit(Occurrence::single(GameEvent::ZoneChange(
+                    ZoneChange {
+                        snapshot: None,
+                        object: *object,
+                        from: Some(Zone::Hand),
+                        to: Zone::Battlefield,
+                        enters: None,
+                        position: None,
+                        face: None,
+                        cause: Some(Cause::play(Agency::SpecialAction, None)),
+                    },
+                )))];
+                items.extend(Self::priority_tail());
+                self.schedule_front(items);
+            }
+            Action::ActivateAbility { object, ability } => {
+                let abilities = derive::usable_abilities(self, *object);
+                let a = abilities.get(*ability).expect(
+                    "ability index from the legal list is in bounds (state frozen by pending)",
+                );
+                self.reset_passes();
+                if matches!(
+                    a.mana_profile(),
+                    Some(sylex_core::ActivatedManaProfile::Always)
+                ) {
+                    self.activate_root_mana_ability(*object, *ability);
+                } else {
+                    // [CR#602.2b]: the casting steps, for an ability.
+                    let items = Self::announce_schedule(
+                        WorkItem::BeginActivate {
+                            object: *object,
+                            ability: *ability,
+                        },
+                        GameEvent::AbilityActivated(AbilityActivated {
+                            source: *object,
+                            ability: *ability,
+                        }),
+                    );
+                    self.schedule_front(items);
+                }
+            }
+            Action::CastSpell { object } => {
+                // [CR#601.2]: reify the announce procedure. Targets and cost are
+                // chosen by the staged WorkItems (surfacing decisions when
+                // there is a choice); `SpellCast` is the becomes-cast moment
+                // ([CR#601.2i]) that promotes the announce onto the stack; the
+                // caster then regains priority ([CR#117.3c]).
+                self.reset_passes();
+                let items = Self::announce_schedule(
+                    WorkItem::BeginCast(*object),
+                    GameEvent::SpellCast(*object),
+                );
+                self.schedule_front(items);
+            }
+        }
+    }
+
+    /// The trailer every priority-restarting action ends with: re-check
+    /// state-based actions ([CR#704.3]), place any waiting triggers
+    /// ([CR#603.3]), then re-open priority for the actor ([CR#117.3c]). Shared
+    /// by the announce schedule, `PlayLand`, and the mana-ability arm so the
+    /// three never drift.
+    #[must_use]
+    pub(crate) fn priority_tail() -> Vec<WorkItem> {
+        vec![
+            WorkItem::CheckSbas,
+            WorkItem::PlaceTriggers,
+            WorkItem::OpenPriority,
+        ]
+    }
+
+    /// [CR#601.2,602.2]: the full announce procedure, identical for casting a
+    /// spell and activating a non-mana ability — only the opening shell
+    /// (`BeginCast` vs `BeginActivate`) and the becomes-cast event
+    /// (`SpellCast` / `AbilityActivated`) differ. `AnnounceX` precedes targets
+    /// ([CR#601.2b,601.2c]); `ChooseCostOptions` concretizes hybrid/Phyrexian
+    /// symbols ([CR#601.2b]) before `PayCost`; the becomes-cast event then
+    /// promotes the announce onto the stack ([CR#601.2i,602.2a]) and the
+    /// shared `priority_tail` re-opens priority for the actor.
+    #[must_use]
+    pub(crate) fn announce_schedule(begin: WorkItem, cast_event: GameEvent) -> Vec<WorkItem> {
+        let mut items = Self::announce_schedule_no_priority(begin, cast_event);
+        items.extend(Self::priority_tail());
+        items
+    }
+
+    /// [CR#608.2g]: the [CR#601.2a..601.2i] announce procedure WITHOUT the
+    /// priority tail — a spell cast during resolution follows the same
+    /// announce steps, "except no player receives priority after it's cast."
+    /// The currently-resolving spell or ability continues once the cast spell
+    /// is the topmost stack object, so this omits the `CheckSbas`/
+    /// `PlaceTriggers`/`OpenPriority` [`priority_tail`](Self::priority_tail)
+    /// (the resolution's own trailing sweep runs at its end). The shared body
+    /// of [`announce_schedule`](Self::announce_schedule), which appends the
+    /// tail for the priority-restarting hand-cast/activation path.
+    #[must_use]
+    pub(crate) fn announce_schedule_no_priority(
+        begin: WorkItem,
+        cast_event: GameEvent,
+    ) -> Vec<WorkItem> {
+        vec![
+            begin,
+            WorkItem::AnnounceModes,
+            WorkItem::AnnounceOptionalCosts { index: 0 },
+            WorkItem::AnnounceX,
+            WorkItem::AnnounceTargets,
+            WorkItem::ChooseCostOptions,
+            WorkItem::OpenPayment,
+            WorkItem::Emit(Occurrence::single(cast_event)),
+        ]
+    }
+
+    /// The per-unit provenance riders a `source` contributes to the mana it
+    /// produces. A snow source is a snow PERMANENT — an object on the
+    /// battlefield whose DERIVED supertypes include `Snow` ([CR#205.4g]) —
+    /// whose mana can pay `{S}` ([CR#107.4h]), so it contributes
+    /// `ManaRider::Snow`; anything else (a non-snow permanent, or a
+    /// mana-producing spell/ability whose source is not a permanent)
+    /// contributes none. Read off the layered view so a granted Snow supertype
+    /// counts (rare, but the derived view is the consistent source of truth).
+    /// Callers are responsible for merging these with any riders the producing
+    /// ability declares.
+    pub(crate) fn snow_provenance(&self, source: ObjectId) -> Vec<sylex_core::ManaRider> {
+        // Never-crash: the source may have ceased to exist by the time this
+        // runs (a token that left the game, or an LKI-only snapshot id). Both
+        // `objects.obj` and `layers().get` panic on a stale id, so guard the
+        // lookup with the non-panicking `objects.get` accessor and fizzle to
+        // no provenance — an object that is gone is not a snow permanent. A
+        // non-battlefield object short-circuits here too, keeping `layers()`
+        // (which also panics on a non-live id) off the path unless the source
+        // is a live permanent.
+        let Some(obj) = self.objects.get(source) else {
+            return vec![];
+        };
+        if obj.zone != Some(Zone::Battlefield) {
+            return vec![];
+        }
+        let is_snow = self
+            .layers()
+            .get(source)
+            .supertypes
+            .contains(&sylex_core::Supertype::Snow);
+        if is_snow { vec![sylex_core::ManaRider::Snow] } else { vec![] }
+    }
+
+    /// [CR#117.3c]: taking an action restarts the pass count; the actor
+    /// receives priority again afterward. `holder` is intentionally not
+    /// touched — the scheduled `OpenPriority` reuses it as-is, and it is
+    /// already the actor.
+    ///
+    /// # Panics
+    ///
+    /// Panics if no priority round is open — engine invariant, not caller
+    /// input.
+    fn reset_passes(&mut self) {
+        self.turn
+            .priority
+            .as_mut()
+            .expect("open priority round")
+            .consecutive_passes = 0;
+    }
+}
+
+#[cfg(test)]
+mod snow_provenance_tests {
+    use crate::object::ObjectId;
+    use crate::player::PlayerId;
+    use crate::state::GameConfig;
+    use crate::state::GameState;
+    use crate::state::PlayerConfig;
+    use crate::state::StartingPlayer;
+
+    fn game() -> GameState {
+        GameState::new(GameConfig {
+            players: vec![PlayerConfig { deck: vec![] }, PlayerConfig { deck: vec![] }],
+            seed: 1,
+            starting_life: 20,
+            starting_player: StartingPlayer::Fixed(PlayerId(0)),
+            sba_rules: vec![],
+            conferral_rules: vec![],
+            damage_result_rules: vec![],
+            counter_decls: std::collections::HashMap::new(),
+            subtypes: std::collections::HashMap::new(),
+            types: std::collections::HashMap::new(),
+        })
+    }
+
+    /// Never-crash ([CR#107.4h]): a mana ability can resolve after its source
+    /// has ceased to exist (a token that left the game, or an LKI-only
+    /// snapshot id) — `frame.source(self)` then names an object absent from the
+    /// store. `snow_provenance` must fizzle to no provenance rather than
+    /// panic in the `objects.obj` / `layers().get` lookups. Regression for a
+    /// latent panic surfaced while writing an `AmongColorsOf` test.
+    #[test]
+    fn snow_provenance_fizzles_on_ceased_source() {
+        let state = game();
+        // A fabricated id that was never in the store stands in for a source
+        // that has ceased to exist by resolution time.
+        let ceased = ObjectId::from_raw(9999);
+        let riders = state.snow_provenance(ceased);
+        assert!(
+            riders.is_empty(),
+            "a ceased/absent source contributes no snow provenance (must not \
+             panic): {riders:?}"
+        );
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::decide::pending::Priority;
+    use crate::state::GameConfig;
+    use crate::state::PlayerConfig;
+    use crate::state::StartingPlayer;
+
+    fn game() -> GameState {
+        GameState::new(GameConfig {
+            players: vec![PlayerConfig { deck: vec![] }, PlayerConfig { deck: vec![] }],
+            seed: 1,
+            starting_life: 20,
+            starting_player: StartingPlayer::Fixed(PlayerId(0)),
+            sba_rules: vec![],
+            conferral_rules: vec![],
+            damage_result_rules: vec![],
+            counter_decls: std::collections::HashMap::new(),
+            subtypes: std::collections::HashMap::new(),
+            types: std::collections::HashMap::new(),
+        })
+    }
+
+    /// `submit_decision`'s contract: a REJECTED submission leaves the
+    /// decision OPEN (`self.pending` unchanged), so the runner can re-ask.
+    /// Pins the clone-then-clear-on-success design.
+    #[test]
+    fn rejected_submission_leaves_pending_open() {
+        // Open a Priority pending with a known legal list, then submit an
+        // action that is NOT in it.
+        let mut state = game();
+        let player = PlayerId(0);
+        state.pending = Some(DecisionPointKind::Priority(Priority {
+            player,
+            legal: vec![Action::Pass],
+        }));
+        let before = state.pending.clone();
+        let result = state.submit_decision(Decision::Act(Action::PlayLand {
+            object: ObjectId::from_raw(9999),
+        }));
+        let DecisionError::Illegal { reason } = result.as_ref().unwrap_err() else {
+            panic!("expected illegal action rejection, got {result:?}");
+        };
+        assert_ne!(reason, "");
+        assert_eq!(
+            state.pending, before,
+            "the decision stays pending after rejection"
+        );
+    }
+}

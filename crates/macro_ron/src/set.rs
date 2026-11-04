@@ -161,7 +161,7 @@ pub struct MacroDef<Metadata = ()> {
     pub template: Option<String>,
     /// Optional plural surface of `template`'s head noun (metadata): "Merfolk"
     /// for a macro whose regular-rules plural (see
-    /// `deckmaste_legacy_render::template::plural::pluralize`) is wrong or
+    /// `sylex_render_v1::template::plural::pluralize`) is wrong or
     /// ambiguous. Absent for the common case, where the regular rules
     /// suffice — every existing definition file omits this field, so it
     /// reads as `None` unchanged.

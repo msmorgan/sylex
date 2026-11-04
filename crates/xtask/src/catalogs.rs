@@ -1,4 +1,4 @@
-//! Derive the catalog files consumed by deckmaste from local authoritative
+//! Derive the catalog files consumed by sylex from local authoritative
 //! sources, without querying Scryfall.
 
 use std::fs;
@@ -10,10 +10,10 @@ use std::path::PathBuf;
 use anyhow::Context;
 use clap::Args;
 use clap::Subcommand;
-use deckmaste_catalogs::CardNameNicknames;
-use deckmaste_catalogs::CatalogSet;
-use deckmaste_catalogs::compare_directories;
-use deckmaste_catalogs::legacy::LegacyCatalogSet;
+use sylex_catalogs::CardNameNicknames;
+use sylex_catalogs::CatalogSet;
+use sylex_catalogs::compare_directories;
+use sylex_catalogs::legacy::LegacyCatalogSet;
 
 #[derive(Debug, Args)]
 pub struct CatalogArgs {

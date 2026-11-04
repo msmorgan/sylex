@@ -4,7 +4,7 @@
 // `MacroDef.frames`).
 //
 // Loaded by `macro_ron::frames::load_constructor_frames`. `constructor`
-// names the entry, not a promise of a bare `deckmaste_core` variant of that
+// names the entry, not a promise of a bare `sylex_core` variant of that
 // spelling: it may resolve to one (verified against `cargo xtask map enums`,
 // not memory), to a macro of the same name, or — if the entry carries a
 // `body:` — to whatever that body denotes. `params` names each positional
@@ -12,7 +12,7 @@
 // (`<Param(0)>` is `params[0]`).
 [
     // `Action::DealDamage(Reference, Count, Reference)`
-    // (`crates/deckmaste_core/src/action.rs:145`): the third field is a
+    // (`crates/core/src/action.rs:145`): the third field is a
     // plain `Reference` (the damage's patient object/player), same as the
     // first. Registers as a sentence: the frame is a full imperative/
     // declarative clause, not a noun phrase.
@@ -67,7 +67,7 @@
     // Matchable because a frame whose entire tree peels down to one hole is
     // admissible when the hole discriminates: a `SelfRef` hole accepts a
     // self-reference and nothing else, unlike a `Subtree` hole. See
-    // `try_entry` in `crates/deckmaste_spelling/src/unify.rs`.
+    // `try_entry` in `crates/spelling/src/unify.rs`.
     //
     // No `params`, so no `<Param(i)>` may appear in the text; recovery is
     // the nullary invocation `This` — the same shape the `Creature`

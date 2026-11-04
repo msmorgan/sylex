@@ -1197,13 +1197,13 @@ impl<'ast> syn::visit::Visit<'ast> for RustExemptionSites {
 
 impl RustExemptionSites {
     fn for_file(file: &str, syntax: &syn::File) -> anyhow::Result<Self> {
-        let allow_rule_arguments = file == "crates/deckmaste_catalogs/src/cr.rs";
+        let allow_rule_arguments = file == "crates/catalogs/src/cr.rs";
         if allow_rule_arguments {
             ensure_parser_helpers_are_unshadowed(file, syntax)?;
         }
         let allow_fixture = matches!(
             file,
-            "crates/deckmaste_catalogs/src/lib.rs" | "crates/deckmaste_catalogs/src/legacy.rs"
+            "crates/catalogs/src/lib.rs" | "crates/catalogs/src/legacy.rs"
         );
         let fixtures =
             if allow_fixture { vec![exact_cr_fixture(file, syntax)?] } else { Vec::new() };
@@ -1779,7 +1779,7 @@ const CR_FIXTURE: &str = \"rule 200.1\";
 }
 ";
         let hits =
-            noncompliant_source_hits("crates/deckmaste_catalogs/src/cr.rs", line_source).unwrap();
+            noncompliant_source_hits("crates/catalogs/src/cr.rs", line_source).unwrap();
         assert_eq!(
             hits.iter()
                 .map(|hit| hit.matched.as_str())
@@ -1787,7 +1787,7 @@ const CR_FIXTURE: &str = \"rule 200.1\";
             ["CR 100.1", "100.1", "rule 400.1", "400.1"]
         );
         assert_eq!(
-            noncompliant_source_hits("crates/deckmaste_catalogs/src/lib.rs", scope_source,)
+            noncompliant_source_hits("crates/catalogs/src/lib.rs", scope_source,)
                 .unwrap(),
             [] as [crate::cite::NoncompliantHit; 0]
         );
@@ -1796,32 +1796,32 @@ const CR_FIXTURE: &str = \"rule 200.1\";
     #[test]
     fn noncompliant_scan_rejects_rule_key_in_unrelated_free_call() {
         let source = "fn f() { unrelated(&lines, \"100.1\", // cite: noncompliant-line -- machine-readable parser key\n); }";
-        assert!(noncompliant_source_hits("crates/deckmaste_catalogs/src/cr.rs", source).is_err());
+        assert!(noncompliant_source_hits("crates/catalogs/src/cr.rs", source).is_err());
     }
 
     #[test]
     fn noncompliant_scan_rejects_rule_key_in_method_call() {
         let source = "fn f() { parser.numbered_rule(&lines, \"100.1\", // cite: noncompliant-line -- machine-readable parser key\n); }";
-        assert!(noncompliant_source_hits("crates/deckmaste_catalogs/src/cr.rs", source).is_err());
+        assert!(noncompliant_source_hits("crates/catalogs/src/cr.rs", source).is_err());
     }
 
     #[test]
     fn noncompliant_scan_rejects_rule_key_in_wrong_helper_argument() {
         let source = "fn f() { parse_list_rule(\"100.1\", // cite: noncompliant-line -- machine-readable parser key\n&lines); }";
-        assert!(noncompliant_source_hits("crates/deckmaste_catalogs/src/cr.rs", source).is_err());
+        assert!(noncompliant_source_hits("crates/catalogs/src/cr.rs", source).is_err());
     }
 
     #[test]
     fn noncompliant_scan_rejects_cr_helper_in_wrong_file() {
         let source = "fn f() { numbered_rule(&lines, \"100.1\", // cite: noncompliant-line -- machine-readable parser key\n\"examples\"); }";
-        assert!(noncompliant_source_hits("crates/deckmaste_catalogs/src/lib.rs", source).is_err());
+        assert!(noncompliant_source_hits("crates/catalogs/src/lib.rs", source).is_err());
     }
 
     #[test]
     fn noncompliant_scan_reports_loose_claims_beside_exempt_literals() {
         let parser_source = "fn f() { let _ = \"[CR#100.1|é]\"; /* rule 900.1 */ parse_list_rule(&lines, \"100.1\", // cite: noncompliant-line -- machine-readable parser key\n\"lead\", \"catalog\"); }";
         let parser_hits =
-            noncompliant_source_hits("crates/deckmaste_catalogs/src/cr.rs", parser_source).unwrap();
+            noncompliant_source_hits("crates/catalogs/src/cr.rs", parser_source).unwrap();
         assert_eq!(
             parser_hits
                 .iter()
@@ -1836,7 +1836,7 @@ const CR_FIXTURE: &str = \"rule 200.1\"; // rule 900.1\n\
 // cite: noncompliant end\n\
 }";
         let fixture_hits =
-            noncompliant_source_hits("crates/deckmaste_catalogs/src/lib.rs", fixture_source)
+            noncompliant_source_hits("crates/catalogs/src/lib.rs", fixture_source)
                 .unwrap();
         assert_eq!(
             fixture_hits
@@ -1855,7 +1855,7 @@ numbered_rule((), \"100.1\", // cite: noncompliant-line -- machine-readable pars
 \"catalog\");\n\
 }";
 
-        assert!(noncompliant_source_hits("crates/deckmaste_catalogs/src/cr.rs", source).is_err());
+        assert!(noncompliant_source_hits("crates/catalogs/src/cr.rs", source).is_err());
 
         let imported_source = "mod other { fn numbered_rule(_: (), _: &str, _: &str) {} }\n\
 fn f() {\n\
@@ -1865,7 +1865,7 @@ numbered_rule((), \"100.1\", // cite: noncompliant-line -- machine-readable pars
 }";
 
         assert!(
-            noncompliant_source_hits("crates/deckmaste_catalogs/src/cr.rs", imported_source)
+            noncompliant_source_hits("crates/catalogs/src/cr.rs", imported_source)
                 .is_err()
         );
     }
@@ -1898,7 +1898,7 @@ numbered_rule((), \"100.1\", // cite: noncompliant-line -- machine-readable pars
 
         for source in [nested_definition, nested_glob_import] {
             assert!(
-                noncompliant_source_hits("crates/deckmaste_catalogs/src/cr.rs", &source).is_err()
+                noncompliant_source_hits("crates/catalogs/src/cr.rs", &source).is_err()
             );
         }
     }
@@ -1908,7 +1908,7 @@ numbered_rule((), \"100.1\", // cite: noncompliant-line -- machine-readable pars
         let source = "// cite: noncompliant begin -- verbatim CR parser fixture, not prose claims\n\
 const LICENSE_FIXTURE: &str = \"rule 100.1\";\n\
 // cite: noncompliant end\n";
-        assert!(noncompliant_source_hits("crates/deckmaste_catalogs/src/lib.rs", source).is_err());
+        assert!(noncompliant_source_hits("crates/catalogs/src/lib.rs", source).is_err());
     }
 
     #[test]
@@ -1917,7 +1917,7 @@ const LICENSE_FIXTURE: &str = \"rule 100.1\";\n\
 const PARSER_FIXTURE: &str = \"rule 100.1\";\n\
 // cite: noncompliant end\n";
         assert!(
-            noncompliant_source_hits("crates/deckmaste_catalogs/src/legacy.rs", source).is_err()
+            noncompliant_source_hits("crates/catalogs/src/legacy.rs", source).is_err()
         );
     }
 
@@ -1926,7 +1926,7 @@ const PARSER_FIXTURE: &str = \"rule 100.1\";\n\
         let source = "// cite: noncompliant begin -- verbatim CR parser fixture, not prose claims\n\
 const CR_FIXTURE: &str = \"rule 100.1\";\n\
 // cite: noncompliant end\n";
-        assert!(noncompliant_source_hits("crates/deckmaste_catalogs/src/io.rs", source).is_err());
+        assert!(noncompliant_source_hits("crates/catalogs/src/io.rs", source).is_err());
     }
 
     #[test]
@@ -1935,7 +1935,7 @@ const CR_FIXTURE: &str = \"rule 100.1\";\n\
 const CR_FIXTURE: &str = \"rule 100.1\";\n\
 // cite: noncompliant end\n";
 
-        assert!(noncompliant_source_hits("crates/deckmaste_catalogs/src/lib.rs", source).is_err());
+        assert!(noncompliant_source_hits("crates/catalogs/src/lib.rs", source).is_err());
     }
 
     #[test]
@@ -1954,7 +1954,7 @@ const CR_FIXTURE: &str = \"rule 200.1\";\n\
             );
 
             assert!(
-                noncompliant_source_hits("crates/deckmaste_catalogs/src/lib.rs", &source).is_err(),
+                noncompliant_source_hits("crates/catalogs/src/lib.rs", &source).is_err(),
                 "{extra}"
             );
         }
