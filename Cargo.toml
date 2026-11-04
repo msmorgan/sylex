@@ -6,7 +6,6 @@ members = [
     "crates/catalogs",
     "crates/english",
     "crates/lexicon",
-    "crates/lexical_model",
     "crates/vocabulary",
     "crates/core",
     "crates/upstream",

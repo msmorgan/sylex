@@ -94,7 +94,7 @@ fn cardinal_component(text: &str) -> bool {
         || SCALES.iter().any(|(_, name)| *name == text)
 }
 
-pub use sylex_lexical_model::Numeral;
+pub use crate::types::Numeral;
 
 /// An error returned when numeral text is invalid or noncanonical.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error, serde::Serialize)]
