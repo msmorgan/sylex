@@ -4,6 +4,7 @@
 /.superpowers/
 /docs/memory
 /docs/evidence
+/docs/cleanup
 /plugins/*/
 !/plugins/builtin/
 !/plugins/canon/
