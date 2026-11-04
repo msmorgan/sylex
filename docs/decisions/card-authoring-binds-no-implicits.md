@@ -74,5 +74,5 @@ pin's whole subject is the proof term it refuses to admit.
 ## Tracked references
 
 - [Macros are declarative](macros-are-declarative.md)
-- [The kind index joins; union marking is spelling](kind-index-joins-union-marking-is-spelling.md)
+- [Architecture](architecture.md)
 - [Idris is a soundness gate](idris-is-a-soundness-gate.md)

@@ -8,9 +8,9 @@
 definition, and every reference is a register read. Core never resolves
 anything; lowering resolves once, and the engine reads by index.**
 
-Decided 2026-09-02. Amends [Semantics, spelling, lowering](semantics-spelling-lowering.md)
-§17: the per-scope slot environment it previews becomes closed regions with
-declared parameters, and the frame-local candidate tier it kept is gone.
+Decided 2026-09-02. Realizes the core half of the
+[divergence trajectory](architecture.md#the-divergence-trajectory) as closed
+regions with declared parameters, with no frame-local candidate tier.
 Supersedes the `core-reference-slots` ticket (deleted the same day) and the
 engine tickets its stages absorb (listed in each stage ticket).
 

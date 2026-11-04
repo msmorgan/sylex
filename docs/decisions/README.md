@@ -7,6 +7,9 @@ the intended design rather than a dated implementation inventory; current code
 wins if an incidental implementation description drifts. Changing a decision
 requires explicit review rather than an opportunistic refactor.
 
+- [Architecture](architecture.md) — The whole system and why it is shaped so:
+  English ⇄ spelling ⇄ semantics → lowering → core → engine; Oracle text is the
+  authority, the semantic term the canonical meaning, core a compiled artifact.
 - [Authored card surface](authored-card-surface.md) — Keep card RON terse,
   structural, and stable.
 - [Effect atom independence](effect-atom-independence.md) — An effect atom reads
@@ -29,9 +32,6 @@ requires explicit review rather than an opportunistic refactor.
   One typed template drives both rendering and parsing.
 - [State-based actions are data](state-based-actions-are-data.md) — Ordinary
   state-based actions are swappable rules over explicit scopes.
-- [Semantics, spelling, lowering](semantics-spelling-lowering.md) — One
-  semantics grammar; English relates two-way via spelling, core derives
-  one-way via lowering.
 - [English grammar: lexical analysis, Readings, and how the grammar is kept small](english-lexical-analysis.md)
   — Engine contract, round-trip laws, Reading normal forms, and how words reach
   the grammar.
@@ -51,9 +51,6 @@ requires explicit review rather than an opportunistic refactor.
   take optional named parameters after the required ones.
 - [Workbench RON-shaped and label rulings](workbench-ron-shaped-and-label-rulings.md)
   — Registry label and RON-shaped syntax rulings.
-- [The kind index joins; union marking is spelling](kind-index-joins-union-marking-is-spelling.md) —
-  Semantics takes the join lattice; the marked union constructions are
-  spelling-boundary knowledge.
 - [Core is explicit regions](core-explicit-regions.md) — Every core binding
   is a declared param or numbered def; references are register reads;
   lowering resolves once.

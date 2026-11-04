@@ -55,13 +55,12 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
   from where it is kept (`english-lexical-analysis.md` §1).
   - A wording difference with the same meaning lives in which Template a card calls, never in the
     AST. Put and return are the existing case.
-  - This replaces "byte-exact replay is out of scope" in `semantics-spelling-lowering.md` §3.
+  - This is the exact round trip `architecture.md` ("Exact round trip") sets as the goal.
 
 ## Change
 
 - **ADR:**
   - Record the conventions where `spelling` is defined (`docs/decisions/semantics-v3.md` §5.1).
-  - Amend `semantics-spelling-lowering.md` §3 as above.
 - **Glossary:** add entries for the terms this introduces (a spelling's pattern and its holes) to
   the owning glossary, via the `domain-modeling` skill.
 - **Rust `semantics` and `sylex_syl`:**

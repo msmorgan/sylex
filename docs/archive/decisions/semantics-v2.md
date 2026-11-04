@@ -15,7 +15,7 @@ Decision: 2026-09-06 (draft 2026-08-07). §§1–7 fix the target shape of
 the semantics layer — the form the macro and card rewrite aims at — and the
 rules for growing it; §§10–16 fix how that layer lands as Rust and how v1
 retires. It realizes the divergence trajectory of
-[semantics-spelling-lowering §17](semantics-spelling-lowering.md): semantics
+[Architecture](../../decisions/architecture.md#the-divergence-trajectory): semantics
 drifts toward English constructions, core toward explicit slot reference.
 The evidence artifact is the Lean workbench (`lean/Semantics/`, per
 [Lean is the workbench](lean-is-the-workbench.md)); Idris paths in the
@@ -29,8 +29,8 @@ Semantics v2 encodes the raw Magic card grammar — a reduced but equivalent
 form of English — translated from the raw English AST. Constructions occupy
 their surface positions: no prenex target slot lists, no hoisted binders, no
 positional slot reads. All rearrangement, hoisting, and indexing is lowering's
-job. The explicit indexed-binder form of [semantics-spelling-lowering
-§7](semantics-spelling-lowering.md) stops being the semantics-layer normal
+job. The explicit indexed-binder form of `semantics-spelling-lowering.md`
+§7 (since deleted) stops being the semantics-layer normal
 form; it is core's normal form, produced by lowering.
 
 ## 2. Binding and scope
@@ -83,8 +83,7 @@ antecedent's kind pair; the half-reading anaphor projects one side rather than
 collapsing the pair. Settled 2026-09-06 by `semantics-v2-crate` on the
 workbench's own execution shape (`Payload.join`, whose kind is the join of its
 halves' and whose zone, type, size and provenance projections read the halves
-in turn) and on the census [The kind index joins; union marking is
-spelling](kind-index-joins-union-marking-is-spelling.md) already recorded — the
+in turn) and on the census [Architecture](../../decisions/architecture.md#small-primitives-phrasing-lives-in-data) already recorded — the
 demonstrative echo copies its antecedent's kind pair 33 of 33 times, so a flat
 join would reconstruct on every echo what the pair-carrying record keeps.
 Nothing else about the union family moves: the marked union constructions stay
@@ -854,7 +853,8 @@ parity (§14).
 
 ## 9. Affected contracts and tickets
 
-- [semantics-spelling-lowering](semantics-spelling-lowering.md): §7's indexed
+- `semantics-spelling-lowering.md` (since deleted; its lasting rulings are in
+  [Architecture](../../decisions/architecture.md)): §7's indexed
   scope calculus becomes core-only normal form (see §1 above); §17's
   trajectory is realized by this contract; §9's lowering contract carries
   over to `deckmaste_lowering_v2` unchanged.

@@ -233,7 +233,6 @@ implicits](card-authoring-binds-no-implicits.md) is satisfied by direct use.
 ## Tracked references
 
 - [Semantics v2](semantics-v2.md)
-- [The kind index joins; union marking is spelling](kind-index-joins-union-marking-is-spelling.md)
+- [Architecture](../../decisions/architecture.md)
 - [Card authoring binds no implicits](card-authoring-binds-no-implicits.md)
 - [Idris is a soundness gate](idris-is-a-soundness-gate.md)
-- [Semantics, spelling, lowering](semantics-spelling-lowering.md)

@@ -2,8 +2,9 @@
 needs: [card-crate-split]
 ---
 **Mint the engine-owned base/computed characteristics seam: `trait
-BaseCharacteristics` and `CardRef<T>`.** Design:
-`docs/decisions/semantics-spelling-lowering.md` (§1). Deferred from
+BaseCharacteristics` and `CardRef<T>`.** Design: this ticket;
+`docs/decisions/architecture.md` fixes the crate direction (`sylex_card`
+depends on core, never the reverse). Deferred from
 `card-crate-split`, which landed as a pure move and enforced only the
 NEGATIVE half of the contract — that `sylex_core` carries no
 characteristics abstraction. This ticket owns the positive half.

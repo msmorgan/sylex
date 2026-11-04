@@ -452,7 +452,7 @@ exposes a concrete incompatibility.
 - [English lexical analysis](english-lexical-analysis.md)
 - [Macros are declarative](macros-are-declarative.md)
 - [Idris is a soundness gate](idris-is-a-soundness-gate.md)
-- [Semantics, spelling, lowering](semantics-spelling-lowering.md)
+- [Architecture](../../decisions/architecture.md)
 
 
 ## Superseded: attachment participles are adjectives (2026-08-28)

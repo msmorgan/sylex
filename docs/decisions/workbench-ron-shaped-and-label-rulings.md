@@ -129,7 +129,7 @@ Facts rows are generated, so a keyword's parameter shapes and its `bodied` /
 - [Card authoring binds no implicits](card-authoring-binds-no-implicits.md)
 - [Core is explicit regions](core-explicit-regions.md)
 - [Builtin-v2 macro spelling and grammar](../archive/decisions/builtin-v2-macro-spelling-and-grammar.md)
-- [The kind index joins; union marking is spelling](kind-index-joins-union-marking-is-spelling.md)
+- [Architecture](architecture.md)
 
 ## Rulings 2026-09-04 (cleanroom review 3)
 
