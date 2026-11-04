@@ -29,7 +29,7 @@ whose `grep -cE` binds only the `Cards.idr` re-export today.
 it refuses.
 
 **The direction of travel is RON → Idris.** RON is authored and lowered to the
-engine ([Core is explicit regions](core-explicit-regions.md)); Idris checks RON
+engine ([Core](core.md)); Idris checks RON
 that has been re-emitted into it. The review's proposals to give `Words.Binding`
 a stable binder id, and to write a RON *emitter* in Idris over the checked term
 (its §5.1, §5.9 and §3 risk table), are therefore moot — they solve a lowering
@@ -127,7 +127,7 @@ Facts rows are generated, so a keyword's parameter shapes and its `bodied` /
 
 - [Idris is a soundness gate](idris-is-a-soundness-gate.md)
 - [Card authoring binds no implicits](card-authoring-binds-no-implicits.md)
-- [Core is explicit regions](core-explicit-regions.md)
+- [Core](core.md)
 - [Builtin-v2 macro spelling and grammar](../archive/decisions/builtin-v2-macro-spelling-and-grammar.md)
 - [Architecture](architecture.md)
 

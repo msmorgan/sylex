@@ -44,10 +44,7 @@ impl EventApply for Copied {
                 // only and may be "possibly gone, possibly changed"
                 // (`StackObject::Activated` doc) — a zone change
                 // removes it from the store ([CR#400.7]). A stale id
-                // here is a semantic-input-adjacent runtime state, not a
-                // reason to crash: fizzle (the Invalid semantic input fizzles
-                // decision, `docs/decisions/invalid-semantic-input-fizzles.
-                // md`).
+                // here is a runtime state, not a reason to crash: fizzle.
                 g.objects.get(*source)?.source
             }
         };

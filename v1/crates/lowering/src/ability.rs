@@ -77,9 +77,10 @@ fn as_additional_cost(
 ///
 /// The cost block is lowered FIRST, so its payment-time subject instructions
 /// occupy the definitions that come before the body's — a paid product is a
-/// def the body reads (ADR law 9), never an anaphor re-derived at resolution.
-/// `declared` is the ability's own printed cost (an activation cost, a mode's
-/// cost); a root `AdditionalCost` in `effect` is hoisted onto the same block.
+/// def the body reads (core law 4), never an anaphor re-derived at
+/// resolution. `declared` is the ability's own printed cost (an activation
+/// cost, a mode's cost); a root `AdditionalCost` in `effect` is hoisted onto
+/// the same block.
 fn lower_announced_region(
     kind: crate::region::RegionKind,
     declared: &[sylex_semantics_v1::CostComponent],

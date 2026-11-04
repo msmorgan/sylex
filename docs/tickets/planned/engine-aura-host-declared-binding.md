@@ -1,29 +1,35 @@
 ---
 needs: []
 ---
-**An Aura's attach-host is read positionally from targets slot 0 via a card-shape
-predicate, not from a declared binding.** The engine-side twin of
-[[parse-positional-target-reads]]: an implicit convention where a channel should be.
+**An Aura's attach host is read positionally from target slot 0 through a
+card-shape predicate, not from a declared register.**
 
-Spell-resolution dispatch (`crates/engine/src/resolve/mod.rs:106-115`):
+## Why
 
-```rust
-enters_attached_self(source) && entry.targets.first().and_then(|slot| slot.first())
-```
+Spell resolution attaches an entering Aura to "slot 0's single member" when
+`enters_attached_self` recognizes the card's self-attach replacement. That is
+an instruction reading outside its operands
+([Engine](../../decisions/engine.md) law 3): any targeted
+permanent spell whose attach host is not slot 0, or whose slot 0 is plural,
+attaches to the wrong object.
 
-The enchant-host linkage is "slot 0's single member", gated by the
-`enters_attached_self` card-shape predicate, instead of a link declared from the
-`AsEnters` enter-status to a specific target slot. It special-cases the one-slot
-Aura arity: any targeted permanent spell whose attach-host is not slot 0 (or whose
-slot 0 is plural) silently attaches to the wrong object.
+## Done when
 
-## Fix
+- The self-attach replacement's `Attach(This, to)` names its host as a register
+  read (`Reference::Reg` of the region's `Provenance::AnnouncedTarget(n)`
+  parameter), and the engine resolves the host through that ordinary read.
+- The slot-0 lookup in spell resolution is gone, and `enters_attached_self`
+  no longer chooses the host.
+- A test attaches an Aura to its declared slot when that slot is not slot 0;
+  the existing single-slot Auras (Enchant Creature canon) attach unchanged.
+- `cargo test -p sylex_engine` and `cargo clippy -p sylex_engine --tests -- -D
+  warnings` pass.
 
-The `AsEnters` / enter-status data names its host as a declared slot link
-(`Reference::Target(n)`), resolved through the normal reference channel — the same
-positional-target channel [[parse-positional-target-reads]] establishes on the
-surface. No card-shape predicate, no positional convention. See
-[Effect atom independence](../../decisions/effect-atom-independence.md).
+## Pointers
 
-Verify: engine tests; an Aura attaches to its declared slot regardless of slot
-index; the existing single-slot Auras (Enchant Creature canon) attach unchanged.
+- `crates/engine/src/resolve/mod.rs`: the `enters_attached_self` /
+  `entry.targets.first()` branch in spell resolution.
+- `crates/engine/src/replace.rs`: `enters_attached_self`, and the `Attach`
+  fold into `EnterStatus`.
+- `crates/core/src/region.rs`: `Provenance::AnnouncedTarget`,
+  `Region::reference_for`.

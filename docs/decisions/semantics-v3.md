@@ -23,7 +23,7 @@ natively.
 
 1. **Surface-faithful.** A construction stands where the English puts it. Nothing is hoisted:
    there are no prenex target lists and no positional slot reads. Lowering does all rearrangement
-   ([`core-explicit-regions.md`](./core-explicit-regions.md)). Why: a term that mirrors the text
+   ([`core.md`](./core.md)). Why: a term that mirrors the text
    can be checked against the text and spelled back into it. A hoisted term needs a second,
    hidden mapping to the wording, and that mapping is where readings go wrong.
 2. **Forward reading order.** Every argument is read in the discourse context of everything

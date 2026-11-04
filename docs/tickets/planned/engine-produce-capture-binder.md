@@ -6,8 +6,8 @@ payable, and its product readable.** [CR#400.7j]'s second sentence is
 explicit that a cost may move an object to a public zone and the spell's
 effects can then find it.
 
-Rewritten 2026-09-02: the cost landing of
-[Core is explicit regions](../../decisions/core-explicit-regions.md) deleted
+Rewritten 2026-09-02: the region cost landing
+([Core](../../decisions/core.md), law 4) deleted
 both functions this ticket used to name. `with_cost_feasible` became
 `cost_step_feasible` in `crates/engine/src/activate.rs`, and
 `resolve_binder`'s read-only spine is gone with the `Binder` enum. Costs are

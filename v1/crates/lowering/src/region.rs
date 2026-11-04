@@ -43,8 +43,9 @@ struct Antecedent {
     sort: Option<Sort>,
     site: Site,
     /// True once the antecedent has crossed a region boundary and survives
-    /// only as a declared capture (ADR law 7). A region's own antecedents
-    /// outrank captured ones on the general search ([CR#608.2h]).
+    /// only as a declared capture (core law 2). A region's own
+    /// antecedents outrank captured ones on the general search
+    /// ([CR#608.2h]).
     inherited: bool,
 }
 
@@ -63,12 +64,13 @@ struct Context {
     x: Option<RefId>,
     antecedents: Vec<Antecedent>,
     named: HashMap<Ident, RefId>,
-    /// ADR law 8: the card's linked memory cells this region declares as
-    /// `Provenance::Linked` parameters, and the register each landed in.
+    /// core law 3: the card's linked memory cells this region
+    /// declares as `Provenance::Linked` parameters, and the register each
+    /// landed in.
     linked: HashMap<Ident, RefId>,
 }
 
-/// The card-scoped linked-memory plan ([CR#607.1], ADR law 8).
+/// The card-scoped linked-memory plan ([CR#607.1], core law 3).
 ///
 /// Lowering is context-free per ability EXCEPT for what a region declares, so
 /// a cell read in one ability and written in another needs the card's whole
@@ -181,8 +183,9 @@ pub(crate) fn in_card<T>(card: &str, f: impl FnOnce() -> T) -> Result<T, String>
 
 /// Refuse to compile the card's text, naming the card and the reason.
 ///
-/// The ADR routes R1/R2 refusals here (law 12: resolution happens once, in
-/// lowering, "as per-card diagnostics"). The first refusal wins; lowering may
+/// R1/R2 refusals land here: reference is resolved once, in lowering, as
+/// per-card diagnostics (`docs/decisions/architecture.md`, the divergence
+/// trajectory). The first refusal wins; lowering may
 /// finish the current infallible arm, but [`crate::lower_card`] discards its
 /// image and returns the recorded [`crate::Diagnostic`]. Outside a card walk,
 /// a refusal remains loud so isolated per-node lowering cannot lose it.
@@ -929,10 +932,11 @@ fn resolve(cardinality: Cardinality, want: Option<Sort>, prefer: Option<Site>) -
         // applied once per entry ([CR#608.2h] determines its information
         // then), so a magnitude or product pinned inside a loop body is a
         // different value from the enclosing region's and outranks it; the
-        // outer one survives only as a declared capture (ADR law 7). R2 still
-        // refuses WITHIN a tier: two magnitudes pinned by the same region have
-        // no proximity tiebreak in the rules ([CR#608.2c] — read the whole
-        // text; [CR#607.1] pins a reference by linkage, never by position).
+        // outer one survives only as a declared capture (core law
+        // 2). R2 still refuses WITHIN a tier: two magnitudes pinned by
+        // the same region have no proximity tiebreak in the rules
+        // ([CR#608.2c] — read the whole text; [CR#607.1] pins a
+        // reference by linkage, never by position).
         resolve_tier(
             context.antecedents.iter().filter(|a| !a.inherited),
             cardinality,
@@ -995,8 +999,9 @@ pub(crate) fn allotment() -> Option<RefId> {
 
 /// A per-candidate predicate region whose declared Entity domain is the
 /// narrowest one the lowered predicate's own atoms admit ([CR#109.1,102.1] —
-/// ADR law 2). Every predicate region lowering builds goes through here, so a
-/// Player-only filter never declares the Object domain and the reverse.
+/// see `Provenance`). Every predicate region lowering builds goes through
+/// here, so a Player-only filter never declares the Object domain and the
+/// reverse.
 pub(crate) fn predicate_region(
     f: impl FnOnce() -> sylex_core::Predicate,
 ) -> sylex_core::Region<sylex_core::Predicate> {
@@ -1096,7 +1101,7 @@ mod tests {
     }
 
     /// Every region's parameters are dense and ordered from `DefId(0)` — the
-    /// invariant `sylex_core::validate` enforces at load (ADR law 2).
+    /// invariant `sylex_core::validate` enforces at load (see `Provenance`).
     fn assert_dense(params: &[Param]) {
         for (index, param) in params.iter().enumerate() {
             assert_eq!(
@@ -1108,7 +1113,8 @@ mod tests {
     }
 
     /// An announcement region declares source, controller and announced X, plus
-    /// one parameter per target slot in order ([CR#601.2b,601.2c], ADR law 2).
+    /// one parameter per target slot in order ([CR#601.2b,601.2c],
+    /// see `Provenance`).
     #[test]
     fn an_announcement_region_declares_source_controller_targets_then_x() {
         let (params, ()) = super::in_region(RegionKind::Spell, 2, || ());
@@ -1126,7 +1132,7 @@ mod tests {
     }
 
     /// An event-observing region declares the fixed event-role prefix, so a
-    /// trigger and a replacement read the same registers (ADR law 2).
+    /// trigger and a replacement read the same registers (see `Provenance`).
     #[test]
     fn an_event_region_declares_the_fixed_event_role_prefix() {
         let (params, ()) = super::in_region(RegionKind::Triggered, 0, || ());
@@ -1168,7 +1174,8 @@ mod tests {
     }
 
     /// Instruction definitions continue the parameter sequence densely
-    /// (ADR law 3): the first definition of a spell region is register 3.
+    /// (see `DefId`): the first definition of a spell region is
+    /// register 3.
     #[test]
     fn definitions_continue_the_parameter_sequence() {
         let (params, defs) = super::in_region(RegionKind::Spell, 0, || {
@@ -1183,8 +1190,8 @@ mod tests {
     }
 
     /// A nested region declares its own engine-supplied parameters FIRST and
-    /// then captures the enclosing register file in definition order (ADR
-    /// law 7), so a body reads nothing it did not declare.
+    /// then captures the enclosing register file in definition order
+    /// (core law 2), so a body reads nothing it did not declare.
     #[test]
     fn a_nested_region_declares_supplied_params_then_captures_the_enclosing_file() {
         let (_, inner) = super::in_region(RegionKind::Spell, 1, || {
@@ -1208,7 +1215,7 @@ mod tests {
     /// A capture of a nested-only role (a loop element, an allotment, a
     /// candidate) becomes an explicit `Capture` of the outer register rather
     /// than repeating the role — the outer loop's element is not this body's
-    /// own element (ADR law 7).
+    /// own element (core law 2).
     #[test]
     fn a_nested_only_role_is_captured_not_repeated() {
         let (_, inner) = super::in_region(RegionKind::Spell, 0, || {
@@ -1233,7 +1240,7 @@ mod tests {
 
     /// A carried body (a delayed trigger, a floating replacement) keeps its OWN
     /// engine-supplied ABI and takes the enclosing registers as explicit
-    /// captures afterwards ([CR#603.7,603.12], ADR law 7).
+    /// captures afterwards ([CR#603.7,603.12], core law 2).
     #[test]
     fn a_carried_region_keeps_its_own_abi_then_captures() {
         let (_, carried) = super::in_region(RegionKind::Spell, 0, || {
@@ -1450,8 +1457,8 @@ mod tests {
         assert_eq!(allotment, None);
     }
 
-    /// A block scope retires the definitions it introduced (ADR law 6): a
-    /// sibling block neither reads them nor captures them.
+    /// A block scope retires the definitions it introduced (see `Block`):
+    /// a sibling block neither reads them nor captures them.
     #[test]
     fn a_scoped_block_retires_its_own_definitions() {
         let (_, captured) = super::in_region(RegionKind::Spell, 0, || {
@@ -1552,7 +1559,7 @@ mod tests {
 
     /// A predicate lowered with no enclosing region still gets one: the
     /// candidate is parameter zero, followed by source and controller, so a
-    /// carrier-relative filter has registers to read (ADR law 1).
+    /// carrier-relative filter has registers to read (core law 1).
     #[test]
     fn a_candidate_region_stands_alone_when_there_is_no_enclosing_region() {
         assert!(!super::is_active(), "no region is open");
@@ -1592,7 +1599,7 @@ mod tests {
 
     /// Drift guard for the Entity boundary: the SAME predicate must declare
     /// the same candidate domain whichever path builds its region
-    /// ([CR#109.1,102.1] — ADR law 2). The two paths are lowering's
+    /// ([CR#109.1,102.1] — see `Provenance`). The two paths are lowering's
     /// [`super::predicate_region`] and core's
     /// `Region::over`/`Region::candidate`; the first case is the Ascend
     /// gate's count, an Object-domain census on both. A hand-written region

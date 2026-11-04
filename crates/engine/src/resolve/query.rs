@@ -474,15 +474,10 @@ impl GameState {
         }
     }
 
-    /// Semantic-input errors in card data must never crash the engine (the
-    /// Invalid semantic input fizzles decision,
-    /// `docs/decisions/invalid-semantic-input-fizzles.md`): an unresolvable
-    /// semantic reference degrades to the null [`ObjectId`] — a slotmap key
-    /// that never maps to a live object, so the effect fizzles exactly as a
-    /// reference to a departed/zone-changed object does — leaving an
-    /// `eprintln!` breadcrumb. Soundness (a well-formed card's references
-    /// always resolving) is an authoring invariant no checker enforces any
-    /// more; its worst case here is a silent no-op, never a crash.
+    /// An unresolvable reference degrades to the null [`ObjectId`] — a
+    /// slotmap key that never maps to a live object, so the effect does
+    /// nothing, exactly as a reference to a departed/zone-changed object
+    /// does — leaving an `eprintln!` breadcrumb.
     fn unbound_ref(reference: &Reference, why: &str) -> ObjectId {
         eprintln!(
             "sylex: reference {reference:?} did not resolve ({why}); treating as unbound — effect fizzles"
@@ -874,12 +869,13 @@ mod tests {
     /// activation, which inserts the announced slot at register 6 and X at 7.
     const FIRST_DEF_WITH_TARGET: sylex_core::DefId = sylex_core::DefId(8);
 
-    /// ADR law 2, the provenance split: an instruction PRODUCT is a new object
-    /// ([CR#400.7j]) and its register read chases the same-resolution move
-    /// record to the object it became; an ANNOUNCED slot is positional and
-    /// keeps the partial-fizzle read ([CR#608.2b]) — it never chases onto a
-    /// successor. Re-spelled from `bound_role_reads_chase_the_move_record`,
-    /// whose `That`/`It` bindings are these two registers.
+    /// `DefId` and `Provenance`, the provenance split: an instruction PRODUCT
+    /// is a new object ([CR#400.7j]) and its register read chases the
+    /// same-resolution move record to the object it became; an ANNOUNCED
+    /// slot is positional and keeps the partial-fizzle read ([CR#608.2b]) —
+    /// it never chases onto a successor. Re-spelled from
+    /// `bound_role_reads_chase_the_move_record`, whose `That`/`It` bindings
+    /// are these two registers.
     #[test]
     fn product_registers_chase_the_move_record_but_announced_slots_do_not() {
         let (mut state, a, b) = two_permanents_on_field();
@@ -905,7 +901,7 @@ mod tests {
     /// chooser writes its own `dest` and later instructions read it
     /// ([CR#601.2b]); no shared slot, no re-surfacing. A `Random` selection is
     /// a DECISION and is never evaluated by this pure reader
-    /// ([CR#608.2h], ADR law 5). Re-spelled from
+    /// ([CR#608.2h], see `Expr`). Re-spelled from
     /// `eval_selection_set_reads_bound_choice`.
     #[test]
     fn a_group_read_returns_the_register_the_decision_wrote() {
@@ -1146,13 +1142,10 @@ mod tests {
         );
     }
 
-    /// Semantic-input errors in card data never crash the engine (the Invalid
-    /// semantic input fizzles decision,
-    /// `docs/decisions/invalid-semantic-input-fizzles.md`, and ADR law 10): a
-    /// register read that finds nothing degrades to the null object id (the
-    /// effect fizzles) rather than panicking. Validation at load makes "never
-    /// bound" unrepresentable; what remains at run time is bound-but-departed,
-    /// and that must fizzle.
+    /// A register read that finds nothing degrades to the null object id (the
+    /// effect does nothing) rather than panicking. Validation at load makes
+    /// "never bound" unrepresentable; what remains at run time is
+    /// bound-but-departed, and that must fizzle.
     #[test]
     fn unbound_reference_degrades_to_null_not_panic() {
         use slotmap::Key;

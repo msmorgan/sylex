@@ -22,12 +22,12 @@ constraints apply.
 sacrificed a permanent this way, you may return another permanent card from
 your graveyard to your hand." The first sentence's choice happens inside the
 `Each`-over-players body — a region of its own — and a register does not
-escape its region ([Core is explicit regions](../../decisions/core-explicit-regions.md)
+escape its region ([Core](../../decisions/core.md)
 law 1). `Noting` binds only the newest antecedent of the region it wraps, so it
 cannot reach in either.
 
 The one channel that crosses a region boundary is linked memory ([CR#607.1],
-law 8), and it is the wrong shape twice over: it links two abilities printed on
+core law 3), and it is the wrong shape twice over: it links two abilities printed on
 one OBJECT, not two clauses of one resolution, and the group wanted here is
 per-player rather than per-card.
 

@@ -1,17 +1,17 @@
 ---
 needs: [core-as-enters-choices, core-regions-substrate, core-regions-discourse, core-regions-costs-and-captures, core-regions-witness-fixtures, core-regions-test-restoration, core-regions-discourse-closeout, core-regions-captures-and-memory, engine-granted-body-captures, engine-cross-target-announce-enumeration, engine-damage-fact-participant-lki, lowering-pay-cost-decision-registers, engine-derived-reference-in-filters, engine-cross-target-retarget-and-precheck, engine-cast-from-zones, engine-condition-lki-context, engine-deontic-legality-residue, engine-departed-reference-fizzle, engine-granted-prevention-rows, engine-granted-static-rows, engine-piles, engine-snapshot-combat-state, engine-snapshot-object-classification, engine-statof-reference-channel, engine-turn-modification]
 ---
-**Epic: close every runtime abort exposed by faithfully lowering Foundations
-cards to `sylex_core`.** The 2026-08-09 audit covered all 517 distinct
-English card names in `data/mtgjson/AllSetFiles/FDN.json`, including the
-extended-card pool. It found 38 cards with a production-profile panic path and
-17 additional unique cards whose faithful path trips a debug assertion before
-degrading to a silent false match in release builds.
+**Epic: land every engine mechanism that faithfully lowered Foundations cards
+need.** An audit of all 517 distinct English card names in
+`data/mtgjson/AllSetFiles/FDN.json` found 38 cards whose faithful core terms
+reach a production panic and 17 more that trip a debug assertion. Each of those
+aborts marks a missing mechanism. The missing mechanism is the defect; the
+loud failure is correct until that mechanism lands
+([Engine](../../decisions/engine.md) law 6).
 
 This is a closure node, not an implementation bucket. Its `needs:` are the
 mechanism tickets that must land; the table records the card witnesses so the
-set-level claim remains reproducible rather than turning into “the obvious
-variants seem covered.”
+set-level claim stays reproducible.
 
 | Missing engine mechanism | Owning ticket | Foundations witnesses |
 |---|---|---|
@@ -32,16 +32,17 @@ variants seem covered.”
 
 Done means:
 
-1. Every row has behavioral engine coverage for its distinct binding/liveness
-   shapes, using direct core fixtures where card/macro authoring is not present.
-2. A replay of the audit's faithful core terms completes without a production
-   panic or a reachable debug assertion. Unsupported legal terms are not
-   converted into silent no-ops merely to pass the abort check: each witness
-   must perform the card-required behavior.
+1. Every row's mechanism is built, with behavioral engine coverage for its
+   distinct binding and liveness shapes, using direct core fixtures where card
+   authoring is not present.
+2. Each witness performs the card-required behavior. A panic is never removed
+   by turning a legal term into a silent no-op; it goes away only because the
+   mechanism behind it now exists.
 3. Partial-target and departed-source tests assert the correct remaining
-   effects, not only “did not panic.”
-4. The set audit is rerun against the same 517-name snapshot at close and any
-   newly exposed abort is routed before this epic moves to `done/`.
+   effects, not only the absence of a panic.
+4. A replay of the audit's faithful core terms against the same 517-name
+   snapshot reaches no abort. Any newly exposed abort is routed to the
+   mechanism ticket that owns it before this epic moves to `done/`.
 
 Explicitly outside this epic: completeness of builtin macro bodies, parser or
 authoring convenience, and non-panicking semantic gaps. Crew is not a missing

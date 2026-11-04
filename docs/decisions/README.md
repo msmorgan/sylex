@@ -12,26 +12,16 @@ requires explicit review rather than an opportunistic refactor.
   authority, the semantic term the canonical meaning, core a compiled artifact.
 - [Authored card surface](authored-card-surface.md) — Keep card RON terse,
   structural, and stable.
-- [Effect atom independence](effect-atom-independence.md) — An effect atom reads
-  only its arguments and explicitly bound references.
-- [Invalid semantic input fizzles](invalid-semantic-input-fizzles.md) — Bad semantic
-  references degrade to no-ops instead of crashing play.
-- [Engine and runner boundary](engine-runner-boundary.md) — Core exposes legal
-  decisions; consumers own convenience policy.
 - [Minimal core and data-driven rules](minimal-core-data-driven-rules.md) —
   Compose named mechanics from primitives and declared data.
 - [Macros are declarative](macros-are-declarative.md) — Plugin macros are typed
   templates, not a control-flow language.
 - [Conferrals come from registries](conferrals-come-from-registries.md) —
   Registries are the authority for open named behavior.
-- [Types grant capabilities](types-grant-capabilities.md) — Current
-  characteristics positively grant the capabilities subsystems consume.
 - [Lean is the workbench](lean-is-the-workbench.md) — Active semantics modeling
   and theorem-form pins; the Idris workbench is deleted.
 - [Macro templates are bidirectional](macro-templates-are-bidirectional.md) —
   One typed template drives both rendering and parsing.
-- [State-based actions are data](state-based-actions-are-data.md) — Ordinary
-  state-based actions are swappable rules over explicit scopes.
 - [English grammar: lexical analysis, Readings, and how the grammar is kept small](english-lexical-analysis.md)
   — Engine contract, round-trip laws, Reading normal forms, and how words reach
   the grammar.
@@ -51,9 +41,11 @@ requires explicit review rather than an opportunistic refactor.
   take optional named parameters after the required ones.
 - [Workbench RON-shaped and label rulings](workbench-ron-shaped-and-label-rulings.md)
   — Registry label and RON-shaped syntax rulings.
-- [Core is explicit regions](core-explicit-regions.md) — Every core binding
-  is a declared param or numbered def; references are register reads;
-  lowering resolves once.
+- [Core](core.md) — The contract of `sylex_core` and `sylex_card`: closed
+  regions with declared parameters and register reads, captures, linked
+  memory, validate at load, and Card Faces.
+- [Engine](engine.md) — The contract of `sylex_engine`: the activation record,
+  Decisions, operands, Conferrals, state-based actions and failure.
 
 Superseded historical decision records live in [`docs/archive/decisions/`](../archive/decisions/)
 and are not active authority.

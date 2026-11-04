@@ -3228,10 +3228,7 @@ mod tests {
     /// object store (a zone change removes an id from the store, [CR#400.7])
     /// must fizzle silently, never panic — `StackObject::Activated`'s source
     /// is carried by id only and is documented as "possibly gone, possibly
-    /// changed" (`stack.rs`). Card-semantics / timing situations that leave
-    /// a stale reference must never crash the engine (the Invalid semantic
-    /// input fizzles decision,
-    /// `docs/decisions/invalid-semantic-input-fizzles.md`); this
+    /// changed" (`stack.rs`); this
     /// pins the `Copied` apply arm's Activated-branch lookup against that
     /// invariant.
     #[test]

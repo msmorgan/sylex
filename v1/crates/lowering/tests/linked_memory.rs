@@ -1,5 +1,5 @@
-//! Linked memory across two abilities of one card ([CR#607.1], [Core is
-//! explicit regions] law 8).
+//! Linked memory across two abilities of one card ([CR#607.1], core
+//! law 3).
 //!
 //! Linkage is between two abilities PRINTED ON ONE OBJECT, so what a cell
 //! means is not knowable from either ability alone: lowering compiles the card

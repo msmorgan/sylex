@@ -460,15 +460,9 @@ impl GameState {
                     .sum()
             }
             // [CR#607.2,608.2c]: a scalar note read back in the SAME resolution
-            // ("that number"). A present `Number` note reads its value; a
-            // MISSING key (or a future non-number value) is a semantic-input
-            // mistake, not a legal 0 — the engine-stat-none-fizzle ruling says
-            // fizzle the consuming read, never a silent bare 0. `eval_count`
-            // returns a bare `Uint` with no fizzle channel, so — exactly as the
-            // `unbound_ref` no-op does for references — we leave a LOUD
-            // `eprintln!` breadcrumb and degrade to 0 (no `debug_assert`: the
-            // fizzle must never panic; a fizzling `Count` read is the principled
-            // fix, tracked by engine-stat-none-fizzle).
+            // ("that number"). A MISSING key is broken data and must fail
+            // loudly, never read as 0 (engine law 6; owner:
+            // engine-invalid-states-unrepresentable).
             // [CR#120.3]: the damage marked on the referenced object — read
             // directly off the base state (damage is not a derived stat).
             // [CR#702.33c]: multikicker's "for each time it was kicked" — the
@@ -1472,8 +1466,9 @@ mod tests {
         );
     }
 
-    /// An unavailable declared number parameter fizzles to 0
-    /// (engine-stat-none-fizzle), never a panic or stale value.
+    /// An unavailable declared number parameter reads as 0, never a panic or
+    /// stale value (owner of the policy question:
+    /// engine-invalid-states-unrepresentable).
     #[test]
     fn unavailable_declared_number_parameter_fizzles_to_zero() {
         let (state, a) = bear_on_field();
@@ -1521,8 +1516,7 @@ mod tests {
 
     /// A register a payment or instruction has not written yet holds no
     /// product, and every value read over it DEGRADES TO NULL rather than
-    /// panicking (the fizzle law of
-    /// `docs/decisions/invalid-semantic-input-fizzles.md`). `StatOf` is the
+    /// panicking. `StatOf` is the
     /// read a cost's paid product travels through ("the sacrificed creature's
     /// power", [CR#118.8]), so it must never assert liveness.
     #[test]
@@ -2607,11 +2601,11 @@ mod tests {
     }
 
     /// FIXTURE — a nested `Where` inside a `Pick`, reading BOTH candidates.
-    /// ADR law 1: every per-candidate predicate is its own region, so the
-    /// `Where` inside the pick's filter reads the PICK's candidate through its
-    /// own parameter while the projection nested inside that `Where` reads its
-    /// OWN per-element candidate through a distinct one. The depth-0
-    /// restriction is gone ([CR#107.1]).
+    /// core law 1: every per-candidate predicate is its own region,
+    /// so the `Where` inside the pick's filter reads the PICK's candidate
+    /// through its own parameter while the projection nested inside that
+    /// `Where` reads its OWN per-element candidate through a distinct one.
+    /// The depth-0 restriction is gone ([CR#107.1]).
     ///
     /// "The creature with the greatest power among creatures some other
     /// creature outpowers": on a 2/2, 3/3, 4/4 board the filter admits the 2/2

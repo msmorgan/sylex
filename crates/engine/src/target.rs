@@ -656,7 +656,7 @@ pub(crate) fn matches_with_activation(
             ),
         // A DERIVED reference (`ControllerOf`, `OwnerOf`, `AttachHostOf`,
         // `OpponentOf`, `Coalesce`) is a pure expression over a register
-        // (core-explicit-regions law 4), so a filter may name one wherever it
+        // (see `Reference::Reg`), so a filter may name one wherever it
         // may name the register it derives from: resolve it against the same
         // activation record + carrier the `Reg` arm above reads, and match iff
         // it lands on THIS candidate. Unresolvable (a gone register, no
@@ -675,7 +675,7 @@ pub(crate) fn matches_with_activation(
 /// [`crate::stack::ExecutionFrame`].
 ///
 /// Derived references are pure expressions over a register
-/// (`docs/decisions/core-explicit-regions.md` law 4), introducing no binding,
+/// (see `Reference::Reg`), introducing no binding,
 /// so every one of them is resolvable exactly where its innermost register is.
 /// That is why this walks the derivation itself rather than deferring to
 /// [`crate::state::GameState::eval_reference`]: that evaluator reads the
@@ -1000,7 +1000,7 @@ pub(crate) fn candidates_with_activation(
 
 /// Whether `id` matches a predicate REGION. The region's declared candidate
 /// domain gates the Entity boundary before the predicate runs ([CR#109.1,102.1]
-/// — ADR law 2): an Object-domain region never sees a player, and a
+/// — see `Provenance`): an Object-domain region never sees a player, and a
 /// Player-domain region never sees an object.
 #[must_use]
 pub(crate) fn matches_region_with_activation(
@@ -2133,10 +2133,10 @@ mod tests {
         assert!(!matches_with(&state, c, &above, None));
     }
 
-    /// A per-candidate predicate is a REGION (ADR law 1): the candidate it
-    /// tests is parameter zero and the carrier (`This`) is parameter one, so
-    /// a cross-object comparison reads two declared registers rather than two
-    /// anaphors.
+    /// A per-candidate predicate is a REGION (core law 1): the
+    /// candidate it tests is parameter zero and the carrier (`This`) is
+    /// parameter one, so a cross-object comparison reads two declared
+    /// registers rather than two anaphors.
     fn candidate_region_with_carrier(
         condition: sylex_core::Condition,
     ) -> Arc<sylex_core::Region<sylex_core::Condition>> {
@@ -2321,10 +2321,11 @@ mod tests {
     }
 
     /// FIXTURE — a nested per-candidate predicate reading the OUTER candidate.
-    /// ADR law 1: every per-candidate predicate is a region, and a nested one
-    /// declares its own candidate at register 0 with the enclosing candidate as
-    /// a capture — so the depth-0 restriction is gone and an inner predicate
-    /// can compare each inner candidate to the outer one.
+    /// core law 1: every per-candidate predicate is a region, and a
+    /// nested one declares its own candidate at register 0 with the
+    /// enclosing candidate as a capture — so the depth-0 restriction is
+    /// gone and an inner predicate can compare each inner candidate to the
+    /// outer one.
     ///
     /// The filter is "a creature, if some OTHER creature exists": the inner
     /// predicate ranges over every creature and excludes the outer candidate by
@@ -2548,8 +2549,7 @@ mod tests {
 
     /// The never-crash floor that replaced the `debug_assert!(false)`: a
     /// reference the matcher genuinely cannot resolve reads "no match" instead
-    /// of aborting the process ([Invalid semantic input
-    /// fizzles](../../../docs/decisions/invalid-semantic-input-fizzles.md)).
+    /// of aborting the process.
     /// `Single` needs the selection evaluator's `ExecutionFrame`.
     #[test]
     fn unresolvable_ref_in_filter_fizzles_instead_of_asserting() {

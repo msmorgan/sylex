@@ -17,8 +17,17 @@ use crate::Instruction;
 
 /// The ordinal assigned to a value defined in a [`Region`].
 ///
-/// Parameters occupy the first ordinals. Instruction products added by later
-/// region stages continue the same sequence.
+/// Parameters occupy the first ordinals, and definitions continue the same
+/// sequence in textual order. Only an instruction with a program point
+/// defines: a decision (a choice, a chosen value, a search, a pile separation
+/// or pile choice), an action's product (`Act { dest, .. }`), a dig
+/// (`RevealUntil`), a cost's paid product, and `Let`. `Let` pins a pure
+/// expression only where English fixes the moment it is evaluated, as "that
+/// many" does after a count [CR#608.2h].
+///
+/// Inside one region, an instruction's product that has moved is chased to its
+/// new incarnation for actions [CR#400.7j], while information reads fall back
+/// to its snapshot [CR#608.2h]. A parameter is never chased.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Ord, PartialOrd, Serialize)]
 #[serde(transparent)]
 pub struct DefId(pub u32);
@@ -54,6 +63,12 @@ pub enum Kind {
 }
 
 /// Why a region parameter exists and how the engine supplies it.
+///
+/// Provenance is typed data, never a string, and the engine dispatches on it
+/// to decide what a read denotes. An announced target keeps the
+/// partial-target read [CR#608.2b], a trigger's departed source falls back to
+/// last known information [CR#608.2h], and a moved product is a new object
+/// [CR#400.7].
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub enum Provenance {
     Source,
@@ -68,17 +83,18 @@ pub enum Provenance {
     AnnouncedX,
     /// A register of the enclosing region, snapshotted when THIS region was
     /// created ([CR#603.7,603.12]) — the only thing that crosses a region
-    /// boundary (ADR law 7). The snapshot is taken once, at creation, of the
-    /// value the creating region had already chased to its post-move
-    /// incarnation ([CR#400.7j] — "other parts of that effect can find that
-    /// object"); it is NEVER chased again at the read site. [CR#603.7c]
-    /// settles that: a captured object that is no longer in the zone it was
-    /// expected to be in is not affected, and one that left and returned "is
-    /// a new object and thus won't be affected". Information reads therefore
-    /// fall back to last-known information ([CR#608.2h]) while actions find
-    /// nothing.
+    /// boundary (core law 2). The snapshot is taken once, at
+    /// creation, of the value the creating region had already chased to its
+    /// post-move incarnation ([CR#400.7j] — "other parts of that effect can
+    /// find that object"); it is NEVER chased again at the read site.
+    /// [CR#603.7c] settles that: a captured object that is no longer in the
+    /// zone it was expected to be in is not affected, and one that left and
+    /// returned "is a new object and thus won't be affected". Information
+    /// reads therefore fall back to last-known information ([CR#608.2h])
+    /// while actions find nothing.
     Capture(RefId),
-    /// A linked memory cell of the card ([CR#607.1] — ADR law 8), written by
+    /// A linked memory cell of the card ([CR#607.1] — core law 3),
+    /// written by
     /// an [`Instruction::Remember`](crate::Instruction::Remember) on
     /// another ability of the same card and supplied to this region at entry.
     Linked(crate::Ident),
@@ -88,10 +104,10 @@ pub enum Provenance {
     /// The share supplied alongside a `Distribute` body region's loop element.
     Allotment,
     /// The per-candidate subject of a predicate region, carrying the Entity
-    /// domain it ranges over ([CR#109.1,102.1] — ADR law 2). The domain fixes
-    /// what the engine enumerates before the predicate runs, and
-    /// [`crate::validate`] refuses a predicate whose subject cannot inhabit
-    /// it — a Player-only predicate never enters the Object domain.
+    /// domain it ranges over ([CR#109.1,102.1]). The
+    /// domain fixes what the engine enumerates before the predicate runs,
+    /// and [`crate::validate`] refuses a predicate whose subject cannot
+    /// inhabit it — a Player-only predicate never enters the Object domain.
     Candidate(crate::Domain),
 }
 
@@ -221,8 +237,19 @@ pub fn triggered_region_params(target_count: usize) -> Arc<[Param]> {
 
 /// A textual sequence of instructions in one lexical region.
 ///
-/// Definitions produced by an instruction are visible to later instructions
-/// in this block and to nested blocks, but not after the block closes.
+/// Inside one region, instructions nest blocks: `Sequentially`, `If`, `May`,
+/// `Repeat`, `Batch`, `Simultaneously`, a search's if-none branch, and a pile
+/// instruction's follow-up. A definition is visible to later instructions in
+/// its block and in the blocks nested in it, never after its block closes.
+/// There is no phi: a value needed after a branch is defined before the
+/// branch. A mode, an `Each`, `Distribute` or `RevealUntil` body, a delayed or
+/// reflexive trigger body and a per-candidate predicate are child regions, not
+/// blocks, and outer definitions reach them only as captures.
+///
+/// Rejected: a flat control-flow graph with phi nodes, as in LLVM IR. It is
+/// built for optimization passes the engine never runs. The engine pauses at
+/// Decision Points and re-enters nested bodies, which structured blocks make
+/// direct.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Deserialize, Serialize)]
 #[serde(transparent)]
 pub struct Block(pub Arc<[Instruction]>);
@@ -286,9 +313,9 @@ impl<T> Region<T> {
 
     /// Construct a predicate-like region whose subject is register zero,
     /// declaring the narrowest Entity domain the body's own subject admits
-    /// ([CR#109.1,102.1] — ADR law 2). The declared domain is a function of
-    /// the body alone, so a region built here and the same region built by
-    /// lowering declare the same domain.
+    /// ([CR#109.1,102.1] — see `Provenance`). The declared domain is a
+    /// function of the body alone, so a region built here and the same
+    /// region built by lowering declare the same domain.
     #[must_use]
     pub fn candidate(body: T) -> Self
     where
@@ -329,10 +356,10 @@ impl<T> Region<T> {
     }
 
     /// The registers this region captures from the region that created it
-    /// ([CR#603.7,603.12] — ADR law 7). Each item is `(here, there)`: the
-    /// parameter this region reads and the enclosing register it was taken
-    /// from. The list IS the declaration a created body's supplier must
-    /// satisfy in full; nothing else crosses the boundary.
+    /// ([CR#603.7,603.12] — core law 2). Each item is `(here,
+    /// there)`: the parameter this region reads and the enclosing register
+    /// it was taken from. The list IS the declaration a created body's
+    /// supplier must satisfy in full; nothing else crosses the boundary.
     pub fn captures(&self) -> impl Iterator<Item = (RefId, RefId, Kind)> + '_ {
         self.params
             .iter()
@@ -342,8 +369,8 @@ impl<T> Region<T> {
             })
     }
 
-    /// The linked memory cells this region reads ([CR#607.1] — ADR law 8),
-    /// as `(here, cell, kind)`.
+    /// The linked memory cells this region reads ([CR#607.1] — core
+    /// law 3), as `(here, cell, kind)`.
     pub fn linked_cells(&self) -> impl Iterator<Item = (RefId, &crate::Ident, Kind)> + '_ {
         self.params
             .iter()
@@ -407,7 +434,7 @@ impl Region<crate::Predicate> {
 }
 
 /// A body a candidate region can carry, and the Entity domain its subject
-/// admits ([CR#109.1,102.1] — ADR law 2).
+/// admits ([CR#109.1,102.1] — see `Provenance`).
 ///
 /// [`Region::candidate`] reads the declared domain from here rather than
 /// taking it as an argument, so every construction of the same candidate
@@ -446,6 +473,12 @@ impl From<Instruction> for Region<Block> {
 }
 
 /// A pure expression whose value can be pinned by [`crate::Instruction::Let`].
+///
+/// An instruction has a program point: an effect, a decision or a `Let`. An
+/// expression is pure and makes no decision, and [`validate`] refuses a
+/// decision-bearing form inside one. Why: every pause in a resolution then
+/// lands on an instruction boundary, so resuming at a Decision Point is "write
+/// the register, advance."
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub enum Expr {
     Object(crate::Reference),
@@ -2457,10 +2490,11 @@ mod tests {
         }
     }
 
-    /// ADR law 7: a created body's capture must name a definition of the region
-    /// that CREATED it. One that does not is a load-time refusal, which is what
-    /// makes "a declared capture is never unavailable at firing" true — the
-    /// engine supplies every capture the validator let through.
+    /// core law 2: a created body's capture must name a definition
+    /// of the region that CREATED it. One that does not is a load-time
+    /// refusal, which is what makes "a declared capture is never
+    /// unavailable at firing" true — the engine supplies every capture the
+    /// validator let through.
     #[test]
     fn a_capture_naming_no_definition_of_the_creating_region_is_refused() {
         let body = Region::new(
@@ -2504,8 +2538,8 @@ mod tests {
     }
 
     /// A capture at an ABILITY ROOT has no enclosing region to take a value
-    /// from, so it is refused however it is numbered ([Core is explicit
-    /// regions] law 7 — captures cross a boundary, and a root has none).
+    /// from, so it is refused however it is numbered (core
+    /// law 2 — captures cross a boundary, and a root has none).
     #[test]
     fn a_capture_at_an_ability_root_is_refused() {
         let root = Region::new(
@@ -2525,8 +2559,9 @@ mod tests {
         );
     }
 
-    /// ADR law 8: `Remember` reads one register of its own region and defines
-    /// nothing. A write of a register the region never defined is refused.
+    /// core law 3: `Remember` reads one register of its own region
+    /// and defines nothing. A write of a register the region never defined
+    /// is refused.
     #[test]
     fn remember_reads_a_register_of_its_own_region() {
         let valid = Region::new(

@@ -326,7 +326,7 @@ impl GameState {
                     // Fail CLOSED: a semantic subset-look (`to: Some(..)`)
                     // whose player doesn't resolve fizzles the reveal — it
                     // must NOT widen into the `to: None` "revealed to all
-                    // players" form (invalid semantic input fizzles; a private look
+                    // players" form (a private look
                     // never silently goes public).
                     let to = match to {
                         None => None,

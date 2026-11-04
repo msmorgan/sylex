@@ -484,8 +484,8 @@ mod tests {
     }
 
     /// An announced target reaches the ability's declaration, and the region
-    /// takes it as a parameter — never as an effect node ([CR#601.2c], ADR
-    /// law 9).
+    /// takes it as a parameter — never as an effect node ([CR#601.2c],
+    /// core law 4).
     #[test]
     fn a_target_slot_becomes_an_announced_region_parameter() {
         let lowered = sylex_semantics_v1::SpellAbility {
@@ -1058,8 +1058,9 @@ mod tests {
     /// individually ([CR#608.2f]), so the per-element amount a loop body pins
     /// is a DIFFERENT value from the enclosing region's — not a competing
     /// antecedent at the same discourse level. The outer magnitude survives
-    /// inside the body only as a declared capture (ADR law 7), so "that much"
-    /// in the body reads the body's own amount instead of being refused.
+    /// inside the body only as a declared capture (core law 2), so
+    /// "that much" in the body reads the body's own amount instead of being
+    /// refused.
     ///
     /// This is the second clause of the absorbed
     /// `engine-that-much-frame-scoped` ticket ("an `Each` over players
@@ -1666,7 +1667,7 @@ fn lower_instructions(effect: sylex_semantics_v1::OneShotEffect) -> Vec<Instruct
         // [CR#607.1,607.2a]: "note the cards exiled this way" — the value is a
         // register of this region for the SAME ability's later clauses, and,
         // when another ability on the card reads the cell, also a `Remember`
-        // that publishes it as the card's linked memory (ADR law 8).
+        // that publishes it as the card's linked memory (core law 3).
         S::Noting(noting) => {
             let mut instructions =
                 lower_instructions(std::sync::Arc::unwrap_or_clone(noting.effect));

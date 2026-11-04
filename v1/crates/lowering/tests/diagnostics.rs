@@ -1,5 +1,6 @@
-//! Per-card lowering diagnostics ([Core is explicit regions] law 12:
-//! "resolution happens once, in lowering: … R1/R2 as per-card diagnostics").
+//! Per-card lowering diagnostics: reference is resolved once, in lowering,
+//! with a diagnostic per card (`docs/decisions/architecture.md`, the
+//! divergence trajectory).
 //!
 //! An unresolvable anaphor is a COMPILATION error carrying provenance, not an
 //! eval-time refusal and not an anonymous panic from inside the tree walk. The
@@ -74,8 +75,9 @@ fn an_ambiguous_card_produces_a_diagnostic_naming_the_card() {
         "the diagnostic states the refusal, got {:?}",
         error.message
     );
-    // Provenance (ADR law 12): the diagnostic names the competing registers,
-    // so an author can see WHICH two magnitudes collided.
+    // Provenance (per-card lowering diagnostics): the diagnostic names the
+    // competing registers, so an author can see WHICH two magnitudes
+    // collided.
     assert!(
         error.message.contains("antecedents are in scope"),
         "the diagnostic carries the competing antecedents, got {:?}",
@@ -150,8 +152,8 @@ fn a_resolvable_card_lowers_through_the_diagnostic_entry() {
 /// A bare `Source` reference is a damage-history query with no register to
 /// read, so it is a per-card refusal rather than a lowering. Successor to the
 /// retired `lowers_reference_source`, which asserted the identity lowering that
-/// [Core is explicit regions] law 4 removed: the outcome changed from "lowers"
-/// to "refuses", and this pins the new one.
+/// the register-read rule (`Reference::Reg`) removed: the outcome changed from
+/// "lowers" to "refuses", and this pins the new one.
 #[test]
 fn a_bare_source_reference_produces_a_diagnostic_naming_the_card() {
     let card = sem::Card::Normal(face(

@@ -58,8 +58,8 @@ pub enum Selection {
     /// A random selection of a quantity of matching candidates. The
     /// predicate rides a candidate region like
     /// [`SelectAll`](Self::SelectAll)'s, so the domain it enumerates over is
-    /// declared rather than inferred at evaluation ([CR#109.1,102.1] — ADR
-    /// law 2).
+    /// declared rather than inferred at evaluation ([CR#109.1,102.1] —
+    /// see `Provenance`).
     Random(Quantity, Arc<crate::Region<Predicate>>),
     /// The top `count` cards of a library, top → down (an ORDERED set —
     /// position is the whole point). `whose` names the library's player; the

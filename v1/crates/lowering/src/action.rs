@@ -855,8 +855,8 @@ impl Lower for sylex_semantics_v1::Action {
                 // WHATEVER IT AFFECTS. English names the affected permanent by
                 // discourse ("the next time IT would be destroyed"), so the
                 // shield's subject is the region's nearest permanent-sorted
-                // antecedent, resolved HERE (ADR law 12) and declared as a
-                // register the engine reads by index. R1/R2 refuse an
+                // antecedent, resolved HERE (reference is resolved once, in lowering) and declared
+                // as a register the engine reads by index. R1/R2 refuse an
                 // ambiguous one at compile time; a shield with no antecedent
                 // at all falls back to the source parameter, which is what a
                 // self-regenerating permanent means.

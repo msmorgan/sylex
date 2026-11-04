@@ -1,6 +1,6 @@
 //! Hand-spelled region witnesses — one test per card for the nineteen
 //! witnesses `core-regions-substrate` inherited from the absorbed engine
-//! tickets (`docs/decisions/core-explicit-regions.md`).
+//! tickets (`docs/decisions/core.md`).
 //!
 //! The generated wizards corpus cannot exercise these. Eighteen of the
 //! nineteen cards are `.ron.todo` with the witnessed clause parked in an
@@ -2287,12 +2287,12 @@ fn painful_quandary_punishes_the_caster_it_triggered_on() {
 /// the group the first sentence produced, but that group is chosen inside the
 /// `Each`-over-players body — a nested region — and a register does not escape
 /// its region. The one channel that crosses a region boundary is linked memory
-/// ([CR#607.1], ADR law 8), which is a per-OBJECT link between two abilities
-/// printed on one card, not a way for a later clause of the SAME resolution to
-/// name an earlier clause's per-player choice. `Noting` binds only the newest
-/// antecedent of the region it wraps, so it cannot reach in either. The
-/// assertions below therefore describe the whole card, and the fixture cannot
-/// yet satisfy them.
+/// ([CR#607.1], core law 3), which is a per-OBJECT link between two
+/// abilities printed on one card, not a way for a later clause of the SAME
+/// resolution to name an earlier clause's per-player choice. `Noting` binds
+/// only the newest antecedent of the region it wraps, so it cannot reach in
+/// either. The assertions below therefore describe the whole card, and the
+/// fixture cannot yet satisfy them.
 #[test]
 #[ignore = "grammar: no way to name the group an enclosed per-player region \
             chose (`this way`), so Deadly Brew's second sentence has no \

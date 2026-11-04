@@ -66,8 +66,9 @@ pub enum ObjectClass {
 /// The Entity domain a predicate region's candidate ranges over — the typed
 /// provenance rider on
 /// [`Provenance::Candidate(Domain::Entity)`](crate::Provenance::Candidate(Domain::Entity))
-/// (ADR law 2). It fixes what the engine enumerates before any predicate runs:
-/// `Player` enumerates the players, `Object` the objects, `Entity` both.
+/// (see `Provenance`). It fixes what the engine enumerates before any
+/// predicate runs: `Player` enumerates the players, `Object` the objects,
+/// `Entity` both.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub enum Domain {
     Player,

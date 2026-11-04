@@ -116,11 +116,11 @@ where
 
 /// A card whose text could not be compiled.
 ///
-/// The ADR makes an unresolvable anaphor a COMPILATION error with provenance
-/// (law 12: "resolution happens once, in lowering … R1/R2 as per-card
-/// diagnostics"), never an eval-time refusal — so the resolver's R1/R2 verdict
-/// reaches a corpus compiler as data naming the offending card, not as a bare
-/// panic from somewhere inside the tree walk.
+/// An unresolvable anaphor is a COMPILATION error with provenance (reference
+/// is resolved once, in lowering: `docs/decisions/architecture.md`, the
+/// divergence trajectory), never an eval-time refusal — so the resolver's R1/R2
+/// verdict reaches a corpus compiler as data naming the offending card, not as
+/// a bare panic from somewhere inside the tree walk.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Diagnostic {
     /// The card that failed to compile — its front face's name.
@@ -172,7 +172,7 @@ pub fn lower_card(card: sylex_semantics_v1::Card) -> Result<sylex_card::Card, Di
         // not knowable from either ability alone. Pass one collects the
         // card's cell reads and writes; pass two runs only when the card
         // actually reads a cell, and declares the surviving ones as
-        // `Provenance::Linked` parameters (ADR law 8).
+        // `Provenance::Linked` parameters (core law 3).
         let (plan, first) = region::collect_cells(|| card.clone().lower());
         if region::plan_is_empty(&plan) {
             first

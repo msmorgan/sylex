@@ -41,9 +41,9 @@ pub(crate) struct ReferenceProduct {
 ///
 /// `Unavailable` is the only shape a read can find empty, and after
 /// `sylex_core::validate` it can only mean a bound-but-departed value —
-/// never "never bound" (ADR law 10). A DECLARED capture is never unavailable
-/// for this reason: its value is snapshotted at creation and travels with the
-/// created body (see [`GameState::capture_snapshot`]).
+/// never "never bound" (core law 5). A DECLARED capture is never
+/// unavailable for this reason: its value is snapshotted at creation and
+/// travels with the created body (see [`GameState::capture_snapshot`]).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum Value {
     Unavailable,

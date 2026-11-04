@@ -239,7 +239,7 @@ pub enum Action {
     /// that resolved identity at creation. Semantics has no `subject:` field —
     /// English leaves the protected permanent to the discourse — so lowering
     /// resolves the anaphor and declares the register here, rather than the
-    /// engine searching its register file at resolution (ADR law 4).
+    /// engine searching its register file at resolution (see `Reference::Reg`).
     /// `one_shot` consumes the shield on first use ([CR#614.3]).
     /// [CR#701.19a,614.8]
     CreateReplacement {

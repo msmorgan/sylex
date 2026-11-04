@@ -1267,7 +1267,7 @@ impl GameState {
             // panic, matching the CRITICAL never-crash ruling.
             Instruction::RevealUntil(_) => {}
             // [CR#607.1]: write one of this card's linked memory cells — the
-            // writer half of a linked pair (ADR law 8). The cell is keyed by
+            // writer half of a linked pair (core law 3). The cell is keyed by
             // the object the two abilities are printed on, so the later
             // reading ability's `Provenance::Linked` parameter finds it. The
             // published value is the register's SNAPSHOT, taken here: like a
@@ -1456,13 +1456,13 @@ impl GameState {
     /// parameter — a region's source is intrinsic, not a crossing.
     ///
     /// Everything else the created body may read from the region that created
-    /// it comes through `ability.effect`'s declared capture parameters (ADR
-    /// law 7), snapshotted here, once, at creation ([CR#603.7a]). Nothing is
-    /// hand-carried: the defending player this used to copy across is supplied
-    /// by the FIRING event's own roles ([CR#608.2k] — an ability's effect
-    /// refers to what its trigger condition referred to) when the body
-    /// declares it, and by a declared capture when the body means the
-    /// creating combat's.
+    /// it comes through `ability.effect`'s declared capture parameters
+    /// (core law 2), snapshotted here, once, at creation
+    /// ([CR#603.7a]). Nothing is hand-carried: the defending player this
+    /// used to copy across is supplied by the FIRING event's own roles
+    /// ([CR#608.2k] — an ability's effect refers to what its trigger
+    /// condition referred to) when the body declares it, and by a declared
+    /// capture when the body means the creating combat's.
     ///
     /// [CR#400.7j]: when the creating source itself MOVED during the same
     /// resolution (madness exiles the very card whose ability is discarding
@@ -5894,9 +5894,10 @@ mod tests {
 
     /// A nested `Each` inside a `Distribute` body reads the enclosing
     /// distribution's share through the CAPTURE its region declares
-    /// ([CR#601.2d], ADR laws 6 and 7): the inner loop's own element parameter
-    /// takes register 0 and the outer allotment rides a declared capture, so
-    /// the share neither leaks by accident nor is silently cleared.
+    /// ([CR#601.2d], `Block`, core law 2): the inner loop's own
+    /// element parameter takes register 0 and the outer allotment rides a
+    /// declared capture, so the share neither leaks by accident nor is
+    /// silently cleared.
     ///
     /// Re-spelled from `nested_each_clears_outer_divide_among_allotment`,
     /// whose subject — a frame slot the inner loop had to CLEAR so a stale
@@ -6667,8 +6668,8 @@ mod tests {
         // produced. Its core spelling is the successor's: a register holding
         // the group, read by the constraining chooser. Where the group has to
         // outlive the clause that produced it, the register is published as a
-        // linked memory cell instead ([CR#607.1], ADR law 8) — covered by
-        // `a_noted_product_group_can_be_acted_on`.
+        // linked memory cell instead ([CR#607.1], core law 3) —
+        // covered by `a_noted_product_group_can_be_acted_on`.
         //
         // "Destroy exactly one of them" — a constraining quantity over the
         // group.
@@ -6797,10 +6798,10 @@ mod tests {
     }
 
     /// FIXTURE — a chooser nested under another chooser resolves its OWN picks
-    /// ([CR#608.2d], ADR law 3). Each decision writes its own destination
-    /// register, so there is no shared slot for the inner pick to clobber and
-    /// no clear to omit: the inner chooser's victim dies and the outer pick
-    /// survives.
+    /// ([CR#608.2d], see `DefId`). Each decision writes its own
+    /// destination register, so there is no shared slot for the inner pick
+    /// to clobber and no clear to omit: the inner chooser's victim dies and
+    /// the outer pick survives.
     #[test]
     fn a_chooser_nested_under_a_chooser_resolves_its_own_picks() {
         use crate::decide::Decision;
@@ -6922,12 +6923,12 @@ mod tests {
     }
 
     // ---- The named fixtures of `core-regions-captures-and-memory` ----
-    // ADR laws 7 (captures) and 8 (linked memory).
+    // core laws 2 (captures) and 3 (linked memory).
 
     /// The event-role prefix a lowered TRIGGERED region declares, followed by
     /// its announced X: source(0), controller(1), event object(2), patient(3),
     /// actor(4), defending player(5), amount(6), X(7). A created body's
-    /// captures follow it ([Core is explicit regions] law 2).
+    /// captures follow it (see `Provenance`).
     fn created_body_params(
         captures: &[(sylex_core::RefId, sylex_core::Kind)],
     ) -> Arc<[sylex_core::Param]> {
@@ -7134,10 +7135,10 @@ mod tests {
     /// FIXTURE — a carried body with a CAPTURE LIST. A delayed trigger created
     /// inside an `Each` body captures that body's own per-element register:
     /// the loop element is region-local to the loop body, so the created body
-    /// can only see it by declaring it ([Core is explicit regions] law 7 —
-    /// nothing else crosses a region boundary). Each iteration's capture is
-    /// its own snapshot, so two elements produce two triggers that name two
-    /// different objects.
+    /// can only see it by declaring it (`docs/decisions/core.md` law
+    /// 2 — nothing else crosses a region boundary). Each iteration's
+    /// capture is its own snapshot, so two elements produce two triggers
+    /// that name two different objects.
     #[test]
     fn a_carried_body_captures_its_enclosing_loop_element_per_iteration() {
         let (mut state, a, b) = two_permanents_on_field();
@@ -7203,11 +7204,11 @@ mod tests {
         );
     }
 
-    /// FIXTURE — a linked pair through a DECLARED CELL ([CR#607.1], law 8):
-    /// one ability exiles a card and REMEMBERS it, a second ability of the
-    /// same object acts on "the exiled card" by declaring that cell as a
-    /// `Provenance::Linked` parameter. The two abilities never share an
-    /// activation; the cell is the whole channel.
+    /// FIXTURE — a linked pair through a DECLARED CELL ([CR#607.1],
+    /// core law 3): one ability exiles a card and REMEMBERS it,
+    /// a second ability of the same object acts on "the exiled card" by
+    /// declaring that cell as a `Provenance::Linked` parameter. The two
+    /// abilities never share an activation; the cell is the whole channel.
     #[test]
     fn a_linked_pair_acts_on_the_exiled_card_through_a_declared_cell() {
         let (mut state, a, b) = two_permanents_on_field();

@@ -73,14 +73,14 @@ cards and card faces: a face's characteristics together with its lowered
 abilities, so lowering targets both. `sylex_card` depends on core, never the
 reverse. Every
 binding in core is declared and every reference is a register read, so core
-resolves nothing; [Core is explicit regions](core-explicit-regions.md) is its
+resolves nothing; [Core](core.md) is its
 contract.
 
 **Engine.** `sylex_engine` holds game state and the rules systems (the stack,
 the layers, combat and the rest) and executes core. It exposes player decisions
 as explicit decision points, which its consumers drive: the terminal client
 `sylex_tui` and the matchup suite `sylex_matchups`
-([Engine and runner boundary](engine-runner-boundary.md)).
+([Engine](engine.md), law 2).
 
 ## Authority, canon and artifact
 
@@ -214,12 +214,12 @@ directions. Each form spends its explicitness on what its consumer needs.
   such as bracketing and attachment, is made explicit. Reference stays
   anaphoric, because English is anaphoric and spelling needs the anaphors: "it"
   and "that creature" are written as such and resolved by the discourse reading
-  (§2). The drift lands in the data (Templates, Definitions and spellings)
-  while the primitives stay generic.
+  ([Semantics v3](semantics-v3.md) §2). The drift lands in the data
+  (Templates, Definitions and spellings) while the primitives stay generic.
 - **Core drifts toward evaluation shape.** Reference becomes explicit. Every
   binding is a declared parameter or a numbered definition and every read is a
   register read, while grouping stays only as structured as evaluation needs
-  ([Core is explicit regions](core-explicit-regions.md)).
+  ([Core](core.md)).
 - **Reference is resolved once, on the way down.** The discourse reading
   resolves each reference in the expanded tree, lowering turns each resolution
   into a register read, and the engine never searches for an antecedent. Why:

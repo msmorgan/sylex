@@ -10,11 +10,14 @@
 //! Three distinct kinds of "this input doesn't work" get three distinct
 //! behaviors, and conflating them is the bug this policy exists to prevent.
 //!
-//! **Invalid semantic input fizzles.** A malformed reference or a missing
-//! semantic object resolves to no applicable object, emits no game facts, and
-//! retains a diagnostic for validation and logging. It does not panic. See
-//! `docs/decisions/invalid-semantic-input-fizzles.md` for the boundary; that
-//! decision is the only thing that licenses a fizzle.
+//! **Broken state fails loudly; what the rules make impossible is ignored.**
+//! Malformed core is refused at load. A run-time read that finds an impossible
+//! state (a missing register, a value of the wrong kind, an unknown verb) is a
+//! lowering or engine bug that fails loudly and names the defect. A part of an
+//! instruction the rules make impossible to perform is ignored and does
+//! nothing ([CR#101.3]); a departed object is one case ([CR#608.2b]). See
+//! `docs/decisions/engine.md`, law 6; that law is the only thing
+//! that licenses a silent no-op.
 //!
 //! **An unsupported Magic mechanic panics loudly.** When the input is a legal
 //! card behavior the engine has not built yet, the site keeps a

@@ -5,7 +5,7 @@ needs: [semantics-rust-rewrite]
 `core` (updated 2026-10-14 per
 [`docs/decisions/semantics-v3.md`](../../decisions/semantics-v3.md)).**
 Sibling of `sylex_lowering_v1`; v1 lowering deletes at cutover. Same contract
-as `architecture.md` (lowering, the divergence trajectory) and `core-explicit-regions.md`:
+as `architecture.md` (lowering, the divergence trajectory) and [`core.md`](../../decisions/core.md):
 one-way compile, the crate is the divergence ledger, and rearrangement,
 hoisting, and register indexing happen here. May fail on a card that breaks a
 `deckmaste_discourse` law; does not validate. Standard constraints apply.

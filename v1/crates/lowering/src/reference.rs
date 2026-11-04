@@ -64,7 +64,7 @@ impl Lower for sylex_semantics_v1::Reference {
             ),
             // [CR#607.1]: a linked read resolves to a register of THIS region —
             // either one the same ability bound, or the card's memory cell
-            // declared as a `Provenance::Linked` parameter (ADR law 8). A name
+            // declared as a `Provenance::Linked` parameter (core law 3). A name
             // no ability on the card writes has no cell to read, and refusing
             // here names the card.
             Self::Linked(name) => sylex_core::Reference::Reg(

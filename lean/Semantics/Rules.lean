@@ -19,7 +19,7 @@ namespace Semantics
 /-- A rules-defined state-based action [CR#704.1], authored under `rules/sba/`: *for every
 object or player matching `scope`, with `this` bound to it, if `when` holds the game performs
 `then_`*. The sweep [CR#704.3] evaluates the whole table. Rows that would need a player to
-choose stay imperative in the engine (`docs/decisions/state-based-actions-are-data.md`); the
+choose stay imperative in the engine (`docs/decisions/engine.md`, law 5); the
 grammar has no complete read for a choice, so that is a convention here and not a checked
 obligation. -/
 structure SbaRule where

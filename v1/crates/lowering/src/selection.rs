@@ -21,7 +21,7 @@ impl Lower for sylex_semantics_v1::Selection {
             ),
             // [CR#607.1]: "them" over a noted group — a register of this
             // region, or the card's memory cell read through the ability's
-            // declared `Provenance::Linked` parameter (ADR law 8).
+            // declared `Provenance::Linked` parameter (core law 3).
             Self::AmongNoted(name, _) => crate::region::group_read(
                 crate::region::named(&name)
                     .or_else(|| crate::region::cell_read(&name))

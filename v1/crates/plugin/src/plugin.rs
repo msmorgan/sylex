@@ -392,7 +392,8 @@ impl Plugin {
     /// If the source doesn't expand to a card.
     pub fn card_from_str(&self, source: &str) -> anyhow::Result<LoadedCard> {
         let semantic: sylex_semantics_v1::Card = self.macros.read_str_restricted(source)?;
-        // Lowering owns the per-card diagnostic (ADR law 12): `lower_card`
+        // Lowering owns the per-card diagnostic (reference is resolved once, in
+        // lowering: `docs/decisions/architecture.md`): `lower_card`
         // installs the card as the resolver's diagnostic context, so an R1/R2
         // refusal comes back naming this card and the antecedents that
         // collided, instead of an anonymous panic from inside the tree walk.

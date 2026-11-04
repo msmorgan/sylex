@@ -119,7 +119,14 @@ mod tests {
 /// states each constructor's domain.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
 pub enum Reference {
-    /// An indexed read from the current region's activation record.
+    /// An indexed read from the current region's activation record: the only
+    /// read of a binding. No anaphor ("it", "that creature", "the exiled
+    /// card") reaches core. A pure derivation over a register (the other
+    /// variants) stays a nestable expression evaluated where it is read; it
+    /// introduces no binding and gets no definition unless a `Let` pins it.
+    /// Why: a definition per derivation would double the instruction count
+    /// without adding a binding, and memoizing pure expressions remains open
+    /// to the engine.
     Reg(crate::RefId),
     /// Demote a selection to its sole element. Empty and ambiguous selections
     /// fail closed.

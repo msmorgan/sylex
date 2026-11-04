@@ -525,9 +525,7 @@ impl GameState {
             }
             // A resolved member with no zone to leave — a player proxy
             // (`zone: None`, which `Predicate::Any` matches) — is skipped,
-            // never moved (the Invalid semantic input fizzles
-            // decision, `docs/decisions/
-            // invalid-semantic-input-fizzles.md`).
+            // never moved.
             let Some(from) = self.objects.obj(object).zone else {
                 continue;
             };
@@ -707,9 +705,7 @@ impl GameState {
         // Dispatch on the verb NAME ([CR#701]); each verb reads its own
         // performer/patient references off the stored `body` (the same body
         // facets the renderer reads), so no typed atom is needed. An
-        // unknown/mistyped verb name fizzles to no window — never a panic (the
-        // Invalid semantic input fizzles decision,
-        // `docs/decisions/invalid-semantic-input-fizzles.md`).
+        // unknown/mistyped verb name fizzles to no window — never a panic.
         match name.as_str() {
             // ── Destroy: single Battlefield → Graveyard move ([CR#701.8a]) ──
             "Destroy" => {
@@ -4414,10 +4410,8 @@ mod tests {
 
     /// A `MoveGroup` whose `SelectAll(Any)` selection sweeps in a zoneless
     /// member — a player proxy (`zone: None`, which `Predicate::Any` matches) —
-    /// skips that member instead of panicking on its absent zone (the
-    /// Invalid semantic input fizzles decision,
-    /// `docs/decisions/invalid-semantic-input-fizzles.md`). The zoned members
-    /// still move.
+    /// skips that member instead of panicking on its absent zone. The zoned
+    /// members still move.
     #[test]
     fn move_group_skips_zoneless_members() {
         let (mut state, _bear) = bear_on_field();
@@ -5975,12 +5969,13 @@ mod tests {
     ///
     /// RE-SPELLED onto the successor shape. The `Noting` node and
     /// `Selection::AmongNoted` are gone; a product group that must outlive the
-    /// clause that produced it is now a LINKED MEMORY CELL ([CR#607.1], ADR
-    /// law 8): the producing instruction writes its dest, `Remember` publishes
-    /// that register under a cell of the card, and the acting ability declares
-    /// the cell as a `Provenance::Linked` parameter of its own region. The
-    /// two abilities share no activation — the cell is the whole channel,
-    /// which is exactly what [CR#607.2a] linkage means.
+    /// clause that produced it is now a LINKED MEMORY CELL ([CR#607.1],
+    /// core law 3): the producing instruction writes its dest,
+    /// `Remember` publishes that register under a cell of the card, and the
+    /// acting ability declares the cell as a `Provenance::Linked` parameter
+    /// of its own region. The two abilities share no activation — the cell
+    /// is the whole channel, which is exactly what [CR#607.2a] linkage
+    /// means.
     ///
     /// A graveyard occupant that the first clause did NOT put there is the
     /// control: the group is the produced cards, never "everything in the

@@ -329,7 +329,7 @@ pub struct GameImage {
     /// ([CR#603.12]) are NOT stored here (they are checked against earlier
     /// same-resolution events immediately at creation, never persisted).
     pub delayed_triggers: Vec<crate::trigger::CreatedTrigger>,
-    /// [CR#607.1]: the linked memory each object carries — ADR law 8. Keyed by
+    /// [CR#607.1]: the linked memory each object carries — core law 3. Keyed by
     /// the object both linked abilities are printed on plus the cell name a
     /// `Remember` instruction declared, so a reading region's
     /// `Provenance::Linked` parameter is one indexed lookup at region entry.

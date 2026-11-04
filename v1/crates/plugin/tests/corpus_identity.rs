@@ -617,7 +617,7 @@ fn pair_subterms<'a>(
 /// RE-SPELLED. The claim this test used to make — that a subterm lowered in
 /// isolation equals its image inside the card — is false BY DESIGN and is
 /// permanently superseded (see
-/// `docs/decisions/core-explicit-regions.md`, law 7). A carried region's
+/// `docs/decisions/core.md`, law 2). A carried region's
 /// value is a function of its ENCLOSING register file: `in_carried_region`
 /// appends a `Capture` parameter per enclosing register, and an isolated
 /// lowering has no enclosing region to count. There is no honest normalization

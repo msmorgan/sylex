@@ -754,7 +754,7 @@ impl Lower for sylex_semantics_v1::Count {
             Self::EventCount(f0, f1) => sylex_core::Count::EventCount(f0.lower(), f1.lower()),
             Self::EventSum(f0, f1) => sylex_core::Count::EventSum(f0.lower(), f1.lower()),
             // A region-local definition wins; then the card's declared linked
-            // memory parameter ([CR#607.1], ADR law 8). There is no
+            // memory parameter ([CR#607.1], core law 3). There is no
             // resolution-local name-keyed fallback.
             Self::Noted(name) => crate::region::named(&name)
                 .or_else(|| crate::region::cell_read(&name))

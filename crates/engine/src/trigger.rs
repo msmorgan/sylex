@@ -104,13 +104,14 @@ pub struct TriggerBindings {
     /// and again at the resolution recheck ([CR#603.4]). `None` for facts
     /// that fix no totals.
     pub crossed: Option<(Uint, Uint)>,
-    /// ADR law 7: the DECLARED captures of a delayed or reflexive body
-    /// ([CR#603.7,603.12]), snapshotted when the creating effect created it
-    /// ([CR#603.7a]) and keyed by the created region's own parameter. Empty
-    /// for a printed trigger, which captures nothing — its whole context is
-    /// its own event roles. This is the ONLY channel by which a value reaches
-    /// a created body from the region that created it; a body's `this` is its
-    /// own `Source` parameter ([CR#603.7d,603.7e]), not a capture.
+    /// core law 2: the DECLARED captures of a delayed or reflexive
+    /// body ([CR#603.7,603.12]), snapshotted when the creating effect
+    /// created it ([CR#603.7a]) and keyed by the created region's own
+    /// parameter. Empty for a printed trigger, which captures nothing — its
+    /// whole context is its own event roles. This is the ONLY channel by
+    /// which a value reaches a created body from the region that created
+    /// it; a body's `this` is its own `Source` parameter
+    /// ([CR#603.7d,603.7e]), not a capture.
     pub(crate) captures: Vec<(sylex_core::RefId, crate::activation::Value)>,
 }
 
