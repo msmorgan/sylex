@@ -68,7 +68,7 @@ Authorities: `docs/decisions/semantics-v3.md` and `docs/decisions/english-v4.md`
   lowering crates; `semantics-rust-rewrite` owns their future Rust replacement.
 - `english-v4` lives in `sylex_syntax`, `sylex_vocabulary` and `sylex_english`.
   `english-v4-cutover-v3` deleted `deckmaste_english_v3`, `deckmaste_construction_v3*` and the
-  earlier `sylex_vocabulary`; `english-v4-final-suffix-cutover` dropped the `_v4` suffixes
+  earlier `deckmaste_lexical_source`; `english-v4-final-suffix-cutover` dropped the `_v4` suffixes
   and renamed `cargo xtask english-v4` to `cargo xtask english`. What remains of it, gated on
   `semantics-v1-cutover`, is moving the catalogs into `plugins/` and deleting `sylex_features_v1`.
 - Deletion-bound at parity (`semantics-v1-cutover` and the remainder of

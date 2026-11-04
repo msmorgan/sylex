@@ -4,10 +4,10 @@
 `analyze` returns every licensed lexical occurrence; `realize` accepts a lexical
 value independently of source text. Shared grammar-facing values live in the
 data-only `types` module (lexeme identities, categories, inflectional forms,
-feature bundles, frame signatures and lexical values); declaration provenance, morphology, binding, tokenization,
-indexes, occurrences, numeral codecs, and realization stay in this deep module.
-This crate has no construction, catalog-I/O, game-model or grammar-compiler
-dependency. The governing contract is
+feature bundles, frame signatures and lexical values); declaration provenance,
+morphology, binding, tokenization, indexes, occurrences, numeral codecs, and
+realization stay in this deep module. This crate has no construction,
+catalog-I/O, game-model or grammar-compiler dependency. The governing contract is
 [independent lexical analysis](../../docs/decisions/english-lexical-analysis.md).
 
 ## Input and morphology

@@ -157,7 +157,7 @@ An admission gate (an `Exclude` or `Require`, a Category that restates Productio
 
 ## 5. Self-Contained Core Lexicon and Catalogs (`deckmaste_lexical_source_v4`)
 
-To unblock the retirement of `plugins_v2/builtin` and avoid `sylex_vocabulary`'s 4-layer salvage pipeline, `deckmaste_lexical_source_v4` owns clean, uniform RON files. Core English vocabulary is not a Catalog: it is declared with Core provenance, which is what lets the grammar name its closed-class words; Catalog entries carry Catalog provenance and never appear in the grammar.
+To unblock the retirement of `plugins_v2/builtin` and avoid `deckmaste_lexical_source`'s 4-layer salvage pipeline, `deckmaste_lexical_source_v4` owns clean, uniform RON files. Core English vocabulary is not a Catalog: it is declared with Core provenance, which is what lets the grammar name its closed-class words; Catalog entries carry Catalog provenance and never appear in the grammar.
 
 - **Core English Lexicon (`lexicon/english/`):**
   - `closed_class.ron` (pronouns, determinatives, coordinators, auxiliaries/modals, clitics, symbols)
@@ -220,8 +220,8 @@ Rather than reactive blocker recon across 32,828 cards, the entire Vintage-legal
 2. **Side-by-Side Buildout (Prototype First):** First build `sylex_syntax` and `deckmaste_english_v4` and prove the unified frame engine on the seed lexicon (`english-v4-compiler-and-runtime`), then populate `deckmaste_lexical_source_v4` (`english-v4-lexical-catalogs`), stratify the corpus and migrate `v3`'s genuine behavioral test obligations into the `v4` judgment set (`english-v4-corpus-stratification-and-judgment-harness`), and execute Strata 0–7.
 3. **Cutover 1 (`english-v4-cutover-v3`):** Once Stratum 7 completes and passes the judgment suite:
    - Repoint `xtask` and workspace consumers at `deckmaste_english_v4`.
-   - Delete `deckmaste_english_v3` (recording the migrated obligations and named retirement reasons for the wave test suite), `deckmaste_construction_v3*`, and `sylex_vocabulary`. `plugins_v2/builtin/` and its reader `deckmaste_macro_def` are not deleted here: they stay until `semantics-v3-dsl-and-plugins`, because `xtask` still reads them.
-4. **Cutover 2 (`english-v4-final-suffix-cutover`):** After `semantics-v1-cutover` retires the legacy v1 consumers and renames `plugins/` → `plugins/`:
-   - Delete legacy `sylex_features_v1`. (Legacy suffixless `sylex_english`, `deckmaste_construction_compiler` and `deckmaste_constructions_macro` were deleted earlier by `retire-v1-english-and-spelling`.)
+   - Delete `deckmaste_english_v3` (recording the migrated obligations and named retirement reasons for the wave test suite), `deckmaste_construction_v3*`, and `deckmaste_lexical_source`. `plugins_v2/builtin/` and its reader `deckmaste_macro_def` are not deleted here: they stay until `semantics-v3-dsl-and-plugins`, because `xtask` still reads them.
+4. **Cutover 2 (`english-v4-final-suffix-cutover`):** After `semantics-v1-cutover` retires the legacy v1 consumers (the `.syl` plugins already moved from `plugins_v3/` to `plugins/`):
+   - Delete legacy `sylex_features_v1`. (Legacy suffixless `deckmaste_english`, `deckmaste_construction_compiler` and `deckmaste_constructions_macro` were deleted earlier by `retire-v1-english-and-spelling`.)
    - Drop all `_v4` suffixes (`deckmaste_english_v4` → `sylex_english`, `deckmaste_lexical_source_v4` → `sylex_vocabulary`; `sylex_syntax` already has its final unversioned name).
    - Move the `catalogs/*.ron` lexical declarations into `plugins/` declaration metadata.

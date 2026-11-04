@@ -4,16 +4,16 @@
 //! constructors — canon RON is 83.5% raw constructors, so this catalog is
 //! most of the lexicon, not an appendix).
 //!
-//! Lives in `macro_ron`, not the `sylex_spelling` bridge crate: schema
+//! Lives in `macro_ron`, not the `deckmaste_spelling` bridge crate: schema
 //! lives with the data (`MacroDef.frames` needs this type; see
-//! [`crate::set::MacroDef`]), and the engine (`sylex_spelling`, which will
+//! [`crate::set::MacroDef`]), and the engine (`deckmaste_spelling`, which will
 //! need `macro_ron::MacroSet` itself to actually expand macro bodies)
 //! depends on the schema, not the other way around — the reverse arrow
 //! would cycle. This module has no dependency beyond `serde` and `ron`
 //! (already `macro_ron` dependencies) and no English/rendering knowledge.
 //!
 //! A frame's text carries two hole sigils, read by a later stage
-//! (`sylex_spelling`): `~` (self-reference) and `<Param(i)>` (positional).
+//! (`deckmaste_spelling`): `~` (self-reference) and `<Param(i)>` (positional).
 //! This module only carries the strings through serde — it never parses
 //! them — so they must round-trip byte-for-byte.
 //!
@@ -118,7 +118,7 @@ pub struct FrameSpec {
     /// ```
     ///
     /// It is a restriction on the *filler*, not a change to the hole's own
-    /// structural class (`sylex_spelling`'s `HoleClass`, which the parse
+    /// structural class (`deckmaste_spelling`'s `HoleClass`, which the parse
     /// decides): the same hole is a whole-subtree hole either way, and both
     /// wordings above and below stay one authored English string. The
     /// restriction runs in both directions — a listed param's hole rejects a
@@ -253,11 +253,11 @@ impl Serialize for FrameSpec {
 
 /// The English category a constructor entry's frames are parsed at and
 /// registered under. A schema-owned mirror of
-/// `sylex_english::FragmentKind` — duplicated, not imported, because
+/// `deckmaste_english::FragmentKind` — duplicated, not imported, because
 /// this module has no dependency beyond `serde`/`ron` (see the module doc)
 /// and must not gain one merely to name the category a frame belongs to.
 /// The bridge crate carries the exhaustive conversion
-/// (`sylex_spelling::lexicon::fragment_kind_of`; not a `From` impl —
+/// (`deckmaste_spelling::lexicon::fragment_kind_of`; not a `From` impl —
 /// both this type and `FragmentKind` are foreign to that crate, and to
 /// every crate that could host one); this module never interprets the
 /// variant, only carries it through serde, exactly as it already does for
@@ -284,7 +284,7 @@ pub enum FrameKind {
 /// [`MacroDef`](crate::set::MacroDef)), so there is nothing to guess it
 /// from, and registering an entry at every category it happens to parse
 /// cleanly at costs several entries where one is meant — see
-/// `sylex_spelling::lexicon::Lexicon::assemble`.
+/// `deckmaste_spelling::lexicon::Lexicon::assemble`.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct ConstructorFrames {
     pub constructor: String,

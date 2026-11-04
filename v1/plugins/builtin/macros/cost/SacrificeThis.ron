@@ -4,7 +4,7 @@
 //
 // The `~` self-reference sigil is a rejected parameterized alternative:
 // `~` resolves structurally to `NounPhrase::ThisCard`
-// (`crates/english/src/syntax/phrase.rs`), which renders as the
+// (`crates/deckmaste_english/src/syntax/phrase.rs`), which renders as the
 // card's own printed name, never a type-generic demonstrative. This macro
 // is invoked live by
 // `plugins/builtin/tokens/{Clue,Gold,Treasure,Food,Blood}.ron`, whose

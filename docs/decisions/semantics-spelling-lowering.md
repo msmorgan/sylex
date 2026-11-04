@@ -30,7 +30,7 @@ One semantics grammar, two derived projections, three new crates:
 
 ```
                 sylex_spelling            sylex_lowering_v1
-sylex_english ◄════════════════► sylex_semantics_v1 ────────► sylex_core
+deckmaste_english ◄════════════════► sylex_semantics_v1 ────────► sylex_core
   English AST       two-way ranked      the semantics       one-way    pure engine
   text ⇄ AST only   relation            rules grammar       total      AST; plain
                     (frames ENGINE      + macro layer       compile    serde; NOT
@@ -87,11 +87,11 @@ sylex_english ◄════════════════► sylex_seman
   crate below both grammars (killing atom mirroring) is booked as a
   design-gated follow-up (`characteristics-atoms-crate`), deliberately
   NOT part of Stage 1.
-- **The card-loader crate is renamed to `sylex_plugin_v1`** (Stage 0): it
+- **The card-loader crate is renamed to `deckmaste_plugin`** (Stage 0): it
   was always the loader plus riders. The rename landed alone; splitting the
   riders (the Idris emitter and validation) out is booked as
   `plugin-rider-split`. The dying legacy renderer and the fidelity harness
-  that rides it move together into `sylex_render_v1`, in
+  that rides it move together into `deckmaste_legacy_render`, in
   `runtime-prose-link` (owner-settled 2026-08-02, superseding "stays put to
   die in place"): that ticket must retype every one of the renderer's
   `Expanded` match sites onto semantic terms regardless, so moving and
@@ -612,7 +612,7 @@ legally land before an earlier-stage one when its needs are met. Every
 landing keeps all gates green (zero behavior change until Stage 2 begins
 the visible policy).
 
-- **Stage 0 — free the names**: the card-loader crate → `sylex_plugin_v1`
+- **Stage 0 — free the names**: the card-loader crate → `deckmaste_plugin`
   (rename only; the rider split is `plugin-rider-split`); `sylex_card`
   split out of core — a cross-cutting, land-anytime migration
   (deliberately `needs: []`; whichever of it and the fork lands second

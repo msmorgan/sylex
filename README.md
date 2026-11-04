@@ -2,6 +2,8 @@
 
 > **Reading the card explains the card.**
 
+**Project site:** [deckmaste.rs — Magic: The Gathering rules engine](https://deckmaste.rs/)
+
 sylex tests the long-standing intuition that Oracle text can serve as an
 executable source language for Magic: it builds the whole path — parser, typed
 intermediate form, rules engine — and measures, card by card, where recovery
@@ -180,7 +182,7 @@ launches the client:
 
 - **`sylex_syntax`**, **`sylex_vocabulary`** and
   **`sylex_english`** — the English grammar for Oracle text; its own
-  section below. (The first-attempt `sylex_english` was retired.)
+  section below. (The first-attempt `deckmaste_english` was retired.)
 - **`macro_ron`** / **`macro_ron_derive`** — the RON macro-expansion layer the
   intermediate grammar is built on.
 - **`macro_ron_lsp`** — a small language server for the repo's RON card files.
@@ -237,7 +239,7 @@ below.
 
 ## The English grammar (`sylex_english`)
 
-The first-attempt `sylex_english` crate and its `cargo xtask english` tools
+The first-attempt `deckmaste_english` crate and its `cargo xtask english` tools
 have been retired; the grammar lives in `sylex_syntax`,
 `sylex_vocabulary` and `sylex_english`, measured by
 `cargo xtask english`. The grammar parses Oracle text into a genuine grammatical syntax tree —

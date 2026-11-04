@@ -5,6 +5,9 @@
 /docs/memory
 /docs/evidence
 /docs/cleanup
+# Pre-rename location of the generated wizards corpus (now `v1/plugins/wizards`);
+# existing checkouts still hold it untracked.
+/plugins/wizards/
 /v1/plugins/*/
 !/v1/plugins/builtin/
 !/v1/plugins/canon/
