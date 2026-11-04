@@ -21,5 +21,5 @@ cards that are declined for stated reasons (`crates/english/declined.txt`).
 **Not in scope.** Changing the design documents the README summarizes.
 
 **Pointers.** `README.md`, `docs/decisions/architecture.md` (the vision the README summarizes for
-a human reader), `docs/decisions/semantics-v3.md`, `docs/decisions/english-v4.md`,
+a human reader), `docs/decisions/semantics.md`, `docs/decisions/syl.md`, `docs/decisions/english.md`,
 `docs/decisions/english-lexical-analysis.md`, `crates/english/declined.txt`.

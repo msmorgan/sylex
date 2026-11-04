@@ -2,7 +2,7 @@
 needs: [lowering-v3]
 ---
 **The cutover finish line (updated 2026-10-14 per
-[`docs/decisions/semantics-v3.md`](../../decisions/semantics-v3.md)).** A
+[`docs/decisions/semantics.md`](../../decisions/semantics.md)).** A
 harness that lowers each canon card through both v1 and v3
 (the `deckmaste_semantics_v3`, `deckmaste_discourse`, and `deckmaste_lowering_v3` crates from
 `semantics-rust-rewrite`) and compares the core terms. v1 is a starting point, not an oracle: not

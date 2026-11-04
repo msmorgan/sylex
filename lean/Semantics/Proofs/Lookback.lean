@@ -637,7 +637,7 @@ theorem thisWayReadsWhatTheEventMoved :
 
 /-- "Destroy target creature. If that creature dies this way, …": a definite noun phrase as the
 subject of the move a lookback reads is the moved patient, read as the permanent it was, as "it"
-is (`semantics-v3.md`, the historical read) [CR#700.4,608.2h]. -/
+is (`semantics.md`, the historical read) [CR#700.4,608.2h]. -/
 theorem okThatCreatureDiesThisWay :
     Action.check (DRS.ofList [])
       (sequentially [destroy (target isCreature), doIf (did (Semantics.Subject.actor (that creature)) die thisWay) (draw 1)]) =

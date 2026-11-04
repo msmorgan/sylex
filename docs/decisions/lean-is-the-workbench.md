@@ -23,7 +23,7 @@ and exact refusal lists; a `Spelled` card pairs its syntax with a proof of
 labels are registry keys, and their checker facts are generated from those
 declarations plus overlays for columns the declarations do not carry.
 
-Inert vocabulary (ruling 2026-09-06, [Semantics v3 §6](semantics-v3.md) / [archived Semantics v2 §16](../archive/decisions/semantics-v2.md)):
+Inert vocabulary (ruling 2026-09-06, [Semantics §5](semantics.md) / [archived Semantics v2 §16](../archive/decisions/semantics-v2.md)):
 an enum no checker function reads is engine-facing vocabulary the syntax
 carries opaquely. It owes no law, and its members are not twins to prune.
 

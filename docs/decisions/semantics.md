@@ -1,17 +1,15 @@
-# ADR: Semantics v3 — DRT Reference Resolution, the Definition/Template Split, and the Action-Clause Spine
+# ADR: Semantics — DRT Reference Resolution, Definitions and Templates, and the Action-Clause Spine
 
-- **Status:** Promoted (accepted by owner).
-- **Supersedes:** `docs/archive/decisions/semantics-v2.md`,
-  `oracle-text-is-forward-anaphoric.md`, `idris-is-a-soundness-gate.md`. Their rulings still in
-  force are restated here.
+- **Companion:** [`syl.md`](./syl.md), the `.syl` data language this model is written in.
 
 ## Overview
 
 A card's meaning is a `.syl` term that follows the card's English phrase by phrase. The pipeline
 has four steps:
 
-1. Parse the `.syl` files (§5.1).
-2. Resolve names by expected sort, and expand Templates and Definitions (§5.2).
+1. Parse the `.syl` files ([`syl.md`](./syl.md) §2).
+2. Resolve names by expected sort, and expand Templates and Definitions ([`syl.md`](./syl.md)
+   §3–§4).
 3. Read the expanded term left to right against a Discourse Representation Structure. This
    resolves every reference (§2) and checks the term against the action-clause spine (§4).
 4. Lower the term to the engine's core.
@@ -178,28 +176,27 @@ Source coordinated with the phrase is its anchor. Otherwise the anchor is, in or
 
 ## 3. Definitions and Templates
 
-The language has three kinds of named word, because there are three different jobs:
+A named word is a primitive, a Template or a Definition; why the language has the three is a
+language matter ([`syl.md`](./syl.md) §1). A primitive only names a model constructor. The other
+two differ in what they mean:
 
-- **A primitive** is where a model constructor's spelling is attached. It is the one declaration
-  that binds a word to a constructor, and it does the wrapping: it names the constructor the word
-  builds. Without primitives, there is nowhere to attach a constructor's spelling. The wording
-  would have to live somewhere other than the declaration that binds the word, which makes a
-  second source of truth for spelling.
 - **A Definition** is vocabulary the rules define: a keyword action or ability ([CR#701.1,702.1]),
   a Counter, a Designation. It carries rules meaning: a Deed that triggers, lookbacks and
-  prohibitions can name ("whenever you scry", "can't be regenerated"), and its own Reference Scope
-  (§2.3).
+  prohibitions can name ("whenever you scry", "the card exiled this way", "can't be
+  regenerated"), and its own Reference Scope (§2.3). "This way" reads the current ability's stamps
+  (§2.4), and the stamp a keyword action leaves is its Definition's Deed. That is why each keyword
+  action has exactly one Deed (§3.1): a variant with its own Deed would make "exiled this way"
+  miss it.
 - **A Template** is printed wording only. It expands transparently into the expressions its parts
   would be written as, and it adds no meaning.
 
 They are kept apart because conflating them goes wrong both ways. A phrasing given a Deed or a
 scope invents a rules distinction the CR does not make: an event then matches it, and referents it
 should see are hidden from it. A rules-defined keyword treated as a phrasing loses its identity, so
-"can't X" and "whenever X" can no longer name it. So a declaration's kind decides which it is; its
-file path never does: a role inferred from location is not stated by the declaration, and it can
-disagree with what the declaration is. That a Definition's body is the rules' meaning of its
-keyword is trusted, vouched for by its CR citation like any rule declaration (§1 item 4). Its
-reference resolution and sorts are checked in each context that expands it.
+"can't X" and "whenever X" can no longer name it. So the kind a declaration states decides which it
+is ([`syl.md`](./syl.md) §1). That a Definition's body is the rules' meaning of its keyword is
+trusted, vouched for by its CR citation like any rule declaration (§1 item 4). Its reference
+resolution and sorts are checked in each context that expands it.
 
 ### 3.1 Keyword Actions and Deeds
 
@@ -210,11 +207,6 @@ reference resolution and sorts are checked in each context that expands it.
   `devour` over `sacrifice` ([CR#702.82b]).
 - With no Handoff to a Permanent, a deed a permanent performs is performed by the Source
   ([CR#701.14a,701.44a]). The checker never guesses a deed from a body's shape.
-
-### 3.2 Repeated Template Parameters
-
-A Template that mentions a NounPhrase parameter more than once binds it at the first occurrence.
-The binding is generated, never hand-written, so targets are not duplicated ([CR#115.1]).
 
 ## 4. The Action-Clause Spine
 
@@ -334,67 +326,7 @@ A lookback is `did(subj, action, within)`, with an optional Event Ordinal.
   do" trigger is a separate ability whose targets do not escape ([CR#603.12]).
 - Linked and self-linked abilities share one authored tree. Lowering finds the link.
 
-## 5. The `.syl` Data Language
-
-### 5.1 Files and Syntax
-
-- **First-order data.** Every declaration body is a tree of calls. There is no evaluation, there
-  are no local bindings or higher-order parameters, and there is no type inference. Why: every
-  tool (the Rust pipeline, the Lean generator, the formatter, the citation checker) can read a file
-  without an evaluator, and what a file says is what it means.
-- **No coercions.** Only the direct sort atoms of §5.2 resolve implicitly. Every wrapper is written,
-  `actor(…)` included. Why: a coercion hides which word was meant. Uglier but simpler is the
-  point; coercions may return deliberately once the language is simple enough to refactor.
-- **Reads are marked.** `$name` reads a parameter; a bare word never does. Why: what a word refers
-  to can be read from its spelling, and a parameter can never shadow a word.
-- **Argument order carries no meaning.** Named arguments may stand anywhere, so a call can follow
-  printed order.
-- **Notation.** `=` binds and `:` means "has sort". A leading `.` appears only where a primitive
-  names its constructor.
-- **One block per declaration** holds three layers: `lexical`, `spelling` and the meaning (`body`,
-  `confers`, `rules`). Why: a word's frames, spelling and meaning are one fact, so they have one
-  source. Keyword `parameters` are spelling frames and live in `lexical`.
-- **Citations live in comments.** There is no `rule` field; `cargo xtask cite` checks the comments.
-- **Paths are for people.** Folder and file names never carry meaning.
-
-### 5.2 Name Resolution, Expansion and Read Order
-
-1. **Primitives.** A primitive is a constructor's only binding. Fixed arguments and helpers belong
-   in Templates over it.
-2. **Expected-sort dispatch.** One printed word may build different sorts (`and`, `target`,
-   `did`), so names are keyed by `(name, sort)` instead of being qualified. No two declarations
-   share a `(name, sort)`. At expected sort `T`, a
-   word resolves in constant time, with no backtracking, in this order:
-   1. `$name`: a parameter of the enclosing declaration;
-   2. `none`, if `T` is optional;
-   3. the declaration `(name, T)`;
-   4. a constructor or enum word of `T`.
-
-   Declarations therefore shadow constructors.
-
-   **Optional positions.** A value at an `Option(T)` position is written as a `T`, `some` is never
-   written, and an omitted argument takes its declared default. This is the one implicit wrap the
-   language keeps.
-
-   **Direct sort atoms** are integers; color words; and keyword names at `Ability`, `KeywordLabel`,
-   `KeywordTerm`, `Action` and `Deed`.
-3. **Expansion.**
-   - Templates substitute their parameters.
-   - A Definition wraps every parameter for caller-scope reading, with no opt-out. It wraps its body
-     in its Reference Scope under its Deed.
-   - `.syl` cannot write a scope, a mention, a raw Deed or a keyword wrapper.
-   - Which occurrence of a parameter is its first mention is decided after expansion, in the order
-     the checker reads. Why: the first mention is the one that introduces referents, so it must be
-     the occurrence actually read first. It is never decided by written argument order. For
-     example, a passive `by(np)` reads the patient before `np` (§4.2).
-4. **Read order is printed order.** A declaration's parameters are read in the order its spelling
-   prints them, with no per-declaration exception: where the printed order differs ("When
-   <event>, if <condition>, <action>"), the declaration's parameters are reordered to match. Why:
-   the anaphora rules read what the text says first as first, spelling renders a declaration in its
-   parameter order, and a reference oracle keyed to printed text lines up with the term only if
-   the two orders agree.
-
-## 6. Standing Mechanisms
+## 5. Standing Mechanisms
 
 - `getsPt` carries both printed deltas ("+X/+0"), because spelling must render them back
   ([CR#613.4c]).

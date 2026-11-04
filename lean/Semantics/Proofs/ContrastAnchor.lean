@@ -10,7 +10,7 @@ import Semantics.Proofs.CardsDescription
 /-!
 # Semantics.Proofs.ContrastAnchor
 
-What a bare "another"/"other" contrasts with (`semantics-v3.md` §2.5): a mention of the Source
+What a bare "another"/"other" contrasts with (`semantics.md` §2.5): a mention of the Source
 coordinated with it; else the current member of the distributive group its clause's subject
 names; else the nearest earlier mention in scope; else a particular of the same
 clause read forward; else the Source for an Object or "you" for a Player

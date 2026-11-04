@@ -40,7 +40,7 @@ pub struct Grammar {
     pub slot_equations: BTreeMap<SlotKind, Vec<Equation>>,
     /// `(Category, feature, value)`: a dependent of that Category carrying
     /// that value attaches high by its Attachment Class, as a comma-set
-    /// Supplement does (`docs/decisions/english-v4.md` §4.3): it counts its
+    /// Supplement does (`docs/decisions/english.md` §4.3): it counts its
     /// distance from its host's head reversed.
     #[serde(default)]
     pub high_attachment: Vec<(Ident, Ident, Ident)>,

@@ -73,7 +73,7 @@ leave your graveyard" trigger would fire once for the card and twice for the enc
   - Re-encode *Call Damage Control* and *Wild Shape*.
   - Add *Outlaws' Merriment* and *Genku, Future Shaper*.
 - **ADR and glossary:**
-  - Record the construct in semantics-v3.
+  - Record the construct in `semantics.md`.
   - Amend §1 item 2, "There is no cataphora, apart from the clause-internal Contrast Anchor",
     to name this construct as the second scoped exception.
   - Note in the oracle-english glossary that this Antecedent follows its Anaphor (cataphora), via

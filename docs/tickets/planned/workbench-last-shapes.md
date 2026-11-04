@@ -4,7 +4,7 @@ needs: [lean-v3-proofs-and-cards]
 **[port-required: semantics-v3] Close the five card/semantics shapes the
 residue sweep stopped on.** Residue of `workbench-witness-sweep-residues`
 (2026-09-04); each STOP carries its exact goal in that ticket's landing
-record. Port to `lean/Semantics/` (`semantics-v3`, `docs/decisions/semantics-v3.md`):
+record. Port to `lean/Semantics/` (`semantics-v3`, `docs/decisions/semantics.md`):
 
 - **Alaundo the Seer.** The granted ability's "it" has no antecedent inside
   the grant; decide whether a granted ability's subject is published to

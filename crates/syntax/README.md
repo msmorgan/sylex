@@ -1,7 +1,7 @@
 # sylex_syntax
 
 The unversioned, data-driven syntax engine of English v4
-([`docs/decisions/english-v4.md`](../../docs/decisions/english-v4.md),
+([`docs/decisions/english.md`](../../docs/decisions/english.md),
 [`docs/decisions/english-lexical-analysis.md`](../../docs/decisions/english-lexical-analysis.md)).
 It has no proc macros and no generated code: a grammar is data.
 
@@ -20,7 +20,7 @@ It has no proc macros and no generated code: a grammar is data.
    Category's features, its Gap, and the engine-derived facts a parent may check.
 4. `Parse::best_readings(k) -> impl Iterator<Item = Reading> + '_` yields
    up to `k` Readings by Ranking Key
-   (`RankingKey`, `docs/decisions/english-v4.md` §4.3): Attachment Class,
+   (`RankingKey`, `docs/decisions/english.md` §4.3): Attachment Class,
    then Right Association words, then summed Production Cost, compared in that
    order, with the Reading's own order as the final tie-break, so the best
    Reading is unique. Enumeration uses Huang & Chiang (2005),
@@ -374,7 +374,7 @@ adjunct whose object a relative clause binds).
 ## The lexicon-to-syntax interface
 
 The engine never names a grammar feature, value or Category
-(`docs/decisions/english-v4.md` §4.4, principle 6), with one exception: the lexicon
+(`docs/decisions/english.md` §4.4, principle 6), with one exception: the lexicon
 feature-bundle mapping table, the single declared interface through which
 lexical facts reach the grammar's features. It is `PROJECTED` in
 `compile.rs` (the grammar features the engine projects onto leaves: `Number`,
@@ -398,7 +398,7 @@ Gap kinds and its reserved child names are not grammar names.
 environment's declared properties, including Catalog entries. Empty and
 singleton classes are reported. The grammar never enumerates their members.
 Binding reports features the same way (`english-lexical-analysis.md` §3,
-`english-v4.md` §4.4, principle 3): a feature with no value, and a value with fewer than
+`english.md` §4.4, principle 3): a feature with no value, and a value with fewer than
 two holders. A feature may declare one, privative, value, which is reported
 only by its holders. A value's holders are the lexemes that carry it and those
 that hold it through a Production setting it on its mother: the lexemes its

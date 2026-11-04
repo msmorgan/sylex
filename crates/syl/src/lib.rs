@@ -1,6 +1,6 @@
 //! Parses `.syl` source files to a purely syntactic tree.
 //!
-//! The `.syl` language is described in `docs/decisions/semantics-v3.md` §5.1.
+//! The `.syl` language is described in `docs/decisions/syl.md` §2.
 //! This crate only reads its syntax: it does not resolve names, expand
 //! templates, check sorts or treat any declaration kind specially. A
 //! [`File`] is a sequence of [`Declaration`]s and [`Comment`]s; every node

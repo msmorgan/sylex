@@ -100,7 +100,7 @@
         "PronounKind": ["Personal", "Existential", "Relative"],
         // `FreeChoice` has one holder, *any*, and that is the whole class, as
         // `Serial` is *time*. Determined and DeterminedModifiedQuantity
-        // exclude it, two admission gates (`docs/decisions/english-v4.md`
+        // exclude it, two admission gates (`docs/decisions/english.md`
         // §4.5): Determined's routes *any* to FreeChoiceDetermined,
         // TransparentQuantity and TemporalQuantity, which carry number
         // transparency (CGEL, Ch. 5 §3.3, pp. 349–351: never *any number of
@@ -116,7 +116,7 @@
         // with *further* or *additional*, read by DeterminedModifiedQuantity.
         // The two also part in temporal location: *another day*, never *a
         // day* (Ch. 8 §6.3, p. 698), an admission gate on TemporalLocation
-        // (`docs/decisions/english-v4.md` §4.5).
+        // (`docs/decisions/english.md` §4.5).
         // `Targeting` has one holder, the Targeting Marker *target* (project
         // term, `docs/contexts/oracle-english/CONTEXT.md`): a determinative
         // that only determines a nominal, so it is kept apart from
@@ -226,7 +226,7 @@
         "AdjunctGapClause": (category: Some("Clause"), features: ["VerbForm"], gap: true),
         // A finite clause that opens with its Subject, as a bare relative's
         // does: no preposed adjunct comes before it (CGEL, Ch. 12 §3.5.5,
-        // p. 1055). An admission gate (ADR english-v4.md §4.5): "Bare
+        // p. 1055). An admission gate (ADR english.md §4.5): "Bare
         // relatives always have the subject in initial position", so the
         // Category restates the Clause Productions that open with the Subject
         // and omits those that front an adjunct.
@@ -287,7 +287,7 @@
         "QuantifiedNominal": (category: Some("Nominal"), features: ["QuantityNumber", "NounKind", "Determination", "NounDistribution"]),
         "ModifiedQuantifiedNominal": (category: Some("Nominal"), features: ["QuantityNumber", "NounKind", "Determination", "NounDistribution"]),
         // A temporal nominal bounded by a relative clause (*next time you cast a
-        // spell*). An admission gate (`docs/decisions/english-v4.md` §4.5),
+        // spell*). An admission gate (`docs/decisions/english.md` §4.5),
         // a formation rule: a Noun Phrase is a temporal Adjunct only
         // in restricted forms (CGEL, Ch. 8 §6.3, p. 698), and a temporal
         // nominal in one takes a *when*-less adverbial relative clause, then at
@@ -320,7 +320,7 @@
         "TargetedNounPhrase": (category: Some("NounPhrase"), features: ["Number", "NounKind", "Countability"]),
         "BareNominalComplement": (category: Some("Nominal")),
         // A genitive's possessor: a Noun Phrase that ends in its head. An
-        // admission gate (`docs/decisions/english-v4.md` §4.5), a
+        // admission gate (`docs/decisions/english.md` §4.5), a
         // register formation rule: English has the phrasal genitive (*the King
         // of England's daughter*; CGEL, Ch. 5 §16.6, p. 479), but Oracle never
         // postmodifies a possessor, and fronts the player noun instead "to
@@ -446,7 +446,7 @@
         "PostmodifierCoordination": (category: Some("Postmodifier"), function: true, features: ["ComplementKind"]),
         "Attribute": (category: Some("Attributes"), function: true, features: ["ComplementKind", "Polarity"]),
         // An asyndetic chain of premodifiers. An admission gate
-        // (`docs/decisions/english-v4.md` §4.5), a register formation
+        // (`docs/decisions/english.md` §4.5), a register formation
         // rule: Oracle sets off with commas only independent *non-*
         // premodifiers of one head (`docs/oracle-style-guide.md` §6,
         // Determiners and modifier order), so the chain never holds an
@@ -698,7 +698,7 @@
     },
     // A distributive adjunct, whose Complement has a Distributive
     // determinative (*for each …*), anchors to the outermost eligible clause,
-    // as a comma-set Supplement does (`docs/decisions/english-v4.md` §4.3,
+    // as a comma-set Supplement does (`docs/decisions/english.md` §4.3,
     // AttachmentClass).
     high_attachment: [("PrepositionPhrase", "DeterminativeDistribution", "Distributive")],
     productions: [
@@ -1377,7 +1377,7 @@
         // [CR#603.1,603.7]) or a relative clause's (*For each creature that
         // entered this turn, ...*), ranks first there: the second of two
         // preposed dependents violates an Attachment Class
-        // (`docs/decisions/english-v4.md` §4.3).
+        // (`docs/decisions/english.md` §4.3).
         (name: "PreposedPrepositionAndTemporal", lhs: "Clause", rhs: [Hosted("adjunct", "PrepositionPhrase", Predicate), Cat("adjunct", "TemporalNounPhrase"), Punct(','), Cat("head", "Clause")], equations: [Require("adjunct.ComplementKind", "NP"), Require("$.FrontPosition", "Occupied")], transparent: ["head"], cost: 2),
         // Two preposed Preposition Phrases set off by one comma, a delayed
         // trigger's timing and its duration (*At the beginning of each of
@@ -1389,7 +1389,7 @@
         // belong inside the first ranks first there, as in the fixed phrase
         // *at the beginning of combat on your turn* (oracle-style-guide §11,
         // Turn-structure names): the second of two preposed dependents
-        // violates an Attachment Class (`docs/decisions/english-v4.md` §4.3).
+        // violates an Attachment Class (`docs/decisions/english.md` §4.3).
         (name: "PreposedPrepositionPair", lhs: "Clause", rhs: [Hosted("adjunct", "PrepositionPhrase", Predicate), Hosted("adjunct", "PrepositionPhrase", Predicate), Punct(','), Cat("head", "Clause")], equations: [Require("adjunct.ComplementKind", "NP"), Require("$.FrontPosition", "Occupied")], transparent: ["head"], cost: 2),
         // *the first time each turn*: a temporal Noun Phrase modifies a
         // temporal nominal.
@@ -2299,7 +2299,7 @@
         // fused-head quantity or a symbol after *by* is also an extent, which
         // *reduce* and *increase* select (*reduced by {2}*, *increased by
         // two*; Ch. 8 §5.2, p. 692): both Readings are well-formed, and
-        // semantics rejects the agent one by type (`docs/decisions/english-v4.md`
+        // semantics rejects the agent one by type (`docs/decisions/english.md`
         // §4.4, principle 1). A *by* gerund is a means Adjunct (p. 1428).
         // Voice is a verb's: another head's phrase takes its Voice from the
         // head (a declared Adjectival Passive). A passive is headed by a past
@@ -2355,7 +2355,7 @@
         // A complement costs nothing. A Preposition Phrase Adjunct costs the
         // same whether it postmodifies a Nominal or modifies a Predicate: the
         // Ranking Key's Right Association, not a Production Cost, prefers one
-        // host to another (`docs/decisions/english-v4.md` §4.3).
+        // host to another (`docs/decisions/english.md` §4.3).
         Adjunct(host: "QuantifiedNominal", adjunct: "PrepositionPhrase", side: After, host_kind: Nominal, cost: 1),
         Adjunct(host: "LocativeHead", adjunct: "PrepositionPhrase", side: After, host_kind: Nominal, cost: 1),
         Adjunct(host: "PartitiveHead", adjunct: "PrepositionPhrase", side: After, host_kind: Nominal, cost: 1),
@@ -2400,7 +2400,7 @@
         // instruction. A Supplement anchors to a Clause or line (Oracle
         // English glossary, "Host Category"), never to a Keyword Phrase in a
         // sentence, which takes only its catalog-declared parameters
-        // (english-v4.md §4.2).
+        // (english.md §4.2).
         Adjunct(host: "KeywordLineItem", adjunct: "PrepositionPhrase", side: After, host_kind: Supplement, delimiter: Some(','), cost: 2),
         Adjunct(host: "IndexedNominal", adjunct: "PrepositionPhrase", side: After, host_kind: Supplement, delimiter: Some(','), cost: 2),
         // A preposed gerund-participial adjunct (*Starting with you, ...*).
@@ -2516,7 +2516,7 @@
         // rule [1]), and a number fills no Noun Phrase Complement slot, so
         // never *is dealt [3] or [more damage]*. Numbers alone are an Amount
         // coordination (*2 or 3*). An admission gate
-        // (`docs/decisions/english-v4.md` §4.5).
+        // (`docs/decisions/english.md` §4.5).
         Coordination(category: "NounPhrase", coordinators: "Alternative", unshared: ["DeterminativeDistribution", "FirstConjunctNumber"], resolve: [("Determination", "Bare")], equations: [ExcludeTogether([("first.Determination", "Overt"), ("last.Determination", "Bare"), ("last.Countability", "Mass")]), Exclude("first.NounKind", "Numeric"), Exclude("first.NounKind", "Quantity"), Exclude("last.NounKind", "Quantity")], proximate: ["Number", "Person", "Case", "NounKind", "Countability", "NounDistribution"]),
         Coordination(category: "Nominal", coordinators: "And", unshared: ["ObliqueNumber", "ObliqueNounKind", "ConjunctNumber", "CompoundPart"], equations: [Exclude("first.CompoundPart", "Base"), Require("$.Number", "Plural"), Agree("$.ConjunctNumber", "first.Number")], proximate: ["NounDistribution"]),
         Coordination(category: "Nominal", coordinators: "Disjunctive", unshared: ["ObliqueNumber", "ObliqueNounKind", "ConjunctNumber", "CompoundPart"], equations: [Exclude("first.CompoundPart", "Base"), Agree("$.ConjunctNumber", "$.Number")], proximate: ["NounDistribution"]),

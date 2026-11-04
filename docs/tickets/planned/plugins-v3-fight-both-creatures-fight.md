@@ -11,7 +11,7 @@ equal to its power to the other creature" [CR#701.14a], and "If one or both crea
 to fight are no longer on the battlefield or are no longer creatures, neither of them fights"
 [CR#701.14b]. `plugins/builtin/definitions/keyword_action/fight.syl` declares
 `permanent = performs`, so the `fight` Deed names one performer, the actor; the creature it
-fights only receives the Deed's stamp as a patient of the body (`semantics-v3.md`, "The header's
+fights only receives the Deed's stamp as a patient of the body (`semantics.md`, "The header's
 deed is the action's one deed"). A trigger or lookback on the fighting creature ("whenever this
 creature fights", "if it fought") then sees only the actor's side. Not probed in Lean's event
 matching; confirm before changing.

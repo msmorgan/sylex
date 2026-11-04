@@ -13,7 +13,7 @@ coordinated trigger subjects), `Replacement` (`StepPhase.preEvent`), deontic sta
 
 1. **Events and trigger headers (`Events.lean`, `HeaderContext.lean`, `[CR#603.1,603.2]`)**:
    - Enforce the closed set of event-capable `Action` heads under `GameEvent::Does`, `Would`, and
-     `Did` (`docs/decisions/semantics-v3.md` §4.6), publishing event subject, actor, cause, and
+     `Did` (`docs/decisions/semantics.md` §4.6), publishing event subject, actor, cause, and
      event magnitude outcomes (`lifeGained`, `damageDealt`, `cardsDrawn`, etc.) into the
      trigger/lookback `DRS`.
    - Implement `commonHeaderContext` for disjunctive trigger headers (`GameEvent::Or`:
@@ -35,7 +35,7 @@ coordinated trigger subjects), `Replacement` (`StepPhase.preEvent`), deontic sta
 
 3. **Deontics, modal boxes, and duration retention (`[CR#101.2,601.2,611.2]`)**:
    - Enforce the closed set of deontic-capable `Action` heads under `StaticSpec::Cant`, `Can`,
-     `Must`, and `GatedBy` (`docs/decisions/semantics-v3.md` §4.7).
+     `Must`, and `GatedBy` (`docs/decisions/semantics.md` §4.7).
    - Implement `closeModalBox` on deontic and conditional scopes so referents introduced inside a
      prohibition or modal possibility do not leak as guaranteed discourse referents to subsequent
      indicative sentences (except where explicitly published by a conjunction rule such as

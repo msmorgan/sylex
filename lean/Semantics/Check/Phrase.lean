@@ -14,7 +14,7 @@ import Semantics.Check.Refusal
 /-!
 # Semantics.Check.Phrase
 
-Minimal core DRT and action-clause checker (`docs/decisions/semantics-v3.md` §2.1–§2.4, §4.2–§4.8).
+Minimal core DRT and action-clause checker (`docs/decisions/semantics.md` §2.1–§2.4, §4.2–§4.8).
 -/
 
 namespace Semantics
@@ -22,7 +22,7 @@ namespace Semantics
 def refuse (ok : Bool) (r : Refusal) : List Refusal := if ok then [] else [r]
 
 
-/-- Stepping phase (`semantics-v3.md` §4.5):
+/-- Stepping phase (`semantics.md` §4.5):
 - `preEvent` (`would` [CR#614.1,614.6]): introduces participants in their pre-action zone/status
   and prospective magnitudes (`thatMuch`, `thatMany`), without introducing post-completion product
   referents or clearing `idents`.
@@ -479,7 +479,7 @@ def Reach.isBarePronoun : Reach → Bool
   | _ => false
 
 /-- Clear `r.idents` on departed referents and transition them to `destZone`, stamped with their
-Zone Change and with `deed`, if a deed names the move (`semantics-v3.md` §2.1,
+Zone Change and with `deed`, if a deed names the move (`semantics.md` §2.1,
 `[CR#400.7,400.7j]`). -/
 def applyZoneMove (drs : DRS) (refIds : List ReferentId) (deed : Option Deed)
     (destZone : Option Zone) : DRS :=
@@ -624,7 +624,7 @@ def applyProcedureDeed (drs : DRS) (kind : Procedure) (refIds : List ReferentId)
   | .resolve => drs
 
 
-/-- Voice and `GramRole` assignment (`semantics-v3.md` §4.2):
+/-- Voice and `GramRole` assignment (`semantics.md` §4.2):
 - Active (`.actor np`): primary patient inside `action` gets `.obj`.
 - Passive (`.any`, `.by np`): promotes primary patient inside `action` to `.subj`. -/
 def Subject.patientRole : Subject → GramRole
@@ -739,7 +739,7 @@ def Predicate.demandsCard (p : Predicate) (fuel : Nat := 64) : Bool :=
 termination_by structural fuel
 
 /-- A bare pronoun read in a slot that demands `carrier`, narrowed to it
-(`semantics-v3.md` §2.4 `J1` item 4). -/
+(`semantics.md` §2.4 `J1` item 4). -/
 def NounPhrase.narrowBareTo (carrier : SlotCarrier) (np : NounPhrase) (fuel : Nat := 64) :
     NounPhrase :=
   match fuel, np with
@@ -879,7 +879,7 @@ def mentionYou (drs : DRS) (plur : Plurality) (role : GramRole) (inArgSlot : Boo
 mentions, so a later mention re-mentions the referent the first introduced, as the object it is
 now (but never one a linked ability published, `Referent.linked`), a self-referent
 (`Determiner.self`) no noun word reads ("that creature" never names "this creature"), the Contrast
-Anchor a bare "another"/"other" Object falls back to (`semantics-v3.md` §2.5). -/
+Anchor a bare "another"/"other" Object falls back to (`semantics.md` §2.5). -/
 def mentionThis (drs : DRS) (role : GramRole) (inArgSlot : Bool) :
     DRS × List ReferentId × List Refusal :=
   let errors := refuse (!drs.sourceless) .noSource
@@ -931,7 +931,7 @@ def performerOutOfView (drs : DRS) (selves : List ReferentId) : DRS :=
   selves.foldl (fun d id => d.updateById id fun r => { r with det := .self }) drs
 
 /-- The particulars a clause's rest introduces, in textual order: stepped ahead of the clause's
-agent for its bare "another"/"other" (Contrast Anchor step 3, `semantics-v3.md` §2.5). A
+agent for its bare "another"/"other" (Contrast Anchor step 3, `semantics.md` §2.5). A
 particular is a target, a definite description, or an attachment host ("equipped creature");
 a generic indefinite ("a permanent or player", "each creature") is none. An anaphor resolves to
 an earlier referent and introduces none, so the described thing's anaphors ("enters with … on
@@ -1043,7 +1043,7 @@ def stepTimingWith (ops : StepOps) (drs : DRS) (tm : Timing) : DRS × List Refus
       (d', es ++ e')) (drs, [])
   -- Each alternative is stepped from the enclosing context, as a Condition's are, and only what
   -- every alternative introduces is kept (`commonHeaderContext`): one alternative's participant
-  -- is no antecedent of the text after them (`semantics-v3.md` §2.2).
+  -- is no antecedent of the text after them (`semantics.md` §2.2).
   | _ + 1, .or ts =>
     let (branches, errors) := ts.foldl (fun (branches, es) t =>
       let (d', e') := ops.timing drs t
@@ -1095,7 +1095,7 @@ def stepLocationWith (ops : StepOps) (drs : DRS) (z : Location) :
       refuse made.pileMention .pileMention)
   | _ + 1, .anyLocation => (drs, [])
   -- A negated location ("from anywhere other than your graveyard") introduces nothing the text
-  -- after it reads, as a negated Timing or Condition does (`semantics-v3.md` §2.2, box 3).
+  -- after it reads, as a negated Timing or Condition does (`semantics.md` §2.2, box 3).
   | _ + 1, .not loc =>
     let (_, errs) := ops.location drs loc
     (drs, errs)
@@ -1396,7 +1396,7 @@ def Location.readsDepartedPermanent (from_ : Location) (at_ : ObservationPoint)
 /-- Whether a lookback's subject is the patient of a move that reads the permanent it was
 ("that creature dies this way" [CR#700.4]), the move's origin, where it writes none, being
 `recorded` (`Location.readsDepartedPermanent`): its subject is then read as the `.move` arm reads
-a written patient, against the departed participants (`semantics-v3.md`, the historical read). -/
+a written patient, against the departed participants (`semantics.md`, the historical read). -/
 def Action.subjectReadsDepartedPermanent (action : Action) (recorded : Option Zone := none) :
     Bool :=
   match action.scopeBody with
@@ -1449,7 +1449,7 @@ def Action.targetsHead (action : Action) : Bool :=
   | _ => false
 
 /-- The action-clause spine every clause that embeds an `action` under a `Subject` shares
-(`semantics-v3.md` §4.1): `does`, `would`, `did`, and the deontic rules `cant`, `can`/`must`,
+(`semantics.md` §4.1): `does`, `would`, `did`, and the deontic rules `cant`, `can`/`must`,
 `gatedBy` and `asThough`. In order: the head gate `gate`; the subject before the action
 (`stepEventSubjectWith`), and the performer it hands the action to, at the kind the action needs
 (`clauseActorRefusals`); the action in `phase`, as a pattern, in the context `enter` makes of the
@@ -1661,7 +1661,7 @@ def stepNounAlternativesWith (ops : StepOps) (drs : DRS) (role : GramRole)
   -- Each alternative is stepped from the enclosing context, and only what every alternative
   -- introduces is kept (`commonHeaderContext`): one alternative's participant is no antecedent of
   -- the text after it, so after "deals damage to you or a white creature you control", "that
-  -- creature" reads the source (*Mangara's Equity*, `semantics-v3.md` §2.1, §2.4). An
+  -- creature" reads the source (*Mangara's Equity*, `semantics.md` §2.1, §2.4). An
   -- alternative that reads an earlier mention reads it as any mention does.
   let common := (commonHeaderContext drs (branches.map (·.1))).referents.filter (·.id ≥ drs.nextId)
   let kept := fun (id : ReferentId) => id < drs.nextId || common.any (·.id == id)
@@ -1877,7 +1877,7 @@ def NounPhrase.namesAttachmentsOf (subject host : NounPhrase) (fuel : Nat := 64)
   | _, _ => false
 termination_by structural fuel
 
-/-- Close a deontic's modal box (`semantics-v3.md` §2.2, box 3), a prohibition's, a
+/-- Close a deontic's modal box (`semantics.md` §2.2, box 3), a prohibition's, a
 requirement's, a permission's or a payment-gated prohibition's: what its clause names stands for
 the text after it, a target, a definite mention, an attachment host, the Source or "you", and a
 universal domain ("Creatures your opponents control can be the targets … Ward abilities of those
@@ -2112,7 +2112,7 @@ termination_by structural fuel
 
 /-- The distributive group a clause's subject names, when it steps to one referent: "each …",
 "all …", a bare plural or another plural group. A bare "another"/"other" in the rest of the
-clause contrasts with its current member (Contrast Anchor step 1, `semantics-v3.md` §2.5). -/
+clause contrasts with its current member (Contrast Anchor step 1, `semantics.md` §2.5). -/
 def NounPhrase.distributiveGroup? (subject : NounPhrase) (ids : List ReferentId) :
     Option ReferentId :=
   if subject.det == some .each || subject.plur == .many then
@@ -2403,7 +2403,7 @@ def stepReplacementWith (ops : StepOps) (drs : DRS) (r : Replacement) (replacesE
     let drs1 := markReplacementDomain drs drs1
     let (drs2, e2) := ops.replacement (nextClause drs1) body replacesEntering
     -- An existential's domain is read in the replacement and closed after it, as `doIf` closes
-    -- it (`semantics-v3.md` §2.2, box 2).
+    -- it (`semantics.md` §2.2, box 2).
     ({ drs2 with referents := drs2.referents.filter fun ref =>
         !ref.existentialDomain || drs.referents.any (·.id == ref.id) }, e1 ++ e2)
 
@@ -3139,7 +3139,7 @@ def stepOps : Nat → StepOps
             let drs2 := { drs2 with participialAnchorRead := drs.participialAnchorRead }
             let (word, zones) := Predicate.participialHead pred.conjuncts plur.isNone
             -- A description whose predicate the caller supplies reads back in the caller's
-            -- visibility, as the predicate is read (`semantics-v3.md` §2.3).
+            -- visibility, as the predicate is read (`semantics.md` §2.3).
             let readFrom := match pred with
               | .inCaller _ => enterCaller drs
               | _ => drs
@@ -4327,7 +4327,7 @@ def stepOps : Nat → StepOps
               selectionEvidence := evidence
               -- The body and its arms wrote their events whether or not the player chooses to
               -- act, so a later "this way" reads them back; "if you do" reads the choice, not an
-              -- event (`semantics-v3.md` §4.8).
+              -- event (`semantics.md` §4.8).
               causedEvents := newlyCaused drs drs2 ++ newlyCaused drs drs3 ++
                 drs.causedEvents }, e1 ++ e2 ++ e3 ++ policyErrors)
         | .limited inst limit =>
@@ -4386,7 +4386,7 @@ def stepOps : Nat → StepOps
           match elseInst with
           | none =>
             -- An existential's domain ("if you control a creature") is read in the branch and
-            -- closed after it (`semantics-v3.md` §2.2, box 2).
+            -- closed after it (`semantics.md` §2.2, box 2).
             ({ drs2 with referents := drs2.referents.filter fun ref =>
                 !ref.existentialDomain || drs.referents.any (·.id == ref.id) }, e1 ++ e2)
           | some el =>
@@ -4404,7 +4404,7 @@ def stepOps : Nat → StepOps
                 referents := amounts ++ conditionReferents
                 nextId := max drs1.nextId drs2.nextId }) el
             -- Either branch's events are read back by a later "this way". What the branches
-            -- leave the text after the `doIf` (`semantics-v3.md` §2.2, box 2) are the referents
+            -- leave the text after the `doIf` (`semantics.md` §2.2, box 2) are the referents
             -- in scope before it and the targets the then-branch announced, as either branch
             -- left them, the then-branch's version first: one a branch moved is read under the
             -- id the move gave it [CR#400.7], and under its earlier id too where the other branch
@@ -4666,7 +4666,7 @@ def stepOps : Nat → StepOps
             refuse (mods.rider.isNone || s matches .can ..) .deonticRider
           -- The text writes the act it permits or requires, so a later "this way" reads it back
           -- ("You may cast spells from the top of your library. If you cast a spell this way,
-          -- …"); whether anyone takes it is the engine's (`semantics-v3.md` §4.8). A
+          -- …"); whether anyone takes it is the engine's (`semantics.md` §4.8). A
           -- prohibition writes none. Its performer is the one the subject handed the act to,
           -- still in view after the act.
           let permitting (d : DRS) : DRS × List Refusal :=
@@ -4998,7 +4998,7 @@ def GameEvent.check (drs : DRS) (ev : GameEvent) : List Refusal :=
 def GameEvent.checkAll (drs : DRS) (evs : List GameEvent) : List Refusal :=
   (stepGameEventList 64 drs evs).2
 
-/-! ## Event-derived `DRS` extension (`docs/decisions/semantics-v3.md` §4.5) -/
+/-! ## Event-derived `DRS` extension (`docs/decisions/semantics.md` §4.5) -/
 
 def DidClause.extend (drs : DRS) (c : DidClause) : DRS :=
   (stepDidClause 64 drs c).1

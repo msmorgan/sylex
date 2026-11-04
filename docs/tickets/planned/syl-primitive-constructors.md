@@ -7,7 +7,7 @@ Standard constraints apply. Step 0 of the semantics-v3 rewrite: `.syl` carries n
 naming. Today a primitive either takes its constructor's Lean name (`primitive activated(…):
 Ability` is `Ability.activated`) or names it with a leading dot (`primitive abilities(keyword:
 KeywordTerm): AbilityLost = .term`), and a bare word anywhere may resolve straight to a constructor
-or closed enum word of the expected sort (`docs/decisions/semantics-v3.md` §5.2 item 2, step 4;
+or closed enum word of the expected sort (`docs/decisions/syl.md` §3, step 4;
 `stat(power)` reaches `Stat.power` with no declaration). The AST's constructor names therefore live
 in Lean, and cards, templates and Definitions use them.
 
@@ -39,8 +39,8 @@ what the Lake generator emits.
   trailing underscore and no leading dot remains in `.syl`.
 - `sylex_syl` parses and formats the constructor clause, and enforces the capitalization rule
   (or `semantics` does, at load; say which).
-- Update §5.1 and §5.2 of `docs/decisions/semantics-v3.md`: the primitive rule, the dispatch
-  steps (step 4 goes), and the direct-sort-atoms paragraph (it goes; "optional positions" stays the
+- Update §1–§3 of `docs/decisions/syl.md`: the primitive rule (§1), the dispatch
+  steps (§3; step 4 goes), and the direct-sort-atoms paragraph (§3) (it goes; "optional positions" stays the
   one implicit wrap).
 
 - **No implicit conversions, with one exception.** A value stands only at its own sort; every wrap

@@ -12,7 +12,7 @@
 card: Agency Outfitter
 oracle: your graveyard, hand and/or library
 corrected: your graveyard, hand, and/or library
-evidence: The printed card (MKM 0038, Scryfall image 8112f133-535e-4264-8357-9cbf97957710) reads "graveyard, hand, and/or library", with the serial comma (`docs/decisions/english-v4.md` §3, item 3). Template siblings with that text in Oracle: Boonweaver Giant, Dark Supplicant, Mishra, Artificer Prodigy and Say Its Name. MTGJSON's `originalText` for MKM lacks the comma, against the image; it is not evidence.
+evidence: The printed card (MKM 0038, Scryfall image 8112f133-535e-4264-8357-9cbf97957710) reads "graveyard, hand, and/or library", with the serial comma (`docs/decisions/english.md` §3, item 3). Template siblings with that text in Oracle: Boonweaver Giant, Dark Supplicant, Mishra, Artificer Prodigy and Say Its Name. MTGJSON's `originalText` for MKM lacks the comma, against the image; it is not evidence.
 
 card: Mathise, Surge Channeler
 oracle: 1-9 |

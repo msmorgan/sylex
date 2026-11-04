@@ -1,7 +1,7 @@
 # sylex_vocabulary
 
 The core English lexicon and the Catalogs of English v4
-([`docs/decisions/english-v4.md`](../../docs/decisions/english-v4.md) §§2, 5),
+([`docs/decisions/english.md`](../../docs/decisions/english.md) §§2, 5),
 loaded as one Lexical Environment: a `sylex_lexicon::Lexicon` and the
 `sylex_syntax::FrameCatalog` of its Subcategorization Frames.
 

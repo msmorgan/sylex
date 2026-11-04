@@ -25,16 +25,20 @@ requires explicit review rather than an opportunistic refactor.
 - [English grammar: lexical analysis, Readings, and how the grammar is kept small](english-lexical-analysis.md)
   — Engine contract, round-trip laws, Reading normal forms, and how words reach
   the grammar.
-- [English v4](english-v4.md) — The governing record for
+- [English](english.md) — The governing record for
   `sylex_syntax`, `deckmaste_english_v4`, and
   `deckmaste_lexical_source_v4`: data-driven schema/production engine,
   frame-driven complementation, CR-catalog separation, stratified buildout, and
   two-stage cutover.
-- [Semantics v3](semantics-v3.md) — The design authority for semantics: DRT
+- [Semantics](semantics.md) — The design authority for semantics: DRT
   reference resolution (the DRS, boxes, `J1`, `J2`, `D′`, `AC>R1`, Contrast
   Anchors), the Definition/Template split, the action-clause spine (`instruct`,
   `does`, `would`/`instead`, `cant`/`must`/`can`/`gatedBy`, `did`/`tally`, `by`,
-  `any`, `which`), and the `.syl` data language under `plugins/`.
+  `any`, `which`), and the standing mechanisms.
+- [The `.syl` data language](syl.md) — How the vocabulary and cards under
+  `plugins/` are written: primitives, Templates and Definitions as a language
+  design, first-order files and syntax, name resolution by expected sort,
+  expansion, and read order.
 - [Card authoring binds no implicits](card-authoring-binds-no-implicits.md) —
   Card authoring binds no implicit parameters; core constructors take every
   field required. Superseded for the Lean workbench (2026-10-21): Templates may

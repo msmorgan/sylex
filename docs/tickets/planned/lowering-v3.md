@@ -3,7 +3,7 @@ needs: [semantics-rust-rewrite]
 ---
 **Implement the `deckmaste_lowering_v3` crate from `semantics-rust-rewrite`: resolved semantics to
 `core` (updated 2026-10-14 per
-[`docs/decisions/semantics-v3.md`](../../decisions/semantics-v3.md)).**
+[`docs/decisions/semantics.md`](../../decisions/semantics.md)).**
 Sibling of `sylex_lowering_v1`; v1 lowering deletes at cutover. Same contract
 as `architecture.md` (lowering, the divergence trajectory) and [`core.md`](../../decisions/core.md):
 one-way compile, the crate is the divergence ledger, and rearrangement,
@@ -39,7 +39,7 @@ hoisting, and register indexing happen here. May fail on a card that breaks a
 3. **Unified Action-Clause Spine (`does`, `would`, `did`, `cant`/`must`/`may`/`gatedBy`) to `core::EventFilter`, `core::Replacement`, `core::Lookback`, and `core::Deontic`:**
    - Compiles `GameEvent.does(subj, action)` (over the closed set of
      event-capable `Instruction` heads enforced by `discourse`,
-     `semantics-v3.md` §4.6) to `core::EventFilter`, routing `Subject.actor np`,
+     `semantics.md` §4.6) to `core::EventFilter`, routing `Subject.actor np`,
      `Subject.any`, and `Subject.by np` into the event filter's actor/source/cause
      fields and the `Instruction`'s patient/destination fields into the event
      filter's subject/zone fields (`ObservationPoint.arrival` vs `.departure`
@@ -49,7 +49,7 @@ hoisting, and register indexing happen here. May fail on a card that breaks a
      `Predicate.did` with `NounPhrase.which`, `Amount.tally`) to `core::Lookback`,
      and `StaticSpec.cant` / `must` / `may` / `gatedBy` (over the closed set of
      deontic-capable `Instruction` heads enforced by `discourse`,
-     `semantics-v3.md` §4.7) to `core::Deontic` (`core::DeonticAction`).
+     `semantics.md` §4.7) to `core::Deontic` (`core::DeonticAction`).
 4. **Action Costs (`Cost.perform(action)`) across `cost : effect`:**
    - Compiles `Cost.perform(action)` to `core::CostComponent` /
      `RunnableCostAction` (`[CR#602.2b,118.1]`), threading cost-bound `DefId`s

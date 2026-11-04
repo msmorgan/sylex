@@ -258,7 +258,7 @@ theorem okAnyOtherTarget :
   decide
 
 /-- "This deals 1 damage to any other target." With no earlier target, "other" contrasts with
-the Source (`semantics-v3.md` §2.5, [CR#707.11]). -/
+the Source (`semantics.md` §2.5, [CR#707.11]). -/
 theorem okOtherAnchorsOnTheSource :
     let action := Action.instruct .this (.dealDamage 1 (target isAnyOtherTarget))
     Action.check (DRS.ofList []) action = [] ∧

@@ -1,23 +1,20 @@
-# ADR: English v4 — Data-Driven Syntax Engine, Domain Catalogs, and Stratified Buildout
+# ADR: English — Data-Driven Syntax Engine, Domain Catalogs, and Stratified Buildout
 
 > 2026-10-26: `deckmaste_english_v4` and `deckmaste_lexical_source_v4` are now `sylex_english` and `sylex_vocabulary`; the census command is `cargo xtask english`.
 
-- **Status:** Accepted (2026-10-14)
 - **Companion Contract:** [`docs/decisions/english-lexical-analysis.md`](./english-lexical-analysis.md)
-- **Supersedes (archived in `docs/archive/decisions/`):**
-  - `docs/archive/decisions/builtin-v2-macro-spelling-and-grammar.md`
 
 ---
 
 ## 1. Charter, Crate Split, and Separation of Concerns
 
-`english-v4` is a clean-sheet rebuild of the English parser and realizer across three focused crates, built atop `sylex_lexicon` under the engine and Reading contract in [`docs/decisions/english-lexical-analysis.md`](./english-lexical-analysis.md):
+This design is a clean-sheet rebuild of the English parser and realizer across three focused crates, built atop `sylex_lexicon` under the engine and Reading contract in [`docs/decisions/english-lexical-analysis.md`](./english-lexical-analysis.md):
 
 1. **`sylex_syntax` (Unversioned Syntax Engine Crate):**
    - Replaces the former proc-macro codegen pair (`deckmaste_construction_v3` + `deckmaste_construction_v3_core`). Because `sylex_syntax` is a new crate name, it requires no `_v4` suffix.
    - Loads a declarative grammar data file of **Schemas** and **Productions** at runtime (eliminating proc-macro Rust codegen and multi-hundred-variant `enum Reading` recompilations).
    - Compiles lexical subcategorization frames into derived valence productions (Active, Passive, Slash/Gap across all verb forms, and Right-Node Raising) and runs the table-driven Earley chart, packed parse forest, Reading normal-form / decomposition checks, and bidirectional surface realization.
-   - Note on terminology: **Construction** is reserved for the Construction Grammar (CxG) **spelling** layer that pairs syntactic form with `semantics_v3` meaning. Purely syntactic grammar declarations use **Schema** (a high-level template that expands into productions) and **Production** (an individual grammar rule).
+   - Note on terminology: **Construction** is reserved for the Construction Grammar (CxG) **spelling** layer that pairs syntactic form with `.syl` meaning ([`semantics.md`](./semantics.md)). Purely syntactic grammar declarations use **Schema** (a high-level template that expands into productions) and **Production** (an individual grammar rule).
 2. **`deckmaste_lexical_source_v4` (Core Lexicon & Catalogs Crate):**
    - Owns clean RON core English vocabulary and MTG catalogs, each with its subcategorization frames, reading only `data/gen/catalogs/card-names.txt` from `data/` and decoupling completely from `plugins_v2/builtin`.
 3. **`deckmaste_english_v4` (Oracle English Grammar & Corpus Crate):**
@@ -179,7 +176,7 @@ To unblock the retirement of `plugins_v2/builtin` and avoid `deckmaste_lexical_s
 - **Full Morphological Paradigms (Attestation Is Provenance, Never a Filter):**
   - Every declared verb and noun receives its full grammatical inflectional paradigm (present 3sg, preterite, gerund-participle, past participle, plain; singular, plural) unless the word is genuinely defective in English. Absence of an inflected form in the current printed card corpus is never grounds to mark an inflection `Unavailable`.
 - **Future `plugins/` Migration:**
-  - Once `english_v4` and `semantics-v1-cutover` are complete, the `catalogs/*.ron` declarations move 1-to-1 into the metadata of the corresponding `plugins/` (`v3`) DSL declarations.
+  - Once this buildout and `semantics-v1-cutover` are complete, the `catalogs/*.ron` declarations move 1-to-1 into the metadata of the corresponding `plugins/` `.syl` declarations.
 
 ---
 

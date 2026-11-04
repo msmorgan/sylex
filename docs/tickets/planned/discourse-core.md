@@ -7,7 +7,7 @@ Standard constraints apply. Core DRT ticket of `semantics-rust-rewrite`: create
 `crates/deckmaste_discourse` depending on `deckmaste_semantics_v3`, and implement the DRT reference
 state (`DRS`, `Referent`, `ReferentId`, `GramRole`, `OwnScopeFrame`), read-order stepping, caller
 parameter binding, core noun-phrase and pronoun/demonstrative/reflexive/contrast-anchor resolution
-(`docs/decisions/semantics-v3.md` §2 and §4), and the top-level `Card` / `CardFace` / `Ability` /
+(`docs/decisions/semantics.md` §2 and §4), and the top-level `Card` / `CardFace` / `Ability` /
 `Cost` entry points so corpus cards run from the first `discourse-*` ticket.
 
 ## Scope & Design Decisions

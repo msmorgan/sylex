@@ -1,5 +1,5 @@
 //! The Syntactic Skeleton profiler: assigns each Corpus Unit its Complexity
-//! Stratum (`docs/decisions/english-v4.md` §6.1).
+//! Stratum (`docs/decisions/english.md` §6.1).
 //!
 //! A unit is read as a sequence of lexical tokens, each the longest declared
 //! analysis at its position. Its Syntactic Skeleton replaces every open-class

@@ -20,7 +20,7 @@ the trailing-underscore names) and an AST that records no written order. `idris/
   every CR citation audited. The generator `semantics-rust-crate` describes runs only while
   `lean/` exists. `cr-coverage.lock` is not lowered: every rule cited only in `.lean` files must be
   cited again where it now lives.
-- Update `CLAUDE.md` (crate fates, Bearings, Tests for a landing), `docs/decisions/semantics-v3.md`
-  and the memory index entries that name Lean as current.
+- Update `CLAUDE.md` (crate fates, Bearings, Tests for a landing), `docs/decisions/semantics.md`,
+  `docs/decisions/syl.md` and the memory index entries that name Lean as current.
 - The `lean-v3-*` and `plugins-v3-*` tickets that need this one are then done in `.syl` and Rust
   only.

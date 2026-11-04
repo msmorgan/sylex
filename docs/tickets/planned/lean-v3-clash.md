@@ -21,7 +21,7 @@ optional bottom: it has no opponent and no winner [CR#701.30b..701.30d]
   and that opponent each clash," plus the win/lose outcome read back with `did … thisWay`
   [CR#701.30d].
 - The simultaneous reveal, the APNAP decisions and the simultaneous move [CR#701.30c] are the
-  engine's procedure (owner update 2026-10-25; `docs/decisions/semantics-v3.md` §1 item 4:
+  engine's procedure (owner update 2026-10-25; `docs/decisions/semantics.md` §1 item 4:
   timing and order are the engine's). The body does not encode them.
 - "Whenever you clash" triggers for each clashing player, so each player's clash is a clash
   event carrying the `clash` deed.

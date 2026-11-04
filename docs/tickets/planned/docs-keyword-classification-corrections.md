@@ -11,7 +11,7 @@ Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-docs.md`
 entries 16, 17 (the ADR part) and 47 (gitignored; read it from the default
 checkout). All are confirmed at head as of 2026-10-21.
 
-## `docs/decisions/semantics-v3.md` §3.1, "Keyword Actions and Deeds"
+## `docs/decisions/semantics.md` §3.1, "Keyword Actions and Deeds"
 
 - Five cites are off by one, because behold is [CR#701.4]. Correct them:
   `cast` [CR#701.5], `counter` [CR#701.6], `create` [CR#701.7],
@@ -29,7 +29,7 @@ checkout). All are confirmed at head as of 2026-10-21.
   CLAUDE.md (planeswalk, set in motion, abandon) and those of the deferred
   Un-sets.
 
-## `docs/decisions/semantics-v3.md` off-stack statics (line 565)
+## `docs/decisions/semantics.md` off-stack statics (line 565)
 
 - This line lists daybound and nightbound under `StaticSpec.whileHolds` state
   statics [CR#702.131b,702.145b,702.195a]. The statics that daybound and
@@ -44,9 +44,9 @@ checkout). All are confirmed at head as of 2026-10-21.
   replace/asEvent/cant here.
 - `docs/archive/decisions/semantics-v2.md` (line 624) makes the same claim.
   That file is archived, so add an erratum note that points to the corrected
-  semantics-v3 text rather than editing the archived ruling.
+  `semantics.md` text rather than editing the archived ruling.
 
-## `docs/decisions/english-v4.md` §2 (line 40)
+## `docs/decisions/english.md` §2 (line 40)
 
 - The keyword-action catalog list includes `firebend`, which is a triggered
   keyword ability [CR#702.189a]. Remove it from the list. (`earthbend`,

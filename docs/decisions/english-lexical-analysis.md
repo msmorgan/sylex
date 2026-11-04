@@ -2,7 +2,7 @@
 
 > 2026-10-26: `deckmaste_english_v4` and `deckmaste_lexical_source_v4` are now `sylex_english` and `sylex_vocabulary`; the census command is `cargo xtask english`.
 
-Updated 2026-10-14 for `sylex_syntax` and `deckmaste_english_v4` (paired with [`docs/decisions/english-v4.md`](./english-v4.md)). It has no amendment log: when a rule changes, this text changes. The syntax layer (`sylex_syntax` and `deckmaste_english_v4`) has no dependency on Game Model semantics; downstream CxG spelling and `deckmaste_semantics_v3` consume its packed parse forest.
+Updated 2026-10-14 for `sylex_syntax` and `deckmaste_english_v4` (paired with [`docs/decisions/english.md`](./english.md)). It has no amendment log: when a rule changes, this text changes. The syntax layer (`sylex_syntax` and `deckmaste_english_v4`) has no dependency on Game Model semantics; downstream CxG spelling and `deckmaste_semantics_v3` consume its packed parse forest.
 
 ## 1. The engine contract
 
@@ -64,7 +64,7 @@ in scope on that face (OSG §5, "do not invent a shortening that could denote
 something else"). A face's Shortened Name is in scope only on that face's own
 text [CR#201.5c,712.8d..712.8f]; full names are in scope everywhere. Where a face's
 own name and another card's full name are spelled alike, both are Readings, and
-the face's own name ranks first ([`english-v4.md`](./english-v4.md) §4.3). The
+the face's own name ranks first ([`english.md`](./english.md) §4.3). The
 census enumerates, validates, counts and digests per unit below the face, and a
 face's reported count is a sum over its units.
 
@@ -74,7 +74,7 @@ A Reading is one whole tree enumerated from the packed forest. Two Readings are
 the same only if they are the same tree.
 
 Multiple Readings are successful parsing. The Ranking Key
-([`english-v4.md`](./english-v4.md) §4.3) may rank Readings for presentation;
+([`english.md`](./english.md) §4.3) may rank Readings for presentation;
 it never decides admission and never removes one.
 
 **The grammar avoids producing distinct trees for the same grammatical analysis
@@ -282,7 +282,7 @@ Settled analyses:
 Readings; wrong Readings beside a correct one are tolerated, because not every
 one can be eliminated in syntax alone. A face whose Readings are all known to
 be wrong is not covered, and is reported separately from read and unread. A
-newly admitted ungrammatical Reading is a defect, never a gain; a grammatical Reading that English admits beside the intended one is disambiguated by semantics ([`english-v4.md`](./english-v4.md) §4.4, principle 1). A known-wrong
+newly admitted ungrammatical Reading is a defect, never a gain; a grammatical Reading that English admits beside the intended one is disambiguated by semantics ([`english.md`](./english.md) §4.4, principle 1). A known-wrong
 analysis is never accepted as coverage.
 
 **Morphological and valence completeness vs. controlled-register syntax.** Every
@@ -337,14 +337,14 @@ dozens of lines is a defect in the schema/compilation layer, to be fixed there.
 
 ## 5. The gate
 
-- Completing Complexity Stratum $k$ (`0..=7` in [`docs/decisions/english-v4.md`](./english-v4.md))
+- Completing Complexity Stratum $k$ (`0..=7` in [`docs/decisions/english.md`](./english.md))
   requires 100% coverage of all non-deferred corpus units in Strata $0..=k$
   with both round-trip laws holding and zero `known-wrong-only` units counted as
   read.
 - The judgment set is the only tracked linguistic test evidence: hand-written,
   one line per entry, no tree dumps. Nothing a tool emits is tracked.
 - Whether an analysis is right is decided against the controlled Oracle English
-  register (`docs/oracle-style-guide.md` and [`docs/decisions/english-v4.md`](./english-v4.md),
+  register (`docs/oracle-style-guide.md` and [`docs/decisions/english.md`](./english.md),
   using CGEL for standard terminology and constituent structure) by two
   independent judges; the owner sees disagreements.
 

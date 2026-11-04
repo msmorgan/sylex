@@ -3,7 +3,7 @@ needs: [english-v4-cutover-v3, semantics-v1-cutover]
 ---
 # Cutover 2: move MTG catalogs into `plugins/` and delete `sylex_features_v1`
 
-Execute what remains of Cutover 2 of [`docs/decisions/english-v4.md`](../../decisions/english-v4.md)
+Execute what remains of Cutover 2 of [`docs/decisions/english.md`](../../decisions/english.md)
 (§7) once `semantics-v1-cutover` has retired the legacy v1 consumers. (The `.syl` plugins
 already moved from `plugins_v3/` to `plugins/`.) Legacy v1 `deckmaste_english`,
 `deckmaste_construction_compiler` and `deckmaste_constructions_macro` were

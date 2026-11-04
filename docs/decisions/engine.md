@@ -60,7 +60,7 @@ deriving it from current characteristics leaves nothing stale.
 
 ### 5. State-based actions that need a choice are engine code today
 
-The rules rows are data ([Semantics v3](semantics-v3.md) §1, item 4); this is
+The rules rows are data ([Semantics](semantics.md) §1, item 4); this is
 the engine's half. Data rows are evaluated synchronously, one object at a time,
 into game events. The legend rule [CR#704.5j] groups objects across a
 controller and pauses at a Decision Point, so it is engine code. That

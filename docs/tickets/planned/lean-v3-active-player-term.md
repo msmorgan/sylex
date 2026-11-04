@@ -36,4 +36,4 @@ Fix: record how a permanent phased out. The phasing event is one `setStatus .pha
 indirect phase-out writes none of its own, so a lookback can't separate the two. Either give the
 indirect phase-out its own event (the attachment's `setStatus` caused by the host's), so the row
 reads "did not phase out caused by its host's phasing out", or add a status distinction. Choose
-by the CR's structure (ADR `semantics-v3.md` §1 item 5).
+by the CR's structure (ADR `semantics.md` §1 item 5).

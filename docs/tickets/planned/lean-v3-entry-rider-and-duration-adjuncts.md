@@ -30,7 +30,7 @@ An effect's Duration is a field (`establish (spec) (duration : Option Duration)`
 
 - **Adjunct nodes.** Entry Riders (Oracle English: Depictive Adjunct, or a PP Adjunct) and effect
   Durations (Duration Phrase) become nodes in their printed position. They wrap the Action they
-  modify, or the Coordination they scope over. This follows semantics-v3 §1: constructions
+  modify, or the Coordination they scope over. This follows semantics.md §1: constructions
   occupy their surface positions.
   - The same rider nodes serve all four places above. A replaced entering's riders wrap the
     entering the replacement describes, and a pattern's riders wrap the entering it matches. So
@@ -79,7 +79,7 @@ An effect's Duration is a field (`establish (spec) (duration : Option Duration)`
   - Re-encode every card that used `riders` or a `duration` field.
   - Add witnesses for each shape above: Vivid Marsh, Sphere of the Suns, Phoenix Chick,
     Anavolver, and a fronted Duration over a Coordination.
-- **ADR:** update semantics-v3 where `move`, `establish`, `Replacement.withRiders` and Entry
+- **ADR:** update `semantics.md` where `move`, `establish`, `Replacement.withRiders` and Entry
   Riders are described.
 - **Glossary:** amend the game-model entries Entry Rider, Pile Placement and Duration for their new
   attachment, and the Entry Rider scope above, via `domain-modeling`.

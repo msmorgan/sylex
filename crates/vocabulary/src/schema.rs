@@ -486,7 +486,7 @@ pub enum DeterminativeDistribution {
     /// whole class: never a bare quantified plural (*\*a three creatures*),
     /// and never the determiner of a temporal location Noun Phrase (*\*a
     /// day*; Ch. 8 §6.3, p. 698), an admission gate on `TemporalLocation`
-    /// (`docs/decisions/english-v4.md` §4.5).
+    /// (`docs/decisions/english.md` §4.5).
     IndefiniteArticle,
     Distributive,
     /// Deictic *this*, *that*, *last* and *next*, which with a period noun form

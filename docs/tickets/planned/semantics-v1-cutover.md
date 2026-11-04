@@ -2,7 +2,7 @@
 needs: [semantics-v3-parity]
 ---
 **Retire v1 scaffolding (the `.syl` plugins already live in `plugins/`; updated 2026-10-14
-per [`docs/decisions/semantics-v3.md`](../../decisions/semantics-v3.md)).**
+per [`docs/decisions/semantics.md`](../../decisions/semantics.md)).**
 Delete the `v1` set (`sylex_semantics_v1`, `sylex_lowering_v1`,
 `sylex_render_v1`, `sylex_plugin_v1` with `deck.rs` and
 `provenance.rs` rehomed, `v1/plugins/builtin`, and `v1/plugins/canon`; `idris/` is already gone

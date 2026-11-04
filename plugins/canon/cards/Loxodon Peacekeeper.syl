@@ -1,6 +1,6 @@
 # Loxodon Peacekeeper: "If two or more players are tied for lowest life total, you choose one
 # of them, and that player gains control of this creature." "Them" reads the players the counted
-# existential introduces (`semantics-v3.md` §2.2, box 2).
+# existential introduces (`semantics.md` §2.2, box 2).
 card {
   name = "Loxodon Peacekeeper",
   cost = [1, white],

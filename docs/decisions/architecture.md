@@ -34,13 +34,13 @@ English and Oracle's conventions, not Magic: it parses "exile target creature"
 as a verb and its object, and nothing in it knows what exiling does. Its
 round-trip laws carry the system's exact round trip at this layer
 ([English grammar: lexical analysis](english-lexical-analysis.md) §1; the crate
-split and the Catalog constraint are in [English v4](english-v4.md) §1–2).
+split and the Catalog constraint are in [English](english.md) §1–2).
 
 **Spelling** relates Readings to resolved terms. Recovery reads the parse forest
 and assembles the resolved terms whose spellings match it. Spelling a resolved
 term yields a Reading for the English layer to realize. Its data is not kept
 apart: every `.syl` declaration carries its `lexical` and `spelling` fields
-beside its meaning ([Semantics v3](semantics-v3.md) §5.1), so a word's wording
+beside its meaning ([`.syl`](syl.md) §2), so a word's wording
 and its meaning are one fact with one source. Spelling coverage is therefore
 ingestion coverage: a card recovers when every phrase it prints has a spelling.
 
@@ -50,15 +50,15 @@ rules such as damage to a player causing that much life loss) live in
 `plugins/builtin/`, and cards live in `plugins/canon/`. A Template is printed wording over other
 declarations and adds no meaning; a Definition is vocabulary the rules define,
 such as a keyword action or ability, checked on its own
-([Semantics v3](semantics-v3.md) §3). There are two levels. The **resolved term**
+([Semantics](semantics.md) §3). There are two levels. The **resolved term**
 is a card's `.syl` with each name resolved by expected sort; it keeps its
 Template and Definition calls, follows the card's English phrase by phrase, and
 is what is stored, recovered and rendered. **Expanding** those calls yields the
 **expanded tree** of primitives. The discourse reading reads the expanded tree
 in printed order against a Discourse Representation Structure, which resolves
 every reference and checks that the card is a faithful reading of its text
-([Semantics v3](semantics-v3.md), from the overview through §5). `sylex_syl`
-parses `.syl`.
+([Semantics](semantics.md), from the overview through §4, and
+[`.syl`](syl.md)). `sylex_syl` parses `.syl`.
 
 **Lowering** compiles a checked expanded tree, every reference in it resolved,
 into core, in one direction only.
@@ -131,7 +131,7 @@ linked, in the manner of a synchronous tree-substitution grammar (STSG). A
 derivation builds both sides at once, so the same grammar recovers a resolved term from a
 Reading and spells a resolved term as English. It is not a bijection: several terms may
 word identically, and one sentence has several grammatical Readings, which the
-parser keeps rather than choosing ([English v4](english-v4.md) §4.4). Meaning
+parser keeps rather than choosing ([English](english.md) §4.4). Meaning
 resolves the ambiguity, never rank or rule order: recovery expands each
 candidate and reads its discourse, and a candidate the checker or discourse
 refuses drops out. The goal is exactly one surviving candidate per card; a card
@@ -171,7 +171,7 @@ beside the term.
    is stored but not derivable from the text drifts, and nothing can check it.
 3. **Sugar never replaces structure.** A Template is printed wording only. It
    expands into the expressions its parts would be written as and adds no
-   meaning ([Semantics v3](semantics-v3.md) §3). Its expansion carries the
+   meaning ([Semantics](semantics.md) §3). Its expansion carries the
    complete rules meaning, so a card's expanded tree means the same whichever
    Templates spell it. Why: a convenience that carried meaning of its own would be a
    second, hidden semantics.
@@ -179,7 +179,7 @@ beside the term.
    composes with an open class gets one mechanism; only a closed idiom gets a
    word. One Action per verb serves every clause context, whether instruction,
    trigger, replacement, prohibition or lookback
-   ([Semantics v3](semantics-v3.md) §4.1). The English grammar derives a verb's
+   ([Semantics](semantics.md) §4.1). The English grammar derives a verb's
    passive and gapped forms from its one Subcategorization Frame. "Dies" is a
    Template over the one zone-change Action [CR#700.4]. Why: a word for every
    combination multiplies as verbs times contexts, and the copies drift apart.
@@ -198,7 +198,7 @@ beside the term.
    a card that misreads its text) are made in recovery and authoring, over a
    corpus that keeps bringing unanticipated input. So every card is checked, at
    the semantic level, against its text
-   ([Semantics v3](semantics-v3.md) §1, item 3). Lowering is a closed,
+   ([Semantics](semantics.md) §1, item 3). Lowering is a closed,
    mechanical mapping written once, and it gets tests over its finite set of
    shapes. Core is generated and carries no proofs: an error in it is a
    lowering bug, caught by lowering's tests and the engine's.
@@ -210,11 +210,11 @@ directions. Each form spends its explicitness on what its consumer needs.
 
 - **Semantics drifts toward English constructions.** A card's resolved term
   follows its English phrase by phrase, and nothing is hoisted
-  ([Semantics v3](semantics-v3.md) §1, item 1). What English leaves implicit,
+  ([Semantics](semantics.md) §1, item 1). What English leaves implicit,
   such as bracketing and attachment, is made explicit. Reference stays
   anaphoric, because English is anaphoric and spelling needs the anaphors: "it"
   and "that creature" are written as such and resolved by the discourse reading
-  ([Semantics v3](semantics-v3.md) §2). The drift lands in the data
+  ([Semantics](semantics.md) §2). The drift lands in the data
   (Templates, Definitions and spellings) while the primitives stay generic.
 - **Core drifts toward evaluation shape.** Reference becomes explicit. Every
   binding is a declared parameter or a numbered definition and every read is a

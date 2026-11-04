@@ -35,7 +35,7 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 - `crates/`: the current crates. `v1/`: the old line, deleted once the new one reaches parity;
   never extend it or copy newer work into it.
 - `lean/`: the Lean prototype that runs the `.syl` corpus in `plugins/`; it is due for deletion.
-- `docs/decisions/`: ADRs; `semantics-v3.md` is the semantics design.
+- `docs/decisions/`: ADRs; `semantics.md` is the semantics design and `syl.md` the `.syl` language.
 
 ## Writing
 

@@ -50,7 +50,7 @@ private theorem additionalCostPublishesTheActualGroupIdentity :
         [.groupSizeInScope 0] := by decide
 
 /-- The group an additional cost puts from a hand into a library is published like any other: a
-hidden destination is the engine's concern, not the text's (`semantics-v3.md` §1 item 4). -/
+hidden destination is the engine's concern, not the text's (`semantics.md` §1 item 4). -/
 private theorem additionalCostPublishesAGroupPutIntoALibrary :
     Ability.checkText (DRS.ofList [])
       [additionalHiddenGroup, .spell none (.draw (.exactlyOf .groupSize))] = [] := by decide

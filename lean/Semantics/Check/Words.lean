@@ -4,7 +4,7 @@ import Semantics.Check.Trace
 /-!
 # Semantics.Check.Words
 
-The checker's vocabulary and Discourse Representation Theory (`DRS`) layer (`semantics-v3.md`
+The checker's vocabulary and Discourse Representation Theory (`DRS`) layer (`semantics.md`
 §2.1–§2.4). Holds the structured `DRS` state (`ReferentId`, `GramRole`, `Payload`, `Referent`,
 `OwnScopeFrame`, `DRS`), the two-stage anaphor resolver (`J1` accessibility, `J2` clause-mate
 exclusion, `D′` bare pronoun resolution, `AC>R1` demonstrative resolution, Principle A
@@ -124,7 +124,7 @@ structure ZoneChange where
   deriving DecidableEq, Repr, BEq
 
 /-- Provenance: the deeds that acted on a referent since it last changed zones, latest first
-(`.actedOn deed`, `semantics-v3.md` §2.1, §2.4), each standing whatever deed follows it, so
+(`.actedOn deed`, `semantics.md` §2.1, §2.4), each standing whatever deed follows it, so
 "Exile target creature. Reveal it. Return the exiled card …" reads the revealed card as exiled,
 and a keyword ability's verb done by doing another deed stands beside that deed: devouring is
 sacrificing [CR#702.82b]; whether it was on the battlefield when they began; the Zone Change that
@@ -176,7 +176,7 @@ class an event naming neither (dealing damage, gaining life); the kind of its Ac
 the kind of what it moved or acted on, if it names one; and whether a permission, not an
 instruction, wrote it ("You may cast spells from the top of your library. If you cast a spell
 this way, …"). It is recorded whether or not the event will happen: a declined optional action,
-an untaken branch, or a permission no one uses still wrote it (`semantics-v3.md` §4.8). -/
+an untaken branch, or a permission no one uses still wrote it (`semantics.md` §4.8). -/
 structure CausedEvent where
   deed : Option Deed
   zoneChange : Option ZoneChange
@@ -209,7 +209,7 @@ def pileMentionFace : List PileFace → Option PileFace
 /-- Stable monotonic identifier assigned to each discourse referent on introduction. -/
 abbrev ReferentId := Nat
 
-/-- Grammatical role of a referent at its latest mention or introduction (`semantics-v3.md` §2.1). -/
+/-- Grammatical role of a referent at its latest mention or introduction (`semantics.md` §2.1). -/
 inductive GramRole where
   | subj
   | obj
@@ -238,7 +238,7 @@ structure ActorShape where
   deriving DecidableEq, Repr
 
 
-/-- Domain-sort and characteristic facts of a discourse referent (`semantics-v3.md` §2.1).
+/-- Domain-sort and characteristic facts of a discourse referent (`semantics.md` §2.1).
 `parameterFrame`, `scopeFrame`, `hidden`, `masked`, and `amount` are gone. -/
 inductive Payload where
   | object (ty : List CardType) (zone : Option Zone) (prov : Option Stamp) (orig : Option Origin)
@@ -333,7 +333,7 @@ def groupOf : List Payload → Option Payload
 
 end Payload
 
-/-- A discourse referent in a `DRS` (`semantics-v3.md` §2.1). -/
+/-- A discourse referent in a `DRS` (`semantics.md` §2.1). -/
 structure Referent where
   det             : Determiner
   plur            : Plurality
@@ -391,7 +391,7 @@ structure Referent where
   hypothetical, never a Contrast Anchor. -/
   fromCondition : Bool := false
   /-- Introduced as the subject of an existential ("if there is a …", "if two or more creatures
-  are tied …"): read back in the consequent and closed after it (`semantics-v3.md` §2.2, box 2). -/
+  are tied …"): read back in the consequent and closed after it (`semantics.md` §2.2, box 2). -/
   existentialDomain : Bool := false
   /-- An existential's domain a replacement's condition published ("If there is …, instead put
   two of them …"): the replacement does what the replaced action would have done, to what that
@@ -448,7 +448,7 @@ structure GrantorLinked where
   before : List Referent
   deriving DecidableEq, Repr
 
-/-- Explicit Reference Scope frame for `Action.ownScope` (`semantics-v3.md` §2.1, §2.3). -/
+/-- Explicit Reference Scope frame for `Action.ownScope` (`semantics.md` §2.1, §2.3). -/
 structure OwnScopeFrame where
   preEntryIds   : List ReferentId
   maskedIds     : List ReferentId
@@ -467,7 +467,7 @@ structure OwnScopeFrame where
   deed : Option Deed := none
   deriving DecidableEq, Repr
 
-/-- What a bare "another"/"other" contrasts with, as the checker resolved it (`semantics-v3.md`
+/-- What a bare "another"/"other" contrasts with, as the checker resolved it (`semantics.md`
 §2.5): the current member of the distributive group its clause's subject names, the nearest
 earlier mention in scope, a participant of the same clause read forward, or, failing those, the
 Source for an Object or "you" for a Player ([CR#109.5]). -/
@@ -486,7 +486,7 @@ inductive ContrastAnchor where
   | you
   deriving DecidableEq, Repr
 
-/-- Discourse Representation Structure (`semantics-v3.md` §2.1). -/
+/-- Discourse Representation Structure (`semantics.md` §2.1). -/
 structure DRS where
   referents     : List Referent := []
   nextId        : ReferentId := 0
@@ -719,7 +719,7 @@ def performersInView (performers : List ActorShape) (referents : List Referent) 
   | ids => referents.map fun r =>
     if r.det == .self && ids.contains r.id then { r with det := .the } else r
 
-/-- Advance the clause counter (`semantics-v3.md` §2.1): commits buffered `pendingRoles` updates
+/-- Advance the clause counter (`semantics.md` §2.1): commits buffered `pendingRoles` updates
 (`clause` and `role`) onto `drs.referents`, clears `pendingRoles`, and resets `pronounResolved`. -/
 def nextClause (drs : DRS) : DRS :=
   let updated := (performersInView drs.performers drs.referents).map fun r =>
@@ -738,7 +738,7 @@ pronoun, mark `pronounResolved := true`). A mention in a verb argument slot is b
 `pendingRoles` until `nextClause`. One read for its characteristics outside every argument slot,
 as a possessor ("that creature's owner", "its power"), is foregrounded at once, in the current
 clause as `.other`, as a newly introduced possessor is, so a later bare pronoun of the clause sees
-it (`D′`), though `J2` counts it no clause-mate (`semantics-v3.md` §2.1, §2.4): *Weeping Angel*'s
+it (`D′`), though `J2` counts it no clause-mate (`semantics.md` §2.1, §2.4): *Weeping Angel*'s
 "that creature's owner shuffles it into their library". -/
 def DRS.recordMention (drs : DRS) (id : ReferentId) (role : GramRole := .other)
     (inArgSlot : Bool := false) (isBarePronoun : Bool := false) : DRS :=
@@ -1062,7 +1062,7 @@ def Referent.recentOver (a b : Referent) : Bool :=
   a.clause > b.clause || (a.clause == b.clause && a.id > b.id)
 
 /-- Resolve the Contrast Anchor of a bare "another"/"other" of kind `k` whose Head Noun names
-`headTypes` in `headZone` (`semantics-v3.md` §2.5). A mention of the Source coordinated with the
+`headTypes` in `headZone` (`semantics.md` §2.5). A mention of the Source coordinated with the
 phrase is its anchor ("this card and up to one other target creature card"). Otherwise: (1) the
 current member of the compatible distributive group the clause's subject names
 (`distributiveSubject`): the affected set is fixed as the effect begins ([CR#611.2c]), but the
@@ -1289,7 +1289,7 @@ def survivesShuffle (b : Referent) : Bool :=
   | .object _ (some .library) none _ _ => false
   | _ => true
 
-/-- Stage 1 (`J1`): sort, plurality, and zone/carrier reach (`semantics-v3.md` §2.4). -/
+/-- Stage 1 (`J1`): sort, plurality, and zone/carrier reach (`semantics.md` §2.4). -/
 def reaches (r : Reach) (pl : Plurality) (b : Referent) : Bool :=
   match r with
   | .bare => Kind.lte .object b.kind && pl.isOne == b.plur.isOne
@@ -1314,7 +1314,7 @@ def DRS.isClauseMate (drs : DRS) (id : ReferentId) : Bool :=
 
 /-- `D′`'s clause for `ref`: the current clause when `ref` is re-mentioned in a direct argument
 slot of it (buffered in `pendingRoles`), otherwise the clause it was introduced or last
-foregrounded in (`semantics-v3.md` §2.4, owner ruling 2026-10-21). -/
+foregrounded in (`semantics.md` §2.4, owner ruling 2026-10-21). -/
 def DRS.rankingClause (drs : DRS) (ref : Referent) : Nat :=
   if drs.isClauseMate ref.id then drs.currentClause else ref.clause
 
@@ -1325,7 +1325,7 @@ def DRS.rankingRole (drs : DRS) (ref : Referent) : Nat :=
   | [] => ref.role.rank
   | slots => slots.foldl (fun acc (_, role) => Nat.min acc role.rank) 2
 
-/-- Two-stage anaphor candidate resolution (`semantics-v3.md` §2.4):
+/-- Two-stage anaphor candidate resolution (`semantics.md` §2.4):
 - Bare pronouns (`.bare`, `.atSlot _`) use `D′`: filter by `J1` and exclude `J2` clause-mates
   (when `inArgSlot`), then select the nearest clause (highest `rankingClause`) and highest
   grammatical role (`rankingRole`, `subj < obj < other`); a unique winner resolves, while `0` or
@@ -1498,7 +1498,7 @@ def tyOfReach (r : Reach) (pl : Plurality) (drs : DRS) : List CardType :=
 def faceOfReach (r : Reach) (pl : Plurality) (drs : DRS) : Option PileFace :=
   firstReach r pl drs >>= (·.face)
 
-/-- Principle A reflexive resolution (`NounPhrase.refl plur`, `semantics-v3.md` §2.4):
+/-- Principle A reflexive resolution (`NounPhrase.refl plur`, `semantics.md` §2.4):
 requires an accessible clause-mate subject referent agreeing with `plur`. -/
 def resolveReflexive (pl : Plurality) (drs : DRS) : List Referent :=
   drs.visibleReferents.filter fun b =>
@@ -1547,7 +1547,7 @@ def leaveMeasure (before after : DRS) : DRS :=
     r.det == .target && r.id ≥ before.nextId
   { closed with referents := targets ++ closed.referents }
 
-/-- Open a keyword action body's own Reference Scope (`Action.ownScope`, `semantics-v3.md` §2.3):
+/-- Open a keyword action body's own Reference Scope (`Action.ownScope`, `semantics.md` §2.3):
 pushes an `OwnScopeFrame` masking all pre-entry referents except the active performer. -/
 def enterOwnScope (drs : DRS) (deed : Option Deed := none) : DRS :=
   let preIds := drs.referents.map (·.id)
@@ -1579,7 +1579,7 @@ def DRS.scopeDeed (drs : DRS) : Option Deed :=
   drs.scopeStack.head?.bind (·.deed)
 
 /-- Temporarily pop the top `OwnScopeFrame` to evaluate an `inCaller` argument in the immediate
-caller's visibility (`semantics-v3.md` §2.3). -/
+caller's visibility (`semantics.md` §2.3). -/
 def enterCaller (drs : DRS) : DRS :=
   match drs.scopeStack with
   | [] => drs
@@ -1593,7 +1593,7 @@ def enterCaller (drs : DRS) : DRS :=
         sourceTypes   := topFrame.callerSourceTypes }
 
 /-- Restore the top `OwnScopeFrame` after evaluating an `inCaller` argument, unmasking any
-referents bound or introduced by that argument (`semantics-v3.md` §2.3). -/
+referents bound or introduced by that argument (`semantics.md` §2.3). -/
 def leaveCaller (before after : DRS) (unmaskIds : List ReferentId := []) : DRS :=
   match before.scopeStack with
   | [] => after
@@ -1624,7 +1624,7 @@ def leaveCaller (before after : DRS) (unmaskIds : List ReferentId := []) : DRS :
         resolvedIds   := (after.resolvedIds ++ before.resolvedIds).eraseDups
         sourceTypes   := before.sourceTypes }
 
-/-- Close an own Reference Scope (`Action.ownScope`, `semantics-v3.md` §2.3): pops `topFrame`,
+/-- Close an own Reference Scope (`Action.ownScope`, `semantics.md` §2.3): pops `topFrame`,
 drops definition-internal scratch referents (`.part` and `.player _`), and stamps surviving
 referents introduced during `topFrame` with `clause := topFrame.callerClause` and `role := .obj`.
 A mention in the body never changes a role the caller can see: the caller's pending roles are
@@ -1657,7 +1657,7 @@ def leaveOwnScope (drs : DRS) : DRS :=
 
 /-! ## Binding Identity (`firstMention` / `laterMention`) -/
 
-/-- The most recent visible referent recorded under `id`, if any (`semantics-v3.md` §2.3). -/
+/-- The most recent visible referent recorded under `id`, if any (`semantics.md` §2.3). -/
 def identityBinding (id : BindingId) (drs : DRS) : Option Referent :=
   drs.visibleReferents.find? fun b => b.idents.contains id
 

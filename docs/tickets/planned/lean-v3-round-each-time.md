@@ -46,7 +46,7 @@ only way out would be single-purpose Templates like `basePtHalfRoundedUpOf`.
     `plugins-v3-spelling-conventions`.
 - **Canon:** re-encode *Saw in Half*. Add *Pox* or *Fraying Omnipotence* as the witness for a
   "then" chain.
-- **ADR:** record the construct in semantics-v3.
+- **ADR:** record the construct in `semantics.md`.
 
 ## Acceptance
 

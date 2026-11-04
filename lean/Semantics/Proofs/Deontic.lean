@@ -608,7 +608,7 @@ theorem badAnnouncingAsThoughAmount :
         (greaterBy .power (.statOf (.stat .power) (target isCreature)))) = [.bindingless] := by
   decide
 
-/-! ## Modal boxes close (`semantics-v3.md` §2.2, box 3) -/
+/-! ## Modal boxes close (`semantics.md` §2.2, box 3) -/
 
 private def castFromGraveyard : Action :=
   .procedure .cast (a (.and [isCreature, .in_ (graveyardOf .you)])) .itsOwnCost none

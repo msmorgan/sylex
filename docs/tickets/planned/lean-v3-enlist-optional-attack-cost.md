@@ -12,7 +12,7 @@ where X is the tapped creature's power." [CR#702.154a]. Its static ability is an
 to attack [CR#508.1g,702.154b], and its triggered ability is linked to it [CR#607.2h]. `enlist`
 (`plugins/builtin/definitions/keyword_ability/enlist.syl`) is bodiless.
 
-Decided (from ADR `semantics-v3.md` §1 items 4 and 5): extend the cost-to-attack form,
+Decided (from ADR `semantics.md` §1 items 4 and 5): extend the cost-to-attack form,
 `StaticSpec.gatedBy`, with an `offered` flag. An offered gate is a cost the player may pay as
 the creature attacks, not a prohibition unless paid. Pair it with a linked reflexive trigger,
 "when you do". No `asEvent`, which would make the cost an effect.

@@ -46,7 +46,7 @@ The pipeline it belongs to:
   (`number_slots`, `defines_pt`, `Ability::category`, `keyword_instances`), and `DRS`-free
   card-frame/shape checks. It does no DRT endophor resolution.
 - **`deckmaste_discourse`** (this epic) implements the context-sensitive DRT endophor resolution of
-  `docs/decisions/semantics-v3.md` §2 and §4 in Rust. Lean is never in the hot path of card
+  `docs/decisions/semantics.md` §2 and §4 in Rust. Lean is never in the hot path of card
   compilation, so this is a reimplementation, not a reader of Lean output. The deleted
   `deckmaste_lowering_v3` had part of it; recover what is useful from jj history.
 - **`deckmaste_lowering_v3`** (`lowering-v3`) translates the `deckmaste_semantics_v3` AST and

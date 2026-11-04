@@ -640,7 +640,7 @@ private def countersOnTheExiledCard : Action :=
 
 /-- "{T}: Exile a card from your hand and put four time counters on it. Then remove a time
 counter from each other card you own in exile." The bare "other" is anchored on the card this
-same ability exiled and granted to, its nearest earlier mention (`semantics-v3.md` §2.5). -/
+same ability exiled and granted to, its nearest earlier mention (`semantics.md` §2.5). -/
 theorem okOtherAnchorsOnTheCardThisAbilityExiled :
     let afterCost := (stepCost 64 (DRS.ofList []) exileCost).1
     let after := (stepAction 64 .postEvent .obj (nextClause afterCost)
@@ -653,7 +653,7 @@ theorem okOtherAnchorsOnTheCardThisAbilityExiled :
   decide
 
 /-- The same last sentence with a bare "other": with nothing mentioned earlier, it contrasts with
-the Source (`semantics-v3.md` §2.5). -/
+the Source (`semantics.md` §2.5). -/
 theorem okBareOtherAnchorsOnTheSource :
     let effect := Action.removeCounters (some (exactly 1)) (some (.printed (.named "timeCounter")))
       (each (.and [.other, .hasPossessor .owner .you, .in_ exileZone]))

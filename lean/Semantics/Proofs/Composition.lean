@@ -93,7 +93,7 @@ theorem okThreeDamageRecipientAlternatives :
     Action.check (DRS.ofList []) (Action.instruct .this (.dealDamage 1 (.or [thisCreature, .you, thisCreature]))) =
       [] := by decide
 
-/-! ## Disjunction and negation scoping (`semantics-v3.md` §2.1, §2.2) -/
+/-! ## Disjunction and negation scoping (`semantics.md` §2.1, §2.2) -/
 
 private def kinds (drs : DRS) : List (ReferentId × Kind) := drs.referents.map (fun r => (r.id, r.kind))
 

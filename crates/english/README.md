@@ -1,7 +1,7 @@
 # sylex_english
 
 Oracle English for English v4
-([`docs/decisions/english-v4.md`](../../docs/decisions/english-v4.md)): the
+([`docs/decisions/english.md`](../../docs/decisions/english.md)): the
 grammar data file [`grammar/english.ron`](grammar/english.ron) and its binding
 into `sylex_syntax`.
 
@@ -34,7 +34,7 @@ paragraph line of its rules text after balanced reminder text is removed
 
 ## Complexity Strata
 
-`profile` assigns each unit its Complexity Stratum (`docs/decisions/english-v4.md`
+`profile` assigns each unit its Complexity Stratum (`docs/decisions/english.md`
 §6.1). A unit is read as its longest lexical analyses; its Syntactic Skeleton
 replaces each open-class catalog item with a placeholder (`<Subtype>`,
 `<KeywordAction>`, ...). Its Syntactic Families are recognized from lexical
@@ -110,12 +110,12 @@ multiply to its count, is not segmentable (its Surplus is `derivations − 1`);
 the summary lists it and `--check` fails on it.
 
 Each unit also reports its `cheapest_tier`: how many of its Derivations share
-the least Ranking Key (`docs/decisions/english-v4.md` §4.3), before the final
+the least Ranking Key (`docs/decisions/english.md` §4.3), before the final
 tie-break, counted on the Packed Forest without building trees. The summary
 gives how many ambiguous units have a cheapest tier of one, the tiers' sum over
 ambiguous units, and the largest tier. Ranking never changes which Readings
 exist: verdicts, Readings and Surplus do not depend on it. These figures are a
-reported statistic, never an acceptance gate (`docs/decisions/english-v4.md`
+reported statistic, never an acceptance gate (`docs/decisions/english.md`
 §4.4, principle 4).
 
 `COMPLETED_STRATUM` is the highest Stratum whose gate is met. A unit at or below

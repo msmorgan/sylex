@@ -12,7 +12,7 @@ and the combat damage step's split into a first-strike step [CR#510.4,702.7b,702
 modifies declaring attackers and who assigns a banded creature's damage
 [CR#702.22c,702.22h,702.22j,702.22k].
 
-Rules are DSL data (`docs/decisions/semantics-v3.md` §1 item 4), so these are rules-table rows,
+Rules are DSL data (`docs/decisions/semantics.md` §1 item 4), so these are rules-table rows,
 not engine procedure and not keyword bodies: each keyword stays bodiless, and its row reads it
 with `hasKeyword`, as toxic's damage-result row reads toxic (`plugins/builtin/rules/conferral/toxicPoison.syl`).
 Compose the rows from existing primitives first (ADR item 5b); a turn-based action is a

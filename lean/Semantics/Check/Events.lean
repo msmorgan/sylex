@@ -6,7 +6,7 @@ import Semantics.Abilities
 # Semantics.Check.Events
 
 Closed event head-gating (`does`, `would`, `did`) and the lookback,
-deed, and play-window rules (`docs/decisions/semantics-v3.md` §4.6–§4.8).
+deed, and play-window rules (`docs/decisions/semantics.md` §4.6–§4.8).
 -/
 
 namespace Semantics
@@ -22,11 +22,11 @@ def Delta.lifeOutcomes : Delta Amount → List OutcomeSort
 /-- Whether the head of `e` passes `admits`, the head read through its caller and scope-only
 wrappers (`Action.scopeBody`). An Action Definition's own Reference Scope header names the one
 deed it performs (`Action.ownDeed?`), and every head gate admits it alike, so an event, a lookback
-and a deontic clause read a Definition's deed the same way (`semantics-v3.md` §3.1). -/
+and a deontic clause read a Definition's deed the same way (`semantics.md` §3.1). -/
 def Action.headGate (admits : Action → Bool) (e : Action) : Bool :=
   e.ownDeed?.isSome || admits e.scopeBody
 
-/-- The event-capable `Action` heads (`semantics-v3.md` §4.6), refusing compound or
+/-- The event-capable `Action` heads (`semantics.md` §4.6), refusing compound or
 control-flow actions (`sequentially`, `doIf`, `doForEach`, `chooseModes`, `establish`, etc.). -/
 def Action.eventHead : Action → Bool
   | .dealDamage .. | .markDamage .. | .clearDamage ..
@@ -43,12 +43,12 @@ def Action.eventHead : Action → Bool
   | .skipUntap .. | .skipPart .. | .addTurnPart .. | .exchange .. => true
   | _ => false
 
-/-- Closed event head-gating (`semantics-v3.md` §4.6): `does`, `would`, and `did` admit an
+/-- Closed event head-gating (`semantics.md` §4.6): `does`, `would`, and `did` admit an
 Action Definition by its header and otherwise only an event-capable head (`Action.eventHead`). -/
 def Action.eventHeadOk (e : Action) : Bool := e.headGate Action.eventHead
 
 /-- Whether an event-capable action carries a quantity or magnitude that `TallyMode.quantity`
-can sum (`semantics-v3.md` §4.8). -/
+can sum (`semantics.md` §4.8). -/
 def Action.eventHasMagnitude (e : Action) (fuel : Nat := 64) : Bool :=
   match fuel, e with
   | 0, _ => false

@@ -14,7 +14,7 @@ use sylex_vocabulary::Sources;
 
 /// Grammatical terms that happen to spell a catalog item, each the standard
 /// name of a grammatical concept rather than a use of the catalog word.
-// Case is the nominative/accusative/genitive distinction in english-v4 §1.
+// Case is the nominative/accusative/genitive distinction in english.md §1.
 // *Free* (free-choice *any*, CGEL, Ch. 5 §7.5, p. 381), *past* (the past
 // participle), *present* (the present tense) and *time* (a relative of time)
 // name grammatical concepts; the catalog words they spell are vote options
