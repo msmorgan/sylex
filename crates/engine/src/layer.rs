@@ -3043,7 +3043,7 @@ mod tests {
         use sylex_plugin_v1::plugin::Plugin;
 
         let plugin = Plugin::load_with_sibling_prelude(
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/wizards"),
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/wizards"),
         )
         .expect("load wizards plugin (builtin prelude)");
         let card = Arc::new(
@@ -3065,7 +3065,7 @@ mod tests {
     }
 
     /// C1 regression: a Changeling permanent must NOT panic in
-    /// `state.layers()`. `plugins/builtin/macros/keyword/Changeling.ron`
+    /// `state.layers()`. `v1/plugins/builtin/macros/keyword/Changeling.ron`
     /// confers `Modify(of: Of(This), changes: [AllCreatureTypes])`; now
     /// that `Of(This)` resolves source-relative in gather (Stage 3), Layer
     /// 4 runs the `AllCreatureTypes` arm. That arm was a `todo!()` (panic)
@@ -3076,7 +3076,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn changeling_layers_does_not_panic() {
         // Avian Changeling: `Keyword(Changeling)` + `Keyword(Flying)`, a
@@ -3110,7 +3110,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn devoid_derives_colorless() {
         // Havoc Sower: a Black creature with `Keyword(Devoid)` — Devoid's CDA

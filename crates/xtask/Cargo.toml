@@ -19,15 +19,15 @@ sylex_syntax = { version = "0.1.0", path = "../syntax" }
 sylex_english = { version = "0.1.0", path = "../english" }
 sylex_vocabulary = { version = "0.1.0", path = "../vocabulary" }
 sylex_lexicon = { version = "0.1.0", path = "../lexicon" }
-sylex_semantics_v1 = { version = "0.1.0", path = "../semantics" }
-sylex_plugin_v1 = { version = "0.1.0", path = "../plugin" }
-sylex_render_v1 = { version = "0.1.0", path = "../render" }
+sylex_semantics_v1 = { version = "0.1.0", path = "../../v1/crates/semantics" }
+sylex_plugin_v1 = { version = "0.1.0", path = "../../v1/crates/plugin" }
+sylex_render_v1 = { version = "0.1.0", path = "../../v1/crates/render" }
 sylex_core = { version = "0.1.0", path = "../core" }
 # Reuse the locked substring scanner for JSONL name candidates.
 memchr = "2.8.2"
 libc = "0.2.186"
-sylex_pipeline_v1 = { version = "0.1.0", path = "../pipeline" }
-macro_ron = { version = "0.1.0", path = "../macro_ron" }
+sylex_pipeline_v1 = { version = "0.1.0", path = "../../v1/crates/pipeline" }
+macro_ron = { version = "0.1.0", path = "../../v1/crates/macro_ron" }
 # `map enums`: parse Rust sources to find `pub enum` shapes; span-locations
 # lets `syn`'s spans report real source line numbers outside a proc-macro.
 proc-macro2 = { version = "1.0.106", features = ["span-locations"] }

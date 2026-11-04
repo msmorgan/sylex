@@ -49,7 +49,7 @@ use sylex_plugin_v1::plugin::Plugin;
 
 fn plugin(name: &str) -> Plugin {
     Plugin::load_with_sibling_prelude(
-        Path::new(env!("CARGO_MANIFEST_DIR")).join(format!("../../plugins/{name}")),
+        Path::new(env!("CARGO_MANIFEST_DIR")).join(format!("../../v1/plugins/{name}")),
     )
     .unwrap()
 }
@@ -99,7 +99,7 @@ fn two_player_decks(p0_card: &str, p1_card: &str, seed: u64, deck_size: usize) -
     // Load builtin rules so data-driven SBAs (lethal-damage destroy, etc.)
     // fire when the engine drives the SBA check during combat.
     let builtin = sylex_plugin_v1::plugin::Plugin::load(
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin"),
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"),
     )
     .unwrap();
     state.sba_rules = builtin.sba_rules;
@@ -1594,7 +1594,7 @@ fn two_player_mixed(p0: Vec<Arc<Card>>, p1: Vec<Arc<Card>>, seed: u64) -> GameSt
         types: std::collections::HashMap::new(),
     });
     let builtin = sylex_plugin_v1::plugin::Plugin::load(
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin"),
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"),
     )
     .unwrap();
     state.sba_rules = builtin.sba_rules;

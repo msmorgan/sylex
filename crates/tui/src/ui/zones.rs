@@ -82,7 +82,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn hand_is_the_perspective_players_hand() {
         let state = opening();
@@ -97,7 +97,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn battlefield_leads_with_the_player_then_controlled_permanents() {
         let state = opening();
@@ -117,7 +117,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn graveyard_is_the_perspective_players_and_exile_is_shared() {
         let state = opening();
@@ -136,7 +136,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn battlefield_sorts_lands_below_nonlands() {
         use sylex_core::Type;
@@ -188,7 +188,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn stack_count_matches_and_is_top_first() {
         let state = opening();

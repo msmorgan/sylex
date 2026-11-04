@@ -21,9 +21,9 @@ thiserror = { workspace = true }
 
 
 [dev-dependencies]
-sylex_semantics_v1 = { version = "0.1.0", path = "../semantics" }
-sylex_lowering_v1 = { version = "0.1.0", path = "../lowering" }
-sylex_plugin_v1 = { version = "0.1.0", path = "../plugin" }
+sylex_semantics_v1 = { version = "0.1.0", path = "../../v1/crates/semantics" }
+sylex_lowering_v1 = { version = "0.1.0", path = "../../v1/crates/lowering" }
+sylex_plugin_v1 = { version = "0.1.0", path = "../../v1/crates/plugin" }
 criterion = "0.8"
 rayon = "1"
 tempfile = "3.27.0"

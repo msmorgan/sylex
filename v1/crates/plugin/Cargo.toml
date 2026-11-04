@@ -1,0 +1,32 @@
+[package]
+publish = false
+name = "sylex_plugin_v1"
+version = "0.1.0"
+edition = "2024"
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { version = "1.0.102" }
+sylex_card = { version = "0.1.0", path = "../../../crates/card" }
+sylex_core = { version = "0.1.0", path = "../../../crates/core" }
+# The semantics rules grammar: the loader parses THIS, and the macro
+# configuration (kinds, param types) is the semantics crate's, not a second
+# copy over core types (docs/decisions/semantics-spelling-lowering.md §1).
+sylex_semantics_v1 = { version = "0.1.0", path = "../semantics" }
+# The one-way compile semantics → engine. The loader owns the erasure point:
+# `lower` is called here and nowhere upstream of here.
+sylex_lowering_v1 = { version = "0.1.0", path = "../lowering" }
+macro_ron = { version = "0.1.0", path = "../macro_ron" }
+regex = "1.12.3"
+ron = "0.12.1"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
+sha2 = "0.11.0"
+thiserror = { workspace = true }
+
+
+[dev-dependencies]
+tempfile = "3.27.0"
+syn = { version = "2.0.117", features = ["full", "visit"] }

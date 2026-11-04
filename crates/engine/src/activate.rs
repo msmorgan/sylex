@@ -910,7 +910,7 @@ mod tests {
         use sylex_lowering_v1::Lower;
 
         let plugin = sylex_plugin_v1::plugin::Plugin::load(
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin"),
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"),
         )
         .unwrap();
         let semantic: sylex_semantics_v1::KeywordAbility = plugin

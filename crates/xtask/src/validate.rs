@@ -9,7 +9,7 @@ use clap::Args;
 
 #[derive(Debug, Args)]
 pub struct ValidateArgs {
-    /// Defaults to this workspace's `plugins/builtin`.
+    /// Defaults to this workspace's `v1/plugins/builtin`.
     plugin_dir: Option<PathBuf>,
 }
 
@@ -23,7 +23,7 @@ pub struct ValidateArgs {
 pub fn run(args: ValidateArgs) -> anyhow::Result<()> {
     let plugin_dir = args
         .plugin_dir
-        .unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin"));
+        .unwrap_or_else(|| Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"));
 
     let validation = sylex_plugin_v1::validate::validate_plugin(&plugin_dir)?;
     for failure in &validation.failures {

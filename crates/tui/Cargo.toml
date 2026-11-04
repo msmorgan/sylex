@@ -13,9 +13,9 @@ workspace = true
 [dependencies]
 sylex_card = { version = "0.1.0", path = "../card" }
 sylex_core = { version = "0.1.0", path = "../core" }
-sylex_semantics_v1 = { version = "0.1.0", path = "../semantics" }
-sylex_plugin_v1 = { version = "0.1.0", path = "../plugin" }
-sylex_render_v1 = { version = "0.1.0", path = "../render" }
+sylex_semantics_v1 = { version = "0.1.0", path = "../../v1/crates/semantics" }
+sylex_plugin_v1 = { version = "0.1.0", path = "../../v1/crates/plugin" }
+sylex_render_v1 = { version = "0.1.0", path = "../../v1/crates/render" }
 sylex_engine = { version = "0.1.0", path = "../engine" }
 anyhow = "1.0.102"
 clap = { version = "4.6.1", features = ["derive"] }

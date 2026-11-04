@@ -272,7 +272,7 @@ mod tests {
     )]
     fn canon() -> Plugin {
         Plugin::load_with_sibling_prelude(
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/canon"),
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
         )
         .unwrap()
     }
@@ -874,7 +874,7 @@ mod tests {
     /// [Task 5]: the committed builtin `rules/grant/planeswalker-loyalty.ron`
     /// ([CR#306.5b]'s intrinsic "enters with loyalty counters equal to its
     /// printed loyalty" rule) applies to a REAL planeswalker loaded through
-    /// the REAL `plugins/builtin` `Plugin`/`GameConfig`/`GameState` path —
+    /// the REAL `v1/plugins/builtin` `Plugin`/`GameConfig`/`GameState` path —
     /// `state.conferral_rules` is never hand-set here, unlike
     /// [`conferred_enters_with_counters_by_type`]'s Task-2 fixture or
     /// [`data_conferred_rule_applies_at_entry_end_to_end`]'s tempdir fixture.
@@ -884,7 +884,7 @@ mod tests {
     #[test]
     fn builtin_planeswalker_loyalty_conferral_applies_at_entry() {
         let builtin =
-            Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin"))
+            Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
                 .unwrap();
         assert!(
             builtin

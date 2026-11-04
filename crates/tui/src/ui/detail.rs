@@ -268,7 +268,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn none_is_placeholder() {
         let d = opening();
@@ -283,7 +283,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn object_detail_names_the_card_and_type_line() {
         let d = opening();
@@ -309,7 +309,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn object_detail_renders_abilities_as_prose_not_debug() {
         let d = opening();
@@ -335,7 +335,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn object_detail_renders_mogg_fanatic() {
         let d = opening();
@@ -370,7 +370,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn object_detail_renders_a_layer_six_grant_as_prose() {
         use sylex_core::Type;
@@ -440,7 +440,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn object_detail_marks_every_provenance_miss() {
         use sylex_plugin_v1::provenance::ProvenanceIndex;

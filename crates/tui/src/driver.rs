@@ -296,7 +296,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn advance_with_no_modes_surfaces_an_interactive_decision() {
         let game = game::build_game().expect("build demo game");
@@ -314,7 +314,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn advance_leaves_land_plays_for_the_human() {
         use sylex_core::Type;
@@ -365,7 +365,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn armed_pass_modes_stay_legal_and_terminate() {
         // Arm "Turn" for whoever holds priority on every priority window, and
@@ -406,7 +406,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn auto_play_produces_only_legal_decisions() {
         use sylex_engine::sim::GreedyDemo;
@@ -425,7 +425,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn autotap_and_cast_floats_mana_and_lands_the_spell() {
         use sylex_engine::PlayerId;
@@ -517,7 +517,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn run_to_decision_stops_on_an_interactive_kind() {
         let game = game::build_game().expect("build demo game");

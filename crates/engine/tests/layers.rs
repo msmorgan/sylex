@@ -1,5 +1,5 @@
 //! The layer system ([CR#613]): derived characteristics. Fixtures are real
-//! cards from `plugins/canon`, plus `plugins/testing` mocks for the two layer
+//! cards from `v1/plugins/canon`, plus `v1/plugins/testing` mocks for the two layer
 //! shapes no real card carries (see that plugin's cards/README.md).
 
 use std::path::Path;
@@ -19,7 +19,7 @@ use sylex_plugin_v1::plugin::Plugin;
 
 fn plugin(name: &str) -> Plugin {
     Plugin::load_with_sibling_prelude(
-        Path::new(env!("CARGO_MANIFEST_DIR")).join(format!("../../plugins/{name}")),
+        Path::new(env!("CARGO_MANIFEST_DIR")).join(format!("../../v1/plugins/{name}")),
     )
     .unwrap()
 }

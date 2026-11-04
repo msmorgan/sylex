@@ -7,7 +7,7 @@ import Semantics.Check.Builtin
 
 The rules-table bench and its pins. Not a port of an Idris family — Idris never modelled the
 tables — so the sentences here are the Comprehensive Rules' own, and the bench items are the
-rows `plugins/builtin/rules` and `plugins/builtin/tokens` actually write.
+rows `v1/plugins/builtin/rules` and `v1/plugins/builtin/tokens` actually write.
 
 Each `ok…` fixes the empty refusal list for a real row; each `bad…` fixes the complete list a
 malformed one earns. `distinctPredefinedTokens` is asserted over the predefined-token catalog.

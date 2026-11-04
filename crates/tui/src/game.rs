@@ -77,19 +77,19 @@ pub fn build_game() -> Result<BuiltGame> {
 /// live play varies); tests use the fixed-seed `build_game`.
 ///
 /// The demo's cards are produced locally (not shipped): `wizards` is the
-/// gitignored generated corpus (`cargo xtask generate plugins/wizards`), so the
+/// gitignored generated corpus (`cargo xtask generate v1/plugins/wizards`), so the
 /// decklists resolve against canon staples (Lightning Bolt, basics) plus the
 /// rest of each card materialized from bulk data.
 ///
 /// # Errors
 /// If a plugin or decklist fails to load, or a listed card can't be resolved.
 pub fn build_game_with_seed(seed: u64) -> Result<BuiltGame> {
-    let canon = Plugin::load_with_sibling_prelude(data("../../plugins/canon"))?;
-    let builtin = Plugin::load(data("../../plugins/builtin"))?;
-    let wizards = Plugin::load_with_prelude(&builtin, data("../../plugins/wizards"))?;
+    let canon = Plugin::load_with_sibling_prelude(data("../../v1/plugins/canon"))?;
+    let builtin = Plugin::load(data("../../v1/plugins/builtin"))?;
+    let wizards = Plugin::load_with_prelude(&builtin, data("../../v1/plugins/wizards"))?;
 
-    let goblins = Deck::load(&data("../../plugins/demo/decks/goblins.txt"))?;
-    let elves = Deck::load(&data("../../plugins/demo/decks/elves.txt"))?;
+    let goblins = Deck::load(&data("../../v1/plugins/demo/decks/goblins.txt"))?;
+    let elves = Deck::load(&data("../../v1/plugins/demo/decks/elves.txt"))?;
 
     let loaded0 = goblins.resolve(&[&canon, &builtin, &wizards])?;
     let loaded1 = elves.resolve(&[&canon, &builtin, &wizards])?;
@@ -209,7 +209,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn builds_two_player_twenty_life_game() {
         let state = build_game().expect("build demo game").state;
@@ -234,7 +234,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn pins_card_ids_to_deck_order() {
         use sylex_engine::CardId;
@@ -275,7 +275,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn opening_hands_are_keepable() {
         use sylex_core::Type;
@@ -303,7 +303,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn game_state_carries_the_type_registry() {
         let state = build_game().expect("build demo game").state;
@@ -326,7 +326,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn demo_auto_plays_to_completion() {
         use sylex_engine::sim::GreedyDemo;

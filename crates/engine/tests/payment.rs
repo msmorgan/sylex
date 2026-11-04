@@ -139,7 +139,7 @@ fn crew_fixture() -> (
     sylex_engine::ObjectId,
     sylex_engine::ObjectId,
 ) {
-    let plugin = Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin"))
+    let plugin = Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
         .expect("the builtin plugin loads");
     let semantic: sylex_semantics_v1::KeywordAbility =
         plugin.macros.read_str("Crew(3)").expect("Crew expands");

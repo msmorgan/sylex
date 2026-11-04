@@ -12,7 +12,7 @@ use crate::graduate::print_report;
 
 #[derive(Debug, Args)]
 pub struct GenerateArgs {
-    /// The plugin directory to (re)generate (e.g. plugins/wizards).
+    /// The plugin directory to (re)generate (e.g. v1/plugins/wizards).
     plugin_dir: PathBuf,
 }
 

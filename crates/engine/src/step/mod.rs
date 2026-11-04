@@ -2838,13 +2838,13 @@ mod tests {
         use crate::step::StepOutcome;
 
         fn builtin() -> Plugin {
-            Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin"))
+            Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
                 .unwrap()
         }
 
         fn canon() -> Plugin {
             Plugin::load_with_sibling_prelude(
-                Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/canon"),
+                Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
             )
             .unwrap()
         }
@@ -2941,7 +2941,7 @@ mod tests {
         use crate::step::StepOutcome;
 
         fn builtin() -> Plugin {
-            Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin"))
+            Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
                 .unwrap()
         }
 

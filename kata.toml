@@ -7,7 +7,7 @@ workspace_dir = ".workspaces"
 
 # Set explicitly rather than relying on the default: a fresh workspace has none
 # of the gitignored fixtures the build needs (data, local docs/ dirs, generated
-# plugins/wizards) until this runs, so an unprovisioned workspace wastes the
+# v1/plugins/wizards) until this runs, so an unprovisioned workspace wastes the
 # work done in it. Naming it also makes a missing or non-executable hook a hard
 # error instead of a silent skip.
 provision_hook = "scripts/provision-workspace"

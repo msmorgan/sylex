@@ -13,7 +13,7 @@ const TOP_MACROS: usize = 25;
 
 #[derive(Debug, Args)]
 pub struct GraduateArgs {
-    /// The plugin directory to graduate (e.g. plugins/wizards).
+    /// The plugin directory to graduate (e.g. v1/plugins/wizards).
     plugin_dir: PathBuf,
 }
 

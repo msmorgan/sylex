@@ -103,7 +103,7 @@ jobs:
           cargo xtask catalogs text
           cargo xtask derive-cards
 
-      # Generate the gitignored `plugins/wizards` corpus from the staged Scryfall
+      # Generate the gitignored `v1/plugins/wizards` corpus from the staged Scryfall
       # Oracle Cards snapshot, so each crate's build.rs sets `wizards_corpus` and the
       # otherwise-`ignored` corpus tests run. `generate` runs subtype stubs +
       # extract/resolve/graduate, all satisfiable from the fetched inputs — the
@@ -112,13 +112,13 @@ jobs:
       # removed, so plain `generate` no longer touches cr.json. Verified: this
       # corpus passes the full workspace suite (every gated test is green).
       - name: generate wizards corpus
-        run: cargo xtask generate plugins/wizards
+        run: cargo xtask generate v1/plugins/wizards
       # Un-freeze the fixture cfgs: the xtasks above already BUILT several
       # workspace crates before every generated path existed, and the build
       # scripts deliberately emit no `rerun-if-changed`. Without this touch an
       # OFF cfg can stay fingerprint-frozen and silently report `ignored`.
       - name: re-run build scripts against the staged fixtures
-        run: touch crates/*/build.rs
+        run: touch crates/*/build.rs v1/crates/*/build.rs
       - name: clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: test

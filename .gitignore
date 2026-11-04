@@ -5,11 +5,11 @@
 /docs/memory
 /docs/evidence
 /docs/cleanup
-/plugins/*/
-!/plugins/builtin/
-!/plugins/canon/
-!/plugins/testing/
-!/plugins/demo/
+/v1/plugins/*/
+!/v1/plugins/builtin/
+!/v1/plugins/canon/
+!/v1/plugins/testing/
+!/v1/plugins/demo/
 !/CLAUDE.md
 # The Claude Code RON-LSP plugin is checked in; re-include it despite the
 # machine-global `.claude/*` ignore. Everything else under .claude/skills/

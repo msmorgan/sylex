@@ -708,7 +708,7 @@ mod tests {
 
     fn canon() -> Plugin {
         Plugin::load_with_sibling_prelude(
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/canon"),
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
         )
         .unwrap()
     }

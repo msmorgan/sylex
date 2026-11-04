@@ -5,7 +5,7 @@ or return
 
 argparse m/minimal c/cr -- $argv; or return
 
-# --minimal: download only what `cargo xtask generate plugins/wizards` and the
+# --minimal: download only what `cargo xtask generate v1/plugins/wizards` and the
 # English catalog loader need.
 # Without the flag: also download the reference files used by local audits.
 # --cr: include the plain-text Comprehensive Rules with a minimal download.

@@ -13,7 +13,7 @@
 //! `KeywordAbility`-kind plugin macro invoked INSIDE the wrapper — cards
 //! always read `Keyword(Flying)` — expanding to
 //! [`Composite`](KeywordAbility::Composite); see
-//! `plugins/builtin/macros/keyword/`: flying carries its real evasion
+//! `v1/plugins/builtin/macros/keyword/`: flying carries its real evasion
 //! `Cant` ([CR#702.9b]); lifelink and reach carry their names alone
 //! (lifelink's combat hook matches by NAME through
 //! [`as_str`](KeywordAbility::as_str) — the look-through seam — pending the

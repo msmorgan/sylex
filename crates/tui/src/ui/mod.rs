@@ -702,7 +702,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn renders_opening_board_without_panicking() {
         let mut driver = Driver::new(
@@ -745,7 +745,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn renders_attacker_pick_mode_without_panicking() {
         use crate::interact::Interaction;
@@ -792,7 +792,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn renders_discard_pick_mode_with_footer_prompt() {
         use crate::interact::Interaction;
@@ -839,7 +839,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn priority_footer_shows_yield_and_pass_turn() {
         let mut driver = Driver::new(
@@ -882,7 +882,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn header_shows_armed_mode() {
         let mut driver = Driver::new(
@@ -924,7 +924,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn board_shows_controlled_seat_and_all_zone_panes() {
         let mut driver = Driver::new(
@@ -971,7 +971,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn help_overlay_lists_keybindings() {
         let mut driver = Driver::new(

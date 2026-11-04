@@ -16,10 +16,10 @@ use sylex_render_v1::fidelity::Outcome;
 /// policy (every canon card must exist in the oracle — canon encodes real
 /// cards; testing/demo fixtures are synthetic and skip when unmatched).
 const COVERED: [(&str, bool); 4] = [
-    ("builtin", false),
-    ("canon", true),
-    ("testing", false),
-    ("demo", false),
+    ("v1/plugins/builtin", false),
+    ("v1/plugins/canon", true),
+    ("v1/plugins/testing", false),
+    ("v1/plugins/demo", false),
 ];
 
 #[derive(Debug, Args)]
@@ -56,7 +56,7 @@ pub fn run(args: FidelityArgs) -> anyhow::Result<()> {
         }
         None => COVERED
             .iter()
-            .map(|(name, strict)| (workspace_root.join("plugins").join(name), *strict))
+            .map(|(name, strict)| (workspace_root.join(name), *strict))
             .collect(),
     };
 

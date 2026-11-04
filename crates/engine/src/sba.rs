@@ -480,12 +480,12 @@ mod tests {
     use crate::step::StepOutcome;
 
     fn builtin() -> Plugin {
-        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin")).unwrap()
+        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap()
     }
 
     fn canon() -> Plugin {
         Plugin::load_with_sibling_prelude(
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/canon"),
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
         )
         .unwrap()
     }
@@ -499,7 +499,7 @@ mod tests {
     /// sets the `wizards_corpus` cfg from the directory's presence).
     fn wizards() -> Plugin {
         Plugin::load_with_sibling_prelude(
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/wizards"),
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/wizards"),
         )
         .unwrap()
     }
@@ -587,7 +587,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn wizards_aura_carries_conferred_graveyard_rule() {
         let gift = Arc::new(wizards().card("Angelic Gift").unwrap().core);
@@ -1292,11 +1292,11 @@ mod tests {
         }
     }
 
-    /// A `plugins/testing` Saga on the battlefield carrying the subtype's
+    /// A `v1/plugins/testing` Saga on the battlefield carrying the subtype's
     /// [CR#714.4] conferral, with `lore` lore counters on it.
     fn saga_on_field(state: &mut GameState, name: &str, lore: u32) -> crate::object::ObjectId {
         let printed = Plugin::load_with_sibling_prelude(
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/testing"),
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/testing"),
         )
         .unwrap()
         .card(name)

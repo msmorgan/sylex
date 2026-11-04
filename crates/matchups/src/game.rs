@@ -150,7 +150,7 @@ mod tests {
     #[test]
     // ~640s: three full pass-bot deck-out games. Kept ignored so it stays out of
     // the default suite; run explicitly with `--run-ignored` (e.g. the noncanon
-    // keep-green job). Also needs the generated `plugins/wizards` corpus.
+    // keep-green job). Also needs the generated `v1/plugins/wizards` corpus.
     #[ignore = "slow (~640s) full-game deck-out sim; run with --run-ignored"]
     fn passbots_deck_out() {
         let src = CardSource::load();
@@ -183,7 +183,7 @@ mod tests {
     /// One complete game over the exact Worlds 1999 Sped Red and Stompy
     /// maindecks.
     #[test]
-    #[cfg_attr(not(wizards_corpus), ignore = "needs generated plugins/wizards corpus")]
+    #[cfg_attr(not(wizards_corpus), ignore = "needs generated v1/plugins/wizards corpus")]
     fn sped_red_vs_stompy99_completes() {
         let src = CardSource::load();
         let red = deck::build_full(&wc99::SPED_RED, &src);

@@ -43,7 +43,7 @@ struct EntailmentFile {
 pub(crate) fn entailment(verb: &str) -> Option<&'static EntailmentRow> {
     static TABLE: LazyLock<HashMap<String, EntailmentRow>> = LazyLock::new(|| {
         let file: EntailmentFile = ron::from_str(include_str!(
-            "../../plugin/tables/entailments.ron"
+            "../../../v1/crates/plugin/tables/entailments.ron"
         ))
         .expect("generated entailments table parses");
         file.rows.into_iter().map(|r| (r.verb.clone(), r)).collect()

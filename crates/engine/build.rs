@@ -1,7 +1,7 @@
-// Detects the generated `plugins/wizards` corpus at build time and, when it is
+// Detects the generated `v1/plugins/wizards` corpus at build time and, when it is
 // present, sets the `wizards_corpus` cfg. Tests that need the corpus carry
 // `#[cfg_attr(not(wizards_corpus), ignore = "…")]`, so they run locally (where
-// `cargo xtask generate plugins/wizards` has populated it) and on CI (which
+// `cargo xtask generate v1/plugins/wizards` has populated it) and on CI (which
 // fetches upstream inputs and generates the corpus before building) and report
 // as `ignored` on a bare checkout (the corpus is gitignored, built from the
 // ~150 MB mtgjson dump under `data/`).
@@ -25,9 +25,9 @@ fn main() {
     let manifest = std::env::var("CARGO_MANIFEST_DIR").expect("CARGO_MANIFEST_DIR set by cargo");
     // Relative paths: cargo resolves them against the package root, so a
     // target/ copied into another workspace watches that workspace's files.
-    if Path::new(&manifest).join("../../plugins/wizards").is_dir() {
+    if Path::new(&manifest).join("../../v1/plugins/wizards").is_dir() {
         println!("cargo::rustc-cfg=wizards_corpus");
     } else {
-        println!("cargo::rerun-if-changed=../../plugins");
+        println!("cargo::rerun-if-changed=../../v1/plugins");
     }
 }

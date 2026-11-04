@@ -40,7 +40,7 @@ enum Cmd {
     Catalogs(CatalogArgs),
     /// Derive the flat Oracle snapshot from Scryfall Oracle Cards JSONL.
     DeriveCards(DeriveCardsArgs),
-    /// Validate every finished card in a plugin (defaults to plugins/builtin).
+    /// Validate every finished card in a plugin (defaults to v1/plugins/builtin).
     Validate(ValidateArgs),
     /// Show a card as parsed from a plugin, with its macros expanded.
     Card(CardArgs),

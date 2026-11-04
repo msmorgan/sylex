@@ -46,12 +46,12 @@ use sylex_plugin_v1::plugin::Plugin;
 // ---------------------------------------------------
 
 fn builtin() -> Plugin {
-    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin")).unwrap()
+    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap()
 }
 
 fn canon() -> Plugin {
     Plugin::load_with_sibling_prelude(
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/canon"),
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
     )
     .unwrap()
 }
@@ -607,12 +607,12 @@ fn bolt_kills_grizzly_bears() {
     assert_eq!(state.stack, [] as [sylex_engine::StackEntry; 0]);
 }
 
-/// A `plugins/testing` mock card (macro-aware, builtin prelude) — the home of
+/// A `v1/plugins/testing` mock card (macro-aware, builtin prelude) — the home of
 /// fixtures for mechanics no canon card carries (e.g. Ward, [CR#702.21a]).
 fn testing_card(name: &str) -> Arc<Card> {
     Arc::new(
         Plugin::load_with_sibling_prelude(
-            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/testing"),
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/testing"),
         )
         .unwrap()
         .card(name)

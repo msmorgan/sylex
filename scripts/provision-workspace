@@ -7,7 +7,7 @@
 # What it does: `data` is symlinked back to `default`. Each dir present under
 # `default/docs/` but absent from the new tracked workspace is symlinked too,
 # sharing ignored local dirs such as `docs/superpowers` and `docs/memory` while
-# leaving tracked documentation alone. `plugins/wizards` is reflinked from
+# leaving tracked documentation alone. `v1/plugins/wizards` is reflinked from
 # `default`'s copy (generated there first if missing) as a real dir, never a
 # symlink (sylex_plugin_v1's suite loads it, and a symlink would make a
 # workspace's generate write into the main checkout). `default`'s `target/` is
@@ -60,10 +60,10 @@ and begin
 end
 and phase_done symlinks $t
 
-# Copy the generated cards from default's plugins/wizards, generating that copy
+# Copy the generated cards from default's v1/plugins/wizards, generating that copy
 # from Oracle text first if it is missing. The generator rarely changes, so
 # regenerating per workspace is pure overhead; to refresh default's copy after
-# a generator change, delete default's plugins/wizards (the next provision
+# a generator change, delete default's v1/plugins/wizards (the next provision
 # regenerates it) or run the generate command below against it by hand.
 # Generation runs default's built xtask binary directly (it is what the
 # `cargo xtask` alias runs): `cargo xtask` takes cargo's build lock on default's
@@ -73,23 +73,23 @@ and phase_done symlinks $t
 # never a symlink, for the reason given above.
 and set t (date +%s%N)
 and begin
-    test -d "$default_dir/plugins/wizards"
+    test -d "$default_dir/v1/plugins/wizards"
     or begin
         if test -x "$default_dir/target/debug/cargo-xtask"
-            "$default_dir/target/debug/cargo-xtask" generate "$default_dir/plugins/wizards"
+            "$default_dir/target/debug/cargo-xtask" generate "$default_dir/v1/plugins/wizards"
         else
-            cargo xtask generate "$default_dir/plugins/wizards"
+            cargo xtask generate "$default_dir/v1/plugins/wizards"
         end
         and phase_done "wizards generate (default)" $t
     end
 end
 and set t (date +%s%N)
-and mkdir -p "$ws_dir/plugins/wizards"
-and cp --reflink=auto -a "$default_dir/plugins/wizards/." "$ws_dir/plugins/wizards/"
+and mkdir -p "$ws_dir/v1/plugins/wizards"
+and cp --reflink=auto -a "$default_dir/v1/plugins/wizards/." "$ws_dir/v1/plugins/wizards/"
 and phase_done "wizards copy" $t
 
 or begin
-    echo >&2 "$(status filename): $ws_dir's jj structure is set, but shared-dir provisioning failed — check symlinks and run 'cargo xtask generate $ws_dir/plugins/wizards' by hand."
+    echo >&2 "$(status filename): $ws_dir's jj structure is set, but shared-dir provisioning failed — check symlinks and run 'cargo xtask generate $ws_dir/v1/plugins/wizards' by hand."
     exit 1
 end
 

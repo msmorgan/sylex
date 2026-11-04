@@ -3008,7 +3008,7 @@ mod tests {
     /// A two-player game with no permanents (builtin Forests as decks).
     fn cm_game() -> GameState {
         let builtin = Plugin::load(
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin"),
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"),
         )
         .unwrap();
         let forest = Arc::new(builtin.card("Forest").unwrap().core);

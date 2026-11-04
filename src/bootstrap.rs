@@ -2,7 +2,7 @@ use std::path::Path;
 use std::process::Command;
 
 pub fn ensure_ready() -> Result<(), String> {
-    let cards = Path::new("plugins/wizards/cards");
+    let cards = Path::new("v1/plugins/wizards/cards");
     if cards.read_dir().ok().and_then(|mut d| d.next()).is_some() {
         return Ok(());
     }
@@ -29,7 +29,7 @@ fn fetch_data_if_needed() -> Result<(), String> {
 fn generate_cards() -> Result<(), String> {
     eprintln!("cargo run: first-run setup: generating card corpus...");
     let status = Command::new("cargo")
-        .args(["xtask", "generate", "plugins/wizards"])
+        .args(["xtask", "generate", "v1/plugins/wizards"])
         .status()
         .map_err(|e| format!("failed to run cargo xtask generate: {e}"))?;
     if !status.success() {

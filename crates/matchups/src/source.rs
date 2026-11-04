@@ -47,12 +47,12 @@ impl CardSource {
     /// Panics if either plugin fails to load — the harness is unusable then.
     #[must_use]
     pub fn load() -> Self {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins");
-        let builtin = Plugin::load(root.join("builtin")).expect("plugins/builtin loads");
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins");
+        let builtin = Plugin::load(root.join("builtin")).expect("v1/plugins/builtin loads");
         let canon =
-            Plugin::load_with_prelude(&builtin, root.join("canon")).expect("plugins/canon loads");
+            Plugin::load_with_prelude(&builtin, root.join("canon")).expect("v1/plugins/canon loads");
         let wizards = Plugin::load_with_prelude(&builtin, root.join("wizards"))
-            .expect("plugins/wizards loads");
+            .expect("v1/plugins/wizards loads");
         Self {
             wizards,
             canon,

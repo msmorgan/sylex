@@ -8,7 +8,7 @@ use clap::Args;
 
 #[derive(Debug, Args)]
 pub struct ResolveArgs {
-    /// The plugin directory to resolve (e.g. plugins/wizards).
+    /// The plugin directory to resolve (e.g. v1/plugins/wizards).
     plugin_dir: PathBuf,
 }
 

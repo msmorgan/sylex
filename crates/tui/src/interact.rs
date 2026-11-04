@@ -597,7 +597,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn action_object_extracts_the_object_or_none() {
         let id = ids()[0];
@@ -617,7 +617,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn actions_for_filters_to_the_selected_object() {
         let v = ids();
@@ -640,7 +640,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn partition_surfaces_priority_targets_and_nonempty_combat() {
         let v = ids();
@@ -674,7 +674,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn discard_is_interactive_and_built_over_the_hand() {
         let v = ids();
@@ -700,7 +700,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn discard_caps_at_count_and_confirms_exactly_count_cards() {
         let v = ids();
@@ -721,7 +721,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn discard_ignores_non_hand_ids_and_cancel_clears() {
         let v = ids();
@@ -738,7 +738,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn for_decision_builds_one_target_slot_per_spec() {
         let v = ids();
@@ -764,7 +764,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn targets_toggle_adds_and_removes_within_a_slot() {
         let v = ids();
@@ -793,7 +793,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn targets_advance_walks_specs_and_confirms_in_order() {
         let v = ids();
@@ -819,7 +819,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn targets_ignores_non_candidates() {
         let v = ids();
@@ -840,7 +840,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn attackers_toggle_is_a_free_subset_and_confirms_any_set() {
         let v = ids();
@@ -870,7 +870,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn blockers_pairing_records_blocker_attacker_pairs() {
         let v = ids();
@@ -899,7 +899,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn blockers_unpair_undoes_pending_then_pairs() {
         let v = ids();
@@ -935,7 +935,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn interactive_path_produces_only_legal_decisions() {
         use sylex_engine::DecisionPointKind;

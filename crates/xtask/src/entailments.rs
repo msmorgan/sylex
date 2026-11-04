@@ -180,7 +180,7 @@ pub fn render() -> String {
 }
 
 fn table_path() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../plugin/tables/entailments.ron")
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/crates/plugin/tables/entailments.ron")
 }
 
 pub fn run(args: &EntailmentsArgs) -> anyhow::Result<()> {

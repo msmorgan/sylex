@@ -32,12 +32,12 @@ use crate::step::Progress;
 use crate::step::StepOutcome;
 
 pub(super) fn builtin() -> Plugin {
-    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin")).unwrap()
+    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap()
 }
 
 pub(super) fn canon() -> Plugin {
     Plugin::load_with_sibling_prelude(
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/canon"),
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
     )
     .unwrap()
 }
@@ -385,7 +385,7 @@ pub(super) fn battlefield_with(names: &[&str]) -> (GameState, Vec<ObjectId>) {
 /// wrapping `If (both fighters are creatures on the battlefield —
 /// [CR#701.14b]) (Simultaneously [each deals its power to the OTHER, source
 /// = itself])`. Slots `x`/`y` are the two fighters. Mirrors
-/// `plugins/builtin/macros/effect/Fight.ron` (the guard's `Permanent` is
+/// `v1/plugins/builtin/macros/effect/Fight.ron` (the guard's `Permanent` is
 /// spelled here as `InZone(Battlefield)`, an equivalent for the test).
 pub(super) fn fight_effect(x: &Reference, y: &Reference) -> Instruction {
     use sylex_core::Condition;

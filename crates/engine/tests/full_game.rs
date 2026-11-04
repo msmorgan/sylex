@@ -30,11 +30,11 @@ const SEED: u64 = 1;
 /// on the hot path).
 fn matchup() -> DeckCards {
     let canon = Plugin::load_with_sibling_prelude(
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/canon"),
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
     )
     .unwrap();
     let builtin =
-        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin")).unwrap();
+        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap();
     DeckCards {
         p0_spell: Arc::new(canon.card("Grizzly Bears").unwrap().core),
         p0_land: Arc::new(builtin.card("Forest").unwrap().core),

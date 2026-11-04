@@ -43,12 +43,12 @@ use sylex_engine::ZoneChange;
 use sylex_plugin_v1::plugin::Plugin;
 
 fn builtin() -> Plugin {
-    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin")).unwrap()
+    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap()
 }
 
 fn canon() -> Plugin {
     Plugin::load_with_sibling_prelude(
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/canon"),
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
     )
     .unwrap()
 }

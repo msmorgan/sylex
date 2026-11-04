@@ -264,7 +264,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn steer_to_focuses_the_zone_holding_an_object() {
         let mut d = Driver::new(
@@ -291,7 +291,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn blocker_step_steers_onto_a_legal_blocker_and_pairing_submits() {
         use sylex_engine::Decision;
@@ -366,7 +366,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn targeting_step_steers_onto_a_candidate_and_targets_path_submits() {
         use sylex_engine::Decision;
@@ -448,7 +448,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn sync_follows_pending_decider() {
         let mut d = Driver::new(
@@ -470,7 +470,7 @@ mod tests {
     #[test]
     #[cfg_attr(
         not(wizards_corpus),
-        ignore = "requires generated plugins/wizards corpus"
+        ignore = "requires generated v1/plugins/wizards corpus"
     )]
     fn selected_resolves_hand_and_is_none_for_empty_stack() {
         let mut d = Driver::new(

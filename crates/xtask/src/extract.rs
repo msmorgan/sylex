@@ -8,7 +8,7 @@ use clap::Args;
 
 #[derive(Debug, Args)]
 pub struct ExtractArgs {
-    /// The plugin directory to extract into (e.g. plugins/wizards).
+    /// The plugin directory to extract into (e.g. v1/plugins/wizards).
     plugin_dir: PathBuf,
 }
 

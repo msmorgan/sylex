@@ -50,7 +50,7 @@ use sylex_plugin_v1::plugin::Plugin;
 /// Load the builtin plugin's `sba_rules` — used to populate `state.sba_rules`
 /// so data-driven SBAs (lethal-damage destroy, toughness-0 move, etc.) fire.
 fn builtin_sba_rules() -> Vec<sylex_core::SbaRule> {
-    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin"))
+    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
         .unwrap()
         .sba_rules
 }
@@ -60,7 +60,7 @@ fn builtin_sba_rules() -> Vec<sylex_core::SbaRule> {
 /// `sba_rules`).
 fn builtin_counter_decls()
 -> std::collections::HashMap<sylex_core::Ident, sylex_core::Counter> {
-    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin"))
+    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
         .unwrap()
         .counters
 }

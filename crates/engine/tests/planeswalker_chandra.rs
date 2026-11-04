@@ -42,12 +42,12 @@ const BEARS: &str = "Grizzly Bears"; // {1}{G}, no targets — the impulse's cas
 const CENTAUR: &str = "Centaur Courser"; // 3/3 — a 4-toughness bystander lives, a −3 (4 dmg) kills
 
 fn builtin() -> Plugin {
-    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin")).unwrap()
+    Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin")).unwrap()
 }
 
 fn canon() -> Plugin {
     Plugin::load_with_sibling_prelude(
-        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/canon"),
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
     )
     .unwrap()
 }

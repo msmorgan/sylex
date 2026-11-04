@@ -318,7 +318,7 @@ pub enum Action {
     /// game action, the same tier as damage ([CR#120]).
     ///
     /// Named `DrawCard`, not `Draw`: the `Draw(N)` authoring macro
-    /// (`plugins/builtin/macros/action/Draw.ron`) owns the bare `Draw` ident
+    /// (`v1/plugins/builtin/macros/action/Draw.ron`) owns the bare `Draw` ident
     /// — its own body is `Batch(Param(0), DrawCard(You))`, so `DrawCard`
     /// keeps the macro's *own* body unambiguous between the variant
     /// (`DrawCard(You)`, one required `Reference` slot) and the macro
@@ -725,7 +725,7 @@ impl Action {
 
 /// `who`'s hand ([CR#701.9a] discard's domain) as a
 /// [`Predicate`](crate::Predicate) — the expanded shape of the `InHand(who)`
-/// macro (`plugins/builtin/macros/filter/InHand.ron`): `And([InZone(Hand),
+/// macro (`v1/plugins/builtin/macros/filter/InHand.ron`): `And([InZone(Hand),
 /// Owner(Ref(who))])`. Builds the filter [`Action::discard`]'s `Choose`/
 /// `Random` binder carries; [`discard_body_whose`] reads `who` back off it
 /// for the at-random form, which (unlike `Choose`) carries no separate `by`.

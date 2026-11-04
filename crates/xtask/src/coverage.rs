@@ -98,7 +98,7 @@ const SKIP_DIRS: &[&str] = &[
     "target",
     "data",
     ".claude",
-    "plugins/wizards",
+    "v1/plugins/wizards",
     "docs/superpowers",
 ];
 const EXTENSIONS: &[&str] = &["rs", "md", "ron", "lean", "syl"];
@@ -513,14 +513,14 @@ mod tests {
             tier_for_path("crates/engine/tests/activate.rs"),
             Tier::Bound
         );
-        assert_eq!(tier_for_path("plugins/testing/cards/Foo.ron"), Tier::Bound);
+        assert_eq!(tier_for_path("v1/plugins/testing/cards/Foo.ron"), Tier::Bound);
         assert_eq!(tier_for_path("lean/Proofs/Foo.lean"), Tier::Bound);
         assert_eq!(
             tier_for_path("crates/engine/src/step/mod.rs"),
             Tier::Bound
         );
         assert_eq!(
-            tier_for_path("plugins/builtin/rules/sba/toughness-zero.ron"),
+            tier_for_path("v1/plugins/builtin/rules/sba/toughness-zero.ron"),
             Tier::Bound
         );
         assert_eq!(tier_for_path("docs/tickets/done/foo.md"), Tier::Mentioned);
