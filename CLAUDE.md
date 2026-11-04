@@ -34,7 +34,7 @@ The jj-kata `kata` and `kanban` skills own the lifecycle. Repo specifics:
 
 - **Claim or start before any exploration, design or subagents**, then work in
   `.workspaces/NAME`. Unprovisioned workspaces lack `data`, local `docs/` dirs and the generated
-  `plugins/wizards`. A hand-built workspace needs `scripts/provision-workspace .workspaces/NAME`
+  `v1/plugins/wizards`. A hand-built workspace needs `scripts/provision-workspace .workspaces/NAME`
   run from `default`; verify with a real `jj st` (no changes).
 - **Never `kata refresh --all`** (human-only).
 - Tickets: `docs/tickets/<status>/<slug>.md`; `docs/tickets/README.md` is the model.
@@ -49,15 +49,15 @@ The jj-kata `kata` and `kanban` skills own the lifecycle. Repo specifics:
 
 - Authorities: `docs/decisions/english-lexical-analysis.md` and `docs/decisions/english-v4.md`.
   Read them before implementing, planning, reviewing or accounting for the English grammar
-  (`deckmaste_english`), syntax engine (`deckmaste_syntax`), or lexical catalogs
-  (`deckmaste_lexical_source`).
+  (`sylex_english`), syntax engine (`sylex_syntax`), or lexical catalogs
+  (`sylex_vocabulary`).
 - `docs/oracle-style-guide.md` is the authority on Oracle register. Before that same work, read its
   front matter (through "The shortest useful checklist"), then read in full every section your
   change touches, and cite it when a ruling depends on it. Briefs name those sections.
 - No word enumerated by the CR as a catalog item (including all `[CR#701.1]` keyword actions) may
   appear directly in grammar declarations (`schema` or `production`); vocabulary and complement
-  frames live in the domain catalogs of `deckmaste_lexical_source` (and later `plugins_v3/`).
-- The v1 English crate and its xtask tools are gone; `deckmaste_english` is now the english-v4
+  frames live in the domain catalogs of `sylex_vocabulary` (and later `plugins_v3/`).
+- The v1 English crate and its xtask tools are gone; `sylex_english` is now the english-v4
   grammar. Do not recreate v1.
 
 ## Crate fates (semantics_v3 and english-v4)
@@ -66,18 +66,18 @@ Authorities: `docs/decisions/semantics-v3.md` and `docs/decisions/english-v4.md`
 - `semantics-v3` executes in `lean/Semantics/`; `sylGen` compiles the `.syl` builtin and canon
   under `plugins_v3/`. `plugins-v3-syl-conversion` deleted the `.lean`-only Rust mirror and
   lowering crates; `semantics-rust-rewrite` owns their future Rust replacement.
-- `english-v4` lives in `deckmaste_syntax`, `deckmaste_lexical_source` and `deckmaste_english`.
+- `english-v4` lives in `sylex_syntax`, `sylex_vocabulary` and `sylex_english`.
   `english-v4-cutover-v3` deleted `deckmaste_english_v3`, `deckmaste_construction_v3*` and the
-  earlier `deckmaste_lexical_source`; `english-v4-final-suffix-cutover` dropped the `_v4` suffixes
+  earlier `sylex_vocabulary`; `english-v4-final-suffix-cutover` dropped the `_v4` suffixes
   and renamed `cargo xtask english-v4` to `cargo xtask english`. What remains of it, gated on
-  `semantics-v1-cutover`, is moving the catalogs into `plugins/` and deleting `deckmaste_features`.
+  `semantics-v1-cutover`, is moving the catalogs into `plugins/` and deleting `sylex_features_v1`.
 - Deletion-bound at parity (`semantics-v1-cutover` and the remainder of
-  `english-v4-final-suffix-cutover`): `deckmaste_semantics`, `deckmaste_lowering`,
-  `deckmaste_legacy_render`, `deckmaste_plugin` (`deck.rs` and `provenance.rs` rehomed),
-  `deckmaste_features`, `plugins/builtin`, `plugins/canon`. `idris/` is already gone
+  `english-v4-final-suffix-cutover`): `sylex_semantics_v1`, `sylex_lowering_v1`,
+  `sylex_render_v1`, `sylex_plugin_v1` (`deck.rs` and `provenance.rs` rehomed),
+  `sylex_features_v1`, `v1/plugins/builtin`, `v1/plugins/canon`. `idris/` is already gone
   (`idris-retirement`). The v1 English crate,
   `deckmaste_construction_compiler`, `deckmaste_constructions_macro` and xtask's v1 `english` and
-  `macro` tools are already gone, and `deckmaste_spelling` is a stub crate (no implementation).
+  `macro` tools are already gone, and the `spelling` stub crate is deleted (recreated as `sylex_spelling` when spelling starts).
   Never copy v2/v3/v4 work back into v1, and add no new v1 registries.
 
 ## Terminology

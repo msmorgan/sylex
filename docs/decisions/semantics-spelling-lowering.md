@@ -29,8 +29,8 @@ describes the code.
 One semantics grammar, two derived projections, three new crates:
 
 ```
-                deckmaste_spelling            deckmaste_lowering
-deckmaste_english ◄════════════════► deckmaste_semantics ────────► deckmaste_core
+                sylex_spelling            sylex_lowering_v1
+sylex_english ◄════════════════► sylex_semantics_v1 ────────► sylex_core
   English AST       two-way ranked      the semantics       one-way    pure engine
   text ⇄ AST only   relation            rules grammar       total      AST; plain
                     (frames ENGINE      + macro layer       compile    serde; NOT
@@ -40,7 +40,7 @@ deckmaste_english ◄════════════════► deckmas
                     defs)
 ```
 
-- **`deckmaste_semantics`** is the canonical semantic form: the normalized,
+- **`sylex_semantics_v1`** is the canonical semantic form: the normalized,
   information-complete rules grammar persisted in every card-content container
   — card files, token files, and the `rules/` engine tables. For existing Magic
   cards, Oracle text is the authoritative source input and recovery compiles it
@@ -49,19 +49,19 @@ deckmaste_english ◄════════════════► deckmas
   and `SupportsMacros` machinery, identity-macro registration, the collision
   diagnostic, the scope-calculus and sugar forms, and normalization (desugar +
   scope elaboration, semantics → semantic normal form).
-- **`deckmaste_spelling`** is the semantics ⇄ English relation:
+- **`sylex_spelling`** is the semantics ⇄ English relation:
   `deckmaste_frames` renamed and absorbed — the ENGINE (compile/unify/
   render). "Frames" survives as the name of the lexicon's entries, and the
   frame SCHEMA (`FrameSpec` and kin) deliberately stays in neutral
   `macro_ron`: defs carry `frames:` and `macro_ron` parses defs, so moving
   the schema into spelling would cycle schema and consumer.
-- **`deckmaste_lowering`** is the one-way compile semantics → core: it
+- **`sylex_lowering_v1`** is the one-way compile semantics → core: it
   invokes semantics' normalization, then owns the cross-grammar type
   mapping, semantic-invariant enforcement, and the divergence ledger.
-- **`deckmaste_core`** becomes a pure engine AST: no macro machinery, plain
+- **`sylex_core`** becomes a pure engine AST: no macro machinery, plain
   serde, no Idris obligations (until an engine-side dependent invariant
   earns a thin mirror back).
-- **`deckmaste_card`** (engine-side, sitting directly above core): the
+- **`sylex_card`** (engine-side, sitting directly above core): the
   engine's unit of card definitions — `Card`/`CardFace` and the face
   layouts, the packaging of primitives into a playable unit — split out of
   core so the loose primitives are testable independently and the
@@ -87,11 +87,11 @@ deckmaste_english ◄════════════════► deckmas
   crate below both grammars (killing atom mirroring) is booked as a
   design-gated follow-up (`characteristics-atoms-crate`), deliberately
   NOT part of Stage 1.
-- **The card-loader crate is renamed to `deckmaste_plugin`** (Stage 0): it
+- **The card-loader crate is renamed to `sylex_plugin_v1`** (Stage 0): it
   was always the loader plus riders. The rename landed alone; splitting the
   riders (the Idris emitter and validation) out is booked as
   `plugin-rider-split`. The dying legacy renderer and the fidelity harness
-  that rides it move together into `deckmaste_legacy_render`, in
+  that rides it move together into `sylex_render_v1`, in
   `runtime-prose-link` (owner-settled 2026-08-02, superseding "stays put to
   die in place"): that ticket must retype every one of the renderer's
   `Expanded` match sites onto semantic terms regardless, so moving and
@@ -593,7 +593,7 @@ and nothing checks its destination. Mirroring the rest is
 - Sugar-level syntactic rules (occurrence criterion, prefix rule) are
   desugar-time Rust checks; Idris proves semantic invariants on the normal
   form. English-ward divergence brings its proof obligations with it.
-- **`deckmaste_core` carries no proofs**, deliberately: its divergences are
+- **`sylex_core` carries no proofs**, deliberately: its divergences are
   engine-driven and Rust-testable. If a genuinely dependent engine-side
   invariant appears, a thin core mirror can return for that obligation.
 - Known gate-coverage debt is unchanged by the move and more naturally
@@ -612,13 +612,13 @@ legally land before an earlier-stage one when its needs are met. Every
 landing keeps all gates green (zero behavior change until Stage 2 begins
 the visible policy).
 
-- **Stage 0 — free the names**: the card-loader crate → `deckmaste_plugin`
-  (rename only; the rider split is `plugin-rider-split`); `deckmaste_card`
+- **Stage 0 — free the names**: the card-loader crate → `sylex_plugin_v1`
+  (rename only; the rider split is `plugin-rider-split`); `sylex_card`
   split out of core — a cross-cutting, land-anytime migration
   (deliberately `needs: []`; whichever of it and the fork lands second
   adapts). No semantic change.
-- **Stage 1 — the fork**: `deckmaste_semantics` created as a mirror of
-  core's grammar WITH the macro machinery; `deckmaste_lowering` with the
+- **Stage 1 — the fork**: `sylex_semantics_v1` created as a mirror of
+  core's grammar WITH the macro machinery; `sylex_lowering_v1` with the
   generated identity mapping; loaders and migrations repoint (parse
   semantics, lower to core); Idris mirror reattaches; THEN core is stripped
   of macro machinery, with the test-fixture sweep (the priced big-boring
@@ -631,7 +631,7 @@ the visible policy).
   machinery it checks was moving underneath it; `needs:
   [macro-author-surface]`, exemption live against the compiled registry).
 - **Stage 3 — spelling consolidation**: `deckmaste_frames` →
-  `deckmaste_spelling`; catalog merge; capability unification.
+  `sylex_spelling`; catalog merge; capability unification.
 - **Stage 4 — sugar and scope**: inline target sugar + elaboration rules.
 - **Throughout**: laws first — expansion equality and the per-variant
   mapping tests are owned by `lowering-crate`;
@@ -639,7 +639,7 @@ the visible policy).
   legacy renderer + regex migrations run as shadow oracles with ratcheted
   coverage until each feature family crosses its gates (ratchets and kill
   criteria are owned by each family's landing ticket; the comparison
-  harness rides fidelity in `deckmaste_legacy_render`) — measurements, not
+  harness rides fidelity in `sylex_render_v1`) — measurements, not
   authorities — then die.
 
 Parallelism contract (the ticket `needs:` graph encodes this):
@@ -675,7 +675,7 @@ cross-interference a build error.
   core values to semantic values (a real sub-project inside Stage 1, not a
   rename) — the loader grows a dual-result contract (semantic term AND
   lowered core value; provenance erased exactly at `lower`), and the ~97
-  production `Expanded(…)` match sites across ~14 `deckmaste_engine`
+  production `Expanded(…)` match sites across ~14 `sylex_engine`
   modules stop existing once core values carry no wrappers. The relocation
   is sequenced in two landings so that no landing degrades (owner-settled
   2026-08-02). `plugin-repoint` builds the dual-result contract with the
@@ -684,7 +684,7 @@ cross-interference a build error.
   corpus — and every consumer of invocation provenance keeps working
   untouched. `runtime-prose-link` then erases the wrappers in the same
   landing that moves the legacy renderer and fidelity into
-  `deckmaste_legacy_render` and repoints them onto semantic terms (a further
+  `sylex_render_v1` and repoints them onto semantic terms (a further
   ~30+ `Expanded` match sites, outside the ~97-site engine count) and builds
   the provenance index — so prose that feeds on invocation templates never
   loses them, and the ~97 engine arms are deleted alongside the erasure that
@@ -773,7 +773,7 @@ tracked tree); the deltas restated here are self-contained.
 ## 16. Verification obligations
 
 1. Every stage's zero-behavior-change claim is gated: canon + workspace
-   suites, `cargo xtask idris-check plugins/canon` no regressions
+   suites, `cargo xtask idris-check v1/plugins/canon` no regressions
    (against the `ci-idris-gate` baseline — the batch command currently
    exits 0 on failures, so a diffable baseline is part of the gate),
    fidelity green, before and after each stage lands — with "zero change"

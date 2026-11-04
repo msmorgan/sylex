@@ -3,7 +3,7 @@
 Each entry answers one item from the mtg-rules skill's
 `references/underdetermined.md` registry (the engine-choice list), keyed by
 its stable `UD-n` id. Convention: the skill records *what the CR leaves
-open*, engine-agnostically; this file records *which option deckmaste chose*
+open*, engine-agnostically; this file records *which option sylex chose*
 and where the code embodies it. A decision made implicitly by code is still
 a decision — write it down here when discovered. When a CR update settles an
 entry upstream, the skill moves it to its Settled section and the ADR here
@@ -13,7 +13,7 @@ becomes historical.
 
 Uniform and independent, from a seeded deterministic generator:
 `GameState.rng` is a `ChaCha8Rng` built with `seed_from_u64(config.seed)`
-(`crates/deckmaste_engine/src/state.rs`); shuffles draw from it uniformly.
+(`crates/engine/src/state.rs`); shuffles draw from it uniformly.
 Determinism-under-seed is load-bearing for simulation reproducibility
 (`sim.rs` takes `seed: u64`). No commitment yet to a verifiability story
 (committed-seed reveal for adversarial play) — that is a runner/server
@@ -23,7 +23,7 @@ concern, like hidden-information views.
 
 A snapshot is an **enumerated-field value**, not a full object copy:
 `LkiSnapshot { object, source, controller, tapped, damage, counters, left }`
-(`crates/deckmaste_engine/src/lki.rs`), where `source` is the `ObjectSource`
+(`crates/engine/src/lki.rs`), where `source` is the `ObjectSource`
 spine that derives printed characteristics and owner. The counter map supports
 consumers such as Modular, Undying, and Persist after the live object is gone.
 Extent policy: fields are added as consumers demand them (triggers, damage
@@ -78,12 +78,12 @@ forces it; the working lean above stands.
 forbids the untap: the CR does not classify the wording. [CR#614.17] covers
 effects that state that something can't happen, which this wording never
 says, and [CR#502.3]'s "keep … from untapping" is how [CR#122.1d] describes
-the stun counter's replacement effect. Deckmaste treats it as `cant`: the
+the stun counter's replacement effect. Sylex treats it as `cant`: the
 Lean template `doesntUntap` (`lean/Semantics/Definitions/Actions.lean`) is
 `cant any (untap subject)` during the untap step, and the engine's
-`Cant(Untap)` row (`crates/deckmaste_core/src/deontic.rs`) keeps the matching
+`Cant(Untap)` row (`crates/core/src/deontic.rs`) keeps the matching
 permanent out of the untap step's untapping
-(`crates/deckmaste_engine/src/step/mod.rs`), the selection-constraint reading,
+(`crates/engine/src/step/mod.rs`), the selection-constraint reading,
 which agrees with `cant` unless something else tries to untap the permanent
 during that step.
 

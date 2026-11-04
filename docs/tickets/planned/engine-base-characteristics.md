@@ -5,7 +5,7 @@ needs: [card-crate-split]
 BaseCharacteristics` and `CardRef<T>`.** Design:
 `docs/decisions/semantics-spelling-lowering.md` (§1). Deferred from
 `card-crate-split`, which landed as a pure move and enforced only the
-NEGATIVE half of the contract — that `deckmaste_core` carries no
+NEGATIVE half of the contract — that `sylex_core` carries no
 characteristics abstraction. This ticket owns the positive half.
 
 ## Current state (verified at mint time, not from the design prose)
@@ -13,12 +13,12 @@ characteristics abstraction. This ticket owns the positive half.
 The design describes the trait as unifying "the three existing base
 sources". Only two are live:
 
-- **`deckmaste_card::CardFace`** — read directly by the layers pipeline:
+- **`sylex_card::CardFace`** — read directly by the layers pipeline:
   `layer::base_values` reads `face.power`/`.toughness`/… and
-  `layer::base_colors(face: &deckmaste_card::CardFace)`.
-- **`deckmaste_core::Token`** — read by `object.rs` when building an
+  `layer::base_colors(face: &sylex_card::CardFace)`.
+- **`sylex_core::Token`** — read by `object.rs` when building an
   object from a token (`power: token.power.clone()`, and kin).
-- **`deckmaste_core::FaceDownCharacteristics`** — defined in
+- **`sylex_core::FaceDownCharacteristics`** — defined in
   `core/src/status.rs` and exported, but has NO consumer anywhere in the
   workspace. Its base-source role is prospective (`engine-face-down` is
   the ticket that would wire it; `layer.rs`'s `base_values` doc comment
@@ -30,10 +30,10 @@ base-in / computed-out.
 
 ## Scope
 
-- `trait BaseCharacteristics` defined in `deckmaste_engine` and
-  implemented THERE for `deckmaste_card`'s types and for core's `Token`
+- `trait BaseCharacteristics` defined in `sylex_engine` and
+  implemented THERE for `sylex_card`'s types and for core's `Token`
   (a local trait over foreign types — the orphan rule permits it). It must
-  NOT live in `deckmaste_core` or `deckmaste_card`; the whole point of the
+  NOT live in `sylex_core` or `sylex_card`; the whole point of the
   crate split's interface contract is that neither grammar crate carries a
   characteristics abstraction.
 - `CardRef<T: BaseCharacteristics>` engine-local, kept at the
@@ -57,5 +57,5 @@ Stage 1.
 ## Gates
 
 Standard constraints apply. Zero behavior change: full workspace suites green
-(`cargo test -p deckmaste_engine`). `cargo tree` must still prove
-`deckmaste_core` does not depend on `deckmaste_card`.
+(`cargo test -p sylex_engine`). `cargo tree` must still prove
+`sylex_core` does not depend on `sylex_card`.

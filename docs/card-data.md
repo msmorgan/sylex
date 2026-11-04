@@ -4,13 +4,13 @@
 
 ## Committed: a curated canon (~100–200 cards)
 
-`plugins/canon/` holds real cards — names plus structured behavior encodings —
+`v1/plugins/canon/` holds real cards — names plus structured behavior encodings —
 and is tracked in version control. The target is roughly 100–200 cards total,
 curated as a nearly complete slice of MTG mechanics: a card earns its slot by
 exercising a mechanic, interaction, or grammar shape, not by being famous.
 Canon is the durable, reviewable proof that the grammar and engine handle the
 real game; bulk coverage lives in the local, generated pipeline output
-(`plugins/wizards/`, gitignored).
+(`v1/plugins/wizards/`, gitignored).
 
 Curation is deliberate: batch canon additions and run them by the user.
 Growth should track mechanics landing.
@@ -28,8 +28,8 @@ canon's job is correctness.
 - `/data/` — CR text (`cr.txt`/`cr.json`), Scryfall Oracle Cards JSONL,
   supporting MTGJSON reference snapshots, and catalogs.
   Fetched locally via `scripts/fetch_data`.
-- `plugins/wizards/` — generated full-corpus pipeline output; rebuild with
-  `cargo xtask generate plugins/wizards`.
+- `v1/plugins/wizards/` — generated full-corpus pipeline output; rebuild with
+  `cargo xtask generate v1/plugins/wizards`.
 - Oracle text, flavor text, and art, in any form. Canon encodes behavior,
   not text; tools persist only derived artifacts (rule numbers, checksums,
   URLs — see the CR citation lockfile).
@@ -51,8 +51,8 @@ and art are WOTC's. A small, purposeful slice of name+behavior encodings
 
 ## Engine tests
 
-Engine tests use real cards from `plugins/canon`. A fake belongs in
-`plugins/testing` ONLY when the behavior under test exists in no real card —
+Engine tests use real cards from `v1/plugins/canon`. A fake belongs in
+`v1/plugins/testing` ONLY when the behavior under test exists in no real card —
 verified against the full corpus (see that plugin's `cards/README.md` for the
 current residents and why each combo cannot be real). When a mechanic lands
 that makes a mock encodable with a real card, canonize the real card and

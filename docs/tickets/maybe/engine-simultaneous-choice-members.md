@@ -5,7 +5,7 @@ design: true
 **Engine: a `Simultaneously` member whose verb needs an in-resolution choice
 panics. No card needs it yet; the design question is real.**
 
-`crates/deckmaste_engine/src/resolve/effect.rs` requires every `Act` member's
+`crates/engine/src/resolve/effect.rs` requires every `Act` member's
 `action_items` lowering to yield nothing but `WorkItem::Emit`. Several
 `Action` variants lower to something else when the verb needs a decision
 before it can become concrete events — `ChooseManaColor`/`ChooseManaMode`,

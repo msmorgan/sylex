@@ -1,6 +1,6 @@
-# deckmaste_tui
+# sylex_tui
 
-An interactive [ratatui](https://ratatui.rs) hotseat client for the deckmaste
+An interactive [ratatui](https://ratatui.rs) hotseat client for the sylex
 rules engine — the engine's first real external consumer. One human drives both
 seats of a full game (a **Goblins vs Elves** demo: decklists are committed, the
 cards themselves generated locally from MTGJSON) by answering the engine's *own*
@@ -12,10 +12,10 @@ actions, and no-choice decisions auto-resolve.
 
 ```sh
 # Play it — interactive hotseat in your terminal.
-cargo run -p deckmaste_tui
+cargo run -p sylex_tui
 
 # Watch it play itself to a result (no UI), for a quick smoke check.
-cargo run -p deckmaste_tui -- --headless
+cargo run -p sylex_tui -- --headless
 ```
 
 The active perspective **auto-follows whoever the engine is asking to decide**:

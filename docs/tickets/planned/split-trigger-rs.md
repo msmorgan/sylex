@@ -1,7 +1,7 @@
 ---
 needs: []
 ---
-**Carve `crates/deckmaste_engine/src/trigger.rs` (~4.9k lines, the largest
+**Carve `crates/engine/src/trigger.rs` (~4.9k lines, the largest
 file left after the resolve split) into a `trigger/` module directory, using
 the `resolve/` split as the template.** Like pre-split `resolve.rs`, the bulk
 is almost certainly the embedded `mod tests`; measure first, then split code

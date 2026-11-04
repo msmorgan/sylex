@@ -7,7 +7,7 @@ designation "is not a characteristic of the object represented by the card;
 rather, it is an attribute of the card itself. The card retains this
 designation even when it changes zones."
 
-`plugins/builtin/macros/designations/Commander.ron` declares `scope: Object`
+`v1/plugins/builtin/macros/designations/Commander.ron` declares `scope: Object`
 and quotes that same clause in its comment as the justification. The
 `persistence: Permanently` on the row is the compensating patch: object-scope
 state would otherwise expire on a zone change, so the declaration buys
@@ -38,12 +38,12 @@ Uniqueness stays `None` — a deck may designate two carriers
 
 Mirror surfaces (`DesignationScope` is mirrored across core, semantics, and lowering):
 
-- `crates/deckmaste_core/src/designation.rs` — the enum
-- `crates/deckmaste_semantics/src/designation.rs` — semantics mirror
-- `crates/deckmaste_lowering/src/designation.rs` — the `Lower` impl
-- `plugins/builtin/macros/designations/Commander.ron` — the row, and its
+- `crates/core/src/designation.rs` — the enum
+- `v1/crates/semantics/src/designation.rs` — semantics mirror
+- `v1/crates/lowering/src/designation.rs` — the `Lower` impl
+- `v1/plugins/builtin/macros/designations/Commander.ron` — the row, and its
   self-contradicting comment
-- `crates/deckmaste_plugin/tests/builtin.rs` — pins the wrong value today
+- `v1/crates/plugin/tests/builtin.rs` — pins the wrong value today
   (`assert_eq!(scope_of("Commander"), DesignationScope::Object)`)
 
 Standard constraints apply.

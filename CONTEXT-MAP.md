@@ -1,6 +1,6 @@
 # Context Map
 
-Deckmaste has two bounded contexts. Each owns a vocabulary; a spelling shared
+Sylex has two bounded contexts. Each owns a vocabulary; a spelling shared
 between them has the meaning assigned by the context in which it is used.
 
 ## Contexts

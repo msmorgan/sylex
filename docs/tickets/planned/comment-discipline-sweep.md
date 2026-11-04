@@ -14,7 +14,7 @@ hardest-to-recover content first).
 ## Assessment (2026-07-24)
 
 - Concentration: 78 files with ≥100 comment lines hold 84% of the mass;
-  the top 40 hold 66%. `deckmaste_engine` alone holds over half.
+  the top 40 hold 66%. `sylex_engine` alone holds over half.
 - 5,294 comment lines carry `[CR#…]` citations (1 in 6) — load-bearing,
   entangled with the cite lock.
 - ~1,500 blocks of ≥6 lines hold ≈40% of the mass; ~738 lines use caps
@@ -27,7 +27,7 @@ hardest-to-recover content first).
 External review re-confirmed the mini-essay as the sweep's primary target
 and measured the work-log dialect the phases must also strip:
 reviewer-directed scope negotiation ("a correctness rewrite this task
-does not sign up for" — `deckmaste_engine/src/sba.rs:~103-130` is the
+does not sign up for" — `sylex_engine/src/sba.rs:~103-130` is the
 type specimen) and plan shorthand no outside reader can resolve — 89
 `Task N` references, 55 `P0.Wn` references, and 233 "seam" mentions
 across `crates/**/*.rs` (regenerate at claim time with
@@ -45,8 +45,8 @@ there unless verification finds a missed violation.
 
 ## Phases 1–5 — heavy files, per crate
 
-Order: `deckmaste_engine` → `deckmaste_plugin` → `deckmaste_migrations` →
-`deckmaste_core` → remainder (`tui`, `macro_ron`, `macro_ron_derive`,
+Order: `sylex_engine` → `sylex_plugin_v1` → `sylex_pipeline_v1` →
+`sylex_core` → remainder (`tui`, `macro_ron`, `macro_ron_derive`,
 `xtask`, `noncanon`, `macro_ron_lsp`). Heavy file = ≥100 comment lines;
 regenerate the list at claim time
 (`rg -t rust -c '^\s*//' crates | awk -F: '$2>=100'`) rather than trusting

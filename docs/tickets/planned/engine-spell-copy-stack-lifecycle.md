@@ -10,7 +10,7 @@ Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #19
 
 ## 1. Copies never fire "becomes the target" (#19)
 
-`crates/deckmaste_engine/src/step/stack.rs:20-79` `Copied::apply` clones
+`crates/engine/src/step/stack.rs:20-79` `Copied::apply` clones
 `targets: entry.targets.clone()` and returns only `GameEvent::Copied`; the only
 `BecameTarget` producer is `decide/pending/cast.rs:143-154`, at announcement or
 trigger placement. So ward, valiant and the like never fire for a copy. Reachable:
@@ -52,13 +52,13 @@ Cite corrections in the same landing:
   fizzle is [CR#608.2b] (an intervening-if removal is [CR#608.2a]).
 - The copy-cease sites cite [CR#704.5d] (the token rule) with [CR#707.10a]; use
   [CR#704.5e,707.10a]: `sba.rs:103, 115, 315, 921, 981, 997, 1060`,
-  `event.rs:109`, `resolve/action.rs:176`, `crates/deckmaste_core/src/action.rs:146`,
-  `crates/deckmaste_semantics/src/action.rs:169`,
-  `crates/deckmaste_plugin/tests/no_dead_grammar.rs:263`. `Action::Cease` gets
+  `event.rs:109`, `resolve/action.rs:176`, `crates/core/src/action.rs:146`,
+  `v1/crates/semantics/src/action.rs:169`,
+  `v1/crates/plugin/tests/no_dead_grammar.rs:263`. `Action::Cease` gets
   [CR#704.5d] only if token ceasing is routed through it.
-- `crates/deckmaste_engine/src/stack.rs:106` ("vanishes instead of moving zones").
+- `crates/engine/src/stack.rs:106` ("vanishes instead of moving zones").
 
-The tests at `crates/deckmaste_engine/tests/stack.rs:4041` ("a copy leaves the
+The tests at `crates/engine/tests/stack.rs:4041` ("a copy leaves the
 stack by CEASING TO EXIST, never by moving") and `:4107` ("a COUNTERED copy also
 ceases rather than moving to a graveyard"), and the docs at `:4213`, `:5158`, pin
 the wrong model; rewrite them to assert the graveyard move and then the cease.

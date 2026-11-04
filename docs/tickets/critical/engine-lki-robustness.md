@@ -12,7 +12,7 @@ Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #8
 
 ## What is wrong at head
 
-- `crates/deckmaste_engine/src/lki.rs:16-19`, `LkiSnapshot` doc: "Characteristics
+- `crates/engine/src/lki.rs:16-19`, `LkiSnapshot` doc: "Characteristics
   (types/P-T/name) derive from `source` via the card definition — correct in
   Stage 3 (no continuous effects yet to have modified them)." Stale. The struct
   stores no characteristics; `capture` (`:48-60`) stores the base

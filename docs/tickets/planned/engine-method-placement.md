@@ -3,7 +3,7 @@ needs: []
 ---
 **Shrink `GameState`'s ~705-method surface by moving component-local methods
 onto the component types they actually touch.** `GameState` (see
-`crates/deckmaste_engine/src/state.rs`) is a struct-of-components — `Zones`,
+`crates/engine/src/state.rs`) is a struct-of-components — `Zones`,
 `ObjectStore`, `TurnState`, `CombatState`, `PlayerState`, `Cards`,
 `DesignationStore`, … — but nearly all behavior hangs off `impl GameState`
 blocks spread across 19 files. A large share of those methods read/write

@@ -18,7 +18,7 @@ and an object can sit outside the game with no zone at all ([CR#400.11]) — so 
 position that may be out-of-game is a `Location`; a position the context
 *guarantees* is in-game stays a `Zone`. `#[macro_ron(flatten)]` lifts the zone
 variant names into `Location`'s dispatch exactly as `Destination::Zone` does
-today (`crates/deckmaste_core/src/action.rs`), so a bare `Hand` still
+today (`crates/core/src/action.rs`), so a bare `Hand` still
 reads/renders as `Hand`, never `Zone(Hand)`.
 
 ## Why

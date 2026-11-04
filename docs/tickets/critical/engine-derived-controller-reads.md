@@ -13,7 +13,7 @@ Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #2.
 Witness: canon Avarice Totem (two `Continuously(… SetController …)` halves), and
 any Control Magic-shaped static.
 
-## Base reads at head (crates/deckmaste_engine/src)
+## Base reads at head (crates/engine/src)
 
 - `step/mod.rs:1346-1350` (`begin_turn`): sickness clears for
   `self.objects.obj(id).controller == active`. [CR#302.6]: "under its
@@ -39,7 +39,7 @@ There are about 200 non-test `.controller` reads in the crate; the sites above
 are the ones the review traced, not an exhaustive list.
 
 The test `stolen_creature_attacks_for_new_controller`
-(`crates/deckmaste_engine/tests/layers.rs:804`) asserts a Grizzly Bears stolen by a
+(`crates/engine/tests/layers.rs:804`) asserts a Grizzly Bears stolen by a
 `SetController` continuous effect "can attack" for its new Controller that turn.
 That contradicts [CR#302.6]; the test is rewritten, not kept.
 
@@ -47,7 +47,7 @@ That contradicts [CR#302.6]; the test is rewritten, not kept.
 
 1. Read the derived Controller (`state.layers().controller(id)`, or one view per
    step/scan) at every rules-facing read: the sites above, then an audit of the
-   remaining `.controller` reads in `crates/deckmaste_engine/src`. A read that must
+   remaining `.controller` reads in `crates/engine/src`. A read that must
    stay base (the layer system's own input, the one-shot `ControlChanged` apply,
    off-battlefield objects whose controller is the owner per [CR#108.4a]) says why
    in a comment.

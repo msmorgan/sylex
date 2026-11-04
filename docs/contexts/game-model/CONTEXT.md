@@ -1,6 +1,6 @@
 # Game Model
 
-The canonical vocabulary for Deckmaste's executable model of Magic. It combines
+The canonical vocabulary for Sylex's executable model of Magic. It combines
 Magic rules terms with project-defined concepts needed to represent them.
 
 ## Authority
@@ -675,7 +675,7 @@ _Avoid_: Semantic Macro, macro; Definition, for a phrasing the rules do not
 define
 
 **Entity** (project term):
-An addressable game-state thing. Deckmaste's current Entity domain contains
+An addressable game-state thing. Sylex's current Entity domain contains
 exactly CR Objects and Players; the project term may expand if the game model
 later requires another addressable kind, and an Entity is not necessarily a CR
 Object.

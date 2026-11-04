@@ -4,7 +4,7 @@ needs: []
 **Engine: the cleanup step follows [CR#514.1,514.2,514.3a], combat with no attackers
 skips the declare blockers and combat damage steps, and the deathtouch SBA only
 counts damage dealt since the last check.** Three timing departures in
-`crates/deckmaste_engine/src/step/mod.rs` and the SBA data; all reachable.
+`crates/engine/src/step/mod.rs` and the SBA data; all reachable.
 
 Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #17,
 #39, #18.
@@ -56,7 +56,7 @@ assert no `StepBegan` and no priority for the skipped steps.
 `check_sbas` (`step/mod.rs:1644-1650`): "deathtouch provenance now rides the damage
 mark itself … no separate per-check window to close. The mark persists exactly as
 long as the damage does". `DamageMark` (`object.rs:253-271`) has no check epoch;
-`plugins/builtin/rules/sba/lethal-damage.ron` reads `DealtDamageBy(This,
+`v1/plugins/builtin/rules/sba/lethal-damage.ron` reads `DealtDamageBy(This,
 Has(Deathtouch))` over every mark. [CR#704.5h]: a creature "dealt damage by a
 source with deathtouch since the last time state-based actions were checked … is
 destroyed." Reachable with canon cards: Darksteel Myr is dealt damage by Typhoid

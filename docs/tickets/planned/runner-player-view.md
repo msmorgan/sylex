@@ -39,7 +39,7 @@ not the paragraphs above.
 
 - "OR the viewer owns/controls the hidden object" matches every card in the
   viewer's own library, because off the battlefield the controller is the owner
-  ([CR#108.4a]; `crates/deckmaste_engine/src/step/mod.rs:590-594`). [CR#401.2]:
+  ([CR#108.4a]; `crates/engine/src/step/mod.rs:590-594`). [CR#401.2]:
   "Players can't look at or change the order of cards in a library."
 - `face(id)` hiding a face-down object "the viewer neither controls nor has a grant
   for" would show an owner a card an opponent exiled face down (Gonti ruling: "No

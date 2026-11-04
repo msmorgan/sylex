@@ -1,8 +1,8 @@
 # English grammar: lexical analysis, Readings, and how the grammar is kept small
 
-> 2026-10-26: `deckmaste_english_v4` and `deckmaste_lexical_source_v4` are now `deckmaste_english` and `deckmaste_lexical_source`; the census command is `cargo xtask english`.
+> 2026-10-26: `deckmaste_english_v4` and `deckmaste_lexical_source_v4` are now `sylex_english` and `sylex_vocabulary`; the census command is `cargo xtask english`.
 
-Updated 2026-10-14 for `deckmaste_syntax` and `deckmaste_english_v4` (paired with [`docs/decisions/english-v4.md`](./english-v4.md)). It has no amendment log: when a rule changes, this text changes. The syntax layer (`deckmaste_syntax` and `deckmaste_english_v4`) has no dependency on Game Model semantics; downstream CxG spelling and `deckmaste_semantics_v3` consume its packed parse forest.
+Updated 2026-10-14 for `sylex_syntax` and `deckmaste_english_v4` (paired with [`docs/decisions/english-v4.md`](./english-v4.md)). It has no amendment log: when a rule changes, this text changes. The syntax layer (`sylex_syntax` and `deckmaste_english_v4`) has no dependency on Game Model semantics; downstream CxG spelling and `deckmaste_semantics_v3` consume its packed parse forest.
 
 ## 1. The engine contract
 
@@ -328,7 +328,7 @@ Unknown ids, class names and values are load errors.
 ## 4. The authoring rule
 
 An author states what a schema or production changes; the syntax engine
-(`deckmaste_syntax`) derives the rest at load time from the grammar data file.
+(`sylex_syntax`) derives the rest at load time from the grammar data file.
 Complete feature summaries and valence alternations (active, passive,
 slash-gap extraction, and right-node raising) are the engine's compiled
 productions from declared complement frames, not the author's manual input. A
@@ -356,6 +356,6 @@ required to lower or record it.
 
 A concise grammar data file (on the order of ~2,500 lines, ~40 features, ~60
 categories at full corpus coverage) is the expected scale; a grammar several
-times that size—or one that pushes equivalent complexity into `deckmaste_syntax`
+times that size—or one that pushes equivalent complexity into `sylex_syntax`
 or `deckmaste_lexical_source_v4`—is a design defect. It is fixed by better
 schema abstractions (section 4), not by counting or by policing flags.

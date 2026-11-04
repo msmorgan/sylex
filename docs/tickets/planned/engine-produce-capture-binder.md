@@ -9,7 +9,7 @@ effects can then find it.
 Rewritten 2026-09-02: the cost landing of
 [Core is explicit regions](../../decisions/core-explicit-regions.md) deleted
 both functions this ticket used to name. `with_cost_feasible` became
-`cost_step_feasible` in `crates/deckmaste_engine/src/activate.rs`, and
+`cost_step_feasible` in `crates/engine/src/activate.rs`, and
 `resolve_binder`'s read-only spine is gone with the `Binder` enum. Costs are
 now a block of instructions with destinations, and `CostComponent::Act {
 dest, .. }` captures a paid product's register.

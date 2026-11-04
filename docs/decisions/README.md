@@ -1,6 +1,6 @@
 # Project decisions
 
-> 2026-10-26: `deckmaste_english_v4` and `deckmaste_lexical_source_v4` are now `deckmaste_english` and `deckmaste_lexical_source`; the census command is `cargo xtask english`.
+> 2026-10-26: `deckmaste_english_v4` and `deckmaste_lexical_source_v4` are now `sylex_english` and `sylex_vocabulary`; the census command is `cargo xtask english`.
 
 These documents record durable project contracts for contributors. They describe
 the intended design rather than a dated implementation inventory; current code
@@ -36,7 +36,7 @@ requires explicit review rather than an opportunistic refactor.
   — Engine contract, round-trip laws, Reading normal forms, and how words reach
   the grammar.
 - [English v4](english-v4.md) — The governing record for
-  `deckmaste_syntax`, `deckmaste_english_v4`, and
+  `sylex_syntax`, `deckmaste_english_v4`, and
   `deckmaste_lexical_source_v4`: data-driven schema/production engine,
   frame-driven complementation, CR-catalog separation, stratified buildout, and
   two-stage cutover.

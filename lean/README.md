@@ -99,7 +99,7 @@ functions a card's text obeys — the row's own obligation is only what the scop
 the kind it may bind. A conferral is an ordinary `Ability` or `StaticSpec` and a
 catalog entry an ordinary `CharacteristicBundle`, checked through
 `TokenSpec.written`; neither is a twin type. The pins are `Proofs/Rules`, whose
-bench items are the rows `plugins/builtin/rules` and `plugins/builtin/tokens`
+bench items are the rows `v1/plugins/builtin/rules` and `v1/plugins/builtin/tokens`
 write.
 
 ## Registry facts

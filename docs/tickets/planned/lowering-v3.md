@@ -4,16 +4,16 @@ needs: [semantics-rust-rewrite]
 **Implement the `deckmaste_lowering_v3` crate from `semantics-rust-rewrite`: resolved semantics to
 `core` (updated 2026-10-14 per
 [`docs/decisions/semantics-v3.md`](../../decisions/semantics-v3.md)).**
-Sibling of `deckmaste_lowering`; v1 lowering deletes at cutover. Same contract
+Sibling of `sylex_lowering_v1`; v1 lowering deletes at cutover. Same contract
 as `semantics-spelling-lowering.md` §9 and §17 and `core-explicit-regions.md`:
 one-way compile, the crate is the divergence ledger, and rearrangement,
 hoisting, and register indexing happen here. May fail on a card that breaks a
 `deckmaste_discourse` law; does not validate. Standard constraints apply.
 
-## Lowering Seams (`deckmaste_discourse` → `deckmaste_core`)
+## Lowering Seams (`deckmaste_discourse` → `sylex_core`)
 
 1. **`DRS` / `ReferentId` to `core::Region` (`DefId` / `RefId` / `Param`) without a duplicate antecedent stack:**
-   - Whereas `v1` `deckmaste_lowering` (`region.rs`) had to maintain its own
+   - Whereas `v1` `sylex_lowering_v1` (`region.rs`) had to maintain its own
      heuristic `antecedents: Vec<Antecedent>` stack to guess which earlier
      `DefId` an `it` or `that <noun>` referred to, `deckmaste_lowering_v3`
      consumes the `DRS` resolution from `deckmaste_discourse`

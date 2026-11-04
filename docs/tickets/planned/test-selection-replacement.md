@@ -13,7 +13,7 @@ it. Two failure modes made it a tax:
 
 1. Any change to `xtask` itself pulled xtask's whole test suite into the gate,
    including the `lean_check` tests that run real `lake` builds (15+ minutes).
-2. A change to a low-level crate (e.g. `deckmaste_syntax`)
+2. A change to a low-level crate (e.g. `sylex_syntax`)
    rebuilt and tested nearly the whole workspace, with no caching between
    landings.
 

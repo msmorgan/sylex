@@ -45,7 +45,7 @@ moved with
 [lean-card-soundness-gate](../tickets/done/lean-card-soundness-gate.md)
 (2026-09-06): `cargo xtask lean check` emits each expanded `plugins_v2/` card as
 a Lean term and proves `Card.check = []` by `decide`, ratcheted per plugin. The
-Rust-to-Idris emitter, the legacy check for the v1 `plugins/canon` corpus,
+Rust-to-Idris emitter, the legacy check for the v1 `v1/plugins/canon` corpus,
 retired with Idris (`idris-retirement`) without a successor; `semantics-v3-parity`
 is the v3 cross-check.
 

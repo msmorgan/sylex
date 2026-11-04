@@ -6,7 +6,7 @@ needs: [semantics-card-facts, discourse-core, discourse-outcomes, discourse-loop
 Standard constraints apply. Epic coordinating Stage 2 (`crates/deckmaste_semantics_v3` static facts
 and `crates/deckmaste_discourse` DRT endophor resolution):
 - **`semantics-card-facts`** (`needs: [semantics-rust-crate, lean-proofs-spec-catalog]`): Rename
-  `crates/semantics` to `crates/deckmaste_semantics_v3`, define the shared `Refusal` type, and
+  `v1/crates/semantics` to `crates/deckmaste_semantics_v3`, define the shared `Refusal` type, and
   implement context-free AST queries (`NumberSlots` `[CR#107.1b]`, CDA `defines_pt`/`defined_stats`
   `[CR#604.3]`, `Ability::category`, `Action::own_deed`, `Ability::keyword_instances`) and
   `DRS`-free card-frame/shape validation (`CardFacts` / `Card` frame laws, `Keywords`,
@@ -42,7 +42,7 @@ The pipeline it belongs to:
 
 - **`deckmaste_semantics_v3`** (`semantics-rust-crate` and `semantics-card-facts`) resolves names by
   expected sort (§5.2), expands Templates and Definitions over the `.syl` syntax tree
-  `deckmaste_dsl` parses, and provides the shared `Refusal` type, context-free AST queries
+  `sylex_syl` parses, and provides the shared `Refusal` type, context-free AST queries
   (`number_slots`, `defines_pt`, `Ability::category`, `keyword_instances`), and `DRS`-free
   card-frame/shape checks. It does no DRT endophor resolution.
 - **`deckmaste_discourse`** (this epic) implements the context-sensitive DRT endophor resolution of
@@ -50,7 +50,7 @@ The pipeline it belongs to:
   compilation, so this is a reimplementation, not a reader of Lean output. The deleted
   `deckmaste_lowering_v3` had part of it; recover what is useful from jj history.
 - **`deckmaste_lowering_v3`** (`lowering-v3`) translates the `deckmaste_semantics_v3` AST and
-  `deckmaste_discourse` `DRS` bindings to the `deckmaste_core` representation.
+  `deckmaste_discourse` `DRS` bindings to the `sylex_core` representation.
 
 Split out of this epic (2026-11-02): `lean-discourse-export` (the oracle),
 `discourse-corpus-agreement` (the gate) and `lean-retirement` (deleting Lean). Absorbed into the
@@ -121,7 +121,7 @@ valencies by defaults).
 
 ## Verification
 
-`deckmaste_dsl` and the Lake generator parse the same `.syl` corpus to identical trees
+`sylex_syl` and the Lake generator parse the same `.syl` corpus to identical trees
 (`dsl-parse-differential`, done). The Lean checker is the oracle for `deckmaste_discourse`, live
 while it is built and in the tree for probing until `discourse-corpus-agreement` passes: the
 bindings and fixture snapshot come from `lean-discourse-export`, keyed as that ticket says.

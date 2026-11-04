@@ -1,14 +1,14 @@
-# deckmaste_english
+# sylex_english
 
 Oracle English for English v4
 ([`docs/decisions/english-v4.md`](../../docs/decisions/english-v4.md)): the
 grammar data file [`grammar/english.ron`](grammar/english.ron) and its binding
-into `deckmaste_syntax`.
+into `sylex_syntax`.
 
 The grammar names Categories, features, Schemas and core closed-class lexemes
 only. Vocabulary and Subcategorization Frames come from the lexical environment
 the caller binds it with: the seed in `tests/seed/` for the seed proof, and
-`deckmaste_lexical_source`'s core lexicon and Catalogs for the strata.
+`sylex_vocabulary`'s core lexicon and Catalogs for the strata.
 `tests/catalog_leak.rs` checks that the grammar names only core closed-class
 lexemes of that lexicon and that none of its own names spells a catalog item.
 
@@ -27,10 +27,10 @@ per seed sentence.
 
 `corpus` reads the supported corpus (Vintage legal or restricted, outside
 `set_type: funny`) from `data/scryfall/oracle-cards.jsonl` through
-`deckmaste_data`, one `Face` per Card Face record with its own name and its
+`sylex_upstream`, one `Face` per Card Face record with its own name and its
 card's in lexical scope. Each face yields Corpus Units: its Type Line, and each
 paragraph line of its rules text after balanced reminder text is removed
-(`deckmaste_data::oracle_text::strip_reminder_text`). The split needs no parse.
+(`sylex_upstream::oracle_text::strip_reminder_text`). The split needs no parse.
 
 ## Complexity Strata
 

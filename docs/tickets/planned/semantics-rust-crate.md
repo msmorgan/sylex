@@ -6,7 +6,7 @@ needs: [semantics-rust-resolve, lean-elaborated-value-dump]
 Standard constraints apply. Second half of Stage 1 of `semantics-rust-rewrite`, building on
 `semantics-rust-resolve` (bundle loader, signature registry, `spelling_order`, expected-sort
 resolution to `Term`, and SCC cycle checking): define the typed Semantics AST in
-`crates/semantics`, expand resolved `Template` and `Definition` declarations into concrete `Arc`
+`v1/crates/semantics`, expand resolved `Template` and `Definition` declarations into concrete `Arc`
 AST values while preserving call boundaries and parameter substitutions, and verify per declaration
 and card that `semantics`'s expansion equals the value Lean elaborates
 (`lean-elaborated-value-dump`).
@@ -17,7 +17,7 @@ and card that `semantics`'s expansion equals the value Lean elaborates
 
 ## Design Specification
 
-### 1. Plain Rust AST Representation & Traversal Traits (`crates/semantics/src/ast`)
+### 1. Plain Rust AST Representation & Traversal Traits (`v1/crates/semantics/src/ast`)
 
 `semantics` defines every AST type in `lean/Semantics/{Words,Events,Abilities,Card,Rules}.lean`:
 
@@ -38,7 +38,7 @@ and card that `semantics`'s expansion equals the value Lean elaborates
   - **List fields**: Explicit `Arc<[T]>` across all AST types (`sequentially`, `and`, `or`,
     `types`, `subtypes`, `text`, etc.). Never alias `type Vec<T> = Arc<[T]>`.
   - **Recursive subtrees & heavy enum payloads**: Wrapped in `Arc<T>` so every AST enum satisfies
-    `clippy::large_enum_variant` without suppressions (matching `deckmaste_semantics` v1) and
+    `clippy::large_enum_variant` without suppressions (matching `sylex_semantics_v1` v1) and
     multi-mention parameter substitution clones subtrees in $O(1)$ via `Arc::clone`.
   - **Identifiers (`dpsi::Ident`)**: All names and labels (`CardFace.name`, `CardType.name`,
     `Subtype`, `KeywordLabel`, `AbilityWordLabel`, `CounterKind`, `DesignationLabel`,
@@ -123,7 +123,7 @@ call and recording `CallId → CallSiteInfo` (with `args` ordered by `decl.spell
 
 ### 3. Verification Gate (`lean-elaborated-value-dump`)
 
-A test in `crates/semantics` reads the gitignored Lean dump at
+A test in `v1/crates/semantics` reads the gitignored Lean dump at
 `docs/evidence/lean-dumps/<label>/values.txt` (`lean-elaborated-value-dump`) and verifies
 wrapper-erased tree equality:
 

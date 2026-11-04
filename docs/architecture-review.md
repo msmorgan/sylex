@@ -6,7 +6,7 @@
 
 ## Overview
 
-A comprehensive review of the `deckmaste.rs` engine and taxonomy was performed
+A comprehensive review of the `sylex` engine and taxonomy was performed
 to identify systemic issues, false assumptions, and technical debt. Four of its
 six findings have since been implemented. The two remaining findings are open
 design investigations, not known correctness regressions on the implemented
@@ -26,7 +26,7 @@ counts and derived statistics. Regression coverage includes a dynamic CDA and a
 dynamic layer-7c pump.
 
 - **Completed ticket:** `done/engine-layers-dynamic-counts`
-- **Implementation:** `crates/deckmaste_engine/src/layer.rs::eval_count`
+- **Implementation:** `crates/engine/src/layer.rs::eval_count`
 
 ### 2. Subtype Modification in Layer 4
 
@@ -41,7 +41,7 @@ deduplication, removal, and conferred abilities.
 
 - **Completed ticket:** `done/layers-layer-4-subtypes`
 - **Implementation:** the `Modification::Subtypes` arm and
-  `fold_conferred_abilities` in `crates/deckmaste_engine/src/layer.rs`
+  `fold_conferred_abilities` in `crates/engine/src/layer.rs`
 
 Two narrower cases remain explicitly deferred in the implementation:
 `BecomeBasicLandType` and the every-creature-type expansion used by changeling.
@@ -61,7 +61,7 @@ convergence.
 
 - **Completed ticket:** `done/engine-layers-fixpoint`
 - **Implementation:** `GameState::layers` in
-  `crates/deckmaste_engine/src/layer.rs`
+  `crates/engine/src/layer.rs`
 
 ### 4. Macro Composition Opportunities
 
@@ -75,7 +75,7 @@ individually under the repository's keyword policy; the completion of Amass
 does not imply that every composite keyword has been authored.
 
 - **Completed ticket:** `done/macro-amass`
-- **Definition:** `plugins/builtin/macros/action/Amass.ron`
+- **Definition:** `v1/plugins/builtin/macros/action/Amass.ron`
 
 ### 5. Loop Detection and Game-State Equality (UD-11)
 

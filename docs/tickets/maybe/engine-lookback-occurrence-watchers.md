@@ -10,7 +10,7 @@ Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #3.
 
 ## What is wrong at head
 
-`crates/deckmaste_engine/src/trigger.rs`:
+`crates/engine/src/trigger.rs`:
 
 - `scan_triggers` (`:614-666`) loops over an `Occurrence::Batch` and calls
   `scan_event` once per fact.

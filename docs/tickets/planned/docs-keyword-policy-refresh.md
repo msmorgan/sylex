@@ -6,7 +6,7 @@ needs: []
 - §6 documents a plugin-load enforcement step (`keyword_shape` matching each
   `KeywordAbility` macro's param-type multiset against seven signatures, load
   error on mismatch, a `keywords: HashMap` registry on the plugin) that no
-  longer exists in `crates/deckmaste_core/src/plugin.rs`. The `ParamShape` /
+  longer exists in `crates/core/src/plugin.rs`. The `ParamShape` /
   `KeywordDecl` types survive as orphans — re-exported from `lib.rs`,
   exercised by one round-trip test, read by nothing else — and §6's "only
   reads are one test and a clone-forward" line is stale too (no clone-forward

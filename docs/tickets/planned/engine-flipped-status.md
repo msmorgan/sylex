@@ -3,8 +3,8 @@ needs: []
 ---
 **Engine: `Status::Flipped` / `Status::Unflipped` are unevaluated predicates.**
 
-The `Status` predicate arm in `crates/deckmaste_engine/src/target.rs` and its
-LKI/snapshot twin in `crates/deckmaste_engine/src/trigger.rs` cover no status
+The `Status` predicate arm in `crates/engine/src/target.rs` and its
+LKI/snapshot twin in `crates/engine/src/trigger.rs` cover no status
 values yet. The arm's other values have owners — `PhasedOut`/`PhasedIn` →
 `engine-phasing`, `FaceDown`/`FaceUp` → `engine-face-down` — but
 `Flipped`/`Unflipped` had none.

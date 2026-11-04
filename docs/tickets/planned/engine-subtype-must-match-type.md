@@ -7,7 +7,7 @@ needs: []
 [CR#205.3d], and "if an object's card type is removed, the subtypes correlated with that card
 type will remain if they are also the subtypes of a card type the object currently has; otherwise,
 they are also removed for the entire time the object's card type is removed" [CR#205.1a]. The
-engine's layer-4 subtype change (`Modification::Subtypes` in `crates/deckmaste_engine/src/layer.rs`,
+engine's layer-4 subtype change (`Modification::Subtypes` in `crates/engine/src/layer.rs`,
 around line 1895) adds or sets any subtype whatever the object's types. `idris-retirement`
 carried the [CR#205.3d] citation to `primitives/static/typeLine.syl`, which states the rule without
 anything enforcing it.
@@ -40,7 +40,7 @@ is a 2/2 black Orc Goblin Army creature token again, because amass's Goblin effe
   among the object's types at that point; cite [CR#205.3d] there.
 - When layer 4 removes a card type, remove the subtypes correlated only with it [CR#205.1a] (check
   whether the engine already does; cite it where it does).
-- Tests in `deckmaste_engine`:
+- Tests in `sylex_engine`:
   - the witness above, through all three states;
   - a creature subtype added to a noncreature is not gained, and is gained once the object becomes
     a creature while the effect lasts (the reverse timestamp order);

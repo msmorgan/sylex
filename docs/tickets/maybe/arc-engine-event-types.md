@@ -13,11 +13,11 @@ parent work) shrank the small variants of several engine runtime enums, which
 (~288 bytes) inline. Five enums now trip `large_enum_variant` and are suppressed
 with `#[expect(clippy::large_enum_variant, reason = "… arc-engine-event-types …")]`:
 
-- `Occurrence::Single(GameEvent)` — `crates/deckmaste_engine/src/event.rs`
-- `Progress::Applied(Occurrence)` — `crates/deckmaste_engine/src/step/mod.rs`
-- `StepOutcome` (carries `Progress`) — `crates/deckmaste_engine/src/step/mod.rs`
-- `ReplaceOutcome::Pass(GameEvent)` — `crates/deckmaste_engine/src/replace_registry.rs`
-- `ResumeOutcome::Fact(GameEvent)` — `crates/deckmaste_engine/src/replace_registry.rs`
+- `Occurrence::Single(GameEvent)` — `crates/engine/src/event.rs`
+- `Progress::Applied(Occurrence)` — `crates/engine/src/step/mod.rs`
+- `StepOutcome` (carries `Progress`) — `crates/engine/src/step/mod.rs`
+- `ReplaceOutcome::Pass(GameEvent)` — `crates/engine/src/replace_registry.rs`
+- `ResumeOutcome::Fact(GameEvent)` — `crates/engine/src/replace_registry.rs`
 
 These join the pre-existing suppressions on `WorkItem` (agenda.rs, same hot-path
 rationale) and `Card`/`TodoCard` (a `CardFace`-per-variant leaf; core `card.rs`

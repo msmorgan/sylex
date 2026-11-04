@@ -2,7 +2,7 @@
 needs: []
 ---
 Fix the WC99 probe's damage classification for the blocking era. The
-heuristic (crates/deckmaste_noncanon/src/probe.rs) classifies by
+heuristic (crates/matchups/src/probe.rs) classifies by
 source-on-battlefield at post-batch observe time, guarded by a comment
 ("fine while the fixture has no combat trades; revisit with blockers") that
 is stale: both pilots now declare `Block(BlockAll)`, so trades happen every

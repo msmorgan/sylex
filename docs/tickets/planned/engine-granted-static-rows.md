@@ -3,7 +3,7 @@ needs: []
 ---
 **Engine: most `Continuously(...)` granted static-row kinds can't be minted.**
 
-`crates/deckmaste_engine/src/resolve/effect.rs` mints a granted continuous row
+`crates/engine/src/resolve/effect.rs` mints a granted continuous row
 only for `Each(SelectAll, Modify(It, _))`. Three arms stay loud:
 
 - `Each(SelectAll, inner)` where `inner` isn't `Modify(It, _)`;

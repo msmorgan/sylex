@@ -8,7 +8,7 @@ consultation: build ONLY when a trigger arrives — a UI needs per-source
 attribution ("granted by which Anthem" — identical values from two lords
 are indistinguishable in the value-keyed index), a real text-changing
 effect lands (the layer-3 slot,
-`crates/deckmaste_engine/src/layer.rs:1717-1721`), or idiom
+`crates/engine/src/layer.rs:1717-1721`), or idiom
 misrendering from index collisions is observed in practice.
 
 ## Decision criterion (documented; re-check at claim time)
@@ -16,7 +16,7 @@ misrendering from index collisions is observed in practice.
 The `runtime-prose-link` value index suffices iff canonical spelling
 factors through core: `lower(a) == lower(b)` ⇒ same rendered prose. The
 law fails in general — invocation equality is provenance-sensitive by
-design (`crates/macro_ron/src/expansion.rs:10-13`) and lowering erases
+design (`v1/crates/macro_ron/src/expansion.rs:10-13`) and lowering erases
 the wrappers — but holds in practice on a canonical-form authored
 surface. This ticket exists for when "in practice" stops being good
 enough.

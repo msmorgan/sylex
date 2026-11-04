@@ -18,7 +18,7 @@ belongs with the Lean tickets; `lean-defense-projection` covers the Lean
 
 `Stat::Loyalty` is "the PRINTED loyalty characteristic off the card face — never
 the live counter count" in every zone; `Stat::Defense` is the `DefenseCounter`
-count in every zone. Sites (crates/deckmaste_engine/src):
+count in every zone. Sites (crates/engine/src):
 
 - `layer.rs:1265-1285` (`eval_stat_of`) and `:915-930` (second arm); the
   `layer.rs:1233` doc "mana value / loyalty / defense are layer-stable base
@@ -26,7 +26,7 @@ count in every zone. Sites (crates/deckmaste_engine/src):
 - `resolve/count.rs:194-210` (live arm) and `:64-67` (snapshot arm);
 - `trigger.rs:1609-1622` (snapshot arm); `activate.rs:504-520`;
   `target.rs:843-858`;
-- `plugins/builtin/macros/counters/LoyaltyCounter.ron:1-2` says the opposite ("a
+- `v1/plugins/builtin/macros/counters/LoyaltyCounter.ron:1-2` says the opposite ("a
   planeswalker's loyalty IS its number of loyalty counters — read by
   StatOf(_, Loyalty)").
 
@@ -43,7 +43,7 @@ number of loyalty counters on it." [CR#306.5a]: the printed number elsewhere.
 1. Make both stats zone-dependent in every arm above: on the battlefield, the
    counter count (planeswalkers for loyalty, battles for defense); elsewhere, the
    printed number. A snapshot reads the value as it was in the zone it left.
-2. The [CR#306.5b] entry grant (`plugins/builtin/rules/grant/planeswalker-loyalty.ron:9`,
+2. The [CR#306.5b] entry grant (`v1/plugins/builtin/rules/grant/planeswalker-loyalty.ron:9`,
    `PutCounters(This, LoyaltyCounter, StatOf(This, Loyalty))`) gets an explicit
    printed-loyalty read, since after step 1 the live read on the battlefield is
    the counter count.

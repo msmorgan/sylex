@@ -4,7 +4,7 @@ needs: [semantics-rust-crate, lean-proofs-spec-catalog]
 # `semantics-card-facts`: crate rename, `Refusal`, context-free AST queries, and card-frame laws
 
 Standard constraints apply. Context-free AST query and card-frame/shape validation ticket of
-`semantics-rust-rewrite`: rename `crates/semantics` to `crates/deckmaste_semantics_v3`, define the
+`semantics-rust-rewrite`: rename `v1/crates/semantics` to `crates/deckmaste_semantics_v3`, define the
 shared `Refusal` taxonomy, and implement the `DRS`-free AST queries (`NumberSlots`, CDA/ability/
 keyword queries) and static card-frame/shape checks (`CardFacts`, `Card` frame laws, `Keywords`,
 `TextChanges`, and the verified `DRS`-free subset of `PredicateShape` / `LocalShape`) in
@@ -14,7 +14,7 @@ them directly.
 ## Scope & Design Decisions
 
 1. **Crate rename and shared `Refusal` taxonomy (`Refusal.lean`)**:
-   - Rename `crates/semantics` (package `semantics`) to `crates/deckmaste_semantics_v3` (package
+   - Rename `v1/crates/semantics` (package `semantics`) to `crates/deckmaste_semantics_v3` (package
      `deckmaste_semantics_v3`), updating `Cargo.toml`, `crates/xtask`, and
      `.github/workflows/ci.yml`.
    - Define `Refusal` (`Refusal.lean`) in `crates/deckmaste_semantics_v3` so both

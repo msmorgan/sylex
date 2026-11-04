@@ -3,7 +3,7 @@ needs: []
 ---
 **Engine: deontic rows outside the Cast arm go unevaluated.**
 
-`guard_deontic_seam` in `crates/deckmaste_engine/src/legal.rs` trips loudly for
+`guard_deontic_seam` in `crates/engine/src/legal.rs` trips loudly for
 any deontic row shape the legality evaluator doesn't yet interpret. It is a
 *presence guard*, not a fizzle: a row exists in the derived view and would
 change legality, so silently ignoring it would be wrong ([CR#101.2] — a

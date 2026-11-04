@@ -3,7 +3,7 @@ needs: []
 ---
 **Engine: non-mana cost components on a cost-change row are not folded.**
 
-`crates/deckmaste_engine/src/cast.rs` implements the total-cost pipeline
+`crates/engine/src/cast.rs` implements the total-cost pipeline
 ([CR#601.2f] — the player determines the total cost; effects may increase or
 reduce it). Three arms stay loud because they only handle mana:
 

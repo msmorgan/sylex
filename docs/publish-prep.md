@@ -23,15 +23,15 @@ The repo touches Wizards of the Coast IP in three tiers:
 - `data/` — the raw MTGJSON dump (~600 MB) and CR snapshot. Already
   gitignored; never publish. The README should point at
   `scripts/fetch_data` so users fetch their own copy.
-- `plugins/wizards/` — generated card stubs/todos. Already gitignored and
-  regenerated via `cargo xtask generate plugins/wizards`; never publish.
-- `plugins/canon/` (and friends) — hand-written RON encodings that reference
+- `v1/plugins/wizards/` — generated card stubs/todos. Already gitignored and
+  regenerated via `cargo xtask generate v1/plugins/wizards`; never publish.
+- `v1/plugins/canon/` (and friends) — hand-written RON encodings that reference
   real card names and derive from oracle text. These **are** published, so
   the README needs a fan-content section.
 
 The plan required the README to include the Fan Content Policy notice:
 
-> Deckmaste is unofficial Fan Content permitted under the
+> Sylex is unofficial Fan Content permitted under the
 > [Fan Content Policy](https://company.wizards.com/en/legal/fancontentpolicy).
 > Not approved/endorsed by Wizards. Portions of the materials used are
 > property of Wizards of the Coast. © Wizards of the Coast LLC.
@@ -52,9 +52,9 @@ temporary card-count estimate:
    who know MTG know these are where hobby engines die; name them.
 3. **Honest scope line** — describe the curated vertical slice without a
    quickly stale card-count total.
-4. **Architecture** — one line per crate: `deckmaste_core` (the card
-   language: abilities, effects, costs, zones…), `deckmaste_engine` (game
-   state and rules), `deckmaste_plugin` (corpus + suite), `deckmaste_migrations`
+4. **Architecture** — one line per crate: `sylex_core` (the card
+   language: abilities, effects, costs, zones…), `sylex_engine` (game
+   state and rules), `sylex_plugin_v1` (corpus + suite), `sylex_pipeline_v1`
    (data pipeline), `macro_ron`/`macro_ron_derive` (RON macro-expansion DSL),
    `xtask` (tooling).
 5. **The cite-check system** — a paragraph on `cargo xtask cite check` /
@@ -63,7 +63,7 @@ temporary card-count estimate:
    citations against the rules snapshot. This is the most novel dev-tooling idea in the repo;
    don't bury it.
 6. **Getting started** — build prereqs, `scripts/fetch_data` (note the
-   ~600 MB download), `cargo xtask generate plugins/wizards`, then how to run
+   ~600 MB download), `cargo xtask generate v1/plugins/wizards`, then how to run
    the test suite. Flag which steps need the data and which don't.
 7. **Fan-content / license section** — from §2 above.
 
@@ -78,11 +78,11 @@ warnings denied, and workspace tests. Data-dependent corpus tests are ignored
 when their local generated inputs are absent.
 
 The complication considered at the time was that parts of the
-`deckmaste_plugin` suite loaded `plugins/wizards`, generated from the 600 MB
+`sylex_plugin_v1` suite loaded `v1/plugins/wizards`, generated from the 600 MB
 `data/` dump unavailable to CI. The alternatives considered were:
 
 - **(a)** run only the crates/tests that don't need data (e.g.
-  `cargo test --workspace --exclude deckmaste_plugin`, or an env-var/feature
+  `cargo test --workspace --exclude sylex_plugin_v1`, or an env-var/feature
   gate on the data-dependent tests) — simplest, recommended first pass;
 - **(b)** fetch + cache the dataset in CI (actions/cache can hold it, but
   the first-fetch and restore costs are real);

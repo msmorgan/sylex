@@ -12,7 +12,7 @@ excluded from `Target(n)`/plural reads"; only departed-target exclusion landed.
 
 ## 1. Illegal targets are still read (#13)
 
-- `crates/deckmaste_engine/src/resolve/targets.rs:28` `targets_still_legal(&self,
+- `crates/engine/src/resolve/targets.rs:28` `targets_still_legal(&self,
   entry) -> bool` computes legality per target but returns one bool
   (`:84-104`); its doc (`:20-22`) says "(the illegal targets are then excluded
   from the reads)".

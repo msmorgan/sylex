@@ -26,8 +26,8 @@ grammar (`core-card-shapes`), extraction, and engine behavior. Slug:
 
 ## 6. Keyword abilities
 
-Per-keyword work = macro body (stub: `plugins/wizards/keyword_abilities/*.todo.ron`;
-authored macros land in `plugins/builtin/macros/keyword/`),
+Per-keyword work = macro body (stub: `v1/plugins/wizards/keyword_abilities/*.todo.ron`;
+authored macros land in `v1/plugins/builtin/macros/keyword/`),
 any engine machinery (right column names the engine ticket it rides on), parser
 coverage, and graduating its cards. Slug: `kw-<kebab-case>`. Rows tagged
 **[shipped]** are integrated (authored macro + `done/` ticket) — kept here for

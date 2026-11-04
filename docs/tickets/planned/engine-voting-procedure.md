@@ -3,7 +3,7 @@ needs: []
 ---
 **Engine: the `Vote` decision is shaped but has no producer and no handler.**
 
-`crates/deckmaste_engine/src/decide/pending/choice.rs` defines `Vote { player,
+`crates/engine/src/decide/pending/choice.rs` defines `Vote { player,
 options }` and `strategy.rs` can answer one, but nothing ever constructs a
 `PendingDecision::Vote`, and `Vote::resolve` is unbuilt.
 

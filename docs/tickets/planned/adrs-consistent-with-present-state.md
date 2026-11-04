@@ -13,9 +13,9 @@ Where an ADR is superseded in whole, say so at the top and link the successor.
 Scope:
 
 - The crate names and command: `deckmaste_english_v4` and
-  `deckmaste_lexical_source_v4` are now `deckmaste_english` and
-  `deckmaste_lexical_source`; the census command is `cargo xtask english`.
-- Deleted crates still described as live: v1 English, `deckmaste_spelling` (now
+  `deckmaste_lexical_source_v4` are now `sylex_english` and
+  `sylex_vocabulary`; the census command is `cargo xtask english`.
+- Deleted crates still described as live: v1 English, `sylex_spelling` (now
   a stub crate), the construction crates (`deckmaste_construction_v3*`,
   `deckmaste_construction_compiler`, `deckmaste_constructions_macro`), and the
   timing of `plugins_v2/builtin/`.
@@ -30,20 +30,20 @@ the lines below are where to look, not a finished audit.
 - `english-v4.md`: §1 and the layer table name `deckmaste_lexical_source_v4`
   and `deckmaste_english_v4` as live crates; §7 Cutover 2 still lists the suffix
   drop as future work, though it is done, and keeps the catalog move and the
-  `deckmaste_features` deletion; Cutover 1 says `plugins_v2/builtin/` stays
+  `sylex_features_v1` deletion; Cutover 1 says `plugins_v2/builtin/` stays
   until `semantics-v3-dsl-and-plugins`, which must match the actual schedule;
-  §5 contrasts the crate with "`deckmaste_lexical_source`'s 4-layer salvage
+  §5 contrasts the crate with "`sylex_vocabulary`'s 4-layer salvage
   pipeline", which now reads as the crate itself because the old crate's name
   was reused.
 - `english-lexical-analysis.md`: the header says it pairs with
   `deckmaste_english_v4`; names the v4 crate throughout.
-- `semantics-v3.md`: cites `deckmaste_spelling` (a stub) as the consumer of linked
+- `semantics-v3.md`: cites `sylex_spelling` (a stub) as the consumer of linked
   abilities (§ on linked abilities), `plugins_v2/` and `deckmaste_semantics_v2`
-  deletion timing, and the v1 `deckmaste_english` translation path; the
+  deletion timing, and the v1 `sylex_english` translation path; the
   deletion-bound and cutover bullets (lines near 54-57 and 608-610) predate
   `retire-v1-english-and-spelling`.
 - `semantics-spelling-lowering.md`: the architecture diagram and section list
-  describe v1 `deckmaste_english` and `deckmaste_spelling` as live, plus the
+  describe v1 `sylex_english` and `sylex_spelling` as live, plus the
   Idris mirror (`idris/src/Semantics.idr`) and `ci-idris-gate`; the decision is
   largely superseded by `semantics-v3.md` and the Lean workbench, and should say
   so at the top.

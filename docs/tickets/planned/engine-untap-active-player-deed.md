@@ -3,7 +3,7 @@ needs: []
 ---
 # The untap step's untap is the active player's deed
 
-`DeonticAction::Untap` (`crates/deckmaste_core/src/deontic.rs:288-299`) has one patient slot,
+`DeonticAction::Untap` (`crates/core/src/deontic.rs:288-299`) has one patient slot,
 and its doc comment says untapping "is a turn-based action, not a deed some object performs, so
 there is no agent slot". That is wrong. [CR#502.3]: "the active player determines which
 permanents they control will untap. Then they untap them all simultaneously." The untap has an
@@ -13,7 +13,7 @@ Change: give `DeonticAction::Untap` an agent slot beside `what`, and model the u
 turn-based action as the active player's deed, with [CR#502.3]'s choice as its decision point.
 Player-keyed caps (Winter Orb, Static Orb, Smoke) and "you may choose not to untap" (Rubinia
 Soulsinger) need the agent. Reword the "no agent slot" doc comment, and the matching one in
-`crates/deckmaste_semantics/src/deontic.rs:307` while that crate lives.
+`v1/crates/semantics/src/deontic.rs:307` while that crate lives.
 
 Decided: the Lean v3 workbench already writes the untap this way, and its shapes are the model
 for this change: `doesntUntap` and `mayDeclineUntap` (`Definitions/Actions.lean`, `cant any

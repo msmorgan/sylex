@@ -3,7 +3,7 @@ needs: []
 ---
 **Engine: a granted continuous prevention row can't be minted.**
 
-`crates/deckmaste_engine/src/resolve/effect.rs` trips on
+`crates/engine/src/resolve/effect.rs` trips on
 `Continuously(Prevention(_))` — an effect that *grants* a continuous
 prevention effect ([CR#615.1]).
 

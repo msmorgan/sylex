@@ -4,7 +4,7 @@ needs: []
 **Narrow `GameState`'s field visibility so the engine-runner boundary is
 enforced by the compiler, not by convention.** Today every field on
 `GameState` (23 of them — `zones`, `objects`, `stack`, `turn`, `combat`,
-`rng`, `agenda`, `shields`, …; see `crates/deckmaste_engine/src/state.rs`) is
+`rng`, `agenda`, `shields`, …; see `crates/engine/src/state.rs`) is
 fully `pub`. Any consumer crate can mutate `state.zones` or `state.stack`
 directly, bypassing the zone-change pipeline (LKI snapshots, replacement
 shields, trigger noting, SBA scheduling) and silently invalidating every
@@ -13,7 +13,7 @@ convenience/filtering/redaction while the engine owns all state transitions is
 currently unenforceable.
 
 A first-pass grep (receivers named `state`/`game`/`gs` outside
-`crates/deckmaste_engine`) finds roughly 60 external field-access sites:
+`crates/engine`) finds roughly 60 external field-access sites:
 `zones` ~24, `objects` ~9, `stack` ~8, `turn` ~7, `combat` ~7, `players` ~4,
 `pending` 1. That heuristic undercounts; step 1 below re-audits properly.
 

@@ -9,7 +9,7 @@ speculative — claim only with a design pass.
 Today the same relation set is spelled independently in three places, with no
 shared type and no connection between them:
 
-- durative → `crates/deckmaste_core/src/filter.rs`: `StateFilter::Attacking`,
+- durative → `crates/core/src/filter.rs`: `StateFilter::Attacking`,
   `Blocking`, `Unblocked`, `RelationFilter::AttachedTo`
 - inchoative (events) → `event.rs`: `StateFilterEvent::Attacking/Blocking/Blocked`,
   `Event::BecomesTarget`, casting as a stringly `Event::Performed { verb: "Cast" }`

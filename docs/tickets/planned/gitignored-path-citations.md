@@ -3,12 +3,12 @@ needs: []
 ---
 
 **Tracked code cites gitignored `docs/superpowers/…` paths — 1 site
-remaining.** (The runtime-printed site and the `deckmaste_spelling` test sites
+remaining.** (The runtime-printed site and the `sylex_spelling` test sites
 went with `retire-v1-english-and-spelling`.) Flagged by macro-frames round 2's Task 3
 review; all predate that round and sat outside its declared scope
 (recorded in the round-2 ledger, "Corrected line numbers" note).
 
-- `crates/macro_ron/src/frames.rs:47`
+- `v1/crates/macro_ron/src/frames.rs:47`
 
 Line numbers are as of round-2 exit — re-grep at claim time:
 `rg 'docs/superpowers|docs/memory' crates plugins`.

@@ -1,13 +1,13 @@
-# deckmaste_lexical_source
+# sylex_vocabulary
 
 The core English lexicon and the Catalogs of English v4
 ([`docs/decisions/english-v4.md`](../../docs/decisions/english-v4.md) §§2, 5),
-loaded as one Lexical Environment: a `deckmaste_lexical::Lexicon` and the
-`deckmaste_syntax::FrameCatalog` of its Subcategorization Frames.
+loaded as one Lexical Environment: a `sylex_lexicon::Lexicon` and the
+`sylex_syntax::FrameCatalog` of its Subcategorization Frames.
 
 ```rust
-let environment = deckmaste_lexical_source::LexicalEnvironment::load()?;
-let grammar = deckmaste_english::bind(&environment.lexicon, &environment.frames)?;
+let environment = sylex_vocabulary::LexicalEnvironment::load()?;
+let grammar = sylex_english::bind(&environment.lexicon, &environment.frames)?;
 ```
 
 ## Data files
@@ -41,14 +41,14 @@ authored type.
 | `catalogs/plural_names.ron` | Catalog | none: the Number of `name:` Lexemes (every other Catalog name is singular) |
 | `data/gen/catalogs/card-names.txt` (read at load) | Catalog | `name:` |
 
-Only Core vocabulary may be named by a grammar (`deckmaste_syntax` rejects any
+Only Core vocabulary may be named by a grammar (`sylex_syntax` rejects any
 other Closed Word). A word is never both Core and a catalog item of the same
 Category; the loader rejects it.
 
 ## Morphology and frames
 
 Every verb has its full paradigm and every count noun its plural; regular
-spellings come from `deckmaste_lexical`'s default rules and irregular ones are
+spellings come from `sylex_lexicon`'s default rules and irregular ones are
 explicit overrides. Only the modals and negative auxiliaries are defective
 (`finite_only`). Attestation never withholds a form.
 
@@ -151,7 +151,7 @@ named in the test. `paradigms` checks full paradigms and that every lexical
 value realizes and analyzes back. `labels`, `names` and `loader` cover
 registered-label exclusivity, Shortened Name, Introduced Name and Anchor Word
 scope and the loader's rejections. The grammar-leak lint lives with the grammar, in
-`deckmaste_english/tests/catalog_leak.rs`.
+`sylex_english/tests/catalog_leak.rs`.
 
 ## Not here
 

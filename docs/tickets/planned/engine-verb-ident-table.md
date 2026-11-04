@@ -3,7 +3,7 @@ needs: []
 ---
 **Replace stringly dispatch for engine-interpreted verbs with one typed
 vocabulary.** There are 51 `as_str() == "…"` sites in
-`crates/deckmaste_engine/src` as of 2026-08-03, including production paths for
+`crates/engine/src` as of 2026-08-03, including production paths for
 `Destroy`, `Draw`, `Mill`, `Discard`, and `DayNight`/`Day`/`Night`. A typo at a
 call site silently disables behavior.
 

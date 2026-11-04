@@ -1,6 +1,6 @@
-# deckmaste RON language server
+# sylex RON language server
 
-A language server for deckmaste's macro-aware RON dialect (`*.ron`, `*.ron.todo`),
+A language server for sylex's macro-aware RON dialect (`*.ron`, `*.ron.todo`),
 built on `lsp-server` + `lsp-types`. It backs both editor LSP clients and Claude
 Code's built-in `LSP` tool.
 
@@ -8,7 +8,7 @@ Code's built-in `LSP` tool.
 
 | LSP request | What it does |
 |---|---|
-| `textDocument/definition` | Jump from an identifier to matching macro definitions (`plugins/*/macros/**/*.ron`), card files, keyword/ability-word definitions, and Rust structs/enums/variants in `deckmaste_core`. |
+| `textDocument/definition` | Jump from an identifier to matching macro definitions (`plugins/*/macros/**/*.ron`), card files, keyword/ability-word definitions, and Rust structs/enums/variants in `sylex_core`. |
 | `textDocument/references` | All use sites of a macro / card / type across card and macro files. The reverse index is built lazily on the first request and cached, and tracks only known-symbol identifiers, so it stays bounded across a plugin's tens of thousands of cards. |
 | `textDocument/hover` | For a macro, its `template` and `kinds`; for a card / keyword / type, its kind and container. |
 | `textDocument/documentSymbol` | An outline of the open card: the card `name` as the root, one child per top-level `abilities` entry. |

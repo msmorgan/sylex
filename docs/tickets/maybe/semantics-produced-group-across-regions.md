@@ -37,7 +37,7 @@ processed simultaneously, which the rewrite would break.
 
 ## Acceptance
 
-`crates/deckmaste_engine/tests/region_witnesses.rs`'s
+`crates/engine/tests/region_witnesses.rs`'s
 `deadly_brew_lets_the_caster_rebuy_after_the_table_sacrifices` loses its
 `#[ignore]` and passes: each player sacrifices one of their own, and the
 caster — having sacrificed one this way — returns a DIFFERENT permanent card

@@ -29,7 +29,7 @@ duplicates the keyword's meaning (breaks single-source-of-truth), and reads as a
 global timing permission rather than a per-checker counterfactual. Ruling: an
 "as though [keyword]" effect must be the counterfactual overlay that INVOKES the
 keyword. The ONE legitimate `May(Cast(InstantSpeed))` author is the Flash keyword
-macro itself (`plugins/builtin/macros/keyword/Flash.ron`, `what: Ref(This)`).
+macro itself (`v1/plugins/builtin/macros/keyword/Flash.ron`, `what: Ref(This)`).
 
 ## The blocker this ticket must clear (engine infrastructure)
 

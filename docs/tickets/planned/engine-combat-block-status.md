@@ -10,7 +10,7 @@ Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #20
 
 ## 1. `Unblocked` matches before blocks (#20)
 
-`crates/deckmaste_engine/src/target.rs:499-502`: `// [CR#509.1h]: attacking and not
+`crates/engine/src/target.rs:499-502`: `// [CR#509.1h]: attacking and not
 (stickily) blocked.` → `state.combat.is_attacking(id) &&
 !state.combat.is_blocked(id)`; `CombatState` (`combat.rs:90-104`) has a blocked set
 and no unblocked set. The test `combat_filters_read_combat_state`

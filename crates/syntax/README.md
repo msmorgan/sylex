@@ -1,4 +1,4 @@
-# deckmaste_syntax
+# sylex_syntax
 
 The unversioned, data-driven syntax engine of English v4
 ([`docs/decisions/english-v4.md`](../../docs/decisions/english-v4.md),
@@ -9,7 +9,7 @@ It has no proc macros and no generated code: a grammar is data.
 
 1. `Grammar::from_ron_str` reads a grammar data file of Productions and Schemas.
 2. `CompiledGrammar::bind(grammar, lexicon, frames)` binds it to a
-   `deckmaste_lexical::Lexicon` and a `FrameCatalog` of Subcategorization Frames.
+   `sylex_lexicon::Lexicon` and a `FrameCatalog` of Subcategorization Frames.
    Binding validates every name, rejects policing feature names (`…Use`,
    `…Licence`, `…License`, `…Present`, `…Restriction`), and rejects any Closed Word
    or explicitly named Lexical Class member that is not a core closed-class lexeme, so catalog
@@ -68,7 +68,7 @@ It has no proc macros and no generated code: a grammar is data.
    none of its finite siblings.
    The forest is readable from outside through `PackedForest`'s accessors
    (`roots`, `node_span`, `node_items`, `item_families`, `leaf_span`),
-   `Parse::count_node` and the `walk` memo; `deckmaste_english`'s census
+   `Parse::count_node` and the `walk` memo; `sylex_english`'s census
    builds its Segments on them.
 5. `admit(reading, lexicon)` re-checks a Reading without parsing, through the same
    step function the chart uses. `realize(reading, lexicon)` writes it back out.
@@ -83,7 +83,7 @@ It has no proc macros and no generated code: a grammar is data.
    from structure, so no quotation punctuation is stored.
    A square bracket is an ordinary punctuation char to the engine. The
    brackets that mark the text a cleave spell removes [CR#702.148a] never
-   reach it: `deckmaste_english::cleave` parses a cleave line without
+   reach it: `sylex_english::cleave` parses a cleave line without
    them, and again without the text they enclose.
 6. `parse_analyzed(analyzed)` parses a text already analyzed (for example with a
    card's names in scope); `parse_category(analyzed, category)` parses it as any

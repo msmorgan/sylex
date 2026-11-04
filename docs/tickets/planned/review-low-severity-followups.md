@@ -3,7 +3,7 @@ needs: []
 ---
 **Low-severity follow-ups from the 2026-06-29 code review** (batched).
 
-- `PlayerAttr::Life`/`HandSize` (`crates/deckmaste_core/src/continuous.rs:427`)
+- `PlayerAttr::Life`/`HandSize` (`crates/core/src/continuous.rs:427`)
   are dead/unreachable and model non-continuous values (a
   `ModifyPlayer(You, SetTo(Life, 20))` is a silent no-op) — drop them or document
   as read-only axes invalid for `PlayerMod`.

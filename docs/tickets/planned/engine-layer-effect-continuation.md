@@ -9,7 +9,7 @@ or `LoseAbility` (Humility, Opalescence, Dryad of the Ilysian Grove, Blood Moon 
 
 Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #6.
 
-## What is wrong at head (crates/deckmaste_engine/src/layer.rs)
+## What is wrong at head (crates/engine/src/layer.rs)
 
 - `gather` (`:502`, `:543-564`): after iteration 0, static effects are re-gathered
   from each object's DERIVED ability list, so an effect whose source ability is

@@ -13,13 +13,13 @@ A CDA (an ability that defines a characteristic — most commonly a creature who
 printed power/toughness is `*` set to some count) applies in layer 7a, *before*
 other power/toughness-setting and -modifying effects. The engine already models
 the distinction: the internal layer-pass struct carries `is_cda: bool`
-(`crates/deckmaste_engine/src/layer.rs`, on `ContinuousEffect`).
+(`crates/engine/src/layer.rs`, on `ContinuousEffect`).
 
 The problem is purely semantics-side: **every construction site that builds a
 continuous effect from ability/static data hardcodes `is_cda: false`**
-(`crates/deckmaste_engine/src/layer.rs` — the sites that lower `Ability` /
+(`crates/engine/src/layer.rs` — the sites that lower `Ability` /
 `StaticEffect` / `Modification` into layer effects). There is no field on
-`Ability`, `StaticEffect`, or `Modification` in `crates/deckmaste_core/` that an
+`Ability`, `StaticEffect`, or `Modification` in `crates/core/` that an
 author (or the macro/parser layer) can set to request 7a. So a card written as
 `Static(Modify(This, Power(Set(CountOf(Objects(<filter>))))))` parses and
 round-trips fine and produces the correct *value*, but is placed in layer 7b —
@@ -37,7 +37,7 @@ deferred here rather than landed in the macro wave.
   single-component statics extend). Decide the exact carrier during design; keep
   it representable in RON and round-trippable.
 - Thread the flag through the engine lowering sites in
-  `crates/deckmaste_engine/src/layer.rs` so a flagged static builds a
+  `crates/engine/src/layer.rs` so a flagged static builds a
   `ContinuousEffect` with `is_cda: true` (→ layer 7a), leaving unflagged statics
   at 7b unchanged.
 - Confirm the fixpoint layer pass orders a CDA-flagged P/T `Set` ahead of a

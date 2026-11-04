@@ -3,9 +3,9 @@ needs: []
 ---
 **Engine: `sim.rs` has no mechanical strategy for the unbuilt decision kinds.**
 
-`mechanical()` and `pending_player()` in `crates/deckmaste_engine/src/sim.rs`
+`mechanical()` and `pending_player()` in `crates/engine/src/sim.rs`
 both fall through to a loud arm for any `PendingDecision` kind outside the
-wired subset. `crates/deckmaste_engine/src/strategy.rs` has the same shape at
+wired subset. `crates/engine/src/strategy.rs` has the same shape at
 its own fallback (`ChooseCostOptions`, `OrderReplacements`, `PreGame`,
 `LegendRule`).
 

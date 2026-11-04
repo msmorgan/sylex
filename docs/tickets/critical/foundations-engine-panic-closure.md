@@ -2,7 +2,7 @@
 needs: [core-as-enters-choices, core-regions-substrate, core-regions-discourse, core-regions-costs-and-captures, core-regions-witness-fixtures, core-regions-test-restoration, core-regions-discourse-closeout, core-regions-captures-and-memory, engine-granted-body-captures, engine-cross-target-announce-enumeration, engine-damage-fact-participant-lki, lowering-pay-cost-decision-registers, engine-derived-reference-in-filters, engine-cross-target-retarget-and-precheck, engine-cast-from-zones, engine-condition-lki-context, engine-deontic-legality-residue, engine-departed-reference-fizzle, engine-granted-prevention-rows, engine-granted-static-rows, engine-piles, engine-snapshot-combat-state, engine-snapshot-object-classification, engine-statof-reference-channel, engine-turn-modification]
 ---
 **Epic: close every runtime abort exposed by faithfully lowering Foundations
-cards to `deckmaste_core`.** The 2026-08-09 audit covered all 517 distinct
+cards to `sylex_core`.** The 2026-08-09 audit covered all 517 distinct
 English card names in `data/mtgjson/AllSetFiles/FDN.json`, including the
 extended-card pool. It found 38 cards with a production-profile panic path and
 17 additional unique cards whose faithful path trips a debug assertion before

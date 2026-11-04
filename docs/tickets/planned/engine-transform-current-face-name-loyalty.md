@@ -28,7 +28,7 @@ boundary is correct, not accidental. Prerequisite of `engine-day-night`.
 
 Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #14.
 
-- **Copiable values.** `crates/deckmaste_engine/src/copy.rs:102-115`
+- **Copiable values.** `crates/engine/src/copy.rs:102-115`
   `copiable_values` reads `derive::face` (front), and `CopiableValues` has no back
   face or side. [CR#707.8]: copy "the copiable values of the face that's currently
   up"; [CR#707.8a]: a token copy of a double-faced permanent "is a double-faced

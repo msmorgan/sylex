@@ -13,13 +13,13 @@
 
 What kinds of value does a complete card-encoding language need? This is the
 taxonomy of typed positions — the things `MacroKind` will eventually
-enumerate, the enums `deckmaste_core` will grow, and the vocabularies plugins
+enumerate, the enums `sylex_core` will grow, and the vocabularies plugins
 will extend. Sources:
 
 - the Comprehensive Rules snapshot at `data/rules/cr.json` (rule numbers
   cited throughout as e.g. [CR#603.4]);
 - an empirical census of the card-todo corpus: 30,881 todo files under
-  `plugins/wizards/cards/`, 58,689 ability-text lines (counts cited as e.g.
+  `v1/plugins/wizards/cards/`, 58,689 ability-text lines (counts cited as e.g.
   "5,256 lines");
 - the current model: `Ability { Static, Activated, Triggered, Spell, Keyword }`,
   `Target`, `Selector::{Target(usize), GameObject(usize)}`, `Effect`,
@@ -373,7 +373,7 @@ durations, modal gates, activation restrictions, and **ability words** —
 which are *named Condition (or Event) macros*: 2,116 corpus lines lead with
 an ability word (landfall 166, threshold 98, delirium 73, domain 55, raid
 46, heroic 44…). The repo already stubs these in
-`plugins/wizards/ability_words/`. Atom families:
+`v1/plugins/wizards/ability_words/`. Atom families:
 
 - count comparisons over Filters ("if you control three or more artifacts",
   "if an opponent has more cards in hand than you");
@@ -612,7 +612,7 @@ Treasure's `AddMana(1, AnyColor)` already wants this kind.
 characteristics) and of becomes/copy effects. Needs: full CardFace-shaped
 characteristics, the predefined-token shorthand ([CR#111.10]: Treasure, Food,
 Gold, Walker, Shard, Clue, Blood, Powerstone, Incubator, the seven Role
-tokens, Map, Junk, Lander, Mutagen — the repo's `plugins/builtin/tokens/`
+tokens, Map, Junk, Lander, Mutagen — the repo's `v1/plugins/builtin/tokens/`
 is this), "token copy of [reference] except…" ([CR#707.2] copiable values +
 exception list), and entering-state riders ("tapped and attacking").
 Corpus: "create … token" 3,232 lines (5.5%); Treasure 321, Food 138, Blood
@@ -806,7 +806,7 @@ The design criterion was that not every row needed to be a `MacroKind` — only
 positions where bare *names* should expand. Each did need a serde type with a
 stable position name, while open-vocabulary rows needed declaration support so
 plugins could mint new names alongside the mechanic that introduced them.
-Current registrations live in `crates/deckmaste_core/src/ron.rs`; current gaps
+Current registrations live in `crates/core/src/ron.rs`; current gaps
 live in `docs/conformance.md`.
 
 ### Historical corpus-driven priority

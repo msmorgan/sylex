@@ -6,7 +6,7 @@ needs: []
 the fight both-or-neither guard [CR#701.14b] and the creature state-based
 actions [CR#704.5f,704.5g] still test `Type(Creature)`, because a role atom
 in the PREDICATE vocabulary can only be authored in the v1 grammar
-(`deckmaste_semantics`, deletion-bound). At cutover, when predicates are
+(`sylex_semantics_v1`, deletion-bound). At cutover, when predicates are
 authored from the v2 grammar, add `HasRole(Combatant)` to the predicate
 sort, point those three sites at it, and delete the `Type(Creature)` proxies.
 

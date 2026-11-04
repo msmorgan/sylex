@@ -9,7 +9,7 @@ declarations used to carry (`plugins_v3/` / `deckmaste_semantics_v3`).**
 onto the `deckmaste_semantics_v2::facts` mirror of
 `lean/Semantics/Check/FactTypes.lean`. `DesignationFacts` has no column for
 `shape`, `uniqueness` or `persistence`, so those three dropped out of the tree.
-Seventeen of the nineteen rows existed only there — `plugins/builtin` (v1)
+Seventeen of the nineteen rows existed only there — `v1/plugins/builtin` (v1)
 declares only `Commander` and `Monarch` — so this ticket is the record of what
 was dropped and the decision of where it goes in `semantics-v3` (`plugins_v3/`)
 when an engine needs it.
@@ -49,6 +49,6 @@ that player's Ring-bearer [CR#701.54a]) or engine-only state that belongs in a
 a column no law reads should not be a Lean column; a designation law that needs
 uniqueness or persistence is the trigger for growing them. Related but distinct:
 `core-getdesignation-scopes-and-eviction` and `core-designation-card-scope` are
-the v1 `deckmaste_core` half of the same question.
+the v1 `sylex_core` half of the same question.
 
 Standard constraints apply.

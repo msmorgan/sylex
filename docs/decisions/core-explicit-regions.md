@@ -4,7 +4,7 @@
 > `lean/`; Idris paths below are historical. See
 > [Lean is the workbench](lean-is-the-workbench.md).
 
-**Every binding in `deckmaste_core` is a declared parameter or a numbered
+**Every binding in `sylex_core` is a declared parameter or a numbered
 definition, and every reference is a register read. Core never resolves
 anything; lowering resolves once, and the engine reads by index.**
 
@@ -86,7 +86,7 @@ engine tickets its stages absorb (listed in each stage ticket).
 
    **A declared capture is never unavailable at firing.** Three legs, no
    runtime hole: lowering emits a capture only for a register the enclosing
-   region declares; `deckmaste_core::validate` refuses at LOAD any capture
+   region declares; `sylex_core::validate` refuses at LOAD any capture
    that names no definition of the creating region; and the engine snapshots
    every capture the created region declares at creation and supplies the
    list at region entry, so supply is total over `Region::captures()`.
@@ -164,7 +164,7 @@ engine tickets its stages absorb (listed in each stage ticket).
    announcement in the ability's own activation, so a paid product is a def
    the body reads. `OneShotEffect::Targeted` and the root `AdditionalCost`
    are deleted.
-10. **Validate at load, fizzle at run.** `deckmaste_core::validate` checks
+10. **Validate at load, fizzle at run.** `sylex_core::validate` checks
     def sequence, dominance, kind, region closure, and the expression
     carve-out. After it, a runtime read can only find a bound-but-departed
     value, which stays under [Invalid semantic input fizzles](invalid-semantic-input-fizzles.md).
@@ -180,7 +180,7 @@ engine tickets its stages absorb (listed in each stage ticket).
 12. **Resolution happens once, in lowering.** Lowering is the compiler:
     scope elaboration, param declaration, lambda lifting for predicates,
     closure conversion for captures, R1/R2 as per-card diagnostics
-    (`deckmaste_lowering::lower_card` returns the refusal as a `Diagnostic`
+    (`sylex_lowering_v1::lower_card` returns the refusal as a `Diagnostic`
     naming the card and the antecedents that collided). The Idris mirror
     stays the certifier of semantic input, and the two derivations are
     gate-compared (§17's certifier/resolver split, unchanged) by
@@ -242,7 +242,7 @@ supply residue by carrying grant-time closure values through layer-derived
 abilities.
 
 Core's shape is independent of which semantics lowers into it. The chain
-builds the resolver on today's `deckmaste_semantics` → core path as the
+builds the resolver on today's `sylex_semantics_v1` → core path as the
 proof of concept; the `semantics_v2` being designed in the workbench gets its
 own front half later and reuses the region-building and R1/R2 back half.
 Nothing in this contract waits on `semantics_v2`.

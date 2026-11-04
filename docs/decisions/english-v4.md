@@ -1,6 +1,6 @@
 # ADR: English v4 — Data-Driven Syntax Engine, Domain Catalogs, and Stratified Buildout
 
-> 2026-10-26: `deckmaste_english_v4` and `deckmaste_lexical_source_v4` are now `deckmaste_english` and `deckmaste_lexical_source`; the census command is `cargo xtask english`.
+> 2026-10-26: `deckmaste_english_v4` and `deckmaste_lexical_source_v4` are now `sylex_english` and `sylex_vocabulary`; the census command is `cargo xtask english`.
 
 - **Status:** Accepted (2026-10-14)
 - **Companion Contract:** [`docs/decisions/english-lexical-analysis.md`](./english-lexical-analysis.md)
@@ -11,23 +11,23 @@
 
 ## 1. Charter, Crate Split, and Separation of Concerns
 
-`english-v4` is a clean-sheet rebuild of the English parser and realizer across three focused crates, built atop `deckmaste_lexical` under the engine and Reading contract in [`docs/decisions/english-lexical-analysis.md`](./english-lexical-analysis.md):
+`english-v4` is a clean-sheet rebuild of the English parser and realizer across three focused crates, built atop `sylex_lexicon` under the engine and Reading contract in [`docs/decisions/english-lexical-analysis.md`](./english-lexical-analysis.md):
 
-1. **`deckmaste_syntax` (Unversioned Syntax Engine Crate):**
-   - Replaces the former proc-macro codegen pair (`deckmaste_construction_v3` + `deckmaste_construction_v3_core`). Because `deckmaste_syntax` is a new crate name, it requires no `_v4` suffix.
+1. **`sylex_syntax` (Unversioned Syntax Engine Crate):**
+   - Replaces the former proc-macro codegen pair (`deckmaste_construction_v3` + `deckmaste_construction_v3_core`). Because `sylex_syntax` is a new crate name, it requires no `_v4` suffix.
    - Loads a declarative grammar data file of **Schemas** and **Productions** at runtime (eliminating proc-macro Rust codegen and multi-hundred-variant `enum Reading` recompilations).
    - Compiles lexical subcategorization frames into derived valence productions (Active, Passive, Slash/Gap across all verb forms, and Right-Node Raising) and runs the table-driven Earley chart, packed parse forest, Reading normal-form / decomposition checks, and bidirectional surface realization.
    - Note on terminology: **Construction** is reserved for the Construction Grammar (CxG) **spelling** layer that pairs syntactic form with `semantics_v3` meaning. Purely syntactic grammar declarations use **Schema** (a high-level template that expands into productions) and **Production** (an individual grammar rule).
 2. **`deckmaste_lexical_source_v4` (Core Lexicon & Catalogs Crate):**
    - Owns clean RON core English vocabulary and MTG catalogs, each with its subcategorization frames, reading only `data/gen/catalogs/card-names.txt` from `data/` and decoupling completely from `plugins_v2/builtin`.
 3. **`deckmaste_english_v4` (Oracle English Grammar & Corpus Crate):**
-   - Owns the Oracle English grammar data file, binds it with `deckmaste_lexical_source_v4` into `deckmaste_syntax`, and owns Oracle-English-specific logic: attachment-choosing heuristics (the structural Ranking Key, §4.3), reminder-text stripping, card-face and unit splitting, corpus census execution, and complexity-stratum profiling (moving heavy corpus analysis out of `crates/xtask` so `xtask` is a thin CLI wrapper).
+   - Owns the Oracle English grammar data file, binds it with `deckmaste_lexical_source_v4` into `sylex_syntax`, and owns Oracle-English-specific logic: attachment-choosing heuristics (the structural Ranking Key, §4.3), reminder-text stripping, card-face and unit splitting, corpus census execution, and complexity-stratum profiling (moving heavy corpus analysis out of `crates/xtask` so `xtask` is a thin CLI wrapper).
 
 The system enforces a strict three-layer boundary:
 
 | Layer | Authority | What Belongs Here | What Is Forbidden Here |
 | :--- | :--- | :--- | :--- |
-| **1. Syntax Engine & English Grammar Data** (`deckmaste_syntax`, `deckmaste_english_v4`) | Pure English morphosyntax, Oracle text-box/symbolic syntax, valence compilation, and attachment heuristics | • Core CGEL syntactic categories (`Document`, `Clause`, `Predicate`, `NounPhrase`, `Nominal`, `PrepositionPhrase`, `AdjectivePhrase`, `AdverbPhrase`, `DeterminerPhrase`)<br>• Genuine morphosyntactic features (`Person`, `Number`, `Case`, `VerbForm`, `Voice`, `Countability`, `Definiteness`, `Gap`)<br>• Engine-derived valence productions from frames (Active, Passive, Slash/Gap extraction, Right-Node Raising)<br>• General adjunct/modifier attachment schemas & the non-destructive Ranking Key (§4.3) | • Any CR-cataloged word or open-class lexeme<br>• Word- or phrase-specific boolean policing flags (`AtRandom...`, `StartingWith...`, `Instead...`)<br>• MTG rules semantics (`CounterShareableVerb`, `ManaPassive...`)<br>• Guards that suppress syntactically valid attachment ambiguities |
+| **1. Syntax Engine & English Grammar Data** (`sylex_syntax`, `deckmaste_english_v4`) | Pure English morphosyntax, Oracle text-box/symbolic syntax, valence compilation, and attachment heuristics | • Core CGEL syntactic categories (`Document`, `Clause`, `Predicate`, `NounPhrase`, `Nominal`, `PrepositionPhrase`, `AdjectivePhrase`, `AdverbPhrase`, `DeterminerPhrase`)<br>• Genuine morphosyntactic features (`Person`, `Number`, `Case`, `VerbForm`, `Voice`, `Countability`, `Definiteness`, `Gap`)<br>• Engine-derived valence productions from frames (Active, Passive, Slash/Gap extraction, Right-Node Raising)<br>• General adjunct/modifier attachment schemas & the non-destructive Ranking Key (§4.3) | • Any CR-cataloged word or open-class lexeme<br>• Word- or phrase-specific boolean policing flags (`AtRandom...`, `StartingWith...`, `Instead...`)<br>• MTG rules semantics (`CounterShareableVerb`, `ManaPassive...`)<br>• Guards that suppress syntactically valid attachment ambiguities |
 | **2. Lexical & Frame Catalogs** (`deckmaste_lexical_source_v4`, later `plugins/`) | Lexical inventory, morphology, and complement subcategorization | • Closed-class English function words<br>• Open-class English & MTG vocabulary (`Nouns`, `Verbs`, `Adjectives`, `Prepositions`, `Adverbs`)<br>• Subcategorization frames for **complements** (`NP`, `NP + PP[into]`, `PP[for]`, `Clause[Finite]`, `ToInf`)<br>• Preposition host-category distribution (`Nominal` postmodifier, `Predicate`/`Clause` adjunct, or complement-only)<br>• CR-enumerated domain catalogs | • Corpus-attestation filters that withhold grammatical inflections<br>• Verb- or noun-specific flags restricting which open-class heads may host general adjuncts |
 | **3. CxG Spelling & Semantic Checker** (`lean/Semantics/`; Rust replacement owned by `semantics-rust-rewrite`) | Form–meaning constructions, game-rules meaning, anaphora, and disambiguation | • Consuming the **packed parse forest** (never blindly enumerating all $C_n$ attachment trees)<br>• Pairing syntactic patterns with semantic meaning (Constructions)<br>• Resolving discourse referents and attachment ambiguities | • Re-parsing surface strings |
 
@@ -40,7 +40,7 @@ The system enforces a strict three-layer boundary:
 
 **No word or phrase enumerated by the Comprehensive Rules as a catalog/registry item may appear directly in the grammar data file (`deckmaste_english_v4/grammar/`).**
 
-This prohibition is absolute and enforced by `deckmaste_syntax` at grammar load time:
+This prohibition is absolute and enforced by `sylex_syntax` at grammar load time:
 
 1. **Keyword Actions (`[CR#701.1]`):** Every Vintage-legal keyword action—including common English verbs that Section 701 defines as keyword actions (`destroy`, `exile`, `sacrifice`, `tap`, `untap`, `counter`, `attach`, `unattach`, `create`, `reveal`, `search`, `shuffle`, `regenerate`, `fight`, `scry`, `mill`, `goad`, `proliferate`, `populate`, `investigate`, `explore`, `connive`, `amass`, `surveil`, `adapt`, `bolster`, `detain`, `exert`, `fateseal`, `forage`, `incubate`, `learn`, `manifest`, `monstrosity`, `suspect`, `support`, `time travel`, `venture`, `vote`, `waterbend`, `airbend`, `earthbend`, `firebend`, etc.)—is strictly a catalog entry in `keyword_actions.ron`. The grammar never names a keyword action or defines a keyword-action-specific feature, schema, or production; it parses them solely through their lexical category (`Verb` or fixed clause) and declared subcategorization frames.
 2. **Keyword Abilities (`[CR#702.1]`):** All keyword abilities live in `keyword_abilities.ron` and are parsed via general keyword-line and keyword-parameter schemas driven by their catalog-declared parameter frames (cost, amount, quality, dash cost, bound stem class).
@@ -80,9 +80,9 @@ Oracle text is a **controlled technical register** (`docs/oracle-style-guide.md`
 
 ### 4.1 Complements Are Driven by Lexical Frames (Proven First via Prototype)
 A **Complement** is a dependent licensed by the head's lexical subcategorization frame:
-- **Unified Frame Engine (First Deliverable):** Before scaling out the catalogs or strata, `deckmaste_syntax` and `deckmaste_english_v4` prove the unified frame compiler end-to-end on a ~15-word seed lexicon across `Verb`, `Preposition`, `Noun`, `Adjective`, and `Determinative`, with correctness and chart-size measurements.
+- **Unified Frame Engine (First Deliverable):** Before scaling out the catalogs or strata, `sylex_syntax` and `deckmaste_english_v4` prove the unified frame compiler end-to-end on a ~15-word seed lexicon across `Verb`, `Preposition`, `Noun`, `Adjective`, and `Determinative`, with correctness and chart-size measurements.
 - **Prepositions from Frames:** Instead of 30 bespoke `PrepositionPhrase` productions and 25 licence tables, a `PrepositionPhrase` is built from a `Preposition` head plus the complement selected by its frame in `prepositions.ron` (`NP`, `Clause[Finite]`, `Clause[Verbless]`, `PP[with]`, bare location `Nominal`, or `Intransitive`).
-- **Engine-Derived Valence Alternations:** Verb complement frames are declared **once** (in active voice) in `verbs.ron` / `keyword_actions.ron`. From those active frames and the valence schemas in the grammar data file, `deckmaste_syntax` automatically derives productions for:
+- **Engine-Derived Valence Alternations:** Verb complement frames are declared **once** (in active voice) in `verbs.ron` / `keyword_actions.ron`. From those active frames and the valence schemas in the grammar data file, `sylex_syntax` automatically derives productions for:
   1. **Active** complementation (`put [the card] [into your hand]`).
   2. **Passive** complementation (`[the card] was put [into your hand]`, `each card put [into your hand]`, plus optional `by <NP>` internalised complement).
   3. **Slashed / Gapped** complementation across **all** verb forms—finite, plain/bare, progressive (`be + V-ing`), perfect (`have + V-en`), and passive (`be + V-en`)—eliminating manual cross-product gap categories (`"the card you put / are putting / have put _ into your hand"`).
@@ -122,7 +122,7 @@ Every component is a sum over the Reading's attachments or Productions, and lexi
 3. **Structure over suppression.** A missing or wrong analysis is fixed by a general construction that cites CGEL, OSG or the CR, adding the features, values, Categories, Productions or engine capabilities that construction needs, in any Stratum. It is not fixed by an exclusion aimed at one witness.
 4. **Ranking is traversal order.** The Ranking Key (§4.3) orders the forest for presentation and bounded traversal and accepts or rejects nothing. A judgment asserts grammaticality only: a positive entry, that its endorsed structure is admitted; a negative entry, that a genuinely ungrammatical form is not. No judgment asserts a rank. Cheapest-tier figures and judgment tallies are reported, never gated, and no ranking work is done to move a Reading up.
 5. **Measure.** Every change to the grammar, its compiler, its lexicon or the census is measured by the census before and after: no face is lost, and the units that change are reported.
-6. **Boundaries.** `deckmaste_syntax` never names a grammar feature, value or Category, except in the lexicon feature-bundle mapping table, the one declared lexicon-to-syntax interface; purely structural `Summary` bits computed from the engine's own host check, coordinators, extensions and punctuation are allowed. Vocabulary lives in the catalogs and lexicon, and no word the CR enumerates appears in a grammar declaration (§2).
+6. **Boundaries.** `sylex_syntax` never names a grammar feature, value or Category, except in the lexicon feature-bundle mapping table, the one declared lexicon-to-syntax interface; purely structural `Summary` bits computed from the engine's own host check, coordinators, extensions and punctuation are allowed. Vocabulary lives in the catalogs and lexicon, and no word the CR enumerates appears in a grammar declaration (§2).
 
 **Scope.** Every card not on the Reserved List must parse. A Reserved List card may be declined when its construction is unique to it and costly to support. Declined cards are listed in `crates/deckmaste_english_v4/declined.txt`, each with its reason, and the census reports them separately from unread. A declined card is scope, not an accepted wrong reading.
 
@@ -150,14 +150,14 @@ An admission gate (an `Exclude` or `Require`, a Category that restates Productio
 - **Complement Cluster shape**: Clusters coordinate only with Clusters of one frame shape (CGEL, Ch. 15 §4.3, p. 1341, [17ii]: *blame X for Y* and *blame Y on X* do not coordinate).
 - **Adjunct Cluster parallelism** (Coordination `parallel`): Clusters of Adjuncts alone coordinate only with Clusters of the initial one's prepositions, its first overt or elided in a remnant (CGEL, Ch. 15 §4.3, p. 1341, the structural parallelism requirement; p. 1343, note 65). Without it the forest grows by 10 Readings on 3 units, each a non-parallel Cluster (*[a +1/+1 counter] [on it]* beside *[with a +1/+1 counter on it] [for each …]*). Added by change `swknnvqx`.
 - **`uncoordinated` and `coordinated` children**: an `uncoordinated` child is no coordination where a coordination one level up is the same analysis (principle 2); a `coordinated` child is one, for a dependent that scopes over a whole coordination where a single conjunct has a site of its own (CGEL, Ch. 15 §1.3.4, pp. 1285–1286).
-- **Flavor Word title casing** (`deckmaste_lexical` analysis): a label before an em dash is a Flavor Word only when every word of it that begins in lowercase is a function word (`docs/oracle-style-guide.md` §14, "Ability words and flavor words": "natural title casing"), so a clause before a dash is none (*Each opponent faces a villainous choice — …*).
+- **Flavor Word title casing** (`sylex_lexicon` analysis): a label before an em dash is a Flavor Word only when every word of it that begins in lowercase is a function word (`docs/oracle-style-guide.md` §14, "Ability words and flavor words": "natural title casing"), so a clause before a dash is none (*Each opponent faces a villainous choice — …*).
 - **A sentence's one unwritten period** (`Summary::unwritten_period`): a quotation's final period is moved outside its closing mark (`chart::quotations`), a sentence's period after a word whose spelling ends in terminal punctuation is not written (*Exile Blood for the Blood God!*, *Agents of S.H.I.E.L.D.*), and no two Constituents both end in the unwritten one. A keyword's verbal cost ends in its own period (`docs/oracle-style-guide.md` §3, "Periods": *Ward—Pay 3 life.*), so without it *have "Ward—Pay 2 life."* reads as *Ward—Pay 2 life..*, and six faces stop round-tripping.
 
 ---
 
 ## 5. Self-Contained Core Lexicon and Catalogs (`deckmaste_lexical_source_v4`)
 
-To unblock the retirement of `plugins_v2/builtin` and avoid `deckmaste_lexical_source`'s 4-layer salvage pipeline, `deckmaste_lexical_source_v4` owns clean, uniform RON files. Core English vocabulary is not a Catalog: it is declared with Core provenance, which is what lets the grammar name its closed-class words; Catalog entries carry Catalog provenance and never appear in the grammar.
+To unblock the retirement of `plugins_v2/builtin` and avoid `sylex_vocabulary`'s 4-layer salvage pipeline, `deckmaste_lexical_source_v4` owns clean, uniform RON files. Core English vocabulary is not a Catalog: it is declared with Core provenance, which is what lets the grammar name its closed-class words; Catalog entries carry Catalog provenance and never appear in the grammar.
 
 - **Core English Lexicon (`lexicon/english/`):**
   - `closed_class.ron` (pronouns, determinatives, coordinators, auxiliaries/modals, clitics, symbols)
@@ -210,18 +210,18 @@ Rather than reactive blocker recon across 32,828 cards, the entire Vintage-legal
    - Asserts constituent category, surface span, head identity, grammatical function (`Subject`, `Object`, `Complement`, `Adjunct`, `Modifier`), gap-filler binding, negative controls of inflectional-form selection (agreement, case and verb form, which generation needs; never a word combination no card contains), and documented attachment-ambiguity witnesses—without freezing internal `Reading` constructor names or form indices.
    - Adjudicated against the controlled Oracle English register (`docs/oracle-style-guide.md` and this ADR, using CGEL for standard terminology and constituent structure) by two independent judges, with disagreements surfaced to the owner.
 3. **Size as a Review Signal, Not a Mechanical Target (`english-lexical-analysis.md` §6):**
-   - Around ~2,500 lines in the English grammar data file (~40 features, ~60 categories) at full coverage is the expected scale and serves as a review smell test across the grammar data file, `deckmaste_syntax`, and `deckmaste_lexical_source_v4`—never a mechanical line cap that pushes hacks into the syntax engine or catalogs.
+   - Around ~2,500 lines in the English grammar data file (~40 features, ~60 categories) at full coverage is the expected scale and serves as a review smell test across the grammar data file, `sylex_syntax`, and `deckmaste_lexical_source_v4`—never a mechanical line cap that pushes hacks into the syntax engine or catalogs.
 
 ---
 
 ## 7. Two-Stage Cutover and Crate Fates
 
 1. **Immediate Glossary Pruning:** [`docs/contexts/oracle-english/CONTEXT.md`](../contexts/oracle-english/CONTEXT.md) is pruned immediately of all `english_v3` wave 5–9 policing features (`...Use`, `...Licence`, `...Present`, `...Restriction`) and implementation-detail rationalizations, retaining clean CGEL and Oracle-English domain terminology (`Schema`, `Production`, `Production Cost`, `Ranking Key`, `Admission`, `Packing`, `Derivation`, etc.) and updated inline as `v4` lands.
-2. **Side-by-Side Buildout (Prototype First):** First build `deckmaste_syntax` and `deckmaste_english_v4` and prove the unified frame engine on the seed lexicon (`english-v4-compiler-and-runtime`), then populate `deckmaste_lexical_source_v4` (`english-v4-lexical-catalogs`), stratify the corpus and migrate `v3`'s genuine behavioral test obligations into the `v4` judgment set (`english-v4-corpus-stratification-and-judgment-harness`), and execute Strata 0–7.
+2. **Side-by-Side Buildout (Prototype First):** First build `sylex_syntax` and `deckmaste_english_v4` and prove the unified frame engine on the seed lexicon (`english-v4-compiler-and-runtime`), then populate `deckmaste_lexical_source_v4` (`english-v4-lexical-catalogs`), stratify the corpus and migrate `v3`'s genuine behavioral test obligations into the `v4` judgment set (`english-v4-corpus-stratification-and-judgment-harness`), and execute Strata 0–7.
 3. **Cutover 1 (`english-v4-cutover-v3`):** Once Stratum 7 completes and passes the judgment suite:
    - Repoint `xtask` and workspace consumers at `deckmaste_english_v4`.
-   - Delete `deckmaste_english_v3` (recording the migrated obligations and named retirement reasons for the wave test suite), `deckmaste_construction_v3*`, and `deckmaste_lexical_source`. `plugins_v2/builtin/` and its reader `deckmaste_macro_def` are not deleted here: they stay until `semantics-v3-dsl-and-plugins`, because `xtask` still reads them.
+   - Delete `deckmaste_english_v3` (recording the migrated obligations and named retirement reasons for the wave test suite), `deckmaste_construction_v3*`, and `sylex_vocabulary`. `plugins_v2/builtin/` and its reader `deckmaste_macro_def` are not deleted here: they stay until `semantics-v3-dsl-and-plugins`, because `xtask` still reads them.
 4. **Cutover 2 (`english-v4-final-suffix-cutover`):** After `semantics-v1-cutover` retires the legacy v1 consumers and renames `plugins_v3/` → `plugins/`:
-   - Delete legacy `deckmaste_features`. (Legacy suffixless `deckmaste_english`, `deckmaste_construction_compiler` and `deckmaste_constructions_macro` were deleted earlier by `retire-v1-english-and-spelling`.)
-   - Drop all `_v4` suffixes (`deckmaste_english_v4` → `deckmaste_english`, `deckmaste_lexical_source_v4` → `deckmaste_lexical_source`; `deckmaste_syntax` already has its final unversioned name).
+   - Delete legacy `sylex_features_v1`. (Legacy suffixless `sylex_english`, `deckmaste_construction_compiler` and `deckmaste_constructions_macro` were deleted earlier by `retire-v1-english-and-spelling`.)
+   - Drop all `_v4` suffixes (`deckmaste_english_v4` → `sylex_english`, `deckmaste_lexical_source_v4` → `sylex_vocabulary`; `sylex_syntax` already has its final unversioned name).
    - Move the `catalogs/*.ron` lexical declarations into `plugins/` declaration metadata.

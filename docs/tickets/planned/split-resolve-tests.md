@@ -1,7 +1,7 @@
 ---
 needs: []
 ---
-**Hoist the embedded test suites out of `crates/deckmaste_engine/src/resolve/
+**Hoist the embedded test suites out of `crates/engine/src/resolve/
 action.rs` and `resolve/effect.rs` into sibling test files.** The `resolve/`
 *code* split already happened; these two files have since grown into 5.5k/5.1k
 line files — but the growth is test volume, not logic. Measured 2026-07-24:

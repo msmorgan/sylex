@@ -22,7 +22,7 @@ representation first.
    make Rust `DivideAndChoose.other` an `Option`/default, or force RON to spell
    an explicit empty `other`.
 2. **Done item 4 ("engine unchanged; a semantic test pins it") is drifted — the
-   engine never resolved this card.** `crates/deckmaste_engine/src/resolve/effect.rs`
+   engine never resolved this card.** `crates/engine/src/resolve/effect.rs`
    has no arm for `SeparatePiles`/`ChoosePile`/`DivideAndChoose`; they hit the
    catch-all `todo!` choice seam, and there is no existing Do-or-Die / pile
    engine test. So there is no behavior to leave "unchanged," and a semantic
@@ -48,7 +48,7 @@ that Done item 4 assumes (blocker 2), and the `no_dead_grammar` exemptions
 
 ## The stringly binder
 
-`plugins/canon/cards/Do or Die.ron` today threads string labels from the
+`v1/plugins/canon/cards/Do or Die.ron` today threads string labels from the
 split to the choice:
 
 ```

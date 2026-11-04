@@ -41,7 +41,7 @@ a body's `Pay`.
 
 ## Acceptance
 
-`crates/deckmaste_engine/tests/region_witnesses.rs`'s
+`crates/engine/tests/region_witnesses.rs`'s
 `perforating_artist_taxes_each_opponent_who_will_not_pay` loses its `#[ignore]`
 and passes with the punisher spelled, alongside the Raid intervening-if and
 the per-opponent loop already in that fixture.

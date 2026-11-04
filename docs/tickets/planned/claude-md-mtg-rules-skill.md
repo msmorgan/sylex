@@ -5,7 +5,7 @@ needs: []
 
 Add one line (about 60 tokens) to the "CR citations" section of `CLAUDE.md` (`AGENTS.md` is a
 symlink to it, so Codex reads the same line). Agents here never load the mtg-rules skill: session
-transcripts show 0 mtg-rules Skill calls from deckmaste.rs Claude subagents against 165 jj-sensei
+transcripts show 0 mtg-rules Skill calls from sylex Claude subagents against 165 jj-sensei
 calls, because the current instructions route CR work only to `cargo xtask cite`.
 
 What the line says:

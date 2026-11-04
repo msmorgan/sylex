@@ -3,7 +3,7 @@ needs: []
 ---
 **Engine: the pre-game procedure (`PreGame` decision) has no handler.**
 
-`crates/deckmaste_engine/src/decide/pending/choice.rs` — `PreGame::resolve` is
+`crates/engine/src/decide/pending/choice.rs` — `PreGame::resolve` is
 unbuilt; `PreGameKind::Mulligan` is the only kind currently shaped.
 
 [CR#103] is the whole pre-game procedure: determining who goes first, opening

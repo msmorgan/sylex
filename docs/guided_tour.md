@@ -1,6 +1,6 @@
 # Guided tour
 
-deckmaste.rs is easiest to read along the same path a card takes: Oracle text is
+sylex is easiest to read along the same path a card takes: Oracle text is
 compiled into a typed intermediate form, while the card's printed
 characteristics arrive as structured metadata. That information-complete form
 can then be rendered back to English or lowered into a shared rules engine. This
@@ -42,19 +42,19 @@ turn “reading the card explains the card” into two card-by-card measurements
 ## Rules live in shared systems
 
 Continuous effects meet in
-[`layer.rs`](../crates/deckmaste_engine/src/layer.rs). Start with
-[`run_layer_pass`](../crates/deckmaste_engine/src/layer.rs#L1929): it applies the
+[`layer.rs`](../crates/engine/src/layer.rs). Start with
+[`run_layer_pass`](../crates/engine/src/layer.rs#L1929): it applies the
 layer sequence, asks
-[`depends_on`](../crates/deckmaste_engine/src/layer.rs#L1837) whether one effect
+[`depends_on`](../crates/engine/src/layer.rs#L1837) whether one effect
 changes another's affected set, and re-evaluates the remaining order after each
 application. The code cites the Comprehensive Rules at the point where each
 ordering constraint enters the algorithm.
 
 The focused tests live beside the implementation. In particular,
-[`same_layer_change_enables_conditional_static`](../crates/deckmaste_engine/src/layer.rs#L3340)
+[`same_layer_change_enables_conditional_static`](../crates/engine/src/layer.rs#L3340)
 proves that an earlier effect can enable a later conditional in the same layer,
 while
-[`granted_static_is_gathered_to_fixpoint`](../crates/deckmaste_engine/src/layer.rs#L3260)
+[`granted_static_is_gathered_to_fixpoint`](../crates/engine/src/layer.rs#L3260)
 proves that an ability granted in layer 6 becomes an effect source on the next
 pass. These are engine behaviors, so every card using those shapes gets them
 without card-specific code.
@@ -79,7 +79,7 @@ per-plugin baseline. `lean/scripts/build` proves the terms hand-supplied to
 Lean; `lean check` certifies the loaded card data beside it, and
 `cargo xtask lean definitions` does the same for every counter, subtype and
 designation definition `plugins_v2/builtin` declares. The v1
-`plugins/canon` corpus has no card gate: the Idris one was retired without a
+`v1/plugins/canon` corpus has no card gate: the Idris one was retired without a
 successor, and `semantics-v3-parity` is the v3 cross-check. The
 [succession decision](decisions/lean-is-the-workbench.md) records the
 succession.

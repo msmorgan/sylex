@@ -3,7 +3,7 @@ needs: []
 ---
 **Engine: the `OrderReplacements` decision has no submission handler.**
 
-`crates/deckmaste_engine/src/decide/pending/choice.rs` —
+`crates/engine/src/decide/pending/choice.rs` —
 `OrderReplacements::resolve` is unbuilt, and `strategy.rs` has no default for
 it either.
 

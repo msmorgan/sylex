@@ -7,7 +7,7 @@ Standard constraints apply. This absorbs `plugins-v3-spelling-deferred-reasons`.
 `syl-parameter-sigil` only because both rewrite the whole `.syl` corpus.
 
 A `spelling` string is meant to be parsed through the English grammar with typed holes, and
-recovery and rendering unify against that parse (`deckmaste_spelling`, not built yet). These
+recovery and rendering unify against that parse (`sylex_spelling`, not built yet). These
 conventions make the strings fit for that. They also settle the 151 `TODO(spelling)` markers,
 123 of which carry generated text instead of a reason.
 
@@ -20,7 +20,7 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
   - **The grammatical Subject is a parameter.** The hole stays in the spelling and the verb is
     still uninflected: `becomeBlocked(subject)` is `"<subject> become blocked"`, and likewise
     `becomeBlocking`, `stopBlocking` and `phaseOutUntil`. The parse with typed holes leaves the
-    hole's agreement open (`deckmaste_spelling`). These Templates keep `subject`. Their Subject is
+    hole's agreement open (`sylex_spelling`). These Templates keep `subject`. Their Subject is
     the patient, not the performer (`does(any, becomeBlocked(this))`, semantics-v3 §4.1), so
     `theActor` would misstate it.
   - **The Subject is fixed inside the template**, and no hole decides agreement. The verb is
@@ -49,7 +49,7 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
   supplied by duration", the `riders` list entries) move to that ticket. The same goes for any
   other marker whose parameter becomes an adjunct node there.
 - **A template with several parses** keeps every parse that recovers to its `body`, and fails to
-  load if none does. This is recorded in the ADR for `deckmaste_spelling`; no code here.
+  load if none does. This is recorded in the ADR for `sylex_spelling`; no code here.
 - **Rendering reproduces the analyzed Oracle text.** That is the text after balanced reminder text
   is removed and keyword-line semicolons become commas, with cleave's Bracketed text written back
   from where it is kept (`english-lexical-analysis.md` §1).
@@ -64,7 +64,7 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
   - Amend `semantics-spelling-lowering.md` §3 as above.
 - **Glossary:** add entries for the terms this introduces (a spelling's pattern and its holes) to
   the owning glossary, via the `domain-modeling` skill.
-- **Rust `semantics` and `deckmaste_dsl`:**
+- **Rust `semantics` and `sylex_syl`:**
   - `spelling` accepts a string or a list of strings, in SylGen's mirror too (it discards
     `spelling`, but must parse it).
   - `semantics` checks that no two patterns share a set of holes, and that every call's set of
@@ -87,4 +87,4 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
   expected.
 - The expansions `semantics` produces are identical before and after the corpus rewrite, since
   spelling carries no meaning.
-- Per-crate tests and clippy for `deckmaste_dsl` and `semantics`.
+- Per-crate tests and clippy for `sylex_syl` and `semantics`.

@@ -11,11 +11,11 @@ Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #4,
 
 ## 1. A colored or {C} reduction with no matching pip reduces generic (#4)
 
-`crates/deckmaste_engine/src/cast.rs:91-92` (doc: "a colored pip removes ONE
+`crates/engine/src/cast.rs:91-92` (doc: "a colored pip removes ONE
 matching colored pip and nothing else") and `reduce_symbol` `:131-135` (a
 `Specific(_)` reduction removes a matching pip; no else arm, so an unmatched one is
 dropped). Core `CostChange::Reduce(Arc<[CostComponent]>)`
-(`crates/deckmaste_core/src/continuous.rs:203-206`) has no colored-only flag; Lean
+(`crates/core/src/continuous.rs:203-206`) has no colored-only flag; Lean
 `CostShift.bySymbols … (coloredOnly : Bool)` and semantics_v2 `BySymbols {
 colored_only }` already carry one, but no lowering maps it into core.
 
@@ -67,7 +67,7 @@ public zone or the cost includes a shuffle or other randomness. Register `DrawCa
 even with a match sitting right there"; `min` is floored to 0 for every non-bare
 filter across every zone in `search.from` (`:371-375`); same claim in
 `resolve/query.rs:505-516` and the test doc at `:5077-5079`.
-`crates/deckmaste_semantics/src/binder.rs:63` calls the zones "hidden
+`v1/crates/semantics/src/binder.rs:63` calls the zones "hidden
 libraries/graveyards". [CR#701.23b] exempts only "searching a hidden zone"; its
 example: "Splinter's controller must find the Howling Mine in the graveyard."
 [CR#400.2]: the graveyard is public. Eradicate ruling: "The copies must be found if

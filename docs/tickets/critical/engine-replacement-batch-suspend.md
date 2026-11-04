@@ -10,7 +10,7 @@ creatures that each hold two regeneration shields, destroyed in one SBA batch
 
 Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #9.
 
-## What is wrong at head (crates/deckmaste_engine/src)
+## What is wrong at head (crates/engine/src)
 
 1. **No tiers.** `replace_registry.rs:676-683` (`replace_event`, the `_ =>` arm)
    calls `surface_choice(state, current, applied, &applicable)` with every

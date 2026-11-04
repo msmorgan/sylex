@@ -3,7 +3,7 @@ needs: []
 ---
 **Engine: `ForThisEvent` riders other than `Cant(Regenerate)` are unbuilt.**
 
-`crates/deckmaste_engine/src/resolve/effect.rs` wires exactly one rider shape:
+`crates/engine/src/resolve/effect.rs` wires exactly one rider shape:
 `Cant(Regenerate(on: <bare object Ref>))` ([CR#701.19c] — "can't be
 regenerated"). Three adjacent arms stay loud:
 

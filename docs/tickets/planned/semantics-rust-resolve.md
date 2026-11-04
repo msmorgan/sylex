@@ -1,15 +1,15 @@
 ---
 needs: [dsl-parser, dsl-parse-differential, plugins-v3-data-language, lean-proofs-spec-catalog, dsl-named-arguments-anywhere, dsl-plain-word-names]
 ---
-# Stage 1a of `semantics-rust-rewrite`: `deckmaste_dsl::bundle` and `semantics` resolution
+# Stage 1a of `semantics-rust-rewrite`: `sylex_syl::bundle` and `semantics` resolution
 
 Standard constraints apply. First half of Stage 1 of `semantics-rust-rewrite`: load and cache
-preparsed `.syl` bundles in `deckmaste_dsl::bundle`, register declaration signatures and their
+preparsed `.syl` bundles in `sylex_syl::bundle`, register declaration signatures and their
 fixed argument stepping order, resolve names and arguments by expected sort
-(`docs/decisions/semantics-v3.md` §5.2) into a resolved `Term` tree in `crates/semantics`, check
+(`docs/decisions/semantics-v3.md` §5.2) into a resolved `Term` tree in `v1/crates/semantics`, check
 dependency cycles, and expose `cargo xtask semantics check`.
 
-- Calls with interleaved named and positional arguments resolve as `deckmaste_dsl` parses them
+- Calls with interleaved named and positional arguments resolve as `sylex_syl` parses them
   (`dsl-named-arguments-anywhere`).
 - A call's written argument order carries no meaning: arguments bind to parameters, and each
   declaration records its fixed argument stepping order for `discourse` (`semantics-rust-rewrite`).
@@ -19,28 +19,28 @@ dependency cycles, and expose `cargo xtask semantics check`.
 
 ## Design Specification
 
-### 1. Preparsed Bundle Loader (`deckmaste_dsl::bundle`)
+### 1. Preparsed Bundle Loader (`sylex_syl::bundle`)
 
-The v3 pipeline has no separate top-level `deckmaste_plugin` crate (v1 `deckmaste_plugin` is
+The v3 pipeline has no separate top-level `sylex_plugin_v1` crate (v1 `sylex_plugin_v1` is
 deletion-bound at `semantics-v1-cutover` per `CLAUDE.md`):
 
-- `deckmaste_dsl::bundle::Bundle::load` walks a plugin directory (`plugins_v3/builtin`,
+- `sylex_syl::bundle::Bundle::load` walks a plugin directory (`plugins_v3/builtin`,
   `plugins_v3/canon`), parses each `.syl` file once into `Arc<SourceFile>`
   (`{ id: FileId, path: PathBuf, source: String, ast: dsl::File }`), and returns an `Arc<Bundle>`
   exposing both a deterministic path map (`BTreeMap<PathBuf, Arc<SourceFile>>`) and a
   `FileId → Arc<SourceFile>` table for resolving `Span`s to `path:line:col` so downstream layers
   share preparsed ASTs without re-reading disk.
 
-### 2. `crates/semantics` Dependencies & CLI Entry Point
+### 2. `v1/crates/semantics` Dependencies & CLI Entry Point
 
-- Depends on `deckmaste_dsl`, `dpsi` (already a workspace dependency of `deckmaste_dsl` for
-  `Ident`), and `thiserror` (zero dependency on `deckmaste_core` or `deckmaste_english`).
+- Depends on `sylex_syl`, `dpsi` (already a workspace dependency of `sylex_syl` for
+  `Ident`), and `thiserror` (zero dependency on `sylex_core` or `sylex_english`).
 - Exposes `cargo xtask semantics check` to validate `plugins_v3/builtin` and `plugins_v3/canon`
   from the CLI with `path:line:col` diagnostics.
 
 ### 3. Pass 1: Header & Envelope Validation + Signature Registration
 
-Enforces all declaration-level checks deferred from `deckmaste_dsl` (`dsl-parser.md`) and populates
+Enforces all declaration-level checks deferred from `sylex_syl` (`dsl-parser.md`) and populates
 the signature registry (`SylGen/Emit.lean`):
 - **Declaration kinds**: Validates the `.syl` declaration kinds (`primitive`, `template`, `action`,
   `ability`, `ability_word`, `counter`, `designation`, `subtype`, `card_type`, `relation`, `token`,
@@ -129,5 +129,5 @@ and recording directed body dependencies `decl_id → callee_decl_id`:
   their parameter declaration order (declarations with reordered `<param>` holes in `spelling`,
   `ReadOrder.fieldOrders`, `doOnlyIf` / `unless`, `when` / `whenever` / `at` / `Ability::Triggered`
   intervening `if`, and `gatedBy` / `StaticSpec::GatedBy`).
-- Focused negative unit tests in `crates/semantics` cover every header, resolution, argument-binding,
+- Focused negative unit tests in `v1/crates/semantics` cover every header, resolution, argument-binding,
   constructor-refusal, and cycle error in Passes 1–3a (mirroring `lean/SylGen/tests/negative.sh`).

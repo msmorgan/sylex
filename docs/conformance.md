@@ -1,7 +1,7 @@
 # Skill conformance tables — the P0 progress meter
 
 Concept-by-concept parity between the mtg-rules skill's reference docs
-(pinned baseline: docs/rules-taxonomy.md §10) and deckmaste, maintained by
+(pinned baseline: docs/rules-taxonomy.md §10) and sylex, maintained by
 the P0 alignment effort (catalog priority 0, since closed). One row per skill
 concept; statuses:
 
@@ -23,7 +23,7 @@ from the implementation and tests, not inferred solely from surviving P0 tags.
 
 ## 1. Predicates & selectors (`queries.md` §1–2 ↔ `Filter`/`TargetSpec`/`Selection`)
 
-| skill concept | deckmaste | status |
+| skill concept | sylex | status |
 |---|---|---|
 | name test (identity-aware self-names) | `Named(Ident)`; self = `Ref(This)` | ✓ |
 | color test, monocolored | `ColorIs(Color)` | ✓ |
@@ -59,7 +59,7 @@ from the implementation and tests, not inferred solely from surviving P0 tags.
 
 ## 2. Event ontology (`events.md` §2–3 ↔ core `Event`, engine `GameEvent`)
 
-| skill concept | deckmaste | status |
+| skill concept | sylex | status |
 |---|---|---|
 | zone-change master event (object, from, to, position, face, cause) | core `EventFilter::ZoneChange` (cause verbs = the open `VerbName` newtype, its vocabulary gated by the `cause_verbs_are_entailment_rows` corpus test against the emitted entailments table); engine `ZoneWillChange`/`ZoneChanged` | ✓ — every emitter is face-up today (morph/manifest post-P0); a face-narrowed pattern is no longer spellable (the coordinate returns with the morph grammar) |
 | named views: dies / enters | builtin `Dies`/`ThisDies`/`Enters`/`ThisEnters` macros | ✓ |
@@ -87,7 +87,7 @@ from the implementation and tests, not inferred solely from surviving P0 tags.
 
 ## 3. Decision kinds (`choices.md` §2–4 ↔ engine `PendingDecision`/`Action`)
 
-| skill concept | deckmaste | status |
+| skill concept | sylex | status |
 |---|---|---|
 | modes of a spell / activated ability (announce-locked) | `PendingDecision::ChooseModes` shell | ✓ schema; surfacing engine-seam |
 | cost intentions: alternative/additional, X, splice, hybrid/Phyrexian | `CostChange::Additional`, `AlternativeCost` grammar + `PendingDecision::ChooseCostOptions` shell ([CR#601.2b]) | ✓ grammar+schema; surfacing engine-seam |
@@ -110,7 +110,7 @@ from the implementation and tests, not inferred solely from surviving P0 tags.
 
 ## 3b. Memory, queries & copies (`queries.md` §3–5, [CR#607.2,707.10])
 
-| skill concept | deckmaste | status |
+| skill concept | sylex | status |
 |---|---|---|
 | linked slots / chosen-value anaphora (write side) | `NotedKind` + `ChooseAndNote(key, kind)` + `Effect::Noting{key, effect}` | partial — object-set products are stored live; general scalar chosen-value slots remain engine-seam |
 | noted reads | `Selection::AmongNoted`, `Count::Noted(key)`, `Reference::Linked(key)` | partial — object-set and count reads are live; scalar `Reference::Linked` remains engine-seam |
@@ -122,7 +122,7 @@ from the implementation and tests, not inferred solely from surviving P0 tags.
 
 ## 4. Temporal & deontic modifiers (`temporal.md`, `deontics.md` §2–3 ↔ `temporal.rs`/`deontic.rs`)
 
-| skill concept | deckmaste | status |
+| skill concept | sylex | status |
 |---|---|---|
 | four polarities over typed actions (May/Cant/Must/Gate) | `Deontic` over `DeonticAction` | ✓ grammar; legality evaluation is engine-seam (P0.W1 presence guards live in `legal.rs`) |
 | resolution Toll (price bites at resolution) | `Effect::Unless` (named the Toll node) | ✓ |
@@ -138,7 +138,7 @@ from the implementation and tests, not inferred solely from surviving P0 tags.
 
 ## 5. Costs & mana (`costs.md`, `mana.md` ↔ `cost.rs`/`mana.rs`/`continuous.rs`)
 
-| skill concept | deckmaste | status |
+| skill concept | sylex | status |
 |---|---|---|
 | printed mana cost / activation cost positions | face `mana_cost`; `ActivatedAbility.cost` | ✓ |
 | additional costs, mandatory + optional/kicker (pipeline-positional) | `CostChange::Additional { components }` plus announce-stage cost choices | ✓ for the implemented cost-component subset; broader optional/additional choice shapes remain engine-seams |
@@ -163,7 +163,7 @@ from the implementation and tests, not inferred solely from surviving P0 tags.
 
 ## 6. Designations, emblems & state instances (`designations.md`, `state.md` ↔ engine `state.rs`)
 
-| skill concept | deckmaste | status |
+| skill concept | sylex | status |
 |---|---|---|
 | designation scopes: game value / player value / per-object instances | `DesignationStore{game, players, objects}`; `DesignationValue::{Flag, Holder, Mode}` | ✓ — registry live, granting effects engine-seam |
 | object designation = grantor-parameterized temporary static payload (goad) | decl payload is the TEMPLATE; `DesignationInstance{grantor, duration}` supplies the bindings | ✓ storage; payload application = the layers pipeline's designation source (engine-seam) |
@@ -174,7 +174,7 @@ from the implementation and tests, not inferred solely from surviving P0 tags.
 
 ## 7. Outcomes & information (`outcomes.md`, `information.md` ↔ `action.rs`/`continuous.rs`/engine `sba.rs`/`event.rs`)
 
-| skill concept | deckmaste | status |
+| skill concept | sylex | status |
 |---|---|---|
 | loss SBAs: life ([CR#704.5a]) / empty draw ([CR#704.5b]) / poison ([CR#704.5c]) | `sba::sweep` + `LossReason` — all three LIVE; poison reads the player proxy's live counter map | ✓ |
 | effect outcomes: "loses" / "wins the game" ([CR#104.3e,104.2b]) | `PlayerAction::{LoseGame, WinGame}` riding `By(player, …)` | ✓ — resolve to first-class outcome events and honor outcome gates |

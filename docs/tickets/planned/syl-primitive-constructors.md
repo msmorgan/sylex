@@ -37,7 +37,7 @@ what the Lake generator emits.
 - **The Lake generator maps the capitalized name to Lean's constructor** (lowercasing the first
   letter, and quoting the words that collide with Lean as it already does). No Lean name, no
   trailing underscore and no leading dot remains in `.syl`.
-- `deckmaste_dsl` parses and formats the constructor clause, and enforces the capitalization rule
+- `sylex_syl` parses and formats the constructor clause, and enforces the capitalization rule
   (or `semantics` does, at load; say which).
 - Update §5.1 and §5.2 of `docs/decisions/semantics-v3.md`: the primitive rule, the dispatch
   steps (step 4 goes), and the direct-sort-atoms paragraph (it goes; "optional positions" stays the
@@ -75,7 +75,7 @@ what the Lake generator emits.
 
 - Renaming only: `lake exe dumpValues` gives byte-identical value dumps before and after.
 - `cargo xtask lean check`; `cargo xtask dsl fmt --check`; `cargo xtask dsl differential`;
-  `cargo test -p deckmaste_dsl` and clippy.
+  `cargo test -p sylex_syl` and clippy.
 - A capitalized identifier outside a primitive's constructor clause, a primitive without one, a bare
   word that names no declaration, and two primitives for one constructor are each refused, with a
   negative test apiece.

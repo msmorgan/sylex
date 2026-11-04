@@ -5,7 +5,7 @@ needs: []
 predicate, not from a declared binding.** The engine-side twin of
 [[parse-positional-target-reads]]: an implicit convention where a channel should be.
 
-Spell-resolution dispatch (`crates/deckmaste_engine/src/resolve/mod.rs:106-115`):
+Spell-resolution dispatch (`crates/engine/src/resolve/mod.rs:106-115`):
 
 ```rust
 enters_attached_self(source) && entry.targets.first().and_then(|slot| slot.first())

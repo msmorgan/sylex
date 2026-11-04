@@ -17,7 +17,7 @@ in the expansion of `gift`: … macro `createToken` argument characteristics
 (`crates/deckmaste_semantics_v2/tests/corpus.rs:109`.)
 
 Likely cause, inferred from the code, not yet reproduced deterministically:
-`crates/macro_ron/src/expand.rs` keys provenance by memory address. `ReadCtx::chain_of` (~181)
+`v1/crates/macro_ron/src/expand.rs` keys provenance by memory address. `ReadCtx::chain_of` (~181)
 looks a text up by its address in the thread-local `Provenance.bodies` and `Provenance.spliced`,
 and `ReadCtx::enter` (~218) identifies a definition by its body's address. `spliced` entries stay
 until the outermost read ends ("a splice's memory lives as long as its read"), but a nested read

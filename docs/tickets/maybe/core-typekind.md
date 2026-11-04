@@ -8,7 +8,7 @@ useful later, so this stays a live speculative item rather than a hard won't-fix
 Why not now:
 
 - `.permanent` has exactly **one** production reader — `is_permanent_spell`
-  (`crates/deckmaste_engine/src/resolve/mod.rs`), `.any(|t| t.permanent)` —
+  (`crates/engine/src/resolve/mod.rs`), `.any(|t| t.permanent)` —
   driving a single boolean fork: enter the battlefield vs. resolve-then-graveyard.
   There is no third resolution mode today. A bool is the honest, minimal
   representation for that fork.

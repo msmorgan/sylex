@@ -10,13 +10,13 @@ Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #5.
 
 ## What is wrong at head
 
-- `crates/deckmaste_engine/src/copy.rs:278-311` `token_from_copiable`: "`Token` has
+- `crates/engine/src/copy.rs:278-311` `token_from_copiable`: "`Token` has
   no `mana_cost`/`loyalty`/`defense` slot … those `CopiableValues` fields are dropped
   here"; builds `Token { name, color_indicator, supertypes, types, subtypes,
   abilities, power, toughness }`.
 - `object.rs:142` `push_token`: `mana_cost: ManaCost::default()`, and `:151-152`
   `loyalty: None, defense: None`.
-- `crates/deckmaste_core/src/token.rs:319-320` doc: "a token has no mana cost".
+- `crates/core/src/token.rs:319-320` doc: "a token has no mana cost".
 - `layer.rs:248-264` `base_colors` reads the mana cost and uses the colour indicator
   only `if colors.is_empty()`, a fallback rather than a union.
 

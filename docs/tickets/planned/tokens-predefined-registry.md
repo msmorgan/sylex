@@ -3,9 +3,9 @@ needs: []
 design: true
 ---
 **Data-fy `PredefinedToken`: one canonical copy in the token registry, enum
-dies.** 2026-07-18 deep-dive: `plugins/builtin/tokens/{Treasure,Food,Gold,
+dies.** 2026-07-18 deep-dive: `v1/plugins/builtin/tokens/{Treasure,Food,Gold,
 Clue,Blood,Vibranium}.ron` already exist as the canonical definitions, and
-`PredefinedToken::token()` (`deckmaste_core/src/token.rs`, ~140 lines of
+`PredefinedToken::token()` (`sylex_core/src/token.rs`, ~140 lines of
 hardcoded `Token` construction) is a second, hand-synchronized copy — its own
 doc comment says each match arm must match its `.ron` file. This is the
 conferrals precedent violated: conferral-shaped data belongs in RON, never
@@ -21,7 +21,7 @@ match arm AND a `.ron` file."
 ## The design question (why this is [design])
 
 `TokenName::resolve()` is synchronous and dependency-free *because* it
-hardcodes — `deckmaste_core` has no handle to the plugin registry. Options:
+hardcodes — `sylex_core` has no handle to the plugin registry. Options:
 thread a token-registry handle to the resolve sites (in the engine), or
 embed `builtin/tokens/*.ron` into core at build time. Pick one with the user.
 `TokenSpec::Named(TokenName)` stays as the typed hook either way.

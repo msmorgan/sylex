@@ -1,6 +1,6 @@
 # Judgment set
 
-The hand-written linguistic judgments of `deckmaste_english`
+The hand-written linguistic judgments of `sylex_english`
 ([`docs/decisions/english-lexical-analysis.md`](../../../docs/decisions/english-lexical-analysis.md) §5).
 It is the only tracked linguistic test evidence: one line per entry, no tree
 dumps, nothing a tool emitted. Each `*.txt` file here holds the entries for one
@@ -16,8 +16,8 @@ index or any other internal detail of a Reading.
 ## When an entry is enforced
 
 An entry's Complexity Stratum is the Stratum the profiler assigns to its text
-(`deckmaste_english::profile`). `tests/judgments.rs` fails on any entry at
-or below the completed Stratum (`deckmaste_english::COMPLETED_STRATUM`) that
+(`sylex_english::profile`). `tests/judgments.rs` fails on any entry at
+or below the completed Stratum (`sylex_english::COMPLETED_STRATUM`) that
 does not hold, and reports the others as pending, as it does an entry whose
 text is a unit named in [`deferred.txt`](../deferred.txt) while that unit stays
 deferred. `seed.txt` is always enforced. Every file is always parsed, so a malformed entry fails at once.

@@ -6,9 +6,9 @@ needs: []
 `Action::Special` exists in the action taxonomy, but `legal_actions` never
 enumerates it, so two sites are unreachable shells:
 
-- `crates/deckmaste_engine/src/decide/mod.rs` — `take_priority_action` has no
+- `crates/engine/src/decide/mod.rs` — `take_priority_action` has no
   `Action::Special` arm.
-- `crates/deckmaste_engine/src/render.rs` — no render shape for it.
+- `crates/engine/src/render.rs` — no render shape for it.
 
 [CR#116.1]: a special action is one a player may take *when they have
 priority*, and it does not use the stack — so it never becomes an object other

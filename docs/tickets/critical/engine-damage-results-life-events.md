@@ -13,7 +13,7 @@ Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md`
 
 ## What is wrong at head
 
-`crates/deckmaste_engine/src/step/combat.rs`, `impl EventApply for DamageDealt`
+`crates/engine/src/step/combat.rs`, `impl EventApply for DamageDealt`
 (every damage, not only combat damage):
 
 - `:32-34` — `// [CR#120.3a]: damage to a player is life loss.` then
@@ -38,7 +38,7 @@ counters)". [CR#119.9] and [CR#119.10] read gain-life triggers and replacements
 as "a source causes". [CR#702.15e]: multiple lifelink sources dealing damage at
 once "cause separate life gain events".
 
-Infect and wither (`plugins/builtin/macros/keyword/Infect.ron`, `Wither.ron`)
+Infect and wither (`v1/plugins/builtin/macros/keyword/Infect.ron`, `Wither.ron`)
 are `Static(Replacement(Instead(would: Damage(...), instead: PutCounters(...))))`;
 `replace_registry.rs` notes an `Instead` "replaces the intent away — it never
 reaches the apply funnel". So `DamageDealt::apply` never runs for them: the

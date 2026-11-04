@@ -10,7 +10,7 @@ permission of [CR#406.3] becomes its own ledger.** Latent: nothing reads
 Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #15,
 #30, #37.
 
-## What is wrong at head (crates/deckmaste_engine/src)
+## What is wrong at head (crates/engine/src)
 
 - **Shuffle does not end grants (#15).** `state.rs:473-477`: grants are "keyed by
   object IDENTITY (`ObjectId`), which is freshly minted on every zone change

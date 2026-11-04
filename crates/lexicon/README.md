@@ -36,7 +36,7 @@ does not infer stress or paradigm classes. An override replaces the default for
 the selected slot. Multiple valid spellings occupy explicit variant indices.
 There is no fallback dictionary or unknown-word POS inference.
 
-`deckmaste_lexical_source` declares the English vocabulary and its
+`sylex_vocabulary` declares the English vocabulary and its
 `LexicalEnvironment` loader builds the `Lexicon` from `lexicon/english/*.ron`
 (closed-class vocabulary, pronoun bundles, auxiliary paradigms, irregular
 replacements and frame additions), `catalogs/*.ron` (the Comprehensive Rules'
@@ -119,7 +119,7 @@ case. Checked realization rejects lossy Roman values: finite magnitudes through
 ```sh
 cargo xtask lexical --data data/scryfall/oracle-cards.jsonl --all \
   --output /tmp/lexical-inventory.json --export /tmp/lexemes.ron
-cargo run -p deckmaste_lexical --example inspect -- /tmp/lexemes.ron 'counters'
+cargo run -p sylex_lexicon --example inspect -- /tmp/lexemes.ron 'counters'
 ```
 
 Use the command's face selectors during development; pass `--export-subset`

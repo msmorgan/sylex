@@ -68,7 +68,7 @@ and companion `[CR#702.139a,116.2g]`. No other keyword may ever become a
 variant.
 
 **Enum membership follows implementation, not classification.** The enum
-(`crates/deckmaste_core/src/keyword.rs`) holds only the *implemented* primitives
+(`crates/core/src/keyword.rs`) holds only the *implemented* primitives
 — today the five combat variants. Banding, phasing, mutate, and companion are
 **reserved but absent**: each gets a variant when its mechanics land, never as
 an unroutable placeholder. The invariant that `KeywordAbility::ALL`, `as_str`,
@@ -324,7 +324,7 @@ pins. It is the active workbench gate. Card data is checked beside it by
 ([lean-card-soundness-gate](tickets/done/lean-card-soundness-gate.md)), which
 re-emits every `plugins_v2/` card as a Lean term and proves `Card.check = []`;
 the workbench build itself still makes no claim about loaded card data. The v1
-`plugins/canon` corpus has no card gate since the Rust-to-Idris emitter was
+`v1/plugins/canon` corpus has no card gate since the Rust-to-Idris emitter was
 retired. [Lean is the workbench](decisions/lean-is-the-workbench.md) records
 the succession; the handwritten Idris model was deleted by `idris-retirement`.
 

@@ -1,10 +1,8 @@
-# deckmaste.rs
+# sylex
 
 > **Reading the card explains the card.**
 
-**Project site:** [deckmaste.rs — Magic: The Gathering rules engine](https://deckmaste.rs/)
-
-deckmaste.rs tests the long-standing intuition that Oracle text can serve as an
+sylex tests the long-standing intuition that Oracle text can serve as an
 executable source language for Magic: it builds the whole path — parser, typed
 intermediate form, rules engine — and measures, card by card, where recovery
 holds and where it fails.
@@ -45,7 +43,7 @@ Magic's card pool is large and open-ended — on the order of thirty thousand
 printed cards — and a card is defined almost entirely by how it changes the
 rules. The usual way to model this is to give each card its own imperative
 implementation: a script or a class that manipulates game state directly.
-(XMage, for instance, implements each card as a Java class.) deckmaste.rs treats
+(XMage, for instance, implements each card as a Java class.) sylex treats
 Oracle text itself as the source language instead. Recovery turns a sentence
 into typed, declarative structure composed from rules concepts — zones, costs,
 durations, conditions, the deontic modalities (may, must, can't), and effects —
@@ -109,7 +107,7 @@ payment from the keyboard. On first run it downloads the source snapshot and
 generates the demo corpus; subsequent runs reuse those local files.
 
 The engine's behavior is also covered by a test suite that exercises specific
-interactions, and `crates/deckmaste_engine/examples/full_game_1k.rs` runs a
+interactions, and `crates/engine/examples/full_game_1k.rs` runs a
 thousand complete games.
 
 ---
@@ -128,9 +126,9 @@ it does not create a competing authority.
 ```
 Oracle text
     ⇅ parse / render
-deckmaste_english
-    ⇅ deckmaste_spelling: recover / spell
-deckmaste_semantics ── deckmaste_lowering: lower ──► deckmaste_core
+sylex_english
+    ⇅ sylex_spelling: recover / spell
+sylex_semantics_v1 ── sylex_lowering_v1: lower ──► sylex_core
   canonical typed IR                                      engine AST
   persisted as RON
 ```
@@ -147,44 +145,42 @@ launches the client:
 
 **The card grammar and its projections**
 
-- **`deckmaste_semantics`** — the typed intermediate rules grammar: the
+- **`sylex_semantics_v1`** — the typed intermediate rules grammar: the
   canonical normalized hub recovered from Oracle text and persisted as RON in
   today's card, token, and rules-table containers, plus its macro layer (sugar
   desugars at load; the explicit form is always the meaning).
-- **`deckmaste_spelling`** — a stub crate reserved for the intermediate ⇄
-  English relation; its first implementation was removed along with v1 English.
-- **`deckmaste_lowering`** — the one-way compile from intermediate form to the
+- **`sylex_lowering_v1`** — the one-way compile from intermediate form to the
   engine's types. Generated as an exact mirror at the fork, it doubles as the
   divergence ledger: every arm that stops being an identity carries its
   justification in place.
-- **`deckmaste_core`** — the engine AST: the typed vocabulary of abilities,
+- **`sylex_core`** — the engine AST: the typed vocabulary of abilities,
   effects, costs, zones, durations, and conditions, in the shapes the rules
   systems execute.
-- **`deckmaste_card`** — the engine's unit of card definitions:
+- **`sylex_card`** — the engine's unit of card definitions:
   `Card`/`CardFace` and the face layouts, packaging core's loose primitives
   into a playable unit. Depends on core; core never depends on it.
 
 **The engine and its consumers**
 
-- **`deckmaste_engine`** — the rules engine: game state and the rules systems
+- **`sylex_engine`** — the rules engine: game state and the rules systems
   listed above.
-- **`deckmaste_plugin`** — the card corpus, its plugin loader, and conformance
+- **`sylex_plugin_v1`** — the card corpus, its plugin loader, and conformance
   suite.
-- **`deckmaste_legacy_render`** — the card-text renderer the client uses today
+- **`sylex_render_v1`** — the card-text renderer the client uses today
   and its fidelity harness, kept as a measurement oracle until rendering
   through the spelling layer replaces it.
-- **`deckmaste_tui`** — the interactive terminal client, built on ratatui.
-- **`deckmaste_migrations`** — the regex-era data pipeline (extract, resolve,
+- **`sylex_tui`** — the interactive terminal client, built on ratatui.
+- **`sylex_pipeline_v1`** — the regex-era data pipeline (extract, resolve,
   graduate) that turns oracle text into encodings. Still the production path;
   it becomes a shadow oracle as English-grammar recovery crosses its gates.
-- **`deckmaste_noncanon`** — a non-canon proving ground: complete WC99 decks
+- **`sylex_matchups`** — a non-canon proving ground: complete WC99 decks
   and matchup tests that exercise the engine end-to-end.
 
 **Language infrastructure**
 
-- **`deckmaste_syntax`**, **`deckmaste_lexical_source`** and
-  **`deckmaste_english`** — the English grammar for Oracle text; its own
-  section below. (The first-attempt `deckmaste_english` was retired.)
+- **`sylex_syntax`**, **`sylex_vocabulary`** and
+  **`sylex_english`** — the English grammar for Oracle text; its own
+  section below. (The first-attempt `sylex_english` was retired.)
 - **`macro_ron`** / **`macro_ron_derive`** — the RON macro-expansion layer the
   intermediate grammar is built on.
 - **`macro_ron_lsp`** — a small language server for the repo's RON card files.
@@ -230,7 +226,7 @@ The load-bearing rules for the split are:
   justification written in place, and every variant carries a mapping test
   naming the engine shape it expects.
 
-The crate split has landed: `deckmaste_semantics` and `deckmaste_lowering`
+The crate split has landed: `sylex_semantics_v1` and `sylex_lowering_v1`
 exist, and loaders lower cached intermediate terms to core at load. The curated
 canon cache is still written and verified by hand, while the broader production
 cache comes from the regex-era pipeline. Structural English recovery is
@@ -239,11 +235,11 @@ below.
 
 ---
 
-## The English grammar (`deckmaste_english`)
+## The English grammar (`sylex_english`)
 
-The first-attempt `deckmaste_english` crate and its `cargo xtask english` tools
-have been retired; the grammar lives in `deckmaste_syntax`,
-`deckmaste_lexical_source` and `deckmaste_english`, measured by
+The first-attempt `sylex_english` crate and its `cargo xtask english` tools
+have been retired; the grammar lives in `sylex_syntax`,
+`sylex_vocabulary` and `sylex_english`, measured by
 `cargo xtask english`. The grammar parses Oracle text into a genuine grammatical syntax tree —
 constituency structure, not keyword-spotting. A chart parser produces a packed
 forest; parts of speech are selected by the grammar slots they fill rather than
@@ -319,7 +315,7 @@ records that plan). The near-term work runs in three strands:
    legacy renderer; stripping the macro machinery out of core;
    the intermediate vocabulary (bare engine variants stop being recoverable
    syntax, made near-zero-churn by identity macros); consolidating frames into
-   `deckmaste_spelling`; inline target sugar and its scope elaboration; and
+   `sylex_spelling`; inline target sugar and its scope elaboration; and
    connecting the intermediate grammar to the Lean card-soundness gate.
 2. **Deriving the English grammar and growing recovery.** The constructicon
    migration above, alongside the frame-coverage rounds — with the regex
@@ -378,7 +374,7 @@ it is Wizards of the Coast property (see below):
 
 ```sh
 scripts/fetch_data                       # Scryfall Oracle Cards, MTGJSON references, and CR
-cargo xtask generate plugins/wizards     # build the stub corpus from it
+cargo xtask generate v1/plugins/wizards     # build the stub corpus from it
 cargo xtask cite check                   # validate CR citations
 ```
 

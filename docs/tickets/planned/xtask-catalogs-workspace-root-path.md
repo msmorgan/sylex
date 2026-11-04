@@ -3,7 +3,7 @@ needs: []
 ---
 Stop resolving the project workspace root from a compile-time-baked path.
 
-`crates/deckmaste_catalogs/src/io.rs` canonicalizes
+`crates/catalogs/src/io.rs` canonicalizes
 `env!("CARGO_MANIFEST_DIR")/../..` at run time, purely as a safety check that a
 catalog output directory is not the workspace root or an ancestor of it. The
 path is baked in when the crate is compiled, so the check fails whenever the

@@ -11,9 +11,9 @@ fire.
 
 Echo [CR#702.30a]: "At the beginning of your upkeep, if this permanent came under
 your control since the beginning of your last upkeep, sacrifice it unless you pay
-[cost]." `plugins/builtin/macros/keyword/Echo.ron` uses
+[cost]." `v1/plugins/builtin/macros/keyword/Echo.ron` uses
 `within: SinceYour(Beginning(Upkeep))`, and the scan is implemented in
-`crates/deckmaste_engine/src/history.rs` (`in_window_for`,
+`crates/engine/src/history.rs` (`in_window_for`,
 `position_in_window_for`), watcher-relative: the anchor is the watcher's most recent
 `StepBegan(step)` onset, except while that step is itself current on the watcher's
 turn, where the anchor is the PREVIOUS onset (the current onset is the one firing the

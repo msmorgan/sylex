@@ -4,7 +4,7 @@ needs: [ci-cite-gate, engine-todo-triage]
 **Land the reviewer-facing slice of the comment-discipline program without
 making the entire repository sweep a publication blocker.** The cold-reader
 failures are concentrated: unresolved `Task N`/`P0.Wn` shorthand, the
-reviewer-directed correctness essay in `deckmaste_engine/src/sba.rs`, and the
+reviewer-directed correctness essay in `sylex_engine/src/sba.rs`, and the
 large engine files a ten-minute reviewer is actually directed toward.
 
 Scope:

@@ -13,7 +13,7 @@ hops. This site discards it.
 
 ## The site
 
-`crates/macro_ron/src/expand.rs`, the `RAW_VALUE_TOKEN` branch of
+`v1/crates/macro_ron/src/expand.rs`, the `RAW_VALUE_TOKEN` branch of
 `deserialize_newtype_struct`:
 
 ```rust
@@ -35,7 +35,7 @@ The capture only fires for a type that deserializes through ron's private
 raw-value newtype. Nothing in the graph the restricted entry reads
 (`Card` / `Token` / `Predicate` and their descendants) carries a `RawValue`.
 The `RawValue`-bearing types are `MacroDef`, frames, params
-and `deckmaste_migrations::todo_card` — all read
+and `sylex_pipeline_v1::todo_card` — all read
 through free entries.
 
 ## What makes it live

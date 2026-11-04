@@ -8,7 +8,7 @@ files, with similar duplication around `card()`, `two_player_with()`, and
 hand, while others intentionally require a hand card or accept an existing
 object id.
 
-Add shared integration-test support under `crates/deckmaste_engine/tests/` and
+Add shared integration-test support under `crates/engine/tests/` and
 factor only behaviorally identical setup. Expose distinct, intention-revealing
 helpers for materially different operations (for example hand-only,
 hand-or-library, and existing-object movement); do not create one permissive

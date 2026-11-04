@@ -15,7 +15,7 @@ For power/toughness the behaviour is unchanged — Quicksilver-of-Tarmogoyf is 7
 no `*/1+*` CDA, and a Populate of that token stays 7/7 [CR#707.3].
 
 **Behaviour changes on colour and subtypes (corrected 2026-10-21).** The current drop
-covers only P/T: `crates/deckmaste_engine/src/copy.rs:30-38` (module doc, "Power/Toughness
+covers only P/T: `crates/engine/src/copy.rs:30-38` (module doc, "Power/Toughness
 axes only") and `retain_characteristic` (`copy.rs:574-594`, a no-op arm for `Colors`
 and `Subtypes`); the Modify path (`copy.rs:334`, `:337`) does no CDA drop either.
 [CR#707.9d] drops the copied CDA for any characteristic the exception provides or
