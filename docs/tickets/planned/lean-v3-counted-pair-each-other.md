@@ -23,8 +23,8 @@ Approved.
   on the plural referent introduced by `DetPhrase.target` / `DetPhrase.count`.
 - That way `targets (exactly 2) isCreature` is recognized by the distributive-pair lookup and the
   "the other" check (Lean's `distributivePair?`, `theOtherOk`) for `fightEachOther`
-  (`plugins_v3/builtin/definitions/keyword_action/fightEachOther.syl`).
-- Then spell *Rivals' Duel* as `plugins_v3/canon/cards/Rivals' Duel.syl` (its "share no creature
+  (`plugins/builtin/definitions/keyword_action/fightEachOther.syl`).
+- Then spell *Rivals' Duel* as `plugins/canon/cards/Rivals' Duel.syl` (its "share no creature
   types" is `agree (.subtype .creature) .differ …`). Two targets of one "target" word are
   distinct objects [CR#115.3], so no self-fight [CR#701.14c] arises here.
 - Check what the count does to other readers of `Payload.size` (Lean's `countedGroupSize`,

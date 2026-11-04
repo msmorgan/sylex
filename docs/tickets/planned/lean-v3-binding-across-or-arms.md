@@ -5,9 +5,9 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 
 Standard constraints apply. Split from `lean-v3-authoring-default-leaks` §3 (2026-10-25).
 
-`objectsOfPlayer` (`plugins_v3/builtin/templates/predicate/objectsOfPlayer.syl`, "…that <player>
+`objectsOfPlayer` (`plugins/builtin/templates/predicate/objectsOfPlayer.syl`, "…that <player>
 controls or owns but no player controls", its only caller *True-Name Nemesis*,
-`plugins_v3/canon/cards/True-Name Nemesis.syl`) writes `player` twice, once in each arm of an
+`plugins/canon/cards/True-Name Nemesis.syl`) writes `player` twice, once in each arm of an
 `.or`. ADR `docs/decisions/semantics-v3.md` §3.2 binds a Template
 parameter mentioned more than once with `.firstMention`/`.laterMention`. Writing
 

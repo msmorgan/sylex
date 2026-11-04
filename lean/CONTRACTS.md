@@ -981,7 +981,7 @@ minimum-two-fields packing rule has no semantic counterpart in an edit list.
 
 `Ability.keyword` takes an ordered `List KeywordParam`. It is an internal
 expansion carrier: a card writes a keyword ability through its typed Definition
-(`../plugins_v3/builtin/definitions/keyword_ability/`), whose signature fixes the arguments'
+(`../plugins/builtin/definitions/keyword_ability/`), whose signature fixes the arguments'
 number and order, so there is no argument schema table and the checker does not
 branch on keyword names. A quality a keyword restricts to objects is restricted by
 the Definition's body, which uses it as an object's quality: typecycling's "[type]
@@ -1096,7 +1096,7 @@ when the linked ability resolves (a card that left exile) is the engine's, not t
 checker's.
 
 A Relation (`RelationLabel`) is declared in a `.syl` file under
-`plugins_v3/builtin/definitions/relation/`, with a generated
+`plugins/builtin/definitions/relation/`, with a generated
 `RegistryDefinition.relation` record. Names resolve at their expected sort.
 `Action.relate` checks both operands as objects, so a player operand is
 refused `kindMismatch`; every relation links two objects, and neither the label nor its record
@@ -1331,7 +1331,7 @@ A counter's kind is a name: `CounterKind.named` carries the counter
 declaration's name verbatim (`p1p1Counter`, `flyingCounter`, `chargeCounter`),
 and "counters with the same name or description are interchangeable"
 [CR#122.1], with what the counter is placed on (`holder`, an object unless the declaration
-says a player). Each kind is a `.syl` declaration under `plugins_v3/builtin/definitions/counter/`, a +X/+Y
+says a player). Each kind is a `.syl` declaration under `plugins/builtin/definitions/counter/`, a +X/+Y
 counter [CR#122.1a] and a keyword counter [CR#122.1b] included. Names resolve at the expected
 sort; `CounterKind.scope` reads the
 value's own holder. A counter definition
@@ -1363,7 +1363,7 @@ a declaration that lists members, a member's (`day`, `night` [CR#731.1]); the
 phrase a card prints ("the monarch") is the declaration's spelling and never
 reaches the checker. The label also carries its `scope` (who holds it), which gives `holder`,
 `possessorOk`, `heldByItsCard` and `gameWide`; each designation is a declaration in
-`plugins_v3/builtin/definitions/designation/`. Names resolve at the expected sort. A designation
+`plugins/builtin/definitions/designation/`. Names resolve at the expected sort. A designation
 declaration's bare name means its label, so it reads at a designation
 position; its definition (`RegistryDefinition.designation`) is a separate record the
 registry holds under the name (ruling 2026-10-10).

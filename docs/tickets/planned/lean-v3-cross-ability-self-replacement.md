@@ -48,7 +48,7 @@ after an ability word) is a separate spell ability whose body is a `Replacement`
 ## Change
 
 - Add `Ability.spellReplacement (replacement : Replacement)` with primitive `spellReplacement`
-  (beside `spell`, `plugins_v3/builtin/primitives/ability/spell.syl`). It replaces the effect of the immediately preceding
+  (beside `spell`, `plugins/builtin/primitives/ability/spell.syl`). It replaces the effect of the immediately preceding
   spell ability of the same spell.
 - `discourse` steps it as it steps the `.replace` action arm (Lean's `stepReplacementWith`
   path, `lean/Semantics/Check/Phrase.lean`): from the state the replaced spell ability read, per

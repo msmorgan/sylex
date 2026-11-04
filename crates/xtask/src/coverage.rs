@@ -636,13 +636,13 @@ mod tests {
     #[test]
     fn syl_conversion_preserves_bound_coverage() {
         let dir = tempdir_with(&[(
-            "plugins_v3/example.lean",
+            "plugins/example.lean",
             "/-- [CR#100.1] -/\n-- [CR#200.2]",
         )]);
         let before = scan_tree(dir.path(), &[]);
-        std::fs::remove_file(dir.path().join("plugins_v3/example.lean")).unwrap();
+        std::fs::remove_file(dir.path().join("plugins/example.lean")).unwrap();
         std::fs::write(
-            dir.path().join("plugins_v3/example.syl"),
+            dir.path().join("plugins/example.syl"),
             "# [CR#100.1]\n# [CR#200.2]\n",
         )
         .unwrap();

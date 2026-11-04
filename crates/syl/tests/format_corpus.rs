@@ -1,4 +1,4 @@
-//! The formatter over every `.syl` file under `plugins_v3/`: in every style,
+//! The formatter over every `.syl` file under `plugins/`: in every style,
 //! formatting preserves the tree and is idempotent.
 
 use std::path::Path;
@@ -75,7 +75,7 @@ fn check(file: &sylex_syl::File, style: &Style) -> Option<String> {
 
 #[test]
 fn formatting_the_corpus_preserves_trees_and_is_idempotent() {
-    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins_v3");
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins");
     let mut paths = Vec::new();
     collect(&root, &mut paths);
     paths.sort();

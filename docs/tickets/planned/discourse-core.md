@@ -95,7 +95,7 @@ parameter binding, core noun-phrase and pronoun/demonstrative/reflexive/contrast
 
 ## Tests & Verification
 
-- **Corpus & fixture gate**: Every card in `plugins_v3/canon/cards/` and every equation in
+- **Corpus & fixture gate**: Every card in `plugins/canon/cards/` and every equation in
   `fixtures.jsonl` whose combined `deckmaste_semantics_v3` + `deckmaste_discourse` check produces no
   `Refusal::Unsupported` agrees with `lean-discourse-export`'s `bindings.jsonl` and
   `fixtures.jsonl`, except at the documented fixes: `flagDefect` multi-use parameter entries, the

@@ -101,7 +101,7 @@ private def dump (label : String) : MetaM UInt32 := do
           records := records.push (k, result)
           if sample == "unsampled" then unsampled := unsampled + 1 else samples := samples + 1
       catch e => errors := errors.push s!"{id}: {← e.toMessageData.toString}"
-  let sourceEntries ← (System.FilePath.mk "../plugins_v3/canon/cards").readDir
+  let sourceEntries ← (System.FilePath.mk "../plugins/canon/cards").readDir
   let cardFiles ← sourceEntries.filterM fun entry => do
     return (entry.fileName.endsWith ".lean" || entry.fileName.endsWith ".syl") &&
       !(← entry.path.isDir)

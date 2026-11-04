@@ -7,7 +7,7 @@ Standard constraints apply. Found by the 2026-10-25 triage of an external audit 
 verified against the tree at `wmyykqnv`. Fragment paths are Lean proof-suite files under
 `lean/Semantics/`, which `semantics-rust-rewrite` carries to Rust tests; edit each fragment where
 it lives then, finding it by its identifier (line numbers are historical, as of that change).
-Whole-card declarations are `.syl` in `plugins_v3/canon/cards/`, with the current paths listed
+Whole-card declarations are `.syl` in `plugins/canon/cards/`, with the current paths listed
 below. Test names below are the Lean pin names.
 
 A Head Noun narrows what a phrase is known to be (`docs/contexts/game-model/CONTEXT.md`, **Head
@@ -17,9 +17,9 @@ writes the matching predicate. The rulings already in force: `lean-v3-authoring-
 `and [isCard, in_ yourGraveyard]`, `and [isCreature, isCard, in_ yourHand]` and
 `and [isCard, in_ (exiledWith thisArtifact)]`, and `lean-v3-typed-verbed-deeds` rewrote sites "to
 match their Oracle text … actual head nouns". The Templates are `isPermanent`
-(`plugins_v3/builtin/templates/predicate/isPermanent.syl`, `.in_ battlefield`), `isCard` (primitive,
-`plugins_v3/builtin/primitives/predicate/isCard.syl`) and `cardIn`
-(`plugins_v3/builtin/templates/predicate/cardIn.syl`, `and [isCard, in_ zone]`). `youControl` and
+(`plugins/builtin/templates/predicate/isPermanent.syl`, `.in_ battlefield`), `isCard` (primitive,
+`plugins/builtin/primitives/predicate/isCard.syl`) and `cardIn`
+(`plugins/builtin/templates/predicate/cardIn.syl`, `and [isCard, in_ zone]`). `youControl` and
 `controlledBy` (`youControl.syl`, `controlledBy.syl` in the same directory) are possessor tests only and do not imply the
 battlefield, so dropping "permanent" widens the set to spells you control.
 
@@ -146,7 +146,7 @@ pinned by `okFiresongAndSunspeaker` (`Proofs/CardsKeyword.lean:166`). If `thatJo
 ## Acceptance
 
 - `cargo test` and `cargo clippy --tests -- -D warnings` for `semantics` and `discourse`.
-- `rg 'allOf\(youControl\)' plugins_v3/canon/cards` is empty, and no carried-over fragment test
+- `rg 'allOf\(youControl\)' plugins/canon/cards` is empty, and no carried-over fragment test
   writes `allOf youControl`; the 20 §1 rows and every §2 line carry the head noun.
 - CR citation gates: `cargo xtask cite check --list-noncompliant` empty, `cargo xtask cite check`
   0 stale.
@@ -168,45 +168,45 @@ include both printed names.
 
 | Printed name | Canon file |
 |---|---|
-| Abolish | `plugins_v3/canon/cards/Abolish.syl` |
-| Ashes of the Fallen | `plugins_v3/canon/cards/Ashes of the Fallen.syl` |
-| Aven Shrine | `plugins_v3/canon/cards/Aven Shrine.syl` |
-| Blatant Thievery | `plugins_v3/canon/cards/Blatant Thievery.syl` |
-| Blazing Shoal | `plugins_v3/canon/cards/Blazing Shoal.syl` |
-| Bleeding Effect | `plugins_v3/canon/cards/Bleeding Effect.syl` |
-| Bloodfire Enforcers | `plugins_v3/canon/cards/Bloodfire Enforcers.syl` |
-| Cairn Wanderer | `plugins_v3/canon/cards/Cairn Wanderer.syl` |
-| Carrion Grub | `plugins_v3/canon/cards/Carrion Grub.syl` |
-| Celebrate the Harvest | `plugins_v3/canon/cards/Celebrate the Harvest.syl` |
-| Charnel Troll | `plugins_v3/canon/cards/Charnel Troll.syl` |
-| Chrome Mox | `plugins_v3/canon/cards/Chrome Mox.syl` |
-| Cold Storage | `plugins_v3/canon/cards/Cold Storage.syl` |
-| Crypt Lurker | `plugins_v3/canon/cards/Crypt Lurker.syl` |
-| Cultivator Colossus | `plugins_v3/canon/cards/Cultivator Colossus.syl` |
-| Custodi Squire | `plugins_v3/canon/cards/Custodi Squire.syl` |
-| Death or Glory | `plugins_v3/canon/cards/Death or Glory.syl` |
-| Death-Mask Duplicant | `plugins_v3/canon/cards/Death-Mask Duplicant.syl` |
-| Delivery Moogle | `plugins_v3/canon/cards/Delivery Moogle.syl` |
-| Disrupting Shoal | `plugins_v3/canon/cards/Disrupting Shoal.syl` |
-| Drach'Nyen | `plugins_v3/canon/cards/Drach'Nyen.syl` |
-| Force of Will | `plugins_v3/canon/cards/Force of Will.syl` |
-| Garruk Relentless // Garruk, the Veil-Cursed | `plugins_v3/canon/cards/Garruk Relentless {slash}{slash} Garruk, the Veil-Cursed.syl` |
-| Land Tax | `plugins_v3/canon/cards/Land Tax.syl` |
-| Midnight Scavengers // Chittering Host | `plugins_v3/canon/cards/Midnight Scavengers {slash}{slash} Chittering Host.syl` |
-| Mox Diamond | `plugins_v3/canon/cards/Mox Diamond.syl` |
-| Nourishing Shoal | `plugins_v3/canon/cards/Nourishing Shoal.syl` |
-| Old-Growth Dryads | `plugins_v3/canon/cards/Old-Growth Dryads.syl` |
-| Rogues' Gallery | `plugins_v3/canon/cards/Rogues' Gallery.syl` |
-| Rune Snag | `plugins_v3/canon/cards/Rune Snag.syl` |
-| Scapeshift | `plugins_v3/canon/cards/Scapeshift.syl` |
-| Seedborn Muse | `plugins_v3/canon/cards/Seedborn Muse.syl` |
-| Shining Shoal | `plugins_v3/canon/cards/Shining Shoal.syl` |
-| Sickening Shoal | `plugins_v3/canon/cards/Sickening Shoal.syl` |
-| Sphinx of the Chimes | `plugins_v3/canon/cards/Sphinx of the Chimes.syl` |
-| Sunscour | `plugins_v3/canon/cards/Sunscour.syl` |
-| Syr Konrad, the Grim | `plugins_v3/canon/cards/Syr Konrad, the Grim.syl` |
-| Thawing Glaciers | `plugins_v3/canon/cards/Thawing Glaciers.syl` |
-| Tower Winder | `plugins_v3/canon/cards/Tower Winder.syl` |
-| Urborg Scavengers | `plugins_v3/canon/cards/Urborg Scavengers.syl` |
-| Voracious Brood | `plugins_v3/canon/cards/Voracious Brood.syl` |
-| Vraska's Scorn | `plugins_v3/canon/cards/Vraska's Scorn.syl` |
+| Abolish | `plugins/canon/cards/Abolish.syl` |
+| Ashes of the Fallen | `plugins/canon/cards/Ashes of the Fallen.syl` |
+| Aven Shrine | `plugins/canon/cards/Aven Shrine.syl` |
+| Blatant Thievery | `plugins/canon/cards/Blatant Thievery.syl` |
+| Blazing Shoal | `plugins/canon/cards/Blazing Shoal.syl` |
+| Bleeding Effect | `plugins/canon/cards/Bleeding Effect.syl` |
+| Bloodfire Enforcers | `plugins/canon/cards/Bloodfire Enforcers.syl` |
+| Cairn Wanderer | `plugins/canon/cards/Cairn Wanderer.syl` |
+| Carrion Grub | `plugins/canon/cards/Carrion Grub.syl` |
+| Celebrate the Harvest | `plugins/canon/cards/Celebrate the Harvest.syl` |
+| Charnel Troll | `plugins/canon/cards/Charnel Troll.syl` |
+| Chrome Mox | `plugins/canon/cards/Chrome Mox.syl` |
+| Cold Storage | `plugins/canon/cards/Cold Storage.syl` |
+| Crypt Lurker | `plugins/canon/cards/Crypt Lurker.syl` |
+| Cultivator Colossus | `plugins/canon/cards/Cultivator Colossus.syl` |
+| Custodi Squire | `plugins/canon/cards/Custodi Squire.syl` |
+| Death or Glory | `plugins/canon/cards/Death or Glory.syl` |
+| Death-Mask Duplicant | `plugins/canon/cards/Death-Mask Duplicant.syl` |
+| Delivery Moogle | `plugins/canon/cards/Delivery Moogle.syl` |
+| Disrupting Shoal | `plugins/canon/cards/Disrupting Shoal.syl` |
+| Drach'Nyen | `plugins/canon/cards/Drach'Nyen.syl` |
+| Force of Will | `plugins/canon/cards/Force of Will.syl` |
+| Garruk Relentless // Garruk, the Veil-Cursed | `plugins/canon/cards/Garruk Relentless {slash}{slash} Garruk, the Veil-Cursed.syl` |
+| Land Tax | `plugins/canon/cards/Land Tax.syl` |
+| Midnight Scavengers // Chittering Host | `plugins/canon/cards/Midnight Scavengers {slash}{slash} Chittering Host.syl` |
+| Mox Diamond | `plugins/canon/cards/Mox Diamond.syl` |
+| Nourishing Shoal | `plugins/canon/cards/Nourishing Shoal.syl` |
+| Old-Growth Dryads | `plugins/canon/cards/Old-Growth Dryads.syl` |
+| Rogues' Gallery | `plugins/canon/cards/Rogues' Gallery.syl` |
+| Rune Snag | `plugins/canon/cards/Rune Snag.syl` |
+| Scapeshift | `plugins/canon/cards/Scapeshift.syl` |
+| Seedborn Muse | `plugins/canon/cards/Seedborn Muse.syl` |
+| Shining Shoal | `plugins/canon/cards/Shining Shoal.syl` |
+| Sickening Shoal | `plugins/canon/cards/Sickening Shoal.syl` |
+| Sphinx of the Chimes | `plugins/canon/cards/Sphinx of the Chimes.syl` |
+| Sunscour | `plugins/canon/cards/Sunscour.syl` |
+| Syr Konrad, the Grim | `plugins/canon/cards/Syr Konrad, the Grim.syl` |
+| Thawing Glaciers | `plugins/canon/cards/Thawing Glaciers.syl` |
+| Tower Winder | `plugins/canon/cards/Tower Winder.syl` |
+| Urborg Scavengers | `plugins/canon/cards/Urborg Scavengers.syl` |
+| Voracious Brood | `plugins/canon/cards/Voracious Brood.syl` |
+| Vraska's Scorn | `plugins/canon/cards/Vraska's Scorn.syl` |

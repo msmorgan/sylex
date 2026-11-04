@@ -32,7 +32,7 @@ Requirements for a replacement, not a design:
   changed, or a content-hash cache of passing test results keyed by the test
   binary's input fingerprint, so an unchanged test binary is never re-run).
 - Exclude slow suites (`lean_check`, `slow-tests`) unless their own inputs
-  (`lean/`, `plugins_v3`, the Lean checker code) changed.
+  (`lean/`, `plugins`, the Lean checker code) changed.
 - Run in well under a minute for a typical grammar or lexicon landing on an
   idle host.
 - Print the exact command list it will run before running it, so an agent can

@@ -139,4 +139,4 @@ wrapper-erased tree equality:
     `"default"`, and appending ` rules=<rendered RegistryDefinition>` when the declaration produces
     a companion registry definition).
   - Every `["card", printed_name]` row in `values.txt`, plus asserting that the card count matches
-    the `.syl` file count in `plugins_v3/canon/cards/`.
+    the `.syl` file count in `plugins/canon/cards/`.

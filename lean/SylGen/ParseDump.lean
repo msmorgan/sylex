@@ -1,7 +1,7 @@
 import SylGen.Parser
 
 /-!
-`sylParseDump ROOT OUTPUT`: parse every `ROOT/plugins_v3/**/*.syl` file with `SylGen.parse` (no
+`sylParseDump ROOT OUTPUT`: parse every `ROOT/plugins/**/*.syl` file with `SylGen.parse` (no
 resolution) and write the declarations as one JSON object to `OUTPUT`, keyed by the path relative
 to `ROOT`. Positions are left out. `cargo xtask dsl differential` compares the dump with
 `sylex_syl`'s trees.
@@ -51,7 +51,7 @@ def main (args : List String) : IO UInt32 := do
   let [root, output] := args
     | IO.eprintln "usage: sylParseDump ROOT OUTPUT"; return 2
   let root : FilePath := root
-  let paths := (← (root / "plugins_v3").walkDir).filter (·.extension == some "syl")
+  let paths := (← (root / "plugins").walkDir).filter (·.extension == some "syl")
   let mut files : Array (String × Json) := #[]
   for path in paths do
     let relative := ((path.toString.drop (root.toString.length + 1)).toString)

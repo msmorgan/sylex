@@ -31,7 +31,7 @@ Review probe (2026-10-24, Lean checker, which `discourse` ports), *Recoil*:
 
 Proposal, a requirement on `discourse`: the owner's zones written "its owner's <zone>" introduce
 the owner, by stepping the destination as `handOf (ownerOf it)` (or giving `returnToHand`,
-`plugins_v3/builtin/templates/action/returnToHand.syl`, and its siblings an owner possessor read
+`plugins/builtin/templates/action/returnToHand.syl`, and its siblings an owner possessor read
 after the subject), so "that player" reads the owner and each card above checks. The move already
 steps its subject before its destination, so a "that player" inside the subject still reads an
 earlier player: *Noetic Scales*' owner-written spelling already checks (Lean pin

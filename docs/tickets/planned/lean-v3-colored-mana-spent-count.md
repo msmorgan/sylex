@@ -34,8 +34,8 @@ Use `ManaTypeTerm` [CR#106.1b] (`.colorless | .ofColor (color : ColorTerm)`, ver
 
 - Add `LinkedFacet.manaSpent (type : ManaTypeTerm)`, the amount of mana of that type spent to cast
   the object. Templates beside `colorsSpentToCast`
-  (`plugins_v3/builtin/templates/amount/colorsSpentToCast.syl`): `manaOfColorSpentToCast` and
-  `colorlessManaSpentToCast`. Adamant (`plugins_v3/builtin/templates/ability_word/adamant.syl`)
+  (`plugins/builtin/templates/amount/colorsSpentToCast.syl`): `manaOfColorSpentToCast` and
+  `colorlessManaSpentToCast`. Adamant (`plugins/builtin/templates/ability_word/adamant.syl`)
   then reads `compareAmt (manaOfColorSpentToCast .red thisSpell) .atLeast 3`.
 - The same facet covers *Desecrate Reality*'s "three colorless mana".
 - "Three mana of the same color" is the next section.

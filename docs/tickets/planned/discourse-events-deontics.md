@@ -22,7 +22,7 @@ coordinated trigger subjects), `Replacement` (`StepPhase.preEvent`), deontic sta
      `NounPhrase::Or` / `NounPhrase::And` coordination (`"Whenever this creature or another
      creature you control is turned face up, untap that creature"`), publish a merged subject
      referent representing whichever coordinated branch matched the event so `"that creature"`
-     resolves to it; respell `plugins_v3/canon/cards/Pine Walker.syl` to use the printed
+     resolves to it; respell `plugins/canon/cards/Pine Walker.syl` to use the printed
      coordination and `"that creature"`.
 
 2. **Replacements (`Replacement`, `StepPhase.preEvent`, `[CR#614.1,614.6]`)**:
@@ -46,7 +46,7 @@ coordinated trigger subjects), `Replacement` (`StepPhase.preEvent`), deontic sta
 
 - **Corpus & fixture gate**: Every corpus card and fixture with no remaining `Refusal::Unsupported`
   agrees with `bindings.jsonl` and `fixtures.jsonl` (plus the documented fixes).
-- ***Pine Walker* respelling**: `plugins_v3/canon/cards/Pine Walker.syl` is respelled with the
+- ***Pine Walker* respelling**: `plugins/canon/cards/Pine Walker.syl` is respelled with the
   coordinated trigger subject and `untap(that(isCreature))`, and checks with zero refusals.
 - **Spec catalog**: Port `docs/semantics-spec-catalog.md` Part 2 Suites F (Triggers, event
   patterns), I (Turn structure, reflexive triggers, timing), J (Deontic rules), and O (Static

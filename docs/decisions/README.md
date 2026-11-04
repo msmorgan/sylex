@@ -44,7 +44,7 @@ requires explicit review rather than an opportunistic refactor.
   reference resolution (the DRS, boxes, `J1`, `J2`, `D′`, `AC>R1`, Contrast
   Anchors), the Definition/Template split, the action-clause spine (`instruct`,
   `does`, `would`/`instead`, `cant`/`must`/`can`/`gatedBy`, `did`/`tally`, `by`,
-  `any`, `which`), and the `.syl` data language under `plugins_v3/`.
+  `any`, `which`), and the `.syl` data language under `plugins/`.
 - [Card authoring binds no implicits](card-authoring-binds-no-implicits.md) —
   Card authoring binds no implicit parameters; core constructors take every
   field required. Superseded for the Lean workbench (2026-10-21): Templates may

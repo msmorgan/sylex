@@ -9,7 +9,7 @@ Each card type is declared twice, in two different shapes.
   `CardType.dungeon`, plus `cardTypes`. The checker reads these by value: `Check/Words.lean`
   uses `normalizeTypes`, `mergeTypes` and `commonTypes`, and `Check/Card.lean`,
   `Check/Queries.lean`, `Check/AbilityRules.lean` and about 60 proof files use them too.
-- `plugins_v3/builtin/definitions/card_type/*.syl` declares `card_type` items that carry the
+- `plugins/builtin/definitions/card_type/*.syl` declares `card_type` items that carry the
   same fields plus `confers`.
 
 `lean/CONTRACTS.md:154-157` makes the core copies deliberate: card types are "the one catalog

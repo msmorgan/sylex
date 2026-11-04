@@ -14,7 +14,7 @@ already retired, and `sylex_spelling` is now a stub crate;
 `semantics-v3-dsl-and-plugins`, and the pre-v4 `sylex_vocabulary` was
 retired in `english-v4-cutover-v3`), use the `deckmaste_semantics_v3`, `deckmaste_discourse`, and
 `deckmaste_lowering_v3` crates from `semantics-rust-rewrite` (dropping the `_v3` suffixes), move
-`plugins_v3/` to `plugins/`, drop the symlink, and re-point
+`plugins/` to `plugins/`, drop the symlink, and re-point
 `sylex_pipeline_v1`. Coordinate with `idris-retirement` and
 `english-v4-final-suffix-cutover` (whose remaining scope moves
 `catalogs/*.ron` into `plugins/` metadata and deletes `sylex_features_v1`;

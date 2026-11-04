@@ -6,9 +6,9 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 Standard constraints apply.
 
 Declare `ventureIntoTheDungeon` and its variant venture into [quality] [CR#701.49a..701.49d] under
-`plugins_v3/builtin/definitions/keyword_action/`, then author the initiative's two "ventures into
+`plugins/builtin/definitions/keyword_action/`, then author the initiative's two "ventures into
 Undercity" triggers on the initiative designation
-(`plugins_v3/builtin/definitions/designation/initiative.syl`) [CR#726.2],
+(`plugins/builtin/definitions/designation/initiative.syl`) [CR#726.2],
 beside the inlined combat-damage conferral. Moved here from
 `lean-v3-keyword-bodies-and-catalog-sync`, which declared learn and empower Jace.
 
@@ -20,7 +20,7 @@ Design (from ADR `semantics-v3.md` §1 items 4 and 5):
   (the marker is in the bottommost room, or in a room with a given arrow), never by simulating it
   in the checker [CR#309.5a,309.5b,701.49b,701.49c].
 - The dungeon card comes from outside the game: it is described with `outsideTheGame`
-  (`plugins_v3/builtin/templates/predicate/outsideTheGame.syl`) [CR#701.49a,400.11], and is put into the command zone [CR#309.2b].
+  (`plugins/builtin/templates/predicate/outsideTheGame.syl`) [CR#701.49a,400.11], and is put into the command zone [CR#309.2b].
 - A room ability's trigger is "When you move your venture marker into this room" [CR#309.4c].
   Completing a dungeon is removing it from the game [CR#309.7], and the bottommost-room rule is a
   state-based action [CR#309.6], a rules-table row.

@@ -7,7 +7,7 @@ Standard constraints apply. The gate `lean-retirement` waits on.
 
 - Per card, `deckmaste_discourse`'s bindings and the combined `deckmaste_semantics_v3` +
   `deckmaste_discourse` refusals equal `lean-discourse-export`'s `bindings.jsonl` across the whole
-  `plugins_v3` corpus, except entries marked FLAG DEFECT or explicitly fixed in
+  `plugins` corpus, except entries marked FLAG DEFECT or explicitly fixed in
   `semantics-card-facts` and the `discourse-*` tickets (where Rust fixes the defect and the
   difference is checked to be that fix), with zero `Refusal::Unsupported` remaining
   (`Refusal::Unsupported` is deleted in this ticket).

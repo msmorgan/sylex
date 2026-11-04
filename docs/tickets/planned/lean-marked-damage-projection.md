@@ -5,9 +5,9 @@ needs: [lean-v3-action-clause-spine, lean-generated-canon-modules, lean-retireme
 `lean-rules-tables` (2026-09-07): [CR#704.5h] reads whether a source with deathtouch has dealt a
 creature damage *since the last time state-based actions were checked*. `ProjAxis.markedDamage`,
 `GameEvent.stateBasedActionsChecked` and the [CR#704.5g] row already exist (the row is on
-`plugins_v3/builtin/definitions/card_type/creature.syl`, landed in
+`plugins/builtin/definitions/card_type/creature.syl`, landed in
 `lean-v3-card-type-conferral-rows`). The [CR#704.5h] row is written, but as a standalone scoped
-`sba` rule, `plugins_v3/builtin/rules/sba/deathtouchDestruction.syl` (scope `isCreature`), not on
+`sba` rule, `plugins/builtin/rules/sba/deathtouchDestruction.syl` (scope `isCreature`), not on
 the creature row as decided below. What remains is moving it there.
 
 Decided (2026-10-13, owner; `semantics-v3.md` §§4.6, 4.8; archived
@@ -24,7 +24,7 @@ Decided (2026-10-13, owner; `semantics-v3.md` §§4.6, 4.8; archived
   lives in the table. [CR#702.2c] (combat damage assignment) is a named residue
   for the engine.
 
-Do: move `deathtouchDestruction` onto `plugins_v3/builtin/definitions/card_type/creature.syl` as
+Do: move `deathtouchDestruction` onto `plugins/builtin/definitions/card_type/creature.syl` as
 a `stateBased` conferral beside the [CR#704.5g] row, keeping its citations and comment
 ([CR#702.2b,704.5h], [CR#702.2d]) in the declaration's header, and delete the standalone file.
 Its test (Lean's `okDeathtouchDestruction`, carried to Rust by `semantics-rust-rewrite`) reads the

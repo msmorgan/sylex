@@ -160,7 +160,7 @@ theorem badNamelessSubtype :
 
 /-! ## The card types' rows
 
-Each card type's declared `RegistryDefinition.cardType` row (`plugins_v3/builtin/definitions/card_type/`) checks,
+Each card type's declared `RegistryDefinition.cardType` row (`plugins/builtin/definitions/card_type/`) checks,
 and each rule a row confers is pinned on the row: it is one of the row's conferrals, and it checks.
 -/
 
@@ -446,11 +446,11 @@ theorem okFortificationDefinition : RegistryDefinition.check fortification_defin
 
 theorem okAuraDefinition : RegistryDefinition.check aura_definition = [] := by decide
 
-/-- [CR#714.3a,714.3c,714.4] The declared Saga row (`plugins_v3/builtin/definitions/subtype/`): its
+/-- [CR#714.3a,714.3c,714.4] The declared Saga row (`plugins/builtin/definitions/subtype/`): its
 lore counter on entering, the lore increment and the sacrifice rule. -/
 theorem okSagaDefinition : RegistryDefinition.check saga_definition = [] := by decide
 
-/-- [CR#310.12a,310.12b,704.5v] The declared Siege row (`plugins_v3/builtin/definitions/subtype/`): the
+/-- [CR#310.12a,310.12b,704.5v] The declared Siege row (`plugins/builtin/definitions/subtype/`): the
 opponent protector, the last-counter trigger and the Siege state-based action. -/
 theorem okSiegeDefinition : RegistryDefinition.check siege_definition = [] := by decide
 
@@ -747,7 +747,7 @@ theorem badUnnamedPredefinedToken :
 
 /-- The predicate-scoped rules tables the builtin plugin carries. What a card type or a subtype
 confers, its results of damage and state-based actions among them, is on that type's declared
-`RegistryDefinition` row (`plugins_v3/builtin/definitions/card_type/`, `plugins_v3/builtin/definitions/subtype/`),
+`RegistryDefinition` row (`plugins/builtin/definitions/card_type/`, `plugins/builtin/definitions/subtype/`),
 not here. The deathtouch lethal-damage row [CR#704.5h] is not written yet. -/
 def builtinTables : RulesTables :=
   { conferral := [plottedCardCast, foretoldCardLook, playerDamageLifeLoss, toxicPoison] }

@@ -56,7 +56,7 @@ The jj-kata `kata` and `kanban` skills own the lifecycle. Repo specifics:
   change touches, and cite it when a ruling depends on it. Briefs name those sections.
 - No word enumerated by the CR as a catalog item (including all `[CR#701.1]` keyword actions) may
   appear directly in grammar declarations (`schema` or `production`); vocabulary and complement
-  frames live in the domain catalogs of `sylex_vocabulary` (and later `plugins_v3/`).
+  frames live in the domain catalogs of `sylex_vocabulary` (and later `plugins/`).
 - The v1 English crate and its xtask tools are gone; `sylex_english` is now the english-v4
   grammar. Do not recreate v1.
 
@@ -64,7 +64,7 @@ The jj-kata `kata` and `kanban` skills own the lifecycle. Repo specifics:
 
 Authorities: `docs/decisions/semantics-v3.md` and `docs/decisions/english-v4.md`.
 - `semantics-v3` executes in `lean/Semantics/`; `sylGen` compiles the `.syl` builtin and canon
-  under `plugins_v3/`. `plugins-v3-syl-conversion` deleted the `.lean`-only Rust mirror and
+  under `plugins/`. `plugins-v3-syl-conversion` deleted the `.lean`-only Rust mirror and
   lowering crates; `semantics-rust-rewrite` owns their future Rust replacement.
 - `english-v4` lives in `sylex_syntax`, `sylex_vocabulary` and `sylex_english`.
   `english-v4-cutover-v3` deleted `deckmaste_english_v3`, `deckmaste_construction_v3*` and the

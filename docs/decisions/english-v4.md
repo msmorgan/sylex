@@ -221,7 +221,7 @@ Rather than reactive blocker recon across 32,828 cards, the entire Vintage-legal
 3. **Cutover 1 (`english-v4-cutover-v3`):** Once Stratum 7 completes and passes the judgment suite:
    - Repoint `xtask` and workspace consumers at `deckmaste_english_v4`.
    - Delete `deckmaste_english_v3` (recording the migrated obligations and named retirement reasons for the wave test suite), `deckmaste_construction_v3*`, and `sylex_vocabulary`. `plugins_v2/builtin/` and its reader `deckmaste_macro_def` are not deleted here: they stay until `semantics-v3-dsl-and-plugins`, because `xtask` still reads them.
-4. **Cutover 2 (`english-v4-final-suffix-cutover`):** After `semantics-v1-cutover` retires the legacy v1 consumers and renames `plugins_v3/` → `plugins/`:
+4. **Cutover 2 (`english-v4-final-suffix-cutover`):** After `semantics-v1-cutover` retires the legacy v1 consumers and renames `plugins/` → `plugins/`:
    - Delete legacy `sylex_features_v1`. (Legacy suffixless `sylex_english`, `deckmaste_construction_compiler` and `deckmaste_constructions_macro` were deleted earlier by `retire-v1-english-and-spelling`.)
    - Drop all `_v4` suffixes (`deckmaste_english_v4` → `sylex_english`, `deckmaste_lexical_source_v4` → `sylex_vocabulary`; `sylex_syntax` already has its final unversioned name).
    - Move the `catalogs/*.ron` lexical declarations into `plugins/` declaration metadata.

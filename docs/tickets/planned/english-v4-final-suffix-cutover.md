@@ -5,7 +5,7 @@ needs: [english-v4-cutover-v3, semantics-v1-cutover]
 
 Execute what remains of Cutover 2 of [`docs/decisions/english-v4.md`](../../decisions/english-v4.md)
 (§7) once `semantics-v1-cutover` has retired the legacy v1 consumers and renamed
-`plugins_v3/` to `plugins/`. Legacy v1 `sylex_english`,
+`plugins/` to `plugins/`. Legacy v1 `sylex_english`,
 `deckmaste_construction_compiler` and `deckmaste_constructions_macro` were
 already deleted by `retire-v1-english-and-spelling`, and `sylex_spelling`
 is now a stub crate.

@@ -8,11 +8,11 @@ Standard constraints apply. Follow-up after `lean-retirement`: once the AST is u
 `deckmaste_semantics_v3` with `.syl` `spelling` strings (or reordered parameters if the
 optional-argument naming rule is adopted) and delete the frozen-AST `Action::DoIf.postposed` field.
 
-- Add `spelling` strings (or align parameter order) for every declaration in `plugins_v3/builtin/`
+- Add `spelling` strings (or align parameter order) for every declaration in `plugins/builtin/`
   whose printed argument order differs from its parameter declaration order and currently carries
   `# TODO(spelling)` (`when`, `whenever`, `at`, `triggered`, `gatedBy`, `staticSpecGatedBy`), then
   remove the `read_order` seeds in `crates/deckmaste_semantics_v3`. The overrides
   (`ReadOrder.fieldOrders`, where resolution steps arguments in an order other than the printed one)
   stay.
 - Delete `Action::DoIf.postposed` from `crates/deckmaste_semantics_v3` and
-  `plugins_v3/builtin/templates/action/doOnlyIf.syl`.
+  `plugins/builtin/templates/action/doOnlyIf.syl`.

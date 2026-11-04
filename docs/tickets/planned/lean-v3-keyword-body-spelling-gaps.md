@@ -6,7 +6,7 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 Standard constraints apply. Found by the 2026-10-25 triage of an external audit ("Atraxa"),
 verified against `wmyykqnv`. Keyword Definitions carry their full bodies, so a body that drops
 part of its "means" text is a fidelity gap. Both bodies below were probed in Lean on 2026-10-25
-and check `[]`. Keyword Definitions are under `plugins_v3/builtin/definitions/keyword_ability/`;
+and check `[]`. Keyword Definitions are under `plugins/builtin/definitions/keyword_ability/`;
 AST types are in Rust `semantics` (`lean/Semantics/Abilities.lean` today). Test names below are
 the Lean proof-suite names (`lean/Semantics/Proofs/`), carried to Rust tests by
 `semantics-rust-rewrite`. The `.syl` below follows the live files; match their syntax.
@@ -41,13 +41,13 @@ body = [
       is(thisPermanent, attachedTo(a(isCreature)))))]
 ```
 - The second ability's condition is respelled through `attachedTo`
-  (`plugins_v3/builtin/templates/predicate/attachedTo.syl`); it expands to today's raw
+  (`plugins/builtin/templates/predicate/attachedTo.syl`); it expands to today's raw
   `attachment(attachment, a(isCreature))`.
 - The third static follows impending's type removal (`impending.syl`).
 - Add [CR#702.151b] to the header comment.
 
 Tests:
-- Added: *Lizard Blades* (Vintage-legal) as `plugins_v3/canon/cards/Lizard Blades.syl`:
+- Added: *Lizard Blades* (Vintage-legal) as `plugins/canon/cards/Lizard Blades.syl`:
   ```
   card {
     name = "Lizard Blades",
@@ -76,15 +76,15 @@ copy of a daybound creature, or a creature granted daybound, is the case the cla
 [CR#701.27a,701.27c].
 
 No existing construct says it: `Predicate.currentFace`
-(`plugins_v3/builtin/primitives/predicate/currentFace.syl`) is a permanent's face;
-`isTransformed` (`plugins_v3/builtin/templates/predicate/isTransformed.syl`) is
+(`plugins/builtin/primitives/predicate/currentFace.syl`) is a permanent's face;
+`isTransformed` (`plugins/builtin/templates/predicate/isTransformed.syl`) is
 `currentFace(back)`; `Card.transforming` and `Card.modalDfc` are the printed frame, not a
 predicate; `TokenSpec.doubleFaced` is token creation.
 
 Change:
 1. Add a nullary Predicate beside `isCopyOfACard`, documented "The member is represented by a
    double-faced card [CR#712.1,702.145b]", and its primitive beside
-   `plugins_v3/builtin/primitives/predicate/isCopyOfACard.syl`. `.isCopyOfACard` has no checker
+   `plugins/builtin/primitives/predicate/isCopyOfACard.syl`. `.isCopyOfACard` has no checker
    arm (every Predicate match falls through a wildcard to kind `.object`); the `discourse` tests
    confirm whether the new atom needs one.
 2. Glossary: add **Double-Faced Card** to `docs/contexts/game-model/CONTEXT.md` beside
@@ -107,8 +107,8 @@ Change:
 
 Tests:
 - Added: *Tavern Ruffian // Tavern Smasher* (Vintage-legal) as
-  `plugins_v3/canon/cards/Tavern Ruffian {slash}{slash} Tavern Smasher.syl`, following
-  `plugins_v3/canon/cards/Afflicted Deserter {slash}{slash} Werewolf Ransacker.syl`:
+  `plugins/canon/cards/Tavern Ruffian {slash}{slash} Tavern Smasher.syl`, following
+  `plugins/canon/cards/Afflicted Deserter {slash}{slash} Werewolf Ransacker.syl`:
   ```
   card transforming(
     {

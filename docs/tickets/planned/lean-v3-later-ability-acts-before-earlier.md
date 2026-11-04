@@ -29,8 +29,8 @@ Kept separate from `lean-v3-cross-ability-self-replacement`; one design does not
   `event` in `action`'s output DRS [CR#608.2c]. The event is the earlier action the pump precedes.
 - *Savage Punch*'s second paragraph is
   `italicHead ferocious (spell (doOnlyIf (beforeEvent (get …) (does it (fight any))) (exists_ …)))`
-  (`plugins_v3/builtin/templates/action/doOnlyIf.syl`, and the primitives
-  `plugins_v3/builtin/primitives/ability/italicHead.syl` and `spell.syl`).
+  (`plugins/builtin/templates/action/doOnlyIf.syl`, and the primitives
+  `plugins/builtin/primitives/ability/italicHead.syl` and `spell.syl`).
 - "It" reads back "the creature you control" through the landed
   [lean-v3-spell-abilities-share-targets](../done/lean-v3-spell-abilities-share-targets.md) and
   [lean-v3-anaphoric-definite-description](../done/lean-v3-anaphoric-definite-description.md)

@@ -155,7 +155,7 @@ scope and the loader's rejections. The grammar-leak lint lives with the grammar,
 
 ## Not here
 
-Plugin-declared vocabulary arrives when `plugins_v3/` does; at
+Plugin-declared vocabulary arrives when `plugins/` does; at
 `english-v4-final-suffix-cutover` the catalogs move into plugin declaration
 metadata. (The `_v4` suffix is already dropped.)
 

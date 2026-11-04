@@ -71,7 +71,7 @@ enum Cmd {
     /// Build the native Lean workbench with warnings treated as errors.
     Lean(LeanArgs),
     /// `.syl` tooling: check `sylex_syl` against `SylGen`'s parser over
-    /// `plugins_v3`, or format `.syl` files.
+    /// `plugins`, or format `.syl` files.
     Dsl(DslArgs),
     /// On-demand "bearings" dumps of current code shape (`enums`).
     Map(MapArgs),
@@ -131,7 +131,7 @@ mod tests {
             assert!(Cli::try_parse_from(["cargo xtask", "lean", command]).is_err());
         }
         assert!(
-            Cli::try_parse_from(["cargo xtask", "lean", "check", "plugins_v3/testing"]).is_err()
+            Cli::try_parse_from(["cargo xtask", "lean", "check", "plugins/testing"]).is_err()
         );
         assert!(Cli::try_parse_from(["cargo xtask", "lean"]).is_err());
         assert!(Cli::try_parse_from(["cargo xtask", "lean-check"]).is_err());

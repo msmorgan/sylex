@@ -78,7 +78,7 @@ private unsafe def exportBindings (dir : System.FilePath) : MetaM (Array String 
   for i in [1:records.size] do
     if records[i-1]!.1 == records[i]!.1 then
       errors := errors.push s!"duplicate card: {records[i]!.1}"
-  let sourceEntries ← (System.FilePath.mk "../plugins_v3/canon/cards").readDir
+  let sourceEntries ← (System.FilePath.mk "../plugins/canon/cards").readDir
   let cardFiles ← sourceEntries.filterM fun entry => do
     return (entry.fileName.endsWith ".lean" || entry.fileName.endsWith ".syl") &&
       !(← entry.path.isDir)

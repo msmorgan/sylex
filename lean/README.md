@@ -29,7 +29,7 @@ and the proof importing it, and that `lake setup-file` regenerates.
 
 The obsolete `plugins_v2` card/definition emitters and macro generator have
 been retired. `lean definitions` and `lean macros generate|check|align` are no
-longer commands. The v3 declarations live in `plugins_v3/builtin/`, one `.syl` declaration
+longer commands. The v3 declarations live in `plugins/builtin/`, one `.syl` declaration
 per file. `Semantics/Definitions.lean` imports the generated bundle, placing primitives and templates in
 `Semantics.Templates` and the rules-defined vocabulary in `Semantics.Definitions`.
 v2 RON output must not regenerate them. Existing v2 readers elsewhere remain until their
@@ -105,7 +105,7 @@ write.
 ## Registry facts
 
 There are no registry tables. Keyword actions, keyword abilities, counters, designations,
-relations and subtypes are each a self-contained declaration in `plugins_v3/builtin/definitions/` whose
+relations and subtypes are each a self-contained declaration in `plugins/builtin/definitions/` whose
 value carries its own columns (a counter's holder, a designation's scope, whether a permanent
 performs a keyword action). A keyword
 ability's Definition generates its label, and its typed signature fixes its parameters;
@@ -180,7 +180,7 @@ kernel.
 
 ## Cards
 
-`plugins_v3/canon/cards/<name>.syl` contains one declaration per printed card.
+`plugins/canon/cards/<name>.syl` contains one declaration per printed card.
 `sylGen` parses and resolves the corpus, then emits plain Lean definitions under
 `.lake/build/gen/Generated/`. `Generated.Canon` imports the card data;
 `Generated.CanonChecks` imports their separate checker proofs. Lake tracks the

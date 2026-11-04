@@ -42,7 +42,7 @@ impl SourceFile {
     }
 }
 
-/// The `.syl` files of one plugin directory, such as `plugins_v3/builtin`.
+/// The `.syl` files of one plugin directory, such as `plugins/builtin`.
 #[derive(Debug)]
 pub struct Bundle {
     root: PathBuf,
@@ -261,7 +261,7 @@ mod tests {
 
     #[test]
     fn loads_the_builtin_plugins() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins_v3/builtin");
+        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins/builtin");
         let bundle = Bundle::load(&root, FileId(0)).unwrap();
         assert!(bundle.files().len() > 1000);
         let first = bundle.files().values().next().unwrap();

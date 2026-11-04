@@ -1,4 +1,4 @@
-//! Every `.syl` file under `plugins_v3/` parses.
+//! Every `.syl` file under `plugins/` parses.
 
 use std::path::Path;
 use std::path::PathBuf;
@@ -60,8 +60,8 @@ fn collect(dir: &Path, out: &mut Vec<PathBuf>) {
 }
 
 #[test]
-fn every_plugins_v3_file_parses() {
-    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins_v3");
+fn every_plugins_file_parses() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins");
     let mut paths = Vec::new();
     collect(&root, &mut paths);
     paths.sort();

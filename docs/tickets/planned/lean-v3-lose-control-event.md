@@ -27,10 +27,10 @@ Either extend `Action.changeControl` (AST in Rust `semantics`, currently the gai
 a direction, or add `Action.loseControl (subject : NounPhrase)` with primitive `loseControl`. The
 owner leaves the choice between the two to the implementer; record the choice and why in the
 landing. Admit it in event and lookback patterns alongside `gainControlOf`
-(`plugins_v3/builtin/primitives/action/gainControlOf.syl`).
+(`plugins/builtin/primitives/action/gainControlOf.syl`).
 
 ## Tests
 
 - Extend `stolenUniformOpening` (a fragment in `lean/Semantics/Proofs/CardsChoice.lean`, carried to
   a Rust test by `semantics-rust-rewrite`) to the whole card, as
-  `plugins_v3/canon/cards/Stolen Uniform.syl`.
+  `plugins/canon/cards/Stolen Uniform.syl`.

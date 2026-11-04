@@ -1,7 +1,7 @@
 //! `cargo xtask dsl`: `.syl` tooling. `fmt` lives in [`crate::dsl_fmt`].
 //!
 //! `cargo xtask dsl differential` checks that `sylex_syl` and `SylGen`'s
-//! parser (`lean/SylGen/Parser.lean`) read every `plugins_v3/**/*.syl` file
+//! parser (`lean/SylGen/Parser.lean`) read every `plugins/**/*.syl` file
 //! identically.
 //!
 //! The Lean executable `sylParseDump` writes `SylGen`'s `Declaration`s, before
@@ -40,10 +40,10 @@ pub struct DslArgs {
 
 #[derive(Debug, Subcommand)]
 enum DslCmd {
-    /// Parse every `plugins_v3` `.syl` file with both `sylex_syl` and
+    /// Parse every `plugins` `.syl` file with both `sylex_syl` and
     /// `SylGen`'s parser, and fail on any difference between the trees.
     Differential,
-    /// Format `.syl` files (default: every `plugins_v3` file) in place, check
+    /// Format `.syl` files (default: every `plugins` file) in place, check
     /// them, or format standard input.
     Fmt(crate::dsl_fmt::FmtArgs),
 }
@@ -102,12 +102,12 @@ fn differential() -> anyhow::Result<()> {
     }
 }
 
-/// Parses every `plugins_v3/**/*.syl` file under `root` with `sylex_syl`,
+/// Parses every `plugins/**/*.syl` file under `root` with `sylex_syl`,
 /// keyed by its `/`-separated path relative to `root`; each entry is the
 /// projected declarations or the rendered parse error.
 fn parse_corpus(root: &Path) -> anyhow::Result<BTreeMap<String, Result<Json, String>>> {
     let mut paths = Vec::new();
-    collect(&root.join("plugins_v3"), &mut paths)?;
+    collect(&root.join("plugins"), &mut paths)?;
     paths.sort();
     let mut out = BTreeMap::new();
     for (index, path) in paths.iter().enumerate() {

@@ -161,7 +161,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: lean/.lake
-          key: lean-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json') }}-${{ hashFiles('lean/**/*.lean', 'plugins_v3/**/*.lean') }}
+          key: lean-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json') }}-${{ hashFiles('lean/**/*.lean', 'plugins/**/*.lean') }}
           restore-keys: |
             lean-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json') }}-
       - name: build Lean model and proof suite

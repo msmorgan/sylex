@@ -13,7 +13,7 @@ verified against the tree at `wmyykqnv`. Test names below are the Lean proof-sui
 creature if it regenerates this way." It cannot be written. A probe on 2026-10-25 of the
 spelling below returned `[anaphor …, anaphor …, thisWayUngrounded, anaphor (word creature) …]`.
 
-`regenerate` (`plugins_v3/builtin/definitions/keyword_action/regenerate.syl`) is a shield: it
+`regenerate` (`plugins/builtin/definitions/keyword_action/regenerate.syl`) is a shield: it
 establishes a single-use replacement of the subject's destruction [CR#701.19a]. The subject is
 mentioned only inside the replacement's `would` pattern, which the checker steps as a
 hypothetical box, so its target never reaches the following text. The pin
@@ -32,9 +32,9 @@ are ([CR#601.2c])" (`docs/decisions/semantics-v3.md` §2.5 step 2).
    announced in the box enclosing the `establish`, with its `.target` stamp, so later text reads
    it by D′ ("it") and AC>R1 ("that creature"). Non-target mentions in the pattern stay
    hypothetical. Add no AST node, field or variant ([CR#701.19a] is unchanged; §1 item 5(c)).
-2. Add *Debt of Loyalty* to canon as `plugins_v3/canon/cards/Debt of Loyalty.syl`, its text
+2. Add *Debt of Loyalty* to canon as `plugins/canon/cards/Debt of Loyalty.syl`, its text
    following *Matopi Golem*'s reflexive "When it regenerates this way"
-   (`plugins_v3/canon/cards/Matopi Golem.syl`, tested by
+   (`plugins/canon/cards/Matopi Golem.syl`, tested by
    `regenerationEventDescribesTheApplicationRatherThanTheShield`, `ActionFamilies.lean`):
    ```
    triggerThisWay(

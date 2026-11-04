@@ -6,7 +6,7 @@ needs: [lean-retirement]
 The rules define the Predefined Tokens' characteristics [CR#111.10], so by the glossary each is a
 Definition, not a Template. The pieces for that exist but are unused: the `PredefinedToken`
 structure (`lean/Semantics/Rules.lean` today, Rust `semantics` after the port), the `.syl` `token`
-declaration (sort `PredefinedToken`, checked like the other rule-registry declarations), and `plugins_v3/builtin/definitions/token/`,
+declaration (sort `PredefinedToken`, checked like the other rule-registry declarations), and `plugins/builtin/definitions/token/`,
 which semantics-v3 §5.2 reserves and which does not exist. Meanwhile Clue, Food and Treasure are
 written as `template … : CharacteristicBundle` under `templates/noun/`, and the Lean proof suite
 (`lean/Semantics/Proofs/Rules.lean`, carried to Rust tests by `semantics-rust-rewrite`) keeps its

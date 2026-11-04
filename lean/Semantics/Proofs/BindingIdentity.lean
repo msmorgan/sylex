@@ -6,7 +6,7 @@ import Semantics.Proofs.Helpers
 
 A Definition's or Template's referent parameter is bound at the body's first mention, and every later
 mention refers back to that binding by its Binding Identity, not by a pronoun search
-(`docs/decisions/semantics-v3.md` §§2.1,2.3). The `plugins_v3` loader writes the
+(`docs/decisions/semantics-v3.md` §§2.1,2.3). The `plugins` loader writes the
 first mention `firstMention id argument` and each later one `laterMention id argument`; the
 terms below are written the way it writes them. The identity is a name, never a stack position:
 other bindings pushed between the mentions do not change what a later mention reads. Each pin
@@ -161,7 +161,7 @@ theorem groupHandoffByIdentityPublishesPlurals :
 mention, read back by identity, so the read's number is the slice's, which is the amount's:
 scry 1 reads "that card", scry 2 "those cards" (ruling 2026-10-06). -/
 
-/-- The `plugins_v3` helper `lookAndSortSlice` as the loader expands it: the
+/-- The `plugins` helper `lookAndSortSlice` as the loader expands it: the
 `Semantics.Templates` template. -/
 private def lookAndSortSlice (slice : NounPhrase) (spill : Location) (spillRiders : List MoveRider) :
     Action :=
@@ -196,7 +196,7 @@ theorem okFatesealTwo : Action.check (DRS.ofList []) (fateseal 2) = [] := by dec
 
 "Regenerate <permanent>" [CR#701.19a]: the next time it would be destroyed this turn, instead
 remove all damage marked on it and its controller taps it; if it's an attacking or blocking
-creature, remove it from combat. The `plugins_v3` declaration binds the permanent where the
+creature, remove it from combat. The `plugins` declaration binds the permanent where the
 replacement's event first mentions it, and the application (`regeneration`) binds
 its own subject at its first mention, read back by identity in the other five. -/
 

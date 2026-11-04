@@ -4,7 +4,7 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 # A term for the active player; phasing's direct phase-out
 
 Standard constraints apply. Both halves rewrite the phasing turn-based action
-(`plugins_v3/builtin/rules/conferral/phasingTurnBased.syl`); the second was folded in from
+(`plugins/builtin/rules/conferral/phasingTurnBased.syl`); the second was folded in from
 `lean-v3-phasing-direct-phase-out`. Its header comment names both slugs; update it with the row.
 
 ## The active player

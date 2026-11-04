@@ -1603,7 +1603,7 @@ fn added_diff_lines(diff: &str) -> BTreeSet<(String, usize)> {
         if let Some(path) = line.strip_prefix("+++ ") {
             // A unified diff separates the path from an optional timestamp with
             // a TAB, so only a TAB ends the path: a plain space is
-            // part of it (`plugins_v3/canon/cards/Luminarch
+            // part of it (`plugins/canon/cards/Luminarch
             // Aspirant.lean`).
             let path = path.split('\t').next().unwrap_or(path);
             file = Some(path.strip_prefix("b/").unwrap_or(path).to_string());
@@ -2232,8 +2232,8 @@ const CR_FIXTURE: &str = "rule 100.1";
         );
         let mut repo = Repository::load(fixture.path()).unwrap();
         repo.config.sources.tracked = false;
-        repo.config.sources.globs = vec!["plugins_v3/*.syl".into()];
-        fixture.write("plugins_v3/A card.syl", "# [CR#100.1]\n# CR 100.1\n");
+        repo.config.sources.globs = vec!["plugins/*.syl".into()];
+        fixture.write("plugins/A card.syl", "# [CR#100.1]\n# CR 100.1\n");
         let citations = repo.resolved_citations(&repo.load_cr().unwrap()).unwrap();
         assert_eq!(citations.len(), 1);
         assert_eq!(
@@ -2244,7 +2244,7 @@ const CR_FIXTURE: &str = "rule 100.1";
         assert_eq!(hits.first().map(|hit| hit.line), Some(2));
         assert!(hits.iter().all(|hit| hit.line == 2));
         let lines = added_diff_lines(
-            "+++ b/plugins_v3/A card.syl\n@@ -0,0 +1,2 @@\n+# [CR#100.1]\n+# CR 100.1\n",
+            "+++ b/plugins/A card.syl\n@@ -0,0 +1,2 @@\n+# [CR#100.1]\n+# CR 100.1\n",
         );
         assert!(lines.contains(&(citations[0].site.file.clone(), citations[0].site.line)));
     }

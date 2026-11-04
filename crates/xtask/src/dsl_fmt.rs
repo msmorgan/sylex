@@ -2,7 +2,7 @@
 //!
 //! The command line is `sylex_syl::cli`'s, the same as the `sylfmt`
 //! binary's (`cargo xtask dsl fmt --help` lists it); this command only
-//! supplies the default path, every `plugins_v3/**/*.syl` file.
+//! supplies the default path, every `plugins/**/*.syl` file.
 
 use std::path::Path;
 use std::path::PathBuf;
@@ -22,7 +22,7 @@ pub fn run(args: &FmtArgs) -> anyhow::Result<()> {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../..")
         .canonicalize()?;
-    let default_paths: [PathBuf; 1] = [root.join("plugins_v3")];
+    let default_paths: [PathBuf; 1] = [root.join("plugins")];
     if sylex_syl::cli::main(args.args.iter().cloned(), &default_paths) == ExitCode::SUCCESS {
         Ok(())
     } else {

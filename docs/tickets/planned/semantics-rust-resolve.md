@@ -24,8 +24,8 @@ dependency cycles, and expose `cargo xtask semantics check`.
 The v3 pipeline has no separate top-level `sylex_plugin_v1` crate (v1 `sylex_plugin_v1` is
 deletion-bound at `semantics-v1-cutover` per `CLAUDE.md`):
 
-- `sylex_syl::bundle::Bundle::load` walks a plugin directory (`plugins_v3/builtin`,
-  `plugins_v3/canon`), parses each `.syl` file once into `Arc<SourceFile>`
+- `sylex_syl::bundle::Bundle::load` walks a plugin directory (`plugins/builtin`,
+  `plugins/canon`), parses each `.syl` file once into `Arc<SourceFile>`
   (`{ id: FileId, path: PathBuf, source: String, ast: dsl::File }`), and returns an `Arc<Bundle>`
   exposing both a deterministic path map (`BTreeMap<PathBuf, Arc<SourceFile>>`) and a
   `FileId → Arc<SourceFile>` table for resolving `Span`s to `path:line:col` so downstream layers
@@ -35,7 +35,7 @@ deletion-bound at `semantics-v1-cutover` per `CLAUDE.md`):
 
 - Depends on `sylex_syl`, `dpsi` (already a workspace dependency of `sylex_syl` for
   `Ident`), and `thiserror` (zero dependency on `sylex_core` or `sylex_english`).
-- Exposes `cargo xtask semantics check` to validate `plugins_v3/builtin` and `plugins_v3/canon`
+- Exposes `cargo xtask semantics check` to validate `plugins/builtin` and `plugins/canon`
   from the CLI with `path:line:col` diagnostics.
 
 ### 3. Pass 1: Header & Envelope Validation + Signature Registration
@@ -123,8 +123,8 @@ and recording directed body dependencies `decl_id → callee_decl_id`:
 
 ### 6. Verification
 
-- `cargo xtask semantics check` resolves all declarations across `plugins_v3/builtin` and
-  `plugins_v3/canon` with zero errors.
+- `cargo xtask semantics check` resolves all declarations across `plugins/builtin` and
+  `plugins/canon` with zero errors.
 - A unit test verifies `spelling_order` across all declarations whose printed order differs from
   their parameter declaration order (declarations with reordered `<param>` holes in `spelling`,
   `ReadOrder.fieldOrders`, `doOnlyIf` / `unless`, `when` / `whenever` / `at` / `Ability::Triggered`

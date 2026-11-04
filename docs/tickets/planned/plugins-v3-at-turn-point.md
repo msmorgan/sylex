@@ -8,7 +8,7 @@ Rust `semantics` (after `semantics-rust-rewrite`; Lean is retired).
 
 ## The defect
 
-`plugins_v3/builtin/templates/ability/{when,whenever,at_}.syl` have identical signatures and bodies: all three
+`plugins/builtin/templates/ability/{when,whenever,at_}.syl` have identical signatures and bodies: all three
 take `event : GameEvent` and expand to the single `triggered` primitive. So `at_ (does it enter)`
 type-checks, even though no card is printed that way.
 

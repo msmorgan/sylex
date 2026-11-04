@@ -1,6 +1,6 @@
 //! Prints a [`File`] in a canonical layout.
 //!
-//! The default [`Style`] is the one chosen for the `plugins_v3` corpus:
+//! The default [`Style`] is the one chosen for the `plugins` corpus:
 //!
 //! - A node goes on one line if it fits in [`Style::width`] columns, counting
 //!   the closers and comma that follow it on the same line. An unbreakable
