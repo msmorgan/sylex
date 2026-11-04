@@ -52,8 +52,20 @@ what the Lake generator emits.
     wrapper).
   - **Integer literals** are values only at the integer sorts. An `Amount` or a generic mana
     symbol wraps one explicitly.
-  - **A Definition's name** stands for that Definition only (its `Action` or `Ability`). Its
-    keyword label, keyword term and Deed are each reached through a wrapper.
+  - **Mana-cost wrappers are Templates** over primitive chains (`1` is two constructors deep at a
+    mana symbol, `blue` three), as `colorless` already is; one primitive per constructor holds.
+  - **An `ability` declaration also declares its keyword label:** its name exists at
+    `KeywordLabel` as part of what the declaration declares (a second declaration, not a
+    conversion), so a keyword that takes parameters (`kicker(cost)`) is still named bare
+    (`byKeyword(kicker)`). The label-to-term conversion goes: a term is written
+    `theKeyword(kicker)`.
+  - **The `Deed` registration of action names is removed.** No `.syl` writes a Deed; the Deed comes
+    from the declaration's header, so no wrapper is needed.
+  - **Card files:** the frame-unpacking shorthand goes (`card adventurer({ normal = …, adventure =
+    … })` read as named arguments); write `adventurer(normal = …, adventure = …)`. A face record
+    without `characteristics` keeps being wrapped for now: Lean's `CardFace` is a struct whose one
+    field is `characteristics`, and the Rust AST has no such wrapper, so this shorthand disappears
+    with Lean rather than being respelled.
   - **`Option` stays as it is:** a value at an `Option(T)` position is a `T`, `some` is never
     written, and an argument or field left out takes its declared default. This is how `.syl`
     writes optional arguments, the one implicit wrap the language keeps.

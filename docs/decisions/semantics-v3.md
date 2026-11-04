@@ -31,8 +31,7 @@ natively.
    (§2.5), and no out-of-band announcement channel.
    - Across an activated ability's colon, the effect reads every cost referent wherever the cost
      moved it ([CR#400.7j]).
-   - A referent a body moves is a new object ([CR#400.7]). Later text reads it back by anaphora,
-     never by the pre-move parameter.
+   - A referent the text moves stays the same referent; the move is recorded on it (§2.1).
 3. **The checker reads text, not game state.** It verifies that a term is a faithful reading of
    its English: references resolve, sorts are right, and frames are well-formed. Whether an ability
    is characteristic-defining is fixed by the textual criteria of [CR#604.3a], so the checker
@@ -79,7 +78,10 @@ as others are pushed and removed.
   Pronouns, groups and counts never read an Actor; only the `actor` word does.
 - A disjunctive noun phrase exports only the referents common to every branch. A coordination bound
   to a parameter binds every member under the parameter's one Binding Identity.
-- A zone change gives the object a fresh referent with no Binding Identity ([CR#400.7]).
+- A zone change keeps the referent and records the move on it: its new zone and the deed. Carrier
+  words ("that card" after "exile target creature", [CR#109.2]), the consuming verb's
+  applicability (§2.4, J1) and Participial Descriptions read those. That the moved card is a new
+  object in the game ([CR#400.7]) is game identity, which lowering supplies.
 
 ### 2.2 Boxes
 
@@ -383,8 +385,14 @@ A lookback is `did(subj, action, within)`, with an optional Event Ordinal.
    - `.syl` cannot write a scope, a mention, a raw Deed or a keyword wrapper.
    - Which occurrence of a parameter is its first mention is decided after expansion, in the order
      the checker reads. Why: the first mention is the one that introduces referents, so it must be
-     the occurrence actually read first. It is never decided by written argument order. For example, a passive
-     `by(np)` reads the patient before `np` (§4.2).
+     the occurrence actually read first. It is never decided by written argument order. For
+     example, a passive `by(np)` reads the patient before `np` (§4.2).
+4. **Read order is printed order.** A declaration's parameters are read in the order its spelling
+   prints them, with no per-declaration exception: where the printed order differs ("When
+   <event>, if <condition>, <action>"), the declaration's parameters are reordered to match. Why:
+   the anaphora rules read what the text says first as first, spelling renders a declaration in its
+   parameter order, and a reference oracle keyed to printed text lines up with the term only if
+   the two orders agree.
 
 ## 6. Standing Mechanisms
 
