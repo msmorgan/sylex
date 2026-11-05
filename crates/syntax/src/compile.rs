@@ -142,7 +142,10 @@ pub struct CompiledGrammar {
     report: LoadReport,
 }
 
-/// Findings that do not prevent binding.
+/// Findings that do not prevent binding: a Lexical Class, authored or typed,
+/// with fewer than two members; a feature with no value; and a feature value
+/// with fewer than two holders, each warning naming them
+/// (`Binder::report_holders`).
 #[derive(Debug, Clone, Default)]
 pub struct LoadReport {
     pub warnings: Vec<String>,

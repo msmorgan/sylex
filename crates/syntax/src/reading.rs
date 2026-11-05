@@ -171,8 +171,10 @@ impl Parse<'_> {
     }
 
     /// The `k` best Readings with their Ranking Keys, best first. Huang &
-    /// Chiang (2005), Algorithm 3 advances child streams only on demand;
-    /// features and Selected Frames are cloned only for the emitted Reading.
+    /// Chiang (2005), [Algorithm 3](https://aclanthology.org/W05-1506.pdf)
+    /// (lazy k-best extraction from a forest), advances child streams only on
+    /// demand; features and Selected Frames are cloned only for the emitted
+    /// Reading.
     pub fn best_ranked(&self, k: usize) -> impl Iterator<Item = (RankingKey, Reading)> + '_ {
         let mut enumeration = Enumeration::new(self);
         let mut index = 0;

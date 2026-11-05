@@ -171,7 +171,13 @@ pub struct ProductionDecl {
     /// never also attached beside it (`docs/decisions/english.md` §8).
     #[serde(default)]
     pub unadjoined: Vec<(Ident, Vec<Ident>)>,
-    /// Children through which a Gap may pass to the mother.
+    /// Children through which a Gap may pass to the mother. A Gap passes
+    /// up through no other child: an auxiliary marks its Verb Phrase
+    /// Complement transparent, so extraction works across every verb form
+    /// without a Production per form. `Require("child.Gap", ..)` fills the
+    /// child's Gap within the mother, unless the child is also transparent:
+    /// then the mother takes that Gap over (a purpose adjunct whose Object a
+    /// relative clause binds). `Require("$.Gap", ..)` introduces one.
     #[serde(default)]
     pub transparent: Vec<Ident>,
     /// The phrase ends in an ellipsis site: its head omits every Complement
@@ -352,10 +358,22 @@ pub struct AdjunctClustersDecl {
 }
 
 /// An instance of one of the engine's built-in Schema kinds.
+///
+/// Binding compiles each Schema into Productions: authors write the active
+/// Subcategorization Frames and what each Schema changes, and the engine
+/// derives the alternations, Gap variants, coordination shapes and feature
+/// summaries (`docs/decisions/english.md` §1). A Schema derives nothing its
+/// grammar does not declare: a missing declaration yields no derivation or a
+/// load error, never a default.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum SchemaDecl {
     /// An attributive lexical head retains its phrasal Category as a Modifier.
+    ///
+    /// The premodified phrase passes up its head's Gap, so a premodified
+    /// conjunct shares its Complement (*the noted number and kind of
+    /// counters*). A verb whose every frame is Active-only
+    /// ([`crate::frames::Frame`]) has no past participle Modifier.
     Premodification {
         head: sylex_lexicon::Category,
         modifier: Ident,
@@ -370,6 +388,9 @@ pub enum SchemaDecl {
         equations: Vec<(sylex_lexicon::WordForm, Vec<Equation>)>,
     },
     /// Catalog-declared ordered parameter patterns around a lexical head.
+    ///
+    /// Slots select grammar Categories; markers, bound stems and head
+    /// identities stay in the Catalog, which the grammar never enumerates.
     Parameters {
         head: sylex_lexicon::Category,
         phrase: Ident,
@@ -386,6 +407,29 @@ pub enum SchemaDecl {
         remnant: Option<Ident>,
     },
     /// Frame-driven phrases headed by every lexeme of a lexical Category.
+    ///
+    /// For each frame of each head lexeme it derives a phrase of the head and
+    /// its Frame Slots that records the Selected Frame. For a verb it also
+    /// derives:
+    /// - every object-Gap variant, and a predicative-Gap variant of a
+    ///   `Copular` frame only (never of the objective predicative of
+    ///   *turn it face up*); the extracting verb is a free word, never a
+    ///   reduced clitic (CGEL, Ch. 18 §6.2.1, p. 1615);
+    /// - with `passive`, verbal passives with and without the Internalised
+    ///   Complement, which may also precede later selected Preposition Phrase
+    ///   Complements (*dealt by a source to a player*) and strands its
+    ///   preposition like any other, and a `Prepositional` frame's passive,
+    ///   which strands its Preposition Phrase;
+    /// - with `adjectival`, Adjectival Passives of each frame whose passive
+    ///   leaves no Complement.
+    ///
+    /// No passive or Gap is derived from an Active-only frame, from an Amount
+    /// or Cost slot (a Complement, never an Object), or from a `MeasureNP` or
+    /// keyword-phrase Object. A non-verbal head's `Intransitive` frame derives
+    /// no phrase of its own: the bare phrase is it. A non-verbal head's bare
+    /// phrase omits the Complements its frames select, and a Preposition
+    /// Phrase right after it headed by one of their prepositions is that
+    /// head's Complement, never a dependent of another host.
     Valence {
         head: sylex_lexicon::Category,
         phrase: Ident,
@@ -482,7 +526,16 @@ pub enum SchemaDecl {
         #[serde(default)]
         remnants: Vec<(SlotKind, Ident)>,
     },
-    /// Unselected attachment of an adjunct Category to a host.
+    /// Unselected attachment of an adjunct Category to a host, limited to
+    /// Preposition Phrases whose (preposition, complement frame) entry admits
+    /// the [`HostKind`].
+    ///
+    /// Same-head complement priority is derived from the frames: a
+    /// Preposition Phrase, or an adjunct of a Frame Slot's Category, does not
+    /// attach as a Predicate adjunct to a head that has a longer frame
+    /// selecting it (*choose to attack* has no purpose reading). A host
+    /// delimited from a post-adjunct by a comma passes up no Gap, so it never
+    /// closes a relative clause (CGEL, Ch. 12 §4, p. 1058).
     Adjunct {
         host: Ident,
         adjunct: Ident,
@@ -506,6 +559,19 @@ pub enum SchemaDecl {
     },
     /// Binary and serial coordination of a Category, with Right Node Raising
     /// when the Category may contain a Gap.
+    ///
+    /// It derives the binary coordination, the Oxford-comma serial one, the
+    /// delimited polysyndetic chain (*A, or B, or C*) and across-the-board
+    /// Gaps, with one tree per chain joined by one coordinator. Right Node
+    /// Raising, a Gap shared at each conjunct's right edge and filled once
+    /// after the coordination, is derived for a Category's first
+    /// Coordination schema. Every schema whose coordinators admit a
+    /// [`Grammar::correlatives`] coordinator also derives the coordination
+    /// after its marker, and the first one whose coordinators admit a
+    /// [`Grammar::idiomatic_coordinates`] coordinator, with no `unlike`
+    /// feature, derives the binary and serial ends with its pro-form. A
+    /// coordination of Preposition Phrases keeps up to two prepositions for
+    /// selection and admits only the Host Categories every conjunct admits.
     Coordination {
         category: Ident,
         /// The Closed Word or Lexical Class of its Coordinators. Exactly one

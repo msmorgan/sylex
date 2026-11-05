@@ -1,543 +1,91 @@
 # sylex_syntax
 
-The data-driven syntax engine of the English layer
-([`docs/decisions/english.md`](../../docs/decisions/english.md)).
-It has no proc macros and no generated code: a grammar is data.
+The generic syntax engine: it binds a grammar data file to a lexical
+environment, parses text into a packed forest with an Earley chart, ranks and
+enumerates Readings, and realizes them back to text. A grammar is data, loaded
+at runtime; the engine has no proc macros and no generated code. It knows no
+English and no Oracle: the Oracle English grammar is
+[`sylex_english`](../english/README.md)'s.
+
+The design and its reasons are in
+[`docs/decisions/english.md`](../../docs/decisions/english.md) (the crate
+split in §1, the Ranking Key in §5, the parser contract in §7, Readings in §8)
+and [`docs/decisions/lexicon.md`](../../docs/decisions/lexicon.md). Terms
+follow [`docs/contexts/oracle-english/CONTEXT.md`](../../docs/contexts/oracle-english/CONTEXT.md).
+Mechanism is documented in rustdoc on the types:
+
+```
+cargo doc -p sylex_syntax --no-deps --document-private-items --open
+```
 
 ## Data flow
 
-1. `Grammar::from_ron_str` reads a grammar data file of Productions and Schemas.
-2. `CompiledGrammar::bind(grammar, lexicon, frames)` binds it to a
-   `sylex_lexicon::Lexicon` and a `FrameCatalog` of Subcategorization Frames.
-   Binding validates every name, rejects policing feature names (`…Use`,
-   `…Licence`, `…License`, `…Present`, `…Restriction`), and rejects any Closed Word
-   or explicitly named Lexical Class member that is not a core closed-class lexeme, so catalog
-   vocabulary such as keyword actions can never appear in a grammar.
-3. `parse(lexicon, text)` runs an Earley chart over the lexical analysis of the
-   text and returns a `Parse`: the Packed Forest, its `Metrics`, and vocabulary
-   gaps. Constituents are packed by (Category, span, summary); a summary holds the
-   Category's features, its Gap, and the engine-derived facts a parent may check.
-4. `Parse::best_readings(k) -> impl Iterator<Item = Reading> + '_` yields
-   up to `k` Readings by Ranking Key
-   (`RankingKey`, `docs/decisions/english.md` §5): Attachment Class,
-   then Right Association words, then summed Production Cost, compared in that
-   order, with the Reading's own order as the final tie-break, so the best
-   Reading is unique. Enumeration uses Huang & Chiang (2005),
-   [Algorithm 3](https://aclanthology.org/W05-1506.pdf), over an internal
-   flyweight arena. Each forest node and each Earley item/anchor group keeps
-   deduplicated best-so-far handles and a min-heap of candidate families and
-   child ranks. Requesting another result expands the last candidate's
-   immediate successors, requesting child ranks only as needed. Flat tree
-   entries and cons-cell child sequences share subtrees and prefixes; no
-   intermediate candidate owns a `ReadingNode`. Feature maps are cached once
-   per forest node, and comparisons borrow Selected Frames. Only `.next()`
-   materializes an owned Reading, cloning its features and frames. Arena
-   comparisons match `Reading::Ord` field-for-field, including lexicographic
-   children, and stop immediately at identical handles.
-   Right Association is computed from spans for every
-   unselected dependent (a child named `adjunct`, `modifier` or `supplement`
-   after its phrase's `head`): the words of its host, unless the host is a
-   coordination, plus the words between the host and it; the last conjunct of
-   a coordination adds the difference between its length and its first
-   conjunct's. A dependent whose Attachment Class attaches high counts that
-   distance reversed: a Supplement (`supplement`), and a dependent the
-   grammar's `high_attachment` declares by Category, feature and value (the
-   English grammar declares a distributive Preposition Phrase, *for each …*).
-   The Attachment Class counts a coordination's
-   last conjunct that ends in a dependent its first conjunct, which ends in its
-   head, lacks: that dependent belongs to the whole coordination. It also
-   counts the second of two dependents before their head (`adjunct` or
-   `modifier`): it belongs inside the first where the first can hold it
-   (*At the beginning of each combat this turn, …*). The chart
-   tracks `head_final` as the last head-line child's, which neither
-   punctuation nor the coordinator changes, so that the last conjunct's item
-   records the first's.
-   `best_ranked(k) -> impl Iterator<Item = (RankingKey, Reading)> + '_`
-   yields the keys too;
-   the tree-side `CompiledGrammar::ranking_key` (feature
-   `tree-ranking-key`, enabled for tests only) computes a given Reading's key to
-   check the forest's, and `cheapest_tier()` counts the Derivations sharing the least key without
-   building trees. `derivation_count()` counts trees without building
-   them. `readings() -> impl Iterator<Item = Reading> + '_` lazily yields
-   every Reading; callers needing a vector or set use `.collect()`.
-   All three iterators borrow the Parse, which must outlive them. A Derivation
-   never contains its own Constituent: stream graphs reached through an open
-   unary cycle remain private to that ancestor path, while cycle-free graphs
-   are memoized. A cycle therefore adds no Derivation of its own and hides
-   none of its finite siblings.
-   The forest is readable from outside through `PackedForest`'s accessors
-   (`roots`, `node_span`, `node_items`, `item_families`, `leaf_span`),
-   `Parse::count_node` and the `walk` memo; `sylex_english`'s census
-   builds its Segments on them.
-5. `admit(reading, lexicon)` re-checks a Reading without parsing, through the same
-   step function the chart uses. `realize(reading, lexicon)` writes it back out.
-   Both round-trip laws are tested on every Reading the tests produce.
-   A `Quoted(name, Category)` child is set in quotation marks the engine
-   supplies, double and single by nesting depth; the chart pairs the marks of
-   the text and reads it in logical order, where a period or comma written
-   inside a closing mark follows it and the quotation's own final period is
-   not written (`docs/oracle-style-guide.md` §3). Nor is a sentence's period
-   after a word whose spelling ends in terminal punctuation (*Exile Blood for
-   the Blood God!*; CGEL, Ch. 20 §8.4, p. 1764). Realization writes them back
-   from structure, so no quotation punctuation is stored.
-   A square bracket is an ordinary punctuation char to the engine. The
-   brackets that mark the text a cleave spell removes [CR#702.148a] never
-   reach it: `sylex_english::cleave` parses a cleave line without
-   them, and again without the text they enclose.
-6. `parse_analyzed(analyzed)` parses a text already analyzed (for example with a
-   card's names in scope); `parse_category(analyzed, category)` parses it as any
-   Category, and `Parse::admit` admits at the Category the Parse was made for.
-7. Both round-trip laws are checked without enumerating trees:
-   `Parse::verify_realization(lexicon)` proves law 1 for every Reading in the
-   forest by checking each reachable leaf's spelling and the spacing of every
-   pair of atoms adjacent in some Derivation; `Parse::contains(reading)` decides
-   law 2's membership by walking the forest along the Reading.
-8. `constituents(reading, lexicon)` lists a Reading's Constituents in preorder
-   with their spans in its realization, their mother, their head lexeme (through
-   `head` children) and their name in the mother's Production. A child's name
-   is its grammatical function (`predicative_complement` comes from the Frame
-   Slot's relation in derived valence phrases); the names the engine inspects
-   are listed on `ProductionDecl` in `src/grammar.rs`. A phrase shared by Right Node Raising also bears, in each
-   conjunct, the function of the Frame Slot whose Gap it fills
-   (`Constituent::also`), as does the head of a function Category it is. A
-   `modifier` after its phrase's `object` is postposed out of it, and also
-   bears `modifier` in that Object.
-
-## Chart and realization costs
-
-Binding computes transitive left-corner terminal masks for Categories and
-Productions, including recursive Categories. Parsing builds one active terminal
-mask per chart position from the independent lexical analysis and punctuation;
-only Productions whose first terminals can match are predicted. Whitespace
-marks use the unskipped position, preserving structural line boundaries.
-
-Prediction stamps and waiting-parent lists use flat indexes. Item deduplication
-is partitioned by end position and hashes internal integer identities with a
-fixed mixer. State and Summary feature slots occupy one byte each; binding
-rejects feature domains larger than 255 values, reserving one byte value for an
-unbound slot. These representations retain the same grammatical distinctions.
-
-Packed realization verification stores its four possible boundary behaviours
-in a bitmask. Each reachable leaf is checked once per verification, including
-when unary cycles prevent memoizing a surrounding node. Successful spelling
-checks compare characters without allocating another source string.
+1. **Load.** `Grammar::from_ron_str` or `Grammar::from_path` reads a grammar
+   of Categories, features, Productions and Schemas (`grammar.rs`).
+2. **Bind.** `CompiledGrammar::bind(grammar, lexicon, frames)` binds it to a
+   `sylex_lexicon::Lexicon` and a `FrameCatalog` of Subcategorization Frames
+   (`frames.rs`), validates every name, and compiles the Schemas into
+   Productions (`compile.rs`). Non-fatal findings are in
+   `CompiledGrammar::report()`.
+3. **Parse.** `parse(lexicon, text)`, `parse_analyzed(analyzed)` or
+   `parse_category(analyzed, category)` runs the chart over the lexical
+   analysis (`chart.rs`, `step.rs`, `prediction.rs`) and returns a `Parse`:
+   the `PackedForest`, its `Metrics` and the vocabulary gaps.
+4. **Rank.** `Parse::best_readings(k)`, `best_ranked(k)` and `readings()`
+   lazily enumerate Readings by Ranking Key; `cheapest_tier()` and
+   `derivation_count()` count without building trees (`reading.rs`).
+5. **Check and write back.** `admit` re-checks a Reading through the chart's
+   own step function, `realize` writes it out, `constituents` locates its
+   Constituents in that text, and `normal_form` applies the approved
+   canonicalizations (`normal_form.rs`). `Parse::verify_realization` and
+   `Parse::contains` check both round-trip laws over the forest without
+   enumerating trees (`laws.rs`).
 
 ## Schemas
 
-Authors write active Subcategorization Frames once; the engine derives the rest.
+Authors write the active Subcategorization Frames once and declare Schemas;
+binding compiles each Schema into the Productions it implies, so no voice,
+Gap or coordination shape is written by hand. The kinds are the variants of
+`grammar::SchemaDecl`:
 
-- `Valence { head, phrase, complement_kind, active, passive, verbal_passive, prepositional_passive, internalised, adjectival, adjectival_passive, obligatory }`: for each frame of each head lexeme
-  (verb, preposition, noun, adjective, determinative), a phrase of its head and
-  frame slots, recording the Selected Frame. For verbs it also derives every
-  object-Gap variant, a predicative-Gap variant of a `Copular` frame only (a
-  subjective predicative; never the objective one of *turn it face up*) and,
-  when `passive` names the `by` Closed Word, passive
-  phrases with and without the Internalised Complement, a `by` Preposition
-  Phrase, which strands its preposition like any other. The Internalised
-  Complement (CGEL, Ch. 16 §10.1.1, pp. 1428–1429) can also precede later
-  selected Preposition Phrase Complements (*dealt by a source to a player*),
-  preserving the Frame and grammatical functions in both surface orders.
-  `internalised` equations
-  constrain that Preposition Phrase in every derived passive, as the child
-  `internalised` (the English grammar admits only *by* + a Noun Phrase that is
-  neither a fused-head quantity nor a braced symbol, so *reduced by {2}* is only its selected extent); a `Prepositional` frame's passive strands its
-  Preposition Phrase (*each card looked at*). What each derived phrase carries
-  is declared, as equations over `$` and its lexical `head`: `active` on every
-  active phrase, `verbal_passive` and `prepositional_passive` on every passive
-  (required with `passive`), and `adjectival_passive` on every Adjectival
-  Passive (required with `adjectival`). The English grammar makes a verb's
-  active phrases `Voice: Active` (another head's phrase takes its Voice from
-  the head), its passives `Voice: Passive` past participles, and excludes an
-  auxiliary from the prepositional passive. When `adjectival` names a Category, a frame whose passive leaves no
-  Complement also derives Adjectival Passives of it (the participle, with or
-  without its `by` phrase); the English grammar makes them `Voice: Passive`
-  and `AdjectivePosition: Predicative`, and excludes a verb marked
-  `AdjectivalPassive: Lexical` (a declared Adjective spells it) or `VerbKind:
-  Auxiliary`. A preposition with an NP
-  complement also strands; an Intransitive Preposition heads its phrase alone.
-  With `complement_kind`, a feature its phrase must carry, a phrase bears its
-  first Complement's Slot Kind (`NP`, `AdjP`, ...); a non-verbal phrase without
-  one is `Intransitive`, and a stranded Preposition Phrase bears the Slot Kind
-  of the Complement it strands. The grammar's `slot_equations` constrain every
-  Frame Slot child of a kind in a derived phrase, as the child `slot` (the
-  English grammar's Noun Phrase Complement is never nominative). `agree` pairs make a phrase's feature agree with that
-  feature of each Frame Slot child that carries it (a Preposition Phrase takes
-  its Complement's Number; a determinative its oblique's).
-  `obligatory: true` keeps the bare phrase to non-verbal heads that declare
-  no frame or an `Intransitive` one, so another head realizes its frame (a
-  noun in a fossilised Preposition Phrase: *until end of turn*, *in excess
-  of*, but *on top*). A non-verbal head's `Intransitive` frame derives no
-  phrase of its own: the bare phrase is it.
-  With `clusters` (a `cluster` Category, the `coordination` Category of
-  their coordination, and an optional `adjunct` Category), an active verb
-  phrase's Frame Slots also form a Complement Cluster, optionally ending in
-  one or two Adjuncts, and the verb heads a coordination of Clusters, its
-  head shared on the left as the mirror of Right Node Raising (*put one of
-  them into your hand and the rest into your graveyard*, *has lifelink if you
-  control a Cleric and deathtouch if you control a Rogue*; right
-  nonce-constituent coordination, CGEL, Ch. 15 §4.3, pp. 1341–1343). A single
-  Slot with no Adjunct is a Cluster only where it alone breaks parallelism:
-  never last, beside at least two Clusters that end in as many Adjuncts,
-  each holding one that no Nominal hosts (*at random*), so that they are
-  Clusters of necessity (`Summary::bare`, `Summary::nominal_unhosted`). A Coordination schema
-  over the `coordination` Category joins Clusters, any number of them; its Clusters are parallel:
-  their frames share a shape, the relation of each Slot and, but for an
-  Object, what fills it (`Summary::cluster`), the first Cluster's frame is
-  the head's, and the head declares any other (a keyword phrase and a quoted
-  ability are each the Object of *has*). The coordination is the child
-  `clusters`, with no function; each dependent in a Cluster bears its own in
-  the verb's phrase too (`Constituent::also`). With `remnants`, a Cluster
-  after the initial one may fill its first Slot with a remnant, a phrase whose
-  head is elided: the head of the initial Cluster's first Slot, shared with
-  the verb on the left (*gain protection from white if ..., [from blue] if
-  ...*; CGEL, Ch. 15 §4.3, p. 1343, note 65). A `Parameters` schema with
-  `remnant` derives each pattern that begins with its head again without it,
-  in that Category; the phrase with the head records it
-  (`Summary::shared_head`) and the remnant the head it elides
-  (`Summary::remnant`), which must be the initial Cluster's. A Valence
-  schema's `remnants` pair a Slot Kind with a Category: an active phrase
-  whose frame's first Slot is of that kind is derived again without its head,
-  in that Category, as a medial conjunct of a coordination that admits it
-  (`Coordination::remnant`). The phrase with the head shares it, and the
-  remnant elides any head that declares its frame
-  (`Elided::Frame`; *is enchanted, [equipped], and has a counter on it*;
-  CGEL, Ch. 15 §3.6, pp. 1335–1336, [31ii]). A Preposition Phrase's remnant
-  elides any preposition that declares its frame (`Elided::PrepositionFrame`).
-  With `adjunct_clusters`, a phrase of a frame with no Slot heads a
-  coordination of Clusters of two Preposition Phrase Adjuncts, a later
-  Cluster's first one possibly a Preposition Phrase remnant (*enters [with a
-  +1/+1 counter on it for each other red creature you control] and [a +1/+1
-  counter on it for each other green creature you control]*; CGEL, Ch. 15
-  §4.3, p. 1343, note 65), whose Coordination schema is `parallel`: every
-  conjunct after the initial has its lexical head (`Summary::shared_head`),
-  overt or elided, and its last preposition (`Summary::cluster_preposition`).
-  A `MeasureNP` slot is a Monotransitive Object filled by the grammar's
-  measure Noun Phrase Category, which no `NP` slot accepts (*gets +2/+2*, but
-  not *draw 2/2*); like a keyword-phrase Object it derives no passive.
-  Amount and Cost slots (*scry 2*, *waterbend {3}*) are Complements, never
-  objects, so they derive no passive or Gap. An `Idiom` frame fixes a
-  preposition among its Complements (*come up heads*). A frame marked
-  `active_only` (an Active-only Frame: *cost*, lexical *have*) derives no
-  passive of any kind: verbal, prepositional or adjectival. A verb whose every
-  frame is Active-only has no past participle in a `Premodification` either. A
-  `Premodification`'s `equations` hold of the modifier one of its `forms`
-  heads, over its lexical `head` (the English grammar's past participle is
-  not one a declared Adjective spells). A
-  `Premodification` passes up its head's Gap, so a premodified conjunct shares
-  its Complement (*the noted number and kind of counters*).
-- `Adjunct { host, adjunct, side, host_kind, equations, nonfinal }`: unselected attachment, limited to
-  Preposition Phrases whose (preposition, complement frame) entry admits that Host
-  Category: a Nominal (as `modifier`), a Predicate (as `adjunct`), or a Clause
-  or line that a comma-set Supplement is anchored to (as `supplement`, *, where
-  X is its power*). Same-head complement priority is derived from the frames: a PP, or an
-  adjunct of a Frame Slot's Category (a purpose *to*-infinitival), may not
-  attach as a Predicate adjunct to a head that has a longer frame selecting it
-  (*choose to attack* has no purpose reading). A `PP(prepositions, Some(kind))`
-  Frame Slot selects only a Preposition Phrase whose Complement is of that kind,
-  and pre-empts only that one (*do the same for [Vampire]* is a Complement,
-  *do the same for [flying]* an Adjunct); a preposition frame declared
-  `named_only` is selected by no slot that names its preposition alone. A
-  non-verbal head's bare phrase (a noun's, an adjective's, a determinative's)
-  omits the Complements its frames select, and a Preposition Phrase right after
-  it headed by one of their prepositions is that head's Complement, never a
-  dependent of another host (*on top of your library*, *equal to the number of
-  cards in their hand*; never bare *equal* with *to the difference* stranded
-  for an outer noun): every constituent ending in such a bare phrase passes its omitted
-  Complements on to the sibling that follows it. A coordination of bare nouns
-  that omit unlike prepositions may take such a phrase as its own dependent
-  (*the type and amount of mana*); an omitted Amount is no preposition, so
-  *number and kind [of counters]* shares it as a Complement.
-  A delimited (comma-set) post-adjunct's host passes up no Gap, so it never
-  closes a relative clause's Clause (CGEL, Ch. 12 §4, p. 1058).
-  An Adjunct declared `nonfinal` builds a phrase that is only a conjunct of a
-  coordination other than the last (`Summary::nonfinal`): every other
-  position rejects it, so a Supplement to a Verb Phrase conjunct before the
-  next (*searches …, where X is …, puts them …*) leaves the last conjunct's
-  Supplement to its Clause.
-  Likewise a frame's predicative
-  Complement is not a Preposition Phrase that a rival frame of the same head
-  selects in its place (locative *on the battlefield* after *be*). Optional
-  `equations` constrain the `head` (host) and the adjunct (a depictive
-  gerund-participial of a lexical verb only).
-- `Coordination { category, coordinators, link, unshared, equations, proximate, resolve, delimiter, delimited, serial }`:
-  binary (only with the delimiter when `delimited`) and Oxford-comma serial
-  coordination (`serial` overrides the default: like conjuncts only; a plain serial ends with
-  one of its own coordinators), a delimited polysyndetic chain
-  (*A, or B, or C*), one tree per same-coordinator chain, across-the-board Gaps, and Right Node Raising (a coordination with a
-  shared NP, keyword-phrase, *to*-infinitival, predicative or catenative bare-infinitival Gap, a
-  preposition's Amount Complement, or a noun's single-preposition
-  Preposition Phrase Complement headed by that preposition (*the top or bottom of their library*),
-  or nouns' Amount Complements filled respectively by a slash Measure (*base power and toughness 4/4*)
-  or all by one Amount (*power or toughness 2 or less*),
-  filled once after it, derived for a Category's first
-  coordination schema). Conjuncts agree on every feature but the `unshared`
-  ones, which the coordination leaves unvalued, and the `proximate` ones, which
-  it takes from its last conjunct (*one or more cards*). Every conjunct but
-  the last shares a `resolve` feature, and the coordination takes that value
-  with the last conjunct's, or the listed value when they differ (a
-  coordination of Noun Phrases is determined only when every conjunct is). `equations` over `$`
-  resolve the whole coordination: a feature they value is still shared by the
-  conjuncts but not by the coordination (two singular nominals joined by *and*
-  are plural); equations over `first` hold of every conjunct but the last, over
-  `last` of the last (imperatives followed by a declarative), over `initial`
-  of the initial conjunct alone (a serial of mixed moods opens with an
-  imperative); an
-  `ExcludeTogether` equation over `first` and `last` relates the last conjunct
-  to the one before it. A `delimiter` may
-  also precede the coordinator of a binary coordination (*X, and Y*). The
-  grammar's `correlatives` pair a marker with a coordinator (*both … and*);
-  every schema whose coordinators admit the paired one also derives the
-  coordination after the marker. The grammar's `idiomatic_coordinates` pair a
-  coordinator with the Category of a pro-form that may be the last
-  coordinate after it, standing for further conjuncts of the coordination's
-  kind (*and so on*; CGEL, Ch. 17 §7.7.3(e), p. 1540): the first schema of a
-  Category whose coordinators admit it, with no `unlike` feature, derives the
-  binary and the serial tail's end with it. It is no conjunct: the overt
-  conjunct before it is the last one, no `last` equation applies, and it is
-  outside the head line. A coordination of Preposition Phrases keeps
-  up to two prepositions for selection, and admits only the Host Categories
-  every conjunct admits, where a conjunct whose Host Categories are
-  `NominalAndConjoinedPredicate` admits a Predicate host if the coordination
-  has one preposition and another conjunct admits that host on its own
-  (*enters with flying and with X +1/+1 counters on it*). A coordination
-  with a `remnant` Category may have a phrase of it for a medial conjunct,
-  the first conjunct of a serial tail, never the initial or the last one: a
-  coordination at the level of its final conjunct (CGEL, Ch. 15 §3.6,
-  pp. 1335–1336). Its `recovered` features are unshared among the conjuncts
-  but shared by each remnant with the initial conjunct, through the serial
-  tails (a Subject remnant's Number and Person). A coordination of a function may name its `conjunct`
-  Category, and `unlike` a feature its two conjuncts must not share: unlike
-  categories coordinated in one function (a depictive *tapped and attacking*),
-  binary unless `serial` is set (an *and*-list of an Object with keywords), whose serial and polysyndetic shapes have conjuncts not all of one value
-  (any middle one may differ). A constituent that begins with a dependent set off by
-  a comma (*When …, …*) is never the initial conjunct of a coordination
-  undelimited before its coordinator: the preposed dependent scopes over the
-  whole coordination. The initial conjunct of a coordination delimited before
-  its coordinator may have its own (*[If you do, …], and [if you don't, …]*),
-  and so may a middle conjunct of a serial one, whose serial tail names it
-  `first` too (*C1, [if …, C2], and C3*). A Predicate Adjunct preposed
-  without a comma may scope over the initial conjunct alone or over the whole
-  coordination (*instead [A] and B*, *instead [A and B]*; CGEL, Ch. 15
-  §1.3.4, pp. 1285–1286), so a constituent that begins with one may be that
-  initial conjunct (`Summary::preposed_predicate`).
-  Nor is such a constituent the host of a comma-set post-dependent (a head
-  followed by a comma and its dependent): the fronted dependent attaches
-  outermost, *Pre, [Clause, Post]*.
-  A schema names its `coordinators` or, for a Linked Coordination, its `link`:
-  the Category of the Conjunct after each link, which has no Coordinator but
-  is marked by its own initial connective (*Draw a card, [then discard a
-  card]*; CGEL, Ch. 15 §2.10, pp. 1319–1320). It has the binary shapes and
-  the serial, whose middle Conjuncts are ordinary ones that may begin with
-  the connective too (*A, then B, then C*), and no polysyndetic shape or
-  Right Node Raising. Its identity, by its serial tail, stands for a
-  Coordinator: no Conjunct of it is, or is headed through `head` children by,
-  a Linked Coordination of the same identity, so each chain has one tree.
-  The host of a comma-set post-dependent contains a delimiting comma, whose
-  closing mark only a stronger indicator absorbs (CGEL, Ch. 20 §3.2.5, p. 1745
-  [25]), so it runs to the end of the sentence, and every phrase that contains
-  one carries it up (`Summary::internal_comma`). A dependent set off before its
-  head by a comma ends at that comma, so it never contains one: an intervening
-  *if* follows the trigger condition rather than sitting inside it (*When [this
-  creature dies], if …*). A dependent after its head may contain one (*unless
-  [its controller pays {X}, where X is …]*). The comma of a coordination,
-  delimited (*A, and B*) or serial, separates coordinates and needs no closing
-  mark (CGEL, Ch. 20 §3.1, pp. 1736–1737 [3]–[4]; §3.2.1, p. 1739), so a
-  dependent set off before its head may contain one (*If [A are attacking, and
-  you both own and control them], …*). A phrase that ends in a comma-set
-  post-dependent is followed by a mark, which closes that comma, or by
-  nothing in its Production (`Summary::open_comma`): no sibling follows it
-  unpunctuated (*from black if [you control a Swamp, from red] if …* is no
-  Cluster).
+- `Valence`: a phrase per frame of every head lexeme of a lexical Category,
+  with its passives, Gap variants, Complement Clusters and remnants.
+- `Adjunct`: unselected attachment to a Host Category, with same-head
+  complement priority derived from the frames.
+- `Coordination`: binary, serial and polysyndetic coordination of a
+  Category, with Right Node Raising.
+- `Premodification`: an attributive head kept as a Modifier.
+- `Parameters`: the Catalog's ordered parameter patterns around a head.
 
-Gaps pass from a child to its mother only through children the Production marks
-`transparent`; auxiliaries mark their verb-phrase complement transparent, so
-extraction works across finite, plain, progressive, perfect and passive forms with
-no per-form Productions.
+Everything else is an authored Production. The child names the engine acts
+on are the contract documented on `grammar::ProductionDecl`.
 
-A clause Frame Slot is finite (*when this creature enters*), present-tense
-finite (*whenever you cast a spell*), verbless (*if able*), absolute, a Subject
-and its non-finite or verbless predicate (*with your hand revealed*), or
-interrogative (*choose which creatures attack*), each filled by its own
-Category.
+## Inspecting
 
-A Gap is an `NP` (an extracted Object or Complement of a preposition), a `Pred`
-(an extracted predicative Complement, *whose turn it is*) or an `Adjunct` (*the
-next time you cast a spell*). Valence introduces `NP` and `Pred` Gaps. The
-extracting verb is a free word, since a reduced clitic such as *'s* never
-stands before a Gap (CGEL, Ch. 18 §6.2.1, p. 1615), and a `Pred` Gap's verb is
-finite (never *can't be \_\_*). An authored Production introduces one with `Require("$.Gap", ..)` (a subject Gap).
-`Require("child.Gap", ..)` fills the child's Gap within the mother, unless the
-child is also `transparent`: then the mother takes that Gap over (a purpose
-adjunct whose object a relative clause binds).
+- `cargo xtask english parse "<text>" … [--limit N]` prints the cheapest
+  Readings of each input under the English grammar, with their Ranking Keys
+  and Constituents.
+- `Parse::metrics()` gives chart items, forest nodes, families and leaves.
+- `PackedForest`'s accessors (`roots`, `node_span`, `node_items`,
+  `item_families`, `leaf_span`), `Parse::count_node` and the `walk` module
+  read the forest from outside; `sylex_english`'s census is built on them.
+- The `tree-ranking-key` feature, enabled for this crate's tests, adds
+  `CompiledGrammar::ranking_key`, which computes a Reading's key from its tree
+  to check the forest's.
 
-## The lexicon-to-syntax interface
+## Working rules
 
-The engine never names a grammar feature, value or Category
-(`docs/decisions/english.md` §1), with one exception: the lexicon
-feature-bundle mapping table, the single declared interface through which
-lexical facts reach the grammar's features. It is `PROJECTED` in
-`compile.rs` (the grammar features the engine projects onto leaves: `Number`,
-`Person`, `Tense`, `VerbForm`, `Case`, `Inflection`, `Countability`, `Sign`),
-`projected_values` and `inflection_name` in `step.rs` (the values each takes),
-and `leaf_facts` in `step.rs`, which projects a word's inflection (its Word
-Form onto `VerbForm` and `Inflection`), a lexeme's Countability, and a
-numeral's `Number` and `Sign`. A grammar that declares one of those features
-must include every value projected onto it. A lexeme's own feature bundle
-reaches the grammar by the names it declares. Everything else a derivation
-carries, the grammar declares: Schema parameters (a Valence schema's voice
-and passive equations and `complement_kind`, a Premodification's
-`equations`) and grammar-level roles (`slot_equations`, `high_attachment`).
-A grammar without such a declaration gets no such derivation or a load
-error, never a default. Purely structural `Summary` bits, the engine's own
-Gap kinds and its reserved child names are not grammar names.
-
-## Lexical classes and notation
-
-`typed_classes` names classes whose membership comes from the lexical
-environment's declared properties, including Catalog entries. Empty and
-singleton classes are reported. The grammar never enumerates their members.
-Binding reports features the same way (`docs/decisions/lexicon.md` §4,
-`english.md` §3): a feature with no value, and a value with fewer than
-two holders. A feature may declare one, privative, value, which is reported
-only by its holders. A value's holders are the lexemes that carry it and those
-that hold it through a Production setting it on its mother: the lexemes its
-lexical `head` names (a Closed Word, a lifted Lexical Class, a keyword's
-Parameter pattern, the lexemes declaring a Frame), or else the Production
-itself. A value with neither is held by the Productions that require it of a
-child. A value projected from inflection is held by every word form inflected
-for it. Features equated with one another share their holders, and such a
-value is reported once, naming them all. Each warning names its holders.
-`Parameters` compiles the catalog's ordered parameter patterns around a head:
-slots select grammar Categories; markers, bound stems and head identities stay
-in the catalog. With `coordinators`, a pattern's final marker and slot also
-coordinate, binary and serial, the marker repeated (*protection from black and
-from red*). Noun notation parameters support indexed headers by the same
-mechanism as keyword parameters. `ModifiedWords` builds a restricted word set with recursive
-premodification inside its projected category.
-
-`Selected` names a Preposition Phrase child headed by one of the listed
-Closed Words, as a `PP([...])` Frame Slot selects one (*up to two*, a partitive
-*of* oblique). An `AdvP` Frame Slot is an adverbial Complement (*more than
-twice*).
-
-`Mark` specifies structural punctuation and its attachment at either edge;
-`Attached` attaches a constituent at its outer boundaries, for adjacent symbol
-sequences; `Free` requires a constituent whose first atom does not glue to the
-one before (a Verb Phrase that does not begin with a bound clitic). These bindings are applied by both realization and the packed-forest
-law checker. Paragraph boundaries are explicit terminals, never skipped as
-interword whitespace. `Numeral` selects numeral notation; `FreeLex` excludes bound stems
-from independent word positions. Bare valence phrases likewise require free words.
-`Sign`, when declared, projects a numeral’s Negative, Zero, or Positive value
-onto its lexical leaf. Grammars can constrain signed notation without inspecting
-source spelling or changing lexical analysis.
-Flavor Word leaves use the lexical layer's registered-label exclusion and realization.
-
-## Function Categories and frameless auxiliaries
-
-A Category declared `function: true` names a grammatical function rather than a
-constituent, as `Predicative` names the predicative Complement: in
-`constituents`, its head child bears the same function in the same mother. A
-Production can require that a Preposition Phrase child admit a Host Category
-(`Hosted`), as a predicative PP must be able to modify a nominal. It can also
-require a child to be `light`, one lexical leaf alone or projected, or `heavy`,
-more than one, as a single postpositive participle differs from a participial
-clause (the engine's own `Postposable` weight, for a postposed Object, is a
-phrase that ends in a dependent or is a coordination), or `uncoordinated`, not itself a coordination, where the coordination
-one level up is the same analysis (a chain of bare imperatives is coordinated
-imperative Clauses), or `coordinated`, itself one. For both, a phrase built by
-a Production of its own Category whose later children are all `adjunct`s is a
-coordination when its head is one: a dependent after a coordination leaves it
-a coordination, so *[untap target creature and gain control of it] until end
-of turn* heads no Imperative, and its shared Adjunct is the coordinated
-Clauses' (structural `Summary::coordinated`, computed from the engine's own
-coordinators), or `unlinked`, neither a Linked Coordination nor headed
-by one through `head` children (a subordinate clause, which a sole connective
-never links). A child can be `unextended`: it does not end, through
-its head line, in a Preposition Phrase dependent that its Production, or a
-sibling with the same children up to and including it, selects as a `PP`
-Complement right after it (an existential's Extension is a Complement of
-*be*, never also the Displaced Subject's postmodifier). A child can be
-`unadjoined` for listed Categories: it does not end in a trailing Adjunct of
-one of them, the last child, named `adjunct`, of a Production whose head
-precedes it with no comma between, reached through `head` children and a last
-child of its Production's own Category or an alias of it (a modal's bare
-infinitival), never through a coordination's conjuncts (a dependent coordinate
-with that Adjunct is its coordinate, never attached beside it). A verb without
-a Subcategorization Frame binds when the grammar names it as a Closed Word or a
-Lexical Class member (perfect *have* and its forms).
-
-A Production whose last child is a function Category aliasing its own Category
-builds an auxiliary phrase: that child is the participial Verb Phrase
-Complement of perfect *have* or of passive or progressive *be*, whereas a
-modal's bare infinitival is a Category of its own. When such a phrase is
-`VerbKind: Auxiliary` and not a coordination, it is never the head of a
-Production of its own Category whose later children are all `adjunct`s: a
-post-verbal Adjunct attaches to the lexical participial Verb Phrase inside it
-(*was [put there from the battlefield this turn]*, *have [lost this turn]*), so
-the duplicate site above it is never built (`docs/decisions/english.md` §8).
-A coordination of auxiliary Verb Phrases still hosts an Adjunct its conjuncts
-share.
-
-## Reading Normal Form
-
-`normal_form(reading)` identifies only the approved canonicalizations the
-engine derives: every grouping of a chain joined by one coordinator becomes one
-node listing its conjuncts and then the coordinator (with no features of its
-own), a Linked Coordination's chain likewise without one; a Production over a coordination of its `uncoordinated` child becomes
-the coordination of that Production over each conjunct (clause versus
-verb-phrase coordination of bare imperatives); an Adjunct Production over an
-uncoordinated auxiliary Verb Phrase becomes the auxiliary over that Production
-of its participial Complement's Verb Phrase (adjuncts below a non-modal
-auxiliary); a Preposition Phrase attached as a Predicate adjunct to a head
-with a longer frame selecting it becomes that frame's complement; and a
-comma-set post-dependent of a Clause that begins with a fronted dependent
-becomes a post-dependent of that Clause's head, *Pre, [Clause, Post]* for
-*[Pre, Clause], Post* (fronted dependent outermost), the moved host taking
-from its new head the features it shared with the fronted Clause. It endorses
-nothing; it lets two sets of Readings be compared under exactly those
-equivalences.
-
-Category aliases retain a grammatical category in Readings while allowing
-separate internal production domains. Declared lexical features participate in
-the same equations as inflectional features. `Require` values an unvalued
-feature; `Carry` requires the child to carry the value itself; `ExcludeTogether`
-rejects only a combination of child values, every one of them carried. A
-mother shares each feature its `head` child carries, except those its
-Production lists as `unshared`, which its own equations value instead (a degree
-modifier that changes its head's grade). An
-equation on a child name that several children share (two preposed `adjunct`s)
-constrains each of them that carries the feature. Multiword noun terms, measured compounds
-(`+1/+1 counter`) among them, are one leaf in both parsing and Admission.
-The ordinary words of one declared outside the core lexicon also reach the
-chart as separate leaves, but only to straddle a constituent boundary, where
-the smallest Constituent spanning the term has its first word in a child that
-begins before the term and its last word in a child that ends after it.
-Admission checks the same rule on the Reading's own Constituents, without
-parsing. Construction boundaries enforce the spacing used by realization.
-
-The Valence Schema can interleave PP Adjuncts before selected complements and
-postpose an Object. Its `interleaved` Category interleaves before any selected
-PP Complement or shifted Object; its `interleaved_internalised` Category only
-before the Internalised Complement of a passive, a non-core Complement (CGEL,
-Ch. 4 §3.2.1, p. 241). With `heavy_shift`, the Object postposes past selected
-PP Complements; past a predicative Complement, or past an `interleaved` Adjunct
-alone, only a heavy Object does: one that ends in a dependent or is a
-coordination, and satisfies the `shifted_object` equations (*chooses from among
-them [an artifact, a creature, …]*; CGEL, Ch. 16 §4, pp. 1382–1384). With `postposed`, a phrase whose Object is followed only by
-selected PP complements also ends in a `modifier` of that function Category,
-postposed out of the Object past them and agreeing with it in each feature
-both carry (*put a number of counters on it equal to …*; CGEL, Ch. 12 §4,
-p. 1066); it is never interleaved. Same-head complement priority still applies through these
-projections; a coordination whose conjuncts take the same Complements keeps
-them as its extensions, so a Complement they share is never an Adjunct of the
-coordination. Right Node Raising requires the shared Gap at each coordinate's
-right edge; ordinary extraction is not subject to that restriction. A
-gap-capable Category's `closed_gaps` names Gap kinds its Constituents never
-contain: a non-finite Complement passes up no predicative Gap (*can't be __*),
-so one is shared only inside it (*can't [be and become] legendary*). Adjunct
-Schemas can declare a punctuation delimiter for preposed or delimited PPs.
-
-Declarative content-clause slots distinguish non-expandable finite clauses
-from expandable clauses, whose grammar may admit the subordinator *that*.
-Preposition Frames select that distinction; *except* permits *that*, whereas
-*when* excludes it (CGEL, Ch. 11 §4.8, p. 971).
+- **The engine names no grammar term.** Outside the lexicon feature-bundle
+  mapping table (`PROJECTED` in `compile.rs`, `projected_values` and
+  `leaf_facts` in `step.rs`), no feature, value or Category name appears in
+  the engine; anything English belongs in `sylex_english`'s grammar data.
+- **No defaults.** A derivation the grammar does not declare is not built, or
+  binding fails; the engine never supplies a grammar default.
+- **Canonicalizations are listed.** Every canonicalization the chart builds is
+  listed in the `normal_form` module doc, marked where `normal_form`
+  re-applies it.
+- **Both laws on every Reading.** Tests check admission and realization on
+  every Reading they produce.
+- **Census before and after.** An engine change runs `sylex_english`'s
+  census before and after it
+  ([`crates/english/README.md`](../english/README.md), Working rules).
