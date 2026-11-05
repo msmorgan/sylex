@@ -70,15 +70,15 @@ as others are pushed and removed.
 - A referent records the clause it was last foregrounded in and its role there: subject, object or
   other. Possessor mentions foreground their referent with role other, but they are never
   clause-mates of the verb.
-- A re-mention in a direct argument slot is a clause-mate for J2 and Principle A, and D′ ranks
-  it in the current clause.
+- A re-mention in a direct argument slot is a clause-mate of the verb and is foregrounded in the
+  current clause.
 - **Actors are not referents.** A Handoff makes its Actor the innermost for the Action it contains.
   Pronouns, groups and counts never read an Actor; only the `actor` word does.
 - A disjunctive noun phrase exports only the referents common to every branch. A coordination bound
   to a parameter binds every member under the parameter's one Binding Identity.
 - A zone change keeps the referent and records the move on it: its new zone and the deed. Carrier
   words ("that card" after "exile target creature", [CR#109.2]), the consuming verb's
-  applicability (§2.4, J1) and Participial Descriptions read those. That the moved card is a new
+  applicability (§2.4) and Participial Descriptions read those. That the moved card is a new
   object in the game ([CR#400.7]) is game identity, which lowering supplies.
 
 ### 2.2 Boxes
@@ -131,9 +131,9 @@ only announced choices.
 
 ### 2.4 Anaphor Resolution
 
-Resolution runs in two stages: an accessibility filter (J1), then a rule for each anaphor form.
+Resolution runs in two stages: an accessibility filter, then a rule for each anaphor form.
 
-**J1: a referent is accessible only if all four hold.**
+**Accessibility: a referent is accessible only if all four hold.**
 
 1. No active Reference Scope hides it.
 2. Its number agrees with the anaphor's.
@@ -148,11 +148,11 @@ description with no zone or "card" reads the permanent as it is.
 
 **The rule for each form:**
 
-- **J2:** a pronoun in a direct argument slot excludes its clause-mates.
-- **Principle A:** a reflexive requires a clause-mate subject.
-- **D′ (bare pronouns):** take the nearest clause, then rank by role (subject, then object, then
+- **Clause-mate exclusion:** a pronoun in a direct argument slot excludes its clause-mates.
+- **Reflexives:** a reflexive requires a clause-mate subject.
+- **Bare pronouns:** take the nearest clause, then rank by role (subject, then object, then
   other). Refuse a tie.
-- **AC>R1 (demonstratives):** exclude clause-mates. Prefer a referent other than one a same-clause
+- **Demonstratives:** exclude clause-mates. Prefer a referent other than one a same-clause
   pronoun resolved to, but only when one exists. Then take the most recent.
 - **Participial Descriptions** ("the exiled card") require the unique referent the deed stamped.
   They are the only references that reach objects a linked ability published ([CR#607.2a]).
