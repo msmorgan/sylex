@@ -304,7 +304,7 @@
         // A Word-Part Coordination of Compound Nouns that share their head
         // word (*a +1/+1, first strike, or vigilance counter*), and each of
         // its Conjuncts: a first base alone, or, last, the whole Compound
-        // Noun, which never splits (`docs/decisions/lexicon.md`).
+        // Noun, which never splits (`docs/decisions/lexicon.md` §5).
         "CompoundCoordination": (category: Some("Nominal"), features: ["Number", "Countability", "NounKind", "NounDistribution"]),
         "CompoundConjunct": (category: Some("Nominal"), features: ["Number", "Countability", "NounKind", "NounDistribution", "CompoundPart"]),
         // A conjunct of a coordination of noun premodifiers: a noun premodifier,
@@ -892,7 +892,7 @@
         // so the face's own Shortened Name [CR#201.5c] ranks first where the
         // two are spelled alike (*Nicol Bolas* on Nicol Bolas, the Ravager).
         // Both stay Readings: full names are in scope everywhere
-        // (`docs/decisions/lexicon.md`).
+        // (`docs/decisions/lexicon.md` §6).
         (name: "NamedParameter", lhs: "Name", rhs: [Lex("head", Catalog)], scoped: ["head"]),
         (name: "SlashMeasure", lhs: "Measure", rhs: [Cat("first", "SignedAmount"), Mark('/', Bound), Cat("second", "SignedAmount")]),
         (name: "MeasureHeader", lhs: "Header", rhs: [Cat("head", "Measure")]),

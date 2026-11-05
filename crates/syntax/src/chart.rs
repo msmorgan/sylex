@@ -378,7 +378,7 @@ impl CompiledGrammar {
     /// The spans of the multiword nouns of `analyzed`, each with whether its
     /// words may stand apart where they straddle a constituent boundary:
     /// those of a term declared outside the core lexicon may
-    /// (`docs/decisions/lexicon.md`). A noun whose first
+    /// (`docs/decisions/lexicon.md` §5). A noun whose first
     /// word is also a preposition is none: its words form a Preposition
     /// Phrase, never the noun's own analysis (*cards you own [outside the
     /// game]* beside the noun *outside the game*).

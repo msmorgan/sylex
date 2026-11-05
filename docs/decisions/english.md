@@ -46,17 +46,16 @@ meaning into it.
 No item the Comprehensive Rules enumerate appears in a grammar declaration.
 This covers keyword actions [CR#701.1], keyword abilities [CR#702.1], ability
 words [CR#207.2c] and every other Catalog in the
-[glossary's](../contexts/oracle-english/CONTEXT.md) sense. Each is a Catalog
-entry in `sylex_vocabulary` that brings its own frames: a keyword action its
-Complements, a keyword ability its Keyword Parameters. The grammar parses
-Catalog items by lexical Category and frame. It never names one, and it defines
+[glossary's](../contexts/oracle-english/CONTEXT.md) sense. Each is a game word
+declared in its `.syl` file, which brings its own frames
+([Lexicon](lexicon.md) §3): a keyword action its Complements, a keyword
+ability its Keyword Parameters. The grammar parses Catalog items by lexical Category and frame. It never names one, and it defines
 no feature, Schema or Production for one. A keyword action that is also an
 ordinary English verb, such as *destroy*, *exile* or *search*
 [CR#701.8,701.13,701.23], is still a Catalog item.
 
-The grammar names only core closed-class words, by lexeme id
-([Lexicon](lexicon.md)). Core vocabulary is never
-a Catalog. It carries Core provenance, which is what lets the grammar name its
+The grammar names only core closed-class words, by lexeme id. Core vocabulary
+is never a Catalog. It carries Core provenance, which is what lets the grammar name its
 closed-class words, and binding refuses a grammar that names anything else.
 
 Why: the Catalogs are open. Sets keep adding keyword actions, abilities and

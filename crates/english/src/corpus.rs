@@ -1,11 +1,10 @@
 //! The supported Oracle corpus and its Corpus Units.
 //!
 //! The supported corpus is every Vintage-playable (legal or restricted) Oracle
-//! record outside Scryfall `set_type: funny`
-//! (`docs/decisions/lexicon.md`). Each Card Face record
+//! record outside Scryfall `set_type: funny`. Each Card Face record
 //! yields one Type Line unit and one unit per paragraph line of its rules text
-//! after balanced reminder text is removed (a line break inside a quotation
-//! does not end a line); a face's count is a sum over its units. The split
+//! after balanced reminder text is removed (`docs/decisions/lexicon.md` §1;
+//! a line break inside a quotation does not end a line); a face's count is a sum over its units. The split
 //! is deterministic, so a text has one segmentation into units.
 //!
 //! A face's text is read with its recorded Editorial Corrections applied

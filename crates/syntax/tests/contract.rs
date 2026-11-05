@@ -340,7 +340,7 @@ fn multiword_lexeme_is_atomic_and_needs_its_separator() {
 /// a constituent boundary, each in a child that reaches past the lexeme, as
 /// in *[big first] [strike damage]*; never where they rebuild it, alone or
 /// with a dependent of one part, as in *first [strike damage]*. A core
-/// multiword lexeme's never do (`docs/decisions/lexicon.md`).
+/// multiword lexeme's never do (`docs/decisions/lexicon.md` §5).
 #[test]
 fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
     let mut first_strike = word("n:first-strike", "first strike", Category::Noun);

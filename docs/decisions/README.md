@@ -10,3 +10,4 @@ construct is used. Card rulings are never recorded here.
 - [Core](core.md): the compiled core that the engine executes.
 - [Engine](engine.md): the engine's laws.
 - [English](english.md): the English grammar and parser: crate split, Catalog constraint, admission, ranking and the round-trip contract.
+- [Lexicon](lexicon.md): how words reach the grammar: the analyzed text, lexical analysis, Categories, Provenance, multiword terms and names.

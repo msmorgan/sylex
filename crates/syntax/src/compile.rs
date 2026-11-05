@@ -1462,8 +1462,8 @@ impl<'a> Binder<'a> {
     }
 
     /// Reports, as findings, a declared feature with no value and a feature
-    /// value with fewer than two holders (`docs/decisions/lexicon.md`,
-    /// `english.md` §4). A feature may declare one value, a
+    /// value with fewer than two holders (`docs/decisions/lexicon.md` §4,
+    /// `english.md` §3). A feature may declare one value, a
     /// privative one, whose unvalued feature is the unmarked default; the
     /// value is still a finding unless it has two or more holders. A
     /// value's holders are the lexemes whose feature bundles carry it and

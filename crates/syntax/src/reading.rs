@@ -1066,7 +1066,7 @@ impl CompiledGrammar {
     }
 
     /// Lexical atomicity, decided on the Reading's own structure as the chart
-    /// decides it (`docs/decisions/lexicon.md`): a word
+    /// decides it (`docs/decisions/lexicon.md` §5): a word
     /// inside a multiword noun of `atomic` stands alone only where the term's
     /// words may stand apart, and then only where they straddle a constituent
     /// boundary. In the smallest Constituent spanning the term, the child

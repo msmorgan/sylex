@@ -52,7 +52,7 @@ conventions make the strings fit for that. They also settle the 151 `TODO(spelli
   load if none does. This is recorded in the ADR for `sylex_spelling`; no code here.
 - **Rendering reproduces the analyzed Oracle text.** That is the text after balanced reminder text
   is removed and keyword-line semicolons become commas, with cleave's Bracketed text written back
-  from where it is kept (`docs/decisions/lexicon.md`).
+  from where it is kept (`docs/decisions/lexicon.md` §1).
   - A wording difference with the same meaning lives in which Template a card calls, never in the
     AST. Put and return are the existing case.
   - This is the exact round trip `architecture.md` ("Exact round trip") sets as the goal.

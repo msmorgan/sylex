@@ -141,7 +141,7 @@ with more is reported, never stored as a choice.
 
 The goal is an exact round trip over the analyzed Oracle text, the text English
 analysis produces with reminder text removed
-([Lexicon](lexicon.md)): it goes
+([Lexicon](lexicon.md) §1): it goes
 to its resolved term and back to the identical analyzed text. That is what
 faithful means here, and it is the easy, visible demonstration that the system
 works: a card whose rendering is not its own text has a wrong term, found

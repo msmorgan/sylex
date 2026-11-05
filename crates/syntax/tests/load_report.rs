@@ -1,6 +1,6 @@
 //! Binding reports a feature with no value and a feature value with fewer
-//! than two holders as findings (`docs/decisions/lexicon.md`,
-//! `english.md` §4), without refusing the grammar. A feature
+//! than two holders as findings (`docs/decisions/lexicon.md` §4,
+//! `english.md` §3), without refusing the grammar. A feature
 //! may declare one, privative, value. A value's holders are counted as they
 //! are: the members of a lifted class, the lexemes that declare a Frame or a
 //! Parameter pattern that gives it, and once across linked features.

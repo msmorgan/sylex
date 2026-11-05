@@ -396,8 +396,8 @@ Gap kinds and its reserved child names are not grammar names.
 `typed_classes` names classes whose membership comes from the lexical
 environment's declared properties, including Catalog entries. Empty and
 singleton classes are reported. The grammar never enumerates their members.
-Binding reports features the same way (`docs/decisions/lexicon.md`,
-`english.md` §4): a feature with no value, and a value with fewer than
+Binding reports features the same way (`docs/decisions/lexicon.md` §4,
+`english.md` §3): a feature with no value, and a value with fewer than
 two holders. A feature may declare one, privative, value, which is reported
 only by its holders. A value's holders are the lexemes that carry it and those
 that hold it through a Production setting it on its mother: the lexemes its
