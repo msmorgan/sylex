@@ -96,7 +96,7 @@ pub const SEQUENCING: Family = family(7, "DiscourseSequencing");
 pub const PRO_FORM: Family = family(7, "ProFormDo");
 pub const ELLIPSIS: Family = family(7, "Ellipsis");
 pub const ABSOLUTE: Family = family(7, "AbsoluteClause");
-pub const OPTIONAL_BRACKETED_TEXT: Family = family(7, "OptionalBracketedText");
+pub const BRACKETED_TEXT: Family = family(7, "BracketedText");
 pub const APPOSITION: Family = family(7, "Apposition");
 pub const QUOTED_ABILITY: Family = family(7, "QuotedAbility");
 pub const VOCABULARY_GAP: Family = family(7, "VocabularyGap");
@@ -729,7 +729,7 @@ fn clause(tokens: &[Tok<'_>], baseline: bool, families: &mut BTreeSet<Family>) {
                 .position(|t| t.is_punct(']'))
                 .is_some_and(|end| !is_notation(&tokens[i + 1..i + 1 + end]))
         {
-            families.insert(OPTIONAL_BRACKETED_TEXT);
+            families.insert(BRACKETED_TEXT);
         }
     }
     for window in tokens.windows(3) {
