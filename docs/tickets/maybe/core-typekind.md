@@ -37,10 +37,9 @@ capabilities back into fields — the Combatant role and other capabilities stay
 conferred data in `TypeDef.confers`, per the rulings above.
 
 This item now follows the `type-def-permanent-type-flag` rename: the flag it
-would restructure becomes the CR-faithful `TypeDef.permanent_type` first. See
-the glossary's [`Permanent Type`, `Spell`, and `Permanent`
-definitions](../../contexts/game-model/CONTEXT.md) — Permanent Type is a property of a Card
-Type, while Spell and Permanent are nonexclusive *current roles* of an Object.
+would restructure becomes the CR-faithful `TypeDef.permanent_type` first. Permanent
+Type is a property of a Card Type [CR#110.4], while Spell and Permanent are nonexclusive
+*current roles* of an Object [CR#110.1,112.1].
 So any future enum must not be named or shaped as `Spell | Permanent`; that
 spelling asserts an exclusivity the rules do not have.
 

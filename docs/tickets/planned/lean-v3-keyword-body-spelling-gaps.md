@@ -87,10 +87,8 @@ Change:
    `plugins/builtin/primitives/predicate/isCopyOfACard.syl`. `.isCopyOfACard` has no checker
    arm (every Predicate match falls through a wildcard to kind `.object`); the `discourse` tests
    confirm whether the new atom needs one.
-2. Glossary: add **Double-Faced Card** to `docs/contexts/game-model/CONTEXT.md` beside
-   **Card Face** with [CR#712.1], through the `domain-modeling` skill, before naming the
-   identifier; if the glossary entry settles on another name, use that name for the constructor
-   and primitive.
+2. Name the constructor and primitive after the CR term *double-faced card* [CR#712.1]; the
+   glossary does not redefine CR terms.
 3. Daybound's first static becomes
    ```
    static(

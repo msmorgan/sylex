@@ -55,7 +55,7 @@ Core and the checker. Add a Linked Facet (alongside `LinkedFacet.colorsSpent` [C
 the greatest amount of mana of any one color spent to cast it, with a Template reading it for the
 spell, so both cards compare it `.atLeast 3`. It ranges over the five colors [CR#105.1]; colorless
 mana is a mana type but not a color [CR#106.1b] and does not count. It stays distinct from the
-stated-type count above. Name the facet per `CONTEXT-MAP.md` and the game-model glossary.
+stated-type count above. Name the facet per the game-model glossary.
 
 ## Tests
 

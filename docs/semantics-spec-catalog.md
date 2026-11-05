@@ -93,7 +93,7 @@ Reading aids (terms the setups use):
 
 ### 3. Contrast Anchor ("another"/"other" with no "other than")
 
-Priority ladder from the glossary: (1) Source coordinated with the phrase; (2) the current member of a
+Priority ladder from `docs/decisions/semantics.md` §2.5: (1) Source coordinated with the phrase; (2) the current member of a
 distributive group the clause's subject names; (3) nearest earlier compatible mention in Reference
 Scope (kind, Card Type, zone, controller; never the described thing, the Source, "you" or a Condition's
 hypothetical); (4) a compatible particular of the same clause read forward; (5) the Source (Object) or

@@ -181,12 +181,16 @@ language matter ([`syl.md`](./syl.md) §1). A primitive only names a model const
 two differ in what they mean:
 
 - **A Definition** is vocabulary the rules define: a keyword action or ability ([CR#701.1,702.1]),
-  a Counter, a Designation. It carries rules meaning: a Deed that triggers, lookbacks and
-  prohibitions can name ("whenever you scry", "the card exiled this way", "can't be
-  regenerated"), and its own Reference Scope (§2.3). "This way" reads the current ability's stamps
-  (§2.4), and the stamp a keyword action leaves is its Definition's Deed. That is why each keyword
-  action has exactly one Deed (§3.1): a variant with its own Deed would make "exiled this way"
-  miss it.
+  a Counter, a Designation. It carries rules meaning and its own Reference Scope (§2.3).
+  - A keyword action's Definition carries a Deed that triggers, lookbacks and prohibitions can
+    name ("whenever you scry", "the card exiled this way", "can't be regenerated"). "This way"
+    reads the current ability's stamps (§2.4), and the stamp a keyword action leaves is its
+    Definition's Deed. That is why each keyword action has exactly one Deed (§3.1): a variant with
+    its own Deed would make "exiled this way" miss it.
+  - A keyword ability's Definition carries a Deed only where the rules let text ask who did it:
+    a creature tapped to pay a crew cost "crews" the Vehicle, and the Vehicle is "crewed by" it
+    ([CR#702.122b,702.122c]), so Crew's Definition carries the Deed paying that cost stamps.
+  - A Counter's or a Designation's Definition carries none.
 - **A Template** is printed wording only. It expands transparently into the expressions its parts
   would be written as, and it adds no meaning.
 
