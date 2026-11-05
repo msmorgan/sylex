@@ -99,49 +99,6 @@ pub enum Countability {
     Mass,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
-pub enum Relation {
-    Subject,
-    Object,
-    Complement,
-}
-
-/// One grammatical position in a lexical frame.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct FrameSlot {
-    pub relation: Relation,
-    pub category: dpsi::Ident,
-}
-
-/// One ordered element of a lexical frame signature.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
-pub enum FrameItem {
-    Argument(FrameSlot),
-    Marker {
-        vocabulary: dpsi::Ident,
-        member: dpsi::Ident,
-    },
-    Marked {
-        vocabulary: dpsi::Ident,
-        member: dpsi::Ident,
-        slot: FrameSlot,
-    },
-    Optional(Box<FrameItem>),
-    /// Legacy source data that has not yet been reconciled to a declared
-    /// marker identity.
-    Literal(String),
-}
-
-/// A lexical frame signature, independent of grammar productions and
-/// admission.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct Frame {
-    pub kind: dpsi::Ident,
-    pub items: Vec<FrameItem>,
-}
-
 /// The selected capitalization of a grammatical lexical value.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]
 pub enum SurfaceCase {

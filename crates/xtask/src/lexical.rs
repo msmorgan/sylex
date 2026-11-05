@@ -206,9 +206,6 @@ struct Report {
     independent_values_checked: usize,
     lexeme_sources: BTreeMap<sylex_lexicon::LexemeId, Source>,
     lexeme_inventory: BTreeMap<sylex_lexicon::LexemeId, LexemeInventory>,
-    /// Declared frame signatures belong to lexical identities; they are not
-    /// stand-alone surface readings or constructed grammar values.
-    declared_frame_signatures: usize,
     #[serde(rename = "timings_seconds")]
     timings: Timings,
     inventory: Inventory,
@@ -320,11 +317,6 @@ fn analyze_cards(faces: &[SelectedFace], lexicon: &Lexicon, workers: usize) -> R
             .map(|(id, lexeme)| (*id, lexeme.source.clone()))
             .collect(),
         lexeme_inventory: lexeme_inventory(lexicon),
-        declared_frame_signatures: lexicon
-            .lexemes()
-            .values()
-            .map(|lexeme| lexeme.properties.frames.len())
-            .sum(),
         timings: Timings::default(),
         inventory: Inventory::default(),
         faces: Vec::new(),

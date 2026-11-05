@@ -23,7 +23,6 @@ pub struct LexicalProperties {
     pub countability: Vec<crate::Countability>,
     /// Declared distribution features retained by name for the grammar adapter.
     pub features: BTreeMap<dpsi::Ident, dpsi::Ident>,
-    pub frames: Vec<crate::Frame>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]

@@ -157,19 +157,8 @@ fn cast_preserves_plain_present_preterite_and_participle_alternatives() {
 }
 
 #[test]
-fn declarations_roundtrip_with_shared_frame_and_feature_values() {
+fn declarations_roundtrip_with_overridden_forms() {
     let mut cast = verb("v:cast", "cast");
-    cast.properties.frames = vec![Frame {
-        kind: dpsi::Ident::new("Predicate"),
-        items: vec![FrameItem::Marked {
-            vocabulary: dpsi::Ident::new("Preposition"),
-            member: dpsi::Ident::new("At"),
-            slot: FrameSlot {
-                relation: Relation::Object,
-                category: dpsi::Ident::new("NounPhrase"),
-            },
-        }],
-    }];
     override_form(&mut cast, WordForm::Preterite, &["cast"]);
     override_form(&mut cast, WordForm::PastParticiple, &["cast"]);
 
