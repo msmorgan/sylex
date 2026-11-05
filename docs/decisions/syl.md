@@ -98,7 +98,7 @@ language keeps.
 
 Read order is printed order. A declaration's parameters are read in the order its spelling prints
 them, with no per-declaration exception: where the printed order differs ("When <event>, if
-<condition>, <action>"), the declaration's parameters are reordered to match. Why: the anaphora
-rules read what the text says first as first, spelling renders a declaration in its parameter
+<condition>, <action>"), the declaration's parameters are reordered to match. Why: reference
+resolution sees what the text says first as first, spelling renders a declaration in its parameter
 order, and a reference oracle keyed to printed text lines up with the term only if the two orders
 agree.

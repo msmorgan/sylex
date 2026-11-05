@@ -335,7 +335,3 @@ Conjunct (*is enchanted, equipped, and has a counter on it*).
 **Conjunct Number**:
 The Number of each Conjunct of a nominal Coordination, as distinct from the
 Coordination's own (*each creature and planeswalker*).
-
-**Clause-mate**:
-Of an Anaphor, another argument of the same verb. A genitive's possessor and
-the Noun Phrase of a small clause are not clause-mates.

@@ -10,8 +10,8 @@ has four steps:
 1. Parse the `.syl` files ([`syl.md`](./syl.md) §2).
 2. Resolve names by expected sort, and expand Templates and Definitions ([`syl.md`](./syl.md)
    §3–§4).
-3. Read the expanded term left to right against a Discourse Representation Structure. This
-   resolves every reference (§2) and checks the term against the action-clause spine (§4).
+3. Build a Discourse Representation Structure from the expanded term, resolve every reference
+   against it (§2), and check the term against the action-clause spine (§4).
 4. Lower the term to the engine's core.
 
 Lean is a workbench for this model. It is never in the hot path: the Rust pipeline reads `.syl`
@@ -24,9 +24,9 @@ natively.
    ([`core.md`](./core.md)). Why: a term that mirrors the text
    can be checked against the text and spelled back into it. A hoisted term needs a second,
    hidden mapping to the wording, and that mapping is where readings go wrong.
-2. **Forward reading order.** Every argument is read in the discourse context of everything
-   textually earlier. There is no cataphora, except one clause-internal step of the Contrast Anchor
-   (§2.5), and no out-of-band announcement channel.
+2. **Printed reading order.** The term is read in the order the text prints it
+   ([`syl.md`](./syl.md) §5). Reading order does not limit reference direction: an anaphor may
+   resolve to a mention later in the text (§2.4). There is no out-of-band announcement channel.
    - Across an activated ability's colon, the effect reads every cost referent wherever the cost
      moved it ([CR#400.7j]).
    - A referent the text moves stays the same referent; the move is recorded on it (§2.1).
@@ -58,20 +58,15 @@ natively.
 
 ## 2. Discourse and Reference Resolution
 
-Reference is modeled explicitly with Discourse Representation Theory (DRT). Why: the measured
-anaphora rules (§2.4) need stable referent identities, clause boundaries, grammatical roles and
-nested boxes. Positional binding stacks cannot supply these, because a binding's position shifts
-as others are pushed and removed.
+Reference is modeled explicitly with Discourse Representation Theory (DRT). Why: anaphor resolution
+(§2.4) needs stable referent identities, clause boundaries and nested boxes. Positional binding
+stacks cannot supply these, because a binding's position shifts as others are pushed and removed.
 
 ### 2.1 The DRS
 
 - Every mention that introduces an entity, quantity, choice or outcome creates a referent with a
   stable identity. A re-mention resolves to the existing referent and creates nothing.
-- A referent records the clause it was last foregrounded in and its role there: subject, object or
-  other. Possessor mentions foreground their referent with role other, but they are never
-  clause-mates of the verb.
-- A re-mention in a direct argument slot is a clause-mate of the verb and is foregrounded in the
-  current clause.
+- Each mention has a grammatical role in its clause: subject, object or other (§4.2).
 - **Actors are not referents.** A Handoff makes its Actor the innermost for the Action it contains.
   Pronouns, groups and counts never read an Actor; only the `actor` word does.
 - A disjunctive noun phrase exports only the referents common to every branch. A coordination bound
@@ -93,16 +88,13 @@ spell or ability is put on the stack ([CR#601.2c,115.1]).
    accessible in the consequent and closed after it. A `doIf` with no else branch lets its branch's
    output, such as a token it creates, continue to later text, while its condition's referents
    close. With an else branch, branch-local non-targets are closed. An existential
-   ("there is …", `exists`) publishes its indefinite subject to the consequent. Inside a
-   replacement's condition, that subject ranks below earlier mentions for a plural pronoun and for
-   "the rest".
+   ("there is …", `exists`) publishes its indefinite subject to the consequent.
 3. **Negated or modal** (`cant`/`must`/`can`/`gatedBy`, `not`, an else branch). Hypothetical
    indefinite, counted and partitive participants are closed. Targets, definite references and
    universal domains stay accessible under their identities ([CR#101.2]).
-4. **Distributive loop** (`doForEach`). The body starts one clause after the header, so "it" in the
-   body selects the loop referent. On exit, the loop exports plural referents for the targets the
-   body announced and the objects it created. Each is a recorded discourse fact, not derived from
-   determiners or stamps.
+4. **Distributive loop** (`doForEach`). Each pass binds the loop referent for the body to read.
+   On exit, the loop exports plural referents for the targets the body announced and the objects
+   it created. Each is a recorded discourse fact, not derived from determiners or stamps.
 5. **Relative clause or comparison**, including the domain `countOf` and `aggregate` measure. It is
    closed on exit, so no later pronoun reads a measured domain. Attachment Hosts ("enchanted",
    "equipped") project to the ability's box ([CR#303.4b]).
@@ -131,9 +123,8 @@ only announced choices.
 
 ### 2.4 Anaphor Resolution
 
-Resolution runs in two stages: an accessibility filter, then a rule for each anaphor form.
-
-**Accessibility: a referent is accessible only if all four hold.**
+Resolution applies DRT techniques to the DRS, measured against a gold set of the corpus's
+endophora. Whatever the technique, a referent is accessible to an anaphor only if all four hold:
 
 1. No active Reference Scope hides it.
 2. Its number agrees with the anaphor's.
@@ -146,33 +137,16 @@ A **characteristic read** ("its power") may select a departed object by its last
 writes a departed object's information in the past tense, so a present-tense guard over a
 description with no zone or "card" reads the permanent as it is.
 
-**The rule for each form:**
-
-- **Clause-mate exclusion:** a pronoun in a direct argument slot excludes its clause-mates.
-- **Reflexives:** a reflexive requires a clause-mate subject.
-- **Bare pronouns:** take the nearest clause, then rank by role (subject, then object, then
-  other). Refuse a tie.
-- **Demonstratives:** exclude clause-mates. Prefer a referent other than one a same-clause
-  pronoun resolved to, but only when one exists. Then take the most recent.
-- **Participial Descriptions** ("the exiled card") require the unique referent the deed stamped.
-  They are the only references that reach objects a linked ability published ([CR#607.2a]).
-  "This way" reads only the current ability's stamps, since it is no linking phrase ([CR#607.1]).
-  Only a Participial Description written without "this way" reaches a linked ability's objects.
+**Participial Descriptions** ("the exiled card") require the unique referent the deed stamped.
+They are the only references that reach objects a linked ability published ([CR#607.2a]).
+"This way" reads only the current ability's stamps, since it is no linking phrase ([CR#607.1]).
+Only a Participial Description written without "this way" reaches a linked ability's objects.
 
 ### 2.5 The Contrast Anchor
 
 A bare printed "another" or "other" (`isOther`) excludes its Contrast Anchor, which need not be a
-target ([CR#702.151a,707.11]). `otherThan` is only for a printed "other than". A mention of the
-Source coordinated with the phrase is its anchor. Otherwise the anchor is, in order:
-
-1. the current member of a distributive group named by the phrase's clause subject. The amount is
-   then per member ([CR#611.2c]);
-2. the nearest earlier compatible mention in scope (kind, Card Type, zone and controller). This
-   excludes the Source, "you", the thing described, and hypotheticals introduced by a condition. A
-   delayed trigger's settled targets count ([CR#603.7c]);
-3. a compatible particular of the same clause, read forward, when "another X" is that clause's
-   agent;
-4. otherwise the Source for an object head, or "you" for a player head ([CR#109.5]).
+target ([CR#702.151a]). `otherThan` is only for a printed "other than". Resolution finds the
+anchor like any other reference (§2.4).
 
 ## 3. Definitions and Templates
 
@@ -239,8 +213,9 @@ subject, action and agent. A context adds only what is its own.
 ### 4.2 Voice
 
 Voice belongs to the Subject, not to the Action, so the passive needs no separate event. The
-passive matters only because it promotes the patient to grammatical subject, and roles drive
-pronoun resolution (§2.4). A Subject is one of three:
+passive matters only because it promotes the patient to grammatical subject. The patient is then
+read first, ahead of any agent, and that decides which occurrence of a parameter is its first
+mention ([`syl.md`](./syl.md) §4). A Subject is one of three:
 
 - `actor(np)`: active. `np` is read first and is the Actor.
 - `any`: passive with no agent. The patient is promoted to subject.
