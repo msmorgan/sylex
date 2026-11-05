@@ -1,7 +1,8 @@
 // Core verbs and their active Subcategorization Frames. Keyword actions
 // [CR#701.1] live in catalogs/keyword_actions.ron; auxiliaries and modals in
 // closed_class.ron. Verbs formed from keyword abilities (*cycle*, *crew*,
-// *equip*, …) are ordinary verbs of Category Verb and live here.
+// *equip*, …) are declared with their keywords in
+// catalogs/keyword_abilities.ron.
 [
     (lemma: "accept", frames: [Monotransitive]),
     // *add a booster pack to the draft*
@@ -132,6 +133,8 @@
     (lemma: "redistribute", frames: [Monotransitive]),
     // *reduce their speed below 1*
     (lemma: "reduce", frames: [Monotransitive, TransitiveWithPP(["by", "to", "below"])]),
+    // A locative Preposition Phrase as well as a predicative Complement
+    // (CGEL, Ch. 4 §5.2, p. 257).
     (lemma: "remain", frames: [Copular, Prepositional(["in", "on", "under", "outside", "among"])]),
     (lemma: "remove", frames: [Monotransitive, TransitiveWithPP(["from"])]),
     (lemma: "reorder", frames: [Monotransitive]),

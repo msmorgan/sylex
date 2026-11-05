@@ -1,5 +1,5 @@
-//! The core English lexicon and the Catalogs of English v4, as one Lexical
-//! Environment for `sylex_syntax`.
+//! The core English lexicon and the Catalogs, as one Lexical Environment for
+//! `sylex_syntax`.
 //!
 //! Core vocabulary (`lexicon/english/`) is declared with Core Provenance and
 //! is the only vocabulary a grammar may name. Catalog items (`catalogs/`) and

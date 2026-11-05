@@ -224,7 +224,8 @@ pub struct VerbEntry {
     #[serde(default)]
     pub frames: Vec<FrameSpec>,
     /// Every frame is restricted to active voice and derives no passive
-    /// (CGEL, Ch. 16 §10.1.2, p. 1432): *costs {1} less*, *has flying*.
+    /// (CGEL, Ch. 16 §10.1.2, p. 1432): *costs {1} less*, *has flying*. Only
+    /// a verb with frames may declare it.
     #[serde(default)]
     pub active_only: bool,
 }
@@ -300,11 +301,19 @@ impl NounDecl {
 
 /// An adjective. Its inflected grades, when it has them, are declared beside
 /// it and become adjectives of their own `Grade`.
+///
+/// An adjective not restricted to attributive use and spelled like a verb's
+/// past participle (*tapped*, *attached*) is that verb's Adjectival Passive:
+/// the loader marks the verb `AdjectivalPassive: Lexical`, and the grammar
+/// does not derive the adjective from the participle again. An action's adjective (*transformed*)
+/// is declared on its `KeywordAction`, a status's on its `Status`.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct AdjectiveEntry {
     #[serde(default)]
     pub position: Option<AdjectivePosition>,
+    /// `Overt` for an attributive adjective that requires its nominal to
+    /// have an overt determiner (*only*).
     #[serde(default)]
     pub determination: Option<Determination>,
     #[serde(default)]
@@ -641,9 +650,11 @@ pub enum KeywordParameter {
     Amount,
     /// A cost: mana-only after a space (*equip {2}*); when final, a cost
     /// containing words follows an em dash and ends in a period (*ward—Pay 3
-    /// life.*).
+    /// life.*). A final Cost lowers to one Production per spelling, carrying
+    /// `FinalParameter: Cost` or `FinalParameter: SetOffCost`.
     Cost,
-    /// A mana cost after an em dash: *suspend 4—{1}{U}*.
+    /// A mana cost after an em dash: *suspend 4—{1}{U}*. When final, it
+    /// carries `FinalParameter: SetOffCost`.
     DashCost,
     /// A condition after an em dash: *companion—…*.
     DashCondition,
@@ -655,6 +666,7 @@ pub enum KeywordParameter {
     /// A card name after the preposition named, if any: *partner with …*.
     Name(Option<String>),
     /// An ability after an em dash, which the keyword labels: *boast — {1}: …*.
+    /// When final, it carries `FinalParameter: SetOffAbility`.
     DashAbility,
     /// Power and toughness after an em dash: *prototype {1}{B} — 1/1*.
     DashPowerToughness,
@@ -849,7 +861,8 @@ pub enum NounDistribution {
     DirectMeasure,
     /// Used as a nominal head, with no attributive noun use. A non-count one
     /// is not a bare Predicative either: those uses are its adjective's
-    /// (*His tie is brown*; CGEL, Ch. 19 §3.3, p. 1642).
+    /// (*His tie is brown*; CGEL, Ch. 19 §3.3, p. 1642). `noun:target` is
+    /// one: its determiner use is the Targeting Marker, `det:target`.
     HeadOnly,
     /// Serial *time*, counting occasions: a Noun Phrase Adjunct with any
     /// determinative (*any time*, *an additional time*, *three times*),
