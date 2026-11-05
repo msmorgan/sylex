@@ -583,6 +583,9 @@ impl Lexicon {
         }
     }
 
+    /// Every licensed lexical occurrence in `text`, as overlapping edges over
+    /// its Unicode scalars, with no word split chosen. Words no declaration
+    /// covers are reported by [`AnalyzedText::unknown_words`], never guessed.
     #[must_use]
     pub fn analyze(&self, text: &str) -> AnalyzedText {
         self.analyze_source(text, None)

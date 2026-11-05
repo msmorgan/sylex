@@ -64,6 +64,16 @@ pub(crate) fn applicable(category: Category, form: WordForm, features: &FeatureB
 }
 
 /// The regular spelling of a Word Form of `lexeme`, from its lemma.
+///
+/// - Plural and third-person singular present: consonant + `y` becomes
+///   `ies`; a final `s`, `x`, `z`, `ch` or `sh` takes `es`; otherwise `s`.
+/// - Preterite and past participle: [`default_participle`].
+/// - Gerund-participle: final `ie` becomes `ying`; a final `e` drops except
+///   after `ee`, `oe` or `ye`; otherwise `ing`.
+/// - Every other form is the lemma.
+///
+/// Consonant doubling and every other irregular spelling are explicit
+/// overrides in the form declaration.
 #[must_use]
 pub fn default_surface(lexeme: &Lexeme, form: WordForm, features: &FeatureBundle) -> String {
     let lemma = &lexeme.lemma;
@@ -102,7 +112,8 @@ fn suffix_s(stem: &str) -> String {
 }
 
 /// The regular past-participle spelling, also used by explicitly declared
-/// participial-adjective derivations. Irregular spellings replace this rule.
+/// participial-adjective derivations: consonant + `y` becomes `ied`, a final
+/// `e` takes `d`, otherwise `ed`. Irregular spellings replace this rule.
 #[must_use]
 pub fn default_participle(stem: &str) -> String {
     if let Some(base) = consonant_y(stem) {

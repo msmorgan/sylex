@@ -120,8 +120,7 @@ pub trait NumeralCodec {
     /// # Errors
     ///
     /// Returns [`ParseNumeralError`] for Roman values outside -3,999 through
-    /// 3,999 other than `i32::MIN` and `i32::MAX`, and for retired ordinal
-    /// value -1 (orchestrator ruling R14e, 2026-10-09).
+    /// 3,999 other than `i32::MIN` and `i32::MAX`, and for ordinal value -1.
     fn try_format(self, value: i32) -> Result<String, ParseNumeralError>;
 
     /// Parses an integer written using this notation.

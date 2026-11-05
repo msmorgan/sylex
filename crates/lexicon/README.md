@@ -1,145 +1,65 @@
-# Independent lexical analysis
+# sylex_lexicon
 
-`Lexicon::new` freezes declared lexemes into analysis and realization indexes.
-`analyze` returns every licensed lexical occurrence; `realize` accepts a lexical
-value independently of source text. Shared grammar-facing values live in the
-data-only `types` module (lexeme identities, categories, inflectional forms,
-feature bundles, frame signatures and lexical values); declaration provenance,
-morphology, binding, tokenization, indexes, occurrences, numeral codecs, and
-realization stay in this deep module. This crate has no construction,
-catalog-I/O, game-model or grammar-compiler dependency. The governing contract is
-the parser contract in
-[English](../../docs/decisions/english.md) §7.
+Lexical analysis and realization for the English layer. It reads text as every
+declared Lexeme occurrence it could be, and spells a lexical value back out.
+Morphology, spelling variants, Onsets and the numeral codecs live here. It
+depends on no grammar, vocabulary file or Game Model.
 
-## Input and morphology
+The design of this layer is [Lexicon](../../docs/decisions/lexicon.md); what it
+owes the grammar is the parser contract in
+[English](../../docs/decisions/english.md) §7. Terms are the
+[glossary's](../../docs/contexts/oracle-english/CONTEXT.md).
 
-A `Lexeme` carries its stable identity, category, source, grammatical properties
-and frames. Each form declaration pairs one complete feature bundle with a
-default realization or explicit replacing spelling alternatives. Person, Number,
-Tense, Finiteness and Word Form remain separate. Missing dimensions are not
-expanded into guessed values. Finite verb bundles require Person and Tense. A
-finite verb form spelled alike in both numbers (*entered*, *can*) is one bundle
-unmarked for Number, since it does not agree in number;
-`Lexeme::merge_number_neutral_forms` merges such slots. Other equal spellings
-retain distinct bundles and identities.
+## Data flow
 
-The one default algorithm for each inflection is:
+1. Lexemes are declared elsewhere. `sylex_vocabulary`'s `LexicalEnvironment`
+   builds them from its RON files, the Catalogs and the card names; tests build
+   them with `Lexeme::invariant`, `Lexeme::noun` and `Lexeme::verb`.
+2. `Lexicon::new` validates the declarations, spells every form, and freezes
+   the analysis and realization indexes.
+3. `analyze_source_scoped`, given the face's names as scope, returns an
+   `AnalyzedText`: overlapping `LexicalMatch` edges over Unicode scalars, and
+   the unknown words. `sylex_syntax`'s chart reads it from there.
+4. `realize` spells a `LexicalReading`, whether analysis produced it or it was
+   constructed independently.
 
-| Form | Default |
-|---|---|
-| Invariant, singular noun, plain verb, non-third-singular present | Lemma |
-| Plural noun, third-singular present | Consonant + `y` → `ies`; final `s`, `x`, `z`, `ch`, `sh` → `es`; otherwise append `s` |
-| Preterite, past participle | Consonant + `y` → `ied`; final `e` → `d`; otherwise append `ed` |
-| Gerund-participle | Final `ie` → `ying`; drop final `e` except after `ee`, `oe`, `ye`; otherwise append `ing` |
+```rust
+let lexicon = sylex_lexicon::Lexicon::new(lexemes)?;
+let analyzed = lexicon.analyze_source_scoped(text, None, &face_names);
+for occurrence in &analyzed.matches {
+    let spelling = lexicon.realize(&occurrence.reading)?;
+}
+```
 
-Consonant doubling and lexical exceptions are explicit overrides; the analyzer
-does not infer stress or paradigm classes. An override replaces the default for
-the selected slot. Multiple valid spellings occupy explicit variant indices.
-There is no fallback dictionary or unknown-word POS inference.
+Subcategorization Frames are not lexicon data: they live in
+`sylex_syntax::FrameCatalog`.
 
-`sylex_vocabulary` declares the English vocabulary and its
-`LexicalEnvironment` loader builds the `Lexicon` from `lexicon/english/*.ron`
-(closed-class vocabulary, pronoun bundles, auxiliary paradigms, irregular
-replacements and frame additions), `catalogs/*.ron` (the Comprehensive Rules'
-catalog items) and the generated card names. Optional RON exports are
-inspection artifacts, not an input interface: the prototype `FrameItem`
-representation changed when correlated marked slots entered the shared model,
-so regenerate old artifacts rather than expecting backward deserialization.
-Catalog phrases remain whole entries; their internal words are not added as new
-lexemes.
-
-Ordinary verbs acquire the regular paradigm before overrides. Old verb
-`Unavailable` markers based on nonattestation are reported as retired source
-policy; they do not suppress forms. The declared modal paradigms contain only their applicable finite forms;
-no regular nonfinite paradigm is guessed for them. Supplemental adjectives are
-loaded only when the keyword declaration explicitly requests that derivation;
-the regular participle rule above and explicit replacements also drive their
-realization.
-
-## Occurrences and spelling
-
-The lossless atomic sequence uses Unicode scalars. Lexical matches are edges
-between scalar occurrences; this permits overlapping multiword forms and bound
-prefixes/suffixes without committing to a word split. Whitespace and punctuation
-remain in the sequence. Byte ranges are derived when requested and are absent
-from lexical value identity. Raw and externally normalized text are kept distinct.
-This ticket's corpus command analyzes raw text, including reminders.
-
-Free forms require word edges; Unicode combining marks belong to those words.
-`Binding` explicitly relaxes the left, right or both edges. Declared prefixes
-expose a following host boundary and declared suffixes expose a preceding one,
-including chains of bound forms. This is independent lexical segmentation:
-Category, host and allomorph constraints remain grammatical admission work.
-Multiword separators
-must match the declared spelling exactly. `Capitalization::Initial` adds a
-first-scalar uppercase realization when it differs from the declared spelling;
-the reading records that choice. It does not license arbitrary case folding.
-The grammar will constrain where an initial realization is appropriate.
-
-`Lexicon::surface_features` exposes frozen pronunciation and positional casing
-capabilities for each licensed lexical value. `Lexeme::onsets` declares onset
-overrides keyed by exact declared spelling; `article_onsets` declares the onset
-required by each indefinite-article variant. Overrides must name realized forms,
-and article requirements must cover every variant of a determinative. Generated
-initial spellings inherit these features from their declared variant. A declared
-capitalized name permits both initial and interior use without changing identity.
-
-The bounded default pronunciation recipe uses the first word of a multiword or
-hyphenated form, spoken cardinal notation for numerals, letter names for uppercase
-initialisms, and declared English silent-h and consonantal-vowel prefix defaults.
-ASCII orthography is its final fallback; unknown onsets remain absent. Explicit
-overrides take precedence when that default does not describe the pronunciation.
-This normalization belongs to lexical realization; grammatical admission reads
-the resulting `Consonant`/`Vowel` feature, never the spelling or lexeme identity.
-
-`SurfaceStructure::Word` rejects embedded whitespace, separators and quotation
-boundaries in lemmas and overrides. Internal hyphens and apostrophes are word
-characters only in their permitted spelling positions. An internal slash
-between alphabetic characters is also permitted in an explicitly declared word;
-numeric slash notation retains its separate notation category. `Multiword` declares a
-sequence of words with exact single-space separators. `Opaque` is reserved for
-catalog, keyword and notation categories; a noun cannot escape word validation
-by claiming an opaque spelling. Catalog and keyword entries retain their exact
-atomicity, including internal punctuation, without declaring their constituent
-words as lexemes.
-
-Genitive clitics and negative prefixes have their own declared categories and
-binding. Contracted auxiliary endings retain full finite bundles; straight and
-curly apostrophes are explicit spelling variants. A genitive and a contracted
-auxiliary may share the same ending without sharing grammatical identity. The
-inventory does not decide which host or use is admissible.
-
-The numeral codecs recognize cardinal, ordinal, Arabic and Roman notation
-alongside ordinary lexical entries. They never claim exclusive ownership of
-`one`, `I` or any other spelling. A numeric reading retains value, notation and
-case. Checked realization rejects lossy Roman values: finite magnitudes through
-3999 and the two integer extrema roundtrip; intermediate saturated values do not.
-
-## Corpus accounting and inspection
+## Inspecting
 
 ```sh
-cargo xtask lexical --data data/scryfall/oracle-cards.jsonl --all \
+cargo xtask lexical --all \
   --output /tmp/lexical-inventory.json --export /tmp/lexemes.ron
 cargo run -p sylex_lexicon --example inspect -- /tmp/lexemes.ron 'counters'
 ```
 
-Use the command's face selectors during development; pass `--export-subset`
-to retain the selected source records as JSONL. The report retains raw face
-text, input digests, byte occurrences, overlapping material classes, unknown
-words and unrecognized nonword material, analyzed in each face's card-name
-scope. Ordinary vocabulary, catalogs, keywords, numerals, symbols, affixes and
-clitics are accounted separately. Schema 3 lists every indexed lexical owner with its
-Category, properties, frame signatures and independently checked value count.
-Every unknown word remains named; every nonlexical scalar is classified as a
-structural separator, notation material or unresolved nonword. Those classes
-are source accounting, not lexical or grammatical licenses. In particular,
-classifying braces as notation does not license an unknown symbol inside them.
-A word is covered only by a contiguous lexical path, including a containing
-multiword entry; crossing overlaps alone cannot hide a remainder.
+`cargo xtask lexical` analyzes each selected face's raw Oracle text, reminder
+text included, in its card-name scope. Its report names every unknown word,
+classifies every scalar no Lexeme covers, and checks both lexical laws below
+across the corpus. Narrow it with the face selectors (`--card-name`,
+`--text-contains` and the rest) in place of `--all`; `--export-subset` saves
+the selected cards as JSONL. The `--export` RON is an inspection artifact, not
+an input format: regenerate it after the model changes. The `inspect` example
+loads it and prints the occurrences in a string.
 
-Every returned occurrence must realize exactly to its source substring. Every
-indexed lexical value is also realized independently and recovered as the same
-complete reading. Numeral property tests exercise independently generated values.
-These are lexical laws: an indexed word or covered face is not evidence that
-the construction grammar admits a card. Chart integration owns grammatical
-composition, separator admission and generated construction roundtripping.
+## Working rules
+
+- Declare words in `sylex_vocabulary`, never here.
+- Fix a wrong default spelling with an override on its Lexeme, not with a new
+  rule in the morphology ([Lexicon](../../docs/decisions/lexicon.md) §2).
+- Keep both lexical laws: every returned occurrence realizes to exactly its
+  source substring, and every indexed value realizes and analyzes back to the
+  same reading. `tests/analysis.rs` holds them, and `cargo xtask lexical`
+  checks them over the corpus.
+- Lexical coverage is not grammatical coverage. A face whose every word
+  analyzes is no evidence that the grammar admits it; the Census in
+  `sylex_english` measures that.

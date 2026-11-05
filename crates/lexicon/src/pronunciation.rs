@@ -2,8 +2,13 @@ use crate::Numeral;
 use crate::NumeralCodec;
 use crate::Onset;
 
-/// Normalization recipe for declared spellings. Overrides take precedence;
-/// orthography is the final fallback, never the grammatical admission rule.
+/// Normalization recipe for declared spellings, read from the first word of a
+/// multiword or hyphenated form: digits are spoken as a cardinal, an uppercase
+/// initialism by its first letter name, and declared silent-`h` and
+/// consonantal-vowel prefixes override the first letter. Otherwise the first
+/// ASCII letter decides; an unknown onset stays `None`. Declared overrides
+/// take precedence, and the grammar reads only the resulting [`Onset`],
+/// never the spelling.
 pub(crate) fn default_onset(surface: &str) -> Option<Onset> {
     let word = surface
         .split(|c: char| c.is_whitespace() || c == '-')

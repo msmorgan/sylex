@@ -47,29 +47,43 @@ pub struct Source {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Capitalization {
+    /// Only the declared spelling.
     Exact,
+    /// The declared spelling, plus a variant with its first scalar uppercased
+    /// when that differs. The reading records which was written
+    /// ([`crate::SurfaceCase`]); no other case folding is licensed.
     Initial,
 }
 
 /// Bound entries relax only the declared word edge, never whitespace matching.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Binding {
+    /// Both edges must be word edges.
     Free,
+    /// The right edge may abut a following host.
     Prefix,
+    /// The left edge may abut a preceding host.
     Suffix,
+    /// Either edge may abut a host.
     Bound,
 }
 
 /// The declared internal boundaries of a lexical spelling.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Deserialize, Serialize)]
 pub enum SurfaceStructure {
+    /// One word: no whitespace, separator or quotation boundary. A hyphen or
+    /// apostrophe must sit between word characters, except at the edges a
+    /// bound form relaxes ([`Binding`]); a slash must sit between alphabetic
+    /// characters.
     #[default]
     Word,
     /// An explicitly declared sequence of words separated by single spaces.
     Multiword,
     /// A declared Arabic measure pair followed by a single noun head word.
     MeasuredCompound,
-    /// Catalog and notation entries retain their declared atomicity.
+    /// Catalog and notation entries retain their declared atomicity. Only the
+    /// Catalog, Keyword, Symbol and Numeral categories may declare it, so an
+    /// ordinary word cannot escape word validation.
     Opaque,
 }
 
