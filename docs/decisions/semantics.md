@@ -283,8 +283,6 @@ Event decisions:
 - **Being an effect follows from the enclosing node.** No Action carries an effect flag, so a
   Saga's turn-based lore counter is no effect ([CR#614.16,714.3c]). A performer and a cause are
   independent.
-- **A retention** ("this effect doesn't remove …") wraps the one clause it exempts, never a
-  conjunction ([CR#702.16n,702.16p]).
 - **Damage is composed, not special.** Damage results are conferred properties
   ([CR#120.3a,120.3c,120.3e,120.4c]). Wither and infect replace the marking results
   ([CR#702.80a,702.90b]). Prevention, redirection and scaling replace the damage event
