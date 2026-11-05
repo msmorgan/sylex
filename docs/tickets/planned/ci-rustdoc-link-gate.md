@@ -1,67 +1,40 @@
 ---
 needs: []
 ---
-**Make `cargo doc` usable as a gate: the `[CR#…]` citation format collides with
-rustdoc's intra-doc link syntax.** `cargo doc --workspace --no-deps` currently
-emits **1601** unresolved-link warnings, of which **~1532** are `[CR#…]`
-citations in doc comments being parsed by rustdoc as intra-doc links to a
-nonexistent item named `CR`. The repo's mandated citation spelling and
-rustdoc's `[Item]` link syntax are the same characters.
 
-**Why this matters — a defect class no gate catches.** A broken rustdoc
-intra-doc link is invisible to `cargo clippy` and to the test suite; only
-rustdoc reports it, and CI runs neither. Deleting a public type therefore
-leaves a silent trail of dead doc links behind a fully green battery. This is
-not hypothetical: `core-pay-player-action` deleted `PlayerAction`, `By`,
-`MayPay`, `MustPay`, and the `GainLife`/`LoseLife`/`SetLife` family, and three
-broken links to `PlayerAction` (`continuous.rs`, `effect.rs` ×2) survived
-clippy, the full workspace suite, `idris-check`, `fidelity`, and `cite check`.
-They were found only by grepping for them by hand. The reason a real check
-could not be run instead is exactly this ticket: **the ~1532 false positives
-bury the real ones**, so the warning count carries no signal.
+# Make `cargo doc` a gate: escape bracketed citations and placeholders
 
-**Constraint.** The bracket format is not negotiable by itself — `CLAUDE.md`
-mandates `[CR#704.5g]` / `[CR#601.2g,106.4]` / `[CR#601.2a..601.2b]`, and
-`cargo xtask cite check --list-noncompliant` flags both the unbracketed
-`CR`-prefixed spelling and a loose bare rule number in prose. (This ticket
-deliberately does not spell those two counter-example forms out: doing so trips
-the checker, as the first draft of this file discovered.) Whatever fix lands
-must leave `cite check`,
-`cite check --list-noncompliant`, `cite bless`, and `cite audit --diff` all
-working on the new spelling, and must not silently drop citations from the
-10625 the checker currently tracks.
+**Why.** A broken intra-doc link is invisible to clippy and the tests; only rustdoc reports it, and
+no gate runs rustdoc. Deleting a type can therefore leave dead doc links behind a green run. The
+check is unusable today because doc-comment citations in the mandated `[CR#…]` format parse as
+intra-doc links to a nonexistent item `CR`: they are about 2,600 of the 2,750 warnings
+`cargo doc --workspace --no-deps` emits, and they bury the real ones.
 
-**Approaches, roughly in order of preference:**
+**Approach.** Escape only the opening bracket of a doc-comment citation: `\[CR#702.148a]`. Rustdoc
+renders it as the literal citation, and `cargo xtask cite` extracts the rule numbers unchanged
+(verified for single rules, comma lists and `..` ranges). Escaping the closing bracket too is wrong:
+the checker reads the trailing backslash into the rule number and reports it malformed. Bracketed
+placeholders in doc prose (`[2]`, `[Vampire]`, `[,]`, `[who]`) get the same opening-bracket escape;
+code-like text goes in backticks.
 
-1. **Backslash-escape the brackets in doc comments** — a `\` before each
-   bracket makes rustdoc render literal brackets rather than parse a link.
-   Requires teaching the `cite` tooling to accept the escaped form and a
-   mechanical sweep over every doc-comment citation. Two traps this file hit
-   while being written: the escaped spelling cannot be quoted verbatim in
-   prose (the checker reads the trailing backslash as part of the rule number
-   and reports MALFORMED), and the rendered output must still read as an
-   ordinary bracketed citation.
-2. **A narrower rustdoc lint scope** — do NOT reach for a blanket
-   `#![allow(rustdoc::broken_intra_doc_links)]`; that suppresses the genuine
-   breakage this ticket exists to expose.
-3. **A different in-doc-comment delimiter** for citations, with the checker
-   taught both spellings. Least attractive — it splits the convention.
+**Done when.**
+- Every `[CR#` in a `///` or `//!` doc comment is written `\[CR#`. This is a mechanical sweep
+  (about 5,300 citations in about 210 files across 16 crates); plain `//` comments and non-Rust
+  files are untouched.
+- Bracketed placeholders in doc comments are escaped, and HTML-like text (`<effect>`, `<filter>`) is
+  in backticks.
+- Every remaining warning that is a real dead link is fixed (for example `Predicate::r#type`,
+  `crate::Selection::That`, `SubtypeRef`, `DeonticAction::Cast`, `crate::render::template`,
+  `sylex_plugin_v1::Strategy`, `VerbName`), and the private-item link
+  (`discard_body_whose` → `hand_owner_ref`) is fixed.
+- `cargo doc --workspace --no-deps` emits no warnings, and joins the CI gates.
+- `cargo xtask cite check` reports 0 stale and 0 non-compliant, and the number of tracked citations
+  is unchanged by the sweep.
+- `CLAUDE.md`'s citation rule states the escaped form for doc comments.
 
-**Then triage what is left.** The residual ~69 warnings are a mix of
-English-word placeholders inside quoted example sentences (`"unless [who] pays
-[cost]"`, `"If [event] would happen, [effect] instead"` — the same
-bracket-prose convention) and a genuine tail in unrelated subsystems:
-`Fragment`, `Display`, `FaceLayout`, `Self::Adjective`/`Self::Noun`,
-`crate::render::template`, `OneShotEffect::Batch`, `DeonticAction::Cast`,
-`crate::Selection::That`, `SubtypeRef`, `crate::layer`, `Predicate::r#type`,
-`sylex_plugin_v1::Strategy`, `VerbName`. The quoted-placeholder cases want the
-same escaping treatment as the citations; the rest are real dead links to fix.
+**Not in scope.** Changing the citation format elsewhere (Markdown, `.syl`, `.ron`, plain comments).
+A blanket `#![allow(rustdoc::broken_intra_doc_links)]`, which would hide exactly the breakage this
+exists to expose.
 
-**Acceptance:** `cargo doc --workspace --no-deps` reaches a known-zero (or
-pinned-baseline) warning count, `cite check` still reports 0 stale and 0
-non-compliant over the full citation set, and the doc build joins the gate
-battery so that deleting a type can never again leave dead links behind a green
-run.
-
-Related: [[comment-discipline-sweep]] (doc-comment hygiene at scale),
-[[core-pay-player-action]] (the effort that surfaced the three silent breaks).
+**Pointers.** `crates/xtask/src/cite.rs` (`bracketed_refs`, `blank_bracketed_citations`),
+`.github/workflows/ci.yml`, `CLAUDE.md` (CR citations).
