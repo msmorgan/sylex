@@ -31,9 +31,11 @@ A Keyword Ability made of component Abilities that stay parts of the one named k
 What one registry declaration (a Counter, Subtype, Card Type or Designation) means: the rules
 content its name stands for.
 
-**Card Class**:
-Whether a card is a permanent card or an instant or sorcery card, which selects a keyword's
-meaning where the rules define it differently for each ([CR#110.4,110.4a]).
+**Permanent Type**:
+A Card Type that is one of the six permanent types: artifact, battle, creature, enchantment,
+land and planeswalker ([CR#110.4]). Whether an object is a permanent card or spell, or an
+instant or sorcery, follows from the types of the face it has, so a card's faces can differ
+([CR#110.4a,110.4b]).
 
 **Same-Is-True-For Ability**:
 One Ability printed for the first keyword of a list and applied in turn to each keyword "the

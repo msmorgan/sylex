@@ -1,4 +1,5 @@
-# `onPermanent` on a permanent card and `onInstantOrSorcery` on an instant or sorcery card: a
-# keyword the rules define by Card Class [CR#110.4,110.4a].
+# `onPermanent` on a permanent and `onInstantOrSorcery` on an instant or sorcery spell: a keyword
+# the rules define differently for each, read from the object's current Permanent Types
+# [CR#110.4,110.4a].
 # [CR#110.4,110.4a]
 primitive byCardClass(onPermanent: Ability, onInstantOrSorcery: Ability): Ability
