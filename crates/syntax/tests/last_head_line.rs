@@ -34,20 +34,21 @@ fn lexicon() -> Lexicon {
 /// Production does (*power 3 or less*), but declares no `coordinator`. A
 /// `Long` group ends in a dependent; a `Plain` one ends in its head.
 fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
-    let text = r#"(
-        root: "Sentence",
-        categories: { "Sentence": (), "Group": (), "Temporal": () },
-        closed_words: { "This": "d:this", "Or": "c:or" },
-        productions: [
-            (name: "Statement", lhs: "Sentence", rhs: [Cat("head", "Group"), Punct('.')]),
-            (name: "Plain", lhs: "Group", rhs: [Lex("head", Noun)]),
-            (name: "Long", lhs: "Group", rhs: [Lex("head", Noun), Cat("modifier", "Temporal")]),
-            (name: "This", lhs: "Temporal", rhs: [Word("determiner", "This"), Lex("head", Noun)]),
-            (name: "Alternative", lhs: "Group", rhs: [Cat("first", "Group"), Word("coordinator", "Or"), Cat("last", "Group")]),
-        ],
-    )"#;
+    let text = r#"
+        root Sentence
+        category Group
+        category Sentence
+        category Temporal
+        word Or = "c:or"
+        word This = "d:this"
+        Statement: Sentence -> Group '.'
+        Plain: Group -> Lex(Noun)
+        Long: Group -> Lex(Noun) modifier:Temporal
+        This: Temporal -> determiner:Word(This) Lex(Noun)
+        Alternative: Group -> first:Group coordinator:Word(Or) last:Group
+    "#;
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(text).unwrap(),
+        &Grammar::from_fug_str(text).unwrap(),
         lexicon,
         &FrameCatalog::default(),
     )

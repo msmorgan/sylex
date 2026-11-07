@@ -45,65 +45,55 @@ const FRAMES: &str = r#"(
     },
 )"#;
 
-/// The verb Valence schema's declarations, the grammar-level ones and a
-/// Premodification's are spliced in.
-fn grammar(valence: &str, grammar_level: &str, premodification: &str) -> String {
+/// The verb Valence schema's declarations, the equations of the `NP` slot, a
+/// High Attachment declaration and a Premodification are spliced in.
+fn grammar(
+    valence: &str,
+    np_slot_equations: &str,
+    high_attachment: &str,
+    premodification: &str,
+) -> String {
     format!(
-        r#"(
-    root: "Sentence",
-    features: {{
-        "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"],
-        "Voice": ["Active", "Passive"],
-        "Case": ["Nominative", "Accusative", "Genitive"],
-        "ComplementKind": ["NP", "Intransitive"],
-        "Inflection": ["Invariant", "IndependentGenitive", "Singular", "Plural", "Plain", "Present", "Preterite", "Irrealis", "GerundParticiple", "PastParticiple"],
-    }},
-    categories: {{
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm", "Voice"], gap: true),
-        "AdjectivePhrase": (features: ["Voice"]),
-        "NounPhrase": (features: ["Case"]),
-        "Nominal": (features: ["Case"]),
-        "Participle": (features: ["Inflection"]),
-        "PrepositionPhrase": (features: ["ComplementKind"], gap: true),
-    }},
-    closed_words: {{ "By": "p:by" }},
-    slot_categories: {{
-        NP: "NounPhrase",
-        PP: "PrepositionPhrase",
-    }},
-    {grammar_level}
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "Plain")]),
-        (name: "Passive", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('!')],
-            equations: [Require("clause.Voice", "Passive")]),
-        (name: "Adjectival", lhs: "Sentence", rhs: [Cat("head", "AdjectivePhrase"), Punct('?')]),
-        (name: "Bare", lhs: "NounPhrase", rhs: [Cat("head", "Nominal")]),
-        (name: "Fragment", lhs: "Sentence", rhs: [Cat("head", "NounPhrase"), Punct(';')]),
-    ],
-    schemas: [
-        {premodification}
-        Valence(head: Verb, phrase: "VerbPhrase", {valence}),
-        Valence(head: Preposition, phrase: "PrepositionPhrase", complement_kind: Some("ComplementKind")),
-        Valence(head: Noun, phrase: "Nominal"),
-    ],
-)"#
+        r#"
+            root Sentence
+            feature Case = Nominative | Accusative | Genitive
+            feature ComplementKind = NP | Intransitive
+            feature Inflection = Invariant | IndependentGenitive | Singular | Plural | Plain | Present | Preterite | Irrealis | GerundParticiple | PastParticiple
+            feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+            feature Voice = Active | Passive
+            category AdjectivePhrase [Voice]
+            category Nominal [Case]
+            category NounPhrase [Case]
+            category Participle [Inflection]
+            category PrepositionPhrase [ComplementKind] {{ gap }}
+            category Sentence
+            category VerbPhrase [VerbForm, Voice] {{ gap }}
+            word By = "p:by"
+            slot NP = NounPhrase {np_slot_equations}
+            slot PP = PrepositionPhrase
+            {high_attachment}
+            Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+            Passive: Sentence -> clause:VerbPhrase '!' where clause.Voice = Passive
+            Adjectival: Sentence -> AdjectivePhrase '?'
+            Bare: NounPhrase -> Nominal
+            Fragment: Sentence -> NounPhrase ';'
+            {premodification}
+            valence VerbPhrase {{ head: Verb, {valence} }}
+            valence PrepositionPhrase {{ head: Preposition, complement_kind: ComplementKind }}
+            valence Nominal {{ head: Noun }}
+        "#
     )
 }
 
-const VOICES: &str = r#"active: [Require("$.Voice", "Active")], passive: Some("By"),
-    verbal_passive: [Require("$.Voice", "Passive"), Require("$.VerbForm", "PastParticiple")],
-    prepositional_passive: [Require("$.Voice", "Passive"), Require("$.VerbForm", "PastParticiple")],
-    adjectival: Some("AdjectivePhrase"),
-    adjectival_passive: [Require("head.VerbForm", "PastParticiple"), Require("$.Voice", "Passive")]"#;
+const VOICES: &str = "active: [$.Voice = Active], passive: By, verbal_passive: [$.Voice = Passive, $.VerbForm = PastParticiple], prepositional_passive: [$.Voice = Passive, $.VerbForm = PastParticiple], adjectival: AdjectivePhrase, adjectival_passive: [head.VerbForm = PastParticiple, $.Voice = Passive]";
 
-const PREMODIFICATION: &str = r#"Premodification(head: Verb, modifier: "Participle", host: "Nominal", forms: [PastParticiple]),"#;
+const PREMODIFICATION: &str =
+    "premodification Participle { head: Verb, host: Nominal, forms: [PastParticiple] }";
 
 fn bind(text: &str) -> Result<(Lexicon, CompiledGrammar), LoadError> {
     let lexicon = lexicon();
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(text).unwrap(),
+        &Grammar::from_fug_str(text).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )?;
@@ -125,7 +115,7 @@ fn load_error(text: &str) -> String {
 
 #[test]
 fn the_declared_equations_value_each_derived_voice() {
-    let text = grammar(VOICES, "", "");
+    let text = grammar(VOICES, "", "", "");
     assert_eq!(count(&text, "Destroy Zombie."), 1);
     assert_eq!(count(&text, "Destroyed!"), 1);
     assert_eq!(count(&text, "Destroyed by Zombie!"), 1);
@@ -134,36 +124,32 @@ fn the_declared_equations_value_each_derived_voice() {
 
 #[test]
 fn a_passive_without_its_equations_is_a_load_error() {
-    let error = load_error(&grammar(r#"passive: Some("By")"#, "", ""));
+    let error = load_error(&grammar("passive: By", "", "", ""));
     assert!(error.contains("verbal_passive"), "{error}");
 }
 
 #[test]
 fn an_adjectival_passive_without_its_equations_is_a_load_error() {
     let valence = VOICES.replace(
-        r#"adjectival_passive: [Require("head.VerbForm", "PastParticiple"), Require("$.Voice", "Passive")]"#,
+        ", adjectival_passive: [head.VerbForm = PastParticiple, $.Voice = Passive]",
         "",
     );
-    let error = load_error(&grammar(&valence, "", ""));
+    let error = load_error(&grammar(&valence, "", "", ""));
     assert!(error.contains("adjectival_passive"), "{error}");
 }
 
 #[test]
 fn a_complement_kind_the_phrase_does_not_carry_is_a_load_error() {
-    let valence = format!(r#"{VOICES}, complement_kind: Some("ComplementKind")"#);
-    let error = load_error(&grammar(&valence, "", ""));
+    let valence = format!("{VOICES}, complement_kind: ComplementKind");
+    let error = load_error(&grammar(&valence, "", "", ""));
     assert!(error.contains("does not carry"), "{error}");
 }
 
 #[test]
 fn slot_equations_constrain_every_frame_slot_of_their_kind() {
-    let undeclared = grammar(VOICES, "", "");
+    let undeclared = grammar(VOICES, "", "", "");
     assert_eq!(count(&undeclared, "Destroy he."), 1);
-    let declared = grammar(
-        VOICES,
-        r#"slot_equations: { NP: [Exclude("slot.Case", "Nominative")] },"#,
-        "",
-    );
+    let declared = grammar(VOICES, "where slot.Case != Nominative", "", "");
     assert_eq!(count(&declared, "Destroy he."), 0);
     assert_eq!(count(&declared, "Destroy Zombie."), 1);
 }
@@ -172,7 +158,8 @@ fn slot_equations_constrain_every_frame_slot_of_their_kind() {
 fn a_high_attachment_declaration_names_declared_values() {
     let error = load_error(&grammar(
         VOICES,
-        r#"high_attachment: [("PrepositionPhrase", "ComplementKind", "Distributive")],"#,
+        "",
+        "high_attachment PrepositionPhrase where $.ComplementKind = Distributive",
         "",
     ));
     assert!(error.contains("high attachment"), "{error}");
@@ -180,13 +167,13 @@ fn a_high_attachment_declaration_names_declared_values() {
 
 #[test]
 fn premodification_equations_constrain_their_form() {
-    let undeclared = grammar(VOICES, "", PREMODIFICATION);
+    let undeclared = grammar(VOICES, "", "", PREMODIFICATION);
     assert_eq!(count(&undeclared, "Destroyed Zombie;"), 1);
     let excluded = grammar(
         VOICES,
         "",
-        r#"Premodification(head: Verb, modifier: "Participle", host: "Nominal", forms: [PastParticiple],
-            equations: [(PastParticiple, [Exclude("head.Inflection", "PastParticiple")])]),"#,
+        "",
+        "premodification Participle { head: Verb, host: Nominal, forms: [PastParticiple], equations: [PastParticiple -> [head.Inflection != PastParticiple]] }",
     );
     assert_eq!(count(&excluded, "Destroyed Zombie;"), 0);
 }
@@ -196,8 +183,8 @@ fn premodification_equations_name_only_its_forms() {
     let error = load_error(&grammar(
         VOICES,
         "",
-        r#"Premodification(head: Verb, modifier: "Participle", host: "Nominal", forms: [PastParticiple],
-            equations: [(GerundParticiple, [])]),"#,
+        "",
+        "premodification Participle { head: Verb, host: Nominal, forms: [PastParticiple], equations: [GerundParticiple -> []] }",
     ));
     assert!(error.contains("GerundParticiple"), "{error}");
 }

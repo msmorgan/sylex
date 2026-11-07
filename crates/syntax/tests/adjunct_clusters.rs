@@ -43,40 +43,45 @@ const FRAMES: &str = r#"(
 )"#;
 
 fn count(text: &str) -> usize {
-    let source = r#"(
-    root: "Sentence",
-    features: { "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"] },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm"]),
-        "NounPhrase": (),
-        "PrepositionPhrase": (),
-        "PrepositionRemnant": (),
-        "Adjunct": (),
-        "Cluster": (),
-        "Clusters": (category: Some("Cluster")),
-        "AdjunctCluster": (),
-        "AdjunctClusters": (category: Some("AdjunctCluster")),
-    },
-    lexical_classes: { "Coordinator": ["c:and"] },
-    slot_categories: { NP: "NounPhrase" },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("head", "VerbPhrase"), Punct('.')], equations: [Require("head.VerbForm", "Plain")]),
-        (name: "Noun", lhs: "NounPhrase", rhs: [Lex("head", Noun)]),
-        (name: "PredicateAdjunct", lhs: "Adjunct", rhs: [Hosted("filler", "PrepositionPhrase", Predicate)]),
-    ],
-    schemas: [
-        Valence(head: Verb, phrase: "VerbPhrase",
-            clusters: Some((cluster: "Cluster", coordination: "Clusters", adjunct: Some("Adjunct"),
-                adjunct_clusters: Some((cluster: "AdjunctCluster", coordination: "AdjunctClusters", preposition: "PrepositionPhrase", remnant: "PrepositionRemnant"))))),
-        Valence(head: Preposition, phrase: "PrepositionPhrase", remnants: [(NP, "PrepositionRemnant")]),
-        Adjunct(host: "VerbPhrase", adjunct: "PrepositionPhrase", side: After, host_kind: Predicate, cost: 1),
-        Coordination(category: "AdjunctClusters", conjunct: Some("AdjunctCluster"), coordinators: "Coordinator", parallel: true),
-    ],
-)"#;
+    let source = r#"
+        root Sentence
+        feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+        category Adjunct
+        category AdjunctCluster
+        category AdjunctClusters : AdjunctCluster
+        category Cluster
+        category Clusters : Cluster
+        category NounPhrase
+        category PrepositionPhrase
+        category PrepositionRemnant
+        category Sentence
+        category VerbPhrase [VerbForm]
+        class Coordinator = ["c:and"]
+        slot NP = NounPhrase
+        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Noun: NounPhrase -> Lex(Noun)
+        PredicateAdjunct: Adjunct -> filler:Hosted(PrepositionPhrase, Predicate)
+        valence VerbPhrase {
+            head: Verb,
+            clusters: {
+                cluster: Cluster,
+                coordination: Clusters,
+                adjunct: Adjunct,
+                adjunct_clusters: {
+                    cluster: AdjunctCluster,
+                    coordination: AdjunctClusters,
+                    preposition: PrepositionPhrase,
+                    remnant: PrepositionRemnant,
+                },
+            },
+        }
+        valence PrepositionPhrase { head: Preposition, remnants: [NP -> PrepositionRemnant] }
+        adjunct PrepositionPhrase { host: VerbPhrase, side: After, host_kind: Predicate }
+        coordination AdjunctClusters { coordinators: Coordinator, conjunct: AdjunctCluster, parallel }
+    "#;
     let lexicon = lexicon();
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(source).unwrap(),
+        &Grammar::from_fug_str(source).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )

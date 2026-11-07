@@ -49,31 +49,24 @@ const FRAMES: &str = r#"(
 )"#;
 
 fn grammar(obligatory: bool) -> String {
+    let obligatory = if obligatory { ", obligatory" } else { "" };
     format!(
-        r#"(
-    root: "Sentence",
-    features: {{
-        "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"],
-    }},
-    categories: {{
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm"]),
-        "NounPhrase": (),
-        "Nominal": (),
-        "PrepositionPhrase": (),
-    }},
-    slot_categories: {{ NP: "NounPhrase", PP: "PrepositionPhrase" }},
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "Plain")]),
-        (name: "Bare", lhs: "NounPhrase", rhs: [Cat("head", "Nominal")]),
-    ],
-    schemas: [
-        Valence(head: Verb, phrase: "VerbPhrase"),
-        Valence(head: Preposition, phrase: "PrepositionPhrase"),
-        Valence(head: Noun, phrase: "Nominal", obligatory: {obligatory}),
-    ],
-)"#
+        r"
+            root Sentence
+            feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+            category Nominal
+            category NounPhrase
+            category PrepositionPhrase
+            category Sentence
+            category VerbPhrase [VerbForm]
+            slot NP = NounPhrase
+            slot PP = PrepositionPhrase
+            Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+            Bare: NounPhrase -> Nominal
+            valence VerbPhrase {{ head: Verb }}
+            valence PrepositionPhrase {{ head: Preposition }}
+            valence Nominal {{ head: Noun{obligatory} }}
+        "
     )
 }
 
@@ -81,7 +74,7 @@ fn grammar(obligatory: bool) -> String {
 fn readings(obligatory: bool, text: &str) -> Vec<Reading> {
     let lexicon = lexicon();
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(&grammar(obligatory)).unwrap(),
+        &Grammar::from_fug_str(&grammar(obligatory)).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )

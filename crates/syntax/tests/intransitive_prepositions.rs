@@ -34,30 +34,23 @@ const FRAMES: &str = r#"(
     },
 )"#;
 
-const GRAMMAR: &str = r#"(
-    root: "Sentence",
-    features: { "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"] },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm"]),
-        "PrepositionPhrase": (),
-    },
-    slot_categories: { PP: "PrepositionPhrase" },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "Plain")]),
-    ],
-    schemas: [
-        Valence(head: Verb, phrase: "VerbPhrase"),
-        Valence(head: Preposition, phrase: "PrepositionPhrase"),
-    ],
-)"#;
+const GRAMMAR: &str = r"
+    root Sentence
+    feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+    category PrepositionPhrase
+    category Sentence
+    category VerbPhrase [VerbForm]
+    slot PP = PrepositionPhrase
+    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    valence VerbPhrase { head: Verb }
+    valence PrepositionPhrase { head: Preposition }
+";
 
 #[test]
 fn a_verb_selects_an_intransitive_preposition() {
     let lexicon = lexicon();
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(GRAMMAR).unwrap(),
+        &Grammar::from_fug_str(GRAMMAR).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
@@ -113,28 +106,22 @@ fn an_idiom_selects_its_particle_and_a_predicative() {
         },
         prepositions: { "p:up": [(complement: Intransitive, hosts: ComplementOnly)] },
     )"#;
-    let grammar = r#"(
-        root: "Sentence",
-        features: { "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"] },
-        categories: {
-            "Sentence": (),
-            "VerbPhrase": (features: ["VerbForm"]),
-            "PrepositionPhrase": (),
-            "Predicative": (function: true),
-        },
-        slot_categories: { PP: "PrepositionPhrase", Pred: "Predicative" },
-        productions: [
-            (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-                equations: [Require("clause.VerbForm", "Plain")]),
-            (name: "NounPredicative", lhs: "Predicative", rhs: [Lex("head", Noun)]),
-        ],
-        schemas: [
-            Valence(head: Verb, phrase: "VerbPhrase"),
-            Valence(head: Preposition, phrase: "PrepositionPhrase"),
-        ],
-    )"#;
+    let grammar = r"
+        root Sentence
+        feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+        category Predicative { function }
+        category PrepositionPhrase
+        category Sentence
+        category VerbPhrase [VerbForm]
+        slot PP = PrepositionPhrase
+        slot Pred = Predicative
+        Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+        NounPredicative: Predicative -> Lex(Noun)
+        valence VerbPhrase { head: Verb }
+        valence PrepositionPhrase { head: Preposition }
+    ";
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(grammar).unwrap(),
+        &Grammar::from_fug_str(grammar).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(frames).unwrap(),
     )

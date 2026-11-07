@@ -37,35 +37,30 @@ fn lexicon() -> Lexicon {
 
 fn grammar(lexicon: &Lexicon, coordination: &str) -> Result<CompiledGrammar, String> {
     let text = format!(
-        r#"(
-        root: "Phrase",
-        features: {{
-            "Determination": ["Bare", "Overt"],
-            "Countability": ["Count", "Mass"],
-        }},
-        categories: {{
-            "Phrase": (),
-            "NounPhrase": (features: ["Determination", "Countability"]),
-        }},
-        closed_words: {{ "The": "d:the", "All": "d:all", "And": "c:and" }},
-        productions: [
-            (name: "Bare", lhs: "NounPhrase", rhs: [Lex("head", Noun)], equations: [Require("$.Determination", "Bare")]),
-            (name: "Determined", lhs: "NounPhrase", rhs: [Word("determiner", "The"), Lex("head", Noun)], equations: [Require("$.Determination", "Overt")]),
-            (name: "Plain", lhs: "Phrase", rhs: [Cat("head", "NounPhrase")]),
-            (name: "Predetermined", lhs: "Phrase", rhs: [Word("predeterminer", "All"), Cat("head", "NounPhrase")], equations: [Require("head.Determination", "Overt")]),
-        ],
-        schemas: [
-            {coordination},
-        ],
-    )"#
+        r#"
+            root Phrase
+            feature Countability = Count | Mass
+            feature Determination = Bare | Overt
+            category NounPhrase [Determination, Countability]
+            category Phrase
+            word All = "d:all"
+            word And = "c:and"
+            word The = "d:the"
+            Bare: NounPhrase -> Lex(Noun) where $.Determination = Bare
+            Determined: NounPhrase -> determiner:Word(The) Lex(Noun) where $.Determination = Overt
+            Plain: Phrase -> NounPhrase
+            Predetermined: Phrase -> predeterminer:Word(All) NounPhrase where head.Determination = Overt
+            {coordination}
+        "#
     );
-    let grammar = Grammar::from_ron_str(&text).map_err(|e| format!("{e:?}"))?;
+    let grammar = Grammar::from_fug_str(&text).map_err(|e| format!("{e:?}"))?;
     CompiledGrammar::bind(&grammar, lexicon, &FrameCatalog::default()).map_err(|e| format!("{e:?}"))
 }
 
-const RESOLVED: &str = r#"Coordination(category: "NounPhrase", coordinators: "And", resolve: [("Determination", "Bare")], proximate: ["Countability"], equations: [ExcludeTogether([("first.Determination", "Overt"), ("last.Determination", "Bare"), ("last.Countability", "Mass")])])"#;
+const RESOLVED: &str = r"coordination NounPhrase { coordinators: And, proximate: [Countability], resolve: [Determination = Bare] } where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass)";
 
-const UNSHARED: &str = r#"Coordination(category: "NounPhrase", coordinators: "And", unshared: ["Determination", "Countability"])"#;
+const UNSHARED: &str =
+    r"coordination NounPhrase { coordinators: And, unshared: [Determination, Countability] }";
 
 fn productions(reading: &Reading) -> Vec<String> {
     match reading {
@@ -146,11 +141,13 @@ fn every_conjunct_but_the_last_shares_a_resolved_feature() {
 fn malformed_resolutions_and_joint_exclusions_are_rejected() {
     let lexicon = lexicon();
     for bad in [
-        r#"Coordination(category: "NounPhrase", coordinators: "And", unshared: ["Determination"], resolve: [("Determination", "Bare")])"#,
-        r#"Coordination(category: "NounPhrase", coordinators: "And", resolve: [("Determination", "Some")])"#,
-        r#"Coordination(category: "NounPhrase", coordinators: "And", equations: [ExcludeTogether([("first.Determination", "Overt"), ("$.Countability", "Mass")])])"#,
-        r#"Coordination(category: "NounPhrase", coordinators: "And", equations: [ExcludeTogether([("first.Determination", "Overt")])])"#,
+        r"coordination NounPhrase { coordinators: And, unshared: [Determination], resolve: [Determination = Bare] }",
+        r"coordination NounPhrase { coordinators: And, resolve: [Determination = Some] }",
+        r"coordination NounPhrase { coordinators: And } where !(first.Determination = Overt & $.Countability = Mass)",
+        r"coordination NounPhrase { coordinators: And } where !(first.Determination = Overt)",
     ] {
-        assert!(grammar(&lexicon, bad).is_err(), "{bad}");
+        // Rejected by binding, not by the parser: the text is well-formed.
+        let error = grammar(&lexicon, bad).expect_err(bad);
+        assert!(error.starts_with("Invalid("), "{bad}: {error}");
     }
 }

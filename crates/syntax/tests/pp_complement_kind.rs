@@ -46,42 +46,31 @@ fn frames(ask: &str) -> String {
     )
 }
 
-const GRAMMAR: &str = r#"(
-    root: "Sentence",
-    features: {
-        "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"],
-        "Inflection": ["Invariant", "IndependentGenitive", "Singular", "Plural", "Plain", "Present", "Preterite", "Irrealis", "GerundParticiple", "PastParticiple"],
-    },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm"]),
-        "NounPhrase": (),
-        "Nominal": (),
-        "Mention": (),
-        "PrepositionPhrase": (),
-    },
-    slot_categories: {
-        NP: "NounPhrase",
-        PP: "PrepositionPhrase",
-        Mention: "Mention",
-    },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "Plain")]),
-        (name: "Determined", lhs: "NounPhrase", rhs: [Lex("determiner", Determinative), Cat("head", "Nominal")]),
-        (name: "WordMention", lhs: "Mention", rhs: [Lex("head", Noun)]),
-    ],
-    schemas: [
-        Valence(head: Verb, phrase: "VerbPhrase"),
-        Valence(head: Preposition, phrase: "PrepositionPhrase"),
-        Valence(head: Noun, phrase: "Nominal"),
-        Adjunct(host: "VerbPhrase", adjunct: "PrepositionPhrase", side: After, host_kind: Predicate),
-    ],
-)"#;
+const GRAMMAR: &str = r"
+    root Sentence
+    feature Inflection = Invariant | IndependentGenitive | Singular | Plural | Plain | Present | Preterite | Irrealis | GerundParticiple | PastParticiple
+    feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+    category Mention
+    category Nominal
+    category NounPhrase
+    category PrepositionPhrase
+    category Sentence
+    category VerbPhrase [VerbForm]
+    slot NP = NounPhrase
+    slot PP = PrepositionPhrase
+    slot Mention = Mention
+    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Determined: NounPhrase -> determiner:Lex(Determinative) Nominal
+    WordMention: Mention -> Lex(Noun)
+    valence VerbPhrase { head: Verb }
+    valence PrepositionPhrase { head: Preposition }
+    valence Nominal { head: Noun }
+    adjunct PrepositionPhrase { host: VerbPhrase, side: After, host_kind: Predicate }
+";
 
 fn grammar(lexicon: &Lexicon, ask: &str) -> Result<CompiledGrammar, LoadError> {
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(GRAMMAR).unwrap(),
+        &Grammar::from_fug_str(GRAMMAR).unwrap(),
         lexicon,
         &FrameCatalog::from_ron_str(&frames(ask)).unwrap(),
     )

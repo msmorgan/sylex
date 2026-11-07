@@ -22,19 +22,18 @@ fn lexicon() -> Lexicon {
 
 fn grammar(lexicon: &Lexicon, light: &str) -> Result<CompiledGrammar, sylex_syntax::LoadError> {
     let text = format!(
-        r#"(
-        root: "Sentence",
-        categories: {{ "Sentence": (), "Words": () }},
-        productions: [
-            (name: "Word", lhs: "Words", rhs: [Lex("head", Noun)]),
-            (name: "MoreWords", lhs: "Words", rhs: [Cat("head", "Words"), Lex("next", Noun)]),
-            (name: "Light", lhs: "Sentence", rhs: [Cat("words", "Words"), Punct('.')], light: ["{light}"]),
-            (name: "Heavy", lhs: "Sentence", rhs: [Cat("words", "Words"), Punct('!')], heavy: ["words"]),
-        ],
-    )"#
+        r"
+            root Sentence
+            category Sentence
+            category Words
+            Word: Words -> Lex(Noun)
+            MoreWords: Words -> Words next:Lex(Noun)
+            Light: Sentence -> words:Words '.' {{ light: [{light}] }}
+            Heavy: Sentence -> words:Words '!' {{ heavy: [words] }}
+        "
     );
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(&text).unwrap(),
+        &Grammar::from_fug_str(&text).unwrap(),
         lexicon,
         &FrameCatalog::default(),
     )

@@ -29,22 +29,18 @@ fn lexicon() -> Lexicon {
 
 fn grammar(lexicon: &Lexicon, equations: &str) -> Result<CompiledGrammar, String> {
     let text = format!(
-        r#"(
-        root: "Phrase",
-        features: {{ "Determination": ["Bare", "Overt"] }},
-        categories: {{
-            "Phrase": (),
-            "NounPhrase": (features: ["Determination"]),
-        }},
-        closed_words: {{ "The": "d:the" }},
-        productions: [
-            (name: "Bare", lhs: "NounPhrase", rhs: [Lex("head", Noun)], equations: [Require("$.Determination", "Bare")]),
-            (name: "Determined", lhs: "NounPhrase", rhs: [Word("determiner", "The"), Lex("head", Noun)], equations: [Require("$.Determination", "Overt")]),
-            (name: "Pair", lhs: "Phrase", rhs: [Cat("adjunct", "NounPhrase"), Cat("adjunct", "NounPhrase"), Punct('.')], equations: [{equations}]),
-        ],
-    )"#
+        r#"
+            root Phrase
+            feature Determination = Bare | Overt
+            category NounPhrase [Determination]
+            category Phrase
+            word The = "d:the"
+            Bare: NounPhrase -> Lex(Noun) where $.Determination = Bare
+            Determined: NounPhrase -> determiner:Word(The) Lex(Noun) where $.Determination = Overt
+            Pair: Phrase -> adjunct:NounPhrase adjunct:NounPhrase '.' where {equations}
+        "#
     );
-    let grammar = Grammar::from_ron_str(&text).map_err(|e| format!("{e:?}"))?;
+    let grammar = Grammar::from_fug_str(&text).map_err(|e| format!("{e:?}"))?;
     CompiledGrammar::bind(&grammar, lexicon, &FrameCatalog::default()).map_err(|e| format!("{e:?}"))
 }
 
@@ -60,7 +56,7 @@ fn count(equations: &str, text: &str) -> usize {
 
 #[test]
 fn a_requirement_on_a_shared_name_holds_of_every_child() {
-    let overt = r#"Require("adjunct.Determination", "Overt")"#;
+    let overt = "adjunct.Determination = Overt";
     assert_eq!(count(overt, "The card the land."), 1);
     assert_eq!(count(overt, "Card the land."), 0);
     assert_eq!(count(overt, "The card land."), 0);
@@ -68,7 +64,7 @@ fn a_requirement_on_a_shared_name_holds_of_every_child() {
 
 #[test]
 fn an_exclusion_on_a_shared_name_holds_of_every_child() {
-    let bare = r#"Exclude("adjunct.Determination", "Bare")"#;
+    let bare = "adjunct.Determination != Bare";
     assert_eq!(count(bare, "The card the land."), 1);
     assert_eq!(count(bare, "Card the land."), 0);
     assert_eq!(count(bare, "The card land."), 0);

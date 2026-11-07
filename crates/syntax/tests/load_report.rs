@@ -75,49 +75,44 @@ const FRAMES: &str = r#"(
 /// set by a Production lifting a class, `ComplementKind` by the Preposition
 /// Valence, and `Final` by Parameter patterns; `ObliqueKind` is linked to
 /// `ComplementKind`.
-const GRAMMAR: &str = r#"(
-    root: "Sentence",
-    features: {
-        "Number": ["Singular", "Plural"],
-        "Kind": ["Common", "Rare"],
-        "Form": ["Plain", "Marked"],
-        "Lone": ["Only"],
-        "Mark": ["Set"],
-        "Position": ["Front", "End"],
-        "ComplementKind": ["NP", "Intransitive"],
-        "ObliqueKind": ["NP", "Intransitive"],
-        "Final": ["Cost", "Amount"],
-    },
-    categories: {
-        "Sentence": (),
-        "NounPhrase": (features: ["Number", "Kind", "Form", "Lone", "Mark"]),
-        "AdverbPhrase": (features: ["Position"]),
-        "PrepositionPhrase": (features: ["ComplementKind"]),
-        "Oblique": (features: ["ObliqueKind"]),
-        "KeywordParameters": (features: ["Final"]),
-    },
-    closed_words: { "The": "det:the", "A": "det:a", "With": "prep:with", "Only": "adv:only" },
-    lexical_classes: { "FrontAdverb": ["adv:first", "adv:then"] },
-    slot_categories: { NP: "NounPhrase" },
-    productions: [
-        (name: "Statement", lhs: "Sentence", rhs: [Cat("subject", "NounPhrase"), Punct('.')]),
-        (name: "Bare", lhs: "NounPhrase", rhs: [Lex("head", Noun)], equations: [Require("$.Form", "Plain")]),
-        (name: "Definite", lhs: "NounPhrase", rhs: [Word("det", "The"), Lex("head", Noun)], equations: [Require("$.Form", "Plain"), Require("$.Mark", "Set")]),
-        (name: "Indefinite", lhs: "NounPhrase", rhs: [Word("det", "A"), Lex("head", Noun)], equations: [Require("$.Form", "Marked"), Require("$.Lone", "Only"), Require("$.Mark", "Set")]),
-        (name: "Front", lhs: "AdverbPhrase", rhs: [Class("head", "FrontAdverb")], equations: [Require("$.Position", "Front")]),
-        (name: "End", lhs: "AdverbPhrase", rhs: [Word("head", "Only")], equations: [Require("$.Position", "End")]),
-        (name: "Oblique", lhs: "Oblique", rhs: [Cat("head", "PrepositionPhrase")], equations: [Agree("$.ObliqueKind", "head.ComplementKind")]),
-        (name: "Accompanied", lhs: "PrepositionPhrase", rhs: [Word("head", "With"), Cat("complement", "NounPhrase")], equations: [Require("$.ComplementKind", "NP")]),
-    ],
-    schemas: [
-        Valence(head: Preposition, phrase: "PrepositionPhrase", complement_kind: Some("ComplementKind")),
-        Parameters(head: Keyword, phrase: "KeywordParameters"),
-    ],
-)"#;
+const GRAMMAR: &str = r#"
+    root Sentence
+    feature ComplementKind = NP | Intransitive
+    feature Final = Cost | Amount
+    feature Form = Plain | Marked
+    feature Kind = Common | Rare
+    feature Lone = Only
+    feature Mark = Set
+    feature Number = Singular | Plural
+    feature ObliqueKind = NP | Intransitive
+    feature Position = Front | End
+    category AdverbPhrase [Position]
+    category KeywordParameters [Final]
+    category NounPhrase [Number, Kind, Form, Lone, Mark]
+    category Oblique [ObliqueKind]
+    category PrepositionPhrase [ComplementKind]
+    category Sentence
+    word A = "det:a"
+    word Only = "adv:only"
+    word The = "det:the"
+    word With = "prep:with"
+    class FrontAdverb = ["adv:first", "adv:then"]
+    slot NP = NounPhrase
+    Statement: Sentence -> subject:NounPhrase '.'
+    Bare: NounPhrase -> Lex(Noun) where $.Form = Plain
+    Definite: NounPhrase -> det:Word(The) Lex(Noun) where $.Form = Plain, $.Mark = Set
+    Indefinite: NounPhrase -> det:Word(A) Lex(Noun) where $.Form = Marked, $.Lone = Only, $.Mark = Set
+    Front: AdverbPhrase -> Class(FrontAdverb) where $.Position = Front
+    End: AdverbPhrase -> Word(Only) where $.Position = End
+    Oblique: Oblique -> PrepositionPhrase where $.ObliqueKind = head.ComplementKind
+    Accompanied: PrepositionPhrase -> Word(With) complement:NounPhrase where $.ComplementKind = NP
+    valence PrepositionPhrase { head: Preposition, complement_kind: ComplementKind }
+    parameters KeywordParameters { head: Keyword }
+"#;
 
 fn warnings() -> Vec<String> {
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(GRAMMAR).unwrap(),
+        &Grammar::from_fug_str(GRAMMAR).unwrap(),
         &lexicon(),
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
@@ -214,11 +209,11 @@ fn a_parameter_kind_is_held_by_the_keywords_declaring_it() {
 #[test]
 fn a_value_of_linked_features_is_reported_once_naming_both() {
     let grammar = GRAMMAR.replace(
-        r#"(name: "Accompanied", lhs: "PrepositionPhrase", rhs: [Word("head", "With"), Cat("complement", "NounPhrase")], equations: [Require("$.ComplementKind", "NP")]),"#,
+        "    Accompanied: PrepositionPhrase -> Word(With) complement:NounPhrase where $.ComplementKind = NP\n",
         "",
     );
     let warnings = CompiledGrammar::bind(
-        &Grammar::from_ron_str(&grammar).unwrap(),
+        &Grammar::from_fug_str(&grammar).unwrap(),
         &lexicon(),
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )

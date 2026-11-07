@@ -56,52 +56,44 @@ const FRAMES: &str = r#"(
     },
 )"#;
 
-const GRAMMAR: &str = r#"(
-    root: "Sentence",
-    features: {
-        "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"],
-        "Voice": ["Active", "Passive"],
-        "Inflection": ["Invariant", "IndependentGenitive", "Singular", "Plural", "Plain", "Present", "Preterite", "Irrealis", "GerundParticiple", "PastParticiple"],
-    },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm", "Voice"], gap: true),
-        "AdjectivePhrase": (features: ["Voice"]),
-        "NounPhrase": (),
-        "Nominal": (),
-        "Participle": (),
-        "PrepositionPhrase": (gap: true),
-    },
-    closed_words: { "By": "p:by" },
-    slot_categories: {
-        NP: "NounPhrase",
-        PP: "PrepositionPhrase",
-    },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "Plain"), Require("clause.Voice", "Active")]),
-        (name: "Passive", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('!')],
-            equations: [Require("clause.Voice", "Passive")]),
-        (name: "Adjectival", lhs: "Sentence", rhs: [Cat("head", "AdjectivePhrase"), Punct('?')]),
-        (name: "Bare", lhs: "NounPhrase", rhs: [Cat("head", "Nominal")]),
-        (name: "Fragment", lhs: "Sentence", rhs: [Cat("head", "NounPhrase"), Punct(';')]),
-    ],
-    schemas: [
-        Premodification(head: Verb, modifier: "Participle", host: "Nominal", forms: [PastParticiple]),
-        Valence(head: Verb, phrase: "VerbPhrase", active: [Require("$.Voice", "Active")], passive: Some("By"),
-            verbal_passive: [Require("$.Voice", "Passive"), Require("$.VerbForm", "PastParticiple")],
-            prepositional_passive: [Require("$.Voice", "Passive"), Require("$.VerbForm", "PastParticiple")],
-            adjectival: Some("AdjectivePhrase"),
-            adjectival_passive: [Require("head.VerbForm", "PastParticiple"), Require("$.Voice", "Passive")]),
-        Valence(head: Preposition, phrase: "PrepositionPhrase"),
-        Valence(head: Noun, phrase: "Nominal"),
-    ],
-)"#;
+const GRAMMAR: &str = r#"
+    root Sentence
+    feature Inflection = Invariant | IndependentGenitive | Singular | Plural | Plain | Present | Preterite | Irrealis | GerundParticiple | PastParticiple
+    feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+    feature Voice = Active | Passive
+    category AdjectivePhrase [Voice]
+    category Nominal
+    category NounPhrase
+    category Participle
+    category PrepositionPhrase { gap }
+    category Sentence
+    category VerbPhrase [VerbForm, Voice] { gap }
+    word By = "p:by"
+    slot NP = NounPhrase
+    slot PP = PrepositionPhrase
+    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain, clause.Voice = Active
+    Passive: Sentence -> clause:VerbPhrase '!' where clause.Voice = Passive
+    Adjectival: Sentence -> AdjectivePhrase '?'
+    Bare: NounPhrase -> Nominal
+    Fragment: Sentence -> NounPhrase ';'
+    premodification Participle { head: Verb, host: Nominal, forms: [PastParticiple] }
+    valence VerbPhrase {
+        head: Verb,
+        active: [$.Voice = Active],
+        passive: By,
+        verbal_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
+        prepositional_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
+        adjectival: AdjectivePhrase,
+        adjectival_passive: [head.VerbForm = PastParticiple, $.Voice = Passive],
+    }
+    valence PrepositionPhrase { head: Preposition }
+    valence Nominal { head: Noun }
+"#;
 
 fn count(text: &str) -> usize {
     let lexicon = lexicon();
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(GRAMMAR).unwrap(),
+        &Grammar::from_fug_str(GRAMMAR).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )

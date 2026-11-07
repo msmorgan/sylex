@@ -59,36 +59,30 @@ const FRAMES: &str = r#"(
     },
 )"#;
 
-const GRAMMAR: &str = r#"(
-    root: "Sentence",
-    features: {
-        "Inflection": ["Invariant", "IndependentGenitive", "Singular", "Plural", "Plain", "Present", "Preterite", "Irrealis", "GerundParticiple", "PastParticiple"],
-        "AdjectivalPassive": ["Lexical"],
-    },
-    categories: {
-        "Sentence": (),
-        "NounPhrase": (),
-        "Nominal": (),
-        "Participle": (features: ["Inflection"]),
-    },
-    slot_categories: {
-        NP: "NounPhrase",
-    },
-    productions: [
-        (name: "Bare", lhs: "NounPhrase", rhs: [Cat("head", "Nominal")]),
-        (name: "Fragment", lhs: "Sentence", rhs: [Cat("head", "NounPhrase"), Punct(';')]),
-    ],
-    schemas: [
-        Premodification(head: Verb, modifier: "Participle", host: "Nominal", forms: [GerundParticiple, PastParticiple],
-            equations: [(PastParticiple, [Exclude("head.AdjectivalPassive", "Lexical")])]),
-        Valence(head: Noun, phrase: "Nominal"),
-    ],
-)"#;
+const GRAMMAR: &str = r"
+    root Sentence
+    feature AdjectivalPassive = Lexical
+    feature Inflection = Invariant | IndependentGenitive | Singular | Plural | Plain | Present | Preterite | Irrealis | GerundParticiple | PastParticiple
+    category Nominal
+    category NounPhrase
+    category Participle [Inflection]
+    category Sentence
+    slot NP = NounPhrase
+    Bare: NounPhrase -> Nominal
+    Fragment: Sentence -> NounPhrase ';'
+    premodification Participle {
+        head: Verb,
+        host: Nominal,
+        forms: [GerundParticiple, PastParticiple],
+        equations: [PastParticiple -> [head.AdjectivalPassive != Lexical]],
+    }
+    valence Nominal { head: Noun }
+";
 
 fn count(text: &str) -> usize {
     let lexicon = lexicon();
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(GRAMMAR).unwrap(),
+        &Grammar::from_fug_str(GRAMMAR).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )

@@ -57,48 +57,41 @@ const FRAMES: &str = r#"(
     },
 )"#;
 
-const GRAMMAR: &str = r#"(
-    root: "Sentence",
-    features: {
-        "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"],
-        "Voice": ["Active", "Passive"],
-    },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm", "Voice"], gap: true),
-        "NounPhrase": (),
-        "Nominal": (),
-        "AmountPhrase": (),
-        "CostPhrase": (),
-        "PrepositionPhrase": (),
-    },
-    closed_words: { "By": "b:by" },
-    slot_categories: {
-        NP: "NounPhrase",
-        PP: "PrepositionPhrase",
-        Nominal: "Nominal",
-        Amount: "AmountPhrase",
-        Cost: "CostPhrase",
-    },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "Plain"), Require("clause.Voice", "Active")]),
-        (name: "Numeral", lhs: "AmountPhrase", rhs: [Lex("head", Numeral)]),
-        (name: "Symbol", lhs: "CostPhrase", rhs: [Lex("head", Symbol)]),
-        (name: "Bare", lhs: "NounPhrase", rhs: [Cat("head", "Nominal")]),
-    ],
-    schemas: [
-        Valence(head: Verb, phrase: "VerbPhrase", active: [Require("$.Voice", "Active")], passive: Some("By"),
-            verbal_passive: [Require("$.Voice", "Passive"), Require("$.VerbForm", "PastParticiple")],
-            prepositional_passive: [Require("$.Voice", "Passive"), Require("$.VerbForm", "PastParticiple")]),
-        Valence(head: Preposition, phrase: "PrepositionPhrase"),
-        Valence(head: Noun, phrase: "Nominal"),
-    ],
-)"#;
+const GRAMMAR: &str = r#"
+    root Sentence
+    feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+    feature Voice = Active | Passive
+    category AmountPhrase
+    category CostPhrase
+    category Nominal
+    category NounPhrase
+    category PrepositionPhrase
+    category Sentence
+    category VerbPhrase [VerbForm, Voice] { gap }
+    word By = "b:by"
+    slot NP = NounPhrase
+    slot PP = PrepositionPhrase
+    slot Nominal = Nominal
+    slot Amount = AmountPhrase
+    slot Cost = CostPhrase
+    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain, clause.Voice = Active
+    Numeral: AmountPhrase -> Lex(Numeral)
+    Symbol: CostPhrase -> Lex(Symbol)
+    Bare: NounPhrase -> Nominal
+    valence VerbPhrase {
+        head: Verb,
+        active: [$.Voice = Active],
+        passive: By,
+        verbal_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
+        prepositional_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
+    }
+    valence PrepositionPhrase { head: Preposition }
+    valence Nominal { head: Noun }
+"#;
 
 fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(GRAMMAR).unwrap(),
+        &Grammar::from_fug_str(GRAMMAR).unwrap(),
         lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )

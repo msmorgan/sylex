@@ -34,26 +34,29 @@ fn lexicon() -> Lexicon {
 }
 
 fn grammar(lexicon: &Lexicon, equations: &str) -> CompiledGrammar {
+    let wheres = if equations.is_empty() { String::new() } else { format!("where {equations}") };
     let text = format!(
-        r#"(
-        root: "Phrase",
-        features: {{ "Determination": ["Bare", "Overt"] }},
-        categories: {{
-            "Phrase": (),
-            "NounPhrase": (features: ["Determination"]),
-        }},
-        closed_words: {{ "The": "d:the", "And": "c:and" }},
-        productions: [
-            (name: "Bare", lhs: "NounPhrase", rhs: [Lex("head", Noun)], equations: [Require("$.Determination", "Bare")]),
-            (name: "Determined", lhs: "NounPhrase", rhs: [Word("determiner", "The"), Lex("head", Noun)], equations: [Require("$.Determination", "Overt")]),
-            (name: "Plain", lhs: "Phrase", rhs: [Cat("head", "NounPhrase")]),
-        ],
-        schemas: [
-            Coordination(category: "NounPhrase", coordinators: "And", unshared: ["Determination"], unlike: Some("Determination"), serial: Some(true), delimiter: Some(','), equations: [{equations}]),
-        ],
-    )"#
+        r#"
+            root Phrase
+            feature Determination = Bare | Overt
+            category NounPhrase [Determination]
+            category Phrase
+            word And = "c:and"
+            word The = "d:the"
+            Bare: NounPhrase -> Lex(Noun) where $.Determination = Bare
+            Determined: NounPhrase -> determiner:Word(The) Lex(Noun) where $.Determination = Overt
+            Plain: Phrase -> NounPhrase
+            coordination NounPhrase {{
+                coordinators: And,
+                unshared: [Determination],
+                delimiter: ',',
+                serial: true,
+                unlike: Determination,
+            }}
+                {wheres}
+        "#
     );
-    let grammar = Grammar::from_ron_str(&text).unwrap();
+    let grammar = Grammar::from_fug_str(&text).unwrap();
     CompiledGrammar::bind(&grammar, lexicon, &FrameCatalog::default()).unwrap()
 }
 
@@ -105,7 +108,7 @@ fn like_conjuncts_are_no_unlike_coordination() {
 
 #[test]
 fn an_initial_equation_holds_of_the_initial_conjunct_alone() {
-    let initial = r#"Require("initial.Determination", "Overt")"#;
+    let initial = "initial.Determination = Overt";
     for text in [
         "the card and land",
         "the card, land, and mana",

@@ -35,31 +35,26 @@ const FRAMES: &str = r#"(
 )"#;
 
 fn count(text: &str) -> usize {
-    let source = r#"(
-    root: "Sentence",
-    features: { "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"] },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm"]),
-        "NounPhrase": (),
-        "Predicative": (),
-        "PredicativeRemnant": (),
-    },
-    lexical_classes: { "Coordinator": ["c:and"] },
-    slot_categories: { NP: "NounPhrase", Pred: "Predicative" },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("head", "VerbPhrase"), Punct('.')], equations: [Require("head.VerbForm", "Plain")]),
-        (name: "Noun", lhs: "NounPhrase", rhs: [Lex("head", Noun)]),
-        (name: "NominalPredicative", lhs: "Predicative", rhs: [Cat("head", "NounPhrase")]),
-    ],
-    schemas: [
-        Valence(head: Verb, phrase: "VerbPhrase", remnants: [(Pred, "PredicativeRemnant")]),
-        Coordination(category: "VerbPhrase", coordinators: "Coordinator", remnant: Some("PredicativeRemnant")),
-    ],
-)"#;
+    let source = r#"
+        root Sentence
+        feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+        category NounPhrase
+        category Predicative
+        category PredicativeRemnant
+        category Sentence
+        category VerbPhrase [VerbForm]
+        class Coordinator = ["c:and"]
+        slot NP = NounPhrase
+        slot Pred = Predicative
+        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Noun: NounPhrase -> Lex(Noun)
+        NominalPredicative: Predicative -> NounPhrase
+        valence VerbPhrase { head: Verb, remnants: [Pred -> PredicativeRemnant] }
+        coordination VerbPhrase { coordinators: Coordinator, remnant: PredicativeRemnant }
+    "#;
     let lexicon = lexicon();
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(source).unwrap(),
+        &Grammar::from_fug_str(source).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )

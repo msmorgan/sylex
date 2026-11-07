@@ -39,39 +39,37 @@ const FRAMES: &str = r#"(
 )"#;
 
 /// The grammar, its stranded *can* declared `elliptical` with these word
-/// forms for its omitted Complement (RON: `None` or `Some([...])`).
+/// forms for its omitted Complement (a `{ elliptical: [...] }` prop block, or
+/// none).
 fn grammar(lexicon: &Lexicon, elliptical: &str) -> CompiledGrammar {
     let text = format!(
-        r#"(
-        root: "Sentence",
-        categories: {{
-            "Sentence": (),
-            "Clause": (),
-            "Predicate": (),
-            "NounPhrase": (),
-            "PrepositionPhrase": (),
-        }},
-        closed_words: {{ "Can": "w:can", "Draws": "w:draws", "Block": "v:block" }},
-        slot_categories: {{ NP: "NounPhrase", PP: "PrepositionPhrase" }},
-        productions: [
-            (name: "Statement", lhs: "Sentence", rhs: [Cat("clause", "Clause"), Punct('.')]),
-            (name: "SubjectPredicate", lhs: "Clause", rhs: [Cat("subject", "NounPhrase"), Cat("head", "Predicate")]),
-            (name: "Noun", lhs: "NounPhrase", rhs: [Lex("head", Noun)]),
+        r#"
+            root Sentence
+            category Clause
+            category NounPhrase
+            category Predicate
+            category PrepositionPhrase
+            category Sentence
+            word Block = "v:block"
+            word Can = "w:can"
+            word Draws = "w:draws"
+            slot NP = NounPhrase
+            slot PP = PrepositionPhrase
+            Statement: Sentence -> clause:Clause '.'
+            SubjectPredicate: Clause -> subject:NounPhrase Predicate
+            Noun: NounPhrase -> Lex(Noun)
             // A reduced relative: *card [that] can*.
-            (name: "Postmodified", lhs: "NounPhrase", rhs: [Cat("head", "NounPhrase"), Cat("modifier", "Predicate")]),
-            (name: "Stranded", lhs: "Predicate", rhs: [Word("head", "Can")], elliptical: {elliptical}),
-            (name: "Lexical", lhs: "Predicate", rhs: [Word("head", "Draws")]),
-            (name: "Verbal", lhs: "Predicate", rhs: [Word("head", "Block")]),
-        ],
-        schemas: [
-            Valence(head: Preposition, phrase: "PrepositionPhrase"),
-            Adjunct(host: "Clause", adjunct: "PrepositionPhrase", side: After, host_kind: Predicate, cost: 1),
-            Adjunct(host: "Clause", adjunct: "PrepositionPhrase", side: After, host_kind: Predicate, delimiter: Some(','), cost: 1),
-        ],
-    )"#
+            Postmodified: NounPhrase -> NounPhrase modifier:Predicate
+            Stranded: Predicate -> Word(Can) {elliptical}
+            Lexical: Predicate -> Word(Draws)
+            Verbal: Predicate -> Word(Block)
+            valence PrepositionPhrase {{ head: Preposition }}
+            adjunct PrepositionPhrase {{ host: Clause, side: After, host_kind: Predicate }}
+            adjunct PrepositionPhrase {{ host: Clause, side: After, host_kind: Predicate, delimiter: ',' }}
+        "#
     );
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(&text).unwrap(),
+        &Grammar::from_fug_str(&text).unwrap(),
         lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
@@ -89,28 +87,28 @@ fn count(grammar: &CompiledGrammar, lexicon: &Lexicon, text: &str) -> usize {
 #[test]
 fn an_ellipsis_site_ends_its_phrase() {
     let lexicon = lexicon();
-    let grammar = grammar(&lexicon, "Some([Plain])");
+    let grammar = grammar(&lexicon, "{ elliptical: [Plain] }");
     assert_eq!(count(&grammar, &lexicon, "Card can."), 1);
     // No dependent comes right after the site, at any height.
     assert_eq!(count(&grammar, &lexicon, "Card can in card."), 0);
     // An ordinary predicate still takes the dependent.
     assert_eq!(count(&grammar, &lexicon, "Card draws in card."), 1);
     // Without the declaration, the dependent attaches above the site.
-    let open = self::grammar(&lexicon, "None");
+    let open = self::grammar(&lexicon, "");
     assert_eq!(count(&open, &lexicon, "Card can in card."), 1);
 }
 
 #[test]
 fn punctuation_ends_the_reach_of_an_ellipsis_site() {
     let lexicon = lexicon();
-    let grammar = grammar(&lexicon, "Some([Plain])");
+    let grammar = grammar(&lexicon, "{ elliptical: [Plain] }");
     assert_eq!(count(&grammar, &lexicon, "Card can, in card."), 1);
 }
 
 #[test]
 fn the_head_a_phrase_ending_in_an_ellipsis_site_depends_on_follows_it() {
     let lexicon = lexicon();
-    let grammar = grammar(&lexicon, "Some([Plain])");
+    let grammar = grammar(&lexicon, "{ elliptical: [Plain] }");
     // *card [that] can* is the Subject of *draws*.
     let found = grammar
         .parse(&lexicon, "Card can draws.")
@@ -128,13 +126,13 @@ fn the_head_a_phrase_ending_in_an_ellipsis_site_depends_on_follows_it() {
 #[test]
 fn a_head_that_could_be_the_omitted_complement_never_follows_the_site() {
     let lexicon = lexicon();
-    let grammar = grammar(&lexicon, "Some([Plain])");
+    let grammar = grammar(&lexicon, "{ elliptical: [Plain] }");
     // Plain *block* would be *can*'s Complement: no ellipsis is there.
     assert_eq!(count(&grammar, &lexicon, "Card can block."), 0);
     // A site whose Complement is a past participle keeps every Reading the
     // undeclared site has (one per paradigm cell spelled *block*).
-    let participial = self::grammar(&lexicon, "Some([PastParticiple])");
-    let open = self::grammar(&lexicon, "None");
+    let participial = self::grammar(&lexicon, "{ elliptical: [PastParticiple] }");
+    let open = self::grammar(&lexicon, "");
     let all = count(&open, &lexicon, "Card can block.");
     assert!(all > 0);
     assert_eq!(count(&participial, &lexicon, "Card can block."), all);
@@ -145,16 +143,14 @@ fn a_head_that_could_be_the_omitted_complement_never_follows_the_site() {
 #[test]
 fn an_ellipsis_site_names_its_omitted_complement_forms() {
     let lexicon = lexicon();
-    let text = r#"(
-        root: "Predicate",
-        categories: { "Predicate": () },
-        closed_words: { "Can": "w:can" },
-        productions: [
-            (name: "Stranded", lhs: "Predicate", rhs: [Word("head", "Can")], elliptical: Some([])),
-        ],
-    )"#;
+    let text = r#"
+        root Predicate
+        category Predicate
+        word Can = "w:can"
+        Stranded: Predicate -> Word(Can) { elliptical: [] }
+    "#;
     let error = CompiledGrammar::bind(
-        &Grammar::from_ron_str(text).unwrap(),
+        &Grammar::from_fug_str(text).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )

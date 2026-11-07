@@ -34,32 +34,33 @@ fn lexicon() -> Lexicon {
 
 fn grammar_text(linked: &str) -> String {
     format!(
-        r#"(
-        root: "Sentence",
-        categories: {{ "Sentence": (), "Clause": (), "LinkedClause": (category: Some("Clause")), "Complement": () }},
-        closed_words: {{ "And": "c:and", "Then": "adv:then", "Until": "p:until" }},
-        productions: [
-            (name: "Declarative", lhs: "Sentence", rhs: [Cat("clause", "Clause"), Punct('.')]),
-            (name: "Intransitive", lhs: "Clause", rhs: [Lex("subject", Pronoun), Lex("head", Verb)]),
-            (name: "Front", lhs: "Clause", rhs: [Word("adjunct", "Then"), Cat("head", "Clause")]),
-            (name: "Linked", lhs: "LinkedClause", rhs: [Word("adjunct", "Then"), Cat("head", "Clause")]),
-            (name: "Until", lhs: "Clause", rhs: [Cat("head", "Clause"), Word("marker", "Until"), Cat("complement", "Complement")]),
-            (name: "Complement", lhs: "Complement", rhs: [Cat("head", "Clause")], unlinked: ["head"]),
-        ],
-        schemas: [
-            Coordination(category: "Clause", coordinators: "And", delimiter: Some(',')),
-            {linked},
-        ],
-    )"#
+        r#"
+            root Sentence
+            category Clause
+            category Complement
+            category LinkedClause : Clause
+            category Sentence
+            word And = "c:and"
+            word Then = "adv:then"
+            word Until = "p:until"
+            Declarative: Sentence -> clause:Clause '.'
+            Intransitive: Clause -> subject:Lex(Pronoun) Lex(Verb)
+            Front: Clause -> adjunct:Word(Then) Clause
+            Linked: LinkedClause -> adjunct:Word(Then) Clause
+            Until: Clause -> Clause marker:Word(Until) complement:Complement
+            Complement: Complement -> Clause {{ unlinked: [head] }}
+            coordination Clause {{ coordinators: And, delimiter: ',' }}
+            {linked}
+        "#
     )
 }
 
 fn grammar(lexicon: &Lexicon, linked: &str) -> Result<CompiledGrammar, String> {
-    let grammar = Grammar::from_ron_str(&grammar_text(linked)).map_err(|e| format!("{e:?}"))?;
+    let grammar = Grammar::from_fug_str(&grammar_text(linked)).map_err(|e| format!("{e:?}"))?;
     CompiledGrammar::bind(&grammar, lexicon, &FrameCatalog::default()).map_err(|e| format!("{e:?}"))
 }
 
-const LINKED: &str = r#"Coordination(category: "Clause", link: Some("LinkedClause"), delimiter: Some(','), delimited: true)"#;
+const LINKED: &str = r"coordination Clause { link: LinkedClause, delimiter: ',', delimited }";
 
 fn uses(reading: &Reading, production: &str) -> bool {
     reading.node().is_some_and(|node| {
@@ -126,8 +127,8 @@ fn an_unlinked_child_is_no_linked_coordination() {
 fn a_coordination_names_its_coordinators_or_its_link() {
     let lexicon = lexicon();
     for schema in [
-        r#"Coordination(category: "Clause", coordinators: "And", link: Some("LinkedClause"))"#,
-        r#"Coordination(category: "Clause")"#,
+        r"coordination Clause { coordinators: And, link: LinkedClause }",
+        r"coordination Clause",
     ] {
         assert!(grammar(&lexicon, schema).is_err(), "{schema}");
     }

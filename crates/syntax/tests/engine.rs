@@ -48,36 +48,32 @@ fn lexicon() -> Lexicon {
 }
 
 /// Imperatives with PP attachment to the verb phrase or to any nominal.
-const GRAMMAR: &str = r#"(
-    root: "Sentence",
-    features: { "Number": ["Singular", "Plural"], "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"] },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm"]),
-        "NounPhrase": (features: ["Number"]),
-        "Nominal": (features: ["Number"]),
-        "PrepositionPhrase": (),
-    },
-    closed_words: { "The": "d:the", "This": "d:this", "These": "d:these" },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "Plain")]),
-        (name: "Transitive", lhs: "VerbPhrase", rhs: [Lex("head", Verb), Cat("object", "NounPhrase")]),
-        (name: "PredicateAdjunct", lhs: "VerbPhrase", rhs: [Cat("head", "VerbPhrase"), Cat("adjunct", "PrepositionPhrase")], cost: 2),
-        (name: "Determined", lhs: "NounPhrase", rhs: [Word("det", "The"), Cat("head", "Nominal")]),
-        (name: "DeterminedSingular", lhs: "NounPhrase", rhs: [Word("det", "This"), Cat("head", "Nominal")],
-            equations: [Require("head.Number", "Singular")]),
-        (name: "DeterminedPlural", lhs: "NounPhrase", rhs: [Word("det", "These"), Cat("head", "Nominal")],
-            equations: [Require("head.Number", "Plural")]),
-        (name: "Noun", lhs: "Nominal", rhs: [Lex("head", Noun)]),
-        (name: "Postmodifier", lhs: "Nominal", rhs: [Cat("head", "Nominal"), Cat("modifier", "PrepositionPhrase")]),
-        (name: "PrepositionPhrase", lhs: "PrepositionPhrase", rhs: [Lex("head", Preposition), Cat("object", "NounPhrase")]),
-    ],
-)"#;
+const GRAMMAR: &str = r#"
+    root Sentence
+    feature Number = Singular | Plural
+    feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+    category Nominal [Number]
+    category NounPhrase [Number]
+    category PrepositionPhrase
+    category Sentence
+    category VerbPhrase [VerbForm]
+    word The = "d:the"
+    word These = "d:these"
+    word This = "d:this"
+    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Transitive: VerbPhrase -> Lex(Verb) object:NounPhrase
+    PredicateAdjunct: VerbPhrase -> VerbPhrase adjunct:PrepositionPhrase { cost: 2 }
+    Determined: NounPhrase -> det:Word(The) Nominal
+    DeterminedSingular: NounPhrase -> det:Word(This) Nominal where head.Number = Singular
+    DeterminedPlural: NounPhrase -> det:Word(These) Nominal where head.Number = Plural
+    Noun: Nominal -> Lex(Noun)
+    Postmodifier: Nominal -> Nominal modifier:PrepositionPhrase
+    PrepositionPhrase: PrepositionPhrase -> Lex(Preposition) object:NounPhrase
+"#;
 
 fn bind(text: &str, lexicon: &Lexicon) -> Result<CompiledGrammar, LoadError> {
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(text)?,
+        &Grammar::from_fug_str(text)?,
         lexicon,
         &FrameCatalog::default(),
     )
@@ -129,10 +125,7 @@ fn terminal_initial_productions_are_predicted_only_where_they_scan() {
     let lexicon = lexicon();
     let grammar = bind(GRAMMAR, &lexicon).unwrap();
     let bracketed = bind(
-        &GRAMMAR.replace(
-            "    ],\n)",
-            "        (name: \"Bracketed\", lhs: \"NounPhrase\", rhs: [Mark('(', Prefix), Cat(\"head\", \"NounPhrase\"), Punct(')')]),\n    ],\n)",
-        ),
+        &format!("{GRAMMAR}    Bracketed: NounPhrase -> '(':Prefix NounPhrase ')'\n"),
         &lexicon,
     )
     .unwrap();
@@ -197,10 +190,7 @@ fn feature_requirements_reject_disagreement() {
 #[test]
 fn feature_exclusion_is_shared_by_parsing_and_admission() {
     let lexicon = lexicon();
-    let source = GRAMMAR.replace(
-        "Require(\"clause.VerbForm\", \"Plain\")",
-        "Exclude(\"clause.VerbForm\", \"Finite\")",
-    );
+    let source = GRAMMAR.replace("clause.VerbForm = Plain", "clause.VerbForm != Finite");
     let grammar = bind(&source, &lexicon).unwrap();
     assert_ne!(
         readings(&grammar, &lexicon, "See the card."),
@@ -215,7 +205,7 @@ fn feature_exclusion_is_shared_by_parsing_and_admission() {
         [] as [Reading; 0]
     );
     let unrestricted = bind(
-        &source.replace("Exclude(\"clause.VerbForm\", \"Finite\")", ""),
+        &source.replace(" where clause.VerbForm != Finite", ""),
         &lexicon,
     )
     .unwrap();
@@ -301,50 +291,40 @@ fn load_errors() {
         assert!(GRAMMAR.contains(from), "{from}");
         GRAMMAR.replacen(from, to, 1)
     };
+    assert!(load_error(&swap("object:NounPhrase", "object:Noun")).contains("unknown category"));
     assert!(
-        load_error(&swap(
-            "Cat(\"object\", \"NounPhrase\")",
-            "Cat(\"object\", \"Noun\")"
-        ))
-        .contains("unknown category")
+        load_error(&swap("clause.VerbForm = Plain", "clause.Voice = Plain"))
+            .contains("unknown feature")
     );
     assert!(
         load_error(&swap(
-            "Require(\"clause.VerbForm\", \"Plain\")",
-            "Require(\"clause.Voice\", \"Plain\")"
-        ))
-        .contains("unknown feature")
-    );
-    assert!(
-        load_error(&swap(
-            "Require(\"clause.VerbForm\", \"Plain\")",
-            "Require(\"clause.VerbForm\", \"Imperative\")"
+            "clause.VerbForm = Plain",
+            "clause.VerbForm = Imperative"
         ))
         .contains("unknown value")
     );
+    assert!(load_error(&swap("det:Word(This)", "det:Word(That)")).contains("unknown closed word"));
     assert!(
-        load_error(&swap("Word(\"det\", \"This\")", "Word(\"det\", \"That\")"))
-            .contains("unknown closed word")
-    );
-    assert!(
-        load_error(&swap("\"This\": \"d:this\"", "\"This\": \"d:that\""))
+        load_error(&swap("word This = \"d:this\"", "word This = \"d:that\""))
             .contains("unknown lexeme")
     );
-    assert!(load_error(&swap("rhs: [Lex(\"head\", Noun)]", "rhs: []")).contains("empty"));
+    assert!(load_error(&swap("Noun: Nominal -> Lex(Noun)", "Noun: Nominal ->")).contains("empty"));
     for suffix in ["Use", "Licence", "License", "Present", "Restriction"] {
         let policing = swap(
-            "\"Number\": [",
-            &format!("\"Attachment{suffix}\": [\"Yes\"], \"Number\": ["),
+            "feature Number = ",
+            &format!("feature Attachment{suffix} = Yes\n    feature Number = "),
         );
         assert!(load_error(&policing).contains("policing"), "{suffix}");
     }
     // The CR-catalog ban: a keyword action is catalog vocabulary.
     assert!(
-        load_error(&swap("\"This\": \"d:this\"", "\"This\": \"v:destroy\"")).contains("Catalog")
+        load_error(&swap("word This = \"d:this\"", "word This = \"v:destroy\""))
+            .contains("Catalog")
     );
     // An open-class core word is not a closed word either.
     assert!(
-        load_error(&swap("\"This\": \"d:this\"", "\"This\": \"n:card\"")).contains("closed-class")
+        load_error(&swap("word This = \"d:this\"", "word This = \"n:card\""))
+            .contains("closed-class")
     );
     match FrameCatalog::from_ron_str(
         "(frames: { \"v:see\": [(family: Monotransitive, slots: [])] })",
@@ -543,15 +523,10 @@ fn a_phrase_parses_and_admits_as_its_own_category() {
 fn left_corner_filter_skips_unreachable_recursive_categories() {
     let lexicon = lexicon();
     let grammar = bind(GRAMMAR, &lexicon).unwrap();
-    let extended = GRAMMAR
-        .replace("\"PrepositionPhrase\": (),", "\"PrepositionPhrase\": (), \"Bracket\": (), \"Alias\": (),")
-        .replace("    ],\n)", r#"
-        (name: "BracketPhrase", lhs: "NounPhrase", rhs: [Cat("head", "Bracket")]),
-        (name: "BracketAlias", lhs: "Bracket", rhs: [Cat("head", "Alias")]),
-        (name: "AliasCycle", lhs: "Alias", rhs: [Cat("head", "Bracket")]),
-        (name: "Brackets", lhs: "Alias", rhs: [Mark('(', Prefix), Cat("head", "NounPhrase"), Punct(')')]),
-    ],
-)"#);
+    let extended = GRAMMAR.replace(
+        "    category PrepositionPhrase\n",
+        "    category PrepositionPhrase\n    category Bracket\n    category Alias\n",
+    ) + "    BracketPhrase: NounPhrase -> Bracket\n    BracketAlias: Bracket -> Alias\n    AliasCycle: Alias -> Bracket\n    Brackets: Alias -> '(':Prefix NounPhrase ')'\n";
     let extended = bind(&extended, &lexicon).unwrap();
     let text = "See the man on the hill with the telescope.";
     assert_eq!(
@@ -573,19 +548,18 @@ fn left_corner_filter_skips_unreachable_recursive_categories() {
 #[test]
 fn left_corner_masks_preserve_more_than_64_distinct_terminals() {
     let lexicon = lexicon();
-    let mut productions =
-        String::from(r#"(name: "Root", lhs: "Root", rhs: [Cat("head", "Mark")]),"#);
+    let mut productions = String::from("Root: Root -> Mark\n");
     let marks: Vec<_> = (0..70)
         .map(|i| char::from_u32(0x2500 + i).unwrap())
         .collect();
     for (i, mark) in marks.iter().enumerate() {
-        write!(
-            productions,
-            "(name: \"Mark{i}\", lhs: \"Mark\", rhs: [Punct('{mark}')]),"
-        )
-        .unwrap();
+        writeln!(productions, "Mark{i}: Mark -> '{mark}'").unwrap();
     }
-    let grammar = bind(&format!(r#"(root: "Root", categories: {{"Root": (), "Mark": ()}}, productions: [{productions}])"#), &lexicon).unwrap();
+    let grammar = bind(
+        &format!("root Root\ncategory Mark\ncategory Root\n{productions}"),
+        &lexicon,
+    )
+    .unwrap();
     for mark in marks {
         let text = mark.to_string();
         // Each distinct mark selects its own sole declared Production.
@@ -602,20 +576,18 @@ fn left_corner_masks_preserve_more_than_64_distinct_terminals() {
 fn compact_feature_values_preserve_zero_last_and_unbound() {
     let lexicon = lexicon();
     let values = (0..255)
-        .map(|i| format!("\"V{i}\""))
+        .map(|i| format!("V{i}"))
         .collect::<Vec<_>>()
-        .join(",");
+        .join(" | ");
     let source = format!(
-        r#"(
-        root: "Root",
-        features: {{"Feature": [{values}]}},
-        categories: {{"Root": (features: ["Feature"])}},
-        productions: [
-            (name: "First", lhs: "Root", rhs: [Lex("head", Noun)], equations: [Require("$.Feature", "V0")]),
-            (name: "Last", lhs: "Root", rhs: [Lex("head", Noun)], equations: [Require("$.Feature", "V254")]),
-            (name: "Unbound", lhs: "Root", rhs: [Lex("head", Noun)]),
-        ],
-    )"#
+        r"
+            root Root
+            feature Feature = {values}
+            category Root [Feature]
+            First: Root -> Lex(Noun) where $.Feature = V0
+            Last: Root -> Lex(Noun) where $.Feature = V254
+            Unbound: Root -> Lex(Noun)
+        "
     );
     let grammar = bind(&source, &lexicon).unwrap();
     let values: std::collections::BTreeSet<_> = readings(&grammar, &lexicon, "card")
@@ -632,20 +604,19 @@ fn compact_feature_values_preserve_zero_last_and_unbound() {
         values,
         [None, Some("V0".into()), Some("V254".into())].into()
     );
-    assert!(
-        load_error(&source.replace("\"V254\"]", "\"V254\", \"V255\"]")).contains("more than 255")
-    );
+    assert!(load_error(&source.replace("| V254\n", "| V254 | V255\n")).contains("more than 255"));
 }
 
 #[test]
 fn realization_checks_reachable_leaves_and_reports_misspellings() {
     let lexicon = lexicon();
     let grammar = bind(
-        r#"(
-        root: "Root", categories: {"Root": ()},
-        closed_words: {"The": "d:the"},
-        productions: [(name: "Word", lhs: "Root", rhs: [Word("head", "The")])],
-    )"#,
+        r#"
+            root Root
+            category Root
+            word The = "d:the"
+            Word: Root -> Word(The)
+        "#,
         &lexicon,
     )
     .unwrap();

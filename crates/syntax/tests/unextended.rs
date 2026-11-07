@@ -36,36 +36,32 @@ const FRAMES: &str = r#"(
 
 fn grammar(lexicon: &Lexicon, extended: &str) -> Result<CompiledGrammar, sylex_syntax::LoadError> {
     let text = format!(
-        r#"(
-        root: "Sentence",
-        categories: {{
-            "Sentence": (),
-            "Predicate": (),
-            "NounPhrase": (),
-            "PrepositionPhrase": (),
-        }},
-        closed_words: {{ "In": "p:in" }},
-        slot_categories: {{ NP: "NounPhrase", PP: "PrepositionPhrase" }},
-        productions: [
-            (name: "Statement", lhs: "Sentence", rhs: [Cat("head", "Predicate"), Punct('.')]),
-            (name: "Noun", lhs: "NounPhrase", rhs: [Lex("head", Noun)]),
-            (name: "Bare", lhs: "Predicate", rhs: [Cat("subject", "NounPhrase")], unextended: ["subject"]),
-            {extended}
-        ],
-        schemas: [
-            Valence(head: Preposition, phrase: "PrepositionPhrase"),
-            Adjunct(host: "NounPhrase", adjunct: "PrepositionPhrase", side: After, host_kind: Nominal, cost: 1),
-        ],
-    )"#
+        r#"
+root Sentence
+category NounPhrase
+category Predicate
+category PrepositionPhrase
+category Sentence
+word In = "p:in"
+slot NP = NounPhrase
+slot PP = PrepositionPhrase
+Statement: Sentence -> Predicate '.'
+Noun: NounPhrase -> Lex(Noun)
+Bare: Predicate -> subject:NounPhrase {{ unextended: [subject] }}
+{extended}
+valence PrepositionPhrase {{ head: Preposition }}
+adjunct PrepositionPhrase {{ host: NounPhrase, side: After, host_kind: Nominal }}
+        "#
     );
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(&text).unwrap(),
+        &Grammar::from_fug_str(&text).unwrap(),
         lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
 }
 
-const EXTENDED: &str = r#"(name: "Extended", lhs: "Predicate", rhs: [Cat("subject", "NounPhrase"), Selected("complement", "PrepositionPhrase", ["In"])]),"#;
+const EXTENDED: &str =
+    "Extended: Predicate -> subject:NounPhrase complement:Selected(PrepositionPhrase, In)";
 
 #[test]
 fn a_phrase_the_sibling_selects_is_its_complement_only() {
@@ -95,7 +91,7 @@ fn a_phrase_the_sibling_selects_is_its_complement_only() {
 #[test]
 fn a_child_before_a_selected_complement_does_not_end_in_one() {
     let lexicon = lexicon();
-    let closed = r#"(name: "Extended", lhs: "Predicate", rhs: [Cat("subject", "NounPhrase"), Selected("complement", "PrepositionPhrase", ["In"])], unextended: ["subject"]),"#;
+    let closed = "Extended: Predicate -> subject:NounPhrase complement:Selected(PrepositionPhrase, In) { unextended: [subject] }";
     let open = grammar(&lexicon, EXTENDED).unwrap();
     let grammar = grammar(&lexicon, closed).unwrap();
     // Open, *card in card* can be the subject before the extension *in card*.
@@ -145,8 +141,9 @@ fn an_unextended_child_before_no_selected_complement_is_a_load_error() {
     let lexicon = lexicon();
     // A first child followed by a Constituent is not `unextended` unless a
     // selected `PP` Complement follows it in some sibling.
-    let first = r#"(name: "Pair", lhs: "Sentence", rhs: [Cat("subject", "NounPhrase"), Cat("object", "NounPhrase"), Punct('.')], unextended: ["subject"]),"#;
-    assert!(grammar(&lexicon, &format!("{EXTENDED}{first}")).is_err());
-    let unknown = r#"(name: "Named", lhs: "Predicate", rhs: [Cat("subject", "NounPhrase"), Selected("complement", "PrepositionPhrase", ["In"])], unextended: ["nonesuch"]),"#;
+    let first =
+        "Pair: Sentence -> subject:NounPhrase object:NounPhrase '.' { unextended: [subject] }";
+    assert!(grammar(&lexicon, &format!("{EXTENDED}\n{first}")).is_err());
+    let unknown = "Named: Predicate -> subject:NounPhrase complement:Selected(PrepositionPhrase, In) { unextended: [nonesuch] }";
     assert!(grammar(&lexicon, unknown).is_err());
 }

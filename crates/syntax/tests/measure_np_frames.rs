@@ -54,42 +54,35 @@ const FRAMES: &str = r#"(
 
 // A numeral stands in for a slash measure: the Slot's Category is what is
 // under test, not the measure's internal structure.
-const GRAMMAR: &str = r#"(
-    root: "Sentence",
-    features: {
-        "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"],
-        "Voice": ["Active", "Passive"],
-    },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm", "Voice"], gap: true),
-        "NounPhrase": (),
-        "MeasureNounPhrase": (category: Some("NounPhrase")),
-        "PrepositionPhrase": (),
-    },
-    closed_words: { "By": "b:by" },
-    slot_categories: {
-        NP: "NounPhrase",
-        MeasureNP: "MeasureNounPhrase",
-        PP: "PrepositionPhrase",
-    },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "Plain"), Require("clause.Voice", "Active")]),
-        (name: "Measure", lhs: "MeasureNounPhrase", rhs: [Lex("head", Numeral)]),
-        (name: "Bare", lhs: "NounPhrase", rhs: [Lex("head", Noun)]),
-    ],
-    schemas: [
-        Valence(head: Verb, phrase: "VerbPhrase", active: [Require("$.Voice", "Active")], passive: Some("By"),
-            verbal_passive: [Require("$.Voice", "Passive"), Require("$.VerbForm", "PastParticiple")],
-            prepositional_passive: [Require("$.Voice", "Passive"), Require("$.VerbForm", "PastParticiple")]),
-        Valence(head: Preposition, phrase: "PrepositionPhrase"),
-    ],
-)"#;
+const GRAMMAR: &str = r#"
+    root Sentence
+    feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+    feature Voice = Active | Passive
+    category MeasureNounPhrase : NounPhrase
+    category NounPhrase
+    category PrepositionPhrase
+    category Sentence
+    category VerbPhrase [VerbForm, Voice] { gap }
+    word By = "b:by"
+    slot NP = NounPhrase
+    slot PP = PrepositionPhrase
+    slot MeasureNP = MeasureNounPhrase
+    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain, clause.Voice = Active
+    Measure: MeasureNounPhrase -> Lex(Numeral)
+    Bare: NounPhrase -> Lex(Noun)
+    valence VerbPhrase {
+        head: Verb,
+        active: [$.Voice = Active],
+        passive: By,
+        verbal_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
+        prepositional_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
+    }
+    valence PrepositionPhrase { head: Preposition }
+"#;
 
 fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(GRAMMAR).unwrap(),
+        &Grammar::from_fug_str(GRAMMAR).unwrap(),
         lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )

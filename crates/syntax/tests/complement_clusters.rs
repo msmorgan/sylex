@@ -47,35 +47,36 @@ const FRAMES: &str = r#"(
 )"#;
 
 fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
-    let source = r#"(
-    root: "Sentence",
-    features: { "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"] },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm"]),
-        "NounPhrase": (),
-        "PrepositionPhrase": (),
-        "Adjunct": (),
-        "Cluster": (),
-        "Clusters": (category: Some("Cluster")),
-    },
-    lexical_classes: { "Coordinator": ["c:and"] },
-    slot_categories: { NP: "NounPhrase", PP: "PrepositionPhrase" },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("head", "VerbPhrase"), Punct('.')], equations: [Require("head.VerbForm", "Plain")]),
-        (name: "Noun", lhs: "NounPhrase", rhs: [Lex("head", Noun)]),
-        (name: "PredicateAdjunct", lhs: "Adjunct", rhs: [Hosted("filler", "PrepositionPhrase", Predicate)]),
-    ],
-    schemas: [
-        Valence(head: Verb, phrase: "VerbPhrase",
-            clusters: Some((cluster: "Cluster", coordination: "Clusters", adjunct: Some("Adjunct")))),
-        Valence(head: Preposition, phrase: "PrepositionPhrase"),
-        Adjunct(host: "VerbPhrase", adjunct: "PrepositionPhrase", side: After, host_kind: Predicate, cost: 1),
-        Coordination(category: "Clusters", conjunct: Some("Cluster"), coordinators: "Coordinator"),
-    ],
-)"#;
+    let source = r#"
+        root Sentence
+        feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+        category Adjunct
+        category Cluster
+        category Clusters : Cluster
+        category NounPhrase
+        category PrepositionPhrase
+        category Sentence
+        category VerbPhrase [VerbForm]
+        class Coordinator = ["c:and"]
+        slot NP = NounPhrase
+        slot PP = PrepositionPhrase
+        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Noun: NounPhrase -> Lex(Noun)
+        PredicateAdjunct: Adjunct -> filler:Hosted(PrepositionPhrase, Predicate)
+        valence VerbPhrase {
+            head: Verb,
+            clusters: {
+                cluster: Cluster,
+                coordination: Clusters,
+                adjunct: Adjunct,
+            },
+        }
+        valence PrepositionPhrase { head: Preposition }
+        adjunct PrepositionPhrase { host: VerbPhrase, side: After, host_kind: Predicate }
+        coordination Clusters { coordinators: Coordinator, conjunct: Cluster }
+    "#;
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(source).unwrap(),
+        &Grammar::from_fug_str(source).unwrap(),
         lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
@@ -215,42 +216,43 @@ const REMNANT_FRAMES: &str = r#"(
 )"#;
 
 fn remnant_count(text: &str) -> usize {
-    let source = r#"(
-    root: "Sentence",
-    features: { "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"] },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm"]),
-        "NounPhrase": (),
-        "KeywordParameters": (),
-        "KeywordPhrase": (),
-        "ParameterRemnant": (),
-        "PrepositionPhrase": (),
-        "Adjunct": (),
-        "Cluster": (),
-        "Clusters": (category: Some("Cluster")),
-    },
-    lexical_classes: { "Coordinator": ["c:and"] },
-    slot_categories: { NP: "NounPhrase", KeywordPhrase: "KeywordPhrase" },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("head", "VerbPhrase"), Punct('.')], equations: [Require("head.VerbForm", "Plain")]),
-        (name: "Noun", lhs: "NounPhrase", rhs: [Lex("head", Noun)]),
-        (name: "Keyword", lhs: "KeywordPhrase", rhs: [Cat("head", "KeywordParameters")]),
-        (name: "PredicateAdjunct", lhs: "Adjunct", rhs: [Hosted("filler", "PrepositionPhrase", Predicate)]),
-    ],
-    schemas: [
-        Parameters(head: Keyword, phrase: "KeywordParameters", remnant: Some("ParameterRemnant")),
-        Valence(head: Verb, phrase: "VerbPhrase",
-            clusters: Some((cluster: "Cluster", coordination: "Clusters", adjunct: Some("Adjunct"),
-                remnants: [(KeywordPhrase, "ParameterRemnant")]))),
-        Valence(head: Preposition, phrase: "PrepositionPhrase"),
-        Adjunct(host: "VerbPhrase", adjunct: "PrepositionPhrase", side: After, host_kind: Predicate, cost: 1),
-        Coordination(category: "Clusters", conjunct: Some("Cluster"), coordinators: "Coordinator"),
-    ],
-)"#;
+    let source = r#"
+        root Sentence
+        feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+        category Adjunct
+        category Cluster
+        category Clusters : Cluster
+        category KeywordParameters
+        category KeywordPhrase
+        category NounPhrase
+        category ParameterRemnant
+        category PrepositionPhrase
+        category Sentence
+        category VerbPhrase [VerbForm]
+        class Coordinator = ["c:and"]
+        slot NP = NounPhrase
+        slot KeywordPhrase = KeywordPhrase
+        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Noun: NounPhrase -> Lex(Noun)
+        Keyword: KeywordPhrase -> KeywordParameters
+        PredicateAdjunct: Adjunct -> filler:Hosted(PrepositionPhrase, Predicate)
+        parameters KeywordParameters { head: Keyword, remnant: ParameterRemnant }
+        valence VerbPhrase {
+            head: Verb,
+            clusters: {
+                cluster: Cluster,
+                coordination: Clusters,
+                adjunct: Adjunct,
+                remnants: [KeywordPhrase -> ParameterRemnant],
+            },
+        }
+        valence PrepositionPhrase { head: Preposition }
+        adjunct PrepositionPhrase { host: VerbPhrase, side: After, host_kind: Predicate }
+        coordination Clusters { coordinators: Coordinator, conjunct: Cluster }
+    "#;
     let lexicon = remnant_lexicon();
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(source).unwrap(),
+        &Grammar::from_fug_str(source).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(REMNANT_FRAMES).unwrap(),
     )

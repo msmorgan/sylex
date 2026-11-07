@@ -63,43 +63,35 @@ const FRAMES: &str = r#"(
     },
 )"#;
 
-const GRAMMAR: &str = r#"(
-    root: "Sentence",
-    features: {
-        "Number": ["Singular", "Plural"],
-        "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"],
-    },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm"]),
-        "NounPhrase": (),
-        "Nominal": (features: ["Number"]),
-        "DeterminerPhrase": (),
-        "AdjectivePhrase": (),
-        "PrepositionPhrase": (),
-    },
-    slot_categories: { NP: "NounPhrase", PP: "PrepositionPhrase" },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "Plain")]),
-        (name: "Determined", lhs: "NounPhrase", rhs: [Cat("determiner", "DeterminerPhrase"), Cat("head", "Nominal")]),
-        (name: "FusedHead", lhs: "NounPhrase", rhs: [Cat("head", "DeterminerPhrase")]),
-        (name: "Postpositive", lhs: "Nominal", rhs: [Cat("head", "Nominal"), Cat("modifier", "AdjectivePhrase")]),
-    ],
-    schemas: [
-        Valence(head: Verb, phrase: "VerbPhrase"),
-        Valence(head: Preposition, phrase: "PrepositionPhrase"),
-        Valence(head: Noun, phrase: "Nominal"),
-        Valence(head: Adjective, phrase: "AdjectivePhrase"),
-        Valence(head: Determinative, phrase: "DeterminerPhrase"),
-    ],
-)"#;
+const GRAMMAR: &str = r"
+    root Sentence
+    feature Number = Singular | Plural
+    feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+    category AdjectivePhrase
+    category DeterminerPhrase
+    category Nominal [Number]
+    category NounPhrase
+    category PrepositionPhrase
+    category Sentence
+    category VerbPhrase [VerbForm]
+    slot NP = NounPhrase
+    slot PP = PrepositionPhrase
+    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Determined: NounPhrase -> determiner:DeterminerPhrase Nominal
+    FusedHead: NounPhrase -> DeterminerPhrase
+    Postpositive: Nominal -> Nominal modifier:AdjectivePhrase
+    valence VerbPhrase { head: Verb }
+    valence PrepositionPhrase { head: Preposition }
+    valence Nominal { head: Noun }
+    valence AdjectivePhrase { head: Adjective }
+    valence DeterminerPhrase { head: Determinative }
+";
 
 /// Every Reading of `text`, each checked for Admission and round-trip law 1.
 fn readings(text: &str) -> Vec<Reading> {
     let lexicon = lexicon();
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(GRAMMAR).unwrap(),
+        &Grammar::from_fug_str(GRAMMAR).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )

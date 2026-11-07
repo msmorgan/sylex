@@ -40,7 +40,7 @@ fn lexicon() -> Lexicon {
 
 fn bind(grammar: &str) -> CompiledGrammar {
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(grammar).unwrap(),
+        &Grammar::from_fug_str(grammar).unwrap(),
         &lexicon(),
         &FrameCatalog::default(),
     )
@@ -51,19 +51,20 @@ const OUTER: &[&str] = &["Document", "Sentences"];
 const EDGES: &[char] = &['.', ',', ':'];
 
 /// A sentence sequence, and a sentence that holds a bracketed one of its own.
-const SEQUENCE: &str = r#"(
-    root: "Document",
-    categories: { "Document": (), "Sentences": (), "Sentence": (), "Word": () },
-    productions: [
-        (name: "Text", lhs: "Document", rhs: [Cat("head", "Sentences")]),
-        (name: "Single", lhs: "Sentences", rhs: [Cat("head", "Sentence")]),
-        (name: "Sequence", lhs: "Sentences", rhs: [Cat("first", "Sentence"), Cat("rest", "Sentences")]),
-        (name: "Plain", lhs: "Sentence", rhs: [Cat("word", "Word"), Punct('.')]),
-        (name: "Nested", lhs: "Sentence", rhs: [Cat("word", "Word"), Mark('[', Prefix), Cat("inner", "Sentences"), Punct(']'), Punct('.')]),
-        (name: "Noun", lhs: "Word", rhs: [Lex("word", Noun)]),
-        (name: "Adjective", lhs: "Word", rhs: [Lex("word", Adjective)]),
-    ],
-)"#;
+const SEQUENCE: &str = r"
+    root Document
+    category Document
+    category Sentence
+    category Sentences
+    category Word
+    Text: Document -> Sentences
+    Single: Sentences -> Sentence
+    Sequence: Sentences -> first:Sentence rest:Sentences
+    Plain: Sentence -> word:Word '.'
+    Nested: Sentence -> word:Word '[':Prefix inner:Sentences ']' '.'
+    Noun: Word -> word:Lex(Noun)
+    Adjective: Word -> word:Lex(Adjective)
+";
 
 fn segments(grammar: &CompiledGrammar, text: &str) -> (u128, Segmentation) {
     let parse = grammar.parse(&lexicon(), text);
@@ -120,16 +121,17 @@ fn a_parse_without_a_derivation_has_no_segments() {
 #[test]
 fn segment_boundaries_that_differ_between_derivations_are_reported() {
     let grammar = bind(
-        r#"(
-        root: "Document",
-        categories: { "Document": (), "Sentences": (), "Pair": (), "Word": () },
-        productions: [
-            (name: "Words", lhs: "Document", rhs: [Cat("first", "Word"), Cat("second", "Word"), Punct('.')]),
-            (name: "Paired", lhs: "Document", rhs: [Cat("head", "Pair"), Punct('.')]),
-            (name: "Pair", lhs: "Pair", rhs: [Cat("first", "Word"), Cat("second", "Word")]),
-            (name: "Noun", lhs: "Word", rhs: [Lex("word", Noun)]),
-        ],
-    )"#,
+        r"
+            root Document
+            category Document
+            category Pair
+            category Sentences
+            category Word
+            Words: Document -> first:Word second:Word '.'
+            Paired: Document -> Pair '.'
+            Pair: Pair -> first:Word second:Word
+            Noun: Word -> word:Lex(Noun)
+        ",
     );
     let (derivations, segmentation) = segments(&grammar, "Card card.");
     assert_eq!(derivations, 2);
@@ -145,16 +147,16 @@ fn segment_boundaries_that_differ_between_derivations_are_reported() {
 #[test]
 fn several_outer_structures_over_one_segmentation_are_reported() {
     let grammar = bind(
-        r#"(
-        root: "Document",
-        categories: { "Document": (), "Sentences": (), "Word": () },
-        productions: [
-            (name: "Direct", lhs: "Document", rhs: [Cat("head", "Word"), Punct('.')]),
-            (name: "Listed", lhs: "Document", rhs: [Cat("head", "Sentences")]),
-            (name: "Single", lhs: "Sentences", rhs: [Cat("head", "Word"), Punct('.')]),
-            (name: "Noun", lhs: "Word", rhs: [Lex("word", Noun)]),
-        ],
-    )"#,
+        r"
+            root Document
+            category Document
+            category Sentences
+            category Word
+            Direct: Document -> Word '.'
+            Listed: Document -> Sentences
+            Single: Sentences -> Word '.'
+            Noun: Word -> word:Lex(Noun)
+        ",
     );
     let (derivations, segmentation) = segments(&grammar, "Card.");
     assert_eq!(derivations, 2);

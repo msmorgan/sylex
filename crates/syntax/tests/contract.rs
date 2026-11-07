@@ -86,7 +86,7 @@ fn pronoun(id: &str, lemma: &str, bundles: &[(Number, Person)]) -> Lexeme {
 
 fn bind(grammar: &str, lexicon: &Lexicon, frames: &str) -> Result<CompiledGrammar, LoadError> {
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(grammar)?,
+        &Grammar::from_fug_str(grammar)?,
         lexicon,
         &FrameCatalog::from_ron_str(frames)?,
     )
@@ -182,18 +182,17 @@ fn lexemes(reading: &Reading) -> Vec<String> {
 }
 
 /// One word of a lexical Category, then a full stop.
-const WORD: &str = r#"(
-    root: "Sentence",
-    categories: { "Sentence": (), "Word": () },
-    productions: [
-        (name: "Sentence", lhs: "Sentence", rhs: [Cat("word", "Word"), Punct('.')]),
-        (name: "Noun", lhs: "Word", rhs: [Lex("word", Noun)]),
-        (name: "Verb", lhs: "Word", rhs: [Lex("word", Verb)]),
-        (name: "Adjective", lhs: "Word", rhs: [Lex("word", Adjective)]),
-        (name: "Determinative", lhs: "Word", rhs: [Lex("word", Determinative)]),
-        (name: "Numeral", lhs: "Word", rhs: [Lex("word", Numeral)]),
-    ],
-)"#;
+const WORD: &str = r"
+    root Sentence
+    category Sentence
+    category Word
+    Sentence: Sentence -> word:Word '.'
+    Noun: Word -> word:Lex(Noun)
+    Verb: Word -> word:Lex(Verb)
+    Adjective: Word -> word:Lex(Adjective)
+    Determinative: Word -> word:Lex(Determinative)
+    Numeral: Word -> word:Lex(Numeral)
+";
 
 /// The Reading of `Sentence` over one leaf.
 fn word_reading(production: &str, value: LexicalReading) -> Reading {
@@ -278,10 +277,7 @@ fn duplicate_derivations_of_one_tree_are_one_reading() {
         BTreeSet::from([word_reading("Noun", analyzed.matches[0].reading.clone())])
     );
     // Two Productions cannot derive one tree: a tree names its Production.
-    let twice = WORD.replace(
-        "(name: \"Verb\", lhs: \"Word\"",
-        "(name: \"Noun\", lhs: \"Word\"",
-    );
+    let twice = WORD.replace("Verb: Word ->", "Noun: Word ->");
     match bind(&twice, &lexicon, NO_FRAMES) {
         Err(LoadError::Invalid(message)) => assert!(message.contains("duplicate production")),
         other => panic!("{other:?}"),
@@ -301,15 +297,14 @@ fn multiword_lexeme_is_atomic_and_needs_its_separator() {
         noun("strike"),
     ];
     let lexicon = Lexicon::new([first_strike].into_iter().chain(words.clone())).unwrap();
-    let source = r#"(
-            root: "Sentence",
-            categories: { "Sentence": (), "Nominal": () },
-            productions: [
-                (name: "Sentence", lhs: "Sentence", rhs: [Cat("head", "Nominal"), Punct('.')]),
-                (name: "Noun", lhs: "Nominal", rhs: [Lex("head", Noun)]),
-                (name: "Premodified", lhs: "Nominal", rhs: [Lex("modifier", Adjective), Cat("head", "Nominal")]),
-            ],
-        )"#;
+    let source = r"
+        root Sentence
+        category Nominal
+        category Sentence
+        Sentence: Sentence -> Nominal '.'
+        Noun: Nominal -> Lex(Noun)
+        Premodified: Nominal -> modifier:Lex(Adjective) Nominal
+    ";
     let grammar = bind(source, &lexicon, NO_FRAMES).unwrap();
     let found: BTreeSet<Vec<String>> = readings(&grammar, &lexicon, "First strike.")
         .iter()
@@ -356,18 +351,18 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
         noun("damage"),
     ];
     let lexicon = Lexicon::new([first_strike].into_iter().chain(others.clone())).unwrap();
-    let source = r#"(
-            root: "Sentence",
-            categories: { "Sentence": (), "Nominal": (), "Adjectives": () },
-            productions: [
-                (name: "Sentence", lhs: "Sentence", rhs: [Cat("head", "Nominal"), Punct('.')]),
-                (name: "Split", lhs: "Sentence", rhs: [Cat("modifier", "Adjectives"), Cat("head", "Nominal"), Punct('.')]),
-                (name: "Adjectives", lhs: "Adjectives", rhs: [Lex("first", Adjective), Lex("last", Adjective)]),
-                (name: "Noun", lhs: "Nominal", rhs: [Lex("head", Noun)]),
-                (name: "Premodified", lhs: "Nominal", rhs: [Lex("modifier", Adjective), Cat("head", "Nominal")]),
-                (name: "Compound", lhs: "Nominal", rhs: [Lex("modifier", Noun), Cat("head", "Nominal")]),
-            ],
-        )"#;
+    let source = r"
+        root Sentence
+        category Adjectives
+        category Nominal
+        category Sentence
+        Sentence: Sentence -> Nominal '.'
+        Split: Sentence -> modifier:Adjectives Nominal '.'
+        Adjectives: Adjectives -> first:Lex(Adjective) last:Lex(Adjective)
+        Noun: Nominal -> Lex(Noun)
+        Premodified: Nominal -> modifier:Lex(Adjective) Nominal
+        Compound: Nominal -> modifier:Lex(Noun) Nominal
+    ";
     let grammar = bind(source, &lexicon, NO_FRAMES).unwrap();
     let found = |text: &str| -> BTreeSet<Vec<String>> {
         readings(&grammar, &lexicon, text)
@@ -452,7 +447,7 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
 fn no_category_is_nullable() {
     let lexicon =
         Lexicon::new([noun("one"), word("d:one", "one", Category::Determinative)]).unwrap();
-    let empty = WORD.replace("rhs: [Lex(\"word\", Numeral)]", "rhs: []");
+    let empty = WORD.replace("Numeral: Word -> word:Lex(Numeral)", "Numeral: Word ->");
     match bind(&empty, &lexicon, NO_FRAMES) {
         Err(LoadError::Invalid(message)) => assert!(message.contains("empty right-hand side")),
         other => panic!("{other:?}"),
@@ -475,18 +470,18 @@ fn no_category_is_nullable() {
 
 /// A list of words: `Seq -> Item | Seq Item`, where `Item` carries Number
 /// and `Seq` carries nothing.
-const LIST: &str = r#"(
-    root: "Sentence",
-    features: { "Number": ["Singular", "Plural"] },
-    categories: { "Sentence": (), "Seq": (), "Item": (features: ["Number"]) },
-    productions: [
-        (name: "Sentence", lhs: "Sentence", rhs: [Cat("list", "Seq"), Punct('.')]),
-        (name: "One", lhs: "Seq", rhs: [Cat("item", "Item")]),
-        (name: "More", lhs: "Seq", rhs: [Cat("list", "Seq"), Cat("item", "Item")]),
-        (name: "Noun", lhs: "Item", rhs: [Lex("head", Noun)]),
-        (name: "Adjective", lhs: "Item", rhs: [Lex("head", Adjective)]),
-    ],
-)"#;
+const LIST: &str = r"
+    root Sentence
+    feature Number = Singular | Plural
+    category Item [Number]
+    category Sentence
+    category Seq
+    Sentence: Sentence -> list:Seq '.'
+    One: Seq -> item:Item
+    More: Seq -> list:Seq item:Item
+    Noun: Item -> Lex(Noun)
+    Adjective: Item -> Lex(Adjective)
+";
 
 fn repeated(word: &str, n: usize) -> String {
     let mut text = vec![word; n].join(" ");
@@ -581,29 +576,21 @@ fn agreement_keeps_joint_alternatives_correlated() {
     ])
     .unwrap();
     let grammar = bind(
-        r#"(
-            root: "Sentence",
-            features: {
-                "Number": ["Singular", "Plural"],
-                "Person": ["First", "Second", "Third"],
-                "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"],
-            },
-            categories: {
-                "Sentence": (),
-                "Subject": (features: ["Number", "Person"]),
-                "VerbPhrase": (features: ["Number", "Person", "VerbForm"]),
-            },
-            productions: [
-                (name: "Clause", lhs: "Sentence", rhs: [Cat("subject", "Subject"), Cat("head", "VerbPhrase"), Punct('.')],
-                    equations: [
-                        Agree("subject.Number", "head.Number"),
-                        Agree("subject.Person", "head.Person"),
-                        Require("head.VerbForm", "Finite"),
-                    ]),
-                (name: "Pronoun", lhs: "Subject", rhs: [Lex("head", Pronoun)]),
-                (name: "Verb", lhs: "VerbPhrase", rhs: [Lex("head", Verb)]),
-            ],
-        )"#,
+        r"
+            root Sentence
+            feature Number = Singular | Plural
+            feature Person = First | Second | Third
+            feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+            category Sentence
+            category Subject [Number, Person]
+            category VerbPhrase [Number, Person, VerbForm]
+            Clause: Sentence -> subject:Subject VerbPhrase '.'
+                where subject.Number = head.Number,
+                      subject.Person = head.Person,
+                      head.VerbForm = Finite
+            Pronoun: Subject -> Lex(Pronoun)
+            Verb: VerbPhrase -> Lex(Verb)
+        ",
         &lexicon,
         NO_FRAMES,
     )
@@ -708,38 +695,29 @@ fn agreement_keeps_joint_alternatives_correlated() {
 }
 
 /// Imperatives whose objects take gapped relative clauses.
-const RELATIVE: &str = r#"(
-    root: "Sentence",
-    features: {
-        "Number": ["Singular", "Plural"],
-        "Person": ["First", "Second", "Third"],
-        "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"],
-    },
-    categories: {
-        "Sentence": (),
-        "Clause": (gap: true),
-        "VerbPhrase": (features: ["Number", "Person", "VerbForm"], gap: true),
-        "NounPhrase": (),
-        "Nominal": (),
-    },
-    closed_words: { "The": "d:the", "You": "pr:you" },
-    slot_categories: { NP: "NounPhrase" },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "Plain")]),
-        (name: "Declarative", lhs: "Clause", rhs: [Word("subject", "You"), Cat("head", "VerbPhrase")],
-            equations: [
-                Require("head.VerbForm", "Finite"),
-                Agree("subject.Number", "head.Number"),
-                Agree("subject.Person", "head.Person"),
-            ], transparent: ["head"]),
-        (name: "Determined", lhs: "NounPhrase", rhs: [Word("det", "The"), Cat("head", "Nominal")]),
-        (name: "Noun", lhs: "Nominal", rhs: [Lex("head", Noun)]),
-        (name: "Relative", lhs: "Nominal", rhs: [Cat("head", "Nominal"), Cat("modifier", "Clause")],
-            equations: [Require("modifier.Gap", "NP")]),
-    ],
-    schemas: [Valence(head: Verb, phrase: "VerbPhrase")],
-)"#;
+const RELATIVE: &str = r#"
+    root Sentence
+    feature Number = Singular | Plural
+    feature Person = First | Second | Third
+    feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+    category Clause { gap }
+    category Nominal
+    category NounPhrase
+    category Sentence
+    category VerbPhrase [Number, Person, VerbForm] { gap }
+    word The = "d:the"
+    word You = "pr:you"
+    slot NP = NounPhrase
+    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Declarative: Clause -> subject:Word(You) VerbPhrase { transparent: [head] }
+        where head.VerbForm = Finite,
+              subject.Number = head.Number,
+              subject.Person = head.Person
+    Determined: NounPhrase -> det:Word(The) Nominal
+    Noun: Nominal -> Lex(Noun)
+    Relative: Nominal -> Nominal modifier:Clause where modifier.Gap = NP
+    valence VerbPhrase { head: Verb }
+"#;
 
 const SEE_BOTH: &str = r#"(frames: { "v:see": [
     (family: Monotransitive, slots: [(relation: Object, fill: NP)]),
@@ -821,9 +799,9 @@ fn closed_child_with_a_gap_yields_no_mother() {
         pronoun("pr:you", "you", &[(Number::Plural, Person::Second)]),
     ])
     .unwrap();
-    let transparent = r#"], transparent: ["head"]),"#;
+    let transparent = " { transparent: [head] }";
     assert_eq!(RELATIVE.matches(transparent).count(), 1);
-    let opaque = RELATIVE.replace(transparent, "]),");
+    let opaque = RELATIVE.replace(transparent, "");
     for frames in [SEE_BOTH, SEE_TRANSITIVE] {
         let passing = bind(RELATIVE, &lexicon, frames).unwrap();
         let closed = bind(&opaque, &lexicon, frames).unwrap();
@@ -846,7 +824,7 @@ fn closed_child_with_a_gap_yields_no_mother() {
 /// `B` each derive the word and each other; every tree in which no
 /// Constituent contains itself is a Reading, whichever Constituent the
 /// forest reaches first.
-/// A Production introduces a Gap with `Require("$.Gap", ..)` (a subject
+/// A Production introduces a Gap with `$.Gap = ..` (a subject
 /// Gap), and a transparent child with a required Gap raises exactly that Gap
 /// to its mother.
 #[test]
@@ -859,20 +837,9 @@ fn authored_productions_introduce_and_raise_gaps() {
     ])
     .unwrap();
     let grammar = RELATIVE.replace(
-        r#""Nominal": (),"#,
-        r#""Nominal": (), "Raised": (gap: true),"#,
-    )
-    .replace(
-        "    ],\n    schemas:",
-        r#"        (name: "SubjectGap", lhs: "Clause", rhs: [Cat("head", "VerbPhrase")],
-            equations: [Require("head.VerbForm", "Finite"), Require("$.Gap", "NP")]),
-        (name: "Raise", lhs: "Raised", rhs: [Cat("inner", "Clause")],
-            equations: [Require("inner.Gap", "NP")], transparent: ["inner"]),
-        (name: "RaisedRelative", lhs: "Nominal", rhs: [Cat("head", "Nominal"), Cat("modifier", "Raised")],
-            equations: [Require("modifier.Gap", "NP")]),
-    ],
-    schemas:"#,
-    );
+        "    category Nominal\n",
+        "    category Nominal\n    category Raised { gap }\n",
+    ) + "    SubjectGap: Clause -> VerbPhrase where head.VerbForm = Finite, $.Gap = NP\n    Raise: Raised -> inner:Clause { transparent: [inner] } where inner.Gap = NP\n    RaisedRelative: Nominal -> Nominal modifier:Raised where modifier.Gap = NP\n";
     let grammar = bind(&grammar, &lexicon, SEE_BOTH).unwrap();
     let gaps = |text: &str, category: &str| -> Vec<Gap> {
         let mut found = Vec::new();
@@ -903,18 +870,18 @@ fn authored_productions_introduce_and_raise_gaps() {
 fn unary_cycle_hides_no_finite_sibling() {
     let lexicon = Lexicon::new([noun("card")]).unwrap();
     let grammar = bind(
-        r#"(
-            root: "Sentence",
-            categories: { "Sentence": (), "A": (), "B": () },
-            productions: [
-                (name: "SA", lhs: "Sentence", rhs: [Cat("head", "A"), Punct('.')]),
-                (name: "SB", lhs: "Sentence", rhs: [Cat("head", "B"), Punct('.')]),
-                (name: "AB", lhs: "A", rhs: [Cat("head", "B")]),
-                (name: "BA", lhs: "B", rhs: [Cat("head", "A")]),
-                (name: "AWord", lhs: "A", rhs: [Lex("head", Noun)]),
-                (name: "BWord", lhs: "B", rhs: [Lex("head", Noun)]),
-            ],
-        )"#,
+        r"
+            root Sentence
+            category A
+            category B
+            category Sentence
+            SA: Sentence -> A '.'
+            SB: Sentence -> B '.'
+            AB: A -> B
+            BA: B -> A
+            AWord: A -> Lex(Noun)
+            BWord: B -> Lex(Noun)
+        ",
         &lexicon,
         NO_FRAMES,
     )
@@ -972,18 +939,19 @@ fn removing_an_alternative_removes_exactly_its_readings() {
     ])
     .unwrap();
     let grammar = bind(
-        r#"(
-            root: "Sentence",
-            features: { "Number": ["Singular", "Plural"], "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"] },
-            categories: { "Sentence": (), "VerbPhrase": (features: ["VerbForm"]), "NounPhrase": (features: ["Number"]) },
-            productions: [
-                (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')]),
-                (name: "Transitive", lhs: "VerbPhrase", rhs: [Lex("head", Verb), Cat("object", "NounPhrase")]),
-                (name: "Bare", lhs: "NounPhrase", rhs: [Lex("head", Noun)]),
-                (name: "Determined", lhs: "NounPhrase", rhs: [Lex("det", Determinative), Lex("head", Noun)]),
-                (name: "Counted", lhs: "NounPhrase", rhs: [Lex("det", Numeral), Lex("head", Noun)]),
-            ],
-        )"#,
+        r"
+            root Sentence
+            feature Number = Singular | Plural
+            feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+            category NounPhrase [Number]
+            category Sentence
+            category VerbPhrase [VerbForm]
+            Imperative: Sentence -> clause:VerbPhrase '.'
+            Transitive: VerbPhrase -> Lex(Verb) object:NounPhrase
+            Bare: NounPhrase -> Lex(Noun)
+            Determined: NounPhrase -> det:Lex(Determinative) Lex(Noun)
+            Counted: NounPhrase -> det:Lex(Numeral) Lex(Noun)
+        ",
         &lexicon,
         NO_FRAMES,
     )
@@ -1065,33 +1033,29 @@ fn every_declared_lexical_value_round_trips() {
 }
 
 /// Imperatives with nominal and predicate attachment of Preposition Phrases.
-const PHRASES: &str = r#"(
-    root: "Sentence",
-    features: { "Number": ["Singular", "Plural"], "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"] },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm"]),
-        "NounPhrase": (features: ["Number"]),
-        "Nominal": (features: ["Number"]),
-        "PrepositionPhrase": (),
-    },
-    closed_words: { "The": "d:the", "This": "d:this", "These": "d:these" },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "Plain")]),
-        (name: "Transitive", lhs: "VerbPhrase", rhs: [Lex("head", Verb), Cat("object", "NounPhrase")]),
-        (name: "PredicateAdjunct", lhs: "VerbPhrase", rhs: [Cat("head", "VerbPhrase"), Cat("adjunct", "PrepositionPhrase")]),
-        (name: "Determined", lhs: "NounPhrase", rhs: [Word("det", "The"), Cat("head", "Nominal")]),
-        (name: "DeterminedSingular", lhs: "NounPhrase", rhs: [Word("det", "This"), Cat("head", "Nominal")],
-            equations: [Require("head.Number", "Singular")]),
-        (name: "DeterminedPlural", lhs: "NounPhrase", rhs: [Word("det", "These"), Cat("head", "Nominal")],
-            equations: [Require("head.Number", "Plural")]),
-        (name: "Noun", lhs: "Nominal", rhs: [Lex("head", Noun)]),
-        (name: "Premodified", lhs: "Nominal", rhs: [Lex("modifier", Adjective), Cat("head", "Nominal")]),
-        (name: "Postmodifier", lhs: "Nominal", rhs: [Cat("head", "Nominal"), Cat("modifier", "PrepositionPhrase")]),
-        (name: "PrepositionPhrase", lhs: "PrepositionPhrase", rhs: [Lex("head", Preposition), Cat("object", "NounPhrase")]),
-    ],
-)"#;
+const PHRASES: &str = r#"
+    root Sentence
+    feature Number = Singular | Plural
+    feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+    category Nominal [Number]
+    category NounPhrase [Number]
+    category PrepositionPhrase
+    category Sentence
+    category VerbPhrase [VerbForm]
+    word The = "d:the"
+    word These = "d:these"
+    word This = "d:this"
+    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Transitive: VerbPhrase -> Lex(Verb) object:NounPhrase
+    PredicateAdjunct: VerbPhrase -> VerbPhrase adjunct:PrepositionPhrase
+    Determined: NounPhrase -> det:Word(The) Nominal
+    DeterminedSingular: NounPhrase -> det:Word(This) Nominal where head.Number = Singular
+    DeterminedPlural: NounPhrase -> det:Word(These) Nominal where head.Number = Plural
+    Noun: Nominal -> Lex(Noun)
+    Premodified: Nominal -> modifier:Lex(Adjective) Nominal
+    Postmodifier: Nominal -> Nominal modifier:PrepositionPhrase
+    PrepositionPhrase: PrepositionPhrase -> Lex(Preposition) object:NounPhrase
+"#;
 
 /// Groups independently built Readings by their realization and checks
 /// that the parse of each realization has exactly that group as Readings.
@@ -1278,16 +1242,14 @@ fn complete_phrase_families_round_trip() {
 fn numeral_sign_survives_phrase_projection_and_controls_admission() {
     let lexicon = Lexicon::new([]).unwrap();
     let grammar = bind(
-        r#"(
-            root: "Root",
-            features: { "Sign": ["Negative", "Zero", "Positive"] },
-            categories: { "Root": (), "Amount": (features: ["Sign"]) },
-            productions: [
-                (name: "Nonnegative", lhs: "Root", rhs: [Cat("head", "Amount")],
-                    equations: [Exclude("head.Sign", "Negative")]),
-                (name: "Numeric", lhs: "Amount", rhs: [Numeral("head", Arabic(false))]),
-            ],
-        )"#,
+        r"
+            root Root
+            feature Sign = Negative | Zero | Positive
+            category Amount [Sign]
+            category Root
+            Nonnegative: Root -> Amount where head.Sign != Negative
+            Numeric: Amount -> Numeral(Arabic(false))
+        ",
         &lexicon,
         NO_FRAMES,
     )
@@ -1333,14 +1295,13 @@ fn reparse_keeps_a_category_reported_under_another_name() {
     ])
     .unwrap();
     let grammar = bind(
-        r#"(
-            root: "Nominal",
-            categories: { "Nominal": (), "Premodified": (category: Some("Nominal")) },
-            productions: [
-                (name: "Noun", lhs: "Nominal", rhs: [Lex("head", Noun)]),
-                (name: "Premodified", lhs: "Premodified", rhs: [Lex("modifier", Adjective), Cat("head", "Nominal")]),
-            ],
-        )"#,
+        r"
+            root Nominal
+            category Nominal
+            category Premodified : Nominal
+            Noun: Nominal -> Lex(Noun)
+            Premodified: Premodified -> modifier:Lex(Adjective) Nominal
+        ",
         &lexicon,
         NO_FRAMES,
     )

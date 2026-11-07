@@ -32,23 +32,24 @@ fn lexicon() -> Lexicon {
 /// A preposed group and a temporal set off by one comma; a noun's group can
 /// take the temporal inside it (`Long`), an adjective's cannot.
 fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
-    let text = r#"(
-        root: "Sentence",
-        categories: { "Sentence": (), "Group": (), "Temporal": (), "Clause": () },
-        closed_words: { "This": "d:this" },
-        productions: [
-            (name: "Statement", lhs: "Sentence", rhs: [Cat("head", "Clause"), Punct('.')]),
-            (name: "Plain", lhs: "Clause", rhs: [Lex("head", Noun)]),
-            (name: "Noun", lhs: "Group", rhs: [Lex("head", Noun)]),
-            (name: "Adjective", lhs: "Group", rhs: [Lex("head", Adjective)]),
-            (name: "Long", lhs: "Group", rhs: [Lex("head", Noun), Cat("modifier", "Temporal")]),
-            (name: "This", lhs: "Temporal", rhs: [Word("determiner", "This"), Lex("head", Noun)]),
-            (name: "Preposed", lhs: "Clause", rhs: [Cat("adjunct", "Group"), Punct(','), Cat("head", "Clause")]),
-            (name: "PreposedPair", lhs: "Clause", rhs: [Cat("adjunct", "Group"), Cat("adjunct", "Temporal"), Punct(','), Cat("head", "Clause")]),
-        ],
-    )"#;
+    let text = r#"
+        root Sentence
+        category Clause
+        category Group
+        category Sentence
+        category Temporal
+        word This = "d:this"
+        Statement: Sentence -> Clause '.'
+        Plain: Clause -> Lex(Noun)
+        Noun: Group -> Lex(Noun)
+        Adjective: Group -> Lex(Adjective)
+        Long: Group -> Lex(Noun) modifier:Temporal
+        This: Temporal -> determiner:Word(This) Lex(Noun)
+        Preposed: Clause -> adjunct:Group ',' Clause
+        PreposedPair: Clause -> adjunct:Group adjunct:Temporal ',' Clause
+    "#;
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(text).unwrap(),
+        &Grammar::from_fug_str(text).unwrap(),
         lexicon,
         &FrameCatalog::default(),
     )

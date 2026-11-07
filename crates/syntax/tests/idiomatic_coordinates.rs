@@ -38,35 +38,30 @@ const FRAMES: &str = r#"(
 )"#;
 
 fn count(text: &str) -> usize {
-    let source = r#"(
-    root: "Sentence",
-    features: { "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"] },
-    categories: {
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm"]),
-        "NounPhrase": (),
-        "IdiomaticCoordinate": (),
-    },
-    lexical_classes: { "Coordinator": ["c:and", "c:or"], "CoordinateAdverb": ["adv:so on"] },
-    closed_words: { "And": "c:and" },
-    slot_categories: { NP: "NounPhrase" },
-    productions: [
-        (name: "Imperative", lhs: "Sentence", rhs: [Cat("head", "VerbPhrase"), Punct('.')], equations: [Require("head.VerbForm", "Plain")]),
-        (name: "Noun", lhs: "NounPhrase", rhs: [Lex("head", Noun)]),
-        (name: "IdiomaticCoordinate", lhs: "IdiomaticCoordinate", rhs: [Class("head", "CoordinateAdverb")]),
-    ],
-    schemas: [
-        Valence(head: Verb, phrase: "VerbPhrase"),
-        Coordination(category: "NounPhrase", coordinators: "Coordinator", delimiter: Some(',')),
+    let source = r#"
+        root Sentence
+        feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+        category IdiomaticCoordinate
+        category NounPhrase
+        category Sentence
+        category VerbPhrase [VerbForm]
+        word And = "c:and"
+        class CoordinateAdverb = ["adv:so on"]
+        class Coordinator = ["c:and", "c:or"]
+        slot NP = NounPhrase
+        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Noun: NounPhrase -> Lex(Noun)
+        IdiomaticCoordinate: IdiomaticCoordinate -> Class(CoordinateAdverb)
+        valence VerbPhrase { head: Verb }
+        coordination NounPhrase { coordinators: Coordinator, delimiter: ',' }
         // A second schema whose coordinators admit *and* derives no second
         // tree of the idiomatic coordinate.
-        Coordination(category: "NounPhrase", coordinators: "Coordinator", cost: 2),
-    ],
-    idiomatic_coordinates: [("And", "IdiomaticCoordinate")],
-)"#;
+        coordination NounPhrase { coordinators: Coordinator, cost: 2 }
+        idiomatic_coordinate And = IdiomaticCoordinate
+    "#;
     let lexicon = lexicon();
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(source).unwrap(),
+        &Grammar::from_fug_str(source).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )

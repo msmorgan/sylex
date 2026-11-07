@@ -31,27 +31,27 @@ fn lexicon() -> Lexicon {
 
 fn grammar(lexicon: &Lexicon, quotation: &str) -> Result<CompiledGrammar, String> {
     let text = format!(
-        r#"(
-        root: "Sentence",
-        categories: {{ "Sentence": (), "Clause": (), "Quotation": () }},
-        closed_words: {{ "And": "c:and" }},
-        productions: [
-            (name: "Declarative", lhs: "Sentence", rhs: [Cat("clause", "Clause"), Punct('.')]),
-            (name: "Intransitive", lhs: "Clause", rhs: [Lex("subject", Pronoun), Lex("head", Verb)]),
-            (name: "Granting", lhs: "Clause", rhs: [Lex("subject", Pronoun), Lex("head", Verb), Cat("object", "Quotation")]),
-            (name: "Quotation", lhs: "Quotation", rhs: [{quotation}]),
-        ],
-        schemas: [Coordination(category: "Quotation", coordinators: "And")],
-    )"#
+        r#"
+            root Sentence
+            category Clause
+            category Quotation
+            category Sentence
+            word And = "c:and"
+            Declarative: Sentence -> clause:Clause '.'
+            Intransitive: Clause -> subject:Lex(Pronoun) Lex(Verb)
+            Granting: Clause -> subject:Lex(Pronoun) Lex(Verb) object:Quotation
+            Quotation: Quotation -> {quotation}
+            coordination Quotation {{ coordinators: And }}
+        "#
     );
-    let grammar = Grammar::from_ron_str(&text).map_err(|e| format!("{e:?}"))?;
+    let grammar = Grammar::from_fug_str(&text).map_err(|e| format!("{e:?}"))?;
     CompiledGrammar::bind(&grammar, lexicon, &FrameCatalog::default()).map_err(|e| format!("{e:?}"))
 }
 
 #[test]
 fn quotations_round_trip_with_derived_punctuation() {
     let lexicon = lexicon();
-    let grammar = grammar(&lexicon, r#"Quoted("head", "Sentence")"#).unwrap();
+    let grammar = grammar(&lexicon, r#""Sentence""#).unwrap();
     for text in [
         r#"it gains "it draws.""#,
         r#"it gains "it gains 'it draws.'""#,
@@ -73,7 +73,7 @@ fn quotations_round_trip_with_derived_punctuation() {
 #[test]
 fn quotation_marks_and_their_punctuation_are_oracle_s() {
     let lexicon = lexicon();
-    let grammar = grammar(&lexicon, r#"Quoted("head", "Sentence")"#).unwrap();
+    let grammar = grammar(&lexicon, r#""Sentence""#).unwrap();
     for text in [
         // The outermost marks are double, the next single.
         "it gains 'it draws.'",
@@ -97,7 +97,7 @@ fn quotation_marks_and_their_punctuation_are_oracle_s() {
 #[test]
 fn quotation_marks_are_declared_only_by_quoting() {
     let lexicon = lexicon();
-    for symbol in [r#"Punct('"')"#, r"Mark('\'', Bound)"] {
+    for symbol in [r#"'"'"#, "''':Bound"] {
         assert!(grammar(&lexicon, symbol).is_err(), "{symbol}");
     }
 }

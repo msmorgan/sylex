@@ -20,7 +20,7 @@ cargo doc -p sylex_syntax --no-deps --document-private-items --open
 
 ## Data flow
 
-1. **Load.** `Grammar::from_ron_str` or `Grammar::from_path` reads a grammar
+1. **Load.** `Grammar::from_fug_str` reads a grammar
    of Categories, features, Productions and Schemas (`grammar.rs`).
 2. **Bind.** `CompiledGrammar::bind(grammar, lexicon, frames)` binds it to a
    `sylex_lexicon::Lexicon` and a `FrameCatalog` of Subcategorization Frames

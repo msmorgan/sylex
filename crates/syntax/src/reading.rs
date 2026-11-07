@@ -1638,14 +1638,13 @@ mod enumeration_tests {
             },
         )])
         .unwrap();
-        let grammar = crate::Grammar::from_ron_str(
-            r#"(
-            root: "S", categories: { "S": () },
-            productions: [
-                (name: "Leaf", lhs: "S", rhs: [Lex("head", Noun)]),
-                (name: "Pair", lhs: "S", rhs: [Cat("left", "S"), Cat("right", "S")]),
-            ],
-        )"#,
+        let grammar = crate::Grammar::from_fug_str(
+            r"
+                root S
+                category S
+                Leaf: S -> Lex(Noun)
+                Pair: S -> left:S right:S
+            ",
         )
         .unwrap();
         let grammar =

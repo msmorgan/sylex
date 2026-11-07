@@ -64,45 +64,41 @@ fn grammar(
     internalised: &str,
 ) -> Result<CompiledGrammar, sylex_syntax::LoadError> {
     let source = format!(
-        r#"(
-    root: "Sentence",
-    features: {{
-        "VerbForm": ["Plain", "Finite", "GerundParticiple", "PastParticiple"],
-        "Voice": ["Active", "Passive"],
-        "ComplementKind": ["NP", "Amount"],
-    }},
-    categories: {{
-        "Sentence": (),
-        "VerbPhrase": (features: ["VerbForm", "Voice"], gap: true),
-        "NounPhrase": (),
-        "Nominal": (),
-        "AmountPhrase": (),
-        "PrepositionPhrase": (features: ["ComplementKind"]),
-    }},
-    closed_words: {{ "By": "b:by" }},
-    slot_categories: {{
-        NP: "NounPhrase",
-        PP: "PrepositionPhrase",
-        Nominal: "Nominal",
-        Amount: "AmountPhrase",
-    }},
-    productions: [
-        (name: "Participial", lhs: "Sentence", rhs: [Cat("clause", "VerbPhrase"), Punct('.')],
-            equations: [Require("clause.VerbForm", "PastParticiple"), Require("clause.Voice", "Passive")]),
-        (name: "Numeral", lhs: "AmountPhrase", rhs: [Lex("head", Numeral)]),
-        (name: "Bare", lhs: "NounPhrase", rhs: [Cat("head", "Nominal")]),
-    ],
-    schemas: [
-        Valence(head: Verb, phrase: "VerbPhrase", active: [Require("$.Voice", "Active")], passive: Some("By"),
-            verbal_passive: [Require("$.Voice", "Passive"), Require("$.VerbForm", "PastParticiple")],
-            prepositional_passive: [Require("$.Voice", "Passive"), Require("$.VerbForm", "PastParticiple")], internalised: [{internalised}]),
-        Valence(head: Preposition, phrase: "PrepositionPhrase", complement_kind: Some("ComplementKind")),
-        Valence(head: Noun, phrase: "Nominal"),
-    ],
-)"#
+        r#"
+            root Sentence
+            feature ComplementKind = NP | Amount
+            feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+            feature Voice = Active | Passive
+            category AmountPhrase
+            category Nominal
+            category NounPhrase
+            category PrepositionPhrase [ComplementKind]
+            category Sentence
+            category VerbPhrase [VerbForm, Voice] {{ gap }}
+            word By = "b:by"
+            slot NP = NounPhrase
+            slot PP = PrepositionPhrase
+            slot Nominal = Nominal
+            slot Amount = AmountPhrase
+            Participial: Sentence -> clause:VerbPhrase '.'
+                where clause.VerbForm = PastParticiple,
+                      clause.Voice = Passive
+            Numeral: AmountPhrase -> Lex(Numeral)
+            Bare: NounPhrase -> Nominal
+            valence VerbPhrase {{
+                head: Verb,
+                active: [$.Voice = Active],
+                passive: By,
+                verbal_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
+                prepositional_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
+                internalised: [{internalised}],
+            }}
+            valence PrepositionPhrase {{ head: Preposition, complement_kind: ComplementKind }}
+            valence Nominal {{ head: Noun }}
+        "#
     );
     CompiledGrammar::bind(
-        &Grammar::from_ron_str(&source).unwrap(),
+        &Grammar::from_fug_str(&source).unwrap(),
         lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
@@ -126,7 +122,7 @@ fn family(reading: &Reading) -> Option<FrameFamily> {
     clause.selected_frame.as_ref().map(|frame| frame.family)
 }
 
-const BY_NP: &str = r#"Require("internalised.ComplementKind", "NP")"#;
+const BY_NP: &str = "internalised.ComplementKind = NP";
 
 #[test]
 fn an_unconstrained_internalised_complement_doubles_a_selected_by_extent() {
@@ -155,5 +151,5 @@ fn a_noun_phrase_stays_an_internalised_complement() {
 #[test]
 fn an_internalised_equation_names_a_carried_feature() {
     let lexicon = lexicon();
-    assert!(grammar(&lexicon, r#"Require("internalised.VerbForm", "Plain")"#).is_err());
+    assert!(grammar(&lexicon, "internalised.VerbForm = Plain").is_err());
 }

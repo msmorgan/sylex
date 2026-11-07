@@ -38,30 +38,30 @@ const FRAMES: &str = r#"(
     },
 )"#;
 
-const GRAMMAR: &str = r#"(
-    root: "Sentence",
-    categories: {
-        "Sentence": (),
-        "Clause": (),
-        "VerbPhrase": (),
-        "NounPhrase": (),
-        "PrepositionPhrase": (),
-    },
-    closed_words: { "And": "c:and" },
-    slot_categories: { NP: "NounPhrase" },
-    productions: [
-        (name: "Declarative", lhs: "Sentence", rhs: [Cat("clause", "Clause"), Punct('.')]),
-        (name: "SubjectPredicate", lhs: "Clause", rhs: [Lex("subject", Pronoun), Cat("head", "VerbPhrase")]),
-        (name: "Verb", lhs: "VerbPhrase", rhs: [Lex("head", Verb)]),
-        (name: "Noun", lhs: "NounPhrase", rhs: [Lex("head", Noun)]),
-    ],
-    schemas: [
-        Valence(head: Preposition, phrase: "PrepositionPhrase"),
-        Coordination(category: "VerbPhrase", coordinators: "And", delimiter: Some(',')),
-        Adjunct(host: "Clause", adjunct: "PrepositionPhrase", side: After, host_kind: Supplement, delimiter: Some(',')),
-        Adjunct(host: "VerbPhrase", adjunct: "PrepositionPhrase", side: After, host_kind: Supplement, delimiter: Some(','), nonfinal: true),
-    ],
-)"#;
+const GRAMMAR: &str = r#"
+    root Sentence
+    category Clause
+    category NounPhrase
+    category PrepositionPhrase
+    category Sentence
+    category VerbPhrase
+    word And = "c:and"
+    slot NP = NounPhrase
+    Declarative: Sentence -> clause:Clause '.'
+    SubjectPredicate: Clause -> subject:Lex(Pronoun) VerbPhrase
+    Verb: VerbPhrase -> Lex(Verb)
+    Noun: NounPhrase -> Lex(Noun)
+    valence PrepositionPhrase { head: Preposition }
+    coordination VerbPhrase { coordinators: And, delimiter: ',' }
+    adjunct PrepositionPhrase { host: Clause, side: After, host_kind: Supplement, delimiter: ',' }
+    adjunct PrepositionPhrase {
+        host: VerbPhrase,
+        side: After,
+        host_kind: Supplement,
+        delimiter: ',',
+        nonfinal,
+    }
+"#;
 
 const VERB_PHRASE_SUPPLEMENT: &str =
     "Adjunct:VerbPhrase+PrepositionPhrase/After/Supplement/,/nonfinal";
@@ -77,7 +77,7 @@ fn uses(reading: &Reading, production: &str) -> bool {
 fn reading(text: &str) -> Reading {
     let lexicon = lexicon();
     let grammar = CompiledGrammar::bind(
-        &Grammar::from_ron_str(GRAMMAR).unwrap(),
+        &Grammar::from_fug_str(GRAMMAR).unwrap(),
         &lexicon,
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
