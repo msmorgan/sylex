@@ -19,15 +19,11 @@ fn malformed_items_are_rejected_naming_the_defect() {
     for (item, expected) in [
         (
             "A: S -> B { colour: [head] }",
-            "3:13: unknown setting `colour`",
+            "3:13: unknown field `colour`",
         ),
         (
             "A: S -> B { cost: 2, cost: 3 }",
-            "3:22: `cost` is given twice",
-        ),
-        (
-            "A: S -> B { unclosed: true }",
-            "`unclosed` is a flag and takes no value",
+            "3:22: duplicate field `cost`",
         ),
         ("A: S -> B { transparent }", "`transparent` takes a value"),
         (
@@ -42,16 +38,67 @@ fn malformed_items_are_rejected_naming_the_defect() {
             "A: S -> B { heavy: [head, head] }",
             "`head` is listed twice",
         ),
-        ("A: S -> Shout(B)", "unknown symbol kind `Shout`"),
-        ("A: S -> Class(B, C)", "`Class` takes no more arguments"),
+        ("A: S -> Shout(B)", "3:9: unknown variant `Shout`"),
+        ("A: S -> Class(B, C)", "3:18: one argument too many"),
         ("A: S -> Lex(Nown)", "unknown variant `Nown`"),
-        ("A: S -> head:','", "expected a right-hand-side symbol"),
+        ("A: S -> head:','", "3:14: punctuation names no child"),
         (
             "A: S -> B where B = C",
             "expected `$.Feature` or `child.Feature`",
         ),
-        ("A: S -> B where $.F := head.G", "malformed equation"),
+        ("A: S -> B where $.F := head.G", "3:24: expected a name"),
         ("A: S -> B where $.F = G,", "item ends too early"),
+        // A name is a name: no path, character or quoted string.
+        ("A: S -> B { heavy: [$.F] }", "3:21: a path is no name"),
+        ("A: S -> B { heavy: ['x'] }", "3:21: a character is no name"),
+        ("A: S -> Class('c')", "3:15: a character is no name"),
+        ("feature G = $.A | B", "3:13: a path is no name"),
+        ("A: S -> B where $.F = 'x'", "3:23: expected a name"),
+        (
+            "adjunct X { host: H, side: Before, host_kind: Predicate, delimiter: a }",
+            "expected a character",
+        ),
+        // An equation is written as one, never as its variant.
+        (
+            "A: S -> B where Require(B, C)",
+            "3:17: expected an equation",
+        ),
+        (
+            "A: S -> B where !(B = C & $.F = A)",
+            "3:19: expected `$.Feature` or `child.Feature`",
+        ),
+        (
+            "A: S -> B where !($.F -> A)",
+            "a joint exclusion is `!(path = A & ...)`",
+        ),
+        ("A: S -> B where !($.F = head.G)", "3:25: expected a name"),
+        ("A: S -> B where $.F != head.G", "3:24: expected a name"),
+        // A pair is `A -> B`.
+        (
+            "valence V { head: Verb, agree: [A = B] }",
+            "expected a pair: `A -> B`",
+        ),
+        // What the item's own syntax fills is no setting.
+        (
+            "category T { category: P }",
+            "`category` is written in the item's own syntax",
+        ),
+        (
+            "A: S -> B { equations: [$.F = A] }",
+            "`equations` is written in the item's own syntax",
+        ),
+        (
+            "A: S -> B { name: C }",
+            "`name` is written in the item's own syntax",
+        ),
+        (
+            "premodification M { head: Verb, host: H, forms: [PastParticiple] } where $.F = A",
+            "this item takes no `where`",
+        ),
+        (
+            "valence V { head: Verb } where $.F = A",
+            "this item takes no `where`",
+        ),
         ("A: S -> 'ab'", "malformed character literal"),
         ("word Of = \"prep:of", "unterminated string"),
         ("A: S -> B ~", "unexpected character `~`"),
@@ -61,10 +108,7 @@ fn malformed_items_are_rejected_naming_the_defect() {
         ),
         ("frobnicate S", "unknown keyword `frobnicate`"),
         ("slot Np = S", "unknown variant `Np`"),
-        (
-            "coordination S { serial: maybe }",
-            "expected `true` or `false`",
-        ),
+        ("coordination S { serial: maybe }", "expected a boolean"),
         (
             "high_attachment S where $.F != G",
             "a high attachment is `where $.Feature = Value`",

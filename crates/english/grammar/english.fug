@@ -3451,9 +3451,9 @@ valence PrepositionPhrase {
     head: Preposition,
     complement_kind: ComplementKind,
     agree: [
-        Number = Number, Number = QuantityNumber, Determination = Determination, Case = Case,
-        NounKind = NounKind, Countability = Countability,
-        DeterminativeDistribution = DeterminativeDistribution,
+        Number -> Number, Number -> QuantityNumber, Determination -> Determination, Case -> Case,
+        NounKind -> NounKind, Countability -> Countability,
+        DeterminativeDistribution -> DeterminativeDistribution,
     ],
     remnants: [NP -> PrepositionRemnant],
 }
@@ -3461,7 +3461,7 @@ valence BareNominal {
     head: Noun,
     complement_kind: ComplementKind,
     interleaved: InterleavedModifier,
-    agree: [ObliqueNumber = Number, ObliqueKind = ComplementKind, ObliqueNounKind = NounKind],
+    agree: [ObliqueNumber -> Number, ObliqueKind -> ComplementKind, ObliqueNounKind -> NounKind],
 }
 // A bare noun in a fossilised Preposition Phrase keeps the Complement
 // it selects (*until end of turn*, *on top of*, *in excess of*; CGEL,
@@ -3473,8 +3473,8 @@ valence DeterminerPhrase {
     head: Determinative,
     complement_kind: ComplementKind,
     agree: [
-        ObliqueNumber = Number, ObliqueKind = ComplementKind, ObliqueDetermination = Determination,
-        ObliqueDistribution = DeterminativeDistribution,
+        ObliqueNumber -> Number, ObliqueKind -> ComplementKind, ObliqueDetermination -> Determination,
+        ObliqueDistribution -> DeterminativeDistribution,
     ],
 }
 // A carrier noun distributes over a coordination of noun premodifiers
@@ -3802,7 +3802,7 @@ coordination NounPhrase {
     coordinators: And,
     unshared: [Number, Person, DeterminativeDistribution, FirstConjunctNumber],
     proximate: [Case, NounKind, Countability, NounDistribution],
-    resolve: [Determination = Bare],
+    resolve: [Determination -> Bare],
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
           $.Number = Plural,
@@ -3814,7 +3814,7 @@ coordination NounPhrase {
     coordinators: And,
     unshared: [Number, Person, FirstConjunctNumber],
     proximate: [Case, NounKind, Countability, NounDistribution],
-    resolve: [Determination = Bare],
+    resolve: [Determination -> Bare],
 }
     where $.Number = Singular,
           $.Person = Third,
@@ -3827,7 +3827,7 @@ coordination NounPhrase {
     coordinators: AndOr,
     unshared: [Number, DeterminativeDistribution, FirstConjunctNumber],
     proximate: [Person, Case, NounKind, Countability, NounDistribution],
-    resolve: [Determination = Bare],
+    resolve: [Determination -> Bare],
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
           last.Number = Plural,
@@ -3836,7 +3836,7 @@ coordination NounPhrase {
     coordinators: AndOr,
     unshared: [Number, DeterminativeDistribution, FirstConjunctNumber],
     proximate: [Person, Case, NounKind, Countability, NounDistribution],
-    resolve: [Determination = Bare],
+    resolve: [Determination -> Bare],
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
           last.Number = Singular
@@ -3850,7 +3850,7 @@ coordination NounPhrase {
     coordinators: Alternative,
     unshared: [DeterminativeDistribution, FirstConjunctNumber],
     proximate: [Number, Person, Case, NounKind, Countability, NounDistribution],
-    resolve: [Determination = Bare],
+    resolve: [Determination -> Bare],
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
           first.NounKind != Numeric | Quantity,
@@ -4018,7 +4018,7 @@ coordination SymbolCosts { coordinators: Coordinator }
 coordination DeterminerPhrase {
     coordinators: Coordinator,
     proximate: [Number, Countability, DeterminativeDistribution, NounKind],
-    resolve: [Cardinality = Cardinal],
+    resolve: [Cardinality -> Cardinal],
 }
 // Numbers alone are an Amount coordination (*X is 2 or 3*), never also
 // a fused quantity over them (`docs/decisions/english.md`

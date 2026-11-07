@@ -9,7 +9,7 @@ use crate::LoadError;
 use crate::frames::SlotKind;
 
 /// An authored grammar data file.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Grammar {
     /// The Category a whole input is parsed as.
     pub root: Ident,
@@ -61,20 +61,26 @@ impl Grammar {
 }
 
 /// A syntactic Category and the features its summary carries.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CategoryDecl {
     /// The grammatical Category represented by this restricted production set.
+    #[serde(default)]
     pub category: Option<Ident>,
+    #[serde(default)]
     pub features: Vec<Ident>,
     /// Whether a Constituent of this Category may contain an unfilled Gap.
+    #[serde(default)]
     pub gap: bool,
     /// The Gap kinds a Constituent of this gap-capable Category never
     /// contains, as a non-finite Complement never passes up a predicative
     /// Gap (*can't be __*).
+    #[serde(default)]
     pub closed_gaps: Vec<Ident>,
     /// Whether this Category names a grammatical function, as `Predicative`
     /// names the predicative Complement: its head child bears that function
     /// in the same phrase too.
+    #[serde(default)]
     pub function: bool,
 }
 
@@ -115,16 +121,21 @@ pub struct CategoryDecl {
 /// - `supplement`: reversed Right Association (`reading.rs`).
 /// - `object`, `shared`: the Reading functions of postposed Modifiers
 ///   (`object`) and of Right Node Raising (`shared`) (`reading.rs`, `locate`).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ProductionDecl {
     pub name: Ident,
     pub lhs: Ident,
     pub rhs: Vec<SymbolDecl>,
+    #[serde(default)]
     pub equations: Vec<Equation>,
+    #[serde(default = "default_cost")]
     pub cost: u32,
     /// Children that must span more than one lexical leaf.
+    #[serde(default)]
     pub heavy: Vec<Ident>,
     /// Children that must be exactly one lexical leaf, alone or projected.
+    #[serde(default)]
     pub light: Vec<Ident>,
     /// A child that does not end, through its head line, in a Preposition
     /// Phrase dependent that this Production, or a sibling Production with
@@ -133,11 +144,13 @@ pub struct ProductionDecl {
     /// child's postmodifier (an existential's Extension after its Displaced
     /// Subject, CGEL Ch. 16 §6.2.1, p. 1394). A child that no such Complement
     /// follows is a load error.
+    #[serde(default)]
     pub unextended: Vec<Ident>,
     /// Children that do not end, through their edge line, in a trailing
     /// Adjunct of one of these Categories: a dependent after the child that
     /// is coordinate with such an Adjunct is a basic coordination of the two,
     /// never also attached beside it (`docs/decisions/english.md` §8).
+    #[serde(default)]
     pub unadjoined: Vec<(Ident, Vec<Ident>)>,
     /// Children through which a Gap may pass to the mother. A Gap passes
     /// up through no other child: an auxiliary marks its Verb Phrase
@@ -146,6 +159,7 @@ pub struct ProductionDecl {
     /// child's Gap within the mother, unless the child is also transparent:
     /// then the mother takes that Gap over (a purpose adjunct whose Object a
     /// relative clause binds). `$.Gap = ..` introduces one.
+    #[serde(default)]
     pub transparent: Vec<Ident>,
     /// The phrase ends in an ellipsis site: its head omits every Complement
     /// it selects (a stranded auxiliary, CGEL Ch. 17 §7.1, p. 1519). The
@@ -158,33 +172,40 @@ pub struct ProductionDecl {
     /// Complement, so no ellipsis is there (p. 1519), as with a bare noun's
     /// omitted Complement (`docs/decisions/english.md`
     /// §8).
+    #[serde(default)]
     pub elliptical: Option<Vec<sylex_lexicon::WordForm>>,
     /// The phrase opens with a single dash that only the end of its
     /// sentence closes (CGEL Ch. 20 §5, p. 1751: the closing member of the
     /// pair is absorbed into the higher-level boundary). A Constituent that
     /// ends in one is followed by nothing but a period.
+    #[serde(default)]
     pub unclosed: bool,
     /// Lexical children that cost one more where analysis did not admit
     /// their leaf through the scope of the face whose text is parsed (one of
     /// the face's own names, or a card-scoped spelling such as its Shortened
     /// Name [CR#201.5c]): another card's full name. A Production Cost
     /// preference, never an admission condition.
+    #[serde(default)]
     pub scoped: Vec<Ident>,
     /// Children that are not themselves a coordination, where a coordination
     /// one level up is the same analysis (a chain of bare imperatives).
+    #[serde(default)]
     pub uncoordinated: Vec<Ident>,
     /// Children that neither are nor are headed by a Linked Coordination: a
     /// subordinate clause, which a sole connective never links (CGEL, Ch. 15
     /// §2.10, p. 1320).
+    #[serde(default)]
     pub unlinked: Vec<Ident>,
     /// Children that are themselves a coordination: a dependent that scopes
     /// over a whole coordination where a single conjunct has a site of its
     /// own (CGEL, Ch. 15 §1.3.4, pp. 1285–1286).
+    #[serde(default)]
     pub coordinated: Vec<Ident>,
     /// Features of the mother that it does not share with its `head` child
     /// and that the Production's equations value instead: a degree modifier
     /// that changes its head's grade (an analytic superlative, CGEL, Ch. 13
     /// §4.3, p. 1122).
+    #[serde(default)]
     pub unshared: Vec<Ident>,
 }
 
@@ -196,7 +217,7 @@ pub(crate) fn default_cost() -> u32 {
 ///
 /// A child's name is its grammatical function; the engine reserves some names
 /// (see `ProductionDecl`).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub enum SymbolDecl {
     /// A Constituent of a Category.
     Cat(Ident, Ident),
@@ -239,7 +260,7 @@ pub enum SymbolDecl {
 /// A feature equation over `$.Feature` (the mother) or `child.Feature` paths.
 /// A child named `head` implicitly agrees with the mother on every feature both
 /// carry; see the reserved child names on `ProductionDecl`.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub enum Equation {
     Agree(Ident, Ident),
     Require(Ident, Ident),
@@ -268,7 +289,8 @@ pub enum Equation {
 /// head's frame (p. 1341, [17ii]). The head takes the coordination as the
 /// child `clusters`, which bears no function; each dependent in a Cluster
 /// bears its own in the head's phrase too (`Constituent::also`).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ClustersDecl {
     /// The Category of one Cluster.
     pub cluster: Ident,
@@ -276,6 +298,7 @@ pub struct ClustersDecl {
     /// schema declares.
     pub coordination: Ident,
     /// The Category of the Adjuncts that may end a Cluster.
+    #[serde(default)]
     pub adjunct: Option<Ident>,
     /// Remnant Categories by Slot Kind: a Cluster after the first may fill
     /// its first Slot, of that kind, with a phrase of the Category whose head
@@ -283,8 +306,10 @@ pub struct ClustersDecl {
     /// verb on the left (*We'll be in Paris for a week and Bonn for three
     /// days*, *in* elided; CGEL, Ch. 15 §4.3, p. 1343, note 65). A schema
     /// declares the remnant phrases (`SchemaDecl::Parameters::remnant`).
+    #[serde(default)]
     pub remnants: Vec<(SlotKind, Ident)>,
     /// Clusters of Adjuncts alone, after a head whose frame has no Slot.
+    #[serde(default)]
     pub adjunct_clusters: Option<AdjunctClustersDecl>,
 }
 
@@ -299,7 +324,8 @@ pub struct ClustersDecl {
 /// coordination's Coordination schema is `parallel`, so every Cluster has the
 /// initial one's prepositions, the first overt or elided
 /// (`Summary::shared_head`), the last overt (`Summary::cluster_preposition`).
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AdjunctClustersDecl {
     /// The Category of one Cluster.
     pub cluster: Ident,
@@ -320,7 +346,8 @@ pub struct AdjunctClustersDecl {
 /// summaries (`docs/decisions/english.md` §1). A Schema derives nothing its
 /// grammar does not declare: a missing declaration yields no derivation or a
 /// load error, never a default.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "snake_case")]
 pub enum SchemaDecl {
     /// An attributive lexical head retains its phrasal Category as a Modifier.
     ///
@@ -333,10 +360,12 @@ pub enum SchemaDecl {
         modifier: Ident,
         host: Ident,
         forms: Vec<sylex_lexicon::WordForm>,
+        #[serde(default)]
         prefix: bool,
         /// Equations on the modifier one of the `forms` heads, over its
         /// lexical child `head` (a past participle that a declared Adjective
         /// spells is not one).
+        #[serde(default)]
         equations: Vec<(sylex_lexicon::WordForm, Vec<Equation>)>,
     },
     /// Catalog-declared ordered parameter patterns around a lexical head.
@@ -346,13 +375,16 @@ pub enum SchemaDecl {
     Parameters {
         head: sylex_lexicon::Category,
         phrase: Ident,
+        #[serde(default)]
         binding: Option<sylex_lexicon::Binding>,
         /// Coordinators of a pattern's final marked parameter, repeated
         /// with its marker (*protection from black and from red*).
+        #[serde(default)]
         coordinators: Option<Ident>,
         /// The Category of each pattern's phrase without the head it begins
         /// with: a Complement Cluster's remnant, its head elided
         /// (`ClustersDecl::remnants`).
+        #[serde(default)]
         remnant: Option<Ident>,
     },
     /// Frame-driven phrases headed by every lexeme of a lexical Category.
@@ -382,69 +414,86 @@ pub enum SchemaDecl {
     Valence {
         head: sylex_lexicon::Category,
         phrase: Ident,
+        #[serde(default)]
         cost: u32,
         /// The feature, carried by the phrase, that names the Slot Kind of
         /// its first Frame Slot: a non-verbal head's bare phrase names
         /// `Intransitive`, and a stranded Preposition Phrase the Slot Kind of
         /// the Complement it strands.
+        #[serde(default)]
         complement_kind: Option<Ident>,
         /// Equations on every active phrase of a frame, over `$` and the
         /// lexical child `head` (a verb's Voice).
+        #[serde(default)]
         active: Vec<Equation>,
         /// Derive passive phrases from active verb frames, naming the Closed
         /// Word that marks the Internalised Complement (verbs only).
+        #[serde(default)]
         passive: Option<Ident>,
         /// Equations on every derived verbal passive, over `$` and the lexical
         /// child `head`: its Voice and its past participle. Required with
         /// `passive`.
+        #[serde(default)]
         verbal_passive: Vec<Equation>,
         /// Equations on every derived prepositional passive, over `$` and the
         /// lexical child `head` (*each card looked at*). Required with
         /// `passive`.
+        #[serde(default)]
         prepositional_passive: Vec<Equation>,
         /// Equations on the Internalised Complement of every derived
         /// passive, over the child `internalised`: what its Preposition
         /// Phrase may contain (CGEL, Ch. 16 §10.1.1, p. 1428).
+        #[serde(default)]
         internalised: Vec<Equation>,
         /// Derive Adjectival Passives of this Category from verb frames whose
         /// passive leaves no Complement but the optional `by` phrase.
+        #[serde(default)]
         adjectival: Option<Ident>,
         /// Equations on every derived Adjectival Passive, over `$` and the
         /// lexical child `head`. Required with `adjectival`.
+        #[serde(default)]
         adjectival_passive: Vec<Equation>,
         /// Adjunct category permitted before a selected PP or shifted Object.
+        #[serde(default)]
         interleaved: Option<Ident>,
         /// Adjunct category permitted only before the Internalised Complement
         /// of a passive, a non-core Complement (CGEL, Ch. 4 §3.2.1, p. 241),
         /// beside the `interleaved` one.
+        #[serde(default)]
         interleaved_internalised: Option<Ident>,
         /// Postpose the Object to the end of the phrase: past selected
         /// Preposition Phrase Complements, and, when it is heavy, past a
         /// predicative Complement or an `interleaved` Adjunct alone (CGEL,
         /// Ch. 16 §4, pp. 1382–1384).
+        #[serde(default)]
         heavy_shift: bool,
         /// Equations over the child `object` that a heavy postposed Object
         /// satisfies, beside ending in a dependent or being a coordination.
+        #[serde(default)]
         shifted_object: Vec<Equation>,
         /// Function Category of a Modifier postposed out of the Object past
         /// the selected Preposition Phrase Complements after it, at the end
         /// of the phrase (*put a number of counters [on it] [equal to …]*;
         /// CGEL, Ch. 12 §4, p. 1066). It bears Modifier in the Object too,
         /// and agrees with the Object in each feature they both carry.
+        #[serde(default)]
         postposed: Option<Ident>,
         /// A non-verbal head that declares a Frame realizes one of them in
         /// this phrase: only a head declaring none, or an Intransitive one,
         /// forms its bare phrase.
+        #[serde(default)]
         obligatory: bool,
         /// `(phrase feature, slot feature)` pairs: the phrase's feature
         /// agrees with that feature of each Frame Slot child that carries it
         /// (a Preposition Phrase takes its Complement's Number).
+        #[serde(default)]
         agree: Vec<(Ident, Ident)>,
         /// Complement Clusters: a verb heads a coordination of parallel
         /// sequences of its Frame Slots, each sequence optionally ending in
         /// an Adjunct (*put one of them into your hand and the rest into your
         /// graveyard*; *has lifelink if you control a Cleric and deathtouch
         /// if you control a Rogue*; CGEL, Ch. 15 §4.3, pp. 1341–1343).
+        #[serde(default)]
         clusters: Option<ClustersDecl>,
         /// Verb Phrase remnants by Slot Kind: a verb's phrase of a frame
         /// whose first Slot is of that kind also stands without its head, in
@@ -455,6 +504,7 @@ pub enum SchemaDecl {
         /// the beginning of the medial ones; CGEL, Ch. 15 §3.6,
         /// pp. 1335–1336, [31ii]). A Coordination schema admits the remnants
         /// (`SchemaDecl::Coordination::remnant`).
+        #[serde(default)]
         remnants: Vec<(SlotKind, Ident)>,
     },
     /// Unselected attachment of an adjunct Category to a host, limited to
@@ -472,9 +522,12 @@ pub enum SchemaDecl {
         adjunct: Ident,
         side: Side,
         host_kind: HostKind,
+        #[serde(default)]
         delimiter: Option<char>,
+        #[serde(default = "default_cost")]
         cost: u32,
         /// Equations over the `head` (host) and the adjunct's function child.
+        #[serde(default)]
         equations: Vec<Equation>,
         /// The phrase it builds is only a conjunct of a coordination other
         /// than the last, never a child in any other position: a comma-set
@@ -482,6 +535,7 @@ pub enum SchemaDecl {
         /// (*searches … for up to X cards, where X is …, puts them …*), where
         /// the last conjunct's Supplement is the Clause's (CGEL, Ch. 15 §5.1,
         /// p. 1351).
+        #[serde(default)]
         nonfinal: bool,
     },
     /// Binary and serial coordination of a Category, with Right Node Raising
@@ -503,6 +557,7 @@ pub enum SchemaDecl {
         category: Ident,
         /// The Closed Word or Lexical Class of its Coordinators. Exactly one
         /// of `coordinators` and `link` is given.
+        #[serde(default)]
         coordinators: Option<Ident>,
         /// A Linked Coordination, which has no Coordinator: the Category of
         /// its Linked Conjunct, the one after each link, marked by its own
@@ -510,40 +565,51 @@ pub enum SchemaDecl {
         /// card*; CGEL, Ch. 15 §2.10, pp. 1319–1320). Its serial middle
         /// Conjuncts are ordinary ones, which may begin with the connective
         /// too (*A, then B, then C*).
+        #[serde(default)]
         link: Option<Ident>,
+        #[serde(default = "default_cost")]
         cost: u32,
         /// Features the conjuncts need not share, which the coordination
         /// leaves unvalued unless its `equations` value them.
+        #[serde(default)]
         unshared: Vec<Ident>,
         /// Equations over the whole coordination (`$`): its resolved
         /// features (an *and*-coordination of Noun Phrases is plural).
+        #[serde(default)]
         equations: Vec<Equation>,
         /// Features the coordination takes from its last conjunct, which the
         /// others need not share (proximity: *one or more cards*).
+        #[serde(default)]
         proximate: Vec<Ident>,
         /// Features every conjunct but the last shares, which the
         /// coordination resolves with its last conjunct's: their common value,
         /// or the listed one when they differ (an *and*-coordination of Noun
         /// Phrases is determined only when every conjunct is). A conjunct
         /// without a value does not decide it.
+        #[serde(default)]
         resolve: Vec<(Ident, Ident)>,
         /// Punctuation that may also precede the coordinator of a binary
         /// coordination (two independent clauses joined by *, and*).
+        #[serde(default)]
         delimiter: Option<char>,
         /// The binary coordination exists only with the delimiter (a
         /// declarative and then an imperative: *…, and put …*).
+        #[serde(default)]
         delimited: bool,
         /// Whether serial coordinations are derived: by default for like
         /// conjuncts, not for unlike ones.
+        #[serde(default)]
         serial: Option<bool>,
         /// The Category of the conjuncts, when the coordination is of a
         /// function its conjuncts fill (a depictive *tapped and attacking*).
+        #[serde(default)]
         conjunct: Option<Ident>,
         /// A feature whose value the two conjuncts of a binary coordination
         /// must not share: a coordination of unlike categories in one
         /// function (CGEL, Ch. 15 §3.2, pp. 1326–1329); the conjuncts of
         /// serial and polysyndetic ones, derived only with `serial`, are not
         /// all of one value.
+        #[serde(default)]
         unlike: Option<Ident>,
         /// The Category of a phrase whose head is elided that may stand as a
         /// middle conjunct of a serial coordination, its head recovered from
@@ -552,16 +618,19 @@ pub enum SchemaDecl {
         /// pp. 1335–1336): a coordination whose later conjuncts all were is
         /// the coordination of their Complements under the one head (*is a
         /// creature, an artifact, and an enchantment*; §3.2, pp. 1326–1327).
+        #[serde(default)]
         remnant: Option<Ident>,
         /// Features a remnant shares with the initial conjunct, which the
         /// other conjuncts need not share: those of the element it elides
         /// (an elided Subject's Number and Person, *you gain 4 life, [draw
         /// four cards], and he deals 4 damage*, never *[draws four cards]*).
+        #[serde(default)]
         recovered: Vec<Ident>,
         /// Every conjunct after the initial has the initial conjunct's
         /// lexical head (`Summary::shared_head`), overt or elided in a
         /// remnant, and its last preposition (`Summary::cluster_preposition`;
         /// `AdjunctClustersDecl`).
+        #[serde(default)]
         parallel: bool,
     },
 }

@@ -36,7 +36,10 @@
 //! the coordinated Category), and its props are named as the [`SchemaDecl`]
 //! fields, as a Production's are named as the [`ProductionDecl`] fields; a
 //! `cost` defaults to 1, and to 0 on `valence`. An adjunct's or
-//! coordination's equations go in `where`.
+//! coordination's equations go in `where`. Category, Production and Schema
+//! items are read through the `serde` derives of those types, so their field
+//! names, defaults and unknown-field rejection are declared there alone; a
+//! flag reads as `true`, and a flag may also be written `key: true`.
 //!
 //! A right-hand-side symbol is `[role:]Category` (role `head` when omitted),
 //! `[role:]"Category"` (set in quotation marks), `'c'` (punctuation),
@@ -47,28 +50,24 @@
 //! equation is `path = Value` (require), `path = path` (agree),
 //! `path := Value` (carry), `path != A | B` (exclude each), or
 //! `!(path = A & path = B)` (exclude together), where a path is `$.Feature`
-//! or `child.Feature`. Props are `key: value` or a bare `key` flag; a pair in
-//! a prop list is `A = B` (features) or `A -> B` (a map).
+//! or `child.Feature`; `=` is written only in equations. Props are
+//! `key: value` or a bare `key` flag; a pair in a prop list is `A -> B`.
 
-use std::collections::BTreeMap;
 use std::fmt::Display;
 
 use dpsi::Ident;
+use serde::de;
 use serde::de::DeserializeOwned;
-use serde::de::value::Error as ValueError;
-use serde::de::value::StrDeserializer;
+use serde::de::DeserializeSeed;
+use serde::de::Visitor;
 
 use crate::LoadError;
 use crate::frames::SlotKind;
-use crate::grammar::AdjunctClustersDecl;
 use crate::grammar::CategoryDecl;
-use crate::grammar::ClustersDecl;
 use crate::grammar::Equation;
 use crate::grammar::Grammar;
 use crate::grammar::ProductionDecl;
 use crate::grammar::SchemaDecl;
-use crate::grammar::SymbolDecl;
-use crate::grammar::default_cost;
 
 /// Parses `.fug` source into a [`Grammar`].
 ///
@@ -95,10 +94,7 @@ struct Pos {
 }
 
 fn fail<T>(at: Pos, message: impl Display) -> Result<T, LoadError> {
-    Err(LoadError::Format(format!(
-        "{}:{}: {message}",
-        at.line, at.col
-    )))
+    Err(error_at(at, message).load(at))
 }
 
 // --- Lexer ------------------------------------------------------------------
@@ -219,6 +215,11 @@ enum ValueKind {
     Rel(Box<Value>, &'static str, Box<Value>),
     /// `!(a = A & b = B)`.
     NotAll(Vec<Value>),
+    /// A bare prop key: `true`.
+    Flag,
+    /// A fixed-length sequence the reader builds: a pair's two sides, a
+    /// joint exclusion's condition.
+    Tuple(Vec<Value>),
 }
 
 type Props = Vec<(String, Option<Value>, Pos)>;
@@ -477,269 +478,443 @@ impl Parser {
     }
 }
 
-// --- Values -----------------------------------------------------------------
+// --- Deserializing values into the declaration types --------------------
+//
+// Every Category, Production and Schema item is read through the `serde`
+// derive of its type in `grammar.rs`, which declares the field names,
+// defaults and unknown-field policy once. A value takes the shape the target
+// type asks for: `A = B` is a pair where a tuple is wanted and an
+// `Equation` where an enum is; `Kind(args)` and a bare name are enum
+// variants.
+
+/// A deserialization error, located at the innermost value it names.
+#[derive(Debug)]
+struct Error {
+    at: Option<Pos>,
+    message: String,
+}
+
+impl Error {
+    fn at(mut self, at: Pos) -> Self {
+        self.at.get_or_insert(at);
+        self
+    }
+
+    fn load(self, fallback: Pos) -> LoadError {
+        let at = self.at.unwrap_or(fallback);
+        LoadError::Format(format!("{}:{}: {}", at.line, at.col, self.message))
+    }
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.message)
+    }
+}
+
+impl std::error::Error for Error {}
+
+impl de::Error for Error {
+    fn custom<T: Display>(message: T) -> Self {
+        Self {
+            at: None,
+            message: message.to_string(),
+        }
+    }
+}
+
+fn error_at(at: Pos, message: impl Display) -> Error {
+    Error {
+        at: Some(at),
+        message: message.to_string(),
+    }
+}
+
+fn read<T: DeserializeOwned>(value: Value) -> Result<T, LoadError> {
+    let at = value.at;
+    T::deserialize(value).map_err(|e| e.load(at))
+}
 
 impl Value {
+    fn new(kind: ValueKind, at: Pos) -> Self {
+        Self { kind, at }
+    }
+
+    fn is_path(&self) -> bool {
+        matches!(self.kind, ValueKind::Path(_))
+    }
+
+    /// The path as the name an `Equation` holds.
+    fn path(self) -> Result<Self, Error> {
+        match self.kind {
+            ValueKind::Path(path) => Ok(Self::new(ValueKind::Ident(path), self.at)),
+            _ => Err(error_at(self.at, "expected `$.Feature` or `child.Feature`")),
+        }
+    }
+
+    fn name(self) -> Result<Self, Error> {
+        match self.kind {
+            ValueKind::Ident(_) => Ok(self),
+            _ => Err(error_at(self.at, "expected a name")),
+        }
+    }
+
+    /// The `Equation` variant a written equation is, and its arguments.
+    fn equation(self) -> Result<(String, Vec<Self>), Error> {
+        let at = self.at;
+        let (variant, args) = match self.kind {
+            ValueKind::Rel(a, "=", b) if b.is_path() => ("Agree", vec![a.path()?, b.path()?]),
+            ValueKind::Rel(a, "=", b) => ("Require", vec![a.path()?, b.name()?]),
+            ValueKind::Rel(a, ":=", b) => ("Carry", vec![a.path()?, b.name()?]),
+            ValueKind::Rel(a, "!=", b) => ("Exclude", vec![a.path()?, b.name()?]),
+            ValueKind::NotAll(all) => {
+                let conditions = all
+                    .into_iter()
+                    .map(|condition| match condition.kind {
+                        ValueKind::Rel(a, "=", b) => Ok(Self::new(
+                            ValueKind::Tuple(vec![a.path()?, b.name()?]),
+                            condition.at,
+                        )),
+                        _ => Err(error_at(
+                            condition.at,
+                            "a joint exclusion is `!(path = A & ...)`",
+                        )),
+                    })
+                    .collect::<Result<_, _>>()?;
+                (
+                    "ExcludeTogether",
+                    vec![Self::new(ValueKind::List(conditions), at)],
+                )
+            }
+            _ => return Err(error_at(at, "expected an equation")),
+        };
+        Ok((variant.to_owned(), args))
+    }
+
     fn ident(self) -> Result<Ident, LoadError> {
         match self.kind {
             ValueKind::Ident(name) => Ok(Ident::from(name.as_str())),
             _ => fail(self.at, "expected an identifier"),
         }
     }
+}
 
-    fn idents(self) -> Result<Vec<Ident>, LoadError> {
-        distinct(self.list()?)
-    }
+impl<'de> de::Deserializer<'de> for Value {
+    type Error = Error;
 
-    fn list(self) -> Result<Vec<Value>, LoadError> {
-        match self.kind {
-            ValueKind::List(values) => Ok(values),
-            _ => fail(self.at, "expected a list"),
-        }
-    }
-
-    fn variant<T: DeserializeOwned>(self) -> Result<T, LoadError> {
+    fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Error> {
         let at = self.at;
-        variant(&self.ident()?, at)
+        match self.kind {
+            ValueKind::Ident(text) => visitor.visit_string(text),
+            ValueKind::Int(n) => visitor.visit_u32(n),
+            ValueKind::Flag => visitor.visit_bool(true),
+            ValueKind::List(values) => visitor.visit_seq(Seq::list(values)?),
+            ValueKind::Tuple(values) => visitor.visit_seq(Seq::new(values)),
+            ValueKind::Path(_) => Err(error_at(at, "a path is no name; paths go in equations")),
+            ValueKind::Char(_) => Err(error_at(at, "a character is no name")),
+            ValueKind::Props(props) => {
+                let mut map = Map::new(props, at);
+                visitor.visit_map(&mut map).map_err(|e| e.at(map.at))
+            }
+            ValueKind::Str(_) => Err(error_at(at, "a quoted string is no value here")),
+            _ => Err(error_at(at, "expected a name, a list or `{ ... }`")),
+        }
+        .map_err(|e| e.at(at))
     }
 
-    fn bool(self) -> Result<bool, LoadError> {
+    fn deserialize_bool<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Error> {
         match self.kind {
-            ValueKind::Ident(b) if b == "true" => Ok(true),
-            ValueKind::Ident(b) if b == "false" => Ok(false),
-            _ => fail(self.at, "expected `true` or `false`"),
+            ValueKind::Ident(b) if b == "true" => visitor.visit_bool(true),
+            ValueKind::Ident(b) if b == "false" => visitor.visit_bool(false),
+            _ => self.deserialize_any(visitor),
         }
     }
 
-    /// `A op B`, with `op` the expected one.
-    fn pair(self, expected: &str) -> Result<(Value, Value), LoadError> {
+    fn deserialize_char<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Error> {
         match self.kind {
-            ValueKind::Rel(a, op, b) if op == expected => Ok((*a, *b)),
-            _ => fail(self.at, format!("expected `A {expected} B`")),
+            ValueKind::Char(c) => visitor.visit_char(c),
+            _ => Err(error_at(self.at, "expected a character: ','")),
         }
     }
 
-    /// A list of `A op B`, each side read by its function.
-    fn pairs<A, B>(
+    fn deserialize_option<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Error> {
+        visitor.visit_some(self)
+    }
+
+    /// `A -> B` is a pair.
+    fn deserialize_tuple<V: Visitor<'de>>(self, _: usize, visitor: V) -> Result<V::Value, Error> {
+        let at = self.at;
+        match self.kind {
+            ValueKind::Rel(a, "->", b) => exactly(visitor, vec![*a, *b], at),
+            ValueKind::Tuple(values) => exactly(visitor, values, at),
+            _ => Err(error_at(at, "expected a pair: `A -> B`")),
+        }
+    }
+
+    fn deserialize_enum<V: Visitor<'de>>(
         self,
-        op: &str,
-        a: fn(Value) -> Result<A, LoadError>,
-        b: fn(Value) -> Result<B, LoadError>,
-    ) -> Result<Vec<(A, B)>, LoadError> {
-        self.list()?
-            .into_iter()
-            .map(|v| v.pair(op).and_then(|(x, y)| Ok((a(x)?, b(y)?))))
-            .collect()
-    }
-
-    fn path(self) -> Result<Ident, LoadError> {
-        match self.kind {
-            ValueKind::Path(path) => Ok(Ident::from(path.as_str())),
-            _ => fail(self.at, "expected `$.Feature` or `child.Feature`"),
-        }
-    }
-
-    /// Pushes the equations one written equation stands for.
-    fn lower_into(self, out: &mut Vec<Equation>) -> Result<(), LoadError> {
+        name: &'static str,
+        _: &'static [&'static str],
+        visitor: V,
+    ) -> Result<V::Value, Error> {
         let at = self.at;
-        match self.kind {
-            ValueKind::NotAll(all) => {
-                let pairs = all
-                    .into_iter()
-                    .map(|v| v.pair("=").and_then(|(a, b)| Ok((a.path()?, b.ident()?))))
-                    .collect::<Result<_, _>>()?;
-                out.push(Equation::ExcludeTogether(pairs));
-            }
-            ValueKind::Rel(a, "!=", b) => {
-                let path = a.path()?;
-                let values = match b.kind {
-                    ValueKind::Alt(values) => values,
-                    _ => vec![*b],
-                };
-                for value in values {
-                    out.push(Equation::Exclude(path, value.ident()?));
-                }
-            }
-            ValueKind::Rel(a, op, b) => {
-                let path = a.path()?;
-                out.push(match (op, b.kind) {
-                    ("=", ValueKind::Path(other)) => {
-                        Equation::Agree(path, Ident::from(other.as_str()))
-                    }
-                    ("=", ValueKind::Ident(value)) => {
-                        Equation::Require(path, Ident::from(value.as_str()))
-                    }
-                    (":=", ValueKind::Ident(value)) => {
-                        Equation::Carry(path, Ident::from(value.as_str()))
-                    }
-                    _ => return fail(at, "malformed equation"),
-                });
-            }
-            _ => return fail(at, "expected an equation"),
-        }
-        Ok(())
+        let (variant, args) = match self.kind {
+            _ if name == "Equation" => self.equation()?,
+            ValueKind::Call(name, args) => (name, args),
+            ValueKind::Ident(name) => (name, Vec::new()),
+            _ => return Err(error_at(at, "expected a name or `Kind(...)`")),
+        };
+        visitor
+            .visit_enum(Variant {
+                name: variant,
+                args,
+                at,
+            })
+            .map_err(|e| e.at(at))
     }
 
-    fn equations(self) -> Result<Vec<Equation>, LoadError> {
-        lower(self.list()?)
-    }
-
-    fn props(self) -> Result<Fields, LoadError> {
-        let at = self.at;
-        match self.kind {
-            ValueKind::Props(props) => Fields::new(props, at),
-            _ => fail(at, "expected `{ ... }`"),
-        }
+    serde::forward_to_deserialize_any! {
+        i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 str string bytes byte_buf
+        unit unit_struct newtype_struct seq tuple_struct map struct identifier ignored_any
     }
 }
 
-/// The equations a written list of equations stands for.
-fn lower(values: Vec<Value>) -> Result<Vec<Equation>, LoadError> {
-    let mut out = Vec::new();
-    for value in values {
-        value.lower_into(&mut out)?;
-    }
-    Ok(out)
-}
-
-/// Identifiers, none named twice: a feature's values, a Category's features,
-/// a setting's children.
-fn distinct(values: Vec<Value>) -> Result<Vec<Ident>, LoadError> {
-    let mut idents = Vec::new();
-    for value in values {
-        let at = value.at;
-        let ident = value.ident()?;
-        if idents.contains(&ident) {
-            return fail(at, format!("`{ident}` is listed twice"));
-        }
-        idents.push(ident);
-    }
-    Ok(idents)
-}
-
-/// A built-in enum's unit variant, by its Rust name.
-fn variant<T: DeserializeOwned>(name: &str, at: Pos) -> Result<T, LoadError> {
-    T::deserialize(StrDeserializer::<ValueError>::new(name)).or_else(|e| fail(at, e))
-}
-
-/// Props by key, each taken once; [`Fields::finish`] rejects the rest.
-struct Fields {
+/// Visits `values` as a sequence that must be used up.
+fn exactly<'de, V: Visitor<'de>>(
+    visitor: V,
+    values: Vec<Value>,
     at: Pos,
-    map: BTreeMap<String, (Option<Value>, Pos)>,
+) -> Result<V::Value, Error> {
+    let mut seq = Seq::new(values);
+    let value = visitor.visit_seq(&mut seq)?;
+    match seq.values.next() {
+        None => Ok(value),
+        Some(extra) => Err(error_at(extra.at, "one argument too many").at(at)),
+    }
 }
 
-impl Fields {
-    fn new(props: Props, at: Pos) -> Result<Self, LoadError> {
-        let mut map = BTreeMap::new();
-        for (key, value, key_at) in props {
-            if map.insert(key.clone(), (value, key_at)).is_some() {
-                return fail(key_at, format!("`{key}` is given twice"));
+/// Elements to visit. `a != A | B` stands for one exclusion per alternative.
+struct Seq {
+    values: std::vec::IntoIter<Value>,
+}
+
+impl Seq {
+    /// A written list, which names nothing twice.
+    fn list(values: Vec<Value>) -> Result<Self, Error> {
+        for (i, value) in values.iter().enumerate() {
+            if let ValueKind::Ident(name) = &value.kind
+                && values[..i]
+                    .iter()
+                    .any(|v| matches!(&v.kind, ValueKind::Ident(n) if n == name))
+            {
+                return Err(error_at(value.at, format!("`{name}` is listed twice")));
             }
         }
-        Ok(Self { at, map })
+        Ok(Self::new(values))
     }
 
-    fn value(&mut self, key: &str) -> Result<Option<Value>, LoadError> {
-        match self.map.remove(key) {
-            None => Ok(None),
-            Some((Some(value), _)) => Ok(Some(value)),
-            Some((None, at)) => fail(at, format!("`{key}` takes a value")),
-        }
-    }
-
-    fn required(&mut self, key: &str) -> Result<Value, LoadError> {
-        let at = self.at;
-        self.value(key)?
-            .map_or_else(|| fail(at, format!("`{key}` is required")), Ok)
-    }
-
-    fn flag(&mut self, key: &str) -> Result<bool, LoadError> {
-        match self.map.remove(key) {
-            None => Ok(false),
-            Some((None, _)) => Ok(true),
-            Some((Some(value), _)) => {
-                fail(value.at, format!("`{key}` is a flag and takes no value"))
+    fn new(values: Vec<Value>) -> Self {
+        let mut out: Vec<Value> = Vec::new();
+        for value in values {
+            match value.kind {
+                ValueKind::Rel(a, "!=", b) => {
+                    let alternatives = match b.kind {
+                        ValueKind::Alt(alternatives) => alternatives,
+                        kind => vec![Value::new(kind, b.at)],
+                    };
+                    for alternative in alternatives {
+                        out.push(Value::new(
+                            ValueKind::Rel(a.clone(), "!=", Box::new(alternative)),
+                            value.at,
+                        ));
+                    }
+                }
+                kind => out.push(Value::new(kind, value.at)),
             }
         }
+        Self {
+            values: out.into_iter(),
+        }
     }
+}
 
-    fn ident(&mut self, key: &str) -> Result<Option<Ident>, LoadError> {
-        self.value(key)?.map(Value::ident).transpose()
-    }
+impl<'de> de::SeqAccess<'de> for Seq {
+    type Error = Error;
 
-    fn idents(&mut self, key: &str) -> Result<Vec<Ident>, LoadError> {
-        Ok(self
-            .value(key)?
-            .map(Value::idents)
-            .transpose()?
-            .unwrap_or_default())
-    }
-
-    fn equations(&mut self, key: &str) -> Result<Vec<Equation>, LoadError> {
-        Ok(self
-            .value(key)?
-            .map(Value::equations)
-            .transpose()?
-            .unwrap_or_default())
-    }
-
-    fn pairs<A, B>(
+    fn next_element_seed<T: DeserializeSeed<'de>>(
         &mut self,
-        key: &str,
-        op: &str,
-        a: fn(Value) -> Result<A, LoadError>,
-        b: fn(Value) -> Result<B, LoadError>,
-    ) -> Result<Vec<(A, B)>, LoadError> {
-        Ok(self
-            .value(key)?
-            .map(|v| v.pairs(op, a, b))
-            .transpose()?
-            .unwrap_or_default())
+        seed: T,
+    ) -> Result<Option<T::Value>, Error> {
+        self.values
+            .next()
+            .map(|value| seed.deserialize(value))
+            .transpose()
     }
+}
 
-    fn cost(&mut self, default: u32) -> Result<u32, LoadError> {
-        match self.value("cost")? {
-            None => Ok(default),
-            Some(Value {
-                kind: ValueKind::Int(n),
-                ..
-            }) => Ok(n),
-            Some(value) => fail(value.at, "expected an integer cost"),
+/// `{ key: value, flag }`, located at the key last read.
+struct Map {
+    entries: std::vec::IntoIter<(String, Option<Value>, Pos)>,
+    value: Option<(String, Value)>,
+    at: Pos,
+    start: Pos,
+}
+
+impl Map {
+    fn new(props: Props, at: Pos) -> Self {
+        Self {
+            entries: props.into_iter(),
+            value: None,
+            at,
+            start: at,
         }
     }
+}
 
-    fn char(&mut self, key: &str) -> Result<Option<char>, LoadError> {
-        match self.value(key)? {
-            None => Ok(None),
-            Some(Value {
-                kind: ValueKind::Char(c),
-                ..
-            }) => Ok(Some(c)),
-            Some(value) => fail(value.at, "expected a character"),
-        }
+impl<'de> de::MapAccess<'de> for Map {
+    type Error = Error;
+
+    fn next_key_seed<K: DeserializeSeed<'de>>(
+        &mut self,
+        seed: K,
+    ) -> Result<Option<K::Value>, Error> {
+        let Some((key, value, at)) = self.entries.next() else {
+            // A missing field is the whole block's.
+            self.at = self.start;
+            return Ok(None);
+        };
+        self.at = at;
+        self.value = Some((
+            key.clone(),
+            value.unwrap_or(Value::new(ValueKind::Flag, at)),
+        ));
+        seed.deserialize(Value::new(ValueKind::Ident(key), at))
+            .map(Some)
     }
 
-    fn finish(self) -> Result<(), LoadError> {
-        match self.map.into_iter().next() {
+    fn next_value_seed<V: DeserializeSeed<'de>>(&mut self, seed: V) -> Result<V::Value, Error> {
+        let (key, value) = self
+            .value
+            .take()
+            .expect("serde reads a key before its value");
+        let flag = matches!(value.kind, ValueKind::Flag);
+        let at = value.at;
+        seed.deserialize(value)
+            .map_err(|e| if flag { error_at(at, format!("`{key}` takes a value")) } else { e })
+    }
+}
+
+/// An enum variant and its arguments: `Kind(args)`, a bare `Kind`, or the
+/// variant an equation names.
+struct Variant {
+    name: String,
+    args: Vec<Value>,
+    at: Pos,
+}
+
+impl<'de> de::EnumAccess<'de> for Variant {
+    type Error = Error;
+    type Variant = Self;
+
+    fn variant_seed<V: DeserializeSeed<'de>>(self, seed: V) -> Result<(V::Value, Self), Error> {
+        let name = Value::new(ValueKind::Ident(self.name.clone()), self.at);
+        Ok((seed.deserialize(name)?, self))
+    }
+}
+
+impl<'de> de::VariantAccess<'de> for Variant {
+    type Error = Error;
+
+    fn unit_variant(self) -> Result<(), Error> {
+        match self.args.first() {
             None => Ok(()),
-            Some((key, (_, at))) => fail(at, format!("unknown setting `{key}`")),
+            Some(arg) => Err(error_at(
+                arg.at,
+                format!("`{}` takes no arguments", self.name),
+            )),
+        }
+    }
+
+    fn newtype_variant_seed<T: DeserializeSeed<'de>>(self, seed: T) -> Result<T::Value, Error> {
+        match <[Value; 1]>::try_from(self.args) {
+            Ok([arg]) => seed.deserialize(arg),
+            Err(_) => Err(error_at(
+                self.at,
+                format!("`{}` takes one argument", self.name),
+            )),
+        }
+    }
+
+    fn tuple_variant<V: Visitor<'de>>(self, _: usize, visitor: V) -> Result<V::Value, Error> {
+        exactly(visitor, self.args, self.at)
+    }
+
+    fn struct_variant<V: Visitor<'de>>(
+        self,
+        _: &'static [&'static str],
+        visitor: V,
+    ) -> Result<V::Value, Error> {
+        match <[Value; 1]>::try_from(self.args) {
+            Ok([props]) => de::Deserializer::deserialize_any(props, visitor),
+            Err(_) => Err(error_at(
+                self.at,
+                format!("`{}` takes `{{ ... }}`", self.name),
+            )),
         }
     }
 }
 
 // --- Items ------------------------------------------------------------------
 
+/// The Schema kinds by keyword (the `SchemaDecl` variant, snake-cased), with
+/// the field the item's name fills.
+const SCHEMAS: [(&str, &str); 5] = [
+    ("adjunct", "adjunct"),
+    ("premodification", "modifier"),
+    ("parameters", "phrase"),
+    ("valence", "phrase"),
+    ("coordination", "category"),
+];
+
 impl Item {
-    fn fields(&mut self) -> Result<Fields, LoadError> {
-        Fields::new(self.props.take().unwrap_or_default(), self.at)
+    fn ident(&self, name: &str) -> Value {
+        Value::new(ValueKind::Ident(name.to_owned()), self.at)
     }
 
-    fn equations(&mut self) -> Result<Vec<Equation>, LoadError> {
-        self.equations
-            .take()
-            .map(lower)
-            .transpose()
-            .map(Option::unwrap_or_default)
+    /// The item's props with its positional parts as the `fields` they
+    /// fill, which no written prop may also set; `where_field`, if any, is
+    /// the field its `where` equations fill.
+    fn record(
+        &mut self,
+        fields: Vec<(&str, Option<Value>)>,
+        where_field: Option<&str>,
+    ) -> Result<Value, LoadError> {
+        let written = self.props.take().unwrap_or_default();
+        let reserved =
+            |key: &str| fields.iter().any(|(k, _)| *k == key) || where_field == Some(key);
+        if let Some((key, _, at)) = written.iter().find(|(key, ..)| reserved(key)) {
+            return fail(
+                *at,
+                format!("`{key}` is written in the item's own syntax, not as a setting"),
+            );
+        }
+        let mut props: Props = Vec::new();
+        for (key, value) in fields {
+            if let Some(value) = value {
+                props.push((key.to_owned(), Some(value), self.at));
+            }
+        }
+        if let Some(field) = where_field
+            && let Some(equations) = self.equations.take()
+        {
+            props.push((
+                field.to_owned(),
+                Some(Value::new(ValueKind::List(equations), self.at)),
+                self.at,
+            ));
+        }
+        props.extend(written);
+        Ok(Value::new(ValueKind::Props(props), self.at))
     }
 
     fn value(&mut self) -> Result<Value, LoadError> {
@@ -748,8 +923,12 @@ impl Item {
             .map_or_else(|| fail(self.at, "expected `= ...`"), Ok)
     }
 
-    fn name(&self) -> Ident {
-        Ident::from(self.name.as_str())
+    fn equations(&mut self) -> Result<Vec<Equation>, LoadError> {
+        let at = self.at;
+        self.equations.take().map_or_else(
+            || Ok(Vec::new()),
+            |eqs| read(Value::new(ValueKind::List(eqs), at)),
+        )
     }
 
     /// Rejects any part the item's kind did not take.
@@ -769,6 +948,94 @@ impl Item {
     }
 }
 
+/// A right-hand-side symbol as the `SymbolDecl` variant it writes:
+/// `role:B` is `Cat(role, B)`, `"B"` is `Quoted(head, B)`, `','` is
+/// `Punct(',')`, `'—':Free` is `Mark('—', Free)`, and `Kind(args)` is
+/// `Kind(role, args)`, a `Selected`'s Closed Words gathered in a list.
+fn symbol(symbol: RhsSymbol) -> Result<Value, LoadError> {
+    let RhsSymbol {
+        role,
+        term,
+        binding,
+    } = symbol;
+    let at = term.at;
+    let char_term = matches!(term.kind, ValueKind::Char(_));
+    if char_term && role.is_some() {
+        return fail(at, "punctuation names no child");
+    }
+    let role = Value::new(
+        ValueKind::Ident(role.unwrap_or_else(|| "head".to_owned())),
+        at,
+    );
+    let (kind, args) = match term.kind {
+        ValueKind::Char(_) => match binding {
+            None => ("Punct".to_owned(), vec![term]),
+            Some(binding) => (
+                "Mark".to_owned(),
+                vec![term, Value::new(ValueKind::Ident(binding), at)],
+            ),
+        },
+        ValueKind::Ident(_) => ("Cat".to_owned(), vec![role, term]),
+        ValueKind::Str(category) => (
+            "Quoted".to_owned(),
+            vec![role, Value::new(ValueKind::Ident(category), at)],
+        ),
+        ValueKind::Call(kind, mut args) => {
+            if kind == "Selected" && !args.is_empty() {
+                let words = args.split_off(1);
+                args.push(Value::new(ValueKind::List(words), at));
+            }
+            args.insert(0, role);
+            (kind, args)
+        }
+        _ => return fail(at, "expected a right-hand-side symbol"),
+    };
+    Ok(Value::new(ValueKind::Call(kind, args), at))
+}
+
+fn production(item: &mut Item) -> Result<ProductionDecl, LoadError> {
+    let (Some(lhs), Some(rhs)) = (item.parent.take(), item.rhs.take()) else {
+        return fail(item.at, "a Production is `Name: Lhs -> ...`");
+    };
+    let rhs = rhs.into_iter().map(symbol).collect::<Result<_, _>>()?;
+    let name = item.ident(&item.name.clone());
+    let lhs = item.ident(&lhs);
+    let rhs = Value::new(ValueKind::List(rhs), item.at);
+    let record = item.record(
+        vec![("name", Some(name)), ("lhs", Some(lhs)), ("rhs", Some(rhs))],
+        Some("equations"),
+    )?;
+    read(record)
+}
+
+fn category(item: &mut Item) -> Result<CategoryDecl, LoadError> {
+    let parent = item.parent.take().map(|parent| item.ident(&parent));
+    let at = item.at;
+    let features = item
+        .list
+        .take()
+        .map(|features| Value::new(ValueKind::List(features), at));
+    read(item.record(vec![("category", parent), ("features", features)], None)?)
+}
+
+fn schema(keyword: &str, item: &mut Item) -> Result<SchemaDecl, LoadError> {
+    let Some((_, field)) = SCHEMAS.iter().find(|(k, _)| *k == keyword) else {
+        return fail(
+            item.at,
+            format!("unknown keyword `{keyword}`; a Production's name is capitalized"),
+        );
+    };
+    let name = item.ident(&item.name.clone());
+    // Only an adjunct's and a coordination's equations are written in `where`.
+    let where_field = matches!(keyword, "adjunct" | "coordination").then_some("equations");
+    let record = item.record(vec![(field, Some(name))], where_field)?;
+    read(Value::new(
+        ValueKind::Call(keyword.to_owned(), vec![record]),
+        item.at,
+    ))
+}
+
+/// The Grammar's sections, filled item by item.
 struct Builder {
     root: Option<Ident>,
     grammar: Grammar,
@@ -776,24 +1043,9 @@ struct Builder {
 
 impl Builder {
     fn new() -> Self {
-        let grammar = Grammar {
-            root: Ident::from(""),
-            features: BTreeMap::new(),
-            categories: BTreeMap::new(),
-            closed_words: BTreeMap::new(),
-            lexical_classes: BTreeMap::new(),
-            typed_classes: Vec::new(),
-            slot_categories: BTreeMap::new(),
-            slot_equations: BTreeMap::new(),
-            high_attachment: Vec::new(),
-            productions: Vec::new(),
-            schemas: Vec::new(),
-            correlatives: Vec::new(),
-            idiomatic_coordinates: Vec::new(),
-        };
         Self {
             root: None,
-            grammar,
+            grammar: Grammar::default(),
         }
     }
 
@@ -809,11 +1061,11 @@ impl Builder {
 
     fn add(&mut self, mut item: Item) -> Result<(), LoadError> {
         let at = item.at;
-        let name = item.name();
+        let name = Ident::from(item.name.as_str());
+        let grammar = &mut self.grammar;
         let duplicate = match item.keyword.take().as_deref() {
             None => {
-                let production = production(&mut item)?;
-                self.grammar.productions.push(production);
+                grammar.productions.push(production(&mut item)?);
                 false
             }
             Some("root") if self.root.is_some() => return fail(at, "`root` is given twice"),
@@ -822,47 +1074,55 @@ impl Builder {
                 false
             }
             Some("feature") => {
-                let values = match item.value()? {
-                    Value {
-                        kind: ValueKind::Alt(values),
-                        ..
-                    } => values,
-                    value => vec![value],
+                let value = item.value()?;
+                let values = match value.kind {
+                    ValueKind::Alt(values) => values,
+                    kind => vec![Value::new(kind, value.at)],
                 };
-                let values = distinct(values)?;
-                self.grammar.features.insert(name, values).is_some()
+                let values = read(Value::new(ValueKind::List(values), value.at))?;
+                grammar.features.insert(name, values).is_some()
             }
             Some("category") => {
-                let mut fields = item.fields()?;
-                let decl = CategoryDecl {
-                    category: item.parent.take().map(|p| Ident::from(p.as_str())),
-                    features: distinct(item.list.take().unwrap_or_default())?,
-                    gap: fields.flag("gap")?,
-                    closed_gaps: fields.idents("closed_gaps")?,
-                    function: fields.flag("function")?,
-                };
-                fields.finish()?;
-                self.grammar.categories.insert(name, decl).is_some()
+                let decl = category(&mut item)?;
+                grammar.categories.insert(name, decl).is_some()
             }
             Some("word") => {
-                let lexeme = match item.value()?.kind {
-                    ValueKind::Str(lexeme) => Ident::from(lexeme.as_str()),
-                    _ => return fail(at, "a word is `word Name = \"lexeme\"`"),
-                };
-                self.grammar.closed_words.insert(name, lexeme).is_some()
+                let lexeme = lexeme(item.value()?)?;
+                grammar.closed_words.insert(name, lexeme).is_some()
             }
-            Some("class") => self.class(&mut item, name)?,
+            Some("class") if item.value.is_some() => {
+                let value = item.value()?;
+                let ValueKind::List(members) = value.kind else {
+                    return fail(value.at, "a class is `class Name = [\"lexeme\", ...]`");
+                };
+                let members = members.into_iter().map(lexeme).collect::<Result<_, _>>()?;
+                grammar.lexical_classes.insert(name, members).is_some()
+            }
+            Some("class") => {
+                let props = item.props.take().unwrap_or_default();
+                let typed = |value: &Option<Value>| {
+                    value
+                        .as_ref()
+                        .is_none_or(|v| matches!(&v.kind, ValueKind::Ident(b) if b == "true"))
+                };
+                if !matches!(props.as_slice(), [(key, value, _)] if key == "typed" && typed(value))
+                {
+                    return fail(
+                        at,
+                        "a class is `class Name = [...]` or `class Name { typed }`",
+                    );
+                }
+                grammar.typed_classes.push(name);
+                false
+            }
             Some("slot") => {
-                let slot: SlotKind = variant(&item.name, at)?;
+                let slot: SlotKind = read(item.ident(&item.name.clone()))?;
                 let category = item.value()?.ident()?;
                 let equations = item.equations()?;
                 if !equations.is_empty() {
-                    self.grammar.slot_equations.insert(slot, equations);
+                    grammar.slot_equations.insert(slot, equations);
                 }
-                self.grammar
-                    .slot_categories
-                    .insert(slot, category)
-                    .is_some()
+                grammar.slot_categories.insert(slot, category).is_some()
             }
             Some("high_attachment") => {
                 let equations = item.equations()?;
@@ -872,23 +1132,23 @@ impl Builder {
                 let Some(feature) = path.strip_prefix("$.") else {
                     return fail(at, "a high attachment is `where $.Feature = Value`");
                 };
-                let entry = (name, Ident::from(feature), *value);
-                self.grammar.high_attachment.push(entry);
+                grammar
+                    .high_attachment
+                    .push((name, Ident::from(feature), *value));
                 false
             }
             Some("correlative") => {
-                let pair = (name, item.value()?.ident()?);
-                self.grammar.correlatives.push(pair);
+                grammar.correlatives.push((name, item.value()?.ident()?));
                 false
             }
             Some("idiomatic_coordinate") => {
-                let pair = (name, item.value()?.ident()?);
-                self.grammar.idiomatic_coordinates.push(pair);
+                grammar
+                    .idiomatic_coordinates
+                    .push((name, item.value()?.ident()?));
                 false
             }
-            Some(kind) => {
-                let schema = schema(kind, &mut item)?;
-                self.grammar.schemas.push(schema);
+            Some(keyword) => {
+                grammar.schemas.push(schema(keyword, &mut item)?);
                 false
             }
         };
@@ -897,256 +1157,12 @@ impl Builder {
         }
         item.finish()
     }
-
-    /// `class Name = ["lexeme", ...]`, or `class Name { typed }` for a class
-    /// the lexical environment declares.
-    fn class(&mut self, item: &mut Item, name: Ident) -> Result<bool, LoadError> {
-        let mut fields = item.fields()?;
-        let typed = fields.flag("typed")?;
-        fields.finish()?;
-        if typed {
-            self.grammar.typed_classes.push(name);
-            return Ok(false);
-        }
-        let members = item
-            .value()?
-            .list()?
-            .into_iter()
-            .map(|member| match member.kind {
-                ValueKind::Str(lexeme) => Ok(Ident::from(lexeme.as_str())),
-                _ => fail(member.at, "a class member is a quoted lexeme id"),
-            })
-            .collect::<Result<_, _>>()?;
-        Ok(self.grammar.lexical_classes.insert(name, members).is_some())
-    }
 }
 
-fn production(item: &mut Item) -> Result<ProductionDecl, LoadError> {
-    let Some(lhs) = item.parent.take() else {
-        return fail(item.at, "a Production is `Name: Lhs -> ...`");
-    };
-    let Some(rhs) = item.rhs.take() else {
-        return fail(item.at, "a Production is `Name: Lhs -> ...`");
-    };
-    let mut fields = item.fields()?;
-    let unadjoined = fields.pairs("unadjoined", "->", Value::ident, Value::idents)?;
-    let elliptical = fields
-        .value("elliptical")?
-        .map(|v| v.list()?.into_iter().map(Value::variant).collect())
-        .transpose()?;
-    let production = ProductionDecl {
-        name: item.name(),
-        lhs: Ident::from(lhs.as_str()),
-        rhs: rhs.into_iter().map(symbol).collect::<Result<_, _>>()?,
-        equations: item.equations()?,
-        cost: fields.cost(default_cost())?,
-        heavy: fields.idents("heavy")?,
-        light: fields.idents("light")?,
-        unextended: fields.idents("unextended")?,
-        unadjoined,
-        transparent: fields.idents("transparent")?,
-        elliptical,
-        unclosed: fields.flag("unclosed")?,
-        scoped: fields.idents("scoped")?,
-        uncoordinated: fields.idents("uncoordinated")?,
-        unlinked: fields.idents("unlinked")?,
-        coordinated: fields.idents("coordinated")?,
-        unshared: fields.idents("unshared")?,
-    };
-    fields.finish()?;
-    Ok(production)
-}
-
-fn symbol(symbol: RhsSymbol) -> Result<SymbolDecl, LoadError> {
-    let RhsSymbol {
-        role,
-        term,
-        binding,
-    } = symbol;
-    let at = term.at;
-    let has_role = role.is_some();
-    let role = Ident::from(role.as_deref().unwrap_or("head"));
-    let decl = match term.kind {
-        ValueKind::Char(c) if !has_role => match binding {
-            None => SymbolDecl::Punct(c),
-            Some(binding) => SymbolDecl::Mark(c, variant(&binding, at)?),
-        },
-        ValueKind::Ident(category) => SymbolDecl::Cat(role, Ident::from(category.as_str())),
-        ValueKind::Str(category) => SymbolDecl::Quoted(role, Ident::from(category.as_str())),
-        ValueKind::Call(kind, args) => call_symbol(role, &kind, args, at)?,
-        _ => return fail(at, "expected a right-hand-side symbol"),
-    };
-    Ok(decl)
-}
-
-fn call_symbol(
-    role: Ident,
-    kind: &str,
-    args: Vec<Value>,
-    at: Pos,
-) -> Result<SymbolDecl, LoadError> {
-    let mut args = args.into_iter();
-    let mut arg = || {
-        args.next()
-            .map_or_else(|| fail(at, format!("`{kind}` lacks an argument")), Ok)
-    };
-    let decl = match kind {
-        "Class" => SymbolDecl::Class(role, arg()?.ident()?),
-        "Word" => SymbolDecl::Word(role, arg()?.ident()?),
-        "Free" => SymbolDecl::Free(role, arg()?.ident()?),
-        "Lex" => SymbolDecl::Lex(role, arg()?.variant()?),
-        "FreeLex" => SymbolDecl::FreeLex(role, arg()?.variant()?),
-        "Numeral" => SymbolDecl::Numeral(role, numeral(arg()?)?),
-        "Hosted" => SymbolDecl::Hosted(role, arg()?.ident()?, arg()?.variant()?),
-        "Attached" => SymbolDecl::Attached(role, arg()?.ident()?, arg()?.variant()?),
-        "Selected" => {
-            let category = arg()?.ident()?;
-            SymbolDecl::Selected(
-                role,
-                category,
-                args.by_ref().map(Value::ident).collect::<Result<_, _>>()?,
-            )
-        }
-        _ => return fail(at, format!("unknown symbol kind `{kind}`")),
-    };
-    if let Some(extra) = args.next() {
-        return fail(extra.at, format!("`{kind}` takes no more arguments"));
-    }
-    Ok(decl)
-}
-
-fn numeral(value: Value) -> Result<sylex_lexicon::Numeral, LoadError> {
-    let at = value.at;
+/// A quoted lexeme id.
+fn lexeme(value: Value) -> Result<Ident, LoadError> {
     match value.kind {
-        ValueKind::Call(name, args) if name == "Arabic" => match <[Value; 1]>::try_from(args) {
-            Ok([grouped]) => Ok(sylex_lexicon::Numeral::Arabic(grouped.bool()?)),
-            Err(_) => fail(at, "`Arabic` takes `true` or `false`"),
-        },
-        kind => Value { kind, at }.variant(),
+        ValueKind::Str(lexeme) => Ok(Ident::from(lexeme.as_str())),
+        _ => fail(value.at, "a lexeme id is quoted: \"prep:of\""),
     }
-}
-
-fn schema(kind: &str, item: &mut Item) -> Result<SchemaDecl, LoadError> {
-    let name = item.name();
-    let mut f = item.fields()?;
-    let schema = match kind {
-        "adjunct" => SchemaDecl::Adjunct {
-            host: f.required("host")?.ident()?,
-            adjunct: name,
-            side: f.required("side")?.variant()?,
-            host_kind: f.required("host_kind")?.variant()?,
-            delimiter: f.char("delimiter")?,
-            cost: f.cost(default_cost())?,
-            equations: item.equations()?,
-            nonfinal: f.flag("nonfinal")?,
-        },
-        "premodification" => SchemaDecl::Premodification {
-            head: f.required("head")?.variant()?,
-            modifier: name,
-            host: f.required("host")?.ident()?,
-            forms: f
-                .required("forms")?
-                .list()?
-                .into_iter()
-                .map(Value::variant)
-                .collect::<Result<_, _>>()?,
-            prefix: f.flag("prefix")?,
-            equations: f.pairs("equations", "->", Value::variant, Value::equations)?,
-        },
-        "parameters" => SchemaDecl::Parameters {
-            head: f.required("head")?.variant()?,
-            phrase: name,
-            binding: f.value("binding")?.map(Value::variant).transpose()?,
-            coordinators: f.ident("coordinators")?,
-            remnant: f.ident("remnant")?,
-        },
-        "valence" => valence(name, &mut f)?,
-        "coordination" => coordination(name, &mut f, item.equations()?)?,
-        _ => {
-            return fail(
-                item.at,
-                format!("unknown keyword `{kind}`; a Production's name is capitalized"),
-            );
-        }
-    };
-    f.finish()?;
-    Ok(schema)
-}
-
-fn valence(phrase: Ident, f: &mut Fields) -> Result<SchemaDecl, LoadError> {
-    Ok(SchemaDecl::Valence {
-        head: f.required("head")?.variant()?,
-        phrase,
-        cost: f.cost(0)?,
-        complement_kind: f.ident("complement_kind")?,
-        active: f.equations("active")?,
-        passive: f.ident("passive")?,
-        verbal_passive: f.equations("verbal_passive")?,
-        prepositional_passive: f.equations("prepositional_passive")?,
-        internalised: f.equations("internalised")?,
-        adjectival: f.ident("adjectival")?,
-        adjectival_passive: f.equations("adjectival_passive")?,
-        interleaved: f.ident("interleaved")?,
-        interleaved_internalised: f.ident("interleaved_internalised")?,
-        heavy_shift: f.flag("heavy_shift")?,
-        shifted_object: f.equations("shifted_object")?,
-        postposed: f.ident("postposed")?,
-        obligatory: f.flag("obligatory")?,
-        agree: f.pairs("agree", "=", Value::ident, Value::ident)?,
-        clusters: f.value("clusters")?.map(clusters).transpose()?,
-        remnants: f.pairs("remnants", "->", Value::variant, Value::ident)?,
-    })
-}
-
-fn clusters(value: Value) -> Result<ClustersDecl, LoadError> {
-    let mut f = value.props()?;
-    let adjunct_clusters = match f.value("adjunct_clusters")? {
-        None => None,
-        Some(value) => {
-            let mut a = value.props()?;
-            let decl = AdjunctClustersDecl {
-                cluster: a.required("cluster")?.ident()?,
-                coordination: a.required("coordination")?.ident()?,
-                preposition: a.required("preposition")?.ident()?,
-                remnant: a.required("remnant")?.ident()?,
-            };
-            a.finish()?;
-            Some(decl)
-        }
-    };
-    let decl = ClustersDecl {
-        cluster: f.required("cluster")?.ident()?,
-        coordination: f.required("coordination")?.ident()?,
-        adjunct: f.ident("adjunct")?,
-        remnants: f.pairs("remnants", "->", Value::variant, Value::ident)?,
-        adjunct_clusters,
-    };
-    f.finish()?;
-    Ok(decl)
-}
-
-fn coordination(
-    category: Ident,
-    f: &mut Fields,
-    equations: Vec<Equation>,
-) -> Result<SchemaDecl, LoadError> {
-    let serial = f.value("serial")?.map(Value::bool).transpose()?;
-    Ok(SchemaDecl::Coordination {
-        category,
-        coordinators: f.ident("coordinators")?,
-        link: f.ident("link")?,
-        cost: f.cost(default_cost())?,
-        unshared: f.idents("unshared")?,
-        equations,
-        proximate: f.idents("proximate")?,
-        resolve: f.pairs("resolve", "=", Value::ident, Value::ident)?,
-        delimiter: f.char("delimiter")?,
-        delimited: f.flag("delimited")?,
-        serial,
-        conjunct: f.ident("conjunct")?,
-        unlike: f.ident("unlike")?,
-        remnant: f.ident("remnant")?,
-        recovered: f.idents("recovered")?,
-        parallel: f.flag("parallel")?,
-    })
 }

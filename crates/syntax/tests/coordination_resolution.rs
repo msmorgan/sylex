@@ -57,7 +57,7 @@ fn grammar(lexicon: &Lexicon, coordination: &str) -> Result<CompiledGrammar, Str
     CompiledGrammar::bind(&grammar, lexicon, &FrameCatalog::default()).map_err(|e| format!("{e:?}"))
 }
 
-const RESOLVED: &str = r"coordination NounPhrase { coordinators: And, proximate: [Countability], resolve: [Determination = Bare] } where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass)";
+const RESOLVED: &str = r"coordination NounPhrase { coordinators: And, proximate: [Countability], resolve: [Determination -> Bare] } where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass)";
 
 const UNSHARED: &str =
     r"coordination NounPhrase { coordinators: And, unshared: [Determination, Countability] }";
@@ -141,8 +141,8 @@ fn every_conjunct_but_the_last_shares_a_resolved_feature() {
 fn malformed_resolutions_and_joint_exclusions_are_rejected() {
     let lexicon = lexicon();
     for bad in [
-        r"coordination NounPhrase { coordinators: And, unshared: [Determination], resolve: [Determination = Bare] }",
-        r"coordination NounPhrase { coordinators: And, resolve: [Determination = Some] }",
+        r"coordination NounPhrase { coordinators: And, unshared: [Determination], resolve: [Determination -> Bare] }",
+        r"coordination NounPhrase { coordinators: And, resolve: [Determination -> Some] }",
         r"coordination NounPhrase { coordinators: And } where !(first.Determination = Overt & $.Countability = Mass)",
         r"coordination NounPhrase { coordinators: And } where !(first.Determination = Overt)",
     ] {
