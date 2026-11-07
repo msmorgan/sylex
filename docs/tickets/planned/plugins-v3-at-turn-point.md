@@ -1,48 +1,34 @@
 ---
 needs: [plugins-v3-data-language, lean-retirement]
 ---
-# `at_` takes a turn point; `when` and `whenever` take an event
 
-Standard constraints apply. Implement in the `plugins-v3-data-language` grammar, in `.syl` and
-Rust `semantics` (after `semantics-rust-rewrite`; Lean is retired).
+# `at` takes a turn point; `when` and `whenever` take an event
 
-## The defect
+**Why.** `plugins/builtin/templates/ability/{at,when,whenever}.syl` have the same signature and
+body: each takes `event: GameEvent` and expands to the one `triggered` primitive, so `at(does(it,
+enter), …)` resolves though no card is printed that way. The three words all open a triggered
+ability [CR#603.1], but they name different things. "When" and "whenever" take an event; the CR
+does not tell them apart, so they stay two Templates over one constructor, chosen by Oracle
+wording (`docs/oracle-style-guide.md`, "Use **When** for a discrete event"). "At" names a point
+in the turn: "at the beginning of" a phase or step triggers when it begins [CR#603.2b]. Every
+current `at` call is a `beginningOf…` event, one wrapped in `nthOccurrence` (*Paradox Haze*,
+"first upkeep each turn").
 
-`plugins/builtin/templates/ability/{when,whenever,at_}.syl` have identical signatures and bodies: all three
-take `event : GameEvent` and expand to the single `triggered` primitive. So `at_ (does it enter)`
-type-checks, even though no card is printed that way.
+**Done when.**
+- A turn-point sort covers the beginning of a phase or step with its possessor (your, each, a
+  possessed player's), end of combat, and the "next" and nth-occurrence forms that delayed
+  triggers and *Paradox Haze* need.
+- `at` takes a turn point, is spelled "At <turn point>, <action>", and expands to the event the
+  turn point denotes; there is still one triggered-ability constructor, because the CR treats a
+  step's beginning as a trigger event [CR#603.2b]. Its spelling `TODO` is settled and its stale
+  "Lean keyword" comment is gone.
+- `when` and `whenever` refuse a turn point.
+- Every `at` call in builtin and canon, and the delayed-trigger Templates that write "at the
+  beginning of the next …" (`atNext`, `beginningOfNext`, `asThoughFlashSacrificedAtCleanup`), use
+  the new argument.
+- Negative tests pin that `at(does(it, enter), …)` and `whenever(beginningOfYour(upkeep), …)` are
+  refused, and the rest of the corpus still passes the `.syl` checks.
 
-The three trigger words all open the triggered-ability form [CR#603.1], but they do not name the
-same kind of thing:
-
-- **When** and **Whenever** take an event. The CR does not distinguish them. The choice between
-  them is Oracle wording (`docs/oracle-style-guide.md`, the trigger-word guidance that begins
-  "Use **When** for a discrete event that is naturally singular"). They stay two Templates over
-  one constructor, each its own spelling point. That much is settled
-  (`plugins-v3-primitive-template-boundary`).
-- **At** names a point in the turn structure. "At the beginning of" a phase or step triggers when
-  that phase or step begins [CR#603.2b]. All 52 current `at_` uses are
-  `beginningOfYour`/`beginningOfPossessed`/`beginningOfEach <part>`, and one of them is wrapped in
-  `nthOccurrence` (Paradox Haze, "first upkeep each turn").
-
-## Change
-
-- Add an authoring sort for turn points. It covers:
-  - the beginning of a phase or step, with its possessor (your, each, a possessed player's);
-  - end of combat;
-  - the "next" / nth-occurrence forms that delayed triggers and Paradox Haze need.
-- `at_` takes a turn point and expands it to the `GameEvent` it denotes. The core AST keeps one
-  triggered-ability constructor, because the CR models the beginning of a step as a trigger
-  event too ([CR#603.2b]).
-- `when` and `whenever` refuse turn-point events.
-- Rewrite the 52 `at_` uses in builtin and canon to the new argument.
-- Rewrite any delayed-trigger Template that writes "at the beginning of the next …" to match.
-- The spellings say "at <turn point>". Settle `at_`'s bucket-3 `TODO(spelling)` here.
-
-## Acceptance
-
-- `at_ (does it enter)` and `whenever (beginningOfYour upkeep)` are refused, pinned by negative
-  Rust `semantics` tests.
-- Rust `semantics` expansions of the corpus, compared before and after, show 0 differences, apart
-  from keys this ticket renames, each listed.
-- Gate: `cargo test` and `cargo clippy --tests -- -D warnings` for `semantics`.
+**Pointers.** `plugins/builtin/templates/ability/{at,when,whenever}.syl`,
+`plugins/builtin/templates/event/beginningOfNext.syl`, `plugins/builtin/templates/action/atNext.syl`,
+`docs/decisions/semantics.md` §4.6.

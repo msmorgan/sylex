@@ -1,29 +1,27 @@
 ---
 needs: []
 ---
-**Hoist the embedded test suites out of `crates/engine/src/resolve/
-action.rs` and `resolve/effect.rs` into sibling test files.** The `resolve/`
-*code* split already happened; these two files have since grown into 5.5k/5.1k
-line files — but the growth is test volume, not logic. Measured 2026-07-24:
-`action.rs` logic ends at line 965 (~4.6k test lines, 82%); `effect.rs` logic
-ends at 1,851 (~3.3k test lines, 64%). The logic itself is reasonably sized
-and does NOT need decomposing; framing this as a logic-behemoth split (as an
-external review did) misreads it.
 
-## Shape
+# Move the `resolve/` test suites out of their logic files
 
-Per file: move the embedded `mod tests` body to a sibling (`action/tests.rs`
-or `#[path]`-free equivalent by converting the file to a directory module),
-keeping the module path, test names, and CR-citation texts identical. Shared
-construction helpers go to the existing `#[cfg(test)] mod test_support`
-(`src/test_support.rs`) — extend it rather than minting a second fixtures
-home. While in there, `player_action.rs` (tests from 660/2,962) and
-`count.rs` (652/2,325) are optional same-pattern extractions if cheap;
-don't force them.
+**Why.** `crates/engine/src/resolve/action.rs` (6.4k lines) and `resolve/effect.rs` (7.3k) are
+large because of their embedded `mod tests`, not their logic: `action.rs`'s logic ends near line
+1,030 and `effect.rs`'s near 1,890. The logic is reasonably sized, but a reader of either file has
+to scroll past thousands of test lines. `player_action.rs` (tests from line ~920 of 3.9k) and
+`count.rs` (~710 of 2.7k) have the same shape.
 
-## Gates
+**Done when.**
+- Every test in `action.rs`, `effect.rs`, `player_action.rs` and `count.rs` that can go through
+  the engine's public API lives in `crates/engine/tests/`; a test that needs private access stays
+  in its module's `mod tests`.
+- No module becomes a directory module or gains a `tests.rs` file just to hold its tests. A module
+  whose remaining inline tests are still large, or one part of which needs exhaustive testing of
+  its own, is split along its concept boundaries.
+- Inline tests share helpers through the existing `#[cfg(test)]` `test_support` and
+  `resolve/fixtures.rs` modules, not a new fixtures module.
+- Test names and CR-citation text are unchanged, the number of `#[test]` functions across
+  `src/` and `tests/` is the same before and after, and no authored comment is lost (the sorted
+  multiset of comment lines matches).
 
-Standard constraints apply, plus: exact `#[test]`-count parity before vs
-after; `cargo xtask cite check` 0 stale (the test bodies carry CR citations,
-which move files); the comment-multiset audit and the tests-mod-import
-gotchas from the [[split-trigger-rs]] template apply verbatim.
+**Pointers.** `crates/engine/src/resolve/`, `crates/engine/src/test_support.rs`,
+`crates/engine/tests/`, `split-trigger-rs` (the same kind of move, with known pitfalls).

@@ -1,66 +1,42 @@
 ---
 needs: [engine-face-down, engine-look-grants-lifecycle]
 ---
-Build the per-player redacted view whose shape was fixed by the
-`runner-hidden-info` decision. A borrowed accessor `PlayerView<'a> { state:
-&GameState, viewer: PlayerId }` — a zero-copy, stateless read facade over the
-full-information engine, living in the engine crate beside the layer view.
 
-Visibility predicate (positional + look_grants): a viewer sees an object's
-identity iff it is in a public zone ([CR#400.2]), OR the viewer owns/controls
-the hidden object, OR `(viewer, object)` is in the engine's `look_grants`
-ledger ([CR#406.3]) — the continuing-look permission that peeks/reveals write
-and shuffle/remint clears ([CR#701.20]). Redacting reads collapse
-hidden-from-viewer content to cardinality (opponent hand → count, library
-order → unknown beyond granted top-N).
+# A per-player redacted view of the game
 
-Characteristic axis (face-down): a `face(id)` chokepoint distinct from the zone
-predicate returns the known face or `hidden` for a face-down object the viewer
-neither controls nor has a grant for. This is why the build depends on
-`engine-face-down` — the face-down object representation is what makes
-characteristic redaction real and testable.
+**Why.** The engine is full-information, and its consumers (the demo strategies, the TUI) read
+hidden zones and printed faces straight from `GameState`, so an AI can cheat and a client could
+leak hidden cards. A per-player view that redacts what the viewer may not see makes hidden
+information real without changing the engine's model.
 
-Migration when built: route the demo `Strategy` and the TUI's hidden-zone /
-printed-face reads through the view; add `can_see` / `face` tests (own vs
-opponent hand, public zones, granted scry top then cleared by shuffle,
-reveal-to-all, face-down controller vs opponent vs grantee). Core stays
-full-information throughout — no change to RNG, zone storage, or the
-full-info model.
+**Design.**
+- `PlayerView` is a borrowed, stateless read facade over `GameState` in the engine crate, beside
+  the layer view; nothing is copied.
+- Visibility is decided by zone, not by whether the viewer owns or controls the object: off the
+  battlefield and the stack an object's controller is its owner [CR#108.4a], so an owns-or-controls
+  test would show a player their own library.
+- A `face(id)` chokepoint, separate from the zone check, returns the known face or "hidden".
+- A read of what the viewer can't see collapses to a count: an opponent's hand is a count, and
+  library order is unknown beyond any granted top cards.
 
-Early-build override: if a consumer needs genuinely non-cheating play (an
-adversarial self-play sim or a networked/server runner) before face-down lands,
-the zone/`can_see` half can be built ahead of the `face()` half.
+**Done when.**
+- `PlayerView` exists in `sylex_engine`, with `can_see` and `face` accessors.
+- `can_see` follows the zone rules: every object in a public zone is visible [CR#400.2], subject to
+  `face`; a hand is visible to its player [CR#402.3], except a card drawn face down while a spell
+  is being cast, hidden until that spell becomes cast [CR#121.8]; a library is visible to no one
+  [CR#401.2], except a card a live effect or an open look window in `look_grants` shows
+  [CR#401.5,701.20e,701.23a].
+- `face` shows a face-down spell or permanent's face to its controller [CR#708.5] and to no other
+  player without a grant. A face-down exiled card is visible to no one, its owner included, except
+  under the separate [CR#406.3] ledger, not `look_grants`.
+- The demo strategies and the TUI's hidden-zone and printed-face reads go through it.
+- Tests cover: own versus opponent hand; public zones; a granted scry top card, then cleared by a
+  shuffle; a reveal to all; an owner can't see their own library; an owner can't see a card an
+  opponent exiled face down; a face-down permanent seen by its controller, an opponent and a
+  grantee; the owner of a face-down permanent an opponent controls can't see its face.
 
-## Correction (2026-10-21): visibility is keyed per zone
+**Not in scope.** Changes to core, the RNG or zone storage. If a consumer needs non-cheating play
+before `engine-face-down` lands, the zone half (`can_see`) may be built ahead of `face`.
 
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #22.
-The predicate above is wrong in two places, and the build follows this section,
-not the paragraphs above.
-
-- "OR the viewer owns/controls the hidden object" matches every card in the
-  viewer's own library, because off the battlefield the controller is the owner
-  ([CR#108.4a]; `crates/engine/src/step/mod.rs:590-594`). [CR#401.2]:
-  "Players can't look at or change the order of cards in a library."
-- `face(id)` hiding a face-down object "the viewer neither controls nor has a grant
-  for" would show an owner a card an opponent exiled face down (Gonti ruling: "No
-  player may look at it"). [CR#406.3]: face-down exiled cards "can't be examined by
-  any player except when instructions allow it"; [CR#708.5]: "You can't look at
-  face-down cards in any other zone or face-down spells or permanents controlled by
-  another player."
-- "shuffle/remint clears" grants is false at head: a shuffle does not remint
-  (`engine-look-grants-lifecycle` fixes the engine side).
-
-Key visibility per zone instead:
-
-- **Hand:** visible to its player ([CR#402.3]) and to teammates where the variant
-  lets them review hands ([CR#808.5,809.7,810.5]; [CR#811.5] only for teammates
-  sitting next to each other), minus a card drawn face down mid-cast ([CR#121.8]).
-- **Library:** visible to no one, except through a live effect or an open look
-  window ([CR#401.5,701.20e,701.23a]).
-- **Face axis:** consult the controller only for stack and battlefield objects
-  ([CR#708.5]); a face-down exiled card is visible only under the [CR#406.3] ledger.
-
-Add tests: an owner can't see their own library; an owner can't see a card an
-opponent exiled face down; the owner of a face-down permanent an opponent controls
-can't see its face. The "granted scry top then cleared by shuffle" test stays and
-needs `engine-look-grants-lifecycle`.
+**Pointers.** `crates/engine/src/state.rs` (`look_grants`), `crates/engine/src/strategy.rs`,
+`crates/tui/src/`.

@@ -1,54 +1,55 @@
 ---
 needs: []
 ---
-**[port-required: semantics-v3] Rehome the designation storage columns the
-declarations used to carry (`plugins/` / `deckmaste_semantics_v3`).**
-`facts-generator-sheds-v1` (2026-09-07) retyped every
-`plugins_v2/builtin/macros/stubs/designations/*.ron` body from the v1
-`DesignationDecl(definition: Stored(scope, shape, uniqueness, persistence))`
-onto the `deckmaste_semantics_v2::facts` mirror of
-`lean/Semantics/Check/FactTypes.lean`. `DesignationFacts` has no column for
-`shape`, `uniqueness` or `persistence`, so those three dropped out of the tree.
-Seventeen of the nineteen rows existed only there — `v1/plugins/builtin` (v1)
-declares only `Commander` and `Monarch` — so this ticket is the record of what
-was dropped and the decision of where it goes in `semantics-v3` (`plugins/`)
-when an engine needs it.
 
-`scope` survives as `DesignationFacts.scope`; an `Enum` shape survives as one
-`DesignationFacts` row per member (`DayNight` → "day"/"night", `Sector` →
-"alpha sector"/"beta sector"/"gamma sector"). What was dropped:
+# Where designation shape, uniqueness and persistence live
 
-| declaration | shape | uniqueness | persistence |
+**Why.** Every designation has a storage shape, a uniqueness and a persistence, the three axes of
+core's `DesignationDef::Stored` (`crates/core/src/designation.rs`). `.syl` designations state only
+`scope` and, for the monarch and the initiative, `sole = true`, so a Ring-bearer's per-player
+uniqueness, day and night being one value, and saddled lasting until end of turn are stated
+nowhere a reader of `.syl` can see. Either the declarations carry these values, because something
+reading `.syl` needs them (holder eviction [CR#725.3,726.3,701.54a]), or they are engine-only
+state that lowering supplies. Where they live is the owner's open question.
+
+The values, wherever they come to live:
+
+| designation | shape | uniqueness | persistence |
 |---|---|---|---|
-| CitysBlessing | Flag | PerPlayer | Permanently |
-| Commander | Flag | None | Permanently |
-| DayNight | Enum(["Day", "Night"]) | PerGame | Permanently |
-| EnduringStory | Flag | PerPlayer | Permanently |
-| Goaded | Relation | None | EffectSupplied |
-| Harnessed | Flag | None | ObjectLifetime |
-| Initiative | Flag | PerGame | Permanently |
-| LeftHalfUnlocked | Flag | None | ObjectLifetime |
-| Level | Number | None | ObjectLifetime |
-| Monarch | Flag | PerGame | Permanently |
-| Monstrous | Flag | None | ObjectLifetime |
-| Prepared | Flag | None | ObjectLifetime |
-| Renowned | Flag | None | ObjectLifetime |
-| RightHalfUnlocked | Flag | None | ObjectLifetime |
-| RingBearer | Relation | PerPlayer | EffectSupplied |
-| Saddled | Flag | None | UntilEndOfTurn |
-| Sector | Enum(["Alpha", "Beta", "Gamma"]) | None | EffectSupplied |
-| Solved | Flag | None | ObjectLifetime |
-| Suspected | Flag | None | ObjectLifetime |
+| citysBlessing | Flag | PerPlayer | Permanently |
+| commander | Flag | None | Permanently |
+| day / night | Enum(day, night) | PerGame | Permanently |
+| enduringStory | Flag | PerPlayer | Permanently |
+| goaded | Relation | None | EffectSupplied |
+| harnessed | Flag | None | ObjectLifetime |
+| initiative | Flag | PerGame | Permanently |
+| leftHalfUnlocked | Flag | None | ObjectLifetime |
+| level | Number | None | ObjectLifetime |
+| monarch | Flag | PerGame | Permanently |
+| monstrous | Flag | None | ObjectLifetime |
+| prepared | Flag | None | ObjectLifetime |
+| renowned | Flag | None | ObjectLifetime |
+| rightHalfUnlocked | Flag | None | ObjectLifetime |
+| ringBearer | Relation | PerPlayer | EffectSupplied |
+| saddled | Flag | None | UntilEndOfTurn |
+| solved | Flag | None | ObjectLifetime |
+| suspected | Flag | None | ObjectLifetime |
 
-The decision to make: whether these are Lean columns (`DesignationFacts` grows
-`shape`/`uniqueness`/`persistence`, and the checker gains a law that reads
-them — the initiative and the monarch move off their prior holder
-[CR#725.3,726.3], a Ring-bearer designation ends when another creature becomes
-that player's Ring-bearer [CR#701.54a]) or engine-only state that belongs in a
-`plugins_v2/*/rules/` table rather than in the declaration. Lean is the spec, so
-a column no law reads should not be a Lean column; a designation law that needs
-uniqueness or persistence is the trigger for growing them. Related but distinct:
-`core-getdesignation-scopes-and-eviction` and `core-designation-card-scope` are
-the v1 `sylex_core` half of the same question.
+Two rows are flagged as likely wrong:
 
-Standard constraints apply.
+- The single `day / night` Enum row contradicts the corpus, which declares `day.syl` and
+  `night.syl` separately.
+- `ringBearer` as EffectSupplied: a creature stays your Ring-bearer until another creature becomes
+  your Ring-bearer or another player gains control of it [CR#701.54a], which is a rule-defined
+  persistence, not one an effect supplies.
+
+**Done when.**
+- The owner has decided where each of the three values lives, and why.
+- Every designation states its values in that place, matching the table with the two flagged rows
+  resolved and `foretold` and `plotted` filled in; `sole` is folded into uniqueness if uniqueness
+  moves to `.syl`.
+- If the values are on `.syl`, the `.syl` checks pass; if they are engine-side, the engine reads
+  them from one declared place and `core-getdesignation-scopes-and-eviction` uses them.
+
+**Pointers.** `plugins/builtin/definitions/designation/`, `crates/core/src/designation.rs`,
+`core-getdesignation-scopes-and-eviction`, `core-designation-card-scope`.

@@ -12,10 +12,12 @@ The variant's doc comment ("an explicitly named inventory whose grammatical dist
 yet mapped") is also out of date.
 
 **Done when.**
-- `Category::Catalog` is `Category::ProperName` everywhere it is used (code, tests, RON data,
-  grammar data), with a doc comment that says what the Category holds.
-- The glossary's Proper Name entry drops its "proposed" mark, and `lexicon.md` §2 uses the name.
-- `cargo xtask english strata --check` passes, and tests and clippy pass for every crate touched.
+- `Category::Catalog` is `Category::ProperName` everywhere it is used (code, tests, and the
+  grammar's `Lex(Catalog)` in `english.fug`), with a doc comment that says what the Category holds.
+- The glossary's Proper Name entry drops "The code calls it `Category::Catalog`", and
+  `lexicon.md` §2 uses the name.
+- `cargo xtask english strata --check` passes.
 
 **Pointers.** `crates/lexicon/src/types.rs` (`Category`), `crates/vocabulary/src/lib.rs`,
-`docs/contexts/oracle-english/CONTEXT.md` (Proper Name), `docs/decisions/lexicon.md` §2.
+`crates/english/grammar/english.fug`, `docs/contexts/oracle-english/CONTEXT.md` (Proper Name),
+`docs/decisions/lexicon.md` §2.

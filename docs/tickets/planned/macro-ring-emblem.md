@@ -1,39 +1,29 @@
 ---
 needs: [core-emblems, core-getdesignation-scopes-and-eviction]
 ---
-The Ring emblem and tempts-you progression (50 cards). The Ring is an emblem
-with a level-style progression.
 
-## Current state (2026-07-18 deep-dive)
+# The Ring tempts you: the Ring emblem and Ring-bearer in the engine
 
-The mechanic-specific action variant has been retired. A future `The Ring
-tempts you` builtin macro will expand to `Action::Composite` plus the
-designation/emblem primitives; there is no parse/render arm yet and zero live
-corpus cards. Emblem minting is real (`GetEmblem` → command zone,
-`core-emblems` done) and the designation machinery fits — your-Ring-bearer
-uniqueness is exactly `DesignationUniqueness::PerPlayer`, and the Monarch
-macro is the precedent for a designation as pure RON data.
+**Why.** 54 Vintage-legal cards say "the Ring tempts you". `.syl` writes it
+(`keyword_action/theRingTemptsYou.syl`, `designation/ringBearer.syl`), but core and the engine
+cannot run it. Emblems exist (`GetEmblem` puts one in the command zone), and core's designation
+model can describe a Ring-bearer (object scope, `DesignationUniqueness::PerPlayer`), but three
+seams are missing.
 
-## Shape
+**Done when.**
+- Granting Ring-bearer to a creature ends it on that player's previous Ring-bearer, and it ends
+  when another player gains control of the bearer [CR#701.54a]; it is not a copiable value
+  [CR#701.54b]. The grant and eviction come from `core-getdesignation-scopes-and-eviction`.
+- The engine counts how many times the Ring has tempted each player, and the emblem's three
+  higher abilities are each in force as long as that count reaches two, three or four
+  [CR#701.54c]; the emblem itself is not changed.
+- The Ring tempts a player whenever they complete the [CR#701.54a] actions, even if some or all
+  of them were impossible [CR#701.54d], so a "whenever the Ring tempts you" trigger fires with no
+  creature to choose.
+- Engine tests with real tempting cards cover the first temptation (emblem created, bearer
+  chosen), a second bearer replacing the first, each tier's ability appearing at its count, and a
+  temptation with no creature.
 
-Composite body per [CR#701.54a..701.54c]: emit the tempted fact; if you have
-no Ring emblem, get it; the emblem gains the next tier (the four tiers as
-`Conditionally(tempt-count >= N)` clauses reading a per-player count, not
-emblem mutation); choose a creature you control — it becomes your Ring-bearer
-until another does or you lose control of it. Not a copiable value
-[CR#701.54b].
-
-## Blocking seams (three)
-
-1. Object-scope, single-holder-with-eviction designation grant — owned by
-   `core-getdesignation-scopes-and-eviction`. The `Stored{scope: Object,
-   uniqueness: PerPlayer, …}` shape Ring-bearer needs already exists; what is
-   missing is `GetDesignation` coverage for it, prior-holder eviction, and
-   registry loader wiring.
-2. Per-player Ring-temptation count feeding the tier conditions.
-3. The unconditional tempted fact: [CR#701.54d] — the "whenever the Ring
-   tempts you" trigger fires even if some or all of the [CR#701.54a] actions
-   were impossible, so the verb must emit the fact before/regardless of the
-   choice resolving.
-
-Note (2026-09-07): the "future builtin macro" is a v2 declaration (`TheRingTemptsYou`) routed by `semantics-v2-keyword-action-residues`; the engine blockers above are unchanged.
+**Pointers.** `crates/core/src/designation.rs`, `crates/core/src/action.rs` (`GetEmblem`,
+`GetDesignation`), `plugins/builtin/definitions/keyword_action/theRingTemptsYou.syl`,
+`plugins/builtin/definitions/designation/ringBearer.syl`.

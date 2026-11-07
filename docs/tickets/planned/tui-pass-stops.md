@@ -1,10 +1,19 @@
 ---
 needs: [tui-shortcuts]
 ---
-Configurable pass stops, like real clients. Today's "pass" shortcut wakes on a fixed
-set of conditions (mandatory decision / non-empty stack / combat / your main phase).
-Real clients (MTGO F-key stops, Arena) let a player pick which boundaries auto-pass
-should stop at — opponent's upkeep, beginning of combat, each end step, before
-declaring attackers, etc. — and ignore priority everywhere else. This generalizes the
-per-player pass state from a hard-coded stop set into a selectable set of stop points,
-with a small UI to toggle them. Part of tui-client.
+
+# Configurable pass stops in the TUI
+
+**Why.** The TUI's pass modes (`PassMode::Yield` and `PassMode::Turn` in
+`crates/tui/src/shortcuts.rs`) stop at a fixed set of conditions: the stack grew or emptied,
+combat began, your main phase, your next turn. Real clients (MTGO's stops, Arena) let a player
+pick which turn boundaries auto-pass stops at (the opponent's upkeep, beginning of combat, each
+end step, before attackers are declared) and pass priority everywhere else.
+
+**Done when.**
+- Each player has a set of stop points, phases and steps on their own or the opponent's turn,
+  that auto-pass stops at, replacing the hard-coded conditions.
+- A small UI toggles the stop points.
+- `keep_passing`'s unit tests cover a custom stop set, including a stop on the opponent's turn.
+
+**Pointers.** `crates/tui/src/shortcuts.rs` (`PassMode`, `keep_passing`), `crates/tui/src/app.rs`.

@@ -1,59 +1,32 @@
 ---
 needs: [plugins-v3-spelling-conventions, lean-retirement]
 ---
+
 # "Round up each time." as a construct in its own position
 
-Standard constraints apply. Done in `.syl` and Rust (`semantics`, `discourse`) after
-`semantics-rust-rewrite`; the Lean names below are the current AST, which that epic ports.
+**Why.** Six Vintage-legal cards end a sentence of fractions with "Round up each time." or "Round
+down each time.": *Peer into the Abyss*, *Fraying Omnipotence*, *Pox*, *Hydroid Krasis*, *Pox
+Plague* and *Saw in Half*. `Saw in Half.syl` writes `half(up, …)` on each fraction, so spelling
+cannot give back the shared sentence, and the only way out would be single-purpose Templates
+like `basePtHalfRoundedUpOf`. The inline ", rounded up/down" is a different construction and
+stays on its own fraction: *Banshee* and *Aspect of Wolf* round two fractions of one sentence in
+different directions.
 
-Six Vintage-legal cards end with "Round up each time." or "Round down each time.":
+**Done when.**
+- An unrounded fraction amount exists for half and for a third (*Pox*), spelled "half <amount>"
+  and "a third of <amount>".
+- `roundEachTime(mode, action)` wraps the sentence it covers and is spelled as that sentence
+  followed by "Round <mode> each time.". It wraps the whole sentence, so a "then" chain of several
+  Actions (*Pox*, *Fraying Omnipotence*) is covered; it is not a trailing step that looks back at
+  the step before it.
+- The checks are structural: every fraction inside the wrapped Action is unrounded and at least
+  one exists; an unrounded fraction that no `roundEachTime` wraps is refused, because the spell or
+  ability must say which way to round [CR#107.1a]. Each refusal has a test: an unrounded fraction
+  nothing wraps, an "each time" with no fraction, a rounded fraction inside an "each time".
+- *Saw in Half* is re-encoded with it, and *Pox* or *Fraying Omnipotence* is added as the witness
+  for a "then" chain; a test shows every fraction of that chain is covered.
+- `half` (rounded) is unchanged and *Banshee*-style sentences still use it.
+- `docs/decisions/semantics.md` records the construct.
 
-- *Peer into the Abyss*, *Fraying Omnipotence*, *Pox*, *Hydroid Krasis*, *Pox Plague*.
-- *Saw in Half*: "… except their power is half that creature's power and their toughness is half
-  that creature's toughness. Round up each time."
-
-In every one, the fractions are all in the sentence just before it. Today *Saw in Half* writes
-`half(up, …)` on each fraction. Spelling cannot put the shared sentence back from that, and the
-only way out would be single-purpose Templates like `basePtHalfRoundedUpOf`.
-
-## Decisions already made
-
-- **Two constructions.** The inline ", rounded up/down" keeps its mode on its own fraction
-  (`half(up, X)`). *Banshee* and *Aspect of Wolf* round two fractions of one sentence in
-  different directions. "Round up/down each time." is a sentence-level construct, and the fractions
-  it covers are written unrounded.
-- **The construct wraps the sentence it covers:** `roundEachTime(mode, action)`, spelled as that
-  sentence followed by "Round <mode> each time.". It cannot be a trailing step that looks back at
-  "the preceding step". *Pox* and *Fraying Omnipotence* cover a "then" chain of three or four
-  Actions in one sentence. As steps of one `sequentially`, a look-back at the preceding step would
-  miss all but the last fraction.
-- **Fractions in general.** *Pox* says "a third", so the unrounded fraction covers more than
-  `half`.
-- **The check is structural; no discourse referent:**
-  - every fraction inside the wrapped Action must be unrounded, and at least one must exist;
-  - an unrounded fraction that no construct wraps is refused, because "the spell or ability will
-    tell you whether to round up or down" [CR#107.1a].
-- **No lowering work.** semantics_v3 is disconnected from other layers.
-
-## Change
-
-- **AST (Rust `semantics`):** add an unrounded fraction amount (half, a third) and the wrapping
-  rounding construct.
-- **`discourse`:** the refusals above.
-- **Templates:**
-  - Spell the construct as its wrapped sentence followed by "Round <mode> each time.".
-  - Spell the unrounded fraction "half <amount>" / "a third of <amount>", following
-    `plugins-v3-spelling-conventions`.
-- **Canon:** re-encode *Saw in Half*. Add *Pox* or *Fraying Omnipotence* as the witness for a
-  "then" chain.
-- **ADR:** record the construct in `semantics.md`.
-
-## Acceptance
-
-- *Saw in Half* and the added witness check clean.
-- Tests for:
-  - an unrounded fraction that nothing wraps;
-  - an "each time" that wraps no fraction;
-  - a rounded fraction inside an "each time";
-  - every fraction of a "then" chain being covered.
-- The `semantics` and `discourse` tests pass.
+**Pointers.** `plugins/builtin/primitives/quantity/half.syl`,
+`plugins/canon/cards/Saw in Half.syl`.

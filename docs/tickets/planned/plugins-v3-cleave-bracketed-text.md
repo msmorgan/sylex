@@ -1,14 +1,23 @@
 ---
 needs: [plugins-v3-data-language, lean-retirement]
 ---
-# Return `bracketed` text to `.syl` and make cleave work
 
-Standard constraints apply. `plugins-v3-syl-conversion` deletes the `bracketed` template and
-its pins in `lean/Semantics/Proofs/TextChanges.lean`, and `plugins-v3-data-language` deletes
-`Authoring.Form`, so cleave is not expected to work through templates until this lands. The first goal there was a
-simple `.syl`; this ticket brings the feature back on top of it.
+# Square-bracketed text in `.syl`, so cleave works
 
-Redesign how square-bracketed rules text is represented across English and semantics (Lean is
-retired; this is `.syl`, Rust `semantics` and `discourse`), so that `TextChange.removeBracketed`
-[CR#702.148a,702.148b] reads it from the parsed `.syl` tree and existing cleave cards check again
-in `discourse`. Re-add the pins that were retired, as Rust tests.
+**Why.** Cleave's second ability changes a spell's text by removing everything in square brackets
+[CR#702.148a,702.148b]. `cleave.syl` writes it as `textChange(thisSpell, removeBracketed)`, but a
+card's `.syl` term has no way to mark which of its parts are bracketed, so the text change
+removes nothing and none of the 12 Vintage-legal cleave cards can be written. The English side
+already reads a cleave line twice, as its Uncleaved and Cleaved Text, with the bracketed spans
+kept beside it (`crates/english/src/cleave.rs`).
+
+**Done when.**
+- The owner has approved how a bracketed span is represented in a card's `.syl` term, such that
+  `removeBracketed` can read it from the term and spelling can print the brackets back.
+- `.syl` and its checks implement it, and at least two cleave cards are in `plugins/canon/cards/`
+  and pass the checks.
+- Tests pin that `removeBracketed` removes exactly the bracketed spans of a cleave card's term.
+
+**Pointers.** `plugins/builtin/definitions/keyword_ability/cleave.syl`,
+`plugins/builtin/primitives/static/removeBracketed.syl`, `crates/english/src/cleave.rs`,
+`docs/oracle-style-guide.md` §3 (square brackets).

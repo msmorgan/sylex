@@ -1,25 +1,26 @@
 ---
 needs: []
 ---
-**Retire v1 scaffolding (the `.syl` plugins already live in `plugins/`; updated 2026-10-14
-per [`docs/decisions/semantics.md`](../../decisions/semantics.md)).**
-Delete the `v1` set (`sylex_semantics_v1`, `sylex_lowering_v1`,
-`sylex_render_v1`, `sylex_plugin_v1` with `deck.rs` and
-`provenance.rs` rehomed, `v1/plugins/builtin`, and `v1/plugins/canon`; `idris/` is already gone
-with `idris-retirement`;
-the `deckmaste_spelling` splice machinery and v1 `deckmaste_english` are
-already retired, and the `spelling` stub crate is deleted (`sylex_spelling` is planned for when
-spelling starts);
-`deckmaste_semantics_v2`,
-`plugins_v2/canon/`, and `plugins_v2/builtin/` are retired in
-`semantics-v3-dsl-and-plugins`, and the pre-v4 `deckmaste_lexical_source` was
-retired in `english-v4-cutover-v3`), use the `deckmaste_semantics_v3`, `deckmaste_discourse`, and
-`deckmaste_lowering_v3` crates from `semantics-rust-rewrite` (dropping the `_v3` suffixes), and re-point
-`sylex_pipeline_v1`. Coordinate with `idris-retirement` and
-`english-v4-final-suffix-cutover` (whose remaining scope moves
-`catalogs/*.ron` into `plugins/` metadata and deletes `sylex_features_v1`;
-the `_v4` suffixes are already dropped).
-Standard constraints apply.
 
-The Idris card gate is retired earlier, by `idris-retirement` (owner, 2026-11-02, replacing the
-2026-09-06 ruling that retired it here).
+# Delete `v1/` once the new line reaches parity
+
+**Why.** `v1/` is the old pipeline: its own semantics, lowering, render, plugin loader, pipeline,
+features and RON macro crates, and its RON plugins. The engine, the TUI, the matchups and `xtask`
+still load cards through it, and engine tests and examples load `v1/plugins/builtin` and
+`v1/plugins/canon` directly. It stays only until the `.syl` semantics and its lowering to
+`sylex_core` can feed the engine; then it is dead weight that every build compiles.
+
+**Done when.**
+- Every crate outside `v1/` gets its cards from the `.syl` pipeline and its lowering to core, and
+  no `Cargo.toml` outside `v1/` names a v1 crate.
+- What is still used from `sylex_plugin_v1` (`deck.rs`, `provenance.rs`) is rehomed in a current
+  crate, or replaced.
+- `v1/` is deleted, with its workspace members, its `[profile.dev.package.sylex_pipeline_v1]`
+  entry, its `xtask` commands and the CI steps that generate and build `v1/plugins/wizards`.
+- No file outside `v1/` names a `v1/` path or a v1 crate: the engine's `build.rs`, the tests and
+  examples that load v1 plugins, the doc comments in `crates/core` that point at v1 RON macros,
+  and the comments in `crates/card/Cargo.toml`.
+- The demo and test decks the engine, TUI and matchups use still load.
+
+**Pointers.** `v1/`, the workspace `Cargo.toml`, `crates/{card,engine,matchups,tui,xtask}/Cargo.toml`,
+`crates/engine/build.rs`, `.github/workflows/ci.yml`, `docs/decisions/architecture.md`.

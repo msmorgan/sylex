@@ -1,41 +1,29 @@
 ---
 needs: [ci-lean-gate, ci-noncanon-gate, comment-reviewer-hotspots, engine-verb-ident-table, readme-oracle-text-primer, readme-reviewer-path, todo-harness-ci]
 ---
-**Epic: the presentation capstone.** Close the reviewer-facing credibility
-gaps from the 2026-08-03 external review, then verify the result as one cold
-clone. This is a publication boundary, not a demand to finish every internal
-cleanup ticket.
 
-The needs list covers three claims the capstone must be able to defend:
+# Rewrite the README and guided tour, and verify them on a fresh clone
 
-- **The advertised path is real:** a reviewer gets direct artifact links and
-  a clean clone can build, run the demo, and execute the documented checks.
-- **The gates are real:** citation, Lean lockstep, noncanon, ticket-graph, and
-  ordinary Rust suites execute in CI rather than surviving as comments,
-  ignored files, or maintainer-machine commands.
-- **Known failure modes are deliberate:** engine-interpreted verbs are not
-  typo-prone string dispatch, and every remaining engine abort is classified
-  as malformed semantic input, unsupported mechanics, or an internal invariant.
+**Why.** `README.md` and `docs/guided_tour.md` are the project's public face, and both describe a
+project that no longer exists: the Lean workbench as active, the v1 pipeline as the production
+path, and a chart-parser framing that overstates what parses. A reviewer who follows them hits
+dead ends. They need rewriting together, then checking the way a stranger would use them.
 
-Final pass:
+**Done when.**
+- The owner has agreed the outline of both before drafting, and approves the draft.
+- The README carries the vision and rationale from `docs/decisions/architecture.md`, describes
+  the English grammar, and says nothing that goes stale with the next landing; the tour follows one
+  current `.syl` card through the pipeline.
+- Every path and link in both resolves.
+- A disposable fresh clone, with no pre-existing `data/`, `target/`, mtg-rules skill or
+  repository-specific environment variables, follows the README literally (build, first run,
+  `cargo test`, every documented gate) and succeeds. The landing reports the commands,
+  toolchain, OS and result.
+- Every externally visible README claim is checked against that run, and `ci.yml` comments about
+  gaps that have closed are gone.
+- `kata kanban check`, the citation gates and the noncanon fixed-seed suite pass.
 
-1. **Disposable fresh-clone verification.** Verify a fresh clone
-   in an environment with no pre-existing `data/`, `target/`, mtg-rules skill,
-   or repository-specific environment variables. Follow the README literally:
-   build, first-run `cargo run`, `cargo test`, and every newly wired gate.
-   Record the commands, toolchain/OS, elapsed time, and result in the publish
-   checklist so the proof is repeatable rather than "worked on my machine."
-2. **README claims audit.** Check every externally visible claim against that
-   run. Retire ci.yml gap comments that closed. Soften or fix the chart-parser
-   framing (the v1 chart grammar tops out at `Sentence`; the ability/document
-   layer is hand-written recursive descent) unless `english-v4` has replaced it
-   by then.
-3. **Regression sweep.** Run `kata kanban check`, the complete citation
-   toolchain, the Lean baseline, the noncanon fixed-seed suite, and the
-   work-log-vocabulary grep from `comment-reviewer-hotspots`.
+**Not in scope.** `comment-discipline-sweep`, `post-reshape-comment-rot`, and helper extraction.
 
-Explicitly outside this capstone: the full multi-million-token
-`comment-discipline-sweep`, the design-gated
-`lowering-mirror-drift-gate`, pure helper/function extraction tracked by
-`review-followups-2026-08-03`, the external method write-up, and
-`post-reshape-comment-rot`.
+**Pointers.** `README.md`, `docs/guided_tour.md`, `docs/decisions/architecture.md`,
+`.github/workflows/ci.yml`, `readme-oracle-text-primer`.

@@ -1,42 +1,28 @@
 ---
 needs: []
 ---
-**Carve `crates/engine/src/trigger.rs` (~4.9k lines, the largest
-file left after the resolve split) into a `trigger/` module directory, using
-the `resolve/` split as the template.** Like pre-split `resolve.rs`, the bulk
-is almost certainly the embedded `mod tests`; measure first, then split code
-by subsystem seam and tests by the submodule that owns what they exercise.
 
-## Template (what worked for `resolve/`)
+# Split `trigger.rs` into a `trigger/` module
 
-1. `mv trigger.rs trigger/mod.rs` — verify the lib still builds before
-   touching anything else.
-2. Carve code into submodules along method-cluster seams, each holding its own
-   `impl GameState` block (established crate convention — no traits, no
-   forwarding shims). Helpers crossing submodule lines get `pub(super)`;
-   parent-module free fns are *visible* to children but not *in scope* — add
-   `use super::<fn>;` where needed. Anything referenced from outside the
-   module by `crate::trigger::<item>` paths keeps its old path via
-   `pub(crate) use` re-exports in `mod.rs`.
-3. Split `mod tests` per owning submodule; shared test helpers go to a
-   `#[cfg(test)] mod fixtures` sibling (`pub(super)` items), theme-specific
-   helpers stay local to their test mod.
-4. Gates: engine suite green with **exact `#[test]`-count parity** before vs
-   after; workspace clippy clean; nightly fmt; `cargo xtask cite check` (CR
-   citations move files); and a **comment-multiset audit** — diff the sorted
-   set of comment lines before vs after so no authored comment is silently
-   dropped.
+**Why.** `crates/engine/src/trigger.rs` is 6.7k lines, the largest engine file: about 1,620 lines
+of `impl GameState` trigger code and 5,100 of embedded tests. Code and tests cover several
+distinct subsystems in one file.
 
-## Gotchas hit during the resolve split (avoid re-learning)
+**Done when.**
+- `trigger.rs` is a `trigger/` directory module. Its code is cut along method-cluster seams, each
+  submodule with its own `impl GameState` block (no traits, no forwarding shims); paths used from
+  outside as `crate::trigger::…` still resolve, through `pub(crate) use` re-exports where needed.
+- Every test that can go through the engine's public API lives in `crates/engine/tests/`; a test
+  that needs private access stays in the `mod tests` of the submodule that owns what it exercises,
+  with no per-submodule `tests.rs` file. A submodule whose remaining inline tests are still large,
+  or one part of which needs exhaustive testing of its own, is split further.
+- The number of `#[test]` functions across `src/` and `tests/` is the same before and after, and
+  the sorted multiset of comment lines matches, so no authored comment is dropped.
+- `cargo +nightly fmt --check` passes.
 
-- The tests mod had `use` statements interleaved *between* test fns, not just
-  in the header. Any mechanical carve that assigns "lines between items" to
-  the preceding item will glue those imports into the wrong bucket — collect
-  ALL module-level `use` lines in the tests mod up front and treat them as
-  header for every emitted test mod (then let `cargo fix` prune unused).
-- Section-banner comments (`// ---- … ----`) sitting between test clusters
-  are easy to orphan or delete with adjacent stray imports; the
-  comment-multiset audit catches this.
-- `cargo fix --lib/--tests --allow-dirty --allow-no-vcs` handles the
-  unused-import blizzard from copying the full import block into every new
-  file (`--allow-no-vcs` needed: jj feature workspaces have no `.git`).
+**Pointers.** `crates/engine/src/trigger.rs`, `crates/engine/tests/`. Known pitfalls from moving
+tests out of a large `mod tests`: the module had `use` lines interleaved between test functions,
+so collect every module-level `use` first and treat them as the header of each destination;
+section-banner comments between test clusters are easy to orphan; and
+`cargo fix --lib --tests --allow-dirty --allow-no-vcs` prunes the unused imports (jj workspaces
+have no `.git`).

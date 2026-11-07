@@ -1,21 +1,23 @@
 ---
 needs: [engine-planeswalkers]
 ---
-The engine already threads an attack target per attacker (`Decision::Attackers` carries
-`(attacker, target)` pairs; `PendingDecision::DeclareAttackers` surfaces `legal_targets` =
-the defending player's proxy plus each planeswalker they control). Two consumer-side
-residuals remain, both deferred so the core landed without a UI blow-up:
 
-1. Rich attack-target selection. The AI strategies and the TUI declare-attackers flow
-   currently always target the defending player's proxy (behavior preserved from before
-   planeswalkers existed). Give the AI a policy for when to attack a planeswalker instead,
-   and give the TUI a picker so a human can choose each attacker's target from
-   `legal_targets`.
+# Choose planeswalker attack targets in the AI and the TUI
 
-2. `Must(Attack)` retarget. The attack requirement's `on`-match still tests only the sole
-   defender proxy (latent site around `decide.rs`), so a "must attack if able" creature is
-   not yet forced toward a specific chosen planeswalker target. Generalize the match to the
-   pair's chosen target once selection (item 1) can produce non-proxy targets.
+**Why.** The engine already carries an attack target per attacker: the declare-attackers decision
+surfaces `legal_targets`, the defending player's proxy plus each planeswalker they control
+[CR#506.3,508.1b]. But the AI strategies and the TUI always attack the defending player's proxy,
+so no planeswalker is ever attacked. And the `Must(Attack)` requirement's `on` match still tests
+only the defender's proxy (`legal.rs`), so "attacks if able" toward a specific planeswalker is not
+enforced; that is unreachable today only because no consumer passes another target.
 
-Neither is reachable-wrong today (consumers only ever pass the player proxy), so this is an
-enhancement, not a correctness fix.
+**Done when.**
+- The AI strategies have a policy for when to attack a planeswalker instead of the player.
+- The TUI's declare-attackers flow lets a human choose each attacker's target from
+  `legal_targets`.
+- The `Must(Attack)` match checks each attacker's chosen target, with an engine test grounded in a
+  real card that a non-proxy target exercises.
+
+**Pointers.** `crates/engine/src/decide/pending/combat.rs` (`DeclareAttackers`),
+`crates/engine/src/legal.rs` (`legal_attack_targets`, the `Must(Attack)` match),
+`crates/engine/src/strategy.rs`, `crates/tui/src/interact.rs`.

@@ -1,34 +1,34 @@
 ---
 needs: [lean-retirement]
 ---
+
 # Predefined tokens are `token` Definitions
 
-The rules define the Predefined Tokens' characteristics [CR#111.10], so by the glossary each is a
-Definition, not a Template. The pieces for that exist but are unused: the `PredefinedToken`
-structure (`lean/Semantics/Rules.lean` today, Rust `semantics` after the port), the `.syl` `token`
-declaration (sort `PredefinedToken`, checked like the other rule-registry declarations), and `plugins/builtin/definitions/token/`,
-which does not exist. Meanwhile Clue, Food and Treasure are
-written as `template … : CharacteristicBundle` under `templates/noun/`, and the Lean proof suite
-(`lean/Semantics/Proofs/Rules.lean`, carried to Rust tests by `semantics-rust-rewrite`) keeps its
-own hand-written `treasure`, `food`, `gold`, `clue` and `blood` values that nothing creates from.
+**Why.** The rules define each predefined token's characteristics [CR#111.10], so each is a
+Definition, not a Template. The `.syl` `token` declaration kind exists (sort `PredefinedToken`)
+but nothing declares one, and `plugins/builtin/definitions/token/` does not exist. Clue, Food and
+Treasure are written as `template … : CharacteristicBundle` under `templates/noun/`, and core
+keeps a second hand-synchronized copy of every predefined token's characteristics
+(`PredefinedToken` in `crates/core/src/token.rs`).
 
-## Change
-
-- Declare each Predefined Token [CR#111.10a..111.10x] as a `token` under
-  `definitions/token/`, starting with the three in use (Clue, Food, Treasure). A Role token is told
-  apart from the other Roles by its name, Walker by its name (it is a Zombie [CR#111.10d]), so the
-  declaration's name is the key an effect writes ("create a Clue token"), not its subtype.
-- `create` takes a token Definition where it now takes `written(clueToken)`; update `investigate`,
-  `giftAFood`, `giftATreasure` and the canon cards that create Treasure (Ragavan, Spell Swindle,
-  Zidane). Delete `clueToken.syl`, `foodToken.syl` and `treasureToken.syl`.
-- Delete the duplicate values in the carried-over tests; checks of the `token` declarations
-  replace them.
-- A token Definition's declared characteristics can be named from `.syl`, at least its subtype, so
-  a rule written over "a <subtype> token" can take the subtype from the Definition it creates
+**Done when.**
+- Each predefined token [CR#111.10a..111.10x] is a `token` declaration under
+  `plugins/builtin/definitions/token/`. The declaration's name is the key an effect writes ("create
+  a Clue token"), not its subtype: Role tokens are told apart by name, and a Walker is a Zombie
+  [CR#111.10d].
+- `create` takes a token Definition where it now takes `written(clueToken)`; `investigate`,
+  `giftAFood`, `giftATreasure` and the canon cards that create Treasure (*Ragavan, Nimble
+  Pilferer*, *Spell Swindle*, *Zidane, Tantalus Thief*) use it; `clueToken.syl`, `foodToken.syl`
+  and `treasureToken.syl` are deleted.
+- A token Definition's declared characteristics, at least its subtype, can be named from `.syl`,
+  so a rule written over "a <subtype> token" can take the subtype from the Definition it creates
   (needed by `lean-v3-empower-token-parameter`).
-- Widen `PredefinedToken`'s doc and the glossary's **Predefined Token** entry to also cover a token
-  a keyword action's rule defines in full, as [CR#701.71a] defines the Jace planeswalker token, or
-  name that a separate term; it is a Definition either way.
-- Core's hardcoded predefined tokens (`PredefinedToken` in `crates/core/src/token.rs`, a
-  second hand-synchronized copy of each token's characteristics) go; the token Definitions are the
-  one copy, and each predefined token not yet declared is one more declaration [CR#111.10a..111.10x].
+- A token a keyword action's rule defines in full, as [CR#701.71a] defines the Jace planeswalker
+  token, is a `token` Definition too, and the glossary names the term that covers both.
+- Core's hardcoded predefined tokens are gone; the token Definitions are the one copy.
+- Everything passes the `.syl` checks.
+
+**Pointers.** `plugins/builtin/templates/noun/{clueToken,foodToken,treasureToken}.syl`,
+`plugins/builtin/definitions/keyword_action/{investigate,empowerJace}.syl`,
+`plugins/builtin/templates/ability/{giftAFood,giftATreasure}.syl`, `crates/core/src/token.rs`,
+`crates/xtask/src/dsl.rs` (`kind_sort`).

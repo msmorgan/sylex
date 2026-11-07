@@ -1,18 +1,24 @@
 ---
 needs: [plugins-v3-data-language, lean-retirement]
 ---
-# Remove the remaining sort-prefixed structural primitive names
 
-Standard constraints apply.
+# Remove the remaining sort-prefixed primitive names
 
-Eliminate these 11 remaining structural primitive names:
-`actionSearch`, `actionShuffle`, `actionVote`, `actionChooseModes`, `actionFlipCoins`,
-`actionPay`, `actionRemoveCounters`, `actionShiftResult`, `nounPhraseSomeOf`,
-`amountAggregate` and `durationBetween`.
+**Why.** Twelve primitives carry their sort as a name prefix: `actionSearch`, `actionShuffle`,
+`actionVote`, `actionChooseModes`, `actionFlipCoins`, `actionPay`, `actionRemoveCounters`,
+`actionShiftResult`, `nounPhraseSomeOf`, `amountAggregate`, `durationBetween` and `conditionDid`.
+Each prefix works around a collision: the plain name is taken by a keyword action or a Template
+at the same sort, and resolution by `(name, sort)` (`syl.md` §3) cannot tell them apart. A
+prefix is not a word Oracle text uses, so it misnames the primitive.
 
-Their shorter names collide with same-sort keyword actions or type-adapting templates;
-return-type dispatch alone cannot distinguish them. Resolve ownership at the primitive/template
-boundary before renaming, then update declarations and all consumers without changing their
-expansions. Preserve the distinction between structural primitives, keyword Definitions and
-worded Templates. Record explicit key renames when comparing Rust `semantics` expansions before and after, and
-verify with its tests; retaining the prefixes is a defect to resolve.
+**Done when.**
+- None of the twelve names remains. Each collision is resolved at the primitive, Template or
+  Definition boundary first: whichever declaration does not own the plain name is renamed to what
+  it is or folded into the other, keeping structural primitives, keyword Definitions and worded
+  Templates distinct.
+- Every declaration and call in `builtin/` and `canon/` is updated, and the corpus means the same
+  as before (only the renamed names differ).
+- Everything passes the `.syl` checks.
+
+**Pointers.** `plugins/builtin/primitives/{action,determiner,quantity,timing,condition}/`,
+`docs/decisions/syl.md` §1 and §3.

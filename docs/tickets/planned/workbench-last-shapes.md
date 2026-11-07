@@ -1,28 +1,35 @@
 ---
 needs: [lean-v3-proofs-and-cards]
 ---
-**[port-required: semantics-v3] Close the five card/semantics shapes the
-residue sweep stopped on.** Residue of `workbench-witness-sweep-residues`
-(2026-09-04); each STOP carries its exact goal in that ticket's landing
-record. Port to `lean/Semantics/` (`semantics-v3`, `docs/decisions/semantics.md`):
 
-- **Alaundo the Seer.** The granted ability's "it" has no antecedent inside
-  the grant; decide whether a granted ability's subject is published to
-  the grant's own DRT scope (`DRS`).
-- **"All cards with the same name."** No mandatory-`all` `Quantity` arm —
-  "all" is a determiner over a description; add the determiner reading
-  through `Described` and bench the card in `lean/Semantics/Cards/`.
-- **The card-level linked-exile law.** `ExiledWith` uniquifies by the
-  linked-ability rule [CR#607.2a], but the tree cannot check that the same
-  card carries the exiling ability (it needs a traversal over the card's
-  abilities); decide whether that law lives on `Card` as a frame law or is
-  accepted as a witness-level convention.
-- **"Or base toughness."** Vedalken Squirrel-Whacker's exchange names an
-  `Amount` disjunction; decide whether `Amount` gains an `EitherOf` row or
-  the card is two exchanges under a choice.
-- **Tahngarth, First Mate** is still benched in three pieces; bench it
-  whole once the granted-ability read (first bullet) lands.
+# Four card shapes `.syl` cannot yet write
 
-Size: M. Done when: each bullet is landed or its refusal is ruled with the
-rule named; the named cards read their printed text in full; `lean/scripts/build`
-passes clean. Standard constraints apply.
+**Why.** Four Vintage-legal card shapes have no faithful `.syl` reading, each waiting on a
+decision:
+
+- *Alaundo the Seer*: the ability it grants ("It gains 'When the last time counter is removed
+  from this card, …'") reads "it" and "this card" inside the grant, where nothing introduces an
+  antecedent. Whether a granted ability's bearer is published into the granted ability's own
+  reference scope is undecided.
+- *Tahngarth, First Mate* needs the same granted-ability reading to be written whole.
+- "All cards with the same name" (*Extirpate*, *Counterbore*, *Lobotomy* and others): `allOf` and
+  `withTheSameName` exist, but no canon card writes the "same name as that card" search, so the
+  reading is unchecked.
+- The linked-exile law: `exiledWith` reads the cards its linked ability exiled [CR#607.2a], but
+  nothing checks that the same card carries the exiling ability. Whether that is a law on `Card`
+  (a check over the card's abilities) or an unchecked convention is undecided.
+
+**Done when.**
+- The owner has decided the granted-ability scope and where the linked-exile law lives.
+- *Alaundo the Seer*, *Tahngarth, First Mate* and one "all cards with the same name" card are in
+  `plugins/canon/cards/` with their printed text in full and pass the `.syl` checks, or each
+  refusal names the rule that forbids it.
+- The linked-exile law is checked, or `docs/decisions/semantics.md` §4.8 says it is a convention.
+
+**Not in scope.** *Vedalken Squirrel-Whacker*'s "base power or base toughness" exchange: it is an
+Un-set card, which is deferred.
+
+**Pointers.** `plugins/builtin/primitives/zone/exiledWith.syl`,
+`plugins/builtin/templates/noun/withTheSameName.syl`,
+`plugins/builtin/templates/determiner/allOf.syl`, `docs/decisions/semantics.md` §2.3, §2.4 and
+§4.8.

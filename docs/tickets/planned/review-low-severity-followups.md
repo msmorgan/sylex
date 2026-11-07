@@ -1,36 +1,31 @@
 ---
 needs: []
 ---
-**Low-severity follow-ups from the 2026-06-29 code review** (batched).
 
-- `PlayerAttr::Life`/`HandSize` (`crates/core/src/continuous.rs:427`)
-  are dead/unreachable and model non-continuous values (a
-  `ModifyPlayer(You, SetTo(Life, 20))` is a silent no-op) — drop them or document
-  as read-only axes invalid for `PlayerMod`.
-- Stale doc: `from_zone_qualified` says "While" but emits "As long as"
-  (`render/ability.rs`). The `Modification::flatten` and `Reference::That`
-  documentation findings from the original review have since been corrected.
-- `library_position` deep-offset renders "2 from the top"
-  (`render/fragment.rs:380`) — ungrammatical for a rare non-zero anchor.
-- `macro_ron_derive/input.rs` accepts trailing-default layouts the deserializer
-  rejects with `compile_error!` (`generate.rs:337`) — reject earlier with a
-  clearer message, or document the supported set (arity-3, 2 required + 1
-  default).
-- `pt_delta_clause` (`render/ability.rs:263`) drops dynamic (non-literal) P/T
-  deltas from the modify predicate (pre-existing; preserved by the rename).
-- `eval_count` uses non-saturating `(a - b).max(0)` (`layer.rs:916`) while
-  Plus/Times saturate — consistency nit.
-- `trigger_multiplier_extra` (`trigger.rs:773`) doesn't `flatten_composites`, so
-  a `TriggerMultiplier` delivered via a keyword/composite would be missed (no card
-  today).
-- `decide.rs:438` `todo!()` for a `TapTotal` used inside `Effect::Unless` — a
-  documented-unreachable seam; consider a graceful decline.
-- `Domain` macro over-counts (counts all land subtypes, not just the 5 basic land
-  types) — documented v1 approximation; needs a basic-land-type subset.
-- `CostComponent` boxing asymmetry (`cost.rs:31,70`): `ManaCostOf` /
-  `TapTotal.count` left inline while `filter` / `Do` are boxed — verify enum size.
-- pip-payment convoke test comment overstates which pip is tap-covered
-  (`tests/pip_payment.rs`) — Grizzly Bears matches both the generic and green
-  rows.
+# Small core and engine follow-ups from a code review
 
-Severity: **low** (cleanup / docs / edge cases). Effort: **M** (batchable).
+**Why.** A code review left a batch of low-severity defects in `crates/core` and `crates/engine`:
+each is small, but each is a value that can silently do nothing, an inconsistency, or a comment
+that misleads.
+
+**Done when.**
+- `PlayerAttr::Life` and `PlayerAttr::HandSize` can no longer be the target of a `PlayerMod`:
+  they are readable attributes but not continuous caps, so a
+  `ModifyPlayer(You, SetTo(Life, 20))` is today a silent no-op. Split the readable attributes
+  from the modifiable ones, or refuse the combination with an error that names it.
+- `eval_count`'s `Count::Minus` (`crates/engine/src/layer.rs`) saturates like `Plus` and `Times`
+  instead of subtracting unchecked before flooring at 0.
+- `trigger_multiplier_extra` (`crates/engine/src/trigger.rs`) sees a `TriggerMultiplier` that
+  arrives through a keyword or composite ability, as the rest of the trigger code does via
+  `flatten_composites`, with a test.
+- The `CostComponent::TapTotal` arm of the "unless" cost renderer in
+  `crates/engine/src/decide/mod.rs` no longer panics with `todo!`: either the seam is closed, or it
+  fails with an error naming the unsupported cost (its `todo!` cites `engine-resolve-effects`,
+  which is done).
+- `CostComponent`'s boxing is consistent (`ManaCostOf` and `TapTotal.count` inline while `filter`
+  and `Do` are boxed), or the landing reports the enum's size showing why not.
+- The convoke test comment in `crates/engine/tests/pip_payment.rs` says correctly which pip
+  Grizzly Bears' tap can cover (it matches both the generic and the green row).
+
+**Pointers.** `crates/core/src/continuous.rs` (`PlayerAttr`), `crates/engine/src/player_statics.rs`,
+`crates/core/src/cost.rs`, and the files named above.

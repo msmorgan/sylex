@@ -1,36 +1,23 @@
 ---
 needs: [lean-generated-canon-modules, lean-retirement]
 ---
-# Preposed condition ordering on `StaticSpec.conditional` and Angelic Cub's second ability
 
-Standard constraints apply.
+# A condition-first static: "As long as <condition>, <spec>"
 
-## Context
+**Why.** The only "as long as" static is the Template `onlyWhile`, spelled "<spec> as long as
+<condition>", over the primitive `conditional`. Cards that print the condition first (*Angelic
+Cub*: "As long as this creature has three or more +1/+1 counters on it, it has flying"; also
+*Escaped Shapeshifter*, *Martyrs of Korlis*, *Guardian Beast*, *Thunderstaff*, *Thranduil's
+Company*) cannot be written in printed order. Written with `onlyWhile`, the static is read before
+the condition, so the round trip breaks and the static's "it" is read before the condition that
+introduces its antecedent. `Angelic Cub.syl` therefore carries only its triggered ability.
 
-The checker (Lean's `lean/Semantics/Check/Phrase.lean`, ported to `discourse`) steps
-`StaticSpec.conditional spec cond _` with `spec` always before `cond`. For postposed static
-conditions (`"This creature has flying as long as it has three or more +1/+1 counters on it"`),
-`spec` introduces the antecedent (`thisCreature`) and `cond` resolves `"it"` against it. For
-preposed static conditions (`"As long as this creature has three or more +1/+1 counters on it, it
-has flying"`, as printed on *Angelic Cub*), the condition clause introduces the antecedent
-(`thisCreature`) and the static grant reads `"it"` from the condition.
+**Done when.**
+- A condition-first Template exists whose parameters are in printed order, condition then static.
+- *Angelic Cub* carries both printed abilities, with "it" in the grant written as `it`, and its
+  "Fragment" comment is gone; the other condition-first cards in canon use the new Template.
+- Everything passes the `.syl` checks. Once reference resolution exists, a test pins that the
+  grant's "it" reads this creature from the condition.
 
-Because `StaticSpec.conditional` currently lacks a preposed-condition ordering mode (analogous to
-`Action.doIf` vs. preposed conditional actions), `plugins/canon/cards/Angelic Cub.syl`
-currently authors only its triggered ability.
-
-## Deliverables
-
-1. `discourse` supports preposed static conditions in `StaticSpec.conditional` (or `CondMarking`):
-   it steps `condition` before `spec` when the condition is preposed, threading the condition's
-   DRS into `spec`.
-2. Author *Angelic Cub*'s second ability (`"As long as this creature has three or more +1/+1
-   counters on it, it has flying"`) on `plugins/canon/cards/Angelic Cub.syl` with `"it"` in the
-   grant resolving to `thisCreature` in the preposed condition, and drop the card's "Fragment"
-   comment.
-
-## Acceptance
-
-- `plugins/canon/cards/Angelic Cub.syl` includes both printed abilities and checks clean in
-  `discourse`, with a per-card test that the grant's "it" resolves to `thisCreature`.
-- `cargo test` and `cargo clippy --tests -- -D warnings` for `semantics` and `discourse`.
+**Pointers.** `plugins/builtin/templates/static/onlyWhile.syl`,
+`plugins/canon/cards/Angelic Cub.syl`, `docs/decisions/syl.md` §5.

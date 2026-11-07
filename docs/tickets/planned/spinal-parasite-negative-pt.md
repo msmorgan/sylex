@@ -1,52 +1,26 @@
 ---
 needs: []
 ---
-Add **Spinal Parasite** as a canon test card and cover the negative-base-P/T
-mechanics end-to-end. The signed `StatValue::Number(Int)` model and the
-literal reader's negative-numeral splice landed already (a printed -1/-1 now
-parses through `generate` and the card readers); this ticket exercises the
-*behavior* those enable.
 
-Spinal Parasite: `{5}` Artifact Creature — Insect, base **-1/-1**, with
-**Sunburst** (enters with a +1/+1 counter for each color of mana spent to cast
-it, [CR#702.44]) and "**Remove two +1/+1 counters from this creature:** Remove
-a counter from target permanent." It is an unusually good single-card probe:
-the base P/T is negative, Sunburst scales the counters by colors spent, and the
-activated ability's cost consumes those same counters — so counter count,
-layer-7 P/T, the toughness-≤-0 SBA ([CR#704.5f]), and cost payability all
-interlock.
+# Spinal Parasite: negative base power and toughness, end to end
 
-## Target scenarios (the behavioral assertions)
+**Why.** *Spinal Parasite* ({5}, Artifact Creature — Insect, -1/-1) has Sunburst and
+"Remove two +1/+1 counters from this creature: Remove a counter from target permanent." It is a
+compact probe of four interlocking pieces: a negative base power and toughness, counters scaled
+by colors of mana spent [CR#702.44a], a cost that consumes those counters, and the toughness-0
+state-based action [CR#704.5f]. Core already carries a signed base value
+(`StatValue::Number(Int)`), but the engine has no Sunburst, and nothing tests the negative-base
+path.
 
-1. **Cast for 4 colors → dies after two activations.** 4 `+1/+1` counters →
-   net 3/3. Activating the ability twice removes 4 counters → 0 counters →
-   base -1/-1 → toughness < 1 → creature dies (SBA [CR#704.5f]).
-2. **Cast for 5 colors → dies after two activations.** 5 counters → net 4/4.
-   Two activations remove 4 → 1 counter → -1/-1 + 1/1 = **0/0** → toughness 0
-   → dies (SBA [CR#704.5f]).
-3. **Cast for 5 colors with an anthem (+1/+1) → survives, then uncastable
-   cost.** 5 counters; a static +1/+1 anthem in play. Two activations → 1
-   counter → base -1/-1 + counter +1/+1 + anthem +1/+1 = **1/1** → survives.
-   A third activation is impossible: only 1 counter remains and "remove two
-   +1/+1 counters" is no longer a payable cost.
+**Done when.**
+- The engine implements Sunburst: the permanent enters with a +1/+1 counter (or, if not entering
+  as a creature, a charge counter) for each color of mana spent to cast it [CR#702.44a].
+- Engine tests with the real card, driven through the runner and asserting by card identity
+  across zone changes:
+  - cast with four colors (3/3), activated twice: no counters, -1/-1, it dies [CR#704.5f];
+  - cast with five colors (4/4), activated twice: one counter, 0/0, it dies;
+  - cast with five colors under a +1/+1 anthem, activated twice: one counter, 1/1, it survives,
+    and a third activation cannot be paid.
 
-## Depends on (verify support before claiming)
-
-- **Sunburst** (census row: 38 cards) — enters-with-a-counter-per-color-of-mana-spent;
-  needs cast-time colors-spent memory. Not yet implemented.
-- **Remove-N-counters activated cost** — a counter-removal cost component and
-  its payability check (scenario 3 hinges on the cost becoming unpayable).
-- **Toughness-≤-0 SBA** ([CR#704.5f]) — present, re-verify it fires on the
-  negative-base path.
-- **Static +1/+1 anthem** for scenario 3.
-
-## Known model gap to resolve here (not before)
-
-The Rust side now carries the signed base value: `StatValue::Number(Int)` and
-`NumericOp::Set(StatValue)`, with `StatValue::Count(Count)` for a dynamic base.
-The Lean workbench (`lean/Semantics/`) models signed Int for P/T values cleanly.
-Resolving that across engine and card tests is part of THIS ticket.
-
-Follow the card-surface test conventions (assert by card identity across zone
-changes, drive resolution through the runner). Behavioral equivalence to the CR
-is the bar, not vocabulary.
+**Pointers.** `plugins/builtin/definitions/keyword_ability/sunburst.syl`,
+`crates/core/src/cost.rs`, `crates/engine/tests/pip_payment.rs` (a counter-and-cost test).
