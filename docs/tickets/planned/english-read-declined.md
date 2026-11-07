@@ -10,8 +10,8 @@ Mask, Raging River and Soul Echo. This ticket reads them and then removes the me
 
 **Spike first.** Before building anything, run each declined unit against the existing machinery and
 report what is missing. For each unit, give the estimated size and location of its support:
-grammar data in `english.ron`, lexicon data, or engine code. Bespoke engine code outside
-`english.ron` is to be avoided. The owner decides per unit, from the spike, before it is built.
+grammar data in `english.fug`, lexicon data, or engine code. Bespoke engine code outside
+`english.fug` is to be avoided. The owner decides per unit, from the spike, before it is built.
 For Raging River the spike answers:
 - Does quotation handling (`chart::quotations`, `unwritten_period` and the quotation Productions
   for granted abilities) already cover the period absorbed inside the closing quote?

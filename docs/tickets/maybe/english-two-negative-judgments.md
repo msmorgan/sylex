@@ -18,5 +18,5 @@ needs: []
 - `cargo xtask english strata --check` and `cargo test -p sylex_english` pass.
 
 **Pointers.** `crates/english/judgments/floated_each_quantifier.txt`,
-`crates/english/judgments/notation_coordination.txt`, `crates/english/grammar/english.ron`,
+`crates/english/judgments/notation_coordination.txt`, `crates/english/grammar/english.fug`,
 `crates/english/README.md` (working rules).

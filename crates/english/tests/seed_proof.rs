@@ -4,12 +4,14 @@
 
 mod seed;
 
+use dpsi::Ident;
 use sylex_lexicon::Lexicon;
 use sylex_syntax::CompiledGrammar;
 use sylex_syntax::Gap;
 use sylex_syntax::RankingKey;
 use sylex_syntax::Reading;
 use sylex_syntax::ReadingNode;
+use sylex_syntax::grammar::SymbolDecl;
 
 struct Seed {
     lexicon: Lexicon,
@@ -415,16 +417,72 @@ fn ungrammatical_controls() {
     }
 }
 
+/// The child name a right-hand-side symbol gives, if any.
+fn role(symbol: &SymbolDecl) -> Option<&Ident> {
+    match symbol {
+        SymbolDecl::Cat(role, _)
+        | SymbolDecl::Attached(role, ..)
+        | SymbolDecl::Free(role, _)
+        | SymbolDecl::Numeral(role, _)
+        | SymbolDecl::Lex(role, _)
+        | SymbolDecl::FreeLex(role, _)
+        | SymbolDecl::Word(role, _)
+        | SymbolDecl::Class(role, _)
+        | SymbolDecl::Hosted(role, ..)
+        | SymbolDecl::Selected(role, ..)
+        | SymbolDecl::Quoted(role, _) => Some(role),
+        SymbolDecl::Punct(_) | SymbolDecl::Mark(..) => None,
+    }
+}
+
 #[test]
 fn grammar_names_no_open_class_or_catalog_word() {
-    let text = sylex_english::GRAMMAR.to_lowercase();
+    let grammar = sylex_english::grammar().unwrap();
+    let names = grammar
+        .categories
+        .keys()
+        .chain(grammar.closed_words.keys())
+        .chain(grammar.lexical_classes.keys())
+        .chain(&grammar.typed_classes)
+        .chain(
+            grammar
+                .features
+                .iter()
+                .flat_map(|(feature, values)| std::iter::once(feature).chain(values)),
+        )
+        .chain(
+            grammar
+                .productions
+                .iter()
+                .map(|production| &production.name),
+        )
+        .chain(
+            grammar
+                .productions
+                .iter()
+                .flat_map(|production| &production.rhs)
+                .filter_map(role),
+        )
+        .map(|name| name.to_lowercase());
+    let lexemes = grammar
+        .closed_words
+        .values()
+        .chain(grammar.lexical_classes.values().flatten());
+    let lemmas: Vec<String> = lexemes
+        .map(|lexeme| {
+            lexeme
+                .split_once(':')
+                .map_or(lexeme.as_str(), |(_, lemma)| lemma)
+                .to_lowercase()
+        })
+        .chain(names)
+        .collect();
     for lemma in seed::OPEN_CLASS {
-        assert!(!text.contains(&format!("\"{lemma}\"")), "{lemma}");
-        assert!(!text.contains(&format!(":{lemma}\"")), "{lemma}");
+        assert!(!lemmas.iter().any(|named| named == lemma), "{lemma}");
     }
     // A closed word pointing at a keyword action is a binding error.
     let grammar = sylex_english::GRAMMAR.replace("\"verb:have\"", "\"verb:destroy\"");
-    let bound = sylex_syntax::Grammar::from_ron_str(&grammar)
+    let bound = sylex_syntax::Grammar::from_fug_str(&grammar)
         .and_then(|g| CompiledGrammar::bind(&g, &seed::lexicon(), &seed::frames()));
     assert!(bound.is_err());
 }

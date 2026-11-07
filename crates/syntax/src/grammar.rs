@@ -10,7 +10,7 @@ use crate::LoadError;
 use crate::frames::SlotKind;
 
 /// An authored grammar data file.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Grammar {
     /// The Category a whole input is parsed as.
@@ -70,17 +70,29 @@ impl Grammar {
         ron::from_str(text).map_err(|error| LoadError::Format(error.to_string()))
     }
 
+    /// Parses `.fug` source (the language [`crate::fug`] describes).
+    ///
     /// # Errors
-    /// Unreadable file or malformed RON.
+    /// Malformed `.fug` source, naming the line and column.
+    pub fn from_fug_str(text: &str) -> Result<Self, LoadError> {
+        crate::fug::parse(text)
+    }
+
+    /// # Errors
+    /// Unreadable file or malformed grammar source.
     pub fn from_path(path: &Path) -> Result<Self, LoadError> {
         let text = std::fs::read_to_string(path)
             .map_err(|error| LoadError::Format(format!("{}: {error}", path.display())))?;
-        Self::from_ron_str(&text)
+        if path.extension().is_some_and(|ext| ext == "fug") {
+            Self::from_fug_str(&text)
+        } else {
+            Self::from_ron_str(&text)
+        }
     }
 }
 
 /// A syntactic Category and the features its summary carries.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct CategoryDecl {
     /// The grammatical Category represented by this restricted production set.
@@ -140,7 +152,7 @@ pub struct CategoryDecl {
 /// - `supplement`: reversed Right Association (`reading.rs`).
 /// - `object`, `shared`: the Reading functions of postposed Modifiers
 ///   (`object`) and of Right Node Raising (`shared`) (`reading.rs`, `locate`).
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ProductionDecl {
     pub name: Ident,
@@ -236,7 +248,7 @@ pub(crate) fn default_cost() -> u32 {
 ///
 /// A child's name is its grammatical function; the engine reserves some names
 /// (see `ProductionDecl`).
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub enum SymbolDecl {
     /// A Constituent of a Category.
     Cat(Ident, Ident),
@@ -279,7 +291,7 @@ pub enum SymbolDecl {
 /// A feature equation over `$.Feature` (the mother) or `child.Feature` paths.
 /// A child named `head` implicitly agrees with the mother on every feature both
 /// carry; see the reserved child names on `ProductionDecl`.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub enum Equation {
     Agree(Ident, Ident),
     Require(Ident, Ident),
@@ -308,7 +320,7 @@ pub enum Equation {
 /// head's frame (p. 1341, [17ii]). The head takes the coordination as the
 /// child `clusters`, which bears no function; each dependent in a Cluster
 /// bears its own in the head's phrase too (`Constituent::also`).
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ClustersDecl {
     /// The Category of one Cluster.
@@ -343,7 +355,7 @@ pub struct ClustersDecl {
 /// coordination's Coordination schema is `parallel`, so every Cluster has the
 /// initial one's prepositions, the first overt or elided
 /// (`Summary::shared_head`), the last overt (`Summary::cluster_preposition`).
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct AdjunctClustersDecl {
     /// The Category of one Cluster.
@@ -365,7 +377,7 @@ pub struct AdjunctClustersDecl {
 /// summaries (`docs/decisions/english.md` §1). A Schema derives nothing its
 /// grammar does not declare: a missing declaration yields no derivation or a
 /// load error, never a default.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub enum SchemaDecl {
     /// An attributive lexical head retains its phrasal Category as a Modifier.

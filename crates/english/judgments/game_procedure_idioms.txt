@@ -1,6 +1,6 @@
 # Game-procedure idioms: dice, coins, ties, life totals and game procedure.
 # OSG §12, Randomness, dice, coins, and voting; §14, Keyword actions in
-# sentences; CGEL as cited at each construction in grammar/english.ron.
+# sentences; CGEL as cited at each construction in grammar/english.fug.
 # A die roll's result is a noun; an exception phrase on *all* takes a
 # determined standard (CGEL, Ch. 5 §11(f), p. 433).
 + <card=Berserker's Frenzy> Roll two d20 and ignore the lower roll. => NounPhrase "the lower roll" as Object of ignore

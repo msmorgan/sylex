@@ -15,19 +15,19 @@ use sylex_syntax::LoadError;
 use sylex_vocabulary::data_text;
 
 /// The Oracle English grammar data file: compiled in for release and wasm
-/// builds, read from `grammar/english.ron` at run time in dev builds, so a
+/// builds, read from `grammar/english.fug` at run time in dev builds, so a
 /// grammar edit needs no rebuild ([`sylex_vocabulary::data_text!`]).
 ///
 /// # Panics
 /// On first use of a dev build, naming the path, if the file is unreadable.
-pub static GRAMMAR: LazyLock<String> = data_text!("grammar/english.ron");
+pub static GRAMMAR: LazyLock<String> = data_text!("grammar/english.fug");
 
 /// Parses the Oracle English grammar data file.
 ///
 /// # Errors
 /// Malformed grammar data.
 pub fn grammar() -> Result<Grammar, LoadError> {
-    Grammar::from_ron_str(&GRAMMAR)
+    Grammar::from_fug_str(&GRAMMAR)
 }
 
 /// Binds the Oracle English grammar to a lexical environment.

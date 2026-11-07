@@ -2,8 +2,9 @@
 
 The Oracle English grammar
 ([`docs/decisions/english.md`](../../docs/decisions/english.md)): the
-grammar data file [`grammar/english.ron`](grammar/english.ron) and its binding
-into `sylex_syntax`.
+grammar data file [`grammar/english.fug`](grammar/english.fug), written in the
+`.fug` language that `sylex_syntax::fug` describes, and its binding into
+`sylex_syntax`.
 
 The grammar names Categories, features, Schemas and core closed-class lexemes
 only. Vocabulary and Subcategorization Frames come from the lexical environment
@@ -46,7 +47,7 @@ lexemes of that lexicon and that none of its own names spells a catalog item.
   it, run the census, and compare with the census that has it: the spurious
   Readings and units the forest gains without it, and the largest units'
   growth. A new gate states that result in its comment in
-  [`grammar/english.ron`](grammar/english.ron).
+  [`grammar/english.fug`](grammar/english.fug).
 
 ## Seed proof
 

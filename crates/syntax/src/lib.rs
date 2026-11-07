@@ -10,6 +10,7 @@
 mod chart;
 mod compile;
 pub mod frames;
+pub mod fug;
 pub mod grammar;
 mod hash;
 mod laws;
