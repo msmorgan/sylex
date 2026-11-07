@@ -727,13 +727,16 @@
         // disturb cost*, *the flashback cost*).
         (name: "KeywordPremodifier", lhs: "BareNominal", rhs: [Cat("modifier", "KeywordPhrase"), Cat("head", "BareNominal")], equations: [Exclude("modifier.FinalParameter", "SetOffAbility"), Exclude("modifier.FinalParameter", "Cost")]),
         // Quotation marks around a term that mentions literal wording: a
-        // keyword premodifier (*all "bands with other" abilities*) and the
-        // singular nominal that names one term (*the "legend rule"*,
-        // [CR#704.5j]), written without a period of its own (style guide §3,
-        // Quotation marks and apostrophes; CGEL, Ch. 20 §6, pp. 1753–1755).
-        // A quoted plural is a granted ability's (*have "bands with other
-        // legendary creatures."*), never a term's.
+        // keyword or cited-word premodifier (*all "bands with other"
+        // abilities*, *a "left" pile*), a cited word on its own (*choose
+        // "left" or "right."*), and the singular nominal that names one term
+        // (*the "legend rule"*, [CR#704.5j]), written without a period of its
+        // own (style guide §3, Quotation marks and apostrophes; CGEL, Ch. 20
+        // §6, pp. 1753–1755). A quoted plural is a granted ability's (*have
+        // "bands with other legendary creatures."*), never a term's.
         (name: "QuotedKeywordPremodifier", lhs: "BareNominal", rhs: [Quoted("modifier", "KeywordPhrase"), Cat("head", "BareNominal")], equations: [Exclude("modifier.FinalParameter", "SetOffAbility"), Exclude("modifier.FinalParameter", "Cost")]),
+        (name: "QuotedMentionPremodifier", lhs: "BareNominal", rhs: [Quoted("modifier", "Mention"), Cat("head", "BareNominal")]),
+        (name: "QuotedMention", lhs: "Mention", rhs: [Quoted("head", "Mention")]),
         (name: "QuotedNominal", lhs: "BareNominal", rhs: [Quoted("head", "BareNominal")], equations: [Require("head.Number", "Singular")]),
         // A quoted imperative names the cost it states (*cost an additional
         // "Sacrifice a land" to activate*; [CR#118.8]): the clause is

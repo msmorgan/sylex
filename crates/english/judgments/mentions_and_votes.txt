@@ -21,6 +21,7 @@
 # Quotation marks around a term that mentions literal wording (style guide §3, Quotation marks and apostrophes)
 + <card=Mirror Box> The "legend rule" doesn't apply to permanents you control. => NounPhrase "The \"legend rule\"" as Subject of do
 + <card=Shelkin Brownie> {T}: Target creature loses all "bands with other" abilities until end of turn. => NounPhrase "all \"bands with other\" abilities" as Object of lose
++ <card=Raging River> Whenever one or more creatures you control attack, each defending player divides all creatures without flying they control into a "left" pile and a "right" pile. Then, for each attacking creature you control, choose "left" or "right." That creature can't be blocked this combat except by creatures with flying and creatures in a pile with the chosen label. => Mention "left" as Modifier of pile; Mention "right" as Modifier of pile; Mention "\"left\" or \"right.\"" as Object of choose; PrepositionPhrase "by creatures with flying and creatures in a pile with the chosen label" as Complement of except
 # Names cited from outside the corpus: an expansion [CR#206.1] and a dungeon card [CR#309.1]
 + <card=Golgothian Sylex> {1}, {T}: Each nontoken permanent with a name originally printed in the Antiquities expansion is sacrificed by its controller. => NounPhrase "the Antiquities expansion"
 + <card=Acererak the Archlich> When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon. => NounPhrase "Tomb of Annihilation" as Object of complete
