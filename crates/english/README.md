@@ -33,11 +33,6 @@ lexemes of that lexicon and that none of its own names spells a catalog item.
 - **Judgments.** `cargo test -p sylex_english --test judgments` runs the
   judgment set. How an entry is written and adjudicated, by two independent
   judges, is in [`judgments/README.md`](judgments/README.md).
-- **Declining.** A unit may be declined only when its card is on the Reserved
-  List and its construction is unique to that card and costly to support.
-  [`declined.txt`](declined.txt) lists it as `NAME | TEXT` after comments
-  giving the construction and the reason, and the census counts it apart from
-  unread. A declined card is scope, not an accepted wrong reading.
 - **Reported, never gated.** Where the endorsed Reading ranks, the cheapest
   tier, judgment tallies and forest size (`derivations`, `total_derivations`,
   Surplus) are reported. None is a pass condition, and no change is made to
@@ -147,7 +142,7 @@ known-wrong-only unit counts. It advances only then. A unit at or below
 it that is not read is a regression, unless [`deferred.txt`](deferred.txt) names
 it by card and text: a deferred unit is left unread on purpose, owned by a
 ticket, and counted apart. A law failure is never deferred, and a deferred unit
-that reads is stale, as is a deferred or declined line that names no unit of the
+that reads is stale, as is a deferred line that names no unit of the
 whole snapshot (with or without `--card`).
 
 Where a face's Oracle text is in error, the census reads the Editorial

@@ -170,7 +170,7 @@ pub struct Corpus {
     /// Editorial Corrections that matched no face of the stream read: the
     /// Oracle text they correct has changed or gone.
     pub stale_corrections: Vec<EditorialCorrection>,
-    /// Deferral and declined lines (`NAME | TEXT`) that name no unit of any
+    /// Deferral lines (`NAME | TEXT`) that name no unit of any
     /// face of the stream read, kept or not: the unit they name has changed
     /// or gone.
     pub unmatched_deferrals: Vec<String>,
@@ -226,10 +226,19 @@ impl Corpus {
     /// # Errors
     /// An unreadable or invalid record.
     pub fn read(reader: impl BufRead, keep: impl Fn(&Face) -> bool) -> Result<Self, CorpusError> {
+        Self::read_deferring(reader, keep, crate::census::deferrals())
+    }
+
+    /// As [`Corpus::read`], matching `deferrals` (`NAME | TEXT` pairs) in
+    /// place of `deferred.txt`'s.
+    fn read_deferring(
+        reader: impl BufRead,
+        keep: impl Fn(&Face) -> bool,
+        deferrals: BTreeSet<(&str, &str)>,
+    ) -> Result<Self, CorpusError> {
         let corrections = editorial_corrections();
         let mut applied = vec![false; corrections.len()];
-        let mut unmatched: BTreeSet<(&'static str, &'static str)> = crate::census::deferrals();
-        unmatched.extend(crate::census::declined());
+        let mut unmatched = deferrals;
         let mut corpus = Self::default();
         for card in OracleCardReader::new(reader) {
             let card = card.map_err(|e| CorpusError::Read(e.to_string()))?;
@@ -383,30 +392,22 @@ mod tests {
 
     #[test]
     fn a_deferral_matches_a_unit_of_any_face_read_kept_or_not() {
-        // Any deferred or declined unit serves as the witness, both lists
-        // matched alike: the first listed one, so that the test names no unit
-        // a landing will remove, and holds while `deferred.txt` is empty.
-        let (name, text) = crate::census::deferrals()
-            .into_iter()
-            .chain(crate::census::declined())
-            .next()
-            .expect("deferred.txt or declined.txt lists a unit");
-        let line = format!("{name} | {text}");
-        let escape = |s: &str| s.replace('\\', "\\\\").replace('"', "\\\"");
-        let input = format!(
-            r#"{{"object":"card","id":"p","oracle_id":"o","name":"{}","layout":"normal","legalities":{{"vintage":"legal"}},"type_line":"Creature — Demon","oracle_text":"Fear\n{}"}}"#,
-            escape(name),
-            escape(text)
-        );
-        let corpus = Corpus::read(std::io::Cursor::new(input), |_| false).unwrap();
-        assert!(!corpus.unmatched_deferrals.contains(&line));
-        // Every other deferred or declined line names no unit of this stream.
-        assert_eq!(
-            corpus.unmatched_deferrals.len(),
-            crate::census::deferrals().len() + crate::census::declined().len() - 1
-        );
-        let corpus = Corpus::read(std::io::Cursor::new(""), |_| true).unwrap();
-        assert!(corpus.unmatched_deferrals.contains(&line));
+        // Lord of the Pit's real text names the first deferral; the second
+        // names a unit of no face of the stream.
+        let line = "Lord of the Pit | Flying, trample";
+        let deferrals = || {
+            BTreeSet::from([
+                ("Lord of the Pit", "Flying, trample"),
+                ("Lord of the Pit", "Fear"),
+            ])
+        };
+        let input = r#"{"object":"card","id":"p","oracle_id":"o","name":"Lord of the Pit","layout":"normal","legalities":{"vintage":"legal"},"type_line":"Creature — Demon","oracle_text":"Flying, trample\nAt the beginning of your upkeep, sacrifice a creature other than this creature. If you can't, this creature deals 7 damage to you."}"#;
+        let corpus =
+            Corpus::read_deferring(std::io::Cursor::new(input), |_| false, deferrals()).unwrap();
+        assert_eq!(corpus.unmatched_deferrals, ["Lord of the Pit | Fear"]);
+        let corpus =
+            Corpus::read_deferring(std::io::Cursor::new(""), |_| true, deferrals()).unwrap();
+        assert!(corpus.unmatched_deferrals.iter().any(|l| l == line));
     }
 
     #[test]

@@ -98,9 +98,6 @@ pub struct StratumRow {
     /// Units not read that the deferral list names (not counted in `unread`
     /// or `known_wrong_only`).
     pub deferred: usize,
-    /// Units not read that the declined list names (not counted in `unread`,
-    /// `known_wrong_only` or `deferred`).
-    pub declined: usize,
     /// Units with a round-trip law failure (counted in `unread`).
     pub law_failures: usize,
     /// Faces whose highest unit is in this Stratum.
@@ -338,7 +335,6 @@ fn summarize(faces: usize, bind_error: Option<String>, units: Vec<UnitResult>) -
     let mut not_segmentable = Vec::new();
     let mut stale_deferrals = Vec::new();
     let deferrals = deferrals();
-    let declined_list = declined();
     for unit in &units {
         let stratum = unit.profile.stratum;
         let row = &mut strata[usize::from(stratum)];
@@ -349,13 +345,7 @@ fn summarize(faces: usize, bind_error: Option<String>, units: Vec<UnitResult>) -
                 unit.verdict,
                 Verdict::Read | Verdict::Unread(Unread::Law(_))
             );
-        let declined = declined_list.contains(&(unit.name.as_str(), unit.text.as_str()))
-            && !matches!(
-                unit.verdict,
-                Verdict::Read | Verdict::Unread(Unread::Law(_))
-            );
         match &unit.verdict {
-            _ if declined => row.declined += 1,
             _ if deferred => row.deferred += 1,
             Verdict::Read => row.read += 1,
             Verdict::KnownWrongOnly => row.known_wrong_only += 1,
@@ -366,14 +356,11 @@ fn summarize(faces: usize, bind_error: Option<String>, units: Vec<UnitResult>) -
                 }
             }
         }
-        if (named || declined_list.contains(&(unit.name.as_str(), unit.text.as_str())))
-            && unit.verdict == Verdict::Read
-        {
+        if named && unit.verdict == Verdict::Read {
             stale_deferrals.push(format!("{} | {}", unit.name, unit.text));
         }
         if unit.verdict != Verdict::Read
             && !deferred
-            && !declined
             && completed.is_some_and(|done| stratum <= done)
         {
             regressions.push(format!("{} ({}): {}", unit.name, unit.face, unit.text));
@@ -467,26 +454,6 @@ pub fn deferrals() -> BTreeSet<(&'static str, &'static str)> {
         .collect()
 }
 
-/// The declined units: `NAME | TEXT` lines of `declined.txt`, each preceded by
-/// comment lines giving the construction and the reason.
-///
-/// # Panics
-/// On a malformed line, which `tests/census.rs` rejects first.
-#[must_use]
-pub fn declined() -> BTreeSet<(&'static str, &'static str)> {
-    crate::DECLINED
-        .lines()
-        .map(str::trim)
-        .filter(|line| !line.is_empty() && !line.starts_with('#'))
-        .map(|line| {
-            let (name, text) = line
-                .split_once(" | ")
-                .unwrap_or_else(|| panic!("declined entry `{line}` is not `NAME | TEXT`"));
-            (name.trim(), text.trim())
-        })
-        .collect()
-}
-
 impl Report {
     /// A plain-text summary: per-Stratum counts, families, and the most
     /// frequent `top` skeletons of each Stratum.
@@ -527,19 +494,18 @@ impl Report {
         );
         let _ = writeln!(
             out,
-            "stratum  units   read  known-wrong-only  unread  deferred  declined  law-failures   faces  faces-read"
+            "stratum  units   read  known-wrong-only  unread  deferred  law-failures   faces  faces-read"
         );
         for row in &self.strata {
             let _ = writeln!(
                 out,
-                "{:>7}  {:>5}  {:>5}  {:>16}  {:>6}  {:>8}  {:>8}  {:>12}  {:>6}  {:>10}",
+                "{:>7}  {:>5}  {:>5}  {:>16}  {:>6}  {:>8}  {:>12}  {:>6}  {:>10}",
                 row.stratum,
                 row.units,
                 row.read,
                 row.known_wrong_only,
                 row.unread,
                 row.deferred,
-                row.declined,
                 row.law_failures,
                 row.faces,
                 row.faces_read

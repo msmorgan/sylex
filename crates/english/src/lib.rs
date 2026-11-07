@@ -78,11 +78,6 @@ pub const COMPLETED_STRATUM: Option<profile::Stratum> = Some(7);
 /// unread on purpose, each owned by a ticket (`census::deferrals`).
 pub static DEFERRED: LazyLock<String> = data_text!("deferred.txt");
 
-/// The tracked list of declined units: Reserved List cards whose
-/// construction is unique to them and costly to support (`census::declined`).
-/// Loaded like [`GRAMMAR`].
-pub static DECLINED: LazyLock<String> = data_text!("declined.txt");
-
 /// The tracked Editorial Corrections the census reads in place of Oracle text
 /// (`corpus::editorial_corrections`). Loaded like [`GRAMMAR`].
 pub static EDITORIAL_CORRECTIONS: LazyLock<String> = data_text!("corrections.txt");

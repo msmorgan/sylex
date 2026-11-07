@@ -110,23 +110,20 @@ fn strata(args: &StrataArgs, output: &mut dyn Write) -> Result<()> {
         );
     }
     if !corpus.unmatched_deferrals.is_empty() {
-        writeln!(
-            output,
-            "\ndeferred or declined lines that match no corpus unit:"
-        )?;
+        writeln!(output, "\ndeferred lines that match no corpus unit:")?;
         for line in &corpus.unmatched_deferrals {
             writeln!(output, "  {line}")?;
         }
     }
     if args.check && !corpus.unmatched_deferrals.is_empty() {
         anyhow::bail!(
-            "{} deferred or declined lines match no corpus unit; update or remove them",
+            "{} deferred lines match no corpus unit; update or remove them",
             corpus.unmatched_deferrals.len()
         );
     }
     if args.check && !report.stale_deferrals.is_empty() {
         anyhow::bail!(
-            "{} deferred units are read; remove them from deferred.txt or declined.txt",
+            "{} deferred units are read; remove them from deferred.txt",
             report.stale_deferrals.len()
         );
     }

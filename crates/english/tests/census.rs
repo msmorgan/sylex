@@ -297,26 +297,3 @@ fn a_unit_counts_its_segments_and_their_surplus() {
         report.units.iter().map(|u| u.surplus).sum::<u128>()
     );
 }
-
-#[test]
-fn a_declined_unit_is_counted_as_declined_not_unread() {
-    let env = LexicalEnvironment {
-        lexicon: seed::lexicon(),
-        frames: seed::frames(),
-    };
-    let (name, text) = *sylex_english::census::declined()
-        .iter()
-        .find(|(name, _)| *name == "Illusionary Mask")
-        .expect("Illusionary Mask is declined");
-    let mut corpus = Corpus::default();
-    let mut declined_face = face("soul", text);
-    declined_face.name = name.to_owned();
-    declined_face.type_line = None;
-    corpus.push(declined_face);
-    let report = sylex_english::census::run(&corpus, &env, &[]);
-    let rows = |f: fn(&sylex_english::census::StratumRow) -> usize| -> usize {
-        report.strata.iter().map(f).sum()
-    };
-    assert_eq!(rows(|r| r.declined), 1);
-    assert_eq!(rows(|r| r.unread), 0);
-}
