@@ -36,6 +36,8 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
   never extend it or copy newer work into it.
 - `lean/`: the Lean prototype that runs the `.syl` corpus in `plugins/`; it is due for deletion.
 - `docs/decisions/`: ADRs; `semantics.md` is the semantics design and `syl.md` the `.syl` language.
+- `docs/specs/`: accepted designs not yet in code. `docs/unusual-cards.md`: cards whose text defeats
+  a natural modeling assumption.
 
 ## Writing
 

@@ -18,7 +18,8 @@ in `kata.toml`) makes the moves; never move a ticket by hand.
 ## Writing a ticket
 
 Front matter carries `needs: [...]`: the slugs of tickets that must reach `done/` first. Run
-`kata kanban check` after editing it. The body has up to four parts:
+`kata kanban check` after editing it. A ticket that builds a design not yet in code also carries
+`specs: [...]`: the names of its files in `docs/specs/`. The body has up to four parts:
 
 - **Why**: the problem, in a few sentences.
 - **Done when**: checkable acceptance criteria, including which tests or gates must pass.
@@ -26,6 +27,7 @@ Front matter carries `needs: [...]`: the slugs of tickets that must reach `done/
 - **Pointers**: the files or documents to read.
 
 Never put in a ticket: "Standard constraints apply" or any restatement of `CLAUDE.md`; design
-prose (a design decision lives in the ADR, the code or the declaration it shapes); provenance or
+prose (a design decision lives in the ADR, the code or the declaration it shapes, or, until the
+code exists, in `docs/specs/`); provenance or
 the history of the ticket or its predecessors; "(owner, date)" labels. Do not model a new ticket
 on an existing one.
