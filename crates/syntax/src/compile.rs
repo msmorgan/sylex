@@ -1916,11 +1916,17 @@ impl<'a> Binder<'a> {
                 shifted_object,
                 postposed,
                 obligatory,
+                closed_complement,
                 agree,
                 clusters,
                 remnants,
                 ..
             } => {
+                if *closed_complement && *head != LexicalCategory::Preposition {
+                    return Err(invalid(format!(
+                        "valence `{phrase}`: `closed_complement` on a non-preposition head"
+                    )));
+                }
                 let derivations = self.valence_derivations(schema)?;
                 let mut drafts = self.valence(
                     *head,
@@ -1929,6 +1935,7 @@ impl<'a> Binder<'a> {
                     &derivations,
                     *obligatory,
                     *heavy_shift,
+                    *closed_complement,
                 )?;
                 for draft in &mut drafts {
                     self.internalised_equations(draft, internalised)?;
@@ -2433,6 +2440,7 @@ impl<'a> Binder<'a> {
         vec![binary, serial, more, end]
     }
 
+    #[expect(clippy::too_many_arguments, reason = "the Valence schema's fields")]
     fn valence(
         &self,
         head: LexicalCategory,
@@ -2441,13 +2449,21 @@ impl<'a> Binder<'a> {
         derivations: &Derivations<'_>,
         obligatory: bool,
         heavy_shift: bool,
+        closed_complement: bool,
     ) -> Result<Vec<Draft>, LoadError> {
         let lhs = self.category(phrase)?;
         let gap_capable = self.out.category_gap[lhs] != 0;
         let mut drafts = Vec::new();
         let complement_kind = derivations.complement_kind;
         if head == LexicalCategory::Preposition {
-            return self.preposition_valence(lhs, phrase, cost, gap_capable, complement_kind);
+            return self.preposition_valence(
+                lhs,
+                phrase,
+                cost,
+                gap_capable,
+                complement_kind,
+                closed_complement,
+            );
         }
         let used = self.used_frames(head)?;
         if head != LexicalCategory::Verb {
@@ -2586,7 +2602,8 @@ impl<'a> Binder<'a> {
     }
 
     /// A phrase per used Preposition Frame and, when `gap_capable`, a
-    /// stranded variant of each with an NP Complement.
+    /// stranded variant of each with an NP Complement. With
+    /// `closed_complement`, a Gap inside the Complement never passes up.
     fn preposition_valence(
         &self,
         lhs: usize,
@@ -2594,6 +2611,7 @@ impl<'a> Binder<'a> {
         cost: u32,
         gap_capable: bool,
         complement_kind: Option<usize>,
+        closed_complement: bool,
     ) -> Result<Vec<Draft>, LoadError> {
         let mut drafts = Vec::new();
         let used: BTreeSet<usize> = self
@@ -2628,7 +2646,7 @@ impl<'a> Binder<'a> {
                 let child = draft.child(
                     relation_name(frame.relation),
                     self.slot_symbol(&frame.complement)?,
-                    GapRule::Transparent,
+                    if closed_complement { GapRule::Closed } else { GapRule::Transparent },
                 );
                 self.slot_equations(&mut draft, child, frame.complement.kind())?;
             }
@@ -3177,8 +3195,17 @@ impl<'a> Binder<'a> {
     }
 
     /// Right Node Raising: a coordination with a shared Gap, filled once
-    /// after it.
-    fn right_node_raising(&self, conjoin: &Conjoin, category: &str, cost: u32) -> Vec<Draft> {
+    /// after it. With `delimited`, the coordination is that private
+    /// Category's, whose final coordinate the mark sets off before and after
+    /// (*attracted to, and overawed by, the new lodger*; CGEL, Ch. 20
+    /// §3.2.5, p. 1746, [26iii]).
+    fn right_node_raising(
+        &self,
+        conjoin: &Conjoin,
+        category: &str,
+        cost: u32,
+        delimited: Option<(usize, char)>,
+    ) -> Vec<Draft> {
         let mut drafts = Vec::new();
         // One per shareable Gap: an NP, a keyword phrase, a
         // *to*-infinitival, a predicative (*be and become legendary*).
@@ -3198,12 +3225,27 @@ impl<'a> Binder<'a> {
             let Ok(shared) = self.slot_category(kind) else {
                 continue;
             };
+            let (shape, head) = match delimited {
+                None => ("shared", conjoin.conjunct()),
+                Some((coordination, _)) => (
+                    "shared-delimited",
+                    Symbol::Cat {
+                        binding: None,
+                        category: coordination,
+                        prepositions: None,
+                        host: None,
+                    },
+                ),
+            };
             let mut raising = Draft::new(
-                format!("Coordination:{category}/shared{suffix}"),
+                format!("Coordination:{category}/{shape}{suffix}"),
                 conjoin.lhs,
                 cost,
             );
-            let h = raising.child("head", conjoin.conjunct(), GapRule::Require(gap));
+            let h = raising.child("head", head, GapRule::Require(gap));
+            if let Some((_, mark)) = delimited {
+                raising.child("", Symbol::Punct(mark, Binding::Suffix), GapRule::Closed);
+            }
             let shared_child = raising.child(
                 "shared",
                 Symbol::Cat {
@@ -3226,7 +3268,7 @@ impl<'a> Binder<'a> {
     /// The drafts of a Coordination schema: the whole coordination (binary,
     /// delimited binary, serial, each after a correlative marker too), its
     /// serial tail, and Right Node Raising, once per Category.
-    fn coordination(&self, schema: &SchemaDecl) -> Result<Vec<Draft>, LoadError> {
+    fn coordination(&mut self, schema: &SchemaDecl) -> Result<Vec<Draft>, LoadError> {
         let SchemaDecl::Coordination {
             remnant, parallel, ..
         } = schema
@@ -3247,7 +3289,7 @@ impl<'a> Binder<'a> {
         reason = "one coordination schema, shapes in order"
     )]
     fn coordination_drafts(
-        &self,
+        &mut self,
         schema: &SchemaDecl,
         remnant: Option<&str>,
     ) -> Result<Vec<Draft>, LoadError> {
@@ -3258,6 +3300,7 @@ impl<'a> Binder<'a> {
             cost,
             delimiter,
             delimited,
+            raising_delimiter,
             serial: serial_shapes,
             ..
         } = schema
@@ -3309,6 +3352,23 @@ impl<'a> Binder<'a> {
                 ));
             }
         }
+        // The private Category of the coordination a delimited Right Node
+        // Raising shares its Gap across.
+        let raising = match raising_delimiter {
+            None => None,
+            Some(mark) => {
+                if conjoin.unlike.is_some()
+                    || conjoin.conjunct != conjoin.lhs
+                    || self.out.category_gap[conjoin.lhs] == 0
+                {
+                    return Err(invalid(format!(
+                        "coordination of `{category}`: `raising_delimiter` without Right Node \
+                         Raising (unlike conjuncts, a `conjunct` Category or no Gap)"
+                    )));
+                }
+                Some((self.private_category(conjoin.lhs), *mark))
+            }
+        };
         for (marker, test, paired) in variants {
             let suffix = paired.map_or(String::new(), |p| format!("-{p}"));
             let id = |shape: &str| format!("Coordination:{}/{shape}{suffix}", conjoin.tail_name);
@@ -3329,8 +3389,21 @@ impl<'a> Binder<'a> {
                     self,
                     id("binary-delimited"),
                     None,
-                    test,
+                    test.clone(),
                     Some(*mark),
+                    *cost,
+                )?);
+            }
+            // Binary in a Right Node Raising set off by the mark:
+            // X , Coord X before the closing mark.
+            if let (Some((coordination, mark)), None) = (raising, &marker) {
+                drafts.push(conjoin.binary_into(
+                    self,
+                    coordination,
+                    id("binary-raising"),
+                    None,
+                    test.clone(),
+                    Some(mark),
                     *cost,
                 )?);
             }
@@ -3434,6 +3507,11 @@ impl<'a> Binder<'a> {
             recover(&mut end, middle.map(|_| a), None);
             drafts.push(end);
         }
+        drafts.extend(
+            raising
+                .into_iter()
+                .flat_map(|r| self.right_node_raising(&conjoin, category, *cost, Some(r))),
+        );
         if conjoin.unlike.is_some() {
             return Ok(drafts);
         }
@@ -3447,7 +3525,7 @@ impl<'a> Binder<'a> {
             && first.is_some_and(|first| std::ptr::eq(first, schema))
             && self.out.category_gap[conjoin.lhs] != 0
         {
-            drafts.extend(self.right_node_raising(&conjoin, category, *cost));
+            drafts.extend(self.right_node_raising(&conjoin, category, *cost, None));
         }
         Ok(drafts)
     }
@@ -3833,7 +3911,21 @@ impl Conjoin {
         delimiter: Option<char>,
         cost: u32,
     ) -> Result<Draft, LoadError> {
-        let mut draft = Draft::new(id, self.lhs, cost);
+        self.binary_into(binder, self.lhs, id, marker, coordinator, delimiter, cost)
+    }
+
+    #[expect(clippy::too_many_arguments, reason = "the schema's shapes")]
+    fn binary_into(
+        &self,
+        binder: &Binder<'_>,
+        lhs: usize,
+        id: String,
+        marker: Option<&Test>,
+        coordinator: Test,
+        delimiter: Option<char>,
+        cost: u32,
+    ) -> Result<Draft, LoadError> {
+        let mut draft = Draft::new(id, lhs, cost);
         if let Some(marker) = marker {
             draft.child("correlative", Symbol::Leaf(marker.clone()), GapRule::Closed);
         }

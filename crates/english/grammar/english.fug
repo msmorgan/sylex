@@ -262,7 +262,7 @@ category DummyPronoun : NounPhrase [Number, Person]
 category ExistentialPredicate : VerbPhrase [Number, Person, VerbForm, Inflection, ComplementKind]
 category FusedNounPhrase : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability, DeterminativeDistribution,
-]
+] { gap }
 // A symbol sequence as a Noun Phrase, which a Preposition Phrase may
 // postmodify (*{X} in its mana cost*).
 category SymbolHead : NounPhrase [Number, Person, Case, Determination, NounKind, Countability]
@@ -274,7 +274,7 @@ category SymbolHead : NounPhrase [Number, Person, Case, Determination, NounKind,
 // X* (CGEL, Ch. 5 §9.1, p. 411).
 category PartitiveHead : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability, DeterminativeDistribution,
-]
+] { gap }
 // A slash measure as a Noun Phrase (*gets +2/+2*), taken only where a
 // head selects one, or beside keyword phrases naming counter kinds
 // (MeasureObjectConjunct): never a general Object or bare singular
@@ -1862,7 +1862,7 @@ MeasuredComparativeHead: NounPhrase -> modifier:NounPhrase Class(ComparativeQuan
 // Phrase takes its Number from the oblique, a distributive head's
 // singular from the head, and *any* may be singular with a plural
 // oblique (*if any of those cards shares a card type*).
-Partitive: PartitiveHead -> Class(PartitiveQuantifier) complement:Selected(PrepositionPhrase, Of)
+Partitive: PartitiveHead -> Class(PartitiveQuantifier) complement:Selected(PrepositionPhrase, Of) { transparent: [complement] }
     where head.DeterminativeDistribution != Distributive,
           $.Number = complement.Number,
           $.NounKind = Ordinary,
@@ -2529,9 +2529,9 @@ DistributiveMeasure: NounPhrase -> determiner:DeterminerPhrase Nominal
           $.Case = Plain,
           $.Person = Third,
           $.Determination = Overt
-FusedPhrase: NounPhrase -> FusedNounPhrase
+FusedPhrase: NounPhrase -> FusedNounPhrase { transparent: [head] }
 LocativeFusedHead: FusedNounPhrase -> LocativeHead
-PartitiveFusedHead: FusedNounPhrase -> PartitiveHead
+PartitiveFusedHead: FusedNounPhrase -> PartitiveHead { transparent: [head] }
 FusedLocative: LocativeHead -> Word(Anywhere)
     where $.NounKind = Ordinary,
           $.Determination = Bare,
@@ -2675,7 +2675,7 @@ ProperName: NounPhrase -> Name
           $.Determination = Bare,
           $.Case = Plain,
           $.Person = Third
-Determined: NounPhrase -> determiner:DeterminerPhrase Nominal
+Determined: NounPhrase -> determiner:DeterminerPhrase Nominal { transparent: [head] }
     where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           $.Determination = Overt,
           $.Case = Plain,
@@ -3447,9 +3447,18 @@ valence VerbPhrase {
 // `Intransitive` without one.
 // A Preposition Phrase with a Noun Phrase Complement also stands
 // without its preposition, as a later Adjunct Cluster's remnant.
+// A Gap inside a preposition's Complement never passes up: only a
+// stranded preposition's own Gap does. English extracts from there
+// (*the card you put it on top of*), but no card reads that way, and
+// an extraction from a determined Noun Phrase in a preposition's
+// Complement makes spurious Right Node Raising (*less than [void
+// counters on it] or equal to the number of [void counters on it]*,
+// Sphere of Annihilation). An admission gate
+// (`docs/decisions/english.md` §6).
 valence PrepositionPhrase {
     head: Preposition,
     complement_kind: ComplementKind,
+    closed_complement,
     agree: [
         Number -> Number, Number -> QuantityNumber, Determination -> Determination, Case -> Case,
         NounKind -> NounKind, Countability -> Countability,
@@ -3846,8 +3855,13 @@ coordination NounPhrase {
 // never *is dealt [3] or [more damage]*. Numbers alone are an Amount
 // coordination (*2 or 3*). An admission gate
 // (`docs/decisions/english.md` §6).
+// Commas may set off the final coordinate of Right Node Raising, so
+// that the shared constituent is read as the Complement of each
+// coordinate (*some amount of, or all of, the mana*, Illusionary
+// Mask; CGEL, Ch. 20 §3.2.5, p. 1746, [26iii]).
 coordination NounPhrase {
     coordinators: Alternative,
+    raising_delimiter: ',',
     unshared: [DeterminativeDistribution, FirstConjunctNumber],
     proximate: [Number, Person, Case, NounKind, Countability, NounDistribution],
     resolve: [Determination -> Bare],

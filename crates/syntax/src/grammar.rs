@@ -483,6 +483,11 @@ pub enum SchemaDecl {
         /// forms its bare phrase.
         #[serde(default)]
         obligatory: bool,
+        /// A Preposition Phrase passes up no Gap from inside its Complement:
+        /// only its stranded phrase has a Gap, the Complement's own. A load
+        /// error on any other head.
+        #[serde(default)]
+        closed_complement: bool,
         /// `(phrase feature, slot feature)` pairs: the phrase's feature
         /// agrees with that feature of each Frame Slot child that carries it
         /// (a Preposition Phrase takes its Complement's Number).
@@ -596,6 +601,14 @@ pub enum SchemaDecl {
         /// declarative and then an imperative: *…, and put …*).
         #[serde(default)]
         delimited: bool,
+        /// Punctuation that sets off the final coordinate of a binary
+        /// coordination sharing a Gap by Right Node Raising, before its
+        /// coordinator and before the shared constituent (*attracted to,
+        /// and overawed by, the new lodger*; CGEL, Ch. 20 §3.2.5, p. 1746,
+        /// [26iii]; Ch. 15 §4.4, pp. 1343–1345). A load error where the
+        /// schema derives no Right Node Raising.
+        #[serde(default)]
+        raising_delimiter: Option<char>,
         /// Whether serial coordinations are derived: by default for like
         /// conjuncts, not for unlike ones.
         #[serde(default)]
