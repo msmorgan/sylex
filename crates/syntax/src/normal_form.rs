@@ -9,10 +9,10 @@
 //! after. The full set, with where each is built:
 //!
 //! - the grouping within a chain joined by the same coordinator, or linked by
-//!   the same connective: the Coordination schemas' serial tails and the
-//!   Linked Coordination's identity (`Summary::link`); re-applied;
-//! - clause versus verb-phrase coordination of bare imperatives: `uncoordinated`
-//!   children; re-applied;
+//!   the same connective: the Coordination schemas' serial tails and the Linked
+//!   Coordination's identity (`Summary::link`); re-applied;
+//! - clause versus verb-phrase coordination of bare imperatives:
+//!   `uncoordinated` children; re-applied;
 //! - a bare coordination is of Noun Phrases, never of Nominals under one bare
 //!   Noun Phrase: `uncoordinated` children;
 //! - a dependent that scopes over a whole coordination where a single conjunct
