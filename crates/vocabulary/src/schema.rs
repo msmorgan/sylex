@@ -305,8 +305,9 @@ impl NounDecl {
 /// An adjective not restricted to attributive use and spelled like a verb's
 /// past participle (*tapped*, *attached*) is that verb's Adjectival Passive:
 /// the loader marks the verb `AdjectivalPassive: Lexical`, and the grammar
-/// does not derive the adjective from the participle again. An action's adjective (*transformed*)
-/// is declared on its `KeywordAction`, a status's on its `Status`.
+/// does not derive the adjective from the participle again. An action's
+/// adjective (*transformed*) is declared on its `KeywordAction`, a status's on
+/// its `Status`.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct AdjectiveEntry {

@@ -65,8 +65,8 @@ pub(crate) fn applicable(category: Category, form: WordForm, features: &FeatureB
 
 /// The regular spelling of a Word Form of `lexeme`, from its lemma.
 ///
-/// - Plural and third-person singular present: consonant + `y` becomes
-///   `ies`; a final `s`, `x`, `z`, `ch` or `sh` takes `es`; otherwise `s`.
+/// - Plural and third-person singular present: consonant + `y` becomes `ies`; a
+///   final `s`, `x`, `z`, `ch` or `sh` takes `es`; otherwise `s`.
 /// - Preterite and past participle: [`default_participle`].
 /// - Gerund-participle: final `ie` becomes `ying`; a final `e` drops except
 ///   after `ee`, `oe` or `ye`; otherwise `ing`.
