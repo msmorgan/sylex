@@ -3,90 +3,74 @@ needs: [plugins-v3-spelling-conventions, lean-retirement]
 ---
 # Entry Riders and Durations as surface adjunct nodes
 
-Standard constraints apply. Done in `.syl` and Rust (`semantics`, `discourse`) after
-`semantics-rust-rewrite`; the Lean names below are the current AST, which that epic ports.
+## Why
 
-Today Entry Riders are entries in a `MoveRider` list in four places:
-- `Action.move`'s `riders`;
-- a Token's creation;
-- a replaced entering, `Replacement.withRiders`. *Vivid Marsh* and *Sphere of the Suns* are
-  statics of this kind, "This land enters tapped …";
-- an event pattern that matches an entering by its riders (`MoveRider.not` exists only there).
+Entry Riders are `List(MoveRider)` arguments in four places: `move`'s `riders`, `token`'s
+`riders`, `withRiders` (a replaced entering) and event patterns (`not(rider)` exists only there).
+An effect's Duration is a field (`establish(spec, duration)`, `gainDesignation(…, duration)`).
+Oracle text attaches neither that way:
 
-An effect's Duration is a field (`establish (spec) (duration : Option Duration)`,
-`gainDesignation … duration`). Oracle text does not attach either of them that way:
+- Order varies: "tapped under your control" and "under your control tapped" both print.
+- Coordination varies with no change in meaning: *Vivid Marsh* "enters tapped with two charge
+  counters on it"; *Sphere of the Suns* "enters tapped and with three charge counters on it";
+  *Anavolver* "with two +1/+1 counters on it and with flying"; *Phoenix Chick* "tapped and
+  attacking with a +1/+1 counter on it".
+- A fronted Duration scopes over a Coordination: *Wild Shape*'s "Until end of turn, target creature
+  you control has …, becomes …, and gains …". A field on each verb cannot say that, and
+  `plugins/canon/cards/Wild Shape.syl` repeats `untilEndOfTurn` per mode.
 
-- **Order varies.** "tapped under your control" appears on 45 cards, "under your control tapped"
-  on 9.
-- **Coordination varies with no change in meaning.** Vivid Marsh "enters tapped with two charge
-  counters on it"; Sphere of the Suns and Noble's Purse "enter tapped and with three … counters
-  on it"; 14 cards with "with … and with …" (Anavolver, Pouncing Wurm, Voidpouncer); Phoenix
-  Chick "tapped and attacking with a +1/+1 counter on it".
-- **A fronted Duration scopes over a Coordination.** Wild Shape: "Until end of turn, target
-  creature you control has …, becomes …, and gains …", one Duration over three Verb Phrases. 261
-  cards open a sentence with "Until end of turn,". A field on each verb cannot say that.
+## Design
 
-## Decisions already made
+- Entry Riders and Durations are wrapping nodes around the Action they modify, not list or field
+  arguments.
+- One set of rider nodes serves moves, token creation, replaced enterings (`withRiders`) and event
+  patterns that match an entering by its riders, so the static *Vivid Marsh* and an instruction
+  "put it onto the battlefield tapped" share one "tapped". The same nodes ride moves that don't go
+  to the battlefield ("exile it with three time counters on it", "exile it face down").
+- There is no `and` node over riders: the coordinated wording ("enters tapped and with three
+  charge counters", *Sphere of the Suns*) and the side-by-side one ("enters tapped with two charge
+  counters", *Vivid Marsh*) are two Templates over the same nodes, as are a fronted and a trailing
+  Duration. A coordinated variant is added only where a card prints one.
+- A Duration node can wrap a whole Coordination of Verb Phrases (*Wild Shape*'s fronted "Until end
+  of turn,").
+- The placement of a moved pile ("in any order", "in a random order") stays a field of `move`, at
+  its fixed position at the end; a move carries Entry Riders or that placement, as its destination
+  allows, never both. `delay`'s window is not a printed effect Duration and stays.
+- Two refusals: a rider on a move, creation, entering or pattern whose destination does not allow
+  it; and a Duration on anything that establishes no Continuous Effect [CR#611.2a].
+- Open question: Vintage-legal Oracle prints both "tapped under your control" (17 cards) and
+  "under your control tapped" (5). Either riders nest in printed order (the term mirrors the text
+  and read order is printed order), or there is one canonical nesting with Templates spelling both
+  orders (one term per meaning).
+- Open question: "Pile Placement", the name the field has had, is in no glossary; is it the term,
+  and does it go in the game-model glossary?
 
-- **Adjunct nodes.** Entry Riders (Oracle English: Depictive Adjunct, or a PP Adjunct) and effect
-  Durations (Duration Phrase) become nodes in their printed position. They wrap the Action they
-  modify, or the Coordination they scope over. This follows semantics.md §1: constructions
-  occupy their surface positions.
-  - The same rider nodes serve all four places above. A replaced entering's riders wrap the
-    entering the replacement describes, and a pattern's riders wrap the entering it matches. So
-    the static *Vivid Marsh* and an instruction "put it onto the battlefield tapped" share one
-    representation of "tapped".
-- **Nesting records order.** Riders wrap in printed order, so the checker steps them left to right
-  and a rider's Anaphor ("on it") follows its Antecedent.
-- **Wording differences live in Template choice, not nodes.** There is no `and` node over riders.
-  A coordinated wording ("tapped and with …") and the side-by-side one ("tapped with …") are two
-  Templates over the same nodes, so both expand to an identical AST. A fronted and a trailing
-  Duration over the same scope are likewise two Templates.
-- **Pile Placements stay a field on `move`.** `inOrder` ("in any order", "in a random order")
-  keeps its fixed position at the end of the move, so it stays a field: `riders` is split, not
-  removed. A move carries the Entry Riders or the Pile Placements its destination allows, never
-  both (game-model glossary, Pile Placement).
-- **Riders on other moves are nodes too.** `withCounters` and `faceDown` also ride moves that do
-  not go to the battlefield ("exile it with three time counters on it", "exile it face down").
-  They are printed adjuncts like the rest, so they take the same nodes, and the attachment check
-  allows them on those moves. The game-model glossary's Entry Rider says it rides "a move to the
-  battlefield, a Token's creation, or a static ability, and nothing else". Amend it, or add a term
-  beside it, with CR citations, via `domain-modeling`.
-- **The checker checks attachment by sort.** It refuses:
-  - a rider on a move, creation, entering or pattern whose destination does not allow it;
-  - a Duration on anything that establishes no Continuous Effect [CR#611.2a].
-- **No lowering work.** semantics_v3 is disconnected from other layers.
+## Done when
 
-## Change
+- The adjunct primitives exist, and `move`, `token`, `withRiders` and the event patterns take them
+  instead of rider lists; `move` keeps its pile-placement field.
+- No Action has a field holding a printed effect Duration.
+- The declarations that took `riders` or `duration` (`putOntoBattlefield`, `returnToBattlefield`,
+  `enter`, `create`, `gain`, `gainHaste`, `getsPt`, `become`, …) are bare declarations plus adjunct
+  Templates, and the `TODO(spelling)` markers about Entry Riders and Durations are resolved under
+  `plugins-v3-spelling-conventions`.
+- Every canon card that used a `riders` list or a `duration` field is re-encoded, and canon has
+  *Vivid Marsh*, *Sphere of the Suns*, *Phoenix Chick* and *Anavolver*; *Vivid Marsh* and *Sphere of
+  the Suns* expand to an identical entering.
+- The adjunct primitives' doc comments state the two refusals in Design.
+- `semantics.md` (§2.3's Entry Rider, §4.7's `withRiders`) and the game-model glossary's **Entry
+  Rider** and **Duration** entries describe the new attachment; **Entry Rider** covers the riders
+  on moves that do not go to the battlefield, or a term beside it does.
 
-- **AST (Rust `semantics`):**
-  - Add the adjunct nodes.
-  - Split `move`'s `riders`: Pile Placements stay in a field of their own, and every other rider
-    becomes a node.
-  - Move the rider lists of Token creation, `Replacement.withRiders` and event patterns to the
-    same nodes.
-  - Remove every Action field that holds a printed effect Duration. Audit each
-    `duration : Option Duration` on an Action: `delay`'s window is a different thing.
-- **`discourse`:** the attachment refusals, and stepping in surface order.
-- **Templates:**
-  - Rewrite the Templates that took `riders` or `duration` (`putOntoBattlefield`,
-    `returnToBattlefield`, `enter`, `create`, `gain`, `gainHaste`, `getsPt`, `becomes`, …) as bare
-    Templates plus adjunct Templates.
-  - Add a coordinated variant only where a card prints one.
-  - Resolve the `TODO(spelling)` markers this ticket owns (Entry Riders and Durations), following
-    `plugins-v3-spelling-conventions`.
-- **Canon:**
-  - Re-encode every card that used `riders` or a `duration` field.
-  - Add witnesses for each shape above: Vivid Marsh, Sphere of the Suns, Phoenix Chick,
-    Anavolver, and a fronted Duration over a Coordination.
-- **ADR:** update `semantics.md` where `move`, `establish`, `Replacement.withRiders` and Entry
-  Riders are described.
-- **Glossary:** amend the game-model entries Entry Rider, Pile Placement and Duration for their new
-  attachment, and the Entry Rider scope above, via `domain-modeling`.
+## Not in scope
 
-## Acceptance
+Enforcing the attachment refusals: no `.syl` checker exists until the Rust AST and the greenfield
+discourse checker, which take the Design's refusals as requirements.
 
-- Each witness reads to its intended nodes. Vivid Marsh and Sphere of the Suns expand to an
-  identical AST.
-- Tests for the attachment refusals.
-- The `semantics` and `discourse` tests pass. Report the canon cards whose encoding changed.
+## Pointers
+
+- `plugins/builtin/primitives/action/move.syl`, `plugins/builtin/primitives/action/token.syl`,
+  `plugins/builtin/primitives/static/withRiders.syl`, `plugins/builtin/primitives/move/not.syl`,
+  `plugins/builtin/primitives/zone/` (the `MoveRider` primitives)
+- `plugins/builtin/primitives/action/establish.syl`, `plugins/builtin/primitives/action/gainDesignation.syl`
+- `docs/contexts/game-model/CONTEXT.md` (Entry Rider, Duration)

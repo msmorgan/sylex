@@ -1,32 +1,30 @@
 ---
 needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
 ---
-# A Template parameter mentioned in two arms of an `or` cannot be bound
+# A Template parameter mentioned in two arms of an `or` shares one binding
 
-Standard constraints apply. Split from `lean-v3-authoring-default-leaks` §3 (2026-10-25).
+## Why
 
-`objectsOfPlayer` (`plugins/builtin/templates/predicate/objectsOfPlayer.syl`, "…that <player>
-controls or owns but no player controls", its only caller *True-Name Nemesis*,
-`plugins/canon/cards/True-Name Nemesis.syl`) writes `player` twice, once in each arm of an
-`.or`. ADR `docs/decisions/syl.md` §4 binds a Template
-parameter mentioned more than once with `.firstMention`/`.laterMention`. Writing
+`objectsOfPlayer` (`plugins/builtin/templates/predicate/objectsOfPlayer.syl`, "protection from
+<player>" [CR#702.16k]) writes `$player` once in each arm of an `or`: each object `player`
+controls, or each object `player` owns that no player controls. Its one caller is *True-Name
+Nemesis*. A Template that mentions a NounPhrase parameter more than once binds it at the first
+occurrence, and the binding is generated (`docs/decisions/syl.md` §4). But reference resolution
+steps each disjunct from the context before the `or`, so the second arm's mention cannot see the
+binding the first arm made, and the parameter is refused (as the Lean checker did) or bound
+twice.
 
-```lean
-semantic_template objectsOfPlayer (player : NounPhrase) : Predicate :=
-  .or [ controlledBy (.firstMention "objectsOfPlayer.player" player),
-        .and [ ownedBy (.laterMention "objectsOfPlayer.player" player),
-               .not (controlledBy (a .isPlayer)) ] ]
-```
+## Done when
 
-made *True-Name Nemesis* fail the Lean card check with seven
-`Refusal.bindingIdentity "objectsOfPlayer.player"`: the `.or` steps each arm from the common
-header context, so the second arm's `.laterMention` cannot see the first arm's `.firstMention`.
-`discourse`, ported with the same `.or` stepping, inherits the refusal.
+- Reference resolution shares one Template parameter's Binding Identity across the disjuncts of
+  an `or`; how (bind it before the arms, or let a later arm read the earlier arm's binding) is
+  part of the reference-resolution design (`docs/decisions/semantics.md` §2).
+- Tests in the reference-resolution crate: *True-Name Nemesis* checks, with `the(isChosenPlayer)`
+  bound once for both arms of `objectsOfPlayer`; an anaphor in one arm that has no antecedent in
+  any arm or before the `or` is still refused.
 
-Requirement on `discourse`: one Template parameter identity is shared across the disjuncts of an
-`.or`. Decide how (for example, bind the parameter in the common header before the arms, or let
-`laterMention` read a `firstMention` from a sibling disjunct), implement it in `discourse`, then
-respell `objectsOfPlayer` (in `.syl`) as above.
+## Pointers
 
-Tests (`discourse`): *True-Name Nemesis* checks clean with the bound spelling; a `laterMention`
-with no `firstMention` in any arm is still refused.
+- `plugins/builtin/templates/predicate/objectsOfPlayer.syl`, `plugins/canon/cards/True-Name Nemesis.syl`
+- `docs/decisions/syl.md` §4; `docs/decisions/semantics.md` §2.2 (boxes), §2.4
+- Glossary: **Binding Identity** (`docs/contexts/game-model/CONTEXT.md`)

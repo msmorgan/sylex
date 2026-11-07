@@ -1,30 +1,33 @@
 ---
 needs: [lean-v3-action-clause-spine, lean-generated-canon-modules, lean-retirement]
 ---
-**The deathtouch state-based action [CR#704.5h] is not on the creature row.** Found by
-`lean-rules-tables` (2026-09-07): [CR#704.5h] reads whether a source with deathtouch has dealt a
-creature damage *since the last time state-based actions were checked*. `ProjAxis.markedDamage`,
-`GameEvent.stateBasedActionsChecked` and the [CR#704.5g] row already exist (the row is on
-`plugins/builtin/definitions/card_type/creature.syl`, landed in
-`lean-v3-card-type-conferral-rows`). The [CR#704.5h] row is written, but as a standalone scoped
-`sba` rule, `plugins/builtin/rules/sba/deathtouchDestruction.syl` (scope `isCreature`), not on
-the creature row as decided below. What remains is moving it there.
+# Deathtouch's state-based action is a creature-type conferral
 
-Decided (2026-10-13, owner; `semantics.md` §§4.6, 4.8):
+## Why
 
-- `GameEvent.stateBasedActionsChecked` names the check [CR#704.3]. Under the
-  `semantics-v3` spine (`docs/decisions/semantics.md` §4.8), the [CR#704.5h]
-  row reads `did(by(a(withKeyword(deathtouch))), dealDamage(any, this),
-  .duration (.between .stateBasedActionsChecked .now))` (replacing the old
-  `LookbackClause` on `damage(...)`).
-- Both lethal rows are conferrals scoped to the creature card type, with "destroy" as the
-  instruction; regeneration replacing it is the engine's business, as for the
-  existing rows. Deathtouch's declaration stays empty (2026-09-07): its rule
-  lives in the table. [CR#702.2c] (combat damage assignment) is a named residue
-  for the engine.
+The creature card type confers its own state-based actions: the zero-toughness row [CR#704.5f]
+and the lethal-damage row [CR#704.5g] are `stateBased` conferrals in
+`plugins/builtin/definitions/card_type/creature.syl`; the lethal-damage row destroys with
+"destroy", which regeneration can replace. The deathtouch row [CR#702.2b,704.5h] is the same kind
+of rule about creatures but is written apart, as a standalone `sba` rule scoped by `isCreature`
+(`plugins/builtin/rules/sba/deathtouchDestruction.syl`). Deathtouch's own declaration has an
+empty body because its rule lives in that row; its combat-damage assignment rule [CR#702.2c] stays
+with the engine.
 
-Do: move `deathtouchDestruction` onto `plugins/builtin/definitions/card_type/creature.syl` as
-a `stateBased` conferral beside the [CR#704.5g] row, keeping its citations and comment
-([CR#702.2b,704.5h], [CR#702.2d]) in the declaration's header, and delete the standalone file.
-Its test (Lean's `okDeathtouchDestruction`, carried to Rust by `semantics-rust-rewrite`) reads the
-creature row instead, its claim unchanged. Standard constraints apply.
+## Done when
+
+- The deathtouch row is a `stateBased` conferral on `creature.syl` beside the [CR#704.5g] row,
+  with the same condition: toughness greater than 0, and dealt damage by a source with deathtouch
+  within the window from the last state-based action check to now (`within(durationBetween(
+  stateBasedActionsChecked, now))`).
+- Its citations and comment ([CR#702.2b,704.5h], and [CR#702.2d] for reading the source from any
+  zone) move into the creature declaration's header comment.
+- `plugins/builtin/rules/sba/deathtouchDestruction.syl` is deleted, and nothing names it.
+- `cargo xtask dsl fmt --check` (or its successor) and the `.syl` checks that exist then pass.
+
+## Pointers
+
+- `plugins/builtin/definitions/card_type/creature.syl`
+- `plugins/builtin/rules/sba/deathtouchDestruction.syl`
+- `plugins/builtin/definitions/keyword_ability/deathtouch.syl`
+- `docs/decisions/semantics.md` §4.8 (Lookback), §5 (state-based actions as Conferrals)

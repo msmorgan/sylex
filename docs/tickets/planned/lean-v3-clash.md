@@ -1,27 +1,41 @@
 ---
 needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
 ---
-# Clash
+# Clash: an opponent and a winner
 
-Standard constraints apply. Implemented when the first clash card is spelled in
-`plugins/canon/cards/`; 28 cards in `data/derived/cards.jsonl` say "clash with an opponent".
+## Why
 
-Today `clash` (`plugins/builtin/definitions/keyword_action/clash.syl`) is only [CR#701.30a]'s reveal and
-optional bottom: it has no opponent and no winner [CR#701.30b..701.30d]
-(`lean-v3-rules-and-card-fidelity` §2, superseded here).
+`clash` (`plugins/builtin/definitions/keyword_action/clash.syl`) is only [CR#701.30a]'s reveal
+and optional move to the bottom. It has no opponent and no winner [CR#701.30b..701.30d], so none
+of the 28 Vintage-legal cards that "clash with an opponent" can be spelled, nor "if you win" or a
+trigger on clashing (*Entangling Trap*, *Rebellion of the Flamekin*, *Sylvan Echoes*). No clash
+card is in `plugins/canon/cards/` yet.
 
-**Ruling (owner, 2026-10-25): option (b), the coin-flip precedent.**
+## Design
 
-- The clash action carries a win/lose outcome, as `flipCoins` carries its `FlipCall`
-  (`FlipCall`, AST in Rust `semantics`). "If you win" is read back as `did you (clash … (some .wins)) thisWay`, as
-  a coin flip's is read as `did you (flipCoins 1 (some .wins)) thisWay` (`plugins/canon/cards/Chance Encounter.syl`). No `wonClash` Condition is minted.
-- A player wins a clash if they revealed a card with a higher mana value than all other cards
-  revealed in it [CR#701.30d].
-- "Clash with an opponent" is one Definition, [CR#701.30b]'s composition: "Choose an opponent. You
-  and that opponent each clash," plus the win/lose outcome read back with `did … thisWay`
-  [CR#701.30d].
+- The win/lose outcome is a field of the `clash` action, read back for "if you win" with a
+  `did(you, clash(… wins …), thisWay)` lookback, as a `flipCoins` outcome is. No "won a clash"
+  Condition exists.
+- Each clashing player's clash is its own event carrying the `clash` Deed, so "whenever you
+  clash" triggers for each player who clashed.
+- "Clash with an opponent" is a Template over `clash`, not a Definition: an action the rules
+  define as another action is a Template (`docs/decisions/semantics.md` §3.1) [CR#701.30b].
 - The simultaneous reveal, the APNAP decisions and the simultaneous move [CR#701.30c] are the
-  engine's procedure (owner update 2026-10-25; `docs/decisions/semantics.md` §1 item 4:
-  timing and order are the engine's). The body does not encode them.
-- "Whenever you clash" triggers for each clashing player, so each player's clash is a clash
-  event carrying the `clash` deed.
+  engine's procedure (`docs/decisions/semantics.md` §1: timing and order belong to the engine).
+  The body does not encode them.
+
+## Done when
+
+- `clash` carries the outcome: a player wins if they revealed a card with a higher mana value
+  than all other cards revealed in that clash [CR#701.30d].
+- "Clash with an opponent" is a Template that chooses an opponent, then you and that opponent
+  each clash [CR#701.30b], with the outcome readable afterward.
+- At least one "clash with an opponent … if you win" card and one "whenever you clash" card are
+  spelled in `plugins/canon/cards/`.
+
+## Pointers
+
+- `plugins/builtin/definitions/keyword_action/clash.syl`
+- `plugins/builtin/templates/action/flipCoins.syl`, `plugins/builtin/primitives/action/actionFlipCoins.syl`,
+  `plugins/canon/cards/Chance Encounter.syl` (the coin-flip precedent)
+- `docs/decisions/semantics.md` §3.1 (keyword actions and Deeds), §4.8 (lookback)

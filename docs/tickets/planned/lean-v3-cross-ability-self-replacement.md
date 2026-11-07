@@ -3,65 +3,44 @@ needs: [lean-v3-spell-abilities-share-targets, plugins-v3-builtin-primitives-and
 ---
 # A later spell ability's "instead" replaces an earlier spell ability's effect
 
-Standard constraints apply.
+## Why
 
-## Problem
+A self-replacement can be printed as its own paragraph, usually after an ability word [CR#614.15],
+and each paragraph is its own ability [CR#113.2c]. `.syl` cannot write that form: `replace(replaced,
+replacement)` (`plugins/builtin/primitives/action/replace.syl`) is one `Action` holding both
+halves, and a `Replacement` (`instead`, `doIf`) is not an `Action`, so a later spell ability cannot
+name the earlier paragraph's effect as the event it replaces. *Fatal Push*: "Destroy target creature
+if it has mana value 2 or less. / Revolt — Destroy that creature if it has mana value 4 or less
+instead if a permanent left the battlefield under your control this turn."
 
-A self-replacement effect replaces part or all of its own spell's effect [CR#614.15]. "The text
-creating a self-replacement effect is usually part of the ability whose effect is being replaced,
-but the text can be a separate ability, particularly when preceded by an ability word"
-[CR#614.15]. The word "instead" marks it as a replacement effect [CR#614.1a].
+## Design
 
-The checker cannot spell that separate-ability form. `Action.replace replaced replacement`
-(the AST, `lean/Semantics/Abilities.lean` today, Rust `semantics` after the port; "the spell's or
-ability's own `replaced` action") holds the
-replaced action inside itself. So the replaced action and the replacement have to be one
-`Action`, inside one spell ability. Each paragraph is its own ability [CR#113.2c], and a
-`Replacement` (`instead`, `Replacement.doIf`) is not an `Action`, so a later spell ability has no
-way to name the earlier paragraph's effect as the event it replaces. Folding both paragraphs into
-one `Action.replace` would erase the ability boundary and the ability word. Writing the later
-paragraph as a second action without "instead" would change what the card does.
+- `spellReplacement(replacement: Replacement): Ability`, a primitive beside `spell`, replaces the
+  effect of the immediately preceding spell ability of the same spell [CR#113.2c,614.15]. It is
+  not folded into that ability as one `replace(replaced, replacement)`.
+- The replacement reads the referents the replaced spell ability introduced, its targets included
+  ("that creature", "that spell").
+- A `spellReplacement` with no immediately preceding spell ability (the card's first ability, or
+  one preceded only by a non-spell ability) is refused.
 
-`lean-v3-spell-abilities-share-targets` already lets the later paragraph read the earlier one's
-targets ("that creature", "that spell"). What is missing is the replacement itself.
+## Done when
 
-## Witnesses
+- The `spellReplacement` primitive exists. Its doc comment cites [CR#113.2c,614.15], states the
+  three Design rules, and says in one line why self-replacement has two forms: the paragraph is a
+  separate ability, and folding it into one `replace` would erase that ability boundary and its
+  ability word.
+- The five witnesses are in `plugins/canon/cards/`, each later paragraph written as a
+  `spellReplacement` under its ability word. *Bring the Ending* needs a `corrupted` ability word,
+  which `plugins/builtin/templates/ability_word/` lacks.
 
-- *Fatal Push*: "Destroy target creature if it has mana value 2 or less. / Revolt — Destroy that
-  creature if it has mana value 4 or less instead if a permanent left the battlefield under your
-  control this turn."
-- *Stubborn Denial*: "Counter target noncreature spell unless its controller pays {1}. /
-  Ferocious — If you control a creature with power 4 or greater, counter that spell instead."
-- *Hunger of the Howlpack*: "Put a +1/+1 counter on target creature. / Morbid — Put three +1/+1
-  counters on that creature instead if a creature died this turn."
-- *Kamahl's Sledge*: "Kamahl's Sledge deals 4 damage to target creature. / Threshold — If there are
-  seven or more cards in your graveyard, instead Kamahl's Sledge deals 4 damage to that creature and
-  4 damage to that creature's controller."
-- *Bring the Ending*: "Counter target spell unless its controller pays {2}. / Corrupted — Counter
-  that spell instead if its controller has three or more poison counters."
+## Not in scope
 
-## Ruling (owner, 2026-10-24)
+The checker that steps `spellReplacement` and refuses one with no preceding spell ability: it is
+built with the greenfield discourse checker, which takes the Design's rules as requirements.
 
-Approved. Per [CR#113.2c,614.15], a self-replacement printed as its own paragraph (typically
-after an ability word) is a separate spell ability whose body is a `Replacement`.
+## Pointers
 
-## Change
-
-- Add `Ability.spellReplacement (replacement : Replacement)` with primitive `spellReplacement`
-  (beside `spell`, `plugins/builtin/primitives/ability/spell.syl`). It replaces the effect of the immediately preceding
-  spell ability of the same spell.
-- `discourse` steps it as it steps the `.replace` action arm (Lean's `stepReplacementWith`
-  path, `lean/Semantics/Check/Phrase.lean`): from the state the replaced spell ability read, per
-  `lean-v3-self-replacement-remainder`, plus the targets that earlier spell abilities of the same
-  spell published.
-- It refuses a `spellReplacement` that has no preceding spell ability to replace. "Preceding" is
-  immediate, so a witness's later paragraph replaces exactly the paragraph before it.
-
-## Tests
-
-- Each witness spelled in full, with the later paragraph's "instead" as a self-replacement of the
-  earlier paragraph's effect.
-- A refusal test: a `spellReplacement` with no preceding spell ability to replace (first ability of
-  the card, or preceded only by a non-spell ability).
-- A test that the replacement reads the earlier paragraph's published targets ("that creature",
-  "that spell").
+- `plugins/builtin/primitives/ability/spell.syl`, `plugins/builtin/primitives/action/replace.syl`,
+  `plugins/builtin/primitives/static/instead.syl`
+- `plugins/builtin/templates/ability_word/` (`revolt`, `ferocious`, `morbid`, `threshold`)
+- `docs/decisions/semantics.md` §2 (reference across a spell's abilities)

@@ -1,80 +1,65 @@
 ---
 needs: []
 ---
-**Engine: the cleanup step follows [CR#514.1,514.2,514.3a], combat with no attackers
-skips the declare blockers and combat damage steps, and the deathtouch SBA only
-counts damage dealt since the last check.** Three timing departures in
-`crates/engine/src/step/mod.rs` and the SBA data; all reachable.
+# Cleanup order, the no-attackers skip and the deathtouch window
 
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #17,
-#39, #18.
+## Why
 
-## 1. Cleanup order, priority and repeat (#17)
+Three turn-timing departures in the engine, all reachable with current cards.
 
-- `step/mod.rs:1523-1530`: Cleanup runs `self.clear_marked_damage();
-  self.expire_end_of_turn(); vec![WorkItem::CheckHandSize]`, so damage and "this
-  turn" effects end before the discard.
-- `step/mod.rs:1546-1561` `step_tail`: Cleanup is `[CheckSbas, PlaceTriggers] +
-  end_of_step_items()`, with no `OpenPriority` and no repeated cleanup; the comment
-  and the doc at `:1547-1548` say the sweep "can never act in the skeleton". Stale:
-  canon Falkenrath Gorger grants madness, so a cleanup discard places a madness
-  trigger and the turn moves on with no priority (it resolves in the next upkeep).
+**Cleanup.** The active player first discards to hand size [CR#514.1]; second, marked damage is
+removed and "until end of turn" and "this turn" effects end, simultaneously [CR#514.2]. If any
+state-based action is then performed or any trigger is waiting, they are performed and put on
+the stack, the active player gets priority, and another cleanup step follows [CR#514.3a]. The
+engine's Cleanup (`turn_based_actions` in `step/mod.rs`) clears damage and expires effects before
+`CheckHandSize`, and `step_tail` gives Cleanup `CheckSbas` and `PlaceTriggers` with no
+`OpenPriority` and no repeat; its comment says the sweep "can never act in the skeleton". It can:
+Falkenrath Gorger grants madness, so a cleanup discard puts a madness trigger on the stack and the
+turn moves on with no priority.
 
-[CR#514.1]: first the active player discards to maximum hand size. [CR#514.2]:
-"Second, the following actions happen simultaneously: all damage marked … is
-removed and all 'until end of turn' and 'this turn' effects end." [CR#514.3a]: if
-any state-based action was performed or trigger is waiting, they are performed and
-put on the stack, "then the active player gets priority", and another cleanup step
-begins.
+**No attackers.** If no creatures are declared as attackers or put onto the battlefield
+attacking, the declare blockers and combat damage steps are skipped [CR#508.8]. `begin_step`
+skips only the first-strike damage step; with no attackers, declare blockers and combat damage
+still emit `StepBegan` and open priority, and only their turn-based actions are suppressed (keyed
+on `combat.attackers().is_empty()`, which removal from combat also empties). The comment in
+`legal.rs` that the declare blockers step "is reached only when an attacker exists" is false.
 
-**Change:** run `CheckHandSize` first, then clear damage and expire effects as one
-simultaneous step. After `CheckSbas` and `PlaceTriggers`, if any SBA was performed
-or any trigger placed, schedule `OpenPriority` then another `BeginStep(Cleanup)`.
-Delete the stale comments.
+**Deathtouch.** A creature is destroyed if it has been dealt damage by a source with deathtouch
+"since the last time state-based actions were checked" [CR#704.5h]. `DamageMark` (`object.rs`)
+has no check epoch, and the lethal-damage SBA data reads `DealtDamageBy(This, Has(Deathtouch))`
+over every mark, so a creature that survives one check (for example while indestructible) is
+destroyed at a later check that turn. Damage stays marked even on a permanent that stops being a
+creature [CR#120.6], so the same happens to one that becomes a creature again.
 
-## 2. No attackers: skip declare blockers and combat damage (#39)
+## Done when
 
-`begin_step` (`step/mod.rs:1362-1394`) elides only `FirstCombatDamage`
-(`:1369-1376`); `DeclareBlockers` and `CombatDamage` still emit `StepBegan` and open
-priority (`step_tail`, `:1565-1569`). `:1495-1515` says "with no creatures
-attacking, the Declare Blockers step is skipped" and then skips only the TBA
-(`PhaseStep::Combat(CombatStep::DeclareBlockers) => vec![]`), keyed on
-`self.combat.attackers().is_empty()`. `legal.rs:532-533` ("the Declare Blockers
-step is reached only when an attacker exists") is false. [CR#508.8]: "If no
-creatures are declared as attackers or put onto the battlefield attacking, skip
-the declare blockers and combat damage steps."
+- Cleanup discards first, then removes damage and ends the effects together; after the SBA check
+  and trigger placement, if any SBA was performed or any trigger placed, the active player gets
+  priority and another cleanup step begins. The stale comments are gone.
+- A combat in which no creature was declared as an attacker or put onto the battlefield attacking
+  goes from declare attackers to end of combat, with no `StepBegan` or priority for the skipped
+  steps. The decision rests on a per-combat record of whether any creature was declared or put
+  onto the battlefield attacking, not on the current attackers. The `legal.rs` comment is
+  corrected.
+- The deathtouch clause matches only damage dealt since the last state-based action check, while
+  the [CR#704.5g] clause still counts all marked damage. The comment in `check_sbas` that the mark's
+  lifetime is the window is corrected.
+- Tests, with real cards:
+  - a madness card discarded in cleanup with Falkenrath Gorger: its trigger goes on the stack, the
+    active player gets priority, and a second cleanup step follows;
+  - a "this turn" graveyard-to-exile replacement still applies to a cleanup discard;
+  - a turn with no attackers has no declare blockers or combat damage `StepBegan`
+    (`declare_blockers_skipped_when_no_attackers` in `tests/combat.rs` asserts this, not only the
+    missing decision);
+  - a creature dealt damage by Typhoid Rats while indestructible, which loses indestructible later
+    that turn with toughness above its marked damage, survives. (Darksteel Myr under Humility
+    does not test this: as a 1/1 with 1 damage marked it dies to [CR#704.5g] anyway.)
 
-**Change:** set a per-combat flag when any creature is declared as an attacker or
-put onto the battlefield attacking (not `combat.attackers()`, which removal from
-combat empties). When it is false, go from declare attackers straight to end of
-combat. Fix the `legal.rs` comment. Extend `declare_blockers_skipped_when_no_attackers`
-(`tests/combat.rs:2278-2304`), which only checks for no DeclareBlockers decision, to
-assert no `StepBegan` and no priority for the skipped steps.
+## Pointers
 
-## 3. Deathtouch counts only since the last SBA check (#18)
-
-`check_sbas` (`step/mod.rs:1644-1650`): "deathtouch provenance now rides the damage
-mark itself … no separate per-check window to close. The mark persists exactly as
-long as the damage does". `DamageMark` (`object.rs:253-271`) has no check epoch;
-`v1/plugins/builtin/rules/sba/lethal-damage.ron` reads `DealtDamageBy(This,
-Has(Deathtouch))` over every mark. [CR#704.5h]: a creature "dealt damage by a
-source with deathtouch since the last time state-based actions were checked … is
-destroyed." Reachable with canon cards: Darksteel Myr is dealt damage by Typhoid
-Rats, survives the check (indestructible), then Humility resolves that turn; the
-engine destroys the Myr at the next check, the CR does not. Same for a creature
-that stops being a creature and becomes one again ([CR#120.6] keeps the damage
-marked). `done/engine-deathtouch-sba-window.md` specified the per-check window; the
-landing replaced it with the mark's lifetime.
-
-**Change:** stamp each `DamageMark` with an SBA-check epoch (or a `checked` flag
-`check_sbas` sets after each sweep); the deathtouch clause matches only marks dealt
-since the last check, while [CR#704.5g] still counts all marked damage. Correct the
-comment.
-
-## Tests
-
-- A madness card discarded in cleanup: its trigger goes on the stack, the active
-  player gets priority, and a second cleanup step follows.
-- A "this turn" graveyard-to-exile replacement still applies to a cleanup discard.
-- A turn with no attackers has no declare blockers or combat damage `StepBegan`.
-- Darksteel Myr + Typhoid Rats + Humility later that turn: the Myr survives.
+- `crates/engine/src/step/mod.rs`: `begin_step`, `turn_based_actions`, `step_tail`,
+  `check_sbas`
+- `crates/engine/src/object.rs` (`DamageMark`), `crates/engine/src/sba.rs`,
+  `crates/engine/src/legal.rs`
+- `v1/plugins/builtin/rules/sba/lethal-damage.ron` (the SBA data the engine loads)
+- `crates/engine/tests/combat.rs`

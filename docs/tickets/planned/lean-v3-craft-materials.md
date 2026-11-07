@@ -3,31 +3,40 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 ---
 # Craft's body and its materials parameter
 
-Standard constraints apply.
+## Why
 
-"Craft with [materials] [cost]" means "[Cost], Exile this permanent, Exile [materials] from
-among permanents you control and/or cards in your graveyard: Return this card to the battlefield
-transformed under its owner's control. Activate only as a sorcery." [CR#702.167a]. `craft`
-(`plugins/builtin/definitions/keyword_ability/craft.syl`) takes only the cost and is bodiless.
+"Craft with [materials] [cost]" means "[Cost], Exile this permanent, Exile [materials] from among
+permanents you control and/or cards in your graveyard: Return this card to the battlefield
+transformed under its owner's control. Activate only as a sorcery." [CR#702.167a].
+`craft.syl` takes only the cost, carries a `TODO(spelling)` saying the materials are folded into
+it, and has `body = []`.
 
-Decided (from ADR `semantics.md` §1 items 4 and 5): write the body as it composes. Add a
-materials parameter that holds a counted or coordinated noun phrase, and keep the [CR#702.167b]
-exception in the body: a material described only by a card type or subtype, without "card",
-is a permanent of that type on the battlefield or a card of it in a graveyard.
+The printed materials take every noun-phrase shape: counted ("six artifacts", "one or more
+creatures"), coordinated ("a Dinosaur, a Merfolk, a Pirate, and a Vampire", `oneEachOf`), or an
+agreement ("two that share a card type", `agree`). The body must restrict whatever the card wrote
+to "from among permanents you control and/or cards in your graveyard", and nothing today restricts
+a `NounPhrase` parameter from outside. A `Location` cannot say it either: `andOr([battlefield,
+yourGraveyard])` admits an opponent's permanents. Two shapes are open:
 
-Why it was not done in `lean-v3-keyword-bodies-and-catalog-sync`: the printed materials take
-every noun-phrase shape. They can be counted ("six artifacts", "one or more creatures"),
-coordinated ("a Dinosaur, a Merfolk, a Pirate, and a Vampire", `oneEachOf`) or an agreement
-("two that share a card type", `agree`), and the body has to restrict whatever the caller wrote
-to its domain, "from among permanents you control and/or cards in your graveyard". Neither a
-`NounPhrase` nor a `KeywordParam` can be restricted from outside. A `Location` cannot say
-"permanents you control": `andOr [battlefield, yourGraveyard]` would admit an opponent's
-permanents. Options:
+1. The materials parameter is a noun phrase over a pool placeholder that the body fills with the
+   domain.
+2. A Template the card calls builds the whole materials phrase with the domain as its
+   `someOf`/`oneEachOf`/`agree` group, and the Definition receives that phrase.
 
-1. A `KeywordParam` holding the materials as a noun phrase over a pool the body supplies (a
-   pool placeholder the Definition fills with the domain).
-2. A materials phrase whose `NounPhrase.someOf`/`oneEachOf`/`agree` group is the domain,
-   written by a Template the card calls, with the Definition receiving the whole phrase.
+## Done when
 
-Vintage-legal craft cards: 24 in the MTGJSON snapshot. Their phrasings (`data/derived/cards.jsonl`)
-are the test set.
+- `craft` takes a materials parameter separate from its cost, and its body writes the
+  [CR#702.167a] ability in full.
+- The body keeps the [CR#702.167b] exception: a material described only by a card type or subtype,
+  without "card", is a permanent of that type on the battlefield or a card of it in a graveyard.
+- The exiled materials stay readable by the crafted permanent's abilities [CR#702.167c].
+- Canon holds craft cards covering a counted, a coordinated and an agreement materials phrase,
+  chosen from the 24 Vintage-legal craft cards (*Braided Net // Braided Quipu*, *Clay-Fired Bricks
+  // Cosmium Kiln*, …).
+
+## Pointers
+
+- `plugins/builtin/definitions/keyword_ability/craft.syl`
+- `plugins/builtin/primitives/determiner/oneEachOf.syl`, `plugins/builtin/primitives/noun/agree.syl`,
+  `plugins/builtin/templates/determiner/someOf.syl`, `plugins/builtin/templates/zone/andOr.syl`
+- `data/derived/cards.jsonl` (the craft cards' printed phrasings)

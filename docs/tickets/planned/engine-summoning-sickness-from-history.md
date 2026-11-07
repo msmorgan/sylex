@@ -1,51 +1,55 @@
 ---
 needs: [engine-combatant-role, engine-history-tallies-cache, engine-derived-controller-reads]
 ---
-Drop the tracked `GameObject.summoning_sick` bool and derive summoning sickness
-purely from history, once the history-tally cache makes that cheap. After
-`engine-combatant-role`, the bool has exactly one data consumer — the
-Combatant role's conditional `Cant` conferral, which reads it via
-`StatePredicate::SummoningSick` (plus a TUI display read). That predicate is the
-seam this ticket replaces: swap its evaluation from a field read to a history
-query, then delete the field and its four maintenance sites (`step.rs` set on
-ETB / mint / control-change, clear at controller-turn-start).
+# Derive summoning sickness from history
 
-**The equivalent history query.** A Combatant is sick iff it "entered its
-controller's battlefield this turn" — i.e. the most recent event that put it
-under its *current* controller happened during that controller's current turn.
-Both events are already recorded facts: ETB is `ZoneChange(→Battlefield)`,
-control-gain is `ControlChanged{of, to}`. So the derived form is roughly
-`Happened(Or([ZoneChange(what: Ref(This), to: Battlefield),
-ControlChanged(of: Ref(This), to: <controller>)]), within: <controller-turn>)`.
+## Why
 
-**Two blockers, both real:**
+`GameObject.summoning_sick` is per-object mutable state that the engine keeps in step by hand: it
+is set on battlefield arrival, token mint and control change, and cleared at the controller's turn
+start (`step/mod.rs`, `step/player.rs`), and the payment simulation in `payment/fulfill.rs`
+writes it too. Its one rules consumer is `StatePredicate::SummoningSick` (`target.rs`), which the
+creature type's conditional `Cant` conferral reads through `Matches(This, SummoningSick)`; the TUI
+reads it for display. Both facts it summarizes are already recorded history: battlefield entry is a
+`ZoneChange` to the battlefield and a one-shot control change is `ControlChanged { of, to }`.
+Evaluating `SummoningSick` as a history query removes the field and every write site.
 
-1. **The window must be controller-relative, not `ThisTurn`.** `Lookback::ThisTurn`
-   is the *active* player's turn; sickness clears at the *controller's* turn start
-   (`step.rs` clears only when `controller == active`). They diverge for a creature
-   controlled by the non-active player (flash/Threaten on an opponent's turn): it
-   stays sick until its controller's next turn begins, but `ThisTurn` would report
-   it non-sick on the intervening turn. Needs a "since the controller's most recent
-   turn began" window — the `SinceYour(PhaseStep)` family is controller-relative but
-   is built for trigger watchers and has no clean "turn began" step marker; verify /
-   extend it to bind correctly in a per-object layer-gather `Matches(This, …)`
-   context.
+[CR#302.6] makes the window controller-relative: a creature is sick unless it "has been under its
+controller's control continuously since their most recent turn began". `Lookback::ThisTurn` is
+the active player's turn, so it gives the wrong answer for a creature the non-active player gained
+or put onto the battlefield (flash, Threaten on an opponent's turn) when another turn that is not
+its controller's comes next (an extra turn, or a third player's turn).
+`Lookback::SinceYour(PhaseStep)` is controller-relative but anchors on a step, not on the turn's
+start, and is built for trigger watchers, not for a per-object `Matches(This, …)` read during the
+layer gather.
 
-2. **Perf — hence the `engine-history-tallies-cache` dependency.** The conferral
-   condition is evaluated per creature per layer pass (fixpoint, ≤16 passes). Two
-   history scans per creature per pass in that hot path is unacceptable without the
-   O(1) history-tally cache. Do not claim this before that cache lands (and, per the
-   project rule, before the engine is functionally complete — optimizations last).
+A layer-2 control change ([CR#613.1b]) also starts the window. It writes no `ControlChanged`
+event, so the query needs a fact for the derived Controller changing, which
+`engine-derived-controller-reads` introduces when it corrects the bool.
 
-**Layer-2 control (added 2026-10-21).** The bool this ticket replaces is wrong
-for continuous control changes: only the one-shot `ControlChanged` sets it, so a
-creature stolen by a layer-2 `SetController` effect is never sick for its new
-Controller ([CR#302.6,613.1b]). `engine-derived-controller-reads` fixes the bool
-first; the history query here must then be equivalent to the corrected rule,
-which means the derived-Controller change is its own event or marker, not
-`ControlChanged` alone.
+The conferral condition is evaluated per creature per layer pass, so the history read must be
+cheap: this waits for `engine-history-tallies-cache`.
 
-Net effect: one fewer piece of per-object mutable state, sickness expressed as
-data over existing history primitives — the minimal-primitives end state. Purely
-a simplification; no behavior change (the derived query must be exactly
-equivalent to the bool it replaces, including the control-change window).
+## Done when
+
+- `GameObject.summoning_sick` and all its write sites are gone; `StatePredicate::SummoningSick`
+  is evaluated from history, as "no event since the controller's most recent turn began put this
+  object under its current controller": battlefield entry, a one-shot control change, or a
+  derived (layer-2) Controller change.
+- The window binds to the object's current controller, not the active player, in the layer-gather
+  `Matches(This, …)` context.
+- No behavior change: the existing summoning-sickness, haste and control-change tests pass
+  unchanged, plus new ones for a creature that entered or changed control on another player's
+  turn (still sick on a later turn that is not its controller's, such as an extra turn, and not
+  sick once its controller's turn begins) and for a layer-2 steal (Avarice Totem).
+- The TUI's sickness display reads the derived predicate.
+
+## Pointers
+
+- `crates/engine/src/object.rs` (`summoning_sick`), `crates/engine/src/target.rs`
+  (`StatePredicate::SummoningSick` arm), `crates/engine/src/trigger.rs` (snapshot arm).
+- `rg summoning_sick crates/engine/src crates/tui/src` for the write sites.
+- `crates/core/src/temporal.rs` (`Lookback`), `crates/core/src/condition.rs` (`Happened`),
+  `crates/core/src/event.rs` (`ControlChanged`).
+- `crates/engine/src/legal.rs` (the creature type's `Conditionally(SummoningSick & !Haste, …)`
+  rows).

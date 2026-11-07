@@ -1,32 +1,32 @@
 ---
 needs: []
 ---
+# Tracked code never cites a gitignored path
 
-**Tracked code cites gitignored `docs/superpowers/…` paths — 1 site
-remaining.** (The runtime-printed site and the `sylex_spelling` test sites
-went with `retire-v1-english-and-spelling`.) Flagged by macro-frames round 2's Task 3
-review; all predate that round and sat outside its declared scope
-(recorded in the round-2 ledger, "Corrected line numbers" note).
+## Why
 
-- `v1/crates/macro_ron/src/frames.rs:47`
+A comment or message in tracked code that cites a gitignored path (`docs/superpowers/`,
+`docs/memory/`, `docs/evidence/`, `docs/cleanup/`, `.superpowers/`) dangles in a fresh checkout.
+One such citation remains in code that is not being deleted:
+`v1/crates/macro_ron/src/frames.rs` cites a `docs/superpowers/research/…` file for corpus
+counts the comment already states. Nothing stops a new one from landing.
 
-Line numbers are as of round-2 exit — re-grep at claim time:
-`rg 'docs/superpowers|docs/memory' crates plugins`.
+## Done when
 
-## Fix
+- The `frames.rs` comment keeps its fact and drops the dangling path.
+- A standing check (an `xtask` lint run in CI) fails when a tracked file under `crates/`,
+  `plugins/`, `v1/` or `scripts/` cites a gitignored path. Code that names such a path as data
+  (the scanner's exclusion list in `crates/xtask/src/coverage.rs`, `scripts/provision-workspace`
+  sharing the ignored directories) is not a citation, and the check tells the two apart without a
+  per-site allowlist.
+- The check passes on the tree.
 
-Per the comments-state-what-code-cannot genre: inline the fact the
-comment actually needs, or re-point at a tracked doc
-(`docs/decisions/…`).
+## Not in scope
 
-## Guard
+- `lean/`, which cites `docs/evidence/` and is being deleted (`lean-retirement`).
+- Tickets and other docs citing shared local docs.
 
-Add the grep as a cheap standing check (CI or an xtask lint) so new
-sites can't land silently.
+## Pointers
 
-## Scope note
-
-Tickets under `docs/tickets/` citing shared-local docs are established
-practice (provisioning symlinks `docs/superpowers/` into every
-workspace) and are NOT in scope. The rule bites where a fresh checkout
-or runtime output dangles: `crates/` and `plugins/`.
+- `rg -n 'docs/(superpowers|memory|evidence|cleanup)|\.superpowers' crates plugins v1 scripts`
+- `.gitignore`, `.github/workflows/ci.yml`, `crates/xtask/src/lib.rs`

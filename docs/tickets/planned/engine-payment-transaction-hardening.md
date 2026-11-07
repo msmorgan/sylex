@@ -1,91 +1,109 @@
 ---
 needs: [engine-payment-obligation-window]
-design: true
 ---
-Harden the first full-clone payment transaction implementation after the next
-engine-shape pass. The initial protocol deliberately keeps the naïve replay
-model, but its post-implementation review found several reachable boundaries
-that should be fixed together because they share payment-frame reconstruction,
-mana-ability classification, activation legality and enumeration, triggered-mana
-routing, and runner-advisory machinery.
+# Harden the payment transaction's reachable boundaries
 
-Keep `DeclinePayment` as an unconditional exit. Reconstruction must compute the
-dependency closure of forced-retained records, or use a conservative whole-frame
-fallback, so decline cannot return `DecisionError` or leave an unpayable
-announcement open. Pin the concrete remint case: fulfillment A moves a card
-from the battlefield to the graveyard, fulfillment B later moves that reminted
-card from the graveyard to a library and is therefore retained under
-[CR#733.1]; declining while omitting A must still reconstruct a legal state and
-emit the policy-neutral incident.
+## Why
 
-Complete the lowering-time [CR#605.1a] classifier. An activated ability is not
-a mana ability when either its cost or effect moves a card to or from a library.
-Inspect nested `Move`, `MoveGroup`, draw, binder, selection, and cast shapes
-rather than treating them as neutral. Add positive and negative fixtures for
-library movement in both the cost and effect while preserving modal
-`ByAnnouncedMode` behavior.
+The clone-based payment transaction has reachable gaps that share frame reconstruction,
+mana-ability classification, activation legality and runner machinery:
 
-Make mana-ability exemptions explicit in activation prohibitions rather than
-having `can_activate_mana` ignore every blanket `Cant(Activate)` row. A blanket
-prohibition blocks every matching activation by default [CR#101.2,602.5]; only
-an effect or rule with an actual mana exception bypasses it, such as split
-second [CR#702.61b] or Damping Matrix's "unless they're mana abilities."
-Replace the current Linvala-shaped regression with separate Linvala, Damping
-Matrix, and split-second cases proving the first blocks matching mana abilities
-while the latter two permit them.
-(2026-10-21, `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #7:
-the bypass is `blanket_applies` in `legal.rs` `cant_activate` (:757-780), passed
-`false` by `activate.rs` `can_activate_mana` (:247-292), `cast.rs:1075-1077` and
-`payment/mana.rs:127, :226`; `DeonticAction::Activate` needs an ability-kind
-scope (not mana / not mana or loyalty) to express Damping Matrix and Pithing
-Needle. The test to rewrite is
-`cant_activate_battlefield_blanket_grant_blocks_nonmana_allows_mana`
-(`legal.rs:3272`); the split-second one at `:3228` is right. The [CR#702.61b]
-cites on the Linvala and generic-blanket docs are wrong outside split second:
-[CR#605.3] gives mana abilities no exemption from prohibitions.)
+- Declining can fail: forced-retained records are collected (`collect_forced_retained_record_ids`
+  in `crates/engine/src/payment.rs`) without the records they depend on.
+- `Ability::mana_profile` (`crates/core/src/ability.rs`) skips [CR#605.1a]'s library clause, so an
+  activated ability that moves a card to or from a library counts as a mana ability.
+- `can_activate_mana` (`crates/engine/src/activate.rs`) passes `blanket_applies: false` to
+  `legal::cant_activate`, so every blanket `Cant(Activate)` row skips mana abilities. Linvala,
+  Keeper of Silence wrongly lets an opponent's creatures tap for mana. The auto-tap source scan in
+  `autotap_for_cast` (`crates/engine/src/cast.rs`) hard-codes the same exemption. The doc
+  comments on `cant_activate_rows` and `cant_activate`, and the comment at the auto-tap scan, cite
+  [CR#702.61b] for a general blanket exemption, but that rule covers split second only.
+- `legal_actions` (`crates/engine/src/legal.rs`) and the payment prompt's mana-ability list
+  (`crates/engine/src/payment/mana.rs`) scan only the battlefield, so Elvish Spirit Guide's hand
+  ability is never offered.
+- A created delayed or reflexive trigger always fires through `TriggerFired`, never as a triggered
+  mana ability (`scan_delayed` in `trigger.rs`, `scan_created_reflexive` in `resolve/effect.rs`).
+- `automatic_activation_cost_usable` (`payment.rs`) checks `spendable_pool(controller, source)`:
+  the source permanent rather than the announced ability is the spend subject.
+- `begin_optional_payment` panics (`expect`) on a cost that is not yet concrete.
+- The mana-reversal candidate loop enumerates `2^n` masks, and `checked_shl(..).unwrap_or(0)`
+  silently yields no candidates at 64 actions.
+- `rescindable` lists fulfillments while progress is not `Idle`, where
+  `rescind_payment_fulfillment` rejects them.
 
-Enumerate activated abilities from every zone in which they function instead
-of treating the battlefield as the sole source. Honor `ActivatedAbility::from`
-in both priority actions and mana-payment prompts, including an Elvish Spirit
-Guide-shaped hand ability [CR#113.6j,113.6m,605.3a], and keep the two paths on
-one shared source-and-ability discovery rule.
+## Design
 
-Classify created delayed and reflexive triggered abilities as mana abilities
-when they meet the triggered criteria [CR#603.7,603.12,605.1b]. Carry that
-classification through their by-value representation and route qualifying
-created triggers through immediate `ResolveTriggeredMana` handling instead of
-`TriggerFired`/`pending_triggers`, preserving causal order without putting them
-on the stack [CR#605.4a]. Add delayed and reflexive regressions proving that
-qualifying created triggers stay stackless and causally ordered, including when
-they fire inside a nested payment window.
+- Decline reconstruction keeps the dependency closure of every forced-retained record, and
+  retains the whole frame when it cannot compute that closure.
+- `DeonticAction::Activate` gains an ability-kind scope (not mana; not mana or loyalty). Only a
+  scoped row and split second exempt mana abilities from a blanket `Cant(Activate)`.
+- An unresolved optional-payment shape (Hybrid, Phyrexian, `ManaCostOf` and any other) exposes
+  its choice before the frame starts or fails plugin/runtime validation; it never panics.
+- Runner affordability advice treats a source as unusable when it cannot prove a rider match.
 
-Make runner affordability advice use the same spend subject and rider check as
-exact `ManaCoverage` validation, or fail conservatively when it cannot prove a
-match. Add a restricted-mana fixture whose rider matches the source permanent
-but not the announced ability, plus the inverse, and prove the automated runner
-cannot loop between activating a source and declining the same payment.
+## Done when
 
-Replace the `begin_optional_payment` concretization assertion with a checked
-path. Hybrid, Phyrexian, `ManaCostOf`, and any future unresolved effect-payment
-shape must either expose their required choice before the frame starts or fail
-plugin/runtime validation without panicking. Preserve the rule that
-affordability is not an announcement-time legality gate.
+- `DeclinePayment` is an unconditional exit: it never returns `DecisionError` and never leaves an
+  unpayable announcement open. A record retained under [CR#733.1] keeps the records it depends
+  on.
+- `Ability::mana_profile` applies every [CR#605.1a] criterion, including "its cost and effect
+  don't move any card to or from a library", inspecting nested `Move`, `MoveGroup`, draw,
+  selection and cast shapes in both cost and effect. Modal `ByAnnouncedMode` classification is
+  preserved.
+- A created delayed or reflexive triggered ability [CR#603.7,603.12] that meets the [CR#605.1b]
+  criteria is a triggered mana ability: its by-value representation carries that, and it
+  resolves through the immediate `ResolveTriggeredMana` path, never through
+  `TriggerFired`/`pending_triggers` and never on the stack [CR#605.4a], keeping causal order.
+- A blanket `Cant(Activate)` row blocks every matching activation, mana abilities included
+  [CR#101.2,602.5]; mana abilities have no general exemption [CR#605.3]. Only split second
+  [CR#702.61b] and a row scoped "unless they're mana abilities" (Damping Matrix, Pithing Needle)
+  bypass it, at both `can_activate_mana` and the auto-tap scan.
+- Priority actions and mana-payment prompts find sources and abilities through one shared rule
+  that enumerates every zone an activated ability functions from, honoring
+  `ActivatedAbility::from` [CR#113.6j,113.6m]; a hand mana ability is activatable with priority
+  and inside a payment window [CR#605.3a].
+- Runner advice uses the same spend subject and rider check as exact `ManaCoverage` validation
+  [CR#106.6]. Advice never changes legality.
+- Affordability stays out of announcement-time legality.
+- Mana-reversal selection does not enumerate every subset; it preserves dependency ordering,
+  [CR#733.1] barriers, independent `ManaActionId` selection and the runner's maximal-reversal
+  policy, with no fixed-width limit on the number of candidate actions.
+- The prompt lists a fulfillment as rescindable only while payment progress is `Idle`.
+- Each item above has a focused regression, including:
+  - declining after fulfillment A moves a card from battlefield to graveyard and B moves that
+    reminted card from graveyard to a library (retained under [CR#733.1]) reconstructs a legal
+    state and emits the incident;
+  - library movement in the cost and in the effect each disqualify a mana ability, with a
+    non-library control and modal `ByAnnouncedMode` unchanged;
+  - separate Linvala, Keeper of Silence, Damping Matrix and Sudden Shock (split second) cases:
+    Linvala blocks matching mana abilities, the other two permit them;
+  - Elvish Spirit Guide is activatable from hand with priority and inside a payment window;
+  - qualifying delayed and reflexive triggers stay stackless and causally ordered, including
+    inside a nested payment window;
+  - a restricted-mana fixture whose rider matches the source permanent but not the announced
+    ability, and its inverse, and the runner never loops between activating a source and
+    declining the same payment;
+  - Hybrid, Phyrexian and `ManaCostOf` optional payments run without a panic;
+  - reversal selection with 64 or more candidate actions;
+  - a suspended fulfillment is not listed as rescindable.
+- Tests and fixtures that bless library-moving mana abilities (`payment_replay.rs`'s
+  `suspending_barred_mana_source`, `submitted_mana_action_with_a_library_barrier_is_forced_to_remain`)
+  or blanket exemptions (`cant_activate_battlefield_blanket_grant_blocks_nonmana_allows_mana` in
+  `legal.rs`) are rewritten or inverted. The split-second test in `legal.rs` stays.
+- No panic or softlock on malformed or unpayable input. `crates/engine/tests/payment.rs`,
+  `payment_replay.rs`, `payment_mana.rs` and `pip_payment.rs` pass.
 
-Replace materialization of every legal mana-reversal subset. The current
-`2^n` enumeration repeats full reconstruction for many candidates and its
-fixed-width count becomes invalid at 64 actions. Design an incremental or
-constraint-based selection protocol that preserves dependency ordering,
-[CR#733.1] barriers, independent `ManaActionId` selection, and the runner's
-maximal-reversal policy without enumerating all subsets.
+## Not in scope
 
-Finally, expose fulfillment rescindability only while payment progress is idle;
-a suspended fulfillment must not advertise a command the engine will reject.
+- Generalizing replay identity (`engine-payment-replay-identity-generalization`) and general
+  cost-binder effects (`engine-payment-general-cost-binder-effects`).
 
-Acceptance requires focused regressions for every case above, no panic or
-softlock on malformed/unpayable input, and the existing Omnath/Cylix/Rancher,
-Mox/KCI, Wheel, optional-payment, and nested-replay matrices remaining green.
-Remove or invert the existing regressions that bless library-moving mana
-classification or blanket activation-ban exemptions.
-Coordinate rather than duplicate the broader identity and binder work tracked
-by `engine-payment-replay-identity-generalization` and
-`engine-payment-general-cost-binder-effects`.
+## Pointers
+
+- `crates/engine/src/payment.rs`, `crates/engine/src/payment/` (`replay.rs`, `mana.rs`,
+  `fulfill.rs`, `coverage.rs`)
+- `crates/engine/src/legal.rs` (`cant_activate`, `legal_actions`), `crates/engine/src/activate.rs`,
+  `crates/engine/src/cast.rs` (`autotap_for_cast`)
+- `crates/core/src/ability.rs` (`mana_profile`, `is_triggered_mana_ability`),
+  `crates/core/src/deontic.rs` (`DeonticAction::Activate`)
+- `crates/engine/src/trigger.rs`, `crates/engine/src/resolve/effect.rs`

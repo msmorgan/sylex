@@ -1,48 +1,54 @@
 ---
 needs: [engine-transform]
 ---
-Route the remaining current-characteristic reads through the CURRENT face for a
-back-up double-faced permanent — surfaced by the `engine-transform` whole-branch
-review. No longer latent (2026-10-21): canon Delver of Secrets transforms, so a
-back-up permanent is reachable; the wrong reads below are still unexercised by a
-current card.
+# Read a transformed permanent's current face everywhere
 
-`engine-transform` converted `base_values` / `abilities_of_source` /
-`printed_base_len` / player-statics to the face-aware `face_of`, but these sites
-still read `derive::face` (FRONT) where a battlefield back-up permanent should use
-its back face:
-- `sba.rs:419` (was 358) — legend-rule name grouping [CR#704.5j]: a back-up legendary
-  transforming permanent is grouped by its FRONT name. (The legendary CHECK one line
-  up already uses the layered view; only the name key is stale.)
-- `target.rs:355-369` (was 279) — the `Named` and `NamedReg` predicates [CR#201]
-  match the FRONT name.
-- `target.rs:601` / `activate.rs:599` / `layer.rs:790` — loyalty base reads FRONT;
-  matters only for a DFC whose back is a planeswalker (intertwined with
-  enters-transformed and the `planeswalker-loyalty` work).
+## Why
 
-Fix: switch these to `face_of` (or the layered view) for a battlefield object. Keep
-cast-time / off-battlefield / mana-value reads on FRONT ([CR#712.8a,712.8e]) — that
-boundary is correct, not accidental. Prerequisite of `engine-day-night`.
+A double-faced permanent with its back face up has only its back face's characteristics, except
+that its mana value uses the front face's mana cost [CR#712.8e]. `engine-transform` made
+`base_values`, `abilities_of_source` and the player statics read the current face
+(`derive::face_of`), but other battlefield reads still use `derive::face`, which is always the
+front face:
 
-## Added 2026-10-21
+- the legend rule's name key (`sba.rs`): the legendary check uses the layered view, the name it
+  groups by is the front face's [CR#704.5j];
+- the `Named` and `NamedReg` predicates (`target.rs`);
+- the printed-loyalty base reads (`target.rs`, `activate.rs`, `layer.rs`), which matter for a
+  double-faced card whose back face is a planeswalker;
+- `distinct_keys_derived` (`layer.rs`): types, subtypes, basic land types, supertypes and name;
+- `copiable_values` (`copy.rs`): a copy of a double-faced permanent uses the copiable values of the
+  face that's up [CR#707.8], and a token copy of one is a double-faced token that enters back face
+  up when the original's back face was up [CR#707.8a]. `CopiableValues` carries one face and no
+  side.
 
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #14.
+The layered view (`DerivedObject`, `layer.rs`) has no name, so the legend rule and `Named` also
+ignore copy effects: a Clone copying a legend is grouped by "Clone". The legend rule also compares
+names as exact strings, where two objects have the same name if they have at least one name in
+common [CR#201.2a].
 
-- **Copiable values.** `crates/engine/src/copy.rs:102-115`
-  `copiable_values` reads `derive::face` (front), and `CopiableValues` has no back
-  face or side. [CR#707.8]: copy "the copiable values of the face that's currently
-  up"; [CR#707.8a]: a token copy of a double-faced permanent "is a double-faced
-  token" and enters with its back face up if the original's back face was up.
-  Carry both faces plus the current side through the copy path (Cackling
-  Counterpart on a transformed Delver makes a double-faced token, back face up).
-- **`distinct_keys_derived`** (`layer.rs:1621`, Name at `:1649`) reads the front
-  face for types, subtypes, basic land types and name.
-- **Legend-rule grouping by name set.** Group legend-rule candidates by
-  name-set intersection, not exact string ([CR#201.2a]: "at least one name in
-  common"; [CR#704.5j]).
-- **Check before fixing:** the layered view (`DerivedObject`, `layer.rs:131`) has no
-  name field, so the legend key and `Named` may also ignore copy effects (a Clone
-  copying a legend keyed by "Clone"). If so, route name reads through a layered
-  name, which covers both the face and the copy cases.
+Delver of Secrets transforms, so a back-face-up permanent is reachable, but no current card
+exercises these reads.
 
-Per [CR#712.8e] mana value stays on the front face's mana cost.
+## Done when
+
+- The layered view carries the name, derived from the current face and copy effects, and the
+  legend rule, `Named`, `NamedReg` and `distinct_keys_derived` read it and the other current-face
+  characteristics.
+- The legend rule groups by name-set intersection [CR#201.2a,704.5j].
+- Printed-loyalty reads of a battlefield object use its current face.
+- Copying a double-faced permanent copies the face that's up; a token copy carries both faces and
+  enters with the original's side up [CR#707.8,707.8a]. For example, Cackling Counterpart on a
+  transformed Delver of Secrets makes a double-faced token, back face up.
+- Reads off the battlefield and off the stack, cast-time reads and mana value stay on the front
+  face [CR#712.8a,712.8e].
+- Tests cover each read with a back-face-up permanent: a real double-faced card, or a minimal
+  repro derived from one.
+
+## Pointers
+
+- `crates/engine/src/derive.rs` (`face`, `face_of`)
+- `rg -n 'derive::face\(' crates/engine/src` for the front-face reads
+- `crates/engine/src/layer.rs` (`DerivedObject`, `base_values`, `distinct_keys_derived`),
+  `crates/engine/src/sba.rs`, `crates/engine/src/target.rs`, `crates/engine/src/activate.rs`,
+  `crates/engine/src/copy.rs`, `crates/core/src/copy.rs` (`CopiableValues`)

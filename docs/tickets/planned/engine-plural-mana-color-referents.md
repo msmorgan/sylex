@@ -1,18 +1,30 @@
 ---
 needs: [engine-payment-obligation-window]
-design: true
 ---
-Add a plural color-union referent for mana production such as Mox Amber.
+# Plural color-union mana production (Mox Amber)
 
-`ManaSpec::AmongColorsOf` currently accepts one `Reference`. The payment-window
-acceptance fixture intentionally needs only one qualifying colored legendary
-permanent and then zero, so it uses `Single(SelectAll(...))`: exact for that
-matrix, but fail-closed when two or more qualifying permanents exist. A real
-Mox Amber must instead offer the union of colors among every legendary creature
-and planeswalker its controller controls, without an object-choice prompt.
+## Why
 
-Settle whether mana specs consume a `Selection` directly or gain a dedicated
-plural color-source form. Preserve deterministic color ordering, produce no
-mana when the set or its color union is empty, and add zero-, one-, and
-multi-permanent tests including overlapping and distinct colors. Replace the
-synthetic fixture's singular shortcut only after that representation exists.
+`ManaSpec::AmongColorsOf` (`crates/core/src/mana.rs`) takes one `Reference`, and its engine arm
+(`resolve/player_action.rs`) reads the colors of one object. Mox Amber ("{T}: Add one mana of any
+color among legendary creatures and planeswalkers you control") needs the union of colors across
+every qualifying permanent, offered as one color choice with no prompt to pick a permanent. The
+Mox Amber fixture in `crates/engine/tests/payment_replay.rs` works around this with
+`Reference::Single(Selection::SelectAll(..))`, which is exact only while at most one permanent
+qualifies.
+
+## Done when
+
+- A mana spec can name a plural color source and produces one mana of any color in the union of
+  the colors of every object it selects, in a deterministic color order. It produces no mana when
+  the set or its color union is empty.
+- Tests with zero, one and several qualifying permanents, including overlapping and distinct
+  colors.
+- The `payment_replay.rs` Mox Amber fixture uses the plural form.
+
+## Pointers
+
+- `crates/core/src/mana.rs` (`ManaSpec`), `crates/engine/src/resolve/player_action.rs`
+  (`AmongColorsOf` arm)
+- `crates/engine/tests/payment_replay.rs` (Mox Amber fixture)
+- `plugins/builtin/primitives/mana/ofAnyColorOf.syl`

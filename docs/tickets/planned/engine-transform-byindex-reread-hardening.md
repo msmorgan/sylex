@@ -1,29 +1,50 @@
 ---
 needs: [engine-transform]
 ---
-Harden the by-index triggered/target ability re-reads now that ability sourcing is
-face-aware — a latent panic surfaced by the `engine-transform` whole-branch review.
-Gated behind Transform-emitting cards (none exist until `engine-day-night` or a
-canon transform card lands), so latent today.
+# A trigger on the stack keeps its text when its source transforms
 
-`engine-transform` made `abilities_of_source` face-aware: a back-up permanent
-sources its section-1 printed abilities from its BACK face. Back-up-at-fire-time
-triggers are captured BY VALUE (`showing_back`, `trigger.rs`), and one re-read
-(`resolve/mod.rs`) was hardened to `.get()` + graceful fizzle. Three sibling
-re-reads still index raw `[*ability]` + `unreachable!()`:
-- `resolve/targets.rs:46` (`targets_still_legal`)
-- `trigger.rs:1110` (`trigger_targets`)
-- `cast.rs:1216` (stack-object target getter)
+## Why
 
-Failure scenario ([CR#603.3] — an ability on the stack resolves independently of
-its source): a FRONT-up printed trigger fires (`created: None`, captured by index),
-its source transforms to back before the trigger resolves, and the re-read now
-returns the back face's shorter/differently-typed list → index-out-of-bounds panic
-or `unreachable!()`. Before this feature these sites were panic-proof because
-`abilities_of_source` always returned the immutable front face.
+A triggered ability on the stack "has the text of the ability that created it" [CR#603.3] and
+exists independently of its source [CR#113.7a]. The engine instead stores most printed triggers
+by index (`StackObject::Triggered { ability, created: None }`) and re-reads the body from the
+source with `derive::abilities_of_source`, which is face-aware: a permanent with its back face up
+sources its printed abilities from the back face [CR#712.8e]. Triggers that fire while the back
+face is up are captured by value (`showing_back` in `trigger.rs`), but a trigger that fires
+front-up and whose source then transforms before it resolves is re-read from the back face's
+list: a different or shorter list, so the read panics or finds the wrong ability.
 
-Fix: either extend the by-value capture to ALL `TwoFaced` printed triggers (not just
-back-up-at-fire), or harden the three sites to `.get()` + fizzle, symmetric with
-`resolve/mod.rs`. The replacement path (`replace.rs`, `cast.rs` replacement gather)
-iterates rather than storing an index — no analogous hazard. Prerequisite of
-`engine-day-night`, the first consumer that makes back-up permanents reachable.
+These sites index the list raw and panic on a mismatch:
+
+- `resolve/targets.rs`, `targets_still_legal`
+- `trigger.rs`, `trigger_targets` and `enter_trigger_activation`
+- `cast.rs`, the `StackObject::Triggered` arm of the stack-object target getter
+
+`resolve/mod.rs` reads with `.get()` and makes the ability vanish on a miss, which is also wrong:
+the trigger should resolve with its own text, not disappear.
+
+Delver of Secrets transforms, but no current card transforms a permanent while one of its
+front-face triggers waits on the stack; day/night (`engine-day-night`) is the first that will.
+
+## Done when
+
+- A trigger whose source transforms between triggering and resolving resolves with the text it
+  triggered with, at every site above (for example by capturing the body by value for every
+  printed trigger of a double-faced source).
+- No re-read site falls back silently: a body the engine cannot find is a crash that names the
+  defect.
+- A test transforms a double-faced permanent while its front-face trigger is on the stack, and
+  the trigger's targets, legality check and effect come from the front-face text. The source is a
+  real double-faced card, or a minimal repro derived from one.
+
+## Not in scope
+
+The replacement gather (`replace.rs`, the replacement path in `cast.rs`): it iterates the list
+instead of storing an index.
+
+## Pointers
+
+- `crates/engine/src/derive.rs` (`abilities_of_source`, `derived_abilities_of`)
+- `crates/engine/src/trigger.rs` (the `showing_back` capture), `crates/engine/src/resolve/mod.rs`,
+  `crates/engine/src/resolve/targets.rs`, `crates/engine/src/cast.rs`
+- `crates/engine/src/transform.rs`

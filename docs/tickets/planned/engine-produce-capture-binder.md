@@ -1,22 +1,37 @@
 ---
 needs: []
 ---
-**Engine: a cost that moves an object to a public zone must be decidable as
-payable, and its product readable.** [CR#400.7j]'s second sentence is
-explicit that a cost may move an object to a public zone and the spell's
-effects can then find it.
+# Costs that move an object to a public zone, read by the ability's effect
 
-Rewritten 2026-09-02: the region cost landing
-([Core](../../decisions/core.md), law 4) deleted
-both functions this ticket used to name. `with_cost_feasible` became
-`cost_step_feasible` in `crates/engine/src/activate.rs`, and
-`resolve_binder`'s read-only spine is gone with the `Binder` enum. Costs are
-now a block of instructions with destinations, and `CostComponent::Act {
-dest, .. }` captures a paid product's register.
+## Why
 
-What survives as a real question: whether `cost_step_feasible` can decide
-payability for every producing cost shape, and whether a product moved by a
-cost is chased to its new incarnation on the read the body makes. Re-assess
-against the landed shape before sizing; the original two-consumer diagnosis
-no longer describes the code. `Binder::Produce` still exists on the
-semantics side, so lowering and the legacy renderer are unaffected.
+If a cost moves an object to a public zone, the ability's effects can find that object
+[CR#400.7j]. A producing cost is `CostComponent::Act { dest: Some(..), .. }`. Its fulfillment
+(`IouKind::Act` in `crates/engine/src/payment/fulfill.rs`) writes the moved object's pre-move id,
+and register reads chase it to the new object. Two gaps remain:
+
+- Fulfillment accepts only `Move` and `Sacrifice` as producing actions and rejects any other
+  cost-eligible action at fulfillment time. A producing discard ("Discard a card: … the discarded
+  card's mana value", Mercurial Chemister) passes `is_cost_eligible` and announcement
+  (`cost_step_feasible` and `can_pay_verbs` in `crates/engine/src/activate.rs`), then fails when
+  paid.
+- Effect-body reads are tested only for a sacrifice read through last-known information
+  (`a_cost_block_binds_its_paid_product_for_the_ability_body` in `resolve/effect.rs`). Nothing
+  tests a body finding the moved object itself in its new public zone.
+
+## Done when
+
+- Every action a producing cost can be built with is payable through fulfillment and writes its
+  product, or is refused when the cost is built. None is refused only at fulfillment.
+- Tests: Dread Defiler (exile a creature card from your graveyard; the opponent loses life equal to
+  the exiled card's power), Mercurial Chemister (discard a card; damage equal to the discarded
+  card's mana value), and a body that acts on the moved object in its new zone (Dollhouse of
+  Horrors copies the exiled card).
+
+## Pointers
+
+- `crates/core/src/cost.rs` (`CostComponent::producing`, `RunnableCostAction`),
+  `crates/core/src/action.rs` (`is_cost_eligible`)
+- `crates/engine/src/payment/fulfill.rs`, `crates/engine/src/payment.rs` (`lock_action`)
+- `crates/engine/src/activate.rs` (`cost_step_feasible`, `can_pay_verbs`)
+- `crates/engine/tests/payment.rs` (`producer_cost_runs_the_producer_then_binds_its_moved_product`)

@@ -3,32 +3,40 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 ---
 # Enlist: an optional cost to attack and its linked trigger
 
-Standard constraints apply.
+## Why
 
 Enlist means "As this creature attacks, you may tap up to one untapped creature you control that
 you didn't choose to attack with and that either has haste or has been under your control
 continuously since this turn began. When you do, this creature gets +X/+0 until end of turn,
-where X is the tapped creature's power." [CR#702.154a]. Its static ability is an optional cost
-to attack [CR#508.1g,702.154b], and its triggered ability is linked to it [CR#607.2h]. `enlist`
-(`plugins/builtin/definitions/keyword_ability/enlist.syl`) is bodiless.
+where X is the tapped creature's power." [CR#702.154a]. `enlist.syl` has `body = []`, and the
+cost-to-attack form has no optional variant, so the static cannot be written.
 
-Decided (from ADR `semantics.md` §1 items 4 and 5): extend the cost-to-attack form,
-`StaticSpec.gatedBy`, with an `offered` flag. An offered gate is a cost the player may pay as
-the creature attacks, not a prohibition unless paid. Pair it with a linked reflexive trigger,
-"when you do". No `asEvent`, which would make the cost an effect.
+## Design
 
-Why it was not done in `lean-v3-keyword-bodies-and-catalog-sync`: the cost's description needs
-a predicate the grammar lacks. "That you didn't choose to attack with": the cost is chosen at
-[CR#508.1g], before the chosen creatures become attacking creatures [CR#508.1k], so `isAttacking`
-doesn't say it. It needs the declaration's chosen set.
+- The static is an offered variant of `gatedBy`: an optional cost the player may pay as the
+  creature attacks [CR#508.1g,702.154b], not a prohibition unless paid, and not written with
+  `asEvent`.
+- "That you didn't choose to attack with" reads the declaration's chosen set, not
+  `isAttacking`: the cost is chosen at [CR#508.1g], before the chosen creatures become attacking
+  creatures [CR#508.1k].
 
-"Has been under your control continuously since this turn began" composes as a negated lookback.
-A creature you control has been under your control continuously since the turn began unless it
-entered or changed control this turn:
-`not (or [did which enter soFarThisTurn, did any (.changeControl which none) soFarThisTurn])`.
-It checks inside the tap's description.
+## Done when
 
-The linked trigger reads the tapped creature's power. The engine counts each enlist instance's
-trigger once, for its own cost [CR#702.154d].
+- `gatedBy` has the offered form.
+- `.syl` has a predicate for "a creature chosen to attack in this declaration" [CR#508.1g].
+- "Has been under your control continuously since this turn began" reuses `heldSince` (as
+  `controlledSinceTheirTurnBegan` and `echo.syl` do); no new lookback is invented for it.
+- The linked trigger [CR#607.2h,702.154b] reads the tapped creature's power, and each enlist
+  instance's trigger triggers once, only for its own instance's cost [CR#702.154d].
+- `enlist.syl`'s body writes the static and its linked trigger in full.
+- A Vintage-legal enlist card (one of the 12, such as *Argivian Cavalier*) is in
+  `plugins/canon/cards/`.
 
-Vintage-legal enlist cards: 12 in the MTGJSON snapshot.
+## Pointers
+
+- `plugins/builtin/definitions/keyword_ability/enlist.syl`
+- `plugins/builtin/templates/static/gatedBy.syl`, `plugins/builtin/primitives/static/staticSpecGatedBy.syl`
+- `plugins/builtin/primitives/condition/heldSince.syl`,
+  `plugins/builtin/templates/condition/controlledSinceTheirTurnBegan.syl`,
+  `plugins/builtin/definitions/keyword_ability/echo.syl`
+- `plugins/builtin/templates/predicate/isAttacking.syl`

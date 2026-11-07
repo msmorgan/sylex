@@ -1,30 +1,42 @@
 ---
 needs: []
-design: true
 ---
-**Engine: scope `Simultaneously`'s remaining non-verb member shapes.**
+# Engine: decide which further `Simultaneously` member shapes real cards need
 
-`resolve/effect.rs`'s `OneShotEffect::Simultaneously` arm wires two member
-kinds: an `Act` verb (lowered to events) and a `Continuously` whose body is a
-bare `Modify(_, _)` (scope resolved read-only in phase A, row minted in phase
-B). `engine-simultaneous-non-verb-members` built that split for Avarice
-Totem's control exchange and deliberately stopped there.
+## Why
 
-Two seams remain, both loud:
+The `Instruction::Simultaneously` arm in `crates/engine/src/resolve/effect.rs` evaluates every
+member against one snapshot and voids the whole set if any member comes up empty ("if the entire
+exchange can't be completed, no part of the exchange occurs" [CR#701.12a]). It handles two member
+shapes: an `Act` verb, lowered to events, and an `Instruction::Continuously` whose body is a bare
+`StaticSpec::Modify(reference, change)`. Avarice Totem's control exchange uses that second shape:
+its reference is evaluated read-only first and the continuous effect is created after.
 
-- A `Continuously` member with any other `StaticEffect` body — `Each`,
-  `Deontic`, `CostModifier`, `CantHappen`, prevention. The blocker is the
-  all-or-nothing void test ([CR#701.12a]): a `Modify` body's `Locked` scope is
-  emptiness-testable at mint, whereas a `Floating` scope deliberately is not
-  expanded to objects there, so "did this member come up empty" has no answer.
-- Any other `OneShotEffect` member — `Sequentially`, `If`, `May`, `With`, a
-  nested `Simultaneously`.
+Every other member panics:
 
-This is a **scoping ticket, not an implementation ticket**: no card drives
-either shape today. Establish which, if any, a real card needs before
-building, and split per shape rather than widening the match arm at once.
+- a `Continuously` with any other `StaticSpec` body (`Each`, `Deontic`, `CostModifier`,
+  `CantHappen`, `Prevention` and the rest). Only `Modify` names one object that can be evaluated
+  and tested for emptiness before anything is created, so "did this member come up empty" has no
+  answer for the others;
+- any other `Instruction` member: `Sequentially`, `If`, `May`, a nested `Simultaneously` and the
+  rest.
 
-Not in scope: a choice-bearing `Act` member, whose verb lowers to a decision
-rather than events — `engine-simultaneous-choice-members` (maybe/) owns that.
+No card is known to need either shape.
 
-Effort: **S**.
+## Done when
+
+- The in-scope corpus has been searched for cards that need each shape. Each shape a card needs
+  has its own ticket naming that card; a shape no card needs gets none.
+- Each panic's `owner:` text names the ticket that now owns its shape, and a shape no card needs
+  says so in its panic.
+
+## Not in scope
+
+- An `Act` member whose verb lowers to a decision rather than events:
+  `engine-simultaneous-choice-members`.
+
+## Pointers
+
+- `crates/engine/src/resolve/effect.rs` (the `Instruction::Simultaneously` arm and its Avarice
+  Totem tests).
+- `crates/core/src/effect.rs` (`Instruction`), `crates/core/src/continuous.rs` (`StaticSpec`).

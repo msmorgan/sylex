@@ -1,26 +1,47 @@
 ---
 needs: [idris-retirement]
 ---
-# Delete `lean/` and `sylGen`
+# Delete `lean/`
 
-Standard constraints apply. Settled (owner, 2026-11-02): Lean is deleted in full, and no Lean
-mirror of the DSL is kept. A mirror would keep the DSL bound to Lean: its keywords (the source of
-the trailing-underscore names) and an AST that records no written order. `idris/` went first.
+## Why
 
-- Delete `lean/` (the checker, proofs, `sylGen`, the generated-module plumbing) and
-  `lean-discourse-export`'s exporter and snapshot with it. The snapshot is not maintained: its
-  expected outputs are frozen at deletion, and the first AST change afterwards would break fixtures
-  nothing can regenerate. After this, the spec catalog's Rust tests and the canon corpus are the
-  only record of what must and must not check.
-- Delete `cargo xtask lean` and every other Lean-only xtask command, the Lean CI job, the Lean
-  cache provisioning in `scripts/provision-workspace`, and Lean-only settings, skills and hooks
-  references the repo carries.
-- Before deleting, port the Lean AST's doc comments onto the Rust types in
-  `crates/deckmaste_semantics_v3/src/ast` (their only doc line points into `lean/Semantics/`), with
-  every CR citation audited. The generator `semantics-rust-crate` describes runs only while
-  `lean/` exists. `cr-coverage.lock` is not lowered: every rule cited only in `.lean` files must be
-  cited again where it now lives.
-- Update `CLAUDE.md` (crate fates, Bearings, Tests for a landing), `docs/decisions/semantics.md`,
-  `docs/decisions/syl.md` and the memory index entries that name Lean as current.
-- The `lean-v3-*` and `plugins-v3-*` tickets that need this one are then done in `.syl` and Rust
-  only.
+Lean is deleted in full and no Lean mirror of the `.syl` language is kept: a mirror would keep
+`.syl` bound to Lean's keywords (the source of the trailing-underscore names) and to an AST that
+records no written order. Lean stays in jj history, to compare against if a later `.syl` change
+breaks something that cannot otherwise be diagnosed. This follows `syl-primitive-constructors`
+(checked by Lean's value dump) and the temporary `.syl` resolution validator, which together
+guard `.syl` once Lean is gone. The tickets that need this one are then done in `.syl` and Rust
+only.
+
+## Done when
+
+- `lean/` is gone, with `sylGen` and the value dump.
+- Every Lean-only tool is gone: `cargo xtask lean`, `cargo xtask dsl differential` (it compares
+  `sylex_syl` against `SylGen`'s parser), the Lean CI job and its cache in
+  `.github/workflows/ci.yml`, the `lean/.lake` seeding in `scripts/provision-workspace`, and the
+  `/lean/Generated/` entry in `.gitignore`.
+- Nothing tracked names Lean as current: `CLAUDE.md` (the `lean/` line, `lean check` under Tests),
+  `docs/decisions/semantics.md` ("Lean is a workbench"), `docs/decisions/syl.md` §2 ("the Lean
+  generator"), comments in tracked code such as `crates/syl/tests/parse.rs`, and the memory
+  entries that name Lean as current.
+- `cite-config.json` no longer scans `.lean` files, and the citation tooling's `.lean` fixtures
+  are rewritten.
+- The rules cited only in `.lean` files lose their citation. They are listed for the owner, and
+  the list is kept so that the Rust AST work (the AST-level rules from `Words.lean` and
+  `Abilities.lean`) and the DRT work (the checker and proof rules) cite them again. Coverage is a
+  report, not a floor (`cite-coverage-inventory`).
+- `cargo test --workspace`, `cargo clippy --workspace --tests -- -D warnings`, `cargo xtask cite
+  check` and the `.syl` validator pass.
+
+## Not in scope
+
+Porting Lean's code or doc comments to Rust: the Rust semantics is designed from the ADRs and the
+CR, never translated from Lean.
+
+## Pointers
+
+- `lean/`, `crates/xtask/src/lean.rs`, `crates/xtask/src/dsl.rs`,
+  `crates/xtask/src/bin/cargo-xtask.rs`
+- `.github/workflows/ci.yml` (`lean` job), `scripts/provision-workspace`, `cite-config.json`,
+  `crates/xtask/src/coverage.rs`
+- `rg -il '\blean\b' --glob '!lean/**' --glob '!docs/tickets/**'` for the remaining mentions

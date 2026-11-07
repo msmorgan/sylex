@@ -1,45 +1,40 @@
 ---
 needs: [core-regions-piles]
 ---
-**Engine: pile registers have no resolution writer or choice path.**
+# Resolve pile separation and pile choice
 
-Core now represents each temporary pile as a `Kind::Pile` register
-([CR#700.3a] — each affected object goes into exactly one pile; [CR#700.3b] —
-a pile is not an object, each card in it stays individual). `SeparatePiles`
-declares its `dests`, `ChoosePile.from` reads those registers and writes the
-chosen pile to its own `dest`, and a pile-valued `Selection::Reg` iterates the
-members. The activation value exists and reads as an object group, but no
-engine instruction writes one yet.
+## Why
 
-The whole family is unbuilt, not just the read:
+Core spells each temporary pile as a `Kind::Pile` register [CR#700.3a,700.3b]: `SeparatePiles`
+writes its `dests`, `ChoosePile` reads pile registers in `from` and writes the chosen pile to
+`dest`. The engine interprets neither: both fall into the `todo!` seam at the end of
+`run_effect` in `crates/engine/src/resolve/effect.rs`. `Action::Shuffle` over anything but a
+library returns no work through a catch-all `_ => vec![]` in
+`crates/engine/src/resolve/player_action.rs`, so shuffling a pile silently does nothing. Fact or
+Fiction, Do or Die, Death or Glory, Fortune's Favor, Steam Augury and Atris, Oracle of
+Half-Truths in `plugins/canon/cards/` all separate piles.
 
-- `resolve/effect.rs` has no arm for `OneShotEffect::SeparatePiles` or
-  `ChoosePile` — both fall into the catch-all choice seam.
-- The semantic `PileSource::Noted` / `Selection::PilesOf` surface has no
-  register spelling and lowering refuses it; the old label-bearing core
-  variants and pile store are gone.
-- `Action::Shuffle` over a pile-valued register degrades to a silent no-op in
-  `resolve/player_action.rs`.
+## Done when
 
-**This is the engine-resolution half that `core-do-or-die-divide-and-choose`
-asked for.** That ticket (planned) scopes the two-pile,
-opponent-chooses-and-consequence-applies shape onto a new `DivideAndChoose`
-core primitive, and defers here twice over: it carves the general N-pile case
-back out for "genuinely N-way cards (Whims of the Fates)", and its blocker 2
-recommends "splitting into a `core:` emit/render/RON slice (cleanly doable) vs
-a separate engine-resolution ticket". This is that separate ticket. Its
-blocker 2 also records the one reuse dead end worth knowing up front:
-`ChoiceContinuation::ArrangePiles` is scry-style ordering *within* a known
-pile, not partition-and-choose, so it is not a starting point.
+- `SeparatePiles` surfaces a decision for `by` to put each object of `group` into exactly one of
+  `dests.len()` piles, any of them possibly empty [CR#700.3a,700.3d]. Objects stay in their zone,
+  and a graveyard keeps its order [CR#700.3c]. Every destination register is written.
+- `ChoosePile` surfaces a pick over `from` (or picks at random when `random`), writes the chosen
+  pile to `dest`, and runs `then`.
+- Shuffling a pile-valued register shuffles it [CR#701.24a]. Any other unsupported shuffle shape
+  fails loudly instead of returning no work.
+- Tests use Fact or Fiction and Do or Die, built as core values.
 
-Scope: surface a partition decision for `group` into `dests.len()` piles and
-write every destination register; surface a pile-pick decision over `from`,
-write the chosen pile to `dest`, and run `then`; wire shuffle over a pile
-register. The cross-region, per-player noted-pile shape needed by Whims of the
-Fates also needs a label-free authored/core design before its engine storage
-can be built; do not restore the deleted label-bearing core variants.
+## Not in scope
 
-No canon card exercises this today — Whims of the Fates is the design target
-once authored, so check the corpus at pickup before sizing.
+- Whims of the Fates' per-player, cross-region piles. They need a label-free authored and core
+  design first; the deleted label-bearing core pile variants are not restored.
+- `ArrangePile` (`crates/engine/src/state.rs`) orders cards within one known pile landing in a
+  library. It is not partition-and-choose.
 
-Effort: **M**.
+## Pointers
+
+- `crates/core/src/effect.rs` (`SeparatePiles`, `ChoosePile`), `crates/core/src/region.rs`
+- `crates/engine/src/resolve/effect.rs`, `crates/engine/src/resolve/player_action.rs`,
+  `crates/engine/src/activation.rs` (`Value::Pile`)
+- `plugins/builtin/primitives/action/separateIntoPiles.syl`, `plugins/builtin/primitives/pile/`
