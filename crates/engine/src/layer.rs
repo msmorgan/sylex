@@ -1944,8 +1944,8 @@ fn apply_static(
             }
         }
         // "Loses all abilities" strips every ability the object has, printed
-        // and type-conferred alike ([CR#305.7]: a land whose subtype is set
-        // loses the abilities its old land types gave it). A type's
+        // and type-conferred alike ([CR#613.1f]; a basic land type's mana
+        // ability is an ordinary ability of the land, [CR#305.6]). A type's
         // ability-FREE rules are untouched because they are not abilities
         // ([CR#113.12]) and never entered this list.
         Modification::LoseAllAbilities => {
@@ -2269,7 +2269,7 @@ fn run_layer_pass(
         // derived list — the SINGLE source of type/subtype conferral (the base
         // carries no confer of its own); running here — before layer 6 — lets a
         // later `LoseAllAbilities` strip the conferred abilities too
-        // ([CR#305.7]).
+        // ([CR#305.6,613.1f]).
         if layer == Layer::L4 {
             fold_conferred_abilities(&mut working);
         }
@@ -2681,7 +2681,7 @@ mod tests {
     /// through the one conferral path (`Property::conferred_ability`) — is an
     /// ORDINARY ability of the object: the island HAS it for card-facing
     /// queries, it is activatable, and a lose-all-abilities effect REMOVES it
-    /// ([CR#305.7]), leaving the island with no ability at all.
+    /// ([CR#613.1f]), leaving the island with no ability at all.
     #[test]
     fn conferred_basic_land_mana_is_an_ordinary_ability() {
         use sylex_card::Card;
@@ -2807,7 +2807,7 @@ mod tests {
         );
 
         // LACKS: "loses all abilities" removes the conferred ability like
-        // printed text ([CR#305.7]) — the island no longer taps for blue and
+        // printed text ([CR#613.1f]) — the island no longer taps for blue and
         // reads as having no abilities.
         lose_all_abilities(&mut state, id);
         assert!(
