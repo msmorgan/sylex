@@ -1,21 +1,32 @@
 ---
 needs: [ci-cite-gate]
 ---
-**[design] Consider extracting the largest coherent arms from the engine
-effect interpreter without changing dispatch or behavior.**
-`resolve/effect.rs` contains a roughly 1,000-line `run_effect` match; the
-`Each`, `May`, and `With` arms appear large enough to hide their individual
-contracts while remaining natural semantic units.
+# Consider extracting the largest arms of `run_effect`
 
-This reopens a prior refactor boundary. `refactor-oversized-fns` deliberately
-kept `run_effect` as a flat dispatcher, and `split-resolve-tests` records the
-effect logic as reasonably sized. Before implementation, confirm that the
-proposed helpers improve local reasoning rather than merely satisfying a line
-metric. The central match and one-arm-per-variant dispatch must remain flat;
-traits, a second dispatch table, or subsystem scattering are out of scope.
+## Why
 
-If approved, move only the three arm bodies into named same-module helpers,
-preserving control-flow/return behavior exactly and carrying their citations
-and invariant comments with them. Gates: engine test-count parity, focused
-tests for each extracted arm, workspace clippy/fmt, citation checking, and a
-comment/citation multiset audit. No English-crate refactor is in scope.
+`run_effect` in `crates/engine/src/resolve/effect.rs` is one match over `Instruction`, about 1,100
+lines long. Its largest arms (`Simultaneously`, `Continuously`, `Each`, `Modal`, then `Batch`, `Act`
+and `May`) are natural semantic units whose contracts are hard to see inline. Extracting some of
+them into named helpers may help local reasoning; whether it does, and which arms, is the owner's
+call. Line counts are not the reason.
+
+## Done when
+
+- The owner has approved a list of arms to extract.
+- Each approved arm body is a named helper in the same module, with control flow and returns
+  unchanged and its citations and invariant comments carried along; `run_effect` stays one flat
+  match with one arm per variant.
+- Each extracted arm has a focused test, the engine's test count is unchanged otherwise, and the
+  multiset of comments and citations in the file is unchanged.
+- `cargo fmt --check` passes.
+
+## Not in scope
+
+- Traits, a second dispatch table, or moving arms into other modules.
+- Moving the file's embedded tests (`docs/tickets/planned/split-resolve-tests.md`).
+
+## Pointers
+
+- `crates/engine/src/resolve/effect.rs` (`run_effect`)
+- `crates/core/src/effect.rs` (`Instruction`)

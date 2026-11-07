@@ -1,83 +1,46 @@
 ---
 needs: [comment-reviewer-hotspots]
 ---
-Editorial sweep of the ~32.8k comment lines in `crates/` (≈21k doc, ≈11.8k
-plain). The dominant genre is not slop narration but the dense defensive
-mini-essay: real CR rulings wrapped in reviewer-directed argument, caps
-emphasis, and diff-speak. Disposition is per-block triage — keep the
-invariant compressed, delete what the code and types already say, relocate
-genuine essays — for both doc and plain comments. Success is information-
-shaped, not line-shaped: no ruling lost. Expected yield ~40–50% of block
-mass; that is a prediction, not a quota (a quota rewards deleting the
-hardest-to-recover content first).
 
-## Assessment (2026-07-24)
+# Comment discipline: sweep every crate
 
-- Concentration: 78 files with ≥100 comment lines hold 84% of the mass;
-  the top 40 hold 66%. `sylex_engine` alone holds over half.
-- 5,294 comment lines carry `[CR#…]` citations (1 in 6) — load-bearing,
-  entangled with the cite lock.
-- ~1,500 blocks of ≥6 lines hold ≈40% of the mass; ~738 lines use caps
-  emphasis (THAT, NEVER, ONCE…).
-- Classic slop is nearly absent: imperative narration ~72 lines,
-  diff-speak ~205, commented-out code ~12, plan-speak ~5, TODOs 3.
+## Why
 
-## Addendum (2026-08-03)
+`crates/` holds about 29,000 comment lines (about 20,600 doc, 8,700 plain). The dominant genre is
+the defensive mini-essay: real CR rulings wrapped in reviewer-directed argument, capitalized
+emphasis and diff-speak. It teaches every reader to write the next one. The mass is
+concentrated: 65 files with 100 or more comment lines, about 17,400 of their lines in
+`sylex_engine`.
 
-External review re-confirmed the mini-essay as the sweep's primary target
-and measured the work-log dialect the phases must also strip:
-reviewer-directed scope negotiation ("a correctness rewrite this task
-does not sign up for" — `sylex_engine/src/sba.rs:~103-130` is the
-type specimen) and plan shorthand no outside reader can resolve — 89
-`Task N` references, 55 `P0.Wn` references, and 233 "seam" mentions
-across `crates/**/*.rs` (regenerate at claim time with
-`rg -n -e '\bTask [0-9]' -e 'P0\.W[0-9]' crates`). Under the Phase 0 rules these
-compress to the bare invariant, or to a labeled `TODO`/`SEAM` naming a
-ticket slug; the essay and the negotiation are deleted.
+## Design
 
-## Phase 0 — reviewer-facing dependency
+The comment rule, which the sweep applies and new and edited code follows:
 
-`comment-reviewer-hotspots` lands the decision doc, removes the unresolved
-work-log vocabulary, and sweeps the first reviewer-visible engine files. This
-ticket begins after that dependency and treats its committed decision as the
-byte-identical brief for every later round. Do not redo files already covered
-there unless verification finds a missed violation.
+- A comment states only what the code and types can't: rules meaning with its CR citation,
+  an invariant, a rejected alternative and why, or a labeled seam.
+- Arguing correctness is allowed where it's the idiom (a `// SAFETY:` block on `unsafe`).
+- Banned: a comment excusing a known defect ("slightly wrong but okay for now because …"); a
+  known defect is fixed or ticketed with a `TODO`/`SEAM` naming the ticket. Also banned: diff
+  narration ("previously", "now uses") and plan narration.
+- A plain `//` block over four lines is compressed, or moved to where its content belongs: the
+  doc comment of the item it's about when it's local, the module doc when module-wide, an ADR
+  when it's design.
+- A doc comment opens with a one-sentence contract and documents the interface.
+- A test comment states the scenario and the rule it proves.
+- Tracked code never cites local memory.
 
-## Phases 1–5 — heavy files, per crate
+## Done when
 
-Order: `sylex_engine` → `sylex_plugin_v1` → `sylex_pipeline_v1` →
-`sylex_core` → remainder (`tui`, `macro_ron`, `macro_ron_derive`,
-`xtask`, `noncanon`, `macro_ron_lsp`). Heavy file = ≥100 comment lines;
-regenerate the list at claim time
-(`rg -t rust -c '^\s*//' crates | awk -F: '$2>=100'`) rather than trusting
-this ticket's snapshot.
+- Every file in `crates/` with 100 or more comment lines (regenerate the list at claim time with
+  `rg -t rust -c '^\s*//' crates | awk -F: '$2>=100'`) has had a whole-file comment pass under the
+  rule in Design, crate by crate: `sylex_engine`, `sylex_core`, `sylex_syntax`, then the rest. Files done by
+  `comment-reviewer-hotspots` are skipped unless a violation was missed.
+- The remaining files are checked for the mechanical patterns (diff-speak, imperative narration,
+  commented-out code, plan-speak) hit by hit.
+- No ruling is lost: every CR citation removed with a comment is either restated where it still
+  applies or recorded as dropped in the round's report.
+- Each round's diff changes no code outside comments and lands as its own commit.
 
-Whole-file editorial passes, 2–4 files per agent. All agents in a round
-share a byte-identical brief prefix (the decision doc's rules plus
-disposition guidance) so the prompt cache absorbs the repetition; the
-per-round variation is only the file list at the tail. Every brief carries
-a standing crate-boundary line naming the crate's external consumers, so
-agents judging "derivable / needed by whom" never burn rounds on
-cross-crate audits. Diffs are comments-only; the orchestrator verifies
-each round by diffstat and scope.
+## Not in scope
 
-## Phase 6 — tail
-
-One agent sweeps the mechanical patterns across the remaining ~169 files
-(16% of mass): diff-speak, imperative narration, commented-out code,
-plan-speak. Review each grep hit in place; no whole-file reading.
-
-## Verification per round
-
-Standard constraints apply. Deltas:
-
-- The round diff must contain no non-comment code changes.
-- `cargo test --doc -p <crate>` after doc-comment edits (doctests live in
-  doc comments).
-- Cite toolchain after every round even when no citation was deliberately
-  edited — deleting a comment can orphan lock entries.
-- Commit per round; the sweep must be resumable at any crate boundary.
-
-## Budget
-
-~2–3M tokens across all rounds, dominated by the heavy-file phases.
+- `v1/`.

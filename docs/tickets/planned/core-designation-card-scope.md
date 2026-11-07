@@ -1,49 +1,39 @@
 ---
 needs: []
 ---
-**`DesignationScope` has no `Card` variant, so Commander is declared
-object-scope — which the CR explicitly denies.** [CR#903.3]: the commander
-designation "is not a characteristic of the object represented by the card;
-rather, it is an attribute of the card itself. The card retains this
-designation even when it changes zones."
 
-`v1/plugins/builtin/macros/designations/Commander.ron` declares `scope: Object`
-and quotes that same clause in its comment as the justification. The
-`persistence: Permanently` on the row is the compensating patch: object-scope
-state would otherwise expire on a zone change, so the declaration buys
-zone-independence from the persistence axis instead of the scope axis.
+# Core has no card scope for designations, so the commander is object state
 
-Three further confirmations that this is card state, not object state:
+## Why
 
-- [CR#400.7]'s exception list (a–m) has no commander entry. Object state that
-  survives a zone change needs one; commander does not, because it is never
-  object state.
-- [CR#903.3e] lets effects read a commander's characteristics "in all zones,
-  including that player's library and hand", so the carrier must stay readable
-  in hidden zones rather than only on battlefield objects.
-- [CR#903.3] fixes the designation at deck construction ("each deck has a
-  legendary card designated as its commander"); [CR#903.3a] and [CR#113.6n]
-  put the abilities that modify it before the game begins.
+The commander designation "is not a characteristic of the object represented by the card; rather,
+it is an attribute of the card itself. The card retains this designation even when it changes
+zones" [CR#903.3]. `.syl` declares it that way (`commander.syl`: `scope = heldByCard`), but core's
+`DesignationScope` has only `Object`, `Player` and `Game`. The v1 row the engine runs today
+(`v1/plugins/builtin/macros/designations/Commander.ron`) declares `scope: Object` and buys
+zone-independence from `persistence: Permanently` instead.
 
-**Design point to settle before implementing.** [CR#903.3b] and [CR#903.3c]
-make the melded/merged permanent the commander, and [CR#903.3d] phrases the
-common queries per-zone ("control a commander", "cast a commander"). So card
-scope needs an object-facing projection. Decide whether `Card` is a third
-stored scope with the query layer projecting onto objects, or whether the
-carrier is modelled outside the designation registry as deck-construction
-data.
+It is card state, not object state: [CR#400.7]'s exceptions have no commander entry, effects read
+a commander's characteristics in every zone, library and hand included [CR#903.3e], and the
+designation is fixed at deck construction [CR#903.3,903.3a]. Yet the queries are per object: a
+melded or merged permanent containing the commander is the commander [CR#903.3b,903.3c], and
+"control", "cast" and "in a zone" read the permanent, the spell or the card [CR#903.3d]. A deck
+can have two commanders [CR#702.124a], so the designation is not unique.
 
-Uniqueness stays `None` — a deck may designate two carriers
-([CR#702.124b] partner commanders).
+## Done when
 
-Mirror surfaces (`DesignationScope` is mirrored across core, semantics, and lowering):
+- Core represents a card-held designation, and the engine answers [CR#903.3d]'s three query forms
+  and [CR#903.3e]'s hidden-zone read from it, including the meld and merge cases.
+- Engine tests cover a commander changing zones and still being the commander, and a
+  characteristic read in the library or hand.
 
-- `crates/core/src/designation.rs` — the enum
-- `v1/crates/semantics/src/designation.rs` — semantics mirror
-- `v1/crates/lowering/src/designation.rs` — the `Lower` impl
-- `v1/plugins/builtin/macros/designations/Commander.ron` — the row, and its
-  self-contradicting comment
-- `v1/crates/plugin/tests/builtin.rs` — pins the wrong value today
-  (`assert_eq!(scope_of("Commander"), DesignationScope::Object)`)
+## Not in scope
 
-Standard constraints apply.
+- `v1/`: its Commander row and the test pinning `DesignationScope::Object`
+  (`v1/crates/plugin/tests/builtin.rs`) go when `v1/` is deleted.
+
+## Pointers
+
+- `crates/core/src/designation.rs` (`DesignationScope`, `DesignationDef`)
+- `plugins/builtin/definitions/designation/commander.syl`
+- `crates/engine/src/state.rs` (`DesignationStore`)

@@ -1,66 +1,55 @@
 ---
 needs: []
 ---
-**Engine: a resolving spell or ability does not affect, or read information
-from, a target that has become illegal; and a spell or ability that does not
-resolve because all its targets are illegal is not "countered".** Part 1 is
-reachable with canon Pounce, Arc Lightning and Fate Transfer.
 
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #13,
-#12. `done/engine-target-distinctness.md` §3 specified "illegal targets are
-excluded from `Target(n)`/plural reads"; only departed-target exclusion landed.
+# Engine: a resolving spell or ability neither affects nor reads a target that has become illegal, and one that doesn't resolve because all its targets are illegal is not countered
 
-## 1. Illegal targets are still read (#13)
+## Why
 
-- `crates/engine/src/resolve/targets.rs:28` `targets_still_legal(&self,
-  entry) -> bool` computes legality per target but returns one bool
-  (`:84-104`); its doc (`:20-22`) says "(the illegal targets are then excluded
-  from the reads)".
-- `resolve/query.rs:94-99` `live_target_slot` filters only departed objects
-  (`self.objects.get(target).is_some()`).
-- The unpruned `&entry.targets` reaches `resolution_region_frame` and
-  `cast::announced_effect_items` at `resolve/mod.rs:166-196` (spells),
-  `:303-312` (triggered), `:332-349` (activated).
+Illegal targets are still used (reachable with Pounce, Arc Lightning and Fate Transfer).
+`targets_still_legal` (`crates/engine/src/resolve/targets.rs`) judges each target but returns
+one bool, though its doc says the illegal targets "are then excluded from the reads".
+`live_target_slot` (`crates/engine/src/resolve/query.rs`) drops only departed objects, and the
+unpruned `entry.targets` reach `resolution_region_frame` and `cast::announced_effect_items` for
+spells, triggered and activated abilities (`crates/engine/src/resolve/mod.rs`). A target that
+gains hexproof or protection, changes controller or stops matching its filter while staying on
+the battlefield is still affected: Pounce still fights, and Arc Lightning still damages a
+creature that gained protection from red. Illegal targets aren't affected by the parts of the
+effect they're illegal for, and a part that needs information about one doesn't happen
+[CR#608.2b].
 
-So a target that gains hexproof or protection, changes controller, or stops
-matching its filter while staying on the battlefield is still affected (Pounce
-still fights; Arc Lightning still damages a target that gained protection).
-[CR#608.2b]: "Illegal targets, if any, won't be affected by parts of a resolving
-spell's effect for which they're illegal", and a part that needs information
-about an illegal target "fails to determine any such information".
+The permanent-spell branch of `resolve/mod.rs` (an Aura attaching to `entry.targets`) never
+checks target legality. A permanent spell with an illegal target, other than a bestowed Aura or
+a mutating creature spell, doesn't resolve [CR#608.3b].
 
-**Change:** return per-slot legality and pass a pruned target set (illegal
-members read as nothing) into the frame and the effect items.
+A fizzle is stamped as a counter (latent). The four sites in `resolve/mod.rs` that remove an
+entry whose targets are all illegal give it `Cause::counter(Agency::StateBasedAction, None)`,
+the same shape a real `Action::Counter` produces and the cause a "countered" view narrows by
+(`crates/engine/src/event.rs`). Such a spell or ability "doesn't resolve" and is removed
+[CR#608.2b]; nothing counters it [CR#701.6a], and state-based actions happen only when a player
+would get priority [CR#704.3]. Multani's Presence's ruling: "A spell that doesn't resolve because
+its targets are illegal isn't countered, so this ability won't trigger." No countered-event view
+exists yet.
 
-**Check alongside:** the permanent-spell branch (`resolve/mod.rs:126-159`, an
-Aura's `attach_to` from `entry.targets`) never calls `targets_still_legal`.
-[CR#608.3b]: a permanent spell with an illegal target, other than a bestowed Aura
-or mutating creature spell, doesn't resolve. Verify with canon Pacifism and fix
-here if it reproduces.
+## Done when
 
-## 2. A fizzle is stamped as a counter (#12)
+- Target legality is judged per target, and the frame and effect items see only the legal
+  targets; an illegal target reads as no object.
+- A permanent spell checks its targets as it resolves and, if they are illegal, goes to its
+  owner's graveyard without entering, except a bestowed Aura or mutating creature spell
+  [CR#608.3b]. Pacifism (in the engine's test canon) whose target became illegal is the test.
+- Targets-illegal removal carries its own cause, which is neither the "Counter" verb nor the
+  state-based-action agency, at all four sites. `Action::Counter` keeps the "Counter" cause.
+- Tests: Arc Lightning on two creatures, one of which gains protection from red before
+  resolution, damages only the other; Pounce whose opposing target gained hexproof makes no
+  fight and deals no damage; a spell whose only target became illegal goes to the graveyard and
+  does not fire a "whenever a spell you control is countered" trigger.
 
-Four sites stamp targets-illegal removal `Cause::counter(Agency::StateBasedAction,
-None)`: `resolve/mod.rs:201-210` (copy, `AbilityCountered`), `:211-224` (spell,
-Stack→Graveyard `ZoneChange`), `:315-322` (triggered), `:353-360` (activated).
-`event.rs:103-107` documents `Cause::counter` as the cause a "becomes countered"
-view narrows by, and a real `Action::Counter` (`resolve/action.rs:117-135`)
-produces the same shape. [CR#608.2b]: the spell or ability "doesn't resolve. It's
-removed from the stack and, if it's a spell, put into its owner's graveyard";
-nothing counters it ([CR#701.6a] is the counter verb). [CR#704.3] confines
-state-based actions to the priority check, so the SBA agency is wrong too.
-Multani's Presence ruling (2018-04-27): "A spell that doesn't resolve because its
-targets are illegal isn't countered, so this ability won't trigger." Latent: no
-countered-event view exists yet and Multani's Presence is `.todo`.
+## Pointers
 
-**Change:** give targets-illegal removal its own cause (a "does not resolve" verb
-under a resolution agency) at all four sites; keep "Counter" for
-`Action::Counter`.
-
-## Tests
-
-- Arc Lightning on two creatures, one gains protection from red before
-  resolution: only the other is dealt damage.
-- Pounce, the opponent's creature gains hexproof: no fight, no damage.
-- A spell whose only target became illegal goes to the graveyard and does not
-  fire a "whenever a spell you control is countered" trigger.
+- `crates/engine/src/resolve/targets.rs` (`targets_still_legal`)
+- `crates/engine/src/resolve/query.rs` (`live_target_slot`)
+- `crates/engine/src/resolve/mod.rs` (the spell, permanent-spell, triggered and activated
+  branches)
+- `crates/engine/src/event.rs` (`Cause::counter`), `crates/core/src/event.rs` (`Agency`)
+- `crates/engine/src/resolve/action.rs` (`Action::Counter`)

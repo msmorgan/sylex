@@ -1,47 +1,33 @@
 ---
 needs: []
 ---
-## Deferred status — 2026-09-06
 
-Parked as a v1 witness/lowering obligation, not a request to add new v1
-syntax. Lean already has `Cost.either`, so the v2 workbench can represent a
-cost alternative; that alone does not establish Perforating Artist's payment
-behavior, payer scope, or lowering. Revisit against the successor lowering
-path, preserving the witness and acceptance below. The original v1 diagnosis
-is retained for context; it is not a claim that Lean lacks cost alternatives.
+# Core and engine: a punisher whose escape is a choice between two costs
 
-## Original v1 gap
+## Why
 
-**"Unless that player sacrifices … OR discards a card" has no spelling: a
-semantic `Cost` is a conjunction.** Found by
-`core-regions-witness-fixtures`; it is the blocker on Perforating Artist.
-Standard constraints apply.
+Perforating Artist: "each opponent loses 3 life unless that player sacrifices a nonland
+permanent of their choice or discards a card." `.syl` can write the escape as one cost with a
+choice in it (the `or` cost primitive and its `either` Template, used by Earthen Goo's cumulative
+upkeep), but core cannot: `sylex_core::Cost` is a list of `CostComponent`s that must all be paid,
+and `May` with `Pay(cost)` takes one such list. Two nested `May(Pay(…))`s would ask two yes/no
+questions in a row instead of offering one choice among three outcomes, so they are not a faithful
+substitute. Whatever shape core gets must keep the [CR#118.12a] reading (the escape is something
+the affected player may do) and make the payer the loop's player, not the ability's controller.
 
-## The gap
+## Done when
 
-`Cost` is `Arc<[CostComponent]>` — every component must be paid — and the
-`Unless` macro takes exactly one `Cost`. A punisher whose escape is a CHOICE
-between two costs ("each opponent loses 3 life unless that player sacrifices a
-nonland permanent of their choice or discards a card") therefore cannot be
-written at all. Nesting two `May(Pay(…))`s would ask two sequential yes/no
-questions instead of offering one choice among three outcomes, so it is not a
-faithful substitute.
+- Core can express a cost that is a choice among costs, as `.syl`'s `or` does, and the engine
+  offers the paying player one decision among the alternatives (or declining).
+- `crates/engine/tests/region_witnesses.rs`'s
+  `perforating_artist_taxes_each_opponent_who_will_not_pay` loses its `#[ignore]` and passes with
+  the punisher spelled, alongside the Raid intervening "if" and the per-opponent loop already in
+  that fixture, and without new syntax in `v1/`.
 
-A design decision is needed before an implementation: whether the disjunction
-lives on `Cost` (a component that is itself a choice among costs), on the
-`Unless`/`May` shape, or as a modal cost rider. Whichever it is, it must keep
-[CR#118.12a]'s reading — the escape is a cost the affected player MAY pay —
-and the payer must stay the loop element, not the ability's controller.
+## Pointers
 
-## Related
-
-Either disjunct alone would still hit
-`lowering-pay-cost-decision-registers`: both are decision-bearing costs inside
-a body's `Pay`.
-
-## Acceptance
-
-`crates/engine/tests/region_witnesses.rs`'s
-`perforating_artist_taxes_each_opponent_who_will_not_pay` loses its `#[ignore]`
-and passes with the punisher spelled, alongside the Raid intervening-if and
-the per-opponent loop already in that fixture.
+`crates/core/src/cost.rs` (`Cost`, `CostComponent`), `crates/core/src/effect.rs`
+(`May`), `crates/engine/tests/region_witnesses.rs` (Perforating Artist, and Painful Quandary for
+the single-cost punisher), `plugins/builtin/primitives/cost/or.syl`,
+`plugins/builtin/templates/cost/either.syl`, `plugins/builtin/templates/action/doUnless.syl`,
+`docs/decisions/core.md`.

@@ -1,24 +1,26 @@
 ---
 needs: []
 ---
+
 # Name the mtg-rules skill in CLAUDE.md for rules-modeling work
 
-Add one line (about 60 tokens) to the "CR citations" section of `CLAUDE.md` (`AGENTS.md` is a
-symlink to it, so Codex reads the same line). Agents here never load the mtg-rules skill: session
-transcripts show 0 mtg-rules Skill calls from sylex Claude subagents against 165 jj-sensei
-calls, because the current instructions route CR work only to `cargo xtask cite`.
+## Why
 
-What the line says:
+`CLAUDE.md` routes all CR work to `cargo xtask cite`, which only checks that cited rules exist and
+pins their text. It never mentions the mtg-rules skill, which supplies rule text, card data,
+rulings and maps of the rules a subsystem spans, so agents designing or auditing rules encodings
+work without those maps.
 
-- `cargo xtask cite` checks that cited rules exist and pins their text.
-- The mtg-rules skill supplies rule text, card data, rulings and maps of the rules a subsystem
-  spans. Before designing or auditing anything that encodes the rules, read the matching map
-  section (`scripts/ref <map> <section>`).
-- Cite rules, not maps.
+## Done when
 
-Gate: the line names `scripts/ref`, which ships in mtg-rules v1.11.0 (the local jj stack in
-`~/Projects/agent-plugins/mtg-rules`, not yet pushed). As of 2026-10-21 the installed plugin is
-1.10.1. Land the line once `~/.claude/plugins` has 1.11.0; landing earlier, the line must say that
-`ref` needs mtg-rules ≥ 1.11.0.
+- The "CR citations" section of `CLAUDE.md` (which `AGENTS.md` links to) gains one short line
+  saying: `cargo xtask cite` checks cited rules and pins their text; the mtg-rules skill supplies
+  rule text, card data, rulings and subsystem maps, and before designing or auditing anything that
+  encodes the rules, read the matching map section (`scripts/ref <map> <section>`); cite rules,
+  not maps.
+- The edit follows the `writing-for-agents` skill.
 
-Use the `writing-for-agents` skill for the edit.
+## Pointers
+
+- `CLAUDE.md` (CR citations)
+- The installed mtg-rules plugin: `skills/mtg-rules/scripts/ref` and `skills/mtg-rules/references/`.

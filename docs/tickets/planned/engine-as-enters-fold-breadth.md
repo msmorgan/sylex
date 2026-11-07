@@ -1,44 +1,31 @@
 ---
 needs: []
-design: true
 ---
-**Engine: scope `apply_as_enters`'s catch-all (`replace.rs`).**
+# Route every `also` shape of an enters replacement to an owner
 
-`apply_as_enters` folds a self `Also(would: Enters(This), also: …)`
-replacement into `EnterStatus`. Handled today: `Act(Tap(This))`,
-`With(ChooseOne(quality), Attach(This, It))` (enters attached),
-`Act(PutCounters(This, kind, n))`, `If` (the taken branch, recursively), and
-`Sequentially`/`Simultaneously` (composing any of the above). Everything else
-falls into one generic `todo!` seam — a single catch-all cannot honestly name
-one owning ticket, because the residual `also` shapes belong to different
-lanes.
+## Why
 
-This is a **scoping ticket, not an implementation ticket**: enumerate which
-`also` shapes a self `Enters(This)` replacement can realistically carry, and
-route each to its owner, rather than pre-guessing an implementation.
+`apply_as_enters` (`crates/engine/src/replace.rs`) folds a permanent's own
+`Replacement::Also { would: <it enters>, also }` [CR#614.1c] into its `EnterStatus`. It handles
+`Act(Tap)` of itself, a host `Choose` followed by `Act(Attach)` (enters attached), `Act(PutCounters)`
+on itself, `If` (the taken branch) and `Sequentially`/`Simultaneously` of those. Every other
+`Instruction` falls into one catch-all `todo!`, which can't name an honest owner because the
+remaining shapes belong to different work, and the repo forbids catch-all arms.
 
-Known destinations already split out:
+## Done when
 
-- **Entry-time player choices** ("as this enters, choose a color/type/
-  number/opponent") — a `With(binder, body)` shape distinct from the
-  attach-quality `With` already handled; the choice must be stored and read
-  back by other abilities. Owner: `core-as-enters-choices`.
-- **Face-down entry** (manifest/morph/disguise/cloak self-text, if any card
-  actually prints it as an as-enters replacement rather than an alternative
-  cast cost). Owner: `engine-face-down`.
+- Vintage-legal cards are surveyed for "As [this] enters …", "[This] enters with …" and
+  "[This] enters as …" texts, and each `Instruction` shape they need in `also` is known.
+- The catch-all arm is replaced by explicit arms: each shape is folded, or is a `todo!` naming
+  its owning ticket (entry-time choices such as "choose a color" are `core-as-enters-choices`;
+  face-down entry is `engine-face-down`; a shape with no owner gets a new ticket). A variant no
+  card puts there is an arm that fails naming the defect.
 
-Everything else in the `OneShotEffect` grammar (`Continuously`, `Until`,
-`Label`, `SeparatePiles`, `ChoosePile`, `May`, `AdditionalCost`, `Each`,
-`Distribute`, `Noting`, `Delayed`, `Reflexive`, `Modal`, `Targeted`, `Repeat`,
-`Batch`, `RevealUntil`, `Expanded`, and any bare `Act(...)` other than
-`Tap`/`PutCounters`) has no confirmed real-card driver reaching this seam
-yet. Don't pre-build folds for these; when the `todo!` actually fires against
-a real card, route it to the matching existing ticket or split a new one
-here.
+## Not in scope
 
-Done when every `also` shape with a real corpus card behind it is routed to
-an owning ticket (existing or newly split), and this list is the reference
-for the next one that fires rather than each getting re-derived from
-scratch.
+Implementing the folds that the survey routes elsewhere.
 
-Effort: **S**.
+## Pointers
+
+- `crates/engine/src/replace.rs` (`as_enters_status`, `apply_as_enters`)
+- `crates/core/src/effect.rs` (`Instruction`)

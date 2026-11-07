@@ -1,42 +1,42 @@
 ---
 needs: []
-design: true
 ---
-**Engine: `Condition::Crossed` is correct by convention, not by construction.**
+# Make `Condition::Crossed` correct by construction
 
-`condition.rs` reads `frame.anaphora.crossed`, a before/after pair set by
-counter-placement event roles ([CR#714.2b] — "if the number of lore counters
-on it was less than N and became at least N"). `Crossed` has exactly one
-grammar producer, the `Chapter` saga macro, which always expands to a
-triggered ability's intervening-if condition. `core-saga-chapters` (done) says
-so outright: chapters are `Crossed`'s only consumer.
+## Why
 
-**That path is fully wired and works.** `crossed` threads through
-`EventRoles`/`TriggerBindings` at both the printed
-(`trigger.rs::scan_event`) and delayed gates, and is rechecked at resolution.
-Nothing is broken today.
+`Condition::Crossed` ("if the number of lore counters on it was less than N and became at least N",
+[CR#714.2b]) reads the before/after counts that the firing counter-placement fact puts in the
+frame. Only a Saga chapter's intervening-if condition supplies that channel, at both the printed
+and the delayed trigger gate and again at resolution, and that path works. Every other
+`condition_holds` caller builds a frame with no channel: an activated ability's "Activate only if"
+gate (`activate.rs`), the state-based statics (`sba.rs`) and the `ForAsLongAs` sweep
+(`state.rs`), and the `EventFilter::When` refinement when it falls back to a watcher frame
+(`eval.rs`); the derived-condition pass in
+`layer.rs` short-circuits `Crossed` to false. A `Crossed` that reached any of them would hit the
+`todo!` in `condition.rs` at runtime with no earlier signal. No producer emits that shape today, so
+this is hardening.
 
-What is missing is enforcement of the exclusivity. `condition_holds` has many
-other call sites that build a frame with no `crossed` channel — an activated
-ability's "Activate only if" gate in `activate.rs`, the `Sba` statics and
-`ForAsLongAs` duration sweeps in `sba.rs` (all via `Frame::bare`), the
-derived-condition pass in `layer.rs` (which short-circuits `Crossed => false`
-rather than reaching `condition_holds` at all), and `eval.rs`'s
-`EventFilter::When` refinement. If a future macro composed `Crossed` into one
-of those positions it would panic at runtime with no authoring-time signal.
+Two fixes close it, and the owner picks one:
 
-Decide one of:
+1. **Restrict where it can appear.** Lowering (or core's types) admits `Crossed` only as a
+   triggered ability's intervening-if condition, so any other position is refused before play.
+2. **Make it self-sufficient.** `Crossed` reads the firing counter-placement fact from history, as
+   `Condition::Happened` does, so it needs no frame channel. This also serves per-member firing
+   when one doubled placement crosses two chapters of a range at once
+   (`docs/tickets/planned/engine-sagas.md`).
 
-1. **Grammar-gate it.** Restrict `Crossed` to the triggered-ability
-   `condition:` position at macro-expansion or Lean check time, making it a
-   build-time error elsewhere. Matches the stated design intent literally.
-2. **Make it self-sufficient.** Have `Crossed` query history for the firing
-   counter-placement fact the way `Condition::Happened` already does, needing
-   no frame plumbing anywhere. Higher leverage if `engine-sagas`' per-crossed
-   firing ends up evaluating `Crossed` somewhere the trigger gate doesn't
-   reach.
+## Done when
 
-Either closes the panic by construction. Filed under `maybe/` because no
-grammar produces the failing shape — this is hardening, not coverage.
+- The chosen fix is in, and the `todo!` in `Condition::Crossed`'s arm is unreachable by
+  construction (option 1) or gone (option 2).
+- A test shows the chosen behavior for a `Crossed` outside a chapter trigger: refused before play,
+  or evaluated correctly.
+- The existing Saga chapter tests pass unchanged.
 
-Effort: **S**. Design input needed on which option.
+## Pointers
+
+- `crates/core/src/condition.rs` (`Crossed`), `crates/engine/src/condition.rs`
+- `crates/engine/src/trigger.rs` (`scan_event`, `TriggerBindings`), `crates/engine/src/layer.rs`
+- `plugins/builtin/primitives/event/chapterMark.syl`,
+  `plugins/builtin/definitions/subtype/enchantment/saga.syl`

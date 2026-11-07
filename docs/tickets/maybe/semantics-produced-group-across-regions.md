@@ -1,44 +1,37 @@
 ---
 needs: []
 ---
-## Deferred status — 2026-09-06
 
-Parked as a successor-lowering obligation. The original gap concerns v1
-execution regions; the Lean surface model does not establish how a produced
-per-player group crosses those regions. This is unresolved, not answered by
-v2 grammar or ordinary linked-ability memory. Preserve the Deadly Brew witness
-and its required behavior below, and revisit when the lowering representation
-is concrete rather than extending v1 syntax in this pass.
+# Core: read a group an enclosed per-player region produced ("… this way")
 
-## Original v1 gap
+## Why
 
-**"…this way" cannot name a group an ENCLOSED region produced.** Found by
-`core-regions-witness-fixtures`; it is the blocker on Deadly Brew. Standard
-constraints apply.
+Deadly Brew: "Each player sacrifices a creature or planeswalker of their choice. If you
+sacrificed a permanent this way, you may return another permanent card from your graveyard to
+your hand." `.syl` writes this kind of readback as a lookback over the enclosing action
+(`did(…, thisWay)`, as Vaevictis Asmadi, the Dire does), but core has no shape for it. The first
+sentence's choice is made inside the `Each`-over-players body, a region of its own, and a region
+reads nothing it did not declare, with only captures going in and linked memory crossing out
+(`core.md` laws 1–3). Linked memory [CR#607.1] is the wrong channel: it links two abilities printed
+on one object, not two clauses of one resolution, and the group wanted here is per player.
+Rewriting the card as "you sacrifice, then each opponent sacrifices" is not a substitute: the
+choices are made in APNAP order and the sacrifices happen simultaneously [CR#608.2e].
 
-## The gap
+## Done when
 
-"Each player sacrifices a creature or planeswalker of their choice. If you
-sacrificed a permanent this way, you may return another permanent card from
-your graveyard to your hand." The first sentence's choice happens inside the
-`Each`-over-players body — a region of its own — and a register does not
-escape its region ([Core](../../decisions/core.md)
-law 1). `Noting` binds only the newest antecedent of the region it wraps, so it
-cannot reach in either.
+- Core can represent a group produced across the iterations of an enclosed per-player region so a
+  later clause of the same resolution can test membership in it and exclude its members
+  ("another"), consistent with `core.md`'s region laws (or with an amendment to them agreed with
+  the owner).
+- `crates/engine/tests/region_witnesses.rs`'s
+  `deadly_brew_lets_the_caster_rebuy_after_the_table_sacrifices` loses its `#[ignore]` and
+  passes, without new syntax in `v1/`: each player sacrifices one of their own, and the caster,
+  having sacrificed one this way, returns a different permanent card from their graveyard to
+  their hand.
 
-The one channel that crosses a region boundary is linked memory ([CR#607.1],
-core law 3), and it is the wrong shape twice over: it links two abilities printed on
-one OBJECT, not two clauses of one resolution, and the group wanted here is
-per-player rather than per-card.
+## Pointers
 
-Restructuring the card to "you sacrifice, then each opponent sacrifices" is not
-a substitute — [CR#608.2e] has the choices made in APNAP order and the action
-processed simultaneously, which the rewrite would break.
-
-## Acceptance
-
-`crates/engine/tests/region_witnesses.rs`'s
-`deadly_brew_lets_the_caster_rebuy_after_the_table_sacrifices` loses its
-`#[ignore]` and passes: each player sacrifices one of their own, and the
-caster — having sacrificed one this way — returns a DIFFERENT permanent card
-from their graveyard to their hand.
+`docs/decisions/core.md` (Laws, §1–§3), `crates/core/src/effect.rs` (`Each`),
+`crates/engine/tests/region_witnesses.rs` (Deadly Brew),
+`plugins/canon/cards/Vaevictis Asmadi, the Dire.syl`,
+`plugins/builtin/primitives/timing/thisWay.syl`.

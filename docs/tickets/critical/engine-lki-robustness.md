@@ -1,65 +1,50 @@
 ---
 needs: []
 ---
-**Engine: `LkiSnapshot` captures the Object's derived characteristics and
-Controller at capture time, and every snapshot read uses them.** Promoted from
-`maybe/` on 2026-10-21: the original investigation (below) is now a correctness
-defect, because layers 2 and 4-7 exist and the snapshot still reads the printed
-card.
 
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #8
-(and the snapshot halves of #2 and #16).
+# Engine: `LkiSnapshot` captures the object's derived characteristics and controller, and every snapshot read uses them
 
-## What is wrong at head
+## Why
 
-- `crates/engine/src/lki.rs:16-19`, `LkiSnapshot` doc: "Characteristics
-  (types/P-T/name) derive from `source` via the card definition — correct in
-  Stage 3 (no continuous effects yet to have modified them)." Stale. The struct
-  stores no characteristics; `capture` (`:48-60`) stores the base
-  `o.controller`.
-- `trigger.rs:1586-1589` `snapshot_has_type` and `:1591-1625` `snapshot_stat`
-  read `snapshot_face` (the printed face): "The snapshot stores no derived P/T, so
-  this is the printed face — an LKI-stat capture seam." An animated land that dies
-  fails "whenever a creature dies"; a creature that lost a type still matches it.
-- `resolve/count.rs:36-66` `last_known_stat`: printed P/T plus +1/+1 and -1/-1
-  counters. Canon Fling ignores Giant Growth or an anthem on the sacrificed
-  creature.
-- The snapshot test `snapshot_stat_reads_printed_stats` (`trigger.rs:5491`) pins
-  the printed read; it is rewritten to assert a derived read (a pumped creature's
-  snapshot reports its pumped power).
+`LkiSnapshot` (`crates/engine/src/lki.rs`) stores the card spine, the base controller, tap state,
+damage, attachment host, counters and the zone left. Its doc still says characteristics derive
+from the card definition because no continuous effects exist; layers 2 and 4–7 now exist.
+Every characteristic read of a departed object therefore reads the printed face:
 
-[CR#603.10]: look-back triggers use "the appearance of objects immediately prior
-to the event". [CR#608.2h]: an effect needing information from an object that
-left its expected public zone "uses the object's last known information". Fling's
-ruling (2024-04-12): "Use the sacrificed creature's power as it last existed on
-the battlefield."
+- `snapshot_has_type` and `snapshot_stat` (`crates/engine/src/trigger.rs`) and the other
+  `filter_matches_snapshot_with_activation` leaves read `snapshot_face`. A land animated into a
+  creature that dies fails "whenever a creature dies"; a creature that lost a type still
+  matches it.
+- `last_known_stat` (`crates/engine/src/resolve/count.rs`) is printed power and toughness plus
+  +1/+1 and -1/-1 counters. Fling ignores an anthem or Giant Growth on the sacrificed creature,
+  though its ruling says to "use the sacrificed creature's power as it last existed on the
+  battlefield" [CR#608.2h].
+- A stolen creature's snapshot names its owner as controller.
 
-## Change
+Look-back triggers use "the appearance of objects immediately prior to the event" [CR#603.10].
 
-Capture, at `LkiSnapshot::capture`, the derived values from `state.layers()`:
-card types, subtypes, supertypes, colors, name, mana value, power, toughness,
-abilities (keywords included, for the [CR#702.15c,702.2e] damage reads in
-`engine-damage-results-life-events`), Controller, and the current Card Face Side.
-`snapshot_has_type`, `snapshot_stat`, `last_known_stat` and the other
-`snapshot_face` readers read the stored values. Delete the stale doc paragraph.
+## Design
 
-Keep the original constraint: the snapshot is a value (no live object
-references; the engine never retains dead objects). Whether the captured set is
-an enumerated struct or a generic per-characteristic map is the implementer's
-call; the original investigation preferred a map so new captured facts do not
-need per-predicate struct surgery (`engine-snapshot-predicate-breadth` class 2,
-`engine-snapshot-object-classification`, `engine-snapshot-combat-state` all add
-captured facts and should land on the same shape).
+- Every ticket that adds a captured fact to the snapshot uses one shared capture shape; whether
+  that shape is an enumerated struct or a per-characteristic map is the implementer's call.
 
-Overlap: `engine-statof-reference-channel` covers routing `Count::StatOf` through
-a live-or-LKI reference and already asks for "derived power/toughness rather than
-silently falling back to printed values"; this ticket supplies the captured
-values that channel reads.
+## Done when
 
-## Tests
+- `LkiSnapshot::capture` records the object as it last existed in the zone it left
+  [CR#608.2h], from `state.layers()`: card types, subtypes, supertypes, colors, name, mana value,
+  power, toughness and abilities (keywords included), plus its controller and which face is up.
+  Every snapshot reader reads them; no snapshot read uses the printed face. The stale doc
+  paragraph is gone.
+- `snapshot_stat_reads_printed_stats` (`trigger.rs`) is rewritten to assert a derived read (a
+  pumped creature's snapshot reports its pumped power).
+- Tests: a creature pumped by an anthem is sacrificed to Fling, and Fling deals the pumped
+  power; an animated land dies and "whenever a creature dies" triggers; a creature stolen by a
+  layer-2 effect dies and its snapshot's controller is the thief.
 
-- A creature pumped by an anthem is sacrificed to Fling; Fling deals the pumped
-  power.
-- An animated land (layer-4 creature type) dies; "whenever a creature dies"
-  triggers.
-- A stolen creature (layer-2) dies; its snapshot's Controller is the thief.
+## Pointers
+
+- `crates/engine/src/lki.rs`
+- `crates/engine/src/trigger.rs` (`snapshot_face` and its readers)
+- `crates/engine/src/resolve/count.rs` (`last_known_stat`)
+- `engine-snapshot-predicate-breadth`, `engine-snapshot-object-classification` and
+  `engine-snapshot-combat-state` add captured facts on the same shape.

@@ -1,100 +1,47 @@
 ---
 needs: []
 ---
-Retire the `Sideboard`-as-a-zone model and give an object's **position** a type
-that can name the out-of-game store, since a zone can't. Introduce a `Location`
-that wraps a `Zone` or is `OutsideTheGame`:
-
-```rust
-enum Location {
-    #[macro_ron(flatten)]
-    Zone(Zone),
-    OutsideTheGame,
-}
-```
-
-`Zone` is the **in-game subset** of `Location`. Cards are objects ([CR#109.1]),
-and an object can sit outside the game with no zone at all ([CR#400.11]) — so a
-position that may be out-of-game is a `Location`; a position the context
-*guarantees* is in-game stays a `Zone`. `#[macro_ron(flatten)]` lifts the zone
-variant names into `Location`'s dispatch exactly as `Destination::Zone` does
-today (`crates/core/src/action.rs`), so a bare `Hand` still
-reads/renders as `Hand`, never `Zone(Hand)`.
+# Give the engine a position for objects outside the game
 
 ## Why
 
-The CR is explicit that outside-the-game is **not a zone**, so a `Sideboard`
-zone constructor is a rules error:
+Wishes, companion, learn and venture reach cards outside the game, which is not a zone
+[CR#400.11]. The engine has nowhere to hold such a card: `GameObject.zone` is an `Option<Zone>`
+whose `None` means a player proxy, and `Zone` rightly has no sideboard. Modeling these effects
+today would force a fake zone.
 
-- [CR#400.1] "There are normally seven zones: library, hand, battlefield,
-  graveyard, stack, exile, and command." No sideboard among them.
-- [CR#400.11] "An object is outside the game if it isn't in any of the game's
-  zones. **Outside the game is not a zone.**"
-- [CR#400.11a] "Cards in a player's sideboard are outside the game." — the
-  sideboard is deck-construction membership ([CR#100.4]), not a place objects
-  sit *during* a game.
-- [CR#400.11c] cards outside the game can't be affected by spells/abilities
-  except their own CDAs and effects that bring them into the game — a
-  restriction that is a property of `OutsideTheGame`, distinct from any zone's
-  visibility default.
+## Design
 
-The concrete driver is the family of effects that reach out-of-game cards:
-Wishes (Burning/Living Wish), Companion, Learn/Lesson, and Venture/Dungeon
-([CR#309.2] dungeons begin outside the game). They fetch/reveal a **card**
-that has no `Zone` — it lives in a `Location::OutsideTheGame`. Modeling that
-today would force a fake `Zone::Sideboard`, which this ticket rules out.
-
-## Scope
-
-**Add `Location` (Rust `core`):**
-- New type beside `Zone`, flatten-lifting the zone names as above.
-- Verify parse⇄render round-trips (bare zone name ↔ `Zone` arm; `OutsideTheGame`
-  as its own token), matching the `Destination` flatten tests in `action.rs`.
-
-**Substitution scoping — the rule for the sweep (cards *are* objects
-[CR#109.1], so the axis is in-game vs out-of-game, not card vs object):**
-- An object's **position field** that must be able to name the out-of-game
-  store → `Location`. This is the widening of the object model: a card in a
-  sideboard, or a dungeon before it enters ([CR#309.2]), is an object with no
-  zone. Whether `Object`'s stored position (`Option<Zone>` today) becomes
-  `Location` is the central call this ticket makes — decide it explicitly
-  rather than by mechanical find-replace. (`None` today means "no zone yet";
-  `Location::OutsideTheGame` gives that state an actual name.)
-- A position the context **guarantees is in-game** stays `Zone`. A `Move`
-  destination is the clearest case: you cannot zone-change an object to
-  `OutsideTheGame` — leaving the game is a distinct event ([CR#400.11b]), not a
-  `Move`. `Destination` (which already excludes non-move zones) stays
-  `Zone`-based; battlefield/graveyard/hand/priority/SBA APIs likewise.
-- Net: `Location` appears at the *boundary* where out-of-game cards enter the
-  model (fetch sources, sideboard membership, reveal-from-outside); the in-game
-  hot path keeps `Zone` and is unchanged.
-
-## Out of scope (future, do not gate on this)
-
-Deck construction proper. When it lands:
-- `Deck::Mainboard` / `Deck::Sideboard` model the 60+15 membership
-  ([CR#100.2a,100.4a]) — the sideboard is a *deck partition*, not a `Location`
-  and not a `Zone`.
-- The card-scoped **Commander** designation is handled by commander-first
-  decklist ordering plus an authored `Commander.ron` rules-grant (or similar),
-  not a new zone. (Note the command zone *is* a real zone, [CR#408]; this is
-  about the deck-side designation, not where the commander sits in play.)
-
-These are named here only so the `Location` refactor stays independent of them
-and claimable on its own.
+- No `Zone` variant stands for the sideboard or any other out-of-game store; a card outside the
+  game is an object with no zone.
+- A position that can be outside the game uses a type that wraps a `Zone` or names outside the
+  game, with `Zone` its in-game subset.
+- The sideboard is deck membership, modeled by deck construction as a partition of the deck
+  [CR#100.4,400.11a], not as this type and not as a `Zone`.
+- Open question: whether the wider type appears only where out-of-game cards enter the model
+  (fetch and reveal sources: Wishes, learn's Lesson [CR#701.48a], companion [CR#116.2g], venture
+  [CR#701.49a]) or `GameObject`'s stored position widens to it.
 
 ## Done when
 
-- No `Sideboard` `Zone` constructor anywhere (Rust or Lean); Lean gate (`lean/scripts/build`) green.
-- `Location` exists in `core` with round-trip tests; the flatten spelling keeps
-  bare zone names unchanged.
-- The in-game-vs-out-of-game scoping rule above is applied: object positions
-  that can be out-of-game use `Location`; guaranteed-in-game APIs keep `Zone`.
-- Standard constraints apply (fmt, clippy, CR citations blessed, wizards regen
-  if touched).
+- `sylex_core` has the out-of-game-capable position type, with serde round-trip tests that keep
+  every zone's existing spelling.
+- Its name fits `docs/contexts/game-model/CONTEXT.md`, where **Location** already means a Zone, a
+  pile position, anywhere, or a combination (the `.syl` sort, which treats outside the game as a
+  predicate, `outsideTheGame`, not a Location).
+- The open question in Design is answered and written in the type's doc comment. A player proxy
+  keeps a representation distinct from "outside the game".
+- `Destination` and the other guaranteed-in-game APIs still take `Zone`.
 
-Routing (2026-10-08, `semantics-v2-keyword-action-residues`; revised 2026-10-25): this ticket is
-the Rust `Location` work only. On the Lean side, `lean-v3-keyword-bodies-and-catalog-sync`
-declared learn [CR#701.48a] with its Lesson described as `outsideTheGame`, a Predicate meaning in
-none of the seven zones [CR#400.11], not a zone; venture into the dungeon's dungeon card
-[CR#701.49a,309.2] is `lean-v3-venture-dungeon`'s.
+## Not in scope
+
+Deck construction (mainboard and sideboard membership, [CR#100.4]) and any card that uses the new
+position: each fetch effect lands with its own card.
+
+## Pointers
+
+- `crates/core/src/zone.rs`, `crates/core/src/action.rs` (`Destination`),
+  `crates/engine/src/object.rs` (`GameObject.zone`, `mint`)
+- `plugins/builtin/templates/predicate/outsideTheGame.syl`,
+  `plugins/builtin/definitions/keyword_ability/companion.syl`,
+  `plugins/builtin/definitions/keyword_action/learn.syl`

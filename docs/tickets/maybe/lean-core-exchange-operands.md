@@ -1,28 +1,31 @@
 ---
 needs: []
 ---
-# Fold `Exchanged.lifeTotals` into `Exchanged.values` (`[CR#701.12c,701.12g]`)
 
-In [`Semantics/Abilities.lean:518-525`](../../../lean/Semantics/Abilities.lean),
-`Exchanged` has five constructors:
-- `lifeTotals (parties : NounPhrase)` (`[CR#701.12c]`)
-- `controlOf (left right : NounPhrase)` (`[CR#701.12b]`)
-- `cardsAcross (left right : NounPhrase)`
-- `zones (left right : Location)` (`[CR#701.12d]`)
-- `values (left right : Amount)` (`[CR#701.12g]`: life totals, powers,
-  toughnesses, or rolled results)
+# Decide whether `.syl`'s `lifeTotals` exchange operand folds into `values`
 
-Under `[CR#701.12c,701.12g]`, exchanging life totals is exchanging two numerical
-values, and *Tree of Redemption* ("Exchange your life total with Tree of
-Redemption's toughness") already uses `values (lifeOf you) (toughnessOf thisCreature)`.
-Two-party life-total exchanges with distinct NPs (*Mirror Universe*: `"you"` and
-`"target opponent"`) likewise write `values (lifeOf you) (lifeOf (target isOpponent))`
-directly.
+## Why
 
-## Design
+The `exchange` primitive takes one `Exchanged` operand, with five constructors:
+`controlOf` [CR#701.12b], `cardsAcross` [CR#701.12d], `zones` [CR#701.12f], `values`
+[CR#701.12g] and `lifeTotals` [CR#701.12c]. Exchanging life totals is exchanging two numerical
+values, so `exchangeValues` over two `lifeTotalOf` amounts could say what `exchangeLifeTotals`
+says, and `semantics.md` §1 item 5(b) prefers composing over minting. `lifeTotals` exists because
+it takes one group of players, so "Two target players exchange life totals" (Soul Conduit, Axis of
+Mortality, Profane Transfusion) names both parties as one plural target group; `values` takes two
+separate amounts. Canon's one user today, Mirror Universe, writes
+`exchangeLifeTotals(youAnd(target(isOpponent)))`.
 
-- Check whether plural two-party life exchanges (*Soul Conduit*: `"Two target
-  players exchange life totals"`, currently `lifeTotals (targets (exactly 2) isPlayer)`)
-  can be expressed cleanly through `values` (or a pairwise `valuesOf (axis : ProjAxis) (parties : NounPhrase)`)
-  without losing the single plural target group (`targets (exactly 2) isPlayer`),
-  retiring `Exchanged.lifeTotals`.
+## Done when
+
+- Either `lifeTotals` is retired, every life-total exchange is written through `values` (or a
+  pairwise form over one group of players), and "two target players" stays a single plural target
+  group; or `lifeTotals` stays and `exchange.syl`'s doc comment states why.
+- The life-total exchange cards in canon (Mirror Universe today) still read as printed.
+
+## Pointers
+
+`plugins/builtin/primitives/action/exchange.syl`, `lifeTotals.syl`, `values.syl`;
+`plugins/builtin/definitions/keyword_action/exchangeLifeTotals.syl`, `exchangeValues.syl`;
+`plugins/builtin/templates/quantity/lifeTotalOf.syl`; `plugins/canon/cards/Mirror Universe.syl`;
+`docs/decisions/semantics.md` §1.

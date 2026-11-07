@@ -1,51 +1,52 @@
 ---
 needs: []
 ---
-**Engine: a token made as a copy keeps the copied mana cost (and so its colour
-and mana value) and loyalty.** Reachable: Offspring mints `Copy(source: SelfCard)`,
-so live Offspring cards (Agate Instigator, {1}{R}) make a colourless token with
-mana value 0; Populate is affected the same way.
 
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #5.
+# Engine: a token made as a copy keeps the copied mana cost and loyalty, so its color and mana value come from that cost
 
-## What is wrong at head
+## Why
 
-- `crates/engine/src/copy.rs:278-311` `token_from_copiable`: "`Token` has
-  no `mana_cost`/`loyalty`/`defense` slot … those `CopiableValues` fields are dropped
-  here"; builds `Token { name, color_indicator, supertypes, types, subtypes,
-  abilities, power, toughness }`.
-- `object.rs:142` `push_token`: `mana_cost: ManaCost::default()`, and `:151-152`
-  `loyalty: None, defense: None`.
-- `crates/core/src/token.rs:319-320` doc: "a token has no mana cost".
-- `layer.rs:248-264` `base_colors` reads the mana cost and uses the colour indicator
-  only `if colors.is_empty()`, a fallback rather than a union.
+A copy acquires the original's copiable values, mana cost and loyalty among them [CR#707.2],
+and a token has a mana cost when the effect that creates it says so [CR#202.1b]. The engine
+drops both: `token_from_copiable` (`crates/engine/src/copy.rs`) builds a `Token`, which has no
+mana-cost or loyalty slot, and `push_token` (`crates/engine/src/object.rs`) mints every token
+with an empty mana cost and no loyalty. An Offspring token of Agate Instigator ({1}{R}) is
+therefore colorless with mana value 0; Populate and every other token-copy path are affected
+the same way. Cackling Counterpart's ruling ("If the copied creature has {X} in its mana cost,
+X is considered to be 0") presupposes the cost carries over.
 
-[CR#707.2]: copiable values include "name, mana cost, color indicator, card type,
-subtype, supertype, rules text, power, toughness, and/or loyalty". [CR#202.1b]: a
-token has no mana cost "unless the effect that creates them specifies otherwise".
-[CR#202.2] derives colour from the mana cost; [CR#202.2e]: an object "is each color
-denoted by that color indicator". Cackling Counterpart's ruling ("If the copied
-creature has {X} in its mana cost, X is considered to be 0") presupposes the cost
-carries over.
+Base color is also computed wrongly: `base_colors` (`crates/engine/src/layer.rs`) uses the
+color indicator only when the mana cost has no colors, but an object is the colors of its mana
+cost [CR#202.2] and also each color its color indicator denotes [CR#202.2e].
 
-## Change
+Embalm and Eternalize copy "except … it has no mana cost" [CR#702.128a,702.129a]. Today they
+come out right only because the cost is always dropped, with their color set through the color
+indicator.
 
-1. Mint copy tokens with the copied mana cost and loyalty: either give `Token`
-   those slots or build the object straight from `CopiableValues`. Colour and mana
-   value then derive from the copied cost. [CR#707.2] does not list defense;
-   decide by reading the CR whether a battle copy carries its printed defense
-   before adding that slot, and register it as underdetermined if the CR is silent.
-2. Make `base_colors` the union of the mana cost's colours and the colour indicator
-   ([CR#202.2,202.2e]).
-3. Embalm ([CR#702.128a], "it has no mana cost") and Eternalize: today
-   `Embalm.ron:17` / `Eternalize.ron:31` set colour with
-   `Modify(Colors(Set([…])))`, which writes the colour indicator (`copy.rs:334`) and
-   is right only because the cost is dropped. Give them an explicit "no mana cost"
-   copy exception, and make the colour `Set` win over the cost-derived colour.
-4. Correct the `token.rs` and `copy.rs` docs.
+## Done when
 
-## Tests
+- A token created as a copy has the copied mana cost and loyalty; its color and mana value
+  derive from that cost.
+- `base_colors` is the union of the mana cost's colors and the color indicator's.
+- Core can say "it has no mana cost" as a copy exception. Embalm and Eternalize use it, and their
+  color exception wins over the color the copied cost would give.
+- The docs that say a token never has a mana cost are corrected: `token_from_copiable`'s
+  doc in `copy.rs`, and the `Token` doc in `crates/core/src/token.rs` (which also cites
+  [CR#202.2e] for that claim; the rule is [CR#202.1b]).
+- Tests: an Offspring token of Agate Instigator is red with mana value 2; a copy of a creature
+  with {X} in its cost has mana value with X as 0; an embalmed token is white with mana value 0.
 
-- An Offspring token of a {1}{R} creature is red with mana value 2.
-- A copy of a creature with {X} in its cost has mana value counting X as 0.
-- An embalmed token is white with mana value 0.
+## Not in scope
+
+- Defense. [CR#707.2]'s list of copiable values leaves out defense; whether a copy of a battle
+  carries its printed defense is an open question for the owner.
+
+## Pointers
+
+- `crates/engine/src/copy.rs` (`token_from_copiable`, `apply_modification`)
+- `crates/engine/src/object.rs` (`push_token`)
+- `crates/engine/src/layer.rs` (`base_colors`)
+- `crates/core/src/token.rs` (`Token`), `crates/core/src/continuous.rs` (`Modification`)
+- `plugins/builtin/definitions/keyword_ability/{embalm,eternalize,offspring}.syl`
+- `crates/engine/src/resolve/player_action.rs` (the existing Embalm/Eternalize/Offspring
+  token-copy tests)

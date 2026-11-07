@@ -1,31 +1,47 @@
 ---
 needs: [core-regions-substrate]
 ---
-**Engine: make `Count::StatOf` consume a live-or-LKI reference result instead
-of a bare `ObjectId`.** Today power/toughness route a stale or null id into
-`LayeredView`'s live-object assertion, while mana value routes it into the live
-definition lookup. The count evaluator cannot distinguish “this role has valid
-last-known information” from “this announced target is now illegal and must not
-be used.”
 
-Use the unified reference channel to make that distinction explicit:
+# Engine: `Count::StatOf` reports "no information" for an illegal target or a gone current-only operand instead of reading 0
 
-- live subjects read derived characteristics;
-- source/event/cost roles that carry valid LKI read characteristics captured at
-  the required time, including derived power/toughness rather than silently
-  falling back to printed values; and
-- unavailable or current-only operands produce an unavailable count that makes
-  the consuming instruction no-op. They never become a raw null/stale lookup.
+## Why
 
-Foundations LKI witnesses: Heartfire Immolator after sacrificing itself;
-Halana and Alena, Partners and Prime Speaker Zegana after the trigger source
-leaves; Ovika, Enigma Goliath after the triggering spell leaves the stack.
-Current-only negative witnesses shared with `engine-departed-reference-fizzle`:
-Bite Down and Felling Blow (an illegal target [CR#608.2b]). Heroes’ Bane is not a
-StatOf witness: "where X is its power" is untargeted, so a departed source's power
-is read from LKI [CR#608.2h,113.7a]; its no-op comes from the recipient being a new
-object [CR#400.7] (`docs/evidence/mtg-rules-review-2026-10-21/departures-docs.md`
-#42).
+`Count::StatOf` (`crates/engine/src/resolve/count.rs`) already reads a live-or-LKI reference
+product: a live object reads the layered view, and a departed object with a bound snapshot reads
+`last_known_stat`. What it can't say is that there is no answer. A register with no product, an
+illegal target and a gone operand that is not entitled to last-known information all read `0`.
+The rule is that the part of the effect needing information about an illegal target doesn't
+happen [CR#608.2b], which is not the same as that part happening with 0. The test
+`a_value_read_over_an_unwritten_register_degrades_to_null_not_a_panic` pins the `0` reading.
 
-Tests must distinguish the LKI-positive and current-only cases and verify the
-card result, not normalize every missing stat to zero indiscriminately.
+The witnesses, all Foundations cards, show both sides:
+
+- Entitled to last-known information: Heartfire Immolator after sacrificing itself as a cost
+  ("It deals damage equal to its power"); Halana and Alena, Partners and Prime Speaker Zegana
+  after the source leaves; Ovika, Enigma Goliath after the triggering spell leaves the stack.
+  Heroes' Bane is also here: "where X is its power" is untargeted, so a departed source's power
+  comes from last-known information [CR#608.2h,113.7a], and the ability does nothing only
+  because the recipient is a new object [CR#400.7].
+- Not entitled: Bite Down and Felling Blow when the creature you control has become an illegal
+  target [CR#608.2b].
+
+## Done when
+
+- A `StatOf` read over an illegal target, or over a current-only operand whose object is gone,
+  is "unavailable": the part of the effect that needs that information doesn't happen
+  [CR#608.2b]. It is never 0 or any other stand-in value. A read entitled to last-known
+  information with a bound snapshot reads the snapshot instead.
+- `a_value_read_over_an_unwritten_register_degrades_to_null_not_a_panic` is rewritten to assert
+  the unavailable result.
+- Tests distinguish the LKI-entitled and the current-only cases on the witness cards and check
+  each card's result, not only the absence of a panic.
+
+## Not in scope
+
+- Capturing derived power and toughness in the snapshot: `engine-lki-robustness`.
+
+## Pointers
+
+- `crates/engine/src/resolve/count.rs` (`Count::StatOf`, `last_known_stat`)
+- `crates/engine/src/resolve/query.rs` (`eval_reference_product`)
+- `crates/engine/src/activation.rs` (`ReferenceProduct`, `Value::Unavailable`)

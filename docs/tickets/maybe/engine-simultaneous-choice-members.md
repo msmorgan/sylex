@@ -1,39 +1,37 @@
 ---
 needs: []
-design: true
 ---
-**Engine: a `Simultaneously` member whose verb needs an in-resolution choice
-panics. No card needs it yet; the design question is real.**
+# A `Simultaneously` member that needs a choice during resolution
 
-`crates/engine/src/resolve/effect.rs` requires every `Act` member's
-`action_items` lowering to yield nothing but `WorkItem::Emit`. Several
-`Action` variants lower to something else when the verb needs a decision
-before it can become concrete events — `ChooseManaColor`/`ChooseManaMode`,
-`FlipCoins { called: true }`, `Retarget`, `ChooseNoteNumber`/
-`ChooseNoteCardName` (all in `resolve/player_action.rs`).
+## Why
 
-**Nothing authored reaches this.** The corpus's only `Simultaneously` users
-are the `Fight` and `ExchangeControl` builtin macros, Avarice Totem, and Axis
-of Mortality. All are pure verb pairs, except Avarice Totem, which trips
-`engine-simultaneous-non-verb-members`' guard first. The real template that
-would need this is Equipment/Aura swap ("Exchange this Equipment with an
-Equipment card in your hand") — a resolution-time choice of which card. No
-such card is authored, not even as a `.ron.todo` stub.
+The `Simultaneously` arm of `run_effect` (`crates/engine/src/resolve/effect.rs`) requires every
+member's `action_items` to yield only `WorkItem::Emit`, and hits a `todo!` otherwise. Several
+actions instead yield a decision before they become events: choosing a mana color, a called coin
+flip, choosing new targets, and choosing a number or card name to note (`resolve/player_action.rs`).
 
-**The design gap.** `Simultaneously`'s doctrine is one snapshot: every
-member's items are evaluated up front against the current state, before any
-applies. A decision in this engine is asynchronous — surfaced via
-`self.pending` and resumed by `submit_decision`, the `ChoiceContinuation`
-machinery `engine-resolve-effects` built for `May`/`Unless`/`Modal`. So
-admitting a choice-bearing member forces a choice: does the decision resolve
-*before* the snapshot, so every member still evaluates against one state with
-the outcome already known? Or does the whole `Simultaneously` pause mid-batch
-and re-enter with the resolved reference substituted — which sits badly with
-one-snapshot, since other members' state could move while the decision is
-outstanding?
+No authored card reaches this. The `.syl` users of `simultaneously` are `fight` and Heart of
+Bogardan, neither with a choice-bearing member. The nearest real case is Aura swap (Arcanum Wings),
+whose exchange chooses the Aura card from hand at resolution [CR#702.65a].
 
-Do not build ahead of card pressure. This is filed so that whoever hits the
-panic finds the question already framed; the answer should be informed by
-whatever real card finally forces it.
+`Simultaneously` evaluates every member against one snapshot before any applies, while a decision
+is asynchronous (surfaced as pending and resumed by `submit_decision`). So a choice-bearing member
+forces a choice: the decision resolves before the snapshot, so every member still sees one state
+with the outcome known; or the batch pauses mid-way and resumes with the choice substituted, which
+lets other members' state move while the decision is outstanding. Do not build this ahead of a
+real card; the card that needs it should inform the answer.
 
-Effort: **L**.
+## Done when
+
+- A real card needs it, and the owner has chosen between deciding before the snapshot and pausing
+  the batch.
+- That card resolves through `Simultaneously` with its choice, tested end to end, and the `todo!`
+  is gone.
+
+## Pointers
+
+- `crates/engine/src/resolve/effect.rs` (`Instruction::Simultaneously` arm),
+  `crates/engine/src/resolve/player_action.rs`
+- `plugins/builtin/primitives/action/simultaneously.syl`,
+  `plugins/builtin/definitions/keyword_ability/auraSwap.syl`
+- `docs/tickets/planned/engine-simultaneous-member-breadth.md`

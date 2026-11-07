@@ -1,61 +1,48 @@
 ---
-needs: []
+needs: [lean-v3-cast-spell-anaphora-and-noted-mana]
 ---
-# `discourse`: a card a cast permission names is "that spell" to the text after it
+# A card a cast permission names is "that spell" to the text after it
 
-Standard constraints apply. Split from `lean-v3-cast-spell-anaphora-and-noted-mana` (its former
-Part 1, design item 2), which keeps the AST change to `SpendPurpose.toCast`. Found by the
-2026-10-25 triage of an external audit ("Atraxa"), verified against `wmyykqnv`.
+## Why
 
-## The cards
+Two printed texts refer to the card a permission lets you cast as "that spell" / "those spells":
 
 - *Rogue Class* level 3: "You may play cards exiled with this Class, and you may spend mana as
   though it were mana of any color to cast those spells."
-- *Summon: Esper Valigarmanda* chapters II-IV: "You may cast an instant or sorcery card exiled
+- *Summon: Esper Valigarmanda* chapters II–IV: "You may cast an instant or sorcery card exiled
   with this Saga, and mana of any type can be spent to cast that spell."
 
-Both are fragments today (`rogueClassLevelThree`, `summonEsperValigarmandaCast` in
-`lean/Semantics/Proofs/CardsChoice.lean`, carried to Rust tests by `semantics-rust-rewrite`).
-Both re-describe the anaphor (`toCast (in_ (exiledWith thisClass))`, `toCast (and
-[isInstantOrSorcery, in_ (exiledWith thisSaga)])`) because the Lean checker refuses it even in a
-NounPhrase slot. Probed: `conjunction [can you (play (allOf (cardIn (exiledWith thisClass)))), can
-you (cast (those .spell))]` gives `[.anaphor (.word .spell) .many 0]`; Esper's `cast (that
-.spell)` gives `[.anaphor (.word .spell) .one 0]`. (`cast them` checks `[]`, but drops the printed
-"spells"; do not use it.)
+Casting moves the card to the stack, where it is the spell [CR#601.2a], so reference resolution
+has to resolve those anaphors to the permitted card. This is an exception to
+`docs/decisions/semantics.md` §2.2 item 3, under which modal `can` closes its hypothetical
+participants. Neither card is in the `.syl` corpus; the old fragments re-described the card
+instead of writing the anaphor.
 
-## Requirement
+## Design
 
-Casting moves the card to the stack, where it is the spell [CR#601.2a]. `discourse` already treats
-a performed `play`/`cast` this way (the referent is stamped with the procedure deed, so the
-`.spell` head reaches it; Lean's pin `playRecordsALandPlayOrASpellCast`). It must do the same for
-a `can` permission over `cast`/`play`: when a `conjunction` (or a `doIf` continuation) steps
-`can <who> (cast|play X)`, X's referent is published to the later conjuncts with the procedure
-deed stamped, so the `.spell` head (and `.subtype (.spell _)`) resolves to it as after a performed
-cast. The permission's own `allOf …` or `a …` determiner fixes plurality ("those spells" for
-*Rogue Class*'s `allOf`, "that spell" for Esper's `a`). Nothing else about a permission's
-referents changes; a `can` outside a conjunction publishes nothing new.
+- When a `conjunction` or a `doIf` continuation steps `can(<who>, cast|play(X))`, X's referent is
+  published to the later parts with the cast deed recorded, so "that spell" / "those spells" (and
+  a subtype-of-spell head) resolves to it as after a performed cast. The permission's own
+  determiner fixes plurality: `allOf` gives "those spells" (Rogue Class), `a` gives "that spell"
+  (Summon: Esper Valigarmanda). A `can` outside a conjunction or continuation publishes nothing
+  new.
 
-## Respell the two cards
+## Done when
 
-- *Rogue Class*: `conjunction [ can you (play (allOf (cardIn (exiledWith thisClass)))), can you
-  (pay anyCost .once) (asThough := some (spendManaAs none .anyColor (toCast (those .spell)))) ]`.
-  The `cardIn` head noun is also `lean-v3-card-head-noun-sweep` §1 row 5's; whichever lands
-  second keeps it.
-- *Esper*: `conjunction [ can you (cast (a (and [isInstantOrSorcery, isCard, in_ (exiledWith
-  thisSaga)]))), can you (pay anyCost .once) (asThough := some (spendManaAs none .anyType (toCast
-  (that .spell)))) ]`.
+- Both texts are written in `.syl` with the printed anaphor ("those spells", "that spell") as the
+  argument of the second part's `toCast` purpose, and reference resolution resolves each anaphor
+  to the first part's referent with the right plurality.
+- The second part alone (the spend-mana permission with "those spells" and no permission before
+  it) is refused with an unresolved plural `spell` anaphor.
+- Tests for a performed play or cast and for keyword cast permissions still pass.
 
-`toCast` over a NounPhrase is `lean-v3-cast-spell-anaphora-and-noted-mana`'s. If it has not
-landed, test the requirement through a NounPhrase slot (`cast (that .spell)`) and leave the two
-`toCast` respellings to whichever of the two tickets lands second.
+## Not in scope
 
-## Tests (`discourse`)
+Letting `toCast` take a noun phrase (today it takes a `Predicate`): that is
+`lean-v3-cast-spell-anaphora-and-noted-mana`.
 
-- *Rogue Class* and *Esper* as above: each checks, and the second conjunct resolves to the first's
-  referent (was the proposed Lean pin `castPermissionPublishesThatSpell`).
-- `can you (pay anyCost .once) (asThough := some (spendManaAs none .anyColor (toCast (those
-  .spell))))` alone is refused with an unresolved `.spell` anaphor, plural (was
-  `thoseSpellsNeedThePermission`).
-- Must stay green: the carried-over tests for a performed play/cast
-  (`playRecordsALandPlayOrASpellCast`) and for keyword cast permissions
-  (`Proofs/KeywordCastPermissions.lean`).
+## Pointers
+
+- `docs/decisions/semantics.md` §2 (reference resolution)
+- `plugins/builtin/primitives/mana/toCast.syl`, `plugins/builtin/primitives/static/conjunction.syl`,
+  `plugins/builtin/templates/static/can.syl`, `plugins/builtin/primitives/static/spendManaAs.syl`

@@ -6,10 +6,11 @@ needs: []
 ## Why
 
 First strike, double strike, deathtouch, trample and banding change how combat damage is assigned
-and dealt. The engine defines them (deathtouch's destruction rule [CR#704.5h] is already a `.syl`
-row). `.syl` declares them as bodiless keyword abilities today and is to declare them as
-primitives, so the engine's ownership is explicit. Each can become a Definition once `.syl` has
-the primitives its rules need. In order of difficulty:
+and dealt. `.syl` declares them as bodiless keyword abilities today and is to declare them as
+primitives, so the engine's ownership is explicit (deathtouch's destruction rule [CR#704.5h] is
+already a `.syl` rule row). Each can become a Definition once `.syl` has the primitives its rules
+need. The engine implements first and double strike; it has no trample, banding or
+deathtouch-lethal assignment rule yet. In order of difficulty:
 
 1. **Deathtouch and trample, together.** Trample's excess is what remains once the blockers are
    assigned lethal damage [CR#702.19b], and deathtouch makes any nonzero amount lethal for that
@@ -17,18 +18,22 @@ the primitives its rules need. In order of difficulty:
 2. **First strike and double strike.** They add a combat damage step [CR#510.4,702.7b,702.4b],
    which needs a turn-part primitive.
 3. **Banding and "bands with other".** A block spreads to the whole band [CR#702.22h], and banding
-   swaps who assigns combat damage [CR#702.22j,702.22k]. Raging River also regroups blockers, so
-   the two may share primitives.
+   swaps who assigns combat damage [CR#702.22j,702.22k]. Raging River also sorts potential
+   blockers into groups before blocks, so the two may share primitives.
 
 ## Done when
 
-- Each moved keyword is a Definition whose body states its rule, its primitive is deleted, and
-  the engine's special case for it is gone.
-- The `.syl` checks pass, and the engine's combat tests pass unchanged.
+- Each moved keyword is a Definition whose body states its rule, and its bodiless declaration is
+  gone. For first and double strike, the engine's special case (`any_first_or_double_striker` and
+  the skipped first-strike damage step) is gone; trample and banding are enforced through their
+  Definitions, not a new engine special case.
+- The existing combat tests pass unchanged.
 
 ## Pointers
 
 - `plugins/builtin/definitions/keyword_ability/` (`firstStrike`, `doubleStrike`, `trample`,
   `banding`, `bandsWithOther`, `deathtouch`)
-- `docs/tickets/planned/lean-marked-damage-projection.md`: deathtouch's destruction rule
-  [CR#704.5h], which is already `.syl`.
+- `plugins/builtin/rules/sba/deathtouchDestruction.syl`
+- `crates/engine/src/combat.rs`, `crates/engine/src/step/combat.rs`,
+  `crates/engine/src/decide/pending/combat.rs` (`AssignCombatDamage`)
+- `docs/tickets/planned/lean-marked-damage-projection.md`
