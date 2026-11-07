@@ -488,7 +488,7 @@ impl Value {
     }
 
     fn idents(self) -> Result<Vec<Ident>, LoadError> {
-        self.list()?.into_iter().map(Value::ident).collect()
+        distinct(self.list()?)
     }
 
     fn list(self) -> Result<Vec<Value>, LoadError> {
@@ -600,6 +600,21 @@ fn lower(values: Vec<Value>) -> Result<Vec<Equation>, LoadError> {
         value.lower_into(&mut out)?;
     }
     Ok(out)
+}
+
+/// Identifiers, none named twice: a feature's values, a Category's features,
+/// a setting's children.
+fn distinct(values: Vec<Value>) -> Result<Vec<Ident>, LoadError> {
+    let mut idents = Vec::new();
+    for value in values {
+        let at = value.at;
+        let ident = value.ident()?;
+        if idents.contains(&ident) {
+            return fail(at, format!("`{ident}` is listed twice"));
+        }
+        idents.push(ident);
+    }
+    Ok(idents)
 }
 
 /// A built-in enum's unit variant, by its Rust name.
@@ -814,23 +829,14 @@ impl Builder {
                     } => values,
                     value => vec![value],
                 };
-                let values = values
-                    .into_iter()
-                    .map(Value::ident)
-                    .collect::<Result<_, _>>()?;
+                let values = distinct(values)?;
                 self.grammar.features.insert(name, values).is_some()
             }
             Some("category") => {
                 let mut fields = item.fields()?;
                 let decl = CategoryDecl {
                     category: item.parent.take().map(|p| Ident::from(p.as_str())),
-                    features: item
-                        .list
-                        .take()
-                        .unwrap_or_default()
-                        .into_iter()
-                        .map(Value::ident)
-                        .collect::<Result<_, _>>()?,
+                    features: distinct(item.list.take().unwrap_or_default())?,
                     gap: fields.flag("gap")?,
                     closed_gaps: fields.idents("closed_gaps")?,
                     function: fields.flag("function")?,

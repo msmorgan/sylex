@@ -36,6 +36,12 @@ fn malformed_items_are_rejected_naming_the_defect() {
         ),
         ("category S", "`S` is declared twice"),
         ("root T", "`root` is given twice"),
+        ("feature F = A | B | A", "3:21: `A` is listed twice"),
+        ("category T [F, G, F]", "`F` is listed twice"),
+        (
+            "A: S -> B { heavy: [head, head] }",
+            "`head` is listed twice",
+        ),
         ("A: S -> Shout(B)", "unknown symbol kind `Shout`"),
         ("A: S -> Class(B, C)", "`Class` takes no more arguments"),
         ("A: S -> Lex(Nown)", "unknown variant `Nown`"),
