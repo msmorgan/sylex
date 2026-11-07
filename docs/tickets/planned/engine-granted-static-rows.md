@@ -1,23 +1,37 @@
 ---
 needs: []
 ---
-**Engine: most `Continuously(...)` granted static-row kinds can't be minted.**
+# Continuous effects created by resolution, by static-spec kind
 
-`crates/engine/src/resolve/effect.rs` mints a granted continuous row
-only for `Each(SelectAll, Modify(It, _))`. Three arms stay loud:
+## Why
 
-- `Each(SelectAll, inner)` where `inner` isn't `Modify(It, _)`;
-- `Each(sel, _)` for any non-`SelectAll` selection;
-- the catch-all — `TriggerMultiplier`, `AsThough`, `Sba`, `OutcomeGate`, and
-  the rest of `StaticEffect`.
+The `Instruction::Continuously` arm in `crates/engine/src/resolve/effect.rs` mints a continuous
+effect from a resolving spell or ability [CR#611.2] for only some `StaticSpec` kinds: `Modify`,
+`Each(SelectAll, Modify(<candidate register>, _))`, `Deontic`, `CostModifier` and `CantHappen`.
+Every other kind trips a `todo!`:
 
-Documented residue of `engine-durations-grants` (done). The catch-all is the
-one to split: each `StaticEffect` variant that a continuous *grant* can carry
-needs its own mint path and its own test, and some already have owners
-(`engine-asthough-had-flash`, `engine-cda-authorable-statics`). Inventory the
-variants first, then split per-kind rather than implementing the catch-all as
-one lump.
+- `Each(SelectAll, inner)` whose inner spec is not a `Modify` of the candidate;
+- `Each(sel, _)` for any selection other than `SelectAll`;
+- the catch-all: `Conditionally`, `Role`, `CostOption`, `TriggerMultiplier`, `ModifyPlayer`,
+  `Replacement`, `CantPrevent`, `SpendAsThough`, `AsThough`, `ConditionallyDo`, `OutcomeGate`,
+  `ReplaceRoll` and `PayPips`.
 
-Granted *prevention* rows are `engine-granted-prevention-rows`.
+## Done when
 
-Effort: **M** (many small sub-kinds).
+- Each kind in the catch-all that a Vintage-legal card can create by resolution is listed with
+  that card, and has its own mint path and a test grounded in the card.
+- The two `Each` shapes are wired for the cards that need them, each with a test.
+- A kind no card can create by resolution keeps failing loudly, naming the kind.
+
+## Not in scope
+
+- `Prevention`: `engine-granted-prevention-rows`.
+- `BecomesCopy`: `engine-layers-1-copy-facedown-text`.
+- The positive "as though it had flash" counterfactual (Alchemist's Refuge):
+  `engine-asthough-had-flash`.
+
+## Pointers
+
+- `crates/engine/src/resolve/effect.rs`: the `Instruction::Continuously` arm.
+- `crates/core/src/continuous.rs`: `StaticSpec`.
+- `crates/engine/src/layer.rs`: how `ContinuousEffect.changes` and `rows` are read.

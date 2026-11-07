@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**The engine degrades silently on broken core instead of making the bad
-shape unrepresentable or failing loudly.**
+# Make broken core unrepresentable or loud in the engine
 
 ## Why
 
@@ -35,13 +34,11 @@ validate-at-load, so malformed core reaches play.
   `unresolvable_ref_in_filter_fizzles_instead_of_asserting` and
   `unavailable_declared_number_parameter_fizzles_to_zero` are rewritten or
   retired, each named with its reason in the landing.
-- `cargo test -p sylex_engine` and `cargo clippy -p sylex_engine --tests -- -D
-  warnings` pass.
 
 ## Not in scope
 
 - Copying an activated ability whose source has left:
-  [[engine-copy-ability-source-gone]].
+  `engine-copy-ability-source-gone`.
 - Legal mechanics the engine has not built yet; their `todo!` panics are
   already loud.
 
@@ -67,6 +64,9 @@ validate-at-load, so malformed core reaches play.
   `None` for shapes it cannot evaluate.
 - `crates/engine/src/resolve/player_action.rs`: the reveal whose player does
   not resolve.
+- `crates/engine/src/resolve/effect.rs`: the `Instruction::Continuously` arm,
+  which silently drops a `ForThisEvent` duration with no host instruction;
+  the unknown-verb arm of `batch_act_head`.
 - `crates/engine/src/state.rs`: `GameConfig`, `GameState::new`.
-- `v1/crates/plugin/src/plugin.rs`: `validate_card_regions`, today's only
-  load-time caller.
+- `crates/core/src/region.rs`: `validate`, `validate_static`, `validate_sba`
+  and their siblings.

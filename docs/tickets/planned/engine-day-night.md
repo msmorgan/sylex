@@ -1,58 +1,57 @@
 ---
 needs: [engine-transform, engine-transform-byindex-reread-hardening, engine-transform-current-face-name-loyalty]
 ---
-Day/night game state, daybound/nightbound transforms (~236 cards). The generic
-grammar is now in place: effects set
-`SetGameDesignation("DayNight", "Day"/"Night")`, and triggers use
-`DesignationChanged(name: "DayNight", to: "Day"/"Night")`. Build the
-day/night lifecycle and daybound/nightbound on top.
+**Engine: day/night, and daybound/nightbound.**
 
-## Current state (2026-07-18 deep-dive)
+## Why
 
-Storage, mutation, and event routing are generic: `DesignationStore.game`
-holds `DesignationValue::Mode("Day"/"Night")`; `SetGameDesignation` emits and
-applies the transition; `DesignationChanged{name,to}` filters the fact. Zero
-corpus cards, zero macros, no daybound/nightbound anywhere.
+Day and night are designations the game itself holds. The game starts with neither, and once one
+is held it always holds exactly one [CR#731.1]. About 50 Vintage-legal cards read or change day
+and night; 35 of them have daybound. Core can already change the designation and watch it:
+`Action::SetGameDesignation("DayNight", "Day")` writes `DesignationStore.game` as
+`DesignationValue::Mode`, and the `EventFilter::DesignationChanged { name, to }` trigger filter
+matches the change. The `.syl` side declares `day` and `night` (`plugins/builtin/definitions/designation/`),
+`gameIs` and `gameBecomes`, and the `daybound` and `nightbound` keywords. The engine is missing
+the rest:
 
-## Missing machinery (in dependency order)
+- **A game-scope read.** `StatePredicate::Designated` evaluates only object and player
+  designations (`crates/engine/src/target.rs`), so "if it's night" cannot be read.
+- **The untap-step check** [CR#502.2,731.2]: if it's day and the previous turn's active player
+  cast no spells, it becomes night. If it's night and they cast two or more, it becomes day. If
+  it's neither, no check happens [CR#731.2c]. This is a turn-based action the engine performs.
+- **Daybound and nightbound.** Their statics [CR#702.145b,702.145e]: a daybound permanent enters
+  transformed at night; "as it becomes night/day", a permanent with the matching face up
+  transforms; and it can't transform except through its own keyword. The keywords also have
+  any-time rules that apply immediately and are not state-based actions: a front-face-up daybound
+  permanent at night transforms [CR#702.145c]; a back-face-up nightbound permanent during the day
+  transforms [CR#702.145f]; with a daybound permanent and neither designation, it becomes day
+  [CR#702.145d]; with a nightbound permanent, neither designation and no daybound permanent, it
+  becomes night [CR#702.145g].
 
-1. A game-scope read path — `StatePredicate::Designated` eval covers
-   objects/players only; "if it's day" has no expressible condition.
-2. The untap-step turn-based flip check [CR#502.2]: if day and the previous
-   turn's active player cast no spells, it becomes night; if night and they
-   cast two or more, day. The predicate is already data-expressible
-   (`EventCount(Cast{who: …}, Lookback::LastTurn)`); the firing point,
-   previous-active-player binding, and the store invariant — starts neither and,
-   once set, always exactly one [CR#731.1] — need engine wiring. (When it is
-   neither, the untap-step check doesn't happen [CR#731.2c].)
+These are the first cards that put back-face-up double-faced permanents into a real game, so the
+two transform hardening tickets in `needs` must land first.
 
-The DayNight declaration itself becomes data: a game-scoped
-`Enum(["Day","Night"])` designation, `PerGame`, permanent, neither-yet = key
-absent. The untap-step check stays engine-intrinsic permanently; only the
-vocabulary moves.
+## Done when
 
-## Daybound/nightbound (second half, needs engine-transform)
+- A game-scope designation read is evaluable, and "if it's day/night" conditions read the store.
+- The untap step performs the [CR#502.2] check, binding the previous turn's active player and
+  counting their spells. It never runs while the game has neither designation, and the store never
+  returns to neither once set.
+- Daybound and nightbound behave as their statics say, and the any-time rules run immediately
+  whenever their conditions can become true: on a designation change, when a permanent enters, and
+  when control changes.
+- Tests grounded in a real daybound card (Brutal Cathar // Moonrage Brute) cover entering at night,
+  the flip at day/night changes, the untap-step check after zero and after two spells, the
+  neither-to-day rule when the first daybound permanent appears, and the can't-transform-otherwise
+  restriction.
 
-Daybound's three statics [CR#702.145b] and nightbound's two [CR#702.145e]:
-enters transformed if it is night; "As it becomes night/day" (an event static, not
-a trigger) transforms it if the matching face is up; can't transform except due to
-its daybound/nightbound ability. Plus the any-time rules, which are immediate and
-not state-based actions: a front-face-up daybound permanent at night is
-transformed [CR#702.145c], a back-face-up nightbound permanent during day likewise
-[CR#702.145f]; with a daybound permanent and neither day nor night, it becomes day
-[CR#702.145d]; with a nightbound permanent, neither designation, and no daybound
-permanent on the battlefield, it becomes night [CR#702.145g]. Needs the transform
-verb from `engine-transform` plus an immediate non-stack hook evaluated whenever
-those conditions can become true (designation change, entry, control change).
-(Corrected 2026-10-21: the earlier text glossed [CR#702.145c] as "transforms
-when day/night flips", which is [CR#702.145b]'s "As it becomes", and omitted
-[CR#702.145d,702.145f,702.145g];
-`docs/evidence/mtg-rules-review-2026-10-21/departures-docs.md` #17.)
+## Pointers
 
-This is the first consumer that makes back-up double-faced permanents
-reachable in production, so the two latent gaps the `engine-transform`
-whole-branch review deferred are hard prerequisites:
-`engine-transform-byindex-reread-hardening` (a mid-resolution transform can
-panic an un-hardened by-index ability re-read) and
-`engine-transform-current-face-name-loyalty` (legend-rule name /
-named-predicate / loyalty reads still take the front face).
+- `crates/core/src/action.rs` (`SetGameDesignation`), `crates/core/src/event.rs`
+  (`DesignationChanged`)
+- `crates/engine/src/state.rs` (`DesignationStore`, `DesignationValue`)
+- `crates/engine/src/target.rs` (`StatePredicate::Designated`)
+- `crates/engine/src/transform.rs`
+- `plugins/builtin/definitions/designation/day.syl`, `night.syl`;
+  `plugins/builtin/definitions/keyword_ability/daybound.syl`, `nightbound.syl`;
+  `plugins/builtin/primitives/condition/gameIs.syl`, `plugins/builtin/templates/event/gameBecomes.syl`

@@ -1,64 +1,62 @@
 ---
 needs: []
 ---
-**Engine: "unblocked" is a status a creature gets at the declare blockers step,
-and block triggers fire per [CR#509.3a..509.3d] instead of being deduplicated per
-attacker before any trigger sees them.**
+**"Unblocked" is a status a creature gets at the declare blockers step, and block triggers fire
+per [CR#509.3a..509.3d].**
 
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #20,
-#21.
+## Why
 
-## 1. `Unblocked` matches before blocks (#20)
+`StatePredicate::Unblocked` matches "attacking and not blocked", so it is true right after
+attackers are declared. An attacker becomes unblocked only when blockers are declared with none
+for it [CR#509.1h], or when it enters attacking during declare blockers or later [CR#508.4d];
+ninjutsu and every other "unblocked attacker" cost is payable a step early (Ninja of the Deep
+Hours' ruling: "Before then, attacking creatures are neither blocked nor unblocked.").
 
-`crates/engine/src/target.rs:499-502`: `// [CR#509.1h]: attacking and not
-(stickily) blocked.` → `state.combat.is_attacking(id) &&
-!state.combat.is_blocked(id)`; `CombatState` (`combat.rs:90-104`) has a blocked set
-and no unblocked set. The test `combat_filters_read_combat_state`
-(`target.rs:1554`, `:1586-1597`) asserts `Unblocked` matches right after
-`declare_attacker`; rewrite it. [CR#509.1h]: an attacker with no blockers declared
-"becomes an unblocked creature"; [CR#508.4d]: one put onto the battlefield attacking
-during declare blockers or later enters unblocked. Ninja of the Deep Hours ruling
-(2021-03-19): "Before then, attacking creatures are neither blocked nor
-unblocked." Latent (only `macros/identity/Unblocked.ron` uses it), but every
-ninjutsu-style consumer would be payable a step early.
+Separately, `scan_triggers` drops every `Blocked` fact after the first per attacker before any
+watcher sees it. Two bushido creatures blocking one attacker trigger only one bushido, and a
+creature with "whenever this creature blocks" blocking two attackers triggers twice instead of
+once. The comment there claiming the [CR#509.3d] pattern shape does not exist is stale.
 
-**Change:** keep an explicit unblocked set in `CombatState`, filled by the declare
-blockers TBA and by [CR#508.4d] entries, updated when an effect makes a creature
-blocked, cleared on removal from combat; `Unblocked` reads it.
-`maybe/engine-relation-spine.md` derives "unblocked" as attacking ∧ ¬blocked; that
-derivation must use this status instead.
+## Design
 
-## 2. Block triggers are dropped after the first per attacker (#21)
+- `CombatState` keeps an explicit unblocked set beside its blocked set; "unblocked" is never
+  derived as "attacking and not blocked", since before blockers are declared an attacker is
+  neither. `StatePredicate::Unblocked` and every later derivation of "unblocked" (including
+  `engine-relation-spine`'s) read the set.
+- Every `Blocked` fact of a declaration reaches the trigger scan. Block triggers deduplicate per
+  watching ability, keyed by the `BlockDeclared` pattern it uses [CR#700.1]:
 
-`trigger.rs:620-627` and `:659`: `GameEvent::Blocked(Blocked { attacker, .. }) if
-!blocked_attackers.insert(*attacker) => { continue; }` drops every `Blocked` fact
-after the first per attacker before any watcher sees it, for every `BlockDeclared`
-spelling (`eval.rs:1043-1047`): `by` ("blocks", `macros/event/Blocks.ron`), `of`
-("becomes blocked"), `by`+`of` (`Blocking.ron`), and Bushido's union
-(`keyword/Bushido.ron`). The comment's "[CR#509.3d] … that pattern shape doesn't
-exist yet" is stale. Two bushido creatures double-blocking one attacker: the second
-never triggers (recorded as a seam in `done/kw-bushido.md:21-23`). And by-only
-"blocks" is never deduplicated per blocker, so a creature blocking two attackers
-fires twice.
+  | Pattern | Wording | Key | CR |
+  |---|---|---|---|
+  | `of` only | "becomes blocked" | (watcher, ability, attacker) per declaration | [CR#509.3c] |
+  | `by` only | "blocks" | (watcher, ability, blocker) | [CR#509.3a] |
+  | `by` and `of` | "blocks a creature", "becomes blocked by a creature" | none: once per pair | [CR#509.3b,509.3d] |
+  | union of `by` and `of` | Bushido's "blocks or becomes blocked" | (watcher, ability, creature) | [CR#702.45a] |
 
-[CR#509.3a]: "Whenever [a creature] blocks" triggers "only once each combat for that
-creature, even if it blocks multiple creatures". [CR#509.3b]: "blocks a creature"
-triggers "once for each attacking creature the creature with the ability blocks".
-[CR#509.3c]: "becomes blocked" triggers once each combat "even if it's blocked by
-multiple creatures". [CR#509.3d]: "becomes blocked by a creature" triggers "once for
-each creature that blocks the specified creature". [CR#700.1]: one happening may be
-one event for one ability and several for another.
+## Done when
 
-**Change:** stop dropping `Blocked` facts; deduplicate per ability by its key.
-`of`-only: (watcher, ability, attacker) per declaration. `by`-only: (watcher,
-ability, blocker). `by`+`of`: no dedup (per pair). Bushido's union: (watcher,
-ability). Correct the comment. Keep the of-only behaviour canon Deepwood Tantiv
-relies on. `maybe/engine-lookback-occurrence-watchers` touches the same loop.
+- The declare blockers turn-based action puts every attacker with no blocker declared into the
+  unblocked set [CR#509.1h], and a creature put onto the battlefield attacking during declare
+  blockers or later enters it [CR#508.4d]. It stays unblocked until it is removed from combat,
+  an effect says it becomes blocked (which moves it to the blocked set), or the combat phase
+  ends; an effect that says an attacker becomes unblocked puts it in the set [CR#509.1h].
+- `scan_triggers` no longer drops `Blocked` facts; block triggers deduplicate by the Design
+  table, and the stale comment is gone.
+- Tests, with real cards:
+  - `Unblocked` is false after attackers are declared and true after blockers are declared for
+    an attacker with no blocker; `combat_filters_read_combat_state` is rewritten to assert this.
+  - Two Samurai of the Pale Curtain blocking one attacker: both bushido abilities trigger.
+  - A creature blocking two attackers: Folk of An-Havva's "blocks" triggers once, Wall of Frost's
+    "blocks a creature" twice (a minimal repro granting the extra block is fine).
+  - Deepwood Tantiv's "becomes blocked" still triggers once when blocked by two creatures.
 
-## Tests
+## Pointers
 
-- `Unblocked` is false after attackers are declared and true after blockers are
-  declared for an attacker with no blocker.
-- Two bushido creatures block one attacker: both blockers' bushido triggers.
-- One creature with "whenever this blocks" blocking two attackers triggers once;
-  one with "whenever this blocks a creature" triggers twice.
+- `crates/engine/src/combat.rs`: `CombatState`.
+- `crates/engine/src/target.rs`: the `StatePredicate::Unblocked` arm,
+  `combat_filters_read_combat_state`.
+- `crates/engine/src/trigger.rs`: `scan_triggers` (`blocked_attackers`).
+- `crates/engine/src/eval.rs`: `EventFilter::BlockDeclared`.
+- `crates/engine/tests/combat.rs`: the Deepwood Tantiv test.
+- `plugins/builtin/definitions/keyword_ability/bushido.syl`, `ninjutsu.syl`.
+- `docs/tickets/maybe/engine-lookback-occurrence-watchers.md`: touches the same loop.

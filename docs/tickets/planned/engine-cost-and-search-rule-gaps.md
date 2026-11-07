@@ -1,79 +1,64 @@
 ---
 needs: []
 ---
-**Engine: four latent cost and search rules the engine gets wrong: unmatched
-colored cost reductions, gain-life costs under "can't gain life", the [CR#601.2h]
-payment tiers, and the stated-quality search floor in public zones.** All latent at
-head (no live card reaches them); each will be hit by the first card of its kind.
+**Engine: four cost and search rules the engine gets wrong: unmatched colored cost reductions,
+gain-life costs under "can't gain life", the [CR#601.2h] payment tiers, and the stated-quality
+search floor in public zones.**
 
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #4,
-#29, #34, #35.
+## Why
 
-## 1. A colored or {C} reduction with no matching pip reduces generic (#4)
+No current card hits these yet; the first card of each kind will.
 
-`crates/engine/src/cast.rs:91-92` (doc: "a colored pip removes ONE
-matching colored pip and nothing else") and `reduce_symbol` `:131-135` (a
-`Specific(_)` reduction removes a matching pip; no else arm, so an unmatched one is
-dropped). Core `CostChange::Reduce(Arc<[CostComponent]>)`
-(`crates/core/src/continuous.rs:203-206`) has no colored-only flag; Lean
-`CostShift.bySymbols … (coloredOnly : Bool)` and semantics_v2 `BySymbols {
-colored_only }` already carry one, but no lowering maps it into core.
+1. **A colored or {C} reduction with no matching pip.** `reduce_symbol` (`crates/engine/src/cast.rs`)
+   removes a matching `Specific` pip, and an unmatched one is silently dropped. When the cost has
+   no mana of that type, the reduction applies to generic mana instead [CR#118.7b], and an excess
+   over the matching pips also comes off generic [CR#118.7c,118.7d]. So {W}{U}{B}{R}{G} off a
+   {3}{U} spell should leave {0}; the engine leaves {3}. The Khalni Hydra ruling adds that its {G}
+   reduction also cuts an imposed generic tax, after taking the green. Core
+   `CostChange::Reduce(Arc<[CostComponent]>)` cannot say "colored only", but the `.syl`
+   `bySymbols(change, coloredOnly)` primitive can, and Edgewalker uses it.
+2. **A gain-life cost under "can't gain life".** `activate.rs` treats a `ChangeLife` cost with
+   `LifeOp::Up` or `LifeOp::Set` as always payable. While the player who would gain the life
+   can't gain life, such a cost can't be paid [CR#119.7], and a set that raises a life total is a
+   gain [CR#119.5]. Per the Invigorate ruling, the player who gains is the opponent named by the
+   cost, and a replacement of the gain (Sulfuric Vortex) still lets the cost be paid
+   [CR#118.11]. The sibling [CR#119.8] lock has a seam comment and the pin test
+   `cant_pay_life_lock_is_a_documented_seam`; [CR#119.7] has neither.
+3. **Payment tiers.** `payment/fulfill.rs` (`is_deferred`, `action_is_deferred`) defers every
+   `Search` from a library, every `DrawCard`, and every `Move` from a library to a non-library
+   zone, hand included. Only costs that involve random elements or move objects from the library
+   to a public zone go to the second tier [CR#601.2h]. The hand is a hidden zone [CR#400.2], so a
+   library-to-hand move with no random element belongs in the first tier.
+4. **Stated-quality search floor.** The `Instruction::Search` arm in `resolve/effect.rs` floors
+   the minimum to 0 for any search that names a quality, in every zone it searches. The doc
+   comment of `search_is_bare_quantity` in `resolve/query.rs` makes the same claim. The exemption
+   covers only "searching a hidden zone" [CR#701.23b], and its example has Splinter's controller
+   required to find the Howling Mine in the graveyard, a public zone [CR#400.2]. The Eradicate
+   and Splinter rulings say the same.
 
-[CR#118.7b]: "If a cost is reduced by an amount of colored or colorless mana, but
-the cost doesn't require mana of that type, the cost is reduced by that amount of
-generic mana." [CR#118.7c] and [CR#118.7d] reduce generic by the excess. Khalni
-Hydra ruling (2010-06-15): the reduction also cuts an imposed generic tax, after
-the green requirement. So {W}{U}{B}{R}{G} off a {3}{U} spell leaves {0}; the engine
-leaves {3}.
+## Done when
 
-**Change:** add a colored-only flag to core `CostChange::Reduce`; when no matching
-pip remains and the flag is false, fall through to the generic arm. Tests: the
-{3}{U} case; a Khalni-shaped {G} reduction under a generic tax.
+- Core `CostChange::Reduce` carries a colored-only flag. A colored or {C} reduction that finds no
+  matching pip, or that exceeds the matching pips, reduces generic unless the flag is set. Tests
+  cover the {3}{U} case, a Khalni Hydra-shaped {G} reduction under a generic tax, and Edgewalker's
+  colored-only reduction.
+- A gain-life or raising-`Set` cost is unpayable while the player who would gain can't gain life,
+  and payable under a replacement of the gain. If the deontic layer cannot yet express "can't gain
+  life", the always-payable comment becomes a [CR#119.7,119.5] seam with a pin test beside
+  `cant_pay_life_lock_is_a_documented_seam`.
+- A library-origin `Move` or `Search` cost is deferred only when it moves cards to a public zone or
+  the cost includes a shuffle or other random element. The code that decides `DrawCard`'s tier
+  states in its doc comment whether an unknown top card counts as a random element.
+- A search's lower bound is computed per zone: candidates in a hidden zone that match only a
+  stated quality floor to 0, and public-zone candidates use the quantity's own bound. The
+  `Search` arm comment and the `search_is_bare_quantity` doc are corrected, and a test is grounded
+  in Splinter or Eradicate.
 
-## 2. A gain-life cost under "can't gain life" (#29)
+## Pointers
 
-`activate.rs:616-618`: "Gaining/setting life as a cost ([CR#119.7]; Invigorate,
-Skyshroud Cutter) needs no prior resource — always payable." →
-`Action::ChangeLife(_, LifeOp::Up(_) | LifeOp::Set(_)) => true`. The sibling
-[CR#119.8] lock has a seam TODO (`:548-557`) and a pin test
-(`cant_pay_life_lock_is_a_documented_seam`, `:1438-1451`); [CR#119.7] has neither.
-[CR#119.7]: under a can't-gain-life effect "a cost that involves having that player
-gain life can't be paid"; [CR#119.5] makes a raising set a gain. Invigorate ruling
-(2020-08-07): a replacement of the gain (Sulfuric Vortex's) does not block
-payment ([CR#118.11]).
-
-**Change:** replace the comment with a [CR#119.7,119.5] seam and add a pin test
-beside the [CR#119.8] one now; when the deontic layer gains a gain-life action, a
-gain-life cost or a raising `Set` is unpayable while the player who would gain
-(possibly an opponent, not the payer) can't gain life.
-
-## 3. [CR#601.2h] payment tiers (#34)
-
-`payment/fulfill.rs:81-83` defers any library `Search`; `:96-104` defers `DrawCard`;
-`:107-109` defers any library-origin `Move` to a non-library zone, hand included.
-[CR#601.2h]: "First, they pay all costs that don't involve random elements or moving
-objects from the library to a public zone … Then they pay all remaining costs."
-[CR#400.2]: library and hand are hidden zones. A library→hand move with no random
-element is first-tier; a search that includes a shuffle has a random element.
-
-**Change:** defer a library-origin `Move` or `Search` only when its destination is a
-public zone or the cost includes a shuffle or other randomness. Answer for `DrawCard`
-whether an unknown top card is a "random element", in the doc comment of the code that
-decides it.
-
-## 4. Stated-quality search floor in public zones (#35)
-
-`resolve/effect.rs:345-375`: "A STATED quality ([CR#701.23b]) never compels one,
-even with a match sitting right there"; `min` is floored to 0 for every non-bare
-filter across every zone in `search.from` (`:371-375`); same claim in
-`resolve/query.rs:505-516` and the test doc at `:5077-5079`.
-`v1/crates/semantics/src/binder.rs:63` calls the zones "hidden
-libraries/graveyards". [CR#701.23b] exempts only "searching a hidden zone"; its
-example: "Splinter's controller must find the Howling Mine in the graveyard."
-[CR#400.2]: the graveyard is public. Eradicate ruling: "The copies must be found if
-they are in publicly viewable zones."
-
-**Change:** compute the lower bound per zone, flooring to 0 only for stated-quality
-candidates in hidden zones; public-zone candidates use the quantity's own bound
-(check whether `Quantity::Range(Some(CountOf(..)), None)` expresses a mandatory
-"all" before adding a variant). Correct the `binder.rs:63` doc comment.
+- `crates/engine/src/cast.rs` (`reduce_mana_components`, `reduce_symbol`)
+- `crates/core/src/continuous.rs` (`CostChange`)
+- `plugins/builtin/primitives/cost/bySymbols.syl`, `plugins/canon/cards/Edgewalker.syl`
+- `crates/engine/src/activate.rs` (the `ChangeLife` payability arm, the [CR#119.8] seam)
+- `crates/engine/src/payment/fulfill.rs`
+- `crates/engine/src/resolve/effect.rs` (`Instruction::Search`), `crates/engine/src/resolve/query.rs`

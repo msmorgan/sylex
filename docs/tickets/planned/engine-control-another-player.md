@@ -1,23 +1,45 @@
 ---
 needs: []
-design: true
 ---
-Controlling another player [CR#723] (Mindslaver, Worst Fears, Sorin Markov -7):
-"you control target player during that player's next turn" — you make all
-choices and decisions that player is allowed to make [CR#723.5], but object
-control, resources, and active-player status stay with them [CR#723.3,723.5a].
-Needs: a `PlayerAction::ControlPlayer(Reference)` verb (no Rust variant yet); per-player
-`pending_controller` + next-turn duration consumed in `begin_turn` (overwrite last-wins [CR#723.1a],
-dropped if the controller left [CR#800.4b]); and the decision-routing remap —
-a `GameState::actual_decider(&pending)` that maps the nominal
-`PendingDecision::decider_player()` to the controller while control is live,
-honoring the documented `DeciderSpec` nominal→actual contract
-(`decision.rs:12`). Concede never redirects [CR#723.6]. Limited-duration control
-(Word of Command, Opposition Agent) and all turn-STRUCTURE alteration (extra
-turns/skips — see engine-turn-modification) are out of scope. Split out of
-engine-win-alterations.
+**"You control target player during that player's next turn" (Mindslaver, Worst Fears, Sorin
+Markov).**
 
-The `.syl` model has no player-control construct yet, so Mindslaver ("{4}, {T}, Sacrifice
-Mindslaver: You control target player during that player's next turn.") has no canon file. The
-retired `idris/src/Cards.idr` modeled the effect as one action naming the targeted player, with
-the next-turn duration left to the engine.
+## Why
+
+A player controlling another makes every choice and decision the controlled player is allowed or
+told to make, while objects, resources and active-player status stay with the controlled player
+[CR#723.3,723.5,723.5a]. Core has no action for it and the engine has no notion of a player's
+controller: every decision goes to its nominal decider.
+
+## Done when
+
+- Core has an action that makes its performer the controller of a referenced player during that
+  player's next turn.
+- Each player carries at most one pending controller. A new player-controlling effect overwrites
+  it [CR#723.1a]; it waits through skipped turns [CR#723.1b]; it is consumed when that player's
+  turn begins and is the live controller for the whole turn [CR#723.1]; it is dropped if the
+  controller has left the game [CR#800.4b].
+- Control changes only who decides: objects keep their controllers, the controlled player stays
+  the active player [CR#723.3], and costs paid for them use their resources [CR#723.5a].
+- While control is live, every decision whose concrete decider is the controlled player, except
+  conceding, is routed to the controller [CR#723.5,723.6], through one remap from the nominal
+  decider (`DeciderSpec`) to the actual one. The controller keeps making their own decisions
+  [CR#723.8], and a player given control of themselves decides as normal [CR#723.9].
+- Tests with Mindslaver: the controller makes the controlled player's priority, attack and
+  targeting decisions for that whole turn, objects keep their controllers, and the next turn
+  routes normally; a second activation before that turn overwrites the first [CR#723.1a]. A core
+  fixture is fine where the card is not authored.
+
+## Not in scope
+
+- Limited-duration control (Word of Command, Opposition Agent) [CR#723.2].
+- Turn-structure changes such as extra or skipped turns (`engine-turn-modification`).
+- The `.syl` construct for player control: `.syl` has none yet, so the cards have no canon file.
+
+## Pointers
+
+- `crates/core/src/decision.rs`: `DeciderSpec`.
+- `crates/engine/src/decide/mod.rs`: `DecisionPoint`, `DecisionPointKind::decider_spec`,
+  `decider_player`.
+- `crates/engine/src/step/mod.rs`: `begin_turn`.
+- `crates/core/src/action.rs`: `Action`.

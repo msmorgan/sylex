@@ -1,53 +1,46 @@
 ---
 needs: []
 ---
-**Engine: a continuous effect that has started applying keeps applying in later
-layers even if its source ability is removed during the pass ([CR#613.6]), and the
-layer fixpoint can't oscillate.** Latent: no live card authors `LoseAllAbilities`
-or `LoseAbility` (Humility, Opalescence, Dryad of the Ilysian Grove, Blood Moon are
-`.todo`), but every ability-removing static will hit it.
+**A continuous effect that has started applying keeps applying in later layers even if its
+source ability is removed during the layer pass, and the layer fixpoint cannot oscillate.**
 
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #6.
+## Why
 
-## What is wrong at head (crates/engine/src/layer.rs)
+An effect that starts to apply in one layer continues to apply to the same objects in every
+other applicable layer, "even if the ability generating the effect is removed during this
+process" [CR#613.6]. `layers()` instead re-gathers every static effect from each object's
+derived ability list on each fixpoint iteration, so an effect whose source ability a layer-6
+effect removes (Humility) drops out of every layer on the next iteration. Two effects that
+remove each other's source abilities (Humility and Opalescence: Opalescence makes Humility a
+creature, Humility then strips its own ability) alternate between iterations: the loop stops
+only when two successive signatures match, so it runs to its cap of 16, the result depends on
+parity, and the `debug_assert!(converged, …)` trips. Humility is a live card in the
+`v1/plugins/canon` corpus the engine loads, so the departure is reachable today.
 
-- `gather` (`:502`, `:543-564`): after iteration 0, static effects are re-gathered
-  from each object's DERIVED ability list, so an effect whose source ability is
-  removed later in the pass (layer 6) is dropped from every layer on the next
-  iteration.
-- `layers()` (`:2333`, `:2369-2378`) stops only when the new signature equals the
-  previous one; two alternating states never converge, the loop runs to its cap of
-  16, and the result depends on parity; `:2383` `debug_assert!(converged, …)`
-  trips. `:2346` "The effect set grows monotonically toward the fixpoint" is false
-  once an effect can remove ability sources.
-- `depends_on` (`:2117-2131`) probes only the affected set; it has no existence
-  edge.
+## Done when
 
-Failures: (a) a creature with a layer-4 static (Dryad of the Ilysian Grove) under
-Humility loses the layer-4 effect from iteration 1 on, and the pass converges there;
-(b) Humility plus Opalescence, or two "other creatures lose all abilities" creatures,
-alternate between iterations.
+- An effect that has applied in a layer continues in each later applicable layer of the same
+  pass even if its source ability was removed [CR#613.6]; only newly granted statics enter
+  through the re-gather.
+- `depends_on` detects existence dependency: applying one effect would remove the ability that
+  generates another [CR#613.8a]. Effects in a dependency loop apply in timestamp order
+  [CR#613.8b].
+- The fixpoint always converges; the comment in `layers()` claiming the effect set "grows
+  monotonically" is corrected.
+- Tests, against real cards:
+  - Humility with Opalescence (and Worship) in both timestamp orders gives the results of the
+    2009-10-01 Humility/Opalescence ruling.
+  - Humility with two Opalescences in each timestamp order gives the results of the 2006-02-01
+    ruling.
+  - A creature whose own static applies in a layer before 6 (Dryad of the Ilysian Grove's
+    layer-4 land-type effect) keeps that effect under Humility.
 
-[CR#613.6]: an effect that starts to apply "will continue to be applied to the same
-set of objects in each other applicable layer … even if the ability generating the
-effect is removed during this process". [CR#613.8a]: an effect depends on another
-if applying the other "would change the text or the existence of the first effect".
-[CR#613.8b]: loop members "are applied in timestamp order". Humility ruling
-(2009-10-01): "The rest of it will apply even if the permanent loses its ability
-before it's finished applying." [CR#613.8b] does not itself say whether both of two
-mutually ability-removing effects apply; the Opalescence/Humility rulings
-(2006-02-01) give the timestamp-order results to test against.
+## Pointers
 
-## Change
-
-Decide each static effect's existence per layer during the pass: once an effect has
-applied in a layer, it continues in every later layer ([CR#613.6]); add
-[CR#613.8a] existence edges (applying d removes e's source ability) to
-`depends_on`. Keep the re-gather only for newly granted statics, and never drop an
-effect that already applied. Fix the `:2346` comment.
-
-## Tests
-
-- Dryad of the Ilysian Grove under Humility keeps its layer-4 effect.
-- Humility + Opalescence in both timestamp orders match the 2006-02-01 rulings.
-- Two "other creatures lose all abilities" creatures converge.
+- `crates/engine/src/layer.rs`: `gather`, `depends_on`, `effect_signature`, `layers()`
+  (`MAX_FIXPOINT_ITERS`, the convergence loop and assert).
+- `crates/engine/tests/layers.rs`: the existing Humility tests.
+- `v1/plugins/canon/cards/Humility.ron` (live); Opalescence and Dryad of the Ilysian Grove are
+  `.ron.todo` in `v1/plugins/wizards/cards/`, and as `.syl` only Dryad exists
+  (`plugins/canon/cards/`).
+- Rulings: `cardRulings` in `data/mtgjson/AllPrintings.sqlite` for Humility and Opalescence.

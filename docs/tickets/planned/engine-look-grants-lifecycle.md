@@ -1,68 +1,74 @@
 ---
 needs: []
 ---
-**Engine: look grants end when the looked-at cards are shuffled or reordered,
-reveals last only as long as [CR#701.20a] allows, and the face-down-exile look
-permission of [CR#406.3] becomes its own ledger.** Latent: nothing reads
-`look_grants` as a permission yet (only tests: `resolve/action.rs:5857`,
-`tests/payment_replay.rs:2784-2785`), but `runner-player-view` is built on it.
+**Look grants end when the looked-at cards are shuffled or reordered, reveals last only as long
+as their effect needs, and the face-down exile look right is its own ledger.**
 
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #15,
-#30, #37.
+## Why
 
-## What is wrong at head (crates/engine/src)
+`look_grants` is keyed on `ObjectId`, and its doc comment claims grants "expire for free on
+shuffle" because an id is reminted on every zone change. A shuffle is not a zone change:
+`handle_shuffled` only permutes the library, so a scry grant follows the card to its random new
+position [CR#701.24a]. Scry, surveil and fateseal put cards back with `reposition_library`, which
+keeps the id and so the grant, though reordered cards become new objects [CR#701.20d,701.20e].
+`GameEvent::Revealed` grants every viewer a permanent entry, so a card revealed from hand for a
+cost stays visible to opponents while it stays in hand [CR#701.20a]. Nothing reads `look_grants`
+as a permission yet except tests, but `runner-player-view` is built on it.
 
-- **Shuffle does not end grants (#15).** `state.rs:473-477`: grants are "keyed by
-  object IDENTITY (`ObjectId`), which is freshly minted on every zone change
-  ([CR#400.7]) — so grants expire for free on shuffle". A shuffle is not a zone
-  change: `step/zone.rs:90-101` `handle_shuffled` only permutes the deque ("Revealed-
-  state reset ([CR#701.20d]) is unbuilt"), and nothing removes a grant (inserted only
-  at `payment.rs:1016` and `payment/replay.rs:1537`). A scry grant follows the card
-  to its random new position. `resolve/effect.rs:820-823` ("expires free on the next
-  remint/shuffle") repeats the claim. [CR#701.24a]: shuffling randomizes "so that no
-  player knows their order".
-- **Reordering keeps the id (#30).** `agenda.rs:311-322` `RepositionLibrary` and
-  `step/mod.rs:1718-1749` `reposition_library` keep the `ObjectId` and the grant when
-  scry, surveil or fateseal puts cards back. [CR#701.20e]: "Looking at a card follows
-  the same rules as revealing a card"; [CR#701.20d]: "any revealed cards that are
-  reordered stop being revealed and become new objects." (No ruling addresses this;
-  it is the CR chain.) The test `scry_reposition_keeps_id_and_fires_no_zone_change`
-  (`resolve/action.rs:5831` ff.) pins the kept id; rewrite it to assert a new id and
-  still no `ZoneChange`. These sites also cite [CR#401.7] (the too-few-cards rule):
-  `agenda.rs:311-322`, `step/mod.rs:179`, `:1718-1725`, the test doc. Drop it there;
-  keep the correct one at `step/mod.rs:652`.
-- **Reveals are permanent (#37).** `state.rs:473-477` calls the ledger "[CR#406.3]
-  generalized … Persistent"; `GameEvent::Revealed` (`step/mod.rs:454-470`) grants
-  every viewer a permanent entry, so a card revealed from hand for a cost stays
-  "granted" to opponents while it stays in hand. [CR#701.20a]: a revealed card
-  "remains revealed for as long as necessary to complete the parts of the effect
-  that card is relevant to". [CR#406.3]'s persistence is only for a card exiled
-  face down ("may continue to look at that card until it leaves the exile zone or
-  is part of a pile of cards that are shuffled"), and must survive the [CR#400.7]
-  remint at the exile, which an `ObjectId`-keyed, look-time ledger drops.
+## Design
 
-## Change
+- A shuffle remints every card in the shuffled library, and a shuffled face-down exile pile is
+  reminted the same way; a grant keyed on the old `ObjectId` ends with that id.
+- An effect that puts looked-at or revealed library cards back in an order (scry, surveil's top
+  pile, fateseal, random-bottom remainders) remints them in place, with no zone change and no
+  `ZoneChange` event, including a card put back in the position it came from.
+- Whatever `look_grants` keeps beyond a reveal's window [CR#701.20a] is the engine's knowledge
+  model (who has seen what), not a rules permission.
+- The [CR#406.3] look right is a separate ledger, written as part of the face-down exile and
+  keyed on the exiled object, so it survives the remint at the exile. Only that ledger and the
+  look rights cards confer gate casting from face-down exile [CR#601.3f] and choosing a specific
+  face-down exiled card [CR#406.4].
 
-1. On `Shuffled(player)`, remint every card in that library (which also gives the
-   [CR#701.20d] reset) or at least drop every grant on them. Do the same for
-   face-down exile piles when they land.
-2. When an effect reorders looked-at or revealed library cards (scry, surveil's top
-   pile, fateseal, random-bottom remainders), remint them in place, with no zone
-   change and no `ZoneChange` event; their grants end with the old ids. Record the
-   put-back-in-the-same-position reading in the doc comment of the code that remints,
-   since the CR chain is interpretive.
-3. Cite peeks and reveals to [CR#701.20e,701.20a], end reveal grants when the
-   revealing effect finishes, and document the remaining entries as the engine's
-   knowledge model, not a [CR#406.3] permission. Correct the `state.rs` and
-   `resolve/effect.rs` comments.
-4. When face-down exile lands (`engine-face-down`), keep a separate [CR#406.3] look
-   ledger written as part of the exile and keyed on the exiled object, ending when
-   it leaves exile or its pile is shuffled; back it with live predicates for
-   hideaway (the controller of the permanent that exiled it, [CR#702.75a]) and
-   foretell ([CR#702.143a]). Gate [CR#601.3f] and [CR#406.4] on that ledger only.
+## Done when
 
-## Tests
+- `Shuffled(player)` remints every card in that library [CR#701.24a,701.20d], and the reorders
+  in Design remint in place [CR#701.20e,701.20d]; the reminting code's doc comment records that
+  a card put back where it came from is reminted too.
+- A reveal grant ends when its window closes: a revealed card stays revealed only as long as
+  needed to complete the parts of the effect it is relevant to, and a card revealed for a cost
+  until its spell or ability leaves the stack [CR#701.20a]. `look_grants`' doc comment says what
+  it keeps beyond that is a knowledge model.
+- Once face-down exile exists (`engine-face-down`), the [CR#406.3] ledger exists and gates
+  [CR#601.3f,406.4]: a player who looked at a card and then exiled it face down, or was allowed
+  to look at a card exiled face down, keeps looking until it leaves exile or is part of a
+  shuffled pile. The card-specific rights stay data: `hideaway` [CR#702.75a] and the
+  `foretoldCardLook` conferral [CR#702.143d].
+- `scry_reposition_keeps_id_and_fires_no_zone_change` is rewritten to assert a new id and still
+  no `ZoneChange`.
+- The comments that claim free expiry or a [CR#406.3] basis are corrected (`state.rs` on
+  `look_grants`, `resolve/effect.rs` at the top-of-library peek), and peeks and reveals cite
+  [CR#701.20e,701.20a].
+- [CR#401.7] (a card put "Nth from the top" of a library with fewer than N cards) is cited only for
+  that clamp (`event.rs` on `ZoneChange`, `step/mod.rs` at the library insert). It is removed
+  from the reposition sites (`agenda.rs` `RepositionLibrary`, `step/mod.rs` `Repositioned` and
+  `reposition_library`, `resolve/action.rs` on same-library moves and the scry test) and from
+  the other anchor sites that are not about the clamp (`target.rs` `ordered_zone_position`,
+  `resolve/action.rs` anchor helpers and tests, `resolve/effect.rs` arrange detection).
+- Tests:
+  - Scry 1 keeping the card on top: the scrying player's grant is gone after a shuffle.
+  - A scried card put back gets a new id and fires no `ZoneChange`.
+  - A card revealed from hand for a cost is not visible to the opponent once its spell leaves
+    the stack.
 
-- Scry 1 keeps the card on top: the scrying player's grant is gone after a shuffle.
-- A scried card put back gets a new id and fires no `ZoneChange`.
-- A card revealed from hand for a cost is not visible to the opponent afterwards.
+## Pointers
+
+- `crates/engine/src/state.rs`: `look_grants`, `payment_observations`.
+- `crates/engine/src/payment.rs`: `grant_payment_look` (the only writer, also feeding payment
+  observations); `crates/engine/src/payment/replay.rs`.
+- `crates/engine/src/step/zone.rs`: `handle_shuffled`.
+- `crates/engine/src/step/mod.rs`: `reposition_library`, the `GameEvent::Revealed` arm.
+- `crates/engine/src/agenda.rs`: `WorkItem::RepositionLibrary`.
+- `crates/engine/src/resolve/effect.rs`: the `Instruction::Each` top-of-library peek.
+- `crates/engine/tests/payment_replay.rs`: the look-grant assertions.
+- `plugins/builtin/definitions/keyword_ability/hideaway.syl`,
+  `plugins/builtin/rules/conferral/foretoldCardLook.syl`.

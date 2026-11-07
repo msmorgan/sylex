@@ -1,23 +1,37 @@
 ---
 needs: []
 ---
-**Engine: `Status::Flipped` / `Status::Unflipped` are unevaluated predicates.**
+# Track flipped status and flip cards on the battlefield
 
-The `Status` predicate arm in `crates/engine/src/target.rs` and its
-LKI/snapshot twin in `crates/engine/src/trigger.rs` cover no status
-values yet. The arm's other values have owners — `PhasedOut`/`PhasedIn` →
-`engine-phasing`, `FaceDown`/`FaceUp` → `engine-face-down` — but
-`Flipped`/`Unflipped` had none.
+## Why
 
-[CR#110.5] makes flipped/unflipped one of the four status categories every
-permanent always has a value for, and [CR#710.3] is the rule that requires
-that value be tracked and unambiguous at all times — which is what the engine
-does not do yet. [CR#710.1] describes the card frame itself: flip cards carry
-a second set of characteristics printed upside down, so a flipped permanent
-has a different name, types, and P/T. The census lists 20 `flip`-layout cards
-(`shape-flip`), so this rides on that shape landing.
+Flipped/unflipped is one of the four status categories every permanent has [CR#110.5], and the
+engine does not store it. `Status::Flipped` and `Status::Unflipped` trip a `todo!` in
+`crates/engine/src/target.rs` and its snapshot twin in `crates/engine/src/trigger.rs`. A filter
+over an unstored status must keep failing loudly: reading a default would change targeting
+legality. The card model already has flip cards (`Card::Flip` in `crates/card/src/card.rs`, one
+Card Face plus Alternative Characteristics), and the `.syl` `flip` template
+(`plugins/builtin/templates/action/flip.syl`) sets the status, but the engine always reads the
+normal characteristics. 20 Vintage-legal cards have the flip layout.
 
-A filter over an unevaluated status must keep tripping rather than silently
-read a default — the answer changes targeting legality.
+## Done when
 
-Effort: **S** once `shape-flip` exists.
+- A permanent's flipped status is stored; it enters unflipped [CR#110.5b], flipping is one-way,
+  and a permanent that leaves the battlefield keeps no memory of it [CR#710.4].
+- A flipped `Card::Flip` permanent uses its alternative name, text box, type line, power and
+  toughness, keeping its color and mana cost [CR#710.1b,710.1c,710.2]; in every other zone and
+  before it flips, only its normal characteristics [CR#710.2].
+- The `Status` predicate reads flipped status in `target.rs` and `trigger.rs`.
+- Tests use real cards: Kitsune Mystic flipping into Autumn-Tail, Kitsune Sage at the end step
+  with two Auras attached, and a flipped permanent's name and power after it returns to hand.
+
+## Pointers
+
+- `crates/core/src/status.rs`: `Status`.
+- `crates/card/src/card.rs`: `Card::Flip`.
+- `crates/engine/src/target.rs` and `crates/engine/src/trigger.rs`: the `Status` arms.
+- `crates/engine/src/object.rs` and `crates/engine/src/derive.rs`: where a permanent's
+  characteristics come from its card.
+- `plugins/builtin/templates/action/flip.syl`,
+  `plugins/canon/cards/Kitsune Mystic {slash}{slash} Autumn-Tail, Kitsune Sage.syl`.
+- Flip cards [CR#710] in `data/rules/cr.txt`.

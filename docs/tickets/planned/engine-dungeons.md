@@ -1,37 +1,55 @@
 ---
 needs: []
 ---
-Dungeon objects outside the game, venture progression through rooms, and the
-completion trigger (76 cards). Dungeons are not on the battlefield; room
-transitions fire triggered abilities.
+# Dungeons and venture into the dungeon in the engine
 
-## Current state (2026-07-18 deep-dive)
+## Why
 
-The mechanic-specific action variant has been retired. A future venture
-builtin macro will expand to `Action::Composite` over the dungeon subsystem;
-there is no parse/render arm yet, and zero live corpus cards
-(candidates sit in `wizards.bak`). `Type::Dungeon` + the `Dungeon.ron` TypeDef
-macro exist.
+Venture into the dungeon [CR#701.49], the initiative [CR#726.2] and "if you've completed a
+dungeon" all need engine state that does not exist: no venture-marker position, no dungeon cards
+outside the game, no room abilities, no record of completed dungeons. `Type::Dungeon` exists in
+core and `plugins/builtin/definitions/card_type/dungeon.syl` declares the card type, but
+nothing in `crates/engine` models a dungeon. 68 Vintage-legal cards in the MTGJSON snapshot
+mention venturing, the initiative or a dungeon.
 
-## Shape
+## Done when
 
-The verb body is expressible as a `Composite` over existing primitives once
-the state lands: "if you own no dungeon card in the command zone, choose one
-you own from outside the game, put it there, marker on topmost room, trigger
-it [CR#701.49a]; else move the marker along an arrow to an adjacent room and
-trigger it [CR#701.49b]; leaving the bottommost room removes the dungeon from
-the game, completing it [CR#701.49c,309.7]." Rooms are per-card data: a
-dungeon card is an ordered room graph, each room an intrinsic trigger "when
-you move your venture marker into this room" [CR#309.4c].
+- Venture has no mechanic-specific engine action: it resolves as a named `Action::Composite`
+  whose body composes the dungeon primitives, the way other keyword actions resolve through
+  `composite_items`.
+- A dungeon card is per-card data: its rooms joined by arrows, a directed graph with one topmost
+  and one bottommost room [CR#309.4,309.5a].
+- Each player owns a pool of dungeon cards outside the game. A dungeon card leaves the command
+  zone only by leaving the game [CR#309.2c].
+- Each player has one venture-marker position (none, or a room of the dungeon card they own in
+  the command zone [CR#309.3,309.4]), and venturing follows [CR#701.49a..701.49d]: with no
+  dungeon in the command zone, the player chooses one they own from outside the game, puts it
+  there and the marker on its topmost room [CR#309.4a]; otherwise the marker moves along an arrow
+  of the player's choice [CR#309.5a]; from the bottommost room the dungeon is removed and a new
+  one is chosen [CR#309.5b].
+- An effect other than venturing that would bring a dungeon card into the game does nothing
+  [CR#309.2d].
+- Moving the marker into a room triggers that room's ability, controlled by the dungeon's owner
+  [CR#309.4c].
+- The bottommost-room state-based action removes the dungeon unless one of its room abilities is
+  still on the stack [CR#309.6].
+- Completing a dungeon is removing it from the game [CR#309.7], whether by venturing from the
+  bottommost room or by the state-based action. It is an event a trigger watches (Dungeon
+  Crawler) and is recorded in history, so a condition reads it like any other history fact
+  (Gloom Stalker; Acererak the Archlich reads which dungeon).
+- Tests use real cards: Nadaar, Selfless Paladin venturing through one complete dungeon, and a
+  choice at a branching arrow.
 
-## Missing engine primitives (all four required)
+## Not in scope
 
-1. Per-player venture-marker position state — nothing exists.
-2. A dungeon-card pool: "outside the game" source + command-zone mint
-   (emblems live there, but no dungeon lifecycle; [CR#309.2d] even forbids
-   other effects putting dungeon cards there).
-3. Room-ability trigger sourcing wired to marker movement.
-4. Completed-dungeon history for "if you've completed a dungeon" conditionals
-   (Acererak-family).
+- The `.syl` venture action, the dungeon card frame and the initiative's venture triggers:
+  `lean-v3-venture-dungeon`.
 
-Note (2026-09-07): the "future venture builtin macro" is a v2 declaration under `plugins_v2/builtin/macros/stubs/keyword_actions/`, routed by `semantics-v2-keyword-action-residues`; the engine primitives above are unchanged.
+## Pointers
+
+- `crates/core/src/type.rs`: `Type::Dungeon`.
+- `crates/engine/src/resolve/action.rs`: `composite_items`.
+- `crates/engine/src/history.rs`.
+- `plugins/builtin/definitions/designation/initiative.syl`,
+  `plugins/builtin/definitions/subtype/dungeon/undercity.syl`.
+- Dungeons [CR#309] and venture into the dungeon [CR#701.49] in `data/rules/cr.txt`.

@@ -1,62 +1,41 @@
 ---
 needs: []
 ---
-**Engine: `Stat::Loyalty` and `Stat::Defense` read counters on the battlefield and
-the printed number elsewhere, and the two entry grants read the printed number
-explicitly.** Latent today (no implemented card reads either stat on the
-battlefield; no battle is implemented), but it turns major as soon as Nahiri-style
-"mana value less than its loyalty", Compel Brutality or any battle lands.
+**`Stat::Loyalty` and `Stat::Defense` read counters on the battlefield and the printed number
+elsewhere.**
 
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #33
-and the Rust half of `departures-lean.md` #20. The Lean half (Nahiri at
-`lean/Semantics/Cards/Mana.lean:666-667` and the [CR#306.5b] row at
-`lean/Semantics/Proofs/Rules.lean:68` share one `statOf (.stat .loyalty)` term)
-belongs with the Lean tickets; `lean-defense-projection` covers the Lean
-[CR#310.4b] conferral.
+## Why
 
-## What is wrong at head
+A planeswalker's loyalty is the printed number off the battlefield [CR#306.5a] and the number of
+loyalty counters on it on the battlefield [CR#306.5c]; a battle's defense works the same way
+[CR#310.4a,310.4c]. The engine reads `Stat::Loyalty` as the printed number in every zone and
+`Stat::Defense` as the `DefenseCounter` count in every zone. So "damage equal to its loyalty"
+(Compel Brutality) reads the printed loyalty of a planeswalker on the battlefield, and a battle's
+defense is 0 off the battlefield. The test `stat_of_loyalty_reads_printed_loyalty` asserts the
+wrong rule: a battlefield planeswalker printed 4 with one loyalty counter reads 4.
 
-`Stat::Loyalty` is "the PRINTED loyalty characteristic off the card face — never
-the live counter count" in every zone; `Stat::Defense` is the `DefenseCounter`
-count in every zone. Sites (crates/engine/src):
+## Done when
 
-- `layer.rs:1265-1285` (`eval_stat_of`) and `:915-930` (second arm); the
-  `layer.rs:1233` doc "mana value / loyalty / defense are layer-stable base
-  state";
-- `resolve/count.rs:194-210` (live arm) and `:64-67` (snapshot arm);
-- `trigger.rs:1609-1622` (snapshot arm); `activate.rs:504-520`;
-  `target.rs:843-858`;
-- `v1/plugins/builtin/macros/counters/LoyaltyCounter.ron:1-2` says the opposite ("a
-  planeswalker's loyalty IS its number of loyalty counters — read by
-  StatOf(_, Loyalty)").
+- Both stats are zone-dependent in every read: on the battlefield the counter count, elsewhere
+  the printed number. A snapshot reads the value in the zone the object left.
+- A planeswalker enters with loyalty counters equal to its printed loyalty [CR#306.5b], and a
+  battle with defense counters equal to its printed defense [CR#310.4b], although the
+  battlefield read is now the counter count.
+- `stat_of_loyalty_reads_printed_loyalty` is rewritten: 1 on the battlefield, 4 in hand.
+- The doc comments that call loyalty and defense "layer-stable base state" (`layer.rs`) or
+  `Stat::Loyalty` the printed number are corrected.
+- Tests: the rewritten one; a planeswalker entering with counters equal to its printed loyalty;
+  a battle entering with defense counters equal to its printed defense and reading its printed
+  defense off the battlefield.
 
-The test `stat_of_loyalty_reads_printed_loyalty` (`resolve/count.rs:1614-1652`)
-asserts a battlefield planeswalker printed 4 with one loyalty counter has
-`StatOf(Loyalty) = 4`. It asserts the wrong rule and is rewritten (expects 1).
+## Pointers
 
-[CR#306.5c]: "The loyalty of a planeswalker on the battlefield is equal to the
-number of loyalty counters on it." [CR#306.5a]: the printed number elsewhere.
-[CR#310.4c] and [CR#310.4a]: the same for a battle's defense.
-
-## Change
-
-1. Make both stats zone-dependent in every arm above: on the battlefield, the
-   counter count (planeswalkers for loyalty, battles for defense); elsewhere, the
-   printed number. A snapshot reads the value as it was in the zone it left.
-2. The [CR#306.5b] entry grant (`v1/plugins/builtin/rules/grant/planeswalker-loyalty.ron:9`,
-   `PutCounters(This, LoyaltyCounter, StatOf(This, Loyalty))`) gets an explicit
-   printed-loyalty read, since after step 1 the live read on the battlefield is
-   the counter count.
-3. Add the missing [CR#310.4b] battle entry grant ("enters with a number of
-   defense counters on it equal to its printed defense number") beside it, with a
-   printed-defense read. Without it a battle would enter with 0 counters and
-   `rules/sba/battle-defense-zero.ron` would put it into the graveyard.
-4. Fix the LoyaltyCounter.ron comment and the `layer.rs:1233` doc.
-
-## Tests
-
-- A planeswalker printed 4 with one loyalty counter: `StatOf(Loyalty)` = 1 on the
-  battlefield, 4 in hand.
-- A planeswalker enters with counters equal to its printed loyalty.
-- A battle enters with defense counters equal to its printed defense; off the
-  battlefield `StatOf(Defense)` is the printed number.
+- `crates/engine/src/layer.rs`: `eval_stat_of` and the second `Stat::Loyalty`/`Stat::Defense`
+  arm; `crates/engine/src/resolve/count.rs` (live and snapshot arms, the test);
+  `crates/engine/src/trigger.rs` (snapshot arm); `crates/engine/src/activate.rs`;
+  `crates/engine/src/target.rs`.
+- The entry grants the engine loads today: `v1/plugins/builtin/rules/grant/planeswalker-loyalty.ron`
+  (reads `StatOf(This, Loyalty)`); there is no battle entry grant there, and
+  `v1/plugins/builtin/rules/sba/battle-defense-zero.ron` reads `StatOf(This, Defense)`.
+- The `.syl` types confer both grants as `entersWithCounters(this, statOf(stat(…), this), …)`:
+  `plugins/builtin/definitions/card_type/planeswalker.syl`, `battle.syl`.

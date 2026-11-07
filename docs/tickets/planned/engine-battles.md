@@ -1,23 +1,46 @@
 ---
 needs: [engine-counters-api, engine-transform, engine-dfc-cast-faces]
 ---
-Protector designation, attacking battles, the defeated trigger, and back-face
-casting. (Defense counters and the battle SBA already landed — see
-`defense_zero_battle_is_put_into_graveyard` in `crates/engine/src/sba.rs`.)
+**Battles play in the engine: defense, the protector, attacking a battle, and a Siege's defeat.**
 
-Battle-adjacent substrate already in place: counter-apply (`engine-counters-api`),
-the designation registry (`engine-citys-blessing`,
-`idris-open-counter-designation-registries`) that Protector rides on, trigger
-events + the combat-damage event, and per-attacker attack-target threading
-(`Decision::Attackers` already carries `(attacker, target)` pairs) — attacking a
-battle just adds it as a legal target.
+## Why
 
-DFC deps (the piece this ticket originally missed): Siege cards are two-faced, so
-back-face casting needs (1) transform-layout **extraction** to get the cards
-(`pipeline-layout-extraction`), (2) the runtime front/back **face-state substrate**
-(`engine-transform`), and (3) the **cast-a-face mechanism** itself
-(`engine-dfc-cast-faces` — the census `modal_dfc` "back-face casting rules" line;
-distinct from transform-in-place). `core-card-shapes` deliberately deferred the
-layout work. Soft/related, not a hard need: `planeswalker-attack-target-ui` (the
-AI/TUI picker to *choose* to attack a battle) — battles can land core-only without
-it, exactly as planeswalkers did.
+The engine has the battle card type and one battle rule: the defense-zero state-based action,
+which today also moves a Siege whose defeat trigger is still waiting, against [CR#704.5v]. A
+battle does not enter with defense counters, damage does not remove them, nothing chooses or
+tracks a protector, and `legal_attack_targets` offers only the defending player and their
+planeswalkers. The `.syl` battle and Siege definitions declare the full rule set the engine is
+missing.
+
+## Done when
+
+- A battle enters with defense counters equal to its printed defense [CR#310.4b], and damage
+  dealt to it removes that many [CR#120.3h].
+- As a battle enters, its controller chooses its protector: a Siege's from among their opponents
+  [CR#310.9a,310.12a]. The protector is tracked per battle and survives the battle stopping
+  being a battle or becoming a copy [CR#310.9g].
+- A battle is a legal attack target for an attacking player whose defending player is its
+  protector, and never for its protector [CR#310.9b,508.1b]; a Siege can be attacked by its own
+  controller. Only its protector may block creatures attacking it [CR#310.9c], and "defending
+  player" for those attackers means the protector [CR#310.9d,508.5].
+- The protector state-based actions run [CR#704.5x,704.5y], and an attached battle becomes
+  unattached [CR#310.10].
+- The defense-zero action spares a Siege while one of its triggered abilities waits to leave the
+  stack [CR#704.5v], and still moves a non-Siege [CR#704.5w].
+- When a Siege's last defense counter is removed it is exiled and its controller may cast it
+  transformed without paying its mana cost [CR#310.12b].
+- Tests use real Sieges (e.g. Invasion of Zendikar // Awakened Skyclave), by core fixture where
+  the cards are not authored.
+
+## Not in scope
+
+- The TUI/AI picker that chooses to attack a battle (`planeswalker-attack-target-ui`).
+
+## Pointers
+
+- `plugins/builtin/definitions/card_type/battle.syl`, `plugins/builtin/definitions/subtype/battle/siege.syl`:
+  the declared battle and Siege rules.
+- `crates/engine/src/legal.rs`: `legal_attack_targets`.
+- `crates/engine/src/combat.rs`: `CombatState::attack_target`.
+- `crates/engine/src/sba.rs`: `defense_zero_battle_is_put_into_graveyard`.
+- `docs/tickets/planned/engine-dfc-cast-faces.md`: casting a back face.

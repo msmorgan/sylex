@@ -17,10 +17,10 @@ together and what triggers see.
 - The legend-rule choice and the mechanical state-based actions of one check
   are performed as one event, or the investigation shows the current order is
   already equivalent and a test pins that behavior.
+- Every legend-rule group of one check belongs to that same event; today
+  `check_sbas` surfaces one group per decision cycle and re-checks between them.
 - A test covers a check where the legend rule and a mechanical state-based
   action apply at once (two same-name legends, one with lethal damage).
-- `cargo test -p sylex_engine` and `cargo clippy -p sylex_engine --tests -- -D
-  warnings` pass.
 
 ## Pointers
 

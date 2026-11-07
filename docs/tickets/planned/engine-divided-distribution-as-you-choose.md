@@ -1,19 +1,41 @@
 ---
 needs: []
 ---
-**Engine: divided distribution (`DivideAmong` / `split_evenly`) is rules-illegal
-and not player-chosen.** Found in the 2026-06-29 code review.
+**Engine: the caster announces a division of damage or counters, with at least one for each
+target.**
 
-`split_evenly` (`crates/engine/src/resolve/effect.rs`) splits the total
-evenly: when chosen targets > total, some recipients get a **0** share (divided
-damage/counters must put at least one on each recipient); when the group resolves
-to 0 elements the whole total is silently dropped. The division is also fixed
-(even), not the "divided as you choose" player decision the rules require.
+## Why
 
-Fix: bound the target choice so each gets ≥1 (divide cardinality and amount
-together), and surface the as-you-choose split as a payment/announcement-time
-decision (the documented seam). Add tests for total < targets and a chosen
-(uneven) split. Pairs with `engine-divide-among-player-panic` (same `DivideAmong`
-path) and the Arc Lightning data fix.
+A player casting a spell that divides or distributes an effect announces the division while
+casting, and each target must receive at least one [CR#601.2d]. A copy keeps that division, and
+changing targets can't change it [CR#115.7f]. The engine never asks for the division:
 
-Severity: **medium** (rules-incorrect distribution). Effort: **M**.
+- `Instruction::Distribute` in `crates/engine/src/resolve/effect.rs` splits the total with
+  `split_evenly` at resolution. When there are more recipients than the total, some get 0. An
+  empty group drops the total silently.
+- The `Division` decision (`crates/engine/src/decide/pending/choice.rs`) is a shell whose
+  `resolve` is a `todo!` naming this ticket.
+- The `Instruction::Distribute` doc in `crates/core/src/effect.rs` calls the split
+  "resolution-time", which contradicts [CR#601.2d].
+
+Electrolyze, Chandra's Pyrohelix and Aerial Volley (`dealDivided` in `plugins/canon/`) are
+witnesses.
+
+## Done when
+
+- At announcement, the caster divides the amount among the chosen targets, at least one each.
+  The target count is bounded so that a legal division exists. The division is recorded on the
+  stack entry, copied with the spell, and kept when targets change.
+- At resolution each target that is still legal receives its announced share, and `split_evenly`
+  is gone.
+- The `Distribute` doc in core states the announce-time rule.
+- `arc_lightning_announces_one_to_three_targets` (`crates/engine/tests/stack.rs`) extends through
+  resolution. New tests grounded in Electrolyze or Chandra's Pyrohelix cover an uneven chosen split
+  and a target count above the total being refused.
+
+## Pointers
+
+- `crates/core/src/effect.rs` (`Instruction::Distribute`, `Distribute`)
+- `crates/engine/src/resolve/effect.rs` (the `Distribute` arm, `split_evenly`)
+- `crates/engine/src/decide/pending/choice.rs` (`Division`)
+- `plugins/builtin/primitives/action/distribute.syl`, `plugins/builtin/templates/action/dealDivided.syl`

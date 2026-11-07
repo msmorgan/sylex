@@ -1,33 +1,34 @@
 ---
 needs: []
-design: true
 ---
-Sub-turn history-lookback windows: the remaining `ThisCombat` and `ThisStep` arms.
-Rewritten 2026-10-21 (`docs/evidence/mtg-rules-review-2026-10-21/departures-docs.md`
-#43): the earlier text quoted echo wrongly and proposed an anchor that would never
-fire.
+# "This combat" and "this step" history windows
 
-## Landed: `SinceYour(step)` (echo)
+## Why
 
-Echo [CR#702.30a]: "At the beginning of your upkeep, if this permanent came under
-your control since the beginning of your last upkeep, sacrifice it unless you pay
-[cost]." `v1/plugins/builtin/macros/keyword/Echo.ron` uses
-`within: SinceYour(Beginning(Upkeep))`, and the scan is implemented in
-`crates/engine/src/history.rs` (`in_window_for`,
-`position_in_window_for`), watcher-relative: the anchor is the watcher's most recent
-`StepBegan(step)` onset, except while that step is itself current on the watcher's
-turn, where the anchor is the PREVIOUS onset (the current onset is the one firing the
-trigger, so anchoring on it would never match; Paradox Haze ruling 2006-09-25 on
-"last upkeep"). With no earlier onset the window runs from game start. Entries
-strictly after the anchor are in the window.
+History reads choose their entries by a `Lookback` window. `ThisTurn`, `ThisGame`, `LastTurn`
+and `SinceYour(step)` (echo's "since the beginning of your last upkeep" [CR#702.30a]) work;
+`ThisCombat` and `ThisStep` reach `unreachable!` in `window_contains`
+(`crates/engine/src/eval.rs`). Cards read them: Clockwork Beast ("if this creature attacked or
+blocked this combat"), Cathedral Membrane ("each creature it blocked this combat", read as it
+dies) and Harsh Justice ("only if you've been attacked this step").
 
-## Remaining
+How `ThisCombat` and `ThisStep` anchor when read outside that combat phase or step, for example
+from a delayed trigger, is open and needs a ruling per consumer before the build.
 
-`eval.rs` `window_contains` (around `:758-768`) still `unreachable!`s for
-`ThisCombat | ThisStep | SinceYour(_)`: `SinceYour` never reaches it (history.rs
-handles it first), and `ThisCombat`/`ThisStep` have no consumer yet. Implement those
-two arms on the same anchor machinery (the current combat phase's / step's onset by
-log position) when the first card needs them, and make the `SinceYour` arm's
-unreachability a typed impossibility rather than a panic. The design question is only
-how `ThisCombat` and `ThisStep` anchor when read outside that combat or step (for
-example from a delayed trigger), which needs a ruling per consumer.
+## Done when
+
+- `ThisCombat` selects the entries since the current combat phase began [CR#506.1] and `ThisStep`
+  those since the current step began, anchored by log position on the phase's or step's onset,
+  the way `in_window_for` anchors `SinceYour`.
+- Their meaning when read outside that combat phase or step is ruled for each consumer and
+  tested.
+- `SinceYour` can no longer reach `window_contains`: the type rules it out instead of an
+  `unreachable!`.
+- The `in_window` doc comment no longer calls the sub-turn windows unemittable.
+- Tests use the real cards above.
+
+## Pointers
+
+- `crates/engine/src/history.rs`: `in_window`, `in_window_for`, `position_in_window_for`.
+- `crates/engine/src/eval.rs`: `window_contains`.
+- `crates/core/src/temporal.rs`: `Lookback`.

@@ -1,42 +1,36 @@
 ---
 needs: []
 ---
-**Shrink `GameState`'s ~705-method surface by moving component-local methods
-onto the component types they actually touch.** `GameState` (see
-`crates/engine/src/state.rs`) is a struct-of-components — `Zones`,
-`ObjectStore`, `TurnState`, `CombatState`, `PlayerState`, `Cards`,
-`DesignationStore`, … — but nearly all behavior hangs off `impl GameState`
-blocks spread across 19 files. A large share of those methods read/write
-exactly one component and belong on that component's own `impl`:
+# Move single-component methods off `GameState`
 
-- a method touching only `self.zones` → `impl Zones`
-- only `self.combat` → `impl CombatState`
-- only `self.objects` → `impl ObjectStore`
-- pure helpers over one component's data → module-local free fns taking
-  narrow params
+## Why
 
-Payoffs: the god object's method list shrinks toward genuinely cross-cutting
-orchestration; each component's API documents what its subsystem actually
-needs; split borrows get *easier* (borrowck can see disjoint fields), removing
-`let x = self.f(); self.g(x)` dances. Explicitly **not traits** — behavior
-does not vary by implementor here; this is plain method placement
-(ruling settled: traits only where a second implementor exists, e.g.
-`StrategyEvaluator`).
+`GameState` (`crates/engine/src/state.rs`) derefs to `GameImage`, a struct of components
+(`Zones`, `ObjectStore`, `TurnState`, `CombatState`, `PlayerState`, `Cards`, `DesignationStore`,
+…), but nearly all behavior hangs off `impl GameState` blocks spread across some two dozen files.
+Many of those methods read or write exactly one component. On `GameState` they hide what each
+subsystem needs and force `let x = self.f(); self.g(x)` borrow workarounds that disjoint field
+borrows would make unnecessary.
 
-## Plan
+## Done when
 
-1. Inventory: for each `impl GameState` method, compute the set of fields it
-   touches (a quick script over `self.<field>` occurrences per method body is
-   enough for triage; verify by hand before moving).
-2. Move the single-component methods, file by file (subsystem by subsystem —
-   this can also happen opportunistically inside [[split-trigger-rs]] /
-   [[split-step-rs]] carves). Call sites change from `self.foo(...)` to
-   `self.zones.foo(...)` — mechanical.
-3. Methods touching one component plus a cheap read of another often want the
-   read hoisted to the caller and passed as a param; don't force it where the
-   result reads worse.
-4. No behavior change anywhere. No new `pub` — component methods get the
-   narrowest visibility that compiles (most `pub(crate)`).
+- Each `impl GameState` method that touches only one component lives on that component's own
+  `impl` (or is a module-local free function over that component's data), and its callers call it
+  through the component (`self.zones.foo(..)`).
+- A method that touches one component plus a cheap read of another takes that read as a
+  parameter where the call site reads no worse; it stays on `GameState` otherwise.
+- Moved methods get the narrowest visibility that compiles; no new `pub` items.
+- No behavior changes.
+- Moved doc comments keep their citations: `cargo xtask cite check` reports 0 stale.
 
-Gates: engine suite green, workspace clippy clean, nightly fmt,
-`cargo xtask cite check` (moved methods carry CR-cited comments).
+## Not in scope
+
+- Traits: each component has a single implementor, so this is plain method placement.
+- Splitting large files; `split-trigger-rs` and `split-step-rs` own that, and a move may ride
+  along with either.
+
+## Pointers
+
+- `crates/engine/src/state.rs` (`GameState`, `GameImage`)
+- `crates/engine/src/zone.rs`, `object.rs`, `turn.rs`, `combat.rs`, `player.rs`
+- `docs/tickets/planned/split-trigger-rs.md`, `docs/tickets/planned/split-step-rs.md`

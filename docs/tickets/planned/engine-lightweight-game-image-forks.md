@@ -1,18 +1,34 @@
 ---
 needs: [engine-payment-obligation-window]
 ---
-Replace the payment window's naïve full `GameImage` clones with lightweight
-forks only after the complete clone-based protocol is correct and measured.
-Preserve exactly the same runnable surface: nested frames must still support
-all engine queries and mutations, replacements, triggers, layers, history,
-RNG, pending decisions, zone-change reminting, and deterministic replay.
+**Payment frames fork the game image cheaply instead of cloning it whole.**
 
-Start with profiles and benchmarks covering nested filter-land/KCI payments and
-selective rescind/decline replay. Share immutable card/registry data directly;
-evaluate copy-on-write or persistent storage for mutable object/zones/player
-state and chunked history. In particular, preserve SlotMap's generational-key
-and allocator behavior—do not trade correctness for an object store that can
-restore stale IDs or resolve them to different objects. The optimized image
-must remain behaviorally interchangeable with the full-clone implementation,
-with differential tests over the payment-window acceptance scenarios.
+## Why
 
+Each `PaymentFrame` holds up to three full `GameImage` clones (`working`, `proposal_base`,
+`payment_base`), and nested payments stack frames, so a filter-land or Krark-Clan Ironworks
+payment copies every object, zone, history entry and the card table several times. Whether that
+cost matters is not yet measured.
+
+## Done when
+
+- A benchmark covers nested filter-land and Krark-Clan Ironworks payments and selective
+  rescind/decline replay, and its numbers on the full-clone implementation are recorded before
+  any change.
+- A forked frame keeps the whole runnable surface of a full clone: every engine query and
+  mutation, replacements, triggers, layers, history, RNG, pending decisions, zone-change
+  reminting and deterministic replay.
+- The object store keeps `SlotMap`'s generational keys and allocator behavior: a stale
+  `ObjectId` never resolves again, and never to a different object.
+- Differential tests run the payment-window acceptance scenarios on the forked image and on
+  full clones and require identical results.
+
+## Pointers
+
+- `crates/engine/src/state.rs`: `GameImage`. Its doc comment calls `cards` "fixed at game start,
+  never mutated after"; the card table is append-only (`Cards::push_token` adds an entry per
+  created token).
+- `crates/engine/src/payment.rs`: `PaymentFrame`; `crates/engine/src/payment/replay.rs`.
+- `crates/engine/src/object.rs`: `ObjectStore`, `Cards`.
+- `crates/engine/tests/payment.rs`, `payment_mana.rs`, `payment_replay.rs`;
+  `crates/engine/benches/full_game.rs`.

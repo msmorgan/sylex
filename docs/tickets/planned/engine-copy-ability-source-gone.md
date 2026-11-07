@@ -19,10 +19,8 @@ sacrificed as a cost, gets no copy.
   last known information [CR#113.7a].
 - `copy_activated_ability_with_gone_source_fizzles` is rewritten to assert the
   copy exists and resolves.
-- A test with Rings of Brighthearth and a fetchland passes, by core fixture
+- A test with Rings of Brighthearth copying Polluted Delta's ability passes, by core fixture
   where the cards are not authored.
-- `cargo test -p sylex_engine` and `cargo clippy -p sylex_engine --tests -- -D
-  warnings` pass.
 
 ## Pointers
 

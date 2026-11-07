@@ -1,27 +1,49 @@
 ---
 needs: [engine-transform]
 ---
-Casting a chosen face of a two-faced card — the cast-time face mechanic, distinct
-from transform-in-place (`engine-transform`, which flips an already-on-battlefield
-permanent). Two populations:
+**Engine: cast or play a chosen face of a double-faced card.**
 
-- **Modal DFC play-either-face** (~93 `modal_dfc` cards; grammar + extraction
-  already done). At cast/play time the player chooses which face to put on the
-  stack; only that face is evaluated for legality and cost, and only it is put on
-  the stack [CR#712.11b,712.11c]. A resolving DFC spell that becomes a permanent
-  enters with the same face that was up on the stack [CR#712.13]. Playing an MDFC
-  as a land chooses one land face before it enters [CR#712.12].
-- **Back-face / "transformed" casting** — casting a card's back face as a
-  consequence of an effect (Siege "cast the back face", disturb, etc.), including
-  casting a nonmodal DFC "transformed"/"converted" so the spell is put on the
-  stack with its back face up and only the back face's characteristics, its mana
-  value still calculated from the front face's mana cost [CR#712.8c,712.11a]. The
-  nonmodal (Siege/TDFC) subset needs those cards extracted first
-  (`pipeline-layout-extraction`).
+## Why
 
-Builds on the runtime face-state substrate from `engine-transform` (which face an
-object presents; face-aware base characteristics). Adds the cast-subsystem face
-selection that `cast.rs` lacks today — every cast site reads the front face via
-`derive::face`, so a two-faced card is only ever castable as its front face. This
-is the census `modal_dfc` engine line ("play-either-face + back-face casting
-rules") and the third battles dependency for back-face casting. `[design]`.
+Every cast path reads the front face: `cast.rs` takes characteristics from `derive::face`, which
+is `Card::primary_face`, and `Action::CastSpell { object }` carries no face. So a double-faced card
+can only ever be cast or played as its front face. The card model and the `.syl` corpus already
+distinguish the two kinds (`DoubleFacedLayout::{Transforming, ModalDfc}`; `card modalDfc(…)` and
+`card transforming(…)`), and `engine-transform` gave objects a `side`. Two populations need the
+cast-time face:
+
+- **Modal double-faced cards** (98 Vintage-legal). The player chooses which face to cast before
+  putting it on the stack [CR#712.11b]. Only that face is evaluated for castability and only it is
+  put on the stack [CR#712.11c]. Playing one as a land chooses a land face, and it enters with that
+  face up [CR#712.12]. The Pathway lands are the witnesses: their back face is a land too.
+- **Casting a nonmodal card "transformed" or "converted"**, for example the `transformedPaying`
+  play payment ([CR#712.8c,702.146a], disturb) or a defeated Siege cast transformed (`engine-battles`). The spell is put on the
+  stack back face up [CR#712.11a] with only the back face's characteristics, and its mana value
+  comes from the front face's mana cost [CR#712.8c].
+
+A resolving double-faced spell enters with the face that was up on the stack [CR#712.13].
+
+## Done when
+
+- `legal_actions` offers each castable face of a modal double-faced card and each playable land
+  face, and the chosen face rides the action.
+- The cast pipeline evaluates timing, legality, targets and cost from the chosen face, and the
+  spell object carries that face's `side` on the stack and onto the battlefield.
+- An effect that casts a card transformed puts it on the stack back face up, and its mana value
+  reads the front face.
+- Tests grounded in Branchloft Pathway // Boulderloft Pathway (playing either land face), a modal
+  card whose faces are a spell and a land, and a disturb card cast transformed from the graveyard
+  (checking its mana value).
+
+## Not in scope
+
+- Turning a permanent over on the battlefield: done in `engine-transform`.
+- Copies of double-faced spells keeping their face: `engine-copy-permanent-spells`.
+
+## Pointers
+
+- `crates/engine/src/cast.rs`, `crates/engine/src/derive.rs` (`face`, `face_of`),
+  `crates/engine/src/legal.rs` (`legal_actions`)
+- `crates/card/src/card.rs` (`Card::DoubleFaced`, `DoubleFacedLayout`)
+- `plugins/canon/cards/Branchloft Pathway {slash}{slash} Boulderloft Pathway.syl`
+- `plugins/builtin/primitives/cost/transformedPaying.syl`

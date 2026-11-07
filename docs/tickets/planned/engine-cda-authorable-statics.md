@@ -1,59 +1,34 @@
 ---
 needs: []
 ---
-**Add an author-facing way to mark a static `Modify` as a characteristic-defining
-ability (CDA) so it settles in layer 7a instead of 7b.** Unblocks the
-"power/toughness equal to a count" card family (e.g. "* / * where * is the number
-of X"), which was carved out of [[macro-second-wave]] because it cannot be
-authored correctly today.
+**Core carries the characteristic-defining mark on a static ability, and the engine applies such
+abilities first in their layer.**
 
-## The gap
+## Why
 
-A CDA (an ability that defines a characteristic — most commonly a creature whose
-printed power/toughness is `*` set to some count) applies in layer 7a, *before*
-other power/toughness-setting and -modifying effects. The engine already models
-the distinction: the internal layer-pass struct carries `is_cda: bool`
-(`crates/engine/src/layer.rs`, on `ContinuousEffect`).
+A characteristic-defining ability [CR#604.3,604.3a] applies in layer 7a when it defines power or
+toughness [CR#613.4a], ahead of effects that set them [CR#613.4b], and first within layers 2–6
+for the other characteristics [CR#613.3]. The engine's layer pass already orders by
+`ContinuousEffect::is_cda`, but every site that builds a continuous effect from a static ability
+sets `is_cda: false`, because nothing in core marks a static as characteristic-defining. `.syl`
+already does (`characteristicDefining`, behind `definesPt` and its siblings), so Tarmogoyf and
+Maro get correct values today but land in layer 7b, wrong as soon as another P/T effect applies.
 
-The problem is purely semantics-side: **every construction site that builds a
-continuous effect from ability/static data hardcodes `is_cda: false`**
-(`crates/engine/src/layer.rs` — the sites that lower `Ability` /
-`StaticEffect` / `Modification` into layer effects). There is no field on
-`Ability`, `StaticEffect`, or `Modification` in `crates/core/` that an
-author (or the macro/parser layer) can set to request 7a. So a card written as
-`Static(Modify(This, Power(Set(CountOf(Objects(<filter>))))))` parses and
-round-trips fine and produces the correct *value*, but is placed in layer 7b —
-wrong ordering the moment it interacts with other P/T effects.
+## Done when
 
-Shipping the 7b form anyway is the "convenient-but-wrong" pattern this project
-fixes at source rather than grandfathering, which is why the card family was
-deferred here rather than landed in the macro wave.
+- Core's static-ability grammar can mark a static as characteristic-defining, and the engine's
+  gather sites build `is_cda: true` effects from marked statics; unmarked statics are unchanged.
+- A Tarmogoyf under Glorious Anthem has its count plus one, and a Tarmogoyf hit by Turn to Frog
+  is 1/1: the 7b set applies after the 7a definition.
+- A marked color CDA applies before other layer-5 effects in the same layer pass [CR#613.3].
+- Tests use the real cards, by core fixture where they are not authored.
 
-## Scope
+## Pointers
 
-- Add a CDA marker to the core static/modification grammar that the author (and
-  the reverse macro index) can set — the minimal shape is a boolean/flag on the
-  static-modify carrier, not a whole new effect variant (mirror how existing
-  single-component statics extend). Decide the exact carrier during design; keep
-  it representable in RON and round-trippable.
-- Thread the flag through the engine lowering sites in
-  `crates/engine/src/layer.rs` so a flagged static builds a
-  `ContinuousEffect` with `is_cda: true` (→ layer 7a), leaving unflagged statics
-  at 7b unchanged.
-- Confirm the fixpoint layer pass orders a CDA-flagged P/T `Set` ahead of a
-  plain 7b `Set`/`+N/+N` modification, with an engine test exercising the
-  interaction (a `*`-P/T creature under a separate anthem).
-
-## Then: land the deferred card family
-
-Once the flag exists, author the `PowerAndToughnessCountEqual` / `PowerCountEqual`
-`Modification`-family macros (the value shape is already expressible:
-`Power(Set(CountOf(Objects(<filter>))))` with the primitives confirmed present)
-plus the CDA flag, with an acceptance card that graduates and round-trips. That
-card family is ~84 single-blocker cards.
-
-## Verification
-
-- `cargo test --workspace` green; `cargo clippy --all-targets -- -D warnings` clean.
-- A layer-interaction test proves 7a-before-7b ordering for a CDA-flagged static.
-- Wipe-first wizards regen; graduation count strictly rises once the family lands.
+- `crates/engine/src/layer.rs`: `ContinuousEffect::is_cda`, `layer_of`, the gather sites that set
+  `is_cda: false`, and `cda_sets_pt_to_dynamic_creature_count`.
+- `crates/core/src/continuous.rs`: `NumericOp`, `Modification`.
+- `plugins/builtin/primitives/static/characteristicDefining.syl`,
+  `plugins/canon/cards/Tarmogoyf.syl`, `plugins/canon/cards/Maro.syl`.
+- `docs/tickets/planned/engine-copy-cda-generalize.md`: its copy-exception drop can read this
+  mark instead of matching ability shapes.

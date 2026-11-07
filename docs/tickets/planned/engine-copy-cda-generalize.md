@@ -1,31 +1,36 @@
 ---
 needs: [core-copy-grammar, engine-layers-1-copy-facedown-text]
 ---
-Remove the bespoke CDA-drop special-casing in copy-exception application.
-`core-copy-grammar` applies a `CopyException::Modify`/`Retain` by folding it into the
-copiable values at layer 1a and, per [CR#707.9d], stripping the source's
-characteristic-defining ability for any characteristic the exception provides or
-retains — implemented as an explicit "find the CDA that defines this characteristic and
-drop it" pass in the copy-application code. That strip is messy and easy to get subtly
-wrong. Once `engine-layers-1-copy-facedown-text` lands the real layer-1a
-copiable-values machinery, model "the defining ability is not copied" [CR#707.9d] as a
-consequence of copiable-value derivation (the providing/retaining exception participates
-in the layer-1a fold) rather than a bespoke ability-filter, and delete the special case.
-For power/toughness the behaviour is unchanged — Quicksilver-of-Tarmogoyf is 7/7 with
-no `*/1+*` CDA, and a Populate of that token stays 7/7 [CR#707.3].
+**A copy exception drops the copied object's characteristic-defining ability for every
+characteristic it provides or retains, as part of deriving the copiable values.**
 
-**Behaviour changes on colour and subtypes (corrected 2026-10-21).** The current drop
-covers only P/T: `crates/engine/src/copy.rs:30-38` (module doc, "Power/Toughness
-axes only") and `retain_characteristic` (`copy.rs:574-594`, a no-op arm for `Colors`
-and `Subtypes`); the Modify path (`copy.rs:334`, `:337`) does no CDA drop either.
-[CR#707.9d] drops the copied CDA for any characteristic the exception provides or
-retains, and for colour also the colour indicator, except where the exception says
-"in addition to its other types". Devoid ([CR#702.114a]) and changeling
-([CR#702.73a]) are CDAs ([CR#604.3a]). So a "1/1 green Frog" copy exception
-(Croaking Counterpart) over a devoid creature must come out green, not colourless
-(live: devoid's layer-5 colour set is implemented), and a changeling copy with a
-subtype exception must drop changeling (latent while `AllCreatureTypes` is a no-op,
-`layer.rs:1925`). Extend the layer-1a fold to colour and subtype CDAs and the colour
-indicator, honouring the carve-out. An exception that ADDS a colour over a
-colour-defining CDA is underdetermined in the CR; register it rather than guess.
-Provenance: `docs/evidence/mtg-rules-review-2026-10-21/departures-engine.md` #31.
+## Why
+
+When a copy exception provides or retains a characteristic, any characteristic-defining ability
+of the copied object that defines it is not copied, and for color neither is the color indicator,
+unless the exception adds types "in addition to its other types" [CR#707.9d]. The engine
+implements only the power/toughness case, by a shape-matching filter (`defines_pt`) applied
+after the exception: `retain_characteristic` is a no-op for colors and subtypes, and the
+`Modify` path drops nothing for them. Devoid [CR#702.114a] and changeling [CR#702.73a] are
+characteristic-defining abilities [CR#604.3a], so Croaking Counterpart ("except it's a 1/1 green
+Frog") copying Barrage Tyrant makes a colorless Frog instead of a green one, and copying
+Avian Changeling keeps changeling (latent while `AllCreatureTypes` is a no-op in the layer pass).
+
+## Done when
+
+- The drop happens inside layer-1 copiable-value derivation for every characteristic
+  [CR#707.9d] names (power, toughness, colors with the color indicator, subtypes),
+  honoring the "in addition to its other types" exception; `defines_pt` and the per-axis special
+  case in `retain_characteristic` are gone.
+- Power and toughness behave as now: Quicksilver Gargantuan copying Tarmogoyf is 7/7 with no
+  Tarmogoyf CDA, and a copy of that copy stays 7/7 [CR#707.3].
+- Tests: Croaking Counterpart copying Barrage Tyrant is a green Frog; Croaking Counterpart
+  copying Avian Changeling has no changeling. Core fixtures where the cards are not authored.
+
+## Pointers
+
+- `crates/engine/src/copy.rs`: the module doc's [CR#707.9d] paragraph, the `Modification` apply,
+  `defines_pt`, `retain_characteristic`.
+- `crates/engine/src/layer.rs`: `base_values`, the `AllCreatureTypes` arm, `devoid_derives_colorless`.
+- `docs/tickets/planned/engine-cda-authorable-statics.md`: the core mark that identifies a
+  characteristic-defining ability.

@@ -1,30 +1,36 @@
 ---
 needs: []
 ---
-**Engine: non-mana cost components on a cost-change row are not folded.**
+**Engine: fold non-mana components and non-simple symbols in cost increases and reductions.**
 
-`crates/engine/src/cast.rs` implements the total-cost pipeline
-([CR#601.2f] — the player determines the total cost; effects may increase or
-reduce it). Three arms stay loud because they only handle mana:
+## Why
 
-- a cost-**increase** pass reaching a non-mana `CostComponent`;
-- a cost-**reduction** pass reaching a non-mana `CostComponent`;
-- `reduce_symbol` reaching a symbol kind it can't decompose.
+The total-cost pipeline in `crates/engine/src/cast.rs` [CR#601.2f] handles only mana. Three arms
+stop with a loud `todo!` that names this ticket:
 
-`engine-cost-modification` (done) scoped these as intentional, permanent loud
-residue — "fold when a card needs it" — rather than guessing at semantics no
-corpus card exercises. Folding a non-mana component into a cost *change* is
-genuinely ambiguous in places ("spells cost 1 less to cast" does not reduce an
-additional sacrifice), so each new component kind wants its own ruling and its
-own test rather than a blanket arm.
+- `add_mana_components`: an increase that reaches a non-mana `CostComponent`;
+- `reduce_mana_components`: a reduction that reaches a non-mana `CostComponent`;
+- `reduce_symbol`: a reduction symbol other than generic or a single colored/{C} pip (hybrid,
+  Phyrexian, snow, {X}). A hybrid reduction has the payer choose a half when the reduction
+  applies [CR#118.7e].
 
-This is deliberately **not** `engine-alt-costs`: that ticket owns choosing an
-alternative cost at announcement (cascade / suspend / plot and per-keyword
-alt-cost selection), a different lane from modifying an already-determined
-total.
+Each component kind needs its own ruling, because folding is not uniform. "Spells cost {1} less
+to cast" does not reduce an additional sacrifice, for example. So each arm is widened when a real
+card reaches it.
 
-Close it by widening one component kind at a time as the corpus demands, or by
-retiring it if the taxonomy is reshaped so non-mana components can't reach
-these passes.
+## Done when
 
-Effort: **S** per component kind.
+- Each component kind or symbol kind that a card in `plugins/canon/` reaches has its fold
+  implemented, with a test grounded in that card. The `todo!` stays for every kind no card
+  reaches.
+
+## Not in scope
+
+- Choosing an alternative cost at announcement: `engine-alt-costs`.
+- An unmatched colored reduction falling through to generic [CR#118.7b]:
+  `engine-cost-and-search-rule-gaps`.
+
+## Pointers
+
+- `crates/engine/src/cast.rs` (`add_mana_components`, `reduce_mana_components`, `reduce_symbol`)
+- `crates/core/src/continuous.rs` (`CostChange`), `crates/core/src/cost.rs` (`CostComponent`)
