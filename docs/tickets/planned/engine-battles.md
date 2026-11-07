@@ -1,5 +1,5 @@
 ---
-needs: [engine-counters-api, engine-transform, pipeline-layout-extraction, engine-dfc-cast-faces]
+needs: [engine-counters-api, engine-transform, engine-dfc-cast-faces]
 ---
 Protector designation, attacking battles, the defeated trigger, and back-face
 casting. (Defense counters and the battle SBA already landed — see

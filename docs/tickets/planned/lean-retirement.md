@@ -1,5 +1,5 @@
 ---
-needs: [discourse-corpus-agreement, idris-retirement]
+needs: [idris-retirement]
 ---
 # Delete `lean/` and `sylGen`
 

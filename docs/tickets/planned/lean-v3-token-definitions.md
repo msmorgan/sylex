@@ -29,8 +29,6 @@ own hand-written `treasure`, `food`, `gold`, `clue` and `blood` values that noth
 - Widen `PredefinedToken`'s doc and the glossary's **Predefined Token** entry to also cover a token
   a keyword action's rule defines in full, as [CR#701.71a] defines the Jace planeswalker token, or
   name that a separate term; it is a Definition either way.
-
-## Relation to other tickets
-
-`tokens-design` and `tokens-templates` (maybe/) cover ad-hoc token authoring and extraction from
-Oracle text. This ticket is only the rules-defined tokens.
+- Core's hardcoded predefined tokens (`PredefinedToken` in `crates/core/src/token.rs`, a
+  second hand-synchronized copy of each token's characteristics) go; the token Definitions are the
+  one copy, and each predefined token not yet declared is one more declaration [CR#111.10a..111.10x].

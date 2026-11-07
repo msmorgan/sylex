@@ -1,5 +1,5 @@
 ---
-needs: [semantics-v3-parity]
+needs: []
 ---
 **Retire v1 scaffolding (the `.syl` plugins already live in `plugins/`; updated 2026-10-14
 per [`docs/decisions/semantics.md`](../../decisions/semantics.md)).**
