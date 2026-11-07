@@ -306,8 +306,8 @@ fn a_declined_unit_is_counted_as_declined_not_unread() {
     };
     let (name, text) = *sylex_english::census::declined()
         .iter()
-        .find(|(name, _)| *name == "Soul Echo")
-        .expect("Soul Echo is declined");
+        .find(|(name, _)| *name == "Illusionary Mask")
+        .expect("Illusionary Mask is declined");
     let mut corpus = Corpus::default();
     let mut declined_face = face("soul", text);
     declined_face.name = name.to_owned();

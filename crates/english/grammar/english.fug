@@ -3320,10 +3320,13 @@ PastParticipialAbsolute: AbsoluteClause -> subject:ComplementNounPhrase VerbPhra
           head.Voice = Passive,
           head.VerbKind != Auxiliary
 
-// Interrogative content clauses: closed (*whether ...*), with an
-// interrogative phrase as Subject (*which creatures attack*) or filling
-// a Gap (*which number you chose*), or with an interrogative adverb
-// (*how each player votes*; CGEL, Ch. 11 §5.1, pp. 972–973).
+// Content clauses: declarative (*choose that ...*; CGEL, Ch. 11 §3.1,
+// p. 951), closed interrogative (*whether ...*), or open interrogative
+// with an interrogative phrase as Subject (*which creatures attack*)
+// or filling a Gap (*which number you chose*) or with an interrogative
+// adverb (*how each player votes*; Ch. 11 §5.1, pp. 972–973).
+DeclarativeContentClause: InterrogativeClause -> marker:Word(ContentMarker) clause:Clause
+    where clause.VerbForm = Finite
 ClosedInterrogative: InterrogativeClause -> marker:Word(Whether) clause:Clause
     where clause.VerbForm = Finite
 ClosedInfinitivalInterrogative: InterrogativeClause -> marker:Word(Whether) clause:Clause
