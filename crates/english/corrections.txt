@@ -11,19 +11,19 @@
 card: Agency Outfitter
 oracle: your graveyard, hand and/or library
 corrected: your graveyard, hand, and/or library
-evidence: The printed card (MKM 0038, Scryfall image 8112f133-535e-4264-8357-9cbf97957710) reads "graveyard, hand, and/or library", with the serial comma (`docs/oracle-style-guide.md` §3, "Commas and the serial comma"). Template siblings with that text in Oracle: Boonweaver Giant, Dark Supplicant, Mishra, Artificer Prodigy and Say Its Name. MTGJSON's `originalText` for MKM lacks the comma, against the image; it is not evidence.
+evidence: The printed card (MKM 0038, Scryfall image 8112f133-535e-4264-8357-9cbf97957710) reads "graveyard, hand, and/or library", with the serial comma (`docs/oracle-style-guide.md` §3, "Commas and the serial comma"). Template siblings with that text in Oracle: Boonweaver Giant, Dark Supplicant, Mishra, Artificer Prodigy and Say Its Name. MTGJSON's `originalText` for MKM omits the comma, but the image shows it, so `originalText` is not evidence here.
 
 card: Mathise, Surge Channeler
 oracle: 1-9 |
 corrected: 1—9 |
-evidence: The printed card (SLX 0025, Scryfall image 3c560e53-73d9-4b0e-9b93-c729e00e7bbe) prints the range "1–9" with the dash that Earth-Cult Elemental (AFR 141) prints, not a hyphen. Oracle spells that dash "—" in all 75 other d20 row ranges among supported cards.
+evidence: The printed card (SLX 0025, Scryfall image 3c560e53-73d9-4b0e-9b93-c729e00e7bbe) prints the range as "1–9" with a range dash, not a hyphen, as Earth-Cult Elemental (AFR 141) also does. Oracle writes that printed dash as "—" in all 75 other d20 row ranges among supported cards.
 
 card: Mathise, Surge Channeler
 oracle: 10-19 |
 corrected: 10—19 |
-evidence: As for its "1-9" row: the printed card prints "10–19" with the range dash Oracle spells "—".
+evidence: Same as the "1-9" row: the printed card prints "10–19" with a range dash, which Oracle writes as "—".
 
 card: Kutzil, Malamet Exemplar
 oracle: power greater than its base power deals combat damage
 corrected: power greater than its base power deal combat damage
-evidence: Oracle errata of subject-verb agreement. The subject "one or more creatures you control each with power greater than its base power" is plural and takes "deal". The printed card (LCI 232) carries the same "deals" as Oracle, so this is not a printed-card disagreement; the correction restores the agreement every other "one or more creatures ... deal combat damage" trigger keeps.
+evidence: Ungrammatical Oracle text: the subject "one or more creatures you control each with power greater than its base power" is plural, so the verb is "deal". The printed card (LCI 232) has the same "deals", so the ground is grammar, not a printed-card disagreement. Every other "one or more creatures ... deal combat damage" trigger in Oracle uses "deal".
