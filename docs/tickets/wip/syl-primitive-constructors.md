@@ -53,7 +53,9 @@ identifier cannot be traced to what it builds. Implicit conversions hide the sam
   (the landing says where).
 - `docs/decisions/syl.md` §1 to §3 state the rules: the primitive rule, the resolution steps
   without step 4, and no direct sort atoms.
-- The change is renaming only: `lake exe dumpValues` gives byte-identical dumps before and after.
+- The change is renaming only: `lake exe dumpValues compare before after --rename <map>`, the map
+  covering the four templates retyped from `Nat` to `Int`, reports no card row changed or removed,
+  no existing builtin row changed or removed, and added rows only for the new primitives.
 - `cargo xtask lean check`, `cargo xtask dsl fmt --check`, `cargo xtask dsl differential`, and
   `cargo test -p sylex_syl` with clippy pass.
 - A capitalized identifier outside a constructor clause, a primitive without one, a bare word that

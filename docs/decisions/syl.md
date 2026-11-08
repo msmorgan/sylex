@@ -32,7 +32,8 @@ constructor's spelling, adding printed wording, and adding vocabulary the rules 
   letter for letter as the Rust AST's variant name: `primitive activated(cost: Cost, action: Action):
   Ability = Activated { … }`. The clause is required even when it only capitalizes the
   primitive's own name (`primitive power: Stat = Power`). Every constructor and enum word a
-  file uses has its primitive, and each constructor has exactly one, at its result sort. Fixed
+  file uses has its primitive, and each constructor has exactly one, at its result sort. No
+  primitive builds a constructor that only expansion writes (§4). Fixed
   arguments and helpers belong in Templates over it.
   Why: without primitives, there is nowhere to attach a constructor's spelling. The wording would
   have to live somewhere other than the declaration that binds the word, which makes a second
