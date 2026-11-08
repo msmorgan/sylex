@@ -17,6 +17,7 @@ use crate::tree::Entry;
 use crate::tree::Field;
 use crate::tree::File;
 use crate::tree::Item;
+use crate::tree::METADATA_FIELDS;
 use crate::tree::Name;
 use crate::tree::NamedShape;
 use crate::tree::Param;
@@ -38,6 +39,7 @@ pub fn parse(file: FileId, source: &str) -> Result<File> {
         pos: 0,
         hoisted: Vec::new(),
         prev_end: 0,
+        in_metadata: false,
     };
     let items = parser.file()?;
     debug_assert_eq!(parser.hoisted, Vec::new());
@@ -56,6 +58,13 @@ struct Parser<'t> {
     hoisted: Vec<(Comment, bool)>,
     /// End of the last significant token consumed.
     prev_end: usize,
+    /// Whether the parser is inside the value of a metadata field, where
+    /// capitalized words are allowed.
+    in_metadata: bool,
+}
+
+fn is_capitalized(name: Name) -> bool {
+    name.ident.as_str().starts_with(|c: char| c.is_ascii_uppercase())
 }
 
 fn comment_item<T>((comment, blank_line_before): (Comment, bool)) -> Item<T> {
@@ -134,6 +143,24 @@ impl Parser<'_> {
             }
             _ => Err(self.error_here(expected)),
         }
+    }
+
+    /// A word that is not a sort or a constructor, so it must not be
+    /// capitalized outside metadata.
+    fn lowercase_word(&mut self, expected: &'static str) -> Result<Name> {
+        let name = self.word(expected)?;
+        self.check_lowercase(name)?;
+        Ok(name)
+    }
+
+    fn check_lowercase(&self, name: Name) -> Result<()> {
+        if is_capitalized(name) && !self.in_metadata {
+            return Err(Error::new(
+                name.span,
+                ErrorKind::CapitalizedWord(name.ident.as_str().to_owned()),
+            ));
+        }
+        Ok(())
     }
 
     fn span_from(&self, start: Span) -> Span {
@@ -225,7 +252,7 @@ impl Parser<'_> {
     }
 
     fn declaration(&mut self) -> Result<Declaration> {
-        let kind = self.word("a declaration")?;
+        let kind = self.lowercase_word("a declaration")?;
         let shape = if self.named_header_follows() {
             Shape::Named(self.named_shape()?)
         } else {
@@ -263,7 +290,7 @@ impl Parser<'_> {
     }
 
     fn named_shape(&mut self) -> Result<NamedShape> {
-        let name = self.word("a declaration name")?;
+        let name = self.lowercase_word("a declaration name")?;
         let params = if self.at(&TokenKind::LParen) {
             let open = self.bump().span;
             let params = self.sequence(&TokenKind::RParen, "',' or ')'", Self::param)?;
@@ -285,13 +312,14 @@ impl Parser<'_> {
         };
         let constructor = if self.at(&TokenKind::Equals) {
             self.bump();
-            match self.peek().kind {
-                TokenKind::Constructor(ident) => Some(Name {
-                    ident,
-                    span: self.bump().span,
-                }),
-                _ => return Err(self.error_here("'.constructor'")),
+            let constructor = self.word("a constructor")?;
+            if !is_capitalized(constructor) {
+                return Err(Error::new(
+                    constructor.span,
+                    ErrorKind::UncapitalizedConstructor(constructor.ident.as_str().to_owned()),
+                ));
             }
+            Some(constructor)
         } else {
             None
         };
@@ -312,7 +340,7 @@ impl Parser<'_> {
     }
 
     fn param(&mut self) -> Result<Param> {
-        let name = self.word("a parameter name")?;
+        let name = self.lowercase_word("a parameter name")?;
         self.expect(&TokenKind::Colon, "':'")?;
         let sort = self.sort()?;
         let default = if self.at(&TokenKind::Equals) {
@@ -383,6 +411,7 @@ impl Parser<'_> {
             TokenKind::Word(_) => ValueKind::Call(self.call()?),
             &TokenKind::Parameter(ident) => {
                 let span = self.bump().span;
+                self.check_lowercase(Name { ident, span })?;
                 if self.at(&TokenKind::LParen) {
                     return Err(Error::new(self.peek().span, ErrorKind::ParameterArguments));
                 }
@@ -399,9 +428,13 @@ impl Parser<'_> {
     /// Parses a record's fields after its `{`.
     fn record(&mut self, open: Span) -> Result<Record> {
         let fields = self.sequence(&TokenKind::RBrace, "',' or '}'", |p| {
-            let name = p.word("a field name")?;
+            let name = p.lowercase_word("a field name")?;
             p.expect(&TokenKind::Equals, "'='")?;
-            let value = p.value()?;
+            let outer = p.in_metadata;
+            p.in_metadata |= METADATA_FIELDS.contains(&name.ident.as_str());
+            let value = p.value();
+            p.in_metadata = outer;
+            let value = value?;
             Ok(Field {
                 name,
                 value,
@@ -415,7 +448,7 @@ impl Parser<'_> {
     }
 
     fn call(&mut self) -> Result<Call> {
-        let head = self.word("a word")?;
+        let head = self.lowercase_word("a word")?;
         let mut args = Vec::new();
         if self.at(&TokenKind::LParen) {
             let open = self.bump().span;
@@ -436,7 +469,7 @@ impl Parser<'_> {
         let name = if matches!(self.peek().kind, TokenKind::Word(_))
             && self.peek_nth(1).kind == TokenKind::Equals
         {
-            let name = self.word("an argument name")?;
+            let name = self.lowercase_word("an argument name")?;
             self.bump();
             Some(name)
         } else {

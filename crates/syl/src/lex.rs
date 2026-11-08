@@ -24,8 +24,6 @@ pub struct Token {
 pub enum TokenKind {
     /// `[A-Za-z_][A-Za-z0-9_]*`.
     Word(Ident),
-    /// `.word`, naming a constructor; the dot is not part of the ident.
-    Constructor(Ident),
     /// `$word`, reading a parameter's value; the `$` is not part of the ident.
     Parameter(Ident),
     /// A double-quoted string, unescaped.
@@ -53,7 +51,6 @@ impl TokenKind {
     pub fn describe(&self) -> String {
         match self {
             TokenKind::Word(w) => format!("word `{w}`"),
-            TokenKind::Constructor(w) => format!("constructor `.{w}`"),
             TokenKind::Parameter(w) => format!("parameter `${w}`"),
             TokenKind::String(_) => "a string".to_owned(),
             TokenKind::Integer(n) => format!("integer `{n}`"),
@@ -177,17 +174,6 @@ pub fn lex(file: FileId, source: &str) -> Result<Vec<Token>, Error> {
                 let (kind, end) = integer(source, start, span)?;
                 i = end;
                 kind
-            }
-            b'.' if bytes.get(i + 1).copied().is_some_and(is_word_start) => {
-                i += 1;
-                let word_start = i;
-                while bytes.get(i).copied().is_some_and(is_word_continue) {
-                    i += 1;
-                }
-                if bytes.get(i) == Some(&b'.') {
-                    return Err(dotted_word(bytes, start, i, span));
-                }
-                TokenKind::Constructor(Ident::new(&source[word_start..i]))
             }
             b'$' => {
                 i += 1;

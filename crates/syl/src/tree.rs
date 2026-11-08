@@ -126,7 +126,7 @@ pub struct Declaration {
 /// The two declaration shapes, told apart by the tokens after the kind word.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Shape {
-    /// `kind name(params): Sort = .constructor { fields }`, every part after
+    /// `kind name(params): Sort = Constructor { fields }`, every part after
     /// the name optional.
     Named(NamedShape),
     /// `kind value`, such as `card { ... }` or `card split({ ... })`.
@@ -141,7 +141,7 @@ pub struct NamedShape {
     pub params: Vec<Item<Param>>,
     /// The sort after `:`.
     pub sort: Option<Sort>,
-    /// The constructor after `= .`, without the dot.
+    /// The constructor clause after `=`, a capitalized word.
     pub constructor: Option<Name>,
     /// The `{ ... }` block.
     pub body: Option<Record>,
@@ -203,6 +203,11 @@ impl Record {
         self.fields.iter().filter_map(Item::node)
     }
 }
+
+/// The fields whose values are metadata, a declaration's frames and spelling,
+/// rather than its meaning. The capitalization rule and the declaration
+/// checks do not apply inside them.
+pub const METADATA_FIELDS: [&str; 2] = ["lexical", "spelling"];
 
 /// A record field, `name = value`.
 #[derive(Debug, Clone, PartialEq, Eq)]

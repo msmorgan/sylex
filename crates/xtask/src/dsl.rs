@@ -410,7 +410,7 @@ card_type artifact { name = \"Artifact\", count = 3 }
 
 # Detached.
 
-primitive cost(x: Option(Mana) = none, y: Option(Mana) = $x): Cost = .mk
+primitive cost(x: Option(Mana) = none, y: Option(Mana) = $x): Cost = Mk
 card split({ left = { name = \"Fire\" }, right = { name = \"Ice\" } })
 ";
 
@@ -444,7 +444,7 @@ card split({ left = { name = \"Fire\" }, right = { name = \"Ice\" } })
                     "default": { "parameter": "x" },
                 }],
                 "sort": { "name": "Cost", "args": [] },
-                "fields": [], "constructor": "mk", "cardValue": null, "documentation": "",
+                "fields": [], "constructor": "Mk", "cardValue": null, "documentation": "",
             },
             {
                 "kind": "card", "name": "Fire // Ice", "parameters": [],

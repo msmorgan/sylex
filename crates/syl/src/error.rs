@@ -56,4 +56,11 @@ pub enum ErrorKind {
     EmptyParameterList,
     #[error("empty sort argument list")]
     EmptySortArguments,
+    #[error(
+        "capitalized word `{0}`: only sorts and a primitive's constructor clause are \
+         capitalized, outside `lexical` and `spelling`"
+    )]
+    CapitalizedWord(String),
+    #[error("constructor `{0}` must be capitalized")]
+    UncapitalizedConstructor(String),
 }

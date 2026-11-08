@@ -526,8 +526,8 @@ fn a_doc_comment_stays_attached() {
 #[test]
 fn a_parameter_list_that_fits_stays_flat() {
     assert_eq!(
-        fmt("primitive p(\n  x: Option(A),\n  y: List(B) = []): S = .mk"),
-        "primitive p(x: Option(A), y: List(B) = []): S = .mk\n"
+        fmt("primitive p(\n  x: Option(A),\n  y: List(B) = []): S = Mk"),
+        "primitive p(x: Option(A), y: List(B) = []): S = Mk\n"
     );
 }
 
@@ -535,10 +535,10 @@ fn a_parameter_list_that_fits_stays_flat() {
 fn a_broken_parameter_list_follows_the_call_rule() {
     // The header after `)` counts toward the last parameter's line.
     let long = word(30);
-    let source = format!("primitive p(a: {long}, b: {long} = none): {long} = .mk");
+    let source = format!("primitive p(a: {long}, b: {long} = none): {long} = Mk");
     assert_eq!(
         fmt(&source),
-        format!("primitive p(\n  a: {long},\n  b: {long} = none): {long} = .mk\n")
+        format!("primitive p(\n  a: {long},\n  b: {long} = none): {long} = Mk\n")
     );
     let style = Style {
         closers: Closers::OwnLine,
@@ -547,7 +547,7 @@ fn a_broken_parameter_list_follows_the_call_rule() {
     };
     assert_eq!(
         fmt_with(&source, &style),
-        format!("primitive p(\n  a: {long},\n  b: {long} = none,\n): {long} = .mk\n")
+        format!("primitive p(\n  a: {long},\n  b: {long} = none,\n): {long} = Mk\n")
     );
     assert_eq!(
         fmt(&format!(

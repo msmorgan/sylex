@@ -397,7 +397,7 @@ impl Printer<'_> {
                     let _ = write!(rest, ": {}", sort(sort_ref));
                 }
                 if let Some(constructor) = named.constructor {
-                    let _ = write!(rest, " = .{}", constructor.ident);
+                    let _ = write!(rest, " = {}", constructor.ident);
                 }
                 if named.body.is_some() {
                     rest.push(' ');

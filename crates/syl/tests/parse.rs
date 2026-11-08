@@ -105,7 +105,7 @@ fn render(file: &File) -> String {
                             let _ = write!(out, ": {}", sort(s));
                         }
                         if let Some(c) = &n.constructor {
-                            let _ = write!(out, " = .{}", c.ident);
+                            let _ = write!(out, " = {}", c.ident);
                         }
                         if let Some(body) = &n.body {
                             let _ = write!(
@@ -149,8 +149,8 @@ fn named_header_with_sort_and_no_body() {
 #[test]
 fn named_header_with_every_part() {
     check(
-        "primitive actionSearch(scope: Location, for: Option(List(Cost)) = none): Action = .search { lexical = {} }",
-        "primitive actionSearch(scope: Location; for: Option(List(Cost)) = none): Action = .search {lexical = {}}",
+        "primitive actionSearch(scope: Location, for: Option(List(Cost)) = none): Action = Search { lexical = {} }",
+        "primitive actionSearch(scope: Location; for: Option(List(Cost)) = none): Action = Search {lexical = {}}",
     );
 }
 
@@ -173,8 +173,8 @@ fn named_header_with_body_only() {
 #[test]
 fn named_header_with_constructor_and_no_params() {
     check(
-        "primitive itself: NounPhrase = .self_",
-        "primitive itself: NounPhrase = .self_",
+        "primitive itself: NounPhrase = Itself",
+        "primitive itself: NounPhrase = Itself",
     );
 }
 
@@ -429,27 +429,66 @@ fn stray_minus_is_an_error() {
 
 #[test]
 fn dotted_words_are_errors() {
-    check_err("card { a = Foo.bar }", &ErrorKind::DottedWord, "Foo.bar");
-    check_err("primitive p: X = .a.b", &ErrorKind::DottedWord, ".a.b");
+    check_err("card { a = foo.bar }", &ErrorKind::DottedWord, "foo.bar");
+    check_err("primitive p: X = A.b", &ErrorKind::DottedWord, "A.b");
 }
 
 #[test]
-fn constructor_is_only_accepted_after_equals_in_a_header() {
+fn a_constructor_clause_is_a_capitalized_word_without_a_dot() {
     check_err(
-        "card { a = .foo }",
-        &ErrorKind::Expected {
-            expected: "a value",
-            found: "constructor `.foo`".to_owned(),
-        },
-        ".foo",
+        "primitive p: X = .foo",
+        &ErrorKind::UnexpectedChar('.'),
+        ".",
     );
     check_err(
         "primitive p: X = foo",
-        &ErrorKind::Expected {
-            expected: "'.constructor'",
-            found: "word `foo`".to_owned(),
-        },
+        &ErrorKind::UncapitalizedConstructor("foo".to_owned()),
         "foo",
+    );
+    check_err(
+        "primitive p: X = $foo",
+        &ErrorKind::Expected {
+            expected: "a constructor",
+            found: "parameter `$foo`".to_owned(),
+        },
+        "$foo",
+    );
+}
+
+#[test]
+fn capitalized_words_outside_sorts_and_constructor_clauses_are_errors() {
+    let capitalized = |word: &str| ErrorKind::CapitalizedWord(word.to_owned());
+    check_err("Card { a = b }", &capitalized("Card"), "Card");
+    check_err("primitive Power: Stat = Power", &capitalized("Power"), "Power");
+    check_err("template t(X: A): B", &capitalized("X"), "X");
+    check_err("template t: B { Body = a }", &capitalized("Body"), "Body");
+    check_err("template t: B { body = Power }", &capitalized("Power"), "Power");
+    check_err("template t: B { body = f(Power) }", &capitalized("Power"), "Power");
+    check_err("template t: B { body = f(X = a) }", &capitalized("X"), "X");
+    check_err("template t(x: A): B { body = $X }", &capitalized("X"), "$X");
+    check_err("template t(x: A = B): B", &capitalized("B"), "B");
+    check_err("card { text = [Activated] }", &capitalized("Activated"), "Activated");
+}
+
+#[test]
+fn capitalized_words_are_allowed_in_sorts_constructor_clauses_and_metadata() {
+    check(
+        "primitive p(x: Option(List(Cost))): Ability = Activated",
+        "primitive p(x: Option(List(Cost))): Ability = Activated",
+    );
+    check(
+        "template t: B { lexical = { frame = Monotransitive(Verb) }, body = a }",
+        "template t: B {lexical = {frame = Monotransitive(Verb)}; body = a}",
+    );
+    check(
+        "template t: B { spelling = [Word, \"x\"], body = f(spelling = a) }",
+        "template t: B {spelling = [Word; \"x\"]; body = f(spelling = a)}",
+    );
+    // The exemption covers a metadata field's value only, not its siblings.
+    check_err(
+        "template t: B { lexical = A, body = B }",
+        &ErrorKind::CapitalizedWord("B".to_owned()),
+        "B",
     );
 }
 
@@ -645,13 +684,13 @@ fn spans_cover_their_nodes() {
     assert!(named.span.text(source).starts_with("t(a: "));
     assert!(named.span.text(source).ends_with("2),\n}"));
     assert_eq!(named.span.end, declaration.span.end);
-    let bare = ok("primitive p(a: A): X = .c\n# after\n");
+    let bare = ok("primitive p(a: A): X = C\n# after\n");
     let Shape::Named(bare) = &bare.declarations().next().unwrap().shape else {
         panic!("named")
     };
     assert_eq!(
-        bare.span.text("primitive p(a: A): X = .c\n# after\n"),
-        "p(a: A): X = .c"
+        bare.span.text("primitive p(a: A): X = C\n# after\n"),
+        "p(a: A): X = C"
     );
     let param = named.params[0].node().unwrap();
     assert_eq!(param.span.text(source), "a: List(X) = [1]");
@@ -707,11 +746,11 @@ fn comments_inside_a_header_are_not_doc_comments() {
     assert_eq!(doc, [" doc"]);
 
     // Several hoisted comments, one after a blank line inside the header.
-    let source = "# one\n# two\nprimitive # a\n  bar(x: X) # b\n\n  # c\n  : Y = .d\n";
+    let source = "# one\n# two\nprimitive # a\n  bar(x: X) # b\n\n  # c\n  : Y = D\n";
     let file = ok(source);
     assert_eq!(
         render(&file),
-        "# one\n# two\n# a\n# b\n^# c\nprimitive bar(x: X): Y = .d"
+        "# one\n# two\n# a\n# b\n^# c\nprimitive bar(x: X): Y = D"
     );
     let doc: Vec<_> = file
         .doc_comment(5)
