@@ -1,18 +1,22 @@
 //! Parses `.syl` source files to a purely syntactic tree.
 //!
-//! The `.syl` language is described in `docs/decisions/syl.md` §2.
-//! This crate only reads its syntax: it does not resolve names, expand
-//! templates, check sorts or treat any declaration kind specially. A
-//! [`File`] is a sequence of [`Declaration`]s and [`Comment`]s; every node
-//! carries a [`Span`].
+//! The `.syl` language is described in `docs/decisions/syl.md` §1 to §3.
+//! This crate reads its syntax: it does not resolve names by sort, expand
+//! templates or check sorts. Parsing treats no declaration kind specially;
+//! only [`check()`] knows that a primitive names a constructor. A [`File`] is
+//! a sequence of [`Declaration`]s and [`Comment`]s; every node carries a
+//! [`Span`].
 //!
 //! Lexing ([`lex()`]) is separate from building the tree ([`parse()`]).
 //! [`format()`] prints a tree back in a canonical layout, and
 //! [`same_meaning`] checks that a reformatted file still means the same.
-//! [`bundle`] loads a plugin directory's files, parsed once, for later layers.
+//! [`bundle`] loads a plugin directory's files, parsed once, for later layers,
+//! and [`check()`] refuses, across bundles, what breaks the declaration rules
+//! that need every declaration.
 //! [`cli`] is the formatter's command line, run by the `sylfmt` binary.
 
 pub mod bundle;
+pub mod check;
 pub mod cli;
 mod error;
 mod format;
@@ -24,6 +28,7 @@ mod tree;
 
 pub use bundle::Bundle;
 pub use bundle::SourceFile;
+pub use check::check;
 pub use error::Error;
 pub use error::ErrorKind;
 pub use format::Closers;
@@ -44,6 +49,7 @@ pub use tree::Entry;
 pub use tree::Field;
 pub use tree::File;
 pub use tree::Item;
+pub use tree::METADATA_FIELDS;
 pub use tree::Name;
 pub use tree::NamedShape;
 pub use tree::Param;
