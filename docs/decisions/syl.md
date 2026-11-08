@@ -16,7 +16,7 @@ What sets the language apart, each in its own section:
 - **Each word's spelling and meaning have one source.** A primitive is a constructor's only
   binding (§1), and one block per declaration holds its frames, spelling and meaning (§2).
 - **What a file says is what it means.** It is first-order data: no evaluation, no local bindings,
-  no coercions, no type inference (§2).
+  no conversions besides `Option`, no type inference (§2).
 - **A name is found by its expected sort**, not by qualification (§3).
 - **Expansion, not the author, supplies scopes, mentions and bindings** (§4).
 - **Read order is printed order** (§5).
@@ -27,11 +27,19 @@ The language has three kinds of named word, because there are three different jo
 constructor's spelling, adding printed wording, and adding vocabulary the rules define.
 
 - **A primitive** is where a model constructor's spelling is attached. It is the one
-  declaration that binds a word to a constructor, and it does the wrapping: it names the
-  constructor the word builds. Fixed arguments and helpers belong in Templates over it.
+  declaration that binds a word to a constructor, and it does the wrapping: its constructor
+  clause, after its signature, names the constructor the word builds, capitalized and spelled
+  letter for letter as the Rust AST's variant name: `primitive activated(cost: Cost, action: Action):
+  Ability = Activated { … }`. The clause is required even when it only capitalizes the
+  primitive's own name (`primitive power: Stat = Power`). Every constructor and enum word a
+  file uses has its primitive, and each constructor has exactly one, at its result sort. Fixed
+  arguments and helpers belong in Templates over it.
   Why: without primitives, there is nowhere to attach a constructor's spelling. The wording would
   have to live somewhere other than the declaration that binds the word, which makes a second
-  source of truth for spelling.
+  source of truth for spelling. A primitive is the one explicit mapping from a word to the AST, so
+  every word can be traced to what it builds, and the AST's names appear nowhere else.
+  `sylex_syl::check` refuses a primitive without a constructor clause, a constructor clause on
+  any other declaration, and two primitives for one constructor.
 - **A Template** substitutes its parameters (§4). What that means, and why it adds no meaning, is
   [`semantics.md`](./semantics.md) §3.
 - **A Definition** wraps its parameters and its body (§4). What it carries, a Deed and its own
@@ -46,15 +54,22 @@ location is not stated by the declaration, and it can disagree with what the dec
   are no local bindings or higher-order parameters, and there is no type inference. Why: every
   tool (the Rust pipeline, the Lean generator, the formatter, the citation checker) can read a file
   without an evaluator, and what a file says is what it means.
-- **No coercions.** Only the direct sort atoms of §3 resolve implicitly. Every wrapper is written,
-  `actor(…)` included. Why: a coercion hides which word was meant. Uglier but simpler is the
-  point; coercions may return deliberately once the language is simple enough to refactor.
+- **No conversions besides `Option`.** A value stands only at its own sort (§3), and every wrap
+  into another sort is a primitive or a Template written at the call site, `actor(…)` included: a
+  color word is a `Color`, and a `ColorOrColorless` or a mana symbol wraps it; an integer literal
+  is an integer, and an `Amount` or a generic mana symbol wraps it. Mana-symbol wrappers are
+  Templates over primitive chains. Why: a conversion hides which word was meant.
+  Uglier but simpler is the point; conversions may return deliberately once the language is
+  simple enough to refactor.
 - **Reads are marked.** `$name` reads a parameter; a bare word never does. Why: what a word refers
   to can be read from its spelling, and a parameter can never shadow a word.
 - **Argument order carries no meaning.** Named arguments may stand anywhere, so a call can follow
   printed order.
-- **Notation.** `=` binds and `:` means "has sort". A leading `.` appears only where a primitive
-  names its constructor.
+- **Notation.** `=` binds and `:` means "has sort". A capitalized word is a sort in a signature
+  (`other: NounPhrase`, `Option(List(Cost))`) or a constructor in a primitive's constructor
+  clause, and nothing else; `sylex_syl`'s parser refuses one anywhere else. The rule does not
+  apply inside `lexical` and `spelling`, which are metadata. Why: a capitalized word is the AST's
+  own name, so where one stands, the AST is named, and nowhere else is.
 - **One block per declaration** holds three layers: `lexical`, `spelling` and the meaning (`body`,
   `confers`, `rules`). Why: a word's frames, spelling and meaning are one fact, so they have one
   source. Keyword `parameters` are spelling frames and live in `lexical`.
@@ -69,17 +84,22 @@ sort `T`, a word resolves in constant time, with no backtracking, in this order:
 
 1. `$name`: a parameter of the enclosing declaration;
 2. `none`, if `T` is optional;
-3. the declaration `(name, T)`;
-4. a constructor or enum word of `T`.
+3. the declaration `(name, T)`.
 
-Declarations therefore shadow constructors.
+A word that names no declaration at `T` is refused; no word reaches a constructor except through
+its primitive (§1). A declaration's kind may declare its name at a second sort: an `ability`
+declaration is also its keyword's `KeywordLabel`, so a keyword is named bare where a label is
+expected (`byKeyword(kicker)`). That is a second declaration, not a conversion; the keyword's
+term is written `theKeyword(kicker)`. `sylex_syl::check` refuses a word that names no declaration
+at any sort; the resolver refuses one that names none at `T`.
 
 **Optional positions.** A value at an `Option(T)` position is written as a `T`, `some` is never
-written, and an omitted argument takes its declared default. This is the one implicit wrap the
-language keeps.
+written, and an omitted argument or field takes its declared default. This is the one implicit
+wrap the language keeps.
 
-**Direct sort atoms** are integers; color words; and keyword names at `Ability`, `KeywordLabel`,
-`KeywordTerm`, `Action` and `Deed`.
+**Literals** stand only at their own sorts: a string at `String`, an integer at the integer sorts
+(`Int`, and `Nat` when it is not negative). There are no direct sort atoms: a literal or a
+declared word at any other sort is wrapped by a written primitive or Template (§2).
 
 ## 4. Expansion
 
