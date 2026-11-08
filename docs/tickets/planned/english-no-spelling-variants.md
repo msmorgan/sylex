@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [english-other-card-names]
 ---
 
 # Eliminate free-variation spelling variants (`LexicalValue::variant`)
