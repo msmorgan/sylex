@@ -65,7 +65,8 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 ## CR citations
 
 - Format: `[CR#704.5g]`, `[CR#601.2g,106.4]`, `[CR#601.2a..601.2b]`; never a bare `704.5g`.
-- Rule numbers come from the CR (`data/rules/`), never memory.
+- Load the `mtg-rules` skill before any rules or game-modeling claim; rule numbers and text come
+  from its scripts and maps, never memory.
 - After changes: `cargo xtask cite check --list-noncompliant` empty; `cargo xtask cite check`
   0 stale; `cargo xtask cite bless` for newly cited rules.
 - Before committing, run `jj diff --git | cargo xtask cite audit --diff` (it reads stdin; run bare,
