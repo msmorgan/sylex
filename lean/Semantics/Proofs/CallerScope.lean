@@ -28,7 +28,7 @@ export SylFixture.Semantics.Templates (drawTwice forwardedSubject subjectPower r
   playerIgnoringSubject nestedRereadDamage)
 
 private def selected (drs : DRS) (body : NounPhrase) : List Referent :=
-  let result := stepNounPhrase 64 drs .other false body
+  let result := stepNounPhrase 64 drs .other Bool.false body
   result.2.1.filterMap result.1.findById?
 private def callerCreature : DRS := DRS.ofList
   [{ det := .the, plur := .one, payload := .object [.creature] (some .battlefield) none none none }]
@@ -41,7 +41,7 @@ private def selectThenTap (subject : NounPhrase) : Action :=
       .setStatus .untapped (.laterMention "select.subject" .any)])
 private def selectThenMove (subject : NounPhrase) : Action :=
   .ownScope none (.move (.firstMention "select.subject" (.inCaller subject))
-    .anyLocation (some graveyard) .arrival [])
+    .anyLocation (some Semantics.Templates.Location.graveyard) .arrival [])
 private def announceThen (chosen : NounPhrase) (body : Action) : Action :=
   .ownScope none (.sequentially [.setStatus .tapped (.firstMention "announce.subject" (.inCaller chosen)),
     .inCaller body])
@@ -89,9 +89,9 @@ theorem movedParameterLosesItsIdentity :
       after.findById? 0 = none := by decide
 
 theorem suppliedBodyKeepsItsCallerPronoun :
-    (announceThen (target isArtifact) (putInto it graveyard)).check callerCreature = [] := by decide
+    (announceThen (target isArtifact) (putInto it Semantics.Templates.Location.graveyard)).check callerCreature = [] := by decide
 theorem suppliedBodyUpdatesItsOriginalReferent :
-    let after := actionResult callerCreature (announceThen (target isArtifact) (putInto it graveyard))
+    let after := actionResult callerCreature (announceThen (target isArtifact) (putInto it Semantics.Templates.Location.graveyard))
     (after.visibleReferents.filter (fun r => r.ty == [.creature])).map (·.zone) = [some .graveyard] ∧
       (after.visibleReferents.filter (fun r => r.ty == [.artifact])).map (·.zone) = [some .battlefield] := by decide
 
@@ -106,7 +106,7 @@ theorem quantitiesAcceptTemplateValues : (stepQuantityWith (stepOps 64) (DRS.ofL
 theorem templateValuesPreserveLiteralFacts :
     let value := literalEcho 1
     (value.exact, value.plur, value.unit) =
-      (some 1, .one, true) := by decide
+      (some 1, .one, Bool.true) := by decide
 theorem amountTemplatesCanReuseAValue :
     (repeatedValueSum .thatMuch).check (DRS.ofList [outcomeB .damageDealt]) = [] := by decide
 theorem quantityParameterPreservesOneCardinality :
@@ -149,15 +149,15 @@ theorem eventParametersPublishTheirOutcome :
 theorem templateUseRemainsInsideCondition :
     Action.doIf (.compareAmt 1 .eq 1) (moveSubject (target isCreature)) none =
       .doIf (.compareAmt 1 .eq 1)
-        (.move (target isCreature) .anyLocation (some graveyard) .arrival []) none := by rfl
+        (.move (target isCreature) .anyLocation (some Semantics.Templates.Location.graveyard) .arrival []) none := by rfl
 theorem templateUseRemainsInsideRepetition :
     Action.repeat_ (.fixed 2 (moveSubject (target isCreature))) =
       .repeat_ (.fixed 2
-        (.move (target isCreature) .anyLocation (some graveyard) .arrival [])) := by rfl
+        (.move (target isCreature) .anyLocation (some Semantics.Templates.Location.graveyard) .arrival [])) := by rfl
 theorem parameterizedGroupsRemainCountable :
     (Amount.countOf (forwardedSubject (counted (exactly 2) isCreature))).check (DRS.ofList []) = [] := by decide
-theorem forwardedYouRemainsThePayer : (forwardedSubject you).isYou = true := by decide
-theorem forwardedOpponentIsNotThePayer : (forwardedSubject anOpponent).isYou = false := by decide
+theorem forwardedYouRemainsThePayer : (forwardedSubject you).isYou = Bool.true := by decide
+theorem forwardedOpponentIsNotThePayer : (forwardedSubject anOpponent).isYou = Bool.false := by decide
 
 theorem firstMentionUsesTextualOrder :
     Action.check (DRS.ofList []) (.sequentially
@@ -243,7 +243,7 @@ theorem eventTemplatePublishesItsOutcome :
       1 := by decide
 
 theorem forwardedSourceRetainsItsSelfDefinitionRole :
-    (forwardedSubject thisCreature).selfDefinedOk = true := by decide
+    (forwardedSubject thisCreature).selfDefinedOk = Bool.true := by decide
 
 theorem callerExitDoesNotResurrectForgottenMentions :
     let caller := nounResult (DRS.ofList [])
@@ -336,7 +336,7 @@ new clause after the condition, so "it" names the creature the condition introdu
 theorem callerConditionIntroducesWhatItsActionReads :
     Action.check (DRS.ofList [])
       (drawUnlessReplaced
-        (doIf sacrificedACreature (instead (returnToHand it graveyard)))) = [] := by
+        (doIf sacrificedACreature (instead (returnToHand it Semantics.Templates.Location.graveyard)))) = [] := by
   decide
 
 /-- Read in two caller frames instead, one for the condition and one for the action, the
@@ -346,7 +346,7 @@ theorem callerConditionReadInItsOwnFrameLosesItsReferent :
       (.ownScope none (.replace (draw 1)
         (.onlyIf
           (.and [compareAmt (countOf isArtifact) .atLeast 3, .inCaller sacrificedACreature])
-          (.instead (.inCaller (returnToHand it graveyard)))))) = [.anaphor (.atSlot .card) .one 0] := by
+          (.instead (.inCaller (returnToHand it Semantics.Templates.Location.graveyard)))))) = [.anaphor (.atSlot .card) .one 0] := by
   decide
 
 /-- Read in the Definition's own scope instead, the caller's action names nothing. -/

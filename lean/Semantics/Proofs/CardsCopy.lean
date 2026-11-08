@@ -12,6 +12,7 @@ did.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a)
 open Semantics.Templates.Predicate (and)
@@ -53,7 +54,7 @@ theorem okFrontlineHeroismCopy : Ability.check (DRS.ofList []) frontlineHeroismC
 /-- Flawless Forgery -/
 def flawlessForgeryLine : Action :=
   sequentially
-    [ exile (target (and [isInstantOrSorcery, in_ (graveyardOf anOpponent)])),
+    [ Semantics.Definitions.Action.exile (target (and [isInstantOrSorcery, in_ (graveyardOf anOpponent)])),
       copy .fromCardZone (that card) 1 [],
       may (cast (that .copy) (payment := withoutPaying)) ]
 theorem okFlawlessForgeryLine : Action.check (DRS.ofList []) flawlessForgeryLine = [] := by decide
@@ -77,8 +78,8 @@ theorem okMisterFantasticCopy : Ability.check (DRS.ofList []) misterFantasticCop
 /-- Rowan's Talent -/
 def rowansTalentCopy : Ability :=
   whenever
-    (does (Semantics.Subject.actor you) (activate (a (and [ abilityHead .loyalty,
-                 abilityOf (enchanted planeswalker) ]))))
+    (does (Semantics.Subject.actor you) (Semantics.Definitions.Action.activate (a (and [ abilityHead .loyalty,
+                 abilityOf (Semantics.Templates.NounPhrase.enchanted planeswalker) ]))))
     (sequentially
       [ copyOnStack (that .ability),
         may (chooseNewTargets (that (.copied .ability))) ])
@@ -88,7 +89,7 @@ theorem okRowansTalentCopy : Ability.check (DRS.ofList []) rowansTalentCopy = []
 def pyromancersGogglesMana : Ability :=
   activated tapSymbol
     (addMana 1 (manaOf [[.of .red]])
-      [ whenSpentOn .triggersThen false
+      [ whenSpentOn .triggersThen Bool.false
           (a (and [hasColor .red, isInstantOrSorcery, isSpell]))
           (sequentially
             [ copyOnStack (that .spell),

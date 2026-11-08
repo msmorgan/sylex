@@ -18,6 +18,7 @@ the bench items beside them.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each counted)
 open Semantics.Templates.Predicate (and or andOr not did isAttached)
@@ -47,7 +48,7 @@ theorem okGracefulReprieve : Action.check (DRS.ofList []) gracefulReprieve = [] 
 
 def cloudkinSeer : Ability := when (does (Semantics.Subject.actor (thisCreature)) enter) (draw 1)
 theorem okCloudkinSeer : Ability.check (DRS.ofList []) cloudkinSeer = [] := by decide
-def promiseOfTomorrow : Ability := whenever (does ((Semantics.Subject.actor (a (and [isCreature, youControl])))) die) (exile it)
+def promiseOfTomorrow : Ability := whenever (does ((Semantics.Subject.actor (a (and [isCreature, youControl])))) die) (Semantics.Definitions.Action.exile it)
 theorem okPromiseOfTomorrow : Ability.check (DRS.ofList []) promiseOfTomorrow = [] := by decide
 def libraryLarcenist : Ability := whenever (does (Semantics.Subject.actor (thisCreature)) attack) (draw 1)
 theorem okLibraryLarcenist : Ability.check (DRS.ofList []) libraryLarcenist = [] := by decide
@@ -62,7 +63,7 @@ theorem okScholarOfStars : Ability.check (DRS.ofList []) scholarOfStars = [] := 
 
 def miserysShadow : Ability :=
   static (replace
-            (would ((Semantics.Subject.actor (a (and [isCreature, anOpponentControls])))) die) (instead (exile it)))
+            (would ((Semantics.Subject.actor (a (and [isCreature, anOpponentControls])))) die) (instead (Semantics.Definitions.Action.exile it)))
 theorem okMiserysShadow : Ability.check (DRS.ofList []) miserysShadow = [] := by decide
 
 def beastWhisperer : Ability :=
@@ -102,15 +103,15 @@ def hollowhengeSpirit : Ability :=
 theorem okHollowhengeSpirit : Ability.check (DRS.ofList []) hollowhengeSpirit = [] := by decide
 def netcasterSpider : Ability :=
   whenever (does (Semantics.Subject.actor (thisCreature)) (block (a (and [isCreature, hasKeyword (Semantics.KeywordTerm.the flying.label)]))))
-    (get thisCreature (up 2) (up 0) untilEndOfTurn)
+    (get thisCreature (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 0) untilEndOfTurn)
 theorem okNetcasterSpider : Ability.check (DRS.ofList []) netcasterSpider = [] := by decide
 def viashinoWeaponsmith : Ability :=
   whenever (does (by_ (a isCreature)) (block thisCreature))
-    (get thisCreature (up 2) (up 2) untilEndOfTurn)
+    (get thisCreature (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 2) untilEndOfTurn)
 theorem okViashinoWeaponsmith : Ability.check (DRS.ofList []) viashinoWeaponsmith = [] := by decide
 def somberwaldAlpha : Ability :=
   whenever (does any (becomeBlocked (a (and [isCreature, youControl]))))
-    (get it (up 1) (up 1) untilEndOfTurn)
+    (get it (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn)
 theorem okSomberwaldAlpha : Ability.check (DRS.ofList []) somberwaldAlpha = [] := by decide
 def vertigoSpawn : Ability :=
   whenever (does (Semantics.Subject.actor (thisCreature)) (block (a isCreature)))
@@ -122,12 +123,12 @@ def orneryDilophosaur : Ability :=
   whenever (does (Semantics.Subject.actor (thisCreature)) attack)
     (if_ := exists_ (and [ isCreature, youControl,
                      hasPower .atLeast 4 ]))
-    (get thisCreature (up 2) (up 2) untilEndOfTurn)
+    (get thisCreature (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 2) untilEndOfTurn)
 theorem okOrneryDilophosaur : Ability.check (DRS.ofList []) orneryDilophosaur = [] := by decide
 def incisorGlider : Ability :=
   whenever (does (Semantics.Subject.actor (thisCreature)) attack)
     (if_ := compareAmt (countersOn poison anOpponent) .atLeast 3)
-    (get (allOf (and [isCreature, youControl])) (up 1) (up 1) untilEndOfTurn)
+    (get (allOf (and [isCreature, youControl])) (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn)
 theorem okIncisorGlider : Ability.check (DRS.ofList []) incisorGlider = [] := by decide
 def stormFleetSpy : Ability :=
   when (does (Semantics.Subject.actor (thisCreature)) enter) (if_ := some (did (Semantics.Subject.actor (you)) attack (Semantics.LookbackSpan.duration (soFarThisTurn) none)))
@@ -156,17 +157,17 @@ def firmamentSage : Ability := whenever (gameBecomes night) (draw 1)
 theorem okFirmamentSage : Ability.check (DRS.ofList []) firmamentSage = [] := by decide
 def deeprootWarrior : Ability :=
   whenever (does any (becomeBlocked thisCreature))
-    (get it (up 1) (up 1) untilEndOfTurn)
+    (get it (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn)
 theorem okDeeprootWarrior : Ability.check (DRS.ofList []) deeprootWarrior = [] := by decide
 def borderlandMarauder : Ability :=
-  whenever (does (Semantics.Subject.actor (thisCreature)) attack) (get it (up 2) (up 0) untilEndOfTurn)
+  whenever (does (Semantics.Subject.actor (thisCreature)) attack) (get it (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 0) untilEndOfTurn)
 theorem okBorderlandMarauder : Ability.check (DRS.ofList []) borderlandMarauder = [] := by decide
 def lichsMasteryLoss : Ability :=
-  when (does (Semantics.Subject.actor (thisEnchantment)) leave) loseGame
+  when (does (Semantics.Subject.actor (thisEnchantment)) leave) Semantics.Templates.Action.loseGame
 theorem okLichsMasteryLoss : Ability.check (DRS.ofList []) lichsMasteryLoss = [] := by decide
 def phageTheUntouchable : Ability :=
   whenever (does (Semantics.Subject.actor (thisCreature)) (dealDamage (recipient := a isPlayer) (kind := some .combat)))
-      (instruct (that player) loseGame)
+      (instruct (that Semantics.Templates.NounWord.player) Semantics.Templates.Action.loseGame)
 theorem okPhageTheUntouchable : Ability.check (DRS.ofList []) phageTheUntouchable = [] := by decide
 def elderscaleWurm : Ability :=
   when (does (Semantics.Subject.actor (thisCreature)) enter) (if_ := compareAmt (lifeTotalOf you) .less 7)
@@ -180,7 +181,7 @@ theorem okKrang : Ability.check (DRS.ofList []) krang = [] := by decide
 
 /-- Once Upon a Time -/
 def onceUponATimeFirstCast : Predicate :=
-  did (Semantics.Subject.actor (you)) (cast which) thisObject (ordinal := some ⟨.nth 1, some .game⟩)
+  did (Semantics.Subject.actor (you)) (cast which) Semantics.Templates.LookbackSpan.thisObject (ordinal := some ⟨.nth 1, some .game⟩)
 theorem okOnceUponATimeFirstCast : Predicate.checkAt .object (DRS.ofList []) onceUponATimeFirstCast = [] := by
   decide
 
@@ -209,12 +210,12 @@ theorem okHollowmurkSiegeSultai : Ability.check (DRS.ofList []) hollowmurkSiegeS
 /-- Sakashima's Student -/
 def sakashimasStudentCopy : Ability :=
   static (enters thisCreature
-    [asCopyOf true (a isCreature) [isAlso (subtypes := [ninja])]])
+    [asCopyOf Bool.true (a isCreature) [isAlso (subtypes := [ninja])]])
 theorem okSakashimasStudentCopy : Ability.check (DRS.ofList []) sakashimasStudentCopy = [] := by decide
 /-- Chameleon, Master of Disguise -/
 def chameleonCopy : Ability :=
   static (enters thisCreature
-    [asCopyOf true (a (and [isCreature, youControl]))
+    [asCopyOf Bool.true (a (and [isCreature, youControl]))
       [isNamed "Chameleon, Master of Disguise"]])
 theorem okChameleonCopy : Ability.check (DRS.ofList []) chameleonCopy = [] := by decide
 
@@ -232,11 +233,11 @@ theorem okSoulsOfTheFaultlessDrain : Ability.check (DRS.ofList []) soulsOfTheFau
 def steppeLynx : Ability :=
   landfall
     (whenever (does ((Semantics.Subject.actor (a (and [isLand, youControl])))) enter)
-      (get thisCreature (up 2) (up 2) untilEndOfTurn))
+      (get thisCreature (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 2) untilEndOfTurn))
 theorem okSteppeLynx : Ability.check (DRS.ofList []) steppeLynx = [] := by decide
 /-- Owlbear -/
 def owlbear : Ability :=
-  flavorWord "Keen Senses" (when (does (Semantics.Subject.actor (thisCreature)) enter) (draw 1))
+  Semantics.Templates.Ability.flavorWord "Keen Senses" (when (does (Semantics.Subject.actor (thisCreature)) enter) (draw 1))
 theorem okOwlbear : Ability.check (DRS.ofList []) owlbear = [] := by decide
 /-- Netherese Puzzle-Ward -/
 def netheresePuzzleWardIllumination : Ability :=
@@ -287,7 +288,7 @@ theorem okPoliticalTriumphHeader : GameEvent.check (DRS.ofList []) politicalTriu
 def thoughtLashTrigger : Ability :=
   when (does ((Semantics.Subject.actor (a isPlayer)))
           (pay anyCost .once .unpaid (some thisEnchantment) (some cumulativeUpkeep.label)))
-    (instruct (that player) (exile (each (cardIn (libraryOf they)))))
+    (instruct (that Semantics.Templates.NounWord.player) (Semantics.Definitions.Action.exile (each (cardIn (libraryOf they)))))
 theorem okThoughtLashTrigger : Ability.check (DRS.ofList []) thoughtLashTrigger = [] := by decide
 /-- Heart of Bogardan -/
 def heartOfBogardanHeader : GameEvent :=
@@ -310,7 +311,7 @@ theorem okStormscapeBattlemageFirstKicker :
 /-- All-Seeing Arbiter -/
 def allSeeingArbiterHeader : GameEvent :=
   does (Semantics.Subject.actor (you)) (discard (a
-    (cardIn hand)))
+    (cardIn Semantics.Templates.Location.hand)))
 theorem okAllSeeingArbiterHeader : GameEvent.check (DRS.ofList []) allSeeingArbiterHeader = [] := by decide
 
 /-- Myth Unbound -/
@@ -320,7 +321,7 @@ theorem okMythUnboundTrigger : Ability.check (DRS.ofList []) mythUnboundTrigger 
 
 /-- Oscorp Industries -/
 def oscorpIndustriesReturn : Ability :=
-  when (does (Semantics.Subject.actor (thisLand)) (enter (from_ := graveyard))) (loseLife 2)
+  when (does (Semantics.Subject.actor (thisLand)) (enter (from_ := Semantics.Templates.Location.graveyard))) (loseLife 2)
 theorem okOscorpIndustriesReturn : Ability.check (DRS.ofList []) oscorpIndustriesReturn = [] := by decide
 def theLostAndTheDamnedEntryArm : GameEvent :=
   does ((Semantics.Subject.actor (a (and [isLand, youControl])))) (enter (from_ := not yourHand))
@@ -375,7 +376,7 @@ def debrisBeetleTrigger : Ability :=
 theorem okDebrisBeetleTrigger : Ability.check (DRS.ofList []) debrisBeetleTrigger = [] := by decide
 /-- Roads Go Ever, Ever On's chapters II and III -/
 def roadsGoEverEverOnChapters : Ability :=
-  when (chapterMark [2, 3]) (putInto (a (cardIn (exiledWith thisSaga))) hand)
+  when (chapterMark [2, 3]) (putInto (a (cardIn (exiledWith thisSaga))) Semantics.Templates.Location.hand)
 theorem okRoadsGoEverEverOnChapters : Ability.check (DRS.ofList []) roadsGoEverEverOnChapters = [] := by decide
 /-- Wurmwall Sweeper -/
 def wurmwallSweeperTrigger : Ability := when (does (Semantics.Subject.actor (thisSpacecraft)) enter) (surveil 2)
@@ -403,7 +404,7 @@ theorem agencyOutfitterThemIsTheFoundGroup :
       (search (andOr [yourGraveyard, yourHand, yourLibrary])
         (andOr [a (named (Semantics.NameSource.printed ("Magnifying Glass"))), a (named (Semantics.NameSource.printed ("Thinking Cap")))]))).1
     (resolveCandidates .bare .many found).map (fun ref => (ref.plur, ref.groupKey == ref.id)) =
-      [(.many, true)] := by decide
+      [(.many, Bool.true)] := by decide
 
 /-- Trouble in Pairs' -/
 def troubleInPairsArms : Ability :=
@@ -445,7 +446,7 @@ def dontBlinkReplacement : Action :=
       (wouldAny
         [ would ((Semantics.Subject.actor (counted (orMore 1) isCreature))) (enter (from_ := exileZone)),
           would ((Semantics.Subject.actor (counted (orMore 1) (and [isCreature,
-              did any (cast which (from_ := exileZone)) thisObject])))) enter ])
+              did any (cast which (from_ := exileZone)) Semantics.Templates.LookbackSpan.thisObject])))) enter ])
       (instead (shuffleInto them)))
     untilEndOfTurn
 theorem okDontBlinkReplacement : Action.check (DRS.ofList []) dontBlinkReplacement = [] := by decide
@@ -490,7 +491,7 @@ theorem okAkiriEquippedAttackers : Ability.check (DRS.ofList []) akiriEquippedAt
 def vexingBaubleTrigger : Ability :=
   whenever (does ((Semantics.Subject.actor (a isPlayer))) (cast (a isSpell)))
     (if_ := noManaSpentToCast it)
-    (counter (that .spell))
+    (Semantics.Definitions.Action.counter (that .spell))
 theorem okVexingBaubleTrigger : Ability.check (DRS.ofList []) vexingBaubleTrigger = [] := by decide
 
 /-- Jeskai Ascendancy's first trigger -/
@@ -498,7 +499,7 @@ def jeskaiAscendancyPump : Ability :=
   whenever (does (Semantics.Subject.actor (you)) (cast (a (and
     [isSpell, non isCreature]))))
     (sequentially
-      [ get (bare (and [isCreature, youControl])) (up 1) (up 1) untilEndOfTurn,
+      [ get (Semantics.Templates.NounPhrase.bare (and [isCreature, youControl])) (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn,
         untap (those creature) ])
 theorem okJeskaiAscendancyPump : Ability.check (DRS.ofList []) jeskaiAscendancyPump = [] := by decide
 def herosDemise : Action := destroy (target (and [isCreature, hasSupertype .legendary]))

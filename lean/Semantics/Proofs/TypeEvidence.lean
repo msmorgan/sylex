@@ -56,7 +56,7 @@ theorem pureTypePermutation (xs ys : List CardType) (h : xs.Perm ys) :
 
 private def artifactCreature : Predicate := .and [isArtifact, isCreature]
 private def creatureArtifact : Predicate := .and [isCreature, isArtifact]
-private def afterTarget (p : Predicate) : DRS := (stepNounPhrase 64 (DRS.ofList []) .other false (target p)).1
+private def afterTarget (p : Predicate) : DRS := (stepNounPhrase 64 (DRS.ofList []) .other Bool.false (target p)).1
 
 theorem artifactFirstReadsCreature :
     countReach (.word (.type .creature)) .one (afterTarget artifactCreature) = 1 := by decide
@@ -76,7 +76,7 @@ theorem targetTypeOrderKeepsBinding :
 theorem conjunctionDoesNotInventLand :
     countReach (.word (.type .land)) .one (afterTarget artifactCreature) = 0 := by decide
 
-private def afterExile (p : Predicate) : DRS := (stepAction 64 .postEvent .obj (DRS.ofList []) (exile (target p))).1
+private def afterExile (p : Predicate) : DRS := (stepAction 64 .postEvent .obj (DRS.ofList []) (Semantics.Definitions.Action.exile (target p))).1
 
 theorem movedArtifactCreatureReadsCreatureCard :
     countReach (.word (.ofType .card .creature)) .one (afterExile artifactCreature) = 1 := by decide
@@ -136,19 +136,19 @@ private def equipmentHost : NounPhrase :=
   .attachHost .equipped (.ofType (.type .artifact) .creature)
 
 theorem equipmentHostSeedsBothTypes :
-    ((stepNounPhrase 64 (DRS.ofList []) .subj true equipmentHost).1.referents.map (·.ty)) =
+    ((stepNounPhrase 64 (DRS.ofList []) .subj Bool.true equipmentHost).1.referents.map (·.ty)) =
       [[.creature, .artifact]] := by decide
 
 theorem movedEquipmentHostKeepsCreatureCardEvidence :
     countReach (.word (.ofType .card .creature)) .one
-      (stepAction 64 .postEvent .obj (DRS.ofList []) (exile equipmentHost)).1 = 1 := by decide
+      (stepAction 64 .postEvent .obj (DRS.ofList []) (Semantics.Definitions.Action.exile equipmentHost)).1 = 1 := by decide
 
 theorem movedEquipmentHostKeepsArtifactCardEvidence :
     countReach (.word (.ofType .card .artifact)) .one
-      (stepAction 64 .postEvent .obj (DRS.ofList []) (exile equipmentHost)).1 = 1 := by decide
+      (stepAction 64 .postEvent .obj (DRS.ofList []) (Semantics.Definitions.Action.exile equipmentHost)).1 = 1 := by decide
 
 theorem movedEquipmentHostLosesPermanentCarrier :
     countReach (.word (.type .creature)) .one
-      (stepAction 64 .postEvent .obj (DRS.ofList []) (exile equipmentHost)).1 = 0 := by decide
+      (stepAction 64 .postEvent .obj (DRS.ofList []) (Semantics.Definitions.Action.exile equipmentHost)).1 = 0 := by decide
 
 end Semantics.Proofs.TypeEvidence

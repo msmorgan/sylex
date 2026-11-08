@@ -12,7 +12,7 @@ namespace Semantics.Proofs.DrtWitnesses
 
 private def kalitasBody : Action := .sequentially [
   destroy (target isCreature),
-  .doIf (was (.move (that (.type .creature)) (battlefield)
+  .doIf (was (.move (that (.type .creature)) (Semantics.Templates.Location.battlefield)
         (some (graveyardOf .any)) .departure []) thisWay)
     (.sequentially [
       create 1
@@ -27,10 +27,10 @@ theorem kalitasReadback : Action.check (DRS.ofList []) kalitasBody = [] := by de
 
 theorem kalitasSelectsTokenThenDestroyedCreature :
     let result := (stepAction 64 .postEvent .obj (DRS.ofList []) kalitasBody).1
-    result.resolvedIds.contains 1 = true ∧ result.resolvedIds.contains 2 = true ∧
-      (result.findById? 2).map (·.pronounResolved) = some true ∧
+    result.resolvedIds.contains 1 = Bool.true ∧ result.resolvedIds.contains 2 = Bool.true ∧
+      (result.findById? 2).map (·.pronounResolved) = some Bool.true ∧
       (result.findById? 2).map (·.payload.orig) = some (some .token) ∧
-      (result.findById? 1).map (·.pronounResolved) = some false ∧
+      (result.findById? 1).map (·.pronounResolved) = some Bool.false ∧
       (result.findById? 1).map (·.zone) = some (some .graveyard) := by decide
 
 /-- Kalitas's "Its power is equal to that creature's power" spelled literally, with the
@@ -83,7 +83,7 @@ theorem brokenVisageReadback :
 theorem brokenVisageSelectsTokenThenDestroyedCreature :
     let result := (stepAction 64 .postEvent .obj (DRS.ofList []) brokenVisageBody).1
     result.resolvedIds = [1, 2] ∧
-      (result.findById? 2).map (·.pronounResolved) = some true ∧
+      (result.findById? 2).map (·.pronounResolved) = some Bool.true ∧
       (result.findById? 1).map (·.zone) = some (some .graveyard) := by decide
 
 end Semantics.Proofs.DrtWitnesses

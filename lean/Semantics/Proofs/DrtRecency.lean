@@ -67,7 +67,7 @@ theorem tahngarthDefenderModifierChecks :
     NounPhrase.check (nextClause tahngarthAfter) tahngarthDefender = [] := by decide
 
 theorem tahngarthRawFinalDemonstrativeSelectsDefender :
-    selected .join (stepNounPhrase 64 (nextClause tahngarthAfter) .obj true tahngarthDefender).1 =
+    selected .join (stepNounPhrase 64 (nextClause tahngarthAfter) .obj Bool.true tahngarthDefender).1 =
       [["tahngarth.defender"]] := by decide
 
 private def bombshellPlayer : NounPhrase :=
@@ -84,14 +84,14 @@ theorem bronzeBombshellRawPlayerSelectsController :
 private def runeswordSource : NounPhrase :=
   .firstMention "runesword.source" (target isCreature)
 private def runeswordBefore : DRS :=
-  (stepNounPhrase 64 (DRS.ofList []) .obj true runeswordSource).1
+  (stepNounPhrase 64 (DRS.ofList []) .obj Bool.true runeswordSource).1
 private def runeswordVictim : NounPhrase :=
   .firstMention "runesword.victim" (a (.and [isCreature,
     .did { subj := .actor (.laterMention "runesword.source" (target isCreature))
            action := .dealDamage .anyAmount .which
            within := some (.duration soFarThisTurn none) }]))
 private def runeswordWould : WouldClause :=
-  .would .any (.move runeswordVictim (battlefield) (some graveyard) .departure [])
+  .would .any (.move runeswordVictim (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .departure [])
 
 theorem runeswordRawDemonstrativeSelectsDyingCreature :
     selected (.type .creature)
@@ -192,7 +192,7 @@ private def scytheDeath : GameEvent :=
 private def scytheAfterDeath : DRS :=
   (stepGameEvent 64 (DRS.ofList []) scytheDeath).1
 private def scytheReturn : Action :=
-  .move (that .card) .anyLocation (some battlefield) .arrival []
+  .move (that .card) .anyLocation (some Semantics.Templates.Location.battlefield) .arrival []
 private def scytheAfterReturn : DRS :=
   (stepAction 64 .postEvent .obj (nextClause scytheAfterDeath) scytheReturn).1
 

@@ -13,6 +13,7 @@ too, so the distinction is not a type's to make.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each counted)
 open Semantics.Templates.Predicate (and did)
@@ -622,11 +623,11 @@ theorem generalManaSymbolMatcher :
     Predicate.checkAt .object (DRS.ofList []) (.manaCostHas (.simple (.specific (.of .red)))) = [] := by decide
 
 theorem playerItRead :
-    NounPhrase.checkAt (some .player) [({ det := .a, plur := .one, payload := .player false, idents := [] } : Referent)] they = [] := by decide
+    NounPhrase.checkAt (some .player) [({ det := .a, plur := .one, payload := .player Bool.false, idents := [] } : Referent)] they = [] := by decide
 
 theorem delayedDoorTraversal :
     Action.namesThisDoor (delay (.does (.actor .you) (.unlock .thisDoor)) (draw 1))
-      = true := by
+      = Bool.true := by
   decide
 
 theorem distributiveGroupSurvives :
@@ -662,7 +663,7 @@ def alternativeCostKeywords : List KeywordLabel :=
 
 theorem alternativeCostReadbacks :
     alternativeCostKeywords.all
-      (fun k => (Amount.check (DRS.ofList []) (paidCostRead (.byKeyword k) none .this)).isEmpty) = true := by
+      (fun k => (Amount.check (DRS.ofList []) (paidCostRead (.byKeyword k) none .this)).isEmpty) = Bool.true := by
   decide
 
 theorem modalCostReadbacks :

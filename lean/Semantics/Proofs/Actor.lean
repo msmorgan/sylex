@@ -11,6 +11,7 @@ performs the action it is part of: by default, the player addressed by the text
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each)
 open Semantics.Templates.Predicate (and)
@@ -27,22 +28,22 @@ open Semantics.Templates.DetPhrase (a each)
 namespace Semantics.Proofs.Actor
 
 private def handoff (drs : DRS) (subject : NounPhrase) : DRS :=
-  let (after, ids, _) := stepNounPhrase 64 drs .subj true subject
+  let (after, ids, _) := stepNounPhrase 64 drs .subj Bool.true subject
   let actorShape : ActorShape := {
     kind := subject.kindIn after .player
     isYou := subject.isYou
-    ascribable := false
+    ascribable := Bool.false
     refIds := ids }
   after.pushPerformer actorShape
 
 private def performerIsYou (drs : DRS) : Bool :=
-  ((actorShape? drs).map (·.isYou)).getD true
+  ((actorShape? drs).map (·.isYou)).getD Bool.true
 
 private def products (drs : DRS) : List Payload :=
   (drs.referents.filter (fun r => r.kind != .player)).map (·.payload)
 
 /-- One player already named, for "they". -/
-private def onePlayer : DRS := (DRS.ofList [{ det := .the, plur := .one, payload := .player false }])
+private def onePlayer : DRS := (DRS.ofList [{ det := .the, plur := .one, payload := .player Bool.false }])
 
 /-! ## Cards -/
 
@@ -69,7 +70,7 @@ theorem okBurglarRat : Action.check (DRS.ofList []) (instruct (each (.isOpponent
 published as a group, as `doForEach` publishes it. -/
 theorem okDistributedDiscardReadsAsGroup :
     Action.check (DRS.ofList [])
-      (.sequentially [instruct (each (.isOpponentOf .you)) (discard (a .isCard)), exile them]) = [] := by
+      (.sequentially [instruct (each (.isOpponentOf .you)) (discard (a .isCard)), Semantics.Definitions.Action.exile them]) = [] := by
   decide
 
 /-- "Each opponent discards a card. Exile it.": one card per opponent, so the singular read has
@@ -77,7 +78,7 @@ no antecedent (`okDistributedDiscardReadsAsGroup` is the plural read; compare
 `Choice.badDistributedChoiceReadSingular`). -/
 theorem badDistributedDiscardReadSingular :
     Action.check (DRS.ofList [])
-      (.sequentially [instruct (each (.isOpponentOf .you)) (discard (a .isCard)), exile it])
+      (.sequentially [instruct (each (.isOpponentOf .you)) (discard (a .isCard)), Semantics.Definitions.Action.exile it])
       = [.anaphor .bare .one 0] := by
   decide
 
@@ -207,14 +208,14 @@ theorem keywordAbilityBodyCannotReadItsCard :
 theorem actorDrawIsYouDraw :
     Action.check (DRS.ofList []) (draw 1) = Action.check (DRS.ofList []) (instruct .you (draw 1)) ∧
       (products (actionResult (DRS.ofList []) (draw 1)) == products (actionResult (DRS.ofList []) (instruct .you (draw 1))))
-        = true := by
+        = Bool.true := by
   decide
 
 /-- "Lose 2 life.": as handed to "you". -/
 theorem actorLoseLifeIsYouLoseLife :
     Action.check (DRS.ofList []) (loseLife 2) = Action.check (DRS.ofList []) (instruct .you (loseLife 2)) ∧
       (products (actionResult (DRS.ofList []) (loseLife 2)) ==
-        products (actionResult (DRS.ofList []) (instruct .you (loseLife 2)))) = true := by
+        products (actionResult (DRS.ofList []) (instruct .you (loseLife 2)))) = Bool.true := by
   decide
 
 /-- "You may pay 1 life. If you do, draw a card." (`Choice.okMatchedPayer` with the actor) -/
@@ -238,7 +239,7 @@ theorem badHandedOffLifeCost :
       (.activated (.perform (instruct (target (.isOpponentOf .you)) (loseLife 2))) (draw 1)
         none none none none)
       = [] ∧
-      performerIsYou (handoff (DRS.ofList []) (target (.isOpponentOf .you))) = false := by
+      performerIsYou (handoff (DRS.ofList []) (target (.isOpponentOf .you))) = Bool.false := by
   decide
 
 /-! ## Costs: each handoff twin judged as its explicit-agent form
@@ -281,7 +282,7 @@ theorem invigorateHandoffTwin :
   decide
 
 private def blockersTheyControl : Amount :=
-  times 1 (countOf (.and [isCreature, isBlocking, .hasPossessor .controller they]))
+  Semantics.Templates.Amount.times 1 (countOf (.and [isCreature, isBlocking, .hasPossessor .controller they]))
 
 /-- Heat Wave: "Nonblue creatures can't block creatures you control unless their controller pays 1
 life for each blocking creature they control." -/
@@ -365,7 +366,7 @@ theorem badCapturedActorIsTheHandedPlayer :
         = [] ∧
       performerIsYou
         (handoff (handoff (DRS.ofList []) (target (.isOpponentOf .you))) .you) =
-        true := by
+        Bool.true := by
   decide
 
 /-- Inside "target opponent …", `theActor` passed through a `capture` parameter is the opponent:
@@ -378,7 +379,7 @@ theorem capturedActorIsTheHandedPlayer :
         none none none none)
       = [] ∧
       performerIsYou (handoff (DRS.ofList []) (target (.isOpponentOf .you))) =
-        false := by
+        Bool.false := by
   decide
 
 /-! ## Handoffs -/
@@ -440,8 +441,8 @@ theorem badNestedHandoffInnermost :
           (may (.pay (.perform (instruct anOpponent (loseLife 1))) .once .paid none none) none
             (some (draw 1)))))
       = [] ∧
-      performerIsYou (handoff (handoff (DRS.ofList []) (target (.isOpponentOf .you))) .you) = true ∧
-      performerIsYou (handoff (DRS.ofList []) (target (.isOpponentOf .you))) = false := by
+      performerIsYou (handoff (handoff (DRS.ofList []) (target (.isOpponentOf .you))) .you) = Bool.true ∧
+      performerIsYou (handoff (DRS.ofList []) (target (.isOpponentOf .you))) = Bool.false := by
   decide
 
 /-- "Target opponent … Until end of turn, target creature gains '{T}: You may pay an
@@ -460,7 +461,7 @@ theorem badGrantedAbilityKeepsItsOwnPerformer :
               none none none none))
           (some untilEndOfTurn)))
       = [] ∧
-      performerIsYou (DRS.ofList []) = true := by
+      performerIsYou (DRS.ofList []) = Bool.true := by
   decide
 
 /-! ## Statics -/
@@ -468,10 +469,10 @@ theorem badGrantedAbilityKeepsItsOwnPerformer :
 /-- "You may cast spells from your graveyard.": with no handoff in a static ability the
 permitted player is the controller, and the clause checks as the `you` spelling does. -/
 theorem okStaticActorPermission :
-    Ability.check (DRS.ofList []) (.static (can (.actor theActor) (cast (bare isSpell) (from_ := some (graveyardOf theActor))))) = [] ∧
-      Ability.check (DRS.ofList []) (.static (can (.actor theActor) (cast (bare isSpell) (from_ := some (graveyardOf theActor))))) =
+    Ability.check (DRS.ofList []) (.static (can (.actor theActor) (cast (Semantics.Templates.NounPhrase.bare isSpell) (from_ := some (graveyardOf theActor))))) = [] ∧
+      Ability.check (DRS.ofList []) (.static (can (.actor theActor) (cast (Semantics.Templates.NounPhrase.bare isSpell) (from_ := some (graveyardOf theActor))))) =
         Ability.check (DRS.ofList [])
-          (.static (can (.actor you) (cast (bare isSpell) (from_ := some (graveyardOf .you))))) := by
+          (.static (can (.actor you) (cast (Semantics.Templates.NounPhrase.bare isSpell) (from_ := some (graveyardOf .you))))) := by
   decide
 
 /-- "Exile target creature. Its owner may cast it from exile.": the permission handed to the
@@ -479,7 +480,7 @@ exiled card's owner. -/
 theorem okHandedCastPermission :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ exile (target isCreature),
+        [ Semantics.Definitions.Action.exile (target isCreature),
           instruct (ownerOf it) (.establish (can (.actor theActor) (cast it (from_ := some exileZone))) none) ]) = [] := by
   decide
 
@@ -490,7 +491,7 @@ deed performed by the actor in context [CR#701.9a]. -/
 theorem okDiscardWrapperCarriesActor :
     Action.check onePlayer
       (instruct they
-        (.ownScope (some (.action "discard")) (.move (a .isCard) ((.zone .hand (some theActor))) (some graveyard) .arrival [])))
+        (.ownScope (some (.action "discard")) (.move (a .isCard) ((.zone .hand (some theActor))) (some Semantics.Templates.Location.graveyard) .arrival [])))
       = [] := by
   decide
 
@@ -498,7 +499,7 @@ theorem okDiscardWrapperCarriesActor :
 that player. -/
 theorem okDiscardWrapperWithAgent :
     Action.check (DRS.ofList [])
-      (instruct (target .isPlayer) (.ownScope (some (.action "discard")) (.move (a .isCard) ((.zone .hand none)) (some graveyard) .arrival [])))
+      (instruct (target .isPlayer) (.ownScope (some (.action "discard")) (.move (a .isCard) ((.zone .hand none)) (some Semantics.Templates.Location.graveyard) .arrival [])))
       = [] := by
   decide
 
@@ -526,7 +527,7 @@ theorem handedGroupPublishesPlurals :
 /-- `instruct you` publishes exactly what its body does with no handoff. -/
 theorem handedToYouIsTransparent :
     (products (actionResult (DRS.ofList []) (instruct .you (discard (a .isCard)))) ==
-      products (actionResult (DRS.ofList []) (discard (a .isCard)))) = true := by
+      products (actionResult (DRS.ofList []) (discard (a .isCard)))) = Bool.true := by
   decide
 
 /-! ## A group handoff publishes its amount outcomes as totals
@@ -572,7 +573,7 @@ theorem handedGroupPublishesTotal :
     shape (actionResult (DRS.ofList []) (instruct (each (.isOpponentOf .you)) (loseLife 1))) =
         [(.outcome, .one, .the), (.player, .many, .each)] ∧
       (actionResult (DRS.ofList []) (instruct (each (.isOpponentOf .you)) (loseLife 1)) ==
-        actionResult (DRS.ofList []) (instruct (each (.isOpponentOf .you)) (.changeLife (.down 1)))) = true := by
+        actionResult (DRS.ofList []) (instruct (each (.isOpponentOf .you)) (.changeLife (.down 1)))) = Bool.true := by
   decide
 
 /-- "Each opponent discards a card. You gain that much life.": the body has no amount outcome,
@@ -597,7 +598,7 @@ theorem okGroupHandoffSequenceReadsLifeTotal :
       Action.check (DRS.ofList [])
         (.sequentially
           [ instruct (each (.isOpponentOf .you)) lossAndDiscard,
-            exile them ]) = [] := by
+            Semantics.Definitions.Action.exile them ]) = [] := by
   decide
 
 /-- "Each opponent loses 1 life, then loses 2 life. You gain that much life.": two totals, so

@@ -71,7 +71,7 @@ theorem okConvokeColorReadback :
 "that creature's color" has no antecedent, even with a creature in scope outside. -/
 theorem badSubstitutePaysWithoutAntecedent :
     StaticSpec.check (DRS.ofList []) (.paySubstitute thisSpell
-      (substitute (exile (a (.and [.isCard, .in_ (graveyardOf .you)])))
+      (substitute (Semantics.Definitions.Action.exile (a (.and [.isCard, .in_ (graveyardOf .you)])))
         [.ofColor (.colorOf (that (.type .creature)))])) =
       [.anaphor (.word (.type .creature)) .one 0] := by decide
 

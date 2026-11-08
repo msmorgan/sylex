@@ -41,7 +41,7 @@ namespace Semantics.Cards
 
 def cloudshift : Action :=
   sequentially
-    [ exile (target (and [isCreature, youControl])),
+    [ Semantics.Definitions.Action.exile (target (and [isCreature, youControl])),
       returnToBattlefield (that card) [(under you)] ]
 theorem okCloudshift : Action.check (DRS.ofList []) cloudshift = [] := by decide
 
@@ -52,11 +52,11 @@ theorem okBitterDownfall : Action.check (DRS.ofList []) bitterDownfall = [] := b
 def suspendedSentence : Action :=
   sequentially
     [ destroy (target (and [isCreature, anOpponentControls])),
-      instruct (that player) (loseLife 3) ]
+      instruct (that Semantics.Templates.NounWord.player) (loseLife 3) ]
 theorem okSuspendedSentence : Action.check (DRS.ofList []) suspendedSentence = [] := by decide
 
 def flickeringSpirit : Action :=
-  sequentially [exile thisCreature, returnToBattlefield it [(under (ownerOf it))]]
+  sequentially [Semantics.Definitions.Action.exile thisCreature, returnToBattlefield it [(under (ownerOf it))]]
 theorem okFlickeringSpirit : Action.check (DRS.ofList []) flickeringSpirit = [] := by decide
 
 /-- Bench item: "Mill a card. Return the card put into your graveyard this way to your hand." One
@@ -83,7 +83,7 @@ def phthisis : Action :=
   sequentially
     [ destroy (target isCreature),
       instruct (controllerOf it) (loseLife
-        (plus (powerOf it) (toughnessOf it))) ]
+        (Semantics.Templates.Amount.plus (powerOf it) (toughnessOf it))) ]
 theorem okPhthisis : Action.check (DRS.ofList []) phthisis = [] := by decide
 
 def foulTongueShriek : Action :=
@@ -95,13 +95,13 @@ theorem okFoulTongueShriek : Action.check (DRS.ofList []) foulTongueShriek = [] 
 
 def impulse : Action :=
   sequentially
-    [ lookAt (topSlice 4), putInto (someOf (exactly 1) them) hand,
+    [ Semantics.Templates.Action.lookAt (topSlice 4), putInto (someOf (exactly 1) them) Semantics.Templates.Location.hand,
       putInto theRest onBottom (riders := [(inOrder .anyOrder)]) ]
 theorem okImpulse : Action.check (DRS.ofList []) impulse = [] := by decide
 
 def anticipate : Action :=
   sequentially
-    [ lookAt (topSlice 3), putInto (someOf (exactly 1) them) hand,
+    [ Semantics.Templates.Action.lookAt (topSlice 3), putInto (someOf (exactly 1) them) Semantics.Templates.Location.hand,
       putInto theRest onBottom (riders := [(inOrder .anyOrder)]) ]
 theorem okAnticipate : Action.check (DRS.ofList []) anticipate = [] := by decide
 
@@ -109,9 +109,9 @@ theorem okAnticipate : Action.check (DRS.ofList []) anticipate = [] := by decide
 library), not the instant and sorcery cards the existential published nor the part and remainder
 of the replaced action, and they are the one group "the rest" is taken from. -/
 theorem flowStateThemAndTheRestReadTheCardsLookedAt :
-    let looked := (stepAction 512 .postEvent .obj (DRS.ofList []) (lookAt (topSlice 3))).1
+    let looked := (stepAction 512 .postEvent .obj (DRS.ofList []) (Semantics.Templates.Action.lookAt (topSlice 3))).1
     let replaced := (stepAction 512 .preEvent .obj looked (sequentially
-      [ putInto (someOf (exactly 1) them) hand,
+      [ putInto (someOf (exactly 1) them) Semantics.Templates.Location.hand,
         putInto theRest onBottom (riders := [(inOrder .anyOrder)]) ])).1
     let instantAndSorcery := thereAre (both (a (and [isInstant, cardIn yourGraveyard]))
       (a (and [isSorcery, cardIn yourGraveyard])))
@@ -130,34 +130,34 @@ the bottom of your library in any order": the replacement reads what the replace
 1), not the replaced action's remainder. -/
 theorem selfReplacementReadsWhatTheReplacedActionRead :
     let putOne := sequentially
-      [ putInto (someOf (exactly 1) them) hand,
+      [ putInto (someOf (exactly 1) them) Semantics.Templates.Location.hand,
         putInto theRest onBottom (riders := [(inOrder .anyOrder)]) ]
     let putTwo := sequentially
-      [ putInto (someOf (exactly 2) them) hand,
+      [ putInto (someOf (exactly 2) them) Semantics.Templates.Location.hand,
         putInto theRest onBottom (riders := [(inOrder .anyOrder)]) ]
-    let looked := (stepAction 512 .postEvent .obj (DRS.ofList []) (lookAt (topSlice 3))).1
+    let looked := (stepAction 512 .postEvent .obj (DRS.ofList []) (Semantics.Templates.Action.lookAt (topSlice 3))).1
     let replaced := (stepAction 512 .preEvent .obj looked putOne).1
     let start := nextClause (replacementStart looked replaced)
     Action.check (DRS.ofList [])
-        (sequentially [lookAt (topSlice 3), replace putOne (instead putTwo)]) = [] ∧
+        (sequentially [Semantics.Templates.Action.lookAt (topSlice 3), replace putOne (instead putTwo)]) = [] ∧
       (resolveCandidates .bare .many start).map (·.id) = [1] ∧
       countGroups .object start = 1 ∧ countParts .object start = 0 := by
   decide
 
 def revealFourPartition : Action :=
   sequentially
-    [ reveal (topSlice 4), putInto (someOf (exactly 1) (those card)) hand,
-      putInto theRest graveyard ]
+    [ Semantics.Definitions.Action.reveal (topSlice 4), putInto (someOf (exactly 1) (those card)) Semantics.Templates.Location.hand,
+      putInto theRest Semantics.Templates.Location.graveyard ]
 theorem okRevealFourPartition : Action.check (DRS.ofList []) revealFourPartition = [] := by decide
 
 def exileFourOfThem : Action :=
   sequentially
-    [ lookAt (topSlice 8), exile (someOf (exactly 4) them),
+    [ Semantics.Templates.Action.lookAt (topSlice 8), Semantics.Definitions.Action.exile (someOf (exactly 4) them),
       putInto theRest onTop (riders := [(inOrder .anyOrder)]) ]
 theorem okExileFourOfThem : Action.check (DRS.ofList []) exileFourOfThem = [] := by decide
 
 def sylvanScrying : Action :=
-  sequentially [search yourLibrary (a isLand), reveal it, putInto it hand, shuffle]
+  sequentially [search yourLibrary (a isLand), Semantics.Definitions.Action.reveal it, putInto it Semantics.Templates.Location.hand, shuffle]
 theorem okSylvanScrying : Action.check (DRS.ofList []) sylvanScrying = [] := by decide
 
 def searchToBattlefield : Action :=
@@ -168,7 +168,7 @@ def glimpseTheUnthinkable : Action := instruct (target isPlayer) (mill 10)
 theorem okGlimpseTheUnthinkable : Action.check (DRS.ofList []) glimpseTheUnthinkable = [] := by decide
 
 def millThenReadGroup : Action :=
-  sequentially [mill 3, exile (those card)]
+  sequentially [mill 3, Semantics.Definitions.Action.exile (those card)]
 theorem okMillThenReadGroup : Action.check (DRS.ofList []) millThenReadGroup = [] := by decide
 
 def takeIntoCustody : Action :=
@@ -179,7 +179,7 @@ theorem okTakeIntoCustody : Action.check (DRS.ofList []) takeIntoCustody = [] :=
 def frenziedGorespawnGoad : Action :=
   doForEach eachOpponent
     (gainDesignation
-      (target (and [isCreature, controlledBy (that player)])) goaded)
+      (target (and [isCreature, controlledBy (that Semantics.Templates.NounWord.player)])) goaded)
 theorem okFrenziedGorespawnGoad : Action.check (DRS.ofList []) frenziedGorespawnGoad = [] := by decide
 
 /-- Consecrate // Consume -/
@@ -194,8 +194,8 @@ theorem okConsume : Ability.check (DRS.ofList []) consume = [] := by decide
 
 def riseFromTheGrave : Action :=
   sequentially
-    [ putOntoBattlefieldUnderYourControl (target (and [isCreature, in_ graveyard]))
-        (from_ := graveyard),
+    [ putOntoBattlefieldUnderYourControl (target (and [isCreature, in_ Semantics.Templates.Location.graveyard]))
+        (from_ := Semantics.Templates.Location.graveyard),
       become (that creature)
         { characteristics := { colors := [.black], subtypes := [zombie] } } ]
 theorem okRiseFromTheGrave : Action.check (DRS.ofList []) riseFromTheGrave = [] := by decide
@@ -211,14 +211,14 @@ theorem okEverAfter : Action.check (DRS.ofList []) everAfter = [] := by decide
 
 def martyrsCry : Action :=
   sequentially
-    [ exile (allOf (and [isCreature, hasColor .white])),
-      doForEach (each (and [isCreature, was (exile which) thisWay]))
+    [ Semantics.Definitions.Action.exile (allOf (and [isCreature, hasColor .white])),
+      doForEach (each (and [isCreature, was (Semantics.Definitions.Action.exile which) thisWay]))
         (instruct (controllerOf it) (draw 1)) ]
 theorem okMartyrsCry : Action.check (DRS.ofList []) martyrsCry = [] := by decide
 
 def anotherRound : Action :=
   sequentially
-    [ exile (counted anyNumber (and [isCreature, youControl])),
+    [ Semantics.Definitions.Action.exile (counted anyNumber (and [isCreature, youControl])),
       returnToBattlefield them [(under (ownerOf them))],
       repeat_ (moreTimes (letter .x)) ]
 theorem okAnotherRound : Action.check (DRS.ofList []) anotherRound = [] := by decide
@@ -226,22 +226,22 @@ theorem okAnotherRound : Action.check (DRS.ofList []) anotherRound = [] := by de
 /-- Eradicate -/
 def eradicateSearch : Action :=
   sequentially
-    [ exile (target (and [isCreature, non (hasColor .black)])),
+    [ Semantics.Definitions.Action.exile (target (and [isCreature, non (hasColor .black)])),
       searchZonesOf (controllerOf (that card)) (allOf (shares .cardName .share (that card))),
-      exile them,
-      instruct (that player) shuffle ]
+      Semantics.Definitions.Action.exile them,
+      instruct (that Semantics.Templates.NounWord.player) shuffle ]
 theorem okEradicateSearch : Action.check (DRS.ofList []) eradicateSearch = [] := by decide
 
 /-- Deem Inferior -/
 def deemInferior : Action :=
   instruct (ownerOf (target (and [isPermanent, non isLand])))
-      (put it (or [(fromTop 2 library), (fromBottom 2 library)]))
+      (put it (or [(fromTop 2 Semantics.Templates.Location.library), (fromBottom 2 Semantics.Templates.Location.library)]))
 theorem okDeemInferior : Action.check (DRS.ofList []) deemInferior = [] := by decide
 
 /-- Write into Being -/
 def writeIntoBeingPlacement : Action :=
   sequentially
-    [ lookAt (topSlice 2),
+    [ Semantics.Templates.Action.lookAt (topSlice 2),
       manifestPlacement (someOf (exactly 1) them),
       putInto theOther (or [onTop, onBottom]) ]
 theorem okWriteIntoBeingPlacement : Action.check (DRS.ofList []) writeIntoBeingPlacement = [] := by decide
@@ -249,25 +249,25 @@ theorem okWriteIntoBeingPlacement : Action.check (DRS.ofList []) writeIntoBeingP
 /-- Mystical Tutor -/
 def mysticalTutor : Action :=
   sequentially
-    [search yourLibrary (a isInstantOrSorcery), reveal it, shuffle, putInto it onTop]
+    [search yourLibrary (a isInstantOrSorcery), Semantics.Definitions.Action.reveal it, shuffle, putInto it onTop]
 theorem okMysticalTutor : Action.check (DRS.ofList []) mysticalTutor = [] := by decide
 
 /-- Demonic Tutor -/
 def demonicTutor : Action :=
-  sequentially [search yourLibrary (a isCard), putInto it hand, shuffle]
+  sequentially [search yourLibrary (a isCard), putInto it Semantics.Templates.Location.hand, shuffle]
 theorem okDemonicTutor : Action.check (DRS.ofList []) demonicTutor = [] := by decide
 
 /-- Thalia's Lancers -/
 def thaliasLancersSearch : Action :=
   may
     (sequentially
-      [ search yourLibrary (a (and [hasSupertype .legendary])), reveal it,
-        putInto it hand, shuffle ])
+      [ search yourLibrary (a (and [hasSupertype .legendary])), Semantics.Definitions.Action.reveal it,
+        putInto it Semantics.Templates.Location.hand, shuffle ])
 theorem okThaliasLancersSearch : Action.check (DRS.ofList []) thaliasLancersSearch = [] := by decide
 
 def contrabandLivestock : Action :=
   sequentially
-    [ exile (target isCreature),
+    [ Semantics.Definitions.Action.exile (target isCreature),
       rollDice 1 (.sides 20),
       applyResultsTable
         [ rollRow (oneThrough 9)
@@ -279,15 +279,15 @@ def contrabandLivestock : Action :=
 theorem okContrabandLivestock : Action.check (DRS.ofList []) contrabandLivestock = [] := by decide
 
 /-- Hypnotic Specter -/
-def hypnoticSpecterDiscard : Action := instruct they (discard (aAtRandom (cardIn hand)))
+def hypnoticSpecterDiscard : Action := instruct they (discard (aAtRandom (cardIn Semantics.Templates.Location.hand)))
 theorem okHypnoticSpecterDiscard :
-    Action.check (DRS.ofList [{ det := .the, plur := .one, payload := .player false }]) hypnoticSpecterDiscard = [] := by decide
+    Action.check (DRS.ofList [{ det := .the, plur := .one, payload := .player Bool.false }]) hypnoticSpecterDiscard = [] := by decide
 
 /-- Wyll, Blade of Frontiers -/
 def wyllExtraDie : Action :=
   replaceEvent (would (Semantics.Subject.actor (you)) (rollDice anyAmount .anyDie))
     (instead (sequentially
-      [ rollDice (plus thatMuch 1) .thoseDice,
+      [ rollDice (Semantics.Templates.Amount.plus thatMuch 1) .thoseDice,
         ignoreOutcomes (extreme .lowest) ]))
     none
 theorem okWyllExtraDie : Action.check (DRS.ofList []) wyllExtraDie = [] := by decide
@@ -315,33 +315,33 @@ def playerOrPlaneswalkerAnnounced : NounPhrase := targetPlayerOrPlaneswalker
 def chainOfPlasmaOfferee : NounPhrase := splitOverPermanent
 theorem okChainOfPlasmaOfferee :
     NounPhrase.checkAt (some .player)
-        ((stepNounPhrase 512 (DRS.ofList []) .obj true anyTargetAnnounced).1) chainOfPlasmaOfferee =
+        ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true anyTargetAnnounced).1) chainOfPlasmaOfferee =
         [] := by
   decide
 /-- Chain Lightning -/
 def chainLightningPayer : NounPhrase := splitOverPermanent
 theorem okChainLightningPayer :
     NounPhrase.checkAt (some .player)
-        ((stepNounPhrase 512 (DRS.ofList []) .obj true anyTargetAnnounced).1) chainLightningPayer =
+        ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true anyTargetAnnounced).1) chainLightningPayer =
         [] := by
   decide
 /-- Flames of the Blood Hand -/
 def flamesOfTheBloodHandSubject : NounPhrase := splitOverPlaneswalker
 theorem okFlamesOfTheBloodHandSubject :
     NounPhrase.checkAt (some .player)
-        ((stepNounPhrase 512 (DRS.ofList []) .obj true playerOrPlaneswalkerAnnounced).1)
+        ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true playerOrPlaneswalkerAnnounced).1)
         flamesOfTheBloodHandSubject = [] := by
   decide
 /-- Flaming Gambit -/
 def flamingGambitOfferee : NounPhrase := splitOverPlaneswalker
 theorem okFlamingGambitOfferee :
     NounPhrase.checkAt (some .player)
-        ((stepNounPhrase 512 (DRS.ofList []) .obj true playerOrPlaneswalkerAnnounced).1)
+        ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true playerOrPlaneswalkerAnnounced).1)
         flamingGambitOfferee = [] := by
   decide
 theorem okEachCreatureThatSplitControls :
     NounPhrase.checkAt (some .object)
-        ((stepNounPhrase 512 (DRS.ofList []) .obj true playerOrPlaneswalkerAnnounced).1)
+        ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true playerOrPlaneswalkerAnnounced).1)
         eachCreatureThatSplitControls = [] := by
   decide
 
@@ -374,17 +374,17 @@ reads (`Determiner.self`; owner ruling 2026-10-24), which this pin used to count
 theorem nekrataalNoCreatureWord : countReach (.word creature) .one nekrataalRider = 0 := by
   decide
 theorem nekrataalOneDestroyed :
-    (participialCandidates (.deed (.action "destroy")) (some .one) none false nekrataalRider).length = 1 := by
+    (participialCandidates (.deed (.action "destroy")) (some .one) none Bool.false nekrataalRider).length = 1 := by
   decide
 
 def sequencedRiderBody : Action :=
-  sequentially [exile (target isArtifact), destroy (target isCreature)]
+  sequentially [Semantics.Definitions.Action.exile (target isArtifact), destroy (target isCreature)]
 theorem okSequencedRiderBody : Action.check (DRS.ofList []) sequencedRiderBody = [] := by decide
 def sequencedRider : DRS := (stepAction 512 .postEvent .obj (DRS.ofList []) sequencedRiderBody).1
 theorem sequencedRiderOneDestroyed :
-    (participialCandidates (.deed (.action "destroy")) (some .one) none false sequencedRider).length = 1 := by decide
+    (participialCandidates (.deed (.action "destroy")) (some .one) none Bool.false sequencedRider).length = 1 := by decide
 theorem sequencedRiderOneExiled :
-    (participialCandidates (.deed (.action "exile")) (some .one) none false sequencedRider).length = 1 := by
+    (participialCandidates (.deed (.action "exile")) (some .one) none Bool.false sequencedRider).length = 1 := by
   decide
 
 /-- Engulfing Flames -/
@@ -392,7 +392,7 @@ def engulfingFlamesBody : Action := instruct this_ (dealDamage 1 (target isCreat
 theorem okEngulfingFlamesBody : Action.check (DRS.ofList []) engulfingFlamesBody = [] := by decide
 def engulfingFlamesRider : DRS := (stepAction 512 .postEvent .obj (DRS.ofList []) engulfingFlamesBody).1
 theorem engulfingFlamesNoDestroyStamp :
-    (participialCandidates (.deed (.action "destroy")) (some .one) none false engulfingFlamesRider).length = 0 := by decide
+    (participialCandidates (.deed (.action "destroy")) (some .one) none Bool.false engulfingFlamesRider).length = 0 := by decide
 theorem engulfingFlamesBareReadStands : countReach .bare .one engulfingFlamesRider = 1 := by decide
 
 def bioplasmExiledPronoun : NounPhrase := (match (Semantics.Cards.«Bioplasm») with
@@ -404,28 +404,28 @@ def bioplasmExiledPronoun : NounPhrase := (match (Semantics.Cards.«Bioplasm») 
 theorem okBioplasmExiledPronoun :
     NounPhrase.checkAt (some .object) bioplasmAfterExile bioplasmExiledPronoun = [] := by decide
 theorem bioplasmNoTypedRead :
-    (participialCandidates (.deed (.action "exile")) (some .one) creature false bioplasmAfterExile).length
+    (participialCandidates (.deed (.action "exile")) (some .one) creature Bool.false bioplasmAfterExile).length
       = 0 := by
   decide
 theorem bioplasmExiledCardHasNoType :
-    (participialCandidates (.deed (.action "exile")) (some .one) none false bioplasmAfterExile).map (·.ty)
+    (participialCandidates (.deed (.action "exile")) (some .one) none Bool.false bioplasmAfterExile).map (·.ty)
       = [[]] := by decide
 theorem bioplasmTypeTestPreservesExiledIdentity :
-    let before := participialCandidates (.deed (.action "exile")) (some .one) none false bioplasmAfterExile
-    let after := participialCandidates (.deed (.action "exile")) (some .one) none false bioplasmAfterTest
+    let before := participialCandidates (.deed (.action "exile")) (some .one) none Bool.false bioplasmAfterExile
+    let after := participialCandidates (.deed (.action "exile")) (some .one) none Bool.false bioplasmAfterTest
     before.length = 1 ∧ after.map (·.id) = before.map (·.id) := by decide
 theorem bioplasmTestRemarksType :
-    (participialCandidates (.deed (.action "exile")) (some .one) none false bioplasmAfterTest).map (·.ty)
+    (participialCandidates (.deed (.action "exile")) (some .one) none Bool.false bioplasmAfterTest).map (·.ty)
       = [[.creature]] := by decide
 /-- The narrowed bare read finds the exiled card, whose card carrier remains available. -/
 theorem bioplasmTestKeepsCardSlot : countReach (.atSlot .card) .one bioplasmAfterTest = 1 := by
   decide
 theorem bioplasmTypedReadStillRefused :
-    (participialCandidates (.deed (.action "exile")) (some .one) creature false bioplasmAfterTest).length
+    (participialCandidates (.deed (.action "exile")) (some .one) creature Bool.false bioplasmAfterTest).length
       = 0 := by
   decide
 theorem bioplasmTypedCardReadWrites :
-    (participialCandidates (.deed (.action "exile")) (some .one) (some (.ofType .card .creature)) false
+    (participialCandidates (.deed (.action "exile")) (some .one) (some (.ofType .card .creature)) Bool.false
       bioplasmAfterTest).length = 1 := by
   decide
 
@@ -448,9 +448,9 @@ theorem okScapeshiftSearch : Action.check scapeshiftSacrificed scapeshiftSearch 
 def scapeshiftAfterSearch : DRS := (stepAction 512 .postEvent .obj scapeshiftSacrificed scapeshiftSearch).1
 theorem scapeshiftTwoGroups : countReach .bare .many scapeshiftAfterSearch = 2 := by decide
 theorem scapeshiftOneSearchedGroup :
-    (participialCandidates (.deed search.deed) (some .many) none false scapeshiftAfterSearch).length = 1 := by decide
+    (participialCandidates (.deed search.deed) (some .many) none Bool.false scapeshiftAfterSearch).length = 1 := by decide
 theorem scapeshiftOneSacrificedGroup :
-    (participialCandidates (.deed sacrifice.deed) (some .many) none false scapeshiftAfterSearch).length = 1 := by decide
+    (participialCandidates (.deed sacrifice.deed) (some .many) none Bool.false scapeshiftAfterSearch).length = 1 := by decide
 
 /-- Bind to Life, Vastlands Scavenger's adventure -/
 def bindToLife : Action :=
@@ -461,17 +461,17 @@ theorem okBindToLife : Action.check (DRS.ofList []) bindToLife = [] := by decide
 /-- Glamdring, Foe-hammer's Gleam of Death -/
 def gleamOfDeath : Action :=
   sequentially
-    [mill 6, putInto (allFromAmong isInstantOrSorcery them) hand]
+    [mill 6, putInto (allFromAmong isInstantOrSorcery them) Semantics.Templates.Location.hand]
 theorem okGleamOfDeath : Action.check (DRS.ofList []) gleamOfDeath = [] := by decide
 
 /-- Tezzeret, Master of the Bridge -/
 def tezzeretAllArtifacts : Action :=
   sequentially
-    [ exile (topSlice 10),
+    [ Semantics.Definitions.Action.exile (topSlice 10),
       putOntoBattlefield (allFromAmong isArtifact them) ]
 theorem okTezzeretAllArtifacts : Action.check (DRS.ofList []) tezzeretAllArtifacts = [] := by decide
 
-def companyContext : DRS := (stepAction 512 .postEvent .obj (DRS.ofList []) (lookAt (topSlice 6))).1
+def companyContext : DRS := (stepAction 512 .postEvent .obj (DRS.ofList []) (Semantics.Templates.Action.lookAt (topSlice 6))).1
 def companyDescribedSlice : NounPhrase :=
   (match (Semantics.Cards.«Collected Company») with
     | Card.singleFaced face => match face.characteristics.text with
@@ -489,7 +489,7 @@ theorem okCompanyBareSlice : NounPhrase.checkAt (some .object) companyContext co
 /-- Lord of the Void -/
 def exileTopThenPutFromAmong : Action :=
   sequentially
-    [ exile (slice .top 7 (libraryOf (target isOpponent))),
+    [ Semantics.Definitions.Action.exile (slice .top 7 (libraryOf (target isOpponent))),
       putOntoBattlefieldUnderYourControl (fromAmong (exactly 1) isCreature them) ]
 theorem okExileTopThenPutFromAmong : Action.check (DRS.ofList []) exileTopThenPutFromAmong = [] := by decide
 
@@ -505,12 +505,12 @@ theorem okGreatestCardsAnOpponentDrew : Amount.check (DRS.ofList []) greatestCar
   decide
 def greatestCardsAPlayerDiscardedThisWay : Amount :=
   aggregateOver .max isPlayer
-    (eventTally (Semantics.Subject.actor (they)) (discard (allOf (cardIn hand))) thisWay .events)
+    (eventTally (Semantics.Subject.actor (they)) (discard (allOf (cardIn Semantics.Templates.Location.hand))) thisWay .events)
 /-- Windfall: "Each player discards their hand, then draws cards equal to the greatest number of
 cards a player discarded this way." -/
 def windfallDiscardAndDraw : Action :=
   instruct eachPlayer
-    (sequentially [discard (allOf (cardIn hand)), draw greatestCardsAPlayerDiscardedThisWay])
+    (sequentially [discard (allOf (cardIn Semantics.Templates.Location.hand)), draw greatestCardsAPlayerDiscardedThisWay])
 theorem okGreatestCardsAPlayerDiscardedThisWay :
     Action.check (DRS.ofList []) windfallDiscardAndDraw = [] := by decide
 /-- Alone, "this way" reads no discard [CR#608.2c]. -/
@@ -521,12 +521,12 @@ theorem badGreatestCardsAPlayerDiscardedThisWayAlone :
 def eachPlayerBase : NounPhrase := eachPlayer
 theorem okEachPlayerBase : NounPhrase.checkAt (some .player) (DRS.ofList []) eachPlayerBase = [] := by decide
 theorem eachPlayerBindsOneDistributedMember :
-    let result := stepNounPhrase 512 (DRS.ofList []) .obj true eachPlayerBase
+    let result := stepNounPhrase 512 (DRS.ofList []) .obj Bool.true eachPlayerBase
     result.2.1 = [0] ∧
       (result.1.findById? 0).map (fun ref => (ref.det, ref.plur, ref.kind)) =
         some (.each, .one, .player) := by decide
 theorem eachPlayerDoesNotIntroduceASeparateGroup :
-    countManys .player ((stepNounPhrase 512 (DRS.ofList []) .obj true eachPlayerBase).1) = 0 := by decide
+    countManys .player ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true eachPlayerBase).1) = 0 := by decide
 
 /-- Soul Ransom -/
 def soulRansomRansom : Action :=
@@ -548,34 +548,34 @@ def targetCreaturesController : NounPhrase := controllerOf (target isCreature)
 theorem okTargetCreaturesController :
     NounPhrase.checkAt (some .player) (DRS.ofList []) targetCreaturesController = [] := by decide
 theorem possessiveDeicticIsReadableByIt :
-    countReach (.atSlot .permanent) .one ((stepNounPhrase 512 (DRS.ofList []) .obj true thisAurasController).1) = 1 := by decide
+    countReach (.atSlot .permanent) .one ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true thisAurasController).1) = 1 := by decide
 /-- "this Aura's controller": the possessor is the Source, a self-referent no demonstrative
 reads ("that enchantment" finds nothing; `Determiner.self`, owner ruling 2026-10-24), while a
 later "this Aura" re-mentions it, on the battlefield as an enchantment (`mentionThis`). -/
 theorem possessiveDeicticSourceIsNoDemonstrativeAntecedent :
-    let result := stepNounPhrase 512 (DRS.ofList []) .obj true thisAurasController
-    let again := stepNounPhrase 512 result.1 .obj true thisAura
+    let result := stepNounPhrase 512 (DRS.ofList []) .obj Bool.true thisAurasController
+    let again := stepNounPhrase 512 result.1 .obj Bool.true thisAura
     result.2.1 = [1] ∧ resolveCandidates (.word enchantment) .one result.1 = [] ∧
       again.2.1 = [0] ∧
       (again.2.1.filterMap again.1.findById?).all
         (fun ref => ref.zone == some .battlefield && ref.ty == [.enchantment]) := by decide
 
 theorem possessiveDescribedBaseUnchanged :
-    countReach (.atSlot .permanent) .one ((stepNounPhrase 512 (DRS.ofList []) .obj true targetCreaturesController).1) = 1 := by decide
+    countReach (.atSlot .permanent) .one ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true targetCreaturesController).1) = 1 := by decide
 
 /-- Open the Vaults -/
 def openTheVaults : Action :=
   returnToBattlefield
     (allOf (and [ isCard, or [isArtifact, isEnchantment],
-                   in_ (graveyardOf (bare isPlayer)) ]))
-    [under (ownerOf them)] (from_ := graveyardOf (bare isPlayer))
+                   in_ (graveyardOf (Semantics.Templates.NounPhrase.bare isPlayer)) ]))
+    [under (ownerOf them)] (from_ := graveyardOf (Semantics.Templates.NounPhrase.bare isPlayer))
 theorem okOpenTheVaults : Action.check (DRS.ofList []) openTheVaults = [] := by decide
 
 /-- Codecracker Hound -/
 def codecrackerHoundLook : Action :=
   sequentially
-    [ lookAt (topSlice 2), putInto (someOf (exactly 1) them) hand,
-      putInto theOther graveyard ]
+    [ Semantics.Templates.Action.lookAt (topSlice 2), putInto (someOf (exactly 1) them) Semantics.Templates.Location.hand,
+      putInto theOther Semantics.Templates.Location.graveyard ]
 theorem okCodecrackerHoundLook : Action.check (DRS.ofList []) codecrackerHoundLook = [] := by decide
 
 def oneOfTheTopTwo : NounPhrase := someOf (exactly 1) (topSlice 2)
@@ -588,15 +588,15 @@ def theArtifactsAmongTheTopFive : NounPhrase :=
   allFromAmong isArtifact (topSlice 5)
 theorem okTheArtifactsAmongTheTopFive :
     NounPhrase.checkAt (some .object) (DRS.ofList []) theArtifactsAmongTheTopFive = [] := by decide
-theorem theOtherAfterATwoCardLook : theOtherOk .object ((stepNounPhrase 512 (DRS.ofList []) .obj true oneOfTheTopTwo).1) = true := by
+theorem theOtherAfterATwoCardLook : theOtherOk .object ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true oneOfTheTopTwo).1) = Bool.true := by
   decide
 theorem theOtherNeedsAStatedCount :
-    theOtherOk .object ((stepNounPhrase 512 (DRS.ofList []) .obj true oneOfAnUncountedTop).1) = false := by decide
+    theOtherOk .object ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true oneOfAnUncountedTop).1) = Bool.false := by decide
 theorem theRestStandsWhereTheOtherRefuses :
-    theRestOk .object ((stepNounPhrase 512 (DRS.ofList []) .obj true oneOfAnUncountedTop).1) = true := by decide
+    theRestOk .object ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true oneOfAnUncountedTop).1) = Bool.true := by decide
 theorem theOtherRefusesTheUniversalSlice :
-    (theOtherOk .object ((stepNounPhrase 512 (DRS.ofList []) .obj true theArtifactsAmongTheTopFive).1),
-     theRestOk .object ((stepNounPhrase 512 (DRS.ofList []) .obj true theArtifactsAmongTheTopFive).1)) = (false, true) := by
+    (theOtherOk .object ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true theArtifactsAmongTheTopFive).1),
+     theRestOk .object ((stepNounPhrase 512 (DRS.ofList []) .obj Bool.true theArtifactsAmongTheTopFive).1)) = (Bool.false, Bool.true) := by
   decide
 
 def eachPlayerShufflesTheirHandAndGraveyard : Action :=
@@ -611,7 +611,7 @@ def grismold : Action :=
   instruct eachPlayer (create 1 (Semantics.TokenSpec.written ((creatureToken 1 1 [.green] [plant]))))
 theorem okGrismold : Action.check (DRS.ofList []) grismold = [] := by decide
 /-- Grenzo, Dungeon Warden -/
-def grenzoBottomCard : Action := putInto bottomCard graveyard
+def grenzoBottomCard : Action := putInto bottomCard Semantics.Templates.Location.graveyard
 theorem okGrenzoBottomCard : Action.check (DRS.ofList []) grenzoBottomCard = [] := by decide
 
 theorem nekrataalTwoObjects : countOnes .object nekrataalRider = 2 := by decide
@@ -666,7 +666,7 @@ def zoyowasJusticeBody : Action :=
 
 /-- Gyome, Master Chef: "{1}, Sacrifice a Food: Target creature gains indestructible until
 end of turn. Tap it." -/
-def gyomeProtectionCost : Cost := compound [mana [generic 1], perform (sacrifice (a (Semantics.Predicate.hasSubtype (food))))]
+def gyomeProtectionCost : Cost := compound [Semantics.Templates.Cost.mana [generic 1], perform (sacrifice (a (Semantics.Predicate.hasSubtype (food))))]
 def gyomeProtectionBody : Action :=
   sequentially [gain (target isCreature) indestructible untilEndOfTurn, .setStatus .tapped it]
 def gyomeProtection : Ability := activated gyomeProtectionCost gyomeProtectionBody
@@ -682,7 +682,7 @@ theorem gyomeTapsItsTarget :
 /-- Prosperity Tycoon: "{2}, Sacrifice a token: This creature gains indestructible until end
 of turn. Tap it." -/
 def prosperityTycoonProtectionCost : Cost :=
-  compound [mana [generic 2], perform (sacrifice (a isToken))]
+  compound [Semantics.Templates.Cost.mana [generic 2], perform (sacrifice (a isToken))]
 def prosperityTycoonProtectionBody : Action :=
   sequentially [gain thisCreature indestructible untilEndOfTurn, .setStatus .tapped it]
 def prosperityTycoonProtection : Ability :=

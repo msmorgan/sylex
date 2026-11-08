@@ -51,16 +51,16 @@ theorem okThroughTheBreach : Action.check (DRS.ofList []) throughTheBreach = [] 
 
 def turnToMist : Action :=
   sequentially
-    [ exile (target isCreature),
+    [ Semantics.Definitions.Action.exile (target isCreature),
       atNext .endStep (returnToBattlefield (that card) [(under (ownerOf it))]) ]
 theorem okTurnToMist : Action.check (DRS.ofList []) turnToMist = [] := by decide
 
 def voyagerStaff : Ability :=
   activated (compound [(Semantics.Cost.mana [generic 2]), (Semantics.Cost.perform (sacrifice thisArtifact))])
     (sequentially
-      [ exile (target isCreature),
+      [ Semantics.Definitions.Action.exile (target isCreature),
         atNext .endStep
-          (returnToBattlefield (the (and [was (exile which), isCard])) [(under (ownerOf it))]) ])
+          (returnToBattlefield (the (and [was (Semantics.Definitions.Action.exile which), isCard])) [(under (ownerOf it))]) ])
 theorem okVoyagerStaff : Ability.check (DRS.ofList []) voyagerStaff = [] := by decide
 
 def staffOfNin : Ability :=
@@ -89,7 +89,7 @@ def brazenCannonade : Ability :=
   raid
     (at_ (beginningOfYour .postcombatMain)
       (if_ := some (did (Semantics.Subject.actor you) attack (Semantics.LookbackSpan.duration (soFarThisTurn) none)))
-      (exile (topSlice 1)))
+      (Semantics.Definitions.Action.exile (topSlice 1)))
 theorem okBrazenCannonade : Ability.check (DRS.ofList []) brazenCannonade = [] := by decide
 
 def fourKnocks : Ability :=
@@ -126,7 +126,7 @@ def saheelisCopy : Action :=
           [isAlso (some [.artifact])])
         [],
       gainHaste thatToken,
-      atNext .endStep (exile it) ]
+      atNext .endStep (Semantics.Definitions.Action.exile it) ]
 theorem okSaheelisCopy : Action.check (DRS.ofList []) saheelisCopy = [] := by decide
 
 def finalFortuneExtraTurn : Action := (match (Semantics.Cards.«Final Fortune») with
@@ -156,7 +156,7 @@ theorem okNinthDoctorAdditionalUpkeep :
 
 def chainVeilEndStep : Ability :=
   at_ (beginningOfYour .endStep)
-    (if_ := some (not (did (Semantics.Subject.actor (you)) (activate (a
+    (if_ := some (not (did (Semantics.Subject.actor (you)) (Semantics.Definitions.Action.activate (a
       (and [abilityHead .loyalty,
       abilityOf (a isPlaneswalker)]))) (.duration soFarThisTurn none))))
     (loseLife 2)
@@ -165,7 +165,7 @@ theorem okChainVeilEndStep : Ability.check (DRS.ofList []) chainVeilEndStep = []
 def selfSacrificeThenExile : Ability :=
   activated (Semantics.Cost.perform (sacrifice thisArtifact))
     (sequentially
-      [ exile (target isCreature),
+      [ Semantics.Definitions.Action.exile (target isCreature),
         atNext .endStep (putOntoBattlefield (that card)) ])
 theorem okSelfSacrificeThenExile : Ability.check (DRS.ofList []) selfSacrificeThenExile = [] := by decide
 

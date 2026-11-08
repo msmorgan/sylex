@@ -35,7 +35,7 @@ namespace Semantics.Proofs.Retention
 
 /-- "Enchanted creature has protection from black." -/
 private def protectionFromBlack : StaticSpec :=
-  abilityGrant (enchanted creature) (protection (hasColor .black))
+  abilityGrant (Semantics.Templates.NounPhrase.enchanted creature) (protection (hasColor .black))
 
 /-- The first `retention` a single-faced card's text writes. -/
 private def retentionOf? (card : Card) : Option StaticSpec :=
@@ -51,7 +51,7 @@ Auras attached to the host read back by "it" (*Benevolent Blessing* [CR#702.16p]
 theorem retentionAdmitsItsShapes :
     StaticSpec.check emptyContext (retention protectionFromBlack thisAura) = [] ∧
     StaticSpec.check emptyContext
-      (retention (abilityGrant (equipped creature) (protection (hasColor .black))) thisEquipment)
+      (retention (abilityGrant (Semantics.Templates.NounPhrase.equipped creature) (protection (hasColor .black))) thisEquipment)
       = [] ∧
     StaticSpec.check emptyContext (retention protectionFromBlack (allOf (Semantics.Predicate.hasSubtype (aura)))) = [] ∧
     StaticSpec.check emptyContext
@@ -63,9 +63,9 @@ no Attachment of the clause's host is refused (`retentionSubject`): "this creatu
 "Auras attached to target creature" (a fresh host, not the clause's), and "this Equipment" for
 an enchanted creature. -/
 theorem retentionLawRefusals :
-    StaticSpec.check emptyContext (retention (getsPt (enchanted creature) (up 1) (up 1)) thisAura)
+    StaticSpec.check emptyContext (retention (getsPt (Semantics.Templates.NounPhrase.enchanted creature) (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1)) thisAura)
       = [.retentionClause] ∧
-    StaticSpec.check emptyContext (retention (abilityGrant (enchanted creature) flying) thisAura)
+    StaticSpec.check emptyContext (retention (abilityGrant (Semantics.Templates.NounPhrase.enchanted creature) flying) thisAura)
       = [.retentionClause] ∧
     StaticSpec.check emptyContext (retention protectionFromBlack thisCreature)
       = [.retentionSubject] ∧
@@ -85,7 +85,7 @@ theorem exemptionDoesNotCoverOtherProtection :
     retentionOf? (Semantics.Cards.«Black Ward») = some (retention protectionFromBlack thisAura) ∧
     StaticSpec.check emptyContext
       (conjunction [retention protectionFromBlack thisAura, protectionFromBlack]) = [] ∧
-    protectionFromBlack.removesAttachments = true :=
+    protectionFromBlack.removesAttachments = Bool.true :=
   ⟨rfl, by decide, by decide⟩
 
 /-- "Already attached to" is a point in time [CR#702.16p] (owner rulings 2026-10-22, 3c): the
@@ -100,21 +100,21 @@ theorem alreadyAttachedIsReadWhenTheEffectStarts :
      | some (.retention spec (.described _ p)) =>
        spec.removesAttachments &&
          (match spec.attachmentHost?, p.attachmentHosts with
-          | some (.attachHost .enchanted _), [.pro .bare .one] => true
-          | _, _ => false)
-     | _ => false) = true ∧
+          | some (.attachHost .enchanted _), [.pro .bare .one] => Bool.true
+          | _, _ => Bool.false)
+     | _ => Bool.false) = Bool.true ∧
     (match retentionOf? (Semantics.Cards.«Black Ward») with
-     | some (.retention _ (.headed (.subtype _) .this)) => true
-     | _ => false) = true := by decide
+     | some (.retention _ (.headed (.subtype _) .this)) => Bool.true
+     | _ => Bool.false) = Bool.true := by decide
 
 /-- The exemption's referent reads the effect's own host, not an earlier mention: after
 "artifacts your opponents control" (referent 0), *Guardian Beast*'s "those artifacts" reads the
 artifacts the effect governs, its clauses' shared subject. -/
 theorem exemptionReadsTheEffectsOwnHost :
-    let before := (stepNounPhrase 64 emptyContext .other false
+    let before := (stepNounPhrase 64 emptyContext .other Bool.false
       (allOf (and [isArtifact, opponentsControl]))).1
-    let governed := (stepNounPhrase 64 before .subj true
-      (bare (and [non isCreature, isArtifact, youControl]))).2.1
+    let governed := (stepNounPhrase 64 before .subj Bool.true
+      (Semantics.Templates.NounPhrase.bare (and [non isCreature, isArtifact, youControl]))).2.1
     let out := (stepStaticSpec 64 before guardianBeastProtection).1
     (resolveCandidates (.word (.type .artifact)) .many out).map (·.id) = governed ∧
       governed ≠ [0] := by
@@ -164,13 +164,13 @@ wraps the grant as a whole, the one protection ability whose quality is "each co
 reaches each of the five abilities that grant is ("this effect" [CR#702.16h,702.16n]). -/
 theorem spectraWardExemptsAurasFromEachColor :
     memberRetentionOf? (Semantics.Cards.«Spectra Ward») =
-      some (retention (abilityGrant (enchanted creature) (protection (eachKind .color)))
+      some (retention (abilityGrant (Semantics.Templates.NounPhrase.enchanted creature) (protection (eachKind .color)))
         (allOf (Semantics.Predicate.hasSubtype (aura)))) ∧
     (exemptClause? (memberRetentionOf? (Semantics.Cards.«Spectra Ward»))).map
         (fun spec => (grantedAbilities spec).flatMap (·.keywordInstances?.getD [])) =
       some protectionFromEachOfFiveColors ∧
-    ((exemptClause? (memberRetentionOf? (Semantics.Cards.«Spectra Ward»))).map (·.removesAttachments)).getD false
-      = true :=
+    ((exemptClause? (memberRetentionOf? (Semantics.Cards.«Spectra Ward»))).map (·.removesAttachments)).getD Bool.false
+      = Bool.true :=
   ⟨rfl, rfl, by decide⟩
 
 /-- *Pledge of Loyalty*: "Enchanted creature has protection from each color among permanents you
@@ -182,7 +182,7 @@ grant. -/
 theorem pledgeOfLoyaltyReadsItsColorsContinuously :
     memberRetentionOf? (Semantics.Cards.«Pledge of Loyalty») =
       some (retention
-        (abilityGrant (enchanted creature)
+        (abilityGrant (Semantics.Templates.NounPhrase.enchanted creature)
           (protection (eachKind .color (some (allOf (and [isPermanent, youControl]))))))
         thisAura) ∧
     (match exemptClause? (memberRetentionOf? (Semantics.Cards.«Pledge of Loyalty»)) with
@@ -193,10 +193,10 @@ theorem pledgeOfLoyaltyReadsItsColorsContinuously :
              match ability with
              | .keyword _ [.quality q] _ =>
                match q.eachKindOf? with
-               | some (.color, some (.described .all _)) => true
-               | _ => false
-             | _ => false)
-     | none => false) = true :=
+               | some (.color, some (.described .all _)) => Bool.true
+               | _ => Bool.false
+             | _ => Bool.false)
+     | none => Bool.false) = Bool.true :=
   ⟨rfl, by decide⟩
 
 /-- "Each <value>" stands only as the whole quality of a keyword (`eachKindPlacement`): not

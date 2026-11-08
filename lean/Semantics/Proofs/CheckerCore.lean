@@ -91,7 +91,7 @@ fixture: its header names no keyword action. -/
 theorem post_move_later_mention_refused :
     (Action.ownScope (some (.action "exileThenTap")) <|
       .sequentially
-        [ exile (.firstMention "subject" (.inCaller targetCreature)),
+        [ Semantics.Definitions.Action.exile (.firstMention "subject" (.inCaller targetCreature)),
           tap (.laterMention "subject" (.inCaller targetCreature)) ]).check (DRS.ofList []) =
       [.bindingIdentity "subject"] := by decide
 
@@ -140,7 +140,7 @@ def kalitasReplacement : Ability :=
     (replace
       (would (.actor (a (and [non isToken, isCreature, anOpponentControls]))) die)
       (instead (sequentially
-        [ exile (that creature),
+        [ Semantics.Definitions.Action.exile (that creature),
           create 1 (Semantics.TokenSpec.written (creatureToken 2 2 [.black] [zombie])) ])))
 
 theorem kalitas_replacement_sound :

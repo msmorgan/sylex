@@ -13,6 +13,7 @@ sentences are the Idris ones.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each counted the)
 open Semantics.Templates.Predicate (and andOr did was)
@@ -34,7 +35,7 @@ namespace Semantics.Proofs.Anaphora
 /-- An unknown zone supplies no contradiction to any slot carrier; runtime applicability
 remains the engine's (`semantics.md` §2.4 `J1` item 4). -/
 theorem unknownZoneRemainsAccessible (carrier : SlotCarrier) :
-    slotZoneOk carrier none = true := by
+    slotZoneOk carrier none = Bool.true := by
   cases carrier <;> rfl
 
 /-- Bioplasm's "if it's a creature card" narrows the bare pronoun to the exiled card (`3`),
@@ -118,13 +119,13 @@ theorem badBothArmsAntecedent :
 
 /-- "Put target creature onto the battlefield." -/
 theorem okMoveToBattlefield :
-    Action.check (DRS.ofList []) (.move (target isCreature) .anyLocation (some battlefield) .arrival []) = [] := by decide
+    Action.check (DRS.ofList []) (.move (target isCreature) .anyLocation (some Semantics.Templates.Location.battlefield) .arrival []) = [] := by decide
 
 /-- "Look at the top four cards of your library. You choose one of them." -/
 theorem okAgentChoiceOfSome :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ lookAt (topSlice 4),
+        [ Semantics.Templates.Action.lookAt (topSlice 4),
           .choose none (someOf (exactly 1) them) .openly none ]) = [] := by
   decide
 
@@ -133,7 +134,7 @@ in context, so the bare imperative is the same term as "You choose one of them."
 theorem okChooseSomeOf :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ lookAt (topSlice 4),
+        [ Semantics.Templates.Action.lookAt (topSlice 4),
           .choose none (someOf (exactly 1) them) .openly none ]) = [] := by
   decide
 
@@ -146,7 +147,7 @@ theorem okLookbackObjectDied :
     Ability.check (DRS.ofList [])
       (when (does (Semantics.Subject.actor (thisCreature)) enter)
         (if_ := some (.did { subj := .any
-                             action := (.move (a isCreature) (battlefield) (some graveyard) .departure [])
+                             action := (.move (a isCreature) (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .departure [])
                              within := some (.duration soFarThisTurn none) })) (draw 1))
             = [] := by
   decide
@@ -156,7 +157,7 @@ theorem badLookbackPlayerDied :
     Ability.check (DRS.ofList [])
       (when (does (Semantics.Subject.actor (thisCreature)) enter)
         (if_ := some (.did { subj := .any
-                             action := (.move .you (battlefield) (some graveyard) .departure [])
+                             action := (.move .you (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .departure [])
                              within := some (.duration soFarThisTurn none) })) (draw
           1))
       = [.kindLte .player (.join .object .pile)] := by
@@ -176,7 +177,7 @@ theorem badLookbackObjectCast :
 theorem okHappenedToObjectEntry :
     NounPhrase.checkAt (some .object) (DRS.ofList [])
       (target (.and [isCreature, (.did { subj := .any
-                                         action := (.move .which .anyLocation (some battlefield) .arrival [])
+                                         action := (.move .which .anyLocation (some Semantics.Templates.Location.battlefield) .arrival [])
                                          within := some (.duration soFarThisTurn none) })])) = [] :=
         by
   decide
@@ -194,7 +195,7 @@ theorem badHappenedToObjectCast :
 theorem badHappenedToPlayerDied :
     NounPhrase.checkAt (some .player) (DRS.ofList [])
       (each (.and [(.isOpponentOf .you), (.did { subj := .any
-                                                 action := (.move .which (battlefield) (some graveyard) .departure [])
+                                                 action := (.move .which (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .departure [])
                                                  within := some (.duration soFarThisTurn none) })])) = [.kindLte .player (.join .object .pile)] := by
   decide
 
@@ -237,7 +238,7 @@ reach it [CR#701.6a]. -/
 theorem badStackAnaphorAfterCounteringAbility :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ counter (target (.abilityHead .anyActivated)), counter (that .stackObject) ])
+        [ Semantics.Definitions.Action.counter (target (.abilityHead .anyActivated)), Semantics.Definitions.Action.counter (that .stackObject) ])
       = [.anaphor (.word .stackObject) .one 0] := by
   decide
 
@@ -296,19 +297,19 @@ theorem badPlayerCastComplement :
 /-- "target spell cast from your graveyard": the spell's own casting [CR#400.7]. -/
 theorem okCastFromGraveyard :
     Predicate.checkAt .object (DRS.ofList [])
-      (did any (cast which (from_ := graveyardOf you)) thisObject) = [] := by decide
+      (did any (cast which (from_ := graveyardOf you)) Semantics.Templates.LookbackSpan.thisObject) = [] := by decide
 
 /-- "spells cast by a creature": a player casts a spell [CR#601.2]. -/
 theorem badCastByNonPlayer :
-    Predicate.checkAt .object (DRS.ofList []) (did ((Semantics.Subject.actor (a isCreature))) (cast which) thisObject) =
+    Predicate.checkAt .object (DRS.ofList []) (did ((Semantics.Subject.actor (a isCreature))) (cast which) Semantics.Templates.LookbackSpan.thisObject) =
       [.kindMismatch .player .object] := by decide
 
 /-- "spells they cast", with nothing for the pronoun to read, and "spells it cast", whose "it"
 can read only the spell itself, which casts nothing: a player casts a spell [CR#601.2]. -/
 theorem badCastByUnresolvedPronoun :
-    Predicate.checkAt .object (DRS.ofList []) (did (Semantics.Subject.actor (they)) (cast which) thisObject) =
+    Predicate.checkAt .object (DRS.ofList []) (did (Semantics.Subject.actor (they)) (cast which) Semantics.Templates.LookbackSpan.thisObject) =
         [.anaphor (.word .player) .one 0] ∧
-      Predicate.checkAt .object (DRS.ofList []) (did (Semantics.Subject.actor (it)) (cast which) thisObject) =
+      Predicate.checkAt .object (DRS.ofList []) (did (Semantics.Subject.actor (it)) (cast which) Semantics.Templates.LookbackSpan.thisObject) =
         [.kindMismatch .player .object] := by
   decide
 
@@ -316,32 +317,32 @@ theorem badCastByUnresolvedPronoun :
 span an event ordinal counts within [CR#400.7], though it is the span the lookback reads. -/
 theorem ownCastingRankIsAnEventOrdinal :
     Predicate.checkAt .object (DRS.ofList [])
-        (did (Semantics.Subject.actor (you)) (cast which) thisObject (ordinal := some ⟨.nth 2, some .turn⟩)) = [] ∧
+        (did (Semantics.Subject.actor (you)) (cast which) Semantics.Templates.LookbackSpan.thisObject (ordinal := some ⟨.nth 2, some .turn⟩)) = [] ∧
       Predicate.checkAt .object (DRS.ofList [])
-        (did (Semantics.Subject.actor (you)) (cast which) thisObject (ordinal := some ⟨.nth 2, some .thisObject⟩)) =
+        (did (Semantics.Subject.actor (you)) (cast which) Semantics.Templates.LookbackSpan.thisObject (ordinal := some ⟨.nth 2, some .thisObject⟩)) =
         [.eventOrdinalPeriod .thisObject] := by decide
 
 /-- "spells cast from their graveyard", with nothing for "their" to read, is refused as "in
 their graveyard" is. -/
 theorem badCastFromUnresolvedZone :
     Predicate.checkAt .object (DRS.ofList [])
-        (did any (cast which (from_ := graveyardOf they)) thisObject) =
+        (did any (cast which (from_ := graveyardOf they)) Semantics.Templates.LookbackSpan.thisObject) =
         [.anaphor (.word .player) .one 0] ∧
       Predicate.checkAt .object (DRS.ofList []) (.in_ (graveyardOf they)) =
         [.anaphor (.word .player) .one 0] := by decide
 
 /-- "abilities activated by a creature": a player activates an ability [CR#602.2]. -/
 theorem badActivatedByNonPlayer :
-    Predicate.checkAt .object (DRS.ofList []) (did ((Semantics.Subject.actor (a isCreature))) (activate which) thisObject) =
+    Predicate.checkAt .object (DRS.ofList []) (did ((Semantics.Subject.actor (a isCreature))) (Semantics.Definitions.Action.activate which) Semantics.Templates.LookbackSpan.thisObject) =
         [.kindMismatch .player .object] ∧
-      Predicate.checkAt .object (DRS.ofList []) (did (Semantics.Subject.actor (you)) (activate which) thisObject) = [] := by
+      Predicate.checkAt .object (DRS.ofList []) (did (Semantics.Subject.actor (you)) (Semantics.Definitions.Action.activate which) Semantics.Templates.LookbackSpan.thisObject) = [] := by
   decide
 
 /-- "… that was put somewhere from the battlefield this turn." -/
 theorem okPlacementOriginBattlefield :
     Predicate.checkAt .object (DRS.ofList [])
       (.did { subj := .any
-              action := (.move .which (battlefield) none .departure [])
+              action := (.move .which (Semantics.Templates.Location.battlefield) none .departure [])
               within := some (.duration soFarThisTurn none) })
       = [] := by
   decide
@@ -350,7 +351,7 @@ theorem okPlacementOriginBattlefield :
 theorem okCastOriginFromHand :
     Condition.check (DRS.ofList [])
       (.did { subj := (.actor .you)
-              action := (.procedure .cast .any .itsOwnCost none (some (hand)) none)
+              action := (.procedure .cast .any .itsOwnCost none (some (Semantics.Templates.Location.hand)) none)
               within := some (.duration soFarThisTurn none) })
         = [] := by
   decide
@@ -359,14 +360,14 @@ theorem okCastOriginFromHand :
 theorem okOriginPayloadInvolving :
     Condition.check (DRS.ofList [])
       (.did { subj := (.actor .you)
-              action := (.procedure .cast (a (.and [isCreature, isSpell])) .itsOwnCost none (some (hand)) none)
+              action := (.procedure .cast (a (.and [isCreature, isSpell])) .itsOwnCost none (some (Semantics.Templates.Location.hand)) none)
               within := some (.duration soFarThisTurn none) }) = [] := by
   decide
 
 /-- "… that died this turn." -/
 theorem okDeathLookbackWithoutOrigin :
     Predicate.checkAt .object (DRS.ofList []) (.did { subj := .any
-                                                      action := (.move .which (battlefield) (some graveyard) .departure [])
+                                                      action := (.move .which (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .departure [])
                                                       within := some (.duration soFarThisTurn none) }) = [] := by decide
 
 /-- "… that was put into a graveyard from the battlefield this turn" is a leaves-the-battlefield
@@ -375,11 +376,11 @@ refused, never read as the card in the graveyard. -/
 theorem badPlacementIntoGraveyardObservedOnArrival :
     Predicate.checkAt .object (DRS.ofList [])
       (.did { subj := .any
-              action := (.move .which (battlefield) (some graveyard) .departure [])
+              action := (.move .which (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .departure [])
               within := some (.duration soFarThisTurn none) }) = [] ∧
     Predicate.checkAt .object (DRS.ofList [])
       (.did { subj := .any
-              action := (.move .which (battlefield) (some graveyard) .arrival [])
+              action := (.move .which (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .arrival [])
               within := some (.duration soFarThisTurn none) }) = [.arrivalFromBattlefield] := by
   decide
 
@@ -388,13 +389,13 @@ theorem badPlacementIntoGraveyardObservedOnArrival :
 /-- info: [Semantics.Refusal.arrivalFromBattlefield] -/
 #guard_msgs in
 #eval Action.check (DRS.ofList [])
-  (.move (target isCreature) (.coord .or [battlefield, yourHand]) (some graveyard) .arrival [])
+  (.move (target isCreature) (.coord .or [Semantics.Templates.Location.battlefield, yourHand]) (some Semantics.Templates.Location.graveyard) .arrival [])
 
 /-- "… that was put into the battlefield this turn." -/
 theorem okPlacementIntoBattlefield :
     Predicate.checkAt .object (DRS.ofList [])
       (.did { subj := .any
-              action := (.move .which .anyLocation (some battlefield) .arrival [])
+              action := (.move .which .anyLocation (some Semantics.Templates.Location.battlefield) .arrival [])
               within := some (.duration soFarThisTurn none) })
       = [] := by
   decide
@@ -440,7 +441,7 @@ theorem okResolvedCreatureSpell :
 /-- "if it entered this turn" -/
 theorem okEntryLookbackWithoutOrigin :
     Predicate.checkAt .object (DRS.ofList []) (.did { subj := .any
-                                                      action := (.move .which .anyLocation (some battlefield) .arrival [])
+                                                      action := (.move .which .anyLocation (some Semantics.Templates.Location.battlefield) .arrival [])
                                                       within := some (.duration soFarThisTurn none) }) = [] :=
       by decide
 
@@ -586,7 +587,7 @@ theorem coordinationPublishesItsGroup :
     let after := nextClause (actionResult (DRS.ofList [])
       (tap (and [target isCreature, target isArtifact])))
     (resolveCandidates .bare .many after).map (fun ref => (ref.plur, ref.groupKey == some ref.id)) =
-        [(.many, true)] ∧
+        [(.many, Bool.true)] ∧
       countReach (.word (.type .creature)) .one after = 1 ∧
       countReach (.word (.type .artifact)) .one after = 1 := by decide
 
@@ -614,10 +615,10 @@ the battlefield.": the participial reads the coordination's group. -/
 theorem okExiledCardsAfterSingularAndPluralConjuncts :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ exile (and [target isCreature,
+        [ Semantics.Definitions.Action.exile (and [target isCreature,
             allOf (and [isCreature, shares .cardName .share (that creature),
               otherThan (that creature)])]),
-          returnToBattlefield (thePlural (and [isCard, was (exile which) thisWay])) [] ]) = [] := by
+          returnToBattlefield (thePlural (and [isCard, was (Semantics.Definitions.Action.exile which) thisWay])) [] ]) = [] := by
   decide
 
 /-- "Sacrifice this creature and any number of lands. Search your library for up to that many
@@ -634,23 +635,23 @@ coordination of parts is a part of the revealed cards, not a second group beside
 theorem okTheRestAfterCoordinatedParts :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ reveal (topSlice 4),
+        [ Semantics.Definitions.Action.reveal (topSlice 4),
           putInto (andOr [fromAmong (exactly 1) isCreature them,
-            fromAmong (exactly 1) isLand them]) hand,
-          putInto theRest graveyard ]) = [] := by decide
+            fromAmong (exactly 1) isLand them]) Semantics.Templates.Location.hand,
+          putInto theRest Semantics.Templates.Location.graveyard ]) = [] := by decide
 
 /-- "Look at the top three cards of your library. Put one of them and one of them into your hand
 and the other into your graveyard." -/
 theorem okTheOtherAfterCoordinatedParts :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ lookAt (topSlice 3),
-          putInto (and [someOf (exactly 1) them, someOf (exactly 1) them]) hand,
-          putInto theOther graveyard ]) = [] := by decide
+        [ Semantics.Templates.Action.lookAt (topSlice 3),
+          putInto (and [someOf (exactly 1) them, someOf (exactly 1) them]) Semantics.Templates.Location.hand,
+          putInto theOther Semantics.Templates.Location.graveyard ]) = [] := by decide
 
 /-- "you and this creature" publishes both participants and the group they make up. -/
 theorem youAndPublishesBothParticipants :
-    (nounResult (DRS.ofList []) (youAnd thisCreature) .obj true).referents.map (fun ref => (ref.kind, ref.plur)) =
+    (nounResult (DRS.ofList []) (youAnd thisCreature) .obj Bool.true).referents.map (fun ref => (ref.kind, ref.plur)) =
       [(.join .player .object, .many), (.object, .one), (.player, .one)] := by decide
 
 /-- "If a player is dealt damage this way, you draw a card." -/
@@ -673,20 +674,20 @@ theorem badDealtThisWayNoDamage :
 /-- "the number of creatures that died this turn" -/
 theorem okDeathTally :
     Amount.check (DRS.ofList []) (.tally { subj := .any
-                                           action := .move (a isCreature) (battlefield) (some graveyard) .departure []
+                                           action := .move (a isCreature) (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .departure []
                                            within := some (.duration soFarThisTurn none) } .events) = [] := by decide
 
 /-- "the amount of creatures that died this turn" -/
 theorem badDeathSum :
     Amount.check (DRS.ofList []) (.tally { subj := .any
-                                           action := .move (a isCreature) (battlefield) (some graveyard) .departure []
+                                           action := .move (a isCreature) (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .departure []
                                            within := some (.duration soFarThisTurn none) } .quantity) = [.tallyOk] := by
   decide
 
 /-- "creature that died this turn" -/
 theorem okObjectDeathLookbackSubject :
     Predicate.checkAt .object (DRS.ofList []) (.did { subj := .any
-                                                      action := (.move .which (battlefield) (some graveyard) .departure [])
+                                                      action := (.move .which (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .departure [])
                                                       within := some (.duration soFarThisTurn none) }) = [] := by decide
 
 /-- "creature that won a coin flip this turn" -/
@@ -816,17 +817,17 @@ kind `.pile`. -/
 theorem theOtherReadsThePileKind :
     let before := actionResult (DRS.ofList [])
       (sequentially
-        [ reveal (topSlice 5),
+        [ Semantics.Definitions.Action.reveal (topSlice 5),
           instruct anOpponent (separateIntoPiles them 2),
-          putInto onePile hand ])
-    let (after, ids, errors) := stepNounPhrase 64 (nextClause before) .obj true theOther
+          putInto onePile Semantics.Templates.Location.hand ])
+    let (after, ids, errors) := stepNounPhrase 64 (nextClause before) .obj Bool.true theOther
     errors = [] ∧ (ids.head?.bind after.findById?).map (·.kind) = some .pile := by decide
 
 /-- In Impulse, after "Put one of them into your hand", `restKind? .many` reads `.object` from the
 partitive. -/
 theorem theRestReadsThePartKind :
     let after := actionResult (DRS.ofList [])
-      (sequentially [lookAt (topSlice 4), putInto (someOf (exactly 1) them) hand])
+      (sequentially [Semantics.Templates.Action.lookAt (topSlice 4), putInto (someOf (exactly 1) them) Semantics.Templates.Location.hand])
     DRS.restKind? .many (nextClause after) = some .object := by decide
 
 /-- In Grim Contest, inside `eachOf (those creature)`, `restKind? .one` reads `.object` from the
@@ -835,17 +836,17 @@ theorem theOtherReadsTheDistributiveGroup :
     let chosen := actionResult (DRS.ofList [])
       (choose (both (target (and [isCreature, youControl]))
                     (target (and [isCreature, anOpponentControls]))))
-    let (inside, _, _) := stepNounPhrase 64 (nextClause chosen) .subj true (eachOf (those creature))
+    let (inside, _, _) := stepNounPhrase 64 (nextClause chosen) .subj Bool.true (eachOf (those creature))
     DRS.restKind? .one inside = some .object := by decide
 
-def afterALook : DRS := actionResult (DRS.ofList []) (lookAt (topSlice 1))
+def afterALook : DRS := actionResult (DRS.ofList []) (Semantics.Templates.Action.lookAt (topSlice 1))
 
 /-- "Look at the top card of your library. Put that card into your graveyard." -/
 theorem okReadsLookedAtCard : NounPhrase.checkAt (some .object) afterALook (that .card) = [] := by
   decide
 
 def afterShuffledLook : DRS :=
-  actionResult (DRS.ofList []) (.sequentially [lookAt (topSlice 1), shuffle])
+  actionResult (DRS.ofList []) (.sequentially [Semantics.Templates.Action.lookAt (topSlice 1), shuffle])
 
 theorem badReadsShuffledLibraryCard :
     NounPhrase.checkAt (some .object) afterShuffledLook (that .card)
@@ -864,12 +865,12 @@ theorem scryPatternAllowsUnspecifiedActor :
 theorem okIntransitiveBecomes :
     GameEvent.check (DRS.ofList [])
       (.does .any (.ownScope (some (.action "transform"))
-        (.turnOver (a isCreature) (some (.hasSubtype (phyrexian)))))) = [] := by
+        (.turnOver (a isCreature) (some (.hasSubtype (Semantics.Definitions.Subtype.phyrexian)))))) = [] := by
   decide
 
 /-- "Whenever you discard a card, …" -/
 theorem okDiscardFromHand :
-    GameEvent.check (DRS.ofList []) (.does (.actor .you) (.ownScope (some (.action "discard")) (discard (a (.and [.isCard, .in_ hand])))))
+    GameEvent.check (DRS.ofList []) (.does (.actor .you) (.ownScope (some (.action "discard")) (discard (a (.and [.isCard, .in_ Semantics.Templates.Location.hand])))))
       = [] := by
   decide
 
@@ -945,10 +946,10 @@ theorem oneNonTokenIsNoSpec :
   decide
 
 /-- "where X is ..." -/
-theorem badDefineWithoutUse : anyOpenLetter .x (DRS.ofList []) = false := by decide
+theorem badDefineWithoutUse : anyOpenLetter .x (DRS.ofList []) = Bool.false := by decide
 
 theorem costXStaysOpen :
-    anyOpenLetter .x (stepCost 64 (DRS.ofList []) (.loyaltySymbol (.down (.letter .x)))).1 = true := by decide
+    anyOpenLetter .x (stepCost 64 (DRS.ofList []) (.loyaltySymbol (.down (.letter .x)))).1 = Bool.true := by decide
 
 theorem thisNeedsNoAntecedent : NounPhrase.checkAt (some .object) (DRS.ofList []) .this = [] := by decide
 
@@ -960,7 +961,7 @@ theorem letterValIntroducesAtEmptyPrefix : Amount.check (DRS.ofList []) (.letter
 theorem ownSurvivesSecondSingular :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ exile (target isArtifact),
+        [ Semantics.Definitions.Action.exile (target isArtifact),
           dealDamageOwnPower (target isCreature)
             (target isAnyTarget) ]) = [] := by
   decide
@@ -968,14 +969,14 @@ theorem ownSurvivesSecondSingular :
 /-- "Exile target creature. Draw cards equal to its power." -/
 theorem okItReadsTheOnlyBareSingular :
     Action.check (DRS.ofList [])
-      (.sequentially [exile (target isCreature), draw (.statOf (.stat .power) it)]) = []
+      (.sequentially [Semantics.Definitions.Action.exile (target isCreature), draw (.statOf (.stat .power) it)]) = []
           := by
   decide
 
 theorem possessiveItReadsCurrentSubject :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ exile (target isArtifact),
+        [ Semantics.Definitions.Action.exile (target isArtifact),
           instruct (target isCreature) (.dealDamage (.statOf (.stat .power) it) (target isAnyTarget)) ])
       = [] := by
   decide
@@ -984,7 +985,7 @@ theorem possessiveItReadsCurrentSubject :
 theorem badSingularReadOfBarePlural :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ get (bare (and [isCreature, youControl])) (.up 1) (.up 1) (some untilEndOfTurn),
+        [ get (Semantics.Templates.NounPhrase.bare (and [isCreature, youControl])) (.up 1) (.up 1) (some untilEndOfTurn),
           draw (.statOf (.stat .power) it) ]) = [.anaphor .bare .one 0] := by
   decide
 
@@ -1033,15 +1034,15 @@ theorem badOwnTwoInDelta :
     (Action.check (DRS.ofList [])
       (dealDamageOwnPower (both (target isCreature) (target isCreature)) (target isAnyTarget))).any
         (fun refusal => match refusal with
-          | .anaphor .bare .one 2 => true
-          | _ => false) = true := by
+          | .anaphor .bare .one 2 => Bool.true
+          | _ => Bool.false) = Bool.true := by
   decide
 
 theorem distributedDeedReadsBackPlural :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ .sequentially [instruct (each (.isOpponentOf .you)) (choose (a (.and [.isCard, .in_ hand]))), discard them],
-          exile (thePlural (and [was (discard which), isCard])) ]) = [] := by
+        [ .sequentially [instruct (each (.isOpponentOf .you)) (choose (a (.and [.isCard, .in_ Semantics.Templates.Location.hand]))), discard them],
+          Semantics.Definitions.Action.exile (thePlural (and [was (discard which), isCard])) ]) = [] := by
   decide
 
 /-- "Discard a card. Exile the discarded card." -/
@@ -1049,7 +1050,7 @@ theorem okTheDiscardedCardAfterSingularDiscard :
     Action.check (DRS.ofList [])
       (.sequentially
         [ discard (a (.and [.isCard, .in_ yourHand])),
-          exile (the (and [was (discard which), isCard])) ])
+          Semantics.Definitions.Action.exile (the (and [was (discard which), isCard])) ])
       = [] := by
   decide
 
@@ -1058,8 +1059,8 @@ which a singular "the" reads only when a linked ability discarded them [CR#607.3
 theorem badDistributedDiscardSingular :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ .sequentially [instruct (each (.isOpponentOf .you)) (choose (a (.and [.isCard, .in_ hand]))), discard them],
-          exile (the (and [was (discard which), isCard])) ])
+        [ .sequentially [instruct (each (.isOpponentOf .you)) (choose (a (.and [.isCard, .in_ Semantics.Templates.Location.hand]))), discard them],
+          Semantics.Definitions.Action.exile (the (and [was (discard which), isCard])) ])
       = [.participialDescription (.deed (.action "discard")) 0] := by
   decide
 
@@ -1131,23 +1132,23 @@ theorem chosenPlayerDemonstrativeHasNewMentionIdentity :
 
 theorem possessiveItHasCurrentSubjectIdentity :
     let after := actionResult (DRS.ofList [])
-      (.sequentially [exile (target isArtifact),
+      (.sequentially [Semantics.Definitions.Action.exile (target isArtifact),
         instruct (.firstMention "p05.subject" (target isCreature))
           (.dealDamage (.statOf (.stat .power) it) (target isAnyTarget))])
     (after.referents.filter (fun ref => ref.idents.contains "p05.subject")).map
-      (·.pronounResolved) = [true] := by decide
+      (·.pronounResolved) = [Bool.true] := by decide
 
 /-- "Its controller" read after a destroy reaches the permanent by last known information: the
 controller is a player, and the permanent stays in the graveyard. -/
 theorem destroyedPermanentControllerReadUsesLastKnownInformation :
     let destroyed := (stepAction 64 .postEvent .obj (DRS.ofList [])
       (destroy (target isArtifact))).1
-    let (after, ids, errors) := stepNounPhrase 64 (nextClause destroyed) .obj true
+    let (after, ids, errors) := stepNounPhrase 64 (nextClause destroyed) .obj Bool.true
       (controllerOf (that .permanent))
     errors = [] ∧ ids.length = 1 ∧
       (ids.filterMap after.findById?).all (fun r => r.kind == .player) ∧
       after.referents.any (fun r => r.id == 1 && r.zone == some .graveyard) ∧
-      after.characteristicRead = false := by decide
+      after.characteristicRead = Bool.false := by decide
 
 /-- Reading the destroyed permanent's controller does not bring it back into view: "untap that
 permanent" afterwards has no antecedent. -/
@@ -1195,7 +1196,7 @@ theorem millingOneCardReadsAsMovingTheTopCard :
       Action.check (DRS.ofList []) (sequentially [mill (.lit 1), returnToHand np])) =
     ([that .card, it, cardMilledThisWay the, them, those .card].map fun np =>
       Action.check (DRS.ofList [])
-        (sequentially [putInto (topSlice (.lit 1)) graveyard, returnToHand np])) := by decide
+        (sequentially [putInto (topSlice (.lit 1)) Semantics.Templates.Location.graveyard, returnToHand np])) := by decide
 
 /-- "Mill a card. Return them to your hand." has no group to read: one card was milled. -/
 theorem pluralReadbackAfterMillingOneCardIsRefused :

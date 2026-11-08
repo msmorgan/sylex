@@ -19,6 +19,7 @@ look-back zone changes, so it is observed on arrival [CR#603.10a].
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.ManaSymbol (generic)
 
@@ -42,18 +43,18 @@ def wouldClauses (a : Ability) : List WouldClause :=
 /-- Is this action, under its own scope, the resolution of a spell or ability? -/
 def isResolution (a : Action) : Bool :=
   match a.scopeBody with
-  | .procedure .resolve .. => true
-  | _ => false
+  | .procedure .resolve .. => Bool.true
+  | _ => Bool.false
 
 /-- An event caused by a resolution [CR#608.2n]. -/
 def eventResolutionCaused : GameEvent → Bool
   | .causes (.event (.does _ a)) _ => isResolution a
-  | _ => false
+  | _ => Bool.false
 
 /-- A would-clause caused by a resolution [CR#608.2n]. -/
 def wouldResolutionCaused : WouldClause → Bool
   | .causedBy (.event (.does _ a)) _ => isResolution a
-  | _ => false
+  | _ => Bool.false
 
 /-- The observation point of a move. -/
 def moveAt? : Action → Option ObservationPoint
@@ -72,7 +73,7 @@ def wouldMoveAt? : WouldClause → Option ObservationPoint
 
 /-- The `counter` Definition's own stack-to-graveyard move, as the event "is countered"
 [CR#701.6a]. -/
-def countered : GameEvent := does .any (counter thisSpell)
+def countered : GameEvent := does .any (Semantics.Definitions.Action.counter thisSpell)
 
 /-! ## Observation points [CR#603.10a] -/
 
@@ -98,22 +99,22 @@ theorem reboundMoveObservesOnArrival :
 countering the spell causes its move to the graveyard by no resolution, so haunt's spell half
 does not trigger on it [CR#702.55a,608.2n,701.6a]. -/
 theorem counteredHauntSpellDoesNotTrigger :
-    (triggerEvents haunt).map eventResolutionCaused = [false, true] ∧
-      eventResolutionCaused countered = false := by
+    (triggerEvents haunt).map eventResolutionCaused = [Bool.false, Bool.true] ∧
+      eventResolutionCaused countered = Bool.false := by
   decide
 
 /-- Buyback replaces only the move its spell's resolution causes, not a countered spell's
 [CR#702.27a,608.2n,701.6a]. -/
 theorem counteredBuybackSpellDoesNotReplace :
-    (wouldClauses (buyback (.mana [generic 3]))).map wouldResolutionCaused = [true] ∧
-      eventResolutionCaused countered = false := by
+    (wouldClauses (buyback (.mana [generic 3]))).map wouldResolutionCaused = [Bool.true] ∧
+      eventResolutionCaused countered = Bool.false := by
   decide
 
 /-- Rebound replaces only the move its spell's resolution causes, not a countered spell's
 [CR#702.88a,608.2n,701.6a]. -/
 theorem counteredReboundSpellDoesNotReplace :
-    (wouldClauses rebound).map wouldResolutionCaused = [true] ∧
-      eventResolutionCaused countered = false := by
+    (wouldClauses rebound).map wouldResolutionCaused = [Bool.true] ∧
+      eventResolutionCaused countered = Bool.false := by
   decide
 
 /-! ## The resolve Procedure [CR#608.1,608.2] -/
@@ -121,16 +122,16 @@ theorem counteredReboundSpellDoesNotReplace :
 /-- `does .any (resolve thisSpell)` checks clean as an event, as a cause, and in a timing; and
 `resolve` is admitted wherever `cast` is, as an action and as an event's action. -/
 theorem resolveProcedureChecks :
-    GameEvent.check (DRS.ofList []) (does .any (resolve thisSpell)) = [] ∧
-      Action.check (DRS.ofList []) (resolve thisSpell) = [] ∧
+    GameEvent.check (DRS.ofList []) (does .any (Semantics.Definitions.Action.resolve thisSpell)) = [] ∧
+      Action.check (DRS.ofList []) (Semantics.Definitions.Action.resolve thisSpell) = [] ∧
       Action.check (DRS.ofList []) (cast thisSpell) = [] ∧
       GameEvent.check (DRS.ofList [])
-        (.causes (.event (does .any (resolve thisSpell)))
-          (does .any (putInto thisSpell graveyard (from_ := stack)))) = [] ∧
+        (.causes (.event (does .any (Semantics.Definitions.Action.resolve thisSpell)))
+          (does .any (putInto thisSpell Semantics.Templates.Location.graveyard (from_ := Semantics.Templates.Location.stack)))) = [] ∧
       WouldClause.check (DRS.ofList [])
-        (.causedBy (.event (does .any (resolve thisSpell)))
-          (.would .any (putInto thisSpell graveyard (from_ := stack)))) = [] ∧
-      Timing.check (DRS.ofList []) (.whileDoing (does .any (resolve thisSpell))) = [] ∧
+        (.causedBy (.event (does .any (Semantics.Definitions.Action.resolve thisSpell)))
+          (.would .any (putInto thisSpell Semantics.Templates.Location.graveyard (from_ := Semantics.Templates.Location.stack)))) = [] ∧
+      Timing.check (DRS.ofList []) (.whileDoing (does .any (Semantics.Definitions.Action.resolve thisSpell))) = [] ∧
       Timing.check (DRS.ofList []) (.whileDoing (does .any (cast thisSpell))) = [] := by
   decide
 

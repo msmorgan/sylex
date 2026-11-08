@@ -42,7 +42,7 @@ namespace Semantics.Cards
 /-- Glyph of Destruction -/
 def glyphOfDestruction : Action :=
   get (target (and [isBlocking, (Semantics.Predicate.hasSubtype (wall)), youControl]))
-    (up 10) (up 0) untilEndOfCombat
+    (Semantics.Templates.Delta.Amount.up 10) (Semantics.Templates.Delta.Amount.up 0) untilEndOfCombat
 theorem okGlyphOfDestruction : Action.check (DRS.ofList []) glyphOfDestruction = [] := by decide
 
 def rawNonattacking : Predicate := and [isCreature, non isAttacking, non isBlocking]
@@ -79,7 +79,7 @@ theorem okTerashisVerdict : Action.check (DRS.ofList []) terashisVerdict = [] :=
 
 /-- Pillar of Light -/
 def pillarOfLight : Action :=
-  exile (target (and [isCreature, hasToughness .atLeast 4]))
+  Semantics.Definitions.Action.exile (target (and [isCreature, hasToughness .atLeast 4]))
 theorem okPillarOfLight : Action.check (DRS.ofList []) pillarOfLight = [] := by decide
 
 /-- Unholy Annex -/
@@ -93,7 +93,7 @@ theorem okUnholyAnnex : Action.check (DRS.ofList []) unholyAnnex = [] := by deci
 
 /-- War Screecher -/
 def warScreecher : Action :=
-  get (allOf (and [isCreature, youControl, isOther])) (up 1) (up 1)
+  get (allOf (and [isCreature, youControl, isOther])) (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1)
     untilEndOfTurn
 theorem okWarScreecher : Action.check (DRS.ofList []) warScreecher = [] := by decide
 
@@ -167,7 +167,7 @@ def croakingCounterpartCopy : Action :=
     (copyOf (target (and [isCreature, non (Semantics.Predicate.hasSubtype (frog))]))
       (copyCharacteristics {
                  colors := [.green], subtypes := [frog], power := stat 1,
-                 toughness := stat 1 } false))
+                 toughness := stat 1 } Bool.false))
     []
 theorem okCroakingCounterpartCopy : Action.check (DRS.ofList []) croakingCounterpartCopy = [] := by decide
 
@@ -199,7 +199,7 @@ def sparkFiendUpkeepRoll : Action :=
 theorem okSparkFiendUpkeepRoll : Action.check (DRS.ofList []) sparkFiendUpkeepRoll = [] := by decide
 
 /-- Erebos, God of the Dead -/
-def devotionCondition : Condition := compareAmt (devotion you (color .black)) .less 5
+def devotionCondition : Condition := compareAmt (devotion you (Semantics.Templates.ColorTerm.color .black)) .less 5
 theorem okDevotionCondition : Condition.check (DRS.ofList []) devotionCondition = [] := by decide
 
 /-- Multiple Choice -/
@@ -234,7 +234,7 @@ def requitingHexAdditionalRead : Ability :=
 theorem okRequitingHexAdditionalRead : Ability.check (DRS.ofList []) requitingHexAdditionalRead = [] := by
   decide
 
-def bioplasmExiledCard : NounPhrase := the (and [was (exile which), isCard])
+def bioplasmExiledCard : NounPhrase := the (and [was (Semantics.Definitions.Action.exile which), isCard])
 theorem okBioplasmExiledCard :
     NounPhrase.checkAt (some .object) bioplasmAfterExile bioplasmExiledCard = [] := by decide
 
@@ -245,7 +245,7 @@ theorem okPlayersTopCardSlice : NounPhrase.checkAt (some .object) (DRS.ofList []
 
 /-- Deepglow Skate's recipient -/
 def deepglowSkateRecipient : NounPhrase := targets anyNumber isPermanent
-theorem deepglowSkateRecipientRefused : deepglowSkateRecipient.perMemberOk = false := by decide
+theorem deepglowSkateRecipientRefused : deepglowSkateRecipient.perMemberOk = Bool.false := by decide
 
 /-- Weftwalking -/
 def weftwalkingShuffle : Action :=
@@ -265,7 +265,7 @@ theorem okNongreenSpellsOrAbilities :
 /-- Hot Pursuit -/
 def twoOrMorePlayersHaveLost : Condition :=
   compareAmt (countOf (and
-    [isPlayer, did (Semantics.Subject.actor (which)) loseGame (Semantics.LookbackSpan.duration (thisGame) none)])) .atLeast 2
+    [isPlayer, did (Semantics.Subject.actor (which)) Semantics.Templates.Action.loseGame (Semantics.LookbackSpan.duration (thisGame) none)])) .atLeast 2
 theorem okTwoOrMorePlayersHaveLost : Condition.check (DRS.ofList []) twoOrMorePlayersHaveLost = [] := by decide
 
 def commanderCreaturesYouOwn : Predicate :=
@@ -331,7 +331,7 @@ def yourOpponentsHaveMoreLifeThanYou : Condition :=
 theorem okYourOpponentsHaveMoreLifeThanYou :
     Condition.check (DRS.ofList []) yourOpponentsHaveMoreLifeThanYou = [] := by decide
 
-def rawExile : Action := exile (target isCreature)
+def rawExile : Action := Semantics.Definitions.Action.exile (target isCreature)
 theorem okRawExile : Action.check (DRS.ofList []) rawExile = [] := by decide
 def disenchant : Action := destroy (target (or [isArtifact, isEnchantment]))
 theorem okDisenchant : Action.check (DRS.ofList []) disenchant = [] := by decide
@@ -378,7 +378,7 @@ theorem okArchpriestOfIonaPower : Ability.check (DRS.ofList []) archpriestOfIona
 def archpriestOfIonaFullParty : Ability :=
   at_ (beginningOfYour .combat) (if_ := fullParty)
     (establishFor (target isCreature)
-      [getsPt it (up 1) (up 1), abilityGrant it flying]
+      [getsPt it (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1), abilityGrant it flying]
       untilEndOfTurn)
 theorem okArchpriestOfIonaFullParty : Ability.check (DRS.ofList []) archpriestOfIonaFullParty = [] := by decide
 

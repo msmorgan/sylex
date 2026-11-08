@@ -20,6 +20,7 @@ correction is about, and why the Oracle text and the rules want it.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each)
 open Semantics.Templates.Predicate (and or not was)
@@ -64,7 +65,7 @@ one-shot cast during resolution [CR#608.2g]. -/
 theorem copiedCardIsCastDuringResolution :
     Cards.flawlessForgeryLine =
       sequentially
-        [ exile (target (and [isInstantOrSorcery, in_ (graveyardOf anOpponent)])),
+        [ Semantics.Definitions.Action.exile (target (and [isInstantOrSorcery, in_ (graveyardOf anOpponent)])),
           copy .fromCardZone (that card) 1 [],
           may (cast (that .copy) (payment := withoutPaying)) ] := rfl
 
@@ -83,17 +84,17 @@ theorem madnessCastsDuringTheTriggersResolution :
 its performer's own hand [CR#701.9a], so the instruction is handed to the player who discards,
 not performed by the ability's controller. -/
 theorem discardIsHandedToTheDiscardingPlayer :
-    Cards.hypnoticSpecterDiscard = instruct they (discard (aAtRandom (cardIn hand))) ∧
+    Cards.hypnoticSpecterDiscard = instruct they (discard (aAtRandom (cardIn Semantics.Templates.Location.hand))) ∧
       Cards.syphonMind =
         sequentially
-          [ instruct (each isOtherPlayer) (discard (a (cardIn hand))),
+          [ instruct (each isOtherPlayer) (discard (a (cardIn Semantics.Templates.Location.hand))),
             doForEach (each (and [isCard, was (discard which) thisWay])) (draw 1) ] ∧
       Cards.braidsFrightfulReturn =
-        may (sacrifice (a isCreature)) (some (instruct eachOpponent (discard (a (cardIn hand))))) ∧
+        may (sacrifice (a isCreature)) (some (instruct eachOpponent (discard (a (cardIn Semantics.Templates.Location.hand))))) ∧
       (match Cards.immersturmSkullcairn with
         | .activated _ (.sequentially [_, discarding]) _ _ _ _ => some discarding
-        | _ => none) = some (instruct (that .player) (discard (a (cardIn hand)))) ∧
-      Cards.cryOfContrition = instruct (target isPlayer) (discard (a (cardIn hand))) :=
+        | _ => none) = some (instruct (that .player) (discard (a (cardIn Semantics.Templates.Location.hand)))) ∧
+      Cards.cryOfContrition = instruct (target isPlayer) (discard (a (cardIn Semantics.Templates.Location.hand))) :=
   ⟨rfl, rfl, rfl, rfl, rfl⟩
 
 /-- "Counter target spell unless its controller pays {3}": the spell's controller is offered the
@@ -102,7 +103,7 @@ handed back to `you`. -/
 theorem unlessPaysCountersByTheCounterspellsController :
     (faceText (Semantics.Cards.«Mana Leak»)).filterMap spellEffect =
       [ instruct (controllerOf (target isSpell))
-          (doUnless (instruct you (counter it)) (Semantics.Cost.mana ([generic 3]))) ] := rfl
+          (doUnless (instruct you (Semantics.Definitions.Action.counter it)) (Semantics.Cost.mana ([generic 3]))) ] := rfl
 
 /-- Killing Wave's "sacrifices it unless they pay X life" and Heat Wave's "unless their controller
 pays 1 life for each blocking creature they control" pay life as a cost (`payLife`, [CR#119.4]),
@@ -132,7 +133,7 @@ theorem cycloneDealsDamageIfYouPay :
     (match Cards.cycloneUpkeepPayment with
       | .triggered _ _ _ _ _ _ _ (.sequentially [_, payment]) => some payment
       | _ => none) =
-      some (may (pay (scaled (Semantics.Cost.mana ([pip .green])) (times 1 (countersOn windCounter thisEnchantment))) .once)
+      some (may (pay (scaled (Semantics.Cost.mana ([pip .green])) (Semantics.Templates.Amount.times 1 (countersOn windCounter thisEnchantment))) .once)
         (some (instruct thisEnchantment
           (dealDamage (countersOn windCounter thisEnchantment) (each (or [isCreature, isPlayer])))))
         (some (sacrifice thisEnchantment))) := rfl
@@ -191,8 +192,8 @@ theorem graveyardOriginsAreWrittenOnTheMove :
       written (moves 64 Cards.stormOfSouls) = [(yourGraveyard, []), (.anyLocation, [])] ∧
       (written (moves 64 Cards.bondOfRevival)).head? = some (yourGraveyard, []) ∧
       (written (moves 64 Cards.everAfter)).head? = some (yourGraveyard, []) ∧
-      (written (moves 64 Cards.riseFromTheGrave)).head? = some (graveyard, [(.under .you)]) ∧
-      written (moves 64 Cards.hymnOfRebirth) = [(graveyard, [(.under .you)])] ∧
+      (written (moves 64 Cards.riseFromTheGrave)).head? = some (Semantics.Templates.Location.graveyard, [(.under .you)]) ∧
+      written (moves 64 Cards.hymnOfRebirth) = [(Semantics.Templates.Location.graveyard, [(.under .you)])] ∧
       (written (moves 64 Cards.theLastRoninII)).getLast? = some (yourGraveyard, []) ∧
       Action.check (DRS.ofList []) Cards.bondOfRevival = [] ∧
       Action.check (DRS.ofList []) Cards.hymnOfRebirth = [] := by
@@ -225,7 +226,7 @@ private def triggerEvents (card : Card) : List GameEvent :=
 /-- Darksteel Garrison: "Whenever fortified land becomes tapped" fires on the change from untapped
 to tapped [CR#603.2e], for mana or not (ruling 2007-05-01). -/
 theorem darksteelGarrisonWatchesBecomingTapped :
-    triggerEvents (Semantics.Cards.«Darksteel Garrison») = [does (Semantics.Subject.actor ((fortified land))) (becomeStatus tapped)] := rfl
+    triggerEvents (Semantics.Cards.«Darksteel Garrison») = [does (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.fortified land))) (becomeStatus tapped)] := rfl
 
 /-- Lightmine Field deals damage "equal to the number of attacking creatures", not the number of
 the triggering group. -/
@@ -257,14 +258,14 @@ reflexive trigger is only "when [a player] does" or "when … this way" [CR#603.
 theorem archfiendsVesselIfYouDoIsNoReflexiveTrigger :
     ((faceText (Semantics.Cards.«Archfiend's Vessel»)).filterMap fun
       | .triggered _ _ _ _ _ _ _ (.withContinuation .required body (some _) none) => some body
-      | _ => none) = [exile it] := rfl
+      | _ => none) = [Semantics.Definitions.Action.exile it] := rfl
 
 /-- Memoricide: "Search … for any number of cards with that name and exile them. Then that player
 shuffles." The exile is not dropped. -/
 theorem memoricideExilesWhatItFinds :
     (match Cards.memoricideSearch with
       | .sequentially [_, _, exiling, _] => some exiling
-      | _ => none) = some (exile them) := rfl
+      | _ => none) = some (Semantics.Definitions.Action.exile them) := rfl
 
 /-- Quakebringer's "This ability triggers only if …" is a trigger restriction, the `qualified`
 guard, as Solved's [CR#702.169c]; the triggered ability itself has no intervening "if", which
@@ -275,7 +276,7 @@ theorem quakebringerRestrictsTriggeringOnly :
       | .qualified (.triggered _ _ _ _ _ _ intervening _) _ _ guard _ =>
         some (intervening.isNone, guard)
       | _ => none) =
-      some (true, some (or [ is this_ (in_ battlefield),
+      some (Bool.true, some (or [ is this_ (in_ Semantics.Templates.Location.battlefield),
         and [is this_ (cardIn yourGraveyard), exists_ (and [isCreature, (Semantics.Predicate.hasSubtype (giant)), youControl])] ])) :=
   rfl
 
@@ -296,14 +297,14 @@ theorem orTiedForTheMostIsMembership :
       | .triggered _ _ _ _ _ _ intervening _ => intervening
       | _ => none) =
         some (exists_ (and [isArtifact, youControl,
-          superlative .max (.stat .manaValue) (and [isArtifact, in_ battlefield])])) ∧
+          superlative .max (.stat .manaValue) (and [isArtifact, in_ Semantics.Templates.Location.battlefield])])) ∧
       (match dethrone with
         | .keyword _ _ [.triggered event ..] => some event
         | _ => none) =
         some (does (Semantics.Subject.actor (thisCreature)) (.attack (some
           (a (and [.isPlayer, .superlative .max (.playerStat .lifeTotal) .isPlayer]))))) ∧
       triggerEvents (Semantics.Cards.«Seraphic Greatsword») =
-        [ does (Semantics.Subject.actor ((equipped creature))) (attack (some
+        [ does (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.equipped creature))) (attack (some
             (a (and [isPlayer, superlative .max (.playerStat .lifeTotal) isPlayer])))) ] ∧
       triggerEvents (Semantics.Cards.«Undercover Butler») =
         [ does (Semantics.Subject.actor (thisCreature)) (attack (some
@@ -355,7 +356,7 @@ theorem qarsiDeceiverSpendsOnManifestAndMorph :
       | _ => []) =
       [ spendOnly
           [ toCast (and [isCreature, isFaceDown]),
-            toTurnFaceUp (and [isCreature, was (manifest which) thisObject]),
+            toTurnFaceUp (and [isCreature, was (manifest which) Semantics.Templates.LookbackSpan.thisObject]),
             toPay (.ofKeyword morph.label) ] ] := rfl
 
 end Semantics.Proofs.CardFidelity

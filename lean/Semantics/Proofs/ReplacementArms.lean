@@ -89,7 +89,7 @@ enters with N +1/+1 counters on it for each creature sacrificed this way" [CR#70
 sacrifice is a `before`, and the counters ride the entering, `alongside` it. -/
 theorem devourSacrificeIsBefore :
     beforeActions (devour 2) =
-        [some (may (Action.devour (counted anyNumber (and [isCreature, .in_ battlefield]))))] ∧
+        [some (may (Action.devour (counted anyNumber (and [isCreature, .in_ Semantics.Templates.Location.battlefield]))))] ∧
       abilityArms (devour 2) = [[.before, .alongside]] := ⟨rfl, rfl⟩
 
 /-- Amplify: "As this object enters, reveal any number of cards from your hand that share a

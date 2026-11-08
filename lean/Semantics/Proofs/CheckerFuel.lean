@@ -24,7 +24,7 @@ private def empty : DRS := DRS.ofList []
 by the checker, before an exhausted reader can supply its default to an accepted term. -/
 theorem nounKindBudget :
     (wrap NounPhrase.inCaller 63 .you).kind? = some .player ∧
-      (stepNounPhrase 64 empty .other false (wrap NounPhrase.inCaller 64 .you)).2.2 =
+      (stepNounPhrase 64 empty .other Bool.false (wrap NounPhrase.inCaller 64 .you)).2.2 =
         [.recursionLimit] := by decide
 
 theorem predicateKindBudget :
@@ -34,7 +34,7 @@ theorem predicateKindBudget :
 
 theorem nounPluralityBudget :
     (wrap NounPhrase.inCaller 63 (.described .all .isPlayer)).plur = .many ∧
-      (stepNounPhrase 64 empty .other false
+      (stepNounPhrase 64 empty .other Bool.false
         (wrap NounPhrase.inCaller 64 (.described .all .isPlayer))).2.2 =
           [.recursionLimit] := by decide
 
@@ -50,16 +50,16 @@ theorem quantityPluralityBudget :
 
 theorem eventFactsBudget :
     (wrap GameEvent.inCaller 63 (.does (.actor .you) (.draw (.exactlyOf 1)))).facts.hasMagnitude
-      = true ∧
+      = Bool.true ∧
       (stepGameEvent 64 empty
         (wrap GameEvent.inCaller 64 (.does (.actor .you) (.draw (.exactlyOf 1))))).2.contains
-          .recursionLimit = true := by decide
+          .recursionLimit = Bool.true := by decide
 
 theorem actionMagnitudeBudget :
-    (wrap (Action.ownScope none) 63 (.draw (.exactlyOf 1))).eventHasMagnitude = true ∧
+    (wrap (Action.ownScope none) 63 (.draw (.exactlyOf 1))).eventHasMagnitude = Bool.true ∧
       (stepAction 64 .postEvent .obj empty
         (wrap (Action.ownScope none) 64 (.draw (.exactlyOf 1)))).2.contains
-          .recursionLimit = true := by decide
+          .recursionLimit = Bool.true := by decide
 
 /-- A quantity, timing or location deeper than the former helper limit of eight is accepted.
 The same helpers refuse at the checker's remaining depth, including a smaller supplied budget. -/
@@ -85,31 +85,31 @@ private def countedRider : MoveRider := .withCounters 1 (.printed p1p1Counter) .
 theorem riderNumberSlotsBudget :
     (wrap MoveRider.inCaller 63 countedRider).numberSlots = [(1, .clamped)] ∧
       (stepMoveRiderWith (stepOps 64) empty
-        (wrap MoveRider.inCaller 64 countedRider)).2.contains .recursionLimit = true := ⟨rfl, by decide⟩
+        (wrap MoveRider.inCaller 64 countedRider)).2.contains .recursionLimit = Bool.true := ⟨rfl, by decide⟩
 
 theorem replacementNumberSlotsBudget :
     (wrap Replacement.inCaller 63 (.withRiders [countedRider])).numberSlots =
       [(1, .clamped)] ∧
       (stepReplacementWith (stepOps 64) empty
-        (wrap Replacement.inCaller 64 (.withRiders [countedRider])) true).2.contains
-          .recursionLimit = true := ⟨rfl, by decide⟩
+        (wrap Replacement.inCaller 64 (.withRiders [countedRider])) Bool.true).2.contains
+          .recursionLimit = Bool.true := ⟨rfl, by decide⟩
 
 theorem costNumberSlotsBudget :
     (wrap Cost.inCaller 63 (.scaled .tapSymbol 1)).numberSlots = [(1, .clamped)] ∧
       (stepCost 64 empty (wrap Cost.inCaller 64 (.scaled .tapSymbol 1))).2.contains
-        .recursionLimit = true := ⟨rfl, by decide⟩
+        .recursionLimit = Bool.true := ⟨rfl, by decide⟩
 
 theorem staticNumberSlotsBudget :
     (wrap StaticSpec.inCaller 63 (.letterDefinition .x 1)).numberSlots = [(1, .signed)] ∧
       (stepStaticSpec 64 empty
         (wrap StaticSpec.inCaller 64 (.letterDefinition .x 1))).2.contains
-          .recursionLimit = true := ⟨rfl, by decide⟩
+          .recursionLimit = Bool.true := ⟨rfl, by decide⟩
 
 theorem actionNumberSlotsBudget :
     (wrap Action.inCaller 63 (.draw (.exactlyOf 1))).numberSlots = [(1, .clamped)] ∧
       (stepAction 64 .postEvent .obj empty
         (wrap Action.inCaller 64 (.draw (.exactlyOf 1)))).2.contains
-          .recursionLimit = true := ⟨rfl, by decide⟩
+          .recursionLimit = Bool.true := ⟨rfl, by decide⟩
 
 -- Game events have no own number slots; their actions declare theirs. Still pin the event
 -- reader's traversal boundary and the refusal before a deeper event can be accepted.
@@ -131,7 +131,7 @@ private def costFixtures : List Cost := [
 ]
 
 private def costContexts : List DRS :=
-  let base := empty.push (kindBinding .player) .subj true
+  let base := empty.push (kindBinding .player) .subj Bool.true
   let inner := enterOwnScope base
   let rementioned := { inner with pendingRoles := [(0, .obj)] }
   [base, inner, enterOwnScope rementioned]
@@ -142,11 +142,11 @@ alternatives and compound costs. -/
 theorem costsKeepScopeStackBalanced :
     [0, 1, 4, 64].all (fun fuel ↦ costContexts.all (fun drs ↦
       (costFixtures ++ [Cost.anyCost, Cost.compound [], Cost.or []]).all (fun cost ↦
-        (stepCost fuel drs cost).1.scopeStack.length == drs.scopeStack.length))) = true := by decide
+        (stepCost fuel drs cost).1.scopeStack.length == drs.scopeStack.length))) = Bool.true := by decide
 
 theorem balancedCostsStillCheck :
     costContexts.all (fun drs ↦ costFixtures.all (fun cost ↦
-      (stepCost 64 drs cost).2.isEmpty)) = true := by decide
+      (stepCost 64 drs cost).2.isEmpty)) = Bool.true := by decide
 
 /-- Each cost-bearing payment restores every frame's caller mentions in order. It retains the
 paid context's other frame fields, including the arguments the payment unmasked. -/
@@ -160,7 +160,7 @@ theorem paymentsRestoreCallerPendingFrameForFrame :
           result.1.scopeStack.map (·.callerPending) == drs.scopeStack.map (·.callerPending) &&
           result.1.scopeStack.map (·.callerReferentIds) ==
             paid.1.scopeStack.map (·.callerReferentIds) &&
-          result.2 == paid.2))) = true := by decide
+          result.2 == paid.2))) = Bool.true := by decide
 
 theorem paymentKeepsCallerArgumentMutations :
     let before := enterOwnScope empty
@@ -168,6 +168,6 @@ theorem paymentKeepsCallerArgumentMutations :
       (.payingInstead (.inCaller (.perform (tap (target isCreature)))))
     result.2 = [] ∧
       result.1.scopeStack.map (·.callerPending) = before.scopeStack.map (·.callerPending) ∧
-      result.1.scopeStack.any (fun frame ↦ !frame.callerReferentIds.isEmpty) = true := by decide
+      result.1.scopeStack.any (fun frame ↦ !frame.callerReferentIds.isEmpty) = Bool.true := by decide
 
 end Semantics.Proofs.CheckerFuel

@@ -13,6 +13,7 @@ theorem form, each closed by `decide`. The names and the sentences are the Idris
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each counted)
 open Semantics.Templates.Predicate (and or was)
@@ -170,7 +171,7 @@ theorem okStaticUntargeting :
 theorem okPlayFromGraveyard :
     Action.check (DRS.ofList [])
       (.establish
-        (.can (.actor .you) (.procedure .play (a (.and [.isCard, .in_ graveyard])) .itsOwnCost none none none) {}) (some thisTurn)) = [] := by
+        (.can (.actor .you) (.procedure .play (a (.and [.isCard, .in_ Semantics.Templates.Location.graveyard])) .itsOwnCost none none none) {}) (some thisTurn)) = [] := by
   decide
 
 /-- "You may play a land card from your graveyard this turn." -/
@@ -220,7 +221,7 @@ theorem badMonarchHolder :
 /-- "target creature you control that is your Ring-bearer" -/
 theorem okRingBearerOnBattlefield :
     Predicate.checkAt .object (DRS.ofList [])
-      (.and [isCreature, .hasDesignation (.named "ringBearer" (.heldBy .object)) (some .you), .in_ battlefield]) = [] := by
+      (.and [isCreature, .hasDesignation (.named "ringBearer" (.heldBy .object)) (some .you), .in_ Semantics.Templates.Location.battlefield]) = [] := by
   decide
 
 /-- "This creature can't attack target planeswalker this turn." -/
@@ -303,7 +304,7 @@ theorem cantBePreventedIsADeonticOverPreventDamage :
             subtypes := [avatar], text := [static cantBePrevented],
             power := stat 7, toughness := stat 7 } ∧
       StaticSpec.check (DRS.ofList []) cantBePrevented = [] ∧
-      (Action.preventDamage .all none none).eventHeadOk = true :=
+      (Action.preventDamage .all none none).eventHeadOk = Bool.true :=
   ⟨rfl, by decide, rfl⟩
 
 /-- *Whippoorwill*: "Damage that would be dealt to that creature this turn can't be prevented or
@@ -323,16 +324,16 @@ theorem whippoorwillCantIsADeonticOverRedirectDamage :
         (cant any
           (redirectDamage allDamage (allOf (or [isPermanent, isPlayer]))
             (damage := toThatCreature))) = [.singular] ∧
-      (Action.redirectDamage .all .you none).eventHeadOk = true ∧
+      (Action.redirectDamage .all .you none).eventHeadOk = Bool.true ∧
       Action.eventHeadOk
           (.replace (.dealDamage .anyAmount .any none) (.instead (.draw (.exactlyOf 1))))
-        = false := by
+        = Bool.false := by
   decide
 
 /-- "You may cast spells as though they had flash." -/
 theorem okObjectPremiseAtCast :
     StaticSpec.check (DRS.ofList [])
-      (.can (.actor .you) (.procedure .cast (bare isSpell) .itsOwnCost none none none) { asThough := (some (.condition (.matches (.pro .bare .many) (.hasKeyword (.the (.named "flash")))))) }) = [] := by
+      (.can (.actor .you) (.procedure .cast (Semantics.Templates.NounPhrase.bare isSpell) .itsOwnCost none none none) { asThough := (some (.condition (.matches (.pro .bare .many) (.hasKeyword (.the (.named "flash")))))) }) = [] := by
   decide
 
 /-- "This creature can't be blocked by more than one creature." -/
@@ -345,13 +346,13 @@ theorem okBlockBoundOnBlock :
 [CR#113.9], so the Counter deed's patient admits a spell or an ability. -/
 theorem okCantCounterSpellsAndAbilities :
     StaticSpec.check (DRS.ofList [])
-      (cant any (counter (allOf (.or [isSpell, .abilityHead .anyActivated]))))
+      (cant any (Semantics.Definitions.Action.counter (allOf (.or [isSpell, .abilityHead .anyActivated]))))
       = [] := by
   decide
 
 /-- "Activated abilities can't be countered." -/
 theorem okCantCounterAbilities :
-    StaticSpec.check (DRS.ofList []) (cant any (counter (allOf (.abilityHead .anyActivated))))
+    StaticSpec.check (DRS.ofList []) (cant any (Semantics.Definitions.Action.counter (allOf (.abilityHead .anyActivated))))
       = [] := by
   decide
 
@@ -359,7 +360,7 @@ theorem okCantCounterAbilities :
 theorem distributedDeedReadsBackPluralUnderCondition :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ Templates.instruct (each (.isOpponentOf .you)) (choose (a (.and [.isCard, .in_ hand]))),
+        [ Templates.instruct (each (.isOpponentOf .you)) (choose (a (.and [.isCard, .in_ Semantics.Templates.Location.hand]))),
           discard them,
           doIf (.matches (those .card) isCreature) (gainLife 1) ]) = [] := by
   decide
@@ -369,7 +370,7 @@ theorem distributedDeedRiderReadsBackPlural :
     Action.check (DRS.ofList [])
       (doUnderProhibition
         (Templates.instruct (each (.isOpponentOf .you)) (sacrifice (a isCreature)))
-        (regeneration (bare (and [was (sacrifice which), isPermanent])))) = [] := by
+        (regeneration (Semantics.Templates.NounPhrase.bare (and [was (sacrifice which), isPermanent])))) = [] := by
   decide
 
 /-- "Destroy target creature. It can't be regenerated.": later text that modifies the destroy, a
@@ -431,14 +432,14 @@ introduced. -/
 theorem okGatedCostReadsPayer :
     StaticSpec.check [letterB .x]
       (.gatedBy (scaled (.mana [generic 1])
-            (times (.letter .x)
+            (Semantics.Templates.Amount.times (.letter .x)
               (countOf (.and [isCreature, isAttacking, .hasPossessor .controller they])))) (.actor (allOf isCreature)) (.attack none) {}) = [] := by
   decide
 
 /-- "{X} for each attacking creature": the same scaled cost with no read. -/
 theorem okBareScaledCost :
     Cost.check [letterB .x]
-      (scaled (.mana [generic 1]) (times (.letter .x) (countOf (.and [isCreature, isAttacking])))) = [] := by
+      (scaled (.mana [generic 1]) (Semantics.Templates.Amount.times (.letter .x) (countOf (.and [isCreature, isAttacking])))) = [] := by
   decide
 
 /-- The same cost written on its own: outside the clause there is no payer to read, and a cost
@@ -446,14 +447,14 @@ carries no agent context of its own. -/
 theorem badBareCostReadsPayer :
     Cost.check [letterB .x]
       (scaled (.mana [generic 1])
-        (times (.letter .x) (countOf (.and [isCreature, isAttacking, .hasPossessor .controller they]))))
+        (Semantics.Templates.Amount.times (.letter .x) (countOf (.and [isCreature, isAttacking, .hasPossessor .controller they]))))
       = [.anaphor (.word .player) .one 0] := by
   decide
 
 /-- "This card can't be revealed": what is revealed is a card [CR#701.20a], so a deontic rule
 names it in the reveal deed's patient role. -/
 theorem okCantBeRevealed :
-    StaticSpec.check (DRS.ofList []) (.cant .any (reveal .this) {}) = [] := by decide
+    StaticSpec.check (DRS.ofList []) (.cant .any (Semantics.Definitions.Action.reveal .this) {}) = [] := by decide
 
 /-- "Each player can't cast more than one spell each turn.": the bound is the noun phrase's own
 quantity, the rate the rule's timing. -/
@@ -581,10 +582,10 @@ Vehicles as though its power were 2 greater" records no permitted crew, where "t
 crew Vehicles as though …" does. -/
 theorem asThoughIsNotRecordedAsPermitted :
     recordsPermitted
-        (asThough (Semantics.Subject.actor (thisCreature)) (crew (allOf (hasSubtype vehicle))) (greaterBy .power 2)) = false ∧
+        (asThough (Semantics.Subject.actor (thisCreature)) (crew (allOf (hasSubtype vehicle))) (greaterBy .power 2)) = Bool.false ∧
       recordsPermitted
         (can (Semantics.Subject.actor (thisCreature)) (crew (allOf (hasSubtype vehicle))) (asThough := greaterBy .power 2)) =
-        true := by
+        Bool.true := by
   decide
 
 /-- Hotshot Mechanic and Cloudspire Captain check in the indicative form. -/
@@ -621,10 +622,10 @@ nothing. -/
 theorem permissionClosesItsBox :
     Action.check (DRS.ofList [])
         (.sequentially [.establish (.can (.actor .you) castFromGraveyard {}) (some thisTurn),
-          exile it]) = [.anaphor .bare .one 0] ∧
+          Semantics.Definitions.Action.exile it]) = [.anaphor .bare .one 0] ∧
       Action.check (DRS.ofList [])
         (.sequentially [.establish (.cant (.actor .you) castFromGraveyard {}) (some thisTurn),
-          exile it]) = [.anaphor .bare .one 0] := by
+          Semantics.Definitions.Action.exile it]) = [.anaphor .bare .one 0] := by
   decide
 
 /-- "Target creature attacks a planeswalker each combat if able. Tap that planeswalker." The
@@ -664,7 +665,7 @@ theorem modifyingProhibitionReadsOnlyThePrecedingActionsObjects :
       Action.check (DRS.ofList []) (.sequentially (before ++
         [doUnderProhibition (destroy (target destroyed)) (regeneration (that (.type .creature)))]))
     rider [] isCreature = [] ∧
-      rider [exile (target isCreature)] isArtifact =
+      rider [Semantics.Definitions.Action.exile (target isCreature)] isArtifact =
         [.anaphor (.word (.type .creature)) .one 0] ∧
       rider [sacrifice (a isCreature)] isArtifact =
         [.anaphor (.word (.type .creature)) .one 0] := by

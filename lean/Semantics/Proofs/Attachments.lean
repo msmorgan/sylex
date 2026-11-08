@@ -19,7 +19,7 @@ open Semantics.Templates.SliceCount (counted)
 namespace Semantics.Proofs.Attachments
 
 private def nounTypes (drs : DRS) (noun : NounPhrase) : List CardType :=
-  let result := stepNounPhrase 64 drs .other false noun
+  let result := stepNounPhrase 64 drs .other Bool.false noun
   ((result.2.1.head? >>= result.1.findById?).map (·.ty)).getD []
 
 /-- The enchanted-player domain used by Curse of Exhaustion is also a valid host predicate. -/
@@ -70,7 +70,7 @@ theorem okAttachedHostRetainsCreatureType :
 
 theorem okNestedCounterpartTargetRemainsAvailable :
     Action.check (DRS.ofList []) (.sequentially [
-      exile (target (.and [isArtifact, .attachment .attachment none (some (target isCreature))])),
+      Semantics.Definitions.Action.exile (target (.and [isArtifact, .attachment .attachment none (some (target isCreature))])),
       .setStatus .tapped (that (.type .creature))]) = [] := by decide
 
 /-- The explicit source mention remains available after the attached artifact is exiled, to a
@@ -78,24 +78,24 @@ later "this creature"; "that creature" never reads the Source, a self-referent
 (`Determiner.self`; owner ruling 2026-10-24). -/
 theorem sourceCounterpartRemainsAvailable :
     Action.check (DRS.ofList []) (.sequentially [
-      exile (target (.and [isArtifact, .attachment .attachment none (some thisCreature)])),
+      Semantics.Definitions.Action.exile (target (.and [isArtifact, .attachment .attachment none (some thisCreature)])),
       .setStatus .tapped thisCreature]) = [] ∧
     Action.check (DRS.ofList []) (.sequentially [
-      exile (target (.and [isArtifact, .attachment .attachment none (some thisCreature)])),
+      Semantics.Definitions.Action.exile (target (.and [isArtifact, .attachment .attachment none (some thisCreature)])),
       .setStatus .tapped (that (.type .creature))]) =
       [.anaphor (.word (.type .creature)) .one 0] := by decide
 
 private def sourceCounterpartAfterExile : DRS :=
   (stepAction 64 .postEvent .obj (DRS.ofList [])
-    (exile (target (.and [isArtifact, .attachment .attachment none (some thisCreature)])))).1
+    (Semantics.Definitions.Action.exile (target (.and [isArtifact, .attachment .attachment none (some thisCreature)])))).1
 
 /-- A later "this creature" re-mentions the Source's referent, on the battlefield as a creature
 (`mentionThis`); no demonstrative selects it. -/
 theorem sourceCounterpartReMentionSelectsTheSourceIdentity :
     let context := nextClause sourceCounterpartAfterExile
-    let (after, ids, errors) := stepNounPhrase 64 context .obj true thisCreature
+    let (after, ids, errors) := stepNounPhrase 64 context .obj Bool.true thisCreature
     errors = [] ∧
-      ids = (stepNounPhrase 64 (DRS.ofList []) .other false thisCreature).2.1 ∧
+      ids = (stepNounPhrase 64 (DRS.ofList []) .other Bool.false thisCreature).2.1 ∧
       (ids.filterMap after.findById?).all
         (fun ref => ref.zone == some .battlefield && ref.ty.contains .creature) ∧
       resolveCandidates (.word (.type .creature)) .one context = [] := by decide
@@ -114,7 +114,7 @@ theorem badCurrentFaceOnPlayer :
     Predicate.checkAt .player (DRS.ofList []) (.currentFace .back) = [.kindMismatch .player .object] := by decide
 
 theorem currentFaceDoesNotSupplyTokenEvidence :
-    Predicate.seedsToken (.currentFace .back) = false := by rfl
+    Predicate.seedsToken (.currentFace .back) = Bool.false := by rfl
 
 /-! ## The attach deed's host role (ruling 2026-10-10) -/
 
@@ -171,8 +171,8 @@ a graveyard"; the card Volute enchants "won't be on the battlefield", ruling 200
 /-- "enchanted creature" is on the battlefield; "enchanted creature card" is in no zone the
 checker fixes. -/
 theorem enchantedCardIsNotOnTheBattlefield :
-    [nounZone (DRS.ofList []) (enchanted (.ofType .card .creature)),
-      nounZone (DRS.ofList []) (enchanted creature)]
+    [nounZone (DRS.ofList []) (Semantics.Templates.NounPhrase.enchanted (.ofType .card .creature)),
+      nounZone (DRS.ofList []) (Semantics.Templates.NounPhrase.enchanted creature)]
       = [none, some .battlefield] := by
   decide
 
@@ -181,7 +181,7 @@ this Aura to it." -/
 theorem okAnimateDeadReturn :
     Action.check (DRS.ofList [])
       (sequentially
-        [ returnToBattlefield (enchanted (.ofType .card .creature)) [under you],
+        [ returnToBattlefield (Semantics.Templates.NounPhrase.enchanted (.ofType .card .creature)) [under you],
           attachTo thisAura it ]) = [] := by
   decide
 
@@ -189,13 +189,13 @@ theorem okAnimateDeadReturn :
 battlefield, so "the exiled instant", which names a permanent by what it was [CR#608.2h], does
 not read it back, while "the exiled instant card" does. -/
 theorem voluteExilesACardNotAPermanent :
-    let exileEnchanted := exile (enchanted (.ofType .card .instant))
+    let exileEnchanted := Semantics.Definitions.Action.exile (Semantics.Templates.NounPhrase.enchanted (.ofType .card .instant))
     Action.check (DRS.ofList [])
-        (sequentially [exileEnchanted, returnTo (the (and [was (exile which), isInstant, isCard]))
-          graveyard []]) = [] ∧
+        (sequentially [exileEnchanted, returnTo (the (and [was (Semantics.Definitions.Action.exile which), isInstant, isCard]))
+          Semantics.Templates.Location.graveyard []]) = [] ∧
       Action.check (DRS.ofList [])
-        (sequentially [exileEnchanted, returnTo (the (and [was (exile which), isInstant]))
-          graveyard []]) = [.participialDescription (.deed (.action "exile")) 0] := by
+        (sequentially [exileEnchanted, returnTo (the (and [was (Semantics.Definitions.Action.exile which), isInstant]))
+          Semantics.Templates.Location.graveyard []]) = [.participialDescription (.deed (.action "exile")) 0] := by
   decide
 
 /-! ## Protection's attach rows -/

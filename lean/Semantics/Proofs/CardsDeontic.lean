@@ -17,6 +17,7 @@ Port of `idris/src/Experimental/Cards/Deontic.idr`: the printed cards of the Deo
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a counted)
 open Semantics.Templates.Predicate (and or not was quality isAttached attachedTo)
@@ -97,31 +98,31 @@ def munghaWurm : Ability :=
 theorem okMunghaWurm : Ability.check (DRS.ofList []) munghaWurm = [] := by decide
 def dampingField : Ability :=
   static
-      (cant (Semantics.Subject.actor ((bare isPlayer))) (untap (counted (moreThan 1) isArtifact))
+      (cant (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.bare isPlayer))) (untap (counted (moreThan 1) isArtifact))
          (timing := duringTheirUntapSteps))
 theorem okDampingField : Ability.check (DRS.ofList []) dampingField = [] := by decide
 def smoke : Ability := static
-    (cant (Semantics.Subject.actor ((bare isPlayer))) (untap (counted (moreThan 1) isCreature))
+    (cant (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.bare isPlayer))) (untap (counted (moreThan 1) isCreature))
        (timing := duringTheirUntapSteps))
 theorem okSmoke : Ability.check (DRS.ofList []) smoke = [] := by decide
 def winterOrb : Ability :=
   static
       (onlyWhile
-         (cant (Semantics.Subject.actor ((bare isPlayer))) (untap (counted (moreThan 1) isLand))
+         (cant (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.bare isPlayer))) (untap (counted (moreThan 1) isLand))
             (timing := duringTheirUntapSteps))
     (is thisArtifact isUntapped))
 theorem okWinterOrb : Ability.check (DRS.ofList []) winterOrb = [] := by decide
 def staticOrb : Ability :=
   static
       (onlyWhile
-         (cant (Semantics.Subject.actor ((bare isPlayer))) (untap (counted (moreThan 2) isPermanent))
+         (cant (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.bare isPlayer))) (untap (counted (moreThan 2) isPermanent))
             (timing := duringTheirUntapSteps))
     (is thisArtifact isUntapped))
 theorem okStaticOrb : Ability.check (DRS.ofList []) staticOrb = [] := by decide
 
 def winterMoon : Ability :=
   static
-      (cant (Semantics.Subject.actor ((bare isPlayer)))
+      (cant (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.bare isPlayer)))
          (untap (counted (moreThan 1) (and [isLand, non (hasSupertype .basic)])))
       (timing := duringTheirUntapSteps))
 theorem okWinterMoon : Ability.check (DRS.ofList []) winterMoon = [] := by decide
@@ -161,8 +162,8 @@ theorem okFrodoBaggins : Ability.check (DRS.ofList []) frodoBaggins = [] := by d
 /-- Everybody Lives! -/
 def everybodyLivesGateLine : Action :=
   establishThroughout (conjunction
-                         [cant (Semantics.Subject.actor ((bare isPlayer))) loseGame, cant (Semantics.Subject.actor ((bare isPlayer)))
-                            winGame]) thisTurn
+                         [cant (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.bare isPlayer))) Semantics.Templates.Action.loseGame, cant (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.bare isPlayer)))
+                            Semantics.Templates.Action.winGame]) thisTurn
 theorem okEverybodyLivesGateLine : Action.check (DRS.ofList []) everybodyLivesGateLine = [] := by decide
 
 /-- Nowhere to Run -/
@@ -174,7 +175,7 @@ theorem okNowhereToRunWardLine : StaticSpec.check (DRS.ofList []) nowhereToRunWa
 
 /-- Mornsong Aria -/
 def mornsongAriaLock : StaticSpec :=
-  conjunction [cant (Semantics.Subject.actor ((bare isPlayer))) (draw anyAmount), cant (Semantics.Subject.actor ((bare isPlayer)))
+  conjunction [cant (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.bare isPlayer))) (draw anyAmount), cant (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.bare isPlayer)))
                  (gainLife anyAmount)]
 theorem okMornsongAriaLock : StaticSpec.check (DRS.ofList []) mornsongAriaLock = [] := by decide
 
@@ -206,7 +207,7 @@ def complyNameLock : Action :=
   sequentially
     [ choose (a (quality .cardName)),
       establishThroughout (cant (Semantics.Subject.actor (yourOpponents))
-                             (cast (bare (and [isSpell, named chosenName])))) untilYourNextTurn ]
+                             (cast (Semantics.Templates.NounPhrase.bare (and [isSpell, named chosenName])))) untilYourNextTurn ]
 theorem okComplyNameLock : Action.check (DRS.ofList []) complyNameLock = [] := by decide
 
 /-- Academic Probation -/
@@ -214,7 +215,7 @@ def academicProbationNameMode : Action :=
   sequentially
     [ choose (a (qualityFrom .cardName (nameOfCard (non isLand)))),
       establishThroughout (cant (Semantics.Subject.actor (yourOpponents))
-                             (cast (bare (and [isSpell, named chosenName])))) untilYourNextTurn ]
+                             (cast (Semantics.Templates.NounPhrase.bare (and [isSpell, named chosenName])))) untilYourNextTurn ]
 theorem okAcademicProbationNameMode : Action.check (DRS.ofList []) academicProbationNameMode = [] := by
   decide
 
@@ -241,7 +242,7 @@ theorem okBlazingArchonCant : Ability.check (DRS.ofList []) blazingArchonCant = 
 
 /-- Canoptek Wraith -/
 def canoptekWraith : Ability :=
-  flavorWord "Wraith Form"
+  Semantics.Templates.Ability.flavorWord "Wraith Form"
     (static (cant any (block thisCreature)))
 theorem okCanoptekWraith : Ability.check (DRS.ofList []) canoptekWraith = [] := by decide
 
@@ -285,13 +286,13 @@ def attackToll : StaticSpec :=
 /-- Archangel of Tithes -/
 def archangelOfTithesBlockToll : Ability :=
   static (onlyWhile
-    (gatedBy (scaledGenericMana (times 1 groupSize)) (Semantics.Subject.actor ((allOf isCreature))) block)
+    (gatedBy (scaledGenericMana (Semantics.Templates.Amount.times 1 groupSize)) (Semantics.Subject.actor ((allOf isCreature))) block)
     (is thisCreature isAttacking))
 theorem okArchangelOfTithesBlockToll : Ability.check (DRS.ofList []) archangelOfTithesBlockToll = [] := by decide
 /-- Archangel of Tithes -/
 def archangelOfTithesAttackToll : Ability :=
   static (onlyWhile
-    (gatedBy (scaledGenericMana (times 1 groupSize)) (Semantics.Subject.actor ((allOf isCreature)))
+    (gatedBy (scaledGenericMana (Semantics.Templates.Amount.times 1 groupSize)) (Semantics.Subject.actor ((allOf isCreature)))
        (attack (youOr (allOf (and [isPlaneswalker, youControl])))))
     (is thisCreature isUntapped))
 theorem okArchangelOfTithesAttackToll : Ability.check (DRS.ofList []) archangelOfTithesAttackToll = [] := by
@@ -300,7 +301,7 @@ theorem okArchangelOfTithesAttackToll : Ability.check (DRS.ofList []) archangelO
 /-- Distortion Strike -/
 def distortionStrikeLine : Action :=
   sequentially
-    [ get (target isCreature) (up 1) (up 0) untilEndOfTurn,
+    [ get (target isCreature) (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 0) untilEndOfTurn,
       establishThroughout (cant any (block (that creature))) thisTurn ]
 theorem okDistortionStrikeLine : Action.check (DRS.ofList []) distortionStrikeLine = [] := by decide
 
@@ -308,7 +309,7 @@ theorem okDistortionStrikeLine : Action.check (DRS.ofList []) distortionStrikeLi
 def conquerorsFlailProhibition : StaticSpec :=
   onlyWhile
     (partScope .turn you
-      (cant (Semantics.Subject.actor (yourOpponents)) (cast (bare isSpell))))
+      (cant (Semantics.Subject.actor (yourOpponents)) (cast (Semantics.Templates.NounPhrase.bare isSpell))))
     (is this_ (attachedTo (a isCreature)))
 theorem okConquerorsFlailProhibition : StaticSpec.check (DRS.ofList []) conquerorsFlailProhibition = [] := by
   decide
@@ -353,16 +354,16 @@ and having no one host for the Auras to be attached to. -/
 theorem guardianBeastExemptsOnlyTheEnchantProhibition :
     (match guardianBeastProtection with
      | .conditional (.conjunction _ [.retention (.cant .any _ _) _, .characteristicChange _ _,
-         .cant _ _ _]) _ _ => true
-     | _ => false) = true ∧
+         .cant _ _ _]) _ _ => Bool.true
+     | _ => Bool.false) = Bool.true ∧
     StaticSpec.check (DRS.ofList [])
       (onlyWhile
         (retention
           (conjunction
             [ cant any (attachTo (a (Semantics.Predicate.hasSubtype (aura))) them),
               abilityGrant them indestructible,
-              cant (Semantics.Subject.actor ((bare (and [isPlayer, isOther])))) (gainControlOf them) ]
-            (bare (and [non isCreature, isArtifact, youControl])))
+              cant (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.bare (and [isPlayer, isOther])))) (gainControlOf them) ]
+            (Semantics.Templates.NounPhrase.bare (and [non isCreature, isArtifact, youControl])))
           aurasAlreadyAttachedToThoseArtifacts)
         (is thisCreature isUntapped)) = [.retentionClause, .retentionSubject] := by decide
 
@@ -370,7 +371,7 @@ theorem guardianBeastExemptsOnlyTheEnchantProhibition :
 is not spelled: the bench declares neither the Democracy designation nor "get rid of the
 monarchy". -/
 def fioranReformistPlayersCantBecomeTheMonarch : Ability :=
-  static (cant (.actor (bare isPlayer)) (gainDesignation .actor monarch))
+  static (cant (.actor (Semantics.Templates.NounPhrase.bare isPlayer)) (gainDesignation .actor monarch))
 theorem okFioranReformistPlayersCantBecomeTheMonarch :
     Ability.check (DRS.ofList []) fioranReformistPlayersCantBecomeTheMonarch = [] := by decide
 

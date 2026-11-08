@@ -21,35 +21,35 @@ namespace Semantics.Proofs.Sharing
 /-- An object named both "Fire" and "Ice" shares a name with an object named "Fire" and with one
 named "Ice", though it equals neither name list [CR#201.2a]. -/
 theorem twoNamesShareEither :
-    Agreement.holdsOn .cardName .share ["Fire", "Ice"] ["Fire"] = true ∧
-      Agreement.holdsOn .cardName .share ["Fire", "Ice"] ["Ice"] = true ∧
-      (["Fire", "Ice"] == ["Fire"]) = false := by
+    Agreement.holdsOn .cardName .share ["Fire", "Ice"] ["Fire"] = Bool.true ∧
+      Agreement.holdsOn .cardName .share ["Fire", "Ice"] ["Ice"] = Bool.true ∧
+      (["Fire", "Ice"] == ["Fire"]) = Bool.false := by
   decide
 
 /-- An object with no name has the same name as no other object, a nameless one included
 [CR#201.2a]. -/
 theorem namelessSharesNoName :
-    Agreement.holdsOn (α := String) .cardName .share [] [] = false ∧
-      Agreement.holdsOn .cardName .share [] ["Fire"] = false := by
+    Agreement.holdsOn (α := String) .cardName .share [] [] = Bool.false ∧
+      Agreement.holdsOn .cardName .share [] ["Fire"] = Bool.false := by
   decide
 
 /-- "a different name": no name in common [CR#201.2c]. -/
 theorem differIsNoValueInCommon :
-    Agreement.holdsOn .cardName .differ ["Fire", "Ice"] ["Ice"] = false ∧
-      Agreement.holdsOn .cardName .differ ["Fire", "Ice"] ["Bolt"] = true := by
+    Agreement.holdsOn .cardName .differ ["Fire", "Ice"] ["Ice"] = Bool.false ∧
+      Agreement.holdsOn .cardName .differ ["Fire", "Ice"] ["Bolt"] = Bool.true := by
   decide
 
 /-- An object with no name does not have a different name than any other object, even one
 that has a name [CR#201.2c]. -/
 theorem namelessHasNoDifferentName :
-    Agreement.holdsOn .cardName .differ [] ["Fire"] = false ∧
-      Agreement.holdsOn (α := String) .cardName .differ [] [] = false := by
+    Agreement.holdsOn .cardName .differ [] ["Fire"] = Bool.false ∧
+      Agreement.holdsOn (α := String) .cardName .differ [] [] = Bool.false := by
   decide
 
 /-- The nameless rule is on the name axis only: a colorless object has no color in common
 with a red one, having no color [CR#105.2c]. -/
 theorem colorlessDiffersInColor :
-    Agreement.holdsOn .color .differ [] [Color.red] = true := by
+    Agreement.holdsOn .color .differ [] [Color.red] = Bool.true := by
   decide
 
 /-- Liliana's Contract: "if you control four or more Demons with different names". A group has
@@ -58,12 +58,12 @@ different names only if each member has at least one name and no two have a name
 theorem withDifferentNamesNeedsEveryName :
     Agreement.holdsAmong .cardName .differ
         [["Archfiend of Ifnir"], ["Lord of the Pit"], ["Demonlord Belzenlok"],
-          ["Rune-Scarred Demon"]] = true ∧
+          ["Rune-Scarred Demon"]] = Bool.true ∧
       Agreement.holdsAmong .cardName .differ
-        [["Archfiend of Ifnir"], ["Lord of the Pit"], ["Demonlord Belzenlok"], []] = false ∧
+        [["Archfiend of Ifnir"], ["Lord of the Pit"], ["Demonlord Belzenlok"], []] = Bool.false ∧
       Agreement.holdsAmong .cardName .differ
         [["Archfiend of Ifnir"], ["Lord of the Pit"], ["Lord of the Pit"],
-          ["Rune-Scarred Demon"]] = false := by
+          ["Rune-Scarred Demon"]] = Bool.false := by
   decide
 
 /-- "creatures that share a color with it": both relata are objects. -/
@@ -100,7 +100,7 @@ theorem okConspireCost :
         (.perform (tap (counted (exactly 2)
           (.and [isUntapped, isCreature, .hasPossessor .controller .you,
             .shares .color .share thisSpell]))))
-        true .once)) = [] := by
+        Bool.true .once)) = [] := by
   decide
 
 end Semantics.Proofs.Sharing

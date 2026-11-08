@@ -283,7 +283,7 @@ theorem activatedManaCostIntroducesItsOwnX :
 theorem sharedSubjectSurvivesSecondSingular :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ exile (target isArtifact),
+        [ Semantics.Definitions.Action.exile (target isArtifact),
           establishFor (.firstMention "sharedSubject.subject" (target isCreature))
             [ Templates.modification (.laterMention "sharedSubject.subject" (target isCreature)) .power (.up 1),
               Templates.modification (.laterMention "sharedSubject.subject" (target isCreature)) .toughness (.up 1),
@@ -308,11 +308,11 @@ theorem okOwnPayerCost : Ability.check (DRS.ofList []) (activated (Semantics.Cos
   decide
 
 /-- "Counter target spell." -/
-theorem okCounterSpell : Action.check (DRS.ofList []) (counter (target isSpell)) = [] := by decide
+theorem okCounterSpell : Action.check (DRS.ofList []) (Semantics.Definitions.Action.counter (target isSpell)) = [] := by decide
 
 /-- "Counter target creature or player." -/
 theorem badCounterJoinedPlayer :
-    Action.check (DRS.ofList []) (counter (target isAnyTarget))
+    Action.check (DRS.ofList []) (Semantics.Definitions.Action.counter (target isAnyTarget))
       = [.kindLte (.join .object .player) (.join .object .pile)] := by
   decide
 
@@ -377,7 +377,7 @@ theorem keywordListOfAbilities :
 
 /-- Madness {1}{R}: discarding this card exiles it instead, and its owner may cast it from exile
 [CR#702.35a]. -/
-theorem okMadness : Ability.check (DRS.ofList []) (madness (mana [generic 1, pip .red])) = [] := by
+theorem okMadness : Ability.check (DRS.ofList []) (madness (Semantics.Templates.Cost.mana [generic 1, pip .red])) = [] := by
   decide
 
 /-- Madness's replacement body, "that player discards it, but exiles it instead of putting it
@@ -387,18 +387,18 @@ both exiled, read by "the exiled card" and by the trigger's "when this card is e
 theorem madnessCardIsDiscardedAndExiled :
     let body : Action := discard thisCard .exile
     let after := (stepAction 64 .postEvent .obj (DRS.ofList []) body).1
-    (participialCandidates (.deed exile.deed) (some .one) none false after).length = 1 ∧
-      (participialCandidates (.deed discard.deed) (some .one) none false after).length = 1 ∧
+    (participialCandidates (.deed Semantics.Definitions.Action.exile.deed) (some .one) none Bool.false after).length = 1 ∧
+      (participialCandidates (.deed discard.deed) (some .one) none Bool.false after).length = 1 ∧
       Action.check (DRS.ofList [])
-        (sequentially [body, putInto (the (was (exile which))) graveyard]) = [] ∧
+        (sequentially [body, putInto (the (was (Semantics.Definitions.Action.exile which))) Semantics.Templates.Location.graveyard]) = [] ∧
       body.namedDeed = some discard.deed ∧
-      after.causedEvents.any (fun event => event.readBy (some (.deed discard.deed)) []) = true ∧
-      after.causedEvents.any (fun event => event.readBy (some (.deed exile.deed)) []) = true := by
+      after.causedEvents.any (fun event => event.readBy (some (.deed discard.deed)) []) = Bool.true ∧
+      after.causedEvents.any (fun event => event.readBy (some (.deed Semantics.Definitions.Action.exile.deed)) []) = Bool.true := by
   decide
 
 /-- Mayhem {1}{R}: castable from your graveyard as long as you discarded this card this turn
 [CR#702.187b]. -/
-theorem okMayhem : Ability.check (DRS.ofList []) (mayhem (mana [generic 1, pip .red])) = [] := by
+theorem okMayhem : Ability.check (DRS.ofList []) (mayhem (Semantics.Templates.Cost.mana [generic 1, pip .red])) = [] := by
   decide
 
 /-- Umbra armor: enchanted permanent's destruction becomes the removal of its damage and this
@@ -548,10 +548,10 @@ theorem odricReadsAsItsJoinedKeywords :
 escalate, spree and tiered [CR#702.42a,702.120a,702.172a,702.183a]. -/
 theorem okEntwineEscalateSpreeTieredWantModes :
     [ entwine (.mana [generic 2]), escalate (.mana [generic 2]), spree, tiered ].all
-      Ability.keywordWantsModes = true := by decide
+      Ability.keywordWantsModes = Bool.true := by decide
 
 /-- A keyword whose Definition writes no Mode Change wants none, a cost-bearing one included. -/
-theorem kickerWantsNoModes : (kicker (.mana [generic 2])).keywordWantsModes = false := by decide
+theorem kickerWantsNoModes : (kicker (.mana [generic 2])).keywordWantsModes = Bool.false := by decide
 
 /-- Bloodthirst asks whether an opponent was dealt damage this turn [CR#702.54a]: the opponent is
 the damage's recipient, and the agentless passive leaves the source that dealt it [CR#120.1]
@@ -610,7 +610,7 @@ and aura swap exchanges through `exchangeCards`, so each step keeps its keyword 
 [CR#702.53a,702.71a,702.65a,701.23a,701.24a,701.12d]. -/
 theorem keywordBodiesKeepTheirActionDeeds :
     activatedStepDeeds (transmute (.mana [generic 1])) =
-        [some search.deed, some reveal.deed, none, some shuffle.deed] ∧
+        [some search.deed, some Semantics.Definitions.Action.reveal.deed, none, some shuffle.deed] ∧
       activatedStepDeeds (transfigure (.mana [generic 1])) =
         [some search.deed, none, some shuffle.deed] ∧
       (match auraSwap (.mana [generic 1]) with

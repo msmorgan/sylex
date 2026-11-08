@@ -19,6 +19,7 @@ printed-star ruling; there is no printed-box term to write).
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each counted)
 open Semantics.Templates.Predicate (and or not did)
@@ -58,7 +59,7 @@ def jushiApprentice : Ability :=
     (sequentially
       [ draw 1,
         doIf (compareAmt (countOf (cardIn yourHand)) .atLeast 9)
-          (flip thisCreature) ])
+          (Semantics.Templates.Action.flip thisCreature) ])
 theorem okJushiApprentice : Ability.check (DRS.ofList []) jushiApprentice = [] := by decide
 
 /-- Missy -/
@@ -217,7 +218,7 @@ theorem okChitteringHostOnGrafRats : CardFace.check .back chitteringHostOnGrafRa
 
 def meldThemInto : Action :=
   sequentially
-    [ exile
+    [ Semantics.Definitions.Action.exile
         (allOf (and [ isCreature, youControl,
                        or [ named (Semantics.NameSource.printed ("Graf Rats")),
                              named (Semantics.NameSource.printed ("Midnight Scavengers")) ] ])),
@@ -235,7 +236,7 @@ def titaniaVoiceOfGaeaMeld : Ability :=
       [ thereAre (counted (orMore 4) (and [isLand, cardIn yourGraveyard])),
         is (both thisCreature (a (and [isLand, named (Semantics.NameSource.printed ("Argoth, Sanctum of Nature"))])))
           (and [youOwn, youControl]) ]))
-    (sequentially [exile them, meldInto them "Titania, Gaea Incarnate"])
+    (sequentially [Semantics.Definitions.Action.exile them, meldInto them "Titania, Gaea Incarnate"])
 theorem okTitaniaVoiceOfGaeaMeld :
     Ability.check (DRS.ofList []) titaniaVoiceOfGaeaMeld = [] := by decide
 

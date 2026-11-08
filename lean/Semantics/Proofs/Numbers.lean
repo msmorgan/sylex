@@ -158,7 +158,7 @@ theorem triplingPowerAndToughnessIsSigned :
     let later : NounPhrase :=
       .laterMention "triplePowerAndToughness.subject" (.inCaller (target isCreature))
     (triplePowerAndToughness (target isCreature) (some untilEndOfTurn)).numberSlots =
-      [(times 2 (powerOf later), .signed), (times 2 (toughnessOf later), .signed)] := by rfl
+      [(Semantics.Templates.Amount.times 2 (powerOf later), .signed), (Semantics.Templates.Amount.times 2 (toughnessOf later), .signed)] := by rfl
 
 /-- The `double` deed's scope signs only a power or toughness change it directly encloses: a counter
 put directly under the deed keeps its clamped count [CR#107.1b,701.10e]. This is a hand-built tree:

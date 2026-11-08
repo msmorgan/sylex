@@ -10,6 +10,7 @@ form, each closed by `decide`. The names and the sentences are the Idris ones.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each counted the)
 open Semantics.Templates.Predicate (and did quality)
@@ -247,7 +248,7 @@ theorem badChoiceRestDisposedTwice :
 
 theorem restConsumptionPreservesChoiceHistoryAndOtherSources :
     let chosen : SelectionEvidence :=
-      { kind := .object, chosen := true, scope := 0 }
+      { kind := .object, chosen := Bool.true, scope := 0 }
     let otherSource : SelectionEvidence :=
       { kind := .object, sourceGroup := some 1, scope := 0 }
     let otherScope : SelectionEvidence :=
@@ -263,16 +264,16 @@ theorem restConsumptionPreservesChoiceHistoryAndOtherSources :
             chosen, otherSource, otherScope, otherKind] }
     (before.consumeRest before .object).selectionEvidence =
       [chosen, otherSource, otherScope, otherKind] ∧
-      (before.consumeRest before .object).choiceWasPossible .object = true := by decide
+      (before.consumeRest before .object).choiceWasPossible .object = Bool.true := by decide
 
 theorem consumingObjectRestPreservesUnrelatedPlayerChoice :
-    let before := (stepNounPhrase 64 (DRS.ofList []) .other false (allOf (.isOpponentOf .you))).1
+    let before := (stepNounPhrase 64 (DRS.ofList []) .other Bool.false (allOf (.isOpponentOf .you))).1
     let after := actionResult before
       (.sequentially [choose (a (.isOpponentOf .you)), choose (counted (upTo 1) isCreature),
         destroy theRest])
     NounPhrase.checkAt (some .object) after theRest = [.theRestFits .many] ∧
       countParts .object after = 0 ∧ countChoice .player after = 1 ∧
-      (after.findById? 1).map (·.payload) = some (.player true) ∧
+      (after.findById? 1).map (·.payload) = some (.player Bool.true) ∧
       (after.findById? 0).map (fun ref => (ref.kind, ref.plur)) =
         some (.player, .many) := by decide
 
@@ -325,9 +326,9 @@ theorem targetLoopPublishesAFreshPluralResult :
       (.sequentially [loop, instruct (those .player) (sacrifice (those .permanent))]) = [] ∧
       after.visibleReferents.map (fun r => (r.id, r.kind, r.plur)) =
         [(3, .object, .many), (0, .player, .many)] ∧
-      (after.findById? 2).isNone = true ∧
+      (after.findById? 2).isNone = Bool.true ∧
       (firstReach (.word .permanent) .many (nextClause after)).map (·.id) = some 3 ∧
-      (firstReach (.word .permanent) .one (nextClause after)).isNone = true := by decide
+      (firstReach (.word .permanent) .one (nextClause after)).isNone = Bool.true := by decide
 
 theorem ordinaryLoopChoicesRemainLocal :
     let loop := Action.doForEach (each .isPlayer)
@@ -348,7 +349,7 @@ theorem distributedRestPreservesTheUnrelatedOuterGroup :
     Action.check (DRS.ofList []) sequence = [] ∧
       (after.findById? 5).map (fun ref => (ref.kind, ref.plur, ref.zone, ref.ty)) =
         some (.object, .many, some .graveyard, [.creature]) ∧
-      (after.findById? 4).isNone = true ∧
+      (after.findById? 4).isNone = Bool.true ∧
       (after.findById? 0).map (·.payload) =
         ((actionResult (DRS.ofList []) tapping).findById? 0).map (·.payload) := by decide
 
@@ -360,7 +361,7 @@ theorem distributedSacrificeConsumesTheOuterRemainder :
     Action.check (DRS.ofList []) sequence = [] ∧
       (after.findById? 3).map (fun ref => (ref.kind, ref.plur, ref.zone, ref.ty)) =
         some (.object, .many, some .graveyard, [.creature]) ∧
-      (after.findById? 2).isNone = true ∧
+      (after.findById? 2).isNone = Bool.true ∧
       countParts .object after = 0 := by decide
 
 /-- "an opponent who controls more lands than you control" -/
@@ -467,7 +468,7 @@ theorem badChoseThisWayWithoutAChoice :
 
 /-- "Each player chooses a creature. Exile them." -/
 theorem okDistributedChoiceReadsAsGroup :
-    Action.check (DRS.ofList []) (.sequentially [instruct (each .isPlayer) (choose (a isCreature)), exile
+    Action.check (DRS.ofList []) (.sequentially [instruct (each .isPlayer) (choose (a isCreature)), Semantics.Definitions.Action.exile
         them])
       = [] := by
   decide
@@ -476,7 +477,7 @@ theorem okDistributedChoiceReadsAsGroup :
 chooser, so the singular read has no antecedent (`okDistributedChoiceReadsAsGroup` is the
 plural read). -/
 theorem badDistributedChoiceReadSingular :
-    Action.check (DRS.ofList []) (.sequentially [instruct (each .isPlayer) (choose (a isCreature)), exile
+    Action.check (DRS.ofList []) (.sequentially [instruct (each .isPlayer) (choose (a isCreature)), Semantics.Definitions.Action.exile
         it])
       = [.anaphor .bare .one 0] := by
   decide
@@ -485,7 +486,7 @@ theorem badDistributedChoiceReadSingular :
 printed card on the bench. -/
 theorem lookAtTopThenBin :
     Action.check (DRS.ofList [])
-      (.sequentially [lookAt (topSlice 1), may (putInto (that .card) graveyard)])
+      (.sequentially [Semantics.Templates.Action.lookAt (topSlice 1), may (putInto (that .card) Semantics.Templates.Location.graveyard)])
       = [] := by
   decide
 
@@ -495,15 +496,15 @@ theorem playAndCastFromGraveyardThisTurn :
     Action.check (DRS.ofList [])
       (.establish
         (.conjunction none
-          [ can (Semantics.Subject.actor you) (play (allOf isLand) (from_ := some (graveyardOf .you))),
-            can (Semantics.Subject.actor you) (cast (bare isSpell) (from_ := some (graveyardOf .you))) ])
+          [ can (Semantics.Subject.actor you) (Semantics.Definitions.Action.play (allOf isLand) (from_ := some (graveyardOf .you))),
+            can (Semantics.Subject.actor you) (cast (Semantics.Templates.NounPhrase.bare isSpell) (from_ := some (graveyardOf .you))) ])
         (some untilEndOfTurn)) = [] := by
   decide
 
 /-- "Each player may play an additional land on each of their turns." No printed card on the
 bench. -/
 theorem eachPlayerPlaysAdditionalLand :
-    StaticSpec.check (DRS.ofList []) (can ((Semantics.Subject.actor (each .isPlayer))) (play (counted (additional (exactly 1)) isLand))) = [] := by decide
+    StaticSpec.check (DRS.ofList []) (can ((Semantics.Subject.actor (each .isPlayer))) (Semantics.Definitions.Action.play (counted (Semantics.Templates.Quantity.additional (exactly 1)) isLand))) = [] := by decide
 
 /-- "Mill three cards. You may put an artifact card from among the cards milled this way into
 your hand." No printed card on the bench. -/
@@ -517,9 +518,9 @@ theorem millThenPutFromAmongMilled :
                 (thePlural (and [isCard,
                   .did { subj := .any
                          action := .ownScope (some (.action "mill"))
-                           (.move (.inCaller .which) yourLibrary (some graveyard) .departure [])
+                           (.move (.inCaller .which) yourLibrary (some Semantics.Templates.Location.graveyard) .departure [])
                          within := some .thisWay }])))
-              hand) ]) = [] := by
+              Semantics.Templates.Location.hand) ]) = [] := by
   decide
 
 /-- "Each player may shuffle their hand and graveyard into their library." No printed card on
@@ -717,11 +718,11 @@ private def afterTargetPair : DRS :=
 /-- "the chosen creature you control" reads back the target its restriction picks out, "the
 chosen creature you don't control" the other, and "the chosen creatures" the pair. -/
 theorem chosenCreatureReadsBackTheTarget :
-    (stepNounPhrase 512 afterTargetPair .obj true
+    (stepNounPhrase 512 afterTargetPair .obj Bool.true
         (the (and [isCreature, isChosen, youControl]))).2 = ([1], []) ∧
-      (stepNounPhrase 512 afterTargetPair .obj true
+      (stepNounPhrase 512 afterTargetPair .obj Bool.true
         (the (and [isCreature, isChosen, youDontControl]))).2 = ([2], []) ∧
-      (stepNounPhrase 512 afterTargetPair .obj true
+      (stepNounPhrase 512 afterTargetPair .obj Bool.true
         (thePlural (and [isCreature, isChosen]))).2 = ([3], []) := by
   decide
 
@@ -730,12 +731,12 @@ the cards chosen as the effect applies [CR#608.2d], the group "those cards" read
 theorem chosenCardsReadBackTheChoice :
     let after := nextClause (stepAction 512 .postEvent .obj (DRS.ofList [letterB .x])
       (sequentially
-        [ reveal (topSlice (plus (letter .x) 1)),
+        [ Semantics.Definitions.Action.reveal (topSlice (Semantics.Templates.Amount.plus (letter .x) 1)),
           choose (NounPhrase.andOr
             [ fromAmong (exactly 1) (and [isCreature, isCard]) them,
               fromAmong (exactly 1) (and [isLand, isCard]) them ]) ])).1
-    (stepNounPhrase 512 after .obj true (thePlural (and [isCard, isChosen]))).2 = ([5], []) ∧
-      (stepNounPhrase 512 after .obj true (those .card)).2.1 = [5] := by
+    (stepNounPhrase 512 after .obj Bool.true (thePlural (and [isCard, isChosen]))).2 = ([5], []) ∧
+      (stepNounPhrase 512 after .obj Bool.true (those .card)).2.1 = [5] := by
   decide
 
 /-- "Choose a creature. Tap the chosen creature." -/
@@ -746,7 +747,7 @@ theorem okChosenCreatureAfterChoose :
 
 /-- "the chosen card" and "the chosen creature" with no choice in scope name nothing chosen. -/
 theorem badChosenObjectWithoutChoose :
-    Action.check (DRS.ofList []) (putInto (the (and [isCard, isChosen])) hand) =
+    Action.check (DRS.ofList []) (putInto (the (and [isCard, isChosen])) Semantics.Templates.Location.hand) =
         [.choiceInScope .object] ∧
       Action.check (DRS.ofList []) (tap (the (and [isCreature, isChosen]))) =
         [.choiceInScope .object] := by

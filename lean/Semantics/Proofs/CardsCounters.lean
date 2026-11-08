@@ -60,8 +60,8 @@ def kaitoBaneOfNightmares : Action :=
 theorem okKaitoBaneOfNightmares : Action.check (DRS.ofList []) kaitoBaneOfNightmares = [] := by decide
 def jhoiraOfTheGhitu : Ability :=
   activated
-    (compound [(Semantics.Cost.mana [generic 2]), (Semantics.Cost.perform (exile (a (and [non isLand, in_ yourHand]))))])
-    (putCounters 4 (Semantics.CounterKindSource.printed timeCounter) (the (and [was (exile which), isCard])))
+    (compound [(Semantics.Cost.mana [generic 2]), (Semantics.Cost.perform (Semantics.Definitions.Action.exile (a (and [non isLand, in_ yourHand]))))])
+    (putCounters 4 (Semantics.CounterKindSource.printed timeCounter) (the (and [was (Semantics.Definitions.Action.exile which), isCard])))
 theorem okJhoiraOfTheGhitu : Ability.check (DRS.ofList []) jhoiraOfTheGhitu = [] := by decide
 def alaundoTheSeer : Action :=
   removeCounters (exactly 1) (some (Semantics.CounterKindSource.printed timeCounter)) (each
@@ -78,7 +78,7 @@ def ashnodsTransmogrant : Ability :=
 theorem okAshnodsTransmogrant : Ability.check (DRS.ofList []) ashnodsTransmogrant = [] := by decide
 def azulaAlwaysLies : Action :=
   chooseModes (oneThrough 2)
-    [ { action := get (target isCreature) (down 1) (down 1) untilEndOfTurn },
+    [ { action := get (target isCreature) (Semantics.Templates.Delta.Amount.down 1) (Semantics.Templates.Delta.Amount.down 1) untilEndOfTurn },
       { action := putCounters 1 (Semantics.CounterKindSource.printed p1p1Counter) (target isCreature) } ]
 theorem okAzulaAlwaysLies : Action.check (DRS.ofList []) azulaAlwaysLies = [] := by decide
 def bellowingAegisaur : Action :=
@@ -165,7 +165,7 @@ def throneWarden : Ability :=
     (putCounters 1 (Semantics.CounterKindSource.printed p1p1Counter) thisCreature)
 theorem okThroneWarden : Ability.check (DRS.ofList []) throneWarden = [] := by decide
 def bloodTyrant : Ability :=
-  whenever (does ((Semantics.Subject.actor (a isPlayer))) loseGame)
+  whenever (does ((Semantics.Subject.actor (a isPlayer))) Semantics.Templates.Action.loseGame)
       (putCounters 5 (Semantics.CounterKindSource.printed p1p1Counter) thisCreature)
 theorem okBloodTyrant : Ability.check (DRS.ofList []) bloodTyrant = [] := by decide
 
@@ -178,7 +178,7 @@ theorem okToweringTitan : Ability.check (DRS.ofList []) toweringTitan = [] := by
 
 /-- Corpsejack Menace -/
 def corpsejackMenace : Ability :=
-  static (replace (would any (putCounters anyAmount (Semantics.CounterKindSource.printed p1p1Counter) (a (and [isCreature, youControl])))) (instead (putCounters (times 2 thatMuch) (Semantics.CounterKindSource.printed p1p1Counter) it)))
+  static (replace (would any (putCounters anyAmount (Semantics.CounterKindSource.printed p1p1Counter) (a (and [isCreature, youControl])))) (instead (putCounters (Semantics.Templates.Amount.times 2 thatMuch) (Semantics.CounterKindSource.printed p1p1Counter) it)))
 theorem okCorpsejackMenace : Ability.check (DRS.ofList []) corpsejackMenace = [] := by decide
 
 /-- Doubling Season's first line: "If an effect would create one or more tokens under your
@@ -201,15 +201,15 @@ def doublingSeasonCounters : Ability :=
 
 /-- Whether an ability is a replacement whose would-clause an effect causes. -/
 private def watchesAnEffect : Ability → Bool
-  | .static (.replace (.causedBy .anEffect _) ..) => true
-  | _ => false
+  | .static (.replace (.causedBy .anEffect _) ..) => Bool.true
+  | _ => Bool.false
 
 /-- Both of Doubling Season's lines watch only what an effect does, "if an effect would …"
 [CR#614.16], so neither doubles a Saga's turn-based lore counter [CR#703.1,714.3c]. Corpsejack
 Menace's "if one or more +1/+1 counters would be put" has no such cause. -/
 theorem doublingSeasonWatchesAnEffect :
-    watchesAnEffect doublingSeasonTokens = true ∧ watchesAnEffect doublingSeasonCounters = true ∧
-      watchesAnEffect corpsejackMenace = false := by decide
+    watchesAnEffect doublingSeasonTokens = Bool.true ∧ watchesAnEffect doublingSeasonCounters = Bool.true ∧
+      watchesAnEffect corpsejackMenace = Bool.false := by decide
 
 /-- What *Doc Samson, Super Psychiatrist* watches you do: "put one or more counters on a permanent
 you control". -/
@@ -218,7 +218,7 @@ def docSamsonWatched : Action := putCounters anyAmount anyKind (a (and [isPerman
 /-- Doc Samson, Super Psychiatrist -/
 def docSamsonDistributive : Ability :=
   static (replace (would (Semantics.Subject.actor you) docSamsonWatched)
-    (instead (putCounters (plus thatMuch 1) thoseCounters (that permanent))))
+    (instead (putCounters (Semantics.Templates.Amount.plus thatMuch 1) thoseCounters (that permanent))))
 theorem okDocSamsonDistributive : Ability.check (DRS.ofList []) docSamsonDistributive = [] := by decide
 
 /-- Adapt is an instruction about "this permanent", the Source, that you, its controller, follow
@@ -227,7 +227,7 @@ watches them. -/
 theorem docSamsonWatchesAdaptsCounters :
     let watched := docSamsonWatched.describedEvents (some .player)
     let adapted := (stepAction 64 .postEvent .obj (DRS.ofList []) (adapt 2)).1.causedEvents
-    watched ≠ [] ∧ watched.all adapted.contains = true := by
+    watched ≠ [] ∧ watched.all adapted.contains = Bool.true := by
   decide
 
 /-- Aragorn, Company Leader -/
@@ -272,7 +272,7 @@ def boonOfSafetyPut : Action :=
 theorem okBoonOfSafetyPut : Action.check (DRS.ofList []) boonOfSafetyPut = [] := by decide
 /-- Vivien's Talent and Teferi's Talent -/
 def talentLoyaltyPut : Action :=
-  putCounters 1 (Semantics.CounterKindSource.printed loyaltyCounter) (enchanted
+  putCounters 1 (Semantics.CounterKindSource.printed loyaltyCounter) (Semantics.Templates.NounPhrase.enchanted
                                                                   planeswalker)
 theorem okTalentLoyaltyPut : Action.check (DRS.ofList []) talentLoyaltyPut = [] := by decide
 /-- Simic Fluxmage -/
@@ -307,7 +307,7 @@ def cycloneUpkeepPayment : Ability :=
   at_ (beginningOfYour .upkeep)
     (sequentially
       [ putCounters 1 (Semantics.CounterKindSource.printed windCounter) thisEnchantment,
-        may (pay (scaled (Semantics.Cost.mana [pip .green]) (times 1 (countersOn windCounter thisEnchantment))) .once)
+        may (pay (scaled (Semantics.Cost.mana [pip .green]) (Semantics.Templates.Amount.times 1 (countersOn windCounter thisEnchantment))) .once)
           (instruct thisEnchantment
             (dealDamage (countersOn windCounter thisEnchantment)
               (each (or [isCreature, isPlayer]))))
@@ -324,20 +324,20 @@ def renataLine : StaticSpec :=
     p1p1Counter
 theorem okRenataLine : StaticSpec.check (DRS.ofList []) renataLine = [] := by decide
 def entDraughtBasinAbility : Ability :=
-  activatedOnlyDuring (compound [mana [.variable], tapSymbol])
+  activatedOnlyDuring (compound [Semantics.Templates.Cost.mana [.variable], tapSymbol])
     (putCounters 1 (Semantics.CounterKindSource.printed p1p1Counter)
       (target (and [isCreature, hasPower .eq (letter .x)])))
     asSorcery
 theorem okEntDraughtBasinAbility : Ability.check (DRS.ofList []) entDraughtBasinAbility = [] := by decide
 
 def coverOfWinterPut : Ability :=
-  activated (mana [.snow]) (putCounters 1 (Semantics.CounterKindSource.printed ageCounter) thisEnchantment)
+  activated (Semantics.Templates.Cost.mana [.snow]) (putCounters 1 (Semantics.CounterKindSource.printed ageCounter) thisEnchantment)
 theorem okCoverOfWinterPut : Ability.check (DRS.ofList []) coverOfWinterPut = [] := by decide
 
 /-- Vivien's Talent -/
 def viviensTalentTrigger : Ability :=
   whenever (does ((Semantics.Subject.actor (a (and [isNontoken, and [isCreature, youControl]])))) enter)
-    (putCounters 1 (Semantics.CounterKindSource.printed loyaltyCounter) (enchanted planeswalker))
+    (putCounters 1 (Semantics.CounterKindSource.printed loyaltyCounter) (Semantics.Templates.NounPhrase.enchanted planeswalker))
 theorem okViviensTalentTrigger : Ability.check (DRS.ofList []) viviensTalentTrigger = [] := by decide
 /-- Bioessence Hydra -/
 def bioessenceHydraTrigger : Ability :=
@@ -405,7 +405,7 @@ theorem okKorvoldCombatTrigger : Ability.check (DRS.ofList []) korvoldCombatTrig
 /-- Mirelurk Queen -/
 def mirelurkQueenTrigger : Ability :=
   whenever
-    (does any (millCards (counted (orMore 1) (and [non isLand, isCard, in_ library]))))
+    (does any (millCards (counted (orMore 1) (and [non isLand, isCard, in_ Semantics.Templates.Location.library]))))
     (sequentially [draw 1, putCounters 1 (Semantics.CounterKindSource.printed (p1p1Counter))
         thisCreature]) (limit := oncePerTurn)
 theorem okMirelurkQueenTrigger : Ability.check (DRS.ofList []) mirelurkQueenTrigger = [] := by decide
@@ -428,7 +428,7 @@ def agentOfTheShadowThievesGrantedTrigger : Ability :=
   whenever (does (Semantics.Subject.actor (thisCreature)) (attack (a isPlayer))) (if_ := some (not
                                                                           (exists_
                                                                              (and [ isOpponent,
-                                 compare .greater (lifeTotalOf (that player))
+                                 compare .greater (lifeTotalOf (that Semantics.Templates.NounWord.player))
                                      (axes := [.playerStat .lifeTotal]) ]))))
                                      (putCounters 1 (Semantics.CounterKindSource.printed (p1p1Counter)) thisCreature)
 theorem okAgentOfTheShadowThievesGrantedTrigger :
@@ -438,7 +438,7 @@ theorem okAgentOfTheShadowThievesGrantedTrigger :
 def chamberSentryDamage : Ability :=
   activated
     (compound
-      [ mana [.variable], tapSymbol,
+      [ Semantics.Templates.Cost.mana [.variable], tapSymbol,
         (Semantics.Cost.perform ((removeCounters (exactlyOf (letter .x)) (some (Semantics.CounterKindSource.printed (p1p1Counter))) thisCreature))) ])
     (instruct this_ (dealDamage (letter .x) (target isAnyTarget)))
 theorem okChamberSentryDamage : Ability.check (DRS.ofList []) chamberSentryDamage = [] := by decide
@@ -463,7 +463,7 @@ def neurokTransmuter : Action :=
 theorem okNeurokTransmuter : Action.check (DRS.ofList []) neurokTransmuter = [] := by decide
 def syphonMind : Action :=
   sequentially
-    [ instruct (each isOtherPlayer) (discard (a (cardIn hand))),
+    [ instruct (each isOtherPlayer) (discard (a (cardIn Semantics.Templates.Location.hand))),
       doForEach (each (and [isCard, was (discard which) thisWay])) (draw 1) ]
 theorem okSyphonMind : Action.check (DRS.ofList []) syphonMind = [] := by decide
 def peek : Action := sequentially [lookAtHandOf (target isPlayer), draw 1]

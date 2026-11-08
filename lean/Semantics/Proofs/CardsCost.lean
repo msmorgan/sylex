@@ -20,6 +20,7 @@ Not ported: `missyChaosBranch` ("chaos ensues" is Planechase, out of scope).
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each)
 open Semantics.Templates.Predicate (and or not did was)
@@ -47,15 +48,15 @@ def cycling : Ability :=
 theorem okCycling : Ability.check (DRS.ofList []) cycling = [] := by decide
 def merrowGrimeblotter : Ability :=
   activated (compound [(Semantics.Cost.mana ([generic 1, hybridPip .blue .black])), untapSymbol])
-    (get (target isCreature) (down 2) (down 0) untilEndOfTurn)
+    (get (target isCreature) (Semantics.Templates.Delta.Amount.down 2) (Semantics.Templates.Delta.Amount.down 0) untilEndOfTurn)
 theorem okMerrowGrimeblotter : Ability.check (DRS.ofList []) merrowGrimeblotter = [] := by decide
 def phyrexianSnowcrusher : Ability :=
   activated (Semantics.Cost.mana ([generic 1, .snow]))
-    (get thisCreature (up 1) (up 0) untilEndOfTurn)
+    (get thisCreature (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 0) untilEndOfTurn)
 theorem okPhyrexianSnowcrusher : Ability.check (DRS.ofList []) phyrexianSnowcrusher = [] := by decide
 def havocSower : Ability :=
   activated (Semantics.Cost.mana ([generic 1, colorlessPip]))
-    (get thisCreature (up 2) (up 1) untilEndOfTurn)
+    (get thisCreature (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn)
 theorem okHavocSower : Ability.check (DRS.ofList []) havocSower = [] := by decide
 /-- Erebos, God of the Dead -/
 def erebos : Ability :=
@@ -63,7 +64,7 @@ def erebos : Ability :=
 theorem okErebos : Ability.check (DRS.ofList []) erebos = [] := by decide
 def baskingRootwalla : Ability :=
   activatedOnlyOnce (Semantics.Cost.mana ([generic 1, pip .green]))
-    (get thisCreature (up 2) (up 2) untilEndOfTurn) oncePerTurn
+    (get thisCreature (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 2) untilEndOfTurn) oncePerTurn
 theorem okBaskingRootwalla : Ability.check (DRS.ofList []) baskingRootwalla = [] := by decide
 def securityDetail : Ability :=
   activatedOnlyOnceIf (Semantics.Cost.mana ([pip .white, pip .white]))
@@ -116,7 +117,7 @@ def dokai : Ability :=
 theorem okDokai : Ability.check (DRS.ofList []) dokai = [] := by decide
 
 def ancientStoneIdol : Ability :=
-  static (costShift this_ (less (forEach 1 (and [isCreature, isAttacking]))))
+  static (costShift this_ (Semantics.Templates.CostShift.less (forEach 1 (and [isCreature, isAttacking]))))
 theorem okAncientStoneIdol : Ability.check (DRS.ofList []) ancientStoneIdol = [] := by decide
 
 def nullhideFerox : Ability :=
@@ -128,8 +129,8 @@ theorem okNullhideFerox : Ability.check (DRS.ofList []) nullhideFerox = [] := by
 def saheelisEmblem : Action :=
   getEmblem
     [ static (getsPt (allOf (and [isArtifact, isCreature, youControl]))
-        (up 1) (up 1)),
-      static ((costShift (allOf (and [isArtifact, isSpell, did (Semantics.Subject.actor (you)) (cast which) thisObject])) (less 1))) ]
+        (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1)),
+      static ((costShift (allOf (and [isArtifact, isSpell, did (Semantics.Subject.actor (you)) (cast which) Semantics.Templates.LookbackSpan.thisObject])) (Semantics.Templates.CostShift.less 1))) ]
 theorem okSaheelisEmblem : Action.check (DRS.ofList []) saheelisEmblem = [] := by decide
 
 /-- Elspeth's Talent -/
@@ -157,22 +158,22 @@ def boomScholarExhaustDiscount : Ability :=
   static (costShift
     (allOf (and [ abilityHead (.keyword exhaust.label),
                    abilityOf (allOf (and [isPermanent, isOther, youControl])) ]))
-    (less 2))
+    (Semantics.Templates.CostShift.less 2))
 theorem okBoomScholarExhaustDiscount : Ability.check (DRS.ofList []) boomScholarExhaustDiscount = [] := by decide
 /-- Hulk, Gamma Goliath -/
 def hulkPowerUpDiscount : Ability :=
   static (costShift
     (allOf (and [ abilityHead (.keyword powerUp.label),
                    abilityOf (allOf (and [isCreature, isOther, youControl])) ]))
-    (less 3))
+    (Semantics.Templates.CostShift.less 3))
 theorem okHulkPowerUpDiscount : Ability.check (DRS.ofList []) hulkPowerUpDiscount = [] := by decide
 
 /-- Fervent Champion -/
 def ferventChampionEquipDiscount : Ability :=
   static (costShift
-    (allOf (and [abilityHead (.keyword equip.label), did (Semantics.Subject.actor (you)) (activate which) thisObject,
+    (allOf (and [abilityHead (.keyword equip.label), did (Semantics.Subject.actor (you)) (Semantics.Definitions.Action.activate which) Semantics.Templates.LookbackSpan.thisObject,
         targeting thisCreature .someTarget]))
-    (less 3))
+    (Semantics.Templates.CostShift.less 3))
 theorem okFerventChampionEquipDiscount : Ability.check (DRS.ofList []) ferventChampionEquipDiscount = [] := by decide
 
 def oppressiveRaysLine : StaticSpec :=
@@ -190,32 +191,32 @@ theorem okHurrJackalAbility : Ability.check (DRS.ofList []) hurrJackalAbility = 
 
 /-- Void Maw -/
 def voidMawPutCost : Ability :=
-  activated (Semantics.Cost.perform ((putInto (a (in_ (exiledWith thisCreature))) graveyard)))
-    (get thisCreature (up 2) (up 2) untilEndOfTurn)
+  activated (Semantics.Cost.perform ((putInto (a (in_ (exiledWith thisCreature))) Semantics.Templates.Location.graveyard)))
+    (get thisCreature (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 2) untilEndOfTurn)
 theorem okVoidMawPutCost : Ability.check (DRS.ofList []) voidMawPutCost = [] := by decide
 /-- Ghor-Clan Rampager -/
 def ghorClanRampager : Ability :=
   bloodrush
     (activated (compound [(Semantics.Cost.mana ([pip .red, pip .green])), (Semantics.Cost.perform (discard this_))])
       (establishFor (target (and [isCreature, isAttacking]))
-        [getsPt it (up 4) (up 4), abilityGrant it trample]
+        [getsPt it (Semantics.Templates.Delta.Amount.up 4) (Semantics.Templates.Delta.Amount.up 4), abilityGrant it trample]
         untilEndOfTurn))
 theorem okGhorClanRampager : Ability.check (DRS.ofList []) ghorClanRampager = [] := by decide
 /-- Tymora's Invoker -/
 def tymorasInvoker : Ability :=
-  flavorWord "Sleight of Hand" (activated (Semantics.Cost.mana ([generic 8])) (draw 2))
+  Semantics.Templates.Ability.flavorWord "Sleight of Hand" (activated (Semantics.Cost.mana ([generic 8])) (draw 2))
 theorem okTymorasInvoker : Ability.check (DRS.ofList []) tymorasInvoker = [] := by decide
 /-- Skyblade's Boon -/
 def skybladesBoonReturn : Ability :=
   activatedOnlyIf (Semantics.Cost.mana ([generic 2, pip .white])) (returnToHand this_)
-    (or [is this_ (in_ battlefield), is this_ (cardIn yourGraveyard)])
+    (or [is this_ (in_ Semantics.Templates.Location.battlefield), is this_ (cardIn yourGraveyard)])
 theorem okSkybladesBoonReturn : Ability.check (DRS.ofList []) skybladesBoonReturn = [] := by decide
 /-- Bamboozling Beeble -/
 def bamboozlingBeebleIgnore : Ability :=
   activated (compound [(Semantics.Cost.mana ([generic 1])), tapSymbol])
     (replaceNextEvent (would ((Semantics.Subject.actor (target isPlayer))) (rollDice anyAmount .anyDie))
       (instead (sequentially
-        [ instruct they (rollDice (plus thatMuch 1) .thoseDice),
+        [ instruct they (rollDice (Semantics.Templates.Amount.plus thatMuch 1) .thoseDice),
           ignoreOutcomes (chosenResults you 1) ]))
       thisTurn)
 theorem okBamboozlingBeebleIgnore : Ability.check (DRS.ofList []) bamboozlingBeebleIgnore = [] := by decide
@@ -224,13 +225,13 @@ def generalTazriPump : Ability :=
   activated (Semantics.Cost.mana ([pip .white, pip .blue, pip .black, pip .red, pip .green]))
     (sequentially
       [ get (each (and [isCreature, (Semantics.Predicate.hasSubtype (ally)), youControl]))
-          (up (letter .x)) (up (letter .x)) untilEndOfTurn,
+          (Semantics.Templates.Delta.Amount.up (letter .x)) (Semantics.Templates.Delta.Amount.up (letter .x)) untilEndOfTurn,
         define .x (distinctCount .color (those creature)) ])
 theorem okGeneralTazriPump : Ability.check (DRS.ofList []) generalTazriPump = [] := by decide
 /-- Diplomatic Escort -/
 def diplomaticEscortLine : Ability :=
   activated (compound [(Semantics.Cost.mana ([pip .blue])), tapSymbol, (Semantics.Cost.perform (discard (a (cardIn yourHand))))])
-    (counter
+    (Semantics.Definitions.Action.counter
       (target (and [or [isSpell, abilityHead .anyOnStack], targeting (a isCreature) .someTarget])))
 theorem okDiplomaticEscortLine : Ability.check (DRS.ofList []) diplomaticEscortLine = [] := by decide
 
@@ -251,7 +252,7 @@ theorem noCostNoLetter : costLetters none = [] := by decide
 
 /-- Doc Aurlock, Grizzled Genius -/
 def docAurlockCost : StaticSpec :=
-  (costShift (allOf (and [isSpell, did (Semantics.Subject.actor (you)) (cast which (from_ := some (or [yourGraveyard, exileZone]))) thisObject])) (less 2))
+  (costShift (allOf (and [isSpell, did (Semantics.Subject.actor (you)) (cast which (from_ := some (or [yourGraveyard, exileZone]))) Semantics.Templates.LookbackSpan.thisObject])) (Semantics.Templates.CostShift.less 2))
 theorem okDocAurlockCost : StaticSpec.check (DRS.ofList []) docAurlockCost = [] := by decide
 /-- Obelisk of Undoing -/
 def obeliskOfUndoing : Ability :=
@@ -261,7 +262,7 @@ theorem okObeliskOfUndoing : Ability.check (DRS.ofList []) obeliskOfUndoing = []
 
 /-- Cavern-Hoard Dragon -/
 def cavernHoardDragonRider : Ability :=
-  static (conjunction [ costShift this_ (less (letter .x)),
+  static (conjunction [ costShift this_ (Semantics.Templates.CostShift.less (letter .x)),
       letterDefinition .x
         (aggregateOver .max isOpponent (countOf (and [isArtifact, controlledBy they]))) ])
 theorem okCavernHoardDragonRider : Ability.check (DRS.ofList []) cavernHoardDragonRider = [] := by decide
@@ -284,7 +285,7 @@ theorem okShayCormacStrip : Ability.check (DRS.ofList []) shayCormacStrip = [] :
 def nestingDragonInnerToken : Ability :=
   activated (Semantics.Cost.mana ([pip .red]))
     (establishThroughout
-       (conjunction [ getsPt thisToken (up 1) (up 0) ]) untilEndOfTurn)
+       (conjunction [ getsPt thisToken (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 0) ]) untilEndOfTurn)
 theorem okNestingDragonInnerToken : Ability.check (DRS.ofList []) nestingDragonInnerToken = [] := by decide
 
 /-- Alluring Suitor // Deadly Dancer -/
@@ -292,7 +293,7 @@ def deadlyDancerPump : Ability :=
   activated (Semantics.Cost.mana ([pip .red, pip .red]))
     (establishThroughout
        (getsPt (eachOf (both thisCreature (target (and [isCreature, isOther]))))
-          (up 1) (up 0)) untilEndOfTurn)
+          (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 0)) untilEndOfTurn)
 theorem okDeadlyDancerPump : Ability.check (DRS.ofList []) deadlyDancerPump = [] := by decide
 
 def bareTextLetter : Amount := letter .x

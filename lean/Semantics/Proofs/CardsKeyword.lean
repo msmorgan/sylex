@@ -50,7 +50,7 @@ def gabrielAngelfire : Action :=
 theorem okGabrielAngelfire : Action.check (DRS.ofList []) gabrielAngelfire = [] := by decide
 def builtToSmash : Action :=
   sequentially
-    [ get (target (and [isCreature, isAttacking])) (up 3) (up 3) untilEndOfTurn,
+    [ get (target (and [isCreature, isAttacking])) (Semantics.Templates.Delta.Amount.up 3) (Semantics.Templates.Delta.Amount.up 3) untilEndOfTurn,
       doIf (is it (and [isArtifact, isCreature]))
         (gain it trample untilEndOfTurn) ]
 theorem okBuiltToSmash : Action.check (DRS.ofList []) builtToSmash = [] := by decide
@@ -108,7 +108,7 @@ theorem okPontiffOfBlight : Ability.check (DRS.ofList []) pontiffOfBlight = [] :
 
 /-- Blade of the Oni -/
 def bladeOfTheOniStatic : StaticSpec :=
-  conjunction [ getsBase (equipped creature) 5 5,
+  conjunction [ getsBase (Semantics.Templates.NounPhrase.equipped creature) 5 5,
       abilityGrant it menace,
       qualityChange it .adds
         (bundle { characteristics := { colors := [.black], subtypes := [demon] } }) ]
@@ -130,7 +130,7 @@ theorem okTayamLine : StaticSpec.check (DRS.ofList []) tayamLine = [] := by deci
 
 /-- Kang the Conqueror -/
 def kangPowerUpLock : StaticSpec :=
-  cant any (activate (allOf (abilityHead (.keyword powerUp.label))))
+  cant any (Semantics.Definitions.Action.activate (allOf (abilityHead (.keyword powerUp.label))))
 theorem okKangPowerUpLock : StaticSpec.check (DRS.ofList []) kangPowerUpLock = [] := by decide
 
 def stormOfSouls : Action :=
@@ -140,7 +140,7 @@ def stormOfSouls : Action :=
         { characteristics :=
           { subtypes := [spirit], text := [flying],
             power := stat 1, toughness := stat 1 } },
-      exile this_ ]
+      Semantics.Definitions.Action.exile this_ ]
 theorem okStormOfSouls : Action.check (DRS.ofList []) stormOfSouls = [] := by decide
 
 /-- Hate Mirage's middle two sentences -/
@@ -255,15 +255,15 @@ theorem okNewPerspectivesCyclingAltCost :
     Ability.check (DRS.ofList []) newPerspectivesCyclingAltCost = [] := by decide
 /-- Whether an ability is an alternative cost that applies only "as long as" a condition holds. -/
 def altCostAsLongAs : Ability → Bool
-  | .static (.conditional (.altCost ..) _ .asLongAs) => true
-  | _ => false
+  | .static (.conditional (.altCost ..) _ .asLongAs) => Bool.true
+  | _ => Bool.false
 /-- The condition-less spelling drops the printed "as long as you have seven or more cards in
 hand": the card's alternative cost sits under a `conditional … .asLongAs`, which that spelling
 lacks. -/
 theorem badNewPerspectivesWithoutCondition :
-    altCostAsLongAs newPerspectivesCyclingAltCost = true ∧
+    altCostAsLongAs newPerspectivesCyclingAltCost = Bool.true ∧
       altCostAsLongAs (static (altCost (allOf (abilityHead (.keyword cycling.label))) (some (Semantics.Cost.mana ([generic 0])))))
-        = false := by decide
+        = Bool.false := by decide
 
 /-- Fumiko the Lowblood -/
 def fumikoBushidoX : Ability :=
@@ -348,8 +348,8 @@ def protectionFromAnyColor : KeywordTerm :=
   ((match (Semantics.Cards.«Escaped Shapeshifter») with
     | .singleFaced face => match face.characteristics.text with
       | .sameIsTrueFor _ keywords :: _ => keywords.filter fun
-        | KeywordTerm.anyIn _ => true
-        | _ => false
+        | KeywordTerm.anyIn _ => Bool.true
+        | _ => Bool.false
       | _ => []
     | _ => [])[0]?).get (by decide)
 
@@ -381,7 +381,7 @@ def maritLage : CharacteristicBundle :=
     | _ => none).get (by decide)
 
 def giantGrowth : Action :=
-  get (target isCreature) (up 3) (up 3) untilEndOfTurn
+  get (target isCreature) (Semantics.Templates.Delta.Amount.up 3) (Semantics.Templates.Delta.Amount.up 3) untilEndOfTurn
 theorem okGiantGrowth : Action.check (DRS.ofList []) giantGrowth = [] := by decide
 def amassZombiesTwo : Action := amass zombie 2
 theorem okAmassZombiesTwo : Action.check (DRS.ofList []) amassZombiesTwo = [] := by decide

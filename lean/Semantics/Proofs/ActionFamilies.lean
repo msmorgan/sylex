@@ -17,10 +17,10 @@ open Semantics.Templates.Exposed (zone)
 namespace Semantics.Proofs.ActionFamilies
 
 private def outcomeReferents (drs : DRS) : List Referent :=
-  drs.referents.filter fun ref => match ref.payload with | .outcome _ => true | _ => false
+  drs.referents.filter fun ref => match ref.payload with | .outcome _ => Bool.true | _ => Bool.false
 
 theorem okBlockednessWithoutChangingBlockingRelations :
-    Action.check (DRS.ofList []) (.combat thisCreature (.participation (.blocked false))) = [] := by decide
+    Action.check (DRS.ofList []) (.combat thisCreature (.participation (.blocked Bool.false))) = [] := by decide
 
 theorem okRemoveAttackedPlaneswalkerFromCombat :
     Action.check (DRS.ofList []) (.combat (.headed (.type .planeswalker) .this)
@@ -55,7 +55,7 @@ theorem okCreateSeveralEmblems :
 theorem okEmblemPublication :
     (actionResult (DRS.ofList [])
       (.createObject 1 (.emblem none emblemAbilities) none)).sameReferents
-      (DRS.ofList [({ det := .a, plur := .one, payload := .object [] (some .command) none none none } : Referent)]) = true := by decide
+      (DRS.ofList [({ det := .a, plur := .one, payload := .object [] (some .command) none none none } : Referent)]) = Bool.true := by decide
 
 theorem copiedTokenUsesItsSelectedSourceRatherThanANeighbor :
     let source := nounResult (DRS.ofList []) (.firstMention "token.source" (target isArtifact))
@@ -72,7 +72,7 @@ private def exiledAbility : DRS :=
   actionResult (DRS.ofList []) (.move (target (.abilityHead .anyActivated)) .anyLocation (some exileZone) .arrival [])
 
 private def graveyardAbility : DRS :=
-  actionResult (DRS.ofList []) (.move (target (.abilityHead .anyActivated)) .anyLocation (some graveyard) .arrival [])
+  actionResult (DRS.ofList []) (.move (target (.abilityHead .anyActivated)) .anyLocation (some Semantics.Templates.Location.graveyard) .arrival [])
 
 theorem exiledAbilityKeepsItsLocation :
     nounZone exiledAbility (that .ability) = some .exile := by decide
@@ -92,19 +92,19 @@ theorem movementPublishesItsRequiredDestination :
     nounZone graveyardAbility (that .ability) = some .graveyard := by decide
 
 theorem movementAcceptsAnAbilitySubject :
-    Action.check (DRS.ofList []) (.move (target (.abilityHead .anyActivated)) .anyLocation (some graveyard) .arrival []) = [] := by decide
+    Action.check (DRS.ofList []) (.move (target (.abilityHead .anyActivated)) .anyLocation (some Semantics.Templates.Location.graveyard) .arrival []) = [] := by decide
 
 theorem graveyardDestinationAcceptsCounterRiders :
-    Action.check (DRS.ofList []) (.move (target (.abilityHead .anyActivated)) .anyLocation (some graveyard) .arrival [(.withCounters 1 (.printed p1p1Counter) .fresh)]) = [] := by decide
+    Action.check (DRS.ofList []) (.move (target (.abilityHead .anyActivated)) .anyLocation (some Semantics.Templates.Location.graveyard) .arrival [(.withCounters 1 (.printed p1p1Counter) .fresh)]) = [] := by decide
 
 theorem pronounMovePreservesCopyOriginAndOuterBindings :
     (actionResult (DRS.ofList [
       { det := .the, plur := .one, payload := .ability (some .copy) },
-      { det := .the, plur := .one, payload := .player false }])
-      (.move (that .ability) .anyLocation (some graveyard) .arrival [])).sameReferents
+      { det := .the, plur := .one, payload := .player Bool.false }])
+      (.move (that .ability) .anyLocation (some Semantics.Templates.Location.graveyard) .arrival [])).sameReferents
       (DRS.ofList [
         { det := .the, plur := .one, payload := .ability (some .copy) (some .graveyard) },
-        { det := .the, plur := .one, payload := .player false }]) = true := by decide
+        { det := .the, plur := .one, payload := .player Bool.false }]) = Bool.true := by decide
 
 theorem abilityElementRetainsItsLocation :
     nounZone (DRS.ofList []) (.eachOf (allOf (.and [.abilityHead .anyActivated, .in_ exileZone]))) = some .exile := by decide
@@ -143,7 +143,7 @@ private def operand (i : Nat) : NounPhrase := .laterMention (operandKey i) .any
 
 private def operandContext (drs : DRS) (operands : List NounPhrase) : DRS :=
   operands.zipIdx.foldl (fun context (noun, i) =>
-    (stepNounPhrase 64 context .other false (.firstMention (operandKey i) noun)).1) drs
+    (stepNounPhrase 64 context .other Bool.false (.firstMention (operandKey i) noun)).1) drs
 
 private def operandIdentity (drs : DRS) (i : Nat) : Option ReferentId :=
   (drs.visibleReferents.find? (fun ref => ref.idents.contains (operandKey i))).map (·.id)
@@ -210,12 +210,12 @@ theorem regenerationInstallationPublishesNoImmediateOutcome :
 
 theorem counterDoesNotLeaveAnAbilityOnTheStack :
     nounZone (actionResult (DRS.ofList [])
-      (counter (target (.abilityHead .anyActivated))))
+      (Semantics.Definitions.Action.counter (target (.abilityHead .anyActivated))))
       (that .ability) = some .graveyard := by decide
 
 theorem counterPreservesTheAbilityCategory :
     NounPhrase.checkAt none (actionResult (DRS.ofList [])
-      (counter (target (.abilityHead .anyActivated))))
+      (Semantics.Definitions.Action.counter (target (.abilityHead .anyActivated))))
       (that .ability) = [] := by decide
 
 theorem losingCountersPublishesTheSharedRemovalOutcome :
@@ -234,13 +234,13 @@ theorem forgottenOperandDoesNotRedirectToNeighbor :
     let shuffled := afterShuffle bound
     let moved := movedOperand shuffled (operand 0) (some .exile)
     NounPhrase.checkAt none shuffled (operand 0) = [.bindingIdentity (operandKey 0)] ∧
-      neighbor.isSome = true ∧
+      neighbor.isSome = Bool.true ∧
       operandIdentity shuffled 1 = neighbor ∧
       (neighbor.bind moved.findById?).bind (·.zone) = some .battlefield ∧
-      moved.sameReferents shuffled = true := by decide
+      moved.sameReferents shuffled = Bool.true := by decide
 
 theorem postposedCounterConditionReadsTheUnmovedSpell :
-    Action.check (DRS.ofList []) (doOnlyIf (counter (target isSpell))
+    Action.check (DRS.ofList []) (doOnlyIf (Semantics.Definitions.Action.counter (target isSpell))
       (costWasPaid (.byKeyword (.named "kicker")) none it) none) = [] := by decide
 
 
@@ -254,7 +254,7 @@ theorem regenerationCanProtectANoncreaturePermanent :
 
 theorem alternativeDoesNotObserveThePrimaryBranchesMove :
     Action.check (DRS.ofList []) (doOnlyIf (putInto (target isSpell) exileZone)
-      (.matches it (.colorIs .red)) (some (counter it))) = [] := by decide
+      (.matches it (.colorIs .red)) (some (Semantics.Definitions.Action.counter it))) = [] := by decide
 
 
 theorem forgottenAliasesAreBothRefused :
@@ -273,7 +273,7 @@ theorem conditionalShuffleForgetsPrivateOperand :
     Action.check (DRS.ofList []) (.ownScope none (.sequentially [
       .expose .lookAt (.cards (.firstMention (operandKey 0) (a (.and [.isCard, .in_ yourLibrary])))),
       .doIf (.matches .you .isPlayer) (.shuffle (libraryOf .actor)) none,
-      .move (operand 0) .anyLocation (some graveyard) .arrival []])) =
+      .move (operand 0) .anyLocation (some Semantics.Templates.Location.graveyard) .arrival []])) =
       [.bindingIdentity (operandKey 0)] := by decide
 
 theorem capturePreservesTheResolvedPermanentView :

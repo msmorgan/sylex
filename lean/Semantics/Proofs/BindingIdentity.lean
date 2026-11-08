@@ -60,14 +60,14 @@ theorem copiedArgumentTargetsTwice :
 
 /-- The later mention reads the very binding the first mention introduced. -/
 theorem laterMentionReadsTheFirstMention :
-    let after := nounResult (DRS.ofList []) (.firstMention "m.0" (target isCreature)) .obj true
-    (stepNounPhrase 64 after .obj true (.laterMention "m.0" (target isCreature))).2.1 == [0] := by
+    let after := nounResult (DRS.ofList []) (.firstMention "m.0" (target isCreature)) .obj Bool.true
+    (stepNounPhrase 64 after .obj Bool.true (.laterMention "m.0" (target isCreature))).2.1 == [0] := by
   decide
 
 /-- A binding pushed between the mentions does not move the read: the later mention still
 reads the artifact the first mention targeted, not the creature targeted after it. -/
 theorem interveningBindingDoesNotShiftTheRead :
-    let after := nounResult (nounResult (DRS.ofList []) (.firstMention "m.0" (target isArtifact)) .obj true) (target isCreature) .obj true
+    let after := nounResult (nounResult (DRS.ofList []) (.firstMention "m.0" (target isArtifact)) .obj Bool.true) (target isCreature) .obj Bool.true
     (identityBinding "m.0" after).map (·.ty) =
       some [.artifact] := by
   decide
@@ -138,7 +138,7 @@ theorem okFightHandedToEachOfAGroup :
 private def discardThenExile (x : NounPhrase) : Action :=
   .sequentially
     [ discard (.firstMention "discardThenExile.0" x),
-      exile (.laterMention "discardThenExile.0" x) ]
+      Semantics.Definitions.Action.exile (.laterMention "discardThenExile.0" x) ]
 
 /-- "Each opponent discards a card, then exiles it": the first mention is checked where it
 stands, inside the handoff, so each opponent chooses their own card. -/

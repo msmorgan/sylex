@@ -10,6 +10,7 @@ bench items beside them.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a the)
 open Semantics.Templates.Predicate (and or not did was)
@@ -68,7 +69,7 @@ def qarsiDeceiverMorphSpend : Ability :=
     (addMana 1 (manaOf [[.colorless]])
       [spendOnly
         [ toCast (and [isCreature, isFaceDown]),
-          toTurnFaceUp (and [isCreature, was (manifest which) thisObject]),
+          toTurnFaceUp (and [isCreature, was (manifest which) Semantics.Templates.LookbackSpan.thisObject]),
           toPay (.ofKeyword morph.label) ]])
 theorem okQarsiDeceiverMorphSpend : Ability.check (DRS.ofList []) qarsiDeceiverMorphSpend = [] := by decide
 
@@ -77,7 +78,7 @@ def rootcoilCreeperGraveyardMana : Ability :=
   activated tapSymbol
     (addMana 2 (ofAnyColor .sameColor)
       [spendOnly [toCast (and [isSpell,
-          did any (cast which (from_ := yourGraveyard)) thisObject])]])
+          did any (cast which (from_ := yourGraveyard)) Semantics.Templates.LookbackSpan.thisObject])]])
 theorem okRootcoilCreeperGraveyardMana : Ability.check (DRS.ofList []) rootcoilCreeperGraveyardMana = [] := by
   decide
 
@@ -98,8 +99,8 @@ theorem okNahiriLoyaltyRead : Predicate.checkAt .object (DRS.ofList []) nahiriLo
 /-- Caustic Bronco -/
 def causticBroncoLoss : Action :=
   sequentially
-    [ reveal (topSlice 1),
-      putInto (that card) hand,
+    [ Semantics.Definitions.Action.reveal (topSlice 1),
+      putInto (that card) Semantics.Templates.Location.hand,
       doOnlyIf (loseLife (statOf (.stat .manaValue) it))
         (not (is thisCreature (hasDesignation saddled)))
         (instruct eachOpponent (loseLife thatMuch)) ]
@@ -114,7 +115,7 @@ theorem okDarkFortressMana : Ability.check (DRS.ofList []) darkFortressMana = []
 
 /-- Karametra's Acolyte -/
 def karametrasAcolyte : Ability :=
-  activated tapSymbol (addMana (devotion you (color .green)) (manaOf [[.of .green]]))
+  activated tapSymbol (addMana (devotion you (Semantics.Templates.ColorTerm.color .green)) (manaOf [[.of .green]]))
 theorem okKarametrasAcolyte : Ability.check (DRS.ofList []) karametrasAcolyte = [] := by decide
 
 /-- Birthing Pod -/
@@ -123,7 +124,7 @@ def birthingPodSearch : Ability :=
     (compound [(Semantics.Cost.mana [generic 1, phyrexianPip .green]), tapSymbol, (Semantics.Cost.perform (sacrifice (a isCreature)))])
     (search yourLibrary
       (a (and [isCreature,
-             hasManaValue .eq (plus 1 (statOf (.stat .manaValue)
+             hasManaValue .eq (Semantics.Templates.Amount.plus 1 (statOf (.stat .manaValue)
                    (the (and [was (sacrifice which), isCreature]))))])))
 theorem okBirthingPodSearch : Ability.check (DRS.ofList []) birthingPodSearch = [] := by decide
 
@@ -166,7 +167,7 @@ theorem okSoulShatter : Action.check (DRS.ofList []) soulShatter = [] := by deci
 def padeemConsulOfInnovation : Ability :=
   at_ (beginningOfYour .upkeep)
     (if_ := exists_ (and [isArtifact, youControl,
-      superlative .max (.stat .manaValue) (and [isArtifact, in_ battlefield])]))
+      superlative .max (.stat .manaValue) (and [isArtifact, in_ Semantics.Templates.Location.battlefield])]))
     (draw 1)
 theorem okPadeemConsulOfInnovation : Ability.check (DRS.ofList []) padeemConsulOfInnovation = [] := by decide
 
@@ -174,8 +175,8 @@ theorem okPadeemConsulOfInnovation : Ability.check (DRS.ofList []) padeemConsulO
 def delightedHalflingMana : Ability :=
   activated tapSymbol
     (addMana 1 (ofAnyColor .sameColor)
-      [ whenSpentOn .affectsIt true (a (and [hasSupertype .legendary, isSpell]))
-          (establish (cant any (counter (that .spell)))) ])
+      [ whenSpentOn .affectsIt Bool.true (a (and [hasSupertype .legendary, isSpell]))
+          (establish (cant any (Semantics.Definitions.Action.counter (that .spell)))) ])
 theorem okDelightedHalflingMana : Ability.check (DRS.ofList []) delightedHalflingMana = [] := by decide
 
 /-- Thran Turbine -/

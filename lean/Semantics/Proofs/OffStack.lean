@@ -65,7 +65,7 @@ theorem okWhileHoldsCitysBlessing :
 
 /-- "Return the permanent this spell becomes to its owner's hand" [CR#400.7,702.109a]. -/
 theorem okBecomesThisSpell :
-    Action.check (DRS.ofList []) (putInto (.becomes thisSpell) hand) = [] := by decide
+    Action.check (DRS.ofList []) (putInto (.becomes thisSpell) Semantics.Templates.Location.hand) = [] := by decide
 
 /-- Only an object changes zones [CR#400.7]: what a player "becomes" is refused as a kind. -/
 theorem badBecomesOfAPlayer :
@@ -83,13 +83,13 @@ theorem okExceptByKeyword :
 theorem okExceptByObjects :
     StaticSpec.check (DRS.ofList [])
       (cant any (block thisCreature)
-        (except := byObjects (bare (and [isCreature, or [isArtifact, hasColor .black]])))) = [] := by
+        (except := byObjects (Semantics.Templates.NounPhrase.bare (and [isCreature, or [isArtifact, hasColor .black]])))) = [] := by
   decide
 
 /-- An exception by objects describes objects: "except by opponents" is refused as a kind. -/
 theorem badExceptByPlayers :
     StaticSpec.check (DRS.ofList [])
-      (cant any (block thisCreature) (except := byObjects (bare isOpponent))) =
+      (cant any (block thisCreature) (except := byObjects (Semantics.Templates.NounPhrase.bare isOpponent))) =
         [.kindMismatch .object .player] := by
   decide
 
@@ -151,12 +151,12 @@ Definition revealed, by its deed: after the reveal it counts them, and with no r
 it reads none. -/
 theorem amplifyCountsTheCardsRevealedThisWay :
     let revealed := (stepAction 64 .postEvent .obj (DRS.ofList [])
-      (reveal (counted anyNumber (and [cardIn yourHand, isCreature])))).1
-    (participialCandidates (.deed reveal.deed) none (some .card) true revealed).length = 1 ∧
-      Amount.check (nextClause revealed) (forEach 1 (and [.isCard, was (reveal which) thisWay])) =
+      (Semantics.Definitions.Action.reveal (counted anyNumber (and [cardIn yourHand, isCreature])))).1
+    (participialCandidates (.deed Semantics.Definitions.Action.reveal.deed) none (some .card) Bool.true revealed).length = 1 ∧
+      Amount.check (nextClause revealed) (forEach 1 (and [.isCard, was (Semantics.Definitions.Action.reveal which) thisWay])) =
         [] ∧
-      Amount.check (DRS.ofList []) (forEach 1 (and [.isCard, was (reveal which) thisWay])) =
-        [.participialDescription (.deed reveal.deed) 0] := by
+      Amount.check (DRS.ofList []) (forEach 1 (and [.isCard, was (Semantics.Definitions.Action.reveal which) thisWay])) =
+        [.participialDescription (.deed Semantics.Definitions.Action.reveal.deed) 0] := by
   decide
 
 /-! ## The readbacks (`semantics-v2-linked-readback`) -/
@@ -179,7 +179,7 @@ theorem okGoblinsItDevoured :
     Ability.checkText (DRS.ofList [])
       [ devour 1,
         when (does (Semantics.Subject.actor thisCreature) enter)
-          (dealDamage (times 2 (countOf (and [hasSubtype goblin, did (Semantics.Subject.actor (it)) (Definitions.Action.devour which)])))
+          (dealDamage (Semantics.Templates.Amount.times 2 (countOf (and [hasSubtype goblin, did (Semantics.Subject.actor (it)) (Definitions.Action.devour which)])))
             (target isAnyTarget)) ] = [] := by
   decide
 
@@ -189,7 +189,7 @@ theorem badDevouredWithoutDevour :
     Ability.checkText (DRS.ofList []) [drawForEachDevoured] =
         [.participialDescription (.deed (.ofAbility (.named "devour"))) 0] ∧
       Ability.checkText (DRS.ofList [])
-        [ static (.addedCost (.perform (sacrifice (a isCreature))) false .once),
+        [ static (.addedCost (.perform (sacrifice (a isCreature))) Bool.false .once),
           drawForEachDevoured ] =
         [.participialDescription (.deed (.ofAbility (.named "devour"))) 0] := by
   decide
@@ -223,12 +223,12 @@ ability of its own [CR#702.109a,702.152a,702.185a,113.2c], and none is an "as [e
 Static. Rewritten from the pin that each watched an invented event, the permanent's move from
 the stack to the battlefield: the rules give the timing, and the text names no event. -/
 theorem delayedTriggersWaitForThePermanent :
-    ((resolutionDelayedTriggers (dash (mana [generic 1]))).length,
-      (resolutionDelayedTriggers (blitz (mana [generic 1]))).length,
-      (resolutionDelayedTriggers (warp (mana [generic 1]))).length,
-      offStackStatics (dash (mana [generic 1])),
-      offStackStatics (blitz (mana [generic 1])),
-      offStackStatics (warp (mana [generic 1])))
+    ((resolutionDelayedTriggers (dash (Semantics.Templates.Cost.mana [generic 1]))).length,
+      (resolutionDelayedTriggers (blitz (Semantics.Templates.Cost.mana [generic 1]))).length,
+      (resolutionDelayedTriggers (warp (Semantics.Templates.Cost.mana [generic 1]))).length,
+      offStackStatics (dash (Semantics.Templates.Cost.mana [generic 1])),
+      offStackStatics (blitz (Semantics.Templates.Cost.mana [generic 1])),
+      offStackStatics (warp (Semantics.Templates.Cost.mana [generic 1])))
       = (1, 1, 1, [], [], []) := by
   rfl
 
@@ -238,7 +238,7 @@ is the spell's controller as it resolved, who controls the permanent it sacrific
 [CR#603.7d,701.21a]. Rewritten from the `asEvent` tree, which read both
 off `thisPermanent`. -/
 theorem blitzSacrificesThePermanent :
-    resolutionDelayedTriggers (blitz (mana [generic 1]))
+    resolutionDelayedTriggers (blitz (Semantics.Templates.Cost.mana [generic 1]))
       = [doIf (keywordCostPaid (.named "blitz") thisSpell)
           (atNext .endStep (sacrifice (becomes thisSpell)))] := by
   rfl
@@ -254,9 +254,9 @@ theorem resolutionDelayedTriggerCreatesOne :
   decide
 
 theorem okDashBlitzWarp :
-    (Ability.check (DRS.ofList []) (dash (mana [generic 1])),
-      Ability.check (DRS.ofList []) (blitz (mana [generic 1])),
-      Ability.check (DRS.ofList []) (warp (mana [generic 1]))) = ([], [], []) := by
+    (Ability.check (DRS.ofList []) (dash (Semantics.Templates.Cost.mana [generic 1])),
+      Ability.check (DRS.ofList []) (blitz (Semantics.Templates.Cost.mana [generic 1])),
+      Ability.check (DRS.ofList []) (warp (Semantics.Templates.Cost.mana [generic 1]))) = ([], [], []) := by
   decide
 
 /-! ## An Aura's entry -/
@@ -280,15 +280,15 @@ theorem enchantReplacesTheEntering :
       = ([],
         [ (would (Semantics.Subject.actor thisAura) enter,
             doIf (not (exists_ (legalHostOf thisAura)))
-              (instead (doIf (is thisAura (in_ stack)) (putInto thisAura graveyard)))),
+              (instead (doIf (is thisAura (in_ Semantics.Templates.Location.stack)) (putInto thisAura Semantics.Templates.Location.graveyard)))),
           (would .any
-              (.move thisAura (not stack) battlefield .arrival [.not (.attachedTo .any)]),
+              (.move thisAura (not Semantics.Templates.Location.stack) Semantics.Templates.Location.battlefield .arrival [.not (.attachedTo .any)]),
             doIf (exists_ (legalHostOf thisAura))
-              (before (choose (a (legalHostOf thisAura)))
+              (Semantics.Templates.Replacement.before (choose (a (legalHostOf thisAura)))
                 (some (alongside (attachTo thisAura it))))),
           (would (Semantics.Subject.actor thisAura)
               (enter (riders := [.attachedTo .any, .not (.attachedTo (a (legalHostOf thisAura)))])),
-            instead (doIf (is thisAura (in_ stack)) (putInto thisAura graveyard))) ]) := by
+            instead (doIf (is thisAura (in_ Semantics.Templates.Location.stack)) (putInto thisAura Semantics.Templates.Location.graveyard))) ]) := by
   rfl
 
 /-- The [CR#303.4f] choice applies only where "the effect putting it onto the battlefield doesn't
@@ -309,7 +309,7 @@ writes. The host an effect names is an object or a player [CR#303.4b,701.3a]: a 
 be one, a color may not. -/
 theorem riderNegationIsOnlyAPattern :
     Action.check (DRS.ofList [])
-        (put (target isCreature) battlefield [.not (.entersAs .tapped)]) =
+        (put (target isCreature) Semantics.Templates.Location.battlefield [.not (.entersAs .tapped)]) =
       [.riderNegationPattern] ∧
     Action.check (DRS.ofList [])
         (putOntoBattlefieldAttachedTo (a (and [hasSubtype aura, cardIn yourHand]))

@@ -24,7 +24,7 @@ private def comparison : Predicate :=
 /-- The subordinate comparison candidate outranks an enclosing subject from the older clause. -/
 theorem comparisonReadsItsCandidateRatherThanTheOuterArtifact :
     let member := bindFor .the .one .object (.hasType .creature)
-    let localContext := (nextClause outerArtifact).push member .other false
+    let localContext := (nextClause outerArtifact).push member .other Bool.false
     Predicate.checkAt .object outerArtifact comparison = [] ∧
       (resolveCandidates .bare .one localContext).map (·.id) = [1] ∧
       (resolveCandidates .bare .one localContext).map (·.ty) = [[.creature]] ∧
@@ -64,35 +64,35 @@ private def candidate (clause id : Nat) : Referent := {
 private theorem candidateWins (rs : List Referent) (clause id : Nat)
     (older : ∀ r ∈ rs, r.clause < clause) :
     resolveCandidates .bare .one
-      { referents := candidate clause id :: rs, characteristicRead := true } =
+      { referents := candidate clause id :: rs, characteristicRead := Bool.true } =
         [candidate clause id] := by
   have filteredOlder : ∀ (p : Referent → Bool), ∀ r ∈ rs.filter p, r.clause < clause := by
     intro p r h
     exact older r (List.mem_filter.mp h).1
   have visible : (DRS.visibleReferents {
-      referents := candidate clause id :: rs, characteristicRead := true }) =
+      referents := candidate clause id :: rs, characteristicRead := Bool.true }) =
       candidate clause id :: rs := by
     apply List.filter_eq_self.mpr
     intro r _
     rfl
-  have eligible : reachesCharacteristic .bare .one (candidate clause id) = true := by rfl
+  have eligible : reachesCharacteristic .bare .one (candidate clause id) = Bool.true := by rfl
   unfold resolveCandidates
   dsimp only
   rw [visible]
   obtain ⟨byClause, byRole⟩ := rankingWithoutPending
-    { referents := candidate clause id :: rs, characteristicRead := true } rfl
+    { referents := candidate clause id :: rs, characteristicRead := Bool.true } rfl
   simp only [byClause, byRole]
   simp only [Bool.false_eq_true, ↓reduceIte,
-    Bool.false_and, Bool.or_false, show (candidate clause id).linked = false from rfl,
+    Bool.false_and, Bool.or_false, show (candidate clause id).linked = Bool.false from rfl,
     Bool.not_false, Bool.true_and, List.filter_cons, eligible,
-    show Plurality.one.isOne = true from rfl]
+    show Plurality.one.isOne = Bool.true from rfl]
   simp only [List.foldl_cons, show (candidate clause id).clause = clause from rfl, Nat.zero_max,
     olderClauseMaximum _ _ (filteredOlder _), BEq.rfl, ↓reduceIte,
     olderClauseFilter _ _ (filteredOlder _), List.foldl_nil]
   rfl
 
 private def comparisonContext (drs : DRS) : DRS :=
-  (nextClause drs).push (bindFor .the .one .object (.hasType .creature)) .other false
+  (nextClause drs).push (bindFor .the .one .object (.hasType .creature)) .other Bool.false
 
 private theorem comparisonErrors (n : Nat) (drs : DRS) :
     ((stepOps (n + 4)).pred drs
@@ -105,16 +105,16 @@ private theorem comparisonErrors (n : Nat) (drs : DRS) :
   simp only [List.nil_append, List.append_nil]
 
 private theorem proStep (n : Nat) (drs : DRS) :
-    (stepOps (n + 1)).np drs .other false (.pro .bare .one) =
+    (stepOps (n + 1)).np drs .other Bool.false (.pro .bare .one) =
       let winners := resolvePronoun .bare .one drs
       match winners with
-      | [w] => (drs.recordMention w.id .other false true, [w.id], [])
+      | [w] => (drs.recordMention w.id .other Bool.false Bool.true, [w.id], [])
       | _ => (drs, [], [.anaphor .bare .one winners.length]) := by rfl
 
 private theorem powerErrors (n : Nat) (drs : DRS) :
     ((stepOps (n + 2)).amt drs (.statOf (.stat .power) (.pro .bare .one))).2 =
-      let selected := (stepOps (n + 1)).np { drs with characteristicRead := true }
-        .other false (.pro .bare .one)
+      let selected := (stepOps (n + 1)).np { drs with characteristicRead := Bool.true }
+        .other Bool.false (.pro .bare .one)
       let refs := selected.2.1.filterMap selected.1.findById?
       selected.2.2 ++ kindCheck .object ((refs.head?).map (·.kind)) ++
         refuse (!(refs.any (fun r => r.plur != .one))) .singular := by rfl
@@ -128,7 +128,7 @@ private theorem powerOnCandidate (n : Nat) (rs : List Referent) (clause id : Nat
       (.statOf (.stat .power) (.pro .bare .one))).2 = [] := by
   have winners := candidateWins rs clause id older
   change resolveCandidates .bare .one {
-    referents := candidate clause id :: rs, characteristicRead := true,
+    referents := candidate clause id :: rs, characteristicRead := Bool.true,
     currentClause := current, nextId := next, relativeKind := kind } = _ at winners
   rw [powerErrors, proStep, resolvePronoun, winners]
   simp [DRS.recordMention, DRS.findById?, candidate]
@@ -147,7 +147,7 @@ theorem comparisonScopeIgnoresEveryEarlierOuterContext (rs : List Referent) (c i
     (.compareOver (.hasType .creature) (.statOf (.stat .power) (.pro .bare .one))
       .atLeast 1)).2 ++ [] = []
   rw [stepPredicate, comparisonErrors 60]
-  let normalized := rs.map (fun r => { r with pronounResolved := false })
+  let normalized := rs.map (fun r => { r with pronounResolved := Bool.false })
   have normalizedOlder : ∀ r ∈ normalized, r.clause < c + 1 := by
     intro r member
     obtain ⟨original, mem, rfl⟩ := List.mem_map.mp member

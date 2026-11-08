@@ -84,30 +84,30 @@ theorem copySpecificAdditionsRemainSeparate :
 
 
 theorem abilityOnlyCopyInputNeedsNoEmptyEditBlock :
-    CopyExcept.checkAll (DRS.ofList []) (copyCharacteristics {text := [keyword (.named "flying")]} false) = [] := by decide
+    CopyExcept.checkAll (DRS.ofList []) (copyCharacteristics {text := [keyword (.named "flying")]} Bool.false) = [] := by decide
 
 /-- A removed bundle's mana cost is removed, never set: every written value of a `loses` bundle
 is removed. -/
 theorem lostBundleRemovesItsManaCost :
     (match QualityPayload.edits .loses
         (.bundle { characteristics := { cost := some [generic 2] } } none) with
-      | [.typeLine .loses _, .manaCost none] => true
-      | _ => false) = true := by decide
+      | [.typeLine .loses _, .manaCost none] => Bool.true
+      | _ => Bool.false) = Bool.true := by decide
 
 /-- An added bundle sets its written name as it sets its other values. -/
 theorem addedBundleSetsItsName :
     (match QualityPayload.edits .adds
         (.bundle { characteristics := { name := some "Ajani's Pridemate" } } none) with
-      | [.typeLine .adds _, .name .sets _] => true
-      | _ => false) = true := by decide
+      | [.typeLine .adds _, .name .sets _] => Bool.true
+      | _ => Bool.false) = Bool.true := by decide
 
 /-- "It's still a land" keeps every prior type, so the type line is added under a set
 [CR#205.1b]. -/
 theorem retainedTypeLineIsAdded :
     (match QualityPayload.edits .sets
         (.bundle { characteristics := { types := [.creature] } } (some .land)) with
-      | [.typeLine .adds _] => true
-      | _ => false) = true := by decide
+      | [.typeLine .adds _] => Bool.true
+      | _ => Bool.false) = Bool.true := by decide
 
 /-- "This creature's power is equal to …" is a Characteristic-Defining Ability, so it fills the
 printed `*` [CR#604.3a,613.4a]; an ordinary set of its power ("has base power 2") does not. -/
@@ -120,8 +120,8 @@ theorem definingAbilityDefinesPower :
 the power's number back ("that number plus 1") [CR#604.3a]. -/
 theorem tarmogoyfDefinesBothStats :
     let goyf := definesPowerAndToughness thisCreature
-      (distinctCount .cardType (allOf (cardIn (graveyardOf (bare isPlayer)))))
-      (plus thatMuch 1)
+      (distinctCount .cardType (allOf (cardIn (graveyardOf (Semantics.Templates.NounPhrase.bare isPlayer)))))
+      (Semantics.Templates.Amount.plus thatMuch 1)
     StaticSpec.check (DRS.ofList []) goyf = [] ∧ goyf.definedStats = [.power, .toughness] := by
   decide
 
@@ -129,8 +129,8 @@ theorem tarmogoyfDefinesBothStats :
 colors", devoid's "this object is colorless") or subtypes (changeling's "this object is every
 creature type") [CR#604.3a,702.73a,702.114a]. -/
 theorem definingAbilitiesDefineColorsAndSubtypes :
-    StaticSpec.check (DRS.ofList []) (definesQuality thisCreature .sets (colored .every)) = [] ∧
-    StaticSpec.check (DRS.ofList []) (definesQuality this_ .sets (colored (.some []))) = [] ∧
+    StaticSpec.check (DRS.ofList []) (definesQuality thisCreature .sets (Semantics.Templates.QualityPayload.colored .every)) = [] ∧
+    StaticSpec.check (DRS.ofList []) (definesQuality this_ .sets (Semantics.Templates.QualityPayload.colored (.some []))) = [] ∧
     StaticSpec.check (DRS.ofList []) (definesQuality this_ .adds (everyTypeOf .creature)) =
       [] ∧
     Ability.check (DRS.ofList []) changeling = [] ∧ Ability.check (DRS.ofList []) devoid = [] := by
@@ -176,7 +176,7 @@ theorem definingAbilityIsNeverGranted :
       (abilityGrant thisCreature (static (definesPower thisCreature 2))) =
       [.cdaGranted] ∧
     Action.check (DRS.ofList [])
-      (establishThroughout (definesQuality thisCreature .sets (colored .every))
+      (establishThroughout (definesQuality thisCreature .sets (Semantics.Templates.QualityPayload.colored .every))
         untilEndOfTurn) = [.cdaGranted] ∧
     StaticSpec.check (DRS.ofList []) (abilityGrant thisCreature changeling) = [] := by decide
 

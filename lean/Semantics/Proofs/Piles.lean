@@ -12,6 +12,7 @@ leaves out of the grammar.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each)
 open Semantics.Templates.Predicate (and not was)
@@ -29,7 +30,7 @@ open Semantics.Templates.DetPhrase (a each)
 namespace Semantics.Proofs.Piles
 
 private def nounSelected (drs : DRS) (noun : NounPhrase) : List Referent :=
-  let result := stepNounPhrase 64 drs .other false noun
+  let result := stepNounPhrase 64 drs .other Bool.false noun
   result.2.1.filterMap result.1.findById?
 
 /-- An instant whose whole text is one spell ability. -/
@@ -73,18 +74,18 @@ theorem badWildcardBallotPerformed :
 /-- "Put target creature card ... onto the battlefield transformed." -/
 theorem okTransformedArrivalOnField :
     Action.check (DRS.ofList [])
-      (.move (target (.and [isCreature, .in_ (graveyardOf .you)])) .anyLocation (some battlefield) .arrival [.entersTransformed]) = [] := by
+      (.move (target (.and [isCreature, .in_ (graveyardOf .you)])) .anyLocation (some Semantics.Templates.Location.battlefield) .arrival [.entersTransformed]) = [] := by
   decide
 
 /-- "Reveal the top five cards of your library. An opponent separates those cards into two
 piles." -/
 def revealAndSplit : List Action :=
-  [reveal (topSlice 5), instruct anOpponent (.separateIntoPiles them 2 [])]
+  [Semantics.Definitions.Action.reveal (topSlice 5), instruct anOpponent (.separateIntoPiles them 2 [])]
 
 /-- "Reveal the top five cards of your library. An opponent separates those cards into two
 piles. Put those piles into your hand." -/
 theorem okPileWordAfterPartition :
-    Card.check (instantSaying (.sequentially (revealAndSplit ++ [putInto (those .pile) hand])))
+    Card.check (instantSaying (.sequentially (revealAndSplit ++ [putInto (those .pile) Semantics.Templates.Location.hand])))
       = [] := by
   decide
 
@@ -92,37 +93,37 @@ theorem okPileWordAfterPartition :
 piles. Put those cards into your hand.": each object in a pile is still an individual object
 [CR#700.3b], so the card word still reads them. -/
 theorem okCardWordReadsPiles :
-    Card.check (instantSaying (.sequentially (revealAndSplit ++ [putInto (those .card) hand])))
+    Card.check (instantSaying (.sequentially (revealAndSplit ++ [putInto (those .card) Semantics.Templates.Location.hand])))
       = [] := by
   decide
 
 /-- "Reveal the top five cards of your library. Put those piles into your hand." -/
 theorem badPileWordWithoutAPartition :
     Card.check
-      (instantSaying (.sequentially [reveal (topSlice 5), putInto (those .pile) hand]))
+      (instantSaying (.sequentially [Semantics.Definitions.Action.reveal (topSlice 5), putInto (those .pile) Semantics.Templates.Location.hand]))
       = [.anaphor (.word .pile) .many 0] := by
   decide
 
 /-- "... into two piles. Put one pile into your hand." -/
 theorem okOnePileAfterPartition :
-    Action.check (DRS.ofList []) (.sequentially (revealAndSplit ++ [putInto onePile hand])) = [] := by decide
+    Action.check (DRS.ofList []) (.sequentially (revealAndSplit ++ [putInto onePile Semantics.Templates.Location.hand])) = [] := by decide
 
 /-- "Put target player into your hand.": a zone holds objects [CR#400.1]; a player is not
 one. -/
 theorem badPlayerMovedToAZone :
-    Action.check (DRS.ofList []) (.move (target .isPlayer) .anyLocation (some hand) .arrival [])
+    Action.check (DRS.ofList []) (.move (target .isPlayer) .anyLocation (some Semantics.Templates.Location.hand) .arrival [])
       = [.kindLte .player (.join .object .pile)] := by decide
 
 /-- "Put one pile into your hand." -/
 theorem badPilePartitiveWithoutAPartition :
-    Action.check (DRS.ofList []) (putInto onePile hand) = [.anaphor (.word .pile) .many 0] := by decide
+    Action.check (DRS.ofList []) (putInto onePile Semantics.Templates.Location.hand) = [.anaphor (.word .pile) .many 0] := by decide
 
 /-- "Put each card in the pile of your choice into your hand." -/
 theorem okMembershipInAPile :
     Card.check
       (instantSaying
         (.sequentially
-          (revealAndSplit ++ [putInto (allOf (.and [.isCard, .in_ (.pile (pileOfChoice .you))])) hand])))
+          (revealAndSplit ++ [putInto (allOf (.and [.isCard, .in_ (.pile (pileOfChoice .you))])) Semantics.Templates.Location.hand])))
       = [] := by
   decide
 
@@ -132,8 +133,8 @@ theorem badMembershipWithoutAPartition :
     Card.check
       (instantSaying
         (.sequentially
-          [ reveal (topSlice 5),
-            putInto (allOf (.and [.isCard, .in_ (.pile (those .pile))])) hand ]))
+          [ Semantics.Definitions.Action.reveal (topSlice 5),
+            putInto (allOf (.and [.isCard, .in_ (.pile (those .pile))])) Semantics.Templates.Location.hand ]))
       = [.anaphor (.word .pile) .many 0] := by
   decide
 
@@ -168,7 +169,7 @@ or a run of one is an ordered group of its objects, which stay in their zone [CR
 
 /-- "Exile the top card of your graveyard.": a graveyard is ordered too [CR#404.2]. -/
 theorem okSliceOfAGraveyard :
-    Action.check (DRS.ofList []) (exile (.slice .top 1 (.zone .graveyard (some .you)))) = [] := by
+    Action.check (DRS.ofList []) (Semantics.Definitions.Action.exile (.slice .top 1 (.zone .graveyard (some .you)))) = [] := by
   decide
 
 /-- The slice of a graveyard is a group in that graveyard: grouping moves nothing, and the order
@@ -235,12 +236,12 @@ revealed cards not cast this way on the bottom of your library in any order." Th
 remains accessible through the cast selection and subsequent move. -/
 theorem rippleRevealedCardsRemainAccessible :
     Action.check (DRS.ofList [])
-      (may (reveal (.slice .top 4 (libraryOf .actor)))
+      (may (Semantics.Definitions.Action.reveal (.slice .top 4 (libraryOf .actor)))
         (some (.sequentially
           [ castWithoutPaying
               (.someOf (.counted anyNumber) (some (.shares .cardName .share .this)) them) none,
             (.move
-              (allOf (and [isCard, was (reveal which) thisWay, not (was (cast which) thisWay)]))
+              (allOf (and [isCard, was (Semantics.Definitions.Action.reveal which) thisWay, not (was (cast which) thisWay)]))
               .anyLocation (some onBottom) .arrival [(.inOrder .anyOrder)]) ])))
       = [] := by
   decide
@@ -280,7 +281,7 @@ theorem okVoteReadsAfterVote :
       (.sequentially
         [ instruct (each .isPlayer) (vote .openly (.byLabel ["alpha", "beta"])),
           draw (.votesFor "alpha"),
-          doIf (.voteLead "beta" true) (exile (allOf (.and [isPermanent, .withMostVotes]))) ])
+          doIf (.voteLead "beta" Bool.true) (Semantics.Definitions.Action.exile (allOf (.and [isPermanent, .withMostVotes]))) ])
       = [] := by
   decide
 
@@ -295,14 +296,14 @@ theorem badVotesForWithoutVote :
 /-- "If beta gets more votes, draw a card.": the same missing vote [CR#701.38a]
 (`okVoteReadsAfterVote` is the same condition after a vote). -/
 theorem badVoteLeadWithoutVote :
-    Action.check (DRS.ofList []) (doIf (.voteLead "beta" true) (draw 1))
+    Action.check (DRS.ofList []) (doIf (.voteLead "beta" Bool.true) (draw 1))
       = [.outcomeInScope .voteHeld 0] := by
   decide
 
 /-- "Exile each permanent with the most votes.": the same missing vote [CR#701.38a]
 (`okVoteReadsAfterVote` exiles by the same predicate after a vote). -/
 theorem badWithMostVotesWithoutVote :
-    Action.check (DRS.ofList []) (exile (allOf (.and [isPermanent, .withMostVotes])))
+    Action.check (DRS.ofList []) (Semantics.Definitions.Action.exile (allOf (.and [isPermanent, .withMostVotes])))
       = [.outcomeInScope .voteHeld 0] := by
   decide
 

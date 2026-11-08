@@ -21,6 +21,7 @@ under the printed-star ruling, and their Characteristic-Defining Abilities set t
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a counted)
 open Semantics.Templates.Predicate (and or not did)
@@ -51,7 +52,7 @@ def thoughtReflection : Ability :=
   static (replace (would (Semantics.Subject.actor (you)) (draw 1)) (instead (draw 2)))
 theorem okThoughtReflection : Ability.check (DRS.ofList []) thoughtReflection = [] := by decide
 def jorKadeen : Ability :=
-  static (onlyWhile (getsPt (allOf (and [isCreature, youControl])) (up 3) (up 0))
+  static (onlyWhile (getsPt (allOf (and [isCreature, youControl])) (Semantics.Templates.Delta.Amount.up 3) (Semantics.Templates.Delta.Amount.up 0))
     (compareAmt (countOf (and [isArtifact, youControl])) .atLeast 3))
 theorem okJorKadeen : Ability.check (DRS.ofList []) jorKadeen = [] := by decide
 def abandonedOutpost : Ability := static (entersTapped thisLand)
@@ -74,7 +75,7 @@ def counterspell : Action := (match (Semantics.Cards.«Counterspell») with
 theorem okCounterspell : Action.check (DRS.ofList []) counterspell = [] := by decide
 
 def adantoVanguard : Ability :=
-  static (onlyWhile (getsPt thisCreature (up 2) (up 0))
+  static (onlyWhile (getsPt thisCreature (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 0))
     (is thisCreature isAttacking))
 theorem okAdantoVanguard : Ability.check (DRS.ofList []) adantoVanguard = [] := by decide
 /-- Nowhere to Run -/
@@ -86,32 +87,32 @@ def hithlainRopeSacrificeLock : StaticSpec := cant any (sacrifice this_)
 theorem okHithlainRopeSacrificeLock : StaticSpec.check (DRS.ofList []) hithlainRopeSacrificeLock = [] := by
   decide
 /-- Lich's Mastery -/
-def lichsMasteryGate : Ability := static (cant (Semantics.Subject.actor (you)) loseGame)
+def lichsMasteryGate : Ability := static (cant (Semantics.Subject.actor (you)) Semantics.Templates.Action.loseGame)
 theorem okLichsMasteryGate : Ability.check (DRS.ofList []) lichsMasteryGate = [] := by decide
 def theGoldenThrone : Ability :=
-  static (replace (would (Semantics.Subject.actor (you)) loseGame) (instead (sequentially [exile thisArtifact, setLife 1])))
+  static (replace (would (Semantics.Subject.actor (you)) Semantics.Templates.Action.loseGame) (instead (sequentially [Semantics.Definitions.Action.exile thisArtifact, setLife 1])))
 theorem okTheGoldenThrone : Ability.check (DRS.ofList []) theGoldenThrone = [] := by decide
 def stunningReversal : Ability :=
   spell (establishThroughout
-           (replace (would (Semantics.Subject.actor (you)) loseGame) (instead (sequentially [draw 7, setLife 1]))
+           (replace (would (Semantics.Subject.actor (you)) Semantics.Templates.Action.loseGame) (instead (sequentially [draw 7, setLife 1]))
               none .nextTimeOnly) thisTurn)
 theorem okStunningReversal : Ability.check (DRS.ofList []) stunningReversal = [] := by decide
 def pathOfBravery : Ability :=
-  static (onlyWhile (getsPt (allOf (and [isCreature, youControl])) (up 1) (up 1))
+  static (onlyWhile (getsPt (allOf (and [isCreature, youControl])) (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1))
     (compareAmt (lifeTotalOf you) .atLeast (statOf (.playerStat .startingLifeTotal) you)))
 theorem okPathOfBravery : Ability.check (DRS.ofList []) pathOfBravery = [] := by decide
 
 def spontaneousMutation : Ability :=
-  static (conjunction [ getsPt (enchanted creature) (down (letter .x)) (down 0),
+  static (conjunction [ getsPt (Semantics.Templates.NounPhrase.enchanted creature) (Semantics.Templates.Delta.Amount.down (letter .x)) (Semantics.Templates.Delta.Amount.down 0),
       letterDefinition .x (countOf (cardIn yourGraveyard)) ])
 theorem okSpontaneousMutation : Ability.check (DRS.ofList []) spontaneousMutation = [] := by decide
 
 def scourgeOfTheSkyclaves : Ability :=
   static (definesPt thisCreature
-    (minus 20 (aggregate .max (.playerStat .lifeTotal) isPlayer)))
+    (Semantics.Templates.Amount.minus 20 (aggregate .max (.playerStat .lifeTotal) isPlayer)))
 theorem okScourgeOfTheSkyclaves : Ability.check (DRS.ofList []) scourgeOfTheSkyclaves = [] := by decide
 def aettirAndPriwen : Ability :=
-  static (conjunction [ getsBase (equipped creature) (letter .x) (letter .x),
+  static (conjunction [ getsBase (Semantics.Templates.NounPhrase.equipped creature) (letter .x) (letter .x),
       letterDefinition .x (lifeTotalOf you) ])
 theorem okAettirAndPriwen : Ability.check (DRS.ofList []) aettirAndPriwen = [] := by decide
 
@@ -123,7 +124,7 @@ theorem okCycleOfLife : Action.check (DRS.ofList []) cycleOfLife = [] := by deci
 
 def roilingHorror : Ability :=
   static (definesPt thisCreature
-    (minus (lifeTotalOf you)
+    (Semantics.Templates.Amount.minus (lifeTotalOf you)
       (lifeTotalOf
         (a (and [isOpponent, superlative .max (.playerStat .lifeTotal) isOpponent])))))
 theorem okRoilingHorror : Ability.check (DRS.ofList []) roilingHorror = [] := by decide
@@ -142,8 +143,8 @@ controls) [CR#609.1,701.9a], and the replacement checks clean with both. -/
 theorem okWiltLeafLiegeEffectCausedDiscard :
     Ability.check (DRS.ofList []) wiltLeafLiegeDiscardReplacement = [] ∧
     (match wiltLeafLiegeDiscardReplacement with
-      | .static (.replace (.causedBy (.source _) (.would (.actor .you) _)) ..) => true
-      | _ => false) = true := by decide
+      | .static (.replace (.causedBy (.source _) (.would (.actor .you) _)) ..) => Bool.true
+      | _ => Bool.false) = Bool.true := by decide
 
 /-- Master Chef -/
 def masterChefGrantedAbility : Ability :=
@@ -157,10 +158,10 @@ theorem okTahngarthAttacksThatJoin :
       tahngarthAttacksThatJoin = [] := by
   decide
 
-def omenMachineDraw : Ability := static (cant (Semantics.Subject.actor ((bare isPlayer))) (draw anyAmount))
+def omenMachineDraw : Ability := static (cant (Semantics.Subject.actor ((Semantics.Templates.NounPhrase.bare isPlayer))) (draw anyAmount))
 theorem okOmenMachineDraw : Ability.check (DRS.ofList []) omenMachineDraw = [] := by decide
 def solfataraLandLock : Action :=
-  establishThroughout (cant ((Semantics.Subject.actor (target isPlayer))) (play any)) thisTurn
+  establishThroughout (cant ((Semantics.Subject.actor (target isPlayer))) (Semantics.Definitions.Action.play any)) thisTurn
 theorem okSolfataraLandLock : Action.check (DRS.ofList []) solfataraLandLock = [] := by decide
 
 /-- Volrath's Laboratory -/
@@ -184,8 +185,8 @@ def celestialDawnAscriptions : List Ability :=
     static (qualityChange (and [
               allOf (and [isPermanent, non isLand, youControl]),
               allOf (and [isSpell, youControl]),
-              allOf (and [isCard, non isLand, youOwn, not (in_ battlefield)]) ]) .sets
-        (colored (.some [.white]))) ]
+              allOf (and [isCard, non isLand, youOwn, not (in_ Semantics.Templates.Location.battlefield)]) ]) .sets
+        (Semantics.Templates.QualityPayload.colored (.some [.white]))) ]
 theorem okCelestialDawnAscriptions : Ability.checkText (DRS.ofList []) celestialDawnAscriptions = [] := by decide
 
 /-- Booby Trap -/
@@ -196,18 +197,18 @@ theorem okBoobyTrapNameChoice : StaticSpec.check (DRS.ofList []) boobyTrapNameCh
 /-- Nameless Inversion -/
 def namelessInversionBody : Action :=
   establishFor (target isCreature)
-    [getsPt it (up 3) (down 3), qualityChange it .loses (everyTypeOf .creature)]
+    [getsPt it (Semantics.Templates.Delta.Amount.up 3) (Semantics.Templates.Delta.Amount.down 3), qualityChange it .loses (everyTypeOf .creature)]
     untilEndOfTurn
 theorem okNamelessInversionBody : Action.check (DRS.ofList []) namelessInversionBody = [] := by decide
 /-- Ego Erasure -/
 def egoErasureBody : Action :=
   establishFor (allOf (and [isCreature, controlledBy (target isPlayer)]))
-    [getsPt them (down 2) (up 0), qualityChange them .loses (everyTypeOf .creature)]
+    [getsPt them (Semantics.Templates.Delta.Amount.down 2) (Semantics.Templates.Delta.Amount.up 0), qualityChange them .loses (everyTypeOf .creature)]
     untilEndOfTurn
 theorem okEgoErasureBody : Action.check (DRS.ofList []) egoErasureBody = [] := by decide
 /-- Lithoform Blight -/
 def lithoformBlightLoss : StaticSpec :=
-  conjunction [ qualityChange (enchanted land) .loses (everyTypeOf .land),
+  conjunction [ qualityChange (Semantics.Templates.NounPhrase.enchanted land) .loses (everyTypeOf .land),
       allAbilityLoss it ]
 theorem okLithoformBlightLoss : StaticSpec.check (DRS.ofList []) lithoformBlightLoss = [] := by decide
 
@@ -226,22 +227,22 @@ theorem okClergyOfTheHolyNimbus : Ability.check (DRS.ofList []) clergyOfTheHolyN
 /-- Rampant Frogantua -/
 def rampantFrogantuaPump : Ability :=
   static (getsPt thisCreature
-    (up (forEach 10 (and [isPlayer,
-      did (Semantics.Subject.actor (which)) loseGame (Semantics.LookbackSpan.duration (thisGame) none)])))
-    (up (forEach 10 (and [isPlayer,
-      did (Semantics.Subject.actor (which)) loseGame (Semantics.LookbackSpan.duration (thisGame) none)]))))
+    (Semantics.Templates.Delta.Amount.up (forEach 10 (and [isPlayer,
+      did (Semantics.Subject.actor (which)) Semantics.Templates.Action.loseGame (Semantics.LookbackSpan.duration (thisGame) none)])))
+    (Semantics.Templates.Delta.Amount.up (forEach 10 (and [isPlayer,
+      did (Semantics.Subject.actor (which)) Semantics.Templates.Action.loseGame (Semantics.LookbackSpan.duration (thisGame) none)]))))
 theorem okRampantFrogantuaPump : Ability.check (DRS.ofList []) rampantFrogantuaPump = [] := by decide
 /-- Maskwood Nexus -/
 def maskwoodNexusTypes : Ability :=
   static (qualityChange (and [
               allOf (and [isCreature, youControl]),
               allOf (and [isCreature, isSpell, youControl]),
-              allOf (and [isCard, isCreature, youOwn, not (in_ battlefield)]) ]) .adds (everyTypeOf
+              allOf (and [isCard, isCreature, youOwn, not (in_ Semantics.Templates.Location.battlefield)]) ]) .adds (everyTypeOf
       .creature))
 theorem okMaskwoodNexusTypes : Ability.check (DRS.ofList []) maskwoodNexusTypes = [] := by decide
 /-- Luxior, Giada's Gift -/
 def luxiorEquippedPermanent : Ability :=
-  static (qualityChange (equipped permanent) .adds
+  static (qualityChange (Semantics.Templates.NounPhrase.equipped permanent) .adds
     (bundle { characteristics := { types := [.creature] } }))
 theorem okLuxiorEquippedPermanent : Ability.check (DRS.ofList []) luxiorEquippedPermanent = [] := by decide
 /-- Nahiri, the Unforgiving's compleated reminder -/
@@ -251,16 +252,16 @@ theorem okNahiriCompleatedEntry : Ability.check (DRS.ofList []) nahiriCompleated
 /-- Nimble Mongoose -/
 def nimbleMongoose : Ability :=
   threshold
-    (static (onlyWhile (getsPt thisCreature (up 2) (up 2))
+    (static (onlyWhile (getsPt thisCreature (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 2))
       (compareAmt (countOf (cardIn yourGraveyard)) .atLeast 7)))
 theorem okNimbleMongoose : Ability.check (DRS.ofList []) nimbleMongoose = [] := by decide
 /-- Anax, Hardened in the Forge -/
 def anaxPowerDefinition : Ability :=
-  static (definesPower thisCreature (devotion you (color .red)))
+  static (definesPower thisCreature (devotion you (Semantics.Templates.ColorTerm.color .red)))
 theorem okAnaxPowerDefinition : Ability.check (DRS.ofList []) anaxPowerDefinition = [] := by decide
 /-- Aspect of Wolf -/
 def aspectOfWolf : Ability :=
-  static (conjunction [ getsPt (enchanted creature) (up (letter .x)) (up (letter .y)),
+  static (conjunction [ getsPt (Semantics.Templates.NounPhrase.enchanted creature) (Semantics.Templates.Delta.Amount.up (letter .x)) (Semantics.Templates.Delta.Amount.up (letter .y)),
       letterDefinition .x (half .down
         (countOf (and [(Semantics.Predicate.hasSubtype (forest)), youControl]))),
       letterDefinition .y (half .up
@@ -268,8 +269,8 @@ def aspectOfWolf : Ability :=
 theorem okAspectOfWolf : Ability.check (DRS.ofList []) aspectOfWolf = [] := by decide
 /-- Lhurgoyf -/
 def lhurgoyfDefinition : Ability :=
-  static (definesPowerAndToughness thisCreature (countOf (and [isCreature, in_ graveyard]))
-    (plus thatMuch 1))
+  static (definesPowerAndToughness thisCreature (countOf (and [isCreature, in_ Semantics.Templates.Location.graveyard]))
+    (Semantics.Templates.Amount.plus thatMuch 1))
 theorem okLhurgoyfDefinition : Ability.check (DRS.ofList []) lhurgoyfDefinition = [] := by decide
 
 /-- Deflecting Swat -/
@@ -281,44 +282,44 @@ theorem okDeflectingSwatCommanderAltCost :
 
 /-- Voltage Surge's declaration -/
 def voltageSurgeAddedCost : Ability :=
-  static (addedCost (Semantics.Cost.perform ((sacrifice (a isArtifact)))) true)
+  static (addedCost (Semantics.Cost.perform ((sacrifice (a isArtifact)))) Bool.true)
 theorem okVoltageSurgeAddedCost : Ability.check (DRS.ofList []) voltageSurgeAddedCost = [] := by decide
 /-- Tarmogoyf -/
 def tarmogoyfDefinition : Ability :=
   static (definesPowerAndToughness thisCreature
-    (distinctCount .cardType (allOf (cardIn (graveyardOf (bare isPlayer)))))
-    (plus thatMuch 1))
+    (distinctCount .cardType (allOf (cardIn (graveyardOf (Semantics.Templates.NounPhrase.bare isPlayer)))))
+    (Semantics.Templates.Amount.plus thatMuch 1))
 theorem okTarmogoyfDefinition : Ability.check (DRS.ofList []) tarmogoyfDefinition = [] := by decide
 /-- Consuming Blob's definition -/
 def consumingBlobDefinition : Ability :=
   static (definesPowerAndToughness thisCreature (distinctCount .cardType (allOf (cardIn yourGraveyard)))
-    (plus thatMuch 1))
+    (Semantics.Templates.Amount.plus thatMuch 1))
 theorem okConsumingBlobDefinition : Ability.check (DRS.ofList []) consumingBlobDefinition = [] := by decide
 /-- Nighthawk Scavenger's definition -/
 def nighthawkScavengerDefinition : Ability :=
   static (definesPower thisCreature
-    (plus 1
+    (Semantics.Templates.Amount.plus 1
       (distinctCount .cardType (allOf (cardIn (graveyardOf yourOpponents))))))
 theorem okNighthawkScavengerDefinition : Ability.check (DRS.ofList []) nighthawkScavengerDefinition = [] := by
   decide
 /-- Faeburrow Elder's pump -/
 def faeburrowElderPump : Ability :=
   static (getsPt thisCreature
-    (up (times 1
+    (Semantics.Templates.Delta.Amount.up (Semantics.Templates.Amount.times 1
       (distinctCount .color (allOf (and [isPermanent, youControl])))))
-    (up (times 1
+    (Semantics.Templates.Delta.Amount.up (Semantics.Templates.Amount.times 1
       (distinctCount .color (allOf (and [isPermanent, youControl]))))))
 theorem okFaeburrowElderPump : Ability.check (DRS.ofList []) faeburrowElderPump = [] := by decide
 /-- Bonds of Faith -/
 def bondsOfFaithPump : Ability :=
   static (onlyWhile
-    (getsPt (enchanted creature) (up 2) (up 2))
+    (getsPt (Semantics.Templates.NounPhrase.enchanted creature) (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 2))
     (is it (Semantics.Predicate.hasSubtype (human))))
 theorem okBondsOfFaithPump : Ability.check (DRS.ofList []) bondsOfFaithPump = [] := by decide
 
 /-- Lantern of Insight -/
 def lanternOfInsightRider : Ability :=
-  static (visibility .reveal (bare isPlayer) topOfLibrary)
+  static (visibility .reveal (Semantics.Templates.NounPhrase.bare isPlayer) topOfLibrary)
 theorem okLanternOfInsightRider : Ability.check (DRS.ofList []) lanternOfInsightRider = [] := by decide
 
 /-- Phyrexian Unlife -/
@@ -332,9 +333,9 @@ theorem okPhyrexianUnlifeImmunity : Ability.check (DRS.ofList []) phyrexianUnlif
 /-- Umbris, Fear Manifest -/
 def umbrisPump : Ability :=
   static (getsPt thisCreature
-    (up (forEach 1
+    (Semantics.Templates.Delta.Amount.up (forEach 1
       (and [isCard, opponentsOwn, in_ exileZone])))
-    (up (forEach 1
+    (Semantics.Templates.Delta.Amount.up (forEach 1
       (and [isCard, opponentsOwn, in_ exileZone]))))
 theorem okUmbrisPump : Ability.check (DRS.ofList []) umbrisPump = [] := by decide
 /-- Turbulent Fen -/
@@ -347,11 +348,11 @@ theorem okTurbulentFen : Ability.check (DRS.ofList []) turbulentFen = [] := by d
 def bastionProtectorPump : Ability :=
   static (getsPt
     (allOf (and [isCreature, hasDesignation commander, youControl]))
-    (up 2) (up 2))
+    (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 2))
 theorem okBastionProtectorPump : Ability.check (DRS.ofList []) bastionProtectorPump = [] := by decide
 /-- Luxior, Giada's Gift -/
 def luxiorTypeSetting : Ability :=
-  static (conjunction [ qualityChange (equipped permanent) .loses
+  static (conjunction [ qualityChange (Semantics.Templates.NounPhrase.equipped permanent) .loses
         (bundle { characteristics := { types := [.planeswalker] } }),
       qualityChange it .adds (bundle { characteristics := { types := [.creature] } }) ])
 theorem okLuxiorTypeSetting : Ability.check (DRS.ofList []) luxiorTypeSetting = [] := by decide
@@ -362,7 +363,7 @@ theorem okKasminaLoyaltySharing : StaticSpec.check (DRS.ofList []) kasminaLoyalt
 /-- Nicol Bolas, Dragon-God -/
 def nicolBolasDragonGodSharing : StaticSpec :=
   abilityGrantFrom this_ (allOf
-                             (and [isPlaneswalker, isOther, in_ battlefield])) [.loyalty]
+                             (and [isPlaneswalker, isOther, in_ Semantics.Templates.Location.battlefield])) [.loyalty]
 theorem okNicolBolasDragonGodSharing : StaticSpec.check (DRS.ofList []) nicolBolasDragonGodSharing = [] := by
   decide
 /-- Myr Welder -/
@@ -392,7 +393,7 @@ theorem okVindicate : Action.check (DRS.ofList []) vindicate = [] := by decide
 /-- Gray Merchant of Asphodel -/
 def grayMerchantDrain : Action :=
   sequentially
-    [instruct eachOpponent (loseLife (letter .x)), define .x (devotion you (color .black))]
+    [instruct eachOpponent (loseLife (letter .x)), define .x (devotion you (Semantics.Templates.ColorTerm.color .black))]
 theorem okGrayMerchantDrain : Action.check (DRS.ofList []) grayMerchantDrain = [] := by decide
 
 end Semantics.Cards

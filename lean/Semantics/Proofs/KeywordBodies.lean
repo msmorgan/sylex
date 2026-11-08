@@ -15,6 +15,7 @@ and vigilance the same way; their pins follow the census's.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a the)
 open Semantics.Templates.Predicate (and not)
@@ -89,24 +90,24 @@ private def firstStatic? : Ability → Option StaticSpec
 theorem okFrenzyDefinition :
     (match frenzy 1 with
       | .keyword _ _ [.triggered (.does (.actor _) (.attackUnblocked none)) [] none [] none none none _]
-        => true
-      | _ => false) = true ∧
+        => Bool.true
+      | _ => Bool.false) = Bool.true ∧
       Ability.check (DRS.ofList []) (frenzy 1) = [] := by decide
 
 /-- "Freerunning {1}{U}": an alternative cost [CR#118.9] that applies only while its condition
 holds [CR#702.173a], and it checks. -/
 theorem okFreerunningDefinition :
     (match firstStatic? (freerunning (Semantics.Cost.mana ([generic 1, pip .blue]))) with
-      | some (.conditional (.altCost _ (some _)) (.did _) _) => true
-      | _ => false) = true ∧
+      | some (.conditional (.altCost _ (some _)) (.did _) _) => Bool.true
+      | _ => Bool.false) = Bool.true ∧
       Ability.check (DRS.ofList []) (freerunning (Semantics.Cost.mana ([generic 1, pip .blue]))) = [] := by decide
 
 /-- "Encore {3}{B}": one activated ability, activated only as a sorcery [CR#702.141a], and it
 checks. -/
 theorem okEncoreDefinition :
     (match encore (Semantics.Cost.mana ([generic 3, pip .black])) with
-      | .keyword _ _ [.activated (.compound [_, .perform _]) _ (some _) none none none] => true
-      | _ => false) = true ∧
+      | .keyword _ _ [.activated (.compound [_, .perform _]) _ (some _) none none none] => Bool.true
+      | _ => Bool.false) = Bool.true ∧
       Ability.check (DRS.ofList []) (encore (Semantics.Cost.mana ([generic 3, pip .black]))) = [] := by decide
 
 /-- "Partner with Blaring Recruiter": the one ability of the game partner with represents, the
@@ -119,8 +120,8 @@ theorem okPartnerWithDefinition :
             (.instruct (.described (.target _) _)
               (.withContinuation .optional
                 (.sequentially [.ownScope (some (.action "search")) _, _, _, _]) none none))] =>
-        true
-      | _ => false) = true ∧
+        Bool.true
+      | _ => Bool.false) = Bool.true ∧
       Ability.check (DRS.ofList []) (partnerWith (named (Semantics.NameSource.printed ("Blaring Recruiter")))) = [] := by decide
 
 /-- Vigilance forbids only the tap its creature's attacking causes [CR#702.20b,508.1f]: the
@@ -128,8 +129,8 @@ prohibition carries that cause, and it checks. -/
 theorem okVigilanceDefinition :
     (match firstStatic? vigilance with
       | some (.cant .any (.ownScope (some (.action "tap")) _)
-          { cause := some (.event (.does (.actor _) (.attack none))), .. }) => true
-      | _ => false) = true ∧
+          { cause := some (.event (.does (.actor _) (.attack none))), .. }) => Bool.true
+      | _ => Bool.false) = Bool.true ∧
       Ability.check (DRS.ofList []) vigilance = [] := by decide
 
 /-- Paradigm is two spell abilities [CR#702.192a], the first creating a delayed triggered ability
@@ -140,14 +141,14 @@ theorem okParadigmDefinition :
           [ .spell none
               (.doIf _
                 (.delay _ [] (some _) (.sequentially [.copy (.inZone .exile) _ _ _, _])) none _),
-            .spell none _ ] => true
-      | _ => false) = true ∧
+            .spell none _ ] => Bool.true
+      | _ => Bool.false) = Bool.true ∧
       Ability.check (DRS.ofList []) paradigm = [] := by decide
 
 /-- Whether a keyword Definition's body is empty. -/
 private def bodiless : Ability → Bool
-  | .keyword _ _ [] => true
-  | _ => false
+  | .keyword _ _ [] => Bool.true
+  | _ => Bool.false
 
 /-- The keywords whose rule the CR states as a rule of the game reading the keyword, not as an
 ability of its object, hold no body (`lean/CONTRACTS.md`, "Keyword abilities with no body"):
@@ -159,15 +160,15 @@ theorem intentionallyBodiless :
     [ firstStrike, doubleStrike, trample, deathtouch, banding, bandsWithOther isCreature, reach,
       phasing, startYourEngines, toxic 1, partner, partnerCharacterSelect,
       partnerFatherAndSon, partnerFriendsForever, partnerSurvivors, chooseABackground,
-      doctorsCompanion ].all bodiless = true := by decide
+      doctorsCompanion ].all bodiless = Bool.true := by decide
 
 /-- "Assist": the optional choice made as you cast the spell, no cost, and the chosen player
 paying generic mana for it, one generic mana each [CR#702.132a], and it checks. -/
 theorem okAssistDefinition :
     (match assist with
       | .keyword _ _ [.static (.asEvent _ (.withContinuation .optional (.choose ..) none none)),
-          .static (.paySubstitute _ ⟨.instruct _ _, [.generic]⟩)] => true
-      | _ => false) = true ∧
+          .static (.paySubstitute _ ⟨.instruct _ _, [.generic]⟩)] => Bool.true
+      | _ => Bool.false) = Bool.true ∧
       Ability.check (DRS.ofList []) assist = [] := by decide
 
 /-- The intervening condition and the payment of echo's upkeep trigger. -/
@@ -209,11 +210,11 @@ private def castPayment? : Ability → Option PlayPayment
 prototyped [CR#718.3], transformed [CR#702.146a,712.8c], converted [CR#702.162a] and fused
 [CR#702.102a]. Each checks. -/
 theorem castModeDefinitions :
-    (match castPayment? prototype, castPayment? (disturb (Semantics.Cost.mana ([generic 3, pip .white]))),
+    (match castPayment? Semantics.Definitions.Ability.prototype, castPayment? (disturb (Semantics.Cost.mana ([generic 3, pip .white]))),
         castPayment? (moreThanMeetsTheEye (Semantics.Cost.mana ([pip .white, pip .blue]))), castPayment? fuse with
-      | some .prototyped, some (.transformed _), some (.transformed _), some .fused => true
-      | _, _, _, _ => false) = true ∧
-      Ability.check (DRS.ofList []) prototype = [] ∧
+      | some .prototyped, some (.transformed _), some (.transformed _), some .fused => Bool.true
+      | _, _, _, _ => Bool.false) = Bool.true ∧
+      Ability.check (DRS.ofList []) Semantics.Definitions.Ability.prototype = [] ∧
       Ability.check (DRS.ofList []) (disturb (Semantics.Cost.mana ([generic 3, pip .white]))) = [] ∧
       Ability.check (DRS.ofList []) (moreThanMeetsTheEye (Semantics.Cost.mana ([pip .white, pip .blue]))) = [] ∧
       Ability.check (DRS.ofList []) fuse = [] := by decide
@@ -225,8 +226,8 @@ theorem okCompleatedDefinition :
       | .keyword _ _
           [.static (.replace _
             (.onlyIf (.compareAmt (.paid .phyrexianPaidWithLife _) .atLeast _)
-              (.withRiders [.withCounters _ _ .fewer])) _ _ _)] => true
-      | _ => false) = true ∧
+              (.withRiders [.withCounters _ _ .fewer])) _ _ _)] => Bool.true
+      | _ => Bool.false) = Bool.true ∧
       Ability.check (DRS.ofList []) compleated = [] := by decide
 
 /-- "Suspend 4—{1}{U}" is its special action, gated on the card's being castable from your hand,
@@ -236,8 +237,8 @@ theorem okSuspendDefinition :
       | .keyword _ _
           [ .static (.specialAction none (some (.onlyIf (.couldBeginToCast .you _ _))) _ _),
             .triggered .., .triggered (.does .any (.removeCounters (some .theLast) _ _)) .. ] =>
-        true
-      | _ => false) = true ∧
+        Bool.true
+      | _ => Bool.false) = Bool.true ∧
       Ability.check (DRS.ofList []) (suspend 4 (Semantics.Cost.mana ([generic 1, pip .blue]))) = [] := by decide
 
 /-- "Miracle {R}": as you draw your first card each turn, if it is this card, revealing it makes
@@ -246,8 +247,8 @@ theorem okMiracleDefinition :
     (match miracle (Semantics.Cost.mana ([pip .red])) with
       | .keyword _ _
           [.static (.asEvent (.nthOccurrence (.nth 1) (some .turn) _)
-            (.doIf _ (.triggerReflexively _ none _) none _))] => true
-      | _ => false) = true ∧
+            (.doIf _ (.triggerReflexively _ none _) none _))] => Bool.true
+      | _ => Bool.false) = Bool.true ∧
       Ability.check (DRS.ofList []) (miracle (Semantics.Cost.mana ([pip .red]))) = [] := by decide
 
 /-- Miracle's "that card" is the card the draw drew: an event that draws none leaves it no
@@ -262,8 +263,8 @@ theorem badDrawnCardWithoutADraw :
 game [CR#702.139a,116.2g], and it checks. -/
 theorem okCompanionDefinition :
     (match companion (deckSizeOverMinimum 20) with
-      | .keyword _ _ [.static (.specialAction none (some _) _ (.limited _ ⟨1, .game⟩))] => true
-      | _ => false) = true ∧
+      | .keyword _ _ [.static (.specialAction none (some _) _ (.limited _ ⟨1, .game⟩))] => Bool.true
+      | _ => Bool.false) = Bool.true ∧
       Ability.check (DRS.ofList []) (companion (deckSizeOverMinimum 20)) = [] := by decide
 
 /-- An optional choice in an Off-Stack Static is published to the text's later abilities as a

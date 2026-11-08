@@ -94,38 +94,38 @@ private def movedCopy (deed : Deed) (origin : Option Origin) : Referent :=
 
 theorem participialRefinementsKeepCarrierTypeAndOrigin :
     (participialCandidates (.deed (.action "exile")) (some .one)
-      (some (.copied (.ofType .card .creature))) false
+      (some (.copied (.ofType .card .creature))) Bool.false
       [movedCopy (.action "exile") (some .copy)]).length = 1 := by decide
 
 theorem participialRefinementsReadExileDestination :
     (participialCandidates (.deed (.action "exile")) (some .one)
-      (some (.copied (.ofType .card .creature))) false
+      (some (.copied (.ofType .card .creature))) Bool.false
       [movedCopy (.action "destroy") (some .copy)]).length = 1 := by decide
 
 theorem participialRefinementsRejectOriginal :
     (participialCandidates (.deed (.action "exile")) (some .one)
-      (some (.copied (.ofType .card .creature))) false
+      (some (.copied (.ofType .card .creature))) Bool.false
       [movedCopy (.action "exile") none]).length = 0 := by decide
 
 /-! A Participial Description reads the object its deed stamped whether or not its other
 conjuncts name a Head Noun: "the exiled card" and the bare "the exiled one" both reach it. -/
 
 theorem participialWithoutHeadNounReachesTheStampedObject :
-    (participialCandidates (.deed (.action "exile")) (some .one) none false
+    (participialCandidates (.deed (.action "exile")) (some .one) none Bool.false
       [movedCopy (.action "exile") none]).length = 1 := by decide
 
 theorem participialWithHeadNounReachesTheStampedObject :
-    (participialCandidates (.deed (.action "exile")) (some .one) (some .card) false
+    (participialCandidates (.deed (.action "exile")) (some .one) (some .card) Bool.false
       [movedCopy (.action "exile") none]).length = 1 := by decide
 
 theorem participialReadsExileDestination :
-    (participialCandidates (.deed (.action "exile")) (some .one) none false
+    (participialCandidates (.deed (.action "exile")) (some .one) none Bool.false
       [movedCopy (.action "destroy") none]).length = 1 := by decide
 
 theorem participialRejectsUnrelatedDeed :
-    (participialCandidates (.deed (.action "discard")) (some .one) none false
+    (participialCandidates (.deed (.action "discard")) (some .one) none Bool.false
       [movedCopy (.action "destroy") none]).length = 0 ∧
-    (participialCandidates (.deed (.action "discard")) (some .one) (some .card) false
+    (participialCandidates (.deed (.action "discard")) (some .one) (some .card) Bool.false
       [movedCopy (.action "destroy") none]).length = 0 := by decide
 
 theorem participialExileDoesNotSurviveAnotherMove :
@@ -133,7 +133,7 @@ theorem participialExileDoesNotSurviveAnotherMove :
       det := .target, plur := .one, idents := [],
       payload := .object [.creature] (some .graveyard)
         (some (moveStamp (some (.action "put")) (some .exile) (some .graveyard))) none none }
-    (participialCandidates (.deed (.action "exile")) (some .one) none false [moved]).length = 0 := by
+    (participialCandidates (.deed (.action "exile")) (some .one) none Bool.false [moved]).length = 0 := by
   decide
 
 theorem typeAndCopyRefinementsCommute (word : NounWord) (ty : CardType) (b : Referent) :
@@ -156,14 +156,14 @@ private def selectedOpponent : NounPhrase :=
   .someOf (.counted (exactly 1)) none (allOf (.isOpponentOf .you))
 
 theorem playerSubsetRetainsItsGroupKindAndIdentity :
-    let (after, ids, errors) := stepNounPhrase 64 (DRS.ofList []) .other false selectedOpponent
+    let (after, ids, errors) := stepNounPhrase 64 (DRS.ofList []) .other Bool.false selectedOpponent
     errors = [] ∧ ids = [1] ∧ selectedOpponent.kind? = some .player ∧
       (after.findById? 0).map (fun ref => (ref.kind, ref.plur)) =
         some (.player, .many) ∧
       (after.findById? 1).map (fun ref => (ref.kind, ref.plur, ref.det, ref.payload)) =
-        some (.player, .one, .part, .player false) ∧
+        some (.player, .one, .part, .player Bool.false) ∧
       after.selectionEvidence =
-        [{ kind := .player, sourceGroup := some 0, chosen := false, scope := 0 }] := by decide
+        [{ kind := .player, sourceGroup := some 0, chosen := Bool.false, scope := 0 }] := by decide
 
 theorem playerSubsetCanPerformAPlayerAction :
     Action.check (DRS.ofList []) (instruct selectedOpponent (draw 1)) = [] := by
@@ -174,7 +174,7 @@ theorem playerSubsetCannotFillAnObjectContext :
       [.kindMismatch .object .player] := by decide
 
 theorem objectSubsetRetainsItsTypeZoneAndExactSize :
-    let (after, ids, errors) := stepNounPhrase 64 (DRS.ofList []) .other false
+    let (after, ids, errors) := stepNounPhrase 64 (DRS.ofList []) .other Bool.false
       (.someOf (.counted (exactly 1)) none (allOf isCreature))
     errors = [] ∧ ids = [1] ∧
       (after.findById? 1).map (·.payload) =
@@ -184,12 +184,12 @@ theorem objectSubsetRetainsItsTypeZoneAndExactSize :
 
 private def chosenSource : Referent :=
   { det := .a, plur := .one, payload := .object [] none none none none,
-    introducedAsSource := true }
+    introducedAsSource := Bool.true }
 private def chosenSourceOnStack : Referent :=
   { chosenSource with payload := .object [.instant] (some .stack) none none none }
 private def theSource : Referent :=
   { det := .self, plur := .one, payload := .object [.instant] (some .stack) none none none,
-    introducedAsSource := true }
+    introducedAsSource := Bool.true }
 
 /-- "That source" reads an antecedent introduced as a source, in any zone [CR#609.7a]. -/
 theorem sourceWordReadsAChosenSourceInAnyZone :
@@ -209,9 +209,9 @@ theorem sourceWordNeverReadsTheSource :
 
 /-- Introducing an object by a description that names it a source records it as one. -/
 theorem sourceDescriptionRecordsTheFlag :
-    (bindFor .a .one .object isSource).introducedAsSource = true ∧
-      (bindFor .a .one .object (and [isSource, hasColor .red])).introducedAsSource = true ∧
-      (bindFor .a .one .object isCreature).introducedAsSource = false := by
+    (bindFor .a .one .object isSource).introducedAsSource = Bool.true ∧
+      (bindFor .a .one .object (and [isSource, hasColor .red])).introducedAsSource = Bool.true ∧
+      (bindFor .a .one .object isCreature).introducedAsSource = Bool.false := by
   decide
 
 private def departedSpell (origin : Zone := .stack) : Referent :=
@@ -223,29 +223,29 @@ private def departedSpell (origin : Zone := .stack) : Referent :=
 [CR#608.2h]; neither an action slot nor a Participial Description gets that exception. -/
 theorem departedSpellInformationReadOnly :
     let ref := departedSpell
-    reachesCharacteristic (.word .spell) .one ref = true ∧
-      reachesCharacteristic (.word (.subtype (.spell "Arcane"))) .one ref = true ∧
-      reaches (.atSlot .spell) .one ref = false ∧
-      reaches (.word .spell) .one ref = false ∧
-      (participialCandidates (.deed (.action "counter")) (some .one) (some .spell) false
-        (DRS.ofList [ref])).isEmpty = true ∧
-      reachesCharacteristic (.word .spell) .one (departedSpell .hand) = false := by decide
+    reachesCharacteristic (.word .spell) .one ref = Bool.true ∧
+      reachesCharacteristic (.word (.subtype (.spell "Arcane"))) .one ref = Bool.true ∧
+      reaches (.atSlot .spell) .one ref = Bool.false ∧
+      reaches (.word .spell) .one ref = Bool.false ∧
+      (participialCandidates (.deed (.action "counter")) (some .one) (some .spell) Bool.false
+        (DRS.ofList [ref])).isEmpty = Bool.true ∧
+      reachesCharacteristic (.word .spell) .one (departedSpell .hand) = Bool.false := by decide
 
 /-- Countering an already countered spell remains refused [CR#109.2b]. -/
 theorem badCounterDepartedSpell :
     Action.check (DRS.ofList [])
-      (sequentially [counter (target isSpell), counter (that .spell)]) =
+      (sequentially [Semantics.Definitions.Action.counter (target isSpell), Semantics.Definitions.Action.counter (that .spell)]) =
         [.anaphor (.word .spell) .one 0] := by decide
 
 /-- A possessor read may explicitly name the departed spell [CR#608.2h]. -/
 theorem departedSpellsControllerIsReadable :
     Action.check (DRS.ofList [])
-      (sequentially [counter (target isSpell),
+      (sequentially [Semantics.Definitions.Action.counter (target isSpell),
         instruct (controllerOf (that .spell)) (draw 1)]) = [] := by decide
 
 /-- A historical counter reads its departed spell; it performs no second counter [CR#608.2h]. -/
 theorem counteredThisWayReadsDepartedSpell :
-    let after := (stepAction 64 .postEvent .obj (DRS.ofList []) (counter (target isSpell))).1
-    Condition.check (nextClause after) (did any (counter (that .spell)) thisWay) = [] := by decide
+    let after := (stepAction 64 .postEvent .obj (DRS.ofList []) (Semantics.Definitions.Action.counter (target isSpell))).1
+    Condition.check (nextClause after) (did any (Semantics.Definitions.Action.counter (that .spell)) thisWay) = [] := by decide
 
 end Semantics.Proofs.NounWords

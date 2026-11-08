@@ -18,6 +18,7 @@ but a graveyard [CR#702.127a]; flashback's spell is an instant or sorcery [CR#70
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a the)
 open Semantics.Templates.Predicate (and not did was quality)
@@ -146,7 +147,7 @@ theorem multikickerIsKicker :
 /-- Multikicker's body: an additional cost that may be paid any number of times [CR#702.33c]. -/
 theorem multikickerMayBePaidAnyNumberOfTimes :
     components (multikicker cost) =
-      [static (.addedCost (.inCaller cost) true .anyNumberOfTimes)] := rfl
+      [static (.addedCost (.inCaller cost) Bool.true .anyNumberOfTimes)] := rfl
 
 /-- Megamorph is morph's two abilities and a replacement of the turning face up that puts the
 counter on as the permanent turns [CR#702.37b,614.1e]; its special action only turns it face up. -/
@@ -223,9 +224,9 @@ theorem jumpStartExileIsGatedOnAJumpStartCast :
     (components jumpStart)[1]? =
       some
         (static
-          (replace (would (Semantics.Subject.actor (thisSpell)) (leave stack))
+          (replace (would (Semantics.Subject.actor (thisSpell)) (leave Semantics.Templates.Location.stack))
             (doIf (choiceWasTaken (.byKeyword (.named "jumpStart")) thisSpell)
-              (instead (exile thisSpell))))) := rfl
+              (instead (Semantics.Definitions.Action.exile thisSpell))))) := rfl
 
 /-! ## Splice adds to the cast -/
 
@@ -236,7 +237,7 @@ theorem spliceIsACastTimeReveal (quality : Predicate) :
       [ static
           (.revealedAsCast (a (and [isSpell, .inCaller quality]))
             (.conjunction none
-              [ .addedCost (.inCaller cost) false .once,
+              [ .addedCost (.inCaller cost) Bool.false .once,
                 .textChange (that .spell) (.appendTextOf this_) ])) ] := rfl
 
 /-- Two cards with splice onto Arcane check as two statics. The order of their text is a choice
@@ -260,7 +261,7 @@ theorem badRevealedAsAPlayerIsCast :
 [CR#702.127a]. -/
 theorem aftermathExcludesEveryZoneButAGraveyard :
     (components aftermath)[1]? =
-      some (static (cant (Semantics.Subject.actor (theActor)) (cast this_ (from_ := some (not graveyard))))) := rfl
+      some (static (cant (Semantics.Subject.actor (theActor)) (cast this_ (from_ := some (not Semantics.Templates.Location.graveyard))))) := rfl
 
 /-- Flashback casts only an instant or sorcery spell [CR#702.34a]. -/
 theorem flashbackResultingSpellIsAnInstantOrSorcery :
@@ -284,19 +285,19 @@ def componentStatics (a : Ability) : List StaticSpec :=
 
 /-- An alternative cost [CR#118.9], bare or under a condition. -/
 def isAltCost : StaticSpec → Bool
-  | .altCost .. | .conditional (.altCost ..) _ _ => true
-  | _ => false
+  | .altCost .. | .conditional (.altCost ..) _ _ => Bool.true
+  | _ => Bool.false
 
 /-- A permission to cast paying an alternative cost [CR#601.3,118.9]. -/
 def castPaysInstead (action : Action) : Bool :=
   match action.scopeBody with
-  | .procedure .cast _ (.payingInstead _) .. => true
-  | _ => false
+  | .procedure .cast _ (.payingInstead _) .. => Bool.true
+  | _ => Bool.false
 
 /-- A permission to cast paying an alternative cost, bare or under a condition. -/
 def isPayingInsteadPermission : StaticSpec → Bool
   | .can _ action _ | .conditional (.can _ action _) _ _ => castPaysInstead action
-  | _ => false
+  | _ => Bool.false
 
 /-- Every keyword whose cost a spell's controller may pay rather than its mana cost, granting no
 cast from another zone or at another time, is an alternative cost of this spell [CR#118.9]:
@@ -310,7 +311,7 @@ theorem pureAlternativeCostsAreAltCost :
       prowl cost, spectacle cost, surge cost, warp cost, webSlinging cost ].all
       (fun keyword =>
         (componentStatics keyword).any isAltCost &&
-          !(componentStatics keyword).any isPayingInsteadPermission) = true := by
+          !(componentStatics keyword).any isPayingInsteadPermission) = Bool.true := by
   decide
 
 /-- Flashback, escape and foretell grant a cast from another zone, so each keeps its permission
@@ -318,8 +319,8 @@ and pays its cost instead of the mana cost there [CR#702.34a,702.138a,702.143a,6
 pays its cost instead too, but in a one-shot cast during its trigger's resolution, not under a
 permission [CR#702.35a,608.2g]. -/
 theorem castPermissionsKeepPayingInstead :
-    (componentStatics (flashback cost)).any isPayingInsteadPermission = true ∧
-      (componentStatics (escape cost)).any isPayingInsteadPermission = true ∧
+    (componentStatics (flashback cost)).any isPayingInsteadPermission = Bool.true ∧
+      (componentStatics (escape cost)).any isPayingInsteadPermission = Bool.true ∧
       (specialActionSteps (foretell cost))[3]? =
         some
           (establishThroughout
@@ -330,11 +331,11 @@ theorem castPermissionsKeepPayingInstead :
       (components (madness cost))[1]? =
         some
           (when
-            (.causes (.event (does any (discard thisCard))) (does any (exileFrom thisCard hand)))
+            (.causes (.event (does any (discard thisCard))) (does any (exileFrom thisCard Semantics.Templates.Location.hand)))
             (instruct (ownerOf thisCard)
               (mayOrElse
                 (cast thisCard (from_ := exileZone) (payment := .payingInstead (.inCaller cost)))
-                (putInto thisCard graveyard)))) := by
+                (putInto thisCard Semantics.Templates.Location.graveyard)))) := by
   refine ⟨by decide, by decide, rfl, rfl⟩
 
 end Semantics.Proofs.KeywordCastPermissions

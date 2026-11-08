@@ -17,6 +17,7 @@ Port of `idris/src/Experimental/Cards/Choice.idr`: the printed cards of the Choi
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each counted the)
 open Semantics.Templates.Predicate (and or not was quality attachedTo)
@@ -82,10 +83,10 @@ The objects resolved are counted: "you", re-mentioned by each "you control", is 
 theorem joustConditionReadsTheClauseSubject :
     let out := (stepAction 16 .postEvent .obj (DRS.ofList []) (sequentially
       [ chooseFightPair,
-        doOnlyIf (get (the (and [isCreature, youControl])) (up 2) (up 1) untilEndOfTurn)
+        doOnlyIf (get (the (and [isCreature, youControl])) (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn)
           (is it (hasSubtype knight)) ])).1
     ((out.resolvedIds.filterMap out.findById?).filter (·.kind == .object)).map
-      (·.controlledByYou) = [some true] := by
+      (·.controlledByYou) = [some Bool.true] := by
   decide
 
 /-- "If it's a Knight, the creature you control gets +2/+1 until end of turn.": a preposed "if"
@@ -94,7 +95,7 @@ theorem badPreposedConditionReadsNoLaterClauseSubject :
     Action.check (DRS.ofList []) (sequentially
       [ chooseFightPair,
         doIf (is it (hasSubtype knight))
-          (get (the (and [isCreature, youControl])) (up 2) (up 1) untilEndOfTurn) ]) =
+          (get (the (and [isCreature, youControl])) (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn) ]) =
       [.anaphor .bare .one 2] := by decide
 
 /-- Stolen Uniform, through its third sentence: "Choose target creature you control and target
@@ -133,7 +134,7 @@ theorem okPhantomBlade : Ability.check (DRS.ofList []) phantomBlade = [] := by d
 /-- Braids's Frightful Return -/
 def braidsFrightfulReturn : Action :=
   may (sacrifice (a isCreature))
-                                    (instruct eachOpponent (discard (a (cardIn hand))))
+                                    (instruct eachOpponent (discard (a (cardIn Semantics.Templates.Location.hand))))
 theorem okBraidsFrightfulReturn : Action.check (DRS.ofList []) braidsFrightfulReturn = [] := by decide
 /-- Daretti, Ingenious Iconoclast -/
 def darettisMinusOne : Action :=
@@ -148,14 +149,14 @@ theorem okRainOfThorns : Action.check (DRS.ofList []) rainOfThorns = [] := by de
 
 def rankleMasterOfPranks : Action :=
   chooseModes anyNumber
-    [ { action := instruct eachPlayer (discard (a (cardIn hand))) },
-      { action := sequentially [instruct eachPlayer (loseLife 1), instruct (those player)
+    [ { action := instruct eachPlayer (discard (a (cardIn Semantics.Templates.Location.hand))) },
+      { action := sequentially [instruct eachPlayer (loseLife 1), instruct (those Semantics.Templates.NounWord.player)
                       (draw 1)] },
       { action := instruct eachPlayer (sacrifice (aTheirChoice isCreature)) } ]
 theorem okRankleMasterOfPranks : Action.check (DRS.ofList []) rankleMasterOfPranks = [] := by decide
 
 def myrkulsEdict : Action :=
-  sequentially [choose anOpponent, instruct (that player) (sacrifice (aTheirChoice isCreature))]
+  sequentially [choose anOpponent, instruct (that Semantics.Templates.NounWord.player) (sacrifice (aTheirChoice isCreature))]
 theorem okMyrkulsEdict : Action.check (DRS.ofList []) myrkulsEdict = [] := by decide
 def moltingHarpy : Action := doUnless (sacrifice thisCreature) (Semantics.Cost.mana ([generic
     2]))
@@ -169,15 +170,15 @@ theorem okSolitaryConfinement : Action.check (DRS.ofList []) solitaryConfinement
 def yasminKhan : Ability :=
   activated tapSymbol
     (sequentially
-      [ exile (topSlice 1),
-        establishThroughout (can (Semantics.Subject.actor (you)) (play it)) untilYourNextEndStep ])
+      [ Semantics.Definitions.Action.exile (topSlice 1),
+        establishThroughout (can (Semantics.Subject.actor (you)) (Semantics.Definitions.Action.play it)) untilYourNextEndStep ])
 theorem okYasminKhan : Ability.check (DRS.ofList []) yasminKhan = [] := by decide
 
 /-- Brazen Cannonade -/
 def brazenCannonadePermission : Action :=
   sequentially
-    [ exile (topSlice 1),
-      establishThroughout (can (Semantics.Subject.actor (you)) (play it)) (untilEvent
+    [ Semantics.Definitions.Action.exile (topSlice 1),
+      establishThroughout (can (Semantics.Subject.actor (you)) (Semantics.Definitions.Action.play it)) (untilEvent
                                                          (endOf .combat you nextTime)) ]
 theorem okBrazenCannonadePermission : Action.check (DRS.ofList []) brazenCannonadePermission = [] := by
   decide
@@ -205,9 +206,9 @@ theorem okSkaabRuinator : Ability.check (DRS.ofList []) skaabRuinator = [] := by
 
 def escapeToTheWilds : Action :=
   sequentially
-    [ exile (topSlice 5),
+    [ Semantics.Definitions.Action.exile (topSlice 5),
       establishThroughout (can (Semantics.Subject.actor (you))
-                             (play (bare (and [isCard, was (exile which) thisWay]))))
+                             (Semantics.Definitions.Action.play (Semantics.Templates.NounPhrase.bare (and [isCard, was (Semantics.Definitions.Action.exile which) thisWay]))))
         (untilEvent (endOf .turn you nextTime)) ]
 theorem okEscapeToTheWilds : Action.check (DRS.ofList []) escapeToTheWilds = [] := by decide
 
@@ -216,7 +217,7 @@ def museVesselPlay : Ability :=
   activated (Semantics.Cost.mana ([generic 1]))
     (sequentially
       [ choose (a (cardIn (exiledWith thisArtifact))),
-        establishThroughout (can (Semantics.Subject.actor (you)) (play (that card))) thisTurn ])
+        establishThroughout (can (Semantics.Subject.actor (you)) (Semantics.Definitions.Action.play (that card))) thisTurn ])
 theorem okMuseVesselPlay : Ability.check (DRS.ofList []) museVesselPlay = [] := by decide
 
 def demonicConsultationChoice : Action := choose (a (quality .cardName))
@@ -247,9 +248,9 @@ theorem okForgottenLoreChoice : Action.check (DRS.ofList []) forgottenLoreChoice
 def psychicPaperChoiceAndReads : List Ability :=
   [ static (conjunction [ attachChoosing thisEquipment .cardName,
         attachChoosing thisEquipment (.subtype .creature) ]),
-    static (conjunction [ qualityChange (equipped creature) .sets
+    static (conjunction [ qualityChange (Semantics.Templates.NounPhrase.equipped creature) .sets
           (chosenQuality (ofTheLastChosen .cardName)),
-        qualityChange (equipped creature) .sets
+        qualityChange (Semantics.Templates.NounPhrase.equipped creature) .sets
           (chosenQuality (ofTheLastChosen (.subtype .creature))) ]) ]
 theorem okPsychicPaperChoiceAndReads : Ability.checkText (DRS.ofList []) psychicPaperChoiceAndReads = [] := by
   decide
@@ -316,15 +317,15 @@ def memoricideSearch : Action :=
   sequentially
     [ choose (a (qualityFrom .cardName (nameOfCard (non isLand)))),
       searchZonesOf (target isPlayer) (counted anyNumber (named chosenName)),
-      exile them,
-      instruct (that player) shuffle ]
+      Semantics.Definitions.Action.exile them,
+      instruct (that Semantics.Templates.NounWord.player) shuffle ]
 theorem okMemoricideSearch : Action.check (DRS.ofList []) memoricideSearch = [] := by decide
 /-- Lost Hours -/
 def lostHoursPlacement : Action :=
   sequentially
     [ instruct (target isPlayer) revealHand,
       choose (a (and [non isLand, in_ (handOf they)])),
-      instruct (that player) (put it (fromTop 3 library)) ]
+      instruct (that Semantics.Templates.NounWord.player) (put it (fromTop 3 Semantics.Templates.Location.library)) ]
 theorem okLostHoursPlacement : Action.check (DRS.ofList []) lostHoursPlacement = [] := by decide
 /-- Aether Gust -/
 def aetherGustPlacement : Action :=
@@ -333,7 +334,7 @@ def aetherGustPlacement : Action :=
       instruct (ownerOf it) (put it (or [onTop, onBottom])) ]
 theorem okAetherGustPlacement : Action.check (DRS.ofList []) aetherGustPlacement = [] := by decide
 /-- Fastbond -/
-def fastbondLands : Ability := static (can (Semantics.Subject.actor (you)) (play (counted (additional anyNumber) isLand)))
+def fastbondLands : Ability := static (can (Semantics.Subject.actor (you)) (Semantics.Definitions.Action.play (counted (Semantics.Templates.Quantity.additional anyNumber) isLand)))
 theorem okFastbondLands : Ability.check (DRS.ofList []) fastbondLands = [] := by decide
 /-- Panglacial Wurm -/
 def panglacialWurmCast : Ability :=
@@ -361,9 +362,9 @@ def boreasChargerSpell : Action :=
   sequentially
     [ choose (a opponentWithMoreLands),
       search yourLibrary (counted (exactlyOf theDifference) (Semantics.Predicate.hasSubtype (plains))),
-      reveal (those card),
+      Semantics.Definitions.Action.reveal (those card),
       putOntoBattlefieldTapped (someOf (exactly 1) (those card)),
-      putInto theRest hand ]
+      putInto theRest Semantics.Templates.Location.hand ]
 theorem okBoreasChargerSpell : Action.check (DRS.ofList []) boreasChargerSpell = [] := by decide
 
 /-- Slithermuse -/
@@ -371,7 +372,7 @@ def slithermuseTrigger : Ability :=
   when (does (Semantics.Subject.actor (thisCreature)) leave)
     (sequentially
       [ choose anOpponent,
-        doIf (compareAmt (countOf (cardIn (handOf (that player)))) .greater
+        doIf (compareAmt (countOf (cardIn (handOf (that Semantics.Templates.NounWord.player)))) .greater
                 (countOf (cardIn yourHand)))
           (draw theDifference) ])
 theorem okSlithermuseTrigger : Ability.check (DRS.ofList []) slithermuseTrigger = [] := by decide
@@ -391,7 +392,7 @@ def drawUpToTwoThenGainPerShortfall : Action :=
   instruct eachPlayer
     (sequentially
       [ may (drawCount (upToOf 2)),
-        instruct (that player) (gainLife (times 2 shortOfCeiling)) ])
+        instruct (that Semantics.Templates.NounWord.player) (gainLife (Semantics.Templates.Amount.times 2 shortOfCeiling)) ])
 theorem okDrawUpToTwoThenGainPerShortfall :
     Action.check (DRS.ofList []) drawUpToTwoThenGainPerShortfall = [] := by decide
 
@@ -412,7 +413,7 @@ theorem okSummonEsperValigarmandaCast :
     StaticSpec.check (DRS.ofList []) summonEsperValigarmandaCast = [] := by decide
 /-- Rogue Class's level-3 body -/
 def rogueClassLevelThree : StaticSpec :=
-  conjunction [ can (Semantics.Subject.actor (you)) (play (allOf (in_ (exiledWith thisClass)))),
+  conjunction [ can (Semantics.Subject.actor (you)) (Semantics.Definitions.Action.play (allOf (in_ (exiledWith thisClass)))),
       can (Semantics.Subject.actor (you)) (pay anyCost .once)
           (asThough :=
              spendManaAs none .anyColor (toCast (in_ (exiledWith thisClass)))) ]
@@ -420,17 +421,17 @@ theorem okRogueClassLevelThree : StaticSpec.check (DRS.ofList []) rogueClassLeve
 
 /-- Muldrotha, the Gravetide -/
 def muldrothaLandWindow : StaticSpec :=
-  can (Semantics.Subject.actor (you)) (play (a isLand) (from_ := yourGraveyard)) (timing := onEachOfYourTurns)
+  can (Semantics.Subject.actor (you)) (Semantics.Definitions.Action.play (a isLand) (from_ := yourGraveyard)) (timing := onEachOfYourTurns)
 theorem okMuldrothaLandWindow : StaticSpec.check (DRS.ofList []) muldrothaLandWindow = [] := by decide
 /-- Nahiri's Lithoforming -/
 def nahiriExtraLands : StaticSpec := can (Semantics.Subject.actor (you))
-    (play (counted (additional (exactlyOf (letter .x))) isLand))
+    (Semantics.Definitions.Action.play (counted (Semantics.Templates.Quantity.additional (exactlyOf (letter .x))) isLand))
 theorem okNahiriExtraLands : StaticSpec.check (DRS.ofList [letterB .x]) nahiriExtraLands = [] := by decide
 
 /-- Apex of Power -/
 def apexOfPowerCast : Action :=
   sequentially
-    [ exile (topSlice 7),
+    [ Semantics.Definitions.Action.exile (topSlice 7),
       establishThroughout (can (Semantics.Subject.actor (you)) (cast (fromAmong anyNumber isSpell them))) thisTurn ]
 theorem okApexOfPowerCast : Action.check (DRS.ofList []) apexOfPowerCast = [] := by decide
 /-- Blight Herder -/
@@ -438,7 +439,7 @@ def blightHerderCast : Action :=
   may
     (putInto (counted (exactly 2)
             (and [isCard, opponentsOwn, in_ exileZone]))
-      graveyard)
+      Semantics.Templates.Location.graveyard)
 theorem okBlightHerderCast : Action.check (DRS.ofList []) blightHerderCast = [] := by decide
 
 /-- Akiri, Fearless Voyager -/
@@ -451,7 +452,7 @@ def akiriUnattachOffer : Ability :=
 theorem okAkiriUnattachOffer : Ability.check (DRS.ofList []) akiriUnattachOffer = [] := by decide
 /-- Summoning Materia -/
 def summoningMateriaTopCast : Ability :=
-  static (onlyWhile ((can (Semantics.Subject.actor (you)) (cast (bare (and [isSpell, isCreature])) (from_ := onTop))))
+  static (onlyWhile ((can (Semantics.Subject.actor (you)) (cast (Semantics.Templates.NounPhrase.bare (and [isSpell, isCreature])) (from_ := onTop))))
     (is thisEquipment (attachedTo (a isCreature))))
 theorem okSummoningMateriaTopCast : Ability.check (DRS.ofList []) summoningMateriaTopCast = [] := by decide
 /-- Vizier of the Menagerie -/
@@ -477,12 +478,12 @@ def collectiveUnconscious : Action := draw (forEach 1 (and [isCreature, youContr
 theorem okCollectiveUnconscious : Action.check (DRS.ofList []) collectiveUnconscious = [] := by decide
 def killiansConfidence : Action :=
   sequentially
-    [get (target isCreature) (up 1) (up 1) untilEndOfTurn, draw 1]
+    [get (target isCreature) (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn, draw 1]
 theorem okKilliansConfidence : Action.check (DRS.ofList []) killiansConfidence = [] := by decide
 
 /-- Not Forgotten -/
 def notForgottenPlacement : Action :=
-  putInto (target (cardIn graveyard)) (or [onTop, onBottom])
+  putInto (target (cardIn Semantics.Templates.Location.graveyard)) (or [onTop, onBottom])
 theorem okNotForgottenPlacement : Action.check (DRS.ofList []) notForgottenPlacement = [] := by decide
 
 def boreasChargerDifference : Amount := theDifference
@@ -534,12 +535,12 @@ ruling 2026-10-22, batch 4). -/
 theorem okJuxtaposeThemReadsTheTiedPermanents :
     let tied := thereAre (counted (orMore 2)
       (and [isPermanent, controlledBy (a isPlayer),
-            tiedFor .max (.stat .manaValue) (and [isPermanent, controlledBy (that player)])]))
+            tiedFor .max (.stat .manaValue) (and [isPermanent, controlledBy (that Semantics.Templates.NounWord.player)])]))
     let artifacts := (stepAction 512 .postEvent .obj (DRS.ofList [])
-      (get (bare (and [isArtifact, youControl])) (up 1) (up 1) untilEndOfTurn)).1
+      (get (Semantics.Templates.NounPhrase.bare (and [isArtifact, youControl])) (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn)).1
     let after := (stepCondition 512 (nextClause artifacts) tied).1
     Action.check (DRS.ofList [])
-        (sequentially [get (bare (and [isArtifact, youControl])) (up 1) (up 1) untilEndOfTurn,
+        (sequentially [get (Semantics.Templates.NounPhrase.bare (and [isArtifact, youControl])) (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn,
           juxtaposeTie]) = [] ∧
       (artifacts.findById? 1).map (·.det) = some .all ∧
       (resolveCandidates .bare .many (nextClause after)).map (·.det) = [.count] := by

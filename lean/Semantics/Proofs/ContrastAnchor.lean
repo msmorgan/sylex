@@ -132,7 +132,7 @@ theorem embermawHellionAnchorsOnTheSource :
     let rule := replace
       (would ((Semantics.Subject.actor (a (and [isSource, hasColor .red, youControl, isOther]))))
         (dealDamage anyAmount (a (or [isPermanent, isPlayer]))))
-      (instead (instruct it (dealDamage (plus thatMuch 1) thatJoin)))
+      (instead (instruct it (dealDamage (Semantics.Templates.Amount.plus thatMuch 1) thatJoin)))
     let after := stepStaticSpec 64 (framed [.creature]) rule
     after.2 = [] ∧ after.1.contrastAnchors = [.source] := by
   decide
@@ -148,7 +148,7 @@ def probeEquipment : Card := .singleFaced
       subtypes := [equipment],
       text :=
         [ whenever (does ((Semantics.Subject.actor (a (and [isCreature, isOther])))) die) (draw 1),
-          equip (mana [generic 1]) ] } }
+          equip (Semantics.Templates.Cost.mana [generic 1]) ] } }
 
 theorem okCreatureHeadedOtherOnANoncreatureSource :
     probeEquipment.check = [] ∧
@@ -317,11 +317,11 @@ creature card from your graveyard to the battlefield." The sacrificed Saproling 
 earlier mention in the graveyard; the anchor is this card, coordinated with the phrase. -/
 theorem slimefootAndSqueeAnchorsOnThisCard :
     let cost := (stepCost 64 (framed [.creature]) (perform (sacrifice (a isCreature)))).1
-    let after := (stepNounPhrase 64 (nextClause cost) .obj true
+    let after := (stepNounPhrase 64 (nextClause cost) .obj Bool.true
       (both thisCard (targets (upTo 1) (and [isCreature, isCard, isOther, in_ yourGraveyard])))).1
     (after.contrastAnchors.map fun
       | .mention id => (after.findById? id).map (·.defaultAnchor)
-      | _ => none) = [some true] := by
+      | _ => none) = [some Bool.true] := by
   decide
 
 /-! ## A particular of the same clause, read forward -/
@@ -332,12 +332,12 @@ anchor is the clause's recipient, the equipped creature. -/
 theorem inquisitorsFlailAnchorsOnTheEquippedCreature :
     let event :=
       would ((Semantics.Subject.actor (a (and [isCreature, isOther]))))
-        (dealDamage anyAmount (equipped creature) (some .combat))
+        (dealDamage anyAmount (Semantics.Templates.NounPhrase.equipped creature) (some .combat))
     let rule :=
-      replace event (instead (instruct it (dealDamage (times 2 thatMuch) (equipped creature))))
+      replace event (instead (instruct it (dealDamage (Semantics.Templates.Amount.times 2 thatMuch) (Semantics.Templates.NounPhrase.equipped creature))))
     let after := stepStaticSpec 64 (framed [.artifact]) rule
     let recipient := (stepWouldClause 64 (framed [.artifact]) event).1.findById? 1
-    after.2 = [] ∧ recipient.map (·.attachmentHost) = some true ∧
+    after.2 = [] ∧ recipient.map (·.attachmentHost) = some Bool.true ∧
       after.1.contrastAnchors = recipient.toList.map (fun ref => ContrastAnchor.participant ref.payload)
     := by
   decide
@@ -357,10 +357,10 @@ theorem mirrorweaveAnchorsOnTheTarget :
 /-! ## The member of a distributive subject's group -/
 
 /-- "Attacking creatures you control get +1/+0 until end of turn …" -/
-private def attackersYouControl : NounPhrase := bare (and [isAttacking, isCreature, youControl])
+private def attackersYouControl : NounPhrase := Semantics.Templates.NounPhrase.bare (and [isAttacking, isCreature, youControl])
 
 /-- "… for each other attacking creature." -/
-private def perOtherAttacker : Delta Amount := up (forEach 1 (and [isAttacking, isCreature, isOther]))
+private def perOtherAttacker : Delta Amount := Semantics.Templates.Delta.Amount.up (forEach 1 (and [isAttacking, isCreature, isOther]))
 
 /-- Run (*Hit // Run*): "Attacking creatures you control get +1/+0 until end of turn for each
 other attacking creature." The anchor is the current member of the group the subject names
@@ -380,7 +380,7 @@ theorem distributiveStepPrecedesNearestMention :
     let after := (stepAction 64 .postEvent .obj (framed [.instant])
       (sequentially
         [ tap (target (and [isAttacking, isCreature])),
-          get attackersYouControl perOtherAttacker (up 0) untilEndOfTurn ])).1
+          get attackersYouControl perOtherAttacker (Semantics.Templates.Delta.Amount.up 0) untilEndOfTurn ])).1
     after.contrastAnchors = [.member 2] ∧
       (after.findById? 2).map (fun ref => (ref.det, ref.ty)) = some (.all, [.creature]) := by
   decide
@@ -389,7 +389,7 @@ theorem distributiveStepPrecedesNearestMention :
 Its subject names no group, so the anchor is the nearest earlier mention, the target. -/
 theorem nonGroupSubjectKeepsTheNearestMention :
     let after := (stepAction 64 .postEvent .obj (framed [.instant])
-      (get (target isCreature) perOtherAttacker (up 0) untilEndOfTurn)).1
+      (get (target isCreature) perOtherAttacker (Semantics.Templates.Delta.Amount.up 0) untilEndOfTurn)).1
     after.contrastAnchors = [.mention 0] ∧
       (after.findById? 0).map (fun ref => (ref.det, ref.ty)) = some (.target, [.creature]) := by
   decide

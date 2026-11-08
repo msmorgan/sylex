@@ -33,7 +33,7 @@ theorem okCastsSingularComplement :
 
 /-- "Whenever you cast all spells, draw a card." -/
 theorem badCastsPluralComplement :
-    Ability.check (DRS.ofList []) (whenever (.does (.actor .you) (.procedure .cast (bare isSpell) .itsOwnCost none none none)) (draw 1))
+    Ability.check (DRS.ofList []) (whenever (.does (.actor .you) (.procedure .cast (Semantics.Templates.NounPhrase.bare isSpell) .itsOwnCost none none none)) (draw 1))
       = [.singular] := by
   decide
 
@@ -265,8 +265,8 @@ triggered ability [CR#113.3c]: a trigger would resolve after the roll's instruct
 the result. -/
 theorem okAfterRollShift :
     (match after youRollADie rollShiftBody with
-      | .static (.rollModifier ..) => true
-      | _ => false) = true ∧
+      | .static (.rollModifier ..) => Bool.true
+      | _ => Bool.false) = Bool.true ∧
     Ability.check (DRS.ofList []) (after youRollADie rollShiftBody) = [] :=
   ⟨rfl, by decide⟩
 
@@ -337,17 +337,17 @@ private def conditionIsInTheEffect (card : Card) : Bool :=
     match (face.characteristics.text.head? : Option Ability) with
     | some (.sameIsTrueFor (.triggered _ _ _ _ _ _ none (.doIf _ _ none _)) keywords) =>
       !keywords.isEmpty
-    | _ => false
-  | _ => false
+    | _ => Bool.false
+  | _ => Bool.false
 
 /-- Required pin: *Odric, Lunarch Marshal*'s "creatures you control gain first strike until end of
 turn if a creature you control has first strike" prints its "if" after the effect, so it is not an
 intervening "if" [CR#603.4] and the condition is part of the effect: each keyword's effect is a
 `doIf`; so are *Bleeding Effect*'s and *Concerted Effort*'s. -/
 theorem trailingIfIsInTheEffect :
-    conditionIsInTheEffect (Semantics.Cards.«Odric, Lunarch Marshal») = true ∧
-      conditionIsInTheEffect (Semantics.Cards.«Bleeding Effect») = true ∧
-      conditionIsInTheEffect (Semantics.Cards.«Concerted Effort») = true := by
+    conditionIsInTheEffect (Semantics.Cards.«Odric, Lunarch Marshal») = Bool.true ∧
+      conditionIsInTheEffect (Semantics.Cards.«Bleeding Effect») = Bool.true ∧
+      conditionIsInTheEffect (Semantics.Cards.«Concerted Effort») = Bool.true := by
   decide
 
 /-- The number of keywords a card's lines grant through one triggered ability each, with the

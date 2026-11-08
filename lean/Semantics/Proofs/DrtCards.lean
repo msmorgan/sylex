@@ -59,12 +59,12 @@ theorem airbendMultipleTargetsUsePerCardLoop :
 
 theorem counterAlternativesUseTheirOwnHolderKinds :
     Predicate.checkAt (.join .object .player) (DRS.ofList [])
-      (.or [.and [.in_ battlefield, .hasCounters none],
+      (.or [.and [.in_ Semantics.Templates.Location.battlefield, .hasCounters none],
         .compare [.anyCounter .player] .atLeast 1]) = [] := by decide
 
 theorem mixedCounterAxesStillRejectOneHolder :
-    axesAt .object [.anyCounter .object, .anyCounter .player] = false ∧
-      axesAt .player [.anyCounter .object, .anyCounter .player] = false := by decide
+    axesAt .object [.anyCounter .object, .anyCounter .player] = Bool.false ∧
+      axesAt .player [.anyCounter .object, .anyCounter .player] = Bool.false := by decide
 
 theorem anyDieResultReadsOneRollBatch :
     Condition.check (DRS.ofList [outcomeB .diceRolled])
@@ -81,7 +81,7 @@ theorem anyDieResultRejectsAmbiguousBatches :
 theorem distributedLifeLossKeepsOneScalarLetter :
     let out := (stepAction 64 .postEvent .obj (DRS.ofList [])
       (instruct (each (.isOpponentOf .you)) (loseLife (.letter .x)))).1
-    countLetter .x out = 1 ∧ anyOpenLetter .x out = true := by decide
+    countLetter .x out = 1 ∧ anyOpenLetter .x out = Bool.true := by decide
 
 theorem alternativeConditionsCannotBorrowOtherBranchParticipants :
     Condition.check (DRS.ofList [])
@@ -99,23 +99,23 @@ theorem powerDefinitionPublishesItsNumber :
 theorem grantedKeywordPublishesItsScalarParameter :
     let out := (stepStaticSpec 64 (DRS.ofList [])
       (Templates.abilityGrant thisCreature (keywordNumber (.named "bushido") (.letter .x)))).1
-    anyOpenLetter .x out = true ∧ countLetter .x out = 1 := by decide
+    anyOpenLetter .x out = Bool.true ∧ countLetter .x out = 1 := by decide
 
 /-- The same through a keyword Definition, whose parameter arrives in its caller's scope:
 "Fumiko has bushido X" publishes X for the sibling "where X is …". -/
 theorem grantedKeywordDefinitionPublishesItsScalarParameter :
     let out := (stepStaticSpec 64 (DRS.ofList [])
       (Templates.abilityGrant thisCreature (bushido (.letter .x)))).1
-    anyOpenLetter .x out = true ∧ countLetter .x out = 1 := by decide
+    anyOpenLetter .x out = Bool.true ∧ countLetter .x out = 1 := by decide
 
 theorem typedPlayerViewOwnsAHandWithoutChangingTheJoinedReferent :
     let joinedRef : Referent := {
       id := 17, det := .target, plur := .one,
       payload := .join (.object [.planeswalker] (some .battlefield) none none none)
-        (.player false) }
+        (.player Bool.false) }
     let initial := nextClause (DRS.ofNumbered [joinedRef])
     let out := stepZoneOwnerWith (stepOps 12) initial (some they)
-    (initial.findById? 17).isSome = true ∧ out.2 = [] ∧ (out.1.findById? 17).map (·.payload) =
+    (initial.findById? 17).isSome = Bool.true ∧ out.2 = [] ∧ (out.1.findById? 17).map (·.payload) =
       (initial.findById? 17).map (·.payload) := by decide
 
 theorem distributedDamagePublishesItsRecipientGroup :
@@ -161,18 +161,18 @@ theorem conditionReadsOnlyTheBranchsTargets :
     out.2 = [.anaphor .bare .one 0] := by decide
 
 theorem prohibitionsReadTheirCallerScopedSpellParameter :
-    let announced := nextClause ((stepNounPhrase 12 (DRS.ofList []) .subj true (a isSpell)).1)
-    let out := stepStaticSpec 16 announced (cant any (counter (that .spell)))
+    let announced := nextClause ((stepNounPhrase 12 (DRS.ofList []) .subj Bool.true (a isSpell)).1)
+    let out := stepStaticSpec 16 announced (cant any (Semantics.Definitions.Action.counter (that .spell)))
     out.2 = [] ∧ (out.1.findById? 0).map (·.zone) = some (some .stack) := by decide
 
 theorem prohibitionsReadTheirCallerScopedPermanentParameter :
-    let announced := nextClause ((stepNounPhrase 12 (DRS.ofList []) .subj true (a isCreature)).1)
+    let announced := nextClause ((stepNounPhrase 12 (DRS.ofList []) .subj Bool.true (a isCreature)).1)
     ([destroy, sacrifice, regeneration].map fun verb =>
       (stepStaticSpec 16 announced (cant any (verb (that (.type .creature))))).2) =
       [[], [], []] := by decide
 
 theorem prohibitionsStillRefuseMissingCallerParameters :
-    StaticSpec.check (DRS.ofList []) (cant any (counter (that .spell))) =
+    StaticSpec.check (DRS.ofList []) (cant any (Semantics.Definitions.Action.counter (that .spell))) =
       [.anaphor (.word .spell) .one 0] := by decide
 
 theorem iterationCanReadDepartedPermanentsWithoutChangingTheirZone :
@@ -181,7 +181,7 @@ theorem iterationCanReadDepartedPermanentsWithoutChangingTheirZone :
     let out := stepAction 16 .postEvent .obj (nextClause dead)
       (.doForEach (those .permanent) (instruct (controllerOf (that .permanent)) (draw 1)))
     out.2 = [] ∧ (out.1.visibleReferents.filter (fun ref => ref.kind == .object)).all
-      (fun ref => ref.zone == some .graveyard) = true := by decide +kernel
+      (fun ref => ref.zone == some .graveyard) = Bool.true := by decide +kernel
 
 theorem lookingBackAtAnEntryKeepsTheCurrentReferent :
     let initial := { nextClause ((stepGameEvent 16 (DRS.ofList [])
@@ -190,7 +190,7 @@ theorem lookingBackAtAnEntryKeepsTheCurrentReferent :
     let original := initial.referents.head?.map (·.id)
     let out := stepCondition 16 initial
       (.did { subj := .any
-              action := .move it (graveyardOf .you) (some battlefield) .arrival []
+              action := .move it (graveyardOf .you) (some Semantics.Templates.Location.battlefield) .arrival []
               within := some .triggering })
     out.2 = [] ∧ (original.bind out.1.findById?).map (·.zone) = some (some .battlefield) ∧
       out.1.historicalReferentIds = [] := by decide +kernel
@@ -201,7 +201,7 @@ theorem aNewHistoricalDeathStillPublishesItsMovedReferent :
               action := destroy (a isCreature)
               within := some (.duration soFarThisTurn none) })
     out.2 = [] ∧ out.1.visibleReferents.any
-      (fun ref => ref.zone == some .graveyard && ref.id == 1) = true := by decide +kernel
+      (fun ref => ref.zone == some .graveyard && ref.id == 1) = Bool.true := by decide +kernel
 
 private def createdCreature : Action :=
   .createObject 1
@@ -214,8 +214,8 @@ theorem aCreationLoopPublishesAFreshGroupRatherThanItsLocalIdentity :
     let out := stepAction 12 .postEvent .obj (DRS.ofList []) creatureCreationLoop
     let groups := out.1.visibleReferents.filter (·.createdResult)
     out.2 = [] ∧ groups.map (·.id) = [3] ∧ groups.map (·.plur) = [.many] ∧
-      groups.all (fun ref => ref.idents.isEmpty && ref.payload.size.isNone) = true ∧
-      (out.1.findById? 1).isNone = true ∧ (out.1.findById? 2).isNone = true ∧
+      groups.all (fun ref => ref.idents.isEmpty && ref.payload.size.isNone) = Bool.true ∧
+      (out.1.findById? 1).isNone = Bool.true ∧ (out.1.findById? 2).isNone = Bool.true ∧
       NounPhrase.checkAt (some .object) (nextClause out.1) (those .token) = [] := by decide +kernel
 
 theorem aTokenMentionIsNotACreationResult :
@@ -223,30 +223,30 @@ theorem aTokenMentionIsNotACreationResult :
       (.described (.a .unmarked) (.isToken))
     let out := stepAction 12 .postEvent .obj (DRS.ofList [])
       (.doForEach (.described .all (.hasType .creature)) mention)
-    out.2 = [] ∧ out.1.visibleReferents.any (·.createdResult) = false ∧
-      (resolveCandidates (.word .token) .many (nextClause out.1)).isEmpty = true := by decide +kernel
+    out.2 = [] ∧ out.1.visibleReferents.any (·.createdResult) = Bool.false ∧
+      (resolveCandidates (.word .token) .many (nextClause out.1)).isEmpty = Bool.true := by decide +kernel
 
 theorem prospectiveCreationDoesNotPublishALoopResult :
     let out := stepAction 12 .preEvent .obj (DRS.ofList []) creatureCreationLoop
-    out.2 = [] ∧ out.1.visibleReferents.any (·.createdResult) = false ∧
-      (resolveCandidates (.word .token) .many (nextClause out.1)).isEmpty = true := by decide +kernel
+    out.2 = [] ∧ out.1.visibleReferents.any (·.createdResult) = Bool.false ∧
+      (resolveCandidates (.word .token) .many (nextClause out.1)).isEmpty = Bool.true := by decide +kernel
 
 theorem nestedCreationLoopsRetainOnlyTheirFreshAggregate :
     let out := stepAction 16 .postEvent .obj (DRS.ofList [])
       (.doForEach (.described .all (.hasType .land)) creatureCreationLoop)
     let groups := out.1.visibleReferents.filter (·.createdResult)
-    out.2 = [] ∧ groups.length = 1 ∧ groups.all (fun ref => ref.plur == .many) = true ∧
-      (resolveCandidates (.word .token) .one (nextClause out.1)).isEmpty = true ∧
+    out.2 = [] ∧ groups.length = 1 ∧ groups.all (fun ref => ref.plur == .many) = Bool.true ∧
+      (resolveCandidates (.word .token) .one (nextClause out.1)).isEmpty = Bool.true ∧
       NounPhrase.checkAt (some .object) (nextClause out.1) (those .token) = [] := by decide +kernel
 
 theorem creationResultsKeepTheirActualDestinationAfterAMove :
     let moved := Action.sequentially [createdCreature,
-      .move (.pro .bare .one) (battlefield) (some exileZone) .departure []]
+      .move (.pro .bare .one) (Semantics.Templates.Location.battlefield) (some exileZone) .departure []]
     let out := stepAction 16 .postEvent .obj (DRS.ofList [])
       (.doForEach (.described .all (.hasType .creature)) moved)
     let groups := out.1.visibleReferents.filter (·.createdResult)
     out.2 = [] ∧ groups.length = 1 ∧
-      groups.all (fun ref => ref.zone == some .exile) = true ∧
+      groups.all (fun ref => ref.zone == some .exile) = Bool.true ∧
       (stepAction 8 .postEvent .obj (nextClause out.1)
         (.setStatus .tapped (those .token))).2 = [.anaphor (.word .token) .many 0] := by decide +kernel
 
@@ -254,21 +254,21 @@ theorem movingAnOuterCreationInsideALoopDoesNotCreateAPluralResult :
     let initial := nextClause ((stepAction 8 .postEvent .obj (DRS.ofList []) createdCreature).1)
     let out := stepAction 12 .postEvent .obj initial
       (.doForEach (.described .all (.hasType .creature))
-        (.move (.pro (.word .token) .one) (battlefield)
+        (.move (.pro (.word .token) .one) (Semantics.Templates.Location.battlefield)
           (some exileZone) .departure []))
     let created := out.1.visibleReferents.filter (·.createdResult)
     out.2 = [] ∧ created.map (·.id) = [3] ∧ created.map (·.plur) = [.one] ∧
-      created.all (fun ref => ref.zone == some .exile) = true ∧
-      (out.1.findById? 0).isNone = true ∧ (out.1.findById? 2).isNone = true ∧
-      (resolveCandidates (.word .token) .many (nextClause out.1)).isEmpty = true := by decide +kernel
+      created.all (fun ref => ref.zone == some .exile) = Bool.true ∧
+      (out.1.findById? 0).isNone = Bool.true ∧ (out.1.findById? 2).isNone = Bool.true ∧
+      (resolveCandidates (.word .token) .many (nextClause out.1)).isEmpty = Bool.true := by decide +kernel
 
 theorem countersOnItReadsTheStatSubjectInsideTheSmallClause :
-    let initial := (stepNounPhrase 16 (DRS.ofList []) .subj true
+    let initial := (stepNounPhrase 16 (DRS.ofList []) .subj Bool.true
       (target isCreature)).1
     let result := stepAmount 16 initial (countersOn p1p1Counter it)
     result.2 = [] ∧ result.1.resolvedIds = [0] ∧
       (initial.findById? 0).map (·.role) = some .subj ∧
-      (initial.pendingRoles.contains (0, .subj)) = true := by decide +kernel
+      (initial.pendingRoles.contains (0, .subj)) = Bool.true := by decide +kernel
 
 private def weepingAngelRecipientContext : DRS :=
   (stepWouldClauseWith (stepOps 16) (DRS.ofList [])
@@ -277,13 +277,13 @@ private def weepingAngelRecipientContext : DRS :=
 
 theorem weepingAngelNestedPossessorDoesNotMakeItsCreatureAClauseMate :
     let initial := nextClause weepingAngelRecipientContext
-    let owner := stepNounPhrase 16 initial .subj true (ownerOf (that (.type .creature)))
-    let patient := stepNounPhrase 16 owner.1 .obj true
+    let owner := stepNounPhrase 16 initial .subj Bool.true (ownerOf (that (.type .creature)))
+    let patient := stepNounPhrase 16 owner.1 .obj Bool.true
       (.laterMention "weeping.recipient" it)
     owner.2.2 = [] ∧ patient.2.2 = [] ∧
       owner.2.1 = [3] ∧ patient.2.1 = [1] ∧
-      (owner.1.pendingRoles.contains (1, .subj)) = false ∧
-      (owner.1.pendingRoles.contains (3, .subj)) = true := by decide +kernel
+      (owner.1.pendingRoles.contains (1, .subj)) = Bool.false ∧
+      (owner.1.pendingRoles.contains (3, .subj)) = Bool.true := by decide +kernel
 
 /-- The owner shuffles the damaged creature into their library, whether "it" is read through
 the recipient's Binding Identity or as written, a raw pronoun. -/
@@ -300,8 +300,8 @@ clause (`DRS.recordMention`, `semantics.md` §2.4) without becoming a clause-mat
 prefers it to the Source, mentioned in the earlier clause. -/
 theorem weepingAngelRawPronounSelectsTheDamagedCreature :
     let owner := stepNounPhrase 16 (nextClause weepingAngelRecipientContext)
-      .subj true (ownerOf (that (.type .creature)))
-    let raw := stepNounPhrase 16 owner.1 .obj true it
+      .subj Bool.true (ownerOf (that (.type .creature)))
+    let raw := stepNounPhrase 16 owner.1 .obj Bool.true it
     owner.2.2 = [] ∧ raw.2.2 = [] ∧ raw.2.1 = [1] ∧
       (identityBinding "weeping.recipient" raw.1).map (·.id) = some 1 := by decide +kernel
 
@@ -319,6 +319,6 @@ theorem weepingAngelDesignatedRecipientMovesAndTheSourceDoesNot :
       (moved.1.visibleReferents.filter
         (fun ref => ref.ty.contains .creature && ref.zone == some .library)).length = 1 ∧
       (out.1.findById? 0).map (·.zone) = some (some .battlefield) ∧
-      (out.1.findById? 1).isNone = true := by decide +kernel
+      (out.1.findById? 1).isNone = Bool.true := by decide +kernel
 
 end Semantics.Proofs.DrtCards

@@ -3,6 +3,7 @@ import Semantics.Check.Card
 import Semantics.Proofs.Helpers
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a counted the)
 open Semantics.Templates.Predicate (and or not)
@@ -49,7 +50,7 @@ theorem occurredDamageComposesSourceThenBodyForEveryContext
     let subjectContext := (stepEventSubjectWith (stepOps fuel) drs (.actor source) .postEvent
       (.dealDamage .anyAmount patient kind)).1
     let bodyContext := (stepAction fuel .postEvent .obj
-      { subjectContext with actionPattern := true } (.dealDamage .anyAmount patient kind)).1
+      { subjectContext with actionPattern := Bool.true } (.dealDamage .anyAmount patient kind)).1
     (stepGameEvent (fuel + 1) drs
       (.does (.actor source) (.dealDamage .anyAmount patient kind))).1 =
       { (dropActorFrame bodyContext) with actionPattern := drs.actionPattern } := by rfl
@@ -135,7 +136,7 @@ theorem deathPublishesArrival :
 
 theorem deathInterceptionKeepsDeparture :
     nounZone (WouldClause.extend (DRS.ofList [])
-      (.would .any (.move (a isCreature) (battlefield) (some graveyard) .departure []))) it =
+      (.would .any (.move (a isCreature) (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .departure []))) it =
       some .battlefield := by decide
 
 theorem unknownDepartureCanBeConstrained :
@@ -147,12 +148,12 @@ theorem excludingOnePlayersZoneDoesNotExcludeEveryPlayersZone :
 
 theorem arrivalCanBeDescribedAsCard :
     GameEvent.check (DRS.ofList [])
-      (.does .any (.move (a (.and [.isCard, isCreature])) (.zone .library none) (some graveyard) .arrival [])) = [] := by decide
+      (.does .any (.move (a (.and [.isCard, isCreature])) (.zone .library none) (some Semantics.Templates.Location.graveyard) .arrival [])) = [] := by decide
 
 theorem anywhereAndBattlefieldHaveDifferentObservation :
-    (match does any (putInto .this graveyard (from_ := .anyLocation)) with
+    (match does any (putInto .this Semantics.Templates.Location.graveyard (from_ := .anyLocation)) with
       | .does _ (.move _ _ _ point _) => point | _ => .departure) = .arrival ∧
-    (match does any (putIntoFromBattlefield .this graveyard) with
+    (match does any (putIntoFromBattlefield .this Semantics.Templates.Location.graveyard) with
       | .does _ (.move _ _ _ point _) => point | _ => .arrival) = .departure := by decide
 
 /-- A pattern whose origin list names the battlefield beside another zone is a leaves-the-battlefield
@@ -160,14 +161,14 @@ ability [CR#603.6c], so it looks back in time [CR#603.10a]: "put into a graveyar
 battlefield or your hand" is observed on its departure, like the battlefield alone. -/
 theorem mixedOriginWithTheBattlefieldIsObservedOnDeparture :
     (match
-        does any (zoneChangeObservedOnDeparture .this graveyard (or [battlefield, yourHand]) [])
+        does any (zoneChangeObservedOnDeparture .this Semantics.Templates.Location.graveyard (or [Semantics.Templates.Location.battlefield, yourHand]) [])
       with
       | .does _ (.move _ _ _ point _) => point | _ => .arrival) = .departure := by decide
 
 theorem historyDoesNotMoveTheCurrentReference :
     let before := nounResult (DRS.ofList []) (a isCreature)
     let after := (stepPredicate 64 before (.did { subj := .any
-                                                  action := .move .which (battlefield) (some graveyard) .departure []
+                                                  action := .move .which (Semantics.Templates.Location.battlefield) (some Semantics.Templates.Location.graveyard) .departure []
                                                   within := some .thisWay })).1
     nounZone after it = some .battlefield := by decide
 
@@ -179,7 +180,7 @@ theorem playerIsNotAChangingObject :
       [.kindLte .player (.join .object .pile)] := by decide
 
 theorem writtenCardLocationIsRetained :
-    nounZone (DRS.ofList []) (a (.and [.isCard, isCreature, .in_ graveyard])) =
+    nounZone (DRS.ofList []) (a (.and [.isCard, isCreature, .in_ Semantics.Templates.Location.graveyard])) =
       some .graveyard := by decide
 
 theorem wholeTurnConditionNeedsNoPossessor :
@@ -201,7 +202,7 @@ theorem applicabilityPreservesNumericDefinition :
 
 theorem ownedOutsideCardsAreAdmitted :
     NounPhrase.checkAt (some .object) (DRS.ofList [])
-      (allOf (.and [.isCard, isCreature, .hasPossessor .owner .you, .not (.in_ battlefield)])) =
+      (allOf (.and [.isCard, isCreature, .hasPossessor .owner .you, .not (.in_ Semantics.Templates.Location.battlefield)])) =
       [] := by decide
 
 theorem controlledCreatureSpellsRemainIncluded :
@@ -216,7 +217,7 @@ theorem beforeObservationRetainsKnownUnspecifiedOrigin :
 
 theorem placelessCardsDoNotAcquireBattlefieldEvidence :
     nounZone (nounResult (DRS.ofList [])
-      (a (.and [.isCard, isCreature, .not (.in_ battlefield)]))) it = none := by decide
+      (a (.and [.isCard, isCreature, .not (.in_ Semantics.Templates.Location.battlefield)]))) it = none := by decide
 
 theorem destinationReadsTheSourcePossessor :
     GameEvent.check (DRS.ofList []) (.does .any (.move (a .isCard) (graveyardOf (a (.isOpponentOf .you))) (some (handOf (that .player))) .departure [])) =
@@ -290,7 +291,7 @@ theorem controlChangeIsOnlyAPattern :
       GameEvent.check (DRS.ofList [])
         (.does (.actor anOpponent) (gainControlOf (a isPermanent) (some you))) = [] ∧
       StaticSpec.check (DRS.ofList [])
-        (cant (Semantics.Subject.actor (bare (and [isPlayer, isOther]))) (gainControlOf thisCreature)) = [] := by decide
+        (cant (Semantics.Subject.actor (Semantics.Templates.NounPhrase.bare (and [isPlayer, isOther]))) (gainControlOf thisCreature)) = [] := by decide
 
 /-- The player control is taken from is a player. -/
 theorem controlIsTakenFromAPlayer :
@@ -303,7 +304,7 @@ theorem controlIsTakenFromAPlayer :
 control of" reads either. -/
 theorem controlChangeStampsItsPatientAsTheGrantDoes :
     let after := GameEvent.extend (DRS.ofList []) (.does (.actor anOpponent) (gainControlOf (a isPermanent)))
-    (participialCandidates (.deed (.core .gainControl)) (some .one) none false
+    (participialCandidates (.deed (.core .gainControl)) (some .one) none Bool.false
       (nextClause after)).length = 1 := by decide
 
 /-! ## The replaced event's ordinal
@@ -321,7 +322,7 @@ private def firstCreationEachTurn : WouldClause :=
 
 private def moonlitReplacement : StaticSpec :=
   replace firstCreationEachTurn
-    (instead (may (create groupSize (copyOf (enchanted permanent)) [])))
+    (instead (may (create groupSize (copyOf (Semantics.Templates.NounPhrase.enchanted permanent)) [])))
 
 theorem firstTimeEachTurnIsTheWatchedEventsOrdinal :
     firstCreationEachTurn =
@@ -330,7 +331,7 @@ theorem firstTimeEachTurnIsTheWatchedEventsOrdinal :
             (createObject anyAmount (token (copyOf (counted (orMore 1) isToken)) []))) ∧
       moonlitReplacement =
         .replace firstCreationEachTurn
-          (instead (may (create groupSize (copyOf (enchanted permanent)) []))) none .repeatedly
+          (instead (may (create groupSize (copyOf (Semantics.Templates.NounPhrase.enchanted permanent)) []))) none .repeatedly
           none ∧
       WouldClause.check (DRS.ofList []) firstCreationEachTurn = [] ∧
       StaticSpec.check (DRS.ofList []) moonlitReplacement = [] :=
@@ -369,7 +370,7 @@ Blocked status event, `combat … (.participation (.blocked true))` [CR#509.1h,5
 theorem becomesBlockedIsTheStatusEvent :
     keywordTriggerEvents (bushido 2) =
       [.does (Semantics.Subject.actor thisCreature) (.block .any),
-       .does .any (.combat thisCreature (.participation (.blocked true)))] := by rfl
+       .does .any (.combat thisCreature (.participation (.blocked Bool.true)))] := by rfl
 
 /-- "Becomes blocked by a creature" stays a block with a `by` subject [CR#509.3d]. -/
 theorem becomesBlockedByStaysABlock :

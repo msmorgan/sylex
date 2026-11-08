@@ -86,10 +86,10 @@ theorem badAscribedTarget :
       = [.ascribable] := by decide
 
 theorem namedSelfTypeViewRetainsItsSelectedIdentity :
-    let before := (stepNounPhrase 64 (DRS.ofList []) .other false
+    let before := (stepNounPhrase 64 (DRS.ofList []) .other Bool.false
       (.firstMention "view.subject" .this)).1
     let noun := NounPhrase.headed (.type .creature) (.laterMention "view.subject" .this)
-    let after := (stepNounPhrase 64 before .other false noun).1
+    let after := (stepNounPhrase 64 before .other Bool.false noun).1
     NounPhrase.checkAt (some .object) before noun = [] ∧
       after.nextId = before.nextId ∧
       after.visibleReferents.map (·.id) = [0] ∧
@@ -100,10 +100,10 @@ theorem badMarkerOnTarget :
       [.ascribable] := by decide
 
 theorem namedSelfMarkerViewRetainsItsSelectedIdentity :
-    let before := (stepNounPhrase 64 (DRS.ofList []) .other false
+    let before := (stepNounPhrase 64 (DRS.ofList []) .other Bool.false
       (.firstMention "marker.subject" .this)).1
     let noun := NounPhrase.headed .spell (.laterMention "marker.subject" .this)
-    let after := (stepNounPhrase 64 before .other false noun).1
+    let after := (stepNounPhrase 64 before .other Bool.false noun).1
     NounPhrase.checkAt (some .object) before noun = [] ∧
       after.nextId = before.nextId ∧
       (identityBinding "marker.subject" after).map (fun r => (r.id, r.zone)) = some (0, some .stack) := by decide
@@ -276,9 +276,9 @@ theorem celestialConvergenceZeroCounterTieDraws :
       | _ => none) =
       some (doIf (thereAre (counted (orMore 2)
           (and [isPlayer, tiedFor .max (.playerStat .lifeTotal) isPlayer])))
-        drawGame
+        Semantics.Templates.Action.drawGame
         (some (instruct
-          (the (and [isPlayer, superlative .max (.playerStat .lifeTotal) isPlayer])) winGame))) :=
+          (the (and [isPlayer, superlative .max (.playerStat .lifeTotal) isPlayer])) Semantics.Templates.Action.winGame))) :=
   rfl
 
 /-- "Double the number of each kind of counter on target creature" [CR#701.10e]: counters are
@@ -287,7 +287,7 @@ theorem doublingCountersPublishesCountersPut :
     let after :=
       (stepAction 64 .postEvent .obj (DRS.ofList []) (doubleCounters (target isCreature))).1
     Action.check (DRS.ofList []) (doubleCounters (target isCreature)) = [] ∧
-      after.visibleReferents.any (fun ref => ref.payload == .outcome .countersPut) = true := by
+      after.visibleReferents.any (fun ref => ref.payload == .outcome .countersPut) = Bool.true := by
   decide
 
 /-- "the number of counters of that kind on this creature" reads the one bound counter kind: with
@@ -457,7 +457,7 @@ theorem okChargeCounterOnArtifact :
 theorem okOneOrMoreCountersPublishTheirCount :
     StaticSpec.check (DRS.ofList [])
       (.replace (.would .any (.putCounters .anyAmount (.printed p1p1Counter) (a (and [isCreature, youControl]))))
-        (instead (.putCounters (plus .thatMuch 1) p11 it))
+        (instead (.putCounters (Semantics.Templates.Amount.plus .thatMuch 1) p11 it))
         none .repeatedly none) = [] := by
   decide
 
@@ -466,7 +466,7 @@ theorem okOneOrMoreCountersPublishTheirCount :
 theorem badOneCounterPublishesNoCount :
     StaticSpec.check (DRS.ofList [])
       (.replace (.would .any (.putCounters 1 (.printed p1p1Counter) (a (and [isCreature, youControl]))))
-        (instead (.putCounters (plus .thatMuch 1) p11 it))
+        (instead (.putCounters (Semantics.Templates.Amount.plus .thatMuch 1) p11 it))
         none .repeatedly none)
       = [.quantOutcomeInScope 0] := by
   decide
@@ -543,7 +543,7 @@ theorem badThoseKindsUnannounced :
 theorem okInterceptsCounterEvent :
     StaticSpec.check (DRS.ofList [])
       (.replace (.would .any (.putCounters .anyAmount (.printed p1p1Counter) (a (and [isCreature, youControl]))))
-        (instead (.putCounters (plus .thatMuch 1) p11 it))
+        (instead (.putCounters (Semantics.Templates.Amount.plus .thatMuch 1) p11 it))
         none .repeatedly none) = [] := by
   decide
 
@@ -611,7 +611,7 @@ agent. -/
 theorem okAgentlessCounterReplacement :
     StaticSpec.check (DRS.ofList [])
       (.replace (.would .any (.putCounters .anyAmount .anyKind teamPermanent))
-        (instead (.putCounters (plus .thatMuch 1) .those (that .permanent)))
+        (instead (.putCounters (Semantics.Templates.Amount.plus .thatMuch 1) .those (that .permanent)))
         none .repeatedly none)
       = [] := by
   decide
@@ -629,12 +629,12 @@ theorem okCounterEventAgentAndEffect :
   decide
 
 private def exileCost : Cost :=
-  .compound [.tapSymbol, .perform (exile (a (.and [.not isLand, .in_ (handOf .you)])))]
+  .compound [.tapSymbol, .perform (Semantics.Definitions.Action.exile (a (.and [.not isLand, .in_ (handOf .you)])))]
 
 private def countersOnTheExiledCard : Action :=
   .sequentially
     [ (.putCounters 4 (.printed (.named "timeCounter"))
-        (the (and [was (exile which), isCard]))),
+        (the (and [was (Semantics.Definitions.Action.exile which), isCard]))),
       (.removeCounters (some (exactly 1)) (some (.printed (.named "timeCounter"))) (each (.and
           [ .other, .hasPossessor .owner .you, .in_ exileZone ]))) ]
 
@@ -703,7 +703,7 @@ theorem okSnowblindWhicheverIsSmaller :
       (smallerOf
         (countOf (.and [.hasSupertype .snow, isLand,
           .hasPossessor .controller (controllerOf (.attachHost .enchanted (.type .creature)))]))
-        (minus (toughnessOf (.attachHost .enchanted (.type .creature))) 1))
+        (Semantics.Templates.Amount.minus (toughnessOf (.attachHost .enchanted (.type .creature))) 1))
       = [] := by
   decide
 
@@ -807,8 +807,8 @@ theorem urborgScavengersIsOneStatic :
         face.characteristics.text.length == 2 &&
           match (face.characteristics.text[1]? : Option Ability) with
           | some (.sameIsTrueFor (.static _) keywords) => keywords.length == 12
-          | _ => false
-      | _ => false) = true := by
+          | _ => Bool.false
+      | _ => Bool.false) = Bool.true := by
   decide
 
 end Semantics.Proofs.Counters

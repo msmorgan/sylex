@@ -81,7 +81,7 @@ theorem badEitherHalfRefused :
 read the player it chose [CR#607.2d,702.174a]. -/
 theorem okBothHalvesReadTheCostChoice :
     Ability.checkText (DRS.ofList [])
-      [ .static (.addedCost (.perform (choose anOpponent)) true .once),
+      [ .static (.addedCost (.perform (choose anOpponent)) Bool.true .once),
         byCardClass chosenDraws chosenDraws ] = [] := by
   decide
 

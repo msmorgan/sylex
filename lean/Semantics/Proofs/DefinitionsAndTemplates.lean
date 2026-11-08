@@ -3,6 +3,7 @@ import Semantics.Check.Card
 import Semantics.Definitions
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (the)
 open Semantics.Templates.Predicate (and or andOr not was)
@@ -24,7 +25,7 @@ theorem destroyBindsItsSubject (subject : NounPhrase) :
     destroy subject =
       .ownScope (some (.action "destroy"))
         (.move (.firstMention "destroy.subject" (.inCaller subject)) (.zone .battlefield none)
-          graveyard .departure []) := rfl
+          Semantics.Templates.Location.graveyard .departure []) := rfl
 
 theorem harnessBindsItsSubject (subject : NounPhrase) :
     harness subject =
@@ -93,7 +94,7 @@ theorem parameterIdentitySurvivesTap :
   decide
 
 theorem movedParameterCannotBeReused :
-    (Action.sequentially [exile (target isCreature),
+    (Action.sequentially [Semantics.Definitions.Action.exile (target isCreature),
       .setStatus .untapped (.laterMention "exile.subject" .any)]).check (DRS.ofList []) =
         [.bindingIdentity "exile.subject"] := by decide
 
@@ -106,7 +107,7 @@ second deed-carrying node (`Action.ownDeed?`). `cast` writes no other node at al
 theorem headerDeedIsReadByTheGateAndTheStepper :
     let spell := cast (target (and [isInstantOrSorcery, .isCard]))
     let after := (stepAction 64 .postEvent .obj (DRS.ofList []) spell).1
-    spell.eventHeadOk = true ∧
+    spell.eventHeadOk = Bool.true ∧
       spell.namedDeed = some (.action "cast") ∧
       after.referents.map (·.payload.prov.map (·.deeds)) = [some [.action "cast"]] := by decide
 
@@ -117,19 +118,19 @@ shape"). -/
 theorem bareShapesNameNoDeed :
     (Action.move (target isCreature) .anyLocation (some exileZone) .arrival []).namedDeed = none ∧
       (Action.setStatus .tapped (target isCreature)).namedDeed = none ∧
-      (exile (target isCreature)).namedDeed = some (.action "exile") ∧
+      (Semantics.Definitions.Action.exile (target isCreature)).namedDeed = some (.action "exile") ∧
       (tap (target isCreature)).namedDeed = some (.action "tap") := by decide
 
 theorem revealUpdatesActionStamp :
-    (Action.sequentially [tap (target isCreature), reveal it,
-      tap (the (was (reveal which)))]).check (DRS.ofList []) = [] := by decide
+    (Action.sequentially [tap (target isCreature), Semantics.Definitions.Action.reveal it,
+      tap (the (was (Semantics.Definitions.Action.reveal which)))]).check (DRS.ofList []) = [] := by decide
 
 theorem exhaustedTraversalRefuses :
     (stepAction 0 .postEvent .obj (DRS.ofList []) (tap (target isCreature))).2 =
       [.recursionLimit] := by decide
 
 theorem exhaustedWrapperRefuses :
-    (stepLocationWith (stepOps 0) (DRS.ofList []) hand).2 =
+    (stepLocationWith (stepOps 0) (DRS.ofList []) Semantics.Templates.Location.hand).2 =
       [.recursionLimit] := by decide
 
 /-! ## Put and return
@@ -139,10 +140,10 @@ Templates keep the two wordings, and they expand to the same move. -/
 
 theorem putAndReturnExpandToOneTree (subject : NounPhrase) (destination : Location)
     (riders : List MoveRider) (origin : Location) :
-    returnToHand subject = putInto subject hand ∧
-    returnToHand subject origin = putInto subject hand origin ∧
+    returnToHand subject = putInto subject Semantics.Templates.Location.hand ∧
+    returnToHand subject origin = putInto subject Semantics.Templates.Location.hand origin ∧
     returnToBattlefield subject = putOntoBattlefield subject ∧
-    returnToBattlefield subject riders origin = putInto subject battlefield origin riders ∧
+    returnToBattlefield subject riders origin = putInto subject Semantics.Templates.Location.battlefield origin riders ∧
     returnTo subject destination riders = put subject destination riders :=
   ⟨rfl, rfl, rfl, rfl, rfl⟩
 
@@ -156,16 +157,16 @@ control get +1/+1" and "All creatures you control get +1/+1". Separate Templates
 wordings, and they expand to the same tree. -/
 
 theorem bareAndAllOfExpandToOneTree (p : Predicate) :
-    bare p = allOf p ∧
-      getsPt (bare (and [isCreature, youControl])) (up 1) (up 1) =
-        getsPt (allOf (and [isCreature, youControl])) (up 1) (up 1) :=
+    Semantics.Templates.NounPhrase.bare p = allOf p ∧
+      getsPt (Semantics.Templates.NounPhrase.bare (and [isCreature, youControl])) (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1) =
+        getsPt (allOf (and [isCreature, youControl])) (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1) :=
   ⟨rfl, rfl⟩
 
 /-- "Return <subject> from your graveyard to your hand" and "put <subject> into your hand from
 your graveyard" name no deed and expand to the same move, its written origin kept [CR#400.7]. -/
 theorem graveyardToHandVerbsExpandToOneMove :
     returnToHand (target isCreature) yourGraveyard =
-      putInto (target isCreature) hand yourGraveyard := rfl
+      putInto (target isCreature) Semantics.Templates.Location.hand yourGraveyard := rfl
 
 /-- "X and Y", "X or Y" and "X and/or Y" are three encodings of a noun phrase. -/
 theorem nounPhraseCoordinatorsAreDistinct :

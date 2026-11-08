@@ -14,6 +14,7 @@ malformed one earns. `distinctPredefinedTokens` is asserted over the predefined-
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a counted)
 open Semantics.Templates.Predicate (and not)
@@ -60,7 +61,7 @@ theorem badSbaScopeKind :
     SbaRule.check
       { scope := .qualityNoun .color none,
         when := .compareAmt (toughnessOf .this) .atMost 0,
-        then_ := putInto .this graveyard }
+        then_ := putInto .this Semantics.Templates.Location.graveyard }
       = [.kindLte (.quality .color) (.join .object .player)] := by
   decide
 
@@ -95,7 +96,7 @@ no body of its own, and the one row reads the total toxic value [CR#702.164b,702
 theorem toxicIsOneResultReadingTheTotal :
     (match toxic 2 with
       | .keyword (.named "toxic") [.number _] body => body.isEmpty
-      | _ => false) = true ∧
+      | _ => Bool.false) = Bool.true ∧
       (match toxicPoison.confer with
         | .property (.asEvent _ (.putCounters count _ _)) => some count
         | _ => none) = some (totalToxicValue this_) := ⟨rfl, rfl⟩
@@ -104,8 +105,8 @@ theorem toxicIsOneResultReadingTheTotal :
 confer, so an effect that makes a permanent lose all abilities leaves them [CR#120.3c,113.12]. -/
 theorem planeswalkerDamageResultIsNotAnAbility :
     (match (confersOf planeswalker_definition)[3]? with
-      | some (.property _) => true
-      | _ => false) = true := rfl
+      | some (.property _) => Bool.true
+      | _ => Bool.false) = Bool.true := rfl
 
 /-! ## The rules that read a keyword
 
@@ -206,7 +207,7 @@ theorem okSummoningSicknessActivation :
     let confer : Conferral :=
       .property
         (onlyUnless
-          (cant any (activate (allOf (and [abilityHead .anyActivated, abilityOf this_,
+          (cant any (Semantics.Definitions.Action.activate (allOf (and [abilityHead .anyActivated, abilityOf this_,
             tapOrUntapInCost]))))
           (controlledSinceTheirTurnBegan this_))
     confer ∈ confersOf creature_definition ∧
@@ -239,7 +240,7 @@ theorem okToughnessZero :
       .stateBased
         (compareAmt (toughnessOf this_)
           .atMost 0)
-        (putInto this_ graveyard)
+        (putInto this_ Semantics.Templates.Location.graveyard)
     confer ∈ confersOf creature_definition ∧
       confer.check = [] :=
   ⟨by
@@ -317,7 +318,7 @@ theorem okLoyaltyZero :
         (compareAmt
           (countersOn (.named "loyaltyCounter") this_)
           .eq 0)
-        (putInto this_ graveyard)
+        (putInto this_ Semantics.Templates.Location.graveyard)
     confer ∈ confersOf planeswalker_definition ∧
       confer.check = [] :=
   ⟨by
@@ -379,7 +380,7 @@ theorem okBattleDefenseZero :
             compareAmt
               (countersOn (.named "defenseCounter") this_)
               .eq 0])
-        (putInto this_ graveyard)
+        (putInto this_ Semantics.Templates.Location.graveyard)
     confer ∈ confersOf battle_definition ∧
       confer.check = [] :=
   ⟨by
@@ -472,7 +473,7 @@ theorem okSiegeLastCounter :
       .ability
         (when (does any (removeCounters theLast (some (Semantics.CounterKindSource.printed defenseCounter)) thisPermanent))
           (sequentially
-            [ exile it,
+            [ Semantics.Definitions.Action.exile it,
               may (cast it (payment := withoutPaying) (resulting := some isTransformed)) ]))
     confer ∈ confersOf siege_definition ∧
       confer.check = [] :=
@@ -490,7 +491,7 @@ theorem okSiegeDefenseZero :
               (countersOn defenseCounter this_)
               .eq 0,
             (not (exists_ (and [abilityOf this_, triggeredNotLeftStack])))])
-        (putInto this_ graveyard)
+        (putInto this_ Semantics.Templates.Location.graveyard)
     confer ∈ confersOf siege_definition ∧
       confer.check = [] :=
   ⟨by
@@ -522,7 +523,7 @@ theorem okSagaHasTriggeredChapter :
 
 /-- "An ability that has triggered but not yet left the stack" is an ability, so it binds an
 ability referent alone, as the Siege's guard writes it [CR#704.5v,310.7]. -/
-theorem triggeredNotLeftStackSeedsAnAbility : triggeredNotLeftStack.seedsAbility = true := rfl
+theorem triggeredNotLeftStackSeedsAnAbility : triggeredNotLeftStack.seedsAbility = Bool.true := rfl
 
 /-- The Siege's guard, "it isn't the source of an ability that has triggered but not yet left the
 stack", over the row's own subject, checks
@@ -531,7 +532,7 @@ theorem okSiegeGuard :
     let guard : Condition := not (exists_ (and [abilityOf this_, triggeredNotLeftStack]))
     (confersOf siege_definition)[2]? = some (.stateBased
       (and [compareAmt (countersOn defenseCounter this_) .eq 0, guard])
-      (putInto this_ graveyard)) ∧ Condition.check (DRS.ofList []) guard = [] :=
+      (putInto this_ Semantics.Templates.Location.graveyard)) ∧ Condition.check (DRS.ofList []) guard = [] :=
   ⟨rfl, by decide⟩
 
 /-! ## The designations' rows
@@ -549,7 +550,7 @@ theorem okMonarchDefinition : RegistryDefinition.check monarch_definition = [] :
 /-- [CR#725.2] "At the beginning of the monarch's end step, that player draws a card." -/
 theorem okMonarchDraw :
     let confer : Conferral :=
-      .ability (at_ (beginningOfPossessed .endStep theMonarch) (instruct (that player) (draw 1)))
+      .ability (at_ (beginningOfPossessed .endStep theMonarch) (instruct (that Semantics.Templates.NounWord.player) (draw 1)))
     confer ∈ confersOf monarch_definition ∧
       confer.checkIn monarch_definition.conferralContext = [] :=
   ⟨by
@@ -736,7 +737,7 @@ theorem builtinPredefinedTokensCheck :
     builtinPredefinedTokens.flatMap PredefinedToken.check = [] := by decide
 
 theorem builtinPredefinedTokensDistinct :
-    distinctPredefinedTokens builtinPredefinedTokens = true := by decide
+    distinctPredefinedTokens builtinPredefinedTokens = Bool.true := by decide
 
 /-- An effect creates a predefined token by name [CR#111.10], so an unnamed entry is
 unreachable. -/

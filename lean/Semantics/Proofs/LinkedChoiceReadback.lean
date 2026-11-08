@@ -31,7 +31,7 @@ namespace Semantics.Proofs.LinkedChoiceReadback
 def giftCost : LinkSource := .byKeyword (.named "gift")
 
 /-- "As an additional cost to cast this spell, you may choose an opponent." [CR#702.174a] -/
-def costPart : Ability := .static (.addedCost (.perform (choose anOpponent)) true .once)
+def costPart : Ability := .static (.addedCost (.perform (choose anOpponent)) Bool.true .once)
 
 /-- "the chosen player draws a card", the player read back from gift's cost. -/
 def chosenDraws : Action := instruct (the isChosenPlayer) (draw 1)
@@ -70,7 +70,7 @@ theorem badTwoChosenPlayers :
 /-- Kicker's cost chooses no player, so there is none to read back [CR#702.33a,607.2d]. -/
 theorem badKickerChoosesNoPlayer :
     Ability.checkText (DRS.ofList [])
-      [ .static (.addedCost (.mana [generic 1]) true .once),
+      [ .static (.addedCost (.mana [generic 1]) Bool.true .once),
         .spell none (instruct (the isChosenPlayer) (draw 1)) ] =
       [.choiceRef .theChoice .player 0] := by
   decide

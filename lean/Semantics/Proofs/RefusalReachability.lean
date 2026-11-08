@@ -51,13 +51,13 @@ to the number of cards in target player's hand to that player", and the same thr
 greatest power among creatures target opponent controls". -/
 theorem measureKeepsItsAnnouncedTargets :
     Action.check emptyContext
-        (instruct this_ (dealDamage (countOf (cardIn (handOf (target isPlayer)))) (that player))) =
+        (instruct this_ (dealDamage (countOf (cardIn (handOf (target isPlayer)))) (that Semantics.Templates.NounWord.player))) =
       [] ∧
     Action.check emptyContext
         (.sequentially
           [ gainLife (aggregate .max (.stat .power)
               (and [isCreature, .hasPossessor .controller (target isOpponent)])),
-            instruct (that player) (draw 1) ]) = [] := by decide
+            instruct (that Semantics.Templates.NounWord.player) (draw 1) ]) = [] := by decide
 
 open Semantics.Templates Semantics.Definitions in
 /-- An existential's domain is read in a self-replacement's replacement and closed after it, as
@@ -76,7 +76,7 @@ open Semantics.Templates Semantics.Definitions in
 number of attacking creatures. Sacrifice those creatures …": "those creatures" reads the
 creatures that got +X/+0 (the subject, referent 1), not the attacking creatures counted. -/
 theorem tearsOfRageThoseCreaturesReadTheSubject :
-    let pumped := get (bare (and [isCreature, isAttacking, youControl])) (up (letter .x)) (up 0)
+    let pumped := get (Semantics.Templates.NounPhrase.bare (and [isCreature, isAttacking, youControl])) (Semantics.Templates.Delta.Amount.up (letter .x)) (Semantics.Templates.Delta.Amount.up 0)
       untilEndOfTurn
     let out := (stepAction 512 .postEvent .obj emptyContext
       (.sequentially [pumped, define .x (countOf (and [isCreature, isAttacking]))])).1

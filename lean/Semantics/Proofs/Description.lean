@@ -49,12 +49,12 @@ theorem badEachOfSingular :
 
 /-- "Look at the top card of target player's library." -/
 theorem okSliceOfOnePossessor :
-    Action.check (DRS.ofList []) (lookAt (.slice .top 1 (libraryOf (target .isPlayer)))) = [] := by decide
+    Action.check (DRS.ofList []) (Semantics.Templates.Action.lookAt (.slice .top 1 (libraryOf (target .isPlayer)))) = [] := by decide
 
 /-- "Look at the top card of two target players' library." -/
 theorem badSliceOfCountedPossessor :
     Action.check (DRS.ofList [])
-      (lookAt (.slice .top 1 (libraryOf (.described (.target (exactly 2)) .isPlayer))))
+      (Semantics.Templates.Action.lookAt (.slice .top 1 (libraryOf (.described (.target (exactly 2)) .isPlayer))))
       = [.slicePossessor] := by
   decide
 
@@ -258,17 +258,17 @@ private def fightPairTarget (fact : Bool) : List ReferentId :=
 control gets +2/+1 until end of turn.": each description reads back the target its restriction
 picks out, and introduces no object ("you control" mentions you, as any description does). -/
 theorem okDefiniteReadsBackChosenTarget :
-    (stepNounPhrase 64 chosenFightPair .other false (the creatureYouControl)).2 =
-        (fightPairTarget true, []) ∧
-      (stepNounPhrase 64 chosenFightPair .other false (the creatureYouDontControl)).2 =
-        (fightPairTarget false, []) ∧
-      fightPairTarget true ≠ fightPairTarget false ∧
-      ((stepNounPhrase 64 chosenFightPair .other false (the creatureYouControl)).1.referents.filter
+    (stepNounPhrase 64 chosenFightPair .other Bool.false (the creatureYouControl)).2 =
+        (fightPairTarget Bool.true, []) ∧
+      (stepNounPhrase 64 chosenFightPair .other Bool.false (the creatureYouDontControl)).2 =
+        (fightPairTarget Bool.false, []) ∧
+      fightPairTarget Bool.true ≠ fightPairTarget Bool.false ∧
+      ((stepNounPhrase 64 chosenFightPair .other Bool.false (the creatureYouControl)).1.referents.filter
         fun ref => ref.id ≥ chosenFightPair.nextId && ref.kind == .object).isEmpty ∧
       Action.check (DRS.ofList [])
         (sequentially
           [ choose (both (target creatureYouControl) (target creatureYouDontControl)),
-            get (the creatureYouControl) (up 2) (up 1) untilEndOfTurn ]) = [] := by
+            get (the creatureYouControl) (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn ]) = [] := by
   decide
 
 /-- "Choose target creature you control. Tap the creature you control.": the readback does not
@@ -283,7 +283,7 @@ controls" after "target creature you don't control", which does not say an oppon
 it: no mention matches, and "the" names nothing unique. -/
 theorem badDefiniteNoMatchingMention :
     Action.check (DRS.ofList []) (tap (the creatureYouControl)) = [.uniquifying] ∧
-      (stepNounPhrase 64 chosenFightPair .other false
+      (stepNounPhrase 64 chosenFightPair .other Bool.false
         (the (and [isCreature, anOpponentControls]))).2.2 = [.uniquifying] := by
   decide
 
@@ -300,7 +300,7 @@ theorem badDefiniteTwoMatchingMentions :
 creature you don't control": the superlative makes it unique, so it describes afresh and never
 reads back an earlier creature mention. -/
 theorem okSuperlativeDescribesAfresh :
-    let (out, ids, errors) := stepNounPhrase 64 chosenFightPair .other false
+    let (out, ids, errors) := stepNounPhrase 64 chosenFightPair .other Bool.false
         (the (and [isCreature, superlative .max (.stat .power) isCreature]))
     errors = [] ∧ ids.length = 1 ∧ ids = (headerFreshReferents chosenFightPair out).map (·.id) := by
   decide
@@ -383,15 +383,15 @@ theorem otherwiseReadsSubjectIntroducedByCondition :
                 (hasSubtype knight))
         (get (.laterMention "knight.subj"
                (the (and [isCreature, .superlative .max (.stat .power) isCreature])))
-          (up 2) (up 2) untilEndOfTurn)
+          (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 2) untilEndOfTurn)
         (some (get (.laterMention "knight.subj"
                      (the (and [isCreature, .superlative .max (.stat .power) isCreature])))
-          (up 1) (up 1) untilEndOfTurn))) = [] ∧
+          (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn))) = [] ∧
     Action.check (DRS.ofList [])
       (doIf (is (the (and [isCreature, .superlative .max (.stat .power) isCreature]))
                 (hasSubtype knight))
-        (get it (up 2) (up 2) untilEndOfTurn)
-        (some (get it (up 1) (up 1) untilEndOfTurn))) = [] := by decide
+        (get it (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 2) untilEndOfTurn)
+        (some (get it (Semantics.Templates.Delta.Amount.up 1) (Semantics.Templates.Delta.Amount.up 1) untilEndOfTurn))) = [] := by decide
 
 /-- "Tap target creature. If you control an artifact, exile that creature. Otherwise, sacrifice
 it. Return the exiled card to the battlefield." Whichever branch is taken, what it did to a
@@ -401,12 +401,12 @@ neither branch did is still no antecedent. -/
 theorem otherwiseKeepsWhatEitherBranchDidToAnOuterReferent :
     let line := fun (later : Action) => Action.sequentially
       [ .setStatus .tapped (target isCreature),
-        .doIf (exists_ (and [isArtifact, youControl])) (exile (that (.type .creature)))
+        .doIf (exists_ (and [isArtifact, youControl])) (Semantics.Definitions.Action.exile (that (.type .creature)))
           (some (sacrifice it)),
         later ]
     let returned := fun (deed : Predicate) =>
-      Action.check (DRS.ofList []) (line (putInto (the (and [deed, isCard])) battlefield))
-    returned (was (exile which)) = [] ∧ returned (was (sacrifice which)) = [] ∧
+      Action.check (DRS.ofList []) (line (putInto (the (and [deed, isCard])) Semantics.Templates.Location.battlefield))
+    returned (was (Semantics.Definitions.Action.exile which)) = [] ∧ returned (was (sacrifice which)) = [] ∧
       returned (was (destroy which)) =
         [.participialDescription (.deed (.action "destroy")) 0] := by
   decide
@@ -475,13 +475,13 @@ theorem badTotalWithoutRoll :
 
 /-- "Look at the top card of your library. Put that card into your graveyard." -/
 theorem okReadsLookedAtLibraryCard :
-    NounPhrase.checkAt (some .object) (actionResult (DRS.ofList []) (lookAt (topSlice 1))) (that .card)
+    NounPhrase.checkAt (some .object) (actionResult (DRS.ofList []) (Semantics.Templates.Action.lookAt (topSlice 1))) (that .card)
       = [] := by
   decide
 
 theorem badReadsShuffledIntoLibraryCard :
     NounPhrase.checkAt (some .object)
-      (actionResult (DRS.ofList []) (.sequentially [lookAt (topSlice 1), shuffleInto .this]))
+      (actionResult (DRS.ofList []) (.sequentially [Semantics.Templates.Action.lookAt (topSlice 1), shuffleInto .this]))
       (that .card) = [.anaphor (.word .card) .one 0] := by
   decide
 

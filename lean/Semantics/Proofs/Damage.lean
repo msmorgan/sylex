@@ -196,7 +196,7 @@ theorem delayedTriggerSelectsLatest :
       (.sequentially [delay (beginningOfNext .endStep) (draw 1),
         delay (beginningOfNext .endStep) (draw 2)])).1
     after.delayedTriggers.length = 2 ∧
-      (stepNounPhrase 64 after .subj true .delayedTrigger).2.1 =
+      (stepNounPhrase 64 after .subj Bool.true .delayedTrigger).2.1 =
         [after.nextId - 1] := by decide
 
 /-- What "they" reads in the branch of Screaming Nemesis's triggered ability, as its referent's
@@ -211,7 +211,7 @@ private def screamingNemesisThey : Option (List (Kind × Determiner)) :=
       (.does .any (dealDamage (recipient := thisCreature)))
     let afterDamage := (stepAction 64 .postEvent .obj (nextClause header) first).1
     let afterCondition := (stepCondition 64 (nextClause afterDamage) condition).1
-    let (read, ids, _) := stepNounPhrase 64 (nextClause afterCondition) .subj true they
+    let (read, ids, _) := stepNounPhrase 64 (nextClause afterCondition) .subj Bool.true they
     some (ids.filterMap fun id => (read.findById? id).map fun ref => (ref.kind, ref.det))
   | _ => none
 
@@ -225,19 +225,19 @@ theorem screamingNemesisTheyReadsTheDamagedPlayer :
 
 private def objectAntecedents (a : Action) : List Bool :=
   (resolveCandidates .bare .one (nextClause (stepAction 64 .postEvent .obj (DRS.ofList []) a).1)).map
-    fun r => match r.payload with | .object .. => true | _ => false
+    fun r => match r.payload with | .object .. => Bool.true | _ => Bool.false
 
 /-- The Obzedat and Whip of Erebos shape, "… exile it at the beginning of the next end step. It
 …": a delayed trigger is no antecedent, so a later "it" still reads the creature. -/
 theorem pronounAfterDelayReadsTheCreature :
     objectAntecedents (.sequentially [tap (target isCreature),
-      delay (beginningOfNext .endStep) (exile it)]) = [true] := by
+      delay (beginningOfNext .endStep) (Semantics.Definitions.Action.exile it)]) = [Bool.true] := by
   decide
 
 /-- "At the beginning of the next end step, draw a card. Exile it.": nothing for "it" to read. -/
 theorem badPronounAfterDelayedDraw :
     Action.check (DRS.ofList [])
-      (.sequentially [delay (beginningOfNext .endStep) (draw 1), exile it]) =
+      (.sequentially [delay (beginningOfNext .endStep) (draw 1), Semantics.Definitions.Action.exile it]) =
       [.anaphor .bare .one 0] := by
   decide
 
@@ -409,7 +409,7 @@ theorem okDamageDisjunctHead :
 
 /-- "attacking or blocking creature on the battlefield" -/
 theorem okAttackingOrBlockingOnBattlefield :
-    Predicate.checkAt .object (DRS.ofList []) (.and [isCreature, .or [isAttacking, isBlocking], .in_ battlefield])
+    Predicate.checkAt .object (DRS.ofList []) (.and [isCreature, .or [isAttacking, isBlocking], .in_ Semantics.Templates.Location.battlefield])
       = [] := by
   decide
 
@@ -430,7 +430,7 @@ theorem badConditionAntecedent :
 
 /-- "You may sacrifice a creature. If you don't, exile it." -/
 theorem badIfNotReadsMayBody :
-    Action.check (DRS.ofList []) (may (sacrifice (a isCreature)) none (some (exile it)))
+    Action.check (DRS.ofList []) (may (sacrifice (a isCreature)) none (some (Semantics.Definitions.Action.exile it)))
       = [.anaphor .bare .one 0] := by
   decide
 
@@ -501,36 +501,36 @@ theorem badDivideAmongDescription :
 theorem okRestAfterPart :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ lookAt (topSlice 4),
-          putInto (someOf (exactly 1) them) hand,
-          putInto theRest graveyard ]) = [] := by
+        [ Semantics.Templates.Action.lookAt (topSlice 4),
+          putInto (someOf (exactly 1) them) Semantics.Templates.Location.hand,
+          putInto theRest Semantics.Templates.Location.graveyard ]) = [] := by
   decide
 
 /-- "Put the rest into your graveyard." -/
 theorem badRestWithoutGroup :
-    Action.check (DRS.ofList []) (putInto theRest graveyard) = [.theRestFits .many] := by decide
+    Action.check (DRS.ofList []) (putInto theRest Semantics.Templates.Location.graveyard) = [.theRestFits .many] := by decide
 
 /-- "Look at the top four cards of your library. Put the rest on the bottom." -/
 theorem badRestWithoutPart :
     Action.check (DRS.ofList [])
-      (.sequentially [lookAt (topSlice 4), putInto theRest onBottom])
+      (.sequentially [Semantics.Templates.Action.lookAt (topSlice 4), putInto theRest onBottom])
       = [.theRestFits .many] := by
   decide
 
 theorem badRestDisposedTwice :
     Action.check (DRS.ofList [])
       (.sequentially
-        [ lookAt (topSlice 4),
-          putInto (someOf (exactly 1) them) hand,
+        [ Semantics.Templates.Action.lookAt (topSlice 4),
+          putInto (someOf (exactly 1) them) Semantics.Templates.Location.hand,
           putInto theRest onBottom,
-          putInto theRest graveyard ]) = [.theRestFits .many] := by
+          putInto theRest Semantics.Templates.Location.graveyard ]) = [.theRestFits .many] := by
   decide
 
 theorem badRestOverTwoAnnouncements :
     Action.check (DRS.ofList [])
       (.sequentially
         [ instruct (target (and [isCreature, youControl])) (fight (target (and [isCreature, youDontControl]))),
-          putInto theRest graveyard ]) = [.theRestFits .many] := by
+          putInto theRest Semantics.Templates.Location.graveyard ]) = [.theRestFits .many] := by
   decide
 
 /-- "This creature deals 2 damage to each opponent." -/
@@ -540,7 +540,7 @@ theorem okEachOpponentDamage :
 /-- "This creature deals 2 damage to opponents.": the universal bare plural is "all opponents"
 (`bare` expands to `.all`), each dealt the damage. -/
 theorem okBarePluralPlayerDamageRecipient :
-    Action.check (DRS.ofList []) (Action.instruct thisCreature (.dealDamage 2 (bare (.isOpponentOf .you))))
+    Action.check (DRS.ofList []) (Action.instruct thisCreature (.dealDamage 2 (Semantics.Templates.NounPhrase.bare (.isOpponentOf .you))))
       = [] := by
   decide
 
@@ -664,7 +664,7 @@ theorem badPreventedThisWayUnannounced :
 theorem okShortOfCeilingAnnounced :
     let drawing := instruct (each .isPlayer)
       (.sequentially [may (drawCount (upToOf 2)),
-        instruct they (gainLife (times 2 shortOfCeiling))])
+        instruct they (gainLife (Semantics.Templates.Amount.times 2 shortOfCeiling))])
     let after := (stepAction 64 .postEvent .obj (DRS.ofList []) drawing).1
     Action.check (DRS.ofList []) drawing = [] ∧
       (after.visibleReferents.filter (fun ref => ref.payload == .outcome .ceilingShortfall)).map
@@ -674,7 +674,7 @@ theorem singularTheyCannotReadThePublishedPlayerGroup :
     Action.check (DRS.ofList [])
       (.sequentially
         [ instruct (each .isPlayer) (may (instruct they (drawCount (upToOf 2)))),
-          instruct they (gainLife (times 2 shortOfCeiling)) ]) =
+          instruct they (gainLife (Semantics.Templates.Amount.times 2 shortOfCeiling)) ]) =
       [.anaphor (.word .player) .one 0] := by decide
 
 theorem optionalDrawSummaryDoesNotExportDrawnCards :
@@ -686,7 +686,7 @@ theorem optionalDrawSummaryDoesNotExportDrawnCards :
 
 /-- "You gain 2 life for each card less than two you draw this way." -/
 theorem badShortOfCeilingUnannounced :
-    Action.check (DRS.ofList []) (gainLife (times 2 shortOfCeiling))
+    Action.check (DRS.ofList []) (gainLife (Semantics.Templates.Amount.times 2 shortOfCeiling))
       = [.outcomeInScope .ceilingShortfall 0] := by
   decide
 
@@ -758,7 +758,7 @@ no source to hand the damage to [CR#614.9]. -/
 theorem okPassiveRedirectionNeedsNoSource :
     StaticSpec.check (DRS.ofList [])
       (replace (would any (dealDamage anyAmount .you))
-        (instead (redirectDamage .all (enchanted creature)))) = [] := by
+        (instead (redirectDamage .all (Semantics.Templates.NounPhrase.enchanted creature)))) = [] := by
   decide
 
 /-- Damage is redirected to a permanent or a player [CR#614.9,120.1]; a color is neither. -/
@@ -781,7 +781,7 @@ the source and "that much" the replaced damage. -/
 theorem okScaleDoubled :
     StaticSpec.check (DRS.ofList [])
       (replace (would ((Semantics.Subject.actor (a isSource))) (dealDamage anyAmount (a (.or [isPermanent, .isPlayer]))))
-        (instead (instruct it (dealDamage (times 2 thatMuch) thatJoin)))) = [] := by
+        (instead (instruct it (dealDamage (Semantics.Templates.Amount.times 2 thatMuch) thatJoin)))) = [] := by
   decide
 
 /-- "… it deals that much damage plus that much instead": "that much" reads the replaced damage,
@@ -789,14 +789,14 @@ the one amount in scope. -/
 theorem okScaleShiftByThatMuch :
     StaticSpec.check (DRS.ofList [])
       (replace (would ((Semantics.Subject.actor (a isSource))) (dealDamage anyAmount (a (.or [isPermanent, .isPlayer]))))
-        (instead (instruct it (dealDamage (plus thatMuch thatMuch) thatJoin)))) = [] := by
+        (instead (instruct it (dealDamage (Semantics.Templates.Amount.plus thatMuch thatMuch) thatJoin)))) = [] := by
   decide
 
 /-- "If a source would deal damage …, it deals that much damage plus 1 to that permanent or player
 instead" read with no damage replaced: outside the replacement, "that much" reads nothing. -/
 theorem badScaleShiftWithoutReplacedDamage :
     Action.check (DRS.ofList [])
-      (instruct this_ (dealDamage (plus thatMuch 1) (target isAnyTarget)))
+      (instruct this_ (dealDamage (Semantics.Templates.Amount.plus thatMuch 1) (target isAnyTarget)))
       = [.quantOutcomeInScope 0] := by
   decide
 
@@ -824,9 +824,9 @@ theorem badThatMuchAfterDeath :
 to: `subject` stepped as the subject of the clause after `before`, under its performer frame,
 while a characteristic is read (the steps `Action.instruct` and `Amount.statOf` take). -/
 private def possessiveContext (before : DRS) (subject : NounPhrase) : DRS × List ReferentId :=
-  let (after, ids, _) := stepNounPhrase 64 (nextClause before) .subj true subject
-  let shape : ActorShape := { kind := .object, isYou := false, ascribable := false, refIds := ids }
-  ({ after.pushPerformer shape with characteristicRead := true }, ids)
+  let (after, ids, _) := stepNounPhrase 64 (nextClause before) .subj Bool.true subject
+  let shape : ActorShape := { kind := .object, isYou := Bool.false, ascribable := Bool.false, refIds := ids }
+  ({ after.pushPerformer shape with characteristicRead := Bool.true }, ids)
 
 /-- After "This creature deals damage equal to its power to target creature.": this creature is 0,
 the target creature 2. -/
@@ -859,7 +859,7 @@ theorem karplusanYetiItsReadsThatCreature :
       (possessiveContext yetiFirst (that creature)).2 = [1] ∧
       (firstReach .bare .one (possessiveContext yetiFirst (that creature)).1).map (·.id) =
         some 1 ∧
-      (possessiveContext yetiFirst (that creature)).1.visibleReferents.any (·.id == 0) = true ∧
+      (possessiveContext yetiFirst (that creature)).1.visibleReferents.any (·.id == 0) = Bool.true ∧
       (yetiFirst.findById? 0).map (·.det) = some .self :=
   ⟨rfl, by decide⟩
 
@@ -878,7 +878,7 @@ theorem garrukRelentlessItsReadsThatCreature :
       (possessiveContext garrukFirst (that creature)).2 = [1] ∧
       (firstReach .bare .one (possessiveContext garrukFirst (that creature)).1).map (·.id) =
         some 1 ∧
-      (possessiveContext garrukFirst (that creature)).1.visibleReferents.any (·.id == 0) = true :=
+      (possessiveContext garrukFirst (that creature)).1.visibleReferents.any (·.id == 0) = Bool.true :=
   ⟨rfl, by decide⟩
 
 /-- Lightning Bolt: "Lightning Bolt deals 3 damage to any target." The spell is the Source of the
@@ -1094,7 +1094,7 @@ counters are no marking, so the other row has nothing left to replace [CR#616.1f
 theorem witherAndInfectPutCountersOnce :
     (bodyStatics wither).head? = some markingReplacedByCounters ∧
       (bodyStatics infect).head? = some markingReplacedByCounters ∧
-      (putCounters thatMuch (Semantics.CounterKindSource.printed (m1m1Counter)) (that creature)).eventVerbs.contains .damageMarked = false ∧
+      (putCounters thatMuch (Semantics.CounterKindSource.printed (m1m1Counter)) (that creature)).eventVerbs.contains .damageMarked = Bool.false ∧
       StaticSpec.check (DRS.ofList []) markingReplacedByCounters = [] :=
   ⟨rfl, rfl, by decide, by decide⟩
 
@@ -1104,9 +1104,9 @@ zone it functions from, and its replacement reads the damage its source deals, n
 theorem witherFunctionsFromAnyZone :
     (match wither with
       | .keyword _ _ body => body.all fun
-        | .qualified _ _ _ _ (some _) => false
-        | _ => true
-      | _ => false) = true ∧
+        | .qualified _ _ _ _ (some _) => Bool.false
+        | _ => Bool.true
+      | _ => Bool.false) = Bool.true ∧
       (bodyStatics wither).head? = some markingReplacedByCounters ∧
       (Semantics.Cards.«Puncture Blast»).check = [] :=
   ⟨by decide, rfl, (by decide)⟩
@@ -1176,12 +1176,12 @@ life, the one class of event the prohibition forbids. -/
 theorem archonLeavesTheDamagesOtherResults :
     let forbidden := (loseLife anyAmount).eventVerbs
     let untouched (action : Action) := action.eventVerbs.all (!forbidden.contains ·)
-    untouched (dealDamage anyAmount you (kind := some .combat)) = true ∧
+    untouched (dealDamage anyAmount you (kind := some .combat)) = Bool.true ∧
       Ability.check (DRS.ofList []) monarchStillChanges = [] ∧
-      untouched (gainDesignation (controllerOf it) monarch) = true ∧
+      untouched (gainDesignation (controllerOf it) monarch) = Bool.true ∧
       bodyStatics lifelink = [asEvent (does (Semantics.Subject.actor (this_)) (dealDamage anyAmount)) (gainLife thatMuch)] ∧
-      untouched (gainLife thatMuch) = true ∧
-      untouched (putCounters thatMuch (Semantics.CounterKindSource.printed (poison)) you) = true :=
+      untouched (gainLife thatMuch) = Bool.true ∧
+      untouched (putCounters thatMuch (Semantics.CounterKindSource.printed (poison)) you) = Bool.true :=
   ⟨by decide, by decide, by decide, rfl, by decide, by decide⟩
 
 /-- With no cause, `cant you (loseLife anyAmount)` is "you can't lose life", a different card and
@@ -1298,8 +1298,8 @@ theorem mirrorUniverseExchangesLifeTotals :
         match face.characteristics.text with
         | [.activated _ exchanging ..] =>
           exchanging.ownDeed? == some exchangeLifeTotals.deed
-        | _ => false
-      | _ => false : Bool) := by decide
+        | _ => Bool.false
+      | _ => Bool.false : Bool) := by decide
 
 theorem juxtaposeExchangesControl :
     (match (Semantics.Cards.«Juxtapose») with
@@ -1308,13 +1308,13 @@ theorem juxtaposeExchangesControl :
         | [.spell _ (.sequentially [creatures, artifacts, _])] =>
           creatures.ownDeed? == some exchangeControl.deed &&
             artifacts.ownDeed? == some exchangeControl.deed
-        | _ => false
-      | _ => false : Bool) := by decide
+        | _ => Bool.false
+      | _ => Bool.false : Bool) := by decide
 
 theorem soulConduitExchangesLifeTotals :
     (match Cards.soulConduitExchange with
       | .activated _ exchanging .. => exchanging.ownDeed? == some exchangeLifeTotals.deed
-      | _ => false : Bool) := by decide
+      | _ => Bool.false : Bool) := by decide
 
 theorem vedalkenSquirrelWhackerExchangesValues :
     (match Cards.vedalkenSquirrelWhackerReroll with
@@ -1323,7 +1323,7 @@ theorem vedalkenSquirrelWhackerExchangesValues :
             [⟨_, _, power⟩, ⟨_, _, toughness⟩]) none none])) ..) _ =>
         power.ownDeed? == some exchangeValues.deed &&
           toughness.ownDeed? == some exchangeValues.deed
-      | _ => false : Bool) := by decide
+      | _ => Bool.false : Bool) := by decide
 
 theorem avariceTotemExchangesControl :
     Cards.avariceTotemExchange.ownDeed? == some exchangeControl.deed := by decide
@@ -1338,8 +1338,8 @@ theorem deadpoolTradingCardExchangesTextBoxes :
         | .static (.replace _ (.alongside
             (.withContinuation .optional exchanging none none)) ..) :: _ =>
           exchanging.ownDeed? == some exchangeTextBoxes.deed
-        | _ => false
-      | _ => false : Bool) := by decide
+        | _ => Bool.false
+      | _ => Bool.false : Bool) := by decide
 
 end Semantics.Proofs.Damage
 

@@ -12,6 +12,7 @@ form, each closed by `decide`. The names and the sentences are the Idris ones.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each the)
 open Semantics.Templates.Predicate (and or not did was)
@@ -51,7 +52,7 @@ theorem okDelayedOtherAnchorsOnTheSettledTarget :
 
 theorem badStaleCarrier :
     Action.check (DRS.ofList [])
-      (.sequentially [exile (target (and [isCreature, youControl])), putInto (that (.type .creature)) battlefield])
+      (.sequentially [Semantics.Definitions.Action.exile (target (and [isCreature, youControl])), putInto (that (.type .creature)) Semantics.Templates.Location.battlefield])
       = [.anaphor (.word (.type .creature)) .one 0] := by
   decide
 
@@ -80,8 +81,8 @@ theorem okTwoCostMentionsItReadsTheNearer :
     let cost := Cost.compound
       [.perform (discard (a (.and [.isCard, .in_ yourHand]))), .perform (sacrifice (a isCreature))]
     let after := (stepAction 64 .postEvent .obj
-      (nextClause (stepCost 64 (DRS.ofList []) cost).1) (exile it)).1
-    Ability.check (DRS.ofList []) (activated cost (exile it)) = [] ∧
+      (nextClause (stepCost 64 (DRS.ofList []) cost).1) (Semantics.Definitions.Action.exile it)).1
+    Ability.check (DRS.ofList []) (activated cost (Semantics.Definitions.Action.exile it)) = [] ∧
       (after.referents.filter (·.zone == some .exile)).map (·.ty) = [[.creature]] := by
   decide
 
@@ -90,7 +91,7 @@ sacrificed: a compound cost opens a clause per member (`lean/CONTRACTS.md`, "Enc
 traversals"), so the sacrificed creature is no clause-mate of "it". -/
 theorem okLaterCostMemberReadsAnEarlierOne :
     Ability.check (DRS.ofList [])
-      (activated (.compound [.perform (sacrifice (a isCreature)), .perform (exile it)])
+      (activated (.compound [.perform (sacrifice (a isCreature)), .perform (Semantics.Definitions.Action.exile it)])
         (draw 1)) = [] := by
   decide
 
@@ -104,7 +105,7 @@ theorem okSacrificeOnBattlefield :
 theorem badDeadCreatureRead :
     Action.check (DRS.ofList [])
       (.delay (does ((Semantics.Subject.actor (target isCreature))) die) [] (some thisTurn)
-        (putInto (that (.type .creature)) battlefield))
+        (putInto (that (.type .creature)) Semantics.Templates.Location.battlefield))
       = [.anaphor (.word (.type .creature)) .one 0] := by
   decide
 
@@ -122,11 +123,11 @@ still finds nothing. -/
 theorem deedsAccumulateOnAReferent :
     let exiled := fun (deed : Predicate) (between : List Action) =>
       Action.check (DRS.ofList [])
-        (.sequentially ([exile (target isCreature)] ++ between ++
+        (.sequentially ([Semantics.Definitions.Action.exile (target isCreature)] ++ between ++
           [returnToBattlefield (the (and [deed, isCard]))]))
-    exiled (was (exile which)) [reveal it] = [] ∧
-      exiled (was (reveal which)) [reveal it] = [] ∧
-      exiled (was (reveal which)) [] =
+    exiled (was (Semantics.Definitions.Action.exile which)) [Semantics.Definitions.Action.reveal it] = [] ∧
+      exiled (was (Semantics.Definitions.Action.reveal which)) [Semantics.Definitions.Action.reveal it] = [] ∧
+      exiled (was (Semantics.Definitions.Action.reveal which)) [] =
         [.participialDescription (.deed (.action "reveal")) 0] := by
   decide
 
@@ -159,14 +160,14 @@ theorem okBareCardRead :
     Ability.check (DRS.ofList [])
       (activated (.perform (sacrifice (a isCreature)))
         (.sequentially
-          [exile (target isCreature), delay atTheEndStep (returnToBattlefield (that .card))]))
+          [Semantics.Definitions.Action.exile (target isCreature), delay atTheEndStep (returnToBattlefield (that .card))]))
       = [] := by
   decide
 
 private def bareCardReadContext : DRS :=
   let afterCost := (stepCost 64 (DRS.ofList []) (.perform (sacrifice (a isCreature)))).1
   (stepAction 64 .postEvent .obj (nextClause afterCost)
-    (exile (target isCreature))).1
+    (Semantics.Definitions.Action.exile (target isCreature))).1
 
 theorem bareCardReadSelectsExiledTarget :
     let afterCost := (stepCost 64 (DRS.ofList []) (.perform (sacrifice (a isCreature)))).1
@@ -325,7 +326,7 @@ theorem okAdditionalUpkeep :
 /-- "Spells with the chosen name can't be cast." -/
 theorem okCastSpellClass :
     StaticSpec.check [qualityB .cardName]
-      (cant any (cast (bare (.and [isSpell, .named .chosen]))))
+      (cant any (cast (Semantics.Templates.NounPhrase.bare (.and [isSpell, .named .chosen]))))
       = [] := by
   decide
 
@@ -333,7 +334,7 @@ theorem okCastSpellClass :
 when every arm does, so the deed's ability role is met [CR#113.1c]. -/
 theorem okAbilityDisjunctionActivated :
     StaticSpec.check (DRS.ofList [])
-      (cant any (activate (allOf (.or [.abilityHead .anyActivated, .abilityHead .anyTriggered]))))
+      (cant any (Semantics.Definitions.Action.activate (allOf (.or [.abilityHead .anyActivated, .abilityHead .anyTriggered]))))
       = [] := by
   decide
 
@@ -453,7 +454,7 @@ theorem okExtraTurnAmountIntroducesPlayer :
 
 theorem okExtraTurnNestedAmountIntroducesLetterOnce :
     countLetter .x (actionResult (DRS.ofList [])
-      (extraTurn (plus (.letter .x) (.letter .x)))) = 1 := by decide
+      (extraTurn (Semantics.Templates.Amount.plus (.letter .x) (.letter .x)))) = 1 := by decide
 
 theorem okSkipNextAmountReadsSubject :
     Action.check [qualityB .color]
@@ -477,7 +478,7 @@ theorem okSkipNextAmountIntroducesPlayer :
 
 theorem okSkipNextNestedAmountIntroducesLetterOnce :
     countLetter .x (actionResult (DRS.ofList [])
-      (.skipPart .drawStep (plus (.letter .x) (.letter .x)))) = 1 := by decide
+      (.skipPart .drawStep (Semantics.Templates.Amount.plus (.letter .x) (.letter .x)))) = 1 := by decide
 
 theorem okAdditionalPartAmountReadsSubject :
     Action.check [qualityB .color]
@@ -504,7 +505,7 @@ theorem okAdditionalPartAmountIntroducesPlayer :
 
 theorem okAdditionalPartNestedAmountIntroducesLetterOnce :
     countLetter .x (actionResult (DRS.ofList [])
-      (addTurnPart .upkeep (plus (.letter .x) (.letter .x))))
+      (addTurnPart .upkeep (Semantics.Templates.Amount.plus (.letter .x) (.letter .x))))
       = 1 := by
   decide
 
@@ -514,13 +515,13 @@ theorem okUntapAmountReadsSubject :
 
 theorem untapAmountReadsItsPublishedSelfSubject :
     let before := DRS.ofList [qualityB .color]
-    let selected := (stepNounPhrase 64 before .obj true thisCreature).1
+    let selected := (stepNounPhrase 64 before .obj Bool.true thisCreature).1
     Action.check before (.skipUntap thisCreature (powerOf it)) = [] ∧
       (firstReach .bare .one selected).map (·.id) = some 1 := by decide
 
 theorem okUntapNestedAmountIntroducesLetterOnce :
     countLetter .x (actionResult (DRS.ofList [])
-      (.skipUntap (target isCreature) (plus (.letter .x) (.letter .x)))) = 1 := by decide
+      (.skipUntap (target isCreature) (Semantics.Templates.Amount.plus (.letter .x) (.letter .x)))) = 1 := by decide
 
 theorem okUntapAmountIntroducesPlayer :
     Action.check (DRS.ofList []) (.sequentially
@@ -538,27 +539,27 @@ theorem badAdditionalPartWithoutSubjectOrOuterContext :
 /-- Nested amounts preserve the identities and kinds of their introduced targets. -/
 theorem okExtraTurnNestedAmountOrder :
     let after := actionResult [qualityB .color]
-      (extraTurn (plus (powerOf (target isCreature)) (lifeTotalOf (target (.isOpponentOf .you)))))
+      (extraTurn (Semantics.Templates.Amount.plus (powerOf (target isCreature)) (lifeTotalOf (target (.isOpponentOf .you)))))
     after.visibleReferents.map (fun r => (r.id, r.kind)) =
       [(3, .turnRef), (2, .player), (1, .object), (0, .quality .color)] ∧
       (after.findById? 1).map (·.ty) = some [.creature] := by decide
 
 theorem okSkipNextNestedAmountOrder :
     let after := actionResult (DRS.ofList [])
-      (.skipPart .drawStep (plus (powerOf (target isCreature)) (lifeTotalOf (target (.isOpponentOf .you)))))
+      (.skipPart .drawStep (Semantics.Templates.Amount.plus (powerOf (target isCreature)) (lifeTotalOf (target (.isOpponentOf .you)))))
     after.visibleReferents.map (fun r => (r.id, r.kind)) = [(1, .player), (0, .object)] ∧
       (after.findById? 0).map (·.ty) = some [.creature] := by decide
 
 theorem okAdditionalPartNestedAmountOrder :
     let after := actionResult (DRS.ofList [])
       (addTurnPart .upkeep
-        (plus (powerOf (target isCreature)) (lifeTotalOf (target (.isOpponentOf .you)))))
+        (Semantics.Templates.Amount.plus (powerOf (target isCreature)) (lifeTotalOf (target (.isOpponentOf .you)))))
     after.visibleReferents.map (fun r => (r.id, r.kind)) = [(1, .player), (0, .object)] ∧
       (after.findById? 0).map (·.ty) = some [.creature] := by decide
 
 theorem okUntapNestedAmountOrder :
     let after := actionResult (DRS.ofList [])
-      (.skipUntap .this (plus (powerOf (target isCreature)) (lifeTotalOf (target (.isOpponentOf .you)))))
+      (.skipUntap .this (Semantics.Templates.Amount.plus (powerOf (target isCreature)) (lifeTotalOf (target (.isOpponentOf .you)))))
     after.visibleReferents.map (fun r => (r.id, r.kind)) =
       [(2, .player), (1, .object), (0, .object)] ∧
       (after.findById? 1).map (·.ty) = some [.creature] ∧
@@ -753,8 +754,8 @@ theorem okDoThisOnlyOnceEachTurn :
 
 /-- The limited action is checked as the action it wraps. -/
 theorem limitedChecksItsAction :
-    Action.check (DRS.ofList []) (.limited (putInto it hand) oncePerTurn) =
-      Action.check (DRS.ofList []) (putInto it hand) := by
+    Action.check (DRS.ofList []) (.limited (putInto it Semantics.Templates.Location.hand) oncePerTurn) =
+      Action.check (DRS.ofList []) (putInto it Semantics.Templates.Location.hand) := by
   decide
 
 end Semantics.Proofs.Turn

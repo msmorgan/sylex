@@ -127,7 +127,7 @@ theorem okAshnodsBattleGear : Ability.check (DRS.ofList []) ashnodsBattleGear = 
 /-- Tahngarth, First Mate -/
 def tahngarthChoosesDefender : Action :=
   choose (a (and [ or [isPlaneswalker, isPlayer],
-               inCombat .attackedBy (that player) ]))
+               inCombat .attackedBy (that Semantics.Templates.NounWord.player) ]))
 theorem okTahngarthChoosesDefender :
     Action.check ((stepGameEvent 512 (DRS.ofList []) tahngarthHeader).1)
       tahngarthChoosesDefender = [] := by
@@ -153,8 +153,8 @@ def sameIsTrueForFamilies (card : Card) : List KeywordTerm :=
   match card with
   | .singleFaced face => face.characteristics.text.flatMap fun
     | .sameIsTrueFor _ keywords => keywords.filter fun
-      | .anyIn _ => true
-      | _ => false
+      | .anyIn _ => Bool.true
+      | _ => Bool.false
     | _ => []
   | _ => []
 def protectionAbilities : KeywordTerm :=
@@ -229,7 +229,7 @@ theorem okGarrukRelentlessFight : Action.check (DRS.ofList []) garrukRelentlessF
   decide
 
 /-- Harness Infinity: the exchange action alone, as the Idris bench holds it. -/
-def harnessInfinityExchange : Action := exchangeZones hand graveyard
+def harnessInfinityExchange : Action := exchangeZones Semantics.Templates.Location.hand Semantics.Templates.Location.graveyard
 theorem okHarnessInfinityExchange : Action.check (DRS.ofList []) harnessInfinityExchange = [] := by
   decide
 
@@ -237,8 +237,8 @@ theorem okHarnessInfinityExchange : Action.check (DRS.ofList []) harnessInfinity
 def boseijuMana : Ability :=
   activated (compound [tapSymbol, (Semantics.Cost.perform (payLife 2))])
     (addMana 1 (manaOf [[.colorless]])
-      [ whenSpentOn .affectsIt false (a (and [isInstantOrSorcery, isSpell]))
-          (establish (cant any (counter (that .spell)))) ])
+      [ whenSpentOn .affectsIt Bool.false (a (and [isInstantOrSorcery, isSpell]))
+          (establish (cant any (Semantics.Definitions.Action.counter (that .spell)))) ])
 theorem okBoseijuMana : Ability.check (DRS.ofList []) boseijuMana = [] := by decide
 
 end Semantics.Cards

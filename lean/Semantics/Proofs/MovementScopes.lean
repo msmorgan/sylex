@@ -39,11 +39,11 @@ theorem abilityZoneChangeCreatesFreshIdentity :
 private def callerPart : Referent :=
   { det := .part, plur := .one, payload := .object [.creature] (some .battlefield) none none none }
 private def callerPlayer : Referent :=
-  { det := .a, plur := .one, payload := .player false }
+  { det := .a, plur := .one, payload := .player Bool.false }
 
 private def argumentResult (r : Referent) : DRS :=
   let inner := enterOwnScope (DRS.ofList [])
-  leaveCaller inner ((enterCaller inner).push r .obj true)
+  leaveCaller inner ((enterCaller inner).push r .obj Bool.true)
 
 theorem callerPartSurvivesDefinition :
     (leaveOwnScope (argumentResult callerPart)).referents.length = 1 := by decide
@@ -52,10 +52,10 @@ theorem callerPlayerSurvivesDefinition :
     (leaveOwnScope (argumentResult callerPlayer)).referents.length = 1 := by decide
 
 theorem definitionInternalPartDoesNotEscape :
-    (leaveOwnScope ((enterOwnScope (DRS.ofList [])).push callerPart .obj true)).referents = [] := by decide
+    (leaveOwnScope ((enterOwnScope (DRS.ofList [])).push callerPart .obj Bool.true)).referents = [] := by decide
 
 theorem definitionInternalPlayerDoesNotEscape :
-    (leaveOwnScope ((enterOwnScope (DRS.ofList [])).push callerPlayer .obj true)).referents = [] := by decide
+    (leaveOwnScope ((enterOwnScope (DRS.ofList [])).push callerPlayer .obj Bool.true)).referents = [] := by decide
 
 theorem movedCallerPartSurvivesDefinition :
     let after := leaveOwnScope
@@ -74,13 +74,13 @@ theorem departedPermanentCannotBeActionPatient :
     resolveCandidates (.word .permanent) .one moved = [] := by decide
 
 theorem departedPermanentRemainsAvailableForCharacteristicRead :
-    (resolveCandidates (.word .permanent) .one { moved with characteristicRead := true }).map
+    (resolveCandidates (.word .permanent) .one { moved with characteristicRead := Bool.true }).map
       (·.id) = [1] := by decide
 
 theorem joinedDepartedCreatureCannotBypassZoneFilter :
     let context := DRS.ofList [{
       det := .a, plur := .one,
-      payload := .join (.player false)
+      payload := .join (.player Bool.false)
         (.object [.creature] (some .graveyard) none none none) }]
     resolveCandidates (.word (.type .creature)) .one context = [] := by decide
 
@@ -92,26 +92,26 @@ theorem shuffleForgetsMaskedLibraryIdentity :
     after.referents = [] ∧ identityBinding "library.card" after = none := by decide
 
 private def relativeResult : DRS :=
-  let inner := (DRS.ofList []).push callerPart .other false
-  let inner := inner.push callerPlayer .other false
-  inner.push { callerPart with det := .the, attachmentHost := true } .subj true
+  let inner := (DRS.ofList []).push callerPart .other Bool.false
+  let inner := inner.push callerPlayer .other Bool.false
+  inner.push { callerPart with det := .the, attachmentHost := Bool.true } .subj Bool.true
 
 theorem relativeClauseExportsOnlyAttachmentHost :
     let after := leaveRelative (DRS.ofList []) relativeResult
     after.referents.map (·.id) = [2] ∧ after.nextId = 3 := by decide
 
 theorem projectedHostDoesNotReuseLocalIdentity :
-    let after := (leaveRelative (DRS.ofList []) relativeResult).push callerPlayer .obj true
+    let after := (leaveRelative (DRS.ofList []) relativeResult).push callerPlayer .obj Bool.true
     after.referents.map (·.id) = [3, 2] := by decide
 
 theorem explicitCallerArgumentPreservesAuxiliaryPlayer :
     let inner := enterOwnScope (DRS.ofList [])
-    let argument := ((enterCaller inner).push callerPlayer .other false).push callerPart .obj true
+    let argument := ((enterCaller inner).push callerPlayer .other Bool.false).push callerPart .obj Bool.true
     let after := leaveOwnScope (leaveCaller inner argument [1])
     after.referents.map (·.id) = [1, 0] := by decide
 
 theorem typeViewRefusesMovedPronounWithoutChangingItsZone :
-    let (after, ids, errors) := stepNounPhrase 64 moved .other false
+    let (after, ids, errors) := stepNounPhrase 64 moved .other Bool.false
       (.headed (.type .creature) (.pro (.word .card) .one))
     errors = [.ascribable] ∧ ids = [1] ∧ after.nextId = moved.nextId ∧
       after.referents.map (·.zone) = [some .exile] := by decide
@@ -156,13 +156,13 @@ theorem distributedMovementKeepsAnOuterCardSingular :
       some (.one, some .exile) ∧ result.1.outerReferentIds = [] := by decide
 
 theorem unqualifiedSourceDoesNotInventAZone :
-    let after := (stepNounPhrase 64 (DRS.ofList []) .other false .this).1
+    let after := (stepNounPhrase 64 (DRS.ofList []) .other Bool.false .this).1
     after.referents.map (·.zone) = [none] := by decide
 
 theorem explicitSourceCarrierSuppliesItsZone :
-    let creature := (stepNounPhrase 64 (DRS.ofList []) .other false
+    let creature := (stepNounPhrase 64 (DRS.ofList []) .other Bool.false
       (.headed (.type .creature) .this)).1
-    let spell := (stepNounPhrase 64 (DRS.ofList []) .other false (.headed .spell .this)).1
+    let spell := (stepNounPhrase 64 (DRS.ofList []) .other Bool.false (.headed .spell .this)).1
     creature.referents.map (·.zone) = [some .battlefield] ∧
       spell.referents.map (·.zone) = [some .stack] := by decide
 
@@ -171,7 +171,7 @@ theorem explicitSourceCarrierSuppliesItsZone :
 adds nothing [CR#109.1]. -/
 theorem headNounsKeepTheirReadings :
     let read (np : NounPhrase) :=
-      (stepNounPhrase 64 (DRS.ofList []) .other false np).1.referents.map (·.payload)
+      (stepNounPhrase 64 (DRS.ofList []) .other Bool.false np).1.referents.map (·.payload)
     read thisEmblem = [.object [] (some .command) none none none] ∧
       read thisToken = [.object [] (some .battlefield) none (some .token) none] ∧
       read thisAbility = [.ability none (some .stack)] ∧
@@ -182,7 +182,7 @@ emblem is in the command zone [CR#114.2,114.4]; "the permanent that granted it" 
 battlefield. -/
 theorem grantorReadsItsHeadNoun :
     let read (head : NounWord) :=
-      (stepNounPhrase 64 (DRS.ofList []) .other false (.theGrantor head)).1.referents.map
+      (stepNounPhrase 64 (DRS.ofList []) .other Bool.false (.theGrantor head)).1.referents.map
         (·.payload)
     read .emblem = [.object [] (some .command) none none none] ∧
       read .permanent = [.object [] (some .battlefield) none none none] := by decide
@@ -191,22 +191,22 @@ theorem revealedSearchResultSurvivesShuffleWithSameIdentity :
     let searched := (stepAction 64 .postEvent .obj (DRS.ofList [])
       (search yourLibrary (a isInstantOrSorcery))).1
     let (after, errors) := stepAction 64 .postEvent .obj (nextClause searched)
-      (.sequentially [reveal it, shuffle])
+      (.sequentially [Semantics.Definitions.Action.reveal it, shuffle])
     let beforeIds := (searched.referents.filter (·.stampedBy searchDeed)).map (·.id)
     errors = [] ∧ beforeIds.length = 1 ∧
       (resolveCandidates .bare .one (nextClause after)).map (·.id) = beforeIds ∧
-      (participialCandidates (.deed (.action "search")) (some .one) (some .card) false
+      (participialCandidates (.deed (.action "search")) (some .one) (some .card) Bool.false
         (nextClause after)).map (·.id) = beforeIds := by decide
 
 theorem revealedTopCardDoesNotAcquireSearchProvenance :
     let (after, errors) := stepAction 64 .postEvent .obj (DRS.ofList [])
-      (.sequentially [reveal (topSlice 1), shuffle])
+      (.sequentially [Semantics.Definitions.Action.reveal (topSlice 1), shuffle])
     errors = [] ∧ resolveCandidates .bare .one (nextClause after) = [] := by decide
 
 theorem zoneMoveClearsSearchProvenance :
     let searched := (stepAction 64 .postEvent .obj (DRS.ofList [])
       (search yourLibrary (a isInstantOrSorcery))).1
-    let (after, errors) := stepAction 64 .postEvent .obj (nextClause searched) (putInto it hand)
+    let (after, errors) := stepAction 64 .postEvent .obj (nextClause searched) (putInto it Semantics.Templates.Location.hand)
     errors = [] ∧ after.referents.all (fun r => !r.stampedBy searchDeed) := by decide
 
 end Semantics.Proofs.MovementScopes

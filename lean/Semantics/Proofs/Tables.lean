@@ -20,12 +20,12 @@ namespace Semantics.Proofs.Tables
 
 /-- Deeds written literally in the checker agree with generated declarations. -/
 theorem checkerDeedLiteralsMatchDefinitions :
-    (.action "cast" : Deed) = cast.deed ∧
-    (.action "exile" : Deed) = exile.deed ∧
-    (.action "play" : Deed) = play.deed ∧
+    (.action "cast" : Deed) = Semantics.Definitions.Action.cast.deed ∧
+    (.action "exile" : Deed) = Semantics.Definitions.Action.exile.deed ∧
+    (.action "play" : Deed) = Semantics.Definitions.Action.play.deed ∧
     searchDeed = search.deed ∧
     (.action "tap" : Deed) = tap.deed ∧
-    (.action "activate" : Deed) = activate.deed ∧
+    (.action "activate" : Deed) = Semantics.Definitions.Action.activate.deed ∧
     (.action "double" : Deed) = doublePower.deed ∧
     (.action "double" : Deed) = doubleToughness.deed ∧
     (.action "double" : Deed) = doublePowerAndToughness.deed ∧
@@ -57,16 +57,16 @@ theorem designationScopesAreDeclared :
 /-- Only the monarch [CR#725.3] and the initiative [CR#726.3] are held by at most one player at a
 time; the city's blessing is each player's own [CR#702.131c]. -/
 theorem designationSoleHoldersAreDeclared :
-    (monarch.sole, initiative.sole, citysBlessing.sole) = (true, true, false) := by decide
+    (monarch.sole, initiative.sole, citysBlessing.sole) = (Bool.true, Bool.true, Bool.false) := by decide
 
 /-- A designation's holder follows from its scope: a permanent is goaded [CR#701.15b], a player
 is the monarch [CR#725.1], a card is a commander, and day and night are the game's
 [CR#731.1]. -/
 theorem designationHoldersFollowFromScope :
-    (goaded.holder, goaded.possessorOk) = (some .object, true) ∧
-      (monarch.holder, monarch.possessorOk) = (some .player, false) ∧
-      (commander.heldByItsCard, commander.holder) = (true, some .object) ∧
-      (day.gameWide, day.holder, designationHolderOk day) = (true, none, false) := by decide
+    (goaded.holder, goaded.possessorOk) = (some .object, Bool.true) ∧
+      (monarch.holder, monarch.possessorOk) = (some .player, Bool.false) ∧
+      (commander.heldByItsCard, commander.holder) = (Bool.true, some .object) ∧
+      (day.gameWide, day.holder, designationHolderOk day) = (Bool.true, none, Bool.false) := by decide
 
 /-- Hexproof bare and "hexproof from [quality]" are one keyword [CR#702.11d], as cycling and
 typecycling are [CR#702.29f]: each variant's Definition generates the label its keyword's does. -/
@@ -80,9 +80,9 @@ follows [CR#701.46a,701.37a,608.2c], so no permanent performs them; harness name
 [CR#701.64a], and a player performs a search, an exile, a scry, a sacrifice, a destroy and a
 shuffle. -/
 theorem permanentPerformedActions :
-    [connive.deed, endure.deed, explore.deed, fight.deed].all (·.permanentActor) = true ∧
-      [adapt.deed, harness.deed, monstrosity.deed, search.deed, exile.deed, scry.deed,
-        sacrifice.deed, destroy.deed, shuffle.deed].all (!·.permanentActor) = true := by decide
+    [connive.deed, endure.deed, explore.deed, fight.deed].all (·.permanentActor) = Bool.true ∧
+      [adapt.deed, harness.deed, monstrosity.deed, search.deed, Semantics.Definitions.Action.exile.deed, scry.deed,
+        sacrifice.deed, destroy.deed, shuffle.deed].all (!·.permanentActor) = Bool.true := by decide
 
 /-! ## Card types read back -/
 

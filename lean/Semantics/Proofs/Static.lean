@@ -54,7 +54,7 @@ theorem okEquippedCreature :
 
 /-- "You can't lose the game." -/
 theorem okUntargetedOutcomeGate :
-    Ability.check (DRS.ofList []) (.static (cant (Semantics.Subject.actor you) loseGame)) = [] := by decide
+    Ability.check (DRS.ofList []) (.static (cant (Semantics.Subject.actor you) Semantics.Templates.Action.loseGame)) = [] := by decide
 
 /-- "where X is the number of creatures you control." -/
 theorem okSingleStaticXRider :
@@ -140,7 +140,7 @@ theorem okSingleExtension :
         (and [
               allOf (and [isCreature, youControl]),
               allOf (and [isCreature, isSpell, youControl]),
-              allOf (and [isCard, isCreature, youOwn, not (in_ battlefield)]) ]) .adds (.quality (.everyTypeOf .creature))) = [] := by decide
+              allOf (and [isCard, isCreature, youOwn, not (in_ Semantics.Templates.Location.battlefield)]) ]) .adds (.quality (.everyTypeOf .creature))) = [] := by decide
 
 /-- "If you would draw a card, draw two cards instead." -/
 theorem okDrawReplacement :
@@ -259,7 +259,7 @@ action done as part of it [CR#702.104a,614.12a]. -/
 theorem okAlongsideReadsTheChoiceBefore :
     StaticSpec.check (DRS.ofList [])
       (replace (would (Semantics.Subject.actor thisCreature) enter)
-        (before (choose anOpponent)
+        (Semantics.Templates.Replacement.before (choose anOpponent)
           (some
             (alongside
               (instruct (the isChosenPlayer)

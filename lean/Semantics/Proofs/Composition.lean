@@ -54,20 +54,20 @@ theorem badThirdCompoundCostAlternative :
       [.notCompound] := by decide
 
 theorem okOptionalSuccessReadsBody :
-    Action.check (DRS.ofList []) (.withContinuation .optional (exile (a (and [isCreature, youControl])))
-      (some (putInto it battlefield)) none) = [] := by decide
+    Action.check (DRS.ofList []) (.withContinuation .optional (Semantics.Definitions.Action.exile (a (and [isCreature, youControl])))
+      (some (putInto it Semantics.Templates.Location.battlefield)) none) = [] := by decide
 
 theorem badOptionalFailureReadsBody :
-    Action.check (DRS.ofList []) (.withContinuation .optional (exile (a (and [isCreature, youControl])))
-      none (some (exile it))) = [.anaphor .bare .one 0] := by decide
+    Action.check (DRS.ofList []) (.withContinuation .optional (Semantics.Definitions.Action.exile (a (and [isCreature, youControl])))
+      none (some (Semantics.Definitions.Action.exile it))) = [.anaphor .bare .one 0] := by decide
 
 theorem okRequiredSuccessReadsBody :
-    Action.check (DRS.ofList []) (.withContinuation .required (exile (a (and [isCreature, youControl])))
-      (some (putInto it battlefield)) none) = [] := by decide
+    Action.check (DRS.ofList []) (.withContinuation .required (Semantics.Definitions.Action.exile (a (and [isCreature, youControl])))
+      (some (putInto it Semantics.Templates.Location.battlefield)) none) = [] := by decide
 
 theorem badRequiredFailureReadsBody :
-    Action.check (DRS.ofList []) (.withContinuation .required (exile (a (and [isCreature, youControl])))
-      none (some (exile it))) = [.anaphor .bare .one 0] := by decide
+    Action.check (DRS.ofList []) (.withContinuation .required (Semantics.Definitions.Action.exile (a (and [isCreature, youControl])))
+      none (some (Semantics.Definitions.Action.exile it))) = [.anaphor .bare .one 0] := by decide
 
 theorem okNumericDefinitionAsCost :
     Cost.check [letterB .x] (.perform (.establish (.letterDefinition .x 2) none)) = [] := by decide
@@ -81,7 +81,7 @@ theorem okFixedRepetitionKeepsOuterBindings :
 theorem okFixedRepetitionPublishesCount :
     ((stepAction 64 .postEvent .obj (DRS.ofList [])
       (.repeat_ (.fixed 3 (draw 1)))).1.visibleReferents.filter
-        (fun ref => match ref.payload with | .outcome .repeatCount => true | _ => false)).length = 1 := by decide
+        (fun ref => match ref.payload with | .outcome .repeatCount => Bool.true | _ => Bool.false)).length = 1 := by decide
 
 theorem badEmptySequentialComposition :
     Action.check (DRS.ofList []) (.sequentially []) = [.nonEmpty] := by decide

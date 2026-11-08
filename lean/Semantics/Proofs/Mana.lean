@@ -64,19 +64,19 @@ theorem badEmptyManaCost :
 /-- "Exile a creature you control. If you do, return it to the battlefield." -/
 theorem okIfDoneReadsDoneBody :
     Action.check (DRS.ofList [])
-      (doIfDone (exile (a (and [isCreature, youControl]))) (some (returnToBattlefield it))) = [] := by
+      (doIfDone (Semantics.Definitions.Action.exile (a (and [isCreature, youControl]))) (some (returnToBattlefield it))) = [] := by
   decide
 
 /-- "Sacrifice a creature. If you don't, exile it." -/
 theorem badIfNotReadsMandatoryBody :
-    Action.check (DRS.ofList []) (doIfDone (sacrifice (a isCreature)) none (some (exile it)))
+    Action.check (DRS.ofList []) (doIfDone (sacrifice (a isCreature)) none (some (Semantics.Definitions.Action.exile it)))
       = [.anaphor .bare .one 0] := by
   decide
 
 /-- "Counter target spell unless its controller pays {3}." -/
 theorem okUnlessManaCost :
     Action.check (DRS.ofList [])
-      (Templates.instruct (controllerOf (target isSpell)) (doUnless (counter it) (.mana [generic 3]))) =
+      (Templates.instruct (controllerOf (target isSpell)) (doUnless (Semantics.Definitions.Action.counter it) (.mana [generic 3]))) =
           [] := by
   decide
 
@@ -135,7 +135,7 @@ theorem badPurposelessSpend :
 
 /-- "{U}: Counter target spell with the chosen name." -/
 def counterChosenName : Ability :=
-  activated (.mana [pip .blue]) (counter (target (.and [isSpell, .named .chosen])))
+  activated (.mana [pip .blue]) (Semantics.Definitions.Action.counter (target (.and [isSpell, .named .chosen])))
 
 /-- "… Counter target spell with the chosen name." -/
 theorem okNameMatchAfterChooser :
@@ -166,7 +166,7 @@ theorem okPlayPaymentMana : PlayPayment.check (DRS.ofList []) (.payingInstead (.
 
 /-- "As an additional cost to cast this spell, sacrifice an artifact." -/
 theorem okAddedCostSacrifice :
-    StaticSpec.check (DRS.ofList []) (.addedCost (.perform (sacrifice (a isArtifact))) false .once) = []
+    StaticSpec.check (DRS.ofList []) (.addedCost (.perform (sacrifice (a isArtifact))) Bool.false .once) = []
         := by
   decide
 

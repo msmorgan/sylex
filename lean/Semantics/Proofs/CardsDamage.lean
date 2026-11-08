@@ -17,6 +17,7 @@ the bench items beside them.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions
+open Semantics.Definitions.Action (cast)
 
 open Semantics.Templates.NounPhrase (a each counted the)
 open Semantics.Templates.Predicate (and or andOr did quality)
@@ -63,7 +64,7 @@ def immersturmSkullcairn : Ability :=
       (Semantics.Cost.perform ((sacrifice thisLand)))])
     (sequentially
       [ instruct this_ (dealDamage 3 (target isPlayer)),
-        instruct (that .player) (discard (a (cardIn hand))) ])
+        instruct (that .player) (discard (a (cardIn Semantics.Templates.Location.hand))) ])
     asSorcery
 theorem okImmersturmSkullcairn : Ability.check (DRS.ofList []) immersturmSkullcairn = [] := by decide
 def pyriteSpellbomb : Ability :=
@@ -90,7 +91,7 @@ def flamesOfTheRazeBoar : Action :=
     [ instruct this_ (dealDamage 4 (target (and [isCreature, anOpponentControls]))),
       doOnlyIf
         (instruct this_
-          (dealDamage 2 (each (and [isCreature, isOther, controlledBy (that player)]))))
+          (dealDamage 2 (each (and [isCreature, isOther, controlledBy (that Semantics.Templates.NounWord.player)]))))
         (exists_ (and [isCreature, youControl, hasPower .atLeast 4])) ]
 theorem okFlamesOfTheRazeBoar : Action.check (DRS.ofList []) flamesOfTheRazeBoar = [] := by decide
 def yawgmothDemon : Action :=
@@ -123,7 +124,7 @@ def botBashingTime : Action :=
   sequentially
     [ instruct this_ (dealDamage 6 (target isCreature)),
       replaceEvent (would (Semantics.Subject.actor ((that creature))) die)
-          (instead (exile it)) thisTurn ]
+          (instead (Semantics.Definitions.Action.exile it)) thisTurn ]
 theorem okBotBashingTime : Action.check (DRS.ofList []) botBashingTime = [] := by decide
 def wordsOfWar : Action :=
   replaceNextEvent (would (Semantics.Subject.actor (you)) (draw 1))
@@ -196,7 +197,7 @@ theorem okPurgingScythe : Ability.check (DRS.ofList []) purgingScythe = [] := by
 
 /-- Chandra Nalaar -/
 def chandraNalaarsX : Ability :=
-  activated (loyaltySymbol (down (letter .x))) (instruct this_ (dealDamage (letter .x) (target isCreature)))
+  activated (loyaltySymbol (Semantics.Templates.Delta.Amount.down (letter .x))) (instruct this_ (dealDamage (letter .x) (target isCreature)))
 theorem okChandraNalaarsX : Ability.check (DRS.ofList []) chandraNalaarsX = [] := by decide
 
 def onakkeJavelineerBolt : Ability :=
@@ -232,7 +233,7 @@ theorem okSarkhansUnsealingLine : Ability.check (DRS.ofList []) sarkhansUnsealin
 /-- Savage Swipe, both sentences -/
 def savageSwipeLine : Action :=
   sequentially
-    [ doOnlyIf (get (target (and [isCreature, youControl])) (up 2) (up 2)
+    [ doOnlyIf (get (target (and [isCreature, youControl])) (Semantics.Templates.Delta.Amount.up 2) (Semantics.Templates.Delta.Amount.up 2)
         untilEndOfTurn)
         (compareAmt (powerOf it) .eq 2),
       instruct it (fight (target (and [isCreature, youDontControl]))) ]
@@ -265,7 +266,7 @@ cannot. -/
 def quakebringerDamage : Ability :=
   qualified
     (at_ (beginningOfYour .upkeep) (instruct this_ (dealDamage 2 eachOpponent)))
-    (guard := some (or [ is this_ (in_ battlefield),
+    (guard := some (or [ is this_ (in_ Semantics.Templates.Location.battlefield),
            and [ is this_ (cardIn yourGraveyard),
                   exists_ (and [isCreature, (Semantics.Predicate.hasSubtype (giant)),
                                  youControl]) ] ]))
@@ -443,7 +444,7 @@ theorem okNivMizzetGuildpactTrigger : Ability.check (DRS.ofList []) nivMizzetGui
 def eachOfThoseOpponentsTopCard : Action :=
   sequentially
     [ instruct this_ (dealDamage 1 eachOpponent),
-      exile (slice .top 1 (libraryOf (eachOf (those player)))) ]
+      Semantics.Definitions.Action.exile (slice .top 1 (libraryOf (eachOf (those Semantics.Templates.NounWord.player)))) ]
 theorem okEachOfThoseOpponentsTopCard : Action.check (DRS.ofList []) eachOfThoseOpponentsTopCard = [] := by
   decide
 
@@ -454,7 +455,7 @@ def cracklingDoom : Action :=
       instruct eachOpponent (sacrifice
         (a (and [isCreature,
                   superlative .max (.stat .power)
-                    (and [isCreature, controlledBy (that player)])]))) ]
+                    (and [isCreature, controlledBy (that Semantics.Templates.NounWord.player)])]))) ]
 theorem okCracklingDoom : Action.check (DRS.ofList []) cracklingDoom = [] := by decide
 def theFallen : Ability :=
   at_ (beginningOfYour .upkeep)
@@ -481,7 +482,7 @@ def diabolicEdict : Action := instruct (target isPlayer) (sacrifice (aTheirChoic
 theorem okDiabolicEdict : Action.check (DRS.ofList []) diabolicEdict = [] := by decide
 def innocentBlood : Action := instruct eachPlayer (sacrifice (aTheirChoice isCreature))
 theorem okInnocentBlood : Action.check (DRS.ofList []) innocentBlood = [] := by decide
-def cryOfContrition : Action := instruct (target isPlayer) (discard (a (cardIn hand)))
+def cryOfContrition : Action := instruct (target isPlayer) (discard (a (cardIn Semantics.Templates.Location.hand)))
 theorem okCryOfContrition : Action.check (DRS.ofList []) cryOfContrition = [] := by decide
 def cyclingCost : Action := discard this_
 theorem okCyclingCost : Action.check (DRS.ofList []) cyclingCost = [] := by decide
