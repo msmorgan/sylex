@@ -13,7 +13,8 @@ A ticket's status is the folder it lives in:
 | `done/` | Integrated into the default line |
 
 Tickets move `critical/planned/maybe → wip → done`. The jj-kata folder-Kanban driver (configured
-in `kata.toml`) makes the moves; never move a ticket by hand.
+in `kata.toml`) makes every move into or out of `wip/` and `done/`; moves among `critical/`,
+`planned/` and `maybe/` are triage, made by hand.
 
 ## Writing a ticket
 
