@@ -326,6 +326,8 @@ fn kind_sort(kind: &str) -> Option<&'static str> {
 /// "`.
 fn printed_name(card: &Value) -> Result<String, String> {
     let record = match &card.kind {
+        // Temporary: a record card mirrors the loader's single-face shorthand;
+        // `syl-single-face-card-call` deletes both.
         ValueKind::Record(record) => record,
         ValueKind::Call(call) => {
             let args: Vec<_> = call.args.iter().filter_map(|a| a.node()).collect();

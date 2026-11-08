@@ -22,7 +22,7 @@ single-faced cards need no respelling.
   multi-faced card is written without the `characteristics` wrap.
 - The loader no longer accepts a record at `Card`, or a `CardFace` record without
   `characteristics` (the shorthand in `lean/SylGen/Resolve.lean`), each refused with a negative
-  test.
+  test, and `printed_name` in `crates/xtask/src/dsl.rs` no longer reads a record card.
 - The respelled cards mean the same: `lake exe dumpValues compare` shows no changed card row.
 - `cargo xtask lean check`, `cargo xtask dsl fmt --check`, `cargo xtask dsl differential` and
   `cargo test -p sylex_syl` pass.
