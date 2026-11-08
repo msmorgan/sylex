@@ -59,7 +59,7 @@ theorem subjectCannotReadOuterChoice :
 
 theorem amountCannotReadOuterChoice :
     Ability.check [(ChoiceSort.quality .number).binding]
-      (keywordNumber bushido.label (.chosenNumber .theChoice)) =
+      (keywordNumbered bushido.label (.chosenNumber .theChoice)) =
       [.choiceRef .theChoice (.quality .number) 0] := by decide
 
 theorem costCannotReadOuterChoice :

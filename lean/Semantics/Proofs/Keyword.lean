@@ -43,7 +43,7 @@ theorem okSacrificeAsCost :
 
 /-- "Target creature gains flying." -/
 theorem okGainsKeyword :
-    Action.check (DRS.ofList []) (gain (target isCreature) (keyword (.named "flying")) none) = [] := by decide
+    Action.check (DRS.ofList []) (gain (target isCreature) (keywordBare (.named "flying")) none) = [] := by decide
 
 /-- "Creature spells you cast cost {1} less to cast." -/
 theorem okCostSubjectOnStack :
@@ -53,7 +53,7 @@ theorem okCostSubjectOnStack :
 
 /-- "Creatures you control have flying." -/
 theorem okBattlefieldFlying :
-    StaticSpec.check (DRS.ofList []) (Templates.abilityGrant (allOf (and [isCreature, youControl])) (keyword (.named "flying"))) = [] := by
+    StaticSpec.check (DRS.ofList []) (Templates.abilityGrant (allOf (and [isCreature, youControl])) (keywordBare (.named "flying"))) = [] := by
         decide
 
 /-- "Target creature gets +1/+1, gains flying, and gains trample." -/
@@ -62,8 +62,8 @@ theorem okFlatCoordination :
       (.conjunction none
         [ Templates.modification (target isCreature) .power (.up 1),
           Templates.modification it .toughness (.up 1),
-          Templates.abilityGrant it (keyword (.named "flying")),
-          Templates.abilityGrant it (keyword (.named "trample")) ]) = [] := by
+          Templates.abilityGrant it (keywordBare (.named "flying")),
+          Templates.abilityGrant it (keywordBare (.named "trample")) ]) = [] := by
   decide
 
 /-- "Target creature gets +1/+1 and gains flying and gains trample." -/
@@ -73,8 +73,8 @@ theorem badNestedCoordination :
         [ .conjunction none
             [ Templates.modification (target isCreature) .power (.up 1),
               Templates.modification it .toughness (.up 1),
-              Templates.abilityGrant it (keyword (.named "flying")) ],
-          Templates.abilityGrant it (keyword (.named "trample")) ]) = [.notCoord] := by
+              Templates.abilityGrant it (keywordBare (.named "flying")) ],
+          Templates.abilityGrant it (keywordBare (.named "trample")) ]) = [.notCoord] := by
   decide
 
 /-- "Whenever a creature enters, destroy that creature." -/
@@ -90,7 +90,7 @@ theorem staticSelfRemainsReadableByIt :
     let spec := fun (third : NounPhrase) => StaticSpec.conjunction none
       [Templates.modification thisCreature .power (.up 1),
         Templates.modification it .toughness (.up 1),
-        Templates.abilityGrant third (keyword (.named "flying"))]
+        Templates.abilityGrant third (keywordBare (.named "flying"))]
     let after := (stepStaticSpec 64 (DRS.ofList []) (spec it)).1
     Ability.check (DRS.ofList []) (.static (spec it)) = [] ∧
       Ability.check (DRS.ofList []) (.static (spec (that (.type .creature)))) =
@@ -105,7 +105,7 @@ theorem okCoordinatedPlural :
         (.conjunction none
           [ Templates.modification (allOf (and [isCreature, youControl])) .power (.up 1),
             Templates.modification them .toughness (.up 1),
-            Templates.abilityGrant them (keyword (.named "flying")) ])) = [] := by
+            Templates.abilityGrant them (keywordBare (.named "flying")) ])) = [] := by
   decide
 
 /-- "Enchanted creature gets +1/+1 and they have flying." -/
@@ -115,7 +115,7 @@ theorem badCoordinatedHostPlural :
         (.conjunction none
           [ Templates.modification (.attachHost .enchanted (.type .creature)) .power (.up 1),
             Templates.modification it .toughness (.up 1),
-            Templates.abilityGrant them (keyword (.named "flying")) ])) = [.anaphor .bare .many 0] := by
+            Templates.abilityGrant them (keywordBare (.named "flying")) ])) = [.anaphor .bare .many 0] := by
   decide
 
 /-- "Create a 1/1 white Soldier creature token with flying." -/
@@ -124,7 +124,7 @@ theorem okTokenKeywordAbility :
       (create 1
         (.written { characteristics :=
           { colors := [.white], types := [.creature], subtypes := [soldier],
-            power := some 1, toughness := some 1, text := [keyword (.named "flying")] } }))
+            power := some 1, toughness := some 1, text := [keywordBare (.named "flying")] } }))
       = [] := by
   decide
 
@@ -287,7 +287,7 @@ theorem sharedSubjectSurvivesSecondSingular :
           establishFor (.firstMention "sharedSubject.subject" (target isCreature))
             [ Templates.modification (.laterMention "sharedSubject.subject" (target isCreature)) .power (.up 1),
               Templates.modification (.laterMention "sharedSubject.subject" (target isCreature)) .toughness (.up 1),
-              Templates.abilityGrant (.laterMention "sharedSubject.subject" (target isCreature)) (keyword (.named "flying")) ]
+              Templates.abilityGrant (.laterMention "sharedSubject.subject" (target isCreature)) (keywordBare (.named "flying")) ]
             (some untilEndOfTurn) ]) = [] := by
   decide
 

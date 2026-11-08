@@ -98,7 +98,7 @@ theorem powerDefinitionPublishesItsNumber :
 
 theorem grantedKeywordPublishesItsScalarParameter :
     let out := (stepStaticSpec 64 (DRS.ofList [])
-      (Templates.abilityGrant thisCreature (keywordNumber (.named "bushido") (.letter .x)))).1
+      (Templates.abilityGrant thisCreature (keywordNumbered (.named "bushido") (.letter .x)))).1
     anyOpenLetter .x out = Bool.true ∧ countLetter .x out = 1 := by decide
 
 /-- The same through a keyword Definition, whose parameter arrives in its caller's scope:

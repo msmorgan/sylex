@@ -3,7 +3,7 @@ import Semantics.Registry
 
 namespace Semantics.Templates
 
-def keyword (label : KeywordLabel) : Ability := .keyword label [] []
+def keywordBare (label : KeywordLabel) : Ability := .keyword label [] []
 /-- "<keyword> <cost>" -/
 def keywordCosting (label : KeywordLabel) (cost : Cost) : Ability :=
   .keyword label [.cost cost] []
@@ -14,7 +14,7 @@ def keywordQuality (label : KeywordLabel) (quality : Predicate) : Ability :=
 def keywordSubject (label : KeywordLabel) (subject : Predicate) : Ability :=
   .keyword label [.subject subject] []
 /-- "<keyword> N", e.g. "bushido 2" -/
-def keywordNumber (label : KeywordLabel) (amount : Amount) : Ability :=
+def keywordNumbered (label : KeywordLabel) (amount : Amount) : Ability :=
   .keyword label [.number amount] []
 /-- "<keyword> <quality> <cost>", e.g. "plainscycling {2}" [CR#702.29e] -/
 def keywordQualityCosting (label : KeywordLabel) (quality : Predicate) (cost : Cost) :

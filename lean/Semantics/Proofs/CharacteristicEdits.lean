@@ -79,12 +79,12 @@ theorem subjectIsPublishedBeforeItsEdits :
       [.stat .power (.set (powerOf it))]) = [] := by decide
 
 theorem copySpecificAdditionsRemainSeparate :
-    CopyExcept.checkAll (DRS.ofList []) [.ability (keyword (.named "flying")),
+    CopyExcept.checkAll (DRS.ofList []) [.ability (keywordBare (.named "flying")),
       .entersWithCounters 1 p1p1Counter .fresh] = [] := by decide
 
 
 theorem abilityOnlyCopyInputNeedsNoEmptyEditBlock :
-    CopyExcept.checkAll (DRS.ofList []) (copyCharacteristics {text := [keyword (.named "flying")]} Bool.false) = [] := by decide
+    CopyExcept.checkAll (DRS.ofList []) (copyCharacteristics {text := [keywordBare (.named "flying")]} Bool.false) = [] := by decide
 
 /-- A removed bundle's mana cost is removed, never set: every written value of a `loses` bundle
 is removed. -/

@@ -47,7 +47,7 @@ theorem badExtraTurnWithoutPlayer :
     Action.check (DRS.ofList []) (instruct (target isCreature) (.addTurnPart .turn none 1 none))
       = [.kindMismatch .player .object] := by decide
 
-def emblemAbilities : List Ability := [.static (Templates.abilityGrant (allOf (and [isCreature, youControl])) (keyword (.named "haste")))]
+def emblemAbilities : List Ability := [.static (Templates.abilityGrant (allOf (and [isCreature, youControl])) (keywordBare (.named "haste")))]
 
 theorem okCreateSeveralEmblems :
     Action.check (DRS.ofList []) (.createObject 2 (.emblem none emblemAbilities) none) = [] := by decide

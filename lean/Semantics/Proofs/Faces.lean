@@ -207,7 +207,7 @@ theorem badEquippedPlayer :
 
 /-- "Target creature gains indestructible." -/
 theorem okGainsIndestructible :
-    StaticSpec.check (DRS.ofList []) (Templates.abilityGrant (target isCreature) (keyword (.named "indestructible"))) = [] := by
+    StaticSpec.check (DRS.ofList []) (Templates.abilityGrant (target isCreature) (keywordBare (.named "indestructible"))) = [] := by
         decide
 
 /-- a "Kindred Enchantment — Merfolk" card -/
@@ -215,7 +215,7 @@ theorem okKindredWithAnotherType :
     Card.check
       (one
         { name := some "", cost := some [generic 2], types := [.kindred, .enchantment],
-          subtypes := [merfolk], text := [keyword (.named "flying")] }) = [] := by
+          subtypes := [merfolk], text := [keywordBare (.named "flying")] }) = [] := by
   decide
 
 /-- a "Kindred Enchantment — Siege" card -/
@@ -223,7 +223,7 @@ theorem badSiegeWithoutBattle :
     Card.check
       (one
         { name := some "", cost := some [generic 2], types := [.kindred, .enchantment],
-          subtypes := [siege], text := [keyword (.named "flying")] }) = [.cardLine] := by
+          subtypes := [siege], text := [keywordBare (.named "flying")] }) = [.cardLine] := by
   decide
 
 /-- "Enchanted creature can't attack." -/

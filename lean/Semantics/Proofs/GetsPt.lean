@@ -83,7 +83,7 @@ theorem okDeltasReadTheirSubject :
 theorem okGetsInsideCoordination :
     StaticSpec.check (DRS.ofList [])
       (.conjunction none
-        [getsPt (target isCreature) (.up 1) (.up 1), Templates.abilityGrant it (keyword (.named "flying"))])
+        [getsPt (target isCreature) (.up 1) (.up 1), Templates.abilityGrant it (keywordBare (.named "flying"))])
       = [] := by
   decide
 
@@ -123,8 +123,8 @@ theorem nestedModernCoordinationIsRefused :
       (.conjunction none
         [.conjunction none
           [getsPt thisCreature (.up 1) (.up 1),
-            Templates.abilityGrant thisCreature (keyword (.named "flying"))],
-          Templates.abilityGrant thisCreature (keyword (.named "trample"))]) = [.notCoord] := by decide
+            Templates.abilityGrant thisCreature (keywordBare (.named "flying"))],
+          Templates.abilityGrant thisCreature (keywordBare (.named "trample"))]) = [.notCoord] := by decide
 
 private def abilityTrace (context : DRS) (ability : Ability) : DRS × List Refusal :=
   match ability with
@@ -330,21 +330,21 @@ theorem nextUpkeepPumpKeepsItsCreatureTarget :
 theorem modernFlatCoordinationKeepsOneTarget :
     let result := stepStaticSpec 32 (DRS.ofList [])
       (.conjunction none [getsPt (target isCreature) (.up 1) (.up 1),
-        Templates.abilityGrant it (keyword (.named "flying")),
-        Templates.abilityGrant it (keyword (.named "trample"))])
+        Templates.abilityGrant it (keywordBare (.named "flying")),
+        Templates.abilityGrant it (keywordBare (.named "trample"))])
     result.2 = [] ∧ result.1.resolvedIds = [0] ∧ creatureIdentity result.1 0 = Bool.true := by decide
 
 theorem modernPluralCoordinationKeepsItsPumpedGroup :
     let result := stepStaticSpec 32 (DRS.ofList [])
       (.conjunction none [getsPt (allOf (and [isCreature, youControl])) (.up 1) (.up 1),
-        Templates.abilityGrant them (keyword (.named "flying"))])
+        Templates.abilityGrant them (keywordBare (.named "flying"))])
     result.2 = [] ∧ result.1.resolvedIds = [1] ∧ creatureIdentity result.1 1 = Bool.true ∧
       (result.1.findById? 1).map (·.plur) = some .many := by decide
 
 theorem modernEnchantedSubjectCannotBeReadAsPlural :
     StaticSpec.check (DRS.ofList []) (.conjunction none
       [getsPt (.attachHost .enchanted (.type .creature)) (.up 1) (.up 1),
-        Templates.abilityGrant them (keyword (.named "flying"))]) = [.anaphor .bare .many 0] := by decide
+        Templates.abilityGrant them (keywordBare (.named "flying"))]) = [.anaphor .bare .many 0] := by decide
 
 /-- "This creature gets +1/+1 and has flying.": the shared subject is the Source, re-mentioned
 by a second "this creature" (`mentionThis`) and never read by "that creature", a self-referent
@@ -352,11 +352,11 @@ by a second "this creature" (`mentionThis`) and never read by "that creature", a
 theorem modernStaticSelfRemainsReadableAsThisCreature :
     let result := stepStaticSpec 32 (DRS.ofList []) (.conjunction none
       [getsPt thisCreature (.up 1) (.up 1),
-        Templates.abilityGrant thisCreature (keyword (.named "flying"))])
+        Templates.abilityGrant thisCreature (keywordBare (.named "flying"))])
     result.2 = [] ∧ result.1.resolvedIds = [0] ∧ creatureIdentity result.1 0 = Bool.true ∧
       (stepStaticSpec 32 (DRS.ofList []) (.conjunction none
         [getsPt thisCreature (.up 1) (.up 1),
-          Templates.abilityGrant (that (.type .creature)) (keyword (.named "flying"))])).2 =
+          Templates.abilityGrant (that (.type .creature)) (keywordBare (.named "flying"))])).2 =
         [.anaphor (.word (.type .creature)) .one 0] := by decide
 
 theorem modernLandHostProhibitionKeepsItsPumpedHost :
@@ -402,7 +402,7 @@ theorem modernSharedSubjectSurvivesAnEarlierExile :
     let body := Action.sequentially [Semantics.Definitions.Action.exile (target isArtifact),
       establishFor (.firstMention "audit.shared" (target isCreature))
         [getsPt (.laterMention "audit.shared" it) (.up 1) (.up 1),
-          Templates.abilityGrant (.laterMention "audit.shared" it) (keyword (.named "flying"))]
+          Templates.abilityGrant (.laterMention "audit.shared" it) (keywordBare (.named "flying"))]
         (some untilEndOfTurn)]
     let result := stepAction 32 .postEvent .obj (DRS.ofList []) body
     result.2 = [] ∧ (identityBinding "audit.shared" result.1).map (·.id) = some 2 ∧
@@ -518,7 +518,7 @@ theorem getsAndGainsStepOneSubject :
 theorem subjectRepeatedInEachPartIsSteppedEachTime :
     let repeated := establishFor (target isCreature)
       [ getsPt (target isCreature) (.up 4) (.up 4),
-        Templates.abilityGrant (target isCreature) (keyword (.named "trample")) ]
+        Templates.abilityGrant (target isCreature) (keywordBare (.named "trample")) ]
       (some untilEndOfTurn)
     sharesOneSubject repeated = Bool.false ∧ stepsSubjectOnce (DRS.ofList [], repeated) = Bool.false ∧
       (stepAction 32 .postEvent .obj (DRS.ofList []) repeated).1.referents.countP isSelected =

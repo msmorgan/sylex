@@ -6,18 +6,16 @@ namespace SylGen
 private partial def sortNamespace (sort : SortRef) : Name :=
   sort.arguments.foldl (fun ns arg => ns ++ sortNamespace arg) sort.name.toName
 
-/-- A declaration's Lean name. A word declared at more than one sort, or whose plain name a
-hand-written Lean constant already has (`taken`), goes under its sort's namespace. -/
-def declarationName (root : Name) (d : Declaration) (ds : Array Declaration)
-    (taken : Name → Bool := fun _ => false) : Name :=
+/-- A declaration's Lean name. A word declared at more than one sort goes under its sort's
+namespace. -/
+def declarationName (root : Name) (d : Declaration) (ds : Array Declaration) : Name :=
   let ns := match d.kind with
     | "primitive" | "template" => `Semantics.Templates
     | "card" => `Semantics.Cards
     | _ => `Semantics.Definitions
-  let word := Name.mkSimple (declarationWord d.name)
-  let shared := ds.any (fun other => other.name == d.name && other.sort != d.sort) ||
-    taken (root ++ ns ++ word)
-  root ++ ns ++ (if shared then sortNamespace d.sort else .anonymous) ++ word
+  let shared := ds.any (fun other => other.name == d.name && other.sort != d.sort)
+  root ++ ns ++ (if shared then sortNamespace d.sort else .anonymous) ++
+    Name.mkSimple (declarationWord d.name)
 
 private def allowedFields (kind : String) : List String :=
   ["lexical", "spelling"] ++ match kind with
@@ -47,8 +45,11 @@ def loadDeclarations (root : Name) (ds : Array Declaration) (_fallback : Registr
         throwError value.position.error s!"unknown {d.kind} field '{key}'"
     let key := (d.name, d.sort.text)
     if table.contains key then throwError d.pos.error s!"Duplicate bundle declaration {key}"
-    let env ← getEnv
-    let name := declarationName root d ds env.contains
+    let name := declarationName root d ds
+    if let some module := (← getEnv).getModuleIdxFor? name then
+      let module := (← getEnv).header.moduleNames[module.toNat]!
+      throwError d.pos.error
+        s!"{d.kind} {d.name} generates {name}, which {module} already declares"
     let identity : Option String ← match (d.fields.find? (·.1 == "identity")).map (·.2) with
       | none => pure none
       | some (Value.string _ value) =>
@@ -66,9 +67,8 @@ def loadDeclarations (root : Name) (ds : Array Declaration) (_fallback : Registr
         emittedName := parameterName p } }
     table := table.insert key sig
     if d.kind == "ability" then
-      for sort in ["KeywordLabel", "KeywordTerm"] do
-        if table.contains (d.name, sort) then
-          throwError d.pos.error s!"duplicate declaration {(d.name, sort)}"
+      if table.contains (d.name, "KeywordLabel") then
+        throwError d.pos.error s!"duplicate declaration {(d.name, "KeywordLabel")}"
       table := table.insert (d.name, "KeywordLabel")
         { constant := name ++ `label, fields := #[], result := { name := "KeywordLabel" } }
     if d.kind == "action" && !(d.fields.any (·.1 == "ofAbility")) &&

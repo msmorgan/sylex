@@ -71,7 +71,7 @@ theorem badSbaScopeKind :
 [CR#113.1a,113.1b] — and a color is neither. -/
 theorem badConferralScopeKind :
     ConferralRule.check
-      { scope := .qualityNoun .color none, confer := .ability (keyword (.named "flying")) }
+      { scope := .qualityNoun .color none, confer := .ability (keywordBare (.named "flying")) }
       = [.kindLte (.quality .color) (.join .object .player)] := by
   decide
 
@@ -723,7 +723,7 @@ def vibranium : PredefinedToken :=
       { characteristics :=
           { types := [.artifact], subtypes := [Semantics.Definitions.vibranium],
             text :=
-              [ keyword (.named "indestructible"),
+              [ keywordBare (.named "indestructible"),
                 activated .tapSymbol
                   (.addMana 1 (.runs [[.colorless]])
                     [.spendNotOn [.toCast (.and [.not isArtifact, isSpell])]]) ] } } }
