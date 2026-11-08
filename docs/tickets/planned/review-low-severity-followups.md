@@ -4,11 +4,14 @@ needs: []
 
 # Small core and engine follow-ups from a code review
 
-**Why.** A code review left a batch of low-severity defects in `crates/core` and `crates/engine`:
+## Why
+
+A code review left a batch of low-severity defects in `crates/core` and `crates/engine`:
 each is small, but each is a value that can silently do nothing, an inconsistency, or a comment
 that misleads.
 
-**Done when.**
+## Done when
+
 - `PlayerAttr::Life` and `PlayerAttr::HandSize` can no longer be the target of a `PlayerMod`:
   they are readable attributes but not continuous caps, so a
   `ModifyPlayer(You, SetTo(Life, 20))` is today a silent no-op. Split the readable attributes
@@ -27,5 +30,7 @@ that misleads.
 - The convoke test comment in `crates/engine/tests/pip_payment.rs` says correctly which pip
   Grizzly Bears' tap can cover (it matches both the generic and the green row).
 
-**Pointers.** `crates/core/src/continuous.rs` (`PlayerAttr`), `crates/engine/src/player_statics.rs`,
+## Pointers
+
+`crates/core/src/continuous.rs` (`PlayerAttr`), `crates/engine/src/player_statics.rs`,
 `crates/core/src/cost.rs`, and the files named above.

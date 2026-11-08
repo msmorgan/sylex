@@ -18,7 +18,7 @@ in `kata.toml`) makes the moves; never move a ticket by hand.
 ## Writing a ticket
 
 Front matter carries `needs: [...]`: the slugs of tickets that must reach `done/` first. Run
-`kata kanban check` after editing it. The body has up to five parts:
+`kata kanban check` after editing it. The body is a `#` title, then up to five `##` sections:
 
 - **Why**: the problem, in a few sentences.
 - **Design**: optional; one bullet per choice the ticket builds that the CR and the ADRs don't

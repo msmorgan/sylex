@@ -4,7 +4,9 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 
 # A later spell ability that acts "before" an earlier one's action
 
-**Why.** *Savage Punch*: "Target creature you control fights target creature you don't control. /
+## Why
+
+*Savage Punch*: "Target creature you control fights target creature you don't control. /
 Ferocious — The creature you control gets +2/+2 until end of turn before it fights if you control
 a creature with power 4 or greater." The second paragraph is its own spell ability [CR#113.2c],
 yet its effect happens before the first paragraph's fight: instructions are followed in the order
@@ -13,7 +15,8 @@ one spell ability place its action before an action of an earlier one. Spelling 
 one sequence with the pump first erases the ability boundary; spelling them in written order puts
 the pump after the fight, which changes the outcome.
 
-**Done when.**
+## Done when
+
 - A primitive `beforeEvent(action: Action, event: GameEvent): Action` exists, spelled
   "<action> before <event>". It is read like `holdUntil`: `action` first, then `event` in the
   state `action` leaves, where `event` is the earlier ability's action that `action` precedes.
@@ -23,9 +26,13 @@ the pump after the fight, which changes the outcome.
 - Its "the creature you control" and "it" read the first paragraph's target (spell abilities
   share targets).
 
-**Not in scope.** A later ability replacing an earlier one's action
+## Not in scope
+
+A later ability replacing an earlier one's action
 (`syl-cross-ability-self-replacement`), which needs a different design.
 
-**Pointers.** `plugins/builtin/primitives/action/holdUntil.syl`,
+## Pointers
+
+`plugins/builtin/primitives/action/holdUntil.syl`,
 `plugins/builtin/templates/action/doOnlyIf.syl`,
 `plugins/builtin/primitives/ability/{italicHead,spell}.syl`.

@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**The remaining no-op layer arms: every creature type, basic land types, and base
-loyalty/defense.**
+# The remaining no-op layer arms: every creature type, basic land types, and base loyalty/defense
 
 ## Why
 

@@ -4,7 +4,9 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 
 # "When you lose control of <object>" has no event
 
-**Why.** `.syl` names a control change only from the gaining side (`gainControlOf`, constructor
+## Why
+
+`.syl` names a control change only from the gaining side (`gainControlOf`, constructor
 `changeControl`: "gains control of … from you"). A player's losing control of a permanent is not
 the same event: control returns to the owner when a "gain control" effect ends, and other effects
 can take it. *Stolen Uniform*'s last sentence, a delayed triggered ability its resolution creates
@@ -13,13 +15,16 @@ creature you control, unattach it." Other Vintage-legal cards printing "lose con
 *Duplicity*, *Khârn the Betrayer*, *Krovikan Vampire*, *Ogre Geargrabber*, *Ray of Command*,
 *Seraph*.
 
-**Done when.**
+## Done when
+
 - Losing control is an event, either as a direction on the `changeControl` constructor or as a
   `loseControl(subject: NounPhrase)` primitive; the landing says which and why.
 - It is admitted in event and lookback patterns alongside `gainControlOf`, and refused as an
   instruction.
 - *Stolen Uniform* is in `plugins/canon/cards/` in full and passes the `.syl` checks.
 
-**Pointers.** `plugins/builtin/primitives/action/gainControlOf.syl`,
+## Pointers
+
+`plugins/builtin/primitives/action/gainControlOf.syl`,
 `plugins/builtin/definitions/keyword_action/exchangeControl.syl`, `docs/decisions/semantics.md`
 §4.6 (the event gate, pattern-only heads).

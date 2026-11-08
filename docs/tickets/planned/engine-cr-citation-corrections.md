@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**Correct rule citations and rules claims in `crates/` comments where the behavior is already
-right.**
+# Correct rule citations and rules claims in `crates/` comments where the behavior is already right
 
 ## Why
 

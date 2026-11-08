@@ -3,7 +3,9 @@ needs: []
 ---
 # Let the owner arrange cards that arrive together in a graveyard or library
 
-**Why.** When an effect or rule puts two or more cards into the same graveyard at the same time,
+## Why
+
+When an effect or rule puts two or more cards into the same graveyard at the same time,
 their owner may arrange them in any order [CR#404.3]. The engine never offers that choice. Every
 arrival is appended in commit order (`Zone::Graveyard` in the zone-change placement in
 `crates/engine/src/step/mod.rs`), so a destroy-all, a state-based-action batch, a multi-card
@@ -13,7 +15,8 @@ scry-family `Each` that repositions cards, surface an arrangement [CR#401.4]. An
 simultaneous arrival at one library position is inserted in commit order by the same placement
 code.
 
-**Done when.**
+## Done when
+
 - Two or more cards entering one graveyard in one simultaneous batch surface one arrangement
   decision to their owner (one per owner when the cards have different owners), and the
   graveyard ends in the chosen order [CR#404.3]. A single card, or a batch whose cards all go to
@@ -26,11 +29,14 @@ code.
   graveyard, a state-based-action batch, and a mill of two or more cards.
 - `cargo test -p sylex_engine` and `cargo clippy -p sylex_engine --tests -- -D warnings` pass.
 
-**Not in scope.** Melded and merged permanents [CR#712.21a,730.3a]. The engine represents
+## Not in scope
+
+Melded and merged permanents [CR#712.21a,730.3a]. The engine represents
 neither today. When they are added, a melded or merged permanent put into its owner's graveyard
 or library must reach that same arrangement decision.
 
-**Pointers.**
+## Pointers
+
 - `crates/engine/src/step/mod.rs`: the zone-change placement (`match to`, the
   `Zone::Graveyard` and `Zone::Library` arms), `apply_occurrence`, `arrange_piles` and
   `arrange_group_landing`.

@@ -4,7 +4,9 @@ needs: []
 
 # Where designation shape, uniqueness and persistence live
 
-**Why.** Every designation has a storage shape, a uniqueness and a persistence, the three axes of
+## Why
+
+Every designation has a storage shape, a uniqueness and a persistence, the three axes of
 core's `DesignationDef::Stored` (`crates/core/src/designation.rs`). `.syl` designations state only
 `scope` and, for the monarch and the initiative, `sole = true`, so a Ring-bearer's uniqueness for
 each controller, day and night excluding each other, and saddled lasting until end of turn are
@@ -66,13 +68,16 @@ Rows core's axes cannot state yet:
   ringBearer's alone.
 - `level` reads as 1 on a permanent without one [CR#716.2d]; Number has no default.
 
-**Done when.**
+## Done when
+
 - The owner has decided where each of the three values lives, and why.
 - Every designation, `protector` included, states its values in that place, matching the table
   with the rows above resolved; `sole` is folded into uniqueness if uniqueness moves to `.syl`.
 - If the values are on `.syl`, the `.syl` checks pass; if they are engine-side, the engine reads
   them from one declared place and `core-getdesignation-scopes-and-eviction` uses them.
 
-**Pointers.** `plugins/builtin/definitions/designation/`, `crates/core/src/designation.rs`,
+## Pointers
+
+`plugins/builtin/definitions/designation/`, `crates/core/src/designation.rs`,
 `core-getdesignation-scopes-and-eviction`, `core-designation-card-scope`, the mtg-rules
 `designations` map.

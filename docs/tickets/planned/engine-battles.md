@@ -1,7 +1,7 @@
 ---
 needs: [engine-counters-api, engine-transform, engine-dfc-cast-faces, engine-loyalty-defense-zone-reads]
 ---
-**Battles play in the engine: defense, the protector, attacking a battle, and a Siege's defeat.**
+# Battles play in the engine: defense, the protector, attacking a battle, and a Siege's defeat
 
 ## Why
 

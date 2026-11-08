@@ -1,9 +1,7 @@
 ---
 needs: []
 ---
-**Engine: four cost and search rules the engine gets wrong: unmatched colored cost reductions,
-gain-life costs under "can't gain life", the [CR#601.2h] payment tiers, and the stated-quality
-search floor in public zones.**
+# Engine: four cost and search rules the engine gets wrong: unmatched colored cost reductions, gain-life costs under "can't gain life", the [CR#601.2h] payment tiers, and the stated-quality search floor in public zones
 
 ## Why
 

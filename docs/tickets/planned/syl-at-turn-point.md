@@ -4,7 +4,9 @@ needs: [plugins-v3-data-language, lean-retirement]
 
 # `at` takes a turn point; `when` and `whenever` take an event
 
-**Why.** `plugins/builtin/templates/ability/{at,when,whenever}.syl` have the same signature and
+## Why
+
+`plugins/builtin/templates/ability/{at,when,whenever}.syl` have the same signature and
 body: each takes `event: GameEvent` and expands to the one `triggered` primitive, so `at(does(it,
 enter), …)` resolves though no card is printed that way. The three words all open a triggered
 ability [CR#603.1], but they name different things. "When" and "whenever" take an event; the CR
@@ -14,7 +16,8 @@ in the turn: "at the beginning of" a phase or step triggers when it begins [CR#6
 current `at` call is a `beginningOf…` event, one wrapped in `nthOccurrence` (*Paradox Haze*,
 "first upkeep each turn").
 
-**Done when.**
+## Done when
+
 - A turn-point sort covers the beginning of a phase or step with its possessor (your, each, a
   possessed player's), end of combat, and the "next" and nth-occurrence forms that delayed
   triggers and *Paradox Haze* need.
@@ -29,6 +32,8 @@ current `at` call is a `beginningOf…` event, one wrapped in `nthOccurrence` (*
 - Negative tests pin that `at(does(it, enter), …)` and `whenever(beginningOfYour(upkeep), …)` are
   refused, and the rest of the corpus still passes the `.syl` checks.
 
-**Pointers.** `plugins/builtin/templates/ability/{at,when,whenever}.syl`,
+## Pointers
+
+`plugins/builtin/templates/ability/{at,when,whenever}.syl`,
 `plugins/builtin/templates/event/beginningOfNext.syl`, `plugins/builtin/templates/action/atNext.syl`,
 `docs/decisions/semantics.md` §4.6.

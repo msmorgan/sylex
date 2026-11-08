@@ -4,11 +4,14 @@ needs: []
 
 # Split `trigger.rs` into a `trigger/` module
 
-**Why.** `crates/engine/src/trigger.rs` is 6.7k lines, the largest engine file: about 1,620 lines
+## Why
+
+`crates/engine/src/trigger.rs` is 6.7k lines, the largest engine file: about 1,620 lines
 of `impl GameState` trigger code and 5,100 of embedded tests. Code and tests cover several
 distinct subsystems in one file.
 
-**Done when.**
+## Done when
+
 - `trigger.rs` is a `trigger/` directory module. Its code is cut along method-cluster seams, each
   submodule with its own `impl GameState` block (no traits, no forwarding shims); paths used from
   outside as `crate::trigger::…` still resolve, through `pub(crate) use` re-exports where needed.
@@ -20,7 +23,9 @@ distinct subsystems in one file.
   the sorted multiset of comment lines matches, so no authored comment is dropped.
 - `cargo +nightly fmt --check` passes.
 
-**Pointers.** `crates/engine/src/trigger.rs`, `crates/engine/tests/`. Known pitfalls from moving
+## Pointers
+
+`crates/engine/src/trigger.rs`, `crates/engine/tests/`. Known pitfalls from moving
 tests out of a large `mod tests`: the module had `use` lines interleaved between test functions,
 so collect every module-level `use` first and treat them as the header of each destination;
 section-banner comments between test clusters are easy to orphan; and

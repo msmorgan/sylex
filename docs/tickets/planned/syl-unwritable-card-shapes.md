@@ -4,7 +4,9 @@ needs: [lean-v3-proofs-and-cards]
 
 # Four card shapes `.syl` cannot yet write
 
-**Why.** Four Vintage-legal card shapes have no faithful `.syl` reading, each waiting on a
+## Why
+
+Four Vintage-legal card shapes have no faithful `.syl` reading, each waiting on a
 decision:
 
 - *Alaundo the Seer*: the ability it grants ("It gains 'When the last time counter is removed
@@ -19,17 +21,22 @@ decision:
   nothing checks that the same card carries the exiling ability. Whether that is a law on `Card`
   (a check over the card's abilities) or an unchecked convention is undecided.
 
-**Done when.**
+## Done when
+
 - The owner has decided the granted-ability scope and where the linked-exile law lives.
 - *Alaundo the Seer*, *Tahngarth, First Mate* and one "all cards with the same name" card are in
   `plugins/canon/cards/` with their printed text in full and pass the `.syl` checks, or each
   refusal names the rule that forbids it.
 - The linked-exile law is checked, or `docs/decisions/semantics.md` §4.8 says it is a convention.
 
-**Not in scope.** *Vedalken Squirrel-Whacker*'s "base power or base toughness" exchange: it is an
+## Not in scope
+
+*Vedalken Squirrel-Whacker*'s "base power or base toughness" exchange: it is an
 Un-set card, which is deferred.
 
-**Pointers.** `plugins/builtin/primitives/zone/exiledWith.syl`,
+## Pointers
+
+`plugins/builtin/primitives/zone/exiledWith.syl`,
 `plugins/builtin/templates/noun/withTheSameName.syl`,
 `plugins/builtin/templates/determiner/allOf.syl`, `docs/decisions/semantics.md` §2.3, §2.4 and
 §4.8.

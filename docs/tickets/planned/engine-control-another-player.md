@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**"You control target player during that player's next turn" (Mindslaver, Worst Fears, Sorin
-Markov).**
+# "You control target player during that player's next turn" (Mindslaver, Worst Fears, Sorin Markov)
 
 ## Why
 

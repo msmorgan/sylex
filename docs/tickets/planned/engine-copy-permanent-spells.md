@@ -1,8 +1,7 @@
 ---
 needs: [engine-copy-spells]
 ---
-**Engine: a resolving copy of a permanent spell becomes a token permanent, and "cast a copy"
-runs.**
+# Engine: a resolving copy of a permanent spell becomes a token permanent, and "cast a copy" runs
 
 ## Why
 

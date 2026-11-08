@@ -1,7 +1,7 @@
 ---
 needs: [engine-transform, engine-trigger-text-survives-transform, engine-transform-current-face-name-loyalty]
 ---
-**Engine: day/night, and daybound/nightbound.**
+# Engine: day/night, and daybound/nightbound
 
 ## Why
 

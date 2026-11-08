@@ -1,7 +1,7 @@
 ---
 needs: [core-copy-grammar, engine-face-down]
 ---
-**Layer 1 (copy and face-down) and layer 3 (text-changing) apply in the layer pass.**
+# Layer 1 (copy and face-down) and layer 3 (text-changing) apply in the layer pass
 
 ## Why
 

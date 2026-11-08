@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**Copying an activated ability whose source has left the battlefield makes no
-copy.**
+# Copying an activated ability whose source has left the battlefield makes no copy
 
 ## Why
 

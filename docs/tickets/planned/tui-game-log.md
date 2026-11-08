@@ -4,11 +4,14 @@ needs: [tui-polish]
 
 # A game-log pane in the TUI
 
-**Why.** The hotseat client shows the board and the pending decision, but not what has happened:
+## Why
+
+The hotseat client shows the board and the pending decision, but not what has happened:
 triggers, combat damage, deaths, draws and life changes that resolve between a player's decisions
 pass unseen. A scrolling log of the game's events lets a player follow the sequence.
 
-**Done when.**
+## Done when
+
 - The owner has chosen the log's source:
   - **the engine's history**: render `GameState.history`, the engine's append-only `GameEvent`
     log. This needs a public read accessor on `History` (`entries` is `pub(crate)`) and curation of
@@ -21,5 +24,7 @@ pass unseen. A scrolling log of the game's events lets a player follow the seque
   entries, newest at the bottom, and scrolls.
 - Each logged entry is a human-readable line, with tests over the formatting.
 
-**Pointers.** `crates/engine/src/history.rs`, `crates/engine/src/event.rs` (`GameEvent`),
+## Pointers
+
+`crates/engine/src/history.rs`, `crates/engine/src/event.rs` (`GameEvent`),
 `crates/tui/src/ui/`, `crates/tui/src/ui/format.rs`.

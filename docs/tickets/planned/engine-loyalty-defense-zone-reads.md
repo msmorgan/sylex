@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**`Stat::Loyalty` and `Stat::Defense` read counters on the battlefield and the printed number
-elsewhere.**
+# `Stat::Loyalty` and `Stat::Defense` read counters on the battlefield and the printed number elsewhere
 
 ## Why
 

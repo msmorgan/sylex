@@ -1,7 +1,7 @@
 ---
 needs: []
 ---
-**Block legality is proven for every evasion keyword, not only flying and menace.**
+# Block legality is proven for every evasion keyword, not only flying and menace
 
 ## Why
 

@@ -4,7 +4,9 @@ needs: [lean-v3-monstrosity-adapt-name-the-source, lean-retirement]
 
 # Events for the verbs keyword abilities define
 
-**Why.** Several keyword abilities define a verb for one of their own steps, used only to say what
+## Why
+
+Several keyword abilities define a verb for one of their own steps, used only to say what
 happened: a creature "evolves" [CR#702.100b], "trains" [CR#702.149c], "exploits a creature"
 [CR#702.110b], "mentors" another [CR#702.134c], "devoured" [CR#702.82b], is "championed"
 [CR#702.72c], "enlists" another [CR#702.154c]. Only devour's is modeled, as a separate
@@ -13,7 +15,8 @@ verb and no Deed, so "whenever this creature evolves" cannot be written. *Bioman
 also uses "<creature> adapts", which the CR never defines: [CR#701.46a] defines only the
 instruction "adapt N".
 
-**Done when.**
+## Done when
+
 - Each keyword ability's own declaration in `definitions/keyword_ability/` states the step its verb
   names, and nothing else in `.syl` uses `ofAbility`; `keyword_action/devour.syl` is gone and its
   readers ("creatures it devoured", "each creature sacrificed this way") still resolve.
@@ -34,9 +37,13 @@ instruction "adapt N".
   (mentors), *Mistbind Clique* (championed), *Guardian of New Benalia* (enlists), and a card with
   "When this creature exploits a creature".
 
-**Not in scope.** *Biomancer's Familiar*'s "as though it had no +1/+1 counters"
+## Not in scope
+
+*Biomancer's Familiar*'s "as though it had no +1/+1 counters"
 (`syl-single-use-as-though`).
 
-**Pointers.** `plugins/builtin/definitions/keyword_ability/{evolve,training,exploit,mentor,devour,champion,enlist}.syl`,
+## Pointers
+
+`plugins/builtin/definitions/keyword_ability/{evolve,training,exploit,mentor,devour,champion,enlist}.syl`,
 `plugins/builtin/definitions/keyword_action/{devour,adapt}.syl`, `docs/decisions/semantics.md`
 §3 and §3.1 (Deeds of keyword actions and abilities).

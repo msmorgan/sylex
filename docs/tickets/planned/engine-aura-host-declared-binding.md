@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**A resolving Aura spell's host is read positionally from target slot 0, not from the target its
-enchant ability declares.**
+# A resolving Aura spell's host is read positionally from target slot 0, not from the target its enchant ability declares
 
 ## Why
 

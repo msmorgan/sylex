@@ -4,7 +4,9 @@ needs: [lean-retirement]
 
 # Sacrifice is limited to what its performer controls
 
-**Why.** `keyword_action/sacrifice.syl` moves its subject from `zone(battlefield, none)`, any
+## Why
+
+`keyword_action/sacrifice.syl` moves its subject from `zone(battlefield, none)`, any
 permanent on the battlefield. The rule limits it to the performer's own: "A player can't sacrifice
 something that isn't a permanent, or something that's a permanent they don't control"
 [CR#701.21a]. As written, "each opponent sacrifices a creature" can be satisfied with your
@@ -14,7 +16,8 @@ once. A partitive over the subject is refused for a singular one (a Saga's
 `sacrifice(thisSaga)`), and `doIf(is(subject, actorControls), move(subject, …))` mentions the
 subject twice.
 
-**Done when.**
+## Done when
+
 - A primitive restricts a noun phrase, singular or plural, by a predicate with one mention of the
   noun phrase.
 - `sacrifice`'s body uses it to restrict its subject to permanents the performer controls, so no
@@ -29,10 +32,14 @@ subject twice.
   assert the refusal, or retired.
 - Everything passes the `.syl` checks.
 
-**Not in scope.** `destroy`, which rightly reaches any permanent. The destination stays the bare
+## Not in scope
+
+`destroy`, which rightly reaches any permanent. The destination stays the bare
 `graveyard`, which is consistent with "its owner's graveyard" [CR#701.21a]. The destination
 template's spelling ("your graveyard" for an owner's-graveyard body) is the `.syl` zone-words
 fix, not this ticket.
 
-**Pointers.** `plugins/builtin/definitions/keyword_action/{sacrifice,forage,destroy}.syl`,
+## Pointers
+
+`plugins/builtin/definitions/keyword_action/{sacrifice,forage,destroy}.syl`,
 `plugins/builtin/templates/action/controllerSacrifices.syl`, `docs/decisions/semantics.md` §2.3.

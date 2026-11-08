@@ -1,7 +1,7 @@
 ---
 needs: [engine-transform]
 ---
-**Engine: cast or play a chosen face of a double-faced card.**
+# Engine: cast or play a chosen face of a double-faced card
 
 ## Why
 

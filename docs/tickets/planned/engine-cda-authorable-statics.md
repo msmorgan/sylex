@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**Core carries the characteristic-defining mark on a static ability, and the engine applies such
-abilities first in their layer.**
+# Core carries the characteristic-defining mark on a static ability, and the engine applies such abilities first in their layer
 
 ## Why
 

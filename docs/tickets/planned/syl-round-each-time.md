@@ -4,7 +4,9 @@ needs: [syl-spelling-conventions, lean-retirement]
 
 # "Round up each time." as a construct in its own position
 
-**Why.** Six Vintage-legal cards end a sentence of fractions with "Round up each time." or "Round
+## Why
+
+Six Vintage-legal cards end a sentence of fractions with "Round up each time." or "Round
 down each time.": *Peer into the Abyss*, *Fraying Omnipotence*, *Pox*, *Hydroid Krasis*, *Pox
 Plague* and *Saw in Half*. `Saw in Half.syl` writes `half(up, …)` on each fraction, so spelling
 cannot give back the shared sentence, and the only way out would be single-purpose Templates
@@ -12,7 +14,8 @@ like `basePtHalfRoundedUpOf`. The inline ", rounded up/down" is a different cons
 stays on its own fraction: *Banshee* and *Aspect of Wolf* round two fractions of one sentence in
 different directions.
 
-**Done when.**
+## Done when
+
 - An unrounded fraction amount exists for half and for a third (*Pox*), spelled "half <amount>"
   and "a third of <amount>".
 - `roundEachTime(mode, action)` wraps the sentence it covers and is spelled as that sentence
@@ -28,5 +31,7 @@ different directions.
 - `half` (rounded) is unchanged and *Banshee*-style sentences still use it.
 - The `roundEachTime` declaration's doc comment records the construct.
 
-**Pointers.** `plugins/builtin/primitives/quantity/half.syl`,
+## Pointers
+
+`plugins/builtin/primitives/quantity/half.syl`,
 `plugins/canon/cards/Saw in Half.syl`.

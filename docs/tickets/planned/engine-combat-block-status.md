@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**"Unblocked" is a status a creature gets at the declare blockers step, and block triggers fire
-per [CR#509.3a..509.3d].**
+# "Unblocked" is a status a creature gets at the declare blockers step, and block triggers fire per [CR#509.3a..509.3d]
 
 ## Why
 

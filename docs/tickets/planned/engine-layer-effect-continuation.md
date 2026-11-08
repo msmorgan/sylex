@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**A continuous effect that has started applying keeps applying in later layers even if its
-source ability is removed during the layer pass, and the layer fixpoint cannot oscillate.**
+# A continuous effect that has started applying keeps applying in later layers even if its source ability is removed during the layer pass, and the layer fixpoint cannot oscillate
 
 ## Why
 

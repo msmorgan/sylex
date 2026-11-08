@@ -4,11 +4,14 @@ needs: [syl-parameter-sigil, lean-retirement]
 
 # Settle the `spelling` conventions and apply them to the corpus
 
-**Why.** `spelling` strings are to be parsed through the English grammar with typed holes, but
+## Why
+
+`spelling` strings are to be parsed through the English grammar with typed holes, but
 today they inflect verbs inconsistently, and 151 `TODO(spelling)` markers stand where a spelling
 is missing, many carrying generated text instead of a reason.
 
-**Design.**
+## Design
+
 - A verb is written uninflected wherever its agreement depends on a hole or on the performer;
   agreement is solved when the clause is rendered. Three cases:
   - The performer is outside the declaration (`theActor`): the spelling is the bare verb phrase.
@@ -25,7 +28,8 @@ is missing, many carrying generated text instead of a reason.
   if none does. A wording difference with the same meaning lives in which Template a card calls,
   never in the AST.
 
-**Done when.**
+## Done when
+
 - `docs/decisions/syl.md` §2 states the conventions, and the glossary has an entry for a
   spelling's holes.
 - In separate corpus commits: every spelling follows the three inflection cases, and every
@@ -36,8 +40,12 @@ is missing, many carrying generated text instead of a reason.
 - The corpus means the same before and after the rewrite, since spelling carries no meaning, and
   passes the `.syl` checks.
 
-**Not in scope.** How a spelling expresses optional and repeated segments (a list hole, a
+## Not in scope
+
+How a spelling expresses optional and repeated segments (a list hole, a
 defaulted or `Option` parameter), which is open. The spelling crate itself.
 
-**Pointers.** `docs/decisions/syl.md` §2,
+## Pointers
+
+`docs/decisions/syl.md` §2,
 `docs/decisions/lexicon.md` §1, `crates/syl/`.

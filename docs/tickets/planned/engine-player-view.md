@@ -4,12 +4,15 @@ needs: [engine-face-down, engine-look-grants-lifecycle]
 
 # A per-player redacted view of the game
 
-**Why.** The engine is full-information, and its consumers (the demo strategies, the TUI) read
+## Why
+
+The engine is full-information, and its consumers (the demo strategies, the TUI) read
 hidden zones and printed faces straight from `GameState`, so an AI can cheat and a client could
 leak hidden cards. A per-player view that redacts what the viewer may not see makes hidden
 information real without changing the engine's model.
 
-**Design.**
+## Design
+
 - `PlayerView` is a borrowed, stateless read facade over `GameState` in the engine crate, beside
   the layer view; nothing is copied.
 - Visibility is decided by zone, not by whether the viewer owns or controls the object: off the
@@ -19,7 +22,8 @@ information real without changing the engine's model.
 - A read of what the viewer can't see collapses to a count: an opponent's hand is a count, and
   library order is unknown beyond any granted top cards.
 
-**Done when.**
+## Done when
+
 - `PlayerView` exists in `sylex_engine`, with `can_see` and `face` accessors.
 - `can_see` follows the zone rules: every object in a public zone is visible [CR#400.2], subject to
   `face`; a hand is visible to its player [CR#402.3], except a card drawn face down while a spell
@@ -35,8 +39,12 @@ information real without changing the engine's model.
   opponent exiled face down; a face-down permanent seen by its controller, an opponent and a
   grantee; the owner of a face-down permanent an opponent controls can't see its face.
 
-**Not in scope.** Changes to core, the RNG or zone storage. If a consumer needs non-cheating play
+## Not in scope
+
+Changes to core, the RNG or zone storage. If a consumer needs non-cheating play
 before `engine-face-down` lands, the zone half (`can_see`) may be built ahead of `face`.
 
-**Pointers.** `crates/engine/src/state.rs` (`look_grants`), `crates/engine/src/strategy.rs`,
+## Pointers
+
+`crates/engine/src/state.rs` (`look_grants`), `crates/engine/src/strategy.rs`,
 `crates/tui/src/`.

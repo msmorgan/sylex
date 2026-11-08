@@ -1,8 +1,7 @@
 ---
 needs: [engine-planeswalkers]
 ---
-**Compleated: a planeswalker cast with life paid for Phyrexian symbols enters with two fewer
-loyalty counters per symbol.**
+# Compleated: a planeswalker cast with life paid for Phyrexian symbols enters with two fewer loyalty counters per symbol
 
 ## Why
 

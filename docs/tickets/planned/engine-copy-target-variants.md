@@ -1,8 +1,7 @@
 ---
 needs: [engine-copy-spells]
 ---
-**Engine: copies that retarget (choose new targets, a specified new target, one copy per thing
-the spell could target).**
+# Engine: copies that retarget (choose new targets, a specified new target, one copy per thing the spell could target)
 
 ## Why
 

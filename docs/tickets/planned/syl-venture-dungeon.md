@@ -4,11 +4,14 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 
 # Venture into the dungeon, dungeon cards and the initiative's venture triggers
 
-**Why.** 38 Vintage-legal cards venture into the dungeon, and the initiative has two inherent
+## Why
+
+38 Vintage-legal cards venture into the dungeon, and the initiative has two inherent
 triggers that venture into Undercity [CR#726.2]. `.syl` has no venture action and no dungeon card,
 so `designation/initiative.syl` carries only its third ability.
 
-**Done when.**
+## Done when
+
 - A dungeon card is a card frame of its own: rooms, each a room ability, joined by arrows
   [CR#309.4,309.4c]. `Card` has it beside the other frames, with the checks the frame needs.
 - Each room ability's trigger is "When you move your venture marker into this room" [CR#309.4c].
@@ -25,8 +28,12 @@ so `designation/initiative.syl` carries only its third ability.
   missing two is gone.
 - Everything passes the `.syl` checks, with at least one venturing card in canon.
 
-**Not in scope.** The engine's dungeon state (`engine-dungeons`).
+## Not in scope
 
-**Pointers.** `plugins/builtin/definitions/designation/initiative.syl`,
+The engine's dungeon state (`engine-dungeons`).
+
+## Pointers
+
+`plugins/builtin/definitions/designation/initiative.syl`,
 `plugins/builtin/templates/predicate/outsideTheGame.syl`, `docs/decisions/semantics.md` §1 items 4
 and 5.

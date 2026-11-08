@@ -4,14 +4,17 @@ needs: [lean-retirement]
 
 # Predefined tokens are `token` Definitions
 
-**Why.** The rules define each predefined token's characteristics [CR#111.10], so each is a
+## Why
+
+The rules define each predefined token's characteristics [CR#111.10], so each is a
 Definition, not a Template. The `.syl` `token` declaration kind exists (sort `PredefinedToken`)
 but nothing declares one, and `plugins/builtin/definitions/token/` does not exist. Clue, Food and
 Treasure are written as `template … : CharacteristicBundle` under `templates/noun/`, and core
 keeps a second hand-synchronized copy of every predefined token's characteristics
 (`PredefinedToken` in `crates/core/src/token.rs`).
 
-**Done when.**
+## Done when
+
 - Each predefined token [CR#111.10a..111.10x] is a `token` declaration under
   `plugins/builtin/definitions/token/`. The declaration's name is the key an effect writes ("create
   a Clue token"), not its subtype: Role tokens are told apart by name, and a Walker is a Zombie
@@ -27,8 +30,12 @@ keeps a second hand-synchronized copy of every predefined token's characteristic
   token, is a `token` Definition too, and the glossary names the term that covers both.
 - Everything passes the `.syl` checks.
 
-**Not in scope.** Removing core's `PredefinedToken`, once the engine's input comes from `.syl`.
+## Not in scope
 
-**Pointers.** `plugins/builtin/templates/noun/{clueToken,foodToken,treasureToken}.syl`,
+Removing core's `PredefinedToken`, once the engine's input comes from `.syl`.
+
+## Pointers
+
+`plugins/builtin/templates/noun/{clueToken,foodToken,treasureToken}.syl`,
 `plugins/builtin/definitions/keyword_action/{investigate,empowerJace}.syl`, `crates/core/src/token.rs`,
 `crates/xtask/src/dsl.rs` (`kind_sort`).

@@ -1,7 +1,7 @@
 ---
 needs: [engine-payment-obligation-window]
 ---
-**Payment frames fork the game image cheaply instead of cloning it whole.**
+# Payment frames fork the game image cheaply instead of cloning it whole
 
 ## Why
 

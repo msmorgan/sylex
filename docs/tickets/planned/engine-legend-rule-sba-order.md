@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**The legend rule is surfaced before, and apart from, the other state-based
-actions.**
+# The legend rule is surfaced before, and apart from, the other state-based actions
 
 ## Why
 

@@ -4,7 +4,9 @@ needs: [lean-retirement]
 
 # A shared frame over modal fillers, read forward
 
-**Why.** Four Vintage-legal cards (*Call Damage Control*, *Wild Shape*, *Outlaws' Merriment*,
+## Why
+
+Four Vintage-legal cards (*Call Damage Control*, *Wild Shape*, *Outlaws' Merriment*,
 *Genku, Future Shaper*) print one frame sentence over Modes that are not clauses, and the frame's
 demonstratives refer forward to the chosen Mode. The canon encodings of *Call Damage Control* and
 *Wild Shape* copy the frame into every Mode, which for *Call Damage Control* turns one return
@@ -12,7 +14,8 @@ into two, performed in order [CR#608.2c], so a "whenever one or more cards leave
 trigger fires twice instead of once. A heuristic corpus scan found no other Vintage-legal card of
 this shape.
 
-**Design.**
+## Design
+
 - One construct, `chooseModesOver`, has a choice (a quantity plus mode-choice modifiers), a frame
   (an Action expression) and fillers.
 - A reserved word stands at the filler's site in the frame, the way `theActor` stands for the
@@ -28,7 +31,8 @@ this shape.
 - Open question: the frame may be written with any Template whose argument is the reserved word
   only while Templates stay transparent, expanding before reference resolution.
 
-**Done when.**
+## Done when
+
 - `chooseModesOver`, its reserved filler word and the "at random" mode-choice modifier exist, with
   frame Templates spelled by the `.syl` spelling conventions.
 - *Call Damage Control* and *Wild Shape* are re-encoded with it; *Outlaws' Merriment* and *Genku,
@@ -40,6 +44,8 @@ this shape.
   [CR#601.2b,601.2c], and an unchosen Mode's targets are never chosen [CR#700.2c].
 - The construct's doc comment records it.
 
-**Pointers.** `plugins/canon/cards/{Call Damage Control,Wild Shape}.syl`,
+## Pointers
+
+`plugins/canon/cards/{Call Damage Control,Wild Shape}.syl`,
 `plugins/builtin/primitives/action/actionChooseModes.syl`,
 `plugins/builtin/primitives/static/notChosenBefore.syl`, `docs/decisions/semantics.md` §1 item 2.

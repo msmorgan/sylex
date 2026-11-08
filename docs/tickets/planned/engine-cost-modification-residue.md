@@ -1,7 +1,7 @@
 ---
 needs: []
 ---
-**Engine: fold non-mana components and non-simple symbols in cost increases and reductions.**
+# Engine: fold non-mana components and non-simple symbols in cost increases and reductions
 
 ## Why
 

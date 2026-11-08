@@ -4,14 +4,17 @@ needs: []
 
 # `.syl` names AST constructors only in primitives, capitalized
 
-**Why.** A primitive either takes its constructor's Lean name (`primitive activated(…): Ability` is
+## Why
+
+A primitive either takes its constructor's Lean name (`primitive activated(…): Ability` is
 `Ability.activated`) or names it with a leading dot (`primitive abilities(keyword: KeywordTerm):
 AbilityLost = .term`), and a bare word anywhere may resolve straight to a constructor or enum word
 of the expected sort (`docs/decisions/syl.md` §3, step 4: `stat(power)` reaches `Stat.power` with
 no declaration). So the AST's constructor names live in Lean, cards and Templates use them, and an
 identifier cannot be traced to what it builds. Implicit conversions hide the same thing.
 
-**Design.**
+## Design
+
 - Every primitive names its constructor, capitalized, after its signature, letter for letter the
   Rust AST's variant name: `primitive activated(cost: Cost, action: Action, …): Ability =
   Activated { spelling = … }`. The name is required even when it only capitalizes the
@@ -40,7 +43,8 @@ identifier cannot be traced to what it builds. Implicit conversions hide the sam
 - `Option` stays implicit: a value at an `Option(T)` position is a `T`, `some` is never written,
   and an omitted argument or field takes its declared default.
 
-**Done when.**
+## Done when
+
 - `.syl` follows the Design: every primitive names its capitalized constructor, capitalized
   identifiers appear nowhere else outside `lexical` and `spelling`, every constructor and enum
   word has a primitive, and the only implicit wrap left is `Option`.
@@ -56,7 +60,11 @@ identifier cannot be traced to what it builds. Implicit conversions hide the sam
   names no declaration, and two primitives for one constructor are each refused, with a negative
   test apiece.
 
-**Not in scope.** Declared implicit wraps (`syl-implicit-coercions`).
+## Not in scope
 
-**Pointers.** `docs/decisions/syl.md` §1 to §3,
+Declared implicit wraps (`syl-implicit-coercions`).
+
+## Pointers
+
+`docs/decisions/syl.md` §1 to §3,
 `crates/syl/`, `lean/SylGen/`, `crates/xtask/src/dsl.rs`.

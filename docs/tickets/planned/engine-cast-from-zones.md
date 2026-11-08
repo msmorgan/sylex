@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**Permissions to cast or play from a zone other than the hand, and the miracle and forecast
-windows.**
+# Permissions to cast or play from a zone other than the hand, and the miracle and forecast windows
 
 ## Why
 

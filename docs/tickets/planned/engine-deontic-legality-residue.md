@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**Engine: evaluate the deontic rows the legality checks still refuse, and guard every row they
-ignore.**
+# Engine: evaluate the deontic rows the legality checks still refuse, and guard every row they ignore
 
 ## Why
 

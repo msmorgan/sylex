@@ -1,8 +1,7 @@
 ---
 needs: [core-copy-grammar, engine-layers-1-copy-facedown-text]
 ---
-**A copy exception drops the copied object's characteristic-defining ability for every
-characteristic it provides or retains, as part of deriving the copiable values.**
+# A copy exception drops the copied object's characteristic-defining ability for every characteristic it provides or retains, as part of deriving the copiable values
 
 ## Why
 

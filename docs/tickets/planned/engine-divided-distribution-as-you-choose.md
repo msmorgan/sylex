@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**Engine: the caster announces a division of damage or counters, with at least one for each
-target.**
+# Engine: the caster announces a division of damage or counters, with at least one for each target
 
 ## Why
 

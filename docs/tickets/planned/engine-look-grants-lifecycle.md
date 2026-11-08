@@ -1,8 +1,7 @@
 ---
 needs: []
 ---
-**Look grants end when the looked-at cards are shuffled or reordered, reveals last only as long
-as their effect needs, and the face-down exile look right is its own ledger.**
+# Look grants end when the looked-at cards are shuffled or reordered, reveals last only as long as their effect needs, and the face-down exile look right is its own ledger
 
 ## Why
 
