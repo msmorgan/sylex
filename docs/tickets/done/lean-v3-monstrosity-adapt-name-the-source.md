@@ -29,9 +29,9 @@ Handoff. Both rules are stated over "this permanent" and say nothing about who p
   prints.
 - Retire `biomancersFamiliarWatchesTheCreatureThatAdapts` (`Proofs/CardsCounters.lean`): it tests
   whether one card's pattern catches the events another causes, which is event matching, not
-  meaning. "Target creature adapts" moves to `lean-v3-keyword-verb-events`.
+  meaning. "Target creature adapts" moves to `syl-keyword-verb-events`.
 - `badPlayersCantExploreOrAdapt` keeps its explore half; its adapt half moves to
-  `lean-v3-keyword-verb-events`, where the event's subject kind is declared.
+  `syl-keyword-verb-events`, where the event's subject kind is declared.
 - `Tables.permanentPerformedActions` drops its `aboutAPermanent` conjunct and lists adapt and
   monstrosity among the deeds no permanent performs.
 - Keep `bareAdaptIsTheControllers` and `docSamsonWatchesAdaptsCounters`.
@@ -51,6 +51,6 @@ Handoff. Both rules are stated over "this permanent" and say nothing about who p
 - Lean's current plumbing is no authority on the representation, and nothing here may be a
   per-definition special case in `.lean`.
 - "<X> adapts" is not an inflection of the keyword action. It is an event defined as evolve's is
-  [CR#702.100b], in `lean-v3-keyword-verb-events`.
+  [CR#702.100b], in `syl-keyword-verb-events`.
 - An earlier attempt is archived at `archive-monstrosity-actorless`; only its `monstrosity.syl`
   body carries over.

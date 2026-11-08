@@ -453,7 +453,7 @@ needs: [lean-v3-authoring-impl-10-definitions-and-cards-polish]
   performer, and each body step's, is the controller (`causedPerformer`) [CR#701.46a,608.2c].
   Monstrosity took the same fix, since it was the same edit. Pin added:
   `Counters.biomancersFamiliarWatchesTheCreatureThatAdapts` (the card itself is unspelled until
-  `lean-v3-single-use-as-though` gives an as-though statement its single use);
+  `syl-single-use-as-though` gives an as-though statement its single use);
   `Actor.okAdaptHandedToAPermanent` restored, asserting that the counters and the stamp go on the
   target and that the controller performs. Rewritten back to refusals: `adaptHandedToAPlayerReadsTheSource`
   → `badAdaptHandedToOpponent`, `monstrosityHandedToAPlayerReadsTheSource` →

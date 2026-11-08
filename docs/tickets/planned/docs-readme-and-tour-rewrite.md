@@ -23,7 +23,8 @@ dead ends. They need rewriting together, then checking the way a stranger would 
   gaps that have closed are gone.
 - `kata kanban check`, the citation gates and the noncanon fixed-seed suite pass.
 
-**Not in scope.** `comment-discipline-sweep`, `post-reshape-comment-rot`, and helper extraction.
+**Not in scope.** `comment-discipline-sweep`, `core-player-action-merge-leftovers`, and helper
+extraction.
 
 **Pointers.** `README.md`, `docs/guided_tour.md`, `docs/decisions/architecture.md`,
 `.github/workflows/ci.yml`, `readme-oracle-text-primer`.

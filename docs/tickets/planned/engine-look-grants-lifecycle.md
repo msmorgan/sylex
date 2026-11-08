@@ -13,7 +13,7 @@ position [CR#701.24a]. Scry, surveil and fateseal put cards back with `repositio
 keeps the id and so the grant, though reordered cards become new objects [CR#701.20d,701.20e].
 `GameEvent::Revealed` grants every viewer a permanent entry, so a card revealed from hand for a
 cost stays visible to opponents while it stays in hand [CR#701.20a]. Nothing reads `look_grants`
-as a permission yet except tests, but `runner-player-view` is built on it.
+as a permission yet except tests, but `engine-player-view` is built on it.
 
 ## Design
 

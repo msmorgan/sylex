@@ -22,6 +22,6 @@ question: why would card text be uniform enough to compile at all?
 - The GitHub repository's About blurb carries the same framing in one line.
 
 **Not in scope.** Restructuring the Design section; the rest of the README rewrite
-(`portfolio-polish`).
+(`docs-readme-and-tour-rewrite`).
 
 **Pointers.** `README.md`, `docs/oracle-style-guide.md`.

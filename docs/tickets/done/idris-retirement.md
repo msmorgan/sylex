@@ -6,7 +6,7 @@ needs: [ci-lean-gate, lean-card-soundness-gate, idris-retire-cards-idr, entailme
 (`idris_emit.rs`, `cargo xtask idris-check`, the per-plugin baselines, the CI `idris` job) goes in
 this landing too, without a successor: it checks the v1 plugins, which are deletion-bound, and
 `semantics-v3-parity` is the v3 cross-check. This moves the gate's retirement forward from
-`semantics-v1-cutover` (ruling of 2026-09-06). Decision (2026-09-05): the Lean 4 workbench
+`v1-retirement` (ruling of 2026-09-06). Decision (2026-09-05): the Lean 4 workbench
 under `lean/` is the successor of the Idris 2 workbench under `idris/`; the
 Idris tree is a reference only, reread when a Lean port needs its evidence,
 and is deleted once nothing else depends on it. This ticket is the

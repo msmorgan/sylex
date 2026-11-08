@@ -574,7 +574,7 @@ each with the rule that holds its meaning:
 | `firstStrike`, `doubleStrike`, `trample`, `banding`, `bandsWithOther` | The combat damage turn-based actions, assigning and dealing combat damage [CR#703.4k,703.4m,510.4,702.19b,702.22c]: rows not yet written (`lean-v3-combat-damage-rule-rows`). |
 | `deathtouch` | The state-based action that destroys a creature dealt damage by a deathtouch source [CR#702.2b,704.5h], `deathtouchDestruction`; and lethal damage in combat damage assignment [CR#702.2c] (`lean-v3-combat-damage-rule-rows`). |
 | `phasing` | The untap step's phasing turn-based action [CR#703.4a,502.1,702.26a], `phasingTurnBased`. |
-| `startYourEngines` | A state-based action giving a player with no speed a speed of 1 [CR#702.179a,704.5aa]: no row yet, since no action sets speed (`lean-v3-player-speed-rules`). |
+| `startYourEngines` | A state-based action giving a player with no speed a speed of 1 [CR#702.179a,704.5aa]: no row yet, since no action sets speed (`syl-speed-rules`). |
 | `toxic` | The result of combat damage to a player, reading the creature's total toxic value [CR#702.164b,702.164c], `toxicPoison`. |
 | `reach` | Flying's rule, "can't be blocked except by creatures with flying and/or reach" [CR#702.17b,702.9b], which `flying`'s body writes. |
 | `partner`, `partnerCharacterSelect`, `partnerFatherAndSon`, `partnerFriendsForever`, `partnerSurvivors`, `chooseABackground`, `doctorsCompanion` | Deck construction in the Commander variant, before the game begins [CR#702.124a]. `partnerWith`'s first ability is too; its body writes the second, its entering trigger [CR#702.124j]. |
@@ -586,7 +586,7 @@ is stated about its own object has a body even where it modifies a game procedur
 prohibition of that tap [CR#508.1f], so `vigilance`'s body states it.
 `Proofs/KeywordBodies.lean` pins each of these bodiless (`intentionallyBodiless`).
 `craft` and `enlist` are bodiless too, but not by design: each waits on vocabulary its ticket
-names (`lean-v3-craft-materials`, `lean-v3-enlist-optional-attack-cost`).
+names (`syl-craft-materials`, `syl-enlist-optional-attack-cost`).
 
 ## Scheduling fields
 

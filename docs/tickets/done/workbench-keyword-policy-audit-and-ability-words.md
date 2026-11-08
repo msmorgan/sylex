@@ -19,7 +19,7 @@ Do this first: the descriptive classification is pinned to **mtg-rules skill
 v1.7.0** — confirm that pin is current before auditing, since a stale pin is a
 plausible source of the misses.
 
-(Check `docs-keyword-policy-refresh` before starting; if that ticket already
+(Check `core-delete-paramshape-keyworddecl` before starting; if that ticket already
 covers part of this surface, fold rather than duplicate.)
 
 ## 2. Ability words
@@ -77,7 +77,7 @@ actions}.txt` exactly. The v1.7.0 baseline held 260.
   sacrifice / discard / exile composite where the descriptive catalog files them
   intrinsic; §10 keeps attach native where the catalog files it
   composite-given(attachment-relation). Both are argued in the doc.
-- Folded from `docs-keyword-policy-refresh`: its **count-reconciliation** bullet
+- Folded from `core-delete-paramshape-keyworddecl`: its **count-reconciliation** bullet
   (§2's rows are now labeled by catalog, so abilities and actions read
   separately). Its `ParamShape` / `KeywordDecl` decision was **not** touched.
 

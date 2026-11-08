@@ -24,7 +24,7 @@ the pump after the fight, which changes the outcome.
   share targets).
 
 **Not in scope.** A later ability replacing an earlier one's action
-(`lean-v3-cross-ability-self-replacement`), which needs a different design.
+(`syl-cross-ability-self-replacement`), which needs a different design.
 
 **Pointers.** `plugins/builtin/primitives/action/holdUntil.syl`,
 `plugins/builtin/templates/action/doOnlyIf.syl`,

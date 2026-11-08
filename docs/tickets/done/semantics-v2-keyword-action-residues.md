@@ -12,14 +12,14 @@ mirrored, then the declaration gets its body.
 - No v2 shape: Cloak, Manifest, Manifest Dread (face-down substrate; engine
   side is `engine-face-down` and `engine-special-actions`), Collect Evidence,
   Discover, Incubate (`tokens-predefined-registry` lists Incubator), Learn,
-  The Ring Tempts You (`macro-ring-emblem` holds the engine blockers; its
+  The Ring Tempts You (`engine-ring-tempts-you` holds the engine blockers; its
   "future builtin macro expands to `Action::Composite`" framing is v1 and
   moot), Venture into the Dungeon (`engine-dungeons`, same framing, same
-  note; `lean-core-room-declarations` holds the designation question),
+  note; `syl-room-doors-as-designations` holds the designation question),
   Waterbend.
 - Rules procedures, not instructions: Activate, Cast, Play.
 - One phrase, several expansions: Double, Triple, Exchange
-  (`lean-core-exchange-operands` is this question for Exchange alone; fold it
+  (`syl-life-totals-exchange-operand` is this question for Exchange alone; fold it
   in), Support.
 - Assemble is Un-set only and stays bodyless permanently; delete the
   declaration if english_v3 does not need its spelling.
@@ -33,7 +33,7 @@ mirrored, then the declaration gets its body.
   enacts and the facts table does not list, so a card writing it loads and
   is refused only at check (`knownAct`).
 
-`semantics-v1-cutover` deletes `plugins/builtin/macros/action/` wholesale;
+`v1-retirement` deletes `plugins/builtin/macros/action/` wholesale;
 any of the 30 still bodyless at parity is a named loss in that record.
 `keyword-stub-gate-columns` defers on "once the semantics-v2 keyword macros
 are written"; 35 of 65 are, so its ruling reads against this ticket.
@@ -95,7 +95,7 @@ are measured on `mrwkzkrm`. `lean/` changed.
    - Double, Triple, Exchange stay bodyless: one phrase, an expansion per
      thing changed, each a helper (Exchange's helpers already landed).
      Mana doubling [CR#701.10f] has no helper: no amount reads a mana pool.
-   - Exchange fold (`lean-core-exchange-operands`, left in `maybe/`):
+   - Exchange fold (`syl-life-totals-exchange-operand`, left in `maybe/`):
      assessed, not folded. Life totals select a group ("two target players"),
      which two `Amount` operands cannot, so the fold needs the machinery that
      ticket rules out.

@@ -1,7 +1,7 @@
 ---
 needs: []
 ---
-**Costs to attack and to block.**
+# Combat: costs to attack and block, and the unfinished block-requirement cases
 
 ## Why
 
@@ -9,7 +9,10 @@ Attack and block requirements (must attack, must block, goad) are evaluated at d
 `Gate(Attack)` or `Gate(Block)` row, a toll on attacking or blocking, is still a loud
 `guard_deontic_seam` in `legal_attackers` and `legal_blockers`. Propaganda and Ghostly Prison
 ("Creatures can't attack you unless their controller pays {2} for each creature they control
-that's attacking you") cannot be played.
+that's attacking you") cannot be played. Three block-requirement cases in
+`decide/pending/combat.rs` are still `todo!`: a `Must(Block)` row carrying an arrangement bound,
+a requirement meeting an arrangement bound (menace, [CR#509.1c]'s example), and conflicting
+requirements that need the maximum obeyed.
 
 ## Done when
 
@@ -19,6 +22,9 @@ that's attacking you") cannot be played.
   declaration whose cost is not paid is illegal.
 - Requirement counting does not oblige a player to pay a cost to obey a requirement
   [CR#508.1d,509.1c].
+- A blocking declaration obeys the most `Must(Block)` requirements possible without violating a
+  restriction [CR#509.1c], including requirements that carry or meet an arrangement bound and
+  requirements that conflict; the three `todo!`s are gone.
 - The seam guards no longer cover the `Gate` polarity of `Attack` and `Block`.
 - Tests with Propaganda and Ghostly Prison, including an "attacks each combat if able" creature
   under Propaganda that need not attack, by core fixture where the cards are not authored.

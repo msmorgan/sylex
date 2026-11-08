@@ -151,7 +151,7 @@ not already show.
    `Words.lean:248`, after the label). Tag the same way; declare each of the 21 designations with
    its scope. Drop `zone`, `type`, `half` (and `DesignationLabel.seedZone`, which nothing calls).
    Delete `designationTable`, `DesignationFacts`, `findDesignation`, `DesignationLabel.facts`,
-   `.known`. Keep `RoomHalf` only if `lean-core-room-declarations` still needs it (it is a
+   `.known`. Keep `RoomHalf` only if `syl-room-doors-as-designations` still needs it (it is a
    `maybe` ticket; `lean-v3-keyword-bodies-and-catalog-sync` §2 retires `half`).
 3. `RelationLabel`: tag `[semantic_expression, internal_expansion]`; delete `relationTable`,
    `RelationFacts`, `RelationLabel.facts/.known/.left/.right`, and the `relation.known` refusal at
@@ -198,8 +198,8 @@ not already show.
   `RoomHalf.designation` / `DesignationLabel.half` and cross-pins catalogs against
   `Check/Facts.lean`; the cross-pin is moot once the tables are gone. Whichever lands second
   reconciles.
-- `semantics-v3-designation-storage-columns` (planned): expects the designation columns back in
+- `designation-storage-axes` (planned): expects the designation columns back in
   `plugins_v3/`; its decision is whether they are Lean columns, which this ticket now answers for
   `scope`.
-- `lean-core-room-declarations` (maybe): declares `leftHalfUnlocked`/`rightHalfUnlocked`
+- `syl-room-doors-as-designations` (maybe): declares `leftHalfUnlocked`/`rightHalfUnlocked`
   (`Check/Facts.lean:499-500`).

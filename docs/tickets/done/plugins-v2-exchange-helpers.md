@@ -39,8 +39,8 @@ instruction, so `keyword_abilities/auraSwap.ron` still writes the
 
 ## Related
 
-`lean-core-exchange-operands` (maybe/) asks whether life totals fold into
-numeric operands; `research-exchange-textbox` surveys which arms cards use.
+`syl-life-totals-exchange-operand` (maybe/) asks whether life totals fold into
+numeric operands; `research-exchange-arms` surveys which arms cards use.
 Neither blocks this.
 
 ## Landing record
@@ -163,5 +163,5 @@ totals, homograph and form-literal inventories and the performance advisory:
 no English grammar, lexicon or corpus input changed, so `coverage` was not
 run. Lean pins and the Lean bench: no Lean file changed.
 
-**Routed.** Nothing new. `lean-core-exchange-operands` and
-`research-exchange-textbox` are unaffected.
+**Routed.** Nothing new. `syl-life-totals-exchange-operand` and
+`research-exchange-arms` are unaffected.

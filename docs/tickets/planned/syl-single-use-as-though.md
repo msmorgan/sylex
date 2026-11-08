@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-checker-and-drt-fixes, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-v3-keyword-verb-events]
+needs: [lean-v3-checker-and-drt-fixes, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, syl-keyword-verb-events]
 ---
 
 # A single-use "as though" statement
@@ -16,7 +16,7 @@ makes it a replacement.
 - An as-though statement can be limited to the next matching event (a use field on `asThough`,
   or a usage limit on `establish`; the landing says which and why).
 - *Biomancer's Familiar* is in `plugins/canon/cards/`, its "adapts" being the event
-  `lean-v3-keyword-verb-events` defines, and passes the `.syl` checks.
+  `syl-keyword-verb-events` defines, and passes the `.syl` checks.
 - A test pins that a second adapt the same turn is not covered.
 
 **Pointers.** `plugins/builtin/primitives/static/asThough.syl`,

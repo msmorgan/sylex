@@ -14,12 +14,12 @@ them in one landing:
   semantics workbench (`lean/Semantics/`).
 - Passing mentions and deliverables scrubbed across 15 tickets to point to Lean gates
   (`lean/scripts/build`), Rust core/engine tests, or remove Idris mirror requirements:
-  `balance-choose-complement-player-selection`, `core-do-or-die-divide-and-choose`,
-  `engine-base-characteristics`, `core-location-outside-the-game`, `portfolio-polish`,
+  `syl-balance-family`, `core-do-or-die-divide-and-choose`,
+  `engine-base-characteristics`, `core-location-outside-the-game`, `docs-readme-and-tour-rewrite`,
   `spinal-parasite-negative-pt`, `engine-crossed-channel-scope`, `engine-loyalty-limit-intrinsic`,
   `core-use-limit-general-window`, `core-designation-card-scope`,
   `core-retire-planechase-surface`, `tokens-predefined-registry`,
-  `post-reshape-comment-rot`, `workbench-corpus-frame-gate`, plus `workbench-paper`.
+  `core-player-action-merge-leftovers`, `workbench-corpus-frame-gate`, plus `workbench-paper`.
 - Checked `census.md` and `docs/tickets/README.md`: confirmed no live Idris columns or gate wording.
 
 ### Deleted tickets (35)

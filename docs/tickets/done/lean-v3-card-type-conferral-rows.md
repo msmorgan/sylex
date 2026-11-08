@@ -66,5 +66,5 @@ row. The protector choice, attack and block, and summoning sickness have no benc
   protector link (`Definitions/Designations.lean` defers it until a card reads a protector), so
   the chosen player is the battle's choice until then.
 - **The lethal-damage row was added** [CR#704.5g]: `lethalDamage` on the creature row reads
-  `statOf .markedDamage`, which already exists. `lean-marked-damage-projection` and
+  `statOf .markedDamage`, which already exists. `syl-deathtouch-creature-conferral` and
   `lean-v3-proofs-and-docs-alignment` §2 are narrowed accordingly; [CR#704.5h] stays there.

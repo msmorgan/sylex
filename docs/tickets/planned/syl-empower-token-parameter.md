@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-token-definitions]
+needs: [syl-token-definitions]
 ---
 # Empower takes its token as a parameter
 

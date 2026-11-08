@@ -60,7 +60,7 @@ RON-shaped constraint.
 - "The exiled card": `ExiledWith This` uniquifies when the exiling ability's
   quantity is one, read off the card's own abilities; no cross-ability
   binding. The implementer reads the exile-with rule in `data/rules/cr.txt`
-  and cites it; `research-imprint-uniqueness` supplies the corpus count.
+  and cites it; `research-exiled-card-uniqueness` supplies the corpus count.
 - A condition's nouns do NOT join the read stack; "if … it …" reads the
   clause subject.
 - Combat relations take a kind-polymorphic argument (`Player | Object` via
@@ -70,7 +70,7 @@ RON-shaped constraint.
 - The agentless counter replacement row takes a positional `Maybe` agent.
 - `QualitySort.AbilityQ` with the chosen-quality read; not a `Modal`.
 - `Exchanged` gains `Values a b` (two amounts) and `TextBoxes a b`; the
-  text-box arm lands with a pin only if `research-exchange-textbox` finds no
+  text-box arm lands with a pin only if `research-exchange-arms` finds no
   supported card.
 - `EachClosesOwnParts` extends to parts the same `ForEachOf` published.
 - "As you activate": a positional `Maybe` timing rider on the announced

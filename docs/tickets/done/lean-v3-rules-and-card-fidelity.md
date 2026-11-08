@@ -148,7 +148,7 @@ were re-located against the Lean source on 2026-10-24.
     (`Proofs/Keyword.lean`).
   - `clash` (`[CR#701.30b..701.30d]`, `Definitions/Actions.lean:649-654`): include the opponent
     and winner condition.
-    **Superseded** by [lean-v3-clash](../planned/lean-v3-clash.md) (owner ruling 2026-10-25,
+    **Superseded** by [syl-clash](../planned/syl-clash.md) (owner ruling 2026-10-25,
     option (b): a win/lose outcome on the clash action, read back as coin flips are).
   - `melee` (`[CR#702.121a]`, `Definitions/Keywords.lean:1098-1108`): count attacked opponents
     rather than attack events.
@@ -351,7 +351,7 @@ were re-located against the Lean source on 2026-10-24.
   .card`, which nothing grounds in a pattern. Pins `overgrownZealotSpendsToTurnFaceUp`,
   `qarsiDeceiverSpendsOnManifestAndMorph`. The purpose does not yet say Qarsi's "pay a mana
   cost", so it admits a manifested card's disguise cost:
-  [lean-v3-turn-face-up-spend-cost](../planned/lean-v3-turn-face-up-spend-cost.md).
+  [syl-turn-face-up-spend-cost](../planned/syl-turn-face-up-spend-cost.md).
 
 ### 4. Printed move text dropped by the move-deeds landing (wave review, 2026-10-21)
 

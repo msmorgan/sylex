@@ -45,8 +45,8 @@ and Mutagen Connoisseur's current-face read. Run `lean/scripts/build`.
 Standard constraints apply.
 
 [General relation queries](../maybe/lean-core-relation-queries.md),
-[numeric folds and reads](../maybe/lean-core-numeric-bindings-and-aggregation.md),
-and [result collections](../maybe/lean-core-result-collections.md) are parked
+[numeric folds and reads](../maybe/syl-numeric-anaphors.md),
+and [result collections](../maybe/syl-result-reads.md) are parked
 separately. The current noun projections, aggregates, and random-result forms
 remain in this ticket's implementation.
 

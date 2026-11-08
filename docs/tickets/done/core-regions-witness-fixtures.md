@@ -150,9 +150,9 @@ names the fixture that un-ignores when it closes:
   Run Away Together.
 - `critical/engine-damage-fact-participant-lki` — Predator Ooze.
 - `critical/lowering-pay-cost-decision-registers` — Painful Quandary.
-- `maybe/semantics-disjunctive-cost` — Perforating Artist; deferred to successor
+- `maybe/core-disjunctive-cost` — Perforating Artist; deferred to successor
   lowering on 2026-09-06, with the witness obligation retained.
-- `maybe/semantics-produced-group-across-regions` — Deadly Brew; deferred to
+- `maybe/core-produced-group-across-regions` — Deadly Brew; deferred to
   successor lowering on 2026-09-06, with the witness obligation retained.
 - `planned/engine-derived-reference-in-filters` — the `debug_assert!(false)`
   the two re-spellings avoided; blocks nothing today.

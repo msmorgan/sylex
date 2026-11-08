@@ -3,7 +3,7 @@
 # event each turn, and "it" in the effect resolves to `thisCreature` rather than the targeting spell
 # or ability.
 # Fragment: the conditional flying sentence ("As long as this creature has three or more +1/+1
-# counters on it, it has flying") is missing until `lean-v3-preposed-static-condition-ordering`.
+# counters on it, it has flying") is missing until `syl-condition-first-static`.
 card {
   name = "Angelic Cub",
   cost = [1, white],

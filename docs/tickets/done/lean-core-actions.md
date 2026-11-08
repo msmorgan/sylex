@@ -79,8 +79,8 @@ draw [CR#121.5], and a label cannot supply the missing body. No generic
 request/attempt framework is part of this campaign merely to remove draw.
 
 Retain the existing Room/designation and exchange shapes. Their possible
-reductions are parked in [Room declarations](../maybe/lean-core-room-declarations.md)
-and [exchange operands](../maybe/lean-core-exchange-operands.md). Neither
+reductions are parked in [Room declarations](../maybe/syl-room-doors-as-designations.md)
+and [exchange operands](../maybe/syl-life-totals-exchange-operand.md). Neither
 requires generic feasibility machinery as part of this ticket.
 
 Retain `turnOver` as the lower face-switching operation. The predicate ticket

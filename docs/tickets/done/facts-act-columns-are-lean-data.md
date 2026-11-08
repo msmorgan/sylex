@@ -35,7 +35,7 @@ The same question stands for the `KeywordFacts` gate columns (`regime` 53 rows,
 `functionsOnStack` 47, `onInstantOrSorceryCard` 66, `paidCost` 64,
 `onPermanentCard` 13, `wantsModes` 4, and the six `extra` argument-schema
 variants), but those are ALSO read by the frozen Idris reference generator, so
-they cannot move until it retires (`semantics-v1-cutover`). Decide the two
+they cannot move until it retires (`v1-retirement`). Decide the two
 separately. Standard constraints apply.
 
 ## Landing record

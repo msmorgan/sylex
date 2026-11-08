@@ -1,5 +1,5 @@
 ---
-needs: [engine-transform, engine-transform-byindex-reread-hardening, engine-transform-current-face-name-loyalty]
+needs: [engine-transform, engine-trigger-text-survives-transform, engine-transform-current-face-name-loyalty]
 ---
 **Engine: day/night, and daybound/nightbound.**
 

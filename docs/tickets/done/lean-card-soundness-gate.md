@@ -37,7 +37,7 @@ this ticket supersedes that half of it.
 
 The Idris gate retires with Idris, which retires with v1 (user ruling,
 2026-09-06). Its deletion and the differential's fate are recorded on
-`docs/tickets/planned/semantics-v1-cutover.md`; nothing is deleted here and
+`docs/tickets/planned/v1-retirement.md`; nothing is deleted here and
 the Idris CI job stays.
 
 ## Landing record
@@ -109,7 +109,7 @@ plus the docs/CI commit above it and the review-round commit
      covers every card the Idris gate did". It does not yet: v2 has no canon.
      So this landing delivers the emitter, the gate, the ratchet and the CI
      wiring, keeps the Idris job, and routes the deletion and the differential
-     re-home to `semantics-v1-cutover` (see `## Ledger`).
+     re-home to `v1-retirement` (see `## Ledger`).
   2. **Emission goes through `serde::Serialize` rather than hand-written
      per-type renderers.** The serde data model already carries what a Lean
      term needs — a variant's declaring type and name, a struct's fields in

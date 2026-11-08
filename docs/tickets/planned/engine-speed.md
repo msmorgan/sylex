@@ -28,5 +28,5 @@ one [CR#702.179b], and an effect that reads the speed of a player with none sees
 
 - `plugins/builtin/definitions/keyword_ability/startYourEngines.syl`, `maxSpeed.syl`, and
   `plugins/builtin/templates/quantity/speedOf.syl`: the `.syl` side. Its missing actions and
-  state-based row are `lean-v3-player-speed-rules`.
+  state-based row are `syl-speed-rules`.
 - `crates/engine/src/player.rs`, `crates/engine/src/sba.rs`.

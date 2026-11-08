@@ -60,7 +60,7 @@ with parallel agents. Land it in three changes, comparing the expansion baseline
 - Gates: `cargo xtask lean check`. Run tests and clippy for `deckmaste_semantics_v3` and
   `xtask`.
 - Tickets that cite canon cards by camelCase name or old path are re-pointed. This includes
-  `lean-v3-card-head-noun-sweep`, which should not run concurrently with this ticket.
+  `syl-card-head-noun-sweep`, which should not run concurrently with this ticket.
 
 ## Expansion baseline workflow
 

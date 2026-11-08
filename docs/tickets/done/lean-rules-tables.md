@@ -129,7 +129,7 @@ tokens [CR#111.10a,111.10b,111.10c,111.10f,111.10g,111.10h,111.10w].
    damage and `Lookback` has no "since state-based actions were last checked"
    window, so `plugins/builtin/rules/sba/lethal-damage.ron` is the one v1 row
    `builtinTables` cannot carry. Routed to the new
-   `docs/tickets/planned/lean-marked-damage-projection.md`.
+   `docs/tickets/planned/syl-deathtouch-creature-conferral.md`.
 3. **`Stat` has no `defense` axis**, so a battle's *printed* defense is
    unreadable and the battle's intrinsic conferral [CR#310.4b] — the exact
    analogue of the planeswalker row this ticket proves — has no row. The

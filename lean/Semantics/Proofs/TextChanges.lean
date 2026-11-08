@@ -8,7 +8,7 @@ A Text Change is a specified rewrite of an object's rules text, applied in layer
 [CR#612.1,613.1c]; cleave's Text Change removes all text found within square brackets
 [CR#702.148a,702.148b].
 A Text Change is checked by kinds only: the rewritten text is not checked again.
-Bracketed text awaits `plugins-v3-cleave-bracketed-text`.
+Bracketed text awaits `syl-cleave-bracketed-text`.
 -/
 
 open Semantics Semantics.Templates Semantics.Definitions

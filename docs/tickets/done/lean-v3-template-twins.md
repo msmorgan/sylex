@@ -35,7 +35,7 @@ with the destination carrying its own preposition ("on the bottom", "third from 
 - The `put` sites `Cards/Choice.lean:1121` (Lost Hours), `:1127` (Aether Gust) and
   `Cards/Anaphora.lean:274` (Deem Inferior) stay as they are.
 - `Cards/Cost.lean:680` (Void Maw, "Put a card exiled with this creature into its owner's
-  graveyard") prints "into", which is `putInto`'s wording. `lean-v3-card-head-noun-sweep` §1
+  graveyard") prints "into", which is `putInto`'s wording. `syl-card-head-noun-sweep` §1
   row 6 makes that change together with its head noun; skip this line here if that ticket has
   landed, and make only the verb change (`putInto`) if it has not.
 
@@ -205,7 +205,7 @@ printed "card" where it is dropped:
 - `putInto`, `putOntoBattlefield`, `returnToBattlefield`, `returnToHand`, the fixed-rider
   `putOntoBattlefield*`/`returnToBattlefield*` Templates, `createToken`, `createTappedToken`,
   `create`, Core `Action.move` and every checker module. Reconfigure's body is
-  `lean-v3-keyword-body-spelling-gaps`'s, not this ticket's.
+  `syl-daybound-reconfigure-bodies`'s, not this ticket's.
 - No card changes its printed verb except as listed. No pin is weakened.
 
 ## Pins

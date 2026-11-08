@@ -71,7 +71,7 @@ implementation work; absence of dependency edges is not a promise of disjoint fi
 
 ## Deferred and dropped work
 
-[Member binding, aggregation, and numeric reads](../maybe/lean-core-numeric-bindings-and-aggregation.md)
+[Member binding, aggregation, and numeric reads](../maybe/syl-numeric-anaphors.md)
 are separately assessable design questions. [Carried repetition selections](../maybe/lean-core-repetition-selections.md)
 are also parked. Neither is needed to complete the four folds above.
 

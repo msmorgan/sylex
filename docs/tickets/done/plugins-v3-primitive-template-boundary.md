@@ -20,7 +20,7 @@ The promoted `can`, `cant`, `must`, `gatedBy` and both `did` bindings directly a
 non-expression `DeonticMods`/`DidClause` data records with the existing field defaults.
 `when`, `whenever` and `at_` remain separate spelling attachment points over `triggered`.
 The 11 remaining prefixed two-layer pairs are tracked by
-`plugins-v3-shadowed-primitive-names`.
+`syl-sort-prefixed-primitive-names`.
 
 `doForEachKind` takes `axis`, `domain := none`, `sort`, then `body`. Its callers must preserve
 the domain-before-body order used by mention assignment and checking. Both loaders allow a

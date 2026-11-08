@@ -95,8 +95,8 @@ mana-ability classification, activation legality and runner machinery:
 
 ## Not in scope
 
-- Generalizing replay identity (`engine-payment-replay-identity-generalization`) and general
-  cost-binder effects (`engine-payment-general-cost-binder-effects`).
+- Generalizing replay identity (`engine-payment-replay-identity-generalization`) and
+  cost instructions the payment protocol cannot run (`engine-cost-instruction-gaps`).
 
 ## Pointers
 

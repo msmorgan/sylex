@@ -37,8 +37,8 @@ runtime work, not a taxonomy change.
 ## Not in scope
 
 - The conferred abilities of these designations (the monarch's draw, goad's attack requirement)
-  and the Ring's tempt progression (`macro-ring-emblem`).
-- Where `.syl` declares uniqueness (`semantics-v3-designation-storage-columns`).
+  and the Ring's tempt progression (`engine-ring-tempts-you`).
+- Where `.syl` declares uniqueness (`designation-storage-axes`).
 
 ## Pointers
 

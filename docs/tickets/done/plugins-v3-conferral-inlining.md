@@ -51,8 +51,8 @@ State each one over the inlined term, extracted from the owning definition. Do n
 helper alive for the proof's sake.
 
 Tickets that cite these helpers by name and must be re-pointed when they are claimed:
-`lean-marked-damage-projection` (`lethalDamage`), `lean-defense-projection`
-(`planeswalkerLoyalty`, `battleDefense`) and `lean-v3-venture-dungeon` (`initiativeSteal`).
+`syl-deathtouch-creature-conferral` (`lethalDamage`), `lean-defense-projection`
+(`planeswalkerLoyalty`, `battleDefense`) and `syl-venture-dungeon` (`initiativeSteal`).
 
 ## Acceptance
 

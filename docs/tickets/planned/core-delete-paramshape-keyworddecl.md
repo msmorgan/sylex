@@ -1,5 +1,5 @@
 ---
-needs: [semantics-v1-cutover]
+needs: [v1-retirement]
 ---
 # Delete `ParamShape` and `KeywordDecl` from core
 

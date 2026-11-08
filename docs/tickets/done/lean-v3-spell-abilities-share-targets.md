@@ -76,7 +76,7 @@ the spell's instructions followed in the order written, read as one text.
 Two witnesses need constructs this ticket does not add, so they moved to new tickets:
 
 - *Fatal Push*, together with *Stubborn Denial*, *Hunger of the Howlpack*, *Kamahl's Sledge* and
-  *Bring the Ending*, moved to `lean-v3-cross-ability-self-replacement`. In each, the later
+  *Bring the Ending*, moved to `syl-cross-ability-self-replacement`. In each, the later
   paragraph's "instead" replaces the earlier paragraph's effect.
-- *Searing Barrage* moved to `lean-v3-colored-mana-spent-count`, because its Adamant condition
+- *Searing Barrage* moved to `syl-colored-mana-spent-count`, because its Adamant condition
   counts the red mana spent.

@@ -5,7 +5,7 @@ Parse the **single-card** look-at-top-of-library family (shapes 4 & 5). The
 peek-N-and-keep-some shapes ("Look at the top N cards … put one into your hand
 and **the rest** on the bottom") are **deferred** — they need a
 complement/"the rest" selection primitive that does not exist in core/engine
-(its own ticket: `balance-choose-complement-player-selection`, "no primitive
+(its own ticket: `syl-balance-family`, "no primitive
 for 'keep N of a set, act on the REST'"). Only the single-card shapes are
 parser-only; the ticket's original "~484 parser-only" premise was wrong (the
 bulk of the 484 are the complement-blocked shapes 1–3).
@@ -74,6 +74,6 @@ exile-top and a reveal-to-hand card. Standard constraints apply.
 
 ## Deferred (not this ticket)
 
-- Shapes 1–3 (peek-N + "the rest") → `balance-choose-complement-player-selection`
+- Shapes 1–3 (peek-N + "the rest") → `syl-balance-family`
   (the complement primitive).
 - IMPULSE tail ("you may play it this turn") → `engine-cast-from-zones`.

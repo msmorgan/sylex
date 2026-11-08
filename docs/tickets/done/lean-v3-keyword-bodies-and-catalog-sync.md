@@ -95,16 +95,16 @@ needs: [lean-v3-rules-and-card-fidelity]
     `.not (.otherThan thisCard)`, and a reflexive reveal-then-cast `payingInstead` (`orumzszv`,
     `okMiracleDefinition`, `badDrawnCardWithoutADraw`).
   - `companion`: the in-game special action, once per game, from outside the game (`wusksqoq`,
-    `okCompanionDefinition`). The pregame reveal [CR#103.2b] is `lean-v3-companion-pregame-rule`.
+    `okCompanionDefinition`). The pregame reveal [CR#103.2b] is `syl-companion-pregame-rule`.
   - `partnerWith`'s pin reads the target player's may-search (`slwkmpnu`).
 
   Ticketed instead:
-  - `ventureIntoTheDungeon` and the initiative's venture triggers: `lean-v3-venture-dungeon`
+  - `ventureIntoTheDungeon` and the initiative's venture triggers: `syl-venture-dungeon`
     (`mnkwmyls`), which needs a dungeon card frame with rooms and the venture marker read
     through a Condition atom.
-  - `craft`: `lean-v3-craft-materials`. Its materials take every noun-phrase shape, and the
+  - `craft`: `syl-craft-materials`. Its materials take every noun-phrase shape, and the
     body has no way to restrict them to its domain.
-  - `enlist`: `lean-v3-enlist-optional-attack-cost`. The decided `offered` gate needs predicates
+  - `enlist`: `syl-enlist-optional-attack-cost`. The decided `offered` gate needs predicates
     for "didn't choose to attack with" and "under your control since this turn began".
 - Note: `lifelink`, `wither`, `infect`, and `toxic` were landed by
   [`lean-v3-damage-composition`](../done/lean-v3-damage-composition.md) (Q89 ruled
@@ -124,9 +124,9 @@ needs: [lean-v3-rules-and-card-fidelity]
   keyword's rule is a rules-table row, not engine procedure. Deathtouch's state-based action
   [CR#704.5h] and phasing's turn-based action [CR#703.4a] are written (`deathtouchDestruction`,
   `phasingTurnBased`, `Proofs/Rules.lean`). The rows for the combat damage keywords are
-  `lean-v3-combat-damage-rule-rows`, start your engines! is `lean-v3-player-speed-rules`, and
+  `lean-v3-combat-damage-rule-rows`, start your engines! is `syl-speed-rules`, and
   phasing's "the active player controlled when they phased out" is
-  `lean-v3-active-player-term`. The phasing row leaves an attachment phased out with its
+  `syl-active-player-and-indirect-phasing`. The phasing row leaves an attachment phased out with its
   phased-out host to phase in with that host [CR#702.26g] (`rprturmu`); telling a direct phase-out
   from an indirect one exactly is `lean-v3-phasing-direct-phase-out`. Only the deck-construction keywords are bodiless with no row.
   Vigilance keeps its body.

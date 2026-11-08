@@ -23,7 +23,7 @@ a Leyline beginning on the battlefield [CR#103.6a].
 
 ## Not in scope
 
-- Companion reveal and the outside-the-game card pool (`lean-v3-companion-pregame-rule`,
+- Companion reveal and the outside-the-game card pool (`syl-companion-pregame-rule`,
   `runner-outside-game`).
 
 ## Pointers

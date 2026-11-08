@@ -23,7 +23,7 @@ Before any deletion, copy into one untracked file under `docs/evidence/` the pas
 
 - Six decision records: `english-v2-rewrite.md`, `english-lean-design-workbench.md`, `english-grammar-is-derived.md`, `english-productions-ship-their-inverse.md`, `english-clauses-are-structural.md`, `english-coordination-is-structural.md`. Remove their entries from `docs/decisions/README.md` (six are indexed there).
 - Dead historical documents under `docs/`: `english-grammar-review.md`, `english-derived-family-inventory.md`, `english-parser-performance.md`, `english-recovery-audit.md`, `english-regular-vocabulary-tables-design.md`, `english-grammar-design.md`, `english-grammar-wayfinder.md`.
-- Repair or remove every remaining reference to a deleted file (`grep` for each name in `docs/`, `crates/`, `README.md`, `CLAUDE.md`; known referrers include `semantics-v2.md`, `builtin-v2-macro-spelling-and-grammar.md`, `kind-index-joins-union-marking-is-spelling.md`, `docs/tickets/fog.md`, `planned/readme-oracle-text-primer.md`, `planned/semantics-v1-cutover.md`, and a comment in `crates/deckmaste_english/src/grammar/ability.rs`). Do not edit `done/` tickets.
+- Repair or remove every remaining reference to a deleted file (`grep` for each name in `docs/`, `crates/`, `README.md`, `CLAUDE.md`; known referrers include `semantics-v2.md`, `builtin-v2-macro-spelling-and-grammar.md`, `kind-index-joins-union-marking-is-spelling.md`, `docs/tickets/fog.md`, `planned/readme-oracle-text-primer.md`, `planned/v1-retirement.md`, and a comment in `crates/deckmaste_english/src/grammar/ability.rs`). Do not edit `done/` tickets.
 
 ## Replace
 

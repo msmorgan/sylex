@@ -43,7 +43,7 @@ mention venturing, the initiative or a dungeon.
 ## Not in scope
 
 - The `.syl` venture action, the dungeon card frame and the initiative's venture triggers:
-  `lean-v3-venture-dungeon`.
+  `syl-venture-dungeon`.
 
 ## Pointers
 

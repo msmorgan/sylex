@@ -101,7 +101,7 @@ theorem badPreposedConditionReadsNoLaterClauseSubject :
 Equipment. Gain control of that Equipment until end of turn. Attach it to the chosen creature."
 "The chosen creature" reads back the creature target, chosen as the spell is cast [CR#601.2c].
 Its last sentence, "When you lose control of that Equipment this turn, if it's attached to a
-creature you control, unattach it", waits on `lean-v3-lose-control-event`. -/
+creature you control, unattach it", waits on `syl-lose-control-event`. -/
 def stolenUniformOpening : Action :=
   sequentially
     [ choose (both (target (and [isCreature, youControl])) (target (hasSubtype equipment))),

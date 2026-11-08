@@ -36,4 +36,4 @@ deathtouch-lethal assignment rule yet. In order of difficulty:
 - `plugins/builtin/rules/sba/deathtouchDestruction.syl`
 - `crates/engine/src/combat.rs`, `crates/engine/src/step/combat.rs`,
   `crates/engine/src/decide/pending/combat.rs` (`AssignCombatDamage`)
-- `docs/tickets/planned/lean-marked-damage-projection.md`
+- `docs/tickets/planned/syl-deathtouch-creature-conferral.md`

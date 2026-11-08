@@ -22,7 +22,7 @@ keeps a second hand-synchronized copy of every predefined token's characteristic
   and `treasureToken.syl` are deleted.
 - A token Definition's declared characteristics, at least its subtype, can be named from `.syl`,
   so a rule written over "a <subtype> token" can take the subtype from the Definition it creates
-  (needed by `lean-v3-empower-token-parameter`).
+  (needed by `syl-empower-token-parameter`).
 - A token a keyword action's rule defines in full, as [CR#701.71a] defines the Jace planeswalker
   token, is a `token` Definition too, and the glossary names the term that covers both.
 - Core's hardcoded predefined tokens are gone; the token Definitions are the one copy.

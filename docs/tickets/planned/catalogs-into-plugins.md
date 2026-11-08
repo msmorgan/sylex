@@ -1,5 +1,5 @@
 ---
-needs: [semantics-v1-cutover, plural-name-flag]
+needs: [v1-retirement, plural-name-flag]
 ---
 # Move the Catalogs into `plugins/` declarations
 

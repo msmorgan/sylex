@@ -77,7 +77,7 @@ Change `ouqkwnvy` lists all 102 retained qualified sites. They comprise:
 These are defects tracked by `plugins-v3-kept-qualified-sites`, after
 `plugins-v3-canon-authoring-surface`. Shared-name typeclass dispatch belongs to
 `lean-v3-overloaded-primitive-typeclasses`; the 11 prefixed structural primitive names
-belong to `plugins-v3-shadowed-primitive-names`, after `plugins-v3-primitive-template-boundary`.
+belong to `syl-sort-prefixed-primitive-names`, after `plugins-v3-primitive-template-boundary`.
 
 ## Acceptance
 

@@ -40,7 +40,7 @@ Two gaps in `.syl`'s mana spending, separately landable:
 ## Not in scope
 
 - A cast permission publishing "that spell" to the text after it (*Rogue Class*, *Summon: Esper
-  Valigarmanda*): `discourse-cast-permission-publishes-spell`.
+  Valigarmanda*): `syl-cast-permission-spell-anaphor`.
 
 ## Pointers
 

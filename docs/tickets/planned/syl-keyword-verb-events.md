@@ -35,7 +35,7 @@ instruction "adapt N".
   "When this creature exploits a creature".
 
 **Not in scope.** *Biomancer's Familiar*'s "as though it had no +1/+1 counters"
-(`lean-v3-single-use-as-though`).
+(`syl-single-use-as-though`).
 
 **Pointers.** `plugins/builtin/definitions/keyword_ability/{evolve,training,exploit,mentor,devour,champion,enlist}.syl`,
 `plugins/builtin/definitions/keyword_action/{devour,adapt}.syl`, `docs/decisions/semantics.md`

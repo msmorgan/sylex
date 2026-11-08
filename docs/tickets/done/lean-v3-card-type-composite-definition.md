@@ -187,6 +187,6 @@ are not gated.
 - `lean-v3-authoring-surface` (planned umbrella; `hasType (t : CardType)` and the type words,
   `:520-529`), `parse-subject-filter-stringly-channels` and `engine-static-ability-zone-gating`
   (Rust-side card-type mentions): read, no edit.
-- `lean-core-room-declarations` (maybe): cites `Check/Facts.lean:499-500`.
+- `syl-room-doors-as-designations` (maybe): cites `Check/Facts.lean:499-500`.
 - `lean-v3-card-class-gate-removal`, `lean-v3-keyword-facts-deleted`, `lean-v3-action-facts-deleted`
   (planned): earlier tickets of this set; they must have landed.

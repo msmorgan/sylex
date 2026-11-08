@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-spelling-conventions, lean-retirement]
+needs: [syl-spelling-conventions, lean-retirement]
 ---
 
 # "Round up each time." as a construct in its own position

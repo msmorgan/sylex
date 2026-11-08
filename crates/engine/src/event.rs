@@ -918,8 +918,8 @@ impl GameEvent {
 // `GameEvent` (~288B) rides the hot `step()` path one-at-a-time; wrapping it in
 // `Arc`/`Box` here adds a per-event allocation and splits event producers from
 // consumers workspace-wide (see the `WorkItem` note in `agenda.rs`, same
-// rationale). A uniform engine-event `Arc` conversion is tracked in the
-// `arc-engine-event-types` ticket.
+// rationale). Making events cheap to move is tracked in the
+// `engine-event-representation` ticket.
 #[allow(
     clippy::large_enum_variant,
     reason = "occurrences are expected to carry large but hot-path event payloads"

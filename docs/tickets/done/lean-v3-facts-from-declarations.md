@@ -86,7 +86,7 @@ Findings that matter to the work:
 Step 1 is done. Item 6 deleted the unread columns: a designation's zone, type and Room half and a
 relation's sides stay on the declaration's record (`Definition.designation`, `Definition.relation`
 in `Rules.lean`), which is where `lean-v3-keyword-bodies-and-catalog-sync` §2 and
-`semantics-v3-designation-storage-columns` find them; a facts row carries only what the checker
+`designation-storage-axes` find them; a facts row carries only what the checker
 reads.
 
 1. **`Check/Facts.lean` is the source of truth.** Replace the header comment (`Facts.lean:1`),
@@ -122,7 +122,7 @@ reads.
    `RelationFacts.left/right` (and the pin `Tables.lean:51-53`), or keep them and record in
    `FactTypes.lean` that nothing reads them yet. Do not delete them silently:
    `lean-v3-keyword-bodies-and-catalog-sync` §2 retires `half`, and
-   `semantics-v3-designation-storage-columns` expects the designation columns back in
+   `designation-storage-axes` expects the designation columns back in
    `plugins_v3/`.
 7. **Replace the property tests the generator carried.** For each retired xtask test, name the
    Lean pin that carries what it asserted or port it; do not just delete. Candidates:

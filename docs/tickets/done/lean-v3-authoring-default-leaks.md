@@ -31,7 +31,7 @@ controller (an imperative "gain control of"), drop it:
 
 - `Cards/Anaphora.lean:633` and `:647` (Zidane, Tantalus Thief)
 - `Cards/Description.lean:79`
-- `Cards/Static.lean:496` (Blatant Thievery; `lean-v3-card-head-noun-sweep` §1 row 2 edits the
+- `Cards/Static.lean:496` (Blatant Thievery; `syl-card-head-noun-sweep` §1 row 2 edits the
   same line's target, so whichever lands second rebases onto the other)
 - `Cards/Choice.lean:1025`
 
@@ -51,7 +51,7 @@ Four fragments pass the default `RollWatch` raw. Drop the argument (it defaults 
 
 ## 3. A Template that mentions its parameter twice without a binding
 
-**Moved 2026-10-25** to [lean-v3-binding-across-or-arms](../planned/lean-v3-binding-across-or-arms.md): the spelling below is refused (`bindingIdentity`) because the two mentions sit in different `.or` arms.
+**Moved 2026-10-25** to [syl-binding-across-or-arms](../planned/syl-binding-across-or-arms.md): the spelling below is refused (`bindingIdentity`) because the two mentions sit in different `.or` arms.
 
 `objectsOfPlayer` (`Templates.lean:479-480`) writes `player` twice. ADR
 `docs/decisions/semantics-v3.md` §2.2 binds a Template parameter mentioned more than once. Write

@@ -32,9 +32,9 @@ list — the query is exhaustive and the prose list is one person's grep.
 
 | Site | Disposition | Owner |
 |---|---|---|
-| `activate.rs` producer cost binder | mint | `engine-produce-capture-binder` |
+| `activate.rs` producer cost binder | mint | `engine-producing-cost-moved-object` |
 | `activate.rs` search cost binder | mint | `engine-library-search-primitive` |
-| `resolve/effect.rs` `Produce` outside `With` | mint | `engine-produce-capture-binder` |
+| `resolve/effect.rs` `Produce` outside `With` | mint | `engine-producing-cost-moved-object` |
 | `resolve/effect.rs` `Search`/`SearchOne` | mint | `engine-library-search-primitive` |
 | `resolve/effect.rs` non-verb `Simultaneously` member | mint | `engine-simultaneous-non-verb-members` |
 | `resolve/effect.rs` choice-bearing `Simultaneously` member | mint | `engine-simultaneous-choice-members` |
