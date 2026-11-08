@@ -5,14 +5,11 @@ needs: [runtime-prose-link]
 
 ## Why
 
-The TUI renders a derived ability's prose by looking its core value up in a value-keyed index
-(today v1's `sylex_plugin_v1::provenance::ProvenanceIndex`, which `v1-retirement` replaces with
-these refs).
-The index renders correctly only while equal lowered values always render the same prose, which
-holds on a canonical-form authored surface. This ticket stays parked until that stops being
-enough: a UI needs per-source attribution (two identical grants from different sources are
-indistinguishable in the index), a real text-changing effect lands in layer 3 [CR#613.1c], or an
-index collision misrenders a card.
+The TUI renders a derived ability's prose by looking its core value up in a value-keyed index,
+v1's `sylex_plugin_v1::provenance::ProvenanceIndex`, which goes with `v1/` (`v1-retirement`).
+The index renders correctly only while equal lowered values always render the same prose: two
+identical grants from different sources are indistinguishable in it, and a text-changing effect in
+layer 3 [CR#613.1c] or an index collision misrenders a card.
 
 ## Design
 
@@ -29,8 +26,7 @@ index collision misrenders a card.
 
 ## Done when
 
-- One of the triggers in Why has arrived, and the claim re-checks that the index fails on the
-  lowering then in use.
+- The TUI renders ability prose from refs alone, and nothing reads `ProvenanceIndex`.
 - Refs follow abilities through the layer pipeline (including the whole-pass fixpoint), stack
   bodies, conferral registries, and token and emblem creation, riding the source tracking the
   layer pipeline already keeps for timestamp and dependency ordering [CR#613.7,613.8].
