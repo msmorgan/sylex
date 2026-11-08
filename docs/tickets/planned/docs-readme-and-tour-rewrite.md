@@ -1,5 +1,5 @@
 ---
-needs: [ci-lean-gate, ci-noncanon-gate, comment-discipline-sweep, engine-verb-ident-table, readme-oracle-text-primer, readme-reviewer-path, todo-harness-ci]
+needs: [ci-lean-gate, ci-noncanon-gate, comment-discipline-sweep, engine-verb-ident-table, readme-reviewer-path, todo-harness-ci]
 ---
 
 # Rewrite the README and guided tour, and verify them on a fresh clone
@@ -14,6 +14,17 @@ dead ends. They need rewriting together, then checking the way a stranger would 
 - The README carries the vision and rationale from `docs/decisions/architecture.md`, describes
   the English grammar, and says nothing that goes stale with the next landing; the tour follows one
   current `.syl` card through the pipeline.
+- Near the top, ahead of Design, the README says what Oracle text is, so a reader who does not
+  play Magic learns why card text is uniform enough to compile: Wizards of the Coast's
+  authoritative rules text for each card, maintained centrally rather than fixed at print time,
+  so an old card carries current wording; and written to a house template, the same concept in
+  the same words in the same order across the card pool, with the existing corpus reissued when
+  the template changes. It calls Oracle text "templated", "regimented" or a "controlled
+  sublanguage", never a "regular language" (formally it is not one, and "regular" elsewhere in
+  the repo means regular morphology). It cites `docs/oracle-style-guide.md`, if at all, as the
+  project's own reconstruction from the CR and the corpus, never as a published standard, and it
+  describes the input corpus, not the parser. The GitHub repository's About blurb carries the
+  same framing in one line.
 - Every path and link in both resolves.
 - A disposable fresh clone, with no pre-existing `data/`, `target/`, mtg-rules skill or
   repository-specific environment variables, follows the README literally (build, first run,
@@ -27,4 +38,4 @@ dead ends. They need rewriting together, then checking the way a stranger would 
 extraction.
 
 **Pointers.** `README.md`, `docs/guided_tour.md`, `docs/decisions/architecture.md`,
-`.github/workflows/ci.yml`, `readme-oracle-text-primer`.
+`.github/workflows/ci.yml`, `docs/oracle-style-guide.md`.
