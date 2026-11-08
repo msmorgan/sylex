@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-entry-rider-and-duration-adjuncts, lean-retirement]
+needs: [lean-retirement]
 ---
 
 # A shared frame over modal fillers, read forward
