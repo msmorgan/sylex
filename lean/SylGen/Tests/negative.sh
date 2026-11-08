@@ -141,6 +141,14 @@ printf '%s\n' 'primitive white: Color = White template shadowed(white: Color): C
 grep -F ': Semantics.«Color» := («Semantics».«Templates».«white» )' "$scratch/shadow-output/Shadow/"*.lean >/dev/null
 printf 'sylGen bare word beside a same-named parameter: passed\n'
 
+printf '%s\n' 'primitive lit(value: Int): Amount = Literal template keywordBare: Amount { body = lit(1) }' > "$scratch/input/bad.syl"
+if "$exe" "$scratch/input" "$scratch/collision-output" "" Collision > "$scratch/log" 2>&1; then
+  echo 'unexpected success: generated name colliding with a hand-written constant' >&2
+  exit 1
+fi
+grep -F 'template keywordBare generates Semantics.Templates.keywordBare, which Semantics.Primitives already declares' "$scratch/log" >/dev/null
+printf 'sylGen generated name colliding with a hand-written constant: refused\n'
+
 printf '%s\n' 'template value: Int { body = 1 } template use: Int { body = value }' > "$scratch/input/bad.syl"
 "$exe" "$scratch/input" "$scratch/custom-output" CustomRoot Custom.Generated > "$scratch/log" 2>&1
 test -f "$scratch/custom-output/Custom/Generated.lean"
@@ -181,10 +189,8 @@ printf 'sylGen separate card refusal report: passed\n'
 
 mkdir -p "$scratch/corpus/builtin/definitions/keyword_action" "$scratch/elsewhere"
 ring='primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope
-primitive action(label: String, permanent: DeedPermanent = noPermanent): Deed = Action
-primitive noPermanent: DeedPermanent = NoPermanent
 primitive sequentially(steps: List(Action) = []): Action = Sequentially
-action theRingTemptsYou { body = ownScope(action("theRingTemptsYou"), sequentially([])) }'
+action theRingTemptsYou { body = ownScope(theRingTemptsYou, sequentially([])) }'
 printf '%s\n' "$ring" > "$scratch/corpus/builtin/definitions/keyword_action/theRingTemptsYou.syl"
 (
   cd "$scratch/elsewhere"
@@ -195,8 +201,8 @@ printf 'sylGen corpus-relative Ring exception: passed\n'
 
 printf '%s\n' 'template elsewhere: Action { body = ownScope(none, sequentially([])) }' > "$scratch/corpus/builtin/elsewhere.syl"
 if "$exe" "$scratch/corpus" "$scratch/ring-use-output" RingFixture Ring.Generated > "$scratch/log" 2>&1; then
-  echo "unexpected success: the Ring's temporary primitive used elsewhere" >&2
+  echo "unexpected success: the Ring's ownScope primitive used elsewhere" >&2
   exit 1
 fi
 grep -F 'elsewhere.syl:1:' "$scratch/log" | grep -F 'Action.ownScope is reserved for generated scope and deeds' >/dev/null
-printf "sylGen Ring primitives refused outside the Ring's file: passed\n"
+printf "sylGen Ring's ownScope primitive refused outside the Ring's file: passed\n"

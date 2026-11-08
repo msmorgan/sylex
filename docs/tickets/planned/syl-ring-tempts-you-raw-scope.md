@@ -2,24 +2,24 @@
 needs: [syl-primitive-constructors]
 ---
 
-# `theRingTemptsYou` without the reserved scope and Deed
+# `theRingTemptsYou` without the reserved scope
 
 ## Why
 
-`plugins/builtin/definitions/keyword_action/theRingTemptsYou.syl` writes `Action.ownScope` and
-`Deed.action`, which `.syl` may not write (`docs/decisions/syl.md` §4), so that the Ring emblem
-can count the times the Ring has tempted you by the deed's own steps. It does so through three
-temporary primitives declared in that file (`ownScope`, `action`, `noPermanent`) and `sylGen`'s
-path-gated `legacyScope` exception, which is the only reason the file loads.
+`plugins/builtin/definitions/keyword_action/theRingTemptsYou.syl` writes `Action.ownScope` around
+its own deed, so that the Ring emblem can count the times the Ring has tempted you by the deed's
+own steps. `.syl` may not write a scope (`docs/decisions/syl.md` §4); the file does so through a
+temporary primitive declared in it (`ownScope`) and `sylGen`'s path-gated `legacyScope`
+exception, which is the only reason the file loads.
 
 ## Done when
 
-- `theRingTemptsYou.syl` writes no scope and no raw Deed, and declares no primitive.
-- The three temporary primitives and the `legacyScope` exception (`lean/SylGen/Main.lean`, and
+- `theRingTemptsYou.syl` writes no scope and declares no primitive.
+- The temporary `ownScope` primitive and the `legacyScope` exception (`lean/SylGen/Main.lean`, and
   its uses in `Emit.lean` and `Resolve.lean`) are deleted, so a primitive building a reserved
   constructor is refused in every file, the Ring's included, with a negative test.
 - The Ring emblem's count reads the same as before: `lake exe dumpValues compare` shows no
-  changed card or builtin row besides `theRingTemptsYou`'s own and the deleted primitives'.
+  changed card or builtin row besides `theRingTemptsYou`'s own and the deleted `ownScope`'s.
 - `cargo xtask lean check` and `cargo test -p sylex_syl` pass.
 
 ## Pointers

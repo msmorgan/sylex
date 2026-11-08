@@ -34,7 +34,7 @@ action theRingTemptsYou {
                 compareAmt(
                   eventCount(
                     ownScope(
-                      action("theRingTemptsYou"),
+                      theRingTemptsYou,
                       sequentially([
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
@@ -54,7 +54,7 @@ action theRingTemptsYou {
                 compareAmt(
                   eventCount(
                     ownScope(
-                      action("theRingTemptsYou"),
+                      theRingTemptsYou,
                       sequentially([
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
@@ -74,7 +74,7 @@ action theRingTemptsYou {
                 compareAmt(
                   eventCount(
                     ownScope(
-                      action("theRingTemptsYou"),
+                      theRingTemptsYou,
                       sequentially([
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
@@ -86,9 +86,7 @@ action theRingTemptsYou {
       gainDesignation(that(creature), ringBearer)])
 }
 
-# Temporary: these three primitives build `Action.ownScope` and `Deed.action`, which `.syl` may
-# not write (`docs/decisions/syl.md` §4). Only this file may use them, through `sylGen`'s
-# `legacyScope` exception; `syl-ring-tempts-you-raw-scope` deletes them.
+# Temporary: this primitive builds `Action.ownScope`, which `.syl` may not write
+# (`docs/decisions/syl.md` §4). Only this file may use it, through `sylGen`'s `legacyScope`
+# exception; `syl-ring-tempts-you-raw-scope` deletes it.
 primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope
-primitive action(label: String, permanent: DeedPermanent = noPermanent): Deed = Action
-primitive noPermanent: DeedPermanent = NoPermanent

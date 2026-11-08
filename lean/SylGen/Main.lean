@@ -45,8 +45,8 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
   let mut errors : Array String := #[]
   for d in ds do
     try
-      -- Temporary: `theRingTemptsYou.syl` writes the reserved `Action.ownScope` and
-      -- `Deed.action` through primitives declared in that file, and only it may use them.
+      -- Temporary: `theRingTemptsYou.syl` writes the reserved `Action.ownScope` through a
+      -- primitive declared in that file, and only it may use it.
       -- `syl-ring-tempts-you-raw-scope` deletes this exception. Compare canonical paths, so
       -- another bundle cannot opt in by copying the basename.
       let legacyFile := input / "builtin/definitions/keyword_action/theRingTemptsYou.syl"
