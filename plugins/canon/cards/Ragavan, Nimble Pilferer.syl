@@ -2,7 +2,7 @@
 # Delayed Trigger [CR#702.109a,608.3g].
 card {
   name = "Ragavan, Nimble Pilferer",
-  cost = [red],
+  cost = [pip(red)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [monkey, pirate],
@@ -10,10 +10,10 @@ card {
     whenever(
       does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
       sequentially([
-          create(1, written(treasureToken)),
-          exile(slice(top, 1, libraryOf(that(player)))),
+          create(lit(1), written(treasureToken)),
+          exile(slice(top, lit(1), libraryOf(that(player)))),
           establishThroughout(can(actor(you), cast(that(card))), untilEndOfTurn)])),
-    dash(mana([1, red]))],
-  power = 2,
-  toughness = 1
+    dash(mana([generic(1), pip(red)]))],
+  power = lit(2),
+  toughness = lit(1)
 }

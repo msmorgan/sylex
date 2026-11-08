@@ -1,4 +1,4 @@
 # "any cost"
-primitive anyCost: Cost {
+primitive anyCost: Cost = AnyCost {
   spelling = "any cost"
 }

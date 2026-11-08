@@ -7,5 +7,5 @@ template clueToken: CharacteristicBundle {
       types = [artifact],
       subtypes = [clue],
       text = [
-        activated(compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]), draw(1))]}}
+        activated(compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]), draw(lit(1)))]}}
 }

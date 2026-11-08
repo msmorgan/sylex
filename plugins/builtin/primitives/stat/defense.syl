@@ -1,0 +1,3 @@
+primitive defense: Stat = Defense {
+  spelling = "defense"
+}

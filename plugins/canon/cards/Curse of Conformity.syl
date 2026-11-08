@@ -1,6 +1,6 @@
 card {
   name = "Curse of Conformity",
-  cost = [4, white],
+  cost = [generic(4), pip(white)],
   types = [enchantment],
   subtypes = [aura, curse],
   text = [
@@ -9,7 +9,7 @@ card {
       conjunction([
           getsBase(
             allOf(and([isCreature, non(hasSupertype(legendary)), controlledBy(enchanted(player))])),
-            3,
-            3),
+            lit(3),
+            lit(3)),
           qualityChange(them, loses, everyTypeOf(creature))]))]
 }

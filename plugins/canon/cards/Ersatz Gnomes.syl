@@ -1,11 +1,11 @@
 card {
   name = "Ersatz Gnomes",
-  cost = [3],
+  cost = [generic(3)],
   types = [artifact, creature],
   subtypes = [gnome],
   text = [
-    activated(tapSymbol, becomeColor(target(isSpell), some([]))),
-    activated(tapSymbol, becomeColor(target(isPermanent), some([]), untilEndOfTurn))],
-  power = 1,
-  toughness = 1
+    activated(tapSymbol, becomeColor(target(isSpell), colors([]))),
+    activated(tapSymbol, becomeColor(target(isPermanent), colors([]), untilEndOfTurn))],
+  power = lit(1),
+  toughness = lit(1)
 }

@@ -1,5 +1,5 @@
 # "<subject> commits a crime" [CR#700.13]
 # [CR#700.13]
-primitive commitCrime: Action {
+primitive commitCrime: Action = CommitCrime {
   spelling = "commits a crime"
 }

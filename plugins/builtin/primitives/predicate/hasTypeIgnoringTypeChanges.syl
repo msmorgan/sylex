@@ -1,5 +1,5 @@
 # "<type>, ignoring any type-changing effects that would affect it" [CR#702.44a,613.1d]
 # [CR#702.44a,613.1d]
-primitive hasTypeIgnoringTypeChanges(type: CardType): Predicate {
+primitive hasTypeIgnoringTypeChanges(type: CardType): Predicate = HasTypeIgnoringTypeChanges {
   spelling = "<type>, ignoring any type-changing effects that would affect it"
 }

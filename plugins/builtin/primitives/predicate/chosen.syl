@@ -1,1 +1,1 @@
-primitive chosen(ref: ChoiceRef): Predicate
+primitive chosen(ref: ChoiceRef): Predicate = Chosen

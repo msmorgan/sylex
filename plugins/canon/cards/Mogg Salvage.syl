@@ -1,6 +1,6 @@
 card {
   name = "Mogg Salvage",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [instant],
   text = [
     static(

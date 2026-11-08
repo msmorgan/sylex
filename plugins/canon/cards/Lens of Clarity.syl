@@ -1,6 +1,6 @@
 card {
   name = "Lens of Clarity",
-  cost = [1],
+  cost = [generic(1)],
   types = [artifact],
   text = [
     static(

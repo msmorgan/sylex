@@ -1,3 +1,5 @@
 # "<subject> attacks with <attackers> [<defender>]"
 # TODO(spelling): Include or omit the clauses supplied by defender.
-primitive attackWith(attackers: NounPhrase, defender: Option(NounPhrase) = none): Action
+primitive attackWith(
+  attackers: NounPhrase,
+  defender: Option(NounPhrase) = none): Action = AttackWith

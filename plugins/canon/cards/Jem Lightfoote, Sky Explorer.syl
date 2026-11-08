@@ -1,6 +1,6 @@
 card {
   name = "Jem Lightfoote, Sky Explorer",
-  cost = [2, white, blue],
+  cost = [generic(2), pip(white), pip(blue)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, scout],
@@ -10,7 +10,7 @@ card {
     at(
       beginningOfYour(endStep),
       if = not(did(actor(you), cast(a(isSpell), from = yourHand), within(soFarThisTurn))),
-      action = draw(1))],
-  power = 3,
-  toughness = 3
+      action = draw(lit(1)))],
+  power = lit(3),
+  toughness = lit(3)
 }

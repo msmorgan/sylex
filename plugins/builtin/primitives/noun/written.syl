@@ -1,2 +1,2 @@
 # A token described by an explicit characteristic bundle.
-primitive written(characteristics: CharacteristicBundle): TokenSpec
+primitive written(characteristics: CharacteristicBundle): TokenSpec = Written

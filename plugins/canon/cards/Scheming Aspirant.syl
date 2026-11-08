@@ -1,12 +1,12 @@
 card {
   name = "Scheming Aspirant",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [creature],
   subtypes = [phyrexian, advisor],
   text = [
     whenever(
       does(actor(you), proliferate),
-      sequentially([instruct(eachOpponent, loseLife(2)), gainLife(2)]))],
-  power = 1,
-  toughness = 3
+      sequentially([instruct(eachOpponent, loseLife(lit(2))), gainLife(lit(2))]))],
+  power = lit(1),
+  toughness = lit(3)
 }

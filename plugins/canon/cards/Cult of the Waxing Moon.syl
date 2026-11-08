@@ -1,6 +1,6 @@
 card {
   name = "Cult of the Waxing Moon",
-  cost = [4, green],
+  cost = [generic(4), pip(green)],
   types = [creature],
   subtypes = [human, shaman],
   text = [
@@ -10,7 +10,7 @@ card {
         transform(
           a(and([isPermanent, youControl])),
           into = and([isCreature, not(hasSubtype(human))]))),
-      create(1, written(creatureToken(2, 2, [green], [wolf]))))],
-  power = 5,
-  toughness = 4
+      create(lit(1), written(creatureToken(2, 2, [green], [wolf]))))],
+  power = lit(5),
+  toughness = lit(4)
 }

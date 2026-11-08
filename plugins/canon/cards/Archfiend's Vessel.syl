@@ -1,6 +1,6 @@
 card {
   name = "Archfiend's Vessel",
-  cost = [black],
+  cost = [pip(black)],
   types = [creature],
   subtypes = [human, cleric],
   text = [
@@ -13,15 +13,15 @@ card {
       action = doIfDone(
         exile(it),
         create(
-          1,
+          lit(1),
           written({
               characteristics = {
                 colors = [black],
                 types = [creature],
                 subtypes = [demon],
                 text = [flying],
-                power = 5,
-                toughness = 5}}))))],
-  power = 1,
-  toughness = 1
+                power = lit(5),
+                toughness = lit(5)}}))))],
+  power = lit(1),
+  toughness = lit(1)
 }

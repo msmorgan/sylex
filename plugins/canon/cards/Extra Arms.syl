@@ -1,11 +1,11 @@
 card {
   name = "Extra Arms",
-  cost = [4, red],
+  cost = [generic(4), pip(red)],
   types = [enchantment],
   subtypes = [aura],
   text = [
     enchant(isCreature),
     whenever(
       does(actor(enchanted(creature)), attack),
-      instruct(it, dealDamage(2, target(isAnyTarget))))]
+      instruct(it, dealDamage(lit(2), target(isAnyTarget))))]
 }

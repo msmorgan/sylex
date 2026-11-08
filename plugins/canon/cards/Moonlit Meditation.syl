@@ -1,6 +1,6 @@
 card {
   name = "Moonlit Meditation",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [enchantment],
   subtypes = [aura],
   text = [

@@ -5,4 +5,4 @@
 primitive nthOccurrence(
   ordinal: Ordinal,
   clause: WouldClause,
-  per: Option(Period) = none): WouldClause
+  per: Option(Period) = none): WouldClause = NthOccurrence

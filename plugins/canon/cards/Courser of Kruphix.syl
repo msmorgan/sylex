@@ -1,12 +1,12 @@
 card {
   name = "Courser of Kruphix",
-  cost = [1, green, green],
+  cost = [generic(1), pip(green), pip(green)],
   types = [enchantment, creature],
   subtypes = [centaur],
   text = [
     static(visibility(reveal, you, topOfLibrary)),
     static(can(actor(you), play(allOf(isLand), from = onTop))),
-    whenever(does(actor(a(and([isLand, youControl]))), enter), gainLife(1))],
-  power = 2,
-  toughness = 4
+    whenever(does(actor(a(and([isLand, youControl]))), enter), gainLife(lit(1)))],
+  power = lit(2),
+  toughness = lit(4)
 }

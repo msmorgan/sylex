@@ -1,0 +1,3 @@
+primitive power: Stat = Power {
+  spelling = "power"
+}

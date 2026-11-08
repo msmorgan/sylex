@@ -1,9 +1,9 @@
 card {
   name = "Ballot Broker",
-  cost = [2, white],
+  cost = [generic(2), pip(white)],
   types = [creature],
   subtypes = [human, advisor],
   text = [static(can(actor(you), vote(times = additional(exactly(1)))))],
-  power = 2,
-  toughness = 3
+  power = lit(2),
+  toughness = lit(3)
 }

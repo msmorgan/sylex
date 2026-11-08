@@ -1,15 +1,15 @@
-card transforming({
-    front = {
-      name = "Invasion of Dominaria",
-      cost = [2, white],
-      types = [battle],
-      subtypes = [siege],
-      text = [when(does(actor(thisSiege), enter), sequentially([gainLife(4), draw(1)]))],
-      defense = 5},
-    back = {
-      name = "Serra Faithkeeper",
-      types = [creature],
-      subtypes = [angel],
-      text = [flying, vigilance],
-      power = 4,
-      toughness = 4}})
+card transforming(
+  front = {
+    name = "Invasion of Dominaria",
+    cost = [generic(2), pip(white)],
+    types = [battle],
+    subtypes = [siege],
+    text = [when(does(actor(thisSiege), enter), sequentially([gainLife(lit(4)), draw(lit(1))]))],
+    defense = lit(5)},
+  back = {
+    name = "Serra Faithkeeper",
+    types = [creature],
+    subtypes = [angel],
+    text = [flying, vigilance],
+    power = lit(4),
+    toughness = lit(4)})

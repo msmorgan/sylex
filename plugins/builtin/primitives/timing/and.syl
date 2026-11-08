@@ -1,2 +1,2 @@
 # All of the timing constraints apply.
-primitive and(conjuncts: List(Timing) = []): Timing
+primitive and(conjuncts: List(Timing) = []): Timing = And

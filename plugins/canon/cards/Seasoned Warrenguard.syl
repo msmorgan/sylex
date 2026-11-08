@@ -1,13 +1,13 @@
 card {
   name = "Seasoned Warrenguard",
-  cost = [white],
+  cost = [pip(white)],
   types = [creature],
   subtypes = [rabbit, warrior],
   text = [
     whenever(
       does(actor(thisCreature), attack),
       while = whileTrue(exists(and([isToken, youControl]))),
-      action = get(thisCreature, up(2), up(0), untilEndOfTurn))],
-  power = 1,
-  toughness = 2
+      action = get(thisCreature, up(lit(2)), up(lit(0)), untilEndOfTurn))],
+  power = lit(1),
+  toughness = lit(2)
 }

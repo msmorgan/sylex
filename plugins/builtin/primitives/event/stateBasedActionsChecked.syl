@@ -1,1 +1,1 @@
-primitive stateBasedActionsChecked: GameEvent
+primitive stateBasedActionsChecked: GameEvent = StateBasedActionsChecked

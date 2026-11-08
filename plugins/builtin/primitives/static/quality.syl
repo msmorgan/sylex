@@ -1,2 +1,2 @@
 # Authoring primitive for `QualityPayload.quality`.
-primitive quality(quality: WrittenQuality): QualityPayload
+primitive quality(quality: WrittenQuality): QualityPayload = Quality

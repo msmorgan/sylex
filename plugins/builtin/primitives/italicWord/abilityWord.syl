@@ -1,0 +1,1 @@
+primitive abilityWord(label: AbilityWordLabel): ItalicWord = AbilityWord

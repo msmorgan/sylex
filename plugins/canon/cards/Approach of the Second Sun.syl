@@ -1,6 +1,6 @@
 card {
   name = "Approach of the Second Sun",
-  cost = [6, white],
+  cost = [generic(6), pip(white)],
   types = [sorcery],
   text = [
     spell(
@@ -12,5 +12,5 @@ card {
               cast(a(and([isSpell, isOther, named(printedName("Approach of the Second Sun"))]))),
               within(thisGame))]),
         winGame,
-        sequentially([putInto(this, fromTop(7, library)), gainLife(7)])))]
+        sequentially([putInto(this, fromTop(7, library)), gainLife(lit(7))])))]
 }

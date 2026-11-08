@@ -1,6 +1,6 @@
 card {
   name = "Cultivator Colossus",
-  cost = [4, green, green, green],
+  cost = [generic(4), pip(green), pip(green), pip(green)],
   types = [creature],
   subtypes = [plant, beast],
   text = [
@@ -10,5 +10,5 @@ card {
       does(actor(thisCreature), enter),
       may(
         putOntoBattlefieldTapped(a(and([isLand, in(yourHand)]))),
-        sequentially([draw(1), repeat(again)])))]
+        sequentially([draw(lit(1)), repeat(again)])))]
 }

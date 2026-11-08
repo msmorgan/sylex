@@ -1,6 +1,6 @@
 card {
   name = "Skeleton Ship",
-  cost = [3, blue, black],
+  cost = [generic(3), pip(blue), pip(black)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [skeleton],
@@ -8,7 +8,7 @@ card {
     when(
       stateHolds(not(exists(and([isLand, hasSubtype(island), youControl])))),
       sacrifice(thisCreature)),
-    activated(tapSymbol, putCounters(1, printedKind(m1m1Counter), target(isCreature)))],
-  power = 0,
-  toughness = 3
+    activated(tapSymbol, putCounters(lit(1), printedKind(m1m1Counter), target(isCreature)))],
+  power = lit(0),
+  toughness = lit(3)
 }

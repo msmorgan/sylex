@@ -1,6 +1,6 @@
 card {
   name = "Aya of Alexandria",
-  cost = [2, red, white],
+  cost = [generic(2), pip(red), pip(white)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, assassin],
@@ -12,15 +12,15 @@ card {
         actor(a(and([isHistoric, isCreature, youControl]))),
         dealDamage(recipient = a(isPlayer), kind = combat)),
       create(
-        1,
+        lit(1),
         written({
             characteristics = {
               colors = [black],
               types = [creature],
               subtypes = [assassin],
               text = [menace],
-              power = 1,
-              toughness = 1}})))],
-  power = 4,
-  toughness = 3
+              power = lit(1),
+              toughness = lit(1)}})))],
+  power = lit(4),
+  toughness = lit(3)
 }

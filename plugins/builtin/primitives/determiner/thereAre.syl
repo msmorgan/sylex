@@ -1,5 +1,5 @@
 # "if there are <subject>", as "three or more lands with the same name", "if two or more creatures
 # are tied for least toughness": a counted indefinite, published for the consequent.
-primitive thereAre(subject: NounPhrase): Condition = .exists {
+primitive thereAre(subject: NounPhrase): Condition = Exists {
   spelling = "if there are <subject>"
 }

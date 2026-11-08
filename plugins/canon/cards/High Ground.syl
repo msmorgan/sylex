@@ -1,6 +1,6 @@
 card {
   name = "High Ground",
-  cost = [white],
+  cost = [pip(white)],
   types = [enchantment],
   text = [
     static(

@@ -1,6 +1,6 @@
 card {
   name = "Soldevi Adnate",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [creature],
   subtypes = [human, cleric],
   text = [
@@ -9,7 +9,7 @@ card {
         [tapSymbol, perform(sacrifice(a(and([isCreature, or([hasColor(black), isArtifact])]))))]),
       addMana(
         statOf(stat(manaValue), the(and([was(sacrifice(which)), isCreature]))),
-        manaOf([[of(black)]])))],
-  power = 1,
-  toughness = 2
+        manaOf([[colored(black)]])))],
+  power = lit(1),
+  toughness = lit(2)
 }

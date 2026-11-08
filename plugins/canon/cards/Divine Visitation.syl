@@ -1,6 +1,6 @@
 card {
   name = "Divine Visitation",
-  cost = [3, white, white],
+  cost = [generic(3), pip(white), pip(white)],
   types = [enchantment],
   text = [
     static(
@@ -20,6 +20,6 @@ card {
                   types = [creature],
                   subtypes = [angel],
                   text = [flying, vigilance],
-                  power = 4,
-                  toughness = 4}})))))]
+                  power = lit(4),
+                  toughness = lit(4)}})))))]
 }

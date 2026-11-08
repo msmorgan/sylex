@@ -1,6 +1,6 @@
 card {
   name = "Bleeding Effect",
-  cost = [2, white, black],
+  cost = [generic(2), pip(white), pip(black)],
   types = [enchantment],
   text = [
     alsoForKeywords(
@@ -15,15 +15,15 @@ card {
             untilEndOfTurn),
           exists(and([isCreature, in(yourGraveyard), hasKeyword(thatKeyword)])))),
       [
-        flying,
-        firstStrike,
-        doubleStrike,
-        deathtouch,
+        theKeyword(flying),
+        theKeyword(firstStrike),
+        theKeyword(doubleStrike),
+        theKeyword(deathtouch),
         anyIn({word = hexproof}),
-        indestructible,
-        lifelink,
-        menace,
-        reach,
-        trample,
-        vigilance])]
+        theKeyword(indestructible),
+        theKeyword(lifelink),
+        theKeyword(menace),
+        theKeyword(reach),
+        theKeyword(trample),
+        theKeyword(vigilance)])]
 }

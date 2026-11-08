@@ -1,4 +1,4 @@
 # "while <event>"
-primitive whileDoing(event: GameEvent): Timing {
+primitive whileDoing(event: GameEvent): Timing = WhileDoing {
   spelling = "while <event>"
 }

@@ -1,12 +1,12 @@
 card {
   name = "Agate-Blade Assassin",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [creature],
   subtypes = [lizard, assassin],
   text = [
     whenever(
       does(actor(thisCreature), attack),
-      sequentially([instruct(defendingPlayer, loseLife(1)), gainLife(1)]))],
-  power = 1,
-  toughness = 3
+      sequentially([instruct(defendingPlayer, loseLife(lit(1))), gainLife(lit(1))]))],
+  power = lit(1),
+  toughness = lit(3)
 }

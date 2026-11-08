@@ -1,6 +1,6 @@
 card {
   name = "Grave Servitude",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [enchantment],
   subtypes = [aura],
   text = [
@@ -8,7 +8,7 @@ card {
     enchant(isCreature),
     static(
       conjunction([
-          getsPt(enchanted(creature), up(3), down(1)),
-          qualityChange(it, sets, colored(some([black])))],
+          getsPt(enchanted(creature), up(lit(3)), down(lit(1))),
+          qualityChange(it, sets, colored(colors([black])))],
         subject = enchanted(creature)))]
 }

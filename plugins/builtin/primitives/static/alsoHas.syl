@@ -1,4 +1,4 @@
 # "except it has <ability>"
-primitive alsoHas(ability: Ability): CopyExcept = .ability {
+primitive alsoHas(ability: Ability): CopyExcept = Ability {
   spelling = "except it has <ability>"
 }

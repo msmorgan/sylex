@@ -1,9 +1,9 @@
 card {
   name = "Mana Flare",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [enchantment],
   text = [
     whenever(
       does(actor(a(isPlayer)), tapForMana(a(isLand))),
-      instruct(that(player), addMana(1, ofTypeProducedBy(that(land)))))]
+      instruct(that(player), addMana(lit(1), ofTypeProducedBy(that(land)))))]
 }

@@ -1,9 +1,9 @@
 card {
   name = "Giant Cindermaw",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [creature],
   subtypes = [dinosaur, beast],
   text = [trample, static(cant(actor(bare(isPlayer)), gainLife(anyAmount)))],
-  power = 4,
-  toughness = 3
+  power = lit(4),
+  toughness = lit(3)
 }

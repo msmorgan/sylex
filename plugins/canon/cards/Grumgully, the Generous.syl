@@ -1,6 +1,6 @@
 card {
   name = "Grumgully, the Generous",
-  cost = [1, red, green],
+  cost = [generic(1), pip(red), pip(green)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [goblin, shaman],
@@ -8,8 +8,8 @@ card {
     static(
       entersWithAdditionalCounters(
         each(and([isCreature, youControl, non(hasSubtype(human)), isOther])),
-        1,
+        lit(1),
         p1p1Counter))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

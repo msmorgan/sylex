@@ -1,0 +1,3 @@
+primitive mainPhase: TurnPart = MainPhase {
+  spelling = "main phase"
+}

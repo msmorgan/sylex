@@ -1,11 +1,11 @@
 card {
   name = "Kaervek's Purge",
-  cost = [variable, black, red],
+  cost = [variable, pip(black), pip(red)],
   types = [sorcery],
   text = [
     spell(
       sequentially([
-          destroy(target(and([isCreature, hasManaValue(eq, letter(x))]))),
+          destroy(target(and([isCreature, hasManaValue(equal, letter(x))]))),
           doIf(
             did(actor(that(creature)), die, thisWay),
             instruct(this, dealDamage(powerOf(that(creature)), controllerOf(that(creature)))))]))]

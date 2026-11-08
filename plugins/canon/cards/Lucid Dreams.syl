@@ -1,6 +1,6 @@
 card {
   name = "Lucid Dreams",
-  cost = [3, blue, blue],
+  cost = [generic(3), pip(blue), pip(blue)],
   types = [sorcery],
   text = [
     spell(

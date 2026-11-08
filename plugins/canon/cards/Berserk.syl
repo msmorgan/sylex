@@ -1,6 +1,6 @@
 card {
   name = "Berserk",
-  cost = [green],
+  cost = [pip(green)],
   types = [instant],
   text = [
     spell(
@@ -9,7 +9,7 @@ card {
             target(isCreature),
             [
               abilityGrant(it, trample),
-              getsPt(it, up(letter(x)), up(0)),
+              getsPt(it, up(letter(x)), up(lit(0))),
               letterDefinition(x, powerOf(it))],
             untilEndOfTurn),
           atNext(

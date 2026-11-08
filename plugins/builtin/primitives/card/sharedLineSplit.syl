@@ -1,0 +1,4 @@
+primitive sharedLineSplit(
+  shared: CardFace,
+  left: SharedLineHalf,
+  right: SharedLineHalf): Card = SharedLineSplit

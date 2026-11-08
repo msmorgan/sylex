@@ -5,7 +5,7 @@
 # [CR#608.2c].
 card {
   name = "Joust",
-  cost = [1, red],
+  cost = [generic(1), pip(red)],
   types = [sorcery],
   text = [
     spell(
@@ -13,7 +13,7 @@ card {
           choose(
             both(target(and([isCreature, youControl])), target(and([isCreature, youDontControl])))),
           doOnlyIf(
-            get(the(and([isCreature, youControl])), up(2), up(1), untilEndOfTurn),
+            get(the(and([isCreature, youControl])), up(lit(2)), up(lit(1)), untilEndOfTurn),
             is(it, hasSubtype(knight))),
           fightEachOther(those(creature))]))]
 }

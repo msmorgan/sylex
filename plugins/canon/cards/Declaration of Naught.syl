@@ -1,8 +1,8 @@
 card {
   name = "Declaration of Naught",
-  cost = [blue, blue],
+  cost = [pip(blue), pip(blue)],
   types = [enchantment],
   text = [
     static(entersChoosing(thisEnchantment, cardName)),
-    activated(mana([blue]), counter(target(and([isSpell, named(chosenName)]))))]
+    activated(mana([pip(blue)]), counter(target(and([isSpell, named(chosenName)]))))]
 }

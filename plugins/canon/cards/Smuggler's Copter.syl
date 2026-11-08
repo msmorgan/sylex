@@ -1,6 +1,6 @@
 card {
   name = "Smuggler's Copter",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   subtypes = [vehicle],
   text = [
@@ -8,8 +8,8 @@ card {
     whenever(
       does(actor(thisVehicle), attack),
       or = [does(actor(thisVehicle), block)],
-      action = may(draw(1), discard(a(cardIn(yourHand))))),
-    crew(1)],
-  power = 3,
-  toughness = 3
+      action = may(draw(lit(1)), discard(a(cardIn(yourHand))))),
+    crew(lit(1))],
+  power = lit(3),
+  toughness = lit(3)
 }

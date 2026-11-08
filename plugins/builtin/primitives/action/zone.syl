@@ -1,1 +1,1 @@
-primitive zone(zone: Location): Exposed
+primitive zone(zone: Location): Exposed = Zone

@@ -1,6 +1,6 @@
 card {
   name = "Bloodshed Fever",
-  cost = [red],
+  cost = [pip(red)],
   types = [enchantment],
   subtypes = [aura],
   text = [enchant(isCreature), static(must(actor(enchanted(creature)), attack))]

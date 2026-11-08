@@ -1,9 +1,9 @@
 card {
   name = "Repentant Blacksmith",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [creature],
   subtypes = [human],
   text = [protection(hasColor(red))],
-  power = 1,
-  toughness = 2
+  power = lit(1),
+  toughness = lit(2)
 }

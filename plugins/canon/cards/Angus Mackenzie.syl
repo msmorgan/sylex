@@ -1,14 +1,14 @@
 card {
   name = "Angus Mackenzie",
-  cost = [green, white, blue],
+  cost = [pip(green), pip(white), pip(blue)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, cleric],
   text = [
     activatedOnlyDuring(
-      compound([mana([green, white, blue]), tapSymbol]),
+      compound([mana([pip(green), pip(white), pip(blue)]), tapSymbol]),
       preventAll(any, thisTurn, combat),
       beforePart(combatDamage))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

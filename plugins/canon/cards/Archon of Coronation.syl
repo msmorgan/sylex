@@ -5,7 +5,7 @@
 # [CR#120.3f,725.2].
 card {
   name = "Archon of Coronation",
-  cost = [4, white, white],
+  cost = [generic(4), pip(white), pip(white)],
   types = [creature],
   subtypes = [archon],
   text = [
@@ -18,6 +18,6 @@ card {
           loseLife(anyAmount),
           causedBy = byEvent(does(actor(a(isSource)), dealDamage(recipient = you)))),
         is(you, hasDesignation(monarch))))],
-  power = 5,
-  toughness = 5
+  power = lit(5),
+  toughness = lit(5)
 }

@@ -1,2 +1,2 @@
 # Authoring primitive for `StaticSpec.addsTarget`.
-primitive addsTarget(subject: NounPhrase, description: Predicate): StaticSpec
+primitive addsTarget(subject: NounPhrase, description: Predicate): StaticSpec = AddsTarget

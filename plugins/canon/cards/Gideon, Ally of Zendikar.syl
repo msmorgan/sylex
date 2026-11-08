@@ -1,12 +1,12 @@
 card {
   name = "Gideon, Ally of Zendikar",
-  cost = [2, white, white],
+  cost = [generic(2), pip(white), pip(white)],
   supertypes = [legendary],
   types = [planeswalker],
   subtypes = [gideon],
   text = [
     activated(
-      loyaltySymbol(up(1)),
+      loyaltySymbol(up(lit(1))),
       sequentially([
           establishThroughout(
             qualityChange(
@@ -17,16 +17,16 @@ card {
                     types = [creature],
                     subtypes = [human, soldier, ally],
                     text = [indestructible],
-                    power = 5,
-                    toughness = 5}},
+                    power = lit(5),
+                    toughness = lit(5)}},
                 planeswalker)),
             untilEndOfTurn),
           preventAll(it, thisTurn)])),
     activated(
-      loyaltySymbol(up(0)),
-      create(1, written(creatureToken(2, 2, [white], [knight, ally])))),
+      loyaltySymbol(up(lit(0))),
+      create(lit(1), written(creatureToken(2, 2, [white], [knight, ally])))),
     activated(
-      loyaltySymbol(down(4)),
-      getEmblem([static(getsPt(allOf(and([isCreature, youControl])), up(1), up(1)))]))],
-  loyalty = 4
+      loyaltySymbol(down(lit(4))),
+      getEmblem([static(getsPt(allOf(and([isCreature, youControl])), up(lit(1)), up(lit(1))))]))],
+  loyalty = lit(4)
 }

@@ -1,6 +1,6 @@
 card {
   name = "Denry Klin, Editor in Chief",
-  cost = [2, white, blue],
+  cost = [generic(2), pip(white), pip(blue)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [cat, advisor],
@@ -8,7 +8,11 @@ card {
     static(
       enters(
         thisCreature,
-        [withCounters(1, chosenKind([p1p1Counter, firstStrikeCounter, vigilanceCounter]), fresh)])),
+        [
+          withCounters(
+            lit(1),
+            chosenKind([p1p1Counter, firstStrikeCounter, vigilanceCounter]),
+            fresh)])),
     whenever(
       does(actor(a(and([isNontoken, and([isCreature, youControl])]))), enter),
       if = is(thisCreature, hasCounter),
@@ -17,6 +21,6 @@ card {
         thisCreature,
         counterKind,
         putCounters(statOf(boundCounter, thisCreature), thatKind, that(creature))))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

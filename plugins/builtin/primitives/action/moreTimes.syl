@@ -1,4 +1,4 @@
 # "<times> more times"
-primitive moreTimes(times: Amount): Repetition {
+primitive moreTimes(times: Amount): Repetition = MoreTimes {
   spelling = "<times> more times"
 }

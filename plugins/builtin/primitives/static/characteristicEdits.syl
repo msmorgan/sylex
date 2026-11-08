@@ -1,1 +1,1 @@
-primitive characteristicEdits(edits: List(CharacteristicEdit)): CopyExcept
+primitive characteristicEdits(edits: List(CharacteristicEdit)): CopyExcept = CharacteristicEdits

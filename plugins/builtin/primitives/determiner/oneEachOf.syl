@@ -1,2 +1,2 @@
 # Choose one member of the pool for each listed role.
-primitive oneEachOf(pool: NounPhrase, roles: List(Predicate) = []): NounPhrase
+primitive oneEachOf(pool: NounPhrase, roles: List(Predicate) = []): NounPhrase = OneEachOf

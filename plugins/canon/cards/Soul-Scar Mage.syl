@@ -1,6 +1,6 @@
 card {
   name = "Soul-Scar Mage",
-  cost = [red],
+  cost = [pip(red)],
   types = [creature],
   subtypes = [human, wizard],
   text = [
@@ -11,6 +11,6 @@ card {
           actor(a(and([isSource, youControl]))),
           dealDamage(recipient = a(and([isCreature, anOpponentControls])), kind = noncombat)),
         instead(putCounters(thatMuch, printedKind(m1m1Counter), that(creature)))))],
-  power = 1,
-  toughness = 2
+  power = lit(1),
+  toughness = lit(2)
 }

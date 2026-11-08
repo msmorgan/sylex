@@ -1,5 +1,5 @@
 # "the next <amount> damage" [CR#615.7]
 # [CR#615.7]
-primitive theNext(amount: Amount): PreventCut = .shield {
+primitive theNext(amount: Amount): PreventCut = Shield {
   spelling = "the next <amount> damage"
 }

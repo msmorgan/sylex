@@ -5,4 +5,4 @@ primitive qualified(
   timing: Option(Timing) = none,
   limit: Option(UsageLimit) = none,
   guard: Option(Condition) = none,
-  from: Option(Zone) = none): Ability
+  from: Option(Zone) = none): Ability = Qualified

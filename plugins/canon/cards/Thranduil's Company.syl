@@ -1,6 +1,6 @@
 card {
   name = "Thranduil's Company",
-  cost = [2, green, blue],
+  cost = [generic(2), pip(green), pip(blue)],
   types = [creature],
   subtypes = [elf, soldier],
   text = [
@@ -12,8 +12,8 @@ card {
       whenever(
         does(actor(a(and([isLand, youControl]))), enter),
         sequentially([
-            putCounters(2, printedKind(p1p1Counter), target(and([isCreature, youControl]))),
+            putCounters(lit(2), printedKind(p1p1Counter), target(and([isCreature, youControl]))),
             gain(it, vigilance, untilEndOfTurn)])))],
-  power = 3,
-  toughness = 4
+  power = lit(3),
+  toughness = lit(4)
 }

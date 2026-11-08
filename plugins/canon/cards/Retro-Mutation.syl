@@ -1,6 +1,6 @@
 card {
   name = "Retro-Mutation",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [enchantment],
   subtypes = [aura],
   text = [
@@ -12,7 +12,7 @@ card {
             enchanted(creature),
             sets,
             bundle({characteristics = {subtypes = [turtle]}})),
-          getsBase(it, 0, 1),
+          getsBase(it, lit(0), lit(1)),
           cant(actor(it), attack),
           allAbilityLoss(it)]))]
 }

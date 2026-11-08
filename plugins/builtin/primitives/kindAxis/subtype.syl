@@ -1,0 +1,1 @@
+primitive subtype(host: CardType, scope: SubtypeScope): KindAxis = Subtype

@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.hasType`.
-primitive hasType(type: CardType): Predicate {
+primitive hasType(type: CardType): Predicate = HasType {
   spelling = "<type>"
 }

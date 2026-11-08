@@ -1,13 +1,13 @@
 card {
   name = "Magistrate's Scepter",
-  cost = [3],
+  cost = [generic(3)],
   types = [artifact],
   text = [
     activated(
-      compound([mana([4]), tapSymbol]),
-      putCounters(1, printedKind(chargeCounter), thisArtifact)),
+      compound([mana([generic(4)]), tapSymbol]),
+      putCounters(lit(1), printedKind(chargeCounter), thisArtifact)),
     activated(
       compound(
         [tapSymbol, perform(removeCounters(exactly(3), printedKind(chargeCounter), thisArtifact))]),
-      extraTurn(1))]
+      extraTurn(lit(1)))]
 }

@@ -1,6 +1,6 @@
 card {
   name = "Snapcaster Mage",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [creature],
   subtypes = [human, wizard],
   text = [
@@ -11,6 +11,6 @@ card {
         target(and([isInstantOrSorcery, cardIn(yourGraveyard)])),
         flashback(itsManaCost),
         untilEndOfTurn))],
-  power = 2,
-  toughness = 1
+  power = lit(2),
+  toughness = lit(1)
 }

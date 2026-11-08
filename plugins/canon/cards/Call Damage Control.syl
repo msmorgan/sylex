@@ -2,15 +2,15 @@
 # graveyard to your hand.", with its bullet's target.
 card {
   name = "Call Damage Control",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [sorcery],
   text = [
     spell(
       chooseModes(
         upTo(2),
         [
-          mk(none, none, returnToHand(target(and([isArtifact, isCard])), yourGraveyard)),
-          mk(none, none, returnToHand(target(and([isCreature, isCard])), yourGraveyard)),
-          mk(none, none, returnToHand(target(and([isEnchantment, isCard])), yourGraveyard)),
-          mk(none, none, returnToHand(target(and([isLand, isCard])), yourGraveyard))]))]
+          mode(none, none, returnToHand(target(and([isArtifact, isCard])), yourGraveyard)),
+          mode(none, none, returnToHand(target(and([isCreature, isCard])), yourGraveyard)),
+          mode(none, none, returnToHand(target(and([isEnchantment, isCard])), yourGraveyard)),
+          mode(none, none, returnToHand(target(and([isLand, isCard])), yourGraveyard))]))]
 }

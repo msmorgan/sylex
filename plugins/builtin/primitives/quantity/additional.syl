@@ -1,4 +1,4 @@
 # "an additional N": beyond what is otherwise allowed ("play an additional land").
-primitive additional(quantity: Quantity): Quantity {
+primitive additional(quantity: Quantity): Quantity = Additional {
   spelling = "an additional <quantity>"
 }

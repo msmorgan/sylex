@@ -1,0 +1,1 @@
+primitive simple(symbol: SimpleManaSymbol): ManaSymbol = Simple

@@ -2,15 +2,15 @@ card {
   name = "Mutavault",
   types = [land],
   text = [
-    activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
+    activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
     activated(
-      mana([1]),
+      mana([generic(1)]),
       establishThroughout(
         qualityChange(
           thisLand,
           sets,
           bundle({
-              characteristics = {types = [creature], power = 2, toughness = 2},
+              characteristics = {types = [creature], power = lit(2), toughness = lit(2)},
               qualities = [withEveryType(creature)]},
             land)),
         untilEndOfTurn))]

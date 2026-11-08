@@ -1,6 +1,6 @@
 card {
   name = "Arrest",
-  cost = [2, white],
+  cost = [generic(2), pip(white)],
   types = [enchantment],
   subtypes = [aura],
   text = [

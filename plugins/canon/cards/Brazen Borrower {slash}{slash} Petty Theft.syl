@@ -1,19 +1,21 @@
-card adventurer({
-    normal = {
-      name = "Brazen Borrower",
-      cost = [1, blue, blue],
-      types = [creature],
-      subtypes = [faerie, rogue],
-      text = [
-        flash,
-        flying,
-        static(
-          cant(actor(thisCreature), block(allOf(and([isCreature, not(hasKeyword(flying))])))))],
-      power = 3,
-      toughness = 1},
-    adventure = {
-      name = "Petty Theft",
-      cost = [1, blue],
-      types = [instant],
-      subtypes = [adventure],
-      text = [spell(returnToHand(target(and([non(isLand), isPermanent, anOpponentControls]))))]}})
+card adventurer(
+  normal = {
+    name = "Brazen Borrower",
+    cost = [generic(1), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [faerie, rogue],
+    text = [
+      flash,
+      flying,
+      static(
+        cant(
+          actor(thisCreature),
+          block(allOf(and([isCreature, not(hasKeyword(theKeyword(flying)))])))))],
+    power = lit(3),
+    toughness = lit(1)},
+  adventure = {
+    name = "Petty Theft",
+    cost = [generic(1), pip(blue)],
+    types = [instant],
+    subtypes = [adventure],
+    text = [spell(returnToHand(target(and([non(isLand), isPermanent, anOpponentControls]))))]})

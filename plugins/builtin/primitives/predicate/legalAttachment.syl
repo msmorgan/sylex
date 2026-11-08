@@ -1,2 +1,4 @@
 # Full-arity binding for `Predicate.legalAttachment`.
-primitive legalAttachment(side: AttachmentSide, counterpart: NounPhrase): Predicate
+primitive legalAttachment(
+  side: AttachmentSide,
+  counterpart: NounPhrase): Predicate = LegalAttachment

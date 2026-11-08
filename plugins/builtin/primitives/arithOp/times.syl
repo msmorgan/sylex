@@ -1,0 +1,1 @@
+primitive times: ArithOp = Times

@@ -1,12 +1,12 @@
 card {
   name = "Answered Prayers",
-  cost = [1, white, white],
+  cost = [generic(1), pip(white), pip(white)],
   types = [enchantment],
   text = [
     when(
       does(actor(a(and([isCreature, youControl]))), enter),
       sequentially([
-          gainLife(1),
+          gainLife(lit(1)),
           doIf(
             not(is(thisEnchantment, isCreature)),
             become(
@@ -16,7 +16,7 @@ card {
                   types = [creature],
                   subtypes = [angel],
                   text = [flying],
-                  power = 3,
-                  toughness = 3}},
+                  power = lit(3),
+                  toughness = lit(3)}},
               untilEndOfTurn))]))]
 }

@@ -1,14 +1,14 @@
 card {
   name = "Skill Borrower",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [artifact, creature],
   subtypes = [human, wizard],
   text = [
     static(visibility(reveal, you, topOfLibrary)),
     static(
       onlyWhile(
-        abilityGrantFrom(thisCreature, topSlice(1), [anyActivated]),
-        is(topSlice(1), or([isArtifact, isCreature]))))],
-  power = 1,
-  toughness = 3
+        abilityGrantFrom(thisCreature, topSlice(lit(1)), [anyActivated]),
+        is(topSlice(lit(1)), or([isArtifact, isCreature]))))],
+  power = lit(1),
+  toughness = lit(3)
 }

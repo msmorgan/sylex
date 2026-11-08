@@ -1,9 +1,9 @@
 card {
   name = "Heart of Bogardan",
-  cost = [2, red, red],
+  cost = [generic(2), pip(red), pip(red)],
   types = [enchantment],
   text = [
-    cumulativeUpkeep(mana([2])),
+    cumulativeUpkeep(mana([generic(2)])),
     when(
       does(actor(a(isPlayer)), pay(anyCost, once, unpaid, thisEnchantment, cumulativeUpkeep)),
       sequentially([
@@ -14,5 +14,5 @@ card {
                 dealDamage(
                   letter(x),
                   each(and([isCreature, controlledBy(splitOverPlaneswalker)]))))]),
-          define(x, minus(times(2, countersOn(ageCounter, thisEnchantment)), 2))]))]
+          define(x, minus(times(lit(2), countersOn(ageCounter, thisEnchantment)), lit(2)))]))]
 }

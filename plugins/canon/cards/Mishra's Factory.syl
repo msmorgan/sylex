@@ -2,9 +2,9 @@ card {
   name = "Mishra's Factory",
   types = [land],
   text = [
-    activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
+    activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
     activated(
-      mana([1]),
+      mana([generic(1)]),
       establishThroughout(
         qualityChange(
           thisLand,
@@ -13,11 +13,15 @@ card {
               characteristics = {
                 types = [artifact, creature],
                 subtypes = [assemblyWorker],
-                power = 2,
-                toughness = 2}},
+                power = lit(2),
+                toughness = lit(2)}},
             land)),
         untilEndOfTurn)),
     activated(
       tapSymbol,
-      get(target(and([isCreature, hasSubtype(assemblyWorker)])), up(1), up(1), untilEndOfTurn))]
+      get(
+        target(and([isCreature, hasSubtype(assemblyWorker)])),
+        up(lit(1)),
+        up(lit(1)),
+        untilEndOfTurn))]
 }

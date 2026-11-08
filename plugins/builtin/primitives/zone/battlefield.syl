@@ -1,0 +1,3 @@
+primitive battlefield: Zone = Battlefield {
+  spelling = "battlefield"
+}

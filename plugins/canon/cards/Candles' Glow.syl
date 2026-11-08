@@ -1,6 +1,6 @@
 card {
   name = "Candles' Glow",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [instant],
   subtypes = [arcane],
   text = [
@@ -8,7 +8,7 @@ card {
       establishThroughout(
         replace(
           would(any, dealDamage(recipient = target(isAnyTarget))),
-          instead(preventDamage(theNext(3), also = gainLife(preventedThisWay)))),
+          instead(preventDamage(theNext(lit(3)), also = gainLife(preventedThisWay)))),
         thisTurn)),
-    splice(hasSubtype(arcane), mana([1, white]))]
+    splice(hasSubtype(arcane), mana([generic(1), pip(white)]))]
 }

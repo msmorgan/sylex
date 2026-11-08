@@ -1,6 +1,6 @@
 card {
   name = "Ethereal Haze",
-  cost = [white],
+  cost = [pip(white)],
   types = [instant],
   subtypes = [arcane],
   text = [spell(preventAllBy(allOf(isCreature), any, thisTurn))]

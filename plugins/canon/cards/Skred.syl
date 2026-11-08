@@ -1,6 +1,6 @@
 card {
   name = "Skred",
-  cost = [red],
+  cost = [pip(red)],
   types = [instant],
   text = [
     spell(

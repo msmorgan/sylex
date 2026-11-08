@@ -1,6 +1,6 @@
 card {
   name = "Squelch",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [instant],
-  text = [spell(sequentially([counter(target(abilityHead(anyActivated))), draw(1)]))]
+  text = [spell(sequentially([counter(target(abilityHead(anyActivated))), draw(lit(1))]))]
 }

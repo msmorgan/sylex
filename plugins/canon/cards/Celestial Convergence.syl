@@ -1,15 +1,15 @@
 card {
   name = "Celestial Convergence",
-  cost = [2, white, white],
+  cost = [generic(2), pip(white), pip(white)],
   types = [enchantment],
   text = [
-    static(entersWithCounters(thisEnchantment, 7, omenCounter)),
+    static(entersWithCounters(thisEnchantment, lit(7), omenCounter)),
     at(
       beginningOfYour(upkeep),
       sequentially([
           removeCounters(exactly(1), printedKind(omenCounter), thisEnchantment),
           doIf(
-            compareAmt(countersOn(omenCounter, thisEnchantment), atMost, 0),
+            compareAmt(countersOn(omenCounter, thisEnchantment), atMost, lit(0)),
             doIf(
               thereAre(
                 counted(orMore(2), and([isPlayer, tiedFor(max, playerStat(lifeTotal), isPlayer)]))),

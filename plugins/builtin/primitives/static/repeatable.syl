@@ -1,4 +1,4 @@
 # Allows the same mode to be chosen more than once. [CR#700.2d]
-primitive repeatable: ModeChange {
+primitive repeatable: ModeChange = Repeatable {
   spelling = "You may choose the same mode more than once."
 }

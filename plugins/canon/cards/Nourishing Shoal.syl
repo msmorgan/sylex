@@ -1,12 +1,12 @@
 card {
   name = "Nourishing Shoal",
-  cost = [variable, green, green],
+  cost = [variable, pip(green), pip(green)],
   types = [instant],
   subtypes = [arcane],
   text = [
     static(
       altCost(
         this,
-        perform(exile(a(and([hasColor(green), hasManaValue(eq, letter(x)), in(yourHand)])))))),
+        perform(exile(a(and([hasColor(green), hasManaValue(equal, letter(x)), in(yourHand)])))))),
     spell(gainLife(letter(x)))]
 }

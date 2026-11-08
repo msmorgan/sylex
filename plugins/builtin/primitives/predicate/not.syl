@@ -1,4 +1,4 @@
 # "not <predicate>"
-primitive not(predicate: Predicate): Predicate {
+primitive not(predicate: Predicate): Predicate = Not {
   spelling = "not <predicate>"
 }

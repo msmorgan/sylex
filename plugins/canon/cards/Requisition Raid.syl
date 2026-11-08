@@ -1,16 +1,16 @@
 card {
   name = "Requisition Raid",
-  cost = [white],
+  cost = [pip(white)],
   types = [sorcery],
   text = [
     spell(
       chooseSpree([
-          {cost = mana([1]), action = destroy(target(isArtifact))},
-          {cost = mana([1]), action = destroy(target(isEnchantment))},
+          {cost = mana([generic(1)]), action = destroy(target(isArtifact))},
+          {cost = mana([generic(1)]), action = destroy(target(isEnchantment))},
           {
-            cost = mana([1]),
+            cost = mana([generic(1)]),
             action = putCounters(
-              1,
+              lit(1),
               printedKind(p1p1Counter),
               each(and([isCreature, controlledBy(target(isPlayer))])))}]))]
 }

@@ -1,0 +1,3 @@
+primitive basePower: Stat = BasePower {
+  spelling = "base power"
+}

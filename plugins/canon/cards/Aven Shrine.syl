@@ -1,6 +1,6 @@
 card {
   name = "Aven Shrine",
-  cost = [1, white, white],
+  cost = [generic(1), pip(white), pip(white)],
   types = [enchantment],
   text = [
     whenever(

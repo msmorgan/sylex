@@ -1,11 +1,11 @@
 card {
   name = "Flickering Ward",
-  cost = [white],
+  cost = [pip(white)],
   types = [enchantment],
   subtypes = [aura],
   text = [
     enchant(isCreature),
     static(entersChoosing(thisAura, color)),
     static(retention(abilityGrant(enchanted(creature), protection(ofChosen(color))), thisAura)),
-    activated(mana([white]), returnToHand(thisAura))]
+    activated(mana([pip(white)]), returnToHand(thisAura))]
 }

@@ -1,6 +1,6 @@
 card {
   name = "Belltower Sphinx",
-  cost = [4, blue],
+  cost = [generic(4), pip(blue)],
   types = [creature],
   subtypes = [sphinx],
   text = [
@@ -8,6 +8,6 @@ card {
     whenever(
       does(actor(a(isSource)), dealDamage(recipient = thisCreature)),
       instruct(controllerOf(thatSource), mill(thatMuch)))],
-  power = 2,
-  toughness = 5
+  power = lit(2),
+  toughness = lit(5)
 }

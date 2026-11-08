@@ -1,2 +1,2 @@
 # "<np> <verb>s": the clause's subject, in the active voice.
-primitive actor(np: NounPhrase): Subject
+primitive actor(np: NounPhrase): Subject = Actor

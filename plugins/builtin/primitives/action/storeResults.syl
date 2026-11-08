@@ -1,2 +1,2 @@
 # Store die results on the subject.
-primitive storeResults(on: NounPhrase): Action
+primitive storeResults(on: NounPhrase): Action = StoreResults

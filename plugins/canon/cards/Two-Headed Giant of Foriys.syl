@@ -1,6 +1,6 @@
 card {
   name = "Two-Headed Giant of Foriys",
-  cost = [4, red],
+  cost = [generic(4), pip(red)],
   types = [creature],
   subtypes = [giant],
   text = [
@@ -10,6 +10,6 @@ card {
         actor(thisCreature),
         block(counted(additional(exactly(1)), isCreature)),
         timing = eachCombat))],
-  power = 4,
-  toughness = 4
+  power = lit(4),
+  toughness = lit(4)
 }

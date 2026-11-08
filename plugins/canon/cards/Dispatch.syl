@@ -8,13 +8,13 @@
 # that creature."
 card {
   name = "Dispatch",
-  cost = [white],
+  cost = [pip(white)],
   types = [instant],
   text = [
     spell(tap(target(isCreature))),
     metalcraft(
       spell(
         doIf(
-          compareAmt(countOf(and([isArtifact, youControl])), atLeast, 3),
+          compareAmt(countOf(and([isArtifact, youControl])), atLeast, lit(3)),
           exile(that(creature)))))]
 }

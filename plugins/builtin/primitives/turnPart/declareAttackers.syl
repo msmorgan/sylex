@@ -1,0 +1,3 @@
+primitive declareAttackers: TurnPart = DeclareAttackers {
+  spelling = "declare attackers"
+}

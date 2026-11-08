@@ -1,4 +1,4 @@
 # "you"
-primitive you: NounPhrase {
+primitive you: NounPhrase = You {
   spelling = "you"
 }

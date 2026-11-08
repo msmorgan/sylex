@@ -1,10 +1,10 @@
 card {
   name = "Training Grounds",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [enchantment],
   text = [
     static(
       costShift(
         allOf(and([abilityHead(anyActivated), abilityOf(allOf(and([isCreature, youControl])))])),
-        less(2, 1)))]
+        less(lit(2), lit(1))))]
 }

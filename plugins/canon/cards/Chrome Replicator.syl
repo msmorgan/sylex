@@ -1,6 +1,6 @@
 card {
   name = "Chrome Replicator",
-  cost = [5],
+  cost = [generic(5)],
   types = [artifact, creature],
   subtypes = [construct],
   text = [
@@ -10,13 +10,13 @@ card {
         withTheSameName(
           counted(orMore(2), and([isPermanent, non(isLand), isNontoken, youControl])))),
       action = create(
-        1,
+        lit(1),
         written({
             characteristics = {
               types = [artifact, creature],
               subtypes = [construct],
-              power = 4,
-              toughness = 4}})))],
-  power = 4,
-  toughness = 4
+              power = lit(4),
+              toughness = lit(4)}})))],
+  power = lit(4),
+  toughness = lit(4)
 }

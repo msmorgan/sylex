@@ -1,0 +1,1 @@
+primitive loseGame: OutcomeVerb = LoseGame

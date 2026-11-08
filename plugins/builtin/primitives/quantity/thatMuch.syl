@@ -1,4 +1,4 @@
 # The previously mentioned amount.
-primitive thatMuch: Amount {
+primitive thatMuch: Amount = ThatMuch {
   spelling = "that much"
 }

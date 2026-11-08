@@ -1,6 +1,6 @@
 card {
   name = "Grixis Illusionist",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [creature],
   subtypes = [human, wizard],
   text = [
@@ -12,6 +12,6 @@ card {
           sets,
           chosenQuality(ofYourChoice(subtype(land), basicTypesOnly))),
         untilEndOfTurn))],
-  power = 1,
-  toughness = 1
+  power = lit(1),
+  toughness = lit(1)
 }

@@ -1,1 +1,1 @@
-primitive conditionDid(clause: DidClause): Condition = .did
+primitive conditionDid(clause: DidClause): Condition = Did

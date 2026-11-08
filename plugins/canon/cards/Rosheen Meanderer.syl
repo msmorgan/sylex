@@ -1,6 +1,6 @@
 card {
   name = "Rosheen Meanderer",
-  cost = [3, hybridPip(red, green)],
+  cost = [generic(3), hybridPip(red, green)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [giant, shaman],
@@ -8,9 +8,9 @@ card {
     activated(
       tapSymbol,
       addMana(
-        1,
+        lit(1),
         manaOf([[colorless, colorless, colorless, colorless]]),
         [spendOnly([toPay(containing(variable))])]))],
-  power = 4,
-  toughness = 4
+  power = lit(4),
+  toughness = lit(4)
 }

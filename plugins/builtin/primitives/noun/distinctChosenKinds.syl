@@ -1,4 +1,4 @@
 # "N different counters from among <menu>"
-primitive distinctChosenKinds(menu: List(CounterKind)): CounterKindSource = .distinctChosen {
+primitive distinctChosenKinds(menu: List(CounterKind)): CounterKindSource = DistinctChosen {
   spelling = "N different counters from among <menu>"
 }

@@ -1,6 +1,6 @@
 card {
   name = "Cloudshift",
-  cost = [white],
+  cost = [pip(white)],
   types = [instant],
   text = [
     spell(

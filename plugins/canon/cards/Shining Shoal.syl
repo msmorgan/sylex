@@ -1,13 +1,13 @@
 card {
   name = "Shining Shoal",
-  cost = [variable, white, white],
+  cost = [variable, pip(white), pip(white)],
   types = [instant],
   subtypes = [arcane],
   text = [
     static(
       altCost(
         this,
-        perform(exile(a(and([hasColor(white), hasManaValue(eq, letter(x)), in(yourHand)])))))),
+        perform(exile(a(and([hasColor(white), hasManaValue(equal, letter(x)), in(yourHand)])))))),
     spell(
       establishThroughout(
         replace(

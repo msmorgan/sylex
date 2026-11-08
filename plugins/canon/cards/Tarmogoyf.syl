@@ -1,6 +1,6 @@
 card {
   name = "Tarmogoyf",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [creature],
   subtypes = [lhurgoyf],
   text = [
@@ -8,5 +8,5 @@ card {
       definesPowerAndToughness(
         thisCreature,
         distinctCount(cardType, allOf(cardIn(graveyard))),
-        plus(distinctCount(cardType, allOf(cardIn(graveyard))), 1)))]
+        plus(distinctCount(cardType, allOf(cardIn(graveyard))), lit(1))))]
 }

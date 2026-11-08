@@ -1,6 +1,6 @@
 card {
   name = "Mirror Universe",
-  cost = [6],
+  cost = [generic(6)],
   types = [artifact],
   text = [
     activatedOnlyDuring(

@@ -1,6 +1,6 @@
 card {
   name = "Linvala, Keeper of Silence",
-  cost = [2, white, white],
+  cost = [generic(2), pip(white), pip(white)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [angel],
@@ -14,6 +14,6 @@ card {
             and([
                 abilityHead(anyActivated),
                 abilityOf(allOf(and([isCreature, opponentsControl])))])))))],
-  power = 3,
-  toughness = 4
+  power = lit(3),
+  toughness = lit(4)
 }

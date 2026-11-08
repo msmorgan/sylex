@@ -1,0 +1,3 @@
+primitive hand: Zone = Hand {
+  spelling = "hand"
+}

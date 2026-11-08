@@ -3,5 +3,5 @@
 # "{2}, {T}, Sacrifice this token: You gain 3 life." [CR#111.10b]
 template giftAFood: Ability {
   spelling = "gift a Food",
-  body = gift(create(1, written(foodToken)))
+  body = gift(create(lit(1), written(foodToken)))
 }

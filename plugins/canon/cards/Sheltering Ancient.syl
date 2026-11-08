@@ -1,12 +1,13 @@
 card {
   name = "Sheltering Ancient",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [creature],
   subtypes = [treefolk],
   text = [
     trample,
     cumulativeUpkeep(
-      perform(putCounters(1, printedKind(p1p1Counter), a(and([isCreature, anOpponentControls])))))],
-  power = 5,
-  toughness = 5
+      perform(
+        putCounters(lit(1), printedKind(p1p1Counter), a(and([isCreature, anOpponentControls])))))],
+  power = lit(5),
+  toughness = lit(5)
 }

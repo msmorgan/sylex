@@ -1,12 +1,12 @@
 card {
   name = "Witch's Vengeance",
-  cost = [1, black, black],
+  cost = [generic(1), pip(black), pip(black)],
   types = [sorcery],
   text = [
     spell(
       get(
         allOf(and([isCreature, ofYourChoice(subtype(creature))])),
-        down(3),
-        down(3),
+        down(lit(3)),
+        down(lit(3)),
         untilEndOfTurn))]
 }

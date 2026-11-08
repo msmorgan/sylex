@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.abilityOf`.
-primitive abilityOf(source: NounPhrase): Predicate {
+primitive abilityOf(source: NounPhrase): Predicate = AbilityOf {
   spelling = "ability of <source>"
 }

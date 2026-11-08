@@ -1,1 +1,1 @@
-primitive predicateDid(clause: DidClause): Predicate = .did
+primitive predicateDid(clause: DidClause): Predicate = Did

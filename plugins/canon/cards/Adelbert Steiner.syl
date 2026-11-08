@@ -1,6 +1,6 @@
 card {
   name = "Adelbert Steiner",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, knight],
@@ -9,8 +9,8 @@ card {
     static(
       getsPt(
         thisCreature,
-        up(forEach(1, and([hasSubtype(equipment), youControl]))),
-        up(forEach(1, and([hasSubtype(equipment), youControl])))))],
-  power = 2,
-  toughness = 1
+        up(forEach(lit(1), and([hasSubtype(equipment), youControl]))),
+        up(forEach(lit(1), and([hasSubtype(equipment), youControl])))))],
+  power = lit(2),
+  toughness = lit(1)
 }

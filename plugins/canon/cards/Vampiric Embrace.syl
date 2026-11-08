@@ -1,11 +1,11 @@
 card {
   name = "Vampiric Embrace",
-  cost = [2, black, black],
+  cost = [generic(2), pip(black), pip(black)],
   types = [enchantment],
   subtypes = [aura],
   text = [
     enchant(isCreature),
-    static(getsPt(enchanted(creature), up(2), up(2))),
+    static(getsPt(enchanted(creature), up(lit(2)), up(lit(2)))),
     static(abilityGrant(enchanted(creature), flying)),
     whenever(
       does(
@@ -18,5 +18,5 @@ card {
                   dealDamage(recipient = which),
                   within = within(soFarThisTurn))]))),
         die),
-      putCounters(1, printedKind(p1p1Counter), that(creature)))]
+      putCounters(lit(1), printedKind(p1p1Counter), that(creature)))]
 }

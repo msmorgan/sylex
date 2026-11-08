@@ -1,4 +1,4 @@
 # A quantity equal to the given amount.
-primitive exactlyOf(amount: Amount): Quantity {
+primitive exactlyOf(amount: Amount): Quantity = ExactlyOf {
   spelling = "<amount>"
 }

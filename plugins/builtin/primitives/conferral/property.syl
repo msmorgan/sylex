@@ -1,0 +1,1 @@
+primitive property(spec: StaticSpec): Conferral = Property

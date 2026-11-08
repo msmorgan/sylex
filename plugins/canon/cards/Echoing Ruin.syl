@@ -1,6 +1,6 @@
 card {
   name = "Echoing Ruin",
-  cost = [1, red],
+  cost = [generic(1), pip(red)],
   types = [sorcery],
   text = [
     spell(

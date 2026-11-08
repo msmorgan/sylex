@@ -1,9 +1,9 @@
 card {
   name = "Eager Construct",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact, creature],
   subtypes = [construct],
-  text = [when(does(actor(thisCreature), enter), instruct(eachPlayer, may(scry(1))))],
-  power = 2,
-  toughness = 2
+  text = [when(does(actor(thisCreature), enter), instruct(eachPlayer, may(scry(lit(1)))))],
+  power = lit(2),
+  toughness = lit(2)
 }

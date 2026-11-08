@@ -2,4 +2,4 @@
 primitive actionFlipCoins(
   count: FlipScope,
   call: Option(FlipCall),
-  outcome: Option(CoinFace)): Action = .flipCoins
+  outcome: Option(CoinFace)): Action = FlipCoins

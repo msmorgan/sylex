@@ -1,1 +1,1 @@
-primitive counters(kind: CounterKind): DividedVerb
+primitive counters(kind: CounterKind): DividedVerb = Counters

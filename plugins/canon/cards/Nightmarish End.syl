@@ -1,6 +1,6 @@
 card {
   name = "Nightmarish End",
-  cost = [2, black],
+  cost = [generic(2), pip(black)],
   types = [instant],
   text = [
     spell(

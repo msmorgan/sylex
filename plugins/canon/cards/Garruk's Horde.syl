@@ -1,12 +1,12 @@
 card {
   name = "Garruk's Horde",
-  cost = [5, green, green],
+  cost = [generic(5), pip(green), pip(green)],
   types = [creature],
   subtypes = [beast],
   text = [
     trample,
     static(visibility(reveal, you, topOfLibrary)),
     static(can(actor(you), cast(bare(and([isSpell, isCreature])), from = onTop)))],
-  power = 7,
-  toughness = 7
+  power = lit(7),
+  toughness = lit(7)
 }

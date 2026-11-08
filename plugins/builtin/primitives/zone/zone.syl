@@ -1,2 +1,2 @@
 # A zone location with an optional owner or controller scope.
-primitive zone(zone: Zone, whose: Option(NounPhrase)): Location
+primitive zone(zone: Zone, whose: Option(NounPhrase)): Location = Zone

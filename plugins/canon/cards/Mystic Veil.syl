@@ -1,6 +1,6 @@
 card {
   name = "Mystic Veil",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [enchantment],
   subtypes = [aura],
   text = [

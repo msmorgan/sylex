@@ -1,18 +1,18 @@
 card {
   name = "Inquisitor's Flail",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   subtypes = [equipment],
   text = [
     static(
       replace(
         would(actor(equipped(creature)), dealDamage(kind = combat)),
-        instead(instruct(it, dealDamage(times(2, thatMuch)))))),
+        instead(instruct(it, dealDamage(times(lit(2), thatMuch)))))),
     static(
       replace(
         would(
           actor(a(and([isCreature, isOther]))),
           dealDamage(recipient = equipped(creature), kind = combat)),
-        instead(instruct(it, dealDamage(times(2, thatMuch), equipped(creature)))))),
-    equip(mana([2]))]
+        instead(instruct(it, dealDamage(times(lit(2), thatMuch), equipped(creature)))))),
+    equip(mana([generic(2)]))]
 }

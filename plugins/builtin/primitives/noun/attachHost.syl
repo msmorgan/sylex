@@ -1,4 +1,4 @@
 # The object described as enchanted, equipped, or fortified.
-primitive attachHost(word: AttachWord, head: NounWord): NounPhrase {
+primitive attachHost(word: AttachWord, head: NounWord): NounPhrase = AttachHost {
   spelling = "<word> <head>"
 }

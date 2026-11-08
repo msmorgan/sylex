@@ -1,6 +1,6 @@
 card {
   name = "Bloodfire Enforcers",
-  cost = [3, red],
+  cost = [generic(3), pip(red)],
   types = [creature],
   subtypes = [human, monk],
   text = [
@@ -10,6 +10,6 @@ card {
         and([
             exists(and([isInstant, in(yourGraveyard)])),
             exists(and([isSorcery, in(yourGraveyard)]))])))],
-  power = 5,
-  toughness = 2
+  power = lit(5),
+  toughness = lit(2)
 }

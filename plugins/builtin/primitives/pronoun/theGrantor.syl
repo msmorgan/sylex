@@ -1,2 +1,2 @@
 # The object that granted this ability, identified by its head noun.
-primitive theGrantor(head: NounWord): NounPhrase
+primitive theGrantor(head: NounWord): NounPhrase = Grantor

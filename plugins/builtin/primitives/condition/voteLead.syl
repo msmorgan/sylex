@@ -1,2 +1,2 @@
 # Test whether the named choice has the most votes, optionally allowing a tie.
-primitive voteLead(label: String, orTied: Bool): Condition
+primitive voteLead(label: String, orTied: Bool): Condition = VoteLead

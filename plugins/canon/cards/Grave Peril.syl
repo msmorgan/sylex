@@ -1,6 +1,6 @@
 card {
   name = "Grave Peril",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [enchantment],
   text = [
     when(

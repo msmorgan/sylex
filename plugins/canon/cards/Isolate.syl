@@ -1,6 +1,6 @@
 card {
   name = "Isolate",
-  cost = [white],
+  cost = [pip(white)],
   types = [instant],
-  text = [spell(exile(target(and([isPermanent, hasManaValue(eq, 1)]))))]
+  text = [spell(exile(target(and([isPermanent, hasManaValue(equal, lit(1))]))))]
 }

@@ -1,0 +1,1 @@
+primitive ofType(word: NounWord, type: CardType): NounWord = OfType

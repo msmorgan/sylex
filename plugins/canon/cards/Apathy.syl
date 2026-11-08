@@ -1,6 +1,6 @@
 card {
   name = "Apathy",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [enchantment],
   subtypes = [aura],
   text = [

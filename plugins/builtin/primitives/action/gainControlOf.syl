@@ -5,4 +5,4 @@
 # TODO(spelling): Include or omit the clauses supplied by from.
 primitive gainControlOf(
   subject: NounPhrase,
-  from: Option(NounPhrase) = none): Action = .changeControl
+  from: Option(NounPhrase) = none): Action = ChangeControl

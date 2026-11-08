@@ -1,6 +1,6 @@
 card {
   name = "Lush Growth",
-  cost = [green],
+  cost = [pip(green)],
   types = [enchantment],
   subtypes = [aura],
   text = [

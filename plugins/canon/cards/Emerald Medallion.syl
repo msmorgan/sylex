@@ -1,10 +1,10 @@
 card {
   name = "Emerald Medallion",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   text = [
     static(
       costShift(
         allOf(and([hasColor(green), isSpell, did(actor(you), cast(which), thisObject)])),
-        less(1)))]
+        less(lit(1))))]
 }

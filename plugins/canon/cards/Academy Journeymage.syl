@@ -1,13 +1,13 @@
 card {
   name = "Academy Journeymage",
-  cost = [4, blue],
+  cost = [generic(4), pip(blue)],
   types = [creature],
   subtypes = [human, wizard],
   text = [
-    static(onlyIfSo(costShift(this, less(1)), exists(and([hasSubtype(wizard), youControl])))),
+    static(onlyIfSo(costShift(this, less(lit(1))), exists(and([hasSubtype(wizard), youControl])))),
     when(
       does(actor(thisCreature), enter),
       returnToHand(target(and([isCreature, anOpponentControls]))))],
-  power = 3,
-  toughness = 2
+  power = lit(3),
+  toughness = lit(2)
 }

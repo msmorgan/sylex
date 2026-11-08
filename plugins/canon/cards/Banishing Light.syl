@@ -1,6 +1,6 @@
 card {
   name = "Banishing Light",
-  cost = [2, white],
+  cost = [generic(2), pip(white)],
   types = [enchantment],
   text = [
     when(

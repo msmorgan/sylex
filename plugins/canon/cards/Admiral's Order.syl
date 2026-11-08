@@ -1,8 +1,9 @@
 card {
   name = "Admiral's Order",
-  cost = [1, blue, blue],
+  cost = [generic(1), pip(blue), pip(blue)],
   types = [instant],
   text = [
-    static(onlyWhile(altCost(this, mana([blue])), did(actor(you), attack, within(soFarThisTurn)))),
+    static(
+      onlyWhile(altCost(this, mana([pip(blue)])), did(actor(you), attack, within(soFarThisTurn)))),
     spell(counter(target(isSpell)))]
 }

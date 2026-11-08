@@ -1,6 +1,6 @@
 card {
   name = "Thwart",
-  cost = [2, blue, blue],
+  cost = [generic(2), pip(blue), pip(blue)],
   types = [instant],
   text = [
     static(

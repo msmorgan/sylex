@@ -3,4 +3,4 @@ primitive doForEachKind(
   axis: KindAxis,
   domain: Option(NounPhrase) = none,
   sort: QualitySort,
-  body: Action): Action
+  body: Action): Action = DoForEachKind

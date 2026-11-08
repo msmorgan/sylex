@@ -4,4 +4,4 @@ primitive actionVote(
   first: Option(NounPhrase),
   disclosure: Disclosure,
   ballot: Ballot,
-  times: Option(Quantity)): Action = .vote
+  times: Option(Quantity)): Action = Vote

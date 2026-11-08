@@ -1,9 +1,9 @@
 card {
   name = "Time Sieve",
-  cost = [blue, black],
+  cost = [pip(blue), pip(black)],
   types = [artifact],
   text = [
     activated(
       compound([tapSymbol, perform(sacrifice(counted(exactly(5), isArtifact)))]),
-      extraTurn(1))]
+      extraTurn(lit(1)))]
 }

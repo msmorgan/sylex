@@ -1,1 +1,1 @@
-primitive not(rider: MoveRider): MoveRider
+primitive not(rider: MoveRider): MoveRider = Not

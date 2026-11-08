@@ -1,16 +1,16 @@
 card {
   name = "Liliana of the Veil",
-  cost = [1, black, black],
+  cost = [generic(1), pip(black), pip(black)],
   supertypes = [legendary],
   types = [planeswalker],
   subtypes = [liliana],
   text = [
-    activated(loyaltySymbol(up(1)), instruct(eachPlayer, discard(a(cardIn(hand))))),
-    activated(loyaltySymbol(down(2)), instruct(target(isPlayer), sacrifice(a(isCreature)))),
+    activated(loyaltySymbol(up(lit(1))), instruct(eachPlayer, discard(a(cardIn(hand))))),
+    activated(loyaltySymbol(down(lit(2))), instruct(target(isPlayer), sacrifice(a(isCreature)))),
     activated(
-      loyaltySymbol(down(6)),
+      loyaltySymbol(down(lit(6))),
       sequentially([
           separateIntoPiles(allOf(and([isPermanent, controlledBy(target(isPlayer))])), 2),
           instruct(they, sacrifice(allOf(and([isPermanent, inPile(pileOfChoice(they))]))))]))],
-  loyalty = 3
+  loyalty = lit(3)
 }

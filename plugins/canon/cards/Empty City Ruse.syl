@@ -1,6 +1,6 @@
 card {
   name = "Empty City Ruse",
-  cost = [white],
+  cost = [pip(white)],
   types = [sorcery],
   text = [
     spell(

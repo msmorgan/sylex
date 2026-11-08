@@ -1,12 +1,12 @@
 card {
   name = "Azusa, Lost but Seeking",
-  cost = [2, green],
+  cost = [generic(2), pip(green)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, monk],
   text = [
     static(
       can(actor(you), play(counted(additional(exactly(2)), isLand)), timing = onEachOfYourTurns))],
-  power = 1,
-  toughness = 2
+  power = lit(1),
+  toughness = lit(2)
 }

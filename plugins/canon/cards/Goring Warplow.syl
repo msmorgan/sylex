@@ -1,10 +1,10 @@
-card prototype({
-    inner = {
-      name = "Goring Warplow",
-      cost = [6],
-      types = [artifact, creature],
-      subtypes = [construct],
-      text = [prototype, deathtouch],
-      power = 5,
-      toughness = 4},
-    alternative = {cost = [1, black], power = 1, toughness = 1}})
+card prototype(
+  inner = {
+    name = "Goring Warplow",
+    cost = [generic(6)],
+    types = [artifact, creature],
+    subtypes = [construct],
+    text = [prototype, deathtouch],
+    power = lit(5),
+    toughness = lit(4)},
+  alternative = {cost = [generic(1), pip(black)], power = lit(1), toughness = lit(1)})

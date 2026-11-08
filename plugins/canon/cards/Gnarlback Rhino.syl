@@ -1,13 +1,13 @@
 card {
   name = "Gnarlback Rhino",
-  cost = [2, green, green],
+  cost = [generic(2), pip(green), pip(green)],
   types = [creature],
   subtypes = [rhino],
   text = [
     trample,
     whenever(
       does(actor(you), cast(a(and([isSpell, targeting(thisCreature, someTarget)])))),
-      draw(1))],
-  power = 4,
-  toughness = 4
+      draw(lit(1)))],
+  power = lit(4),
+  toughness = lit(4)
 }

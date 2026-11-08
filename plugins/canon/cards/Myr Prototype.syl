@@ -1,20 +1,20 @@
 card {
   name = "Myr Prototype",
-  cost = [5],
+  cost = [generic(5)],
   types = [artifact, creature],
   subtypes = [myr],
   text = [
-    at(beginningOfYour(upkeep), putCounters(1, printedKind(p1p1Counter), thisCreature)),
+    at(beginningOfYour(upkeep), putCounters(lit(1), printedKind(p1p1Counter), thisCreature)),
     static(
       conjunction([
           gatedBy(
-            scaledGenericMana(times(1, countersOn(p1p1Counter, it))),
+            scaledGenericMana(times(lit(1), countersOn(p1p1Counter, it))),
             actor(thisCreature),
             attack),
           gatedBy(
-            scaledGenericMana(times(1, countersOn(p1p1Counter, it))),
+            scaledGenericMana(times(lit(1), countersOn(p1p1Counter, it))),
             actor(thisCreature),
             block)]))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

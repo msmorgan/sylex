@@ -1,4 +1,4 @@
 # "Add <runs>": one of the listed runs of mana symbols.
-primitive manaOf(runs: List(ProducedRun)): ProducedMana = .runs {
+primitive manaOf(runs: List(ProducedRun)): ProducedMana = Runs {
   spelling = "Add <runs>"
 }

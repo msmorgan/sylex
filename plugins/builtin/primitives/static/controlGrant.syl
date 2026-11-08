@@ -1,4 +1,4 @@
 # Authoring primitive for `StaticSpec.controlGrant`.
-primitive controlGrant(player: NounPhrase, subject: NounPhrase): StaticSpec {
+primitive controlGrant(player: NounPhrase, subject: NounPhrase): StaticSpec = ControlGrant {
   spelling = "<player> controls <subject>"
 }

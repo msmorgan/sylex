@@ -1,3 +1,5 @@
 # Authoring primitive for `Predicate.qualityNoun`.
 # TODO(spelling): Include or omit the clauses supplied by domain.
-primitive qualityNoun(sort: QualitySort, domain: Option(ChoiceDomain) = none): Predicate
+primitive qualityNoun(
+  sort: QualitySort,
+  domain: Option(ChoiceDomain) = none): Predicate = QualityNoun

@@ -1,6 +1,6 @@
 card {
   name = "Expel the Interlopers",
-  cost = [3, white, white],
+  cost = [generic(3), pip(white), pip(white)],
   types = [sorcery],
   text = [
     spell(

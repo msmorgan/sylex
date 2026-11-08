@@ -3,7 +3,7 @@
 # [CR#700.3a,700.3b].
 card {
   name = "Do or Die",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [sorcery],
   text = [
     spell(

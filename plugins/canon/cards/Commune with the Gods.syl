@@ -1,11 +1,11 @@
 card {
   name = "Commune with the Gods",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [sorcery],
   text = [
     spell(
       sequentially([
-          reveal(topSlice(5)),
+          reveal(topSlice(lit(5))),
           may(putInto(fromAmong(exactly(1), or([isCreature, isEnchantment]), them), hand)),
           putInto(theRest, graveyard)]))]
 }

@@ -1,6 +1,6 @@
 card {
   name = "Xenograft",
-  cost = [4, blue],
+  cost = [generic(4), pip(blue)],
   types = [enchantment],
   text = [
     static(entersChoosing(thisEnchantment, subtype(creature))),

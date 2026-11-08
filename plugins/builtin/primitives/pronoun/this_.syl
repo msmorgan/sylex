@@ -1,5 +1,5 @@
 # "this": the source, by self-name [CR#113.7].
 # [CR#113.7]
-primitive this: NounPhrase {
+primitive this: NounPhrase = This {
   spelling = "this"
 }

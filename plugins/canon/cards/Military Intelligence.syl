@@ -1,6 +1,6 @@
 card {
   name = "Military Intelligence",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [enchantment],
-  text = [whenever(does(actor(you), attackWith(counted(orMore(2), isCreature))), draw(1))]
+  text = [whenever(does(actor(you), attackWith(counted(orMore(2), isCreature))), draw(lit(1)))]
 }

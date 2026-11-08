@@ -1,6 +1,6 @@
 card {
   name = "Sunscour",
-  cost = [5, white, white],
+  cost = [generic(5), pip(white), pip(white)],
   types = [sorcery],
   text = [
     static(

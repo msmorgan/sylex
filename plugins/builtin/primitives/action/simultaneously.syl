@@ -1,2 +1,2 @@
 # Perform the actions simultaneously.
-primitive simultaneously(steps: List(Action) = []): Action
+primitive simultaneously(steps: List(Action) = []): Action = Simultaneously

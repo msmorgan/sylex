@@ -1,0 +1,1 @@
+primitive fresh: EntryCounterMark = Fresh

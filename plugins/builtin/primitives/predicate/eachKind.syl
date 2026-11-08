@@ -2,4 +2,4 @@
 # color among permanents you control": one ability per value [CR#702.16h,702.16i].
 # [CR#702.16h,702.16i]
 # TODO(spelling): Include or omit the clauses supplied by domain.
-primitive eachKind(axis: KindAxis, domain: Option(NounPhrase) = none): Predicate
+primitive eachKind(axis: KindAxis, domain: Option(NounPhrase) = none): Predicate = EachKind

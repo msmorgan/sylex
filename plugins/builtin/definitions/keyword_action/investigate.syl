@@ -2,5 +2,5 @@
 action investigate {
   lexical = {verbs = [{lemma = "investigate", frames = [Intransitive]}]},
   spelling = "investigate",
-  body = create(1, written(clueToken))
+  body = create(lit(1), written(clueToken))
 }

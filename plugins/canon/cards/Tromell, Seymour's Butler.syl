@@ -1,6 +1,6 @@
 card {
   name = "Tromell, Seymour's Butler",
-  cost = [2, green],
+  cost = [generic(2), pip(green)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [elf, advisor],
@@ -8,10 +8,10 @@ card {
     static(
       entersWithAdditionalCounters(
         each(and([isCreature, isNontoken, youControl, isOther])),
-        1,
+        lit(1),
         p1p1Counter)),
     activated(
-      compound([mana([1]), tapSymbol]),
+      compound([mana([generic(1)]), tapSymbol]),
       sequentially([
           repeatTimes(letter(x), proliferate),
           define(
@@ -22,6 +22,6 @@ card {
                   isCreature,
                   youControl,
                   did(actor(which), enter, within(soFarThisTurn))])))]))],
-  power = 2,
-  toughness = 3
+  power = lit(2),
+  toughness = lit(3)
 }

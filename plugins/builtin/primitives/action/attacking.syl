@@ -1,1 +1,1 @@
-primitive attacking(defender: Option(NounPhrase)): CombatParticipation
+primitive attacking(defender: Option(NounPhrase)): CombatParticipation = Attacking

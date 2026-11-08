@@ -1,6 +1,6 @@
 card {
   name = "Stuffy Doll",
-  cost = [5],
+  cost = [generic(5)],
   types = [artifact, creature],
   subtypes = [construct],
   text = [
@@ -9,7 +9,7 @@ card {
     whenever(
       does(any, dealDamage(recipient = thisCreature)),
       instruct(it, dealDamage(thatMuch, the(isChosenPlayer)))),
-    activated(tapSymbol, instruct(thisCreature, dealDamage(1, thisCreature)))],
-  power = 0,
-  toughness = 1
+    activated(tapSymbol, instruct(thisCreature, dealDamage(lit(1), thisCreature)))],
+  power = lit(0),
+  toughness = lit(1)
 }

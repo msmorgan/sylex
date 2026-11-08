@@ -1,9 +1,9 @@
 card {
   name = "Thousand Moons Infantry",
-  cost = [2, white],
+  cost = [generic(2), pip(white)],
   types = [creature],
   subtypes = [human, soldier],
   text = [static(untapDuring(thisCreature, each(isOtherPlayer)))],
-  power = 2,
-  toughness = 4
+  power = lit(2),
+  toughness = lit(4)
 }

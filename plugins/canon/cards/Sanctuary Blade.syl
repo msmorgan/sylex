@@ -1,13 +1,13 @@
 card {
   name = "Sanctuary Blade",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   subtypes = [equipment],
   text = [
     static(attachChoosing(thisEquipment, color)),
     static(
       conjunction([
-          getsPt(equipped(creature), up(2), up(0)),
+          getsPt(equipped(creature), up(lit(2)), up(lit(0))),
           abilityGrant(equipped(creature), protection(ofTheLastChosen(color)))])),
-    equip(mana([3]))]
+    equip(mana([generic(3)]))]
 }

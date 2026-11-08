@@ -14,7 +14,7 @@ ability epic {
             copy(
               fromStack,
               thisSpell,
-              1,
+              lit(1),
               [characteristicEdits([removedAbilities(specified([abilities(theKeyword(epic))]))])]),
             may(chooseNewTargets(that(copy)))])))]
 }

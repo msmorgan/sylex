@@ -1,12 +1,12 @@
 card {
   name = "Brazen Dwarf",
-  cost = [1, red],
+  cost = [generic(1), pip(red)],
   types = [creature],
   subtypes = [dwarf, shaman],
   text = [
     whenever(
       does(actor(you), rollDice(anyAmount, anyDie)),
-      instruct(thisCreature, dealDamage(1, eachOpponent)))],
-  power = 1,
-  toughness = 3
+      instruct(thisCreature, dealDamage(lit(1), eachOpponent)))],
+  power = lit(1),
+  toughness = lit(3)
 }

@@ -1,6 +1,6 @@
 card {
   name = "Reciprocate",
-  cost = [white],
+  cost = [pip(white)],
   types = [instant],
   text = [
     spell(

@@ -1,6 +1,6 @@
 card {
   name = "Demon of Death's Gate",
-  cost = [6, black, black, black],
+  cost = [generic(6), pip(black), pip(black), pip(black)],
   types = [creature],
   subtypes = [demon],
   text = [
@@ -8,10 +8,10 @@ card {
       altCost(
         this,
         compound([
-            perform(payLife(6)),
+            perform(payLife(lit(6))),
             perform(sacrifice(counted(exactly(3), and([isCreature, hasColor(black)]))))]))),
     flying,
     trample],
-  power = 9,
-  toughness = 9
+  power = lit(9),
+  toughness = lit(9)
 }

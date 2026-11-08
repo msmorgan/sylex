@@ -1,6 +1,6 @@
 card {
   name = "Archon of Absolution",
-  cost = [3, white],
+  cost = [generic(3), pip(white)],
   types = [creature],
   subtypes = [archon],
   text = [
@@ -8,9 +8,9 @@ card {
     protection(hasColor(white)),
     static(
       gatedBy(
-        scaledGenericMana(times(1, groupSize)),
+        scaledGenericMana(times(lit(1), groupSize)),
         actor(allOf(isCreature)),
         attack(youOr(allOf(and([isPlaneswalker, youControl]))))))],
-  power = 3,
-  toughness = 2
+  power = lit(3),
+  toughness = lit(2)
 }

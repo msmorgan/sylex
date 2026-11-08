@@ -1,14 +1,14 @@
 card {
   name = "Dusk Legion Duelist",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [creature],
   subtypes = [vampire, soldier],
   text = [
     vigilance,
     whenever(
       does(any, putCounters(anyAmount, printedKind(p1p1Counter), thisCreature)),
-      draw(1),
+      draw(lit(1)),
       limit = oncePerTurn)],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

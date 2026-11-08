@@ -1,13 +1,13 @@
 card {
   name = "Fire Servant",
-  cost = [3, red, red],
+  cost = [generic(3), pip(red), pip(red)],
   types = [creature],
   subtypes = [elemental],
   text = [
     static(
       replace(
         would(actor(a(and([isInstantOrSorcery, hasColor(red), youControl]))), dealDamage),
-        instead(instruct(it, dealDamage(times(2, thatMuch))))))],
-  power = 4,
-  toughness = 3
+        instead(instruct(it, dealDamage(times(lit(2), thatMuch))))))],
+  power = lit(4),
+  toughness = lit(3)
 }

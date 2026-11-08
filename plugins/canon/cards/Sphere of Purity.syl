@@ -1,10 +1,10 @@
 card {
   name = "Sphere of Purity",
-  cost = [3, white],
+  cost = [generic(3), pip(white)],
   types = [enchantment],
   text = [
     static(
       replace(
         would(actor(a(isArtifact)), dealDamage(recipient = you)),
-        instead(preventDamage(ofThatDamage(1)))))]
+        instead(preventDamage(ofThatDamage(lit(1))))))]
 }

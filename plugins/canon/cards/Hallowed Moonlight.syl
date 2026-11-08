@@ -1,6 +1,6 @@
 card {
   name = "Hallowed Moonlight",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [instant],
   text = [
     spell(
@@ -9,5 +9,5 @@ card {
             would(actor(a(and([isCreature, not(did(any, cast(which), thisObject))]))), enter),
             instead(exile(it)),
             untilEndOfTurn),
-          draw(1)]))]
+          draw(lit(1))]))]
 }

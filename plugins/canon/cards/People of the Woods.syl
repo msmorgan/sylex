@@ -1,8 +1,8 @@
 card {
   name = "People of the Woods",
-  cost = [green, green],
+  cost = [pip(green), pip(green)],
   types = [creature],
   subtypes = [human],
   text = [static(definesToughness(thisCreature, countOf(and([hasSubtype(forest), youControl]))))],
-  power = 1
+  power = lit(1)
 }

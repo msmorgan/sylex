@@ -1,6 +1,6 @@
 card {
   name = "Summer Bloom",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [sorcery],
   text = [
     spell(

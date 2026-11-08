@@ -1,13 +1,15 @@
 card {
   name = "Disrupting Shoal",
-  cost = [variable, blue, blue],
+  cost = [variable, pip(blue), pip(blue)],
   types = [instant],
   subtypes = [arcane],
   text = [
     static(
       altCost(
         this,
-        perform(exile(a(and([hasColor(blue), hasManaValue(eq, letter(x)), in(yourHand)])))))),
+        perform(exile(a(and([hasColor(blue), hasManaValue(equal, letter(x)), in(yourHand)])))))),
     spell(
-      doOnlyIf(counter(target(isSpell)), compareAmt(statOf(stat(manaValue), it), eq, letter(x))))]
+      doOnlyIf(
+        counter(target(isSpell)),
+        compareAmt(statOf(stat(manaValue), it), equal, letter(x))))]
 }

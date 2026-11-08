@@ -1,13 +1,13 @@
 card {
   name = "Alabaster Leech",
-  cost = [white],
+  cost = [pip(white)],
   types = [creature],
   subtypes = [leech],
   text = [
     static(
       costShift(
         allOf(and([isSpell, hasColor(white), did(actor(you), cast(which), thisObject)])),
-        moreBySymbols(symbols([white]))))],
-  power = 1,
-  toughness = 3
+        moreBySymbols(symbols([pip(white)]))))],
+  power = lit(1),
+  toughness = lit(3)
 }

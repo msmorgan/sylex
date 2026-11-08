@@ -1,6 +1,6 @@
 card {
   name = "Tawnos, the Toymaker",
-  cost = [3, green, blue],
+  cost = [generic(3), pip(green), pip(blue)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, artificer],
@@ -10,6 +10,6 @@ card {
         actor(you),
         cast(a(and([or([hasSubtype(beast), hasSubtype(bird)]), isCreature, isSpell])))),
       may(copyOnStack(it, exceptions = [isAlso([artifact])])))],
-  power = 3,
-  toughness = 5
+  power = lit(3),
+  toughness = lit(5)
 }

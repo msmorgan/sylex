@@ -1,4 +1,4 @@
 # "<objects>" a player may look at
-primitive objects(objects: NounPhrase): VisibleThing {
+primitive objects(objects: NounPhrase): VisibleThing = Objects {
   spelling = "<objects>"
 }

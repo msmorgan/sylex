@@ -1,6 +1,6 @@
 card {
   name = "Chief Engineer",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [creature],
   subtypes = [vedalken, artificer],
   text = [
@@ -8,6 +8,6 @@ card {
       abilityGrant(
         allOf(and([isArtifact, isSpell, did(actor(you), cast(which), thisObject)])),
         convoke))],
-  power = 1,
-  toughness = 3
+  power = lit(1),
+  toughness = lit(3)
 }

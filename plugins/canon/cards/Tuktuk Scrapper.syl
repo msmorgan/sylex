@@ -6,7 +6,7 @@
 # (owner ruling 2026-10-23).
 card {
   name = "Tuktuk Scrapper",
-  cost = [3, red],
+  cost = [generic(3), pip(red)],
   types = [creature],
   subtypes = [goblin, artificer, ally],
   text = [
@@ -21,6 +21,6 @@ card {
               dealDamage(
                 countOf(and([hasSubtype(ally), youControl])),
                 controllerOf(that(artifact)))))]))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

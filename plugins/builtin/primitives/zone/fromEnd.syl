@@ -1,1 +1,1 @@
-primitive fromEnd(end: PileEnd, ordinal: Ordinal = nth(1), loc: Location): Location
+primitive fromEnd(end: PileEnd, ordinal: Ordinal = nth(1), loc: Location): Location = FromEnd

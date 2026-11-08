@@ -1,1 +1,1 @@
-primitive current: TurnRef
+primitive current: TurnRef = Current

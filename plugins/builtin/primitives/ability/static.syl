@@ -1,2 +1,2 @@
 # An ability that states a Static Spec.
-primitive static(spec: StaticSpec): Ability
+primitive static(spec: StaticSpec): Ability = Static

@@ -3,4 +3,4 @@ primitive withContinuation(
   policy: ContinuationPolicy,
   body: Action,
   ifDid: Option(Action) = none,
-  ifNot: Option(Action) = none): Action
+  ifNot: Option(Action) = none): Action = WithContinuation

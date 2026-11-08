@@ -1,6 +1,6 @@
 card {
   name = "Soul's Might",
-  cost = [4, green],
+  cost = [generic(4), pip(green)],
   types = [sorcery],
   text = [
     spell(

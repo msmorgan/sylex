@@ -5,4 +5,4 @@ primitive move(
   from: Location,
   to: Option(Location),
   at: ObservationPoint,
-  riders: List(MoveRider)): Action
+  riders: List(MoveRider)): Action = Move

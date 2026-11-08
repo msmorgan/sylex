@@ -1,4 +1,7 @@
 # Put the specified amount and kind of counters on the subject.
-primitive putCounters(amount: Amount, kind: CounterKindSource, on: NounPhrase): Action {
+primitive putCounters(
+  amount: Amount,
+  kind: CounterKindSource,
+  on: NounPhrase): Action = PutCounters {
   spelling = "put <amount> <kind> counters on <on>"
 }

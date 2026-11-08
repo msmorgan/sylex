@@ -7,4 +7,4 @@ primitive moveCounters(
   amount: Amount,
   source: NounPhrase,
   destination: NounPhrase,
-  kind: Option(CounterKindSource) = none): Action
+  kind: Option(CounterKindSource) = none): Action = MoveCounters

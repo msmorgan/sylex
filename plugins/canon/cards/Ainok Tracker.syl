@@ -1,9 +1,9 @@
 card {
   name = "Ainok Tracker",
-  cost = [5, red],
+  cost = [generic(5), pip(red)],
   types = [creature],
   subtypes = [dog, scout],
-  text = [firstStrike, morph(mana([4, red]))],
-  power = 3,
-  toughness = 3
+  text = [firstStrike, morph(mana([generic(4), pip(red)]))],
+  power = lit(3),
+  toughness = lit(3)
 }

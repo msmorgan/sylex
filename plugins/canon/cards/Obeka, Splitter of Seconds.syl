@@ -1,6 +1,6 @@
 card {
   name = "Obeka, Splitter of Seconds",
-  cost = [1, blue, black, red],
+  cost = [generic(1), pip(blue), pip(black), pip(red)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [ogre, warlock],
@@ -9,6 +9,6 @@ card {
     whenever(
       does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
       additionalStep(upkeep, none, thatMuch))],
-  power = 2,
-  toughness = 5
+  power = lit(2),
+  toughness = lit(5)
 }

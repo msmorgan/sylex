@@ -1,4 +1,4 @@
 # "any amount"
-primitive anyAmount: Amount {
+primitive anyAmount: Amount = AnyAmount {
   spelling = "any amount"
 }

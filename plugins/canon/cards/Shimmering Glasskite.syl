@@ -1,6 +1,6 @@
 card {
   name = "Shimmering Glasskite",
-  cost = [3, blue],
+  cost = [generic(3), pip(blue)],
   types = [creature],
   subtypes = [spirit],
   text = [
@@ -11,6 +11,6 @@ card {
         does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
         turn),
       counter(that(stackObject)))],
-  power = 2,
-  toughness = 3
+  power = lit(2),
+  toughness = lit(3)
 }

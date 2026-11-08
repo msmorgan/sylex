@@ -1,13 +1,13 @@
 card {
   name = "Briarblade Adept",
-  cost = [4, black],
+  cost = [generic(4), pip(black)],
   types = [creature],
   subtypes = [elf, assassin],
   text = [
     whenever(
       does(actor(thisCreature), attack),
-      get(target(and([isCreature, opponentsControl])), down(1), down(1), untilEndOfTurn)),
-    encore(mana([3, black]))],
-  power = 3,
-  toughness = 4
+      get(target(and([isCreature, opponentsControl])), down(lit(1)), down(lit(1)), untilEndOfTurn)),
+    encore(mana([generic(3), pip(black)]))],
+  power = lit(3),
+  toughness = lit(4)
 }

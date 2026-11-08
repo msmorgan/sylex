@@ -1,13 +1,13 @@
 card {
   name = "At Knifepoint",
-  cost = [1, black, red],
+  cost = [generic(1), pip(black), pip(red)],
   types = [enchantment],
   text = [
     static(partScope(turn, you, abilityGrant(allOf(and([isOutlaw, youControl])), firstStrike))),
     whenever(
       does(actor(you), commitCrime),
       create(
-        1,
+        lit(1),
         written({
             characteristics = {
               colors = [red],
@@ -16,9 +16,13 @@ card {
               text = [
                 activatedOnlyDuring(
                   tapSymbol,
-                  get(target(and([isCreature, youControl])), up(1), up(0), untilEndOfTurn),
+                  get(
+                    target(and([isCreature, youControl])),
+                    up(lit(1)),
+                    up(lit(0)),
+                    untilEndOfTurn),
                   asSorcery)],
-              power = 1,
-              toughness = 1}})),
+              power = lit(1),
+              toughness = lit(1)}})),
       limit = oncePerTurn)]
 }

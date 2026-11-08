@@ -1,0 +1,1 @@
+primitive damagePrevented: OutcomeSort = DamagePrevented

@@ -2,15 +2,19 @@ card {
   name = "Soulstone Sanctuary",
   types = [land],
   text = [
-    activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
+    activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
     activated(
-      mana([4]),
+      mana([generic(4)]),
       establish(
         qualityChange(
           thisLand,
           sets,
           bundle({
-              characteristics = {types = [creature], text = [vigilance], power = 3, toughness = 3},
+              characteristics = {
+                types = [creature],
+                text = [vigilance],
+                power = lit(3),
+                toughness = lit(3)},
               qualities = [withEveryType(creature)]},
             land))))]
 }

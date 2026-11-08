@@ -1,13 +1,13 @@
 card {
   name = "Ahn-Crop Invader",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [creature],
   subtypes = [zombie, minotaur, warrior],
   text = [
     static(partScope(turn, you, abilityGrant(thisCreature, firstStrike))),
     activated(
-      compound([mana([1]), perform(sacrifice(a(and([isCreature, isOther]))))]),
-      get(thisCreature, up(2), up(0), untilEndOfTurn))],
-  power = 2,
-  toughness = 2
+      compound([mana([generic(1)]), perform(sacrifice(a(and([isCreature, isOther]))))]),
+      get(thisCreature, up(lit(2)), up(lit(0)), untilEndOfTurn))],
+  power = lit(2),
+  toughness = lit(2)
 }

@@ -1,6 +1,6 @@
 card {
   name = "Through the Breach",
-  cost = [4, red],
+  cost = [generic(4), pip(red)],
   types = [instant],
   subtypes = [arcane],
   text = [
@@ -9,5 +9,5 @@ card {
         putOntoBattlefield(a(and([isCreature, cardIn(yourHand)]))),
         ifDid = sequentially(
           [gainHaste(that(creature)), atNext(endStep, sacrifice(that(creature)))]))),
-    splice(hasSubtype(arcane), mana([2, red, red]))]
+    splice(hasSubtype(arcane), mana([generic(2), pip(red), pip(red)]))]
 }

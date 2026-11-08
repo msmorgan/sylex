@@ -1,2 +1,2 @@
 # The cards from one end of a pile through the stopping predicate.
-primitive run(end: PileEnd, stop: Predicate, pile: Location): NounPhrase
+primitive run(end: PileEnd, stop: Predicate, pile: Location): NounPhrase = Run

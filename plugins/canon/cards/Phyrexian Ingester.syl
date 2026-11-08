@@ -1,6 +1,6 @@
 card {
   name = "Phyrexian Ingester",
-  cost = [6, blue],
+  cost = [generic(6), pip(blue)],
   types = [creature],
   subtypes = [phyrexian, beast],
   text = [
@@ -11,6 +11,6 @@ card {
           getsPt(thisCreature, up(letter(x)), up(letter(y))),
           letterDefinition(x, powerOf(the(and([isCreature, in(exiledWith(thisCreature))])))),
           letterDefinition(y, toughnessOf(that(card)))]))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

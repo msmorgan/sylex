@@ -1,6 +1,6 @@
 card {
   name = "Council's Judgment",
-  cost = [1, white, white],
+  cost = [generic(1), pip(white), pip(white)],
   types = [sorcery],
   text = [
     willOfTheCouncil(

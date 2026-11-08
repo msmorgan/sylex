@@ -1,6 +1,6 @@
 card {
   name = "Investigator's Journal",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   subtypes = [book, clue],
   text = [
@@ -11,9 +11,9 @@ card {
         suspectCounter)),
     activated(
       compound([
-          mana([2]),
+          mana([generic(2)]),
           tapSymbol,
           perform(removeCounters(exactly(1), printedKind(suspectCounter), thisArtifact))]),
-      draw(1)),
-    activated(compound([mana([2]), perform(sacrifice(thisArtifact))]), draw(1))]
+      draw(lit(1))),
+    activated(compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]), draw(lit(1)))]
 }

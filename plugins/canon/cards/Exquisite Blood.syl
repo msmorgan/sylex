@@ -1,6 +1,6 @@
 card {
   name = "Exquisite Blood",
-  cost = [4, black],
+  cost = [generic(4), pip(black)],
   types = [enchantment],
   text = [whenever(does(actor(anOpponent), loseLife(anyAmount)), gainLife(thatMuch))]
 }

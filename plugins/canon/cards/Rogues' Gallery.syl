@@ -1,6 +1,6 @@
 card {
   name = "Rogues' Gallery",
-  cost = [2, black],
+  cost = [generic(2), pip(black)],
   types = [sorcery],
   text = [
     spell(

@@ -3,7 +3,7 @@
 # and the permanent it affects is fixed when the effect begins [CR#611.2c].
 card {
   name = "Donate",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [sorcery],
   text = [spell(instruct(target(isPlayer), gainControl(target(and([isPermanent, youControl])))))]
 }

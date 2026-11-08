@@ -1,12 +1,12 @@
 card {
   name = "Runed Stalactite",
-  cost = [1],
+  cost = [generic(1)],
   types = [artifact],
   subtypes = [equipment],
   text = [
     static(
       conjunction([
-          getsPt(equipped(creature), up(1), up(1)),
+          getsPt(equipped(creature), up(lit(1)), up(lit(1))),
           qualityChange(equipped(creature), adds, everyTypeOf(creature))])),
-    equip(mana([2]))]
+    equip(mana([generic(2)]))]
 }

@@ -1,4 +1,4 @@
 # "enters <status>", as "enters tapped"
-primitive entersAs(status: Status): MoveRider {
+primitive entersAs(status: Status): MoveRider = EntersAs {
   spelling = "enters <status>"
 }

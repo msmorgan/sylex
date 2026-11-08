@@ -1,6 +1,6 @@
 card {
   name = "Culling Mark",
-  cost = [2, green],
+  cost = [generic(2), pip(green)],
   types = [sorcery],
   text = [spell(establishThroughout(must(actor(target(isCreature)), block), thisTurn))]
 }

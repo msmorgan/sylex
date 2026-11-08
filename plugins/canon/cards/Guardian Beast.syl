@@ -1,6 +1,6 @@
 card {
   name = "Guardian Beast",
-  cost = [3, black],
+  cost = [generic(3), pip(black)],
   types = [creature],
   subtypes = [beast],
   text = [
@@ -14,6 +14,6 @@ card {
             cant(actor(bare(and([isPlayer, isOther]))), gainControlOf(them))],
           bare(and([non(isCreature), isArtifact, youControl]))),
         is(thisCreature, isUntapped)))],
-  power = 2,
-  toughness = 4
+  power = lit(2),
+  toughness = lit(4)
 }

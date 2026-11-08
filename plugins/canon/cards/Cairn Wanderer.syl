@@ -1,6 +1,6 @@
 card {
   name = "Cairn Wanderer",
-  cost = [4, black],
+  cost = [generic(4), pip(black)],
   types = [creature],
   subtypes = [shapeshifter],
   text = [
@@ -14,19 +14,19 @@ card {
             and([isCreature, in(graveyard), hasKeyword(thatKeyword)])),
           exists(and([isCreature, in(graveyard), hasKeyword(thatKeyword)])))),
       [
-        flying,
-        fear,
-        firstStrike,
-        doubleStrike,
-        deathtouch,
-        haste,
+        theKeyword(flying),
+        theKeyword(fear),
+        theKeyword(firstStrike),
+        theKeyword(doubleStrike),
+        theKeyword(deathtouch),
+        theKeyword(haste),
         anyIn({word = landwalk}),
-        lifelink,
+        theKeyword(lifelink),
         anyIn({word = protection}),
-        reach,
-        trample,
-        shroud,
-        vigilance])],
-  power = 4,
-  toughness = 4
+        theKeyword(reach),
+        theKeyword(trample),
+        theKeyword(shroud),
+        theKeyword(vigilance)])],
+  power = lit(4),
+  toughness = lit(4)
 }

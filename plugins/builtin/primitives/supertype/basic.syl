@@ -1,0 +1,3 @@
+primitive basic: Supertype = Basic {
+  spelling = "basic"
+}

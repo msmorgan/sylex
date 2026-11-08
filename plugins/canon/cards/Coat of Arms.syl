@@ -1,11 +1,11 @@
 card {
   name = "Coat of Arms",
-  cost = [5],
+  cost = [generic(5)],
   types = [artifact],
   text = [
     static(
       getsPt(
         each(isCreature),
-        up(forEach(1, and([isCreature, isOther, shares(subtype(creature), share, it)]))),
-        up(forEach(1, and([isCreature, isOther, shares(subtype(creature), share, it)])))))]
+        up(forEach(lit(1), and([isCreature, isOther, shares(subtype(creature), share, it)]))),
+        up(forEach(lit(1), and([isCreature, isOther, shares(subtype(creature), share, it)])))))]
 }

@@ -1,6 +1,6 @@
 card {
   name = "Damnation",
-  cost = [2, black, black],
+  cost = [generic(2), pip(black), pip(black)],
   types = [sorcery],
   text = [spell(destroyPluralCantRegenerate(allOf(isCreature)))]
 }

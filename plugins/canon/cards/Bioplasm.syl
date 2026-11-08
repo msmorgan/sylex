@@ -1,13 +1,13 @@
 card {
   name = "Bioplasm",
-  cost = [3, green, green],
+  cost = [generic(3), pip(green), pip(green)],
   types = [creature],
   subtypes = [ooze],
   text = [
     whenever(
       does(actor(thisCreature), attack),
       sequentially([
-          exile(topSlice(1)),
+          exile(topSlice(lit(1))),
           doIf(
             is(it, and([isCard, isCreature])),
             get(
@@ -15,6 +15,6 @@ card {
               up(powerOf(the(and([was(exile(which)), isCreature, isCard])))),
               up(toughnessOf(it)),
               thisTurn))]))],
-  power = 4,
-  toughness = 4
+  power = lit(4),
+  toughness = lit(4)
 }

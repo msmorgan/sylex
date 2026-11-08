@@ -1,0 +1,1 @@
+primitive playerStat(stat: PlayerStat): ProjAxis = PlayerStat

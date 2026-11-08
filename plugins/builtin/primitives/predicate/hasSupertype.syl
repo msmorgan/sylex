@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.hasSupertype`.
-primitive hasSupertype(supertype: Supertype): Predicate {
+primitive hasSupertype(supertype: Supertype): Predicate = HasSupertype {
   spelling = "<supertype>"
 }

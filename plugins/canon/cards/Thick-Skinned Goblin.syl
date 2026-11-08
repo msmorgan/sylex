@@ -1,6 +1,6 @@
 card {
   name = "Thick-Skinned Goblin",
-  cost = [1, red],
+  cost = [generic(1), pip(red)],
   types = [creature],
   subtypes = [goblin, shaman],
   text = [
@@ -9,8 +9,8 @@ card {
         would(
           actor(you),
           pay(anyCost, once, whose = allOf(and([isPermanent, youControl])), keyword = echo)),
-        instead(may(pay(mana([0]), once))))),
-    activated(mana([red]), gain(thisCreature, protection(hasColor(red)), untilEndOfTurn))],
-  power = 2,
-  toughness = 1
+        instead(may(pay(mana([generic(0)]), once))))),
+    activated(mana([pip(red)]), gain(thisCreature, protection(hasColor(red)), untilEndOfTurn))],
+  power = lit(2),
+  toughness = lit(1)
 }

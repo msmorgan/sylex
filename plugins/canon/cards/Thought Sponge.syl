@@ -1,6 +1,6 @@
 card {
   name = "Thought Sponge",
-  cost = [3, blue],
+  cost = [generic(3), pip(blue)],
   types = [creature],
   subtypes = [sponge],
   text = [
@@ -11,6 +11,6 @@ card {
         aggregateOver(max, isOpponent, eventCount(draw(anyAmount), actor(they), soFarThisTurn)),
         p1p1Counter)),
     when(does(actor(thisCreature), die), draw(powerOf(thisCreature)))],
-  power = 1,
-  toughness = 1
+  power = lit(1),
+  toughness = lit(1)
 }

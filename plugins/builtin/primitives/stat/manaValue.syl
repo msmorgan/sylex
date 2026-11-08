@@ -1,0 +1,3 @@
+primitive manaValue: Stat = ManaValue {
+  spelling = "mana value"
+}

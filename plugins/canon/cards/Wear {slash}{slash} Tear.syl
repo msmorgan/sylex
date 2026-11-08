@@ -1,11 +1,11 @@
-card split({
-    left = {
-      name = "Wear",
-      cost = [1, red],
-      types = [instant],
-      text = [spell(destroy(target(isArtifact))), fuse]},
-    right = {
-      name = "Tear",
-      cost = [white],
-      types = [instant],
-      text = [spell(destroy(target(isEnchantment))), fuse]}})
+card split(
+  left = {
+    name = "Wear",
+    cost = [generic(1), pip(red)],
+    types = [instant],
+    text = [spell(destroy(target(isArtifact))), fuse]},
+  right = {
+    name = "Tear",
+    cost = [pip(white)],
+    types = [instant],
+    text = [spell(destroy(target(isEnchantment))), fuse]})

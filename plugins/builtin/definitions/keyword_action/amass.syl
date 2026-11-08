@@ -6,7 +6,7 @@ action amass(subtype: Subtype, count: Amount) {
   body = sequentially([
       doIf(
         not(exists(and([hasSubtype(army), isCreature, actorControls]))),
-        create(1, written(creatureToken(0, 0, [black], [$subtype, army])))),
+        create(lit(1), written(creatureToken(0, 0, [black], [$subtype, army])))),
       choose(a(and([hasSubtype(army), isCreature, actorControls]))),
       putCounters($count, printedKind(p1p1Counter), that(type(creature))),
       doIf(

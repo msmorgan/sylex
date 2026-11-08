@@ -1,12 +1,12 @@
 card {
   name = "Polar Kraken",
-  cost = [8, blue, blue, blue],
+  cost = [generic(8), pip(blue), pip(blue), pip(blue)],
   types = [creature],
   subtypes = [kraken],
   text = [
     trample,
     static(entersTapped(thisCreature)),
     cumulativeUpkeep(perform(sacrifice(a(isLand))))],
-  power = 11,
-  toughness = 11
+  power = lit(11),
+  toughness = lit(11)
 }

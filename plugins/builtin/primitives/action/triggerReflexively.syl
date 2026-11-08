@@ -3,4 +3,7 @@
 # [CR#603.12a].
 # [CR#603.12,603.12a]
 # TODO(spelling): Include or omit the clauses supplied by event.
-primitive triggerReflexively(body: Action, trigger: Action, event: Option(GameEvent) = none): Action
+primitive triggerReflexively(
+  body: Action,
+  trigger: Action,
+  event: Option(GameEvent) = none): Action = TriggerReflexively

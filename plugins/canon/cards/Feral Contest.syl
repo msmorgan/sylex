@@ -1,11 +1,11 @@
 card {
   name = "Feral Contest",
-  cost = [3, green],
+  cost = [generic(3), pip(green)],
   types = [sorcery],
   text = [
     spell(
       sequentially([
-          putCounters(1, printedKind(p1p1Counter), target(and([isCreature, youControl]))),
+          putCounters(lit(1), printedKind(p1p1Counter), target(and([isCreature, youControl]))),
           establishThroughout(
             must(actor(target(and([isCreature, isOther]))), block(it)),
             thisTurn)]))]

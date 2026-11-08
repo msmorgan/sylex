@@ -1,6 +1,6 @@
 card {
   name = "Celestial Judgment",
-  cost = [4, white, white],
+  cost = [generic(4), pip(white), pip(white)],
   types = [sorcery],
   text = [
     spell(
@@ -9,6 +9,6 @@ card {
             value(power),
             allOf(isCreature),
             number,
-            choose(a(and([isCreature, hasPower(eq, chosenNumber)])))),
+            choose(a(and([isCreature, hasPower(equal, chosenNumber)])))),
           destroy(each(and([isCreature, notChosen])))]))]
 }

@@ -1,6 +1,6 @@
 card {
   name = "Rain of Gore",
-  cost = [black, red],
+  cost = [pip(black), pip(red)],
   types = [enchantment],
   text = [
     static(

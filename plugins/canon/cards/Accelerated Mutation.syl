@@ -1,6 +1,6 @@
 card {
   name = "Accelerated Mutation",
-  cost = [3, green, green],
+  cost = [generic(3), pip(green), pip(green)],
   types = [instant],
   text = [
     spell(

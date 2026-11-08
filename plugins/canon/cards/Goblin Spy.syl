@@ -1,9 +1,9 @@
 card {
   name = "Goblin Spy",
-  cost = [red],
+  cost = [pip(red)],
   types = [creature],
   subtypes = [goblin, rogue],
   text = [static(visibility(reveal, you, topOfLibrary))],
-  power = 1,
-  toughness = 1
+  power = lit(1),
+  toughness = lit(1)
 }

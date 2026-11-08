@@ -1,6 +1,6 @@
 card {
   name = "Glorious Anthem",
-  cost = [1, white, white],
+  cost = [generic(1), pip(white), pip(white)],
   types = [enchantment],
-  text = [static(getsPt(allOf(and([isCreature, youControl])), up(1), up(1)))]
+  text = [static(getsPt(allOf(and([isCreature, youControl])), up(lit(1)), up(lit(1))))]
 }

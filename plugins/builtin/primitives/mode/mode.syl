@@ -1,0 +1,1 @@
+primitive mode(cost: Option(Cost), weight: Option(Nat), action: Action): Mode = Mode

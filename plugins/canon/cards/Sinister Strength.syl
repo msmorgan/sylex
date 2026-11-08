@@ -1,12 +1,12 @@
 card {
   name = "Sinister Strength",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [enchantment],
   subtypes = [aura],
   text = [
     enchant(isCreature),
     static(
       conjunction([
-          getsPt(enchanted(creature), up(3), up(1)),
-          qualityChange(it, sets, colored(some([black])))]))]
+          getsPt(enchanted(creature), up(lit(3)), up(lit(1))),
+          qualityChange(it, sets, colored(colors([black])))]))]
 }

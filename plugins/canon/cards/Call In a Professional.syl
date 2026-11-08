@@ -1,6 +1,6 @@
 card {
   name = "Call In a Professional",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [instant],
   text = [
     spell(
@@ -9,5 +9,5 @@ card {
           establishThroughout(
             cant(any, preventDamage(allDamage, damage = would(any, dealDamage))),
             thisTurn),
-          instruct(this, dealDamage(3, target(isAnyTarget)))]))]
+          instruct(this, dealDamage(lit(3), target(isAnyTarget)))]))]
 }

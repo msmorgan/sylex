@@ -1,6 +1,6 @@
 card {
   name = "Wind Zendikon",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [enchantment],
   subtypes = [aura],
   text = [
@@ -15,8 +15,8 @@ card {
               types = [creature],
               subtypes = [elemental],
               text = [flying],
-              power = 2,
-              toughness = 2}},
+              power = lit(2),
+              toughness = lit(2)}},
           land))),
     when(does(actor(enchanted(land)), die), returnToHand(that(card)))]
 }

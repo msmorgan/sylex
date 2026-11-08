@@ -1,4 +1,4 @@
 # "that turn's" occurrence
-primitive thatTime: TurnRef = .that {
+primitive thatTime: TurnRef = That {
   spelling = "that turn's"
 }

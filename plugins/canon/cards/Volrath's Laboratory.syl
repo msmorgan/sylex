@@ -1,17 +1,17 @@
 card {
   name = "Volrath's Laboratory",
-  cost = [5],
+  cost = [generic(5)],
   types = [artifact],
   text = [
     static(
       conjunction(
         [entersChoosing(thisArtifact, color), entersChoosing(thisArtifact, subtype(creature))])),
     activated(
-      compound([mana([5]), tapSymbol]),
+      compound([mana([generic(5)]), tapSymbol]),
       create(
-        1,
+        lit(1),
         written({
-            characteristics = {types = [creature], power = 2, toughness = 2},
+            characteristics = {types = [creature], power = lit(2), toughness = lit(2)},
             qualities = [
               withQuality(ofChosen(color)),
               withQuality(ofChosen(subtype(creature)))]})))]

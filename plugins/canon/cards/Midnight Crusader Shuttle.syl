@@ -3,7 +3,7 @@
 # [CR#207.2d].
 card {
   name = "Midnight Crusader Shuttle",
-  cost = [4],
+  cost = [generic(4)],
   types = [artifact],
   subtypes = [vehicle],
   text = [
@@ -20,7 +20,7 @@ card {
             doIf(
               did(actor(you), gainControlOf(a(isCreature)), thisWay),
               sequentially([tap(it), becomeAttacking(it, defendingPlayer)]))]))),
-    crew(2)],
-  power = 3,
-  toughness = 4
+    crew(lit(2))],
+  power = lit(3),
+  toughness = lit(4)
 }

@@ -1,5 +1,5 @@
 # "the <ordinal>", of a counter put: the put that crosses the ordinal's threshold [CR#122.7].
 # [CR#122.7]
-primitive theNth(ordinal: Ordinal): Amount {
+primitive theNth(ordinal: Ordinal): Amount = Nth {
   spelling = "the <ordinal>"
 }

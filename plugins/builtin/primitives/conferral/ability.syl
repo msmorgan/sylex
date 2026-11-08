@@ -1,0 +1,1 @@
+primitive ability(confer: Ability): Conferral = Ability

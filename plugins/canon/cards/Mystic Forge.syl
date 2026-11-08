@@ -1,6 +1,6 @@
 card {
   name = "Mystic Forge",
-  cost = [4],
+  cost = [generic(4)],
   types = [artifact],
   text = [
     static(visibility(lookAt, you, topOfLibrary)),
@@ -8,5 +8,5 @@ card {
       conjunction([
           can(actor(you), cast(bare(and([isSpell, isArtifact])), from = onTop)),
           can(actor(you), cast(bare(and([isSpell, isColorless])), from = onTop))])),
-    activated(compound([tapSymbol, perform(payLife(1))]), exile(topSlice(1)))]
+    activated(compound([tapSymbol, perform(payLife(lit(1)))]), exile(topSlice(lit(1))))]
 }

@@ -1,16 +1,16 @@
 card {
   name = "Earthen Goo",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [creature],
   subtypes = [ooze],
   text = [
     trample,
-    cumulativeUpkeep(either(mana([red]), mana([green]))),
+    cumulativeUpkeep(either(mana([pip(red)]), mana([pip(green)]))),
     static(
       getsPt(
         thisCreature,
-        up(times(1, countersOn(ageCounter, it))),
-        up(times(1, countersOn(ageCounter, it)))))],
-  power = 2,
-  toughness = 2
+        up(times(lit(1), countersOn(ageCounter, it))),
+        up(times(lit(1), countersOn(ageCounter, it)))))],
+  power = lit(2),
+  toughness = lit(2)
 }

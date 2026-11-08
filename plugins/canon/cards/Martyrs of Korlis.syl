@@ -1,6 +1,6 @@
 card {
   name = "Martyrs of Korlis",
-  cost = [3, white, white],
+  cost = [generic(3), pip(white), pip(white)],
   types = [creature],
   subtypes = [human],
   text = [
@@ -10,6 +10,6 @@ card {
           would(by(allOf(isArtifact)), dealDamage(recipient = you)),
           instead(redirectDamage(allDamage, thisCreature))),
         is(thisCreature, isUntapped)))],
-  power = 1,
-  toughness = 6
+  power = lit(1),
+  toughness = lit(6)
 }

@@ -1,4 +1,4 @@
 # The tap-symbol cost, {T}.
-primitive tapSymbol: Cost {
+primitive tapSymbol: Cost = TapSymbol {
   spelling = "{T}"
 }

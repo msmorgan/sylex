@@ -1,4 +1,4 @@
 # "ignore all but the <extreme> roll"
-primitive allBut(extreme: RollExtreme): IgnoredOutcomes {
+primitive allBut(extreme: RollExtreme): IgnoredOutcomes = AllBut {
   spelling = "ignore all but the <extreme> roll"
 }

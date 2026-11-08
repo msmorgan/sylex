@@ -1,2 +1,2 @@
 # Increase by the given amount.
-primitive up(amount: Amount): Delta(Amount)
+primitive up(amount: Amount): Delta(Amount) = Up

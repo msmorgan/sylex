@@ -1,1 +1,1 @@
-primitive lifeTotals(parties: NounPhrase): Exchanged
+primitive lifeTotals(parties: NounPhrase): Exchanged = LifeTotals

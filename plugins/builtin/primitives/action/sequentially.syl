@@ -1,2 +1,2 @@
 # Perform the actions in order.
-primitive sequentially(steps: List(Action) = []): Action
+primitive sequentially(steps: List(Action) = []): Action = Sequentially

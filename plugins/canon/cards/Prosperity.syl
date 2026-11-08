@@ -1,6 +1,6 @@
 card {
   name = "Prosperity",
-  cost = [variable, blue],
+  cost = [variable, pip(blue)],
   types = [sorcery],
   text = [spell(instruct(eachPlayer, draw(letter(x))))]
 }

@@ -3,6 +3,6 @@
 # the Attachments `subject` names from its host [CR#702.16n,702.16p,303.4c,704.5m]
 # (`StaticSpec.retention`).
 # [CR#702.16n,702.16p,303.4c,704.5m]
-primitive retention(spec: StaticSpec, subject: NounPhrase): StaticSpec {
+primitive retention(spec: StaticSpec, subject: NounPhrase): StaticSpec = Retention {
   spelling = "<spec>. This effect doesn't remove <subject>."
 }

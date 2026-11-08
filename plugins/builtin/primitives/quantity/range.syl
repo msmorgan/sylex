@@ -1,2 +1,2 @@
 # A quantity bounded by the given minimum and maximum.
-primitive range(low: Option(Nat) = none, high: Option(Nat) = none): Quantity
+primitive range(low: Option(Nat) = none, high: Option(Nat) = none): Quantity = Range

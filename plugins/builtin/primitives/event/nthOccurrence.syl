@@ -1,2 +1,5 @@
 # The specified occurrence of an event within an optional period.
-primitive nthOccurrence(ordinal: Ordinal, event: GameEvent, per: Option(Period) = none): GameEvent
+primitive nthOccurrence(
+  ordinal: Ordinal,
+  event: GameEvent,
+  per: Option(Period) = none): GameEvent = NthOccurrence

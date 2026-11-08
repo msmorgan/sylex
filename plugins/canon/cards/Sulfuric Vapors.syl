@@ -1,6 +1,6 @@
 card {
   name = "Sulfuric Vapors",
-  cost = [3, red],
+  cost = [generic(3), pip(red)],
   types = [enchantment],
   text = [
     static(
@@ -8,5 +8,5 @@ card {
         would(
           actor(a(and([isSpell, hasColor(red)]))),
           dealDamage(recipient = a(or([isPermanent, isPlayer])))),
-        instead(instruct(it, dealDamage(plus(thatMuch, 1), thatJoin)))))]
+        instead(instruct(it, dealDamage(plus(thatMuch, lit(1)), thatJoin)))))]
 }

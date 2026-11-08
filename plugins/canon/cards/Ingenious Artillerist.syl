@@ -1,12 +1,12 @@
 card {
   name = "Ingenious Artillerist",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [creature],
   subtypes = [human, artificer],
   text = [
     whenever(
       does(actor(counted(orMore(1), and([isArtifact, youControl]))), enter),
       instruct(thisCreature, dealDamage(groupSize, eachOpponent)))],
-  power = 3,
-  toughness = 1
+  power = lit(3),
+  toughness = lit(1)
 }

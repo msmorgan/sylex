@@ -1,6 +1,6 @@
 card {
   name = "Black Vise",
-  cost = [1],
+  cost = [generic(1)],
   types = [artifact],
   text = [
     static(entersChoosingPlayer(thisArtifact, anOpponent)),
@@ -8,5 +8,5 @@ card {
       beginningOfPossessed(upkeep, the(isChosenPlayer)),
       sequentially([
           instruct(thisArtifact, dealDamage(letter(x), that(player))),
-          define(x, minus(countOf(cardIn(handOf(they))), 4))]))]
+          define(x, minus(countOf(cardIn(handOf(they))), lit(4)))]))]
 }

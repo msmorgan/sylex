@@ -1,6 +1,6 @@
 card {
   name = "Sengir Vampire",
-  cost = [3, black, black],
+  cost = [generic(3), pip(black), pip(black)],
   types = [creature],
   subtypes = [vampire],
   text = [
@@ -13,7 +13,7 @@ card {
                 isCreature,
                 did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))]))),
         die),
-      putCounters(1, printedKind(p1p1Counter), thisCreature))],
-  power = 4,
-  toughness = 4
+      putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
+  power = lit(4),
+  toughness = lit(4)
 }

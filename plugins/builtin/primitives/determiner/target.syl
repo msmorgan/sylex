@@ -1,4 +1,4 @@
 # "target …"
-primitive target(quantity: Quantity): DetPhrase {
+primitive target(quantity: Quantity): DetPhrase = Target {
   spelling = "<quantity> target"
 }

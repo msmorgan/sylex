@@ -1,11 +1,11 @@
 card {
   name = "Ward Sliver",
-  cost = [4, white],
+  cost = [generic(4), pip(white)],
   types = [creature],
   subtypes = [sliver],
   text = [
     static(entersChoosing(thisCreature, color)),
     static(abilityGrant(allOf(hasSubtype(sliver)), protection(ofChosen(color))))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

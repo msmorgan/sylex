@@ -1,1 +1,1 @@
-primitive blocked(value: Bool): CombatParticipation
+primitive blocked(value: Bool): CombatParticipation = Blocked

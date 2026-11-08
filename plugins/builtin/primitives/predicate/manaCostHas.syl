@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.manaCostHas`.
-primitive manaCostHas(symbol: ManaSymbol): Predicate {
+primitive manaCostHas(symbol: ManaSymbol): Predicate = ManaCostHas {
   spelling = "with <symbol> in its mana cost"
 }

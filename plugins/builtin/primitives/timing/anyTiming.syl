@@ -1,4 +1,4 @@
 # "at any time"
-primitive anyTiming: Timing {
+primitive anyTiming: Timing = AnyTiming {
   spelling = "at any time"
 }

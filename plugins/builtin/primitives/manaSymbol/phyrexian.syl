@@ -1,0 +1,1 @@
+primitive phyrexian(color: Color, second: Option(Color)): ManaSymbol = Phyrexian

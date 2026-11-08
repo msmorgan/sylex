@@ -2,7 +2,7 @@
 # [CR#702.16n].
 card {
   name = "Ward of Lights",
-  cost = [white, white],
+  cost = [pip(white), pip(white)],
   types = [enchantment],
   subtypes = [aura],
   text = [

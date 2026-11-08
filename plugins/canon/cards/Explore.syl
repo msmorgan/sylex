@@ -1,6 +1,6 @@
 card {
   name = "Explore",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [sorcery],
   text = [
     spell(
@@ -8,5 +8,5 @@ card {
           establishThroughout(
             can(actor(you), play(counted(additional(exactly(1)), isLand))),
             thisTurn),
-          draw(1)]))]
+          draw(lit(1))]))]
 }

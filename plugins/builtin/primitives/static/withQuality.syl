@@ -1,4 +1,4 @@
 # "of <quality>", as "of the chosen color"
-primitive withQuality(quality: Predicate): WrittenQuality = .chosen {
+primitive withQuality(quality: Predicate): WrittenQuality = Chosen {
   spelling = "of <quality>"
 }

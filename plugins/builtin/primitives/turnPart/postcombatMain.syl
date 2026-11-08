@@ -1,0 +1,3 @@
+primitive postcombatMain: TurnPart = PostcombatMain {
+  spelling = "postcombat main phase"
+}

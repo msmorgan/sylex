@@ -6,5 +6,5 @@ ability ingest {
   body = [
     whenever(
       does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-      instruct(they, exile(slice(top, 1, libraryOf(they)))))]
+      instruct(they, exile(slice(top, lit(1), libraryOf(they)))))]
 }

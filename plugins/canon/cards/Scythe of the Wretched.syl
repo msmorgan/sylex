@@ -1,10 +1,10 @@
 card {
   name = "Scythe of the Wretched",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   subtypes = [equipment],
   text = [
-    static(getsPt(equipped(creature), up(2), up(2))),
+    static(getsPt(equipped(creature), up(lit(2)), up(lit(2)))),
     whenever(
       does(
         actor(
@@ -18,5 +18,5 @@ card {
         die),
       sequentially(
         [returnToBattlefield(that(card), [under(you)]), attachTo(thisEquipment, that(creature))])),
-    equip(mana([4]))]
+    equip(mana([generic(4)]))]
 }

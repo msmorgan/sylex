@@ -1,6 +1,6 @@
 card {
   name = "Cursed Totem",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   text = [
     static(

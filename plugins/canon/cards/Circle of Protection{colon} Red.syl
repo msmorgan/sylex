@@ -1,10 +1,10 @@
 card {
   name = "Circle of Protection: Red",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [enchantment],
   text = [
     activated(
-      mana([1]),
+      mana([generic(1)]),
       establishThroughout(
         replace(
           would(actor(aYourChoice(and([isSource, hasColor(red)]))), dealDamage(recipient = you)),

@@ -1,6 +1,6 @@
 card {
   name = "Tower Winder",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [creature],
   subtypes = [snake],
   text = [
@@ -13,6 +13,6 @@ card {
           reveal(it),
           putInto(it, hand),
           doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],
-  power = 1,
-  toughness = 1
+  power = lit(1),
+  toughness = lit(1)
 }

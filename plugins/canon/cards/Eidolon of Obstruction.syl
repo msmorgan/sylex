@@ -1,6 +1,6 @@
 card {
   name = "Eidolon of Obstruction",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [enchantment, creature],
   subtypes = [spirit],
   text = [
@@ -9,7 +9,7 @@ card {
       costShift(
         allOf(
           and([abilityHead(loyalty), abilityOf(allOf(and([isPlaneswalker, opponentsControl])))])),
-        more(1)))],
-  power = 2,
-  toughness = 1
+        more(lit(1))))],
+  power = lit(2),
+  toughness = lit(1)
 }

@@ -6,7 +6,7 @@
 # fight as in [CR#701.14a].
 card {
   name = "Duel for Dominance",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [instant],
   text = [
     coven(
@@ -20,9 +20,9 @@ card {
               compareAmt(
                 distinctCount(value(power), allOf(and([isCreature, youControl]))),
                 atLeast,
-                3),
+                lit(3)),
               putCounters(
-                1,
+                lit(1),
                 printedKind(p1p1Counter),
                 the(and([isCreature, isChosen, youControl])))),
             fightEachOther(thePlural(and([isCreature, isChosen])))])))]

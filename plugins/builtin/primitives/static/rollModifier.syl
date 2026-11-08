@@ -1,1 +1,4 @@
-primitive rollModifier(roll: GameEvent, modify: Action, limit: Option(UsageLimit)): StaticSpec
+primitive rollModifier(
+  roll: GameEvent,
+  modify: Action,
+  limit: Option(UsageLimit)): StaticSpec = RollModifier

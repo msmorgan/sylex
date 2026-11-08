@@ -3,7 +3,7 @@
 # [CR#608.2h].
 card {
   name = "Mana Drain",
-  cost = [blue, blue],
+  cost = [pip(blue), pip(blue)],
   types = [instant],
   text = [
     spell(

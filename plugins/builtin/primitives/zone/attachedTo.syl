@@ -1,3 +1,3 @@
-primitive attachedTo(host: NounPhrase): MoveRider {
+primitive attachedTo(host: NounPhrase): MoveRider = AttachedTo {
   spelling = "attached to <host>"
 }

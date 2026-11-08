@@ -1,6 +1,6 @@
 card {
   name = "Screaming Nemesis",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [creature],
   subtypes = [spirit],
   text = [
@@ -12,6 +12,6 @@ card {
           doIf(
             was(dealDamage(recipient = a(isPlayer)), thisWay),
             establishThroughout(cant(actor(they), gainLife(anyAmount)), restOfGame))]))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

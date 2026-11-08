@@ -4,7 +4,7 @@
 # is written out as the second exchange.
 card {
   name = "Juxtapose",
-  cost = [3, blue],
+  cost = [generic(3), pip(blue)],
   types = [sorcery],
   text = [
     spell(

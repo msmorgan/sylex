@@ -1,0 +1,1 @@
+primitive split(left: CardFace, right: CardFace): Card = Split

@@ -1,4 +1,4 @@
 # "<cards>", revealed or looked at
-primitive cards(cards: NounPhrase): Exposed {
+primitive cards(cards: NounPhrase): Exposed = Cards {
   spelling = "<cards>"
 }

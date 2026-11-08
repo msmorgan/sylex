@@ -1,0 +1,1 @@
+primitive colors(colors: List(Color)): ColorSpec = Colors

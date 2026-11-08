@@ -1,15 +1,17 @@
 card {
   name = "Centaur of Attention",
-  cost = [3, green, green],
+  cost = [generic(3), pip(green), pip(green)],
   types = [creature],
   subtypes = [centaur, performer],
   text = [
-    when(does(actor(thisCreature), enter), sequentially([rollDice(5), storeResults(thisCreature)])),
+    when(
+      does(actor(thisCreature), enter),
+      sequentially([rollDice(lit(5)), storeResults(thisCreature)])),
     at(beginningOfYour(combat), may(rerollStored(anyNumber, thisCreature))),
     static(
       conjunction([
           getsPt(thisCreature, up(letter(x)), up(letter(x))),
           letterDefinition(x, greatestStoredMatch(thisCreature))]))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

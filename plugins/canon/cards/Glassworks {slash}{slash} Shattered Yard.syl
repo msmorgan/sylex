@@ -1,13 +1,13 @@
-card sharedLineSplit({
-    shared = {types = [enchantment], subtypes = [room]},
-    left = {
-      name = "Glassworks",
-      cost = [2, red],
-      text = [
-        when(
-          does(actor(you), unlock(thisDoor)),
-          instruct(thisRoom, dealDamage(4, target(and([isCreature, anOpponentControls])))))]},
-    right = {
-      name = "Shattered Yard",
-      cost = [4, red],
-      text = [at(beginningOfYour(endStep), instruct(thisRoom, dealDamage(1, eachOpponent)))]}})
+card sharedLineSplit(
+  shared = {types = [enchantment], subtypes = [room]},
+  left = {
+    name = "Glassworks",
+    cost = [generic(2), pip(red)],
+    text = [
+      when(
+        does(actor(you), unlock(thisDoor)),
+        instruct(thisRoom, dealDamage(lit(4), target(and([isCreature, anOpponentControls])))))]},
+  right = {
+    name = "Shattered Yard",
+    cost = [generic(4), pip(red)],
+    text = [at(beginningOfYour(endStep), instruct(thisRoom, dealDamage(lit(1), eachOpponent)))]})

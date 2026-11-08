@@ -1,6 +1,6 @@
 card {
   name = "Arcane Adaptation",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [enchantment],
   text = [
     static(entersChoosing(thisEnchantment, subtype(creature))),

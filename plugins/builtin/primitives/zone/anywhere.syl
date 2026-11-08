@@ -1,4 +1,4 @@
 # "anywhere"
-primitive anywhere: Location = .anyLocation {
+primitive anywhere: Location = AnyLocation {
   spelling = "anywhere"
 }

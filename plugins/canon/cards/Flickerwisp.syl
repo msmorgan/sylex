@@ -1,6 +1,6 @@
 card {
   name = "Flickerwisp",
-  cost = [1, white, white],
+  cost = [generic(1), pip(white), pip(white)],
   types = [creature],
   subtypes = [elemental],
   text = [
@@ -10,6 +10,6 @@ card {
       sequentially([
           exile(target(and([isPermanent, isOther]))),
           atNext(endStep, returnToBattlefield(that(card), [under(ownerOf(it))]))]))],
-  power = 3,
-  toughness = 1
+  power = lit(3),
+  toughness = lit(1)
 }

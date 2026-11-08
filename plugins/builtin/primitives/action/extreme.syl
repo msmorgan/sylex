@@ -1,4 +1,4 @@
 # "ignore the <extreme> roll"
-primitive extreme(extreme: RollExtreme): IgnoredOutcomes {
+primitive extreme(extreme: RollExtreme): IgnoredOutcomes = Extreme {
   spelling = "ignore the <extreme> roll"
 }

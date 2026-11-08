@@ -1,6 +1,6 @@
 card {
   name = "Extinction",
-  cost = [4, black],
+  cost = [generic(4), pip(black)],
   types = [sorcery],
   text = [spell(destroy(allOf(and([isCreature, ofYourChoice(subtype(creature))]))))]
 }

@@ -1,4 +1,4 @@
 # "while <condition>"
-primitive whileTrue(condition: Condition): Timing = .onlyIf {
+primitive whileTrue(condition: Condition): Timing = OnlyIf {
   spelling = "while <condition>"
 }

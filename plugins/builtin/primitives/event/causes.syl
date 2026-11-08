@@ -1,2 +1,2 @@
 # Qualify an event by its cause.
-primitive causes(cause: Causing, event: GameEvent): GameEvent
+primitive causes(cause: Causing, event: GameEvent): GameEvent = Causes

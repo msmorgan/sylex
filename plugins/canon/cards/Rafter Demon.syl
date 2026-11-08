@@ -1,14 +1,14 @@
 card {
   name = "Rafter Demon",
-  cost = [2, black, red],
+  cost = [generic(2), pip(black), pip(red)],
   types = [creature],
   subtypes = [demon],
   text = [
-    spectacle(mana([3, black, red])),
+    spectacle(mana([generic(3), pip(black), pip(red)])),
     when(
       does(actor(thisCreature), enter),
       if = keywordCostPaid(spectacle, thisCreature),
       action = instruct(eachOpponent, discard(a(cardIn(hand)))))],
-  power = 4,
-  toughness = 2
+  power = lit(4),
+  toughness = lit(2)
 }

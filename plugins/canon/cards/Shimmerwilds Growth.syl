@@ -1,6 +1,6 @@
 card {
   name = "Shimmerwilds Growth",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [enchantment],
   subtypes = [aura],
   text = [
@@ -9,5 +9,5 @@ card {
     static(qualityChange(enchanted(land), sets, chosenQuality(ofChosen(color)))),
     whenever(
       does(any, tapForMana(enchanted(land))),
-      instruct(controllerOf(that(land)), addMana(1, ofTheChosenColor)))]
+      instruct(controllerOf(that(land)), addMana(lit(1), ofTheChosenColor)))]
 }

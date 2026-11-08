@@ -1,11 +1,13 @@
 card {
   name = "Raffine's Guidance",
-  cost = [white],
+  cost = [pip(white)],
   types = [enchantment],
   subtypes = [aura],
   text = [
     enchant(isCreature),
-    static(getsPt(enchanted(creature), up(1), up(1))),
+    static(getsPt(enchanted(creature), up(lit(1)), up(lit(1)))),
     static(
-      can(actor(you), cast(this, from = yourGraveyard, payment = payingInstead(mana([2, white])))))]
+      can(
+        actor(you),
+        cast(this, from = yourGraveyard, payment = payingInstead(mana([generic(2), pip(white)])))))]
 }

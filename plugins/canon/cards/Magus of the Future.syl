@@ -1,6 +1,6 @@
 card {
   name = "Magus of the Future",
-  cost = [2, blue, blue, blue],
+  cost = [generic(2), pip(blue), pip(blue), pip(blue)],
   types = [creature],
   subtypes = [human, wizard],
   text = [
@@ -9,6 +9,6 @@ card {
       conjunction([
           can(actor(you), play(allOf(isLand), from = onTop)),
           can(actor(you), cast(bare(isSpell), from = onTop))]))],
-  power = 2,
-  toughness = 3
+  power = lit(2),
+  toughness = lit(3)
 }

@@ -1,2 +1,5 @@
 # Authoring primitive for `StaticSpec.visibility`.
-primitive visibility(verb: ExposeVerb, player: NounPhrase, what: VisibleThing): StaticSpec
+primitive visibility(
+  verb: ExposeVerb,
+  player: NounPhrase,
+  what: VisibleThing): StaticSpec = Visibility

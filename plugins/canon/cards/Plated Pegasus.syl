@@ -1,6 +1,6 @@
 card {
   name = "Plated Pegasus",
-  cost = [2, white],
+  cost = [generic(2), pip(white)],
   types = [creature],
   subtypes = [pegasus],
   text = [
@@ -9,7 +9,7 @@ card {
     static(
       replace(
         would(actor(a(isSpell)), dealDamage(recipient = a(or([isPermanent, isPlayer])))),
-        instead(preventDamage(ofThatDamage(1)))))],
-  power = 1,
-  toughness = 2
+        instead(preventDamage(ofThatDamage(lit(1))))))],
+  power = lit(1),
+  toughness = lit(2)
 }

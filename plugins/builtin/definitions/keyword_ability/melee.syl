@@ -11,13 +11,13 @@ ability melee {
         thisCreature,
         up(
           forEach(
-            1,
+            lit(1),
             and([
                 isOpponent,
                 did(actor(you), attackWith(a(isCreature), which), within(thisCombat))]))),
         up(
           forEach(
-            1,
+            lit(1),
             and([
                 isOpponent,
                 did(actor(you), attackWith(a(isCreature), which), within(thisCombat))]))),

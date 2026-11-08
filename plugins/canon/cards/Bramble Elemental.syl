@@ -1,12 +1,12 @@
 card {
   name = "Bramble Elemental",
-  cost = [3, green, green],
+  cost = [generic(3), pip(green), pip(green)],
   types = [creature],
   subtypes = [elemental],
   text = [
     whenever(
       does(any, attachment(attached, a(hasSubtype(aura)), thisCreature)),
-      create(2, written(creatureToken(1, 1, [green], [saproling]))))],
-  power = 4,
-  toughness = 4
+      create(lit(2), written(creatureToken(1, 1, [green], [saproling]))))],
+  power = lit(4),
+  toughness = lit(4)
 }

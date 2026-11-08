@@ -1,6 +1,6 @@
 card {
   name = "Conjurer's Ban",
-  cost = [white, black],
+  cost = [pip(white), pip(black)],
   types = [sorcery],
   text = [
     spell(
@@ -11,5 +11,5 @@ card {
                 cant(any, cast(bare(and([isSpell, named(chosenName)])))),
                 cant(any, play(allOf(and([isLand, named(chosenName)]))))]),
             untilYourNextTurn)])),
-    spell(draw(1))]
+    spell(draw(lit(1)))]
 }

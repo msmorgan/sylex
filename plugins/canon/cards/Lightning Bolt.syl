@@ -1,6 +1,6 @@
 card {
   name = "Lightning Bolt",
-  cost = [red],
+  cost = [pip(red)],
   types = [instant],
-  text = [spell(instruct(this, dealDamage(3, target(isAnyTarget))))]
+  text = [spell(instruct(this, dealDamage(lit(3), target(isAnyTarget))))]
 }

@@ -3,7 +3,7 @@
 # [CR#608.2h].
 card {
   name = "Essence Backlash",
-  cost = [2, blue, red],
+  cost = [generic(2), pip(blue), pip(red)],
   types = [instant],
   text = [
     spell(

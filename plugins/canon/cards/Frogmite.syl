@@ -1,9 +1,9 @@
 card {
   name = "Frogmite",
-  cost = [4],
+  cost = [generic(4)],
   types = [artifact, creature],
   subtypes = [frog],
   text = [affinity(isArtifact)],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

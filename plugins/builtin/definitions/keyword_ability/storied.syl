@@ -15,7 +15,7 @@ ability storied {
                     youControl,
                     andOr([isArtifact, hasSubtype(saga), hasSupertype(legendary)])])),
               atLeast,
-              3),
+              lit(3)),
             not(is(you, hasDesignation(enduringStory)))]),
         gainDesignation(you, enduringStory, restOfGame)))]
 }

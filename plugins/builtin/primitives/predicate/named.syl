@@ -1,4 +1,4 @@
 # "named <source>"
-primitive named(source: NameSource): Predicate {
+primitive named(source: NameSource): Predicate = Named {
   spelling = "named <source>"
 }

@@ -1,4 +1,4 @@
 # "as though its <stat> were <amount> greater"
-primitive greaterBy(stat: Stat, amount: Amount): AsThough = .greater {
+primitive greaterBy(stat: Stat, amount: Amount): AsThough = Greater {
   spelling = "as though its <stat> were <amount> greater"
 }

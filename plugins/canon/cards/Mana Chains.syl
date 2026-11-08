@@ -1,9 +1,9 @@
 card {
   name = "Mana Chains",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [enchantment],
   subtypes = [aura],
   text = [
     enchant(isCreature),
-    static(abilityGrant(enchanted(creature), cumulativeUpkeep(mana([1]))))]
+    static(abilityGrant(enchanted(creature), cumulativeUpkeep(mana([generic(1)]))))]
 }

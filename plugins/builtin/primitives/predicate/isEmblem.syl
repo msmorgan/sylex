@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.isEmblem`.
-primitive isEmblem: Predicate {
+primitive isEmblem: Predicate = IsEmblem {
   spelling = "emblem"
 }

@@ -1,6 +1,6 @@
 card {
   name = "Unesh, Criosphinx Sovereign",
-  cost = [4, blue, blue],
+  cost = [generic(4), pip(blue), pip(blue)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [sphinx],
@@ -9,14 +9,14 @@ card {
     static(
       costShift(
         allOf(and([hasSubtype(sphinx), isSpell, did(actor(you), cast(which), thisObject)])),
-        less(2))),
+        less(lit(2)))),
     whenever(
       does(actor(eitherOf(thisCreature, a(and([hasSubtype(sphinx), youControl, isOther])))), enter),
       sequentially([
-          reveal(topSlice(4)),
+          reveal(topSlice(lit(4))),
           instruct(anOpponent, separateIntoPiles(them, 2)),
           putInto(onePile, hand),
           putInto(theOther, graveyard)]))],
-  power = 4,
-  toughness = 4
+  power = lit(4),
+  toughness = lit(4)
 }

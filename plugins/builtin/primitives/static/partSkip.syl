@@ -1,4 +1,4 @@
 # Authoring primitive for `StaticSpec.partSkip`.
-primitive partSkip(player: NounPhrase, part: TurnPart): StaticSpec {
+primitive partSkip(player: NounPhrase, part: TurnPart): StaticSpec = PartSkip {
   spelling = "<player> skips <part>"
 }

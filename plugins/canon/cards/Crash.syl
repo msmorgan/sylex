@@ -1,6 +1,6 @@
 card {
   name = "Crash",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [instant],
   text = [
     static(altCost(this, perform(sacrifice(a(and([isLand, hasSubtype(mountain)])))))),

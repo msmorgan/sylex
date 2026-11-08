@@ -1,13 +1,17 @@
 card {
   name = "Stone Haven Outfitter",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [creature],
   subtypes = [kor, artificer, ally],
   text = [
-    static(getsPt(allOf(and([and([isCreature, youControl]), isAttached(equipped)])), up(1), up(1))),
+    static(
+      getsPt(
+        allOf(and([and([isCreature, youControl]), isAttached(equipped)])),
+        up(lit(1)),
+        up(lit(1)))),
     whenever(
       does(actor(a(and([and([isCreature, youControl]), isAttached(equipped)]))), die),
-      draw(1))],
-  power = 2,
-  toughness = 2
+      draw(lit(1)))],
+  power = lit(2),
+  toughness = lit(2)
 }

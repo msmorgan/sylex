@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.notChosen`.
-primitive notChosen: Predicate {
+primitive notChosen: Predicate = NotChosen {
   spelling = "not chosen"
 }

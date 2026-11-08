@@ -1,9 +1,9 @@
 card {
   name = "Asphodel Wanderer",
-  cost = [black],
+  cost = [pip(black)],
   types = [creature],
   subtypes = [skeleton, soldier],
-  text = [activated(mana([2, black]), regenerate(thisCreature))],
-  power = 1,
-  toughness = 1
+  text = [activated(mana([generic(2), pip(black)]), regenerate(thisCreature))],
+  power = lit(1),
+  toughness = lit(1)
 }

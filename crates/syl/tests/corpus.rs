@@ -1,8 +1,9 @@
-//! Every `.syl` file under `plugins/` parses.
+//! Every `.syl` file under `plugins/` parses, and the plugins pass the declaration checks.
 
 use std::path::Path;
 use std::path::PathBuf;
 
+use sylex_syl::Bundle;
 use sylex_syl::Entry;
 use sylex_syl::File;
 use sylex_syl::FileId;
@@ -109,4 +110,14 @@ fn every_plugins_file_parses() {
         failures.len(),
         failures.join("\n")
     );
+}
+
+#[test]
+fn the_plugins_pass_the_declaration_checks() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins");
+    let builtin = Bundle::load(root.join("builtin"), FileId(0)).expect("builtin parses");
+    let canon = Bundle::load(root.join("canon"), builtin.next_file_id()).expect("canon parses");
+    if let Err(error) = sylex_syl::check(&[&builtin, &canon]) {
+        panic!("{} refusals:\n{error}", error.refusals.len());
+    }
 }

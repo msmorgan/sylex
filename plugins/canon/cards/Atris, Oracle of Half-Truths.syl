@@ -1,6 +1,6 @@
 card {
   name = "Atris, Oracle of Half-Truths",
-  cost = [2, blue, black],
+  cost = [generic(2), pip(blue), pip(black)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, advisor],
@@ -9,10 +9,10 @@ card {
     when(
       does(actor(thisCreature), enter),
       sequentially([
-          instruct(target(isOpponent), lookAt(topSlice(3))),
+          instruct(target(isOpponent), lookAt(topSlice(lit(3)))),
           instruct(they, separateIntoPiles(them, 2, [faceDown, faceUp])),
           putInto(onePile, hand),
           putInto(theOther, graveyard)]))],
-  power = 3,
-  toughness = 2
+  power = lit(3),
+  toughness = lit(2)
 }

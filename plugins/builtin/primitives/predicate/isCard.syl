@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.isCard`.
-primitive isCard: Predicate {
+primitive isCard: Predicate = IsCard {
   spelling = "card"
 }

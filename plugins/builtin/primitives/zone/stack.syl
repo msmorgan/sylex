@@ -1,0 +1,3 @@
+primitive stack: Zone = Stack {
+  spelling = "stack"
+}

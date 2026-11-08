@@ -1,6 +1,6 @@
 card {
   name = "Words of Wisdom",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [instant],
-  text = [spell(sequentially([draw(2), instruct(each(isOtherPlayer), draw(1))]))]
+  text = [spell(sequentially([draw(lit(2)), instruct(each(isOtherPlayer), draw(lit(1)))]))]
 }

@@ -1,20 +1,20 @@
 card {
   name = "Animal Attendant",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [creature],
   subtypes = [human, citizen],
   text = [
     activated(
       tapSymbol,
       addMana(
-        1,
+        lit(1),
         ofAnyColor(sameColor),
         [
           whenSpentOn(
             affectsIt,
             false,
             a(and([non(hasSubtype(human)), isCreature, isSpell])),
-            establish(entersWithAdditionalCounters(becomes(that(spell)), 1, p1p1Counter)))]))],
-  power = 2,
-  toughness = 2
+            establish(entersWithAdditionalCounters(becomes(that(spell)), lit(1), p1p1Counter)))]))],
+  power = lit(2),
+  toughness = lit(2)
 }

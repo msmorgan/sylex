@@ -1,6 +1,6 @@
 card {
   name = "Ghalta, Primal Hunger",
-  cost = [10, green, green],
+  cost = [generic(10), pip(green), pip(green)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [elder, dinosaur],
@@ -10,6 +10,6 @@ card {
           costShift(this, less(letter(x))),
           letterDefinition(x, aggregate(sum, stat(power), and([isCreature, youControl])))])),
     trample],
-  power = 12,
-  toughness = 12
+  power = lit(12),
+  toughness = lit(12)
 }

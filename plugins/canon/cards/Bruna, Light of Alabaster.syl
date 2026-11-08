@@ -3,7 +3,7 @@
 # [CR#303.4i].
 card {
   name = "Bruna, Light of Alabaster",
-  cost = [3, white, white, blue],
+  cost = [generic(3), pip(white), pip(white), pip(blue)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [angel],
@@ -22,6 +22,6 @@ card {
                 and(
                   [hasSubtype(aura), cardIn(andOr([yourGraveyard, yourHand])), couldEnchant(it)])),
               it))]))],
-  power = 5,
-  toughness = 5
+  power = lit(5),
+  toughness = lit(5)
 }

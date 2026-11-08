@@ -1,2 +1,2 @@
 # Authoring primitive for `Predicate.choseExtreme`.
-primitive choseExtreme(op: AggregateOp): Predicate
+primitive choseExtreme(op: AggregateOp): Predicate = ChoseExtreme

@@ -1,1 +1,1 @@
-primitive now: GameEvent
+primitive now: GameEvent = Now

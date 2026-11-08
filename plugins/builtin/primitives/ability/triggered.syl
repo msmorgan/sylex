@@ -7,4 +7,4 @@ primitive triggered(
   timing: Option(Timing),
   limit: Option(UsageLimit),
   intervening: Option(Condition),
-  action: Action): Ability
+  action: Action): Ability = Triggered

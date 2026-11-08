@@ -1,11 +1,11 @@
 card {
   name = "Gush",
-  cost = [4, blue],
+  cost = [generic(4), pip(blue)],
   types = [instant],
   text = [
     static(
       altCost(
         this,
         perform(returnToHand(counted(exactly(2), and([isLand, hasSubtype(island), youControl])))))),
-    spell(draw(2))]
+    spell(draw(lit(2)))]
 }

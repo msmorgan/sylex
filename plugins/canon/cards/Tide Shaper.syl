@@ -1,10 +1,10 @@
 card {
   name = "Tide Shaper",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [creature],
   subtypes = [merfolk, wizard],
   text = [
-    kicker(mana([1])),
+    kicker(mana([generic(1)])),
     when(
       does(actor(thisCreature), enter),
       if = keywordCostPaid(kicker, thisCreature),
@@ -13,8 +13,8 @@ card {
         forAsLongAs(is(thisCreature, in(battlefield))))),
     static(
       onlyWhile(
-        getsPt(thisCreature, up(1), up(1)),
+        getsPt(thisCreature, up(lit(1)), up(lit(1))),
         exists(and([hasSubtype(island), opponentsControl]))))],
-  power = 1,
-  toughness = 1
+  power = lit(1),
+  toughness = lit(1)
 }

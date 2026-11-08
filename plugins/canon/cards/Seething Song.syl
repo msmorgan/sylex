@@ -1,6 +1,10 @@
 card {
   name = "Seething Song",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [instant],
-  text = [spell(addMana(1, manaOf([[of(red), of(red), of(red), of(red), of(red)]])))]
+  text = [
+    spell(
+      addMana(
+        lit(1),
+        manaOf([[colored(red), colored(red), colored(red), colored(red), colored(red)]])))]
 }

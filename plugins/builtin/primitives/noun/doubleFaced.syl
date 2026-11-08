@@ -1,1 +1,3 @@
-primitive doubleFaced(front: CharacteristicBundle, back: CharacteristicBundle): TokenSpec
+primitive doubleFaced(
+  front: CharacteristicBundle,
+  back: CharacteristicBundle): TokenSpec = DoubleFaced

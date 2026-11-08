@@ -1,12 +1,12 @@
 card {
   name = "Blast of Genius",
-  cost = [4, blue, red],
+  cost = [generic(4), pip(blue), pip(red)],
   types = [sorcery],
   text = [
     spell(
       sequentially([
           choose(target(isAnyTarget)),
-          draw(3),
+          draw(lit(3)),
           discard(a(cardIn(yourHand))),
           instruct(
             this,

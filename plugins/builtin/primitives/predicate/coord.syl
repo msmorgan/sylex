@@ -1,2 +1,2 @@
 # Authoring primitive for `Predicate.coord`.
-primitive coord(coordinator: Coordinator, items: List(Predicate)): Predicate
+primitive coord(coordinator: Coordinator, items: List(Predicate)): Predicate = Coordination

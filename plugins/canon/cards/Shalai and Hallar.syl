@@ -1,6 +1,6 @@
 card {
   name = "Shalai and Hallar",
-  cost = [1, red, green, white],
+  cost = [generic(1), pip(red), pip(green), pip(white)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [angel, elf],
@@ -10,6 +10,6 @@ card {
     whenever(
       does(any, putCounters(anyAmount, printedKind(p1p1Counter), a(and([isCreature, youControl])))),
       instruct(thisCreature, dealDamage(thatMuch, target(isOpponent))))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

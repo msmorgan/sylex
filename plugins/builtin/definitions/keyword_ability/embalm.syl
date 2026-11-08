@@ -11,12 +11,12 @@ ability embalm(cost: Cost) {
     activatedOnlyDuring(
       compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),
       create(
-        1,
+        lit(1),
         copyOf(
           this,
           [
             characteristicEdits([
-                colors(sets, some([white])),
+                colors(sets, colors([white])),
                 manaCost(none),
                 typeLine(adds, {subtypes = [zombie]})])])),
       asSorcery)]

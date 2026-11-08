@@ -1,1 +1,1 @@
-primitive removedAbilities(selection: AbilitySelection): CharacteristicEdit
+primitive removedAbilities(selection: AbilitySelection): CharacteristicEdit = RemovedAbilities

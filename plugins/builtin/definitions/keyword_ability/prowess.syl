@@ -6,5 +6,5 @@ ability prowess {
   body = [
     whenever(
       does(actor(you), cast(a(and([in(stack), non(isCreature)])))),
-      get(thisCreature, up(1), up(1), untilEndOfTurn))]
+      get(thisCreature, up(lit(1)), up(lit(1)), untilEndOfTurn))]
 }

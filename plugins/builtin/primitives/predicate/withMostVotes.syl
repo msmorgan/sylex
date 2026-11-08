@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.withMostVotes`.
-primitive withMostVotes: Predicate {
+primitive withMostVotes: Predicate = WithMostVotes {
   spelling = "with the most votes"
 }

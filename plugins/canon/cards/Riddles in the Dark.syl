@@ -1,11 +1,11 @@
 card {
   name = "Riddles in the Dark",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [instant],
   text = [
     spell(
       sequentially([
-          lookAt(topSlice(4)),
+          lookAt(topSlice(lit(4))),
           separateIntoPiles(them, 2, [faceDown, faceUp]),
           instruct(anOpponent, choose(onePile)),
           putInto(that(pile), hand),

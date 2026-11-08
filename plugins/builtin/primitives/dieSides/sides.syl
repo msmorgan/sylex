@@ -1,0 +1,1 @@
+primitive sides(sides: Nat): DieSides = Sides

@@ -1,6 +1,6 @@
 card {
   name = "Darkest Hour",
-  cost = [black],
+  cost = [pip(black)],
   types = [enchantment],
-  text = [static(qualityChange(allOf(isCreature), sets, colored(some([black]))))]
+  text = [static(qualityChange(allOf(isCreature), sets, colored(colors([black]))))]
 }

@@ -1,9 +1,9 @@
 card {
   name = "Wandering Eye",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [creature],
   subtypes = [illusion],
   text = [flying, static(visibility(reveal, bare(isPlayer), wholeHand))],
-  power = 1,
-  toughness = 3
+  power = lit(1),
+  toughness = lit(3)
 }

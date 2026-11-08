@@ -1,12 +1,12 @@
 card {
   name = "Keldon Warcaller",
-  cost = [1, red],
+  cost = [generic(1), pip(red)],
   types = [creature],
   subtypes = [human, warrior],
   text = [
     whenever(
       does(actor(thisCreature), attack),
-      putCounters(1, printedKind(loreCounter), target(and([hasSubtype(saga), youControl]))))],
-  power = 2,
-  toughness = 2
+      putCounters(lit(1), printedKind(loreCounter), target(and([hasSubtype(saga), youControl]))))],
+  power = lit(2),
+  toughness = lit(2)
 }

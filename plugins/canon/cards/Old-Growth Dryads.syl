@@ -1,6 +1,6 @@
 card {
   name = "Old-Growth Dryads",
-  cost = [green],
+  cost = [pip(green)],
   types = [creature],
   subtypes = [dryad],
   text = [
@@ -13,6 +13,6 @@ card {
               search(libraryOf(they), a(and([isLand, hasSupertype(basic)]))),
               putOntoBattlefieldTapped(it),
               shuffle]))))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

@@ -1,6 +1,6 @@
 card {
   name = "Humility",
-  cost = [2, white, white],
+  cost = [generic(2), pip(white), pip(white)],
   types = [enchantment],
-  text = [static(conjunction([allAbilityLoss(allOf(isCreature)), getsBase(them, 1, 1)]))]
+  text = [static(conjunction([allAbilityLoss(allOf(isCreature)), getsBase(them, lit(1), lit(1))]))]
 }

@@ -1,6 +1,6 @@
 card {
   name = "Faith's Reward",
-  cost = [3, white],
+  cost = [generic(3), pip(white)],
   types = [instant],
   text = [
     spell(

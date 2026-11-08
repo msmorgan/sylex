@@ -1,15 +1,15 @@
 card {
   name = "Mistform Dreamer",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [creature],
   subtypes = [illusion],
   text = [
     flying,
     activated(
-      mana([1]),
+      mana([generic(1)]),
       establishThroughout(
         qualityChange(thisCreature, sets, chosenQuality(ofYourChoice(subtype(creature)))),
         untilEndOfTurn))],
-  power = 2,
-  toughness = 1
+  power = lit(2),
+  toughness = lit(1)
 }

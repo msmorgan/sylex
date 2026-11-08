@@ -1,4 +1,4 @@
 # "for <candidates>", as a vote's candidates
-primitive byCandidate(candidates: NounPhrase): Ballot {
+primitive byCandidate(candidates: NounPhrase): Ballot = ByCandidate {
   spelling = "for <candidates>"
 }

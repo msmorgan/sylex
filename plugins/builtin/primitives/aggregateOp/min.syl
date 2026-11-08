@@ -1,0 +1,1 @@
+primitive min: AggregateOp = Min

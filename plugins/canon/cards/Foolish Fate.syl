@@ -3,7 +3,7 @@
 # it.
 card {
   name = "Foolish Fate",
-  cost = [2, black],
+  cost = [generic(2), pip(black)],
   types = [instant],
   text = [
     spell(destroy(target(isCreature))),
@@ -11,5 +11,5 @@ card {
       spell(
         doIf(
           did(actor(you), gainLife(anyAmount), within(soFarThisTurn)),
-          instruct(controllerOf(that(creature)), loseLife(3)))))]
+          instruct(controllerOf(that(creature)), loseLife(lit(3))))))]
 }

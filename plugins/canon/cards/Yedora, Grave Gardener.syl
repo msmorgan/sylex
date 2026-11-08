@@ -1,6 +1,6 @@
 card {
   name = "Yedora, Grave Gardener",
-  cost = [4, green],
+  cost = [generic(4), pip(green)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [treefolk, druid],
@@ -14,6 +14,6 @@ card {
               [
                 faceDownAs({characteristics = {types = [land], subtypes = [forest]}}),
                 under(ownerOf(it))])])))],
-  power = 5,
-  toughness = 5
+  power = lit(5),
+  toughness = lit(5)
 }

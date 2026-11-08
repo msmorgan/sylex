@@ -2,7 +2,7 @@
 # [CR#101.1,101.4].
 card {
   name = "Disciple of Caelus Nin",
-  cost = [4, white],
+  cost = [generic(4), pip(white)],
   types = [creature],
   subtypes = [human, wizard],
   text = [
@@ -14,6 +14,6 @@ card {
             chooseStartingWith(you, counted(upTo(5), and([isPermanent, controlledBy(they)])))),
           instruct(allOf(and([isPermanent, otherThan(thisCreature), notChosen])), phaseOut)])),
     static(cant(actor(bare(isPermanent)), phaseIn))],
-  power = 3,
-  toughness = 4
+  power = lit(3),
+  toughness = lit(4)
 }

@@ -1,4 +1,4 @@
 # "another", "other" with no "other than" written: other than its Contrast Anchor.
-primitive isOther: Predicate = .other {
+primitive isOther: Predicate = Other {
   spelling = "another"
 }

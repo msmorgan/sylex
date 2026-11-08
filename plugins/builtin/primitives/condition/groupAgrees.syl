@@ -1,5 +1,5 @@
 # "Each <group> shares a card type", "… has a different name" [CR#702.139a]
 # [CR#702.139a]
-primitive groupAgrees(group: NounPhrase): DeckCondition {
+primitive groupAgrees(group: NounPhrase): DeckCondition = GroupAgrees {
   spelling = "Each <group> shares a card type"
 }

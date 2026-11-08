@@ -2,12 +2,15 @@
 # [CR#208.2a], one that reads the last chosen number.
 card {
   name = "Shapeshifter",
-  cost = [6],
+  cost = [generic(6)],
   types = [artifact, creature],
   subtypes = [shapeshifter],
   text = [
     static(entersChoosingFrom(thisCreature, number, number(fromTo(0, 7)))),
     at(beginningOfYour(upkeep), may(choose(a(qualityFrom(number, number(fromTo(0, 7))))))),
     static(
-      definesPowerAndToughness(thisCreature, theLastChosenNumber, minus(7, theLastChosenNumber)))]
+      definesPowerAndToughness(
+        thisCreature,
+        theLastChosenNumber,
+        minus(lit(7), theLastChosenNumber)))]
 }

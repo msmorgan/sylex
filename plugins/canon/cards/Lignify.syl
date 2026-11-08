@@ -1,6 +1,6 @@
 card {
   name = "Lignify",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [kindred, enchantment],
   subtypes = [treefolk, aura],
   text = [
@@ -11,6 +11,6 @@ card {
             enchanted(creature),
             sets,
             bundle({characteristics = {subtypes = [treefolk]}})),
-          getsBase(it, 0, 4),
+          getsBase(it, lit(0), lit(4)),
           allAbilityLoss(it)]))]
 }

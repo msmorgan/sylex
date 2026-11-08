@@ -5,11 +5,11 @@
 # beginning of the next cleanup step." (`asThoughFlashSacrificedAtCleanup`).
 card {
   name = "Armor of Thorns",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [enchantment],
   subtypes = [aura],
   text = [
     asThoughFlashSacrificedAtCleanup,
     enchant(and([isCreature, non(hasColor(black))])),
-    static(getsPt(enchanted(creature), up(2), up(2)))]
+    static(getsPt(enchanted(creature), up(lit(2)), up(lit(2))))]
 }

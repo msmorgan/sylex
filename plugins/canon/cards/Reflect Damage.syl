@@ -1,6 +1,6 @@
 card {
   name = "Reflect Damage",
-  cost = [3, red, white],
+  cost = [generic(3), pip(red), pip(white)],
   types = [instant],
   text = [
     spell(

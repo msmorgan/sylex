@@ -1,6 +1,6 @@
 card {
   name = "Chain Reaction",
-  cost = [2, red, red],
+  cost = [generic(2), pip(red), pip(red)],
   types = [sorcery],
   text = [
     spell(

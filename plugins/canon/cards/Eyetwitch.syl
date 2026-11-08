@@ -1,9 +1,9 @@
 card {
   name = "Eyetwitch",
-  cost = [black],
+  cost = [pip(black)],
   types = [creature],
   subtypes = [eye, bat],
   text = [flying, when(does(actor(thisCreature), die), learn)],
-  power = 1,
-  toughness = 1
+  power = lit(1),
+  toughness = lit(1)
 }

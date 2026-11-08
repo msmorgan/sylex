@@ -1,4 +1,4 @@
 # "any kind of counter"
-primitive anyKind: CounterKindSource {
+primitive anyKind: CounterKindSource = AnyKind {
   spelling = "any kind of counter"
 }

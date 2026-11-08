@@ -1,4 +1,4 @@
 # "again", "repeat this process"
-primitive again: Repetition {
+primitive again: Repetition = Again {
   spelling = "again"
 }

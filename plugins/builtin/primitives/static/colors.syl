@@ -1,1 +1,1 @@
-primitive colors(op: QualityOp, colors: ColorSpec): CharacteristicEdit
+primitive colors(op: QualityOp, colors: ColorSpec): CharacteristicEdit = Colors

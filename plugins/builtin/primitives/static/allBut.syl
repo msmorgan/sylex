@@ -1,4 +1,4 @@
 # "all but <amount> of that damage"
-primitive allBut(amount: Amount): PreventCut {
+primitive allBut(amount: Amount): PreventCut = AllBut {
   spelling = "all but <amount> of that damage"
 }

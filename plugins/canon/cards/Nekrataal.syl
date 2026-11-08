@@ -1,6 +1,6 @@
 card {
   name = "Nekrataal",
-  cost = [2, black, black],
+  cost = [generic(2), pip(black), pip(black)],
   types = [creature],
   subtypes = [human, assassin],
   text = [
@@ -10,6 +10,6 @@ card {
       doUnderProhibition(
         destroy(target(and([isCreature, non(isArtifact), not(hasColor(black))]))),
         regeneration(that(creature))))],
-  power = 2,
-  toughness = 1
+  power = lit(2),
+  toughness = lit(1)
 }

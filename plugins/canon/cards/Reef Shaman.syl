@@ -1,6 +1,6 @@
 card {
   name = "Reef Shaman",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [creature],
   subtypes = [merfolk, shaman],
   text = [
@@ -12,6 +12,6 @@ card {
           sets,
           chosenQuality(ofYourChoice(subtype(land), basicTypesOnly))),
         untilEndOfTurn))],
-  power = 0,
-  toughness = 2
+  power = lit(0),
+  toughness = lit(2)
 }

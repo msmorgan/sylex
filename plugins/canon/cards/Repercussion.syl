@@ -1,6 +1,6 @@
 card {
   name = "Repercussion",
-  cost = [1, red, red],
+  cost = [generic(1), pip(red), pip(red)],
   types = [enchantment],
   text = [
     whenever(

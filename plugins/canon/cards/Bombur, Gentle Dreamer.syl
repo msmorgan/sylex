@@ -1,12 +1,12 @@
 card {
   name = "Bombur, Gentle Dreamer",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [dwarf, bard],
   text = [
     storied,
     static(onlyUnless(doesntUntap(thisCreature, you), is(you, hasDesignation(enduringStory))))],
-  power = 5,
-  toughness = 3
+  power = lit(5),
+  toughness = lit(3)
 }

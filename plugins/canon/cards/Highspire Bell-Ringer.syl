@@ -1,6 +1,6 @@
 card {
   name = "Highspire Bell-Ringer",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [creature],
   subtypes = [djinn, monk],
   text = [
@@ -11,7 +11,7 @@ card {
           and([
               isSpell,
               did(actor(you), cast(which), thisObject, ordinal = {ordinal = nth(2), per = turn})])),
-        less(1)))],
-  power = 1,
-  toughness = 4
+        less(lit(1))))],
+  power = lit(1),
+  toughness = lit(4)
 }

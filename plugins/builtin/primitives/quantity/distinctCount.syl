@@ -1,4 +1,4 @@
 # Count distinct values of the specified axis in the domain.
-primitive distinctCount(axis: KindAxis, domain: NounPhrase): Amount {
+primitive distinctCount(axis: KindAxis, domain: NounPhrase): Amount = DistinctCount {
   spelling = "the number of different <axis> among <domain>"
 }

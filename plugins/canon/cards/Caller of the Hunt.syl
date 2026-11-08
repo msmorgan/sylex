@@ -1,6 +1,6 @@
 card {
   name = "Caller of the Hunt",
-  cost = [2, green],
+  cost = [generic(2), pip(green)],
   types = [creature],
   subtypes = [human],
   text = [

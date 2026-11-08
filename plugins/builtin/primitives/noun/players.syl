@@ -1,4 +1,4 @@
 # "a <predicate> player"
-primitive players(predicate: Predicate): ChoiceDomain {
+primitive players(predicate: Predicate): ChoiceDomain = Players {
   spelling = "a <predicate> player"
 }

@@ -1,6 +1,6 @@
 card {
   name = "Abolish",
-  cost = [1, white, white],
+  cost = [generic(1), pip(white), pip(white)],
   types = [instant],
   text = [
     static(altCost(this, perform(discard(a(and([hasSubtype(plains), in(yourHand)])))))),

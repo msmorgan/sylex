@@ -1,6 +1,6 @@
 card {
   name = "Scapeshift",
-  cost = [2, green, green],
+  cost = [generic(2), pip(green), pip(green)],
   types = [sorcery],
   text = [
     spell(

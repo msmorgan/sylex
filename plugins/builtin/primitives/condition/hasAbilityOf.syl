@@ -1,4 +1,4 @@
 # "an <class> ability"
-primitive hasAbilityOf(class: AbilityClass): DeckTrait {
+primitive hasAbilityOf(class: AbilityClass): DeckTrait = HasAbilityOf {
   spelling = "an <class> ability"
 }

@@ -1,6 +1,6 @@
 card {
   name = "Eerie Ultimatum",
-  cost = [white, white, black, black, black, green, green],
+  cost = [pip(white), pip(white), pip(black), pip(black), pip(black), pip(green), pip(green)],
   types = [sorcery],
   text = [
     spell(

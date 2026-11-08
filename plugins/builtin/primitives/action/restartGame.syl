@@ -1,4 +1,4 @@
 # Restart the game.
-primitive restartGame: Action {
+primitive restartGame: Action = RestartGame {
   spelling = "restart the game"
 }

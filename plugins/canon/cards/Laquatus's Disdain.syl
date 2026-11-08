@@ -1,10 +1,10 @@
 card {
   name = "Laquatus's Disdain",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [instant],
   text = [
     spell(
       sequentially([
           counter(target(and([isSpell, did(any, cast(which, from = graveyard), thisObject)]))),
-          draw(1)]))]
+          draw(lit(1))]))]
 }

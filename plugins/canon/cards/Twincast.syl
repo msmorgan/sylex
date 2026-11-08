@@ -1,6 +1,6 @@
 card {
   name = "Twincast",
-  cost = [blue, blue],
+  cost = [pip(blue), pip(blue)],
   types = [instant],
   text = [
     spell(

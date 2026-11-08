@@ -1,6 +1,6 @@
 card {
   name = "Thorn of Amethyst",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
-  text = [static(costShift(allOf(and([non(isCreature), isSpell])), more(1)))]
+  text = [static(costShift(allOf(and([non(isCreature), isSpell])), more(lit(1))))]
 }

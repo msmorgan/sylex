@@ -1,6 +1,6 @@
 card {
   name = "Spell Snare",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [instant],
-  text = [spell(counter(target(and([isSpell, hasManaValue(eq, 2)]))))]
+  text = [spell(counter(target(and([isSpell, hasManaValue(equal, lit(2))]))))]
 }

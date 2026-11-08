@@ -1,0 +1,3 @@
+primitive combatDamage: TurnPart = CombatDamage {
+  spelling = "combat damage"
+}

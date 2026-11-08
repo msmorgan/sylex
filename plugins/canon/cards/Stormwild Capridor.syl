@@ -1,6 +1,6 @@
 card {
   name = "Stormwild Capridor",
-  cost = [2, white],
+  cost = [generic(2), pip(white)],
   types = [creature],
   subtypes = [bird, goat],
   text = [
@@ -12,6 +12,6 @@ card {
           preventDamage(
             allDamage,
             also = putCounters(preventedThisWay, printedKind(p1p1Counter), thisCreature)))))],
-  power = 1,
-  toughness = 3
+  power = lit(1),
+  toughness = lit(3)
 }

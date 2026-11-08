@@ -1,15 +1,15 @@
 card {
   name = "Matopi Golem",
-  cost = [5],
+  cost = [generic(5)],
   types = [artifact, creature],
   subtypes = [golem],
   text = [
     activated(
-      mana([1]),
+      mana([generic(1)]),
       triggerThisWay(
         regenerate(thisCreature),
         does(any, regeneration(thisCreature)),
-        putCounters(1, printedKind(m1m1Counter), it)))],
-  power = 3,
-  toughness = 3
+        putCounters(lit(1), printedKind(m1m1Counter), it)))],
+  power = lit(3),
+  toughness = lit(3)
 }

@@ -1,18 +1,18 @@
 card {
   name = "Embercleave",
-  cost = [4, red, red],
+  cost = [generic(4), pip(red), pip(red)],
   supertypes = [legendary],
   types = [artifact],
   subtypes = [equipment],
   text = [
     flash,
-    static(costShift(this, less(forEach(1, and([isCreature, isAttacking, youControl]))))),
+    static(costShift(this, less(forEach(lit(1), and([isCreature, isAttacking, youControl]))))),
     when(does(actor(thisEquipment), enter), attachTo(it, target(and([isCreature, youControl])))),
     static(
       conjunction([
-          getsPt(equipped(creature), up(1), up(1)),
+          getsPt(equipped(creature), up(lit(1)), up(lit(1))),
           abilityGrant(equipped(creature), doubleStrike),
           abilityGrant(equipped(creature), trample)],
         subject = equipped(creature))),
-    equip(mana([3]))]
+    equip(mana([generic(3)]))]
 }

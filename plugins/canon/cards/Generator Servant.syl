@@ -1,13 +1,13 @@
 card {
   name = "Generator Servant",
-  cost = [1, red],
+  cost = [generic(1), pip(red)],
   types = [creature],
   subtypes = [elemental],
   text = [
     activated(
       compound([tapSymbol, perform(sacrifice(thisCreature))]),
       addMana(
-        1,
+        lit(1),
         manaOf([[colorless, colorless]]),
         [
           whenSpentOn(
@@ -15,6 +15,6 @@ card {
             false,
             a(and([isCreature, isSpell])),
             gainHaste(becomes(that(spell)), untilEndOfTurn))]))],
-  power = 2,
-  toughness = 1
+  power = lit(2),
+  toughness = lit(1)
 }

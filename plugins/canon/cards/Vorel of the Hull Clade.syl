@@ -1,13 +1,13 @@
 card {
   name = "Vorel of the Hull Clade",
-  cost = [1, green, blue],
+  cost = [generic(1), pip(green), pip(blue)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, merfolk],
   text = [
     activated(
-      compound([mana([green, blue]), tapSymbol]),
+      compound([mana([pip(green), pip(blue)]), tapSymbol]),
       doubleCounters(target(or([isArtifact, isCreature, isLand]))))],
-  power = 1,
-  toughness = 4
+  power = lit(1),
+  toughness = lit(4)
 }

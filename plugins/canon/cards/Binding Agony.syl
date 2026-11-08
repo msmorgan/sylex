@@ -1,6 +1,6 @@
 card {
   name = "Binding Agony",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [enchantment],
   subtypes = [aura],
   text = [

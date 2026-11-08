@@ -3,7 +3,7 @@
 # [CR#303.4f,303.4i].
 card {
   name = "Academy Researchers",
-  cost = [1, blue, blue],
+  cost = [generic(1), pip(blue), pip(blue)],
   types = [creature],
   subtypes = [human, wizard],
   text = [
@@ -11,6 +11,6 @@ card {
       does(actor(thisCreature), enter),
       may(
         putOntoBattlefieldAttachedTo(a(and([hasSubtype(aura), cardIn(yourHand)])), thisCreature)))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

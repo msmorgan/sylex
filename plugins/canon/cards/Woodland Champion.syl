@@ -1,12 +1,12 @@
 card {
   name = "Woodland Champion",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [creature],
   subtypes = [elf, scout],
   text = [
     whenever(
       does(actor(counted(orMore(1), and([isToken, youControl]))), enter),
       putCounters(groupSize, printedKind(p1p1Counter), thisCreature))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

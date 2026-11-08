@@ -1,1 +1,1 @@
-primitive taken(which: LinkSource): LinkedFacet
+primitive taken(which: LinkSource): LinkedFacet = Taken

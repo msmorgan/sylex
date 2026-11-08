@@ -1,2 +1,4 @@
 # Authoring primitive for `StaticSpec.conjunction`.
-primitive conjunction(parts: List(StaticSpec), subject: Option(NounPhrase) = none): StaticSpec
+primitive conjunction(
+  parts: List(StaticSpec),
+  subject: Option(NounPhrase) = none): StaticSpec = Conjunction

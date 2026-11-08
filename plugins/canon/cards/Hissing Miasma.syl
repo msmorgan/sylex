@@ -1,7 +1,7 @@
 card {
   name = "Hissing Miasma",
-  cost = [1, black, black],
+  cost = [generic(1), pip(black), pip(black)],
   types = [enchantment],
   text = [
-    whenever(does(actor(a(isCreature)), attack(you)), instruct(controllerOf(it), loseLife(1)))]
+    whenever(does(actor(a(isCreature)), attack(you)), instruct(controllerOf(it), loseLife(lit(1))))]
 }

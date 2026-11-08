@@ -1,6 +1,6 @@
 card {
   name = "Mistbreath Elder",
-  cost = [green],
+  cost = [pip(green)],
   types = [creature],
   subtypes = [frog, warrior],
   text = [
@@ -8,8 +8,8 @@ card {
       beginningOfYour(upkeep),
       doIfDone(
         returnToHand(a(and([isCreature, youControl, isOther]))),
-        putCounters(1, printedKind(p1p1Counter), thisCreature),
+        putCounters(lit(1), printedKind(p1p1Counter), thisCreature),
         may(returnToHand(thisCreature))))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

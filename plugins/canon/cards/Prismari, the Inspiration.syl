@@ -1,16 +1,16 @@
 card {
   name = "Prismari, the Inspiration",
-  cost = [5, blue, red],
+  cost = [generic(5), pip(blue), pip(red)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [elder, dragon],
   text = [
     flying,
-    ward(perform(payLife(5))),
+    ward(perform(payLife(lit(5)))),
     static(
       abilityGrant(
         allOf(and([isInstantOrSorcery, isSpell, did(actor(you), cast(which), thisObject)])),
         storm))],
-  power = 7,
-  toughness = 7
+  power = lit(7),
+  toughness = lit(7)
 }

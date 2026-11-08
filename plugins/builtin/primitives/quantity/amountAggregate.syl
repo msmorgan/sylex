@@ -1,3 +1,3 @@
 # The greatest, least, or total value of the specified numeric property among the group. An empty
 # group has no greatest or least value to determine, so that value is 0 [CR#107.2].
-primitive amountAggregate(op: AggregateOp, axis: ProjAxis, group: NounPhrase): Amount = .aggregate
+primitive amountAggregate(op: AggregateOp, axis: ProjAxis, group: NounPhrase): Amount = Aggregate

@@ -1,8 +1,8 @@
 card {
   name = "Countersculpt",
-  cost = [blue, blue],
+  cost = [pip(blue), pip(blue)],
   types = [instant],
   text = [
-    static(addedCost(or([perform(behold(hasSubtype(jace))), mana([1])]), false)),
-    spell(sequentially([counter(target(isSpell)), empowerJace(1)]))]
+    static(addedCost(or([perform(behold(hasSubtype(jace))), mana([generic(1)])]), false)),
+    spell(sequentially([counter(target(isSpell)), empowerJace(lit(1))]))]
 }

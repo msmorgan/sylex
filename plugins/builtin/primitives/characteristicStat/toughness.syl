@@ -1,0 +1,3 @@
+primitive toughness: CharacteristicStat = Toughness {
+  spelling = "toughness"
+}

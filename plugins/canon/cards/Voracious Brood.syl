@@ -1,19 +1,19 @@
 card {
   name = "Voracious Brood",
-  cost = [2, green],
+  cost = [generic(2), pip(green)],
   types = [creature],
   subtypes = [alien, insect],
   text = [
     static(
       entersWithCounters(
         thisCreature,
-        forEach(1, and([isCreature, in(yourGraveyard)])),
+        forEach(lit(1), and([isCreature, in(yourGraveyard)])),
         p1p1Counter)),
     whenever(
       does(
         any,
-        putInto(counted(orMore(1), and([isCard, isCreature])), yourGraveyard, from = anyLocation)),
+        putInto(counted(orMore(1), and([isCard, isCreature])), yourGraveyard, from = anywhere)),
       putCounters(groupSize, printedKind(p1p1Counter), thisCreature))],
-  power = 1,
-  toughness = 1
+  power = lit(1),
+  toughness = lit(1)
 }

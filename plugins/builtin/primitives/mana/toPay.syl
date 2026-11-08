@@ -1,4 +1,4 @@
 # "to pay <cost>"
-primitive toPay(cost: CostNamed): SpendPurpose {
+primitive toPay(cost: CostNamed): SpendPurpose = ToPay {
   spelling = "to pay <cost>"
 }

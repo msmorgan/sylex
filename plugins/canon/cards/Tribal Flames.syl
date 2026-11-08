@@ -2,7 +2,7 @@
 # has no rules meaning [CR#207.2c].
 card {
   name = "Tribal Flames",
-  cost = [1, red],
+  cost = [generic(1), pip(red)],
   types = [sorcery],
   text = [
     domain(

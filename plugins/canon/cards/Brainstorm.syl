@@ -1,11 +1,11 @@
 card {
   name = "Brainstorm",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [instant],
   text = [
     spell(
       sequentially([
-          draw(3),
+          draw(lit(3)),
           putInto(
             counted(exactly(2), cardIn(yourHand)),
             topOf(yourLibrary),

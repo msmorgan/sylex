@@ -1,6 +1,6 @@
 card {
   name = "Stag Beetle",
-  cost = [3, green, green],
+  cost = [generic(3), pip(green), pip(green)],
   types = [creature],
   subtypes = [insect],
   text = [
@@ -8,6 +8,6 @@ card {
       conjunction([
           entersWithCounters(thisCreature, letter(x), p1p1Counter),
           letterDefinition(x, countOf(and([isCreature, isOther])))]))],
-  power = 0,
-  toughness = 0
+  power = lit(0),
+  toughness = lit(0)
 }

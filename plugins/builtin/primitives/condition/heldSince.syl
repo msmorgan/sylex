@@ -1,4 +1,4 @@
 # "<condition> continuously since <since>": `condition` has held from `since` until now.
-primitive heldSince(condition: Condition, since: GameEvent): Condition {
+primitive heldSince(condition: Condition, since: GameEvent): Condition = HeldSince {
   spelling = "<condition> continuously since <since>"
 }

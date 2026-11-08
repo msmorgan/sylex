@@ -1,6 +1,6 @@
 card {
   name = "Divine Deflection",
-  cost = [variable, white],
+  cost = [variable, pip(white)],
   types = [instant],
   text = [
     spell(

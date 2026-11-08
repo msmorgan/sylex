@@ -1,6 +1,6 @@
 card {
   name = "Grievous Wound",
-  cost = [3, black, black],
+  cost = [generic(3), pip(black), pip(black)],
   types = [enchantment],
   subtypes = [aura],
   text = [

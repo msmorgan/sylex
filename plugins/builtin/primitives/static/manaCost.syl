@@ -1,1 +1,1 @@
-primitive manaCost(cost: Option(ManaCost)): CharacteristicEdit
+primitive manaCost(cost: Option(ManaCost)): CharacteristicEdit = ManaCost

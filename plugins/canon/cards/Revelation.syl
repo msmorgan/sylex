@@ -1,6 +1,6 @@
 card {
   name = "Revelation",
-  cost = [green],
+  cost = [pip(green)],
   supertypes = [world],
   types = [enchantment],
   text = [static(visibility(reveal, bare(isPlayer), wholeHand))]

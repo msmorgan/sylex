@@ -1,4 +1,4 @@
 # A printed power, toughness, loyalty, or defense.
-template stat(value: Nat): Option(Amount) {
-  body = lit(ofNat($value))
+template stat(value: Int): Option(Amount) {
+  body = lit($value)
 }

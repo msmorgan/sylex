@@ -1,15 +1,15 @@
 card {
   name = "Tyrant of Valakut",
-  cost = [5, red, red],
+  cost = [generic(5), pip(red), pip(red)],
   types = [creature],
   subtypes = [dragon],
   text = [
-    surge(mana([3, red, red])),
+    surge(mana([generic(3), pip(red), pip(red)])),
     flying,
     when(
       does(actor(thisCreature), enter),
       if = keywordCostPaid(surge, thisCreature),
-      action = instruct(thisCreature, dealDamage(3, target(isAnyTarget))))],
-  power = 5,
-  toughness = 4
+      action = instruct(thisCreature, dealDamage(lit(3), target(isAnyTarget))))],
+  power = lit(5),
+  toughness = lit(4)
 }

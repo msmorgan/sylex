@@ -1,1 +1,1 @@
-primitive outsideCombat: CombatParticipation
+primitive outsideCombat: CombatParticipation = OutsideCombat

@@ -1,6 +1,7 @@
 card {
   name = "Liliana's Caress",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [enchantment],
-  text = [whenever(does(actor(anOpponent), discard(a(cardIn(hand)))), instruct(they, loseLife(2)))]
+  text = [
+    whenever(does(actor(anOpponent), discard(a(cardIn(hand)))), instruct(they, loseLife(lit(2))))]
 }

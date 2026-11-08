@@ -1,6 +1,6 @@
 card {
   name = "Balemurk Leech",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [creature],
   subtypes = [leech],
   text = [
@@ -8,7 +8,7 @@ card {
       whenever(
         does(actor(a(and([isEnchantment, youControl]))), enter),
         joins = [joinedHead(does(actor(you), fullyUnlock(a(hasSubtype(room)))))],
-        action = instruct(eachOpponent, loseLife(1))))],
-  power = 2,
-  toughness = 2
+        action = instruct(eachOpponent, loseLife(lit(1)))))],
+  power = lit(2),
+  toughness = lit(2)
 }

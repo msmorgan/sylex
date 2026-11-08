@@ -1,2 +1,2 @@
 # "<subj> <action>s": an action event, in the voice `subj` carries.
-primitive does(subj: Subject, action: Action): GameEvent
+primitive does(subj: Subject, action: Action): GameEvent = Does

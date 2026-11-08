@@ -1,6 +1,6 @@
 card {
   name = "Energybending",
-  cost = [2],
+  cost = [generic(2)],
   types = [instant],
   subtypes = [lesson],
   text = [
@@ -9,5 +9,5 @@ card {
           establishThroughout(
             qualityChange(allOf(and([isLand, youControl])), adds, everyTypeOf(basicLand)),
             untilEndOfTurn),
-          draw(1)]))]
+          draw(lit(1))]))]
 }

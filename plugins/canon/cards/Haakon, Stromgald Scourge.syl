@@ -1,6 +1,6 @@
 card {
   name = "Haakon, Stromgald Scourge",
-  cost = [1, black, black],
+  cost = [generic(1), pip(black), pip(black)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [zombie, knight],
@@ -11,7 +11,7 @@ card {
       onlyWhile(
         can(actor(you), cast(bare(and([isSpell, hasSubtype(knight)])), from = yourGraveyard)),
         is(this, in(battlefield)))),
-    when(does(actor(thisCreature), die), loseLife(2))],
-  power = 3,
-  toughness = 3
+    when(does(actor(thisCreature), die), loseLife(lit(2)))],
+  power = lit(3),
+  toughness = lit(3)
 }

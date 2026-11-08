@@ -1,6 +1,6 @@
 card {
   name = "Darksteel Mutation",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [enchantment],
   subtypes = [aura],
   text = [
@@ -11,7 +11,7 @@ card {
             enchanted(creature),
             sets,
             bundle({characteristics = {types = [artifact, creature], subtypes = [insect]}})),
-          getsBase(it, 0, 1),
+          getsBase(it, lit(0), lit(1)),
           abilityGrant(it, indestructible),
           allAbilityLoss(it)]))]
 }

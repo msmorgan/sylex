@@ -1,6 +1,6 @@
 card {
   name = "Dazzling Reflection",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [instant],
   text = [
     spell(

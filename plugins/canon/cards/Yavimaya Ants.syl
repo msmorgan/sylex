@@ -1,9 +1,9 @@
 card {
   name = "Yavimaya Ants",
-  cost = [2, green, green],
+  cost = [generic(2), pip(green), pip(green)],
   types = [creature],
   subtypes = [insect],
-  text = [trample, haste, cumulativeUpkeep(mana([green, green]))],
-  power = 5,
-  toughness = 1
+  text = [trample, haste, cumulativeUpkeep(mana([pip(green), pip(green)]))],
+  power = lit(5),
+  toughness = lit(1)
 }

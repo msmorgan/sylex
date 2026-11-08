@@ -1,6 +1,6 @@
 card {
   name = "Sanguine Bond",
-  cost = [3, black, black],
+  cost = [generic(3), pip(black), pip(black)],
   types = [enchantment],
   text = [
     whenever(

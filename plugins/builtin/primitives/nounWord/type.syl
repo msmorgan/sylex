@@ -1,0 +1,1 @@
+primitive type(type: CardType): NounWord = Type

@@ -2,4 +2,4 @@
 # beginning of the next end step": a Resolution Delayed Trigger, created as the permanent is put
 # onto the battlefield as the spell resolves [CR#608.3g].
 # [CR#608.3g]
-primitive resolutionDelayedTrigger(does: Action): StaticSpec
+primitive resolutionDelayedTrigger(does: Action): StaticSpec = ResolutionDelayedTrigger

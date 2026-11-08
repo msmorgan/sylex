@@ -1,4 +1,4 @@
 # A quantity no greater than the given amount.
-primitive upToOf(amount: Amount): Quantity {
+primitive upToOf(amount: Amount): Quantity = UpToOf {
   spelling = "up to <amount>"
 }

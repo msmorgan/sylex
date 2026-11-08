@@ -1,2 +1,2 @@
 # Turn the subject over, optionally specifying its resulting characteristics.
-primitive turnOver(subject: NounPhrase, into: Option(Predicate) = none): Action
+primitive turnOver(subject: NounPhrase, into: Option(Predicate) = none): Action = TurnOver

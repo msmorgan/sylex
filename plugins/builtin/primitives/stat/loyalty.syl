@@ -1,0 +1,3 @@
+primitive loyalty: Stat = Loyalty {
+  spelling = "loyalty"
+}

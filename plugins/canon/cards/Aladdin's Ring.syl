@@ -1,9 +1,9 @@
 card {
   name = "Aladdin's Ring",
-  cost = [8],
+  cost = [generic(8)],
   types = [artifact],
   text = [
     activated(
-      compound([mana([8]), tapSymbol]),
-      instruct(thisArtifact, dealDamage(4, target(isAnyTarget))))]
+      compound([mana([generic(8)]), tapSymbol]),
+      instruct(thisArtifact, dealDamage(lit(4), target(isAnyTarget))))]
 }

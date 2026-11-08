@@ -1,6 +1,9 @@
 card {
   name = "Tranquil Grove",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [enchantment],
-  text = [activated(mana([1, green, green]), destroy(allOf(and([isEnchantment, isOther]))))]
+  text = [
+    activated(
+      mana([generic(1), pip(green), pip(green)]),
+      destroy(allOf(and([isEnchantment, isOther]))))]
 }

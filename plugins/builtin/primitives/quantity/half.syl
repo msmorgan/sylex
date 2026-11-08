@@ -1,4 +1,4 @@
 # Half the given amount, rounded in the specified direction.
-primitive half(rounding: RoundMode, amount: Amount): Amount {
+primitive half(rounding: RoundMode, amount: Amount): Amount = Half {
   spelling = "half <amount>, rounded <rounding>"
 }

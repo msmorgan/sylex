@@ -1,4 +1,4 @@
 # "this mana"
-primitive thisMana: ManaHeld {
+primitive thisMana: ManaHeld = ThisMana {
   spelling = "this mana"
 }

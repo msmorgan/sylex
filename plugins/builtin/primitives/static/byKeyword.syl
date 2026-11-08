@@ -1,1 +1,1 @@
-primitive byKeyword(label: KeywordLabel): DeonticExcept
+primitive byKeyword(label: KeywordLabel): DeonticExcept = ByKeyword

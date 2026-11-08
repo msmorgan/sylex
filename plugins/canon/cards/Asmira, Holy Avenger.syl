@@ -1,6 +1,6 @@
 card {
   name = "Asmira, Holy Avenger",
-  cost = [2, green, white],
+  cost = [generic(2), pip(green), pip(white)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, cleric],
@@ -12,6 +12,6 @@ card {
         eventCount(putIntoFromBattlefield(a(isCreature), yourGraveyard), any, soFarThisTurn),
         printedKind(p1p1Counter),
         thisCreature))],
-  power = 2,
-  toughness = 3
+  power = lit(2),
+  toughness = lit(3)
 }

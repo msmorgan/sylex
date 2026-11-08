@@ -1,8 +1,8 @@
 card {
   name = "Sol Grail",
-  cost = [3],
+  cost = [generic(3)],
   types = [artifact],
   text = [
     static(entersChoosing(thisArtifact, color)),
-    activated(tapSymbol, addMana(1, ofTheChosenColor))]
+    activated(tapSymbol, addMana(lit(1), ofTheChosenColor))]
 }

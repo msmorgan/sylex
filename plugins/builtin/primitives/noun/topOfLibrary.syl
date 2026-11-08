@@ -1,4 +1,4 @@
 # "the top card of your library" as a player may look at it
-primitive topOfLibrary: VisibleThing {
+primitive topOfLibrary: VisibleThing = TopOfLibrary {
   spelling = "the top card of your library"
 }

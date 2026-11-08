@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.counterKindOn`.
-primitive counterKindOn(subject: NounPhrase): Predicate {
+primitive counterKindOn(subject: NounPhrase): Predicate = CounterKindOn {
   spelling = "kind of counter on <subject>"
 }

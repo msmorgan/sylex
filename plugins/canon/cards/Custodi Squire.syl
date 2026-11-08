@@ -1,6 +1,6 @@
 card {
   name = "Custodi Squire",
-  cost = [4, white],
+  cost = [generic(4), pip(white)],
   types = [creature],
   subtypes = [spirit, cleric],
   text = [
@@ -17,6 +17,6 @@ card {
                 byCandidate(
                   a(and([or([isArtifact, isCreature, isEnchantment]), in(yourGraveyard)]))))),
             returnToHand(allOf(and([isCard, withMostVotes])))])))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

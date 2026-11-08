@@ -1,6 +1,6 @@
 card {
   name = "Iron Man, Bleeding Edge",
-  cost = [3, blue, blue],
+  cost = [generic(3), pip(blue), pip(blue)],
   supertypes = [legendary],
   types = [artifact, creature],
   subtypes = [human, hero],
@@ -9,6 +9,6 @@ card {
     whenever(
       does(actor(you), cast(a(and([isArtifact, isSpell])))),
       doOnlyOnceEachTurn(may(copyOnStack(it, exceptions = [isntLegendary]))))],
-  power = 3,
-  toughness = 5
+  power = lit(3),
+  toughness = lit(5)
 }

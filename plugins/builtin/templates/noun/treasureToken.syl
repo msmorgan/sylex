@@ -9,5 +9,5 @@ template treasureToken: CharacteristicBundle {
       text = [
         activated(
           compound([tapSymbol, perform(sacrifice(thisArtifact))]),
-          addMana(1, ofAnyColor(sameColor)))]}}
+          addMana(lit(1), ofAnyColor(sameColor)))]}}
 }

@@ -1,6 +1,6 @@
 card {
   name = "Omniscience",
-  cost = [7, blue, blue, blue],
+  cost = [generic(7), pip(blue), pip(blue), pip(blue)],
   types = [enchantment],
   text = [
     static(

@@ -1,4 +1,4 @@
 # A duration that lasts while its condition holds.
-primitive forAsLongAs(condition: Condition): Duration {
+primitive forAsLongAs(condition: Condition): Duration = ForAsLongAs {
   spelling = "for as long as <condition>"
 }

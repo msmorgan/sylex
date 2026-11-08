@@ -1,0 +1,3 @@
+primitive colorless: ColorOrColorless = Colorless {
+  spelling = "colorless"
+}

@@ -1,2 +1,2 @@
 # `op` written once over established quality wording: the edits the payload writes.
-primitive payload(op: QualityOp, payload: QualityPayload): CharacteristicEdit
+primitive payload(op: QualityOp, payload: QualityPayload): CharacteristicEdit = Payload

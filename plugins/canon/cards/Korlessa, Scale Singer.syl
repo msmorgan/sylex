@@ -1,12 +1,12 @@
 card {
   name = "Korlessa, Scale Singer",
-  cost = [green, blue],
+  cost = [pip(green), pip(blue)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [dragon, bard],
   text = [
     static(visibility(lookAt, you, topOfLibrary)),
     static(can(actor(you), cast(bare(and([isSpell, hasSubtype(dragon)])), from = onTop)))],
-  power = 1,
-  toughness = 4
+  power = lit(1),
+  toughness = lit(4)
 }

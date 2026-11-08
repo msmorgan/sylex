@@ -2,7 +2,7 @@
 # tokens, where X is that spell's mana value." [CR#608.2h]
 card {
   name = "Spell Swindle",
-  cost = [3, blue, blue],
+  cost = [generic(3), pip(blue), pip(blue)],
   types = [instant],
   text = [
     spell(

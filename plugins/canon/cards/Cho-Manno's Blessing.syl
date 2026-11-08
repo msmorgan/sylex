@@ -1,6 +1,6 @@
 card {
   name = "Cho-Manno's Blessing",
-  cost = [white, white],
+  cost = [pip(white), pip(white)],
   types = [enchantment],
   subtypes = [aura],
   text = [

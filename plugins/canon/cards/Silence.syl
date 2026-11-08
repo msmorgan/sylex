@@ -1,6 +1,6 @@
 card {
   name = "Silence",
-  cost = [white],
+  cost = [pip(white)],
   types = [instant],
   text = [spell(establishThroughout(cant(actor(yourOpponents), cast(any)), thisTurn))]
 }

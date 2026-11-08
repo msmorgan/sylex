@@ -1,1 +1,3 @@
-primitive characteristicDefining(subject: NounPhrase, edits: List(CharacteristicEdit)): StaticSpec
+primitive characteristicDefining(
+  subject: NounPhrase,
+  edits: List(CharacteristicEdit)): StaticSpec = CharacteristicDefining

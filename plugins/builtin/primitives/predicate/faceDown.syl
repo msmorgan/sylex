@@ -1,5 +1,5 @@
 # [CR#110.5]
-primitive faceDown: Status {
+primitive faceDown: Status = FaceDown {
   lexical = {
     prepositions = [
       {lemma = "face down", frames = [{complement = Intransitive, hosts = NominalAndPredicate}]}]},

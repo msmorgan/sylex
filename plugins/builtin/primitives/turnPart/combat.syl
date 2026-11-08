@@ -1,0 +1,3 @@
+primitive combat: TurnPart = Combat {
+  spelling = "combat"
+}

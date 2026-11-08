@@ -1,0 +1,3 @@
+primitive library: Zone = Library {
+  spelling = "library"
+}

@@ -3,4 +3,4 @@
 # `can` [CR#101.2].
 # [CR#609.4]
 # [CR#101.2]
-primitive asThough(subj: Subject, action: Action, asThough: AsThough): StaticSpec
+primitive asThough(subj: Subject, action: Action, asThough: AsThough): StaticSpec = AsThough

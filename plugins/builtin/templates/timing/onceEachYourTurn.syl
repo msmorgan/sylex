@@ -1,5 +1,5 @@
 # "only once during each of your turns"
 template onceEachYourTurn: UsageLimit {
   spelling = "only once during each of your turns",
-  body = usageLimit(1, yourTurn)
+  body = usageLimit(lit(1), yourTurn)
 }

@@ -1,2 +1,2 @@
 # "<trait> or <trait>"
-primitive anyOf(traits: List(DeckTrait)): DeckTrait
+primitive anyOf(traits: List(DeckTrait)): DeckTrait = AnyOf

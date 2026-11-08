@@ -1,9 +1,9 @@
 card {
   name = "Hall of Triumph",
-  cost = [3],
+  cost = [generic(3)],
   supertypes = [legendary],
   types = [artifact],
   text = [
     static(entersChoosing(thisArtifact, color)),
-    static(getsPt(allOf(and([isCreature, youControl, ofChosen(color)])), up(1), up(1)))]
+    static(getsPt(allOf(and([isCreature, youControl, ofChosen(color)])), up(lit(1)), up(lit(1))))]
 }

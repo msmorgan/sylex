@@ -1,4 +1,4 @@
 # "if <cause> would cause <clause>"
-primitive causedBy(cause: Causing, clause: WouldClause): WouldClause {
+primitive causedBy(cause: Causing, clause: WouldClause): WouldClause = CausedBy {
   spelling = "if <cause> would cause <clause>"
 }

@@ -1,18 +1,22 @@
 card {
   name = "Elspeth, Sun's Champion",
-  cost = [4, white, white],
+  cost = [generic(4), pip(white), pip(white)],
   supertypes = [legendary],
   types = [planeswalker],
   subtypes = [elspeth],
   text = [
-    activated(loyaltySymbol(up(1)), create(3, written(creatureToken(1, 1, [white], [soldier])))),
-    activated(loyaltySymbol(down(3)), destroy(allOf(and([isCreature, hasPower(atLeast, 4)])))),
     activated(
-      loyaltySymbol(down(7)),
+      loyaltySymbol(up(lit(1))),
+      create(lit(3), written(creatureToken(1, 1, [white], [soldier])))),
+    activated(
+      loyaltySymbol(down(lit(3))),
+      destroy(allOf(and([isCreature, hasPower(atLeast, lit(4))])))),
+    activated(
+      loyaltySymbol(down(lit(7))),
       getEmblem([
           static(
             conjunction([
-                getsPt(allOf(and([isCreature, youControl])), up(2), up(2)),
+                getsPt(allOf(and([isCreature, youControl])), up(lit(2)), up(lit(2))),
                 abilityGrant(them, flying)]))]))],
-  loyalty = 4
+  loyalty = lit(4)
 }

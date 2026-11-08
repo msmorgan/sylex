@@ -3,4 +3,4 @@
 # [CR#205.1b]
 primitive bundle(
   characteristics: CharacteristicBundle,
-  retained: Option(CardType) = none): QualityPayload
+  retained: Option(CardType) = none): QualityPayload = Bundle

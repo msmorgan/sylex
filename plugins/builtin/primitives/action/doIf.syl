@@ -3,4 +3,4 @@ primitive doIf(
   condition: Condition,
   action: Action,
   otherwise: Option(Action) = none,
-  postposed: Bool = false): Action
+  postposed: Bool = false): Action = DoIf

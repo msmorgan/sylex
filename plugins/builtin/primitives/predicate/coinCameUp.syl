@@ -1,2 +1,2 @@
 # Authoring primitive for `Predicate.coinCameUp`.
-primitive coinCameUp(face: CoinFace): Predicate
+primitive coinCameUp(face: CoinFace): Predicate = CoinCameUp

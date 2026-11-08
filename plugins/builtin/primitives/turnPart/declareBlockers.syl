@@ -1,0 +1,3 @@
+primitive declareBlockers: TurnPart = DeclareBlockers {
+  spelling = "declare blockers"
+}

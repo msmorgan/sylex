@@ -1,6 +1,6 @@
 card {
   name = "Crypt Lurker",
-  cost = [3, black],
+  cost = [generic(3), pip(black)],
   types = [creature],
   subtypes = [horror],
   text = [
@@ -8,7 +8,7 @@ card {
       does(actor(thisCreature), enter),
       may(
         chooseOne(sacrifice(a(isCreature)), discard(a(and([isCreature, in(yourHand)])))),
-        draw(1)))],
-  power = 3,
-  toughness = 4
+        draw(lit(1))))],
+  power = lit(3),
+  toughness = lit(4)
 }

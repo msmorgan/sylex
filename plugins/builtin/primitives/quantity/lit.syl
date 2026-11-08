@@ -1,4 +1,4 @@
 # A literal integer amount.
-primitive lit(value: Int): Amount {
+primitive lit(value: Int): Amount = Literal {
   spelling = "<value>"
 }

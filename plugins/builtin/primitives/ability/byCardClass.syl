@@ -2,4 +2,4 @@
 # the rules define differently for each, read from the object's current Permanent Types
 # [CR#110.4,110.4a].
 # [CR#110.4,110.4a]
-primitive byCardClass(onPermanent: Ability, onInstantOrSorcery: Ability): Ability
+primitive byCardClass(onPermanent: Ability, onInstantOrSorcery: Ability): Ability = ByCardClass

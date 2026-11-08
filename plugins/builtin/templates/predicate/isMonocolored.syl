@@ -1,5 +1,5 @@
 # "monocolored"
 template isMonocolored: Predicate {
   spelling = "monocolored",
-  body = colorCount(eq, 1)
+  body = colorCount(equal, 1)
 }

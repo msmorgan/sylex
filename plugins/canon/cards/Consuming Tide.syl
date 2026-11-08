@@ -1,6 +1,6 @@
 card {
   name = "Consuming Tide",
-  cost = [2, blue, blue],
+  cost = [generic(2), pip(blue), pip(blue)],
   types = [sorcery],
   text = [
     spell(
@@ -14,5 +14,5 @@ card {
                 countOf(cardIn(handOf(they))),
                 greater,
                 countOf(cardIn(yourHand)))),
-            draw(1))]))]
+            draw(lit(1)))]))]
 }

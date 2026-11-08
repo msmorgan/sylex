@@ -1,6 +1,6 @@
 card {
   name = "Hijack",
-  cost = [1, red, red],
+  cost = [generic(1), pip(red), pip(red)],
   types = [sorcery],
   text = [
     spell(

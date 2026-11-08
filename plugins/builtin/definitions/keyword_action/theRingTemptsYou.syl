@@ -30,7 +30,7 @@ action theRingTemptsYou {
                   this,
                   whenever(
                     does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
-                    sequentially([draw(1), discard(a(cardIn(hand)))]))),
+                    sequentially([draw(lit(1)), discard(a(cardIn(hand)))]))),
                 compareAmt(
                   eventCount(
                     ownScope(
@@ -41,7 +41,7 @@ action theRingTemptsYou {
                     actor(you),
                     thisGame),
                   atLeast,
-                  2))),
+                  lit(2)))),
             static(
               onlyWhile(
                 abilityGrant(
@@ -61,7 +61,7 @@ action theRingTemptsYou {
                     actor(you),
                     thisGame),
                   atLeast,
-                  3))),
+                  lit(3)))),
             static(
               onlyWhile(
                 abilityGrant(
@@ -70,7 +70,7 @@ action theRingTemptsYou {
                     does(
                       actor(a(and([hasDesignation(ringBearer), youControl]))),
                       dealDamage(recipient = a(isPlayer), kind = combat)),
-                    instruct(eachOpponent, loseLife(3)))),
+                    instruct(eachOpponent, loseLife(lit(3))))),
                 compareAmt(
                   eventCount(
                     ownScope(
@@ -81,7 +81,14 @@ action theRingTemptsYou {
                     actor(you),
                     thisGame),
                   atLeast,
-                  4)))])),
+                  lit(4))))])),
       choose(a(and([isCreature, actorControls]))),
       gainDesignation(that(creature), ringBearer)])
 }
+
+# Temporary: these three primitives build `Action.ownScope` and `Deed.action`, which `.syl` may
+# not write (`docs/decisions/syl.md` §4). Only this file may use them, through `sylGen`'s
+# `legacyScope` exception; `syl-ring-tempts-you-raw-scope` deletes them.
+primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope
+primitive action(label: String, permanent: DeedPermanent = noPermanent): Deed = Action
+primitive noPermanent: DeedPermanent = NoPermanent

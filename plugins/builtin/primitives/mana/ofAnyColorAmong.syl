@@ -1,4 +1,4 @@
 # "one mana of any of <colors>"
-primitive ofAnyColorAmong(colors: List(Color)): ProducedMana = .amongWritten {
+primitive ofAnyColorAmong(colors: List(Color)): ProducedMana = AmongWritten {
   spelling = "one mana of any of <colors>"
 }

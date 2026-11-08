@@ -1,10 +1,10 @@
 card {
   name = "Death-Mask Duplicant",
-  cost = [7],
+  cost = [generic(7)],
   types = [artifact, creature],
   subtypes = [shapeshifter],
   text = [
-    imprint(activated(mana([1]), exile(target(and([isCreature, in(yourGraveyard)]))))),
+    imprint(activated(mana([generic(1)]), exile(target(and([isCreature, in(yourGraveyard)]))))),
     alsoForKeywords(
       static(
         onlyWhile(
@@ -14,14 +14,14 @@ card {
             and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
           exists(and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])))),
       [
-        flying,
-        fear,
-        firstStrike,
-        doubleStrike,
-        haste,
+        theKeyword(flying),
+        theKeyword(fear),
+        theKeyword(firstStrike),
+        theKeyword(doubleStrike),
+        theKeyword(haste),
         anyIn({word = landwalk}),
         anyIn({word = protection}),
-        trample])],
-  power = 5,
-  toughness = 5
+        theKeyword(trample)])],
+  power = lit(5),
+  toughness = lit(5)
 }

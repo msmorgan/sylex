@@ -1,4 +1,4 @@
 # A counter kind printed on the card: "+1/+1 counter".
-primitive printedKind(kind: CounterKind): CounterKindSource = .printed {
+primitive printedKind(kind: CounterKind): CounterKindSource = Printed {
   spelling = "<kind>"
 }

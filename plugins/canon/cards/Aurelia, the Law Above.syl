@@ -1,6 +1,6 @@
 card {
   name = "Aurelia, the Law Above",
-  cost = [3, red, white],
+  cost = [generic(3), pip(red), pip(white)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [angel],
@@ -8,10 +8,10 @@ card {
     flying,
     vigilance,
     haste,
-    whenever(does(actor(a(isPlayer)), attackWith(counted(orMore(3), isCreature))), draw(1)),
+    whenever(does(actor(a(isPlayer)), attackWith(counted(orMore(3), isCreature))), draw(lit(1))),
     whenever(
       does(actor(a(isPlayer)), attackWith(counted(orMore(5), isCreature))),
-      sequentially([instruct(this, dealDamage(3, eachOpponent)), gainLife(3)]))],
-  power = 4,
-  toughness = 4
+      sequentially([instruct(this, dealDamage(lit(3), eachOpponent)), gainLife(lit(3))]))],
+  power = lit(4),
+  toughness = lit(4)
 }

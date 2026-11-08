@@ -1,2 +1,2 @@
 # Keep the subject from untapping for the specified number of untap steps.
-primitive skipUntap(subject: NounPhrase, steps: Amount): Action
+primitive skipUntap(subject: NounPhrase, steps: Amount): Action = SkipUntap

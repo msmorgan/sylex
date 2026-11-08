@@ -1,11 +1,11 @@
 card {
   name = "Pine Walker",
-  cost = [3, green, green],
+  cost = [generic(3), pip(green), pip(green)],
   types = [creature],
   subtypes = [elemental],
   text = [
-    morph(mana([4, green])),
+    morph(mana([generic(4), pip(green)])),
     whenever(does(any, turnFaceUp(a(and([isCreature, youControl])))), untap(that(creature)))],
-  power = 5,
-  toughness = 5
+  power = lit(5),
+  toughness = lit(5)
 }

@@ -1,13 +1,13 @@
 card {
   name = "Chandra's Spitfire",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [creature],
   subtypes = [elemental],
   text = [
     flying,
     whenever(
       does(any, dealDamage(recipient = anOpponent, kind = noncombat)),
-      get(thisCreature, up(3), up(0), untilEndOfTurn))],
-  power = 1,
-  toughness = 3
+      get(thisCreature, up(lit(3)), up(lit(0)), untilEndOfTurn))],
+  power = lit(1),
+  toughness = lit(3)
 }

@@ -1,4 +1,4 @@
 # "Spend this mana only to <purposes>."
-primitive spendOnly(purposes: List(SpendPurpose)): ManaRider {
+primitive spendOnly(purposes: List(SpendPurpose)): ManaRider = SpendOnly {
   spelling = "Spend this mana only to <purposes>."
 }

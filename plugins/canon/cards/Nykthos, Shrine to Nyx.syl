@@ -3,9 +3,9 @@ card {
   supertypes = [legendary],
   types = [land],
   text = [
-    activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
+    activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
     activated(
-      compound([mana([2]), tapSymbol]),
+      compound([mana([generic(2)]), tapSymbol]),
       sequentially(
         [choose(a(quality(color))), addMana(devotion(you, thatColor), ofTheChosenColor)]))]
 }

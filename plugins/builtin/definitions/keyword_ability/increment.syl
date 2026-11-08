@@ -7,7 +7,7 @@ ability increment {
   body = [
     whenever(
       does(actor(you), cast(a(isSpell))),
-      putCounters(1, printedKind(p1p1Counter), thisCreature),
+      putCounters(lit(1), printedKind(p1p1Counter), thisCreature),
       if = and([
           is(thisPermanent, isCreature),
           or([

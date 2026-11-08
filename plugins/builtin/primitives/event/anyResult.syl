@@ -1,4 +1,4 @@
 # "any result" of a roll
-primitive anyResult: RollWatch {
+primitive anyResult: RollWatch = AnyResult {
   spelling = "any result"
 }

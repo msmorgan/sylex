@@ -1,1 +1,1 @@
-primitive inPart(part: TurnPart, whose: Option(NounPhrase), which: TurnRef): Timing
+primitive inPart(part: TurnPart, whose: Option(NounPhrase), which: TurnRef): Timing = InPart

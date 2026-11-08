@@ -1,6 +1,6 @@
 card {
   name = "Churning Eddy",
-  cost = [3, blue],
+  cost = [generic(3), pip(blue)],
   types = [sorcery],
   text = [spell(returnToHand(both(target(isCreature), target(isLand))))]
 }

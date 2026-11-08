@@ -1,6 +1,6 @@
 card {
   name = "Healing Grace",
-  cost = [white],
+  cost = [pip(white)],
   types = [instant],
   text = [
     spell(
@@ -8,7 +8,7 @@ card {
           establishThroughout(
             replace(
               would(by(aYourChoice(isSource)), dealDamage(recipient = target(isAnyTarget))),
-              instead(preventDamage(theNext(3)))),
+              instead(preventDamage(theNext(lit(3))))),
             thisTurn),
-          gainLife(3)]))]
+          gainLife(lit(3))]))]
 }

@@ -1,6 +1,6 @@
 card {
   name = "Whirling Dervish",
-  cost = [green, green],
+  cost = [pip(green), pip(green)],
   types = [creature],
   subtypes = [human, monk],
   text = [
@@ -8,7 +8,7 @@ card {
     at(
       beginningOfPossessed(endStep, eachPlayer),
       if = did(actor(thisCreature), dealDamage(recipient = anOpponent), within(soFarThisTurn)),
-      action = putCounters(1, printedKind(p1p1Counter), it))],
-  power = 1,
-  toughness = 1
+      action = putCounters(lit(1), printedKind(p1p1Counter), it))],
+  power = lit(1),
+  toughness = lit(1)
 }

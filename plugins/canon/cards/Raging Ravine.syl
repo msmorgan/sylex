@@ -3,9 +3,9 @@ card {
   types = [land],
   text = [
     static(entersTapped(thisLand)),
-    activated(tapSymbol, addMana(1, manaOf([[of(red)], [of(green)]]))),
+    activated(tapSymbol, addMana(lit(1), manaOf([[colored(red)], [colored(green)]]))),
     activated(
-      mana([2, red, green]),
+      mana([generic(2), pip(red), pip(green)]),
       establishThroughout(
         qualityChange(
           thisLand,
@@ -18,9 +18,9 @@ card {
                 text = [
                   whenever(
                     does(actor(thisCreature), attack),
-                    putCounters(1, printedKind(p1p1Counter), thisCreature))],
-                power = 3,
-                toughness = 3}},
+                    putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
+                power = lit(3),
+                toughness = lit(3)}},
             land)),
         untilEndOfTurn))]
 }

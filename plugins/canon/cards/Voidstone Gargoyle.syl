@@ -1,6 +1,6 @@
 card {
   name = "Voidstone Gargoyle",
-  cost = [3, white, white],
+  cost = [generic(3), pip(white), pip(white)],
   types = [creature],
   subtypes = [gargoyle],
   text = [
@@ -15,6 +15,6 @@ card {
             and([
                 abilityHead(anyActivated),
                 abilityOf(allOf(and([isSource, named(chosenName)])))])))))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

@@ -1,9 +1,9 @@
 card {
   name = "Boggart Brute",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [creature],
   subtypes = [goblin, warrior],
   text = [menace],
-  power = 3,
-  toughness = 2
+  power = lit(3),
+  toughness = lit(2)
 }

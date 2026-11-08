@@ -13,12 +13,12 @@ ability myriad {
             each(and([isOpponent, otherThan(defendingPlayer)])),
             may(
               create(
-                1,
+                lit(1),
                 copyOf(thisCreature),
                 [
                   entersAs(tapped),
                   entersAttacking(or([they, a(and([isPlaneswalker, controlledBy(they)]))]))]))),
           doIf(
-            compareAmt(numberOf(thoseTokens), atLeast, 1),
+            compareAmt(numberOf(thoseTokens), atLeast, lit(1)),
             atNext(endOfCombat, exile(thoseTokens)))]))]
 }

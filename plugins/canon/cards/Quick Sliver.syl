@@ -1,6 +1,6 @@
 card {
   name = "Quick Sliver",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [creature],
   subtypes = [sliver],
   text = [
@@ -10,6 +10,6 @@ card {
         actor(a(isPlayer)),
         cast(bare(and([isSpell, hasSubtype(sliver)]))),
         asThough = asThoughHadFlash(them)))],
-  power = 1,
-  toughness = 1
+  power = lit(1),
+  toughness = lit(1)
 }

@@ -1,4 +1,4 @@
 template pip(color: Color): ManaSymbol {
   spelling = "{<color>}",
-  body = simple(specific(of($color)))
+  body = simple(specific(colored($color)))
 }

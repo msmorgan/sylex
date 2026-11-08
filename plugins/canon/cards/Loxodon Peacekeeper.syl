@@ -3,7 +3,7 @@
 # existential introduces (`semantics.md` §2.2, box 2).
 card {
   name = "Loxodon Peacekeeper",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [creature],
   subtypes = [elephant, soldier],
   text = [
@@ -19,6 +19,6 @@ card {
             sequentially([
                 choose(someOf(exactly(1), themPlayers)),
                 gainControl(thisCreature, controller = that(player))]))]))],
-  power = 4,
-  toughness = 4
+  power = lit(4),
+  toughness = lit(4)
 }

@@ -2,10 +2,13 @@
 # Trigger [CR#702.185a,608.3g].
 card {
   name = "Starbreach Whale",
-  cost = [4, blue],
+  cost = [generic(4), pip(blue)],
   types = [creature],
   subtypes = [whale],
-  text = [flying, when(does(actor(thisCreature), enter), surveil(2)), warp(mana([1, blue]))],
-  power = 3,
-  toughness = 5
+  text = [
+    flying,
+    when(does(actor(thisCreature), enter), surveil(lit(2))),
+    warp(mana([generic(1), pip(blue)]))],
+  power = lit(3),
+  toughness = lit(5)
 }

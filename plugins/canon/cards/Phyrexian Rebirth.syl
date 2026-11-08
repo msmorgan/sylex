@@ -1,13 +1,13 @@
 card {
   name = "Phyrexian Rebirth",
-  cost = [4, white, white],
+  cost = [generic(4), pip(white), pip(white)],
   types = [sorcery],
   text = [
     spell(
       sequentially([
           destroy(allOf(isCreature)),
           create(
-            1,
+            lit(1),
             written({
                 characteristics = {
                   types = [artifact, creature],

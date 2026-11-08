@@ -4,4 +4,4 @@ primitive specialAction(
   when: Option(Timing),
   cost: Cost,
   does: Action,
-  player: Option(NounPhrase) = none): StaticSpec
+  player: Option(NounPhrase) = none): StaticSpec = SpecialAction

@@ -3,5 +3,5 @@
 ability devoid {
   lexical = {lemma = "devoid"},
   spelling = "devoid",
-  body = [static(definesQuality(this, sets, colored(some([]))))]
+  body = [static(definesQuality(this, sets, colored(colors([]))))]
 }

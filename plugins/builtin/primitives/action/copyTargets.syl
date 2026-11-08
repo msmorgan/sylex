@@ -1,2 +1,2 @@
 # Copy the original spell's or ability's targets to its copy.
-primitive copyTargets(copy: NounPhrase, original: NounPhrase): Action
+primitive copyTargets(copy: NounPhrase, original: NounPhrase): Action = CopyTargets

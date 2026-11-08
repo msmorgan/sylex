@@ -1,33 +1,34 @@
 card {
   name = "Saheeli, Filigree Master",
-  cost = [2, blue, red],
+  cost = [generic(2), pip(blue), pip(red)],
   supertypes = [legendary],
   types = [planeswalker],
   subtypes = [saheeli],
   text = [
     activated(
-      loyaltySymbol(up(1)),
-      sequentially([scry(1), may(tap(a(and([isArtifact, isUntapped, youControl]))), draw(1))])),
+      loyaltySymbol(up(lit(1))),
+      sequentially(
+        [scry(lit(1)), may(tap(a(and([isArtifact, isUntapped, youControl]))), draw(lit(1)))])),
     activated(
-      loyaltySymbol(down(2)),
+      loyaltySymbol(down(lit(2))),
       sequentially([
           create(
-            2,
+            lit(2),
             written({
                 characteristics = {
                   types = [artifact, creature],
                   subtypes = [thopter],
                   text = [flying],
-                  power = 1,
-                  toughness = 1}})),
+                  power = lit(1),
+                  toughness = lit(1)}})),
           gainHaste(them, untilEndOfTurn)])),
     activated(
-      loyaltySymbol(down(4)),
+      loyaltySymbol(down(lit(4))),
       getEmblem([
-          static(getsPt(allOf(and([isArtifact, isCreature, youControl])), up(1), up(1))),
+          static(getsPt(allOf(and([isArtifact, isCreature, youControl])), up(lit(1)), up(lit(1)))),
           static(
             costShift(
               allOf(and([isArtifact, isSpell, did(actor(you), cast(which), thisObject)])),
-              less(1)))]))],
-  loyalty = 3
+              less(lit(1))))]))],
+  loyalty = lit(3)
 }

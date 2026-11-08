@@ -1,10 +1,10 @@
 card {
   name = "Destructive Revelry",
-  cost = [red, green],
+  cost = [pip(red), pip(green)],
   types = [instant],
   text = [
     spell(
       sequentially([
           destroy(target(or([isArtifact, isEnchantment]))),
-          instruct(this, dealDamage(2, controllerOf(that(permanent))))]))]
+          instruct(this, dealDamage(lit(2), controllerOf(that(permanent))))]))]
 }

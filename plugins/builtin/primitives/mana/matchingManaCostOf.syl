@@ -1,4 +1,4 @@
 # "mana equal to <subject>'s mana cost"
-primitive matchingManaCostOf(subject: NounPhrase): ProducedMana = .asPrintedCost {
+primitive matchingManaCostOf(subject: NounPhrase): ProducedMana = AsPrintedCost {
   spelling = "mana equal to <subject>'s mana cost"
 }

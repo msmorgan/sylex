@@ -1,15 +1,15 @@
 card {
   name = "Timely Reinforcements",
-  cost = [2, white],
+  cost = [generic(2), pip(white)],
   types = [sorcery],
   text = [
     spell(
       sequentially([
-          doIf(compareAmt(lifeTotalOf(you), less, lifeTotalOf(anOpponent)), gainLife(6)),
+          doIf(compareAmt(lifeTotalOf(you), less, lifeTotalOf(anOpponent)), gainLife(lit(6))),
           doIf(
             compareAmt(
               countOf(and([isCreature, youControl])),
               less,
               countOf(and([isCreature, anOpponentControls]))),
-            create(3, written(creatureToken(1, 1, [white], [soldier]))))]))]
+            create(lit(3), written(creatureToken(1, 1, [white], [soldier]))))]))]
 }

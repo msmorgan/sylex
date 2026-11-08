@@ -1,4 +1,4 @@
 # The difference established by the preceding comparison.
-primitive theDifference: Amount {
+primitive theDifference: Amount = Difference {
   spelling = "the difference"
 }

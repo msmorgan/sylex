@@ -1,0 +1,3 @@
+primitive upkeep: TurnPart = Upkeep {
+  spelling = "upkeep"
+}

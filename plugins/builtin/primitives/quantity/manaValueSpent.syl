@@ -1,1 +1,1 @@
-primitive manaValueSpent: LinkedFacet
+primitive manaValueSpent: LinkedFacet = ManaValueSpent

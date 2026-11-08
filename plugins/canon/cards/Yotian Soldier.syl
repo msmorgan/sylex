@@ -1,9 +1,9 @@
 card {
   name = "Yotian Soldier",
-  cost = [3],
+  cost = [generic(3)],
   types = [artifact, creature],
   subtypes = [soldier],
   text = [vigilance],
-  power = 1,
-  toughness = 4
+  power = lit(1),
+  toughness = lit(4)
 }

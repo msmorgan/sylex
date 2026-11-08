@@ -1,19 +1,19 @@
 card {
   name = "Tourach, Dread Cantor",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, cleric],
   text = [
-    kicker(mana([black, black])),
+    kicker(mana([pip(black), pip(black)])),
     protection(hasColor(white)),
     whenever(
       does(actor(anOpponent), discard(a(isCard))),
-      putCounters(1, printedKind(p1p1Counter), thisCreature)),
+      putCounters(lit(1), printedKind(p1p1Counter), thisCreature)),
     when(
       does(actor(thisCreature), enter),
       if = keywordCostPaid(kicker, thisCreature),
       action = instruct(target(isOpponent), discard(countedAtRandom(exactly(2), isCard))))],
-  power = 2,
-  toughness = 1
+  power = lit(2),
+  toughness = lit(1)
 }

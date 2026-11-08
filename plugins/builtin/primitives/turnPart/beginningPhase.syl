@@ -1,0 +1,3 @@
+primitive beginningPhase: TurnPart = BeginningPhase {
+  spelling = "beginning phase"
+}

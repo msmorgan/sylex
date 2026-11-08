@@ -1,2 +1,2 @@
 # Full-arity binding for `ColorTerm.chosen`.
-primitive chosen(ref: ChoiceRef = theChoice): ColorTerm
+primitive chosen(ref: ChoiceRef = theChoice): ColorTerm = Chosen

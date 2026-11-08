@@ -1,5 +1,5 @@
 # "it becomes <designation>": the game gains a designation the game can have [CR#731.1].
 # [CR#731.1]
-primitive setGameDesignation(designation: DesignationLabel): Action = .gameGains {
+primitive setGameDesignation(designation: DesignationLabel): Action = GameGains {
   spelling = "it becomes <designation>"
 }

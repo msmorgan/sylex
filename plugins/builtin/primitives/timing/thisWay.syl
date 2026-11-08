@@ -1,4 +1,4 @@
 # "… this way": the event the enclosing action caused.
-primitive thisWay: LookbackSpan {
+primitive thisWay: LookbackSpan = ThisWay {
   spelling = "this way"
 }

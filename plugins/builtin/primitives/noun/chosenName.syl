@@ -1,4 +1,4 @@
 # "the chosen name"
-primitive chosenName: NameSource = .chosen {
+primitive chosenName: NameSource = Chosen {
   spelling = "the chosen name"
 }

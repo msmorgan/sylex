@@ -1,0 +1,1 @@
+primitive flavorWord(label: String): ItalicWord = FlavorWord

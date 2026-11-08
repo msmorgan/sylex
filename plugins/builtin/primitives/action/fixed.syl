@@ -1,1 +1,1 @@
-primitive fixed(times: Amount, body: Action): Repetition
+primitive fixed(times: Amount, body: Action): Repetition = Fixed

@@ -1,19 +1,19 @@
 card {
   name = "Consul's Lieutenant",
-  cost = [white, white],
+  cost = [pip(white), pip(white)],
   types = [creature],
   subtypes = [human, soldier],
   text = [
     firstStrike,
-    renown(1),
+    renown(lit(1)),
     whenever(
       does(actor(thisCreature), attack),
       if = is(it, hasDesignation(renowned)),
       action = get(
         allOf(and([isCreature, isAttacking, youControl, isOther])),
-        up(1),
-        up(1),
+        up(lit(1)),
+        up(lit(1)),
         untilEndOfTurn))],
-  power = 2,
-  toughness = 1
+  power = lit(2),
+  toughness = lit(1)
 }

@@ -1,6 +1,6 @@
 card {
   name = "Conspicuous Snoop",
-  cost = [red, red],
+  cost = [pip(red), pip(red)],
   types = [creature],
   subtypes = [goblin, rogue],
   text = [
@@ -8,8 +8,8 @@ card {
     static(can(actor(you), play(allOf(and([isSpell, hasSubtype(goblin)])), from = onTop))),
     static(
       onlyWhile(
-        abilityGrantFrom(thisCreature, topSlice(1), [anyActivated]),
-        is(topSlice(1), hasSubtype(goblin))))],
-  power = 2,
-  toughness = 2
+        abilityGrantFrom(thisCreature, topSlice(lit(1)), [anyActivated]),
+        is(topSlice(lit(1)), hasSubtype(goblin))))],
+  power = lit(2),
+  toughness = lit(2)
 }

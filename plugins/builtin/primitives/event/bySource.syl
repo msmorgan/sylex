@@ -1,2 +1,2 @@
 # "<source> causes …": a spell, ability or other object as the cause.
-primitive bySource(source: NounPhrase): Causing = .source
+primitive bySource(source: NounPhrase): Causing = Source

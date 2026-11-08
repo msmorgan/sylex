@@ -6,7 +6,7 @@
 # of infect being redundant [CR#702.90f].
 card {
   name = "Phyrexian Unlife",
-  cost = [2, white],
+  cost = [generic(2), pip(white)],
   types = [enchantment],
   text = [
     static(cant(actor(you), loseGame(nonpositiveLife))),
@@ -15,6 +15,6 @@ card {
         asThough(
           by(a(isSource)),
           dealDamage(recipient = you),
-          holds(is(thatSource, hasKeyword(infect)))),
-        compareAmt(lifeTotalOf(you), atMost, 0)))]
+          holds(is(thatSource, hasKeyword(theKeyword(infect))))),
+        compareAmt(lifeTotalOf(you), atMost, lit(0))))]
 }

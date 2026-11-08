@@ -1,6 +1,6 @@
 card {
   name = "Saw in Half",
-  cost = [2, black],
+  cost = [generic(2), pip(black)],
   types = [instant],
   text = [
     spell(
@@ -11,7 +11,7 @@ card {
             instruct(
               controllerOf(it),
               create(
-                2,
+                lit(2),
                 copyOf(
                   that(creature),
                   copyCharacteristics({

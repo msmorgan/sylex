@@ -1,15 +1,15 @@
 card {
   name = "Adarkar Unicorn",
-  cost = [1, white, white],
+  cost = [generic(1), pip(white), pip(white)],
   types = [creature],
   subtypes = [unicorn],
   text = [
     activated(
       tapSymbol,
       addMana(
-        1,
-        manaOf([[of(blue)], [colorless, of(blue)]]),
+        lit(1),
+        manaOf([[colored(blue)], [colorless, colored(blue)]]),
         [spendOnly([toPay(ofKeyword(cumulativeUpkeep))])]))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

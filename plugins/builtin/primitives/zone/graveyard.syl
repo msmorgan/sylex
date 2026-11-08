@@ -1,0 +1,3 @@
+primitive graveyard: Zone = Graveyard {
+  spelling = "graveyard"
+}

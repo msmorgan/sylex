@@ -1,2 +1,2 @@
 # Turn the subject face down with the specified characteristics [CR#701.40a,708.2].
-primitive turnFaceDown(subject: NounPhrase, spec: FaceDown): Action
+primitive turnFaceDown(subject: NounPhrase, spec: FaceDown): Action = TurnFaceDown

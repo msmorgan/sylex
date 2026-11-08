@@ -1,5 +1,5 @@
 # [CR#110.5]
-primitive phasedOut: Status {
+primitive phasedOut: Status = PhasedOut {
   lexical = {
     prepositions = [
       {lemma = "phased out", frames = [{complement = Intransitive, hosts = NominalAndPredicate}]}]},

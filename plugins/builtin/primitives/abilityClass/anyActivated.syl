@@ -1,0 +1,1 @@
+primitive anyActivated: AbilityClass = AnyActivated

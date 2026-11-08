@@ -1,6 +1,6 @@
 card {
   name = "Ensnaring Bridge",
-  cost = [3],
+  cost = [generic(3)],
   types = [artifact],
   text = [
     static(

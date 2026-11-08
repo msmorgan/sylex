@@ -3,9 +3,9 @@ card {
   types = [land],
   text = [
     static(entersTapped(thisLand)),
-    activated(tapSymbol, putCounters(1, printedKind(storageCounter), thisLand)),
+    activated(tapSymbol, putCounters(lit(1), printedKind(storageCounter), thisLand)),
     activated(
       compound(
         [tapSymbol, perform(removeCounters(anyNumber, printedKind(storageCounter), thisLand))]),
-      addMana(removedThisWay, manaOf([[of(red)]])))]
+      addMana(removedThisWay, manaOf([[colored(red)]])))]
 }

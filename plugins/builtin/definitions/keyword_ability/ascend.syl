@@ -9,13 +9,13 @@ ability ascend {
       static(
         whileHolds(
           and([
-              compareAmt(countOf(and([isPermanent, youControl])), atLeast, 10),
+              compareAmt(countOf(and([isPermanent, youControl])), atLeast, lit(10)),
               not(is(you, hasDesignation(citysBlessing)))]),
           gainDesignation(you, citysBlessing, restOfGame))),
       spell(
         doIf(
           and([
-              compareAmt(countOf(and([isPermanent, youControl])), atLeast, 10),
+              compareAmt(countOf(and([isPermanent, youControl])), atLeast, lit(10)),
               not(is(you, hasDesignation(citysBlessing)))]),
           gainDesignation(you, citysBlessing, restOfGame))))]
 }

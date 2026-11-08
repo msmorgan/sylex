@@ -1,12 +1,12 @@
 card {
   name = "Gaddock Teeg",
-  cost = [green, white],
+  cost = [pip(green), pip(white)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [kithkin, advisor],
   text = [
-    static(cant(any, cast(bare(and([isSpell, non(isCreature), hasManaValue(atLeast, 4)]))))),
+    static(cant(any, cast(bare(and([isSpell, non(isCreature), hasManaValue(atLeast, lit(4))]))))),
     static(cant(any, cast(bare(and([isSpell, non(isCreature), manaCostHas(variable)])))))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

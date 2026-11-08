@@ -1,6 +1,6 @@
 card {
   name = "Escaped Shapeshifter",
-  cost = [3, blue, blue],
+  cost = [generic(3), pip(blue), pip(blue)],
   types = [creature],
   subtypes = [shapeshifter],
   text = [
@@ -21,7 +21,11 @@ card {
                 anOpponentControls,
                 hasKeyword(thatKeyword),
                 not(named(printedName("Escaped Shapeshifter")))])))),
-      [flying, firstStrike, trample, anyIn({word = protection, sort = color})])],
-  power = 3,
-  toughness = 4
+      [
+        theKeyword(flying),
+        theKeyword(firstStrike),
+        theKeyword(trample),
+        anyIn({word = protection, sort = color})])],
+  power = lit(3),
+  toughness = lit(4)
 }

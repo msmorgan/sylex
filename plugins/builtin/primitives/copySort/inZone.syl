@@ -1,0 +1,1 @@
+primitive inZone(zone: Zone): CopySort = InZone

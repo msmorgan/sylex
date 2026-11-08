@@ -1,9 +1,9 @@
 card {
   name = "Cold Storage",
-  cost = [4],
+  cost = [generic(4)],
   types = [artifact],
   text = [
-    activated(mana([3]), exile(target(and([isCreature, youControl])))),
+    activated(mana([generic(3)]), exile(target(and([isCreature, youControl])))),
     activated(
       perform(sacrifice(thisArtifact)),
       returnToBattlefield(each(and([isCreature, cardIn(exiledWith(thisArtifact))])), [under(you)]))]

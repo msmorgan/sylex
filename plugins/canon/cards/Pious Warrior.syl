@@ -1,10 +1,10 @@
 card {
   name = "Pious Warrior",
-  cost = [3, white],
+  cost = [generic(3), pip(white)],
   types = [creature],
   subtypes = [human, rebel, warrior],
   text = [
     whenever(does(any, dealDamage(recipient = thisCreature, kind = combat)), gainLife(thatMuch))],
-  power = 2,
-  toughness = 3
+  power = lit(2),
+  toughness = lit(3)
 }

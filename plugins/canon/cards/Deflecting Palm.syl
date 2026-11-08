@@ -1,6 +1,6 @@
 card {
   name = "Deflecting Palm",
-  cost = [red, white],
+  cost = [pip(red), pip(white)],
   types = [instant],
   text = [
     spell(

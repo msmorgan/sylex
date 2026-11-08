@@ -3,12 +3,12 @@
 # permanent [CR#702.152a,601.2b,608.3g].
 card {
   name = "Tenacious Underdog",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [creature],
   subtypes = [human, warrior],
   text = [
-    blitz(compound([mana([2, black, black]), perform(payLife(2))])),
+    blitz(compound([mana([generic(2), pip(black), pip(black)]), perform(payLife(lit(2)))])),
     static(can(actor(you), cast(this, from = yourGraveyard, payment = usingKeyword(blitz))))],
-  power = 3,
-  toughness = 2
+  power = lit(3),
+  toughness = lit(2)
 }

@@ -1,6 +1,6 @@
 card {
   name = "Awesome Presence",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [enchantment],
   subtypes = [aura],
   text = [
@@ -8,7 +8,7 @@ card {
     static(
       gatedBy(
         scaledGenericMana(
-          forEach(3, and([isCreature, controlledBy(they), inCombat(blockerOf, it)]))),
+          forEach(lit(3), and([isCreature, controlledBy(they), inCombat(blockerOf, it)]))),
         any,
         block(enchanted(type(creature)))))]
 }

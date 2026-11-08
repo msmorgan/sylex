@@ -1,6 +1,6 @@
 card {
   name = "Dream Thief",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [creature],
   subtypes = [faerie, rogue],
   text = [
@@ -8,8 +8,8 @@ card {
     when(
       does(actor(thisCreature), enter),
       doOnlyIf(
-        draw(1),
+        draw(lit(1)),
         did(actor(you), cast(a(and([isSpell, hasColor(blue), isOther]))), within(soFarThisTurn))))],
-  power = 2,
-  toughness = 1
+  power = lit(2),
+  toughness = lit(1)
 }

@@ -1,18 +1,18 @@
 card {
   name = "Chainsaw",
-  cost = [1, red],
+  cost = [generic(1), pip(red)],
   types = [artifact],
   subtypes = [equipment],
   text = [
     when(
       does(actor(thisEquipment), enter),
-      instruct(it, dealDamage(3, targets(upTo(1), isCreature)))),
+      instruct(it, dealDamage(lit(3), targets(upTo(1), isCreature)))),
     whenever(
       does(actor(counted(orMore(1), isCreature)), die),
-      putCounters(1, printedKind(revCounter), thisEquipment)),
+      putCounters(lit(1), printedKind(revCounter), thisEquipment)),
     static(
       conjunction([
-          getsPt(equipped(creature), up(letter(x)), up(0)),
+          getsPt(equipped(creature), up(letter(x)), up(lit(0))),
           letterDefinition(x, countersOn(revCounter, thisEquipment))])),
-    equip(mana([3]))]
+    equip(mana([generic(3)]))]
 }

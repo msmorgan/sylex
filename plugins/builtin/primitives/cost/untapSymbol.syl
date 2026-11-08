@@ -1,4 +1,4 @@
 # The untap-symbol cost, {Q}.
-primitive untapSymbol: Cost {
+primitive untapSymbol: Cost = UntapSymbol {
   spelling = "{Q}"
 }

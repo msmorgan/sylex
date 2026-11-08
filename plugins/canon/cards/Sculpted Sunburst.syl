@@ -3,7 +3,7 @@
 # "not chosen by any player this way" excludes every player's chosen creature.
 card {
   name = "Sculpted Sunburst",
-  cost = [3, white, white],
+  cost = [generic(3), pip(white), pip(white)],
   types = [sorcery],
   text = [
     spell(

@@ -1,4 +1,4 @@
 # "all of them": a slice that takes the whole group.
-primitive whole: SliceCount {
+primitive whole: SliceCount = Whole {
   spelling = "all of them"
 }

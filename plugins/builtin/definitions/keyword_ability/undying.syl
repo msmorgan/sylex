@@ -7,6 +7,6 @@ ability undying {
   body = [
     when(
       does(actor(thisPermanent), die),
-      returnToBattlefieldWithCounters(thisPermanent, ownerOf(thisPermanent), 1, p1p1Counter),
+      returnToBattlefieldWithCounters(thisPermanent, ownerOf(thisPermanent), lit(1), p1p1Counter),
       if = not(is(thisPermanent, hasCounter(p1p1Counter))))]
 }

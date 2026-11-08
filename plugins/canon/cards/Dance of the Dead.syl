@@ -1,6 +1,6 @@
 card {
   name = "Dance of the Dead",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [enchantment],
   subtypes = [aura],
   text = [
@@ -25,9 +25,11 @@ card {
       if = is(it, in(battlefield))),
     static(
       conjunction(
-        [getsPt(enchanted(creature), up(1), up(1)), doesntUntap(it, controllerOf(it))],
+        [getsPt(enchanted(creature), up(lit(1)), up(lit(1))), doesntUntap(it, controllerOf(it))],
         subject = enchanted(creature))),
     at(
       beginningOfPossessed(upkeep, controllerOf(enchanted(creature))),
-      instruct(that(player), may(pay(mana([1, black]), once), untap(that(creature)))))]
+      instruct(
+        that(player),
+        may(pay(mana([generic(1), pip(black)]), once), untap(that(creature)))))]
 }

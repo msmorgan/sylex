@@ -1,6 +1,6 @@
 card {
   name = "Melek, Izzet Paragon",
-  cost = [4, blue, red],
+  cost = [generic(4), pip(blue), pip(red)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [weird, wizard],
@@ -10,6 +10,6 @@ card {
     whenever(
       does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])), from = yourLibrary)),
       sequentially([copyOnStack(it), may(chooseNewTargets(that(copy)))]))],
-  power = 2,
-  toughness = 4
+  power = lit(2),
+  toughness = lit(4)
 }

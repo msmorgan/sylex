@@ -1,6 +1,6 @@
 card {
   name = "Teleport",
-  cost = [blue, blue, blue],
+  cost = [pip(blue), pip(blue), pip(blue)],
   types = [instant],
   text = [
     spell(

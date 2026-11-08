@@ -5,5 +5,8 @@ ability ravenous {
   spelling = "ravenous",
   body = [
     static(entersWithCounters(thisPermanent, letter(x), p1p1Counter)),
-    when(does(actor(thisPermanent), enter), draw(1), if = compareAmt(letter(x), atLeast, 5))]
+    when(
+      does(actor(thisPermanent), enter),
+      draw(lit(1)),
+      if = compareAmt(letter(x), atLeast, lit(5)))]
 }

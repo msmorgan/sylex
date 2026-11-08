@@ -1,5 +1,5 @@
 # "if <subj> would <action>": the event a replacement watches [CR#614.1].
 # [CR#614.1]
-primitive would(subj: Subject, action: Action): WouldClause {
+primitive would(subj: Subject, action: Action): WouldClause = Would {
   spelling = "if <subj> would <action>"
 }

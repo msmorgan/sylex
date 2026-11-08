@@ -1,6 +1,6 @@
 card {
   name = "Inferno of the Star Mounts",
-  cost = [4, red, red],
+  cost = [generic(4), pip(red), pip(red)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [dragon],
@@ -9,11 +9,11 @@ card {
     flying,
     haste,
     activated(
-      mana([red]),
+      mana([pip(red)]),
       triggerThisWay(
-        get(thisCreature, up(1), up(0), untilEndOfTurn),
-        stateHolds(compareAmt(powerOf(it), eq, 20)),
-        instruct(it, dealDamage(20, target(isAnyTarget)))))],
-  power = 6,
-  toughness = 6
+        get(thisCreature, up(lit(1)), up(lit(0)), untilEndOfTurn),
+        stateHolds(compareAmt(powerOf(it), equal, lit(20))),
+        instruct(it, dealDamage(lit(20), target(isAnyTarget)))))],
+  power = lit(6),
+  toughness = lit(6)
 }

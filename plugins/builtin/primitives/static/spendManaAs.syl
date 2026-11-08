@@ -4,4 +4,4 @@
 primitive spendManaAs(
   what: Option(ColorOrColorless),
   as: ManaMatch,
-  purpose: Option(SpendPurpose)): AsThough = .mana
+  purpose: Option(SpendPurpose)): AsThough = Mana

@@ -3,7 +3,7 @@
 # [CR#608.2c,613.1b].
 card {
   name = "Coveted Falcon",
-  cost = [1, blue, blue],
+  cost = [generic(1), pip(blue), pip(blue)],
   types = [artifact, creature],
   subtypes = [bird],
   text = [
@@ -11,7 +11,7 @@ card {
     whenever(
       does(actor(thisCreature), attack),
       gainControl(target(and([isPermanent, youOwn, not(youControl)])))),
-    disguise(mana([1, blue])),
+    disguise(mana([generic(1), pip(blue)])),
     when(
       does(any, turnFaceUp(thisCreature)),
       sequentially([
@@ -22,6 +22,6 @@ card {
             forEach(
               eventTally(actor(they), gainControlOf(those(permanent)), thisWay, events),
               isPermanent))]))],
-  power = 1,
-  toughness = 4
+  power = lit(1),
+  toughness = lit(4)
 }

@@ -1,6 +1,6 @@
 card {
   name = "Fatigue",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [sorcery],
-  text = [spell(instruct(target(isPlayer), skipPart(drawStep, 1)))]
+  text = [spell(instruct(target(isPlayer), skipPart(drawStep, lit(1))))]
 }

@@ -1,6 +1,6 @@
 card {
   name = "Fork",
-  cost = [red, red],
+  cost = [pip(red), pip(red)],
   types = [instant],
   text = [
     spell(

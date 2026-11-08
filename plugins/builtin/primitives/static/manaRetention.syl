@@ -1,2 +1,2 @@
 # Authoring primitive for `StaticSpec.manaRetention`.
-primitive manaRetention(player: NounPhrase, mana: ManaHeld): StaticSpec
+primitive manaRetention(player: NounPhrase, mana: ManaHeld): StaticSpec = ManaRetention

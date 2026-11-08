@@ -19,6 +19,10 @@ ability cipher {
           does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
           may(
             sequentially([
-                copy(fromCardZone, the(and([isCard, related(encodedOn, thisCreature)])), 1, []),
+                copy(
+                  fromCardZone,
+                  the(and([isCard, related(encodedOn, thisCreature)])),
+                  lit(1),
+                  []),
                 may(cast(that(copy), payment = withoutPaying))])))))]
 }

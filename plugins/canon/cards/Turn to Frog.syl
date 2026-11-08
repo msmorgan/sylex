@@ -1,6 +1,6 @@
 card {
   name = "Turn to Frog",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [instant],
   text = [
     spell(
@@ -11,6 +11,6 @@ card {
               it,
               sets,
               bundle({characteristics = {colors = [blue], subtypes = [frog]}})),
-            getsBase(it, 1, 1)]),
+            getsBase(it, lit(1), lit(1))]),
         untilEndOfTurn))]
 }

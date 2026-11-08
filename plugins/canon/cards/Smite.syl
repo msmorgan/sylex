@@ -1,6 +1,6 @@
 card {
   name = "Smite",
-  cost = [white],
+  cost = [pip(white)],
   types = [instant],
   text = [spell(destroy(target(and([isCreature, isBlocked]))))]
 }

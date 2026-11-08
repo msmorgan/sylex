@@ -1,6 +1,6 @@
 card {
   name = "Urza's Filter",
-  cost = [4],
+  cost = [generic(4)],
   types = [artifact],
-  text = [static(costShift(allOf(and([isMulticolored, isSpell])), less(2)))]
+  text = [static(costShift(allOf(and([isMulticolored, isSpell])), less(lit(2))))]
 }

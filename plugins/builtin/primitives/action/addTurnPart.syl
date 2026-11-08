@@ -3,4 +3,4 @@ primitive addTurnPart(
   part: TurnPart,
   count: Amount,
   anchor: Option(TurnPart) = none,
-  followedBy: Option(TurnPart) = none): Action
+  followedBy: Option(TurnPart) = none): Action = AddTurnPart

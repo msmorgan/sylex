@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.hasKeyword`.
-primitive hasKeyword(keyword: KeywordTerm): Predicate {
+primitive hasKeyword(keyword: KeywordTerm): Predicate = HasKeyword {
   spelling = "with <keyword>"
 }

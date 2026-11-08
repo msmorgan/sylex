@@ -1,6 +1,6 @@
 card {
   name = "Elspeth's Talent",
-  cost = [2, white, white],
+  cost = [generic(2), pip(white), pip(white)],
   types = [enchantment],
   subtypes = [aura],
   text = [
@@ -9,14 +9,14 @@ card {
       abilityGrant(
         enchanted(planeswalker),
         activated(
-          loyaltySymbol(up(1)),
-          create(3, written(creatureToken(1, 1, [white], [soldier])))))),
+          loyaltySymbol(up(lit(1))),
+          create(lit(3), written(creatureToken(1, 1, [white], [soldier])))))),
     whenever(
       does(
         actor(you),
         activate(a(and([abilityHead(loyalty), abilityOf(enchanted(planeswalker))])))),
       establishFor(
         allOf(and([isCreature, youControl])),
-        [getsPt(them, up(2), up(2)), abilityGrant(them, vigilance)],
+        [getsPt(them, up(lit(2)), up(lit(2))), abilityGrant(them, vigilance)],
         untilEndOfTurn))]
 }

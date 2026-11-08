@@ -1,4 +1,4 @@
 # "their hand" as a player plays with it revealed
-primitive wholeHand: VisibleThing {
+primitive wholeHand: VisibleThing = WholeHand {
   spelling = "their hand"
 }

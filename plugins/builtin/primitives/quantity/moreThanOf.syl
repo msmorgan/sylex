@@ -1,1 +1,1 @@
-primitive moreThanOf(amount: Amount): Quantity
+primitive moreThanOf(amount: Amount): Quantity = MoreThanOf

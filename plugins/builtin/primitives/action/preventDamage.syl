@@ -7,4 +7,4 @@
 primitive preventDamage(
   cut: PreventCut,
   damage: Option(WouldClause) = none,
-  also: Option(Action) = none): Action
+  also: Option(Action) = none): Action = PreventDamage

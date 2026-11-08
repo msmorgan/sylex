@@ -1,11 +1,11 @@
 card {
   name = "Awaken the Bear",
-  cost = [2, green],
+  cost = [generic(2), pip(green)],
   types = [instant],
   text = [
     spell(
       establishFor(
         target(isCreature),
-        [getsPt(it, up(3), up(3)), abilityGrant(it, trample)],
+        [getsPt(it, up(lit(3)), up(lit(3))), abilityGrant(it, trample)],
         untilEndOfTurn))]
 }

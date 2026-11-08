@@ -1,6 +1,6 @@
 card {
   name = "Sugar Coat",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [enchantment],
   subtypes = [aura],
   text = [
@@ -17,7 +17,7 @@ card {
                   subtypes = [food],
                   text = [
                     activated(
-                      compound([mana([2]), tapSymbol, perform(sacrifice(thisArtifact))]),
-                      gainLife(3))]}})),
+                      compound([mana([generic(2)]), tapSymbol, perform(sacrifice(thisArtifact))]),
+                      gainLife(lit(3)))]}})),
           allAbilityLoss(it)]))]
 }

@@ -1,5 +1,5 @@
 # [CR#110.5]
-primitive phasedIn: Status {
+primitive phasedIn: Status = PhasedIn {
   lexical = {
     prepositions = [
       {lemma = "phased in", frames = [{complement = Intransitive, hosts = NominalAndPredicate}]}]},

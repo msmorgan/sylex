@@ -1,0 +1,1 @@
+primitive unionHalf(word: NounWord): Reach = UnionHalf

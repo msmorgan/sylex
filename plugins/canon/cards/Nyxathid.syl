@@ -1,6 +1,6 @@
 card {
   name = "Nyxathid",
-  cost = [1, black, black],
+  cost = [generic(1), pip(black), pip(black)],
   types = [creature],
   subtypes = [elemental],
   text = [
@@ -10,6 +10,6 @@ card {
         thisCreature,
         down(countOf(cardIn(handOf(the(isChosenPlayer))))),
         down(countOf(cardIn(handOf(the(isChosenPlayer)))))))],
-  power = 7,
-  toughness = 7
+  power = lit(7),
+  toughness = lit(7)
 }

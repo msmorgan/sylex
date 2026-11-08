@@ -1,6 +1,6 @@
 card {
   name = "Hymn of Rebirth",
-  cost = [3, green, white],
+  cost = [generic(3), pip(green), pip(white)],
   types = [sorcery],
   text = [
     spell(

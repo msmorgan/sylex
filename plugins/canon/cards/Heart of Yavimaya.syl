@@ -10,6 +10,6 @@ card {
             sacrifice(a(and([isLand, hasSubtype(forest)]))),
             putOntoBattlefield(thisLand),
             putInto(it, graveyard))))),
-    activated(tapSymbol, addMana(1, manaOf([[of(green)]]))),
-    activated(tapSymbol, get(target(isCreature), up(1), up(1), untilEndOfTurn))]
+    activated(tapSymbol, addMana(lit(1), manaOf([[colored(green)]]))),
+    activated(tapSymbol, get(target(isCreature), up(lit(1)), up(lit(1)), untilEndOfTurn))]
 }

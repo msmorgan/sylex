@@ -1,0 +1,3 @@
+primitive endOfCombat: TurnPart = EndOfCombat {
+  spelling = "end of combat"
+}

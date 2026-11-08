@@ -1,6 +1,6 @@
 card {
   name = "Fettergeist",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [creature],
   subtypes = [spirit],
   text = [
@@ -9,7 +9,7 @@ card {
       beginningOfYour(upkeep),
       doUnless(
         sacrifice(thisCreature),
-        scaledGenericMana(forEach(1, and([isCreature, youControl, isOther])))))],
-  power = 3,
-  toughness = 4
+        scaledGenericMana(forEach(lit(1), and([isCreature, youControl, isOther])))))],
+  power = lit(3),
+  toughness = lit(4)
 }

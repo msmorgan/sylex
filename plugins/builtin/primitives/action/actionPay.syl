@@ -4,4 +4,4 @@ primitive actionPay(
   times: PayTimes,
   outcome: PaymentOutcome,
   whose: Option(NounPhrase),
-  keyword: Option(KeywordLabel)): Action = .pay
+  keyword: Option(KeywordLabel)): Action = Pay

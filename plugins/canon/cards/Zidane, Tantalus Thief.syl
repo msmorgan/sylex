@@ -3,7 +3,7 @@
 # as a trigger event, `gainControlOf`, with the player it was taken from [CR#603.10d].
 card {
   name = "Zidane, Tantalus Thief",
-  cost = [3, red, white],
+  cost = [generic(3), pip(red), pip(white)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, mutant, scout],
@@ -19,7 +19,7 @@ card {
             untilEndOfTurn)])),
     whenever(
       does(actor(anOpponent), gainControlOf(a(isPermanent), you)),
-      create(1, written(treasureToken)))],
-  power = 3,
-  toughness = 3
+      create(lit(1), written(treasureToken)))],
+  power = lit(3),
+  toughness = lit(3)
 }

@@ -1,4 +1,4 @@
 # "has <predicate>" as a starting-deck trait
-primitive aCharacteristic(predicate: Predicate): DeckTrait {
+primitive aCharacteristic(predicate: Predicate): DeckTrait = ACharacteristic {
   spelling = "has <predicate>"
 }

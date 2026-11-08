@@ -1,6 +1,6 @@
 card {
   name = "Relic Ward",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [enchantment],
   subtypes = [aura],
   text = [

@@ -5,4 +5,4 @@ primitive delay(
   event: GameEvent,
   body: Action,
   alternatives: List(GameEvent) = [],
-  duration: Option(Duration) = none): Action
+  duration: Option(Duration) = none): Action = Delay

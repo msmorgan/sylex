@@ -1,6 +1,6 @@
 card {
   name = "Encroaching Mycosynth",
-  cost = [3, blue],
+  cost = [generic(3), pip(blue)],
   types = [artifact],
   text = [
     static(

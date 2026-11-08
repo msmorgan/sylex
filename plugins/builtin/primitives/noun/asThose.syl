@@ -1,2 +1,2 @@
 # Tokens with the characteristics of the previously identified objects.
-primitive asThose: TokenSpec
+primitive asThose: TokenSpec = AsThose

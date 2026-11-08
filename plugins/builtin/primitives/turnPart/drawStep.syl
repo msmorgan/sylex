@@ -1,0 +1,3 @@
+primitive drawStep: TurnPart = DrawStep {
+  spelling = "draw step"
+}

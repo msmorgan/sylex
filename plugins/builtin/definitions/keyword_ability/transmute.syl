@@ -14,7 +14,7 @@ ability transmute(cost: Cost) {
               and([
                   isCard,
                   hasManaValue(
-                    eq,
+                    equal,
                     statOf(stat(manaValue), the(and([was(discard(which)), isCard]))))]))),
           reveal(that(card)),
           putInto(it, hand),

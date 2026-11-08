@@ -1,1 +1,1 @@
-primitive participation(state: CombatParticipation): CombatUpdate
+primitive participation(state: CombatParticipation): CombatUpdate = Participation

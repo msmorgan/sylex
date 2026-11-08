@@ -1,2 +1,2 @@
 # Full-arity binding for `Location.coord`.
-primitive coord(coordinator: Coordinator, locs: List(Location)): Location
+primitive coord(coordinator: Coordinator, locs: List(Location)): Location = Coordination

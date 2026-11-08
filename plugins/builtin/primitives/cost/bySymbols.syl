@@ -1,1 +1,1 @@
-primitive bySymbols(change: Delta(ManaCostTerm), coloredOnly: Bool): CostShift
+primitive bySymbols(change: Delta(ManaCostTerm), coloredOnly: Bool): CostShift = BySymbols

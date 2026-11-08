@@ -1,6 +1,6 @@
 card {
   name = "Urborg Scavengers",
-  cost = [2, black],
+  cost = [generic(2), pip(black)],
   types = [creature],
   subtypes = [spirit],
   text = [
@@ -9,7 +9,7 @@ card {
       or = [does(actor(thisCreature), attack)],
       action = sequentially([
           exile(target(cardIn(graveyard))),
-          putCounters(1, printedKind(p1p1Counter), thisCreature)])),
+          putCounters(lit(1), printedKind(p1p1Counter), thisCreature)])),
     alsoForKeywords(
       static(
         onlyWhile(
@@ -19,18 +19,18 @@ card {
             and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
           exists(and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])))),
       [
-        flying,
-        firstStrike,
-        doubleStrike,
-        deathtouch,
-        haste,
+        theKeyword(flying),
+        theKeyword(firstStrike),
+        theKeyword(doubleStrike),
+        theKeyword(deathtouch),
+        theKeyword(haste),
         anyIn({word = hexproof}),
-        indestructible,
-        lifelink,
-        menace,
-        reach,
-        trample,
-        vigilance])],
-  power = 2,
-  toughness = 2
+        theKeyword(indestructible),
+        theKeyword(lifelink),
+        theKeyword(menace),
+        theKeyword(reach),
+        theKeyword(trample),
+        theKeyword(vigilance)])],
+  power = lit(2),
+  toughness = lit(2)
 }

@@ -1,11 +1,11 @@
 card {
   name = "Snuff Out",
-  cost = [3, black],
+  cost = [generic(3), pip(black)],
   types = [instant],
   text = [
     static(
       onlyWhile(
-        altCost(this, perform(payLife(4))),
+        altCost(this, perform(payLife(lit(4)))),
         exists(and([isLand, hasSubtype(swamp), youControl])))),
     spell(destroyCantRegenerate(target(and([isCreature, non(hasColor(black))]))))]
 }

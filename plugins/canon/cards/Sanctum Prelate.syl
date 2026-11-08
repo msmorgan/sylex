@@ -1,11 +1,12 @@
 card {
   name = "Sanctum Prelate",
-  cost = [1, white, white],
+  cost = [generic(1), pip(white), pip(white)],
   types = [creature],
   subtypes = [human, cleric],
   text = [
     static(entersChoosing(thisCreature, number)),
-    static(cant(any, cast(bare(and([isSpell, non(isCreature), hasManaValue(eq, chosenNumber)])))))],
-  power = 2,
-  toughness = 2
+    static(
+      cant(any, cast(bare(and([isSpell, non(isCreature), hasManaValue(equal, chosenNumber)])))))],
+  power = lit(2),
+  toughness = lit(2)
 }

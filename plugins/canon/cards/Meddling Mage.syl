@@ -1,11 +1,11 @@
 card {
   name = "Meddling Mage",
-  cost = [white, blue],
+  cost = [pip(white), pip(blue)],
   types = [creature],
   subtypes = [human, wizard],
   text = [
     static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(isLand)))),
     static(cant(any, cast(bare(and([isSpell, named(chosenName)])))))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

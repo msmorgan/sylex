@@ -1,9 +1,9 @@
 card {
   name = "Drudge Skeletons",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [creature],
   subtypes = [skeleton],
-  text = [activated(mana([black]), regenerate(thisCreature))],
-  power = 1,
-  toughness = 1
+  text = [activated(mana([pip(black)]), regenerate(thisCreature))],
+  power = lit(1),
+  toughness = lit(1)
 }

@@ -1,4 +1,4 @@
 # "more than one of the same mana symbol in its mana cost"
-primitive repeatedManaSymbol: DeckTrait {
+primitive repeatedManaSymbol: DeckTrait = RepeatedManaSymbol {
   spelling = "more than one of the same mana symbol in its mana cost"
 }

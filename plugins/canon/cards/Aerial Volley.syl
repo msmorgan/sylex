@@ -1,7 +1,11 @@
 card {
   name = "Aerial Volley",
-  cost = [green],
+  cost = [pip(green)],
   types = [instant],
   text = [
-    spell(dealDivided(this, 3, targets(oneThrough(3), and([isCreature, hasKeyword(flying)]))))]
+    spell(
+      dealDivided(
+        this,
+        lit(3),
+        targets(oneThrough(3), and([isCreature, hasKeyword(theKeyword(flying))]))))]
 }

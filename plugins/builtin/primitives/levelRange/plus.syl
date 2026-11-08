@@ -1,0 +1,1 @@
+primitive plus(from: Nat): LevelRange = Plus

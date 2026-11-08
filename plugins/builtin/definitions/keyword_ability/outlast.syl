@@ -6,6 +6,6 @@ ability outlast(cost: Cost) {
   body = [
     activatedOnlyDuring(
       compound([$cost, tapSymbol]),
-      putCounters(1, printedKind(p1p1Counter), thisCreature),
+      putCounters(lit(1), printedKind(p1p1Counter), thisCreature),
       asSorcery)]
 }

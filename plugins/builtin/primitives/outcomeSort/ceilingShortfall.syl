@@ -1,0 +1,1 @@
+primitive ceilingShortfall: OutcomeSort = CeilingShortfall

@@ -3,4 +3,4 @@
 primitive dealDamage(
   amount: Amount = anyAmount,
   recipient: NounPhrase = any,
-  kind: Option(DamageKind) = none): Action
+  kind: Option(DamageKind) = none): Action = DealDamage

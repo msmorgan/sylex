@@ -1,2 +1,2 @@
 # A duration bounded by optional starting and ending events.
-primitive durationBetween(start: Option(GameEvent), end: Option(GameEvent)): Duration = .between
+primitive durationBetween(start: Option(GameEvent), end: Option(GameEvent)): Duration = Between

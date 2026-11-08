@@ -14,5 +14,5 @@ counter p1p1Counter {
   lexical = {lemma = "+1/+1 counter"},
   spelling = "+1/+1 counter",
 
-  confers = [boost(up(1), up(1))]
+  confers = [boost(up(lit(1)), up(lit(1)))]
 }

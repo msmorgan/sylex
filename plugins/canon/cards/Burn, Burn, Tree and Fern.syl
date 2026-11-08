@@ -1,12 +1,12 @@
 card {
   name = "Burn, Burn, Tree and Fern",
-  cost = [3, red],
+  cost = [generic(3), pip(red)],
   types = [enchantment],
   subtypes = [saga],
   text = [
     when(
       chapterMark([1]),
-      instruct(this, dealDamage(6, target(and([isCreature, anOpponentControls]))))),
+      instruct(this, dealDamage(lit(6), target(and([isCreature, anOpponentControls]))))),
     when(chapterMark([2]), destroy(target(and([isArtifact, anOpponentControls])))),
-    when(chapterMark([3, 4]), addMana(1, manaOf([[of(red)]])))]
+    when(chapterMark([3, 4]), addMana(lit(1), manaOf([[colored(red)]])))]
 }

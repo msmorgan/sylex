@@ -1,4 +1,4 @@
 # "<ability> triggers": the act a trigger prohibition names.
-primitive trigger: Action {
+primitive trigger: Action = Trigger {
   spelling = "triggers"
 }

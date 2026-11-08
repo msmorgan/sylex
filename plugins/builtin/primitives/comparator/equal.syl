@@ -1,0 +1,1 @@
+primitive equal: Comparator = Equal

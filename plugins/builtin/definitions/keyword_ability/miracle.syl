@@ -8,7 +8,7 @@ ability miracle(cost: Cost) {
   body = [
     static(
       asEvent(
-        nthOccurrence(nth(1), does(actor(you), draw(1)), turn),
+        nthOccurrence(nth(1), does(actor(you), draw(lit(1))), turn),
         doIf(
           is(that(card), not(otherThan(thisCard))),
           triggerReflexively(

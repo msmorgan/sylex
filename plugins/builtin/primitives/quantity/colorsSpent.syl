@@ -1,1 +1,1 @@
-primitive colorsSpent: LinkedFacet
+primitive colorsSpent: LinkedFacet = ColorsSpent

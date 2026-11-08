@@ -1,2 +1,2 @@
 # Repeat according to the specified repetition.
-primitive repeat(repetition: Repetition): Action
+primitive repeat(repetition: Repetition): Action = Repeat

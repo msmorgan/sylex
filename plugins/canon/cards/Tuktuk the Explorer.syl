@@ -1,6 +1,6 @@
 card {
   name = "Tuktuk the Explorer",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [goblin],
@@ -9,15 +9,15 @@ card {
     when(
       does(actor(thisCreature), die),
       create(
-        1,
+        lit(1),
         written({
             characteristics = {
               name = "Tuktuk the Returned",
               supertypes = [legendary],
               types = [artifact, creature],
               subtypes = [goblin, golem],
-              power = 5,
-              toughness = 5}})))],
-  power = 1,
-  toughness = 1
+              power = lit(5),
+              toughness = lit(5)}})))],
+  power = lit(1),
+  toughness = lit(1)
 }

@@ -1,4 +1,4 @@
 # "<ability>", lost as written
-primitive written(ability: Ability): AbilityLost {
+primitive written(ability: Ability): AbilityLost = Written {
   spelling = "<ability>"
 }

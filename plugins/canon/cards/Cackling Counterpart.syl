@@ -1,8 +1,8 @@
 card {
   name = "Cackling Counterpart",
-  cost = [1, blue, blue],
+  cost = [generic(1), pip(blue), pip(blue)],
   types = [instant],
   text = [
-    spell(create(1, copyOf(target(and([isCreature, youControl]))))),
-    flashback(mana([5, blue, blue]))]
+    spell(create(lit(1), copyOf(target(and([isCreature, youControl]))))),
+    flashback(mana([generic(5), pip(blue), pip(blue)]))]
 }

@@ -1,11 +1,11 @@
 card {
   name = "Flaring Pain",
-  cost = [1, red],
+  cost = [generic(1), pip(red)],
   types = [instant],
   text = [
     spell(
       establishThroughout(
         cant(any, preventDamage(allDamage, damage = would(any, dealDamage))),
         thisTurn)),
-    flashback(mana([red]))]
+    flashback(mana([pip(red)]))]
 }

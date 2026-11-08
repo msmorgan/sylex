@@ -1,1 +1,1 @@
-primitive faceDown(spec: FaceDown, cost: Cost): PlayPayment
+primitive faceDown(spec: FaceDown, cost: Cost): PlayPayment = FaceDown

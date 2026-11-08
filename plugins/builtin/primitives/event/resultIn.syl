@@ -1,4 +1,4 @@
 # "a result in <quantity>"
-primitive resultIn(quantity: Quantity): RollWatch {
+primitive resultIn(quantity: Quantity): RollWatch = ResultIn {
   spelling = "a result in <quantity>"
 }

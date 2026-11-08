@@ -1,9 +1,9 @@
 card {
   name = "White Knight",
-  cost = [white, white],
+  cost = [pip(white), pip(white)],
   types = [creature],
   subtypes = [human, knight],
   text = [firstStrike, protection(hasColor(black))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

@@ -1,5 +1,5 @@
 # "<subject> saddles <permanent>" [CR#702.171a]
 # [CR#702.171a]
-primitive saddle(permanent: NounPhrase): Action {
+primitive saddle(permanent: NounPhrase): Action = Saddle {
   spelling = "saddles <permanent>"
 }

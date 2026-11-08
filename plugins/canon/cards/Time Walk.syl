@@ -1,6 +1,6 @@
 card {
   name = "Time Walk",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [sorcery],
-  text = [spell(extraTurn(1))]
+  text = [spell(extraTurn(lit(1)))]
 }

@@ -1,11 +1,11 @@
 card {
   name = "Rooftop Storm",
-  cost = [5, blue],
+  cost = [generic(5), pip(blue)],
   types = [enchantment],
   text = [
     static(
       altCost(
         allOf(
           and([hasSubtype(zombie), isCreature, isSpell, did(actor(you), cast(which), thisObject)])),
-        mana([0])))]
+        mana([generic(0)])))]
 }

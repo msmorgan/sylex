@@ -5,7 +5,7 @@
 # creatures fight each other" is the two-creature fight of [CR#701.14a].
 card {
   name = "Blizzard Brawl",
-  cost = [green],
+  cost = [pip(green)],
   supertypes = [snow],
   types = [sorcery],
   text = [
@@ -14,10 +14,13 @@ card {
           choose(
             both(target(and([isCreature, youControl])), target(and([isCreature, youDontControl])))),
           doIf(
-            compareAmt(countOf(and([hasSupertype(snow), isPermanent, youControl])), atLeast, 3),
+            compareAmt(
+              countOf(and([hasSupertype(snow), isPermanent, youControl])),
+              atLeast,
+              lit(3)),
             establishFor(
               the(and([isCreature, youControl])),
-              [getsPt(it, up(1), up(0)), abilityGrant(it, indestructible)],
+              [getsPt(it, up(lit(1)), up(lit(0))), abilityGrant(it, indestructible)],
               untilEndOfTurn)),
           fightEachOther(those(creature))]))]
 }

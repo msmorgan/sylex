@@ -1,16 +1,16 @@
 card {
   name = "Forcefield",
-  cost = [3],
+  cost = [generic(3)],
   types = [artifact],
   text = [
     activated(
-      mana([1]),
+      mana([generic(1)]),
       establishThroughout(
         replace(
           would(
             actor(aYourChoice(and([isCreature, isUnblocked]))),
             dealDamage(recipient = you, kind = combat)),
-          instead(preventDamage(allBut(1))),
+          instead(preventDamage(allBut(lit(1)))),
           use = nextTimeOnly),
         thisTurn))]
 }

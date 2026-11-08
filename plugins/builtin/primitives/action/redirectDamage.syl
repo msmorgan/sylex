@@ -5,4 +5,4 @@
 primitive redirectDamage(
   cut: PreventCut,
   to: NounPhrase,
-  damage: Option(WouldClause) = none): Action
+  damage: Option(WouldClause) = none): Action = RedirectDamage

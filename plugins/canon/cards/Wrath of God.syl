@@ -1,6 +1,6 @@
 card {
   name = "Wrath of God",
-  cost = [2, white, white],
+  cost = [generic(2), pip(white), pip(white)],
   types = [sorcery],
   text = [spell(destroyPluralCantRegenerate(allOf(isCreature)))]
 }

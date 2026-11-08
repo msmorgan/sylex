@@ -1,4 +1,4 @@
 # "other than <anchor>"
-primitive otherThan(anchor: NounPhrase): Predicate {
+primitive otherThan(anchor: NounPhrase): Predicate = OtherThan {
   spelling = "other than <anchor>"
 }

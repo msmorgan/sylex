@@ -1,6 +1,6 @@
 card {
   name = "Time Stretch",
-  cost = [8, blue, blue],
+  cost = [generic(8), pip(blue), pip(blue)],
   types = [sorcery],
-  text = [spell(instruct(target(isPlayer), extraTurn(2)))]
+  text = [spell(instruct(target(isPlayer), extraTurn(lit(2))))]
 }

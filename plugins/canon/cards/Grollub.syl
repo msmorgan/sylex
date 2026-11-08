@@ -1,12 +1,12 @@
 card {
   name = "Grollub",
-  cost = [2, black],
+  cost = [generic(2), pip(black)],
   types = [creature],
   subtypes = [beast],
   text = [
     whenever(
       does(any, dealDamage(recipient = thisCreature)),
       instruct(eachOpponent, gainLife(thatMuch)))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

@@ -1,10 +1,10 @@
-card prototype({
-    inner = {
-      name = "Blitz Automaton",
-      cost = [7],
-      types = [artifact, creature],
-      subtypes = [construct],
-      text = [prototype, haste],
-      power = 6,
-      toughness = 4},
-    alternative = {cost = [2, red], power = 3, toughness = 2}})
+card prototype(
+  inner = {
+    name = "Blitz Automaton",
+    cost = [generic(7)],
+    types = [artifact, creature],
+    subtypes = [construct],
+    text = [prototype, haste],
+    power = lit(6),
+    toughness = lit(4)},
+  alternative = {cost = [generic(2), pip(red)], power = lit(3), toughness = lit(2)})

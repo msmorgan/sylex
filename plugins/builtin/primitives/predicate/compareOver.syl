@@ -3,4 +3,4 @@ primitive compareOver(
   domain: Predicate,
   measure: Amount,
   comparator: Comparator,
-  bound: Amount): Predicate
+  bound: Amount): Predicate = CompareOver

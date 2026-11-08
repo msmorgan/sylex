@@ -2,11 +2,12 @@
 # indicative "as though" statement about how it crews, not a permission to crew [CR#609.4].
 card {
   name = "Hotshot Mechanic",
-  cost = [white],
+  cost = [pip(white)],
   types = [artifact, creature],
   subtypes = [fox, pilot],
   text = [
-    static(asThough(actor(thisCreature), crew(allOf(hasSubtype(vehicle))), greaterBy(power, 2)))],
-  power = 2,
-  toughness = 1
+    static(
+      asThough(actor(thisCreature), crew(allOf(hasSubtype(vehicle))), greaterBy(power, lit(2))))],
+  power = lit(2),
+  toughness = lit(1)
 }

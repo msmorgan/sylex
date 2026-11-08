@@ -4,5 +4,5 @@
 # [CR#111.10a]
 template giftATreasure: Ability {
   spelling = "gift a Treasure",
-  body = gift(create(1, written(treasureToken)))
+  body = gift(create(lit(1), written(treasureToken)))
 }

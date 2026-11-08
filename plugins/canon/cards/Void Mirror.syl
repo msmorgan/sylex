@@ -1,6 +1,6 @@
 card {
   name = "Void Mirror",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   text = [
     whenever(

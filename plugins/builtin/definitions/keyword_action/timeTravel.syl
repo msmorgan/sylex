@@ -20,6 +20,6 @@ action timeTravel {
       doForEach(
         them,
         chooseOne(
-          putCounters(1, printedKind(timeCounter), it),
+          putCounters(lit(1), printedKind(timeCounter), it),
           removeCounters(oneThrough(1), printedKind(timeCounter), it)))])
 }

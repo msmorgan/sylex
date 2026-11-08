@@ -1,6 +1,6 @@
 card {
   name = "Space-Time Anomaly",
-  cost = [2, white, blue],
+  cost = [generic(2), pip(white), pip(blue)],
   types = [sorcery],
   text = [spell(instruct(target(isPlayer), mill(lifeTotalOf(you))))]
 }

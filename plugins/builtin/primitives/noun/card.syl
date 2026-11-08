@@ -1,4 +1,4 @@
 # "card": the Card head noun.
-primitive card: NounWord {
+primitive card: NounWord = Card {
   spelling = "card"
 }

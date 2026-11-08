@@ -1,1 +1,1 @@
-primitive count(amount: Amount): FlipScope
+primitive count(amount: Amount): FlipScope = Count

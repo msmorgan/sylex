@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.isToken`.
-primitive isToken: Predicate {
+primitive isToken: Predicate = IsToken {
   spelling = "token"
 }

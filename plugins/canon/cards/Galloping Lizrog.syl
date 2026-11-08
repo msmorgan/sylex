@@ -1,6 +1,6 @@
 card {
   name = "Galloping Lizrog",
-  cost = [3, green, blue],
+  cost = [generic(3), pip(green), pip(blue)],
   types = [creature],
   subtypes = [frog, lizard],
   text = [
@@ -12,7 +12,7 @@ card {
           anyNumber,
           printedKind(p1p1Counter),
           among(allOf(and([isCreature, youControl])))),
-        putCounters(times(2, thatMuch), printedKind(p1p1Counter), thisCreature)))],
-  power = 3,
-  toughness = 3
+        putCounters(times(lit(2), thatMuch), printedKind(p1p1Counter), thisCreature)))],
+  power = lit(3),
+  toughness = lit(3)
 }

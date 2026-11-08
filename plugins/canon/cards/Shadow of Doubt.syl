@@ -4,6 +4,7 @@ card {
   types = [instant],
   text = [
     spell(
-      sequentially(
-        [establishThroughout(cant(actor(bare(isPlayer)), search(libraries)), thisTurn), draw(1)]))]
+      sequentially([
+          establishThroughout(cant(actor(bare(isPlayer)), search(libraries)), thisTurn),
+          draw(lit(1))]))]
 }

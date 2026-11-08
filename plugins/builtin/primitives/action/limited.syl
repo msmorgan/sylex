@@ -1,2 +1,2 @@
 # Apply a usage limit to the action.
-primitive limited(action: Action, limit: UsageLimit): Action
+primitive limited(action: Action, limit: UsageLimit): Action = Limited

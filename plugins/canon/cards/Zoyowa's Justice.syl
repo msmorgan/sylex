@@ -1,12 +1,12 @@
 card {
   name = "Zoyowa's Justice",
-  cost = [1, red],
+  cost = [generic(1), pip(red)],
   types = [instant],
   text = [
     spell(
       sequentially([
           instruct(
-            ownerOf(target(and([or([isArtifact, isCreature]), hasManaValue(atLeast, 1)]))),
+            ownerOf(target(and([or([isArtifact, isCreature]), hasManaValue(atLeast, lit(1))]))),
             shuffleInto(it)),
           instruct(that(player), discover(statOf(stat(manaValue), it)))]))]
 }

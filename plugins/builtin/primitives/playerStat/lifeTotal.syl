@@ -1,0 +1,3 @@
+primitive lifeTotal: PlayerStat = LifeTotal {
+  spelling = "life total"
+}

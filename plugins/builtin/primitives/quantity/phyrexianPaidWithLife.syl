@@ -1,1 +1,1 @@
-primitive phyrexianPaidWithLife: LinkedFacet
+primitive phyrexianPaidWithLife: LinkedFacet = PhyrexianPaidWithLife

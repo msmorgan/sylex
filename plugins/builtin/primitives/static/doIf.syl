@@ -3,6 +3,6 @@
 # artifacts, draw two cards instead" [CR#614.1a,614.15]. A replacement that already has a
 # condition keeps it inside, and a caller's replacement stays its caller's.
 # [CR#614.1a,614.15]
-primitive doIf(condition: Condition, body: Replacement): Replacement = .onlyIf {
+primitive doIf(condition: Condition, body: Replacement): Replacement = OnlyIf {
   spelling = "If <condition>, <body> instead"
 }

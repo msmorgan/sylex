@@ -1,6 +1,6 @@
 card {
   name = "Drach'Nyen",
-  cost = [4, black, red],
+  cost = [generic(4), pip(black), pip(red)],
   supertypes = [legendary],
   types = [artifact],
   subtypes = [equipment],
@@ -9,7 +9,7 @@ card {
     static(
       conjunction([
           abilityGrant(equipped(creature), menace),
-          getsPt(equipped(creature), up(letter(x)), up(0)),
+          getsPt(equipped(creature), up(letter(x)), up(lit(0))),
           letterDefinition(x, powerOf(the(in(exiledWith(thisEquipment)))))])),
-    equip(mana([2]))]
+    equip(mana([generic(2)]))]
 }

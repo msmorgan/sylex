@@ -1,9 +1,9 @@
 card {
   name = "Typhoid Rats",
-  cost = [black],
+  cost = [pip(black)],
   types = [creature],
   subtypes = [rat],
   text = [deathtouch],
-  power = 1,
-  toughness = 1
+  power = lit(1),
+  toughness = lit(1)
 }

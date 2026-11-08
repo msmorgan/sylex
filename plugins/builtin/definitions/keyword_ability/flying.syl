@@ -9,5 +9,8 @@ ability flying {
         any,
         block(thisCreature),
         except = byObjects(
-          bare(and([isCreature, andOr([hasKeyword(flying), hasKeyword(reach)])])))))]
+          bare(
+            and([
+                isCreature,
+                andOr([hasKeyword(theKeyword(flying)), hasKeyword(theKeyword(reach))])])))))]
 }

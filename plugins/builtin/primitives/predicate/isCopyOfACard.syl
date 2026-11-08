@@ -1,4 +1,4 @@
 # Authoring primitive for `Predicate.isCopyOfACard`.
-primitive isCopyOfACard: Predicate {
+primitive isCopyOfACard: Predicate = IsCopyOfACard {
   spelling = "copy of a card"
 }

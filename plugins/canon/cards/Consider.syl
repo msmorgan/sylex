@@ -1,6 +1,6 @@
 card {
   name = "Consider",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [instant],
-  text = [spell(sequentially([surveil(1), draw(1)]))]
+  text = [spell(sequentially([surveil(lit(1)), draw(lit(1))]))]
 }

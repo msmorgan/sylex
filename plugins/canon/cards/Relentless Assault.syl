@@ -1,10 +1,10 @@
 card {
   name = "Relentless Assault",
-  cost = [2, red, red],
+  cost = [generic(2), pip(red), pip(red)],
   types = [sorcery],
   text = [
     spell(
       sequentially([
           untap(allOf(and([isCreature, did(actor(which), attack, within(soFarThisTurn))]))),
-          additionalPhase(combat, mainPhase, 1, mainPhase)]))]
+          additionalPhase(combat, mainPhase, lit(1), mainPhase)]))]
 }

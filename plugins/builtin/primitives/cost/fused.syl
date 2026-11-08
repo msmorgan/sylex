@@ -1,5 +1,5 @@
 # "both halves": a fused split spell [CR#702.102a].
 # [CR#702.102a]
-primitive fused: PlayPayment {
+primitive fused: PlayPayment = Fused {
   spelling = "both halves"
 }

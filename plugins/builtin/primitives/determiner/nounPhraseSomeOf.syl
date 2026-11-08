@@ -2,4 +2,4 @@
 primitive nounPhraseSomeOf(
   count: SliceCount,
   description: Option(Predicate),
-  group: NounPhrase): NounPhrase = .someOf
+  group: NounPhrase): NounPhrase = SomeOf

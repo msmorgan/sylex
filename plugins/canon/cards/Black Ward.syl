@@ -1,6 +1,6 @@
 card {
   name = "Black Ward",
-  cost = [white],
+  cost = [pip(white)],
   types = [enchantment],
   subtypes = [aura],
   text = [

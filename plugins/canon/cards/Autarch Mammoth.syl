@@ -1,6 +1,6 @@
 card {
   name = "Autarch Mammoth",
-  cost = [4, green, green],
+  cost = [generic(4), pip(green), pip(green)],
   types = [creature],
   subtypes = [elephant, mount],
   text = [
@@ -10,8 +10,8 @@ card {
         joinedHeadWhile(
           does(actor(thisCreature), attack),
           whileTrue(is(thisCreature, hasDesignation(saddled))))],
-      action = create(1, written(creatureToken(3, 3, [green], [elephant])))),
-    saddle(5)],
-  power = 5,
-  toughness = 5
+      action = create(lit(1), written(creatureToken(3, 3, [green], [elephant])))),
+    saddle(lit(5))],
+  power = lit(5),
+  toughness = lit(5)
 }

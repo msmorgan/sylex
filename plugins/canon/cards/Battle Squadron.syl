@@ -1,6 +1,6 @@
 card {
   name = "Battle Squadron",
-  cost = [3, red, red],
+  cost = [generic(3), pip(red), pip(red)],
   types = [creature],
   subtypes = [goblin],
   text = [flying, static(definesPt(thisCreature, countOf(and([isCreature, youControl]))))]

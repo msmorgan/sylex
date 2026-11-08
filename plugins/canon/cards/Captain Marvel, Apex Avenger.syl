@@ -1,6 +1,6 @@
 card {
   name = "Captain Marvel, Apex Avenger",
-  cost = [5, red, white],
+  cost = [generic(5), pip(red), pip(white)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, kree, hero],
@@ -12,6 +12,6 @@ card {
       does(by(you), putCounters(anyAmount, anyKind, a(and([isCreature, isOther])))),
       if = is(it, not(hasSubtype(kree))),
       action = may(putCounters(thatMuch, thoseCounters, this)))],
-  power = 4,
-  toughness = 4
+  power = lit(4),
+  toughness = lit(4)
 }

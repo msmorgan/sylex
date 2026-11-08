@@ -3,9 +3,9 @@ card {
   name = "Aether Hub",
   types = [land],
   text = [
-    when(does(actor(thisLand), enter), putCounters(1, printedKind(energy), you)),
-    activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
+    when(does(actor(thisLand), enter), putCounters(lit(1), printedKind(energy), you)),
+    activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
     activated(
       compound([tapSymbol, perform(removeCounters(exactly(1), printedKind(energy), you))]),
-      addMana(1, ofAnyColor(sameColor)))]
+      addMana(lit(1), ofAnyColor(sameColor)))]
 }

@@ -8,4 +8,4 @@ primitive replace(
   replacement: Replacement,
   timing: Option(Timing) = none,
   use: ReplUse = repeatedly,
-  limit: Option(UsageLimit) = none): StaticSpec
+  limit: Option(UsageLimit) = none): StaticSpec = Replace

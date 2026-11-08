@@ -1,6 +1,6 @@
 card {
   name = "Clarion Conqueror",
-  cost = [2, white],
+  cost = [generic(2), pip(white)],
   types = [creature],
   subtypes = [dragon],
   text = [
@@ -13,6 +13,6 @@ card {
             and([
                 abilityHead(anyActivated),
                 abilityOf(allOf(or([isArtifact, isCreature, isPlaneswalker])))])))))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

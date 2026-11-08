@@ -1,2 +1,2 @@
 # A token copy of the source with the specified copy exceptions.
-primitive copyOf(source: NounPhrase, exceptions: List(CopyExcept) = []): TokenSpec
+primitive copyOf(source: NounPhrase, exceptions: List(CopyExcept) = []): TokenSpec = CopyOf

@@ -1,2 +1,2 @@
 # "<event> causes …"
-primitive byEvent(event: GameEvent): Causing = .event
+primitive byEvent(event: GameEvent): Causing = Event

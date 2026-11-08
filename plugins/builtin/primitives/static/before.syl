@@ -3,4 +3,4 @@
 # [CR#614.1c,614.12a]. The action may move other objects too, as Sutured Ghoul's "As this creature
 # enters, exile any number of creature cards from your graveyard" does [CR#614.13].
 # [CR#614.1c,614.12a,614.13]
-primitive before(action: Action, body: Option(Replacement) = none): Replacement
+primitive before(action: Action, body: Option(Replacement) = none): Replacement = Before

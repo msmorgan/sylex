@@ -1,0 +1,3 @@
+primitive command: Zone = Command {
+  spelling = "command"
+}

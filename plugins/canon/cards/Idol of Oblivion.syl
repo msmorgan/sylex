@@ -1,16 +1,16 @@
 card {
   name = "Idol of Oblivion",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   text = [
     activatedOnlyIf(
       tapSymbol,
-      draw(1),
+      draw(lit(1)),
       did(
         actor(you),
         createObject(anyAmount, token(copyOf(a(isToken)), [])),
         within(soFarThisTurn))),
     activated(
-      compound([mana([8]), tapSymbol, perform(sacrifice(thisArtifact))]),
-      create(1, written(creatureToken(10, 10, [], [eldrazi]))))]
+      compound([mana([generic(8)]), tapSymbol, perform(sacrifice(thisArtifact))]),
+      create(lit(1), written(creatureToken(10, 10, [], [eldrazi]))))]
 }

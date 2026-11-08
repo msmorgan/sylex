@@ -1,6 +1,6 @@
 card {
   name = "Land Tax",
-  cost = [white],
+  cost = [pip(white)],
   types = [enchantment],
   text = [
     at(

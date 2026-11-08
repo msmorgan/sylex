@@ -1,0 +1,1 @@
+primitive prototype(inner: CardFace, alternative: PrototypeFrame): Card = Prototype

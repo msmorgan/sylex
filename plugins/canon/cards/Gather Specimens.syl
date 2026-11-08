@@ -1,6 +1,6 @@
 card {
   name = "Gather Specimens",
-  cost = [3, blue, blue, blue],
+  cost = [generic(3), pip(blue), pip(blue), pip(blue)],
   types = [instant],
   text = [
     spell(

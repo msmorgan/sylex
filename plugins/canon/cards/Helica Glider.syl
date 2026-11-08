@@ -1,13 +1,13 @@
 card {
   name = "Helica Glider",
-  cost = [2, white],
+  cost = [generic(2), pip(white)],
   types = [creature],
   subtypes = [nightmare, squirrel],
   text = [
     static(
       enters(
         thisCreature,
-        [withCounters(1, chosenKind([flyingCounter, firstStrikeCounter]), fresh)]))],
-  power = 2,
-  toughness = 2
+        [withCounters(lit(1), chosenKind([flyingCounter, firstStrikeCounter]), fresh)]))],
+  power = lit(2),
+  toughness = lit(2)
 }

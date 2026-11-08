@@ -1,0 +1,3 @@
+primitive x: Letter = X {
+  spelling = "X"
+}

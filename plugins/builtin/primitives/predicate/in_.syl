@@ -1,4 +1,4 @@
 # "in <loc>", as "in your graveyard" or "exiled with this artifact".
-primitive in(loc: Location): Predicate {
+primitive in(loc: Location): Predicate = In {
   spelling = "in <loc>"
 }

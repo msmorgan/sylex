@@ -1,6 +1,6 @@
 card {
   name = "Pyroclasm",
-  cost = [1, red],
+  cost = [generic(1), pip(red)],
   types = [sorcery],
-  text = [spell(instruct(this, dealDamage(2, each(isCreature))))]
+  text = [spell(instruct(this, dealDamage(lit(2), each(isCreature))))]
 }

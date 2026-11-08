@@ -1,4 +1,4 @@
 # "source": the object dealing the damage under discussion.
-primitive isSource: Predicate {
+primitive isSource: Predicate = IsSource {
   spelling = "source"
 }

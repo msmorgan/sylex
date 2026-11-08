@@ -1,9 +1,9 @@
 card {
   name = "Scrapbasket",
-  cost = [4],
+  cost = [generic(4)],
   types = [artifact, creature],
   subtypes = [scarecrow],
-  text = [activated(mana([1]), becomeColor(thisCreature, every, untilEndOfTurn))],
-  power = 3,
-  toughness = 2
+  text = [activated(mana([generic(1)]), becomeColor(thisCreature, every, untilEndOfTurn))],
+  power = lit(3),
+  toughness = lit(2)
 }

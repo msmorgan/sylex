@@ -2,5 +2,5 @@
 # this one." [CR#702.174g]
 template giftAnExtraTurn: Ability {
   spelling = "gift an extra turn",
-  body = gift(extraTurn(1))
+  body = gift(extraTurn(lit(1)))
 }

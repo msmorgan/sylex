@@ -1,10 +1,10 @@
 card {
   name = "Aegis of Honor",
-  cost = [white],
+  cost = [pip(white)],
   types = [enchantment],
   text = [
     activated(
-      mana([1]),
+      mana([generic(1)]),
       establishThroughout(
         replace(
           would(actor(a(isInstantOrSorcery)), dealDamage(recipient = you)),

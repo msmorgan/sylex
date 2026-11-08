@@ -1,6 +1,8 @@
 card {
   name = "Electrolyze",
-  cost = [1, blue, red],
+  cost = [generic(1), pip(blue), pip(red)],
   types = [instant],
-  text = [spell(sequentially([dealDivided(this, 2, targets(oneThrough(2), isAnyTarget)), draw(1)]))]
+  text = [
+    spell(
+      sequentially([dealDivided(this, lit(2), targets(oneThrough(2), isAnyTarget)), draw(lit(1))]))]
 }

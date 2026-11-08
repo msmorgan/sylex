@@ -1,6 +1,6 @@
 card {
   name = "Shelkin Brownie",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [creature],
   subtypes = [ouphe],
   text = [
@@ -9,6 +9,6 @@ card {
       establishThroughout(
         abilityLoss(target(isCreature), [abilities(anyIn({word = bandsWithOther}))]),
         untilEndOfTurn))],
-  power = 1,
-  toughness = 1
+  power = lit(1),
+  toughness = lit(1)
 }

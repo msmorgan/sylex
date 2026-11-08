@@ -1,6 +1,9 @@
 # "if <player> could begin to cast <subject> by putting it onto the stack from <from>"
 # [CR#702.62a,116.2f]
 # [CR#702.62a,116.2f]
-primitive couldBeginToCast(player: NounPhrase, subject: NounPhrase, from: Location): Condition {
+primitive couldBeginToCast(
+  player: NounPhrase,
+  subject: NounPhrase,
+  from: Location): Condition = CouldBeginToCast {
   spelling = "if <player> could begin to cast <subject> by putting it onto the stack from <from>"
 }

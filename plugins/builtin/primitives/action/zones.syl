@@ -1,1 +1,1 @@
-primitive zones(left: Location, right: Location): Exchanged
+primitive zones(left: Location, right: Location): Exchanged = Zones

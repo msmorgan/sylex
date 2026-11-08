@@ -9,9 +9,9 @@ ability offspring(cost: Cost) {
     when(
       does(actor(thisPermanent), enter),
       create(
-        1,
+        lit(1),
         copyOf(
           thisPermanent,
-          [characteristicEdits([stat(power, set(1)), stat(toughness, set(1))])])),
+          [characteristicEdits([stat(power, set(lit(1))), stat(toughness, set(lit(1)))])])),
       if = keywordCostPaid(offspring, thisPermanent))]
 }

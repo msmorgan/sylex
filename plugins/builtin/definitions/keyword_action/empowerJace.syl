@@ -15,16 +15,16 @@ action empowerJace(amount: Amount) {
       doIf(
         not(exists(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
         create(
-          1,
+          lit(1),
           written({
               characteristics = {
                 colors = [blue],
                 types = [planeswalker],
                 subtypes = [jace],
                 text = [
-                  activated(loyaltySymbol(down(1)), surveil(1)),
-                  activated(loyaltySymbol(down(3)), draw(1))],
-                loyalty = 0}}))),
+                  activated(loyaltySymbol(down(lit(1))), surveil(lit(1))),
+                  activated(loyaltySymbol(down(lit(3))), draw(lit(1)))],
+                loyalty = lit(0)}}))),
       choose(a(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
       putCounters($amount, printedKind(loyaltyCounter), it)])
 }

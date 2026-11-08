@@ -1,2 +1,2 @@
 # The latest delayed triggered ability created by delay [CR#116.2c,603.7].
-primitive delayedTrigger: NounPhrase
+primitive delayedTrigger: NounPhrase = DelayedTrigger

@@ -1,19 +1,19 @@
 card {
   name = "Blood Spatter Analysis",
-  cost = [black, red],
+  cost = [pip(black), pip(red)],
   types = [enchantment],
   text = [
     when(
       does(actor(thisEnchantment), enter),
-      instruct(thisEnchantment, dealDamage(3, target(and([isCreature, anOpponentControls]))))),
+      instruct(thisEnchantment, dealDamage(lit(3), target(and([isCreature, anOpponentControls]))))),
     whenever(
       does(actor(counted(orMore(1), isCreature)), die),
       sequentially([
-          mill(1),
-          putCounters(1, printedKind(bloodstainCounter), thisEnchantment),
+          mill(lit(1)),
+          putCounters(lit(1), printedKind(bloodstainCounter), thisEnchantment),
           triggerReflexively(
             doOnlyIf(
               sacrifice(thisEnchantment),
-              compareAmt(countersOn(bloodstainCounter, thisEnchantment), atLeast, 5)),
+              compareAmt(countersOn(bloodstainCounter, thisEnchantment), atLeast, lit(5))),
             returnToHand(target(and([isCreature, isCard, in(yourGraveyard)])), yourGraveyard))]))]
 }

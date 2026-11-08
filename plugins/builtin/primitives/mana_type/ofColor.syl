@@ -1,4 +1,4 @@
 # "mana of <color>"
-primitive ofColor(color: ColorTerm): ManaTypeTerm {
+primitive ofColor(color: ColorTerm): ManaTypeTerm = OfColor {
   spelling = "mana of <color>"
 }

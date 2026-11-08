@@ -1,11 +1,11 @@
 card {
   name = "Conqueror's Pledge",
-  cost = [2, white, white, white],
+  cost = [generic(2), pip(white), pip(white), pip(white)],
   types = [sorcery],
   text = [
-    kicker(mana([6])),
+    kicker(mana([generic(6)])),
     spell(
       replace(
-        create(6, written(creatureToken(1, 1, [white], [kor, soldier]))),
-        doIf(keywordCostPaid(kicker, this), instead(create(12, asThose)))))]
+        create(lit(6), written(creatureToken(1, 1, [white], [kor, soldier]))),
+        doIf(keywordCostPaid(kicker, this), instead(create(lit(12), asThose)))))]
 }

@@ -1,15 +1,15 @@
 card {
   name = "Ward of Piety",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [enchantment],
   subtypes = [aura],
   text = [
     enchant(isCreature),
     activated(
-      mana([1, white]),
+      mana([generic(1), pip(white)]),
       establishThroughout(
         replace(
           would(any, dealDamage(recipient = enchanted(creature))),
-          instead(redirectDamage(theNext(1), target(isAnyTarget)))),
+          instead(redirectDamage(theNext(lit(1)), target(isAnyTarget)))),
         thisTurn))]
 }

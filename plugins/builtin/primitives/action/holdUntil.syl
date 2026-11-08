@@ -1,4 +1,4 @@
 # Hold the action until the specified event.
-primitive holdUntil(action: Action, event: GameEvent): Action {
+primitive holdUntil(action: Action, event: GameEvent): Action = HoldUntil {
   spelling = "<action> until <event>"
 }

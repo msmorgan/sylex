@@ -1,13 +1,13 @@
 card {
   name = "Oblivion Stone",
-  cost = [3],
+  cost = [generic(3)],
   types = [artifact],
   text = [
     activated(
-      compound([mana([4]), tapSymbol]),
-      putCounters(1, printedKind(fateCounter), target(isPermanent))),
+      compound([mana([generic(4)]), tapSymbol]),
+      putCounters(lit(1), printedKind(fateCounter), target(isPermanent))),
     activated(
-      compound([mana([5]), tapSymbol, perform(sacrifice(thisArtifact))]),
+      compound([mana([generic(5)]), tapSymbol, perform(sacrifice(thisArtifact))]),
       sequentially([
           destroy(each(and([non(isLand), isPermanent, not(hasCounter(fateCounter))]))),
           removeAllCounters(printedKind(fateCounter), allOf(isPermanent))]))]

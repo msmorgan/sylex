@@ -2,4 +2,4 @@
 primitive copyChange(
   subject: NounPhrase,
   source: NounPhrase,
-  exceptions: List(CopyExcept) = []): StaticSpec
+  exceptions: List(CopyExcept) = []): StaticSpec = CopyChange

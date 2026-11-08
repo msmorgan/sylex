@@ -1,6 +1,6 @@
 card {
   name = "Orchard Elemental",
-  cost = [5, green],
+  cost = [generic(5), pip(green)],
   types = [creature],
   subtypes = [elemental],
   text = [
@@ -9,8 +9,8 @@ card {
         does(actor(thisCreature), enter),
         sequentially([
             instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["sprout", "harvest"]))),
-            putCounters(times(2, votesFor("sprout")), printedKind(p1p1Counter), thisCreature),
-            gainLife(times(3, votesFor("harvest")))])))],
-  power = 2,
-  toughness = 2
+            putCounters(times(lit(2), votesFor("sprout")), printedKind(p1p1Counter), thisCreature),
+            gainLife(times(lit(3), votesFor("harvest")))])))],
+  power = lit(2),
+  toughness = lit(2)
 }

@@ -1,6 +1,6 @@
 card {
   name = "Rakshasa Vizier",
-  cost = [2, black, green, blue],
+  cost = [generic(2), pip(black), pip(green), pip(blue)],
   types = [creature],
   subtypes = [demon],
   text = [
@@ -9,6 +9,6 @@ card {
         any,
         putInto(counted(orMore(1), cardIn(yourGraveyard)), exileZone, from = yourGraveyard)),
       putCounters(groupSize, printedKind(p1p1Counter), thisCreature))],
-  power = 4,
-  toughness = 4
+  power = lit(4),
+  toughness = lit(4)
 }

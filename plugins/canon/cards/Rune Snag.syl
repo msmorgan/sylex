@@ -1,6 +1,6 @@
 card {
   name = "Rune Snag",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [instant],
   text = [
     spell(
@@ -9,7 +9,7 @@ card {
         doUnless(
           instruct(you, counter(it)),
           compound([
-              mana([2]),
+              mana([generic(2)]),
               scaledGenericMana(
-                forEach(2, and([named(printedName("Rune Snag")), in(graveyard)])))]))))]
+                forEach(lit(2), and([named(printedName("Rune Snag")), in(graveyard)])))]))))]
 }

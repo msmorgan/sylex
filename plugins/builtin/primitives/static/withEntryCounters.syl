@@ -2,4 +2,4 @@
 primitive withEntryCounters(
   amount: Amount,
   kind: CounterKind,
-  mark: EntryCounterMark): CopyExcept = .entersWithCounters
+  mark: EntryCounterMark): CopyExcept = EntersWithCounters

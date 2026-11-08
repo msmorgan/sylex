@@ -1,6 +1,6 @@
 card {
   name = "Foriysian Brigade",
-  cost = [3, white],
+  cost = [generic(3), pip(white)],
   types = [creature],
   subtypes = [human, soldier],
   text = [
@@ -9,6 +9,6 @@ card {
         actor(thisCreature),
         block(counted(additional(exactly(1)), isCreature)),
         timing = eachCombat))],
-  power = 2,
-  toughness = 4
+  power = lit(2),
+  toughness = lit(4)
 }

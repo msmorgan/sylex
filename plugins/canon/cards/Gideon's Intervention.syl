@@ -1,6 +1,6 @@
 card {
   name = "Gideon's Intervention",
-  cost = [2, white, white],
+  cost = [generic(2), pip(white), pip(white)],
   types = [enchantment],
   text = [
     static(entersChoosing(thisEnchantment, cardName)),

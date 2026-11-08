@@ -1,4 +1,7 @@
 # Compare two amounts.
-primitive compareAmt(subject: Amount, comparator: Comparator, bound: Amount): Condition {
+primitive compareAmt(
+  subject: Amount,
+  comparator: Comparator,
+  bound: Amount): Condition = CompareAmount {
   spelling = "<subject> is <comparator> <bound>"
 }

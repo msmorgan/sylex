@@ -1,2 +1,2 @@
 # A cost given as a list of mana symbols.
-primitive mana(cost: List(ManaSymbol)): Cost
+primitive mana(cost: List(ManaSymbol)): Cost = Mana

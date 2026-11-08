@@ -1,15 +1,15 @@
 card {
   name = "Unblinking Observer",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [creature],
   subtypes = [homunculus],
   text = [
     activated(
       tapSymbol,
       addMana(
-        1,
-        manaOf([[of(blue)]]),
+        lit(1),
+        manaOf([[colored(blue)]]),
         [spendOnly([toPay(ofKeyword(disturb)), toCast(isInstantOrSorcery)])]))],
-  power = 2,
-  toughness = 1
+  power = lit(2),
+  toughness = lit(1)
 }

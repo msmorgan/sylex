@@ -1,8 +1,8 @@
 # "a P/T <colors> <subtypes> artifact creature token [with <abilities>]":
 # `creatureToken` with the artifact card type beside creature.
 template artifactCreatureToken(
-  powerValue: Nat,
-  toughnessValue: Nat,
+  powerValue: Int,
+  toughnessValue: Int,
   colors: List(Color),
   subtypes: List(Subtype),
   abilities: List(Ability) = []): CharacteristicBundle {
@@ -14,6 +14,6 @@ template artifactCreatureToken(
       types = [artifact, creature],
       subtypes = $subtypes,
       text = $abilities,
-      power = lit(ofNat($powerValue)),
-      toughness = lit(ofNat($toughnessValue))}}
+      power = lit($powerValue),
+      toughness = lit($toughnessValue)}}
 }

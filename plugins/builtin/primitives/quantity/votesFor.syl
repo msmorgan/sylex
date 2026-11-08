@@ -1,4 +1,4 @@
 # The number of votes for the named choice.
-primitive votesFor(label: String): Amount {
+primitive votesFor(label: String): Amount = VotesFor {
   spelling = "the number of votes for <label>"
 }

@@ -1,4 +1,4 @@
 # "all of that damage"
-primitive allDamage: PreventCut = .all {
+primitive allDamage: PreventCut = All {
   spelling = "all of that damage"
 }

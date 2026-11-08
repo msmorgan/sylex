@@ -1,13 +1,13 @@
 card {
   name = "Ghoulflesh",
-  cost = [black],
+  cost = [pip(black)],
   types = [enchantment],
   subtypes = [aura],
   text = [
     enchant(isCreature),
     static(
       conjunction([
-          getsPt(enchanted(creature), down(1), down(1)),
+          getsPt(enchanted(creature), down(lit(1)), down(lit(1))),
           qualityChange(
             it,
             adds,

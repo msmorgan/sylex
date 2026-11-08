@@ -1,6 +1,6 @@
 card {
   name = "Menacing Ogre",
-  cost = [3, red, red],
+  cost = [generic(3), pip(red), pip(red)],
   types = [creature],
   subtypes = [ogre],
   text = [
@@ -14,7 +14,7 @@ card {
           instruct(each(and([isPlayer, choseExtreme(max)])), loseLife(thatMuch)),
           doIf(
             is(you, choseExtreme(max)),
-            putCounters(2, printedKind(p1p1Counter), thisCreature))]))],
-  power = 3,
-  toughness = 3
+            putCounters(lit(2), printedKind(p1p1Counter), thisCreature))]))],
+  power = lit(3),
+  toughness = lit(3)
 }

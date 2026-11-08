@@ -1,6 +1,6 @@
 card {
   name = "Harried Spearguard",
-  cost = [red],
+  cost = [pip(red)],
   types = [creature],
   subtypes = [human, soldier],
   text = [
@@ -8,15 +8,15 @@ card {
     when(
       does(actor(thisCreature), die),
       create(
-        1,
+        lit(1),
         written({
             characteristics = {
               colors = [black],
               types = [creature],
               subtypes = [rat],
               text = [static(cant(actor(thisToken), block))],
-              power = 1,
-              toughness = 1}})))],
-  power = 1,
-  toughness = 1
+              power = lit(1),
+              toughness = lit(1)}})))],
+  power = lit(1),
+  toughness = lit(1)
 }

@@ -1,6 +1,6 @@
 card {
   name = "Disembowel",
-  cost = [variable, black],
+  cost = [variable, pip(black)],
   types = [instant],
-  text = [spell(destroy(target(and([isCreature, hasManaValue(eq, letter(x))]))))]
+  text = [spell(destroy(target(and([isCreature, hasManaValue(equal, letter(x))]))))]
 }

@@ -1,11 +1,11 @@
 card {
   name = "Steam Augury",
-  cost = [2, blue, red],
+  cost = [generic(2), pip(blue), pip(red)],
   types = [instant],
   text = [
     spell(
       sequentially([
-          reveal(topSlice(5)),
+          reveal(topSlice(lit(5))),
           separateIntoPiles(them, 2),
           instruct(anOpponent, choose(onePile)),
           putInto(that(pile), hand),

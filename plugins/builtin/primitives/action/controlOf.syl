@@ -1,1 +1,1 @@
-primitive controlOf(left: NounPhrase, right: NounPhrase): Exchanged
+primitive controlOf(left: NounPhrase, right: NounPhrase): Exchanged = ControlOf

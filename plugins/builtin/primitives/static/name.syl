@@ -1,1 +1,1 @@
-primitive name(op: QualityOp, name: String): CharacteristicEdit
+primitive name(op: QualityOp, name: String): CharacteristicEdit = Name

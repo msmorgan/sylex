@@ -4,7 +4,7 @@
 # [CR#707.10]
 template copyOnStack(
   subject: NounPhrase,
-  times: Amount = 1,
+  times: Amount = lit(1),
   exceptions: List(CopyExcept) = []): Action {
   # TODO(spelling): Format and coordinate the exceptions list entries, including the empty case.
   body = copy(fromStack, $subject, $times, $exceptions)

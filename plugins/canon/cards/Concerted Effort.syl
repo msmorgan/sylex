@@ -1,6 +1,6 @@
 card {
   name = "Concerted Effort",
-  cost = [2, white, white],
+  cost = [generic(2), pip(white), pip(white)],
   types = [enchantment],
   text = [
     alsoForKeywords(
@@ -15,12 +15,12 @@ card {
             untilEndOfTurn),
           exists(and([isCreature, youControl, hasKeyword(thatKeyword)])))),
       [
-        flying,
-        fear,
-        firstStrike,
-        doubleStrike,
+        theKeyword(flying),
+        theKeyword(fear),
+        theKeyword(firstStrike),
+        theKeyword(doubleStrike),
         anyIn({word = landwalk}),
         anyIn({word = protection}),
-        trample,
-        vigilance])]
+        theKeyword(trample),
+        theKeyword(vigilance)])]
 }

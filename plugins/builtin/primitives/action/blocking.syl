@@ -1,1 +1,1 @@
-primitive blocking(move: AttachMove, attacker: NounPhrase): CombatUpdate
+primitive blocking(move: AttachMove, attacker: NounPhrase): CombatUpdate = Blocking

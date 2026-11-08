@@ -1,3 +1,3 @@
-primitive combat: DamageKind {
+primitive combat: DamageKind = Combat {
   spelling = "combat"
 }

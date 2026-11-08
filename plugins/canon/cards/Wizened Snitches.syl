@@ -1,9 +1,9 @@
 card {
   name = "Wizened Snitches",
-  cost = [3, blue],
+  cost = [generic(3), pip(blue)],
   types = [creature],
   subtypes = [faerie, rogue],
   text = [flying, static(visibility(reveal, bare(isPlayer), topOfLibrary))],
-  power = 1,
-  toughness = 3
+  power = lit(1),
+  toughness = lit(3)
 }

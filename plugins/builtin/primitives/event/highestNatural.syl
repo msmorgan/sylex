@@ -1,4 +1,4 @@
 # "the highest natural result"
-primitive highestNatural: RollWatch {
+primitive highestNatural: RollWatch = HighestNatural {
   spelling = "the highest natural result"
 }

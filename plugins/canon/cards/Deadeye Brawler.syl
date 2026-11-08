@@ -1,6 +1,6 @@
 card {
   name = "Deadeye Brawler",
-  cost = [2, blue, black],
+  cost = [generic(2), pip(blue), pip(black)],
   types = [creature],
   subtypes = [human, pirate],
   text = [
@@ -9,7 +9,7 @@ card {
     whenever(
       does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
       if = is(you, hasDesignation(citysBlessing)),
-      action = draw(1))],
-  power = 2,
-  toughness = 4
+      action = draw(lit(1)))],
+  power = lit(2),
+  toughness = lit(4)
 }

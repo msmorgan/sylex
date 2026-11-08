@@ -1,2 +1,2 @@
 # The timing constraint does not apply.
-primitive not(timing: Timing): Timing
+primitive not(timing: Timing): Timing = Not

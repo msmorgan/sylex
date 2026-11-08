@@ -1,6 +1,6 @@
 card {
   name = "Final Fortune",
-  cost = [red, red],
+  cost = [pip(red), pip(red)],
   types = [instant],
-  text = [spell(sequentially([extraTurn(1), delay(beginningOfThatTurns(endStep), loseGame)]))]
+  text = [spell(sequentially([extraTurn(lit(1)), delay(beginningOfThatTurns(endStep), loseGame)]))]
 }

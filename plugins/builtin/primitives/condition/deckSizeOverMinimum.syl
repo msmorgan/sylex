@@ -1,4 +1,4 @@
 # "at least <extra> cards more than the minimum deck size"
-primitive deckSizeOverMinimum(extra: Nat): DeckCondition {
+primitive deckSizeOverMinimum(extra: Nat): DeckCondition = DeckSizeOverMinimum {
   spelling = "at least <extra> cards more than the minimum deck size"
 }

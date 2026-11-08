@@ -5,4 +5,4 @@ primitive whenSpentOn(
   mode: SpentMode,
   only: Bool,
   spell: NounPhrase,
-  says: Action): ManaRider = .onSpent
+  says: Action): ManaRider = OnSpent

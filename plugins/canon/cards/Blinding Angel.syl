@@ -1,13 +1,13 @@
 card {
   name = "Blinding Angel",
-  cost = [3, white, white],
+  cost = [generic(3), pip(white), pip(white)],
   types = [creature],
   subtypes = [angel],
   text = [
     flying,
     whenever(
       does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-      instruct(that(player), skipPart(combat, 1)))],
-  power = 2,
-  toughness = 4
+      instruct(that(player), skipPart(combat, lit(1))))],
+  power = lit(2),
+  toughness = lit(4)
 }

@@ -1,0 +1,3 @@
+primitive speed: PlayerStat = Speed {
+  spelling = "speed"
+}

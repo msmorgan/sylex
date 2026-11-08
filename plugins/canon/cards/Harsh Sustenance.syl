@@ -1,6 +1,6 @@
 card {
   name = "Harsh Sustenance",
-  cost = [1, white, black],
+  cost = [generic(1), pip(white), pip(black)],
   types = [instant],
   text = [
     spell(

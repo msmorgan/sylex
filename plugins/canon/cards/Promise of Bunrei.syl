@@ -1,9 +1,11 @@
 card {
   name = "Promise of Bunrei",
-  cost = [2, white],
+  cost = [generic(2), pip(white)],
   types = [enchantment],
   text = [
     when(
       does(actor(a(and([isCreature, youControl]))), die),
-      doIfDone(sacrifice(thisEnchantment), create(4, written(creatureToken(1, 1, [], [spirit])))))]
+      doIfDone(
+        sacrifice(thisEnchantment),
+        create(lit(4), written(creatureToken(1, 1, [], [spirit])))))]
 }

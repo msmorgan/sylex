@@ -1,6 +1,6 @@
 card {
   name = "Donal, Herald of Wings",
-  cost = [2, blue, blue],
+  cost = [generic(2), pip(blue), pip(blue)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, wizard],
@@ -8,14 +8,20 @@ card {
     whenever(
       does(
         actor(you),
-        cast(a(and([isCreature, isSpell, not(hasSupertype(legendary)), hasKeyword(flying)])))),
+        cast(
+          a(
+            and([
+                isCreature,
+                isSpell,
+                not(hasSupertype(legendary)),
+                hasKeyword(theKeyword(flying))])))),
       doOnlyOnceEachTurn(
         may(
           copyOnStack(
             it,
             exceptions = copyCharacteristics(
-              {subtypes = [spirit], power = 1, toughness = 1},
+              {subtypes = [spirit], power = lit(1), toughness = lit(1)},
               true)))))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

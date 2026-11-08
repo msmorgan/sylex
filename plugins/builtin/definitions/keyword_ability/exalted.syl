@@ -7,5 +7,5 @@ ability exalted {
   body = [
     whenever(
       does(actor(you), attackWith(counted(exactly(1), and([isCreature, youControl])))),
-      get(that(creature), up(1), up(1), untilEndOfTurn))]
+      get(that(creature), up(lit(1)), up(lit(1)), untilEndOfTurn))]
 }

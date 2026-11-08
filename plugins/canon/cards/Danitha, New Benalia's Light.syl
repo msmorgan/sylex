@@ -1,6 +1,6 @@
 card {
   name = "Danitha, New Benalia's Light",
-  cost = [1, green, white],
+  cost = [generic(1), pip(green), pip(white)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [human, knight],
@@ -15,6 +15,6 @@ card {
           counted(exactly(1), and([isSpell, or([hasSubtype(aura), hasSubtype(equipment)])])),
           from = yourGraveyard),
         timing = onEachOfYourTurns))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

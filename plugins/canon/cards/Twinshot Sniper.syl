@@ -1,15 +1,15 @@
 card {
   name = "Twinshot Sniper",
-  cost = [3, red],
+  cost = [generic(3), pip(red)],
   types = [artifact, creature],
   subtypes = [goblin, archer],
   text = [
     reach,
-    when(does(actor(thisCreature), enter), instruct(it, dealDamage(2, target(isAnyTarget)))),
+    when(does(actor(thisCreature), enter), instruct(it, dealDamage(lit(2), target(isAnyTarget)))),
     channel(
       activated(
-        compound([mana([1, red]), perform(discard(this))]),
-        instruct(it, dealDamage(2, target(isAnyTarget)))))],
-  power = 2,
-  toughness = 3
+        compound([mana([generic(1), pip(red)]), perform(discard(this))]),
+        instruct(it, dealDamage(lit(2), target(isAnyTarget)))))],
+  power = lit(2),
+  toughness = lit(3)
 }

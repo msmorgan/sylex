@@ -13,5 +13,5 @@ ability training {
                 orMore(1),
                 and([isCreature, isOther, hasPower(greater, powerOf(thisCreature))]))])),
         attack),
-      putCounters(1, printedKind(p1p1Counter), thisCreature))]
+      putCounters(lit(1), printedKind(p1p1Counter), thisCreature))]
 }

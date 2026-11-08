@@ -7,12 +7,12 @@
 # batch 4), so "them" and "the rest" read the cards looked at.
 card {
   name = "Flow State",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [sorcery],
   text = [
     spell(
       sequentially([
-          lookAt(topSlice(3)),
+          lookAt(topSlice(lit(3))),
           replace(
             sequentially([
                 putInto(someOf(exactly(1), them), hand),

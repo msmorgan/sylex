@@ -1,6 +1,6 @@
 card {
   name = "Serum Visions",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [sorcery],
-  text = [spell(sequentially([draw(1), scry(2)]))]
+  text = [spell(sequentially([draw(lit(1)), scry(lit(2))]))]
 }

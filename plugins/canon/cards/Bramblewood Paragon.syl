@@ -1,15 +1,15 @@
 card {
   name = "Bramblewood Paragon",
-  cost = [1, green],
+  cost = [generic(1), pip(green)],
   types = [creature],
   subtypes = [elf, warrior],
   text = [
     static(
       entersWithAdditionalCounters(
         each(and([isCreature, hasSubtype(warrior), youControl, isOther])),
-        1,
+        lit(1),
         p1p1Counter)),
     static(abilityGrant(each(and([isCreature, youControl, hasCounter(p1p1Counter)])), trample))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

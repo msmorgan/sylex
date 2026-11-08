@@ -1,0 +1,1 @@
+primitive ofKeyword(keyword: KeywordLabel): CostNamed = OfKeyword

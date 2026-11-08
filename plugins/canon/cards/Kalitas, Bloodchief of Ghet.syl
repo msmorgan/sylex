@@ -4,26 +4,26 @@
 # destroyed creature, read as the permanent it was.
 card {
   name = "Kalitas, Bloodchief of Ghet",
-  cost = [5, black, black],
+  cost = [generic(5), pip(black), pip(black)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [vampire, warrior],
   text = [
     lifelink,
     activated(
-      compound([mana([black, black, black]), tapSymbol]),
+      compound([mana([pip(black), pip(black), pip(black)]), tapSymbol]),
       sequentially([
           destroy(target(isCreature)),
           doIf(
             did(actor(that(creature)), die, thisWay),
             create(
-              1,
+              lit(1),
               written(
                 creatureTokenOf(
                   powerOf(that(creature)),
                   toughnessOf(that(creature)),
                   [black],
                   [vampire]))))]))],
-  power = 5,
-  toughness = 5
+  power = lit(5),
+  toughness = lit(5)
 }

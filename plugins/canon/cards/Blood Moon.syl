@@ -1,6 +1,6 @@
 card {
   name = "Blood Moon",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [enchantment],
   text = [
     static(

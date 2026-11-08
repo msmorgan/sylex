@@ -6,7 +6,7 @@
 # counters on it, it has flying") is missing until `syl-condition-first-static`.
 card {
   name = "Angelic Cub",
-  cost = [1, white],
+  cost = [generic(1), pip(white)],
   types = [creature],
   subtypes = [cat, angel],
   text = [
@@ -15,7 +15,7 @@ card {
         nth(1),
         does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
         turn),
-      putCounters(1, printedKind(p1p1Counter), it))],
-  power = 1,
-  toughness = 1
+      putCounters(lit(1), printedKind(p1p1Counter), it))],
+  power = lit(1),
+  toughness = lit(1)
 }

@@ -4,7 +4,7 @@ card {
   text = [
     static(entersTapped(thisLand)),
     activated(
-      compound([mana([1]), tapSymbol]),
+      compound([mana([generic(1)]), tapSymbol]),
       sequentially([
           search(yourLibrary, a(and([isLand, hasSupertype(basic)]))),
           putOntoBattlefieldTapped(that(card)),

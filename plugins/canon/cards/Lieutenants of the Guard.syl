@@ -1,6 +1,6 @@
 card {
   name = "Lieutenants of the Guard",
-  cost = [4, white],
+  cost = [generic(4), pip(white)],
   types = [creature],
   subtypes = [human, soldier],
   text = [
@@ -11,6 +11,6 @@ card {
             instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["strength", "numbers"]))),
             putCounters(votesFor("strength"), printedKind(p1p1Counter), thisCreature),
             create(votesFor("numbers"), written(creatureToken(1, 1, [white], [soldier])))])))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

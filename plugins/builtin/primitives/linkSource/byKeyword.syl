@@ -1,0 +1,1 @@
+primitive byKeyword(keyword: KeywordLabel): LinkSource = ByKeyword

@@ -1,0 +1,3 @@
+primitive cleanup: TurnPart = Cleanup {
+  spelling = "cleanup"
+}

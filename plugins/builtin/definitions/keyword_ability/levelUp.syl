@@ -4,5 +4,8 @@ ability levelUp(cost: Cost) {
   lexical = {lemma = "level up", parameters = [[Cost]]},
   spelling = "level up <cost>",
   body = [
-    activatedOnlyDuring($cost, putCounters(1, printedKind(levelCounter), thisPermanent), asSorcery)]
+    activatedOnlyDuring(
+      $cost,
+      putCounters(lit(1), printedKind(levelCounter), thisPermanent),
+      asSorcery)]
 }

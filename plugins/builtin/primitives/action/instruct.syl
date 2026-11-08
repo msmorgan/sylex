@@ -1,4 +1,4 @@
 # "<subj> <action>": the handoff (`Action.instruct`), to a player or a permanent.
-primitive instruct(subj: NounPhrase, action: Action): Action {
+primitive instruct(subj: NounPhrase, action: Action): Action = Instruct {
   spelling = "<subj> <action>"
 }

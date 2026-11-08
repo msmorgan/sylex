@@ -2,7 +2,7 @@
 # their turn [CR#305.2].
 card {
   name = "Exploration",
-  cost = [green],
+  cost = [pip(green)],
   types = [enchantment],
   text = [
     static(

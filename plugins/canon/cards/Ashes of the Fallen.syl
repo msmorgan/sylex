@@ -1,6 +1,6 @@
 card {
   name = "Ashes of the Fallen",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   text = [
     static(entersChoosing(thisArtifact, subtype(creature))),

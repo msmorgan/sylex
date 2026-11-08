@@ -1,4 +1,4 @@
 # Authoring primitive for `StaticSpec.letterDefinition`.
-primitive letterDefinition(letter: Letter, amount: Amount): StaticSpec {
+primitive letterDefinition(letter: Letter, amount: Amount): StaticSpec = LetterDefinition {
   spelling = "<letter> is <amount>"
 }

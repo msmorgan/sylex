@@ -1,6 +1,6 @@
 card {
   name = "Tyrant's Choice",
-  cost = [1, black],
+  cost = [generic(1), pip(black)],
   types = [sorcery],
   text = [
     willOfTheCouncil(
@@ -10,5 +10,5 @@ card {
             doIf(
               voteLead("death", false),
               instruct(eachOpponent, sacrifice(aTheirChoice(isCreature)))),
-            doIf(voteLead("torture", true), instruct(eachOpponent, loseLife(4)))])))]
+            doIf(voteLead("torture", true), instruct(eachOpponent, loseLife(lit(4))))])))]
 }

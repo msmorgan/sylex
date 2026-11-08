@@ -1,6 +1,6 @@
 card {
   name = "Realmwright",
-  cost = [blue],
+  cost = [pip(blue)],
   types = [creature],
   subtypes = [vedalken, wizard],
   text = [
@@ -10,6 +10,6 @@ card {
         allOf(and([isLand, youControl])),
         adds,
         chosenQuality(ofChosen(subtype(land)))))],
-  power = 1,
-  toughness = 1
+  power = lit(1),
+  toughness = lit(1)
 }

@@ -1,6 +1,6 @@
 card {
   name = "Gaea's Revenge",
-  cost = [5, green, green],
+  cost = [generic(5), pip(green), pip(green)],
   types = [creature],
   subtypes = [elemental],
   text = [
@@ -14,6 +14,6 @@ card {
                 and([isSpell, non(hasColor(green))]),
                 abilityOf(allOf(and([isSource, non(hasColor(green))])))]))),
         target(thisCreature)))],
-  power = 8,
-  toughness = 5
+  power = lit(8),
+  toughness = lit(5)
 }

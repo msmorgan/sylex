@@ -1,2 +1,2 @@
 # "<keyword> or <keyword>", as an ability chosen among named keywords
-primitive abilitiesAmong(keywords: List(KeywordTerm)): ChoiceDomain
+primitive abilitiesAmong(keywords: List(KeywordTerm)): ChoiceDomain = AbilitiesAmong

@@ -1,6 +1,6 @@
 card {
   name = "Leonin Bola",
-  cost = [1],
+  cost = [generic(1)],
   types = [artifact],
   subtypes = [equipment],
   text = [
@@ -10,5 +10,5 @@ card {
         activated(
           compound([tapSymbol, perform(unattach(theGrantor(permanent)))]),
           tap(target(isCreature))))),
-    equip(mana([1]))]
+    equip(mana([generic(1)]))]
 }

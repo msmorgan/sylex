@@ -1,6 +1,6 @@
 card {
   name = "Turn the Tables",
-  cost = [3, white, white],
+  cost = [generic(3), pip(white), pip(white)],
   types = [instant],
   text = [
     spell(

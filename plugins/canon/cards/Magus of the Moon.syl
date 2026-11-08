@@ -1,6 +1,6 @@
 card {
   name = "Magus of the Moon",
-  cost = [2, red],
+  cost = [generic(2), pip(red)],
   types = [creature],
   subtypes = [human, wizard],
   text = [
@@ -9,6 +9,6 @@ card {
         allOf(and([isLand, non(hasSupertype(basic))])),
         sets,
         bundle({characteristics = {subtypes = [mountain]}})))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

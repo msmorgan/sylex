@@ -1,2 +1,2 @@
 # Choose modes from the given modal choices.
-primitive actionChooseModes(quantity: Quantity, modes: List(Mode)): Action = .chooseModes
+primitive actionChooseModes(quantity: Quantity, modes: List(Mode)): Action = ChooseModes

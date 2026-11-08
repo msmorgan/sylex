@@ -1,8 +1,8 @@
 card {
   name = "Stasis",
-  cost = [1, blue],
+  cost = [generic(1), pip(blue)],
   types = [enchantment],
   text = [
     static(partSkip(bare(isPlayer), untapStep)),
-    at(beginningOfYour(upkeep), doUnless(sacrifice(thisEnchantment), mana([blue])))]
+    at(beginningOfYour(upkeep), doUnless(sacrifice(thisEnchantment), mana([pip(blue)])))]
 }

@@ -9,6 +9,6 @@ ability riot {
         would(actor(thisPermanent), enter),
         alongside(
           mayOrElse(
-            putCounters(1, printedKind(p1p1Counter), thisPermanent),
+            putCounters(lit(1), printedKind(p1p1Counter), thisPermanent),
             gainHaste(thisPermanent)))))]
 }

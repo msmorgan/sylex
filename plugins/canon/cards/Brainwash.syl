@@ -1,7 +1,9 @@
 card {
   name = "Brainwash",
-  cost = [white],
+  cost = [pip(white)],
   types = [enchantment],
   subtypes = [aura],
-  text = [enchant(isCreature), static(gatedBy(mana([3]), actor(enchanted(creature)), attack))]
+  text = [
+    enchant(isCreature),
+    static(gatedBy(mana([generic(3)]), actor(enchanted(creature)), attack))]
 }

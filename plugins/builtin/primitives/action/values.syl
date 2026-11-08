@@ -1,1 +1,1 @@
-primitive values(left: Amount, right: Amount): Exchanged
+primitive values(left: Amount, right: Amount): Exchanged = Values

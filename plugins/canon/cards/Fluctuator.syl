@@ -1,10 +1,10 @@
 card {
   name = "Fluctuator",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   text = [
     static(
       costShift(
         allOf(and([abilityHead(keyword(cycling)), did(actor(you), activate(which), thisObject)])),
-        less(2)))]
+        less(lit(2))))]
 }

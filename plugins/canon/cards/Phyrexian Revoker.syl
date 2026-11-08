@@ -1,6 +1,6 @@
 card {
   name = "Phyrexian Revoker",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact, creature],
   subtypes = [phyrexian, horror],
   text = [
@@ -13,6 +13,6 @@ card {
             and([
                 abilityHead(anyActivated),
                 abilityOf(allOf(and([isSource, named(chosenName)])))])))))],
-  power = 2,
-  toughness = 1
+  power = lit(2),
+  toughness = lit(1)
 }

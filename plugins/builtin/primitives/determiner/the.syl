@@ -1,2 +1,2 @@
 # "the …"
-primitive the(plur: Plurality = one): DetPhrase
+primitive the(plur: Plurality = one): DetPhrase = The

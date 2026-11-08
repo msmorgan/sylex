@@ -1,6 +1,6 @@
 card {
   name = "Death or Glory",
-  cost = [4, white],
+  cost = [generic(4), pip(white)],
   types = [sorcery],
   text = [
     spell(

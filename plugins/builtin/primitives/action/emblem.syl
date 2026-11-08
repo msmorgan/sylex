@@ -1,1 +1,1 @@
-primitive emblem(name: Option(String), abilities: List(Ability)): CreationSpec
+primitive emblem(name: Option(String), abilities: List(Ability)): CreationSpec = Emblem

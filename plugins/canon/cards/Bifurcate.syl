@@ -1,6 +1,6 @@
 card {
   name = "Bifurcate",
-  cost = [3, green],
+  cost = [generic(3), pip(green)],
   types = [sorcery],
   text = [
     spell(

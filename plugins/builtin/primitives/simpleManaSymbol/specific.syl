@@ -1,0 +1,1 @@
+primitive specific(color: ColorOrColorless): SimpleManaSymbol = Specific

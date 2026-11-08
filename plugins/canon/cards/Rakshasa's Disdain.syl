@@ -1,6 +1,6 @@
 card {
   name = "Rakshasa's Disdain",
-  cost = [2, blue],
+  cost = [generic(2), pip(blue)],
   types = [instant],
   text = [
     spell(
@@ -8,5 +8,5 @@ card {
         controllerOf(target(isSpell)),
         doUnless(
           instruct(you, counter(it)),
-          scaledGenericMana(forEach(1, cardIn(yourGraveyard))))))]
+          scaledGenericMana(forEach(lit(1), cardIn(yourGraveyard))))))]
 }

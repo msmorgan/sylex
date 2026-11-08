@@ -4,4 +4,4 @@ primitive choose(
   chosen: NounPhrase,
   disclosure: Disclosure = openly,
   first: Option(NounPhrase) = none,
-  when: Option(Timing) = none): Action
+  when: Option(Timing) = none): Action = Choose

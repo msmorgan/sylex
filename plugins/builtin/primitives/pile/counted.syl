@@ -1,1 +1,1 @@
-primitive counted(quantity: Quantity): SliceCount
+primitive counted(quantity: Quantity): SliceCount = Counted

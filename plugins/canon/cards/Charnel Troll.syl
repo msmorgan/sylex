@@ -1,6 +1,6 @@
 card {
   name = "Charnel Troll",
-  cost = [1, black, green],
+  cost = [generic(1), pip(black), pip(green)],
   types = [creature],
   subtypes = [troll],
   text = [
@@ -9,11 +9,12 @@ card {
       beginningOfYour(upkeep),
       doIfDone(
         exile(a(and([isCreature, in(yourGraveyard)]))),
-        putCounters(1, printedKind(p1p1Counter), thisCreature),
+        putCounters(lit(1), printedKind(p1p1Counter), thisCreature),
         sacrifice(thisCreature))),
     activated(
-      compound([mana([black, green]), perform(discard(a(and([isCreature, in(yourHand)]))))]),
-      putCounters(1, printedKind(p1p1Counter), thisCreature))],
-  power = 4,
-  toughness = 4
+      compound(
+        [mana([pip(black), pip(green)]), perform(discard(a(and([isCreature, in(yourHand)]))))]),
+      putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
+  power = lit(4),
+  toughness = lit(4)
 }

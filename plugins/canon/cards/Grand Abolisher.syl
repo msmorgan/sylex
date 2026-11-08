@@ -1,6 +1,6 @@
 card {
   name = "Grand Abolisher",
-  cost = [white, white],
+  cost = [pip(white), pip(white)],
   types = [creature],
   subtypes = [human, cleric],
   text = [
@@ -17,6 +17,6 @@ card {
                   and([
                       abilityHead(anyActivated),
                       abilityOf(allOf(or([isArtifact, isCreature, isEnchantment])))]))))])))],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }

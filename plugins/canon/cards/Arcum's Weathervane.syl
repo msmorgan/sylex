@@ -1,17 +1,17 @@
 card {
   name = "Arcum's Weathervane",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact],
   text = [
     activated(
-      compound([mana([2]), tapSymbol]),
+      compound([mana([generic(2)]), tapSymbol]),
       establish(
         qualityChange(
           target(and([isLand, hasSupertype(snow)])),
           loses,
           bundle({characteristics = {supertypes = [snow]}})))),
     activated(
-      compound([mana([2]), tapSymbol]),
+      compound([mana([generic(2)]), tapSymbol]),
       establish(
         qualityChange(
           target(and([isLand, hasSupertype(basic), not(hasSupertype(snow))])),

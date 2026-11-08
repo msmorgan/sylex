@@ -1,14 +1,14 @@
 card {
   name = "Primal Vigor",
-  cost = [4, green],
+  cost = [generic(4), pip(green)],
   types = [enchantment],
   text = [
     static(
       replace(
         would(any, createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []))),
-        instead(create(times(2, groupSize), asThose)))),
+        instead(create(times(lit(2), groupSize), asThose)))),
     static(
       replace(
         would(any, putCounters(anyAmount, printedKind(p1p1Counter), a(isCreature))),
-        instead(putCounters(times(2, thatMuch), printedKind(p1p1Counter), that(creature)))))]
+        instead(putCounters(times(lit(2), thatMuch), printedKind(p1p1Counter), that(creature)))))]
 }

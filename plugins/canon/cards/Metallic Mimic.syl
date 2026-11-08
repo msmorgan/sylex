@@ -5,7 +5,7 @@
 # [CR#604.3a].
 card {
   name = "Metallic Mimic",
-  cost = [2],
+  cost = [generic(2)],
   types = [artifact, creature],
   subtypes = [shapeshifter],
   text = [
@@ -14,8 +14,8 @@ card {
     static(
       entersWithAdditionalCounters(
         each(and([isCreature, youControl, ofChosen(subtype(creature)), isOther])),
-        1,
+        lit(1),
         p1p1Counter))],
-  power = 2,
-  toughness = 1
+  power = lit(2),
+  toughness = lit(1)
 }

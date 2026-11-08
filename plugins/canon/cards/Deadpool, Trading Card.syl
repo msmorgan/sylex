@@ -1,6 +1,6 @@
 card {
   name = "Deadpool, Trading Card",
-  cost = [2, black, red],
+  cost = [generic(2), pip(black), pip(red)],
   supertypes = [legendary],
   types = [creature],
   subtypes = [mutant, mercenary, hero],
@@ -9,10 +9,10 @@ card {
       replace(
         would(actor(thisCreature), enter),
         alongside(may(exchangeTextBoxes(thisCreature, a(and([isCreature, isOther]))))))),
-    at(beginningOfYour(upkeep), loseLife(3)),
+    at(beginningOfYour(upkeep), loseLife(lit(3))),
     activated(
-      compound([mana([3]), perform(sacrifice(thisCreature))]),
-      instruct(each(isOtherPlayer), draw(1)))],
-  power = 5,
-  toughness = 3
+      compound([mana([generic(3)]), perform(sacrifice(thisCreature))]),
+      instruct(each(isOtherPlayer), draw(lit(1))))],
+  power = lit(5),
+  toughness = lit(3)
 }

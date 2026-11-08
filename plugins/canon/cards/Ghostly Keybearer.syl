@@ -1,6 +1,6 @@
 card {
   name = "Ghostly Keybearer",
-  cost = [3, blue],
+  cost = [generic(3), pip(blue)],
   types = [creature],
   subtypes = [spirit],
   text = [
@@ -8,6 +8,6 @@ card {
     whenever(
       does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
       unlock(doorOf(locked, targets(upTo(1), and([hasSubtype(room), youControl])))))],
-  power = 3,
-  toughness = 3
+  power = lit(3),
+  toughness = lit(3)
 }

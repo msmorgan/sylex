@@ -1,4 +1,4 @@
 # "a card named <name>"
-primitive printedName(name: String): NameSource = .printed {
+primitive printedName(name: String): NameSource = Printed {
   spelling = "a card named <name>"
 }

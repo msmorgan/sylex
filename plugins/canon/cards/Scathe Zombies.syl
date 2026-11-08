@@ -1,8 +1,8 @@
 card {
   name = "Scathe Zombies",
-  cost = [2, black],
+  cost = [generic(2), pip(black)],
   types = [creature],
   subtypes = [zombie],
-  power = 2,
-  toughness = 2
+  power = lit(2),
+  toughness = lit(2)
 }
