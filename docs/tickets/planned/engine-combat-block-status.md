@@ -21,8 +21,7 @@ once. The comment there claiming the [CR#509.3d] pattern shape does not exist is
 
 - `CombatState` keeps an explicit unblocked set beside its blocked set; "unblocked" is never
   derived as "attacking and not blocked", since before blockers are declared an attacker is
-  neither. `StatePredicate::Unblocked` and every later derivation of "unblocked" (including
-  `engine-relation-spine`'s) read the set.
+  neither. `StatePredicate::Unblocked` and every later derivation of "unblocked" read the set.
 - Every `Blocked` fact of a declaration reaches the trigger scan. Block triggers deduplicate per
   watching ability, keyed by the `BlockDeclared` pattern it uses [CR#700.1]:
 
