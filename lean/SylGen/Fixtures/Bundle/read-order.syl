@@ -10,7 +10,7 @@ action fixtureActorHandoff {
 }
 
 template readOrderModifiers(subject: NounPhrase): DeonticMods {
-  body = { timing = inPart(turn, $subject, current), cause = source($subject) }
+  body = { timing = inPart(turn, $subject, current), cause = bySource($subject) }
 }
 template prohibitionMentions(subject: NounPhrase): StaticSpec {
   body = staticSpecCant(any, trigger, readOrderModifiers($subject))

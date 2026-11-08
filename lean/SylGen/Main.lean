@@ -40,13 +40,15 @@ private def generate (input output : FilePath) (root : Name) (modulePrefix : Str
     if (ctors.contains (leanWord p.name, p.sort.text)) then
       { p with binderName := leanWord p.name ++ "Value" }
     else p }
-  let registry ← loadDeclarations root ds fallback
+  let registry ← loadDeclarations root ds fallback ctors
   let mut outputs := #[]
   let mut errors : Array String := #[]
   for d in ds do
     try
-      -- Temporary exception for the separately owned Ring modeling correction. Compare
-      -- canonical paths, so another bundle cannot opt in by copying the basename.
+      -- Temporary: `theRingTemptsYou.syl` writes the reserved `Action.ownScope` and
+      -- `Deed.action` through primitives declared in that file, and only it may use them.
+      -- `syl-ring-tempts-you-raw-scope` deletes this exception. Compare canonical paths, so
+      -- another bundle cannot opt in by copying the basename.
       let legacyFile := input / "builtin/definitions/keyword_action/theRingTemptsYou.syl"
       let legacyScope ← try
         pure ((← IO.FS.realPath d.pos.file) == (← IO.FS.realPath legacyFile))
@@ -156,9 +158,10 @@ private unsafe def run (args : List String) : IO UInt32 := do
     else pure #[]
   let task : MetaM Unit := do
     let mut fallback := {}
-    for (name, sort, constant) in entries do
+    for (name, _, constant) in entries do
       let sig ← signature (← canonical constant)
-      fallback := fallback.insert (name, sort) sig
+      -- Keyed by the full result sort, `Delta(Amount)` rather than the registry's `Delta`.
+      fallback := fallback.insert (name, sig.result.text) sig
     generate input output root.toName modulePrefix fallback
   discard <| task.toIO {
     fileName := "sylGen"

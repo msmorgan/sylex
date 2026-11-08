@@ -57,8 +57,9 @@ elab "syl_ability_word " name:ident binders:bracketedBinder* " := " value:term
       let label := pair.getAppArgs[2]!
       let body := pair.getAppArgs[3]!
       let reduced ← whnf body
+      -- The word is a primitive's application, so it is reduced too.
       let headed := reduced.getAppFn.isConstOf `Semantics.Ability.italicHead &&
-        reduced.getAppArgs[0]!.getAppFn.isConstOf `Semantics.ItalicWord.abilityWord
+        (← whnf reduced.getAppArgs[0]!).getAppFn.isConstOf `Semantics.ItalicWord.abilityWord
       let result := if headed then body else
         mkApp2 wrap (mkApp (mkConst `Semantics.AbilityWordLabel.named) label) body
       mkLambdaFVars parameters result

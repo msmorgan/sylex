@@ -29,12 +29,15 @@ abbrev ResolveM := ReaderT Context (StateT Resolution MetaM)
 private def fail {α : Type} (p : Position) (message : String) : ResolveM α :=
   throwError p.error message
 
-private def findSignature (head : String) (sort : SortRef) : ResolveM (Option Signature) := do
+/-- The declaration `(head, sort)`, recording the dependency. -/
+def findSignature (head : String) (sort : SortRef) : ResolveM (Option Signature) := do
   let ctx ← read
   if let some sig := ctx.declarations[(head, sort.text)]? then
     modify fun s => { s with dependencies := s.dependencies.push sig.constant }
     return some sig
-  if let some sig := ctx.fallback[(head, sort.text)]? then return some sig
+  -- The fallback registry is keyed by Lean names, which add `_` to Lean keywords.
+  if let some sig := ctx.fallback[(head, sort.text)]? <|> ctx.fallback[(leanWord head, sort.text)]? then
+    return some sig
   if sort.name == "KeywordLabel" then
     if let some ability := ctx.fallback[(head, "Ability")]? then
       if (← getEnv).contains (ability.constant ++ `label) then
@@ -43,7 +46,7 @@ private def findSignature (head : String) (sort : SortRef) : ResolveM (Option Si
     if let some action := ctx.fallback[(head, "Action")]? then
       if (← getEnv).contains (action.constant ++ `deed) then
         return some (← signature (action.constant ++ `deed))
-  return ctx.constructors[(head, sort.text)]? <|> ctx.constructors[(leanWord head, sort.text)]?
+  return none
 
 private def underlying (s : SortRef) : SortRef :=
   if s.name == "Option" then s.arguments[0]! else s
@@ -54,6 +57,9 @@ mutual
     if let .record p fields := v then
       if expected.name == "CardType" then
         fail p "raw CardType construction requires a registry declaration"
+      -- Temporary: a record at `Card` is a single-faced card and a `CardFace` record without
+      -- `characteristics` is its characteristics, two implicit wraps that `syl.md` §3 does not
+      -- allow. `syl-single-face-card-call` deletes them.
       if expected.name == "Card" then
         return .call "Semantics.Card.singleFaced"
           #[(none, ← resolve v { name := "CardFace" })]
@@ -73,16 +79,9 @@ mutual
       if head == "some" && expected.name == "Option" then
         fail p "some is implicit; write the value"
       if let some sig ← findSignature head expected then
-        if let some message := sourceConstructorRefusal sig.constant ctx.legacyScope then fail p message
-        let args := if expected.name == "Card" && sig.constant.getString! != "singleFaced" then
-            match args with
-            | #[(none, .record _ fields)] => fields.map (fun (k, v) => (some k, v))
-            | _ => args
-          else args
+        if let some message := sig.reserved then
+          unless ctx.legacyScope do fail p message
         return ← resolveCall p sig args
-      if expected.name == "KeywordTerm" && args.isEmpty then
-        if let some sig ← findSignature head { name := "KeywordLabel" } then
-          return .call "Semantics.KeywordTerm.the" #[(none, ← resolveCall p sig #[])]
     if expected.name == "Option" then
       return .call "some" #[(none, ← resolve v (underlying expected))]
     match v with
@@ -96,10 +95,6 @@ mutual
       | "Nat" =>
         if text.startsWith "-" then fail p "negative integer at Nat"
         return leaf
-      | "Amount" => return .call "Semantics.Amount.lit" #[(none, leaf)]
-      | "ManaSymbol" =>
-        if text.startsWith "-" then fail p "negative generic mana"
-        return .call "Semantics.ManaSymbol.simple" #[(none, .call "Semantics.SimpleManaSymbol.generic" #[(none, leaf)])]
       | _ => fail p s!"integer at {expected.text}"
     | .list p values =>
       unless expected.name == "List" do fail p s!"list at {expected.text}"
@@ -116,15 +111,7 @@ mutual
         else unless f.hasDefault do
           fail p s!"missing field '{f.name}' at {expected.text}"
       return .record result
-    | .word p head args =>
-      if args.isEmpty && head ∈ ["white", "blue", "black", "red", "green"] then
-        if expected.name ∈ ["ColorOrColorless", "ManaSymbol"] then
-          let color := Term.call "Semantics.ColorOrColorless.of"
-            #[(none, .atom ("Semantics.Color." ++ head))]
-          if expected.name == "ColorOrColorless" then return color
-          return .call "Semantics.ManaSymbol.simple"
-            #[(none, .call "Semantics.SimpleManaSymbol.specific" #[(none, color)])]
-      fail p s!"unknown word '{head}' at {expected.text}"
+    | .word p head _ => fail p s!"unknown word '{head}' at {expected.text}"
     | .parameter p name => fail p s!"unknown parameter '${name}'"
 
   partial def resolveCall (p : Position) (sig : Signature)
@@ -153,8 +140,7 @@ mutual
     let ordered := sig.fields.filterMap fun f =>
       (result.find? (·.1 == some f.name)).map fun (_, value) =>
         (some (if f.emittedName.isEmpty then f.name else f.emittedName), value)
-    let call := Term.call (leanName sig.constant) (if sig.constant.getPrefix == ``Int then
-      ordered.map fun (_, value) => (none, value) else ordered)
+    let call := Term.call (leanName sig.constant) ordered
     return sig.identity.elim call (fun identity => .marked identity call)
 end
 

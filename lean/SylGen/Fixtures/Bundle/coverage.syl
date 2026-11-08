@@ -2,11 +2,11 @@
 template textAtom: String { body = "quote: \" and slash: \\" }
 template naturalAtom: Nat { body = 2 }
 template integerAtom: Int { body = -1 }
-template amountAtom: Amount { body = -1 }
-template manaAtom: ManaSymbol { body = 2 }
+template amountAtom: Amount { body = lit(-1) }
+template manaAtom: ManaSymbol { body = generic(2) }
 template colorAtom: Color { body = red }
-template colorlessAtom: ColorOrColorless { body = green }
-template coloredManaAtom: ManaSymbol { body = blue }
+template colorlessAtom: ColorOrColorless { body = colored(green) }
+template coloredManaAtom: ManaSymbol { body = pip(blue) }
 template booleanAtom: Bool { body = true }
 template falseAtom: Bool { body = false }
 template absentAtom: Option(NounPhrase) { body = none }
@@ -23,12 +23,12 @@ template alternatives(who: NounPhrase): Predicate {
   body = or([controlledBy($who), controlledBy($who)])
 }
 template eachKind(who: NounPhrase): Action {
-  body = doForEachKind(color, $who, color, instruct($who, draw(1)))
+  body = doForEachKind(color, $who, color, instruct($who, draw(lit(1))))
 }
 card { name = "Forest", lexical = {}, spelling = "Forest", supertypes = [basic], types = [land], subtypes = [forest] }
 card_type fixtureType { name = "Fixture", cardClass = permanentCard, stats = [] }
 token fixtureToken { name = "Fixture", token = { characteristics = { name = "Fixture" } } }
-sba fixtureSba { scope = isCreature, when = is(thisCreature, isCreature), then_ = draw(1) }
+sba fixtureSba { scope = isCreature, when = is(thisCreature, isCreature), then_ = draw(lit(1)) }
 conferral fixtureConferral { scope = isCreature, confer = ability(flying) }
 template dispatchAtom: Nat { body = 5 }
 template dispatchAtom: Int { body = -5 }
@@ -42,13 +42,14 @@ template innerOptionalUse: Option(Int) { body = innerOptional }
 template defaultsInOrder(x: Int = -1, y: Int = $x): Int { body = $y }
 template defaultsInOrderUse: Int { body = defaultsInOrder }
 template recordOrder(who: NounPhrase): DidClause {
-  body = { action = instruct($who, draw(1)), within = none, subj = actor($who) }
+  body = { action = instruct($who, draw(lit(1))), within = none, subj = actor($who) }
 }
+primitive named(name: String): AbilityWordLabel = Named
 ability_word alreadyWord(ability: Ability) {
   label = "outer",
   body = italicHead(abilityWord(named("inner")), $ability)
 }
 ability_word repeatedAbilityWord(who: NounPhrase) {
   label = "repeated",
-  body = spell(simultaneously([instruct($who, draw(1)), instruct($who, draw(1))]))
+  body = spell(simultaneously([instruct($who, draw(lit(1))), instruct($who, draw(lit(1)))]))
 }

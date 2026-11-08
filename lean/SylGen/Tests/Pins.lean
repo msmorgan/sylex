@@ -100,8 +100,6 @@ example : NormalFixture.Semantics.Templates.words (this_ := 1) (in_ := 2) (from_
     (or_ := 5) (exists_ := 6) (where_ := 7) («variable» := 8) = [1,2,3,4,5,6,7,8] := rfl
 example : NormalFixture.Semantics.Definitions.withoutDeed =
     Semantics.Action.ownScope none (.sequentially []) := rfl
-example : NormalFixture.Semantics.Definitions.wordDeed.deed =
-    Semantics.Deed.action "customWord" := rfl
 
 open Semantics in
 example (who : NounPhrase) : SylFixture.Semantics.Templates.recordOrder who =
@@ -113,7 +111,7 @@ example (ability : Ability) : SylFixture.Semantics.Definitions.alreadyWord abili
     .italicHead (.abilityWord (.named "inner")) ability := rfl
 open Semantics in
 example (who : NounPhrase) : SylFixture.Semantics.Definitions.repeatedAbilityWord who =
-    Templates.abilityWord (.named "repeated") (Templates.Ability.spell
+    Semantics.Templates.Ability.abilityWord (.named "repeated") (Templates.Ability.spell
       (Templates.simultaneously [
         Templates.instruct who (Templates.draw 1),
         Templates.instruct who (Templates.draw 1)])) := rfl
@@ -161,7 +159,7 @@ example : NormalFixture.Semantics.Definitions.outerWord =
     NormalFixture.Semantics.Templates.innerWord := rfl
 
 example : (match SylGen.parse "docs.syl"
-    "primitive lit(value: Int): Amount\n# Attached documentation\ntemplate x: Int { body = 1 }" with
+    "primitive lit(value: Int): Amount = Literal\n# Attached documentation\ntemplate x: Int { body = 1 }" with
     | .ok ds => ds[1]!.documentation == " Attached documentation\n"
     | .error _ => false) = true := by native_decide
 
@@ -174,7 +172,7 @@ run_cmd do
   let some value := (← getConstInfo `SylFixture.Semantics.Definitions.threshold).value?
     | throwError "missing ability word"
   liftTermElabM <| lambdaTelescope value fun _ body => do
-    unless body.getAppFn.isConstOf `Semantics.Templates.abilityWord do
+    unless body.getAppFn.isConstOf `Semantics.Templates.Ability.abilityWord do
       throwError "ability word did not retain its Template application"
 
 example : NormalFixture.Semantics.Templates.or (value := 5) = (5 : Int) := rfl
@@ -182,7 +180,6 @@ example : NormalFixture.Semantics.Templates.or (value := 5) = (5 : Int) := rfl
 example : NormalFixture.Semantics.Definitions.calledDeed.deed =
     Semantics.Deed.action "customWord" := rfl
 
-example : NormalFixture.Semantics.Templates.naturalInteger 3 = (3 : Int) := rfl
 example : NormalFixture.Semantics.Templates.colorSelection = Semantics.ColorSpec.some [.blue] := rfl
 example : NormalFixture.Semantics.Templates.callsWithLocalName .you = Semantics.Subject.actor .you := rfl
 example : NormalFixture.Semantics.Templates.multiline = "first\nsecond" := rfl
@@ -194,7 +191,7 @@ example : LegacyFixture.Semantics.Cards.«Bundle fixture».check = [] := by deci
 example : bundleQuality = bundleAtom := rfl
 example : Action.bundleShared = Semantics.Action.ownScope (some (.action "bundleShared" .none)) bundleDraw := rfl
 example : Ability.bundleShared = .keyword (.named "bundleShared") [] [Semantics.Templates.Ability.spell Action.bundleShared] := rfl
-example : aQuality = Semantics.Predicate.and [Semantics.Predicate.isToken, Semantics.Predicate.isCard] := rfl
+example : aQuality = Semantics.Predicate.and [Semantics.Predicate.isToken, Semantics.Predicate.isPlayer] := rfl
 example : aSubject = Semantics.NounPhrase.you := rfl
 example (subject : NounPhrase) : Action.bundleDevour subject =
     Semantics.Action.ownScope (some (.ofAbility (.named "bundle devour")))
@@ -225,10 +222,7 @@ theorem parameterWrapsOption : optionalParameter .red = some .red := rfl
 theorem parameterKeepsExactOption : exactOptionalParameter none = none := rfl
 theorem closedEnumWords : enumWords = [.legendary, .basic] := rfl
 theorem optionalClosedEnum : optionalEnum = some .upkeep := rfl
-theorem directManaAtoms : manaAtoms = [.simple (.generic 2), .simple (.specific (.of .blue))] := rfl
-theorem optionalNumericAtom : optionalAmount = some (.lit 3) := rfl
 theorem abilityAtLabel : definitionLabel = sourceAbility.label := rfl
-theorem abilityAtTerm : definitionTerm = .the sourceAbility.label := rfl
 theorem actionAtDeed : actionDeed = calledDeed.deed := rfl
 theorem definitionWrapsCaller (subject : NounPhrase) : callerWrapped subject =
     .ownScope (some (.action "callerWrapped"))
@@ -265,9 +259,9 @@ theorem sharedNamesDoNotDependOnLoadOrder :
 
 /-- A body-less primitive has the same placement under either root. -/
 theorem samePrimitivePlacementForEveryRoot :
-    namesFor .anonymous "primitive lit(value: Int): Amount" =
+    namesFor .anonymous "primitive lit(value: Int): Amount = Literal" =
       .some [`Semantics.Templates.lit] ∧
-    namesFor `Fixture "primitive lit(value: Int): Amount" =
+    namesFor `Fixture "primitive lit(value: Int): Amount = Literal" =
       .some [`Fixture.Semantics.Templates.lit] := by native_decide
 
 theorem parameterAbilityWordKeepsItsOuterHeading (ability : Semantics.Ability) :

@@ -1,42 +1,42 @@
-card modalDfc({
-  front = { name = "Branchloft Pathway", types = [land], text = [activated(tapSymbol, addMana(1, manaOf([[of(green)]])))] },
-  back = { name = "Boulderloft Pathway", types = [land], text = [activated(tapSymbol, addMana(1, manaOf([[of(white)]])))] }
-})
-card adventurer({
-  normal = { name = "Merfolk Secretkeeper", cost = [blue], types = [creature], subtypes = [merfolk, wizard], power = 0, toughness = 4 },
-  adventure = { name = "Venture Deeper", cost = [blue], types = [sorcery], subtypes = [adventure], text = [spell(instruct(target(isPlayer), mill(4)))] }
-})
-card prototype({
-  inner = { name = "Blitz Automaton", cost = [7], types = [artifact, creature], subtypes = [construct], text = [prototype, haste], power = 6, toughness = 4 },
-  alternative = { cost = [2, red], power = 3, toughness = 2 }
-})
-card leveler({
-  inner = { name = "Student of Warfare", cost = [white], types = [creature], subtypes = [human, knight], text = [levelUp(mana([white]))], power = 1, toughness = 1 },
+card modalDfc(
+  front = { name = "Branchloft Pathway", types = [land], text = [activated(tapSymbol, addMana(lit(1), manaOf([[colored(green)]])))] },
+  back = { name = "Boulderloft Pathway", types = [land], text = [activated(tapSymbol, addMana(lit(1), manaOf([[colored(white)]])))] }
+)
+card adventurer(
+  normal = { name = "Merfolk Secretkeeper", cost = [pip(blue)], types = [creature], subtypes = [merfolk, wizard], power = lit(0), toughness = lit(4) },
+  adventure = { name = "Venture Deeper", cost = [pip(blue)], types = [sorcery], subtypes = [adventure], text = [spell(instruct(target(isPlayer), mill(lit(4))))] }
+)
+card prototype(
+  inner = { name = "Blitz Automaton", cost = [generic(7)], types = [artifact, creature], subtypes = [construct], text = [prototype, haste], power = lit(6), toughness = lit(4) },
+  alternative = { cost = [generic(2), pip(red)], power = lit(3), toughness = lit(2) }
+)
+card leveler(
+  inner = { name = "Student of Warfare", cost = [pip(white)], types = [creature], subtypes = [human, knight], text = [levelUp(mana([pip(white)]))], power = lit(1), toughness = lit(1) },
   bands = [
-    { range = between(2, 6), power = 3, toughness = 3, text = [firstStrike] },
-    { range = plus(7), power = 4, toughness = 4, text = [doubleStrike] }
+    { range = between(2, 6), power = lit(3), toughness = lit(3), text = [firstStrike] },
+    { range = plus(7), power = lit(4), toughness = lit(4), text = [doubleStrike] }
   ]
-})
-card split({
-  left = { name = "Profit", cost = [1, white], types = [instant], text = [spell(get(allOf(and([isCreature, youControl])), up(1), up(1), untilEndOfTurn)), fuse] },
-  right = { name = "Loss", cost = [2, black], types = [instant], text = [spell(get(allOf(and([isCreature, opponentsControl])), down(1), down(1), untilEndOfTurn)), fuse] }
-})
-card sharedLineSplit({
+)
+card split(
+  left = { name = "Profit", cost = [generic(1), pip(white)], types = [instant], text = [spell(get(allOf(and([isCreature, youControl])), up(lit(1)), up(lit(1)), untilEndOfTurn)), fuse] },
+  right = { name = "Loss", cost = [generic(2), pip(black)], types = [instant], text = [spell(get(allOf(and([isCreature, opponentsControl])), down(lit(1)), down(lit(1)), untilEndOfTurn)), fuse] }
+)
+card sharedLineSplit(
   shared = { types = [enchantment], subtypes = [room] },
-  left = { name = "Glassworks", cost = [2, red], text = [when(does(actor(you), unlock(thisDoor)), instruct(thisRoom, dealDamage(4, target(and([isCreature, anOpponentControls])))))] },
-  right = { name = "Shattered Yard", cost = [4, red], text = [at_(beginningOfYour(endStep), instruct(thisRoom, dealDamage(1, eachOpponent)))] }
-})
-card transforming({
-  front = { name = "Neglected Heirloom", cost = [1], types = [artifact], subtypes = [equipment], text = [
-    static(getsPt(equipped(creature), up(1), up(1))),
-    when(does(any, turnOver(equipped(creature))), transform(thisEquipment)), equip(mana([1]))
+  left = { name = "Glassworks", cost = [generic(2), pip(red)], text = [when(does(actor(you), unlock(thisDoor)), instruct(thisRoom, dealDamage(lit(4), target(and([isCreature, anOpponentControls])))))] },
+  right = { name = "Shattered Yard", cost = [generic(4), pip(red)], text = [at_(beginningOfYour(endStep), instruct(thisRoom, dealDamage(lit(1), eachOpponent)))] }
+)
+card transforming(
+  front = { name = "Neglected Heirloom", cost = [generic(1)], types = [artifact], subtypes = [equipment], text = [
+    static(getsPt(equipped(creature), up(lit(1)), up(lit(1)))),
+    when(does(any, turnOver(equipped(creature))), transform(thisEquipment)), equip(mana([generic(1)]))
   ] },
   back = { name = "Ashmouth Blade", types = [artifact], subtypes = [equipment], text = [
-    static(conjunction([getsPt(equipped(creature), up(3), up(3)), abilityGrant(it, firstStrike)])), equip(mana([3]))
+    static(conjunction([getsPt(equipped(creature), up(lit(3)), up(lit(3))), abilityGrant(it, firstStrike)])), equip(mana([generic(3)]))
   ] }
-})
-card flip({
-  normal = { name = "Bushi Tenderfoot", cost = [white], types = [creature], subtypes = [human, soldier],
-    text = [when(does(actor(a(and([isCreature, did(actor(thisCreature), dealDamage(anyAmount, which), within(soFarThisTurn))]))), die), flip(thisCreature))], power = 1, toughness = 1 },
-  alternative = { name = "Kenzo the Hardhearted", supertypes = [legendary], types = [creature], subtypes = [human, samurai], text = [doubleStrike, bushido(2)], power = 3, toughness = 4 }
-})
+)
+card flip(
+  normal = { name = "Bushi Tenderfoot", cost = [pip(white)], types = [creature], subtypes = [human, soldier],
+    text = [when(does(actor(a(and([isCreature, did(actor(thisCreature), dealDamage(anyAmount, which), within(soFarThisTurn))]))), die), flip(thisCreature))], power = lit(1), toughness = lit(1) },
+  alternative = { name = "Kenzo the Hardhearted", supertypes = [legendary], types = [creature], subtypes = [human, samurai], text = [doubleStrike, bushido(lit(2))], power = lit(3), toughness = lit(4) }
+)

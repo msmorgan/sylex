@@ -241,7 +241,10 @@ def kindSort (kind : String) : Option String :=
 private partial def printedName (v : Value) : Except String String := do
   let fields ← match v with
     | .record _ fields => pure fields
-    | .word p ctor #[(none, .record _ fields)] =>
+    | .word p ctor args =>
+      let fields ← args.mapM fun
+        | (some name, value) => pure (name, value)
+        | (none, value) => throw (value.position.error "card parts are named arguments")
       let parts ← match ctor with
         | "transforming" | "modalDfc" => pure ["front", "back"]
         | "split" | "sharedLineSplit" => pure ["left", "right"]
@@ -264,7 +267,7 @@ private def declaration : Parser Declaration := do
   unless k.text ∈ ["primitive", "template"] || (kindSort k.text).isSome do
     throw (k.pos.error s!"unknown declaration kind '{k.text}'")
   let n ← if k.text == "card" then pure "" else pure (← word).text
-  if n ∈ ["none", "true", "false"] then throw (k.pos.error "reserved declaration name")
+  if n == "none" then throw (k.pos.error "reserved declaration name")
   let mut parameters := #[]
   if ← accept "(" then
     repeat
@@ -287,13 +290,10 @@ private def declaration : Parser Declaration := do
       unless k.text == "primitive" do
         throw (k.pos.error "only a primitive may name a constructor")
       let t ← take
-      let name := (t.text.drop 1).toString
-      unless !t.quoted && t.text.startsWith "." &&
-          (name.toList.head?.any fun c => c.isAlpha || c == '_') &&
-          name.toList.all (fun c => c.isAlphanum || c == '_') do
-        throw (t.pos.error "expected '.constructor'")
-      if name == n then throw (t.pos.error "redundant constructor binding")
-      pure (some name)
+      unless !t.quoted && (t.text.toList.head?.any Char.isUpper) &&
+          t.text.toList.all (fun c => c.isAlphanum || c == '_') do
+        throw (t.pos.error "expected a capitalized constructor")
+      pure (some t.text)
     else pure none
   let cardValue ← if k.text == "card" then pure (some (← value)) else pure none
   let hasFields ← do

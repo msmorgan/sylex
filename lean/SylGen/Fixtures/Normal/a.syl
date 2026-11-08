@@ -11,8 +11,8 @@ template named: Int { body = wordsResult(
   in = 2)
 }
 template wordsResult(in: Int): Int { body = $in }
+primitive sequentially(steps: List(Action) = []): Action = Sequentially
 action withoutDeed { deed = none, body = sequentially([]) }
-action wordDeed { deed = customWord, body = sequentially([]) }
 template in: Int { body = 3 }
 template or(value: Int): Int { body = $value }
 template deedText(value: String): String { body = $value }

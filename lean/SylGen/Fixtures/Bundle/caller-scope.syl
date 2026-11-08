@@ -20,10 +20,10 @@ template graveyardFor(owner: NounPhrase): Location {
   body = zone(graveyard, $owner)
 }
 template creatureCondition(subject: NounPhrase): Condition {
-  body = matches($subject, isCreature)
+  body = is($subject, isCreature)
 }
 template powerEquals(amount: Amount): Predicate {
-  body = compare(eq, $amount, axes = [stat(power)])
+  body = compare(equal, $amount, axes = [stat(power)])
 }
 template lifeCost(amount: Amount): Cost {
   body = perform(changeLife(down($amount)))
@@ -32,19 +32,19 @@ template powerBoost(subject: NounPhrase, amount: Amount): StaticSpec {
   body = modification($subject, power, up($amount))
 }
 template unusedSubject(_chosen: NounPhrase): Action {
-  body = draw(1)
+  body = draw(lit(1))
 }
 template secondSubject(_left: NounPhrase, right: NounPhrase): NounPhrase {
   body = $right
 }
 template moveSubject(subject: NounPhrase): Action {
-  body = move($subject, anyLocation, graveyard, arrival, [])
+  body = move($subject, anywhere, graveyard, arrival, [])
 }
 template rereadDamage(amount: Amount): Action {
   body = sequentially([instruct(this, dealDamage($amount, you)), instruct(this, dealDamage($amount, you))])
 }
 template definedPower(subject: NounPhrase): StaticSpec {
-  body = definesPower($subject, 1)
+  body = definesPower($subject, lit(1))
 }
 template eventWithSubject(subject: NounPhrase): GameEvent {
   body = does(actor($subject), dealDamage(anyAmount, you))
@@ -55,7 +55,7 @@ template playerIgnoringSubject(_subject: NounPhrase): NounPhrase {
 template nestedRereadDamage(amount: Amount): Action {
   body = sequentially([rereadDamage($amount), rereadDamage($amount)])
 }
-primitive dynamicActor: NounPhrase = .actor
+primitive dynamicActor: NounPhrase = Actor
 action actorAcrossControllerHandoff {
   body = instruct(controllerOf(theActor), instruct(dynamicActor, sacrifice(theActor)))
 }

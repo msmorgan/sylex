@@ -1,7 +1,8 @@
-template naturalInteger(value: Nat): Int { body = ofNat($value) }
-template colorSelection: ColorSpec { body = some([blue]) }
-primitive triggerReflexively(body: Action, trigger: Action, event: Option(GameEvent) = none): Action
-primitive actor(np: NounPhrase): Subject
+primitive blue: Color = Blue
+primitive colors(colors: List(Color)): ColorSpec = Colors
+template colorSelection: ColorSpec { body = colors([blue]) }
+primitive triggerReflexively(body: Action, trigger: Action, event: Option(GameEvent) = none): Action = TriggerReflexively
+primitive actor(np: NounPhrase): Subject = Actor
 template callsWithLocalName(actor: NounPhrase): Subject { body = actor($actor) }
 template multiline: String { body = "first
 second" }

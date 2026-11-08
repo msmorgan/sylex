@@ -1,7 +1,7 @@
 # A body-less primitive, with the constructor's field names.
-primitive doForEachKind(axis: KindAxis, domain: Option(NounPhrase) = none, sort: QualitySort, body: Action): Action
-primitive actionSearch(scope: Location, for_: NounPhrase): Action = .search
-primitive actionPay(cost: Cost, times: PayTimes, outcome: PaymentOutcome, whose: Option(NounPhrase), keyword: Option(KeywordLabel)): Action = .pay
+primitive doForEachKind(axis: KindAxis, domain: Option(NounPhrase) = none, sort: QualitySort, body: Action): Action = DoForEachKind
+primitive actionSearch(scope: Location, for_: NounPhrase): Action = Search
+primitive actionPay(cost: Cost, times: PayTimes, outcome: PaymentOutcome, whose: Option(NounPhrase), keyword: Option(KeywordLabel)): Action = Pay
 
 counter aegisCounter {
   lexical = { lemma = "aegis counter", variants = [in, from, by, or, this, exists, where, variable,] },
@@ -24,7 +24,7 @@ action fight(other: NounPhrase) {
 }
 ability flying {
   body = [static(cant(any, block(thisCreature),
-    except = byObjects(bare(and([isCreature, andOr([hasKeyword(flying), hasKeyword(reach)])])))))]
+    except = byObjects(bare(and([isCreature, andOr([hasKeyword(theKeyword(flying)), hasKeyword(theKeyword(reach))])])))))]
 }
 ability_word threshold(ability: Ability) { label = "threshold", body = $ability }
 designation citysBlessing { scope = heldBy(player), sole = false, confers = [] }

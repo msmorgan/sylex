@@ -6,14 +6,18 @@ namespace SylGen
 private partial def sortNamespace (sort : SortRef) : Name :=
   sort.arguments.foldl (fun ns arg => ns ++ sortNamespace arg) sort.name.toName
 
-def declarationName (root : Name) (d : Declaration) (ds : Array Declaration) : Name :=
+/-- A declaration's Lean name. A word declared at more than one sort, or whose plain name a
+hand-written Lean constant already has (`taken`), goes under its sort's namespace. -/
+def declarationName (root : Name) (d : Declaration) (ds : Array Declaration)
+    (taken : Name → Bool := fun _ => false) : Name :=
   let ns := match d.kind with
     | "primitive" | "template" => `Semantics.Templates
     | "card" => `Semantics.Cards
     | _ => `Semantics.Definitions
-  let shared := ds.any (fun other => other.name == d.name && other.sort != d.sort)
-  root ++ ns ++ (if shared then sortNamespace d.sort else .anonymous) ++
-    Name.mkSimple (declarationWord d.name)
+  let word := Name.mkSimple (declarationWord d.name)
+  let shared := ds.any (fun other => other.name == d.name && other.sort != d.sort) ||
+    taken (root ++ ns ++ word)
+  root ++ ns ++ (if shared then sortNamespace d.sort else .anonymous) ++ word
 
 private def allowedFields (kind : String) : List String :=
   ["lexical", "spelling"] ++ match kind with
@@ -34,8 +38,8 @@ private def allowedFields (kind : String) : List String :=
         "power", "toughness", "loyalty", "defense"]
     | _ => []
 
-def loadDeclarations (root : Name) (ds : Array Declaration) (_fallback : Registry) :
-    MetaM Registry := do
+def loadDeclarations (root : Name) (ds : Array Declaration) (_fallback : Registry)
+    (ctors : Registry) : MetaM Registry := do
   let mut table : Registry := {}
   for d in ds do
     for (key, value) in d.fields do
@@ -43,7 +47,8 @@ def loadDeclarations (root : Name) (ds : Array Declaration) (_fallback : Registr
         throwError value.position.error s!"unknown {d.kind} field '{key}'"
     let key := (d.name, d.sort.text)
     if table.contains key then throwError d.pos.error s!"Duplicate bundle declaration {key}"
-    let name := declarationName root d ds
+    let env ← getEnv
+    let name := declarationName root d ds env.contains
     let identity : Option String ← match (d.fields.find? (·.1 == "identity")).map (·.2) with
       | none => pure none
       | some (Value.string _ value) =>
@@ -52,7 +57,11 @@ def loadDeclarations (root : Name) (ds : Array Declaration) (_fallback : Registr
           throwError d.pos.error "identity requires a parameterless NounPhrase template and a nonempty string"
         pure (some value)
       | some v => throwError v.position.error "identity must be a string"
-    let sig : Signature :=  { constant := name, result := d.sort, identity, fields := d.parameters.map fun p =>
+    let built := if d.kind != "primitive" then none else
+      d.constructor.bind (ctors.constructor? d.sort)
+    let refusal := built.bind (fun ctor => sourceConstructorRefusal ctor.constant)
+    let sig : Signature := { constant := name, result := d.sort, identity, reserved := refusal,
+                             fields := d.parameters.map fun p =>
       { name := leanWord p.name, sort := p.sort, hasDefault := p.defaultValue.isSome,
         emittedName := parameterName p } }
     table := table.insert key sig
@@ -95,12 +104,11 @@ private def body (d : Declaration) : ResolveM Term := do
   match d.kind with
   | "primitive" =>
     if (field d "body").isSome then throwError d.pos.error "primitive must be body-less"
-    let ctor := d.constructor.getD d.name
-    if d.constructor.isSome && declarationWord d.name == declarationWord ctor then
-      throwError d.pos.error "redundant constructor binding"
-    let ctors := (← read).constructors
-    let some sig := ctors[(ctor, d.sort.text)]? <|> ctors[(leanWord ctor, d.sort.text)]?
-      | throwError d.pos.error "primitive must name a constructor of its result sort"
+    let some clause := d.constructor
+      | throwError d.pos.error "primitive requires a constructor clause"
+    let some sig := (← read).constructors.constructor? d.sort clause
+      | throwError d.pos.error
+          s!"primitive must name a constructor of its result sort; no {d.sort.text}.{leanConstructor d.sort clause}"
     if let some message := sourceConstructorRefusal sig.constant (← read).legacyScope then
       throwError d.pos.error message
     unless d.parameters.size == sig.fields.size do
@@ -121,9 +129,6 @@ private def body (d : Declaration) : ResolveM Term := do
         direct d `Semantics.Deed.ofAbility #[(none, v)]
       else
         let label := get "deed" (str d d.name)
-        let label := match label with
-          | .word p word #[] => Value.string p word
-          | other => other
         let mut args := #[(none, label)]
         if let some permanent := field d "permanent" then args := args.push (none, permanent)
         direct d `Semantics.Deed.action args
@@ -147,10 +152,10 @@ private def body (d : Declaration) : ResolveM Term := do
   | "ability_word" =>
     let label ← resolve (get "label" (str d d.name)) { name := "String" }
     let content ← resolve (← required d "body") { name := "Ability" }
-    let wrap ← resolve (.word d.pos "abilityWord" #[
-      (none, .word d.pos "named" #[(none, str d "")]), (none, ← required d "body")])
-      { name := "Ability" }
-    let .call wrapName _ := wrap | throwError d.pos.error "abilityWord must be a Template"
+    let some wrap ← findSignature "abilityWord" { name := "Ability" }
+      | throwError d.pos.error "ability_word requires the abilityWord Template"
+    if wrap.identity.isSome then throwError d.pos.error "abilityWord must be a Template"
+    let wrapName := leanName wrap.constant
     return .atom s!"({wrapName}, ({rendered d label}, ({rendered d content})))"
   | "counter" =>
     return ← direct d `Semantics.CounterKind.named

@@ -4,6 +4,7 @@ import Semantics.Events
 import Semantics.Rules
 import Semantics.CallerScope
 import Semantics.Registry
+import Semantics.Primitives
 
 open Lean Meta
 namespace SylGen
@@ -64,6 +65,9 @@ structure Signature where
   fields : Array Field
   result : SortRef
   identity : Option String := none
+  /-- Why a call to this declaration is refused: a primitive that builds a constructor reserved
+  for generated scope and deeds (`sourceConstructorRefusal`). -/
+  reserved : Option String := none
   deriving Inhabited, Repr
 
 def signature (name : Name) (type : Option Expr := none) : MetaM Signature := do
@@ -87,7 +91,7 @@ def constructors : MetaM Registry := do
   let mut result := {}
   for (name, info) in env.constants do
     if let .ctorInfo _ := info then
-      if (`Semantics).isPrefixOf name || name.getPrefix == ``Bool || name.getPrefix == ``Int then
+      if (`Semantics).isPrefixOf name || name.getPrefix == ``Bool then
         try
           let sig ← signature name
           result := result.insert (name.getString!, sig.result.text) sig
@@ -98,6 +102,35 @@ def constructors : MetaM Registry := do
       let sig ← signature ctor (some (← inferType value))
       result := result.insert (ctor.getString!, sig.result.text) sig
   return result
+
+/-- The Lean constructor a primitive's constructor clause names, at the primitive's result sort.
+A clause is its Lean constructor capitalized, except where the Rust AST's variant name differs;
+those are listed here by sort and clause. -/
+def leanConstructor (sort : SortRef) (clause : String) : String :=
+  let renamed := [
+    ("Amount", "Literal", "lit"), ("ColorTerm", "Literal", "lit"),
+    ("ManaCostTerm", "Literal", "lit"), ("UsageLimit", "UsageLimit", "mk"), ("Mode", "Mode", "mk"),
+    ("NounPhrase", "Pronoun", "pro"), ("NounPhrase", "Reflexive", "refl"),
+    ("NounPhrase", "Coordination", "coord"), ("Location", "Coordination", "coord"),
+    ("Predicate", "Coordination", "coord"), ("Condition", "CompareAmount", "compareAmt"),
+    ("CharacteristicEdit", "SwitchPowerToughness", "ptSwitch"), ("PreventCut", "Part", "some"),
+    ("ColorSpec", "Colors", "some"), ("Amount", "Nth", "theNth"),
+    ("Amount", "Difference", "theDifference"), ("Amount", "Outcome", "theOutcome"),
+    ("NounPhrase", "Grantor", "theGrantor"), ("NounPhrase", "Rest", "theRest"),
+    ("Quantity", "Last", "theLast"), ("ChoiceRef", "Choice", "theChoice"),
+    ("ChoiceRef", "LatestChoice", "theLatestChoice"), ("Comparator", "Equal", "eq"),
+    ("Card", "ModalDoubleFaced", "modalDfc"), ("ColorOrColorless", "Color", "of"),
+    ("QualityOp", "Add", "adds"), ("QualityOp", "Set", "sets"), ("QualityOp", "Lose", "loses"),
+    ("Amount", "Arithmetic", "arith"), ("DeedPermanent", "NoPermanent", "none")]
+  match renamed.find? (fun (s, c, _) => s == sort.name && c == clause) with
+  | some (_, _, lean) => lean
+  | none => clause.decapitalize
+
+/-- The constructor a primitive's clause names at `sort`, under its Lean name or, where that is a
+Lean keyword, with the trailing `_` Lean needs. -/
+def Registry.constructor? (ctors : Registry) (sort : SortRef) (clause : String) : Option Signature :=
+  let ctor := leanConstructor sort clause
+  ctors[(ctor, sort.text)]? <|> ctors[(leanWord ctor, sort.text)]?
 
 /-- Constructors reserved for generated identities or registry declarations. -/
 def sourceConstructorRefusal (name : Name) (legacyScope : Bool := false) : Option String :=

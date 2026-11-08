@@ -4,7 +4,9 @@ exe=$1
 scratch=$(mktemp -d)
 trap 'rm -rf "$scratch"' EXIT HUP INT TERM
 mkdir "$scratch/input"
+passed=0
 check() {
+  passed=$((passed + 1))
   printf '%s\n' "$2" > "$scratch/input/bad.syl"
   if "$exe" "$scratch/input" "$scratch/out" Negative > "$scratch/log" 2>&1; then
     echo "unexpected success: $1" >&2
@@ -21,19 +23,20 @@ check 'expected expression' 'template dotted: Nat { lexical = { word = .white },
 check 'expected expression' 'primitive dotted(value: Color = .white): Color = .white'
 check 'only a primitive may name a constructor' 'template white: Color = .white'
 check 'only a primitive may name a constructor' 'action search = .search'
-check 'redundant constructor binding' 'primitive white: Color = .white'
-check 'primitive must name a constructor' 'primitive missing: Color = .nonexistent'
-check "expected '.constructor'" 'primitive colorWhite: Color = white'
+check 'expected a capitalized constructor' 'primitive white: Color = .white'
+check 'primitive must name a constructor' 'primitive missing: Color = Nonexistent'
+check 'expected a capitalized constructor' 'primitive colorWhite: Color = white'
+check 'primitive requires a constructor clause' 'primitive power: Stat'
 check "dotted word '.Color.white'" 'primitive colorWhite: Color = .Color.white'
-check 'primitive must bind every constructor field' 'primitive actionSearch(scope: Location): Action = .search'
-check 'primitive parameter does not match' 'primitive actionSearch(scope: Location, wrong: NounPhrase): Action = .search'
+check 'primitive must bind every constructor field' 'primitive actionSearch(scope: Location): Action = Search'
+check 'primitive parameter does not match' 'primitive actionSearch(scope: Location, wrong: NounPhrase): Action = Search'
 check 'Duplicate bundle declaration' 'template item: Nat { body = 1 } template item: Nat { body = 2 }'
 check "parameter '\$x' has sort" 'template mismatch(x: Color): Nat { body = $x }'
 check 'unsupported string escape' 'template bad: String { body = "\n" }'
 check 'unknown word' 'template missing: Color { body = nonexistent }'
 check 'negative integer at Nat' 'template negative: Nat { body = -1 }'
 check 'empty call' 'template empty: Color { body = blue() }'
-check 'missing argument' 'template missing: Amount { body = lit }'
+check 'missing argument' 'primitive lit(value: Int): Amount = Literal template missing: Amount { body = lit }'
 check 'duplicate field' 'template duplicate: Nat { body = 1, body = 2 }'
 check "duplicate argument 'a'" 'template pair(a: Nat, b: Nat): Nat { body = $a } template twice: Nat { body = pair(a = 1, a = 2) }'
 check "duplicate argument 'a'" 'template pair(a: Nat, b: Nat): Nat { body = $a } template filled: Nat { body = pair(1, a = 2) }'
@@ -41,8 +44,9 @@ check 'too many arguments' 'template pair(a: Nat, b: Nat): Nat { body = $a } tem
 check 'reserved parameter name' 'template bad(none: Int): Int { body = 1 }'
 check 'reserved parameter name' 'template bad(true: Int): Int { body = 1 }'
 check 'reserved parameter name' 'template bad(false: Int): Int { body = 1 }'
-check 'unknown word' 'action bad { deed = foo(1), body = sequentially([]) }'
-check 'none requires Option' 'action bad { deed = none(1), body = sequentially([]) }'
+check "unknown word 'foo'" 'primitive sequentially(steps: List(Action) = []): Action = Sequentially action bad { deed = foo(1), body = sequentially([]) }'
+check 'none requires Option' 'primitive sequentially(steps: List(Action) = []): Action = Sequentially action bad { deed = none(1), body = sequentially([]) }'
+check "unknown word 'customWord' at String" 'primitive sequentially(steps: List(Action) = []): Action = Sequentially action bad { deed = customWord, body = sequentially([]) }'
 check 'Dependency cycle in bundle' 'template a: Int { body = b } template b: Int { body = a }'
 check "dotted word 'Int.b'" 'template a: Int { body = Int.b } template b: Int { body = 1 }'
 check "non-canonical integer '007'" 'template leadingZero: Int { body = 007 }'
@@ -53,7 +57,7 @@ check "invalid integer '1_000'" 'template separated: Int { body = 1_000 }'
 check "integer out of range '9223372036854775808'" 'template tooLarge: Int { body = 9223372036854775808 }'
 check "integer out of range '-9223372036854775809'" 'template tooSmall: Int { body = -9223372036854775809 }'
 check 'Dependency cycle in bundle' 'ability mutualOne { body = [mutualTwo] } ability mutualTwo { body = [mutualOne] }'
-check 'ofAbility cannot be combined with deed or permanent' 'action bad { ofAbility = foo, deed = other, body = sequentially([]) }'
+check 'ofAbility cannot be combined with deed or permanent' 'primitive sequentially(steps: List(Action) = []): Action = Sequentially action bad { ofAbility = foo, deed = other, body = sequentially([]) }'
 check "parameter '\$power' has sort" 'template wrongSortParameterIsRefused(power: Amount): Stat { body = $power }'
 check "parameter '\$who' has sort" 'template noNounSubject(who: NounPhrase): Subject { body = $who }'
 check "unknown word 'draw' at Cost" 'template noActionCost: Cost { body = draw(exactlyOf(1)) }'
@@ -74,38 +78,37 @@ check "parameter '\$value' has sort" 'template noCharacteristicBundle(value: Cha
 check "parameter '\$value' has sort" 'template noActionMode(value: Action): Mode { body = $value }'
 check "parameter '\$value' has sort" 'template noReplacementAction(value: Replacement): Action { body = $value }'
 check "parameter '\$value' has sort" 'template noActionReplacement(value: Action): Replacement { body = $value }'
-check 'firstMention is reserved for generated parameter identities' 'template noWrittenFirst(subject: NounPhrase): NounPhrase { body = firstMention("manual", $subject) }'
-check 'firstMention is reserved for generated parameter identities' 'primitive noFirstAlias(id: String, body: NounPhrase): NounPhrase = .firstMention'
-check 'raw DesignationLabel construction requires a registry declaration' 'template noDesignation: DesignationLabel { body = named("typo", heldByGame) }'
-check 'raw RelationLabel construction requires a registry declaration' 'template noRelation: RelationLabel { body = named("typo") }'
-check 'raw Subtype construction requires a registry declaration' 'template noSubtype: Subtype { body = of(creature, "Typo") }'
-check 'raw Subtype construction requires a registry declaration' 'template noSpellSubtype: Subtype { body = spell("Typo") }'
-check 'raw CardType construction requires a registry declaration' 'template noCardType: CardType { body = mk("Typo", none, []) }'
+check 'firstMention is reserved for generated parameter identities' 'primitive noFirstAlias(id: String, body: NounPhrase): NounPhrase = FirstMention'
+check 'raw DesignationLabel construction requires a registry declaration' 'primitive noDesignation: DesignationLabel = Named'
+check 'raw RelationLabel construction requires a registry declaration' 'primitive noRelation: RelationLabel = Named'
+check 'raw Subtype construction requires a registry declaration' 'primitive noSubtype: Subtype = Of'
+check 'raw Subtype construction requires a registry declaration' 'primitive noSpellSubtype: Subtype = Spell'
+check 'raw CardType construction requires a registry declaration' 'primitive noCardType: CardType = Mk'
 check 'raw CardType construction requires a registry declaration' 'template noCardTypeRecord: CardType { body = { name = "Typo" } }'
-check 'raw RegistryDefinition construction requires a registry declaration' 'template noRegistry: RegistryDefinition { body = relation(named("typo")) }'
-check 'Action.inCaller is reserved for generated caller scope' 'template noActionCaller(value: Action): Action { body = inCaller($value) }'
-check 'Cost.inCaller is reserved for generated caller scope' 'template noCostCaller(value: Cost): Cost { body = inCaller($value) }'
-check 'StaticSpec.inCaller is reserved for generated caller scope' 'template noStaticSpecCaller(value: StaticSpec): StaticSpec { body = inCaller($value) }'
-check 'Replacement.inCaller is reserved for generated caller scope' 'template noReplacementCaller(value: Replacement): Replacement { body = inCaller($value) }'
-check 'Amount.inCaller is reserved for generated caller scope' 'template noAmountCaller(value: Amount): Amount { body = inCaller($value) }'
-check 'Predicate.inCaller is reserved for generated caller scope' 'template noPredicateCaller(value: Predicate): Predicate { body = inCaller($value) }'
-check 'Quantity.inCaller is reserved for generated caller scope' 'template noQuantityCaller(value: Quantity): Quantity { body = inCaller($value) }'
-check 'Location.inCaller is reserved for generated caller scope' 'template noLocationCaller(value: Location): Location { body = inCaller($value) }'
-check 'Condition.inCaller is reserved for generated caller scope' 'template noConditionCaller(value: Condition): Condition { body = inCaller($value) }'
-check 'GameEvent.inCaller is reserved for generated caller scope' 'template noGameEventCaller(value: GameEvent): GameEvent { body = inCaller($value) }'
-check 'Ability.inCaller is reserved for generated caller scope' 'template noAbilityCaller(value: Ability): Ability { body = inCaller($value) }'
-check 'TokenSpec.inCaller is reserved for generated caller scope' 'template noTokenSpecCaller(value: TokenSpec): TokenSpec { body = inCaller($value) }'
-check 'MoveRider.inCaller is reserved for generated caller scope' 'template noMoveRiderCaller(value: MoveRider): MoveRider { body = inCaller($value) }'
-check 'raw KeywordLabel construction requires a registry declaration' 'template noRawKeywordLabel: KeywordLabel { body = named("flyign") }'
-check 'raw CounterKind construction requires a registry declaration' 'template noRawCounterKind: CounterKind { body = named("loyatlyCounter") }'
-check 'raw KeywordLabel construction requires a registry declaration' 'primitive noKeywordLabelAlias(name: String): KeywordLabel = .named'
-check 'raw CounterKind construction requires a registry declaration' 'primitive noCounterKindAlias(name: String, holder: Kind): CounterKind = .named'
-check 'laterMention is reserved for generated parameter identities' 'template noWrittenLater(subject: NounPhrase): NounPhrase { body = laterMention("manual", $subject) }'
-check 'Action.ownScope is reserved for generated scope and deeds' 'template noWrittenScope: Action { body = ownScope(none, sequentially([])) }'
-check 'NounPhrase.inCaller is reserved for generated scope and deeds' 'template noNounCaller(subject: NounPhrase): NounPhrase { body = inCaller($subject) }'
-check 'Deed.action is reserved for generated scope and deeds' 'template noRawDeed: Deed { body = action("discard") }'
-check 'raw Ability.keyword construction requires an ability declaration' 'ability flying { body = [] } template noEmptyKeyword: Ability { body = keyword(flying, [], []) }'
-check 'Action.ownScope is reserved for generated scope and deeds' 'template theRingTemptsYou: Action { body = ownScope(none, sequentially([])) }'
+check 'raw RegistryDefinition construction requires a registry declaration' 'primitive noRegistry: RegistryDefinition = Relation'
+check 'Action.inCaller is reserved for generated caller scope' 'primitive noActionCaller: Action = InCaller'
+check 'Cost.inCaller is reserved for generated caller scope' 'primitive noCostCaller: Cost = InCaller'
+check 'StaticSpec.inCaller is reserved for generated caller scope' 'primitive noStaticSpecCaller: StaticSpec = InCaller'
+check 'Replacement.inCaller is reserved for generated caller scope' 'primitive noReplacementCaller: Replacement = InCaller'
+check 'Amount.inCaller is reserved for generated caller scope' 'primitive noAmountCaller: Amount = InCaller'
+check 'Predicate.inCaller is reserved for generated caller scope' 'primitive noPredicateCaller: Predicate = InCaller'
+check 'Quantity.inCaller is reserved for generated caller scope' 'primitive noQuantityCaller: Quantity = InCaller'
+check 'Location.inCaller is reserved for generated caller scope' 'primitive noLocationCaller: Location = InCaller'
+check 'Condition.inCaller is reserved for generated caller scope' 'primitive noConditionCaller: Condition = InCaller'
+check 'GameEvent.inCaller is reserved for generated caller scope' 'primitive noGameEventCaller: GameEvent = InCaller'
+check 'Ability.inCaller is reserved for generated caller scope' 'primitive noAbilityCaller: Ability = InCaller'
+check 'TokenSpec.inCaller is reserved for generated caller scope' 'primitive noTokenSpecCaller: TokenSpec = InCaller'
+check 'MoveRider.inCaller is reserved for generated caller scope' 'primitive noMoveRiderCaller: MoveRider = InCaller'
+check 'raw KeywordLabel construction requires a registry declaration' 'primitive noRawKeywordLabel: KeywordLabel = Named'
+check 'raw CounterKind construction requires a registry declaration' 'primitive noRawCounterKind: CounterKind = Named'
+check 'raw KeywordLabel construction requires a registry declaration' 'primitive noKeywordLabelAlias(name: String): KeywordLabel = Named'
+check 'raw CounterKind construction requires a registry declaration' 'primitive noCounterKindAlias(name: String, holder: Kind): CounterKind = Named'
+check 'laterMention is reserved for generated parameter identities' 'primitive noWrittenLater: NounPhrase = LaterMention'
+check 'Action.ownScope is reserved for generated scope and deeds' 'primitive noWrittenScope: Action = OwnScope'
+check 'NounPhrase.inCaller is reserved for generated scope and deeds' 'primitive noNounCaller: NounPhrase = InCaller'
+check 'Deed.action is reserved for generated scope and deeds' 'primitive noRawDeed: Deed = Action'
+check 'raw Ability.keyword construction requires an ability declaration' 'primitive noEmptyKeyword: Ability = Keyword'
+check 'Action.ownScope is reserved for generated scope and deeds' 'primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope'
 mv "$scratch/input/bad.syl" "$scratch/input/theRingTemptsYou.syl"
 if "$exe" "$scratch/input" "$scratch/out" Negative > "$scratch/log" 2>&1; then
   echo 'unexpected success: copied Ring filename' >&2
@@ -125,11 +128,17 @@ check "'\$' must be directly followed by a parameter name" 'template loneSigil: 
 check "'\$' must be directly followed by a parameter name" 'template spacedSigil(x: Int): Int { body = $ x }'
 check "dotted word '\$x.y'" 'template dottedParameter(x: Int): Int { body = $x.y }'
 check "unknown word 'amount' at Nat" 'template bareParameter(amount: Nat): Nat { body = amount }'
-printf 'sylGen negative cases: 99 passed\n'
+check "unknown word 'power' at Stat" 'template noConstructorWord: Stat { body = power }'
+check 'integer at Amount' 'template noIntegerAmount: Amount { body = 3 }'
+check 'integer at ManaSymbol' 'template noIntegerMana: List(ManaSymbol) { body = [2] }'
+check "unknown word 'blue' at ManaSymbol" 'primitive blue: Color = Blue template noColorMana: List(ManaSymbol) { body = [blue] }'
+check "unknown word 'blue' at ColorOrColorless" 'primitive blue: Color = Blue template noColorOrColorless: ColorOrColorless { body = blue }'
+check "unknown word 'kicker' at KeywordTerm" 'ability kicker { body = [] } template noKeywordTerm: KeywordTerm { body = kicker }'
+printf 'sylGen negative cases: %s passed\n' "$passed"
 
-printf '%s\n' 'template shadowed(white: Color): Color { body = white }' > "$scratch/input/bad.syl"
+printf '%s\n' 'primitive white: Color = White template shadowed(white: Color): Color { body = white }' > "$scratch/input/bad.syl"
 "$exe" "$scratch/input" "$scratch/shadow-output" "" Shadow > "$scratch/log" 2>&1
-grep -F ': Semantics.«Color» := («Semantics».«Color».«white» )' "$scratch/shadow-output/Shadow/"*.lean >/dev/null
+grep -F ': Semantics.«Color» := («Semantics».«Templates».«white» )' "$scratch/shadow-output/Shadow/"*.lean >/dev/null
 printf 'sylGen bare word beside a same-named parameter: passed\n'
 
 printf '%s\n' 'template value: Int { body = 1 } template use: Int { body = value }' > "$scratch/input/bad.syl"
@@ -171,10 +180,23 @@ export LEAN_PATH="$scratch/bad-output:$LEAN_PATH"
 printf 'sylGen separate card refusal report: passed\n'
 
 mkdir -p "$scratch/corpus/builtin/definitions/keyword_action" "$scratch/elsewhere"
-printf '%s\n' 'action theRingTemptsYou { body = ownScope(action("theRingTemptsYou"), sequentially([])) }' > "$scratch/corpus/builtin/definitions/keyword_action/theRingTemptsYou.syl"
+ring='primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope
+primitive action(label: String, permanent: DeedPermanent = noPermanent): Deed = Action
+primitive noPermanent: DeedPermanent = NoPermanent
+primitive sequentially(steps: List(Action) = []): Action = Sequentially
+action theRingTemptsYou { body = ownScope(action("theRingTemptsYou"), sequentially([])) }'
+printf '%s\n' "$ring" > "$scratch/corpus/builtin/definitions/keyword_action/theRingTemptsYou.syl"
 (
   cd "$scratch/elsewhere"
   "$exe" "$scratch/corpus" "$scratch/ring-output" RingFixture Ring.Generated > "$scratch/log" 2>&1
 )
 test -f "$scratch/ring-output/Ring/Generated.lean"
 printf 'sylGen corpus-relative Ring exception: passed\n'
+
+printf '%s\n' 'template elsewhere: Action { body = ownScope(none, sequentially([])) }' > "$scratch/corpus/builtin/elsewhere.syl"
+if "$exe" "$scratch/corpus" "$scratch/ring-use-output" RingFixture Ring.Generated > "$scratch/log" 2>&1; then
+  echo "unexpected success: the Ring's temporary primitive used elsewhere" >&2
+  exit 1
+fi
+grep -F 'elsewhere.syl:1:' "$scratch/log" | grep -F 'Action.ownScope is reserved for generated scope and deeds' >/dev/null
+printf "sylGen Ring primitives refused outside the Ring's file: passed\n"

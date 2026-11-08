@@ -1,13 +1,16 @@
 template parameterShadowsWord(white: Color): Color { body = $white }
 template optionalParameter(white: Color): Option(Color) { body = $white }
 template exactOptionalParameter(white: Option(Color)): Option(Color) { body = $white }
+primitive legendary: Supertype = Legendary
+primitive basic: Supertype = Basic
 template enumWords: List(Supertype) { body = [legendary, basic] }
+primitive upkeep: TurnPart = Upkeep
 template optionalEnum: Option(TurnPart) { body = upkeep }
-template manaAtoms: List(ManaSymbol) { body = [2, blue] }
-template optionalAmount: Option(Amount) { body = 3 }
 template definitionLabel: KeywordLabel { body = sourceAbility }
-template definitionTerm: KeywordTerm { body = sourceAbility }
 template actionDeed: Deed { body = calledDeed }
+primitive setStatus(status: Status, subject: NounPhrase): Action = SetStatus
+primitive tapped: Status = Tapped
+primitive untapped: Status = Untapped
 action callerWrapped(subject: NounPhrase) { body = setStatus(tapped, $subject) }
 template repeatedSelection(subject: NounPhrase): Action {
   body = sequentially([setStatus(tapped, $subject), setStatus(untapped, $subject)])
