@@ -126,9 +126,9 @@ needs: [lean-v3-rules-and-card-fidelity]
   `phasingTurnBased`, `Proofs/Rules.lean`). The rows for the combat damage keywords are
   `lean-v3-combat-damage-rule-rows`, start your engines! is `syl-speed-rules`, and
   phasing's "the active player controlled when they phased out" is
-  `syl-active-player-and-indirect-phasing`. The phasing row leaves an attachment phased out with its
+  `syl-active-player-noun-phrase`. The phasing row leaves an attachment phased out with its
   phased-out host to phase in with that host [CR#702.26g] (`rprturmu`); telling a direct phase-out
-  from an indirect one exactly is `lean-v3-phasing-direct-phase-out`. Only the deck-construction keywords are bodiless with no row.
+  from an indirect one exactly is `syl-indirect-phase-out`. Only the deck-construction keywords are bodiless with no row.
   Vigilance keeps its body.
 
 ### 2. Retire Unread Registry Columns & Cross-Pin Catalog Authorities (Astra §4, Opus §§5.3, 6.9)

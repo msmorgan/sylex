@@ -1,5 +1,5 @@
 ---
-needs: [syl-tocast-noun-phrase-and-noted-mana]
+needs: [syl-tocast-noun-phrase]
 ---
 # A card a cast permission names is "that spell" to the text after it
 
@@ -39,7 +39,7 @@ instead of writing the anaphor.
 ## Not in scope
 
 Letting `toCast` take a noun phrase (today it takes a `Predicate`): that is
-`syl-tocast-noun-phrase-and-noted-mana`.
+`syl-tocast-noun-phrase`.
 
 ## Pointers
 
