@@ -329,12 +329,9 @@ fn printed_name(card: &Value) -> Result<String, String> {
         ValueKind::Record(record) => record,
         ValueKind::Call(call) => {
             let args: Vec<_> = call.args.iter().filter_map(|a| a.node()).collect();
-            let [arg] = args.as_slice() else {
-                return Err("expected named card parts".to_owned());
-            };
-            let (None, ValueKind::Record(record)) = (arg.name, &arg.value.kind) else {
-                return Err("expected named card parts".to_owned());
-            };
+            if args.iter().any(|arg| arg.name.is_none()) {
+                return Err("card parts are named arguments".to_owned());
+            }
             let parts: &[&str] = match call.head.ident.as_str() {
                 "transforming" | "modalDfc" => &["front", "back"],
                 "split" | "sharedLineSplit" => &["left", "right"],
@@ -346,11 +343,11 @@ fn printed_name(card: &Value) -> Result<String, String> {
             let names = parts
                 .iter()
                 .map(|part| {
-                    let field = record
-                        .nodes()
-                        .find(|f| f.name.ident == *part)
+                    let arg = args
+                        .iter()
+                        .find(|arg| arg.name.is_some_and(|name| name.ident == *part))
                         .ok_or_else(|| format!("missing card part '{part}'"))?;
-                    printed_name(&field.value)
+                    printed_name(&arg.value)
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             return Ok(names.join(" // "));
@@ -411,7 +408,7 @@ card_type artifact { name = \"Artifact\", count = 3 }
 # Detached.
 
 primitive cost(x: Option(Mana) = none, y: Option(Mana) = $x): Cost = Mk
-card split({ left = { name = \"Fire\" }, right = { name = \"Ice\" } })
+card split(left = { name = \"Fire\" }, right = { name = \"Ice\" })
 ";
 
     fn rust_side() -> BTreeMap<String, Result<Json, String>> {
@@ -449,12 +446,12 @@ card split({ left = { name = \"Fire\" }, right = { name = \"Ice\" } })
             {
                 "kind": "card", "name": "Fire // Ice", "parameters": [],
                 "sort": { "name": "Card", "args": [] }, "fields": [], "constructor": null,
-                "cardValue": { "word": "split", "args": [{ "name": null, "value": { "record": [
+                "cardValue": { "word": "split", "args": [
                     { "name": "left", "value": { "record": [
                         { "name": "name", "value": { "string": "Fire" } }] } },
                     { "name": "right", "value": { "record": [
                         { "name": "name", "value": { "string": "Ice" } }] } },
-                ] } }] },
+                ] },
                 "documentation": "",
             },
         ]);
@@ -469,8 +466,8 @@ card split({ left = { name = \"Fire\" }, right = { name = \"Ice\" } })
     #[test]
     fn injected_mismatch_is_reported_with_path_and_both_sides() {
         let mut lean = lean_side();
-        lean.get_mut("a.syl").unwrap()["declarations"][2]["cardValue"]["args"][0]["value"]["record"]
-            [1]["value"]["record"][0]["value"]["string"] = json!("Water");
+        lean.get_mut("a.syl").unwrap()["declarations"][2]["cardValue"]["args"][1]["value"]["record"]
+            [0]["value"]["string"] = json!("Water");
         let differences = compare(&lean, &rust_side());
         assert_eq!(differences.len(), 1, "{differences:?}");
         let message = &differences[0];

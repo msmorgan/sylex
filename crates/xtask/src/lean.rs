@@ -116,6 +116,14 @@ lean_lib Proof where
         let input = package.join("input");
         std::fs::create_dir_all(&input)?;
         std::fs::write(
+            input.join("primitives.syl"),
+            concat!(
+                "primitive permanentCard: CardClass = PermanentCard\n",
+                "primitive simple(symbol: SimpleManaSymbol): ManaSymbol = Simple\n",
+                "primitive generic(amount: Nat): SimpleManaSymbol = Generic\n",
+            ),
+        )?;
+        std::fs::write(
             input.join("artifact.syl"),
             "card_type artifact { name = \"artifact\", cardClass = permanentCard }\n",
         )?;
@@ -235,7 +243,9 @@ lean_lib Proof where
     fn write_card(input: &Path, name: &str, cost: u32) -> anyhow::Result<()> {
         std::fs::write(
             input.join(format!("{name}.syl")),
-            format!("card {{ name = \"{name}\", cost = [{cost}], types = [artifact] }}\n"),
+            format!(
+                "card {{ name = \"{name}\", cost = [simple(generic({cost}))], types = [artifact] }}\n"
+            ),
         )?;
         Ok(())
     }
