@@ -6,7 +6,8 @@ needs: [runtime-prose-link]
 ## Why
 
 The TUI renders a derived ability's prose by looking its core value up in a value-keyed index
-(today v1's `sylex_plugin_v1::provenance::ProvenanceIndex`; the v3 lowering will need its own).
+(today v1's `sylex_plugin_v1::provenance::ProvenanceIndex`, which `v1-retirement` replaces with
+these refs).
 The index renders correctly only while equal lowered values always render the same prose, which
 holds on a canonical-form authored surface. This ticket stays parked until that stops being
 enough: a UI needs per-source attribution (two identical grants from different sources are
@@ -21,8 +22,10 @@ index collision misrenders a card.
   from the lowered structure.
 - A ref is an opaque token outside core equality, hashing and serde, and no game decision reads
   it.
-- A renderer uses the ref when present and the index as the fallback; a value with no authored
-  source fails visibly and never invents prose.
+- Refs are the only route from a core value back to its prose: there is no value-keyed index
+  fallback, which would be the reverse map from core that
+  [architecture](../../decisions/architecture.md) "Two-way above, one-way below" rejects. A value
+  with no authored source fails visibly and never invents prose.
 
 ## Done when
 

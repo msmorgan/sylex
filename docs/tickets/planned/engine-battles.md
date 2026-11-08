@@ -1,5 +1,5 @@
 ---
-needs: [engine-counters-api, engine-transform, engine-dfc-cast-faces]
+needs: [engine-counters-api, engine-transform, engine-dfc-cast-faces, engine-loyalty-defense-zone-reads]
 ---
 **Battles play in the engine: defense, the protector, attacking a battle, and a Siege's defeat.**
 
@@ -14,8 +14,7 @@ missing.
 
 ## Done when
 
-- A battle enters with defense counters equal to its printed defense [CR#310.4b], and damage
-  dealt to it removes that many [CR#120.3h].
+- Damage dealt to a battle removes that many defense counters from it [CR#120.3h].
 - As a battle enters, its controller chooses its protector: a Siege's from among their opponents
   [CR#310.9a,310.12a]. The protector is tracked per battle and survives the battle stopping
   being a battle or becoming a copy [CR#310.9g].

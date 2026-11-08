@@ -35,17 +35,22 @@ The values, wherever they come to live:
 | solved | Flag | None | ObjectLifetime |
 | suspected | Flag | None | ObjectLifetime |
 
-Two rows are flagged as likely wrong:
+These rows are flagged as likely wrong:
 
 - The single `day / night` Enum row contradicts the corpus, which declares `day.syl` and
   `night.syl` separately.
 - `ringBearer` as EffectSupplied: a creature stays your Ring-bearer until another creature becomes
   your Ring-bearer or another player gains control of it [CR#701.54a], which is a rule-defined
   persistence, not one an effect supplies.
+- `goaded` and `ringBearer` with shape `Relation`: each points at a player, goaded at the player
+  or players who goaded it [CR#701.15b,701.15c] and the Ring-bearer at its player [CR#701.54a],
+  while the glossary's Relation is a link between two Objects. Core's `DesignationShape::Relation`
+  (documented as "A relation to another object") has the same defect. The replacement shape is
+  open.
 
 **Done when.**
 - The owner has decided where each of the three values lives, and why.
-- Every designation states its values in that place, matching the table with the two flagged rows
+- Every designation states its values in that place, matching the table with the flagged rows
   resolved and `foretold` and `plotted` filled in; `sole` is folded into uniqueness if uniqueness
   moves to `.syl`.
 - If the values are on `.syl`, the `.syl` checks pass; if they are engine-side, the engine reads

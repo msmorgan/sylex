@@ -30,7 +30,9 @@ subject twice.
 - Everything passes the `.syl` checks.
 
 **Not in scope.** `destroy`, which rightly reaches any permanent. The destination stays the bare
-`graveyard`, which is consistent with "its owner's graveyard" [CR#701.21a].
+`graveyard`, which is consistent with "its owner's graveyard" [CR#701.21a]. The destination
+template's spelling ("your graveyard" for an owner's-graveyard body) is the `.syl` zone-words
+fix, not this ticket.
 
 **Pointers.** `plugins/builtin/definitions/keyword_action/{sacrifice,forage,destroy}.syl`,
 `plugins/builtin/templates/action/controllerSacrifices.syl`, `docs/decisions/semantics.md` §2.3.

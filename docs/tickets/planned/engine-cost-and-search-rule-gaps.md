@@ -15,8 +15,8 @@ No current card hits these yet; the first card of each kind will.
    over the matching pips also comes off generic [CR#118.7c,118.7d]. So {W}{U}{B}{R}{G} off a
    {3}{U} spell should leave {0}; the engine leaves {3}. The Khalni Hydra ruling adds that its {G}
    reduction also cuts an imposed generic tax, after taking the green. Core
-   `CostChange::Reduce(Arc<[CostComponent]>)` cannot say "colored only", but the `.syl`
-   `bySymbols(change, coloredOnly)` primitive can, and Edgewalker uses it.
+   `CostChange::Reduce(Arc<[CostComponent]>)` cannot say "colored only", which Edgewalker's
+   reduction needs.
 2. **A gain-life cost under "can't gain life".** `activate.rs` treats a `ChangeLife` cost with
    `LifeOp::Up` or `LifeOp::Set` as always payable. While the player who would gain the life
    can't gain life, such a cost can't be paid [CR#119.7], and a set that raises a life total is a
@@ -38,8 +38,9 @@ No current card hits these yet; the first card of each kind will.
 
 ## Done when
 
-- Core `CostChange::Reduce` carries a colored-only flag. A colored or {C} reduction that finds no
-  matching pip, or that exceeds the matching pips, reduces generic unless the flag is set. Tests
+- Core `CostChange` tells a colored-only reduction apart by a typed construct (an enum or a
+  separate variant, not a `bool`). A colored or {C} reduction that finds no matching pip, or that
+  exceeds the matching pips, reduces generic unless it is colored-only. Tests
   cover the {3}{U} case, a Khalni Hydra-shaped {G} reduction under a generic tax, and Edgewalker's
   colored-only reduction.
 - A gain-life or raising-`Set` cost is unpayable while the player who would gain can't gain life,
@@ -58,7 +59,7 @@ No current card hits these yet; the first card of each kind will.
 
 - `crates/engine/src/cast.rs` (`reduce_mana_components`, `reduce_symbol`)
 - `crates/core/src/continuous.rs` (`CostChange`)
-- `plugins/builtin/primitives/cost/bySymbols.syl`, `plugins/canon/cards/Edgewalker.syl`
+- `plugins/canon/cards/Edgewalker.syl`
 - `crates/engine/src/activate.rs` (the `ChangeLife` payability arm, the [CR#119.8] seam)
 - `crates/engine/src/payment/fulfill.rs`
 - `crates/engine/src/resolve/effect.rs` (`Instruction::Search`), `crates/engine/src/resolve/query.rs`

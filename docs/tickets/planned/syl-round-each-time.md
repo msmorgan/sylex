@@ -26,7 +26,7 @@ different directions.
 - *Saw in Half* is re-encoded with it, and *Pox* or *Fraying Omnipotence* is added as the witness
   for a "then" chain; a test shows every fraction of that chain is covered.
 - `half` (rounded) is unchanged and *Banshee*-style sentences still use it.
-- `docs/decisions/semantics.md` records the construct.
+- The `roundEachTime` declaration's doc comment records the construct.
 
 **Pointers.** `plugins/builtin/primitives/quantity/half.syl`,
 `plugins/canon/cards/Saw in Half.syl`.

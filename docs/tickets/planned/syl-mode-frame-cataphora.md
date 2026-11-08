@@ -38,7 +38,7 @@ this shape.
 - Once reference resolution exists, each frame demonstrative resolves to the bound filler and
   nothing else: the mode choice fixes what it denotes [CR#700.2a,700.2b] before targets are chosen
   [CR#601.2b,601.2c], and an unchosen Mode's targets are never chosen [CR#700.2c].
-- `docs/decisions/semantics.md` records the construct.
+- The construct's doc comment records it.
 
 **Pointers.** `plugins/canon/cards/{Call Damage Control,Wild Shape}.syl`,
 `plugins/builtin/primitives/action/actionChooseModes.syl`,

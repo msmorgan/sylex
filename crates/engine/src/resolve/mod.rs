@@ -126,7 +126,7 @@ impl GameState {
                     ))]);
                 } else if self.is_permanent_spell(spell) {
                     // [CR#608.3]: a permanent spell enters the battlefield.
-                    // Host resolution by entry context (spec §4, [CR#303.4]): a
+                    // Host resolution by entry context (spec §4, [CR#608.3c]): a
                     // permanent SPELL that enters attached (the Enchant
                     // `AsEnters`) attaches to its resolving spell's CHOSEN
                     // TARGET — the Aura's enchant target —

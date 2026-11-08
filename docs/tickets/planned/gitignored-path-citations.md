@@ -5,9 +5,9 @@ needs: []
 
 ## Why
 
-A comment or message in tracked code that cites a gitignored path (`docs/superpowers/`,
-`docs/memory/`, `docs/evidence/`, `docs/cleanup/`, `.superpowers/`) dangles in a fresh checkout.
-One such citation remains in code that is not being deleted:
+A comment or message in tracked code that cites a gitignored path (`docs/memory/`,
+`docs/evidence/`, `docs/cleanup/`, `.superpowers/`) or a nonexistent one (`docs/superpowers/`)
+dangles in a fresh checkout. One such citation remains in code that is not being deleted:
 `v1/crates/macro_ron/src/frames.rs` cites a `docs/superpowers/research/…` file for corpus
 counts the comment already states. Nothing stops a new one from landing.
 

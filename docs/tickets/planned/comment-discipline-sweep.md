@@ -1,5 +1,5 @@
 ---
-needs: [comment-reviewer-hotspots]
+needs: []
 ---
 
 # Comment discipline: sweep every crate
@@ -31,10 +31,11 @@ The comment rule, which the sweep applies and new and edited code follows:
 
 ## Done when
 
+- `rg -n -e '\bTask [0-9]' -e 'P0\.W[0-9]' crates` returns no hits; each former hit is the
+  durable invariant or a labeled `TODO`/`SEAM` naming a real ticket slug.
 - Every file in `crates/` with 100 or more comment lines (regenerate the list at claim time with
   `rg -t rust -c '^\s*//' crates | awk -F: '$2>=100'`) has had a whole-file comment pass under the
-  rule in Design, crate by crate: `sylex_engine`, `sylex_core`, `sylex_syntax`, then the rest. Files done by
-  `comment-reviewer-hotspots` are skipped unless a violation was missed.
+  rule in Design, crate by crate: `sylex_engine`, `sylex_core`, `sylex_syntax`, then the rest.
 - The remaining files are checked for the mechanical patterns (diff-speak, imperative narration,
   commented-out code, plan-speak) hit by hit.
 - No ruling is lost: every CR citation removed with a comment is either restated where it still

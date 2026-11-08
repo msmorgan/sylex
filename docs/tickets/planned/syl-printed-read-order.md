@@ -20,8 +20,9 @@ proofs call the generated definitions positionally.
   the `preventDamage`, `removeCounters`, `vote` and `pay` families.
 - `doIf` has no `postposed` parameter; `doOnlyIf` ("<action> if <condition>") says the printed
   order itself, and what the flag changed for reference resolution is kept by that order.
-- Required arguments that end up after an optional one are passed by name where the argument
-  binding rule requires it.
+- The argument-naming rule (whether positional arguments bind only required parameters) is
+  settled first; it may remove the need to name them. Under the settled rule, required arguments
+  that end up after an optional one are passed by name where it requires it.
 
 ## Pointers
 

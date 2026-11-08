@@ -1,5 +1,5 @@
 ---
-needs: [idris-retirement]
+needs: [syl-primitive-constructors]
 ---
 # Delete `lean/`
 

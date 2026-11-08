@@ -1,5 +1,5 @@
 ---
-needs: [engine-planeswalkers]
+needs: []
 ---
 
 # The headless simulator runs the rules-as-data rows
@@ -12,11 +12,13 @@ loyalty, and type conferrals never apply. The TUI's game path loads them from th
 the engine's real behavior.
 
 **Done when.**
-- `sim::play` loads every rules-as-data field of its `GameConfig` from the same plugins the TUI
-  uses, through one shared loader rather than a copy of the TUI's code.
+- `sim::play` takes every rules-as-data field of its `GameConfig` from its caller instead of
+  building them empty. Loading them from the plugins stays outside `sylex_engine`'s library,
+  which gains no v1 dependency (the v1 plugin crates stay dev-dependencies).
 - The comment calling the empty rules acceptable is gone.
 - A sim test with a real planeswalker shows damage removing loyalty and the planeswalker dying at
   zero loyalty.
-- The matchups suite passes.
 
-**Pointers.** `crates/engine/src/sim.rs` (`play`), `crates/tui/src/game.rs`.
+**Pointers.** `crates/engine/src/sim.rs` (`play`), `crates/engine/Cargo.toml`,
+`crates/tui/src/game.rs`, `crates/engine/examples/full_game_1k.rs`,
+`crates/engine/benches/full_game.rs`.

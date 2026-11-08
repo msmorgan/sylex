@@ -15,14 +15,15 @@ cost-to-attack form has no optional variant, so the static cannot be written.
 
 - The static is an offered variant of `gatedBy`: an optional cost the player may pay as the
   creature attacks [CR#508.1g,702.154b], not a prohibition unless paid, and not written with
-  `asEvent`.
+  `asEvent`. The offered form is a typed construct, not a `Bool` parameter (`addedCost`'s
+  `offered: Bool` is due for the same replacement).
 - "That you didn't choose to attack with" reads the declaration's chosen set, not
   `isAttacking`: the cost is chosen at [CR#508.1g], before the chosen creatures become attacking
   creatures [CR#508.1k].
 
 ## Done when
 
-- `gatedBy` has the offered form.
+- `gatedBy` has the offered form, as a typed construct rather than a `Bool` parameter.
 - `.syl` has a predicate for "a creature chosen to attack in this declaration" [CR#508.1g].
 - "Has been under your control continuously since this turn began" reuses `heldSince` (as
   `controlledSinceTheirTurnBegan` and `echo.syl` do); no new lookback is invented for it.

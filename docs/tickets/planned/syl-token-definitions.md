@@ -16,8 +16,8 @@ keeps a second hand-synchronized copy of every predefined token's characteristic
   `plugins/builtin/definitions/token/`. The declaration's name is the key an effect writes ("create
   a Clue token"), not its subtype: Role tokens are told apart by name, and a Walker is a Zombie
   [CR#111.10d].
-- `create` takes a token Definition where it now takes `written(clueToken)`; `investigate`,
-  `giftAFood`, `giftATreasure` and the canon cards that create Treasure (*Ragavan, Nimble
+- `create` takes a token Definition where it now takes `written(clueToken)`; `investigate` and
+  the canon cards that create Treasure (*Ragavan, Nimble
   Pilferer*, *Spell Swindle*, *Zidane, Tantalus Thief*) use it; `clueToken.syl`, `foodToken.syl`
   and `treasureToken.syl` are deleted.
 - A token Definition's declared characteristics, at least its subtype, can be named from `.syl`,
@@ -25,10 +25,10 @@ keeps a second hand-synchronized copy of every predefined token's characteristic
   (needed by `syl-empower-token-parameter`).
 - A token a keyword action's rule defines in full, as [CR#701.71a] defines the Jace planeswalker
   token, is a `token` Definition too, and the glossary names the term that covers both.
-- Core's hardcoded predefined tokens are gone; the token Definitions are the one copy.
 - Everything passes the `.syl` checks.
 
+**Not in scope.** Removing core's `PredefinedToken`, once the engine's input comes from `.syl`.
+
 **Pointers.** `plugins/builtin/templates/noun/{clueToken,foodToken,treasureToken}.syl`,
-`plugins/builtin/definitions/keyword_action/{investigate,empowerJace}.syl`,
-`plugins/builtin/templates/ability/{giftAFood,giftATreasure}.syl`, `crates/core/src/token.rs`,
+`plugins/builtin/definitions/keyword_action/{investigate,empowerJace}.syl`, `crates/core/src/token.rs`,
 `crates/xtask/src/dsl.rs` (`kind_sort`).

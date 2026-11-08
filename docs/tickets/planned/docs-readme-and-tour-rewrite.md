@@ -1,5 +1,5 @@
 ---
-needs: [ci-lean-gate, ci-noncanon-gate, comment-reviewer-hotspots, engine-verb-ident-table, readme-oracle-text-primer, readme-reviewer-path, todo-harness-ci]
+needs: [ci-lean-gate, ci-noncanon-gate, comment-discipline-sweep, engine-verb-ident-table, readme-oracle-text-primer, readme-reviewer-path, todo-harness-ci]
 ---
 
 # Rewrite the README and guided tour, and verify them on a fresh clone

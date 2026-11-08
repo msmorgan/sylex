@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [engine-ability-origin-refs]
 ---
 
 # Delete `v1/` once the new line reaches parity
@@ -13,8 +13,9 @@ still load cards through it, and engine tests and examples load `v1/plugins/buil
 **Done when.**
 - Every crate outside `v1/` gets its cards from the `.syl` pipeline and its lowering to core, and
   no `Cargo.toml` outside `v1/` names a v1 crate.
-- What is still used from `sylex_plugin_v1` (`deck.rs`, `provenance.rs`) is rehomed in a current
-  crate, or replaced.
+- What is still used from `sylex_plugin_v1` is gone from it: `deck.rs` is rehomed in a current
+  crate or replaced, and `provenance.rs` is replaced by lowering-time refs
+  (`engine-ability-origin-refs`), not rehomed.
 - `v1/` is deleted, with its workspace members, its `[profile.dev.package.sylex_pipeline_v1]`
   entry, its `xtask` commands and the CI steps that generate and build `v1/plugins/wizards`.
 - No file outside `v1/` names a `v1/` path or a v1 crate: the engine's `build.rs`, the tests and
