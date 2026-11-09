@@ -10,14 +10,16 @@ needs: [syl-primitive-constructors, syl-explicit-deeds]
 its own deed, so that the Ring emblem can count the times the Ring has tempted you by the deed's
 own steps. `.syl` may not write a scope (`docs/decisions/syl.md` §4); the file does so through a
 temporary primitive declared in it (`ownScope`) and the validator's path-gated Ring exception,
-which is the only reason the file passes `cargo xtask dsl check`. The body also names the Ring
-emblem by the string `"The Ring"`, and writes the count of temptations three times over, once per
-emblem ability that reads it.
+which is the only reason the file passes `cargo xtask dsl check`. The body also writes the same
+count of temptations (`eventCount(ownScope(theRingTemptsYou, …), actor(you), thisGame)`) three
+times, once per emblem ability that reads it [CR#701.54c]; only the threshold differs.
 
 ## Done when
 
-- `theRingTemptsYou.syl` writes no scope and declares no primitive, names the emblem by no
-  string, and writes the count of temptations once.
+- `theRingTemptsYou.syl` writes no scope and declares no primitive.
+- The count of temptations is written once, as a parameterless `Amount` Template that the three
+  emblem abilities call. It is a closed expression with no parameter, so a Template expands it
+  the same way at each use and no local binding is needed.
 - The Ring emblem still counts the times the Ring has tempted you. No check can confirm this until
   the Rust resolution and expansion layer exists; the landing shows how the rewritten body counts
   them, for the owner to review.

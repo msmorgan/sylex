@@ -10,7 +10,10 @@ Several keywords are declared many times, once per printed variant: `exchange` s
 (`exchangeCards`, `exchangeControl`, `exchangeLifeTotals`, `exchangeTextBoxes`, `exchangeValues`,
 `exchangeZones`, beside `exchange` and `exchangeWith`), `hexproof` and `hexproofFrom`, and
 `partner` with `partnerWith`, `partnerCharacterSelect`, `partnerFatherAndSon`,
-`partnerFriendsForever` and `partnerSurvivors`. The `exchange` variants already share one Deed
+`partnerFriendsForever`, `partnerSurvivors`, `chooseABackground` and `doctorsCompanion`: the
+partner abilities are partner, partner—[text], partner with [name], choose a Background and
+Doctor's companion [CR#702.124a], and `partner.syl` already lists the last two among its
+variants. The `exchange` variants already share one Deed
 label, `"exchange"`.
 
 ## Design
@@ -35,4 +38,5 @@ label, `"exchange"`.
 
 `plugins/builtin/definitions/keyword_action/exchange*.syl`,
 `plugins/builtin/definitions/keyword_ability/{hexproof,hexproofFrom}.syl`,
-`plugins/builtin/definitions/keyword_ability/partner*.syl`, `docs/decisions/semantics.md` §3.1.
+`plugins/builtin/definitions/keyword_ability/{partner*,chooseABackground,doctorsCompanion}.syl`,
+`docs/decisions/semantics.md` §3.1.

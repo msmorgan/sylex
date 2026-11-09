@@ -8,7 +8,10 @@ needs: []
 
 Nineteen keyword abilities are declared with `body = []`. Some are read by another declaration,
 as `reach` is by `flying` and `deathtouch` and `toxic` are by rule rows; first strike, double
-strike, trample and banding are defined by the engine; and some are simply unfinished.
+strike, trample and banding are defined by the engine; the partner abilities (`partner`, its four
+`partner…` variants, `chooseABackground` [CR#702.124k] and `doctorsCompanion` [CR#702.124m])
+modify deck construction and function before the game begins [CR#702.124a], and nothing reads
+them; and some are simply unfinished.
 `docs/decisions/semantics.md` §3 says "a keyword ability is a Definition", with no exception.
 
 ## Design
@@ -17,11 +20,24 @@ strike, trample and banding are defined by the engine; and some are simply unfin
   empty body that nothing reads is unfinished.
 - An engine-defined keyword is declared as a primitive, not as an ability with an empty body.
 
+## Open questions
+
+- How an engine-defined keyword keeps its name at `KeywordLabel`. Canon names these keywords
+  there: `theKeyword(firstStrike)`, `theKeyword(doubleStrike)` and `theKeyword(trample)` (*Cairn
+  Wanderer*, *Odric, Lunarch Marshal*), `anyIn({word = bandsWithOther})` (*Tolaria*, *Shelkin
+  Brownie*). Only an `ability` declaration registers a name at `KeywordLabel`, and every
+  `KeywordLabel` constructor is reserved (`Reserves::All`,
+  `crates/xtask/src/dsl_check/schema.rs`), so a plain primitive is refused there without a schema
+  change.
+- What the partner abilities become: read by a deck-construction rule, primitives, or empty
+  abilities kept as they are.
+
 ## Done when
 
 - First strike, double strike, trample and banding (and `bandsWithOther`) are primitives, with
   every caller in `plugins/` updated.
 - `docs/decisions/semantics.md` §3 states the exception: an engine-defined keyword is a primitive.
+- The partner abilities are declared as settled.
 - Every other keyword with an empty body is read by a named declaration; the landing lists each
   keyword with its reader.
 - Declaration order stays the printed order (`syl.md` §5).

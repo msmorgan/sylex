@@ -18,8 +18,10 @@ so `designation/initiative.syl` carries only its third ability.
 - The venture marker's position is engine state. `.syl` reads it through Condition atoms (the
   marker is on the bottommost room, or in a room with a given arrow), and never simulates it
   [CR#309.5a,309.5b,701.49b,701.49c].
-- `ventureIntoTheDungeon` and its variant "venture into [quality]" are keyword-action Definitions
-  under `plugins/builtin/definitions/keyword_action/` [CR#701.49a..701.49d]. The dungeon card comes
+- `ventureIntoTheDungeon` is one keyword-action Definition under
+  `plugins/builtin/definitions/keyword_action/` [CR#701.49a..701.49c], and its variant "venture
+  into [quality]" [CR#701.49d] is a parameter of it or a Template over it, not a second
+  Definition. The dungeon card comes
   from outside the game, described with `outsideTheGame` [CR#701.49a,400.11], and is put into the
   command zone [CR#309.2b].
 - The bottommost-room state-based action is a rules row [CR#309.6], and completing a dungeon is
