@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-single-face-card-call]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-single-face-card-call, cleanup-step6-surface]
 ---
 # Restore the printed head nouns that canon card spellings drop
 
@@ -19,6 +19,8 @@ noun out and write only the other conjuncts. That changes the set described:
   hand") writes `and([hasColor(blue), in(yourHand)])`.
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

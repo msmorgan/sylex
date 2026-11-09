@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # Expressions copied for lack of a local binding
@@ -10,6 +10,8 @@ needs: []
 writes the expression twice: melee, rampage and sunburst copy theirs. `theActor` carries
 `identity = "actor"`, a field on the `template` kind (`crates/xtask/src/dsl_check/schema.rs`, marked
 "Step 6") that stands in for a binding.
+
+Written against the start of step 6 (`syl-single-face-card-call`).
 
 ## Open questions
 

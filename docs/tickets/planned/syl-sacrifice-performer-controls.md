@@ -1,5 +1,5 @@
 ---
-needs: [lean-retirement]
+needs: [lean-retirement, cleanup-step6-surface]
 ---
 
 # Sacrifice is limited to what its performer controls
@@ -15,6 +15,8 @@ creature, and so can a bare "sacrifice a creature". The restriction cannot be wr
 once. A partitive over the subject is refused for a singular one (a Saga's
 `sacrifice(thisSaga)`), and `doIf(is(subject, actorControls), move(subject, …))` mentions the
 subject twice.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

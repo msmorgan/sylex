@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 # Record whether a permanent phased out directly or indirectly
 
@@ -15,6 +15,8 @@ phased in, and whose host phased out later, is skipped too, though the rule phas
 
 The phase-out itself is one `setStatus(phasedOut, …)` (`templates/action/phaseOut.syl`), and an
 indirect phase-out records nothing of its own, so no lookback can tell the two apart today.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

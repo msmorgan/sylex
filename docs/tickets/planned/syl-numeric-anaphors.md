@@ -1,5 +1,5 @@
 ---
-needs: [syl-single-face-card-call]
+needs: [syl-single-face-card-call, cleanup-step6-spine]
 ---
 
 # Decide whether `.syl`'s numeric anaphors become one primitive
@@ -16,6 +16,8 @@ One primitive (or `thatMuch` with an optional sort) would give them one resoluti
 greenfield discourse resolution; keeping them apart may be right if they resolve differently.
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
+
+Written against the spine (`cleanup-step6-spine`).
 
 ## Open questions
 

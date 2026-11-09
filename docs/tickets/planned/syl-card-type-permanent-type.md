@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # `cardClass` becomes a `permanentType` bool on `card_type`
@@ -13,6 +13,8 @@ permanent types on the card type itself [CR#110.4] (glossary: **Permanent Type**
 permanent card is defined by its types [CR#110.4a]. Whether a card is one belongs to a face
 through its types, since a card's faces can differ, so a "card class" names nothing the rules
 define.
+
+Written against the start of step 6 (`syl-single-face-card-call`).
 
 ## Design
 

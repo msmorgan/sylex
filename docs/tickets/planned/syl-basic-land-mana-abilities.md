@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [cleanup-step6-surface]
 ---
 
 # The basic land subtypes confer their intrinsic mana abilities
@@ -11,6 +11,8 @@ An object with the land card type and a basic land type has the intrinsic abilit
 (`plugins/builtin/definitions/subtype/land/{plains,island,swamp,mountain,forest}.syl`) state it
 only in a comment and confer nothing, so the rule lives only in the engine's name table
 `BASIC_LAND_TYPES` (`crates/core/src/count.rs`, read by the engine's layers and counts).
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

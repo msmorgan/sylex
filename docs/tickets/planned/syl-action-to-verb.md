@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # `Action` generalizes to a verb
@@ -11,6 +11,8 @@ a negated verb whose subject is the whole effect. `.syl` writes it with the `ret
 around one clause of the effect (`plugins/builtin/primitives/static/retention.syl`), which is
 wrong: the sentence is about the effect, not that clause. Which part of the effect it interacts
 with ("can't be enchanted" making an Aura illegal [CR#704.5m]) is the engine's question.
+
+Written against the start of step 6 (`syl-single-face-card-call`).
 
 ## Open questions
 

@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 
 # A later spell ability that acts "before" an earlier one's action
@@ -14,6 +14,8 @@ written, but later text may modify the meaning of earlier text [CR#608.2c]. Noth
 one spell ability place its action before an action of an earlier one. Spelling both paragraphs as
 one sequence with the pump first erases the ability boundary; spelling them in written order puts
 the pump after the fight, which changes the outcome.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 
 # Which cost a turn-face-up spend purpose pays
@@ -13,6 +13,8 @@ if it has morph or disguise, by paying that cost instead [CR#701.40c,701.40d]. *
 prints "pay a mana cost to turn a manifested creature face up", so its mana cannot pay a manifested
 card's disguise cost, but written with `toTurnFaceUp` alone it can. No spend purpose or named cost
 says "its mana cost".
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

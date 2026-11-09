@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # Whether Template bodies become opaque
@@ -10,6 +10,8 @@ A Template expands transparently (`docs/decisions/syl.md` §4): its arguments ar
 its body, so each use of a parameter is checked only after expansion. A Definition's body is
 opaque by comparison. If Template bodies were opaque too, every argument would be resolved once
 at the call site and each use checked against its own slot.
+
+Written against the start of step 6 (`syl-single-face-card-call`).
 
 ## Open questions
 

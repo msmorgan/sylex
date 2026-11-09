@@ -1,5 +1,5 @@
 ---
-needs: [syl-spelling-conventions, lean-retirement]
+needs: [syl-spelling-conventions, lean-retirement, cleanup-step6-surface]
 ---
 
 # "Round up each time." as a construct in its own position
@@ -13,6 +13,8 @@ cannot give back the shared sentence, and the only way out would be single-purpo
 like `basePtHalfRoundedUpOf`. The inline ", rounded up/down" is a different construction and
 stays on its own fraction: *Banshee* and *Aspect of Wolf* round two fractions of one sentence in
 different directions.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

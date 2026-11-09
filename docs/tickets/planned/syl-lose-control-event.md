@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 
 # "When you lose control of <object>" has no event
@@ -14,6 +14,8 @@ can take it. *Stolen Uniform*'s last sentence, a delayed triggered ability its r
 creature you control, unattach it." Other Vintage-legal cards printing "lose control of":
 *Duplicity*, *Khârn the Betrayer*, *Krovikan Vampire*, *Ogre Geargrabber*, *Ray of Command*,
 *Seraph*.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

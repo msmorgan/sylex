@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [cleanup-step6-surface]
 ---
 
 # Author Balance and its family in `.syl`
@@ -14,6 +14,8 @@ discards) the rest", repeated per category. The pieces this needs may already ex
 `choose` followed by `theRest` (Duneblast), and the minimum over players through
 `aggregateOver`/`superlative`. Nothing yet shows they compose into "choose exactly that many, act
 on the rest" per player, nor how "the same way" repeats the instruction for each category.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

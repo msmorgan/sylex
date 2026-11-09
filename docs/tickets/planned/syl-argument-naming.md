@@ -1,5 +1,5 @@
 ---
-needs: [syl-at-turn-point, syl-alternative-costs-one-model, syl-boolean-flags]
+needs: [syl-at-turn-point, syl-alternative-costs-one-model, syl-boolean-flags, cleanup-step6-spine]
 ---
 
 # Required arguments are positional, defaulted arguments are named
@@ -17,6 +17,8 @@ Three narrower tickets rewrite calls this ticket also respells, and land first:
 `syl-at-turn-point` (14 `at` calls that pass a required `action` by name or an optional argument
 positionally), `syl-alternative-costs-one-model` (39 `altCost` calls that pass `cost`
 positionally) and `syl-boolean-flags` (4 calls of its flagged declarations).
+
+Written against the spine (`cleanup-step6-spine`).
 
 ## Design
 

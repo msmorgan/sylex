@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 # Craft's body and its materials parameter
 
@@ -17,6 +17,8 @@ agreement ("two that share a card type", `agree`). The body must restrict whatev
 to "from among permanents you control and/or cards in your graveyard", and nothing today restricts
 a `NounPhrase` parameter from outside. A `Location` cannot say it either: `andOr([battlefield,
 yourGraveyard])` admits an opponent's permanents.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Open questions
 

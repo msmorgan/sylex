@@ -1,5 +1,5 @@
 ---
-needs: [syl-single-face-card-call]
+needs: [syl-single-face-card-call, cleanup-step6-surface]
 ---
 
 # Model Room doors through the unlocked designations
@@ -14,6 +14,8 @@ define a locked half as one without its unlocked designation, unlocking as gaini
 unlocking as ending up with both, so two representations of one state sit side by side.
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 
 # Venture into the dungeon, dungeon cards and the initiative's venture triggers
@@ -9,6 +9,8 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 38 Vintage-legal cards venture into the dungeon, and the initiative has two inherent
 triggers that venture into Undercity [CR#726.2]. `.syl` has no venture action and no dungeon card,
 so `designation/initiative.syl` carries only its third ability.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 
 # Speed: the start your engines! state-based action and the speed trigger
@@ -13,6 +13,8 @@ their speed becomes 1" [CR#702.179a,704.5aa], which belongs in a rules row under
 speed (`speedOf` only reads it), and "has no speed" is not "speed 0": players have no speed until
 a rule or effect sets it [CR#702.179b], and 0 is only what an effect reading speed sees
 [CR#702.179f].
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

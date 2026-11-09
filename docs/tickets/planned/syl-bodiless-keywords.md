@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # Bodiless keywords are read elsewhere or are primitives
@@ -13,6 +13,8 @@ strike, trample and banding are defined by the engine; the partner abilities (`p
 modify deck construction and function before the game begins [CR#702.124a], and nothing reads
 them; and some are simply unfinished.
 `docs/decisions/semantics.md` §3 says "a keyword ability is a Definition", with no exception.
+
+Written against the start of step 6 (`syl-single-face-card-call`).
 
 ## Design
 

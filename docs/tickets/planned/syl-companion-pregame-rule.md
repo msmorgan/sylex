@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 # Companion's pregame reveal as a start-of-game rule
 
@@ -12,6 +12,8 @@ keyword's in-game body. `companion.syl` writes only the in-game special action [
 gates it on nothing but the card being outside the game, though only "a player who has chosen a
 companion" may take it [CR#116.2g]. No rule declaration under `plugins/builtin/rules/` covers the
 start of the game.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

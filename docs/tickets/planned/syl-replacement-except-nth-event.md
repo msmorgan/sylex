@@ -1,5 +1,5 @@
 ---
-needs: [lean-retirement]
+needs: [lean-retirement, cleanup-step6-surface]
 ---
 
 # A replacement that excepts the nth event
@@ -10,6 +10,8 @@ needs: [lean-retirement]
 of their draw steps, instead that player skips that draw and you draw a card." A would-clause can
 select the nth event in a period (`would/nthOccurrence.syl`) but cannot exclude it, so the card
 cannot be written.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

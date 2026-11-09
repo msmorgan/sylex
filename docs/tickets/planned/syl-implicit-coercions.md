@@ -1,5 +1,5 @@
 ---
-needs: [syl-primitive-constructors, syl-single-face-card-call, syl-argument-naming, syl-printed-read-order, syl-sort-prefixed-primitive-names]
+needs: [syl-primitive-constructors, syl-single-face-card-call, syl-argument-naming, syl-printed-read-order, syl-sort-prefixed-primitive-names, syl-dead-weight-sweep]
 ---
 
 # Declared implicit wrapping in `.syl`

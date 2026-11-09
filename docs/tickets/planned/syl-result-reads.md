@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # Consolidate `.syl`'s vote, roll, coin-flip and secret-choice result reads
@@ -19,6 +19,8 @@ Single-mechanic result reads are scattered across `Predicate`, `Condition`, `Amo
   (Centaur of Attention).
 
 `coinCameUp`, `coinsShowing`, `anyResultIs` and `rolledDoubles` have no user in canon.
+
+Written against the start of step 6 (`syl-single-face-card-call`).
 
 ## Done when
 

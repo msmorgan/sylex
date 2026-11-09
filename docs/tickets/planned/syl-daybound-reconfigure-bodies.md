@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 # Daybound and reconfigure say all of what their CR text means
 
@@ -10,6 +10,8 @@ fidelity gap. `reconfigure.syl` writes only [CR#702.151a], not that an attached 
 Equipment stops being a creature [CR#702.151b]. `daybound.syl`'s first static omits "this
 permanent is represented by a double-faced card" [CR#702.145b], and `.syl` has no predicate that
 says it. The two parts are separately committable.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Design
 

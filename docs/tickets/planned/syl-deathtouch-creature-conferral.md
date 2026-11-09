@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-action-clause-spine, lean-generated-canon-modules, lean-retirement]
+needs: [lean-v3-action-clause-spine, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 # Deathtouch's state-based action is a creature-type conferral
 
@@ -13,6 +13,8 @@ of rule about creatures but is written apart, as a standalone `sba` rule scoped 
 (`plugins/builtin/rules/sba/deathtouchDestruction.syl`). Deathtouch's own declaration has an
 empty body because its rule lives in that row; its combat-damage assignment rule [CR#702.2c] stays
 with the engine.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

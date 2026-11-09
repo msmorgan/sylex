@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [cleanup-step6-spine]
 ---
 
 # Write `it` wherever the card prints "it"
@@ -12,6 +12,8 @@ the card itself: *Megatherium*'s "sacrifice it unless you pay …" is
 `sacrifice(thisCreature)`; *Charnel Troll* and *Blood Spatter Analysis* do the same. The author
 resolved the pronoun by hand, so it never reaches discourse and can't be checked, which breaks
 surface-faithfulness (`docs/decisions/semantics.md` §1 item 1).
+
+Written against the spine (`cleanup-step6-spine`).
 
 ## Done when
 

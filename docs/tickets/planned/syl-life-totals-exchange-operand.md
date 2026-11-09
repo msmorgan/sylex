@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [cleanup-step6-surface]
 ---
 
 # Decide whether `.syl`'s `lifeTotals` exchange operand folds into `values`
@@ -15,6 +15,8 @@ it takes one group of players, so "Two target players exchange life totals" (Sou
 Mortality, Profane Transfusion) names both parties as one plural target group; `values` takes two
 separate amounts. Canon's one user today, Mirror Universe, writes
 `exchangeLifeTotals(youAnd(target(isOpponent)))`.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Open questions
 

@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-spell-abilities-share-targets, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [lean-v3-spell-abilities-share-targets, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 # "If at least three [color] mana was spent to cast this spell"
 
@@ -17,6 +17,8 @@ much in total). Neither counts mana of one stated color, nor the most mana of an
 - Same color: *Clockwork Servant* ("When this creature enters, if at least three mana of the
   same color was spent to cast it, draw a card"), *Henge Walker* ("If at least three mana of the
   same color was spent to cast this spell, this creature enters with a +1/+1 counter on it").
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Design
 

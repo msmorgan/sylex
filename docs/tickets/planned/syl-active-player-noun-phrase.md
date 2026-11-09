@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 # A noun phrase for the active player, read by phasing's phase-in
 
@@ -12,6 +12,8 @@ the phased-out permanent's present controller during that controller's turn. Pha
 control [CR#702.26d], so the two agree unless a control effect ended while the permanent was
 phased out [CR#702.26f]. Then the rule phases it in during the untap step of the player who
 controlled it as it phased out, and the row waits for its present controller's.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 

@@ -1,5 +1,5 @@
 ---
-needs: [syl-token-definitions]
+needs: [syl-token-definitions, cleanup-step6-surface]
 ---
 # Empower takes its token as a parameter
 
@@ -10,6 +10,8 @@ needs: [syl-token-definitions]
 fixed-phrase lemma "empower Jace". Every printed use is "empower Jace" (*Countersculpt*, in canon,
 and 34 more Vintage-legal cards, among them *Theorist's Proxy*, *Jace, Reality Sculptor* and
 *Fatehold Charm*).
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Design
 

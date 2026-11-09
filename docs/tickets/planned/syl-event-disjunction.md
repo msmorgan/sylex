@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # Event disjunction, so `triggered` loses its extra slots
@@ -11,6 +11,8 @@ needs: []
 `joins: List(JoinedHeader)`; `delay` takes `alternatives` too; a would-clause uses `wouldAny`. A
 triggered ability may have more than one trigger condition [CR#603.1b], and one construct should
 say so everywhere an event stands.
+
+Written against the start of step 6 (`syl-single-face-card-call`).
 
 ## Open questions
 

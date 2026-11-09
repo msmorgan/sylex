@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-dead-weight-sweep]
 ---
 
 # Doc comments state why these declarations are shaped as they are
@@ -14,6 +14,8 @@ Several `.syl` declarations embody a modeling choice their doc comment doesn't s
 - `tapForMana`: why tapping for mana is its own event head.
 - `abilityHead`: its comment says only "Authoring primitive for `Predicate.abilityHead`".
 - `pro`: what its `plurality` parameter decides.
+
+It lands after `syl-dead-weight-sweep`, so it documents only declarations that survive it.
 
 ## Done when
 

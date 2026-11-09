@@ -1,5 +1,5 @@
 ---
-needs: [syl-primitive-constructors]
+needs: [syl-primitive-constructors, syl-single-face-card-call]
 ---
 
 # A subtype names the card types it is correlated with
@@ -11,6 +11,8 @@ accepts it as text. Behind it is a model that splits subtypes into one host card
 which models the CR wrongly: each subtype is correlated to card types [CR#205.3c,205.3d], and two
 families are shared, spell types by instants and sorceries [CR#205.3k] and creature types by
 creatures and kindreds [CR#205.3m]. Under that split, kindred needs a special case.
+
+Written against the start of step 6 (`syl-single-face-card-call`).
 
 ## Design
 

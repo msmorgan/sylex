@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-printed-read-order]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-printed-read-order, cleanup-step6-surface]
 ---
 # Enlist: an optional cost to attack and its linked trigger
 
@@ -11,8 +11,9 @@ continuously since this turn began. When you do, this creature gets +X/+0 until 
 where X is the tapped creature's power." [CR#702.154a]. `enlist.syl` has `body = []`, and the
 cost-to-attack form has no optional variant, so the static cannot be written.
 
-It lands after `syl-printed-read-order`, which reorders `gatedBy` and `staticSpecGatedBy` to
-their printed order (2 files), so the offered form is written against that order.
+Written against the surface (`cleanup-step6-surface`): `syl-printed-read-order` reorders
+`gatedBy` and `staticSpecGatedBy` to their printed order (2 files), so the offered form is
+written against that order.
 
 ## Design
 

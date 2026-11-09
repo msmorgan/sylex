@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-single-face-card-call]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-single-face-card-call, cleanup-step6-surface]
 ---
 # `toCast` takes a noun phrase
 
@@ -11,6 +11,8 @@ cannot be written. Its three canon sites also print "spells" twice: *Ancient Zig
 *Mishra's Workshop* pass `and([…, isSpell])` to a spelling that already ends in "spells".
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Design
 

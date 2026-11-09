@@ -1,5 +1,5 @@
 ---
-needs: [syl-single-face-card-call]
+needs: [syl-single-face-card-call, cleanup-step6-spine]
 ---
 
 # Each concept modeled one way
@@ -11,6 +11,8 @@ spell, coordination, and "whose". Two models of one concept give two readings of
 phrase, and a card's meaning depends on which its author picked.
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
+
+Written against the spine (`cleanup-step6-spine`).
 
 ## Done when
 

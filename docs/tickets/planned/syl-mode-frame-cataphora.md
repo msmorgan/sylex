@@ -1,5 +1,5 @@
 ---
-needs: [lean-retirement, syl-opaque-templates, syl-single-face-card-call]
+needs: [lean-retirement, syl-opaque-templates, syl-single-face-card-call, cleanup-step6-surface]
 ---
 
 # A shared frame over modal fillers, read forward
@@ -15,6 +15,8 @@ trigger fires twice instead of once. A heuristic corpus scan found no other Vint
 this shape.
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Design
 

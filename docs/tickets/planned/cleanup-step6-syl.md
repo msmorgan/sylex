@@ -1,5 +1,5 @@
 ---
-needs: [syl-active-player-noun-phrase, syl-balance-family, syl-basic-land-mana-abilities, syl-card-head-noun-sweep, syl-card-type-permanent-type, syl-clash, syl-cleave-bracketed-text, syl-colored-mana-spent-count, syl-concepts-modeled-twice, syl-counter-conferrals, syl-cross-ability-self-replacement, syl-daybound-reconfigure-bodies, syl-dead-weight-sweep, syl-deathtouch-creature-conferral, syl-doc-comment-rationales, syl-each-plural-referent, syl-empower-token-parameter, syl-fight-both-performers, syl-ice-cauldron-noted-mana, syl-implicit-coercions, syl-indirect-phase-out, syl-later-ability-acts-before-earlier, syl-local-binding, syl-lose-control-event, syl-mode-frame-cataphora, syl-numeric-anaphors, syl-replacement-except-nth-event, syl-ring-tempts-you-raw-scope, syl-room-doors-as-designations, syl-round-each-time, syl-sacrifice-performer-controls, syl-single-use-as-though, syl-speed-rules, syl-subtype-card-types, syl-turn-face-up-spend-cost, syl-unwritable-card-shapes, syl-venture-dungeon, syl-zone-words]
+needs: [syl-doc-comment-rationales, syl-implicit-coercions]
 ---
 
 # Step 6: the `.syl` iteration is complete
@@ -7,9 +7,13 @@ needs: [syl-active-player-noun-phrase, syl-balance-family, syl-basic-land-mana-a
 ## Why
 
 Step 6 of the cleanup reshapes the `.syl` corpus under `cargo xtask dsl check` before step 7
-builds the Rust AST from it. This ticket closes when every step-6 ticket has landed. Its `needs:`
-are the step-6 tickets no other step-6 ticket needs, so every step-6 ticket is reached through
-them; a new step-6 ticket joins those `needs:` unless another step-6 ticket needs it.
+builds the Rust AST from it. This ticket closes the staged step-6 graph: `syl-single-face-card-call`
+starts it, then the spine (`cleanup-step6-spine`), then the surface (`cleanup-step6-surface`), then
+three parallel middle stages (`cleanup-step6-constructs-and-cards`,
+`cleanup-step6-rules-and-keywords`, `cleanup-step6-deeds`), then the close:
+`syl-dead-weight-sweep`, followed by `syl-doc-comment-rationales` and `syl-implicit-coercions`, the
+two tickets this one needs. A new step-6 ticket joins one stage: it needs the previous stage's
+gate, and its stage's sub-epic needs it unless another ticket in that stage does.
 
 ## Done when
 

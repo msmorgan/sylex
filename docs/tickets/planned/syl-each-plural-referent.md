@@ -1,5 +1,5 @@
 ---
-needs: [syl-single-face-card-call]
+needs: [syl-single-face-card-call, cleanup-step6-spine]
 ---
 
 # "Each" and the referent it introduces
@@ -11,6 +11,8 @@ read as one object in one place and a group in another, and each verb that takes
 own fix.
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
+
+Written against the spine (`cleanup-step6-spine`).
 
 ## Open questions
 

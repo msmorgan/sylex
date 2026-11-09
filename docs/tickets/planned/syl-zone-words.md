@@ -1,5 +1,5 @@
 ---
-needs: [syl-single-face-card-call]
+needs: [syl-single-face-card-call, cleanup-step6-spine]
 ---
 
 # Zone words mean what they say
@@ -14,6 +14,8 @@ object that would go to another player's hand, graveyard or library goes to its 
 `whose` parameter does not say whether it names an owner or a controller.
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
+
+Written against the spine (`cleanup-step6-spine`).
 
 ## Done when
 

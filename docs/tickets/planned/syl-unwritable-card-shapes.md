@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-proofs-and-cards]
+needs: [lean-v3-proofs-and-cards, cleanup-step6-surface]
 ---
 
 # Four card shapes `.syl` cannot yet write
@@ -20,6 +20,8 @@ decision:
 - The linked-exile law: `exiledWith` reads the cards its linked ability exiled [CR#607.2a], but
   nothing checks that the same card carries the exiling ability. Whether that is a law on `Card`
   (a check over the card's abilities) or an unchecked convention is undecided.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Open questions
 

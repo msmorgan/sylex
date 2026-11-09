@@ -1,5 +1,5 @@
 ---
-needs: [syl-at-turn-point]
+needs: [syl-at-turn-point, cleanup-step6-spine]
 ---
 
 # Spellings with optional and repeated parts
@@ -13,6 +13,8 @@ wordings that differ only by such a part become near-duplicate Template families
 `activatedOnly…`, `prevent…`, `defines…`.
 
 `at.syl`'s spelling `TODO` is also settled by `syl-at-turn-point`, which lands first.
+
+Written against the spine (`cleanup-step6-spine`).
 
 ## Open questions
 

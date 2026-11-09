@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-spell-abilities-share-targets, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [lean-v3-spell-abilities-share-targets, plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 # A later spell ability's "instead" replaces an earlier spell ability's effect
 
@@ -12,6 +12,8 @@ halves, and a `Replacement` (`instead`, `doIf`) is not an `Action`, so a later s
 name the earlier paragraph's effect as the event it replaces. *Fatal Push*: "Destroy target creature
 if it has mana value 2 or less. / Revolt — Destroy that creature if it has mana value 4 or less
 instead if a permanent left the battlefield under your control this turn."
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Design
 

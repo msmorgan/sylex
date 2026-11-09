@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
 ---
 # Clash: an opponent and a winner
 
@@ -10,6 +10,8 @@ and optional move to the bottom. It has no opponent and no winner [CR#701.30b..7
 of the 28 Vintage-legal cards that "clash with an opponent" can be spelled, nor "if you win" or a
 trigger on clashing (*Entangling Trap*, *Rebellion of the Flamekin*, *Sylvan Echoes*). No clash
 card is in `plugins/canon/cards/` yet.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Design
 

@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [cleanup-step6-surface]
 ---
 
 # Keyword and rule-bearing counters confer what the rules give them
@@ -15,6 +15,8 @@ replacement effect [CR#122.1h], a rad counter's inherent triggered ability [CR#1
 hone counter's +1/+0 to the creature its Equipment is attached to [CR#122.1j]. A player with ten or
 more poison counters loses the game [CR#122.1f,704.5c], but `poison.syl` has no `confers`, and no
 state-based row under `plugins/builtin/rules/` writes it.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Open questions
 

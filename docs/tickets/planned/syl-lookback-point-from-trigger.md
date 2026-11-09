@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # The look-back point comes from the trigger, not from `move`
@@ -11,6 +11,8 @@ The rules derive whether an event looks back from the kind of trigger [CR#603.10
 choice can disagree with them, and it does: the Aura state-based row
 (`plugins/builtin/definitions/subtype/enchantment/aura.syl`) moves with `departure`, while the
 creature and other state-based rows use `putInto`, observed on `arrival`.
+
+Written against the start of step 6 (`syl-single-face-card-call`).
 
 ## Open questions
 
