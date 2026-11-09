@@ -1,1 +1,0 @@
-primitive cost(cost: Cost): KeywordParam = Cost
