@@ -167,6 +167,8 @@ private def body (d : Declaration) : ResolveM Term := do
   | "relation" => return ← direct d `Semantics.RelationLabel.named #[(none, str d d.name)]
   | "subtype" =>
     let kind ← required d "kind"
+    -- Temporary: `spell` is matched as text, a word that never resolves, for `Subtype.spell`.
+    -- `syl-subtype-card-types` deletes it.
     if let .word _ "spell" _ := kind then
       return ← direct d `Semantics.Subtype.spell #[(none, get "name" (str d d.name))]
     else return ← direct d `Semantics.Subtype.of #[(none, kind), (none, get "name" (str d d.name))]
