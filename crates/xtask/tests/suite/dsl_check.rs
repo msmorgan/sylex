@@ -486,6 +486,17 @@ fn a_primitive_building_a_reserved_constructor_is_refused() {
     );
 }
 
+#[test]
+fn only_the_deed_constructor_an_action_writes_is_reserved_at_deed() {
+    assert_eq!(
+        kinds(
+            "primitive core(deed: CoreDeed): Deed = Core\n\
+             primitive raw(label: String): Deed = Action"
+        ),
+        [RefusalKind::ReservedConstructor(s("Deed.Action"))]
+    );
+}
+
 const RING: &str = "primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope\n\
                     primitive nothing: Action = Nothing\n\
                     action theRingTemptsYou { body = ownScope(theRingTemptsYou, nothing) }";

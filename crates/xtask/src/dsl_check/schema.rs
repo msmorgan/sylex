@@ -50,6 +50,17 @@ pub struct Secondary {
     /// No second declaration when the block writes one of these fields: any
     /// value for `None`, or the bare word given.
     pub unless: &'static [(&'static str, Option<&'static str>)],
+    /// Which constructors of `sort` a primitive may not build.
+    pub reserves: Reserves,
+}
+
+/// The constructors of a sort that no primitive builds.
+#[derive(Debug, Clone, Copy)]
+pub enum Reserves {
+    /// Every one: only declarations of the kind build the sort.
+    All,
+    /// Only these; the sort's other constructors have primitives.
+    Only(&'static [&'static str]),
 }
 
 /// A kind's rule beyond its fields' sorts.
@@ -172,6 +183,7 @@ pub const KINDS: &[Kind] = &[
         secondary: Some(Secondary {
             sort: "Deed",
             unless: &[("ofAbility", None), ("deed", Some("none"))],
+            reserves: Reserves::Only(&["Action"]),
         }),
         rule: KindRule::Excludes {
             field: "ofAbility",
@@ -192,6 +204,7 @@ pub const KINDS: &[Kind] = &[
         secondary: Some(Secondary {
             sort: "KeywordLabel",
             unless: &[],
+            reserves: Reserves::All,
         }),
         ..kind(
             "ability",
@@ -276,8 +289,7 @@ const EXPANSION_CONSTRUCTORS: &[(Option<&str>, &str)] = &[
 
 /// The reserved constructor a primitive at `sort` naming `constructor`
 /// builds, as `Sort.Constructor`: one only expansion writes, or any
-/// constructor of a sort a declaration kind declares its names at, as a
-/// catalog kind or a second sort.
+/// constructor of a catalog kind's sort, or one a second sort reserves.
 #[must_use]
 pub fn reserved(sort: &str, constructor: &str) -> Option<String> {
     let expansion = EXPANSION_CONSTRUCTORS
@@ -285,9 +297,13 @@ pub fn reserved(sort: &str, constructor: &str) -> Option<String> {
         .any(|(at, name)| *name == constructor && at.is_none_or(|at| at == sort));
     let declared = KINDS.iter().any(|kind| {
         (kind.catalog && kind.sort == Some(sort))
-            || kind
-                .secondary
-                .is_some_and(|secondary| secondary.sort == sort)
+            || kind.secondary.is_some_and(|secondary| {
+                secondary.sort == sort
+                    && match secondary.reserves {
+                        Reserves::All => true,
+                        Reserves::Only(names) => names.contains(&constructor),
+                    }
+            })
     });
     (expansion || declared).then(|| format!("{sort}.{constructor}"))
 }
