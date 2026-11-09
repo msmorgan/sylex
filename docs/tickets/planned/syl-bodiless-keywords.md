@@ -31,6 +31,9 @@ them; and some are simply unfinished.
   change.
 - What the partner abilities become: read by a deck-construction rule, primitives, or empty
   abilities kept as they are.
+- `toxic`'s `amount` is read by a rule row (`toxicPoison.syl`), not by toxic's own empty body.
+  Does `syl-unused-parameter-refusal` count a rule-row read as reading the parameter, or does this
+  ticket's design change where `amount` is read?
 
 ## Done when
 
