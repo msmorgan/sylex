@@ -348,6 +348,34 @@ fn a_sort_no_declaration_names_is_refused() {
 }
 
 #[test]
+fn a_sort_only_produced_is_refused() {
+    assert_eq!(
+        refusals(&[(
+            "a.syl",
+            "primitive x: Actoin = X\n\
+             primitive y: List(Actoin) = Y"
+        )]),
+        [
+            (RefusalKind::UnknownSort(s("Actoin")), s("Actoin")),
+            (RefusalKind::UnknownSort(s("Actoin")), s("Actoin")),
+        ]
+    );
+}
+
+/// A sort misspelled the same way where it is produced and where it is
+/// consumed is a sort to the check: only its name is known.
+#[test]
+fn a_sort_produced_and_consumed_is_known_even_when_misspelled_alike() {
+    assert_eq!(
+        kinds(
+            "primitive x: Actoin = X\n\
+             template t(a: Actoin): Actoin { body = $a }"
+        ),
+        []
+    );
+}
+
+#[test]
 fn two_declarations_at_one_name_and_sort_are_refused() {
     assert_eq!(
         kinds(
@@ -410,7 +438,7 @@ fn a_primitive_building_a_reserved_constructor_is_refused() {
         refusals(&[(
             "a.syl",
             "primitive raw(name: String): CounterKind = Named\n\
-             primitive mention(id: String): NounPhrase = FirstMention\n\
+             primitive mention(id: String, body: NounPhrase): NounPhrase = FirstMention\n\
              primitive caller(body: Cost): Cost = InCaller\n\
              primitive deed(label: String): Deed = Action\n\
              primitive label(name: String): KeywordLabel = Named"
@@ -524,6 +552,7 @@ fn a_single_faced_card_record_is_its_characteristics() {
     let source = format!(
         "{COLORS}card {{ name = \"Card\", colors = [white] }}\n\
          template face: CardFace {{ body = {{ name = \"Face\", colors = [blue] }} }}\n\
+         template double(front: CardFace, back: CardFace): Card {{ body = {{ name = \"D\" }} }}\n\
          template wrapped: CardFace {{ body = {{ characteristics = {{ colors = [blue] }} }} }}\n\
          card {{ name = \"Bad\", colors = [1] }}"
     );
@@ -534,7 +563,7 @@ fn a_single_faced_card_record_is_its_characteristics() {
 fn a_spell_subtype_kind_is_not_resolved() {
     assert_eq!(
         kinds(
-            "primitive spell: Noun = Spell\n\
+            "template spell: Int { body = 1 }\n\
              card_type creature { }\n\
              subtype arcane { kind = spell }\n\
              subtype elf { kind = creature }\n\

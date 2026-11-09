@@ -307,7 +307,8 @@ const fn record(
 const MANA_COST: &str = "Option(List(ManaSymbol))";
 
 /// Every record sort. `CardType` is a record in the model but has none here:
-/// only a `card_type` declaration builds one.
+/// only a `card_type` declaration builds one. Neither has Lean's internal
+/// `RulesTables`, which no `.syl` value writes.
 pub const RECORDS: &[RecordSort] = &[
     record("CardFace", &[("characteristics", "Characteristics", false)]),
     record(
@@ -428,13 +429,6 @@ pub const RECORDS: &[RecordSort] = &[
     record(
         "RollRow",
         &[("results", "Quantity", false), ("action", "Action", false)],
-    ),
-    record(
-        "RulesTables",
-        &[
-            ("sba", "List(SbaRule)", true),
-            ("conferral", "List(ConferralRule)", true),
-        ],
     ),
     record(
         "SbaRule",

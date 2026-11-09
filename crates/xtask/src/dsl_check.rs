@@ -194,7 +194,7 @@ pub fn check(builtin: &Bundle, others: &[&Bundle]) -> Result<Summary, CheckError
         }
     }
     let registry = register(&decls, &mut refusals);
-    known_sorts(&decls, &registry, &mut refusals);
+    unknown_sorts(&decls, &known_sorts(&decls, &registry), &mut refusals);
     let mut edges = vec![Vec::new(); decls.len()];
     for (decl, edges) in decls.iter().zip(&mut edges) {
         resolve(decl, &registry, &mut refusals, edges);
@@ -368,30 +368,63 @@ fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
 /// The sorts a literal stands at (`syl.md` §3).
 const LITERAL_SORTS: [&str; 3] = ["String", "Int", "Nat"];
 
-/// Refuses a written sort name that no declaration's sort, record sort,
-/// literal sort or sort constructor names.
-fn known_sorts(decls: &[Decl<'_>], registry: &Registry, refusals: &mut Vec<Refusal>) {
-    let mut known: BTreeSet<&str> = LITERAL_SORTS
+/// The sort names a written sort may use: the literal sorts, the sort
+/// constructors and the undeclared sorts, and every name both produced and
+/// consumed. A declaration's result sort or a record sort produces a name; a
+/// parameter's sort, or a kind's sort or field sort, or a record field's sort
+/// consumes one. A name only produced or only consumed is a misspelling, or a
+/// sort no value can reach.
+fn known_sorts(decls: &[Decl<'_>], registry: &Registry) -> BTreeSet<String> {
+    fn add(sort: &SortKey, out: &mut BTreeSet<String>) {
+        let mut heads = BTreeSet::new();
+        sort.heads(&mut heads);
+        out.extend(heads.into_iter().map(str::to_owned));
+    }
+    let mut produced = BTreeSet::new();
+    for (_, sort) in registry.keys() {
+        add(sort, &mut produced);
+    }
+    produced.extend(RECORDS.iter().map(|record| record.sort.to_owned()));
+    let mut consumed = BTreeSet::new();
+    for param in decls.iter().flat_map(|decl| &decl.params) {
+        add(
+            param.sort.as_ref().expect("parameters have sorts"),
+            &mut consumed,
+        );
+    }
+    for kind in KINDS {
+        let secondary = kind.secondary.map(|secondary| secondary.sort);
+        let fields = kind.fields.iter().filter_map(|field| field.sort);
+        for sort in kind.sort.into_iter().chain(secondary).chain(fields) {
+            add(&SortKey::table(sort), &mut consumed);
+        }
+    }
+    for (_, sort, _) in RECORDS.iter().flat_map(|record| record.fields) {
+        add(&SortKey::table(sort), &mut consumed);
+    }
+    LITERAL_SORTS
         .into_iter()
         .chain(schema::SORT_CONSTRUCTORS)
-        .chain(RECORDS.iter().map(|record| record.sort))
         .chain(schema::UNDECLARED_SORTS.iter().copied())
-        .collect();
-    for (_, sort) in registry.keys() {
-        sort.heads(&mut known);
-    }
+        .map(str::to_owned)
+        .chain(produced.intersection(&consumed).cloned())
+        .collect()
+}
+
+/// Refuses every written sort name `known` lacks.
+fn unknown_sorts(decls: &[Decl<'_>], known: &BTreeSet<String>, refusals: &mut Vec<Refusal>) {
     for decl in decls {
         let Shape::Named(named) = &decl.declaration.shape else {
             continue;
         };
         let params = named.params.iter().filter_map(Item::node).map(|p| &p.sort);
         for sort in named.sort.iter().chain(params) {
-            unknown_sort(sort, &known, refusals);
+            unknown_sort(sort, known, refusals);
         }
     }
 }
 
-fn unknown_sort(sort: &Sort, known: &BTreeSet<&str>, refusals: &mut Vec<Refusal>) {
+fn unknown_sort(sort: &Sort, known: &BTreeSet<String>, refusals: &mut Vec<Refusal>) {
     let head = sort.head.ident.as_str();
     if !known.contains(head) {
         refusals.push(Refusal {
@@ -721,6 +754,51 @@ impl Resolver<'_> {
                         word: word.to_owned(),
                         argument: param.name.clone(),
                     },
+                );
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::Path;
+
+    use super::*;
+
+    /// Every sort the kind and record tables write is one the plugins
+    /// produce and consume, so the tables name no misspelled sort.
+    #[test]
+    fn every_table_sort_is_known() {
+        let plugins = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins");
+        let builtin = Bundle::load(plugins.join("builtin"), FileId(0)).unwrap();
+        let canon = Bundle::load(plugins.join("canon"), builtin.next_file_id()).unwrap();
+        let decls: Vec<Decl<'_>> = [&builtin, &canon]
+            .into_iter()
+            .flat_map(|bundle| bundle.files().values())
+            .flat_map(|file| file.ast.declarations())
+            .map(|declaration| header(declaration, false).expect("the plugins' headers pass"))
+            .collect();
+        let registry = register(&decls, &mut Vec::new());
+        let known = known_sorts(&decls, &registry);
+        let mut written = Vec::new();
+        for kind in KINDS {
+            let fields = kind.fields.iter().filter_map(|field| field.sort);
+            written.extend(kind.sort.into_iter().chain(fields));
+            written.extend(kind.secondary.map(|secondary| secondary.sort));
+        }
+        for record in RECORDS {
+            written.push(record.sort);
+            written.extend(record.fields.iter().map(|(_, sort, _)| *sort));
+        }
+        for sort in written {
+            let mut heads = BTreeSet::new();
+            let key = SortKey::table(sort);
+            key.heads(&mut heads);
+            for head in heads {
+                assert!(
+                    known.contains(head),
+                    "table sort `{sort}`: `{head}` is unknown"
                 );
             }
         }
