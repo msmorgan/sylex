@@ -1,5 +1,5 @@
 ---
-needs: [lean-retirement, syl-opaque-templates]
+needs: [lean-retirement, syl-opaque-templates, syl-single-face-card-call]
 ---
 
 # A shared frame over modal fillers, read forward
@@ -13,6 +13,8 @@ demonstratives refer forward to the chosen Mode. The canon encodings of *Call Da
 into two, performed in order [CR#608.2c], so a "whenever one or more cards leave your graveyard"
 trigger fires twice instead of once. A heuristic corpus scan found no other Vintage-legal card of
 this shape.
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Design
 

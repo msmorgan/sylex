@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # Zone words mean what they say
@@ -12,6 +12,8 @@ a scoped body. Callers use the unscoped pair to mean an owner's zone, any player
 object that would go to another player's hand, graveyard or library goes to its owner's instead
 [CR#400.3], which is why a destination can be unscoped; no doc comment says so, and `zone`'s
 `whose` parameter does not say whether it names an owner or a controller.
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Done when
 

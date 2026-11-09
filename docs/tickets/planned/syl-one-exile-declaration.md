@@ -1,5 +1,5 @@
 ---
-needs: [syl-explicit-deeds]
+needs: [syl-explicit-deeds, syl-single-face-card-call]
 ---
 
 # One declaration for exile
@@ -12,6 +12,8 @@ Exile is one keyword action [CR#701.13a] declared five times: `exile`, `exileFro
 `"exile"`, so "exiled this way" and "can't be exiled" can match them only by that label. Merging
 the declarations merges their Deeds, which is `syl-explicit-deeds`' open question on one shared
 exile Deed; this ticket builds the answer.
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Done when
 

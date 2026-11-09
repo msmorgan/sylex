@@ -1,5 +1,5 @@
 ---
-needs: [lean-retirement, syl-argument-naming, syl-sort-prefixed-primitive-names, syl-at-turn-point, syl-spelling-optional-segments, syl-enlist-optional-attack-cost]
+needs: [lean-retirement, syl-argument-naming, syl-sort-prefixed-primitive-names, syl-at-turn-point, syl-spelling-optional-segments, syl-enlist-optional-attack-cost, syl-single-face-card-call]
 ---
 # Make every declaration's read order its printed order, and drop `doIf`'s `postposed`
 
@@ -20,6 +20,8 @@ ticket reorders; `syl-at-turn-point` changes `at.syl`'s event parameter;
 Templates whose `preventDamage` calls this ticket reorders (3 files); and
 `syl-enlist-optional-attack-cost` gives `gatedBy` and `staticSpecGatedBy` their offered form
 (2 files).
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Done when
 

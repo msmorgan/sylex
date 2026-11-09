@@ -1,5 +1,5 @@
 ---
-needs: [syl-argument-naming]
+needs: [syl-argument-naming, syl-single-face-card-call]
 ---
 
 # Declarations whose name or spelling says something else
@@ -14,6 +14,8 @@ Three declarations are named or spelled for one use rather than for what they bu
 - `splitOverPermanent` (`templates/pronoun/`) is spelled "any target".
 
 `syl-argument-naming` rewrites 4 arguments that hold these declarations' calls, and lands first.
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Done when
 

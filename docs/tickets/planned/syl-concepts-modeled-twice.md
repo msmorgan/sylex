@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # Each concept modeled one way
@@ -9,6 +9,8 @@ needs: []
 Some concepts have two or more `.syl` models side by side: "X'd this way" in five forms, copying a
 spell, coordination, and "whose". Two models of one concept give two readings of one printed
 phrase, and a card's meaning depends on which its author picked.
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Done when
 

@@ -1,5 +1,5 @@
 ---
-needs: [lean-retirement]
+needs: [lean-retirement, syl-single-face-card-call]
 ---
 
 # Predefined tokens are `token` Definitions
@@ -12,6 +12,8 @@ but nothing declares one, and `plugins/builtin/definitions/token/` does not exis
 Treasure are written as `template … : CharacteristicBundle` under `templates/noun/`, and core
 keeps a second hand-synchronized copy of every predefined token's characteristics
 (`PredefinedToken` in `crates/core/src/token.rs`).
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Done when
 

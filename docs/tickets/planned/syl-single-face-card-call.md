@@ -1,5 +1,5 @@
 ---
-needs: [syl-primitive-constructors, syl-this-head-template, syl-printed-read-order, syl-card-head-noun-sweep, syl-mode-frame-cataphora, syl-round-each-time, syl-tocast-noun-phrase, syl-empower-token-parameter, syl-token-definitions, syl-numeric-anaphors, syl-room-doors-as-designations, syl-concepts-modeled-twice, syl-each-plural-referent, syl-ability-words-once, syl-dead-weight-sweep, syl-one-declaration-per-keyword, syl-one-exile-declaration, syl-misnamed-declarations, syl-zone-words]
+needs: [syl-primitive-constructors]
 ---
 
 # Single-faced cards as an explicit call, and no `CardFace`
@@ -11,17 +11,6 @@ A card file written `card { name = …, … }` is read as `singleFaced(…)` aro
 implicit wrap but `Option` (`docs/decisions/syl.md` §2 and §3). `cargo xtask dsl check` accepts
 them only so the single-faced cards need no respelling. `CardFace` itself is a record whose one
 field is `characteristics`, so it adds nothing over `Characteristics`.
-
-Wrapping each card in `singleFaced({ … })` reindents every line of the 929 single-faced canon
-cards, so every ticket that edits existing canon card lines lands first. The direct ones are
-`syl-this-head-template` (374 cards use a `this<Head>` Template), `syl-printed-read-order`,
-`syl-card-head-noun-sweep` (about 45 cards), `syl-zone-words` (53 cards use `hand` or
-`graveyard`), `syl-misnamed-declarations` (36 cards), `syl-numeric-anaphors` (60 cards),
-`syl-one-declaration-per-keyword` (5 cards), `syl-one-exile-declaration`, `syl-token-definitions`
-(3 cards), `syl-tocast-noun-phrase` (3), `syl-empower-token-parameter` (*Countersculpt*),
-`syl-mode-frame-cataphora` (2), `syl-round-each-time` (*Saw in Half*),
-`syl-room-doors-as-designations` (3), `syl-concepts-modeled-twice`, `syl-each-plural-referent`,
-`syl-ability-words-once` and `syl-dead-weight-sweep`; the rest reach it through them.
 
 ## Design
 

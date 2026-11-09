@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # Decide whether `.syl`'s numeric anaphors become one primitive
@@ -14,6 +14,8 @@ many" counting an event's or action's group, as in Woodland Champion and Divine 
 number"). The first four are one kind of reference, a numeric anaphor, perhaps qualified by sort.
 One primitive (or `thatMuch` with an optional sort) would give them one resolution path in the
 greenfield discourse resolution; keeping them apart may be right if they resolve differently.
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Open questions
 

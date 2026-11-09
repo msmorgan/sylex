@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # Ability words exist once
@@ -11,6 +11,8 @@ Ability words are declared twice: as `ability_word` declarations under
 (`plugins/builtin/templates/ability/abilityWord.syl`) over the `abilityWord` italic-word primitive,
 which nothing uses. The validator also keeps `AbilityWordLabel` as a sort no declaration produces
 (`UNDECLARED_SORTS`, `crates/xtask/src/dsl_check/schema.rs`).
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Done when
 

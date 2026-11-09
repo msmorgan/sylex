@@ -1,5 +1,5 @@
 ---
-needs: [syl-life-totals-exchange-operand, syl-bodiless-keywords]
+needs: [syl-life-totals-exchange-operand, syl-bodiless-keywords, syl-single-face-card-call]
 ---
 
 # One keyword, one declaration
@@ -19,6 +19,8 @@ label, `"exchange"`.
 Two narrower tickets rewrite the same declarations first: `syl-life-totals-exchange-operand`
 (`exchange.syl`, `exchangeLifeTotals.syl`, *Mirror Universe*) and `syl-bodiless-keywords` (the
 seven partner-ability files).
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Design
 

@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # Model Room doors through the unlocked designations
@@ -12,6 +12,8 @@ needs: []
 `doorOf(state: Option(LockState), room)`), `unlock(door)` and `fullyUnlock(room)`. The rules
 define a locked half as one without its unlocked designation, unlocking as gaining it, and fully
 unlocking as ending up with both, so two representations of one state sit side by side.
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Done when
 

@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-single-face-card-call]
 ---
 
 # "Each" and the referent it introduces
@@ -9,6 +9,8 @@ needs: []
 "Each" introduces a singular referent that verbs then patch to plural, so the same phrase is
 read as one object in one place and a group in another, and each verb that takes it carries its
 own fix.
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Open questions
 

@@ -1,5 +1,5 @@
 ---
-needs: [syl-printed-it-self-references, syl-argument-naming, syl-condition-first-static, syl-lookback-point-from-trigger]
+needs: [syl-printed-it-self-references, syl-argument-naming, syl-condition-first-static, syl-lookback-point-from-trigger, syl-single-face-card-call]
 ---
 
 # One `this(head)` Template replaces the 21 `this<Head>` Templates
@@ -18,6 +18,8 @@ Its `this<Head>` sites also sit in calls three tickets rewrite first: `syl-argum
 (83 arguments it names or unnames, in 79 files), `syl-condition-first-static` (the
 condition-first statics, such as *Guardian Beast*'s `is(thisCreature, isUntapped)`) and
 `syl-lookback-point-from-trigger` (3 `move` calls, such as `aura.syl`'s, that drop `at`).
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Open questions
 

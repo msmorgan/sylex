@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-single-face-card-call]
 ---
 # `toCast` takes a noun phrase
 
@@ -9,6 +9,8 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 <predicate> spells") cannot take an anaphor, so "to cast that spell" and "to cast those spells"
 cannot be written. Its three canon sites also print "spells" twice: *Ancient Ziggurat* and
 *Mishra's Workshop* pass `and([…, isSpell])` to a spelling that already ends in "spells".
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Design
 

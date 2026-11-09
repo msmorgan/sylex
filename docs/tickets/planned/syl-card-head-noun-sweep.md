@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-single-face-card-call]
 ---
 # Restore the printed head nouns that canon card spellings drop
 
@@ -17,6 +17,8 @@ noun out and write only the other conjuncts. That changes the set described:
 - "Card": a description with a card type and a zone but no "card" admits tokens and copies where
   the text means a Magic card [CR#108.2,109.2a]. *Force of Will* ("exile a blue card from your
   hand") writes `and([hasColor(blue), in(yourHand)])`.
+
+This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
 ## Done when
 
