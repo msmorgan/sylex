@@ -602,9 +602,11 @@ impl Repository {
                 continue;
             }
             let absolute = self.root.join(&relative);
-            if !absolute.is_file() {
-                continue;
-            }
+            anyhow::ensure!(
+                absolute.is_file(),
+                "cite: source {relative} is listed but is not a readable file at {}",
+                absolute.display()
+            );
             // A symlink into the repository is the same content as its target:
             // the target is scanned (or exempt) under its own name, so the link
             // is skipped rather than counted twice or escaping the exclusions.
