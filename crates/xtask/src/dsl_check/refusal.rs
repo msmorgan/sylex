@@ -52,6 +52,8 @@ pub enum RefusalKind {
     MissingBlock(String),
     #[error("duplicate parameter `{0}`")]
     DuplicateParameter(String),
+    #[error("unknown sort `{0}`")]
+    UnknownSort(String),
     #[error("sort `{0}` takes {1} sort arguments")]
     SortArity(String, usize),
     #[error("duplicate declaration `{name}` at {sort}")]
@@ -64,12 +66,6 @@ pub enum RefusalKind {
     UnknownField { field: String, at: String },
     #[error("missing field `{field}` at {at}")]
     MissingField { field: String, at: String },
-    #[error("`{field}` is a nonempty string on a parameterless declaration at {sort}")]
-    Identity { field: String, sort: String },
-    #[error("`{field}` and `{other}` are not written together")]
-    Excludes { field: String, other: String },
-    #[error("this kind needs the declaration `{word}` at {sort}")]
-    Requires { word: String, sort: String },
     #[error("unknown parameter `${0}`")]
     UnknownParameter(String),
     #[error("parameter `${name}` has sort {sort}, expected {expected}")]

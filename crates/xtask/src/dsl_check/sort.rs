@@ -1,5 +1,6 @@
-//! Sorts, compared with their aliases unfolded.
+//! Sorts, as written in headers and in the schema tables.
 
+use std::collections::BTreeSet;
 use std::fmt;
 
 use sylex_syl::Sort;
@@ -8,7 +9,7 @@ use super::refusal::Refusal;
 use super::refusal::RefusalKind;
 use super::schema;
 
-/// A sort with its aliases unfolded: `Option(List(ManaSymbol))`.
+/// A sort: `Option(List(ManaSymbol))`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub(super) struct SortKey {
     pub(super) head: String,
@@ -64,6 +65,14 @@ impl SortKey {
     pub(super) fn list_inner(&self) -> Option<&SortKey> {
         (self.head == "List").then(|| &self.args[0])
     }
+
+    /// Every sort name in this sort, its arguments' included.
+    pub(super) fn heads<'a>(&'a self, out: &mut BTreeSet<&'a str>) {
+        out.insert(&self.head);
+        for arg in &self.args {
+            arg.heads(out);
+        }
+    }
 }
 
 impl fmt::Display for SortKey {
@@ -83,8 +92,7 @@ impl fmt::Display for SortKey {
     }
 }
 
-/// A written sort with its aliases unfolded, refusing a wrong number of sort
-/// arguments.
+/// A written sort, refusing a wrong number of sort arguments.
 pub(super) fn sort_key(sort: &Sort) -> Result<SortKey, Refusal> {
     let head = sort.head.ident.as_str();
     let arity = usize::from(schema::SORT_CONSTRUCTORS.contains(&head));
@@ -93,9 +101,6 @@ pub(super) fn sort_key(sort: &Sort) -> Result<SortKey, Refusal> {
             span: sort.span,
             kind: RefusalKind::SortArity(head.to_owned(), arity),
         });
-    }
-    if let Some((_, target)) = schema::ALIASES.iter().find(|(alias, _)| *alias == head) {
-        return Ok(SortKey::table(target));
     }
     Ok(SortKey {
         head: head.to_owned(),

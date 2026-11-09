@@ -336,13 +336,14 @@ fn sort_constructors_take_one_sort_argument_and_others_none() {
 }
 
 #[test]
-fn a_sort_alias_reads_as_the_sort_it_names() {
+fn a_sort_no_declaration_names_is_refused() {
     assert_eq!(
-        kinds(
-            "template label: VoteLabel { body = \"grace\" }\n\
-             template use: String { body = label }"
-        ),
-        []
+        refusals(&[(
+            "a.syl",
+            "primitive yes: Bool = Yes\n\
+             template t(x: Option(Bol) = none): Bool { body = yes }"
+        )]),
+        [(RefusalKind::UnknownSort(s("Bol")), s("Bol"))]
     );
 }
 
@@ -404,53 +405,6 @@ fn an_action_declares_a_deed_unless_it_is_deedless() {
 }
 
 #[test]
-fn of_ability_excludes_deed_and_permanent() {
-    assert_eq!(
-        kinds(
-            "primitive nothing: Action = Nothing\nability crew { }\n\
-             action a { body = nothing, ofAbility = crew, deed = \"a\" }"
-        ),
-        [RefusalKind::Excludes {
-            field: s("ofAbility"),
-            other: s("deed")
-        }]
-    );
-}
-
-fn identity() -> RefusalKind {
-    RefusalKind::Identity {
-        field: s("identity"),
-        sort: s("NounPhrase"),
-    }
-}
-
-#[test]
-fn identity_is_a_nonempty_string_on_a_parameterless_noun_phrase_template() {
-    let source = format!(
-        "{COLORS}primitive actor: NounPhrase = Actor\n\
-         template ok: NounPhrase {{ identity = \"actor\", body = actor }}\n\
-         template a(x: NounPhrase): NounPhrase {{ identity = \"actor\", body = $x }}\n\
-         template b: Color {{ identity = \"actor\", body = white }}\n\
-         template c: NounPhrase {{ identity = \"\", body = actor }}"
-    );
-    assert_eq!(kinds(&source), [identity(), identity(), identity()]);
-}
-
-#[test]
-fn an_ability_word_needs_the_ability_word_template() {
-    assert_eq!(
-        kinds(
-            "primitive nothing: Ability = Nothing\n\
-             ability_word threshold { body = nothing }"
-        ),
-        [RefusalKind::Requires {
-            word: s("abilityWord"),
-            sort: s("Ability")
-        }]
-    );
-}
-
-#[test]
 fn a_primitive_building_a_reserved_constructor_is_refused() {
     assert_eq!(
         refusals(&[(
@@ -490,7 +444,8 @@ fn a_primitive_building_a_reserved_constructor_is_refused() {
 fn only_the_deed_constructor_an_action_writes_is_reserved_at_deed() {
     assert_eq!(
         kinds(
-            "primitive core(deed: CoreDeed): Deed = Core\n\
+            "primitive target: CoreDeed = Target\n\
+             primitive core(deed: CoreDeed): Deed = Core\n\
              primitive raw(label: String): Deed = Action"
         ),
         [RefusalKind::ReservedConstructor(s("Deed.Action"))]

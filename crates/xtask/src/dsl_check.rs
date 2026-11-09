@@ -8,7 +8,7 @@
 //! [`check`] first runs [`sylex_syl::check()`] (constructor clauses, and words
 //! that name no declaration at any sort), then resolves every value at its
 //! expected sort against the `(name, sort)` signatures the declaration headers
-//! declare. Declaration kinds, record sorts, sort aliases and reserved
+//! declare. Declaration kinds, record sorts and reserved
 //! constructors have no `.syl` declaration; their provisional schemas are
 //! [`schema`]'s. The only words and sorts written here are the language's own
 //! (`none`, `some`, `Option`, `List` and the literal sorts, `syl.md` §3) and
@@ -36,6 +36,7 @@ use sylex_syl::Item;
 use sylex_syl::METADATA_FIELDS;
 use sylex_syl::Record;
 use sylex_syl::Shape;
+use sylex_syl::Sort;
 use sylex_syl::Span;
 use sylex_syl::Value;
 use sylex_syl::ValueKind;
@@ -46,8 +47,8 @@ pub use self::refusal::RefusalKind;
 use self::schema::Form;
 use self::schema::KINDS;
 use self::schema::Kind;
-use self::schema::KindRule;
 use self::schema::RECORDS;
+use self::schema::TextWord;
 use self::sort::SortKey;
 use self::sort::sort_key;
 
@@ -113,7 +114,7 @@ impl fmt::Display for Summary {
 struct Slot {
     name: String,
     /// `None`: written but not resolved, for the one temporary exception that
-    /// needs it (`KindRule::TextWord`).
+    /// needs it (`schema::TextWord`).
     sort: Option<SortKey>,
     optional: bool,
 }
@@ -193,6 +194,7 @@ pub fn check(builtin: &Bundle, others: &[&Bundle]) -> Result<Summary, CheckError
         }
     }
     let registry = register(&decls, &mut refusals);
+    known_sorts(&decls, &registry, &mut refusals);
     let mut edges = vec![Vec::new(); decls.len()];
     for (decl, edges) in decls.iter().zip(&mut edges) {
         resolve(decl, &registry, &mut refusals, edges);
@@ -363,6 +365,45 @@ fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
     registry
 }
 
+/// The sorts a literal stands at (`syl.md` §3).
+const LITERAL_SORTS: [&str; 3] = ["String", "Int", "Nat"];
+
+/// Refuses a written sort name that no declaration's sort, record sort,
+/// literal sort or sort constructor names.
+fn known_sorts(decls: &[Decl<'_>], registry: &Registry, refusals: &mut Vec<Refusal>) {
+    let mut known: BTreeSet<&str> = LITERAL_SORTS
+        .into_iter()
+        .chain(schema::SORT_CONSTRUCTORS)
+        .chain(RECORDS.iter().map(|record| record.sort))
+        .chain(schema::UNDECLARED_SORTS.iter().copied())
+        .collect();
+    for (_, sort) in registry.keys() {
+        sort.heads(&mut known);
+    }
+    for decl in decls {
+        let Shape::Named(named) = &decl.declaration.shape else {
+            continue;
+        };
+        let params = named.params.iter().filter_map(Item::node).map(|p| &p.sort);
+        for sort in named.sort.iter().chain(params) {
+            unknown_sort(sort, &known, refusals);
+        }
+    }
+}
+
+fn unknown_sort(sort: &Sort, known: &BTreeSet<&str>, refusals: &mut Vec<Refusal>) {
+    let head = sort.head.ident.as_str();
+    if !known.contains(head) {
+        refusals.push(Refusal {
+            span: sort.head.span,
+            kind: RefusalKind::UnknownSort(head.to_owned()),
+        });
+    }
+    for arg in &sort.args {
+        unknown_sort(arg, known, refusals);
+    }
+}
+
 fn is_bare(value: &Value, word: &str) -> bool {
     matches!(&value.kind, ValueKind::Call(call) if call.is_bare() && call.head.ident == word)
 }
@@ -454,51 +495,12 @@ impl Resolver<'_> {
                 optional: !spec.required,
             })
             .collect();
-        match decl.kind.rule {
-            KindRule::None => {}
-            KindRule::Identity { field, sort } => {
-                if let Some(identity) = decl.field(field) {
-                    let nonempty =
-                        matches!(&identity.kind, ValueKind::String(text) if !text.is_empty());
-                    if !nonempty || decl.sort != SortKey::table(sort) || !decl.params.is_empty() {
-                        let kind = RefusalKind::Identity {
-                            field: field.to_owned(),
-                            sort: sort.to_owned(),
-                        };
-                        self.refuse(identity.span, kind);
-                    }
-                }
-            }
-            KindRule::Excludes { field, excludes } => {
-                if let Some(value) = decl.field(field) {
-                    for other in excludes.iter().filter(|other| decl.field(other).is_some()) {
-                        let kind = RefusalKind::Excludes {
-                            field: field.to_owned(),
-                            other: (*other).to_owned(),
-                        };
-                        self.refuse(value.span, kind);
-                    }
-                }
-            }
-            KindRule::Requires { word, sort } => {
-                let key = (word.to_owned(), SortKey::table(sort));
-                if let Some(signature) = self.registry.get(&key) {
-                    self.edges.extend(signature.node);
-                } else {
-                    let kind = RefusalKind::Requires {
-                        word: word.to_owned(),
-                        sort: sort.to_owned(),
-                    };
-                    self.refuse(decl.declaration.span, kind);
-                }
-            }
-            // Temporary: `syl-subtype-card-types` deletes this exception.
-            KindRule::TextWord { field, word } => {
-                if decl.field(field).is_some_and(|value| is_bare(value, word)) {
-                    let slot = slots.iter_mut().find(|slot| slot.name == field);
-                    slot.expect("the text word's field is the kind's").sort = None;
-                }
-            }
+        // Temporary: `syl-subtype-card-types` deletes this exception.
+        if let Some(TextWord { field, word }) = decl.kind.text_word
+            && decl.field(field).is_some_and(|value| is_bare(value, word))
+        {
+            let slot = slots.iter_mut().find(|slot| slot.name == field);
+            slot.expect("the text word's field is the kind's").sort = None;
         }
         self.fields(block, &slots, &at);
     }

@@ -1,13 +1,13 @@
 //! Provisional: the schemas `.syl` does not declare.
 //!
-//! Declaration kinds, record sorts, sort aliases and the reserved
-//! constructors have no `.syl` declaration; their only other copy is the Lean
-//! workbench (`SylGen`'s `kindSort`, `allowedFields`, `body` and
-//! `sourceConstructorRefusal`, and the `Semantics` structures and `abbrev`s),
-//! which step 5 of the semantics-v3 plan deletes. Once it does, these tables
-//! are their only copy, so whether they move into `.syl` is open. Everything
-//! that is a schema without a `.syl` source is here, in one place, and
-//! nowhere else in the validator.
+//! Declaration kinds, record sorts and the reserved constructors have no
+//! `.syl` declaration; their only other copy is the Lean workbench (`SylGen`'s
+//! `kindSort`, `allowedFields`, `body` and `sourceConstructorRefusal`, and the
+//! `Semantics` structures), which step 5 of the semantics-v3 plan deletes.
+//! They stay provisional Rust tables until step 7's AST states them.
+//! Everything that is a schema without a `.syl` source is here, in one place,
+//! and nowhere else in the validator. Items marked "step 6" are ones
+//! `docs/cleanup/06-syl-iteration.md` plans to reshape or delete.
 
 /// What a declaration kind's block holds, besides `lexical` and `spelling`.
 pub struct Kind {
@@ -28,8 +28,17 @@ pub struct Kind {
     /// When the block writes none of `fields`, it writes the fields of the
     /// kind's record sort directly.
     pub record_fields: bool,
-    /// The one rule of this kind that no field's sort states.
-    pub rule: KindRule,
+    /// Temporary: a field whose bare `word` is read as text, a word that
+    /// never resolves. `syl-subtype-card-types` deletes this exception.
+    pub text_word: Option<TextWord>,
+}
+
+/// Temporary: `field = word` is read as text. `syl-subtype-card-types`
+/// deletes this exception.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TextWord {
+    pub field: &'static str,
+    pub word: &'static str,
 }
 
 /// How a declaration kind is written.
@@ -61,34 +70,6 @@ pub enum Reserves {
     All,
     /// Only these; the sort's other constructors have primitives.
     Only(&'static [&'static str]),
-}
-
-/// A kind's rule beyond its fields' sorts.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum KindRule {
-    None,
-    /// `field` is a nonempty string, on a parameterless declaration at
-    /// `sort`.
-    Identity {
-        field: &'static str,
-        sort: &'static str,
-    },
-    /// `field` excludes each of `excludes`.
-    Excludes {
-        field: &'static str,
-        excludes: &'static [&'static str],
-    },
-    /// The kind's body is wrapped by the declaration `word` at `sort`.
-    Requires {
-        word: &'static str,
-        sort: &'static str,
-    },
-    /// Temporary: `field = word` is read as text, a word that never resolves.
-    /// `syl-subtype-card-types` deletes this exception.
-    TextWord {
-        field: &'static str,
-        word: &'static str,
-    },
 }
 
 /// One field of a declaration kind's block.
@@ -127,7 +108,7 @@ const fn kind(word: &'static str, sort: &'static str, fields: &'static [FieldSpe
         secondary: None,
         catalog: false,
         record_fields: false,
-        rule: KindRule::None,
+        text_word: None,
     }
 }
 
@@ -162,10 +143,6 @@ pub const KINDS: &[Kind] = &[
     },
     Kind {
         sort: None,
-        rule: KindRule::Identity {
-            field: "identity",
-            sort: "NounPhrase",
-        },
         ..kind(
             "template",
             "",
@@ -175,6 +152,7 @@ pub const KINDS: &[Kind] = &[
                     sort: None,
                     required: true,
                 },
+                // Step 6: a stand-in for local binding, a design wart.
                 field("identity", "String"),
             ],
         )
@@ -183,17 +161,17 @@ pub const KINDS: &[Kind] = &[
         secondary: Some(Secondary {
             sort: "Deed",
             unless: &[("ofAbility", None), ("deed", Some("none"))],
+            // Step 6: `.syl` writes Deeds explicitly, so a raw Deed is no
+            // longer reserved.
             reserves: Reserves::Only(&["Action"]),
         }),
-        rule: KindRule::Excludes {
-            field: "ofAbility",
-            excludes: &["deed", "permanent"],
-        },
         ..kind(
             "action",
             "Action",
             &[
                 required("body", "Action"),
+                // Step 6: explicit Deeds (a deed action kind) replace these
+                // three fields.
                 field("deed", "Option(String)"),
                 field("permanent", "DeedPermanent"),
                 field("ofAbility", "KeywordLabel"),
@@ -212,17 +190,11 @@ pub const KINDS: &[Kind] = &[
             &[field("body", "List(Ability)"), field("label", "String")],
         )
     },
-    Kind {
-        rule: KindRule::Requires {
-            word: "abilityWord",
-            sort: "Ability",
-        },
-        ..kind(
-            "ability_word",
-            "Ability",
-            &[required("body", "Ability"), field("label", "String")],
-        )
-    },
+    kind(
+        "ability_word",
+        "Ability",
+        &[required("body", "Ability"), field("label", "String")],
+    ),
     catalog(
         "counter",
         "CounterKind",
@@ -238,10 +210,10 @@ pub const KINDS: &[Kind] = &[
         ],
     ),
     Kind {
-        rule: KindRule::TextWord {
+        text_word: Some(TextWord {
             field: "kind",
             word: "spell",
-        },
+        }),
         ..catalog(
             "subtype",
             "Subtype",
@@ -257,6 +229,7 @@ pub const KINDS: &[Kind] = &[
         "CardType",
         &[
             field("name", "String"),
+            // Step 6: becomes a `permanentType` bool.
             field("cardClass", "Option(CardClass)"),
             field("stats", "List(Stat)"),
             CONFERS,
@@ -279,6 +252,7 @@ pub const SORT_CONSTRUCTORS: [&str; 3] = ["Option", "List", "Delta"];
 /// sort that has it). `syl.md` §4 names the categories (a scope, a mention, a
 /// raw Deed, a keyword wrapper); these names are the Lean workbench's current
 /// list (`sourceConstructorRefusal`), in the Rust AST's spelling.
+// Step 6: explicit Deeds let `.syl` write a raw Deed, reshaping this list.
 const EXPANSION_CONSTRUCTORS: &[(Option<&str>, &str)] = &[
     (None, "InCaller"),
     (Some("NounPhrase"), "FirstMention"),
@@ -488,11 +462,7 @@ pub const RECORDS: &[RecordSort] = &[
     ),
 ];
 
-/// Sort names written for another sort, which every sort is read as. Whether
-/// they are respelled to the sort they stand for or kept is open.
-pub const ALIASES: &[(&str, &str)] = &[
-    ("FlavorWordLabel", "String"),
-    ("VoteLabel", "String"),
-    ("ManaCost", "List(ManaSymbol)"),
-    ("ProducedRun", "List(ColorOrColorless)"),
-];
+/// Provisional: sorts the model has that no declaration produces, so the
+/// header-derived sort check cannot know them. Step 6's ability-word
+/// cleanup removes `AbilityWordLabel`.
+pub const UNDECLARED_SORTS: &[&str] = &["AbilityWordLabel"];
