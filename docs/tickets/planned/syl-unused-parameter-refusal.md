@@ -1,5 +1,5 @@
 ---
-needs: [syl-craft-materials, syl-companion-pregame-rule, syl-bodiless-keywords]
+needs: [syl-craft-materials, syl-companion-pregame-rule, syl-bodiless-keywords, cleanup-step6-surface]
 ---
 
 # Refuse a parameter its declaration never reads
@@ -13,6 +13,8 @@ nothing reads is a bug: the caller's argument is dropped silently.
 Four declarations have an unread parameter today: `craft`'s `cost`, `companion`'s `condition`,
 `bandsWithOther`'s `quality` and `toxic`'s `amount`. `syl-craft-materials`,
 `syl-companion-pregame-rule` and `syl-bodiless-keywords` rewrite those files, and land first.
+
+Written against the surface (`cleanup-step6-surface`).
 
 ## Design
 
