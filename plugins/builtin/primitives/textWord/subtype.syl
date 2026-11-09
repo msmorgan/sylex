@@ -1,0 +1,1 @@
+primitive subtype(subtype: Subtype): TextWord = Subtype

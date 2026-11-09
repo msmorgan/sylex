@@ -1,0 +1,3 @@
+primitive heads: CoinFace = Heads {
+  spelling = "heads"
+}

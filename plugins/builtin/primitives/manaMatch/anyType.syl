@@ -1,0 +1,3 @@
+primitive anyType: ManaMatch = AnyType {
+  spelling = "mana of any type"
+}

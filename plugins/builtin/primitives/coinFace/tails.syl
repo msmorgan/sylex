@@ -1,0 +1,3 @@
+primitive tails: CoinFace = Tails {
+  spelling = "tails"
+}

@@ -1,0 +1,3 @@
+primitive anyColor: ManaMatch = AnyColor {
+  spelling = "mana of any color"
+}

@@ -1,0 +1,3 @@
+primitive highest: RollExtreme = Highest {
+  spelling = "highest"
+}

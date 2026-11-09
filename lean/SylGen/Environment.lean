@@ -121,7 +121,7 @@ def leanConstructor (sort : SortRef) (clause : String) : String :=
     ("ChoiceRef", "LatestChoice", "theLatestChoice"), ("Comparator", "Equal", "eq"),
     ("Card", "ModalDoubleFaced", "modalDfc"), ("ColorOrColorless", "Color", "of"),
     ("QualityOp", "Add", "adds"), ("QualityOp", "Set", "sets"), ("QualityOp", "Lose", "loses"),
-    ("Amount", "Arithmetic", "arith")]
+    ("Amount", "Arithmetic", "arith"), ("ManaMatch", "Specific", "of")]
   match renamed.find? (fun (s, c, _) => s == sort.name && c == clause) with
   | some (_, _, lean) => lean
   | none => clause.decapitalize

@@ -1,0 +1,3 @@
+primitive player: ChoiceSort = Player {
+  spelling = "player"
+}

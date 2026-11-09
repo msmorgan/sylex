@@ -1,0 +1,1 @@
+primitive quality(sort: QualitySort): ChoiceSort = Quality

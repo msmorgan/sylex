@@ -1,0 +1,3 @@
+primitive even: Parity = Even {
+  spelling = "even"
+}

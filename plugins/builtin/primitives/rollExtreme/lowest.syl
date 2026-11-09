@@ -1,0 +1,3 @@
+primitive lowest: RollExtreme = Lowest {
+  spelling = "lowest"
+}
