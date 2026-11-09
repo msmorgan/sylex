@@ -6,11 +6,9 @@ needs: []
 ## Why
 
 First strike, double strike, deathtouch, trample and banding change how combat damage is assigned
-and dealt. `.syl` declares them as bodiless keyword abilities today and is to declare them as
-primitives, so the engine's ownership is explicit (deathtouch's destruction rule [CR#704.5h] is
-already a `.syl` rule row). Each can become a Definition once `.syl` has the primitives its rules
-need. The engine implements first and double strike; it has no trample, banding or
-deathtouch-lethal assignment rule yet. In order of difficulty:
+and dealt; `syl-bodiless-keywords` declares the engine-defined ones as primitives. Each can become
+a Definition once `.syl` has the primitives its rules need. The engine implements first and double
+strike; it has no trample, banding or deathtouch-lethal assignment rule yet. In order of difficulty:
 
 1. **Deathtouch and trample, together.** Trample's excess is what remains once the blockers are
    assigned lethal damage [CR#702.19b], and deathtouch makes any nonzero amount lethal for that

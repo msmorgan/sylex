@@ -6,12 +6,16 @@ needs: []
 
 ## Why
 
-A keyword ability declared with `body = []` must either be read by another declaration, as
-`reach` is by `flying` and `deathtouch` and `toxic` are by rule rows, or be defined by the engine.
-An engine-defined keyword is declared as a primitive, not as an ability with an empty body: first
-strike, double strike, trample and banding today are empty abilities. An empty body that nothing
-reads is unfinished. `docs/decisions/semantics.md` §3's "a keyword ability is a Definition" does
-not yet say this.
+Nineteen keyword abilities are declared with `body = []`. Some are read by another declaration,
+as `reach` is by `flying` and `deathtouch` and `toxic` are by rule rows; first strike, double
+strike, trample and banding are defined by the engine; and some are simply unfinished.
+`docs/decisions/semantics.md` §3 says "a keyword ability is a Definition", with no exception.
+
+## Design
+
+- A keyword with an empty body is read by another declaration or is defined by the engine; an
+  empty body that nothing reads is unfinished.
+- An engine-defined keyword is declared as a primitive, not as an ability with an empty body.
 
 ## Done when
 

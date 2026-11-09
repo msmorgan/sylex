@@ -34,6 +34,7 @@ decision:
   `plugins/canon/cards/` with their printed text in full, or each
   refusal names the rule that forbids it.
 - The linked-exile law is checked, or `docs/decisions/semantics.md` §4.8 says it is a convention.
+- Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope

@@ -10,8 +10,12 @@ Several keywords are declared many times, once per printed variant: `exchange` s
 (`exchangeCards`, `exchangeControl`, `exchangeLifeTotals`, `exchangeTextBoxes`, `exchangeValues`,
 `exchangeZones`, beside `exchange` and `exchangeWith`), `hexproof` and `hexproofFrom`, and
 `partner` with `partnerWith`, `partnerCharacterSelect`, `partnerFatherAndSon`,
-`partnerFriendsForever` and `partnerSurvivors`. A keyword the rules define once
-[CR#701.1,702.1] should be one Definition, its variants Templates or parameters over it.
+`partnerFriendsForever` and `partnerSurvivors`. The `exchange` variants already share one Deed
+label, `"exchange"`.
+
+## Design
+
+- A keyword is one Definition, and its printed variants are Templates or parameters over it.
 
 ## Done when
 
@@ -23,8 +27,8 @@ Several keywords are declared many times, once per printed variant: `exchange` s
 
 ## Not in scope
 
-- The five `exile` keyword actions: whether they share one Deed is an open question of
-  `syl-explicit-deeds`.
+- The five `exile` keyword actions: merging them merges their Deeds, so it is
+  `syl-one-exile-declaration`.
 - Whether `lifeTotals` folds into `values`: `syl-life-totals-exchange-operand`.
 
 ## Pointers

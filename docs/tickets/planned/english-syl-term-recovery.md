@@ -21,6 +21,8 @@ yet either.
 - Every canon card's recovery is run and reported: one surviving candidate that matches the
   card's `.syl` file, a mismatch, no candidate, or more than one candidate (reported, never stored
   as a choice).
+- No check exists yet: recovery has no code, and the resolved tree it targets arrives with step 7.
+  The landing names the command that runs recovery and reports its results.
 
 ## Pointers
 

@@ -13,8 +13,7 @@ nothing reads is a bug: the caller's argument is dropped silently.
 ## Design
 
 - A parameter that its declaration's block never reads is refused, on every declaration kind with
-  a body. The one exception is `deed_action` (`syl-explicit-deeds`), whose object parameter can
-  name what received the Deed without being read.
+  a body. `deed_action` (`syl-explicit-deeds`) is exempt.
 
 ## Done when
 

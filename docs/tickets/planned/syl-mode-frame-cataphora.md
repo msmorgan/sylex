@@ -1,5 +1,5 @@
 ---
-needs: [lean-retirement]
+needs: [lean-retirement, syl-opaque-templates]
 ---
 
 # A shared frame over modal fillers, read forward
@@ -33,7 +33,7 @@ this shape.
 
 - Whether the frame may be written with any Template whose argument is the reserved word: that
   holds only while Templates stay transparent, expanding before reference resolution
-  (`syl-opaque-templates`).
+  (`syl-opaque-templates`), so that ticket lands first.
 
 ## Done when
 

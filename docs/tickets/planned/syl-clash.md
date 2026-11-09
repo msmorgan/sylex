@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-explicit-deeds]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
 ---
 # Clash: an opponent and a winner
 

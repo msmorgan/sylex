@@ -17,6 +17,7 @@ which nothing uses. The validator also keeps `AbilityWordLabel` as a sort no dec
 - One form declares ability words; the other is deleted, with every caller using the survivor.
 - `AbilityWordLabel` is produced by a declaration or gone, and `UNDECLARED_SORTS` and its "Step 6"
   note no longer list it.
+- Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers

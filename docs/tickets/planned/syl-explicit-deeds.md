@@ -27,7 +27,7 @@ claim that Crew's Definition carries a Deed is false.
 
 ## Open questions
 
-These are settled with the owner at the end of step 6, after the rest of its tickets.
+These wait for the owner's design discussion of Deeds.
 
 - The `deed_action` syntax, and what replaces the `deed`, `permanent` and `ofAbility` fields of
   `action`. A seed, not settled:
@@ -44,19 +44,20 @@ These are settled with the owner at the end of step 6, after the rest of its tic
   Deed in the cost, the cost's power total is read in that Deed's context so *Hotshot Mechanic*'s
   +2 reaches it, and the `crew` and `saddle` primitives go. Improvise names no Deed.
 - One shared exile Deed: `exile`, `exileFrom`, `exileFaceDown`, `exileFaceDownFrom` and
-  `exileWithCounters` (`definitions/keyword_action/`) each declare their own, so "exiled" can be
-  matched only by its label.
+  `exileWithCounters` (`definitions/keyword_action/`) each declare their own Deed under the label
+  `"exile"`, so "exiled" can be matched only by that label. Merging them into one declaration is
+  `syl-one-exile-declaration`, which waits on this answer.
 - Search marking what it finds: "a search found this card, so it is known after the shuffle"
   [CR#701.23a] is keyed to the Deed name `search`; whether `search`'s body marks the found card
   instead.
 - Whether `cast`, `play` and `activate` are matched by their Deeds rather than by their labels,
   and how a `cast` relates to a `play`.
-- Regenerate. The instruction "regenerate [permanent]" creates a regeneration shield, a
-  replacement effect [CR#701.19a,701.19b]. The event is a permanent actually being regenerated;
-  creating a shield is not regenerating, and "can't be regenerated" stops the shield from being
-  applied [CR#701.19c]. Today `regenerate` (`deed = none`) installs the shield and `regeneration`
-  carries the `"regenerate"` Deed. Which declaration carries the Deed, and whether the two are
-  inverted, is settled in this discussion.
+- Regenerate. The instruction "regenerate [permanent]" creates a replacement effect: a shield
+  [CR#701.19a], or for a static ability one that applies each time [CR#701.19b]. The event is a
+  permanent actually being regenerated; creating a shield is not regenerating, and "can't be
+  regenerated" stops the shield from being applied [CR#701.19c]. Today `regenerate`
+  (`deed = none`) installs the shield and `regeneration` carries the `"regenerate"` Deed. Which
+  declaration carries the Deed, and whether the two are inverted, is settled in this discussion.
 
 ## Done when
 

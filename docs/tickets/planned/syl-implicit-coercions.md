@@ -27,6 +27,7 @@ keyword term are all wrapped by hand, so `cost = [1, blue, blue]` no longer read
   the same as before.
 - An ambiguous implicit wrap (two wrappers reaching one sort) is refused at load, with a test.
 - `docs/decisions/syl.md` §2 and §3 state the rule.
+- Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
