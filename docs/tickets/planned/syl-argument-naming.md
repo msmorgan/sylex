@@ -1,5 +1,5 @@
 ---
-needs: [syl-at-turn-point, syl-alternative-costs-one-model, syl-boolean-flags, cleanup-step6-spine]
+needs: [syl-at-turn-point, syl-alternative-costs-one-model, syl-boolean-flags, cleanup-step6-spine, syl-implicit-coercions]
 ---
 
 # Required arguments are positional, defaulted arguments are named
@@ -32,6 +32,8 @@ Written against the spine (`cleanup-step6-spine`).
 - `cargo xtask dsl check` binds positional arguments only to required parameters, refuses a named
   required argument, a positional defaulted one, and a named argument equal to its declared
   default; each refusal has a negative test.
+- The redundant-default refusal looks through coercion bodies (`syl-implicit-coercions`), so
+  `n = 0` is refused where the declared default is `lit(0)`, with a negative test.
 - Every call in `plugins/` follows the rule, with no named argument equal to its default.
 - The respelled corpus means the same: a one-off script, kept in `docs/evidence/`, checks that
   every call binds the same parameter-to-value map before and after (counting an omitted default
