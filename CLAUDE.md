@@ -18,6 +18,7 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
   legacy wart into new code. "Already failing on default" and "unrelated to my change" are never
   reasons to leave a failure. Fix the cause, not just the instance (add the missing `.gitignore`
   entry, not only delete the stray file); telling the owner to clean something up is leaving it.
+  When the fix is too large to ride along, ticket it and say so.
 - Crash early: fail with an error that names the defect. Never swallow unexpected state or
   missing data with silent fallbacks, dummy values, `unwrap_or_default()`, catch-all `_ =>` arms
   or an early `return`.
@@ -34,7 +35,9 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 
 - `crates/`: the current crates. `v1/`: the old line, deleted once the new one reaches parity;
   never extend it or copy newer work into it.
-- `docs/decisions/`: ADRs; `semantics.md` is the semantics design and `syl.md` the `.syl` language.
+- `docs/decisions/`: ADRs; `architecture.md` is the overall design and the place to start,
+  `english.md` the English grammar, `semantics.md` the semantics design and `syl.md` the `.syl`
+  language.
 - `docs/specs/`: accepted designs not yet in code. `docs/unusual-cards.md`: cards whose text defeats
   a natural modeling assumption.
 
@@ -57,7 +60,8 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 ## Workflow
 
 - The jj-kata `kata` and `kanban` skills own the lifecycle. **Claim or start before any
-  exploration, design or subagents**, then work in `.workspaces/NAME`.
+  exploration, design or subagents** for work that will change the repository, then work in
+  `.workspaces/NAME`. Answering a question needs no claim.
 - **Never `kata refresh --all`** (owner only).
 - Ticket form: `docs/tickets/README.md`.
 - A ticket with Open questions starts with research: answer each question with evidence and a
