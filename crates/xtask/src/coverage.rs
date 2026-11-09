@@ -3,10 +3,8 @@
 
 /// Every rule mentioned in `[CR#…]` brackets in `text`.
 ///
-/// Bracket content is comma-separated tokens; a `A..B` token yields both
-/// endpoints (ranges in this repo are always adjacent subrules, so the two
-/// endpoints are the whole range — and this keeps the scan free of any
-/// `cr.json` ordering dependency).
+/// Bracket content is comma-separated tokens; a range token `A..B` is kept
+/// whole, for [`scan_files`] to expand against the CR's rule order.
 #[must_use]
 pub fn extract_bracket_rules(text: &str) -> Vec<String> {
     let mut out = Vec::new();
@@ -30,12 +28,7 @@ pub fn extract_bracket_rules(text: &str) -> Vec<String> {
         }
         for tok in body.split(',') {
             let tok = tok.trim();
-            if let Some((a, b)) = tok.split_once("..") {
-                push_rule(&mut out, a);
-                push_rule(&mut out, b);
-            } else {
-                push_rule(&mut out, tok);
-            }
+            push_rule(&mut out, tok);
         }
     }
     out
@@ -77,6 +70,7 @@ pub fn extract_attr_rules(text: &str) -> Vec<String> {
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::path::Path;
+use std::path::PathBuf;
 
 use anyhow::Context;
 use serde::Deserialize;
@@ -88,20 +82,6 @@ pub enum Tier {
     Mentioned,
     Bound,
 }
-
-/// Dirs never walked: VCS/build/generated/fixture trees. Repo-specific source
-/// excludes come from `cite-config.json` and are passed in separately.
-const SKIP_DIRS: &[&str] = &[
-    ".git",
-    ".jj",
-    ".workspaces",
-    "target",
-    "data",
-    ".claude",
-    "v1/plugins/wizards",
-    "docs/superpowers",
-];
-const EXTENSIONS: &[&str] = &["rs", "md", "ron", "syl"];
 
 /// Classify a repo-relative path into its citation tier: prose (anything
 /// under `docs/`, any `.md`) is `Mentioned`; every other scanned file,
@@ -120,43 +100,32 @@ pub fn tier_for_path(rel: &str) -> Tier {
     }
 }
 
-/// Walk `root`, extracting every cited rule and keeping the highest tier.
+/// Extract every cited rule from `files` (repo-relative path, absolute path),
+/// keeping each rule's highest tier. `expand_range` turns a range token
+/// `A..B` into every rule it spans.
 ///
-/// `excludes` are repo-relative path prefixes to skip (from
-/// `cite-config.json`'s `sources.exclude`, e.g. `crates/xtask/`).
-#[must_use]
-pub fn scan_tree(root: &Path, excludes: &[String]) -> BTreeMap<String, Tier> {
+/// # Errors
+/// A file cannot be read, or a range does not resolve.
+pub fn scan_files(
+    files: &[(String, PathBuf)],
+    expand_range: &crate::cite::RangeExpander,
+) -> anyhow::Result<BTreeMap<String, Tier>> {
     let mut acc: BTreeMap<String, Tier> = BTreeMap::new();
-    let mut stack = vec![root.to_path_buf()];
-    while let Some(dir) = stack.pop() {
-        let Ok(entries) = std::fs::read_dir(&dir) else { continue };
-        for entry in entries.flatten() {
-            let path = entry.path();
-            let rel = path.strip_prefix(root).unwrap_or(&path);
-            let rel_str = rel.to_string_lossy().replace('\\', "/");
-            if path.is_dir() {
-                if SKIP_DIRS.iter().any(|s| rel_str == *s)
-                    || excludes.iter().any(|e| starts_with_prefix(&rel_str, e))
-                {
-                    continue;
-                }
-                stack.push(path);
-                continue;
-            }
-            let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
-            if !EXTENSIONS.contains(&ext) {
-                continue;
-            }
-            if excludes.iter().any(|e| starts_with_prefix(&rel_str, e)) {
-                continue;
-            }
-            let Ok(text) = std::fs::read_to_string(&path) else { continue };
-            let tier = tier_for_path(&rel_str);
-            let mut rules = extract_bracket_rules(&text);
-            if ext == "rs" {
-                rules.extend(extract_attr_rules(&text));
-            }
-            for rule in rules {
+    for (relative, absolute) in files {
+        let text = std::fs::read_to_string(absolute)
+            .with_context(|| format!("reading {}", absolute.display()))?;
+        let tier = tier_for_path(relative);
+        let mut rules = extract_bracket_rules(&text);
+        if Path::new(relative).extension().is_some_and(|ext| ext == "rs") {
+            rules.extend(extract_attr_rules(&text));
+        }
+        for token in rules {
+            let members = if token.contains("..") {
+                expand_range(&token).with_context(|| format!("{relative}: [CR#{token}]"))?
+            } else {
+                vec![token]
+            };
+            for rule in members {
                 let slot = acc.entry(rule).or_insert(Tier::Mentioned);
                 if tier > *slot {
                     *slot = tier;
@@ -164,14 +133,7 @@ pub fn scan_tree(root: &Path, excludes: &[String]) -> BTreeMap<String, Tier> {
             }
         }
     }
-    acc
-}
-
-/// `cite-config.json` excludes are written like `crates/xtask/` (trailing
-/// slash) or `CLAUDE.md`; match both dir-prefix and exact-file forms.
-fn starts_with_prefix(rel: &str, prefix: &str) -> bool {
-    let p = prefix.trim_end_matches('/');
-    rel == p || rel.starts_with(&format!("{p}/"))
+    Ok(acc)
 }
 
 /// The committed coverage floor. A set, not a count: each named rule is
@@ -216,8 +178,8 @@ const LOCK_FILE: &str = "cr-coverage.lock";
 /// Ratchet failure (`--check`), or any IO/parse error.
 pub fn run(args: &[String]) -> anyhow::Result<()> {
     let root = crate::cite::repo_root();
-    let excludes = load_source_excludes(&root)?;
-    let scan = scan_tree(&root, &excludes);
+    let inputs = crate::cite::coverage_inputs(&root)?;
+    let scan = scan_files(&inputs.files, &inputs.expand_range)?;
     let current = lock_from_scan(&scan);
 
     if args.iter().any(|a| a == "--bless") {
@@ -257,23 +219,6 @@ fn read_lock(root: &Path) -> anyhow::Result<Lock> {
     let text = std::fs::read_to_string(&path)
         .with_context(|| format!("reading {} — run `--bless` first", path.display()))?;
     Ok(serde_json::from_str(&text)?)
-}
-
-/// `sources.exclude` from `cite-config.json`, so coverage scans the same
-/// universe as `cite check`.
-fn load_source_excludes(root: &Path) -> anyhow::Result<Vec<String>> {
-    let path = root.join("cite-config.json");
-    let text =
-        std::fs::read_to_string(&path).with_context(|| format!("reading {}", path.display()))?;
-    let cfg: serde_json::Value = serde_json::from_str(&text)?;
-    Ok(cfg["sources"]["exclude"]
-        .as_array()
-        .map(|a| {
-            a.iter()
-                .filter_map(|v| v.as_str().map(String::from))
-                .collect()
-        })
-        .unwrap_or_default())
 }
 
 /// The leading integer of a rule number (its "section"), e.g. `704.5f -> 704`.
@@ -447,11 +392,22 @@ mod tests {
     }
 
     #[test]
-    fn brackets_range_yields_endpoints() {
+    fn brackets_range_stays_one_token() {
         assert_eq!(
-            extract_bracket_rules("[CR#601.2a..601.2b]"),
-            vec!["601.2a", "601.2b"]
+            extract_bracket_rules("[CR#601.2a..601.2d,106.4]"),
+            vec!["601.2a..601.2d", "106.4"]
         );
+    }
+
+    #[test]
+    fn scan_files_expands_ranges_to_every_member() {
+        let dir = tempdir_with(&[("plugins/solved.syl", "# [CR#702.169b..702.169d]\n")]);
+        let expand = |range: &str| {
+            assert_eq!(range, "702.169b..702.169d");
+            Ok(vec!["702.169b".into(), "702.169c".into(), "702.169d".into()])
+        };
+        let scan = scan(&dir, &expand);
+        assert_eq!(lock_from_scan(&scan).bound, ["702.169b", "702.169c", "702.169d"]);
     }
 
     #[test]
@@ -544,31 +500,17 @@ mod tests {
     }
 
     #[test]
-    fn scan_tree_bound_beats_mentioned() {
+    fn scan_files_bound_beats_mentioned() {
         let dir = tempdir_with(&[
             ("crates/e/src/a.rs", "// [CR#100.1] bound here"),
             ("crates/e/tests/a.rs", "// [CR#100.1] also bound"),
             ("docs/x.md", "[CR#200.2] only mentioned"),
             ("crates/e/tests/b.rs", r#"#[cr("300.3")]"#),
         ]);
-        let scan = scan_tree(dir.path(), &[]);
+        let scan = scan(&dir, &no_ranges);
         assert_eq!(scan.get("100.1"), Some(&Tier::Bound)); // both paths are Bound
         assert_eq!(scan.get("200.2"), Some(&Tier::Mentioned));
         assert_eq!(scan.get("300.3"), Some(&Tier::Bound)); // attribute counts
-    }
-
-    #[test]
-    fn scan_tree_skips_local_workspaces() {
-        let dir = tempdir_with(&[
-            ("crates/e/src/a.rs", "// [CR#100.1] tracked source"),
-            (
-                ".workspaces/fake-test-audit/crates/e/src/lib.rs",
-                "// [CR#701.37] ignored workspace source",
-            ),
-        ]);
-        let scan = scan_tree(dir.path(), &[]);
-        assert_eq!(scan.get("100.1"), Some(&Tier::Bound));
-        assert!(!scan.contains_key("701.37"));
     }
 
     #[test]
@@ -618,13 +560,12 @@ mod tests {
             ("crates/e/tests/a.rs", "// [CR#100.1]"),
             ("crates/e/src/b.rs", "// [CR#200.2]"),
         ]);
-        let scan = scan_tree(dir.path(), &[]);
-        let lock = lock_from_scan(&scan);
+        let lock = lock_from_scan(&scan(&dir, &no_ranges));
         assert_eq!(lock.bound, vec!["100.1", "200.2"]);
 
         // Remove the test citation -> ratchet must flag 100.1 losing Bound.
         std::fs::write(dir.path().join("crates/e/tests/a.rs"), "// no cite").unwrap();
-        let scan2 = scan_tree(dir.path(), &[]);
+        let scan2 = scan(&dir, &no_ranges);
         let regressions = check_ratchet(&lock_from_scan(&scan2), &lock);
         assert!(
             regressions
@@ -636,7 +577,7 @@ mod tests {
     #[test]
     fn syl_citations_are_bound_coverage() {
         let dir = tempdir_with(&[("plugins/example.syl", "# [CR#100.1]\n# [CR#200.2]\n")]);
-        let scan = scan_tree(dir.path(), &[]);
+        let scan = scan(&dir, &no_ranges);
         assert_eq!(lock_from_scan(&scan).bound, ["100.1", "200.2"]);
     }
 
@@ -683,8 +624,12 @@ mod tests {
         assert!(err.to_string().contains("non-empty reason"));
     }
 
-    fn tempdir_with(files: &[(&str, &str)]) -> TempDir {
-        let dir = TempDir::new();
+    fn no_ranges(range: &str) -> anyhow::Result<Vec<String>> {
+        panic!("unexpected range {range}")
+    }
+
+    fn tempdir_with(files: &[(&str, &str)]) -> tempfile::TempDir {
+        let dir = tempfile::tempdir().unwrap();
         for (rel, body) in files {
             let path = dir.path().join(rel);
             std::fs::create_dir_all(path.parent().unwrap()).unwrap();
@@ -693,30 +638,24 @@ mod tests {
         dir
     }
 
-    /// Minimal self-cleaning temp dir (avoids adding the `tempfile` crate).
-    struct TempDir(std::path::PathBuf);
-    impl TempDir {
-        fn new() -> Self {
-            // process id + a monotonically increasing counter keeps this unique
-            // without Date/rand (both unavailable / undesirable here).
-            use std::sync::atomic::AtomicU32;
-            use std::sync::atomic::Ordering;
-            static N: AtomicU32 = AtomicU32::new(0);
-            let base = std::env::temp_dir().join(format!(
-                "xtask-cov-{}-{}",
-                std::process::id(),
-                N.fetch_add(1, Ordering::Relaxed)
-            ));
-            std::fs::create_dir_all(&base).unwrap();
-            Self(base)
+    /// Scans every file under `dir`, as the source list would name it.
+    fn scan(
+        dir: &tempfile::TempDir,
+        expand_range: &crate::cite::RangeExpander,
+    ) -> BTreeMap<String, Tier> {
+        fn walk(root: &Path, dir: &Path, out: &mut Vec<(String, PathBuf)>) {
+            for entry in std::fs::read_dir(dir).unwrap() {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    walk(root, &path, out);
+                } else {
+                    let relative = path.strip_prefix(root).unwrap().to_string_lossy();
+                    out.push((relative.replace('\\', "/"), path));
+                }
+            }
         }
-        fn path(&self) -> &std::path::Path {
-            &self.0
-        }
-    }
-    impl Drop for TempDir {
-        fn drop(&mut self) {
-            let _ = std::fs::remove_dir_all(&self.0);
-        }
+        let mut files = Vec::new();
+        walk(dir.path(), dir.path(), &mut files);
+        scan_files(&files, expand_range).unwrap()
     }
 }

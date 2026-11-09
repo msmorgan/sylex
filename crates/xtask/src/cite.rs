@@ -221,6 +221,34 @@ pub fn dispatch(args: &CiteArgs) -> anyhow::Result<()> {
     }
 }
 
+/// Expands a range citation token (`601.2a..601.2d`) to every rule it spans.
+pub type RangeExpander = dyn Fn(&str) -> anyhow::Result<Vec<String>>;
+
+/// What citation coverage scans.
+pub struct CoverageInputs {
+    /// The files `cite check` reads: repo-relative path, absolute path.
+    pub files: Vec<(String, PathBuf)>,
+    /// Expands a range citation token (`601.2a..601.2d`) to every rule it
+    /// spans in the staged CR's order, as `cite check` resolves it.
+    pub expand_range: Box<RangeExpander>,
+}
+
+/// # Errors
+/// The configuration or the CR snapshot is missing or malformed, or no
+/// source file matches.
+pub fn coverage_inputs(root: &Path) -> anyhow::Result<CoverageInputs> {
+    let repo = Repository::load(root)?;
+    let files = repo.source_files()?;
+    let cr = repo.load_cr()?;
+    Ok(CoverageInputs {
+        files,
+        expand_range: Box::new(move |range: &str| match resolve(range, &cr) {
+            Resolution::Ok(members) => Ok(members),
+            other => anyhow::bail!("range {range} does not resolve: {other:?}"),
+        }),
+    })
+}
+
 impl Repository {
     fn load(root: &Path) -> anyhow::Result<Self> {
         let root = root
