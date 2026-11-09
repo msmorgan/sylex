@@ -58,6 +58,10 @@ These wait for the owner's design discussion of Deeds.
   regenerated" stops the shield from being applied [CR#701.19c]. Today `regenerate`
   (`deed = none`) installs the shield and `regeneration` carries the `"regenerate"` Deed. Which
   declaration carries the Deed, and whether the two are inverted, is settled in this discussion.
+  Adapt is a second instance of the same instruction-versus-event split: [CR#701.46a] defines
+  only the instruction "adapt N", but cards also use "<creature> adapts" as an event
+  (`syl-keyword-verb-events`; *Biomancer's Familiar*, `syl-single-use-as-though`). One design
+  should cover both.
 
 ## Done when
 

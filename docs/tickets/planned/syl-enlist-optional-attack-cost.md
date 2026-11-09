@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-printed-read-order]
 ---
 # Enlist: an optional cost to attack and its linked trigger
 
@@ -10,6 +10,9 @@ you didn't choose to attack with and that either has haste or has been under you
 continuously since this turn began. When you do, this creature gets +X/+0 until end of turn,
 where X is the tapped creature's power." [CR#702.154a]. `enlist.syl` has `body = []`, and the
 cost-to-attack form has no optional variant, so the static cannot be written.
+
+It lands after `syl-printed-read-order`, which reorders `gatedBy` and `staticSpecGatedBy` to
+their printed order (2 files), so the offered form is written against that order.
 
 ## Design
 

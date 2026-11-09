@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-syl]
 ---
 # A Template parameter mentioned in two arms of an `or` shares one binding
 

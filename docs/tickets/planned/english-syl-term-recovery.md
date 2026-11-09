@@ -1,5 +1,5 @@
 ---
-needs: [syl-spelling-conventions, syl-spelling-optional-segments]
+needs: [syl-spelling-conventions, syl-spelling-optional-segments, cleanup-step6-syl]
 ---
 
 # Recover `.syl` terms from `sylex_english` Readings
