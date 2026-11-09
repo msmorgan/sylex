@@ -1604,7 +1604,7 @@ fn added_diff_lines(diff: &str) -> BTreeSet<(String, usize)> {
             // A unified diff separates the path from an optional timestamp with
             // a TAB, so only a TAB ends the path: a plain space is
             // part of it (`plugins/canon/cards/Luminarch
-            // Aspirant.lean`).
+            // Aspirant.syl`).
             let path = path.split('\t').next().unwrap_or(path);
             file = Some(path.strip_prefix("b/").unwrap_or(path).to_string());
             continue;
@@ -2047,7 +2047,7 @@ const OTHER_FIXTURE: usize = 100;\n\
 const CR_FIXTURE: &str = \"rule 100.1\";
 // cite: noncompliant end
 ";
-        for file in ["notes.md", "data.ron", "proof.lean"] {
+        for file in ["notes.md", "data.ron", "card.syl"] {
             let error = noncompliant_source_hits(file, prose).unwrap_err();
             assert!(
                 error.to_string().contains("Rust source"),
@@ -2182,15 +2182,15 @@ const CR_FIXTURE: &str = "rule 100.1";
     #[test]
     fn added_diff_lines_keeps_a_path_containing_spaces() {
         let diff = concat!(
-            "diff --git a/cards/Luminarch Aspirant.lean b/cards/Luminarch Aspirant.lean\n",
+            "diff --git a/cards/Luminarch Aspirant.syl b/cards/Luminarch Aspirant.syl\n",
             "--- /dev/null\n",
-            "+++ b/cards/Luminarch Aspirant.lean\n",
+            "+++ b/cards/Luminarch Aspirant.syl\n",
             "@@ -0,0 +1,1 @@\n",
-            "+// [CR#506.1]\n",
+            "+# [CR#506.1]\n",
         );
         assert_eq!(
             added_diff_lines(diff),
-            BTreeSet::from([("cards/Luminarch Aspirant.lean".into(), 1)])
+            BTreeSet::from([("cards/Luminarch Aspirant.syl".into(), 1)])
         );
     }
 

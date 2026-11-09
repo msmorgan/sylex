@@ -1,8 +1,7 @@
 //! `cargo xtask dsl check`: every reference in the `.syl` bundles resolves.
 //!
-//! A temporary validator that guards `.syl` while there is neither the Lean
-//! workbench nor the Rust resolution layer (step 7 of the semantics-v3 plan),
-//! which replaces it. It checks names, sorts and arity only, following
+//! A temporary validator that guards `.syl` until the Rust resolution layer
+//! (step 7 of the semantics-v3 plan) replaces it. It checks names, sorts and arity only, following
 //! `docs/decisions/syl.md` §3; it expands nothing and reads no meaning.
 //!
 //! [`check`] first runs [`sylex_syl::check()`] (constructor clauses, and words

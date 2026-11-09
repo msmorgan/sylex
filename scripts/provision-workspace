@@ -14,9 +14,8 @@
 # CoW-reflinked (btrfs-snapshotted if it is a subvolume) as a best-effort
 # build-cache pre-warm, then every tracked file
 # whose bytes match `default`'s copy gets `default`'s mtime, so only crates
-# whose sources truly differ rebuild. `lean/.lake` is reflinked the same way
-# (only as fresh as `default`'s last `lake build`). Verify with a real `jj st`
-# (not `--ignore-working-copy`): it must report no changes.
+# whose sources truly differ rebuild. Verify with a real `jj st` (not
+# `--ignore-working-copy`): it must report no changes.
 
 set ws_dir $argv[1]
 if test -z "$ws_dir"; or not test -d "$ws_dir"
@@ -104,10 +103,6 @@ end
 # --reflink=auto is instant and ~zero-space on btrfs (falls back to a plain copy
 # elsewhere); /target/ is gitignored so jj won't snapshot it. A miss here just
 # means a cold first build.
-#
-# lean/.lake is seeded the same way (best-effort CoW reflink, plain-copy fallback,
-# never a symlink: lake writes into it). Without it a fresh workspace's first Lean
-# build is cold (~7 minutes against ~2 s warm). Skipped if default has none.
 #
 # If default's target/ is itself a btrfs subvolume (a local setup, not assumed:
 # detected by the btrfs tool being installed, the filesystem type, and the
@@ -198,13 +193,4 @@ if test $target_warm -eq 1
     end
 end
 
-if test -d "$default_dir/lean/.lake"
-    set t (date +%s%N)
-    if cp --reflink=auto -a "$default_dir/lean/.lake" "$ws_dir/lean/.lake"
-        phase_done "lean/.lake reflink" $t
-    else
-        rm -rf "$ws_dir/lean/.lake"
-        echo >&2 "$(status filename): lean/.lake seed into $ws_dir failed — first Lean build there starts cold (harmless)."
-    end
-end
 exit 0

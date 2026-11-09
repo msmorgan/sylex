@@ -17,7 +17,6 @@ use xtask::extract::ExtractArgs;
 use xtask::fidelity::FidelityArgs;
 use xtask::generate::GenerateArgs;
 use xtask::graduate::GraduateArgs;
-use xtask::lean::LeanArgs;
 use xtask::lexical::LexicalArgs;
 use xtask::map::MapArgs;
 use xtask::resolve::ResolveArgs;
@@ -70,10 +69,8 @@ enum Cmd {
     Entailments(EntailmentsArgs),
     /// Analyze supported raw Oracle text against the independent lexicon.
     Lexical(LexicalArgs),
-    /// Build the native Lean workbench with warnings treated as errors.
-    Lean(LeanArgs),
-    /// `.syl` tooling: check `sylex_syl` against `SylGen`'s parser over
-    /// `plugins`, or format `.syl` files.
+    /// `.syl` tooling: check the `.syl` bundles' references, or format
+    /// `.syl` files.
     Dsl(DslArgs),
     /// On-demand "bearings" dumps of current code shape (`enums`).
     Map(MapArgs),
@@ -105,7 +102,6 @@ fn main() -> anyhow::Result<()> {
             let mut stdout = std::io::stdout().lock();
             xtask::lexical::run(&args, &mut stdout)
         }
-        Cmd::Lean(args) => xtask::lean::run(&args),
         Cmd::Dsl(args) => xtask::dsl::run(&args),
         Cmd::Map(args) => xtask::map::run(&args),
         Cmd::ScaffoldIdentity(args) => xtask::authoring::run(&args),
@@ -123,19 +119,6 @@ mod tests {
             assert!(matches!(cli.command, Cmd::Catalogs(_)));
         }
         assert!(Cli::try_parse_from(["cargo xtask", "catalogs"]).is_err());
-    }
-
-    #[test]
-    fn lean_command_family_requires_a_subcommand() {
-        let cli = Cli::try_parse_from(["cargo xtask", "lean", "check"]).unwrap();
-        assert!(matches!(cli.command, Cmd::Lean(_)));
-        for command in ["definitions", "macros"] {
-            assert!(Cli::try_parse_from(["cargo xtask", "lean", command]).is_err());
-        }
-        assert!(Cli::try_parse_from(["cargo xtask", "lean", "check", "plugins/testing"]).is_err());
-        assert!(Cli::try_parse_from(["cargo xtask", "lean"]).is_err());
-        assert!(Cli::try_parse_from(["cargo xtask", "lean-check"]).is_err());
-        assert!(Cli::try_parse_from(["cargo xtask", "definition-check"]).is_err());
     }
 
     #[test]

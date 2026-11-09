@@ -1,9 +1,0 @@
-#!/bin/sh
-# Full gate: every library (syntax, checker, builtin, generated card bench, pin suites); no
-# errors and no warnings. `cargo xtask lean check` runs the same build, then the Lake
-# generation regression.
-# Inner loops: `lake build Semantics` (checker), `lake build` (builtin), `lake build SemanticsCards`
-# (cards), `lake build SemanticsProofs` (pins).
-cd "$(dirname "$0")/.." || exit 1
-exec lake build -q --wfail Semantics SemanticsDefinitions SemanticsCheckBuiltin \
-  SemanticsCardsData SemanticsCards SemanticsProofs "$@"

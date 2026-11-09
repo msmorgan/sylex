@@ -1,10 +1,8 @@
 //! Provisional: the schemas `.syl` does not declare.
 //!
 //! Declaration kinds, record sorts and the reserved constructors have no
-//! `.syl` declaration; their only other copy is the Lean workbench (`SylGen`'s
-//! `kindSort`, `allowedFields`, `body` and `sourceConstructorRefusal`, and the
-//! `Semantics` structures), which step 5 of the semantics-v3 plan deletes.
-//! They stay provisional Rust tables until step 7's AST states them.
+//! `.syl` declaration, so they are provisional Rust tables until step 7's AST
+//! states them.
 //! Everything that is a schema without a `.syl` source is here, in one place,
 //! and nowhere else in the validator. Items marked "step 6" are ones
 //! `docs/cleanup/06-syl-iteration.md` plans to reshape or delete.
@@ -250,8 +248,8 @@ pub const SORT_CONSTRUCTORS: [&str; 3] = ["Option", "List", "Delta"];
 
 /// Constructors only expansion writes, each at its sort (`None`: at every
 /// sort that has it). `syl.md` §4 names the categories (a scope, a mention, a
-/// raw Deed, a keyword wrapper); these names are the Lean workbench's current
-/// list (`sourceConstructorRefusal`), in the Rust AST's spelling.
+/// raw Deed, a keyword wrapper); this list is provisional, and step 7's AST
+/// replaces it.
 // Step 6: explicit Deeds let `.syl` write a raw Deed, reshaping this list.
 const EXPANSION_CONSTRUCTORS: &[(Option<&str>, &str)] = &[
     (None, "InCaller"),
@@ -307,8 +305,7 @@ const fn record(
 const MANA_COST: &str = "Option(List(ManaSymbol))";
 
 /// Every record sort. `CardType` is a record in the model but has none here:
-/// only a `card_type` declaration builds one. Neither has Lean's internal
-/// `RulesTables`, which no `.syl` value writes.
+/// only a `card_type` declaration builds one.
 pub const RECORDS: &[RecordSort] = &[
     record("CardFace", &[("characteristics", "Characteristics", false)]),
     record(

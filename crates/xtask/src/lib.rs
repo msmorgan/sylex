@@ -24,7 +24,6 @@ pub mod extract;
 pub mod fidelity;
 pub mod generate;
 pub mod graduate;
-pub mod lean;
 pub mod lexical;
 pub mod map;
 pub mod resolve;

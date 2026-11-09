@@ -101,7 +101,7 @@ const SKIP_DIRS: &[&str] = &[
     "v1/plugins/wizards",
     "docs/superpowers",
 ];
-const EXTENSIONS: &[&str] = &["rs", "md", "ron", "lean", "syl"];
+const EXTENSIONS: &[&str] = &["rs", "md", "ron", "syl"];
 
 /// Classify a repo-relative path into its citation tier: prose (anything
 /// under `docs/`, any `.md`) is `Mentioned`; every other scanned file,
@@ -517,7 +517,7 @@ mod tests {
             tier_for_path("v1/plugins/testing/cards/Foo.ron"),
             Tier::Bound
         );
-        assert_eq!(tier_for_path("lean/Proofs/Foo.lean"), Tier::Bound);
+        assert_eq!(tier_for_path("plugins/canon/cards/Foo.syl"), Tier::Bound);
         assert_eq!(tier_for_path("crates/engine/src/step/mod.rs"), Tier::Bound);
         assert_eq!(
             tier_for_path("v1/plugins/builtin/rules/sba/toughness-zero.ron"),
@@ -532,7 +532,7 @@ mod tests {
     #[test]
     fn tier_docs_nonmd_is_mentioned() {
         assert_eq!(
-            tier_for_path("docs/superpowers/reviews/x/Attack.lean"),
+            tier_for_path("docs/superpowers/reviews/x/Attack.syl"),
             Tier::Mentioned
         );
         assert_eq!(tier_for_path("docs/tickets/done/foo.md"), Tier::Mentioned);
@@ -634,17 +634,10 @@ mod tests {
     }
 
     #[test]
-    fn syl_conversion_preserves_bound_coverage() {
-        let dir = tempdir_with(&[("plugins/example.lean", "/-- [CR#100.1] -/\n-- [CR#200.2]")]);
-        let before = scan_tree(dir.path(), &[]);
-        std::fs::remove_file(dir.path().join("plugins/example.lean")).unwrap();
-        std::fs::write(
-            dir.path().join("plugins/example.syl"),
-            "# [CR#100.1]\n# [CR#200.2]\n",
-        )
-        .unwrap();
-        assert_eq!(scan_tree(dir.path(), &[]), before);
-        assert_eq!(lock_from_scan(&before).bound, ["100.1", "200.2"]);
+    fn syl_citations_are_bound_coverage() {
+        let dir = tempdir_with(&[("plugins/example.syl", "# [CR#100.1]\n# [CR#200.2]\n")]);
+        let scan = scan_tree(dir.path(), &[]);
+        assert_eq!(lock_from_scan(&scan).bound, ["100.1", "200.2"]);
     }
 
     fn extant_set(rules: &[&str]) -> BTreeSet<String> {
