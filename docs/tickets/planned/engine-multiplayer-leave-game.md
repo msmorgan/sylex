@@ -11,13 +11,16 @@ anything they still control is exiled [CR#800.4a,104.3a]. The engine has none of
 `concede` in `decide/mod.rs` hits a `todo!` when more than two players are live, but a loss by
 state-based action or effect goes through `PlayerLost`'s apply in `step/player.rs`, which only
 sets `lost = true` and leaves the departed player's objects, control effects and seat in the game.
-Multiplayer is off the 1v1 happy path, and the owner wants the design talked through before any
-implementation.
+Multiplayer is off the 1v1 happy path.
+
+## Open questions
+
+- The design for turn-order repair, pending-decision ownership and priority-round reshaping for
+  a departed seat, talked through with the owner before any implementation; the CR's answers are
+  [CR#800.4g..800.4k].
 
 ## Done when
 
-- The owner has agreed the design for turn-order repair, pending-decision ownership and
-  priority-round reshaping for a departed seat; the CR's answers are [CR#800.4g..800.4k].
 - With more than two live players, every way a player leaves (concession, state-based loss,
   effect-driven loss) performs [CR#800.4a]'s steps in order, and [CR#800.4b..800.4m] hold for
   the departed player.

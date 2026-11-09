@@ -11,9 +11,12 @@ project that no longer exists: the v1 pipeline as the production path, and a cha
 that overstates what parses. A reviewer who follows them hits dead ends. They need rewriting
 together, then checking the way a stranger would use them.
 
+## Open questions
+
+- The outline of both, agreed with the owner before drafting; the owner then approves the draft.
+
 ## Done when
 
-- The owner has agreed the outline of both before drafting, and approves the draft.
 - The README carries the vision and rationale from `docs/decisions/architecture.md`, describes
   the English grammar, and says nothing that goes stale with the next landing; the tour follows one
   current `.syl` card through the pipeline.

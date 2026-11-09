@@ -13,10 +13,14 @@ never surfaced and its `resolve` is a `todo!`. `PreGameKind` already names `Firs
 [CR#103.1], the mulligan loop with London bottoming [CR#103.5], and opening-hand actions such as
 a Leyline beginning on the battlefield [CR#103.6a].
 
+## Open questions
+
+- Whether the simulator needs the interactive procedure (surfaced `PreGame` decisions) or a
+  deterministic seeded opener.
+
 ## Done when
 
-- The owner has chosen whether the simulator needs the interactive procedure (surfaced `PreGame`
-  decisions) or a deterministic seeded opener, and that choice is built.
+- The settled procedure is built.
 - If interactive: `PreGame::resolve` applies first-turn, mulligan (with bottoming) and
   opening-hand answers, and the `todo!` is gone. Tests cover a mulligan to six with one card
   bottomed and Leyline of the Void starting on the battlefield.

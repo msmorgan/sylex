@@ -21,10 +21,14 @@ with the outcome known; or the batch pauses mid-way and resumes with the choice 
 lets other members' state move while the decision is outstanding. Do not build this ahead of a
 real card; the card that needs it should inform the answer.
 
+## Open questions
+
+- Whether a choice-bearing member decides before the snapshot or pauses the batch, informed by
+  the real card that needs it.
+
 ## Done when
 
-- A real card needs it, and the owner has chosen between deciding before the snapshot and pausing
-  the batch.
+- A real card needs it, and the settled answer is built.
 - That card resolves through `Simultaneously` with its choice, tested end to end, and the `todo!`
   is gone.
 

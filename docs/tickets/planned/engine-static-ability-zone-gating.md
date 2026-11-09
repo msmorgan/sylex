@@ -29,17 +29,19 @@ So no static ability functions anywhere else, including:
 The proposal: every ability carries its function zones in the [CR#113.6] vocabulary. Battlefield
 is the default, and one generic check decides whether an ability functions. Card text often
 implies the zones ("as long as ~ isn't on the battlefield", "from your graveyard"), so `.syl` can
-often infer them. This needs a design discussion with the owner before it is built:
+often infer them.
 
-- the vocabulary: one zone, as `from` is today, or a set or an exclusion that matches
-  [CR#113.6b,113.6c];
-- where the zones are set: authored or inferred in `.syl`, or attached when the engine lowers the
-  card;
-- whether `from` on activated and triggered abilities becomes the same property.
+## Open questions
+
+- The vocabulary: one zone, as `from` is today, or a set or an exclusion that matches
+  [CR#113.6b,113.6c].
+- Where the zones are set: authored or inferred in `.syl`, or attached when the engine lowers the
+  card.
+- Whether `from` on activated and triggered abilities becomes the same property.
 
 ## Done when
 
-- The owner has agreed a design, and it is written into `docs/specs/` or an ADR.
+- The settled design is written into `docs/specs/` or an ADR.
 - `gather` no longer special-cases the battlefield and emblems: every static ability is gated by
   its declared zones.
 - `sylex_engine` tests show Grist being a creature in the graveyard and library and not on the

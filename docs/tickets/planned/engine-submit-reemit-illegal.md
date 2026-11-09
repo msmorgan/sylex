@@ -12,24 +12,21 @@ say it is a repeat or why the last answer failed, though. A deterministic driver
 the same illegal answer, a test especially, loops forever. And `sim::play` ends the game with
 `.expect("a strategy submits only legal decisions")`.
 
-The proposed shape, to settle with the owner before building:
+## Open questions
 
-- `submit_decision` keeps returning `Err(Illegal)`, and the re-surfaced decision carries an
-  attempt count and the last rejection reason as data. The engine has no retry cap.
-- Breaking the loop is each runner's policy:
-  - a test driver fails on a re-asked decision;
-  - `sim::play` answers a re-asked decision with the always-legal mechanical answer instead of
-    asking the strategy again;
-  - the TUI re-prompts and shows the reason.
-
-The open questions are where the count and reason live (on each `DecisionPointKind` variant, or
-in a wrapper beside `pending`), and whether `Err` stays once every runner reads the re-asked
-decision.
+- Whether this proposed shape is the one built:
+  - `submit_decision` keeps returning `Err(Illegal)`, and the re-surfaced decision carries an
+    attempt count and the last rejection reason as data. The engine has no retry cap.
+  - Breaking the loop is each runner's policy: a test driver fails on a re-asked decision;
+    `sim::play` answers a re-asked decision with the always-legal mechanical answer instead of
+    asking the strategy again; the TUI re-prompts and shows the reason.
+- Where the count and reason live: on each `DecisionPointKind` variant, or in a wrapper beside
+  `pending`.
+- Whether `Err` stays once every runner reads the re-asked decision.
 
 ## Done when
 
-- The owner has settled the shape.
-- A re-asked decision carries its attempt count and last rejection reason, and each runner
+- A re-asked decision carries what the settled shape says, and each runner
   (`crates/engine/src/sim.rs`, `crates/engine/src/runner.rs`, `crates/tui/src/driver.rs`)
   applies its loop-breaking policy.
 - Every decision kind has an always-legal fallback answer for `sim::play`. The gaps are

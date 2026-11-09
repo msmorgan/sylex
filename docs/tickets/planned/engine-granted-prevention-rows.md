@@ -14,9 +14,11 @@ Prevention works today only as a static ability of a permanent: `prevention_watc
 effect lasts until it is used up or its duration expires [CR#615.3], and a "next N damage" one
 works like a shield [CR#615.7].
 
-The representation is open: reuse the floating `ReplacementInstance` shields in `shields`
-(which carry a duration but a single `subject` object, while Fog names no object), or add a
-prevention row kind on `ContinuousEffect.rows`. The owner decides before the build.
+## Open questions
+
+- The representation: reuse the floating `ReplacementInstance` shields in `shields` (which carry
+  a duration but a single `subject` object, while Fog names no object), or add a prevention row
+  kind on `ContinuousEffect.rows`.
 
 ## Done when
 

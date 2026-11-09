@@ -22,13 +22,16 @@ needs: []
    `Predicate::Class`, and `Predicate::Ref` for every `Reference` except `Reg` (`Single`,
    `OpponentOf`, `ControllerOf`, `Coalesce`, `OwnerOf`, `AttachHostOf`).
 
+## Open questions
+
+- Which `Reference`s are legal in a trigger condition.
+
 ## Done when
 
 - Class 1 is a ticket of its own, or is wired along with this ticket.
 - Class 2 is carried into `engine-lki-robustness` with its list, or is a ticket of its own.
-- Each class 3 leaf has a ticket, and the owner has ruled on which `Reference`s are legal in a
-  trigger condition. A reference that is not legal there is rejected when the card is loaded
-  rather than reaching the engine.
+- Each class 3 leaf has a ticket. A reference not legal in a trigger condition, as settled, is
+  rejected when the card is loaded rather than reaching the engine.
 - The catch-all arm is replaced by explicit arms whose panics name the owning ticket.
 
 ## Pointers

@@ -12,7 +12,7 @@ core's `DesignationDef::Stored` (`crates/core/src/designation.rs`). `.syl` desig
 each controller, day and night excluding each other, and saddled lasting until end of turn are
 stated nowhere a reader of `.syl` can see. Either the declarations carry these values, because
 something reading `.syl` needs them (holder eviction [CR#725.3,726.3,701.54a,310.9f]), or they are
-engine-only state that lowering supplies. Where they live is the owner's open question.
+engine-only state that lowering supplies.
 
 The values, wherever they come to live:
 
@@ -68,13 +68,19 @@ Rows core's axes cannot state yet:
   ringBearer's alone.
 - `level` reads as 1 on a permanent without one [CR#716.2d]; Number has no default.
 
+## Open questions
+
+- Where each of the three values (shape, uniqueness, persistence) lives, `.syl` or engine-only
+  state that lowering supplies, and why.
+
 ## Done when
 
-- The owner has decided where each of the three values lives, and why.
-- Every designation, `protector` included, states its values in that place, matching the table
-  with the rows above resolved; `sole` is folded into uniqueness if uniqueness moves to `.syl`.
-- If the values are on `.syl`, the `.syl` checks pass; if they are engine-side, the engine reads
-  them from one declared place and `core-getdesignation-scopes-and-eviction` uses them.
+- Every designation, `protector` included, states its values in the settled place, matching the
+  table with the rows above resolved; `sole` is folded into uniqueness if uniqueness moves to
+  `.syl`.
+- If the values are on `.syl`, `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and
+  `cargo test -p xtask` pass; if they are engine-side, the engine reads them from one declared
+  place and `core-getdesignation-scopes-and-eviction` uses them.
 
 ## Pointers
 
