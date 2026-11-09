@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-printed-it-self-references]
 ---
 
 # One `this(head)` Template replaces the 21 `this<Head>` Templates
@@ -11,6 +11,8 @@ needs: []
 primitive (`plugins/builtin/primitives/pronoun/this_.syl`). Three have no caller (`thisClass`,
 `thisEmblem`, `thisSpacecraft`), and a head with no Template can't be written at all. Callers also
 mix `thisSpell`, `thisPermanent` and bare `this` for the same printed words.
+It lands after `syl-printed-it-self-references`, which rewrites about 99 of the same call sites
+to `it`, so those sites are rewritten once and the two tickets never edit them in parallel.
 
 ## Open questions
 
