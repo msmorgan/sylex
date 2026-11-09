@@ -60,6 +60,8 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
   exploration, design or subagents**, then work in `.workspaces/NAME`.
 - **Never `kata refresh --all`** (owner only).
 - Ticket form: `docs/tickets/README.md`.
+- A ticket with Open questions starts with research: answer each question with evidence and a
+  recommendation, and present them to the owner before implementing.
 
 ## CR citations
 
