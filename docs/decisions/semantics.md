@@ -14,9 +14,6 @@ has four steps:
    against it (§2), and check the term against the action-clause spine (§4).
 4. Lower the term to the engine's core.
 
-Lean is a workbench for this model. It is never in the hot path: the Rust pipeline reads `.syl`
-natively.
-
 ## 1. Principles
 
 1. **Surface-faithful.** A construction stands where the English puts it. Nothing is hoisted:

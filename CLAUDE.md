@@ -34,7 +34,6 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 
 - `crates/`: the current crates. `v1/`: the old line, deleted once the new one reaches parity;
   never extend it or copy newer work into it.
-- `lean/`: the Lean prototype that runs the `.syl` corpus in `plugins/`; it is due for deletion.
 - `docs/decisions/`: ADRs; `semantics.md` is the semantics design and `syl.md` the `.syl` language.
 - `docs/specs/`: accepted designs not yet in code. `docs/unusual-cards.md`: cards whose text defeats
   a natural modeling assumption.
@@ -75,8 +74,8 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 ## Tests
 
 - Per changed crate (code or consumed data): `cargo test -p <crate>` and
-  `cargo clippy -p <crate> --tests -- -D warnings`. `cargo xtask lean check` only when `lean/` or
-  `plugins/` changed.
+  `cargo clippy -p <crate> --tests -- -D warnings`. When `plugins/` changed: `cargo xtask dsl check`
+  and `cargo xtask dsl fmt --check`.
 - Engine tests are grounded in real cards: use the real card when it exercises the case; to isolate one interaction, a minimal repro card is fine if it is derived from a named real card.
 - If a test fails and what it asserts is still wanted, fix the code.
 - A test that asserts something wrong or pins incidental behavior is rewritten to assert what is

@@ -8,8 +8,8 @@
 # [CR#613.4c], and the model applies it once per counter held, so the conferral reads no count.
 #
 # The conferral is about its bearer wherever the bearer is: a +1/+1 counter also counts "on a
-# creature card in a zone other than the battlefield" [CR#122.1a], and the checker asserts no zone
-# for the bearer of a stat change, a definition's or a card's (`lean-checker-sweep-zone`).
+# creature card in a zone other than the battlefield" [CR#122.1a], so no zone is asserted for the
+# bearer of a stat change, a definition's or a card's.
 counter p1p1Counter {
   lexical = {lemma = "+1/+1 counter"},
   spelling = "+1/+1 counter",

@@ -53,7 +53,7 @@ location is not stated by the declaration, and it can disagree with what the dec
 
 - **First-order data.** Every declaration body is a tree of calls. There is no evaluation, there
   are no local bindings or higher-order parameters, and there is no type inference. Why: every
-  tool (the Rust pipeline, the Lean generator, the formatter, the citation checker) can read a file
+  tool (the Rust pipeline, the formatter, the citation checker) can read a file
   without an evaluator, and what a file says is what it means.
 - **No conversions besides `Option`.** A value stands only at its own sort (§3), and every wrap
   into another sort is a primitive or a Template written at the call site, `actor(…)` included: a

@@ -33,7 +33,7 @@ Elves.*
 ## Start here
 
 The [guided tour](docs/guided_tour.md) follows one card from Oracle text through
-the typed cache, shared rules engine, and Lean workbench boundary. It is the
+the typed cache and the shared rules engine. It is the
 shortest path through the repository; `cargo run` takes the executable side of
 that path into the client shown above.
 
@@ -277,30 +277,6 @@ and the legacy renderer remain as shadow oracles — measurements, not authoriti
 
 ---
 
-## The Lean workbench (`lean/`)
-
-[`lean/`](lean/README.md) is the active design and checking workbench for the
-semantic card language. Its syntax is built from ordinary Lean inductives;
-checker functions compute bindings, kinds, zones and exact refusal lists.
-A `Spelled` card carries a kernel-checked proof that `Card.check` accepts it.
-The model guides the shared Rust vocabulary; game execution remains in the
-Rust engine.
-
-Run `lean/scripts/build` to build the syntax, checker, macros, printed-card
-bench and proof-pin suites with warnings treated as failures. Positive and
-negative pins use `decide` to fix the exact result of a checker call.
-Keyword actions and keyword abilities have no facts table: each is a typed
-declaration in `lean/Semantics/Definitions/`, and a card names one only through
-the authored constant its declaration generates.
-
-The earlier Idris workbench and its card emitter were deleted by
-`idris-retirement`.
-The Rust-to-Lean card-soundness gate is still
-[tracked work](docs/tickets/planned/lean-card-soundness-gate.md), rather than a
-claim made by the current workbench build.
-
----
-
 ## Present state and roadmap
 
 The implemented card set is a deliberate vertical slice rather than a complete
@@ -315,8 +291,7 @@ grammar continues to cover the remaining mechanics. The near-term work runs in t
    legacy renderer; stripping the macro machinery out of core;
    the intermediate vocabulary (bare engine variants stop being recoverable
    syntax, made near-zero-churn by identity macros); consolidating frames into
-   `sylex_spelling`; inline target sugar and its scope elaboration; and
-   connecting the intermediate grammar to the Lean card-soundness gate.
+   `sylex_spelling`; and inline target sugar and its scope elaboration.
 2. **Deriving the English grammar and growing recovery.** The constructicon
    migration above, alongside the frame-coverage rounds — with the regex
    pipeline and legacy renderer as shadow oracles until recovery replaces them

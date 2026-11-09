@@ -1,5 +1,5 @@
 # "<subject> is <predicate>" ("if it's a creature", "if this permanent isn't renowned" under
-# `not`): the condition that `subject` matches `predicate` (`matches` is Lean's word).
+# `not`): the condition that `subject` matches `predicate`.
 primitive is(subject: NounPhrase, predicate: Predicate): Condition = Matches {
   spelling = "<subject> is <predicate>"
 }

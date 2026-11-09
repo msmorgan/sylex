@@ -16,7 +16,7 @@ set_repo fix.tools.1-rustfmt.command '["rustfmt", "+nightly", "--emit", "stdout"
 set_repo fix.tools.1-rustfmt.patterns '["glob:**/*.rs"]'
 set_repo fix.tools.2-sort-derives.command '["cargo", "sort-derives", "--stdin", "--order", "Debug,Clone,Copy,Default,PartialEq,Eq,Hash"]'
 set_repo fix.tools.2-sort-derives.patterns '["glob:**/*.rs"]'
-# `.syl` files in the plugin corpus (the Lean fixtures keep their hand layout).
+# `.syl` files in the plugin corpus.
 # The style is spelled out in full: switching styles means editing these flags
 # (and scripts/fmt's), then `jj fix` over the corpus.
 set_repo fix.tools.3-syl-fmt.command '["cargo", "run", "-q", "-p", "sylex_syl", "--bin", "sylfmt", "--", "--stdin", "--width", "100", "--closers", "hugged", "--trailing-commas", "never", "--record-spaces=false", "--hug-first-list=true", "$path"]'

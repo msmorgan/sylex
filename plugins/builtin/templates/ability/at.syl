@@ -1,4 +1,4 @@
-# "At <event>, <action>" (`at` is a Lean keyword).
+# "At <event>, <action>".
 template at(
   event: GameEvent,
   action: Action,

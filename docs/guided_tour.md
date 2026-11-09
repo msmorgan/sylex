@@ -61,28 +61,10 @@ without card-specific code.
 
 ## Invalid descriptions fail at the boundary
 
-[`Card.check`](../lean/Semantics/Check/Card.lean) checks a card-language term
-and returns its complete refusal list. A `Spelled` card carries a proof that
-this list is empty. The checker reads structural and declared features for
-bindings, kinds, zones and card frames; the Rust engine executes game behavior.
-
-The [pin suites](../lean/Semantics/Proofs/) give exact positive and negative
-witnesses. For example, `okChoosePlayerOrPlaneswalker` accepts a joined-kind
-choice, while `badChooseYou` proves the single `choiceClause` refusal for
-“Choose you.” Both live in `Proofs/Anaphora.lean` and use kernel `decide`.
-Run `lean/scripts/build` to check the workbench and its card bench.
-
-The [Rust-to-Lean card gate](tickets/done/lean-card-soundness-gate.md) is
-`cargo xtask lean check`: it re-emits every `plugins_v2/` card as an expanded
-Lean term and proves `Card.check = []` by `decide`, ratcheted against a
-per-plugin baseline. `lean/scripts/build` proves the terms hand-supplied to
-Lean; `lean check` certifies the loaded card data beside it, and
-`cargo xtask lean definitions` does the same for every counter, subtype and
-designation definition `plugins_v2/builtin` declares. The v1
-`v1/plugins/canon` corpus has no card gate: the Idris one was retired without a
-successor, and `semantics-v3-parity` is the v3 cross-check. The
-[succession decision](decisions/lean-is-the-workbench.md) records the
-succession.
+`cargo xtask dsl check` resolves every reference in the `.syl` bundles by name,
+sort and arity, and refuses a file that names an undeclared word, calls a
+declaration at the wrong sort, or passes the wrong arguments. It reads no
+meaning; the Rust resolution layer replaces it.
 
 ## Run the whole path
 

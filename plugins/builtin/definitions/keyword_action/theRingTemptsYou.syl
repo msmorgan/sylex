@@ -87,6 +87,6 @@ action theRingTemptsYou {
 }
 
 # Temporary: this primitive builds `Action.ownScope`, which `.syl` may not write
-# (`docs/decisions/syl.md` §4). Only this file may use it, through `sylGen`'s `legacyScope`
-# exception; `syl-ring-tempts-you-raw-scope` deletes it.
+# (`docs/decisions/syl.md` §4). Only this file may use it, through the validator's Ring exception
+# (`crates/xtask/src/dsl_check/schema.rs`); `syl-ring-tempts-you-raw-scope` deletes it.
 primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope
