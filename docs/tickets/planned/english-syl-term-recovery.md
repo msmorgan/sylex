@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-spelling-conventions, syl-spelling-optional-segments]
 ---
 
 # Recover `.syl` terms from `sylex_english` Readings
@@ -9,7 +9,10 @@ needs: []
 A card's meaning is a `.syl` term written by hand today. Spelling is meant to be a
 construction grammar: each Template or Definition with its printed wording pairs English structure
 with semantic structure, so the same grammar recovers a resolved term from a Reading and spells a
-term back as English (`architecture.md`, "Spelling is a construction grammar"). Nothing maps a
+term back as English (`architecture.md`, "Spelling is a construction grammar"). Recovery reads
+each Template's and Definition's `spelling`, so it needs the spelling conventions
+(`syl-spelling-conventions`) and the optional and repeated segments
+(`syl-spelling-optional-segments`) that fill the 151 `TODO(spelling)` markers. Nothing maps a
 `sylex_english` Reading to a `.syl` term yet, and the resolved tree it would target does not exist
 yet either.
 

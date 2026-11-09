@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-tocast-noun-phrase]
 ---
 # *Ice Cauldron*'s noted mana
 
@@ -22,9 +22,10 @@ reads a noted amount, and no way to say "the last card exiled with this artifact
 - `noteManaSpent`, the noted-amount reader and the `zoneEntry` axis exist, named against the
   game-model glossary.
 - `plugins/canon/cards/Ice Cauldron.syl` spells both abilities in full, including the exile, the
-  cast permission "for as long as it remains exiled", the charge counter, the note and the
-  activation restriction. If a step does not resolve, the refusal is reported rather than worked
-  around with a raw constructor.
+  cast permission "for as long as it remains exiled", the charge counter, the note, the
+  activation restriction and "Spend this mana only to cast the last card exiled with this
+  artifact", whose `toCast` takes the noun phrase `syl-tocast-noun-phrase` allows. If a step does
+  not resolve, the refusal is reported rather than worked around with a raw constructor.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
