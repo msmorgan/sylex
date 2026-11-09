@@ -37,6 +37,8 @@ reads as giving it a bare marker. `monarch` and `initiative` already confer thei
 
 ## Not in scope
 
+- The preparation mechanic beyond the `prepared` designation's own conferral: preparation cards'
+  inset prepare spells and their other rules [CR#722].
 - The engine side of goad: evaluating the attack requirement (`engine-combat-requirements`) and
   storing one goaded instance per goader with its own duration (`designation-storage-axes`).
 
