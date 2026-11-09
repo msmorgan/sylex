@@ -2,7 +2,7 @@
 
 > **Reading the card explains the card.**
 
-**Project site:** [deckmaste.rs — Magic: The Gathering rules engine](https://deckmaste.rs/)
+**Project site:** [sylex.rs — Magic: The Gathering rules engine](https://sylex.rs/)
 
 sylex tests the long-standing intuition that Oracle text can serve as an
 executable source language for Magic: it builds the whole path — parser, typed
