@@ -8,10 +8,16 @@
 //! [`check`] first runs [`sylex_syl::check()`] (constructor clauses, and words
 //! that name no declaration at any sort), then resolves every value at its
 //! expected sort against the `(name, sort)` signatures the declaration headers
-//! declare. Declaration kinds, record sorts and sort aliases have no `.syl`
-//! declaration; their provisional schemas are [`schema`]'s.
+//! declare. Declaration kinds, record sorts, sort aliases and reserved
+//! constructors have no `.syl` declaration; their provisional schemas are
+//! [`schema`]'s. The only words and sorts written here are the language's own
+//! (`none`, `some`, `Option`, `List` and the literal sorts, `syl.md` §3) and
+//! those of the single-face card exception.
 
-mod schema;
+mod cycles;
+mod refusal;
+pub(crate) mod schema;
+mod sort;
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
@@ -30,15 +36,20 @@ use sylex_syl::Item;
 use sylex_syl::METADATA_FIELDS;
 use sylex_syl::Record;
 use sylex_syl::Shape;
-use sylex_syl::Sort;
 use sylex_syl::Span;
 use sylex_syl::Value;
 use sylex_syl::ValueKind;
 
+pub use self::refusal::CheckError;
+pub use self::refusal::Refusal;
+pub use self::refusal::RefusalKind;
+use self::schema::Form;
 use self::schema::KINDS;
 use self::schema::Kind;
 use self::schema::KindRule;
 use self::schema::RECORDS;
+use self::sort::SortKey;
+use self::sort::sort_key;
 
 #[derive(Debug, Args)]
 pub struct CheckArgs {
@@ -76,219 +87,25 @@ pub fn run(args: &CheckArgs) -> anyhow::Result<()> {
 }
 
 /// What a passing check covered.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Summary {
     pub files: usize,
-    /// Every declaration, cards included.
-    pub declarations: usize,
-    pub cards: usize,
+    /// The declarations of each kind.
+    pub declarations: BTreeMap<&'static str, usize>,
 }
 
 impl fmt::Display for Summary {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{} files, {} declarations ({} cards) resolve",
-            self.files, self.declarations, self.cards
-        )
-    }
-}
-
-/// Why the bundles were refused.
-#[derive(Debug, thiserror::Error)]
-pub enum CheckError {
-    /// `sylex_syl::check` refused them, so nothing was resolved.
-    #[error(transparent)]
-    Declarations(sylex_syl::check::CheckError),
-    /// Every resolution refusal, each also rendered as `path:line:column:
-    /// message`.
-    #[error("{}", rendered.join("\n"))]
-    Resolution {
-        refusals: Vec<Refusal>,
-        rendered: Vec<String>,
-    },
-}
-
-impl CheckError {
-    #[must_use]
-    pub fn count(&self) -> usize {
-        match self {
-            CheckError::Declarations(error) => error.refusals.len(),
-            CheckError::Resolution { refusals, .. } => refusals.len(),
-        }
-    }
-}
-
-/// One refused reference or declaration, located by its span.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Refusal {
-    pub span: Span,
-    pub kind: RefusalKind,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
-pub enum RefusalKind {
-    #[error("unknown declaration kind `{0}`")]
-    UnknownKind(String),
-    #[error("a `{0}` declaration is written with a name")]
-    Nameless(String),
-    #[error("a card is written without a name")]
-    NamedCard,
-    #[error("a card has no printed name: {0}")]
-    CardName(String),
-    #[error("`none` is the word for an omitted value and names no declaration")]
-    NamedNone,
-    #[error("a `{0}` declaration writes its result sort")]
-    MissingSort(String),
-    #[error("a `{kind}` declaration is declared at {sort}; it writes no sort")]
-    WrittenSort { kind: String, sort: String },
-    #[error("a `{0}` declaration has a `{{ ... }}` block")]
-    MissingBlock(String),
-    #[error("duplicate parameter `{0}`")]
-    DuplicateParameter(String),
-    #[error("sort `{0}` takes {1} sort arguments")]
-    SortArity(String, usize),
-    #[error("duplicate declaration `{name}` at {sort}")]
-    DuplicateDeclaration { name: String, sort: String },
-    #[error("{0} is reserved for expansion and registry declarations")]
-    ReservedConstructor(String),
-    #[error("duplicate field `{0}`")]
-    DuplicateField(String),
-    #[error("unknown field `{field}` at {at}")]
-    UnknownField { field: String, at: String },
-    #[error("missing field `{field}` at {at}")]
-    MissingField { field: String, at: String },
-    #[error("`identity` is a nonempty string on a parameterless NounPhrase template")]
-    Identity,
-    #[error("an action with `ofAbility` writes no `deed` or `permanent`")]
-    OfAbilityWithDeed,
-    #[error("an ability word needs the `abilityWord` declaration at Ability")]
-    NoAbilityWordTemplate,
-    #[error("unknown parameter `${0}`")]
-    UnknownParameter(String),
-    #[error("parameter `${name}` has sort {sort}, expected {expected}")]
-    ParameterSort {
-        name: String,
-        sort: String,
-        expected: String,
-    },
-    #[error("`none` stands only at an Option sort, bare; expected {0}")]
-    NoneOutsideOption(String),
-    #[error("`some` is never written; write the value")]
-    SomeWritten,
-    #[error("unknown word `{word}` at {sort}")]
-    UnknownWord { word: String, sort: String },
-    #[error("unknown argument `{argument}` to `{word}`")]
-    UnknownArgument { word: String, argument: String },
-    #[error("too many arguments to `{0}`")]
-    TooManyArguments(String),
-    #[error("duplicate argument `{argument}` to `{word}`")]
-    DuplicateArgument { word: String, argument: String },
-    #[error("missing argument `{argument}` to `{word}`")]
-    MissingArgument { word: String, argument: String },
-    #[error("string at {0}")]
-    StringAt(String),
-    #[error("integer at {0}")]
-    IntegerAt(String),
-    #[error("negative integer at Nat")]
-    NegativeAtNat,
-    #[error("list at {0}")]
-    ListAt(String),
-    #[error("record at {0}, which is not a record sort")]
-    RecordAt(String),
-    #[error("dependency cycle: {}", .0.join(" -> "))]
-    Cycle(Vec<String>),
-}
-
-/// A sort with its aliases unfolded: `Option(List(ManaSymbol))`.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct SortKey {
-    head: String,
-    args: Vec<SortKey>,
-}
-
-/// The sort constructors, each taking one sort argument.
-const SORT_CONSTRUCTORS: [&str; 3] = ["Option", "List", "Delta"];
-
-impl SortKey {
-    fn named(head: &str) -> SortKey {
-        SortKey {
-            head: head.to_owned(),
-            args: Vec::new(),
-        }
-    }
-
-    /// Reads a schema table's sort, `Option(List(ManaSymbol))`.
-    fn table(text: &str) -> SortKey {
-        let (key, rest) = SortKey::table_prefix(text);
-        assert!(rest.is_empty(), "malformed schema sort `{text}`");
-        key
-    }
-
-    fn table_prefix(text: &str) -> (SortKey, &str) {
-        let end = text.find(['(', ')', ',']).unwrap_or(text.len());
-        let mut key = SortKey::named(text[..end].trim());
-        let mut rest = &text[end..];
-        if let Some(inner) = rest.strip_prefix('(') {
-            rest = inner;
-            loop {
-                let (arg, after) = SortKey::table_prefix(rest.trim_start());
-                key.args.push(arg);
-                if let Some(after) = after.strip_prefix(',') {
-                    rest = after;
-                } else {
-                    rest = after.strip_prefix(')').expect("schema sort closes");
-                    break;
-                }
+        let total: usize = self.declarations.values().sum();
+        write!(f, "{} files, {total} declarations resolve (", self.files)?;
+        for (index, (kind, count)) in self.declarations.iter().enumerate() {
+            if index > 0 {
+                f.write_str(", ")?;
             }
+            write!(f, "{kind} {count}")?;
         }
-        (key, rest)
+        f.write_str(")")
     }
-
-    fn option_inner(&self) -> Option<&SortKey> {
-        (self.head == "Option").then(|| &self.args[0])
-    }
-
-    fn list_inner(&self) -> Option<&SortKey> {
-        (self.head == "List").then(|| &self.args[0])
-    }
-}
-
-impl fmt::Display for SortKey {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.head)?;
-        if !self.args.is_empty() {
-            f.write_str("(")?;
-            for (index, arg) in self.args.iter().enumerate() {
-                if index > 0 {
-                    f.write_str(", ")?;
-                }
-                write!(f, "{arg}")?;
-            }
-            f.write_str(")")?;
-        }
-        Ok(())
-    }
-}
-
-/// A written sort with its aliases unfolded, refusing a wrong number of sort
-/// arguments.
-fn sort_key(sort: &Sort) -> Result<SortKey, Refusal> {
-    let head = sort.head.ident.as_str();
-    let arity = usize::from(SORT_CONSTRUCTORS.contains(&head));
-    if sort.args.len() != arity {
-        return Err(Refusal {
-            span: sort.span,
-            kind: RefusalKind::SortArity(head.to_owned(), arity),
-        });
-    }
-    if let Some((_, target)) = schema::ALIASES.iter().find(|(alias, _)| *alias == head) {
-        return Ok(SortKey::table(target));
-    }
-    Ok(SortKey {
-        head: head.to_owned(),
-        args: sort.args.iter().map(sort_key).collect::<Result<_, _>>()?,
-    })
 }
 
 /// A parameter of a declaration, or a field of a record or block.
@@ -296,7 +113,7 @@ fn sort_key(sort: &Sort) -> Result<SortKey, Refusal> {
 struct Slot {
     name: String,
     /// `None`: written but not resolved, for the one temporary exception that
-    /// needs it (`subtype`'s `kind = spell`).
+    /// needs it (`KindRule::TextWord`).
     sort: Option<SortKey>,
     optional: bool,
 }
@@ -308,24 +125,22 @@ struct Signature {
     /// The declaration's node in the dependency graph; `None` for a second
     /// registration and a catalog declaration, which are no dependency edge.
     node: Option<usize>,
-    /// The reserved constructor a primitive builds, as `Sort.Constructor`.
-    reserved: Option<String>,
+    /// Declared under the Ring exception (`schema::RING_EXCEPTION`), so only
+    /// the Ring's file may call it.
+    ring_only: bool,
 }
 
 type Registry = BTreeMap<(String, SortKey), Signature>;
-
-/// The file a temporary exception lets build the reserved `Action.OwnScope`,
-/// relative to the builtin bundle.
-const RING_FILE: &str = "definitions/keyword_action/theRingTemptsYou.syl";
 
 /// One declaration whose header passed.
 struct Decl<'a> {
     declaration: &'a Declaration,
     kind: &'static Kind,
-    name: String,
+    /// `None` for a kind written without a name, which declares no word.
+    name: Option<String>,
     sort: SortKey,
     params: Vec<Slot>,
-    /// Whether this is the file `RING_FILE` names.
+    /// Whether this is the Ring exception's file.
     ring: bool,
 }
 
@@ -355,25 +170,23 @@ pub fn check(builtin: &Bundle, others: &[&Bundle]) -> Result<Summary, CheckError
         .chain(others.iter().copied())
         .collect();
     sylex_syl::check(&bundles).map_err(CheckError::Declarations)?;
-    let ring_file = builtin.root().join(RING_FILE);
+    let ring_file = builtin.root().join(schema::RING_EXCEPTION.0);
     let mut refusals = Vec::new();
     let mut decls = Vec::new();
     let mut summary = Summary {
         files: 0,
-        declarations: 0,
-        cards: 0,
+        declarations: BTreeMap::new(),
     };
     for bundle in &bundles {
         for file in bundle.files().values() {
             summary.files += 1;
             let ring = std::ptr::eq(*bundle, builtin) && file.path == ring_file;
             for declaration in file.ast.declarations() {
-                summary.declarations += 1;
-                if declaration.kind.ident == schema::CARD {
-                    summary.cards += 1;
-                }
                 match header(declaration, ring) {
-                    Ok(decl) => decls.push(decl),
+                    Ok(decl) => {
+                        *summary.declarations.entry(decl.kind.word).or_default() += 1;
+                        decls.push(decl);
+                    }
                     Err(refusal) => refusals.push(refusal),
                 }
             }
@@ -384,7 +197,18 @@ pub fn check(builtin: &Bundle, others: &[&Bundle]) -> Result<Summary, CheckError
     for (decl, edges) in decls.iter().zip(&mut edges) {
         resolve(decl, &registry, &mut refusals, edges);
     }
-    cycles(&decls, &edges, &mut refusals);
+    for cycle in cycles::cycles(&edges) {
+        let name = |i: usize| {
+            decls[i]
+                .name
+                .clone()
+                .expect("only named declarations are nodes")
+        };
+        refusals.push(Refusal {
+            span: decls[cycle[0]].declaration.span,
+            kind: RefusalKind::Cycle(cycle.into_iter().map(name).collect()),
+        });
+    }
     if refusals.is_empty() {
         return Ok(summary);
     }
@@ -419,20 +243,18 @@ fn header(declaration: &Declaration, ring: bool) -> Result<Decl<'_>, Refusal> {
         params,
         ring,
     };
-    let named = match &declaration.shape {
-        Shape::Nameless(value) if word == schema::CARD => {
-            return match crate::dsl::printed_name(value) {
-                Ok(name) => Ok(decl(name, SortKey::named("Card"), Vec::new())),
-                Err(message) => refuse(value.span, RefusalKind::CardName(message)),
-            };
+    let named = match (&declaration.shape, kind.form) {
+        (Shape::Named(named), Form::Block | Form::OptionalBlock) => named,
+        (Shape::Nameless(_), Form::Value) => {
+            let sort = kind.sort.expect("a nameless kind implies its sort");
+            return Ok(decl(None, SortKey::table(sort), Vec::new()));
         }
-        Shape::Nameless(_) => {
-            return refuse(declaration.span, RefusalKind::Nameless(word.to_owned()));
+        (Shape::Nameless(_), Form::Block | Form::OptionalBlock) => {
+            return refuse(declaration.span, RefusalKind::MissingName(word.to_owned()));
         }
-        Shape::Named(_) if word == schema::CARD => {
-            return refuse(declaration.span, RefusalKind::NamedCard);
+        (Shape::Named(_), Form::Value) => {
+            return refuse(declaration.span, RefusalKind::WrittenName(word.to_owned()));
         }
-        Shape::Named(named) => named,
     };
     let name = named.name.ident.as_str();
     if name == "none" {
@@ -452,7 +274,7 @@ fn header(declaration: &Declaration, ring: bool) -> Result<Decl<'_>, Refusal> {
             );
         }
     };
-    if named.body.is_none() && word != "primitive" {
+    if named.body.is_none() && kind.form == Form::Block {
         return refuse(named.span, RefusalKind::MissingBlock(word.to_owned()));
     }
     let mut params: Vec<Slot> = Vec::new();
@@ -470,38 +292,12 @@ fn header(declaration: &Declaration, ring: bool) -> Result<Decl<'_>, Refusal> {
             optional: param.default.is_some(),
         });
     }
-    Ok(decl(name.to_owned(), sort, params))
+    Ok(decl(Some(name.to_owned()), sort, params))
 }
 
-/// The reserved constructor a primitive at `sort` naming `constructor`
-/// builds, as `Sort.Constructor`: one only expansion writes (`syl.md` §1 and
-/// §4: a scope, a mention, a caller-scope wrapper, a raw Deed, a keyword
-/// wrapper), or any constructor of a sort only declaration kinds build.
-fn reserved(sort: &SortKey, constructor: &str) -> Option<String> {
-    let expansion = constructor == "InCaller"
-        || matches!(
-            (sort.head.as_str(), constructor),
-            ("NounPhrase", "FirstMention" | "LaterMention")
-                | ("Action", "OwnScope")
-                | ("Deed", "Action")
-                | ("Ability", "Keyword")
-        );
-    let registry_sort = ["KeywordLabel", "RegistryDefinition"].contains(&sort.head.as_str())
-        || KINDS
-            .iter()
-            .any(|kind| kind.catalog && kind.sort == Some(sort.head.as_str()));
-    (expansion || registry_sort).then(|| format!("{sort}.{constructor}"))
-}
-
-/// Temporary: `theRingTemptsYou.syl` declares and calls a primitive building
-/// the reserved `Action.OwnScope`, and only that file may.
-/// `syl-ring-tempts-you-raw-scope` deletes this exception.
-fn ring_exception(ring: bool, reserved: &str) -> bool {
-    ring && reserved == "Action.OwnScope"
-}
-
-/// Registers every declaration at its `(name, sort)` and its second sort,
-/// refusing duplicates and primitives that build a reserved constructor.
+/// Registers every named declaration at its `(name, sort)` and its second
+/// sort, refusing duplicates and primitives that build a reserved
+/// constructor.
 fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
     let mut registry = Registry::new();
     let mut insert =
@@ -520,52 +316,49 @@ fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
             }
         };
     for (index, decl) in decls.iter().enumerate() {
-        let constructor = match &decl.declaration.shape {
-            Shape::Named(named) => named.constructor,
-            Shape::Nameless(_) => None,
+        let Some(name) = &decl.name else {
+            continue;
         };
-        let reserved = constructor.and_then(|c| reserved(&decl.sort, c.ident.as_str()));
-        if let (Some(reserved), Some(constructor)) = (&reserved, constructor)
-            && !ring_exception(decl.ring, reserved)
+        let Shape::Named(named) = &decl.declaration.shape else {
+            unreachable!("a named declaration has a named shape");
+        };
+        let mut ring_only = false;
+        if let Some(constructor) = named.constructor
+            && let Some(reserved) =
+                schema::reserved(&decl.sort.to_string(), constructor.ident.as_str())
         {
-            refusals.push(Refusal {
-                span: constructor.span,
-                kind: RefusalKind::ReservedConstructor(reserved.clone()),
-            });
+            ring_only = decl.ring && reserved == schema::RING_EXCEPTION.1;
+            if !ring_only {
+                refusals.push(Refusal {
+                    span: constructor.span,
+                    kind: RefusalKind::ReservedConstructor(reserved),
+                });
+            }
         }
         let signature = Signature {
             params: decl.params.clone(),
             node: (!decl.kind.catalog).then_some(index),
-            reserved,
+            ring_only,
         };
         let span = decl.declaration.span;
-        insert(
-            (decl.name.clone(), decl.sort.clone()),
-            signature,
-            span,
-            refusals,
-        );
+        insert((name.clone(), decl.sort.clone()), signature, span, refusals);
         let Some(secondary) = decl.kind.secondary else {
             continue;
         };
-        // An action names no Deed when it is an ability's (`ofAbility`) or
-        // writes `deed = none`.
-        let deedless = decl.field("ofAbility").is_some()
-            || decl.field("deed").is_some_and(|deed| is_bare(deed, "none"));
-        if secondary == "Deed" && deedless {
+        let unless = secondary.unless.iter().any(|(field, word)| {
+            decl.field(field)
+                .is_some_and(|value| word.is_none_or(|word| is_bare(value, word)))
+        });
+        if unless {
             continue;
         }
         let signature = Signature {
             params: Vec::new(),
             node: None,
-            reserved: None,
+            ring_only: false,
         };
-        insert(
-            (decl.name.clone(), SortKey::named(secondary)),
-            signature,
-            span,
-            refusals,
-        );
+        let key = (name.clone(), SortKey::named(secondary.sort));
+        insert(key, signature, span, refusals);
     }
     registry
 }
@@ -630,19 +423,26 @@ impl Resolver<'_> {
     }
 
     fn body(&mut self, decl: &Decl<'_>) {
-        if let Shape::Nameless(value) = &decl.declaration.shape {
-            self.value(value, &decl.sort);
-            return;
-        }
-        // Only a primitive may omit its block, and then it has nothing to
-        // resolve.
-        let Some(block) = decl.block() else {
+        let (named, name) = match (&decl.declaration.shape, &decl.name) {
+            (Shape::Nameless(value), None) => return self.value(value, &decl.sort),
+            (Shape::Named(named), Some(name)) => (named, name),
+            (Shape::Nameless(_), Some(_)) | (Shape::Named(_), None) => {
+                unreachable!("a declaration has a name exactly when its shape is named")
+            }
+        };
+        // Only a kind whose block is optional may omit it, and then there is
+        // nothing to resolve.
+        let Some(block) = &named.body else {
             return;
         };
-        let at = format!("`{}` {}", decl.kind.word, decl.name);
-        if decl.kind.record_fields && decl.field("body").is_none() {
-            self.record(block, &decl.sort);
-            return;
+        let at = format!("`{}` {name}", decl.kind.word);
+        let own_fields = decl
+            .kind
+            .fields
+            .iter()
+            .any(|spec| decl.field(spec.name).is_some());
+        if decl.kind.record_fields && !own_fields {
+            return self.record(block, &decl.sort);
         }
         let mut slots: Vec<Slot> = decl
             .kind
@@ -656,36 +456,47 @@ impl Resolver<'_> {
             .collect();
         match decl.kind.rule {
             KindRule::None => {}
-            KindRule::Identity => {
-                if let Some(identity) = decl.field("identity") {
+            KindRule::Identity { field, sort } => {
+                if let Some(identity) = decl.field(field) {
                     let nonempty =
                         matches!(&identity.kind, ValueKind::String(text) if !text.is_empty());
-                    if !nonempty || decl.sort.head != "NounPhrase" || !decl.params.is_empty() {
-                        self.refuse(identity.span, RefusalKind::Identity);
+                    if !nonempty || decl.sort != SortKey::table(sort) || !decl.params.is_empty() {
+                        let kind = RefusalKind::Identity {
+                            field: field.to_owned(),
+                            sort: sort.to_owned(),
+                        };
+                        self.refuse(identity.span, kind);
                     }
                 }
             }
-            KindRule::OfAbility => {
-                if let Some(of_ability) = decl.field("ofAbility")
-                    && (decl.field("deed").is_some() || decl.field("permanent").is_some())
-                {
-                    self.refuse(of_ability.span, RefusalKind::OfAbilityWithDeed);
+            KindRule::Excludes { field, excludes } => {
+                if let Some(value) = decl.field(field) {
+                    for other in excludes.iter().filter(|other| decl.field(other).is_some()) {
+                        let kind = RefusalKind::Excludes {
+                            field: field.to_owned(),
+                            other: (*other).to_owned(),
+                        };
+                        self.refuse(value.span, kind);
+                    }
                 }
             }
-            KindRule::AbilityWord => {
-                let key = ("abilityWord".to_owned(), SortKey::named("Ability"));
-                match self.registry.get(&key) {
-                    Some(signature) => self.edges.extend(signature.node),
-                    None => self.refuse(decl.declaration.span, RefusalKind::NoAbilityWordTemplate),
+            KindRule::Requires { word, sort } => {
+                let key = (word.to_owned(), SortKey::table(sort));
+                if let Some(signature) = self.registry.get(&key) {
+                    self.edges.extend(signature.node);
+                } else {
+                    let kind = RefusalKind::Requires {
+                        word: word.to_owned(),
+                        sort: sort.to_owned(),
+                    };
+                    self.refuse(decl.declaration.span, kind);
                 }
             }
-            KindRule::SpellKind => {
-                if decl
-                    .field("kind")
-                    .is_some_and(|kind| is_bare(kind, "spell"))
-                {
-                    let kind = slots.iter_mut().find(|slot| slot.name == "kind");
-                    kind.expect("a subtype has a kind field").sort = None;
+            // Temporary: `syl-subtype-card-types` deletes this exception.
+            KindRule::TextWord { field, word } => {
+                if decl.field(field).is_some_and(|value| is_bare(value, word)) {
+                    let slot = slots.iter_mut().find(|slot| slot.name == field);
+                    slot.expect("the text word's field is the kind's").sort = None;
                 }
             }
         }
@@ -854,13 +665,10 @@ impl Resolver<'_> {
     /// parameter, a positional one the first parameter not yet bound.
     fn call(&mut self, call: &Call, signature: &Signature) {
         let word = call.head.ident.as_str();
-        if let Some(reserved) = &signature.reserved
-            && !ring_exception(self.ring, reserved)
-        {
-            self.refuse(
-                call.head.span,
-                RefusalKind::ReservedConstructor(reserved.clone()),
-            );
+        // Temporary: `syl-ring-tempts-you-raw-scope` deletes this exception.
+        if signature.ring_only && !self.ring {
+            let reserved = schema::RING_EXCEPTION.1.to_owned();
+            self.refuse(call.head.span, RefusalKind::ReservedConstructor(reserved));
         }
         self.edges.extend(signature.node);
         let mut bound: Vec<&str> = Vec::new();
@@ -915,78 +723,4 @@ impl Resolver<'_> {
             }
         }
     }
-}
-
-/// Refuses every dependency cycle: a set of declarations each reaching the
-/// next, or one reaching itself.
-fn cycles(decls: &[Decl<'_>], edges: &[Vec<usize>], refusals: &mut Vec<Refusal>) {
-    for component in strongly_connected(edges) {
-        let first = component[0];
-        if component.len() > 1 || edges[first].contains(&first) {
-            let names = component.iter().map(|&i| decls[i].name.clone()).collect();
-            refusals.push(Refusal {
-                span: decls[first].declaration.span,
-                kind: RefusalKind::Cycle(names),
-            });
-        }
-    }
-}
-
-/// Tarjan's strongly connected components, each sorted.
-fn strongly_connected(edges: &[Vec<usize>]) -> Vec<Vec<usize>> {
-    struct State<'e> {
-        edges: &'e [Vec<usize>],
-        index: Vec<Option<usize>>,
-        low: Vec<usize>,
-        stack: Vec<usize>,
-        on_stack: Vec<bool>,
-        next: usize,
-        out: Vec<Vec<usize>>,
-    }
-    fn visit(s: &mut State<'_>, v: usize) {
-        s.index[v] = Some(s.next);
-        s.low[v] = s.next;
-        s.next += 1;
-        s.stack.push(v);
-        s.on_stack[v] = true;
-        for &w in &s.edges[v] {
-            match s.index[w] {
-                None => {
-                    visit(s, w);
-                    s.low[v] = s.low[v].min(s.low[w]);
-                }
-                Some(index) if s.on_stack[w] => s.low[v] = s.low[v].min(index),
-                Some(_) => {}
-            }
-        }
-        if Some(s.low[v]) == s.index[v] {
-            let mut component = Vec::new();
-            loop {
-                let w = s.stack.pop().expect("v is on the stack");
-                s.on_stack[w] = false;
-                component.push(w);
-                if w == v {
-                    break;
-                }
-            }
-            component.sort_unstable();
-            s.out.push(component);
-        }
-    }
-    let n = edges.len();
-    let mut state = State {
-        edges,
-        index: vec![None; n],
-        low: vec![0; n],
-        stack: Vec::new(),
-        on_stack: vec![false; n],
-        next: 0,
-        out: Vec::new(),
-    };
-    for v in 0..n {
-        if state.index[v].is_none() {
-            visit(&mut state, v);
-        }
-    }
-    state.out
 }

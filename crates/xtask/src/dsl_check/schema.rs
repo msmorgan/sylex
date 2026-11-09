@@ -1,49 +1,83 @@
 //! Provisional: the schemas `.syl` does not declare.
 //!
-//! Declaration kinds, record sorts and sort aliases have no `.syl`
-//! declaration; their only other copy is the Lean workbench (`SylGen`'s
-//! `kindSort`, `allowedFields` and `body`, and the `Semantics` structures and
-//! `abbrev`s), which step 5 of the semantics-v3 plan deletes. Once it does,
-//! these tables are their only copy, so whether they move into `.syl` is open.
-//! Everything that is a schema without a `.syl` source is here, in one place,
-//! and nowhere else in the validator.
+//! Declaration kinds, record sorts, sort aliases and the reserved
+//! constructors have no `.syl` declaration; their only other copy is the Lean
+//! workbench (`SylGen`'s `kindSort`, `allowedFields`, `body` and
+//! `sourceConstructorRefusal`, and the `Semantics` structures and `abbrev`s),
+//! which step 5 of the semantics-v3 plan deletes. Once it does, these tables
+//! are their only copy, so whether they move into `.syl` is open. Everything
+//! that is a schema without a `.syl` source is here, in one place, and
+//! nowhere else in the validator.
 
 /// What a declaration kind's block holds, besides `lexical` and `spelling`.
 pub struct Kind {
     pub word: &'static str,
+    /// How a declaration of this kind is written.
+    pub form: Form,
     /// The sort a declaration of this kind declares its name at; `None` when
     /// the header writes it (`primitive`, `template`).
     pub sort: Option<&'static str>,
     /// The fields its block may write.
     pub fields: &'static [FieldSpec],
     /// A second sort its name is declared at (`syl.md` §3).
-    pub secondary: Option<&'static str>,
+    pub secondary: Option<Secondary>,
     /// A catalog declaration (a counter, designation, subtype, card type or
     /// relation) is registered before any body is read, so a reference to
     /// one is no dependency edge.
     pub catalog: bool,
-    /// Instead of a `body`, the block may write the fields of the kind's
-    /// record sort directly.
+    /// When the block writes none of `fields`, it writes the fields of the
+    /// kind's record sort directly.
     pub record_fields: bool,
     /// The one rule of this kind that no field's sort states.
     pub rule: KindRule,
+}
+
+/// How a declaration kind is written.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Form {
+    /// A name and a `{ ... }` block.
+    Block,
+    /// A name, with the block optional.
+    OptionalBlock,
+    /// A value alone, with no name: a card.
+    Value,
+}
+
+/// A second sort a kind declares its name at.
+#[derive(Debug, Clone, Copy)]
+pub struct Secondary {
+    pub sort: &'static str,
+    /// No second declaration when the block writes one of these fields: any
+    /// value for `None`, or the bare word given.
+    pub unless: &'static [(&'static str, Option<&'static str>)],
 }
 
 /// A kind's rule beyond its fields' sorts.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KindRule {
     None,
-    /// `identity` is a nonempty string, on a parameterless `NounPhrase`
-    /// template.
-    Identity,
-    /// `ofAbility` excludes `deed` and `permanent`.
-    OfAbility,
-    /// An ability word is wrapped by the `abilityWord` declaration at
-    /// `Ability`.
-    AbilityWord,
-    /// Temporary: `kind = spell` is read as text, a word that never resolves.
+    /// `field` is a nonempty string, on a parameterless declaration at
+    /// `sort`.
+    Identity {
+        field: &'static str,
+        sort: &'static str,
+    },
+    /// `field` excludes each of `excludes`.
+    Excludes {
+        field: &'static str,
+        excludes: &'static [&'static str],
+    },
+    /// The kind's body is wrapped by the declaration `word` at `sort`.
+    Requires {
+        word: &'static str,
+        sort: &'static str,
+    },
+    /// Temporary: `field = word` is read as text, a word that never resolves.
     /// `syl-subtype-card-types` deletes this exception.
-    SpellKind,
+    TextWord {
+        field: &'static str,
+        word: &'static str,
+    },
 }
 
 /// One field of a declaration kind's block.
@@ -72,11 +106,11 @@ const fn required(name: &'static str, sort: &'static str) -> FieldSpec {
 
 /// A catalog kind's conferrals.
 const CONFERS: FieldSpec = field("confers", "List(Conferral)");
-const RULES: FieldSpec = field("rules", "List(Conferral)");
 
 const fn kind(word: &'static str, sort: &'static str, fields: &'static [FieldSpec]) -> Kind {
     Kind {
         word,
+        form: Form::Block,
         sort: Some(sort),
         fields,
         secondary: None,
@@ -108,18 +142,19 @@ const fn rules_row(word: &'static str, sort: &'static str) -> Kind {
     }
 }
 
-/// The kind word of a card, the one nameless declaration.
-pub const CARD: &str = "card";
-
 /// Every declaration kind.
 pub const KINDS: &[Kind] = &[
     Kind {
         sort: None,
+        form: Form::OptionalBlock,
         ..kind("primitive", "", &[])
     },
     Kind {
         sort: None,
-        rule: KindRule::Identity,
+        rule: KindRule::Identity {
+            field: "identity",
+            sort: "NounPhrase",
+        },
         ..kind(
             "template",
             "",
@@ -134,8 +169,14 @@ pub const KINDS: &[Kind] = &[
         )
     },
     Kind {
-        secondary: Some("Deed"),
-        rule: KindRule::OfAbility,
+        secondary: Some(Secondary {
+            sort: "Deed",
+            unless: &[("ofAbility", None), ("deed", Some("none"))],
+        }),
+        rule: KindRule::Excludes {
+            field: "ofAbility",
+            excludes: &["deed", "permanent"],
+        },
         ..kind(
             "action",
             "Action",
@@ -148,7 +189,10 @@ pub const KINDS: &[Kind] = &[
         )
     },
     Kind {
-        secondary: Some("KeywordLabel"),
+        secondary: Some(Secondary {
+            sort: "KeywordLabel",
+            unless: &[],
+        }),
         ..kind(
             "ability",
             "Ability",
@@ -156,7 +200,10 @@ pub const KINDS: &[Kind] = &[
         )
     },
     Kind {
-        rule: KindRule::AbilityWord,
+        rule: KindRule::Requires {
+            word: "abilityWord",
+            sort: "Ability",
+        },
         ..kind(
             "ability_word",
             "Ability",
@@ -166,7 +213,7 @@ pub const KINDS: &[Kind] = &[
     catalog(
         "counter",
         "CounterKind",
-        &[field("holder", "Kind"), CONFERS, RULES],
+        &[field("holder", "Kind"), CONFERS],
     ),
     catalog(
         "designation",
@@ -175,11 +222,13 @@ pub const KINDS: &[Kind] = &[
             required("scope", "DesignationScope"),
             field("sole", "Bool"),
             CONFERS,
-            RULES,
         ],
     ),
     Kind {
-        rule: KindRule::SpellKind,
+        rule: KindRule::TextWord {
+            field: "kind",
+            word: "spell",
+        },
         ..catalog(
             "subtype",
             "Subtype",
@@ -187,7 +236,6 @@ pub const KINDS: &[Kind] = &[
                 required("kind", "CardType"),
                 field("name", "String"),
                 CONFERS,
-                RULES,
             ],
         )
     },
@@ -199,15 +247,58 @@ pub const KINDS: &[Kind] = &[
             field("cardClass", "Option(CardClass)"),
             field("stats", "List(Stat)"),
             CONFERS,
-            RULES,
         ],
     ),
     catalog("relation", "RelationLabel", &[]),
     rules_row("token", "PredefinedToken"),
     rules_row("sba", "SbaRule"),
     rules_row("conferral", "ConferralRule"),
-    kind(CARD, "Card", &[]),
+    Kind {
+        form: Form::Value,
+        ..kind("card", "Card", &[])
+    },
 ];
+
+/// The sort constructors, each taking one sort argument.
+pub const SORT_CONSTRUCTORS: [&str; 3] = ["Option", "List", "Delta"];
+
+/// Constructors only expansion writes, each at its sort (`None`: at every
+/// sort that has it). `syl.md` §4 names the categories (a scope, a mention, a
+/// raw Deed, a keyword wrapper); these names are the Lean workbench's current
+/// list (`sourceConstructorRefusal`), in the Rust AST's spelling.
+const EXPANSION_CONSTRUCTORS: &[(Option<&str>, &str)] = &[
+    (None, "InCaller"),
+    (Some("NounPhrase"), "FirstMention"),
+    (Some("NounPhrase"), "LaterMention"),
+    (Some("Action"), "OwnScope"),
+    (Some("Ability"), "Keyword"),
+];
+
+/// The reserved constructor a primitive at `sort` naming `constructor`
+/// builds, as `Sort.Constructor`: one only expansion writes, or any
+/// constructor of a sort a declaration kind declares its names at, as a
+/// catalog kind or a second sort.
+#[must_use]
+pub fn reserved(sort: &str, constructor: &str) -> Option<String> {
+    let expansion = EXPANSION_CONSTRUCTORS
+        .iter()
+        .any(|(at, name)| *name == constructor && at.is_none_or(|at| at == sort));
+    let declared = KINDS.iter().any(|kind| {
+        (kind.catalog && kind.sort == Some(sort))
+            || kind
+                .secondary
+                .is_some_and(|secondary| secondary.sort == sort)
+    });
+    (expansion || declared).then(|| format!("{sort}.{constructor}"))
+}
+
+/// Temporary: the one file that may declare a primitive building a reserved
+/// constructor, relative to the builtin bundle, and the constructor. Only that
+/// file may call it. `syl-ring-tempts-you-raw-scope` deletes this exception.
+pub const RING_EXCEPTION: (&str, &str) = (
+    "definitions/keyword_action/theRingTemptsYou.syl",
+    "Action.OwnScope",
+);
 
 /// A record sort, written `{ field = value, ... }`: its fields, each with its
 /// sort and whether it may be omitted.

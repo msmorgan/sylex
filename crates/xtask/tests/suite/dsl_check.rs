@@ -65,7 +65,7 @@ fn the_plugins_resolve() {
     let canon = Bundle::load(plugins.join("canon"), builtin.next_file_id()).unwrap();
     let summary = check(&builtin, &[&canon]).unwrap_or_else(|error| panic!("{error}"));
     assert_eq!(summary.files, builtin.files().len() + canon.files().len());
-    assert!(summary.cards > 0);
+    assert!(summary.declarations["card"] > 0);
 }
 
 #[test]
@@ -297,7 +297,6 @@ fn headers_are_checked_against_their_kind() {
             "widget w { }\n\
              template { body = 1 }\n\
              card c { name = \"C\" }\n\
-             card { types = [] }\n\
              template none: Int { body = 1 }\n\
              template t { body = 1 }\n\
              relation paired: RelationLabel { }\n\
@@ -306,9 +305,8 @@ fn headers_are_checked_against_their_kind() {
         ),
         [
             RefusalKind::UnknownKind(s("widget")),
-            RefusalKind::Nameless(s("template")),
-            RefusalKind::NamedCard,
-            RefusalKind::CardName(s("card face requires a string name")),
+            RefusalKind::MissingName(s("template")),
+            RefusalKind::WrittenName(s("card")),
             RefusalKind::NamedNone,
             RefusalKind::MissingSort(s("template")),
             RefusalKind::WrittenSort {
@@ -412,8 +410,18 @@ fn of_ability_excludes_deed_and_permanent() {
             "primitive nothing: Action = Nothing\nability crew { }\n\
              action a { body = nothing, ofAbility = crew, deed = \"a\" }"
         ),
-        [RefusalKind::OfAbilityWithDeed]
+        [RefusalKind::Excludes {
+            field: s("ofAbility"),
+            other: s("deed")
+        }]
     );
+}
+
+fn identity() -> RefusalKind {
+    RefusalKind::Identity {
+        field: s("identity"),
+        sort: s("NounPhrase"),
+    }
 }
 
 #[test]
@@ -425,14 +433,7 @@ fn identity_is_a_nonempty_string_on_a_parameterless_noun_phrase_template() {
          template b: Color {{ identity = \"actor\", body = white }}\n\
          template c: NounPhrase {{ identity = \"\", body = actor }}"
     );
-    assert_eq!(
-        kinds(&source),
-        [
-            RefusalKind::Identity,
-            RefusalKind::Identity,
-            RefusalKind::Identity
-        ]
-    );
+    assert_eq!(kinds(&source), [identity(), identity(), identity()]);
 }
 
 #[test]
@@ -442,19 +443,23 @@ fn an_ability_word_needs_the_ability_word_template() {
             "primitive nothing: Ability = Nothing\n\
              ability_word threshold { body = nothing }"
         ),
-        [RefusalKind::NoAbilityWordTemplate]
+        [RefusalKind::Requires {
+            word: s("abilityWord"),
+            sort: s("Ability")
+        }]
     );
 }
 
 #[test]
-fn a_reserved_constructor_is_refused_where_declared_and_called() {
+fn a_primitive_building_a_reserved_constructor_is_refused() {
     assert_eq!(
         refusals(&[(
             "a.syl",
             "primitive raw(name: String): CounterKind = Named\n\
              primitive mention(id: String): NounPhrase = FirstMention\n\
              primitive caller(body: Cost): Cost = InCaller\n\
-             template t: CounterKind { body = raw(\"charge\") }"
+             primitive deed(label: String): Deed = Action\n\
+             primitive label(name: String): KeywordLabel = Named"
         )]),
         [
             (
@@ -470,8 +475,12 @@ fn a_reserved_constructor_is_refused_where_declared_and_called() {
                 s("InCaller")
             ),
             (
-                RefusalKind::ReservedConstructor(s("CounterKind.Named")),
-                s("raw")
+                RefusalKind::ReservedConstructor(s("Deed.Action")),
+                s("Action")
+            ),
+            (
+                RefusalKind::ReservedConstructor(s("KeywordLabel.Named")),
+                s("Named")
             ),
         ]
     );
@@ -498,12 +507,10 @@ fn only_the_rings_file_may_build_its_own_scope() {
             s("ownScope")
         )]
     );
+    // Elsewhere the declaration is refused; its calls are not refused again.
     assert_eq!(
         kinds(RING),
-        [
-            RefusalKind::ReservedConstructor(s("Action.OwnScope")),
-            RefusalKind::ReservedConstructor(s("Action.OwnScope")),
-        ]
+        [RefusalKind::ReservedConstructor(s("Action.OwnScope"))]
     );
     // Only the builtin bundle's file is the Ring's.
     let builtin = bundle(
@@ -585,4 +592,15 @@ fn sylex_syl_refusals_stop_the_check() {
         panic!("sylex_syl refuses `nowhere`");
     };
     assert_eq!(error.refusals.len(), 1);
+}
+
+#[test]
+fn any_declared_card_form_resolves() {
+    assert_eq!(
+        kinds(
+            "primitive meld(front: CardFace, back: CardFace): Card = Meld\n\
+             card meld(front = { name = \"Bruna\" }, back = { name = \"Brisela\" })"
+        ),
+        []
+    );
 }
