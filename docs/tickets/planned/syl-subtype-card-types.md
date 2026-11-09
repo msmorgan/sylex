@@ -29,6 +29,8 @@ creatures and kindreds [CR#205.3m]. So kindred needs a hardcoded special case in
 - The `kind = spell` text match in `Emit.lean`, `Subtype.spell` and the kindred special case in
   `subsFitLine` are deleted.
 - Every word at a subtype's `kind` resolves through a declaration.
+- The validator's mirror is deleted: `cargo xtask dsl check` has no `Kind.text_word` exception
+  (`crates/xtask/src/dsl_check/schema.rs`), so a subtype's `kind` always resolves at its sort.
 - Values change only in each subtype's card-type list: `lake exe dumpValues compare` shows no
   other changed row, and the landing reports what changed.
 - `cargo xtask lean check`, `cargo xtask dsl fmt --check`, `cargo xtask dsl differential` and

@@ -18,6 +18,10 @@ exception, which is the only reason the file loads.
 - The temporary `ownScope` primitive and the `legacyScope` exception (`lean/SylGen/Main.lean`, and
   its uses in `Emit.lean` and `Resolve.lean`) are deleted, so a primitive building a reserved
   constructor is refused in every file, the Ring's included, with a negative test.
+- The validator's mirror is deleted: `cargo xtask dsl check` has no Ring path exception
+  (`RING_EXCEPTION` in `crates/xtask/src/dsl_check/schema.rs`, and `Signature::ring_only` in
+  `crates/xtask/src/dsl_check.rs`), and its negative test refuses the Ring's
+  file too.
 - The Ring emblem's count reads the same as before: `lake exe dumpValues compare` shows no
   changed card or builtin row besides `theRingTemptsYou`'s own and the deleted `ownScope`'s.
 - `cargo xtask lean check` and `cargo test -p sylex_syl` pass.
