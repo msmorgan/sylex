@@ -19,9 +19,11 @@ prefix is not a word Oracle text uses, so it misnames the primitive.
   Definition boundary first: whichever declaration does not own the plain name is renamed to what
   it is or folded into the other, keeping structural primitives, keyword Definitions and worded
   Templates distinct.
-- Every declaration and call in `builtin/` and `canon/` is updated, and the corpus means the same
-  as before (only the renamed names differ).
-- Everything passes the `.syl` checks.
+- Every declaration and call in `builtin/` and `canon/` is updated, and a one-off script kept in
+  `docs/evidence/` verifies that the `sylex_syl` trees before and after are equal modulo the
+  explicit rename/fold map, reporting the file and call counts compared.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

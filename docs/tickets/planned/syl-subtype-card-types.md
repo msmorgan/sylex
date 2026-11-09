@@ -33,6 +33,7 @@ creatures and kindreds [CR#205.3m]. Under that split, kindred needs a special ca
   refuses a subtype whose `kind` is a single card type, with a negative test.
 - The `.syl` changes are each subtype's `kind`, the `creature` and `spell` Templates, and
   `card_type/battle.syl` where the cycle needs it; the landing lists them.
+- Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers

@@ -21,7 +21,9 @@ creature you control, unattach it." Other Vintage-legal cards printing "lose con
   `loseControl(subject: NounPhrase)` primitive; the landing says which and why.
 - It is admitted in event and lookback patterns alongside `gainControlOf`, and refused as an
   instruction.
-- *Stolen Uniform* is in `plugins/canon/cards/` in full and passes the `.syl` checks.
+- *Stolen Uniform* is in `plugins/canon/cards/` in full.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

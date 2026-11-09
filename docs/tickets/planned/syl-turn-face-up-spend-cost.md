@@ -21,7 +21,8 @@ says "its mana cost".
 - *Qarsi Deceiver* is in `plugins/canon/cards/`, its second purpose written with the mana-cost
   qualifier, and a test shows that purpose names the mana cost.
 - *Overgrown Zealot* ("to turn permanents face up") stays unqualified.
-- Everything passes the `.syl` checks.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

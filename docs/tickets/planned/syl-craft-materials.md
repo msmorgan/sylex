@@ -16,12 +16,14 @@ creatures"), coordinated ("a Dinosaur, a Merfolk, a Pirate, and a Vampire", `one
 agreement ("two that share a card type", `agree`). The body must restrict whatever the card wrote
 to "from among permanents you control and/or cards in your graveyard", and nothing today restricts
 a `NounPhrase` parameter from outside. A `Location` cannot say it either: `andOr([battlefield,
-yourGraveyard])` admits an opponent's permanents. Two shapes are open:
+yourGraveyard])` admits an opponent's permanents.
 
-1. The materials parameter is a noun phrase over a pool placeholder that the body fills with the
-   domain.
-2. A Template the card calls builds the whole materials phrase with the domain as its
-   `someOf`/`oneEachOf`/`agree` group, and the Definition receives that phrase.
+## Open questions
+
+- Which shape the materials take:
+  1. a noun phrase over a pool placeholder that the body fills with the domain; or
+  2. a Template the card calls builds the whole materials phrase with the domain as its
+     `someOf`/`oneEachOf`/`agree` group, and the Definition receives that phrase.
 
 ## Done when
 
@@ -33,6 +35,8 @@ yourGraveyard])` admits an opponent's permanents. Two shapes are open:
 - Canon holds craft cards covering a counted, a coordinated and an agreement materials phrase,
   chosen from the 24 Vintage-legal craft cards (*Braided Net // Braided Quipu*, *Clay-Fired Bricks
   // Cosmium Kiln*, …).
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

@@ -32,6 +32,8 @@ much in total). Neither counts mana of one stated color, nor the most mana of an
 - Both facets exist, each with a Template reading it for a spell beside `colorsSpentToCast`, the
   same-color facet named against the game-model glossary.
 - The six cards above are spelled in full in `plugins/canon/cards/`, each under `adamant`.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

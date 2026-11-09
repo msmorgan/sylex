@@ -32,6 +32,8 @@ instead if a permanent left the battlefield under your control this turn."
 - The five witnesses are in `plugins/canon/cards/`, each later paragraph written as a
   `spellReplacement` under its ability word. *Bring the Ending* needs a `corrupted` ability word,
   which `plugins/builtin/templates/ability_word/` lacks.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

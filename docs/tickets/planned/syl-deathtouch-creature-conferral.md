@@ -23,7 +23,7 @@ with the engine.
 - Its citations and comment ([CR#702.2b,704.5h], and [CR#702.2d] for reading the source from any
   zone) move into the creature declaration's header comment.
 - `plugins/builtin/rules/sba/deathtouchDestruction.syl` is deleted, and nothing names it.
-- `cargo xtask dsl fmt --check` (or its successor) and the `.syl` checks that exist then pass.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

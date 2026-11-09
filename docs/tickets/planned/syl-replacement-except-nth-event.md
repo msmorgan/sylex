@@ -15,9 +15,11 @@ cannot be written.
 
 - A would-clause can exclude the nth occurrence in a period, either as its own primitive or as a
   general "except" on an event pattern; the landing says which and why.
-- *Notion Thief* is in `plugins/canon/cards/` and passes the `.syl` checks.
-- A test shows the first draw in an opponent's draw step is not replaced and a second draw in
-  that step is.
+- *Notion Thief* is in `plugins/canon/cards/`.
+- That the first draw in an opponent's draw step is not replaced and a second draw in that step
+  is, is not checkable until the engine reads `.syl`.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

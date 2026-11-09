@@ -1,0 +1,36 @@
+---
+needs: []
+---
+
+# Spellings with optional and repeated parts
+
+## Why
+
+A `spelling` string can't say that a part is printed only when an argument is given, or once per
+list entry, so 151 `TODO(spelling)` markers stand where a spelling needs one (re-count when
+claimed; `putInto`'s "Omit the origin phrase when from is anywhere" is typical). Without it,
+wordings that differ only by such a part become near-duplicate Template families: `enters…`,
+`activatedOnly…`, `prevent…`, `defines…`.
+
+## Open questions
+
+- How a spelling expresses an optional segment (tied to a defaulted or `Option` parameter), a
+  repeated segment (a `List` parameter) and list formatting ("A, B, and C").
+
+## Done when
+
+- `docs/decisions/syl.md` §2 states the notation, and `sylex_syl` parses and formats it.
+- Every `TODO(spelling)` that needed an optional or repeated segment is written with it.
+- The near-duplicate Template families that differed only by such a segment are each one
+  Template; the landing lists the merges.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p sylex_syl` and
+  `cargo test -p xtask` pass.
+
+## Not in scope
+
+The other spelling conventions (verb inflection, the hole syntax): `syl-spelling-conventions`.
+
+## Pointers
+
+`docs/decisions/syl.md` §2, `crates/syl/`, `rg 'TODO\(spelling\)' plugins/`.

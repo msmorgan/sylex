@@ -19,6 +19,8 @@ controlled it as it phased out, and the row waits for its present controller's.
   glossary, and the phase-in half of the row is a lookback: this permanent phased out while the
   active player controlled it.
 - The row's header comment states the reading the row now makes, with no ticket slugs.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

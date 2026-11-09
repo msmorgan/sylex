@@ -18,7 +18,7 @@ binding the first arm made, and the parameter is refused or bound twice.
 - Reference resolution shares one Template parameter's Binding Identity across the disjuncts of
   an `or`; how (bind it before the arms, or let a later arm read the earlier arm's binding) is
   part of the reference-resolution design (`docs/decisions/semantics.md` §2).
-- Tests in the reference-resolution crate: *True-Name Nemesis* checks, with `the(isChosenPlayer)`
+- Tests in reference resolution, which does not exist yet: *True-Name Nemesis* checks, with `the(isChosenPlayer)`
   bound once for both arms of `objectsOfPlayer`; an anaphor in one arm that has no antecedent in
   any arm or before the `or` is still refused.
 

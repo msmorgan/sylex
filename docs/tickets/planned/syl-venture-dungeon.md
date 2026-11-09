@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-explicit-deeds]
 ---
 
 # Venture into the dungeon, dungeon cards and the initiative's venture triggers
@@ -26,7 +26,9 @@ so `designation/initiative.syl` carries only its third ability.
   that card's removal from the game [CR#309.7].
 - `initiative.syl` carries all three inherent abilities [CR#726.2], and its comment about the
   missing two is gone.
-- Everything passes the `.syl` checks, with at least one venturing card in canon.
+- At least one venturing card is in canon.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

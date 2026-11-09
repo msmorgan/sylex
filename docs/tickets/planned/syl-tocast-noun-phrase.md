@@ -20,6 +20,8 @@ cannot be written. Its three canon sites also print "spells" twice: *Ancient Zig
 - `toCast` takes a NounPhrase, and *Ancient Ziggurat*, *Mishra's Workshop* and *Unblinking
   Observer* write `toCast(bare(…))`, each predicate reading its printed words once (re-grep
   `toCast` in `plugins/` when starting).
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

@@ -1,5 +1,5 @@
 ---
-needs: [syl-primitive-constructors]
+needs: [syl-primitive-constructors, syl-explicit-deeds]
 ---
 
 # `theRingTemptsYou` without the reserved scope
@@ -10,11 +10,14 @@ needs: [syl-primitive-constructors]
 its own deed, so that the Ring emblem can count the times the Ring has tempted you by the deed's
 own steps. `.syl` may not write a scope (`docs/decisions/syl.md` §4); the file does so through a
 temporary primitive declared in it (`ownScope`) and the validator's path-gated Ring exception,
-which is the only reason the file passes `cargo xtask dsl check`.
+which is the only reason the file passes `cargo xtask dsl check`. The body also names the Ring
+emblem by the string `"The Ring"`, and writes the count of temptations three times over, once per
+emblem ability that reads it.
 
 ## Done when
 
-- `theRingTemptsYou.syl` writes no scope and declares no primitive.
+- `theRingTemptsYou.syl` writes no scope and declares no primitive, names the emblem by no
+  string, and writes the count of temptations once.
 - The Ring emblem still counts the times the Ring has tempted you. No check can confirm this until
   the Rust resolution and expansion layer exists; the landing shows how the rewritten body counts
   them, for the owner to review.
@@ -22,6 +25,7 @@ which is the only reason the file passes `cargo xtask dsl check`.
   `crates/xtask/src/dsl_check/schema.rs`, and `Signature::ring_only` in
   `crates/xtask/src/dsl_check.rs`), so a primitive building a reserved constructor is refused in
   every file, the Ring's included, with a negative test.
+- Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers

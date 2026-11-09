@@ -1,5 +1,5 @@
 ---
-needs: [lean-retirement]
+needs: [lean-retirement, syl-explicit-deeds]
 ---
 
 # Both creatures fight: `fight`'s Deed has two performers
@@ -26,6 +26,8 @@ performer.
   (*Faunsbane Troll*, *Mawloc*).
 - A creature fighting itself still takes twice its power [CR#701.14c].
 - Each of these has a test once events and reference resolution are checkable.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

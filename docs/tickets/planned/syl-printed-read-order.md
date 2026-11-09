@@ -1,5 +1,5 @@
 ---
-needs: [lean-retirement]
+needs: [lean-retirement, syl-argument-naming]
 ---
 # Make every declaration's read order its printed order, and drop `doIf`'s `postposed`
 
@@ -8,7 +8,9 @@ needs: [lean-retirement]
 Read order is printed order (`docs/decisions/syl.md` §5): where a declaration's printed order
 differs from its parameter order, the parameters are reordered to match. Several `.syl`
 declarations still differ, and `doIf` carries a `postposed: Bool` flag that says in a boolean what
-the printed order should say.
+the printed order should say. Reordering puts some required parameters after optional ones;
+under `syl-argument-naming`'s rule a positional argument binds only required parameters, so those
+call sites need no naming.
 
 ## Done when
 
@@ -18,10 +20,13 @@ the printed order should say.
   printed before the action), `gatedBy` and `staticSpecGatedBy` (the cost is printed last), and
   the `preventDamage`, `removeCounters`, `vote` and `pay` families.
 - `doIf` has no `postposed` parameter; `doOnlyIf` ("<action> if <condition>") says the printed
-  order itself, and what the flag changed for reference resolution is kept by that order.
-- The argument-naming rule (whether positional arguments bind only required parameters) is
-  settled first; it may remove the need to name them. Under the settled rule, required arguments
-  that end up after an optional one are passed by name where it requires it.
+  order itself, and what the flag changed for reference resolution is kept by that order. That
+  equivalence is not checkable until reference resolution exists; the landing lists every former
+  `postposed` call with its new form.
+- The reordered corpus means the same: a one-off script, kept in `docs/evidence/`, checks that
+  every call in `plugins/` binds the same parameter-to-value map before and after (apart from
+  `postposed`), and the landing reports the declaration and call counts it compared.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

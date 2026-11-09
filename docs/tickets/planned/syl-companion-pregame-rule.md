@@ -22,6 +22,8 @@ start of the game.
   at this ticket.
 - A Vintage-legal companion card (*Jegantha, the Wellspring* or *Lurrus of the Dream-Den*) is in
   `plugins/canon/cards/`.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

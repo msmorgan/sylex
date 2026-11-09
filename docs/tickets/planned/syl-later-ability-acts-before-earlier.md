@@ -22,9 +22,11 @@ the pump after the fight, which changes the outcome.
   state `action` leaves, where `event` is the earlier ability's action that `action` precedes.
 - *Savage Punch* is in `plugins/canon/cards/` with its two paragraphs as two spell abilities,
   the second written as `beforeEvent` over the pump and "it fights" inside its ferocious
-  condition, and passes the `.syl` checks.
-- Its "the creature you control" and "it" read the first paragraph's target (spell abilities
-  share targets).
+  condition.
+- That its "the creature you control" and "it" read the first paragraph's target (spell
+  abilities share targets) is not checkable until reference resolution exists.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

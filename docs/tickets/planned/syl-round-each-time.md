@@ -30,6 +30,8 @@ different directions.
   for a "then" chain; a test shows every fraction of that chain is covered.
 - `half` (rounded) is unchanged and *Banshee*-style sentences still use it.
 - The `roundEachTime` declaration's doc comment records the construct.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

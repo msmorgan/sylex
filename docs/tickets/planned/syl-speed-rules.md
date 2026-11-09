@@ -23,7 +23,8 @@ a rule or effect sets it [CR#702.179b], and 0 is only what an effect reading spe
 - The inherent triggered ability of every player with speed 1 or more is written as a rules row:
   sourceless and controlled by that player [CR#702.179d], the way designation definitions write
   theirs.
-- Everything passes the `.syl` checks.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

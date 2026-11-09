@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-monstrosity-adapt-name-the-source, lean-retirement]
+needs: [lean-v3-monstrosity-adapt-name-the-source, lean-retirement, syl-explicit-deeds, syl-enlist-optional-attack-cost]
 ---
 
 # Events for the verbs keyword abilities define
@@ -22,7 +22,8 @@ instruction "adapt N".
   readers ("creatures it devoured", "each creature sacrificed this way") still resolve.
 - Each event happens when its rule says: once counters are actually put (evolve, training), when
   the ability resolves (mentor), when the sacrifice or exile happens (exploit, devour, champion),
-  when the cost is paid by tapping the other creature (enlist).
+  when the cost is paid by tapping the other creature (enlist, whose optional cost
+  `syl-enlist-optional-attack-cost` writes).
 - "<creature> adapts" is a standalone event, defined the way [CR#702.100b] defines "evolves": an
   adapt whose Source is that creature resolves. Its doc comment says it is a project-supplied rule
   filling a CR gap, not an inflection of the `adapt` keyword action.
@@ -32,10 +33,12 @@ instruction "adapt N".
 - The subject's kind belongs to the event: "players can't adapt" is refused, because adapt's event
   subject is a creature, and a test pins the refusal.
 - None of these events is usable as an instruction.
-- These Vintage-legal cards are in `plugins/canon/cards/` and pass the `.syl` checks: *Watchful
-  Radstag* and *Renegade Krasis* (evolves), *Savior of Ollenbock* (trains), *Aegis of the Legion*
-  (mentors), *Mistbind Clique* (championed), *Guardian of New Benalia* (enlists), and a card with
-  "When this creature exploits a creature".
+- These Vintage-legal cards are in `plugins/canon/cards/`: *Watchful Radstag* and *Renegade
+  Krasis* (evolves), *Savior of Ollenbock* (trains), *Aegis of the Legion* (mentors), *Mistbind
+  Clique* (championed), *Guardian of New Benalia* (enlists), and a card with "When this creature
+  exploits a creature".
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

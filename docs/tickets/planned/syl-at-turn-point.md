@@ -29,7 +29,9 @@ current `at` call is a `beginningOf…` event, one wrapped in `nthOccurrence` (*
   beginning of the next …" (`atNext`, `beginningOfNext`, `asThoughFlashSacrificedAtCleanup`), use
   the new argument.
 - Negative tests pin that `at(does(it, enter), …)` and `whenever(beginningOfYour(upkeep), …)` are
-  refused, and the rest of the corpus still passes the `.syl` checks.
+  refused.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

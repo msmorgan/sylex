@@ -30,14 +30,15 @@ subject twice.
   `actorControls`.
 - Tests that accept a sacrifice of a permanent the performer doesn't control are rewritten to
   assert the refusal, or retired.
-- Everything passes the `.syl` checks.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 
 `destroy`, which rightly reaches any permanent. The destination stays the bare
 `graveyard`, which is consistent with "its owner's graveyard" [CR#701.21a]. The destination
-template's spelling ("your graveyard" for an owner's-graveyard body) is the `.syl` zone-words
-fix, not this ticket.
+template's spelling ("your graveyard" for an owner's-graveyard body) is
+`syl-zone-words`.
 
 ## Pointers
 

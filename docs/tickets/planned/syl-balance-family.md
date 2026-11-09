@@ -22,6 +22,8 @@ on the rest" per player, nor how "the same way" repeats the instruction for each
   made in APNAP order before the actions happen [CR#101.4].
 - Any construct the cards cannot be written with is added as a new primitive, with the reason in
   its declaration comment.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

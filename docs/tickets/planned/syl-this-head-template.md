@@ -1,0 +1,35 @@
+---
+needs: []
+---
+
+# One `this(head)` Template replaces the 21 `this<Head>` Templates
+
+## Why
+
+`plugins/builtin/templates/noun/` holds 21 `this<Head>` Templates (`thisCreature`, `thisAura`,
+`thisSpell`, `thisPermanent`, …), each `headed(<head>, this)` for one head noun over the `this`
+primitive (`plugins/builtin/primitives/pronoun/this_.syl`). Three have no caller (`thisClass`,
+`thisEmblem`, `thisSpacecraft`), and a head with no Template can't be written at all. Callers also
+mix `thisSpell`, `thisPermanent` and bare `this` for the same printed words.
+
+## Open questions
+
+- The Template's name and parameter: the `this` primitive already holds `(this, NounPhrase)`, so a
+  Template named `this` at `NounPhrase` would collide (`syl.md` §3).
+
+## Done when
+
+- One Template taking the head noun replaces the 21 files, and every builtin and canon caller
+  uses it with the head its text prints; where a caller writes `thisSpell`, `thisPermanent` or
+  bare `this`, it now matches the printed words.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
+
+## Not in scope
+
+Mentions where the card prints "it": `syl-printed-it-self-references`.
+
+## Pointers
+
+`plugins/builtin/templates/noun/this*.syl`, `plugins/builtin/primitives/pronoun/this_.syl`,
+`docs/decisions/syl.md` §3.

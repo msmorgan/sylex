@@ -42,11 +42,13 @@ noun out and write only the other conjuncts. That changes the set described:
 - `rg 'allOf\(youControl\)' plugins/canon/cards` is empty.
 - If adding a head noun makes a later reference in the card ("that card", "it") resolve
   differently or fail, the site is reported, not left without its head noun.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 
 - A card not yet in `plugins/canon/cards/` is spelled with its head nouns when it is written.
-- Printed "it" written as a self-reference (`thisCreature` for "it") is a separate sweep.
+- Printed "it" written as a self-reference (`thisCreature` for "it"):
+  `syl-printed-it-self-references`.
 
 ## Pointers
 

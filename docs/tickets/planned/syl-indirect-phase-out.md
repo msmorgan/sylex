@@ -23,6 +23,8 @@ indirect phase-out records nothing of its own, so no lookback can tell the two a
   out because its host did", or the status carries the distinction. The choice follows the CR's
   structure (`docs/decisions/semantics.md` §1 item 5).
 - The row's header comment states the reading the row now makes, with no ticket slugs.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

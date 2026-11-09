@@ -32,6 +32,8 @@ cost-to-attack form has no optional variant, so the static cannot be written.
 - `enlist.syl`'s body writes the static and its linked trigger in full.
 - A Vintage-legal enlist card (one of the 12, such as *Argivian Cavalier*) is in
   `plugins/canon/cards/`.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

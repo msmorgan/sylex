@@ -13,13 +13,19 @@ removes nothing and none of the 12 Vintage-legal cleave cards can be written. Th
 already reads a cleave line twice, as its Uncleaved and Cleaved Text, with the bracketed spans
 kept beside it (`crates/english/src/cleave.rs`).
 
+## Open questions
+
+- How a bracketed span is represented in a card's `.syl` term.
+
 ## Done when
 
-- The owner has approved how a bracketed span is represented in a card's `.syl` term, such that
-  `removeBracketed` can read it from the term and spelling can print the brackets back.
-- `.syl` and its checks implement it, and at least two cleave cards are in `plugins/canon/cards/`
-  and pass the checks.
-- Tests pin that `removeBracketed` removes exactly the bracketed spans of a cleave card's term.
+- `.syl` represents a bracketed span as settled, such that `removeBracketed` can read it from the
+  term and spelling can print the brackets back, and at least two cleave cards are in
+  `plugins/canon/cards/`.
+- That `removeBracketed` removes exactly the bracketed spans of a cleave card's term is not
+  checkable until the Rust expansion layer exists; the landing shows it for one card.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

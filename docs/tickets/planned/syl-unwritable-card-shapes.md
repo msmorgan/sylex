@@ -21,13 +21,20 @@ decision:
   nothing checks that the same card carries the exiling ability. Whether that is a law on `Card`
   (a check over the card's abilities) or an unchecked convention is undecided.
 
+## Open questions
+
+- Whether a granted ability's bearer is published into the granted ability's own reference
+  scope (*Alaundo the Seer*, *Tahngarth, First Mate*).
+- Whether the linked-exile law is a law on `Card` (a check over the card's abilities) or an
+  unchecked convention.
+
 ## Done when
 
-- The owner has decided the granted-ability scope and where the linked-exile law lives.
 - *Alaundo the Seer*, *Tahngarth, First Mate* and one "all cards with the same name" card are in
-  `plugins/canon/cards/` with their printed text in full and pass the `.syl` checks, or each
+  `plugins/canon/cards/` with their printed text in full, or each
   refusal names the rule that forbids it.
 - The linked-exile law is checked, or `docs/decisions/semantics.md` §4.8 says it is a convention.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

@@ -37,8 +37,10 @@ is missing, many carrying generated text instead of a reason.
   or replaced by the specific missing wording.
 - No verb whose agreement depends on a hole or the performer is inflected, and no marker carries
   generated text.
-- The corpus means the same before and after the rewrite, since spelling carries no meaning, and
-  passes the `.syl` checks.
+- The corpus means the same before and after the rewrite: a one-off script, kept in
+  `docs/evidence/`, checks that every declaration's tree is unchanged apart from its `spelling`
+  and comments, and the landing reports the declaration count it compared.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

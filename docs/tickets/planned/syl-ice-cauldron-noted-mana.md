@@ -25,6 +25,8 @@ reads a noted amount, and no way to say "the last card exiled with this artifact
   cast permission "for as long as it remains exiled", the charge counter, the note and the
   activation restriction. If a step does not resolve, the refusal is reported rather than worked
   around with a raw constructor.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

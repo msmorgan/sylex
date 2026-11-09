@@ -19,8 +19,10 @@ introduces its antecedent. `Angelic Cub.syl` therefore carries only its triggere
 - A condition-first Template exists whose parameters are in printed order, condition then static.
 - *Angelic Cub* carries both printed abilities, with "it" in the grant written as `it`, and its
   "Fragment" comment is gone; the other condition-first cards in canon use the new Template.
-- Everything passes the `.syl` checks. Once reference resolution exists, a test pins that the
-  grant's "it" reads this creature from the condition.
+- That the grant's "it" reads this creature from the condition is not checkable until reference
+  resolution exists.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

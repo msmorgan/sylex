@@ -40,6 +40,8 @@ says it. The two parts are separately committable.
   `plugins/canon/cards/Tavern Ruffian {slash}{slash} Tavern Smasher.syl` ({3}{R} Human Warrior
   Werewolf 2/5 with daybound // Werewolf 6/5 with nightbound, in the form of
   `Afflicted Deserter {slash}{slash} Werewolf Ransacker.syl`) are in canon.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

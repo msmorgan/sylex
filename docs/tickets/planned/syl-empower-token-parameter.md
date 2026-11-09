@@ -31,6 +31,8 @@ and 34 more Vintage-legal cards, among them *Theorist's Proxy*, *Jace, Reality S
 - `plugins/canon/cards/Countersculpt.syl` calls `empower(jaceToken, 1)`.
 - The lemma is "empower" with the token complement before the amount, both in the declaration's
   `lexical` block and in `crates/vocabulary/catalogs/keyword_actions.ron`'s [CR#701.71] entry.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

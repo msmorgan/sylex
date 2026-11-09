@@ -19,8 +19,11 @@ makes it a replacement.
 - An as-though statement can be limited to the next matching event (a use field on `asThough`,
   or a usage limit on `establish`; the landing says which and why).
 - *Biomancer's Familiar* is in `plugins/canon/cards/`, its "adapts" being the event
-  `syl-keyword-verb-events` defines, and passes the `.syl` checks.
-- A test pins that a second adapt the same turn is not covered.
+  `syl-keyword-verb-events` defines.
+- That a second adapt the same turn is not covered is not checkable until the engine reads
+  `.syl`.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

@@ -35,6 +35,7 @@ instead of writing the anaphor.
 - The second part alone (the spend-mana permission with "those spells" and no permission before
   it) is refused with an unresolved plural `spell` anaphor.
 - Tests for a performed play or cast and for keyword cast permissions still pass.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

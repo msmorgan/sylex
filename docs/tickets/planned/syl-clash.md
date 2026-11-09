@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, syl-explicit-deeds]
 ---
 # Clash: an opponent and a winner
 
@@ -32,6 +32,8 @@ card is in `plugins/canon/cards/` yet.
   each clash [CR#701.30b], with the outcome readable afterward.
 - At least one "clash with an opponent … if you win" card and one "whenever you clash" card are
   spelled in `plugins/canon/cards/`.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

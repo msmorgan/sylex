@@ -28,7 +28,8 @@ keeps a second hand-synchronized copy of every predefined token's characteristic
   (needed by `syl-empower-token-parameter`).
 - A token a keyword action's rule defines in full, as [CR#701.71a] defines the Jace planeswalker
   token, is a `token` Definition too, and the glossary names the term that covers both.
-- Everything passes the `.syl` checks.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 

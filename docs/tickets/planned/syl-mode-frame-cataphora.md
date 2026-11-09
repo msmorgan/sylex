@@ -28,21 +28,27 @@ this shape.
   chosen this turn" (*Genku*) reuses `notChosenBefore`.
 - A characteristics filler requires a single choice; the construct refuses it under any choice of
   more than one.
-- Open question: the frame may be written with any Template whose argument is the reserved word
-  only while Templates stay transparent, expanding before reference resolution.
+
+## Open questions
+
+- Whether the frame may be written with any Template whose argument is the reserved word: that
+  holds only while Templates stay transparent, expanding before reference resolution
+  (`syl-opaque-templates`).
 
 ## Done when
 
 - `chooseModesOver`, its reserved filler word and the "at random" mode-choice modifier exist, with
   frame Templates spelled by the `.syl` spelling conventions.
 - *Call Damage Control* and *Wild Shape* are re-encoded with it; *Outlaws' Merriment* and *Genku,
-  Future Shaper* are added. All four pass the `.syl` checks.
+  Future Shaper* are added.
 - *Call Damage Control* is one return over the chosen targets.
 - A characteristics filler under "choose two" is refused, with a test.
-- Once reference resolution exists, each frame demonstrative resolves to the bound filler and
-  nothing else: the mode choice fixes what it denotes [CR#700.2a,700.2b] before targets are chosen
+- Not checkable until reference resolution exists: each frame demonstrative resolves to the bound
+  filler and nothing else; the mode choice fixes what it denotes [CR#700.2a,700.2b] before targets are chosen
   [CR#601.2b,601.2c], and an unchosen Mode's targets are never chosen [CR#700.2c].
 - The construct's doc comment records it.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 
