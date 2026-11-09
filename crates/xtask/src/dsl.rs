@@ -309,27 +309,18 @@ pub fn project(file: &File) -> Result<Json, String> {
     Ok(Json::Array(out))
 }
 
-/// `SylGen`'s `kindSort`: the result sort a declaration kind implies.
+/// `SylGen`'s `kindSort`: the result sort a declaration kind implies, as
+/// the validator's kind table states it.
 fn kind_sort(kind: &str) -> Option<&'static str> {
-    Some(match kind {
-        "action" => "Action",
-        "ability" | "ability_word" => "Ability",
-        "counter" => "CounterKind",
-        "designation" => "DesignationLabel",
-        "subtype" => "Subtype",
-        "card_type" => "CardType",
-        "relation" => "RelationLabel",
-        "token" => "PredefinedToken",
-        "sba" => "SbaRule",
-        "conferral" => "ConferralRule",
-        "card" => "Card",
-        _ => return None,
-    })
+    crate::dsl_check::schema::KINDS
+        .iter()
+        .find(|k| k.word == kind)
+        .and_then(|k| k.sort)
 }
 
 /// `SylGen`'s `printedName`: a card's name, its face names joined with `" //
 /// "`.
-pub(crate) fn printed_name(card: &Value) -> Result<String, String> {
+fn printed_name(card: &Value) -> Result<String, String> {
     let record = match &card.kind {
         // Temporary: a record card mirrors the loader's single-face shorthand;
         // `syl-single-face-card-call` deletes both.
