@@ -135,12 +135,10 @@ sylex_semantics_v1 ── sylex_lowering_v1: lower ──► sylex_core
   persisted as RON
 ```
 
-This split is recent (settled August 2026, and still completing — see the
-roadmap). Before it, one type family was simultaneously the semantics surface,
-the English-facing render/parse target, and the engine's input. Separating the
-roles lets each layer be what its job requires: the intermediate grammar carries
-the macro system and normalization, the English grammar carries genuine syntax,
-and core keeps only what the engine executes.
+Each layer is what its job requires: the intermediate grammar carries the
+macro system and normalization, the English grammar carries genuine syntax, and
+core keeps only what the engine executes. The remaining stages of the split are
+in the roadmap.
 
 The workspace's crates, grouped by role — plus a thin root binary that
 launches the client:
@@ -152,9 +150,8 @@ launches the client:
   today's card, token, and rules-table containers, plus its macro layer (sugar
   desugars at load; the explicit form is always the meaning).
 - **`sylex_lowering_v1`** — the one-way compile from intermediate form to the
-  engine's types. Generated as an exact mirror at the fork, it doubles as the
-  divergence ledger: every arm that stops being an identity carries its
-  justification in place.
+  engine's types. It doubles as the divergence ledger: every arm that is not an
+  identity carries its justification in place.
 - **`sylex_core`** — the engine AST: the typed vocabulary of abilities,
   effects, costs, zones, durations, and conditions, in the shapes the rules
   systems execute.
@@ -182,7 +179,7 @@ launches the client:
 
 - **`sylex_syntax`**, **`sylex_vocabulary`** and
   **`sylex_english`** — the English grammar for Oracle text; its own
-  section below. (The first-attempt `deckmaste_english` was retired.)
+  section below.
 - **`macro_ron`** / **`macro_ron_derive`** — the RON macro-expansion layer the
   intermediate grammar is built on.
 - **`macro_ron_lsp`** — a small language server for the repo's RON card files.
@@ -224,12 +221,11 @@ The load-bearing rules for the split are:
   deliberately narrow discourse channels. A legacy lone-target fallback for
   an unbound `It` still remains in the engine and is scheduled for removal.
 - **Lowering is total, and divergence is governed.** The intermediate → core
-  mapping started as a generated identity; an arm may diverge only with its
+  mapping is an identity by default; an arm may diverge only with its
   justification written in place, and every variant carries a mapping test
   naming the engine shape it expects.
 
-The crate split has landed: `sylex_semantics_v1` and `sylex_lowering_v1`
-exist, and loaders lower cached intermediate terms to core at load. The curated
+Loaders lower cached intermediate terms to core at load. The curated
 canon cache is still written and verified by hand, while the broader production
 cache comes from the regex-era pipeline. Structural English recovery is
 replacing both paths family by family; the remaining stages are in the roadmap
@@ -239,10 +235,8 @@ below.
 
 ## The English grammar (`sylex_english`)
 
-The first-attempt `deckmaste_english` crate and its `cargo xtask english` tools
-have been retired; the grammar lives in `sylex_syntax`,
-`sylex_vocabulary` and `sylex_english`, measured by
-`cargo xtask english`. The grammar parses Oracle text into a genuine grammatical syntax tree —
+The grammar lives in `sylex_syntax`, `sylex_vocabulary` and `sylex_english`,
+measured by `cargo xtask english`. It parses Oracle text into a genuine grammatical syntax tree —
 constituency structure, not keyword-spotting. A chart parser produces a packed
 forest; parts of speech are selected by the grammar slots they fill rather than
 assigned by a lexer (Magic overloads its vocabulary too heavily for tagging —
@@ -285,9 +279,7 @@ breadth of card coverage. A curated cache of real cards is encoded and verified
 by hand while Oracle recovery expands toward producing it directly, and the
 grammar continues to cover the remaining mechanics. The near-term work runs in three strands:
 
-1. **Completing the grammar split.** Landed: the crate splits and renames, the
-   semantics fork, the lowering crate, and the loader repoint. Remaining, in
-   rough order: moving prose rendering onto the spelling layer and retiring the
+1. **Completing the grammar split.** In rough order: moving prose rendering onto the spelling layer and retiring the
    legacy renderer; stripping the macro machinery out of core;
    the intermediate vocabulary (bare engine variants stop being recoverable
    syntax, made near-zero-churn by identity macros); consolidating frames into
