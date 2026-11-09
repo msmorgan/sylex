@@ -23,6 +23,10 @@ them only so the single-faced cards need no respelling.
 - `cargo xtask dsl check` no longer reads a record at `Card`, or a `CardFace` record without
   `characteristics`, as the shorthand (`crates/xtask/src/dsl_check.rs`), and refuses each with a
   negative test.
+- The respelled cards mean the same: a one-off script, kept in `docs/evidence/`, expands the old
+  shorthand of every card it respells (the record wrapped in the single-faced call, its fields in
+  `characteristics`) and checks that the `sylex_syl` tree equals the respelled card's, and the
+  landing reports the card count it compared.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers

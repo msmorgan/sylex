@@ -15,7 +15,9 @@ which is the only reason the file passes `cargo xtask dsl check`.
 ## Done when
 
 - `theRingTemptsYou.syl` writes no scope and declares no primitive.
-- The Ring emblem still counts the times the Ring has tempted you.
+- The Ring emblem still counts the times the Ring has tempted you. No check can confirm this until
+  the Rust resolution and expansion layer exists; the landing shows how the rewritten body counts
+  them, for the owner to review.
 - `cargo xtask dsl check` has no Ring path exception (`RING_EXCEPTION` in
   `crates/xtask/src/dsl_check/schema.rs`, and `Signature::ring_only` in
   `crates/xtask/src/dsl_check.rs`), so a primitive building a reserved constructor is refused in

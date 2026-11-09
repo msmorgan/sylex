@@ -28,10 +28,14 @@ creatures and kindreds [CR#205.3m]. Under that split, kindred needs a special ca
 - Every word at a subtype's `kind` resolves through a declaration.
 - `cargo xtask dsl check` has no `Kind.text_word` exception
   (`crates/xtask/src/dsl_check/schema.rs`), so a subtype's `kind` always resolves at its sort.
-- Only each subtype's `kind` changes, and the landing reports what changed.
+- `Subtype` has one shape: the validator's `subtype` kind declares `kind` at `List(CardType)`,
+  nothing declares or reserves a `spell` constructor at `Subtype`, and `cargo xtask dsl check`
+  refuses a subtype whose `kind` is a single card type, with a negative test.
+- The `.syl` changes are each subtype's `kind`, the `creature` and `spell` Templates, and
+  `card_type/battle.syl` where the cycle needs it; the landing lists them.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 
-`crates/xtask/src/dsl_check/schema.rs` (`text_word`), `plugins/builtin/definitions/subtype/`, `plugins/builtin/definitions/card_type/battle.syl`,
-`crates/core/src/type.rs`.
+`crates/xtask/src/dsl_check/schema.rs` (`text_word`), `plugins/builtin/definitions/subtype/`,
+`plugins/builtin/definitions/card_type/battle.syl`, `crates/core/src/type.rs`.
