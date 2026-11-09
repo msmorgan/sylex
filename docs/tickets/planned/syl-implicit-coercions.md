@@ -28,8 +28,17 @@ bare integers; with the coercions declared first, each writes them once, as prin
   symbol.
 - A coercion applies only at a sort mismatch, and only one hop: a coerced value is never coerced
   again.
-- `cargo xtask dsl check` refuses two coercions with the same from-sort and to-sort, and a word
-  that would resolve at one expected sort both directly and through a coercion.
+- `cargo xtask dsl check` refuses two coercions with the same from-sort and to-sort.
+- For an expected sort `T`, Reaches(`T`) is `T` together with every sort `S` that has a coercion
+  `S` to `T`. A word declared at two sorts in Reaches(`T`) is refused: a word at both `CardType`
+  and `Subtype` (both reach `NounWord`), and a word declared directly at `NounWord` and also at
+  `CardType`, so a direct declaration never silently shadows a coercion (a leftover
+  `templates/noun/creature.syl` beside `card_type creature`).
+- Literals likewise: an integer literal that reaches `T` from both `Int` and `Nat` is refused,
+  since one literal stands at both, and so is a record literal that reaches `T` from two record
+  sorts.
+- The ambiguity check runs at load, across the whole registry, not only where a call site writes
+  the word, so a latent collision fails before any card uses it.
 - `Option` composes with a coercion as it does with any value today: at an `Option(T)` position
   the value is written as a `T`, and a coercion into `T` applies.
 
@@ -45,8 +54,11 @@ bare integers; with the coercions declared first, each writes them once, as prin
 - The eight head-noun Templates
   `templates/noun/{artifact,battle,creature,enchantment,instant,kindred,land,sorcery}.syl` are
   deleted, and their callers resolve through the coercion unchanged.
-- Negative tests refuse an ambiguous coercion (a word that resolves both directly and through a
-  coercion), a chained coercion and a duplicate coercion.
+- Negative tests refuse, each at load with no call site writing the word: a word declared at two
+  from-sorts of one coercion target (`CardType` and `Subtype` into `NounWord`); a word declared
+  both directly at a target and at a sort coerced into it; an integer literal reaching a target
+  from both `Int` and `Nat`; a record literal reaching a target from two record sorts; a chained
+  coercion; and a duplicate coercion.
 - `docs/decisions/syl.md` §2 and §3 state the coercion rule in place of "no conversions besides
   `Option`" and "the one implicit wrap the language keeps", and §3's resolution order says where a
   coercion is tried.
