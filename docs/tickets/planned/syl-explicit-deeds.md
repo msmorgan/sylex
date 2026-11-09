@@ -46,7 +46,8 @@ These wait for the owner's design discussion of Deeds.
 - One shared exile Deed: `exile`, `exileFrom`, `exileFaceDown`, `exileFaceDownFrom` and
   `exileWithCounters` (`definitions/keyword_action/`) each declare their own Deed under the label
   `"exile"`, so "exiled" can be matched only by that label. Merging them into one declaration is
-  `syl-one-exile-declaration`, which waits on this answer.
+  `syl-one-deed-per-keyword-action`, which waits on this answer and applies it to the other
+  keyword actions declared once per variant under a shared Deed label.
 - Search marking what it finds: "a search found this card, so it is known after the shuffle"
   [CR#701.23a] is keyed to the Deed name `search`; whether `search`'s body marks the found card
   instead.

@@ -1,5 +1,5 @@
 ---
-needs: [syl-result-reads, syl-one-declaration-per-keyword, syl-ability-words-once, syl-this-head-template, syl-spelling-optional-segments, syl-one-exile-declaration, cleanup-step6-constructs-and-cards, cleanup-step6-rules-and-keywords, cleanup-step6-deeds]
+needs: [syl-result-reads, syl-one-declaration-per-keyword, syl-ability-words-once, syl-this-head-template, syl-spelling-optional-segments, syl-one-deed-per-keyword-action, cleanup-step6-constructs-and-cards, cleanup-step6-rules-and-keywords, cleanup-step6-deeds]
 ---
 
 # Delete `.syl` declarations nothing needs
@@ -18,7 +18,7 @@ land first: `syl-result-reads` (the coin and die reads with no user),
 `syl-ability-words-once` (the unused `abilityWord` Template), `syl-this-head-template`
 (`thisClass`, `thisEmblem` and `thisSpacecraft`, unused), `syl-spelling-optional-segments` (the
 `enters…`, `activatedOnly…`, `prevent…` and `defines…` Templates it merges, several unused or used
-once) and `syl-one-exile-declaration` (`exileFaceDownFrom` and `exileWithCounters`, used once
+once) and `syl-one-deed-per-keyword-action` (`exileFaceDownFrom` and `exileWithCounters`, used once
 each).
 
 It sweeps after the three middle stages (`cleanup-step6-constructs-and-cards`,
