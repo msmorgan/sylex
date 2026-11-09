@@ -11,8 +11,7 @@ controls, or each object `player` owns that no player controls. Its one caller i
 Nemesis*. A Template that mentions a NounPhrase parameter more than once binds it at the first
 occurrence, and the binding is generated (`docs/decisions/syl.md` §4). But reference resolution
 steps each disjunct from the context before the `or`, so the second arm's mention cannot see the
-binding the first arm made, and the parameter is refused (as the Lean checker did) or bound
-twice.
+binding the first arm made, and the parameter is refused or bound twice.
 
 ## Done when
 

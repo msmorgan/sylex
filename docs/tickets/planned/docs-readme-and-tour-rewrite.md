@@ -7,8 +7,7 @@ needs: [ci-lean-gate, ci-noncanon-gate, comment-discipline-sweep, engine-verb-id
 ## Why
 
 `README.md` and `docs/guided_tour.md` are the project's public face, and both describe a
-project that no longer exists: the Lean workbench as active, the v1 pipeline as the production
-path, and a chart-parser framing that overstates what parses. A reviewer who follows them hits
+project that no longer exists: the v1 pipeline as the production path, and a chart-parser framing that overstates what parses. A reviewer who follows them hits
 dead ends. They need rewriting together, then checking the way a stranger would use them.
 
 ## Done when

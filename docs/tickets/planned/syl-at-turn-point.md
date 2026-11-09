@@ -23,8 +23,7 @@ current `at` call is a `beginningOf…` event, one wrapped in `nthOccurrence` (*
   triggers and *Paradox Haze* need.
 - `at` takes a turn point, is spelled "At <turn point>, <action>", and expands to the event the
   turn point denotes; there is still one triggered-ability constructor, because the CR treats a
-  step's beginning as a trigger event [CR#603.2b]. Its spelling `TODO` is settled and its stale
-  "Lean keyword" comment is gone.
+  step's beginning as a trigger event [CR#603.2b]. Its spelling `TODO` is settled.
 - `when` and `whenever` refuse a turn point.
 - Every `at` call in builtin and canon, and the delayed-trigger Templates that write "at the
   beginning of the next …" (`atNext`, `beginningOfNext`, `asThoughFlashSacrificedAtCleanup`), use

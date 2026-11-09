@@ -6,12 +6,11 @@ needs: [syl-primitive-constructors]
 
 ## Why
 
-A `subtype` declaration's `kind = spell` is matched as text in `lean/SylGen/Emit.lean`, a word
-that never resolves. Behind it, Lean splits subtypes into `Subtype.of(host)` and `Subtype.spell`,
+A `subtype` declaration's `kind = spell` is a word that never resolves: `cargo xtask dsl check`
+accepts it as text. Behind it is a model that splits subtypes into one host card type or `spell`,
 which models the CR wrongly: each subtype is correlated to card types [CR#205.3c,205.3d], and two
 families are shared, spell types by instants and sorceries [CR#205.3k] and creature types by
-creatures and kindreds [CR#205.3m]. So kindred needs a hardcoded special case in the checker
-(`subsFitLine`, `lean/Semantics/Check/Words.lean`).
+creatures and kindreds [CR#205.3m]. Under that split, kindred needs a special case.
 
 ## Design
 
@@ -26,18 +25,13 @@ creatures and kindreds [CR#205.3m]. So kindred needs a hardcoded special case in
 
 ## Done when
 
-- The `kind = spell` text match in `Emit.lean`, `Subtype.spell` and the kindred special case in
-  `subsFitLine` are deleted.
 - Every word at a subtype's `kind` resolves through a declaration.
-- The validator's mirror is deleted: `cargo xtask dsl check` has no `Kind.text_word` exception
+- `cargo xtask dsl check` has no `Kind.text_word` exception
   (`crates/xtask/src/dsl_check/schema.rs`), so a subtype's `kind` always resolves at its sort.
-- Values change only in each subtype's card-type list: `lake exe dumpValues compare` shows no
-  other changed row, and the landing reports what changed.
-- `cargo xtask lean check`, `cargo xtask dsl fmt --check`, `cargo xtask dsl differential` and
-  `cargo test -p sylex_syl` pass.
+- Only each subtype's `kind` changes, and the landing reports what changed.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 
-`lean/SylGen/Emit.lean` (the `subtype` kind), `lean/Semantics/Check/Words.lean` (`subsFitLine`),
-`plugins/builtin/definitions/subtype/`, `plugins/builtin/definitions/card_type/battle.syl`,
+`crates/xtask/src/dsl_check/schema.rs` (`text_word`), `plugins/builtin/definitions/subtype/`, `plugins/builtin/definitions/card_type/battle.syl`,
 `crates/core/src/type.rs`.

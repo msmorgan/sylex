@@ -8,8 +8,7 @@ needs: [lean-retirement]
 Read order is printed order (`docs/decisions/syl.md` §5): where a declaration's printed order
 differs from its parameter order, the parameters are reordered to match. Several `.syl`
 declarations still differ, and `doIf` carries a `postposed: Bool` flag that says in a boolean what
-the printed order should say. The reorder waits for Lean's deletion because Lean's hand-written
-proofs call the generated definitions positionally.
+the printed order should say.
 
 ## Done when
 

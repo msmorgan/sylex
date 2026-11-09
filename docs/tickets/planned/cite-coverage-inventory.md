@@ -7,10 +7,10 @@ needs: []
 ## Why
 
 `cargo xtask cite coverage --check` fails CI when the set of rules cited at the `Bound` tier
-shrinks below the set in `cr-coverage.lock`. That is a threshold: deleting `lean/` and `v1/` will
-shrink it legitimately, and a floor pushes agents to add citations just to clear it. `Bound` is
-every scanned file outside `docs/` that is not Markdown, so `.lean` files, v1 `.ron` macros and
-the `v1/` crates count as coverage today. Markdown is already only `Mentioned` and stays out of
+shrinks below the set in `cr-coverage.lock`. That is a threshold: deleting `v1/` will shrink it
+legitimately, and a floor pushes agents to add citations just to clear it. `Bound` is every
+scanned file outside `docs/` that is not Markdown, so v1 `.ron` macros and the `v1/` crates count
+as coverage today. Markdown is already only `Mentioned` and stays out of
 the lock.
 
 ## Done when
@@ -31,6 +31,6 @@ the lock.
 
 ## Pointers
 
-- `crates/xtask/src/coverage.rs` (`tier_for_path`, `scan_tree`, `check_ratchet`, `run`),
+- `crates/xtask/src/coverage.rs` (`tier_for_path`, `scan_files`, `check_ratchet`, `run`),
   `crates/xtask/src/cite.rs` (`command_bless`)
 - `cite-config.json`, `cr-coverage.lock`, `.github/workflows/ci.yml`

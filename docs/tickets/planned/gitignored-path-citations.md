@@ -16,14 +16,12 @@ counts the comment already states. Nothing stops a new one from landing.
 - The `frames.rs` comment keeps its fact and drops the dangling path.
 - A standing check (an `xtask` lint run in CI) fails when a tracked file under `crates/`,
   `plugins/`, `v1/` or `scripts/` cites a gitignored path. Code that names such a path as data
-  (the scanner's exclusion list in `crates/xtask/src/coverage.rs`, `scripts/provision-workspace`
-  sharing the ignored directories) is not a citation, and the check tells the two apart without a
+  (`scripts/provision-workspace` sharing the ignored directories) is not a citation, and the check tells the two apart without a
   per-site allowlist.
 - The check passes on the tree.
 
 ## Not in scope
 
-- `lean/`, which cites `docs/evidence/` and is being deleted (`lean-retirement`).
 - Tickets and other docs citing shared local docs.
 
 ## Pointers

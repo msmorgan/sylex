@@ -26,10 +26,6 @@ roll's sides may name planar dice.
 - `cargo xtask cite bless` drops the Planechase rules nothing cites any more; `cargo xtask cite
   check` reports 0 stale and `--list-noncompliant` is empty.
 
-## Not in scope
-
-The Lean files' "Not ported" notes on Planechase sentences: `lean/` is deleted whole.
-
 ## Pointers
 
 - `crates/core/src/mana.rs`, `crates/core/src/action.rs`, `crates/core/src/event.rs`
