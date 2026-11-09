@@ -35,9 +35,7 @@ thiserror = "2.0.19"
 # `[lints] workspace = true`.
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -1 }
-# Every #[allow]/#[expect] must carry a `reason` — makes the stale-suppression
-# rot class (see docs/tickets clippy-suppression-hygiene) unrepresentable going
-# forward, since a reasonless suppression now warns.
+# Every #[allow]/#[expect] must carry a `reason`; a reasonless suppression warns.
 allow_attributes_without_reason = "warn"
 
 [package]
@@ -54,9 +52,6 @@ workspace = true
 
 [dependencies]
 sylex_tui = { version = "0.1.0", path = "crates/tui" }
-ron = "0.12.1"
-serde = { version = "1.0.228", features = ["derive", "rc"] }
-slotmap = { version = "1.1.1", features = ["serde"] }
 
 # `cargo xtask generate` streams the pinned Scryfall Oracle Cards JSONL; `extract`,
 # `graduate`, and `validate` parse/serialize tens of thousands of RON card files
@@ -66,9 +61,8 @@ slotmap = { version = "1.1.1", features = ["serde"] }
 # its `regex-automata`/`regex-syntax`/`aho-corasick`/`memchr` workhorses) — so
 # the tools stay fast to *run* without a release build of the whole tree (the
 # xtask alias uses the dev profile — see .cargo/config.toml). The regex crates
-# carry `resolve`'s per-line parser registry and `extract`'s per-card matching;
-# left unoptimized they were the dominant dev-only penalty (dev `resolve` ran
-# ~5x slower than release). `sha2` and the snapshot/catalog crates carry corpus
+# carry `resolve`'s per-line parser registry and `extract`'s per-card matching.
+# `sha2` and the snapshot/catalog crates carry corpus
 # loading and identity hashing; `syn`/`proc-macro2`/`quote` carry the Rust
 # source parsing and token emission the macro and `map` tooling run. Profile
 # overrides only take effect from the workspace root manifest, which is why
@@ -76,7 +70,7 @@ slotmap = { version = "1.1.1", features = ["serde"] }
 [profile.dev.package.sylex_pipeline_v1]
 opt-level = 2
 
-# Optimize the v4 chart parser, packed forest, and round-trip verification.
+# Optimize the chart parser, packed forest, and round-trip verification.
 [profile.dev.package.sylex_syntax]
 opt-level = 2
 

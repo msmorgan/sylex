@@ -1425,9 +1425,6 @@ dependencies = [
 name = "sylex"
 version = "0.1.0"
 dependencies = [
- "ron",
- "serde",
- "slotmap",
  "sylex_tui",
 ]
 
