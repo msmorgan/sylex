@@ -15,13 +15,19 @@ number"). The first four are one kind of reference, a numeric anaphor, perhaps q
 One primitive (or `thatMuch` with an optional sort) would give them one resolution path in the
 greenfield discourse resolution; keeping them apart may be right if they resolve differently.
 
+## Open questions
+
+- Whether the four readbacks become one primitive, optionally sort-qualified, or stay distinct
+  because they resolve differently; and whether `chosenNumber` joins them.
+
 ## Done when
 
 - The four readbacks (`thatMuch`, `theOutcome`, `groupSize`, `theDifference`) are either one
   primitive, optionally sort-qualified, with the old ones expressed through it or deleted, or stay
   distinct with each doc comment saying why it is not the general one. `chosenNumber` is included
   or its exclusion is stated.
-- The discourse resolution, once it exists, keeps these behaviors for the merged or separate forms:
+- Not checkable until reference resolution exists: resolution keeps these behaviors for the
+  merged or separate forms:
   - bare "that much" / "that many" is refused when two eligible numeric outcomes are in scope, and
     a sort-qualified read ("the life lost this way", "the damage prevented this way", "the
     result") picks by sort;
@@ -29,6 +35,8 @@ greenfield discourse resolution; keeping them apart may be right if they resolve
     disjunction;
   - a group count resolves both a proposed event's group (Divine Visitation) and a completed
     action's group (Woodland Champion).
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

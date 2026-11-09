@@ -17,19 +17,20 @@ gate (`activate.rs`), the state-based statics (`sba.rs`) and the `ForAsLongAs` s
 `todo!` in `condition.rs` at runtime with no earlier signal. No producer emits that shape today, so
 this is hardening.
 
-Two fixes close it, and the owner picks one:
+## Open questions
 
-1. **Restrict where it can appear.** Lowering (or core's types) admits `Crossed` only as a
-   triggered ability's intervening-if condition, so any other position is refused before play.
-2. **Make it self-sufficient.** `Crossed` reads the firing counter-placement fact from history, as
-   `Condition::Happened` does, so it needs no frame channel. This also serves per-member firing
-   when one doubled placement crosses two chapters of a range at once
-   (`docs/tickets/planned/engine-sagas.md`).
+- Which of two fixes closes it:
+  1. **Restrict where it can appear.** Lowering (or core's types) admits `Crossed` only as a
+     triggered ability's intervening-if condition, so any other position is refused before play.
+  2. **Make it self-sufficient.** `Crossed` reads the firing counter-placement fact from history,
+     as `Condition::Happened` does, so it needs no frame channel. This also serves per-member
+     firing when one doubled placement crosses two chapters of a range at once
+     (`docs/tickets/planned/engine-sagas.md`).
 
 ## Done when
 
 - The chosen fix is in, and the `todo!` in `Condition::Crossed`'s arm is unreachable by
-  construction (option 1) or gone (option 2).
+  construction (fix 1) or gone (fix 2).
 - A test shows the chosen behavior for a `Crossed` outside a chapter trigger: refused before play,
   or evaluated correctly.
 - The existing Saga chapter tests pass unchanged.

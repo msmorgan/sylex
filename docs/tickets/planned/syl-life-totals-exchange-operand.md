@@ -16,12 +16,19 @@ Mortality, Profane Transfusion) names both parties as one plural target group; `
 separate amounts. Canon's one user today, Mirror Universe, writes
 `exchangeLifeTotals(youAnd(target(isOpponent)))`.
 
+## Open questions
+
+- Whether `lifeTotals` folds into `values` (or a pairwise form over one group of players), or stays
+  its own operand.
+
 ## Done when
 
 - Either `lifeTotals` is retired, every life-total exchange is written through `values` (or a
   pairwise form over one group of players), and "two target players" stays a single plural target
   group; or `lifeTotals` stays and `exchange.syl`'s doc comment states why.
-- The life-total exchange cards in canon (Mirror Universe today) still read as printed.
+- The life-total exchange cards in canon (Mirror Universe today) keep their printed wording.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 

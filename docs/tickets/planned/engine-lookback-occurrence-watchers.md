@@ -15,16 +15,17 @@ Artist triggers once instead of three times.
 Look-back triggers use "the existence of those abilities and the appearance of objects immediately
 prior to the event" [CR#603.10]. In the [CR#603.10a] example, the artifact's ability "triggers
 twice, even though the artifact goes to its owner's graveyard at the same time as the creatures",
-and Blood Artist's ruling says it triggers for each creature that dies with it. Fixing this
-changes how watchers are assembled, so claiming it opens a design discussion with the owner.
+and Blood Artist's ruling says it triggers for each creature that dies with it.
+
+## Open questions
+
+- The watcher shape: per-fact co-leaver snapshots, or one pre-event watcher image per occurrence
+  used for every look-back class (which also keeps an object that entered in the same batch from
+  seeing a look-back event).
+- How a trigger's look-back class is decided: from its `EventFilter` shape, or by a declared flag.
 
 ## Done when
 
-- The owner has settled the watcher shape: per-fact co-leaver snapshots, or one pre-event watcher
-  image per occurrence used for every look-back class (which also keeps an object that entered in
-  the same batch from seeing a look-back event).
-- The owner has settled how a trigger's look-back class is decided: from its `EventFilter` shape,
-  or by a declared flag.
 - The co-leaver snapshots match only look-back triggers [CR#603.10a..603.10f], and the change
   keeps `batch_fired` (a "one or more" trigger fires once per occurrence, [CR#603.2c]) and the
   `Blocked` dedup in the same loop correct.

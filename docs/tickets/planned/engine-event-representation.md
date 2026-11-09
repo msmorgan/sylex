@@ -19,11 +19,15 @@ beside `Batch(Vec<GameEvent>)` breaks every site that flattens an `Occurrence` i
 to callers. The engine both produces and consumes events, so this needs one whole-pipeline choice
 of representation, made before any code changes.
 
+## Open questions
+
+- The event representation: a uniform `Arc<GameEvent>` end to end, or a `Box`/`Arc` only at the
+  enum boundary with `as_ref()` matching.
+
 ## Done when
 
-- The event representation is chosen (a uniform `Arc<GameEvent>` end to end, or a `Box`/`Arc`
-  only at the enum boundary with `as_ref()` matching) and stated in the doc comment on `GameEvent`
-  or `Occurrence`.
+- The chosen event representation is in, and stated in the doc comment on `GameEvent` or
+  `Occurrence`.
 - The `large_enum_variant` allows on `WorkItem`, `Occurrence`, `StepOutcome` and `Progress` are
   gone, with no new ones added.
 - `cargo clippy --workspace --all-targets -- -D warnings` passes.

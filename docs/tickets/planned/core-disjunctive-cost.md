@@ -15,6 +15,11 @@ questions in a row instead of offering one choice among three outcomes, so they 
 substitute. Whatever shape core gets must keep the [CR#118.12a] reading (the escape is something
 the affected player may do) and make the payer the loop's player, not the ability's controller.
 
+## Open questions
+
+- The shape core gives a cost that is a choice among costs, and how the engine offers the paying
+  player that one decision.
+
 ## Done when
 
 - Core can express a cost that is a choice among costs, as `.syl`'s `or` does, and the engine

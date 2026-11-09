@@ -29,12 +29,13 @@ Single-mechanic result reads are scattered across `Predicate`, `Condition`, `Amo
   with the reason stated.
 - The coin and die reads share one typed result read, or each kept one states why.
   `ignoreOutcomes` [CR#706.6] and `shiftResult` [CR#706.2] stay operations on rolls.
-- The canon cards named above still read as printed.
+- The canon cards named above keep their printed wording.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
 
-Deleting unused primitives for being unused; that is the `.syl` dead-weight
-sweep.
+Deleting unused primitives for being unused: `syl-dead-weight-sweep`.
 
 ## Pointers
 

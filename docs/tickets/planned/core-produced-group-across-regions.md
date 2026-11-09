@@ -17,12 +17,16 @@ on one object, not two clauses of one resolution, and the group wanted here is p
 Rewriting the card as "you sacrifice, then each opponent sacrifices" is not a substitute: the
 choices are made in APNAP order and the sacrifices happen simultaneously [CR#608.2e].
 
+## Open questions
+
+- The shape of a group produced across an enclosed per-player region's iterations, and whether it
+  fits `core.md`'s region laws as they stand or needs an amendment to them.
+
 ## Done when
 
 - Core can represent a group produced across the iterations of an enclosed per-player region so a
   later clause of the same resolution can test membership in it and exclude its members
-  ("another"), consistent with `core.md`'s region laws (or with an amendment to them agreed with
-  the owner).
+  ("another"), consistent with `core.md`'s region laws as they stand or as amended.
 - `crates/engine/tests/region_witnesses.rs`'s
   `deadly_brew_lets_the_caster_rebuy_after_the_table_sacrifices` loses its `#[ignore]` and
   passes, without new syntax in `v1/`: each player sacrifices one of their own, and the caster,

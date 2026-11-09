@@ -23,7 +23,9 @@ unlocking as ending up with both, so two representations of one state sit side b
   spellings.
 - Glassworks // Shattered Yard ("When you unlock this door"), Balemurk Leech ("Whenever you fully
   unlock a Room") and Ghostly Keybearer ("unlock a locked door of up to one target Room you
-  control") still read as printed.
+  control") keep their printed wording.
+- Declaration order stays the printed order (`syl.md` §5).
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 
