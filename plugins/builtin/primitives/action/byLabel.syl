@@ -1,4 +1,4 @@
 # "for <options>", as a vote's choices
-primitive byLabel(options: List(VoteLabel)): Ballot = ByLabel {
+primitive byLabel(options: List(String)): Ballot = ByLabel {
   spelling = "for <options>"
 }

@@ -1,4 +1,4 @@
 # "<cost>" written out as mana symbols
-primitive symbols(cost: ManaCost): ManaCostTerm = Literal {
+primitive symbols(cost: List(ManaSymbol)): ManaCostTerm = Literal {
   spelling = "<cost>"
 }
