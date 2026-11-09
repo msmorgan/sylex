@@ -28,10 +28,3 @@ gate, and its stage's sub-epic needs it unless another ticket in that stage does
   `RING_EXCEPTION`, `TextWord`) is one the CR or the design calls for; any other is fixed in the
   checkpoint's own landing or ticketed, and the landing lists them.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
-
-## Pointers
-
-- Doc comments in Lean syntax: `plugins/builtin/definitions/keyword_action/resolve.syl`.
-- Doc comments naming `firstMention`/`laterMention`:
-  `plugins/builtin/templates/action/{controllerSacrifices,lookAndSortSlice}.syl`,
-  `plugins/builtin/templates/duration/duringNextTurnOf.syl`.

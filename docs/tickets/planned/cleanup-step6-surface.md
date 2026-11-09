@@ -1,5 +1,5 @@
 ---
-needs: [syl-concepts-modeled-twice, syl-each-plural-referent, syl-numeric-anaphors, syl-printed-read-order, syl-spelling-conventions, syl-this-head-template, syl-zone-words]
+needs: [syl-concepts-modeled-twice, syl-each-plural-referent, syl-lean-doc-comments, syl-numeric-anaphors, syl-printed-read-order, syl-spelling-conventions, syl-this-head-template, syl-underscore-file-names, syl-zone-words]
 ---
 
 # Step 6 surface: how `.syl` reads
@@ -22,9 +22,5 @@ Later stages write against it.
 
 ## Pointers
 
-- File names with a trailing underscore: `plugins/builtin/primitives/action/repeat_.syl`,
-  `primitives/noun/by_.syl`, `primitives/predicate/in_.syl`, `primitives/pronoun/this_.syl`,
-  `templates/determiner/exists_.syl`, `definitions/subtype/creature/seal_.syl`,
-  `definitions/subtype/enchantment/class_.syl`.
 - `plugins/builtin/templates/action/{destroyCantRegenerate,destroyPluralCantRegenerate}.syl`: one
   printed sentence pair, twinned by the plurality of its fixed pronoun.
