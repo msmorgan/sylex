@@ -14,12 +14,12 @@ for a bench that no longer exists.
 
 Other tickets decide the fate of declarations this sweep would otherwise delete or fold, so they
 land first: `syl-result-reads` (the coin and die reads with no user),
-`syl-one-declaration-per-keyword` (the unused `partner` and `exchange` variants),
+`syl-one-declaration-per-keyword` (the unused `partner` variants),
 `syl-ability-words-once` (the unused `abilityWord` Template), `syl-this-head-template`
 (`thisClass`, `thisEmblem` and `thisSpacecraft`, unused), `syl-spelling-optional-segments` (the
 `enters…`, `activatedOnly…`, `prevent…` and `defines…` Templates it merges, several unused or used
-once) and `syl-one-deed-per-keyword-action` (`exileFaceDownFrom` and `exileWithCounters`, used once
-each).
+once) and `syl-one-deed-per-keyword-action` (the unused `exchange` variants, and `exileFaceDownFrom`
+and `exileWithCounters`, used once each).
 
 It sweeps after the three middle stages (`cleanup-step6-constructs-and-cards`,
 `cleanup-step6-rules-and-keywords`, `cleanup-step6-deeds`), which still add and remove

@@ -1,20 +1,17 @@
 ---
-needs: [syl-life-totals-exchange-operand, syl-bodiless-keywords, syl-single-face-card-call]
+needs: [syl-bodiless-keywords, syl-single-face-card-call, cleanup-step6-surface]
 ---
 
 # One keyword, one declaration
 
 ## Why
 
-Several keywords are declared many times, once per printed variant: `exchange` six ways
-(`exchangeCards`, `exchangeControl`, `exchangeLifeTotals`, `exchangeTextBoxes`, `exchangeValues`,
-`exchangeZones`, beside `exchange` and `exchangeWith`), `hexproof` and `hexproofFrom`, and
-`partner` with `partnerWith`, `partnerCharacterSelect`, `partnerFatherAndSon`,
+Several keywords are declared many times, once per printed variant: `hexproof` and
+`hexproofFrom`, and `partner` with `partnerWith`, `partnerCharacterSelect`, `partnerFatherAndSon`,
 `partnerFriendsForever`, `partnerSurvivors`, `chooseABackground` and `doctorsCompanion`: the
 partner abilities are partner, partner—[text], partner with [name], choose a Background and
 Doctor's companion [CR#702.124a], and `partner.syl` already lists the last two among its
-variants. The `exchange` variants already share one Deed
-label, `"exchange"`.
+variants.
 
 Six more keyword abilities are declared apart from the keyword they are a variant of, and joined
 to it only by a `label` string naming that keyword: `devourQuality` (devour [CR#702.82c]),
@@ -24,9 +21,10 @@ to it only by a `label` string naming that keyword: `devourQuality` (devour [CR#
 morph cost or a multikicker cost a kicker cost [CR#702.37b,702.33c], and nothing checks that it
 names a keyword.
 
-Two narrower tickets rewrite the same declarations first: `syl-life-totals-exchange-operand`
-(`exchange.syl`, `exchangeLifeTotals.syl`, *Mirror Universe*) and `syl-bodiless-keywords` (the
-seven partner-ability files).
+A narrower ticket rewrites the same declarations first: `syl-bodiless-keywords` (the seven
+partner-ability files).
+
+Written against the surface (`cleanup-step6-surface`).
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
@@ -36,7 +34,7 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 
 ## Done when
 
-- `exchange`, `hexproof`, `partner`, devour, emerge, equip, morph, kicker and cycling are each
+- `hexproof`, `partner`, devour, emerge, equip, morph, kicker and cycling are each
   one Definition; each variant is a Template or an argument over it, keeping its printed wording;
   every caller in `plugins/` is updated.
 - No `ability` declaration carries a `label`, and the `ability` kind has no `label` field
@@ -47,13 +45,12 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 
 ## Not in scope
 
-- The `exile`, `double` and `triple` keyword actions and the other variants that share a Deed
-  label: merging them merges their Deeds, so it is `syl-one-deed-per-keyword-action`.
-- Whether `lifeTotals` folds into `values`: `syl-life-totals-exchange-operand`.
+- The keyword actions declared once per variant under a shared Deed label (`exchange`, `exile`,
+  `double`, `triple` and others): merging them merges their Deeds, so it is
+  `syl-one-deed-per-keyword-action`.
 
 ## Pointers
 
-`plugins/builtin/definitions/keyword_action/exchange*.syl`,
 `plugins/builtin/definitions/keyword_ability/{hexproof,hexproofFrom}.syl`,
 `plugins/builtin/definitions/keyword_ability/{partner*,chooseABackground,doctorsCompanion}.syl`,
 `plugins/builtin/definitions/keyword_ability/{devour,devourQuality,emerge,emergeFrom,equip,equipQuality,morph,megamorph,kicker,multikicker,cycling,typecycling}.syl`,
