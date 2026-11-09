@@ -64,7 +64,8 @@ without card-specific code.
 `cargo xtask dsl check` resolves every reference in the `.syl` bundles by name,
 sort and arity, and refuses a file that names an undeclared word, calls a
 declaration at the wrong sort, or passes the wrong arguments. It reads no
-meaning; the Rust resolution layer replaces it.
+meaning, and is temporary: a Rust resolution layer, not yet written, will replace
+it.
 
 ## Run the whole path
 
