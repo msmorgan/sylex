@@ -1,5 +1,5 @@
 ---
-needs: [lean-v3-monstrosity-adapt-name-the-source, lean-retirement, syl-explicit-deeds, syl-enlist-optional-attack-cost]
+needs: [lean-v3-monstrosity-adapt-name-the-source, lean-retirement, syl-explicit-deeds, syl-enlist-optional-attack-cost, syl-one-declaration-per-keyword]
 ---
 
 # Events for the verbs keyword abilities define
@@ -14,6 +14,9 @@ happened: a creature "evolves" [CR#702.100b], "trains" [CR#702.149c], "exploits 
 verb and no Deed, so "whenever this creature evolves" cannot be written. *Biomancer's Familiar*
 also uses "<creature> adapts", which the CR never defines: [CR#701.46a] defines only the
 instruction "adapt N".
+
+`syl-one-declaration-per-keyword` folds `devourQuality` into `keyword_ability/devour.syl`, which
+this ticket also rewrites, and lands first.
 
 ## Done when
 
