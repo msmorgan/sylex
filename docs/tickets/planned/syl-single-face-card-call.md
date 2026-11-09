@@ -13,8 +13,8 @@ single-faced cards need no respelling.
 
 ## Design
 
-- A card face is its Characteristics: a single-faced card is a call on the card's
-  characteristics, with no `characteristics` record between them.
+- A pure respelling: a single-faced card is written as an explicit call, with no implicit
+  `CardFace` or `characteristics` wrap, and every card value stays the same.
 
 ## Done when
 
