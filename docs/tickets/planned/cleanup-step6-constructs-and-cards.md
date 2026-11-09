@@ -1,5 +1,5 @@
 ---
-needs: [syl-active-player-noun-phrase, syl-balance-family, syl-card-head-noun-sweep, syl-cast-permission-spell-anaphor, syl-colored-mana-spent-count, syl-cross-ability-self-replacement, syl-ice-cauldron-noted-mana, syl-later-ability-acts-before-earlier, syl-life-totals-exchange-operand, syl-lose-control-event, syl-mode-frame-cataphora, syl-replacement-except-nth-event, syl-round-each-time, syl-turn-face-up-spend-cost, syl-unwritable-card-shapes]
+needs: [syl-active-player-noun-phrase, syl-balance-family, syl-card-comment-modeling-choices, syl-card-head-noun-sweep, syl-cast-permission-spell-anaphor, syl-colored-mana-spent-count, syl-cross-ability-self-replacement, syl-engineered-explosives-sunburst, syl-ice-cauldron-noted-mana, syl-later-ability-acts-before-earlier, syl-life-totals-exchange-operand, syl-lose-control-event, syl-mode-frame-cataphora, syl-replacement-except-nth-event, syl-round-each-time, syl-turn-face-up-spend-cost, syl-unwritable-card-shapes]
 ---
 
 # Step 6 middle: constructs and cards
@@ -18,10 +18,3 @@ writes those cards. Later stages write against it.
   hand, or a card comment that describes a deleted Lean check instead of the card's modeling
   choice. Each one found is fixed in the checkpoint's own landing or ticketed, and the landing
   lists them.
-
-## Pointers
-
-- `plugins/canon/cards/Engineered Explosives.syl` writes its sunburst out, though
-  `plugins/builtin/definitions/keyword_ability/sunburst.syl` exists.
-- `plugins/canon/cards/` comments that open "Pins …": *Chance Encounter*, *Cursed Scroll*,
-  *Do or Die*, *Exploration*, *Glaring Spotlight*, *Jace Beleren*, *Mana Leak*, *Tribal Flames*.
