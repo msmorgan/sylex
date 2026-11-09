@@ -1,5 +1,5 @@
 ---
-needs: [syl-tocast-noun-phrase]
+needs: [syl-tocast-noun-phrase, cleanup-step6-syl]
 ---
 # A card a cast permission names is "that spell" to the text after it
 

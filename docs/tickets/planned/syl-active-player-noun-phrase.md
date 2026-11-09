@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface, syl-indirect-phase-out]
 ---
 # A noun phrase for the active player, read by phasing's phase-in
 
@@ -14,6 +14,10 @@ phased out [CR#702.26f]. Then the rule phases it in during the untap step of the
 controlled it as it phased out, and the row waits for its present controller's.
 
 Written against the surface (`cleanup-step6-surface`).
+
+It lands after `syl-indirect-phase-out`: both rewrite the phase-in half of
+`phasingTurnBased.syl` and its header comment, and that ticket changes how a phase-out is
+recorded, which this ticket's lookback reads.
 
 ## Done when
 

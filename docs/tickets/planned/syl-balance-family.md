@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-surface]
+needs: [cleanup-step6-surface, syl-sacrifice-performer-controls]
 ---
 
 # Author Balance and its family in `.syl`
@@ -16,6 +16,9 @@ discards) the rest", repeated per category. The pieces this needs may already ex
 on the rest" per player, nor how "the same way" repeats the instruction for each category.
 
 Written against the surface (`cleanup-step6-surface`).
+
+It lands after `syl-sacrifice-performer-controls`, which limits `sacrifice` to what its
+performer controls, so the family's "sacrifices the rest" is written without restating control.
 
 ## Done when
 
