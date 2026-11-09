@@ -30,11 +30,14 @@ instead of writing the anaphor.
 ## Done when
 
 - Both texts are written in `.syl` with the printed anaphor ("those spells", "that spell") as the
-  argument of the second part's `toCast` purpose, and reference resolution resolves each anaphor
-  to the first part's referent with the right plurality.
-- The second part alone (the spend-mana permission with "those spells" and no permission before
-  it) is refused with an unresolved plural `spell` anaphor.
-- Tests for a performed play or cast and for keyword cast permissions still pass.
+  argument of the second part's `toCast` purpose.
+- That reference resolution resolves each anaphor to the first part's referent with the right
+  plurality is not checkable until reference resolution (step 8) exists.
+- That the second part alone (the spend-mana permission with "those spells" and no permission
+  before it) is refused with an unresolved plural `spell` anaphor is not checkable until
+  reference resolution (step 8) exists.
+- That a performed play or cast and keyword cast permissions still resolve as before is
+  not checkable until reference resolution (step 8) exists.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
