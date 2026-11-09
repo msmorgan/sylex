@@ -12,3 +12,16 @@ writes those cards. Later stages write against it.
 ## Done when
 
 - Every ticket in its `needs:` is in `done/`.
+- A checkpoint pass over `plugins/canon/cards/` and the constructs this stage adds finds card
+  text still bent to fit Lean: a printed ability or keyword written out, copied, reordered or
+  dropped instead of written as printed, a frame copied into each Mode, an anaphor resolved by
+  hand, or a card comment that describes a deleted Lean check instead of the card's modeling
+  choice. Each one found is fixed in the checkpoint's own landing or ticketed, and the landing
+  lists them.
+
+## Pointers
+
+- `plugins/canon/cards/Engineered Explosives.syl` writes its sunburst out, though
+  `plugins/builtin/definitions/keyword_ability/sunburst.syl` exists.
+- `plugins/canon/cards/` comments that open "Pins …": *Chance Encounter*, *Cursed Scroll*,
+  *Do or Die*, *Exploration*, *Glaring Spotlight*, *Jace Beleren*, *Mana Leak*, *Tribal Flames*.

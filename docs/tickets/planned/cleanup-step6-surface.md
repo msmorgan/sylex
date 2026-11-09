@@ -13,3 +13,18 @@ Later stages write against it.
 ## Done when
 
 - Every ticket in its `needs:` is in `done/`.
+- A checkpoint pass over how `plugins/` reads (declaration and file names, `spelling` strings and
+  `TODO(spelling)` markers, argument naming and order, self-references, zone words, plural and
+  numeric referents) finds what is still shaped by Lean: a name bent around a Lean keyword, a
+  spelling or doc comment that carries generated text, a pronoun resolved by hand, or a Template
+  twinned by plurality where discourse should decide. Each one found is fixed in the
+  checkpoint's own landing or ticketed, and the landing lists them.
+
+## Pointers
+
+- File names with a trailing underscore: `plugins/builtin/primitives/action/repeat_.syl`,
+  `primitives/noun/by_.syl`, `primitives/predicate/in_.syl`, `primitives/pronoun/this_.syl`,
+  `templates/determiner/exists_.syl`, `definitions/subtype/creature/seal_.syl`,
+  `definitions/subtype/enchantment/class_.syl`.
+- `plugins/builtin/templates/action/{destroyCantRegenerate,destroyPluralCantRegenerate}.syl`: one
+  printed sentence pair, twinned by the plurality of its fixed pronoun.

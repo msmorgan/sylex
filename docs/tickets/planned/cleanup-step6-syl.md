@@ -18,4 +18,20 @@ gate, and its stage's sub-epic needs it unless another ticket in that stage does
 ## Done when
 
 - Every step-6 ticket is in `done/`.
+- A corpus-wide checkpoint pass over `plugins/` and `crates/xtask/src/dsl_check*` finds every
+  Lean hack the stage checkpoints left: a construct, special case, wrapper, workaround or modeling
+  shortcut there because Lean or its generator needed it, and a doc comment written in Lean
+  syntax or naming a generated wrapper. Each one found is fixed in the checkpoint's own landing or
+  ticketed, and the landing lists them.
+- No "Step 6:" marker remains in `crates/xtask/src/dsl_check/schema.rs`, and each entry left in
+  its provisional tables (`KINDS`, `RECORDS`, `EXPANSION_CONSTRUCTORS`, `UNDECLARED_SORTS`,
+  `RING_EXCEPTION`, `TextWord`) is one the CR or the design calls for; any other is fixed in the
+  checkpoint's own landing or ticketed, and the landing lists them.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
+
+## Pointers
+
+- Doc comments in Lean syntax: `plugins/builtin/definitions/keyword_action/resolve.syl`.
+- Doc comments naming `firstMention`/`laterMention`:
+  `plugins/builtin/templates/action/{controllerSacrifices,lookAndSortSlice}.syl`,
+  `plugins/builtin/templates/duration/duringNextTurnOf.syl`.
