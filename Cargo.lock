@@ -2178,6 +2178,7 @@ dependencies = [
  "sylex_vocabulary",
  "syn 2.0.117",
  "tempfile",
+ "thiserror",
 ]
 
 [[package]]

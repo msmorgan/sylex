@@ -1,4 +1,5 @@
-//! `cargo xtask dsl`: `.syl` tooling. `fmt` lives in [`crate::dsl_fmt`].
+//! `cargo xtask dsl`: `.syl` tooling. `fmt` lives in [`crate::dsl_fmt`] and
+//! `check` in [`crate::dsl_check`].
 //!
 //! `cargo xtask dsl differential` checks that `sylex_syl` and `SylGen`'s
 //! parser (`lean/SylGen/Parser.lean`) read every `plugins/**/*.syl` file
@@ -40,6 +41,9 @@ pub struct DslArgs {
 
 #[derive(Debug, Subcommand)]
 enum DslCmd {
+    /// Check that every reference in the `.syl` bundles resolves by name,
+    /// sort and arity.
+    Check(crate::dsl_check::CheckArgs),
     /// Parse every `plugins` `.syl` file with both `sylex_syl` and
     /// `SylGen`'s parser, and fail on any difference between the trees.
     Differential,
@@ -53,6 +57,7 @@ const DUMP: &str = ".lake/build/syl-parse-dump.json";
 
 pub fn run(args: &DslArgs) -> anyhow::Result<()> {
     match &args.command {
+        DslCmd::Check(args) => crate::dsl_check::run(args),
         DslCmd::Differential => differential(),
         DslCmd::Fmt(args) => crate::dsl_fmt::run(args),
     }
@@ -324,7 +329,7 @@ fn kind_sort(kind: &str) -> Option<&'static str> {
 
 /// `SylGen`'s `printedName`: a card's name, its face names joined with `" //
 /// "`.
-fn printed_name(card: &Value) -> Result<String, String> {
+pub(crate) fn printed_name(card: &Value) -> Result<String, String> {
     let record = match &card.kind {
         // Temporary: a record card mirrors the loader's single-face shorthand;
         // `syl-single-face-card-call` deletes both.
