@@ -26,7 +26,7 @@ define.
 ## Open questions
 
 - Whether `permanentType` is required or defaulted.
-- The exact new name for `byCardClass`.
+- The new name for `byCardClass`; it is not `byPermanentType`.
 
 ## Done when
 

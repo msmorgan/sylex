@@ -18,17 +18,13 @@ nothing tells a reader which parameter a positional argument fills.
 - A required argument is passed positionally and binds the next unbound required parameter, in
   declaration order, even when an optional parameter is declared before it.
 - A defaulted argument is passed by name.
-- A named argument whose written value equals the parameter's declared default is linted.
-
-## Open questions
-
-- Whether that lint is a hard refusal or only a warning.
+- A named argument whose written value equals the parameter's declared default is refused.
 
 ## Done when
 
 - `cargo xtask dsl check` binds positional arguments only to required parameters, refuses a named
-  required argument and a positional defaulted one, and lints a named argument equal to its
-  default as settled; each has a negative test.
+  required argument, a positional defaulted one, and a named argument equal to its declared
+  default; each refusal has a negative test.
 - Every call in `plugins/` follows the rule, with no named argument equal to its default.
 - The respelled corpus means the same: a one-off script, kept in `docs/evidence/`, checks that
   every call binds the same parameter-to-value map before and after (counting an omitted default

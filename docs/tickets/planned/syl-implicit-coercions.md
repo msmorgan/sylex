@@ -1,5 +1,5 @@
 ---
-needs: [syl-primitive-constructors]
+needs: [syl-primitive-constructors, syl-single-face-card-call, syl-argument-naming, syl-printed-read-order, syl-sort-prefixed-primitive-names]
 ---
 
 # Declared implicit wrapping in `.syl`
@@ -11,6 +11,8 @@ a value of one sort reaches a position of another only through a wrapper written
 site. Colors and integers in a mana cost, integers at `Amount`, and a Definition's name as its
 keyword term are all wrapped by hand, so `cost = [1, blue, blue]` no longer reads as printed.
 `syl.md` §2 leaves room for coercions to return deliberately once the language is simple enough.
+It comes late in step 6: it is an ergonomics change, and implicit conversions would make the
+rewrite tickets it waits on harder to reason about.
 
 ## Open questions
 
