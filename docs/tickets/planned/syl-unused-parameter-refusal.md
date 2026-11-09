@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-craft-materials, syl-companion-pregame-rule, syl-bodiless-keywords]
 ---
 
 # Refuse a parameter its declaration never reads
@@ -9,6 +9,10 @@ needs: []
 A declaration with a body (`template`, `action`, `ability`, `ability_word`) may declare a
 parameter its body never reads with `$name`, and `cargo xtask dsl check` accepts it. A parameter
 nothing reads is a bug: the caller's argument is dropped silently.
+
+Four declarations have an unread parameter today: `craft`'s `cost`, `companion`'s `condition`,
+`bandsWithOther`'s `quality` and `toxic`'s `amount`. `syl-craft-materials`,
+`syl-companion-pregame-rule` and `syl-bodiless-keywords` rewrite those files, and land first.
 
 ## Design
 

@@ -1,5 +1,5 @@
 ---
-needs: [lean-generated-canon-modules, lean-retirement]
+needs: [lean-generated-canon-modules, lean-retirement, syl-action-to-verb]
 ---
 
 # A condition-first static: "As long as <condition>, <spec>"
@@ -13,6 +13,9 @@ Cub*: "As long as this creature has three or more +1/+1 counters on it, it has f
 Company*) cannot be written in printed order. Written with `onlyWhile`, the static is read before
 the condition, so the round trip breaks and the static's "it" is read before the condition that
 introduces its antecedent. `Angelic Cub.syl` therefore carries only its triggered ability.
+
+*Guardian Beast*'s static is also rewritten by `syl-action-to-verb` (its `retention`), which lands
+first.
 
 ## Done when
 

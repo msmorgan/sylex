@@ -1,5 +1,5 @@
 ---
-needs: [syl-printed-it-self-references]
+needs: [syl-printed-it-self-references, syl-argument-naming, syl-condition-first-static, syl-lookback-point-from-trigger]
 ---
 
 # One `this(head)` Template replaces the 21 `this<Head>` Templates
@@ -13,6 +13,11 @@ primitive (`plugins/builtin/primitives/pronoun/this_.syl`). Three have no caller
 mix `thisSpell`, `thisPermanent` and bare `this` for the same printed words.
 It lands after `syl-printed-it-self-references`, which rewrites about 99 of the same call sites
 to `it`, so those sites are rewritten once and the two tickets never edit them in parallel.
+
+Its `this<Head>` sites also sit in calls three tickets rewrite first: `syl-argument-naming`
+(83 arguments it names or unnames, in 79 files), `syl-condition-first-static` (the
+condition-first statics, such as *Guardian Beast*'s `is(thisCreature, isUntapped)`) and
+`syl-lookback-point-from-trigger` (3 `move` calls, such as `aura.syl`'s, that drop `at`).
 
 ## Open questions
 

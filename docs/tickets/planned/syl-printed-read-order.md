@@ -1,5 +1,5 @@
 ---
-needs: [lean-retirement, syl-argument-naming]
+needs: [lean-retirement, syl-argument-naming, syl-sort-prefixed-primitive-names, syl-at-turn-point, syl-spelling-optional-segments, syl-enlist-optional-attack-cost]
 ---
 # Make every declaration's read order its printed order, and drop `doIf`'s `postposed`
 
@@ -11,6 +11,15 @@ declarations still differ, and `doIf` carries a `postposed: Bool` flag that says
 the printed order should say. Reordering puts some required parameters after optional ones;
 under `syl-argument-naming`'s rule a positional argument binds only required parameters, so those
 call sites need no naming.
+
+The same sites are rewritten by four other tickets, which land first:
+`syl-sort-prefixed-primitive-names` renames the `actionPay`, `actionRemoveCounters` and
+`actionVote` calls inside the `pay`, `removeCounters` and `vote` declarations (10 calls) that this
+ticket reorders; `syl-at-turn-point` changes `at.syl`'s event parameter;
+`syl-spelling-optional-segments` merges the `preventAll`, `preventAllBy` and `preventNext`
+Templates whose `preventDamage` calls this ticket reorders (3 files); and
+`syl-enlist-optional-attack-cost` gives `gatedBy` and `staticSpecGatedBy` their offered form
+(2 files).
 
 ## Done when
 

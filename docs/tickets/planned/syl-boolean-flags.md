@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-result-reads]
 ---
 
 # No meaning carried by a `Bool` parameter
@@ -11,6 +11,9 @@ Several declarations say in a `Bool` what a typed construct or a separate declar
 `copyCharacteristics`, `voteLead(label, orTied: Bool)`, `bySymbols(…, coloredOnly: Bool)` and
 `lessBySymbols`, `whenSpentOn`'s `only`, `asCopyOf`'s `optional`, and `blocked(value: Bool)`. A
 call such as `addedCost(cost, true)` can't be read without the declaration.
+
+`syl-result-reads` decides whether `voteLead` stays, rewriting the same 6 calls in 3 files, and
+lands first.
 
 ## Done when
 

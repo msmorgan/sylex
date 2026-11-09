@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-data-language, lean-retirement]
+needs: [plugins-v3-data-language, lean-retirement, syl-event-disjunction]
 ---
 
 # `at` takes a turn point; `when` and `whenever` take an event
@@ -15,6 +15,9 @@ wording (`docs/oracle-style-guide.md`, "Use **When** for a discrete event"). "At
 in the turn: "at the beginning of" a phase or step triggers when it begins [CR#603.2b]. Every
 current `at` call is a `beginningOf…` event, one wrapped in `nthOccurrence` (*Paradox Haze*,
 "first upkeep each turn").
+
+`at.syl`'s parameter list is also rewritten by `syl-event-disjunction` (its `or` and `joins`
+parameters), which lands first.
 
 ## Done when
 

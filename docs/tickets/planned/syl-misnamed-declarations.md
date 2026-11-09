@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-argument-naming]
 ---
 
 # Declarations whose name or spelling says something else
@@ -12,6 +12,8 @@ Three declarations are named or spelled for one use rather than for what they bu
   regenerated", though it is any rider that modifies the action before it [CR#608.2c].
 - `thisObject` at `LookbackSpan` (`primitives/timing/`) is spelled "spells you cast".
 - `splitOverPermanent` (`templates/pronoun/`) is spelled "any target".
+
+`syl-argument-naming` rewrites 4 arguments that hold these declarations' calls, and lands first.
 
 ## Done when
 

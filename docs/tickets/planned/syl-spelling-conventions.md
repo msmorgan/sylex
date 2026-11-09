@@ -1,5 +1,5 @@
 ---
-needs: [syl-parameter-sigil, lean-retirement]
+needs: [syl-parameter-sigil, lean-retirement, syl-spelling-optional-segments, syl-misnamed-declarations]
 ---
 
 # Settle the `spelling` conventions and apply them to the corpus
@@ -9,6 +9,10 @@ needs: [syl-parameter-sigil, lean-retirement]
 `spelling` strings are to be parsed through the English grammar with typed holes, but
 today they inflect verbs inconsistently, and 151 `TODO(spelling)` markers stand where a spelling
 is missing, many carrying generated text instead of a reason.
+
+Two narrower tickets rewrite spellings this ticket also normalizes, and land first:
+`syl-spelling-optional-segments` (the merged `enters…`, `activatedOnly…`, `prevent…` and
+`defines…` Templates) and `syl-misnamed-declarations` (three declarations' spellings).
 
 ## Design
 

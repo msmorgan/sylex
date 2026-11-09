@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-at-turn-point]
 ---
 
 # Spellings with optional and repeated parts
@@ -11,6 +11,8 @@ list entry, so 151 `TODO(spelling)` markers stand where a spelling needs one (re
 claimed; `putInto`'s "Omit the origin phrase when from is anywhere" is typical). Without it,
 wordings that differ only by such a part become near-duplicate Template families: `enters…`,
 `activatedOnly…`, `prevent…`, `defines…`.
+
+`at.syl`'s spelling `TODO` is also settled by `syl-at-turn-point`, which lands first.
 
 ## Open questions
 

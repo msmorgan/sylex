@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-life-totals-exchange-operand, syl-bodiless-keywords]
 ---
 
 # One keyword, one declaration
@@ -15,6 +15,10 @@ partner abilities are partner, partner—[text], partner with [name], choose a B
 Doctor's companion [CR#702.124a], and `partner.syl` already lists the last two among its
 variants. The `exchange` variants already share one Deed
 label, `"exchange"`.
+
+Two narrower tickets rewrite the same declarations first: `syl-life-totals-exchange-operand`
+(`exchange.syl`, `exchangeLifeTotals.syl`, *Mirror Universe*) and `syl-bodiless-keywords` (the
+seven partner-ability files).
 
 ## Design
 

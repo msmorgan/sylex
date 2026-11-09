@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-data-language, lean-retirement]
+needs: [plugins-v3-data-language, lean-retirement, syl-argument-naming]
 ---
 
 # Remove the remaining sort-prefixed primitive names
@@ -12,6 +12,9 @@ Twelve primitives carry their sort as a name prefix: `actionSearch`, `actionShuf
 Each prefix works around a collision: the plain name is taken by a keyword action or a Template
 at the same sort, and resolution by `(name, sort)` (`syl.md` §3) cannot tell them apart. A
 prefix is not a word Oracle text uses, so it misnames the primitive.
+
+`syl-argument-naming` names an argument that holds one of these calls (an `establish`
+argument), and lands first.
 
 ## Done when
 

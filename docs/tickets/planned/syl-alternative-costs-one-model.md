@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [syl-boolean-flags]
 ---
 
 # Alternative and additional costs modeled one way
@@ -15,6 +15,8 @@ zone the card can be cast from [CR#702.74a,702.103a], and dash's while the card 
 [CR#702.109a]. And `foretoldCardLook.syl` leaves a foretold card's cast
 for its foretell cost [CR#702.143d] unwritten, saying no cost term names a keyword's cost, though
 `usingKeyword` exists.
+
+`syl-boolean-flags` rewrites the same 17 `addedCost` calls (its `offered` flag) and lands first.
 
 ## Done when
 
