@@ -1,5 +1,5 @@
 ---
-needs: [syl-concepts-modeled-twice, syl-core-deeds-out-of-keyword-actions, syl-each-plural-referent, syl-numeric-anaphors, syl-printed-read-order, syl-pronoun-swallowing-templates, syl-spelling-conventions, syl-this-head-template, syl-zone-words]
+needs: [syl-become-replaces-types, syl-concepts-modeled-twice, syl-core-deeds-out-of-keyword-actions, syl-each-plural-referent, syl-numeric-anaphors, syl-printed-read-order, syl-pronoun-swallowing-templates, syl-spelling-conventions, syl-this-head-template, syl-zone-words]
 ---
 
 # Step 6 surface: how `.syl` reads
