@@ -16,10 +16,10 @@ use crate::tree::Declaration;
 use crate::tree::Entry;
 use crate::tree::Field;
 use crate::tree::File;
+use crate::tree::Header;
 use crate::tree::Item;
 use crate::tree::METADATA_FIELDS;
 use crate::tree::Name;
-use crate::tree::NamedShape;
 use crate::tree::Param;
 use crate::tree::Record;
 use crate::tree::Shape;
@@ -64,7 +64,9 @@ struct Parser<'t> {
 }
 
 fn is_capitalized(name: Name) -> bool {
-    name.ident.as_str().starts_with(|c: char| c.is_ascii_uppercase())
+    name.ident
+        .as_str()
+        .starts_with(|c: char| c.is_ascii_uppercase())
 }
 
 fn comment_item<T>((comment, blank_line_before): (Comment, bool)) -> Item<T> {
@@ -253,16 +255,25 @@ impl Parser<'_> {
 
     fn declaration(&mut self) -> Result<Declaration> {
         let kind = self.lowercase_word("a declaration")?;
-        let shape = if self.named_header_follows() {
-            Shape::Named(self.named_shape()?)
+        let shape = if self.nameless_header_follows() {
+            Shape::Header(self.header(None)?)
+        } else if self.named_header_follows() {
+            let name = self.lowercase_word("a declaration name")?;
+            Shape::Header(self.header(Some(name))?)
         } else {
-            Shape::Nameless(self.value()?)
+            Shape::Value(self.value()?)
         };
         Ok(Declaration {
             kind,
             shape,
             span: self.span_from(kind.span),
         })
+    }
+
+    /// Whether the tokens after a kind word start a header with no name: a
+    /// `(` or a `:`, which no value starts with.
+    fn nameless_header_follows(&self) -> bool {
+        matches!(self.peek().kind, TokenKind::LParen | TokenKind::Colon)
     }
 
     /// Whether the tokens after a kind word start a named header: a word
@@ -289,8 +300,9 @@ impl Parser<'_> {
         }
     }
 
-    fn named_shape(&mut self) -> Result<NamedShape> {
-        let name = self.lowercase_word("a declaration name")?;
+    /// The header after its name, if any.
+    fn header(&mut self, name: Option<Name>) -> Result<Header> {
+        let start = name.map_or_else(|| self.peek().span, |name| name.span);
         let params = if self.at(&TokenKind::LParen) {
             let open = self.bump().span;
             let params = self.sequence(&TokenKind::RParen, "',' or ')'", Self::param)?;
@@ -329,13 +341,13 @@ impl Parser<'_> {
         } else {
             None
         };
-        Ok(NamedShape {
+        Ok(Header {
             name,
             params,
             sort,
             constructor,
             body,
-            span: self.span_from(name.span),
+            span: self.span_from(start),
         })
     }
 

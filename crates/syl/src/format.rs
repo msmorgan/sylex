@@ -380,37 +380,43 @@ impl Printer<'_> {
     }
 
     fn declaration(&mut self, declaration: &Declaration) {
-        self.text(&format!("{} ", declaration.kind.ident));
+        self.text(declaration.kind.ident.as_str());
         match &declaration.shape {
-            Shape::Nameless(Value {
+            Shape::Value(Value {
                 kind: ValueKind::Record(record),
                 ..
-            }) => self.body(record),
-            Shape::Nameless(value) => {
+            }) => {
+                self.text(" ");
+                self.body(record);
+            }
+            Shape::Value(value) => {
+                self.text(" ");
                 let layout = self.builder().value(value);
                 self.layout(&layout, 0, 0);
             }
-            Shape::Named(named) => {
-                self.text(named.name.ident.as_str());
+            Shape::Header(header) => {
+                if let Some(name) = header.name {
+                    self.text(&format!(" {}", name.ident));
+                }
                 let mut rest = String::new();
-                if let Some(sort_ref) = &named.sort {
+                if let Some(sort_ref) = &header.sort {
                     let _ = write!(rest, ": {}", sort(sort_ref));
                 }
-                if let Some(constructor) = named.constructor {
+                if let Some(constructor) = header.constructor {
                     let _ = write!(rest, " = {}", constructor.ident);
                 }
-                if named.body.is_some() {
+                if header.body.is_some() {
                     rest.push(' ');
                 }
-                if !named.params.is_empty() {
+                if !header.params.is_empty() {
                     let builder = self.builder();
-                    let elements = elements(&named.params, |p| builder.param(p));
+                    let elements = elements(&header.params, |p| builder.param(p));
                     let layout = builder.seq(SeqKind::Params, "(".to_owned(), elements);
-                    let suffix = width(&rest) + usize::from(named.body.is_some());
+                    let suffix = width(&rest) + usize::from(header.body.is_some());
                     self.layout(&layout, 0, suffix);
                 }
                 self.text(&rest);
-                if let Some(body) = &named.body {
+                if let Some(body) = &header.body {
                     self.body(body);
                 }
             }

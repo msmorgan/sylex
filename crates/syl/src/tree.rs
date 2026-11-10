@@ -112,7 +112,7 @@ pub struct Name {
     pub span: Span,
 }
 
-/// A declaration: its kind word, followed by either a named header or a single
+/// A declaration: its kind word, followed by either a header or a single
 /// value.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Declaration {
@@ -127,16 +127,20 @@ pub struct Declaration {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Shape {
     /// `kind name(params): Sort = Constructor { fields }`, every part after
-    /// the name optional.
-    Named(NamedShape),
-    /// `kind value`, such as `card singleFaced({ ... })` or `card split({ ... })`.
-    Nameless(Value),
+    /// the name optional, or the same with no name, `kind(params): Sort {
+    /// fields }`.
+    Header(Header),
+    /// `kind value`, such as `card singleFaced({ ... })` or `card split({ ...
+    /// })`.
+    Value(Value),
 }
 
-/// The parts of a named declaration.
+/// The parts of a declaration's header.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NamedShape {
-    pub name: Name,
+pub struct Header {
+    /// `None` for a header written without a name, which starts at its `(` or
+    /// `:`.
+    pub name: Option<Name>,
     /// Empty when no parameter list is written.
     pub params: Vec<Item<Param>>,
     /// The sort after `:`.
@@ -145,7 +149,7 @@ pub struct NamedShape {
     pub constructor: Option<Name>,
     /// The `{ ... }` block.
     pub body: Option<Record>,
-    /// From the name through the last part written.
+    /// From the name, or the first part written, through the last part.
     pub span: Span,
 }
 

@@ -6,12 +6,12 @@
 //!
 //! - a primitive without a sort or a constructor clause, and a constructor
 //!   clause on any other kind of declaration;
-//! - two primitives for one constructor, that is, for the same constructor
-//!   name at the same result sort;
+//! - two primitives for one constructor, that is, for the same constructor name
+//!   at the same result sort;
 //! - a word that names no declaration. A word is checked by name only: which
 //!   declaration of that name it reaches depends on the expected sort, which
-//!   this crate does not know. `none` is the language's own word for an
-//!   omitted optional value and names no declaration.
+//!   this crate does not know. `none` is the language's own word for an omitted
+//!   optional value and names no declaration.
 //!
 //! Words inside the metadata fields `lexical` and `spelling` are frames and
 //! spelling, not meaning, so they are not checked.
@@ -54,10 +54,10 @@ pub enum RefusalKind {
     MissingSort(String),
     #[error("a primitive is written with a name")]
     NamelessPrimitive,
-    #[error("only a primitive names a constructor; `{kind} {name}` names `{constructor}`")]
+    #[error("only a primitive names a constructor; `{declaration}` names `{constructor}`")]
     ConstructorOutsidePrimitive {
-        kind: String,
-        name: String,
+        /// The kind word and, when the header writes one, the name.
+        declaration: String,
         constructor: String,
     },
     #[error("primitives `{first}` and `{second}` both name constructor `{constructor}` at {sort}")]
@@ -99,8 +99,8 @@ pub fn check(bundles: &[&Bundle]) -> Result<(), CheckError> {
     };
     let declared: BTreeSet<Ident> = declarations()
         .filter_map(|declaration| match &declaration.shape {
-            Shape::Named(named) => Some(named.name.ident),
-            Shape::Nameless(_) => None,
+            Shape::Header(header) => header.name.map(|name| name.ident),
+            Shape::Value(_) => None,
         })
         .collect();
     let mut refusals = Vec::new();
@@ -112,14 +112,14 @@ pub fn check(bundles: &[&Bundle]) -> Result<(), CheckError> {
             refusals: &mut refusals,
         };
         match &declaration.shape {
-            Shape::Nameless(value) => words.value(value),
-            Shape::Named(named) => {
-                for param in named.params.iter().filter_map(Item::node) {
+            Shape::Value(value) => words.value(value),
+            Shape::Header(header) => {
+                for param in header.params.iter().filter_map(Item::node) {
                     if let Some(default) = &param.default {
                         words.value(default);
                     }
                 }
-                if let Some(body) = &named.body {
+                if let Some(body) = &header.body {
                     words.fields(&body.fields);
                 }
             }
@@ -149,39 +149,52 @@ fn constructor_clause(
     refusals: &mut Vec<Refusal>,
 ) {
     let kind = declaration.kind.ident;
-    let Shape::Named(named) = &declaration.shape else {
-        if kind == PRIMITIVE {
-            refusals.push(Refusal {
-                span: declaration.span,
-                kind: RefusalKind::NamelessPrimitive,
-            });
+    let header = match &declaration.shape {
+        Shape::Header(header) => header,
+        Shape::Value(_) => {
+            if kind == PRIMITIVE {
+                refusals.push(Refusal {
+                    span: declaration.span,
+                    kind: RefusalKind::NamelessPrimitive,
+                });
+            }
+            return;
         }
-        return;
     };
-    let name = named.name.ident;
     if kind != PRIMITIVE {
-        if let Some(constructor) = named.constructor {
+        if let Some(constructor) = header.constructor {
+            let declaration = match header.name {
+                Some(name) => format!("{kind} {}", name.ident),
+                None => kind.as_str().to_owned(),
+            };
             refusals.push(Refusal {
                 span: constructor.span,
                 kind: RefusalKind::ConstructorOutsidePrimitive {
-                    kind: kind.as_str().to_owned(),
-                    name: name.as_str().to_owned(),
+                    declaration,
                     constructor: constructor.ident.as_str().to_owned(),
                 },
             });
         }
         return;
     }
-    let Some(sort) = &named.sort else {
+    let Some(name) = header.name else {
         refusals.push(Refusal {
-            span: named.span,
+            span: declaration.span,
+            kind: RefusalKind::NamelessPrimitive,
+        });
+        return;
+    };
+    let name = name.ident;
+    let Some(sort) = &header.sort else {
+        refusals.push(Refusal {
+            span: header.span,
             kind: RefusalKind::MissingSort(name.as_str().to_owned()),
         });
         return;
     };
-    let Some(constructor) = named.constructor else {
+    let Some(constructor) = header.constructor else {
         refusals.push(Refusal {
-            span: named.span,
+            span: header.span,
             kind: RefusalKind::MissingConstructor(name.as_str().to_owned()),
         });
         return;

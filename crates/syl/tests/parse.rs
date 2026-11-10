@@ -89,9 +89,12 @@ fn render(file: &File) -> String {
             let text = match &item.entry {
                 Entry::Comment(c) => format!("#{}", c.text),
                 Entry::Node(d) => match &d.shape {
-                    Shape::Nameless(v) => format!("{} <{}>", d.kind.ident, value(v)),
-                    Shape::Named(n) => {
-                        let mut out = format!("{} {}", d.kind.ident, n.name.ident);
+                    Shape::Value(v) => format!("{} <{}>", d.kind.ident, value(v)),
+                    Shape::Header(n) => {
+                        let mut out = d.kind.ident.to_string();
+                        if let Some(name) = n.name {
+                            let _ = write!(out, " {}", name.ident);
+                        }
                         if !n.params.is_empty() {
                             let params = items(&n.params, |p| match &p.default {
                                 Some(v) => {
@@ -195,7 +198,25 @@ fn shape_does_not_depend_on_kind_word() {
     check("template f(x = y)", "template <f(x = y)>");
 }
 
-// --- nameless header ------------------------------------------------------
+// --- header without a name ----------------------------------------------
+
+#[test]
+fn a_header_may_omit_its_name() {
+    check(
+        "coercion(type: CardType): NounWord { body = type($type) }",
+        "coercion(type: CardType): NounWord {body = type($type)}",
+    );
+    check("coercion: X", "coercion: X");
+    let source = "coercion(a: A): X";
+    let file = ok(source);
+    let Shape::Header(header) = &file.declarations().next().unwrap().shape else {
+        panic!("a header");
+    };
+    assert_eq!(header.name, None);
+    assert_eq!(header.span.text(source), "(a: A): X");
+}
+
+// --- value shape ----------------------------------------------------------
 
 #[test]
 fn nameless_record() {
@@ -249,7 +270,7 @@ fn parameter_references_are_values() {
 fn parameter_reference_span_includes_the_sigil() {
     let source = "template t(a: X): X { body = f( $amount ) }";
     let file = ok(source);
-    let Shape::Named(named) = &file.declarations().next().unwrap().shape else {
+    let Shape::Header(named) = &file.declarations().next().unwrap().shape else {
         panic!("expected a named declaration");
     };
     let body = &named.body.as_ref().unwrap().nodes().next().unwrap().value;
@@ -350,7 +371,7 @@ fn negative_and_extreme_integers() {
 #[test]
 fn string_escapes_are_unescaped() {
     let file = ok(r#"template t: X { body = "say \"hi\" \\ bye" }"#);
-    let Shape::Named(named) = &file.declarations().next().unwrap().shape else {
+    let Shape::Header(named) = &file.declarations().next().unwrap().shape else {
         panic!("named");
     };
     let field = named.body.as_ref().unwrap().nodes().next().unwrap();
@@ -391,7 +412,7 @@ fn empty_list_and_record() {
 #[test]
 fn sorts_nest() {
     let file = ok("primitive p(a: Option(List(Cost)), b: Pair(A, B)): X");
-    let Shape::Named(named) = &file.declarations().next().unwrap().shape else {
+    let Shape::Header(named) = &file.declarations().next().unwrap().shape else {
         panic!("named");
     };
     let params: Vec<_> = named.params.iter().filter_map(Item::node).collect();
@@ -459,15 +480,31 @@ fn a_constructor_clause_is_a_capitalized_word_without_a_dot() {
 fn capitalized_words_outside_sorts_and_constructor_clauses_are_errors() {
     let capitalized = |word: &str| ErrorKind::CapitalizedWord(word.to_owned());
     check_err("Card { a = b }", &capitalized("Card"), "Card");
-    check_err("primitive Power: Stat = Power", &capitalized("Power"), "Power");
+    check_err(
+        "primitive Power: Stat = Power",
+        &capitalized("Power"),
+        "Power",
+    );
     check_err("template t(X: A): B", &capitalized("X"), "X");
     check_err("template t: B { Body = a }", &capitalized("Body"), "Body");
-    check_err("template t: B { body = Power }", &capitalized("Power"), "Power");
-    check_err("template t: B { body = f(Power) }", &capitalized("Power"), "Power");
+    check_err(
+        "template t: B { body = Power }",
+        &capitalized("Power"),
+        "Power",
+    );
+    check_err(
+        "template t: B { body = f(Power) }",
+        &capitalized("Power"),
+        "Power",
+    );
     check_err("template t: B { body = f(X = a) }", &capitalized("X"), "X");
     check_err("template t(x: A): B { body = $X }", &capitalized("X"), "$X");
     check_err("template t(x: A = B): B", &capitalized("B"), "B");
-    check_err("card { text = [Activated] }", &capitalized("Activated"), "Activated");
+    check_err(
+        "card { text = [Activated] }",
+        &capitalized("Activated"),
+        "Activated",
+    );
 }
 
 #[test]
@@ -679,13 +716,13 @@ fn spans_cover_their_nodes() {
     assert!(declaration.span.text(source).starts_with("template t("));
     assert!(declaration.span.text(source).ends_with("2),\n}"));
     assert_eq!(declaration.kind.span.text(source), "template");
-    let Shape::Named(named) = &declaration.shape else { panic!("named") };
-    assert_eq!(named.name.span.text(source), "t");
+    let Shape::Header(named) = &declaration.shape else { panic!("named") };
+    assert_eq!(named.name.unwrap().span.text(source), "t");
     assert!(named.span.text(source).starts_with("t(a: "));
     assert!(named.span.text(source).ends_with("2),\n}"));
     assert_eq!(named.span.end, declaration.span.end);
     let bare = ok("primitive p(a: A): X = C\n# after\n");
-    let Shape::Named(bare) = &bare.declarations().next().unwrap().shape else {
+    let Shape::Header(bare) = &bare.declarations().next().unwrap().shape else {
         panic!("named")
     };
     assert_eq!(

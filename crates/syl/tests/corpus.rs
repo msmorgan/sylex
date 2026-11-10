@@ -1,4 +1,5 @@
-//! Every `.syl` file under `plugins/` parses, and the plugins pass the declaration checks.
+//! Every `.syl` file under `plugins/` parses, and the plugins pass the
+//! declaration checks.
 
 use std::path::Path;
 use std::path::PathBuf;
@@ -37,8 +38,8 @@ fn value_comments(value: &Value) -> usize {
 
 fn file_comments(file: &File) -> usize {
     count_items(&file.items, |d| match &d.shape {
-        Shape::Nameless(value) => value_comments(value),
-        Shape::Named(named) => {
+        Shape::Value(value) => value_comments(value),
+        Shape::Header(named) => {
             count_items(&named.params, |p| {
                 p.default.as_ref().map_or(0, value_comments)
             }) + named
@@ -83,7 +84,7 @@ fn every_plugins_file_parses() {
                 for declaration in file.declarations() {
                     assert_eq!(
                         declaration.kind.ident == "card",
-                        matches!(declaration.shape, Shape::Nameless(_)),
+                        matches!(declaration.shape, Shape::Value(_)),
                         "{}: wrong shape for `{}`",
                         path.display(),
                         declaration.kind.ident

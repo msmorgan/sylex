@@ -44,7 +44,10 @@ fn a_primitive_with_a_constructor_clause_and_known_words_passes() {
             "t.syl",
             "template itsPower: Amount { body = stat(power), lexical = Frame(unknownWord) }",
         ),
-        ("o.syl", "template maybe(x: Option(Stat) = none): Amount { body = stat(power) }"),
+        (
+            "o.syl",
+            "template maybe(x: Option(Stat) = none): Amount { body = stat(power) }",
+        ),
     ];
     assert_eq!(refusals(&sources), []);
 }
@@ -83,13 +86,37 @@ fn a_nameless_primitive_is_refused() {
 }
 
 #[test]
+fn a_nameless_header_primitive_is_refused() {
+    assert_eq!(
+        refusals(&[("p.syl", "primitive(a: A): X = C")]),
+        [(
+            RefusalKind::NamelessPrimitive,
+            "primitive(a: A): X = C".to_owned()
+        )]
+    );
+}
+
+#[test]
+fn a_constructor_clause_on_a_nameless_header_is_refused() {
+    assert_eq!(
+        refusals(&[("c.syl", "coercion(a: A): X = C")]),
+        [(
+            RefusalKind::ConstructorOutsidePrimitive {
+                declaration: "coercion".to_owned(),
+                constructor: "C".to_owned(),
+            },
+            "C".to_owned()
+        )]
+    );
+}
+
+#[test]
 fn a_constructor_clause_outside_a_primitive_is_refused() {
     assert_eq!(
         refusals(&[("t.syl", "template power: Stat = Power")]),
         [(
             RefusalKind::ConstructorOutsidePrimitive {
-                kind: "template".to_owned(),
-                name: "power".to_owned(),
+                declaration: "template power".to_owned(),
                 constructor: "Power".to_owned(),
             },
             "Power".to_owned()
@@ -121,7 +148,10 @@ fn one_constructor_name_at_two_sorts_is_two_constructors() {
     assert_eq!(
         refusals(&[
             ("a.syl", "primitive up(by: Amount): Delta(Amount) = Up"),
-            ("b.syl", "primitive upCost(by: ManaCostTerm): Delta(ManaCostTerm) = Up"),
+            (
+                "b.syl",
+                "primitive upCost(by: ManaCostTerm): Delta(ManaCostTerm) = Up"
+            ),
         ]),
         []
     );
@@ -136,9 +166,18 @@ fn a_word_that_names_no_declaration_is_refused() {
             ("u.syl", "template withNone: Amount { body = none(power) }"),
         ]),
         [
-            (RefusalKind::UnknownWord("power".to_owned()), "power".to_owned()),
-            (RefusalKind::UnknownWord("none".to_owned()), "none".to_owned()),
-            (RefusalKind::UnknownWord("power".to_owned()), "power".to_owned()),
+            (
+                RefusalKind::UnknownWord("power".to_owned()),
+                "power".to_owned()
+            ),
+            (
+                RefusalKind::UnknownWord("none".to_owned()),
+                "none".to_owned()
+            ),
+            (
+                RefusalKind::UnknownWord("power".to_owned()),
+                "power".to_owned()
+            ),
         ]
     );
 }
@@ -150,13 +189,19 @@ fn words_resolve_across_bundles_and_refusals_render_their_location() {
         FileId(0),
         &[
             ("power.syl", "primitive power: Stat = Power"),
-            ("singleFaced.syl", "primitive singleFaced(face: Characteristics): Card = SingleFaced"),
+            (
+                "singleFaced.syl",
+                "primitive singleFaced(face: Characteristics): Card = SingleFaced",
+            ),
         ],
     );
     let canon = bundle(
         "canon",
         builtin.next_file_id(),
-        &[("c.syl", "card singleFaced({\n  name = \"C\",\n  power = power,\n  toughness = toughness,\n})")],
+        &[(
+            "c.syl",
+            "card singleFaced({\n  name = \"C\",\n  power = power,\n  toughness = toughness,\n})",
+        )],
     );
     let error = check(&[&builtin, &canon]).expect_err("toughness is not declared");
     assert_eq!(

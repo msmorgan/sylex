@@ -32,6 +32,14 @@ fn word(n: usize) -> String {
 // Layout.
 
 #[test]
+fn a_header_without_a_name_hugs_its_kind_word() {
+    assert_eq!(
+        fmt("coercion ( type : CardType ) : NounWord { body = type($type) }"),
+        "coercion(type: CardType): NounWord {\n  body = type($type)\n}\n"
+    );
+}
+
+#[test]
 fn a_node_that_fits_stays_on_one_line() {
     assert_eq!(
         fmt("card {\n  name = \"A\",\n  text = [\n    spell(draw(1))]}"),

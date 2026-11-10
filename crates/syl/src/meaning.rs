@@ -39,11 +39,13 @@ fn normalized(file: &File) -> File {
         name(&mut declaration.kind);
         declaration.span = NOWHERE;
         match &mut declaration.shape {
-            Shape::Nameless(v) => value(v),
-            Shape::Named(named) => {
-                named.span = NOWHERE;
-                name(&mut named.name);
-                items(&mut named.params, |param| {
+            Shape::Value(v) => value(v),
+            Shape::Header(header) => {
+                header.span = NOWHERE;
+                if let Some(n) = &mut header.name {
+                    name(n);
+                }
+                items(&mut header.params, |param| {
                     param.span = NOWHERE;
                     name(&mut param.name);
                     sort(&mut param.sort);
@@ -51,13 +53,13 @@ fn normalized(file: &File) -> File {
                         value(default);
                     }
                 });
-                if let Some(s) = &mut named.sort {
+                if let Some(s) = &mut header.sort {
                     sort(s);
                 }
-                if let Some(constructor) = &mut named.constructor {
+                if let Some(constructor) = &mut header.constructor {
                     name(constructor);
                 }
-                if let Some(body) = &mut named.body {
+                if let Some(body) = &mut header.body {
                     body.span = NOWHERE;
                     fields(&mut body.fields);
                 }
