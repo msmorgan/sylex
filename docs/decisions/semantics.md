@@ -166,15 +166,21 @@ two differ in what they mean:
   - A Defined Token's Definition takes no arguments, so its Reference Scope holds nothing of
     the caller's; the ability text in its characteristics is embedded ability text (§2.3).
 - **A Template** is printed wording only. It expands transparently into the expressions its parts
-  would be written as, and it adds no meaning.
+  would be written as, and it adds no meaning: it has no Reference Scope and no Deed, so its
+  body's references reach the referents at its call site.
+
+Templates and Definitions bind parameters alike: each parameter's argument is read once, at its
+first use, and later uses re-mention it ([`syl.md`](./syl.md) §4). In expansion they differ only in
+Reference Scope and Deed.
 
 They are kept apart because conflating them goes wrong both ways. A phrasing given a Deed or a
 scope invents a rules distinction the CR does not make: an event then matches it, and referents it
 should see are hidden from it. A rules-defined keyword treated as a phrasing loses its identity, so
 "can't X" and "whenever X" can no longer name it. So the kind a declaration states decides which it
 is ([`syl.md`](./syl.md) §1). That a Definition's body is the rules' meaning of its keyword is
-trusted, vouched for by its CR citation like any rule declaration (§1 item 4). Its reference
-resolution and sorts are checked in each context that expands it.
+trusted, vouched for by its CR citation like any rule declaration (§1 item 4). Its sorts are
+checked once, at its declaration ([`syl.md`](./syl.md) §4); its reference resolution is checked in
+each context that expands it.
 
 ### 3.1 Keyword Actions and Deeds
 

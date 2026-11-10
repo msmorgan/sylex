@@ -13,7 +13,8 @@ spelling attaches.
 
 **Template**:
 A named expansion for printed wording the rules do not define. It expands into what its parts
-would be written as and adds no meaning.
+would be written as and adds no meaning. It binds its parameters as a Definition does; in expansion
+it differs from one only in having no Reference Scope and no Deed.
 
 **Definition**:
 A named expansion for vocabulary the rules define: a keyword action or ability

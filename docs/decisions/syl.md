@@ -104,16 +104,26 @@ declared word at any other sort is wrapped by a written primitive or Template (�
 
 ## 4. Expansion
 
-- Templates substitute their parameters. A Template that mentions a NounPhrase parameter more than
-  once binds it at the first occurrence. The binding is generated, never hand-written, so targets
-  are not duplicated ([CR#115.1]).
+- Every parameter is a binding, a Template's or a Definition's, at any sort. Its argument is read
+  once, at the parameter's first use in read order; each later use in the body re-mentions that
+  read and never reads the argument again. The binding is generated, never hand-written, so a
+  value the source writes once is one read in the expanded tree, and targets are not duplicated
+  ([CR#115.1]).
+- Templates substitute their parameters. A Template adds no Reference Scope and no Deed, so its
+  body's references reach the referents at its call site.
 - A Definition wraps every parameter for caller-scope reading, with no opt-out. It wraps its body
   in its Reference Scope under its Deed ([`semantics.md`](./semantics.md) §2.3).
+- So Templates and Definitions bind parameters alike; in expansion they differ only in Reference
+  Scope and Deed.
 - `.syl` cannot write a scope, a mention, a raw Deed or a keyword wrapper.
-- Which occurrence of a parameter is its first mention is decided after expansion, in the order
-  the checker reads. Why: the first mention is the one that introduces referents, so it must be
-  the occurrence actually read first. It is never decided by written argument order. For example,
-  a passive `by(np)` reads the patient before `np` ([`semantics.md`](./semantics.md) §4.2).
+- Expansion keeps every call and parameter boundary and marks no use as first or later. Which use
+  of a parameter is its first mention is decided by reference resolution, in read order (§5). Why:
+  the first mention is the one that introduces referents, so it must be the use actually read
+  first. It is never decided by written argument order. For example, a passive `by(np)` reads the
+  patient before `np` ([`semantics.md`](./semantics.md) §4.2).
+- Sorts are checked per slot, before expansion: `cargo xtask dsl check` checks each argument
+  against its parameter's declared sort at the call, and each `$name` in a declaration against the
+  sort of the slot it stands in, which must be the parameter's sort or `Option` of it (§3).
 
 ## 5. Read Order
 
