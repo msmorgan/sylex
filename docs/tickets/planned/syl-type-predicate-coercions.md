@@ -52,7 +52,10 @@ The mechanism already admits them:
 
 - Three coercions under `plugins/builtin/coercions/`: `CardType` to `Predicate` through `hasType`,
   `Subtype` to `Predicate` through `hasSubtype`, `Supertype` to `Predicate` through
-  `hasSupertype`.
+  `hasSupertype`. `Supertype` has no coercion into `NounWord`, since a supertype is no head noun;
+  that reason does not apply at `Predicate`, where a filter has no head noun and a supertype is a
+  conjunct like a card type (*Arcum's Weathervane*'s "nonsnow basic land" is
+  `and([land, basic, not(snow)])`).
 - The nine single-type `isX` Templates are deleted and every call site respelled bare, so the
   corpus has one spelling of each term (`syl.md` §2). `hasType`, `hasSubtype` and `hasSupertype`
   stay callable, and their call sites at a coerced position are respelled bare too, a parameter
@@ -66,12 +69,6 @@ The mechanism already admits them:
 
 ## Open questions
 
-- **Whether `Supertype` reaches `Predicate`.** `Supertype` has no coercion into `NounWord`, since
-  a supertype is no head noun. That reason does not apply at `Predicate`: `hasSupertype`'s
-  spelling is its argument's, a filter has no head, and the 29 `hasSupertype(…)` sites
-  (`legendary` 12, `basic` 10, `snow` 4, `world` 3) are the sites where the wrapper most breaks
-  printed reading (*Arcum's Weathervane*'s "nonsnow basic land" is
-  `and([isLand, hasSupertype(basic), not(hasSupertype(snow))])`). Recommendation: include it, so the three type sorts read alike in a filter.
 - **A double refusal.** A word declared at both `CardType` and `Subtype` now collides in
   Reaches(`NounWord`) and Reaches(`Predicate`), and `ambiguities` runs per target, so it is
   refused twice, once per target, at the same declaration. Recommendation: keep both, since each
