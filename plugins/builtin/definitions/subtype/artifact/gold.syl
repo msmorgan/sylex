@@ -4,6 +4,6 @@
 subtype gold {
   lexical = {lemma = "Gold"},
   spelling = "Gold",
-  kind = artifact,
+  kind = [artifact],
   name = "Gold"
 }

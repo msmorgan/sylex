@@ -2,7 +2,7 @@
 subtype fortification {
   lexical = {lemma = "Fortification"},
   spelling = "Fortification",
-  kind = artifact,
+  kind = [artifact],
   name = "Fortification",
   confers = [
     property(mayBeAttachedTo(thisFortification, allOf(isLand))),

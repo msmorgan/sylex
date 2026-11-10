@@ -1,0 +1,5 @@
+# The card types a spell type is correlated with: instants and sorceries share their lists of
+# subtypes [CR#205.3k].
+template spell: List(CardType) {
+  body = [instant, sorcery]
+}

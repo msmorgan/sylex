@@ -6,7 +6,7 @@
 subtype saga {
   lexical = {lemma = "Saga"},
   spelling = "Saga",
-  kind = enchantment,
+  kind = [enchantment],
   name = "Saga",
   confers = [
     ability(

@@ -4,7 +4,7 @@
 subtype siege {
   lexical = {lemma = "Siege"},
   spelling = "Siege",
-  kind = battle,
+  kind = [battle],
   name = "Siege",
   confers = [
     property(entersChoosingPlayer(thisSiege, anOpponent)),

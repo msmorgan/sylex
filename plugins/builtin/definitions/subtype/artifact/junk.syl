@@ -4,6 +4,6 @@
 subtype junk {
   lexical = {lemma = "Junk"},
   spelling = "Junk",
-  kind = artifact,
+  kind = [artifact],
   name = "Junk"
 }

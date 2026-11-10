@@ -3,6 +3,6 @@
 subtype undercity {
   lexical = {lemma = "Undercity"},
   spelling = "Undercity",
-  kind = dungeon,
+  kind = [dungeon],
   name = "Undercity"
 }

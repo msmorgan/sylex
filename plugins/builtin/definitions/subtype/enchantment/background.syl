@@ -5,6 +5,6 @@
 subtype background {
   lexical = {lemma = "Background"},
   spelling = "Background",
-  kind = enchantment,
+  kind = [enchantment],
   name = "Background"
 }

@@ -3,7 +3,7 @@
 subtype aura {
   lexical = {lemma = "Aura"},
   spelling = "Aura",
-  kind = enchantment,
+  kind = [enchantment],
   name = "Aura",
   confers = [
     stateBased(

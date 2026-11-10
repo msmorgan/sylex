@@ -4,6 +4,6 @@
 subtype map {
   lexical = {lemma = "Map"},
   spelling = "Map",
-  kind = artifact,
+  kind = [artifact],
   name = "Map"
 }

@@ -5,6 +5,6 @@
 subtype vibranium {
   lexical = {lemma = "Vibranium"},
   spelling = "Vibranium",
-  kind = artifact,
+  kind = [artifact],
   name = "Vibranium"
 }
