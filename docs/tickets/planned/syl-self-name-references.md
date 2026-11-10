@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-number-snapshot, syl-printed-it-self-references]
+needs: [cleanup-step6-spine, syl-number-snapshot, syl-printed-it-self-references, shortened-names-at-load]
 ---
 
 # A card that prints its own name writes a name form, not `this`
@@ -19,13 +19,21 @@ and nothing checks it.
 `syl-this-head-template` rewrites the sites that print "this <head>" after; all three rewrite
 canon self-reference sites, so they land in that order.
 
+`shortened-names-at-load` moves the Shortened Name rule (`short_name` in
+`crates/catalogs/src/nicknames.rs`) from a generated file to load time, where this ticket's check
+can call it, and lands first.
+
 ## Design
 
 - Two zero-argument NounPhrase forms name the card: one its full name, one its Shortened Name.
 - Neither takes a string: the name is the enclosing face's, so an ability gained by an object
   with another name reads as that name [CR#201.5b].
-- `cargo xtask dsl check` refuses the Shortened Name form on a face with no Shortened Name, and
-  both forms anywhere in `plugins/builtin/`, where there is no face.
+- A face stores no Shortened Name string. The Shortened Name form names the shortening that
+  `shortened-names-at-load` computes from the face's `name`, `supertypes` and `types` (a legendary
+  permanent's name, cut by that ticket's rule), so names never come by hand
+  (`docs/decisions/lexicon.md` §3).
+- `cargo xtask dsl check` refuses the Shortened Name form on a face for which that rule gives no
+  Shortened Name, and both forms anywhere in `plugins/builtin/`, where there is no face.
 
 ## Open questions
 
@@ -33,7 +41,6 @@ canon self-reference sites, so they land in that order.
   (`ownName` and `ownShortenedName`, or `selfName` and `shortenedSelfName`, are candidates).
 - Whether they are two primitives, or two Templates over one primitive with a name-form argument
   (not a Bool).
-- Where a face records its Shortened Name.
 - Whether a granted ability that names its grantor by name [CR#201.5a] (*Grothama,
   All-Devouring*'s "fight Grothama, All-Devouring"; *Gutter Grime*'s token) gets the same
   name-versus-head split beside `theGrantor`.
