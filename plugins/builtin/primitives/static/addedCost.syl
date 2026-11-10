@@ -1,3 +1,7 @@
-# An additional cost, optionally offered; `times` specifies how often it may be paid and
-# defaults to once. Squad permits payment any number of times. [CR#702.157a]
-primitive addedCost(cost: Cost, offered: Bool, times: PayTimes = once): StaticSpec = AddedCost
+# An additional cost [CR#118.8], `optional` ("you may <cost>") or `mandatory` ("<cost>")
+# [CR#118.8b,118.8c]; `times` specifies how often it may be paid and defaults to once. Squad
+# permits payment any number of times. [CR#702.157a]
+primitive addedCost(
+  optionality: CostOptionality,
+  cost: Cost,
+  times: PayTimes = once): StaticSpec = AddedCost

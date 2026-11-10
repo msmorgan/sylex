@@ -6,7 +6,7 @@ ability offering(quality: Predicate) {
   lexical = {lemma = "offering", parameters = [[QualityBefore]]},
   spelling = "<quality> offering",
   body = [
-    static(addedCost(perform(sacrifice(a(and([$quality, isPermanent])))), true)),
+    static(addedCost(optional, perform(sacrifice(a(and([$quality, isPermanent])))))),
     static(
       onlyWhile(
         reducedBySymbols(thisSpell, manaCostOf(the(and([was(sacrifice(which)), isPermanent])))),

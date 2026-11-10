@@ -8,12 +8,12 @@ ability conspire {
   body = [
     static(
       addedCost(
+        optional,
         perform(
           tap(
             counted(
               exactly(2),
-              and([isUntapped, isCreature, youControl, shares(color, share, thisSpell)])))),
-        true)),
+              and([isUntapped, isCreature, youControl, shares(color, share, thisSpell)])))))),
     when(
       does(actor(you), cast(thisSpell)),
       sequentially([copyOnStack(thisSpell), may(chooseNewTargets(that(copy)))]),

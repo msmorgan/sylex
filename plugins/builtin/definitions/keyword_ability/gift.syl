@@ -7,7 +7,7 @@ ability gift(promise: Action) {
   # TODO(spelling): Extract the promised gift's noun phrase from the Action; substituting its
   # action clause is not gift wording.
   body = [
-    static(addedCost(perform(choose(anOpponent)), true)),
+    static(addedCost(optional, perform(choose(anOpponent)))),
     ifPermanentType(
       when(
         does(actor(thisPermanent), enter),

@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [human],
     text = [
-      static(addedCost(perform(choose(a(quality(subtype(creature))))), false)),
+      static(addedCost(mandatory, perform(choose(a(quality(subtype(creature))))))),
       static(definesPt(thisCreature, countOf(and([isCreature, ofChosen(subtype(creature))]))))]})

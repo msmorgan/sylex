@@ -1,0 +1,2 @@
+# A cost its payer may decline to pay: "you may <cost>" [CR#118.8b].
+primitive optional: CostOptionality = Optional

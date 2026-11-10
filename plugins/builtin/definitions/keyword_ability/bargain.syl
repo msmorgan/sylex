@@ -6,8 +6,8 @@ ability bargain {
   body = [
     static(
       addedCost(
+        optional,
         perform(
           sacrifice(
-            a(or([and([isArtifact, isPermanent]), and([isEnchantment, isPermanent]), isToken])))),
-        true))]
+            a(or([and([isArtifact, isPermanent]), and([isEnchantment, isPermanent]), isToken]))))))]
 }

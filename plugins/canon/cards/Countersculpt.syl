@@ -3,5 +3,5 @@ card singleFaced({
     cost = [pip(blue), pip(blue)],
     types = [instant],
     text = [
-      static(addedCost(or([perform(behold(hasSubtype(jace))), mana([generic(1)])]), false)),
+      static(addedCost(mandatory, or([perform(behold(hasSubtype(jace))), mana([generic(1)])]))),
       spell(sequentially([counter(target(isSpell)), empowerJace(lit(1))]))]})

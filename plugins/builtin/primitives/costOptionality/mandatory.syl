@@ -1,0 +1,2 @@
+# A cost that must be paid: "<cost>", with no "you may" [CR#118.8,118.8c].
+primitive mandatory: CostOptionality = Mandatory
