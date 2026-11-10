@@ -1,0 +1,6 @@
+# "this effect": the effect of the enclosing spell or ability [CR#609.1], found by enclosure as
+# being an effect is (semantics.md §4.7), never by a pronoun search. It names no source, so it is
+# no `headed(<head>, this)`: "this" alone names the source [CR#113.7].
+primitive thisEffect: NounPhrase = ThisEffect {
+  spelling = "this effect"
+}

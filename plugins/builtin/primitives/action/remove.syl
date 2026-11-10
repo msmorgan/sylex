@@ -1,0 +1,7 @@
+# "remove <what>": an effect's taking an attached permanent off its host, as protection does to
+# an Aura it makes illegally attached [CR#702.16n,702.16p]. The removal is a state-based action
+# [CR#704.5m,704.5n], so `remove` names no Deed and happens as no one event: the Event Gate
+# refuses it (semantics.md §4.6). It is written in what an effect doesn't do (`doesnt`).
+primitive remove(what: NounPhrase): Action = Remove {
+  spelling = "remove <what>"
+}
