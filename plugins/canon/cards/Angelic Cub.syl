@@ -2,8 +2,6 @@
 # put a +1/+1 counter on it": "for the first time each turn" watches only the first matching trigger
 # event each turn, and "it" in the effect resolves to `thisCreature` rather than the targeting spell
 # or ability.
-# Fragment: the conditional flying sentence ("As long as this creature has three or more +1/+1
-# counters on it, it has flying") is missing until `syl-condition-first-static`.
 card singleFaced({
     name = "Angelic Cub",
     cost = [generic(1), pip(white)],
@@ -15,6 +13,10 @@ card singleFaced({
           nth(1),
           does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
           turn),
-        putCounters(lit(1), printedKind(p1p1Counter), it))],
+        putCounters(lit(1), printedKind(p1p1Counter), it)),
+      static(
+        conditionFirstWhile(
+          compareAmt(countersOn(p1p1Counter, thisCreature), atLeast, lit(3)),
+          abilityGrant(it, flying)))],
     power = lit(1),
     toughness = lit(1)})
