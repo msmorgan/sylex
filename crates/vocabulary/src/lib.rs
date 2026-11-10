@@ -10,8 +10,8 @@ mod build;
 #[macro_use]
 mod data_text;
 mod names;
-mod shortening;
 pub mod schema;
+mod shortening;
 
 use std::path::PathBuf;
 use std::sync::LazyLock;
@@ -33,7 +33,6 @@ use crate::build::card_scoped;
 use crate::build::exact;
 use crate::build::source;
 pub use crate::data_text::read_data_file;
-pub use crate::shortening::AttestedShortenings;
 pub use crate::names::shortened_name;
 use crate::schema::AbilityWord;
 use crate::schema::AdjectiveDecl;
@@ -55,6 +54,8 @@ use crate::schema::Token;
 use crate::schema::TurnPart;
 use crate::schema::Types;
 use crate::schema::VerbEntry;
+pub use crate::shortening::AttestedShortenings;
+pub use crate::shortening::short_name;
 
 /// Why the lexicon or a catalog cannot be loaded.
 #[derive(Debug, thiserror::Error)]

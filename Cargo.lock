@@ -1654,6 +1654,7 @@ dependencies = [
  "ron",
  "serde",
  "serde_json",
+ "sylex_core",
  "sylex_lexicon",
  "sylex_syntax",
  "sylex_upstream",

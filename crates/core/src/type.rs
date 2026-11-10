@@ -36,6 +36,21 @@ pub enum Supertype {
     World,
 }
 
+impl Supertype {
+    /// The supertype whose printed name is `name` ([CR#205.4a]).
+    #[must_use]
+    pub fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "Basic" => Some(Supertype::Basic),
+            "Legendary" => Some(Supertype::Legendary),
+            "Ongoing" => Some(Supertype::Ongoing),
+            "Snow" => Some(Supertype::Snow),
+            "World" => Some(Supertype::World),
+            _ => None,
+        }
+    }
+}
+
 /// A subtype: its name, the card types it can appear on ([CR#205.3]), and
 /// what it confers on its bearers — how [CR#305.6] gives basic lands their
 /// mana abilities, as plugin data rather than an engine special case.
@@ -122,6 +137,25 @@ impl Type {
             Type::Planeswalker => "Planeswalker",
             Type::Sorcery => "Sorcery",
         })
+    }
+
+    /// The type whose canonical [`name`](Type::name) is `name`.
+    #[must_use]
+    pub fn from_name(name: &str) -> Option<Self> {
+        [
+            Type::Artifact,
+            Type::Battle,
+            Type::Creature,
+            Type::Dungeon,
+            Type::Enchantment,
+            Type::Instant,
+            Type::Kindred,
+            Type::Land,
+            Type::Planeswalker,
+            Type::Sorcery,
+        ]
+        .into_iter()
+        .find(|candidate| candidate.name().as_str() == name)
     }
 
     /// Whether a spell of this type enters the battlefield on resolution

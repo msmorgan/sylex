@@ -10,8 +10,8 @@ use sylex_lexicon::LexicalReading;
 use sylex_lexicon::Lexicon;
 use sylex_lexicon::SourceKind;
 
-use crate::CARD_NAMES;
 use crate::AttestedShortenings;
+use crate::CARD_NAMES;
 use crate::build::exact;
 use crate::build::source;
 

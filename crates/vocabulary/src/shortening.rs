@@ -4,6 +4,9 @@
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
+use sylex_core::Supertype;
+use sylex_core::Type;
+use sylex_core::TypeDef;
 use sylex_lexicon::Numeral;
 use sylex_lexicon::NumeralCodec;
 use sylex_upstream::scryfall::OracleCard;
@@ -29,7 +32,7 @@ impl AttestedShortenings {
         cards: impl IntoIterator<Item = Result<OracleCard, OracleCardReadError>>,
     ) -> Result<Self, SourceError> {
         let mut titles = BTreeSet::new();
-        let mut faces = Vec::new();
+        let mut faces: Vec<(String, String, String)> = Vec::new();
         for card in cards {
             let card = card.map_err(|error| SourceError::Invalid(error.to_string()))?;
             for unit in card.oracle_units() {
@@ -41,9 +44,11 @@ impl AttestedShortenings {
                             unit.display_name()
                         ))
                     })?;
-                    if legendary_permanent(type_line) {
+                    let (supertypes, types) = parse_type_line(unit.display_name(), type_line)?;
+                    if let Some(candidate) = short_name(unit.display_name(), &supertypes, &types) {
                         faces.push((
                             unit.display_name().to_owned(),
+                            candidate.to_owned(),
                             // A vanilla legendary has no Oracle text.
                             unit.oracle_text().unwrap_or("").to_owned(),
                         ));
@@ -54,8 +59,8 @@ impl AttestedShortenings {
         let titles = title_index(&titles);
         let shortenings = faces
             .iter()
-            .filter_map(|(name, text)| {
-                attested_short_name(name, text, &titles)
+            .filter_map(|(name, candidate, text)| {
+                attested_short_name(name, candidate, text, &titles)
                     .map(|short| (name.clone(), short.to_owned()))
             })
             .collect();
@@ -67,9 +72,7 @@ impl AttestedShortenings {
     /// # Errors
     /// An unreadable corpus, or any [`Self::from_corpus`] error.
     pub fn load() -> Result<Self, SourceError> {
-        Self::from_corpus(
-            oracle_cards().map_err(|error| SourceError::Invalid(error.to_string()))?,
-        )
+        Self::from_corpus(oracle_cards().map_err(|error| SourceError::Invalid(error.to_string()))?)
     }
 
     /// The shortened spelling `name`'s own text uses, if any.
@@ -79,24 +82,40 @@ impl AttestedShortenings {
     }
 }
 
-fn legendary_permanent(type_line: &str) -> bool {
-    let head = type_line.split_once('—').map_or(type_line, |(head, _)| head);
-    let words = head.split_whitespace().collect::<Vec<_>>();
-    words.contains(&"Legendary")
-        && words.iter().any(|word| {
-            matches!(
-                *word,
-                "Artifact" | "Battle" | "Creature" | "Enchantment" | "Land" | "Planeswalker"
-            )
-        })
+/// The supertypes and card types a type line prints before its dash.
+fn parse_type_line(
+    face: &str,
+    type_line: &str,
+) -> Result<(Vec<Supertype>, Vec<TypeDef>), SourceError> {
+    let head = type_line
+        .split_once('—')
+        .map_or(type_line, |(head, _)| head);
+    let mut supertypes = Vec::new();
+    let mut types = Vec::new();
+    for word in head.split_whitespace() {
+        if let Some(supertype) = Supertype::from_name(word) {
+            supertypes.push(supertype);
+        } else if let Some(card_type) = Type::from_name(word) {
+            types.push(card_type.def());
+        } else {
+            return Err(SourceError::Invalid(format!(
+                "face {face} has unknown word `{word}` in type line `{type_line}`"
+            )));
+        }
+    }
+    Ok((supertypes, types))
 }
 
 // Shortened self-reference has the full name's referent [CR#201.5c]. The
 // truncation patterns propose candidates; the unit's Oracle text must attest
 // the candidate outside an occurrence of any complete card title.
 // The full and shortened spellings remain distinct variants of one Lexeme.
-fn attested_short_name<'a>(name: &'a str, text: &str, titles: &TitleIndex<'_>) -> Option<&'a str> {
-    let candidate = short_name(name)?;
+fn attested_short_name<'a>(
+    name: &str,
+    candidate: &'a str,
+    text: &str,
+    titles: &TitleIndex<'_>,
+) -> Option<&'a str> {
     let candidate_spans = text
         .match_indices(candidate)
         .filter_map(|(start, _)| {
@@ -165,7 +184,25 @@ fn title_index(titles: &BTreeSet<String>) -> TitleIndex<'_> {
     index
 }
 
-fn short_name(name: &str) -> Option<&str> {
+/// The Shortened Name [CR#201.5c] the rule gives a face: a legendary
+/// permanent's name cut at the comma prefix; none for names starting "The ";
+/// a trailing Roman numeral dropped; else the text before the earliest
+/// " and the ", " the " or " of "; else the first word. None for any other
+/// face, and when the cut is the full name. Whether the face's own text uses
+/// the result is a separate check ([`AttestedShortenings`]).
+#[must_use]
+pub fn short_name<'a>(
+    name: &'a str,
+    supertypes: &[Supertype],
+    types: &[TypeDef],
+) -> Option<&'a str> {
+    (supertypes.contains(&Supertype::Legendary)
+        && types.iter().any(|card_type| card_type.permanent_type))
+    .then(|| rule(name))
+    .flatten()
+}
+
+fn rule(name: &str) -> Option<&str> {
     let candidate = if let Some((prefix, _)) = name.split_once(',') {
         prefix.trim()
     } else if name.starts_with("The ") {
@@ -190,6 +227,10 @@ fn short_name(name: &str) -> Option<&str> {
 mod tests {
     use super::*;
 
+    fn legendary_short_name(name: &str) -> &str {
+        short_name(name, &[Supertype::Legendary], &[Type::Creature.def()]).unwrap()
+    }
+
     #[test]
     fn oracle_short_names_preserve_multiword_prefixes_and_use_the_numeral_codec() {
         for (name, expected) in [
@@ -204,11 +245,27 @@ mod tests {
             ("Shang-Chi and the Ten Rings", Some("Shang-Chi")),
             ("Progenitus", None),
         ] {
-            assert_eq!(short_name(name), expected, "{name}");
+            assert_eq!(
+                short_name(name, &[Supertype::Legendary], &[Type::Creature.def()]),
+                expected,
+                "{name}"
+            );
         }
-        assert!(legendary_permanent("Legendary Artifact Creature — Golem"));
-        assert!(!legendary_permanent("Legendary Sorcery"));
-        assert!(!legendary_permanent("Creature — Legendary"));
+        let creature = [Type::Creature.def()];
+        let legendary = [Supertype::Legendary];
+        assert_eq!(
+            short_name("Nissa Revane", &legendary, &creature),
+            Some("Nissa")
+        );
+        assert_eq!(short_name("Nissa Revane", &[], &creature), None);
+        assert_eq!(
+            short_name("Nissa Revane", &legendary, &[Type::Sorcery.def()]),
+            None
+        );
+        let (supertypes, types) =
+            parse_type_line("Golem", "Legendary Artifact Creature — Golem").unwrap();
+        assert_eq!(short_name("Golem Man", &supertypes, &types), Some("Golem"));
+        assert!(parse_type_line("Bad", "Legendary Elf — X").is_err());
     }
 
     #[test]
@@ -245,7 +302,11 @@ mod tests {
         assert!(observed["Nissa Revane"].contains("named Nissa's Chosen"));
         for (name, text) in observed {
             let short = expected[name.as_str()];
-            assert_eq!(attested_short_name(&name, &text, &titles), short, "{name}");
+            assert_eq!(
+                attested_short_name(&name, legendary_short_name(&name), &text, &titles),
+                short,
+                "{name}"
+            );
             assert_eq!(aliases.get(&name), short, "{name}");
         }
     }
@@ -257,13 +318,23 @@ mod tests {
         let titles = title_index(&titles);
         for text in ["Dinosaur", "xDina", "Dina-like", "Dina, Soul Steeper"] {
             assert_eq!(
-                attested_short_name("Dina, Soul Steeper", text, &titles),
+                attested_short_name(
+                    "Dina, Soul Steeper",
+                    legendary_short_name("Dina, Soul Steeper"),
+                    text,
+                    &titles
+                ),
                 None
             );
         }
         // Nissa Revane refers to this full card title, not to herself as Nissa.
         assert_eq!(
-            attested_short_name("Nissa Revane", "Nissa's Chosen", &titles),
+            attested_short_name(
+                "Nissa Revane",
+                legendary_short_name("Nissa Revane"),
+                "Nissa's Chosen",
+                &titles
+            ),
             None
         );
     }

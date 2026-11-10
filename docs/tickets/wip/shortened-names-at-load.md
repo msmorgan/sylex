@@ -6,20 +6,21 @@ needs: []
 
 ## Why
 
-A legendary face's Shortened Name [CR#201.5c] comes from a rule (`short_name` in
-`crates/catalogs/src/nicknames.rs`) plus an attestation check against that face's own Oracle text.
-`cargo xtask catalogs` runs both over the whole corpus and writes the results to
-`data/gen/catalogs/card-name-nicknames.json`, which `sylex_vocabulary` then looks up. Everything
-the computation needs (the name, the type line, the text) is at hand when the face is loaded, so
-the generated file is a cache with its own corpus hash and staleness check, and nothing gains from
-it.
+A legendary face's Shortened Name [CR#201.5c] comes from a rule plus an attestation check against
+that face's own Oracle text. Generating both into `data/gen/catalogs/card-name-nicknames.json`
+made the file a cache with its own corpus hash and staleness check. The rule needs only a face's
+name, supertypes and types, so it is a public function a `.syl` face can call; the attestation
+needs the whole corpus (a candidate must be used outside any complete card title), so it is
+computed from the corpus when the lexicon loads.
 
 ## Done when
 
-- The lexicon computes each legendary face's Shortened Name when it loads that face: the same rule
-  (comma prefix; none for names starting "The "; trailing Roman numeral dropped; earliest " and
-  the ", " the " or " of "; first word; none when equal to the full name) and the same attestation
-  check.
+- `sylex_vocabulary::short_name(name, supertypes, types)` gives a face's Shortened Name by the
+  rule: legendary permanents only; comma prefix; none for names starting "The "; trailing Roman
+  numeral dropped; earliest " and the ", " the " or " of "; first word; none when equal to the
+  full name. It needs no corpus, type line or Oracle text.
+- The lexicon computes the attestation from the corpus when it loads (`AttestedShortenings`), and
+  calls `short_name` for the rule.
 - `card-name-nicknames.json`, `CardNameNicknames`, its catalog output entry and `SHORTENED_NAMES`
   are gone.
 - The rule's unit tests survive with the rule (including *King Darien XLVIII* and *Grand Arbiter
@@ -30,7 +31,6 @@ it.
 
 ## Pointers
 
-`crates/catalogs/src/nicknames.rs`, `crates/catalogs/src/io.rs`,
-`crates/catalogs/tests/suite/nicknames.rs`, `crates/vocabulary/src/names.rs`,
-`crates/vocabulary/src/lib.rs` (`SHORTENED_NAMES`), `crates/xtask/src/catalogs.rs`,
+`crates/vocabulary/src/shortening.rs`, `crates/vocabulary/src/names.rs`,
+`crates/vocabulary/src/lib.rs`, `crates/catalogs/src/io.rs`, `crates/xtask/src/catalogs.rs`,
 `docs/decisions/lexicon.md` §6.

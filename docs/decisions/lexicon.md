@@ -73,8 +73,9 @@ notation symbols. Loading refuses a Core word that is also a Catalog item of the
 same Category, because its Core spelling would let the grammar name the item.
 
 **Names come from the Oracle data**, never by hand: card names from the card
-data, Shortened Names computed at load from each face's own Oracle text (§6).
-Why: the card list is the authority on what cards exist.
+data, Shortened Names from a rule over a face's name, supertypes and types
+(`sylex_vocabulary::short_name`) checked at load against each face's own Oracle
+text (§6). Why: the card list is the authority on what cards exist.
 
 ## 4. Binding
 

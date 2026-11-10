@@ -19,9 +19,9 @@ and nothing checks it.
 `syl-this-head-template` rewrites the sites that print "this <head>" after; all three rewrite
 canon self-reference sites, so they land in that order.
 
-`shortened-names-at-load` moves the Shortened Name rule (`short_name` in
-`crates/catalogs/src/nicknames.rs`) from a generated file to load time, where this ticket's check
-can call it, and lands first.
+`shortened-names-at-load` makes the Shortened Name rule a public function,
+`sylex_vocabulary::short_name(name, supertypes, types)` in `crates/vocabulary/src/shortening.rs`,
+which this ticket's check can call, and lands first.
 
 ## Design
 
@@ -29,8 +29,8 @@ can call it, and lands first.
 - Neither takes a string: the name is the enclosing face's, so an ability gained by an object
   with another name reads as that name [CR#201.5b].
 - A face stores no Shortened Name string. The Shortened Name form names the shortening that
-  `shortened-names-at-load` computes from the face's `name`, `supertypes` and `types` (a legendary
-  permanent's name, cut by that ticket's rule), so names never come by hand
+  `short_name` computes from the face's `name`, `supertypes` and `types` (a legendary permanent's
+  name, cut by that ticket's rule), so names never come by hand
   (`docs/decisions/lexicon.md` §3).
 - `cargo xtask dsl check` refuses the Shortened Name form on a face for which that rule gives no
   Shortened Name, and both forms anywhere in `plugins/builtin/`, where there is no face.
