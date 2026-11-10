@@ -11,19 +11,14 @@ use crate::Property;
 pub enum Type {
     Artifact,
     Battle,
-    // Conspiracy,
     Creature,
     Dungeon,
     Enchantment,
     Instant,
     Kindred,
     Land,
-    // Phenomenon,
-    // Plane,
     Planeswalker,
-    // Scheme,
     Sorcery,
-    // Vanguard,
 }
 
 // [CR#205.4a]
