@@ -1,8 +1,9 @@
 //! `cargo xtask dsl check`: every reference in the `.syl` bundles resolves.
 //!
 //! A temporary validator that guards `.syl` until the Rust resolution layer
-//! (step 7 of the semantics-v3 plan) replaces it. It checks names, sorts and arity only, following
-//! `docs/decisions/syl.md` §3; it expands nothing and reads no meaning.
+//! (step 7 of the semantics-v3 plan) replaces it. It checks names, sorts and
+//! arity only, following `docs/decisions/syl.md` §3; it expands nothing and
+//! reads no meaning.
 //!
 //! [`check`] first runs [`sylex_syl::check()`] (constructor clauses, and words
 //! that name no declaration at any sort), then resolves every value at its
@@ -11,7 +12,9 @@
 //! constructors have no `.syl` declaration; their provisional schemas are
 //! [`schema`]'s. The only words and sorts written here are the language's own
 //! (`none`, `some`, `Option`, `List` and the literal sorts, `syl.md` §3).
+//! The coercions are declared in `.syl`; [`coercion`] reads and checks them.
 
+mod coercion;
 mod cycles;
 mod refusal;
 pub(crate) mod schema;
@@ -39,6 +42,7 @@ use sylex_syl::Span;
 use sylex_syl::Value;
 use sylex_syl::ValueKind;
 
+use self::coercion::Coercion;
 pub use self::refusal::CheckError;
 pub use self::refusal::Refusal;
 pub use self::refusal::RefusalKind;
@@ -124,6 +128,8 @@ struct Signature {
     /// Declared under the Ring exception (`schema::RING_EXCEPTION`), so only
     /// the Ring's file may call it.
     ring_only: bool,
+    /// The declaration's span.
+    span: Span,
 }
 
 type Registry = BTreeMap<(String, SortKey), Signature>;
@@ -143,9 +149,20 @@ struct Decl<'a> {
 impl Decl<'_> {
     fn block(&self) -> Option<&Record> {
         match &self.declaration.shape {
-            Shape::Named(named) => named.body.as_ref(),
-            Shape::Nameless(_) => None,
+            Shape::Header(header) => header.body.as_ref(),
+            Shape::Value(_) => None,
         }
+    }
+
+    /// The declaration as a refusal names it: its kind word and its name, or
+    /// for a nameless header its signature.
+    fn label(&self) -> String {
+        let word = self.kind.word;
+        if let Some(name) = &self.name {
+            return format!("`{word}` {name}");
+        }
+        let params: Vec<String> = self.params.iter().map(|p| p.sort.to_string()).collect();
+        format!("`{word}`({}): {}", params.join(", "), self.sort)
     }
 
     fn field(&self, name: &str) -> Option<&Value> {
@@ -190,16 +207,16 @@ pub fn check(builtin: &Bundle, others: &[&Bundle]) -> Result<Summary, CheckError
     }
     let registry = register(&decls, &mut refusals);
     unknown_sorts(&decls, &known_sorts(&decls, &registry), &mut refusals);
+    let coercions = coercion::coercions(&decls, &registry, &mut refusals);
     let mut edges = vec![Vec::new(); decls.len()];
     for (decl, edges) in decls.iter().zip(&mut edges) {
-        resolve(decl, &registry, &mut refusals, edges);
+        resolve(decl, &registry, &coercions, &mut refusals, edges);
     }
     for cycle in cycles::cycles(&edges) {
-        let name = |i: usize| {
-            decls[i]
-                .name
-                .clone()
-                .expect("only named declarations are nodes")
+        // A cycle names a declaration by its name, a nameless one by its label.
+        let name = |i: usize| match &decls[i].name {
+            Some(name) => name.clone(),
+            None => decls[i].label(),
         };
         refusals.push(Refusal {
             span: decls[cycle[0]].declaration.span,
@@ -240,26 +257,47 @@ fn header(declaration: &Declaration, ring: bool) -> Result<Decl<'_>, Refusal> {
         params,
         ring,
     };
-    let named = match (&declaration.shape, kind.form) {
-        (Shape::Named(named), Form::Block | Form::OptionalBlock) => named,
-        (Shape::Nameless(_), Form::Value) => {
-            let sort = kind.sort.expect("a nameless kind implies its sort");
+    let header = match (&declaration.shape, kind.form) {
+        (Shape::Value(_), Form::Value) => {
+            let sort = kind.sort.expect("a value kind implies its sort");
             return Ok(decl(None, SortKey::table(sort), Vec::new()));
         }
-        (Shape::Nameless(_), Form::Block | Form::OptionalBlock) => {
+        (Shape::Header(header), Form::Block | Form::OptionalBlock) => match header.name {
+            Some(_) => header,
+            None => return refuse(declaration.span, RefusalKind::MissingName(word.to_owned())),
+        },
+        (Shape::Header(header), Form::NamelessBlock) => match header.name {
+            Some(name) => return refuse(name.span, RefusalKind::WrittenName(word.to_owned())),
+            None => header,
+        },
+        (Shape::Value(_), Form::Block | Form::OptionalBlock) => {
             return refuse(declaration.span, RefusalKind::MissingName(word.to_owned()));
         }
-        (Shape::Named(_), Form::Value) => {
-            return refuse(declaration.span, RefusalKind::WrittenName(word.to_owned()));
+        (Shape::Value(_), Form::NamelessBlock) => {
+            return refuse(
+                declaration.span,
+                RefusalKind::MissingHeader(word.to_owned()),
+            );
         }
+        (Shape::Header(header), Form::Value) => match header.name {
+            Some(_) => return refuse(declaration.span, RefusalKind::WrittenName(word.to_owned())),
+            None => {
+                return refuse(
+                    declaration.span,
+                    RefusalKind::WrittenHeader(word.to_owned()),
+                );
+            }
+        },
     };
-    let name = named.name.ident.as_str();
-    if name == "none" {
-        return refuse(named.name.span, RefusalKind::NamedNone);
+    if let Some(name) = header.name
+        && name.ident == "none"
+    {
+        return refuse(name.span, RefusalKind::NamedNone);
     }
-    let sort = match (kind.sort, &named.sort) {
+    let name = header.name.map(|name| name.ident.as_str());
+    let sort = match (kind.sort, &header.sort) {
         (None, Some(sort)) => sort_key(sort)?,
-        (None, None) => return refuse(named.span, RefusalKind::MissingSort(word.to_owned())),
+        (None, None) => return refuse(header.span, RefusalKind::MissingSort(word.to_owned())),
         (Some(implied), None) => SortKey::table(implied),
         (Some(implied), Some(sort)) => {
             return refuse(
@@ -271,11 +309,11 @@ fn header(declaration: &Declaration, ring: bool) -> Result<Decl<'_>, Refusal> {
             );
         }
     };
-    if named.body.is_none() && kind.form == Form::Block {
-        return refuse(named.span, RefusalKind::MissingBlock(word.to_owned()));
+    if header.body.is_none() && matches!(kind.form, Form::Block | Form::NamelessBlock) {
+        return refuse(header.span, RefusalKind::MissingBlock(word.to_owned()));
     }
     let mut params: Vec<Slot> = Vec::new();
-    for param in named.params.iter().filter_map(Item::node) {
+    for param in header.params.iter().filter_map(Item::node) {
         let param_name = param.name.ident.as_str();
         if params.iter().any(|p| p.name == param_name) {
             return refuse(
@@ -289,7 +327,7 @@ fn header(declaration: &Declaration, ring: bool) -> Result<Decl<'_>, Refusal> {
             optional: param.default.is_some(),
         });
     }
-    Ok(decl(Some(name.to_owned()), sort, params))
+    Ok(decl(name.map(str::to_owned), sort, params))
 }
 
 /// Registers every named declaration at its `(name, sort)` and its second
@@ -316,11 +354,11 @@ fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
         let Some(name) = &decl.name else {
             continue;
         };
-        let Shape::Named(named) = &decl.declaration.shape else {
-            unreachable!("a named declaration has a named shape");
+        let Shape::Header(header) = &decl.declaration.shape else {
+            unreachable!("a named declaration has a header");
         };
         let mut ring_only = false;
-        if let Some(constructor) = named.constructor
+        if let Some(constructor) = header.constructor
             && let Some(reserved) = schema::reserved(
                 name,
                 decl.params.len(),
@@ -336,12 +374,13 @@ fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
                 });
             }
         }
+        let span = decl.declaration.span;
         let signature = Signature {
             params: decl.params.clone(),
             node: (!decl.kind.catalog).then_some(index),
             ring_only,
+            span,
         };
-        let span = decl.declaration.span;
         insert((name.clone(), decl.sort.clone()), signature, span, refusals);
         let Some(secondary) = decl.kind.secondary else {
             continue;
@@ -357,6 +396,7 @@ fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
             params: Vec::new(),
             node: None,
             ring_only: false,
+            span,
         };
         let key = (name.clone(), SortKey::named(secondary.sort));
         insert(key, signature, span, refusals);
@@ -369,10 +409,10 @@ const LITERAL_SORTS: [&str; 3] = ["String", "Int", "Nat"];
 
 /// The sort names a written sort may use: the literal sorts, the sort
 /// constructors and the undeclared sorts, and every name both produced and
-/// consumed. A declaration's result sort or a record sort produces a name; a
-/// parameter's sort, or a kind's sort or field sort, or a record field's sort
-/// consumes one. A name only produced or only consumed is a misspelling, or a
-/// sort no value can reach.
+/// consumed. A declaration's result sort (a coercion's included) or a record
+/// sort produces a name; a parameter's sort, or a kind's sort or field sort, or
+/// a record field's sort consumes one. A name only produced or only consumed is
+/// a misspelling, or a sort no value can reach.
 fn known_sorts(decls: &[Decl<'_>], registry: &Registry) -> BTreeSet<String> {
     fn add(sort: &SortKey, out: &mut BTreeSet<String>) {
         let mut heads = BTreeSet::new();
@@ -382,6 +422,12 @@ fn known_sorts(decls: &[Decl<'_>], registry: &Registry) -> BTreeSet<String> {
     let mut produced = BTreeSet::new();
     for (_, sort) in registry.keys() {
         add(sort, &mut produced);
+    }
+    for decl in decls
+        .iter()
+        .filter(|decl| decl.kind.word == schema::COERCION)
+    {
+        add(&decl.sort, &mut produced);
     }
     produced.extend(RECORDS.iter().map(|record| record.sort.to_owned()));
     let mut consumed = BTreeSet::new();
@@ -409,11 +455,11 @@ fn known_sorts(decls: &[Decl<'_>], registry: &Registry) -> BTreeSet<String> {
 /// Refuses every written sort name `known` lacks.
 fn unknown_sorts(decls: &[Decl<'_>], known: &BTreeSet<String>, refusals: &mut Vec<Refusal>) {
     for decl in decls {
-        let Shape::Named(named) = &decl.declaration.shape else {
+        let Shape::Header(header) = &decl.declaration.shape else {
             continue;
         };
-        let params = named.params.iter().filter_map(Item::node).map(|p| &p.sort);
-        for sort in named.sort.iter().chain(params) {
+        let params = header.params.iter().filter_map(Item::node).map(|p| &p.sort);
+        for sort in header.sort.iter().chain(params) {
             unknown_sort(sort, known, refusals);
         }
     }
@@ -440,18 +486,20 @@ fn is_bare(value: &Value, word: &str) -> bool {
 fn resolve(
     decl: &Decl<'_>,
     registry: &Registry,
+    coercions: &[Coercion],
     refusals: &mut Vec<Refusal>,
     edges: &mut Vec<usize>,
 ) {
     let ring = decl.ring;
-    if let Shape::Named(named) = &decl.declaration.shape {
+    if let Shape::Header(header) = &decl.declaration.shape {
         // A default reads only the parameters before it.
-        for (index, param) in named.params.iter().filter_map(Item::node).enumerate() {
+        for (index, param) in header.params.iter().filter_map(Item::node).enumerate() {
             if let Some(default) = &param.default {
                 let sort = &decl.params[index].sort;
                 let params = &decl.params[..index];
                 Resolver {
                     registry,
+                    coercions,
                     refusals: &mut *refusals,
                     edges: &mut *edges,
                     params,
@@ -464,6 +512,7 @@ fn resolve(
     let params = &decl.params;
     Resolver {
         registry,
+        coercions,
         refusals,
         edges,
         params,
@@ -475,6 +524,7 @@ fn resolve(
 /// Resolves values for one declaration.
 struct Resolver<'r> {
     registry: &'r Registry,
+    coercions: &'r [Coercion],
     refusals: &'r mut Vec<Refusal>,
     /// The dependency nodes the declaration reaches.
     edges: &'r mut Vec<usize>,
@@ -489,19 +539,16 @@ impl Resolver<'_> {
     }
 
     fn body(&mut self, decl: &Decl<'_>) {
-        let (named, name) = match (&decl.declaration.shape, &decl.name) {
-            (Shape::Nameless(value), None) => return self.value(value, &decl.sort),
-            (Shape::Named(named), Some(name)) => (named, name),
-            (Shape::Nameless(_), Some(_)) | (Shape::Named(_), None) => {
-                unreachable!("a declaration has a name exactly when its shape is named")
-            }
+        let header = match &decl.declaration.shape {
+            Shape::Value(value) => return self.value(value, &decl.sort),
+            Shape::Header(header) => header,
         };
         // Only a kind whose block is optional may omit it, and then there is
         // nothing to resolve.
-        let Some(block) = &named.body else {
+        let Some(block) = &header.body else {
             return;
         };
-        let at = format!("`{}` {name}", decl.kind.word);
+        let at = decl.label();
         let own_fields = decl
             .kind
             .fields
@@ -585,9 +632,16 @@ impl Resolver<'_> {
 
     /// Resolves `value` at `expected` (`syl.md` §3).
     fn value(&mut self, value: &Value, expected: &SortKey) {
+        self.value_at(value, expected, true);
+    }
+
+    /// Resolves `value` at `expected`, trying a coercion into `expected` at a
+    /// sort mismatch when `coerce` holds. A value a coercion reached is
+    /// resolved with `coerce` false: a coercion is one hop.
+    fn value_at(&mut self, value: &Value, expected: &SortKey, coerce: bool) {
         match &value.kind {
             ValueKind::Parameter(name) => {
-                return self.parameter(name.ident.as_str(), value.span, expected);
+                return self.parameter(name.ident.as_str(), value.span, expected, coerce);
             }
             ValueKind::Call(call) => {
                 let head = call.head.ident.as_str();
@@ -612,9 +666,12 @@ impl Resolver<'_> {
             | ValueKind::List(_)
             | ValueKind::Record(_) => {}
         }
-        // The one implicit wrap: a `T` at `Option(T)`.
+        // A `T` at `Option(T)`.
         if let Some(inner) = expected.option_inner() {
-            return self.value(value, inner);
+            return self.value_at(value, inner, coerce);
+        }
+        if coerce && !self.stands_at(value, expected) && self.coerce(value, expected) {
+            return;
         }
         let at = expected.to_string();
         match &value.kind {
@@ -648,21 +705,83 @@ impl Resolver<'_> {
         }
     }
 
-    /// `$name` at `expected`: the parameter's own sort, or `Option` of it.
-    fn parameter(&mut self, name: &str, span: Span, expected: &SortKey) {
+    /// Whether `value` stands at `sort` itself, with no coercion: a word
+    /// declared there, a parameter of that sort, or a literal at its own
+    /// sort. Only the value's head is looked at; its arguments, items and
+    /// fields are resolved once the sort is chosen.
+    fn stands_at(&self, value: &Value, sort: &SortKey) -> bool {
+        match &value.kind {
+            ValueKind::Parameter(name) => self
+                .params
+                .iter()
+                .any(|p| p.name == name.ident.as_str() && p.sort == *sort),
+            ValueKind::Call(call) => self
+                .registry
+                .contains_key(&(call.head.ident.as_str().to_owned(), sort.clone())),
+            ValueKind::String(_) => coercion::string_stands_at(sort),
+            ValueKind::Integer(number) => coercion::integer_stands_at(*number, sort),
+            ValueKind::List(_) => coercion::list_stands_at(sort),
+            ValueKind::Record(_) => coercion::record_stands_at(sort),
+        }
+    }
+
+    /// Resolves `value` through the coercion into `expected` whose from-sort
+    /// it stands at, if there is one. A value standing at two from-sorts is
+    /// refused, never resolved by declaration order. Whether `value` was
+    /// resolved or refused here.
+    fn coerce(&mut self, value: &Value, expected: &SortKey) -> bool {
+        let coercions = self.coercions;
+        let reached: Vec<&Coercion> = coercions
+            .iter()
+            .filter(|c| c.to == *expected && self.stands_at(value, &c.from))
+            .collect();
+        match reached.as_slice() {
+            [] => false,
+            [coercion] => {
+                self.edges.push(coercion.node);
+                self.value_at(value, &coercion.from, false);
+                true
+            }
+            [..] => {
+                self.refuse(
+                    value.span,
+                    RefusalKind::AmbiguousCoercion {
+                        sort: expected.to_string(),
+                        from: reached.iter().map(|c| c.from.to_string()).collect(),
+                    },
+                );
+                true
+            }
+        }
+    }
+
+    /// `$name` at `expected`: the parameter's own sort, `Option` of it, or a
+    /// sort it is coerced into.
+    fn parameter(&mut self, name: &str, span: Span, expected: &SortKey, coerce: bool) {
         let Some(param) = self.params.iter().find(|p| p.name == name) else {
             return self.refuse(span, RefusalKind::UnknownParameter(name.to_owned()));
         };
         let sort = &param.sort;
-        if sort != expected && expected.option_inner() != Some(sort) {
-            self.refuse(
+        let at = expected.option_inner().unwrap_or(expected);
+        if sort == expected || sort == at {
+            return;
+        }
+        // Duplicate coercions are refused and dropped at load, so at most one
+        // goes from the parameter's sort into `at`.
+        let coercion = self
+            .coercions
+            .iter()
+            .find(|c| c.from == *sort && c.to == *at);
+        match coercion {
+            Some(coercion) if coerce => self.edges.push(coercion.node),
+            Some(_) | None => self.refuse(
                 span,
                 RefusalKind::ParameterSort {
                     name: name.to_owned(),
                     sort: sort.to_string(),
                     expected: expected.to_string(),
                 },
-            );
+            ),
         }
     }
 

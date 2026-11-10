@@ -13,7 +13,7 @@ pub struct Kind {
     /// How a declaration of this kind is written.
     pub form: Form,
     /// The sort a declaration of this kind declares its name at; `None` when
-    /// the header writes it (`primitive`, `template`).
+    /// the header writes it (`primitive`, `template`, `coercion`).
     pub sort: Option<&'static str>,
     /// The fields its block may write.
     pub fields: &'static [FieldSpec],
@@ -37,6 +37,8 @@ pub enum Form {
     OptionalBlock,
     /// A value alone, with no name: a card.
     Value,
+    /// A header with no name, and a block: a coercion.
+    NamelessBlock,
 }
 
 /// A second sort a kind declares its name at.
@@ -122,12 +124,18 @@ const fn rules_row(word: &'static str, sort: &'static str) -> Kind {
     }
 }
 
+/// The kind word of the declaration that binds a word to a constructor.
+pub const PRIMITIVE: &str = "primitive";
+
+/// The kind word of a coercion, which declares no word (`syl.md` §3).
+pub const COERCION: &str = "coercion";
+
 /// Every declaration kind.
 pub const KINDS: &[Kind] = &[
     Kind {
         sort: None,
         form: Form::OptionalBlock,
-        ..kind("primitive", "", &[])
+        ..kind(PRIMITIVE, "", &[])
     },
     Kind {
         sort: None,
@@ -141,6 +149,19 @@ pub const KINDS: &[Kind] = &[
                     required: true,
                 },
             ],
+        )
+    },
+    Kind {
+        sort: None,
+        form: Form::NamelessBlock,
+        ..kind(
+            COERCION,
+            "",
+            &[FieldSpec {
+                name: "body",
+                sort: None,
+                required: true,
+            }],
         )
     },
     Kind {

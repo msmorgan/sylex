@@ -893,3 +893,266 @@ fn a_turn_point_header_joins_an_event_header() {
         []
     );
 }
+
+/// The three builtin coercions over their primitives, with a consumer of
+/// `NounWord` so the sort is known.
+const COERCIONS: &str = "primitive type(type: CardType): NounWord = Type\n\
+     primitive subtype(subtype: Subtype): NounWord = Subtype\n\
+     primitive lit(value: Int): Amount = Literal\n\
+     primitive noun(word: NounWord): Predicate = Noun\n\
+     coercion(type: CardType): NounWord { body = type($type) }\n\
+     coercion(subtype: Subtype): NounWord { body = subtype($subtype) }\n\
+     coercion(value: Int): Amount { body = lit($value) }\n\
+     primitive true: Bool = True\n\
+     card_type creature { permanentType = true }\n\
+     subtype goblin { kind = [creature] }\n";
+
+#[test]
+fn a_coercion_applies_at_a_sort_mismatch() {
+    let source = format!(
+        "{COERCIONS}\
+         template word: NounWord {{ body = creature }}\n\
+         template sub: NounWord {{ body = goblin }}\n\
+         template int: Amount {{ body = -2 }}\n\
+         template param(t: CardType): NounWord {{ body = $t }}\n\
+         template items: List(NounWord) {{ body = [creature, goblin] }}\n\
+         template wrapped: NounWord {{ body = type(creature) }}\n\
+         template literal: Amount {{ body = lit(3) }}\n\
+         template own: Int {{ body = 3 }}\n\
+         template arg: Predicate {{ body = noun(goblin) }}"
+    );
+    assert_eq!(kinds(&source), []);
+}
+
+#[test]
+fn a_coercion_composes_with_option() {
+    let source = format!(
+        "{COERCIONS}\
+         template word: Option(NounWord) {{ body = creature }}\n\
+         template int: Option(Amount) {{ body = 2 }}\n\
+         template param(t: Subtype): Option(NounWord) {{ body = $t }}\n\
+         template omitted: Option(Amount) {{ body = none }}"
+    );
+    assert_eq!(kinds(&source), []);
+}
+
+#[test]
+fn a_value_no_coercion_reaches_is_refused() {
+    let source = format!(
+        "{COERCIONS}\
+         template s: Amount {{ body = \"two\" }}\n\
+         template t(n: Nat): Amount {{ body = $n }}\n\
+         template u: CardType {{ body = goblin }}"
+    );
+    assert_eq!(
+        kinds(&source),
+        [
+            RefusalKind::StringAt(s("Amount")),
+            RefusalKind::ParameterSort {
+                name: s("n"),
+                sort: s("Nat"),
+                expected: s("Amount")
+            },
+            RefusalKind::UnknownWord {
+                word: s("goblin"),
+                sort: s("CardType")
+            },
+        ]
+    );
+}
+
+#[test]
+fn a_coercion_is_one_hop() {
+    // `CardType` to `NounWord` to `Predicate`: refused at load, and a card
+    // type at `Predicate` is not coerced twice.
+    let source = format!(
+        "{COERCIONS}\
+         coercion(word: NounWord): Predicate {{ body = noun($word) }}\n\
+         template t: Predicate {{ body = creature }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (
+                RefusalKind::ChainedCoercion {
+                    from: s("CardType"),
+                    via: s("NounWord"),
+                    to: s("Predicate")
+                },
+                s("coercion(word: NounWord): Predicate { body = noun($word) }")
+            ),
+            (
+                RefusalKind::ChainedCoercion {
+                    from: s("Subtype"),
+                    via: s("NounWord"),
+                    to: s("Predicate")
+                },
+                s("coercion(word: NounWord): Predicate { body = noun($word) }")
+            ),
+            (
+                RefusalKind::UnknownWord {
+                    word: s("creature"),
+                    sort: s("Predicate")
+                },
+                s("creature")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn a_duplicate_coercion_is_refused() {
+    let source = format!(
+        "{COERCIONS}\
+         primitive count(value: Int): Amount = Count\n\
+         coercion(n: Int): Amount {{ body = count($n) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::DuplicateCoercion {
+                from: s("Int"),
+                to: s("Amount")
+            },
+            s("coercion(n: Int): Amount { body = count($n) }")
+        )]
+    );
+}
+
+#[test]
+fn a_word_at_two_from_sorts_of_one_target_is_refused_with_no_call_site() {
+    let source = format!("{COERCIONS}subtype creature {{ kind = [creature] }}");
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::AmbiguousWord {
+                word: s("creature"),
+                sorts: vec![s("CardType"), s("Subtype")],
+                target: s("NounWord")
+            },
+            s("subtype creature { kind = [creature] }")
+        )]
+    );
+}
+
+#[test]
+fn a_word_at_a_target_and_at_a_sort_coerced_into_it_is_refused_with_no_call_site() {
+    // A leftover head-noun Template beside its card type.
+    let source = format!("{COERCIONS}template creature: NounWord {{ body = type(creature) }}");
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::AmbiguousWord {
+                word: s("creature"),
+                sorts: vec![s("CardType"), s("NounWord")],
+                target: s("NounWord")
+            },
+            s("template creature: NounWord { body = type(creature) }")
+        )]
+    );
+}
+
+#[test]
+fn an_integer_literal_reaching_a_target_from_int_and_nat_is_refused_with_no_call_site() {
+    let source = format!(
+        "{COERCIONS}\
+         primitive count(value: Nat): Amount = Count\n\
+         coercion(n: Nat): Amount {{ body = count($n) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::AmbiguousLiteral {
+                literal: s("an integer"),
+                sorts: vec![s("Int"), s("Nat")],
+                target: s("Amount")
+            },
+            s("coercion(n: Nat): Amount { body = count($n) }")
+        )]
+    );
+}
+
+#[test]
+fn a_record_literal_reaching_a_target_from_two_record_sorts_is_refused_with_no_call_site() {
+    let source = "primitive ordinalOf(o: EventOrdinal): Predicate = OrdinalOf\n\
+         primitive faceDownOf(f: FaceDown): Predicate = FaceDownOf\n\
+         coercion(o: EventOrdinal): Predicate { body = ordinalOf($o) }\n\
+         coercion(f: FaceDown): Predicate { body = faceDownOf($f) }";
+    assert_eq!(
+        refusals(&[("a.syl", source)]),
+        [(
+            RefusalKind::AmbiguousLiteral {
+                literal: s("a record"),
+                sorts: vec![s("EventOrdinal"), s("FaceDown")],
+                target: s("Predicate")
+            },
+            s("coercion(f: FaceDown): Predicate { body = faceDownOf($f) }")
+        )]
+    );
+}
+
+#[test]
+fn a_word_at_a_list_of_a_from_sort_is_no_ambiguity() {
+    // `creature`, the card types a creature type is correlated with, beside
+    // `card_type creature`: no coercion goes from `List(CardType)`.
+    let source = format!(
+        "{COERCIONS}\
+         template creature: List(CardType) {{ body = [creature] }}\n\
+         subtype elf {{ kind = creature }}\n\
+         template t: NounWord {{ body = creature }}"
+    );
+    assert_eq!(kinds(&source), []);
+}
+
+#[test]
+fn a_word_at_two_sorts_no_coercion_joins_is_no_ambiguity() {
+    // `snow` is a supertype and a mana symbol; neither reaches a coercion's
+    // target.
+    let source = format!(
+        "{COERCIONS}\
+         primitive snow: Supertype = Snow\n\
+         primitive snowPip: ManaSymbol = Snow\n\
+         template snow: ManaSymbol {{ body = snowPip }}"
+    );
+    assert_eq!(kinds(&source), []);
+}
+
+#[test]
+fn a_malformed_coercion_is_refused() {
+    let source = format!(
+        "{COERCIONS}\
+         template article: NounWord {{ body = type(creature) }}\n\
+         coercion(a: Int, b: Int): Amount {{ body = lit($a) }}\n\
+         coercion(a: Int = 1): Amount {{ body = lit($a) }}\n\
+         coercion(a: CardType): NounWord {{ body = article }}\n\
+         coercion(a: Nat): Amount {{ body = lit(1) }}\n\
+         coercion named(a: Int): Amount {{ body = lit($a) }}\n\
+         coercion(a: Int): Amount\n\
+         coercion [1]\n\
+         coercion(a: Int): Amount {{}}"
+    );
+    assert_eq!(
+        kinds(&source),
+        [
+            RefusalKind::WrittenName(s("coercion")),
+            RefusalKind::MissingBlock(s("coercion")),
+            RefusalKind::MissingHeader(s("coercion")),
+            RefusalKind::CoercionParameters,
+            RefusalKind::CoercionParameters,
+            RefusalKind::CoercionBody(s("NounWord")),
+            RefusalKind::CoercionBody(s("Amount")),
+            RefusalKind::MissingField {
+                field: s("body"),
+                at: s("`coercion`(Int): Amount")
+            },
+        ]
+    );
+}
+
+#[test]
+fn a_card_written_as_a_header_without_a_name_is_refused() {
+    assert_eq!(
+        kinds("card(a: Int): Card { body = 1 }"),
+        [RefusalKind::WrittenHeader(s("card"))]
+    );
+}

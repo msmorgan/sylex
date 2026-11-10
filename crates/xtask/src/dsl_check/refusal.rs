@@ -50,6 +50,39 @@ pub enum RefusalKind {
     WrittenSort { kind: String, sort: String },
     #[error("a `{0}` declaration has a `{{ ... }}` block")]
     MissingBlock(String),
+    #[error("a `{0}` declaration is written as a header, `(params): Sort {{ ... }}`")]
+    MissingHeader(String),
+    #[error("a `{0}` declaration is written as a value, with no header")]
+    WrittenHeader(String),
+    #[error("a coercion takes exactly one parameter, with no default")]
+    CoercionParameters,
+    #[error("a coercion's body is a primitive at {0} applied to the coercion's parameter alone")]
+    CoercionBody(String),
+    #[error("duplicate coercion from {from} to {to}")]
+    DuplicateCoercion { from: String, to: String },
+    #[error(
+        "the coercion from {via} to {to} starts where the coercion from {from} to {via} ends; \
+         a coercion is one hop"
+    )]
+    ChainedCoercion {
+        from: String,
+        via: String,
+        to: String,
+    },
+    #[error("`{word}` is declared at {}, which each reach {target}", .sorts.join(" and "))]
+    AmbiguousWord {
+        word: String,
+        sorts: Vec<String>,
+        target: String,
+    },
+    #[error("{literal} literal stands at {}, which each reach {target}", .sorts.join(" and "))]
+    AmbiguousLiteral {
+        literal: String,
+        sorts: Vec<String>,
+        target: String,
+    },
+    #[error("value reaches {sort} through coercions from {}", .from.join(" and "))]
+    AmbiguousCoercion { sort: String, from: Vec<String> },
     #[error("duplicate parameter `{0}`")]
     DuplicateParameter(String),
     #[error("unknown sort `{0}`")]

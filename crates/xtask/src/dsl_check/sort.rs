@@ -55,7 +55,7 @@ impl SortKey {
         (key, rest)
     }
 
-    /// `U`, when this is `Option(U)`: the language's one implicit wrap
+    /// `U`, when this is `Option(U)`, where a `U` stands
     /// (`syl.md` §3).
     pub(super) fn option_inner(&self) -> Option<&SortKey> {
         (self.head == "Option").then(|| &self.args[0])
