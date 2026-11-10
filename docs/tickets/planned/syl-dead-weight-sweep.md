@@ -14,7 +14,8 @@ for a bench that no longer exists.
 
 Other tickets decide the fate of declarations this sweep would otherwise delete or fold, so they
 land first: `syl-result-reads` (the coin and die reads with no user),
-`syl-one-declaration-per-keyword` (the unused `partner` variants),
+`syl-one-declaration-per-keyword` (it folds the unused `partner` variants, kept for deck
+construction, into `partner`),
 `syl-ability-words-once` (the unused `abilityWord` Template), `syl-this-head-template`
 (`thisClass`, `thisEmblem` and `thisSpacecraft`, unused), `syl-spelling-optional-segments` (the
 `enters…`, `activatedOnly…`, `prevent…` and `defines…` Templates it merges, several unused or used

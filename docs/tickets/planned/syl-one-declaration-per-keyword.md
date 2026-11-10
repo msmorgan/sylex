@@ -21,8 +21,8 @@ to it only by a `label` string naming that keyword: `devourQuality` (devour [CR#
 morph cost or a multikicker cost a kicker cost [CR#702.37b,702.33c], and nothing checks that it
 names a keyword.
 
-A narrower ticket rewrites the same declarations first: `syl-bodiless-keywords` (the seven
-partner-ability files).
+A narrower ticket edits the same declarations first: `syl-bodiless-keywords` (the seven
+partner-ability files' doc comments and `lexical`).
 
 Written against the surface (`cleanup-step6-surface`).
 
@@ -36,7 +36,9 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 
 - `hexproof`, `partner`, devour, emerge, equip, morph, kicker and cycling are each
   one Definition; each variant is a Template or an argument over it, keeping its printed wording;
-  every caller in `plugins/` is updated.
+  every caller in `plugins/` is updated. `partner` and its deck-construction variants keep their
+  empty body, since nothing models deck construction [CR#702.124a]; "partner with [name]" keeps
+  its trigger [CR#702.124j].
 - No `ability` declaration carries a `label`, and the `ability` kind has no `label` field
   (`crates/xtask/src/dsl_check/schema.rs`).
 - Any variant kept as its own Definition states in its doc comment the rule that makes it one.
