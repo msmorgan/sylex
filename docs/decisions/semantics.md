@@ -309,7 +309,7 @@ Event decisions:
   leaves-the-battlefield one ([CR#603.6c]). Arms of one `or` can differ: *Syr Konrad, the Grim*'s
   "another creature dies", "a creature card is put into a graveyard from anywhere other than the
   battlefield" and "a creature card leaves your graveyard" look back, look after and look back.
-  The derivation reads an arm's event through `triggerEvent`, through the `or` at
+  The derivation reads an arm's event through `triggerEvent`, through the `and` at
   `TriggerCondition` (each trigger condition of which is an arm, as each arm of an event `or`
   is), and through `timed`, whose Timing is read at the same point as its event:
   *Market Gnome*'s "is exiled from the battlefield while you're activating a craft ability" is a
@@ -348,10 +348,11 @@ Event decisions:
   `when`, `whenever` or `at` over its event ([CR#603.1]), so a trigger word stands only where a
   trigger condition does. Several trigger conditions of one ability ([CR#603.1b]) are one
   disjunction of them, each with its own word: "When this creature enters and whenever it
-  attacks while saddled" (*Autarch Mammoth*). Cards print "and" between them (`and`) and one,
-  *Tenuous Truce*, prints "or" (`or`); both mean the ability triggers on any of them. A
-  concurrent condition or timing window ("while saddled", "during your turn") restricts the event
-  it follows (`timed`), so it stands inside the one trigger condition it qualifies.
+  attacks while saddled" (*Autarch Mammoth*). The ability triggers on any of them. "And" is the
+  printed coordinator, so the primitive is `and`; one card, *Tenuous Truce*, prints "or", the
+  Template `or` over `and` with the same meaning. A concurrent condition or timing window ("while
+  saddled", "during your turn") restricts the event it follows (`timed`), so it stands inside the
+  one trigger condition it qualifies.
 - **`remove` is no event head.** What it names, an effect taking an attachment off its host by
   way of a state-based action ([CR#704.5m,704.5n]), is no one event, so `remove` names no Deed
   and is refused here. It is written in a negative declarative, "this effect doesn't remove this

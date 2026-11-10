@@ -22,9 +22,9 @@ an event does.
   `triggerEvent(reached($point))`) print the trigger words, so a trigger word stands only where a
   trigger condition does.
 - Joined trigger conditions are one disjunction, in printed order: the primitive
-  `or(conditions: List(TriggerCondition))` prints "or" (*Tenuous Truce*'s "… or when they attack
-  you …"), and the Template `and(conditions)` prints "and", which nearly every joining card
-  prints, with body `or($conditions)`. Each word is named for what it prints. Their list joins are
+  `and(conditions: List(TriggerCondition))` prints "and", which nearly every joining card prints,
+  and the Template `or(conditions)` prints "or" (*Tenuous Truce*'s "… or when they attack you
+  …"), with body `and($conditions)`. Each word is named for what it prints. Their list joins are
   `TODO(spelling)`.
 - `triggered(condition: TriggerCondition, intervening = none, action, limit = none)`. The Ability
   Templates `when(event, action, …)`, `whenever(…)` and `at(point, action, …)` stay as the

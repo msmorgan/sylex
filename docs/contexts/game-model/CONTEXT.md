@@ -133,7 +133,8 @@ trigger pattern's arm and the occurrence, and written nowhere ([CR#603.10,603.10
 What a triggered ability triggers on. The `TriggerCondition` sort's wording includes its
 trigger word ("when this creature enters"); the CR's form "[When/Whenever/At] [trigger condition
 or event], [effect]" uses the term for the part after the word ([CR#603.1]). One ability may
-have several, each with its own trigger word, and triggers on any of them ([CR#603.1b,603.2]).
+have several, each with its own trigger word, and triggers on any of them ([CR#603.1b,603.2]);
+cards print "and" between them.
 
 ## Statics and rules data
 

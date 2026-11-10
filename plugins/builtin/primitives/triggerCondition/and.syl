@@ -1,0 +1,8 @@
+# "<condition> and <condition>": a triggered ability with more than one trigger condition, which
+# triggers when any of them is met [CR#603.1b,603.2]. "And" is the printed coordinator: nearly
+# every card with several trigger conditions prints it ("When this enchantment enters and whenever
+# you cast a spell with mana value 5 or greater"), and each condition prints its own trigger word.
+# *Tenuous Truce* prints "or" instead and writes `or`, a Template over this.
+# TODO(spelling): Format and coordinate the conditions list entries with "and".
+# [CR#603.1b,603.2]
+primitive and(conditions: List(TriggerCondition)): TriggerCondition = And

@@ -926,16 +926,17 @@ fn at_refuses_an_event_and_whenever_refuses_a_turn_point() {
 
 /// Joined trigger conditions are one disjunction of trigger conditions
 /// [CR#603.1b], each printing its own trigger word, in either order and with
-/// any of the three words. Most cards print "and" between them (`and`):
-/// *Shrine of Limitless Power*'s "At the beginning of your upkeep and whenever
-/// you cast a black spell", *Minsc & Boo, Timeless Heroes*'s "When Minsc & Boo
-/// enters and at the beginning of your upkeep" and *Bartered Cow*'s "When this
-/// creature dies and when you discard this card" resolve. *Tenuous Truce*
-/// prints "or" (`or`): "When you attack enchanted opponent or a planeswalker
-/// they control or when they attack you or a planeswalker you control", here
-/// with its first arm shortened to "when you attack enchanted player". An
-/// event is no trigger condition without its trigger word, so *Bartered Cow*
-/// written with a bare second arm is refused at that arm's head word.
+/// any of the three words. Most cards print "and" between them (the primitive
+/// `and`): *Shrine of Limitless Power*'s "At the beginning of your upkeep and
+/// whenever you cast a black spell", *Minsc & Boo, Timeless Heroes*'s "When
+/// Minsc & Boo enters and at the beginning of your upkeep" and *Bartered Cow*'s
+/// "When this creature dies and when you discard this card" resolve. *Tenuous
+/// Truce* prints "or" (the Template `or` over `and`): "When you attack enchanted
+/// opponent or a planeswalker they control or when they attack you or a
+/// planeswalker you control", here with its first arm shortened to "when you
+/// attack enchanted player". An event is no trigger condition without its
+/// trigger word, so *Bartered Cow* written with a bare second arm is refused at
+/// that arm's head word.
 #[test]
 fn joined_trigger_conditions_are_one_disjunction() {
     assert_eq!(

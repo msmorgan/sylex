@@ -1,8 +1,0 @@
-# "<condition> and <condition>": the wording most cards print between trigger conditions ("When
-# this enchantment enters and whenever you cast a spell with mana value 5 or greater"). The
-# ability still triggers when any of them is met [CR#603.1b,603.2], so the meaning is `or`'s.
-# TODO(spelling): Format and coordinate the conditions list entries with "and".
-# [CR#603.1b,603.2]
-template and(conditions: List(TriggerCondition)): TriggerCondition {
-  body = or($conditions)
-}
