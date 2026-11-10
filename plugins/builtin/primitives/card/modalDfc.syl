@@ -1,1 +1,1 @@
-primitive modalDfc(front: CardFace, back: CardFace): Card = ModalDoubleFaced
+primitive modalDfc(front: Characteristics, back: Characteristics): Card = ModalDoubleFaced

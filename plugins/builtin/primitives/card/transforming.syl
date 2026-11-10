@@ -1,1 +1,1 @@
-primitive transforming(front: CardFace, back: CardFace): Card = Transforming
+primitive transforming(front: Characteristics, back: Characteristics): Card = Transforming

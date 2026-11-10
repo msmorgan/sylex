@@ -10,8 +10,7 @@
 //! declare. Declaration kinds, record sorts and reserved
 //! constructors have no `.syl` declaration; their provisional schemas are
 //! [`schema`]'s. The only words and sorts written here are the language's own
-//! (`none`, `some`, `Option`, `List` and the literal sorts, `syl.md` §3) and
-//! those of the single-face card exception.
+//! (`none`, `some`, `Option`, `List` and the literal sorts, `syl.md` §3).
 
 mod cycles;
 mod refusal;
@@ -604,20 +603,6 @@ impl Resolver<'_> {
     /// Resolves `value` at `expected` (`syl.md` §3).
     fn value(&mut self, value: &Value, expected: &SortKey) {
         match &value.kind {
-            ValueKind::Record(record) => {
-                // Temporary: a record at `Card` is a single-faced card, and a
-                // `CardFace` record without `characteristics` is its
-                // characteristics: two implicit wraps.
-                // `syl-single-face-card-call` deletes this exception.
-                if expected.head == "Card" {
-                    return self.value(value, &SortKey::named("CardFace"));
-                }
-                if expected.head == "CardFace"
-                    && !record.nodes().any(|f| f.name.ident == "characteristics")
-                {
-                    return self.record(record, &SortKey::named("Characteristics"));
-                }
-            }
             ValueKind::Parameter(name) => {
                 return self.parameter(name.ident.as_str(), value.span, expected);
             }
@@ -639,7 +624,10 @@ impl Resolver<'_> {
                     return self.call(call, signature);
                 }
             }
-            ValueKind::String(_) | ValueKind::Integer(_) | ValueKind::List(_) => {}
+            ValueKind::String(_)
+            | ValueKind::Integer(_)
+            | ValueKind::List(_)
+            | ValueKind::Record(_) => {}
         }
         // The one implicit wrap: a `T` at `Option(T)`.
         if let Some(inner) = expected.option_inner() {

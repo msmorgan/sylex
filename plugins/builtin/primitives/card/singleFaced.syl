@@ -1,1 +1,1 @@
-primitive singleFaced(face: CardFace): Card = SingleFaced
+primitive singleFaced(face: Characteristics): Card = SingleFaced

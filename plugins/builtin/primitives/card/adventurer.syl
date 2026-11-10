@@ -1,1 +1,1 @@
-primitive adventurer(normal: CardFace, adventure: CardFace): Card = Adventurer
+primitive adventurer(normal: Characteristics, adventure: Characteristics): Card = Adventurer

@@ -1,1 +1,1 @@
-primitive split(left: CardFace, right: CardFace): Card = Split
+primitive split(left: Characteristics, right: Characteristics): Card = Split

@@ -307,7 +307,6 @@ const MANA_COST: &str = "Option(List(ManaSymbol))";
 /// Every record sort. `CardType` is a record in the model but has none here:
 /// only a `card_type` declaration builds one.
 pub const RECORDS: &[RecordSort] = &[
-    record("CardFace", &[("characteristics", "Characteristics", false)]),
     record(
         "CharacteristicBundle",
         &[

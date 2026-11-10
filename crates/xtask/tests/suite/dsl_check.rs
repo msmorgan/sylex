@@ -548,13 +548,40 @@ fn dependency_cycles_are_refused_but_catalog_references_are_no_edge() {
 }
 
 #[test]
-fn a_single_faced_card_record_is_its_characteristics() {
+fn a_single_faced_card_is_an_explicit_call() {
     let source = format!(
-        "{COLORS}card {{ name = \"Card\", colors = [white] }}\n\
-         template face: CardFace {{ body = {{ name = \"Face\", colors = [blue] }} }}\n\
-         template double(front: CardFace, back: CardFace): Card {{ body = {{ name = \"D\" }} }}\n\
-         template wrapped: CardFace {{ body = {{ characteristics = {{ colors = [blue] }} }} }}\n\
-         card {{ name = \"Bad\", colors = [1] }}"
+        "{COLORS}primitive singleFaced(face: Characteristics): Card = SingleFaced\n\
+         card singleFaced({{ name = \"Card\", colors = [white] }})"
+    );
+    assert_eq!(kinds(&source), []);
+}
+
+#[test]
+fn a_record_at_card_is_refused() {
+    let source = format!("{COLORS}card {{ name = \"Card\", colors = [white] }}");
+    assert_eq!(kinds(&source), [RefusalKind::RecordAt(s("Card"))]);
+}
+
+#[test]
+fn a_characteristics_wrap_on_a_card_face_is_refused() {
+    let source = format!(
+        "{COLORS}primitive singleFaced(face: Characteristics): Card = SingleFaced\n\
+         card singleFaced({{ characteristics = {{ name = \"Card\", colors = [white] }} }})"
+    );
+    assert_eq!(
+        kinds(&source),
+        [RefusalKind::UnknownField {
+            field: s("characteristics"),
+            at: s("Characteristics")
+        }]
+    );
+}
+
+#[test]
+fn a_card_face_is_a_characteristics_record() {
+    let source = format!(
+        "{COLORS}primitive transforming(front: Characteristics, back: Characteristics): Card = Transforming\n\
+         card transforming(front = {{ name = \"F\", colors = [white] }}, back = {{ name = \"B\", colors = [1] }})"
     );
     assert_eq!(kinds(&source), [RefusalKind::IntegerAt(s("Color"))]);
 }
@@ -593,7 +620,7 @@ fn sylex_syl_refusals_stop_the_check() {
 fn any_declared_card_form_resolves() {
     assert_eq!(
         kinds(
-            "primitive meld(front: CardFace, back: CardFace): Card = Meld\n\
+            "primitive meld(front: Characteristics, back: Characteristics): Card = Meld\n\
              card meld(front = { name = \"Bruna\" }, back = { name = \"Brisela\" })"
         ),
         []

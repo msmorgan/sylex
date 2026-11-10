@@ -1,1 +1,1 @@
-primitive flip(normal: CardFace, alternative: CardFace): Card = Flip
+primitive flip(normal: Characteristics, alternative: Characteristics): Card = Flip
