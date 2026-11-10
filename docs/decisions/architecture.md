@@ -36,13 +36,14 @@ round-trip laws carry the system's exact round trip at this layer
 ([English](english.md) §7; the crate split and the Catalog constraint are in
 §1–2).
 
-**Spelling** relates Readings to resolved terms. Recovery reads the parse forest
+**Spelling** relates Readings to resolved terms. Recovery reads the Packed Forest
 and assembles the resolved terms whose spellings match it. Spelling a resolved
 term yields a Reading for the English layer to realize. Its data is not kept
 apart: every `.syl` declaration carries its `lexical` and `spelling` fields
 beside its meaning ([`.syl`](syl.md) §2), so a word's wording
 and its meaning are one fact with one source. Spelling coverage is therefore
 ingestion coverage: a card recovers when every phrase it prints has a spelling.
+[Spelling](spelling.md) is the grammar's design.
 
 **Semantics** is the card language: `.syl` declarations under `plugins/`.
 Primitives, Templates, Definitions and rules rows (state-based actions, and
@@ -125,11 +126,16 @@ there, in place.
 
 ## Spelling is a construction grammar
 
-Each construction — a Template or Definition with its printed wording — pairs a
-fragment of English structure with a fragment of semantic structure, their holes
-linked, in the manner of a synchronous tree-substitution grammar (STSG). A
-derivation builds both sides at once, so the same grammar recovers a resolved term from a
-Reading and spells a resolved term as English. It is not a bijection: several terms may
+Each Construction — a Primitive, Template or Definition with its printed
+wording — pairs a fragment of English structure with the call it spells, the
+wording's Holes linked to the call's parameters. Constructions combine by
+substitution and by adjunction on one side of a host, never by wrapping, with
+three closed extensions: optional and list Holes, a Tail printed away from its
+Hole, and Factoring of what a coordination's arms share
+([Spelling](spelling.md) §2–3). A derivation builds both sides at once, so the
+same grammar recovers a resolved term from a Reading and spells a resolved term
+as English, and the resolved term is that derivation: nothing records it beside
+the term ([Spelling](spelling.md) §4). It is not a bijection: several terms may
 word identically, and one sentence has several grammatical Readings, which the
 parser keeps rather than choosing ([English](english.md) §4). Meaning
 resolves the ambiguity, never rank or rule order: recovery expands each
@@ -146,9 +152,10 @@ to its resolved term and back to the identical analyzed text. That is what
 faithful means here, and it is the easy, visible demonstration that the system
 works: a card whose rendering is not its own text has a wrong term, found
 without playing a game. The identical text comes back because the resolved term
-keeps the Template call that carries each wording, so two wordings with the
-same meaning differ in which Template a card calls, never in a flag stored
-beside the term.
+keeps the Template call that carries each wording and writes each list in its
+printed order, so two wordings with the same meaning differ in which Template a
+card calls or in the order of a list's elements, never in a flag stored beside
+the term ([Spelling](spelling.md) §4, §6).
 
 ## Design principles
 

@@ -80,6 +80,20 @@ Producing the surface text of a Reading.
 One annotated unit of a realized surface: a word, an opening or closing
 delimiter, a symbol or a line boundary.
 
+## Spelling
+
+**Hole**:
+A place in a Construction's wording that the wording of one parameter's argument fills.
+
+**Tail**:
+Part of a Construction's wording printed away from the rest, at the edge of a phrase that
+encloses the Construction's Hole (*for each creature in your party*, after its clause's
+duration).
+
+**Factoring**:
+Printing once a phrase that the arms of a coordination share, each arm holding it in the
+term (*attacks or blocks*, one Subject for two events).
+
 ## Corpus and census
 
 **Corpus Unit**:
