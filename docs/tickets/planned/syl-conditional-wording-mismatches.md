@@ -17,15 +17,21 @@ so their text does not round-trip:
   into two statics, each with its own condition. `offering` splits [CR#702.48a]'s one "If you
   chose to pay the additional cost, this spell's total cost is reduced …, and you may cast this
   spell any time you could cast an instant" the same way.
-- `readAhead` writes `onlyWhile` around "the turn it entered the battlefield", and folds the
-  printed "unless it has exactly the number of lore counters on it specified in the chapter
-  symbol of that ability" ([CR#702.155a]) into the subject's predicate.
+- `readAhead` writes `onlyWhile` around "the turn it entered the battlefield", and writes its
+  "unless it has exactly the number of lore counters on it specified in the chapter symbol of that
+  ability" ([CR#702.155a]) as `is(that(ability), compare(…))`, "that ability is …".
 - *Jared Carthalion, True Heir* prints "If damage would be dealt to Jared Carthalion while you're
   the monarch, prevent …", but writes "while you're the monarch" as an `onlyWhile` condition
   around the whole replacement instead of inside its would-clause.
-- *Pithing Needle* and *Damping Matrix* print "… can't be activated unless they're mana
-  abilities", but fold the "unless" into the prohibited abilities' predicate
-  (`not(isManaAbility)`).
+- `onlyUnless` ("<spec> unless <condition>") is written for texts that print no "unless": the
+  battle's protector choice ([CR#310.9a] "If it has no battle types, only its controller can be
+  its protector"), the Saga's lore counter ([CR#714.3a] "Each Saga without read ahead"),
+  `foretoldCardCast` ([CR#702.143d] "after the turn it became a foretold card has ended") and
+  `plottedCardCast` ([CR#702.170d] "during any turn after the turn in which it became plotted").
+- *Suppression Field* and *Tithe Taker* print "… cost {2} more to activate unless they're mana
+  abilities" and "… cost {1} more to activate unless they're mana abilities", but fold the
+  "unless" into the cost shift's subject (`not(isManaAbility)`); a cost shift is no deontic rule,
+  so it has no Unless Condition.
 - `partScope` has no `spelling`, and takes the part before whose, though "During your turn"
   prints whose first (`syl.md` §5); `duringPart`, its body, takes them in the same order.
 - `onlyWhile` ("<spec> as long as <condition>") is named for "only while", which no card prints.
@@ -41,7 +47,11 @@ so their text does not round-trip:
 
 `plugins/builtin/definitions/supertype/legendary.syl`,
 `plugins/builtin/definitions/keyword_ability/{blitz,offering,readAhead}.syl`,
-`plugins/canon/cards/{Jared Carthalion, True Heir,Pithing Needle,Damping Matrix}.syl`,
+`plugins/canon/cards/{Jared Carthalion, True Heir,Suppression Field,Tithe Taker}.syl`,
+`plugins/builtin/definitions/card_type/battle.syl`,
+`plugins/builtin/definitions/subtype/enchantment/saga.syl`,
+`plugins/builtin/rules/conferral/{foretoldCardCast,plottedCardCast}.syl`,
+`plugins/builtin/templates/ability/onlyUnless.syl`,
 `plugins/builtin/templates/ability/partScope.syl`,
 `plugins/builtin/primitives/condition/duringPart.syl`,
 `plugins/builtin/templates/static/onlyWhile.syl`.
