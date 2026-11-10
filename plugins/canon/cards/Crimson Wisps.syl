@@ -7,6 +7,6 @@ card singleFaced({
         sequentially([
             establishFor(
               target(isCreature),
-              [qualityChange(it, sets, colored(colors([red]))), abilityGrant(it, haste)],
+              [qualityChange(it, sets, colored(colors([red]))), abilityGrant(it, [haste])],
               untilEndOfTurn),
             draw(1)]))]})

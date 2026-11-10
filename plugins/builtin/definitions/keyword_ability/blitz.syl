@@ -15,9 +15,8 @@ ability blitz(cost: Cost) {
         doIf(
           keywordCostPaid(blitz, thisSpell),
           atNext(beginningOfNext(endStep), sacrifice(becomes(thisSpell)))))),
-    static(asLongAs(keywordCostPaid(blitz, thisPermanent), abilityGrant(thisPermanent, haste))),
     static(
       asLongAs(
         keywordCostPaid(blitz, thisPermanent),
-        abilityGrant(thisPermanent, when(does(actor(thisPermanent), die), draw(1)))))]
+        abilityGrant(thisPermanent, [haste, when(does(actor(thisPermanent), die), draw(1))])))]
 }

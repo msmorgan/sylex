@@ -10,4 +10,4 @@ card singleFaced({
         compound([
             mana([generic(1)]),
             perform(sacrifice(a(and([isCreature, ofChosen(subtype(creature))]))))]),
-        gain(target(and([isCreature, youControl])), indestructible, untilEndOfTurn))]})
+        gain(target(and([isCreature, youControl])), [indestructible], untilEndOfTurn))]})

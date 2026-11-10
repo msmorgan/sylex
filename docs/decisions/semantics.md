@@ -360,6 +360,17 @@ Event decisions:
 
 ### 4.7 Static Specs
 
+- **Abilities granted, lost or listed together are one list**, in printed order, at the parameter
+  of the word that grants, removes or lists them: "gains hexproof and indestructible" (`gain`),
+  "has double strike and trample" (`abilityGrant`), "loses hexproof and indestructible"
+  (`abilityLoss`), "except it has haste and dethrone" (`alsoHas`), "creature tokens with flying
+  and vigilance" (`creatureToken`). Each element is an ability of its own. An object may have
+  several abilities, and a spell or ability may grant it more ([CR#113.2c]): granted and lost
+  abilities are each added or removed in layer 6 ([CR#613.1f]), the abilities a copy effect's
+  exception lists each become part of the copy's copiable values ([CR#707.9b]), and the abilities
+  listed for a token are each an ability the effect that creates it gives it ([CR#113.2c,111.3]).
+  So no Ability stands for several, and `Ability` has no conjunction. A grant of one ability is a
+  list of one.
 - **A deontic rule** is a Subject, an Action and optional modifiers: Timing, as-though, a Deontic
   Exception, an Unless Condition (`cant` and `must`), a cause (`cant` only), and a Permission
   Rider (`can` only) ([CR#113.2c]). "Can't A or B" is a conjunction of prohibitions.

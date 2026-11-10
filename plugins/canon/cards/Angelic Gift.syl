@@ -6,4 +6,4 @@ card singleFaced({
     text = [
       enchant(isCreature),
       when(does(actor(thisAura), enter), draw(1)),
-      static(abilityGrant(enchanted(creature), flying))]})
+      static(abilityGrant(enchanted(creature), [flying]))]})

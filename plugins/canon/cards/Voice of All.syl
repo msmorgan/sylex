@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       flying,
       static(entersChoosing(thisCreature, color)),
-      static(abilityGrant(thisCreature, protection(ofChosen(color))))],
+      static(abilityGrant(thisCreature, [protection(ofChosen(color))]))],
     power = 2,
     toughness = 2})

@@ -9,7 +9,7 @@ card singleFaced({
         conjunction([
             conjunction([
                 getsPt(enchanted(creature), up(1), up(1)),
-                abilityGrant(enchanted(creature), protection(isEnchantment))],
+                abilityGrant(enchanted(creature), [protection(isEnchantment)])],
               subject = enchanted(creature)),
             doesnt(actor(thisEffect), remove(thisAura))])),
       activated(perform(sacrifice(thisAura)), destroy(target(isEnchantment)))]})

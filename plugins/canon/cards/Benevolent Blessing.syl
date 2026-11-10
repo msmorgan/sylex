@@ -12,7 +12,7 @@ card singleFaced({
       static(entersChoosing(thisAura, color)),
       static(
         conjunction([
-            abilityGrant(enchanted(creature), protection(ofChosen(color))),
+            abilityGrant(enchanted(creature), [protection(ofChosen(color))]),
             doesnt(
               actor(thisEffect),
               remove(

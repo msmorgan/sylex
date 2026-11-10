@@ -14,5 +14,5 @@ card transforming(
     subtypes = [equipment],
     text = [
       static(
-        conjunction([getsPt(equipped(creature), up(3), up(3)), abilityGrant(it, firstStrike)])),
+        conjunction([getsPt(equipped(creature), up(3), up(3)), abilityGrant(it, [firstStrike])])),
       equip(mana([generic(3)]))]})

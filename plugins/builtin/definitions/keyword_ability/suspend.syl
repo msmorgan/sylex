@@ -34,7 +34,7 @@ ability suspend(amount: Amount, cost: Cost) {
             did(actor(you), cast(a(and([isCreature, isSpell]))), thisWay),
             gain(
               that(spell),
-              haste,
+              [haste],
               forAsLongAs(
                 or([is(that(spell), youControl), is(becomes(that(spell)), youControl)]))))]),
       if = is(thisCard, in(exileZone)))]

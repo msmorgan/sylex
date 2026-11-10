@@ -7,5 +7,5 @@ card singleFaced({
       enchant(isCreature),
       static(
         conjunction([
-            abilityGrant(enchanted(creature), protection(hasColor(black))),
+            abilityGrant(enchanted(creature), [protection(hasColor(black))]),
             doesnt(actor(thisEffect), remove(thisAura))]))]})

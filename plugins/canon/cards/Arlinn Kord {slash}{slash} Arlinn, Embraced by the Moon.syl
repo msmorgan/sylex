@@ -10,7 +10,7 @@ card transforming(
         loyaltySymbol(up(1)),
         establishFor(
           targets(upTo(1), isCreature),
-          [getsPt(it, up(2), up(2)), abilityGrant(it, vigilance), abilityGrant(it, haste)],
+          [getsPt(it, up(2), up(2)), abilityGrant(it, [vigilance, haste])],
           untilEndOfTurn)),
       activated(
         loyaltySymbol(up(0)),
@@ -28,7 +28,7 @@ card transforming(
         loyaltySymbol(up(1)),
         establishFor(
           allOf(and([isCreature, youControl])),
-          [getsPt(them, up(1), up(1)), abilityGrant(them, trample)],
+          [getsPt(them, up(1), up(1)), abilityGrant(them, [trample])],
           untilEndOfTurn)),
       activated(
         loyaltySymbol(down(1)),
@@ -38,10 +38,10 @@ card transforming(
         loyaltySymbol(down(6)),
         getEmblem([
             static(
-              conjunction([
-                  abilityGrant(allOf(and([isCreature, youControl])), haste),
-                  abilityGrant(
-                    them,
-                    activated(
-                      tapSymbol,
-                      dealDamageOwnPower(thisCreature, target(isAnyTarget))))]))]))]})
+              abilityGrant(
+                allOf(and([isCreature, youControl])),
+                [
+                  haste,
+                  activated(
+                    tapSymbol,
+                    dealDamageOwnPower(thisCreature, target(isAnyTarget)))]))]))]})

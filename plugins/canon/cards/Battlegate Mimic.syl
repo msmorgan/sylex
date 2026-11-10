@@ -7,7 +7,7 @@ card singleFaced({
       whenever(
         does(actor(you), cast(a(and([isSpell, hasColor(red), hasColor(white)])))),
         establishThroughout(
-          conjunction([getsBase(thisCreature, 4, 2), abilityGrant(thisCreature, firstStrike)]),
+          conjunction([getsBase(thisCreature, 4, 2), abilityGrant(thisCreature, [firstStrike])]),
           untilEndOfTurn))],
     power = 2,
     toughness = 1})

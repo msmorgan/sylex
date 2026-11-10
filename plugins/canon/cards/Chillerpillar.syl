@@ -7,6 +7,8 @@ card singleFaced({
     text = [
       activated(mana([generic(4), snow, snow]), monstrosity(2)),
       static(
-        asLongAs(is(thisCreature, hasDesignation(monstrous)), abilityGrant(thisCreature, flying)))],
+        asLongAs(
+          is(thisCreature, hasDesignation(monstrous)),
+          abilityGrant(thisCreature, [flying])))],
     power = 3,
     toughness = 3})

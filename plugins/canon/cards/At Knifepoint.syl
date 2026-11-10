@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(1), pip(black), pip(red)],
     types = [enchantment],
     text = [
-      static(partScope(turn, you, abilityGrant(allOf(and([isOutlaw, youControl])), firstStrike))),
+      static(partScope(turn, you, abilityGrant(allOf(and([isOutlaw, youControl])), [firstStrike]))),
       whenever(
         does(actor(you), commitCrime),
         create(

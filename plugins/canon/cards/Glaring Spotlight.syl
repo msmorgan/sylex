@@ -13,7 +13,7 @@ card singleFaced({
       activated(
         compound([mana([generic(3)]), perform(sacrifice(thisArtifact))]),
         sequentially([
-            gain(allOf(and([isCreature, youControl])), hexproof, untilEndOfTurn),
+            gain(allOf(and([isCreature, youControl])), [hexproof], untilEndOfTurn),
             establishThroughout(
               cant(any, block(allOf(and([isCreature, youControl])))),
               thisTurn)]))]})

@@ -6,4 +6,4 @@ card singleFaced({
       spell(
         create(
           1,
-          copyOf(target(and([isCreature, youControl])), [alsoHas(flying), isntLegendary])))]})
+          copyOf(target(and([isCreature, youControl])), [alsoHas([flying]), isntLegendary])))]})

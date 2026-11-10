@@ -6,5 +6,5 @@ card singleFaced({
       spell(
         establishFor(
           target(isCreature),
-          [getsPt(it, up(3), up(3)), abilityGrant(it, trample)],
+          [getsPt(it, up(3), up(3)), abilityGrant(it, [trample])],
           untilEndOfTurn))]})

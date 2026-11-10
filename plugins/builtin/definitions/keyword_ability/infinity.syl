@@ -7,5 +7,5 @@ ability infinity(ability: Ability) {
     static(
       asLongAs(
         is(thisPermanent, hasDesignation(harnessed)),
-        abilityGrant(thisPermanent, $ability)))]
+        abilityGrant(thisPermanent, [$ability])))]
 }

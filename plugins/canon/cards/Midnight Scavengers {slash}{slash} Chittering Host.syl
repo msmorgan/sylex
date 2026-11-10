@@ -24,7 +24,7 @@ card transforming(
         does(actor(thisCreature), enter),
         establishFor(
           allOf(and([isCreature, youControl, isOther])),
-          [getsPt(them, up(1), up(0)), abilityGrant(them, menace)],
+          [getsPt(them, up(1), up(0)), abilityGrant(them, [menace])],
           untilEndOfTurn))],
     power = 5,
     toughness = 6})

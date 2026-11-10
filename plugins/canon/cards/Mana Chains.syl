@@ -5,4 +5,4 @@ card singleFaced({
     subtypes = [aura],
     text = [
       enchant(isCreature),
-      static(abilityGrant(enchanted(creature), cumulativeUpkeep(mana([generic(1)]))))]})
+      static(abilityGrant(enchanted(creature), [cumulativeUpkeep(mana([generic(1)]))]))]})

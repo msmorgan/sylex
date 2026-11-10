@@ -9,7 +9,7 @@ card singleFaced({
         does(actor(thisCreature), enter),
         gain(
           target(and([isInstantOrSorcery, cardIn(yourGraveyard)])),
-          flashback(itsManaCost),
+          [flashback(itsManaCost)],
           untilEndOfTurn))],
     power = 2,
     toughness = 1})

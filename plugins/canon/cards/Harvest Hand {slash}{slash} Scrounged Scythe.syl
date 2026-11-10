@@ -16,5 +16,5 @@ card transforming(
       static(
         asLongAs(
           is(equipped(creature), hasSubtype(human)),
-          abilityGrant(equipped(creature), menace))),
+          abilityGrant(equipped(creature), [menace]))),
       equip(mana([generic(2)]))]})

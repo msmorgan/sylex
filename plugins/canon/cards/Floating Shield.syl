@@ -8,8 +8,8 @@ card singleFaced({
       static(entersChoosing(thisAura, color)),
       static(
         conjunction([
-            abilityGrant(enchanted(creature), protection(ofChosen(color))),
+            abilityGrant(enchanted(creature), [protection(ofChosen(color))]),
             doesnt(actor(thisEffect), remove(thisAura))])),
       activated(
         perform(sacrifice(thisAura)),
-        gain(target(isCreature), protection(ofChosen(color)), untilEndOfTurn))]})
+        gain(target(isCreature), [protection(ofChosen(color))], untilEndOfTurn))]})

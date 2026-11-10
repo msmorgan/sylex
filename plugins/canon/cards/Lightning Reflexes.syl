@@ -9,5 +9,5 @@ card singleFaced({
       static(
         conjunction([
             getsPt(enchanted(creature), up(1), up(0)),
-            abilityGrant(enchanted(creature), firstStrike)],
+            abilityGrant(enchanted(creature), [firstStrike])],
           subject = enchanted(creature)))]})

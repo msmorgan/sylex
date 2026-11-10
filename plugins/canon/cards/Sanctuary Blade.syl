@@ -8,5 +8,5 @@ card singleFaced({
       static(
         conjunction([
             getsPt(equipped(creature), up(2), up(0)),
-            abilityGrant(equipped(creature), protection(ofTheLastChosen(color)))])),
+            abilityGrant(equipped(creature), [protection(ofTheLastChosen(color))])])),
       equip(mana([generic(3)]))]})

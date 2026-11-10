@@ -18,6 +18,6 @@ card singleFaced({
           allOf(and([isCreature, youControl])),
           [
             getsBoth(them, up(forEach(1, and([hasSubtype(forest), youControl])))),
-            abilityGrant(them, trample)],
+            abilityGrant(them, [trample])],
           untilEndOfTurn))],
     loyalty = 7})

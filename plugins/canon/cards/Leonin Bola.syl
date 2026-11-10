@@ -7,7 +7,8 @@ card singleFaced({
       static(
         abilityGrant(
           equipped(creature),
-          activated(
-            compound([tapSymbol, perform(unattach(theGrantor(permanent)))]),
-            tap(target(isCreature))))),
+          [
+            activated(
+              compound([tapSymbol, perform(unattach(theGrantor(permanent)))]),
+              tap(target(isCreature)))])),
       equip(mana([generic(1)]))]})

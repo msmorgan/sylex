@@ -39,9 +39,10 @@ action theRingTemptsYou {
                   2),
                 abilityGrant(
                   this,
-                  whenever(
-                    does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
-                    sequentially([draw(1), discard(a(cardIn(hand)))]))))),
+                  [
+                    whenever(
+                      does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
+                      sequentially([draw(1), discard(a(cardIn(hand)))]))]))),
             static(
               asLongAs(
                 compareAmt(
@@ -57,11 +58,12 @@ action theRingTemptsYou {
                   3),
                 abilityGrant(
                   this,
-                  whenever(
-                    does(
-                      by(a(isCreature)),
-                      block(a(and([hasDesignation(ringBearer), youControl])))),
-                    atNext(endOfCombat, controllerSacrifices(that(creature))))))),
+                  [
+                    whenever(
+                      does(
+                        by(a(isCreature)),
+                        block(a(and([hasDesignation(ringBearer), youControl])))),
+                      atNext(endOfCombat, controllerSacrifices(that(creature))))]))),
             static(
               asLongAs(
                 compareAmt(
@@ -77,11 +79,12 @@ action theRingTemptsYou {
                   4),
                 abilityGrant(
                   this,
-                  whenever(
-                    does(
-                      actor(a(and([hasDesignation(ringBearer), youControl]))),
-                      dealDamage(recipient = a(isPlayer), kind = combat)),
-                    instruct(eachOpponent, loseLife(3))))))])),
+                  [
+                    whenever(
+                      does(
+                        actor(a(and([hasDesignation(ringBearer), youControl]))),
+                        dealDamage(recipient = a(isPlayer), kind = combat)),
+                      instruct(eachOpponent, loseLife(3)))])))])),
       choose(a(and([isCreature, actorControls]))),
       gainDesignation(that(creature), ringBearer)])
 }

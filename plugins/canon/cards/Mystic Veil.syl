@@ -6,4 +6,4 @@ card singleFaced({
     text = [
       asThoughFlashSacrificedAtCleanup,
       enchant(isCreature),
-      static(abilityGrant(enchanted(creature), shroud))]})
+      static(abilityGrant(enchanted(creature), [shroud]))]})

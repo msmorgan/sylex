@@ -6,4 +6,4 @@ card singleFaced({
       static(
         abilityGrant(
           allOf(and([non(isArtifact), isSpell, did(actor(you), cast(which), thisObject)])),
-          improvise))]})
+          [improvise]))]})

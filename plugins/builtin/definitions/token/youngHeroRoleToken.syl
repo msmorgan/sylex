@@ -13,8 +13,9 @@ token youngHeroRoleToken {
         static(
           abilityGrant(
             enchanted(creature),
-            whenever(
-              does(actor(thisCreature), attack),
-              putCounters(1, printedKind(p1p1Counter), thisCreature),
-              if = compareAmt(toughnessOf(thisCreature), atMost, 3))))]}}
+            [
+              whenever(
+                does(actor(thisCreature), attack),
+                putCounters(1, printedKind(p1p1Counter), thisCreature),
+                if = compareAmt(toughnessOf(thisCreature), atMost, 3))]))]}}
 }

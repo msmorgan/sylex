@@ -15,10 +15,11 @@ ability cipher {
     static(
       abilityGrant(
         counterpart(encodedOn, this),
-        whenever(
-          does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-          may(
-            sequentially([
-                copy(fromCardZone, the(and([isCard, related(encodedOn, thisCreature)])), 1, []),
-                may(cast(that(copy), altCost = withoutPaying))])))))]
+        [
+          whenever(
+            does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
+            may(
+              sequentially([
+                  copy(fromCardZone, the(and([isCard, related(encodedOn, thisCreature)])), 1, []),
+                  may(cast(that(copy), altCost = withoutPaying))])))]))]
 }

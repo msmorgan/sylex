@@ -5,6 +5,6 @@ card singleFaced({
     subtypes = [sliver],
     text = [
       static(entersChoosing(thisCreature, color)),
-      static(abilityGrant(allOf(hasSubtype(sliver)), protection(ofChosen(color))))],
+      static(abilityGrant(allOf(hasSubtype(sliver)), [protection(ofChosen(color))]))],
     power = 2,
     toughness = 2})

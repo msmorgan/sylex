@@ -9,6 +9,6 @@ card singleFaced({
         conjunction([
             conjunction([
                 getsPt(enchanted(creature), up(2), up(2)),
-                abilityGrant(enchanted(creature), protection(eachKind(color)))],
+                abilityGrant(enchanted(creature), [protection(eachKind(color))])],
               subject = enchanted(creature)),
             doesnt(actor(thisEffect), remove(bare(hasSubtype(aura))))]))]})

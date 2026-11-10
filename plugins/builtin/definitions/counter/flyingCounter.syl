@@ -6,5 +6,5 @@ counter flyingCounter {
   lexical = {lemma = "flying counter"},
   spelling = "flying counter",
 
-  confers = [property(abilityGrant(this, flying))]
+  confers = [property(abilityGrant(this, [flying]))]
 }

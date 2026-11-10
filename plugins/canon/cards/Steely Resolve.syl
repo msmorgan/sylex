@@ -4,4 +4,4 @@ card singleFaced({
     types = [enchantment],
     text = [
       static(entersChoosing(thisEnchantment, subtype(creature))),
-      static(abilityGrant(allOf(and([isCreature, ofChosen(subtype(creature))])), shroud))]})
+      static(abilityGrant(allOf(and([isCreature, ofChosen(subtype(creature))])), [shroud]))]})

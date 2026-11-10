@@ -3,4 +3,4 @@ card singleFaced({
     cost = [pip(green)],
     supertypes = [world],
     types = [enchantment],
-    text = [static(abilityGrant(allOf(isCreature), haste))]})
+    text = [static(abilityGrant(allOf(isCreature), [haste]))]})

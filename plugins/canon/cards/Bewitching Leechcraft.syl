@@ -9,11 +9,12 @@ card singleFaced({
       static(
         abilityGrant(
           enchanted(creature),
-          static(
-            replace(
-              would(actor(thisCreature), setStatus(untapped, actor)),
-              instead(
-                doIfDone(
-                  removeCounters(exactly(1), printedKind(p1p1Counter), thisCreature),
-                  untap(thisCreature))),
-              duringPart(untapStep, you)))))]})
+          [
+            static(
+              replace(
+                would(actor(thisCreature), setStatus(untapped, actor)),
+                instead(
+                  doIfDone(
+                    removeCounters(exactly(1), printedKind(p1p1Counter), thisCreature),
+                    untap(thisCreature))),
+                duringPart(untapStep, you)))]))]})

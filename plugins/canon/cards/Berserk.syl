@@ -8,7 +8,7 @@ card singleFaced({
             establishFor(
               target(isCreature),
               [
-                abilityGrant(it, trample),
+                abilityGrant(it, [trample]),
                 getsPt(it, up(letter(x)), up(0)),
                 letterDefinition(x, powerOf(it))],
               untilEndOfTurn),

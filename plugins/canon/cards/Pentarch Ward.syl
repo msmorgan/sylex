@@ -9,5 +9,5 @@ card singleFaced({
       when(does(actor(thisAura), enter), draw(1)),
       static(
         conjunction([
-            abilityGrant(enchanted(creature), protection(ofChosen(color))),
+            abilityGrant(enchanted(creature), [protection(ofChosen(color))]),
             doesnt(actor(thisEffect), remove(thisAura))]))]})

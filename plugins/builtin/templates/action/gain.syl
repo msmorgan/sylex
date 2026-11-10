@@ -1,4 +1,11 @@
-template gain(subject: NounPhrase, ability: Ability, duration: Option(Duration) = none): Action {
-  # TODO(spelling): Include or omit the clauses supplied by duration.
-  body = establish(characteristicChange($subject, [addedAbilities([$ability])]), $duration)
+# "<subject> gains <abilities> [until …]": the abilities are a list in printed order, so "gains
+# hexproof and indestructible" adds each of the two as an ability of its own [CR#113.2c,613.1f].
+# TODO(spelling): Include or omit the clauses supplied by duration. Coordinate the abilities list
+# entries with "and".
+# [CR#113.2c,613.1f]
+template gain(
+  subject: NounPhrase,
+  abilities: List(Ability),
+  duration: Option(Duration) = none): Action {
+  body = establish(characteristicChange($subject, [addedAbilities($abilities)]), $duration)
 }

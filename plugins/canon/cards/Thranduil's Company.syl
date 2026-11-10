@@ -13,6 +13,6 @@ card singleFaced({
           does(actor(a(and([isLand, youControl]))), enter),
           sequentially([
               putCounters(2, printedKind(p1p1Counter), target(and([isCreature, youControl]))),
-              gain(it, vigilance, untilEndOfTurn)])))],
+              gain(it, [vigilance], untilEndOfTurn)])))],
     power = 3,
     toughness = 4})

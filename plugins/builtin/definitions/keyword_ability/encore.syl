@@ -14,7 +14,7 @@ ability encore(cost: Cost) {
             sequentially([
                 create(1, copyOf(this)),
                 establishThroughout(must(actor(thatToken), attack(that(player))), thisTurn)])),
-          gain(thoseTokens, haste),
+          gain(thoseTokens, [haste]),
           atNext(beginningOfNext(endStep), sacrifice(thoseTokens))]),
       asSorcery)]
 }

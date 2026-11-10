@@ -13,5 +13,5 @@ card singleFaced({
             static(
               conjunction([
                   getsPt(allOf(and([isCreature, youControl])), up(2), up(2)),
-                  abilityGrant(them, flying)]))]))],
+                  abilityGrant(them, [flying])]))]))],
     loyalty = 4})

@@ -45,6 +45,6 @@ card transforming(
         sequentially([
             establishFor(
               allOf(and([isCreature, youControl])),
-              [abilityGrant(them, trample), getsPt(them, up(letter(x)), up(letter(x)))],
+              [abilityGrant(them, [trample]), getsPt(them, up(letter(x)), up(letter(x)))],
               untilEndOfTurn),
             define(x, countOf(and([isCreature, in(yourGraveyard)])))]))]})

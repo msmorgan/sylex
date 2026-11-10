@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       enchant(isCreature),
       static(getsPt(enchanted(creature), up(2), up(2))),
-      static(abilityGrant(enchanted(creature), flying)),
+      static(abilityGrant(enchanted(creature), [flying])),
       whenever(
         does(
           actor(

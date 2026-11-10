@@ -10,6 +10,6 @@ card singleFaced({
       static(
         abilityGrant(
           allOf(and([isInstantOrSorcery, isSpell, did(actor(you), cast(which), thisObject)])),
-          storm))],
+          [storm]))],
     power = 7,
     toughness = 7})

@@ -7,6 +7,6 @@ card singleFaced({
       static(
         abilityGrant(
           allOf(and([isArtifact, isSpell, did(actor(you), cast(which), thisObject)])),
-          convoke))],
+          [convoke]))],
     power = 1,
     toughness = 3})

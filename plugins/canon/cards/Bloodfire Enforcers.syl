@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(
         onlyWhile(
-          conjunction([abilityGrant(thisCreature, firstStrike), abilityGrant(it, trample)]),
+          abilityGrant(thisCreature, [firstStrike, trample]),
           and([
               exists(and([isInstant, in(yourGraveyard)])),
               exists(and([isSorcery, in(yourGraveyard)]))])))],

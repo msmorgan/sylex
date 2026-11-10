@@ -6,7 +6,7 @@ card singleFaced({
     subtypes = [dragon],
     text = [
       flying,
-      static(onlyWhile(abilityGrant(thisCreature, ward(mana([generic(4)]))), is(it, isUntapped))),
+      static(onlyWhile(abilityGrant(thisCreature, [ward(mana([generic(4)]))]), is(it, isUntapped))),
       whenever(
         does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
         sequentially(

@@ -1,4 +1,5 @@
-# "except it has <ability>"
-primitive alsoHas(ability: Ability): CopyExcept = Ability {
-  spelling = "except it has <ability>"
+# "except it has <abilities>", in printed order ("except it has haste and dethrone").
+# TODO(spelling): Coordinate the abilities list entries with "and".
+primitive alsoHas(abilities: List(Ability)): CopyExcept = Ability {
+  spelling = "except it has <abilities>"
 }

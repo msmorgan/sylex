@@ -4,7 +4,7 @@ card singleFaced({
     types = [artifact],
     subtypes = [fortification],
     text = [
-      static(abilityGrant(fortified(land), indestructible)),
+      static(abilityGrant(fortified(land), [indestructible])),
       whenever(
         does(actor(fortified(land)), setStatus(tapped, actor)),
         get(target(isCreature), up(1), up(1), untilEndOfTurn)),

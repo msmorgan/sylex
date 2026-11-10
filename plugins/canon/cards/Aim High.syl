@@ -8,5 +8,5 @@ card singleFaced({
             untap(target(isCreature)),
             establishFor(
               it,
-              [getsPt(it, up(2), up(2)), abilityGrant(it, reach)],
+              [getsPt(it, up(2), up(2)), abilityGrant(it, [reach])],
               untilEndOfTurn)]))]})
