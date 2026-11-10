@@ -334,16 +334,24 @@ Event decisions:
 - **A deontic rule** is a Subject, an Action and optional modifiers: Timing, as-though, a Deontic
   Exception, a cause (`cant` only), and a Permission Rider (`can` only) ([CR#113.2c]). "Can't A or
   B" is a conjunction of prohibitions.
-- **A cast or play permission widens only what it states**: the zone its `from` names, its
-  Timing or as-though, the additional land plays it counts ([CR#305.2]), and the zone a moved
-  referent was put into ("you may cast that card" after an exile, §2.1). With none of these it
-  grants no zone and no timing, so it only says how its subject may be cast: *Massacre*'s "you may cast this spell without paying its mana cost" and evoke's "You
-  may cast this card by paying [cost] rather than paying its mana cost" ([CR#702.74a]) are
-  alternative costs of a cast the rules already allow ([CR#601.3,118.9]).
+- **A cast or play permission widens only what it states**: the zone its `from` names, its Timing or
+  as-though, the additional land plays it counts ([CR#305.2]), and the zone a moved referent was put
+  into or its subject names ("you may cast that card" after an exile, §2.1; *Tibalt, Cosmic
+  Impostor*'s emblem's "You may play cards exiled with Tibalt, Cosmic Impostor"). With none of these
+  it grants no zone and no timing, so it only says how its subject may be cast: *Massacre*'s "you
+  may cast this spell without paying its mana cost" and evoke's "You may cast this card by paying
+  [cost] rather than paying its mana cost" ([CR#702.74a]) are alternative costs of a cast the rules
+  already allow, as they allow a cast from the hand
+  ([CR#601.3,118.9,301.1,302.1,303.1,304.1,306.1,307.1,310.1]).
+- **A permission's alternative or additional cost applies only to a cast it describes.** Its `from`
+  bounds that cast as well as granting it: warp's cost applies to a cast from the hand, not to the
+  later cast from exile its delayed trigger allows ([CR#702.185a]). A permission that states no zone
+  bounds none, so its cost joins a cast any other rule or effect allows, as a morph card is cast
+  face down from the top of a library under *Garruk's Horde* ([CR#702.37c,601.3e]).
 - **An alternative or additional cost stands where its sentence prints it.** "You may cast X by
-  paying C …" or "… without paying its mana cost", in a permission or an instructed cast, fills
-  that `cast`'s `altCost` (or, "as an additional cost", its `addedCost`). "You may pay C rather than
-  pay …" is the static `altCost`, and "As an additional cost to cast …" the static `addedCost`
+  paying C …" or "… without paying its mana cost", in a permission or an instructed cast, fills that
+  `cast`'s `altCost` (or, "as an additional cost", its `addedCost`). "You may pay C rather than pay
+  …" is the static `altCost`, and "As an additional cost to cast …" the static `addedCost`
   ([CR#118.8,118.9]).
 - **A replacement's `repl`** says what happens:
   - `instead`: in the event's place.
