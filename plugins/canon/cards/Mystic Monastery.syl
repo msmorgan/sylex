@@ -1,0 +1,8 @@
+card singleFaced({
+    name = "Mystic Monastery",
+    types = [land],
+    text = [
+      static(entersTapped(thisLand)),
+      activated(
+        tapSymbol,
+        addMana(or([symbols([pip(blue)]), symbols([pip(red)]), symbols([pip(white)])])))]})

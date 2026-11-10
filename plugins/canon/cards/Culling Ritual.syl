@@ -1,0 +1,12 @@
+card singleFaced({
+    name = "Culling Ritual",
+    cost = [generic(2), pip(black), pip(green)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            destroy(each(and([non(isLand), isPermanent, hasManaValue(atMost, 2)]))),
+            addMana(
+              counted(
+                forEach(1, and([isPermanent, was(destroy(which), thisWay)])),
+                or([symbols([pip(black)]), symbols([pip(green)])])))]))]})

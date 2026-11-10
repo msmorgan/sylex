@@ -1,0 +1,12 @@
+card singleFaced({
+    name = "Cascade Bluffs",
+    types = [land],
+    text = [
+      activated(tapSymbol, addMana(symbols([colorlessPip]))),
+      activated(
+        compound([mana([hybridPip(blue, red)]), tapSymbol]),
+        addMana(
+          or([
+              symbols([pip(blue), pip(blue)]),
+              symbols([pip(blue), pip(red)]),
+              symbols([pip(red), pip(red)])])))]})
