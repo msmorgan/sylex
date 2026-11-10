@@ -799,7 +799,8 @@ fn plugin_refusals(cards: &str) -> Vec<(RefusalKind, String)> {
 /// "At" names a turn point and "when" and "whenever" an event [CR#603.2b]:
 /// *Elvish Visionary*'s enters trigger under `at`, and *Thallid*'s upkeep
 /// trigger under `whenever` and *Myr Prototype*'s under `when`, are refused
-/// at the trigger word's argument.
+/// at the trigger word's argument: each refusal spans the head word of that
+/// argument, which each card writes once.
 #[test]
 fn at_refuses_an_event_and_whenever_refuses_a_turn_point() {
     assert_eq!(
@@ -822,23 +823,29 @@ fn at_refuses_an_event_and_whenever_refuses_a_turn_point() {
                  when(\n\
                    beginningOfYour(upkeep),\n\
                    putCounters(lit(1), printedKind(p1p1Counter), thisCreature))]})"
-        )
-        .into_iter()
-        .map(|(kind, _)| kind)
-        .collect::<Vec<_>>(),
+        ),
         [
-            RefusalKind::UnknownWord {
-                word: s("does"),
-                sort: s("TurnPoint")
-            },
-            RefusalKind::UnknownWord {
-                word: s("beginningOfYour"),
-                sort: s("GameEvent")
-            },
-            RefusalKind::UnknownWord {
-                word: s("beginningOfYour"),
-                sort: s("GameEvent")
-            },
+            (
+                RefusalKind::UnknownWord {
+                    word: s("does"),
+                    sort: s("TurnPoint")
+                },
+                s("does")
+            ),
+            (
+                RefusalKind::UnknownWord {
+                    word: s("beginningOfYour"),
+                    sort: s("GameEvent")
+                },
+                s("beginningOfYour")
+            ),
+            (
+                RefusalKind::UnknownWord {
+                    word: s("beginningOfYour"),
+                    sort: s("GameEvent")
+                },
+                s("beginningOfYour")
+            ),
         ]
     );
 }

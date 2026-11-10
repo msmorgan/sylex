@@ -13,10 +13,11 @@ name, and optional ones passed positionally, many of them verbs overloaded acros
 defaulted parameter. `docs/decisions/syl.md` §2 says "argument order carries no meaning", so
 nothing tells a reader which parameter a positional argument fills.
 
-Three narrower tickets rewrite calls this ticket also respells, and land first:
-`syl-at-turn-point` (14 `at` calls that pass a required `action` by name or an optional argument
-positionally), `syl-alternative-costs-one-model` (39 `altCost` calls that pass `cost`
-positionally) and `syl-boolean-flags` (4 calls of its flagged declarations).
+Two narrower tickets rewrite calls this ticket also respells, and land first:
+`syl-alternative-costs-one-model` (39 `altCost` calls that pass `cost` positionally) and
+`syl-boolean-flags` (4 calls of its flagged declarations). `syl-at-turn-point` changed `at`'s
+first parameter to a turn point but left the text of the 14 `at` calls that pass the required
+`action` by name as it was; respelling them is this ticket's.
 
 Written against the spine (`cleanup-step6-spine`).
 

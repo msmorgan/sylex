@@ -257,9 +257,9 @@ When a Player may act or a trigger or replacement applies; none written means wh
 Player has priority ([CR#117.1a]).
 
 **Turn Point**:
-A moment in the turn structure that an "at" trigger names: the beginning of a phase, step or
-turn, picked by whose it is and which occurrence ([CR#603.2b]); "end of combat" is the end of
-combat step's beginning ([CR#511.2]). The game reaching one is an event.
+A moment in the turn structure that an "at" trigger names: the beginning of a phase or step
+([CR#603.2b]), or of a turn, picked by whose it is and which occurrence; "at end of combat" names
+the end of combat step's beginning ([CR#511.2]). The game reaching one is an event.
 _Avoid_: Moment, Step trigger.
 
 **Event Ordinal**:

@@ -293,7 +293,10 @@ Event decisions:
   which no Turn Point is. A delayed "at" trigger (`atNext`) takes a Turn Point the same way.
   Any other event-taking position that names a beginning writes `reached` ("until your next
   turn", "continuously since the beginning of your last upkeep"). The end of a phase, step or
-  turn (`endOf`) is no Turn Point: "at end of combat" is a beginning.
+  turn (`endOf`) is no Turn Point: "at end of combat" is a beginning. `reached(point)` is an
+  ordinary `GameEvent`, which durations, `heldSince` and `delay` need, so `when` and `whenever`
+  refuse a Turn Point written bare but not one wrapped in `reached`; the trigger word for a Turn
+  Point is `at`.
 - **Joined headers are not a disjunction.** "When this creature enters and whenever it attacks
   while saddled" is two trigger headers of one ability, each with its own trigger word,
   concurrent condition and timing; an `or` over events stands inside one header's event.

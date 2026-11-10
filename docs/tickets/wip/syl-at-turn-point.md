@@ -23,7 +23,8 @@ current `at` call is a `beginningOf…` event, one wrapped in `nthOccurrence` (*
   triggers and *Paradox Haze* need.
 - `at` takes a turn point, is spelled "At <turn point>, <action>", and expands to the event the
   turn point denotes; there is still one triggered-ability constructor, because the CR treats a
-  step's beginning as a trigger event [CR#603.2b]. Its spelling `TODO` is settled.
+  step's beginning as a trigger event [CR#603.2b]. Its base spelling is settled; the
+  `TODO(spelling)` for its limit, if and joins clauses moves to `syl-spelling-optional-segments`.
 - `when` and `whenever` refuse a turn point as their own header's event. A joined header may be
   a turn-point header beside an event header, each `TriggerHeader` printing its own trigger
   word: *Minsc & Boo, Timeless Heroes* ("When Minsc & Boo enters and at the beginning of your
@@ -35,6 +36,13 @@ current `at` call is a `beginningOf…` event, one wrapped in `nthOccurrence` (*
   refused.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
+
+## Not in scope
+
+- *Kitsune Mystic* prints "At the beginning of the end step", while canon writes `beginningOfEach`,
+  spelled "each".
+- A delayed "at" trigger with a stated duration (epic, paradigm) is `delayWithin(reached(…))`,
+  whose spelling is still "When …".
 
 ## Pointers
 
