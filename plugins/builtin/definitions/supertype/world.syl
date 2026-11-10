@@ -1,6 +1,26 @@
 # World: a supertype [CR#205.4a].
+#
+# [CR#205.4f,704.5k] The world rule: "If two or more permanents have the supertype world, all
+# except the one that has had the world supertype for the shortest amount of time are put into
+# their owners' graveyards. In the event of a tie for the shortest amount of time, all are put into
+# their owners' graveyards." Per holder: a world permanent is put into its owner's graveyard if
+# another world permanent has had the world supertype for the shortest amount of time, alone or
+# tied, since `superlative` admits a tie. So the one with the shortest time stays only when no
+# other ties it, and a lone world permanent stays.
 supertype world {
   lexical = {lemma = "world"},
   spelling = "world",
-  name = "World"
+  name = "World",
+  confers = [
+    stateBased(
+      exists(
+        and([
+            isOther,
+            hasSupertype(world),
+            isPermanent,
+            superlative(
+              min,
+              heldFor(hasSupertype(world)),
+              and([hasSupertype(world), isPermanent]))])),
+      putInto(this, graveyard))]
 }
