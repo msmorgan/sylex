@@ -23,6 +23,11 @@ Scope; a keyword action's Definition also carries a Deed, as does a keyword abil
 can ask who did it (crewing, [CR#702.122b]). A Counter's, Designation's or Defined Token's
 carries none. A Defined Token's takes no arguments, so its scope holds nothing of its caller's.
 
+**Coercion**:
+A nameless `.syl` declaration through which a value of one sort stands at another by way of an
+existing Primitive: a Card Type or Subtype as a Head Noun, an integer as an Amount. It applies
+only where the value does not stand at the expected sort itself, and never twice in a row.
+
 **Defined Token**:
 A token whose characteristics the rules define in full: a predefined token ([CR#111.10]) or one
 a keyword action's rule defines, as empower Jace defines a Jace planeswalker token

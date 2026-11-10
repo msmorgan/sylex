@@ -43,8 +43,15 @@ bare integers; with the coercions declared first, each writes them once, as prin
   the value is written as a `T`, and a coercion into `T` applies.
 - Every existing `lit(…)`, `type(…)` and `subtype(…)` call site whose wrap a coercion would
   supply is respelled bare, in one scripted commit gated by a check that each respelled file
-  resolves to the same tree. `cargo xtask dsl fmt` collapses such an explicit wrap, so the corpus
-  has one spelling of each term; the wrapped primitive stays callable.
+  resolves to the same tree, so the corpus has one spelling of each term; the wrapped primitive
+  stays callable.
+
+## Open questions
+
+- Whether `cargo xtask dsl fmt` collapses an explicit wrap a coercion would supply. The formatter
+  reads one file's syntax and resolves no sort, and the wrap is not visible in the syntax:
+  `subtype(goblin)` is the `NounWord` primitive at a head noun and the `TextWord` primitive in a
+  text change, and only the expected sort tells them apart.
 
 ## Done when
 
