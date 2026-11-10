@@ -16,6 +16,25 @@ zone the card can be cast from [CR#702.74a,702.103a], and dash's while the card 
 for its foretell cost [CR#702.143d] unwritten, saying no cost term names a keyword's cost, though
 `usingKeyword` exists.
 
+## Design
+
+- An alternative cost is a value of sort `AltCost`: `payingInstead(cost)`, `withoutPaying` or
+  `usingKeyword(label)` [CR#118.9]. An additional cost is a value of sort `AddedCost`:
+  `plusAdditional(cost, times = once)` [CR#118.8]. No other declaration builds either.
+- The printed sentence decides where the value stands. "You may pay C rather than pay …" and "As
+  an additional cost to cast …" are the statics `altCost(subject, cost)` and
+  `addedCost(subject, optionality, cost)`. "You may cast X [by paying C | without paying its mana
+  cost]", in a permission or an instructed cast, fills the `altCost` or `addedCost` slot of
+  `cast`, `play` or `activate`. A keyword stands where its rule's sentence puts it: evoke ("You
+  may cast this card by paying [cost] rather than paying its mana cost") is a permission, mutate
+  ("You may pay [cost] rather than pay this spell's mana cost") a static.
+- A cast permission widens only the coordinates it states (`docs/decisions/semantics.md` §4.7),
+  so a permission with no `from` writes *Omniscience*'s and evoke's alternative cost without
+  granting a zone.
+- Cast characteristics (`faceDown`, `prototyped`, `fused`, `transformedPaying`) stay in `cast`'s
+  `payment`, sort `PlayPayment`, whose default `itsOwnCost` is the ordinary cast;
+  `syl-cast-form-sort` splits them out.
+
 ## Done when
 
 - Each of alternative and additional cost has one model, the other form deleted or a Template
