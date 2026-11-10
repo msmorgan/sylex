@@ -31,5 +31,5 @@ reads a noted amount, and no way to say "the last card exiled with this artifact
 
 ## Pointers
 
-- `plugins/builtin/primitives/mana/ofTheLastNotedType.syl`
+- `plugins/builtin/primitives/producedMana/ofTheLastNotedType.syl`
 - `plugins/builtin/primitives/predicate/superlative.syl`

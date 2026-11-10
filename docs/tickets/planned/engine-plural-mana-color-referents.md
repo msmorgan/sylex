@@ -27,4 +27,4 @@ qualifies.
 - `crates/core/src/mana.rs` (`ManaSpec`), `crates/engine/src/resolve/player_action.rs`
   (`AmongColorsOf` arm)
 - `crates/engine/tests/payment_replay.rs` (Mox Amber fixture)
-- `plugins/builtin/primitives/mana/ofAnyColorOf.syl`
+- `plugins/builtin/primitives/producedMana/ofAnyColorOf.syl`
