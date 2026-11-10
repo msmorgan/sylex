@@ -367,6 +367,7 @@ pub const RECORDS: &[RecordSort] = &[
             ("asThough", "Option(AsThough)", true),
             ("except", "Option(DeonticExcept)", true),
             ("cause", "Option(Causing)", true),
+            ("unless", "Option(Condition)", true),
             ("rider", "Option(Action)", true),
         ],
     ),

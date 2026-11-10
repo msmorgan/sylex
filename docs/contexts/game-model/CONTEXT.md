@@ -145,6 +145,11 @@ effect with a Duration. Applying it establishes a Continuous Effect ([CR#611.2])
 The one source a "can't" exempts ("can't be blocked except by artifact creatures",
 [CR#702.13b]).
 
+**Unless Condition**:
+The condition under which a deontic rule does not apply ("A player can't cast a legendary instant
+or sorcery spell unless that player controls …", [CR#205.4e]). It is read inside the rule, so it
+reaches the rule's Subject and patients.
+
 **Permission Rider**:
 The rest of a permission's ability that modifies the act it allows, applying only to acts done
 under that permission ([CR#113.2c]).

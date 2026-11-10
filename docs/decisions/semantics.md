@@ -103,8 +103,10 @@ spell or ability is put on the stack ([CR#601.2c,115.1]).
    already attached to those artifacts" reads the "noncreature artifacts you control" of its "As
    long as" sentence.
 3. **Negated or modal** (`cant`/`must`/`can`/`gatedBy`, `not`, an else branch). Hypothetical
-   indefinite, counted and partitive participants are closed. Targets, definite references and
-   universal domains stay accessible under their identities ([CR#101.2]).
+   indefinite, counted and partitive participants are closed on exit; a deontic rule's Unless
+   Condition is inside its box (§4.7). Under `cant`, a hypothetical indefinite has universal
+   force: "A player can't cast …" forbids each player ([CR#205.4e]). Targets, definite references
+   and universal domains stay accessible under their identities ([CR#101.2]).
 4. **Distributive loop** (`doForEach`). Each pass binds the loop referent for the body to read.
    On exit, the loop exports plural referents for the targets the body announced and the objects
    it created. Each is a recorded discourse fact, not derived from determiners or stamps.
@@ -140,7 +142,9 @@ Resolution applies DRT techniques to the DRS, measured against a gold set of the
 endophora. Whatever the technique, a referent is accessible to an anaphor only if all four hold:
 
 1. No active Reference Scope hides it.
-2. Its number agrees with the anaphor's.
+2. Its number agrees with the anaphor's. Inside a deontic rule's Unless Condition (§4.7), a
+   universal participant is read one member at a time: a plural anaphor reads the domain
+   distributively, and a singular one reads the member at hand.
 3. Its sort, zone and Head Noun fit the anaphor's carrier word ([CR#109.2]).
 4. The consuming verb can apply to it in its zone ([CR#109.2,701.21a]). A creature that died
    cannot be sacrificed or have counters put on it as a permanent.
@@ -356,8 +360,18 @@ Event decisions:
 ### 4.7 Static Specs
 
 - **A deontic rule** is a Subject, an Action and optional modifiers: Timing, as-though, a Deontic
-  Exception, a cause (`cant` only), and a Permission Rider (`can` only) ([CR#113.2c]). "Can't A or
-  B" is a conjunction of prohibitions.
+  Exception, an Unless Condition (`cant` and `must`), a cause (`cant` only), and a Permission
+  Rider (`can` only) ([CR#113.2c]). "Can't A or B" is a conjunction of prohibitions.
+- **An Unless Condition** ("<subject> can't <action> unless <condition>", "<subject> <action>s if
+  able unless <condition>") is read inside its deontic rule's box (§2.2 item 3), after the rule's
+  Subject and Action, so it reaches the Subject's noun phrase and the Action's patients, a
+  hypothetical indefinite among them. [CR#205.4e]'s "A player can't cast a legendary instant or
+  sorcery spell unless that player controls a legendary creature or a legendary planeswalker" reads
+  "that player" as the Subject's "a player"; *Pithing Needle*'s "Activated abilities of sources with
+  the chosen name can't be activated unless they're mana abilities" reads "they" as the abilities.
+  The rule applies to each participant it ranges over exactly when the condition, read of that
+  participant, does not hold, so a singular anaphor may read that participant (§2.4 item 2): read
+  ahead's "Chapter abilities of this Saga can't trigger … unless … that ability" ([CR#702.155a]).
 - **A cast or play permission widens only what it states**: the zone its `from` names, its Timing or
   as-though, the additional land plays it counts ([CR#305.2]), and the zone a moved referent was put
   into or its subject names ("you may cast that card" after an exile, §2.1; *Tibalt, Cosmic

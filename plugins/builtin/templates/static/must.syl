@@ -2,14 +2,19 @@
 # `any` is one requirement on the whole clause: "this creature must be blocked if able" is one
 # requirement on the declaration of blockers [CR#509.1c], met when at least one creature blocks it.
 # `by (allOf …)` instead puts a requirement on each creature ("must be blocked by all creatures
-# able to block it").
+# able to block it"). `unless` is its printed "unless <condition>", read inside it
+# (`docs/decisions/semantics.md` §4.7).
 # [CR#509.1c]
 template must(
   subj: Subject,
   action: Action,
   timing: Option(Timing) = none,
   asThough: Option(AsThough) = none,
-  except: Option(DeonticExcept) = none): StaticSpec {
-  # TODO(spelling): Include or omit the clauses supplied by timing, asThough, except.
-  body = staticSpecMust($subj, $action, {timing = $timing, asThough = $asThough, except = $except})
+  except: Option(DeonticExcept) = none,
+  unless: Option(Condition) = none): StaticSpec {
+  # TODO(spelling): Include or omit the clauses supplied by timing, asThough, except, unless.
+  body = staticSpecMust(
+    $subj,
+    $action,
+    {timing = $timing, asThough = $asThough, except = $except, unless = $unless})
 }
