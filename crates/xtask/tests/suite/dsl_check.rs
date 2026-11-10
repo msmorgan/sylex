@@ -1238,8 +1238,8 @@ fn a_nameless_header_on_a_named_kind_is_refused() {
 #[test]
 fn a_move_names_no_observation_point() {
     let written = |action: &str| format!("template t: Action {{ body = {action} }}");
-    // Whether a trigger looks back is derived [CR#603.10a]; `move` takes no
-    // point to write.
+    // Whether a trigger looks back is derived [CR#603.10a..603.10f]; `move`
+    // takes no point to write.
     assert_eq!(
         plugin_refusals(&written("move(it, battlefield, graveyard, [])")),
         []

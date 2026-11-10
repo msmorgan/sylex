@@ -1,7 +1,7 @@
 # Move the subject from the stated origin to the destination, with the specified arrival riders.
 # A move alone is not destruction [CR#701.8b]. A move names no Observation Point: whether a
 # trigger watching it looks back in time follows from the trigger's pattern and the occurrence
-# [CR#603.10a].
+# [CR#603.10a..603.10f].
 primitive move(
   subject: NounPhrase,
   from: Location,

@@ -71,10 +71,11 @@ stacks cannot supply these, because a binding's position shifts as others are pu
 - A zone change keeps the referent and records the move on it: its origin, its new zone and the
   deed. Carrier words ("that card" after "exile target creature", [CR#109.2]), the consuming
   verb's applicability (§2.4) and Participial Descriptions read those. The origin keys the reads
-  that reach the object as it was before the move: a lookback's historical subject ("If that
-  creature dies this way" in *Saw in Half*, *Kaervek's Purge* and *Tuktuk Scrapper*, §4.8) and
-  last-known information once the move hid it (*Zoyowa's Justice*'s "its mana value" after "shuffles
-  it into their library", [CR#608.2h]). That the moved card is a new object in the game
+  that reach the object as it was before the move: a lookback's historical subject (§4.8), as in
+  *Saw in Half*'s and *Kaervek's Purge*'s "If that creature dies this way" and *Tuktuk
+  Scrapper*'s "If that artifact is put into a graveyard this way, … that artifact's controller",
+  and last-known information once the move hid it (*Zoyowa's Justice*'s "its mana value" after
+  "shuffles it into their library", [CR#608.2h]). That the moved card is a new object in the game
   ([CR#400.7]) is game identity, which lowering supplies.
 
 ### 2.2 Boxes
@@ -260,8 +261,9 @@ word of its own.
 A replacement must see the world the replaced event would change, so `would` reads its Action
 **before** the event. Its patients are still in their old zone, and
 prospective amounts such as "that many" exist, but products such as a drawn card do not
-([CR#614.6]). Every other context reads its Action **after** the event: patients have moved, are
-stamped with the deed, and become new objects where [CR#400.7] applies.
+([CR#614.6]). Every other context reads its Action **after** the event, except for the two reads
+below: patients have moved, are stamped with the deed, and become new objects where [CR#400.7]
+applies.
 
 Two reads are of the world before the event. A look-back trigger pattern (§4.6) reads its own
 descriptions as the objects were immediately prior to the event ([CR#603.10]); only the trigger's
@@ -282,17 +284,18 @@ Event decisions:
   ([CR#700.4]). A move carries no cause; a caused move is wrapped in `causes` or `causedBy`.
 - **The Observation Point is derived, never written.** No event head or trigger carries it. Each
   arm of a trigger pattern looks back in time when it names an event on the closed list of
-  look-back triggers, and otherwise observes the event after it: leaving the battlefield, a sacrifice,
-  leaving a graveyard, or an object all players can see put into a hand or library
-  ([CR#603.10a]); phasing out, becoming unattached, losing control, a spell being countered and a
-  player losing the game ([CR#603.10b..603.10f]). An enters pattern is observed after
-  ([CR#603.6a]), and a pattern "from anywhere" is never a leaves-the-battlefield one
-  ([CR#603.6c]). Arms of one `or` can differ: *Syr Konrad, the Grim*'s "another creature dies",
-  "a creature card is put into a graveyard from anywhere other than the battlefield" and "a
-  creature card leaves your graveyard" look back, look after and look back. The publicly-visible class
-  depends on the occurrence, so the point is not a function of the written pattern alone:
+  look-back triggers. The list is: leaving the battlefield, a sacrifice, leaving a graveyard, and
+  an object all players can see put into a hand or library ([CR#603.10a]); phasing out, becoming
+  unattached, a player losing control of an object or an opponent gaining control of it from that
+  player, a spell being countered, and a player losing the game ([CR#603.10b..603.10f]). Any other
+  arm observes the event after it ([CR#603.10]), and a pattern "from anywhere" is never a
+  leaves-the-battlefield one ([CR#603.6c]). Arms of one `or` can differ: *Syr Konrad, the Grim*'s
+  "another creature dies", "a creature card is put into a graveyard from anywhere other than the
+  battlefield" and "a creature card leaves your graveyard" look back, look after and look back.
+  [CR#603.10a] sorts abilities, not occurrences; this design reads its publicly visible class per
+  occurrence, so the point is not a function of the written pattern alone. Under that reading
   *Dutiful Knowledge Seeker*'s "put into a library from anywhere" looks back for a card from a
-  graveyard and not for one from a hand.
+  graveyard and not for one from a hand; no ruling settles it.
 - **Damage with no kind written** is the effect's own noncombat damage in an instruction, and all
   damage in a pattern ([CR#120.2b]).
 - **A counter or die pattern watches its written amount.** `1` matches each occurrence; `anyAmount`
@@ -356,7 +359,9 @@ Event decisions:
 
 ### 4.8 Lookback
 
-A lookback is `did(subj, action, within)`, with an optional Event Ordinal.
+A lookback is `did(subj, action, within)`, with an optional Event Ordinal. Its subject and its
+patients are read as they were when the event happened, through the zone change's recorded origin
+(§2.1, §4.5): "that creature" in "If that creature dies this way" is the departed permanent.
 
 - `thisWay` reads an event its own ability's earlier text caused ([CR#608.2c]). `triggering` reads
   the event its ability triggers on ([CR#603.2]). Both must be grounded in the text. Whether the

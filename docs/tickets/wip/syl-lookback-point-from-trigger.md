@@ -23,12 +23,14 @@ Written against the start of step 6 (`syl-single-face-card-call`).
 - The semantics derives the Observation Point per trigger-pattern arm and occurrence, from the
   closed list of look-back triggers: leaving the battlefield, a sacrifice, leaving a graveyard, a
   publicly visible object put into a hand or library [CR#603.10a], phasing out [CR#603.10b],
-  becoming unattached [CR#603.10c], losing control [CR#603.10d], a spell being countered
+  becoming unattached [CR#603.10c], a player losing control of an object or an opponent gaining
+  control of it from that player [CR#603.10d], a spell being countered
   [CR#603.10e] and a player losing the game [CR#603.10f]. "From anywhere" is never a
   leaves-the-battlefield ability [CR#603.6c].
-- The publicly-visible class depends on the occurrence (whether the card put into a hand or
-  library was visible to all players), so the derivation is not a function of the written pattern
-  alone (*Dutiful Knowledge Seeker*: "put into a library from anywhere").
+- [CR#603.10a] sorts abilities, not occurrences; this design reads its publicly visible class
+  per occurrence (whether the card put into a hand or library was visible to all players), so the
+  derivation is not a function of the written pattern alone (*Dutiful Knowledge Seeker*: "put into
+  a library from anywhere"). No ruling settles that reading.
 - The point is not a slot on the trigger: one trigger's arms can differ (*Syr Konrad, the Grim*'s
   three arms look back, look after and look back), and its `whenever(or([…]))` names one trigger.
 - It is not a `looksBack` field on each event head: the rule would be stated twice, since a `move`
@@ -39,8 +41,9 @@ Written against the start of step 6 (`syl-single-face-card-call`).
 ## Done when
 
 - `move` has no `at` parameter, and no call in `plugins/` chooses an observation point by hand.
-- The state-based rows that put a permanent into a graveyard observe it the same way.
-- A `move` written with an observation argument is refused (`crates/xtask/tests/suite/dsl_check.rs`).
+- The state-based rows that put a permanent into a graveyard write the move the same way.
+- A `move` written with an observation argument is refused
+  (`crates/xtask/tests/suite/dsl_check.rs`).
 - `docs/decisions/semantics.md` §2.1 records a zone change's origin: the historical read in a
   lookback ("if that creature dies this way") and the last-known read after a shuffle key on it.
 - `docs/decisions/semantics.md` §4.5 states where the before-reading applies: a look-back pattern
@@ -50,6 +53,12 @@ Written against the start of step 6 (`syl-single-face-card-call`).
   entry **Observation Point** says so.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
+
+## Not in scope
+
+- `putInto`'s default `from = anywhere` makes a pattern that states no origin the same term as a
+  written "from anywhere", so the [CR#603.6c] exclusion applies to every origin-less pattern
+  (*Stonebinder's Familiar*'s `putInto(…, exileZone)`).
 
 ## Pointers
 
