@@ -125,7 +125,8 @@ Activating, casting or playing, or a resolution, as a Deed text can name or have
 out (`procedure`) ([CR#601.2,602.1,608.2]).
 
 **Observation Point**:
-Whether an event is observed just before or just after it happens ([CR#603.10,603.10a]).
+Whether a trigger observes an event just before or just after it happens. It is derived from the
+trigger pattern's arm and the occurrence, and written nowhere ([CR#603.10,603.10a..603.10f]).
 
 ## Statics and rules data
 
