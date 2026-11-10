@@ -5,9 +5,10 @@ card singleFaced({
     subtypes = [leech],
     text = [
       eerie(
-        whenever(
-          does(actor(a(and([isEnchantment, youControl]))), enter),
-          joins = [joinedHead(does(actor(you), fullyUnlock(a(hasSubtype(room)))))],
+        triggered(
+          and([
+              whenever(does(actor(a(and([isEnchantment, youControl]))), enter)),
+              whenever(does(actor(you), fullyUnlock(a(hasSubtype(room)))))]),
           action = instruct(eachOpponent, loseLife(1))))],
     power = 2,
     toughness = 2})

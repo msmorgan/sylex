@@ -61,7 +61,8 @@ creature per arm; neither card can be written correctly today.
 
 ## Not in scope
 
-- Joined trigger headers ("When … and whenever …"), which are not a disjunction of events.
+- Joined trigger conditions ("When … and whenever …"): a disjunction of trigger conditions, each
+  with its own trigger word, not an `or` of events with a shared phrase.
 - A Template parameter mentioned in two arms of an `or` inside a body:
   `syl-binding-across-or-arms`.
 

@@ -1,0 +1,6 @@
+# "<event> <timing>": the event, counted only when it happens within the Timing ("whenever this
+# creature attacks while you control two or more artifacts", "whenever a land enters during your
+# turn"). The Timing spells its own word.
+primitive timed(event: GameEvent, timing: Timing): GameEvent = Timed {
+  spelling = "<event> <timing>"
+}

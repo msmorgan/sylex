@@ -236,35 +236,6 @@ fn record_fields_are_checked_against_the_record_sort() {
     );
 }
 
-/// A trigger header names its event; alternative events are an `or` written
-/// as that event, never a field beside it. A header with no concurrent
-/// condition or timing window omits them. `triggered` consumes the record
-/// sort, which an unconsumed sort would otherwise make unknown.
-#[test]
-fn a_trigger_header_writes_its_event_and_no_alternatives() {
-    assert_eq!(
-        kinds(
-            "primitive now: GameEvent = Now\n\
-             primitive triggered(header: TriggerHeader): Ability = Triggered\n\
-             template a: TriggerHeader { body = { event = now } }\n\
-             template b: TriggerHeader { body = { while = none, timing = none } }\n\
-             template c: TriggerHeader {\n\
-               body = { event = now, alternatives = [], while = none, timing = none }\n\
-             }"
-        ),
-        [
-            RefusalKind::MissingField {
-                field: s("event"),
-                at: s("TriggerHeader")
-            },
-            RefusalKind::UnknownField {
-                field: s("alternatives"),
-                at: s("TriggerHeader")
-            },
-        ]
-    );
-}
-
 #[test]
 fn declaration_blocks_are_checked_against_their_kind() {
     assert_eq!(
@@ -953,24 +924,37 @@ fn at_refuses_an_event_and_whenever_refuses_a_turn_point() {
     );
 }
 
-/// A joined header prints its own trigger word, so an "at" header joins an
-/// event header: *Minsc & Boo, Timeless Heroes*'s first ability ("When Minsc &
-/// Boo enters and at the beginning of your upkeep, you may create Boo, a
-/// legendary 1/1 red Hamster creature token with trample and haste."), and
-/// the reverse order ("At the beginning of your upkeep and whenever you cast a
-/// black spell, put a charge counter on this artifact.", *Shrine of Limitless
-/// Power*'s first ability).
+/// Joined trigger conditions are one disjunction of trigger conditions
+/// [CR#603.1b], each printing its own trigger word, in either order and with
+/// any of the three words. Most cards print "and" between them (`and`):
+/// *Shrine of Limitless Power*'s "At the beginning of your upkeep and whenever
+/// you cast a black spell", *Minsc & Boo, Timeless Heroes*'s "When Minsc & Boo
+/// enters and at the beginning of your upkeep" and *Bartered Cow*'s "When this
+/// creature dies and when you discard this card" resolve. *Tenuous Truce*
+/// prints "or" (`or`): "When you attack enchanted opponent or a planeswalker
+/// they control or when they attack you or a planeswalker you control", here
+/// with its first arm shortened to "when you attack enchanted player". An
+/// event is no trigger condition without its trigger word, so *Bartered Cow*
+/// written with a bare second arm is refused at that arm's head word.
 #[test]
-fn a_turn_point_header_joins_an_event_header() {
+fn joined_trigger_conditions_are_one_disjunction() {
     assert_eq!(
         plugin_refusals(
             "card singleFaced({\n\
+               name = \"Shrine of Limitless Power\",\n\
+               types = [artifact],\n\
+               text = [\n\
+                 triggered(\n\
+                   and([\n\
+                     at(beginningOfYour(upkeep)),\n\
+                     whenever(does(actor(you), cast(a(and([isSpell, hasColor(black)])))))]),\n\
+                   action = putCounters(lit(1), printedKind(chargeCounter), thisArtifact))]})\n\
+             card singleFaced({\n\
                name = \"Minsc & Boo, Timeless Heroes\",\n\
                types = [planeswalker],\n\
                text = [\n\
-                 when(\n\
-                   does(actor(thisPlaneswalker), enter),\n\
-                   joins = [atHead(beginningOfYour(upkeep))],\n\
+                 triggered(\n\
+                   and([when(does(actor(thisPlaneswalker), enter)), at(beginningOfYour(upkeep))]),\n\
                    action = may(\n\
                      create(\n\
                        lit(1),\n\
@@ -985,15 +969,40 @@ fn a_turn_point_header_joins_an_event_header() {
                            power = lit(1),\n\
                            toughness = lit(1)}}))))]})\n\
              card singleFaced({\n\
-               name = \"Shrine of Limitless Power\",\n\
-               types = [artifact],\n\
+               name = \"Bartered Cow\",\n\
+               types = [creature],\n\
                text = [\n\
-                 at(\n\
-                   beginningOfYour(upkeep),\n\
-                   joins = [joinedHead(does(actor(you), cast(a(and([isSpell, hasColor(black)])))))],\n\
-                   action = putCounters(lit(1), printedKind(chargeCounter), thisArtifact))]})"
+                 triggered(\n\
+                   and([when(does(actor(thisCreature), die)), when(does(actor(you), discard(thisCard)))]),\n\
+                   action = create(lit(1), defined(foodToken)))]})\n\
+             card singleFaced({\n\
+               name = \"Tenuous Truce\",\n\
+               types = [enchantment],\n\
+               subtypes = [aura],\n\
+               text = [\n\
+                 triggered(\n\
+                   or([\n\
+                     when(does(actor(you), attack(enchanted(player)))),\n\
+                     when(\n\
+                       does(\n\
+                         actor(enchanted(player)),\n\
+                         attack(youOr(a(and([isPlaneswalker, youControl]))))))]),\n\
+                   action = sacrifice(thisAura))]})\n\
+             card singleFaced({\n\
+               name = \"Bartered Cow\",\n\
+               types = [creature],\n\
+               text = [\n\
+                 triggered(\n\
+                   and([when(does(actor(thisCreature), die)), does(actor(you), discard(thisCard))]),\n\
+                   action = create(lit(1), defined(foodToken)))]})"
         ),
-        []
+        [(
+            RefusalKind::UnknownWord {
+                word: s("does"),
+                sort: s("TriggerCondition")
+            },
+            s("does")
+        )]
     );
 }
 

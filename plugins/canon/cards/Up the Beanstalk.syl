@@ -3,7 +3,8 @@ card singleFaced({
     cost = [generic(1), pip(green)],
     types = [enchantment],
     text = [
-      when(
-        does(actor(this), enter),
-        joins = [joinedHead(does(actor(you), cast(a(and([isSpell, hasManaValue(atLeast, 5)])))))],
+      triggered(
+        and([
+            when(does(actor(this), enter)),
+            whenever(does(actor(you), cast(a(and([isSpell, hasManaValue(atLeast, 5)])))))]),
         action = draw(1))]})

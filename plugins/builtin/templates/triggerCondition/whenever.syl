@@ -1,0 +1,5 @@
+# "whenever <event>"
+template whenever(event: GameEvent): TriggerCondition {
+  spelling = "whenever <event>",
+  body = triggerEvent($event)
+}

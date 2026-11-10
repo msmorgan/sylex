@@ -129,6 +129,12 @@ out (`procedure`) ([CR#601.2,602.1,608.2]).
 Whether a trigger observes an event just before or just after it happens. It is derived from the
 trigger pattern's arm and the occurrence, and written nowhere ([CR#603.10,603.10a..603.10f]).
 
+**Trigger Condition**:
+What a triggered ability triggers on. The `TriggerCondition` sort's wording includes its
+trigger word ("when this creature enters"); the CR's form "[When/Whenever/At] [trigger condition
+or event], [effect]" uses the term for the part after the word ([CR#603.1]). One ability may
+have several, each with its own trigger word, and triggers on any of them ([CR#603.1b,603.2]).
+
 ## Statics and rules data
 
 **Static Spec**:

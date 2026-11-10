@@ -1,11 +1,11 @@
-# "When/Whenever/At <header> and <joins>, if <intervening>, <action>" [CR#603.1,603.4]. Each
-# header is a trigger condition, and a triggered ability may have more than one [CR#603.1b]; a
-# joined header prints its own trigger word ("When this creature enters and whenever it attacks
-# while saddled").
+# "<condition>, if <intervening>, <action>" [CR#603.1,603.4]: a triggered ability. Its trigger
+# condition prints its own trigger word ("When this creature enters", `when`); joined ones
+# ("When this creature enters and whenever it attacks while saddled") are one disjunction of
+# trigger conditions, printed with "and" (`and`) or "or" (`or`) [CR#603.1b].
+# TODO(spelling): Include or omit the clauses supplied by intervening and limit.
 # [CR#603.1,603.4,603.1b]
 primitive triggered(
-  header: TriggerHeader,
-  joins: List(TriggerHeader),
-  intervening: Option(Condition),
+  condition: TriggerCondition,
+  intervening: Option(Condition) = none,
   action: Action,
-  limit: Option(UsageLimit)): Ability = Triggered
+  limit: Option(UsageLimit) = none): Ability = Triggered

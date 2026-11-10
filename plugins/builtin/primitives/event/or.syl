@@ -1,7 +1,8 @@
-# "<event> or <event>": met when any one of the events happens, so a triggered ability may have
-# more than one trigger condition [CR#603.1b].
+# "<event> or <event>": met when any one of the events happens, so a trigger condition over it is
+# met when a game event matches any of them [CR#603.2]. Several trigger conditions are the `or` at
+# `TriggerCondition`.
 # TODO(spelling): Format and coordinate the events list entries. Arms with one subject print it
 # once ("attacks or blocks"), even when it stands in two roles ("blocks or becomes blocked",
 # "dies or is exiled").
-# [CR#603.1b]
+# [CR#603.2]
 primitive or(events: List(GameEvent)): GameEvent = Or

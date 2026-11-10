@@ -1,5 +1,0 @@
-# A joined "whenever <event> while <concurrent>" header.
-template joinedHeadWhile(event: GameEvent, while: Timing): TriggerHeader {
-  spelling = "whenever <event> <while>",
-  body = {event = $event, while = $while}
-}

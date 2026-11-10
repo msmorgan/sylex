@@ -1,15 +1,11 @@
-# "At <point>, <action>": "at" names a Turn Point, whose beginning is the trigger event
-# [CR#603.2b]; "when" and "whenever" take an event instead. The point names its own moment, so its
-# header has no concurrent condition or timing window.
+# "At <point>, <action>": "at" names a Turn Point [CR#603.2b].
 # [CR#603.2b]
 template at(
   point: TurnPoint,
   action: Action,
-  joins: List(TriggerHeader) = [],
   limit: Option(UsageLimit) = none,
   if: Option(Condition) = none): Ability {
-  # TODO(spelling): Include or omit the clauses supplied by limit and if. Format and coordinate
-  # the joins list entries after the point, including the empty case.
+  # TODO(spelling): Include or omit the clauses supplied by limit and if.
   spelling = "At <point>, <action>",
-  body = triggered(atHead($point), $joins, $if, $action, $limit)
+  body = triggered(at($point), $if, $action, $limit)
 }

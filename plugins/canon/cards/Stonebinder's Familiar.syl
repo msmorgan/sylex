@@ -5,8 +5,7 @@ card singleFaced({
     subtypes = [spirit, dog],
     text = [
       whenever(
-        does(any, putInto(counted(orMore(1), isCard), exileZone)),
-        during = duringPart(turn, you),
+        timed(does(any, putInto(counted(orMore(1), isCard), exileZone)), duringPart(turn, you)),
         action = putCounters(1, printedKind(p1p1Counter), thisCreature),
         limit = oncePerTurn)],
     power = 1,

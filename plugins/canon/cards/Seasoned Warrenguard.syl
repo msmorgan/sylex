@@ -5,8 +5,7 @@ card singleFaced({
     subtypes = [rabbit, warrior],
     text = [
       whenever(
-        does(actor(thisCreature), attack),
-        while = whileTrue(exists(and([isToken, youControl]))),
+        timed(does(actor(thisCreature), attack), whileTrue(exists(and([isToken, youControl])))),
         action = get(thisCreature, up(2), up(0), untilEndOfTurn))],
     power = 1,
     toughness = 2})

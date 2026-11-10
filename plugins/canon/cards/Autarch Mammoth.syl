@@ -4,12 +4,13 @@ card singleFaced({
     types = [creature],
     subtypes = [elephant, mount],
     text = [
-      when(
-        does(actor(thisCreature), enter),
-        joins = [
-          joinedHeadWhile(
-            does(actor(thisCreature), attack),
-            whileTrue(is(thisCreature, hasDesignation(saddled))))],
+      triggered(
+        and([
+            when(does(actor(thisCreature), enter)),
+            whenever(
+              timed(
+                does(actor(thisCreature), attack),
+                whileTrue(is(thisCreature, hasDesignation(saddled)))))]),
         action = create(1, written(creatureToken(3, 3, [green], [elephant])))),
       saddle(5)],
     power = 5,

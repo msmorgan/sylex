@@ -1,17 +1,14 @@
-# "When <event>, <action>". The trigger words `when`, `whenever` and `at` expand to
-# one triggered-ability constructor [CR#603.1,113.3c]. Its optional header parts are joined
-# headers, a concurrent condition, a timing window, a usage limit and an intervening "if" clause
-# [CR#603.4].
+# "When <event>, <action>": a triggered ability with one trigger condition, the trigger word
+# `when` [CR#603.1,113.3c]. Its optional parts are a usage limit and an intervening "if" clause
+# [CR#603.4]; a concurrent condition or timing window ("while saddled", "during your turn")
+# belongs to the event (`timed`). An ability with joined trigger conditions writes `triggered`
+# over their `and` or `or`.
 # [CR#603.1,113.3c,603.4]
 template when(
   event: GameEvent,
   action: Action,
-  joins: List(TriggerHeader) = [],
-  while: Option(Timing) = none,
-  during: Option(Timing) = none,
   limit: Option(UsageLimit) = none,
   if: Option(Condition) = none): Ability {
-  # TODO(spelling): Include or omit the clauses supplied by while, during, limit, if. Format and
-  # coordinate the joins list entries, including the empty case.
-  body = triggered({event = $event, while = $while, timing = $during}, $joins, $if, $action, $limit)
+  # TODO(spelling): Include or omit the clauses supplied by limit and if.
+  body = triggered(when($event), $if, $action, $limit)
 }

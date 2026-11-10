@@ -305,6 +305,11 @@ Event decisions:
   leaves-the-battlefield one ([CR#603.6c]). Arms of one `or` can differ: *Syr Konrad, the Grim*'s
   "another creature dies", "a creature card is put into a graveyard from anywhere other than the
   battlefield" and "a creature card leaves your graveyard" look back, look after and look back.
+  The derivation reads an arm's event through `triggerEvent`, through the `or` at
+  `TriggerCondition` (each trigger condition of which is an arm, as each arm of an event `or`
+  is), and through `timed`, whose Timing is read at the same point as its event:
+  *Market Gnome*'s "is exiled from the battlefield while you're activating a craft ability" is a
+  leaves-the-battlefield arm, so it looks back, and so does its "while" ([CR#603.10,603.10a]).
   [CR#603.10a] sorts abilities, not occurrences; this design reads its publicly visible class per
   occurrence, so the point is not a function of the written pattern alone. Under that reading
   *Dutiful Knowledge Seeker*'s "put into a library from anywhere" looks back for a card from a
@@ -317,16 +322,17 @@ Event decisions:
   `establish(controlGrant(…))` ([CR#613.1b]). `anyCost` and `anyBallot` likewise appear only in
   patterns.
 - **Paying life** is a cost payment of `loseLife`; there is no life Cost ([CR#119.4,119.8]).
-- **Alternative events are an `or` over events**, since a triggered ability may have more than one
-  trigger condition ([CR#603.1b]). Each arm is a whole event with its own subject: "attacks or
-  blocks" is `or([does(actor(x), attack), does(actor(x), block)])`, and "blocks or becomes
-  blocked" joins two events whose subjects differ. An `or` over Actions would be a compound
-  action, which the gate refuses.
+- **Alternative events are an `or` over events**: one trigger condition, met when a game event
+  matches any arm ([CR#603.2]). Several trigger conditions are the disjunction at
+  `TriggerCondition` instead ([CR#603.1b]). Each arm is a whole event with its own subject:
+  "attacks or blocks" is `or([does(actor(x), attack), does(actor(x), block)])`, and "blocks or
+  becomes blocked" joins two events whose subjects differ. An `or` over Actions would be a
+  compound action, which the gate refuses.
 - **"At" names a Turn Point.** A phase or step beginning is a trigger event [CR#603.2b], and
   "at end of combat" triggers as the end of combat step begins [CR#511.2], so there is one
   triggered-ability constructor and `at` builds it too. What tells the trigger words apart is
-  sort: `at` takes a `TurnPoint` (`beginningOf`, an `nthOccurrence` of one), and the event its
-  header carries is the game reaching it (`reached`); `when` and `whenever` take a `GameEvent`,
+  sort: `at` takes a `TurnPoint` (`beginningOf`, an `nthOccurrence` of one), and the event it
+  triggers on is the game reaching it (`reached`); `when` and `whenever` take a `GameEvent`,
   which no Turn Point is. A delayed "at" trigger (`atNext`) takes a Turn Point the same way.
   Any other event-taking position that names a beginning writes `reached` ("until your next
   turn", "continuously since the beginning of your last upkeep"). The end of a phase, step or
@@ -334,9 +340,14 @@ Event decisions:
   ordinary `GameEvent`, which durations, `heldSince` and `delay` need, so `when` and `whenever`
   refuse a Turn Point written bare but not one wrapped in `reached`; the trigger word for a Turn
   Point is `at`.
-- **Joined headers are not a disjunction.** "When this creature enters and whenever it attacks
-  while saddled" is two trigger headers of one ability, each with its own trigger word,
-  concurrent condition and timing; an `or` over events stands inside one header's event.
+- **A trigger condition prints its trigger word.** `triggered` takes one `TriggerCondition`:
+  `when`, `whenever` or `at` over its event ([CR#603.1]), so a trigger word stands only where a
+  trigger condition does. Several trigger conditions of one ability ([CR#603.1b]) are one
+  disjunction of them, each with its own word: "When this creature enters and whenever it
+  attacks while saddled" (*Autarch Mammoth*). Cards print "and" between them (`and`) and one,
+  *Tenuous Truce*, prints "or" (`or`); both mean the ability triggers on any of them. A
+  concurrent condition or timing window ("while saddled", "during your turn") restricts the event
+  it follows (`timed`), so it stands inside the one trigger condition it qualifies.
 - **`remove` is no event head.** What it names, an effect taking an attachment off its host by
   way of a state-based action ([CR#704.5m,704.5n]), is no one event, so `remove` names no Deed
   and is refused here. It is written in a negative declarative, "this effect doesn't remove this

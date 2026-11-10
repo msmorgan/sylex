@@ -6,8 +6,9 @@ card singleFaced({
     text = [
       suspend(4, mana([generic(1), pip(blue)])),
       when(
-        does(any, removeCounters(theLast, printedKind(timeCounter), this)),
-        while = whileTrue(is(this, cardIn(exileZone))),
+        timed(
+          does(any, removeCounters(theLast, printedKind(timeCounter), this)),
+          whileTrue(is(this, cardIn(exileZone)))),
         action = establishThroughout(cant(any, block(allOf(isCreature))), thisTurn))],
     power = 2,
     toughness = 3})

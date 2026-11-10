@@ -6,8 +6,9 @@ card singleFaced({
     text = [
       when(does(actor(thisCreature), die), sequentially([gainLife(1), draw(1)])),
       when(
-        does(any, exile(thisCreature)),
-        while = whileDoing(does(actor(you), activate(a(abilityHead(keyword(craft)))))),
+        timed(
+          does(any, exile(thisCreature)),
+          whileDoing(does(actor(you), activate(a(abilityHead(keyword(craft))))))),
         action = sequentially([gainLife(1), draw(1)]))],
     power = 0,
     toughness = 3})

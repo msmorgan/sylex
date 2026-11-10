@@ -1,0 +1,4 @@
+# A trigger condition met when its event happens [CR#603.2]. Its trigger word is wording, written
+# by the Template over it: `when`, `whenever` or `at`.
+# [CR#603.2]
+primitive triggerEvent(event: GameEvent): TriggerCondition = Event

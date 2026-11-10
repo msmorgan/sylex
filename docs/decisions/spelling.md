@@ -71,11 +71,11 @@ Three things Oracle text does routinely need it:
   control" (Abdel Adrian, Gorion's Ward), "nonland" stands before the head noun and "you
   control" after it, and the term holds them as elements of one `and([…])`. Each modifier
   attaches on its own side of the nominal.
-- **A trigger header over an effect of several sentences.** Boommobile prints "When this
+- **A trigger condition over an effect of several sentences.** Boommobile prints "When this
   Vehicle enters, add four mana of any one color. Spend this mana only to activate abilities."
   In the Reading, "When this Vehicle enters," belongs to the first sentence. In the term,
-  `when(event, action)` takes the whole effect, both sentences, as its `action`. The header
-  attaches at the left edge of its host, inside the host's first sentence.
+  `when(event, action)` takes the whole effect, both sentences, as its `action`. The trigger
+  condition attaches at the left edge of its host, inside the host's first sentence.
 
 Why one-sided: in each case the adjunct's words are a single run that lies wholly to one side
 of the node it attaches to. A grammar built from such attachments builds only trees a
@@ -213,9 +213,11 @@ once in one of two ways:
 - **Where the phrase has the same role in every arm, the term coordinates where English
   does.** The coordinated Actions stand under one Subject: one Handoff over the Actions of
   Predator's Strike, and one `does` over an `or` of the Actions of "attacks or blocks". A list
-  Hole spells the coordination (§3.1), and no extension is involved. A triggered ability may
-  have more than one trigger condition [CR#603.1b], and an `or` of event-capable Actions under
-  one Subject is how the term says so when the conditions share their Subject.
+  Hole spells the coordination (§3.1), and no extension is involved. "Attacks or blocks" is
+  one trigger condition, met when a game event matches either event [CR#603.2], and an `or` of
+  event-capable Actions under one Subject is how the term says so when the events share their
+  Subject. Several trigger conditions of one ability, each with its own trigger word, are
+  instead the disjunction at `TriggerCondition` [CR#603.1b].
 - **Where the roles differ, the coordination binds the phrase once.** Its Construction takes
   the shared phrase as a parameter, and each arm holds a placeholder word where the phrase
   belongs, as a lookback holds `which` (§1). The parameter is the binding, read once
@@ -257,8 +259,11 @@ recovery admits the wording only when the two printings agree.
 
 One wording recovers one written form. Where `.syl` admits two written forms of one term, the
 bare word a coercion wraps and the written call of the primitive it wraps through, recovery
-yields the bare form, which is the corpus's ([`.syl`](syl.md) §2). Why: two candidates that
-differ only in how an author wrote the same term differ in nothing the text chose.
+yields the bare form, which is the corpus's ([`.syl`](syl.md) §2). Likewise, when a Template's
+expansion is a call that could also be written directly, the written form is the Template: a
+one-condition trigger is the Ability `when`, `whenever` or `at`, and `triggered` is written only
+over a disjunction of trigger conditions. Why: two candidates that differ only in how an author
+wrote the same term differ in nothing the text chose.
 
 Why: a derivation kept apart from the term would be something one direction of translation
 invents and the other discards, which the canonical form does not store
@@ -461,9 +466,9 @@ all, because no spelling crate exists. This section separates the two.
 ## 9. Rejected alternatives
 
 - **Substitution alone**, a synchronous tree-substitution grammar. It cannot put an auxiliary
-  inside its Action's clause, split one list's modifiers around a head, or put a trigger header
-  inside the first sentence of an effect it governs (§2), and it needs a Template per verb for
-  every detached quantity (§3.2).
+  inside its Action's clause, split one list's modifiers around a head, or put a trigger
+  condition inside the first sentence of an effect it governs (§2), and it needs a Template per
+  verb for every detached quantity (§3.2).
 - **Wrapping adjunction**, a full or regular-form synchronous tree-adjoining grammar. Nothing
   in-scope needs the added capacity, and it lacks Factoring like every other variant (§2).
 - **Copying a shared phrase into each arm**, or re-mentioning it there with an anaphor the card

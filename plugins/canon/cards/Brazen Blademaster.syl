@@ -5,8 +5,9 @@ card singleFaced({
     subtypes = [orc, pirate],
     text = [
       whenever(
-        does(actor(thisCreature), attack),
-        while = whileTrue(compareAmt(countOf(and([isArtifact, youControl])), atLeast, 2)),
+        timed(
+          does(actor(thisCreature), attack),
+          whileTrue(compareAmt(countOf(and([isArtifact, youControl])), atLeast, 2))),
         action = get(it, up(2), up(1), untilEndOfTurn))],
     power = 2,
     toughness = 3})
