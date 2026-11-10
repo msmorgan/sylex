@@ -8,6 +8,6 @@ card singleFaced({
         may(
           putOntoBattlefield(a(and([isCreature, cardIn(yourHand)]))),
           ifDid = sequentially([
-              gainHaste(that(creature)),
+              gain(that(creature), [haste]),
               atNext(beginningOfNext(endStep), sacrifice(that(creature)))]))),
       splice(hasSubtype(arcane), mana([generic(2), pip(red), pip(red)]))]})

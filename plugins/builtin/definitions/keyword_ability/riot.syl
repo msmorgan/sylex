@@ -10,5 +10,5 @@ ability riot {
         alongside(
           mayOrElse(
             putCounters(1, printedKind(p1p1Counter), thisPermanent),
-            gainHaste(thisPermanent)))))]
+            gain(thisPermanent, [haste])))))]
 }

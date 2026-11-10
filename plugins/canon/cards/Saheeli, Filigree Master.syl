@@ -20,7 +20,7 @@ card singleFaced({
                     text = [flying],
                     power = 1,
                     toughness = 1}})),
-            gainHaste(them, untilEndOfTurn)])),
+            gain(them, [haste], untilEndOfTurn)])),
       activated(
         loyaltySymbol(down(4)),
         getEmblem([

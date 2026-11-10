@@ -12,6 +12,6 @@ card singleFaced({
             whenSpentOn(
               affectsIt,
               a(and([isCreature, isSpell])),
-              gainHaste(becomes(that(spell)), untilEndOfTurn))]))],
+              gain(becomes(that(spell)), [haste], untilEndOfTurn))]))],
     power = 2,
     toughness = 1})
