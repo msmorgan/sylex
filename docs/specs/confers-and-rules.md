@@ -116,9 +116,11 @@ permanent goes unless it is the sole holder with the least time.
 - **World** [CR#704.5k], on `world`'s `confers`: a world permanent is put into its owner's
   graveyard if another world permanent has had the world supertype for no longer than it has. With
   holding times 10/5/5 all three go; with 10/5 only the 10 goes. It reads a NEW measure,
-  `heldFor(<object>, <predicate>)`: how long the object has continuously satisfied the predicate.
-  It is not a timestamp, because a permanent can gain the world supertype after it enters. Its
-  sort is open on `syl-supertype-declarations`.
+  `heldFor`: how long an object has continuously satisfied a predicate. It is not a timestamp,
+  because a permanent can gain the world supertype after it enters. It is written at whichever
+  sort expresses [CR#704.5k] exactly, including its tie case: as a `ProjAxis` read by the existing
+  `superlative`/`tiedFor` pattern (`bolster.syl`, `dethrone.syl`) if that says it, otherwise as an
+  `Amount` compared with `compareOver`/`compareAmt`.
 - **Role** [CR#704.5z,303.7a], on `role`'s `confers`: a Role is put into its owner's graveyard if
   another Role controlled by the same player is attached to the same permanent and has a more
   recent timestamp. It reads a NEW measure, `timestampOf(<object>)`.

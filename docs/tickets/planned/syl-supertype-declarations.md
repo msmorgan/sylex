@@ -46,16 +46,13 @@ This ticket lands after `syl-card-type-permanent-type`: both edit the kinds tabl
   the world supertype for no longer than it has (spec §6). It reads a new measure, `heldFor`: how
   long an object has continuously satisfied a predicate. It is not a timestamp, because a
   permanent can gain the world supertype after it enters.
+- `heldFor` is written at whichever sort expresses [CR#704.5k] exactly, including its tie case
+  (all go when two tie for the shortest time): as a `ProjAxis` read by the existing
+  `superlative`/`tiedFor` pattern (`bolster.syl`, `dethrone.syl`) if that says it, otherwise as an
+  `Amount` compared with `compareOver`/`compareAmt`. The landing states which and why.
 - No `Supertype` to `NounWord` coercion: a supertype is printed before the card types
   [CR#205.4a], and Oracle text uses one only as a premodifier ("legendary creature", "basic land")
   or a predicate adjective ("is no longer snow"), never as a head noun outside reminder text.
-
-## Open questions
-
-- `heldFor`'s sort: an `Amount`, `heldFor(<object>, <predicate>)`, compared with `compareAmt`; or
-  a `ProjAxis`, `heldFor(<predicate>)`, read by `superlative` and `tiedFor` as `stat(toughness)`
-  is in `bolster.syl`. The world rule's tie, where every tied permanent goes [CR#704.5k], reads
-  either way.
 
 ## Done when
 
