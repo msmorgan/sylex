@@ -19,7 +19,7 @@ you cast" can match them only by that label string:
   `doubleLifeTotal` and `doubleCounters`, all `"double"`, with no plain `double` declaration.
 - Triple [CR#701.11]: `triplePower`, `tripleToughness` and `triplePowerAndToughness`, all
   `"triple"`.
-- `castWithoutPaying` beside `cast` [CR#701.5], `millCards` beside `mill` [CR#701.17],
+- `millCards` beside `mill` [CR#701.17],
   `revealHand` beside `reveal` [CR#701.20], `searchZonesOf` beside `search` [CR#701.23],
   `shuffleInto` beside `shuffle` [CR#701.24] and `voteStartingWith` beside `vote` [CR#701.38].
 

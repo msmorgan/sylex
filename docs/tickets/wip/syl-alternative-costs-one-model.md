@@ -22,7 +22,7 @@ for its foretell cost [CR#702.143d] unwritten, saying no cost term names a keywo
   `usingKeyword(label)` [CR#118.9]. An additional cost is a value of sort `AddedCost`:
   `plusAdditional(cost, times = once)` [CR#118.8]. No other declaration builds either.
 - The printed sentence decides where the value stands. "You may pay C rather than pay …" and "As
-  an additional cost to cast …" are the statics `altCost(subject, cost)` and
+  an additional cost to cast …" are the statics `altCost(cost, subject)` and
   `addedCost(subject, optionality, cost)`. "You may cast X [by paying C | without paying its mana
   cost]", in a permission or an instructed cast, fills the `altCost` or `addedCost` slot of
   `cast`, `play` or `activate`. A keyword stands where its rule's sentence puts it: evoke ("You
@@ -39,10 +39,11 @@ for its foretell cost [CR#702.143d] unwritten, saying no cost term names a keywo
 
 - Each of alternative and additional cost has one model, the other form deleted or a Template
   over it, with every caller in `plugins/` updated.
-- Evoke, bestow and dash function exactly where their rules say [CR#702.74a,702.103a,702.109a];
-  the landing quotes each rule beside its body.
-- `plugins/builtin/rules/conferral/foretoldCardLook.syl` writes the foretell-cost cast
-  [CR#702.143d].
+- Evoke's, bestow's and dash's bodies say nothing about where they function, which their rules
+  state [CR#702.74a,702.103a,702.109a], and each quotes its rule beside its body; the zones are
+  `engine-static-ability-zone-gating`'s.
+- `plugins/builtin/rules/conferral/foretoldCardCast.syl` writes the foretell-cost cast
+  [CR#702.143d], beside `foretoldCardLook`'s look.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 

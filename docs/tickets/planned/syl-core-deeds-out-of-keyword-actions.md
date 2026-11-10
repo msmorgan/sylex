@@ -27,7 +27,7 @@ is edited before it moves.
 
 ## Not in scope
 
-- Keyword-action variants (`millCards`, `castWithoutPaying`, the `double…` family and the
+- Keyword-action variants (`millCards`, the `double…` family and the
   others): `syl-one-deed-per-keyword-action`.
 - `resolve.syl`'s Lean-syntax doc comment: `syl-lean-doc-comments`.
 - `devour.syl`, devour's event, which `syl-keyword-verb-events` deletes; `manifestPlacement.syl`,

@@ -46,6 +46,14 @@ often infer them.
   its declared zones.
 - `sylex_engine` tests show Grist being a creature in the graveyard and library and not on the
   battlefield, and a characteristic-defining ability applying in a hand.
+- Alternative-cost abilities function where their rules say, which their `.syl` terms do not
+  state: an ability that allows an alternative cost functions on the stack [CR#113.6d], one that
+  modifies how its object can be cast in any zone it could be cast from and on the stack
+  [CR#113.6e]. Tests show evoke's static functioning in any zone the card can be cast from
+  [CR#702.74a], bestow's in any zone it could be played from [CR#702.103a], and dash's and blitz's
+  alternative costs only while the card is on the stack [CR#702.109a,702.152a]. Evoke, dash and
+  blitz all print "You may cast this card by paying [cost]", so the zones cannot be inferred from
+  the term's form.
 
 ## Pointers
 
