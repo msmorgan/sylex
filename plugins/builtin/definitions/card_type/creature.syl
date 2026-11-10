@@ -18,13 +18,12 @@ card_type creature {
     property(combatant(this)),
     property(can(actor(this), attack)),
     property(can(actor(this), block)),
-    property(onlyUnless(cant(actor(this), attack), controlledSinceTheirTurnBegan(it))),
+    property(cant(actor(this), attack, unless = controlledSinceTheirTurnBegan(it))),
     property(
-      onlyUnless(
-        cant(
-          any,
-          activate(allOf(and([abilityHead(anyActivated), abilityOf(this), tapOrUntapInCost])))),
-        controlledSinceTheirTurnBegan(this))),
+      cant(
+        any,
+        activate(allOf(and([abilityHead(anyActivated), abilityOf(this), tapOrUntapInCost]))),
+        unless = controlledSinceTheirTurnBegan(this))),
     damageResult(markDamage(this, thatMuch)),
     stateBased(compareAmt(toughnessOf(this), atMost, 0), putInto(this, graveyard)),
     stateBased(

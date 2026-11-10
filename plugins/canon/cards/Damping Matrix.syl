@@ -8,7 +8,5 @@ card singleFaced({
           any,
           activate(
             allOf(
-              and([
-                  abilityHead(anyActivated),
-                  abilityOf(allOf(or([isArtifact, isCreature]))),
-                  not(isManaAbility)])))))]})
+              and([abilityHead(anyActivated), abilityOf(allOf(or([isArtifact, isCreature])))]))),
+          unless = is(them, isManaAbility)))]})

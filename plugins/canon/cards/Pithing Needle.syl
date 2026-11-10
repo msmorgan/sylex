@@ -11,5 +11,5 @@ card singleFaced({
             allOf(
               and([
                   abilityHead(anyActivated),
-                  abilityOf(allOf(and([isSource, named(chosenName)]))),
-                  not(isManaAbility)])))))]})
+                  abilityOf(allOf(and([isSource, named(chosenName)])))]))),
+          unless = is(them, isManaAbility)))]})

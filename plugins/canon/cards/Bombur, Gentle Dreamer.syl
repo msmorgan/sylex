@@ -6,6 +6,6 @@ card singleFaced({
     subtypes = [dwarf, bard],
     text = [
       storied,
-      static(onlyUnless(doesntUntap(thisCreature, you), is(you, hasDesignation(enduringStory))))],
+      static(doesntUntap(thisCreature, you, unless = is(you, hasDesignation(enduringStory))))],
     power = 5,
     toughness = 3})
