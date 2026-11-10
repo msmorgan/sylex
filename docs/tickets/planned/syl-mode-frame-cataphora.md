@@ -32,12 +32,9 @@ Written against the surface (`cleanup-step6-surface`).
   chosen this turn" (*Genku*) reuses `notChosenBefore`.
 - A characteristics filler requires a single choice; the construct refuses it under any choice of
   more than one.
-
-## Open questions
-
-- Whether the frame may be written with any Template whose argument is the reserved word: that
-  holds only while Templates stay transparent, expanding before reference resolution
-  (`syl-opaque-templates`), so that ticket lands first.
+- The frame may be written with any Template whose argument is the reserved word: a Template adds
+  no Reference Scope, so the reserved word is read in the frame's own discourse, once, however
+  often the Template's body uses it (`syl.md` §4).
 
 ## Done when
 
