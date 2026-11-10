@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-data-language, lean-retirement, syl-single-face-card-call]
+needs: [plugins-v3-data-language, lean-retirement, syl-single-face-card-call, cleanup-step6-surface]
 ---
 
 # Square-bracketed text in `.syl`, so cleave works
@@ -13,7 +13,7 @@ removes nothing and none of the 12 Vintage-legal cleave cards can be written. Th
 already reads a cleave line twice, as its Uncleaved and Cleaved Text, with the bracketed spans
 kept beside it (`crates/english/src/cleave.rs`).
 
-Written against the start of step 6 (`syl-single-face-card-call`).
+Written against the surface (`cleanup-step6-surface`).
 
 ## Open questions
 
