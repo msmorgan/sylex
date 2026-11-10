@@ -6,8 +6,7 @@ card singleFaced({
     text = [
       flying,
       whenever(
-        does(actor(thisVehicle), attack),
-        or = [does(actor(thisVehicle), block)],
+        or([does(actor(thisVehicle), attack), does(actor(thisVehicle), block)]),
         action = may(draw(lit(1)), discard(a(cardIn(yourHand))))),
       crew(lit(1))],
     power = lit(3),

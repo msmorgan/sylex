@@ -361,7 +361,6 @@ pub const RECORDS: &[RecordSort] = &[
         "JoinedHeader",
         &[
             ("event", "GameEvent", false),
-            ("alternatives", "List(GameEvent)", false),
             ("while", "Option(Timing)", false),
             ("timing", "Option(Timing)", false),
         ],

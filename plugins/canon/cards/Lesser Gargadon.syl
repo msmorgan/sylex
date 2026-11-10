@@ -5,8 +5,7 @@ card singleFaced({
     subtypes = [beast],
     text = [
       whenever(
-        does(actor(thisCreature), attack),
-        or = [does(actor(thisCreature), block)],
+        or([does(actor(thisCreature), attack), does(actor(thisCreature), block)]),
         action = sacrifice(a(isLand)))],
     power = lit(6),
     toughness = lit(4)})

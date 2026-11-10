@@ -5,8 +5,9 @@ card singleFaced({
     subtypes = [faerie],
     text = [
       whenever(
-        does(actor(thisCreature), block(a(isCreature))),
-        or = [does(by(a(isCreature)), block(thisCreature))],
+        or([
+            does(actor(thisCreature), block(a(isCreature))),
+            does(by(a(isCreature)), block(thisCreature))]),
         action = becomeColor(that(creature), colors([green])))],
     power = lit(1),
     toughness = lit(1)})

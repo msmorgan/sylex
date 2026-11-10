@@ -11,8 +11,7 @@ card singleFaced({
       flying,
       vigilance,
       whenever(
-        does(actor(thisCreature), attack),
-        or = [does(actor(thisCreature), block)],
+        or([does(actor(thisCreature), attack), does(actor(thisCreature), block)]),
         action = sequentially([
             may(attachTo(counted(anyNumber, and([hasSubtype(aura), in(battlefield)])), it)),
             may(

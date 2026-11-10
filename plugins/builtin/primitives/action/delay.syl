@@ -1,8 +1,3 @@
 # "When <event>, <body>" as a delayed trigger.
-# TODO(spelling): Include or omit the clauses supplied by duration. Format and coordinate the
-# alternatives list entries, including the empty case.
-primitive delay(
-  event: GameEvent,
-  body: Action,
-  alternatives: List(GameEvent) = [],
-  duration: Option(Duration) = none): Action = Delay
+# TODO(spelling): Include or omit the clauses supplied by duration.
+primitive delay(event: GameEvent, body: Action, duration: Option(Duration) = none): Action = Delay

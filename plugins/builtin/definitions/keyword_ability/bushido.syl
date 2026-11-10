@@ -4,7 +4,6 @@ ability bushido(count: Amount) {
   spelling = "bushido <count>",
   body = [
     whenever(
-      does(actor(thisCreature), block),
-      or = [does(any, becomeBlocked(thisCreature))],
+      or([does(actor(thisCreature), block), does(any, becomeBlocked(thisCreature))]),
       action = get(thisCreature, up($count), up($count), untilEndOfTurn))]
 }

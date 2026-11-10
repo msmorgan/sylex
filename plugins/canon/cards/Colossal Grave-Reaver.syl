@@ -6,8 +6,7 @@ card singleFaced({
     text = [
       flying,
       whenever(
-        does(actor(thisCreature), enter),
-        or = [does(actor(thisCreature), attack)],
+        or([does(actor(thisCreature), enter), does(actor(thisCreature), attack)]),
         action = mill(lit(3))),
       whenever(
         does(

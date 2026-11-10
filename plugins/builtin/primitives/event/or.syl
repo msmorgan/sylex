@@ -1,0 +1,7 @@
+# "<event> or <event>": met when any one of the events happens, so a triggered ability may have
+# more than one trigger condition [CR#603.1b].
+# TODO(spelling): Format and coordinate the events list entries. Arms with one subject print it
+# once ("attacks or blocks"), even when it stands in two roles ("blocks or becomes blocked",
+# "dies or is exiled").
+# [CR#603.1b]
+primitive or(events: List(GameEvent)): GameEvent = Or

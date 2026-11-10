@@ -5,8 +5,7 @@ card singleFaced({
     subtypes = [frog],
     text = [
       whenever(
-        does(actor(thisCreature), block),
-        or = [does(any, becomeBlocked(thisCreature))],
+        or([does(actor(thisCreature), block), does(any, becomeBlocked(thisCreature))]),
         action = get(it, up(lit(2)), up(lit(2)), untilEndOfTurn))],
     power = lit(1),
     toughness = lit(1)})
