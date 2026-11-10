@@ -23,7 +23,7 @@ is one node of the resolved term, with those parameters as its arguments.
 
 A Construction pairs wording with the call, not with the call's body. The resolved term keeps
 the call, and what the call expands to is expansion's business (§5). Why: a body may use a
-parameter several times, as `getsBoth` passes its one delta to both power and toughness, and
+parameter several times, as `bushido` raises both power and toughness by its one count, and
 may rearrange its parameters freely. If the pairing reached into the body, every such body would
 be a place where one printed phrase stands for two parts of the meaning. Pairing with the call
 keeps one printed phrase for one argument.
@@ -34,7 +34,7 @@ them. What the English layer derives from that structure is never written into a
 none of it is an operation of this grammar:
 
 - **Inflection and agreement.** A verb whose agreement depends on a Hole is written
-  uninflected, and `getsBoth` is "gets" in Giant Growth and "get" in Glorious Anthem.
+  uninflected: one wording is "gets" in Giant Growth and "get" in Glorious Anthem.
 - **Case.** `controllerOf`, "$subject's controller", over `it` is "its controller".
 - **Voice and verb form.** An Action's wording is its verb's one Subcategorization Frame. The
   context that embeds the Action selects the form the frame takes, and its Subject selects the
@@ -133,10 +133,10 @@ recovery one term for a noun phrase where an unordered list would give it every 
 A Tail is part of a Construction's wording that is printed away from the rest: it attaches as
 a one-sided adjunct at the edge of a phrase that encloses the Construction's Hole, and the
 wording names the Category of that phrase. Quantity adjuncts are the case. In Kabira Outrider's
-"target creature gets +1/+1 until end of turn for each creature in your party", the amount is
-"+1 for each creature in your party", one `forEach(per, p)` inside the delta. Its `per` is
-printed where the amount stands, and "for each $p" is printed at the end of the verb phrase,
-past the duration. "Equal to" does the same in Dogpile's "deals damage to any target equal to
+"target creature gets +1/+1 until end of turn for each creature in your party", what is
+scaled is "+1/+1", and one `forEach` holds it and the predicate. The "+1/+1" is printed where
+the verb's object stands, and "for each $p" is printed at the end of the verb phrase, past the
+duration. "Equal to" does the same in Dogpile's "deals damage to any target equal to
 the number of attacking creatures you control", where the recipient stands between "damage" and
 what measures it.
 
@@ -146,22 +146,40 @@ Three properties make the extension closed:
   as an adjunct of the verb phrase, which is where the English grammar already puts it. Only
   the link is longer: the adjunct's meaning belongs to a call several arguments down from the
   call that spells the phrase.
-- **A Tail is printed once however often its Hole is.** `getsBoth` prints its one delta twice,
-  as "+1/+1", and the delta's Tail once ([`.syl`](syl.md) §2).
+- **A Tail states where it stands among its phrase's other adjuncts**: inside them, next to
+  what the host itself prints, or outside them. Aurochs prints "gets +1/+0 until end of turn
+  for each other attacking Aurochs" and Ral's Staticaster "gets +1/+0 for each card in your
+  hand until end of turn". Both Tails attach to one verb phrase, so the Category alone does not
+  tell them apart, and the two placements are two Templates (§4). The notation's form for the
+  placement is pending (§10).
 - **A Tail is read where it is printed.** Gaze of Adamaro "deals damage to target player equal
   to the number of cards in that player's hand": the amount is the declaration's first
   parameter, and its Tail mentions "that player" after the recipient introduced them. Read
   order is printed order ([`.syl`](syl.md) §5), so the walk that reads a term reads a Tail at
   its printed position, not at its Hole's.
 
-Where the text prints a quantity both in place and as a Tail, or prints a Tail on either side
-of another adjunct of the same phrase, the two are two wordings, and each is its own Template
-(§4). Essence Backlash prints "deals damage equal to that spell's power to its controller" with
-nothing detached. Aurochs prints "gets +1/+0 until end of turn for each other attacking
-Aurochs" and Ral's Staticaster "gets +1/+0 for each card in your hand until end of turn". Both
-of those are Tails on one verb phrase, so the Category a Tail names does not tell them apart;
-what does is open (§10). So is how a Tail scales a measure of two different numbers, as in
-Johtull Wurm's "gets -2/-1 until end of turn for each creature blocking it beyond the first".
+Where the text prints a quantity both in place and as a Tail, the two are two wordings, and
+each is its own Template (§4). Essence Backlash prints "deals damage equal to that spell's
+power to its controller" with nothing detached.
+
+**"For each" is declared at the sort of what it scales.** At `Amount` it scales a number the
+text prints: "a card for each …", "3 life for each …". Two things are scaled whole, with no
+number of their own to stand beside:
+
+- **A power/toughness change.** The change is one value of its own sort, which the "gets"
+  wordings take whole, and `forEach` is declared at that sort. Johtull Wurm's "gets -2/-1 until
+  end of turn for each creature blocking it beyond the first" is one change scaled once, and
+  Aurochs's "+1/+0 … for each" has one reading, where a `forEach` inside one of two separate
+  deltas would also recover as a flat 1 beside a scaled 0. Inside the change, a bare "+N/+N" is
+  two printed values and is written as two.
+- **Mana printed with no count.** Gaea's Cradle prints "Add {G} for each creature you control",
+  with no "one" before the symbol, so the wording is a Template at the sort of the produced
+  mana that takes the mana whole. A term that counted the mana with a `forEach` amount would
+  store a 1 the card does not print.
+
+This is a known weak point. Each sort scaled whole needs its own "for each" Template, and
+there may be more of them than these two; if they multiply, the remedy belongs here, not in
+one more Template.
 
 Why: the alternative is a Template per verb. "For each" is printed after its clause's verb on
 well over a thousand in-scope cards, under about thirty different verbs, and with substitution
@@ -179,27 +197,38 @@ actions. The English grammar reads each as a coordination whose conjuncts share 
 ([English](english.md) §3).
 
 Substitution and adjunction, with or without wrapping, link one place in the wording to one
-place in the term. Neither relates a phrase printed once to two places in a term, so a term
-whose arms each hold the shared part needs a third extension. **Factoring** is that extension:
-where the arms of a coordination would each print the same phrase at the same edge, spelling
-prints it once, and recovery distributes the one printed phrase to every arm. An alternative
-event is written with whole-event arms today, each with its own subject, since a triggered
-ability may have more than one trigger condition [CR#603.1b] and the event gate refuses an `or`
-over Actions ([Semantics](semantics.md) §4.6): Chub Toad's is
-`or([does(actor(thisCreature), block), does(any, becomeBlocked(thisCreature))])`.
+place in the term. Neither relates a phrase printed once to several arms.
 
-**Factoring copies only a phrase that introduces no Referent**: a reference to something
-already there, such as "this creature", or a duration. Why: a copy of an introducing phrase
-introduces again. Predator's Strike has one target, and a term with `target(…)` in each arm
-has two. Powerstone Minefield prints "Whenever a creature attacks or blocks, this enchantment
-deals 2 damage to it", and a term with the indefinite in each arm of the `or` introduces a
-Referent per arm for the one creature that "it" names. A shared phrase that introduces a
-Referent is therefore written once in the term. How the term then gives it to each arm is not
-settled (§10).
+**A shared phrase is written once in the term**, as any value the text prints once is
+([`.syl`](syl.md) §2). It is never copied into each arm, and no arm re-mentions it with an
+anaphor the card does not print. Why: a copy of a phrase that introduces a Referent introduces
+again. Predator's Strike has one target, and a term with `target(…)` in each arm has two.
+Powerstone Minefield prints "Whenever a creature attacks or blocks, this enchantment deals 2
+damage to it", and a term with the indefinite in each arm introduces a Referent per arm for
+the one creature that "it" names. An unprinted anaphor is a word in the term that the text does
+not have, and spelling would have to know to print nothing for it. The term writes the phrase
+once in one of two ways:
 
-Factoring loses nothing where the unfactored form is never printed, and for alternative events
-it is not: no in-scope card prints "Whenever X attacks or X blocks" with the subject repeated.
-Where both forms are printed the term already differs. Ancient Craving prints "You draw three
+- **Where the phrase has the same role in every arm, the term coordinates where English
+  does.** The coordinated Actions stand under one Subject: one Handoff over the Actions of
+  Predator's Strike, and one `does` over an `or` of the Actions of "attacks or blocks". A list
+  Hole spells the coordination (§3.1), and no extension is involved. A triggered ability may
+  have more than one trigger condition [CR#603.1b], and an `or` of event-capable Actions under
+  one Subject is how the term says so when the conditions share their Subject.
+- **Where the roles differ, the coordination binds the phrase once.** Its Construction takes
+  the shared phrase as a parameter, and each arm holds a placeholder word where the phrase
+  belongs, as a lookback holds `which` (§1). The parameter is the binding, read once
+  ([`.syl`](syl.md) §4). Chub Toad's "blocks or becomes blocked" is this case, with the
+  performer of one event and the patient of the other; so are Aether Tunnel's "gets +1/+0 and
+  can't be blocked" and Cephalid Illusionist's "dealt to and dealt by target creature you
+  control".
+
+**Factoring** is the third extension, and it serves the second way only: the coordination's
+Construction prints the shared phrase once, where the first arm's placeholder stands, and the
+placeholders of the other arms print nothing. Recovery reads the one printed phrase as the
+parameter.
+
+Where the text repeats the phrase, the term does too. Ancient Craving prints "You draw three
 cards and you lose 3 life" and Ambition's Cost "You draw three cards and lose 3 life", and
 those are two terms: two Handoffs in sequence, and one Handoff over two Actions in sequence.
 
@@ -274,9 +303,10 @@ keeps it:
 - An optional part is printed exactly when its argument differs from the default, so the
   argument decides the wording and the wording the argument.
 - A list is spelled in its written order, which is the printed order.
-- A Tail has one position for a given Template, so two printed positions are two Templates.
-- Factoring is applied where the unfactored form is not a wording any card prints, or where
-  the two forms are already two terms (§3.3).
+- A Tail has one position and one placement for a given Template, so two printed positions are
+  two Templates.
+- A shared phrase is written once and printed once, and a phrase the text repeats is written
+  again, so the two forms are two terms (§3.3).
 
 Punctuation is not spelling's concern. A Reading stores none, and realization derives it from
 structure ([English](english.md) §7).
@@ -388,6 +418,9 @@ all, because no spelling crate exists. This section separates the two.
   every detached quantity (§3.2).
 - **Wrapping adjunction**, a full or regular-form synchronous tree-adjoining grammar. Nothing
   in-scope needs the added capacity, and it lacks Factoring like every other variant (§2).
+- **Copying a shared phrase into each arm**, or re-mentioning it there with an anaphor the card
+  does not print. The first duplicates targets and Referents, and the second puts a word in the
+  term that the text does not have (§3.3).
 - **Fixing the term instead of the grammar.** Surface faithfulness ([Semantics](semantics.md)
   §1, item 1) argues for moving each mismatch into the term: an optional `per` parameter on
   each of about thirty verbs in place of a Tail, explicit premodifier and postmodifier slots in
@@ -400,47 +433,6 @@ all, because no spelling crate exists. This section separates the two.
 
 ## 10. Open
 
-**How a shared phrase that introduces a Referent is written once.** §3.3 lets Factoring copy
-only a phrase that introduces nothing. For one that does, the candidates:
-
-- *Coordinate the term where English does.* The coordinated Actions stand under one Subject,
-  as two Actions already stand under one Handoff, and a list Hole spells them with no
-  Factoring. For an alternative event it needs the event gate to admit an `or` of
-  event-capable heads under one `does` ([Semantics](semantics.md) §4.6). It does not reach a
-  phrase shared across two roles, which has no one Subject to stand under: Chub Toad's "blocks
-  or becomes blocked", Aether Tunnel's "gets +1/+0 and can't be blocked", Cephalid
-  Illusionist's "dealt to and dealt by target creature you control".
-- *Bind it at the coordination.* The coordination's Construction takes the shared phrase as a
-  parameter, and each arm holds a placeholder word where the phrase belongs, as a lookback
-  holds `which`. The parameter is the binding, read once ([`.syl`](syl.md) §4), and it reaches
-  two roles. It costs a placeholder word and a coordination Construction at each sort that
-  coordinates, and it is a binding the arms read by a bare word.
-- *Introduce it in the first arm and re-mention it in the others* with an anaphor the text
-  does not print, as Aether Tunnel's `cant(any, block(it))` is written today. It needs no new
-  construct. It puts a word in the term that the card does not print, and spelling must know
-  to print nothing for it.
-
-Whichever is chosen, a shared phrase that introduces nothing can also be written once by the
-same means, and Factoring by copy then has no use left; whether it stays is part of the
-question, since it writes once per arm a value the text prints once, against
-[`.syl`](syl.md) §2. Until it is settled, an alternative event is written with whole-event
-arms, and no Template is minted for a particular pair of verbs.
-
-**How a Tail is placed among its phrase's other adjuncts.** Aurochs and Ral's Staticaster
-print "for each …" after and before "until end of turn" (§3.2), the first on about a hundred
-in-scope cards and the second on a handful. The candidates: the Tail states its place, inside
-or outside the host's own adjuncts, which makes two `forEach` Templates; or the two attach to
-phrases of different Categories, if the English grammar's Readings tell the two sites apart,
-which is unchecked; or the host carries the choice, which is a Template per verb and what
-Tails exist to avoid.
-
-**How a Tail scales a measure of two numbers.** `forEach` scales one `Amount`. Johtull Wurm's
-"-2/-1 … for each" scales two with one printed phrase, and a `forEach` in each delta writes
-that phrase twice. A `forEach` in one delta is also a second candidate for every measure
-with a zero in it: Aurochs's "+1/+0 … for each" recovers as a scaled 1 beside a flat 0 and as
-a flat 1 beside a scaled 0. The candidates: a sort for the measure itself, which `get` takes
-whole and `forEach` is declared at; or a `forEach` in each delta whose identical Tails print
-once, which is Factoring by copy again; or scaling the Action from outside, which §9 rejects.
-
-The notation of §7 has no form yet for whatever these settle: a Tail's place, and a shared
-phrase.
+The notation of §7 has no form yet for two things this document requires: a Tail's placement
+among its phrase's other adjuncts (§3.2), and the placeholder a coordination's arms hold
+(§3.3).
