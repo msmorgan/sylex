@@ -1,0 +1,6 @@
+# "opponent": a Head Noun for a player, as in "enchanted opponent". Like `player`, it is wording and
+# the carrier word anaphors read; it restricts nothing (the Aura's `enchant(isOpponent)` is what
+# makes the enchanted player an opponent).
+primitive opponent: NounWord = Opponent {
+  spelling = "opponent"
+}

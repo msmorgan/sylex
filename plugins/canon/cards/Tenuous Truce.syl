@@ -1,0 +1,19 @@
+card singleFaced({
+    name = "Tenuous Truce",
+    cost = [generic(1), pip(white)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isOpponent),
+      at(
+        beginningOfPossessed(enchanted(opponent), endStep),
+        instruct(eachOf(youAnd(that(player))), draw(1))),
+      triggered(
+        or([
+            when(
+              does(
+                actor(you),
+                attack(
+                  eitherOf(enchanted(opponent), a(and([isPlaneswalker, controlledBy(they)])))))),
+            when(does(actor(they), attack(youOr(a(and([isPlaneswalker, youControl]))))))]),
+        action = sacrifice(thisAura))]})
