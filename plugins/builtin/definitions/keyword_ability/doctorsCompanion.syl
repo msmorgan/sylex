@@ -2,9 +2,9 @@
 # rather than one if one of them is this card and the other is a legendary Time Lord Doctor
 # creature card that has no other creature types." [CR#702.124m]
 # It modifies deck construction and functions before the game begins [CR#702.124a], and nothing
-# models deck construction, so its body is empty. Its frames are a variant in `partner`'s
-# `lexical`.
+# models deck construction, so its body is empty.
 ability doctorsCompanion {
+  lexical = {lemma = "doctor's companion"},
   spelling = "doctor's companion",
   body = []
 }

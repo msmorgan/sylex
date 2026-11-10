@@ -1,9 +1,9 @@
 # "Partner—Friends forever" allows two legendary cards to be designated as your commander if each
 # has this same partner ability. [CR#702.124i]
 # It modifies deck construction and functions before the game begins [CR#702.124a], and nothing
-# models deck construction, so its body is empty. Its frames are a variant in `partner`'s
-# `lexical`.
+# models deck construction, so its body is empty.
 ability partnerFriendsForever {
+  lexical = {lemma = "partner—Friends forever"},
   spelling = "partner—Friends forever",
   body = []
 }

@@ -2,9 +2,9 @@
 # one of them is this card and the other is a legendary Background enchantment card."
 # [CR#702.124k]
 # It modifies deck construction and functions before the game begins [CR#702.124a], and nothing
-# models deck construction, so its body is empty. Its frames are a variant in `partner`'s
-# `lexical`.
+# models deck construction, so its body is empty.
 ability chooseABackground {
+  lexical = {lemma = "choose a Background"},
   spelling = "choose a Background",
   body = []
 }
