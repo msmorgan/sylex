@@ -1,6 +1,6 @@
-# [CR#702.143d] "That card's owner may look at that card as long as it remains in exile": the
-# look right of every foretold card, whatever made it foretold. Its cast right is
-# `foretoldCardCast`.
+# [CR#702.143d] "That card's owner may look at that card as long as it remains in exile": the look
+# right of every foretold card, whether its foretell ability [CR#702.143a] or an effect made it
+# foretold. Its cast right is `foretoldCardCast`.
 conferral foretoldCardLook {
   body = {
     scope = and([isCard, hasDesignation(foretold), in(exileZone)]),

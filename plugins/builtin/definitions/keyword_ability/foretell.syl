@@ -1,11 +1,11 @@
 # "Foretell [cost]": any time its owner has priority during their turn, they may pay {2} and
 # exile this card from their hand face down, a special action [CR#702.143a,702.143b]; it becomes a
-# foretold card, which its owner may look at as long as it stays one [CR#702.143a,702.143c]. The
-# exile names the hand, so the ability functions only there [CR#113.6m]; the special action and the
-# card's becoming foretold are separate events, and the look permission is keyed on the state. Its
-# owner may cast it after the current turn has ended by paying its foretell cost, [cost], rather
-# than its mana cost [CR#702.143a]: the rule row `foretoldCardCast` confers that cast on every
-# foretold card [CR#702.143d].
+# foretold card [CR#702.143c]. The exile names the hand, so the ability functions only there
+# [CR#113.6m]; the special action and the card's becoming foretold are separate events. Its owner
+# may look at it as long as it remains in exile, and may cast it after the current turn has ended
+# by paying its foretell cost, [cost], rather than its mana cost [CR#702.143a]: the rule rows
+# `foretoldCardLook` and `foretoldCardCast` confer that look and that cast on every foretold card,
+# this ability's [CR#702.143a] and an effect's [CR#702.143d].
 ability foretell(cost: Cost) {
   lexical = {
     lemma = "foretell",
@@ -17,10 +17,5 @@ ability foretell(cost: Cost) {
       specialAction(
         duringPart(turn, you),
         mana([generic(2)]),
-        sequentially([
-            exileFaceDownFrom(thisCard, yourHand),
-            gainDesignation(it, foretold),
-            establishThroughout(
-              visibility(lookAt, you, objects(it)),
-              forAsLongAs(is(it, hasDesignation(foretold))))])))]
+        sequentially([exileFaceDownFrom(thisCard, yourHand), gainDesignation(it, foretold)])))]
 }
