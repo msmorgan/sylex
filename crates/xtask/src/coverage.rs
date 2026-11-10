@@ -116,7 +116,10 @@ pub fn scan_files(
             .with_context(|| format!("reading {}", absolute.display()))?;
         let tier = tier_for_path(relative);
         let mut rules = extract_bracket_rules(&text);
-        if Path::new(relative).extension().is_some_and(|ext| ext == "rs") {
+        if Path::new(relative)
+            .extension()
+            .is_some_and(|ext| ext == "rs")
+        {
             rules.extend(extract_attr_rules(&text));
         }
         for token in rules {
@@ -404,10 +407,17 @@ mod tests {
         let dir = tempdir_with(&[("plugins/solved.syl", "# [CR#702.169b..702.169d]\n")]);
         let expand = |range: &str| {
             assert_eq!(range, "702.169b..702.169d");
-            Ok(vec!["702.169b".into(), "702.169c".into(), "702.169d".into()])
+            Ok(vec![
+                "702.169b".into(),
+                "702.169c".into(),
+                "702.169d".into(),
+            ])
         };
         let scan = scan(&dir, &expand);
-        assert_eq!(lock_from_scan(&scan).bound, ["702.169b", "702.169c", "702.169d"]);
+        assert_eq!(
+            lock_from_scan(&scan).bound,
+            ["702.169b", "702.169c", "702.169d"]
+        );
     }
 
     #[test]
