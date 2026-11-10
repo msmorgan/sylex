@@ -55,6 +55,11 @@ location is not stated by the declaration, and it can disagree with what the dec
   are no local bindings or higher-order parameters, and there is no type inference. Why: every
   tool (the Rust pipeline, the formatter, the citation checker) can read a file
   without an evaluator, and what a file says is what it means.
+- **A value is written once per printed mention.** A value the text prints once is written once,
+  through a Template whose wording prints it once, so a Template parameter is the binding:
+  "gets +1/+1 for each Forest you control" is `getsBoth`'s one delta, not `getsPt`'s two copies.
+  A value the text prints twice is written twice. Why: without local bindings, a copy the text
+  does not print is a second source for one value, and the two can drift apart.
 - **No conversions besides `Option`.** A value stands only at its own sort (§3), and every wrap
   into another sort is a primitive or a Template written at the call site, `actor(…)` included: a
   color word is a `Color`, and a `ColorOrColorless` or a mana symbol wraps it; an integer literal
