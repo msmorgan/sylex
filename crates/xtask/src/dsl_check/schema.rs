@@ -138,8 +138,6 @@ pub const KINDS: &[Kind] = &[
                     sort: None,
                     required: true,
                 },
-                // Step 6: a stand-in for local binding, a design wart.
-                field("identity", "String"),
             ],
         )
     },

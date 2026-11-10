@@ -271,7 +271,8 @@ fn declaration_blocks_are_checked_against_their_kind() {
             "primitive p: Color = White { body = 1 }\n\
              template t: Int { }\n\
              designation monarch { }\n\
-             template u: Int { body = 1, body = 2 }"
+             template u: Int { body = 1, body = 2 }\n\
+             template v: Int { body = 1, identity = \"actor\" }"
         ),
         [
             RefusalKind::UnknownField {
@@ -287,6 +288,10 @@ fn declaration_blocks_are_checked_against_their_kind() {
                 at: s("`designation` monarch")
             },
             RefusalKind::DuplicateField(s("body")),
+            RefusalKind::UnknownField {
+                field: s("identity"),
+                at: s("`template` v")
+            },
         ]
     );
 }
