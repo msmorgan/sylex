@@ -5,4 +5,4 @@ card singleFaced({
     text = [
       activated(
         tapSymbol,
-        addMana(counted(1, ofTypeProducibleBy(a(and([isLand, anOpponentControls]))))))]})
+        addMana(counted(1, ofColorProducibleBy(a(and([isLand, anOpponentControls]))))))]})

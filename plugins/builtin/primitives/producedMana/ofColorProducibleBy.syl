@@ -1,0 +1,5 @@
+# "mana of any color that <subject> could produce" [CR#106.7]: a color only, never colorless mana
+# [CR#106.1a], unlike `ofTypeProducibleBy`.
+primitive ofColorProducibleBy(subject: NounPhrase): ProducedMana = ColorCouldProduce {
+  spelling = "mana of any color that <subject> could produce"
+}
