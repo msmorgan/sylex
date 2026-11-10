@@ -358,14 +358,6 @@ pub const RECORDS: &[RecordSort] = &[
         &[("characteristics", "Option(Characteristics)", false)],
     ),
     record(
-        "JoinedHeader",
-        &[
-            ("event", "GameEvent", false),
-            ("while", "Option(Timing)", false),
-            ("timing", "Option(Timing)", false),
-        ],
-    ),
-    record(
         "KeywordFamily",
         &[
             ("word", "KeywordLabel", false),
@@ -422,6 +414,14 @@ pub const RECORDS: &[RecordSort] = &[
             ("name", "String", false),
             ("cost", MANA_COST, true),
             ("text", "List(Ability)", true),
+        ],
+    ),
+    record(
+        "TriggerHeader",
+        &[
+            ("event", "GameEvent", false),
+            ("while", "Option(Timing)", false),
+            ("timing", "Option(Timing)", false),
         ],
     ),
     record(

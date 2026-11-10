@@ -1,9 +1,11 @@
-# "When/Whenever/At <event>, <action>" [CR#603.1].
+# "When/Whenever/At <header> and <joins>, if <intervening>, <action>" [CR#603.1,603.4]. Each
+# header is a trigger condition, and a triggered ability may have more than one [CR#603.1b]; a
+# joined header prints its own trigger word ("When this creature enters and whenever it attacks
+# while saddled").
+# [CR#603.1,603.4,603.1b]
 primitive triggered(
-  event: GameEvent,
-  while: Option(Timing),
-  joins: List(JoinedHeader),
-  timing: Option(Timing),
-  limit: Option(UsageLimit),
+  header: TriggerHeader,
+  joins: List(TriggerHeader),
   intervening: Option(Condition),
-  action: Action): Ability = Triggered
+  action: Action,
+  limit: Option(UsageLimit)): Ability = Triggered

@@ -6,12 +6,12 @@
 template when(
   event: GameEvent,
   action: Action,
-  joins: List(JoinedHeader) = [],
+  joins: List(TriggerHeader) = [],
   while: Option(Timing) = none,
   during: Option(Timing) = none,
   limit: Option(UsageLimit) = none,
   if: Option(Condition) = none): Ability {
   # TODO(spelling): Include or omit the clauses supplied by while, during, limit, if. Format and
   # coordinate the joins list entries, including the empty case.
-  body = triggered($event, $while, $joins, $during, $limit, $if, $action)
+  body = triggered({event = $event, while = $while, timing = $during}, $joins, $if, $action, $limit)
 }

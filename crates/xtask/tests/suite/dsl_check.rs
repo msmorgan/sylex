@@ -236,6 +236,33 @@ fn record_fields_are_checked_against_the_record_sort() {
     );
 }
 
+/// A trigger header names its event; alternative events are an `or` written
+/// as that event, never a field beside it.
+#[test]
+fn a_trigger_header_writes_its_event_and_no_alternatives() {
+    assert_eq!(
+        kinds(
+            "primitive now: GameEvent = Now\n\
+             primitive triggered(header: TriggerHeader): Ability = Triggered\n\
+             template a: TriggerHeader { body = { event = now, while = none, timing = none } }\n\
+             template b: TriggerHeader { body = { while = none, timing = none } }\n\
+             template c: TriggerHeader {\n\
+               body = { event = now, alternatives = [], while = none, timing = none }\n\
+             }"
+        ),
+        [
+            RefusalKind::MissingField {
+                field: s("event"),
+                at: s("TriggerHeader")
+            },
+            RefusalKind::UnknownField {
+                field: s("alternatives"),
+                at: s("TriggerHeader")
+            },
+        ]
+    );
+}
+
 #[test]
 fn declaration_blocks_are_checked_against_their_kind() {
     assert_eq!(
