@@ -35,7 +35,7 @@ none of it is an operation of this grammar:
 
 - **Inflection and agreement.** A verb whose agreement depends on a Hole is written
   uninflected, and `getsBoth` is "gets" in Giant Growth and "get" in Glorious Anthem.
-- **Case.** `controllerOf`, "<subject>'s controller", over `it` is "its controller".
+- **Case.** `controllerOf`, "$subject's controller", over `it` is "its controller".
 - **Voice and verb form.** An Action's wording is its verb's one Subcategorization Frame. The
   context that embeds the Action selects the form the frame takes, and its Subject selects the
   voice ([Semantics](semantics.md) §4.2): under `any` or `by(np)` the wording is the frame's
@@ -53,8 +53,8 @@ number or Gap would multiply as frames times forms, and the copies would drift a
 
 **Substitution** fills a Hole with the wording of the argument's own Construction. It serves
 every case where a phrase stands whole where its parent's wording leaves room for it: "draw
-<amount> cards", "target <subject>", "<cost>: <action>". A wording whose fixed words stand on
-both sides of its Holes is still substitution: "more <p> than <subject>" is one fragment with
+$amount cards", "target $subject", "$cost: $action". A wording whose fixed words stand on
+both sides of its Holes is still substitution: "more $p than $subject" is one fragment with
 two Holes, and nothing is inserted into another Construction's phrase.
 
 **One-sided adjunction** attaches a Construction's wording to the left or the right of a
@@ -103,7 +103,7 @@ grammar's (§1).
 
 **An optional part** is printed only when its parameter differs from the parameter's declared
 default. It may carry fixed words beside its Hole: Elvish Piper's "put a creature card from
-your hand onto the battlefield" prints "from <from>", and a card that names no origin prints
+your hand onto the battlefield" prints "from $from", and a card that names no origin prints
 nothing there. Giant Growth's "Target creature gets +3/+3 until end of turn" and Glorious
 Anthem's "Creatures you control get +1/+1" are one Construction whose duration is present in
 the first and absent in the second.
@@ -135,7 +135,7 @@ a one-sided adjunct at the edge of a phrase that encloses the Construction's Hol
 wording names the Category of that phrase. Quantity adjuncts are the case. In Kabira Outrider's
 "target creature gets +1/+1 until end of turn for each creature in your party", the amount is
 "+1 for each creature in your party", one `forEach(per, p)` inside the delta. Its `per` is
-printed where the amount stands, and "for each <p>" is printed at the end of the verb phrase,
+printed where the amount stands, and "for each $p" is printed at the end of the verb phrase,
 past the duration. "Equal to" does the same in Dogpile's "deals damage to any target equal to
 the number of attacking creatures you control", where the recipient stands between "damage" and
 what measures it.
@@ -289,28 +289,65 @@ round-trips only if its term says which of its parts are bracketed and spelling 
 parts to the spans. How the term says it is `.syl`'s to settle with cleave, which has no
 representation yet.
 
-## 7. What a `spelling` string must express
+## 7. The `spelling` notation
 
-The formalism fixes what the `spelling` notation must be able to say. Its concrete syntax
-belongs to [`.syl`](syl.md) §2. A `spelling` must be able to state:
-
-- a Hole for a parameter, and the same Hole printed again;
-- an optional part: the parameter that governs it, and the fixed words printed with it;
-- a list Hole and how its elements join, coordinated or juxtaposed;
-- a Tail: the words and Holes that are detached, the Category of the phrase they attach to,
-  and whatever §10 settles is needed to place it among that phrase's other adjuncts;
-- nothing else by markup. Fixed words are plain text. Square brackets and braces are Oracle's
-  own characters, for cleave and for symbols, and never mark anything. Angle brackets appear in
-  no in-scope Oracle text, and the corpus writes a Hole `<name>` today.
-
-As an illustration of the shape only, not of the syntax:
+A `spelling` is fixed words with three kinds of markup, each with one job. `$` marks a Hole,
+parentheses an optional part, and angle brackets a Tail.
 
 ```
-forEach             "<per> <^VerbPhrase for each <p>>"
-putOntoBattlefield  "put <subject> <?from: from <from>> onto the battlefield <riders*>"
-when                "when <event> <?if: , if <if>>, <action>"
-getsBoth            "<subject> get <delta>/<delta> <duration?>"
+spelling := part*
+part     := text | hole | optional | tail
+hole     := "$" name                    -- a parameter's argument
+          | "$<" name ">"               -- the same, where a word character follows
+          | "$" name "<" join ">"       -- a List parameter
+join     := "" | "," | "and" | "or" | "and/or" | "then" | "$" name
+optional := "(" part+ ")"
+tail     := "<" Category ":" part+ ">"
+text     := any characters except "$", "(", ")", "<" and ">"
 ```
+
+**A Hole is `$name`**, the sigil that reads the same parameter in `body`
+([`.syl`](syl.md) §2): "draw $amount cards", "$subject's controller", "non$p". A Hole printed
+again is written again, as in "$subject get $delta/$delta". Where a letter, digit or underscore
+follows the name, the name is delimited: "$<quality>walk", "$<n>th from the top of $loc". The
+formatter writes the undelimited form everywhere else.
+
+**A list Hole is `$name<join>`.** A `List` parameter must state its join and no other
+parameter may, so a list is visible at its Hole. The joins are a closed set: `<>` juxtaposes
+the elements; `<,>` separates them with commas and no coordinator; `<and>`, `<or>`, `<and/or>`
+and `<then>` coordinate them; and `<$name>` coordinates them with the coordinator a parameter
+of the declaration supplies. The commas of a coordination of three or more are the English
+layer's and are never written. A `<` directly after a Hole's name always opens a join, so a
+Tail that follows a Hole stands after a space.
+
+**An optional part is `( … )`.** It is printed exactly when the one defaulted parameter whose
+Hole stands directly in it differs from its declared default: "put $subject (from $from) onto
+the battlefield $riders<>", "$subject get $delta/$delta ($duration)". An optional part may
+hold another, as in "( … $a ( … $b ))", and each has its own parameter. A `spelling` fails to
+load when an optional part directly holds no Hole, the Hole of a parameter with no default, or
+the Holes of two parameters. Why: with exactly one governing parameter, the argument decides
+whether the part is printed and the printed part decides the argument, which is the round trip
+of §6 by construction.
+
+**A Tail is `<Category: …>`**, naming the Category of the enclosing phrase it attaches to
+(§3.2): "$per <VerbPhrase: for each $p>". The notation says nothing yet of where a Tail stands
+among that phrase's other adjuncts (§10).
+
+**No escape exists, because none is needed.** None of `$`, `(`, `)`, `<` and `>` occurs in the
+analyzed Oracle text ([Lexicon](lexicon.md) §1). The first, fourth and fifth occur in no
+in-scope card's text at all, and every parenthesis is removed with reminder text: a
+parenthetical is reminder text even where it reminds the player of something other than a
+keyword's rule, as on Mistform Ultimus, and one inside an ability-word label has no rules
+meaning. Square brackets and braces are Oracle's own characters, for cleave and for symbols, and
+are never markup.
+
+**What the notation does not say is a Template.** It has no part chosen by an enum value and
+no omission governed by a value that is not a default. A wording that differs that way is a
+different wording, and gets its own Template (§4).
+
+The declarations under `plugins/` still write a Hole `<name>`: 774 Holes on 592 `spelling`
+lines, four of which need the delimited form. The `syl-spelling-conventions` ticket migrates
+them.
 
 A wording is written the way the grammar will read it, so each `spelling` is checked by parsing
 it with the English grammar, each Hole standing for a phrase of any Category that its sort's
@@ -402,14 +439,8 @@ Tails exist to avoid.
 that phrase twice. A `forEach` in one delta is also a second candidate for every measure
 with a zero in it: Aurochs's "+1/+0 … for each" recovers as a scaled 1 beside a flat 0 and as
 a flat 1 beside a scaled 0. The candidates: a sort for the measure itself, which `get` takes
-whole and `forEach` is declared at; or a
-`forEach` in each delta whose identical Tails print once, which is Factoring by copy again; or
-scaling the Action from outside, which §9 rejects.
+whole and `forEach` is declared at; or a `forEach` in each delta whose identical Tails print
+once, which is Factoring by copy again; or scaling the Action from outside, which §9 rejects.
 
-**A part omitted for a value that is no default.** An optional part is governed by a declared
-default (§3.1). Gaea's Cradle's "Add {G} for each creature you control" prints no "one" before
-the mana, and `counted(amount, produced)` writes the 1. Either the text's form gets its own
-Template, with nothing to omit, or the notation gains an omission governed by a value.
-
-**Where the notation is designed.** The notation for optional parts and list Holes has a
-planned ticket. The notation for Tails and for whatever shared phrases need has none.
+The notation of §7 has no form yet for whatever these settle: a Tail's place, and a shared
+phrase.

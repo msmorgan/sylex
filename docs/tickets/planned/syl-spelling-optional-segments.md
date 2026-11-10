@@ -18,6 +18,9 @@ Written against the spine (`cleanup-step6-spine`).
 
 ## Open questions
 
+The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `$xs<join>` lists,
+`( … )` optional parts, `<Category: …>` Tails); where this ticket's text differs, §7 governs.
+
 - How a spelling expresses an optional segment (tied to a defaulted or `Option` parameter), a
   repeated segment (a `List` parameter) and list formatting ("A, B, and C").
 
