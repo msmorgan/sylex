@@ -776,3 +776,113 @@ fn any_declared_card_form_resolves() {
         []
     );
 }
+
+/// The resolution refusals for `cards` checked as a bundle beside the real
+/// builtin bundle, with the text each one spans.
+fn plugin_refusals(cards: &str) -> Vec<(RefusalKind, String)> {
+    let plugins = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins");
+    let builtin = Bundle::load(plugins.join("builtin"), FileId(0)).unwrap();
+    let canon = bundle("canon", builtin.next_file_id(), &[("cards.syl", cards)]);
+    match check(&builtin, &[&canon]) {
+        Ok(_) => Vec::new(),
+        Err(CheckError::Declarations(error)) => panic!("sylex_syl refused: {error}"),
+        Err(CheckError::Resolution { refusals, .. }) => refusals
+            .into_iter()
+            .map(|refusal| {
+                let file = canon.file(refusal.span.file).expect("refusal in the cards");
+                (refusal.kind, refusal.span.text(&file.source).to_owned())
+            })
+            .collect(),
+    }
+}
+
+/// "At" names a turn point and "when" and "whenever" an event [CR#603.2b]:
+/// *Elvish Visionary*'s enters trigger under `at`, and *Thallid*'s upkeep
+/// trigger under `whenever` and *Myr Prototype*'s under `when`, are refused
+/// at the trigger word's argument.
+#[test]
+fn at_refuses_an_event_and_whenever_refuses_a_turn_point() {
+    assert_eq!(
+        plugin_refusals(
+            "card singleFaced({\n\
+               name = \"Elvish Visionary\",\n\
+               types = [creature],\n\
+               text = [at(does(actor(thisCreature), enter), draw(lit(1)))]})\n\
+             card singleFaced({\n\
+               name = \"Thallid\",\n\
+               types = [creature],\n\
+               text = [\n\
+                 whenever(\n\
+                   beginningOfYour(upkeep),\n\
+                   putCounters(lit(1), printedKind(sporeCounter), thisCreature))]})\n\
+             card singleFaced({\n\
+               name = \"Myr Prototype\",\n\
+               types = [artifact, creature],\n\
+               text = [\n\
+                 when(\n\
+                   beginningOfYour(upkeep),\n\
+                   putCounters(lit(1), printedKind(p1p1Counter), thisCreature))]})"
+        )
+        .into_iter()
+        .map(|(kind, _)| kind)
+        .collect::<Vec<_>>(),
+        [
+            RefusalKind::UnknownWord {
+                word: s("does"),
+                sort: s("TurnPoint")
+            },
+            RefusalKind::UnknownWord {
+                word: s("beginningOfYour"),
+                sort: s("GameEvent")
+            },
+            RefusalKind::UnknownWord {
+                word: s("beginningOfYour"),
+                sort: s("GameEvent")
+            },
+        ]
+    );
+}
+
+/// A joined header prints its own trigger word, so an "at" header joins an
+/// event header: *Minsc & Boo, Timeless Heroes*'s first ability ("When Minsc &
+/// Boo enters and at the beginning of your upkeep, you may create Boo, a
+/// legendary 1/1 red Hamster creature token with trample and haste."), and
+/// the reverse order ("At the beginning of your upkeep and whenever you cast a
+/// black spell, put a charge counter on this artifact.", *Shrine of Limitless
+/// Power*'s first ability).
+#[test]
+fn a_turn_point_header_joins_an_event_header() {
+    assert_eq!(
+        plugin_refusals(
+            "card singleFaced({\n\
+               name = \"Minsc & Boo, Timeless Heroes\",\n\
+               types = [planeswalker],\n\
+               text = [\n\
+                 when(\n\
+                   does(actor(thisPlaneswalker), enter),\n\
+                   joins = [atHead(beginningOfYour(upkeep))],\n\
+                   action = may(\n\
+                     create(\n\
+                       lit(1),\n\
+                       written({\n\
+                         characteristics = {\n\
+                           name = \"Boo\",\n\
+                           colors = [red],\n\
+                           supertypes = [legendary],\n\
+                           types = [creature],\n\
+                           subtypes = [hamster],\n\
+                           text = [trample, haste],\n\
+                           power = lit(1),\n\
+                           toughness = lit(1)}}))))]})\n\
+             card singleFaced({\n\
+               name = \"Shrine of Limitless Power\",\n\
+               types = [artifact],\n\
+               text = [\n\
+                 at(\n\
+                   beginningOfYour(upkeep),\n\
+                   joins = [joinedHead(does(actor(you), cast(a(and([isSpell, hasColor(black)])))))],\n\
+                   action = putCounters(lit(1), printedKind(chargeCounter), thisArtifact))]})"
+        ),
+        []
+    );
+}
