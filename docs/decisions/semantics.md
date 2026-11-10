@@ -285,6 +285,15 @@ Event decisions:
   blocks" is `or([does(actor(x), attack), does(actor(x), block)])`, and "blocks or becomes
   blocked" joins two events whose subjects differ. An `or` over Actions would be a compound
   action, which the gate refuses.
+- **"At" names a Turn Point.** A phase or step beginning is a trigger event [CR#603.2b], and
+  "at end of combat" triggers as the end of combat step begins [CR#511.2], so there is one
+  triggered-ability constructor and `at` builds it too. What tells the trigger words apart is
+  sort: `at` takes a `TurnPoint` (`beginningOf`, an `nthOccurrence` of one), and the event its
+  header carries is the game reaching it (`reached`); `when` and `whenever` take a `GameEvent`,
+  which no Turn Point is. A delayed "at" trigger (`atNext`) takes a Turn Point the same way.
+  Any other event-taking position that names a beginning writes `reached` ("until your next
+  turn", "continuously since the beginning of your last upkeep"). The end of a phase, step or
+  turn (`endOf`) is no Turn Point: "at end of combat" is a beginning.
 - **Joined headers are not a disjunction.** "When this creature enters and whenever it attacks
   while saddled" is two trigger headers of one ability, each with its own trigger word,
   concurrent condition and timing; an `or` over events stands inside one header's event.

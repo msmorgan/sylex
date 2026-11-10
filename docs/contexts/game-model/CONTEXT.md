@@ -256,6 +256,12 @@ How long a one-shot's Continuous Effect lasts; with none stated, until the game 
 When a Player may act or a trigger or replacement applies; none written means whenever the
 Player has priority ([CR#117.1a]).
 
+**Turn Point**:
+A moment in the turn structure that an "at" trigger names: the beginning of a phase, step or
+turn, picked by whose it is and which occurrence ([CR#603.2b]); "end of combat" is the end of
+combat step's beginning ([CR#511.2]). The game reaching one is an event.
+_Avoid_: Moment, Step trigger.
+
 **Event Ordinal**:
 Which matching event a description picks by position ("the second spell you cast each turn")
 ([CR#700.1]).
