@@ -1,6 +1,26 @@
 # Legendary: a supertype [CR#205.4a].
+#
+# [CR#205.4e] "Any instant or sorcery spell with the supertype "legendary" is subject to a casting
+# restriction. A player can't cast a legendary instant or sorcery spell unless that player
+# controls a legendary creature or a legendary planeswalker." Per holder: while it is an instant
+# or sorcery, each player can't cast it unless that player controls one.
+#
+# [CR#205.4d] The legend rule a legendary permanent is subject to is its own row, `legendRule`,
+# since card text names it.
 supertype legendary {
   lexical = {lemma = "legendary"},
   spelling = "legendary",
-  name = "Legendary"
+  name = "Legendary",
+  confers = [
+    property(
+      conditionFirstWhile(
+        is(this, isInstantOrSorcery),
+        onlyUnless(
+          cant(actor(eachPlayer), cast(this)),
+          exists(
+            and([
+                or([
+                    and([hasSupertype(legendary), isCreature]),
+                    and([hasSupertype(legendary), isPlaneswalker])]),
+                controlledBy(that(player))])))))]
 }
