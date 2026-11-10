@@ -1,5 +1,6 @@
 # "using its <keyword> ability": the alternative cost that keyword ability offers
-# [CR#601.2b,601.2f].
+# [CR#601.2b,601.2f], or that an effect gives the object under the keyword's name, as a foretell
+# cost given to a card that has no foretell [CR#702.143d].
 # [CR#601.2b,601.2f]
 primitive usingKeyword(label: KeywordLabel): PlayPayment = ByKeyword {
   spelling = "using its <label> ability"

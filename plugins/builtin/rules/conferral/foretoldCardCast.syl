@@ -1,0 +1,14 @@
+# [CR#702.143d] A foretold card "may be cast for any foretell cost it has after the turn it became
+# a foretold card has ended, even if the resulting spell doesn't have foretell": the cast right of
+# every foretold card, whatever made it foretold. The foretell cost is the one its foretell ability
+# gives it or the one the effect that made it foretold gives it [CR#702.143d]; "you" on a card in
+# exile is its owner [CR#109.5].
+conferral foretoldCardCast {
+  body = {
+    scope = and([isCard, hasDesignation(foretold), in(exileZone)]),
+    confer = ability(
+      static(
+        onlyUnless(
+          can(actor(you), cast(this, exileZone, usingKeyword(foretell))),
+          did(any, gainDesignation(this, foretold), within(soFarThisTurn)))))}
+}
