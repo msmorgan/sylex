@@ -549,14 +549,6 @@ impl Resolver<'_> {
             return;
         };
         let at = decl.label();
-        let own_fields = decl
-            .kind
-            .fields
-            .iter()
-            .any(|spec| decl.field(spec.name).is_some());
-        if decl.kind.record_fields && !own_fields {
-            return self.record(block, &decl.sort);
-        }
         let slots: Vec<Slot> = decl
             .kind
             .fields

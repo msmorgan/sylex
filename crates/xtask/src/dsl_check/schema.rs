@@ -23,9 +23,6 @@ pub struct Kind {
     /// supertype, relation or top-level rules row) is registered before any
     /// body is read, so a reference to one is no dependency edge.
     pub catalog: bool,
-    /// When the block writes none of `fields`, it writes the fields of the
-    /// kind's record sort directly.
-    pub record_fields: bool,
 }
 
 /// How a declaration kind is written.
@@ -98,7 +95,6 @@ const fn kind(word: &'static str, sort: &'static str, fields: &'static [FieldSpe
         fields,
         secondary: None,
         catalog: false,
-        record_fields: false,
     }
 }
 
@@ -109,19 +105,18 @@ const fn catalog(word: &'static str, sort: &'static str, fields: &'static [Field
     }
 }
 
-const fn rules_row(word: &'static str, sort: &'static str) -> Kind {
-    Kind {
-        record_fields: true,
-        ..kind(
-            word,
-            sort,
-            &[FieldSpec {
-                name: "body",
-                sort: None,
-                required: false,
-            }],
-        )
-    }
+/// A kind whose `body` is a record of its sort: a token's characteristics, a
+/// rules row's fields.
+const fn record_body(word: &'static str, sort: &'static str) -> Kind {
+    kind(
+        word,
+        sort,
+        &[FieldSpec {
+            name: "body",
+            sort: None,
+            required: true,
+        }],
+    )
 }
 
 /// The kind word of the declaration that binds a word to a constructor.
@@ -236,16 +231,16 @@ pub const KINDS: &[Kind] = &[
         &[field("name", "String"), CONFERS],
     ),
     catalog("relation", "RelationLabel", &[]),
-    rules_row("token", "DefinedToken"),
+    record_body("token", "DefinedToken"),
     // A top-level rules row is a catalog declaration, so card text can name
     // it as it names a keyword: the "legend rule" [CR#205.4d].
     Kind {
         catalog: true,
-        ..rules_row("sba", "SbaRule")
+        ..record_body("sba", "SbaRule")
     },
     Kind {
         catalog: true,
-        ..rules_row("conferral", "ConferralRule")
+        ..record_body("conferral", "ConferralRule")
     },
     Kind {
         form: Form::Value,

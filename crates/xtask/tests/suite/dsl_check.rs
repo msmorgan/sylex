@@ -345,24 +345,29 @@ fn a_supertype_is_a_catalog_declaration() {
     );
 }
 
+/// A rules row's fields are its `body`, a record of its sort, written one
+/// way: never directly in the block.
 #[test]
-fn a_rules_row_writes_a_body_or_its_record_fields() {
+fn a_rules_row_writes_its_record_as_its_body() {
     let preamble = "primitive yes: Predicate = Yes\n\
                     primitive always: Condition = Always\n\
                     primitive nothing: Action = Nothing\n";
     let source = format!(
         "{preamble}\
-         sba a {{ scope = yes, when = always, then = nothing }}\n\
-         sba b {{ body = {{ scope = yes, when = always, then = nothing }} }}\n\
-         sba c {{ body = {{ scope = yes, when = always, then = nothing }}, scope = yes }}\n\
-         sba d {{ scope = yes, when = always }}"
+         sba a {{ body = {{ scope = yes, when = always, then = nothing }} }}\n\
+         sba b {{ scope = yes }}\n\
+         sba c {{ body = {{ scope = yes, when = always }} }}"
     );
     assert_eq!(
         kinds(&source),
         [
             RefusalKind::UnknownField {
                 field: s("scope"),
-                at: s("`sba` c")
+                at: s("`sba` b")
+            },
+            RefusalKind::MissingField {
+                field: s("body"),
+                at: s("`sba` b")
             },
             RefusalKind::MissingField {
                 field: s("then"),
@@ -391,7 +396,10 @@ fn a_rules_row_is_a_nameable_catalog_declaration() {
            spelling = \"a rule\",\n\
            body = {{ scope = yes, when = always, then = nothing }}\n\
          }}\n\
-         sba b {{ lexical = {{lemma = \"b rule\"}}, scope = yes, when = always, then = nothing }}\n\
+         sba b {{\n\
+           lexical = {{lemma = \"b rule\"}},\n\
+           body = {{ scope = yes, when = always, then = nothing }}\n\
+         }}\n\
          conferral c {{\n\
            lexical = {{lemma = \"c rule\"}},\n\
            spelling = \"c rule\",\n\
