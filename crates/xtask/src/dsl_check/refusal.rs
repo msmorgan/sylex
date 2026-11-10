@@ -58,6 +58,8 @@ pub enum RefusalKind {
     CoercionParameters,
     #[error("a coercion's body is a primitive at {0} applied to the coercion's parameter alone")]
     CoercionBody(String),
+    #[error("a coercion from {0} to itself; a coercion goes from one sort to another")]
+    CoercionToItself(String),
     #[error("duplicate coercion from {from} to {to}")]
     DuplicateCoercion { from: String, to: String },
     #[error(

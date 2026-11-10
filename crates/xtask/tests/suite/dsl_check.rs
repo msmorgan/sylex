@@ -1125,6 +1125,8 @@ fn a_malformed_coercion_is_refused() {
          coercion(a: Int, b: Int): Amount {{ body = lit($a) }}\n\
          coercion(a: Int = 1): Amount {{ body = lit($a) }}\n\
          coercion(a: CardType): NounWord {{ body = article }}\n\
+         template articleOf(t: CardType): NounWord {{ body = type($t) }}\n\
+         coercion(a: CardType): NounWord {{ body = articleOf($a) }}\n\
          coercion(a: Nat): Amount {{ body = lit(1) }}\n\
          coercion named(a: Int): Amount {{ body = lit($a) }}\n\
          coercion(a: Int): Amount\n\
@@ -1140,6 +1142,7 @@ fn a_malformed_coercion_is_refused() {
             RefusalKind::CoercionParameters,
             RefusalKind::CoercionParameters,
             RefusalKind::CoercionBody(s("NounWord")),
+            RefusalKind::CoercionBody(s("NounWord")),
             RefusalKind::CoercionBody(s("Amount")),
             RefusalKind::MissingField {
                 field: s("body"),
@@ -1154,5 +1157,80 @@ fn a_card_written_as_a_header_without_a_name_is_refused() {
     assert_eq!(
         kinds("card(a: Int): Card { body = 1 }"),
         [RefusalKind::WrittenHeader(s("card"))]
+    );
+}
+
+#[test]
+fn a_word_at_an_option_of_a_target_and_at_a_from_sort_is_refused_with_no_call_site() {
+    // At an `Option(NounWord)` position the `Option` declaration would be
+    // found before the coercion from `CardType` is tried.
+    let source =
+        format!("{COERCIONS}template creature: Option(NounWord) {{ body = type(creature) }}");
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::AmbiguousWord {
+                word: s("creature"),
+                sorts: vec![s("CardType"), s("Option(NounWord)")],
+                target: s("Option(NounWord)")
+            },
+            s("template creature: Option(NounWord) { body = type(creature) }")
+        )]
+    );
+}
+
+#[test]
+fn a_list_literal_reaching_a_target_from_two_list_sorts_is_refused_with_no_call_site() {
+    let source = format!(
+        "{COERCIONS}\
+         primitive ofTypes(types: List(CardType)): Predicate = OfTypes\n\
+         primitive ofSubtypes(subtypes: List(Subtype)): Predicate = OfSubtypes\n\
+         coercion(t: List(CardType)): Predicate {{ body = ofTypes($t) }}\n\
+         coercion(t: List(Subtype)): Predicate {{ body = ofSubtypes($t) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::AmbiguousLiteral {
+                literal: s("a list"),
+                sorts: vec![s("List(CardType)"), s("List(Subtype)")],
+                target: s("Predicate")
+            },
+            s("coercion(t: List(Subtype)): Predicate { body = ofSubtypes($t) }")
+        )]
+    );
+}
+
+#[test]
+fn a_coercion_from_a_sort_to_itself_is_refused() {
+    let source = format!(
+        "{COERCIONS}\
+         primitive twice(n: Amount): Amount = Twice\n\
+         coercion(n: Amount): Amount {{ body = twice($n) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (
+                RefusalKind::CoercionToItself(s("Amount")),
+                s("coercion(n: Amount): Amount { body = twice($n) }")
+            ),
+            (
+                RefusalKind::ChainedCoercion {
+                    from: s("Int"),
+                    via: s("Amount"),
+                    to: s("Amount")
+                },
+                s("coercion(n: Amount): Amount { body = twice($n) }")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn a_nameless_header_on_a_named_kind_is_refused() {
+    assert_eq!(
+        kinds("template(x: Int): Int { body = $x }"),
+        [RefusalKind::MissingName(s("template"))]
     );
 }

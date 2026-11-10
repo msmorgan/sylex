@@ -87,8 +87,15 @@ pub(super) fn coercions(
         }
         coercions.push(coercion);
     }
+    for coercion in coercions.iter().filter(|c| c.from == c.to) {
+        refusals.push(Refusal {
+            span: coercion.span,
+            kind: RefusalKind::CoercionToItself(coercion.to.to_string()),
+        });
+    }
     for first in &coercions {
-        for then in coercions.iter().filter(|then| then.from == first.to) {
+        let chained = |then: &&Coercion| then.from == first.to && !std::ptr::eq(*then, first);
+        for then in coercions.iter().filter(chained) {
             refusals.push(Refusal {
                 span: then.span,
                 kind: RefusalKind::ChainedCoercion {
@@ -173,8 +180,10 @@ fn read(
 }
 
 /// Refuses every word declared at two sorts of Reaches(`target`), `target`
-/// and every from-sort of a coercion into it, and every kind of literal that
-/// stands at two of them.
+/// and every from-sort of a coercion into it, or at `Option(target)` and a
+/// from-sort (at an `Option(target)` position the first would shadow the
+/// coercion), and every kind of literal that stands at two sorts of
+/// Reaches(`target`).
 fn ambiguities(
     target: &SortKey,
     coercions: &[Coercion],
@@ -182,39 +191,19 @@ fn ambiguities(
     refusals: &mut Vec<Refusal>,
 ) {
     let into: Vec<&Coercion> = coercions.iter().filter(|c| c.to == *target).collect();
-    let reaches: Vec<&SortKey> = std::iter::once(target)
-        .chain(into.iter().map(|c| &c.from))
-        .collect();
-    let mut words: BTreeMap<&str, Vec<(&SortKey, Span)>> = BTreeMap::new();
-    for ((name, sort), signature) in registry {
-        if reaches.contains(&sort) {
-            words
-                .entry(name.as_str())
-                .or_default()
-                .push((sort, signature.span));
-        }
-    }
-    for (word, declared) in words {
-        if declared.len() < 2 {
-            continue;
-        }
-        let span = declared
-            .iter()
-            .map(|(_, span)| *span)
-            .max_by_key(|span| (span.file, span.start))
-            .expect("two declarations");
-        refusals.push(Refusal {
-            span,
-            kind: RefusalKind::AmbiguousWord {
-                word: word.to_owned(),
-                sorts: declared.iter().map(|(sort, _)| sort.to_string()).collect(),
-                target: target.to_string(),
-            },
-        });
-    }
-    let literals: [(&str, StandsAt); 4] = [
+    let froms = into.iter().map(|c| &c.from);
+    let reaches: Vec<&SortKey> = std::iter::once(target).chain(froms.clone()).collect();
+    words(&reaches, target, None, registry, refusals);
+    let optional = SortKey {
+        head: "Option".to_owned(),
+        args: vec![target.clone()],
+    };
+    let shadowing: Vec<&SortKey> = std::iter::once(&optional).chain(froms).collect();
+    words(&shadowing, &optional, Some(&optional), registry, refusals);
+    // Only `String` takes a string literal, so no string reaches a target
+    // from two sorts.
+    let literals: [(&str, StandsAt); 3] = [
         ("an integer", |sort| integer_stands_at(0, sort)),
-        ("a string", string_stands_at),
         ("a list", list_stands_at),
         ("a record", record_stands_at),
     ];
@@ -233,6 +222,45 @@ fn ambiguities(
             kind: RefusalKind::AmbiguousLiteral {
                 literal: literal.to_owned(),
                 sorts: sorts.iter().map(ToString::to_string).collect(),
+                target: target.to_string(),
+            },
+        });
+    }
+}
+
+/// Refuses every word declared at two of `sorts`, all of which reach
+/// `target`; with `including`, only a word one of whose sorts it is.
+fn words(
+    sorts: &[&SortKey],
+    target: &SortKey,
+    including: Option<&SortKey>,
+    registry: &Registry,
+    refusals: &mut Vec<Refusal>,
+) {
+    let mut words: BTreeMap<&str, Vec<(&SortKey, Span)>> = BTreeMap::new();
+    for ((name, sort), signature) in registry {
+        if sorts.contains(&sort) {
+            words
+                .entry(name.as_str())
+                .or_default()
+                .push((sort, signature.span));
+        }
+    }
+    for (word, declared) in words {
+        let included = including.is_none_or(|sort| declared.iter().any(|(s, _)| *s == sort));
+        if declared.len() < 2 || !included {
+            continue;
+        }
+        let span = declared
+            .iter()
+            .map(|(_, span)| *span)
+            .max_by_key(|span| (span.file, span.start))
+            .expect("two declarations");
+        refusals.push(Refusal {
+            span,
+            kind: RefusalKind::AmbiguousWord {
+                word: word.to_owned(),
+                sorts: declared.iter().map(|(sort, _)| sort.to_string()).collect(),
                 target: target.to_string(),
             },
         });

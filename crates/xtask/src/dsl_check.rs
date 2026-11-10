@@ -705,16 +705,13 @@ impl Resolver<'_> {
         }
     }
 
-    /// Whether `value` stands at `sort` itself, with no coercion: a word
-    /// declared there, a parameter of that sort, or a literal at its own
-    /// sort. Only the value's head is looked at; its arguments, items and
-    /// fields are resolved once the sort is chosen.
+    /// Whether `value`, not a parameter, stands at `sort` itself, with no
+    /// coercion: a word declared there, or a literal at its own sort. Only the
+    /// value's head is looked at; its arguments, items and fields are resolved
+    /// once the sort is chosen.
     fn stands_at(&self, value: &Value, sort: &SortKey) -> bool {
         match &value.kind {
-            ValueKind::Parameter(name) => self
-                .params
-                .iter()
-                .any(|p| p.name == name.ident.as_str() && p.sort == *sort),
+            ValueKind::Parameter(_) => unreachable!("a parameter is resolved before stands_at"),
             ValueKind::Call(call) => self
                 .registry
                 .contains_key(&(call.head.ident.as_str().to_owned(), sort.clone())),
