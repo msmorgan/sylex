@@ -1,5 +1,6 @@
 ---
-needs: [cleanup-step6-surface]
+needs: [cleanup-step6-surface, syl-declaration-rules-field]
+specs: [confers-and-rules]
 ---
 
 # Keyword and rule-bearing counters confer what the rules give them
@@ -18,12 +19,15 @@ state-based row under `plugins/builtin/rules/` writes it.
 
 Written against the surface (`cleanup-step6-surface`).
 
+## Design
+
+- A per-counter effect stays in the counter's `confers`: the keyword counters' keywords
+  [CR#122.1b] and hone [CR#122.1j]. A once-for-one-or-more effect goes in its `rules`, scoped with
+  `hasCounter(<kind>)`: shield [CR#122.1c], stun [CR#122.1d], finality [CR#122.1h], rad
+  [CR#122.1i,728.1] and the ten-poison loss [CR#122.1f,704.5c] (spec §3).
+
 ## Open questions
 
-- How `.syl` tells a per-counter conferral from a once-for-one-or-more one. `p1p1Counter.syl`
-  says its conferral applies once per counter held, which fits hone [CR#122.1j]; shield, stun,
-  finality and rad counters create one effect for "one or more" counters
-  [CR#122.1c,122.1d,122.1h,122.1i].
 - Whether the Two-Headed Giant team threshold [CR#704.6b], which `poison.syl`'s comment names, is
   written with the ten-counter loss.
 
@@ -34,9 +38,9 @@ Written against the surface (`cleanup-step6-surface`).
   `indestructibleCounter`, `lifelinkCounter`, `menaceCounter`, `reachCounter`, `shadowCounter`,
   `trampleCounter`, `vigilanceCounter`) confers its keyword as `flyingCounter` does.
 - `shieldCounter` [CR#122.1c], `stunCounter` [CR#122.1d], `finalityCounter` [CR#122.1h],
-  `radCounter` [CR#122.1i,728.1] and `honeCounter` [CR#122.1j] confer the effect their rule
-  states, applied per counter or once for one or more counters as settled.
-- `poison` confers, or a state-based row writes, the ten-counter loss [CR#122.1f,704.5c].
+  `radCounter` [CR#122.1i,728.1] and `honeCounter` [CR#122.1j] write the effect their rule
+  states, hone in `confers` and the others in `rules`.
+- `poison` writes the ten-counter loss in `rules` [CR#122.1f,704.5c].
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass;
   `cargo xtask cite check --list-noncompliant` is empty and `cargo xtask cite check` reports
   0 stale, after `cargo xtask cite bless` for newly cited rules.
@@ -48,4 +52,4 @@ Written against the surface (`cleanup-step6-surface`).
 ## Pointers
 
 `plugins/builtin/definitions/counter/` (`flyingCounter.syl` and `p1p1Counter.syl` for the form),
-`docs/decisions/semantics.md` §1 item 4.
+`docs/specs/confers-and-rules.md`, `docs/decisions/semantics.md` §1 item 4.

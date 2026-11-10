@@ -1,5 +1,6 @@
 ---
-needs: [syl-craft-materials, syl-companion-pregame-rule, syl-bodiless-keywords, cleanup-step6-surface]
+needs: [syl-craft-materials, syl-companion-pregame-rule, syl-bodiless-keywords, syl-declaration-rules-field, cleanup-step6-surface]
+specs: [confers-and-rules]
 ---
 
 # Refuse a parameter its declaration never reads
@@ -7,12 +8,12 @@ needs: [syl-craft-materials, syl-companion-pregame-rule, syl-bodiless-keywords, 
 ## Why
 
 A declaration with a body (`template`, `action`, `ability`, `ability_word`) may declare a
-parameter its body never reads with `$name`, and `cargo xtask dsl check` accepts it. A parameter
+parameter its block never reads with `$name`, and `cargo xtask dsl check` accepts it. A parameter
 nothing reads is a bug: the caller's argument is dropped silently.
 
 Three declarations have an unread parameter today: `craft`'s `cost`, `companion`'s `condition`
 and `toxic`'s `amount`. `syl-craft-materials` and `syl-companion-pregame-rule` rewrite the first
-two, and land first.
+two, and `syl-declaration-rules-field` gives toxic `number = $amount`; all three land first.
 
 Written against the surface (`cleanup-step6-surface`).
 
@@ -20,13 +21,10 @@ Written against the surface (`cleanup-step6-surface`).
 
 - A parameter that its declaration's block never reads is refused, on every declaration kind with
   a body. `deed_action` (`syl-explicit-deeds`) is exempt.
-
-## Open questions
-
-- `toxic`'s `amount` is read only through the keyword's number: the rule row `toxicPoison.syl`
-  reads `totalToxicValue`, which sums `keywordNumber(toxic)` [CR#702.164b,702.164c], and toxic's
-  own body is empty. Does the refusal count that as reading `amount`, or does toxic's rule move so
-  that its own declaration reads `amount`?
+- A read in any field of the block counts, `number` included: toxic reads `amount` through
+  `number = $amount`, which `keywordNumber(toxic)` projects and `totalToxicValue` sums
+  [CR#702.164b,702.164c] (spec §7). A read inside `rules` is refused outright (spec §8), so it
+  never counts.
 
 ## Done when
 

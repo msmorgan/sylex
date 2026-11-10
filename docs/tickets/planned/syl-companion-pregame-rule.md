@@ -15,6 +15,12 @@ start of the game.
 
 Written against the surface (`cleanup-step6-surface`).
 
+## Design
+
+- The reveal is a top-level rules row scoped to players (`scope = isPlayer`), enabled once per
+  player, as `playerDamageLifeLoss` is; each player reveals at most one card
+  [CR#103.2b].
+
 ## Done when
 
 - A rule declaration writes the reveal: at most one card [CR#103.2b], its condition read through

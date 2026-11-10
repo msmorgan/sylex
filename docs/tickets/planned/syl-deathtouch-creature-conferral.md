@@ -16,6 +16,13 @@ with the engine.
 
 Written against the surface (`cleanup-step6-surface`).
 
+## Open questions
+
+- Whether the row goes on `deathtouch.syl` under `rules` (`syl-declaration-rules-field`) instead
+  of on `creature.syl`: the rule is about a creature dealt damage by a source with deathtouch
+  [CR#702.2b,704.5h], so it is deathtouch's rule as much as the creature's, and it would end
+  deathtouch's empty body. Its scope would be the damaged creature, not the deathtouch source.
+
 ## Done when
 
 - The deathtouch row is a `stateBased` conferral on `creature.syl` beside the [CR#704.5g] row,

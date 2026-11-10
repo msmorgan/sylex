@@ -16,6 +16,12 @@ a rule or effect sets it [CR#702.179b], and 0 is only what an effect reading spe
 
 Written against the surface (`cleanup-step6-surface`).
 
+## Design
+
+- The [CR#704.5aa] row is a top-level `sba` row scoped to players (`scope = isPlayer`), enabled
+  once per player however many permanents with start your engines! that player controls, as
+  `playerDamageLifeLoss` is.
+
 ## Done when
 
 - An Action sets a player's speed and one raises it by an amount; raising from no speed sets it to

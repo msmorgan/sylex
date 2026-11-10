@@ -1,5 +1,5 @@
 ---
-needs: [syl-basic-land-mana-abilities, syl-clash, syl-companion-pregame-rule, syl-counter-conferrals, syl-craft-materials, syl-daybound-reconfigure-bodies, syl-deathtouch-creature-conferral, syl-designation-conferrals, syl-empower-token-parameter, syl-enlist-optional-attack-cost, syl-indirect-phase-out, syl-one-declaration-per-keyword, syl-room-doors-as-designations, syl-speed-rules, syl-venture-dungeon]
+needs: [syl-basic-land-mana-abilities, syl-clash, syl-companion-pregame-rule, syl-counter-conferrals, syl-craft-materials, syl-daybound-reconfigure-bodies, syl-deathtouch-creature-conferral, syl-declaration-rules-field, syl-designation-conferrals, syl-empower-token-parameter, syl-enlist-optional-attack-cost, syl-indirect-phase-out, syl-one-declaration-per-keyword, syl-room-doors-as-designations, syl-speed-rules, syl-venture-dungeon]
 ---
 
 # Step 6 middle: rules and keywords
