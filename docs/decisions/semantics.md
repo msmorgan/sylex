@@ -268,6 +268,14 @@ Event decisions:
   `establish(controlGrant(…))` ([CR#613.1b]). `anyCost` and `anyBallot` likewise appear only in
   patterns.
 - **Paying life** is a cost payment of `loseLife`; there is no life Cost ([CR#119.4,119.8]).
+- **Alternative events are an `or` over events**, since a triggered ability may have more than one
+  trigger condition ([CR#603.1b]). Each arm is a whole event with its own subject: "attacks or
+  blocks" is `or([does(actor(x), attack), does(actor(x), block)])`, and "blocks or becomes
+  blocked" joins two events whose subjects differ. An `or` over Actions would be a compound
+  action, which the gate refuses.
+- **Joined headers are not a disjunction.** "When this creature enters and whenever it attacks
+  while saddled" is two trigger headers of one ability, each with its own trigger word,
+  concurrent condition and timing; an `or` over events stands inside one header's event.
 
 ### 4.7 Static Specs
 
