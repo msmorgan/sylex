@@ -1,5 +1,5 @@
 ---
-needs: [syl-become-replaces-types, syl-concepts-modeled-twice, syl-each-plural-referent, syl-lean-doc-comments, syl-list-element-printed-order, syl-mana-for-each-template, syl-numeric-anaphors, syl-printed-read-order, syl-pronoun-swallowing-templates, syl-pt-change-sort, syl-spelling-conventions, syl-tail-placement, syl-this-head-template, syl-trigger-condition-written-form, syl-zone-words]
+needs: [syl-become-replaces-types, syl-concepts-modeled-twice, syl-each-plural-referent, syl-lean-doc-comments, syl-list-element-printed-order, syl-mana-for-each-template, syl-numeric-anaphors, syl-printed-read-order, syl-pronoun-swallowing-templates, syl-pt-change-sort, syl-spelling-conventions, syl-tail-placement, syl-this-head-template, syl-trigger-condition-written-form, syl-type-word-templates, syl-zone-words]
 ---
 
 # Step 6 surface: how `.syl` reads

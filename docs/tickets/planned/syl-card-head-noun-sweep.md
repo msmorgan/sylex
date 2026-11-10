@@ -39,29 +39,17 @@ Written against the surface (`cleanup-step6-surface`).
 
 - Every canon description where Oracle prints "permanent" carries `isPermanent`, and every one
   where it prints "card" carries `isCard` (or uses `cardIn(zone)`, which is
-  `and([isCard, in(zone)])`). `isCard` goes immediately after the last card-type, subtype or
-  color conjunct, as in `and([isCreature, isCard, in(yourHand)])`.
+  `and([isCard, in(zone)])`), immediately after the last color conjunct, as in
+  `and([hasColor(blue), isCard, in(yourHand)])`. A type word before "card" is written by
+  `syl-type-word-templates`, whose respell restores the dropped "card" at the type-word sites this
+  ticket listed and drops the unprinted card types beside a subtype.
 - The sweep covers at least these sites, found by scanning conjunctions with a non-battlefield
   zone and searches (the scan misses nested conjunctions, so check each card's Oracle text, not
-  only the scan):
-  - no head noun at all: *Seedborn Muse*, *Blatant Thievery*, *Mutagen Connoisseur* ("transformed
-    permanent you control") (`isPermanent`); *Drach'Nyen*
-    (`powerOf(the(in(exiledWith(thisEquipment))))` → `cardIn`), *Aven Shrine*, *Vraska's Scorn*
-    and *Tower Winder* (`named(…)`), *Force of Will*, *Sunscour*, the five Shoals (*Shining*,
-    *Disrupting*, *Blazing*, *Sickening*, *Nourishing*), *Rune Snag*, *Collected Company*,
-    *Commune with the Gods* and *Tezzeret's Gatebreaker* (`fromAmong`), *Skill Borrower* and
-    *Conspicuous Snoop* (complements of `is`) (`isCard`);
-  - a type but no "card": *Abolish*, *Ashes of the Fallen*, *Bleeding Effect*, *Bloodfire
-    Enforcers*, *Cairn Wanderer*, *Carrion Grub*, *Celebrate the Harvest*, *Charnel Troll*,
-    *Crypt Lurker*, *Cultivator Colossus*, *Custodi Squire*, *Death-Mask Duplicant*, *Death or
-    Glory*, *Delivery Moogle*, *Garruk Relentless // Garruk, the Veil-Cursed*, *Hymn of Rebirth*,
-    *Land Tax*, *Midnight Scavengers // Chittering Host*, *Mox Diamond*, *Old-Growth Dryads*,
-    *Phyrexian Ingester*, *Rogues' Gallery*, *Scapeshift*, *Sphinx of the Chimes*, *Syr Konrad,
-    the Grim*, *Thawing Glaciers*, *Urborg Scavengers*, *Voracious Brood*.
-- No canon description stores a card-type word the card does not print beside a subtype. These
-  sites drop `isLand` (or, on *Kopala*, `isCreature`): *Crash*, *Gush*, *Heart of Yavimaya*,
-  *Invigorate*, *Kopala, Warden of Waves* (two), *Kyren Legate* (two), *Massacre* (two), *Mogg
-  Salvage* (two), *Rouse*, *Skeleton Ship*, *Snuff Out*, *Thwart*.
+  only the scan): *Seedborn Muse*, *Blatant Thievery*, *Mutagen Connoisseur* ("transformed
+  permanent you control") (`isPermanent`); *Drach'Nyen*
+  (`powerOf(the(in(exiledWith(thisEquipment))))` → `cardIn`), *Aven Shrine*, *Vraska's Scorn*
+  and *Tower Winder* (`named(…)`), *Force of Will*, *Sunscour*, the five Shoals (*Shining*,
+  *Disrupting*, *Blazing*, *Sickening*, *Nourishing*), *Rune Snag* (`isCard`).
 - A printed "on the battlefield" is written `in(battlefield)`, not `isPermanent`: *Topple* and
   *Éomer of the Riddermark* ("among creatures on the battlefield").
 - Hexproof's body writes the printed heads "spells or abilities".

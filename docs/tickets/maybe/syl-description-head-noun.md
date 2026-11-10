@@ -39,6 +39,10 @@ integer into `Amount` (`syl.md` §2).
 This ticket tracks the structural answer: a description whose head noun is a slot of its own, so a
 type word's meaning is fixed by where it stands.
 
+`syl-type-word-templates` closes the part of the gap that needs no slot: type words spelled only
+through Templates that take them, with the head reading carrying the battlefield [CR#109.2]. Its
+Q2 (where a head stands) is D1 and D2 here, answered by a checker rule or by this ticket's sort.
+
 ## Design
 
 The idea, as a study worked it out. It is not adopted; the written forms below are warty (three
