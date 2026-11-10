@@ -334,6 +334,17 @@ Event decisions:
 - **A deontic rule** is a Subject, an Action and optional modifiers: Timing, as-though, a Deontic
   Exception, a cause (`cant` only), and a Permission Rider (`can` only) ([CR#113.2c]). "Can't A or
   B" is a conjunction of prohibitions.
+- **A cast or play permission widens only what it states**: the zone its `from` names, its
+  Timing or as-though, the additional land plays it counts ([CR#305.2]), and the zone a moved
+  referent was put into ("you may cast that card" after an exile, §2.1). With none of these it
+  grants no zone and no timing, so it only says how its subject may be cast: *Massacre*'s "you may cast this spell without paying its mana cost" and evoke's "You
+  may cast this card by paying [cost] rather than paying its mana cost" ([CR#702.74a]) are
+  alternative costs of a cast the rules already allow ([CR#601.3,118.9]).
+- **An alternative or additional cost stands where its sentence prints it.** "You may cast X by
+  paying C …" or "… without paying its mana cost", in a permission or an instructed cast, fills
+  that `cast`'s `altCost` (or, "as an additional cost", its `addedCost`). "You may pay C rather than
+  pay …" is the static `altCost`, and "As an additional cost to cast …" the static `addedCost`
+  ([CR#118.8,118.9]).
 - **A replacement's `repl`** says what happens:
   - `instead`: in the event's place.
   - `before`: before the event, which still happens; the choices "as it enters" requires
