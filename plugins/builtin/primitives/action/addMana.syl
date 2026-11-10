@@ -1,5 +1,6 @@
-# Add mana to the actor's mana pool.
-primitive addMana(
-  amount: Amount,
-  produced: ProducedMana,
-  riders: List(ManaRider) = []): Action = AddMana
+# "add <produced>": put the produced mana into the actor's mana pool [CR#106.4]. Its amount is
+# part of the produced mana (`counted`).
+# TODO(spelling): Print each rider as its own sentence after the clause.
+primitive addMana(produced: ProducedMana, riders: List(ManaRider) = []): Action = AddMana {
+  spelling = "add <produced>"
+}

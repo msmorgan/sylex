@@ -1,0 +1,10 @@
+# "<amount> <produced>", as "six {R}", "X {G}" and "two mana of any one color": the produced mana,
+# amount times. An `or` inside it is chosen once for each ("{B} or {G} for each permanent
+# destroyed this way" chooses a color per mana); an `or` of counts is chosen once ("X {G} or X
+# {W}"). A written sequence is `symbols`, never a count: "{R}{R}{R}" and "three {R}" are two terms.
+# TODO(spelling): A `forEach` amount's per of one prints nothing before mana symbols, and its "for
+# each <p>" follows the mana ("{G} for each creature you control"); an amount that is neither a
+# number nor a letter prints "an amount of <produced> equal to <amount>".
+primitive counted(amount: Amount, produced: ProducedMana): ProducedMana = Counted {
+  spelling = "<amount> <produced>"
+}

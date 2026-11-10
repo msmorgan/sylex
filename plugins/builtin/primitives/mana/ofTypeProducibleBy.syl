@@ -1,4 +1,0 @@
-# "one mana of any type <subject> could produce"
-primitive ofTypeProducibleBy(subject: NounPhrase): ProducedMana = CouldProduce {
-  spelling = "one mana of any type <subject> could produce"
-}

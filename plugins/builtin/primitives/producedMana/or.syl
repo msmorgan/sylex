@@ -1,0 +1,4 @@
+# "<a>, <b>, or <c>": one of the alternatives, as "{U}{U}, {U}{R}, or {R}{R}". Inside `counted`
+# it is chosen once for each counted mana.
+# TODO(spelling): Format and coordinate the alternatives list entries.
+primitive or(alternatives: List(ProducedMana)): ProducedMana = Or

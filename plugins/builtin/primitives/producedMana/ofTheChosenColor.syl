@@ -1,0 +1,4 @@
+# "mana of the chosen color"
+primitive ofTheChosenColor: ProducedMana = OfChosenColor {
+  spelling = "mana of the chosen color"
+}

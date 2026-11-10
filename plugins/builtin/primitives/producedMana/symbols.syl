@@ -1,0 +1,6 @@
+# "{U}{U}": mana written as a sequence of mana symbols, each one mana of the type it shows
+# [CR#107.4a,107.4c], and wrapped even when the sequence is one symbol. A symbol that shows no
+# one mana of a type [CR#106.1b] is refused when the term is lowered.
+primitive symbols(symbols: List(ManaSymbol)): ProducedMana = Symbols {
+  spelling = "<symbols>"
+}

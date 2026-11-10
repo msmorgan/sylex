@@ -1,0 +1,4 @@
+# "mana of any type <subject> produced"
+primitive ofTypeProducedBy(subject: NounPhrase): ProducedMana = ProducedByEvent {
+  spelling = "mana of any type <subject> produced"
+}

@@ -1,4 +1,5 @@
-# "mana of any color", "any one color", "any combination of colors"
+# "mana of any color", "mana of any one color": with a count, the freedom says whether every
+# counted mana takes the one color chosen.
 # TODO(spelling): The freedom selects one shared color or a combination of colors, changing the
 # phrase.
 primitive ofAnyColor(freedom: ColorFreedom): ProducedMana = AnyColor
