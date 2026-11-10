@@ -5,7 +5,7 @@ ability ascend {
   lexical = {lemma = "ascend"},
   spelling = "ascend",
   body = [
-    byCardClass(
+    ifPermanentType(
       static(
         whileHolds(
           and([

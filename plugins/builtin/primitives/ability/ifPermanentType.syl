@@ -1,0 +1,6 @@
+# `onPermanent` on a permanent and `onInstantOrSorcery` on an instant or sorcery spell: a keyword
+# the rules word differently for each [CR#702.131a,702.131b], [CR#702.55a], [CR#702.174b]. It is
+# defined for those two cases the rules name.
+primitive ifPermanentType(
+  onPermanent: Ability,
+  onInstantOrSorcery: Ability): Ability = IfPermanentType

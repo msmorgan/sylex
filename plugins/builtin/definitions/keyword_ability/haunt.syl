@@ -5,7 +5,7 @@ ability haunt {
   lexical = {lemma = "haunt", verbs = [{lemma = "haunt", frames = [Monotransitive]}]},
   spelling = "haunt",
   body = [
-    byCardClass(
+    ifPermanentType(
       when(
         does(actor(thisPermanent), die),
         sequentially([exile(it), relate(it, haunting, target(isCreature))])),

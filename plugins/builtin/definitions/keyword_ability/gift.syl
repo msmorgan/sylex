@@ -8,7 +8,7 @@ ability gift(promise: Action) {
   # action clause is not gift wording.
   body = [
     static(addedCost(perform(choose(anOpponent)), true)),
-    byCardClass(
+    ifPermanentType(
       when(
         does(actor(thisPermanent), enter),
         instruct(the(isChosenPlayer), $promise),

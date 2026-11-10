@@ -29,8 +29,9 @@ Written against the start of step 6 (`syl-single-face-card-call`).
   `ifPermanentType(onPermanent, onInstantOrSorcery)`: one Ability when the object is a permanent,
   one when it is an instant or sorcery spell, as the CR words each keyword
   [CR#702.131a,702.131b], [CR#702.55a], [CR#702.174b]. It is defined for those two cases only.
-- `plugins/builtin/templates/predicate/isPermanentType.syl` reads the field instead of listing the
-  six types by hand, if today's `.syl` vocabulary can express it.
+- `plugins/builtin/templates/predicate/isPermanentType.syl` keeps its hand-written list of the
+  six types: no primitive reads a card type's `permanentType` field, so a predicate over "has a
+  type whose `permanentType` is true" is not expressible.
 
 ## Done when
 
