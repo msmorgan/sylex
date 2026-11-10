@@ -20,6 +20,8 @@ Written against the start of step 6 (`syl-single-face-card-call`).
 - Every parameter of a Template or a Definition, at any sort, is a binding: its argument is read
   once, at the parameter's first use in read order, and each later use in the body re-mentions
   that read, never reading the argument again. Templates and Definitions bind parameters alike.
+  Copying the argument to each use is not the rule, because a parameter used twice would then be
+  two reads in the tree.
 - A Template has no Reference Scope and no Deed, so its body's references reach the call site's
   referents; that is what sets it apart from a Definition. A Reference Scope on Templates would
   hide the call site from the pronoun Templates' anaphors and from the `when`/`whenever`/`at`
