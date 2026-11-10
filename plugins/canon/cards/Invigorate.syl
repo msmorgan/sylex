@@ -4,7 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       static(
-        onlyWhile(
-          ratherThanPay(this, payingInstead(perform(instruct(anOpponent, gainLife(3))))),
-          exists(and([isLand, hasSubtype(forest), youControl])))),
+        ifSo(
+          exists(and([isLand, hasSubtype(forest), youControl])),
+          ratherThanPay(this, payingInstead(perform(instruct(anOpponent, gainLife(3))))))),
       spell(get(target(isCreature), up(4), up(4), untilEndOfTurn))]})

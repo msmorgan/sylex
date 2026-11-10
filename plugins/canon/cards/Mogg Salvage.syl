@@ -4,9 +4,9 @@ card singleFaced({
     types = [instant],
     text = [
       static(
-        onlyWhile(
-          can(actor(you), cast(thisSpell, altCost = withoutPaying)),
+        ifSo(
           and([
               exists(and([isLand, hasSubtype(island), anOpponentControls])),
-              exists(and([isLand, hasSubtype(mountain), youControl]))]))),
+              exists(and([isLand, hasSubtype(mountain), youControl]))]),
+          can(actor(you), cast(thisSpell, altCost = withoutPaying)))),
       spell(destroy(target(isArtifact)))]})

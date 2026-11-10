@@ -13,9 +13,9 @@ ability emerge(cost: Cost) {
           thisSpell,
           altCost = payingInstead(compound([$cost, perform(sacrifice(a(isCreature)))]))))),
     static(
-      onlyWhile(
+      ifSo(
+        keywordCostPaid(emerge, thisSpell),
         costShift(
           thisSpell,
-          less(statOf(stat(manaValue), the(and([was(sacrifice(which)), isCreature]))))),
-        keywordCostPaid(emerge, thisSpell)))]
+          less(statOf(stat(manaValue), the(and([was(sacrifice(which)), isCreature])))))))]
 }

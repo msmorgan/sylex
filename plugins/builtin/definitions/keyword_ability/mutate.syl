@@ -11,11 +11,11 @@ ability mutate(cost: Cost) {
   body = [
     static(altCost(payingInstead($cost), this)),
     static(
-      onlyWhile(
+      ifSo(
+        choiceWasTaken(byKeyword(mutate), thisSpell),
         addsTarget(
           thisSpell,
-          and([isCreature, not(hasSubtype(human)), ownedBy(ownerOf(thisSpell))])),
-        choiceWasTaken(byKeyword(mutate), thisSpell))),
+          and([isCreature, not(hasSubtype(human)), ownedBy(ownerOf(thisSpell))])))),
     static(
       replace(
         would(actor(thisSpell), enter),

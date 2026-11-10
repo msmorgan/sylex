@@ -6,5 +6,5 @@ ability cleave(cost: Cost) {
   spelling = "cleave <cost>",
   body = [
     static(can(actor(you), cast(thisSpell, altCost = payingInstead($cost)))),
-    static(onlyWhile(textChange(thisSpell, removeBracketed), keywordCostPaid(cleave, thisSpell)))]
+    static(ifSo(keywordCostPaid(cleave, thisSpell), textChange(thisSpell, removeBracketed)))]
 }

@@ -4,7 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       static(
-        onlyWhile(
-          altCost(payingInstead(mana([pip(blue)])), this),
-          did(actor(you), attack, within(soFarThisTurn)))),
+        ifSo(
+          did(actor(you), attack, within(soFarThisTurn)),
+          altCost(payingInstead(mana([pip(blue)])), this))),
       spell(counter(target(isSpell)))]})
