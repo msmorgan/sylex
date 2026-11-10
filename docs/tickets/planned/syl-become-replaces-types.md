@@ -39,6 +39,9 @@ Written against the spine (`cleanup-step6-spine`). `syl-spelling-optional-segmen
 - Every caller is checked against its Oracle text and calls the form it prints; the landing lists
   each caller with its printed wording.
 - No Template whose name says "become" keeps the old types unless its name says so.
+- *Gift of Tusks* ("Until end of turn, target creature loses all abilities and becomes a green
+  Elephant with base power and toughness 3/3.") is written in `plugins/canon/` with plain
+  `become`, the replacing form's first caller.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass;
   `cargo xtask cite check --list-noncompliant` is empty and `cargo xtask cite check` reports

@@ -1,5 +1,5 @@
 ---
-needs: [syl-single-face-card-call]
+needs: [syl-single-face-card-call, syl-card-type-permanent-type]
 ---
 
 # Supertypes as declarations that carry their rules
@@ -16,6 +16,9 @@ casting restriction on legendary instants and sorceries [CR#205.4e], and the wor
 The supertypes are basic, legendary, ongoing, snow and world [CR#205.4a]. Ongoing's only rule concerns
 scheme cards [CR#205.4h] and no Vintage-legal card has it, so it is out of scope; the other four
 each appear on Vintage-legal cards.
+
+This ticket lands after `syl-card-type-permanent-type`: both edit the kinds table in
+`crates/xtask/src/dsl_check/schema.rs`, and the new `supertype` kind sits beside `card_type`.
 
 ## Design
 

@@ -1,5 +1,5 @@
 ---
-needs: [syl-ability-words-once, syl-add-mana-symbols, syl-alternative-costs-one-model, syl-at-turn-point, syl-bodiless-keywords, syl-card-type-permanent-type, syl-cleave-bracketed-text, syl-condition-first-static, syl-implicit-coercions, syl-local-binding, syl-lookback-point-from-trigger, syl-opaque-templates, syl-subtype-card-types, syl-supertype-declarations, syl-token-definitions]
+needs: [syl-ability-words-once, syl-add-mana-symbols, syl-alternative-costs-one-model, syl-at-turn-point, syl-bodiless-keywords, syl-cleave-bracketed-text, syl-condition-first-static, syl-implicit-coercions, syl-local-binding, syl-lookback-point-from-trigger, syl-opaque-templates, syl-subtype-card-types, syl-supertype-declarations, syl-token-definitions]
 ---
 
 # Step 6 spine: the core constructs
