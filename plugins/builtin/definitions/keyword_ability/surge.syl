@@ -5,7 +5,7 @@ ability surge(cost: Cost) {
   spelling = "surge <cost>",
   body = [
     static(
-      onlyWhile(
+      onlyIfSo(
         altCost(payingInstead($cost), this),
         did(actor(or([you, a(isTeammate)])), cast(a(anotherSpell)), within(soFarThisTurn))))]
 }

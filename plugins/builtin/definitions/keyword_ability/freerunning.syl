@@ -7,7 +7,7 @@ ability freerunning(cost: Cost) {
   spelling = "freerunning <cost>",
   body = [
     static(
-      onlyWhile(
+      onlyIfSo(
         altCost(payingInstead($cost), this),
         did(
           actor(

@@ -5,7 +5,8 @@ ability livingMetal {
   spelling = "living metal",
   body = [
     static(
-      onlyWhile(
-        characteristicChange(thisPermanent, [typeLine(adds, {types = [artifact, creature]})]),
-        duringPart(turn, you)))]
+      partScope(
+        turn,
+        you,
+        characteristicChange(thisPermanent, [typeLine(adds, {types = [artifact, creature]})])))]
 }

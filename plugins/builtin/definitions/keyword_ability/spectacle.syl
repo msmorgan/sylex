@@ -5,7 +5,7 @@ ability spectacle(cost: Cost) {
   spelling = "spectacle <cost>",
   body = [
     static(
-      onlyWhile(
+      onlyIfSo(
         altCost(payingInstead($cost), this),
         did(actor(anOpponent), loseLife(anyAmount), within(soFarThisTurn))))]
 }
