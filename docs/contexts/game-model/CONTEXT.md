@@ -177,8 +177,8 @@ An act a Player may do instead of paying one mana of a cost, as convoke and delv
 ([CR#702.51a,702.66a]).
 
 **Conferral**:
-A rule, Card Type, Subtype or Counter supplying an Ability or rules property to what has it, as
-a basic land type confers its mana ability ([CR#305.6]).
+A rule, Card Type, Subtype, Counter or Designation supplying an Ability or rules property to what
+has it, as a basic land type confers its mana ability ([CR#305.6]).
 
 **Combatant**:
 A Permanent the creature-like combat rules apply to, whether or not it may attack or block now
