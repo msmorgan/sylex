@@ -48,12 +48,35 @@ The mechanism already admits them:
   word (`hasType`'s and `hasSupertype`'s spelling is the argument's). Printed order of the
   conjuncts is `syl-list-element-printed-order`'s.
 
+A type word in a description is not the type test alone. A description with a card type or
+subtype that refers to no zone and has none of the words "card", "spell" or "source" means a
+permanent of that type on the battlefield [CR#109.2]; "card" with a zone, "spell" and "source"
+give it other domains [CR#109.2a,109.2b,109.2c]. "Target creature" is a creature permanent, and
+"a creature card in your graveyard" is not one. The coercion's body, `hasType(creature)`, is the
+type test alone, but so is `isCreature`'s today, and nothing in a term supplies the battlefield:
+
+- Every determiner Template (`target`, `a`, `each`, `bare`, `allOf`, `the`, `counted`, `countOf`,
+  `exists`) is `described(<det>, $p)` with nothing added.
+- The corpus writes the domain only where the text prints it. Of the 1,070 type-predicate sites
+  under `plugins/` (the nine `isX`, `hasType`, `hasSubtype`, `hasSupertype`), 41 carry
+  `isPermanent`, `in(battlefield)` or `tokenOnTheBattlefield`, each where the text or the rule
+  prints "permanent" or "on the battlefield" (the legend and world rules, storied, populate,
+  bargain, forage, *Skred*'s "snow permanents", *Topple*'s "creatures on the battlefield"). 37
+  carry `isCard` or `cardIn`, 61 `isSpell`, 28 a zone without "card", 6 `isToken` alone, and
+  897 no domain word at all (190 under `target`, 172 `allOf`, 158 `a`, 80 `enchant`).
+- `semantics.md` §2.4 reads [CR#109.2]'s carrier words for anaphors and lets a present-tense
+  guard over a description with no zone or "card" read the permanent, and core keeps
+  `Class(Permanent)` apart from the type atom (`crates/core/src/filter.rs`). No ADR says which
+  stage turns "target creature" into a description of battlefield objects.
+
+That gap predates these coercions, which change no expanded tree and inherit it unchanged.
+
 ## Design
 
 - Three coercions under `plugins/builtin/coercions/`: `CardType` to `Predicate` through `hasType`,
   `Subtype` to `Predicate` through `hasSubtype`, `Supertype` to `Predicate` through
   `hasSupertype`. `Supertype` has no coercion into `NounWord`, since a supertype is no head noun;
-  that reason does not apply at `Predicate`, where a filter has no head noun and a supertype is a
+  that reason does not apply at `Predicate`, where a filter marks no head noun and a supertype is a
   conjunct like a card type (*Arcum's Weathervane*'s "nonsnow basic land" is
   `and([land, basic, not(snow)])`).
 - The nine single-type `isX` Templates are deleted and every call site respelled bare, so the
@@ -69,6 +92,49 @@ The mechanism already admits them:
 
 ## Open questions
 
+- **Where the [CR#109.2] permanent reading lives.** The rule is a property of a whole description,
+  keyed to which words it includes, not to a word's position: it holds for a subtype as for a
+  card type, and a zone or "card", "spell" or "source" anywhere in the description cancels it.
+  "Creature token" is a permanent, though "token" heads it, and "creature card" is not one.
+  - (a) The body stays `hasType(x)`, and the default is applied to a description: a description
+    of an object whose conjuncts, after expansion, include a type or subtype test and none of
+    `isCard`, `cardIn`, `isSpell`, `isSource` or `in(<zone>)` describes battlefield objects. It
+    applies where an object description is formed (`described`, and positions such as
+    `addsTarget` that take a description directly), not to a complement (`is(it, creature)` tests
+    an object already found). Expansion first lets a Definition's own words count: affinity's
+    "you control" [CR#702.41a], splice's "spell" [CR#702.47a], and craft's "permanents you
+    control and/or cards in your graveyard" [CR#702.167a]. No site is respelled, the round trip
+    is unchanged, and no card's term changes meaning. `and([creature, isCard])` stays coherent,
+    and `non(creature)` in *Dovin's Veto*'s "noncreature spell" stays a type test. The default
+    is right only where printed "card" and "spell" are written. `syl-card-head-noun-sweep`
+    restores most of the dropped ones. *Collected Company*, *Commune with the Gods* and
+    *Tezzeret's Gatebreaker* (`fromAmong`) and *Skill Borrower* and *Conspicuous Snoop* (`is`)
+    also drop a printed "card" and are not on its list.
+  - (b) The body is `and([hasType(x), isPermanent])`. That is wrong wherever the type word
+    modifies another carrier word. *Animate Dead*'s `and([creature, isCard, in(graveyard)])`
+    describes nothing, and so do the other 36 card sites, 61 spell sites and 28 zone sites.
+    `non(creature)` admits every spell. `or([artifact, creature, enchantment])` in *Custodi
+    Squire*'s "artifact, creature, or enchantment card" admits no card. The modifier use needs
+    another spelling, and since `(name, sort)` is unique, it goes back to `hasType(creature)` at
+    the 126 card, spell and zone sites and at the negated sites outside a "permanent" phrase
+    (*Meddling Mage*'s "nonland card name"). The word "creature" then has two terms, picked by a distinction the CR does
+    not draw.
+  - (c) Two words, one for a head noun and one for a modifier. A word can't be declared twice at
+    `Predicate`, so this means giving each description a head `NounWord` (which already has
+    `card`, `spell`, `permanent`, `token`, `source`, `type`, `subtype` and `ofType`) beside a
+    modifier `Predicate`. Every determiner Template and all 1,070 sites change, and the head
+    still doesn't decide the domain ("creature token"). In a flat `and([…])`, printed order
+    (`syl-list-element-printed-order`) puts the head last among the conjuncts printed before
+    it. Which conjuncts those are comes from each one's Construction, so a checker could
+    recover the head, but [CR#109.2] doesn't need it.
+  - (d) No better placement was found. A word-level body cannot see the description's other
+    words, and the rule depends on them.
+
+  Recommendation: (a). The discourse reading records each description's domain from its
+  conjuncts under [CR#109.2,109.2a,109.2b,109.2c] (§2.4 already needs a referent's zone for
+  carrier words), lowering emits `Class(Permanent)`, and `semantics.md` says so. The coercions
+  don't wait on that work, since they change no expanded tree. Under (b) or (c) this ticket
+  would be redesigned.
 - **A double refusal.** A word declared at both `CardType` and `Subtype` now collides in
   Reaches(`NounWord`) and Reaches(`Predicate`), and `ambiguities` runs per target, so it is
   refused twice, once per target, at the same declaration. Recommendation: keep both, since each
@@ -101,7 +167,8 @@ The mechanism already admits them:
 
 ## Pointers
 
-- `docs/decisions/syl.md` §2 and §3
+- `docs/decisions/syl.md` §2 and §3; `docs/decisions/semantics.md` §2.4
+- `syl-card-head-noun-sweep`
 - `crates/xtask/src/dsl_check.rs` (`value_at`, `coerce`, `parameter`),
   `crates/xtask/src/dsl_check/coercion.rs` (`coercions`, `read`, `ambiguities`)
 - `plugins/builtin/coercions/`, `plugins/builtin/primitives/predicate/{hasType,hasSubtype,hasSupertype}.syl`,
