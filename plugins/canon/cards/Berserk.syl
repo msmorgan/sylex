@@ -13,7 +13,7 @@ card singleFaced({
                 letterDefinition(x, powerOf(it))],
               untilEndOfTurn),
             atNext(
-              endStep,
+              beginningOfNext(endStep),
               doOnlyIf(
                 destroy(that(creature)),
                 did(actor(that(creature)), attack, within(soFarThisTurn))))]),

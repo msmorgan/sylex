@@ -16,7 +16,7 @@ ability rebound {
           instead(
             sequentially([
                 exile(thisSpell),
-                delay(
+                atNext(
                   beginningOf(upkeep, you, nextTime),
                   may(cast(this, payment = withoutPaying)))])))))]
 }

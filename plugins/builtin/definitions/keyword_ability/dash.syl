@@ -8,7 +8,9 @@ ability dash(cost: Cost) {
     static(altCost(this, $cost)),
     static(
       resolutionDelayedTrigger(
-        doIf(keywordCostPaid(dash, thisSpell), atNext(endStep, returnToHand(becomes(thisSpell)))))),
+        doIf(
+          keywordCostPaid(dash, thisSpell),
+          atNext(beginningOfNext(endStep), returnToHand(becomes(thisSpell)))))),
     static(
       conditionFirstWhile(
         keywordCostPaid(dash, thisPermanent),

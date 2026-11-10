@@ -1,0 +1,5 @@
+# "the beginning of the next <part>": a delayed trigger's moment.
+template beginningOfNext(part: TurnPart): TurnPoint {
+  spelling = "the beginning of the next <part>",
+  body = beginningOf($part, none, nextTime)
+}

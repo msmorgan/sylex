@@ -1,0 +1,7 @@
+# The beginning of the specified part of the named turn: a Turn Point, where abilities that
+# trigger "at the beginning of" that part trigger [CR#603.2b].
+# [CR#603.2b]
+primitive beginningOf(
+  part: TurnPart,
+  whose: Option(NounPhrase),
+  which: TurnRef): TurnPoint = BeginningOf

@@ -9,4 +9,4 @@ card singleFaced({
         perform(payLife(lit(1))),
         sequentially([
             exileFaceDown(topSlice(lit(1))),
-            delay(beginningOf(endStep, you, nextTime(you)), putInto(that(card), hand))]))]})
+            atNext(beginningOf(endStep, you, nextTime(you)), putInto(that(card), hand))]))]})

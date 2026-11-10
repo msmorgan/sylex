@@ -3,4 +3,4 @@ card singleFaced({
     cost = [pip(red), pip(red)],
     types = [instant],
     text = [
-      spell(sequentially([extraTurn(lit(1)), delay(beginningOfThatTurns(endStep), loseGame)]))]})
+      spell(sequentially([extraTurn(lit(1)), atNext(beginningOfThatTurns(endStep), loseGame)]))]})

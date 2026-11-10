@@ -1,5 +1,7 @@
 # "last turn"
 template lastTurn: Duration {
   spelling = "last turn",
-  body = durationBetween(beginningOf(turn, none, previous(none)), endOf(turn, none, previous(none)))
+  body = durationBetween(
+    reached(beginningOf(turn, none, previous(none))),
+    endOf(turn, none, previous(none)))
 }

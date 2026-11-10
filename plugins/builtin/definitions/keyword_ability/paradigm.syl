@@ -15,7 +15,7 @@ ability paradigm {
             resolve(a(and([isSpell, isOther, youControl, shares(cardName, share, thisSpell)]))),
             within(thisGame))),
         delayWithin(
-          beginningOfYour(firstMain),
+          reached(beginningOfYour(firstMain)),
           restOfGame,
           sequentially([
               copy(inZone(exile), this, lit(1), []),

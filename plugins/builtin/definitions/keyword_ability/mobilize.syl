@@ -9,5 +9,5 @@ ability mobilize(amount: Amount) {
       does(actor(thisCreature), attack),
       sequentially([
           createTappedAttacking($amount, creatureToken(1, 1, [red], [warrior])),
-          atNext(endStep, sacrifice(thoseTokens))]))]
+          atNext(beginningOfNext(endStep), sacrifice(thoseTokens))]))]
 }

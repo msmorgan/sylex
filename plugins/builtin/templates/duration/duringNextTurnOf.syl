@@ -3,5 +3,7 @@
 # [CR#115.1,608.2c]
 template duringNextTurnOf(player: NounPhrase): Duration {
   spelling = "during <player>'s next turn",
-  body = durationBetween(beginningOf(turn, $player, nextTime), endOf(turn, $player, nextTime))
+  body = durationBetween(
+    reached(beginningOf(turn, $player, nextTime)),
+    endOf(turn, $player, nextTime))
 }

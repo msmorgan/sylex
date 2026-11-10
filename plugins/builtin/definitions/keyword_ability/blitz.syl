@@ -11,7 +11,9 @@ ability blitz(cost: Cost) {
     static(altCost(this, $cost)),
     static(
       resolutionDelayedTrigger(
-        doIf(keywordCostPaid(blitz, thisSpell), atNext(endStep, sacrifice(becomes(thisSpell)))))),
+        doIf(
+          keywordCostPaid(blitz, thisSpell),
+          atNext(beginningOfNext(endStep), sacrifice(becomes(thisSpell)))))),
     static(
       conditionFirstWhile(
         keywordCostPaid(blitz, thisPermanent),

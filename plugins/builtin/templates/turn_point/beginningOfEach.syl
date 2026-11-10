@@ -1,0 +1,5 @@
+# "the beginning of each <part>"
+template beginningOfEach(part: TurnPart): TurnPoint {
+  spelling = "the beginning of each <part>",
+  body = beginningOf($part, none, eachTime)
+}

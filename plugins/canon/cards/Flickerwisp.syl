@@ -9,6 +9,8 @@ card singleFaced({
         does(actor(thisCreature), enter),
         sequentially([
             exile(target(and([isPermanent, isOther]))),
-            atNext(endStep, returnToBattlefield(that(card), [under(ownerOf(it))]))]))],
+            atNext(
+              beginningOfNext(endStep),
+              returnToBattlefield(that(card), [under(ownerOf(it))]))]))],
     power = lit(3),
     toughness = lit(1)})

@@ -1,0 +1,6 @@
+# "the beginning of your <part>", each time it comes
+# TODO(spelling): Combat prints "the beginning of combat on your turn".
+template beginningOfYour(part: TurnPart): TurnPoint {
+  spelling = "the beginning of your <part>",
+  body = beginningOf($part, you, eachTime)
+}

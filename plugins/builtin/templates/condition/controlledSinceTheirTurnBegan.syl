@@ -5,5 +5,5 @@ template controlledSinceTheirTurnBegan(subject: NounPhrase): Condition {
   spelling = "<subject> has been under its controller's control continuously since their most recent turn began",
   body = heldSince(
     is($subject, controlledBy(controllerOf(it))),
-    beginningOf(turn, none, mostRecent(they)))
+    reached(beginningOf(turn, none, mostRecent(they))))
 }

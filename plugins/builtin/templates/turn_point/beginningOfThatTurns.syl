@@ -1,0 +1,5 @@
+# "the beginning of that turn's <part>"
+template beginningOfThatTurns(part: TurnPart): TurnPoint {
+  spelling = "the beginning of that turn's <part>",
+  body = beginningOf($part, none, thatTime)
+}

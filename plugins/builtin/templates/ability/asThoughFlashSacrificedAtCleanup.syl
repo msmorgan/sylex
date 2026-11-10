@@ -15,5 +15,5 @@ template asThoughFlashSacrificedAtCleanup: Ability {
       asThough = asThoughHadFlash(it),
       rider = doIf(
         did(actor(you), cast(it), within(thisGame, not(asSorcery))),
-        atNext(cleanup, instruct(controllerOf(becomes(it)), sacrifice(it))))))
+        atNext(beginningOfNext(cleanup), instruct(controllerOf(becomes(it)), sacrifice(it))))))
 }

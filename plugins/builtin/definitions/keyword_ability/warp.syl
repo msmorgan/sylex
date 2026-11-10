@@ -20,7 +20,7 @@ ability warp(cost: Cost) {
         doIf(
           keywordCostPaid(warp, thisSpell),
           atNext(
-            endStep,
+            beginningOfNext(endStep),
             sequentially([
                 exile(becomes(thisSpell)),
                 establishThroughout(

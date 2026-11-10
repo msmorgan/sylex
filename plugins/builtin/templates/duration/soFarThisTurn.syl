@@ -1,5 +1,5 @@
 # "this turn", as a lookback reads it: from the turn's beginning to now.
 template soFarThisTurn: Duration {
   spelling = "this turn",
-  body = durationBetween(beginningOf(turn, none, current), now)
+  body = durationBetween(reached(beginningOf(turn, none, current)), now)
 }

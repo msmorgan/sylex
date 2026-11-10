@@ -9,6 +9,6 @@ card singleFaced({
       spell(
         sequentially([
             counter(target(isSpell)),
-            delay(
+            atNext(
               beginningOf(mainPhase, you, nextTime(you)),
               addMana(statOf(stat(manaValue), that(spell)), manaOf([[colorless]])))]))]})

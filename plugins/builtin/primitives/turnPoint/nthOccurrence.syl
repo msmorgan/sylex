@@ -1,0 +1,8 @@
+# The specified occurrence of a Turn Point within an optional period ("enchanted player's first
+# upkeep each turn", Paradox Haze).
+# TODO(spelling): The ordinal stands before the part and the period after it ("the beginning of
+# enchanted player's first upkeep each turn").
+primitive nthOccurrence(
+  ordinal: Ordinal,
+  point: TurnPoint,
+  per: Option(Period) = none): TurnPoint = NthOccurrence

@@ -7,4 +7,4 @@ card singleFaced({
         sequentially([
             establish(abilityGrant(allOf(and([isCreature, youControl])), indestructible)),
             extraTurn(lit(1)),
-            delay(beginningOfThatTurns(endStep), loseGame)]))]})
+            atNext(beginningOfThatTurns(endStep), loseGame)]))]})

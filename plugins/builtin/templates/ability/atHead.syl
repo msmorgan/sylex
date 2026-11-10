@@ -1,0 +1,6 @@
+# An "at <point>" trigger header: `at`'s own, or one joined onto a trigger ("When Minsc & Boo
+# enters and at the beginning of your upkeep").
+template atHead(point: TurnPoint): TriggerHeader {
+  spelling = "at <point>",
+  body = {event = reached($point), while = none, timing = none}
+}

@@ -9,4 +9,4 @@ card singleFaced({
             search(yourLibrary, a(and([isLand, hasSupertype(basic)]))),
             putOntoBattlefieldTapped(that(card)),
             shuffle,
-            atNext(cleanup, returnToHand(thisLand))]))]})
+            atNext(beginningOfNext(cleanup), returnToHand(thisLand))]))]})

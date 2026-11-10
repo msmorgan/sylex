@@ -8,7 +8,7 @@ ability epic {
     spell(establishThroughout(cant(actor(you), cast(any)), restOfGame)),
     spell(
       delayWithin(
-        beginningOfYour(upkeep),
+        reached(beginningOfYour(upkeep)),
         restOfGame,
         sequentially([
             copy(
