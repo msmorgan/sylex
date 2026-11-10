@@ -11,7 +11,9 @@ with: `faceDown(spec, cost)` (morph, megamorph, disguise), `prototyped` [CR#718.
 `fused` [CR#702.102a], `transformedPaying(cost)` and its Template `convertedPaying` (disturb,
 more than meets the eye) [CR#712.8c]. Two of them also carry the alternative cost they are paid
 with, which `cast`'s `altCost` slot holds for every other cast, so a cast characteristic and an
-alternative cost are written two ways. Other cast characteristics stand elsewhere or nowhere:
+alternative cost are written two ways. A term can write `payment = faceDown(spec, cost)` together
+with `altCost = …`, two alternative costs on one spell, which [CR#118.9a] forbids; no term in
+`plugins/` does so today. Other cast characteristics stand elsewhere or nowhere:
 a Siege's "cast it transformed" is `resulting = isTransformed`, and casting a bestow card bestowed,
 which makes it an Aura spell with enchant creature [CR#702.103b], has no word.
 

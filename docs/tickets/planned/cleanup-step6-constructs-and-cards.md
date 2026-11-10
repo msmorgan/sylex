@@ -1,5 +1,5 @@
 ---
-needs: [syl-active-player-noun-phrase, syl-already-attached, syl-balance-family, syl-card-comment-modeling-choices, syl-card-head-noun-sweep, syl-cast-form-sort, syl-cast-permission-spell-anaphor, syl-cleave-bracketed-text, syl-colored-mana-spent-count, syl-cross-ability-self-replacement, syl-engineered-explosives-sunburst, syl-ice-cauldron-noted-mana, syl-later-ability-acts-before-earlier, syl-life-totals-exchange-operand, syl-lose-control-event, syl-mode-frame-cataphora, syl-replacement-except-nth-event, syl-round-each-time, syl-turn-face-up-spend-cost, syl-unwritable-card-shapes]
+needs: [syl-active-player-noun-phrase, syl-already-attached, syl-balance-family, syl-card-comment-modeling-choices, syl-card-head-noun-sweep, syl-cast-form-sort, syl-cast-permission-spell-anaphor, syl-cleave-bracketed-text, syl-colored-mana-spent-count, syl-cross-ability-self-replacement, syl-cycling-cost-substitute, syl-engineered-explosives-sunburst, syl-ice-cauldron-noted-mana, syl-later-ability-acts-before-earlier, syl-life-totals-exchange-operand, syl-lose-control-event, syl-mode-frame-cataphora, syl-replacement-except-nth-event, syl-round-each-time, syl-turn-face-up-spend-cost, syl-unwritable-card-shapes]
 ---
 
 # Step 6 middle: constructs and cards
