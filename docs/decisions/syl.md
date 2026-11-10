@@ -171,3 +171,7 @@ them, with no per-declaration exception: where the printed order differs ("When 
 resolution sees what the text says first as first, spelling renders a declaration in its parameter
 order, and a reference oracle keyed to printed text lines up with the term only if the two orders
 agree.
+
+The elements of a list are read in printed order too: a conjunction's conjuncts and a sequence's
+steps stand in the order the text prints them, so "basic land" is
+`and([hasSupertype(basic), isLand])`.
