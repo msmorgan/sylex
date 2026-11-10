@@ -17,9 +17,16 @@ would be written as and adds no meaning.
 
 **Definition**:
 A named expansion for vocabulary the rules define: a keyword action or ability
-([CR#701.1,702.1]), a Counter, a Designation. It carries its own Reference Scope; a keyword
-action's Definition also carries a Deed, as does a keyword ability's where text can ask who did
-it (crewing, [CR#702.122b]). A Counter's or Designation's carries none.
+([CR#701.1,702.1]), a Counter, a Designation, a Defined Token. It carries its own Reference
+Scope; a keyword action's Definition also carries a Deed, as does a keyword ability's where text
+can ask who did it (crewing, [CR#702.122b]). A Counter's, Designation's or Defined Token's
+carries none. A Defined Token's takes no arguments, so its scope holds nothing of its caller's.
+
+**Defined Token**:
+A token whose characteristics the rules define in full: a predefined token ([CR#111.10]) or one
+a keyword action's rule defines, as empower Jace defines a Jace planeswalker token
+([CR#701.71a]). Its Definition is named by the key an effect writes to create it ("create a Clue
+token").
 
 **Primitive Keyword Ability**:
 A Keyword Ability the engine implements natively rather than as a Definition.

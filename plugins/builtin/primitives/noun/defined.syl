@@ -1,0 +1,3 @@
+# A token a Defined Token declaration describes, with the characteristics the rules define for it
+# [CR#111.10,701.71a].
+primitive defined(token: DefinedToken): TokenSpec = Defined

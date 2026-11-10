@@ -1,0 +1,4 @@
+# Has every subtype a Defined Token declares, so a rule written over "a <subtype> token" reads the
+# subtype from the token's declaration ("a Jace planeswalker token", [CR#701.71a]).
+# TODO(spelling): Print the token's declared subtypes, not the token's spelling.
+primitive hasSubtypesOf(token: DefinedToken): Predicate = HasSubtypesOf

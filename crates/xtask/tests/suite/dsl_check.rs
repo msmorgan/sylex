@@ -291,6 +291,58 @@ fn a_rules_row_writes_a_body_or_its_record_fields() {
 }
 
 #[test]
+fn a_token_declares_its_characteristics_and_any_back_face() {
+    let source = format!(
+        "{COLORS}\
+         template make(spec: TokenSpec): Nat {{ body = 0 }}\n\
+         primitive defined(token: DefinedToken): TokenSpec = Defined\n\
+         token single {{ body = {{ characteristics = {{ colors = [blue] }} }} }}\n\
+         token double {{ body = {{ characteristics = {{}}, back = {{ name = \"Back\" }} }} }}\n\
+         token wrong {{ body = {{ back = {{ colors = [white] }}, face = {{}} }} }}\n\
+         template a: Nat {{ body = make(defined(single)) }}\n\
+         template b: Nat {{ body = make(single) }}"
+    );
+    assert_eq!(
+        kinds(&source),
+        [
+            RefusalKind::UnknownField {
+                field: s("face"),
+                at: s("DefinedToken")
+            },
+            RefusalKind::MissingField {
+                field: s("characteristics"),
+                at: s("DefinedToken")
+            },
+            RefusalKind::UnknownWord {
+                word: s("single"),
+                sort: s("TokenSpec")
+            },
+        ]
+    );
+}
+
+#[test]
+fn a_defined_tokens_subtypes_are_read_by_a_predicate_over_the_token() {
+    assert_eq!(
+        kinds(
+            "primitive hasSubtypesOf(token: DefinedToken): Predicate = HasSubtypesOf\n\
+             primitive yes: Predicate = Yes\n\
+             token jaceToken { body = { characteristics = {} } }\n\
+             template a: Predicate { body = hasSubtypesOf(jaceToken) }\n\
+             template b: Predicate { body = hasSubtypesOf(yes) }\n\
+             primitive subtypeOf(token: DefinedToken): Subtype = SubtypeOf"
+        ),
+        [
+            RefusalKind::ReservedConstructor(s("Subtype.SubtypeOf")),
+            RefusalKind::UnknownWord {
+                word: s("yes"),
+                sort: s("DefinedToken")
+            },
+        ]
+    );
+}
+
+#[test]
 fn headers_are_checked_against_their_kind() {
     assert_eq!(
         kinds(

@@ -217,7 +217,7 @@ pub const KINDS: &[Kind] = &[
         ],
     ),
     catalog("relation", "RelationLabel", &[]),
-    rules_row("token", "PredefinedToken"),
+    rules_row("token", "DefinedToken"),
     rules_row("sba", "SbaRule"),
     rules_row("conferral", "ConferralRule"),
     Kind {
@@ -321,6 +321,13 @@ pub const RECORDS: &[RecordSort] = &[
         ],
     ),
     record(
+        "DefinedToken",
+        &[
+            ("characteristics", "Characteristics", false),
+            ("back", "Option(Characteristics)", true),
+        ],
+    ),
+    record(
         "DeonticMods",
         &[
             ("timing", "Option(Timing)", true),
@@ -388,13 +395,6 @@ pub const RECORDS: &[RecordSort] = &[
             ("cost", "Option(Cost)", true),
             ("weight", "Option(Nat)", true),
             ("action", "Action", false),
-        ],
-    ),
-    record(
-        "PredefinedToken",
-        &[
-            ("name", "String", false),
-            ("token", "CharacteristicBundle", false),
         ],
     ),
     record(

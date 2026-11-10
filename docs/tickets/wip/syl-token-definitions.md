@@ -21,12 +21,13 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
   `plugins/builtin/definitions/token/`. The declaration's name is the key an effect writes ("create
   a Clue token"), not its subtype: Role tokens are told apart by name, and a Walker is a Zombie
   [CR#111.10d].
-- `create` takes a token Definition where it now takes `written(clueToken)`; `investigate` and
+- `create` takes a token Definition, wrapped as `defined(clueToken)`, where it now takes
+  `written(clueToken)`; `investigate` and
   the canon cards that create Treasure (*Ragavan, Nimble
   Pilferer*, *Spell Swindle*, *Zidane, Tantalus Thief*) use it; `clueToken.syl`, `foodToken.syl`
   and `treasureToken.syl` are deleted.
-- A token Definition's declared characteristics, at least its subtype, can be named from `.syl`,
-  so a rule written over "a <subtype> token" can take the subtype from the Definition it creates
+- A Predicate over a token Definition, `hasSubtypesOf(token)`, tests for the subtypes it declares,
+  so a rule written over "a <subtype> token" takes the subtype from the Definition it creates
   (needed by `syl-empower-token-parameter`).
 - A token a keyword action's rule defines in full, as [CR#701.71a] defines the Jace planeswalker
   token, is a `token` Definition too, and the glossary names the term that covers both.
@@ -41,4 +42,4 @@ Removing core's `PredefinedToken`, once the engine's input comes from `.syl`.
 
 `plugins/builtin/templates/noun/{clueToken,foodToken,treasureToken}.syl`,
 `plugins/builtin/definitions/keyword_action/{investigate,empowerJace}.syl`, `crates/core/src/token.rs`,
-`crates/xtask/src/dsl.rs` (`kind_sort`).
+`crates/xtask/src/dsl_check/schema.rs` (the `token` kind).
