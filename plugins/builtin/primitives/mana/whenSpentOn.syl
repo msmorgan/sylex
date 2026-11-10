@@ -1,8 +1,5 @@
-# "When that mana is spent to cast <spell>, <says>"; "that spell <says>" (`mode`).
-# TODO(spelling): The mode and only flag choose cast, activation, or resolution wording and its
-# restriction.
-primitive whenSpentOn(
-  mode: SpentMode,
-  only: Bool,
-  spell: NounPhrase,
-  says: Action): ManaRider = OnSpent
+# "If that mana is spent to cast <spell>, <says>"; "that spell <says>" (`mode`): an additional
+# effect on the spell the mana is spent on [CR#106.6]. A restriction on what the mana can be spent
+# on is `spendOnly`.
+# TODO(spelling): The mode chooses cast, activation, or resolution wording.
+primitive whenSpentOn(mode: SpentMode, spell: NounPhrase, says: Action): ManaRider = OnSpent

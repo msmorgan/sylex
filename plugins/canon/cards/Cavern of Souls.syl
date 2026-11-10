@@ -9,9 +9,6 @@ card singleFaced({
         addMana(
           lit(1),
           ofAnyColor(sameColor),
-          [
-            whenSpentOn(
-              affectsIt,
-              true,
-              a(and([isCreature, isSpell, ofChosen(subtype(creature))])),
-              establish(cant(any, counter(that(spell)))))]))]})
+          spendOnlyToCastAnd(
+            and([isCreature, isSpell, ofChosen(subtype(creature))]),
+            establish(cant(any, counter(that(spell)))))))]})

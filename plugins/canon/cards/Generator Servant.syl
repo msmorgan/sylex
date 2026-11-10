@@ -12,7 +12,6 @@ card singleFaced({
           [
             whenSpentOn(
               affectsIt,
-              false,
               a(and([isCreature, isSpell])),
               gainHaste(becomes(that(spell)), untilEndOfTurn))]))],
     power = lit(2),

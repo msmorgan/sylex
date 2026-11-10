@@ -1,0 +1,7 @@
+# "Spend this mana only to cast <spell>, and <says>": the mana can be spent only to cast a spell
+# `spell` describes, and has an additional effect on the spell it is spent on [CR#106.6].
+# TODO(spelling): Give the Template its spelling, "Spend this mana only to cast <spell>, and
+# <says>.", whose article before <spell> agrees with the predicate's first word.
+template spendOnlyToCastAnd(spell: Predicate, says: Action): List(ManaRider) {
+  body = [spendOnly([toCast($spell)]), whenSpentOn(affectsIt, a($spell), $says)]
+}

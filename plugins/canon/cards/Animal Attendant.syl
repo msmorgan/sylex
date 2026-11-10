@@ -12,7 +12,6 @@ card singleFaced({
           [
             whenSpentOn(
               affectsIt,
-              false,
               a(and([non(hasSubtype(human)), isCreature, isSpell])),
               establish(
                 entersWithAdditionalCounters(becomes(that(spell)), lit(1), p1p1Counter)))]))],
