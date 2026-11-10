@@ -1,6 +1,0 @@
-# "whoever performs this action"
-template theActor: NounPhrase {
-  spelling = "whoever performs this action",
-  identity = "actor",
-  body = actor
-}

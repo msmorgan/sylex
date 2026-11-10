@@ -1,4 +1,7 @@
-# The actor of the current instruction, without binding a repeated mention.
+# "whoever performs this action": the actor of the current instruction, without binding a
+# repeated mention.
 # TODO(spelling): Recover the Actor from the containing instruction before choosing its noun
 # phrase or pronoun.
-primitive actor: NounPhrase = Actor
+primitive actor: NounPhrase = Actor {
+  spelling = "whoever performs this action"
+}

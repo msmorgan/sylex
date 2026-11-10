@@ -65,7 +65,7 @@ stacks cannot supply these, because a binding's position shifts as others are pu
   stable identity. A re-mention resolves to the existing referent and creates nothing.
 - Each mention has a grammatical role in its clause: subject, object or other (§4.2).
 - **Actors are not referents.** A Handoff makes its Actor the innermost for the Action it contains.
-  Pronouns, groups and counts never read an Actor; only the `actor` word does.
+  Pronouns, groups and counts never read an Actor; only the `actor` word at NounPhrase does.
 - A disjunctive noun phrase exports only the referents common to every branch. A coordination bound
   to a parameter binds every member under the parameter's one Binding Identity.
 - A zone change keeps the referent and records the move on it: its new zone and the deed. Carrier

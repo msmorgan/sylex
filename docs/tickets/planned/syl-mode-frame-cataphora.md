@@ -22,7 +22,7 @@ Written against the surface (`cleanup-step6-surface`).
 
 - One construct, `chooseModesOver`, has a choice (a quantity plus mode-choice modifiers), a frame
   (an Action expression) and fillers.
-- A reserved word stands at the filler's site in the frame, the way `theActor` stands for the
+- A reserved word stands at the filler's site in the frame, the way `actor` stands for the
   performer, and resolves by expected sort.
 - Fillers are of a closed set of sorts: a NounPhrase (*Call Damage Control*) or a characteristics
   bundle (the other three).

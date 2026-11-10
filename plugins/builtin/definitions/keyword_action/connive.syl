@@ -6,11 +6,11 @@ action connive(amount: Amount = lit(1)) {
   permanent = performs,
   spelling = "connive <amount>",
   body = instruct(
-    controllerOf(theActor),
+    controllerOf(actor),
     sequentially([
         draw($amount),
         discard(counted(exactlyOf($amount), isCard)),
         doForEach(
           allOf(and([non(isLand), isCard, did(any, discard(which), within = thisWay)])),
-          putCounters(lit(1), printedKind(p1p1Counter), theActor))]))
+          putCounters(lit(1), printedKind(p1p1Counter), actor))]))
 }

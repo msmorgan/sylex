@@ -2,5 +2,5 @@
 # [CR#702.26b]
 template phaseOut: Action {
   spelling = "phases out",
-  body = setStatus(phasedOut, theActor)
+  body = setStatus(phasedOut, actor)
 }

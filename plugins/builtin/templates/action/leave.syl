@@ -1,5 +1,5 @@
 # "<subject> leaves <from>", the battlefield unless said.
 template leave(from: Location = battlefield): Action {
   spelling = "leaves <from>",
-  body = move(theActor, $from, none, departure, [])
+  body = move(actor, $from, none, departure, [])
 }

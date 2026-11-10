@@ -34,7 +34,7 @@ These wait for the owner's design discussion of Deeds.
   ```
   deed_action crew(what: NounPhrase) {
     spelling = "crew <what>",
-    body = instruct(controllerOf(theActor), tap(it))
+    body = instruct(controllerOf(actor), tap(it))
   }
   ```
   The creature is the actor and `what` (the Vehicle) is the Deed's object, unused in the body

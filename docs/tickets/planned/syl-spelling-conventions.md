@@ -18,7 +18,7 @@ Two narrower tickets rewrite spellings this ticket also normalizes, and land fir
 
 - A verb is written uninflected wherever its agreement depends on a hole or on the performer;
   agreement is solved when the clause is rendered. Three cases:
-  - The performer is outside the declaration (`theActor`): the spelling is the bare verb phrase.
+  - The performer is outside the declaration (`actor`): the spelling is the bare verb phrase.
     `die` is `"die"`, `sacrifice` is `"sacrifice <subject>"`, `win` is `"win the game"`.
   - The grammatical Subject is a parameter: the hole stays and the verb is still uninflected.
     `becomeBlocked(subject)` is `"<subject> become blocked"`, likewise `becomeBlocking`,

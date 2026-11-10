@@ -8,8 +8,8 @@ ability aftermath {
   lexical = {lemma = "aftermath"},
   spelling = "aftermath",
   body = [
-    static(can(actor(theActor), cast(this, from = yourGraveyard))),
-    static(cant(actor(theActor), cast(this, from = not(graveyard)))),
+    static(can(actor(actor), cast(this, from = yourGraveyard))),
+    static(cant(actor(actor), cast(this, from = not(graveyard)))),
     static(
       replace(
         would(actor(thisSpell), leave(stack)),

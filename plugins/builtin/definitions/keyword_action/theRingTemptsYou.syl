@@ -6,7 +6,7 @@ action theRingTemptsYou {
   spelling = "The Ring tempts you",
   body = sequentially([
       doIf(
-        not(exists(and([isEmblem, named(printedName("The Ring")), ownedBy(theActor)]))),
+        not(exists(and([isEmblem, named(printedName("The Ring")), ownedBy(actor)]))),
         getNamedEmblem(
           "The Ring",
           [

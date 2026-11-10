@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     text = [
       whenever(
-        does(actor(a(and([isCreature, anOpponentControls]))), setStatus(tapped, theActor)),
+        does(actor(a(and([isCreature, anOpponentControls]))), setStatus(tapped, actor)),
         if = is(it, not(inCombat(declaredAttacker))),
         action = may(draw(lit(1)))),
       activated(

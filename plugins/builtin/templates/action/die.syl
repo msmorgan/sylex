@@ -2,5 +2,5 @@
 # [CR#700.4]
 template die: Action {
   spelling = "dies",
-  body = move(theActor, zone(battlefield, none), zone(graveyard, none), departure, [])
+  body = move(actor, zone(battlefield, none), zone(graveyard, none), departure, [])
 }

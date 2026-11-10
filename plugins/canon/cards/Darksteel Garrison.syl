@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       static(abilityGrant(fortified(land), indestructible)),
       whenever(
-        does(actor(fortified(land)), setStatus(tapped, theActor)),
+        does(actor(fortified(land)), setStatus(tapped, actor)),
         get(target(isCreature), up(lit(1)), up(lit(1)), untilEndOfTurn)),
       fortify(mana([generic(3)]))]})
