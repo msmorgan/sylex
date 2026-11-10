@@ -5,8 +5,7 @@
 # their owners' graveyards. In the event of a tie for the shortest amount of time, all are put into
 # their owners' graveyards." Per holder: a world permanent is put into its owner's graveyard if
 # another world permanent has had the world supertype for the shortest amount of time, alone or
-# tied, since `superlative` admits a tie. So the one with the shortest time stays only when no
-# other ties it, and a lone world permanent stays.
+# tied, since `superlative` admits a tie.
 supertype world {
   lexical = {lemma = "world"},
   spelling = "world",
