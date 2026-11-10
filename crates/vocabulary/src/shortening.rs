@@ -3,13 +3,12 @@
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
-use std::fs::File;
-use std::io::BufRead;
-use std::io::BufReader;
 
 use sylex_lexicon::Numeral;
 use sylex_lexicon::NumeralCodec;
-use sylex_upstream::scryfall::OracleCardReader;
+use sylex_upstream::scryfall::OracleCard;
+use sylex_upstream::scryfall::OracleCardReadError;
+use sylex_upstream::scryfall::oracle_cards;
 
 use crate::SourceError;
 
@@ -24,22 +23,31 @@ impl AttestedShortenings {
     /// Computes every face's attested shortening from the Oracle corpus.
     ///
     /// # Errors
-    /// A corpus record that fails `OracleCardReader` validation.
-    pub fn from_corpus(corpus: impl BufRead) -> Result<Self, SourceError> {
+    /// A corpus record that fails `OracleCardReader` validation, or a
+    /// supported legendary face with no type line.
+    pub fn from_corpus(
+        cards: impl IntoIterator<Item = Result<OracleCard, OracleCardReadError>>,
+    ) -> Result<Self, SourceError> {
         let mut titles = BTreeSet::new();
         let mut faces = Vec::new();
-        for card in OracleCardReader::new(corpus) {
-            let card = card.map_err(|error| SourceError::Format {
-                path: crate::ORACLE_CARDS.to_owned(),
-                message: error.to_string(),
-            })?;
+        for card in cards {
+            let card = card.map_err(|error| SourceError::Invalid(error.to_string()))?;
             for unit in card.oracle_units() {
                 titles.insert(unit.display_name().to_owned());
-                if card.supported() && legendary_permanent(unit.type_line()) {
-                    faces.push((
-                        unit.display_name().to_owned(),
-                        unit.oracle_text().unwrap_or("").to_owned(),
-                    ));
+                if card.supported() {
+                    let type_line = unit.type_line().ok_or_else(|| {
+                        SourceError::Invalid(format!(
+                            "supported face {} has no type line",
+                            unit.display_name()
+                        ))
+                    })?;
+                    if legendary_permanent(type_line) {
+                        faces.push((
+                            unit.display_name().to_owned(),
+                            // A vanilla legendary has no Oracle text.
+                            unit.oracle_text().unwrap_or("").to_owned(),
+                        ));
+                    }
                 }
             }
         }
@@ -54,17 +62,14 @@ impl AttestedShortenings {
         Ok(Self { shortenings })
     }
 
-    /// Computes the shortenings from the Oracle corpus in this repository.
+    /// Computes the shortenings from the pinned Oracle corpus.
     ///
     /// # Errors
     /// An unreadable corpus, or any [`Self::from_corpus`] error.
     pub fn load() -> Result<Self, SourceError> {
-        let path = crate::oracle_cards_path();
-        let file = File::open(&path).map_err(|error| SourceError::Io {
-            path: path.display().to_string(),
-            message: error.to_string(),
-        })?;
-        Self::from_corpus(BufReader::new(file))
+        Self::from_corpus(
+            oracle_cards().map_err(|error| SourceError::Invalid(error.to_string()))?,
+        )
     }
 
     /// The shortened spelling `name`'s own text uses, if any.
@@ -74,8 +79,8 @@ impl AttestedShortenings {
     }
 }
 
-fn legendary_permanent(type_line: Option<&str>) -> bool {
-    let head = type_line.unwrap_or("").split('—').next().unwrap_or("");
+fn legendary_permanent(type_line: &str) -> bool {
+    let head = type_line.split_once('—').map_or(type_line, |(head, _)| head);
     let words = head.split_whitespace().collect::<Vec<_>>();
     words.contains(&"Legendary")
         && words.iter().any(|word| {
@@ -201,16 +206,13 @@ mod tests {
         ] {
             assert_eq!(short_name(name), expected, "{name}");
         }
-        assert!(legendary_permanent(Some(
-            "Legendary Artifact Creature — Golem"
-        )));
-        assert!(!legendary_permanent(Some("Legendary Sorcery")));
-        assert!(!legendary_permanent(Some("Creature — Legendary")));
+        assert!(legendary_permanent("Legendary Artifact Creature — Golem"));
+        assert!(!legendary_permanent("Legendary Sorcery"));
+        assert!(!legendary_permanent("Creature — Legendary"));
     }
 
     #[test]
     fn only_standalone_short_references_in_pinned_oracle_text_become_aliases() {
-        let file = File::open(crate::oracle_cards_path()).unwrap();
         let expected = BTreeMap::from([
             ("Captain Sisay", None),
             ("Shang-Chi and the Ten Rings", Some("Shang-Chi")),
@@ -226,7 +228,7 @@ mod tests {
         ]);
         let mut titles = BTreeSet::new();
         let mut observed = BTreeMap::new();
-        for card in OracleCardReader::new(BufReader::new(file)) {
+        for card in oracle_cards().unwrap() {
             let card = card.unwrap();
             for unit in card.oracle_units() {
                 let name = unit.display_name();
