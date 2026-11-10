@@ -1,0 +1,16 @@
+# "A Powerstone token is a colorless Powerstone artifact token with '{T}: Add {C}. This mana can't
+# be spent to cast a nonartifact spell.'" [CR#111.10h]
+token powerstoneToken {
+  spelling = "Powerstone token",
+  body = {
+    characteristics = {
+      types = [artifact],
+      subtypes = [powerstone],
+      text = [
+        activated(
+          tapSymbol,
+          addMana(
+            lit(1),
+            manaOf([[colorless]]),
+            [cantSpendOn([toCast(and([non(isArtifact), isSpell]))])]))]}}
+}

@@ -1,0 +1,13 @@
+# "A Treasure token is a colorless Treasure artifact token with '{T}, Sacrifice this token: Add one
+# mana of any color.'" [CR#111.10a]
+token treasureToken {
+  spelling = "Treasure token",
+  body = {
+    characteristics = {
+      types = [artifact],
+      subtypes = [treasure],
+      text = [
+        activated(
+          compound([tapSymbol, perform(sacrifice(thisToken))]),
+          addMana(lit(1), ofAnyColor(sameColor)))]}}
+}

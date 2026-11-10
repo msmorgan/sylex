@@ -1,0 +1,20 @@
+# "A Young Hero Role token is a colorless Aura Role enchantment token named Young Hero with enchant
+# creature and 'Enchanted creature has "Whenever this creature attacks, if its toughness is 3 or
+# less, put a +1/+1 counter on it."'" [CR#111.10r]
+token youngHeroRoleToken {
+  spelling = "Young Hero Role token",
+  body = {
+    characteristics = {
+      name = "Young Hero",
+      types = [enchantment],
+      subtypes = [aura, role],
+      text = [
+        enchant(isCreature),
+        static(
+          abilityGrant(
+            enchanted(creature),
+            whenever(
+              does(actor(thisCreature), attack),
+              putCounters(lit(1), printedKind(p1p1Counter), thisCreature),
+              if = compareAmt(toughnessOf(thisCreature), atMost, lit(3)))))]}}
+}

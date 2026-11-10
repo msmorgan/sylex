@@ -1,0 +1,19 @@
+# "A Sorcerer Role token is a colorless Aura Role enchantment token named Sorcerer with enchant
+# creature and 'Enchanted creature gets +1/+1 and has "Whenever this creature attacks, scry 1."'"
+# [CR#111.10n]
+token sorcererRoleToken {
+  spelling = "Sorcerer Role token",
+  body = {
+    characteristics = {
+      name = "Sorcerer",
+      types = [enchantment],
+      subtypes = [aura, role],
+      text = [
+        enchant(isCreature),
+        static(
+          conjunction([
+              getsPt(enchanted(creature), up(lit(1)), up(lit(1))),
+              abilityGrant(
+                enchanted(creature),
+                whenever(does(actor(thisCreature), attack), scry(lit(1))))]))]}}
+}

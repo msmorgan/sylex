@@ -1,0 +1,17 @@
+# "An Incubator token is a double-faced token. Its front face is a colorless Incubator artifact
+# with '{2}: Transform this token.' Its back face is a 0/0 colorless Phyrexian artifact creature
+# named Phyrexian Token." [CR#111.10i]
+token incubatorToken {
+  spelling = "Incubator token",
+  body = {
+    characteristics = {
+      types = [artifact],
+      subtypes = [incubator],
+      text = [activated(mana([generic(2)]), transform(thisToken))]},
+    back = {
+      name = "Phyrexian Token",
+      types = [artifact, creature],
+      subtypes = [phyrexian],
+      power = lit(0),
+      toughness = lit(0)}}
+}

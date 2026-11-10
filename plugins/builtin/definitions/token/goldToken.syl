@@ -1,0 +1,10 @@
+# "A Gold token is a colorless Gold artifact token with 'Sacrifice this token: Add one mana of any
+# color.'" [CR#111.10c]
+token goldToken {
+  spelling = "Gold token",
+  body = {
+    characteristics = {
+      types = [artifact],
+      subtypes = [gold],
+      text = [activated(perform(sacrifice(thisToken)), addMana(lit(1), ofAnyColor(sameColor)))]}}
+}

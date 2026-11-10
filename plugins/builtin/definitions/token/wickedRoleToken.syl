@@ -1,0 +1,17 @@
+# "A Wicked Role token is a colorless Aura Role enchantment token named Wicked with enchant
+# creature, 'Enchanted creature gets +1/+1,' and 'When this token is put into a graveyard from the
+# battlefield, each opponent loses 1 life.'" [CR#111.10q]
+token wickedRoleToken {
+  spelling = "Wicked Role token",
+  body = {
+    characteristics = {
+      name = "Wicked",
+      types = [enchantment],
+      subtypes = [aura, role],
+      text = [
+        enchant(isCreature),
+        static(getsPt(enchanted(creature), up(lit(1)), up(lit(1)))),
+        when(
+          does(any, putIntoFromBattlefield(thisToken, graveyard)),
+          instruct(eachOpponent, loseLife(lit(1))))]}}
+}

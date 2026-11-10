@@ -1,0 +1,11 @@
+# "A Heartwood token is a red and green Heartwood artifact token with '{T}: Add {R} or {G}.'"
+# [CR#111.10x]
+token heartwoodToken {
+  spelling = "Heartwood token",
+  body = {
+    characteristics = {
+      colors = [red, green],
+      types = [artifact],
+      subtypes = [heartwood],
+      text = [activated(tapSymbol, addMana(lit(1), manaOf([[colored(red)], [colored(green)]])))]}}
+}

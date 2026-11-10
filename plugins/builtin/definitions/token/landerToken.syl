@@ -1,0 +1,17 @@
+# "A Lander token is a colorless Lander artifact token with '{2}, {T}, Sacrifice this token: Search
+# your library for a basic land card, put it onto the battlefield tapped, then shuffle.'"
+# [CR#111.10u]
+token landerToken {
+  spelling = "Lander token",
+  body = {
+    characteristics = {
+      types = [artifact],
+      subtypes = [lander],
+      text = [
+        activated(
+          compound([mana([generic(2)]), tapSymbol, perform(sacrifice(thisToken))]),
+          sequentially([
+              search(yourLibrary, a(and([isLand, hasSupertype(basic)]))),
+              putOntoBattlefieldTapped(it),
+              shuffle]))]}}
+}

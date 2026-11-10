@@ -1,0 +1,11 @@
+# "A Cursed Role token is a colorless Aura Role enchantment token named Cursed with enchant
+# creature and 'Enchanted creature has base power and toughness 1/1.'" [CR#111.10j]
+token cursedRoleToken {
+  spelling = "Cursed Role token",
+  body = {
+    characteristics = {
+      name = "Cursed",
+      types = [enchantment],
+      subtypes = [aura, role],
+      text = [enchant(isCreature), static(getsBase(enchanted(creature), lit(1), lit(1)))]}}
+}

@@ -1,0 +1,17 @@
+# "A Vibranium token is a colorless Vibranium artifact token with indestructible and '{T}: Add {C}.
+# This mana can't be spent to cast a nonartifact spell.'" [CR#111.10w]
+token vibraniumToken {
+  spelling = "Vibranium token",
+  body = {
+    characteristics = {
+      types = [artifact],
+      subtypes = [vibranium],
+      text = [
+        indestructible,
+        activated(
+          tapSymbol,
+          addMana(
+            lit(1),
+            manaOf([[colorless]]),
+            [cantSpendOn([toCast(and([non(isArtifact), isSpell]))])]))]}}
+}

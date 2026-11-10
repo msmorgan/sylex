@@ -1,0 +1,13 @@
+# "A Shard token is a colorless Shard enchantment token with '{2}, Sacrifice this token: Scry 1,
+# then draw a card.'" [CR#111.10e]
+token shardToken {
+  spelling = "Shard token",
+  body = {
+    characteristics = {
+      types = [enchantment],
+      subtypes = [shard],
+      text = [
+        activated(
+          compound([mana([generic(2)]), perform(sacrifice(thisToken))]),
+          sequentially([scry(lit(1)), draw(lit(1))]))]}}
+}

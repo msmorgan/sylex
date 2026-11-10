@@ -1,0 +1,13 @@
+# "A Food token is a colorless Food artifact token with '{2}, {T}, Sacrifice this token: You gain 3
+# life.'" [CR#111.10b]
+token foodToken {
+  spelling = "Food token",
+  body = {
+    characteristics = {
+      types = [artifact],
+      subtypes = [food],
+      text = [
+        activated(
+          compound([mana([generic(2)]), tapSymbol, perform(sacrifice(thisToken))]),
+          gainLife(lit(3)))]}}
+}

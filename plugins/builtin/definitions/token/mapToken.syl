@@ -1,0 +1,14 @@
+# "A Map token is a colorless Map artifact token with '{1}, {T}, Sacrifice this token: Target
+# creature you control explores. Activate only as a sorcery.'" [CR#111.10s]
+token mapToken {
+  spelling = "Map token",
+  body = {
+    characteristics = {
+      types = [artifact],
+      subtypes = [map],
+      text = [
+        activatedOnlyDuring(
+          compound([mana([generic(1)]), tapSymbol, perform(sacrifice(thisToken))]),
+          instruct(target(and([isCreature, youControl])), explore),
+          asSorcery)]}}
+}

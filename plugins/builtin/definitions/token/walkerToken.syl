@@ -1,0 +1,13 @@
+# "A Walker token is a 2/2 black Zombie creature token named Walker." [CR#111.10d] It is told
+# apart by its name: its subtype is Zombie.
+token walkerToken {
+  spelling = "Walker token",
+  body = {
+    characteristics = {
+      name = "Walker",
+      colors = [black],
+      types = [creature],
+      subtypes = [zombie],
+      power = lit(2),
+      toughness = lit(2)}}
+}

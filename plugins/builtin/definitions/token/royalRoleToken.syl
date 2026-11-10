@@ -1,0 +1,16 @@
+# "A Royal Role token is a colorless Aura Role enchantment token named Royal with enchant creature
+# and 'Enchanted creature gets +1/+1 and has ward {1}.'" [CR#111.10m]
+token royalRoleToken {
+  spelling = "Royal Role token",
+  body = {
+    characteristics = {
+      name = "Royal",
+      types = [enchantment],
+      subtypes = [aura, role],
+      text = [
+        enchant(isCreature),
+        static(
+          conjunction([
+              getsPt(enchanted(creature), up(lit(1)), up(lit(1))),
+              abilityGrant(enchanted(creature), ward(mana([generic(1)])))]))]}}
+}

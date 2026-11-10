@@ -1,0 +1,14 @@
+# "A Mutagen token is a colorless Mutagen artifact token with '{1}, {T}, Sacrifice this token: Put
+# a +1/+1 counter on target creature. Activate only as a sorcery.'" [CR#111.10v]
+token mutagenToken {
+  spelling = "Mutagen token",
+  body = {
+    characteristics = {
+      types = [artifact],
+      subtypes = [mutagen],
+      text = [
+        activatedOnlyDuring(
+          compound([mana([generic(1)]), tapSymbol, perform(sacrifice(thisToken))]),
+          putCounters(lit(1), printedKind(p1p1Counter), target(isCreature)),
+          asSorcery)]}}
+}

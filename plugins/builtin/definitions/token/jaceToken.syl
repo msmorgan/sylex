@@ -1,0 +1,14 @@
+# The token empower Jace creates: "a blue Jace planeswalker token with 0 loyalty, '[−1]: Surveil
+# 1,' and '[−3]: Draw a card.'" [CR#701.71a]
+token jaceToken {
+  spelling = "Jace planeswalker token",
+  body = {
+    characteristics = {
+      colors = [blue],
+      types = [planeswalker],
+      subtypes = [jace],
+      text = [
+        activated(loyaltySymbol(down(lit(1))), surveil(lit(1))),
+        activated(loyaltySymbol(down(lit(3))), draw(lit(1)))],
+      loyalty = lit(0)}}
+}

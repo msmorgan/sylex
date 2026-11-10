@@ -1,0 +1,17 @@
+# "A Virtuous Role token is a colorless Aura Role enchantment token named Virtuous with enchant
+# creature and 'Enchanted creature gets +1/+1 for each enchantment you control.'" [CR#111.10p]
+token virtuousRoleToken {
+  spelling = "Virtuous Role token",
+  body = {
+    characteristics = {
+      name = "Virtuous",
+      types = [enchantment],
+      subtypes = [aura, role],
+      text = [
+        enchant(isCreature),
+        static(
+          getsPt(
+            enchanted(creature),
+            up(forEach(lit(1), and([isEnchantment, youControl]))),
+            up(forEach(lit(1), and([isEnchantment, youControl])))))]}}
+}
