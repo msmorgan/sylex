@@ -1,6 +1,5 @@
 ability_word temptingOffer(ability: Ability) {
   lexical = {lemma = "tempting offer", listed = Rules},
-  label = "tempting offer",
   spelling = "tempting offer — <ability>",
   body = $ability
 }

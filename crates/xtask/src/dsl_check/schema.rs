@@ -195,11 +195,7 @@ pub const KINDS: &[Kind] = &[
             &[field("body", "List(Ability)"), field("label", "String")],
         )
     },
-    kind(
-        "ability_word",
-        "Ability",
-        &[required("body", "Ability"), field("label", "String")],
-    ),
+    kind("ability_word", "Ability", &[required("body", "Ability")]),
     catalog(
         "counter",
         "CounterKind",

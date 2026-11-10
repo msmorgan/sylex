@@ -1,6 +1,5 @@
 ability_word chroma(ability: Ability) {
   lexical = {lemma = "chroma", listed = Rules},
-  label = "chroma",
   spelling = "chroma — <ability>",
   body = $ability
 }

@@ -1,6 +1,5 @@
 ability_word survival(ability: Ability) {
   lexical = {lemma = "survival", listed = Rules},
-  label = "survival",
   spelling = "survival — <ability>",
   body = $ability
 }
