@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       protection(hasColor(black)),
       at(
-        beginningOfPossessed(endStep, eachPlayer),
+        beginningOfPossessed(eachPlayer, endStep),
         if = did(actor(thisCreature), dealDamage(recipient = anOpponent), within(soFarThisTurn)),
         action = putCounters(1, printedKind(p1p1Counter), it))],
     power = 1,

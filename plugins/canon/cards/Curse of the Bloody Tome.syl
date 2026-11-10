@@ -5,4 +5,4 @@ card singleFaced({
     subtypes = [aura, curse],
     text = [
       enchant(isPlayer),
-      at(beginningOfPossessed(upkeep, enchanted(player)), instruct(that(player), mill(2)))]})
+      at(beginningOfPossessed(enchanted(player), upkeep), instruct(that(player), mill(2)))]})

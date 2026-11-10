@@ -28,7 +28,7 @@ card singleFaced({
           [getsPt(enchanted(creature), up(1), up(1)), doesntUntap(it, controllerOf(it))],
           subject = enchanted(creature))),
       at(
-        beginningOfPossessed(upkeep, controllerOf(enchanted(creature))),
+        beginningOfPossessed(controllerOf(enchanted(creature)), upkeep),
         instruct(
           that(player),
           may(pay(mana([generic(1), pip(black)]), once), untap(that(creature)))))]})

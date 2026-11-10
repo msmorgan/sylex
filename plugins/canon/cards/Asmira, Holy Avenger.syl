@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       flying,
       at(
-        beginningOfPossessed(endStep, eachPlayer),
+        beginningOfPossessed(eachPlayer, endStep),
         putCounters(
           eventCount(putInto(a(isCreature), yourGraveyard, from = battlefield), any, soFarThisTurn),
           printedKind(p1p1Counter),

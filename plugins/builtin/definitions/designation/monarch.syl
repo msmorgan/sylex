@@ -10,7 +10,7 @@ designation monarch {
   scope = heldBy(player),
   sole = true,
   confers = [
-    ability(at(beginningOfPossessed(endStep, theMonarch), instruct(that(player), draw(1)))),
+    ability(at(beginningOfPossessed(theMonarch, endStep), instruct(that(player), draw(1)))),
     ability(
       whenever(
         does(actor(a(isCreature)), dealDamage(recipient = theMonarch, kind = combat)),

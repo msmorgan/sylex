@@ -1,5 +1,5 @@
 # "the beginning of <possessor>'s <part>", each time it comes
-template beginningOfPossessed(part: TurnPart, possessor: NounPhrase): TurnPoint {
+template beginningOfPossessed(possessor: NounPhrase, part: TurnPart): TurnPoint {
   spelling = "the beginning of <possessor>'s <part>",
   body = beginningOf($part, $possessor, eachTime)
 }

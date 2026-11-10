@@ -4,6 +4,6 @@ card singleFaced({
     types = [enchantment],
     text = [
       at(
-        beginningOfPossessed(upkeep, eachOpponent),
+        beginningOfPossessed(eachOpponent, upkeep),
         if = compareAmt(countOf(cardIn(handOf(that(player)))), atMost, 1),
         action = instruct(they, loseLife(3)))]})
