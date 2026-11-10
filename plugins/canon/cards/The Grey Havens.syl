@@ -1,0 +1,14 @@
+card singleFaced({
+    name = "The Grey Havens",
+    supertypes = [legendary],
+    types = [land],
+    text = [
+      when(does(actor(thisLand), enter), scry(1)),
+      activated(tapSymbol, addMana(symbols([colorlessPip]))),
+      activated(
+        tapSymbol,
+        addMana(
+          counted(
+            1,
+            ofAnyColorAmong(
+              allOf(and([hasSupertype(legendary), isCreature, cardIn(yourGraveyard)]))))))]})

@@ -1,0 +1,14 @@
+card singleFaced({
+    name = "Mox Amber",
+    cost = [],
+    supertypes = [legendary],
+    types = [artifact],
+    text = [
+      activated(
+        tapSymbol,
+        addMana(
+          counted(
+            1,
+            ofAnyColorAmong(
+              allOf(
+                and([hasSupertype(legendary), or([isCreature, isPlaneswalker]), youControl]))))))]})

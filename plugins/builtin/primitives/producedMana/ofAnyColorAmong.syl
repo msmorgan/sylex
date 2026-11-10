@@ -1,4 +1,10 @@
-# "mana of any of <colors>"
-primitive ofAnyColorAmong(colors: List(Color)): ProducedMana = AmongWritten {
-  spelling = "mana of any of <colors>"
+# "mana of any color among <subject>": one color chosen from the colors of all the objects
+# `subject` describes taken together, as Mox Amber's "any color among legendary creatures and
+# planeswalkers you control". No rule defines "color among"; when those objects have no color
+# between them, the mana's type is undefined and none is produced [CR#106.5]. Unlike
+# `ofAnyColorOf` ("mana of any of <subject>'s colors", Chrome Mox), which reads the colors of one
+# object, and `ofColorProducibleBy` ("mana of any color that <subject> could produce"), which
+# reads the mana the objects could produce [CR#106.7] rather than their colors.
+primitive ofAnyColorAmong(subject: NounPhrase): ProducedMana = ColorAmong {
+  spelling = "mana of any color among <subject>"
 }
