@@ -1,5 +1,6 @@
 ---
 needs: [syl-single-face-card-call, syl-card-type-permanent-type]
+specs: [confers-and-rules]
 ---
 
 # Supertypes as declarations that carry their rules
@@ -23,47 +24,64 @@ This ticket lands after `syl-card-type-permanent-type`: both edit the kinds tabl
 ## Design
 
 - A `supertype` declaration kind, a catalog at `Supertype` like `card_type`, whose declarations
-  carry their rules in `confers`.
+  carry `lexical`, `spelling`, `name` and `confers`.
 - `basic`, `legendary`, `snow` and `world` are declared with it, and their primitives are gone.
-- `legendary` writes the legend rule: if two or more legendary permanents with the same name are
-  controlled by the same player, that player chooses one of them, and the rest are put into their
-  owners' graveyards [CR#704.5j]. It also writes that a player can't cast a legendary instant or
-  sorcery spell unless they control a legendary creature or a legendary planeswalker
+- `basic` and `snow` carry only `lexical`, `spelling`, `name` and a citation: a basic land is a
+  land with the supertype [CR#205.4c], a snow permanent a permanent with it [CR#205.4g]. The
+  deck-construction exception for basic lands [CR#100.2a] belongs to the deck limit, and paying
+  {S} with mana from a snow source [CR#107.4h] to the {S} symbol.
+- `legendary`'s `confers` writes the casting restriction: a player can't cast a legendary instant
+  or sorcery spell unless they control a legendary creature or a legendary planeswalker
   [CR#205.4e].
-- `world` writes the world rule: if two or more permanents have the supertype world, all except
-  the one that has had it for the shortest time are put into their owners' graveyards, and all of
-  them on a tie [CR#704.5k].
+- The legend rule [CR#205.4d,704.5j] is not written on `legendary`. It is a named top-level `sba`
+  row, `legendRule`, scoped to players (spec §4): "legend rule" is printed vocabulary, so it is its
+  own declaration. Top-level rows (`sba`, `conferral`) take `lexical` and `spelling` and become
+  catalog declarations.
+- `legendRule` groups the player's legendary permanents by shared name, the player chooses one per
+  group, and the rest are put into their owners' graveyards, in the group-choose-rest shape
+  *Celestial Judgment* writes (`doForEachKind` with `choose`, then `notChosen`), with a new
+  `KindAxis`, `name`.
+- `world`'s `confers` writes the world rule [CR#205.4f,704.5k] as a per-holder `stateBased`
+  entry: a world permanent is put into its owner's graveyard if another world permanent has had
+  the world supertype for no longer than it has (spec §6). It reads a new measure, `heldFor`: how
+  long an object has continuously satisfied a predicate. It is not a timestamp, because a
+  permanent can gain the world supertype after it enters.
+- No `Supertype` to `NounWord` coercion: a supertype is printed before the card types
+  [CR#205.4a], and Oracle text uses one only as a premodifier ("legendary creature", "basic land")
+  or a predicate adjective ("is no longer snow"), never as a head noun outside reminder text.
 
 ## Open questions
 
-- How the legend rule writes "with the same name" and "that player chooses one of them", and the
-  world rule "had the world supertype for the shortest amount of time": `shares(cardName, …)`
-  (`primitives/predicate/shares.syl`, `primitives/qualitySort/cardName.syl`) compares one object
-  with another, and the state-based rows today (`card_type` `stateBased` conferrals,
-  `rules/sba/deathtouchDestruction.syl`) each test one object, so none groups the permanents that share a name for `choose`
-  (`primitives/action/choose.syl`) to pick from, and nothing records how long an object has had
-  a supertype.
-- What `basic` and `snow` carry. Their rules only define the quality: a basic land is a land with
-  the supertype [CR#205.4c], a snow permanent a permanent with it [CR#205.4g]. Other rules read
-  them from elsewhere: deck construction's basic-land exception [CR#100.2a] and the {S} cost paid
-  with mana from a snow source [CR#107.4h]. Whether either belongs on the declaration.
-- Whether the `CardType` and `Subtype` to `NounWord` coercions (`syl-implicit-coercions`) cover
-  supertypes. A supertype is printed before the card types [CR#205.4a] and is never the head noun
-  ("legendary creature", "basic land", "snow permanent"), so the expected answer is that no
-  supertype coercion is needed.
+- `heldFor`'s sort: an `Amount`, `heldFor(<object>, <predicate>)`, compared with `compareAmt`; or
+  a `ProjAxis`, `heldFor(<predicate>)`, read by `superlative` and `tiedFor` as `stat(toughness)`
+  is in `bolster.syl`. The world rule's tie, where every tied permanent goes [CR#704.5k], reads
+  either way.
 
 ## Done when
 
 - `supertype` is a kind in `crates/xtask/src/dsl_check/schema.rs`.
 - The four supertype primitives are replaced by `supertype` declarations, and every caller
   (`hasSupertype(…)`, `supertypes = […]`) still resolves.
-- The legend rule and the world rule are written, and so is the legendary casting restriction.
+- `sba` and `conferral` rows take `lexical` and `spelling` and are catalog declarations.
+- `rules/sba/legendRule.syl` writes the legend rule, `world` writes the world rule, and
+  `legendary` writes the casting restriction; `name` at `KindAxis` and `heldFor` exist.
+- The glossary entries **Conferral** and **Registry Definition**
+  (`docs/contexts/game-model/CONTEXT.md`) list Supertype.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass;
   `cargo xtask cite check --list-noncompliant` is empty and `cargo xtask cite check` reports
   0 stale, after `cargo xtask cite bless` for newly cited rules.
 
+## Not in scope
+
+- The `rules` field on declarations: `syl-declaration-rules-field`.
+- `doesntApply`, the word for "the "legend rule" doesn't apply" (spec §5): no card in the corpus
+  prints it yet.
+- Removing the engine's own copy of the legend rule (`crates/engine/src/sba.rs`).
+
 ## Pointers
 
-`plugins/builtin/primitives/supertype/`, `plugins/builtin/definitions/card_type/` (the `confers`
-form), `plugins/builtin/rules/sba/`, `crates/xtask/src/dsl_check/schema.rs` (`card_type`,
-`subtype`).
+`docs/specs/confers-and-rules.md`, `plugins/builtin/primitives/supertype/`,
+`plugins/builtin/definitions/card_type/` (the `confers` form), `plugins/builtin/rules/sba/`,
+`plugins/canon/cards/Celestial Judgment.syl`, `plugins/builtin/primitives/action/doForEachKind.syl`,
+`plugins/builtin/primitives/condition/heldSince.syl`, `crates/xtask/src/dsl_check/schema.rs`
+(`card_type`, `subtype`, `rules_row`).
