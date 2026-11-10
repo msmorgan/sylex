@@ -372,6 +372,47 @@ fn a_rules_row_writes_a_body_or_its_record_fields() {
     );
 }
 
+/// A top-level rules row is a catalog declaration that card text can name, as
+/// it names the "legend rule" [CR#205.4d]: it takes `lexical` and `spelling`,
+/// a reference to it is no dependency edge, and no primitive builds a
+/// constructor at its sort.
+#[test]
+fn a_rules_row_is_a_nameable_catalog_declaration() {
+    let preamble = "primitive yes: Predicate = Yes\n\
+                    primitive always: Condition = Always\n\
+                    primitive nothing: Action = Nothing\n\
+                    primitive property(spec: StaticSpec): Conferral = Property\n\
+                    primitive exempt(rule: SbaRule): StaticSpec = Exempt\n\
+                    primitive grants(rule: ConferralRule): StaticSpec = Grants\n";
+    let source = format!(
+        "{preamble}\
+         sba a {{\n\
+           lexical = {{lemma = \"a rule\"}},\n\
+           spelling = \"a rule\",\n\
+           body = {{ scope = yes, when = always, then = nothing }}\n\
+         }}\n\
+         sba b {{ lexical = {{lemma = \"b rule\"}}, scope = yes, when = always, then = nothing }}\n\
+         conferral c {{\n\
+           lexical = {{lemma = \"c rule\"}},\n\
+           spelling = \"c rule\",\n\
+           body = {{ scope = yes, confer = property(grants(c)) }}\n\
+         }}\n\
+         template t: StaticSpec {{ body = exempt(a) }}\n\
+         primitive raw: SbaRule = Raw\n\
+         primitive rawConferral: ConferralRule = Raw"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (RefusalKind::ReservedConstructor(s("SbaRule.Raw")), s("Raw")),
+            (
+                RefusalKind::ReservedConstructor(s("ConferralRule.Raw")),
+                s("Raw")
+            ),
+        ]
+    );
+}
+
 #[test]
 fn a_token_declares_its_characteristics_and_any_back_face() {
     let source = format!(
