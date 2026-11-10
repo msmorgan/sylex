@@ -194,8 +194,7 @@ Every verb is one Action, its bare infinitive verb phrase. Why: otherwise each v
 per clause mood (as an instruction, an event, a prohibition and a lookback), each copy with its own
 subject and patient plumbing, and the copies drift apart. With one Action, "sacrifice" means the same
 thing in "sacrifice a creature", "whenever you sacrifice", "can't be sacrificed" and "if you
-sacrificed". Seven contexts embed that Action
-directly, with no double wrapping:
+sacrificed". Eight contexts embed that Action directly, with no double wrapping:
 
 | Context | Form |
 |---|---|
@@ -206,9 +205,10 @@ directly, with no double wrapping:
 | Replacement | `replace(would(subj, action), repl)` |
 | Deontic | `cant`, `must`, `can`, `gatedBy` |
 | Lookback | `did(subj, action, within)` |
+| Negative declarative | `doesnt(subj, action)` |
 
-Triggers, replacements, deontic rules and lookbacks share one head gate and one reading of
-subject, action and agent. A context adds only what is its own.
+Triggers, replacements, deontic rules and lookbacks share one head gate (§4.6), and every context
+shares one reading of subject, action and agent. A context adds only what is its own.
 
 ### 4.2 Voice
 
@@ -221,6 +221,9 @@ mention ([`syl.md`](./syl.md) §4). A Subject is one of three:
 - `any`: passive with no agent. The patient is promoted to subject.
 - `by(np)`: passive with an agent. The patient is promoted and read first, then `np` with role
   other.
+
+What an active Subject names need not be a player or a permanent: a spell or ability ("<ability>
+triggers") or an effect (`actor(thisEffect)`, §4.7) can be one.
 
 "Becomes blocked" is therefore not the agentless passive of `block`. It is its own event head,
 `becomeBlocked`: the Blocked status beginning, once per combat, even when an effect blocks the
@@ -276,6 +279,10 @@ Event decisions:
 - **Joined headers are not a disjunction.** "When this creature enters and whenever it attacks
   while saddled" is two trigger headers of one ability, each with its own trigger word,
   concurrent condition and timing; an `or` over events stands inside one header's event.
+- **`remove` is no event head.** What it names, an effect taking an attachment off its host by
+  way of a state-based action ([CR#704.5m,704.5n]), is no one event, so `remove` names no Deed
+  and is refused here. It is written in a negative declarative, "this effect doesn't remove this
+  Aura" ([CR#702.16n]).
 
 ### 4.7 Static Specs
 
@@ -290,7 +297,15 @@ Event decisions:
   - `withRiders`: the entering happens with Entry Riders.
 - **Being an effect follows from the enclosing node.** No Action carries an effect flag, so a
   Saga's turn-based lore counter is no effect ([CR#614.16,714.3c]). A performer and a cause are
-  independent.
+  independent. `thisEffect`, what a sentence calls "this effect", is found the same way: it is the
+  effect of the enclosing spell or ability.
+- **A negative declarative** `doesnt(subj, action)` says what its Subject does not do. It is no
+  deontic rule and takes no modifiers. "This effect doesn't remove this Aura" is
+  `doesnt(actor(thisEffect), remove(thisAura))`, its own Static Spec beside the spec it talks
+  about. A `conjunction` joins the two in one static ability, so the sentence's references reach
+  the spec's referents ("those artifacts"). Which consequence of the effect it exempts, an Aura
+  put into its owner's graveyard or Equipment unattached ([CR#704.5m,704.5n]), is the engine's
+  ([CR#702.16n]).
 - **Damage is composed, not special.** Damage results are conferred properties
   ([CR#120.3a,120.3c,120.3e,120.4c]). Wither and infect replace the marking results
   ([CR#702.80a,702.90b]). Prevention, redirection and scaling replace the damage event

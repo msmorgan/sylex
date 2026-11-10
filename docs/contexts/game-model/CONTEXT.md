@@ -85,7 +85,8 @@ What a bare "another" or "other" excludes when no "other than" is written.
 
 **Action**:
 The bare infinitive verb phrase of one verb ("sacrifice a creature"). One Action serves every
-context: imperative, cost, trigger, replacement, prohibition and lookback.
+context: imperative, cost, trigger, replacement, prohibition, lookback and negative declarative
+("this effect doesn't remove this Aura").
 
 **Instruction**:
 One executable step of core, the engine's AST. An Action is semantic and lowers to instructions.
@@ -96,15 +97,17 @@ keyword ability defines that text can ask about, as crewing ([CR#702.122b,702.12
 triggers, lookbacks and prohibitions name. Putting a counter and gaining a designation are none.
 
 **Subject**:
-Who an Action is said of in its clause: the active `actor(np)`, the agentless passive `any`, or
-the passive with an agent `by(np)`.
+Who or what an Action is said of in its clause: the active `actor(np)`, the agentless passive
+`any`, or the passive with an agent `by(np)`.
 
 **Patient**:
 What an Action is done to. It stays inside the Action; the Subject supplies only the performer.
 
 **Actor**:
-The Player or Permanent performing an Action: the controller of the text's spell or ability
-([CR#109.5]), unless a Handoff names another.
+Who or what performs an Action. In an instruction, the controller of the text's spell or ability
+([CR#109.5]), unless a Handoff names another; in a clause, what its active Subject names: a Player
+or Permanent, a spell or ability ("<ability> triggers"), or an effect ("this effect doesn't
+remove this Aura").
 
 **Handoff**:
 `instruct(subject, action)`: an Action making a named Player or Permanent the Actor of the
