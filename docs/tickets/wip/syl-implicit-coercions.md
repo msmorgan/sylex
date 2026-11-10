@@ -48,10 +48,13 @@ bare integers; with the coercions declared first, each writes them once, as prin
 
 ## Open questions
 
-- Whether `cargo xtask dsl fmt` collapses an explicit wrap a coercion would supply. The formatter
-  reads one file's syntax and resolves no sort, and the wrap is not visible in the syntax:
-  `subtype(goblin)` is the `NounWord` primitive at a head noun and the `TextWord` primitive in a
-  text change, and only the expected sort tells them apart.
+- Whether anything normalizes an explicit wrap a coercion would supply. `sylex_syl`'s formatter
+  cannot: it reads one file's syntax and resolves no sort, and `subtype(goblin)` is the `NounWord`
+  primitive at a head noun and the `TextWord` primitive in a text change. `cargo xtask dsl fmt`
+  could resolve the bundles with the xtask resolver and collapse each wrap, as the respell script
+  does once. `cargo xtask dsl check` cannot refuse the wrapped form without making the primitive
+  uncallable at its to-sort, which the Design rules out. Without either, both spellings stay valid
+  and nothing normalizes them.
 
 ## Done when
 

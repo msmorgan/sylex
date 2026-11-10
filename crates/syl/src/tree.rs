@@ -127,11 +127,11 @@ pub struct Declaration {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Shape {
     /// `kind name(params): Sort = Constructor { fields }`, every part after
-    /// the name optional, or the same with no name, `kind(params): Sort {
-    /// fields }`.
+    /// the name optional, or the same with no name,
+    /// `kind(params): Sort { fields }`.
     Header(Header),
-    /// `kind value`, such as `card singleFaced({ ... })` or `card split({ ...
-    /// })`.
+    /// `kind value`, such as `card singleFaced({ ... })` or
+    /// `card split({ ... })`.
     Value(Value),
 }
 

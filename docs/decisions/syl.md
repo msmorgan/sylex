@@ -64,11 +64,12 @@ location is not stated by the declaration, and it can disagree with what the dec
   (§3), and every other wrap into another sort is a primitive or a Template written at the call
   site, `actor(…)` included. A coercion is a declaration with no name,
   `coercion(type: CardType): NounWord { body = type($type) }`: its one parameter's sort reaches its
-  result sort through a primitive at that sort, so it builds no constructor of its own, and the
-  primitive stays callable. There are three: a card type and a subtype stand at `NounWord`
-  (through `type` and `subtype`), and an integer at `Amount` (through `lit`). The corpus writes
-  each such term bare, as printed (`creature`, `goblin`, `3`). Everything else is
-  written: a color word is a `Color`, and a `ColorOrColorless` or a mana symbol wraps it; a mana
+  result sort through a primitive at that sort, so it builds no constructor of its own. There are
+  three: a card type and a subtype stand at `NounWord`
+  (through `type` and `subtype`), and an integer at `Amount` (through `lit`). The bare form, as
+  printed (`creature`, `goblin`, `3`), is the corpus's spelling of each such term; the wrapped
+  primitive stays callable, and `cargo xtask dsl check` accepts both. Everything else is written:
+  a color word is a `Color`, and a `ColorOrColorless` or a mana symbol wraps it; a mana
   symbol is always written (`pip`, `colorlessPip`, `generic`), since a color word is not a mana
   symbol. Mana-symbol wrappers are Templates over primitive chains. Why: a conversion hides which
   word was meant, so the language keeps only those whose word cannot be mistaken, and §3 refuses
@@ -103,17 +104,17 @@ sort `T`, a value resolves in constant time, with no backtracking, in this order
 3. if `T` is `Option(U)`, the value at `U`, by steps 2 to 4;
 4. a coercion into `T` (below).
 
-A word that names no declaration at `T`, and that no coercion reaches `T` from, is refused; no word reaches a constructor except through
-its primitive (§1). A declaration's kind may declare its name at a second sort: an `ability`
-declaration is also its keyword's `KeywordLabel`, so a keyword is named bare where a label is
-expected (`byKeyword(kicker)`). That is a second declaration, not a conversion; the keyword's
-term is written `theKeyword(kicker)`. A Primitive Keyword Ability has no `ability` declaration
-([`semantics.md`](./semantics.md) §3): its label is a primitive at `KeywordLabel` with no
-parameters that builds the constructor its own name capitalizes (`primitive firstStrike:
-KeywordLabel = FirstStrike`), the only `KeywordLabel` constructor a primitive may build, and a
-Template at `Ability` of the same name wraps the label (`primitiveKeyword(firstStrike)`).
-`sylex_syl::check` refuses a word that names no declaration at any sort; the resolver refuses one
-that names none at `T`.
+A word that names no declaration at `T`, and that no coercion reaches `T` from, is refused; no
+word reaches a constructor except through its primitive (§1). A declaration's kind may declare its
+name at a second sort: an `ability` declaration is also its keyword's `KeywordLabel`, so a keyword
+is named bare where a label is expected (`byKeyword(kicker)`). That is a second declaration, not a
+conversion; the keyword's term is written `theKeyword(kicker)`. A Primitive Keyword Ability has no
+`ability` declaration ([`semantics.md`](./semantics.md) §3): its label is a primitive at
+`KeywordLabel` with no parameters that builds the constructor its own name capitalizes
+(`primitive firstStrike: KeywordLabel = FirstStrike`), the only `KeywordLabel` constructor a
+primitive may build, and a Template at `Ability` of the same name wraps the label
+(`primitiveKeyword(firstStrike)`). `sylex_syl::check` refuses a word that names no declaration at
+any sort; the resolver refuses one that names none at `T`.
 
 **Optional positions.** A value at an `Option(T)` position is written as a `T`, `some` is never
 written, and an omitted argument or field takes its declared default. A coercion into `T` applies
@@ -126,7 +127,9 @@ another coercion goes into, and two coercions with the same from-sort and to-sor
 to-sort `T`, Reaches(`T`) is `T` together with every from-sort of a coercion into `T`. A word
 declared at two sorts of Reaches(`T`) is refused: at both `CardType` and `Subtype`, or at
 `NounWord` beside a card type of the same name, so a direct declaration never silently shadows a
-coercion. A literal that stands at two sorts of Reaches(`T`) is refused likewise: an integer when
+coercion. For the same reason a word declared at `Option(T)` and at a from-sort of a coercion into
+`T` is refused, since at an `Option(T)` position the first is found before the coercion is tried.
+A literal that stands at two sorts of Reaches(`T`) is refused likewise: an integer when
 `Int` and `Nat` both reach `T`, a record when two record sorts do, a list when two list sorts do.
 These checks run at load, across the whole registry, so a latent collision fails before any call
 site writes the word. A word at a sort outside every Reaches set, such as `snow` at `Supertype` and
