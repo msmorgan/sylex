@@ -29,7 +29,7 @@ write a once-per-entity rule on a counter or a keyword.
 
 | Where | Enabled |
 |---|---|
-| `card_type` `confers`: `artifact`, `battle`, `creature`, `enchantment`, `instant`, `land`, `planeswalker`, `sorcery` (`kindred` has none) | per holder |
+| `card_type` `confers`: `artifact`, `battle`, `creature`, `enchantment`, `instant`, `land`, `planeswalker`, `sorcery` (`dungeon` and `kindred` have none) | per holder |
 | `subtype` `confers`: `aura`, `equipment`, `fortification`, `saga`, `siege` | per holder |
 | `supertype` `confers`: `legendary`, `world` (`basic` and `snow` have none) | per holder |
 | `designation` `confers`: `monarch`, `initiative` | per holder |
@@ -39,7 +39,7 @@ write a once-per-entity rule on a counter or a keyword.
 | `conferral phasingTurnBased` (`scope = isPermanent`) | per permanent |
 | `conferral playerDamageLifeLoss` (`scope = isPlayer`) | per player |
 | `conferral toxicPoison` (`scope = and([isCreature, hasKeyword(theKeyword(toxic))])`) | per creature with toxic |
-| `conferral foretoldCardLook`, `conferral plottedCardCast` (foretold or plotted cards in exile) | per such card |
+| `conferral foretoldCardCast`, `conferral foretoldCardLook`, `conferral plottedCardCast` (foretold or plotted cards in exile) | per such card |
 
 A counter's `confers` can only be per counter, so a rule the CR gives "one or more" counters
 cannot be written on its counter: it would be enabled once per counter. Shield, stun and finality

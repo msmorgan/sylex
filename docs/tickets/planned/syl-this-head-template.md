@@ -21,11 +21,8 @@ object" (changeling's "This object is every creature type" [CR#702.73a]). `chang
 It lands after `syl-printed-it-self-references`, which rewrites about 99 of the same call sites
 to `it`, so those sites are rewritten once and the two tickets never edit them in parallel.
 
-Its `this<Head>` sites also sit in calls three tickets rewrite first: `syl-argument-naming`
-(83 arguments it names or unnames, in 79 files), `syl-condition-first-static` (the
-condition-first statics, such as *Guardian Beast*'s `is(thisCreature, isUntapped)`) and
-`syl-lookback-point-from-trigger` (the `move` and `putIntoFromBattlefield` calls it respells,
-such as `aura.syl`'s state-based row and *Rancor*'s trigger).
+Its `this<Head>` sites also sit in calls `syl-argument-naming` rewrites first (83 arguments it
+names or unnames, in 79 files).
 
 With the card-type and subtype coercions of `syl-implicit-coercions`, a caller passes such a head
 bare (`creature`, `aura`), so that ticket lands first.
