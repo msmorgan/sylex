@@ -53,8 +53,10 @@ pub struct Secondary {
 /// The constructors of a sort that no primitive builds.
 #[derive(Debug, Clone, Copy)]
 pub enum Reserves {
-    /// Every one: only declarations of the kind build the sort.
-    All,
+    /// Every one but a label: the constructor a primitive with no parameters
+    /// names after itself, capitalized (`primitive firstStrike: KeywordLabel =
+    /// FirstStrike`), which declares a Primitive Keyword Ability's label.
+    AllButLabels,
     /// Only these; the sort's other constructors have primitives.
     Only(&'static [&'static str]),
 }
@@ -166,7 +168,7 @@ pub const KINDS: &[Kind] = &[
         secondary: Some(Secondary {
             sort: "KeywordLabel",
             unless: &[],
-            reserves: Reserves::All,
+            reserves: Reserves::AllButLabels,
         }),
         ..kind(
             "ability",
@@ -239,25 +241,36 @@ const EXPANSION_CONSTRUCTORS: &[(Option<&str>, &str)] = &[
     (Some("Ability"), "Keyword"),
 ];
 
-/// The reserved constructor a primitive at `sort` naming `constructor`
-/// builds, as `Sort.Constructor`: one only expansion writes, or any
-/// constructor of a catalog kind's sort, or one a second sort reserves.
+/// The reserved constructor the primitive `name`, with `params` parameters,
+/// builds at `sort` by naming `constructor`, as `Sort.Constructor`: one only
+/// expansion writes, or any constructor of a catalog kind's sort, or one a
+/// second sort reserves.
 #[must_use]
-pub fn reserved(sort: &str, constructor: &str) -> Option<String> {
+pub fn reserved(name: &str, params: usize, sort: &str, constructor: &str) -> Option<String> {
     let expansion = EXPANSION_CONSTRUCTORS
         .iter()
-        .any(|(at, name)| *name == constructor && at.is_none_or(|at| at == sort));
+        .any(|(at, word)| *word == constructor && at.is_none_or(|at| at == sort));
+    let label = params == 0 && is_capitalized(name, constructor);
     let declared = KINDS.iter().any(|kind| {
         (kind.catalog && kind.sort == Some(sort))
             || kind.secondary.is_some_and(|secondary| {
                 secondary.sort == sort
                     && match secondary.reserves {
-                        Reserves::All => true,
+                        Reserves::AllButLabels => !label,
                         Reserves::Only(names) => names.contains(&constructor),
                     }
             })
     });
     (expansion || declared).then(|| format!("{sort}.{constructor}"))
+}
+
+/// Whether `constructor` is `name` with its first letter capitalized.
+fn is_capitalized(name: &str, constructor: &str) -> bool {
+    let mut chars = name.chars();
+    chars.next().is_some_and(|first| {
+        let capitalized: String = first.to_uppercase().chain(chars).collect();
+        capitalized == constructor
+    })
 }
 
 /// Temporary: the one file that may declare a primitive building a reserved

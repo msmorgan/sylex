@@ -321,8 +321,12 @@ fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
         };
         let mut ring_only = false;
         if let Some(constructor) = named.constructor
-            && let Some(reserved) =
-                schema::reserved(&decl.sort.to_string(), constructor.ident.as_str())
+            && let Some(reserved) = schema::reserved(
+                name,
+                decl.params.len(),
+                &decl.sort.to_string(),
+                constructor.ident.as_str(),
+            )
         {
             ring_only = decl.ring && reserved == schema::RING_EXCEPTION.1;
             if !ring_only {

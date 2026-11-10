@@ -581,7 +581,39 @@ fn only_the_deed_constructor_an_action_writes_is_reserved_at_deed() {
     );
 }
 
-const RING: &str = "primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope\n\
+/// A Primitive Keyword Ability's label is a primitive at `KeywordLabel` that
+/// builds the constructor its own name capitalizes, with no parameters; it
+/// stands where a label is expected, as an `ability` declaration's does.
+#[test]
+fn a_keyword_label_primitive_builds_only_its_own_name() {
+    assert_eq!(
+        kinds(
+            "primitive firstStrike: KeywordLabel = FirstStrike\n\
+             ability flying { }\n\
+             template a: KeywordLabel { body = firstStrike }\n\
+             template b: KeywordLabel { body = flying }"
+        ),
+        []
+    );
+    assert_eq!(
+        kinds(
+            "primitive firstStrike: KeywordLabel = Strike\n\
+             primitive trample(over: String): KeywordLabel = Trample\n\
+             ability flying { }\n\
+             primitive flying: KeywordLabel = Flying"
+        ),
+        [
+            RefusalKind::ReservedConstructor(s("KeywordLabel.Strike")),
+            RefusalKind::ReservedConstructor(s("KeywordLabel.Trample")),
+            RefusalKind::DuplicateDeclaration {
+                name: s("flying"),
+                sort: s("KeywordLabel")
+            },
+        ]
+    );
+}
+
+const RING: &str ="primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope\n\
                     primitive nothing: Action = Nothing\n\
                     action theRingTemptsYou { body = ownScope(theRingTemptsYou, nothing) }";
 
