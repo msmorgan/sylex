@@ -4,7 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       static(
-        ifSo(
+        if(
           and([
               exists(and([isLand, hasSubtype(island), anOpponentControls])),
               exists(and([isLand, hasSubtype(mountain), youControl]))]),

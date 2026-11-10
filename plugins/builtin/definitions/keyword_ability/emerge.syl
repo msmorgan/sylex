@@ -13,7 +13,7 @@ ability emerge(cost: Cost) {
           thisSpell,
           altCost = payingInstead(compound([$cost, perform(sacrifice(a(isCreature)))]))))),
     static(
-      ifSo(
+      if(
         keywordCostPaid(emerge, thisSpell),
         costShift(
           thisSpell,

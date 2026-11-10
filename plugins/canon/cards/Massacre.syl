@@ -4,7 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       static(
-        ifSo(
+        if(
           and([
               exists(and([isLand, hasSubtype(plains), anOpponentControls])),
               exists(and([isLand, hasSubtype(swamp), youControl]))]),

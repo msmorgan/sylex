@@ -4,7 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       static(
-        ifSo(
+        if(
           exists(and([isLand, hasSubtype(swamp), youControl])),
           altCost(payingInstead(perform(payLife(2))), this))),
       spell(get(target(isCreature), up(2), up(0), untilEndOfTurn))]})

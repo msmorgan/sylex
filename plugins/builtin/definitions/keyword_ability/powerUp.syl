@@ -8,7 +8,7 @@ ability powerUp(ability: Ability) {
   body = [
     qualified($ability, limit = oncePerObject),
     static(
-      ifSo(
+      if(
         did(actor(thisPermanent), enter, within(soFarThisTurn)),
         reducedBySymbols(thisAbility, manaCostOf(thisPermanent))))]
 }

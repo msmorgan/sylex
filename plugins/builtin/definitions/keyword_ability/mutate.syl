@@ -11,7 +11,7 @@ ability mutate(cost: Cost) {
   body = [
     static(altCost(payingInstead($cost), this)),
     static(
-      ifSo(
+      if(
         choiceWasTaken(byKeyword(mutate), thisSpell),
         addsTarget(
           thisSpell,

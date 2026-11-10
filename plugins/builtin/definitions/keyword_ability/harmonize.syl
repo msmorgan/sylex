@@ -19,7 +19,7 @@ ability harmonize(cost: Cost) {
                 perform(
                   tap(counted(upTo(1), and([isUntapped, and([isCreature, youControl])]))))]))))),
     static(
-      ifSo(
+      if(
         keywordCostPaid(harmonize, thisSpell),
         costShift(
           thisSpell,
