@@ -1,0 +1,22 @@
+card singleFaced({
+    name = "Plaza of Heroes",
+    types = [land],
+    text = [
+      activated(tapSymbol, addMana(symbols([colorlessPip]))),
+      activated(
+        tapSymbol,
+        addMana(
+          counted(1, ofAnyColor(sameColor)),
+          [spendOnly([toCast(and([hasSupertype(legendary), isSpell]))])])),
+      activated(
+        tapSymbol,
+        addMana(
+          counted(
+            1,
+            ofAnyColorAmong(allOf(and([hasSupertype(legendary), isPermanent, youControl])))))),
+      activated(
+        compound([mana([generic(3)]), tapSymbol, perform(exile(thisLand))]),
+        gain(
+          target(and([hasSupertype(legendary), isCreature])),
+          [hexproof, indestructible],
+          untilEndOfTurn))]})
