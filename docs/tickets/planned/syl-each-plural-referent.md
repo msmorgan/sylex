@@ -1,5 +1,5 @@
 ---
-needs: [syl-single-face-card-call, cleanup-step6-spine]
+needs: [syl-single-face-card-call, cleanup-step6-spine, syl-number-snapshot]
 ---
 
 # "Each" and the referent it introduces
@@ -26,6 +26,7 @@ Written against the spine (`cleanup-step6-spine`).
   as settled; the landing lists the verbs changed.
 - `docs/decisions/semantics.md` states the rule.
 - Declaration order stays the printed order (`syl.md` §5).
+- The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers

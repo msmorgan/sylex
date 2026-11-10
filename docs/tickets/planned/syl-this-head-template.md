@@ -1,5 +1,5 @@
 ---
-needs: [syl-printed-it-self-references, syl-argument-naming, syl-condition-first-static, syl-lookback-point-from-trigger, syl-single-face-card-call, syl-implicit-coercions]
+needs: [syl-printed-it-self-references, syl-argument-naming, syl-condition-first-static, syl-lookback-point-from-trigger, syl-single-face-card-call, syl-implicit-coercions, syl-number-snapshot]
 ---
 
 # One `this(head)` Template replaces the 21 `this<Head>` Templates
@@ -35,6 +35,7 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
   uses it with the head its text prints; where a caller writes `thisSpell`, `thisPermanent` or
   bare `this`, it now matches the printed words.
 - Declaration order stays the printed order (`syl.md` §5).
+- The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope

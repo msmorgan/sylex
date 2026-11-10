@@ -1,5 +1,5 @@
 ---
-needs: [syl-single-face-card-call, cleanup-step6-spine]
+needs: [syl-single-face-card-call, cleanup-step6-spine, syl-number-snapshot]
 ---
 
 # Each concept modeled one way
@@ -20,6 +20,7 @@ Written against the spine (`cleanup-step6-spine`).
   made Templates over it, with every caller in `plugins/` updated; a form kept separate states why
   in its doc comment.
 - Declaration order stays the printed order (`syl.md` §5).
+- The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope

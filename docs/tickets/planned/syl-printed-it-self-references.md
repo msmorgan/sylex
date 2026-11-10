@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine]
+needs: [cleanup-step6-spine, syl-number-snapshot]
 ---
 
 # Write `it` wherever the card prints "it"
@@ -24,6 +24,7 @@ Written against the spine (`cleanup-step6-spine`).
   beside the Oracle text it stands for (`data/mtgjson/AllPrintings.sqlite`), and the landing
   reports the count changed and any site where the printed word is ambiguous.
 - Whether each `it` resolves to the card is not checkable until reference resolution exists.
+- The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope

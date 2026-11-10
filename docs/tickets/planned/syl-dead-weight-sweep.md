@@ -1,5 +1,5 @@
 ---
-needs: [syl-result-reads, syl-one-declaration-per-keyword, syl-ability-words-once, syl-this-head-template, syl-spelling-optional-segments, syl-one-deed-per-keyword-action, cleanup-step6-constructs-and-cards, cleanup-step6-rules-and-keywords, cleanup-step6-deeds]
+needs: [syl-result-reads, syl-one-declaration-per-keyword, syl-ability-words-once, syl-this-head-template, syl-spelling-optional-segments, syl-one-deed-per-keyword-action, cleanup-step6-constructs-and-cards, cleanup-step6-rules-and-keywords, cleanup-step6-deeds, syl-number-snapshot]
 ---
 
 # Delete `.syl` declarations nothing needs
@@ -38,6 +38,7 @@ declarations.
   landing lists each.
 - `manifestPlacement` is gone, and nothing names it.
 - Declaration order stays the printed order (`syl.md` §5).
+- The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers

@@ -1,5 +1,5 @@
 ---
-needs: [syl-parameter-sigil, lean-retirement, syl-spelling-optional-segments, syl-misnamed-declarations]
+needs: [syl-parameter-sigil, lean-retirement, syl-spelling-optional-segments, syl-misnamed-declarations, syl-number-snapshot]
 ---
 
 # Settle the `spelling` conventions and apply them to the corpus
@@ -44,6 +44,7 @@ Two narrower tickets rewrite spellings this ticket also normalizes, and land fir
 - The corpus means the same before and after the rewrite: a one-off script, kept in
   `docs/evidence/`, checks that every declaration's tree is unchanged apart from its `spelling`
   and comments, and the landing reports the declaration count it compared.
+- The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope

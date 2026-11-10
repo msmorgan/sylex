@@ -1,5 +1,5 @@
 ---
-needs: [syl-at-turn-point, cleanup-step6-spine]
+needs: [syl-at-turn-point, cleanup-step6-spine, syl-number-snapshot]
 ---
 
 # Spellings with optional and repeated parts
@@ -28,6 +28,7 @@ Written against the spine (`cleanup-step6-spine`).
 - The near-duplicate Template families that differed only by such a segment are each one
   Template; the landing lists the merges.
 - Declaration order stays the printed order (`syl.md` §5).
+- The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p sylex_syl` and
   `cargo test -p xtask` pass.
 
