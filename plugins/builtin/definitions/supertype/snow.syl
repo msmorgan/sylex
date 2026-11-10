@@ -1,0 +1,10 @@
+# Snow: a supertype [CR#205.4a]. A permanent with it is a snow permanent, and a permanent without
+# it a nonsnow permanent [CR#205.4g].
+#
+# [CR#107.4h] Paying {S} with mana from a snow source belongs to the {S} symbol (`snow` at
+# `ManaSymbol`), not to the supertype.
+supertype snow {
+  lexical = {lemma = "snow"},
+  spelling = "snow",
+  name = "Snow"
+}

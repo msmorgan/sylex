@@ -1,0 +1,10 @@
+# Basic: a supertype [CR#205.4a]. A land with it is a basic land, and a land without it a nonbasic
+# land [CR#205.4c].
+#
+# [CR#100.2a] The deck-construction exception for basic land cards belongs to the deck limit, not
+# to the supertype.
+supertype basic {
+  lexical = {lemma = "basic"},
+  spelling = "basic",
+  name = "Basic"
+}

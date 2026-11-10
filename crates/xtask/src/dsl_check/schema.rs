@@ -19,9 +19,9 @@ pub struct Kind {
     pub fields: &'static [FieldSpec],
     /// A second sort its name is declared at (`syl.md` §3).
     pub secondary: Option<Secondary>,
-    /// A catalog declaration (a counter, designation, subtype, card type or
-    /// relation) is registered before any body is read, so a reference to
-    /// one is no dependency edge.
+    /// A catalog declaration (a counter, designation, subtype, card type,
+    /// supertype or relation) is registered before any body
+    /// is read, so a reference to one is no dependency edge.
     pub catalog: bool,
     /// When the block writes none of `fields`, it writes the fields of the
     /// kind's record sort directly.
@@ -233,6 +233,11 @@ pub const KINDS: &[Kind] = &[
             field("stats", "List(Stat)"),
             CONFERS,
         ],
+    ),
+    catalog(
+        "supertype",
+        "Supertype",
+        &[field("name", "String"), CONFERS],
     ),
     catalog("relation", "RelationLabel", &[]),
     rules_row("token", "DefinedToken"),

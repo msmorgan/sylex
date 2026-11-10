@@ -1,3 +1,0 @@
-primitive snow: Supertype = Snow {
-  spelling = "snow"
-}

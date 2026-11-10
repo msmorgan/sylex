@@ -1,0 +1,6 @@
+# World: a supertype [CR#205.4a].
+supertype world {
+  lexical = {lemma = "world"},
+  spelling = "world",
+  name = "World"
+}

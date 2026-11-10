@@ -1,0 +1,6 @@
+# Legendary: a supertype [CR#205.4a].
+supertype legendary {
+  lexical = {lemma = "legendary"},
+  spelling = "legendary",
+  name = "Legendary"
+}

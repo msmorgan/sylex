@@ -1,3 +1,0 @@
-primitive world: Supertype = World {
-  spelling = "world"
-}

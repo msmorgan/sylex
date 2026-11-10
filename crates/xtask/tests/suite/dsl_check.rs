@@ -312,6 +312,39 @@ fn a_card_type_without_permanent_type_is_refused() {
     );
 }
 
+/// A supertype is a catalog declaration, as a card type is: it declares its
+/// name at `Supertype`, where no primitive builds a constructor, and its block
+/// holds only a supertype's fields [CR#205.4a].
+#[test]
+fn a_supertype_is_a_catalog_declaration() {
+    assert_eq!(
+        refusals(&[(
+            "a.syl",
+            "primitive yes: Predicate = Yes\n\
+             primitive has(supertype: Supertype): Predicate = HasSupertype\n\
+             supertype legendary { name = \"Legendary\", confers = [] }\n\
+             supertype basic\n\
+             supertype world { permanentType = yes }\n\
+             primitive snow: Supertype = Snow\n\
+             template t: Predicate { body = has(legendary) }"
+        )]),
+        [
+            (RefusalKind::MissingBlock(s("supertype")), s("basic")),
+            (
+                RefusalKind::ReservedConstructor(s("Supertype.Snow")),
+                s("Snow")
+            ),
+            (
+                RefusalKind::UnknownField {
+                    field: s("permanentType"),
+                    at: s("`supertype` world")
+                },
+                s("permanentType")
+            ),
+        ]
+    );
+}
+
 #[test]
 fn a_rules_row_writes_a_body_or_its_record_fields() {
     let preamble = "primitive yes: Predicate = Yes\n\
@@ -1110,7 +1143,7 @@ fn a_word_at_two_sorts_no_coercion_joins_is_no_ambiguity() {
     // target.
     let source = format!(
         "{COERCIONS}\
-         primitive snow: Supertype = Snow\n\
+         supertype snow {{ name = \"Snow\" }}\n\
          primitive snowPip: ManaSymbol = Snow\n\
          template snow: ManaSymbol {{ body = snowPip }}"
     );
