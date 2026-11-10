@@ -8,8 +8,8 @@ needs: [syl-primitive-constructors, syl-single-face-card-call]
 
 After `syl-primitive-constructors`, `.syl` has no implicit conversions besides `Option`
 (`docs/decisions/syl.md` §2): a value of one sort reaches a position of another only through a
-wrapper written at the call site. A card type at a head noun is reached through eight one-line
-Templates (`templates/noun/{artifact,battle,creature,enchantment,instant,kindred,land,sorcery}.syl`,
+wrapper written at the call site. A card type at a head noun is reached through nine one-line
+Templates (`templates/noun/{artifact,battle,creature,enchantment,instant,kindred,land,planeswalker,sorcery}.syl`,
 each `type(<card type>)`), a subtype only through a written `subtype(…)`, and an integer at
 `Amount` only through a written `lit(…)`. `syl.md` §2 leaves room for conversions to return
 deliberately once the language is simple enough.
@@ -51,8 +51,8 @@ bare integers; with the coercions declared first, each writes them once, as prin
 
 - The `coercion` kind is in `cargo xtask dsl check`, and in `sylex_syl`'s parser if a nameless
   declaration needs it; the three coercions are declared under `plugins/builtin/`.
-- The eight head-noun Templates
-  `templates/noun/{artifact,battle,creature,enchantment,instant,kindred,land,sorcery}.syl` are
+- The nine head-noun Templates
+  `templates/noun/{artifact,battle,creature,enchantment,instant,kindred,land,planeswalker,sorcery}.syl` are
   deleted, and their callers resolve through the coercion unchanged.
 - Negative tests refuse, each at load with no call site writing the word: a word declared at two
   from-sorts of one coercion target (`CardType` and `Subtype` into `NounWord`); a word declared
