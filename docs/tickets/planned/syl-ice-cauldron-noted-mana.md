@@ -26,6 +26,8 @@ reads a noted amount, and no way to say "the last card exiled with this artifact
   activation restriction and "Spend this mana only to cast the last card exiled with this
   artifact", whose `toCast` takes the noun phrase `syl-tocast-noun-phrase` allows. If a step does
   not resolve, the refusal is reported rather than worked around with a raw constructor.
+- `ofTheLastNotedType`'s spelling prints the `subject` it takes, as the card does ("Add this
+  artifact's last noted type and amount of mana"); today it is "mana of the last noted type".
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 

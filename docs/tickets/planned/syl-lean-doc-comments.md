@@ -21,6 +21,11 @@ Many doc comments under `plugins/` still speak Lean:
   use `firstMention` / `laterMention`, which `.syl` cannot write; expansion decides first mentions
   (`syl.md` §4).
 
+- Repeated citations: 206 comment lines are a bare citation that repeats only rules the same
+  comment already cites, as `templates/turn_point/endOfCombat.syl`'s `# [CR#511.2]` under
+  "abilities that trigger "at end of combat" trigger as the end of combat step begins
+  [CR#511.2]".
+
 A reader is pointed at names and syntax that exist in no current source.
 
 `syl-misnamed-declarations` renames `modifiesPrecedingAction`, which
@@ -34,6 +39,8 @@ and lands first.
   cannot write. Each such comment says
   the same thing in `.syl` declaration names and printed words, or, where it said nothing the
   declaration does not already state (a bare "Authoring primitive for …"), is deleted.
+- No comment line is a bare citation of rules its comment already cites; a bare citation line
+  that is a comment's only citation of a rule is folded into the sentence it supports.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass;
   `cargo xtask cite check --list-noncompliant` is empty and `cargo xtask cite check` reports
   0 stale.

@@ -29,7 +29,11 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
   reordered to match, with its call sites in `plugins/` updated. Cases found so far (re-survey
   when claimed): the trigger templates `when`, `whenever` and `at` (the intervening `if` is
   printed before the action), `gatedBy` and `staticSpecGatedBy` (the cost is printed last), and
-  the `preventDamage`, `removeCounters`, `vote` and `pay` families.
+  the `preventDamage`, `removeCounters`, `vote` and `pay` families, and those whose `spelling`
+  prints a Hole before an earlier parameter's: `markDamage`, `headed`, `half`,
+  `abilityGrantSelected`, `devourEntry`, `createTappedToken`, `delayUnlessPaid`, `doUnless`,
+  `repeatTimes`, `timesPaid`, `choiceWasTaken`, `keywordCostPaid`, `withTotal`, `beforePart` and
+  `duringPart`.
 - `doIf` has no `postposed` parameter; `doOnlyIf` ("<action> if <condition>") says the printed
   order itself, and what the flag changed for reference resolution is kept by that order. That
   equivalence is not checkable until reference resolution exists; the landing lists every former
