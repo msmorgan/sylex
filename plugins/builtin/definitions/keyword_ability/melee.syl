@@ -7,14 +7,8 @@ ability melee {
   body = [
     whenever(
       does(actor(thisCreature), attack),
-      get(
+      getsBoth(
         thisCreature,
-        up(
-          forEach(
-            lit(1),
-            and([
-                isOpponent,
-                did(actor(you), attackWith(a(isCreature), which), within(thisCombat))]))),
         up(
           forEach(
             lit(1),
