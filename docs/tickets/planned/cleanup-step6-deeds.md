@@ -1,5 +1,5 @@
 ---
-needs: [syl-fight-both-performers, syl-one-deed-per-keyword-action, syl-ring-tempts-you-raw-scope, syl-single-use-as-though]
+needs: [syl-core-deeds-out-of-keyword-actions, syl-fight-both-performers, syl-one-deed-per-keyword-action, syl-ring-tempts-you-raw-scope, syl-single-use-as-though]
 ---
 
 # Step 6 middle: Deeds
@@ -12,10 +12,11 @@ It runs in parallel with the other two middle stages. Later stages write against
 ## Done when
 
 - Every ticket in its `needs:` is in `done/`.
-- A checkpoint pass over the `action` declarations under
-  `plugins/builtin/definitions/keyword_action/` and the keyword abilities that perform a Deed
-  finds Deed handling still shaped by Lean: a Deed named or matched by a `deed = "…"` label string,
+- A checkpoint pass over the keyword actions under `plugins/builtin/definitions/keyword_action/`
+  and every Deed, the ones keyword abilities perform included (their other rules are the
+  rules-and-keywords checkpoint's), finds Deed handling still shaped by Lean: a Deed named or matched by a `deed = "…"` label string,
   one keyword action declared once per printed variant under a shared label, a bodiless primitive
   standing in for a Deed, a scope written by hand, or a doc comment that names a generated
   wrapper. Each one found is fixed in the checkpoint's own landing or ticketed, and the landing
   lists them.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.

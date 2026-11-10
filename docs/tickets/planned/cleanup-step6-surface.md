@@ -1,5 +1,5 @@
 ---
-needs: [syl-become-replaces-types, syl-concepts-modeled-twice, syl-core-deeds-out-of-keyword-actions, syl-each-plural-referent, syl-numeric-anaphors, syl-printed-read-order, syl-pronoun-swallowing-templates, syl-spelling-conventions, syl-this-head-template, syl-zone-words]
+needs: [syl-become-replaces-types, syl-concepts-modeled-twice, syl-each-plural-referent, syl-lean-doc-comments, syl-numeric-anaphors, syl-printed-read-order, syl-pronoun-swallowing-templates, syl-spelling-conventions, syl-this-head-template, syl-zone-words]
 ---
 
 # Step 6 surface: how `.syl` reads
@@ -17,5 +17,8 @@ Later stages write against it.
   `TODO(spelling)` markers, argument naming and order, self-references, zone words, plural and
   numeric referents) finds what is still shaped by Lean: a name bent around a Lean keyword, a
   spelling or doc comment that carries generated text, a pronoun resolved by hand, or a Template
-  twinned by plurality where discourse should decide. Each one found is fixed in the
+  that writes an anaphor inside it and so fixes a number its call site should print. Number
+  itself stays in the tree as `Plurality`, and the closed-class pronoun pairs (`it`/`them`,
+  `that`/`those` and the others) are kept. Each one found is fixed in the
   checkpoint's own landing or ticketed, and the landing lists them.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.

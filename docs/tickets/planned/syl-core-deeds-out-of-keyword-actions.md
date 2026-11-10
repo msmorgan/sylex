@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-lean-doc-comments]
+needs: [syl-explicit-deeds, syl-lean-doc-comments]
 ---
 
 # Core-rules Deeds out of `keyword_action/`
@@ -11,19 +11,16 @@ CR's keyword actions are the ones the CR lists [CR#701.1], and resolve is not am
 resolving is the core procedure [CR#608]. `resolve.syl` is a core-rules Deed filed as a
 keyword action, so the folder tells a reader something false about it.
 
-`syl-lean-doc-comments` rewrites `resolve.syl`'s doc comment, and lands first so the file is
-edited before it moves.
-
-## Open questions
-
-- The folder the core-rules Deeds move to.
+Which declaration kind and folder a Deed lives in is settled by `syl-explicit-deeds`, which lands
+first. `syl-lean-doc-comments` rewrites `resolve.syl`'s doc comment, and lands first so the file
+is edited before it moves.
 
 ## Done when
 
-- Every file in `keyword_action/` is checked against that list, and the landing lists
-  each file that is not a keyword action, its variant or its event.
-- `resolve.syl`, and any other core-rules Deed found, moves to its own folder; the landing lists
-  the files moved.
+- Every file in `keyword_action/` is checked against the keyword actions the CR's
+  keyword-action section defines [CR#701.1], and the landing lists each file that is not a keyword action, its variant or its event.
+- `resolve.syl`, and any other core-rules Deed found, moves to where `syl-explicit-deeds` settles
+  such Deeds live; the landing lists the files moved.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass;
   `cargo xtask cite check --list-noncompliant` is empty and `cargo xtask cite check` reports
   0 stale, after `cargo xtask cite bless` for newly cited rules.
