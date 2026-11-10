@@ -16,9 +16,6 @@ in the turn: "at the beginning of" a phase or step triggers when it begins [CR#6
 current `at` call is a `beginningOf…` event, one wrapped in `nthOccurrence` (*Paradox Haze*,
 "first upkeep each turn").
 
-`at.syl`'s parameter list is also rewritten by `syl-event-disjunction` (its `or` and `joins`
-parameters), which lands first.
-
 ## Done when
 
 - A turn-point sort covers the beginning of a phase or step with its possessor (your, each, a
@@ -27,7 +24,10 @@ parameters), which lands first.
 - `at` takes a turn point, is spelled "At <turn point>, <action>", and expands to the event the
   turn point denotes; there is still one triggered-ability constructor, because the CR treats a
   step's beginning as a trigger event [CR#603.2b]. Its spelling `TODO` is settled.
-- `when` and `whenever` refuse a turn point.
+- `when` and `whenever` refuse a turn point as their own header's event. A joined header may be
+  a turn-point header beside an event header, each `TriggerHeader` printing its own trigger
+  word: *Minsc & Boo, Timeless Heroes* ("When Minsc & Boo enters and at the beginning of your
+  upkeep, …") is writable.
 - Every `at` call in builtin and canon, and the delayed-trigger Templates that write "at the
   beginning of the next …" (`atNext`, `beginningOfNext`, `asThoughFlashSacrificedAtCleanup`), use
   the new argument.
