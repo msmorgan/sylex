@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       alsoForKeywords(
         at(
-          beginningOfPossessed(eachPlayer, combat),
+          beginningOfEach(combat),
           doOnlyIf(
             establishThroughout(
               keywordGrant(
