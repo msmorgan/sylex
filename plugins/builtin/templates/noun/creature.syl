@@ -1,4 +1,0 @@
-template creature: NounWord {
-  spelling = "creature",
-  body = type(creature)
-}

@@ -1,4 +1,0 @@
-template instant: NounWord {
-  spelling = "instant",
-  body = type(instant)
-}

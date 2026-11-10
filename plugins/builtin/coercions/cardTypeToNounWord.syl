@@ -1,0 +1,4 @@
+# A card type stands as a head noun: "creature" in "target creature".
+coercion(type: CardType): NounWord {
+  body = type($type)
+}

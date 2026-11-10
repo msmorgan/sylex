@@ -1,4 +1,0 @@
-template artifact: NounWord {
-  spelling = "artifact",
-  body = type(artifact)
-}

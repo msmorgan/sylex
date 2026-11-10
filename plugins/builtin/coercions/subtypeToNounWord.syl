@@ -1,0 +1,4 @@
+# A subtype stands as a head noun: "Goblin" in "target Goblin".
+coercion(subtype: Subtype): NounWord {
+  body = subtype($subtype)
+}

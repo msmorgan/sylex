@@ -1,0 +1,4 @@
+# An integer stands as an amount: "3" in "deals 3 damage".
+coercion(value: Int): Amount {
+  body = lit($value)
+}

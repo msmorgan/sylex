@@ -1,4 +1,0 @@
-template sorcery: NounWord {
-  spelling = "sorcery",
-  body = type(sorcery)
-}
