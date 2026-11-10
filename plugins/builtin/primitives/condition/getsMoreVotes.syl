@@ -1,0 +1,8 @@
+# "<label> gets more votes": the vote's choice `label` got more votes than the vote's other
+# choice, so a tie is not more votes [CR#701.38a]. It is not `compareAmt` over `votesFor`:
+# comparing with the rest of the ballot needs the other choices, which the text does not print.
+# No `Amount` reads the votes of a vote's other choices or the vote's total, and the number of
+# players is not that total, since a player may have several votes [CR#701.38d].
+primitive getsMoreVotes(label: String): Condition = GetsMoreVotes {
+  spelling = "<label> gets more votes"
+}

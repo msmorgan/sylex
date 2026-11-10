@@ -1,5 +1,5 @@
 ---
-needs: [syl-result-reads]
+needs: [syl-single-face-card-call]
 ---
 
 # No meaning carried by a `Bool` parameter
@@ -8,12 +8,9 @@ needs: [syl-result-reads]
 
 Several declarations say in a `Bool` what a typed construct or a separate declaration should say:
 `addedCost(cost, offered: Bool, …)`, `characteristics(values, typesAdded: Bool)` and
-`copyCharacteristics`, `voteLead(label, orTied: Bool)`, `bySymbols(…, coloredOnly: Bool)` and
-`lessBySymbols`, `whenSpentOn`'s `only`, `asCopyOf`'s `optional`, and `blocked(value: Bool)`. A
-call such as `addedCost(cost, true)` can't be read without the declaration.
-
-`syl-result-reads` decides whether `voteLead` stays, rewriting the same 6 calls in 3 files, and
-lands first.
+`copyCharacteristics`, `bySymbols(…, coloredOnly: Bool)` and `lessBySymbols`, `whenSpentOn`'s
+`only`, `asCopyOf`'s `optional`, and `blocked(value: Bool)`. A call such as `addedCost(cost, true)`
+can't be read without the declaration.
 
 ## Done when
 
@@ -34,7 +31,6 @@ lands first.
 
 `plugins/builtin/primitives/static/{addedCost,characteristics}.syl`,
 `plugins/builtin/templates/noun/copyCharacteristics.syl`,
-`plugins/builtin/primitives/condition/voteLead.syl`,
 `plugins/builtin/primitives/cost/bySymbols.syl`, `plugins/builtin/templates/cost/lessBySymbols.syl`,
 `plugins/builtin/primitives/mana/whenSpentOn.syl`,
 `plugins/builtin/primitives/zone/asCopyOf.syl`, `plugins/builtin/primitives/action/blocked.syl`.

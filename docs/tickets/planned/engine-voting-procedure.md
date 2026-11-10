@@ -11,8 +11,8 @@ votes casts them all when they would otherwise vote [CR#701.38d]. The effect the
 result. The engine has the decision's shape, `Vote { player, options }`
 (`crates/engine/src/decide/pending/choice.rs`), and the default strategy answers one, but nothing
 opens a vote and `Vote::resolve` is a `todo!()` naming this ticket. The `.syl` corpus already
-writes votes (`vote`, `voteStartingWith`, `votesFor`, `withMostVotes`, `voteLead`), for cards
-such as Council's Judgment, Coercive Portal and Ballot Broker.
+writes votes (`vote`, `voteStartingWith`, `votesFor`, `withMostVotes`, `getsMoreVotes`,
+`getsMoreVotesOrTied`), for cards such as Council's Judgment, Coercive Portal and Ballot Broker.
 
 ## Done when
 
@@ -31,5 +31,5 @@ such as Council's Judgment, Coercive Portal and Ballot Broker.
 - `plugins/builtin/definitions/keyword_action/vote.syl`, `voteStartingWith.syl`,
   `plugins/builtin/primitives/quantity/votesFor.syl`,
   `plugins/builtin/primitives/predicate/withMostVotes.syl`,
-  `plugins/builtin/primitives/condition/voteLead.syl`
+  `plugins/builtin/primitives/condition/getsMoreVotes.syl`, `getsMoreVotesOrTied.syl`
 - `plugins/canon/cards/Council's Judgment.syl`, `Coercive Portal.syl`, `Ballot Broker.syl`

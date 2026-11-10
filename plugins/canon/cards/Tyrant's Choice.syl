@@ -8,6 +8,6 @@ card singleFaced({
           sequentially([
               instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["death", "torture"]))),
               doIf(
-                voteLead("death", false),
+                getsMoreVotes("death"),
                 instruct(eachOpponent, sacrifice(aTheirChoice(isCreature)))),
-              doIf(voteLead("torture", true), instruct(eachOpponent, loseLife(lit(4))))])))]})
+              doIf(getsMoreVotesOrTied("torture"), instruct(eachOpponent, loseLife(lit(4))))])))]})
