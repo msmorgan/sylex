@@ -1,5 +1,5 @@
 ---
-needs: [syl-concepts-modeled-twice, syl-each-plural-referent, syl-lean-doc-comments, syl-numeric-anaphors, syl-printed-read-order, syl-spelling-conventions, syl-this-head-template, syl-underscore-file-names, syl-zone-words]
+needs: [syl-concepts-modeled-twice, syl-each-plural-referent, syl-lean-doc-comments, syl-numeric-anaphors, syl-printed-read-order, syl-pronoun-swallowing-templates, syl-spelling-conventions, syl-this-head-template, syl-underscore-file-names, syl-zone-words]
 ---
 
 # Step 6 surface: how `.syl` reads
@@ -19,8 +19,3 @@ Later stages write against it.
   spelling or doc comment that carries generated text, a pronoun resolved by hand, or a Template
   twinned by plurality where discourse should decide. Each one found is fixed in the
   checkpoint's own landing or ticketed, and the landing lists them.
-
-## Pointers
-
-- `plugins/builtin/templates/action/{destroyCantRegenerate,destroyPluralCantRegenerate}.syl`: one
-  printed sentence pair, twinned by the plurality of its fixed pronoun.
