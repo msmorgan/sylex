@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(3), pip(blue)],
     types = [creature],
     subtypes = [shapeshifter],
-    text = [static(enters(thisCreature, [asCopyOf(true, a(isCreature), [])]))],
+    text = [static(mayHaveEnter(thisCreature, [asCopyOf(a(isCreature), [])]))],
     power = lit(0),
     toughness = lit(0)})

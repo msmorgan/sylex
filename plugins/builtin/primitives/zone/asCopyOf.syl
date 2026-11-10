@@ -1,6 +1,4 @@
-# "[you may have it enter] as a copy of <source> [except …]"
+# "as a copy of <source> [except …]" [CR#614.1c,707.9]; `mayHaveEnter` makes the entering this
+# way optional ("you may have this creature enter as a copy of …").
 # TODO(spelling): Format and coordinate the exceptions list entries, including the empty case.
-primitive asCopyOf(
-  optional: Bool,
-  source: NounPhrase,
-  exceptions: List(CopyExcept)): MoveRider = AsCopyOf
+primitive asCopyOf(source: NounPhrase, exceptions: List(CopyExcept)): MoveRider = AsCopyOf

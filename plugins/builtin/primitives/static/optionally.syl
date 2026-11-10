@@ -1,0 +1,4 @@
+# A replacement that applies only if you choose, as the event would happen, to have it apply: "you
+# may have <subject> enter …". A choice an entering replacement requires is made before the
+# permanent enters [CR#614.12a].
+primitive optionally(body: Replacement): Replacement = Optionally
