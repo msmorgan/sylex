@@ -4,8 +4,5 @@ card singleFaced({
     types = [artifact],
     text = [
       static(
-        entersWithAdditionalCounters(
-          each(and([hasSubtype(dragon), youControl])),
-          lit(1),
-          p1p1Counter)),
-      activated(tapSymbol, addMana(lit(1), ofAnyColor(sameColor)))]})
+        entersWithAdditionalCounters(each(and([hasSubtype(dragon), youControl])), 1, p1p1Counter)),
+      activated(tapSymbol, addMana(1, ofAnyColor(sameColor)))]})

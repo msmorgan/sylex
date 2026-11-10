@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [aura],
     text = [
       enchant(isCreature),
-      static(getsPt(enchanted(creature), up(lit(1)), up(lit(1)))),
+      static(getsPt(enchanted(creature), up(1), up(1))),
       static(
         can(
           actor(you),

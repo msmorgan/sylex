@@ -4,5 +4,5 @@ action doubleLifeTotal {
   lexical = {verbs = [{lemma = "double", frames = [Monotransitive]}]},
   deed = "double",
   spelling = "double your life total",
-  body = changeLife(set(times(lit(2), lifeTotalOf(actor))))
+  body = changeLife(set(times(2, lifeTotalOf(actor))))
 }

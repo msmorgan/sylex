@@ -8,10 +8,10 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         doOnlyIf(
-          draw(lit(1)),
+          draw(1),
           did(
             actor(you),
             cast(a(and([isSpell, hasColor(blue), isOther]))),
             within(soFarThisTurn))))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

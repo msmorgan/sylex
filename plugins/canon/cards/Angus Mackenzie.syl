@@ -9,5 +9,5 @@ card singleFaced({
         compound([mana([pip(green), pip(white), pip(blue)]), tapSymbol]),
         preventAll(any, thisTurn, combat),
         beforePart(combatDamage))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

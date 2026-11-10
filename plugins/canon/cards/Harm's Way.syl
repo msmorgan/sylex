@@ -9,5 +9,5 @@ card singleFaced({
             would(
               actor(aYourChoice(isSource)),
               dealDamage(recipient = andOr([you, allOf(and([isPermanent, youControl]))]))),
-            instead(redirectDamage(theNext(lit(2)), target(isAnyTarget)))),
+            instead(redirectDamage(theNext(2), target(isAnyTarget)))),
           thisTurn))]})

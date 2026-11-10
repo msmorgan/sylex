@@ -8,4 +8,4 @@ card singleFaced({
             establishThroughout(
               can(actor(you), play(counted(additional(exactly(1)), isLand))),
               thisTurn),
-            draw(lit(1))]))]})
+            draw(1)]))]})

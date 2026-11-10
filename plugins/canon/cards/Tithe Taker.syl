@@ -11,14 +11,14 @@ card singleFaced({
           conjunction([
               costShift(
                 allOf(and([isSpell, did(actor(yourOpponents), cast(which), thisObject)])),
-                more(lit(1))),
+                more(1)),
               costShift(
                 allOf(
                   and([
                       abilityHead(anyActivated),
                       did(actor(yourOpponents), activate(which), thisObject),
                       not(isManaAbility)])),
-                more(lit(1)))]))),
-      afterlife(lit(1))],
-    power = lit(2),
-    toughness = lit(1)})
+                more(1))]))),
+      afterlife(1)],
+    power = 2,
+    toughness = 1})

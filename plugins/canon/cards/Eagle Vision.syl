@@ -2,4 +2,4 @@ card singleFaced({
     name = "Eagle Vision",
     cost = [generic(4), pip(blue)],
     types = [sorcery],
-    text = [freerunning(mana([generic(1), pip(blue)])), spell(draw(lit(3)))]})
+    text = [freerunning(mana([generic(1), pip(blue)])), spell(draw(3))]})

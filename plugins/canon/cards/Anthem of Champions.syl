@@ -2,4 +2,4 @@ card singleFaced({
     name = "Anthem of Champions",
     cost = [pip(green), pip(white)],
     types = [enchantment],
-    text = [static(getsPt(allOf(and([isCreature, youControl])), up(lit(1)), up(lit(1))))]})
+    text = [static(getsPt(allOf(and([isCreature, youControl])), up(1), up(1)))]})

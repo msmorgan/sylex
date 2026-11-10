@@ -1,4 +1,4 @@
 # A printed power, toughness, loyalty, or defense.
 template stat(value: Int): Option(Amount) {
-  body = lit($value)
+  body = $value
 }

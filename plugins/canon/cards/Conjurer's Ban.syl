@@ -11,4 +11,4 @@ card singleFaced({
                   cant(any, cast(bare(and([isSpell, named(chosenName)])))),
                   cant(any, play(allOf(and([isLand, named(chosenName)]))))]),
               untilYourNextTurn)])),
-      spell(draw(lit(1)))]})
+      spell(draw(1))]})

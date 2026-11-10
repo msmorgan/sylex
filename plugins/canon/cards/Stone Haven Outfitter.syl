@@ -5,12 +5,9 @@ card singleFaced({
     subtypes = [kor, artificer, ally],
     text = [
       static(
-        getsPt(
-          allOf(and([and([isCreature, youControl]), isAttached(equipped)])),
-          up(lit(1)),
-          up(lit(1)))),
+        getsPt(allOf(and([and([isCreature, youControl]), isAttached(equipped)])), up(1), up(1))),
       whenever(
         does(actor(a(and([and([isCreature, youControl]), isAttached(equipped)]))), die),
-        draw(lit(1)))],
-    power = lit(2),
-    toughness = lit(2)})
+        draw(1))],
+    power = 2,
+    toughness = 2})

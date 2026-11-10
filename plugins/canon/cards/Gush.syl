@@ -8,4 +8,4 @@ card singleFaced({
           this,
           perform(
             returnToHand(counted(exactly(2), and([isLand, hasSubtype(island), youControl])))))),
-      spell(draw(lit(2)))]})
+      spell(draw(2))]})

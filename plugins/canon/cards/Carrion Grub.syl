@@ -6,10 +6,10 @@ card singleFaced({
     text = [
       static(
         conjunction([
-            getsPt(thisCreature, up(letter(x)), up(lit(0))),
+            getsPt(thisCreature, up(letter(x)), up(0)),
             letterDefinition(
               x,
               aggregate(max, stat(power), and([isCreature, in(yourGraveyard)])))])),
-      when(does(actor(thisCreature), enter), mill(lit(4)))],
-    power = lit(0),
-    toughness = lit(5)})
+      when(does(actor(thisCreature), enter), mill(4))],
+    power = 0,
+    toughness = 5})

@@ -21,5 +21,5 @@ card singleFaced({
                 dealDamage(
                   countOf(and([hasSubtype(ally), youControl])),
                   controllerOf(that(artifact)))))]))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

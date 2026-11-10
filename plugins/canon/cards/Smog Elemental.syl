@@ -8,7 +8,7 @@ card singleFaced({
       static(
         getsPt(
           allOf(and([isCreature, hasKeyword(theKeyword(flying)), opponentsControl])),
-          down(lit(1)),
-          down(lit(1))))],
-    power = lit(3),
-    toughness = lit(3)})
+          down(1),
+          down(1)))],
+    power = 3,
+    toughness = 3})

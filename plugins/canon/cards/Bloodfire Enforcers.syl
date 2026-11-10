@@ -10,5 +10,5 @@ card singleFaced({
           and([
               exists(and([isInstant, in(yourGraveyard)])),
               exists(and([isSorcery, in(yourGraveyard)]))])))],
-    power = lit(5),
-    toughness = lit(2)})
+    power = 5,
+    toughness = 2})

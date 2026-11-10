@@ -9,6 +9,6 @@ card singleFaced({
         triggerThisWay(
           regenerate(thisCreature),
           does(any, regeneration(thisCreature)),
-          putCounters(lit(1), printedKind(m1m1Counter), it)))],
-    power = lit(3),
-    toughness = lit(3)})
+          putCounters(1, printedKind(m1m1Counter), it)))],
+    power = 3,
+    toughness = 3})

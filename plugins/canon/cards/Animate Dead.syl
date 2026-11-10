@@ -21,4 +21,4 @@ card singleFaced({
               does(actor(thisAura), leave),
               instruct(controllerOf(that(creature)), sacrifice(it)))]),
         if = is(it, in(battlefield))),
-      static(getsPt(enchanted(creature), down(lit(1)), up(lit(0))))]})
+      static(getsPt(enchanted(creature), down(1), up(0)))]})

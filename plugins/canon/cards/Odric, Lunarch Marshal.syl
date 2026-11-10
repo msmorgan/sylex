@@ -30,5 +30,5 @@ card singleFaced({
           theKeyword(skulk),
           theKeyword(trample),
           theKeyword(vigilance)])],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

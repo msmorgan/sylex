@@ -4,7 +4,7 @@ card singleFaced({
     types = [artifact],
     text = [
       static(entersChoosing(thisArtifact, color)),
-      static(getsPt(allOf(and([isCreature, ofChosen(color)])), up(lit(1)), up(lit(1)))),
+      static(getsPt(allOf(and([isCreature, ofChosen(color)])), up(1), up(1))),
       whenever(
         does(any, tapForMana(a(and([isLand, hasSupertype(basic)])), ofColor(thatColor))),
-        instruct(controllerOf(that(land)), addMana(lit(1), ofTheChosenColor)))]})
+        instruct(controllerOf(that(land)), addMana(1, ofTheChosenColor)))]})

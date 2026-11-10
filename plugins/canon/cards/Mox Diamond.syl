@@ -11,4 +11,4 @@ card singleFaced({
               discard(a(and([isLand, in(yourHand)]))),
               putOntoBattlefield(thisArtifact),
               putInto(it, graveyard))))),
-      activated(tapSymbol, addMana(lit(1), ofAnyColor(sameColor)))]})
+      activated(tapSymbol, addMana(1, ofAnyColor(sameColor)))]})

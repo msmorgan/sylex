@@ -9,6 +9,6 @@ card singleFaced({
       static(
         replace(
           would(any, createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []), you)),
-          instead(create(times(lit(2), groupSize), asThose))))],
-    power = lit(2),
-    toughness = lit(2)})
+          instead(create(times(2, groupSize), asThose))))],
+    power = 2,
+    toughness = 2})

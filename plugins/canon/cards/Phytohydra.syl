@@ -8,5 +8,5 @@ card singleFaced({
         replace(
           would(any, dealDamage(recipient = thisCreature)),
           instead(putCounters(thatMuch, printedKind(p1p1Counter), it))))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

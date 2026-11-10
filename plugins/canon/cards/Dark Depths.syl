@@ -3,14 +3,14 @@ card singleFaced({
     supertypes = [legendary, snow],
     types = [land],
     text = [
-      static(entersWithCounters(thisLand, lit(10), iceCounter)),
+      static(entersWithCounters(thisLand, 10, iceCounter)),
       activated(mana([generic(3)]), removeCounters(exactly(1), printedKind(iceCounter), thisLand)),
       when(
         stateHolds(not(is(thisLand, hasCounter(iceCounter)))),
         doIfDone(
           sacrifice(thisLand),
           create(
-            lit(1),
+            1,
             written({
                 characteristics = {
                   name = "Marit Lage",
@@ -19,5 +19,5 @@ card singleFaced({
                   types = [creature],
                   subtypes = [avatar],
                   text = [flying, indestructible],
-                  power = lit(20),
-                  toughness = lit(20)}}))))]})
+                  power = 20,
+                  toughness = 20}}))))]})

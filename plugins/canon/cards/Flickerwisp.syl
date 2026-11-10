@@ -12,5 +12,5 @@ card singleFaced({
             atNext(
               beginningOfNext(endStep),
               returnToBattlefield(that(card), [under(ownerOf(it))]))]))],
-    power = lit(3),
-    toughness = lit(1)})
+    power = 3,
+    toughness = 1})

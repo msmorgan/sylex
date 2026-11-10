@@ -11,5 +11,5 @@ card singleFaced({
                 target(and([isCreature, youDontControl])))),
             doIf(
               did(actor(the(and([isCreature, youControl]))), enter, within(soFarThisTurn)),
-              putCounters(lit(1), printedKind(p1p1Counter), it)),
+              putCounters(1, printedKind(p1p1Counter), it)),
             fightEachOther(those(creature))]))]})

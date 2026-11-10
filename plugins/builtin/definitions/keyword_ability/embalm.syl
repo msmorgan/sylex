@@ -11,7 +11,7 @@ ability embalm(cost: Cost) {
     activatedOnlyDuring(
       compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),
       create(
-        lit(1),
+        1,
         copyOf(
           this,
           [

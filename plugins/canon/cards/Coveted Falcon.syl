@@ -22,5 +22,5 @@ card singleFaced({
               forEach(
                 eventTally(actor(they), gainControlOf(those(permanent)), thisWay, events),
                 isPermanent))]))],
-    power = lit(1),
-    toughness = lit(4)})
+    power = 1,
+    toughness = 4})

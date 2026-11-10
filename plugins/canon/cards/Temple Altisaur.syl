@@ -9,6 +9,6 @@ card singleFaced({
           would(
             actor(a(isSource)),
             dealDamage(recipient = a(and([hasSubtype(dinosaur), youControl, isOther])))),
-          instead(preventDamage(allBut(lit(1))))))],
-    power = lit(3),
-    toughness = lit(4)})
+          instead(preventDamage(allBut(1)))))],
+    power = 3,
+    toughness = 4})

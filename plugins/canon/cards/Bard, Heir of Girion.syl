@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       reach,
       vigilance,
-      static(getsPt(allOf(and([isCreature, youControl, isOther])), up(lit(1)), up(lit(1)))),
-      whenever(does(actor(you), attack), draw(lit(1)))],
-    power = lit(4),
-    toughness = lit(4)})
+      static(getsPt(allOf(and([isCreature, youControl, isOther])), up(1), up(1))),
+      whenever(does(actor(you), attack), draw(1))],
+    power = 4,
+    toughness = 4})

@@ -12,4 +12,4 @@ card singleFaced({
                 getsMoreVotes("carnage"),
                 sequentially(
                   [sacrifice(thisArtifact), destroy(allOf(and([isPermanent, non(isLand)])))])),
-              doIf(getsMoreVotesOrTied("homage"), draw(lit(1)))])))]})
+              doIf(getsMoreVotesOrTied("homage"), draw(1))])))]})

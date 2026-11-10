@@ -5,5 +5,5 @@ card singleFaced({
     types = [creature],
     subtypes = [dragon],
     text = [flying, haste],
-    power = lit(6),
-    toughness = lit(5)})
+    power = 6,
+    toughness = 5})

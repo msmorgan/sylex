@@ -6,5 +6,5 @@ card singleFaced({
       spell(
         dealDivided(
           this,
-          lit(3),
+          3,
           targets(oneThrough(3), and([isCreature, hasKeyword(theKeyword(flying))]))))]})

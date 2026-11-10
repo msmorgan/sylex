@@ -8,5 +8,5 @@ card singleFaced({
       flying,
       static(entersChoosing(thisCreature, color)),
       static(cant(actor(yourOpponents), cast(bare(and([isSpell, ofChosen(color)])))))],
-    power = lit(7),
-    toughness = lit(7)})
+    power = 7,
+    toughness = 7})

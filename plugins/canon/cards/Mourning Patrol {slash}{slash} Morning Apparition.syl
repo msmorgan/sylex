@@ -5,8 +5,8 @@ card transforming(
     types = [creature],
     subtypes = [human, soldier],
     text = [vigilance, disturb(mana([generic(3), pip(white)]))],
-    power = lit(2),
-    toughness = lit(3)},
+    power = 2,
+    toughness = 3},
   back = {
     name = "Morning Apparition",
     colors = [white],
@@ -16,5 +16,5 @@ card transforming(
       flying,
       vigilance,
       static(replace(would(any, putInto(thisCreature, graveyard)), instead(exile(it))))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

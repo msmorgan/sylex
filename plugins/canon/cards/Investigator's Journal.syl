@@ -14,5 +14,5 @@ card singleFaced({
             mana([generic(2)]),
             tapSymbol,
             perform(removeCounters(exactly(1), printedKind(suspectCounter), thisArtifact))]),
-        draw(lit(1))),
-      activated(compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]), draw(lit(1)))]})
+        draw(1)),
+      activated(compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]), draw(1))]})

@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [human],
     text = [protection(hasColor(red))],
-    power = lit(1),
-    toughness = lit(2)})
+    power = 1,
+    toughness = 2})

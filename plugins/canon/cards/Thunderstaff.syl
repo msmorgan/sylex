@@ -8,7 +8,7 @@ card singleFaced({
           is(thisArtifact, isUntapped),
           replace(
             would(actor(a(isCreature)), dealDamage(recipient = you, kind = combat)),
-            instead(preventDamage(ofThatDamage(lit(1))))))),
+            instead(preventDamage(ofThatDamage(1)))))),
       activated(
         compound([mana([generic(2)]), tapSymbol]),
-        get(allOf(and([isCreature, isAttacking])), up(lit(1)), up(lit(0)), untilEndOfTurn))]})
+        get(allOf(and([isCreature, isAttacking])), up(1), up(0), untilEndOfTurn))]})

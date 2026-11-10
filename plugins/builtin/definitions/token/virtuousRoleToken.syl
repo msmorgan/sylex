@@ -9,6 +9,5 @@ token virtuousRoleToken {
       subtypes = [aura, role],
       text = [
         enchant(isCreature),
-        static(
-          getsBoth(enchanted(creature), up(forEach(lit(1), and([isEnchantment, youControl])))))]}}
+        static(getsBoth(enchanted(creature), up(forEach(1, and([isEnchantment, youControl])))))]}}
 }

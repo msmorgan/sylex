@@ -10,8 +10,7 @@ card singleFaced({
         does(actor(thisCreature), attack),
         may(
           pay(mana([generic(5), pip(red), pip(red)]), once),
-          sequentially([
-              untap(allOf(and([isCreature, isAttacking]))),
-              additionalPhase(combat, none, lit(1))])))],
-    power = lit(5),
-    toughness = lit(5)})
+          sequentially(
+            [untap(allOf(and([isCreature, isAttacking]))), additionalPhase(combat, none, 1)])))],
+    power = 5,
+    toughness = 5})

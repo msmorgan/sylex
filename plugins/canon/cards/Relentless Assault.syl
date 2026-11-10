@@ -6,4 +6,4 @@ card singleFaced({
       spell(
         sequentially([
             untap(allOf(and([isCreature, did(actor(which), attack, within(soFarThisTurn))]))),
-            additionalPhase(combat, mainPhase, lit(1), mainPhase)]))]})
+            additionalPhase(combat, mainPhase, 1, mainPhase)]))]})

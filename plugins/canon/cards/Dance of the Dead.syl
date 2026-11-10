@@ -25,7 +25,7 @@ card singleFaced({
         if = is(it, in(battlefield))),
       static(
         conjunction(
-          [getsPt(enchanted(creature), up(lit(1)), up(lit(1))), doesntUntap(it, controllerOf(it))],
+          [getsPt(enchanted(creature), up(1), up(1)), doesntUntap(it, controllerOf(it))],
           subject = enchanted(creature))),
       at(
         beginningOfPossessed(upkeep, controllerOf(enchanted(creature))),

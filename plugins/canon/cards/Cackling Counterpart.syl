@@ -3,5 +3,5 @@ card singleFaced({
     cost = [generic(1), pip(blue), pip(blue)],
     types = [instant],
     text = [
-      spell(create(lit(1), copyOf(target(and([isCreature, youControl]))))),
+      spell(create(1, copyOf(target(and([isCreature, youControl]))))),
       flashback(mana([generic(5), pip(blue), pip(blue)]))]})

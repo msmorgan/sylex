@@ -14,5 +14,5 @@ card singleFaced({
                   and([isSpell, non(hasColor(green))]),
                   abilityOf(allOf(and([isSource, non(hasColor(green))])))]))),
           target(thisCreature)))],
-    power = lit(8),
-    toughness = lit(5)})
+    power = 8,
+    toughness = 5})

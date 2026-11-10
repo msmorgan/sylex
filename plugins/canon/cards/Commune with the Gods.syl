@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            reveal(topSlice(lit(5))),
+            reveal(topSlice(5)),
             may(putInto(fromAmong(exactly(1), or([isCreature, isEnchantment]), them), hand)),
             putInto(theRest, graveyard)]))]})

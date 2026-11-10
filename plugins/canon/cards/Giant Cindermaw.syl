@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [dinosaur, beast],
     text = [trample, static(cant(actor(bare(isPlayer)), gainLife(anyAmount)))],
-    power = lit(4),
-    toughness = lit(3)})
+    power = 4,
+    toughness = 3})

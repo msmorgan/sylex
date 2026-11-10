@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [aura],
     text = [
       enchant(isCreature),
-      when(does(actor(thisAura), enter), draw(lit(1))),
+      when(does(actor(thisAura), enter), draw(1)),
       static(
         conjunction([
             allAbilityLoss(enchanted(creature)),
@@ -13,4 +13,4 @@ card singleFaced({
               it,
               sets,
               bundle({characteristics = {colors = [green], types = [creature], subtypes = [elk]}})),
-            getsBase(it, lit(3), lit(3))]))]})
+            getsBase(it, 3, 3)]))]})

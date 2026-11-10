@@ -14,6 +14,6 @@ card singleFaced({
             instruct(each(and([isPlayer, choseExtreme(max)])), loseLife(thatMuch)),
             doIf(
               is(you, choseExtreme(max)),
-              putCounters(lit(2), printedKind(p1p1Counter), thisCreature))]))],
-    power = lit(3),
-    toughness = lit(3)})
+              putCounters(2, printedKind(p1p1Counter), thisCreature))]))],
+    power = 3,
+    toughness = 3})

@@ -5,11 +5,11 @@ card singleFaced({
     text = [
       activatedOnlyIf(
         tapSymbol,
-        draw(lit(1)),
+        draw(1),
         did(
           actor(you),
           createObject(anyAmount, token(copyOf(a(isToken)), [])),
           within(soFarThisTurn))),
       activated(
         compound([mana([generic(8)]), tapSymbol, perform(sacrifice(thisArtifact))]),
-        create(lit(1), written(creatureToken(10, 10, [], [eldrazi]))))]})
+        create(1, written(creatureToken(10, 10, [], [eldrazi]))))]})

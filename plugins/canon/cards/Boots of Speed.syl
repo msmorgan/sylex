@@ -4,6 +4,5 @@ card singleFaced({
     types = [artifact],
     subtypes = [equipment],
     text = [
-      static(
-        conjunction([getsPt(equipped(creature), up(lit(1)), up(lit(0))), abilityGrant(it, haste)])),
+      static(conjunction([getsPt(equipped(creature), up(1), up(0)), abilityGrant(it, haste)])),
       equip(mana([generic(1)]))]})

@@ -8,5 +8,5 @@ card singleFaced({
         abilityGrant(
           allOf(and([isArtifact, isSpell, did(actor(you), cast(which), thisObject)])),
           convoke))],
-    power = lit(1),
-    toughness = lit(3)})
+    power = 1,
+    toughness = 3})

@@ -12,8 +12,8 @@ token sorcererRoleToken {
         enchant(isCreature),
         static(
           conjunction([
-              getsPt(enchanted(creature), up(lit(1)), up(lit(1))),
+              getsPt(enchanted(creature), up(1), up(1)),
               abilityGrant(
                 enchanted(creature),
-                whenever(does(actor(thisCreature), attack), scry(lit(1))))]))]}}
+                whenever(does(actor(thisCreature), attack), scry(1)))]))]}}
 }

@@ -5,4 +5,4 @@ card singleFaced({
     text = [
       whenever(
         does(actor(counted(orMore(1), isCreature)), attack(you)),
-        gainLife(forEach(lit(1), and([isAttacking, isCreature]))))]})
+        gainLife(forEach(1, and([isAttacking, isCreature]))))]})

@@ -5,5 +5,5 @@ card singleFaced({
     types = [creature],
     subtypes = [illusion],
     text = [static(definesQuality(thisCreature, adds, everyTypeOf(creature)))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

@@ -10,4 +10,4 @@ card singleFaced({
               doIf(
                 getsMoreVotes("death"),
                 instruct(eachOpponent, sacrifice(aTheirChoice(isCreature)))),
-              doIf(getsMoreVotesOrTied("torture"), instruct(eachOpponent, loseLife(lit(4))))])))]})
+              doIf(getsMoreVotesOrTied("torture"), instruct(eachOpponent, loseLife(4)))])))]})

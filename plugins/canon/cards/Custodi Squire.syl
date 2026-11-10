@@ -17,5 +17,5 @@ card singleFaced({
                   byCandidate(
                     a(and([or([isArtifact, isCreature, isEnchantment]), in(yourGraveyard)]))))),
               returnToHand(allOf(and([isCard, withMostVotes])))])))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

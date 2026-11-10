@@ -7,6 +7,6 @@ card singleFaced({
       static(attachChoosing(thisEquipment, color)),
       static(
         conjunction([
-            getsPt(equipped(creature), up(lit(2)), up(lit(0))),
+            getsPt(equipped(creature), up(2), up(0)),
             abilityGrant(equipped(creature), protection(ofTheLastChosen(color)))])),
       equip(mana([generic(3)]))]})

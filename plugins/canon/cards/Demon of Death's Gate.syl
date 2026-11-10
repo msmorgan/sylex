@@ -8,9 +8,9 @@ card singleFaced({
         altCost(
           this,
           compound([
-              perform(payLife(lit(6))),
+              perform(payLife(6)),
               perform(sacrifice(counted(exactly(3), and([isCreature, hasColor(black)]))))]))),
       flying,
       trample],
-    power = lit(9),
-    toughness = lit(9)})
+    power = 9,
+    toughness = 9})

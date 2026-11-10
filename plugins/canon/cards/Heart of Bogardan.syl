@@ -14,4 +14,4 @@ card singleFaced({
                   dealDamage(
                     letter(x),
                     each(and([isCreature, controlledBy(splitOverPlaneswalker)]))))]),
-            define(x, minus(times(lit(2), countersOn(ageCounter, thisEnchantment)), lit(2)))]))]})
+            define(x, minus(times(2, countersOn(ageCounter, thisEnchantment)), 2))]))]})

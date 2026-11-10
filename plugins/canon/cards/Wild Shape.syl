@@ -22,8 +22,8 @@ card singleFaced({
                       characteristics = {
                         subtypes = [turtle],
                         text = [hexproof],
-                        power = lit(1),
-                        toughness = lit(3)}})),
+                        power = 1,
+                        toughness = 3}})),
                 untilEndOfTurn)),
             mode(
               none,
@@ -36,8 +36,8 @@ card singleFaced({
                       characteristics = {
                         subtypes = [spider],
                         text = [reach],
-                        power = lit(1),
-                        toughness = lit(5)}})),
+                        power = 1,
+                        toughness = 5}})),
                 untilEndOfTurn)),
             mode(
               none,
@@ -50,6 +50,6 @@ card singleFaced({
                       characteristics = {
                         subtypes = [elephant],
                         text = [trample],
-                        power = lit(3),
-                        toughness = lit(3)}})),
+                        power = 3,
+                        toughness = 3}})),
                 untilEndOfTurn))]))]})

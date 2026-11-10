@@ -15,5 +15,5 @@ card singleFaced({
       metalcraft(
         spell(
           doIf(
-            compareAmt(countOf(and([isArtifact, youControl])), atLeast, lit(3)),
+            compareAmt(countOf(and([isArtifact, youControl])), atLeast, 3),
             exile(that(creature)))))]})

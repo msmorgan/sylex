@@ -7,6 +7,6 @@ card singleFaced({
       flying,
       whenever(
         does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-        instruct(that(player), skipPart(combat, lit(1))))],
-    power = lit(2),
-    toughness = lit(4)})
+        instruct(that(player), skipPart(combat, 1)))],
+    power = 2,
+    toughness = 4})

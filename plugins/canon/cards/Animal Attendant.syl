@@ -7,13 +7,12 @@ card singleFaced({
       activated(
         tapSymbol,
         addMana(
-          lit(1),
+          1,
           ofAnyColor(sameColor),
           [
             whenSpentOn(
               affectsIt,
               a(and([non(hasSubtype(human)), isCreature, isSpell])),
-              establish(
-                entersWithAdditionalCounters(becomes(that(spell)), lit(1), p1p1Counter)))]))],
-    power = lit(2),
-    toughness = lit(2)})
+              establish(entersWithAdditionalCounters(becomes(that(spell)), 1, p1p1Counter)))]))],
+    power = 2,
+    toughness = 2})

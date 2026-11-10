@@ -11,7 +11,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            reveal(topSlice(plus(letter(x), lit(1)))),
+            reveal(topSlice(plus(letter(x), 1))),
             choose(
               andOr([
                   fromAmong(exactly(1), and([isCreature, isCard]), them),
@@ -21,7 +21,7 @@ card singleFaced({
                   putInto(those(card), hand),
                   putInto(theRest, onBottom, riders = [inOrder(randomOrder)])]),
               doIf(
-                compareAmt(letter(x), atLeast, lit(5)),
+                compareAmt(letter(x), atLeast, 5),
                 instead(
                   sequentially([
                       putInto(thePlural(and([isCard, isChosen])), or([battlefield, hand])),

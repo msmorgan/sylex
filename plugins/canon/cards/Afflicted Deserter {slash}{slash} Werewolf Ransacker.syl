@@ -9,8 +9,8 @@ card transforming(
         beginningOfEach(upkeep),
         if = not(did(any, cast(a(isSpell)), within(lastTurn))),
         action = transform(thisCreature))],
-    power = lit(3),
-    toughness = lit(2)},
+    power = 3,
+    toughness = 2},
   back = {
     name = "Werewolf Ransacker",
     types = [creature],
@@ -22,13 +22,13 @@ card transforming(
             may(destroy(target(isArtifact))),
             doIf(
               did(actor(that(artifact)), putInto(actor, graveyard), thisWay),
-              instruct(thisCreature, dealDamage(lit(3), controllerOf(that(artifact)))))])),
+              instruct(thisCreature, dealDamage(3, controllerOf(that(artifact)))))])),
       at(
         beginningOfEach(upkeep),
         if = compareAmt(
           aggregateOver(max, isPlayer, eventCount(cast(a(isSpell)), actor(they), lastTurn)),
           atLeast,
-          lit(2)),
+          2),
         action = transform(thisCreature))],
-    power = lit(5),
-    toughness = lit(4)})
+    power = 5,
+    toughness = 4})

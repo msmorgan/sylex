@@ -4,4 +4,4 @@ card singleFaced({
     types = [instant],
     text = [
       static(addedCost(mandatory, or([perform(behold(hasSubtype(jace))), mana([generic(1)])]))),
-      spell(sequentially([counter(target(isSpell)), empowerJace(lit(1))]))]})
+      spell(sequentially([counter(target(isSpell)), empowerJace(1)]))]})

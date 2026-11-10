@@ -8,4 +8,4 @@ card singleFaced({
           allOf(
             and(
               [or([isInstant, isEnchantment]), isSpell, did(actor(you), cast(which), thisObject)])),
-          less(lit(2))))]})
+          less(2)))]})

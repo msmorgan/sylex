@@ -12,8 +12,8 @@ card singleFaced({
                 thisCreature,
                 sets,
                 bundle({characteristics = {subtypes = [werewolf]}}))),
-            putCounters(lit(2), printedKind(p1p1Counter), it),
-            draw(lit(1))]),
+            putCounters(2, printedKind(p1p1Counter), it),
+            draw(1)]),
         oncePerGame)],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

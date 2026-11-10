@@ -7,5 +7,5 @@ card singleFaced({
       whenever(
         does(actor(counted(orMore(1), and([isArtifact, youControl]))), enter),
         instruct(thisCreature, dealDamage(groupSize, eachOpponent)))],
-    power = lit(3),
-    toughness = lit(1)})
+    power = 3,
+    toughness = 1})

@@ -8,4 +8,4 @@ card singleFaced({
       static(
         abilityGrant(
           enchanted(land),
-          activated(tapSymbol, instruct(target(isPlayer), loseLife(lit(3))))))]})
+          activated(tapSymbol, instruct(target(isPlayer), loseLife(3)))))]})

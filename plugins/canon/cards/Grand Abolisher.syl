@@ -17,5 +17,5 @@ card singleFaced({
                     and([
                         abilityHead(anyActivated),
                         abilityOf(allOf(or([isArtifact, isCreature, isEnchantment])))]))))])))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

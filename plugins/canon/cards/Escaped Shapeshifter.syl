@@ -26,5 +26,5 @@ card singleFaced({
           theKeyword(firstStrike),
           theKeyword(trample),
           anyIn({word = protection, sort = color})])],
-    power = lit(3),
-    toughness = lit(4)})
+    power = 3,
+    toughness = 4})

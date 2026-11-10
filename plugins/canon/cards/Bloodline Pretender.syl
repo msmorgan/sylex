@@ -8,6 +8,6 @@ card singleFaced({
       static(entersChoosing(thisCreature, subtype(creature))),
       whenever(
         does(actor(a(and([isCreature, youControl, isOther, ofChosen(subtype(creature))]))), enter),
-        putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
-    power = lit(2),
-    toughness = lit(2)})
+        putCounters(1, printedKind(p1p1Counter), thisCreature))],
+    power = 2,
+    toughness = 2})

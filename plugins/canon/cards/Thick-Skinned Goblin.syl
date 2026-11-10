@@ -11,5 +11,5 @@ card singleFaced({
             pay(anyCost, once, whose = allOf(and([isPermanent, youControl])), keyword = echo)),
           instead(may(pay(mana([generic(0)]), once))))),
       activated(mana([pip(red)]), gain(thisCreature, protection(hasColor(red)), untilEndOfTurn))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

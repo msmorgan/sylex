@@ -8,9 +8,9 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         sequentially([
-            searchLibraryOrGraveyard(a(and([isArtifact, hasManaValue(atMost, lit(2))]))),
+            searchLibraryOrGraveyard(a(and([isArtifact, hasManaValue(atMost, 2)]))),
             reveal(it),
             putInto(it, hand),
             doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],
-    power = lit(3),
-    toughness = lit(2)})
+    power = 3,
+    toughness = 2})

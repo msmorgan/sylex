@@ -7,20 +7,17 @@ card transforming(
     subtypes = [arlinn],
     text = [
       activated(
-        loyaltySymbol(up(lit(1))),
+        loyaltySymbol(up(1)),
         establishFor(
           targets(upTo(1), isCreature),
-          [
-            getsPt(it, up(lit(2)), up(lit(2))),
-            abilityGrant(it, vigilance),
-            abilityGrant(it, haste)],
+          [getsPt(it, up(2), up(2)), abilityGrant(it, vigilance), abilityGrant(it, haste)],
           untilEndOfTurn)),
       activated(
-        loyaltySymbol(up(lit(0))),
+        loyaltySymbol(up(0)),
         sequentially([
-            create(lit(1), written(creatureToken(2, 2, [green], [wolf]))),
+            create(1, written(creatureToken(2, 2, [green], [wolf]))),
             transform(thisPlaneswalker)]))],
-    loyalty = lit(3)},
+    loyalty = 3},
   back = {
     name = "Arlinn, Embraced by the Moon",
     supertypes = [legendary],
@@ -28,17 +25,17 @@ card transforming(
     subtypes = [arlinn],
     text = [
       activated(
-        loyaltySymbol(up(lit(1))),
+        loyaltySymbol(up(1)),
         establishFor(
           allOf(and([isCreature, youControl])),
-          [getsPt(them, up(lit(1)), up(lit(1))), abilityGrant(them, trample)],
+          [getsPt(them, up(1), up(1)), abilityGrant(them, trample)],
           untilEndOfTurn)),
       activated(
-        loyaltySymbol(down(lit(1))),
+        loyaltySymbol(down(1)),
         sequentially(
-          [instruct(this, dealDamage(lit(3), target(isAnyTarget))), transform(thisPlaneswalker)])),
+          [instruct(this, dealDamage(3, target(isAnyTarget))), transform(thisPlaneswalker)])),
       activated(
-        loyaltySymbol(down(lit(6))),
+        loyaltySymbol(down(6)),
         getEmblem([
             static(
               conjunction([

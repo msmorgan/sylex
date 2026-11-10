@@ -6,8 +6,8 @@ card singleFaced({
       activated(
         compound([mana([generic(4)]), tapSymbol]),
         sequentially([
-            reveal(topSlice(lit(1))),
+            reveal(topSlice(1)),
             doIf(
               is(it, shares(cardName, share, a(cardIn(yourGraveyard)))),
               putInto(it, graveyard),
-              draw(lit(1)))]))]})
+              draw(1))]))]})

@@ -21,8 +21,8 @@ card singleFaced({
               it,
               exceptions = [
                 characteristicEdits([
-                    stat(power, set(lit(1))),
-                    stat(toughness, set(lit(1))),
+                    stat(power, set(1)),
+                    stat(toughness, set(1)),
                     typeLine(adds, {subtypes = [spirit]})])]))))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

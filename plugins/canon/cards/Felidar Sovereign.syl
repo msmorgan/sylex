@@ -8,7 +8,7 @@ card singleFaced({
       lifelink,
       at(
         beginningOfYour(upkeep),
-        if = compareAmt(lifeTotalOf(you), atLeast, lit(40)),
+        if = compareAmt(lifeTotalOf(you), atLeast, 40),
         action = winGame)],
-    power = lit(4),
-    toughness = lit(6)})
+    power = 4,
+    toughness = 6})

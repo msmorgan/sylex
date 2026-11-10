@@ -8,12 +8,12 @@ card singleFaced({
       when(
         does(actor(this), enter),
         replace(
-          draw(lit(1)),
+          draw(1),
           doIf(
             or([
                 did(actor(it), enter(from = yourLibrary), triggering),
                 is(it, did(any, cast(which, from = yourLibrary), thisObject))]),
-            instead(draw(lit(2)))))),
+            instead(draw(2))))),
       when(does(actor(a(isSpell)), target(this)), shuffleInto(this))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

@@ -7,8 +7,8 @@ card leveler(
     types = [creature],
     subtypes = [human, knight],
     text = [levelUp(mana([pip(white)]))],
-    power = lit(1),
-    toughness = lit(1)},
+    power = 1,
+    toughness = 1},
   bands = [
-    {range = between(2, 6), power = lit(3), toughness = lit(3), text = [firstStrike]},
-    {range = plus(7), power = lit(4), toughness = lit(4), text = [doubleStrike]}])
+    {range = between(2, 6), power = 3, toughness = 3, text = [firstStrike]},
+    {range = plus(7), power = 4, toughness = 4, text = [doubleStrike]}])

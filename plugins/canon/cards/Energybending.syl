@@ -9,4 +9,4 @@ card singleFaced({
             establishThroughout(
               qualityChange(allOf(and([isLand, youControl])), adds, everyTypeOf(basicLand)),
               untilEndOfTurn),
-            draw(lit(1))]))]})
+            draw(1)]))]})

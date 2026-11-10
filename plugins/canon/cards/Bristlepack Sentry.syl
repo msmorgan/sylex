@@ -7,10 +7,10 @@ card singleFaced({
       defender,
       static(
         conditionFirstWhile(
-          exists(and([isCreature, youControl, hasPower(atLeast, lit(4))])),
+          exists(and([isCreature, youControl, hasPower(atLeast, 4)])),
           can(
             actor(thisCreature),
             attack,
             asThough = holds(is(it, not(hasKeyword(theKeyword(defender))))))))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

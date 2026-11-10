@@ -7,8 +7,8 @@ card singleFaced({
         sequentially([
             get(
               target(and([isCreature, or([isAttacking, isBlocking])])),
-              up(lit(4)),
-              up(lit(0)),
+              up(4),
+              up(0),
               untilEndOfTurn),
             atNext(beginningOfNext(endStep), destroy(that(creature)))]),
         timing = beforePart(combatDamage))]})

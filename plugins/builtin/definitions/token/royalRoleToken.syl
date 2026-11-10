@@ -11,6 +11,6 @@ token royalRoleToken {
         enchant(isCreature),
         static(
           conjunction([
-              getsPt(enchanted(creature), up(lit(1)), up(lit(1))),
+              getsPt(enchanted(creature), up(1), up(1)),
               abilityGrant(enchanted(creature), ward(mana([generic(1)])))]))]}}
 }

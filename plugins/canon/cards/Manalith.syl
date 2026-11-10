@@ -2,4 +2,4 @@ card singleFaced({
     name = "Manalith",
     cost = [generic(3)],
     types = [artifact],
-    text = [activated(tapSymbol, addMana(lit(1), ofAnyColor(sameColor)))]})
+    text = [activated(tapSymbol, addMana(1, ofAnyColor(sameColor)))]})

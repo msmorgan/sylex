@@ -7,19 +7,15 @@ card singleFaced({
       when(
         chapterMark([1, 2]),
         create(
-          lit(1),
+          1,
           written({
               characteristics = {
                 colors = [white],
                 types = [creature],
                 subtypes = [knight],
                 text = [vigilance],
-                power = lit(2),
-                toughness = lit(2)}}))),
+                power = 2,
+                toughness = 2}}))),
       when(
         chapterMark([3]),
-        get(
-          allOf(and([hasSubtype(knight), youControl])),
-          up(lit(2)),
-          up(lit(1)),
-          untilEndOfTurn))]})
+        get(allOf(and([hasSubtype(knight), youControl])), up(2), up(1), untilEndOfTurn))]})

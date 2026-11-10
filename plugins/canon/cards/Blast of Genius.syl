@@ -6,7 +6,7 @@ card singleFaced({
       spell(
         sequentially([
             choose(target(isAnyTarget)),
-            draw(lit(3)),
+            draw(3),
             discard(a(cardIn(yourHand))),
             instruct(
               this,

@@ -8,6 +8,6 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         if = keywordCostPaid(kicker, thisCreature),
-        action = gainLife(lit(10)))],
-    power = lit(2),
-    toughness = lit(3)})
+        action = gainLife(10))],
+    power = 2,
+    toughness = 3})

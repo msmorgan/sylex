@@ -20,9 +20,9 @@ card singleFaced({
                 compareAmt(
                   distinctCount(value(power), allOf(and([isCreature, youControl]))),
                   atLeast,
-                  lit(3)),
+                  3),
                 putCounters(
-                  lit(1),
+                  1,
                   printedKind(p1p1Counter),
                   the(and([isCreature, isChosen, youControl])))),
               fightEachOther(thePlural(and([isCreature, isChosen])))])))]})

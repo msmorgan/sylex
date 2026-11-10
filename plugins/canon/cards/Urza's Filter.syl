@@ -2,4 +2,4 @@ card singleFaced({
     name = "Urza's Filter",
     cost = [generic(4)],
     types = [artifact],
-    text = [static(costShift(allOf(and([isMulticolored, isSpell])), less(lit(2))))]})
+    text = [static(costShift(allOf(and([isMulticolored, isSpell])), less(2)))]})

@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       activatedOnlyIf(
         compound([mana([generic(2)]), tapSymbol]),
-        draw(lit(1)),
+        draw(1),
         thereAre(withTheSameName(counted(orMore(3), and([isLand, youControl])))))]})

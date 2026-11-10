@@ -8,7 +8,7 @@ card singleFaced({
       static(
         entersWithAdditionalCounters(
           each(and([isCreature, isNontoken, youControl, isOther])),
-          lit(1),
+          1,
           p1p1Counter)),
       activated(
         compound([mana([generic(1)]), tapSymbol]),
@@ -22,5 +22,5 @@ card singleFaced({
                     isCreature,
                     youControl,
                     did(actor(which), enter, within(soFarThisTurn))])))]))],
-    power = lit(2),
-    toughness = lit(3)})
+    power = 2,
+    toughness = 3})

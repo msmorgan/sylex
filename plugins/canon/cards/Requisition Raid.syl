@@ -10,6 +10,6 @@ card singleFaced({
             {
               cost = mana([generic(1)]),
               action = putCounters(
-                lit(1),
+                1,
                 printedKind(p1p1Counter),
                 each(and([isCreature, controlledBy(target(isPlayer))])))}]))]})

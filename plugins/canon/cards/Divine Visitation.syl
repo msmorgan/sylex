@@ -20,5 +20,5 @@ card singleFaced({
                     types = [creature],
                     subtypes = [angel],
                     text = [flying, vigilance],
-                    power = lit(4),
-                    toughness = lit(4)}})))))]})
+                    power = 4,
+                    toughness = 4}})))))]})

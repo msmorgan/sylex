@@ -18,6 +18,6 @@ card singleFaced({
                     equal,
                     chosenNumber,
                     axes = [stat(manaValue), stat(power), stat(toughness)])])))),
-        sequentially([instruct(that(player), loseLife(lit(2))), draw(lit(1))]))],
-    power = lit(3),
-    toughness = lit(4)})
+        sequentially([instruct(that(player), loseLife(2)), draw(1)]))],
+    power = 3,
+    toughness = 4})

@@ -15,6 +15,6 @@ card singleFaced({
                   cast(which),
                   thisObject,
                   ordinal = {ordinal = nth(2), per = turn})])),
-          less(lit(1))))],
-    power = lit(1),
-    toughness = lit(4)})
+          less(1)))],
+    power = 1,
+    toughness = 4})

@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         create(
-          lit(1),
+          1,
           copyOf(target(and([isCreature, youControl])), [alsoHas(flying), isntLegendary])))]})

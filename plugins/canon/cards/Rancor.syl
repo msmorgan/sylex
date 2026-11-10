@@ -6,7 +6,6 @@ card singleFaced({
     text = [
       enchant(isCreature),
       static(
-        conjunction([
-            getsPt(enchanted(creature), up(lit(2)), up(lit(0))),
-            abilityGrant(enchanted(creature), trample)])),
+        conjunction(
+          [getsPt(enchanted(creature), up(2), up(0)), abilityGrant(enchanted(creature), trample)])),
       when(does(any, putIntoFromBattlefield(thisAura, graveyard)), returnToHand(it))]})

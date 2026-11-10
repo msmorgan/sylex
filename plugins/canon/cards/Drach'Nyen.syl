@@ -9,6 +9,6 @@ card singleFaced({
       static(
         conjunction([
             abilityGrant(equipped(creature), menace),
-            getsPt(equipped(creature), up(letter(x)), up(lit(0))),
+            getsPt(equipped(creature), up(letter(x)), up(0)),
             letterDefinition(x, powerOf(the(in(exiledWith(thisEquipment)))))])),
       equip(mana([generic(2)]))]})

@@ -9,8 +9,7 @@ card singleFaced({
       static(onlyWhile(abilityGrant(thisCreature, ward(mana([generic(4)]))), is(it, isUntapped))),
       whenever(
         does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-        sequentially([
-            draw(lit(1)),
-            doIf(compareAmt(countOf(cardIn(yourHand)), less, lit(3)), draw(theDifference))]))],
-    power = lit(5),
-    toughness = lit(5)})
+        sequentially(
+          [draw(1), doIf(compareAmt(countOf(cardIn(yourHand)), less, 3), draw(theDifference))]))],
+    power = 5,
+    toughness = 5})

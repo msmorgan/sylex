@@ -8,6 +8,6 @@ card singleFaced({
       at(
         beginningOfPossessed(endStep, eachPlayer),
         if = did(actor(thisCreature), dealDamage(recipient = anOpponent), within(soFarThisTurn)),
-        action = putCounters(lit(1), printedKind(p1p1Counter), it))],
-    power = lit(1),
-    toughness = lit(1)})
+        action = putCounters(1, printedKind(p1p1Counter), it))],
+    power = 1,
+    toughness = 1})

@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(actor(you), proliferate),
-        sequentially([instruct(eachOpponent, loseLife(lit(2))), gainLife(lit(2))]))],
-    power = lit(1),
-    toughness = lit(3)})
+        sequentially([instruct(eachOpponent, loseLife(2)), gainLife(2)]))],
+    power = 1,
+    toughness = 3})

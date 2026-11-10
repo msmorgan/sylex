@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       static(
         conjunction([
-            getsPt(equipped(creature), up(lit(3)), up(lit(0))),
+            getsPt(equipped(creature), up(3), up(0)),
             qualityChange(equipped(creature), adds, everyTypeOf(creature))])),
       equip(mana([generic(3)]))]})

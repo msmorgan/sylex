@@ -13,14 +13,14 @@ card singleFaced({
         action = doIfDone(
           exile(it),
           create(
-            lit(1),
+            1,
             written({
                 characteristics = {
                   colors = [black],
                   types = [creature],
                   subtypes = [demon],
                   text = [flying],
-                  power = lit(5),
-                  toughness = lit(5)}}))))],
-    power = lit(1),
-    toughness = lit(1)})
+                  power = 5,
+                  toughness = 5}}))))],
+    power = 1,
+    toughness = 1})

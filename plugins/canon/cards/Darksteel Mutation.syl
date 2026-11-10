@@ -11,6 +11,6 @@ card singleFaced({
               enchanted(creature),
               sets,
               bundle({characteristics = {types = [artifact, creature], subtypes = [insect]}})),
-            getsBase(it, lit(0), lit(1)),
+            getsBase(it, 0, 1),
             abilityGrant(it, indestructible),
             allAbilityLoss(it)]))]})

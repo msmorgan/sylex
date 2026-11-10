@@ -2,5 +2,5 @@
 action exert(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "exert", frames = [Monotransitive]}]},
   spelling = "exert <subject>",
-  body = skipUntap($subject, lit(1))
+  body = skipUntap($subject, 1)
 }

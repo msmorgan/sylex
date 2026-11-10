@@ -12,5 +12,5 @@ card singleFaced({
             preventDamage(
               allDamage,
               also = putCounters(preventedThisWay, printedKind(p1p1Counter), thisCreature)))))],
-    power = lit(1),
-    toughness = lit(3)})
+    power = 1,
+    toughness = 3})

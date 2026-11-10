@@ -8,5 +8,5 @@ card singleFaced({
       whenever(
         does(actor(a(isSource)), dealDamage(recipient = thisCreature)),
         instruct(controllerOf(thatSource), mill(thatMuch)))],
-    power = lit(2),
-    toughness = lit(5)})
+    power = 2,
+    toughness = 5})

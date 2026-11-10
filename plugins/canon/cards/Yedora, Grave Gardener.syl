@@ -14,5 +14,5 @@ card singleFaced({
                 [
                   faceDownAs({characteristics = {types = [land], subtypes = [forest]}}),
                   under(ownerOf(it))])])))],
-    power = lit(5),
-    toughness = lit(5)})
+    power = 5,
+    toughness = 5})

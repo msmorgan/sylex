@@ -7,8 +7,8 @@ card singleFaced({
       activated(
         tapSymbol,
         addMana(
-          lit(1),
+          1,
           manaOf([[colored(blue)]]),
           [spendOnly([toPay(ofKeyword(disturb)), toCast(isInstantOrSorcery)])]))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

@@ -5,4 +5,4 @@ card singleFaced({
     text = [
       static(visibility(lookAt, you, topOfLibrary)),
       static(can(actor(you), cast(bare(and([isSpell, isInstantOrSorcery])), from = onTop))),
-      activated(mana([generic(3)]), exile(topSlice(lit(1))))]})
+      activated(mana([generic(3)]), exile(topSlice(1)))]})

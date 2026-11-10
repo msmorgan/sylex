@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [human, rogue],
     text = [hexproof, static(cant(any, block(thisCreature)))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

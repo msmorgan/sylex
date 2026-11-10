@@ -6,4 +6,4 @@ card singleFaced({
       static(
         costShift(
           allOf(and([abilityHead(keyword(cycling)), did(actor(you), activate(which), thisObject)])),
-          less(lit(2))))]})
+          less(2)))]})

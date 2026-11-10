@@ -5,14 +5,14 @@ card transforming(
     types = [artifact, creature],
     subtypes = [scarecrow],
     text = [when(does(actor(thisCreature), die), returnToBattlefieldTransformed(it, you))],
-    power = lit(2),
-    toughness = lit(2)},
+    power = 2,
+    toughness = 2},
   back = {
     name = "Scrounged Scythe",
     types = [artifact],
     subtypes = [equipment],
     text = [
-      static(getsPt(equipped(creature), up(lit(1)), up(lit(1)))),
+      static(getsPt(equipped(creature), up(1), up(1))),
       static(
         conditionFirstWhile(
           is(equipped(creature), hasSubtype(human)),

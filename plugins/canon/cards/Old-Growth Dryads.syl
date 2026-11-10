@@ -13,5 +13,5 @@ card singleFaced({
                 search(libraryOf(they), a(and([isLand, hasSupertype(basic)]))),
                 putOntoBattlefieldTapped(it),
                 shuffle]))))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

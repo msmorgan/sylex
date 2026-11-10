@@ -8,12 +8,12 @@ card singleFaced({
       static(
         entersWithAdditionalCounters(
           each(and([isCreature, hasSubtype(rogue), youControl, isOther])),
-          lit(1),
+          1,
           p1p1Counter)),
       whenever(
         does(
           actor(a(and([isCreature, youControl, hasCounter(p1p1Counter)]))),
           dealDamage(recipient = a(isPlayer), kind = combat)),
         instruct(that(player), discard(a(cardIn(hand)))))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

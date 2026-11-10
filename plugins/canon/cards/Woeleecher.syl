@@ -8,6 +8,6 @@ card singleFaced({
         compound([mana([pip(white)]), tapSymbol]),
         doIfDone(
           removeCounters(exactly(1), printedKind(m1m1Counter), target(isCreature)),
-          gainLife(lit(2))))],
-    power = lit(3),
-    toughness = lit(5)})
+          gainLife(2)))],
+    power = 3,
+    toughness = 5})

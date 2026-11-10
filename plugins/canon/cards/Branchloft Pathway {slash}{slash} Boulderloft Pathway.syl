@@ -2,8 +2,8 @@ card modalDfc(
   front = {
     name = "Branchloft Pathway",
     types = [land],
-    text = [activated(tapSymbol, addMana(lit(1), manaOf([[colored(green)]])))]},
+    text = [activated(tapSymbol, addMana(1, manaOf([[colored(green)]])))]},
   back = {
     name = "Boulderloft Pathway",
     types = [land],
-    text = [activated(tapSymbol, addMana(lit(1), manaOf([[colored(white)]])))]})
+    text = [activated(tapSymbol, addMana(1, manaOf([[colored(white)]])))]})

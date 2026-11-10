@@ -8,7 +8,7 @@ token jaceToken {
       types = [planeswalker],
       subtypes = [jace],
       text = [
-        activated(loyaltySymbol(down(lit(1))), surveil(lit(1))),
-        activated(loyaltySymbol(down(lit(3))), draw(lit(1)))],
-      loyalty = lit(0)}}
+        activated(loyaltySymbol(down(1)), surveil(1)),
+        activated(loyaltySymbol(down(3)), draw(1))],
+      loyalty = 0}}
 }

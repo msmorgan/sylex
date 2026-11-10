@@ -11,6 +11,6 @@ card singleFaced({
             reveal(aAtRandom(cardIn(yourHand))),
             doIf(
               is(that(card), named(chosenName)),
-              instruct(thisCreature, dealDamage(lit(2), target(isAnyTarget))))]))],
-    power = lit(1),
-    toughness = lit(1)})
+              instruct(thisCreature, dealDamage(2, target(isAnyTarget))))]))],
+    power = 1,
+    toughness = 1})

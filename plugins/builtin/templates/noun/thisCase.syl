@@ -1,4 +1,4 @@
 template thisCase: NounPhrase {
   spelling = "this Case",
-  body = headed(subtype(case), this)
+  body = headed(case, this)
 }

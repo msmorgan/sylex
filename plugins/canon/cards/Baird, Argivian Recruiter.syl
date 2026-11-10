@@ -11,6 +11,6 @@ card singleFaced({
         beginningOfYour(endStep),
         if = exists(
           comparesOwnStat(power, and([isCreature, youControl]), greater, basePowerOf(ownMember))),
-        action = create(lit(1), written(creatureToken(1, 1, [white], [soldier]))))],
-    power = lit(2),
-    toughness = lit(2)})
+        action = create(1, written(creatureToken(1, 1, [white], [soldier]))))],
+    power = 2,
+    toughness = 2})

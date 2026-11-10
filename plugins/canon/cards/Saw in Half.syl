@@ -11,7 +11,7 @@ card singleFaced({
               instruct(
                 controllerOf(it),
                 create(
-                  lit(2),
+                  2,
                   copyOf(
                     that(creature),
                     [

@@ -11,5 +11,5 @@ card singleFaced({
           aggregateOver(max, isOpponent, eventCount(draw(anyAmount), actor(they), soFarThisTurn)),
           p1p1Counter)),
       when(does(actor(thisCreature), die), draw(powerOf(thisCreature)))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

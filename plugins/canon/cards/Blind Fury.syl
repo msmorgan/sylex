@@ -9,5 +9,5 @@ card singleFaced({
             establishThroughout(
               replace(
                 would(actor(a(isCreature)), dealDamage(recipient = a(isCreature), kind = combat)),
-                instead(instruct(it, dealDamage(times(lit(2), thatMuch), that(creature))))),
+                instead(instruct(it, dealDamage(times(2, thatMuch), that(creature))))),
               thisTurn)]))]})

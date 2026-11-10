@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         addMana(
-          lit(1),
+          1,
           manaOf([[colored(red), colored(red), colored(red), colored(red), colored(red)]])))]})

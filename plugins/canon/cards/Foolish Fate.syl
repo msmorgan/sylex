@@ -11,4 +11,4 @@ card singleFaced({
         spell(
           doIf(
             did(actor(you), gainLife(anyAmount), within(soFarThisTurn)),
-            instruct(controllerOf(that(creature)), loseLife(lit(3))))))]})
+            instruct(controllerOf(that(creature)), loseLife(3)))))]})

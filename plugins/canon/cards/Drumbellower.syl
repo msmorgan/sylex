@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [spirit],
     text = [flying, static(untapDuring(allOf(and([isCreature, youControl])), each(isOtherPlayer)))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

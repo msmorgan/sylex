@@ -23,5 +23,5 @@ card singleFaced({
                       cardIn(andOr([yourGraveyard, yourHand])),
                       couldEnchant(it)])),
                 it))]))],
-    power = lit(5),
-    toughness = lit(5)})
+    power = 5,
+    toughness = 5})

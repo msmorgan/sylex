@@ -7,7 +7,7 @@ card singleFaced({
       vigilance,
       whenever(
         does(any, putCounters(anyAmount, printedKind(p1p1Counter), thisCreature)),
-        draw(lit(1)),
+        draw(1),
         limit = oncePerTurn)],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

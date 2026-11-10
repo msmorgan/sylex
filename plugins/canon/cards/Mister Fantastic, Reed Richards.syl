@@ -6,8 +6,6 @@ card singleFaced({
     subtypes = [human, scientist, hero],
     text = [
       reach,
-      whenever(
-        does(actor(counted(orMore(1), and([isToken, youControl]))), enter),
-        may(draw(lit(1))))],
-    power = lit(2),
-    toughness = lit(4)})
+      whenever(does(actor(counted(orMore(1), and([isToken, youControl]))), enter), may(draw(1)))],
+    power = 2,
+    toughness = 4})

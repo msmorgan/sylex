@@ -8,8 +8,8 @@ card singleFaced({
       activated(
         tapSymbol,
         addMana(
-          lit(1),
+          1,
           manaOf([[colorless, colorless, colorless, colorless]]),
           [spendOnly([toPay(containing(variable))])]))],
-    power = lit(4),
-    toughness = lit(4)})
+    power = 4,
+    toughness = 4})

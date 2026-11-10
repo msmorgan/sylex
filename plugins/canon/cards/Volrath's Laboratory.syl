@@ -9,9 +9,9 @@ card singleFaced({
       activated(
         compound([mana([generic(5)]), tapSymbol]),
         create(
-          lit(1),
+          1,
           written({
-              characteristics = {types = [creature], power = lit(2), toughness = lit(2)},
+              characteristics = {types = [creature], power = 2, toughness = 2},
               qualities = [
                 withQuality(ofChosen(color)),
                 withQuality(ofChosen(subtype(creature)))]})))]})

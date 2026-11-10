@@ -12,5 +12,5 @@ card singleFaced({
           any,
           putCounters(anyAmount, printedKind(p1p1Counter), a(and([isCreature, youControl])))),
         instruct(thisCreature, dealDamage(thatMuch, target(isOpponent))))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

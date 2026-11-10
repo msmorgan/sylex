@@ -5,9 +5,9 @@ card singleFaced({
     text = [
       activated(
         compound([mana([generic(4)]), tapSymbol]),
-        putCounters(lit(1), printedKind(chargeCounter), thisArtifact)),
+        putCounters(1, printedKind(chargeCounter), thisArtifact)),
       activated(
         compound([
             tapSymbol,
             perform(removeCounters(exactly(3), printedKind(chargeCounter), thisArtifact))]),
-        extraTurn(lit(1)))]})
+        extraTurn(1))]})

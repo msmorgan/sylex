@@ -7,5 +7,5 @@ token cursedRoleToken {
       name = "Cursed",
       types = [enchantment],
       subtypes = [aura, role],
-      text = [enchant(isCreature), static(getsBase(enchanted(creature), lit(1), lit(1)))]}}
+      text = [enchant(isCreature), static(getsBase(enchanted(creature), 1, 1))]}}
 }

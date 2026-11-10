@@ -17,6 +17,6 @@ card singleFaced({
                       within(soFarThisTurn))]))),
             die),
           instead(exile(it)))),
-      activated(tapSymbol, instruct(thisCreature, dealDamage(lit(1), target(isAnyTarget))))],
-    power = lit(1),
-    toughness = lit(2)})
+      activated(tapSymbol, instruct(thisCreature, dealDamage(1, target(isAnyTarget))))],
+    power = 1,
+    toughness = 2})

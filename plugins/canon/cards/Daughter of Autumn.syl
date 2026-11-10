@@ -10,7 +10,7 @@ card singleFaced({
         establishThroughout(
           replace(
             would(any, dealDamage(recipient = target(and([isCreature, hasColor(white)])))),
-            instead(redirectDamage(theNext(lit(1)), thisCreature))),
+            instead(redirectDamage(theNext(1), thisCreature))),
           thisTurn))],
-    power = lit(2),
-    toughness = lit(4)})
+    power = 2,
+    toughness = 4})

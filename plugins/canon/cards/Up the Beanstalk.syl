@@ -5,6 +5,5 @@ card singleFaced({
     text = [
       when(
         does(actor(this), enter),
-        joins = [
-          joinedHead(does(actor(you), cast(a(and([isSpell, hasManaValue(atLeast, lit(5))])))))],
-        action = draw(lit(1)))]})
+        joins = [joinedHead(does(actor(you), cast(a(and([isSpell, hasManaValue(atLeast, 5)])))))],
+        action = draw(1))]})

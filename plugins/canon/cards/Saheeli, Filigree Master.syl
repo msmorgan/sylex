@@ -6,29 +6,27 @@ card singleFaced({
     subtypes = [saheeli],
     text = [
       activated(
-        loyaltySymbol(up(lit(1))),
-        sequentially(
-          [scry(lit(1)), may(tap(a(and([isArtifact, isUntapped, youControl]))), draw(lit(1)))])),
+        loyaltySymbol(up(1)),
+        sequentially([scry(1), may(tap(a(and([isArtifact, isUntapped, youControl]))), draw(1))])),
       activated(
-        loyaltySymbol(down(lit(2))),
+        loyaltySymbol(down(2)),
         sequentially([
             create(
-              lit(2),
+              2,
               written({
                   characteristics = {
                     types = [artifact, creature],
                     subtypes = [thopter],
                     text = [flying],
-                    power = lit(1),
-                    toughness = lit(1)}})),
+                    power = 1,
+                    toughness = 1}})),
             gainHaste(them, untilEndOfTurn)])),
       activated(
-        loyaltySymbol(down(lit(4))),
+        loyaltySymbol(down(4)),
         getEmblem([
-            static(
-              getsPt(allOf(and([isArtifact, isCreature, youControl])), up(lit(1)), up(lit(1)))),
+            static(getsPt(allOf(and([isArtifact, isCreature, youControl])), up(1), up(1))),
             static(
               costShift(
                 allOf(and([isArtifact, isSpell, did(actor(you), cast(which), thisObject)])),
-                less(lit(1))))]))],
-    loyalty = lit(3)})
+                less(1)))]))],
+    loyalty = 3})

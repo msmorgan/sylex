@@ -8,5 +8,5 @@ card singleFaced({
       whenever(
         does(any, dealDamage(recipient = you)),
         may(create(thatMuch, written(creatureToken(1, 1, [white], [soldier])))))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

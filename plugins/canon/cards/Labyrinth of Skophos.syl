@@ -2,7 +2,7 @@ card singleFaced({
     name = "Labyrinth of Skophos",
     types = [land],
     text = [
-      activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
+      activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
       activated(
         compound([mana([generic(4)]), tapSymbol]),
         removeFromCombat(target(and([isCreature, or([isAttacking, isBlocking])]))))]})

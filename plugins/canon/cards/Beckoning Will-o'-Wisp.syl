@@ -7,9 +7,6 @@ card singleFaced({
       flying,
       flavorWord("Lure the Unwary", at(beginningOfYour(combat), choose(anOpponent))),
       static(
-        getsPt(
-          allOf(and([isCreature, inCombat(attackerOf, the(isChosenPlayer))])),
-          up(lit(1)),
-          up(lit(0))))],
-    power = lit(1),
-    toughness = lit(3)})
+        getsPt(allOf(and([isCreature, inCombat(attackerOf, the(isChosenPlayer))])), up(1), up(0)))],
+    power = 1,
+    toughness = 3})

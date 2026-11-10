@@ -12,14 +12,14 @@ card singleFaced({
           actor(a(and([isHistoric, isCreature, youControl]))),
           dealDamage(recipient = a(isPlayer), kind = combat)),
         create(
-          lit(1),
+          1,
           written({
               characteristics = {
                 colors = [black],
                 types = [creature],
                 subtypes = [assassin],
                 text = [menace],
-                power = lit(1),
-                toughness = lit(1)}})))],
-    power = lit(4),
-    toughness = lit(3)})
+                power = 1,
+                toughness = 1}})))],
+    power = 4,
+    toughness = 3})

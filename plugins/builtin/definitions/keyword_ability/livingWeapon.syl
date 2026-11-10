@@ -7,6 +7,6 @@ ability livingWeapon {
     when(
       does(actor(thisEquipment), enter),
       sequentially([
-          create(lit(1), written(creatureToken(0, 0, [black], [phyrexian, germ]))),
+          create(1, written(creatureToken(0, 0, [black], [phyrexian, germ]))),
           attachTo(thisEquipment, thatToken)]))]
 }

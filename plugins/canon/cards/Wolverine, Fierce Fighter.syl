@@ -19,5 +19,5 @@ card singleFaced({
         instruct(thisCreature, fight(targets(upTo(1), and([isCreature, isOther]))))),
       static(
         replace(would(any, dealDamage(recipient = thisCreature)), before(heal(thisCreature))))],
-    power = lit(3),
-    toughness = lit(5)})
+    power = 3,
+    toughness = 5})

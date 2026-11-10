@@ -3,7 +3,7 @@ action incubate(amount: Amount) {
   lexical = {verbs = [{lemma = "incubate", frames = [Amount]}]},
   spelling = "incubate <amount>",
   body = create(
-    lit(1),
+    1,
     defined(incubatorToken),
     [withCounters($amount, printedKind(p1p1Counter), fresh)])
 }

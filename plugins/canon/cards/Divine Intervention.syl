@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(6), pip(white), pip(white)],
     types = [enchantment],
     text = [
-      static(entersWithCounters(thisEnchantment, lit(2), interventionCounter)),
+      static(entersWithCounters(thisEnchantment, 2, interventionCounter)),
       at(
         beginningOfYour(upkeep),
         removeCounters(exactly(1), printedKind(interventionCounter), thisEnchantment)),

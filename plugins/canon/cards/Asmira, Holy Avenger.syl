@@ -12,5 +12,5 @@ card singleFaced({
           eventCount(putIntoFromBattlefield(a(isCreature), yourGraveyard), any, soFarThisTurn),
           printedKind(p1p1Counter),
           thisCreature))],
-    power = lit(2),
-    toughness = lit(3)})
+    power = 2,
+    toughness = 3})

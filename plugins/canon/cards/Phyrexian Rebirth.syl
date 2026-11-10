@@ -7,7 +7,7 @@ card singleFaced({
         sequentially([
             destroy(allOf(isCreature)),
             create(
-              lit(1),
+              1,
               written({
                   characteristics = {
                     types = [artifact, creature],

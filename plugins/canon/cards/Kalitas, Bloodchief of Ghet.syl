@@ -17,12 +17,12 @@ card singleFaced({
             doIf(
               did(actor(that(creature)), die, thisWay),
               create(
-                lit(1),
+                1,
                 written(
                   creatureTokenOf(
                     powerOf(that(creature)),
                     toughnessOf(that(creature)),
                     [black],
                     [vampire]))))]))],
-    power = lit(5),
-    toughness = lit(5)})
+    power = 5,
+    toughness = 5})

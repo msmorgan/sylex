@@ -3,11 +3,11 @@ card singleFaced({
     types = [land],
     text = [
       static(entersChoosing(thisLand, subtype(creature))),
-      activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
+      activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
       activated(
         tapSymbol,
         addMana(
-          lit(1),
+          1,
           ofAnyColor(sameColor),
           spendOnlyToCastAnd(
             and([isCreature, isSpell, ofChosen(subtype(creature))]),

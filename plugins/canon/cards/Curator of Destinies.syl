@@ -9,10 +9,10 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         sequentially([
-            lookAt(topSlice(lit(5))),
+            lookAt(topSlice(5)),
             separateIntoPiles(them, 2, [faceDown, faceUp]),
             instruct(anOpponent, choose(onePile)),
             putInto(that(pile), hand),
             putInto(theOther, graveyard)]))],
-    power = lit(5),
-    toughness = lit(5)})
+    power = 5,
+    toughness = 5})

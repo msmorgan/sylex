@@ -7,19 +7,17 @@ card singleFaced({
     text = [
       compleated,
       activated(
-        loyaltySymbol(up(lit(1))),
+        loyaltySymbol(up(1)),
         sequentially([
-            create(
-              lit(1),
-              written(creatureTokenOf(letter(x), letter(x), [green], [phyrexian, horror]))),
+            create(1, written(creatureTokenOf(letter(x), letter(x), [green], [phyrexian, horror]))),
             define(x, statOf(stat(loyalty), thisPlaneswalker))])),
-      activated(loyaltySymbol(down(lit(1))), destroy(target(or([isArtifact, isEnchantment])))),
+      activated(loyaltySymbol(down(1)), destroy(target(or([isArtifact, isEnchantment])))),
       activated(
-        loyaltySymbol(down(lit(7))),
+        loyaltySymbol(down(7)),
         establishFor(
           allOf(and([isCreature, youControl])),
           [
-            getsBoth(them, up(forEach(lit(1), and([hasSubtype(forest), youControl])))),
+            getsBoth(them, up(forEach(1, and([hasSubtype(forest), youControl])))),
             abilityGrant(them, trample)],
           untilEndOfTurn))],
-    loyalty = lit(7)})
+    loyalty = 7})

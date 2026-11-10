@@ -7,7 +7,7 @@ card singleFaced({
     subtypes = [whale],
     text = [
       flying,
-      when(does(actor(thisCreature), enter), surveil(lit(2))),
+      when(does(actor(thisCreature), enter), surveil(2)),
       warp(mana([generic(1), pip(blue)]))],
-    power = lit(3),
-    toughness = lit(5)})
+    power = 3,
+    toughness = 5})

@@ -8,6 +8,6 @@ card singleFaced({
             establishThroughout(
               replace(
                 would(by(aYourChoice(isSource)), dealDamage(recipient = target(isAnyTarget))),
-                instead(preventDamage(theNext(lit(3))))),
+                instead(preventDamage(theNext(3)))),
               thisTurn),
-            gainLife(lit(3))]))]})
+            gainLife(3)]))]})

@@ -4,5 +4,5 @@ card singleFaced({
     types = [sorcery],
     subtypes = [lesson],
     text = [
-      spell(putCounters(lit(2), printedKind(p1p1Counter), each(and([isCreature, youControl])))),
+      spell(putCounters(2, printedKind(p1p1Counter), each(and([isCreature, youControl])))),
       paradigm]})

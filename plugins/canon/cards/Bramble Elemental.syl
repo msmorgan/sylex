@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(any, attachment(attached, a(hasSubtype(aura)), thisCreature)),
-        create(lit(2), written(creatureToken(1, 1, [green], [saproling]))))],
-    power = lit(4),
-    toughness = lit(4)})
+        create(2, written(creatureToken(1, 1, [green], [saproling]))))],
+    power = 4,
+    toughness = 4})

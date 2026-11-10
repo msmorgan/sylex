@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(any, putCounters(anyAmount, printedKind(p1p1Counter), thisCreature)),
-        may(create(lit(1), written(creatureToken(4, 4, [green], [beast])))))],
-    power = lit(4),
-    toughness = lit(4)})
+        may(create(1, written(creatureToken(4, 4, [green], [beast])))))],
+    power = 4,
+    toughness = 4})

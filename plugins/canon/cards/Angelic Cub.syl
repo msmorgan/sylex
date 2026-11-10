@@ -13,10 +13,10 @@ card singleFaced({
           nth(1),
           does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
           turn),
-        putCounters(lit(1), printedKind(p1p1Counter), it)),
+        putCounters(1, printedKind(p1p1Counter), it)),
       static(
         conditionFirstWhile(
-          compareAmt(countersOn(p1p1Counter, thisCreature), atLeast, lit(3)),
+          compareAmt(countersOn(p1p1Counter, thisCreature), atLeast, 3),
           abilityGrant(it, flying)))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

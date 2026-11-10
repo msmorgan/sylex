@@ -4,7 +4,4 @@ card singleFaced({
     text = [
       activated(
         tapSymbol,
-        addMana(
-          lit(1),
-          ofAnyColor(sameColor),
-          [spendOnly([toCast(and([isCreature, isSpell]))])]))]})
+        addMana(1, ofAnyColor(sameColor), [spendOnly([toCast(and([isCreature, isSpell]))])]))]})

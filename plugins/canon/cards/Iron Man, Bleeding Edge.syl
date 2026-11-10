@@ -9,5 +9,5 @@ card singleFaced({
       whenever(
         does(actor(you), cast(a(and([isArtifact, isSpell])))),
         doOnlyOnceEachTurn(may(copyOnStack(it, exceptions = [isntLegendary]))))],
-    power = lit(3),
-    toughness = lit(5)})
+    power = 3,
+    toughness = 5})

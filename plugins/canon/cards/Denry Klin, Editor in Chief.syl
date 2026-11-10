@@ -10,7 +10,7 @@ card singleFaced({
           thisCreature,
           [
             withCounters(
-              lit(1),
+              1,
               chosenKind([p1p1Counter, firstStrikeCounter, vigilanceCounter]),
               fresh)])),
       whenever(
@@ -21,5 +21,5 @@ card singleFaced({
           thisCreature,
           counterKind,
           putCounters(statOf(boundCounter, thisCreature), thatKind, that(creature))))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

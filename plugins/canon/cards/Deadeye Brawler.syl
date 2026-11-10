@@ -9,6 +9,6 @@ card singleFaced({
       whenever(
         does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
         if = is(you, hasDesignation(citysBlessing)),
-        action = draw(lit(1)))],
-    power = lit(2),
-    toughness = lit(4)})
+        action = draw(1))],
+    power = 2,
+    toughness = 4})

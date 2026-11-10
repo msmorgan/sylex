@@ -18,5 +18,5 @@ card singleFaced({
             doesnt(
               actor(thisEffect),
               remove(bare(and([hasSubtype(aura), attachedTo(those(artifact))]))))]))],
-    power = lit(2),
-    toughness = lit(4)})
+    power = 2,
+    toughness = 4})

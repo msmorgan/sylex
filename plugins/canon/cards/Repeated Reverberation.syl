@@ -10,5 +10,4 @@ card singleFaced({
               does(actor(you), cast(a(and([isSorcery, isSpell])))),
               does(actor(you), activate(a(abilityHead(loyalty))))]),
           thisTurn,
-          sequentially(
-            [copyOnStack(that(stackObject), lit(2)), may(chooseNewTargets(those(copy)))])))]})
+          sequentially([copyOnStack(that(stackObject), 2), may(chooseNewTargets(those(copy)))])))]})

@@ -10,7 +10,7 @@ card singleFaced({
           joinedHeadWhile(
             does(actor(thisCreature), attack),
             whileTrue(is(thisCreature, hasDesignation(saddled))))],
-        action = create(lit(1), written(creatureToken(3, 3, [green], [elephant])))),
-      saddle(lit(5))],
-    power = lit(5),
-    toughness = lit(5)})
+        action = create(1, written(creatureToken(3, 3, [green], [elephant])))),
+      saddle(5)],
+    power = 5,
+    toughness = 5})

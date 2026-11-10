@@ -8,12 +8,12 @@ card flip(
       activated(
         compound([mana([generic(2), pip(green)]), tapSymbol]),
         sequentially([
-            create(lit(1), written(creatureToken(1, 1, [green], [snake]))),
+            create(1, written(creatureToken(1, 1, [green], [snake]))),
             doIf(
-              compareAmt(countOf(and([isCreature, youControl])), atLeast, lit(10)),
+              compareAmt(countOf(and([isCreature, youControl])), atLeast, 10),
               flip(thisCreature))]))],
-    power = lit(1),
-    toughness = lit(1)},
+    power = 1,
+    toughness = 1},
   alternative = {
     name = "Shidako, Broodmistress",
     supertypes = [legendary],
@@ -22,6 +22,6 @@ card flip(
     text = [
       activated(
         compound([mana([pip(green)]), perform(sacrifice(a(isCreature)))]),
-        get(target(isCreature), up(lit(3)), up(lit(3)), untilEndOfTurn))],
-    power = lit(3),
-    toughness = lit(3)})
+        get(target(isCreature), up(3), up(3), untilEndOfTurn))],
+    power = 3,
+    toughness = 3})

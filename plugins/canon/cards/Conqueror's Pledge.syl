@@ -6,5 +6,5 @@ card singleFaced({
       kicker(mana([generic(6)])),
       spell(
         replace(
-          create(lit(6), written(creatureToken(1, 1, [white], [kor, soldier]))),
-          doIf(keywordCostPaid(kicker, this), instead(create(lit(12), asThose)))))]})
+          create(6, written(creatureToken(1, 1, [white], [kor, soldier]))),
+          doIf(keywordCostPaid(kicker, this), instead(create(12, asThose)))))]})

@@ -10,5 +10,5 @@ card singleFaced({
           triggers(
             a(and([abilityHead(anyTriggered), abilityOf(a(and([hasSubtype(ally), youControl])))]))),
           exactly(1)))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

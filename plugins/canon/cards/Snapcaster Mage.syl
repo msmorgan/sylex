@@ -11,5 +11,5 @@ card singleFaced({
           target(and([isInstantOrSorcery, cardIn(yourGraveyard)])),
           flashback(itsManaCost),
           untilEndOfTurn))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

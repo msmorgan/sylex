@@ -6,6 +6,6 @@ card singleFaced({
       spell(
         sequentially([
             choose(target(isAnyTarget)),
-            scry(lit(3)),
-            reveal(topSlice(lit(1))),
+            scry(3),
+            reveal(topSlice(1)),
             instruct(this, dealDamage(statOf(stat(manaValue), that(card)), thatJoin))]))]})

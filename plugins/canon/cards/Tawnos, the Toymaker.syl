@@ -10,5 +10,5 @@ card singleFaced({
           actor(you),
           cast(a(and([or([hasSubtype(beast), hasSubtype(bird)]), isCreature, isSpell])))),
         may(copyOnStack(it, exceptions = [isAlso([artifact])])))],
-    power = lit(3),
-    toughness = lit(5)})
+    power = 3,
+    toughness = 5})

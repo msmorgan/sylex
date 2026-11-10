@@ -9,6 +9,6 @@ token mutagenToken {
       text = [
         activatedOnlyDuring(
           compound([mana([generic(1)]), tapSymbol, perform(sacrifice(thisToken))]),
-          putCounters(lit(1), printedKind(p1p1Counter), target(isCreature)),
+          putCounters(1, printedKind(p1p1Counter), target(isCreature)),
           asSorcery)]}}
 }

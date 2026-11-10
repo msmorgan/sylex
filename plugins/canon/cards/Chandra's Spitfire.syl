@@ -7,6 +7,6 @@ card singleFaced({
       flying,
       whenever(
         does(any, dealDamage(recipient = anOpponent, kind = noncombat)),
-        get(thisCreature, up(lit(3)), up(lit(0)), untilEndOfTurn))],
-    power = lit(1),
-    toughness = lit(3)})
+        get(thisCreature, up(3), up(0), untilEndOfTurn))],
+    power = 1,
+    toughness = 3})

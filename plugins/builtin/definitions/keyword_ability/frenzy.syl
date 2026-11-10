@@ -6,5 +6,5 @@ ability frenzy(amount: Amount) {
   body = [
     whenever(
       does(actor(thisCreature), attackUnblocked(none)),
-      get(thisCreature, up($amount), up(lit(0)), untilEndOfTurn))]
+      get(thisCreature, up($amount), up(0), untilEndOfTurn))]
 }

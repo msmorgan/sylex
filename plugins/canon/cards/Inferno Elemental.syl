@@ -8,6 +8,6 @@ card singleFaced({
         or([
             does(actor(thisCreature), block(a(isCreature))),
             does(by(a(isCreature)), block(thisCreature))]),
-        action = instruct(thisCreature, dealDamage(lit(3), that(creature))))],
-    power = lit(4),
-    toughness = lit(4)})
+        action = instruct(thisCreature, dealDamage(3, that(creature))))],
+    power = 4,
+    toughness = 4})

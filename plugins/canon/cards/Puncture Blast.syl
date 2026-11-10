@@ -2,4 +2,4 @@ card singleFaced({
     name = "Puncture Blast",
     cost = [generic(2), pip(red)],
     types = [instant],
-    text = [wither, spell(instruct(this, dealDamage(lit(3), target(isAnyTarget))))]})
+    text = [wither, spell(instruct(this, dealDamage(3, target(isAnyTarget))))]})

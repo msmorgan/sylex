@@ -2,5 +2,4 @@ card singleFaced({
     name = "Final Fortune",
     cost = [pip(red), pip(red)],
     types = [instant],
-    text = [
-      spell(sequentially([extraTurn(lit(1)), atNext(beginningOfThatTurns(endStep), loseGame)]))]})
+    text = [spell(sequentially([extraTurn(1), atNext(beginningOfThatTurns(endStep), loseGame)]))]})

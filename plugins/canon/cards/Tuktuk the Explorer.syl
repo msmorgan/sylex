@@ -9,14 +9,14 @@ card singleFaced({
       when(
         does(actor(thisCreature), die),
         create(
-          lit(1),
+          1,
           written({
               characteristics = {
                 name = "Tuktuk the Returned",
                 supertypes = [legendary],
                 types = [artifact, creature],
                 subtypes = [goblin, golem],
-                power = lit(5),
-                toughness = lit(5)}})))],
-    power = lit(1),
-    toughness = lit(1)})
+                power = 5,
+                toughness = 5}})))],
+    power = 1,
+    toughness = 1})

@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            draw(lit(3)),
+            draw(3),
             putInto(
               counted(exactly(2), cardIn(yourHand)),
               topOf(yourLibrary),

@@ -14,5 +14,5 @@ card singleFaced({
               and([
                   abilityHead(anyActivated),
                   abilityOf(allOf(and([isCreature, opponentsControl])))])))))],
-    power = lit(3),
-    toughness = lit(4)})
+    power = 3,
+    toughness = 4})

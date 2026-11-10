@@ -7,6 +7,6 @@ card singleFaced({
       trample,
       whenever(
         does(actor(you), cast(a(and([isSpell, targeting(thisCreature, someTarget)])))),
-        draw(lit(1)))],
-    power = lit(4),
-    toughness = lit(4)})
+        draw(1))],
+    power = 4,
+    toughness = 4})

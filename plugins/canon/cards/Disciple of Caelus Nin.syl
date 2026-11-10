@@ -14,5 +14,5 @@ card singleFaced({
               chooseStartingWith(you, counted(upTo(5), and([isPermanent, controlledBy(they)])))),
             instruct(allOf(and([isPermanent, otherThan(thisCreature), notChosen])), phaseOut)])),
       static(cant(actor(bare(isPermanent)), phaseIn))],
-    power = lit(3),
-    toughness = lit(4)})
+    power = 3,
+    toughness = 4})

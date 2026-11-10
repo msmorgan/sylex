@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            putCounters(lit(1), printedKind(p1p1Counter), target(and([isCreature, youControl]))),
+            putCounters(1, printedKind(p1p1Counter), target(and([isCreature, youControl]))),
             establishThroughout(
               must(actor(target(and([isCreature, isOther]))), block(it)),
               thisTurn)]))]})

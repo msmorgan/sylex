@@ -8,10 +8,10 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         sequentially([
-            instruct(it, dealDamage(lit(2), target(isAnyTarget))),
-            gainLife(lit(2)),
+            instruct(it, dealDamage(2, target(isAnyTarget))),
+            gainLife(2),
             doIf(
               was(dealDamage(recipient = a(isPlayer)), thisWay),
               instruct(they, discard(a(cardIn(hand)))))]))],
-    power = lit(4),
-    toughness = lit(4)})
+    power = 4,
+    toughness = 4})

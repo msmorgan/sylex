@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(2)],
     types = [artifact],
     text = [
-      activated(tapSymbol, putCounters(lit(1), printedKind(chargeCounter), thisArtifact)),
+      activated(tapSymbol, putCounters(1, printedKind(chargeCounter), thisArtifact)),
       activated(
         compound([tapSymbol, perform(sacrifice(thisArtifact))]),
         destroy(

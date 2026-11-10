@@ -6,5 +6,5 @@ card singleFaced({
     text = [
       firstStrike,
       activated(perform(sacrifice(thisCreature)), removeAllCounters(none, target(isPermanent)))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

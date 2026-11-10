@@ -2,5 +2,4 @@ card singleFaced({
     name = "Humility",
     cost = [generic(2), pip(white), pip(white)],
     types = [enchantment],
-    text = [
-      static(conjunction([allAbilityLoss(allOf(isCreature)), getsBase(them, lit(1), lit(1))]))]})
+    text = [static(conjunction([allAbilityLoss(allOf(isCreature)), getsBase(them, 1, 1)]))]})

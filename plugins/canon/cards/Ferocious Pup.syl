@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), enter),
-        create(lit(1), written(creatureToken(2, 2, [green], [wolf]))))],
-    power = lit(0),
-    toughness = lit(1)})
+        create(1, written(creatureToken(2, 2, [green], [wolf]))))],
+    power = 0,
+    toughness = 1})

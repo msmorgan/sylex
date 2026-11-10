@@ -12,5 +12,5 @@ card singleFaced({
             doIf(
               was(dealDamage(recipient = a(isPlayer)), thisWay),
               establishThroughout(cant(actor(they), gainLife(anyAmount)), restOfGame))]))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

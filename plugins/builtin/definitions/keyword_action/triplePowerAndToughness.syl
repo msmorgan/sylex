@@ -5,7 +5,7 @@ action triplePowerAndToughness(subject: NounPhrase, duration: Option(Duration) =
   deed = "triple",
   body = get(
     $subject,
-    up(times(lit(2), powerOf($subject))),
-    up(times(lit(2), toughnessOf($subject))),
+    up(times(2, powerOf($subject))),
+    up(times(2, toughnessOf($subject))),
     $duration)
 }

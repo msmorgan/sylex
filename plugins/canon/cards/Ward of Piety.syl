@@ -10,5 +10,5 @@ card singleFaced({
         establishThroughout(
           replace(
             would(any, dealDamage(recipient = enchanted(creature))),
-            instead(redirectDamage(theNext(lit(1)), target(isAnyTarget)))),
+            instead(redirectDamage(theNext(1), target(isAnyTarget)))),
           thisTurn))]})

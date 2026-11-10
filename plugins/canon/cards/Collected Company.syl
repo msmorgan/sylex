@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            lookAt(topSlice(lit(6))),
+            lookAt(topSlice(6)),
             putOntoBattlefield(
-              fromAmong(upTo(2), and([isCreature, hasManaValue(atMost, lit(3))]), them)),
+              fromAmong(upTo(2), and([isCreature, hasManaValue(atMost, 3)]), them)),
             putInto(theRest, onBottom, riders = [inOrder(anyOrder)])]))]})

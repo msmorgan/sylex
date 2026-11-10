@@ -15,5 +15,5 @@ card singleFaced({
             counted(exactly(1), and([isSpell, or([hasSubtype(aura), hasSubtype(equipment)])])),
             from = yourGraveyard),
           timing = onEachOfYourTurns))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

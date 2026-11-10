@@ -9,6 +9,6 @@ card singleFaced({
         beginningOfYour(upkeep),
         doUnless(
           sacrifice(thisCreature),
-          scaledGenericMana(forEach(lit(1), and([isCreature, youControl, isOther])))))],
-    power = lit(3),
-    toughness = lit(4)})
+          scaledGenericMana(forEach(1, and([isCreature, youControl, isOther])))))],
+    power = 3,
+    toughness = 4})

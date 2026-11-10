@@ -6,5 +6,5 @@ card singleFaced({
       spell(
         sequentially([
             establish(abilityGrant(allOf(and([isCreature, youControl])), indestructible)),
-            extraTurn(lit(1)),
+            extraTurn(1),
             atNext(beginningOfThatTurns(endStep), loseGame)]))]})

@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [spider],
     text = [reach],
-    power = lit(2),
-    toughness = lit(4)})
+    power = 2,
+    toughness = 4})

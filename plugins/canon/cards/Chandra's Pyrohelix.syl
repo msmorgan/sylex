@@ -2,4 +2,4 @@ card singleFaced({
     name = "Chandra's Pyrohelix",
     cost = [generic(1), pip(red)],
     types = [instant],
-    text = [spell(dealDivided(this, lit(2), targets(oneThrough(2), isAnyTarget)))]})
+    text = [spell(dealDivided(this, 2, targets(oneThrough(2), isAnyTarget)))]})

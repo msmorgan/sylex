@@ -12,5 +12,5 @@ card singleFaced({
             doIf(
               compareAmt(countOf(cardIn(handOf(that(player)))), greater, countOf(cardIn(yourHand))),
               draw(theDifference))]))],
-    power = lit(4),
-    toughness = lit(4)})
+    power = 4,
+    toughness = 4})

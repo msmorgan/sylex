@@ -9,6 +9,6 @@ card singleFaced({
         costShift(
           allOf(
             and([abilityHead(loyalty), abilityOf(allOf(and([isPlaneswalker, opponentsControl])))])),
-          more(lit(1))))],
-    power = lit(2),
-    toughness = lit(1)})
+          more(1)))],
+    power = 2,
+    toughness = 1})

@@ -7,17 +7,15 @@ card transforming(
     subtypes = [garruk],
     text = [
       when(
-        stateHolds(is(thisPlaneswalker, compare(atMost, lit(2), axes = [counter(loyaltyCounter)]))),
+        stateHolds(is(thisPlaneswalker, compare(atMost, 2, axes = [counter(loyaltyCounter)]))),
         transform(thisPlaneswalker)),
       activated(
-        loyaltySymbol(up(lit(0))),
+        loyaltySymbol(up(0)),
         sequentially([
-            instruct(thisPlaneswalker, dealDamage(lit(3), target(isCreature))),
+            instruct(thisPlaneswalker, dealDamage(3, target(isCreature))),
             dealDamageOwnPower(that(creature), thisPlaneswalker)])),
-      activated(
-        loyaltySymbol(up(lit(0))),
-        create(lit(1), written(creatureToken(2, 2, [green], [wolf]))))],
-    loyalty = lit(3)},
+      activated(loyaltySymbol(up(0)), create(1, written(creatureToken(2, 2, [green], [wolf]))))],
+    loyalty = 3},
   back = {
     name = "Garruk, the Veil-Cursed",
     supertypes = [legendary],
@@ -25,25 +23,25 @@ card transforming(
     subtypes = [garruk],
     text = [
       activated(
-        loyaltySymbol(up(lit(1))),
+        loyaltySymbol(up(1)),
         create(
-          lit(1),
+          1,
           written({
               characteristics = {
                 colors = [black],
                 types = [creature],
                 subtypes = [wolf],
                 text = [deathtouch],
-                power = lit(1),
-                toughness = lit(1)}}))),
+                power = 1,
+                toughness = 1}}))),
       activated(
-        loyaltySymbol(down(lit(1))),
+        loyaltySymbol(down(1)),
         doIfDone(
           sacrifice(a(isCreature)),
           sequentially(
             [search(yourLibrary, a(isCreature)), reveal(it), putInto(it, hand), shuffle]))),
       activated(
-        loyaltySymbol(down(lit(3))),
+        loyaltySymbol(down(3)),
         sequentially([
             establishFor(
               allOf(and([isCreature, youControl])),

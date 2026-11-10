@@ -9,6 +9,6 @@ card singleFaced({
       whenever(
         does(any, dealDamage(recipient = thisCreature)),
         instruct(it, dealDamage(thatMuch, the(isChosenPlayer)))),
-      activated(tapSymbol, instruct(thisCreature, dealDamage(lit(1), thisCreature)))],
-    power = lit(0),
-    toughness = lit(1)})
+      activated(tapSymbol, instruct(thisCreature, dealDamage(1, thisCreature)))],
+    power = 0,
+    toughness = 1})

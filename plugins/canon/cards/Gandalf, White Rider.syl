@@ -8,9 +8,8 @@ card singleFaced({
       vigilance,
       whenever(
         does(actor(you), cast(a(isSpell))),
-        sequentially([
-            get(each(and([isCreature, youControl])), up(lit(1)), up(lit(0)), untilEndOfTurn),
-            scry(lit(1))])),
+        sequentially(
+          [get(each(and([isCreature, youControl])), up(1), up(0), untilEndOfTurn), scry(1)])),
       when(does(actor(thisCreature), die), may(putInto(it, fromTop(5, library))))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

@@ -11,8 +11,8 @@ card adventurer(
         cant(
           actor(thisCreature),
           block(allOf(and([isCreature, not(hasKeyword(theKeyword(flying)))])))))],
-    power = lit(3),
-    toughness = lit(1)},
+    power = 3,
+    toughness = 1},
   adventure = {
     name = "Petty Theft",
     cost = [generic(1), pip(blue)],

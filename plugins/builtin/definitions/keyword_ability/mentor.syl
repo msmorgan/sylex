@@ -7,7 +7,7 @@ ability mentor {
     whenever(
       does(actor(thisCreature), attack),
       putCounters(
-        lit(1),
+        1,
         printedKind(p1p1Counter),
         target(and([isCreature, isAttacking, hasPower(less, powerOf(thisCreature))]))))]
 }

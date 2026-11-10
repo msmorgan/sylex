@@ -14,6 +14,6 @@ card singleFaced({
             actor(you),
             attackWith(counted(orMore(3), hasSubtype(merfolk))),
             within(soFarThisTurn)),
-          getsPt(allOf(and([hasSubtype(merfolk), youControl])), up(lit(1)), up(lit(0)))))],
-    power = lit(2),
-    toughness = lit(2)})
+          getsPt(allOf(and([hasSubtype(merfolk), youControl])), up(1), up(0))))],
+    power = 2,
+    toughness = 2})

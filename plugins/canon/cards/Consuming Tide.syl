@@ -14,4 +14,4 @@ card singleFaced({
                   countOf(cardIn(handOf(they))),
                   greater,
                   countOf(cardIn(yourHand)))),
-              draw(lit(1)))]))]})
+              draw(1))]))]})

@@ -8,4 +8,4 @@ card singleFaced({
         altCost(
           this,
           perform(exile(a(and([hasColor(red), hasManaValue(equal, letter(x)), in(yourHand)])))))),
-      spell(get(target(isCreature), up(letter(x)), up(lit(0)), untilEndOfTurn))]})
+      spell(get(target(isCreature), up(letter(x)), up(0), untilEndOfTurn))]})

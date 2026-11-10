@@ -13,7 +13,7 @@ card singleFaced({
       static(
         getsPt(
           allOf(and([isCreature, youControl, isOther, ofChosen(subtype(creature))])),
-          up(lit(1)),
-          up(lit(1))))],
-    power = lit(2),
-    toughness = lit(2)})
+          up(1),
+          up(1)))],
+    power = 2,
+    toughness = 2})

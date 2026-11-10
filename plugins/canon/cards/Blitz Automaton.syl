@@ -5,6 +5,6 @@ card prototype(
     types = [artifact, creature],
     subtypes = [construct],
     text = [prototype, haste],
-    power = lit(6),
-    toughness = lit(4)},
-  alternative = {cost = [generic(2), pip(red)], power = lit(3), toughness = lit(2)})
+    power = 6,
+    toughness = 4},
+  alternative = {cost = [generic(2), pip(red)], power = 3, toughness = 2})

@@ -10,7 +10,7 @@ card singleFaced({
                 or([isArtifact, isEnchantment]),
                 isSpell,
                 did(actor(yourOpponents), cast(which), thisObject)])),
-          more(lit(2)))),
+          more(2))),
       activated(
         perform(sacrifice(thisEnchantment)),
         destroy(target(or([isArtifact, isEnchantment]))))]})

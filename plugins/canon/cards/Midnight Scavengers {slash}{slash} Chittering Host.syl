@@ -9,10 +9,10 @@ card transforming(
         does(actor(thisCreature), enter),
         may(
           returnToHand(
-            target(and([isCreature, in(yourGraveyard), hasManaValue(atMost, lit(3))])),
+            target(and([isCreature, in(yourGraveyard), hasManaValue(atMost, 3)])),
             yourGraveyard)))],
-    power = lit(3),
-    toughness = lit(3)},
+    power = 3,
+    toughness = 3},
   back = {
     name = "Chittering Host",
     types = [creature],
@@ -24,7 +24,7 @@ card transforming(
         does(actor(thisCreature), enter),
         establishFor(
           allOf(and([isCreature, youControl, isOther])),
-          [getsPt(them, up(lit(1)), up(lit(0))), abilityGrant(them, menace)],
+          [getsPt(them, up(1), up(0)), abilityGrant(them, menace)],
           untilEndOfTurn))],
-    power = lit(5),
-    toughness = lit(6)})
+    power = 5,
+    toughness = 6})

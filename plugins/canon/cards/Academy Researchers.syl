@@ -13,5 +13,5 @@ card singleFaced({
           putOntoBattlefieldAttachedTo(
             a(and([hasSubtype(aura), cardIn(yourHand)])),
             thisCreature)))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

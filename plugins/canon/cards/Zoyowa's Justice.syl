@@ -6,6 +6,6 @@ card singleFaced({
       spell(
         sequentially([
             instruct(
-              ownerOf(target(and([or([isArtifact, isCreature]), hasManaValue(atLeast, lit(1))]))),
+              ownerOf(target(and([or([isArtifact, isCreature]), hasManaValue(atLeast, 1)]))),
               shuffleInto(it)),
             instruct(that(player), discover(statOf(stat(manaValue), it)))]))]})

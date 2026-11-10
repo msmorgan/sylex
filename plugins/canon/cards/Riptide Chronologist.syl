@@ -7,5 +7,5 @@ card singleFaced({
       activated(
         compound([mana([pip(blue)]), perform(sacrifice(thisCreature))]),
         untap(allOf(and([isCreature, ofYourChoice(subtype(creature))]))))],
-    power = lit(1),
-    toughness = lit(3)})
+    power = 1,
+    toughness = 3})

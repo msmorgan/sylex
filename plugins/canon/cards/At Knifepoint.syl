@@ -7,7 +7,7 @@ card singleFaced({
       whenever(
         does(actor(you), commitCrime),
         create(
-          lit(1),
+          1,
           written({
               characteristics = {
                 colors = [red],
@@ -16,12 +16,8 @@ card singleFaced({
                 text = [
                   activatedOnlyDuring(
                     tapSymbol,
-                    get(
-                      target(and([isCreature, youControl])),
-                      up(lit(1)),
-                      up(lit(0)),
-                      untilEndOfTurn),
+                    get(target(and([isCreature, youControl])), up(1), up(0), untilEndOfTurn),
                     asSorcery)],
-                power = lit(1),
-                toughness = lit(1)}})),
+                power = 1,
+                toughness = 1}})),
         limit = oncePerTurn)]})

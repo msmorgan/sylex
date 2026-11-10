@@ -11,5 +11,5 @@ card singleFaced({
               enchanted(creature),
               sets,
               bundle({characteristics = {subtypes = [treefolk]}})),
-            getsBase(it, lit(0), lit(4)),
+            getsBase(it, 0, 4),
             allAbilityLoss(it)]))]})

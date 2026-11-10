@@ -9,5 +9,5 @@ token shardToken {
       text = [
         activated(
           compound([mana([generic(2)]), perform(sacrifice(thisToken))]),
-          sequentially([scry(lit(1)), draw(lit(1))]))]}}
+          sequentially([scry(1), draw(1)]))]}}
 }

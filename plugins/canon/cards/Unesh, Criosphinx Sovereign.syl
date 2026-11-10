@@ -9,15 +9,15 @@ card singleFaced({
       static(
         costShift(
           allOf(and([hasSubtype(sphinx), isSpell, did(actor(you), cast(which), thisObject)])),
-          less(lit(2)))),
+          less(2))),
       whenever(
         does(
           actor(eitherOf(thisCreature, a(and([hasSubtype(sphinx), youControl, isOther])))),
           enter),
         sequentially([
-            reveal(topSlice(lit(4))),
+            reveal(topSlice(4)),
             instruct(anOpponent, separateIntoPiles(them, 2)),
             putInto(onePile, hand),
             putInto(theOther, graveyard)]))],
-    power = lit(4),
-    toughness = lit(4)})
+    power = 4,
+    toughness = 4})

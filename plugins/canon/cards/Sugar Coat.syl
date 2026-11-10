@@ -18,5 +18,5 @@ card singleFaced({
                     text = [
                       activated(
                         compound([mana([generic(2)]), tapSymbol, perform(sacrifice(thisArtifact))]),
-                        gainLife(lit(3)))]}})),
+                        gainLife(3))]}})),
             allAbilityLoss(it)]))]})

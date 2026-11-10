@@ -7,5 +7,5 @@ card singleFaced({
       whenever(
         does(any, dealDamage(recipient = thisCreature)),
         instruct(it, dealDamage(thatMuch, target(or([isPlaneswalker, isOpponent])))))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

@@ -8,7 +8,7 @@ card singleFaced({
         does(actor(thisCreature), die),
         if = not(is(it, hasSubtype(demon))),
         action = sequentially([
-            returnToBattlefieldWithCounters(it, ownerOf(it), lit(2), p1p1Counter),
+            returnToBattlefieldWithCounters(it, ownerOf(it), 2, p1p1Counter),
             become(it, {characteristics = {subtypes = [demon]}})]))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

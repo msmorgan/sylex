@@ -8,5 +8,4 @@ card singleFaced({
           would(
             any,
             putCounters(anyAmount, printedKind(p1p1Counter), a(and([isCreature, youControl])))),
-          instead(
-            putCounters(times(lit(2), thatMuch), printedKind(p1p1Counter), that(creature)))))]})
+          instead(putCounters(times(2, thatMuch), printedKind(p1p1Counter), that(creature)))))]})

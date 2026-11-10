@@ -4,5 +4,5 @@ card singleFaced({
     types = [enchantment],
     text = [
       mayBeginOnBattlefield,
-      static(getsPt(allOf(and([isCreature, youControl])), up(lit(0)), up(lit(1)))),
-      whenever(does(actor(a(and([isCreature, youControl]))), enter), may(gainLife(lit(1))))]})
+      static(getsPt(allOf(and([isCreature, youControl])), up(0), up(1))),
+      whenever(does(actor(a(and([isCreature, youControl]))), enter), may(gainLife(1)))]})

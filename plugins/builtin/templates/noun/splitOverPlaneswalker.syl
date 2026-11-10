@@ -5,5 +5,5 @@ template splitOverPlaneswalker: NounPhrase {
   # union alternative.
   body = eitherOf(
     pro(unionHalf(player), one),
-    possessorOf(controller, pro(unionHalf(type(planeswalker)), one)))
+    possessorOf(controller, pro(unionHalf(planeswalker), one)))
 }

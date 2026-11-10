@@ -1,4 +1,4 @@
 card singleFaced({
     name = "Darksteel Citadel",
     types = [artifact, land],
-    text = [indestructible, activated(tapSymbol, addMana(lit(1), manaOf([[colorless]])))]})
+    text = [indestructible, activated(tapSymbol, addMana(1, manaOf([[colorless]])))]})

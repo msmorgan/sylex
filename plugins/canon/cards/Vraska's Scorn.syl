@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            instruct(target(isOpponent), loseLife(lit(4))),
+            instruct(target(isOpponent), loseLife(4)),
             may(
               sequentially([
                   searchLibraryOrGraveyard(a(named(printedName("Vraska, Scheming Gorgon")))),

@@ -17,8 +17,7 @@ ability paradigm {
         delayWithin(
           reached(beginningOfYour(firstMain)),
           restOfGame,
-          sequentially([
-              copy(inZone(exile), this, lit(1), []),
-              may(cast(that(copy), payment = withoutPaying))])))),
+          sequentially(
+            [copy(inZone(exile), this, 1, []), may(cast(that(copy), payment = withoutPaying))])))),
     spell(exile(thisSpell))]
 }

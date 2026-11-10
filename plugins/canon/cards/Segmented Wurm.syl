@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
-        putCounters(lit(1), printedKind(m1m1Counter), it))],
-    power = lit(5),
-    toughness = lit(5)})
+        putCounters(1, printedKind(m1m1Counter), it))],
+    power = 5,
+    toughness = 5})

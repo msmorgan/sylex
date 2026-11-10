@@ -2,4 +2,4 @@ card singleFaced({
     name = "Moonlit Wake",
     cost = [generic(2), pip(white)],
     types = [enchantment],
-    text = [whenever(does(actor(a(isCreature)), die), gainLife(lit(1)))]})
+    text = [whenever(does(actor(a(isCreature)), die), gainLife(1))]})

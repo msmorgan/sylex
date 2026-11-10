@@ -7,8 +7,8 @@ card singleFaced({
       activated(
         tapSymbol,
         addMana(
-          lit(1),
+          1,
           manaOf([[colored(blue)], [colorless, colored(blue)]]),
           [spendOnly([toPay(ofKeyword(cumulativeUpkeep))])]))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

@@ -6,7 +6,6 @@ card singleFaced({
     subtypes = [human, knight],
     text = [
       lifelink,
-      static(
-        getsBoth(thisCreature, up(forEach(lit(1), and([hasSubtype(equipment), youControl])))))],
-    power = lit(2),
-    toughness = lit(1)})
+      static(getsBoth(thisCreature, up(forEach(1, and([hasSubtype(equipment), youControl])))))],
+    power = 2,
+    toughness = 1})

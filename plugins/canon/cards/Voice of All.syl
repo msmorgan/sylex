@@ -7,5 +7,5 @@ card singleFaced({
       flying,
       static(entersChoosing(thisCreature, color)),
       static(abilityGrant(thisCreature, protection(ofChosen(color))))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

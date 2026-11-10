@@ -12,7 +12,7 @@ ability encore(cost: Cost) {
           doForEach(
             eachOpponent,
             sequentially([
-                create(lit(1), copyOf(this)),
+                create(1, copyOf(this)),
                 establishThroughout(must(actor(thatToken), attack(that(player))), thisTurn)])),
           gain(thoseTokens, haste),
           atNext(beginningOfNext(endStep), sacrifice(thoseTokens))]),

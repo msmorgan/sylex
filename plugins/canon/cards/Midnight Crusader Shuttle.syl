@@ -20,6 +20,6 @@ card singleFaced({
               doIf(
                 did(actor(you), gainControlOf(a(isCreature)), thisWay),
                 sequentially([tap(it), becomeAttacking(it, defendingPlayer)]))]))),
-      crew(lit(2))],
-    power = lit(3),
-    toughness = lit(4)})
+      crew(2)],
+    power = 3,
+    toughness = 4})

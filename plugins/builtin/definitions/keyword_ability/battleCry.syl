@@ -7,6 +7,6 @@ ability battleCry {
     whenever(
       does(actor(thisCreature), attack),
       establishThroughout(
-        getsPt(each(and([isCreature, isAttacking, isOther])), up(lit(1)), up(lit(0))),
+        getsPt(each(and([isCreature, isAttacking, isOther])), up(1), up(0)),
         untilEndOfTurn))]
 }

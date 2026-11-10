@@ -8,7 +8,7 @@ card singleFaced({
         or([does(actor(thisCreature), enter), does(actor(thisCreature), attack)]),
         action = sequentially([
             exile(target(cardIn(graveyard))),
-            putCounters(lit(1), printedKind(p1p1Counter), thisCreature)])),
+            putCounters(1, printedKind(p1p1Counter), thisCreature)])),
       alsoForKeywords(
         static(
           onlyWhile(
@@ -30,5 +30,5 @@ card singleFaced({
           theKeyword(reach),
           theKeyword(trample),
           theKeyword(vigilance)])],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

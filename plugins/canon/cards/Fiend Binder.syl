@@ -7,5 +7,5 @@ card singleFaced({
       whenever(
         does(actor(thisCreature), attack),
         tap(target(and([isCreature, controlledBy(defendingPlayer)]))))],
-    power = lit(3),
-    toughness = lit(2)})
+    power = 3,
+    toughness = 2})

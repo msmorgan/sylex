@@ -7,7 +7,6 @@ card singleFaced({
       asThoughFlashSacrificedAtCleanup,
       enchant(isCreature),
       static(
-        conjunction([
-            getsPt(enchanted(creature), up(lit(0)), up(lit(3))),
-            abilityGrant(enchanted(creature), reach)],
+        conjunction(
+          [getsPt(enchanted(creature), up(0), up(3)), abilityGrant(enchanted(creature), reach)],
           subject = enchanted(creature)))]})

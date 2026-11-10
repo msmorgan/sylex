@@ -8,6 +8,6 @@ card singleFaced({
             establishThroughout(
               replace(
                 would(any, dealDamage(recipient = target(isCreature))),
-                instead(redirectDamage(theNext(lit(1)), target(and([isCreature, isOther]))))),
+                instead(redirectDamage(theNext(1), target(and([isCreature, isOther]))))),
               thisTurn),
-            draw(lit(1))]))]})
+            draw(1)]))]})

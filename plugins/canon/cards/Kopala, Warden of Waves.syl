@@ -12,7 +12,7 @@ card singleFaced({
                 isSpell,
                 did(actor(yourOpponents), cast(which), thisObject),
                 targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
-          more(lit(2)))),
+          more(2))),
       static(
         costShift(
           allOf(
@@ -20,6 +20,6 @@ card singleFaced({
                 abilityHead(anyActivated),
                 did(actor(yourOpponents), activate(which), thisObject),
                 targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
-          more(lit(2))))],
-    power = lit(2),
-    toughness = lit(2)})
+          more(2)))],
+    power = 2,
+    toughness = 2})

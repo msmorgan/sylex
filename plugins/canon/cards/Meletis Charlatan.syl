@@ -9,5 +9,5 @@ card singleFaced({
         sequentially([
             instruct(controllerOf(target(and([isInstantOrSorcery, isSpell]))), copyOnStack(it)),
             instruct(that(player), may(chooseNewTargets(that(copy))))]))],
-    power = lit(2),
-    toughness = lit(3)})
+    power = 2,
+    toughness = 3})

@@ -6,11 +6,11 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), enter),
-        sequentially([rollDice(lit(5)), storeResults(thisCreature)])),
+        sequentially([rollDice(5), storeResults(thisCreature)])),
       at(beginningOfYour(combat), may(rerollStored(anyNumber, thisCreature))),
       static(
         conjunction([
             getsPt(thisCreature, up(letter(x)), up(letter(x))),
             letterDefinition(x, greatestStoredMatch(thisCreature))]))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

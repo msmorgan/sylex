@@ -8,6 +8,6 @@ card singleFaced({
           both(
             target(isCreature),
             allOf(and([isCreature, shares(cardName, share, that(creature)), isOther]))),
-          down(lit(3)),
-          down(lit(3)),
+          down(3),
+          down(3),
           untilEndOfTurn))]})

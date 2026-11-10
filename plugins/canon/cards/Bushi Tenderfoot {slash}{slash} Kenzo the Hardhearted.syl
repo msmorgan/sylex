@@ -17,13 +17,13 @@ card flip(
                     within(soFarThisTurn))]))),
           die),
         flip(thisCreature))],
-    power = lit(1),
-    toughness = lit(1)},
+    power = 1,
+    toughness = 1},
   alternative = {
     name = "Kenzo the Hardhearted",
     supertypes = [legendary],
     types = [creature],
     subtypes = [human, samurai],
-    text = [doubleStrike, bushido(lit(2))],
-    power = lit(3),
-    toughness = lit(4)})
+    text = [doubleStrike, bushido(2)],
+    power = 3,
+    toughness = 4})

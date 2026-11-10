@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            draw(lit(3)),
+            draw(3),
             establishThroughout(
               can(actor(you), play(counted(additional(exactly(1)), isLand))),
               thisTurn)]))]})

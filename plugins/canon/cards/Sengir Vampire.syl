@@ -16,6 +16,6 @@ card singleFaced({
                     dealDamage(recipient = which),
                     within(soFarThisTurn))]))),
           die),
-        putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
-    power = lit(4),
-    toughness = lit(4)})
+        putCounters(1, printedKind(p1p1Counter), thisCreature))],
+    power = 4,
+    toughness = 4})

@@ -8,5 +8,5 @@ card singleFaced({
         replace(
           would(actor(a(isSource)), dealDamage(recipient = a(or([isPermanent, isPlayer])))),
           instead(instruct(it, dealDamage(half(down, thatMuch), thatJoin)))))],
-    power = lit(4),
-    toughness = lit(5)})
+    power = 4,
+    toughness = 5})

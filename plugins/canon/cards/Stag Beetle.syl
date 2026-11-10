@@ -8,5 +8,5 @@ card singleFaced({
         conjunction([
             entersWithCounters(thisCreature, letter(x), p1p1Counter),
             letterDefinition(x, countOf(and([isCreature, isOther])))]))],
-    power = lit(0),
-    toughness = lit(0)})
+    power = 0,
+    toughness = 0})

@@ -5,4 +5,4 @@ card singleFaced({
     text = [
       whenever(
         does(actor(a(isCreature)), attack(youOr(a(and([isPlaneswalker, youControl]))))),
-        instruct(controllerOf(that(creature)), loseLife(lit(1))))]})
+        instruct(controllerOf(that(creature)), loseLife(1)))]})

@@ -8,5 +8,5 @@ action endure(amount: Amount) {
     controllerOf(actor),
     chooseOne(
       putCounters($amount, printedKind(p1p1Counter), actor),
-      create(lit(1), written(creatureTokenOf($amount, $amount, [white], [spirit])))))
+      create(1, written(creatureTokenOf($amount, $amount, [white], [spirit])))))
 }

@@ -4,5 +4,5 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [frog],
     text = [affinity(isArtifact)],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

@@ -7,9 +7,7 @@ card singleFaced({
         chooseSpree([
             {
               cost = mana([generic(1)]),
-              action = instruct(this, dealDamage(lit(2), each(and([isCreature, isOutlaw]))))},
+              action = instruct(this, dealDamage(2, each(and([isCreature, isOutlaw]))))},
             {
               cost = mana([generic(1)]),
-              action = instruct(
-                this,
-                dealDamage(lit(2), each(and([isCreature, non(isOutlaw)]))))}]))]})
+              action = instruct(this, dealDamage(2, each(and([isCreature, non(isOutlaw)]))))}]))]})

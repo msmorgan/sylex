@@ -11,5 +11,5 @@ card singleFaced({
             actor(a(and([isSource, youControl]))),
             dealDamage(recipient = a(and([isCreature, anOpponentControls])), kind = noncombat)),
           instead(putCounters(thatMuch, printedKind(m1m1Counter), that(creature)))))],
-    power = lit(1),
-    toughness = lit(2)})
+    power = 1,
+    toughness = 2})

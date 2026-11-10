@@ -6,4 +6,4 @@ card singleFaced({
       spell(
         sequentially([
             putInto(target(isCreature), fromTop(2, library)),
-            instruct(controllerOf(it), gainLife(lit(3)))]))]})
+            instruct(controllerOf(it), gainLife(3))]))]})

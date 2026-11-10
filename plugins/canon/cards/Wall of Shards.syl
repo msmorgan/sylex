@@ -4,6 +4,6 @@ card singleFaced({
     supertypes = [snow],
     types = [creature],
     subtypes = [wall],
-    text = [defender, flying, cumulativeUpkeep(perform(instruct(anOpponent, gainLife(lit(1)))))],
-    power = lit(1),
-    toughness = lit(8)})
+    text = [defender, flying, cumulativeUpkeep(perform(instruct(anOpponent, gainLife(1))))],
+    power = 1,
+    toughness = 8})

@@ -9,5 +9,5 @@ card singleFaced({
         conjunction([
             can(actor(you), play(allOf(isLand), from = onTop)),
             can(actor(you), cast(bare(isSpell), from = onTop))]))],
-    power = lit(2),
-    toughness = lit(3)})
+    power = 2,
+    toughness = 3})

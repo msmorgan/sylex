@@ -8,5 +8,5 @@ card singleFaced({
         can(actor(you), play(counted(additional(exactly(1)), isLand)), timing = onEachOfYourTurns)),
       static(visibility(reveal, you, topOfLibrary)),
       static(can(actor(you), play(allOf(isLand), from = onTop)))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

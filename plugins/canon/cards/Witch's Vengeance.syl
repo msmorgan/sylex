@@ -6,6 +6,6 @@ card singleFaced({
       spell(
         get(
           allOf(and([isCreature, ofYourChoice(subtype(creature))])),
-          down(lit(3)),
-          down(lit(3)),
+          down(3),
+          down(3),
           untilEndOfTurn))]})

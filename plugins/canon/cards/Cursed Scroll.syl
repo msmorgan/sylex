@@ -12,4 +12,4 @@ card singleFaced({
             reveal(aAtRandom(cardIn(yourHand))),
             doIf(
               is(that(card), named(chosenName)),
-              instruct(thisArtifact, dealDamage(lit(2), target(isAnyTarget))))]))]})
+              instruct(thisArtifact, dealDamage(2, target(isAnyTarget))))]))]})

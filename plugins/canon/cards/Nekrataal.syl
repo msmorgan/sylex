@@ -10,5 +10,5 @@ card singleFaced({
         doUnderProhibition(
           destroy(target(and([isCreature, non(isArtifact), not(hasColor(black))]))),
           regeneration(that(creature))))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

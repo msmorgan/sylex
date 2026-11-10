@@ -10,5 +10,5 @@ card singleFaced({
           allOf(and([isLand, youControl])),
           adds,
           chosenQuality(ofChosen(subtype(land)))))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

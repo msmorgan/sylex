@@ -6,5 +6,5 @@ template creatureToken(
   abilities: List(Ability) = []): CharacteristicBundle {
   # TODO(spelling): Format and coordinate the colors, subtypes, abilities list entries, including
   # the empty case.
-  body = creatureTokenOf(lit($powerValue), lit($toughnessValue), $colors, $subtypes, $abilities)
+  body = creatureTokenOf($powerValue, $toughnessValue, $colors, $subtypes, $abilities)
 }

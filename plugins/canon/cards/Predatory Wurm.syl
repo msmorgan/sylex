@@ -7,7 +7,7 @@ card singleFaced({
       vigilance,
       static(
         onlyWhile(
-          getsPt(thisCreature, up(lit(2)), up(lit(2))),
+          getsPt(thisCreature, up(2), up(2)),
           exists(and([hasSubtype(garruk), youControl]))))],
-    power = lit(4),
-    toughness = lit(4)})
+    power = 4,
+    toughness = 4})

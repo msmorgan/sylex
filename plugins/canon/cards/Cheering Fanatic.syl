@@ -9,7 +9,7 @@ card singleFaced({
         sequentially([
             choose(a(quality(cardName))),
             establishThroughout(
-              costShift(allOf(and([isSpell, ofChosen(cardName)])), less(lit(1))),
+              costShift(allOf(and([isSpell, ofChosen(cardName)])), less(1)),
               thisTurn)]))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

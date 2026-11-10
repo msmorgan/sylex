@@ -10,6 +10,6 @@ card singleFaced({
         does(
           actor(you),
           cast(a(and([isSpell, not(did(any, cast(which, from = yourHand), thisObject))])))),
-        draw(lit(1)))],
-    power = lit(2),
-    toughness = lit(2)})
+        draw(1))],
+    power = 2,
+    toughness = 2})

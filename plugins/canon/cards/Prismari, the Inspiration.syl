@@ -6,10 +6,10 @@ card singleFaced({
     subtypes = [elder, dragon],
     text = [
       flying,
-      ward(perform(payLife(lit(5)))),
+      ward(perform(payLife(5))),
       static(
         abilityGrant(
           allOf(and([isInstantOrSorcery, isSpell, did(actor(you), cast(which), thisObject)])),
           storm))],
-    power = lit(7),
-    toughness = lit(7)})
+    power = 7,
+    toughness = 7})

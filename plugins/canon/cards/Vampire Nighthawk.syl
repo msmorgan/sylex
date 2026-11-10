@@ -9,5 +9,5 @@ card singleFaced({
     types = [creature],
     subtypes = [vampire, shaman],
     text = [flying, deathtouch, lifelink],
-    power = lit(2),
-    toughness = lit(3)})
+    power = 2,
+    toughness = 3})

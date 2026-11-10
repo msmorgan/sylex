@@ -8,5 +8,5 @@ card singleFaced({
       whenever(
         does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
         create(thatMuch, written(creatureToken(1, 1, [green], [insect]))))],
-    power = lit(6),
-    toughness = lit(6)})
+    power = 6,
+    toughness = 6})

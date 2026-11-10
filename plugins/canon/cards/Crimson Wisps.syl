@@ -9,4 +9,4 @@ card singleFaced({
               target(isCreature),
               [qualityChange(it, sets, colored(colors([red]))), abilityGrant(it, haste)],
               untilEndOfTurn),
-            draw(lit(1))]))]})
+            draw(1)]))]})

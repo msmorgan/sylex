@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [rat],
     text = [deathtouch],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

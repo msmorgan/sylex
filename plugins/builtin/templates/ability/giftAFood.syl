@@ -1,5 +1,5 @@
 # "Gift a Food" means the effect is "The chosen player creates a Food token." [CR#702.174d]
 template giftAFood: Ability {
   spelling = "gift a Food",
-  body = gift(create(lit(1), defined(foodToken)))
+  body = gift(create(1, defined(foodToken)))
 }

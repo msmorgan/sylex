@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(8)],
     types = [creature],
     subtypes = [eldrazi],
-    text = [annihilator(lit(2)), static(must(actor(thisCreature), attack))],
-    power = lit(8),
-    toughness = lit(8)})
+    text = [annihilator(2), static(must(actor(thisCreature), attack))],
+    power = 8,
+    toughness = 8})

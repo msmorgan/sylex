@@ -4,7 +4,7 @@ card singleFaced({
     types = [creature],
     subtypes = [human, wizard],
     text = [
-      static(entersWithCounters(thisCreature, lit(1), p1p1Counter)),
+      static(entersWithCounters(thisCreature, 1, p1p1Counter)),
       when(
         does(actor(thisCreature), die),
         doForEachKind(
@@ -12,5 +12,5 @@ card singleFaced({
           it,
           counterKind,
           putCounters(statOf(boundCounter, it), thatKind, target(and([isCreature, youControl])))))],
-    power = lit(0),
-    toughness = lit(0)})
+    power = 0,
+    toughness = 0})

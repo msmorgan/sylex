@@ -5,5 +5,5 @@ card singleFaced({
     subtypes = [avatar],
     text = [
       static(cant(any, preventDamage(allDamage, damage = would(by(thisCreature), dealDamage))))],
-    power = lit(7),
-    toughness = lit(7)})
+    power = 7,
+    toughness = 7})

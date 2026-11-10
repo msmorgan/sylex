@@ -4,7 +4,7 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [robot, soldier],
     text = [
-      static(entersWithCounters(thisCreature, lit(2), p1p1Counter)),
+      static(entersWithCounters(thisCreature, 2, p1p1Counter)),
       whenever(does(actor(anOpponent), commitCrime), proliferate)],
-    power = lit(0),
-    toughness = lit(0)})
+    power = 0,
+    toughness = 0})

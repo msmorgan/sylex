@@ -4,9 +4,9 @@ card singleFaced({
     types = [creature],
     subtypes = [elf, druid],
     text = [
-      activated(tapSymbol, addMana(lit(1), ofAnyColor(sameColor))),
+      activated(tapSymbol, addMana(1, ofAnyColor(sameColor))),
       activated(
         tapSymbol,
-        addMana(lit(2), ofAnyColor(sameColor), [spendOnly([toTurnFaceUp(isPermanent)])]))],
-    power = lit(0),
-    toughness = lit(4)})
+        addMana(2, ofAnyColor(sameColor), [spendOnly([toTurnFaceUp(isPermanent)])]))],
+    power = 0,
+    toughness = 4})

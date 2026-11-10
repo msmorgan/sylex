@@ -8,5 +8,5 @@ card singleFaced({
         conjunction([
             getsPt(thisCreature, down(letter(x)), down(letter(x))),
             letterDefinition(x, lifeTotalOf(you))]))],
-    power = lit(13),
-    toughness = lit(13)})
+    power = 13,
+    toughness = 13})

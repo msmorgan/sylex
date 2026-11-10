@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       activatedOnlyDuring(
         tapSymbol,
-        putCounters(lit(1), printedKind(bountyCounter), target(or([isCreature, isPlaneswalker]))),
+        putCounters(1, printedKind(bountyCounter), target(or([isCreature, isPlaneswalker]))),
         asSorcery),
       whenever(
         does(
@@ -18,5 +18,5 @@ card singleFaced({
                   anOpponentControls,
                   hasCounter(bountyCounter)])))),
         destroy(it))],
-    power = lit(1),
-    toughness = lit(3)})
+    power = 1,
+    toughness = 3})

@@ -3,11 +3,11 @@ card singleFaced({
     cost = [generic(2), pip(black)],
     types = [enchantment],
     text = [
-      static(costShift(allOf(and([isSpell, hasColor(white)])), more(lit(3)))),
+      static(costShift(allOf(and([isSpell, hasColor(white)])), more(3))),
       static(
         costShift(
           allOf(
             and([
                 abilityHead(anyActivated),
                 abilityOf(allOf(and([isEnchantment, hasColor(white)])))])),
-          more(lit(3))))]})
+          more(3)))]})

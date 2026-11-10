@@ -8,6 +8,6 @@ card singleFaced({
       flying,
       when(
         does(actor(thisCreature), enter),
-        gainLife(times(lit(2), timesPaid(byKeyword(kicker), thisCreature))))],
-    power = lit(2),
-    toughness = lit(4)})
+        gainLife(times(2, timesPaid(byKeyword(kicker), thisCreature))))],
+    power = 2,
+    toughness = 4})

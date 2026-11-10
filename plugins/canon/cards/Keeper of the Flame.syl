@@ -13,6 +13,6 @@ card singleFaced({
                     isOpponent,
                     compare(greater, lifeTotalOf(you), axes = [playerStat(lifeTotal)])])),
               whileDoing(does(actor(you), activate(thisAbility)))),
-            instruct(thisCreature, dealDamage(lit(2), that(player)))]))],
-    power = lit(1),
-    toughness = lit(2)})
+            instruct(thisCreature, dealDamage(2, that(player)))]))],
+    power = 1,
+    toughness = 2})

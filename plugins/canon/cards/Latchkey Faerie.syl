@@ -9,6 +9,6 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         if = keywordCostPaid(prowl, thisCreature),
-        action = draw(lit(1)))],
-    power = lit(3),
-    toughness = lit(1)})
+        action = draw(1))],
+    power = 3,
+    toughness = 1})

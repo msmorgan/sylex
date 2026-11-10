@@ -10,5 +10,5 @@ card singleFaced({
         addMana(
           statOf(stat(manaValue), the(and([was(sacrifice(which)), isCreature]))),
           manaOf([[colored(black)]])))],
-    power = lit(1),
-    toughness = lit(2)})
+    power = 1,
+    toughness = 2})

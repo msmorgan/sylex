@@ -8,8 +8,7 @@ card singleFaced({
       whenever(
         does(
           actor(you),
-          cast(
-            a(compareOver(isSpell, paidCostRead(byKeyword(kicker), none, it), atLeast, lit(1))))),
-        scry(lit(2)))],
-    power = lit(4),
-    toughness = lit(4)})
+          cast(a(compareOver(isSpell, paidCostRead(byKeyword(kicker), none, it), atLeast, 1)))),
+        scry(2))],
+    power = 4,
+    toughness = 4})

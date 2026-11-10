@@ -10,5 +10,5 @@ card singleFaced({
           actor(you),
           play(counted(additional(exactly(2)), isLand)),
           timing = onEachOfYourTurns))],
-    power = lit(1),
-    toughness = lit(2)})
+    power = 1,
+    toughness = 2})

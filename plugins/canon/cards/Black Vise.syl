@@ -8,4 +8,4 @@ card singleFaced({
         beginningOfPossessed(upkeep, the(isChosenPlayer)),
         sequentially([
             instruct(thisArtifact, dealDamage(letter(x), that(player))),
-            define(x, minus(countOf(cardIn(handOf(they))), lit(4)))]))]})
+            define(x, minus(countOf(cardIn(handOf(they))), 4))]))]})

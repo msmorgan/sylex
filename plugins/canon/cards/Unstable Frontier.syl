@@ -2,7 +2,7 @@ card singleFaced({
     name = "Unstable Frontier",
     types = [land],
     text = [
-      activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
+      activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
       activated(
         tapSymbol,
         establishThroughout(

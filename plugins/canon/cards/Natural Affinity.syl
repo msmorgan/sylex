@@ -8,7 +8,5 @@ card singleFaced({
           qualityChange(
             allOf(isLand),
             sets,
-            bundle({
-                characteristics = {types = [creature], power = lit(2), toughness = lit(2)}},
-              land)),
+            bundle({characteristics = {types = [creature], power = 2, toughness = 2}}, land)),
           untilEndOfTurn))]})

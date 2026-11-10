@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       enchant(isCreature),
       static(entersChoosing(thisAura, color)),
-      when(does(actor(thisAura), enter), draw(lit(1))),
+      when(does(actor(thisAura), enter), draw(1)),
       static(
         conjunction([
             abilityGrant(enchanted(creature), protection(ofChosen(color))),

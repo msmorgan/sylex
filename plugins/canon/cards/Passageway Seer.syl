@@ -9,6 +9,6 @@ card singleFaced({
       at(
         beginningOfYour(endStep),
         if = is(you, hasDesignation(initiative)),
-        action = putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
-    power = lit(2),
-    toughness = lit(2)})
+        action = putCounters(1, printedKind(p1p1Counter), thisCreature))],
+    power = 2,
+    toughness = 2})

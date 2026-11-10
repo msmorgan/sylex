@@ -8,6 +8,6 @@ card singleFaced({
         establishThroughout(
           replace(
             would(any, dealDamage(recipient = target(isAnyTarget))),
-            instead(preventDamage(theNext(lit(3)), also = gainLife(preventedThisWay)))),
+            instead(preventDamage(theNext(3), also = gainLife(preventedThisWay)))),
           thisTurn)),
       splice(hasSubtype(arcane), mana([generic(1), pip(white)]))]})

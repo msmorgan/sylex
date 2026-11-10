@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       whenever(
         does(
-          actor(counted(orMore(1), and([isCreature, youControl, hasManaValue(atMost, lit(3))]))),
+          actor(counted(orMore(1), and([isCreature, youControl, hasManaValue(atMost, 3)]))),
           enter),
-        draw(lit(1)),
+        draw(1),
         limit = oncePerTurn)]})

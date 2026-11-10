@@ -11,6 +11,6 @@ card singleFaced({
         conditionFirstWhile(
           is(this, in(battlefield)),
           can(actor(you), cast(bare(and([isSpell, hasSubtype(knight)])), from = yourGraveyard)))),
-      when(does(actor(thisCreature), die), loseLife(lit(2)))],
-    power = lit(3),
-    toughness = lit(3)})
+      when(does(actor(thisCreature), die), loseLife(2))],
+    power = 3,
+    toughness = 3})

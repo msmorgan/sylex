@@ -5,4 +5,4 @@ card singleFaced({
     text = [
       whenever(
         does(actor(anOpponent), cast(a(isSpell))),
-        instruct(that(player), doUnless(instruct(you, may(draw(lit(1)))), mana([generic(1)]))))]})
+        instruct(that(player), doUnless(instruct(you, may(draw(1))), mana([generic(1)]))))]})

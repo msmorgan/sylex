@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [eye, bat],
     text = [flying, when(does(actor(thisCreature), die), learn)],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

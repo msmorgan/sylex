@@ -6,6 +6,5 @@ card singleFaced({
       static(
         altCost(
           this,
-          compound(
-            [perform(payLife(lit(1))), perform(exile(a(and([hasColor(blue), in(yourHand)]))))]))),
+          compound([perform(payLife(1)), perform(exile(a(and([hasColor(blue), in(yourHand)]))))]))),
       spell(counter(target(isSpell)))]})

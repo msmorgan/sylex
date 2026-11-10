@@ -3,6 +3,6 @@ card singleFaced({
     cost = [pip(green), pip(white)],
     types = [creature],
     subtypes = [human, druid],
-    text = [whenever(does(any, putIntoFromBattlefield(a(isEnchantment), graveyard)), draw(lit(1)))],
-    power = lit(1),
-    toughness = lit(2)})
+    text = [whenever(does(any, putIntoFromBattlefield(a(isEnchantment), graveyard)), draw(1))],
+    power = 1,
+    toughness = 2})

@@ -11,5 +11,5 @@ card singleFaced({
                 it,
                 sets,
                 bundle({characteristics = {colors = [blue], subtypes = [frog]}})),
-              getsBase(it, lit(1), lit(1))]),
+              getsBase(it, 1, 1)]),
           untilEndOfTurn))]})

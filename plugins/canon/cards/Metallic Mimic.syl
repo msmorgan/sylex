@@ -14,7 +14,7 @@ card singleFaced({
       static(
         entersWithAdditionalCounters(
           each(and([isCreature, youControl, ofChosen(subtype(creature)), isOther])),
-          lit(1),
+          1,
           p1p1Counter))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

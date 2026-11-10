@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [sliver],
     text = [static(qualityChange(allOf(hasSubtype(sliver)), sets, colored(colors([]))))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

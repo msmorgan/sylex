@@ -10,5 +10,5 @@ card singleFaced({
             costShift(this, less(letter(x))),
             letterDefinition(x, aggregate(sum, stat(power), and([isCreature, youControl])))])),
       trample],
-    power = lit(12),
-    toughness = lit(12)})
+    power = 12,
+    toughness = 12})

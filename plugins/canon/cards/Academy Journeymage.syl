@@ -4,10 +4,9 @@ card singleFaced({
     types = [creature],
     subtypes = [human, wizard],
     text = [
-      static(
-        onlyIfSo(costShift(this, less(lit(1))), exists(and([hasSubtype(wizard), youControl])))),
+      static(onlyIfSo(costShift(this, less(1)), exists(and([hasSubtype(wizard), youControl])))),
       when(
         does(actor(thisCreature), enter),
         returnToHand(target(and([isCreature, anOpponentControls]))))],
-    power = lit(3),
-    toughness = lit(2)})
+    power = 3,
+    toughness = 2})

@@ -8,7 +8,7 @@ card singleFaced({
       static(can(actor(you), play(allOf(and([isSpell, hasSubtype(goblin)])), from = onTop))),
       static(
         conditionFirstWhile(
-          is(topSlice(lit(1)), hasSubtype(goblin)),
-          abilityGrantFrom(thisCreature, topSlice(lit(1)), [anyActivated])))],
-    power = lit(2),
-    toughness = lit(2)})
+          is(topSlice(1), hasSubtype(goblin)),
+          abilityGrantFrom(thisCreature, topSlice(1), [anyActivated])))],
+    power = 2,
+    toughness = 2})

@@ -6,5 +6,5 @@ card singleFaced({
       spell(
         establishFor(
           allOf(and([isCreature, youControl])),
-          [getsPt(them, up(lit(2)), up(lit(0))), qualityChange(them, adds, everyTypeOf(creature))],
+          [getsPt(them, up(2), up(0)), qualityChange(them, adds, everyTypeOf(creature))],
           untilEndOfTurn))]})

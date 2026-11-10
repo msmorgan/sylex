@@ -8,6 +8,6 @@ token walkerToken {
       colors = [black],
       types = [creature],
       subtypes = [zombie],
-      power = lit(2),
-      toughness = lit(2)}}
+      power = 2,
+      toughness = 2}}
 }

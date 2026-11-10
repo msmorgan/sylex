@@ -7,7 +7,7 @@ card singleFaced({
       when(
         does(actor(thisEquipment), enter),
         sequentially([
-            create(lit(1), written(creatureToken(1, 1, [white], [soldier]))),
+            create(1, written(creatureToken(1, 1, [white], [soldier]))),
             attachTo(thisEquipment, thatToken)])),
-      static(getsPt(equipped(creature), up(lit(1)), up(lit(1)))),
+      static(getsPt(equipped(creature), up(1), up(1))),
       equip(mana([generic(1)]))]})

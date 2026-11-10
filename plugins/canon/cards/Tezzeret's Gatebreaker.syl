@@ -6,7 +6,7 @@ card singleFaced({
       when(
         does(actor(thisArtifact), enter),
         sequentially([
-            lookAt(topSlice(lit(5))),
+            lookAt(topSlice(5)),
             may(
               sequentially([
                   reveal(fromAmong(exactly(1), or([hasColor(blue), isArtifact]), them)),

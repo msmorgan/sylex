@@ -6,4 +6,4 @@ card singleFaced({
       static(
         getsBoth(
           each(isCreature),
-          up(forEach(lit(1), and([isCreature, isOther, shares(subtype(creature), share, it)])))))]})
+          up(forEach(1, and([isCreature, isOther, shares(subtype(creature), share, it)])))))]})

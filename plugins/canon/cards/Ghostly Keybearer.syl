@@ -8,5 +8,5 @@ card singleFaced({
       whenever(
         does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
         unlock(doorOf(locked, targets(upTo(1), and([hasSubtype(room), youControl])))))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), enter),
-        putCounters(lit(1), printedKind(p1p1Counter), target(and([isCreature, youControl])))),
+        putCounters(1, printedKind(p1p1Counter), target(and([isCreature, youControl])))),
       static(abilityGrant(each(and([isCreature, youControl, hasCounter(p1p1Counter)])), trample))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

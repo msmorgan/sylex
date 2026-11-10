@@ -8,7 +8,7 @@ card singleFaced({
       static(
         conjunction([
             conjunction([
-                getsPt(enchanted(creature), up(lit(2)), up(lit(2))),
+                getsPt(enchanted(creature), up(2), up(2)),
                 abilityGrant(enchanted(creature), protection(eachKind(color)))],
               subject = enchanted(creature)),
             doesnt(actor(thisEffect), remove(bare(hasSubtype(aura))))]))]})

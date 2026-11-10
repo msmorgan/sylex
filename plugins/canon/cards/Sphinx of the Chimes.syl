@@ -7,6 +7,6 @@ card singleFaced({
       flying,
       activated(
         perform(discard(withTheSameName(counted(exactly(2), and([non(isLand), in(yourHand)]))))),
-        draw(lit(4)))],
-    power = lit(5),
-    toughness = lit(6)})
+        draw(4))],
+    power = 5,
+    toughness = 6})

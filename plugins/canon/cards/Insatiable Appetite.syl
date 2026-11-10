@@ -10,5 +10,5 @@ card singleFaced({
       spell(
         may(
           sacrifice(a(hasSubtype(food))),
-          get(target(isCreature), up(lit(5)), up(lit(5)), untilEndOfTurn),
-          get(that(creature), up(lit(3)), up(lit(3)), untilEndOfTurn)))]})
+          get(target(isCreature), up(5), up(5), untilEndOfTurn),
+          get(that(creature), up(3), up(3), untilEndOfTurn)))]})

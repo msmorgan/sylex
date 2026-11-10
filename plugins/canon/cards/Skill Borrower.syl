@@ -7,7 +7,7 @@ card singleFaced({
       static(visibility(reveal, you, topOfLibrary)),
       static(
         conditionFirstWhile(
-          is(topSlice(lit(1)), or([isArtifact, isCreature])),
-          abilityGrantFrom(thisCreature, topSlice(lit(1)), [anyActivated])))],
-    power = lit(1),
-    toughness = lit(3)})
+          is(topSlice(1), or([isArtifact, isCreature])),
+          abilityGrantFrom(thisCreature, topSlice(1), [anyActivated])))],
+    power = 1,
+    toughness = 3})

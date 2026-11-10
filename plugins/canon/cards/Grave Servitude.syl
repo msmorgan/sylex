@@ -8,6 +8,6 @@ card singleFaced({
       enchant(isCreature),
       static(
         conjunction([
-            getsPt(enchanted(creature), up(lit(3)), down(lit(1))),
+            getsPt(enchanted(creature), up(3), down(1)),
             qualityChange(it, sets, colored(colors([black])))],
           subject = enchanted(creature)))]})

@@ -8,14 +8,14 @@ ability eternalize(cost: Cost) {
     activatedOnlyDuring(
       compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),
       create(
-        lit(1),
+        1,
         copyOf(
           this,
           [
             characteristicEdits([
                 colors(sets, colors([black])),
-                stat(power, set(lit(4))),
-                stat(toughness, set(lit(4))),
+                stat(power, set(4)),
+                stat(toughness, set(4)),
                 manaCost(none),
                 typeLine(adds, {subtypes = [zombie]})])])),
       asSorcery)]

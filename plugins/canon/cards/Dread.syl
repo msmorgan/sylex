@@ -10,5 +10,5 @@ card singleFaced({
       when(
         does(any, putInto(this, graveyard, from = anywhere)),
         instruct(ownerOf(it), shuffleInto(it)))],
-    power = lit(6),
-    toughness = lit(6)})
+    power = 6,
+    toughness = 6})

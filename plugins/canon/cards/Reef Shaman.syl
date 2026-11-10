@@ -12,5 +12,5 @@ card singleFaced({
             sets,
             chosenQuality(ofYourChoice(subtype(land), basicTypesOnly))),
           untilEndOfTurn))],
-    power = lit(0),
-    toughness = lit(2)})
+    power = 0,
+    toughness = 2})

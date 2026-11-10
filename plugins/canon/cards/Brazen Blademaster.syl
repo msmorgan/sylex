@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       whenever(
         does(actor(thisCreature), attack),
-        while = whileTrue(compareAmt(countOf(and([isArtifact, youControl])), atLeast, lit(2))),
-        action = get(it, up(lit(2)), up(lit(1)), untilEndOfTurn))],
-    power = lit(2),
-    toughness = lit(3)})
+        while = whileTrue(compareAmt(countOf(and([isArtifact, youControl])), atLeast, 2)),
+        action = get(it, up(2), up(1), untilEndOfTurn))],
+    power = 2,
+    toughness = 3})

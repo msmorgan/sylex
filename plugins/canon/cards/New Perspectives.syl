@@ -3,8 +3,8 @@ card singleFaced({
     cost = [generic(5), pip(blue)],
     types = [enchantment],
     text = [
-      when(does(actor(thisEnchantment), enter), draw(lit(3))),
+      when(does(actor(thisEnchantment), enter), draw(3)),
       static(
         conditionFirstWhile(
-          compareAmt(countOf(cardIn(yourHand)), atLeast, lit(7)),
+          compareAmt(countOf(cardIn(yourHand)), atLeast, 7),
           altCost(allOf(abilityHead(keyword(cycling))), mana([generic(0)]))))]})

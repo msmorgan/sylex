@@ -5,6 +5,6 @@ card singleFaced({
     subtypes = [elemental],
     text = [
       doubleStrike,
-      activated(mana([pip(red)]), get(thisCreature, up(lit(1)), up(lit(0)), untilEndOfTurn))],
-    power = lit(-1),
-    toughness = lit(3)})
+      activated(mana([pip(red)]), get(thisCreature, up(1), up(0), untilEndOfTurn))],
+    power = -1,
+    toughness = 3})

@@ -7,7 +7,7 @@ card singleFaced({
       whenever(
         does(actor(thisCreature), attack),
         sequentially([
-            exile(topSlice(lit(1))),
+            exile(topSlice(1)),
             doIf(
               is(it, and([isCard, isCreature])),
               get(
@@ -15,5 +15,5 @@ card singleFaced({
                 up(powerOf(the(and([was(exile(which)), isCreature, isCard])))),
                 up(toughnessOf(it)),
                 thisTurn))]))],
-    power = lit(4),
-    toughness = lit(4)})
+    power = 4,
+    toughness = 4})

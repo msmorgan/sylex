@@ -10,4 +10,4 @@ card singleFaced({
             mode(none, none, counter(target(isSpell))),
             mode(none, none, returnToHand(target(isPermanent))),
             mode(none, none, tap(allOf(and([isCreature, opponentsControl])))),
-            mode(none, none, draw(lit(1)))]))]})
+            mode(none, none, draw(1))]))]})

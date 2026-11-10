@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(2), pip(green)],
     types = [instant],
     text = [
-      spell(putCounters(lit(2), printedKind(p1p1Counter), target(isCreature))),
+      spell(putCounters(2, printedKind(p1p1Counter), target(isCreature))),
       infusion(
         spell(
           doIf(

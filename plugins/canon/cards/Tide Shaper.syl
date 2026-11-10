@@ -13,7 +13,7 @@ card singleFaced({
           forAsLongAs(is(thisCreature, in(battlefield))))),
       static(
         onlyWhile(
-          getsPt(thisCreature, up(lit(1)), up(lit(1))),
+          getsPt(thisCreature, up(1), up(1)),
           exists(and([hasSubtype(island), opponentsControl]))))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

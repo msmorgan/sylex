@@ -11,4 +11,4 @@ card singleFaced({
     text = [
       asThoughFlashSacrificedAtCleanup,
       enchant(and([isCreature, non(hasColor(black))])),
-      static(getsPt(enchanted(creature), up(lit(2)), up(lit(2))))]})
+      static(getsPt(enchanted(creature), up(2), up(2)))]})

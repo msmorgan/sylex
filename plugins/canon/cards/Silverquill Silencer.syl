@@ -7,6 +7,6 @@ card singleFaced({
       static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(isLand)))),
       whenever(
         does(actor(anOpponent), cast(a(and([isSpell, named(chosenName)])))),
-        sequentially([instruct(they, loseLife(lit(3))), draw(lit(1))]))],
-    power = lit(3),
-    toughness = lit(2)})
+        sequentially([instruct(they, loseLife(3)), draw(1)]))],
+    power = 3,
+    toughness = 2})

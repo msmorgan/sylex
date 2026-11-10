@@ -7,5 +7,5 @@ card singleFaced({
         spell(
           sequentially([
               instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["time", "knowledge"]))),
-              doIf(getsMoreVotes("time"), extraTurn(lit(1))),
-              doIf(getsMoreVotesOrTied("knowledge"), draw(lit(3)))])))]})
+              doIf(getsMoreVotes("time"), extraTurn(1)),
+              doIf(getsMoreVotesOrTied("knowledge"), draw(3))])))]})

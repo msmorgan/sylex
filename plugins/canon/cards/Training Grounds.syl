@@ -6,4 +6,4 @@ card singleFaced({
       static(
         costShift(
           allOf(and([abilityHead(anyActivated), abilityOf(allOf(and([isCreature, youControl])))])),
-          less(lit(2), lit(1))))]})
+          less(2, 1)))]})

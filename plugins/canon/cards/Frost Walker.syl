@@ -7,5 +7,5 @@ card singleFaced({
       when(
         does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
         sacrifice(it))],
-    power = lit(4),
-    toughness = lit(1)})
+    power = 4,
+    toughness = 1})

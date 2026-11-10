@@ -7,6 +7,6 @@ ability forMirrodin {
     when(
       does(actor(thisEquipment), enter),
       sequentially([
-          create(lit(1), written(creatureToken(2, 2, [red], [rebel]))),
+          create(1, written(creatureToken(2, 2, [red], [rebel]))),
           attachTo(thisEquipment, thatToken)]))]
 }

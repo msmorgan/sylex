@@ -8,4 +8,4 @@ card singleFaced({
           controllerOf(target(isSpell)),
           doUnless(
             instruct(you, counter(it)),
-            scaledGenericMana(forEach(lit(1), and([isArtifact, youControl]))))))]})
+            scaledGenericMana(forEach(1, and([isArtifact, youControl]))))))]})

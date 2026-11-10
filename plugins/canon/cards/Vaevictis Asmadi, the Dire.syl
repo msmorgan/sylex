@@ -14,7 +14,7 @@ card singleFaced({
             doForEach(
               each(and([isPlayer, did(actor(which), sacrifice(a(isPermanent)), thisWay)])),
               sequentially([
-                  instruct(they, reveal(slice(top, lit(1), libraryOf(they)))),
+                  instruct(they, reveal(slice(top, 1, libraryOf(they)))),
                   doIf(is(it, isPermanentCard), putOntoBattlefield(it))]))]))],
-    power = lit(6),
-    toughness = lit(6)})
+    power = 6,
+    toughness = 6})

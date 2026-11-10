@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [insect],
     text = [trample, haste, cumulativeUpkeep(mana([pip(green), pip(green)]))],
-    power = lit(5),
-    toughness = lit(1)})
+    power = 5,
+    toughness = 1})

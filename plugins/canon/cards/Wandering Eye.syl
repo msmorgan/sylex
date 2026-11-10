@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [illusion],
     text = [flying, static(visibility(reveal, bare(isPlayer), wholeHand))],
-    power = lit(1),
-    toughness = lit(3)})
+    power = 1,
+    toughness = 3})

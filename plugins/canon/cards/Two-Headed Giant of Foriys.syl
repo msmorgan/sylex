@@ -10,5 +10,5 @@ card singleFaced({
           actor(thisCreature),
           block(counted(additional(exactly(1)), isCreature)),
           timing = eachCombat))],
-    power = lit(4),
-    toughness = lit(4)})
+    power = 4,
+    toughness = 4})

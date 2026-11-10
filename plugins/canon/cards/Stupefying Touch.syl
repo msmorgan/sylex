@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [aura],
     text = [
       enchant(isCreature),
-      when(does(actor(thisAura), enter), draw(lit(1))),
+      when(does(actor(thisAura), enter), draw(1)),
       static(
         cant(
           any,

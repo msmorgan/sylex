@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [goblin, warrior],
     text = [menace],
-    power = lit(3),
-    toughness = lit(2)})
+    power = 3,
+    toughness = 2})

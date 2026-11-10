@@ -6,4 +6,4 @@ card singleFaced({
       static(
         replace(
           would(actor(a(isSource)), dealDamage(recipient = you)),
-          instead(preventDamage(ofThatDamage(lit(1))))))]})
+          instead(preventDamage(ofThatDamage(1)))))]})

@@ -1,4 +1,4 @@
 template thisArtifact: NounPhrase {
   spelling = "this artifact",
-  body = headed(type(artifact), this)
+  body = headed(artifact, this)
 }

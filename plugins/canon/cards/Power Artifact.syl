@@ -8,4 +8,4 @@ card singleFaced({
       static(
         costShift(
           allOf(and([abilityHead(anyActivated), abilityOf(enchanted(artifact))])),
-          less(lit(2), lit(1))))]})
+          less(2, 1)))]})

@@ -27,5 +27,5 @@ card singleFaced({
           theKeyword(trample),
           theKeyword(shroud),
           theKeyword(vigilance)])],
-    power = lit(4),
-    toughness = lit(4)})
+    power = 4,
+    toughness = 4})

@@ -5,7 +5,7 @@ card singleFaced({
     types = [creature],
     subtypes = [human, wizard],
     text = [
-      when(does(actor(thisCreature), enter), mill(lit(4))),
+      when(does(actor(thisCreature), enter), mill(4)),
       static(
         can(
           actor(you),
@@ -13,5 +13,5 @@ card singleFaced({
             counted(exactly(1), and([isSpell, isCreature, hasSubtype(zombie)])),
             from = yourGraveyard),
           timing = onEachOfYourTurns))],
-    power = lit(4),
-    toughness = lit(4)})
+    power = 4,
+    toughness = 4})

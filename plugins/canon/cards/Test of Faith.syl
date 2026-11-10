@@ -9,6 +9,6 @@ card singleFaced({
             would(any, dealDamage(recipient = target(isCreature))),
             instead(
               preventDamage(
-                theNext(lit(3)),
+                theNext(3),
                 also = putCounters(preventedThisWay, printedKind(p1p1Counter), that(creature))))),
           thisTurn))]})

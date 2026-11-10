@@ -4,4 +4,4 @@ card singleFaced({
     types = [enchantment],
     text = [
       mayBeginOnBattlefield,
-      static(getsPt(allOf(and([isCreature, isToken])), up(lit(1)), up(lit(1))))]})
+      static(getsPt(allOf(and([isCreature, isToken])), up(1), up(1)))]})

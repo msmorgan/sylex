@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       trample,
       cumulativeUpkeep(either(mana([pip(red)]), mana([pip(green)]))),
-      static(getsBoth(thisCreature, up(times(lit(1), countersOn(ageCounter, it)))))],
-    power = lit(2),
-    toughness = lit(2)})
+      static(getsBoth(thisCreature, up(times(1, countersOn(ageCounter, it)))))],
+    power = 2,
+    toughness = 2})

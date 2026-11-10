@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(2), pip(red)],
     types = [creature],
     subtypes = [human, soldier],
-    text = [firstStrike, renown(lit(1))],
-    power = lit(2),
-    toughness = lit(2)})
+    text = [firstStrike, renown(1)],
+    power = 2,
+    toughness = 2})

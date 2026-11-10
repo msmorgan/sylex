@@ -10,5 +10,5 @@ card singleFaced({
         establishThroughout(
           qualityChange(thisCreature, sets, chosenQuality(ofYourChoice(subtype(creature)))),
           untilEndOfTurn))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

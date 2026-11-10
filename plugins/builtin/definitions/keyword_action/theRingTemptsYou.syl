@@ -36,12 +36,12 @@ action theRingTemptsYou {
                     actor(you),
                     thisGame),
                   atLeast,
-                  lit(2)),
+                  2),
                 abilityGrant(
                   this,
                   whenever(
                     does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
-                    sequentially([draw(lit(1)), discard(a(cardIn(hand)))]))))),
+                    sequentially([draw(1), discard(a(cardIn(hand)))]))))),
             static(
               conditionFirstWhile(
                 compareAmt(
@@ -54,7 +54,7 @@ action theRingTemptsYou {
                     actor(you),
                     thisGame),
                   atLeast,
-                  lit(3)),
+                  3),
                 abilityGrant(
                   this,
                   whenever(
@@ -74,14 +74,14 @@ action theRingTemptsYou {
                     actor(you),
                     thisGame),
                   atLeast,
-                  lit(4)),
+                  4),
                 abilityGrant(
                   this,
                   whenever(
                     does(
                       actor(a(and([hasDesignation(ringBearer), youControl]))),
                       dealDamage(recipient = a(isPlayer), kind = combat)),
-                    instruct(eachOpponent, loseLife(lit(3)))))))])),
+                    instruct(eachOpponent, loseLife(3))))))])),
       choose(a(and([isCreature, actorControls]))),
       gainDesignation(that(creature), ringBearer)])
 }

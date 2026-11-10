@@ -7,9 +7,9 @@ card singleFaced({
       whenever(
         does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])))),
         replace(
-          create(lit(1), written(creatureToken(1, 1, [blue, red], [elemental]))),
+          create(1, written(creatureToken(1, 1, [blue, red], [elemental]))),
           doIf(
-            compareAmt(statOf(stat(manaValue), that(spell)), atLeast, lit(5)),
-            instead(create(lit(3), asThose)))))],
-    power = lit(2),
-    toughness = lit(1)})
+            compareAmt(statOf(stat(manaValue), that(spell)), atLeast, 5),
+            instead(create(3, asThose)))))],
+    power = 2,
+    toughness = 1})

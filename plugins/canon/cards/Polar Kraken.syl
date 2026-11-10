@@ -7,5 +7,5 @@ card singleFaced({
       trample,
       static(entersTapped(thisCreature)),
       cumulativeUpkeep(perform(sacrifice(a(isLand))))],
-    power = lit(11),
-    toughness = lit(11)})
+    power = 11,
+    toughness = 11})

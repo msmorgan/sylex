@@ -4,4 +4,4 @@ card singleFaced({
     types = [enchantment],
     text = [
       static(cant(actor(you), play(allOf(isLand)))),
-      activatedOnlyOnce(perform(sacrifice(a(isLand))), draw(lit(2)), oncePerTurn)]})
+      activatedOnlyOnce(perform(sacrifice(a(isLand))), draw(2), oncePerTurn)]})

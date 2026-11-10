@@ -2,4 +2,4 @@ card singleFaced({
     name = "Meditate",
     cost = [generic(2), pip(blue)],
     types = [instant],
-    text = [spell(sequentially([draw(lit(4)), skipPart(turn, lit(1))]))]})
+    text = [spell(sequentially([draw(4), skipPart(turn, 1)]))]})

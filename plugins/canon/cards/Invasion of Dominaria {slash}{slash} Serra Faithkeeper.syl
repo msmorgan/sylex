@@ -4,12 +4,12 @@ card transforming(
     cost = [generic(2), pip(white)],
     types = [battle],
     subtypes = [siege],
-    text = [when(does(actor(thisSiege), enter), sequentially([gainLife(lit(4)), draw(lit(1))]))],
-    defense = lit(5)},
+    text = [when(does(actor(thisSiege), enter), sequentially([gainLife(4), draw(1)]))],
+    defense = 5},
   back = {
     name = "Serra Faithkeeper",
     types = [creature],
     subtypes = [angel],
     text = [flying, vigilance],
-    power = lit(4),
-    toughness = lit(4)})
+    power = 4,
+    toughness = 4})

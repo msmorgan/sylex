@@ -6,7 +6,7 @@ card singleFaced({
       when(
         does(actor(a(and([isCreature, youControl]))), enter),
         sequentially([
-            gainLife(lit(1)),
+            gainLife(1),
             doIf(
               not(is(thisEnchantment, isCreature)),
               become(
@@ -16,6 +16,6 @@ card singleFaced({
                     types = [creature],
                     subtypes = [angel],
                     text = [flying],
-                    power = lit(3),
-                    toughness = lit(3)}},
+                    power = 3,
+                    toughness = 3}},
                 untilEndOfTurn))]))]})

@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            reveal(topSlice(lit(1))),
+            reveal(topSlice(1)),
             putInto(that(card), hand),
             loseLife(statOf(stat(manaValue), it)),
             may(repeat(anyNumberOfTimes))]))]})

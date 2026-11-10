@@ -9,5 +9,5 @@ card singleFaced({
             does(actor(thisCreature), block(a(isCreature))),
             does(by(a(isCreature)), block(thisCreature))]),
         action = becomeColor(that(creature), colors([green])))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

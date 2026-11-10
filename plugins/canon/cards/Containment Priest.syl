@@ -11,5 +11,5 @@ card singleFaced({
             actor(a(and([isCreature, isNontoken, not(did(any, cast(which), thisObject))]))),
             enter),
           instead(exile(it))))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

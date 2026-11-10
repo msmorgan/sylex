@@ -6,5 +6,5 @@ card singleFaced({
     text = [
       activated(tapSymbol, becomeColor(target(isSpell), colors([]))),
       activated(tapSymbol, becomeColor(target(isPermanent), colors([]), untilEndOfTurn))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

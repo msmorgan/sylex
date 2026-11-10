@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [dog, scout],
     text = [firstStrike, morph(mana([generic(4), pip(red)]))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

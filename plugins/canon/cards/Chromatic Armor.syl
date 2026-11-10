@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       enchant(isCreature),
       static(entersChoosing(thisAura, color)),
-      static(entersWithCounters(thisAura, lit(1), sleightCounter)),
+      static(entersWithCounters(thisAura, 1, sleightCounter)),
       static(
         replace(
           would(
@@ -16,6 +16,6 @@ card singleFaced({
       activated(
         mana([variable]),
         sequentially([
-            putCounters(lit(1), printedKind(sleightCounter), thisAura),
+            putCounters(1, printedKind(sleightCounter), thisAura),
             choose(a(quality(color))),
             define(x, countersOn(sleightCounter, thisAura))]))]})

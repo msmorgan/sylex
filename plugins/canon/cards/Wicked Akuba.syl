@@ -11,6 +11,6 @@ card singleFaced({
             and([
                 isPlayer,
                 did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))])),
-          loseLife(lit(1))))],
-    power = lit(2),
-    toughness = lit(2)})
+          loseLife(1)))],
+    power = 2,
+    toughness = 2})

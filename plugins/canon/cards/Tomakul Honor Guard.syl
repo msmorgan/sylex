@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [human, soldier],
     text = [ward(mana([generic(2)]))],
-    power = lit(3),
-    toughness = lit(1)})
+    power = 3,
+    toughness = 1})

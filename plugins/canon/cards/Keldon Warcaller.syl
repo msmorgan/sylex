@@ -6,9 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(actor(thisCreature), attack),
-        putCounters(
-          lit(1),
-          printedKind(loreCounter),
-          target(and([hasSubtype(saga), youControl]))))],
-    power = lit(2),
-    toughness = lit(2)})
+        putCounters(1, printedKind(loreCounter), target(and([hasSubtype(saga), youControl]))))],
+    power = 2,
+    toughness = 2})

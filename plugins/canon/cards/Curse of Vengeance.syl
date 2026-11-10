@@ -7,7 +7,7 @@ card singleFaced({
       enchant(isPlayer),
       whenever(
         does(actor(enchanted(player)), cast(a(isSpell))),
-        putCounters(lit(1), printedKind(spiteCounter), thisAura)),
+        putCounters(1, printedKind(spiteCounter), thisAura)),
       when(
         does(actor(enchanted(player)), loseGame),
         sequentially(

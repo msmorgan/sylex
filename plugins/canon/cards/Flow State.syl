@@ -12,7 +12,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            lookAt(topSlice(lit(3))),
+            lookAt(topSlice(3)),
             replace(
               sequentially([
                   putInto(someOf(exactly(1), them), hand),

@@ -7,5 +7,5 @@ card singleFaced({
       whenever(
         does(actor(counted(orMore(1), and([isToken, youControl]))), enter),
         putCounters(groupSize, printedKind(p1p1Counter), thisCreature))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

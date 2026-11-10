@@ -9,8 +9,8 @@ card flip(
         beginningOfEach(endStep),
         if = is(thisCreature, attachedBy(enchanted, counted(orMore(2), hasSubtype(aura)))),
         action = flip(thisCreature))],
-    power = lit(2),
-    toughness = lit(3)},
+    power = 2,
+    toughness = 3},
   alternative = {
     name = "Autumn-Tail, Kitsune Sage",
     supertypes = [legendary],
@@ -22,5 +22,5 @@ card flip(
         attachTo(
           target(and([hasSubtype(aura), attachedTo(a(isCreature))])),
           a(and([isCreature, isOther]))))],
-    power = lit(4),
-    toughness = lit(5)})
+    power = 4,
+    toughness = 5})

@@ -4,4 +4,4 @@ card singleFaced({
     types = [creature],
     subtypes = [human],
     text = [static(definesToughness(thisCreature, countOf(and([hasSubtype(forest), youControl]))))],
-    power = lit(1)})
+    power = 1})

@@ -7,5 +7,5 @@ card singleFaced({
     text = [
       storied,
       static(onlyUnless(doesntUntap(thisCreature, you), is(you, hasDesignation(enduringStory))))],
-    power = lit(5),
-    toughness = lit(3)})
+    power = 5,
+    toughness = 3})

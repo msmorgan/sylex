@@ -11,5 +11,5 @@ card singleFaced({
           does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
           turn),
         counter(that(stackObject)))],
-    power = lit(2),
-    toughness = lit(3)})
+    power = 2,
+    toughness = 3})

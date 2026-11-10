@@ -9,6 +9,6 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         if = keywordCostPaid(surge, thisCreature),
-        action = instruct(thisCreature, dealDamage(lit(3), target(isAnyTarget))))],
-    power = lit(5),
-    toughness = lit(4)})
+        action = instruct(thisCreature, dealDamage(3, target(isAnyTarget))))],
+    power = 5,
+    toughness = 4})

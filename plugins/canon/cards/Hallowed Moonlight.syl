@@ -9,4 +9,4 @@ card singleFaced({
               would(actor(a(and([isCreature, not(did(any, cast(which), thisObject))]))), enter),
               instead(exile(it)),
               untilEndOfTurn),
-            draw(lit(1))]))]})
+            draw(1)]))]})

@@ -10,5 +10,5 @@ card singleFaced({
           actor(you),
           cast(bare(and([isSpell, isArtifact]))),
           asThough = asThoughHadFlash(them)))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

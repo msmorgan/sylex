@@ -4,6 +4,5 @@ ability maxSpeed(ability: Ability) {
   lexical = {lemma = "max speed", parameters = [[DashAbility]]},
   spelling = "max speed — <ability>",
   body = [
-    static(
-      conditionFirstWhile(compareAmt(speedOf(you), equal, lit(4)), abilityGrant(this, $ability)))]
+    static(conditionFirstWhile(compareAmt(speedOf(you), equal, 4), abilityGrant(this, $ability)))]
 }

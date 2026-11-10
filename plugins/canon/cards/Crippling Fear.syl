@@ -8,6 +8,6 @@ card singleFaced({
             choose(a(quality(subtype(creature)))),
             get(
               allOf(and([isCreature, not(ofChosen(subtype(creature)))])),
-              down(lit(3)),
-              down(lit(3)),
+              down(3),
+              down(3),
               untilEndOfTurn)]))]})

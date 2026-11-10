@@ -6,4 +6,4 @@ card singleFaced({
       spell(
         sequentially([
             establishThroughout(cant(actor(bare(isPlayer)), search(libraries)), thisTurn),
-            draw(lit(1))]))]})
+            draw(1)]))]})

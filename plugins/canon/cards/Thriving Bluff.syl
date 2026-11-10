@@ -4,4 +4,4 @@ card singleFaced({
     text = [
       static(entersTapped(thisLand)),
       static(entersChoosingFrom(thisLand, color, colorOtherThan(red))),
-      activated(tapSymbol, addMana(lit(1), ofTheChosenColor([colored(red)])))]})
+      activated(tapSymbol, addMana(1, ofTheChosenColor([colored(red)])))]})

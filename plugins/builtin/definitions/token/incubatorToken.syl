@@ -12,6 +12,6 @@ token incubatorToken {
       name = "Phyrexian Token",
       types = [artifact, creature],
       subtypes = [phyrexian],
-      power = lit(0),
-      toughness = lit(0)}}
+      power = 0,
+      toughness = 0}}
 }

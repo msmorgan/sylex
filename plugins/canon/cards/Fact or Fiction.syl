@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            reveal(topSlice(lit(5))),
+            reveal(topSlice(5)),
             instruct(anOpponent, separateIntoPiles(them, 2)),
             putInto(onePile, hand),
             putInto(theOther, graveyard)]))]})

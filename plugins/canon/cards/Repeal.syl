@@ -6,4 +6,4 @@ card singleFaced({
       spell(
         sequentially([
             returnToHand(target(and([non(isLand), isPermanent, hasManaValue(equal, letter(x))]))),
-            draw(lit(1))]))]})
+            draw(1)]))]})

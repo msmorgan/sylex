@@ -7,5 +7,5 @@ card singleFaced({
       flying,
       cumulativeUpkeep(perform(discard(a(cardIn(yourHand))))),
       when(does(actor(thisCreature), die), draw(countersOn(ageCounter, it)))],
-    power = lit(4),
-    toughness = lit(4)})
+    power = 4,
+    toughness = 4})

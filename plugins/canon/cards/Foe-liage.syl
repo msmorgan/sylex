@@ -7,6 +7,6 @@ card singleFaced({
       whenever(
         does(actor(a(isLand)), enter),
         during = duringPart(turn, you),
-        action = putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
-    power = lit(3),
-    toughness = lit(3)})
+        action = putCounters(1, printedKind(p1p1Counter), thisCreature))],
+    power = 3,
+    toughness = 3})

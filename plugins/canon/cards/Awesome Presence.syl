@@ -8,6 +8,6 @@ card singleFaced({
       static(
         gatedBy(
           scaledGenericMana(
-            forEach(lit(3), and([isCreature, controlledBy(they), inCombat(blockerOf, it)]))),
+            forEach(3, and([isCreature, controlledBy(they), inCombat(blockerOf, it)]))),
           any,
-          block(enchanted(type(creature)))))]})
+          block(enchanted(creature))))]})

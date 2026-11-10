@@ -19,6 +19,6 @@ card split(
       spell(
         get(
           bare(and([isAttacking, isCreature, youControl])),
-          up(forEach(lit(1), and([isAttacking, isCreature, isOther]))),
-          up(lit(0)),
+          up(forEach(1, and([isAttacking, isCreature, isOther]))),
+          up(0),
           untilEndOfTurn))]})

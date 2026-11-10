@@ -2,4 +2,4 @@ card singleFaced({
     name = "Military Intelligence",
     cost = [generic(1), pip(blue)],
     types = [enchantment],
-    text = [whenever(does(actor(you), attackWith(counted(orMore(2), isCreature))), draw(lit(1)))]})
+    text = [whenever(does(actor(you), attackWith(counted(orMore(2), isCreature))), draw(1))]})

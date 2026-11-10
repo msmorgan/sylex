@@ -8,6 +8,6 @@ ability graft(amount: Amount) {
     static(entersWithCounters(thisPermanent, $amount, p1p1Counter)),
     whenever(
       does(actor(a(and([isCreature, isOther]))), enter),
-      may(moveCounters(lit(1), thisPermanent, that(creature), printedKind(p1p1Counter))),
+      may(moveCounters(1, thisPermanent, that(creature), printedKind(p1p1Counter))),
       if = is(thisPermanent, hasCounter(p1p1Counter)))]
 }

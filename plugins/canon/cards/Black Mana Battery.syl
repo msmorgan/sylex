@@ -5,11 +5,11 @@ card singleFaced({
     text = [
       activated(
         compound([mana([generic(2)]), tapSymbol]),
-        putCounters(lit(1), printedKind(chargeCounter), thisArtifact)),
+        putCounters(1, printedKind(chargeCounter), thisArtifact)),
       activated(
         compound([
             tapSymbol,
             perform(removeCounters(anyNumber, printedKind(chargeCounter), thisArtifact))]),
         sequentially([
-            addMana(lit(1), manaOf([[colored(black)]])),
+            addMana(1, manaOf([[colored(black)]])),
             addMana(removedThisWay, manaOf([[colored(black)]]))]))]})

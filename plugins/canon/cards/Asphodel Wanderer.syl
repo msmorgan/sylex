@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [skeleton, soldier],
     text = [activated(mana([generic(2), pip(black)]), regenerate(thisCreature))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

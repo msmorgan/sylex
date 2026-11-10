@@ -12,4 +12,4 @@ card singleFaced({
         definesPowerAndToughness(
           thisCreature,
           theLastChosenNumber,
-          minus(lit(7), theLastChosenNumber)))]})
+          minus(7, theLastChosenNumber)))]})

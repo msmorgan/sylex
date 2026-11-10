@@ -4,6 +4,6 @@ card singleFaced({
     types = [artifact],
     subtypes = [equipment],
     text = [
-      static(getsPt(equipped(creature), up(lit(4)), up(lit(0)))),
+      static(getsPt(equipped(creature), up(4), up(0))),
       whenever(does(any, attachment(attached, thisEquipment, a(isCreature))), tap(that(creature))),
       equip(mana([generic(2)]))]})

@@ -10,5 +10,5 @@ card singleFaced({
         establishThroughout(
           qualityChange(target(isPermanent), adds, colored(colors([blue]))),
           untilEndOfTurn))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

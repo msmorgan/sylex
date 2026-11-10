@@ -10,8 +10,7 @@ token junkToken {
       text = [
         activatedOnlyDuring(
           compound([tapSymbol, perform(sacrifice(thisToken))]),
-          sequentially([
-              exile(topSlice(lit(1))),
-              establishThroughout(can(actor(you), play(that(card))), thisTurn)]),
+          sequentially(
+            [exile(topSlice(1)), establishThroughout(can(actor(you), play(that(card))), thisTurn)]),
           asSorcery)]}}
 }

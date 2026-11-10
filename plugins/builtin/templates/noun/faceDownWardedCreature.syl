@@ -6,6 +6,6 @@ template faceDownWardedCreature: FaceDown {
     characteristics = {
       types = [creature],
       text = [ward(mana([generic(2)]))],
-      power = lit(2),
-      toughness = lit(2)}}
+      power = 2,
+      toughness = 2}}
 }

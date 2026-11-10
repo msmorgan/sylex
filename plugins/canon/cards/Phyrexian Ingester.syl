@@ -11,5 +11,5 @@ card singleFaced({
             getsPt(thisCreature, up(letter(x)), up(letter(y))),
             letterDefinition(x, powerOf(the(and([isCreature, in(exiledWith(thisCreature))])))),
             letterDefinition(y, toughnessOf(that(card)))]))],
-    power = lit(3),
-    toughness = lit(3)})
+    power = 3,
+    toughness = 3})

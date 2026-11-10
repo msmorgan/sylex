@@ -4,5 +4,5 @@ card singleFaced({
     types = [creature],
     subtypes = [shapeshifter],
     text = [static(mayHaveEnter(thisCreature, [asCopyOf(a(isCreature), [])]))],
-    power = lit(0),
-    toughness = lit(0)})
+    power = 0,
+    toughness = 0})

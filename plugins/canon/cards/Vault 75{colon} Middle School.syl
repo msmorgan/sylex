@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     subtypes = [saga],
     text = [
-      when(chapterMark([1]), exile(allOf(and([isCreature, hasPower(atLeast, lit(4))])))),
+      when(chapterMark([1]), exile(allOf(and([isCreature, hasPower(atLeast, 4)])))),
       when(
         chapterMark([2, 3]),
-        putCounters(lit(1), printedKind(p1p1Counter), each(and([isCreature, youControl]))))]})
+        putCounters(1, printedKind(p1p1Counter), each(and([isCreature, youControl]))))]})

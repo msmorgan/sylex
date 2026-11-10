@@ -10,5 +10,5 @@ card singleFaced({
       whenever(
         does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])), from = yourLibrary)),
         sequentially([copyOnStack(it), may(chooseNewTargets(that(copy)))]))],
-    power = lit(2),
-    toughness = lit(4)})
+    power = 2,
+    toughness = 4})

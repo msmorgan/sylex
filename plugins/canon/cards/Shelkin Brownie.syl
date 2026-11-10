@@ -9,5 +9,5 @@ card singleFaced({
         establishThroughout(
           abilityLoss(target(isCreature), [abilities(anyIn({word = bandsWithOther}))]),
           untilEndOfTurn))],
-    power = lit(1),
-    toughness = lit(1)})
+    power = 1,
+    toughness = 1})

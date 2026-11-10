@@ -7,7 +7,7 @@ card singleFaced({
       static(
         entersWithAdditionalCounters(
           each(and([isCreature, hasSubtype(wizard), youControl, isOther])),
-          lit(1),
+          1,
           p1p1Counter)),
       activated(
         compound([
@@ -17,6 +17,6 @@ card singleFaced({
                 exactly(1),
                 printedKind(p1p1Counter),
                 a(and([isCreature, youControl]))))]),
-        draw(lit(1)))],
-    power = lit(2),
-    toughness = lit(2)})
+        draw(1))],
+    power = 2,
+    toughness = 2})

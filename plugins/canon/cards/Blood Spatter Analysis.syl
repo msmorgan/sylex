@@ -5,18 +5,16 @@ card singleFaced({
     text = [
       when(
         does(actor(thisEnchantment), enter),
-        instruct(
-          thisEnchantment,
-          dealDamage(lit(3), target(and([isCreature, anOpponentControls]))))),
+        instruct(thisEnchantment, dealDamage(3, target(and([isCreature, anOpponentControls]))))),
       whenever(
         does(actor(counted(orMore(1), isCreature)), die),
         sequentially([
-            mill(lit(1)),
-            putCounters(lit(1), printedKind(bloodstainCounter), thisEnchantment),
+            mill(1),
+            putCounters(1, printedKind(bloodstainCounter), thisEnchantment),
             triggerReflexively(
               doOnlyIf(
                 sacrifice(thisEnchantment),
-                compareAmt(countersOn(bloodstainCounter, thisEnchantment), atLeast, lit(5))),
+                compareAmt(countersOn(bloodstainCounter, thisEnchantment), atLeast, 5)),
               returnToHand(
                 target(and([isCreature, isCard, in(yourGraveyard)])),
                 yourGraveyard))]))]})

@@ -13,5 +13,5 @@ card singleFaced({
               and([
                   abilityHead(anyActivated),
                   abilityOf(allOf(and([isSource, named(chosenName)])))])))))],
-    power = lit(2),
-    toughness = lit(1)})
+    power = 2,
+    toughness = 1})

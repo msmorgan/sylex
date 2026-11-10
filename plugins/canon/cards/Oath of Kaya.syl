@@ -6,9 +6,9 @@ card singleFaced({
     text = [
       when(
         does(actor(this), enter),
-        sequentially([instruct(this, dealDamage(lit(3), target(isAnyTarget))), gainLife(lit(3))])),
+        sequentially([instruct(this, dealDamage(3, target(isAnyTarget))), gainLife(3)])),
       whenever(
         does(
           actor(anOpponent),
           attackWith(counted(orMore(1), isCreature), a(and([isPlaneswalker, youControl])))),
-        sequentially([instruct(this, dealDamage(lit(2), that(player))), gainLife(lit(2))]))]})
+        sequentially([instruct(this, dealDamage(2, that(player))), gainLife(2)]))]})

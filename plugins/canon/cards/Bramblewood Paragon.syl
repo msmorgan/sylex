@@ -7,8 +7,8 @@ card singleFaced({
       static(
         entersWithAdditionalCounters(
           each(and([isCreature, hasSubtype(warrior), youControl, isOther])),
-          lit(1),
+          1,
           p1p1Counter)),
       static(abilityGrant(each(and([isCreature, youControl, hasCounter(p1p1Counter)])), trample))],
-    power = lit(2),
-    toughness = lit(2)})
+    power = 2,
+    toughness = 2})

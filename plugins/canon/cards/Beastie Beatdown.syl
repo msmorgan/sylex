@@ -18,8 +18,8 @@ card singleFaced({
       delirium(
         spell(
           doIf(
-            compareAmt(distinctCount(cardType, allOf(cardIn(yourGraveyard))), atLeast, lit(4)),
-            putCounters(lit(2), printedKind(p1p1Counter), the(and([isCreature, youControl])))))),
+            compareAmt(distinctCount(cardType, allOf(cardIn(yourGraveyard))), atLeast, 4),
+            putCounters(2, printedKind(p1p1Counter), the(and([isCreature, youControl])))))),
       spell(
         dealDamageOwnPower(
           the(and([isCreature, youControl])),

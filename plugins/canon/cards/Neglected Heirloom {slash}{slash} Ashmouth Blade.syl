@@ -5,7 +5,7 @@ card transforming(
     types = [artifact],
     subtypes = [equipment],
     text = [
-      static(getsPt(equipped(creature), up(lit(1)), up(lit(1)))),
+      static(getsPt(equipped(creature), up(1), up(1))),
       when(does(any, turnOver(equipped(creature))), transform(thisEquipment)),
       equip(mana([generic(1)]))]},
   back = {
@@ -14,6 +14,5 @@ card transforming(
     subtypes = [equipment],
     text = [
       static(
-        conjunction(
-          [getsPt(equipped(creature), up(lit(3)), up(lit(3))), abilityGrant(it, firstStrike)])),
+        conjunction([getsPt(equipped(creature), up(3), up(3)), abilityGrant(it, firstStrike)])),
       equip(mana([generic(3)]))]})

@@ -7,6 +7,6 @@ card singleFaced({
       static(
         enters(
           thisCreature,
-          [withCounters(lit(1), chosenKind([flyingCounter, firstStrikeCounter]), fresh)]))],
-    power = lit(2),
-    toughness = lit(2)})
+          [withCounters(1, chosenKind([flyingCounter, firstStrikeCounter]), fresh)]))],
+    power = 2,
+    toughness = 2})

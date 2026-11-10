@@ -5,6 +5,6 @@ card singleFaced({
     subtypes = [sphinx],
     text = [
       flying,
-      at(beginningOfYour(postcombatMain), additionalPhase(beginningPhase, postcombatMain, lit(1)))],
-    power = lit(6),
-    toughness = lit(6)})
+      at(beginningOfYour(postcombatMain), additionalPhase(beginningPhase, postcombatMain, 1))],
+    power = 6,
+    toughness = 6})

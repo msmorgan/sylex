@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       static(
         onlyWhile(
-          altCost(this, perform(payLife(lit(4)))),
+          altCost(this, perform(payLife(4))),
           exists(and([isLand, hasSubtype(swamp), youControl])))),
       spell(destroyCantRegenerate(target(and([isCreature, non(hasColor(black))]))))]})

@@ -6,6 +6,6 @@ card singleFaced({
       static(
         gatedBy(
           scaledGenericMana(
-            forEach(lit(2), and([isCreature, controlledBy(they), inCombat(attackerOf, you)]))),
+            forEach(2, and([isCreature, controlledBy(they), inCombat(attackerOf, you)]))),
           actor(allOf(isCreature)),
           attack(you)))]})

@@ -3,6 +3,4 @@ card singleFaced({
     cost = [generic(2)],
     types = [artifact],
     text = [
-      activated(
-        tapSymbol,
-        addMana(lit(1), ofTypeProducibleBy(a(and([isLand, anOpponentControls])))))]})
+      activated(tapSymbol, addMana(1, ofTypeProducibleBy(a(and([isLand, anOpponentControls])))))]})

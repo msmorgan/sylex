@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            exile(topSlice(lit(1))),
+            exile(topSlice(1)),
             doIf(is(it, isPermanentCard), may(putOntoBattlefield(it), repeat(again)))]))]})

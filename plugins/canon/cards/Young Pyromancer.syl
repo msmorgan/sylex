@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])))),
-        create(lit(1), written(creatureToken(1, 1, [red], [elemental]))))],
-    power = lit(2),
-    toughness = lit(1)})
+        create(1, written(creatureToken(1, 1, [red], [elemental]))))],
+    power = 2,
+    toughness = 1})

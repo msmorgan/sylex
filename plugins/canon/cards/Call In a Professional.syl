@@ -9,4 +9,4 @@ card singleFaced({
             establishThroughout(
               cant(any, preventDamage(allDamage, damage = would(any, dealDamage))),
               thisTurn),
-            instruct(this, dealDamage(lit(3), target(isAnyTarget)))]))]})
+            instruct(this, dealDamage(3, target(isAnyTarget)))]))]})

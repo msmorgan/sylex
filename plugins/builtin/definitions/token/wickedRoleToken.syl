@@ -10,8 +10,8 @@ token wickedRoleToken {
       subtypes = [aura, role],
       text = [
         enchant(isCreature),
-        static(getsPt(enchanted(creature), up(lit(1)), up(lit(1)))),
+        static(getsPt(enchanted(creature), up(1), up(1))),
         when(
           does(any, putIntoFromBattlefield(thisToken, graveyard)),
-          instruct(eachOpponent, loseLife(lit(1))))]}}
+          instruct(eachOpponent, loseLife(1)))]}}
 }

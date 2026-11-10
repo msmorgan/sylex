@@ -8,5 +8,5 @@ card singleFaced({
       activated(
         compound([mana([pip(green), pip(blue)]), tapSymbol]),
         doubleCounters(target(or([isArtifact, isCreature, isLand]))))],
-    power = lit(1),
-    toughness = lit(4)})
+    power = 1,
+    toughness = 4})

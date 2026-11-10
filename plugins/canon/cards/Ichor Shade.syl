@@ -9,6 +9,6 @@ card singleFaced({
         if = was(
           putIntoFromBattlefield(a(or([isArtifact, isCreature])), graveyard),
           within(soFarThisTurn)),
-        action = putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
-    power = lit(2),
-    toughness = lit(3)})
+        action = putCounters(1, printedKind(p1p1Counter), thisCreature))],
+    power = 2,
+    toughness = 3})

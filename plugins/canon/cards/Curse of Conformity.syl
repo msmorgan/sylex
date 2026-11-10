@@ -10,6 +10,6 @@ card singleFaced({
             getsBase(
               allOf(
                 and([isCreature, non(hasSupertype(legendary)), controlledBy(enchanted(player))])),
-              lit(3),
-              lit(3)),
+              3,
+              3),
             qualityChange(them, loses, everyTypeOf(creature))]))]})

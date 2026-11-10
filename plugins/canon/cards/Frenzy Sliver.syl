@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(1), pip(black)],
     types = [creature],
     subtypes = [sliver],
-    text = [static(abilityGrant(allOf(and([hasSubtype(sliver), isCreature])), frenzy(lit(1))))],
-    power = lit(1),
-    toughness = lit(1)})
+    text = [static(abilityGrant(allOf(and([hasSubtype(sliver), isCreature])), frenzy(1)))],
+    power = 1,
+    toughness = 1})
