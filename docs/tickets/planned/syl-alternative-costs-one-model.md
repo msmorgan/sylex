@@ -16,8 +16,6 @@ zone the card can be cast from [CR#702.74a,702.103a], and dash's while the card 
 for its foretell cost [CR#702.143d] unwritten, saying no cost term names a keyword's cost, though
 `usingKeyword` exists.
 
-`syl-boolean-flags` rewrites the same 17 `addedCost` calls (its `offered` flag) and lands first.
-
 ## Done when
 
 - Each of alternative and additional cost has one model, the other form deleted or a Template

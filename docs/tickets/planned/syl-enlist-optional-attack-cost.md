@@ -19,8 +19,8 @@ written against that order.
 
 - The static is an offered variant of `gatedBy`: an optional cost the player may pay as the
   creature attacks [CR#508.1g,702.154b], not a prohibition unless paid, and not written with
-  `asEvent`. The offered form is a typed construct, not a `Bool` parameter (`addedCost`'s
-  `offered: Bool` is due for the same replacement).
+  `asEvent`. The offered form is a typed construct, not a `Bool` parameter, as `addedCost`'s
+  `CostOptionality` (`optional`, `mandatory`) is.
 - "That you didn't choose to attack with" reads the declaration's chosen set, not
   `isAttacking`: the cost is chosen at [CR#508.1g], before the chosen creatures become attacking
   creatures [CR#508.1k].
