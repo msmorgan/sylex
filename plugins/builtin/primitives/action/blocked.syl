@@ -1,1 +1,3 @@
-primitive blocked(value: Bool): CombatParticipation = Blocked
+# The Blocked status an effect gives an attacking creature: "<subject> becomes blocked"
+# [CR#509.1h]. Becoming unblocked, which [CR#509.1h] also lets an effect say, is another status.
+primitive blocked: CombatParticipation = Blocked

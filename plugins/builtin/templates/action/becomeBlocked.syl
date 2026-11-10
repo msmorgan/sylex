@@ -5,5 +5,5 @@
 # [CR#509.3d]
 template becomeBlocked(subject: NounPhrase): Action {
   spelling = "<subject> becomes blocked",
-  body = combat($subject, participation(blocked(true)))
+  body = combat($subject, participation(blocked))
 }
