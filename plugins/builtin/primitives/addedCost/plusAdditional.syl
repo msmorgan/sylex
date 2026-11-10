@@ -1,7 +1,8 @@
 # "<cost> as an additional cost": the mana cost or an alternative cost, plus `cost`
-# [CR#118.8,601.2f]; `times` specifies how often it may be paid and defaults to once. Squad permits
-# payment any number of times. [CR#702.157a]
+# [CR#118.8,601.2f].
 # [CR#118.8,601.2f]
+# `times` specifies how often it may be paid and defaults to once. Squad permits payment any number
+# of times. [CR#702.157a]
 # TODO(spelling): Include the clause supplied by times.
 primitive plusAdditional(cost: Cost, times: PayTimes = once): AddedCost = PlusAdditional {
   spelling = "by <cost> as an additional cost to cast it"
