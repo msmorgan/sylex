@@ -14,7 +14,8 @@ defaulted parameter. `docs/decisions/syl.md` §2 says "argument order carries no
 nothing tells a reader which parameter a positional argument fills.
 
 Two narrower tickets rewrite calls this ticket also respells, and land first:
-`syl-alternative-costs-one-model` (39 `altCost` calls that pass `cost` positionally) and
+`syl-alternative-costs-one-model` (every `altCost` and `addedCost` call, and every `cast` or
+`play` call that passed an alternative or additional cost) and
 `syl-boolean-flags` (4 calls of its flagged declarations). `syl-at-turn-point` changed `at`'s
 first parameter to a turn point but left the text of the 14 `at` calls that pass the required
 `action` by name as it was; respelling them is this ticket's.
