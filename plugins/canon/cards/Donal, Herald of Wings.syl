@@ -19,8 +19,10 @@ card singleFaced({
           may(
             copyOnStack(
               it,
-              exceptions = copyCharacteristics(
-                {subtypes = [spirit], power = lit(1), toughness = lit(1)},
-                true)))))],
+              exceptions = [
+                characteristicEdits([
+                    stat(power, set(lit(1))),
+                    stat(toughness, set(lit(1))),
+                    typeLine(adds, {subtypes = [spirit]})])]))))],
     power = lit(3),
     toughness = lit(3)})
