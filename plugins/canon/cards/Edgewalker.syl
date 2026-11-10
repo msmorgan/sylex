@@ -7,6 +7,6 @@ card singleFaced({
       static(
         costShift(
           allOf(and([hasSubtype(cleric), isSpell, did(actor(you), cast(which), thisObject)])),
-          lessBySymbols(symbols([pip(white), pip(black)]), coloredOnly = true)))],
+          lessColoredOnly(symbols([pip(white), pip(black)]))))],
     power = lit(2),
     toughness = lit(2)})

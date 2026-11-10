@@ -1,0 +1,5 @@
+# "costs <cost> less to cast. This effect reduces only the amount of colored mana you pay.": each
+# colored symbol reduces only mana of its color, and an excess reduces no generic mana, which it
+# otherwise would [CR#118.7b,118.7c].
+# TODO(spelling): Spell the second sentence after the sentence that states the reduction.
+primitive lessColoredOnly(cost: ManaCostTerm): CostShift = LessColoredOnly

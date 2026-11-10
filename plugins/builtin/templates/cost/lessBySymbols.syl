@@ -1,7 +1,6 @@
 # "costs <cost> less", symbol by symbol [CR#702.48c,118.7]
 # [CR#702.48c,118.7]
-template lessBySymbols(cost: ManaCostTerm, coloredOnly: Bool = false): CostShift {
-  # TODO(spelling): The coloredOnly flag adds the restriction to the colored portion of the mana
-  # cost.
-  body = bySymbols(down($cost), $coloredOnly)
+template lessBySymbols(cost: ManaCostTerm): CostShift {
+  spelling = "costs <cost> less",
+  body = bySymbols(down($cost))
 }

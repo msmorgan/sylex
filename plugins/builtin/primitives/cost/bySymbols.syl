@@ -1,1 +1,3 @@
-primitive bySymbols(change: Delta(ManaCostTerm), coloredOnly: Bool): CostShift = BySymbols
+# A cost changed symbol by symbol: a reduction by colored or colorless mana that the cost doesn't
+# require, or that exceeds it, reduces generic mana instead [CR#118.7b,118.7c,118.7d].
+primitive bySymbols(change: Delta(ManaCostTerm)): CostShift = BySymbols
