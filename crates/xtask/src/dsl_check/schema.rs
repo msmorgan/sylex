@@ -453,8 +453,8 @@ pub const RECORDS: &[RecordSort] = &[
         "TriggerHeader",
         &[
             ("event", "GameEvent", false),
-            ("while", "Option(Timing)", false),
-            ("timing", "Option(Timing)", false),
+            ("while", "Option(Timing)", true),
+            ("timing", "Option(Timing)", true),
         ],
     ),
     record(

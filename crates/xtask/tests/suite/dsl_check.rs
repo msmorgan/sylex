@@ -237,7 +237,8 @@ fn record_fields_are_checked_against_the_record_sort() {
 }
 
 /// A trigger header names its event; alternative events are an `or` written
-/// as that event, never a field beside it. `triggered` consumes the record
+/// as that event, never a field beside it. A header with no concurrent
+/// condition or timing window omits them. `triggered` consumes the record
 /// sort, which an unconsumed sort would otherwise make unknown.
 #[test]
 fn a_trigger_header_writes_its_event_and_no_alternatives() {
@@ -245,7 +246,7 @@ fn a_trigger_header_writes_its_event_and_no_alternatives() {
         kinds(
             "primitive now: GameEvent = Now\n\
              primitive triggered(header: TriggerHeader): Ability = Triggered\n\
-             template a: TriggerHeader { body = { event = now, while = none, timing = none } }\n\
+             template a: TriggerHeader { body = { event = now } }\n\
              template b: TriggerHeader { body = { while = none, timing = none } }\n\
              template c: TriggerHeader {\n\
                body = { event = now, alternatives = [], while = none, timing = none }\n\

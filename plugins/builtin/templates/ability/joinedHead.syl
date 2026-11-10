@@ -1,5 +1,5 @@
 # A further "whenever <event>" header joined onto a trigger.
 template joinedHead(event: GameEvent): TriggerHeader {
   spelling = "whenever <event>",
-  body = {event = $event, while = none, timing = none}
+  body = {event = $event}
 }
