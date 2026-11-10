@@ -1,8 +1,12 @@
-# "If <condition>, <body> instead": a replacement applying only while `condition` holds,
-# the event happening unmodified otherwise, as "draw a card. If you control three or more
-# artifacts, draw two cards instead" [CR#614.1a,614.15]. A replacement that already has a
-# condition keeps it inside, and a caller's replacement stays its caller's.
-# [CR#614.1a,614.15]
-primitive doIf(condition: Condition, body: Replacement): Replacement = OnlyIf {
+# "If <condition>, <body> instead[. Otherwise, <otherwise>]": a replacement applying only while
+# `condition` holds, as "draw a card. If you control three or more artifacts, draw two cards
+# instead" [CR#614.1a,614.15]. Otherwise the `otherwise` replacement applies, or with none the
+# event happens unmodified. A replacement that already has a condition keeps it inside, and a
+# caller's replacement stays its caller's.
+primitive doIf(
+  condition: Condition,
+  body: Replacement,
+  otherwise: Option(Replacement) = none): Replacement = OnlyIf {
+  # TODO(spelling): Print ". Otherwise, <otherwise>" when otherwise is supplied.
   spelling = "If <condition>, <body> instead"
 }
