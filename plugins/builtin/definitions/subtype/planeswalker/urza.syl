@@ -2,6 +2,6 @@
 subtype urza {
   lexical = {lemma = "Urza"},
   spelling = "Urza",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Urza"
 }

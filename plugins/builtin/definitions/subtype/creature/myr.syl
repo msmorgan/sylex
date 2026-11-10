@@ -1,6 +1,6 @@
 subtype myr {
   lexical = {lemma = "Myr", plural = "Myr"},
   spelling = "Myr",
-  kind = creature,
+  types = [creature, kindred],
   name = "Myr"
 }

@@ -1,6 +1,6 @@
 subtype caribou {
   lexical = {lemma = "Caribou", plural = "Caribou"},
   spelling = "Caribou",
-  kind = creature,
+  types = [creature, kindred],
   name = "Caribou"
 }

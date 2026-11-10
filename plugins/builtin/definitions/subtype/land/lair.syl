@@ -2,6 +2,6 @@
 subtype lair {
   lexical = {lemma = "Lair"},
   spelling = "Lair",
-  kind = [land],
+  types = [land],
   name = "Lair"
 }

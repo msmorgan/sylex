@@ -1,6 +1,6 @@
 subtype demigod {
   lexical = {lemma = "Demigod"},
   spelling = "Demigod",
-  kind = creature,
+  types = [creature, kindred],
   name = "Demigod"
 }

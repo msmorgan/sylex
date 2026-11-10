@@ -2,6 +2,6 @@
 subtype ral {
   lexical = {lemma = "Ral"},
   spelling = "Ral",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Ral"
 }

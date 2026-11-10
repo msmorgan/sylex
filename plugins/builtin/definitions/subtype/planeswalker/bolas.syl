@@ -2,6 +2,6 @@
 subtype bolas {
   lexical = {lemma = "Bolas"},
   spelling = "Bolas",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Bolas"
 }

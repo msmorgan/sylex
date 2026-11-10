@@ -1,6 +1,6 @@
 subtype chimera {
   lexical = {lemma = "Chimera"},
   spelling = "Chimera",
-  kind = creature,
+  types = [creature, kindred],
   name = "Chimera"
 }

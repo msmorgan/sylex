@@ -1,6 +1,6 @@
 subtype weird {
   lexical = {lemma = "Weird"},
   spelling = "Weird",
-  kind = creature,
+  types = [creature, kindred],
   name = "Weird"
 }

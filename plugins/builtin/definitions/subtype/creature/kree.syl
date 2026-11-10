@@ -1,6 +1,6 @@
 subtype kree {
   lexical = {lemma = "Kree", plural = "Kree"},
   spelling = "Kree",
-  kind = creature,
+  types = [creature, kindred],
   name = "Kree"
 }

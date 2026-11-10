@@ -1,6 +1,6 @@
 subtype pincher {
   lexical = {lemma = "Pincher"},
   spelling = "Pincher",
-  kind = creature,
+  types = [creature, kindred],
   name = "Pincher"
 }

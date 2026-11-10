@@ -1,6 +1,6 @@
 subtype mount {
   lexical = {lemma = "Mount"},
   spelling = "Mount",
-  kind = creature,
+  types = [creature, kindred],
   name = "Mount"
 }

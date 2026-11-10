@@ -5,6 +5,6 @@
 subtype lesson {
   lexical = {lemma = "Lesson"},
   spelling = "Lesson",
-  kind = spell,
+  types = [instant, sorcery],
   name = "Lesson"
 }

@@ -2,6 +2,6 @@
 subtype kasmina {
   lexical = {lemma = "Kasmina"},
   spelling = "Kasmina",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Kasmina"
 }

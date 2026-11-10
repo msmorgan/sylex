@@ -1,6 +1,6 @@
 subtype troll {
   lexical = {lemma = "Troll"},
   spelling = "Troll",
-  kind = creature,
+  types = [creature, kindred],
   name = "Troll"
 }

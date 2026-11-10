@@ -1,6 +1,6 @@
 subtype shrine {
   lexical = {lemma = "Shrine"},
   spelling = "Shrine",
-  kind = [enchantment],
+  types = [enchantment],
   name = "Shrine"
 }

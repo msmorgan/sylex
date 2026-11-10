@@ -1,6 +1,6 @@
 subtype basilisk {
   lexical = {lemma = "Basilisk"},
   spelling = "Basilisk",
-  kind = creature,
+  types = [creature, kindred],
   name = "Basilisk"
 }

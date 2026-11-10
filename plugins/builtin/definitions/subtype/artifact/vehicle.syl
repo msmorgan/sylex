@@ -3,6 +3,6 @@
 subtype vehicle {
   lexical = {lemma = "Vehicle"},
   spelling = "Vehicle",
-  kind = [artifact],
+  types = [artifact],
   name = "Vehicle"
 }

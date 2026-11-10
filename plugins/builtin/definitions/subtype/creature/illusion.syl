@@ -1,6 +1,6 @@
 subtype illusion {
   lexical = {lemma = "Illusion"},
   spelling = "Illusion",
-  kind = creature,
+  types = [creature, kindred],
   name = "Illusion"
 }

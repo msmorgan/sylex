@@ -1,6 +1,6 @@
 subtype desert {
   lexical = {lemma = "Desert"},
   spelling = "Desert",
-  kind = [land],
+  types = [land],
   name = "Desert"
 }

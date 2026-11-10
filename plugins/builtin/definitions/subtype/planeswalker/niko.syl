@@ -2,6 +2,6 @@
 subtype niko {
   lexical = {lemma = "Niko"},
   spelling = "Niko",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Niko"
 }

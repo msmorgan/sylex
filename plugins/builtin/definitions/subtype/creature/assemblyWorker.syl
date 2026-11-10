@@ -1,6 +1,6 @@
 subtype assemblyWorker {
   lexical = {lemma = "Assembly-Worker"},
   spelling = "Assembly-Worker",
-  kind = creature,
+  types = [creature, kindred],
   name = "Assembly-Worker"
 }

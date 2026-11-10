@@ -2,6 +2,6 @@
 subtype arcane {
   lexical = {lemma = "Arcane"},
   spelling = "Arcane",
-  kind = spell,
+  types = [instant, sorcery],
   name = "Arcane"
 }

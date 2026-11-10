@@ -2,6 +2,6 @@
 subtype garruk {
   lexical = {lemma = "Garruk"},
   spelling = "Garruk",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Garruk"
 }

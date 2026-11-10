@@ -6,6 +6,6 @@
 subtype adventure {
   lexical = {lemma = "Adventure"},
   spelling = "Adventure",
-  kind = spell,
+  types = [instant, sorcery],
   name = "Adventure"
 }

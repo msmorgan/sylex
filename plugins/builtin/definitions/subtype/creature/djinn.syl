@@ -1,6 +1,6 @@
 subtype djinn {
   lexical = {lemma = "Djinn"},
   spelling = "Djinn",
-  kind = creature,
+  types = [creature, kindred],
   name = "Djinn"
 }

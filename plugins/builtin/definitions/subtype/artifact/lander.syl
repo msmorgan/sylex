@@ -5,6 +5,6 @@
 subtype lander {
   lexical = {lemma = "Lander"},
   spelling = "Lander",
-  kind = [artifact],
+  types = [artifact],
   name = "Lander"
 }

@@ -3,6 +3,6 @@
 subtype gargoyle {
   lexical = {lemma = "Gargoyle"},
   spelling = "Gargoyle",
-  kind = creature,
+  types = [creature, kindred],
   name = "Gargoyle"
 }

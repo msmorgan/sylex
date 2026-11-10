@@ -2,6 +2,6 @@
 subtype sivitri {
   lexical = {lemma = "Sivitri"},
   spelling = "Sivitri",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Sivitri"
 }

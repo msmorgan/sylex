@@ -1,6 +1,6 @@
 subtype mongoose {
   lexical = {lemma = "Mongoose"},
   spelling = "Mongoose",
-  kind = creature,
+  types = [creature, kindred],
   name = "Mongoose"
 }

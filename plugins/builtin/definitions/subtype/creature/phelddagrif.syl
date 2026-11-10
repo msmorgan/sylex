@@ -1,6 +1,6 @@
 subtype phelddagrif {
   lexical = {lemma = "Phelddagrif"},
   spelling = "Phelddagrif",
-  kind = creature,
+  types = [creature, kindred],
   name = "Phelddagrif"
 }

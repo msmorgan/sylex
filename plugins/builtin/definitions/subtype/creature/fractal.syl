@@ -1,6 +1,6 @@
 subtype fractal {
   lexical = {lemma = "Fractal"},
   spelling = "Fractal",
-  kind = creature,
+  types = [creature, kindred],
   name = "Fractal"
 }

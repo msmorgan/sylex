@@ -2,6 +2,6 @@
 subtype powerPlant {
   lexical = {lemma = "Power-Plant"},
   spelling = "Power-Plant",
-  kind = [land],
+  types = [land],
   name = "Power-Plant"
 }

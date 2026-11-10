@@ -3,6 +3,6 @@
 subtype doctor {
   lexical = {lemma = "Doctor"},
   spelling = "Doctor",
-  kind = creature,
+  types = [creature, kindred],
   name = "Doctor"
 }

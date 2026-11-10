@@ -5,6 +5,6 @@
 subtype omen {
   lexical = {lemma = "Omen"},
   spelling = "Omen",
-  kind = spell,
+  types = [instant, sorcery],
   name = "Omen"
 }

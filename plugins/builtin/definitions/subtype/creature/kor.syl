@@ -1,6 +1,6 @@
 subtype kor {
   lexical = {lemma = "Kor", plural = "Kor"},
   spelling = "Kor",
-  kind = creature,
+  types = [creature, kindred],
   name = "Kor"
 }

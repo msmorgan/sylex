@@ -2,6 +2,6 @@
 subtype gideon {
   lexical = {lemma = "Gideon"},
   spelling = "Gideon",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Gideon"
 }

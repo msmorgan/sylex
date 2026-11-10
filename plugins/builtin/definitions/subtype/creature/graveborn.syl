@@ -1,6 +1,6 @@
 subtype graveborn {
   lexical = {lemma = "Graveborn", plural = "Graveborn"},
   spelling = "Graveborn",
-  kind = creature,
+  types = [creature, kindred],
   name = "Graveborn"
 }

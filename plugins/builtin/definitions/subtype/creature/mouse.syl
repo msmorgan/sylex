@@ -1,6 +1,6 @@
 subtype mouse {
   lexical = {lemma = "Mouse", plural = "Mice"},
   spelling = "Mouse",
-  kind = creature,
+  types = [creature, kindred],
   name = "Mouse"
 }

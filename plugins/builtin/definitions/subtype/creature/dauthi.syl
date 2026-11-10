@@ -1,6 +1,6 @@
 subtype dauthi {
   lexical = {lemma = "Dauthi", plural = "Dauthi"},
   spelling = "Dauthi",
-  kind = creature,
+  types = [creature, kindred],
   name = "Dauthi"
 }

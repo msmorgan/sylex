@@ -1,6 +1,6 @@
 subtype fungus {
   lexical = {lemma = "Fungus", plural = "Fungi"},
   spelling = "Fungus",
-  kind = creature,
+  types = [creature, kindred],
   name = "Fungus"
 }

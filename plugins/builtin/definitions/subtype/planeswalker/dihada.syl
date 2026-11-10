@@ -2,6 +2,6 @@
 subtype dihada {
   lexical = {lemma = "Dihada"},
   spelling = "Dihada",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Dihada"
 }

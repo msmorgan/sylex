@@ -6,6 +6,6 @@
 subtype class {
   lexical = {lemma = "Class"},
   spelling = "Class",
-  kind = [enchantment],
+  types = [enchantment],
   name = "Class"
 }

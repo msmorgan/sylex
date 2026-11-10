@@ -1,6 +1,6 @@
 subtype gnome {
   lexical = {lemma = "Gnome"},
   spelling = "Gnome",
-  kind = creature,
+  types = [creature, kindred],
   name = "Gnome"
 }

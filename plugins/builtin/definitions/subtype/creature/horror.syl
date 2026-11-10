@@ -1,6 +1,6 @@
 subtype horror {
   lexical = {lemma = "Horror"},
   spelling = "Horror",
-  kind = creature,
+  types = [creature, kindred],
   name = "Horror"
 }

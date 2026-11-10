@@ -1,6 +1,6 @@
 subtype kithkin {
   lexical = {lemma = "Kithkin", plural = "Kithkin"},
   spelling = "Kithkin",
-  kind = creature,
+  types = [creature, kindred],
   name = "Kithkin"
 }

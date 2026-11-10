@@ -2,6 +2,6 @@
 subtype mordenkainen {
   lexical = {lemma = "Mordenkainen"},
   spelling = "Mordenkainen",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Mordenkainen"
 }

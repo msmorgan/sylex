@@ -2,6 +2,6 @@
 subtype dovin {
   lexical = {lemma = "Dovin"},
   spelling = "Dovin",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Dovin"
 }

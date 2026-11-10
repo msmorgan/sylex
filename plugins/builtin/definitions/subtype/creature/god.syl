@@ -1,6 +1,6 @@
 subtype god {
   lexical = {lemma = "God"},
   spelling = "God",
-  kind = creature,
+  types = [creature, kindred],
   name = "God"
 }

@@ -1,6 +1,6 @@
 subtype eldrazi {
   lexical = {lemma = "Eldrazi", plural = "Eldrazi"},
   spelling = "Eldrazi",
-  kind = creature,
+  types = [creature, kindred],
   name = "Eldrazi"
 }

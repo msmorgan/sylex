@@ -1,6 +1,6 @@
 subtype phyrexian {
   lexical = {lemma = "Phyrexian"},
   spelling = "Phyrexian",
-  kind = creature,
+  types = [creature, kindred],
   name = "Phyrexian"
 }

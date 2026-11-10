@@ -3,7 +3,7 @@
 subtype equipment {
   lexical = {lemma = "Equipment", plural = "Equipment"},
   spelling = "Equipment",
-  kind = [artifact],
+  types = [artifact],
   name = "Equipment",
   confers = [
     property(mayBeAttachedTo(thisEquipment, allOf(isCreature))),

@@ -1,6 +1,6 @@
 subtype gorgon {
   lexical = {lemma = "Gorgon"},
   spelling = "Gorgon",
-  kind = creature,
+  types = [creature, kindred],
   name = "Gorgon"
 }

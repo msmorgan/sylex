@@ -1,6 +1,6 @@
 subtype qu {
   lexical = {lemma = "Qu", plural = "Qu"},
   spelling = "Qu",
-  kind = creature,
+  types = [creature, kindred],
   name = "Qu"
 }

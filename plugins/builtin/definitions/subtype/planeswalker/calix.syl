@@ -2,6 +2,6 @@
 subtype calix {
   lexical = {lemma = "Calix"},
   spelling = "Calix",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Calix"
 }

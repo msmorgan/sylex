@@ -3,6 +3,6 @@
 subtype contraption {
   lexical = {lemma = "Contraption"},
   spelling = "Contraption",
-  kind = [artifact],
+  types = [artifact],
   name = "Contraption"
 }

@@ -1,6 +1,6 @@
 subtype glimmer {
   lexical = {lemma = "Glimmer"},
   spelling = "Glimmer",
-  kind = creature,
+  types = [creature, kindred],
   name = "Glimmer"
 }

@@ -4,6 +4,6 @@
 subtype role {
   lexical = {lemma = "Role"},
   spelling = "Role",
-  kind = [enchantment],
+  types = [enchantment],
   name = "Role"
 }

@@ -1,6 +1,6 @@
 subtype werewolf {
   lexical = {lemma = "Werewolf", plural = "Werewolves"},
   spelling = "Werewolf",
-  kind = creature,
+  types = [creature, kindred],
   name = "Werewolf"
 }

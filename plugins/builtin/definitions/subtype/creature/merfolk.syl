@@ -1,6 +1,6 @@
 subtype merfolk {
   lexical = {lemma = "Merfolk", plural = "Merfolk"},
   spelling = "Merfolk",
-  kind = creature,
+  types = [creature, kindred],
   name = "Merfolk"
 }

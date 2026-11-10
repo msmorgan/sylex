@@ -2,6 +2,6 @@
 subtype elspeth {
   lexical = {lemma = "Elspeth"},
   spelling = "Elspeth",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Elspeth"
 }

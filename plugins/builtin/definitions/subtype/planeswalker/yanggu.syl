@@ -2,6 +2,6 @@
 subtype yanggu {
   lexical = {lemma = "Yanggu"},
   spelling = "Yanggu",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Yanggu"
 }

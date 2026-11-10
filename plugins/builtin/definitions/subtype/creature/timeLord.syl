@@ -3,6 +3,6 @@
 subtype timeLord {
   lexical = {lemma = "Time Lord"},
   spelling = "Time Lord",
-  kind = creature,
+  types = [creature, kindred],
   name = "Time Lord"
 }

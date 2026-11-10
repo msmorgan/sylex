@@ -1,6 +1,6 @@
 subtype zubera {
   lexical = {lemma = "Zubera", plural = "Zubera"},
   spelling = "Zubera",
-  kind = creature,
+  types = [creature, kindred],
   name = "Zubera"
 }

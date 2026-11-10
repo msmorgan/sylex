@@ -5,6 +5,6 @@
 subtype powerstone {
   lexical = {lemma = "Powerstone"},
   spelling = "Powerstone",
-  kind = [artifact],
+  types = [artifact],
   name = "Powerstone"
 }

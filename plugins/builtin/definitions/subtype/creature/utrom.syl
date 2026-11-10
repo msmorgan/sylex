@@ -1,6 +1,6 @@
 subtype utrom {
   lexical = {lemma = "Utrom"},
   spelling = "Utrom",
-  kind = creature,
+  types = [creature, kindred],
   name = "Utrom"
 }

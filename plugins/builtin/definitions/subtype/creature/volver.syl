@@ -1,6 +1,6 @@
 subtype volver {
   lexical = {lemma = "Volver"},
   spelling = "Volver",
-  kind = creature,
+  types = [creature, kindred],
   name = "Volver"
 }

@@ -1,6 +1,6 @@
 subtype vedalken {
   lexical = {lemma = "Vedalken", plural = "Vedalken"},
   spelling = "Vedalken",
-  kind = creature,
+  types = [creature, kindred],
   name = "Vedalken"
 }

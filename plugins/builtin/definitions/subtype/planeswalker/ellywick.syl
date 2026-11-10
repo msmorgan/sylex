@@ -2,6 +2,6 @@
 subtype ellywick {
   lexical = {lemma = "Ellywick"},
   spelling = "Ellywick",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Ellywick"
 }

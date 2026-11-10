@@ -1,6 +1,6 @@
 subtype nightmare {
   lexical = {lemma = "Nightmare"},
   spelling = "Nightmare",
-  kind = creature,
+  types = [creature, kindred],
   name = "Nightmare"
 }

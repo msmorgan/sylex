@@ -1,6 +1,6 @@
 subtype beholder {
   lexical = {lemma = "Beholder"},
   spelling = "Beholder",
-  kind = creature,
+  types = [creature, kindred],
   name = "Beholder"
 }

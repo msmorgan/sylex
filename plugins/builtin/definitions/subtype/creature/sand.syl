@@ -1,6 +1,6 @@
 subtype sand {
   lexical = {lemma = "Sand"},
   spelling = "Sand",
-  kind = creature,
+  types = [creature, kindred],
   name = "Sand"
 }

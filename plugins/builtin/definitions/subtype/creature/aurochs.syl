@@ -2,6 +2,6 @@
 subtype aurochs {
   lexical = {lemma = "Aurochs", plural = "Aurochs"},
   spelling = "Aurochs",
-  kind = creature,
+  types = [creature, kindred],
   name = "Aurochs"
 }

@@ -2,6 +2,6 @@
 subtype sheep {
   lexical = {lemma = "Sheep", plural = "Sheep"},
   spelling = "Sheep",
-  kind = creature,
+  types = [creature, kindred],
   name = "Sheep"
 }

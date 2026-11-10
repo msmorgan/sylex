@@ -1,6 +1,6 @@
 subtype drone {
   lexical = {lemma = "Drone"},
   spelling = "Drone",
-  kind = creature,
+  types = [creature, kindred],
   name = "Drone"
 }

@@ -1,6 +1,6 @@
 subtype mole {
   lexical = {lemma = "Mole"},
   spelling = "Mole",
-  kind = creature,
+  types = [creature, kindred],
   name = "Mole"
 }

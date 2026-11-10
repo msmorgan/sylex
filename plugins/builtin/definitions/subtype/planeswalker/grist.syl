@@ -2,6 +2,6 @@
 subtype grist {
   lexical = {lemma = "Grist"},
   spelling = "Grist",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Grist"
 }

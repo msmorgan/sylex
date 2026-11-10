@@ -1,6 +1,6 @@
 subtype imp {
   lexical = {lemma = "Imp"},
   spelling = "Imp",
-  kind = creature,
+  types = [creature, kindred],
   name = "Imp"
 }

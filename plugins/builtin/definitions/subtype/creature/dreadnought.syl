@@ -1,6 +1,6 @@
 subtype dreadnought {
   lexical = {lemma = "Dreadnought"},
   spelling = "Dreadnought",
-  kind = creature,
+  types = [creature, kindred],
   name = "Dreadnought"
 }

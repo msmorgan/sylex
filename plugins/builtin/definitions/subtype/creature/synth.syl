@@ -1,6 +1,6 @@
 subtype synth {
   lexical = {lemma = "Synth"},
   spelling = "Synth",
-  kind = creature,
+  types = [creature, kindred],
   name = "Synth"
 }

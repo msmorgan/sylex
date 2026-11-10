@@ -2,6 +2,6 @@
 subtype rune {
   lexical = {lemma = "Rune"},
   spelling = "Rune",
-  kind = [enchantment],
+  types = [enchantment],
   name = "Rune"
 }

@@ -1,6 +1,6 @@
 subtype licid {
   lexical = {lemma = "Licid"},
   spelling = "Licid",
-  kind = creature,
+  types = [creature, kindred],
   name = "Licid"
 }

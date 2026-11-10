@@ -2,6 +2,6 @@
 subtype trap {
   lexical = {lemma = "Trap"},
   spelling = "Trap",
-  kind = spell,
+  types = [instant, sorcery],
   name = "Trap"
 }

@@ -2,6 +2,6 @@
 subtype rowan {
   lexical = {lemma = "Rowan"},
   spelling = "Rowan",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Rowan"
 }

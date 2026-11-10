@@ -1,6 +1,6 @@
 subtype camarid {
   lexical = {lemma = "Camarid", plural = "Camarid"},
   spelling = "Camarid",
-  kind = creature,
+  types = [creature, kindred],
   name = "Camarid"
 }

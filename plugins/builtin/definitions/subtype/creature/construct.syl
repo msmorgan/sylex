@@ -1,6 +1,6 @@
 subtype construct {
   lexical = {lemma = "Construct"},
   spelling = "Construct",
-  kind = creature,
+  types = [creature, kindred],
   name = "Construct"
 }

@@ -2,6 +2,6 @@
 subtype teferi {
   lexical = {lemma = "Teferi"},
   spelling = "Teferi",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Teferi"
 }

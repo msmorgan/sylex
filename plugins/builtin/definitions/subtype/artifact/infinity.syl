@@ -2,6 +2,6 @@
 subtype infinity {
   lexical = {lemma = "Infinity"},
   spelling = "Infinity",
-  kind = [artifact],
+  types = [artifact],
   name = "Infinity"
 }

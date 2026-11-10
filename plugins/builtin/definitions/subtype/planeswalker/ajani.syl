@@ -2,6 +2,6 @@
 subtype ajani {
   lexical = {lemma = "Ajani"},
   spelling = "Ajani",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Ajani"
 }

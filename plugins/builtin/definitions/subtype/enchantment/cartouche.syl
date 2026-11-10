@@ -2,6 +2,6 @@
 subtype cartouche {
   lexical = {lemma = "Cartouche"},
   spelling = "Cartouche",
-  kind = [enchantment],
+  types = [enchantment],
   name = "Cartouche"
 }

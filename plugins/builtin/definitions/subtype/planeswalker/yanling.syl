@@ -2,6 +2,6 @@
 subtype yanling {
   lexical = {lemma = "Yanling"},
   spelling = "Yanling",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Yanling"
 }

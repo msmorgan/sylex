@@ -5,6 +5,6 @@
 subtype incubator {
   lexical = {lemma = "Incubator"},
   spelling = "Incubator",
-  kind = [artifact],
+  types = [artifact],
   name = "Incubator"
 }

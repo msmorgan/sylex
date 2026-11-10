@@ -1,6 +1,6 @@
 subtype gith {
   lexical = {lemma = "Gith", plural = "Gith"},
   spelling = "Gith",
-  kind = creature,
+  types = [creature, kindred],
   name = "Gith"
 }

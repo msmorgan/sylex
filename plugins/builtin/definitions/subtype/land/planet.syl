@@ -2,6 +2,6 @@
 subtype planet {
   lexical = {lemma = "Planet"},
   spelling = "Planet",
-  kind = [land],
+  types = [land],
   name = "Planet"
 }

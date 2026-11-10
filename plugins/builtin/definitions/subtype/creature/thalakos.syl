@@ -1,6 +1,6 @@
 subtype thalakos {
   lexical = {lemma = "Thalakos", plural = "Thalakos"},
   spelling = "Thalakos",
-  kind = creature,
+  types = [creature, kindred],
   name = "Thalakos"
 }

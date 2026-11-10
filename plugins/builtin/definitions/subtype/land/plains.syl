@@ -2,6 +2,6 @@
 subtype plains {
   lexical = {lemma = "Plains", plural = "Plains"},
   spelling = "Plains",
-  kind = [land],
+  types = [land],
   name = "Plains"
 }

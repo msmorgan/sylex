@@ -2,6 +2,6 @@
 subtype kiora {
   lexical = {lemma = "Kiora"},
   spelling = "Kiora",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Kiora"
 }

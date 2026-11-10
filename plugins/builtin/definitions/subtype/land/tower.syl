@@ -2,6 +2,6 @@
 subtype tower {
   lexical = {lemma = "Tower"},
   spelling = "Tower",
-  kind = [land],
+  types = [land],
   name = "Tower"
 }

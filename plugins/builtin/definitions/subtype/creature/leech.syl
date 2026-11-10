@@ -2,6 +2,6 @@
 subtype leech {
   lexical = {lemma = "Leech"},
   spelling = "Leech",
-  kind = creature,
+  types = [creature, kindred],
   name = "Leech"
 }

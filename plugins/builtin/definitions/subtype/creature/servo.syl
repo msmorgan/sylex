@@ -1,6 +1,6 @@
 subtype servo {
   lexical = {lemma = "Servo"},
   spelling = "Servo",
-  kind = creature,
+  types = [creature, kindred],
   name = "Servo"
 }

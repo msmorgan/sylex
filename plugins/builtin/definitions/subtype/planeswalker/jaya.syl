@@ -2,6 +2,6 @@
 subtype jaya {
   lexical = {lemma = "Jaya"},
   spelling = "Jaya",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Jaya"
 }

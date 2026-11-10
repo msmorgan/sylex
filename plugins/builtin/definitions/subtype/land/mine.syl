@@ -2,6 +2,6 @@
 subtype mine {
   lexical = {lemma = "Mine"},
   spelling = "Mine",
-  kind = [land],
+  types = [land],
   name = "Mine"
 }

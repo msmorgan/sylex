@@ -2,6 +2,6 @@
 subtype ugin {
   lexical = {lemma = "Ugin"},
   spelling = "Ugin",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Ugin"
 }

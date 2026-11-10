@@ -1,6 +1,6 @@
 subtype flagbearer {
   lexical = {lemma = "Flagbearer"},
   spelling = "Flagbearer",
-  kind = creature,
+  types = [creature, kindred],
   name = "Flagbearer"
 }

@@ -1,6 +1,6 @@
 subtype custodes {
   lexical = {lemma = "Custodes", plural = "Custodes"},
   spelling = "Custodes",
-  kind = creature,
+  types = [creature, kindred],
   name = "Custodes"
 }

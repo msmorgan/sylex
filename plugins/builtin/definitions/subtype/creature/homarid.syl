@@ -1,6 +1,6 @@
 subtype homarid {
   lexical = {lemma = "Homarid"},
   spelling = "Homarid",
-  kind = creature,
+  types = [creature, kindred],
   name = "Homarid"
 }

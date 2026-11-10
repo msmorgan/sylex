@@ -1,6 +1,6 @@
 subtype eye {
   lexical = {lemma = "Eye"},
   spelling = "Eye",
-  kind = creature,
+  types = [creature, kindred],
   name = "Eye"
 }

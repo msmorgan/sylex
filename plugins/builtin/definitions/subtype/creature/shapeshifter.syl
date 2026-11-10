@@ -1,6 +1,6 @@
 subtype shapeshifter {
   lexical = {lemma = "Shapeshifter"},
   spelling = "Shapeshifter",
-  kind = creature,
+  types = [creature, kindred],
   name = "Shapeshifter"
 }

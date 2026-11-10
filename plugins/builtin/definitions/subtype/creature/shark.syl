@@ -1,6 +1,6 @@
 subtype shark {
   lexical = {lemma = "Shark"},
   spelling = "Shark",
-  kind = creature,
+  types = [creature, kindred],
   name = "Shark"
 }

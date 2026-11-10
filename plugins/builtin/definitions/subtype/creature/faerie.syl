@@ -1,6 +1,6 @@
 subtype faerie {
   lexical = {lemma = "Faerie"},
   spelling = "Faerie",
-  kind = creature,
+  types = [creature, kindred],
   name = "Faerie"
 }

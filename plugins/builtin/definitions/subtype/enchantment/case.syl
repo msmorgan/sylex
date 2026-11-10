@@ -5,6 +5,6 @@
 subtype case {
   lexical = {lemma = "Case"},
   spelling = "Case",
-  kind = [enchantment],
+  types = [enchantment],
   name = "Case"
 }

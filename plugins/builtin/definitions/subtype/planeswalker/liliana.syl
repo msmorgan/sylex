@@ -2,6 +2,6 @@
 subtype liliana {
   lexical = {lemma = "Liliana"},
   spelling = "Liliana",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Liliana"
 }

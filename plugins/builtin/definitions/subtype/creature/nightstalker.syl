@@ -1,6 +1,6 @@
 subtype nightstalker {
   lexical = {lemma = "Nightstalker"},
   spelling = "Nightstalker",
-  kind = creature,
+  types = [creature, kindred],
   name = "Nightstalker"
 }

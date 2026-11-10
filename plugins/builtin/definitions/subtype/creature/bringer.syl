@@ -1,6 +1,6 @@
 subtype bringer {
   lexical = {lemma = "Bringer"},
   spelling = "Bringer",
-  kind = creature,
+  types = [creature, kindred],
   name = "Bringer"
 }

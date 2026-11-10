@@ -2,6 +2,6 @@
 subtype tamiyo {
   lexical = {lemma = "Tamiyo"},
   spelling = "Tamiyo",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Tamiyo"
 }

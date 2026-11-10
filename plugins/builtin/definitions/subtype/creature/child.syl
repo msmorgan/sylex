@@ -2,6 +2,6 @@
 subtype child {
   lexical = {lemma = "Child", plural = "Children"},
   spelling = "Child",
-  kind = creature,
+  types = [creature, kindred],
   name = "Child"
 }

@@ -1,6 +1,6 @@
 subtype necron {
   lexical = {lemma = "Necron"},
   spelling = "Necron",
-  kind = creature,
+  types = [creature, kindred],
   name = "Necron"
 }

@@ -2,6 +2,6 @@
 subtype dack {
   lexical = {lemma = "Dack"},
   spelling = "Dack",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Dack"
 }

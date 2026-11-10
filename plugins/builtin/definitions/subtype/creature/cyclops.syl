@@ -2,6 +2,6 @@
 subtype cyclops {
   lexical = {lemma = "Cyclops", plural = "Cyclopes"},
   spelling = "Cyclops",
-  kind = creature,
+  types = [creature, kindred],
   name = "Cyclops"
 }

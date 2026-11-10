@@ -2,6 +2,6 @@
 subtype lolth {
   lexical = {lemma = "Lolth"},
   spelling = "Lolth",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Lolth"
 }

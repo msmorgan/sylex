@@ -1,6 +1,6 @@
 subtype processor {
   lexical = {lemma = "Processor"},
   spelling = "Processor",
-  kind = creature,
+  types = [creature, kindred],
   name = "Processor"
 }

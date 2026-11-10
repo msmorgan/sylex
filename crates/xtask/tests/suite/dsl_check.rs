@@ -804,11 +804,12 @@ fn a_card_face_is_a_characteristics_record() {
     assert_eq!(kinds(&source), [RefusalKind::IntegerAt(s("Color"))]);
 }
 
-/// A subtype's `kind` is the list of card types it is correlated with: a
-/// shared family names a Template at `List(CardType)` (Spirit and Arcane), a
-/// single-type family a list literal (Siege). A lone card type is no list.
+/// A subtype's `types` is the list of card types it is correlated with,
+/// written out whole: Spirit's `[creature, kindred]` [CR#205.3m], Arcane's
+/// `[instant, sorcery]` [CR#205.3k], Siege's `[battle]`. A lone card type is
+/// no list.
 #[test]
-fn a_subtype_kind_is_a_list_of_card_types() {
+fn a_subtype_types_is_a_list_of_card_types() {
     assert_eq!(
         refusals(&[(
             "a.syl",
@@ -819,12 +820,10 @@ fn a_subtype_kind_is_a_list_of_card_types() {
              card_type instant { permanentType = false }\n\
              card_type sorcery { permanentType = false }\n\
              card_type battle { permanentType = true }\n\
-             template creature: List(CardType) { body = [creature, kindred] }\n\
-             template spell: List(CardType) { body = [instant, sorcery] }\n\
-             subtype spirit { kind = creature }\n\
-             subtype arcane { kind = spell }\n\
-             subtype siege { kind = [battle] }\n\
-             subtype bad { kind = battle }"
+             subtype spirit { types = [creature, kindred] }\n\
+             subtype arcane { types = [instant, sorcery] }\n\
+             subtype siege { types = [battle] }\n\
+             subtype bad { types = battle }"
         )]),
         [(
             RefusalKind::UnknownWord {
@@ -832,6 +831,27 @@ fn a_subtype_kind_is_a_list_of_card_types() {
                 sort: s("List(CardType)")
             },
             s("battle")
+        )]
+    );
+}
+
+/// No word at `List(CardType)` stands for several card types: *Grizzly
+/// Bears*'s `types = creature` is refused beside the real builtin bundle
+/// rather than read as a kindred creature.
+#[test]
+fn a_card_type_word_is_no_list_of_card_types() {
+    assert_eq!(
+        plugin_refusals(
+            "card singleFaced({\n\
+               name = \"Grizzly Bears\",\n\
+               types = creature})"
+        ),
+        [(
+            RefusalKind::UnknownWord {
+                word: s("creature"),
+                sort: s("List(CardType)")
+            },
+            s("creature")
         )]
     );
 }
@@ -988,7 +1008,7 @@ const COERCIONS: &str = "primitive type(type: CardType): NounWord = Type\n\
      coercion(value: Int): Amount { body = lit($value) }\n\
      primitive true: Bool = True\n\
      card_type creature { permanentType = true }\n\
-     subtype goblin { kind = [creature] }\n";
+     subtype goblin { types = [creature] }\n";
 
 #[test]
 fn a_coercion_applies_at_a_sort_mismatch() {
@@ -1104,7 +1124,7 @@ fn a_duplicate_coercion_is_refused() {
 
 #[test]
 fn a_word_at_two_from_sorts_of_one_target_is_refused_with_no_call_site() {
-    let source = format!("{COERCIONS}subtype creature {{ kind = [creature] }}");
+    let source = format!("{COERCIONS}subtype creature {{ types = [creature] }}");
     assert_eq!(
         refusals(&[("a.syl", &source)]),
         [(
@@ -1113,7 +1133,7 @@ fn a_word_at_two_from_sorts_of_one_target_is_refused_with_no_call_site() {
                 sorts: vec![s("CardType"), s("Subtype")],
                 target: s("NounWord")
             },
-            s("subtype creature { kind = [creature] }")
+            s("subtype creature { types = [creature] }")
         )]
     );
 }
@@ -1172,19 +1192,6 @@ fn a_record_literal_reaching_a_target_from_two_record_sorts_is_refused_with_no_c
             s("coercion(f: FaceDown): Predicate { body = faceDownOf($f) }")
         )]
     );
-}
-
-#[test]
-fn a_word_at_a_list_of_a_from_sort_is_no_ambiguity() {
-    // `creature`, the card types a creature type is correlated with, beside
-    // `card_type creature`: no coercion goes from `List(CardType)`.
-    let source = format!(
-        "{COERCIONS}\
-         template creature: List(CardType) {{ body = [creature] }}\n\
-         subtype elf {{ kind = creature }}\n\
-         template t: NounWord {{ body = creature }}"
-    );
-    assert_eq!(kinds(&source), []);
 }
 
 #[test]

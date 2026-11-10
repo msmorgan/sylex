@@ -210,7 +210,7 @@ pub const KINDS: &[Kind] = &[
         "Subtype",
         &[
             // The card types it is correlated with [CR#205.3c,205.3d].
-            required("kind", "List(CardType)"),
+            required("types", "List(CardType)"),
             field("name", "String"),
             CONFERS,
         ],

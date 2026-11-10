@@ -1,6 +1,6 @@
 subtype soltari {
   lexical = {lemma = "Soltari", plural = "Soltari"},
   spelling = "Soltari",
-  kind = creature,
+  types = [creature, kindred],
   name = "Soltari"
 }

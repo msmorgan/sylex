@@ -4,6 +4,6 @@
 subtype blood {
   lexical = {lemma = "Blood"},
   spelling = "Blood",
-  kind = [artifact],
+  types = [artifact],
   name = "Blood"
 }

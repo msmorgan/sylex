@@ -2,6 +2,6 @@
 subtype dellian {
   lexical = {lemma = "Dellian"},
   spelling = "Dellian",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Dellian"
 }

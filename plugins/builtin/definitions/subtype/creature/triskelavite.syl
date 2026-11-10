@@ -1,6 +1,6 @@
 subtype triskelavite {
   lexical = {lemma = "Triskelavite"},
   spelling = "Triskelavite",
-  kind = creature,
+  types = [creature, kindred],
   name = "Triskelavite"
 }

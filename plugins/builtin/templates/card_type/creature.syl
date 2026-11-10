@@ -1,5 +1,0 @@
-# The card types a creature type is correlated with: creatures and kindreds share their lists of
-# subtypes [CR#205.3m].
-template creature: List(CardType) {
-  body = [creature, kindred]
-}

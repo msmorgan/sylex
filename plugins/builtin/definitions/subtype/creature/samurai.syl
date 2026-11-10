@@ -1,6 +1,6 @@
 subtype samurai {
   lexical = {lemma = "Samurai", plural = "Samurai"},
   spelling = "Samurai",
-  kind = creature,
+  types = [creature, kindred],
   name = "Samurai"
 }

@@ -1,6 +1,6 @@
 subtype bobblehead {
   lexical = {lemma = "Bobblehead"},
   spelling = "Bobblehead",
-  kind = [artifact],
+  types = [artifact],
   name = "Bobblehead"
 }

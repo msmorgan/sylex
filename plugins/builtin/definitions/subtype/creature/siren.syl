@@ -1,6 +1,6 @@
 subtype siren {
   lexical = {lemma = "Siren"},
   spelling = "Siren",
-  kind = creature,
+  types = [creature, kindred],
   name = "Siren"
 }

@@ -2,6 +2,6 @@
 subtype serra {
   lexical = {lemma = "Serra"},
   spelling = "Serra",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Serra"
 }

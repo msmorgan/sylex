@@ -2,6 +2,6 @@
 subtype aminatou {
   lexical = {lemma = "Aminatou"},
   spelling = "Aminatou",
-  kind = [planeswalker],
+  types = [planeswalker],
   name = "Aminatou"
 }
