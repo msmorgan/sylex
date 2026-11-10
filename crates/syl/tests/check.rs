@@ -148,12 +148,15 @@ fn words_resolve_across_bundles_and_refusals_render_their_location() {
     let builtin = bundle(
         "builtin",
         FileId(0),
-        &[("power.syl", "primitive power: Stat = Power")],
+        &[
+            ("power.syl", "primitive power: Stat = Power"),
+            ("singleFaced.syl", "primitive singleFaced(face: Characteristics): Card = SingleFaced"),
+        ],
     );
     let canon = bundle(
         "canon",
         builtin.next_file_id(),
-        &[("c.syl", "card {\n  name = \"C\",\n  power = power,\n  toughness = toughness,\n}")],
+        &[("c.syl", "card singleFaced({\n  name = \"C\",\n  power = power,\n  toughness = toughness,\n})")],
     );
     let error = check(&[&builtin, &canon]).expect_err("toughness is not declared");
     assert_eq!(

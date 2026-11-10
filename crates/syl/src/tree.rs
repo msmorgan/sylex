@@ -129,7 +129,7 @@ pub enum Shape {
     /// `kind name(params): Sort = Constructor { fields }`, every part after
     /// the name optional.
     Named(NamedShape),
-    /// `kind value`, such as `card { ... }` or `card split({ ... })`.
+    /// `kind value`, such as `card singleFaced({ ... })` or `card split({ ... })`.
     Nameless(Value),
 }
 
