@@ -237,7 +237,8 @@ fn record_fields_are_checked_against_the_record_sort() {
 }
 
 /// A trigger header names its event; alternative events are an `or` written
-/// as that event, never a field beside it.
+/// as that event, never a field beside it. `triggered` consumes the record
+/// sort, which an unconsumed sort would otherwise make unknown.
 #[test]
 fn a_trigger_header_writes_its_event_and_no_alternatives() {
     assert_eq!(

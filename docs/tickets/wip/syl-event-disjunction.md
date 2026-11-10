@@ -29,8 +29,9 @@ Written against the start of step 6 (`syl-single-face-card-call`).
   saddled" (*Autarch Mammoth*) prints a trigger word per header and carries a `while` on one
   header only. `triggered` takes its first header and a list of joined headers, each a
   `TriggerHeader` record `{event, while, timing}`; an event disjunction lives inside `event`.
-  `.syl` has no list concatenation, so the first header is its own parameter: a Template could
-  not otherwise put its header ahead of its caller's joined ones. `JoinedHeader` is deleted.
+  The first header is its own parameter because `.syl` has no list concatenation, so
+  `when(e, joins = […])` cannot build one list of headers from its own header and its caller's.
+  `JoinedHeader` is deleted.
 - A header's trigger word is spelling, written by the Template that builds the header (`when`,
   `whenever`, `at`, `joinedHead`); the record carries none. A joined header may therefore be a
   turn-point header beside an event header ("When … enters and at the beginning of your upkeep",
@@ -59,8 +60,9 @@ Written against the start of step 6 (`syl-single-face-card-call`).
 
 ## Not in scope
 
-- Where the look-back point of each arm is decided (`syl-lookback-point-from-trigger`), and a
-  referent bound across arms (*Syr Konrad*'s "it", `syl-binding-across-or-arms`).
+- Where the look-back point of each arm is decided (`syl-lookback-point-from-trigger`).
+- A referent bound in more than one arm of an event `or`, read after it: *Chub Toad*'s "it gets
+  +2/+2", *Aisling Leprechaun*'s "that creature".
 - Reordering `when`, `whenever` and `at` to printed order (`syl-printed-read-order`).
 
 ## Pointers
