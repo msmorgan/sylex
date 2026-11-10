@@ -5,7 +5,7 @@ card_type enchantment {
   lexical = {lemma = "enchantment"},
   spelling = "enchantment",
   name = "Enchantment",
-  cardClass = permanentCard,
+  permanentType = true,
 
   confers = [castableFrom(yourHand, asSorcery)]
 }

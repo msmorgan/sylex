@@ -8,7 +8,7 @@ card_type battle {
   lexical = {lemma = "battle"},
   spelling = "battle",
   name = "Battle",
-  cardClass = permanentCard,
+  permanentType = true,
   stats = [defense],
   confers = [
     castableFrom(yourHand, asSorcery),

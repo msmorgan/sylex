@@ -291,6 +291,22 @@ fn declaration_blocks_are_checked_against_their_kind() {
     );
 }
 
+/// `permanentType` is required on a card type, `false` included [CR#110.4].
+#[test]
+fn a_card_type_without_permanent_type_is_refused() {
+    assert_eq!(
+        kinds(
+            "primitive true: Bool = True\n\
+             card_type kindred { }\n\
+             card_type creature { permanentType = true }"
+        ),
+        [RefusalKind::MissingField {
+            field: s("permanentType"),
+            at: s("`card_type` kindred")
+        }]
+    );
+}
+
 #[test]
 fn a_rules_row_writes_a_body_or_its_record_fields() {
     let preamble = "primitive yes: Predicate = Yes\n\
@@ -618,7 +634,9 @@ fn dependency_cycles_are_refused_but_catalog_references_are_no_edge() {
              template c: Int { body = c }\n\
              primitive yes: Predicate = Yes\n\
              primitive grant(scope: Predicate, type: CardType): Conferral = Grant\n\
-             card_type battle { confers = [grant(yes, battle)] }"
+             primitive true: Bool = True\n\
+             primitive false: Bool = False\n\
+             card_type battle { permanentType = true, confers = [grant(yes, battle)] }"
         ),
         [
             RefusalKind::Cycle(vec![s("a"), s("b")]),
@@ -674,11 +692,13 @@ fn a_subtype_kind_is_a_list_of_card_types() {
     assert_eq!(
         refusals(&[(
             "a.syl",
-            "card_type creature { }\n\
-             card_type kindred { }\n\
-             card_type instant { }\n\
-             card_type sorcery { }\n\
-             card_type battle { }\n\
+            "primitive true: Bool = True\n\
+             primitive false: Bool = False\n\
+             card_type creature { permanentType = true }\n\
+             card_type kindred { permanentType = false }\n\
+             card_type instant { permanentType = false }\n\
+             card_type sorcery { permanentType = false }\n\
+             card_type battle { permanentType = true }\n\
              template creature: List(CardType) { body = [creature, kindred] }\n\
              template spell: List(CardType) { body = [instant, sorcery] }\n\
              subtype spirit { kind = creature }\n\

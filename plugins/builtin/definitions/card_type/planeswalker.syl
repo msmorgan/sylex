@@ -7,7 +7,7 @@ card_type planeswalker {
   lexical = {lemma = "planeswalker"},
   spelling = "planeswalker",
   name = "Planeswalker",
-  cardClass = permanentCard,
+  permanentType = true,
   stats = [loyalty],
   confers = [
     castableFrom(yourHand, asSorcery),

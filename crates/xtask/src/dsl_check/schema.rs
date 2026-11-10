@@ -210,8 +210,7 @@ pub const KINDS: &[Kind] = &[
         "CardType",
         &[
             field("name", "String"),
-            // Step 6: becomes a `permanentType` bool.
-            field("cardClass", "Option(CardClass)"),
+            required("permanentType", "Bool"),
             field("stats", "List(Stat)"),
             CONFERS,
         ],

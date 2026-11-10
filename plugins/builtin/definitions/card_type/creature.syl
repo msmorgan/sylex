@@ -11,7 +11,7 @@ card_type creature {
   lexical = {lemma = "creature"},
   spelling = "creature",
   name = "Creature",
-  cardClass = permanentCard,
+  permanentType = true,
   stats = [power, toughness],
   confers = [
     castableFrom(yourHand, asSorcery),

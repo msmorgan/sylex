@@ -6,7 +6,7 @@ card_type land {
   lexical = {lemma = "land"},
   spelling = "land",
   name = "Land",
-  cardClass = permanentCard,
+  permanentType = true,
 
   confers = [playableFrom(yourHand, asSorcery)]
 }
