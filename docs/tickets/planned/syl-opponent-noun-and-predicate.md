@@ -43,8 +43,8 @@ bare primitive while `isPermanent` means `in(battlefield)`; `spell` is a bare pr
     restricts nothing, so `that(opponent)` keeps reading any player.
   - (c) One declaration carries both: a word is declared once and stands at both `NounWord` and
     `Predicate` with one meaning, so `opponent` and `isOpponent` are one word.
-    `syl-type-predicate-coercions` meets the same split for card types and subtypes, and its
-    option (c) weighs separate head-noun and modifier words.
+    `syl-description-head-noun` (maybe) tracks the same head-noun-versus-`Predicate` split for
+    card types and subtypes.
 
   Recommendation: (a), with (b)'s fits relation stated in §2.4 item 3 for anaphors: (a) makes
   "that opponent" mean what it prints, and the fits relation is still needed where the carrier
@@ -65,4 +65,4 @@ bare primitive while `isPermanent` means `in(battlefield)`; `spell` is a bare pr
 `plugins/builtin/templates/predicate/{isOpponent,isPermanent,isSpell}.syl`,
 `plugins/builtin/templates/noun/`, `plugins/builtin/templates/pronoun/{that,those}.syl`,
 `plugins/builtin/definitions/keyword_ability/encore.syl`; `docs/decisions/semantics.md` §2.4;
-`syl-type-predicate-coercions`, `syl-card-head-noun-sweep`.
+`syl-description-head-noun`, `syl-card-head-noun-sweep`.
