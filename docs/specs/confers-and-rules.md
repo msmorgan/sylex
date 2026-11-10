@@ -31,9 +31,11 @@ write a once-per-entity rule on a counter or a keyword.
 |---|---|
 | `card_type` `confers`: `artifact`, `battle`, `creature`, `enchantment`, `instant`, `land`, `planeswalker`, `sorcery` (`kindred` has none) | per holder |
 | `subtype` `confers`: `aura`, `equipment`, `fortification`, `saga`, `siege` | per holder |
+| `supertype` `confers`: `legendary`, `world` (`basic` and `snow` have none) | per holder |
 | `designation` `confers`: `monarch`, `initiative` | per holder |
 | `counter` `confers`: `p1p1Counter`, `m1m1Counter`, `flyingCounter` | per counter |
 | `sba deathtouchDestruction` (`scope = isCreature`) | per creature |
+| `sba legendRule` (`scope = isPlayer`) | per player |
 | `conferral phasingTurnBased` (`scope = isPermanent`) | per permanent |
 | `conferral playerDamageLifeLoss` (`scope = isPlayer`) | per player |
 | `conferral toxicPoison` (`scope = and([isCreature, hasKeyword(theKeyword(toxic))])`) | per creature with toxic |
@@ -63,39 +65,10 @@ Counter rules are therefore split this way:
 ## 4. Named rows
 
 A top-level rules row takes `lexical` and `spelling` and is a catalog declaration, so a card can
-name it. The legend rule is such a row: a named `sba` row scoped to players.
-
-- "Legend rule" is printed vocabulary: 10 Vintage-legal cards print "the "legend rule" doesn't
-  apply" (*Brothers Yamazaki*, *Cadric, Soul Kindler*, *Council of Reeds*, *Hall of Echoes*,
-  *Mirror Box*, *Mirror Gallery*, *Sakashima of a Thousand Faces*, *Sliver Gravemother*,
-  *Spider-Verse*, *The Master, Multiplied*). A word's frames, spelling and meaning are one block
-  (`syl.md` §2), so the word needs its own declaration, and a rule written inline in `legendary`'s
-  `confers` has none.
-- The CR names it the same way: a legendary permanent "is subject to the state-based action for
-  legendary permanents, also called the "legend rule"" [CR#205.4d], which is [CR#704.5j].
-- So `legendary` carries only its casting restriction [CR#205.4e], and the legend rule is a row.
-
-The legend rule groups a player's legendary permanents by shared name, the player chooses one per
-group, and the rest go to their owners' graveyards [CR#704.5j]. *Celestial Judgment* already writes
-that group-choose-rest shape (`doForEachKind(value(power), allOf(isCreature), number,
-choose(…))`, then `destroy(each(and([isCreature, notChosen])))`); the legend rule needs one NEW
-`KindAxis`, `name`:
-
-    # P stands for and([isPermanent, hasSupertype(legendary), youControl])
-    sba legendRule {
-      lexical = {lemma = "legend rule"},     # NEW: rows take lexical and spelling
-      spelling = "legend rule",
-      body = {
-        scope = isPlayer,
-        when = thereAre(withTheSameName(counted(orMore(2), P))),
-        then = sequentially([
-            doForEachKind(name, <the P that share a name with another P>, cardName,
-              choose(a(and([P, named(chosenName)])))),
-            putInto(each(and([<the same>, notChosen])), graveyard)])}
-    }
-
-In a row scoped to players, "you" is the player, as in `playerDamageLifeLoss`. The two
-`<…>` placeholders are the domain the implementing ticket writes.
+name it; `legendRule` is one. "Legend rule" is printed vocabulary: 10 Vintage-legal cards print
+"the "legend rule" doesn't apply" (*Brothers Yamazaki*, *Cadric, Soul Kindler*, *Council of Reeds*,
+*Hall of Echoes*, *Mirror Box*, *Mirror Gallery*, *Sakashima of a Thousand Faces*, *Sliver
+Gravemother*, *Spider-Verse*, *The Master, Multiplied*).
 
 ## 5. Exempting objects from a named rule
 
@@ -108,22 +81,12 @@ applies to only the nontoken permanents … You may not choose one of the token 
 may not put any of the tokens into your graveyard this way." No card in the corpus prints it yet;
 the ticket that writes the first such card adds `doesntApply`.
 
-## 6. The world rule and the Role rule
+## 6. The Role rule
 
-Neither needs `rules`: each is an ordinary per-holder `stateBased` entry in `confers`, where each
-permanent goes unless it is the sole holder with the least time.
-
-- **World** [CR#704.5k], on `world`'s `confers`: a world permanent is put into its owner's
-  graveyard if another world permanent has had the world supertype for no longer than it has. With
-  holding times 10/5/5 all three go; with 10/5 only the 10 goes. It reads a NEW measure,
-  `heldFor`: how long an object has continuously satisfied a predicate. It is not a timestamp,
-  because a permanent can gain the world supertype after it enters. It is written at whichever
-  sort expresses [CR#704.5k] exactly, including its tie case: as a `ProjAxis` read by the existing
-  `superlative`/`tiedFor` pattern (`bolster.syl`, `dethrone.syl`) if that says it, otherwise as an
-  `Amount` compared with `compareOver`/`compareAmt`.
-- **Role** [CR#704.5z,303.7a], on `role`'s `confers`: a Role is put into its owner's graveyard if
-  another Role controlled by the same player is attached to the same permanent and has a more
-  recent timestamp. It reads a NEW measure, `timestampOf(<object>)`.
+The Role rule [CR#704.5z,303.7a] needs no `rules`: like the world rule on `world`, it is an
+ordinary per-holder `stateBased` entry, on `role`'s `confers`. A Role is put into its owner's
+graveyard if another Role controlled by the same player is attached to the same permanent and has
+a more recent timestamp. It reads a NEW measure, `timestampOf(<object>)`.
 
 ## 7. A keyword's number
 
@@ -168,9 +131,6 @@ it needs from the instances is read through what each instance publishes, as tox
 ## 10. New words
 
 - Fields: `rules` on `card_type`, `subtype`, `supertype`, `counter`, `designation` and `ability`;
-  `lexical` and `spelling` on `sba` and `conferral` rows; `number` on `ability`.
-- `name` at `KindAxis` (`name` at `CharacteristicEdit` exists; a name is keyed by its sort,
-  `syl.md` §3).
-- `heldFor` and `timestampOf`, measures.
+  `number` on `ability`.
+- `timestampOf`, a measure.
 - `doesntApply`.
-- `legendRule`, an `sba` row.

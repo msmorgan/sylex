@@ -41,8 +41,8 @@ A Keyword Ability the engine implements natively rather than as a Definition.
 A Keyword Ability made of component Abilities that stay parts of the one named keyword.
 
 **Registry Definition**:
-What one registry declaration (a Counter, Subtype, Card Type or Designation) means: the rules
-content its name stands for.
+What one registry declaration (a Counter, Subtype, Card Type, Supertype or Designation) means:
+the rules content its name stands for.
 
 **Permanent Type**:
 A Card Type that is one of the six permanent types: artifact, battle, creature, enchantment,
@@ -178,8 +178,8 @@ An act a Player may do instead of paying one mana of a cost, as convoke and delv
 ([CR#702.51a,702.66a]).
 
 **Conferral**:
-A rule, Card Type, Subtype, Counter or Designation supplying an Ability or rules property to what
-has it, as a basic land type confers its mana ability ([CR#305.6]).
+A rule, Card Type, Subtype, Supertype, Counter or Designation supplying an Ability or rules
+property to what has it, as a basic land type confers its mana ability ([CR#305.6]).
 
 **Combatant**:
 A Permanent the creature-like combat rules apply to, whether or not it may attack or block now
