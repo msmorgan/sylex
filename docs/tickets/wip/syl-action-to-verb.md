@@ -41,6 +41,7 @@ object, and a plain negative declarative among the contexts a verb stands in.
 
 ## Not in scope
 
+- "Already" in *Benevolent Blessing*'s and *Guardian Beast*'s objects: `syl-already-attached`.
 - The other "this effect …" sentences (*Power Artifact*'s floor, *Edgewalker*'s colored-only
   reduction), written today as typed parameters of the cost change.
 

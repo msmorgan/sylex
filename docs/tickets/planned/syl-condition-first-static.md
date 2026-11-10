@@ -14,8 +14,8 @@ Company*) cannot be written in printed order. Written with `onlyWhile`, the stat
 the condition, so the round trip breaks and the static's "it" is read before the condition that
 introduces its antecedent. `Angelic Cub.syl` therefore carries only its triggered ability.
 
-*Guardian Beast*'s static is also rewritten by `syl-action-to-verb` (its `retention`), which lands
-first.
+*Guardian Beast*'s second sentence ("This effect doesn't remove …") is a `doesnt` beside its
+condition-first static, the two joined in one `conjunction`, and stays outside the new Template.
 
 ## Done when
 
