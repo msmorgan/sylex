@@ -1,5 +1,5 @@
 ---
-needs: [syl-action-to-verb]
+needs: [syl-action-to-verb, cleanup-step6-surface]
 ---
 
 # "Already attached": the permanents attached when an effect starts to apply
@@ -14,6 +14,12 @@ apply keep their place, and others can't become attached [CR#702.16p]. `plugins/
 no word for "attached when this effect started to apply": `attachedTo` reads the present, and
 `heldSince` is a Condition over a GameEvent, and the start of an effect is no GameEvent. Both
 cards write the object without "already" and say so in a "Fragment" comment.
+
+## Open questions
+
+- What word says "already attached": the permanents attached when an effect starts to apply.
+- Whether *Guardian Beast*'s "already" means "attached when the effect starts to apply", which
+  [CR#702.16p] defines for *Benevolent Blessing* only.
 
 ## Done when
 
