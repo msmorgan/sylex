@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       when(does(actor(thisEnchantment), enter), draw(lit(3))),
       static(
-        onlyWhile(
-          altCost(allOf(abilityHead(keyword(cycling))), mana([generic(0)])),
-          compareAmt(countOf(cardIn(yourHand)), atLeast, lit(7))))]})
+        conditionFirstWhile(
+          compareAmt(countOf(cardIn(yourHand)), atLeast, lit(7)),
+          altCost(allOf(abilityHead(keyword(cycling))), mana([generic(0)]))))]})

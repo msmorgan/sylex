@@ -7,12 +7,12 @@ card singleFaced({
       imprint(activated(mana([generic(1)]), exile(target(and([isCreature, in(yourGraveyard)]))))),
       alsoForKeywords(
         static(
-          onlyWhile(
+          conditionFirstWhile(
+            exists(and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
             keywordGrant(
               thisCreature,
               thatKeyword,
-              and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
-            exists(and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])))),
+              and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])))),
         [
           theKeyword(flying),
           theKeyword(fear),

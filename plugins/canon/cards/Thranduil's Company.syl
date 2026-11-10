@@ -5,9 +5,9 @@ card singleFaced({
     subtypes = [elf, soldier],
     text = [
       static(
-        onlyWhile(
-          can(actor(you), play(counted(additional(exactly(1)), isLand))),
-          exists(and([and([isCreature, isOther]), hasSubtype(elf), youControl])))),
+        conditionFirstWhile(
+          exists(and([and([isCreature, isOther]), hasSubtype(elf), youControl])),
+          can(actor(you), play(counted(additional(exactly(1)), isLand))))),
       landfall(
         whenever(
           does(actor(a(and([isLand, youControl]))), enter),

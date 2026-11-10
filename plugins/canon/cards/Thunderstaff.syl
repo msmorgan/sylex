@@ -4,11 +4,11 @@ card singleFaced({
     types = [artifact],
     text = [
       static(
-        onlyWhile(
+        conditionFirstWhile(
+          is(thisArtifact, isUntapped),
           replace(
             would(actor(a(isCreature)), dealDamage(recipient = you, kind = combat)),
-            instead(preventDamage(ofThatDamage(lit(1))))),
-          is(thisArtifact, isUntapped))),
+            instead(preventDamage(ofThatDamage(lit(1))))))),
       activated(
         compound([mana([generic(2)]), tapSymbol]),
         get(allOf(and([isCreature, isAttacking])), up(lit(1)), up(lit(0)), untilEndOfTurn))]})

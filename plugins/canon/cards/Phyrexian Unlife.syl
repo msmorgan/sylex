@@ -11,9 +11,9 @@ card singleFaced({
     text = [
       static(cant(actor(you), loseGame(nonpositiveLife))),
       static(
-        onlyWhile(
+        conditionFirstWhile(
+          compareAmt(lifeTotalOf(you), atMost, lit(0)),
           asThough(
             by(a(isSource)),
             dealDamage(recipient = you),
-            holds(is(thatSource, hasKeyword(theKeyword(infect))))),
-          compareAmt(lifeTotalOf(you), atMost, lit(0))))]})
+            holds(is(thatSource, hasKeyword(theKeyword(infect)))))))]})

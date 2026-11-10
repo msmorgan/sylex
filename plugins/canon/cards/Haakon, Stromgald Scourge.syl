@@ -8,9 +8,9 @@ card singleFaced({
       static(can(actor(you), cast(this, from = yourGraveyard))),
       static(cant(actor(you), cast(this, from = not(yourGraveyard)))),
       static(
-        onlyWhile(
-          can(actor(you), cast(bare(and([isSpell, hasSubtype(knight)])), from = yourGraveyard)),
-          is(this, in(battlefield)))),
+        conditionFirstWhile(
+          is(this, in(battlefield)),
+          can(actor(you), cast(bare(and([isSpell, hasSubtype(knight)])), from = yourGraveyard)))),
       when(does(actor(thisCreature), die), loseLife(lit(2)))],
     power = lit(3),
     toughness = lit(3)})

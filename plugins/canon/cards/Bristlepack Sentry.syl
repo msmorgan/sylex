@@ -6,11 +6,11 @@ card singleFaced({
     text = [
       defender,
       static(
-        onlyWhile(
+        conditionFirstWhile(
+          exists(and([isCreature, youControl, hasPower(atLeast, lit(4))])),
           can(
             actor(thisCreature),
             attack,
-            asThough = holds(is(it, not(hasKeyword(theKeyword(defender)))))),
-          exists(and([isCreature, youControl, hasPower(atLeast, lit(4))]))))],
+            asThough = holds(is(it, not(hasKeyword(theKeyword(defender))))))))],
     power = lit(3),
     toughness = lit(3)})

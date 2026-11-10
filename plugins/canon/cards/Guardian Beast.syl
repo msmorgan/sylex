@@ -8,13 +8,13 @@ card singleFaced({
     text = [
       static(
         conjunction([
-            onlyWhile(
+            conditionFirstWhile(
+              is(thisCreature, isUntapped),
               conjunction([
                   cant(any, attachTo(a(hasSubtype(aura)), them)),
                   abilityGrant(them, indestructible),
                   cant(actor(bare(and([isPlayer, isOther]))), gainControlOf(them))],
-                bare(and([non(isCreature), isArtifact, youControl]))),
-              is(thisCreature, isUntapped)),
+                bare(and([non(isCreature), isArtifact, youControl])))),
             doesnt(
               actor(thisEffect),
               remove(bare(and([hasSubtype(aura), attachedTo(those(artifact))]))))]))],

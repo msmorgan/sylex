@@ -12,11 +12,11 @@ card singleFaced({
       flying,
       when(does(actor(thisCreature), enter), gainDesignation(you, monarch)),
       static(
-        onlyWhile(
+        conditionFirstWhile(
+          is(you, hasDesignation(monarch)),
           cant(
             actor(you),
             loseLife(anyAmount),
-            causedBy = byEvent(does(actor(a(isSource)), dealDamage(recipient = you)))),
-          is(you, hasDesignation(monarch))))],
+            causedBy = byEvent(does(actor(a(isSource)), dealDamage(recipient = you))))))],
     power = lit(5),
     toughness = lit(5)})

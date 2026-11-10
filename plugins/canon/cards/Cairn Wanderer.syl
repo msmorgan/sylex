@@ -7,12 +7,12 @@ card singleFaced({
       changeling,
       alsoForKeywords(
         static(
-          onlyWhile(
+          conditionFirstWhile(
+            exists(and([isCreature, in(graveyard), hasKeyword(thatKeyword)])),
             keywordGrant(
               thisCreature,
               thatKeyword,
-              and([isCreature, in(graveyard), hasKeyword(thatKeyword)])),
-            exists(and([isCreature, in(graveyard), hasKeyword(thatKeyword)])))),
+              and([isCreature, in(graveyard), hasKeyword(thatKeyword)])))),
         [
           theKeyword(flying),
           theKeyword(fear),

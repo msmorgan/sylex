@@ -6,16 +6,16 @@ card singleFaced({
     text = [
       alsoForKeywords(
         static(
-          onlyWhile(
-            keywordGrant(
-              thisCreature,
-              thatKeyword,
+          conditionFirstWhile(
+            exists(
               and([
                   isCreature,
                   anOpponentControls,
                   hasKeyword(thatKeyword),
                   not(named(printedName("Escaped Shapeshifter")))])),
-            exists(
+            keywordGrant(
+              thisCreature,
+              thatKeyword,
               and([
                   isCreature,
                   anOpponentControls,

@@ -9,11 +9,11 @@ card singleFaced({
         does(actor(thisCreature), enter),
         untap(each(and([hasSubtype(merfolk), youControl, isOther])))),
       static(
-        onlyWhile(
-          getsPt(allOf(and([hasSubtype(merfolk), youControl])), up(lit(1)), up(lit(0))),
+        conditionFirstWhile(
           did(
             actor(you),
             attackWith(counted(orMore(3), hasSubtype(merfolk))),
-            within(soFarThisTurn))))],
+            within(soFarThisTurn)),
+          getsPt(allOf(and([hasSubtype(merfolk), youControl])), up(lit(1)), up(lit(0)))))],
     power = lit(2),
     toughness = lit(2)})
