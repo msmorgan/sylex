@@ -22,7 +22,9 @@ characteristic once ("for each kind of counter", "for each color").
 Subtype families are modeled several ways besides: `SubtypeSpace` (`creature`, `basicLand`) for
 "every creature type" and "every basic land type", and `KindAxis.subtype(host, scope)`, whose
 required `scope` has one value, `basicOnly`, so a `KindAxis` subtype is always a basic land type
-(*Tribal Flames*'s `subtype(land, basicOnly)`).
+(*Tribal Flames*'s `subtype(land, basicOnly)`). A `subtype` declaration names no family word: its
+`types` field lists the card types it is correlated with (`types = [creature, kindred]`), so the
+question below is only how these three reading sorts name a family.
 
 ## Open questions
 
