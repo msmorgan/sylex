@@ -1,11 +1,12 @@
-# "Evoke [cost]" means "You may cast this card by paying [cost] rather than paying its mana cost"
-# and "When this permanent enters, if its evoke cost was paid, its controller sacrifices it."
-# [CR#702.74a]
+# [CR#702.74a] "Evoke represents two abilities: a static ability that functions in any zone from
+# which the card with evoke can be cast and a triggered ability that functions on the battlefield.
+# 'Evoke [cost]' means 'You may cast this card by paying [cost] rather than paying its mana cost'
+# and 'When this permanent enters, if its evoke cost was paid, its controller sacrifices it.'"
 ability evoke(cost: Cost) {
   lexical = {lemma = "evoke", parameters = [[Cost]]},
   spelling = "evoke <cost>",
   body = [
-    static(altCost(payingInstead($cost), this)),
+    static(can(actor(you), cast(thisCard, altCost = payingInstead($cost)))),
     when(
       does(actor(thisPermanent), enter),
       if = keywordCostPaid(evoke, thisPermanent),

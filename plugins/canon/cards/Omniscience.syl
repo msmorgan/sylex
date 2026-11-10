@@ -3,7 +3,4 @@ card singleFaced({
     cost = [generic(7), pip(blue), pip(blue), pip(blue)],
     types = [enchantment],
     text = [
-      static(
-        altCost(
-          withoutPaying,
-          allOf(and([isSpell, did(actor(you), cast(which, from = yourHand), thisObject)]))))]})
+      static(can(actor(you), cast(bare(isSpell), from = yourHand, altCost = withoutPaying)))]})

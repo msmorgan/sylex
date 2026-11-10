@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       static(
         onlyWhile(
-          altCost(withoutPaying, this),
+          can(actor(you), cast(thisSpell, altCost = withoutPaying)),
           and([
               exists(and([isLand, hasSubtype(island), anOpponentControls])),
               exists(and([isLand, hasSubtype(mountain), youControl]))]))),

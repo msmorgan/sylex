@@ -1,4 +1,5 @@
-# "Blitz [cost]" [CR#702.152a]. "If this spell's blitz cost was paid, sacrifice the permanent
+# "Blitz [cost]": "You may cast this card by paying [cost] rather than its mana cost" and the rest
+# [CR#702.152a]. "If this spell's blitz cost was paid, sacrifice the permanent
 # this spell becomes at the beginning of the next end step" is its own ability [CR#113.2c], a
 # Resolution Delayed Trigger: it creates its delayed trigger as the permanent is put onto the
 # battlefield as the spell resolves [CR#608.3g], controlled by the spell's controller as it resolved
@@ -8,7 +9,7 @@ ability blitz(cost: Cost) {
   lexical = {lemma = "blitz", parameters = [[Cost]]},
   spelling = "blitz <cost>",
   body = [
-    static(altCost(payingInstead($cost), this)),
+    static(can(actor(you), cast(thisCard, altCost = payingInstead($cost)))),
     static(
       resolutionDelayedTrigger(
         doIf(

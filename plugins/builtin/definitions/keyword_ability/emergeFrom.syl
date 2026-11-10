@@ -1,14 +1,19 @@
-# "Emerge from [quality] [cost]", a variant of emerge, so it carries emerge's label, its
-# quality telling it apart, and its cost is an emerge cost [CR#702.119b].
+# "Emerge from [quality] [cost]" means "You may cast this spell by paying [cost] and sacrificing a
+# [quality] permanent rather than paying its mana cost" and the rest, a variant of emerge, so it
+# carries emerge's label, its quality telling it apart, and its cost is an emerge cost
+# [CR#702.119b].
 ability emergeFrom(quality: Predicate, cost: Cost) {
   lexical = {lemma = "emerge", parameters = [[Cost], [Quality(Some("from")), Cost]]},
   label = "emerge",
   spelling = "emerge from <quality> <cost>",
   body = [
     static(
-      altCost(
-        payingInstead(compound([$cost, perform(sacrifice(a(and([$quality, isPermanent]))))])),
-        this)),
+      can(
+        actor(you),
+        cast(
+          thisSpell,
+          altCost = payingInstead(
+            compound([$cost, perform(sacrifice(a(and([$quality, isPermanent]))))]))))),
     static(
       onlyWhile(
         costShift(

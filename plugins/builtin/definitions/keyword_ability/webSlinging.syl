@@ -5,8 +5,11 @@ ability webSlinging(cost: Cost) {
   spelling = "web-slinging <cost>",
   body = [
     static(
-      altCost(
-        payingInstead(
-          compound([$cost, perform(returnToHand(a(and([isCreature, isTapped, youControl]))))])),
-        this))]
+      can(
+        actor(you),
+        cast(
+          thisSpell,
+          altCost = payingInstead(
+            compound(
+              [$cost, perform(returnToHand(a(and([isCreature, isTapped, youControl]))))])))))]
 }

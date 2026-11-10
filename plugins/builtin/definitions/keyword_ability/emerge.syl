@@ -6,7 +6,12 @@ ability emerge(cost: Cost) {
   lexical = {lemma = "emerge", parameters = [[Cost], [Quality(Some("from")), Cost]]},
   spelling = "emerge <cost>",
   body = [
-    static(altCost(payingInstead(compound([$cost, perform(sacrifice(a(isCreature)))])), this)),
+    static(
+      can(
+        actor(you),
+        cast(
+          thisSpell,
+          altCost = payingInstead(compound([$cost, perform(sacrifice(a(isCreature)))]))))),
     static(
       onlyWhile(
         costShift(

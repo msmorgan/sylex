@@ -1,5 +1,8 @@
-# "Bestow [cost]" means "As you cast this spell, you may choose to cast it bestowed. If you do,
-# you pay [cost] rather than its mana cost." [CR#702.103a]
+# [CR#702.103a] "Bestow represents a static ability that functions in any zone from which you
+# could play the card it's on. 'Bestow [cost]' means 'As you cast this spell, you may choose to
+# cast it bestowed. If you do, you pay [cost] rather than its mana cost.'" Casting it bestowed,
+# which makes it an Aura spell with enchant creature [CR#702.103b], is not written: it is a cast
+# characteristic, which `payment` has no word for.
 ability bestow(cost: Cost) {
   lexical = {lemma = "bestow", parameters = [[Cost]]},
   spelling = "bestow <cost>",
