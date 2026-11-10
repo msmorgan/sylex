@@ -301,11 +301,10 @@ Event decisions:
   effect of the enclosing spell or ability.
 - **A negative declarative** `doesnt(subj, action)` says what its Subject does not do. It is no
   deontic rule and takes no modifiers. "This effect doesn't remove this Aura" is
-  `doesnt(actor(thisEffect), remove(thisAura))`, its own Static Spec beside the spec it talks
-  about. A `conjunction` joins the two in one static ability, so the sentence's references reach
-  the spec's referents ("those artifacts"). Which consequence of the effect it exempts, an Aura
-  put into its owner's graveyard or Equipment unattached ([CR#704.5m,704.5n]), is the engine's
-  ([CR#702.16n]).
+  `doesnt(actor(thisEffect), remove(thisAura))`, written as the card prints it: its own Static
+  Spec beside the spec it talks about, the two joined by `conjunction` in one static ability.
+  Which consequence of the effect it exempts, an Aura put into its owner's graveyard or Equipment
+  unattached ([CR#704.5m,704.5n]), is the engine's ([CR#702.16n]).
 - **Damage is composed, not special.** Damage results are conferred properties
   ([CR#120.3a,120.3c,120.3e,120.4c]). Wither and infect replace the marking results
   ([CR#702.80a,702.90b]). Prevention, redirection and scaling replace the damage event

@@ -16,6 +16,8 @@ introduces its antecedent. `Angelic Cub.syl` therefore carries only its triggere
 
 *Guardian Beast*'s second sentence ("This effect doesn't remove …") is a `doesnt` beside its
 condition-first static, the two joined in one `conjunction`, and stays outside the new Template.
+Its "those artifacts" then still reads a referent introduced inside the conditional, which
+`semantics.md` §2.2 does not yet say is reachable (`docs/cleanup/08-drt.md`).
 
 ## Done when
 
