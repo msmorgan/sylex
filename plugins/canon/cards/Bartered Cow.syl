@@ -1,0 +1,11 @@
+card singleFaced({
+    name = "Bartered Cow",
+    cost = [generic(3), pip(white)],
+    types = [creature],
+    subtypes = [ox],
+    text = [
+      triggered(
+        and([when(does(actor(thisCreature), die)), when(does(actor(you), discard(thisCard)))]),
+        action = create(1, defined(foodToken)))],
+    power = 3,
+    toughness = 3})
