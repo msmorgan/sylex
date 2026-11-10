@@ -20,10 +20,10 @@ gate, and its stage's sub-epic needs it unless another ticket in that stage does
 - A corpus-wide checkpoint pass over `plugins/` and `crates/xtask/src/dsl_check*` finds every
   Lean hack the stage checkpoints left: a construct, special case, wrapper, workaround or modeling
   shortcut there because Lean or its generator needed it, and a doc comment written in Lean
-  syntax or naming a generated wrapper. Each one found is fixed in the checkpoint's own landing or
-  ticketed, and the landing lists them.
+  syntax or naming a generated wrapper. Each one found is fixed in the checkpoint's own landing;
+  anything that truly needs step 7 or later is ticketed with that reason. The landing lists them.
 - No "Step 6:" marker remains in `crates/xtask/src/dsl_check/schema.rs`, and each entry left in
-  its provisional tables (`KINDS`, `RECORDS`, `EXPANSION_CONSTRUCTORS`, `UNDECLARED_SORTS`,
-  `RING_EXCEPTION`, `TextWord`) is one the CR or the design calls for; any other is fixed in the
-  checkpoint's own landing or ticketed, and the landing lists them.
+  whatever provisional tables remain there is one the CR or the design calls for; any other is
+  fixed in the checkpoint's own landing, or, if it truly needs step 7 or later, ticketed with that
+  reason. The landing lists them.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.

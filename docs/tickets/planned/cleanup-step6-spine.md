@@ -20,3 +20,4 @@ result reads, flags, alternative costs, supertypes, mana production and coercion
   construct should say, a second declaration of one concept, a choice made by hand that the rules
   derive, or a validator exception kept for one file. Each one found is fixed in the
   checkpoint's own landing or ticketed, and the landing lists them.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.

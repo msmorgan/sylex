@@ -13,9 +13,10 @@ against it.
 ## Done when
 
 - Every ticket in its `needs:` is in `done/`.
-- A checkpoint pass over `plugins/builtin/rules/` and the keyword ability, keyword action,
-  counter, designation, subtype and card type declarations under `plugins/builtin/definitions/`
-  finds rules still left where Lean put them: an empty or partial keyword body, a rule stated only
+- A checkpoint pass over `plugins/builtin/rules/` and the keyword ability, counter,
+  designation, subtype and card type declarations under `plugins/builtin/definitions/` (keyword
+  actions and the Deeds keyword abilities perform are the deeds checkpoint's) finds rules still left where Lean put them: an empty or partial keyword body, a rule stated only
   in a doc comment or left to an engine name table, a keyword variant joined to its keyword only
   by a `label` string, or a parameter its declaration never reads. Each one found is fixed in the
   checkpoint's own landing or ticketed, and the landing lists them.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.

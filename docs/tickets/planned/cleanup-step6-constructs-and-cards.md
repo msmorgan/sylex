@@ -18,3 +18,4 @@ writes those cards. Later stages write against it.
   hand, or a card comment that describes a deleted Lean check instead of the card's modeling
   choice. Each one found is fixed in the checkpoint's own landing or ticketed, and the landing
   lists them.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
