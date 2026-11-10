@@ -6,7 +6,7 @@ needs: [syl-argument-naming, syl-single-face-card-call]
 
 ## Why
 
-Four declarations are named or spelled for one use, or read poorly for what they build:
+Five declarations are named or spelled for one use, or read poorly for what they build:
 
 - `modifiesPrecedingAction` (`primitives/timing/`) is a `Duration` spelled "It can't be
   regenerated", though it is any rider that modifies the action before it [CR#608.2c].
@@ -14,6 +14,11 @@ Four declarations are named or spelled for one use, or read poorly for what they
 - `splitOverPermanent` (`templates/pronoun/`) is spelled "any target".
 - `under` (`primitives/zone/`), the move rider spelled "under <controller>'s control", reads
   as `under(you)`; it is renamed `underControlOf` (16 files call it).
+- `actor(np)` (`primitives/noun/actor.syl`), the active `Subject` constructor, says its noun
+  phrase performs the Action, but an effect can be a Subject (`doesnt(actor(thisEffect),
+  remove(thisAura))`, *Black Ward*) and an effect performs no Deed; it is renamed `subject(np)`.
+  The noun-phrase word `actor` (`primitives/pronoun/actor.syl`), the performer of an instruction,
+  keeps its name.
 
 `syl-argument-naming` rewrites 4 arguments that hold these declarations' calls, and lands first.
 
@@ -23,11 +28,23 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 
 - Each is named for what it builds and spelled with words that mean it, or its one use moves into
   a Template that carries the printed wording; every caller in `plugins/` is updated.
+- The `Subject` constructor is `subject(np)`, and no `actor(` call is left in `plugins/`. The
+  rename is corpus-wide (every `actor(` call, about 640 today), so a one-off script makes it and
+  checks that every file parses to the same tree apart from the constructor's name; the landing
+  reports the counts it compared. The glossary entry **Subject**
+  (`docs/contexts/game-model/CONTEXT.md`), `syl.md` §2 and `semantics.md` §4.2, §4.6 and §4.7
+  name `subject(…)`.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
+
+## Not in scope
+
+- Whether an Actor is a referent (`semantics.md` §2.1 against §4.2): the rename changes the
+  constructor's name, not what either section says the Actor is.
 
 ## Pointers
 
 `plugins/builtin/primitives/timing/{modifiesPrecedingAction,thisObject}.syl`,
 `plugins/builtin/primitives/period/thisObject.syl`,
-`plugins/builtin/templates/pronoun/splitOverPermanent.syl`.
+`plugins/builtin/templates/pronoun/splitOverPermanent.syl`, `plugins/builtin/primitives/noun/actor.syl`,
+`plugins/builtin/primitives/static/doesnt.syl`.
