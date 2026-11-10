@@ -19,6 +19,6 @@ card singleFaced({
               untilEndOfTurn)])),
       whenever(
         does(actor(anOpponent), gainControlOf(a(isPermanent), you)),
-        create(lit(1), written(treasureToken)))],
+        create(lit(1), defined(treasureToken)))],
     power = lit(3),
     toughness = lit(3)})

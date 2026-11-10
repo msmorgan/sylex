@@ -8,5 +8,5 @@ card singleFaced({
       spell(
         sequentially([
             counter(target(isSpell)),
-            create(letter(x), written(treasureToken)),
+            create(letter(x), defined(treasureToken)),
             define(x, statOf(stat(manaValue), that(spell)))]))]})

@@ -14,17 +14,7 @@ action empowerJace(amount: Amount) {
   body = sequentially([
       doIf(
         not(exists(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
-        create(
-          lit(1),
-          written({
-              characteristics = {
-                colors = [blue],
-                types = [planeswalker],
-                subtypes = [jace],
-                text = [
-                  activated(loyaltySymbol(down(lit(1))), surveil(lit(1))),
-                  activated(loyaltySymbol(down(lit(3))), draw(lit(1)))],
-                loyalty = lit(0)}}))),
+        create(lit(1), defined(jaceToken))),
       choose(a(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
       putCounters($amount, printedKind(loyaltyCounter), it)])
 }

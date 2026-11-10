@@ -4,17 +4,6 @@ action incubate(amount: Amount) {
   spelling = "incubate <amount>",
   body = create(
     lit(1),
-    doubleFaced({
-        characteristics = {
-          types = [artifact],
-          subtypes = [incubator],
-          text = [activated(mana([generic(2)]), transform(this))]}},
-      {
-        characteristics = {
-          name = "Phyrexian Token",
-          types = [artifact, creature],
-          subtypes = [phyrexian],
-          power = lit(0),
-          toughness = lit(0)}}),
+    defined(incubatorToken),
     [withCounters($amount, printedKind(p1p1Counter), fresh)])
 }
