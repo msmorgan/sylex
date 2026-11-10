@@ -162,6 +162,9 @@ two differ in what they mean:
   - A keyword ability's Definition carries a Deed only where the rules let text ask who did it:
     a creature tapped to pay a crew cost "crews" the Vehicle, and the Vehicle is "crewed by" it
     ([CR#702.122b,702.122c]), so Crew's Definition carries the Deed paying that cost stamps.
+  - A Primitive Keyword Ability, one the engine implements natively (first strike, double strike,
+    trample, banding), is the exception: it is a primitive, not a Definition, with no body and no
+    Reference Scope ([`syl.md`](./syl.md) §3).
   - A Counter's, a Designation's or a Defined Token's Definition carries none.
   - A Defined Token's Definition takes no arguments, so its Reference Scope holds nothing of
     the caller's; the ability text in its characteristics is embedded ability text (§2.3).

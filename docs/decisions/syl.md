@@ -96,8 +96,13 @@ A word that names no declaration at `T` is refused; no word reaches a constructo
 its primitive (§1). A declaration's kind may declare its name at a second sort: an `ability`
 declaration is also its keyword's `KeywordLabel`, so a keyword is named bare where a label is
 expected (`byKeyword(kicker)`). That is a second declaration, not a conversion; the keyword's
-term is written `theKeyword(kicker)`. `sylex_syl::check` refuses a word that names no declaration
-at any sort; the resolver refuses one that names none at `T`.
+term is written `theKeyword(kicker)`. A Primitive Keyword Ability has no `ability` declaration
+([`semantics.md`](./semantics.md) §3): its label is a primitive at `KeywordLabel` with no
+parameters that builds the constructor its own name capitalizes (`primitive firstStrike:
+KeywordLabel = FirstStrike`), the only `KeywordLabel` constructor a primitive may build, and a
+Template at `Ability` of the same name wraps the label (`primitiveKeyword(firstStrike)`).
+`sylex_syl::check` refuses a word that names no declaration at any sort; the resolver refuses one
+that names none at `T`.
 
 **Optional positions.** A value at an `Option(T)` position is written as a `T`, `some` is never
 written, and an omitted argument or field takes its declared default. This is the one implicit
