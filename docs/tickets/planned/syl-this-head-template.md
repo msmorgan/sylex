@@ -24,7 +24,8 @@ to `it`, so those sites are rewritten once and the two tickets never edit them i
 Its `this<Head>` sites also sit in calls three tickets rewrite first: `syl-argument-naming`
 (83 arguments it names or unnames, in 79 files), `syl-condition-first-static` (the
 condition-first statics, such as *Guardian Beast*'s `is(thisCreature, isUntapped)`) and
-`syl-lookback-point-from-trigger` (3 `move` calls, such as `aura.syl`'s, that drop `at`).
+`syl-lookback-point-from-trigger` (the `move` and `putIntoFromBattlefield` calls it respells,
+such as `aura.syl`'s state-based row and *Rancor*'s trigger).
 
 With the card-type and subtype coercions of `syl-implicit-coercions`, a caller passes such a head
 bare (`creature`, `aura`), so that ticket lands first.
