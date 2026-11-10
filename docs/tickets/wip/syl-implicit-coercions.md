@@ -41,11 +41,10 @@ bare integers; with the coercions declared first, each writes them once, as prin
   the word, so a latent collision fails before any card uses it.
 - `Option` composes with a coercion as it does with any value today: at an `Option(T)` position
   the value is written as a `T`, and a coercion into `T` applies.
-
-## Open questions
-
-- Whether the existing explicit `lit(…)`, `type(…)` and `subtype(…)` call sites are respelled
-  later to rely on the coercion. They stay valid either way.
+- Every existing `lit(…)`, `type(…)` and `subtype(…)` call site whose wrap a coercion would
+  supply is respelled bare, in one scripted commit gated by a check that each respelled file
+  resolves to the same tree. `cargo xtask dsl fmt` collapses such an explicit wrap, so the corpus
+  has one spelling of each term; the wrapped primitive stays callable.
 
 ## Done when
 
