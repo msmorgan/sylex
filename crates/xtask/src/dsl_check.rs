@@ -403,7 +403,6 @@ fn known_sorts(decls: &[Decl<'_>], registry: &Registry) -> BTreeSet<String> {
     LITERAL_SORTS
         .into_iter()
         .chain(schema::SORT_CONSTRUCTORS)
-        .chain(schema::UNDECLARED_SORTS.iter().copied())
         .map(str::to_owned)
         .chain(produced.intersection(&consumed).cloned())
         .collect()

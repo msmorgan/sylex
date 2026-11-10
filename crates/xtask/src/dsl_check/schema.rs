@@ -451,8 +451,3 @@ pub const RECORDS: &[RecordSort] = &[
         ],
     ),
 ];
-
-/// Provisional: sorts the model has that no declaration produces, so the
-/// header-derived sort check cannot know them. Step 6's ability-word
-/// cleanup removes `AbilityWordLabel`.
-pub const UNDECLARED_SORTS: &[&str] = &["AbilityWordLabel"];
