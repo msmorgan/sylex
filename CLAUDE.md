@@ -36,8 +36,8 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 - `crates/`: the current crates. `v1/`: the old line, deleted once the new one reaches parity;
   never extend it or copy newer work into it.
 - `docs/decisions/`: ADRs; `architecture.md` is the overall design and the place to start,
-  `english.md` the English grammar, `semantics.md` the semantics design and `syl.md` the `.syl`
-  language.
+  `english.md` the English grammar, `semantics.md` the semantics design, `syl.md` the `.syl`
+  language and `spelling.md` the spelling grammar.
 - `docs/specs/`: accepted designs not yet in code. `docs/unusual-cards.md`: cards whose text defeats
   a natural modeling assumption.
 
