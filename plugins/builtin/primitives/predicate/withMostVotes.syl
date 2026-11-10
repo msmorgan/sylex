@@ -4,5 +4,5 @@
 # counts the votes for one named word. No `ProjAxis` measures the votes a choice got, so
 # `superlative` has nothing to rank by.
 primitive withMostVotes: Predicate = WithMostVotes {
-  spelling = "with the most votes"
+  spelling = "with the most votes or tied for most votes"
 }
