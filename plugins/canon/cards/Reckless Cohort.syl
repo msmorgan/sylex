@@ -1,0 +1,13 @@
+card singleFaced({
+    name = "Reckless Cohort",
+    cost = [generic(1), pip(red)],
+    types = [creature],
+    subtypes = [human, warrior, ally],
+    text = [
+      static(
+        must(
+          actor(thisCreature),
+          attack,
+          unless = exists(and([isOther, hasSubtype(ally), youControl]))))],
+    power = 2,
+    toughness = 2})
