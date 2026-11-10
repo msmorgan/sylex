@@ -26,21 +26,22 @@ describe only the mana.
 - `symbols(symbols: List(ManaSymbol))` at `ProducedMana` is mana written as a sequence of
   symbols, wrapped even when the sequence is one symbol: `symbols([pip(blue), pip(blue)])`,
   `symbols([colorlessPip])`. Its elements are ordinary mana symbols; one that stands for no one
-  mana of a type ([CR#106.1b,107.4a,107.4c]) is refused at lowering, not by its sort. A bare mana
-  symbol never stands for produced mana, so each of a filterland's sequences stays visible.
+  mana of a type ([CR#106.1b,107.4a,107.4c]) is for lowering to refuse, not its sort. A bare
+  mana symbol never stands for produced mana, so each of a filterland's sequences stays visible.
 - `or(alternatives: List(ProducedMana))` is a choice between productions, in printed order:
   *Mystic Monastery*'s "Add {U}, {R}, or {W}", *Cascade Bluffs*'s "Add {U}{U}, {U}{R}, or
   {R}{R}", *Thriving Heath*'s "Add {W} or one mana of the chosen color".
   `ofTheChosenColor` has no `alternative`; `or` says it.
 - `counted(amount: Amount, produced: ProducedMana)` is a printed count of produced mana: *The
   Flux*'s "six {R}", "X {G}", "two mana of any one color". The produced mana is produced `amount`
-  times, and an `or` inside it is chosen once for each: *Culling Ritual*'s "Add {B} or {G} for
-  each permanent destroyed this way" is `counted(forEach(1, …), or([symbols([pip(black)]),
-  symbols([pip(green)])]))`, a color per mana, while *Brigid, Doun's Mind*'s "Add X {G} or X {W}"
-  is `or([counted(letter(x), symbols([pip(green)])), counted(letter(x), symbols([pip(white)]))])`,
-  one choice for all. `ofAnyColor`'s freedom says whether the counted mana shares one color. A
-  written sequence and a count stay different terms: *Soulbright Flamekin*'s eight {R} in a row
-  is one `symbols`, *The Flux*'s "six {R}" a `counted`.
+  times, each mana on its own, so every choice inside it is made once per mana: *Culling Ritual*'s
+  "Add {B} or {G} for each permanent destroyed this way" is `counted(forEach(1, …),
+  or([symbols([pip(black)]), symbols([pip(green)])]))`, a color per mana, while *Brigid, Doun's
+  Mind*'s "Add X {G} or X {W}" is `or([counted(letter(x), symbols([pip(green)])), counted(letter(x),
+  symbols([pip(white)]))])`, one choice for all. Only an inner term that says the mana share a color
+  (`ofAnyColor(sameColor)`) makes one choice for all the counted mana. A written sequence and a
+  count stay different terms: *Soulbright Flamekin*'s eight {R} in a row is one `symbols`, *The
+  Flux*'s "six {R}" a `counted`.
 - "For each" is the general `forEach` amount inside `counted`, as on every other verb: *Gaea's
   Cradle*'s "{G} for each creature you control" is `counted(forEach(1, and([isCreature,
   youControl])), symbols([pip(green)]))`. "An amount of {G} equal to …" is `counted` over the
@@ -50,7 +51,9 @@ describe only the mana.
 - The `ProducedMana` words that printed "one mana of …" (`ofAnyColor`, `ofAnyColorAmong`,
   `ofAnyColorOf`, `ofTheChosenColor`, `ofTypeProducedBy`, `ofTypeProducibleBy`) spell the mana
   without its count, and a card printing "one" writes `counted(1, …)`. `matchingManaCostOf` and
-  `ofTheLastNotedType` print no count and take none.
+  `ofTheLastNotedType` print no count and take none. `ofColorProducibleBy`, added for *Fellwar
+  Stone*'s "any color" (it had been written with `ofTypeProducibleBy`'s "any type"), is spelled
+  without the count from the start.
 
 ## Done when
 
