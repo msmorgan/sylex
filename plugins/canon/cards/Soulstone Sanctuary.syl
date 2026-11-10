@@ -2,7 +2,7 @@ card singleFaced({
     name = "Soulstone Sanctuary",
     types = [land],
     text = [
-      activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
+      activated(tapSymbol, addMana(symbols([colorlessPip]))),
       activated(
         mana([generic(4)]),
         establish(

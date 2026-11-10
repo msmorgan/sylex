@@ -8,7 +8,8 @@ card singleFaced({
         compound(
           [tapSymbol, perform(sacrifice(a(and([isCreature, or([hasColor(black), isArtifact])]))))]),
         addMana(
-          statOf(stat(manaValue), the(and([was(sacrifice(which)), isCreature]))),
-          manaOf([[colored(black)]])))],
+          counted(
+            statOf(stat(manaValue), the(and([was(sacrifice(which)), isCreature]))),
+            symbols([pip(black)]))))],
     power = 1,
     toughness = 2})

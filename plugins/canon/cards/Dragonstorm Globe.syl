@@ -5,4 +5,4 @@ card singleFaced({
     text = [
       static(
         entersWithAdditionalCounters(each(and([hasSubtype(dragon), youControl])), 1, p1p1Counter)),
-      activated(tapSymbol, addMana(1, ofAnyColor(sameColor)))]})
+      activated(tapSymbol, addMana(counted(1, ofAnyColor(sameColor))))]})

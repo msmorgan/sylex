@@ -16,4 +16,4 @@ card singleFaced({
         beginningOfYour(upkeep),
         if = compareAmt(countOf(and([isLand, youControl])), atMost, 3),
         action = gainLife(1)),
-      activated(tapSymbol, addMana(1, manaOf([[colorless]])))]})
+      activated(tapSymbol, addMana(symbols([colorlessPip])))]})

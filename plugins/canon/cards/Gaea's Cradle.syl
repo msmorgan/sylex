@@ -5,4 +5,4 @@ card singleFaced({
     text = [
       activated(
         tapSymbol,
-        addMana(forEach(1, and([isCreature, youControl])), manaOf([[colored(green)]])))]})
+        addMana(counted(forEach(1, and([isCreature, youControl])), symbols([pip(green)]))))]})

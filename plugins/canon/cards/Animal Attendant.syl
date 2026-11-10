@@ -7,8 +7,7 @@ card singleFaced({
       activated(
         tapSymbol,
         addMana(
-          1,
-          ofAnyColor(sameColor),
+          counted(1, ofAnyColor(sameColor)),
           [
             whenSpentOn(
               affectsIt,

@@ -11,5 +11,5 @@ card singleFaced({
             tapSymbol,
             perform(removeCounters(anyNumber, printedKind(chargeCounter), thisArtifact))]),
         sequentially([
-            addMana(1, manaOf([[colored(black)]])),
-            addMana(removedThisWay, manaOf([[colored(black)]]))]))]})
+            addMana(symbols([pip(black)])),
+            addMana(counted(removedThisWay, symbols([pip(black)])))]))]})

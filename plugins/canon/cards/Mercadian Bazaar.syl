@@ -7,4 +7,4 @@ card singleFaced({
       activated(
         compound(
           [tapSymbol, perform(removeCounters(anyNumber, printedKind(storageCounter), thisLand))]),
-        addMana(removedThisWay, manaOf([[colored(red)]])))]})
+        addMana(counted(removedThisWay, symbols([pip(red)]))))]})

@@ -10,7 +10,6 @@ token powerstoneToken {
         activated(
           tapSymbol,
           addMana(
-            1,
-            manaOf([[colorless]]),
+            symbols([colorlessPip]),
             [cantSpendOn([toCast(and([non(isArtifact), isSpell]))])]))]}}
 }

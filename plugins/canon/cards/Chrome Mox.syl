@@ -7,4 +7,6 @@ card singleFaced({
         when(
           does(actor(thisArtifact), enter),
           may(exile(a(and([non(isArtifact), non(isLand), cardIn(yourHand)])))))),
-      activated(tapSymbol, addMana(1, ofAnyColorOf(the(and([was(exile(which)), isCard])))))]})
+      activated(
+        tapSymbol,
+        addMana(counted(1, ofAnyColorOf(the(and([was(exile(which)), isCard]))))))]})

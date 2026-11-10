@@ -7,8 +7,7 @@ card singleFaced({
       activated(
         compound([tapSymbol, perform(sacrifice(thisCreature))]),
         addMana(
-          1,
-          manaOf([[colorless, colorless]]),
+          symbols([colorlessPip, colorlessPip]),
           [
             whenSpentOn(
               affectsIt,

@@ -2,7 +2,7 @@ card singleFaced({
     name = "Mishra's Factory",
     types = [land],
     text = [
-      activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
+      activated(tapSymbol, addMana(symbols([colorlessPip]))),
       activated(
         mana([generic(1)]),
         establishThroughout(

@@ -5,6 +5,5 @@ card singleFaced({
       activated(
         tapSymbol,
         addMana(
-          1,
-          manaOf([[colorless, colorless, colorless]]),
+          symbols([colorlessPip, colorlessPip, colorlessPip]),
           [spendOnly([toCast(and([isArtifact, isSpell]))])]))]})

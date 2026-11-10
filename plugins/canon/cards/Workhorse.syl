@@ -7,6 +7,6 @@ card singleFaced({
       static(entersWithCounters(thisCreature, 4, p1p1Counter)),
       activated(
         perform(removeCounters(exactly(1), printedKind(p1p1Counter), thisCreature)),
-        addMana(1, manaOf([[colorless]])))],
+        addMana(symbols([colorlessPip])))],
     power = 0,
     toughness = 0})

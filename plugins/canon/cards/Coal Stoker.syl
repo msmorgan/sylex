@@ -7,6 +7,6 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         if = is(it, did(actor(you), cast(which, from = yourHand), thisObject)),
-        action = addMana(1, manaOf([[colored(red), colored(red), colored(red)]])))],
+        action = addMana(symbols([pip(red), pip(red), pip(red)])))],
     power = 3,
     toughness = 3})

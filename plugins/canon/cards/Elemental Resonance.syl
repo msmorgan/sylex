@@ -5,4 +5,4 @@ card singleFaced({
     subtypes = [aura],
     text = [
       enchant(isPermanent),
-      at(beginningOfYour(firstMain), addMana(1, matchingManaCostOf(enchanted(permanent))))]})
+      at(beginningOfYour(firstMain), addMana(matchingManaCostOf(enchanted(permanent))))]})

@@ -11,4 +11,4 @@ card singleFaced({
             counter(target(isSpell)),
             atNext(
               beginningOf(mainPhase, you, nextTime(you)),
-              addMana(statOf(stat(manaValue), that(spell)), manaOf([[colorless]])))]))]})
+              addMana(counted(statOf(stat(manaValue), that(spell)), symbols([colorlessPip]))))]))]})

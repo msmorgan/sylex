@@ -3,6 +3,7 @@ card singleFaced({
     cost = [generic(3), pip(green)],
     types = [creature],
     subtypes = [human, druid],
-    text = [activated(tapSymbol, addMana(devotion(you, color(green)), manaOf([[colored(green)]])))],
+    text = [
+      activated(tapSymbol, addMana(counted(devotion(you, color(green)), symbols([pip(green)]))))],
     power = 1,
     toughness = 4})

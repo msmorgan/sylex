@@ -8,4 +8,4 @@ card singleFaced({
         chapterMark([1]),
         instruct(this, dealDamage(6, target(and([isCreature, anOpponentControls]))))),
       when(chapterMark([2]), destroy(target(and([isArtifact, anOpponentControls])))),
-      when(chapterMark([3, 4]), addMana(1, manaOf([[colored(red)]])))]})
+      when(chapterMark([3, 4]), addMana(symbols([pip(red)])))]})

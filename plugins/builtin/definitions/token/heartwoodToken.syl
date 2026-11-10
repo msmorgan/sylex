@@ -7,5 +7,5 @@ token heartwoodToken {
       colors = [red, green],
       types = [artifact],
       subtypes = [heartwood],
-      text = [activated(tapSymbol, addMana(1, manaOf([[colored(red)], [colored(green)]])))]}}
+      text = [activated(tapSymbol, addMana(or([symbols([pip(red)]), symbols([pip(green)])])))]}}
 }

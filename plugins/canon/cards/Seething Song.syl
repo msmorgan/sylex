@@ -2,8 +2,4 @@ card singleFaced({
     name = "Seething Song",
     cost = [generic(2), pip(red)],
     types = [instant],
-    text = [
-      spell(
-        addMana(
-          1,
-          manaOf([[colored(red), colored(red), colored(red), colored(red), colored(red)]])))]})
+    text = [spell(addMana(symbols([pip(red), pip(red), pip(red), pip(red), pip(red)])))]})

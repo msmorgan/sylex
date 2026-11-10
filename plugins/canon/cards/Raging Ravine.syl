@@ -3,7 +3,7 @@ card singleFaced({
     types = [land],
     text = [
       static(entersTapped(thisLand)),
-      activated(tapSymbol, addMana(1, manaOf([[colored(red)], [colored(green)]]))),
+      activated(tapSymbol, addMana(or([symbols([pip(red)]), symbols([pip(green)])]))),
       activated(
         mana([generic(2), pip(red), pip(green)]),
         establishThroughout(

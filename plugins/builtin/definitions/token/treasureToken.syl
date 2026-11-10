@@ -9,5 +9,5 @@ token treasureToken {
       text = [
         activated(
           compound([tapSymbol, perform(sacrifice(thisToken))]),
-          addMana(1, ofAnyColor(sameColor)))]}}
+          addMana(counted(1, ofAnyColor(sameColor))))]}}
 }

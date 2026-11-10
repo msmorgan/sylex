@@ -2,7 +2,7 @@ card singleFaced({
     name = "Bonders' Enclave",
     types = [land],
     text = [
-      activated(tapSymbol, addMana(1, manaOf([[colorless]]))),
+      activated(tapSymbol, addMana(symbols([colorlessPip]))),
       activatedOnlyIf(
         compound([mana([generic(3)]), tapSymbol]),
         draw(1),

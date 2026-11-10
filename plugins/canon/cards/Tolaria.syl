@@ -3,7 +3,7 @@ card singleFaced({
     supertypes = [legendary],
     types = [land],
     text = [
-      activated(tapSymbol, addMana(1, manaOf([[colored(blue)]]))),
+      activated(tapSymbol, addMana(symbols([pip(blue)]))),
       activatedOnlyDuring(
         compound([tapSymbol]),
         establishThroughout(
