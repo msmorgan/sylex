@@ -1,5 +1,7 @@
 # "Partner" means "You may designate two legendary cards as your commander rather than one if each
 # of them has partner." [CR#702.124h]
+# It modifies deck construction and functions before the game begins [CR#702.124a], and nothing
+# models deck construction, so its body is empty.
 ability partner {
   lexical = {
     lemma = "partner",
