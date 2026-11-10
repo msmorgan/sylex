@@ -91,8 +91,8 @@ encloses the Construction's Hole (*for each creature in your party*, after its c
 duration).
 
 **Factoring**:
-Printing once a phrase that the arms of a coordination share, each arm holding it in the
-term (*attacks or blocks*, one Subject for two events).
+Printing once a phrase that the arms of a coordination share and that each arm holds in the
+term (*this creature attacks or blocks*). It copies only a phrase that introduces no Referent.
 
 ## Corpus and census
 

@@ -28,6 +28,27 @@ may rearrange its parameters freely. If the pairing reached into the body, every
 be a place where one printed phrase stands for two parts of the meaning. Pairing with the call
 keeps one printed phrase for one argument.
 
+**A wording is grammatical structure, not a string of words.** It is the fragment of a Reading
+that its `spelling` parses to (§7): Lexemes, Categories and Selected Frames, with Holes among
+them. What the English layer derives from that structure is never written into a wording, and
+none of it is an operation of this grammar:
+
+- **Inflection and agreement.** A verb whose agreement depends on a Hole is written
+  uninflected, and `getsBoth` is "gets" in Giant Growth and "get" in Glorious Anthem.
+- **Case.** `controllerOf`, "<subject>'s controller", over `it` is "its controller".
+- **Voice and verb form.** An Action's wording is its verb's one Subcategorization Frame. The
+  context that embeds the Action selects the form the frame takes, and its Subject selects the
+  voice ([Semantics](semantics.md) §4.2): under `any` or `by(np)` the wording is the frame's
+  passive, with the patient's Hole as the clause's subject.
+- **Gaps.** `which` fills a Hole and prints no word. The Reading has a Gap there, as in
+  Alabaster Leech's "White spells you cast", whose lookback is
+  `did(actor(you), cast(which), thisObject)`.
+
+Why: the English layer derives the passive, the gapped forms and the inflections of every
+frame from the frame's one declaration ([English](english.md) §3). A wording for each voice,
+number or Gap would multiply as frames times forms, and the copies would drift apart
+([Architecture](architecture.md), design principle 4).
+
 ## 2. The two operations
 
 **Substitution** fills a Hole with the wording of the argument's own Construction. It serves
@@ -73,8 +94,10 @@ Factoring (§3.3).
 ## 3. The three extensions
 
 Substitution and one-sided adjunction leave three things Oracle text prints unexpressed. Each
-gets one closed extension. They are the whole list: a wording that needs something else is a
-defect in this design, reported and settled here, never patched in one declaration.
+gets one closed extension. They are the whole list of this grammar's operations: a wording
+that needs something else is a defect in this design, reported and settled here, never patched
+in one declaration. Inflection, voice and Gaps are not on the list because they are not this
+grammar's (§1).
 
 ### 3.1 Optional and list Holes
 
@@ -135,7 +158,10 @@ Where the text prints a quantity both in place and as a Tail, or prints a Tail o
 of another adjunct of the same phrase, the two are two wordings, and each is its own Template
 (§4). Essence Backlash prints "deals damage equal to that spell's power to its controller" with
 nothing detached. Aurochs prints "gets +1/+0 until end of turn for each other attacking
-Aurochs" and Ral's Staticaster "gets +1/+0 for each card in your hand until end of turn".
+Aurochs" and Ral's Staticaster "gets +1/+0 for each card in your hand until end of turn". Both
+of those are Tails on one verb phrase, so the Category a Tail names does not tell them apart;
+what does is open (§10). So is how a Tail scales a measure of two different numbers, as in
+Johtull Wurm's "gets -2/-1 until end of turn for each creature blocking it beyond the first".
 
 Why: the alternative is a Template per verb. "For each" is printed after its clause's verb on
 well over a thousand in-scope cards, under about thirty different verbs, and with substitution
@@ -162,14 +188,20 @@ ability may have more than one trigger condition [CR#603.1b] and the event gate 
 over Actions ([Semantics](semantics.md) §4.6): Chub Toad's is
 `or([does(actor(thisCreature), block), does(any, becomeBlocked(thisCreature))])`.
 
+**Factoring copies only a phrase that introduces no Referent**: a reference to something
+already there, such as "this creature", or a duration. Why: a copy of an introducing phrase
+introduces again. Predator's Strike has one target, and a term with `target(…)` in each arm
+has two. Powerstone Minefield prints "Whenever a creature attacks or blocks, this enchantment
+deals 2 damage to it", and a term with the indefinite in each arm of the `or` introduces a
+Referent per arm for the one creature that "it" names. A shared phrase that introduces a
+Referent is therefore written once in the term. How the term then gives it to each arm is not
+settled (§10).
+
 Factoring loses nothing where the unfactored form is never printed, and for alternative events
 it is not: no in-scope card prints "Whenever X attacks or X blocks" with the subject repeated.
 Where both forms are printed the term already differs. Ancient Craving prints "You draw three
 cards and you lose 3 life" and Ambition's Cost "You draw three cards and lose 3 life", and
 those are two terms: two Handoffs in sequence, and one Handoff over two Actions in sequence.
-
-Whether a given coordination is spelled by Factoring or written as a term that coordinates
-where the English does is not settled (§10).
 
 ## 4. The resolved term is the derivation
 
@@ -193,6 +225,11 @@ it is printed or used ([`.syl`](syl.md) §4). A value the text prints once is wr
 ([`.syl`](syl.md) §2). A Hole that a wording prints twice is the same argument both times, and
 recovery admits the wording only when the two printings agree.
 
+One wording recovers one written form. Where `.syl` admits two written forms of one term, the
+bare word a coercion wraps and the written call of the primitive it wraps through, recovery
+yields the bare form, which is the corpus's ([`.syl`](syl.md) §2). Why: two candidates that
+differ only in how an author wrote the same term differ in nothing the text chose.
+
 Why: a derivation kept apart from the term would be something one direction of translation
 invents and the other discards, which the canonical form does not store
 ([Architecture](architecture.md), design principle 2).
@@ -208,9 +245,12 @@ Construction's wording is matched against forest nodes. The grammar still names 
 and carries no meaning ([English](english.md) §1–2).
 
 **The shape of the resolved term.** A term is a tree of calls with named and positional
-arguments and lists. Adjunction, Tails and Factoring are relations between that tree and a
-Reading. None of them adds a kind of node, and `.syl` gains no syntax outside the `spelling`
-string.
+arguments, lists and records. Adjunction, Tails and Factoring are relations between that tree
+and a Reading. None of them adds a kind of node, and `.syl` gains no syntax outside the
+`spelling` string. Only a declaration carries a `spelling`, so every part of a card's `text`
+that prints words is a call. A record written in place has no wording of its own: where its
+fields are printed, a Template takes them as parameters and spells them: `creatureToken` is
+the Template for Archfiend's Vessel's "a 5/5 black Demon creature token with flying".
 
 **What expansion means.** Expansion substitutes a Template's parameters and wraps a
 Definition's ([`.syl`](syl.md) §4), and a Template still adds no meaning
@@ -239,8 +279,15 @@ keeps it:
   the two forms are already two terms (§3.3).
 
 Punctuation is not spelling's concern. A Reading stores none, and realization derives it from
-structure ([English](english.md) §7). The square brackets of a cleave line [CR#702.148a] are
-likewise restored outside any Reading, so a `spelling` never contains one.
+structure ([English](english.md) §7).
+
+The square brackets of a cleave line [CR#702.148a] are different. No Reading holds them
+either, and no `spelling` contains one, but nothing derives them: "Destroy target [attacking]
+creature" and the same line without brackets have one Uncleaved Text and one Reading. The
+bracketed spans are kept beside the Uncleaved Text, outside the Reading, so a cleave card
+round-trips only if its term says which of its parts are bracketed and spelling relates those
+parts to the spans. How the term says it is `.syl`'s to settle with cleave, which has no
+representation yet.
 
 ## 7. What a `spelling` string must express
 
@@ -250,23 +297,27 @@ belongs to [`.syl`](syl.md) §2. A `spelling` must be able to state:
 - a Hole for a parameter, and the same Hole printed again;
 - an optional part: the parameter that governs it, and the fixed words printed with it;
 - a list Hole and how its elements join, coordinated or juxtaposed;
-- a Tail: the words and Holes that are detached, and the Category of the phrase they attach to;
+- a Tail: the words and Holes that are detached, the Category of the phrase they attach to,
+  and whatever §10 settles is needed to place it among that phrase's other adjuncts;
 - nothing else by markup. Fixed words are plain text. Square brackets and braces are Oracle's
   own characters, for cleave and for symbols, and never mark anything. Angle brackets appear in
-  no in-scope Oracle text, and a Hole is written `<name>`.
+  no in-scope Oracle text, and the corpus writes a Hole `<name>` today.
 
 As an illustration of the shape only, not of the syntax:
 
 ```
 forEach             "<per> <^VerbPhrase for each <p>>"
 putOntoBattlefield  "put <subject> <?from: from <from>> onto the battlefield <riders*>"
-when                "when <event> <joins*> <?if: , if <if>>, <action>"
+when                "when <event> <?if: , if <if>>, <action>"
 getsBoth            "<subject> get <delta>/<delta> <duration?>"
 ```
 
 A wording is written the way the grammar will read it, so each `spelling` is checked by parsing
-it with the English grammar, its Holes standing as phrases of their sorts' Categories. A
-`spelling` no Reading covers fails to load.
+it with the English grammar, each Hole standing for a phrase of any Category that its sort's
+Constructions spell, with the features agreement will fix left unmarked. A sort is not one
+Category: a `Predicate` is a noun in "creature", an adjective in "tapped", a preposition phrase
+in "with flying" and a relative clause in "you control". A `spelling` no Reading covers fails
+to load.
 
 ## 8. Capacity and cost
 
@@ -312,24 +363,53 @@ all, because no spelling crate exists. This section separates the two.
 
 ## 10. Open
 
-**Where a shared-material coordination is expressed.** §3.3 gives the formalism Factoring. It
-does not say which coordinations use it. The candidates:
+**How a shared phrase that introduces a Referent is written once.** §3.3 lets Factoring copy
+only a phrase that introduces nothing. For one that does, the candidates:
 
-- *Factor in spelling.* The term keeps whole arms, each with the shared part written
-  identically, and the Construction for the coordination prints it once. It needs no change to
-  the event gate or to any Action, and it covers a subject in two roles ("blocks or becomes
-  blocked"). It costs the one extension that no grammar formalism supplies ready-made, and a
-  term that writes once per arm a value the text prints once, against [`.syl`](syl.md) §2.
-- *Coordinate the term where English does.* A coordinated Action stands under one Subject or
-  one `does`, as two Actions already stand under one Handoff, and a list Hole spells it with no
-  Factoring. It writes the shared part once. It costs a change to the event gate, which refuses
-  an `or` over Actions today ([Semantics](semantics.md) §4.6), and it does not reach a subject
-  in two roles, which has no single Subject to stand under, so that case needs Factoring or its
-  own Templates anyway.
+- *Coordinate the term where English does.* The coordinated Actions stand under one Subject,
+  as two Actions already stand under one Handoff, and a list Hole spells them with no
+  Factoring. For an alternative event it needs the event gate to admit an `or` of
+  event-capable heads under one `does` ([Semantics](semantics.md) §4.6). It does not reach a
+  phrase shared across two roles, which has no one Subject to stand under: Chub Toad's "blocks
+  or becomes blocked", Aether Tunnel's "gets +1/+0 and can't be blocked", Cephalid
+  Illusionist's "dealt to and dealt by target creature you control".
+- *Bind it at the coordination.* The coordination's Construction takes the shared phrase as a
+  parameter, and each arm holds a placeholder word where the phrase belongs, as a lookback
+  holds `which`. The parameter is the binding, read once ([`.syl`](syl.md) §4), and it reaches
+  two roles. It costs a placeholder word and a coordination Construction at each sort that
+  coordinates, and it is a binding the arms read by a bare word.
+- *Introduce it in the first arm and re-mention it in the others* with an anaphor the text
+  does not print, as Aether Tunnel's `cant(any, block(it))` is written today. It needs no new
+  construct. It puts a word in the term that the card does not print, and spelling must know
+  to print nothing for it.
 
-The two can coexist, each for the coordinations it fits; what is open is which is the rule.
-Until it is settled, an alternative event is written with whole-event arms and the shared
-subject identical in each, and no Template is minted for a particular pair of verbs.
+Whichever is chosen, a shared phrase that introduces nothing can also be written once by the
+same means, and Factoring by copy then has no use left; whether it stays is part of the
+question, since it writes once per arm a value the text prints once, against
+[`.syl`](syl.md) §2. Until it is settled, an alternative event is written with whole-event
+arms, and no Template is minted for a particular pair of verbs.
+
+**How a Tail is placed among its phrase's other adjuncts.** Aurochs and Ral's Staticaster
+print "for each …" after and before "until end of turn" (§3.2), the first on about a hundred
+in-scope cards and the second on a handful. The candidates: the Tail states its place, inside
+or outside the host's own adjuncts, which makes two `forEach` Templates; or the two attach to
+phrases of different Categories, if the English grammar's Readings tell the two sites apart,
+which is unchecked; or the host carries the choice, which is a Template per verb and what
+Tails exist to avoid.
+
+**How a Tail scales a measure of two numbers.** `forEach` scales one `Amount`. Johtull Wurm's
+"-2/-1 … for each" scales two with one printed phrase, and a `forEach` in each delta writes
+that phrase twice. A `forEach` in one delta is also a second candidate for every measure
+with a zero in it: Aurochs's "+1/+0 … for each" recovers as a scaled 1 beside a flat 0 and as
+a flat 1 beside a scaled 0. The candidates: a sort for the measure itself, which `get` takes
+whole and `forEach` is declared at; or a
+`forEach` in each delta whose identical Tails print once, which is Factoring by copy again; or
+scaling the Action from outside, which §9 rejects.
+
+**A part omitted for a value that is no default.** An optional part is governed by a declared
+default (§3.1). Gaea's Cradle's "Add {G} for each creature you control" prints no "one" before
+the mana, and `counted(amount, produced)` writes the 1. Either the text's form gets its own
+Template, with nothing to omit, or the notation gains an omission governed by a value.
 
 **Where the notation is designed.** The notation for optional parts and list Holes has a
-planned ticket. The notation for Tails, and for Factoring if spelling keeps it, has none.
+planned ticket. The notation for Tails and for whatever shared phrases need has none.
