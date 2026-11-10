@@ -9,5 +9,8 @@ ability dash(cost: Cost) {
     static(
       resolutionDelayedTrigger(
         doIf(keywordCostPaid(dash, thisSpell), atNext(endStep, returnToHand(becomes(thisSpell)))))),
-    static(onlyWhile(abilityGrant(thisPermanent, haste), keywordCostPaid(dash, thisPermanent)))]
+    static(
+      conditionFirstWhile(
+        keywordCostPaid(dash, thisPermanent),
+        abilityGrant(thisPermanent, haste)))]
 }

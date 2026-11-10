@@ -6,9 +6,9 @@ ability dredge(amount: Amount) {
   spelling = "dredge <amount>",
   body = [
     static(
-      onlyWhile(
+      conditionFirstWhile(
+        compareAmt(countOf(cardIn(yourLibrary)), atLeast, $amount),
         replace(
           would(actor(you), draw(lit(1))),
-          instead(may(sequentially([mill($amount), returnToHand(this, yourGraveyard)])))),
-        compareAmt(countOf(cardIn(yourLibrary)), atLeast, $amount)))]
+          instead(may(sequentially([mill($amount), returnToHand(this, yourGraveyard)]))))))]
 }

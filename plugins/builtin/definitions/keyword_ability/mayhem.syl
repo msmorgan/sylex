@@ -5,7 +5,7 @@ ability mayhem(cost: Cost) {
   spelling = "mayhem <cost>",
   body = [
     static(
-      onlyWhile(
-        can(actor(you), cast(thisCard, yourGraveyard, payingInstead($cost))),
-        did(actor(you), discard(thisCard), within(soFarThisTurn))))]
+      conditionFirstWhile(
+        did(actor(you), discard(thisCard), within(soFarThisTurn)),
+        can(actor(you), cast(thisCard, yourGraveyard, payingInstead($cost)))))]
 }

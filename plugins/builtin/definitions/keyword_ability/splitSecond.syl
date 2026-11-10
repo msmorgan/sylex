@@ -5,11 +5,11 @@ ability splitSecond {
   spelling = "split second",
   body = [
     static(
-      onlyWhile(
+      conditionFirstWhile(
+        is(thisSpell, in(stack)),
         conjunction([
             cant(actor(bare(isPlayer)), cast(bare(anotherSpell))),
             cant(
               actor(bare(isPlayer)),
-              activate(allOf(and([abilityHead(anyActivated), non(isManaAbility)]))))]),
-        is(thisSpell, in(stack))))]
+              activate(allOf(and([abilityHead(anyActivated), non(isManaAbility)]))))])))]
 }

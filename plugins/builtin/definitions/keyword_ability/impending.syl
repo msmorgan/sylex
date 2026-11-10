@@ -15,11 +15,10 @@ ability impending(amount: Amount, cost: Cost) {
           keywordCostPaid(impending, thisPermanent),
           withRiders([withCounters($amount, printedKind(timeCounter), fresh)])))),
     static(
-      onlyWhile(
-        characteristicChange(thisPermanent, [typeLine(loses, {types = [creature]})]),
-        and([
-            keywordCostPaid(impending, thisPermanent),
-            is(thisPermanent, hasCounter(timeCounter))]))),
+      conditionFirstWhile(
+        and(
+          [keywordCostPaid(impending, thisPermanent), is(thisPermanent, hasCounter(timeCounter))]),
+        characteristicChange(thisPermanent, [typeLine(loses, {types = [creature]})]))),
     at(
       beginningOfYour(endStep),
       removeCounters(oneThrough(1), printedKind(timeCounter), thisPermanent),

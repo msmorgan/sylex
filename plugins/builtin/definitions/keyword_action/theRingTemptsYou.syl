@@ -25,12 +25,7 @@ action theRingTemptsYou {
                           powerOf(a(and([hasDesignation(ringBearer), youControl]))))]))),
                 block(allOf(and([hasDesignation(ringBearer), youControl]))))),
             static(
-              onlyWhile(
-                abilityGrant(
-                  this,
-                  whenever(
-                    does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
-                    sequentially([draw(lit(1)), discard(a(cardIn(hand)))]))),
+              conditionFirstWhile(
                 compareAmt(
                   eventCount(
                     ownScope(
@@ -41,16 +36,34 @@ action theRingTemptsYou {
                     actor(you),
                     thisGame),
                   atLeast,
-                  lit(2)))),
+                  lit(2)),
+                abilityGrant(
+                  this,
+                  whenever(
+                    does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
+                    sequentially([draw(lit(1)), discard(a(cardIn(hand)))]))))),
             static(
-              onlyWhile(
+              conditionFirstWhile(
+                compareAmt(
+                  eventCount(
+                    ownScope(
+                      theRingTemptsYou,
+                      sequentially([
+                          choose(a(and([isCreature, actorControls]))),
+                          gainDesignation(that(creature), ringBearer)])),
+                    actor(you),
+                    thisGame),
+                  atLeast,
+                  lit(3)),
                 abilityGrant(
                   this,
                   whenever(
                     does(
                       by(a(isCreature)),
                       block(a(and([hasDesignation(ringBearer), youControl])))),
-                    atNext(endOfCombat, controllerSacrifices(that(creature))))),
+                    atNext(endOfCombat, controllerSacrifices(that(creature))))))),
+            static(
+              conditionFirstWhile(
                 compareAmt(
                   eventCount(
                     ownScope(
@@ -61,27 +74,14 @@ action theRingTemptsYou {
                     actor(you),
                     thisGame),
                   atLeast,
-                  lit(3)))),
-            static(
-              onlyWhile(
+                  lit(4)),
                 abilityGrant(
                   this,
                   whenever(
                     does(
                       actor(a(and([hasDesignation(ringBearer), youControl]))),
                       dealDamage(recipient = a(isPlayer), kind = combat)),
-                    instruct(eachOpponent, loseLife(lit(3))))),
-                compareAmt(
-                  eventCount(
-                    ownScope(
-                      theRingTemptsYou,
-                      sequentially([
-                          choose(a(and([isCreature, actorControls]))),
-                          gainDesignation(that(creature), ringBearer)])),
-                    actor(you),
-                    thisGame),
-                  atLeast,
-                  lit(4))))])),
+                    instruct(eachOpponent, loseLife(lit(3)))))))])),
       choose(a(and([isCreature, actorControls]))),
       gainDesignation(that(creature), ringBearer)])
 }
