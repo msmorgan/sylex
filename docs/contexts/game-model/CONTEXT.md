@@ -104,16 +104,17 @@ triggers, lookbacks and prohibitions name. Putting a counter and gaining a desig
 
 **Subject**:
 Who or what an Action is said of in its clause: the active `actor(np)`, the agentless passive
-`any`, or the passive with an agent `by(np)`.
+`any`, or the passive with an agent `by(np)`. Its noun phrase is a Referent, which pronouns and
+demonstratives read ("whenever a creature dies, … it"); it is not the Actor.
 
 **Patient**:
 What an Action is done to. It stays inside the Action; the Subject supplies only the performer.
 
 **Actor**:
 Who or what performs an Action. In an instruction, the controller of the text's spell or ability
-([CR#109.5]), unless a Handoff names another; in a clause, what its active Subject names: a Player
-or Permanent, a spell or ability ("<ability> triggers"), or an effect ("this effect doesn't
-remove this Aura").
+([CR#109.5]), unless a Handoff names another; in a clause, whoever performs its Action, whom its
+active Subject names. It is no Referent: only the `actor` noun-phrase word reads it, never a
+pronoun or demonstrative.
 
 **Handoff**:
 `instruct(subject, action)`: an Action making a named Player or Permanent the Actor of the

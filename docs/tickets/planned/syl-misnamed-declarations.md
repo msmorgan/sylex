@@ -14,11 +14,12 @@ Five declarations are named or spelled for one use, or read poorly for what they
 - `splitOverPermanent` (`templates/pronoun/`) is spelled "any target".
 - `under` (`primitives/zone/`), the move rider spelled "under <controller>'s control", reads
   as `under(you)`; it is renamed `underControlOf` (16 files call it).
-- `actor(np)` (`primitives/noun/actor.syl`), the active `Subject` constructor, says its noun
-  phrase performs the Action, but an effect can be a Subject (`doesnt(actor(thisEffect),
-  remove(thisAura))`, *Black Ward*) and an effect performs no Deed; it is renamed `subject(np)`.
-  The noun-phrase word `actor` (`primitives/pronoun/actor.syl`), the performer of an instruction,
-  keeps its name.
+- `actor(np)` (`primitives/noun/actor.syl`), the active `Subject` constructor, is named for the
+  Actor, but its noun phrase is the clause's Subject, a Referent that pronouns and demonstratives
+  read, and not the Actor (`semantics.md` §2.1, §4.2); an effect can be one
+  (`doesnt(actor(thisEffect), remove(thisAura))`, *Black Ward*). It is renamed `subject(np)`. The
+  noun-phrase word `actor` (`primitives/pronoun/actor.syl`), which reads the Actor, keeps its
+  name.
 
 `syl-argument-naming` rewrites 4 arguments that hold these declarations' calls, and lands first.
 
@@ -36,11 +37,6 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
   name `subject(…)`.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
-
-## Not in scope
-
-- Whether an Actor is a referent (`semantics.md` §2.1 against §4.2): the rename changes the
-  constructor's name, not what either section says the Actor is.
 
 ## Pointers
 

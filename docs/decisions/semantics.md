@@ -64,8 +64,14 @@ stacks cannot supply these, because a binding's position shifts as others are pu
 - Every mention that introduces an entity, quantity, choice or outcome creates a referent with a
   stable identity. A re-mention resolves to the existing referent and creates nothing.
 - Each mention has a grammatical role in its clause: subject, object or other (§4.2).
-- **Actors are not referents.** A Handoff makes its Actor the innermost for the Action it contains.
-  Pronouns, groups and counts never read an Actor; only the `actor` word at NounPhrase does.
+- **A Subject is a referent; an Actor is not.** The noun phrase of a clause's Subject (§4.2) is an
+  ordinary mention, which pronouns and demonstratives read like any other: "it" in "whenever a
+  creature dies, … it" reads the Subject's "a creature". The Actor is who performs an Action: in
+  an instruction, the controller of the text's spell or ability unless a Handoff names another;
+  in a clause, whoever performs its Action, whom its active Subject names. A Handoff makes its
+  Actor the innermost for the Action it contains. Pronouns, groups and counts never read an Actor;
+  only the `actor` word at NounPhrase does. The noun phrase that names an Actor, in a Subject or a
+  Handoff, is a mention like any other.
 - A disjunctive noun phrase exports only the referents common to every branch. A coordination bound
   to a parameter binds every member under the parameter's one Binding Identity.
 - A zone change keeps the referent and records the move on it: its origin, its new zone and the
@@ -90,7 +96,12 @@ spell or ability is put on the stack ([CR#601.2c,115.1]).
    accessible in the consequent and closed after it. A `doIf` with no else branch lets its branch's
    output, such as a token it creates, continue to later text, while its condition's referents
    close. With an else branch, branch-local non-targets are closed. An existential
-   ("there is …", `exists`) publishes its indefinite subject to the consequent.
+   ("there is …", `exists`) publishes its indefinite subject to the consequent. A conditional
+   Static Spec's consequent exports the plural domain of a bare plural or "all" it introduces
+   (`described(all, …)`) to the text after the conditional in its ability, as a negated or modal
+   box keeps its universal domains (item 3): *Guardian Beast*'s "This effect doesn't remove Auras
+   already attached to those artifacts" reads the "noncreature artifacts you control" of its "As
+   long as" sentence.
 3. **Negated or modal** (`cant`/`must`/`can`/`gatedBy`, `not`, an else branch). Hypothetical
    indefinite, counted and partitive participants are closed. Targets, definite references and
    universal domains stay accessible under their identities ([CR#101.2]).
@@ -231,13 +242,14 @@ passive matters only because it promotes the patient to grammatical subject. The
 read first, ahead of any agent, and that decides which occurrence of a parameter is its first
 mention ([`syl.md`](./syl.md) §4). A Subject is one of three:
 
-- `actor(np)`: active. `np` is read first and is the Actor.
+- `actor(np)`: active. `np` is read first, with role subject.
 - `any`: passive with no agent. The patient is promoted to subject.
 - `by(np)`: passive with an agent. The patient is promoted and read first, then `np` with role
   other.
 
-What an active Subject names need not be a player or a permanent: a spell or ability ("<ability>
-triggers") or an effect (`actor(thisEffect)`, §4.7) can be one.
+A Subject's noun phrase is a referent, not the Actor (§2.1). What an active Subject names need not
+be a player or a permanent: a spell or ability ("<ability> triggers") or an effect
+(`actor(thisEffect)`, §4.7) can be one.
 
 "Becomes blocked" is therefore not the agentless passive of `block`. It is its own event head,
 `becomeBlocked`: the Blocked status beginning, once per combat, even when an effect blocks the
