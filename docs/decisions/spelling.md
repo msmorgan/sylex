@@ -101,17 +101,17 @@ grammar's (§1).
 
 ### 3.1 Optional and list Holes
 
-**An optional part** is printed only when its parameter differs from the parameter's declared
-default. It may carry fixed words beside its Hole: Elvish Piper's "put a creature card from
-your hand onto the battlefield" prints "from $from", and a card that names no origin prints
-nothing there. Giant Growth's "Target creature gets +3/+3 until end of turn" and Glorious
-Anthem's "Creatures you control get +1/+1" are one Construction whose duration is present in
-the first and absent in the second.
+**An optional part** is printed only when the parameters that govern it are supplied, and
+omitted when they are absent (§7). It may carry fixed words beside its Hole: Elvish Piper's "put
+a creature card from your hand onto the battlefield" prints "from $from", and a card that names
+no origin prints nothing there. Giant Growth's "Target creature gets +3/+3 until end of turn"
+and Glorious Anthem's "Creatures you control get +1/+1" are one Construction whose duration is
+present in the first and absent in the second.
 
 **A list Hole** prints each element of a `List` argument and states how the elements join:
 coordinated, with the commas and the coordinator English uses (Angelic Skirmisher's "first
-strike, vigilance, or lifelink"), or juxtaposed, as riders and modifiers are. An empty list
-prints nothing.
+strike, vigilance, or lifelink"), or juxtaposed, as riders and modifiers are. An empty list has
+no wording: its Hole stands in an optional part, and the part is omitted.
 
 Why: without them a declaration needs a wording for every combination of its optional
 parameters, and `when` alone has four optional parameters and a list. Wordings that differ only
@@ -150,8 +150,9 @@ Three properties make the extension closed:
   what the host itself prints, or outside them. Aurochs prints "gets +1/+0 until end of turn
   for each other attacking Aurochs" and Ral's Staticaster "gets +1/+0 for each card in your
   hand until end of turn". Both Tails attach to one verb phrase, so the Category alone does not
-  tell them apart, and the two placements are two Templates (§4). The notation's form for the
-  placement is pending (§10).
+  tell them apart, and the two placements are two Templates (§4). The notation writes the
+  inside placement `<inner Category: …>` (§7); which Templates need it is the
+  `syl-tail-placement` ticket's to find.
 - **A Tail is read where it is printed.** Gaze of Adamaro "deals damage to target player equal
   to the number of cards in that player's hand": the amount is the declaration's first
   parameter, and its Tail mentions "that player" after the recipient introduced them. Read
@@ -300,8 +301,9 @@ The round trip over the analyzed Oracle text stays exact ([Architecture](archite
 ([English](english.md) §7). Spelling carries it between Reading and term, and each extension
 keeps it:
 
-- An optional part is printed exactly when its argument differs from the default, so the
-  argument decides the wording and the wording the argument.
+- An optional part is printed exactly when every parameter that governs it is supplied, and a
+  `spelling` whose skeleton is ambiguous fails to load (§7), so the arguments decide the
+  wording and the wording the arguments.
 - A list is spelled in its written order, which is the printed order.
 - A Tail has one position and one placement for a given Template, so two printed positions are
   two Templates.
@@ -321,70 +323,116 @@ representation yet.
 
 ## 7. The `spelling` notation
 
-A `spelling` is fixed words with three kinds of markup, each with one job. `$` marks a Hole,
-parentheses an optional part, and angle brackets a Tail.
+A `spelling` is fixed words with four kinds of markup, each with one job. `$` marks a Hole,
+`~` ties a Hole to letters, parentheses mark an optional part, and angle brackets a list's
+join or a Tail.
 
 ```
 spelling := part*
 part     := text | hole | optional | tail
-hole     := "$" name                    -- a parameter's argument
-          | "$<" name ">"               -- the same, where a word character follows
-          | "$" name "<" join ">"       -- a List parameter
+hole     := [affix "~"] "$" name ["~" affix]   -- a parameter's argument
+          | "$" name "<" join ">"              -- a List parameter
 join     := "" | "," | "and" | "or" | "and/or" | "then" | "$" name
 optional := "(" part+ ")"
-tail     := "<" Category ":" part+ ">"
-text     := any characters except "$", "(", ")", "<" and ">"
+tail     := "<" ["inner"] Category ":" part+ ">"
+affix    := letter+
+text     := any characters except "$", "~", "(", ")", "<" and ">"
 ```
 
 **A Hole is `$name`**, the sigil that reads the same parameter in `body`
-([`.syl`](syl.md) §2): "draw $amount cards", "$subject's controller", "non$p". A Hole printed
-again is written again, as in "$subject get $delta/$delta". Where a letter, digit or underscore
-follows the name, the name is delimited: "$<quality>walk", "$<n>th from the top of $loc". The
-formatter writes the undelimited form everywhere else.
+([`.syl`](syl.md) §2): "draw $amount cards", "$subject's controller". A Hole printed again is
+written again, and recovery requires the same term at each (§4).
+
+**A tie, `~`, joins a Hole and the letters beside it into one word**: "non~$p",
+"$quality~walk", "$n~th". The word is formed by the lexicon's morphology, never by putting
+the characters side by side: "non~$p" is "nonland" in Abrupt Decay and "non-Aura" in Absorbing
+Man, and "$n~th" is "third" in Bookwurm's "third from the top". A Hole that abuts a letter or
+digit with no tie fails to load, so a missing space is never read as a tie, and the affix is a
+bound form the lexicon declares.
 
 **A list Hole is `$name<join>`.** A `List` parameter must state its join and no other
 parameter may, so a list is visible at its Hole. The joins are a closed set: `<>` juxtaposes
 the elements; `<,>` separates them with commas and no coordinator; `<and>`, `<or>`, `<and/or>`
 and `<then>` coordinate them; and `<$name>` coordinates them with the coordinator a parameter
 of the declaration supplies. The commas of a coordination of three or more are the English
-layer's and are never written. A `<` directly after a Hole's name always opens a join, so a
-Tail that follows a Hole stands after a space.
+layer's and are never written. One element prints alone, with no join. An element whose own
+wording prints nothing in place, having only a Tail, takes no part in the join. A `<` directly
+after a Hole's name always opens a join, so a Tail that follows a Hole stands after a space.
 
-**An optional part is `( … )`.** It is printed exactly when the one defaulted parameter whose
-Hole stands directly in it differs from its declared default: "put $subject (from $from) onto
-the battlefield $riders<>", "$subject get $delta/$delta ($duration)". An optional part may
-hold another, as in "( … $a ( … $b ))", and each has its own parameter. A `spelling` fails to
-load when an optional part directly holds no Hole, the Hole of a parameter with no default, or
-the Holes of two parameters. Why: with exactly one governing parameter, the argument decides
-whether the part is printed and the printed part decides the argument, which is the round trip
-of §6 by construction.
+**An optional part is `( … )`.** A parameter is omissible when it has a declared default, or
+its sort is `Option(T)` or a list; its absent value is the default, else `none`, else the
+empty list. An optional part is governed by every parameter with a Hole directly in it, and
+each of those must be omissible. It is printed when every governor differs from its absent
+value and omitted when none does: "put $subject (from $from) onto the battlefield
+($riders<>)", "$subject gets $powerValue/$toughnessValue ($duration)". A term in which only
+some governors are supplied has no wording by that declaration. An optional part may hold
+another, which can print only when the outer one does. All the Holes of one parameter stand in
+one optional part, or all stand outside every one. An empty list is never printed by its Hole;
+it is spelled only as the absent value of an optional part.
 
-**A Tail is `<Category: …>`**, naming the Category of the enclosing phrase it attaches to
-(§3.2): "$per <VerbPhrase: for each $p>". The notation says nothing yet of where a Tail stands
-among that phrase's other adjuncts (§10).
+**A Tail is `<Category: …>` or `<inner Category: …>`** (§3.2): "$per <VerbPhrase: for each
+$p>". Its host is the smallest phrase of the named Category that contains the Hole the
+declaration's call fills; for a declaration that prints nothing in place, it is the smallest
+such phrase that ends where that Hole stands. Unmarked, the Tail is adjoined to the largest
+phrase of that Category with the same head, so it prints after the host's other adjuncts.
+Marked `inner`, it is adjoined to the host directly, and prints before them. Tails that land
+at one edge print in the order of their Holes, and an argument printed at two Holes prints its
+Tail once. A Tail stands last among the parts beside it and holds no Tail.
 
-**No escape exists, because none is needed.** None of `$`, `(`, `)`, `<` and `>` occurs in the
-analyzed Oracle text ([Lexicon](lexicon.md) §1). The first, fourth and fifth occur in no
+**No escape exists, because none is needed.** None of `$`, `~`, `(`, `)`, `<` and `>` occurs
+in the analyzed Oracle text ([Lexicon](lexicon.md) §1). `$`, `~`, `<` and `>` occur in no
 in-scope card's text at all, and every parenthesis is removed with reminder text: a
 parenthetical is reminder text even where it reminds the player of something other than a
 keyword's rule, as on Mistform Ultimus, and one inside an ability-word label has no rules
 meaning. Square brackets and braces are Oracle's own characters, for cleave and for symbols, and
 are never markup.
 
-**What the notation does not say is a Template.** It has no part chosen by an enum value and
-no omission governed by a value that is not a default. A wording that differs that way is a
-different wording, and gets its own Template (§4).
+**A `spelling` is refused at load** when it breaks a rule above, and also when:
 
-The declarations under `plugins/` still write a Hole `<name>`: 774 Holes on 592 `spelling`
-lines, four of which need the delimited form. The `syl-spelling-conventions` ticket migrates
-them.
+- **A parameter has no Hole and is not omissible.** A parameter with no Hole is fixed at its
+  absent value by that `spelling`, and a term that supplies another value has no wording by it.
+- **An optional part directly holds no Hole.** Fixed words alone recover no argument.
+- **Nothing is certain to print.** Outside every optional part there is text, a Hole or a
+  Tail.
+- **A variant is not English.** Every variant, which is each consistent choice of optional
+  parts with each list Hole at one, two and three elements, must parse under the English
+  grammar at a Category its result sort is spelled as, each Hole standing for a phrase of any
+  Category that its own sort's Constructions spell, with the features agreement will fix left
+  unmarked. A sort is not one Category: a `Predicate` is a noun in "creature", an adjective in
+  "tapped", a preposition phrase in "with flying" and a relative clause in "you control". A
+  `spelling` that parses in several ways is several Constructions.
+- **Its skeleton is ambiguous.** Replace each Hole by its parameter's sort, counting two sorts
+  as one when a coercion or `Option` takes one to the other, each optional part by an optional,
+  and each list Hole by one or more of its sort with its join between. The result is a regular
+  expression over words and sorts, and no sequence may match it in two ways. Two optional
+  parts that each hold only a bare Hole of one sort are the case it catches, since one printed
+  phrase would recover as either argument. No `spelling` under `plugins/` is refused by it
+  today; `durationBetween`, whose `start` and `end` are both `Option(GameEvent)`, is a
+  declaration that needs a fixed word beside each to pass.
+- **A lone list would word as its element.** Where the `spelling` outside optional parts is one
+  list Hole and an element can stand at the result sort, a list of one words exactly as its
+  element, so that declaration spells lists of two or more only.
 
-A wording is written the way the grammar will read it, so each `spelling` is checked by parsing
-it with the English grammar, each Hole standing for a phrase of any Category that its sort's
-Constructions spell, with the features agreement will fix left unmarked. A sort is not one
-Category: a `Predicate` is a noun in "creature", an adjective in "tapped", a preposition phrase
-in "with flying" and a relative clause in "you control". A `spelling` no Reading covers fails
-to load.
+Why the skeleton rule: it is the round trip of §6 as one check, in place of a rule on each
+construct. It is a check on the `spelling` alone. Two sorts whose wordings overlap can still
+give recovery two candidates, and meaning chooses between those (§5).
+
+**What the notation does not say is a Template, or a change to the declaration.** It has no
+part chosen by an enum value and no omission governed by a value that is not absent. A wording
+that differs that way is a different wording, and gets its own Template (§4). Three more
+things are known limits:
+
+- **Coordinating whichever optional pieces are present.** Akul the Unrepentant prints "Activate
+  only as a sorcery and only once each turn": "Activate" is printed if either restriction is
+  there and "and" only if both are, and an optional part is all or none. One list of
+  restrictions with an `<and>` join says it; separate optional parameters do not.
+- **A word for an absent value.** Angelic Aberration's "4/4 colorless Eldrazi Angel creature
+  tokens" prints a word for an empty list of colors.
+- **A Tail between two of its host's adjuncts.** Only the two placements exist.
+
+The declarations under `plugins/` still write a Hole `<name>`: 776 Holes on 593 `spelling`
+lines, five of which need a tie (`landwalk`, `typecycling`, `non` and the two "$n~th from …"
+wordings). The `syl-spelling-conventions` ticket migrates them.
 
 ## 8. Capacity and cost
 
@@ -433,6 +481,4 @@ all, because no spelling crate exists. This section separates the two.
 
 ## 10. Open
 
-The notation of §7 has no form yet for two things this document requires: a Tail's placement
-among its phrase's other adjuncts (§3.2), and the placeholder a coordination's arms hold
-(§3.3).
+The notation of §7 has no form yet for the placeholder a coordination's arms hold (§3.3).

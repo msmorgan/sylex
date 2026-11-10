@@ -16,7 +16,7 @@ Two narrower tickets rewrite spellings this ticket also normalizes, and land fir
 
 ## Design
 
-The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `$xs<join>` lists,
+The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `~` ties, `$xs<join>` lists,
 `( … )` optional parts, `<Category: …>` Tails); where this ticket's text differs, §7 governs. This
 ticket's corpus rewrite migrates every `<name>` Hole to `$name`.
 
@@ -38,8 +38,8 @@ ticket's corpus rewrite migrates every `<name>` Hole to `$name`.
 
 - `docs/decisions/spelling.md` §1 states the inflection rule and §7 the notation, which
   `docs/decisions/syl.md` §2 points at, and the glossary has a **Hole** entry.
-- Every `<name>` Hole under `plugins/` is written `$name`, or `$<name>` where a word character
-  follows it.
+- Every `<name>` Hole under `plugins/` is written `$name`, with a `~` tie where letters abut
+  it.
 - In separate corpus commits: every spelling follows the three inflection cases, and every
   `TODO(spelling)` whose wording needs no optional or repeated segment is resolved, either written
   or replaced by the specific missing wording.
