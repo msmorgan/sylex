@@ -1,5 +1,5 @@
-# Spell Swindle: "Counter target spell. If that spell is countered this way, create X Treasure
-# tokens, where X is that spell's mana value." [CR#608.2h]
+# Spell Swindle: "Counter target spell. Create X Treasure tokens, where X is that spell's mana
+# value." The countered spell's mana value is its last known information [CR#608.2h].
 card singleFaced({
     name = "Spell Swindle",
     cost = [generic(3), pip(blue), pip(blue)],
@@ -8,8 +8,5 @@ card singleFaced({
       spell(
         sequentially([
             counter(target(isSpell)),
-            doIf(
-              did(any, counter(that(spell)), thisWay),
-              sequentially([
-                  create(letter(x), written(treasureToken)),
-                  define(x, statOf(stat(manaValue), that(spell)))]))]))]})
+            create(letter(x), written(treasureToken)),
+            define(x, statOf(stat(manaValue), that(spell)))]))]})
