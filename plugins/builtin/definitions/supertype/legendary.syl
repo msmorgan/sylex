@@ -3,7 +3,8 @@
 # [CR#205.4e] "Any instant or sorcery spell with the supertype "legendary" is subject to a casting
 # restriction. A player can't cast a legendary instant or sorcery spell unless that player
 # controls a legendary creature or a legendary planeswalker." Per holder: while it is an instant
-# or sorcery, each player can't cast it unless that player controls one.
+# or sorcery, each player can't cast it unless that player controls one. The `onlyUnless`
+# condition reads the Actor of the prohibition it qualifies, the player who would cast it.
 #
 # [CR#205.4d] The legend rule a legendary permanent is subject to is its own row, `legendRule`,
 # since card text names it.
@@ -20,7 +21,7 @@ supertype legendary {
           exists(
             and([
                 or([
-                    and([hasSupertype(legendary), isCreature]),
-                    and([hasSupertype(legendary), isPlaneswalker])]),
-                controlledBy(that(player))])))))]
+                    and([hasSupertype(legendary), isCreature, isPermanent]),
+                    and([hasSupertype(legendary), isPlaneswalker, isPermanent])]),
+                actorControls])))))]
 }
