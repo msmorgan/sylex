@@ -68,8 +68,8 @@ A discourse scope (top level, conditional, negated or modal, distributive, relat
 decides which Referents later text can reach.
 
 **Reference Scope**:
-The Referents a reference can reach. A Definition body has its own, seeing only its arguments
-and the current Actor.
+The Referents a reference can reach. A Definition body has its own, seeing only its arguments;
+`actor` reads the current Actor.
 
 **Binding Identity**:
 The identity a Referent is bound under, fixed at its first mention; later mentions resolve to it
@@ -112,9 +112,9 @@ What an Action is done to. It stays inside the Action; the Subject supplies only
 
 **Actor**:
 Who or what performs an Action. In an instruction, the controller of the text's spell or ability
-([CR#109.5]), unless a Handoff names another; in a clause, whoever performs its Action, whom its
-active Subject names. It is no Referent: only the `actor` noun-phrase word reads it, never a
-pronoun or demonstrative.
+([CR#109.5]), unless a Handoff names another; in a clause, what its active Subject or its `by`
+agent names. It is a role that only the `actor` noun-phrase word reads, not a Referent; the noun
+phrase naming it is an ordinary Referent.
 
 **Handoff**:
 `instruct(subject, action)`: an Action making a named Player or Permanent the Actor of the

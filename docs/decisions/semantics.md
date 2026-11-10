@@ -66,12 +66,12 @@ stacks cannot supply these, because a binding's position shifts as others are pu
 - Each mention has a grammatical role in its clause: subject, object or other (§4.2).
 - **A Subject is a referent; an Actor is not.** The noun phrase of a clause's Subject (§4.2) is an
   ordinary mention, which pronouns and demonstratives read like any other: "it" in "whenever a
-  creature dies, … it" reads the Subject's "a creature". The Actor is who performs an Action: in
-  an instruction, the controller of the text's spell or ability unless a Handoff names another;
-  in a clause, whoever performs its Action, whom its active Subject names. A Handoff makes its
-  Actor the innermost for the Action it contains. Pronouns, groups and counts never read an Actor;
-  only the `actor` word at NounPhrase does. The noun phrase that names an Actor, in a Subject or a
-  Handoff, is a mention like any other.
+  creature dies, … it" reads the Subject's "a creature". The Actor is the performer of an Action:
+  in an instruction, the controller of the text's spell or ability unless a Handoff names another;
+  in a clause, what its active Subject or its `by` agent names. A Handoff makes its Actor the
+  innermost for the Action it contains. The Actor is a role that only the `actor` word at
+  NounPhrase reads, not a discourse referent; pronouns, groups and counts never read it. The noun
+  phrase naming it, in a Subject, an agent or a Handoff, is an ordinary referent.
 - A disjunctive noun phrase exports only the referents common to every branch. A coordination bound
   to a parameter binds every member under the parameter's one Binding Identity.
 - A zone change keeps the referent and records the move on it: its origin, its new zone and the
@@ -122,8 +122,8 @@ A Definition body runs in its own Reference Scope. Why: the rules define a keywo
 of the sentence that uses it. So a pronoun inside the body must not find the caller's referents,
 and the body's own scratch referents must not leak out to the caller's pronouns.
 
-- The caller's referents are hidden from it, except its arguments and the innermost Actor. A
-  referent hidden by an enclosing Definition stays hidden.
+- The caller's referents are hidden from it, except its arguments; the `actor` word still reads
+  the innermost Actor. A referent hidden by an enclosing Definition stays hidden.
 - Each argument is read in the caller's scope and bound to the Definition's Binding Identity at its
   first mention.
 - On exit, the body's changes to its arguments and its outcomes are exported to the caller. Its
@@ -247,7 +247,8 @@ mention ([`syl.md`](./syl.md) §4). A Subject is one of three:
 - `by(np)`: passive with an agent. The patient is promoted and read first, then `np` with role
   other.
 
-A Subject's noun phrase is a referent, not the Actor (§2.1). What an active Subject names need not
+The noun phrase of `actor(np)` or `by(np)` names the Actor and is an ordinary referent, not the
+Actor itself (§2.1). What an active Subject names need not
 be a player or a permanent: a spell or ability ("<ability> triggers") or an effect
 (`actor(thisEffect)`, §4.7) can be one.
 
