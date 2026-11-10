@@ -6,7 +6,10 @@
 # and the rest are put into their owners' graveyards together, as one event [CR#704.3]. Two
 # permanents have the same name if they have at least one name in common, and one with no name
 # shares none [CR#201.2a], so a legendary permanent that shares its name with no other is in no
-# group and is not chosen.
+# group and is not chosen. A permanent with two names is in two groups, so with two fully unlocked
+# copies of one Room under *Leyline of Singularity* [CR#709.5] a player can choose a different
+# copy for each name, leaving neither unchosen, where [CR#704.5j] keeps one
+# (`syl-legend-rule-multiname-groups`).
 sba legendRule {
   lexical = {lemma = "legend rule"},
   spelling = "legend rule",
