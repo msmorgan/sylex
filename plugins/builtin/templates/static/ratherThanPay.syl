@@ -1,0 +1,6 @@
+# "Rather than pay <subject>'s mana cost, you may <cost>": `altCost` with its subject printed first,
+# as *Invigorate* prints it [CR#118.9].
+# TODO(spelling): Spell `payingInstead(<cost>)` here as "<cost>".
+template ratherThanPay(subject: NounPhrase, cost: AltCost): StaticSpec {
+  body = altCost($cost, $subject)
+}
