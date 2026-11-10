@@ -1,0 +1,4 @@
+# A static whose spec applies at any moment its condition holds [CR#611.3a]. The printed word
+# ("if", "as long as", "unless") and the clause order are the calling Template's, so two Templates
+# may expand to the same tree.
+primitive conditionally(spec: StaticSpec, condition: Condition): StaticSpec = Conditionally

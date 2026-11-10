@@ -1,5 +1,5 @@
 # "If <condition>, <spec>"
 template if(condition: Condition, spec: StaticSpec): StaticSpec {
   spelling = "If <condition>, <spec>",
-  body = conditional($spec, $condition, ifSo)
+  body = conditionally($spec, $condition)
 }
