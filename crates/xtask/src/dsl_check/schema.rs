@@ -142,13 +142,11 @@ pub const KINDS: &[Kind] = &[
         ..kind(
             "template",
             "",
-            &[
-                FieldSpec {
-                    name: "body",
-                    sort: None,
-                    required: true,
-                },
-            ],
+            &[FieldSpec {
+                name: "body",
+                sort: None,
+                required: true,
+            }],
         )
     },
     Kind {
