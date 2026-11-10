@@ -6,12 +6,14 @@ needs: [syl-argument-naming, syl-single-face-card-call]
 
 ## Why
 
-Three declarations are named or spelled for one use rather than for what they build:
+Four declarations are named or spelled for one use, or read poorly for what they build:
 
 - `modifiesPrecedingAction` (`primitives/timing/`) is a `Duration` spelled "It can't be
   regenerated", though it is any rider that modifies the action before it [CR#608.2c].
 - `thisObject` at `LookbackSpan` (`primitives/timing/`) is spelled "spells you cast".
 - `splitOverPermanent` (`templates/pronoun/`) is spelled "any target".
+- `under` (`primitives/zone/`), the move rider spelled "under <controller>'s control", reads
+  as `under(you)`; it is renamed `underControlOf` (16 files call it).
 
 `syl-argument-naming` rewrites 4 arguments that hold these declarations' calls, and lands first.
 
