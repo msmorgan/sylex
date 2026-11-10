@@ -1,5 +1,5 @@
 # "As long as <condition>, <spec>"
-template conditionFirstWhile(condition: Condition, spec: StaticSpec): StaticSpec {
+template asLongAs(condition: Condition, spec: StaticSpec): StaticSpec {
   spelling = "As long as <condition>, <spec>",
   body = conditional($spec, $condition, asLongAs)
 }

@@ -12,7 +12,7 @@ card singleFaced({
       flying,
       when(does(actor(thisCreature), enter), gainDesignation(you, monarch)),
       static(
-        conditionFirstWhile(
+        asLongAs(
           is(you, hasDesignation(monarch)),
           cant(
             actor(you),

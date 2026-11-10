@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       defender,
       static(
-        conditionFirstWhile(
+        asLongAs(
           exists(and([isCreature, youControl, hasPower(atLeast, 4)])),
           can(
             actor(thisCreature),

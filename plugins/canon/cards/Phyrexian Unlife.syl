@@ -11,7 +11,7 @@ card singleFaced({
     text = [
       static(cant(actor(you), loseGame(nonpositiveLife))),
       static(
-        conditionFirstWhile(
+        asLongAs(
           compareAmt(lifeTotalOf(you), atMost, 0),
           asThough(
             by(a(isSource)),

@@ -5,7 +5,7 @@ ability splitSecond {
   spelling = "split second",
   body = [
     static(
-      conditionFirstWhile(
+      asLongAs(
         is(thisSpell, in(stack)),
         conjunction([
             cant(actor(bare(isPlayer)), cast(bare(anotherSpell))),

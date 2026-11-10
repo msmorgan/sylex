@@ -15,8 +15,5 @@ ability dash(cost: Cost) {
         doIf(
           keywordCostPaid(dash, thisSpell),
           atNext(beginningOfNext(endStep), returnToHand(becomes(thisSpell)))))),
-    static(
-      conditionFirstWhile(
-        keywordCostPaid(dash, thisPermanent),
-        abilityGrant(thisPermanent, haste)))]
+    static(asLongAs(keywordCostPaid(dash, thisPermanent), abilityGrant(thisPermanent, haste)))]
 }

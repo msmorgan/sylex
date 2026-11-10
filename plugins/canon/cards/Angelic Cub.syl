@@ -15,7 +15,7 @@ card singleFaced({
           turn),
         putCounters(1, printedKind(p1p1Counter), it)),
       static(
-        conditionFirstWhile(
+        asLongAs(
           compareAmt(countersOn(p1p1Counter, thisCreature), atLeast, 3),
           abilityGrant(it, flying)))],
     power = 1,

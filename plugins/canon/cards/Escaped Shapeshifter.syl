@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       alsoForKeywords(
         static(
-          conditionFirstWhile(
+          asLongAs(
             exists(
               and([
                   isCreature,

@@ -5,7 +5,7 @@ ability infinity(ability: Ability) {
   spelling = "∞ — <ability>",
   body = [
     static(
-      conditionFirstWhile(
+      asLongAs(
         is(thisPermanent, hasDesignation(harnessed)),
         abilityGrant(thisPermanent, $ability)))]
 }

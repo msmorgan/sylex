@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(visibility(reveal, you, topOfLibrary)),
       static(
-        conditionFirstWhile(
+        asLongAs(
           is(topSlice(1), or([isArtifact, isCreature])),
           abilityGrantFrom(thisCreature, topSlice(1), [anyActivated])))],
     power = 1,

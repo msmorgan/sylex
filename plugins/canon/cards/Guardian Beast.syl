@@ -8,7 +8,7 @@ card singleFaced({
     text = [
       static(
         conjunction([
-            conditionFirstWhile(
+            asLongAs(
               is(thisCreature, isUntapped),
               conjunction([
                   cant(any, attachTo(a(hasSubtype(aura)), them)),

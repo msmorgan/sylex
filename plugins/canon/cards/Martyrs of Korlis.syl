@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [human],
     text = [
       static(
-        conditionFirstWhile(
+        asLongAs(
           is(thisCreature, isUntapped),
           replace(
             would(by(allOf(isArtifact)), dealDamage(recipient = you)),

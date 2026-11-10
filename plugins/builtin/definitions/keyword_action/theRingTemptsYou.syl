@@ -25,7 +25,7 @@ action theRingTemptsYou {
                           powerOf(a(and([hasDesignation(ringBearer), youControl]))))]))),
                 block(allOf(and([hasDesignation(ringBearer), youControl]))))),
             static(
-              conditionFirstWhile(
+              asLongAs(
                 compareAmt(
                   eventCount(
                     ownScope(
@@ -43,7 +43,7 @@ action theRingTemptsYou {
                     does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
                     sequentially([draw(1), discard(a(cardIn(hand)))]))))),
             static(
-              conditionFirstWhile(
+              asLongAs(
                 compareAmt(
                   eventCount(
                     ownScope(
@@ -63,7 +63,7 @@ action theRingTemptsYou {
                       block(a(and([hasDesignation(ringBearer), youControl])))),
                     atNext(endOfCombat, controllerSacrifices(that(creature))))))),
             static(
-              conditionFirstWhile(
+              asLongAs(
                 compareAmt(
                   eventCount(
                     ownScope(

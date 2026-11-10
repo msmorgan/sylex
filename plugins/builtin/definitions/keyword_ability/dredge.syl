@@ -6,7 +6,7 @@ ability dredge(amount: Amount) {
   spelling = "dredge <amount>",
   body = [
     static(
-      conditionFirstWhile(
+      asLongAs(
         compareAmt(countOf(cardIn(yourLibrary)), atLeast, $amount),
         replace(
           would(actor(you), draw(1)),

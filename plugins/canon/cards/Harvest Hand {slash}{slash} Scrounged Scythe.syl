@@ -14,7 +14,7 @@ card transforming(
     text = [
       static(getsPt(equipped(creature), up(1), up(1))),
       static(
-        conditionFirstWhile(
+        asLongAs(
           is(equipped(creature), hasSubtype(human)),
           abilityGrant(equipped(creature), menace))),
       equip(mana([generic(2)]))]})

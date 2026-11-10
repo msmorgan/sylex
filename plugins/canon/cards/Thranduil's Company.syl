@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [elf, soldier],
     text = [
       static(
-        conditionFirstWhile(
+        asLongAs(
           exists(and([and([isCreature, isOther]), hasSubtype(elf), youControl])),
           can(actor(you), play(counted(additional(exactly(1)), isLand))))),
       landfall(

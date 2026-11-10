@@ -15,7 +15,7 @@ ability impending(amount: Amount, cost: Cost) {
           keywordCostPaid(impending, thisPermanent),
           withRiders([withCounters($amount, printedKind(timeCounter), fresh)])))),
     static(
-      conditionFirstWhile(
+      asLongAs(
         and(
           [keywordCostPaid(impending, thisPermanent), is(thisPermanent, hasCounter(timeCounter))]),
         characteristicChange(thisPermanent, [typeLine(loses, {types = [creature]})]))),

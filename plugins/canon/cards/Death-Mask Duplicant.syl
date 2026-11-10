@@ -7,7 +7,7 @@ card singleFaced({
       imprint(activated(mana([generic(1)]), exile(target(and([isCreature, in(yourGraveyard)]))))),
       alsoForKeywords(
         static(
-          conditionFirstWhile(
+          asLongAs(
             exists(and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
             keywordGrant(
               thisCreature,

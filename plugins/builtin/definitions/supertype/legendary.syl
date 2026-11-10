@@ -4,7 +4,9 @@
 # restriction. A player can't cast a legendary instant or sorcery spell unless that player
 # controls a legendary creature or a legendary planeswalker." Per holder: while it is an instant
 # or sorcery, each player can't cast it unless that player controls one. The `onlyUnless`
-# condition reads the Actor of the prohibition it qualifies, the player who would cast it.
+# condition reads the Actor of the prohibition it qualifies, the player who would cast it. Its
+# "that player" reads no Subject: "each player" leaves the `cant` only as its plural domain, which
+# a singular anaphor cannot read (`docs/decisions/semantics.md` §2.2, §2.4).
 #
 # [CR#205.4d] The legend rule a legendary permanent is subject to is its own row, `legendRule`,
 # since card text names it.
@@ -14,7 +16,7 @@ supertype legendary {
   name = "Legendary",
   confers = [
     property(
-      conditionFirstWhile(
+      asLongAs(
         is(this, isInstantOrSorcery),
         onlyUnless(
           cant(actor(eachPlayer), cast(this)),
