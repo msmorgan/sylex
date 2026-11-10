@@ -613,7 +613,7 @@ fn a_keyword_label_primitive_builds_only_its_own_name() {
     );
 }
 
-const RING: &str ="primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope\n\
+const RING: &str = "primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope\n\
                     primitive nothing: Action = Nothing\n\
                     action theRingTemptsYou { body = ownScope(theRingTemptsYou, nothing) }";
 
