@@ -24,9 +24,9 @@ deathtouch-lethal assignment rule yet. In order of difficulty:
 ## Done when
 
 - Each moved keyword is a Definition whose body states its rule, and its label primitive and
-  Template, or its empty body, are gone. For first and double strike, the engine's special case (`any_first_or_double_striker` and
-  the skipped first-strike damage step) is gone; trample and banding are enforced through their
-  Definitions, not a new engine special case.
+  Template, or its empty body, are gone. For first and double strike, the engine's special case
+  (`any_first_or_double_striker` and the skipped first-strike damage step) is gone; trample and
+  banding are enforced through their Definitions, not a new engine special case.
 - The existing combat tests pass unchanged.
 
 ## Pointers

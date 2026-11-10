@@ -21,8 +21,8 @@ to it only by a `label` string naming that keyword: `devourQuality` (devour [CR#
 morph cost or a multikicker cost a kicker cost [CR#702.37b,702.33c], and nothing checks that it
 names a keyword.
 
-A narrower ticket edits the same declarations first: `syl-bodiless-keywords` (the seven
-partner-ability files' doc comments and `lexical`).
+A narrower ticket edits the same declarations first: `syl-bodiless-keywords` (the doc comments
+of the seven partner-ability files).
 
 Written against the surface (`cleanup-step6-surface`).
 

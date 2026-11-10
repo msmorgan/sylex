@@ -26,10 +26,11 @@ Written against the start of step 6 (`syl-single-face-card-call`).
   `primitiveKeyword(keyword: KeywordLabel, quality: Option(Predicate) = none)`; and one Template
   per keyword at `Ability`, carrying its `spelling`, whose body is `primitiveKeyword(<label>)`.
   Callers name the keyword bare at both sorts, as before.
-- Banding and "bands with other" keep two labels, because a card can lose one and keep the other:
-  *Shelkin Brownie*'s target loses all "bands with other" abilities and keeps banding, and a
-  creature with "bands with other" counts as one without banding [CR#702.22c]. Both build the one
-  wrapper; "bands with other <quality>" passes its quality as the wrapper's optional argument.
+- Banding and "bands with other" have two labels, `banding` and `bandsWithOther`, because a
+  `KeywordFamily` (fields `word` and `sort`) cannot select only the instances of one label that
+  carry a quality, which *Shelkin Brownie* needs: its target loses all "bands with other"
+  abilities and keeps banding. Both build the one wrapper; "bands with other <quality>" passes its
+  quality as the wrapper's optional argument.
 - A primitive at `KeywordLabel` builds only the constructor that capitalizes its own name and
   takes no parameters; every other `KeywordLabel` constructor stays reserved to `ability`
   declarations.
@@ -49,8 +50,9 @@ Written against the start of step 6 (`syl-single-face-card-call`).
 - `docs/decisions/semantics.md` §3 states the exception: a Primitive Keyword Ability is a
   primitive, not a Definition.
 - Each partner ability's doc comment states why its body is empty.
-- Every other keyword with an empty body is read by a named declaration; the landing lists each
-  keyword with its reader.
+- Every other keyword with an empty body is read by a named declaration, modifies deck
+  construction as the partner abilities do, or is unfinished with its ticket named in Not in
+  scope; the landing lists each keyword with its reader or ticket.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 

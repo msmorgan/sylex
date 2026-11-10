@@ -78,7 +78,9 @@ location is not stated by the declaration, and it can disagree with what the dec
   own name, so where one stands, the AST is named, and nowhere else is.
 - **One block per declaration** holds three layers: `lexical`, `spelling` and the meaning (`body`,
   `confers`, `rules`). Why: a word's frames, spelling and meaning are one fact, so they have one
-  source. Keyword `parameters` are spelling frames and live in `lexical`.
+  source. Keyword `parameters` are spelling frames and live in `lexical`. A Primitive Keyword
+  Ability is the exception: its `lexical` is on its label primitive at `KeywordLabel`, and its
+  `spelling` and meaning (`primitiveKeyword(<label>)`) are on its Template at `Ability` (§3).
 - **Citations live in comments.** There is no `rule` field; `cargo xtask cite` checks the comments.
 - **Paths are for people.** Folder and file names never carry meaning.
 
