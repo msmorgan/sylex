@@ -14,11 +14,18 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 
 Written against the spine (`cleanup-step6-spine`).
 
+## Design
+
+- NounPhrase-level `coord(and, …)` is kept wherever a card coordinates noun phrases: the plural
+  group referent comes from it, as in "Untap target creature and each other creature that shares
+  a color with it. Those creatures get +2/+0 until end of turn." (*Rally the Righteous*).
+
 ## Done when
 
 - For each of the four, the landing names its forms, and one model remains, the others deleted or
   made Templates over it, with every caller in `plugins/` updated; a form kept separate states why
   in its doc comment.
+- Every card that coordinates noun phrases still writes NounPhrase-level `coord(and, …)` there.
 - Declaration order stays the printed order (`syl.md` §5).
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.

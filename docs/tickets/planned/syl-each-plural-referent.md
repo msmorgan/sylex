@@ -14,16 +14,22 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 
 Written against the spine (`cleanup-step6-spine`).
 
-## Open questions
+## Design
 
-- Whether "each" introduces a plural referent, a distributive one read once per member, or stays
-  singular with the patch moved to one place; and what that means for the verbs that patch it
-  today.
+- "Each" is distributive. Inside its nuclear scope its referent is singular: "Each creature deals
+  damage to itself equal to its power" (*Wave of Reckoning*), and "their" in "on each of their
+  turns" (*Rites of Flourishing*) is singular.
+- On leaving that scope, its domain and the indefinites introduced inside it are exported as
+  plural: "Destroy each creature with mana value 3 or less. They can't be regenerated."
+  (*Consume the Meek*); "Each player puts a vow counter on a creature they control … Each of
+  those creatures …" (*Promise of Loyalty*).
 
 ## Done when
 
-- "Each" is modeled as settled, the verbs' patches are gone, and every caller in `plugins/` reads
-  as settled; the landing lists the verbs changed.
+- "Each" is modeled as the Design states, the verbs' patches are gone, and every caller in
+  `plugins/` is written to match; the landing lists the verbs changed.
+- Which referent each anaphor resolves to is not checkable until reference resolution exists in
+  step 8; the landing shows the readings of the cards above for the owner to review.
 - `docs/decisions/semantics.md` states the rule.
 - Declaration order stays the printed order (`syl.md` §5).
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
