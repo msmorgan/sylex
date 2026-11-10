@@ -7,8 +7,8 @@ needs: [cleanup-step6-spine, syl-lean-doc-comments]
 ## Why
 
 `plugins/builtin/definitions/keyword_action/` holds 89 files, filed as keyword actions, but the
-CR's keyword actions are the ones it lists [CR#701.2..701.71], and resolve is not among them:
-resolving is the core procedure [CR#608.1]. `resolve.syl` is a core-rules Deed filed as a
+CR's keyword actions are the ones the CR lists [CR#701.1], and resolve is not among them:
+resolving is the core procedure [CR#608]. `resolve.syl` is a core-rules Deed filed as a
 keyword action, so the folder tells a reader something false about it.
 
 `syl-lean-doc-comments` rewrites `resolve.syl`'s doc comment, and lands first so the file is
@@ -20,7 +20,7 @@ edited before it moves.
 
 ## Done when
 
-- Every file in `keyword_action/` is checked against the [CR#701] list, and the landing lists
+- Every file in `keyword_action/` is checked against that list, and the landing lists
   each file that is not a keyword action, its variant or its event.
 - `resolve.syl`, and any other core-rules Deed found, moves to its own folder; the landing lists
   the files moved.
