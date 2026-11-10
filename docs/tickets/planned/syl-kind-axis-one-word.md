@@ -34,7 +34,8 @@ required `scope` has one value, `basicOnly`, so a `KindAxis` subtype is always a
 
 - `doForEachKind` takes its characteristic once, and every call is updated.
 - No characteristic has two words: a card's name is one word wherever an axis or sort names it.
-- No parameter has a sort with a single value.
+- `KindAxis.subtype` has no `scope` parameter whose sort has one value (`SubtypeScope`'s
+  `basicOnly`).
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 

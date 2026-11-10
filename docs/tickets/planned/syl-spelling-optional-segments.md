@@ -12,7 +12,7 @@ claimed; `putInto`'s "Omit the origin phrase when from is anywhere" is typical).
 wordings that differ only by such a part become near-duplicate Template families: `enters…`,
 `activatedOnly…`, `prevent…`, `defines…`.
 
-`syl-at-turn-point`, which lands first, settles `at`'s base spelling "At <point>, <action>"; `at.syl`'s remaining `TODO(spelling)`, for its limit, if and joins clauses, is this ticket's.
+`syl-at-turn-point`, which lands first, settles `at`'s base spelling "At $point, $action"; `at.syl`'s remaining `TODO(spelling)`, for its limit, if and joins clauses, is this ticket's.
 
 Written against the spine (`cleanup-step6-spine`).
 

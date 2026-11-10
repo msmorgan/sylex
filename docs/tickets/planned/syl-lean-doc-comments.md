@@ -21,10 +21,10 @@ Many doc comments under `plugins/` still speak Lean:
   use `firstMention` / `laterMention`, which `.syl` cannot write; expansion decides first mentions
   (`syl.md` §4).
 
-- Repeated citations: 206 comment lines are a bare citation that repeats only rules the same
-  comment already cites, as `templates/turn_point/endOfCombat.syl`'s `# [CR#511.2]` under
-  "abilities that trigger "at end of combat" trigger as the end of combat step begins
-  [CR#511.2]".
+- Repeated citations: of the 334 comment lines that are only a citation, 229 cite only rules
+  that other lines of the same comment block already cite, as
+  `templates/turn_point/endOfCombat.syl`'s `# [CR#511.2]` under "abilities that trigger "at end
+  of combat" trigger as the end of combat step begins [CR#511.2]".
 
 A reader is pointed at names and syntax that exist in no current source.
 
