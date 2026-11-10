@@ -6,8 +6,8 @@ card singleFaced({
     text = [
       enchant(isCreature),
       static(
-        retention(
-          abilityGrant(
-            enchanted(creature),
-            protection(eachKind(color, allOf(and([isPermanent, youControl]))))),
-          thisAura))]})
+        conjunction([
+            abilityGrant(
+              enchanted(creature),
+              protection(eachKind(color, allOf(and([isPermanent, youControl]))))),
+            doesnt(actor(thisEffect), remove(thisAura))]))]})

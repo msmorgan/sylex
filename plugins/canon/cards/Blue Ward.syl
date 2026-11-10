@@ -5,4 +5,7 @@ card singleFaced({
     subtypes = [aura],
     text = [
       enchant(isCreature),
-      static(retention(abilityGrant(enchanted(creature), protection(hasColor(blue))), thisAura))]})
+      static(
+        conjunction([
+            abilityGrant(enchanted(creature), protection(hasColor(blue))),
+            doesnt(actor(thisEffect), remove(thisAura))]))]})

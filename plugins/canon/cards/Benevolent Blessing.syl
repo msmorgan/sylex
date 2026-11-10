@@ -1,3 +1,6 @@
+# Fragment: "already" in "Auras and Equipment you control that are already attached to it", those
+# attached when the protection starts to apply [CR#702.16p], is missing until
+# `syl-already-attached`.
 card singleFaced({
     name = "Benevolent Blessing",
     cost = [generic(1), pip(white)],
@@ -8,7 +11,13 @@ card singleFaced({
       enchant(isCreature),
       static(entersChoosing(thisAura, color)),
       static(
-        retention(
-          abilityGrant(enchanted(creature), protection(ofChosen(color))),
-          allOf(
-            and([or([hasSubtype(aura), hasSubtype(equipment)]), youControl, attachedTo(it)]))))]})
+        conjunction([
+            abilityGrant(enchanted(creature), protection(ofChosen(color))),
+            doesnt(
+              actor(thisEffect),
+              remove(
+                bare(
+                  and([
+                      or([hasSubtype(aura), hasSubtype(equipment)]),
+                      youControl,
+                      attachedTo(it)]))))]))]})

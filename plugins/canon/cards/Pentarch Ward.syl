@@ -7,4 +7,7 @@ card singleFaced({
       enchant(isCreature),
       static(entersChoosing(thisAura, color)),
       when(does(actor(thisAura), enter), draw(lit(1))),
-      static(retention(abilityGrant(enchanted(creature), protection(ofChosen(color))), thisAura))]})
+      static(
+        conjunction([
+            abilityGrant(enchanted(creature), protection(ofChosen(color))),
+            doesnt(actor(thisEffect), remove(thisAura))]))]})

@@ -7,8 +7,8 @@ card singleFaced({
       enchant(isCreature),
       static(
         conjunction([
-            getsPt(enchanted(creature), up(lit(2)), up(lit(2))),
-            retention(
-              abilityGrant(enchanted(creature), protection(eachKind(color))),
-              allOf(hasSubtype(aura)))],
-          subject = enchanted(creature)))]})
+            conjunction([
+                getsPt(enchanted(creature), up(lit(2)), up(lit(2))),
+                abilityGrant(enchanted(creature), protection(eachKind(color)))],
+              subject = enchanted(creature)),
+            doesnt(actor(thisEffect), remove(bare(hasSubtype(aura))))]))]})

@@ -7,7 +7,9 @@ card singleFaced({
       enchant(isCreature),
       static(
         conjunction([
-            getsPt(enchanted(creature), up(lit(1)), up(lit(1))),
-            retention(abilityGrant(enchanted(creature), protection(isEnchantment)), thisAura)],
-          subject = enchanted(creature))),
+            conjunction([
+                getsPt(enchanted(creature), up(lit(1)), up(lit(1))),
+                abilityGrant(enchanted(creature), protection(isEnchantment))],
+              subject = enchanted(creature)),
+            doesnt(actor(thisEffect), remove(thisAura))])),
       activated(perform(sacrifice(thisAura)), destroy(target(isEnchantment)))]})

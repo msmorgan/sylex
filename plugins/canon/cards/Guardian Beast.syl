@@ -1,3 +1,5 @@
+# Fragment: "already" in "Auras already attached to those artifacts" is missing until
+# `syl-already-attached`.
 card singleFaced({
     name = "Guardian Beast",
     cost = [generic(3), pip(black)],
@@ -5,14 +7,16 @@ card singleFaced({
     subtypes = [beast],
     text = [
       static(
-        onlyWhile(
-          conjunction([
-              retention(
-                cant(any, attachTo(a(hasSubtype(aura)), them)),
-                allOf(and([hasSubtype(aura), attachedTo(those(artifact))]))),
-              abilityGrant(them, indestructible),
-              cant(actor(bare(and([isPlayer, isOther]))), gainControlOf(them))],
-            bare(and([non(isCreature), isArtifact, youControl]))),
-          is(thisCreature, isUntapped)))],
+        conjunction([
+            onlyWhile(
+              conjunction([
+                  cant(any, attachTo(a(hasSubtype(aura)), them)),
+                  abilityGrant(them, indestructible),
+                  cant(actor(bare(and([isPlayer, isOther]))), gainControlOf(them))],
+                bare(and([non(isCreature), isArtifact, youControl]))),
+              is(thisCreature, isUntapped)),
+            doesnt(
+              actor(thisEffect),
+              remove(bare(and([hasSubtype(aura), attachedTo(those(artifact))]))))]))],
     power = lit(2),
     toughness = lit(4)})

@@ -6,5 +6,8 @@ card singleFaced({
     text = [
       enchant(isCreature),
       static(entersChoosing(thisAura, color)),
-      static(retention(abilityGrant(enchanted(creature), protection(ofChosen(color))), thisAura)),
+      static(
+        conjunction([
+            abilityGrant(enchanted(creature), protection(ofChosen(color))),
+            doesnt(actor(thisEffect), remove(thisAura))])),
       activated(mana([pip(white)]), returnToHand(thisAura))]})
