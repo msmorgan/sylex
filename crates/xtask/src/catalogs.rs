@@ -205,7 +205,7 @@ mod tests {
 
         run(&generate_args(cr, oracle, output.clone())).unwrap();
 
-        assert_eq!(directory_bytes(&output).len(), 15);
+        assert_eq!(directory_bytes(&output).len(), 14);
     }
 
     #[test]
