@@ -1,13 +1,12 @@
-card {
-  name = "Foundry Inspector",
-  cost = [generic(3)],
-  types = [artifact, creature],
-  subtypes = [construct],
-  text = [
-    static(
-      costShift(
-        allOf(and([isArtifact, isSpell, did(actor(you), cast(which), thisObject)])),
-        less(lit(1))))],
-  power = lit(3),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Foundry Inspector",
+    cost = [generic(3)],
+    types = [artifact, creature],
+    subtypes = [construct],
+    text = [
+      static(
+        costShift(
+          allOf(and([isArtifact, isSpell, did(actor(you), cast(which), thisObject)])),
+          less(lit(1))))],
+    power = lit(3),
+    toughness = lit(2)})

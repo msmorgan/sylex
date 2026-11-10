@@ -1,14 +1,13 @@
-card {
-  name = "Mister Fantastic, Reed Richards",
-  cost = [generic(3), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, scientist, hero],
-  text = [
-    reach,
-    whenever(
-      does(actor(counted(orMore(1), and([isToken, youControl]))), enter),
-      may(draw(lit(1))))],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Mister Fantastic, Reed Richards",
+    cost = [generic(3), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, scientist, hero],
+    text = [
+      reach,
+      whenever(
+        does(actor(counted(orMore(1), and([isToken, youControl]))), enter),
+        may(draw(lit(1))))],
+    power = lit(2),
+    toughness = lit(4)})

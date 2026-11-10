@@ -1,6 +1,5 @@
-card {
-  name = "Silence",
-  cost = [pip(white)],
-  types = [instant],
-  text = [spell(establishThroughout(cant(actor(yourOpponents), cast(any)), thisTurn))]
-}
+card singleFaced({
+    name = "Silence",
+    cost = [pip(white)],
+    types = [instant],
+    text = [spell(establishThroughout(cant(actor(yourOpponents), cast(any)), thisTurn))]})

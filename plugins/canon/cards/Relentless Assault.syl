@@ -1,10 +1,9 @@
-card {
-  name = "Relentless Assault",
-  cost = [generic(2), pip(red), pip(red)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          untap(allOf(and([isCreature, did(actor(which), attack, within(soFarThisTurn))]))),
-          additionalPhase(combat, mainPhase, lit(1), mainPhase)]))]
-}
+card singleFaced({
+    name = "Relentless Assault",
+    cost = [generic(2), pip(red), pip(red)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            untap(allOf(and([isCreature, did(actor(which), attack, within(soFarThisTurn))]))),
+            additionalPhase(combat, mainPhase, lit(1), mainPhase)]))]})

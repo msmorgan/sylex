@@ -1,12 +1,11 @@
-card {
-  name = "Grollub",
-  cost = [generic(2), pip(black)],
-  types = [creature],
-  subtypes = [beast],
-  text = [
-    whenever(
-      does(any, dealDamage(recipient = thisCreature)),
-      instruct(eachOpponent, gainLife(thatMuch)))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Grollub",
+    cost = [generic(2), pip(black)],
+    types = [creature],
+    subtypes = [beast],
+    text = [
+      whenever(
+        does(any, dealDamage(recipient = thisCreature)),
+        instruct(eachOpponent, gainLife(thatMuch)))],
+    power = lit(3),
+    toughness = lit(3)})

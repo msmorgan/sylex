@@ -1,11 +1,10 @@
-card {
-  name = "Invigorate",
-  cost = [generic(2), pip(green)],
-  types = [instant],
-  text = [
-    static(
-      onlyWhile(
-        altCost(this, perform(instruct(anOpponent, gainLife(lit(3))))),
-        exists(and([isLand, hasSubtype(forest), youControl])))),
-    spell(get(target(isCreature), up(lit(4)), up(lit(4)), untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Invigorate",
+    cost = [generic(2), pip(green)],
+    types = [instant],
+    text = [
+      static(
+        onlyWhile(
+          altCost(this, perform(instruct(anOpponent, gainLife(lit(3))))),
+          exists(and([isLand, hasSubtype(forest), youControl])))),
+      spell(get(target(isCreature), up(lit(4)), up(lit(4)), untilEndOfTurn))]})

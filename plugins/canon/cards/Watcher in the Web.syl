@@ -1,15 +1,14 @@
-card {
-  name = "Watcher in the Web",
-  cost = [generic(4), pip(green)],
-  types = [creature],
-  subtypes = [spider],
-  text = [
-    reach,
-    static(
-      can(
-        actor(thisCreature),
-        block(counted(additional(exactly(7)), isCreature)),
-        timing = eachCombat))],
-  power = lit(2),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Watcher in the Web",
+    cost = [generic(4), pip(green)],
+    types = [creature],
+    subtypes = [spider],
+    text = [
+      reach,
+      static(
+        can(
+          actor(thisCreature),
+          block(counted(additional(exactly(7)), isCreature)),
+          timing = eachCombat))],
+    power = lit(2),
+    toughness = lit(5)})

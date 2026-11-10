@@ -1,13 +1,12 @@
-card {
-  name = "Coal Stoker",
-  cost = [generic(3), pip(red)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [
-    when(
-      does(actor(thisCreature), enter),
-      if = is(it, did(actor(you), cast(which, from = yourHand), thisObject)),
-      action = addMana(lit(1), manaOf([[colored(red), colored(red), colored(red)]])))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Coal Stoker",
+    cost = [generic(3), pip(red)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [
+      when(
+        does(actor(thisCreature), enter),
+        if = is(it, did(actor(you), cast(which, from = yourHand), thisObject)),
+        action = addMana(lit(1), manaOf([[colored(red), colored(red), colored(red)]])))],
+    power = lit(3),
+    toughness = lit(3)})

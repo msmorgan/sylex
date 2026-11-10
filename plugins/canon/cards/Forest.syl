@@ -1,6 +1,1 @@
-card {
-  name = "Forest",
-  supertypes = [basic],
-  types = [land],
-  subtypes = [forest]
-}
+card singleFaced({name = "Forest", supertypes = [basic], types = [land], subtypes = [forest]})

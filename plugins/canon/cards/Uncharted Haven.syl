@@ -1,8 +1,7 @@
-card {
-  name = "Uncharted Haven",
-  types = [land],
-  text = [
-    static(entersTapped(thisLand)),
-    static(entersChoosing(thisLand, color)),
-    activated(tapSymbol, addMana(lit(1), ofTheChosenColor))]
-}
+card singleFaced({
+    name = "Uncharted Haven",
+    types = [land],
+    text = [
+      static(entersTapped(thisLand)),
+      static(entersChoosing(thisLand, color)),
+      activated(tapSymbol, addMana(lit(1), ofTheChosenColor))]})

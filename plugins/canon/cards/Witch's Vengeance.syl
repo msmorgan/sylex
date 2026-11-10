@@ -1,12 +1,11 @@
-card {
-  name = "Witch's Vengeance",
-  cost = [generic(1), pip(black), pip(black)],
-  types = [sorcery],
-  text = [
-    spell(
-      get(
-        allOf(and([isCreature, ofYourChoice(subtype(creature))])),
-        down(lit(3)),
-        down(lit(3)),
-        untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Witch's Vengeance",
+    cost = [generic(1), pip(black), pip(black)],
+    types = [sorcery],
+    text = [
+      spell(
+        get(
+          allOf(and([isCreature, ofYourChoice(subtype(creature))])),
+          down(lit(3)),
+          down(lit(3)),
+          untilEndOfTurn))]})

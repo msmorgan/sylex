@@ -1,19 +1,18 @@
-card {
-  name = "Thranduil's Company",
-  cost = [generic(2), pip(green), pip(blue)],
-  types = [creature],
-  subtypes = [elf, soldier],
-  text = [
-    static(
-      onlyWhile(
-        can(actor(you), play(counted(additional(exactly(1)), isLand))),
-        exists(and([and([isCreature, isOther]), hasSubtype(elf), youControl])))),
-    landfall(
-      whenever(
-        does(actor(a(and([isLand, youControl]))), enter),
-        sequentially([
-            putCounters(lit(2), printedKind(p1p1Counter), target(and([isCreature, youControl]))),
-            gain(it, vigilance, untilEndOfTurn)])))],
-  power = lit(3),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Thranduil's Company",
+    cost = [generic(2), pip(green), pip(blue)],
+    types = [creature],
+    subtypes = [elf, soldier],
+    text = [
+      static(
+        onlyWhile(
+          can(actor(you), play(counted(additional(exactly(1)), isLand))),
+          exists(and([and([isCreature, isOther]), hasSubtype(elf), youControl])))),
+      landfall(
+        whenever(
+          does(actor(a(and([isLand, youControl]))), enter),
+          sequentially([
+              putCounters(lit(2), printedKind(p1p1Counter), target(and([isCreature, youControl]))),
+              gain(it, vigilance, untilEndOfTurn)])))],
+    power = lit(3),
+    toughness = lit(4)})

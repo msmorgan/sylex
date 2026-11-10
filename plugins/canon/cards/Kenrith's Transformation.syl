@@ -1,17 +1,16 @@
-card {
-  name = "Kenrith's Transformation",
-  cost = [generic(1), pip(green)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    when(does(actor(thisAura), enter), draw(lit(1))),
-    static(
-      conjunction([
-          allAbilityLoss(enchanted(creature)),
-          qualityChange(
-            it,
-            sets,
-            bundle({characteristics = {colors = [green], types = [creature], subtypes = [elk]}})),
-          getsBase(it, lit(3), lit(3))]))]
-}
+card singleFaced({
+    name = "Kenrith's Transformation",
+    cost = [generic(1), pip(green)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      when(does(actor(thisAura), enter), draw(lit(1))),
+      static(
+        conjunction([
+            allAbilityLoss(enchanted(creature)),
+            qualityChange(
+              it,
+              sets,
+              bundle({characteristics = {colors = [green], types = [creature], subtypes = [elk]}})),
+            getsBase(it, lit(3), lit(3))]))]})

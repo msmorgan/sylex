@@ -1,12 +1,11 @@
-card {
-  name = "Triarch Stalker",
-  cost = [generic(3), pip(black), pip(black)],
-  types = [artifact, creature],
-  subtypes = [necron],
-  text = [
-    flavorWord("Targeting Relay", at(beginningOfYour(combat), choose(anOpponent))),
-    static(
-      abilityGrant(allOf(and([isCreature, inCombat(attackerOf, the(isChosenPlayer))])), menace))],
-  power = lit(4),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Triarch Stalker",
+    cost = [generic(3), pip(black), pip(black)],
+    types = [artifact, creature],
+    subtypes = [necron],
+    text = [
+      flavorWord("Targeting Relay", at(beginningOfYour(combat), choose(anOpponent))),
+      static(
+        abilityGrant(allOf(and([isCreature, inCombat(attackerOf, the(isChosenPlayer))])), menace))],
+    power = lit(4),
+    toughness = lit(5)})

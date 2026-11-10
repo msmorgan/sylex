@@ -1,12 +1,11 @@
-card {
-  name = "Founding of Omashu",
-  cost = [generic(2), pip(red)],
-  types = [enchantment],
-  subtypes = [saga],
-  text = [
-    when(chapterMark([1]), create(lit(2), written(creatureToken(1, 1, [white], [ally])))),
-    when(chapterMark([2]), may(discard(a(cardIn(yourHand))), draw(lit(1)))),
-    when(
-      chapterMark([3]),
-      get(allOf(and([isCreature, youControl])), up(lit(1)), up(lit(0)), untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Founding of Omashu",
+    cost = [generic(2), pip(red)],
+    types = [enchantment],
+    subtypes = [saga],
+    text = [
+      when(chapterMark([1]), create(lit(2), written(creatureToken(1, 1, [white], [ally])))),
+      when(chapterMark([2]), may(discard(a(cardIn(yourHand))), draw(lit(1)))),
+      when(
+        chapterMark([3]),
+        get(allOf(and([isCreature, youControl])), up(lit(1)), up(lit(0)), untilEndOfTurn))]})

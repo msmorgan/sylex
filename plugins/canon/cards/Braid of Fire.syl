@@ -1,6 +1,5 @@
-card {
-  name = "Braid of Fire",
-  cost = [generic(1), pip(red)],
-  types = [enchantment],
-  text = [cumulativeUpkeep(perform(addMana(lit(1), manaOf([[colored(red)]]))))]
-}
+card singleFaced({
+    name = "Braid of Fire",
+    cost = [generic(1), pip(red)],
+    types = [enchantment],
+    text = [cumulativeUpkeep(perform(addMana(lit(1), manaOf([[colored(red)]]))))]})

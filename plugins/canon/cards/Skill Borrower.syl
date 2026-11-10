@@ -1,14 +1,13 @@
-card {
-  name = "Skill Borrower",
-  cost = [generic(2), pip(blue)],
-  types = [artifact, creature],
-  subtypes = [human, wizard],
-  text = [
-    static(visibility(reveal, you, topOfLibrary)),
-    static(
-      onlyWhile(
-        abilityGrantFrom(thisCreature, topSlice(lit(1)), [anyActivated]),
-        is(topSlice(lit(1)), or([isArtifact, isCreature]))))],
-  power = lit(1),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Skill Borrower",
+    cost = [generic(2), pip(blue)],
+    types = [artifact, creature],
+    subtypes = [human, wizard],
+    text = [
+      static(visibility(reveal, you, topOfLibrary)),
+      static(
+        onlyWhile(
+          abilityGrantFrom(thisCreature, topSlice(lit(1)), [anyActivated]),
+          is(topSlice(lit(1)), or([isArtifact, isCreature]))))],
+    power = lit(1),
+    toughness = lit(3)})

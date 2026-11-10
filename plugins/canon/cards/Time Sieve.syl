@@ -1,9 +1,8 @@
-card {
-  name = "Time Sieve",
-  cost = [pip(blue), pip(black)],
-  types = [artifact],
-  text = [
-    activated(
-      compound([tapSymbol, perform(sacrifice(counted(exactly(5), isArtifact)))]),
-      extraTurn(lit(1)))]
-}
+card singleFaced({
+    name = "Time Sieve",
+    cost = [pip(blue), pip(black)],
+    types = [artifact],
+    text = [
+      activated(
+        compound([tapSymbol, perform(sacrifice(counted(exactly(5), isArtifact)))]),
+        extraTurn(lit(1)))]})

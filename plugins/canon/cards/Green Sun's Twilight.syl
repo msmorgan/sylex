@@ -4,26 +4,25 @@
 # battlefield or into your hand and the rest on the bottom of your library in a random order."
 # The cards are chosen as the effect applies [CR#608.2d]. A self-replacement [CR#614.15]: "the
 # chosen cards" reads back the cards the replaced action read, the ones chosen.
-card {
-  name = "Green Sun's Twilight",
-  cost = [variable, pip(green)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          reveal(topSlice(plus(letter(x), lit(1)))),
-          choose(
-            andOr([
-                fromAmong(exactly(1), and([isCreature, isCard]), them),
-                fromAmong(exactly(1), and([isLand, isCard]), them)])),
-          replace(
-            sequentially([
-                putInto(those(card), hand),
-                putInto(theRest, onBottom, riders = [inOrder(randomOrder)])]),
-            doIf(
-              compareAmt(letter(x), atLeast, lit(5)),
-              instead(
-                sequentially([
-                    putInto(thePlural(and([isCard, isChosen])), or([battlefield, hand])),
-                    putInto(theRest, onBottom, riders = [inOrder(randomOrder)])]))))]))]
-}
+card singleFaced({
+    name = "Green Sun's Twilight",
+    cost = [variable, pip(green)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            reveal(topSlice(plus(letter(x), lit(1)))),
+            choose(
+              andOr([
+                  fromAmong(exactly(1), and([isCreature, isCard]), them),
+                  fromAmong(exactly(1), and([isLand, isCard]), them)])),
+            replace(
+              sequentially([
+                  putInto(those(card), hand),
+                  putInto(theRest, onBottom, riders = [inOrder(randomOrder)])]),
+              doIf(
+                compareAmt(letter(x), atLeast, lit(5)),
+                instead(
+                  sequentially([
+                      putInto(thePlural(and([isCard, isChosen])), or([battlefield, hand])),
+                      putInto(theRest, onBottom, riders = [inOrder(randomOrder)])]))))]))]})

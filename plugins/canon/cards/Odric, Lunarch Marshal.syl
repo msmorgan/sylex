@@ -1,35 +1,34 @@
-card {
-  name = "Odric, Lunarch Marshal",
-  cost = [generic(3), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, soldier],
-  text = [
-    alsoForKeywords(
-      at(
-        beginningOfPossessed(combat, eachPlayer),
-        doOnlyIf(
-          establishThroughout(
-            keywordGrant(
-              allOf(and([isCreature, youControl])),
-              thatKeyword,
-              and([isCreature, youControl, hasKeyword(thatKeyword)])),
-            untilEndOfTurn),
-          exists(and([isCreature, youControl, hasKeyword(thatKeyword)])))),
-      [
-        theKeyword(firstStrike),
-        theKeyword(flying),
-        theKeyword(deathtouch),
-        theKeyword(doubleStrike),
-        theKeyword(haste),
-        anyIn({word = hexproof}),
-        theKeyword(indestructible),
-        theKeyword(lifelink),
-        theKeyword(menace),
-        theKeyword(reach),
-        theKeyword(skulk),
-        theKeyword(trample),
-        theKeyword(vigilance)])],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Odric, Lunarch Marshal",
+    cost = [generic(3), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, soldier],
+    text = [
+      alsoForKeywords(
+        at(
+          beginningOfPossessed(combat, eachPlayer),
+          doOnlyIf(
+            establishThroughout(
+              keywordGrant(
+                allOf(and([isCreature, youControl])),
+                thatKeyword,
+                and([isCreature, youControl, hasKeyword(thatKeyword)])),
+              untilEndOfTurn),
+            exists(and([isCreature, youControl, hasKeyword(thatKeyword)])))),
+        [
+          theKeyword(firstStrike),
+          theKeyword(flying),
+          theKeyword(deathtouch),
+          theKeyword(doubleStrike),
+          theKeyword(haste),
+          anyIn({word = hexproof}),
+          theKeyword(indestructible),
+          theKeyword(lifelink),
+          theKeyword(menace),
+          theKeyword(reach),
+          theKeyword(skulk),
+          theKeyword(trample),
+          theKeyword(vigilance)])],
+    power = lit(3),
+    toughness = lit(3)})

@@ -1,10 +1,9 @@
-card {
-  name = "Urza's Armor",
-  cost = [generic(6)],
-  types = [artifact],
-  text = [
-    static(
-      replace(
-        would(actor(a(isSource)), dealDamage(recipient = you)),
-        instead(preventDamage(ofThatDamage(lit(1))))))]
-}
+card singleFaced({
+    name = "Urza's Armor",
+    cost = [generic(6)],
+    types = [artifact],
+    text = [
+      static(
+        replace(
+          would(actor(a(isSource)), dealDamage(recipient = you)),
+          instead(preventDamage(ofThatDamage(lit(1))))))]})

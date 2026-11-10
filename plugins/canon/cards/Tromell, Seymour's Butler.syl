@@ -1,27 +1,26 @@
-card {
-  name = "Tromell, Seymour's Butler",
-  cost = [generic(2), pip(green)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [elf, advisor],
-  text = [
-    static(
-      entersWithAdditionalCounters(
-        each(and([isCreature, isNontoken, youControl, isOther])),
-        lit(1),
-        p1p1Counter)),
-    activated(
-      compound([mana([generic(1)]), tapSymbol]),
-      sequentially([
-          repeatTimes(letter(x), proliferate),
-          define(
-            x,
-            countOf(
-              and([
-                  isNontoken,
-                  isCreature,
-                  youControl,
-                  did(actor(which), enter, within(soFarThisTurn))])))]))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Tromell, Seymour's Butler",
+    cost = [generic(2), pip(green)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [elf, advisor],
+    text = [
+      static(
+        entersWithAdditionalCounters(
+          each(and([isCreature, isNontoken, youControl, isOther])),
+          lit(1),
+          p1p1Counter)),
+      activated(
+        compound([mana([generic(1)]), tapSymbol]),
+        sequentially([
+            repeatTimes(letter(x), proliferate),
+            define(
+              x,
+              countOf(
+                and([
+                    isNontoken,
+                    isCreature,
+                    youControl,
+                    did(actor(which), enter, within(soFarThisTurn))])))]))],
+    power = lit(2),
+    toughness = lit(3)})

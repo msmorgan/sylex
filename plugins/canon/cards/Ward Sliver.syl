@@ -1,11 +1,10 @@
-card {
-  name = "Ward Sliver",
-  cost = [generic(4), pip(white)],
-  types = [creature],
-  subtypes = [sliver],
-  text = [
-    static(entersChoosing(thisCreature, color)),
-    static(abilityGrant(allOf(hasSubtype(sliver)), protection(ofChosen(color))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Ward Sliver",
+    cost = [generic(4), pip(white)],
+    types = [creature],
+    subtypes = [sliver],
+    text = [
+      static(entersChoosing(thisCreature, color)),
+      static(abilityGrant(allOf(hasSubtype(sliver)), protection(ofChosen(color))))],
+    power = lit(2),
+    toughness = lit(2)})

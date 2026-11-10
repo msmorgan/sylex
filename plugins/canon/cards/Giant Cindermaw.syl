@@ -1,9 +1,8 @@
-card {
-  name = "Giant Cindermaw",
-  cost = [generic(2), pip(red)],
-  types = [creature],
-  subtypes = [dinosaur, beast],
-  text = [trample, static(cant(actor(bare(isPlayer)), gainLife(anyAmount)))],
-  power = lit(4),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Giant Cindermaw",
+    cost = [generic(2), pip(red)],
+    types = [creature],
+    subtypes = [dinosaur, beast],
+    text = [trample, static(cant(actor(bare(isPlayer)), gainLife(anyAmount)))],
+    power = lit(4),
+    toughness = lit(3)})

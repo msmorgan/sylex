@@ -1,18 +1,18 @@
-card {
-  name = "Keeper of the Flame",
-  cost = [pip(red), pip(red)],
-  types = [creature],
-  subtypes = [human, wizard],
-  text = [
-    activated(
-      compound([mana([pip(red)]), tapSymbol]),
-      sequentially([
-          chooseWhile(
-            target(
-              and(
-                [isOpponent, compare(greater, lifeTotalOf(you), axes = [playerStat(lifeTotal)])])),
-            whileDoing(does(actor(you), activate(thisAbility)))),
-          instruct(thisCreature, dealDamage(lit(2), that(player)))]))],
-  power = lit(1),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Keeper of the Flame",
+    cost = [pip(red), pip(red)],
+    types = [creature],
+    subtypes = [human, wizard],
+    text = [
+      activated(
+        compound([mana([pip(red)]), tapSymbol]),
+        sequentially([
+            chooseWhile(
+              target(
+                and([
+                    isOpponent,
+                    compare(greater, lifeTotalOf(you), axes = [playerStat(lifeTotal)])])),
+              whileDoing(does(actor(you), activate(thisAbility)))),
+            instruct(thisCreature, dealDamage(lit(2), that(player)))]))],
+    power = lit(1),
+    toughness = lit(2)})

@@ -1,15 +1,14 @@
-card {
-  name = "Soldevi Adnate",
-  cost = [generic(1), pip(black)],
-  types = [creature],
-  subtypes = [human, cleric],
-  text = [
-    activated(
-      compound(
-        [tapSymbol, perform(sacrifice(a(and([isCreature, or([hasColor(black), isArtifact])]))))]),
-      addMana(
-        statOf(stat(manaValue), the(and([was(sacrifice(which)), isCreature]))),
-        manaOf([[colored(black)]])))],
-  power = lit(1),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Soldevi Adnate",
+    cost = [generic(1), pip(black)],
+    types = [creature],
+    subtypes = [human, cleric],
+    text = [
+      activated(
+        compound(
+          [tapSymbol, perform(sacrifice(a(and([isCreature, or([hasColor(black), isArtifact])]))))]),
+        addMana(
+          statOf(stat(manaValue), the(and([was(sacrifice(which)), isCreature]))),
+          manaOf([[colored(black)]])))],
+    power = lit(1),
+    toughness = lit(2)})

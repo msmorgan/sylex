@@ -1,13 +1,12 @@
-card {
-  name = "Iona, Shield of Emeria",
-  cost = [generic(6), pip(white), pip(white), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [angel],
-  text = [
-    flying,
-    static(entersChoosing(thisCreature, color)),
-    static(cant(actor(yourOpponents), cast(bare(and([isSpell, ofChosen(color)])))))],
-  power = lit(7),
-  toughness = lit(7)
-}
+card singleFaced({
+    name = "Iona, Shield of Emeria",
+    cost = [generic(6), pip(white), pip(white), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [angel],
+    text = [
+      flying,
+      static(entersChoosing(thisCreature, color)),
+      static(cant(actor(yourOpponents), cast(bare(and([isSpell, ofChosen(color)])))))],
+    power = lit(7),
+    toughness = lit(7)})

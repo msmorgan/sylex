@@ -1,18 +1,17 @@
-card {
-  name = "Volrath's Laboratory",
-  cost = [generic(5)],
-  types = [artifact],
-  text = [
-    static(
-      conjunction(
-        [entersChoosing(thisArtifact, color), entersChoosing(thisArtifact, subtype(creature))])),
-    activated(
-      compound([mana([generic(5)]), tapSymbol]),
-      create(
-        lit(1),
-        written({
-            characteristics = {types = [creature], power = lit(2), toughness = lit(2)},
-            qualities = [
-              withQuality(ofChosen(color)),
-              withQuality(ofChosen(subtype(creature)))]})))]
-}
+card singleFaced({
+    name = "Volrath's Laboratory",
+    cost = [generic(5)],
+    types = [artifact],
+    text = [
+      static(
+        conjunction(
+          [entersChoosing(thisArtifact, color), entersChoosing(thisArtifact, subtype(creature))])),
+      activated(
+        compound([mana([generic(5)]), tapSymbol]),
+        create(
+          lit(1),
+          written({
+              characteristics = {types = [creature], power = lit(2), toughness = lit(2)},
+              qualities = [
+                withQuality(ofChosen(color)),
+                withQuality(ofChosen(subtype(creature)))]})))]})

@@ -1,16 +1,15 @@
-card {
-  name = "Thick-Skinned Goblin",
-  cost = [generic(1), pip(red)],
-  types = [creature],
-  subtypes = [goblin, shaman],
-  text = [
-    static(
-      replace(
-        would(
-          actor(you),
-          pay(anyCost, once, whose = allOf(and([isPermanent, youControl])), keyword = echo)),
-        instead(may(pay(mana([generic(0)]), once))))),
-    activated(mana([pip(red)]), gain(thisCreature, protection(hasColor(red)), untilEndOfTurn))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Thick-Skinned Goblin",
+    cost = [generic(1), pip(red)],
+    types = [creature],
+    subtypes = [goblin, shaman],
+    text = [
+      static(
+        replace(
+          would(
+            actor(you),
+            pay(anyCost, once, whose = allOf(and([isPermanent, youControl])), keyword = echo)),
+          instead(may(pay(mana([generic(0)]), once))))),
+      activated(mana([pip(red)]), gain(thisCreature, protection(hasColor(red)), untilEndOfTurn))],
+    power = lit(2),
+    toughness = lit(1)})

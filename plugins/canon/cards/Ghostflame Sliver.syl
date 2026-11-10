@@ -1,9 +1,8 @@
-card {
-  name = "Ghostflame Sliver",
-  cost = [pip(black), pip(red)],
-  types = [creature],
-  subtypes = [sliver],
-  text = [static(qualityChange(allOf(hasSubtype(sliver)), sets, colored(colors([]))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Ghostflame Sliver",
+    cost = [pip(black), pip(red)],
+    types = [creature],
+    subtypes = [sliver],
+    text = [static(qualityChange(allOf(hasSubtype(sliver)), sets, colored(colors([]))))],
+    power = lit(2),
+    toughness = lit(2)})

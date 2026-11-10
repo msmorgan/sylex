@@ -1,20 +1,19 @@
-card {
-  name = "Charnel Troll",
-  cost = [generic(1), pip(black), pip(green)],
-  types = [creature],
-  subtypes = [troll],
-  text = [
-    trample,
-    at(
-      beginningOfYour(upkeep),
-      doIfDone(
-        exile(a(and([isCreature, in(yourGraveyard)]))),
-        putCounters(lit(1), printedKind(p1p1Counter), thisCreature),
-        sacrifice(thisCreature))),
-    activated(
-      compound(
-        [mana([pip(black), pip(green)]), perform(discard(a(and([isCreature, in(yourHand)]))))]),
-      putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Charnel Troll",
+    cost = [generic(1), pip(black), pip(green)],
+    types = [creature],
+    subtypes = [troll],
+    text = [
+      trample,
+      at(
+        beginningOfYour(upkeep),
+        doIfDone(
+          exile(a(and([isCreature, in(yourGraveyard)]))),
+          putCounters(lit(1), printedKind(p1p1Counter), thisCreature),
+          sacrifice(thisCreature))),
+      activated(
+        compound(
+          [mana([pip(black), pip(green)]), perform(discard(a(and([isCreature, in(yourHand)]))))]),
+        putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
+    power = lit(4),
+    toughness = lit(4)})

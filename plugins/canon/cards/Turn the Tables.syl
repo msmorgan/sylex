@@ -1,12 +1,11 @@
-card {
-  name = "Turn the Tables",
-  cost = [generic(3), pip(white), pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(
-        replace(
-          would(any, dealDamage(recipient = you, kind = combat)),
-          instead(redirectDamage(allDamage, target(and([isCreature, isAttacking]))))),
-        thisTurn))]
-}
+card singleFaced({
+    name = "Turn the Tables",
+    cost = [generic(3), pip(white), pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(
+          replace(
+            would(any, dealDamage(recipient = you, kind = combat)),
+            instead(redirectDamage(allDamage, target(and([isCreature, isAttacking]))))),
+          thisTurn))]})

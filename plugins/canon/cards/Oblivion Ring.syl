@@ -1,12 +1,11 @@
-card {
-  name = "Oblivion Ring",
-  cost = [generic(2), pip(white)],
-  types = [enchantment],
-  text = [
-    when(
-      does(actor(thisEnchantment), enter),
-      exile(target(and([non(isLand), isPermanent, isOther])))),
-    when(
-      does(actor(thisEnchantment), leave),
-      returnToBattlefield(the(cardIn(exiledWith(thisEnchantment))), [under(ownerOf(it))]))]
-}
+card singleFaced({
+    name = "Oblivion Ring",
+    cost = [generic(2), pip(white)],
+    types = [enchantment],
+    text = [
+      when(
+        does(actor(thisEnchantment), enter),
+        exile(target(and([non(isLand), isPermanent, isOther])))),
+      when(
+        does(actor(thisEnchantment), leave),
+        returnToBattlefield(the(cardIn(exiledWith(thisEnchantment))), [under(ownerOf(it))]))]})

@@ -1,13 +1,12 @@
-card {
-  name = "Aisling Leprechaun",
-  cost = [pip(green)],
-  types = [creature],
-  subtypes = [faerie],
-  text = [
-    whenever(
-      does(actor(thisCreature), block(a(isCreature))),
-      or = [does(by(a(isCreature)), block(thisCreature))],
-      action = becomeColor(that(creature), colors([green])))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Aisling Leprechaun",
+    cost = [pip(green)],
+    types = [creature],
+    subtypes = [faerie],
+    text = [
+      whenever(
+        does(actor(thisCreature), block(a(isCreature))),
+        or = [does(by(a(isCreature)), block(thisCreature))],
+        action = becomeColor(that(creature), colors([green])))],
+    power = lit(1),
+    toughness = lit(1)})

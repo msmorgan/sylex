@@ -1,19 +1,18 @@
 # Ragavan, Nimble Pilferer. Dash's "return the permanent this spell becomes" is a Resolution
 # Delayed Trigger [CR#702.109a,608.3g].
-card {
-  name = "Ragavan, Nimble Pilferer",
-  cost = [pip(red)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [monkey, pirate],
-  text = [
-    whenever(
-      does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-      sequentially([
-          create(lit(1), written(treasureToken)),
-          exile(slice(top, lit(1), libraryOf(that(player)))),
-          establishThroughout(can(actor(you), cast(that(card))), untilEndOfTurn)])),
-    dash(mana([generic(1), pip(red)]))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Ragavan, Nimble Pilferer",
+    cost = [pip(red)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [monkey, pirate],
+    text = [
+      whenever(
+        does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
+        sequentially([
+            create(lit(1), written(treasureToken)),
+            exile(slice(top, lit(1), libraryOf(that(player)))),
+            establishThroughout(can(actor(you), cast(that(card))), untilEndOfTurn)])),
+      dash(mana([generic(1), pip(red)]))],
+    power = lit(2),
+    toughness = lit(1)})

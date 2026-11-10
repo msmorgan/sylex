@@ -1,19 +1,21 @@
-card {
-  name = "Colossal Grave-Reaver",
-  cost = [generic(6), pip(black), pip(green)],
-  types = [creature],
-  subtypes = [dragon],
-  text = [
-    flying,
-    whenever(
-      does(actor(thisCreature), enter),
-      or = [does(actor(thisCreature), attack)],
-      action = mill(lit(3))),
-    whenever(
-      does(
-        any,
-        putInto(counted(orMore(1), and([isCard, isCreature])), yourGraveyard, from = yourLibrary)),
-      putOntoBattlefield(someOf(exactly(1), them)))],
-  power = lit(7),
-  toughness = lit(6)
-}
+card singleFaced({
+    name = "Colossal Grave-Reaver",
+    cost = [generic(6), pip(black), pip(green)],
+    types = [creature],
+    subtypes = [dragon],
+    text = [
+      flying,
+      whenever(
+        does(actor(thisCreature), enter),
+        or = [does(actor(thisCreature), attack)],
+        action = mill(lit(3))),
+      whenever(
+        does(
+          any,
+          putInto(
+            counted(orMore(1), and([isCard, isCreature])),
+            yourGraveyard,
+            from = yourLibrary)),
+        putOntoBattlefield(someOf(exactly(1), them)))],
+    power = lit(7),
+    toughness = lit(6)})

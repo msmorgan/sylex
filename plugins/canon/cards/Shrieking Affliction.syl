@@ -1,10 +1,9 @@
-card {
-  name = "Shrieking Affliction",
-  cost = [pip(black)],
-  types = [enchantment],
-  text = [
-    at(
-      beginningOfPossessed(upkeep, eachOpponent),
-      if = compareAmt(countOf(cardIn(handOf(that(player)))), atMost, lit(1)),
-      action = instruct(they, loseLife(lit(3))))]
-}
+card singleFaced({
+    name = "Shrieking Affliction",
+    cost = [pip(black)],
+    types = [enchantment],
+    text = [
+      at(
+        beginningOfPossessed(upkeep, eachOpponent),
+        if = compareAmt(countOf(cardIn(handOf(that(player)))), atMost, lit(1)),
+        action = instruct(they, loseLife(lit(3))))]})

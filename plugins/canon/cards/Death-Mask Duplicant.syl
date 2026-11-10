@@ -1,27 +1,26 @@
-card {
-  name = "Death-Mask Duplicant",
-  cost = [generic(7)],
-  types = [artifact, creature],
-  subtypes = [shapeshifter],
-  text = [
-    imprint(activated(mana([generic(1)]), exile(target(and([isCreature, in(yourGraveyard)]))))),
-    alsoForKeywords(
-      static(
-        onlyWhile(
-          keywordGrant(
-            thisCreature,
-            thatKeyword,
-            and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
-          exists(and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])))),
-      [
-        theKeyword(flying),
-        theKeyword(fear),
-        theKeyword(firstStrike),
-        theKeyword(doubleStrike),
-        theKeyword(haste),
-        anyIn({word = landwalk}),
-        anyIn({word = protection}),
-        theKeyword(trample)])],
-  power = lit(5),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Death-Mask Duplicant",
+    cost = [generic(7)],
+    types = [artifact, creature],
+    subtypes = [shapeshifter],
+    text = [
+      imprint(activated(mana([generic(1)]), exile(target(and([isCreature, in(yourGraveyard)]))))),
+      alsoForKeywords(
+        static(
+          onlyWhile(
+            keywordGrant(
+              thisCreature,
+              thatKeyword,
+              and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
+            exists(and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])))),
+        [
+          theKeyword(flying),
+          theKeyword(fear),
+          theKeyword(firstStrike),
+          theKeyword(doubleStrike),
+          theKeyword(haste),
+          anyIn({word = landwalk}),
+          anyIn({word = protection}),
+          theKeyword(trample)])],
+    power = lit(5),
+    toughness = lit(5)})

@@ -1,7 +1,6 @@
-card {
-  name = "Indestructibility",
-  cost = [generic(3), pip(white)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [enchant(isPermanent), static(abilityGrant(enchanted(permanent), indestructible))]
-}
+card singleFaced({
+    name = "Indestructibility",
+    cost = [generic(3), pip(white)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [enchant(isPermanent), static(abilityGrant(enchanted(permanent), indestructible))]})

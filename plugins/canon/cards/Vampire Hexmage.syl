@@ -1,11 +1,10 @@
-card {
-  name = "Vampire Hexmage",
-  cost = [pip(black), pip(black)],
-  types = [creature],
-  subtypes = [vampire, shaman],
-  text = [
-    firstStrike,
-    activated(perform(sacrifice(thisCreature)), removeAllCounters(none, target(isPermanent)))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Vampire Hexmage",
+    cost = [pip(black), pip(black)],
+    types = [creature],
+    subtypes = [vampire, shaman],
+    text = [
+      firstStrike,
+      activated(perform(sacrifice(thisCreature)), removeAllCounters(none, target(isPermanent)))],
+    power = lit(2),
+    toughness = lit(1)})

@@ -1,13 +1,12 @@
-card {
-  name = "Necropotence",
-  cost = [pip(black), pip(black), pip(black)],
-  types = [enchantment],
-  text = [
-    static(partSkip(you, drawStep)),
-    whenever(does(actor(you), discard(a(isCard))), exileFrom(that(card), yourGraveyard)),
-    activated(
-      perform(payLife(lit(1))),
-      sequentially([
-          exileFaceDown(topSlice(lit(1))),
-          delay(beginningOf(endStep, you, nextTime(you)), putInto(that(card), hand))]))]
-}
+card singleFaced({
+    name = "Necropotence",
+    cost = [pip(black), pip(black), pip(black)],
+    types = [enchantment],
+    text = [
+      static(partSkip(you, drawStep)),
+      whenever(does(actor(you), discard(a(isCard))), exileFrom(that(card), yourGraveyard)),
+      activated(
+        perform(payLife(lit(1))),
+        sequentially([
+            exileFaceDown(topSlice(lit(1))),
+            delay(beginningOf(endStep, you, nextTime(you)), putInto(that(card), hand))]))]})

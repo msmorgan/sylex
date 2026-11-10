@@ -1,14 +1,13 @@
-card {
-  name = "Soar",
-  cost = [generic(1), pip(blue)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    asThoughFlashSacrificedAtCleanup,
-    enchant(isCreature),
-    static(
-      conjunction([
-          getsPt(enchanted(creature), up(lit(0)), up(lit(1))),
-          abilityGrant(enchanted(creature), flying)],
-        subject = enchanted(creature)))]
-}
+card singleFaced({
+    name = "Soar",
+    cost = [generic(1), pip(blue)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      asThoughFlashSacrificedAtCleanup,
+      enchant(isCreature),
+      static(
+        conjunction([
+            getsPt(enchanted(creature), up(lit(0)), up(lit(1))),
+            abilityGrant(enchanted(creature), flying)],
+          subject = enchanted(creature)))]})

@@ -2,28 +2,27 @@
 # this way, create a black Vampire creature token. Its power is equal to that creature's power and
 # its toughness is equal to that creature's toughness." "That creature" in the lookback is the
 # destroyed creature, read as the permanent it was.
-card {
-  name = "Kalitas, Bloodchief of Ghet",
-  cost = [generic(5), pip(black), pip(black)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [vampire, warrior],
-  text = [
-    lifelink,
-    activated(
-      compound([mana([pip(black), pip(black), pip(black)]), tapSymbol]),
-      sequentially([
-          destroy(target(isCreature)),
-          doIf(
-            did(actor(that(creature)), die, thisWay),
-            create(
-              lit(1),
-              written(
-                creatureTokenOf(
-                  powerOf(that(creature)),
-                  toughnessOf(that(creature)),
-                  [black],
-                  [vampire]))))]))],
-  power = lit(5),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Kalitas, Bloodchief of Ghet",
+    cost = [generic(5), pip(black), pip(black)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [vampire, warrior],
+    text = [
+      lifelink,
+      activated(
+        compound([mana([pip(black), pip(black), pip(black)]), tapSymbol]),
+        sequentially([
+            destroy(target(isCreature)),
+            doIf(
+              did(actor(that(creature)), die, thisWay),
+              create(
+                lit(1),
+                written(
+                  creatureTokenOf(
+                    powerOf(that(creature)),
+                    toughnessOf(that(creature)),
+                    [black],
+                    [vampire]))))]))],
+    power = lit(5),
+    toughness = lit(5)})

@@ -1,15 +1,14 @@
-card {
-  name = "Ichor Shade",
-  cost = [generic(2), pip(black)],
-  types = [creature],
-  subtypes = [phyrexian, shade],
-  text = [
-    at(
-      beginningOfYour(endStep),
-      if = was(
-        putIntoFromBattlefield(a(or([isArtifact, isCreature])), graveyard),
-        within(soFarThisTurn)),
-      action = putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Ichor Shade",
+    cost = [generic(2), pip(black)],
+    types = [creature],
+    subtypes = [phyrexian, shade],
+    text = [
+      at(
+        beginningOfYour(endStep),
+        if = was(
+          putIntoFromBattlefield(a(or([isArtifact, isCreature])), graveyard),
+          within(soFarThisTurn)),
+        action = putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
+    power = lit(2),
+    toughness = lit(3)})

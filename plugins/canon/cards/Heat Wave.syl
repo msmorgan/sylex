@@ -1,16 +1,15 @@
-card {
-  name = "Heat Wave",
-  cost = [generic(2), pip(red)],
-  types = [enchantment],
-  text = [
-    cumulativeUpkeep(mana([pip(red)])),
-    static(
-      cant(
-        actor(allOf(and([isCreature, hasColor(blue)]))),
-        block(allOf(and([isCreature, youControl]))))),
-    static(
-      gatedBy(
-        perform(payLife(forEach(lit(1), and([isCreature, isBlocking, controlledBy(they)])))),
-        actor(allOf(and([isCreature, non(hasColor(blue))]))),
-        block(allOf(and([isCreature, youControl])))))]
-}
+card singleFaced({
+    name = "Heat Wave",
+    cost = [generic(2), pip(red)],
+    types = [enchantment],
+    text = [
+      cumulativeUpkeep(mana([pip(red)])),
+      static(
+        cant(
+          actor(allOf(and([isCreature, hasColor(blue)]))),
+          block(allOf(and([isCreature, youControl]))))),
+      static(
+        gatedBy(
+          perform(payLife(forEach(lit(1), and([isCreature, isBlocking, controlledBy(they)])))),
+          actor(allOf(and([isCreature, non(hasColor(blue))]))),
+          block(allOf(and([isCreature, youControl])))))]})

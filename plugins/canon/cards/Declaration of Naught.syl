@@ -1,8 +1,7 @@
-card {
-  name = "Declaration of Naught",
-  cost = [pip(blue), pip(blue)],
-  types = [enchantment],
-  text = [
-    static(entersChoosing(thisEnchantment, cardName)),
-    activated(mana([pip(blue)]), counter(target(and([isSpell, named(chosenName)]))))]
-}
+card singleFaced({
+    name = "Declaration of Naught",
+    cost = [pip(blue), pip(blue)],
+    types = [enchantment],
+    text = [
+      static(entersChoosing(thisEnchantment, cardName)),
+      activated(mana([pip(blue)]), counter(target(and([isSpell, named(chosenName)]))))]})

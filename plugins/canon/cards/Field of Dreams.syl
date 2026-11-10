@@ -1,7 +1,6 @@
-card {
-  name = "Field of Dreams",
-  cost = [pip(blue)],
-  supertypes = [world],
-  types = [enchantment],
-  text = [static(visibility(reveal, bare(isPlayer), topOfLibrary))]
-}
+card singleFaced({
+    name = "Field of Dreams",
+    cost = [pip(blue)],
+    supertypes = [world],
+    types = [enchantment],
+    text = [static(visibility(reveal, bare(isPlayer), topOfLibrary))]})

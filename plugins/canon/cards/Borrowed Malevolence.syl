@@ -1,13 +1,15 @@
-card {
-  name = "Borrowed Malevolence",
-  cost = [pip(black)],
-  types = [instant],
-  text = [
-    escalate(mana([generic(2)])),
-    spell(
-      chooseModes(
-        oneThrough(2),
-        [
-          mode(none, none, get(target(isCreature), up(lit(1)), up(lit(1)), untilEndOfTurn)),
-          mode(none, none, get(target(isCreature), down(lit(1)), down(lit(1)), untilEndOfTurn))]))]
-}
+card singleFaced({
+    name = "Borrowed Malevolence",
+    cost = [pip(black)],
+    types = [instant],
+    text = [
+      escalate(mana([generic(2)])),
+      spell(
+        chooseModes(
+          oneThrough(2),
+          [
+            mode(none, none, get(target(isCreature), up(lit(1)), up(lit(1)), untilEndOfTurn)),
+            mode(
+              none,
+              none,
+              get(target(isCreature), down(lit(1)), down(lit(1)), untilEndOfTurn))]))]})

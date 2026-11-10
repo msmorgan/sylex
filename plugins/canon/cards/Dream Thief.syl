@@ -1,15 +1,17 @@
-card {
-  name = "Dream Thief",
-  cost = [generic(2), pip(blue)],
-  types = [creature],
-  subtypes = [faerie, rogue],
-  text = [
-    flying,
-    when(
-      does(actor(thisCreature), enter),
-      doOnlyIf(
-        draw(lit(1)),
-        did(actor(you), cast(a(and([isSpell, hasColor(blue), isOther]))), within(soFarThisTurn))))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Dream Thief",
+    cost = [generic(2), pip(blue)],
+    types = [creature],
+    subtypes = [faerie, rogue],
+    text = [
+      flying,
+      when(
+        does(actor(thisCreature), enter),
+        doOnlyIf(
+          draw(lit(1)),
+          did(
+            actor(you),
+            cast(a(and([isSpell, hasColor(blue), isOther]))),
+            within(soFarThisTurn))))],
+    power = lit(2),
+    toughness = lit(1)})

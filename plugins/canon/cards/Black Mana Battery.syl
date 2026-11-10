@@ -1,15 +1,15 @@
-card {
-  name = "Black Mana Battery",
-  cost = [generic(4)],
-  types = [artifact],
-  text = [
-    activated(
-      compound([mana([generic(2)]), tapSymbol]),
-      putCounters(lit(1), printedKind(chargeCounter), thisArtifact)),
-    activated(
-      compound(
-        [tapSymbol, perform(removeCounters(anyNumber, printedKind(chargeCounter), thisArtifact))]),
-      sequentially([
-          addMana(lit(1), manaOf([[colored(black)]])),
-          addMana(removedThisWay, manaOf([[colored(black)]]))]))]
-}
+card singleFaced({
+    name = "Black Mana Battery",
+    cost = [generic(4)],
+    types = [artifact],
+    text = [
+      activated(
+        compound([mana([generic(2)]), tapSymbol]),
+        putCounters(lit(1), printedKind(chargeCounter), thisArtifact)),
+      activated(
+        compound([
+            tapSymbol,
+            perform(removeCounters(anyNumber, printedKind(chargeCounter), thisArtifact))]),
+        sequentially([
+            addMana(lit(1), manaOf([[colored(black)]])),
+            addMana(removedThisWay, manaOf([[colored(black)]]))]))]})

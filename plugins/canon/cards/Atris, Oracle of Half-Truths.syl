@@ -1,18 +1,17 @@
-card {
-  name = "Atris, Oracle of Half-Truths",
-  cost = [generic(2), pip(blue), pip(black)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, advisor],
-  text = [
-    menace,
-    when(
-      does(actor(thisCreature), enter),
-      sequentially([
-          instruct(target(isOpponent), lookAt(topSlice(lit(3)))),
-          instruct(they, separateIntoPiles(them, 2, [faceDown, faceUp])),
-          putInto(onePile, hand),
-          putInto(theOther, graveyard)]))],
-  power = lit(3),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Atris, Oracle of Half-Truths",
+    cost = [generic(2), pip(blue), pip(black)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, advisor],
+    text = [
+      menace,
+      when(
+        does(actor(thisCreature), enter),
+        sequentially([
+            instruct(target(isOpponent), lookAt(topSlice(lit(3)))),
+            instruct(they, separateIntoPiles(them, 2, [faceDown, faceUp])),
+            putInto(onePile, hand),
+            putInto(theOther, graveyard)]))],
+    power = lit(3),
+    toughness = lit(2)})

@@ -1,8 +1,7 @@
-card {
-  name = "Parapet",
-  cost = [generic(1), pip(white)],
-  types = [enchantment],
-  text = [
-    asThoughFlashSacrificedAtCleanup,
-    static(getsPt(allOf(and([isCreature, youControl])), up(lit(0)), up(lit(1))))]
-}
+card singleFaced({
+    name = "Parapet",
+    cost = [generic(1), pip(white)],
+    types = [enchantment],
+    text = [
+      asThoughFlashSacrificedAtCleanup,
+      static(getsPt(allOf(and([isCreature, youControl])), up(lit(0)), up(lit(1))))]})

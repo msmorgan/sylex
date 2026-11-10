@@ -1,11 +1,10 @@
-card {
-  name = "Chance for Glory",
-  cost = [generic(1), pip(red), pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          establish(abilityGrant(allOf(and([isCreature, youControl])), indestructible)),
-          extraTurn(lit(1)),
-          delay(beginningOfThatTurns(endStep), loseGame)]))]
-}
+card singleFaced({
+    name = "Chance for Glory",
+    cost = [generic(1), pip(red), pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            establish(abilityGrant(allOf(and([isCreature, youControl])), indestructible)),
+            extraTurn(lit(1)),
+            delay(beginningOfThatTurns(endStep), loseGame)]))]})

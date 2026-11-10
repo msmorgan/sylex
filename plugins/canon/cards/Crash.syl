@@ -1,8 +1,7 @@
-card {
-  name = "Crash",
-  cost = [generic(2), pip(red)],
-  types = [instant],
-  text = [
-    static(altCost(this, perform(sacrifice(a(and([isLand, hasSubtype(mountain)])))))),
-    spell(destroy(target(isArtifact)))]
-}
+card singleFaced({
+    name = "Crash",
+    cost = [generic(2), pip(red)],
+    types = [instant],
+    text = [
+      static(altCost(this, perform(sacrifice(a(and([isLand, hasSubtype(mountain)])))))),
+      spell(destroy(target(isArtifact)))]})

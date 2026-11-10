@@ -1,13 +1,15 @@
-card {
-  name = "Raffine's Guidance",
-  cost = [pip(white)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    static(getsPt(enchanted(creature), up(lit(1)), up(lit(1)))),
-    static(
-      can(
-        actor(you),
-        cast(this, from = yourGraveyard, payment = payingInstead(mana([generic(2), pip(white)])))))]
-}
+card singleFaced({
+    name = "Raffine's Guidance",
+    cost = [pip(white)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      static(getsPt(enchanted(creature), up(lit(1)), up(lit(1)))),
+      static(
+        can(
+          actor(you),
+          cast(
+            this,
+            from = yourGraveyard,
+            payment = payingInstead(mana([generic(2), pip(white)])))))]})

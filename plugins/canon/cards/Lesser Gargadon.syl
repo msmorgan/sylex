@@ -1,13 +1,12 @@
-card {
-  name = "Lesser Gargadon",
-  cost = [generic(2), pip(red), pip(red)],
-  types = [creature],
-  subtypes = [beast],
-  text = [
-    whenever(
-      does(actor(thisCreature), attack),
-      or = [does(actor(thisCreature), block)],
-      action = sacrifice(a(isLand)))],
-  power = lit(6),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Lesser Gargadon",
+    cost = [generic(2), pip(red), pip(red)],
+    types = [creature],
+    subtypes = [beast],
+    text = [
+      whenever(
+        does(actor(thisCreature), attack),
+        or = [does(actor(thisCreature), block)],
+        action = sacrifice(a(isLand)))],
+    power = lit(6),
+    toughness = lit(4)})

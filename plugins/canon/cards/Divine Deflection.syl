@@ -1,15 +1,14 @@
-card {
-  name = "Divine Deflection",
-  cost = [variable, pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(
-        replace(
-          would(any, dealDamage(recipient = andOr([you, allOf(and([isPermanent, youControl]))]))),
-          instead(
-            preventDamage(
-              theNext(letter(x)),
-              also = instruct(this, dealDamage(thatMuch, target(isAnyTarget)))))),
-        thisTurn))]
-}
+card singleFaced({
+    name = "Divine Deflection",
+    cost = [variable, pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(
+          replace(
+            would(any, dealDamage(recipient = andOr([you, allOf(and([isPermanent, youControl]))]))),
+            instead(
+              preventDamage(
+                theNext(letter(x)),
+                also = instruct(this, dealDamage(thatMuch, target(isAnyTarget)))))),
+          thisTurn))]})

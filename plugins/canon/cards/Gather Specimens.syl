@@ -1,12 +1,11 @@
-card {
-  name = "Gather Specimens",
-  cost = [generic(3), pip(blue), pip(blue), pip(blue)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(
-        replace(
-          would(actor(a(isCreature)), enter(riders = [under(anOpponent)])),
-          instead(instruct(it, enter(riders = [under(you)])))),
-        thisTurn))]
-}
+card singleFaced({
+    name = "Gather Specimens",
+    cost = [generic(3), pip(blue), pip(blue), pip(blue)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(
+          replace(
+            would(actor(a(isCreature)), enter(riders = [under(anOpponent)])),
+            instead(instruct(it, enter(riders = [under(you)])))),
+          thisTurn))]})

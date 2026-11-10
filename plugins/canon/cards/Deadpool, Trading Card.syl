@@ -1,18 +1,17 @@
-card {
-  name = "Deadpool, Trading Card",
-  cost = [generic(2), pip(black), pip(red)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [mutant, mercenary, hero],
-  text = [
-    static(
-      replace(
-        would(actor(thisCreature), enter),
-        alongside(may(exchangeTextBoxes(thisCreature, a(and([isCreature, isOther]))))))),
-    at(beginningOfYour(upkeep), loseLife(lit(3))),
-    activated(
-      compound([mana([generic(3)]), perform(sacrifice(thisCreature))]),
-      instruct(each(isOtherPlayer), draw(lit(1))))],
-  power = lit(5),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Deadpool, Trading Card",
+    cost = [generic(2), pip(black), pip(red)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [mutant, mercenary, hero],
+    text = [
+      static(
+        replace(
+          would(actor(thisCreature), enter),
+          alongside(may(exchangeTextBoxes(thisCreature, a(and([isCreature, isOther]))))))),
+      at(beginningOfYour(upkeep), loseLife(lit(3))),
+      activated(
+        compound([mana([generic(3)]), perform(sacrifice(thisCreature))]),
+        instruct(each(isOtherPlayer), draw(lit(1))))],
+    power = lit(5),
+    toughness = lit(3)})

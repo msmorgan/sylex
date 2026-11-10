@@ -1,6 +1,5 @@
-card {
-  name = "Opt",
-  cost = [pip(blue)],
-  types = [instant],
-  text = [spell(sequentially([scry(lit(1)), draw(lit(1))]))]
-}
+card singleFaced({
+    name = "Opt",
+    cost = [pip(blue)],
+    types = [instant],
+    text = [spell(sequentially([scry(lit(1)), draw(lit(1))]))]})

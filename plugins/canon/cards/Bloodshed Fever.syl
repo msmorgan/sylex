@@ -1,7 +1,6 @@
-card {
-  name = "Bloodshed Fever",
-  cost = [pip(red)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [enchant(isCreature), static(must(actor(enchanted(creature)), attack))]
-}
+card singleFaced({
+    name = "Bloodshed Fever",
+    cost = [pip(red)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [enchant(isCreature), static(must(actor(enchanted(creature)), attack))]})

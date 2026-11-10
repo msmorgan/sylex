@@ -1,18 +1,17 @@
-card {
-  name = "Tower Winder",
-  cost = [generic(1), pip(green)],
-  types = [creature],
-  subtypes = [snake],
-  text = [
-    reach,
-    deathtouch,
-    when(
-      does(actor(thisCreature), enter),
-      sequentially([
-          searchLibraryOrGraveyard(a(named(printedName("Command Tower")))),
-          reveal(it),
-          putInto(it, hand),
-          doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Tower Winder",
+    cost = [generic(1), pip(green)],
+    types = [creature],
+    subtypes = [snake],
+    text = [
+      reach,
+      deathtouch,
+      when(
+        does(actor(thisCreature), enter),
+        sequentially([
+            searchLibraryOrGraveyard(a(named(printedName("Command Tower")))),
+            reveal(it),
+            putInto(it, hand),
+            doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],
+    power = lit(1),
+    toughness = lit(1)})

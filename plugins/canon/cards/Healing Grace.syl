@@ -1,14 +1,13 @@
-card {
-  name = "Healing Grace",
-  cost = [pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          establishThroughout(
-            replace(
-              would(by(aYourChoice(isSource)), dealDamage(recipient = target(isAnyTarget))),
-              instead(preventDamage(theNext(lit(3))))),
-            thisTurn),
-          gainLife(lit(3))]))]
-}
+card singleFaced({
+    name = "Healing Grace",
+    cost = [pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            establishThroughout(
+              replace(
+                would(by(aYourChoice(isSource)), dealDamage(recipient = target(isAnyTarget))),
+                instead(preventDamage(theNext(lit(3))))),
+              thisTurn),
+            gainLife(lit(3))]))]})

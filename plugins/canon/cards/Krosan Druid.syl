@@ -1,14 +1,13 @@
-card {
-  name = "Krosan Druid",
-  cost = [generic(2), pip(green)],
-  types = [creature],
-  subtypes = [centaur, druid],
-  text = [
-    kicker(mana([generic(4), pip(green)])),
-    when(
-      does(actor(thisCreature), enter),
-      if = keywordCostPaid(kicker, thisCreature),
-      action = gainLife(lit(10)))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Krosan Druid",
+    cost = [generic(2), pip(green)],
+    types = [creature],
+    subtypes = [centaur, druid],
+    text = [
+      kicker(mana([generic(4), pip(green)])),
+      when(
+        does(actor(thisCreature), enter),
+        if = keywordCostPaid(kicker, thisCreature),
+        action = gainLife(lit(10)))],
+    power = lit(2),
+    toughness = lit(3)})

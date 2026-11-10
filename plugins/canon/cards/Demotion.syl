@@ -1,12 +1,11 @@
-card {
-  name = "Demotion",
-  cost = [pip(white)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    static(
-      conjunction([
-          cant(actor(enchanted(creature)), block),
-          cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(it)]))))]))]
-}
+card singleFaced({
+    name = "Demotion",
+    cost = [pip(white)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      static(
+        conjunction([
+            cant(actor(enchanted(creature)), block),
+            cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(it)]))))]))]})

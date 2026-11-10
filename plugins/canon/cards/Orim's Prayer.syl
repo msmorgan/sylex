@@ -1,9 +1,8 @@
-card {
-  name = "Orim's Prayer",
-  cost = [generic(1), pip(white), pip(white)],
-  types = [enchantment],
-  text = [
-    whenever(
-      does(actor(counted(orMore(1), isCreature)), attack(you)),
-      gainLife(forEach(lit(1), and([isAttacking, isCreature]))))]
-}
+card singleFaced({
+    name = "Orim's Prayer",
+    cost = [generic(1), pip(white), pip(white)],
+    types = [enchantment],
+    text = [
+      whenever(
+        does(actor(counted(orMore(1), isCreature)), attack(you)),
+        gainLife(forEach(lit(1), and([isAttacking, isCreature]))))]})

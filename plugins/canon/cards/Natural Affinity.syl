@@ -1,15 +1,14 @@
-card {
-  name = "Natural Affinity",
-  cost = [generic(2), pip(green)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(
-        qualityChange(
-          allOf(isLand),
-          sets,
-          bundle({
-              characteristics = {types = [creature], power = lit(2), toughness = lit(2)}},
-            land)),
-        untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Natural Affinity",
+    cost = [generic(2), pip(green)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(
+          qualityChange(
+            allOf(isLand),
+            sets,
+            bundle({
+                characteristics = {types = [creature], power = lit(2), toughness = lit(2)}},
+              land)),
+          untilEndOfTurn))]})

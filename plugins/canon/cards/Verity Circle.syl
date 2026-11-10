@@ -1,13 +1,12 @@
-card {
-  name = "Verity Circle",
-  cost = [generic(2), pip(blue)],
-  types = [enchantment],
-  text = [
-    whenever(
-      does(actor(a(and([isCreature, anOpponentControls]))), setStatus(tapped, theActor)),
-      if = is(it, not(inCombat(declaredAttacker))),
-      action = may(draw(lit(1)))),
-    activated(
-      mana([generic(4), pip(blue)]),
-      tap(target(and([isCreature, not(hasKeyword(theKeyword(flying)))]))))]
-}
+card singleFaced({
+    name = "Verity Circle",
+    cost = [generic(2), pip(blue)],
+    types = [enchantment],
+    text = [
+      whenever(
+        does(actor(a(and([isCreature, anOpponentControls]))), setStatus(tapped, theActor)),
+        if = is(it, not(inCombat(declaredAttacker))),
+        action = may(draw(lit(1)))),
+      activated(
+        mana([generic(4), pip(blue)]),
+        tap(target(and([isCreature, not(hasKeyword(theKeyword(flying)))]))))]})

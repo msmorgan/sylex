@@ -1,12 +1,11 @@
-card {
-  name = "Rites of Flourishing",
-  cost = [generic(2), pip(green)],
-  types = [enchantment],
-  text = [
-    at(beginningOfPossessed(drawStep, eachPlayer), instruct(that(player), draw(lit(1)))),
-    static(
-      can(
-        actor(eachPlayer),
-        play(counted(additional(exactly(1)), isLand)),
-        timing = onEachOfTheirTurns))]
-}
+card singleFaced({
+    name = "Rites of Flourishing",
+    cost = [generic(2), pip(green)],
+    types = [enchantment],
+    text = [
+      at(beginningOfPossessed(drawStep, eachPlayer), instruct(that(player), draw(lit(1)))),
+      static(
+        can(
+          actor(eachPlayer),
+          play(counted(additional(exactly(1)), isLand)),
+          timing = onEachOfTheirTurns))]})

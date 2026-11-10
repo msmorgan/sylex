@@ -1,27 +1,26 @@
-card {
-  name = "Mishra's Factory",
-  types = [land],
-  text = [
-    activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
-    activated(
-      mana([generic(1)]),
-      establishThroughout(
-        qualityChange(
-          thisLand,
-          sets,
-          bundle({
-              characteristics = {
-                types = [artifact, creature],
-                subtypes = [assemblyWorker],
-                power = lit(2),
-                toughness = lit(2)}},
-            land)),
-        untilEndOfTurn)),
-    activated(
-      tapSymbol,
-      get(
-        target(and([isCreature, hasSubtype(assemblyWorker)])),
-        up(lit(1)),
-        up(lit(1)),
-        untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Mishra's Factory",
+    types = [land],
+    text = [
+      activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
+      activated(
+        mana([generic(1)]),
+        establishThroughout(
+          qualityChange(
+            thisLand,
+            sets,
+            bundle({
+                characteristics = {
+                  types = [artifact, creature],
+                  subtypes = [assemblyWorker],
+                  power = lit(2),
+                  toughness = lit(2)}},
+              land)),
+          untilEndOfTurn)),
+      activated(
+        tapSymbol,
+        get(
+          target(and([isCreature, hasSubtype(assemblyWorker)])),
+          up(lit(1)),
+          up(lit(1)),
+          untilEndOfTurn))]})

@@ -1,14 +1,13 @@
-card {
-  name = "Celestial Judgment",
-  cost = [generic(4), pip(white), pip(white)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          doForEachKind(
-            value(power),
-            allOf(isCreature),
-            number,
-            choose(a(and([isCreature, hasPower(equal, chosenNumber)])))),
-          destroy(each(and([isCreature, notChosen])))]))]
-}
+card singleFaced({
+    name = "Celestial Judgment",
+    cost = [generic(4), pip(white), pip(white)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            doForEachKind(
+              value(power),
+              allOf(isCreature),
+              number,
+              choose(a(and([isCreature, hasPower(equal, chosenNumber)])))),
+            destroy(each(and([isCreature, notChosen])))]))]})

@@ -1,21 +1,22 @@
-card {
-  name = "Termination Facilitator",
-  cost = [generic(1), pip(black)],
-  types = [creature],
-  subtypes = [human, assassin],
-  text = [
-    activatedOnlyDuring(
-      tapSymbol,
-      putCounters(lit(1), printedKind(bountyCounter), target(or([isCreature, isPlaneswalker]))),
-      asSorcery),
-    whenever(
-      does(
-        any,
-        dealDamage(
-          recipient = a(
-            and(
-              [or([isCreature, isPlaneswalker]), anOpponentControls, hasCounter(bountyCounter)])))),
-      destroy(it))],
-  power = lit(1),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Termination Facilitator",
+    cost = [generic(1), pip(black)],
+    types = [creature],
+    subtypes = [human, assassin],
+    text = [
+      activatedOnlyDuring(
+        tapSymbol,
+        putCounters(lit(1), printedKind(bountyCounter), target(or([isCreature, isPlaneswalker]))),
+        asSorcery),
+      whenever(
+        does(
+          any,
+          dealDamage(
+            recipient = a(
+              and([
+                  or([isCreature, isPlaneswalker]),
+                  anOpponentControls,
+                  hasCounter(bountyCounter)])))),
+        destroy(it))],
+    power = lit(1),
+    toughness = lit(3)})

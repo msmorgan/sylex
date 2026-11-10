@@ -1,8 +1,7 @@
-card {
-  name = "Thriving Grove",
-  types = [land],
-  text = [
-    static(entersTapped(thisLand)),
-    static(entersChoosingFrom(thisLand, color, colorOtherThan(green))),
-    activated(tapSymbol, addMana(lit(1), ofTheChosenColor([colored(green)])))]
-}
+card singleFaced({
+    name = "Thriving Grove",
+    types = [land],
+    text = [
+      static(entersTapped(thisLand)),
+      static(entersChoosingFrom(thisLand, color, colorOtherThan(green))),
+      activated(tapSymbol, addMana(lit(1), ofTheChosenColor([colored(green)])))]})

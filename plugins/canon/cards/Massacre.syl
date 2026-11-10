@@ -1,13 +1,12 @@
-card {
-  name = "Massacre",
-  cost = [generic(2), pip(black), pip(black)],
-  types = [sorcery],
-  text = [
-    static(
-      onlyWhile(
-        altCost(this),
-        and([
-            exists(and([isLand, hasSubtype(plains), anOpponentControls])),
-            exists(and([isLand, hasSubtype(swamp), youControl]))]))),
-    spell(get(allOf(isCreature), down(lit(2)), down(lit(2)), untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Massacre",
+    cost = [generic(2), pip(black), pip(black)],
+    types = [sorcery],
+    text = [
+      static(
+        onlyWhile(
+          altCost(this),
+          and([
+              exists(and([isLand, hasSubtype(plains), anOpponentControls])),
+              exists(and([isLand, hasSubtype(swamp), youControl]))]))),
+      spell(get(allOf(isCreature), down(lit(2)), down(lit(2)), untilEndOfTurn))]})

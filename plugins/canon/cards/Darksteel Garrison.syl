@@ -1,12 +1,11 @@
-card {
-  name = "Darksteel Garrison",
-  cost = [generic(2)],
-  types = [artifact],
-  subtypes = [fortification],
-  text = [
-    static(abilityGrant(fortified(land), indestructible)),
-    whenever(
-      does(actor(fortified(land)), setStatus(tapped, theActor)),
-      get(target(isCreature), up(lit(1)), up(lit(1)), untilEndOfTurn)),
-    fortify(mana([generic(3)]))]
-}
+card singleFaced({
+    name = "Darksteel Garrison",
+    cost = [generic(2)],
+    types = [artifact],
+    subtypes = [fortification],
+    text = [
+      static(abilityGrant(fortified(land), indestructible)),
+      whenever(
+        does(actor(fortified(land)), setStatus(tapped, theActor)),
+        get(target(isCreature), up(lit(1)), up(lit(1)), untilEndOfTurn)),
+      fortify(mana([generic(3)]))]})

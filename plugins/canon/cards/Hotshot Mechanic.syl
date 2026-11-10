@@ -1,13 +1,12 @@
 # Hotshot Mechanic: "This creature crews Vehicles as though its power were 2 greater." An
 # indicative "as though" statement about how it crews, not a permission to crew [CR#609.4].
-card {
-  name = "Hotshot Mechanic",
-  cost = [pip(white)],
-  types = [artifact, creature],
-  subtypes = [fox, pilot],
-  text = [
-    static(
-      asThough(actor(thisCreature), crew(allOf(hasSubtype(vehicle))), greaterBy(power, lit(2))))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Hotshot Mechanic",
+    cost = [pip(white)],
+    types = [artifact, creature],
+    subtypes = [fox, pilot],
+    text = [
+      static(
+        asThough(actor(thisCreature), crew(allOf(hasSubtype(vehicle))), greaterBy(power, lit(2))))],
+    power = lit(2),
+    toughness = lit(1)})

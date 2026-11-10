@@ -1,15 +1,14 @@
-card {
-  name = "Bloodfire Enforcers",
-  cost = [generic(3), pip(red)],
-  types = [creature],
-  subtypes = [human, monk],
-  text = [
-    static(
-      onlyWhile(
-        conjunction([abilityGrant(thisCreature, firstStrike), abilityGrant(it, trample)]),
-        and([
-            exists(and([isInstant, in(yourGraveyard)])),
-            exists(and([isSorcery, in(yourGraveyard)]))])))],
-  power = lit(5),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Bloodfire Enforcers",
+    cost = [generic(3), pip(red)],
+    types = [creature],
+    subtypes = [human, monk],
+    text = [
+      static(
+        onlyWhile(
+          conjunction([abilityGrant(thisCreature, firstStrike), abilityGrant(it, trample)]),
+          and([
+              exists(and([isInstant, in(yourGraveyard)])),
+              exists(and([isSorcery, in(yourGraveyard)]))])))],
+    power = lit(5),
+    toughness = lit(2)})

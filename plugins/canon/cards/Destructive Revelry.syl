@@ -1,10 +1,9 @@
-card {
-  name = "Destructive Revelry",
-  cost = [pip(red), pip(green)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          destroy(target(or([isArtifact, isEnchantment]))),
-          instruct(this, dealDamage(lit(2), controllerOf(that(permanent))))]))]
-}
+card singleFaced({
+    name = "Destructive Revelry",
+    cost = [pip(red), pip(green)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            destroy(target(or([isArtifact, isEnchantment]))),
+            instruct(this, dealDamage(lit(2), controllerOf(that(permanent))))]))]})

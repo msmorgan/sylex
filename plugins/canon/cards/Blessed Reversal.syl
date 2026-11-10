@@ -1,6 +1,5 @@
-card {
-  name = "Blessed Reversal",
-  cost = [generic(1), pip(white)],
-  types = [instant],
-  text = [spell(gainLife(forEach(lit(3), and([isCreature, inCombat(attackerOf, you)]))))]
-}
+card singleFaced({
+    name = "Blessed Reversal",
+    cost = [generic(1), pip(white)],
+    types = [instant],
+    text = [spell(gainLife(forEach(lit(3), and([isCreature, inCombat(attackerOf, you)]))))]})

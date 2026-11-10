@@ -1,31 +1,30 @@
-card {
-  name = "Escaped Shapeshifter",
-  cost = [generic(3), pip(blue), pip(blue)],
-  types = [creature],
-  subtypes = [shapeshifter],
-  text = [
-    alsoForKeywords(
-      static(
-        onlyWhile(
-          keywordGrant(
-            thisCreature,
-            thatKeyword,
-            and([
-                isCreature,
-                anOpponentControls,
-                hasKeyword(thatKeyword),
-                not(named(printedName("Escaped Shapeshifter")))])),
-          exists(
-            and([
-                isCreature,
-                anOpponentControls,
-                hasKeyword(thatKeyword),
-                not(named(printedName("Escaped Shapeshifter")))])))),
-      [
-        theKeyword(flying),
-        theKeyword(firstStrike),
-        theKeyword(trample),
-        anyIn({word = protection, sort = color})])],
-  power = lit(3),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Escaped Shapeshifter",
+    cost = [generic(3), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [shapeshifter],
+    text = [
+      alsoForKeywords(
+        static(
+          onlyWhile(
+            keywordGrant(
+              thisCreature,
+              thatKeyword,
+              and([
+                  isCreature,
+                  anOpponentControls,
+                  hasKeyword(thatKeyword),
+                  not(named(printedName("Escaped Shapeshifter")))])),
+            exists(
+              and([
+                  isCreature,
+                  anOpponentControls,
+                  hasKeyword(thatKeyword),
+                  not(named(printedName("Escaped Shapeshifter")))])))),
+        [
+          theKeyword(flying),
+          theKeyword(firstStrike),
+          theKeyword(trample),
+          anyIn({word = protection, sort = color})])],
+    power = lit(3),
+    toughness = lit(4)})

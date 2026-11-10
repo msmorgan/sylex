@@ -1,11 +1,10 @@
-card {
-  name = "Sphinx of the Second Sun",
-  cost = [generic(6), pip(blue), pip(blue)],
-  types = [creature],
-  subtypes = [sphinx],
-  text = [
-    flying,
-    at(beginningOfYour(postcombatMain), additionalPhase(beginningPhase, postcombatMain, lit(1)))],
-  power = lit(6),
-  toughness = lit(6)
-}
+card singleFaced({
+    name = "Sphinx of the Second Sun",
+    cost = [generic(6), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [sphinx],
+    text = [
+      flying,
+      at(beginningOfYour(postcombatMain), additionalPhase(beginningPhase, postcombatMain, lit(1)))],
+    power = lit(6),
+    toughness = lit(6)})

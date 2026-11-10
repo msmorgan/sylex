@@ -1,15 +1,14 @@
-card {
-  name = "Ghalta, Primal Hunger",
-  cost = [generic(10), pip(green), pip(green)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [elder, dinosaur],
-  text = [
-    static(
-      conjunction([
-          costShift(this, less(letter(x))),
-          letterDefinition(x, aggregate(sum, stat(power), and([isCreature, youControl])))])),
-    trample],
-  power = lit(12),
-  toughness = lit(12)
-}
+card singleFaced({
+    name = "Ghalta, Primal Hunger",
+    cost = [generic(10), pip(green), pip(green)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [elder, dinosaur],
+    text = [
+      static(
+        conjunction([
+            costShift(this, less(letter(x))),
+            letterDefinition(x, aggregate(sum, stat(power), and([isCreature, youControl])))])),
+      trample],
+    power = lit(12),
+    toughness = lit(12)})

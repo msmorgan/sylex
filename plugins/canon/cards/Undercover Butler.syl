@@ -1,14 +1,13 @@
-card {
-  name = "Undercover Butler",
-  cost = [generic(2), hybridPip(blue, black)],
-  types = [creature],
-  subtypes = [human, rogue],
-  text = [
-    whenever(
-      does(
-        actor(thisCreature),
-        attack(a(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])))),
-      establishThroughout(cant(any, block(it)), thisTurn))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Undercover Butler",
+    cost = [generic(2), hybridPip(blue, black)],
+    types = [creature],
+    subtypes = [human, rogue],
+    text = [
+      whenever(
+        does(
+          actor(thisCreature),
+          attack(a(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])))),
+        establishThroughout(cant(any, block(it)), thisTurn))],
+    power = lit(2),
+    toughness = lit(3)})

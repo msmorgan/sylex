@@ -1,6 +1,5 @@
-card {
-  name = "Damnation",
-  cost = [generic(2), pip(black), pip(black)],
-  types = [sorcery],
-  text = [spell(destroyPluralCantRegenerate(allOf(isCreature)))]
-}
+card singleFaced({
+    name = "Damnation",
+    cost = [generic(2), pip(black), pip(black)],
+    types = [sorcery],
+    text = [spell(destroyPluralCantRegenerate(allOf(isCreature)))]})

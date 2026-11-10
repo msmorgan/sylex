@@ -1,14 +1,13 @@
-card {
-  name = "Balemurk Leech",
-  cost = [generic(1), pip(black)],
-  types = [creature],
-  subtypes = [leech],
-  text = [
-    eerie(
-      whenever(
-        does(actor(a(and([isEnchantment, youControl]))), enter),
-        joins = [joinedHead(does(actor(you), fullyUnlock(a(hasSubtype(room)))))],
-        action = instruct(eachOpponent, loseLife(lit(1)))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Balemurk Leech",
+    cost = [generic(1), pip(black)],
+    types = [creature],
+    subtypes = [leech],
+    text = [
+      eerie(
+        whenever(
+          does(actor(a(and([isEnchantment, youControl]))), enter),
+          joins = [joinedHead(does(actor(you), fullyUnlock(a(hasSubtype(room)))))],
+          action = instruct(eachOpponent, loseLife(lit(1)))))],
+    power = lit(2),
+    toughness = lit(2)})

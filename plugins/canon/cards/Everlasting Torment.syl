@@ -5,13 +5,15 @@
 # isn't marked; rather, that source's controller puts that many −1/−1 counters on it
 # [CR#702.80a,120.3d]. A source that has wither already gets that result once, multiple instances
 # of wither being redundant [CR#702.80d].
-card {
-  name = "Everlasting Torment",
-  cost = [generic(2), hybridPip(black, red)],
-  types = [enchantment],
-  text = [
-    static(cant(actor(bare(isPlayer)), gainLife(anyAmount))),
-    static(cant(any, preventDamage(allDamage, damage = would(any, dealDamage)))),
-    static(
-      asThough(by(a(isSource)), dealDamage, holds(is(thatSource, hasKeyword(theKeyword(wither))))))]
-}
+card singleFaced({
+    name = "Everlasting Torment",
+    cost = [generic(2), hybridPip(black, red)],
+    types = [enchantment],
+    text = [
+      static(cant(actor(bare(isPlayer)), gainLife(anyAmount))),
+      static(cant(any, preventDamage(allDamage, damage = would(any, dealDamage)))),
+      static(
+        asThough(
+          by(a(isSource)),
+          dealDamage,
+          holds(is(thatSource, hasKeyword(theKeyword(wither))))))]})

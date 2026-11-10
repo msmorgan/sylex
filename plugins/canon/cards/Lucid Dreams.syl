@@ -1,9 +1,8 @@
-card {
-  name = "Lucid Dreams",
-  cost = [generic(3), pip(blue), pip(blue)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially(
-        [draw(letter(x)), define(x, distinctCount(cardType, allOf(cardIn(yourGraveyard))))]))]
-}
+card singleFaced({
+    name = "Lucid Dreams",
+    cost = [generic(3), pip(blue), pip(blue)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially(
+          [draw(letter(x)), define(x, distinctCount(cardType, allOf(cardIn(yourGraveyard))))]))]})

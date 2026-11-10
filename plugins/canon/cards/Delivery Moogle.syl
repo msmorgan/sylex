@@ -1,17 +1,16 @@
-card {
-  name = "Delivery Moogle",
-  cost = [generic(3), pip(white)],
-  types = [creature],
-  subtypes = [moogle],
-  text = [
-    flying,
-    when(
-      does(actor(thisCreature), enter),
-      sequentially([
-          searchLibraryOrGraveyard(a(and([isArtifact, hasManaValue(atMost, lit(2))]))),
-          reveal(it),
-          putInto(it, hand),
-          doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],
-  power = lit(3),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Delivery Moogle",
+    cost = [generic(3), pip(white)],
+    types = [creature],
+    subtypes = [moogle],
+    text = [
+      flying,
+      when(
+        does(actor(thisCreature), enter),
+        sequentially([
+            searchLibraryOrGraveyard(a(and([isArtifact, hasManaValue(atMost, lit(2))]))),
+            reveal(it),
+            putInto(it, hand),
+            doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],
+    power = lit(3),
+    toughness = lit(2)})

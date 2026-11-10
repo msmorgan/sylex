@@ -1,15 +1,14 @@
-card {
-  name = "Council of the Absolute",
-  cost = [generic(2), pip(white), pip(blue)],
-  types = [creature],
-  subtypes = [human, advisor],
-  text = [
-    static(entersChoosingFrom(thisCreature, cardName, nameOfCard(not(or([isCreature, isLand]))))),
-    static(cant(actor(yourOpponents), cast(bare(and([isSpell, named(chosenName)]))))),
-    static(
-      costShift(
-        allOf(and([isSpell, named(chosenName), did(actor(you), cast(which), thisObject)])),
-        less(lit(2))))],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Council of the Absolute",
+    cost = [generic(2), pip(white), pip(blue)],
+    types = [creature],
+    subtypes = [human, advisor],
+    text = [
+      static(entersChoosingFrom(thisCreature, cardName, nameOfCard(not(or([isCreature, isLand]))))),
+      static(cant(actor(yourOpponents), cast(bare(and([isSpell, named(chosenName)]))))),
+      static(
+        costShift(
+          allOf(and([isSpell, named(chosenName), did(actor(you), cast(which), thisObject)])),
+          less(lit(2))))],
+    power = lit(2),
+    toughness = lit(4)})

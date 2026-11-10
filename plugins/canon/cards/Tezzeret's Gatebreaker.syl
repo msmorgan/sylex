@@ -1,18 +1,17 @@
-card {
-  name = "Tezzeret's Gatebreaker",
-  cost = [generic(4)],
-  types = [artifact],
-  text = [
-    when(
-      does(actor(thisArtifact), enter),
-      sequentially([
-          lookAt(topSlice(lit(5))),
-          may(
-            sequentially([
-                reveal(fromAmong(exactly(1), or([hasColor(blue), isArtifact]), them)),
-                putInto(that(card), hand)])),
-          putInto(theRest, onBottom, riders = [inOrder(randomOrder)])])),
-    activated(
-      compound([mana([generic(5), pip(blue)]), tapSymbol, perform(sacrifice(thisArtifact))]),
-      establishThroughout(cant(any, block(allOf(and([isCreature, youControl])))), thisTurn))]
-}
+card singleFaced({
+    name = "Tezzeret's Gatebreaker",
+    cost = [generic(4)],
+    types = [artifact],
+    text = [
+      when(
+        does(actor(thisArtifact), enter),
+        sequentially([
+            lookAt(topSlice(lit(5))),
+            may(
+              sequentially([
+                  reveal(fromAmong(exactly(1), or([hasColor(blue), isArtifact]), them)),
+                  putInto(that(card), hand)])),
+            putInto(theRest, onBottom, riders = [inOrder(randomOrder)])])),
+      activated(
+        compound([mana([generic(5), pip(blue)]), tapSymbol, perform(sacrifice(thisArtifact))]),
+        establishThroughout(cant(any, block(allOf(and([isCreature, youControl])))), thisTurn))]})

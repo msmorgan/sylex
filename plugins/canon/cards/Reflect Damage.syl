@@ -1,13 +1,12 @@
-card {
-  name = "Reflect Damage",
-  cost = [generic(3), pip(red), pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(
-        replace(
-          would(actor(aYourChoice(isSource)), dealDamage),
-          instead(redirectDamage(allDamage, controllerOf(thatSource))),
-          use = nextTimeOnly),
-        thisTurn))]
-}
+card singleFaced({
+    name = "Reflect Damage",
+    cost = [generic(3), pip(red), pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(
+          replace(
+            would(actor(aYourChoice(isSource)), dealDamage),
+            instead(redirectDamage(allDamage, controllerOf(thatSource))),
+            use = nextTimeOnly),
+          thisTurn))]})

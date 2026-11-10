@@ -1,15 +1,14 @@
-card {
-  name = "Conspicuous Snoop",
-  cost = [pip(red), pip(red)],
-  types = [creature],
-  subtypes = [goblin, rogue],
-  text = [
-    static(visibility(reveal, you, topOfLibrary)),
-    static(can(actor(you), play(allOf(and([isSpell, hasSubtype(goblin)])), from = onTop))),
-    static(
-      onlyWhile(
-        abilityGrantFrom(thisCreature, topSlice(lit(1)), [anyActivated]),
-        is(topSlice(lit(1)), hasSubtype(goblin))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Conspicuous Snoop",
+    cost = [pip(red), pip(red)],
+    types = [creature],
+    subtypes = [goblin, rogue],
+    text = [
+      static(visibility(reveal, you, topOfLibrary)),
+      static(can(actor(you), play(allOf(and([isSpell, hasSubtype(goblin)])), from = onTop))),
+      static(
+        onlyWhile(
+          abilityGrantFrom(thisCreature, topSlice(lit(1)), [anyActivated]),
+          is(topSlice(lit(1)), hasSubtype(goblin))))],
+    power = lit(2),
+    toughness = lit(2)})

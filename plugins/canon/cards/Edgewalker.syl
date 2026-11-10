@@ -1,13 +1,12 @@
-card {
-  name = "Edgewalker",
-  cost = [generic(1), pip(white), pip(black)],
-  types = [creature],
-  subtypes = [human, cleric],
-  text = [
-    static(
-      costShift(
-        allOf(and([hasSubtype(cleric), isSpell, did(actor(you), cast(which), thisObject)])),
-        lessBySymbols(symbols([pip(white), pip(black)]), coloredOnly = true)))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Edgewalker",
+    cost = [generic(1), pip(white), pip(black)],
+    types = [creature],
+    subtypes = [human, cleric],
+    text = [
+      static(
+        costShift(
+          allOf(and([hasSubtype(cleric), isSpell, did(actor(you), cast(which), thisObject)])),
+          lessBySymbols(symbols([pip(white), pip(black)]), coloredOnly = true)))],
+    power = lit(2),
+    toughness = lit(2)})

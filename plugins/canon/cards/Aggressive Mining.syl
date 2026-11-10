@@ -1,8 +1,7 @@
-card {
-  name = "Aggressive Mining",
-  cost = [generic(3), pip(red)],
-  types = [enchantment],
-  text = [
-    static(cant(actor(you), play(allOf(isLand)))),
-    activatedOnlyOnce(perform(sacrifice(a(isLand))), draw(lit(2)), oncePerTurn)]
-}
+card singleFaced({
+    name = "Aggressive Mining",
+    cost = [generic(3), pip(red)],
+    types = [enchantment],
+    text = [
+      static(cant(actor(you), play(allOf(isLand)))),
+      activatedOnlyOnce(perform(sacrifice(a(isLand))), draw(lit(2)), oncePerTurn)]})

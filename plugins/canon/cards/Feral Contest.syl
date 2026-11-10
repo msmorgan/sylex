@@ -1,12 +1,11 @@
-card {
-  name = "Feral Contest",
-  cost = [generic(3), pip(green)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          putCounters(lit(1), printedKind(p1p1Counter), target(and([isCreature, youControl]))),
-          establishThroughout(
-            must(actor(target(and([isCreature, isOther]))), block(it)),
-            thisTurn)]))]
-}
+card singleFaced({
+    name = "Feral Contest",
+    cost = [generic(3), pip(green)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            putCounters(lit(1), printedKind(p1p1Counter), target(and([isCreature, youControl]))),
+            establishThroughout(
+              must(actor(target(and([isCreature, isOther]))), block(it)),
+              thisTurn)]))]})

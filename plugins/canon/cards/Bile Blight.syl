@@ -1,14 +1,13 @@
-card {
-  name = "Bile Blight",
-  cost = [pip(black), pip(black)],
-  types = [instant],
-  text = [
-    spell(
-      get(
-        both(
-          target(isCreature),
-          allOf(and([isCreature, shares(cardName, share, that(creature)), isOther]))),
-        down(lit(3)),
-        down(lit(3)),
-        untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Bile Blight",
+    cost = [pip(black), pip(black)],
+    types = [instant],
+    text = [
+      spell(
+        get(
+          both(
+            target(isCreature),
+            allOf(and([isCreature, shares(cardName, share, that(creature)), isOther]))),
+          down(lit(3)),
+          down(lit(3)),
+          untilEndOfTurn))]})

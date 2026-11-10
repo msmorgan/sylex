@@ -1,10 +1,9 @@
-card {
-  name = "Spidersilk Armor",
-  cost = [generic(2), pip(green)],
-  types = [enchantment],
-  text = [
-    static(
-      conjunction([
-          getsPt(allOf(and([isCreature, youControl])), up(lit(0)), up(lit(1))),
-          abilityGrant(them, reach)]))]
-}
+card singleFaced({
+    name = "Spidersilk Armor",
+    cost = [generic(2), pip(green)],
+    types = [enchantment],
+    text = [
+      static(
+        conjunction([
+            getsPt(allOf(and([isCreature, youControl])), up(lit(0)), up(lit(1))),
+            abilityGrant(them, reach)]))]})

@@ -1,21 +1,20 @@
-card {
-  name = "Berserk",
-  cost = [pip(green)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          establishFor(
-            target(isCreature),
-            [
-              abilityGrant(it, trample),
-              getsPt(it, up(letter(x)), up(lit(0))),
-              letterDefinition(x, powerOf(it))],
-            untilEndOfTurn),
-          atNext(
-            endStep,
-            doOnlyIf(
-              destroy(that(creature)),
-              did(actor(that(creature)), attack, within(soFarThisTurn))))]),
-      timing = beforePart(combatDamage))]
-}
+card singleFaced({
+    name = "Berserk",
+    cost = [pip(green)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            establishFor(
+              target(isCreature),
+              [
+                abilityGrant(it, trample),
+                getsPt(it, up(letter(x)), up(lit(0))),
+                letterDefinition(x, powerOf(it))],
+              untilEndOfTurn),
+            atNext(
+              endStep,
+              doOnlyIf(
+                destroy(that(creature)),
+                did(actor(that(creature)), attack, within(soFarThisTurn))))]),
+        timing = beforePart(combatDamage))]})

@@ -1,20 +1,19 @@
-card {
-  name = "Pir, Imaginative Rascal",
-  cost = [generic(2), pip(green)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human],
-  text = [
-    partnerWith(named(printedName("Toothy, Imaginary Friend"))),
-    static(
-      replace(
-        would(
-          any,
-          putCounters(
-            anyAmount,
-            anyKind,
-            a(and([isPermanent, controlledBy(youOr(a(isTeammate)))])))),
-        instead(putCounters(plus(thatMuch, lit(1)), thoseCounters, that(permanent)))))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Pir, Imaginative Rascal",
+    cost = [generic(2), pip(green)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human],
+    text = [
+      partnerWith(named(printedName("Toothy, Imaginary Friend"))),
+      static(
+        replace(
+          would(
+            any,
+            putCounters(
+              anyAmount,
+              anyKind,
+              a(and([isPermanent, controlledBy(youOr(a(isTeammate)))])))),
+          instead(putCounters(plus(thatMuch, lit(1)), thoseCounters, that(permanent)))))],
+    power = lit(1),
+    toughness = lit(1)})

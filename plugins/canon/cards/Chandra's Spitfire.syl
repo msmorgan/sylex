@@ -1,13 +1,12 @@
-card {
-  name = "Chandra's Spitfire",
-  cost = [generic(2), pip(red)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [
-    flying,
-    whenever(
-      does(any, dealDamage(recipient = anOpponent, kind = noncombat)),
-      get(thisCreature, up(lit(3)), up(lit(0)), untilEndOfTurn))],
-  power = lit(1),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Chandra's Spitfire",
+    cost = [generic(2), pip(red)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [
+      flying,
+      whenever(
+        does(any, dealDamage(recipient = anOpponent, kind = noncombat)),
+        get(thisCreature, up(lit(3)), up(lit(0)), untilEndOfTurn))],
+    power = lit(1),
+    toughness = lit(3)})

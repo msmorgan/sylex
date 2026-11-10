@@ -1,13 +1,12 @@
-card {
-  name = "Belltower Sphinx",
-  cost = [generic(4), pip(blue)],
-  types = [creature],
-  subtypes = [sphinx],
-  text = [
-    flying,
-    whenever(
-      does(actor(a(isSource)), dealDamage(recipient = thisCreature)),
-      instruct(controllerOf(thatSource), mill(thatMuch)))],
-  power = lit(2),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Belltower Sphinx",
+    cost = [generic(4), pip(blue)],
+    types = [creature],
+    subtypes = [sphinx],
+    text = [
+      flying,
+      whenever(
+        does(actor(a(isSource)), dealDamage(recipient = thisCreature)),
+        instruct(controllerOf(thatSource), mill(thatMuch)))],
+    power = lit(2),
+    toughness = lit(5)})

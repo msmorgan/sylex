@@ -1,7 +1,6 @@
-card {
-  name = "Battle Squadron",
-  cost = [generic(3), pip(red), pip(red)],
-  types = [creature],
-  subtypes = [goblin],
-  text = [flying, static(definesPt(thisCreature, countOf(and([isCreature, youControl]))))]
-}
+card singleFaced({
+    name = "Battle Squadron",
+    cost = [generic(3), pip(red), pip(red)],
+    types = [creature],
+    subtypes = [goblin],
+    text = [flying, static(definesPt(thisCreature, countOf(and([isCreature, youControl]))))]})

@@ -1,14 +1,13 @@
 # Starbreach Whale. Warp's "exile the permanent this spell becomes" is a Resolution Delayed
 # Trigger [CR#702.185a,608.3g].
-card {
-  name = "Starbreach Whale",
-  cost = [generic(4), pip(blue)],
-  types = [creature],
-  subtypes = [whale],
-  text = [
-    flying,
-    when(does(actor(thisCreature), enter), surveil(lit(2))),
-    warp(mana([generic(1), pip(blue)]))],
-  power = lit(3),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Starbreach Whale",
+    cost = [generic(4), pip(blue)],
+    types = [creature],
+    subtypes = [whale],
+    text = [
+      flying,
+      when(does(actor(thisCreature), enter), surveil(lit(2))),
+      warp(mana([generic(1), pip(blue)]))],
+    power = lit(3),
+    toughness = lit(5)})

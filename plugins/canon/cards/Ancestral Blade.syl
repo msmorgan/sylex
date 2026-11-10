@@ -1,14 +1,13 @@
-card {
-  name = "Ancestral Blade",
-  cost = [generic(1), pip(white)],
-  types = [artifact],
-  subtypes = [equipment],
-  text = [
-    when(
-      does(actor(thisEquipment), enter),
-      sequentially([
-          create(lit(1), written(creatureToken(1, 1, [white], [soldier]))),
-          attachTo(thisEquipment, thatToken)])),
-    static(getsPt(equipped(creature), up(lit(1)), up(lit(1)))),
-    equip(mana([generic(1)]))]
-}
+card singleFaced({
+    name = "Ancestral Blade",
+    cost = [generic(1), pip(white)],
+    types = [artifact],
+    subtypes = [equipment],
+    text = [
+      when(
+        does(actor(thisEquipment), enter),
+        sequentially([
+            create(lit(1), written(creatureToken(1, 1, [white], [soldier]))),
+            attachTo(thisEquipment, thatToken)])),
+      static(getsPt(equipped(creature), up(lit(1)), up(lit(1)))),
+      equip(mana([generic(1)]))]})

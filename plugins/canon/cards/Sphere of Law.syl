@@ -1,10 +1,9 @@
-card {
-  name = "Sphere of Law",
-  cost = [generic(3), pip(white)],
-  types = [enchantment],
-  text = [
-    static(
-      replace(
-        would(actor(a(and([isSource, hasColor(red)]))), dealDamage(recipient = you)),
-        instead(preventDamage(ofThatDamage(lit(2))))))]
-}
+card singleFaced({
+    name = "Sphere of Law",
+    cost = [generic(3), pip(white)],
+    types = [enchantment],
+    text = [
+      static(
+        replace(
+          would(actor(a(and([isSource, hasColor(red)]))), dealDamage(recipient = you)),
+          instead(preventDamage(ofThatDamage(lit(2))))))]})

@@ -1,19 +1,18 @@
-card {
-  name = "Consul's Lieutenant",
-  cost = [pip(white), pip(white)],
-  types = [creature],
-  subtypes = [human, soldier],
-  text = [
-    firstStrike,
-    renown(lit(1)),
-    whenever(
-      does(actor(thisCreature), attack),
-      if = is(it, hasDesignation(renowned)),
-      action = get(
-        allOf(and([isCreature, isAttacking, youControl, isOther])),
-        up(lit(1)),
-        up(lit(1)),
-        untilEndOfTurn))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Consul's Lieutenant",
+    cost = [pip(white), pip(white)],
+    types = [creature],
+    subtypes = [human, soldier],
+    text = [
+      firstStrike,
+      renown(lit(1)),
+      whenever(
+        does(actor(thisCreature), attack),
+        if = is(it, hasDesignation(renowned)),
+        action = get(
+          allOf(and([isCreature, isAttacking, youControl, isOther])),
+          up(lit(1)),
+          up(lit(1)),
+          untilEndOfTurn))],
+    power = lit(2),
+    toughness = lit(1)})

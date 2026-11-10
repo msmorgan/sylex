@@ -1,12 +1,11 @@
-card {
-  name = "Explore",
-  cost = [generic(1), pip(green)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          establishThroughout(
-            can(actor(you), play(counted(additional(exactly(1)), isLand))),
-            thisTurn),
-          draw(lit(1))]))]
-}
+card singleFaced({
+    name = "Explore",
+    cost = [generic(1), pip(green)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            establishThroughout(
+              can(actor(you), play(counted(additional(exactly(1)), isLand))),
+              thisTurn),
+            draw(lit(1))]))]})

@@ -1,13 +1,16 @@
-card {
-  name = "Blaring Captain",
-  cost = [generic(3), pip(black)],
-  types = [creature],
-  subtypes = [azra, warrior],
-  text = [
-    partnerWith(named(printedName("Blaring Recruiter"))),
-    whenever(
-      does(actor(thisCreature), attack),
-      get(allOf(and([hasSubtype(warrior), isAttacking])), up(lit(1)), up(lit(1)), untilEndOfTurn))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Blaring Captain",
+    cost = [generic(3), pip(black)],
+    types = [creature],
+    subtypes = [azra, warrior],
+    text = [
+      partnerWith(named(printedName("Blaring Recruiter"))),
+      whenever(
+        does(actor(thisCreature), attack),
+        get(
+          allOf(and([hasSubtype(warrior), isAttacking])),
+          up(lit(1)),
+          up(lit(1)),
+          untilEndOfTurn))],
+    power = lit(2),
+    toughness = lit(2)})

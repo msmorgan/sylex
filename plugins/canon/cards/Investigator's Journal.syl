@@ -1,19 +1,18 @@
-card {
-  name = "Investigator's Journal",
-  cost = [generic(2)],
-  types = [artifact],
-  subtypes = [book, clue],
-  text = [
-    static(
-      entersWithCounters(
-        thisArtifact,
-        aggregateOver(max, isPlayer, countOf(and([isCreature, controlledBy(they)]))),
-        suspectCounter)),
-    activated(
-      compound([
-          mana([generic(2)]),
-          tapSymbol,
-          perform(removeCounters(exactly(1), printedKind(suspectCounter), thisArtifact))]),
-      draw(lit(1))),
-    activated(compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]), draw(lit(1)))]
-}
+card singleFaced({
+    name = "Investigator's Journal",
+    cost = [generic(2)],
+    types = [artifact],
+    subtypes = [book, clue],
+    text = [
+      static(
+        entersWithCounters(
+          thisArtifact,
+          aggregateOver(max, isPlayer, countOf(and([isCreature, controlledBy(they)]))),
+          suspectCounter)),
+      activated(
+        compound([
+            mana([generic(2)]),
+            tapSymbol,
+            perform(removeCounters(exactly(1), printedKind(suspectCounter), thisArtifact))]),
+        draw(lit(1))),
+      activated(compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]), draw(lit(1)))]})

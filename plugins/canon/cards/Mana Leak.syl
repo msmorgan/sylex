@@ -1,12 +1,11 @@
 # Pins the unless-payment construction with the targeted spell’s controller
 # as the payer [CR#118.12a].
-card {
-  name = "Mana Leak",
-  cost = [generic(1), pip(blue)],
-  types = [instant],
-  text = [
-    spell(
-      instruct(
-        controllerOf(target(isSpell)),
-        doUnless(instruct(you, counter(it)), mana([generic(3)]))))]
-}
+card singleFaced({
+    name = "Mana Leak",
+    cost = [generic(1), pip(blue)],
+    types = [instant],
+    text = [
+      spell(
+        instruct(
+          controllerOf(target(isSpell)),
+          doUnless(instruct(you, counter(it)), mana([generic(3)]))))]})

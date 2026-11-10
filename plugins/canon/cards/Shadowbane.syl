@@ -1,25 +1,24 @@
-card {
-  name = "Shadowbane",
-  cost = [generic(1), pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(
-        replace(
-          would(
-            actor(aYourChoice(isSource)),
-            dealDamage(recipient = andOr([you, allOf(and([isCreature, youControl]))]))),
-          instead(
-            preventDamage(
-              allDamage,
-              also = doIf(
-                did(
-                  any,
-                  preventDamage(
-                    allDamage,
-                    damage = would(actor(a(and([isSource, hasColor(black)]))), dealDamage)),
-                  thisWay),
-                gainLife(thatMuch)))),
-          use = nextTimeOnly),
-        thisTurn))]
-}
+card singleFaced({
+    name = "Shadowbane",
+    cost = [generic(1), pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(
+          replace(
+            would(
+              actor(aYourChoice(isSource)),
+              dealDamage(recipient = andOr([you, allOf(and([isCreature, youControl]))]))),
+            instead(
+              preventDamage(
+                allDamage,
+                also = doIf(
+                  did(
+                    any,
+                    preventDamage(
+                      allDamage,
+                      damage = would(actor(a(and([isSource, hasColor(black)]))), dealDamage)),
+                    thisWay),
+                  gainLife(thatMuch)))),
+            use = nextTimeOnly),
+          thisTurn))]})

@@ -1,10 +1,9 @@
-card {
-  name = "Rorix Bladewing",
-  cost = [generic(3), pip(red), pip(red), pip(red)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [dragon],
-  text = [flying, haste],
-  power = lit(6),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Rorix Bladewing",
+    cost = [generic(3), pip(red), pip(red), pip(red)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [dragon],
+    text = [flying, haste],
+    power = lit(6),
+    toughness = lit(5)})

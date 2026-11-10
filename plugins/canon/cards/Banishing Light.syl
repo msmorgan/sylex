@@ -1,11 +1,10 @@
-card {
-  name = "Banishing Light",
-  cost = [generic(2), pip(white)],
-  types = [enchantment],
-  text = [
-    when(
-      does(actor(thisEnchantment), enter),
-      exileUntil(
-        target(and([non(isLand), isPermanent, anOpponentControls])),
-        does(actor(thisEnchantment), leave)))]
-}
+card singleFaced({
+    name = "Banishing Light",
+    cost = [generic(2), pip(white)],
+    types = [enchantment],
+    text = [
+      when(
+        does(actor(thisEnchantment), enter),
+        exileUntil(
+          target(and([non(isLand), isPermanent, anOpponentControls])),
+          does(actor(thisEnchantment), leave)))]})

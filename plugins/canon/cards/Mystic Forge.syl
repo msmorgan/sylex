@@ -1,12 +1,11 @@
-card {
-  name = "Mystic Forge",
-  cost = [generic(4)],
-  types = [artifact],
-  text = [
-    static(visibility(lookAt, you, topOfLibrary)),
-    static(
-      conjunction([
-          can(actor(you), cast(bare(and([isSpell, isArtifact])), from = onTop)),
-          can(actor(you), cast(bare(and([isSpell, isColorless])), from = onTop))])),
-    activated(compound([tapSymbol, perform(payLife(lit(1)))]), exile(topSlice(lit(1))))]
-}
+card singleFaced({
+    name = "Mystic Forge",
+    cost = [generic(4)],
+    types = [artifact],
+    text = [
+      static(visibility(lookAt, you, topOfLibrary)),
+      static(
+        conjunction([
+            can(actor(you), cast(bare(and([isSpell, isArtifact])), from = onTop)),
+            can(actor(you), cast(bare(and([isSpell, isColorless])), from = onTop))])),
+      activated(compound([tapSymbol, perform(payLife(lit(1)))]), exile(topSlice(lit(1))))]})

@@ -1,11 +1,10 @@
-card {
-  name = "Binding Agony",
-  cost = [generic(1), pip(black)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    whenever(
-      does(any, dealDamage(recipient = enchanted(creature))),
-      instruct(thisAura, dealDamage(thatMuch, controllerOf(that(creature)))))]
-}
+card singleFaced({
+    name = "Binding Agony",
+    cost = [generic(1), pip(black)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      whenever(
+        does(any, dealDamage(recipient = enchanted(creature))),
+        instruct(thisAura, dealDamage(thatMuch, controllerOf(that(creature)))))]})

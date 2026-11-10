@@ -1,7 +1,6 @@
 # Radiant Flames (converge is an ability word [CR#207.2c])
-card {
-  name = "Radiant Flames",
-  cost = [generic(2), pip(red)],
-  types = [sorcery],
-  text = [spell(instruct(this, dealDamage(colorsSpentToCast(this), each(isCreature))))]
-}
+card singleFaced({
+    name = "Radiant Flames",
+    cost = [generic(2), pip(red)],
+    types = [sorcery],
+    text = [spell(instruct(this, dealDamage(colorsSpentToCast(this), each(isCreature))))]})

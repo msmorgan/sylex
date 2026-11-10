@@ -1,15 +1,14 @@
-card {
-  name = "Smog Elemental",
-  cost = [generic(4), pip(black), pip(black)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [
-    flying,
-    static(
-      getsPt(
-        allOf(and([isCreature, hasKeyword(theKeyword(flying)), opponentsControl])),
-        down(lit(1)),
-        down(lit(1))))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Smog Elemental",
+    cost = [generic(4), pip(black), pip(black)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [
+      flying,
+      static(
+        getsPt(
+          allOf(and([isCreature, hasKeyword(theKeyword(flying)), opponentsControl])),
+          down(lit(1)),
+          down(lit(1))))],
+    power = lit(3),
+    toughness = lit(3)})

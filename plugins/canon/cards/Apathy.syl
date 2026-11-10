@@ -1,14 +1,13 @@
-card {
-  name = "Apathy",
-  cost = [pip(blue)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    static(doesntUntap(enchanted(creature), controllerOf(enchanted(creature)))),
-    at(
-      beginningOfPossessed(upkeep, controllerOf(enchanted(creature))),
-      instruct(
-        that(player),
-        may(discard(aAtRandom(cardIn(handOf(that(player))))), untap(that(creature)))))]
-}
+card singleFaced({
+    name = "Apathy",
+    cost = [pip(blue)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      static(doesntUntap(enchanted(creature), controllerOf(enchanted(creature)))),
+      at(
+        beginningOfPossessed(upkeep, controllerOf(enchanted(creature))),
+        instruct(
+          that(player),
+          may(discard(aAtRandom(cardIn(handOf(that(player))))), untap(that(creature)))))]})

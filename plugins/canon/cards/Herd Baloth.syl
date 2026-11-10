@@ -1,12 +1,11 @@
-card {
-  name = "Herd Baloth",
-  cost = [generic(3), pip(green), pip(green)],
-  types = [creature],
-  subtypes = [beast],
-  text = [
-    whenever(
-      does(any, putCounters(anyAmount, printedKind(p1p1Counter), thisCreature)),
-      may(create(lit(1), written(creatureToken(4, 4, [green], [beast])))))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Herd Baloth",
+    cost = [generic(3), pip(green), pip(green)],
+    types = [creature],
+    subtypes = [beast],
+    text = [
+      whenever(
+        does(any, putCounters(anyAmount, printedKind(p1p1Counter), thisCreature)),
+        may(create(lit(1), written(creatureToken(4, 4, [green], [beast])))))],
+    power = lit(4),
+    toughness = lit(4)})

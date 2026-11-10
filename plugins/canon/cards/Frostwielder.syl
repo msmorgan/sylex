@@ -1,23 +1,22 @@
-card {
-  name = "Frostwielder",
-  cost = [generic(2), pip(red), pip(red)],
-  types = [creature],
-  subtypes = [human, shaman],
-  text = [
-    static(
-      replace(
-        would(
-          actor(
-            a(
-              and([
-                  isCreature,
-                  did(
-                    actor(thisCreature),
-                    dealDamage(recipient = which),
-                    within(soFarThisTurn))]))),
-          die),
-        instead(exile(it)))),
-    activated(tapSymbol, instruct(thisCreature, dealDamage(lit(1), target(isAnyTarget))))],
-  power = lit(1),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Frostwielder",
+    cost = [generic(2), pip(red), pip(red)],
+    types = [creature],
+    subtypes = [human, shaman],
+    text = [
+      static(
+        replace(
+          would(
+            actor(
+              a(
+                and([
+                    isCreature,
+                    did(
+                      actor(thisCreature),
+                      dealDamage(recipient = which),
+                      within(soFarThisTurn))]))),
+            die),
+          instead(exile(it)))),
+      activated(tapSymbol, instruct(thisCreature, dealDamage(lit(1), target(isAnyTarget))))],
+    power = lit(1),
+    toughness = lit(2)})

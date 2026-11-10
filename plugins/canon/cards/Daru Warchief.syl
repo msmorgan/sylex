@@ -1,15 +1,14 @@
-card {
-  name = "Daru Warchief",
-  cost = [generic(2), pip(white), pip(white)],
-  types = [creature],
-  subtypes = [human, soldier],
-  text = [
-    static(
-      costShift(
-        allOf(and([hasSubtype(soldier), isSpell, did(actor(you), cast(which), thisObject)])),
-        less(lit(1)))),
-    static(
-      getsPt(allOf(and([hasSubtype(soldier), isCreature, youControl])), up(lit(1)), up(lit(2))))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Daru Warchief",
+    cost = [generic(2), pip(white), pip(white)],
+    types = [creature],
+    subtypes = [human, soldier],
+    text = [
+      static(
+        costShift(
+          allOf(and([hasSubtype(soldier), isSpell, did(actor(you), cast(which), thisObject)])),
+          less(lit(1)))),
+      static(
+        getsPt(allOf(and([hasSubtype(soldier), isCreature, youControl])), up(lit(1)), up(lit(2))))],
+    power = lit(1),
+    toughness = lit(1)})

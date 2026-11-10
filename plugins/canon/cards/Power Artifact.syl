@@ -1,12 +1,11 @@
-card {
-  name = "Power Artifact",
-  cost = [pip(blue), pip(blue)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isArtifact),
-    static(
-      costShift(
-        allOf(and([abilityHead(anyActivated), abilityOf(enchanted(artifact))])),
-        less(lit(2), lit(1))))]
-}
+card singleFaced({
+    name = "Power Artifact",
+    cost = [pip(blue), pip(blue)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isArtifact),
+      static(
+        costShift(
+          allOf(and([abilityHead(anyActivated), abilityOf(enchanted(artifact))])),
+          less(lit(2), lit(1))))]})

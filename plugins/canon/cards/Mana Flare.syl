@@ -1,9 +1,8 @@
-card {
-  name = "Mana Flare",
-  cost = [generic(2), pip(red)],
-  types = [enchantment],
-  text = [
-    whenever(
-      does(actor(a(isPlayer)), tapForMana(a(isLand))),
-      instruct(that(player), addMana(lit(1), ofTypeProducedBy(that(land)))))]
-}
+card singleFaced({
+    name = "Mana Flare",
+    cost = [generic(2), pip(red)],
+    types = [enchantment],
+    text = [
+      whenever(
+        does(actor(a(isPlayer)), tapForMana(a(isLand))),
+        instruct(that(player), addMana(lit(1), ofTypeProducedBy(that(land)))))]})

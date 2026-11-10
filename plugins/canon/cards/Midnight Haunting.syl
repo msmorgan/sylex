@@ -1,6 +1,5 @@
-card {
-  name = "Midnight Haunting",
-  cost = [generic(2), pip(white)],
-  types = [instant],
-  text = [spell(create(lit(2), written(creatureToken(1, 1, [white], [spirit], [flying]))))]
-}
+card singleFaced({
+    name = "Midnight Haunting",
+    cost = [generic(2), pip(white)],
+    types = [instant],
+    text = [spell(create(lit(2), written(creatureToken(1, 1, [white], [spirit], [flying]))))]})

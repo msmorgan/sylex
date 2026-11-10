@@ -1,11 +1,10 @@
-card {
-  name = "Char-Rumbler",
-  cost = [generic(2), pip(red), pip(red)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [
-    doubleStrike,
-    activated(mana([pip(red)]), get(thisCreature, up(lit(1)), up(lit(0)), untilEndOfTurn))],
-  power = lit(-1),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Char-Rumbler",
+    cost = [generic(2), pip(red), pip(red)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [
+      doubleStrike,
+      activated(mana([pip(red)]), get(thisCreature, up(lit(1)), up(lit(0)), untilEndOfTurn))],
+    power = lit(-1),
+    toughness = lit(3)})

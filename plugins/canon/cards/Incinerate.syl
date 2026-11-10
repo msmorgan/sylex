@@ -1,14 +1,13 @@
-card {
-  name = "Incinerate",
-  cost = [generic(1), pip(red)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          instruct(this, dealDamage(lit(3), target(isAnyTarget))),
-          establishThroughout(
-            cant(
-              any,
-              regeneration(a(and([isCreature, was(dealDamage(recipient = which), thisWay)])))),
-            thisTurn)]))]
-}
+card singleFaced({
+    name = "Incinerate",
+    cost = [generic(1), pip(red)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            instruct(this, dealDamage(lit(3), target(isAnyTarget))),
+            establishThroughout(
+              cant(
+                any,
+                regeneration(a(and([isCreature, was(dealDamage(recipient = which), thisWay)])))),
+              thisTurn)]))]})

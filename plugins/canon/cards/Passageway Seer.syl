@@ -1,15 +1,14 @@
-card {
-  name = "Passageway Seer",
-  cost = [generic(3), pip(black)],
-  types = [creature],
-  subtypes = [tiefling, warlock],
-  text = [
-    lifelink,
-    when(does(actor(thisCreature), enter), gainDesignation(you, initiative)),
-    at(
-      beginningOfYour(endStep),
-      if = is(you, hasDesignation(initiative)),
-      action = putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Passageway Seer",
+    cost = [generic(3), pip(black)],
+    types = [creature],
+    subtypes = [tiefling, warlock],
+    text = [
+      lifelink,
+      when(does(actor(thisCreature), enter), gainDesignation(you, initiative)),
+      at(
+        beginningOfYour(endStep),
+        if = is(you, hasDesignation(initiative)),
+        action = putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
+    power = lit(2),
+    toughness = lit(2)})

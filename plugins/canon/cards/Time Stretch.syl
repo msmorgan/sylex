@@ -1,6 +1,5 @@
-card {
-  name = "Time Stretch",
-  cost = [generic(8), pip(blue), pip(blue)],
-  types = [sorcery],
-  text = [spell(instruct(target(isPlayer), extraTurn(lit(2))))]
-}
+card singleFaced({
+    name = "Time Stretch",
+    cost = [generic(8), pip(blue), pip(blue)],
+    types = [sorcery],
+    text = [spell(instruct(target(isPlayer), extraTurn(lit(2))))]})

@@ -1,17 +1,19 @@
-card {
-  name = "Mild-Mannered Librarian",
-  cost = [pip(green)],
-  types = [creature],
-  subtypes = [human],
-  text = [
-    activatedOnlyOnce(
-      mana([generic(3), pip(green)]),
-      sequentially([
-          establish(
-            qualityChange(thisCreature, sets, bundle({characteristics = {subtypes = [werewolf]}}))),
-          putCounters(lit(2), printedKind(p1p1Counter), it),
-          draw(lit(1))]),
-      oncePerGame)],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Mild-Mannered Librarian",
+    cost = [pip(green)],
+    types = [creature],
+    subtypes = [human],
+    text = [
+      activatedOnlyOnce(
+        mana([generic(3), pip(green)]),
+        sequentially([
+            establish(
+              qualityChange(
+                thisCreature,
+                sets,
+                bundle({characteristics = {subtypes = [werewolf]}}))),
+            putCounters(lit(2), printedKind(p1p1Counter), it),
+            draw(lit(1))]),
+        oncePerGame)],
+    power = lit(1),
+    toughness = lit(1)})

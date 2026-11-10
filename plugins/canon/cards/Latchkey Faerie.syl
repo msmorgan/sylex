@@ -1,15 +1,14 @@
-card {
-  name = "Latchkey Faerie",
-  cost = [generic(3), pip(blue)],
-  types = [creature],
-  subtypes = [faerie, rogue],
-  text = [
-    flying,
-    prowl(mana([generic(2), pip(blue)])),
-    when(
-      does(actor(thisCreature), enter),
-      if = keywordCostPaid(prowl, thisCreature),
-      action = draw(lit(1)))],
-  power = lit(3),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Latchkey Faerie",
+    cost = [generic(3), pip(blue)],
+    types = [creature],
+    subtypes = [faerie, rogue],
+    text = [
+      flying,
+      prowl(mana([generic(2), pip(blue)])),
+      when(
+        does(actor(thisCreature), enter),
+        if = keywordCostPaid(prowl, thisCreature),
+        action = draw(lit(1)))],
+    power = lit(3),
+    toughness = lit(1)})

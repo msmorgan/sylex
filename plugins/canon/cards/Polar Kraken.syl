@@ -1,12 +1,11 @@
-card {
-  name = "Polar Kraken",
-  cost = [generic(8), pip(blue), pip(blue), pip(blue)],
-  types = [creature],
-  subtypes = [kraken],
-  text = [
-    trample,
-    static(entersTapped(thisCreature)),
-    cumulativeUpkeep(perform(sacrifice(a(isLand))))],
-  power = lit(11),
-  toughness = lit(11)
-}
+card singleFaced({
+    name = "Polar Kraken",
+    cost = [generic(8), pip(blue), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [kraken],
+    text = [
+      trample,
+      static(entersTapped(thisCreature)),
+      cumulativeUpkeep(perform(sacrifice(a(isLand))))],
+    power = lit(11),
+    toughness = lit(11)})

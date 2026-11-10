@@ -1,6 +1,6 @@
-card {
-  name = "Diminish",
-  cost = [pip(blue)],
-  types = [instant],
-  text = [spell(establishThroughout(getsBase(target(isCreature), lit(1), lit(1)), untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Diminish",
+    cost = [pip(blue)],
+    types = [instant],
+    text = [
+      spell(establishThroughout(getsBase(target(isCreature), lit(1), lit(1)), untilEndOfTurn))]})

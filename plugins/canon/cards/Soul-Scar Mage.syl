@@ -1,16 +1,15 @@
-card {
-  name = "Soul-Scar Mage",
-  cost = [pip(red)],
-  types = [creature],
-  subtypes = [human, wizard],
-  text = [
-    prowess,
-    static(
-      replace(
-        would(
-          actor(a(and([isSource, youControl]))),
-          dealDamage(recipient = a(and([isCreature, anOpponentControls])), kind = noncombat)),
-        instead(putCounters(thatMuch, printedKind(m1m1Counter), that(creature)))))],
-  power = lit(1),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Soul-Scar Mage",
+    cost = [pip(red)],
+    types = [creature],
+    subtypes = [human, wizard],
+    text = [
+      prowess,
+      static(
+        replace(
+          would(
+            actor(a(and([isSource, youControl]))),
+            dealDamage(recipient = a(and([isCreature, anOpponentControls])), kind = noncombat)),
+          instead(putCounters(thatMuch, printedKind(m1m1Counter), that(creature)))))],
+    power = lit(1),
+    toughness = lit(2)})

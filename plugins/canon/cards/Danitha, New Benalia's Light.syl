@@ -1,20 +1,19 @@
-card {
-  name = "Danitha, New Benalia's Light",
-  cost = [generic(1), pip(green), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, knight],
-  text = [
-    vigilance,
-    trample,
-    lifelink,
-    static(
-      can(
-        actor(you),
-        cast(
-          counted(exactly(1), and([isSpell, or([hasSubtype(aura), hasSubtype(equipment)])])),
-          from = yourGraveyard),
-        timing = onEachOfYourTurns))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Danitha, New Benalia's Light",
+    cost = [generic(1), pip(green), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, knight],
+    text = [
+      vigilance,
+      trample,
+      lifelink,
+      static(
+        can(
+          actor(you),
+          cast(
+            counted(exactly(1), and([isSpell, or([hasSubtype(aura), hasSubtype(equipment)])])),
+            from = yourGraveyard),
+          timing = onEachOfYourTurns))],
+    power = lit(2),
+    toughness = lit(2)})

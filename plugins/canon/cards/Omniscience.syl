@@ -1,8 +1,8 @@
-card {
-  name = "Omniscience",
-  cost = [generic(7), pip(blue), pip(blue), pip(blue)],
-  types = [enchantment],
-  text = [
-    static(
-      altCost(allOf(and([isSpell, did(actor(you), cast(which, from = yourHand), thisObject)]))))]
-}
+card singleFaced({
+    name = "Omniscience",
+    cost = [generic(7), pip(blue), pip(blue), pip(blue)],
+    types = [enchantment],
+    text = [
+      static(
+        altCost(
+          allOf(and([isSpell, did(actor(you), cast(which, from = yourHand), thisObject)]))))]})

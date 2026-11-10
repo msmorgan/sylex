@@ -1,11 +1,10 @@
-card {
-  name = "Coat of Arms",
-  cost = [generic(5)],
-  types = [artifact],
-  text = [
-    static(
-      getsPt(
-        each(isCreature),
-        up(forEach(lit(1), and([isCreature, isOther, shares(subtype(creature), share, it)]))),
-        up(forEach(lit(1), and([isCreature, isOther, shares(subtype(creature), share, it)])))))]
-}
+card singleFaced({
+    name = "Coat of Arms",
+    cost = [generic(5)],
+    types = [artifact],
+    text = [
+      static(
+        getsPt(
+          each(isCreature),
+          up(forEach(lit(1), and([isCreature, isOther, shares(subtype(creature), share, it)]))),
+          up(forEach(lit(1), and([isCreature, isOther, shares(subtype(creature), share, it)])))))]})

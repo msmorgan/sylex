@@ -1,6 +1,5 @@
-card {
-  name = "Squelch",
-  cost = [generic(1), pip(blue)],
-  types = [instant],
-  text = [spell(sequentially([counter(target(abilityHead(anyActivated))), draw(lit(1))]))]
-}
+card singleFaced({
+    name = "Squelch",
+    cost = [generic(1), pip(blue)],
+    types = [instant],
+    text = [spell(sequentially([counter(target(abilityHead(anyActivated))), draw(lit(1))]))]})

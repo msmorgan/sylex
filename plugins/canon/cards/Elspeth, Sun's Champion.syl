@@ -1,22 +1,21 @@
-card {
-  name = "Elspeth, Sun's Champion",
-  cost = [generic(4), pip(white), pip(white)],
-  supertypes = [legendary],
-  types = [planeswalker],
-  subtypes = [elspeth],
-  text = [
-    activated(
-      loyaltySymbol(up(lit(1))),
-      create(lit(3), written(creatureToken(1, 1, [white], [soldier])))),
-    activated(
-      loyaltySymbol(down(lit(3))),
-      destroy(allOf(and([isCreature, hasPower(atLeast, lit(4))])))),
-    activated(
-      loyaltySymbol(down(lit(7))),
-      getEmblem([
-          static(
-            conjunction([
-                getsPt(allOf(and([isCreature, youControl])), up(lit(2)), up(lit(2))),
-                abilityGrant(them, flying)]))]))],
-  loyalty = lit(4)
-}
+card singleFaced({
+    name = "Elspeth, Sun's Champion",
+    cost = [generic(4), pip(white), pip(white)],
+    supertypes = [legendary],
+    types = [planeswalker],
+    subtypes = [elspeth],
+    text = [
+      activated(
+        loyaltySymbol(up(lit(1))),
+        create(lit(3), written(creatureToken(1, 1, [white], [soldier])))),
+      activated(
+        loyaltySymbol(down(lit(3))),
+        destroy(allOf(and([isCreature, hasPower(atLeast, lit(4))])))),
+      activated(
+        loyaltySymbol(down(lit(7))),
+        getEmblem([
+            static(
+              conjunction([
+                  getsPt(allOf(and([isCreature, youControl])), up(lit(2)), up(lit(2))),
+                  abilityGrant(them, flying)]))]))],
+    loyalty = lit(4)})

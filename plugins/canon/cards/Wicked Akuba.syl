@@ -1,17 +1,16 @@
-card {
-  name = "Wicked Akuba",
-  cost = [pip(black), pip(black)],
-  types = [creature],
-  subtypes = [spirit],
-  text = [
-    activated(
-      mana([pip(black)]),
-      instruct(
-        target(
-          and([
-              isPlayer,
-              did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))])),
-        loseLife(lit(1))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Wicked Akuba",
+    cost = [pip(black), pip(black)],
+    types = [creature],
+    subtypes = [spirit],
+    text = [
+      activated(
+        mana([pip(black)]),
+        instruct(
+          target(
+            and([
+                isPlayer,
+                did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))])),
+          loseLife(lit(1))))],
+    power = lit(2),
+    toughness = lit(2)})

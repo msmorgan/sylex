@@ -1,9 +1,8 @@
-card {
-  name = "Rhystic Study",
-  cost = [generic(2), pip(blue)],
-  types = [enchantment],
-  text = [
-    whenever(
-      does(actor(anOpponent), cast(a(isSpell))),
-      instruct(that(player), doUnless(instruct(you, may(draw(lit(1)))), mana([generic(1)]))))]
-}
+card singleFaced({
+    name = "Rhystic Study",
+    cost = [generic(2), pip(blue)],
+    types = [enchantment],
+    text = [
+      whenever(
+        does(actor(anOpponent), cast(a(isSpell))),
+        instruct(that(player), doUnless(instruct(you, may(draw(lit(1)))), mana([generic(1)]))))]})

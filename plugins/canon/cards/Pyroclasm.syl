@@ -1,6 +1,5 @@
-card {
-  name = "Pyroclasm",
-  cost = [generic(1), pip(red)],
-  types = [sorcery],
-  text = [spell(instruct(this, dealDamage(lit(2), each(isCreature))))]
-}
+card singleFaced({
+    name = "Pyroclasm",
+    cost = [generic(1), pip(red)],
+    types = [sorcery],
+    text = [spell(instruct(this, dealDamage(lit(2), each(isCreature))))]})

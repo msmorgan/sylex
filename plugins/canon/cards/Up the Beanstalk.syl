@@ -1,11 +1,10 @@
-card {
-  name = "Up the Beanstalk",
-  cost = [generic(1), pip(green)],
-  types = [enchantment],
-  text = [
-    when(
-      does(actor(this), enter),
-      joins = [
-        joinedHead(does(actor(you), cast(a(and([isSpell, hasManaValue(atLeast, lit(5))])))))],
-      action = draw(lit(1)))]
-}
+card singleFaced({
+    name = "Up the Beanstalk",
+    cost = [generic(1), pip(green)],
+    types = [enchantment],
+    text = [
+      when(
+        does(actor(this), enter),
+        joins = [
+          joinedHead(does(actor(you), cast(a(and([isSpell, hasManaValue(atLeast, lit(5))])))))],
+        action = draw(lit(1)))]})

@@ -1,11 +1,10 @@
-card {
-  name = "Future Sight",
-  cost = [generic(2), pip(blue), pip(blue), pip(blue)],
-  types = [enchantment],
-  text = [
-    static(visibility(reveal, you, topOfLibrary)),
-    static(
-      conjunction([
-          can(actor(you), play(allOf(isLand), from = onTop)),
-          can(actor(you), cast(bare(isSpell), from = onTop))]))]
-}
+card singleFaced({
+    name = "Future Sight",
+    cost = [generic(2), pip(blue), pip(blue), pip(blue)],
+    types = [enchantment],
+    text = [
+      static(visibility(reveal, you, topOfLibrary)),
+      static(
+        conjunction([
+            can(actor(you), play(allOf(isLand), from = onTop)),
+            can(actor(you), cast(bare(isSpell), from = onTop))]))]})

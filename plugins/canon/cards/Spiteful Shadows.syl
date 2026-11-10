@@ -1,11 +1,10 @@
-card {
-  name = "Spiteful Shadows",
-  cost = [generic(1), pip(black)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    whenever(
-      does(any, dealDamage(recipient = enchanted(creature))),
-      instruct(it, dealDamage(thatMuch, controllerOf(it))))]
-}
+card singleFaced({
+    name = "Spiteful Shadows",
+    cost = [generic(1), pip(black)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      whenever(
+        does(any, dealDamage(recipient = enchanted(creature))),
+        instruct(it, dealDamage(thatMuch, controllerOf(it))))]})

@@ -1,18 +1,17 @@
-card {
-  name = "Heart of Bogardan",
-  cost = [generic(2), pip(red), pip(red)],
-  types = [enchantment],
-  text = [
-    cumulativeUpkeep(mana([generic(2)])),
-    when(
-      does(actor(a(isPlayer)), pay(anyCost, once, unpaid, thisEnchantment, cumulativeUpkeep)),
-      sequentially([
-          simultaneously([
-              instruct(this, dealDamage(letter(x), target(or([isPlaneswalker, isPlayer])))),
-              instruct(
-                this,
-                dealDamage(
-                  letter(x),
-                  each(and([isCreature, controlledBy(splitOverPlaneswalker)]))))]),
-          define(x, minus(times(lit(2), countersOn(ageCounter, thisEnchantment)), lit(2)))]))]
-}
+card singleFaced({
+    name = "Heart of Bogardan",
+    cost = [generic(2), pip(red), pip(red)],
+    types = [enchantment],
+    text = [
+      cumulativeUpkeep(mana([generic(2)])),
+      when(
+        does(actor(a(isPlayer)), pay(anyCost, once, unpaid, thisEnchantment, cumulativeUpkeep)),
+        sequentially([
+            simultaneously([
+                instruct(this, dealDamage(letter(x), target(or([isPlaneswalker, isPlayer])))),
+                instruct(
+                  this,
+                  dealDamage(
+                    letter(x),
+                    each(and([isCreature, controlledBy(splitOverPlaneswalker)]))))]),
+            define(x, minus(times(lit(2), countersOn(ageCounter, thisEnchantment)), lit(2)))]))]})

@@ -1,17 +1,16 @@
-card {
-  name = "Naban, Dean of Iteration",
-  cost = [generic(1), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, wizard],
-  text = [
-    static(
-      additionalTriggers(
-        causes(
-          byEvent(does(actor(a(and([hasSubtype(wizard), youControl]))), enter)),
-          triggers(
-            a(and([abilityHead(anyTriggered), abilityOf(a(and([isPermanent, youControl])))])))),
-        exactly(1)))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Naban, Dean of Iteration",
+    cost = [generic(1), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, wizard],
+    text = [
+      static(
+        additionalTriggers(
+          causes(
+            byEvent(does(actor(a(and([hasSubtype(wizard), youControl]))), enter)),
+            triggers(
+              a(and([abilityHead(anyTriggered), abilityOf(a(and([isPermanent, youControl])))])))),
+          exactly(1)))],
+    power = lit(2),
+    toughness = lit(1)})

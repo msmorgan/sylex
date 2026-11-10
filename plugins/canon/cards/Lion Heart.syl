@@ -1,10 +1,11 @@
-card {
-  name = "Lion Heart",
-  cost = [generic(4)],
-  types = [artifact],
-  subtypes = [equipment],
-  text = [
-    when(does(actor(thisEquipment), enter), instruct(it, dealDamage(lit(2), target(isAnyTarget)))),
-    static(getsPt(equipped(creature), up(lit(2)), up(lit(1)))),
-    equip(mana([generic(2)]))]
-}
+card singleFaced({
+    name = "Lion Heart",
+    cost = [generic(4)],
+    types = [artifact],
+    subtypes = [equipment],
+    text = [
+      when(
+        does(actor(thisEquipment), enter),
+        instruct(it, dealDamage(lit(2), target(isAnyTarget)))),
+      static(getsPt(equipped(creature), up(lit(2)), up(lit(1)))),
+      equip(mana([generic(2)]))]})

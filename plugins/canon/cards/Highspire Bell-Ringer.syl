@@ -1,17 +1,20 @@
-card {
-  name = "Highspire Bell-Ringer",
-  cost = [generic(2), pip(blue)],
-  types = [creature],
-  subtypes = [djinn, monk],
-  text = [
-    flying,
-    static(
-      costShift(
-        the(
-          and([
-              isSpell,
-              did(actor(you), cast(which), thisObject, ordinal = {ordinal = nth(2), per = turn})])),
-        less(lit(1))))],
-  power = lit(1),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Highspire Bell-Ringer",
+    cost = [generic(2), pip(blue)],
+    types = [creature],
+    subtypes = [djinn, monk],
+    text = [
+      flying,
+      static(
+        costShift(
+          the(
+            and([
+                isSpell,
+                did(
+                  actor(you),
+                  cast(which),
+                  thisObject,
+                  ordinal = {ordinal = nth(2), per = turn})])),
+          less(lit(1))))],
+    power = lit(1),
+    toughness = lit(4)})

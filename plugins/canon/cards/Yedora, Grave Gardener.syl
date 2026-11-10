@@ -1,19 +1,18 @@
-card {
-  name = "Yedora, Grave Gardener",
-  cost = [generic(4), pip(green)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [treefolk, druid],
-  text = [
-    whenever(
-      does(actor(a(and([isNontoken, and([isCreature, youControl]), isOther]))), die),
-      may(
-        sequentially([
-            returnToBattlefield(
-              it,
-              [
-                faceDownAs({characteristics = {types = [land], subtypes = [forest]}}),
-                under(ownerOf(it))])])))],
-  power = lit(5),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Yedora, Grave Gardener",
+    cost = [generic(4), pip(green)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [treefolk, druid],
+    text = [
+      whenever(
+        does(actor(a(and([isNontoken, and([isCreature, youControl]), isOther]))), die),
+        may(
+          sequentially([
+              returnToBattlefield(
+                it,
+                [
+                  faceDownAs({characteristics = {types = [land], subtypes = [forest]}}),
+                  under(ownerOf(it))])])))],
+    power = lit(5),
+    toughness = lit(5)})

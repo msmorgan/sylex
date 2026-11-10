@@ -1,15 +1,14 @@
-card {
-  name = "Tolaria",
-  supertypes = [legendary],
-  types = [land],
-  text = [
-    activated(tapSymbol, addMana(lit(1), manaOf([[colored(blue)]]))),
-    activatedOnlyDuring(
-      compound([tapSymbol]),
-      establishThroughout(
-        abilityLoss(
-          target(isCreature),
-          [written(banding), abilities(anyIn({word = bandsWithOther}))]),
-        untilEndOfTurn),
-      duringPart(upkeep))]
-}
+card singleFaced({
+    name = "Tolaria",
+    supertypes = [legendary],
+    types = [land],
+    text = [
+      activated(tapSymbol, addMana(lit(1), manaOf([[colored(blue)]]))),
+      activatedOnlyDuring(
+        compound([tapSymbol]),
+        establishThroughout(
+          abilityLoss(
+            target(isCreature),
+            [written(banding), abilities(anyIn({word = bandsWithOther}))]),
+          untilEndOfTurn),
+        duringPart(upkeep))]})

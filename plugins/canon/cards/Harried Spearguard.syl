@@ -1,22 +1,21 @@
-card {
-  name = "Harried Spearguard",
-  cost = [pip(red)],
-  types = [creature],
-  subtypes = [human, soldier],
-  text = [
-    haste,
-    when(
-      does(actor(thisCreature), die),
-      create(
-        lit(1),
-        written({
-            characteristics = {
-              colors = [black],
-              types = [creature],
-              subtypes = [rat],
-              text = [static(cant(actor(thisToken), block))],
-              power = lit(1),
-              toughness = lit(1)}})))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Harried Spearguard",
+    cost = [pip(red)],
+    types = [creature],
+    subtypes = [human, soldier],
+    text = [
+      haste,
+      when(
+        does(actor(thisCreature), die),
+        create(
+          lit(1),
+          written({
+              characteristics = {
+                colors = [black],
+                types = [creature],
+                subtypes = [rat],
+                text = [static(cant(actor(thisToken), block))],
+                power = lit(1),
+                toughness = lit(1)}})))],
+    power = lit(1),
+    toughness = lit(1)})

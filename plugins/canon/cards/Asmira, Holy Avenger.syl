@@ -1,17 +1,16 @@
-card {
-  name = "Asmira, Holy Avenger",
-  cost = [generic(2), pip(green), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, cleric],
-  text = [
-    flying,
-    at(
-      beginningOfPossessed(endStep, eachPlayer),
-      putCounters(
-        eventCount(putIntoFromBattlefield(a(isCreature), yourGraveyard), any, soFarThisTurn),
-        printedKind(p1p1Counter),
-        thisCreature))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Asmira, Holy Avenger",
+    cost = [generic(2), pip(green), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, cleric],
+    text = [
+      flying,
+      at(
+        beginningOfPossessed(endStep, eachPlayer),
+        putCounters(
+          eventCount(putIntoFromBattlefield(a(isCreature), yourGraveyard), any, soFarThisTurn),
+          printedKind(p1p1Counter),
+          thisCreature))],
+    power = lit(2),
+    toughness = lit(3)})

@@ -1,15 +1,14 @@
-card {
-  name = "Plated Pegasus",
-  cost = [generic(2), pip(white)],
-  types = [creature],
-  subtypes = [pegasus],
-  text = [
-    flash,
-    flying,
-    static(
-      replace(
-        would(actor(a(isSpell)), dealDamage(recipient = a(or([isPermanent, isPlayer])))),
-        instead(preventDamage(ofThatDamage(lit(1))))))],
-  power = lit(1),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Plated Pegasus",
+    cost = [generic(2), pip(white)],
+    types = [creature],
+    subtypes = [pegasus],
+    text = [
+      flash,
+      flying,
+      static(
+        replace(
+          would(actor(a(isSpell)), dealDamage(recipient = a(or([isPermanent, isPlayer])))),
+          instead(preventDamage(ofThatDamage(lit(1))))))],
+    power = lit(1),
+    toughness = lit(2)})

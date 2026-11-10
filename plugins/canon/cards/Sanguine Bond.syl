@@ -1,9 +1,8 @@
-card {
-  name = "Sanguine Bond",
-  cost = [generic(3), pip(black), pip(black)],
-  types = [enchantment],
-  text = [
-    whenever(
-      does(actor(you), gainLife(anyAmount)),
-      instruct(target(isOpponent), loseLife(thatMuch)))]
-}
+card singleFaced({
+    name = "Sanguine Bond",
+    cost = [generic(3), pip(black), pip(black)],
+    types = [enchantment],
+    text = [
+      whenever(
+        does(actor(you), gainLife(anyAmount)),
+        instruct(target(isOpponent), loseLife(thatMuch)))]})

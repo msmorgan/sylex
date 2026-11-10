@@ -1,6 +1,5 @@
-card {
-  name = "About Face",
-  cost = [pip(red)],
-  types = [instant],
-  text = [spell(establishThroughout(ptSwitch(target(isCreature)), untilEndOfTurn))]
-}
+card singleFaced({
+    name = "About Face",
+    cost = [pip(red)],
+    types = [instant],
+    text = [spell(establishThroughout(ptSwitch(target(isCreature)), untilEndOfTurn))]})

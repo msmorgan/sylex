@@ -2,55 +2,54 @@
 # control has that base power and toughness, becomes that creature type, and gains that ability.",
 # with its bullet's creature shape as one set of characteristics: its creature type, its base power
 # and toughness [CR#613.4b] and its ability.
-card {
-  name = "Wild Shape",
-  cost = [pip(green)],
-  types = [instant],
-  text = [
-    spell(
-      chooseModes(
-        exactly(1),
-        [
-          mode(
-            none,
-            none,
-            establish(
-              qualityChange(
-                target(and([isCreature, youControl])),
-                sets,
-                bundle({
-                    characteristics = {
-                      subtypes = [turtle],
-                      text = [hexproof],
-                      power = lit(1),
-                      toughness = lit(3)}})),
-              untilEndOfTurn)),
-          mode(
-            none,
-            none,
-            establish(
-              qualityChange(
-                target(and([isCreature, youControl])),
-                sets,
-                bundle({
-                    characteristics = {
-                      subtypes = [spider],
-                      text = [reach],
-                      power = lit(1),
-                      toughness = lit(5)}})),
-              untilEndOfTurn)),
-          mode(
-            none,
-            none,
-            establish(
-              qualityChange(
-                target(and([isCreature, youControl])),
-                sets,
-                bundle({
-                    characteristics = {
-                      subtypes = [elephant],
-                      text = [trample],
-                      power = lit(3),
-                      toughness = lit(3)}})),
-              untilEndOfTurn))]))]
-}
+card singleFaced({
+    name = "Wild Shape",
+    cost = [pip(green)],
+    types = [instant],
+    text = [
+      spell(
+        chooseModes(
+          exactly(1),
+          [
+            mode(
+              none,
+              none,
+              establish(
+                qualityChange(
+                  target(and([isCreature, youControl])),
+                  sets,
+                  bundle({
+                      characteristics = {
+                        subtypes = [turtle],
+                        text = [hexproof],
+                        power = lit(1),
+                        toughness = lit(3)}})),
+                untilEndOfTurn)),
+            mode(
+              none,
+              none,
+              establish(
+                qualityChange(
+                  target(and([isCreature, youControl])),
+                  sets,
+                  bundle({
+                      characteristics = {
+                        subtypes = [spider],
+                        text = [reach],
+                        power = lit(1),
+                        toughness = lit(5)}})),
+                untilEndOfTurn)),
+            mode(
+              none,
+              none,
+              establish(
+                qualityChange(
+                  target(and([isCreature, youControl])),
+                  sets,
+                  bundle({
+                      characteristics = {
+                        subtypes = [elephant],
+                        text = [trample],
+                        power = lit(3),
+                        toughness = lit(3)}})),
+                untilEndOfTurn))]))]})

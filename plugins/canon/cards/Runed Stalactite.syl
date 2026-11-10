@@ -1,12 +1,11 @@
-card {
-  name = "Runed Stalactite",
-  cost = [generic(1)],
-  types = [artifact],
-  subtypes = [equipment],
-  text = [
-    static(
-      conjunction([
-          getsPt(equipped(creature), up(lit(1)), up(lit(1))),
-          qualityChange(equipped(creature), adds, everyTypeOf(creature))])),
-    equip(mana([generic(2)]))]
-}
+card singleFaced({
+    name = "Runed Stalactite",
+    cost = [generic(1)],
+    types = [artifact],
+    subtypes = [equipment],
+    text = [
+      static(
+        conjunction([
+            getsPt(equipped(creature), up(lit(1)), up(lit(1))),
+            qualityChange(equipped(creature), adds, everyTypeOf(creature))])),
+      equip(mana([generic(2)]))]})

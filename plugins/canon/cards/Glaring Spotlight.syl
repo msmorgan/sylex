@@ -1,18 +1,19 @@
 # Pins an as-though exception for targeting by your spells and abilities.
 # The exception applies only to that act and does not remove hexproof [CR#609.4].
-card {
-  name = "Glaring Spotlight",
-  cost = [generic(1)],
-  types = [artifact],
-  text = [
-    static(
-      can(
-        by(allOf(and([or([isSpell, abilityHead(anyOnStack)]), youControl]))),
-        target(allOf(and([isCreature, opponentsControl, hasKeyword(theKeyword(hexproof))]))),
-        asThough = holds(is(them, not(hasKeyword(theKeyword(hexproof))))))),
-    activated(
-      compound([mana([generic(3)]), perform(sacrifice(thisArtifact))]),
-      sequentially([
-          gain(allOf(and([isCreature, youControl])), hexproof, untilEndOfTurn),
-          establishThroughout(cant(any, block(allOf(and([isCreature, youControl])))), thisTurn)]))]
-}
+card singleFaced({
+    name = "Glaring Spotlight",
+    cost = [generic(1)],
+    types = [artifact],
+    text = [
+      static(
+        can(
+          by(allOf(and([or([isSpell, abilityHead(anyOnStack)]), youControl]))),
+          target(allOf(and([isCreature, opponentsControl, hasKeyword(theKeyword(hexproof))]))),
+          asThough = holds(is(them, not(hasKeyword(theKeyword(hexproof))))))),
+      activated(
+        compound([mana([generic(3)]), perform(sacrifice(thisArtifact))]),
+        sequentially([
+            gain(allOf(and([isCreature, youControl])), hexproof, untilEndOfTurn),
+            establishThroughout(
+              cant(any, block(allOf(and([isCreature, youControl])))),
+              thisTurn)]))]})

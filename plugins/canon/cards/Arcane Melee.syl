@@ -1,6 +1,5 @@
-card {
-  name = "Arcane Melee",
-  cost = [generic(4), pip(blue)],
-  types = [enchantment],
-  text = [static(costShift(allOf(and([isInstantOrSorcery, isSpell])), less(lit(2))))]
-}
+card singleFaced({
+    name = "Arcane Melee",
+    cost = [generic(4), pip(blue)],
+    types = [enchantment],
+    text = [static(costShift(allOf(and([isInstantOrSorcery, isSpell])), less(lit(2))))]})

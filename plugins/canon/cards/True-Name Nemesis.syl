@@ -1,11 +1,10 @@
-card {
-  name = "True-Name Nemesis",
-  cost = [generic(1), pip(blue), pip(blue)],
-  types = [creature],
-  subtypes = [merfolk, rogue],
-  text = [
-    static(entersChoosingPlayer(thisCreature, a(isPlayer))),
-    protection(objectsOfPlayer(the(isChosenPlayer)))],
-  power = lit(3),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "True-Name Nemesis",
+    cost = [generic(1), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [merfolk, rogue],
+    text = [
+      static(entersChoosingPlayer(thisCreature, a(isPlayer))),
+      protection(objectsOfPlayer(the(isChosenPlayer)))],
+    power = lit(3),
+    toughness = lit(1)})

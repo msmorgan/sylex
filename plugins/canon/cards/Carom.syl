@@ -1,14 +1,13 @@
-card {
-  name = "Carom",
-  cost = [generic(1), pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          establishThroughout(
-            replace(
-              would(any, dealDamage(recipient = target(isCreature))),
-              instead(redirectDamage(theNext(lit(1)), target(and([isCreature, isOther]))))),
-            thisTurn),
-          draw(lit(1))]))]
-}
+card singleFaced({
+    name = "Carom",
+    cost = [generic(1), pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            establishThroughout(
+              replace(
+                would(any, dealDamage(recipient = target(isCreature))),
+                instead(redirectDamage(theNext(lit(1)), target(and([isCreature, isOther]))))),
+              thisTurn),
+            draw(lit(1))]))]})

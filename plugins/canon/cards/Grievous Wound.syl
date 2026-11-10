@@ -1,12 +1,11 @@
-card {
-  name = "Grievous Wound",
-  cost = [generic(3), pip(black), pip(black)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isPlayer),
-    static(cant(actor(enchanted(player)), gainLife(anyAmount))),
-    whenever(
-      does(any, dealDamage(recipient = enchanted(player))),
-      instruct(they, loseLife(half(up, lifeTotalOf(they)))))]
-}
+card singleFaced({
+    name = "Grievous Wound",
+    cost = [generic(3), pip(black), pip(black)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isPlayer),
+      static(cant(actor(enchanted(player)), gainLife(anyAmount))),
+      whenever(
+        does(any, dealDamage(recipient = enchanted(player))),
+        instruct(they, loseLife(half(up, lifeTotalOf(they)))))]})

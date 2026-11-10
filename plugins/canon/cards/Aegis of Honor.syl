@@ -1,14 +1,13 @@
-card {
-  name = "Aegis of Honor",
-  cost = [pip(white)],
-  types = [enchantment],
-  text = [
-    activated(
-      mana([generic(1)]),
-      establishThroughout(
-        replace(
-          would(actor(a(isInstantOrSorcery)), dealDamage(recipient = you)),
-          instead(redirectDamage(allDamage, controllerOf(it))),
-          use = nextTimeOnly),
-        thisTurn))]
-}
+card singleFaced({
+    name = "Aegis of Honor",
+    cost = [pip(white)],
+    types = [enchantment],
+    text = [
+      activated(
+        mana([generic(1)]),
+        establishThroughout(
+          replace(
+            would(actor(a(isInstantOrSorcery)), dealDamage(recipient = you)),
+            instead(redirectDamage(allDamage, controllerOf(it))),
+            use = nextTimeOnly),
+          thisTurn))]})

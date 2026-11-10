@@ -1,8 +1,7 @@
-card {
-  name = "People of the Woods",
-  cost = [pip(green), pip(green)],
-  types = [creature],
-  subtypes = [human],
-  text = [static(definesToughness(thisCreature, countOf(and([hasSubtype(forest), youControl]))))],
-  power = lit(1)
-}
+card singleFaced({
+    name = "People of the Woods",
+    cost = [pip(green), pip(green)],
+    types = [creature],
+    subtypes = [human],
+    text = [static(definesToughness(thisCreature, countOf(and([hasSubtype(forest), youControl]))))],
+    power = lit(1)})

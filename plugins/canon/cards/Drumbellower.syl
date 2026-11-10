@@ -1,9 +1,8 @@
-card {
-  name = "Drumbellower",
-  cost = [generic(2), pip(white)],
-  types = [creature],
-  subtypes = [spirit],
-  text = [flying, static(untapDuring(allOf(and([isCreature, youControl])), each(isOtherPlayer)))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Drumbellower",
+    cost = [generic(2), pip(white)],
+    types = [creature],
+    subtypes = [spirit],
+    text = [flying, static(untapDuring(allOf(and([isCreature, youControl])), each(isOtherPlayer)))],
+    power = lit(2),
+    toughness = lit(1)})

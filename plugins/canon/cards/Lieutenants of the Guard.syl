@@ -1,16 +1,15 @@
-card {
-  name = "Lieutenants of the Guard",
-  cost = [generic(4), pip(white)],
-  types = [creature],
-  subtypes = [human, soldier],
-  text = [
-    councilsDilemma(
-      when(
-        does(actor(thisCreature), enter),
-        sequentially([
-            instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["strength", "numbers"]))),
-            putCounters(votesFor("strength"), printedKind(p1p1Counter), thisCreature),
-            create(votesFor("numbers"), written(creatureToken(1, 1, [white], [soldier])))])))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Lieutenants of the Guard",
+    cost = [generic(4), pip(white)],
+    types = [creature],
+    subtypes = [human, soldier],
+    text = [
+      councilsDilemma(
+        when(
+          does(actor(thisCreature), enter),
+          sequentially([
+              instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["strength", "numbers"]))),
+              putCounters(votesFor("strength"), printedKind(p1p1Counter), thisCreature),
+              create(votesFor("numbers"), written(creatureToken(1, 1, [white], [soldier])))])))],
+    power = lit(2),
+    toughness = lit(2)})

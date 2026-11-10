@@ -1,14 +1,13 @@
-card {
-  name = "Rustler Rampage",
-  cost = [pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      chooseSpree([
-          {
-            cost = mana([generic(1)]),
-            action = untap(allOf(and([isCreature, controlledBy(target(isPlayer))])))},
-          {
-            cost = mana([generic(1)]),
-            action = gain(target(isCreature), doubleStrike, untilEndOfTurn)}]))]
-}
+card singleFaced({
+    name = "Rustler Rampage",
+    cost = [pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        chooseSpree([
+            {
+              cost = mana([generic(1)]),
+              action = untap(allOf(and([isCreature, controlledBy(target(isPlayer))])))},
+            {
+              cost = mana([generic(1)]),
+              action = gain(target(isCreature), doubleStrike, untilEndOfTurn)}]))]})

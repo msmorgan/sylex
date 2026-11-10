@@ -1,6 +1,5 @@
-card {
-  name = "Wrath of God",
-  cost = [generic(2), pip(white), pip(white)],
-  types = [sorcery],
-  text = [spell(destroyPluralCantRegenerate(allOf(isCreature)))]
-}
+card singleFaced({
+    name = "Wrath of God",
+    cost = [generic(2), pip(white), pip(white)],
+    types = [sorcery],
+    text = [spell(destroyPluralCantRegenerate(allOf(isCreature)))]})

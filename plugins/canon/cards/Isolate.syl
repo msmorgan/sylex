@@ -1,6 +1,5 @@
-card {
-  name = "Isolate",
-  cost = [pip(white)],
-  types = [instant],
-  text = [spell(exile(target(and([isPermanent, hasManaValue(equal, lit(1))]))))]
-}
+card singleFaced({
+    name = "Isolate",
+    cost = [pip(white)],
+    types = [instant],
+    text = [spell(exile(target(and([isPermanent, hasManaValue(equal, lit(1))]))))]})

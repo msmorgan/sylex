@@ -1,14 +1,13 @@
-card {
-  name = "Stunning Shot",
-  cost = [generic(1), pip(white)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          putCounters(
-            lit(2),
-            printedKind(p1p1Counter),
-            targets(upTo(1), and([isCreature, youControl]))),
-          tap(targets(upTo(1), and([isCreature, anOpponentControls]))),
-          putCounters(lit(1), printedKind(stunCounter), it)]))]
-}
+card singleFaced({
+    name = "Stunning Shot",
+    cost = [generic(1), pip(white)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            putCounters(
+              lit(2),
+              printedKind(p1p1Counter),
+              targets(upTo(1), and([isCreature, youControl]))),
+            tap(targets(upTo(1), and([isCreature, anOpponentControls]))),
+            putCounters(lit(1), printedKind(stunCounter), it)]))]})

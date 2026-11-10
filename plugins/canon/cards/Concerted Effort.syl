@@ -1,26 +1,25 @@
-card {
-  name = "Concerted Effort",
-  cost = [generic(2), pip(white), pip(white)],
-  types = [enchantment],
-  text = [
-    alsoForKeywords(
-      at(
-        beginningOfPossessed(upkeep, eachPlayer),
-        doOnlyIf(
-          establishThroughout(
-            keywordGrant(
-              allOf(and([isCreature, youControl])),
-              thatKeyword,
-              and([isCreature, youControl, hasKeyword(thatKeyword)])),
-            untilEndOfTurn),
-          exists(and([isCreature, youControl, hasKeyword(thatKeyword)])))),
-      [
-        theKeyword(flying),
-        theKeyword(fear),
-        theKeyword(firstStrike),
-        theKeyword(doubleStrike),
-        anyIn({word = landwalk}),
-        anyIn({word = protection}),
-        theKeyword(trample),
-        theKeyword(vigilance)])]
-}
+card singleFaced({
+    name = "Concerted Effort",
+    cost = [generic(2), pip(white), pip(white)],
+    types = [enchantment],
+    text = [
+      alsoForKeywords(
+        at(
+          beginningOfPossessed(upkeep, eachPlayer),
+          doOnlyIf(
+            establishThroughout(
+              keywordGrant(
+                allOf(and([isCreature, youControl])),
+                thatKeyword,
+                and([isCreature, youControl, hasKeyword(thatKeyword)])),
+              untilEndOfTurn),
+            exists(and([isCreature, youControl, hasKeyword(thatKeyword)])))),
+        [
+          theKeyword(flying),
+          theKeyword(fear),
+          theKeyword(firstStrike),
+          theKeyword(doubleStrike),
+          anyIn({word = landwalk}),
+          anyIn({word = protection}),
+          theKeyword(trample),
+          theKeyword(vigilance)])]})

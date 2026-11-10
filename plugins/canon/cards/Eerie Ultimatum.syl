@@ -1,10 +1,9 @@
-card {
-  name = "Eerie Ultimatum",
-  cost = [pip(white), pip(white), pip(black), pip(black), pip(black), pip(green), pip(green)],
-  types = [sorcery],
-  text = [
-    spell(
-      returnToBattlefield(
-        withDifferentNames(counted(anyNumber, and([isPermanentCard, in(yourGraveyard)]))),
-        from = yourGraveyard))]
-}
+card singleFaced({
+    name = "Eerie Ultimatum",
+    cost = [pip(white), pip(white), pip(black), pip(black), pip(black), pip(green), pip(green)],
+    types = [sorcery],
+    text = [
+      spell(
+        returnToBattlefield(
+          withDifferentNames(counted(anyNumber, and([isPermanentCard, in(yourGraveyard)]))),
+          from = yourGraveyard))]})

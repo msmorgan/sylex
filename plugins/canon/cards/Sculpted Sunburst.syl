@@ -1,24 +1,23 @@
 # Sculpted Sunburst: "if you chose a creature this way" reads back the choice you made earlier
 # in the spell (a `did` over `choose`);
 # "not chosen by any player this way" excludes every player's chosen creature.
-card {
-  name = "Sculpted Sunburst",
-  cost = [generic(3), pip(white), pip(white)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          choose(a(and([isCreature, youControl]))),
-          instruct(
-            eachOpponent,
-            choose(
-              a(
-                comparesOwnStat(
-                  power,
-                  and([isCreature, controlledBy(they)]),
-                  atMost,
-                  powerOf(it))))),
-          doIf(
-            did(actor(you), choose(a(isCreature)), thisWay),
-            exile(each(and([isCreature, notChosen]))))]))]
-}
+card singleFaced({
+    name = "Sculpted Sunburst",
+    cost = [generic(3), pip(white), pip(white)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            choose(a(and([isCreature, youControl]))),
+            instruct(
+              eachOpponent,
+              choose(
+                a(
+                  comparesOwnStat(
+                    power,
+                    and([isCreature, controlledBy(they)]),
+                    atMost,
+                    powerOf(it))))),
+            doIf(
+              did(actor(you), choose(a(isCreature)), thisWay),
+              exile(each(and([isCreature, notChosen]))))]))]})

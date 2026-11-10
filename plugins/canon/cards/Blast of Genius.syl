@@ -1,16 +1,15 @@
-card {
-  name = "Blast of Genius",
-  cost = [generic(4), pip(blue), pip(red)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          choose(target(isAnyTarget)),
-          draw(lit(3)),
-          discard(a(cardIn(yourHand))),
-          instruct(
-            this,
-            dealDamage(
-              statOf(stat(manaValue), the(and([was(discard(which)), isCard]))),
-              thatJoin))]))]
-}
+card singleFaced({
+    name = "Blast of Genius",
+    cost = [generic(4), pip(blue), pip(red)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            choose(target(isAnyTarget)),
+            draw(lit(3)),
+            discard(a(cardIn(yourHand))),
+            instruct(
+              this,
+              dealDamage(
+                statOf(stat(manaValue), the(and([was(discard(which)), isCard]))),
+                thatJoin))]))]})

@@ -1,20 +1,22 @@
-card {
-  name = "Dread Slaver",
-  cost = [generic(3), pip(black), pip(black)],
-  types = [creature],
-  subtypes = [zombie, horror],
-  text = [
-    whenever(
-      does(
-        actor(
-          a(
-            and([
-                isCreature,
-                did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))]))),
-        die),
-      sequentially([
-          returnToBattlefield(it, [under(you)]),
-          become(that(creature), {characteristics = {colors = [black], subtypes = [zombie]}})]))],
-  power = lit(3),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Dread Slaver",
+    cost = [generic(3), pip(black), pip(black)],
+    types = [creature],
+    subtypes = [zombie, horror],
+    text = [
+      whenever(
+        does(
+          actor(
+            a(
+              and([
+                  isCreature,
+                  did(
+                    actor(thisCreature),
+                    dealDamage(recipient = which),
+                    within(soFarThisTurn))]))),
+          die),
+        sequentially([
+            returnToBattlefield(it, [under(you)]),
+            become(that(creature), {characteristics = {colors = [black], subtypes = [zombie]}})]))],
+    power = lit(3),
+    toughness = lit(5)})

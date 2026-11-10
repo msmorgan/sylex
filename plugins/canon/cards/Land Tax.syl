@@ -1,20 +1,19 @@
-card {
-  name = "Land Tax",
-  cost = [pip(white)],
-  types = [enchantment],
-  text = [
-    at(
-      beginningOfYour(upkeep),
-      if = exists(
-        compareOver(
-          isOpponent,
-          countOf(and([isLand, controlledBy(they)])),
-          greater,
-          countOf(and([isLand, youControl])))),
-      action = may(
-        sequentially([
-            search(yourLibrary, counted(upTo(3), and([isLand, hasSupertype(basic)]))),
-            reveal(those(card)),
-            putInto(those(card), hand),
-            shuffle])))]
-}
+card singleFaced({
+    name = "Land Tax",
+    cost = [pip(white)],
+    types = [enchantment],
+    text = [
+      at(
+        beginningOfYour(upkeep),
+        if = exists(
+          compareOver(
+            isOpponent,
+            countOf(and([isLand, controlledBy(they)])),
+            greater,
+            countOf(and([isLand, youControl])))),
+        action = may(
+          sequentially([
+              search(yourLibrary, counted(upTo(3), and([isLand, hasSupertype(basic)]))),
+              reveal(those(card)),
+              putInto(those(card), hand),
+              shuffle])))]})

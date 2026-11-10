@@ -1,16 +1,15 @@
-card {
-  name = "Containment Priest",
-  cost = [generic(1), pip(white)],
-  types = [creature],
-  subtypes = [human, cleric],
-  text = [
-    flash,
-    static(
-      replace(
-        would(
-          actor(a(and([isCreature, isNontoken, not(did(any, cast(which), thisObject))]))),
-          enter),
-        instead(exile(it))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Containment Priest",
+    cost = [generic(1), pip(white)],
+    types = [creature],
+    subtypes = [human, cleric],
+    text = [
+      flash,
+      static(
+        replace(
+          would(
+            actor(a(and([isCreature, isNontoken, not(did(any, cast(which), thisObject))]))),
+            enter),
+          instead(exile(it))))],
+    power = lit(2),
+    toughness = lit(2)})

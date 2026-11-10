@@ -1,17 +1,16 @@
-card {
-  name = "Grixis Illusionist",
-  cost = [pip(blue)],
-  types = [creature],
-  subtypes = [human, wizard],
-  text = [
-    activated(
-      tapSymbol,
-      establishThroughout(
-        qualityChange(
-          target(and([isLand, youControl])),
-          sets,
-          chosenQuality(ofYourChoice(subtype(land), basicTypesOnly))),
-        untilEndOfTurn))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Grixis Illusionist",
+    cost = [pip(blue)],
+    types = [creature],
+    subtypes = [human, wizard],
+    text = [
+      activated(
+        tapSymbol,
+        establishThroughout(
+          qualityChange(
+            target(and([isLand, youControl])),
+            sets,
+            chosenQuality(ofYourChoice(subtype(land), basicTypesOnly))),
+          untilEndOfTurn))],
+    power = lit(1),
+    toughness = lit(1)})

@@ -1,14 +1,13 @@
-card {
-  name = "Blind Fury",
-  cost = [generic(2), pip(red), pip(red)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          establishThroughout(abilityLoss(allOf(isCreature), [written(trample)]), untilEndOfTurn),
-          establishThroughout(
-            replace(
-              would(actor(a(isCreature)), dealDamage(recipient = a(isCreature), kind = combat)),
-              instead(instruct(it, dealDamage(times(lit(2), thatMuch), that(creature))))),
-            thisTurn)]))]
-}
+card singleFaced({
+    name = "Blind Fury",
+    cost = [generic(2), pip(red), pip(red)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            establishThroughout(abilityLoss(allOf(isCreature), [written(trample)]), untilEndOfTurn),
+            establishThroughout(
+              replace(
+                would(actor(a(isCreature)), dealDamage(recipient = a(isCreature), kind = combat)),
+                instead(instruct(it, dealDamage(times(lit(2), thatMuch), that(creature))))),
+              thisTurn)]))]})

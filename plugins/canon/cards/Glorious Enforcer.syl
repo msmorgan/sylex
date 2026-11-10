@@ -1,15 +1,14 @@
-card {
-  name = "Glorious Enforcer",
-  cost = [generic(5), pip(white), pip(white)],
-  types = [creature],
-  subtypes = [angel],
-  text = [
-    flying,
-    lifelink,
-    at(
-      beginningOfPossessed(combat, eachPlayer),
-      if = compareAmt(lifeTotalOf(you), greater, lifeTotalOf(anOpponent)),
-      action = gain(thisCreature, doubleStrike, untilEndOfTurn))],
-  power = lit(5),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Glorious Enforcer",
+    cost = [generic(5), pip(white), pip(white)],
+    types = [creature],
+    subtypes = [angel],
+    text = [
+      flying,
+      lifelink,
+      at(
+        beginningOfPossessed(combat, eachPlayer),
+        if = compareAmt(lifeTotalOf(you), greater, lifeTotalOf(anOpponent)),
+        action = gain(thisCreature, doubleStrike, untilEndOfTurn))],
+    power = lit(5),
+    toughness = lit(5)})

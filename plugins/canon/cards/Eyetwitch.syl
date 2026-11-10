@@ -1,9 +1,8 @@
-card {
-  name = "Eyetwitch",
-  cost = [pip(black)],
-  types = [creature],
-  subtypes = [eye, bat],
-  text = [flying, when(does(actor(thisCreature), die), learn)],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Eyetwitch",
+    cost = [pip(black)],
+    types = [creature],
+    subtypes = [eye, bat],
+    text = [flying, when(does(actor(thisCreature), die), learn)],
+    power = lit(1),
+    toughness = lit(1)})

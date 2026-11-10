@@ -1,8 +1,7 @@
-card {
-  name = "Leyline of the Meek",
-  cost = [generic(2), pip(white), pip(white)],
-  types = [enchantment],
-  text = [
-    mayBeginOnBattlefield,
-    static(getsPt(allOf(and([isCreature, isToken])), up(lit(1)), up(lit(1))))]
-}
+card singleFaced({
+    name = "Leyline of the Meek",
+    cost = [generic(2), pip(white), pip(white)],
+    types = [enchantment],
+    text = [
+      mayBeginOnBattlefield,
+      static(getsPt(allOf(and([isCreature, isToken])), up(lit(1)), up(lit(1))))]})

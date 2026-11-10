@@ -1,20 +1,21 @@
-card {
-  name = "Celestial Convergence",
-  cost = [generic(2), pip(white), pip(white)],
-  types = [enchantment],
-  text = [
-    static(entersWithCounters(thisEnchantment, lit(7), omenCounter)),
-    at(
-      beginningOfYour(upkeep),
-      sequentially([
-          removeCounters(exactly(1), printedKind(omenCounter), thisEnchantment),
-          doIf(
-            compareAmt(countersOn(omenCounter, thisEnchantment), atMost, lit(0)),
+card singleFaced({
+    name = "Celestial Convergence",
+    cost = [generic(2), pip(white), pip(white)],
+    types = [enchantment],
+    text = [
+      static(entersWithCounters(thisEnchantment, lit(7), omenCounter)),
+      at(
+        beginningOfYour(upkeep),
+        sequentially([
+            removeCounters(exactly(1), printedKind(omenCounter), thisEnchantment),
             doIf(
-              thereAre(
-                counted(orMore(2), and([isPlayer, tiedFor(max, playerStat(lifeTotal), isPlayer)]))),
-              drawGame,
-              instruct(
-                the(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])),
-                winGame)))]))]
-}
+              compareAmt(countersOn(omenCounter, thisEnchantment), atMost, lit(0)),
+              doIf(
+                thereAre(
+                  counted(
+                    orMore(2),
+                    and([isPlayer, tiedFor(max, playerStat(lifeTotal), isPlayer)]))),
+                drawGame,
+                instruct(
+                  the(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])),
+                  winGame)))]))]})

@@ -1,17 +1,16 @@
-card {
-  name = "Magus of the Scroll",
-  cost = [pip(red)],
-  types = [creature],
-  subtypes = [human, wizard],
-  text = [
-    activated(
-      compound([mana([generic(3)]), tapSymbol]),
-      sequentially([
-          choose(a(quality(cardName))),
-          reveal(aAtRandom(cardIn(yourHand))),
-          doIf(
-            is(that(card), named(chosenName)),
-            instruct(thisCreature, dealDamage(lit(2), target(isAnyTarget))))]))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Magus of the Scroll",
+    cost = [pip(red)],
+    types = [creature],
+    subtypes = [human, wizard],
+    text = [
+      activated(
+        compound([mana([generic(3)]), tapSymbol]),
+        sequentially([
+            choose(a(quality(cardName))),
+            reveal(aAtRandom(cardIn(yourHand))),
+            doIf(
+              is(that(card), named(chosenName)),
+              instruct(thisCreature, dealDamage(lit(2), target(isAnyTarget))))]))],
+    power = lit(1),
+    toughness = lit(1)})

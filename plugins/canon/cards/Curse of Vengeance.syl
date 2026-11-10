@@ -1,15 +1,14 @@
-card {
-  name = "Curse of Vengeance",
-  cost = [pip(black)],
-  types = [enchantment],
-  subtypes = [aura, curse],
-  text = [
-    enchant(isPlayer),
-    whenever(
-      does(actor(enchanted(player)), cast(a(isSpell))),
-      putCounters(lit(1), printedKind(spiteCounter), thisAura)),
-    when(
-      does(actor(enchanted(player)), loseGame),
-      sequentially(
-        [gainLife(letter(x)), draw(letter(x)), define(x, countersOn(spiteCounter, thisAura))]))]
-}
+card singleFaced({
+    name = "Curse of Vengeance",
+    cost = [pip(black)],
+    types = [enchantment],
+    subtypes = [aura, curse],
+    text = [
+      enchant(isPlayer),
+      whenever(
+        does(actor(enchanted(player)), cast(a(isSpell))),
+        putCounters(lit(1), printedKind(spiteCounter), thisAura)),
+      when(
+        does(actor(enchanted(player)), loseGame),
+        sequentially(
+          [gainLife(letter(x)), draw(letter(x)), define(x, countersOn(spiteCounter, thisAura))]))]})

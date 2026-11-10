@@ -1,13 +1,12 @@
-card {
-  name = "Workhorse",
-  cost = [generic(6)],
-  types = [artifact, creature],
-  subtypes = [horse],
-  text = [
-    static(entersWithCounters(thisCreature, lit(4), p1p1Counter)),
-    activated(
-      perform(removeCounters(exactly(1), printedKind(p1p1Counter), thisCreature)),
-      addMana(lit(1), manaOf([[colorless]])))],
-  power = lit(0),
-  toughness = lit(0)
-}
+card singleFaced({
+    name = "Workhorse",
+    cost = [generic(6)],
+    types = [artifact, creature],
+    subtypes = [horse],
+    text = [
+      static(entersWithCounters(thisCreature, lit(4), p1p1Counter)),
+      activated(
+        perform(removeCounters(exactly(1), printedKind(p1p1Counter), thisCreature)),
+        addMana(lit(1), manaOf([[colorless]])))],
+    power = lit(0),
+    toughness = lit(0)})

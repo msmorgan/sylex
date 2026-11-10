@@ -1,13 +1,12 @@
-card {
-  name = "Living Hive",
-  cost = [generic(6), pip(green), pip(green)],
-  types = [creature],
-  subtypes = [elemental, insect],
-  text = [
-    trample,
-    whenever(
-      does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-      create(thatMuch, written(creatureToken(1, 1, [green], [insect]))))],
-  power = lit(6),
-  toughness = lit(6)
-}
+card singleFaced({
+    name = "Living Hive",
+    cost = [generic(6), pip(green), pip(green)],
+    types = [creature],
+    subtypes = [elemental, insect],
+    text = [
+      trample,
+      whenever(
+        does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
+        create(thatMuch, written(creatureToken(1, 1, [green], [insect]))))],
+    power = lit(6),
+    toughness = lit(6)})

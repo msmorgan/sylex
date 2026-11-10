@@ -1,15 +1,14 @@
-card {
-  name = "Felidar Sovereign",
-  cost = [generic(4), pip(white), pip(white)],
-  types = [creature],
-  subtypes = [cat, beast],
-  text = [
-    vigilance,
-    lifelink,
-    at(
-      beginningOfYour(upkeep),
-      if = compareAmt(lifeTotalOf(you), atLeast, lit(40)),
-      action = winGame)],
-  power = lit(4),
-  toughness = lit(6)
-}
+card singleFaced({
+    name = "Felidar Sovereign",
+    cost = [generic(4), pip(white), pip(white)],
+    types = [creature],
+    subtypes = [cat, beast],
+    text = [
+      vigilance,
+      lifelink,
+      at(
+        beginningOfYour(upkeep),
+        if = compareAmt(lifeTotalOf(you), atLeast, lit(40)),
+        action = winGame)],
+    power = lit(4),
+    toughness = lit(6)})

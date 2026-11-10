@@ -1,15 +1,14 @@
-card {
-  name = "Patrician Geist",
-  cost = [generic(2), pip(blue)],
-  types = [creature],
-  subtypes = [spirit, knight],
-  text = [
-    flying,
-    static(getsPt(allOf(and([hasSubtype(spirit), youControl, isOther])), up(lit(1)), up(lit(1)))),
-    static(
-      costShift(
-        allOf(and([isSpell, did(actor(you), cast(which, from = yourGraveyard), thisObject)])),
-        less(lit(1))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Patrician Geist",
+    cost = [generic(2), pip(blue)],
+    types = [creature],
+    subtypes = [spirit, knight],
+    text = [
+      flying,
+      static(getsPt(allOf(and([hasSubtype(spirit), youControl, isOther])), up(lit(1)), up(lit(1)))),
+      static(
+        costShift(
+          allOf(and([isSpell, did(actor(you), cast(which, from = yourGraveyard), thisObject)])),
+          less(lit(1))))],
+    power = lit(2),
+    toughness = lit(2)})

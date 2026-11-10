@@ -1,17 +1,16 @@
-card {
-  name = "Sandstone Oracle",
-  cost = [generic(7)],
-  types = [artifact, creature],
-  subtypes = [sphinx],
-  text = [
-    flying,
-    when(
-      does(actor(thisCreature), enter),
-      sequentially([
-          choose(anOpponent),
-          doIf(
-            compareAmt(countOf(cardIn(handOf(that(player)))), greater, countOf(cardIn(yourHand))),
-            draw(theDifference))]))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Sandstone Oracle",
+    cost = [generic(7)],
+    types = [artifact, creature],
+    subtypes = [sphinx],
+    text = [
+      flying,
+      when(
+        does(actor(thisCreature), enter),
+        sequentially([
+            choose(anOpponent),
+            doIf(
+              compareAmt(countOf(cardIn(handOf(that(player)))), greater, countOf(cardIn(yourHand))),
+              draw(theDifference))]))],
+    power = lit(4),
+    toughness = lit(4)})

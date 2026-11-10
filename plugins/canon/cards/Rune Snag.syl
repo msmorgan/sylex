@@ -1,15 +1,14 @@
-card {
-  name = "Rune Snag",
-  cost = [generic(1), pip(blue)],
-  types = [instant],
-  text = [
-    spell(
-      instruct(
-        controllerOf(target(isSpell)),
-        doUnless(
-          instruct(you, counter(it)),
-          compound([
-              mana([generic(2)]),
-              scaledGenericMana(
-                forEach(lit(2), and([named(printedName("Rune Snag")), in(graveyard)])))]))))]
-}
+card singleFaced({
+    name = "Rune Snag",
+    cost = [generic(1), pip(blue)],
+    types = [instant],
+    text = [
+      spell(
+        instruct(
+          controllerOf(target(isSpell)),
+          doUnless(
+            instruct(you, counter(it)),
+            compound([
+                mana([generic(2)]),
+                scaledGenericMana(
+                  forEach(lit(2), and([named(printedName("Rune Snag")), in(graveyard)])))]))))]})

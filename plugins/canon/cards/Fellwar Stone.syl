@@ -1,7 +1,8 @@
-card {
-  name = "Fellwar Stone",
-  cost = [generic(2)],
-  types = [artifact],
-  text = [
-    activated(tapSymbol, addMana(lit(1), ofTypeProducibleBy(a(and([isLand, anOpponentControls])))))]
-}
+card singleFaced({
+    name = "Fellwar Stone",
+    cost = [generic(2)],
+    types = [artifact],
+    text = [
+      activated(
+        tapSymbol,
+        addMana(lit(1), ofTypeProducibleBy(a(and([isLand, anOpponentControls])))))]})

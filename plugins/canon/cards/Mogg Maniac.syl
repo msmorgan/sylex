@@ -1,12 +1,11 @@
-card {
-  name = "Mogg Maniac",
-  cost = [generic(1), pip(red)],
-  types = [creature],
-  subtypes = [goblin],
-  text = [
-    whenever(
-      does(any, dealDamage(recipient = thisCreature)),
-      instruct(it, dealDamage(thatMuch, target(or([isPlaneswalker, isOpponent])))))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Mogg Maniac",
+    cost = [generic(1), pip(red)],
+    types = [creature],
+    subtypes = [goblin],
+    text = [
+      whenever(
+        does(any, dealDamage(recipient = thisCreature)),
+        instruct(it, dealDamage(thatMuch, target(or([isPlaneswalker, isOpponent])))))],
+    power = lit(1),
+    toughness = lit(1)})

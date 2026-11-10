@@ -1,15 +1,14 @@
-card {
-  name = "Temple Altisaur",
-  cost = [generic(4), pip(white)],
-  types = [creature],
-  subtypes = [dinosaur],
-  text = [
-    static(
-      replace(
-        would(
-          actor(a(isSource)),
-          dealDamage(recipient = a(and([hasSubtype(dinosaur), youControl, isOther])))),
-        instead(preventDamage(allBut(lit(1))))))],
-  power = lit(3),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Temple Altisaur",
+    cost = [generic(4), pip(white)],
+    types = [creature],
+    subtypes = [dinosaur],
+    text = [
+      static(
+        replace(
+          would(
+            actor(a(isSource)),
+            dealDamage(recipient = a(and([hasSubtype(dinosaur), youControl, isOther])))),
+          instead(preventDamage(allBut(lit(1))))))],
+    power = lit(3),
+    toughness = lit(4)})

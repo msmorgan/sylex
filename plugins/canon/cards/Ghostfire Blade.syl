@@ -1,17 +1,16 @@
-card {
-  name = "Ghostfire Blade",
-  cost = [generic(1)],
-  types = [artifact],
-  subtypes = [equipment],
-  text = [
-    static(getsPt(equipped(creature), up(lit(2)), up(lit(2)))),
-    equip(mana([generic(3)])),
-    static(
-      costShift(
-        allOf(
-          and([
-              abilityHead(keyword(equip)),
-              abilityOf(this),
-              targeting(a(and([isCreature, isColorless])), someTarget)])),
-        less(lit(2))))]
-}
+card singleFaced({
+    name = "Ghostfire Blade",
+    cost = [generic(1)],
+    types = [artifact],
+    subtypes = [equipment],
+    text = [
+      static(getsPt(equipped(creature), up(lit(2)), up(lit(2)))),
+      equip(mana([generic(3)])),
+      static(
+        costShift(
+          allOf(
+            and([
+                abilityHead(keyword(equip)),
+                abilityOf(this),
+                targeting(a(and([isCreature, isColorless])), someTarget)])),
+          less(lit(2))))]})

@@ -1,9 +1,8 @@
-card {
-  name = "Elemental Resonance",
-  cost = [generic(2), pip(green), pip(green)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isPermanent),
-    at(beginningOfYour(firstMain), addMana(lit(1), matchingManaCostOf(enchanted(permanent))))]
-}
+card singleFaced({
+    name = "Elemental Resonance",
+    cost = [generic(2), pip(green), pip(green)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isPermanent),
+      at(beginningOfYour(firstMain), addMana(lit(1), matchingManaCostOf(enchanted(permanent))))]})

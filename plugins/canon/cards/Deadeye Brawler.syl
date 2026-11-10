@@ -1,15 +1,14 @@
-card {
-  name = "Deadeye Brawler",
-  cost = [generic(2), pip(blue), pip(black)],
-  types = [creature],
-  subtypes = [human, pirate],
-  text = [
-    deathtouch,
-    ascend,
-    whenever(
-      does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-      if = is(you, hasDesignation(citysBlessing)),
-      action = draw(lit(1)))],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Deadeye Brawler",
+    cost = [generic(2), pip(blue), pip(black)],
+    types = [creature],
+    subtypes = [human, pirate],
+    text = [
+      deathtouch,
+      ascend,
+      whenever(
+        does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
+        if = is(you, hasDesignation(citysBlessing)),
+        action = draw(lit(1)))],
+    power = lit(2),
+    toughness = lit(4)})

@@ -1,12 +1,11 @@
-card {
-  name = "Fuming Effigy",
-  cost = [generic(3), pip(red)],
-  types = [creature],
-  subtypes = [spirit],
-  text = [
-    whenever(
-      does(actor(counted(orMore(1), cardIn(yourGraveyard))), leave(from = yourGraveyard)),
-      instruct(this, dealDamage(lit(1), eachOpponent)))],
-  power = lit(4),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Fuming Effigy",
+    cost = [generic(3), pip(red)],
+    types = [creature],
+    subtypes = [spirit],
+    text = [
+      whenever(
+        does(actor(counted(orMore(1), cardIn(yourGraveyard))), leave(from = yourGraveyard)),
+        instruct(this, dealDamage(lit(1), eachOpponent)))],
+    power = lit(4),
+    toughness = lit(3)})

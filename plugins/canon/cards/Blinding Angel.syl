@@ -1,13 +1,12 @@
-card {
-  name = "Blinding Angel",
-  cost = [generic(3), pip(white), pip(white)],
-  types = [creature],
-  subtypes = [angel],
-  text = [
-    flying,
-    whenever(
-      does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-      instruct(that(player), skipPart(combat, lit(1))))],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Blinding Angel",
+    cost = [generic(3), pip(white), pip(white)],
+    types = [creature],
+    subtypes = [angel],
+    text = [
+      flying,
+      whenever(
+        does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
+        instruct(that(player), skipPart(combat, lit(1))))],
+    power = lit(2),
+    toughness = lit(4)})

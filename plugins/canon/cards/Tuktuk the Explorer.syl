@@ -1,23 +1,22 @@
-card {
-  name = "Tuktuk the Explorer",
-  cost = [generic(2), pip(red)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [goblin],
-  text = [
-    haste,
-    when(
-      does(actor(thisCreature), die),
-      create(
-        lit(1),
-        written({
-            characteristics = {
-              name = "Tuktuk the Returned",
-              supertypes = [legendary],
-              types = [artifact, creature],
-              subtypes = [goblin, golem],
-              power = lit(5),
-              toughness = lit(5)}})))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Tuktuk the Explorer",
+    cost = [generic(2), pip(red)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [goblin],
+    text = [
+      haste,
+      when(
+        does(actor(thisCreature), die),
+        create(
+          lit(1),
+          written({
+              characteristics = {
+                name = "Tuktuk the Returned",
+                supertypes = [legendary],
+                types = [artifact, creature],
+                subtypes = [goblin, golem],
+                power = lit(5),
+                toughness = lit(5)}})))],
+    power = lit(1),
+    toughness = lit(1)})

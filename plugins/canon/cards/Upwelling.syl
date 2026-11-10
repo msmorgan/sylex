@@ -1,6 +1,5 @@
-card {
-  name = "Upwelling",
-  cost = [generic(3), pip(green)],
-  types = [enchantment],
-  text = [static(manaRetention(eachPlayer, unspent(none)))]
-}
+card singleFaced({
+    name = "Upwelling",
+    cost = [generic(3), pip(green)],
+    types = [enchantment],
+    text = [static(manaRetention(eachPlayer, unspent(none)))]})

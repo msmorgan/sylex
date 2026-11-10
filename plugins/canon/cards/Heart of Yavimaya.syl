@@ -1,15 +1,14 @@
-card {
-  name = "Heart of Yavimaya",
-  types = [land],
-  text = [
-    static(
-      replace(
-        would(actor(thisLand), enter),
-        instead(
-          doIfDone(
-            sacrifice(a(and([isLand, hasSubtype(forest)]))),
-            putOntoBattlefield(thisLand),
-            putInto(it, graveyard))))),
-    activated(tapSymbol, addMana(lit(1), manaOf([[colored(green)]]))),
-    activated(tapSymbol, get(target(isCreature), up(lit(1)), up(lit(1)), untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Heart of Yavimaya",
+    types = [land],
+    text = [
+      static(
+        replace(
+          would(actor(thisLand), enter),
+          instead(
+            doIfDone(
+              sacrifice(a(and([isLand, hasSubtype(forest)]))),
+              putOntoBattlefield(thisLand),
+              putInto(it, graveyard))))),
+      activated(tapSymbol, addMana(lit(1), manaOf([[colored(green)]]))),
+      activated(tapSymbol, get(target(isCreature), up(lit(1)), up(lit(1)), untilEndOfTurn))]})

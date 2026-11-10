@@ -1,19 +1,18 @@
-card {
-  name = "Curator of Destinies",
-  cost = [generic(4), pip(blue), pip(blue)],
-  types = [creature],
-  subtypes = [sphinx],
-  text = [
-    static(cant(any, counter(thisSpell))),
-    flying,
-    when(
-      does(actor(thisCreature), enter),
-      sequentially([
-          lookAt(topSlice(lit(5))),
-          separateIntoPiles(them, 2, [faceDown, faceUp]),
-          instruct(anOpponent, choose(onePile)),
-          putInto(that(pile), hand),
-          putInto(theOther, graveyard)]))],
-  power = lit(5),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Curator of Destinies",
+    cost = [generic(4), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [sphinx],
+    text = [
+      static(cant(any, counter(thisSpell))),
+      flying,
+      when(
+        does(actor(thisCreature), enter),
+        sequentially([
+            lookAt(topSlice(lit(5))),
+            separateIntoPiles(them, 2, [faceDown, faceUp]),
+            instruct(anOpponent, choose(onePile)),
+            putInto(that(pile), hand),
+            putInto(theOther, graveyard)]))],
+    power = lit(5),
+    toughness = lit(5)})

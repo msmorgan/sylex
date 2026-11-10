@@ -1,6 +1,6 @@
-card {
-  name = "Crumbling Ashes",
-  cost = [generic(1), pip(black)],
-  types = [enchantment],
-  text = [at(beginningOfYour(upkeep), destroy(target(and([isCreature, hasCounter(m1m1Counter)]))))]
-}
+card singleFaced({
+    name = "Crumbling Ashes",
+    cost = [generic(1), pip(black)],
+    types = [enchantment],
+    text = [
+      at(beginningOfYour(upkeep), destroy(target(and([isCreature, hasCounter(m1m1Counter)]))))]})

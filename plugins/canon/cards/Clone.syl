@@ -1,9 +1,8 @@
-card {
-  name = "Clone",
-  cost = [generic(3), pip(blue)],
-  types = [creature],
-  subtypes = [shapeshifter],
-  text = [static(enters(thisCreature, [asCopyOf(true, a(isCreature), [])]))],
-  power = lit(0),
-  toughness = lit(0)
-}
+card singleFaced({
+    name = "Clone",
+    cost = [generic(3), pip(blue)],
+    types = [creature],
+    subtypes = [shapeshifter],
+    text = [static(enters(thisCreature, [asCopyOf(true, a(isCreature), [])]))],
+    power = lit(0),
+    toughness = lit(0)})

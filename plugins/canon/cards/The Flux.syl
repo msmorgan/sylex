@@ -1,16 +1,15 @@
-card {
-  name = "The Flux",
-  cost = [generic(2), pip(red), pip(red)],
-  types = [enchantment],
-  subtypes = [saga],
-  text = [
-    when(
-      chapterMark([1]),
-      instruct(this, dealDamage(lit(4), target(and([isCreature, anOpponentControls]))))),
-    when(
-      chapterMark([2, 3, 4, 5]),
-      sequentially([
-          exile(topSlice(lit(1))),
-          establishThroughout(can(actor(you), play(that(card))), thisTurn)])),
-    when(chapterMark([6]), addMana(lit(6), manaOf([[colored(red)]])))]
-}
+card singleFaced({
+    name = "The Flux",
+    cost = [generic(2), pip(red), pip(red)],
+    types = [enchantment],
+    subtypes = [saga],
+    text = [
+      when(
+        chapterMark([1]),
+        instruct(this, dealDamage(lit(4), target(and([isCreature, anOpponentControls]))))),
+      when(
+        chapterMark([2, 3, 4, 5]),
+        sequentially([
+            exile(topSlice(lit(1))),
+            establishThroughout(can(actor(you), play(that(card))), thisTurn)])),
+      when(chapterMark([6]), addMana(lit(6), manaOf([[colored(red)]])))]})

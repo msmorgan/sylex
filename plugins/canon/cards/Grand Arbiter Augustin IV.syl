@@ -1,22 +1,21 @@
-card {
-  name = "Grand Arbiter Augustin IV",
-  cost = [generic(2), pip(white), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, advisor],
-  text = [
-    static(
-      costShift(
-        allOf(and([hasColor(white), isSpell, did(actor(you), cast(which), thisObject)])),
-        less(lit(1)))),
-    static(
-      costShift(
-        allOf(and([hasColor(blue), isSpell, did(actor(you), cast(which), thisObject)])),
-        less(lit(1)))),
-    static(
-      costShift(
-        allOf(and([isSpell, did(actor(yourOpponents), cast(which), thisObject)])),
-        more(lit(1))))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Grand Arbiter Augustin IV",
+    cost = [generic(2), pip(white), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, advisor],
+    text = [
+      static(
+        costShift(
+          allOf(and([hasColor(white), isSpell, did(actor(you), cast(which), thisObject)])),
+          less(lit(1)))),
+      static(
+        costShift(
+          allOf(and([hasColor(blue), isSpell, did(actor(you), cast(which), thisObject)])),
+          less(lit(1)))),
+      static(
+        costShift(
+          allOf(and([isSpell, did(actor(yourOpponents), cast(which), thisObject)])),
+          more(lit(1))))],
+    power = lit(2),
+    toughness = lit(3)})

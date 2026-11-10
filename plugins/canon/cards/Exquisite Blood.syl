@@ -1,6 +1,5 @@
-card {
-  name = "Exquisite Blood",
-  cost = [generic(4), pip(black)],
-  types = [enchantment],
-  text = [whenever(does(actor(anOpponent), loseLife(anyAmount)), gainLife(thatMuch))]
-}
+card singleFaced({
+    name = "Exquisite Blood",
+    cost = [generic(4), pip(black)],
+    types = [enchantment],
+    text = [whenever(does(actor(anOpponent), loseLife(anyAmount)), gainLife(thatMuch))]})

@@ -1,13 +1,12 @@
-card {
-  name = "Faith's Reward",
-  cost = [generic(3), pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      returnToBattlefield(
-        allOf(
-          and([
-              isPermanentCard,
-              in(yourGraveyard),
-              was(putIntoFromBattlefield(which, yourGraveyard), within(soFarThisTurn))]))))]
-}
+card singleFaced({
+    name = "Faith's Reward",
+    cost = [generic(3), pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        returnToBattlefield(
+          allOf(
+            and([
+                isPermanentCard,
+                in(yourGraveyard),
+                was(putIntoFromBattlefield(which, yourGraveyard), within(soFarThisTurn))]))))]})

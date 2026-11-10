@@ -1,9 +1,8 @@
-card {
-  name = "Curse of the Bloody Tome",
-  cost = [generic(2), pip(blue)],
-  types = [enchantment],
-  subtypes = [aura, curse],
-  text = [
-    enchant(isPlayer),
-    at(beginningOfPossessed(upkeep, enchanted(player)), instruct(that(player), mill(lit(2))))]
-}
+card singleFaced({
+    name = "Curse of the Bloody Tome",
+    cost = [generic(2), pip(blue)],
+    types = [enchantment],
+    subtypes = [aura, curse],
+    text = [
+      enchant(isPlayer),
+      at(beginningOfPossessed(upkeep, enchanted(player)), instruct(that(player), mill(lit(2))))]})

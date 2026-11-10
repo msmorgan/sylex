@@ -1,11 +1,10 @@
-card {
-  name = "Aerial Volley",
-  cost = [pip(green)],
-  types = [instant],
-  text = [
-    spell(
-      dealDivided(
-        this,
-        lit(3),
-        targets(oneThrough(3), and([isCreature, hasKeyword(theKeyword(flying))]))))]
-}
+card singleFaced({
+    name = "Aerial Volley",
+    cost = [pip(green)],
+    types = [instant],
+    text = [
+      spell(
+        dealDivided(
+          this,
+          lit(3),
+          targets(oneThrough(3), and([isCreature, hasKeyword(theKeyword(flying))]))))]})

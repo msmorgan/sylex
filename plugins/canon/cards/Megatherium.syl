@@ -1,13 +1,12 @@
-card {
-  name = "Megatherium",
-  cost = [generic(2), pip(green)],
-  types = [creature],
-  subtypes = [beast],
-  text = [
-    trample,
-    when(
-      does(actor(thisCreature), enter),
-      doUnless(sacrifice(thisCreature), scaledGenericMana(forEach(lit(1), cardIn(yourHand)))))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Megatherium",
+    cost = [generic(2), pip(green)],
+    types = [creature],
+    subtypes = [beast],
+    text = [
+      trample,
+      when(
+        does(actor(thisCreature), enter),
+        doUnless(sacrifice(thisCreature), scaledGenericMana(forEach(lit(1), cardIn(yourHand)))))],
+    power = lit(4),
+    toughness = lit(4)})

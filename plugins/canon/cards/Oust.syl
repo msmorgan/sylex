@@ -1,10 +1,9 @@
-card {
-  name = "Oust",
-  cost = [pip(white)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          putInto(target(isCreature), fromTop(2, library)),
-          instruct(controllerOf(it), gainLife(lit(3)))]))]
-}
+card singleFaced({
+    name = "Oust",
+    cost = [pip(white)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            putInto(target(isCreature), fromTop(2, library)),
+            instruct(controllerOf(it), gainLife(lit(3)))]))]})

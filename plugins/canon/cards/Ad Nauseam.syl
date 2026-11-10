@@ -1,12 +1,11 @@
-card {
-  name = "Ad Nauseam",
-  cost = [generic(3), pip(black), pip(black)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          reveal(topSlice(lit(1))),
-          putInto(that(card), hand),
-          loseLife(statOf(stat(manaValue), it)),
-          may(repeat(anyNumberOfTimes))]))]
-}
+card singleFaced({
+    name = "Ad Nauseam",
+    cost = [generic(3), pip(black), pip(black)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            reveal(topSlice(lit(1))),
+            putInto(that(card), hand),
+            loseLife(statOf(stat(manaValue), it)),
+            may(repeat(anyNumberOfTimes))]))]})

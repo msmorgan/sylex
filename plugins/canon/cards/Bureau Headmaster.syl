@@ -1,17 +1,16 @@
-card {
-  name = "Bureau Headmaster",
-  cost = [pip(red), pip(white)],
-  types = [creature],
-  subtypes = [human, assassin],
-  text = [
-    static(
-      costShift(
-        allOf(and([isSpell, hasSubtype(equipment), did(actor(you), cast(which), thisObject)])),
-        less(lit(1)))),
-    static(
-      costShift(
-        allOf(and([abilityHead(keyword(equip)), did(actor(you), activate(which), thisObject)])),
-        less(lit(1))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Bureau Headmaster",
+    cost = [pip(red), pip(white)],
+    types = [creature],
+    subtypes = [human, assassin],
+    text = [
+      static(
+        costShift(
+          allOf(and([isSpell, hasSubtype(equipment), did(actor(you), cast(which), thisObject)])),
+          less(lit(1)))),
+      static(
+        costShift(
+          allOf(and([abilityHead(keyword(equip)), did(actor(you), activate(which), thisObject)])),
+          less(lit(1))))],
+    power = lit(2),
+    toughness = lit(2)})

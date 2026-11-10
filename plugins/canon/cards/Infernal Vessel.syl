@@ -1,15 +1,14 @@
-card {
-  name = "Infernal Vessel",
-  cost = [generic(2), pip(black)],
-  types = [creature],
-  subtypes = [human, cleric],
-  text = [
-    when(
-      does(actor(thisCreature), die),
-      if = not(is(it, hasSubtype(demon))),
-      action = sequentially([
-          returnToBattlefieldWithCounters(it, ownerOf(it), lit(2), p1p1Counter),
-          become(it, {characteristics = {subtypes = [demon]}})]))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Infernal Vessel",
+    cost = [generic(2), pip(black)],
+    types = [creature],
+    subtypes = [human, cleric],
+    text = [
+      when(
+        does(actor(thisCreature), die),
+        if = not(is(it, hasSubtype(demon))),
+        action = sequentially([
+            returnToBattlefieldWithCounters(it, ownerOf(it), lit(2), p1p1Counter),
+            become(it, {characteristics = {subtypes = [demon]}})]))],
+    power = lit(2),
+    toughness = lit(1)})

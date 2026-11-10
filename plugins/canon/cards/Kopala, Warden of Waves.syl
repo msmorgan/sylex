@@ -1,26 +1,25 @@
-card {
-  name = "Kopala, Warden of Waves",
-  cost = [generic(1), pip(blue), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [merfolk, wizard],
-  text = [
-    static(
-      costShift(
-        allOf(
-          and([
-              isSpell,
-              did(actor(yourOpponents), cast(which), thisObject),
-              targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
-        more(lit(2)))),
-    static(
-      costShift(
-        allOf(
-          and([
-              abilityHead(anyActivated),
-              did(actor(yourOpponents), activate(which), thisObject),
-              targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
-        more(lit(2))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Kopala, Warden of Waves",
+    cost = [generic(1), pip(blue), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [merfolk, wizard],
+    text = [
+      static(
+        costShift(
+          allOf(
+            and([
+                isSpell,
+                did(actor(yourOpponents), cast(which), thisObject),
+                targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
+          more(lit(2)))),
+      static(
+        costShift(
+          allOf(
+            and([
+                abilityHead(anyActivated),
+                did(actor(yourOpponents), activate(which), thisObject),
+                targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
+          more(lit(2))))],
+    power = lit(2),
+    toughness = lit(2)})

@@ -1,9 +1,8 @@
-card {
-  name = "Aboroth",
-  cost = [generic(4), pip(green), pip(green)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [cumulativeUpkeep(perform(putCounters(lit(1), printedKind(m1m1Counter), thisCreature)))],
-  power = lit(9),
-  toughness = lit(9)
-}
+card singleFaced({
+    name = "Aboroth",
+    cost = [generic(4), pip(green), pip(green)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [cumulativeUpkeep(perform(putCounters(lit(1), printedKind(m1m1Counter), thisCreature)))],
+    power = lit(9),
+    toughness = lit(9)})

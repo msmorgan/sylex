@@ -1,15 +1,14 @@
-card {
-  name = "Nekrataal",
-  cost = [generic(2), pip(black), pip(black)],
-  types = [creature],
-  subtypes = [human, assassin],
-  text = [
-    firstStrike,
-    when(
-      does(actor(thisCreature), enter),
-      doUnderProhibition(
-        destroy(target(and([isCreature, non(isArtifact), not(hasColor(black))]))),
-        regeneration(that(creature))))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Nekrataal",
+    cost = [generic(2), pip(black), pip(black)],
+    types = [creature],
+    subtypes = [human, assassin],
+    text = [
+      firstStrike,
+      when(
+        does(actor(thisCreature), enter),
+        doUnderProhibition(
+          destroy(target(and([isCreature, non(isArtifact), not(hasColor(black))]))),
+          regeneration(that(creature))))],
+    power = lit(2),
+    toughness = lit(1)})

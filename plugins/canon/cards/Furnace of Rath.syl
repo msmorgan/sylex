@@ -1,10 +1,9 @@
-card {
-  name = "Furnace of Rath",
-  cost = [generic(1), pip(red), pip(red), pip(red)],
-  types = [enchantment],
-  text = [
-    static(
-      replace(
-        would(actor(a(isSource)), dealDamage(recipient = a(or([isPermanent, isPlayer])))),
-        instead(instruct(it, dealDamage(times(lit(2), thatMuch), thatJoin)))))]
-}
+card singleFaced({
+    name = "Furnace of Rath",
+    cost = [generic(1), pip(red), pip(red), pip(red)],
+    types = [enchantment],
+    text = [
+      static(
+        replace(
+          would(actor(a(isSource)), dealDamage(recipient = a(or([isPermanent, isPlayer])))),
+          instead(instruct(it, dealDamage(times(lit(2), thatMuch), thatJoin)))))]})

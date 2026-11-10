@@ -1,23 +1,22 @@
-card {
-  name = "Necromancy",
-  cost = [generic(2), pip(black)],
-  types = [enchantment],
-  text = [
-    asThoughFlashSacrificedAtCleanup,
-    when(
-      does(actor(thisEnchantment), enter),
-      sequentially([
-          establish(
-            conjunction([
-                addSubtype(it, aura),
-                abilityGrant(
-                  it,
-                  enchant(and([isCreature, did(by(this), putOntoBattlefield(which))])))],
-              subject = it)),
-          putOntoBattlefieldUnderYourControl(target(and([isCreature, isCard, in(graveyard)]))),
-          attachTo(thisEnchantment, it),
-          delay(
-            does(actor(thisEnchantment), leave),
-            instruct(controllerOf(that(creature)), sacrifice(it)))]),
-      if = is(it, in(battlefield)))]
-}
+card singleFaced({
+    name = "Necromancy",
+    cost = [generic(2), pip(black)],
+    types = [enchantment],
+    text = [
+      asThoughFlashSacrificedAtCleanup,
+      when(
+        does(actor(thisEnchantment), enter),
+        sequentially([
+            establish(
+              conjunction([
+                  addSubtype(it, aura),
+                  abilityGrant(
+                    it,
+                    enchant(and([isCreature, did(by(this), putOntoBattlefield(which))])))],
+                subject = it)),
+            putOntoBattlefieldUnderYourControl(target(and([isCreature, isCard, in(graveyard)]))),
+            attachTo(thisEnchantment, it),
+            delay(
+              does(actor(thisEnchantment), leave),
+              instruct(controllerOf(that(creature)), sacrifice(it)))]),
+        if = is(it, in(battlefield)))]})

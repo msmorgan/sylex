@@ -1,9 +1,8 @@
-card {
-  name = "Bloom Hulk",
-  cost = [generic(3), pip(green)],
-  types = [creature],
-  subtypes = [plant, elemental],
-  text = [when(does(actor(thisCreature), enter), proliferate)],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Bloom Hulk",
+    cost = [generic(3), pip(green)],
+    types = [creature],
+    subtypes = [plant, elemental],
+    text = [when(does(actor(thisCreature), enter), proliferate)],
+    power = lit(4),
+    toughness = lit(4)})

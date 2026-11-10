@@ -1,9 +1,8 @@
-card {
-  name = "Precognition Field",
-  cost = [generic(3), pip(blue)],
-  types = [enchantment],
-  text = [
-    static(visibility(lookAt, you, topOfLibrary)),
-    static(can(actor(you), cast(bare(and([isSpell, isInstantOrSorcery])), from = onTop))),
-    activated(mana([generic(3)]), exile(topSlice(lit(1))))]
-}
+card singleFaced({
+    name = "Precognition Field",
+    cost = [generic(3), pip(blue)],
+    types = [enchantment],
+    text = [
+      static(visibility(lookAt, you, topOfLibrary)),
+      static(can(actor(you), cast(bare(and([isSpell, isInstantOrSorcery])), from = onTop))),
+      activated(mana([generic(3)]), exile(topSlice(lit(1))))]})

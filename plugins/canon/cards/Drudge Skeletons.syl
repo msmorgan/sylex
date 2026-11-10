@@ -1,9 +1,8 @@
-card {
-  name = "Drudge Skeletons",
-  cost = [generic(1), pip(black)],
-  types = [creature],
-  subtypes = [skeleton],
-  text = [activated(mana([pip(black)]), regenerate(thisCreature))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Drudge Skeletons",
+    cost = [generic(1), pip(black)],
+    types = [creature],
+    subtypes = [skeleton],
+    text = [activated(mana([pip(black)]), regenerate(thisCreature))],
+    power = lit(1),
+    toughness = lit(1)})

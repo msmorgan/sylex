@@ -1,15 +1,14 @@
-card {
-  name = "Mox Diamond",
-  cost = [],
-  types = [artifact],
-  text = [
-    static(
-      replace(
-        would(actor(thisArtifact), enter),
-        instead(
-          may(
-            discard(a(and([isLand, in(yourHand)]))),
-            putOntoBattlefield(thisArtifact),
-            putInto(it, graveyard))))),
-    activated(tapSymbol, addMana(lit(1), ofAnyColor(sameColor)))]
-}
+card singleFaced({
+    name = "Mox Diamond",
+    cost = [],
+    types = [artifact],
+    text = [
+      static(
+        replace(
+          would(actor(thisArtifact), enter),
+          instead(
+            may(
+              discard(a(and([isLand, in(yourHand)]))),
+              putOntoBattlefield(thisArtifact),
+              putInto(it, graveyard))))),
+      activated(tapSymbol, addMana(lit(1), ofAnyColor(sameColor)))]})

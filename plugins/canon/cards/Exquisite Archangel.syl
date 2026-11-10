@@ -1,16 +1,15 @@
-card {
-  name = "Exquisite Archangel",
-  cost = [generic(5), pip(white), pip(white)],
-  types = [creature],
-  subtypes = [angel],
-  text = [
-    flying,
-    static(
-      replace(
-        would(actor(you), loseGame),
-        instead(
-          sequentially(
-            [exile(thisCreature), setLife(statOf(playerStat(startingLifeTotal), you))]))))],
-  power = lit(5),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Exquisite Archangel",
+    cost = [generic(5), pip(white), pip(white)],
+    types = [creature],
+    subtypes = [angel],
+    text = [
+      flying,
+      static(
+        replace(
+          would(actor(you), loseGame),
+          instead(
+            sequentially(
+              [exile(thisCreature), setLife(statOf(playerStat(startingLifeTotal), you))]))))],
+    power = lit(5),
+    toughness = lit(5)})

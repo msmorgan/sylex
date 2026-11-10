@@ -1,13 +1,14 @@
-card {
-  name = "Chillerpillar",
-  cost = [generic(3), pip(blue)],
-  supertypes = [snow],
-  types = [creature],
-  subtypes = [insect],
-  text = [
-    activated(mana([generic(4), snow, snow]), monstrosity(lit(2))),
-    static(
-      onlyWhile(abilityGrant(thisCreature, flying), is(thisCreature, hasDesignation(monstrous))))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Chillerpillar",
+    cost = [generic(3), pip(blue)],
+    supertypes = [snow],
+    types = [creature],
+    subtypes = [insect],
+    text = [
+      activated(mana([generic(4), snow, snow]), monstrosity(lit(2))),
+      static(
+        onlyWhile(
+          abilityGrant(thisCreature, flying),
+          is(thisCreature, hasDesignation(monstrous))))],
+    power = lit(3),
+    toughness = lit(3)})

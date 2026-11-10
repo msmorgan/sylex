@@ -1,17 +1,16 @@
-card {
-  name = "Etchings of the Chosen",
-  cost = [generic(1), pip(white), pip(black)],
-  types = [enchantment],
-  text = [
-    static(entersChoosing(thisEnchantment, subtype(creature))),
-    static(
-      getsPt(
-        allOf(and([isCreature, youControl, ofChosen(subtype(creature))])),
-        up(lit(1)),
-        up(lit(1)))),
-    activated(
-      compound([
-          mana([generic(1)]),
-          perform(sacrifice(a(and([isCreature, ofChosen(subtype(creature))]))))]),
-      gain(target(and([isCreature, youControl])), indestructible, untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Etchings of the Chosen",
+    cost = [generic(1), pip(white), pip(black)],
+    types = [enchantment],
+    text = [
+      static(entersChoosing(thisEnchantment, subtype(creature))),
+      static(
+        getsPt(
+          allOf(and([isCreature, youControl, ofChosen(subtype(creature))])),
+          up(lit(1)),
+          up(lit(1)))),
+      activated(
+        compound([
+            mana([generic(1)]),
+            perform(sacrifice(a(and([isCreature, ofChosen(subtype(creature))]))))]),
+        gain(target(and([isCreature, youControl])), indestructible, untilEndOfTurn))]})

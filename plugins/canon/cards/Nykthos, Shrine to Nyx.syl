@@ -1,11 +1,10 @@
-card {
-  name = "Nykthos, Shrine to Nyx",
-  supertypes = [legendary],
-  types = [land],
-  text = [
-    activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
-    activated(
-      compound([mana([generic(2)]), tapSymbol]),
-      sequentially(
-        [choose(a(quality(color))), addMana(devotion(you, thatColor), ofTheChosenColor)]))]
-}
+card singleFaced({
+    name = "Nykthos, Shrine to Nyx",
+    supertypes = [legendary],
+    types = [land],
+    text = [
+      activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
+      activated(
+        compound([mana([generic(2)]), tapSymbol]),
+        sequentially(
+          [choose(a(quality(color))), addMana(devotion(you, thatColor), ofTheChosenColor)]))]})

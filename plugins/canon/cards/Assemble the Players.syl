@@ -1,14 +1,13 @@
-card {
-  name = "Assemble the Players",
-  cost = [generic(1), pip(white)],
-  types = [enchantment],
-  text = [
-    static(visibility(lookAt, you, topOfLibrary)),
-    static(
-      can(
-        actor(you),
-        cast(
-          counted(exactly(1), and([isSpell, isCreature, hasPower(atMost, lit(2))])),
-          from = onTop),
-        timing = eachTurn))]
-}
+card singleFaced({
+    name = "Assemble the Players",
+    cost = [generic(1), pip(white)],
+    types = [enchantment],
+    text = [
+      static(visibility(lookAt, you, topOfLibrary)),
+      static(
+        can(
+          actor(you),
+          cast(
+            counted(exactly(1), and([isSpell, isCreature, hasPower(atMost, lit(2))])),
+            from = onTop),
+          timing = eachTurn))]})

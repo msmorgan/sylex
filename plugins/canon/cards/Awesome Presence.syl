@@ -1,14 +1,13 @@
-card {
-  name = "Awesome Presence",
-  cost = [pip(blue)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    static(
-      gatedBy(
-        scaledGenericMana(
-          forEach(lit(3), and([isCreature, controlledBy(they), inCombat(blockerOf, it)]))),
-        any,
-        block(enchanted(type(creature)))))]
-}
+card singleFaced({
+    name = "Awesome Presence",
+    cost = [pip(blue)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      static(
+        gatedBy(
+          scaledGenericMana(
+            forEach(lit(3), and([isCreature, controlledBy(they), inCombat(blockerOf, it)]))),
+          any,
+          block(enchanted(type(creature)))))]})

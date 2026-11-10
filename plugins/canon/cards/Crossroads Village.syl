@@ -1,9 +1,8 @@
-card {
-  name = "Crossroads Village",
-  types = [land],
-  subtypes = [town],
-  text = [
-    static(entersTapped(thisLand)),
-    static(entersChoosing(thisLand, color)),
-    activated(tapSymbol, addMana(lit(1), ofTheChosenColor))]
-}
+card singleFaced({
+    name = "Crossroads Village",
+    types = [land],
+    subtypes = [town],
+    text = [
+      static(entersTapped(thisLand)),
+      static(entersChoosing(thisLand, color)),
+      activated(tapSymbol, addMana(lit(1), ofTheChosenColor))]})

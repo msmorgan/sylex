@@ -1,14 +1,13 @@
-card {
-  name = "Angus Mackenzie",
-  cost = [pip(green), pip(white), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, cleric],
-  text = [
-    activatedOnlyDuring(
-      compound([mana([pip(green), pip(white), pip(blue)]), tapSymbol]),
-      preventAll(any, thisTurn, combat),
-      beforePart(combatDamage))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Angus Mackenzie",
+    cost = [pip(green), pip(white), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, cleric],
+    text = [
+      activatedOnlyDuring(
+        compound([mana([pip(green), pip(white), pip(blue)]), tapSymbol]),
+        preventAll(any, thisTurn, combat),
+        beforePart(combatDamage))],
+    power = lit(2),
+    toughness = lit(2)})

@@ -1,16 +1,15 @@
-card {
-  name = "Rosheen Meanderer",
-  cost = [generic(3), hybridPip(red, green)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [giant, shaman],
-  text = [
-    activated(
-      tapSymbol,
-      addMana(
-        lit(1),
-        manaOf([[colorless, colorless, colorless, colorless]]),
-        [spendOnly([toPay(containing(variable))])]))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Rosheen Meanderer",
+    cost = [generic(3), hybridPip(red, green)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [giant, shaman],
+    text = [
+      activated(
+        tapSymbol,
+        addMana(
+          lit(1),
+          manaOf([[colorless, colorless, colorless, colorless]]),
+          [spendOnly([toPay(containing(variable))])]))],
+    power = lit(4),
+    toughness = lit(4)})

@@ -1,9 +1,8 @@
-card {
-  name = "Illusionary Forces",
-  cost = [generic(3), pip(blue)],
-  types = [creature],
-  subtypes = [illusion],
-  text = [flying, cumulativeUpkeep(mana([pip(blue)]))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Illusionary Forces",
+    cost = [generic(3), pip(blue)],
+    types = [creature],
+    subtypes = [illusion],
+    text = [flying, cumulativeUpkeep(mana([pip(blue)]))],
+    power = lit(4),
+    toughness = lit(4)})

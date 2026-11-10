@@ -1,11 +1,10 @@
-card {
-  name = "Mishra's Workshop",
-  types = [land],
-  text = [
-    activated(
-      tapSymbol,
-      addMana(
-        lit(1),
-        manaOf([[colorless, colorless, colorless]]),
-        [spendOnly([toCast(and([isArtifact, isSpell]))])]))]
-}
+card singleFaced({
+    name = "Mishra's Workshop",
+    types = [land],
+    text = [
+      activated(
+        tapSymbol,
+        addMana(
+          lit(1),
+          manaOf([[colorless, colorless, colorless]]),
+          [spendOnly([toCast(and([isArtifact, isSpell]))])]))]})

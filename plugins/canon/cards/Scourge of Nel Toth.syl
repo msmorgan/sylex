@@ -1,20 +1,19 @@
-card {
-  name = "Scourge of Nel Toth",
-  cost = [generic(5), pip(black), pip(black)],
-  types = [creature],
-  subtypes = [zombie, dragon],
-  text = [
-    flying,
-    static(
-      can(
-        actor(you),
-        cast(
-          this,
-          from = yourGraveyard,
-          payment = payingInstead(
-            compound([
-                mana([pip(black), pip(black)]),
-                perform(sacrifice(counted(exactly(2), isCreature)))])))))],
-  power = lit(6),
-  toughness = lit(6)
-}
+card singleFaced({
+    name = "Scourge of Nel Toth",
+    cost = [generic(5), pip(black), pip(black)],
+    types = [creature],
+    subtypes = [zombie, dragon],
+    text = [
+      flying,
+      static(
+        can(
+          actor(you),
+          cast(
+            this,
+            from = yourGraveyard,
+            payment = payingInstead(
+              compound([
+                  mana([pip(black), pip(black)]),
+                  perform(sacrifice(counted(exactly(2), isCreature)))])))))],
+    power = lit(6),
+    toughness = lit(6)})

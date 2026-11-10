@@ -1,15 +1,14 @@
-card {
-  name = "Blood Frenzy",
-  cost = [generic(1), pip(red)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          get(
-            target(and([isCreature, or([isAttacking, isBlocking])])),
-            up(lit(4)),
-            up(lit(0)),
-            untilEndOfTurn),
-          atNext(endStep, destroy(that(creature)))]),
-      timing = beforePart(combatDamage))]
-}
+card singleFaced({
+    name = "Blood Frenzy",
+    cost = [generic(1), pip(red)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            get(
+              target(and([isCreature, or([isAttacking, isBlocking])])),
+              up(lit(4)),
+              up(lit(0)),
+              untilEndOfTurn),
+            atNext(endStep, destroy(that(creature)))]),
+        timing = beforePart(combatDamage))]})

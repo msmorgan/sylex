@@ -1,6 +1,5 @@
-card {
-  name = "Telepathy",
-  cost = [pip(blue)],
-  types = [enchantment],
-  text = [static(visibility(reveal, yourOpponents, wholeHand))]
-}
+card singleFaced({
+    name = "Telepathy",
+    cost = [pip(blue)],
+    types = [enchantment],
+    text = [static(visibility(reveal, yourOpponents, wholeHand))]})

@@ -1,10 +1,9 @@
-card {
-  name = "Nylea's Presence",
-  cost = [generic(1), pip(green)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isLand),
-    when(does(actor(thisAura), enter), draw(lit(1))),
-    static(qualityChange(enchanted(land), adds, everyTypeOf(basicLand)))]
-}
+card singleFaced({
+    name = "Nylea's Presence",
+    cost = [generic(1), pip(green)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isLand),
+      when(does(actor(thisAura), enter), draw(lit(1))),
+      static(qualityChange(enchanted(land), adds, everyTypeOf(basicLand)))]})

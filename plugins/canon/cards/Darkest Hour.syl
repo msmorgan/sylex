@@ -1,6 +1,5 @@
-card {
-  name = "Darkest Hour",
-  cost = [pip(black)],
-  types = [enchantment],
-  text = [static(qualityChange(allOf(isCreature), sets, colored(colors([black]))))]
-}
+card singleFaced({
+    name = "Darkest Hour",
+    cost = [pip(black)],
+    types = [enchantment],
+    text = [static(qualityChange(allOf(isCreature), sets, colored(colors([black]))))]})

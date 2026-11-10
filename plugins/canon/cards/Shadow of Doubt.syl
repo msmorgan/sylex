@@ -1,10 +1,9 @@
-card {
-  name = "Shadow of Doubt",
-  cost = [hybridPip(blue, black), hybridPip(blue, black)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          establishThroughout(cant(actor(bare(isPlayer)), search(libraries)), thisTurn),
-          draw(lit(1))]))]
-}
+card singleFaced({
+    name = "Shadow of Doubt",
+    cost = [hybridPip(blue, black), hybridPip(blue, black)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            establishThroughout(cant(actor(bare(isPlayer)), search(libraries)), thisTurn),
+            draw(lit(1))]))]})

@@ -1,13 +1,12 @@
-card {
-  name = "Riddles in the Dark",
-  cost = [generic(2), pip(blue)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          lookAt(topSlice(lit(4))),
-          separateIntoPiles(them, 2, [faceDown, faceUp]),
-          instruct(anOpponent, choose(onePile)),
-          putInto(that(pile), hand),
-          putInto(theOther, graveyard)]))]
-}
+card singleFaced({
+    name = "Riddles in the Dark",
+    cost = [generic(2), pip(blue)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            lookAt(topSlice(lit(4))),
+            separateIntoPiles(them, 2, [faceDown, faceUp]),
+            instruct(anOpponent, choose(onePile)),
+            putInto(that(pile), hand),
+            putInto(theOther, graveyard)]))]})

@@ -1,17 +1,16 @@
-card {
-  name = "Captain Marvel, Apex Avenger",
-  cost = [generic(5), pip(red), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, kree, hero],
-  text = [
-    flying,
-    doubleStrike,
-    indestructible,
-    whenever(
-      does(by(you), putCounters(anyAmount, anyKind, a(and([isCreature, isOther])))),
-      if = is(it, not(hasSubtype(kree))),
-      action = may(putCounters(thatMuch, thoseCounters, this)))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Captain Marvel, Apex Avenger",
+    cost = [generic(5), pip(red), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, kree, hero],
+    text = [
+      flying,
+      doubleStrike,
+      indestructible,
+      whenever(
+        does(by(you), putCounters(anyAmount, anyKind, a(and([isCreature, isOther])))),
+        if = is(it, not(hasSubtype(kree))),
+        action = may(putCounters(thatMuch, thoseCounters, this)))],
+    power = lit(4),
+    toughness = lit(4)})

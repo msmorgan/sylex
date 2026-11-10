@@ -3,19 +3,18 @@
 # power does, and depending on a choice is no condition [CR#604.3a]. Its counter on the other
 # creatures of the chosen type as they enter stays a separate ability, affecting other objects
 # [CR#604.3a].
-card {
-  name = "Metallic Mimic",
-  cost = [generic(2)],
-  types = [artifact, creature],
-  subtypes = [shapeshifter],
-  text = [
-    static(entersChoosing(thisCreature, subtype(creature))),
-    static(definesQuality(thisCreature, adds, chosenQuality(ofChosen(subtype(creature))))),
-    static(
-      entersWithAdditionalCounters(
-        each(and([isCreature, youControl, ofChosen(subtype(creature)), isOther])),
-        lit(1),
-        p1p1Counter))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Metallic Mimic",
+    cost = [generic(2)],
+    types = [artifact, creature],
+    subtypes = [shapeshifter],
+    text = [
+      static(entersChoosing(thisCreature, subtype(creature))),
+      static(definesQuality(thisCreature, adds, chosenQuality(ofChosen(subtype(creature))))),
+      static(
+        entersWithAdditionalCounters(
+          each(and([isCreature, youControl, ofChosen(subtype(creature)), isOther])),
+          lit(1),
+          p1p1Counter))],
+    power = lit(2),
+    toughness = lit(1)})

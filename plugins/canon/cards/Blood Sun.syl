@@ -1,8 +1,7 @@
-card {
-  name = "Blood Sun",
-  cost = [generic(2), pip(red)],
-  types = [enchantment],
-  text = [
-    when(does(actor(thisEnchantment), enter), draw(lit(1))),
-    static(allAbilityLoss(allOf(isLand), isManaAbility))]
-}
+card singleFaced({
+    name = "Blood Sun",
+    cost = [generic(2), pip(red)],
+    types = [enchantment],
+    text = [
+      when(does(actor(thisEnchantment), enter), draw(lit(1))),
+      static(allAbilityLoss(allOf(isLand), isManaAbility))]})

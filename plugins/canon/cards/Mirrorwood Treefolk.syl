@@ -1,17 +1,16 @@
-card {
-  name = "Mirrorwood Treefolk",
-  cost = [generic(3), pip(green)],
-  types = [creature],
-  subtypes = [treefolk],
-  text = [
-    activated(
-      mana([generic(2), pip(red), pip(white)]),
-      establishThroughout(
-        replace(
-          would(any, dealDamage(recipient = thisCreature)),
-          instead(redirectDamage(allDamage, target(isAnyTarget))),
-          use = nextTimeOnly),
-        thisTurn))],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Mirrorwood Treefolk",
+    cost = [generic(3), pip(green)],
+    types = [creature],
+    subtypes = [treefolk],
+    text = [
+      activated(
+        mana([generic(2), pip(red), pip(white)]),
+        establishThroughout(
+          replace(
+            would(any, dealDamage(recipient = thisCreature)),
+            instead(redirectDamage(allDamage, target(isAnyTarget))),
+            use = nextTimeOnly),
+          thisTurn))],
+    power = lit(2),
+    toughness = lit(4)})

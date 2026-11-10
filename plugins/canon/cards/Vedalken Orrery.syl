@@ -1,6 +1,5 @@
-card {
-  name = "Vedalken Orrery",
-  cost = [generic(4)],
-  types = [artifact],
-  text = [static(can(actor(you), cast(bare(isSpell)), asThough = asThoughHadFlash(them)))]
-}
+card singleFaced({
+    name = "Vedalken Orrery",
+    cost = [generic(4)],
+    types = [artifact],
+    text = [static(can(actor(you), cast(bare(isSpell)), asThough = asThoughHadFlash(them)))]})

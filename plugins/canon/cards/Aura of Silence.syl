@@ -1,17 +1,16 @@
-card {
-  name = "Aura of Silence",
-  cost = [generic(1), pip(white), pip(white)],
-  types = [enchantment],
-  text = [
-    static(
-      costShift(
-        allOf(
-          and([
-              or([isArtifact, isEnchantment]),
-              isSpell,
-              did(actor(yourOpponents), cast(which), thisObject)])),
-        more(lit(2)))),
-    activated(
-      perform(sacrifice(thisEnchantment)),
-      destroy(target(or([isArtifact, isEnchantment]))))]
-}
+card singleFaced({
+    name = "Aura of Silence",
+    cost = [generic(1), pip(white), pip(white)],
+    types = [enchantment],
+    text = [
+      static(
+        costShift(
+          allOf(
+            and([
+                or([isArtifact, isEnchantment]),
+                isSpell,
+                did(actor(yourOpponents), cast(which), thisObject)])),
+          more(lit(2)))),
+      activated(
+        perform(sacrifice(thisEnchantment)),
+        destroy(target(or([isArtifact, isEnchantment]))))]})

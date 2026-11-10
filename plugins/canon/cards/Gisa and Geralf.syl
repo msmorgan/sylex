@@ -1,18 +1,17 @@
-card {
-  name = "Gisa and Geralf",
-  cost = [generic(2), pip(blue), pip(black)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, wizard],
-  text = [
-    when(does(actor(thisCreature), enter), mill(lit(4))),
-    static(
-      can(
-        actor(you),
-        cast(
-          counted(exactly(1), and([isSpell, isCreature, hasSubtype(zombie)])),
-          from = yourGraveyard),
-        timing = onEachOfYourTurns))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Gisa and Geralf",
+    cost = [generic(2), pip(blue), pip(black)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, wizard],
+    text = [
+      when(does(actor(thisCreature), enter), mill(lit(4))),
+      static(
+        can(
+          actor(you),
+          cast(
+            counted(exactly(1), and([isSpell, isCreature, hasSubtype(zombie)])),
+            from = yourGraveyard),
+          timing = onEachOfYourTurns))],
+    power = lit(4),
+    toughness = lit(4)})

@@ -1,10 +1,9 @@
-card {
-  name = "Bonders' Enclave",
-  types = [land],
-  text = [
-    activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
-    activatedOnlyIf(
-      compound([mana([generic(3)]), tapSymbol]),
-      draw(lit(1)),
-      exists(and([isCreature, youControl, hasPower(atLeast, lit(4))])))]
-}
+card singleFaced({
+    name = "Bonders' Enclave",
+    types = [land],
+    text = [
+      activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
+      activatedOnlyIf(
+        compound([mana([generic(3)]), tapSymbol]),
+        draw(lit(1)),
+        exists(and([isCreature, youControl, hasPower(atLeast, lit(4))])))]})

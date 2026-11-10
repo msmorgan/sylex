@@ -1,8 +1,11 @@
-card {
-  name = "Hazardous Conditions",
-  cost = [generic(2), pip(black), pip(green)],
-  types = [sorcery],
-  text = [
-    spell(
-      get(allOf(and([isCreature, not(hasCounter)])), down(lit(2)), down(lit(2)), untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Hazardous Conditions",
+    cost = [generic(2), pip(black), pip(green)],
+    types = [sorcery],
+    text = [
+      spell(
+        get(
+          allOf(and([isCreature, not(hasCounter)])),
+          down(lit(2)),
+          down(lit(2)),
+          untilEndOfTurn))]})

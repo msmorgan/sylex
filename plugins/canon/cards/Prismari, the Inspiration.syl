@@ -1,16 +1,15 @@
-card {
-  name = "Prismari, the Inspiration",
-  cost = [generic(5), pip(blue), pip(red)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [elder, dragon],
-  text = [
-    flying,
-    ward(perform(payLife(lit(5)))),
-    static(
-      abilityGrant(
-        allOf(and([isInstantOrSorcery, isSpell, did(actor(you), cast(which), thisObject)])),
-        storm))],
-  power = lit(7),
-  toughness = lit(7)
-}
+card singleFaced({
+    name = "Prismari, the Inspiration",
+    cost = [generic(5), pip(blue), pip(red)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [elder, dragon],
+    text = [
+      flying,
+      ward(perform(payLife(lit(5)))),
+      static(
+        abilityGrant(
+          allOf(and([isInstantOrSorcery, isSpell, did(actor(you), cast(which), thisObject)])),
+          storm))],
+    power = lit(7),
+    toughness = lit(7)})

@@ -1,12 +1,11 @@
-card {
-  name = "Rain of Gore",
-  cost = [pip(black), pip(red)],
-  types = [enchantment],
-  text = [
-    static(
-      replace(
-        causedBy(
-          bySource(a(or([isSpell, abilityHead(anyOnStack)]))),
-          would(actor(controllerOf(it)), gainLife(anyAmount))),
-        instead(instruct(that(player), loseLife(thatMuch)))))]
-}
+card singleFaced({
+    name = "Rain of Gore",
+    cost = [pip(black), pip(red)],
+    types = [enchantment],
+    text = [
+      static(
+        replace(
+          causedBy(
+            bySource(a(or([isSpell, abilityHead(anyOnStack)]))),
+            would(actor(controllerOf(it)), gainLife(anyAmount))),
+          instead(instruct(that(player), loseLife(thatMuch)))))]})

@@ -1,11 +1,12 @@
-card {
-  name = "Stupefying Touch",
-  cost = [generic(1), pip(blue)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    when(does(actor(thisAura), enter), draw(lit(1))),
-    static(
-      cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(enchanted(creature))])))))]
-}
+card singleFaced({
+    name = "Stupefying Touch",
+    cost = [generic(1), pip(blue)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      when(does(actor(thisAura), enter), draw(lit(1))),
+      static(
+        cant(
+          any,
+          activate(allOf(and([abilityHead(anyActivated), abilityOf(enchanted(creature))])))))]})

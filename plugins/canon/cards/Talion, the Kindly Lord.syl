@@ -1,24 +1,23 @@
-card {
-  name = "Talion, the Kindly Lord",
-  cost = [generic(2), pip(blue), pip(black)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [faerie, noble],
-  text = [
-    flying,
-    static(entersChoosing(thisCreature, number)),
-    whenever(
-      does(
-        actor(anOpponent),
-        cast(
-          a(
-            and([
-                isSpell,
-                compare(
-                  equal,
-                  chosenNumber,
-                  axes = [stat(manaValue), stat(power), stat(toughness)])])))),
-      sequentially([instruct(that(player), loseLife(lit(2))), draw(lit(1))]))],
-  power = lit(3),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Talion, the Kindly Lord",
+    cost = [generic(2), pip(blue), pip(black)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [faerie, noble],
+    text = [
+      flying,
+      static(entersChoosing(thisCreature, number)),
+      whenever(
+        does(
+          actor(anOpponent),
+          cast(
+            a(
+              and([
+                  isSpell,
+                  compare(
+                    equal,
+                    chosenNumber,
+                    axes = [stat(manaValue), stat(power), stat(toughness)])])))),
+        sequentially([instruct(that(player), loseLife(lit(2))), draw(lit(1))]))],
+    power = lit(3),
+    toughness = lit(4)})

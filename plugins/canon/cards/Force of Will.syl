@@ -1,12 +1,11 @@
-card {
-  name = "Force of Will",
-  cost = [generic(3), pip(blue), pip(blue)],
-  types = [instant],
-  text = [
-    static(
-      altCost(
-        this,
-        compound(
-          [perform(payLife(lit(1))), perform(exile(a(and([hasColor(blue), in(yourHand)]))))]))),
-    spell(counter(target(isSpell)))]
-}
+card singleFaced({
+    name = "Force of Will",
+    cost = [generic(3), pip(blue), pip(blue)],
+    types = [instant],
+    text = [
+      static(
+        altCost(
+          this,
+          compound(
+            [perform(payLife(lit(1))), perform(exile(a(and([hasColor(blue), in(yourHand)]))))]))),
+      spell(counter(target(isSpell)))]})

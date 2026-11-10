@@ -1,22 +1,21 @@
-card {
-  name = "Custodi Squire",
-  cost = [generic(4), pip(white)],
-  types = [creature],
-  subtypes = [spirit, cleric],
-  text = [
-    flying,
-    willOfTheCouncil(
-      when(
-        does(actor(thisCreature), enter),
-        sequentially([
-            instruct(
-              eachPlayer,
-              voteStartingWith(
-                you,
-                openly,
-                byCandidate(
-                  a(and([or([isArtifact, isCreature, isEnchantment]), in(yourGraveyard)]))))),
-            returnToHand(allOf(and([isCard, withMostVotes])))])))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Custodi Squire",
+    cost = [generic(4), pip(white)],
+    types = [creature],
+    subtypes = [spirit, cleric],
+    text = [
+      flying,
+      willOfTheCouncil(
+        when(
+          does(actor(thisCreature), enter),
+          sequentially([
+              instruct(
+                eachPlayer,
+                voteStartingWith(
+                  you,
+                  openly,
+                  byCandidate(
+                    a(and([or([isArtifact, isCreature, isEnchantment]), in(yourGraveyard)]))))),
+              returnToHand(allOf(and([isCard, withMostVotes])))])))],
+    power = lit(3),
+    toughness = lit(3)})

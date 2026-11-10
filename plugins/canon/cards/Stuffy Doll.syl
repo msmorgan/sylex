@@ -1,15 +1,14 @@
-card {
-  name = "Stuffy Doll",
-  cost = [generic(5)],
-  types = [artifact, creature],
-  subtypes = [construct],
-  text = [
-    indestructible,
-    static(entersChoosingPlayer(thisCreature, a(isPlayer))),
-    whenever(
-      does(any, dealDamage(recipient = thisCreature)),
-      instruct(it, dealDamage(thatMuch, the(isChosenPlayer)))),
-    activated(tapSymbol, instruct(thisCreature, dealDamage(lit(1), thisCreature)))],
-  power = lit(0),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Stuffy Doll",
+    cost = [generic(5)],
+    types = [artifact, creature],
+    subtypes = [construct],
+    text = [
+      indestructible,
+      static(entersChoosingPlayer(thisCreature, a(isPlayer))),
+      whenever(
+        does(any, dealDamage(recipient = thisCreature)),
+        instruct(it, dealDamage(thatMuch, the(isChosenPlayer)))),
+      activated(tapSymbol, instruct(thisCreature, dealDamage(lit(1), thisCreature)))],
+    power = lit(0),
+    toughness = lit(1)})

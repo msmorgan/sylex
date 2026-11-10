@@ -1,14 +1,13 @@
-card {
-  name = "Market Gnome",
-  cost = [pip(white)],
-  types = [artifact, creature],
-  subtypes = [gnome],
-  text = [
-    when(does(actor(thisCreature), die), sequentially([gainLife(lit(1)), draw(lit(1))])),
-    when(
-      does(any, exile(thisCreature)),
-      while = whileDoing(does(actor(you), activate(a(abilityHead(keyword(craft)))))),
-      action = sequentially([gainLife(lit(1)), draw(lit(1))]))],
-  power = lit(0),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Market Gnome",
+    cost = [pip(white)],
+    types = [artifact, creature],
+    subtypes = [gnome],
+    text = [
+      when(does(actor(thisCreature), die), sequentially([gainLife(lit(1)), draw(lit(1))])),
+      when(
+        does(any, exile(thisCreature)),
+        while = whileDoing(does(actor(you), activate(a(abilityHead(keyword(craft)))))),
+        action = sequentially([gainLife(lit(1)), draw(lit(1))]))],
+    power = lit(0),
+    toughness = lit(3)})

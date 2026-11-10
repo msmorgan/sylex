@@ -1,12 +1,11 @@
-card {
-  name = "Blazing Shoal",
-  cost = [variable, pip(red), pip(red)],
-  types = [instant],
-  subtypes = [arcane],
-  text = [
-    static(
-      altCost(
-        this,
-        perform(exile(a(and([hasColor(red), hasManaValue(equal, letter(x)), in(yourHand)])))))),
-    spell(get(target(isCreature), up(letter(x)), up(lit(0)), untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Blazing Shoal",
+    cost = [variable, pip(red), pip(red)],
+    types = [instant],
+    subtypes = [arcane],
+    text = [
+      static(
+        altCost(
+          this,
+          perform(exile(a(and([hasColor(red), hasManaValue(equal, letter(x)), in(yourHand)])))))),
+      spell(get(target(isCreature), up(letter(x)), up(lit(0)), untilEndOfTurn))]})

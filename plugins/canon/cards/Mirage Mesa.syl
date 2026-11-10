@@ -1,9 +1,8 @@
-card {
-  name = "Mirage Mesa",
-  types = [land],
-  subtypes = [desert],
-  text = [
-    static(entersTapped(thisLand)),
-    static(entersChoosing(thisLand, color)),
-    activated(tapSymbol, addMana(lit(1), ofTheChosenColor))]
-}
+card singleFaced({
+    name = "Mirage Mesa",
+    types = [land],
+    subtypes = [desert],
+    text = [
+      static(entersTapped(thisLand)),
+      static(entersChoosing(thisLand, color)),
+      activated(tapSymbol, addMana(lit(1), ofTheChosenColor))]})

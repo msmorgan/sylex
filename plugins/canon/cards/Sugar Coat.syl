@@ -1,23 +1,22 @@
-card {
-  name = "Sugar Coat",
-  cost = [generic(2), pip(blue)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    flash,
-    enchant(or([isCreature, hasSubtype(food)])),
-    static(
-      conjunction([
-          qualityChange(
-            enchanted(permanent),
-            sets,
-            bundle({
-                characteristics = {
-                  types = [artifact],
-                  subtypes = [food],
-                  text = [
-                    activated(
-                      compound([mana([generic(2)]), tapSymbol, perform(sacrifice(thisArtifact))]),
-                      gainLife(lit(3)))]}})),
-          allAbilityLoss(it)]))]
-}
+card singleFaced({
+    name = "Sugar Coat",
+    cost = [generic(2), pip(blue)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      flash,
+      enchant(or([isCreature, hasSubtype(food)])),
+      static(
+        conjunction([
+            qualityChange(
+              enchanted(permanent),
+              sets,
+              bundle({
+                  characteristics = {
+                    types = [artifact],
+                    subtypes = [food],
+                    text = [
+                      activated(
+                        compound([mana([generic(2)]), tapSymbol, perform(sacrifice(thisArtifact))]),
+                        gainLife(lit(3)))]}})),
+            allAbilityLoss(it)]))]})

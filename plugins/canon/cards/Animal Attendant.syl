@@ -1,20 +1,20 @@
-card {
-  name = "Animal Attendant",
-  cost = [generic(1), pip(green)],
-  types = [creature],
-  subtypes = [human, citizen],
-  text = [
-    activated(
-      tapSymbol,
-      addMana(
-        lit(1),
-        ofAnyColor(sameColor),
-        [
-          whenSpentOn(
-            affectsIt,
-            false,
-            a(and([non(hasSubtype(human)), isCreature, isSpell])),
-            establish(entersWithAdditionalCounters(becomes(that(spell)), lit(1), p1p1Counter)))]))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Animal Attendant",
+    cost = [generic(1), pip(green)],
+    types = [creature],
+    subtypes = [human, citizen],
+    text = [
+      activated(
+        tapSymbol,
+        addMana(
+          lit(1),
+          ofAnyColor(sameColor),
+          [
+            whenSpentOn(
+              affectsIt,
+              false,
+              a(and([non(hasSubtype(human)), isCreature, isSpell])),
+              establish(
+                entersWithAdditionalCounters(becomes(that(spell)), lit(1), p1p1Counter)))]))],
+    power = lit(2),
+    toughness = lit(2)})

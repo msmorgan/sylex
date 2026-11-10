@@ -1,11 +1,10 @@
-card {
-  name = "High Ground",
-  cost = [pip(white)],
-  types = [enchantment],
-  text = [
-    static(
-      can(
-        actor(each(and([isCreature, youControl]))),
-        block(counted(additional(exactly(1)), isCreature)),
-        timing = eachCombat))]
-}
+card singleFaced({
+    name = "High Ground",
+    cost = [pip(white)],
+    types = [enchantment],
+    text = [
+      static(
+        can(
+          actor(each(and([isCreature, youControl]))),
+          block(counted(additional(exactly(1)), isCreature)),
+          timing = eachCombat))]})

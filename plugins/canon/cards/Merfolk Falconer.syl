@@ -1,15 +1,15 @@
-card {
-  name = "Merfolk Falconer",
-  cost = [generic(3), pip(blue), pip(blue)],
-  types = [creature],
-  subtypes = [merfolk, wizard],
-  text = [
-    flying,
-    whenever(
-      does(
-        actor(you),
-        cast(a(compareOver(isSpell, paidCostRead(byKeyword(kicker), none, it), atLeast, lit(1))))),
-      scry(lit(2)))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Merfolk Falconer",
+    cost = [generic(3), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [merfolk, wizard],
+    text = [
+      flying,
+      whenever(
+        does(
+          actor(you),
+          cast(
+            a(compareOver(isSpell, paidCostRead(byKeyword(kicker), none, it), atLeast, lit(1))))),
+        scry(lit(2)))],
+    power = lit(4),
+    toughness = lit(4)})

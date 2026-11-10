@@ -1,11 +1,10 @@
-card {
-  name = "Pentarch Ward",
-  cost = [generic(2), pip(white)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    static(entersChoosing(thisAura, color)),
-    when(does(actor(thisAura), enter), draw(lit(1))),
-    static(retention(abilityGrant(enchanted(creature), protection(ofChosen(color))), thisAura))]
-}
+card singleFaced({
+    name = "Pentarch Ward",
+    cost = [generic(2), pip(white)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      static(entersChoosing(thisAura, color)),
+      when(does(actor(thisAura), enter), draw(lit(1))),
+      static(retention(abilityGrant(enchanted(creature), protection(ofChosen(color))), thisAura))]})

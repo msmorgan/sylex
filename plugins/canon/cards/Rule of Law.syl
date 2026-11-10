@@ -1,6 +1,6 @@
-card {
-  name = "Rule of Law",
-  cost = [generic(2), pip(white)],
-  types = [enchantment],
-  text = [static(cant(actor(eachPlayer), cast(counted(moreThan(1), isSpell)), timing = eachTurn))]
-}
+card singleFaced({
+    name = "Rule of Law",
+    cost = [generic(2), pip(white)],
+    types = [enchantment],
+    text = [
+      static(cant(actor(eachPlayer), cast(counted(moreThan(1), isSpell)), timing = eachTurn))]})

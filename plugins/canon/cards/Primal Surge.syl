@@ -1,10 +1,9 @@
-card {
-  name = "Primal Surge",
-  cost = [generic(8), pip(green), pip(green)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          exile(topSlice(lit(1))),
-          doIf(is(it, isPermanentCard), may(putOntoBattlefield(it), repeat(again)))]))]
-}
+card singleFaced({
+    name = "Primal Surge",
+    cost = [generic(8), pip(green), pip(green)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            exile(topSlice(lit(1))),
+            doIf(is(it, isPermanentCard), may(putOntoBattlefield(it), repeat(again)))]))]})

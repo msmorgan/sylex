@@ -1,12 +1,13 @@
-card {
-  name = "Kaervek's Purge",
-  cost = [variable, pip(black), pip(red)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          destroy(target(and([isCreature, hasManaValue(equal, letter(x))]))),
-          doIf(
-            did(actor(that(creature)), die, thisWay),
-            instruct(this, dealDamage(powerOf(that(creature)), controllerOf(that(creature)))))]))]
-}
+card singleFaced({
+    name = "Kaervek's Purge",
+    cost = [variable, pip(black), pip(red)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            destroy(target(and([isCreature, hasManaValue(equal, letter(x))]))),
+            doIf(
+              did(actor(that(creature)), die, thisWay),
+              instruct(
+                this,
+                dealDamage(powerOf(that(creature)), controllerOf(that(creature)))))]))]})

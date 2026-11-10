@@ -1,12 +1,11 @@
-card {
-  name = "Loaming Shaman",
-  cost = [generic(2), pip(green)],
-  types = [creature],
-  subtypes = [centaur, shaman],
-  text = [
-    when(
-      does(actor(thisCreature), enter),
-      instruct(target(isPlayer), shuffleInto(targets(anyNumber, cardIn(graveyardOf(they))))))],
-  power = lit(3),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Loaming Shaman",
+    cost = [generic(2), pip(green)],
+    types = [creature],
+    subtypes = [centaur, shaman],
+    text = [
+      when(
+        does(actor(thisCreature), enter),
+        instruct(target(isPlayer), shuffleInto(targets(anyNumber, cardIn(graveyardOf(they))))))],
+    power = lit(3),
+    toughness = lit(2)})

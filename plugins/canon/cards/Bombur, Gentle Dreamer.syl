@@ -1,12 +1,11 @@
-card {
-  name = "Bombur, Gentle Dreamer",
-  cost = [generic(2), pip(red)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [dwarf, bard],
-  text = [
-    storied,
-    static(onlyUnless(doesntUntap(thisCreature, you), is(you, hasDesignation(enduringStory))))],
-  power = lit(5),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Bombur, Gentle Dreamer",
+    cost = [generic(2), pip(red)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [dwarf, bard],
+    text = [
+      storied,
+      static(onlyUnless(doesntUntap(thisCreature, you), is(you, hasDesignation(enduringStory))))],
+    power = lit(5),
+    toughness = lit(3)})

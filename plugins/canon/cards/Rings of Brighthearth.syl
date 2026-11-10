@@ -1,12 +1,12 @@
-card {
-  name = "Rings of Brighthearth",
-  cost = [generic(3)],
-  types = [artifact],
-  text = [
-    whenever(
-      does(actor(you), activate(a(abilityHead(anyActivated)))),
-      if = not(is(that(ability), isManaAbility)),
-      action = may(
-        pay(mana([generic(2)]), once),
-        sequentially([copyOnStack(that(ability)), may(chooseNewTargets(that(copied(ability))))])))]
-}
+card singleFaced({
+    name = "Rings of Brighthearth",
+    cost = [generic(3)],
+    types = [artifact],
+    text = [
+      whenever(
+        does(actor(you), activate(a(abilityHead(anyActivated)))),
+        if = not(is(that(ability), isManaAbility)),
+        action = may(
+          pay(mana([generic(2)]), once),
+          sequentially(
+            [copyOnStack(that(ability)), may(chooseNewTargets(that(copied(ability))))])))]})

@@ -1,13 +1,12 @@
-card {
-  name = "Brazen Blademaster",
-  cost = [generic(2), pip(red)],
-  types = [creature],
-  subtypes = [orc, pirate],
-  text = [
-    whenever(
-      does(actor(thisCreature), attack),
-      while = whileTrue(compareAmt(countOf(and([isArtifact, youControl])), atLeast, lit(2))),
-      action = get(it, up(lit(2)), up(lit(1)), untilEndOfTurn))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Brazen Blademaster",
+    cost = [generic(2), pip(red)],
+    types = [creature],
+    subtypes = [orc, pirate],
+    text = [
+      whenever(
+        does(actor(thisCreature), attack),
+        while = whileTrue(compareAmt(countOf(and([isArtifact, youControl])), atLeast, lit(2))),
+        action = get(it, up(lit(2)), up(lit(1)), untilEndOfTurn))],
+    power = lit(2),
+    toughness = lit(3)})

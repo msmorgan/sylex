@@ -1,19 +1,18 @@
-card {
-  name = "Guardian Beast",
-  cost = [generic(3), pip(black)],
-  types = [creature],
-  subtypes = [beast],
-  text = [
-    static(
-      onlyWhile(
-        conjunction([
-            retention(
-              cant(any, attachTo(a(hasSubtype(aura)), them)),
-              allOf(and([hasSubtype(aura), attachedTo(those(artifact))]))),
-            abilityGrant(them, indestructible),
-            cant(actor(bare(and([isPlayer, isOther]))), gainControlOf(them))],
-          bare(and([non(isCreature), isArtifact, youControl]))),
-        is(thisCreature, isUntapped)))],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Guardian Beast",
+    cost = [generic(3), pip(black)],
+    types = [creature],
+    subtypes = [beast],
+    text = [
+      static(
+        onlyWhile(
+          conjunction([
+              retention(
+                cant(any, attachTo(a(hasSubtype(aura)), them)),
+                allOf(and([hasSubtype(aura), attachedTo(those(artifact))]))),
+              abilityGrant(them, indestructible),
+              cant(actor(bare(and([isPlayer, isOther]))), gainControlOf(them))],
+            bare(and([non(isCreature), isArtifact, youControl]))),
+          is(thisCreature, isUntapped)))],
+    power = lit(2),
+    toughness = lit(4)})

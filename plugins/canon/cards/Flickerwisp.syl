@@ -1,15 +1,14 @@
-card {
-  name = "Flickerwisp",
-  cost = [generic(1), pip(white), pip(white)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [
-    flying,
-    when(
-      does(actor(thisCreature), enter),
-      sequentially([
-          exile(target(and([isPermanent, isOther]))),
-          atNext(endStep, returnToBattlefield(that(card), [under(ownerOf(it))]))]))],
-  power = lit(3),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Flickerwisp",
+    cost = [generic(1), pip(white), pip(white)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [
+      flying,
+      when(
+        does(actor(thisCreature), enter),
+        sequentially([
+            exile(target(and([isPermanent, isOther]))),
+            atNext(endStep, returnToBattlefield(that(card), [under(ownerOf(it))]))]))],
+    power = lit(3),
+    toughness = lit(1)})

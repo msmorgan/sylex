@@ -1,9 +1,8 @@
-card {
-  name = "Repercussion",
-  cost = [generic(1), pip(red), pip(red)],
-  types = [enchantment],
-  text = [
-    whenever(
-      does(any, dealDamage(recipient = a(isCreature))),
-      instruct(thisEnchantment, dealDamage(thatMuch, controllerOf(that(creature)))))]
-}
+card singleFaced({
+    name = "Repercussion",
+    cost = [generic(1), pip(red), pip(red)],
+    types = [enchantment],
+    text = [
+      whenever(
+        does(any, dealDamage(recipient = a(isCreature))),
+        instruct(thisEnchantment, dealDamage(thatMuch, controllerOf(that(creature)))))]})

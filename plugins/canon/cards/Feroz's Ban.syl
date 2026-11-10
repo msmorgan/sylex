@@ -1,6 +1,5 @@
-card {
-  name = "Feroz's Ban",
-  cost = [generic(6)],
-  types = [artifact],
-  text = [static(costShift(allOf(and([isCreature, isSpell])), more(lit(2))))]
-}
+card singleFaced({
+    name = "Feroz's Ban",
+    cost = [generic(6)],
+    types = [artifact],
+    text = [static(costShift(allOf(and([isCreature, isSpell])), more(lit(2))))]})

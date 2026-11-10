@@ -1,12 +1,11 @@
-card {
-  name = "Urban Evolution",
-  cost = [generic(3), pip(green), pip(blue)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          draw(lit(3)),
-          establishThroughout(
-            can(actor(you), play(counted(additional(exactly(1)), isLand))),
-            thisTurn)]))]
-}
+card singleFaced({
+    name = "Urban Evolution",
+    cost = [generic(3), pip(green), pip(blue)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            draw(lit(3)),
+            establishThroughout(
+              can(actor(you), play(counted(additional(exactly(1)), isLand))),
+              thisTurn)]))]})

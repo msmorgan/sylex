@@ -1,10 +1,9 @@
-card {
-  name = "Boots of Speed",
-  cost = [pip(red)],
-  types = [artifact],
-  subtypes = [equipment],
-  text = [
-    static(
-      conjunction([getsPt(equipped(creature), up(lit(1)), up(lit(0))), abilityGrant(it, haste)])),
-    equip(mana([generic(1)]))]
-}
+card singleFaced({
+    name = "Boots of Speed",
+    cost = [pip(red)],
+    types = [artifact],
+    subtypes = [equipment],
+    text = [
+      static(
+        conjunction([getsPt(equipped(creature), up(lit(1)), up(lit(0))), abilityGrant(it, haste)])),
+      equip(mana([generic(1)]))]})

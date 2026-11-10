@@ -1,9 +1,8 @@
-card {
-  name = "Spirit of the Labyrinth",
-  cost = [generic(1), pip(white)],
-  types = [enchantment, creature],
-  subtypes = [spirit],
-  text = [static(cant(actor(eachPlayer), drawCount(moreThan(1)), timing = eachTurn))],
-  power = lit(3),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Spirit of the Labyrinth",
+    cost = [generic(1), pip(white)],
+    types = [enchantment, creature],
+    subtypes = [spirit],
+    text = [static(cant(actor(eachPlayer), drawCount(moreThan(1)), timing = eachTurn))],
+    power = lit(3),
+    toughness = lit(1)})

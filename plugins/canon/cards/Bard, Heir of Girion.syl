@@ -1,14 +1,13 @@
-card {
-  name = "Bard, Heir of Girion",
-  cost = [generic(2), pip(white), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, archer],
-  text = [
-    reach,
-    vigilance,
-    static(getsPt(allOf(and([isCreature, youControl, isOther])), up(lit(1)), up(lit(1)))),
-    whenever(does(actor(you), attack), draw(lit(1)))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Bard, Heir of Girion",
+    cost = [generic(2), pip(white), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, archer],
+    text = [
+      reach,
+      vigilance,
+      static(getsPt(allOf(and([isCreature, youControl, isOther])), up(lit(1)), up(lit(1)))),
+      whenever(does(actor(you), attack), draw(lit(1)))],
+    power = lit(4),
+    toughness = lit(4)})

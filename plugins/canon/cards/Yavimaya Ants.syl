@@ -1,9 +1,8 @@
-card {
-  name = "Yavimaya Ants",
-  cost = [generic(2), pip(green), pip(green)],
-  types = [creature],
-  subtypes = [insect],
-  text = [trample, haste, cumulativeUpkeep(mana([pip(green), pip(green)]))],
-  power = lit(5),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Yavimaya Ants",
+    cost = [generic(2), pip(green), pip(green)],
+    types = [creature],
+    subtypes = [insect],
+    text = [trample, haste, cumulativeUpkeep(mana([pip(green), pip(green)]))],
+    power = lit(5),
+    toughness = lit(1)})

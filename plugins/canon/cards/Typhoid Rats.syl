@@ -1,9 +1,8 @@
-card {
-  name = "Typhoid Rats",
-  cost = [pip(black)],
-  types = [creature],
-  subtypes = [rat],
-  text = [deathtouch],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Typhoid Rats",
+    cost = [pip(black)],
+    types = [creature],
+    subtypes = [rat],
+    text = [deathtouch],
+    power = lit(1),
+    toughness = lit(1)})

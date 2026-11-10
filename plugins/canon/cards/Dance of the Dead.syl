@@ -1,35 +1,34 @@
-card {
-  name = "Dance of the Dead",
-  cost = [generic(1), pip(black)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(and([isCreature, isCard, in(graveyard)])),
-    when(
-      does(actor(thisAura), enter),
-      sequentially([
-          establish(
-            conjunction([
-                abilityLoss(it, [written(enchant(and([isCreature, isCard, in(graveyard)])))]),
-                abilityGrant(
-                  it,
-                  enchant(and([isCreature, did(by(thisAura), putOntoBattlefield(which))])))],
-              subject = it)),
-          putOntoBattlefield(
-            enchanted(ofType(card, creature)),
-            riders = [entersAs(tapped), under(you)]),
-          attachTo(thisAura, it),
-          delay(
-            does(actor(thisAura), leave),
-            instruct(controllerOf(that(creature)), sacrifice(it)))]),
-      if = is(it, in(battlefield))),
-    static(
-      conjunction(
-        [getsPt(enchanted(creature), up(lit(1)), up(lit(1))), doesntUntap(it, controllerOf(it))],
-        subject = enchanted(creature))),
-    at(
-      beginningOfPossessed(upkeep, controllerOf(enchanted(creature))),
-      instruct(
-        that(player),
-        may(pay(mana([generic(1), pip(black)]), once), untap(that(creature)))))]
-}
+card singleFaced({
+    name = "Dance of the Dead",
+    cost = [generic(1), pip(black)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(and([isCreature, isCard, in(graveyard)])),
+      when(
+        does(actor(thisAura), enter),
+        sequentially([
+            establish(
+              conjunction([
+                  abilityLoss(it, [written(enchant(and([isCreature, isCard, in(graveyard)])))]),
+                  abilityGrant(
+                    it,
+                    enchant(and([isCreature, did(by(thisAura), putOntoBattlefield(which))])))],
+                subject = it)),
+            putOntoBattlefield(
+              enchanted(ofType(card, creature)),
+              riders = [entersAs(tapped), under(you)]),
+            attachTo(thisAura, it),
+            delay(
+              does(actor(thisAura), leave),
+              instruct(controllerOf(that(creature)), sacrifice(it)))]),
+        if = is(it, in(battlefield))),
+      static(
+        conjunction(
+          [getsPt(enchanted(creature), up(lit(1)), up(lit(1))), doesntUntap(it, controllerOf(it))],
+          subject = enchanted(creature))),
+      at(
+        beginningOfPossessed(upkeep, controllerOf(enchanted(creature))),
+        instruct(
+          that(player),
+          may(pay(mana([generic(1), pip(black)]), once), untap(that(creature)))))]})

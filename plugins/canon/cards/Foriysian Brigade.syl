@@ -1,14 +1,13 @@
-card {
-  name = "Foriysian Brigade",
-  cost = [generic(3), pip(white)],
-  types = [creature],
-  subtypes = [human, soldier],
-  text = [
-    static(
-      can(
-        actor(thisCreature),
-        block(counted(additional(exactly(1)), isCreature)),
-        timing = eachCombat))],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Foriysian Brigade",
+    cost = [generic(3), pip(white)],
+    types = [creature],
+    subtypes = [human, soldier],
+    text = [
+      static(
+        can(
+          actor(thisCreature),
+          block(counted(additional(exactly(1)), isCreature)),
+          timing = eachCombat))],
+    power = lit(2),
+    toughness = lit(4)})

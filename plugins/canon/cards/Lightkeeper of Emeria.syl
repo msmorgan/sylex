@@ -1,14 +1,13 @@
-card {
-  name = "Lightkeeper of Emeria",
-  cost = [generic(3), pip(white)],
-  types = [creature],
-  subtypes = [angel],
-  text = [
-    multikicker(mana([pip(white)])),
-    flying,
-    when(
-      does(actor(thisCreature), enter),
-      gainLife(times(lit(2), timesPaid(byKeyword(kicker), thisCreature))))],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Lightkeeper of Emeria",
+    cost = [generic(3), pip(white)],
+    types = [creature],
+    subtypes = [angel],
+    text = [
+      multikicker(mana([pip(white)])),
+      flying,
+      when(
+        does(actor(thisCreature), enter),
+        gainLife(times(lit(2), timesPaid(byKeyword(kicker), thisCreature))))],
+    power = lit(2),
+    toughness = lit(4)})

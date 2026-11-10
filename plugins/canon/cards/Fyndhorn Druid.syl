@@ -1,13 +1,12 @@
-card {
-  name = "Fyndhorn Druid",
-  cost = [generic(2), pip(green)],
-  types = [creature],
-  subtypes = [elf, druid],
-  text = [
-    when(
-      does(actor(thisCreature), die),
-      if = was(becomeBlocked(it), within(soFarThisTurn)),
-      action = gainLife(lit(4)))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Fyndhorn Druid",
+    cost = [generic(2), pip(green)],
+    types = [creature],
+    subtypes = [elf, druid],
+    text = [
+      when(
+        does(actor(thisCreature), die),
+        if = was(becomeBlocked(it), within(soFarThisTurn)),
+        action = gainLife(lit(4)))],
+    power = lit(2),
+    toughness = lit(2)})

@@ -1,17 +1,16 @@
-card {
-  name = "Stormwild Capridor",
-  cost = [generic(2), pip(white)],
-  types = [creature],
-  subtypes = [bird, goat],
-  text = [
-    flying,
-    static(
-      replace(
-        would(any, dealDamage(recipient = thisCreature, kind = noncombat)),
-        instead(
-          preventDamage(
-            allDamage,
-            also = putCounters(preventedThisWay, printedKind(p1p1Counter), thisCreature)))))],
-  power = lit(1),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Stormwild Capridor",
+    cost = [generic(2), pip(white)],
+    types = [creature],
+    subtypes = [bird, goat],
+    text = [
+      flying,
+      static(
+        replace(
+          would(any, dealDamage(recipient = thisCreature, kind = noncombat)),
+          instead(
+            preventDamage(
+              allDamage,
+              also = putCounters(preventedThisWay, printedKind(p1p1Counter), thisCreature)))))],
+    power = lit(1),
+    toughness = lit(3)})

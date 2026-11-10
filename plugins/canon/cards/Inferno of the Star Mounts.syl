@@ -1,19 +1,18 @@
-card {
-  name = "Inferno of the Star Mounts",
-  cost = [generic(4), pip(red), pip(red)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [dragon],
-  text = [
-    static(cant(any, counter(this))),
-    flying,
-    haste,
-    activated(
-      mana([pip(red)]),
-      triggerThisWay(
-        get(thisCreature, up(lit(1)), up(lit(0)), untilEndOfTurn),
-        stateHolds(compareAmt(powerOf(it), equal, lit(20))),
-        instruct(it, dealDamage(lit(20), target(isAnyTarget)))))],
-  power = lit(6),
-  toughness = lit(6)
-}
+card singleFaced({
+    name = "Inferno of the Star Mounts",
+    cost = [generic(4), pip(red), pip(red)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [dragon],
+    text = [
+      static(cant(any, counter(this))),
+      flying,
+      haste,
+      activated(
+        mana([pip(red)]),
+        triggerThisWay(
+          get(thisCreature, up(lit(1)), up(lit(0)), untilEndOfTurn),
+          stateHolds(compareAmt(powerOf(it), equal, lit(20))),
+          instruct(it, dealDamage(lit(20), target(isAnyTarget)))))],
+    power = lit(6),
+    toughness = lit(6)})

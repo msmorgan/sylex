@@ -1,13 +1,12 @@
-card {
-  name = "Brainstorm",
-  cost = [pip(blue)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          draw(lit(3)),
-          putInto(
-            counted(exactly(2), cardIn(yourHand)),
-            topOf(yourLibrary),
-            riders = [inOrder(anyOrder)])]))]
-}
+card singleFaced({
+    name = "Brainstorm",
+    cost = [pip(blue)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            draw(lit(3)),
+            putInto(
+              counted(exactly(2), cardIn(yourHand)),
+              topOf(yourLibrary),
+              riders = [inOrder(anyOrder)])]))]})

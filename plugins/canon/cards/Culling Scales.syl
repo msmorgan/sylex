@@ -1,14 +1,13 @@
-card {
-  name = "Culling Scales",
-  cost = [generic(3)],
-  types = [artifact],
-  text = [
-    at(
-      beginningOfYour(upkeep),
-      destroy(
-        target(
-          and([
-              isPermanent,
-              non(isLand),
-              superlative(min, stat(manaValue), and([isPermanent, non(isLand)]))]))))]
-}
+card singleFaced({
+    name = "Culling Scales",
+    cost = [generic(3)],
+    types = [artifact],
+    text = [
+      at(
+        beginningOfYour(upkeep),
+        destroy(
+          target(
+            and([
+                isPermanent,
+                non(isLand),
+                superlative(min, stat(manaValue), and([isPermanent, non(isLand)]))]))))]})

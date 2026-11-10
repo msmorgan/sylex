@@ -1,14 +1,13 @@
-card {
-  name = "Rafter Demon",
-  cost = [generic(2), pip(black), pip(red)],
-  types = [creature],
-  subtypes = [demon],
-  text = [
-    spectacle(mana([generic(3), pip(black), pip(red)])),
-    when(
-      does(actor(thisCreature), enter),
-      if = keywordCostPaid(spectacle, thisCreature),
-      action = instruct(eachOpponent, discard(a(cardIn(hand)))))],
-  power = lit(4),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Rafter Demon",
+    cost = [generic(2), pip(black), pip(red)],
+    types = [creature],
+    subtypes = [demon],
+    text = [
+      spectacle(mana([generic(3), pip(black), pip(red)])),
+      when(
+        does(actor(thisCreature), enter),
+        if = keywordCostPaid(spectacle, thisCreature),
+        action = instruct(eachOpponent, discard(a(cardIn(hand)))))],
+    power = lit(4),
+    toughness = lit(2)})

@@ -1,11 +1,10 @@
-card {
-  name = "Patrolling Peacemaker",
-  cost = [generic(2), pip(white)],
-  types = [artifact, creature],
-  subtypes = [robot, soldier],
-  text = [
-    static(entersWithCounters(thisCreature, lit(2), p1p1Counter)),
-    whenever(does(actor(anOpponent), commitCrime), proliferate)],
-  power = lit(0),
-  toughness = lit(0)
-}
+card singleFaced({
+    name = "Patrolling Peacemaker",
+    cost = [generic(2), pip(white)],
+    types = [artifact, creature],
+    subtypes = [robot, soldier],
+    text = [
+      static(entersWithCounters(thisCreature, lit(2), p1p1Counter)),
+      whenever(does(actor(anOpponent), commitCrime), proliferate)],
+    power = lit(0),
+    toughness = lit(0)})

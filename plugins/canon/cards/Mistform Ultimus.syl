@@ -1,10 +1,9 @@
-card {
-  name = "Mistform Ultimus",
-  cost = [generic(3), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [illusion],
-  text = [static(definesQuality(thisCreature, adds, everyTypeOf(creature)))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Mistform Ultimus",
+    cost = [generic(3), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [illusion],
+    text = [static(definesQuality(thisCreature, adds, everyTypeOf(creature)))],
+    power = lit(3),
+    toughness = lit(3)})

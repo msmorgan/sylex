@@ -1,17 +1,16 @@
-card {
-  name = "Gandalf, White Rider",
-  cost = [generic(3), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [avatar, wizard],
-  text = [
-    vigilance,
-    whenever(
-      does(actor(you), cast(a(isSpell))),
-      sequentially([
-          get(each(and([isCreature, youControl])), up(lit(1)), up(lit(0)), untilEndOfTurn),
-          scry(lit(1))])),
-    when(does(actor(thisCreature), die), may(putInto(it, fromTop(5, library))))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Gandalf, White Rider",
+    cost = [generic(3), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [avatar, wizard],
+    text = [
+      vigilance,
+      whenever(
+        does(actor(you), cast(a(isSpell))),
+        sequentially([
+            get(each(and([isCreature, youControl])), up(lit(1)), up(lit(0)), untilEndOfTurn),
+            scry(lit(1))])),
+      when(does(actor(thisCreature), die), may(putInto(it, fromTop(5, library))))],
+    power = lit(3),
+    toughness = lit(3)})

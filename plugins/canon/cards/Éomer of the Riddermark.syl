@@ -1,17 +1,18 @@
-card {
-  name = "Éomer of the Riddermark",
-  cost = [generic(4), pip(red)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, knight],
-  text = [
-    haste,
-    whenever(
-      does(actor(thisCreature), attack),
-      if = exists(
-        and(
-          [isCreature, youControl, superlative(max, stat(power), and([isCreature, isPermanent]))])),
-      action = create(lit(1), written(creatureToken(1, 1, [white], [human, soldier]))))],
-  power = lit(5),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Éomer of the Riddermark",
+    cost = [generic(4), pip(red)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, knight],
+    text = [
+      haste,
+      whenever(
+        does(actor(thisCreature), attack),
+        if = exists(
+          and([
+              isCreature,
+              youControl,
+              superlative(max, stat(power), and([isCreature, isPermanent]))])),
+        action = create(lit(1), written(creatureToken(1, 1, [white], [human, soldier]))))],
+    power = lit(5),
+    toughness = lit(4)})

@@ -1,18 +1,17 @@
-card {
-  name = "Galloping Lizrog",
-  cost = [generic(3), pip(green), pip(blue)],
-  types = [creature],
-  subtypes = [frog, lizard],
-  text = [
-    trample,
-    when(
-      does(actor(thisCreature), enter),
-      may(
-        removeCounters(
-          anyNumber,
-          printedKind(p1p1Counter),
-          among(allOf(and([isCreature, youControl])))),
-        putCounters(times(lit(2), thatMuch), printedKind(p1p1Counter), thisCreature)))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Galloping Lizrog",
+    cost = [generic(3), pip(green), pip(blue)],
+    types = [creature],
+    subtypes = [frog, lizard],
+    text = [
+      trample,
+      when(
+        does(actor(thisCreature), enter),
+        may(
+          removeCounters(
+            anyNumber,
+            printedKind(p1p1Counter),
+            among(allOf(and([isCreature, youControl])))),
+          putCounters(times(lit(2), thatMuch), printedKind(p1p1Counter), thisCreature)))],
+    power = lit(3),
+    toughness = lit(3)})

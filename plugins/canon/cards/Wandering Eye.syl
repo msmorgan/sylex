@@ -1,9 +1,8 @@
-card {
-  name = "Wandering Eye",
-  cost = [generic(2), pip(blue)],
-  types = [creature],
-  subtypes = [illusion],
-  text = [flying, static(visibility(reveal, bare(isPlayer), wholeHand))],
-  power = lit(1),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Wandering Eye",
+    cost = [generic(2), pip(blue)],
+    types = [creature],
+    subtypes = [illusion],
+    text = [flying, static(visibility(reveal, bare(isPlayer), wholeHand))],
+    power = lit(1),
+    toughness = lit(3)})

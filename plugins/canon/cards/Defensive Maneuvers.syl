@@ -1,12 +1,11 @@
-card {
-  name = "Defensive Maneuvers",
-  cost = [generic(3), pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      get(
-        allOf(and([isCreature, ofYourChoice(subtype(creature))])),
-        up(lit(0)),
-        up(lit(4)),
-        untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Defensive Maneuvers",
+    cost = [generic(3), pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        get(
+          allOf(and([isCreature, ofYourChoice(subtype(creature))])),
+          up(lit(0)),
+          up(lit(4)),
+          untilEndOfTurn))]})

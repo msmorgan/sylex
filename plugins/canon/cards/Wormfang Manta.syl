@@ -1,12 +1,11 @@
-card {
-  name = "Wormfang Manta",
-  cost = [generic(5), pip(blue), pip(blue)],
-  types = [creature],
-  subtypes = [nightmare, fish, beast],
-  text = [
-    flying,
-    when(does(actor(thisCreature), enter), skipPart(turn, lit(1))),
-    when(does(actor(thisCreature), leave), extraTurn(lit(1)))],
-  power = lit(6),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Wormfang Manta",
+    cost = [generic(5), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [nightmare, fish, beast],
+    text = [
+      flying,
+      when(does(actor(thisCreature), enter), skipPart(turn, lit(1))),
+      when(does(actor(thisCreature), leave), extraTurn(lit(1)))],
+    power = lit(6),
+    toughness = lit(1)})

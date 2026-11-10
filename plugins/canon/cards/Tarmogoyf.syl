@@ -1,12 +1,11 @@
-card {
-  name = "Tarmogoyf",
-  cost = [generic(1), pip(green)],
-  types = [creature],
-  subtypes = [lhurgoyf],
-  text = [
-    static(
-      definesPowerAndToughness(
-        thisCreature,
-        distinctCount(cardType, allOf(cardIn(graveyard))),
-        plus(distinctCount(cardType, allOf(cardIn(graveyard))), lit(1))))]
-}
+card singleFaced({
+    name = "Tarmogoyf",
+    cost = [generic(1), pip(green)],
+    types = [creature],
+    subtypes = [lhurgoyf],
+    text = [
+      static(
+        definesPowerAndToughness(
+          thisCreature,
+          distinctCount(cardType, allOf(cardIn(graveyard))),
+          plus(distinctCount(cardType, allOf(cardIn(graveyard))), lit(1))))]})

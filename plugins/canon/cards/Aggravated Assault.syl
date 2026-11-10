@@ -1,12 +1,11 @@
-card {
-  name = "Aggravated Assault",
-  cost = [generic(2), pip(red)],
-  types = [enchantment],
-  text = [
-    activatedOnlyDuring(
-      mana([generic(3), pip(red), pip(red)]),
-      sequentially([
-          untap(allOf(and([isCreature, youControl]))),
-          additionalPhase(combat, mainPhase, lit(1), mainPhase)]),
-      asSorcery)]
-}
+card singleFaced({
+    name = "Aggravated Assault",
+    cost = [generic(2), pip(red)],
+    types = [enchantment],
+    text = [
+      activatedOnlyDuring(
+        mana([generic(3), pip(red), pip(red)]),
+        sequentially([
+            untap(allOf(and([isCreature, youControl]))),
+            additionalPhase(combat, mainPhase, lit(1), mainPhase)]),
+        asSorcery)]})

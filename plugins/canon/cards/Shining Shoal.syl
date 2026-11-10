@@ -1,19 +1,18 @@
-card {
-  name = "Shining Shoal",
-  cost = [variable, pip(white), pip(white)],
-  types = [instant],
-  subtypes = [arcane],
-  text = [
-    static(
-      altCost(
-        this,
-        perform(exile(a(and([hasColor(white), hasManaValue(equal, letter(x)), in(yourHand)])))))),
-    spell(
-      establishThroughout(
-        replace(
-          would(
-            actor(aYourChoice(isSource)),
-            dealDamage(recipient = andOr([you, allOf(and([isCreature, youControl]))]))),
-          instead(redirectDamage(theNext(letter(x)), target(isAnyTarget)))),
-        thisTurn))]
-}
+card singleFaced({
+    name = "Shining Shoal",
+    cost = [variable, pip(white), pip(white)],
+    types = [instant],
+    subtypes = [arcane],
+    text = [
+      static(
+        altCost(
+          this,
+          perform(exile(a(and([hasColor(white), hasManaValue(equal, letter(x)), in(yourHand)])))))),
+      spell(
+        establishThroughout(
+          replace(
+            would(
+              actor(aYourChoice(isSource)),
+              dealDamage(recipient = andOr([you, allOf(and([isCreature, youControl]))]))),
+            instead(redirectDamage(theNext(letter(x)), target(isAnyTarget)))),
+          thisTurn))]})

@@ -1,11 +1,10 @@
-card {
-  name = "Flaring Pain",
-  cost = [generic(1), pip(red)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(
-        cant(any, preventDamage(allDamage, damage = would(any, dealDamage))),
-        thisTurn)),
-    flashback(mana([pip(red)]))]
-}
+card singleFaced({
+    name = "Flaring Pain",
+    cost = [generic(1), pip(red)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(
+          cant(any, preventDamage(allDamage, damage = would(any, dealDamage))),
+          thisTurn)),
+      flashback(mana([pip(red)]))]})

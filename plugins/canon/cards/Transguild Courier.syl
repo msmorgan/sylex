@@ -1,9 +1,8 @@
-card {
-  name = "Transguild Courier",
-  cost = [generic(4)],
-  types = [artifact, creature],
-  subtypes = [golem],
-  text = [static(definesQuality(thisCreature, sets, colored(every)))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Transguild Courier",
+    cost = [generic(4)],
+    types = [artifact, creature],
+    subtypes = [golem],
+    text = [static(definesQuality(thisCreature, sets, colored(every)))],
+    power = lit(3),
+    toughness = lit(3)})

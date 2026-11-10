@@ -1,10 +1,9 @@
-card {
-  name = "Endless Atlas",
-  cost = [generic(2)],
-  types = [artifact],
-  text = [
-    activatedOnlyIf(
-      compound([mana([generic(2)]), tapSymbol]),
-      draw(lit(1)),
-      thereAre(withTheSameName(counted(orMore(3), and([isLand, youControl])))))]
-}
+card singleFaced({
+    name = "Endless Atlas",
+    cost = [generic(2)],
+    types = [artifact],
+    text = [
+      activatedOnlyIf(
+        compound([mana([generic(2)]), tapSymbol]),
+        draw(lit(1)),
+        thereAre(withTheSameName(counted(orMore(3), and([isLand, youControl])))))]})

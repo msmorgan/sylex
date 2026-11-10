@@ -1,9 +1,8 @@
-card {
-  name = "Quicksilver Gargantuan",
-  cost = [generic(5), pip(blue), pip(blue)],
-  types = [creature],
-  subtypes = [shapeshifter],
-  text = [static(enters(thisCreature, [asCopyOf(true, a(isCreature), [hasPT(lit(7), lit(7))])]))],
-  power = lit(7),
-  toughness = lit(7)
-}
+card singleFaced({
+    name = "Quicksilver Gargantuan",
+    cost = [generic(5), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [shapeshifter],
+    text = [static(enters(thisCreature, [asCopyOf(true, a(isCreature), [hasPT(lit(7), lit(7))])]))],
+    power = lit(7),
+    toughness = lit(7)})

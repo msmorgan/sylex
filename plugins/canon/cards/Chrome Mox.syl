@@ -1,11 +1,10 @@
-card {
-  name = "Chrome Mox",
-  cost = [],
-  types = [artifact],
-  text = [
-    imprint(
-      when(
-        does(actor(thisArtifact), enter),
-        may(exile(a(and([non(isArtifact), non(isLand), cardIn(yourHand)])))))),
-    activated(tapSymbol, addMana(lit(1), ofAnyColorOf(the(and([was(exile(which)), isCard])))))]
-}
+card singleFaced({
+    name = "Chrome Mox",
+    cost = [],
+    types = [artifact],
+    text = [
+      imprint(
+        when(
+          does(actor(thisArtifact), enter),
+          may(exile(a(and([non(isArtifact), non(isLand), cardIn(yourHand)])))))),
+      activated(tapSymbol, addMana(lit(1), ofAnyColorOf(the(and([was(exile(which)), isCard])))))]})

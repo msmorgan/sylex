@@ -1,14 +1,15 @@
-card {
-  name = "Malamet Battle Glyph",
-  cost = [pip(green)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          choose(
-            both(target(and([isCreature, youControl])), target(and([isCreature, youDontControl])))),
-          doIf(
-            did(actor(the(and([isCreature, youControl]))), enter, within(soFarThisTurn)),
-            putCounters(lit(1), printedKind(p1p1Counter), it)),
-          fightEachOther(those(creature))]))]
-}
+card singleFaced({
+    name = "Malamet Battle Glyph",
+    cost = [pip(green)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            choose(
+              both(
+                target(and([isCreature, youControl])),
+                target(and([isCreature, youDontControl])))),
+            doIf(
+              did(actor(the(and([isCreature, youControl]))), enter, within(soFarThisTurn)),
+              putCounters(lit(1), printedKind(p1p1Counter), it)),
+            fightEachOther(those(creature))]))]})

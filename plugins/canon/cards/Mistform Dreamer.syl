@@ -1,15 +1,14 @@
-card {
-  name = "Mistform Dreamer",
-  cost = [generic(2), pip(blue)],
-  types = [creature],
-  subtypes = [illusion],
-  text = [
-    flying,
-    activated(
-      mana([generic(1)]),
-      establishThroughout(
-        qualityChange(thisCreature, sets, chosenQuality(ofYourChoice(subtype(creature)))),
-        untilEndOfTurn))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Mistform Dreamer",
+    cost = [generic(2), pip(blue)],
+    types = [creature],
+    subtypes = [illusion],
+    text = [
+      flying,
+      activated(
+        mana([generic(1)]),
+        establishThroughout(
+          qualityChange(thisCreature, sets, chosenQuality(ofYourChoice(subtype(creature)))),
+          untilEndOfTurn))],
+    power = lit(2),
+    toughness = lit(1)})

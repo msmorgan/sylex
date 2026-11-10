@@ -1,12 +1,11 @@
-card {
-  name = "Amorphous Axe",
-  cost = [generic(2)],
-  types = [artifact],
-  subtypes = [equipment],
-  text = [
-    static(
-      conjunction([
-          getsPt(equipped(creature), up(lit(3)), up(lit(0))),
-          qualityChange(equipped(creature), adds, everyTypeOf(creature))])),
-    equip(mana([generic(3)]))]
-}
+card singleFaced({
+    name = "Amorphous Axe",
+    cost = [generic(2)],
+    types = [artifact],
+    subtypes = [equipment],
+    text = [
+      static(
+        conjunction([
+            getsPt(equipped(creature), up(lit(3)), up(lit(0))),
+            qualityChange(equipped(creature), adds, everyTypeOf(creature))])),
+      equip(mana([generic(3)]))]})

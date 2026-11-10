@@ -1,17 +1,16 @@
-card {
-  name = "Screaming Nemesis",
-  cost = [generic(2), pip(red)],
-  types = [creature],
-  subtypes = [spirit],
-  text = [
-    haste,
-    whenever(
-      does(any, dealDamage(recipient = thisCreature)),
-      sequentially([
-          instruct(it, dealDamage(thatMuch, target(isAnyOtherTarget))),
-          doIf(
-            was(dealDamage(recipient = a(isPlayer)), thisWay),
-            establishThroughout(cant(actor(they), gainLife(anyAmount)), restOfGame))]))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Screaming Nemesis",
+    cost = [generic(2), pip(red)],
+    types = [creature],
+    subtypes = [spirit],
+    text = [
+      haste,
+      whenever(
+        does(any, dealDamage(recipient = thisCreature)),
+        sequentially([
+            instruct(it, dealDamage(thatMuch, target(isAnyOtherTarget))),
+            doIf(
+              was(dealDamage(recipient = a(isPlayer)), thisWay),
+              establishThroughout(cant(actor(they), gainLife(anyAmount)), restOfGame))]))],
+    power = lit(3),
+    toughness = lit(3)})

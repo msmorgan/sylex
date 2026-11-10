@@ -1,12 +1,11 @@
-card {
-  name = "Scheming Aspirant",
-  cost = [generic(1), pip(black)],
-  types = [creature],
-  subtypes = [phyrexian, advisor],
-  text = [
-    whenever(
-      does(actor(you), proliferate),
-      sequentially([instruct(eachOpponent, loseLife(lit(2))), gainLife(lit(2))]))],
-  power = lit(1),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Scheming Aspirant",
+    cost = [generic(1), pip(black)],
+    types = [creature],
+    subtypes = [phyrexian, advisor],
+    text = [
+      whenever(
+        does(actor(you), proliferate),
+        sequentially([instruct(eachOpponent, loseLife(lit(2))), gainLife(lit(2))]))],
+    power = lit(1),
+    toughness = lit(3)})

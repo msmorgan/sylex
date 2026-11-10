@@ -1,26 +1,25 @@
 # Jared Carthalion, True Heir: "You can't become the monarch this turn" is a prohibition over
 # `gainDesignation`, an event head [CR#101.2,725.1].
-card {
-  name = "Jared Carthalion, True Heir",
-  cost = [pip(red), pip(green), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, warrior],
-  text = [
-    when(
-      does(actor(thisCreature), enter),
-      sequentially([
-          gainDesignation(target(isOpponent), monarch),
-          establishThroughout(cant(actor(you), gainDesignation(you, monarch)), thisTurn)])),
-    static(
-      onlyWhile(
-        replace(
-          would(any, dealDamage(recipient = thisCreature)),
-          instead(
-            preventDamage(
-              allDamage,
-              also = putCounters(preventedThisWay, printedKind(p1p1Counter), thisCreature)))),
-        is(you, hasDesignation(monarch))))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Jared Carthalion, True Heir",
+    cost = [pip(red), pip(green), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, warrior],
+    text = [
+      when(
+        does(actor(thisCreature), enter),
+        sequentially([
+            gainDesignation(target(isOpponent), monarch),
+            establishThroughout(cant(actor(you), gainDesignation(you, monarch)), thisTurn)])),
+      static(
+        onlyWhile(
+          replace(
+            would(any, dealDamage(recipient = thisCreature)),
+            instead(
+              preventDamage(
+                allDamage,
+                also = putCounters(preventedThisWay, printedKind(p1p1Counter), thisCreature)))),
+          is(you, hasDesignation(monarch))))],
+    power = lit(3),
+    toughness = lit(3)})

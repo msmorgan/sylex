@@ -1,9 +1,8 @@
-card {
-  name = "White Knight",
-  cost = [pip(white), pip(white)],
-  types = [creature],
-  subtypes = [human, knight],
-  text = [firstStrike, protection(hasColor(black))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "White Knight",
+    cost = [pip(white), pip(white)],
+    types = [creature],
+    subtypes = [human, knight],
+    text = [firstStrike, protection(hasColor(black))],
+    power = lit(2),
+    toughness = lit(2)})

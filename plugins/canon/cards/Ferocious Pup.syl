@@ -1,12 +1,11 @@
-card {
-  name = "Ferocious Pup",
-  cost = [generic(2), pip(green)],
-  types = [creature],
-  subtypes = [wolf],
-  text = [
-    when(
-      does(actor(thisCreature), enter),
-      create(lit(1), written(creatureToken(2, 2, [green], [wolf]))))],
-  power = lit(0),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Ferocious Pup",
+    cost = [generic(2), pip(green)],
+    types = [creature],
+    subtypes = [wolf],
+    text = [
+      when(
+        does(actor(thisCreature), enter),
+        create(lit(1), written(creatureToken(2, 2, [green], [wolf]))))],
+    power = lit(0),
+    toughness = lit(1)})

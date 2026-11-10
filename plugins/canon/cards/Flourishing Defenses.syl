@@ -1,9 +1,8 @@
-card {
-  name = "Flourishing Defenses",
-  cost = [generic(4), pip(green)],
-  types = [enchantment],
-  text = [
-    whenever(
-      does(any, putCounters(lit(1), printedKind(m1m1Counter), a(isCreature))),
-      may(create(lit(1), written(creatureToken(1, 1, [green], [elf, warrior])))))]
-}
+card singleFaced({
+    name = "Flourishing Defenses",
+    cost = [generic(4), pip(green)],
+    types = [enchantment],
+    text = [
+      whenever(
+        does(any, putCounters(lit(1), printedKind(m1m1Counter), a(isCreature))),
+        may(create(lit(1), written(creatureToken(1, 1, [green], [elf, warrior])))))]})

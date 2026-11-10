@@ -1,8 +1,7 @@
-card {
-  name = "Countersculpt",
-  cost = [pip(blue), pip(blue)],
-  types = [instant],
-  text = [
-    static(addedCost(or([perform(behold(hasSubtype(jace))), mana([generic(1)])]), false)),
-    spell(sequentially([counter(target(isSpell)), empowerJace(lit(1))]))]
-}
+card singleFaced({
+    name = "Countersculpt",
+    cost = [pip(blue), pip(blue)],
+    types = [instant],
+    text = [
+      static(addedCost(or([perform(behold(hasSubtype(jace))), mana([generic(1)])]), false)),
+      spell(sequentially([counter(target(isSpell)), empowerJace(lit(1))]))]})

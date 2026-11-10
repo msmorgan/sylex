@@ -1,14 +1,13 @@
-card {
-  name = "Veiling Oddity",
-  cost = [generic(3), pip(blue)],
-  types = [creature],
-  subtypes = [illusion],
-  text = [
-    suspend(lit(4), mana([generic(1), pip(blue)])),
-    when(
-      does(any, removeCounters(theLast, printedKind(timeCounter), this)),
-      while = whileTrue(is(this, cardIn(exileZone))),
-      action = establishThroughout(cant(any, block(allOf(isCreature))), thisTurn))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Veiling Oddity",
+    cost = [generic(3), pip(blue)],
+    types = [creature],
+    subtypes = [illusion],
+    text = [
+      suspend(lit(4), mana([generic(1), pip(blue)])),
+      when(
+        does(any, removeCounters(theLast, printedKind(timeCounter), this)),
+        while = whileTrue(is(this, cardIn(exileZone))),
+        action = establishThroughout(cant(any, block(allOf(isCreature))), thisTurn))],
+    power = lit(2),
+    toughness = lit(3)})

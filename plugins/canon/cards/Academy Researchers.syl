@@ -1,16 +1,17 @@
 # Academy Researchers: the Aura enters attached to the creature the effect names, so enchant's
 # own choice of host doesn't apply; one that can't legally enchant it stays in its owner's hand
 # [CR#303.4f,303.4i].
-card {
-  name = "Academy Researchers",
-  cost = [generic(1), pip(blue), pip(blue)],
-  types = [creature],
-  subtypes = [human, wizard],
-  text = [
-    when(
-      does(actor(thisCreature), enter),
-      may(
-        putOntoBattlefieldAttachedTo(a(and([hasSubtype(aura), cardIn(yourHand)])), thisCreature)))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Academy Researchers",
+    cost = [generic(1), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [human, wizard],
+    text = [
+      when(
+        does(actor(thisCreature), enter),
+        may(
+          putOntoBattlefieldAttachedTo(
+            a(and([hasSubtype(aura), cardIn(yourHand)])),
+            thisCreature)))],
+    power = lit(2),
+    toughness = lit(2)})

@@ -1,9 +1,8 @@
-card {
-  name = "Grave Peril",
-  cost = [generic(1), pip(black)],
-  types = [enchantment],
-  text = [
-    when(
-      does(actor(a(and([isCreature, non(hasColor(black))]))), enter),
-      doIfDone(sacrifice(thisEnchantment), destroy(that(type(creature)))))]
-}
+card singleFaced({
+    name = "Grave Peril",
+    cost = [generic(1), pip(black)],
+    types = [enchantment],
+    text = [
+      when(
+        does(actor(a(and([isCreature, non(hasColor(black))]))), enter),
+        doIfDone(sacrifice(thisEnchantment), destroy(that(type(creature)))))]})

@@ -1,9 +1,8 @@
-card {
-  name = "Blue Ward",
-  cost = [pip(white)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    static(retention(abilityGrant(enchanted(creature), protection(hasColor(blue))), thisAura))]
-}
+card singleFaced({
+    name = "Blue Ward",
+    cost = [pip(white)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      static(retention(abilityGrant(enchanted(creature), protection(hasColor(blue))), thisAura))]})

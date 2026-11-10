@@ -1,10 +1,9 @@
-card {
-  name = "Repeal",
-  cost = [variable, pip(blue)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          returnToHand(target(and([non(isLand), isPermanent, hasManaValue(equal, letter(x))]))),
-          draw(lit(1))]))]
-}
+card singleFaced({
+    name = "Repeal",
+    cost = [variable, pip(blue)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            returnToHand(target(and([non(isLand), isPermanent, hasManaValue(equal, letter(x))]))),
+            draw(lit(1))]))]})

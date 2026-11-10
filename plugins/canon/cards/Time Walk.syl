@@ -1,6 +1,5 @@
-card {
-  name = "Time Walk",
-  cost = [generic(1), pip(blue)],
-  types = [sorcery],
-  text = [spell(extraTurn(lit(1)))]
-}
+card singleFaced({
+    name = "Time Walk",
+    cost = [generic(1), pip(blue)],
+    types = [sorcery],
+    text = [spell(extraTurn(lit(1)))]})

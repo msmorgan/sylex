@@ -1,10 +1,9 @@
-card {
-  name = "Hymn of Rebirth",
-  cost = [generic(3), pip(green), pip(white)],
-  types = [sorcery],
-  text = [
-    spell(
-      putOntoBattlefieldUnderYourControl(
-        target(and([isCreature, in(graveyard)])),
-        from = graveyard))]
-}
+card singleFaced({
+    name = "Hymn of Rebirth",
+    cost = [generic(3), pip(green), pip(white)],
+    types = [sorcery],
+    text = [
+      spell(
+        putOntoBattlefieldUnderYourControl(
+          target(and([isCreature, in(graveyard)])),
+          from = graveyard))]})

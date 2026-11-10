@@ -1,25 +1,24 @@
 # Zidane, Tantalus Thief. "Gain control of" is the imperative `gainControl`, a Continuous Effect
 # [CR#611.2a,613.1b]; "an opponent gains control of a permanent from you" names the control change
 # as a trigger event, `gainControlOf`, with the player it was taken from [CR#603.10d].
-card {
-  name = "Zidane, Tantalus Thief",
-  cost = [generic(3), pip(red), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, mutant, scout],
-  text = [
-    when(
-      does(actor(thisCreature), enter),
-      sequentially([
-          gainControl(target(and([isCreature, anOpponentControls])), untilEndOfTurn),
-          untap(it),
-          establishFor(
-            it,
-            [abilityGrant(it, lifelink), abilityGrant(it, haste)],
-            untilEndOfTurn)])),
-    whenever(
-      does(actor(anOpponent), gainControlOf(a(isPermanent), you)),
-      create(lit(1), written(treasureToken)))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Zidane, Tantalus Thief",
+    cost = [generic(3), pip(red), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, mutant, scout],
+    text = [
+      when(
+        does(actor(thisCreature), enter),
+        sequentially([
+            gainControl(target(and([isCreature, anOpponentControls])), untilEndOfTurn),
+            untap(it),
+            establishFor(
+              it,
+              [abilityGrant(it, lifelink), abilityGrant(it, haste)],
+              untilEndOfTurn)])),
+      whenever(
+        does(actor(anOpponent), gainControlOf(a(isPermanent), you)),
+        create(lit(1), written(treasureToken)))],
+    power = lit(3),
+    toughness = lit(3)})

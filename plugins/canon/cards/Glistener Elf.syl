@@ -1,9 +1,8 @@
-card {
-  name = "Glistener Elf",
-  cost = [pip(green)],
-  types = [creature],
-  subtypes = [phyrexian, elf, warrior],
-  text = [infect],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Glistener Elf",
+    cost = [pip(green)],
+    types = [creature],
+    subtypes = [phyrexian, elf, warrior],
+    text = [infect],
+    power = lit(1),
+    toughness = lit(1)})

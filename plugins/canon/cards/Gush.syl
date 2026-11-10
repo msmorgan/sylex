@@ -1,11 +1,11 @@
-card {
-  name = "Gush",
-  cost = [generic(4), pip(blue)],
-  types = [instant],
-  text = [
-    static(
-      altCost(
-        this,
-        perform(returnToHand(counted(exactly(2), and([isLand, hasSubtype(island), youControl])))))),
-    spell(draw(lit(2)))]
-}
+card singleFaced({
+    name = "Gush",
+    cost = [generic(4), pip(blue)],
+    types = [instant],
+    text = [
+      static(
+        altCost(
+          this,
+          perform(
+            returnToHand(counted(exactly(2), and([isLand, hasSubtype(island), youControl])))))),
+      spell(draw(lit(2)))]})

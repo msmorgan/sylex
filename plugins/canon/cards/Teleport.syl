@@ -1,9 +1,8 @@
-card {
-  name = "Teleport",
-  cost = [pip(blue), pip(blue), pip(blue)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(cant(any, block(target(isCreature))), thisTurn),
-      timing = duringPart(declareAttackers))]
-}
+card singleFaced({
+    name = "Teleport",
+    cost = [pip(blue), pip(blue), pip(blue)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(cant(any, block(target(isCreature))), thisTurn),
+        timing = duringPart(declareAttackers))]})

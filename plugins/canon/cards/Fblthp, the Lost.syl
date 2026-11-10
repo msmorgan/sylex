@@ -1,20 +1,19 @@
-card {
-  name = "Fblthp, the Lost",
-  cost = [generic(1), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [homunculus],
-  text = [
-    when(
-      does(actor(this), enter),
-      replace(
-        draw(lit(1)),
-        doIf(
-          or([
-              did(actor(it), enter(from = yourLibrary), triggering),
-              is(it, did(any, cast(which, from = yourLibrary), thisObject))]),
-          instead(draw(lit(2)))))),
-    when(does(actor(a(isSpell)), target(this)), shuffleInto(this))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Fblthp, the Lost",
+    cost = [generic(1), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [homunculus],
+    text = [
+      when(
+        does(actor(this), enter),
+        replace(
+          draw(lit(1)),
+          doIf(
+            or([
+                did(actor(it), enter(from = yourLibrary), triggering),
+                is(it, did(any, cast(which, from = yourLibrary), thisObject))]),
+            instead(draw(lit(2)))))),
+      when(does(actor(a(isSpell)), target(this)), shuffleInto(this))],
+    power = lit(1),
+    toughness = lit(1)})

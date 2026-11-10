@@ -1,13 +1,12 @@
-card {
-  name = "Inferno Elemental",
-  cost = [generic(4), pip(red), pip(red)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [
-    whenever(
-      does(actor(thisCreature), block(a(isCreature))),
-      or = [does(by(a(isCreature)), block(thisCreature))],
-      action = instruct(thisCreature, dealDamage(lit(3), that(creature))))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Inferno Elemental",
+    cost = [generic(4), pip(red), pip(red)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [
+      whenever(
+        does(actor(thisCreature), block(a(isCreature))),
+        or = [does(by(a(isCreature)), block(thisCreature))],
+        action = instruct(thisCreature, dealDamage(lit(3), that(creature))))],
+    power = lit(4),
+    toughness = lit(4)})

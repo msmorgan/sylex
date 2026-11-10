@@ -1,12 +1,13 @@
-card {
-  name = "Anointed Procession",
-  cost = [generic(3), pip(white)],
-  types = [enchantment],
-  text = [
-    static(
-      replace(
-        causedBy(
-          byAnEffect,
-          would(any, createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []), you))),
-        instead(create(times(lit(2), groupSize), asThose))))]
-}
+card singleFaced({
+    name = "Anointed Procession",
+    cost = [generic(3), pip(white)],
+    types = [enchantment],
+    text = [
+      static(
+        replace(
+          causedBy(
+            byAnEffect,
+            would(
+              any,
+              createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []), you))),
+          instead(create(times(lit(2), groupSize), asThose))))]})

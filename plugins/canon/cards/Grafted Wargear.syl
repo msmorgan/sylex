@@ -1,12 +1,11 @@
-card {
-  name = "Grafted Wargear",
-  cost = [generic(3)],
-  types = [artifact],
-  subtypes = [equipment],
-  text = [
-    static(getsPt(equipped(creature), up(lit(3)), up(lit(2)))),
-    whenever(
-      does(any, attachment(unattached, thisEquipment, a(isPermanent))),
-      sacrifice(that(permanent))),
-    equip(mana([generic(0)]))]
-}
+card singleFaced({
+    name = "Grafted Wargear",
+    cost = [generic(3)],
+    types = [artifact],
+    subtypes = [equipment],
+    text = [
+      static(getsPt(equipped(creature), up(lit(3)), up(lit(2)))),
+      whenever(
+        does(any, attachment(unattached, thisEquipment, a(isPermanent))),
+        sacrifice(that(permanent))),
+      equip(mana([generic(0)]))]})

@@ -1,14 +1,13 @@
-card {
-  name = "Predatory Wurm",
-  cost = [generic(3), pip(green)],
-  types = [creature],
-  subtypes = [wurm],
-  text = [
-    vigilance,
-    static(
-      onlyWhile(
-        getsPt(thisCreature, up(lit(2)), up(lit(2))),
-        exists(and([hasSubtype(garruk), youControl]))))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Predatory Wurm",
+    cost = [generic(3), pip(green)],
+    types = [creature],
+    subtypes = [wurm],
+    text = [
+      vigilance,
+      static(
+        onlyWhile(
+          getsPt(thisCreature, up(lit(2)), up(lit(2))),
+          exists(and([hasSubtype(garruk), youControl]))))],
+    power = lit(4),
+    toughness = lit(4)})

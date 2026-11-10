@@ -1,14 +1,13 @@
-card {
-  name = "Solemnity",
-  cost = [generic(2), pip(white)],
-  types = [enchantment],
-  text = [
-    static(cant(any, putCounters(anyAmount, anyKind, bare(isPlayer)))),
-    static(
-      cant(
-        any,
-        putCounters(
-          anyAmount,
-          anyKind,
-          bare(or([isArtifact, isCreature, isEnchantment, isLand])))))]
-}
+card singleFaced({
+    name = "Solemnity",
+    cost = [generic(2), pip(white)],
+    types = [enchantment],
+    text = [
+      static(cant(any, putCounters(anyAmount, anyKind, bare(isPlayer)))),
+      static(
+        cant(
+          any,
+          putCounters(
+            anyAmount,
+            anyKind,
+            bare(or([isArtifact, isCreature, isEnchantment, isLand])))))]})

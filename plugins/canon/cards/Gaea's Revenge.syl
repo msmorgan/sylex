@@ -1,19 +1,18 @@
-card {
-  name = "Gaea's Revenge",
-  cost = [generic(5), pip(green), pip(green)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [
-    static(cant(any, counter(thisSpell))),
-    haste,
-    static(
-      cant(
-        by(
-          allOf(
-            or([
-                and([isSpell, non(hasColor(green))]),
-                abilityOf(allOf(and([isSource, non(hasColor(green))])))]))),
-        target(thisCreature)))],
-  power = lit(8),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Gaea's Revenge",
+    cost = [generic(5), pip(green), pip(green)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [
+      static(cant(any, counter(thisSpell))),
+      haste,
+      static(
+        cant(
+          by(
+            allOf(
+              or([
+                  and([isSpell, non(hasColor(green))]),
+                  abilityOf(allOf(and([isSource, non(hasColor(green))])))]))),
+          target(thisCreature)))],
+    power = lit(8),
+    toughness = lit(5)})

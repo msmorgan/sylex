@@ -1,9 +1,8 @@
-card {
-  name = "Germination Practicum",
-  cost = [generic(3), pip(green), pip(green)],
-  types = [sorcery],
-  subtypes = [lesson],
-  text = [
-    spell(putCounters(lit(2), printedKind(p1p1Counter), each(and([isCreature, youControl])))),
-    paradigm]
-}
+card singleFaced({
+    name = "Germination Practicum",
+    cost = [generic(3), pip(green), pip(green)],
+    types = [sorcery],
+    subtypes = [lesson],
+    text = [
+      spell(putCounters(lit(2), printedKind(p1p1Counter), each(and([isCreature, youControl])))),
+      paradigm]})

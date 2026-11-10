@@ -1,10 +1,9 @@
-card {
-  name = "Steelclaw Lance",
-  cost = [pip(black), pip(red)],
-  types = [artifact],
-  subtypes = [equipment],
-  text = [
-    static(getsPt(equipped(creature), up(lit(2)), up(lit(2)))),
-    equipQuality(hasSubtype(knight), mana([generic(1)])),
-    equip(mana([generic(3)]))]
-}
+card singleFaced({
+    name = "Steelclaw Lance",
+    cost = [pip(black), pip(red)],
+    types = [artifact],
+    subtypes = [equipment],
+    text = [
+      static(getsPt(equipped(creature), up(lit(2)), up(lit(2)))),
+      equipQuality(hasSubtype(knight), mana([generic(1)])),
+      equip(mana([generic(3)]))]})

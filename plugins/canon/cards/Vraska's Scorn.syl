@@ -1,15 +1,14 @@
-card {
-  name = "Vraska's Scorn",
-  cost = [generic(2), pip(black), pip(black)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          instruct(target(isOpponent), loseLife(lit(4))),
-          may(
-            sequentially([
-                searchLibraryOrGraveyard(a(named(printedName("Vraska, Scheming Gorgon")))),
-                reveal(it),
-                putInto(it, hand)])),
-          doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))]
-}
+card singleFaced({
+    name = "Vraska's Scorn",
+    cost = [generic(2), pip(black), pip(black)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            instruct(target(isOpponent), loseLife(lit(4))),
+            may(
+              sequentially([
+                  searchLibraryOrGraveyard(a(named(printedName("Vraska, Scheming Gorgon")))),
+                  reveal(it),
+                  putInto(it, hand)])),
+            doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))]})

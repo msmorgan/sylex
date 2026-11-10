@@ -1,14 +1,13 @@
-card {
-  name = "Debris Beetle",
-  cost = [generic(2), pip(black), pip(green)],
-  types = [artifact],
-  subtypes = [vehicle],
-  text = [
-    trample,
-    when(
-      does(actor(thisVehicle), enter),
-      sequentially([instruct(eachOpponent, loseLife(lit(3))), gainLife(lit(3))])),
-    crew(lit(2))],
-  power = lit(6),
-  toughness = lit(6)
-}
+card singleFaced({
+    name = "Debris Beetle",
+    cost = [generic(2), pip(black), pip(green)],
+    types = [artifact],
+    subtypes = [vehicle],
+    text = [
+      trample,
+      when(
+        does(actor(thisVehicle), enter),
+        sequentially([instruct(eachOpponent, loseLife(lit(3))), gainLife(lit(3))])),
+      crew(lit(2))],
+    power = lit(6),
+    toughness = lit(6)})

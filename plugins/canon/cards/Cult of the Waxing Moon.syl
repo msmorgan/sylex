@@ -1,16 +1,15 @@
-card {
-  name = "Cult of the Waxing Moon",
-  cost = [generic(4), pip(green)],
-  types = [creature],
-  subtypes = [human, shaman],
-  text = [
-    whenever(
-      does(
-        any,
-        transform(
-          a(and([isPermanent, youControl])),
-          into = and([isCreature, not(hasSubtype(human))]))),
-      create(lit(1), written(creatureToken(2, 2, [green], [wolf]))))],
-  power = lit(5),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Cult of the Waxing Moon",
+    cost = [generic(4), pip(green)],
+    types = [creature],
+    subtypes = [human, shaman],
+    text = [
+      whenever(
+        does(
+          any,
+          transform(
+            a(and([isPermanent, youControl])),
+            into = and([isCreature, not(hasSubtype(human))]))),
+        create(lit(1), written(creatureToken(2, 2, [green], [wolf]))))],
+    power = lit(5),
+    toughness = lit(4)})

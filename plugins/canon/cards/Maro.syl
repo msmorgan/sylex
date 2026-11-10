@@ -1,7 +1,6 @@
-card {
-  name = "Maro",
-  cost = [generic(2), pip(green), pip(green)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [static(definesPt(thisCreature, countOf(cardIn(yourHand))))]
-}
+card singleFaced({
+    name = "Maro",
+    cost = [generic(2), pip(green), pip(green)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [static(definesPt(thisCreature, countOf(cardIn(yourHand))))]})

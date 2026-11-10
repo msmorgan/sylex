@@ -1,12 +1,11 @@
-card {
-  name = "Voice of All",
-  cost = [generic(2), pip(white), pip(white)],
-  types = [creature],
-  subtypes = [angel],
-  text = [
-    flying,
-    static(entersChoosing(thisCreature, color)),
-    static(abilityGrant(thisCreature, protection(ofChosen(color))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Voice of All",
+    cost = [generic(2), pip(white), pip(white)],
+    types = [creature],
+    subtypes = [angel],
+    text = [
+      flying,
+      static(entersChoosing(thisCreature, color)),
+      static(abilityGrant(thisCreature, protection(ofChosen(color))))],
+    power = lit(2),
+    toughness = lit(2)})

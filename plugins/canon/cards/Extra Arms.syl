@@ -1,11 +1,10 @@
-card {
-  name = "Extra Arms",
-  cost = [generic(4), pip(red)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    whenever(
-      does(actor(enchanted(creature)), attack),
-      instruct(it, dealDamage(lit(2), target(isAnyTarget))))]
-}
+card singleFaced({
+    name = "Extra Arms",
+    cost = [generic(4), pip(red)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      whenever(
+        does(actor(enchanted(creature)), attack),
+        instruct(it, dealDamage(lit(2), target(isAnyTarget))))]})

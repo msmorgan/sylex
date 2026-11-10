@@ -1,9 +1,8 @@
-card {
-  name = "Femeref Enchantress",
-  cost = [pip(green), pip(white)],
-  types = [creature],
-  subtypes = [human, druid],
-  text = [whenever(does(any, putIntoFromBattlefield(a(isEnchantment), graveyard)), draw(lit(1)))],
-  power = lit(1),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Femeref Enchantress",
+    cost = [pip(green), pip(white)],
+    types = [creature],
+    subtypes = [human, druid],
+    text = [whenever(does(any, putIntoFromBattlefield(a(isEnchantment), graveyard)), draw(lit(1)))],
+    power = lit(1),
+    toughness = lit(2)})

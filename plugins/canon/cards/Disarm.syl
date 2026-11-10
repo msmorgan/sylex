@@ -1,6 +1,5 @@
-card {
-  name = "Disarm",
-  cost = [pip(blue)],
-  types = [instant],
-  text = [spell(unattach(allOf(and([hasSubtype(equipment), attachedTo(target(isCreature))]))))]
-}
+card singleFaced({
+    name = "Disarm",
+    cost = [pip(blue)],
+    types = [instant],
+    text = [spell(unattach(allOf(and([hasSubtype(equipment), attachedTo(target(isCreature))]))))]})

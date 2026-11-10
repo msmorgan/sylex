@@ -1,12 +1,11 @@
-card {
-  name = "Sickening Shoal",
-  cost = [variable, pip(black), pip(black)],
-  types = [instant],
-  subtypes = [arcane],
-  text = [
-    static(
-      altCost(
-        this,
-        perform(exile(a(and([hasColor(black), hasManaValue(equal, letter(x)), in(yourHand)])))))),
-    spell(get(target(isCreature), down(letter(x)), down(letter(x)), untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Sickening Shoal",
+    cost = [variable, pip(black), pip(black)],
+    types = [instant],
+    subtypes = [arcane],
+    text = [
+      static(
+        altCost(
+          this,
+          perform(exile(a(and([hasColor(black), hasManaValue(equal, letter(x)), in(yourHand)])))))),
+      spell(get(target(isCreature), down(letter(x)), down(letter(x)), untilEndOfTurn))]})

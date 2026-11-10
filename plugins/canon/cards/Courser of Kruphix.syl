@@ -1,12 +1,11 @@
-card {
-  name = "Courser of Kruphix",
-  cost = [generic(1), pip(green), pip(green)],
-  types = [enchantment, creature],
-  subtypes = [centaur],
-  text = [
-    static(visibility(reveal, you, topOfLibrary)),
-    static(can(actor(you), play(allOf(isLand), from = onTop))),
-    whenever(does(actor(a(and([isLand, youControl]))), enter), gainLife(lit(1)))],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Courser of Kruphix",
+    cost = [generic(1), pip(green), pip(green)],
+    types = [enchantment, creature],
+    subtypes = [centaur],
+    text = [
+      static(visibility(reveal, you, topOfLibrary)),
+      static(can(actor(you), play(allOf(isLand), from = onTop))),
+      whenever(does(actor(a(and([isLand, youControl]))), enter), gainLife(lit(1)))],
+    power = lit(2),
+    toughness = lit(4)})

@@ -1,10 +1,9 @@
-card {
-  name = "Sphere of Purity",
-  cost = [generic(3), pip(white)],
-  types = [enchantment],
-  text = [
-    static(
-      replace(
-        would(actor(a(isArtifact)), dealDamage(recipient = you)),
-        instead(preventDamage(ofThatDamage(lit(1))))))]
-}
+card singleFaced({
+    name = "Sphere of Purity",
+    cost = [generic(3), pip(white)],
+    types = [enchantment],
+    text = [
+      static(
+        replace(
+          would(actor(a(isArtifact)), dealDamage(recipient = you)),
+          instead(preventDamage(ofThatDamage(lit(1))))))]})

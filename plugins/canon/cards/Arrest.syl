@@ -1,13 +1,12 @@
-card {
-  name = "Arrest",
-  cost = [generic(2), pip(white)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    static(
-      conjunction([
-          cant(actor(enchanted(creature)), attack),
-          cant(actor(enchanted(creature)), block),
-          cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(it)]))))]))]
-}
+card singleFaced({
+    name = "Arrest",
+    cost = [generic(2), pip(white)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      static(
+        conjunction([
+            cant(actor(enchanted(creature)), attack),
+            cant(actor(enchanted(creature)), block),
+            cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(it)]))))]))]})

@@ -1,8 +1,7 @@
-card {
-  name = "Grizzly Bears",
-  cost = [generic(1), pip(green)],
-  types = [creature],
-  subtypes = [bear],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Grizzly Bears",
+    cost = [generic(1), pip(green)],
+    types = [creature],
+    subtypes = [bear],
+    power = lit(2),
+    toughness = lit(2)})

@@ -1,17 +1,16 @@
-card {
-  name = "Haakon, Stromgald Scourge",
-  cost = [generic(1), pip(black), pip(black)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [zombie, knight],
-  text = [
-    static(can(actor(you), cast(this, from = yourGraveyard))),
-    static(cant(actor(you), cast(this, from = not(yourGraveyard)))),
-    static(
-      onlyWhile(
-        can(actor(you), cast(bare(and([isSpell, hasSubtype(knight)])), from = yourGraveyard)),
-        is(this, in(battlefield)))),
-    when(does(actor(thisCreature), die), loseLife(lit(2)))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Haakon, Stromgald Scourge",
+    cost = [generic(1), pip(black), pip(black)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [zombie, knight],
+    text = [
+      static(can(actor(you), cast(this, from = yourGraveyard))),
+      static(cant(actor(you), cast(this, from = not(yourGraveyard)))),
+      static(
+        onlyWhile(
+          can(actor(you), cast(bare(and([isSpell, hasSubtype(knight)])), from = yourGraveyard)),
+          is(this, in(battlefield)))),
+      when(does(actor(thisCreature), die), loseLife(lit(2)))],
+    power = lit(3),
+    toughness = lit(3)})

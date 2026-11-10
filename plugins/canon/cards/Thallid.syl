@@ -1,13 +1,12 @@
-card {
-  name = "Thallid",
-  cost = [pip(green)],
-  types = [creature],
-  subtypes = [fungus],
-  text = [
-    at(beginningOfYour(upkeep), putCounters(lit(1), printedKind(sporeCounter), thisCreature)),
-    activated(
-      perform(removeCounters(exactly(3), printedKind(sporeCounter), thisCreature)),
-      create(lit(1), written(creatureToken(1, 1, [green], [saproling]))))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Thallid",
+    cost = [pip(green)],
+    types = [creature],
+    subtypes = [fungus],
+    text = [
+      at(beginningOfYour(upkeep), putCounters(lit(1), printedKind(sporeCounter), thisCreature)),
+      activated(
+        perform(removeCounters(exactly(3), printedKind(sporeCounter), thisCreature)),
+        create(lit(1), written(creatureToken(1, 1, [green], [saproling]))))],
+    power = lit(1),
+    toughness = lit(1)})

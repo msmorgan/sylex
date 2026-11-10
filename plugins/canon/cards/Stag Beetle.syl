@@ -1,13 +1,12 @@
-card {
-  name = "Stag Beetle",
-  cost = [generic(3), pip(green), pip(green)],
-  types = [creature],
-  subtypes = [insect],
-  text = [
-    static(
-      conjunction([
-          entersWithCounters(thisCreature, letter(x), p1p1Counter),
-          letterDefinition(x, countOf(and([isCreature, isOther])))]))],
-  power = lit(0),
-  toughness = lit(0)
-}
+card singleFaced({
+    name = "Stag Beetle",
+    cost = [generic(3), pip(green), pip(green)],
+    types = [creature],
+    subtypes = [insect],
+    text = [
+      static(
+        conjunction([
+            entersWithCounters(thisCreature, letter(x), p1p1Counter),
+            letterDefinition(x, countOf(and([isCreature, isOther])))]))],
+    power = lit(0),
+    toughness = lit(0)})

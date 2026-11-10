@@ -1,11 +1,10 @@
-card {
-  name = "Rouse",
-  cost = [generic(1), pip(black)],
-  types = [instant],
-  text = [
-    static(
-      onlyWhile(
-        altCost(this, perform(payLife(lit(2)))),
-        exists(and([isLand, hasSubtype(swamp), youControl])))),
-    spell(get(target(isCreature), up(lit(2)), up(lit(0)), untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Rouse",
+    cost = [generic(1), pip(black)],
+    types = [instant],
+    text = [
+      static(
+        onlyWhile(
+          altCost(this, perform(payLife(lit(2)))),
+          exists(and([isLand, hasSubtype(swamp), youControl])))),
+      spell(get(target(isCreature), up(lit(2)), up(lit(0)), untilEndOfTurn))]})

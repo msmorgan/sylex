@@ -1,9 +1,8 @@
-card {
-  name = "Karametra's Acolyte",
-  cost = [generic(3), pip(green)],
-  types = [creature],
-  subtypes = [human, druid],
-  text = [activated(tapSymbol, addMana(devotion(you, color(green)), manaOf([[colored(green)]])))],
-  power = lit(1),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Karametra's Acolyte",
+    cost = [generic(3), pip(green)],
+    types = [creature],
+    subtypes = [human, druid],
+    text = [activated(tapSymbol, addMana(devotion(you, color(green)), manaOf([[colored(green)]])))],
+    power = lit(1),
+    toughness = lit(4)})

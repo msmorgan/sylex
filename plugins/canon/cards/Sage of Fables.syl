@@ -1,23 +1,22 @@
-card {
-  name = "Sage of Fables",
-  cost = [generic(2), pip(blue)],
-  types = [creature],
-  subtypes = [merfolk, wizard],
-  text = [
-    static(
-      entersWithAdditionalCounters(
-        each(and([isCreature, hasSubtype(wizard), youControl, isOther])),
-        lit(1),
-        p1p1Counter)),
-    activated(
-      compound([
-          mana([generic(2)]),
-          perform(
-            removeCounters(
-              exactly(1),
-              printedKind(p1p1Counter),
-              a(and([isCreature, youControl]))))]),
-      draw(lit(1)))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Sage of Fables",
+    cost = [generic(2), pip(blue)],
+    types = [creature],
+    subtypes = [merfolk, wizard],
+    text = [
+      static(
+        entersWithAdditionalCounters(
+          each(and([isCreature, hasSubtype(wizard), youControl, isOther])),
+          lit(1),
+          p1p1Counter)),
+      activated(
+        compound([
+            mana([generic(2)]),
+            perform(
+              removeCounters(
+                exactly(1),
+                printedKind(p1p1Counter),
+                a(and([isCreature, youControl]))))]),
+        draw(lit(1)))],
+    power = lit(2),
+    toughness = lit(2)})

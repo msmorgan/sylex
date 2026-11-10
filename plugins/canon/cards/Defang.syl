@@ -1,9 +1,9 @@
-card {
-  name = "Defang",
-  cost = [generic(1), pip(white)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    static(replace(would(by(enchanted(creature)), dealDamage), instead(preventDamage(allDamage))))]
-}
+card singleFaced({
+    name = "Defang",
+    cost = [generic(1), pip(white)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      static(
+        replace(would(by(enchanted(creature)), dealDamage), instead(preventDamage(allDamage))))]})

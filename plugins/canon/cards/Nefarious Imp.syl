@@ -1,11 +1,12 @@
-card {
-  name = "Nefarious Imp",
-  cost = [generic(2), pip(black)],
-  types = [creature],
-  subtypes = [imp],
-  text = [
-    flying,
-    whenever(does(actor(counted(orMore(1), and([isPermanent, youControl]))), leave), scry(lit(1)))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Nefarious Imp",
+    cost = [generic(2), pip(black)],
+    types = [creature],
+    subtypes = [imp],
+    text = [
+      flying,
+      whenever(
+        does(actor(counted(orMore(1), and([isPermanent, youControl]))), leave),
+        scry(lit(1)))],
+    power = lit(2),
+    toughness = lit(1)})

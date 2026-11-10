@@ -1,9 +1,8 @@
-card {
-  name = "Tomakul Honor Guard",
-  cost = [generic(1), pip(green)],
-  types = [creature],
-  subtypes = [human, soldier],
-  text = [ward(mana([generic(2)]))],
-  power = lit(3),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Tomakul Honor Guard",
+    cost = [generic(1), pip(green)],
+    types = [creature],
+    subtypes = [human, soldier],
+    text = [ward(mana([generic(2)]))],
+    power = lit(3),
+    toughness = lit(1)})

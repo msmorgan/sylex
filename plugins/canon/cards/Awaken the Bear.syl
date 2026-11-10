@@ -1,11 +1,10 @@
-card {
-  name = "Awaken the Bear",
-  cost = [generic(2), pip(green)],
-  types = [instant],
-  text = [
-    spell(
-      establishFor(
-        target(isCreature),
-        [getsPt(it, up(lit(3)), up(lit(3))), abilityGrant(it, trample)],
-        untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Awaken the Bear",
+    cost = [generic(2), pip(green)],
+    types = [instant],
+    text = [
+      spell(
+        establishFor(
+          target(isCreature),
+          [getsPt(it, up(lit(3)), up(lit(3))), abilityGrant(it, trample)],
+          untilEndOfTurn))]})

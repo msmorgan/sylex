@@ -1,11 +1,10 @@
-card {
-  name = "Snuff Out",
-  cost = [generic(3), pip(black)],
-  types = [instant],
-  text = [
-    static(
-      onlyWhile(
-        altCost(this, perform(payLife(lit(4)))),
-        exists(and([isLand, hasSubtype(swamp), youControl])))),
-    spell(destroyCantRegenerate(target(and([isCreature, non(hasColor(black))]))))]
-}
+card singleFaced({
+    name = "Snuff Out",
+    cost = [generic(3), pip(black)],
+    types = [instant],
+    text = [
+      static(
+        onlyWhile(
+          altCost(this, perform(payLife(lit(4)))),
+          exists(and([isLand, hasSubtype(swamp), youControl])))),
+      spell(destroyCantRegenerate(target(and([isCreature, non(hasColor(black))]))))]})

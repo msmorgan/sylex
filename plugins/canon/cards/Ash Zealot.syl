@@ -1,16 +1,15 @@
-card {
-  name = "Ash Zealot",
-  cost = [pip(red), pip(red)],
-  types = [creature],
-  subtypes = [human, warrior],
-  text = [
-    firstStrike,
-    haste,
-    whenever(
-      does(
-        actor(a(isPlayer)),
-        cast(a(and([isSpell, did(any, cast(which, from = graveyard), thisObject)])))),
-      instruct(thisCreature, dealDamage(lit(3), that(player))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Ash Zealot",
+    cost = [pip(red), pip(red)],
+    types = [creature],
+    subtypes = [human, warrior],
+    text = [
+      firstStrike,
+      haste,
+      whenever(
+        does(
+          actor(a(isPlayer)),
+          cast(a(and([isSpell, did(any, cast(which, from = graveyard), thisObject)])))),
+        instruct(thisCreature, dealDamage(lit(3), that(player))))],
+    power = lit(2),
+    toughness = lit(2)})

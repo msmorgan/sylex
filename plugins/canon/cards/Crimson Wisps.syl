@@ -1,13 +1,12 @@
-card {
-  name = "Crimson Wisps",
-  cost = [pip(red)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          establishFor(
-            target(isCreature),
-            [qualityChange(it, sets, colored(colors([red]))), abilityGrant(it, haste)],
-            untilEndOfTurn),
-          draw(lit(1))]))]
-}
+card singleFaced({
+    name = "Crimson Wisps",
+    cost = [pip(red)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            establishFor(
+              target(isCreature),
+              [qualityChange(it, sets, colored(colors([red]))), abilityGrant(it, haste)],
+              untilEndOfTurn),
+            draw(lit(1))]))]})

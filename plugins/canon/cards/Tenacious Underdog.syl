@@ -1,14 +1,13 @@
 # Tenacious Underdog. Cast from the graveyard "using its blitz ability", the spell takes blitz's
 # alternative cost, so blitz's cost was paid and its Resolution Delayed Trigger sacrifices the
 # permanent [CR#702.152a,601.2b,608.3g].
-card {
-  name = "Tenacious Underdog",
-  cost = [generic(1), pip(black)],
-  types = [creature],
-  subtypes = [human, warrior],
-  text = [
-    blitz(compound([mana([generic(2), pip(black), pip(black)]), perform(payLife(lit(2)))])),
-    static(can(actor(you), cast(this, from = yourGraveyard, payment = usingKeyword(blitz))))],
-  power = lit(3),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Tenacious Underdog",
+    cost = [generic(1), pip(black)],
+    types = [creature],
+    subtypes = [human, warrior],
+    text = [
+      blitz(compound([mana([generic(2), pip(black), pip(black)]), perform(payLife(lit(2)))])),
+      static(can(actor(you), cast(this, from = yourGraveyard, payment = usingKeyword(blitz))))],
+    power = lit(3),
+    toughness = lit(2)})

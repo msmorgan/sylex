@@ -1,19 +1,18 @@
-card {
-  name = "Linvala, Keeper of Silence",
-  cost = [generic(2), pip(white), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [angel],
-  text = [
-    flying,
-    static(
-      cant(
-        any,
-        activate(
-          allOf(
-            and([
-                abilityHead(anyActivated),
-                abilityOf(allOf(and([isCreature, opponentsControl])))])))))],
-  power = lit(3),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Linvala, Keeper of Silence",
+    cost = [generic(2), pip(white), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [angel],
+    text = [
+      flying,
+      static(
+        cant(
+          any,
+          activate(
+            allOf(
+              and([
+                  abilityHead(anyActivated),
+                  abilityOf(allOf(and([isCreature, opponentsControl])))])))))],
+    power = lit(3),
+    toughness = lit(4)})

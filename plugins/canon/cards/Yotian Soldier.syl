@@ -1,9 +1,8 @@
-card {
-  name = "Yotian Soldier",
-  cost = [generic(3)],
-  types = [artifact, creature],
-  subtypes = [soldier],
-  text = [vigilance],
-  power = lit(1),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Yotian Soldier",
+    cost = [generic(3)],
+    types = [artifact, creature],
+    subtypes = [soldier],
+    text = [vigilance],
+    power = lit(1),
+    toughness = lit(4)})

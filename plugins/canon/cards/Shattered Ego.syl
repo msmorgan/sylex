@@ -1,12 +1,11 @@
-card {
-  name = "Shattered Ego",
-  cost = [pip(blue)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    static(getsPt(enchanted(creature), down(lit(3)), down(lit(0)))),
-    activated(
-      mana([generic(3), pip(blue), pip(blue)]),
-      putInto(enchanted(creature), fromTop(3, library)))]
-}
+card singleFaced({
+    name = "Shattered Ego",
+    cost = [pip(blue)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      static(getsPt(enchanted(creature), down(lit(3)), down(lit(0)))),
+      activated(
+        mana([generic(3), pip(blue), pip(blue)]),
+        putInto(enchanted(creature), fromTop(3, library)))]})

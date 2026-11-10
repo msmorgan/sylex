@@ -1,11 +1,10 @@
-card {
-  name = "New Perspectives",
-  cost = [generic(5), pip(blue)],
-  types = [enchantment],
-  text = [
-    when(does(actor(thisEnchantment), enter), draw(lit(3))),
-    static(
-      onlyWhile(
-        altCost(allOf(abilityHead(keyword(cycling))), mana([generic(0)])),
-        compareAmt(countOf(cardIn(yourHand)), atLeast, lit(7))))]
-}
+card singleFaced({
+    name = "New Perspectives",
+    cost = [generic(5), pip(blue)],
+    types = [enchantment],
+    text = [
+      when(does(actor(thisEnchantment), enter), draw(lit(3))),
+      static(
+        onlyWhile(
+          altCost(allOf(abilityHead(keyword(cycling))), mana([generic(0)])),
+          compareAmt(countOf(cardIn(yourHand)), atLeast, lit(7))))]})

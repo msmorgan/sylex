@@ -1,19 +1,19 @@
-card {
-  name = "Sheltered Valley",
-  types = [land],
-  text = [
-    static(
-      replace(
-        would(actor(thisLand), enter),
-        instead(
-          sequentially([
-              sacrifice(
-                each(
-                  and([isPermanent, isOther, named(printedName("Sheltered Valley")), youControl]))),
-              putOntoBattlefield(thisLand)])))),
-    at(
-      beginningOfYour(upkeep),
-      if = compareAmt(countOf(and([isLand, youControl])), atMost, lit(3)),
-      action = gainLife(lit(1))),
-    activated(tapSymbol, addMana(lit(1), manaOf([[colorless]])))]
-}
+card singleFaced({
+    name = "Sheltered Valley",
+    types = [land],
+    text = [
+      static(
+        replace(
+          would(actor(thisLand), enter),
+          instead(
+            sequentially([
+                sacrifice(
+                  each(
+                    and(
+                      [isPermanent, isOther, named(printedName("Sheltered Valley")), youControl]))),
+                putOntoBattlefield(thisLand)])))),
+      at(
+        beginningOfYour(upkeep),
+        if = compareAmt(countOf(and([isLand, youControl])), atMost, lit(3)),
+        action = gainLife(lit(1))),
+      activated(tapSymbol, addMana(lit(1), manaOf([[colorless]])))]})

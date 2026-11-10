@@ -1,16 +1,15 @@
 # Engineered Explosives (its sunburst [CR#702.44a] written out)
-card {
-  name = "Engineered Explosives",
-  cost = [variable],
-  types = [artifact],
-  text = [
-    static(entersWithCounters(thisArtifact, colorsSpentToCast(thisArtifact), chargeCounter)),
-    activated(
-      compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]),
-      destroy(
-        each(
-          and([
-              isPermanent,
-              non(isLand),
-              hasManaValue(equal, countersOn(chargeCounter, thisArtifact))]))))]
-}
+card singleFaced({
+    name = "Engineered Explosives",
+    cost = [variable],
+    types = [artifact],
+    text = [
+      static(entersWithCounters(thisArtifact, colorsSpentToCast(thisArtifact), chargeCounter)),
+      activated(
+        compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]),
+        destroy(
+          each(
+            and([
+                isPermanent,
+                non(isLand),
+                hasManaValue(equal, countersOn(chargeCounter, thisArtifact))]))))]})

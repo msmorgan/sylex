@@ -1,14 +1,13 @@
-card {
-  name = "Shah of Naar Isle",
-  cost = [generic(3), pip(red)],
-  types = [creature],
-  subtypes = [efreet],
-  text = [
-    trample,
-    echo(mana([generic(0)])),
-    when(
-      does(any, pay(anyCost, once, whose = thisCreature, keyword = echo)),
-      instruct(eachOpponent, may(drawCount(upToOf(lit(3))))))],
-  power = lit(6),
-  toughness = lit(6)
-}
+card singleFaced({
+    name = "Shah of Naar Isle",
+    cost = [generic(3), pip(red)],
+    types = [creature],
+    subtypes = [efreet],
+    text = [
+      trample,
+      echo(mana([generic(0)])),
+      when(
+        does(any, pay(anyCost, once, whose = thisCreature, keyword = echo)),
+        instruct(eachOpponent, may(drawCount(upToOf(lit(3))))))],
+    power = lit(6),
+    toughness = lit(6)})

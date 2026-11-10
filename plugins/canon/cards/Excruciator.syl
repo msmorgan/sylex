@@ -1,10 +1,9 @@
-card {
-  name = "Excruciator",
-  cost = [generic(6), pip(red), pip(red)],
-  types = [creature],
-  subtypes = [avatar],
-  text = [
-    static(cant(any, preventDamage(allDamage, damage = would(by(thisCreature), dealDamage))))],
-  power = lit(7),
-  toughness = lit(7)
-}
+card singleFaced({
+    name = "Excruciator",
+    cost = [generic(6), pip(red), pip(red)],
+    types = [creature],
+    subtypes = [avatar],
+    text = [
+      static(cant(any, preventDamage(allDamage, damage = would(by(thisCreature), dealDamage))))],
+    power = lit(7),
+    toughness = lit(7)})

@@ -1,15 +1,14 @@
-card {
-  name = "Quick Sliver",
-  cost = [generic(1), pip(green)],
-  types = [creature],
-  subtypes = [sliver],
-  text = [
-    flash,
-    static(
-      can(
-        actor(a(isPlayer)),
-        cast(bare(and([isSpell, hasSubtype(sliver)]))),
-        asThough = asThoughHadFlash(them)))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Quick Sliver",
+    cost = [generic(1), pip(green)],
+    types = [creature],
+    subtypes = [sliver],
+    text = [
+      flash,
+      static(
+        can(
+          actor(a(isPlayer)),
+          cast(bare(and([isSpell, hasSubtype(sliver)]))),
+          asThough = asThoughHadFlash(them)))],
+    power = lit(1),
+    toughness = lit(1)})

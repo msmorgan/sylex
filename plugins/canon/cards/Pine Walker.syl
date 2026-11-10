@@ -1,11 +1,10 @@
-card {
-  name = "Pine Walker",
-  cost = [generic(3), pip(green), pip(green)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [
-    morph(mana([generic(4), pip(green)])),
-    whenever(does(any, turnFaceUp(a(and([isCreature, youControl])))), untap(that(creature)))],
-  power = lit(5),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Pine Walker",
+    cost = [generic(3), pip(green), pip(green)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [
+      morph(mana([generic(4), pip(green)])),
+      whenever(does(any, turnFaceUp(a(and([isCreature, youControl])))), untap(that(creature)))],
+    power = lit(5),
+    toughness = lit(5)})

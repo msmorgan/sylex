@@ -1,19 +1,20 @@
-card {
-  name = "Thunderwave",
-  cost = [generic(2), pip(red), pip(red)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          rollDice(sides = sides(20)),
-          applyResultsTable([
-              rollRow(oneThrough(9), instruct(this, dealDamage(lit(3), each(isCreature)))),
-              rollRow(
-                fromTo(10, 19),
-                sequentially([
-                    may(choose(a(isCreature))),
-                    instruct(this, dealDamage(lit(3), each(and([isCreature, notChosen]))))])),
-              rollRow(
-                exactly(20),
-                instruct(this, dealDamage(lit(6), each(and([isCreature, opponentsControl])))))])]))]
-}
+card singleFaced({
+    name = "Thunderwave",
+    cost = [generic(2), pip(red), pip(red)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            rollDice(sides = sides(20)),
+            applyResultsTable([
+                rollRow(oneThrough(9), instruct(this, dealDamage(lit(3), each(isCreature)))),
+                rollRow(
+                  fromTo(10, 19),
+                  sequentially([
+                      may(choose(a(isCreature))),
+                      instruct(this, dealDamage(lit(3), each(and([isCreature, notChosen]))))])),
+                rollRow(
+                  exactly(20),
+                  instruct(
+                    this,
+                    dealDamage(lit(6), each(and([isCreature, opponentsControl])))))])]))]})

@@ -1,14 +1,13 @@
-card {
-  name = "Candles' Glow",
-  cost = [generic(1), pip(white)],
-  types = [instant],
-  subtypes = [arcane],
-  text = [
-    spell(
-      establishThroughout(
-        replace(
-          would(any, dealDamage(recipient = target(isAnyTarget))),
-          instead(preventDamage(theNext(lit(3)), also = gainLife(preventedThisWay)))),
-        thisTurn)),
-    splice(hasSubtype(arcane), mana([generic(1), pip(white)]))]
-}
+card singleFaced({
+    name = "Candles' Glow",
+    cost = [generic(1), pip(white)],
+    types = [instant],
+    subtypes = [arcane],
+    text = [
+      spell(
+        establishThroughout(
+          replace(
+            would(any, dealDamage(recipient = target(isAnyTarget))),
+            instead(preventDamage(theNext(lit(3)), also = gainLife(preventedThisWay)))),
+          thisTurn)),
+      splice(hasSubtype(arcane), mana([generic(1), pip(white)]))]})

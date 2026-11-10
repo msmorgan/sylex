@@ -1,11 +1,10 @@
-card {
-  name = "Death or Glory",
-  cost = [generic(4), pip(white)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          separateIntoPiles(allOf(and([isCreature, in(yourGraveyard)])), 2),
-          exile(pileOfChoice(anOpponent)),
-          returnToBattlefield(theOther)]))]
-}
+card singleFaced({
+    name = "Death or Glory",
+    cost = [generic(4), pip(white)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            separateIntoPiles(allOf(and([isCreature, in(yourGraveyard)])), 2),
+            exile(pileOfChoice(anOpponent)),
+            returnToBattlefield(theOther)]))]})

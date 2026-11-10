@@ -1,15 +1,14 @@
-card {
-  name = "Bramblewood Paragon",
-  cost = [generic(1), pip(green)],
-  types = [creature],
-  subtypes = [elf, warrior],
-  text = [
-    static(
-      entersWithAdditionalCounters(
-        each(and([isCreature, hasSubtype(warrior), youControl, isOther])),
-        lit(1),
-        p1p1Counter)),
-    static(abilityGrant(each(and([isCreature, youControl, hasCounter(p1p1Counter)])), trample))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Bramblewood Paragon",
+    cost = [generic(1), pip(green)],
+    types = [creature],
+    subtypes = [elf, warrior],
+    text = [
+      static(
+        entersWithAdditionalCounters(
+          each(and([isCreature, hasSubtype(warrior), youControl, isOther])),
+          lit(1),
+          p1p1Counter)),
+      static(abilityGrant(each(and([isCreature, youControl, hasCounter(p1p1Counter)])), trample))],
+    power = lit(2),
+    toughness = lit(2)})

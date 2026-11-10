@@ -1,18 +1,17 @@
-card {
-  name = "Old-Growth Dryads",
-  cost = [pip(green)],
-  types = [creature],
-  subtypes = [dryad],
-  text = [
-    when(
-      does(actor(thisCreature), enter),
-      instruct(
-        eachOpponent,
-        may(
-          sequentially([
-              search(libraryOf(they), a(and([isLand, hasSupertype(basic)]))),
-              putOntoBattlefieldTapped(it),
-              shuffle]))))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Old-Growth Dryads",
+    cost = [pip(green)],
+    types = [creature],
+    subtypes = [dryad],
+    text = [
+      when(
+        does(actor(thisCreature), enter),
+        instruct(
+          eachOpponent,
+          may(
+            sequentially([
+                search(libraryOf(they), a(and([isLand, hasSupertype(basic)]))),
+                putOntoBattlefieldTapped(it),
+                shuffle]))))],
+    power = lit(3),
+    toughness = lit(3)})

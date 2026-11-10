@@ -1,32 +1,31 @@
-card {
-  name = "Cairn Wanderer",
-  cost = [generic(4), pip(black)],
-  types = [creature],
-  subtypes = [shapeshifter],
-  text = [
-    changeling,
-    alsoForKeywords(
-      static(
-        onlyWhile(
-          keywordGrant(
-            thisCreature,
-            thatKeyword,
-            and([isCreature, in(graveyard), hasKeyword(thatKeyword)])),
-          exists(and([isCreature, in(graveyard), hasKeyword(thatKeyword)])))),
-      [
-        theKeyword(flying),
-        theKeyword(fear),
-        theKeyword(firstStrike),
-        theKeyword(doubleStrike),
-        theKeyword(deathtouch),
-        theKeyword(haste),
-        anyIn({word = landwalk}),
-        theKeyword(lifelink),
-        anyIn({word = protection}),
-        theKeyword(reach),
-        theKeyword(trample),
-        theKeyword(shroud),
-        theKeyword(vigilance)])],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Cairn Wanderer",
+    cost = [generic(4), pip(black)],
+    types = [creature],
+    subtypes = [shapeshifter],
+    text = [
+      changeling,
+      alsoForKeywords(
+        static(
+          onlyWhile(
+            keywordGrant(
+              thisCreature,
+              thatKeyword,
+              and([isCreature, in(graveyard), hasKeyword(thatKeyword)])),
+            exists(and([isCreature, in(graveyard), hasKeyword(thatKeyword)])))),
+        [
+          theKeyword(flying),
+          theKeyword(fear),
+          theKeyword(firstStrike),
+          theKeyword(doubleStrike),
+          theKeyword(deathtouch),
+          theKeyword(haste),
+          anyIn({word = landwalk}),
+          theKeyword(lifelink),
+          anyIn({word = protection}),
+          theKeyword(reach),
+          theKeyword(trample),
+          theKeyword(shroud),
+          theKeyword(vigilance)])],
+    power = lit(4),
+    toughness = lit(4)})

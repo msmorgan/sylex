@@ -1,6 +1,5 @@
-card {
-  name = "Fatigue",
-  cost = [generic(1), pip(blue)],
-  types = [sorcery],
-  text = [spell(instruct(target(isPlayer), skipPart(drawStep, lit(1))))]
-}
+card singleFaced({
+    name = "Fatigue",
+    cost = [generic(1), pip(blue)],
+    types = [sorcery],
+    text = [spell(instruct(target(isPlayer), skipPart(drawStep, lit(1))))]})

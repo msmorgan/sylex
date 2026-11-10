@@ -1,14 +1,13 @@
-card {
-  name = "Meletis Charlatan",
-  cost = [generic(2), pip(blue)],
-  types = [creature],
-  subtypes = [human, wizard],
-  text = [
-    activated(
-      compound([mana([generic(2), pip(blue)]), tapSymbol]),
-      sequentially([
-          instruct(controllerOf(target(and([isInstantOrSorcery, isSpell]))), copyOnStack(it)),
-          instruct(that(player), may(chooseNewTargets(that(copy))))]))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Meletis Charlatan",
+    cost = [generic(2), pip(blue)],
+    types = [creature],
+    subtypes = [human, wizard],
+    text = [
+      activated(
+        compound([mana([generic(2), pip(blue)]), tapSymbol]),
+        sequentially([
+            instruct(controllerOf(target(and([isInstantOrSorcery, isSpell]))), copyOnStack(it)),
+            instruct(that(player), may(chooseNewTargets(that(copy))))]))],
+    power = lit(2),
+    toughness = lit(3)})

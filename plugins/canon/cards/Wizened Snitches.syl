@@ -1,9 +1,8 @@
-card {
-  name = "Wizened Snitches",
-  cost = [generic(3), pip(blue)],
-  types = [creature],
-  subtypes = [faerie, rogue],
-  text = [flying, static(visibility(reveal, bare(isPlayer), topOfLibrary))],
-  power = lit(1),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Wizened Snitches",
+    cost = [generic(3), pip(blue)],
+    types = [creature],
+    subtypes = [faerie, rogue],
+    text = [flying, static(visibility(reveal, bare(isPlayer), topOfLibrary))],
+    power = lit(1),
+    toughness = lit(3)})

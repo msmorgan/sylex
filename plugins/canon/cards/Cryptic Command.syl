@@ -1,14 +1,13 @@
-card {
-  name = "Cryptic Command",
-  cost = [generic(1), pip(blue), pip(blue), pip(blue)],
-  types = [instant],
-  text = [
-    spell(
-      chooseModes(
-        exactly(2),
-        [
-          mode(none, none, counter(target(isSpell))),
-          mode(none, none, returnToHand(target(isPermanent))),
-          mode(none, none, tap(allOf(and([isCreature, opponentsControl])))),
-          mode(none, none, draw(lit(1)))]))]
-}
+card singleFaced({
+    name = "Cryptic Command",
+    cost = [generic(1), pip(blue), pip(blue), pip(blue)],
+    types = [instant],
+    text = [
+      spell(
+        chooseModes(
+          exactly(2),
+          [
+            mode(none, none, counter(target(isSpell))),
+            mode(none, none, returnToHand(target(isPermanent))),
+            mode(none, none, tap(allOf(and([isCreature, opponentsControl])))),
+            mode(none, none, draw(lit(1)))]))]})

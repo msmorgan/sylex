@@ -1,14 +1,15 @@
-card {
-  name = "Caught in the Crossfire",
-  cost = [pip(red), pip(red)],
-  types = [instant],
-  text = [
-    spell(
-      chooseSpree([
-          {
-            cost = mana([generic(1)]),
-            action = instruct(this, dealDamage(lit(2), each(and([isCreature, isOutlaw]))))},
-          {
-            cost = mana([generic(1)]),
-            action = instruct(this, dealDamage(lit(2), each(and([isCreature, non(isOutlaw)]))))}]))]
-}
+card singleFaced({
+    name = "Caught in the Crossfire",
+    cost = [pip(red), pip(red)],
+    types = [instant],
+    text = [
+      spell(
+        chooseSpree([
+            {
+              cost = mana([generic(1)]),
+              action = instruct(this, dealDamage(lit(2), each(and([isCreature, isOutlaw]))))},
+            {
+              cost = mana([generic(1)]),
+              action = instruct(
+                this,
+                dealDamage(lit(2), each(and([isCreature, non(isOutlaw)]))))}]))]})

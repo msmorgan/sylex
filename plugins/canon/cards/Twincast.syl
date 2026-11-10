@@ -1,10 +1,9 @@
-card {
-  name = "Twincast",
-  cost = [pip(blue), pip(blue)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          copyOnStack(target(and([isInstantOrSorcery, isSpell]))),
-          may(chooseNewTargets(that(copy)))]))]
-}
+card singleFaced({
+    name = "Twincast",
+    cost = [pip(blue), pip(blue)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            copyOnStack(target(and([isInstantOrSorcery, isSpell]))),
+            may(chooseNewTargets(that(copy)))]))]})

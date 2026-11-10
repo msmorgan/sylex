@@ -1,16 +1,15 @@
-card {
-  name = "Requisition Raid",
-  cost = [pip(white)],
-  types = [sorcery],
-  text = [
-    spell(
-      chooseSpree([
-          {cost = mana([generic(1)]), action = destroy(target(isArtifact))},
-          {cost = mana([generic(1)]), action = destroy(target(isEnchantment))},
-          {
-            cost = mana([generic(1)]),
-            action = putCounters(
-              lit(1),
-              printedKind(p1p1Counter),
-              each(and([isCreature, controlledBy(target(isPlayer))])))}]))]
-}
+card singleFaced({
+    name = "Requisition Raid",
+    cost = [pip(white)],
+    types = [sorcery],
+    text = [
+      spell(
+        chooseSpree([
+            {cost = mana([generic(1)]), action = destroy(target(isArtifact))},
+            {cost = mana([generic(1)]), action = destroy(target(isEnchantment))},
+            {
+              cost = mana([generic(1)]),
+              action = putCounters(
+                lit(1),
+                printedKind(p1p1Counter),
+                each(and([isCreature, controlledBy(target(isPlayer))])))}]))]})

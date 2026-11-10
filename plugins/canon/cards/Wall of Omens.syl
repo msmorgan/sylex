@@ -1,9 +1,8 @@
-card {
-  name = "Wall of Omens",
-  cost = [generic(1), pip(white)],
-  types = [creature],
-  subtypes = [wall],
-  text = [defender, when(does(actor(thisCreature), enter), draw(lit(1)))],
-  power = lit(0),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Wall of Omens",
+    cost = [generic(1), pip(white)],
+    types = [creature],
+    subtypes = [wall],
+    text = [defender, when(does(actor(thisCreature), enter), draw(lit(1)))],
+    power = lit(0),
+    toughness = lit(4)})

@@ -1,17 +1,16 @@
-card {
-  name = "Star Pupil",
-  cost = [pip(white)],
-  types = [creature],
-  subtypes = [human, wizard],
-  text = [
-    static(entersWithCounters(thisCreature, lit(1), p1p1Counter)),
-    when(
-      does(actor(thisCreature), die),
-      doForEachKind(
-        counterKind,
-        it,
-        counterKind,
-        putCounters(statOf(boundCounter, it), thatKind, target(and([isCreature, youControl])))))],
-  power = lit(0),
-  toughness = lit(0)
-}
+card singleFaced({
+    name = "Star Pupil",
+    cost = [pip(white)],
+    types = [creature],
+    subtypes = [human, wizard],
+    text = [
+      static(entersWithCounters(thisCreature, lit(1), p1p1Counter)),
+      when(
+        does(actor(thisCreature), die),
+        doForEachKind(
+          counterKind,
+          it,
+          counterKind,
+          putCounters(statOf(boundCounter, it), thatKind, target(and([isCreature, youControl])))))],
+    power = lit(0),
+    toughness = lit(0)})

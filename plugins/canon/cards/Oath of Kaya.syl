@@ -1,15 +1,14 @@
-card {
-  name = "Oath of Kaya",
-  cost = [generic(1), pip(white), pip(black)],
-  supertypes = [legendary],
-  types = [enchantment],
-  text = [
-    when(
-      does(actor(this), enter),
-      sequentially([instruct(this, dealDamage(lit(3), target(isAnyTarget))), gainLife(lit(3))])),
-    whenever(
-      does(
-        actor(anOpponent),
-        attackWith(counted(orMore(1), isCreature), a(and([isPlaneswalker, youControl])))),
-      sequentially([instruct(this, dealDamage(lit(2), that(player))), gainLife(lit(2))]))]
-}
+card singleFaced({
+    name = "Oath of Kaya",
+    cost = [generic(1), pip(white), pip(black)],
+    supertypes = [legendary],
+    types = [enchantment],
+    text = [
+      when(
+        does(actor(this), enter),
+        sequentially([instruct(this, dealDamage(lit(3), target(isAnyTarget))), gainLife(lit(3))])),
+      whenever(
+        does(
+          actor(anOpponent),
+          attackWith(counted(orMore(1), isCreature), a(and([isPlaneswalker, youControl])))),
+        sequentially([instruct(this, dealDamage(lit(2), that(player))), gainLife(lit(2))]))]})

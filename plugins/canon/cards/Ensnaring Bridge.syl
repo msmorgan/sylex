@@ -1,8 +1,9 @@
-card {
-  name = "Ensnaring Bridge",
-  cost = [generic(3)],
-  types = [artifact],
-  text = [
-    static(
-      cant(actor(allOf(and([isCreature, hasPower(greater, countOf(cardIn(yourHand)))]))), attack))]
-}
+card singleFaced({
+    name = "Ensnaring Bridge",
+    cost = [generic(3)],
+    types = [artifact],
+    text = [
+      static(
+        cant(
+          actor(allOf(and([isCreature, hasPower(greater, countOf(cardIn(yourHand)))]))),
+          attack))]})

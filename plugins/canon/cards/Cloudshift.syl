@@ -1,10 +1,9 @@
-card {
-  name = "Cloudshift",
-  cost = [pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          exile(target(and([isCreature, youControl]))),
-          returnToBattlefield(that(card), [under(you)])]))]
-}
+card singleFaced({
+    name = "Cloudshift",
+    cost = [pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            exile(target(and([isCreature, youControl]))),
+            returnToBattlefield(that(card), [under(you)])]))]})

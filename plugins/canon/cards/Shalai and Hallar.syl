@@ -1,15 +1,16 @@
-card {
-  name = "Shalai and Hallar",
-  cost = [generic(1), pip(red), pip(green), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [angel, elf],
-  text = [
-    flying,
-    vigilance,
-    whenever(
-      does(any, putCounters(anyAmount, printedKind(p1p1Counter), a(and([isCreature, youControl])))),
-      instruct(thisCreature, dealDamage(thatMuch, target(isOpponent))))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Shalai and Hallar",
+    cost = [generic(1), pip(red), pip(green), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [angel, elf],
+    text = [
+      flying,
+      vigilance,
+      whenever(
+        does(
+          any,
+          putCounters(anyAmount, printedKind(p1p1Counter), a(and([isCreature, youControl])))),
+        instruct(thisCreature, dealDamage(thatMuch, target(isOpponent))))],
+    power = lit(3),
+    toughness = lit(3)})

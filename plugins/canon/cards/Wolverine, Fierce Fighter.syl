@@ -6,18 +6,18 @@
 # event marks the new damage, so healing before the event removes exactly that and never the new
 # damage; healed as part of the event, whether the new damage is removed too would turn on an order
 # the text does not state.
-card {
-  name = "Wolverine, Fierce Fighter",
-  cost = [generic(2), pip(red), pip(green)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [mutant, berserker, hero],
-  text = [
-    haste,
-    when(
-      does(actor(thisCreature), enter),
-      instruct(thisCreature, fight(targets(upTo(1), and([isCreature, isOther]))))),
-    static(replace(would(any, dealDamage(recipient = thisCreature)), before(heal(thisCreature))))],
-  power = lit(3),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Wolverine, Fierce Fighter",
+    cost = [generic(2), pip(red), pip(green)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [mutant, berserker, hero],
+    text = [
+      haste,
+      when(
+        does(actor(thisCreature), enter),
+        instruct(thisCreature, fight(targets(upTo(1), and([isCreature, isOther]))))),
+      static(
+        replace(would(any, dealDamage(recipient = thisCreature)), before(heal(thisCreature))))],
+    power = lit(3),
+    toughness = lit(5)})

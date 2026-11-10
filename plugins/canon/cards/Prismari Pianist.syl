@@ -1,16 +1,15 @@
-card {
-  name = "Prismari Pianist",
-  cost = [generic(1), pip(red), pip(red)],
-  types = [creature],
-  subtypes = [djinn, bard],
-  text = [
-    whenever(
-      does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])))),
-      replace(
-        create(lit(1), written(creatureToken(1, 1, [blue, red], [elemental]))),
-        doIf(
-          compareAmt(statOf(stat(manaValue), that(spell)), atLeast, lit(5)),
-          instead(create(lit(3), asThose)))))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Prismari Pianist",
+    cost = [generic(1), pip(red), pip(red)],
+    types = [creature],
+    subtypes = [djinn, bard],
+    text = [
+      whenever(
+        does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])))),
+        replace(
+          create(lit(1), written(creatureToken(1, 1, [blue, red], [elemental]))),
+          doIf(
+            compareAmt(statOf(stat(manaValue), that(spell)), atLeast, lit(5)),
+            instead(create(lit(3), asThose)))))],
+    power = lit(2),
+    toughness = lit(1)})

@@ -1,9 +1,8 @@
-card {
-  name = "Caller of the Hunt",
-  cost = [generic(2), pip(green)],
-  types = [creature],
-  subtypes = [human],
-  text = [
-    static(addedCost(perform(choose(a(quality(subtype(creature))))), false)),
-    static(definesPt(thisCreature, countOf(and([isCreature, ofChosen(subtype(creature))]))))]
-}
+card singleFaced({
+    name = "Caller of the Hunt",
+    cost = [generic(2), pip(green)],
+    types = [creature],
+    subtypes = [human],
+    text = [
+      static(addedCost(perform(choose(a(quality(subtype(creature))))), false)),
+      static(definesPt(thisCreature, countOf(and([isCreature, ofChosen(subtype(creature))]))))]})

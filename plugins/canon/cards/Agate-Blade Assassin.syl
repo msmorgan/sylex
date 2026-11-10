@@ -1,12 +1,11 @@
-card {
-  name = "Agate-Blade Assassin",
-  cost = [generic(1), pip(black)],
-  types = [creature],
-  subtypes = [lizard, assassin],
-  text = [
-    whenever(
-      does(actor(thisCreature), attack),
-      sequentially([instruct(defendingPlayer, loseLife(lit(1))), gainLife(lit(1))]))],
-  power = lit(1),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Agate-Blade Assassin",
+    cost = [generic(1), pip(black)],
+    types = [creature],
+    subtypes = [lizard, assassin],
+    text = [
+      whenever(
+        does(actor(thisCreature), attack),
+        sequentially([instruct(defendingPlayer, loseLife(lit(1))), gainLife(lit(1))]))],
+    power = lit(1),
+    toughness = lit(3)})

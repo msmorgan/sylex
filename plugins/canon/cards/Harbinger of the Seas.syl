@@ -1,14 +1,13 @@
-card {
-  name = "Harbinger of the Seas",
-  cost = [generic(1), pip(blue), pip(blue)],
-  types = [creature],
-  subtypes = [merfolk, wizard],
-  text = [
-    static(
-      qualityChange(
-        allOf(and([isLand, non(hasSupertype(basic))])),
-        sets,
-        bundle({characteristics = {subtypes = [island]}})))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Harbinger of the Seas",
+    cost = [generic(1), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [merfolk, wizard],
+    text = [
+      static(
+        qualityChange(
+          allOf(and([isLand, non(hasSupertype(basic))])),
+          sets,
+          bundle({characteristics = {subtypes = [island]}})))],
+    power = lit(2),
+    toughness = lit(2)})

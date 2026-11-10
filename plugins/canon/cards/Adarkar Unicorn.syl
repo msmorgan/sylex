@@ -1,15 +1,14 @@
-card {
-  name = "Adarkar Unicorn",
-  cost = [generic(1), pip(white), pip(white)],
-  types = [creature],
-  subtypes = [unicorn],
-  text = [
-    activated(
-      tapSymbol,
-      addMana(
-        lit(1),
-        manaOf([[colored(blue)], [colorless, colored(blue)]]),
-        [spendOnly([toPay(ofKeyword(cumulativeUpkeep))])]))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Adarkar Unicorn",
+    cost = [generic(1), pip(white), pip(white)],
+    types = [creature],
+    subtypes = [unicorn],
+    text = [
+      activated(
+        tapSymbol,
+        addMana(
+          lit(1),
+          manaOf([[colored(blue)], [colorless, colored(blue)]]),
+          [spendOnly([toPay(ofKeyword(cumulativeUpkeep))])]))],
+    power = lit(2),
+    toughness = lit(2)})

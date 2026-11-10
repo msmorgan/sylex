@@ -1,15 +1,14 @@
 # "From anywhere" observes Dread after its arrival in the graveyard.
-card {
-  name = "Dread",
-  cost = [generic(3), pip(black), pip(black), pip(black)],
-  types = [creature],
-  subtypes = [elemental, incarnation],
-  text = [
-    fear,
-    whenever(does(actor(a(isCreature)), dealDamage(recipient = you)), destroy(it)),
-    when(
-      does(any, putInto(this, graveyard, from = anywhere)),
-      instruct(ownerOf(it), shuffleInto(it)))],
-  power = lit(6),
-  toughness = lit(6)
-}
+card singleFaced({
+    name = "Dread",
+    cost = [generic(3), pip(black), pip(black), pip(black)],
+    types = [creature],
+    subtypes = [elemental, incarnation],
+    text = [
+      fear,
+      whenever(does(actor(a(isCreature)), dealDamage(recipient = you)), destroy(it)),
+      when(
+        does(any, putInto(this, graveyard, from = anywhere)),
+        instruct(ownerOf(it), shuffleInto(it)))],
+    power = lit(6),
+    toughness = lit(6)})

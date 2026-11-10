@@ -1,12 +1,11 @@
-card {
-  name = "Vexing Sphinx",
-  cost = [generic(1), pip(blue), pip(blue)],
-  types = [creature],
-  subtypes = [sphinx],
-  text = [
-    flying,
-    cumulativeUpkeep(perform(discard(a(cardIn(yourHand))))),
-    when(does(actor(thisCreature), die), draw(countersOn(ageCounter, it)))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Vexing Sphinx",
+    cost = [generic(1), pip(blue), pip(blue)],
+    types = [creature],
+    subtypes = [sphinx],
+    text = [
+      flying,
+      cumulativeUpkeep(perform(discard(a(cardIn(yourHand))))),
+      when(does(actor(thisCreature), die), draw(countersOn(ageCounter, it)))],
+    power = lit(4),
+    toughness = lit(4)})

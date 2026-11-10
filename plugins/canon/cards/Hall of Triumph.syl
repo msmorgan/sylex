@@ -1,9 +1,9 @@
-card {
-  name = "Hall of Triumph",
-  cost = [generic(3)],
-  supertypes = [legendary],
-  types = [artifact],
-  text = [
-    static(entersChoosing(thisArtifact, color)),
-    static(getsPt(allOf(and([isCreature, youControl, ofChosen(color)])), up(lit(1)), up(lit(1))))]
-}
+card singleFaced({
+    name = "Hall of Triumph",
+    cost = [generic(3)],
+    supertypes = [legendary],
+    types = [artifact],
+    text = [
+      static(entersChoosing(thisArtifact, color)),
+      static(
+        getsPt(allOf(and([isCreature, youControl, ofChosen(color)])), up(lit(1)), up(lit(1))))]})

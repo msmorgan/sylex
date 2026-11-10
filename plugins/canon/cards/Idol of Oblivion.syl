@@ -1,16 +1,15 @@
-card {
-  name = "Idol of Oblivion",
-  cost = [generic(2)],
-  types = [artifact],
-  text = [
-    activatedOnlyIf(
-      tapSymbol,
-      draw(lit(1)),
-      did(
-        actor(you),
-        createObject(anyAmount, token(copyOf(a(isToken)), [])),
-        within(soFarThisTurn))),
-    activated(
-      compound([mana([generic(8)]), tapSymbol, perform(sacrifice(thisArtifact))]),
-      create(lit(1), written(creatureToken(10, 10, [], [eldrazi]))))]
-}
+card singleFaced({
+    name = "Idol of Oblivion",
+    cost = [generic(2)],
+    types = [artifact],
+    text = [
+      activatedOnlyIf(
+        tapSymbol,
+        draw(lit(1)),
+        did(
+          actor(you),
+          createObject(anyAmount, token(copyOf(a(isToken)), [])),
+          within(soFarThisTurn))),
+      activated(
+        compound([mana([generic(8)]), tapSymbol, perform(sacrifice(thisArtifact))]),
+        create(lit(1), written(creatureToken(10, 10, [], [eldrazi]))))]})

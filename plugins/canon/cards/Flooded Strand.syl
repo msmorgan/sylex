@@ -1,11 +1,10 @@
-card {
-  name = "Flooded Strand",
-  types = [land],
-  text = [
-    activated(
-      compound([tapSymbol, perform(payLife(lit(1))), perform(sacrifice(thisLand))]),
-      sequentially([
-          search(yourLibrary, a(and([isCard, or([hasSubtype(plains), hasSubtype(island)])]))),
-          putOntoBattlefield(it),
-          shuffle]))]
-}
+card singleFaced({
+    name = "Flooded Strand",
+    types = [land],
+    text = [
+      activated(
+        compound([tapSymbol, perform(payLife(lit(1))), perform(sacrifice(thisLand))]),
+        sequentially([
+            search(yourLibrary, a(and([isCard, or([hasSubtype(plains), hasSubtype(island)])]))),
+            putOntoBattlefield(it),
+            shuffle]))]})

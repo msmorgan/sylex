@@ -1,12 +1,11 @@
-card {
-  name = "Korlessa, Scale Singer",
-  cost = [pip(green), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [dragon, bard],
-  text = [
-    static(visibility(lookAt, you, topOfLibrary)),
-    static(can(actor(you), cast(bare(and([isSpell, hasSubtype(dragon)])), from = onTop)))],
-  power = lit(1),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Korlessa, Scale Singer",
+    cost = [pip(green), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [dragon, bard],
+    text = [
+      static(visibility(lookAt, you, topOfLibrary)),
+      static(can(actor(you), cast(bare(and([isSpell, hasSubtype(dragon)])), from = onTop)))],
+    power = lit(1),
+    toughness = lit(4)})

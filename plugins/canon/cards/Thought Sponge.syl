@@ -1,16 +1,15 @@
-card {
-  name = "Thought Sponge",
-  cost = [generic(3), pip(blue)],
-  types = [creature],
-  subtypes = [sponge],
-  text = [
-    flash,
-    static(
-      entersWithCounters(
-        thisCreature,
-        aggregateOver(max, isOpponent, eventCount(draw(anyAmount), actor(they), soFarThisTurn)),
-        p1p1Counter)),
-    when(does(actor(thisCreature), die), draw(powerOf(thisCreature)))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Thought Sponge",
+    cost = [generic(3), pip(blue)],
+    types = [creature],
+    subtypes = [sponge],
+    text = [
+      flash,
+      static(
+        entersWithCounters(
+          thisCreature,
+          aggregateOver(max, isOpponent, eventCount(draw(anyAmount), actor(they), soFarThisTurn)),
+          p1p1Counter)),
+      when(does(actor(thisCreature), die), draw(powerOf(thisCreature)))],
+    power = lit(1),
+    toughness = lit(1)})

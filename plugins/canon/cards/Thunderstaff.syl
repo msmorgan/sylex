@@ -1,15 +1,14 @@
-card {
-  name = "Thunderstaff",
-  cost = [generic(3)],
-  types = [artifact],
-  text = [
-    static(
-      onlyWhile(
-        replace(
-          would(actor(a(isCreature)), dealDamage(recipient = you, kind = combat)),
-          instead(preventDamage(ofThatDamage(lit(1))))),
-        is(thisArtifact, isUntapped))),
-    activated(
-      compound([mana([generic(2)]), tapSymbol]),
-      get(allOf(and([isCreature, isAttacking])), up(lit(1)), up(lit(0)), untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Thunderstaff",
+    cost = [generic(3)],
+    types = [artifact],
+    text = [
+      static(
+        onlyWhile(
+          replace(
+            would(actor(a(isCreature)), dealDamage(recipient = you, kind = combat)),
+            instead(preventDamage(ofThatDamage(lit(1))))),
+          is(thisArtifact, isUntapped))),
+      activated(
+        compound([mana([generic(2)]), tapSymbol]),
+        get(allOf(and([isCreature, isAttacking])), up(lit(1)), up(lit(0)), untilEndOfTurn))]})

@@ -1,7 +1,8 @@
-card {
-  name = "Hissing Miasma",
-  cost = [generic(1), pip(black), pip(black)],
-  types = [enchantment],
-  text = [
-    whenever(does(actor(a(isCreature)), attack(you)), instruct(controllerOf(it), loseLife(lit(1))))]
-}
+card singleFaced({
+    name = "Hissing Miasma",
+    cost = [generic(1), pip(black), pip(black)],
+    types = [enchantment],
+    text = [
+      whenever(
+        does(actor(a(isCreature)), attack(you)),
+        instruct(controllerOf(it), loseLife(lit(1))))]})

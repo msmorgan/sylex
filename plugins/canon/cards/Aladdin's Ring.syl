@@ -1,9 +1,8 @@
-card {
-  name = "Aladdin's Ring",
-  cost = [generic(8)],
-  types = [artifact],
-  text = [
-    activated(
-      compound([mana([generic(8)]), tapSymbol]),
-      instruct(thisArtifact, dealDamage(lit(4), target(isAnyTarget))))]
-}
+card singleFaced({
+    name = "Aladdin's Ring",
+    cost = [generic(8)],
+    types = [artifact],
+    text = [
+      activated(
+        compound([mana([generic(8)]), tapSymbol]),
+        instruct(thisArtifact, dealDamage(lit(4), target(isAnyTarget))))]})

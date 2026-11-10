@@ -1,20 +1,19 @@
-card {
-  name = "Generator Servant",
-  cost = [generic(1), pip(red)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [
-    activated(
-      compound([tapSymbol, perform(sacrifice(thisCreature))]),
-      addMana(
-        lit(1),
-        manaOf([[colorless, colorless]]),
-        [
-          whenSpentOn(
-            affectsIt,
-            false,
-            a(and([isCreature, isSpell])),
-            gainHaste(becomes(that(spell)), untilEndOfTurn))]))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Generator Servant",
+    cost = [generic(1), pip(red)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [
+      activated(
+        compound([tapSymbol, perform(sacrifice(thisCreature))]),
+        addMana(
+          lit(1),
+          manaOf([[colorless, colorless]]),
+          [
+            whenSpentOn(
+              affectsIt,
+              false,
+              a(and([isCreature, isSpell])),
+              gainHaste(becomes(that(spell)), untilEndOfTurn))]))],
+    power = lit(2),
+    toughness = lit(1)})

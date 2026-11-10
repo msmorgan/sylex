@@ -1,15 +1,14 @@
-card {
-  name = "Realmwright",
-  cost = [pip(blue)],
-  types = [creature],
-  subtypes = [vedalken, wizard],
-  text = [
-    static(entersChoosingFrom(thisCreature, subtype(land), basicTypesOnly)),
-    static(
-      qualityChange(
-        allOf(and([isLand, youControl])),
-        adds,
-        chosenQuality(ofChosen(subtype(land)))))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Realmwright",
+    cost = [pip(blue)],
+    types = [creature],
+    subtypes = [vedalken, wizard],
+    text = [
+      static(entersChoosingFrom(thisCreature, subtype(land), basicTypesOnly)),
+      static(
+        qualityChange(
+          allOf(and([isLand, youControl])),
+          adds,
+          chosenQuality(ofChosen(subtype(land)))))],
+    power = lit(1),
+    toughness = lit(1)})

@@ -1,13 +1,12 @@
 # Pins separating creatures into piles and destroying the creatures in the chosen
 # pile. Each creature belongs to exactly one pile; the pile itself is not an Object
 # [CR#700.3a,700.3b].
-card {
-  name = "Do or Die",
-  cost = [generic(1), pip(black)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          separateIntoPiles(allOf(and([isCreature, controlledBy(target(isPlayer))])), 2),
-          destroyPluralCantRegenerate(allOf(and([isCreature, inPile(pileOfChoice(they))])))]))]
-}
+card singleFaced({
+    name = "Do or Die",
+    cost = [generic(1), pip(black)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            separateIntoPiles(allOf(and([isCreature, controlledBy(target(isPlayer))])), 2),
+            destroyPluralCantRegenerate(allOf(and([isCreature, inPile(pileOfChoice(they))])))]))]})

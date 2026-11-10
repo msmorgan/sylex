@@ -1,6 +1,5 @@
-card {
-  name = "Counterspell",
-  cost = [pip(blue), pip(blue)],
-  types = [instant],
-  text = [spell(counter(target(isSpell)))]
-}
+card singleFaced({
+    name = "Counterspell",
+    cost = [pip(blue), pip(blue)],
+    types = [instant],
+    text = [spell(counter(target(isSpell)))]})

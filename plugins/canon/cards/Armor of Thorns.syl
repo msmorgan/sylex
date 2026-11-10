@@ -3,13 +3,12 @@
 # Each prints "You may cast this spell as though it had flash. If you cast it any time a sorcery
 # couldn't have been cast, the controller of the permanent it becomes sacrifices it at the
 # beginning of the next cleanup step." (`asThoughFlashSacrificedAtCleanup`).
-card {
-  name = "Armor of Thorns",
-  cost = [generic(1), pip(green)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    asThoughFlashSacrificedAtCleanup,
-    enchant(and([isCreature, non(hasColor(black))])),
-    static(getsPt(enchanted(creature), up(lit(2)), up(lit(2))))]
-}
+card singleFaced({
+    name = "Armor of Thorns",
+    cost = [generic(1), pip(green)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      asThoughFlashSacrificedAtCleanup,
+      enchant(and([isCreature, non(hasColor(black))])),
+      static(getsPt(enchanted(creature), up(lit(2)), up(lit(2))))]})

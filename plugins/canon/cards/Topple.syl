@@ -1,9 +1,9 @@
-card {
-  name = "Topple",
-  cost = [generic(2), pip(white)],
-  types = [sorcery],
-  text = [
-    spell(
-      exile(
-        target(and([isCreature, superlative(max, stat(power), and([isCreature, isPermanent]))]))))]
-}
+card singleFaced({
+    name = "Topple",
+    cost = [generic(2), pip(white)],
+    types = [sorcery],
+    text = [
+      spell(
+        exile(
+          target(
+            and([isCreature, superlative(max, stat(power), and([isCreature, isPermanent]))]))))]})

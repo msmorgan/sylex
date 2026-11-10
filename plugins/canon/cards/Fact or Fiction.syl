@@ -1,12 +1,11 @@
-card {
-  name = "Fact or Fiction",
-  cost = [generic(3), pip(blue)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          reveal(topSlice(lit(5))),
-          instruct(anOpponent, separateIntoPiles(them, 2)),
-          putInto(onePile, hand),
-          putInto(theOther, graveyard)]))]
-}
+card singleFaced({
+    name = "Fact or Fiction",
+    cost = [generic(3), pip(blue)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            reveal(topSlice(lit(5))),
+            instruct(anOpponent, separateIntoPiles(them, 2)),
+            putInto(onePile, hand),
+            putInto(theOther, graveyard)]))]})

@@ -1,11 +1,11 @@
-card {
-  name = "Reciprocate",
-  cost = [pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      exile(
-        target(
-          and(
-            [isCreature, did(actor(which), dealDamage(recipient = you), within(soFarThisTurn))]))))]
-}
+card singleFaced({
+    name = "Reciprocate",
+    cost = [pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        exile(
+          target(
+            and([
+                isCreature,
+                did(actor(which), dealDamage(recipient = you), within(soFarThisTurn))]))))]})

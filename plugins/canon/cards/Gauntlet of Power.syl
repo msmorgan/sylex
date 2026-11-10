@@ -1,11 +1,10 @@
-card {
-  name = "Gauntlet of Power",
-  cost = [generic(5)],
-  types = [artifact],
-  text = [
-    static(entersChoosing(thisArtifact, color)),
-    static(getsPt(allOf(and([isCreature, ofChosen(color)])), up(lit(1)), up(lit(1)))),
-    whenever(
-      does(any, tapForMana(a(and([isLand, hasSupertype(basic)])), ofColor(thatColor))),
-      instruct(controllerOf(that(land)), addMana(lit(1), ofTheChosenColor)))]
-}
+card singleFaced({
+    name = "Gauntlet of Power",
+    cost = [generic(5)],
+    types = [artifact],
+    text = [
+      static(entersChoosing(thisArtifact, color)),
+      static(getsPt(allOf(and([isCreature, ofChosen(color)])), up(lit(1)), up(lit(1)))),
+      whenever(
+        does(any, tapForMana(a(and([isLand, hasSupertype(basic)])), ofColor(thatColor))),
+        instruct(controllerOf(that(land)), addMana(lit(1), ofTheChosenColor)))]})

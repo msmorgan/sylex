@@ -1,11 +1,14 @@
-card {
-  name = "Daydream",
-  cost = [pip(white)],
-  types = [sorcery],
-  text = [
-    spell(
-      sequentially([
-          exile(target(and([isCreature, youControl]))),
-          returnToBattlefieldWithCounters(that(card), ownerOf(that(card)), lit(1), p1p1Counter)])),
-    flashback(mana([generic(2), pip(white)]))]
-}
+card singleFaced({
+    name = "Daydream",
+    cost = [pip(white)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            exile(target(and([isCreature, youControl]))),
+            returnToBattlefieldWithCounters(
+              that(card),
+              ownerOf(that(card)),
+              lit(1),
+              p1p1Counter)])),
+      flashback(mana([generic(2), pip(white)]))]})

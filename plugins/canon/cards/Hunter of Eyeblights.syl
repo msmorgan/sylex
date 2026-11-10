@@ -1,15 +1,14 @@
-card {
-  name = "Hunter of Eyeblights",
-  cost = [generic(3), pip(black), pip(black)],
-  types = [creature],
-  subtypes = [elf, assassin],
-  text = [
-    when(
-      does(actor(thisCreature), enter),
-      putCounters(lit(1), printedKind(p1p1Counter), target(and([isCreature, youDontControl])))),
-    activated(
-      compound([mana([generic(2), pip(black)]), tapSymbol]),
-      destroy(target(and([isCreature, hasCounter]))))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Hunter of Eyeblights",
+    cost = [generic(3), pip(black), pip(black)],
+    types = [creature],
+    subtypes = [elf, assassin],
+    text = [
+      when(
+        does(actor(thisCreature), enter),
+        putCounters(lit(1), printedKind(p1p1Counter), target(and([isCreature, youDontControl])))),
+      activated(
+        compound([mana([generic(2), pip(black)]), tapSymbol]),
+        destroy(target(and([isCreature, hasCounter]))))],
+    power = lit(3),
+    toughness = lit(3)})

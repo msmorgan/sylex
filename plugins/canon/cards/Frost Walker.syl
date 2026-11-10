@@ -1,12 +1,11 @@
-card {
-  name = "Frost Walker",
-  cost = [generic(1), pip(blue)],
-  types = [creature],
-  subtypes = [elemental],
-  text = [
-    when(
-      does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
-      sacrifice(it))],
-  power = lit(4),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Frost Walker",
+    cost = [generic(1), pip(blue)],
+    types = [creature],
+    subtypes = [elemental],
+    text = [
+      when(
+        does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
+        sacrifice(it))],
+    power = lit(4),
+    toughness = lit(1)})

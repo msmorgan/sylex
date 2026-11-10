@@ -1,14 +1,13 @@
-card {
-  name = "Iron Man, Bleeding Edge",
-  cost = [generic(3), pip(blue), pip(blue)],
-  supertypes = [legendary],
-  types = [artifact, creature],
-  subtypes = [human, hero],
-  text = [
-    flying,
-    whenever(
-      does(actor(you), cast(a(and([isArtifact, isSpell])))),
-      doOnlyOnceEachTurn(may(copyOnStack(it, exceptions = [isntLegendary]))))],
-  power = lit(3),
-  toughness = lit(5)
-}
+card singleFaced({
+    name = "Iron Man, Bleeding Edge",
+    cost = [generic(3), pip(blue), pip(blue)],
+    supertypes = [legendary],
+    types = [artifact, creature],
+    subtypes = [human, hero],
+    text = [
+      flying,
+      whenever(
+        does(actor(you), cast(a(and([isArtifact, isSpell])))),
+        doOnlyOnceEachTurn(may(copyOnStack(it, exceptions = [isntLegendary]))))],
+    power = lit(3),
+    toughness = lit(5)})

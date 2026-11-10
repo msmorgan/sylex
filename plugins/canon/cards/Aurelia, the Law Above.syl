@@ -1,17 +1,16 @@
-card {
-  name = "Aurelia, the Law Above",
-  cost = [generic(3), pip(red), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [angel],
-  text = [
-    flying,
-    vigilance,
-    haste,
-    whenever(does(actor(a(isPlayer)), attackWith(counted(orMore(3), isCreature))), draw(lit(1))),
-    whenever(
-      does(actor(a(isPlayer)), attackWith(counted(orMore(5), isCreature))),
-      sequentially([instruct(this, dealDamage(lit(3), eachOpponent)), gainLife(lit(3))]))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Aurelia, the Law Above",
+    cost = [generic(3), pip(red), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [angel],
+    text = [
+      flying,
+      vigilance,
+      haste,
+      whenever(does(actor(a(isPlayer)), attackWith(counted(orMore(3), isCreature))), draw(lit(1))),
+      whenever(
+        does(actor(a(isPlayer)), attackWith(counted(orMore(5), isCreature))),
+        sequentially([instruct(this, dealDamage(lit(3), eachOpponent)), gainLife(lit(3))]))],
+    power = lit(4),
+    toughness = lit(4)})

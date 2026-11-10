@@ -2,19 +2,18 @@
 # Characteristic-Defining Ability: it depends on the choice made as it enters, as Shapeshifter's
 # power does, and depending on a choice is no condition [CR#604.3a]. Its pump of the other creatures of the chosen type stays a
 # separate ability, affecting other objects [CR#604.3a].
-card {
-  name = "Adaptive Automaton",
-  cost = [generic(3)],
-  types = [artifact, creature],
-  subtypes = [construct],
-  text = [
-    static(entersChoosing(thisCreature, subtype(creature))),
-    static(definesQuality(thisCreature, adds, chosenQuality(ofChosen(subtype(creature))))),
-    static(
-      getsPt(
-        allOf(and([isCreature, youControl, isOther, ofChosen(subtype(creature))])),
-        up(lit(1)),
-        up(lit(1))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Adaptive Automaton",
+    cost = [generic(3)],
+    types = [artifact, creature],
+    subtypes = [construct],
+    text = [
+      static(entersChoosing(thisCreature, subtype(creature))),
+      static(definesQuality(thisCreature, adds, chosenQuality(ofChosen(subtype(creature))))),
+      static(
+        getsPt(
+          allOf(and([isCreature, youControl, isOther, ofChosen(subtype(creature))])),
+          up(lit(1)),
+          up(lit(1))))],
+    power = lit(2),
+    toughness = lit(2)})

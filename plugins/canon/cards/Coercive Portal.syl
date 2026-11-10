@@ -1,16 +1,15 @@
-card {
-  name = "Coercive Portal",
-  cost = [generic(4)],
-  types = [artifact],
-  text = [
-    willOfTheCouncil(
-      at(
-        beginningOfYour(upkeep),
-        sequentially([
-            instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["carnage", "homage"]))),
-            doIf(
-              voteLead("carnage", false),
-              sequentially(
-                [sacrifice(thisArtifact), destroy(allOf(and([isPermanent, non(isLand)])))])),
-            doIf(voteLead("homage", true), draw(lit(1)))])))]
-}
+card singleFaced({
+    name = "Coercive Portal",
+    cost = [generic(4)],
+    types = [artifact],
+    text = [
+      willOfTheCouncil(
+        at(
+          beginningOfYour(upkeep),
+          sequentially([
+              instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["carnage", "homage"]))),
+              doIf(
+                voteLead("carnage", false),
+                sequentially(
+                  [sacrifice(thisArtifact), destroy(allOf(and([isPermanent, non(isLand)])))])),
+              doIf(voteLead("homage", true), draw(lit(1)))])))]})

@@ -1,8 +1,7 @@
-card {
-  name = "Cackling Counterpart",
-  cost = [generic(1), pip(blue), pip(blue)],
-  types = [instant],
-  text = [
-    spell(create(lit(1), copyOf(target(and([isCreature, youControl]))))),
-    flashback(mana([generic(5), pip(blue), pip(blue)]))]
-}
+card singleFaced({
+    name = "Cackling Counterpart",
+    cost = [generic(1), pip(blue), pip(blue)],
+    types = [instant],
+    text = [
+      spell(create(lit(1), copyOf(target(and([isCreature, youControl]))))),
+      flashback(mana([generic(5), pip(blue), pip(blue)]))]})

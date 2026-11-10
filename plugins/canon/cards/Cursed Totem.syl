@@ -1,8 +1,9 @@
-card {
-  name = "Cursed Totem",
-  cost = [generic(2)],
-  types = [artifact],
-  text = [
-    static(
-      cant(any, activate(allOf(and([abilityHead(anyActivated), abilityOf(allOf(isCreature))])))))]
-}
+card singleFaced({
+    name = "Cursed Totem",
+    cost = [generic(2)],
+    types = [artifact],
+    text = [
+      static(
+        cant(
+          any,
+          activate(allOf(and([abilityHead(anyActivated), abilityOf(allOf(isCreature))])))))]})

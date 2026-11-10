@@ -1,13 +1,12 @@
-card {
-  name = "Reverse Damage",
-  cost = [generic(1), pip(white), pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(
-        replace(
-          would(actor(aYourChoice(isSource)), dealDamage(recipient = you)),
-          instead(preventDamage(allDamage, also = gainLife(preventedThisWay))),
-          use = nextTimeOnly),
-        thisTurn))]
-}
+card singleFaced({
+    name = "Reverse Damage",
+    cost = [generic(1), pip(white), pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(
+          replace(
+            would(actor(aYourChoice(isSource)), dealDamage(recipient = you)),
+            instead(preventDamage(allDamage, also = gainLife(preventedThisWay))),
+            use = nextTimeOnly),
+          thisTurn))]})

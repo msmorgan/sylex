@@ -1,11 +1,10 @@
-card {
-  name = "Borne Upon a Wind",
-  cost = [generic(1), pip(blue)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(
-        can(actor(you), cast(bare(isSpell)), asThough = asThoughHadFlash(them)),
-        thisTurn)),
-    spell(draw(lit(1)))]
-}
+card singleFaced({
+    name = "Borne Upon a Wind",
+    cost = [generic(1), pip(blue)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(
+          can(actor(you), cast(bare(isSpell)), asThough = asThoughHadFlash(them)),
+          thisTurn)),
+      spell(draw(lit(1)))]})

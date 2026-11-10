@@ -1,16 +1,15 @@
-card {
-  name = "Oppressive Rays",
-  cost = [pip(white)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    static(
-      conjunction([
-          gatedBy(mana([generic(3)]), actor(enchanted(creature)), attack),
-          gatedBy(mana([generic(3)]), actor(enchanted(creature)), block)])),
-    static(
-      costShift(
-        allOf(and([abilityHead(anyActivated), abilityOf(enchanted(creature))])),
-        more(lit(3))))]
-}
+card singleFaced({
+    name = "Oppressive Rays",
+    cost = [pip(white)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      static(
+        conjunction([
+            gatedBy(mana([generic(3)]), actor(enchanted(creature)), attack),
+            gatedBy(mana([generic(3)]), actor(enchanted(creature)), block)])),
+      static(
+        costShift(
+          allOf(and([abilityHead(anyActivated), abilityOf(enchanted(creature))])),
+          more(lit(3))))]})

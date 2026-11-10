@@ -1,16 +1,15 @@
-card {
-  name = "Earthen Goo",
-  cost = [generic(2), pip(red)],
-  types = [creature],
-  subtypes = [ooze],
-  text = [
-    trample,
-    cumulativeUpkeep(either(mana([pip(red)]), mana([pip(green)]))),
-    static(
-      getsPt(
-        thisCreature,
-        up(times(lit(1), countersOn(ageCounter, it))),
-        up(times(lit(1), countersOn(ageCounter, it)))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Earthen Goo",
+    cost = [generic(2), pip(red)],
+    types = [creature],
+    subtypes = [ooze],
+    text = [
+      trample,
+      cumulativeUpkeep(either(mana([pip(red)]), mana([pip(green)]))),
+      static(
+        getsPt(
+          thisCreature,
+          up(times(lit(1), countersOn(ageCounter, it))),
+          up(times(lit(1), countersOn(ageCounter, it)))))],
+    power = lit(2),
+    toughness = lit(2)})

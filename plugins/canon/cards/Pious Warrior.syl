@@ -1,10 +1,9 @@
-card {
-  name = "Pious Warrior",
-  cost = [generic(3), pip(white)],
-  types = [creature],
-  subtypes = [human, rebel, warrior],
-  text = [
-    whenever(does(any, dealDamage(recipient = thisCreature, kind = combat)), gainLife(thatMuch))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Pious Warrior",
+    cost = [generic(3), pip(white)],
+    types = [creature],
+    subtypes = [human, rebel, warrior],
+    text = [
+      whenever(does(any, dealDamage(recipient = thisCreature, kind = combat)), gainLife(thatMuch))],
+    power = lit(2),
+    toughness = lit(3)})

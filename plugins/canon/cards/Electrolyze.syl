@@ -1,8 +1,8 @@
-card {
-  name = "Electrolyze",
-  cost = [generic(1), pip(blue), pip(red)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([dealDivided(this, lit(2), targets(oneThrough(2), isAnyTarget)), draw(lit(1))]))]
-}
+card singleFaced({
+    name = "Electrolyze",
+    cost = [generic(1), pip(blue), pip(red)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially(
+          [dealDivided(this, lit(2), targets(oneThrough(2), isAnyTarget)), draw(lit(1))]))]})

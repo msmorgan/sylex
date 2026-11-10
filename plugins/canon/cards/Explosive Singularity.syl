@@ -1,10 +1,11 @@
-card {
-  name = "Explosive Singularity",
-  cost = [generic(8), pip(red), pip(red)],
-  types = [sorcery],
-  text = [
-    static(
-      addedCost(perform(tap(counted(anyNumber, and([isCreature, youControl, isUntapped])))), true)),
-    static(costShift(this, less(times(lit(1), groupSize)))),
-    spell(instruct(this, dealDamage(lit(10), target(isAnyTarget))))]
-}
+card singleFaced({
+    name = "Explosive Singularity",
+    cost = [generic(8), pip(red), pip(red)],
+    types = [sorcery],
+    text = [
+      static(
+        addedCost(
+          perform(tap(counted(anyNumber, and([isCreature, youControl, isUntapped])))),
+          true)),
+      static(costShift(this, less(times(lit(1), groupSize)))),
+      spell(instruct(this, dealDamage(lit(10), target(isAnyTarget))))]})

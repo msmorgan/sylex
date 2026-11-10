@@ -1,6 +1,5 @@
-card {
-  name = "Stifle",
-  cost = [pip(blue)],
-  types = [instant],
-  text = [spell(counter(target(or([abilityHead(anyActivated), abilityHead(anyTriggered)]))))]
-}
+card singleFaced({
+    name = "Stifle",
+    cost = [pip(blue)],
+    types = [instant],
+    text = [spell(counter(target(or([abilityHead(anyActivated), abilityHead(anyTriggered)]))))]})

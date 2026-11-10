@@ -1,13 +1,12 @@
-card {
-  name = "Vorel of the Hull Clade",
-  cost = [generic(1), pip(green), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, merfolk],
-  text = [
-    activated(
-      compound([mana([pip(green), pip(blue)]), tapSymbol]),
-      doubleCounters(target(or([isArtifact, isCreature, isLand]))))],
-  power = lit(1),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Vorel of the Hull Clade",
+    cost = [generic(1), pip(green), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, merfolk],
+    text = [
+      activated(
+        compound([mana([pip(green), pip(blue)]), tapSymbol]),
+        doubleCounters(target(or([isArtifact, isCreature, isLand]))))],
+    power = lit(1),
+    toughness = lit(4)})

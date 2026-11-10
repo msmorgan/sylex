@@ -1,6 +1,5 @@
-card {
-  name = "Serum Visions",
-  cost = [pip(blue)],
-  types = [sorcery],
-  text = [spell(sequentially([draw(lit(1)), scry(lit(2))]))]
-}
+card singleFaced({
+    name = "Serum Visions",
+    cost = [pip(blue)],
+    types = [sorcery],
+    text = [spell(sequentially([draw(lit(1)), scry(lit(2))]))]})

@@ -1,16 +1,15 @@
-card {
-  name = "Snapcaster Mage",
-  cost = [generic(1), pip(blue)],
-  types = [creature],
-  subtypes = [human, wizard],
-  text = [
-    flash,
-    when(
-      does(actor(thisCreature), enter),
-      gain(
-        target(and([isInstantOrSorcery, cardIn(yourGraveyard)])),
-        flashback(itsManaCost),
-        untilEndOfTurn))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Snapcaster Mage",
+    cost = [generic(1), pip(blue)],
+    types = [creature],
+    subtypes = [human, wizard],
+    text = [
+      flash,
+      when(
+        does(actor(thisCreature), enter),
+        gain(
+          target(and([isInstantOrSorcery, cardIn(yourGraveyard)])),
+          flashback(itsManaCost),
+          untilEndOfTurn))],
+    power = lit(2),
+    toughness = lit(1)})

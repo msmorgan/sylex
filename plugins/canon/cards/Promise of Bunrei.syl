@@ -1,11 +1,10 @@
-card {
-  name = "Promise of Bunrei",
-  cost = [generic(2), pip(white)],
-  types = [enchantment],
-  text = [
-    when(
-      does(actor(a(and([isCreature, youControl]))), die),
-      doIfDone(
-        sacrifice(thisEnchantment),
-        create(lit(4), written(creatureToken(1, 1, [], [spirit])))))]
-}
+card singleFaced({
+    name = "Promise of Bunrei",
+    cost = [generic(2), pip(white)],
+    types = [enchantment],
+    text = [
+      when(
+        does(actor(a(and([isCreature, youControl]))), die),
+        doIfDone(
+          sacrifice(thisEnchantment),
+          create(lit(4), written(creatureToken(1, 1, [], [spirit])))))]})

@@ -1,13 +1,12 @@
-card {
-  name = "Phytohydra",
-  cost = [generic(2), pip(green), pip(white), pip(white)],
-  types = [creature],
-  subtypes = [plant, hydra],
-  text = [
-    static(
-      replace(
-        would(any, dealDamage(recipient = thisCreature)),
-        instead(putCounters(thatMuch, printedKind(p1p1Counter), it))))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Phytohydra",
+    cost = [generic(2), pip(green), pip(white), pip(white)],
+    types = [creature],
+    subtypes = [plant, hydra],
+    text = [
+      static(
+        replace(
+          would(any, dealDamage(recipient = thisCreature)),
+          instead(putCounters(thatMuch, printedKind(p1p1Counter), it))))],
+    power = lit(1),
+    toughness = lit(1)})

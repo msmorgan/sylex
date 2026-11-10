@@ -1,14 +1,13 @@
-card {
-  name = "Cultivator Colossus",
-  cost = [generic(4), pip(green), pip(green), pip(green)],
-  types = [creature],
-  subtypes = [plant, beast],
-  text = [
-    trample,
-    static(definesPt(thisCreature, countOf(and([isLand, youControl])))),
-    when(
-      does(actor(thisCreature), enter),
-      may(
-        putOntoBattlefieldTapped(a(and([isLand, in(yourHand)]))),
-        sequentially([draw(lit(1)), repeat(again)])))]
-}
+card singleFaced({
+    name = "Cultivator Colossus",
+    cost = [generic(4), pip(green), pip(green), pip(green)],
+    types = [creature],
+    subtypes = [plant, beast],
+    text = [
+      trample,
+      static(definesPt(thisCreature, countOf(and([isLand, youControl])))),
+      when(
+        does(actor(thisCreature), enter),
+        may(
+          putOntoBattlefieldTapped(a(and([isLand, in(yourHand)]))),
+          sequentially([draw(lit(1)), repeat(again)])))]})

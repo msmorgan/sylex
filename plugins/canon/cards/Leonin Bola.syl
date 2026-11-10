@@ -1,14 +1,13 @@
-card {
-  name = "Leonin Bola",
-  cost = [generic(1)],
-  types = [artifact],
-  subtypes = [equipment],
-  text = [
-    static(
-      abilityGrant(
-        equipped(creature),
-        activated(
-          compound([tapSymbol, perform(unattach(theGrantor(permanent)))]),
-          tap(target(isCreature))))),
-    equip(mana([generic(1)]))]
-}
+card singleFaced({
+    name = "Leonin Bola",
+    cost = [generic(1)],
+    types = [artifact],
+    subtypes = [equipment],
+    text = [
+      static(
+        abilityGrant(
+          equipped(creature),
+          activated(
+            compound([tapSymbol, perform(unattach(theGrantor(permanent)))]),
+            tap(target(isCreature))))),
+      equip(mana([generic(1)]))]})

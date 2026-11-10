@@ -1,13 +1,12 @@
-card {
-  name = "Abyssal Persecutor",
-  cost = [generic(2), pip(black), pip(black)],
-  types = [creature],
-  subtypes = [demon],
-  text = [
-    flying,
-    trample,
-    static(cant(actor(you), winGame)),
-    static(cant(actor(yourOpponents), loseGame))],
-  power = lit(6),
-  toughness = lit(6)
-}
+card singleFaced({
+    name = "Abyssal Persecutor",
+    cost = [generic(2), pip(black), pip(black)],
+    types = [creature],
+    subtypes = [demon],
+    text = [
+      flying,
+      trample,
+      static(cant(actor(you), winGame)),
+      static(cant(actor(yourOpponents), loseGame))],
+    power = lit(6),
+    toughness = lit(6)})

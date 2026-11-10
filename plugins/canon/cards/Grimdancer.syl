@@ -1,17 +1,16 @@
-card {
-  name = "Grimdancer",
-  cost = [generic(1), pip(black), pip(black)],
-  types = [creature],
-  subtypes = [nightmare],
-  text = [
-    static(
-      enters(
-        thisCreature,
-        [
-          withCounters(
-            lit(2),
-            distinctChosenKinds([menaceCounter, deathtouchCounter, lifelinkCounter]),
-            fresh)]))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Grimdancer",
+    cost = [generic(1), pip(black), pip(black)],
+    types = [creature],
+    subtypes = [nightmare],
+    text = [
+      static(
+        enters(
+          thisCreature,
+          [
+            withCounters(
+              lit(2),
+              distinctChosenKinds([menaceCounter, deathtouchCounter, lifelinkCounter]),
+              fresh)]))],
+    power = lit(3),
+    toughness = lit(3)})

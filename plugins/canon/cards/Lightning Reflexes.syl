@@ -1,14 +1,13 @@
-card {
-  name = "Lightning Reflexes",
-  cost = [generic(1), pip(red)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    asThoughFlashSacrificedAtCleanup,
-    enchant(isCreature),
-    static(
-      conjunction([
-          getsPt(enchanted(creature), up(lit(1)), up(lit(0))),
-          abilityGrant(enchanted(creature), firstStrike)],
-        subject = enchanted(creature)))]
-}
+card singleFaced({
+    name = "Lightning Reflexes",
+    cost = [generic(1), pip(red)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      asThoughFlashSacrificedAtCleanup,
+      enchant(isCreature),
+      static(
+        conjunction([
+            getsPt(enchanted(creature), up(lit(1)), up(lit(0))),
+            abilityGrant(enchanted(creature), firstStrike)],
+          subject = enchanted(creature)))]})

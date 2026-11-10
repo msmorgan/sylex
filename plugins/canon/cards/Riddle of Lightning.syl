@@ -1,12 +1,11 @@
-card {
-  name = "Riddle of Lightning",
-  cost = [generic(3), pip(red), pip(red)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          choose(target(isAnyTarget)),
-          scry(lit(3)),
-          reveal(topSlice(lit(1))),
-          instruct(this, dealDamage(statOf(stat(manaValue), that(card)), thatJoin))]))]
-}
+card singleFaced({
+    name = "Riddle of Lightning",
+    cost = [generic(3), pip(red), pip(red)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            choose(target(isAnyTarget)),
+            scry(lit(3)),
+            reveal(topSlice(lit(1))),
+            instruct(this, dealDamage(statOf(stat(manaValue), that(card)), thatJoin))]))]})

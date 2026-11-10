@@ -1,20 +1,19 @@
-card {
-  name = "Soulstone Sanctuary",
-  types = [land],
-  text = [
-    activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
-    activated(
-      mana([generic(4)]),
-      establish(
-        qualityChange(
-          thisLand,
-          sets,
-          bundle({
-              characteristics = {
-                types = [creature],
-                text = [vigilance],
-                power = lit(3),
-                toughness = lit(3)},
-              qualities = [withEveryType(creature)]},
-            land))))]
-}
+card singleFaced({
+    name = "Soulstone Sanctuary",
+    types = [land],
+    text = [
+      activated(tapSymbol, addMana(lit(1), manaOf([[colorless]]))),
+      activated(
+        mana([generic(4)]),
+        establish(
+          qualityChange(
+            thisLand,
+            sets,
+            bundle({
+                characteristics = {
+                  types = [creature],
+                  text = [vigilance],
+                  power = lit(3),
+                  toughness = lit(3)},
+                qualities = [withEveryType(creature)]},
+              land))))]})

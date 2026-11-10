@@ -1,13 +1,12 @@
-card {
-  name = "Chub Toad",
-  cost = [generic(2), pip(green)],
-  types = [creature],
-  subtypes = [frog],
-  text = [
-    whenever(
-      does(actor(thisCreature), block),
-      or = [does(any, becomeBlocked(thisCreature))],
-      action = get(it, up(lit(2)), up(lit(2)), untilEndOfTurn))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Chub Toad",
+    cost = [generic(2), pip(green)],
+    types = [creature],
+    subtypes = [frog],
+    text = [
+      whenever(
+        does(actor(thisCreature), block),
+        or = [does(any, becomeBlocked(thisCreature))],
+        action = get(it, up(lit(2)), up(lit(2)), untilEndOfTurn))],
+    power = lit(1),
+    toughness = lit(1)})

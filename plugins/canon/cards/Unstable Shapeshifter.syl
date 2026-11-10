@@ -1,12 +1,11 @@
-card {
-  name = "Unstable Shapeshifter",
-  cost = [generic(3), pip(blue)],
-  types = [creature],
-  subtypes = [shapeshifter],
-  text = [
-    whenever(
-      does(actor(a(and([isCreature, isOther]))), enter),
-      establish(copyChange(thisCreature, that(creature), [exceptThisAbility])))],
-  power = lit(0),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Unstable Shapeshifter",
+    cost = [generic(3), pip(blue)],
+    types = [creature],
+    subtypes = [shapeshifter],
+    text = [
+      whenever(
+        does(actor(a(and([isCreature, isOther]))), enter),
+        establish(copyChange(thisCreature, that(creature), [exceptThisAbility])))],
+    power = lit(0),
+    toughness = lit(1)})

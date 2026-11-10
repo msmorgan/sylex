@@ -1,22 +1,21 @@
-card {
-  name = "Chromatic Armor",
-  cost = [generic(1), pip(white), pip(blue)],
-  types = [enchantment],
-  subtypes = [aura],
-  text = [
-    enchant(isCreature),
-    static(entersChoosing(thisAura, color)),
-    static(entersWithCounters(thisAura, lit(1), sleightCounter)),
-    static(
-      replace(
-        would(
-          by(allOf(and([isSource, ofTheLastChosen(color)]))),
-          dealDamage(recipient = enchanted(creature))),
-        instead(preventDamage(allDamage)))),
-    activated(
-      mana([variable]),
-      sequentially([
-          putCounters(lit(1), printedKind(sleightCounter), thisAura),
-          choose(a(quality(color))),
-          define(x, countersOn(sleightCounter, thisAura))]))]
-}
+card singleFaced({
+    name = "Chromatic Armor",
+    cost = [generic(1), pip(white), pip(blue)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(isCreature),
+      static(entersChoosing(thisAura, color)),
+      static(entersWithCounters(thisAura, lit(1), sleightCounter)),
+      static(
+        replace(
+          would(
+            by(allOf(and([isSource, ofTheLastChosen(color)]))),
+            dealDamage(recipient = enchanted(creature))),
+          instead(preventDamage(allDamage)))),
+      activated(
+        mana([variable]),
+        sequentially([
+            putCounters(lit(1), printedKind(sleightCounter), thisAura),
+            choose(a(quality(color))),
+            define(x, countersOn(sleightCounter, thisAura))]))]})

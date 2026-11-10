@@ -1,12 +1,11 @@
-card {
-  name = "Nourishing Shoal",
-  cost = [variable, pip(green), pip(green)],
-  types = [instant],
-  subtypes = [arcane],
-  text = [
-    static(
-      altCost(
-        this,
-        perform(exile(a(and([hasColor(green), hasManaValue(equal, letter(x)), in(yourHand)])))))),
-    spell(gainLife(letter(x)))]
-}
+card singleFaced({
+    name = "Nourishing Shoal",
+    cost = [variable, pip(green), pip(green)],
+    types = [instant],
+    subtypes = [arcane],
+    text = [
+      static(
+        altCost(
+          this,
+          perform(exile(a(and([hasColor(green), hasManaValue(equal, letter(x)), in(yourHand)])))))),
+      spell(gainLife(letter(x)))]})

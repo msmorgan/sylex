@@ -1,8 +1,7 @@
-card {
-  name = "Fall of the Titans",
-  cost = [variable, variable, pip(red)],
-  types = [instant],
-  text = [
-    surge(mana([variable, pip(red)])),
-    spell(instruct(this, dealDamage(letter(x), eachOf(targets(upTo(2), isAnyTarget)))))]
-}
+card singleFaced({
+    name = "Fall of the Titans",
+    cost = [variable, variable, pip(red)],
+    types = [instant],
+    text = [
+      surge(mana([variable, pip(red)])),
+      spell(instruct(this, dealDamage(letter(x), eachOf(targets(upTo(2), isAnyTarget)))))]})

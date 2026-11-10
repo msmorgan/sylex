@@ -1,10 +1,9 @@
-card {
-  name = "Void Mirror",
-  cost = [generic(2)],
-  types = [artifact],
-  text = [
-    whenever(
-      does(actor(a(isPlayer)), cast(a(isSpell))),
-      if = noColoredManaSpentToCast(it),
-      action = counter(that(spell)))]
-}
+card singleFaced({
+    name = "Void Mirror",
+    cost = [generic(2)],
+    types = [artifact],
+    text = [
+      whenever(
+        does(actor(a(isPlayer)), cast(a(isSpell))),
+        if = noColoredManaSpentToCast(it),
+        action = counter(that(spell)))]})

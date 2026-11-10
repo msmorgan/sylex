@@ -4,18 +4,17 @@
 # or ability.
 # Fragment: the conditional flying sentence ("As long as this creature has three or more +1/+1
 # counters on it, it has flying") is missing until `syl-condition-first-static`.
-card {
-  name = "Angelic Cub",
-  cost = [generic(1), pip(white)],
-  types = [creature],
-  subtypes = [cat, angel],
-  text = [
-    whenever(
-      nthOccurrence(
-        nth(1),
-        does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
-        turn),
-      putCounters(lit(1), printedKind(p1p1Counter), it))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Angelic Cub",
+    cost = [generic(1), pip(white)],
+    types = [creature],
+    subtypes = [cat, angel],
+    text = [
+      whenever(
+        nthOccurrence(
+          nth(1),
+          does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
+          turn),
+        putCounters(lit(1), printedKind(p1p1Counter), it))],
+    power = lit(1),
+    toughness = lit(1)})

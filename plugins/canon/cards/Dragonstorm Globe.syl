@@ -1,12 +1,11 @@
-card {
-  name = "Dragonstorm Globe",
-  cost = [generic(3)],
-  types = [artifact],
-  text = [
-    static(
-      entersWithAdditionalCounters(
-        each(and([hasSubtype(dragon), youControl])),
-        lit(1),
-        p1p1Counter)),
-    activated(tapSymbol, addMana(lit(1), ofAnyColor(sameColor)))]
-}
+card singleFaced({
+    name = "Dragonstorm Globe",
+    cost = [generic(3)],
+    types = [artifact],
+    text = [
+      static(
+        entersWithAdditionalCounters(
+          each(and([hasSubtype(dragon), youControl])),
+          lit(1),
+          p1p1Counter)),
+      activated(tapSymbol, addMana(lit(1), ofAnyColor(sameColor)))]})

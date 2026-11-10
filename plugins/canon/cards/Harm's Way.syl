@@ -1,14 +1,13 @@
-card {
-  name = "Harm's Way",
-  cost = [pip(white)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(
-        replace(
-          would(
-            actor(aYourChoice(isSource)),
-            dealDamage(recipient = andOr([you, allOf(and([isPermanent, youControl]))]))),
-          instead(redirectDamage(theNext(lit(2)), target(isAnyTarget)))),
-        thisTurn))]
-}
+card singleFaced({
+    name = "Harm's Way",
+    cost = [pip(white)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(
+          replace(
+            would(
+              actor(aYourChoice(isSource)),
+              dealDamage(recipient = andOr([you, allOf(and([isPermanent, youControl]))]))),
+            instead(redirectDamage(theNext(lit(2)), target(isAnyTarget)))),
+          thisTurn))]})

@@ -1,15 +1,14 @@
-card {
-  name = "Twinshot Sniper",
-  cost = [generic(3), pip(red)],
-  types = [artifact, creature],
-  subtypes = [goblin, archer],
-  text = [
-    reach,
-    when(does(actor(thisCreature), enter), instruct(it, dealDamage(lit(2), target(isAnyTarget)))),
-    channel(
-      activated(
-        compound([mana([generic(1), pip(red)]), perform(discard(this))]),
-        instruct(it, dealDamage(lit(2), target(isAnyTarget)))))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Twinshot Sniper",
+    cost = [generic(3), pip(red)],
+    types = [artifact, creature],
+    subtypes = [goblin, archer],
+    text = [
+      reach,
+      when(does(actor(thisCreature), enter), instruct(it, dealDamage(lit(2), target(isAnyTarget)))),
+      channel(
+        activated(
+          compound([mana([generic(1), pip(red)]), perform(discard(this))]),
+          instruct(it, dealDamage(lit(2), target(isAnyTarget)))))],
+    power = lit(2),
+    toughness = lit(3)})

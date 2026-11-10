@@ -1,10 +1,9 @@
-card {
-  name = "Fluctuator",
-  cost = [generic(2)],
-  types = [artifact],
-  text = [
-    static(
-      costShift(
-        allOf(and([abilityHead(keyword(cycling)), did(actor(you), activate(which), thisObject)])),
-        less(lit(2))))]
-}
+card singleFaced({
+    name = "Fluctuator",
+    cost = [generic(2)],
+    types = [artifact],
+    text = [
+      static(
+        costShift(
+          allOf(and([abilityHead(keyword(cycling)), did(actor(you), activate(which), thisObject)])),
+          less(lit(2))))]})

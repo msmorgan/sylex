@@ -1,12 +1,11 @@
-card {
-  name = "Young Pyromancer",
-  cost = [generic(1), pip(red)],
-  types = [creature],
-  subtypes = [human, shaman],
-  text = [
-    whenever(
-      does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])))),
-      create(lit(1), written(creatureToken(1, 1, [red], [elemental]))))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Young Pyromancer",
+    cost = [generic(1), pip(red)],
+    types = [creature],
+    subtypes = [human, shaman],
+    text = [
+      whenever(
+        does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])))),
+        create(lit(1), written(creatureToken(1, 1, [red], [elemental]))))],
+    power = lit(2),
+    toughness = lit(1)})

@@ -1,18 +1,17 @@
-card {
-  name = "Phyrexian Revoker",
-  cost = [generic(2)],
-  types = [artifact, creature],
-  subtypes = [phyrexian, horror],
-  text = [
-    static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(isLand)))),
-    static(
-      cant(
-        any,
-        activate(
-          allOf(
-            and([
-                abilityHead(anyActivated),
-                abilityOf(allOf(and([isSource, named(chosenName)])))])))))],
-  power = lit(2),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Phyrexian Revoker",
+    cost = [generic(2)],
+    types = [artifact, creature],
+    subtypes = [phyrexian, horror],
+    text = [
+      static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(isLand)))),
+      static(
+        cant(
+          any,
+          activate(
+            allOf(
+              and([
+                  abilityHead(anyActivated),
+                  abilityOf(allOf(and([isSource, named(chosenName)])))])))))],
+    power = lit(2),
+    toughness = lit(1)})

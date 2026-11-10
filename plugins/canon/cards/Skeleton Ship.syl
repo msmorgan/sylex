@@ -1,14 +1,13 @@
-card {
-  name = "Skeleton Ship",
-  cost = [generic(3), pip(blue), pip(black)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [skeleton],
-  text = [
-    when(
-      stateHolds(not(exists(and([isLand, hasSubtype(island), youControl])))),
-      sacrifice(thisCreature)),
-    activated(tapSymbol, putCounters(lit(1), printedKind(m1m1Counter), target(isCreature)))],
-  power = lit(0),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Skeleton Ship",
+    cost = [generic(3), pip(blue), pip(black)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [skeleton],
+    text = [
+      when(
+        stateHolds(not(exists(and([isLand, hasSubtype(island), youControl])))),
+        sacrifice(thisCreature)),
+      activated(tapSymbol, putCounters(lit(1), printedKind(m1m1Counter), target(isCreature)))],
+    power = lit(0),
+    toughness = lit(3)})

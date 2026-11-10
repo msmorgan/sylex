@@ -1,12 +1,11 @@
-card {
-  name = "Garruk's Horde",
-  cost = [generic(5), pip(green), pip(green)],
-  types = [creature],
-  subtypes = [beast],
-  text = [
-    trample,
-    static(visibility(reveal, you, topOfLibrary)),
-    static(can(actor(you), cast(bare(and([isSpell, isCreature])), from = onTop)))],
-  power = lit(7),
-  toughness = lit(7)
-}
+card singleFaced({
+    name = "Garruk's Horde",
+    cost = [generic(5), pip(green), pip(green)],
+    types = [creature],
+    subtypes = [beast],
+    text = [
+      trample,
+      static(visibility(reveal, you, topOfLibrary)),
+      static(can(actor(you), cast(bare(and([isSpell, isCreature])), from = onTop)))],
+    power = lit(7),
+    toughness = lit(7)})

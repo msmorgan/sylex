@@ -1,15 +1,14 @@
-card {
-  name = "Adrix and Nev, Twincasters",
-  cost = [generic(2), pip(green), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [merfolk, wizard],
-  text = [
-    ward(mana([generic(2)])),
-    static(
-      replace(
-        would(any, createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []), you)),
-        instead(create(times(lit(2), groupSize), asThose))))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Adrix and Nev, Twincasters",
+    cost = [generic(2), pip(green), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [merfolk, wizard],
+    text = [
+      ward(mana([generic(2)])),
+      static(
+        replace(
+          would(any, createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []), you)),
+          instead(create(times(lit(2), groupSize), asThose))))],
+    power = lit(2),
+    toughness = lit(2)})

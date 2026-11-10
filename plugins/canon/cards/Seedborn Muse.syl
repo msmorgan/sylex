@@ -1,9 +1,8 @@
-card {
-  name = "Seedborn Muse",
-  cost = [generic(3), pip(green), pip(green)],
-  types = [creature],
-  subtypes = [spirit],
-  text = [static(untapDuring(allOf(youControl), each(isOtherPlayer)))],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Seedborn Muse",
+    cost = [generic(3), pip(green), pip(green)],
+    types = [creature],
+    subtypes = [spirit],
+    text = [static(untapDuring(allOf(youControl), each(isOtherPlayer)))],
+    power = lit(2),
+    toughness = lit(4)})

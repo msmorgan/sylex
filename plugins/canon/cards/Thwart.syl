@@ -1,11 +1,11 @@
-card {
-  name = "Thwart",
-  cost = [generic(2), pip(blue), pip(blue)],
-  types = [instant],
-  text = [
-    static(
-      altCost(
-        this,
-        perform(returnToHand(counted(exactly(3), and([isLand, hasSubtype(island), youControl])))))),
-    spell(counter(target(isSpell)))]
-}
+card singleFaced({
+    name = "Thwart",
+    cost = [generic(2), pip(blue), pip(blue)],
+    types = [instant],
+    text = [
+      static(
+        altCost(
+          this,
+          perform(
+            returnToHand(counted(exactly(3), and([isLand, hasSubtype(island), youControl])))))),
+      spell(counter(target(isSpell)))]})

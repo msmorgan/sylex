@@ -1,26 +1,25 @@
-card {
-  name = "Aya of Alexandria",
-  cost = [generic(2), pip(red), pip(white)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, assassin],
-  text = [
-    menace,
-    lifelink,
-    whenever(
-      does(
-        actor(a(and([isHistoric, isCreature, youControl]))),
-        dealDamage(recipient = a(isPlayer), kind = combat)),
-      create(
-        lit(1),
-        written({
-            characteristics = {
-              colors = [black],
-              types = [creature],
-              subtypes = [assassin],
-              text = [menace],
-              power = lit(1),
-              toughness = lit(1)}})))],
-  power = lit(4),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Aya of Alexandria",
+    cost = [generic(2), pip(red), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, assassin],
+    text = [
+      menace,
+      lifelink,
+      whenever(
+        does(
+          actor(a(and([isHistoric, isCreature, youControl]))),
+          dealDamage(recipient = a(isPlayer), kind = combat)),
+        create(
+          lit(1),
+          written({
+              characteristics = {
+                colors = [black],
+                types = [creature],
+                subtypes = [assassin],
+                text = [menace],
+                power = lit(1),
+                toughness = lit(1)}})))],
+    power = lit(4),
+    toughness = lit(3)})

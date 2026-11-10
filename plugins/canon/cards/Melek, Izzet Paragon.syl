@@ -1,15 +1,14 @@
-card {
-  name = "Melek, Izzet Paragon",
-  cost = [generic(4), pip(blue), pip(red)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [weird, wizard],
-  text = [
-    static(visibility(reveal, you, topOfLibrary)),
-    static(can(actor(you), cast(bare(and([isSpell, isInstantOrSorcery])), from = onTop))),
-    whenever(
-      does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])), from = yourLibrary)),
-      sequentially([copyOnStack(it), may(chooseNewTargets(that(copy)))]))],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Melek, Izzet Paragon",
+    cost = [generic(4), pip(blue), pip(red)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [weird, wizard],
+    text = [
+      static(visibility(reveal, you, topOfLibrary)),
+      static(can(actor(you), cast(bare(and([isSpell, isInstantOrSorcery])), from = onTop))),
+      whenever(
+        does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])), from = yourLibrary)),
+        sequentially([copyOnStack(it), may(chooseNewTargets(that(copy)))]))],
+    power = lit(2),
+    toughness = lit(4)})

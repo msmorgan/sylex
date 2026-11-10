@@ -1,14 +1,13 @@
-card {
-  name = "Crypt Lurker",
-  cost = [generic(3), pip(black)],
-  types = [creature],
-  subtypes = [horror],
-  text = [
-    when(
-      does(actor(thisCreature), enter),
-      may(
-        chooseOne(sacrifice(a(isCreature)), discard(a(and([isCreature, in(yourHand)])))),
-        draw(lit(1))))],
-  power = lit(3),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Crypt Lurker",
+    cost = [generic(3), pip(black)],
+    types = [creature],
+    subtypes = [horror],
+    text = [
+      when(
+        does(actor(thisCreature), enter),
+        may(
+          chooseOne(sacrifice(a(isCreature)), discard(a(and([isCreature, in(yourHand)])))),
+          draw(lit(1))))],
+    power = lit(3),
+    toughness = lit(4)})

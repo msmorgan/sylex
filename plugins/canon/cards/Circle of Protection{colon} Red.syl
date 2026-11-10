@@ -1,14 +1,13 @@
-card {
-  name = "Circle of Protection: Red",
-  cost = [generic(1), pip(white)],
-  types = [enchantment],
-  text = [
-    activated(
-      mana([generic(1)]),
-      establishThroughout(
-        replace(
-          would(actor(aYourChoice(and([isSource, hasColor(red)]))), dealDamage(recipient = you)),
-          instead(preventDamage(allDamage)),
-          use = nextTimeOnly),
-        thisTurn))]
-}
+card singleFaced({
+    name = "Circle of Protection: Red",
+    cost = [generic(1), pip(white)],
+    types = [enchantment],
+    text = [
+      activated(
+        mana([generic(1)]),
+        establishThroughout(
+          replace(
+            would(actor(aYourChoice(and([isSource, hasColor(red)]))), dealDamage(recipient = you)),
+            instead(preventDamage(allDamage)),
+            use = nextTimeOnly),
+          thisTurn))]})

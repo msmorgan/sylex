@@ -1,15 +1,14 @@
-card {
-  name = "Katara, the Fearless",
-  cost = [pip(green), pip(white), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [human, warrior, ally],
-  text = [
-    static(
-      additionalTriggers(
-        triggers(
-          a(and([abilityHead(anyTriggered), abilityOf(a(and([hasSubtype(ally), youControl])))]))),
-        exactly(1)))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Katara, the Fearless",
+    cost = [pip(green), pip(white), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, warrior, ally],
+    text = [
+      static(
+        additionalTriggers(
+          triggers(
+            a(and([abilityHead(anyTriggered), abilityOf(a(and([hasSubtype(ally), youControl])))]))),
+          exactly(1)))],
+    power = lit(3),
+    toughness = lit(3)})

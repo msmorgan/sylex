@@ -1,6 +1,5 @@
-card {
-  name = "Prosperity",
-  cost = [variable, pip(blue)],
-  types = [sorcery],
-  text = [spell(instruct(eachPlayer, draw(letter(x))))]
-}
+card singleFaced({
+    name = "Prosperity",
+    cost = [variable, pip(blue)],
+    types = [sorcery],
+    text = [spell(instruct(eachPlayer, draw(letter(x))))]})

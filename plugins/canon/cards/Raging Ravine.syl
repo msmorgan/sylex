@@ -1,26 +1,25 @@
-card {
-  name = "Raging Ravine",
-  types = [land],
-  text = [
-    static(entersTapped(thisLand)),
-    activated(tapSymbol, addMana(lit(1), manaOf([[colored(red)], [colored(green)]]))),
-    activated(
-      mana([generic(2), pip(red), pip(green)]),
-      establishThroughout(
-        qualityChange(
-          thisLand,
-          sets,
-          bundle({
-              characteristics = {
-                colors = [red, green],
-                types = [creature],
-                subtypes = [elemental],
-                text = [
-                  whenever(
-                    does(actor(thisCreature), attack),
-                    putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
-                power = lit(3),
-                toughness = lit(3)}},
-            land)),
-        untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Raging Ravine",
+    types = [land],
+    text = [
+      static(entersTapped(thisLand)),
+      activated(tapSymbol, addMana(lit(1), manaOf([[colored(red)], [colored(green)]]))),
+      activated(
+        mana([generic(2), pip(red), pip(green)]),
+        establishThroughout(
+          qualityChange(
+            thisLand,
+            sets,
+            bundle({
+                characteristics = {
+                  colors = [red, green],
+                  types = [creature],
+                  subtypes = [elemental],
+                  text = [
+                    whenever(
+                      does(actor(thisCreature), attack),
+                      putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
+                  power = lit(3),
+                  toughness = lit(3)}},
+              land)),
+          untilEndOfTurn))]})

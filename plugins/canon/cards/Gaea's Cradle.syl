@@ -1,9 +1,8 @@
-card {
-  name = "Gaea's Cradle",
-  supertypes = [legendary],
-  types = [land],
-  text = [
-    activated(
-      tapSymbol,
-      addMana(forEach(lit(1), and([isCreature, youControl])), manaOf([[colored(green)]])))]
-}
+card singleFaced({
+    name = "Gaea's Cradle",
+    supertypes = [legendary],
+    types = [land],
+    text = [
+      activated(
+        tapSymbol,
+        addMana(forEach(lit(1), and([isCreature, youControl])), manaOf([[colored(green)]])))]})

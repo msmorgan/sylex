@@ -1,11 +1,11 @@
-card {
-  name = "Mana Matrix",
-  cost = [generic(6)],
-  types = [artifact],
-  text = [
-    static(
-      costShift(
-        allOf(
-          and([or([isInstant, isEnchantment]), isSpell, did(actor(you), cast(which), thisObject)])),
-        less(lit(2))))]
-}
+card singleFaced({
+    name = "Mana Matrix",
+    cost = [generic(6)],
+    types = [artifact],
+    text = [
+      static(
+        costShift(
+          allOf(
+            and(
+              [or([isInstant, isEnchantment]), isSpell, did(actor(you), cast(which), thisObject)])),
+          less(lit(2))))]})

@@ -1,13 +1,12 @@
-card {
-  name = "Sanctuary Blade",
-  cost = [generic(2)],
-  types = [artifact],
-  subtypes = [equipment],
-  text = [
-    static(attachChoosing(thisEquipment, color)),
-    static(
-      conjunction([
-          getsPt(equipped(creature), up(lit(2)), up(lit(0))),
-          abilityGrant(equipped(creature), protection(ofTheLastChosen(color)))])),
-    equip(mana([generic(3)]))]
-}
+card singleFaced({
+    name = "Sanctuary Blade",
+    cost = [generic(2)],
+    types = [artifact],
+    subtypes = [equipment],
+    text = [
+      static(attachChoosing(thisEquipment, color)),
+      static(
+        conjunction([
+            getsPt(equipped(creature), up(lit(2)), up(lit(0))),
+            abilityGrant(equipped(creature), protection(ofTheLastChosen(color)))])),
+      equip(mana([generic(3)]))]})

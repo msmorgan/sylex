@@ -1,22 +1,23 @@
-card {
-  name = "Unesh, Criosphinx Sovereign",
-  cost = [generic(4), pip(blue), pip(blue)],
-  supertypes = [legendary],
-  types = [creature],
-  subtypes = [sphinx],
-  text = [
-    flying,
-    static(
-      costShift(
-        allOf(and([hasSubtype(sphinx), isSpell, did(actor(you), cast(which), thisObject)])),
-        less(lit(2)))),
-    whenever(
-      does(actor(eitherOf(thisCreature, a(and([hasSubtype(sphinx), youControl, isOther])))), enter),
-      sequentially([
-          reveal(topSlice(lit(4))),
-          instruct(anOpponent, separateIntoPiles(them, 2)),
-          putInto(onePile, hand),
-          putInto(theOther, graveyard)]))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Unesh, Criosphinx Sovereign",
+    cost = [generic(4), pip(blue), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [sphinx],
+    text = [
+      flying,
+      static(
+        costShift(
+          allOf(and([hasSubtype(sphinx), isSpell, did(actor(you), cast(which), thisObject)])),
+          less(lit(2)))),
+      whenever(
+        does(
+          actor(eitherOf(thisCreature, a(and([hasSubtype(sphinx), youControl, isOther])))),
+          enter),
+        sequentially([
+            reveal(topSlice(lit(4))),
+            instruct(anOpponent, separateIntoPiles(them, 2)),
+            putInto(onePile, hand),
+            putInto(theOther, graveyard)]))],
+    power = lit(4),
+    toughness = lit(4)})

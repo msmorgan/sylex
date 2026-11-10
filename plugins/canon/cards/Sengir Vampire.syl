@@ -1,19 +1,21 @@
-card {
-  name = "Sengir Vampire",
-  cost = [generic(3), pip(black), pip(black)],
-  types = [creature],
-  subtypes = [vampire],
-  text = [
-    flying,
-    whenever(
-      does(
-        actor(
-          a(
-            and([
-                isCreature,
-                did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))]))),
-        die),
-      putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
-  power = lit(4),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Sengir Vampire",
+    cost = [generic(3), pip(black), pip(black)],
+    types = [creature],
+    subtypes = [vampire],
+    text = [
+      flying,
+      whenever(
+        does(
+          actor(
+            a(
+              and([
+                  isCreature,
+                  did(
+                    actor(thisCreature),
+                    dealDamage(recipient = which),
+                    within(soFarThisTurn))]))),
+          die),
+        putCounters(lit(1), printedKind(p1p1Counter), thisCreature))],
+    power = lit(4),
+    toughness = lit(4)})

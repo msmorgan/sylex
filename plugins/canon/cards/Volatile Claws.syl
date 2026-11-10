@@ -1,11 +1,10 @@
-card {
-  name = "Volatile Claws",
-  cost = [generic(2), pip(red)],
-  types = [instant],
-  text = [
-    spell(
-      establishFor(
-        allOf(and([isCreature, youControl])),
-        [getsPt(them, up(lit(2)), up(lit(0))), qualityChange(them, adds, everyTypeOf(creature))],
-        untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Volatile Claws",
+    cost = [generic(2), pip(red)],
+    types = [instant],
+    text = [
+      spell(
+        establishFor(
+          allOf(and([isCreature, youControl])),
+          [getsPt(them, up(lit(2)), up(lit(0))), qualityChange(them, adds, everyTypeOf(creature))],
+          untilEndOfTurn))]})

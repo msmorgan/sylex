@@ -1,13 +1,12 @@
-card {
-  name = "Rogues' Gallery",
-  cost = [generic(2), pip(black)],
-  types = [sorcery],
-  text = [
-    spell(
-      doForEachKind(
-        color,
-        sort = color,
-        body = returnToHand(
-          targets(upTo(1), and([isCreature, ofChosen(color), in(yourGraveyard)])),
-          yourGraveyard)))]
-}
+card singleFaced({
+    name = "Rogues' Gallery",
+    cost = [generic(2), pip(black)],
+    types = [sorcery],
+    text = [
+      spell(
+        doForEachKind(
+          color,
+          sort = color,
+          body = returnToHand(
+            targets(upTo(1), and([isCreature, ofChosen(color), in(yourGraveyard)])),
+            yourGraveyard)))]})

@@ -1,13 +1,12 @@
-card {
-  name = "Mogg Salvage",
-  cost = [generic(2), pip(red)],
-  types = [instant],
-  text = [
-    static(
-      onlyWhile(
-        altCost(this),
-        and([
-            exists(and([isLand, hasSubtype(island), anOpponentControls])),
-            exists(and([isLand, hasSubtype(mountain), youControl]))]))),
-    spell(destroy(target(isArtifact)))]
-}
+card singleFaced({
+    name = "Mogg Salvage",
+    cost = [generic(2), pip(red)],
+    types = [instant],
+    text = [
+      static(
+        onlyWhile(
+          altCost(this),
+          and([
+              exists(and([isLand, hasSubtype(island), anOpponentControls])),
+              exists(and([isLand, hasSubtype(mountain), youControl]))]))),
+      spell(destroy(target(isArtifact)))]})

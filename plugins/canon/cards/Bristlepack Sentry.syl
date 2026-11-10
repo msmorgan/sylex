@@ -1,17 +1,16 @@
-card {
-  name = "Bristlepack Sentry",
-  cost = [generic(1), pip(green)],
-  types = [creature],
-  subtypes = [plant, wolf],
-  text = [
-    defender,
-    static(
-      onlyWhile(
-        can(
-          actor(thisCreature),
-          attack,
-          asThough = holds(is(it, not(hasKeyword(theKeyword(defender)))))),
-        exists(and([isCreature, youControl, hasPower(atLeast, lit(4))]))))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Bristlepack Sentry",
+    cost = [generic(1), pip(green)],
+    types = [creature],
+    subtypes = [plant, wolf],
+    text = [
+      defender,
+      static(
+        onlyWhile(
+          can(
+            actor(thisCreature),
+            attack,
+            asThough = holds(is(it, not(hasKeyword(theKeyword(defender)))))),
+          exists(and([isCreature, youControl, hasPower(atLeast, lit(4))]))))],
+    power = lit(3),
+    toughness = lit(3)})

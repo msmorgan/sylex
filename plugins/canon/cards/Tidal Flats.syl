@@ -1,20 +1,19 @@
-card {
-  name = "Tidal Flats",
-  cost = [pip(blue)],
-  types = [enchantment],
-  text = [
-    activated(
-      mana([pip(blue), pip(blue)]),
-      doForEach(
-        each(and([isCreature, isAttacking, not(hasKeyword(theKeyword(flying)))])),
-        instruct(
-          controllerOf(it),
-          doUnless(
-            instruct(
-              you,
-              gain(
-                allOf(and([isCreature, youControl, inCombat(blockerOf, that(creature))])),
-                firstStrike,
-                untilEndOfTurn)),
-            mana([generic(1)])))))]
-}
+card singleFaced({
+    name = "Tidal Flats",
+    cost = [pip(blue)],
+    types = [enchantment],
+    text = [
+      activated(
+        mana([pip(blue), pip(blue)]),
+        doForEach(
+          each(and([isCreature, isAttacking, not(hasKeyword(theKeyword(flying)))])),
+          instruct(
+            controllerOf(it),
+            doUnless(
+              instruct(
+                you,
+                gain(
+                  allOf(and([isCreature, youControl, inCombat(blockerOf, that(creature))])),
+                  firstStrike,
+                  untilEndOfTurn)),
+              mana([generic(1)])))))]})

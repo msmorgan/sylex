@@ -1,28 +1,27 @@
-card {
-  name = "At Knifepoint",
-  cost = [generic(1), pip(black), pip(red)],
-  types = [enchantment],
-  text = [
-    static(partScope(turn, you, abilityGrant(allOf(and([isOutlaw, youControl])), firstStrike))),
-    whenever(
-      does(actor(you), commitCrime),
-      create(
-        lit(1),
-        written({
-            characteristics = {
-              colors = [red],
-              types = [creature],
-              subtypes = [mercenary],
-              text = [
-                activatedOnlyDuring(
-                  tapSymbol,
-                  get(
-                    target(and([isCreature, youControl])),
-                    up(lit(1)),
-                    up(lit(0)),
-                    untilEndOfTurn),
-                  asSorcery)],
-              power = lit(1),
-              toughness = lit(1)}})),
-      limit = oncePerTurn)]
-}
+card singleFaced({
+    name = "At Knifepoint",
+    cost = [generic(1), pip(black), pip(red)],
+    types = [enchantment],
+    text = [
+      static(partScope(turn, you, abilityGrant(allOf(and([isOutlaw, youControl])), firstStrike))),
+      whenever(
+        does(actor(you), commitCrime),
+        create(
+          lit(1),
+          written({
+              characteristics = {
+                colors = [red],
+                types = [creature],
+                subtypes = [mercenary],
+                text = [
+                  activatedOnlyDuring(
+                    tapSymbol,
+                    get(
+                      target(and([isCreature, youControl])),
+                      up(lit(1)),
+                      up(lit(0)),
+                      untilEndOfTurn),
+                    asSorcery)],
+                power = lit(1),
+                toughness = lit(1)}})),
+        limit = oncePerTurn)]})

@@ -1,13 +1,12 @@
-card {
-  name = "Aim High",
-  cost = [generic(1), pip(green)],
-  types = [instant],
-  text = [
-    spell(
-      sequentially([
-          untap(target(isCreature)),
-          establishFor(
-            it,
-            [getsPt(it, up(lit(2)), up(lit(2))), abilityGrant(it, reach)],
-            untilEndOfTurn)]))]
-}
+card singleFaced({
+    name = "Aim High",
+    cost = [generic(1), pip(green)],
+    types = [instant],
+    text = [
+      spell(
+        sequentially([
+            untap(target(isCreature)),
+            establishFor(
+              it,
+              [getsPt(it, up(lit(2)), up(lit(2))), abilityGrant(it, reach)],
+              untilEndOfTurn)]))]})

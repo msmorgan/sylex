@@ -1,9 +1,8 @@
-card {
-  name = "Giant Spider",
-  cost = [generic(3), pip(green)],
-  types = [creature],
-  subtypes = [spider],
-  text = [reach],
-  power = lit(2),
-  toughness = lit(4)
-}
+card singleFaced({
+    name = "Giant Spider",
+    cost = [generic(3), pip(green)],
+    types = [creature],
+    subtypes = [spider],
+    text = [reach],
+    power = lit(2),
+    toughness = lit(4)})

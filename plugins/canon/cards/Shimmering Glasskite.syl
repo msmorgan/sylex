@@ -1,16 +1,15 @@
-card {
-  name = "Shimmering Glasskite",
-  cost = [generic(3), pip(blue)],
-  types = [creature],
-  subtypes = [spirit],
-  text = [
-    flying,
-    whenever(
-      nthOccurrence(
-        nth(1),
-        does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
-        turn),
-      counter(that(stackObject)))],
-  power = lit(2),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Shimmering Glasskite",
+    cost = [generic(3), pip(blue)],
+    types = [creature],
+    subtypes = [spirit],
+    text = [
+      flying,
+      whenever(
+        nthOccurrence(
+          nth(1),
+          does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
+          turn),
+        counter(that(stackObject)))],
+    power = lit(2),
+    toughness = lit(3)})

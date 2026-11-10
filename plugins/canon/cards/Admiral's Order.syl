@@ -1,9 +1,10 @@
-card {
-  name = "Admiral's Order",
-  cost = [generic(1), pip(blue), pip(blue)],
-  types = [instant],
-  text = [
-    static(
-      onlyWhile(altCost(this, mana([pip(blue)])), did(actor(you), attack, within(soFarThisTurn)))),
-    spell(counter(target(isSpell)))]
-}
+card singleFaced({
+    name = "Admiral's Order",
+    cost = [generic(1), pip(blue), pip(blue)],
+    types = [instant],
+    text = [
+      static(
+        onlyWhile(
+          altCost(this, mana([pip(blue)])),
+          did(actor(you), attack, within(soFarThisTurn)))),
+      spell(counter(target(isSpell)))]})

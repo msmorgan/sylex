@@ -1,16 +1,15 @@
 # Pins choosing a card name, revealing a random card, and comparing that card
 # to the chosen name. Revealing leaves the card in its zone [CR#701.20b].
-card {
-  name = "Cursed Scroll",
-  cost = [generic(1)],
-  types = [artifact],
-  text = [
-    activated(
-      compound([mana([generic(3)]), tapSymbol]),
-      sequentially([
-          choose(a(quality(cardName))),
-          reveal(aAtRandom(cardIn(yourHand))),
-          doIf(
-            is(that(card), named(chosenName)),
-            instruct(thisArtifact, dealDamage(lit(2), target(isAnyTarget))))]))]
-}
+card singleFaced({
+    name = "Cursed Scroll",
+    cost = [generic(1)],
+    types = [artifact],
+    text = [
+      activated(
+        compound([mana([generic(3)]), tapSymbol]),
+        sequentially([
+            choose(a(quality(cardName))),
+            reveal(aAtRandom(cardIn(yourHand))),
+            doIf(
+              is(that(card), named(chosenName)),
+              instruct(thisArtifact, dealDamage(lit(2), target(isAnyTarget))))]))]})

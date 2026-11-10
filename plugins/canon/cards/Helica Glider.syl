@@ -1,13 +1,12 @@
-card {
-  name = "Helica Glider",
-  cost = [generic(2), pip(white)],
-  types = [creature],
-  subtypes = [nightmare, squirrel],
-  text = [
-    static(
-      enters(
-        thisCreature,
-        [withCounters(lit(1), chosenKind([flyingCounter, firstStrikeCounter]), fresh)]))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Helica Glider",
+    cost = [generic(2), pip(white)],
+    types = [creature],
+    subtypes = [nightmare, squirrel],
+    text = [
+      static(
+        enters(
+          thisCreature,
+          [withCounters(lit(1), chosenKind([flyingCounter, firstStrikeCounter]), fresh)]))],
+    power = lit(2),
+    toughness = lit(2)})

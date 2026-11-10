@@ -1,11 +1,10 @@
-card {
-  name = "Ersatz Gnomes",
-  cost = [generic(3)],
-  types = [artifact, creature],
-  subtypes = [gnome],
-  text = [
-    activated(tapSymbol, becomeColor(target(isSpell), colors([]))),
-    activated(tapSymbol, becomeColor(target(isPermanent), colors([]), untilEndOfTurn))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Ersatz Gnomes",
+    cost = [generic(3)],
+    types = [artifact, creature],
+    subtypes = [gnome],
+    text = [
+      activated(tapSymbol, becomeColor(target(isSpell), colors([]))),
+      activated(tapSymbol, becomeColor(target(isPermanent), colors([]), untilEndOfTurn))],
+    power = lit(1),
+    toughness = lit(1)})

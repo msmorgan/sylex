@@ -1,15 +1,14 @@
-card {
-  name = "Indigo Faerie",
-  cost = [generic(1), pip(blue)],
-  types = [creature],
-  subtypes = [faerie, wizard],
-  text = [
-    flying,
-    activated(
-      mana([pip(blue)]),
-      establishThroughout(
-        qualityChange(target(isPermanent), adds, colored(colors([blue]))),
-        untilEndOfTurn))],
-  power = lit(1),
-  toughness = lit(1)
-}
+card singleFaced({
+    name = "Indigo Faerie",
+    cost = [generic(1), pip(blue)],
+    types = [creature],
+    subtypes = [faerie, wizard],
+    text = [
+      flying,
+      activated(
+        mana([pip(blue)]),
+        establishThroughout(
+          qualityChange(target(isPermanent), adds, colored(colors([blue]))),
+          untilEndOfTurn))],
+    power = lit(1),
+    toughness = lit(1)})

@@ -1,12 +1,11 @@
-card {
-  name = "Gratuitous Violence",
-  cost = [generic(2), pip(red), pip(red), pip(red)],
-  types = [enchantment],
-  text = [
-    static(
-      replace(
-        would(
-          actor(a(and([isCreature, youControl]))),
-          dealDamage(recipient = a(or([isPermanent, isPlayer])))),
-        instead(instruct(it, dealDamage(times(lit(2), thatMuch))))))]
-}
+card singleFaced({
+    name = "Gratuitous Violence",
+    cost = [generic(2), pip(red), pip(red), pip(red)],
+    types = [enchantment],
+    text = [
+      static(
+        replace(
+          would(
+            actor(a(and([isCreature, youControl]))),
+            dealDamage(recipient = a(or([isPermanent, isPlayer])))),
+          instead(instruct(it, dealDamage(times(lit(2), thatMuch))))))]})

@@ -1,12 +1,12 @@
-card {
-  name = "Branching Evolution",
-  cost = [generic(2), pip(green)],
-  types = [enchantment],
-  text = [
-    static(
-      replace(
-        would(
-          any,
-          putCounters(anyAmount, printedKind(p1p1Counter), a(and([isCreature, youControl])))),
-        instead(putCounters(times(lit(2), thatMuch), printedKind(p1p1Counter), that(creature)))))]
-}
+card singleFaced({
+    name = "Branching Evolution",
+    cost = [generic(2), pip(green)],
+    types = [enchantment],
+    text = [
+      static(
+        replace(
+          would(
+            any,
+            putCounters(anyAmount, printedKind(p1p1Counter), a(and([isCreature, youControl])))),
+          instead(
+            putCounters(times(lit(2), thatMuch), printedKind(p1p1Counter), that(creature)))))]})

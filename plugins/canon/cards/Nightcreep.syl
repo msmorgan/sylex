@@ -1,12 +1,14 @@
-card {
-  name = "Nightcreep",
-  cost = [pip(black), pip(black)],
-  types = [instant],
-  text = [
-    spell(
-      establishThroughout(
-        conjunction([
-            qualityChange(allOf(isCreature), sets, colored(colors([black]))),
-            qualityChange(allOf(isLand), sets, bundle({characteristics = {subtypes = [swamp]}}))]),
-        untilEndOfTurn))]
-}
+card singleFaced({
+    name = "Nightcreep",
+    cost = [pip(black), pip(black)],
+    types = [instant],
+    text = [
+      spell(
+        establishThroughout(
+          conjunction([
+              qualityChange(allOf(isCreature), sets, colored(colors([black]))),
+              qualityChange(
+                allOf(isLand),
+                sets,
+                bundle({characteristics = {subtypes = [swamp]}}))]),
+          untilEndOfTurn))]})

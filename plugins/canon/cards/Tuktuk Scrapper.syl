@@ -4,23 +4,22 @@
 # ability is put on the stack, whether or not its controller destroys it [CR#601.2c,603.3d,115.1]:
 # "that artifact" reads it after the optional body, in the lookback and as the damage's possessor
 # (owner ruling 2026-10-23).
-card {
-  name = "Tuktuk Scrapper",
-  cost = [generic(3), pip(red)],
-  types = [creature],
-  subtypes = [goblin, artificer, ally],
-  text = [
-    whenever(
-      does(actor(eitherOf(thisCreature, a(and([hasSubtype(ally), youControl, isOther])))), enter),
-      sequentially([
-          may(destroy(target(isArtifact))),
-          doIf(
-            did(actor(that(artifact)), putInto(theActor, graveyard), thisWay),
-            instruct(
-              thisCreature,
-              dealDamage(
-                countOf(and([hasSubtype(ally), youControl])),
-                controllerOf(that(artifact)))))]))],
-  power = lit(2),
-  toughness = lit(2)
-}
+card singleFaced({
+    name = "Tuktuk Scrapper",
+    cost = [generic(3), pip(red)],
+    types = [creature],
+    subtypes = [goblin, artificer, ally],
+    text = [
+      whenever(
+        does(actor(eitherOf(thisCreature, a(and([hasSubtype(ally), youControl, isOther])))), enter),
+        sequentially([
+            may(destroy(target(isArtifact))),
+            doIf(
+              did(actor(that(artifact)), putInto(theActor, graveyard), thisWay),
+              instruct(
+                thisCreature,
+                dealDamage(
+                  countOf(and([hasSubtype(ally), youControl])),
+                  controllerOf(that(artifact)))))]))],
+    power = lit(2),
+    toughness = lit(2)})

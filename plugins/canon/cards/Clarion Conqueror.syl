@@ -1,18 +1,17 @@
-card {
-  name = "Clarion Conqueror",
-  cost = [generic(2), pip(white)],
-  types = [creature],
-  subtypes = [dragon],
-  text = [
-    flying,
-    static(
-      cant(
-        any,
-        activate(
-          allOf(
-            and([
-                abilityHead(anyActivated),
-                abilityOf(allOf(or([isArtifact, isCreature, isPlaneswalker])))])))))],
-  power = lit(3),
-  toughness = lit(3)
-}
+card singleFaced({
+    name = "Clarion Conqueror",
+    cost = [generic(2), pip(white)],
+    types = [creature],
+    subtypes = [dragon],
+    text = [
+      flying,
+      static(
+        cant(
+          any,
+          activate(
+            allOf(
+              and([
+                  abilityHead(anyActivated),
+                  abilityOf(allOf(or([isArtifact, isCreature, isPlaneswalker])))])))))],
+    power = lit(3),
+    toughness = lit(3)})
