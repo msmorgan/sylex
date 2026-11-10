@@ -1234,3 +1234,51 @@ fn a_nameless_header_on_a_named_kind_is_refused() {
         [RefusalKind::MissingName(s("template"))]
     );
 }
+
+#[test]
+fn a_move_names_no_observation_point() {
+    let written = |action: &str| format!("template t: Action {{ body = {action} }}");
+    // Whether a trigger looks back is derived [CR#603.10a]; `move` takes no
+    // point to write.
+    assert_eq!(
+        plugin_refusals(&written("move(it, battlefield, graveyard, [])")),
+        []
+    );
+    assert_eq!(
+        plugin_refusals(&written(
+            "move(it, battlefield, graveyard, battlefield, [])"
+        )),
+        [
+            (
+                RefusalKind::UnknownWord {
+                    word: s("battlefield"),
+                    sort: s("List(MoveRider)")
+                },
+                s("battlefield")
+            ),
+            (RefusalKind::TooManyArguments(s("move")), s("[]")),
+        ]
+    );
+    assert_eq!(
+        plugin_refusals(&written(
+            "move(it, battlefield, graveyard, [], at = battlefield)"
+        )),
+        [(
+            RefusalKind::UnknownArgument {
+                word: s("move"),
+                argument: s("at")
+            },
+            s("at")
+        )]
+    );
+    // The points themselves are no longer words.
+    let plugins = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins");
+    let builtin = Bundle::load(plugins.join("builtin"), FileId(0)).unwrap();
+    for point in ["arrival", "departure"] {
+        let source = written(&format!("move(it, battlefield, graveyard, {point}, [])"));
+        let canon = bundle("canon", builtin.next_file_id(), &[("cards.syl", &source)]);
+        let Err(CheckError::Declarations(_)) = check(&builtin, &[&canon]) else {
+            panic!("`{point}` names no declaration");
+        };
+    }
+}
