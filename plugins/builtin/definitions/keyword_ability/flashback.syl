@@ -6,7 +6,10 @@ ability flashback(cost: Cost) {
   lexical = {lemma = "flashback", parameters = [[Cost]]},
   spelling = "flashback <cost>",
   body = [
-    static(can(actor(you), cast(this, yourGraveyard, payingInstead($cost), isInstantOrSorcery))),
+    static(
+      can(
+        actor(you),
+        cast(this, yourGraveyard, resulting = isInstantOrSorcery, altCost = payingInstead($cost)))),
     static(
       replace(
         would(actor(thisSpell), leave(stack)),

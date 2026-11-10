@@ -3,5 +3,5 @@
 ability bestow(cost: Cost) {
   lexical = {lemma = "bestow", parameters = [[Cost]]},
   spelling = "bestow <cost>",
-  body = [static(altCost(this, $cost))]
+  body = [static(altCost(payingInstead($cost), this))]
 }

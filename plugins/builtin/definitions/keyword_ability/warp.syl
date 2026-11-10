@@ -13,7 +13,7 @@ ability warp(cost: Cost) {
   body = [
     static(
       onlyWhile(
-        altCost(this, $cost),
+        altCost(payingInstead($cost), this),
         is(this, did(any, cast(which, from = yourHand), thisObject)))),
     static(
       resolutionDelayedTrigger(

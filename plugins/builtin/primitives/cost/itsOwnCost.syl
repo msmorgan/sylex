@@ -1,3 +1,5 @@
-# Paying the spell's or ability's own cost [CR#601.2f].
+# The ordinary cast, play or activation, with no characteristics another `PlayPayment` gives it;
+# its cost is its mana or activation cost, or the alternative and additional costs it takes
+# [CR#601.2f].
 # [CR#601.2f]
 primitive itsOwnCost: PlayPayment = ItsOwnCost

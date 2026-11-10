@@ -8,5 +8,8 @@ ability retrace {
     static(
       can(
         actor(you),
-        cast(this, yourGraveyard, plusAdditional(perform(discard(a(and([isCard, isLand]))))))))]
+        cast(
+          this,
+          yourGraveyard,
+          addedCost = plusAdditional(perform(discard(a(and([isCard, isLand]))))))))]
 }

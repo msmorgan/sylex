@@ -5,7 +5,9 @@ card singleFaced({
     text = [
       static(
         addedCost(
+          this,
           optional,
-          perform(tap(counted(anyNumber, and([isCreature, youControl, isUntapped])))))),
+          plusAdditional(
+            perform(tap(counted(anyNumber, and([isCreature, youControl, isUntapped]))))))),
       static(costShift(this, less(times(1, groupSize)))),
       spell(instruct(this, dealDamage(10, target(isAnyTarget))))]})

@@ -1,2 +1,5 @@
-# Authoring primitive for `StaticSpec.altCost`.
-primitive altCost(subject: NounPhrase, cost: Option(Cost) = none): StaticSpec = AltCost
+# "You may <cost> rather than pay <subject>'s mana cost": an alternative cost its subject's caster
+# may pay [CR#118.9]. "You may cast <subject> without paying its mana cost" is a permission whose
+# `cast` carries the alternative cost (`docs/decisions/semantics.md` §4.7).
+# TODO(spelling): Spell `payingInstead(<cost>)` here as "pay <cost>".
+primitive altCost(cost: AltCost, subject: NounPhrase): StaticSpec = AltCost

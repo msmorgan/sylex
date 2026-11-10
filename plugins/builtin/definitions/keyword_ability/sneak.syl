@@ -12,7 +12,7 @@ ability sneak(cost: Cost) {
         actor(you),
         cast(
           thisSpell,
-          payment = payingInstead(
+          altCost = payingInstead(
             compound(
               [$cost, perform(returnToHand(a(and([isCreature, isUnblocked, youControl]))))]))),
         and([asInstant, duringPart(declareBlockers, you)]))),

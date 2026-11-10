@@ -6,6 +6,6 @@ ability spectacle(cost: Cost) {
   body = [
     static(
       onlyWhile(
-        altCost(this, $cost),
+        altCost(payingInstead($cost), this),
         did(actor(anOpponent), loseLife(anyAmount), within(soFarThisTurn))))]
 }

@@ -6,8 +6,9 @@ card singleFaced({
     text = [
       static(
         altCost(
-          this,
-          perform(exile(a(and([hasColor(blue), hasManaValue(equal, letter(x)), in(yourHand)])))))),
+          payingInstead(
+            perform(exile(a(and([hasColor(blue), hasManaValue(equal, letter(x)), in(yourHand)]))))),
+          this)),
       spell(
         doOnlyIf(
           counter(target(isSpell)),

@@ -5,7 +5,8 @@ card singleFaced({
     text = [
       static(
         altCost(
-          this,
-          perform(
-            returnToHand(counted(exactly(3), and([isLand, hasSubtype(island), youControl])))))),
+          payingInstead(
+            perform(
+              returnToHand(counted(exactly(3), and([isLand, hasSubtype(island), youControl]))))),
+          this)),
       spell(counter(target(isSpell)))]})

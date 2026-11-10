@@ -8,7 +8,7 @@ ability blitz(cost: Cost) {
   lexical = {lemma = "blitz", parameters = [[Cost]]},
   spelling = "blitz <cost>",
   body = [
-    static(altCost(this, $cost)),
+    static(altCost(payingInstead($cost), this)),
     static(
       resolutionDelayedTrigger(
         doIf(

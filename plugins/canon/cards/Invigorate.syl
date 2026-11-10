@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       static(
         onlyWhile(
-          altCost(this, perform(instruct(anOpponent, gainLife(3)))),
+          altCost(payingInstead(perform(instruct(anOpponent, gainLife(3)))), this),
           exists(and([isLand, hasSubtype(forest), youControl])))),
       spell(get(target(isCreature), up(4), up(4), untilEndOfTurn))]})

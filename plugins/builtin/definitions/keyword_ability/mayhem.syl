@@ -7,5 +7,5 @@ ability mayhem(cost: Cost) {
     static(
       conditionFirstWhile(
         did(actor(you), discard(thisCard), within(soFarThisTurn)),
-        can(actor(you), cast(thisCard, yourGraveyard, payingInstead($cost)))))]
+        can(actor(you), cast(thisCard, yourGraveyard, altCost = payingInstead($cost)))))]
 }

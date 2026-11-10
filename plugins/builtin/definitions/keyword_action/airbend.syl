@@ -12,6 +12,8 @@ action airbend(subject: NounPhrase) {
         instruct(
           ownerOf(it),
           establish(
-            can(actor(ownerOf(it)), cast(it, exileZone, payingInstead(mana([generic(2)])))),
+            can(
+              actor(ownerOf(it)),
+              cast(it, exileZone, altCost = payingInstead(mana([generic(2)])))),
             forAsLongAs(is(it, in(exileZone))))))])
 }

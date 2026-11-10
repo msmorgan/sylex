@@ -6,6 +6,7 @@ ability webSlinging(cost: Cost) {
   body = [
     static(
       altCost(
-        this,
-        compound([$cost, perform(returnToHand(a(and([isCreature, isTapped, youControl]))))])))]
+        payingInstead(
+          compound([$cost, perform(returnToHand(a(and([isCreature, isTapped, youControl]))))])),
+        this))]
 }

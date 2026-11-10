@@ -29,7 +29,7 @@ ability suspend(amount: Amount, cost: Cost) {
     when(
       does(any, removeCounters(theLast, printedKind(timeCounter), thisCard)),
       sequentially([
-          may(play(thisCard, payment = withoutPaying)),
+          may(play(thisCard, altCost = withoutPaying)),
           doIf(
             did(actor(you), cast(a(and([isCreature, isSpell]))), thisWay),
             gain(

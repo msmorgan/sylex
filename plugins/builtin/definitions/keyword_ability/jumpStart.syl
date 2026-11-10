@@ -13,8 +13,8 @@ ability jumpStart {
         cast(
           this,
           yourGraveyard,
-          plusAdditional(perform(discard(a(isCard)))),
-          isInstantOrSorcery))),
+          resulting = isInstantOrSorcery,
+          addedCost = plusAdditional(perform(discard(a(isCard))))))),
     static(
       replace(
         would(actor(thisSpell), leave(stack)),

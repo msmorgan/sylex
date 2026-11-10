@@ -12,4 +12,4 @@ card singleFaced({
           cast(
             target(and([isInstantOrSorcery, isCard])),
             from = graveyardOf(anOpponent),
-            payment = withoutPaying)))]})
+            altCost = withoutPaying)))]})

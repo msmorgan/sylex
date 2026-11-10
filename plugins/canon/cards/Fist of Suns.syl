@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       static(
         altCost(
-          allOf(and([isSpell, did(actor(you), cast(which), thisObject)])),
-          mana([pip(white), pip(blue), pip(black), pip(red), pip(green)])))]})
+          payingInstead(mana([pip(white), pip(blue), pip(black), pip(red), pip(green)])),
+          allOf(and([isSpell, did(actor(you), cast(which), thisObject)]))))]})

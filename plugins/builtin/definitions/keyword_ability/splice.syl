@@ -15,5 +15,7 @@ ability splice(quality: Predicate, cost: Cost) {
     static(
       revealedAsCast(
         a(and([isSpell, $quality])),
-        conjunction([addedCost(mandatory, $cost), textChange(that(spell), appendTextOf(this))])))]
+        conjunction([
+            addedCost(that(spell), mandatory, plusAdditional($cost)),
+            textChange(that(spell), appendTextOf(this))])))]
 }

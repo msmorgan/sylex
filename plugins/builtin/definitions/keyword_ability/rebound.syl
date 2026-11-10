@@ -18,5 +18,5 @@ ability rebound {
                 exile(thisSpell),
                 atNext(
                   beginningOf(upkeep, you, nextTime),
-                  may(cast(this, payment = withoutPaying)))])))))]
+                  may(cast(this, altCost = withoutPaying)))])))))]
 }

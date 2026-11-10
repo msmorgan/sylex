@@ -6,7 +6,7 @@ ability replicate(cost: Cost) {
   lexical = {lemma = "replicate", parameters = [[Cost]]},
   spelling = "replicate <cost>",
   body = [
-    static(addedCost(optional, $cost, anyNumberOfTimes)),
+    static(addedCost(this, optional, plusAdditional($cost, times = anyNumberOfTimes))),
     when(
       does(actor(you), cast(thisSpell)),
       sequentially([

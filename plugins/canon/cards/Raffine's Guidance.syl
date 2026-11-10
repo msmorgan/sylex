@@ -12,4 +12,4 @@ card singleFaced({
           cast(
             this,
             from = yourGraveyard,
-            payment = payingInstead(mana([generic(2), pip(white)])))))]})
+            altCost = payingInstead(mana([generic(2), pip(white)])))))]})

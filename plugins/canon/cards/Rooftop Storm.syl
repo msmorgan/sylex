@@ -5,7 +5,10 @@ card singleFaced({
     text = [
       static(
         altCost(
+          payingInstead(mana([generic(0)])),
           allOf(
-            and(
-              [hasSubtype(zombie), isCreature, isSpell, did(actor(you), cast(which), thisObject)])),
-          mana([generic(0)])))]})
+            and([
+                hasSubtype(zombie),
+                isCreature,
+                isSpell,
+                did(actor(you), cast(which), thisObject)]))))]})

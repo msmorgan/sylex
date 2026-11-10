@@ -6,4 +6,6 @@ primitive procedure(
   payment: PlayPayment,
   resulting: Option(Predicate) = none,
   from: Option(Location) = none,
-  of: Option(NounPhrase) = none): Action = Procedure
+  of: Option(NounPhrase) = none,
+  altCost: Option(AltCost) = none,
+  addedCost: Option(AddedCost) = none): Action = Procedure

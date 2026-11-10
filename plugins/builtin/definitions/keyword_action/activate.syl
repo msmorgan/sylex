@@ -1,10 +1,21 @@
-# "activate <subject> [from <from>] [paying <payment>]" (`Definition`, [CR#701.2a]).
+# "activate <subject> [from <from>] [<payment>] [<altCost>] [<addedCost>]" (`Definition`,
+# [CR#701.2a]).
 action activate(
   subject: NounPhrase,
   from: Option(Location) = none,
   payment: PlayPayment = itsOwnCost,
-  resulting: Option(Predicate) = none) {
-  # TODO(spelling): Include or omit the clauses supplied by from, resulting.
+  resulting: Option(Predicate) = none,
+  altCost: Option(AltCost) = none,
+  addedCost: Option(AddedCost) = none) {
+  # TODO(spelling): Include or omit the clauses supplied by from, resulting, altCost,
+  # addedCost.
   lexical = {verbs = [{lemma = "activate", frames = [Monotransitive, Intransitive]}]},
-  body = procedure(activate, $subject, $payment, $resulting, $from)
+  body = procedure(
+    activate,
+    $subject,
+    $payment,
+    $resulting,
+    $from,
+    altCost = $altCost,
+    addedCost = $addedCost)
 }

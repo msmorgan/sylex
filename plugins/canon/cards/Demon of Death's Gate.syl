@@ -6,10 +6,11 @@ card singleFaced({
     text = [
       static(
         altCost(
-          this,
-          compound([
-              perform(payLife(6)),
-              perform(sacrifice(counted(exactly(3), and([isCreature, hasColor(black)]))))]))),
+          payingInstead(
+            compound([
+                perform(payLife(6)),
+                perform(sacrifice(counted(exactly(3), and([isCreature, hasColor(black)]))))])),
+          this)),
       flying,
       trample],
     power = 9,

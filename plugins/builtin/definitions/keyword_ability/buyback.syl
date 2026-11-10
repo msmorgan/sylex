@@ -5,7 +5,7 @@ ability buyback(cost: Cost) {
   lexical = {lemma = "buyback", parameters = [[Cost]]},
   spelling = "buyback <cost>",
   body = [
-    static(addedCost(optional, $cost)),
+    static(addedCost(this, optional, plusAdditional($cost))),
     static(
       replace(
         causedBy(

@@ -7,4 +7,4 @@ card singleFaced({
       static(
         conditionFirstWhile(
           compareAmt(countOf(cardIn(yourHand)), atLeast, 7),
-          altCost(allOf(abilityHead(keyword(cycling))), mana([generic(0)]))))]})
+          altCost(payingInstead(mana([generic(0)])), allOf(abilityHead(keyword(cycling))))))]})

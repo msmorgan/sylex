@@ -23,7 +23,7 @@ ability foretell(cost: Cost) {
               forAsLongAs(is(it, hasDesignation(foretold)))),
             establishThroughout(
               onlyWhile(
-                can(actor(you), cast(it, from = exileZone, payment = payingInstead($cost))),
+                can(actor(you), cast(it, from = exileZone, altCost = payingInstead($cost))),
                 is(it, hasDesignation(foretold))),
               onALaterTurn)])))]
 }

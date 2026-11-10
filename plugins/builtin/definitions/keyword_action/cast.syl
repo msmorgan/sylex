@@ -1,10 +1,21 @@
-# "cast <subject> [from <from>] [paying <payment>]" (`Definition`, [CR#701.5a,701.5b]).
+# "cast <subject> [from <from>] [<payment>] [if the resulting spell is <resulting>] [<altCost>]
+# [<addedCost>]" (`Definition`, [CR#701.5a,701.5b]).
 action cast(
   subject: NounPhrase,
   from: Option(Location) = none,
   payment: PlayPayment = itsOwnCost,
-  resulting: Option(Predicate) = none) {
-  # TODO(spelling): Include or omit the clauses supplied by from, resulting.
+  resulting: Option(Predicate) = none,
+  altCost: Option(AltCost) = none,
+  addedCost: Option(AddedCost) = none) {
+  # TODO(spelling): Include or omit the clauses supplied by from, resulting, altCost,
+  # addedCost.
   lexical = {verbs = [{lemma = "cast", past = "cast", frames = [Monotransitive]}]},
-  body = procedure(cast, $subject, $payment, $resulting, $from)
+  body = procedure(
+    cast,
+    $subject,
+    $payment,
+    $resulting,
+    $from,
+    altCost = $altCost,
+    addedCost = $addedCost)
 }

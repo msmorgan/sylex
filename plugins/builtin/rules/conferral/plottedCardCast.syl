@@ -9,6 +9,6 @@ conferral plottedCardCast {
     confer = ability(
       static(
         onlyUnless(
-          can(actor(you), cast(this, exileZone, withoutPaying), asSorcery),
+          can(actor(you), cast(this, exileZone, altCost = withoutPaying), asSorcery),
           did(any, gainDesignation(this, plotted), within(soFarThisTurn)))))}
 }

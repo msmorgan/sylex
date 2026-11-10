@@ -11,7 +11,7 @@ card singleFaced({
           cast(
             this,
             from = yourGraveyard,
-            payment = payingInstead(
+            altCost = payingInstead(
               compound([
                   mana([pip(black), pip(black)]),
                   perform(sacrifice(counted(exactly(2), isCreature)))])))))],

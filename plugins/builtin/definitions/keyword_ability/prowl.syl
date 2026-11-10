@@ -6,7 +6,7 @@ ability prowl(cost: Cost) {
   body = [
     static(
       onlyWhile(
-        altCost(this, $cost),
+        altCost(payingInstead($cost), this),
         did(
           actor(a(and([shares(subtype(creature), share, thisSpell), youControl]))),
           dealDamage(recipient = a(isPlayer), kind = combat),

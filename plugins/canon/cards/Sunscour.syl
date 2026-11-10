@@ -4,5 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       static(
-        altCost(this, perform(exile(counted(exactly(2), and([hasColor(white), in(yourHand)])))))),
+        altCost(
+          payingInstead(perform(exile(counted(exactly(2), and([hasColor(white), in(yourHand)]))))),
+          this)),
       spell(destroy(allOf(isCreature)))]})

@@ -1,10 +1,21 @@
-# "play <subject> [from <from>] [paying <payment>]" (`Definition`, [CR#701.18a]).
+# "play <subject> [from <from>] [<payment>] [if the resulting spell is <resulting>] [<altCost>]
+# [<addedCost>]" (`Definition`, [CR#701.18a]).
 action play(
   subject: NounPhrase,
   from: Option(Location) = none,
   payment: PlayPayment = itsOwnCost,
-  resulting: Option(Predicate) = none) {
-  # TODO(spelling): Include or omit the clauses supplied by from, resulting.
+  resulting: Option(Predicate) = none,
+  altCost: Option(AltCost) = none,
+  addedCost: Option(AddedCost) = none) {
+  # TODO(spelling): Include or omit the clauses supplied by from, resulting, altCost,
+  # addedCost.
   lexical = {verbs = [{lemma = "play", frames = [Monotransitive, Intransitive]}]},
-  body = procedure(play, $subject, $payment, $resulting, $from)
+  body = procedure(
+    play,
+    $subject,
+    $payment,
+    $resulting,
+    $from,
+    altCost = $altCost,
+    addedCost = $addedCost)
 }

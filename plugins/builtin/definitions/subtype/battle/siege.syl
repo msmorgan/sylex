@@ -12,7 +12,7 @@ subtype siege {
       when(
         does(any, removeCounters(theLast, printedKind(defenseCounter), thisPermanent)),
         sequentially(
-          [exile(it), may(cast(it, payment = withoutPaying, resulting = isTransformed))]))),
+          [exile(it), may(cast(it, resulting = isTransformed, altCost = withoutPaying))]))),
     stateBased(
       and([
           compareAmt(countersOn(defenseCounter, this), equal, 0),

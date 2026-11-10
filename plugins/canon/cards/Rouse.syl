@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       static(
         onlyWhile(
-          altCost(this, perform(payLife(2))),
+          altCost(payingInstead(perform(payLife(2))), this),
           exists(and([isLand, hasSubtype(swamp), youControl])))),
       spell(get(target(isCreature), up(2), up(0), untilEndOfTurn))]})

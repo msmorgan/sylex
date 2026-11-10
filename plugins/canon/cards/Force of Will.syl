@@ -5,6 +5,8 @@ card singleFaced({
     text = [
       static(
         altCost(
-          this,
-          compound([perform(payLife(1)), perform(exile(a(and([hasColor(blue), in(yourHand)]))))]))),
+          payingInstead(
+            compound(
+              [perform(payLife(1)), perform(exile(a(and([hasColor(blue), in(yourHand)]))))])),
+          this)),
       spell(counter(target(isSpell)))]})

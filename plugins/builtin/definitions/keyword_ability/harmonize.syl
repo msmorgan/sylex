@@ -13,7 +13,7 @@ ability harmonize(cost: Cost) {
         cast(
           this,
           yourGraveyard,
-          payingInstead(
+          altCost = payingInstead(
             compound([
                 $cost,
                 perform(

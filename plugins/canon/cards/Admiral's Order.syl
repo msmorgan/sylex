@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       static(
         onlyWhile(
-          altCost(this, mana([pip(blue)])),
+          altCost(payingInstead(mana([pip(blue)])), this),
           did(actor(you), attack, within(soFarThisTurn)))),
       spell(counter(target(isSpell)))]})

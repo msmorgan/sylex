@@ -6,8 +6,10 @@ card singleFaced({
     text = [
       static(
         altCost(
-          this,
-          perform(exile(a(and([hasColor(white), hasManaValue(equal, letter(x)), in(yourHand)])))))),
+          payingInstead(
+            perform(
+              exile(a(and([hasColor(white), hasManaValue(equal, letter(x)), in(yourHand)]))))),
+          this)),
       spell(
         establishThroughout(
           replace(

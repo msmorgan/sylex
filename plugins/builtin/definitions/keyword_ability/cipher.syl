@@ -20,5 +20,5 @@ ability cipher {
           may(
             sequentially([
                 copy(fromCardZone, the(and([isCard, related(encodedOn, thisCreature)])), 1, []),
-                may(cast(that(copy), payment = withoutPaying))])))))]
+                may(cast(that(copy), altCost = withoutPaying))])))))]
 }

@@ -18,7 +18,7 @@ card prototype(
                     hasManaValue(atMost, powerOf(thisCreature)),
                     in(yourGraveyard)]))),
             copy(fromCardZone, that(card), 1, []),
-            may(cast(that(copy), payment = withoutPaying))]))],
+            may(cast(that(copy), altCost = withoutPaying))]))],
     power = 4,
     toughness = 3},
   alternative = {cost = [generic(1), pip(blue), pip(blue)], power = 2, toughness = 1})

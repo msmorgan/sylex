@@ -9,6 +9,6 @@ conferral foretoldCardCast {
     confer = ability(
       static(
         onlyUnless(
-          can(actor(you), cast(this, exileZone, usingKeyword(foretell))),
+          can(actor(you), cast(this, exileZone, altCost = usingKeyword(foretell))),
           did(any, gainDesignation(this, foretold), within(soFarThisTurn)))))}
 }

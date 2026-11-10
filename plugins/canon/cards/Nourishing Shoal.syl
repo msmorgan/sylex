@@ -6,6 +6,8 @@ card singleFaced({
     text = [
       static(
         altCost(
-          this,
-          perform(exile(a(and([hasColor(green), hasManaValue(equal, letter(x)), in(yourHand)])))))),
+          payingInstead(
+            perform(
+              exile(a(and([hasColor(green), hasManaValue(equal, letter(x)), in(yourHand)]))))),
+          this)),
       spell(gainLife(letter(x)))]})

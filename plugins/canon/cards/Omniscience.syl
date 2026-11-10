@@ -5,4 +5,5 @@ card singleFaced({
     text = [
       static(
         altCost(
+          withoutPaying,
           allOf(and([isSpell, did(actor(you), cast(which, from = yourHand), thisObject)]))))]})
