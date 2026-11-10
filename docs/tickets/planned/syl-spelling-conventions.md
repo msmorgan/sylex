@@ -23,23 +23,23 @@ ticket's corpus rewrite migrates every `<name>` Hole to `$name`.
 - A verb is written uninflected wherever its agreement depends on a hole or on the performer;
   agreement is solved when the clause is rendered. Three cases:
   - The performer is outside the declaration (`actor`): the spelling is the bare verb phrase.
-    `die` is `"die"`, `sacrifice` is `"sacrifice <subject>"`, `win` is `"win the game"`.
+    `die` is `"die"`, `sacrifice` is `"sacrifice $subject"`, `win` is `"win the game"`.
   - The grammatical Subject is a parameter: the hole stays and the verb is still uninflected.
-    `becomeBlocked(subject)` is `"<subject> become blocked"`, likewise `becomeBlocking`,
+    `becomeBlocked(subject)` is `"$subject become blocked"`, likewise `becomeBlocking`,
     `stopBlocking` and `phaseOutUntil`. These keep `subject` because their Subject is the
     patient, not the performer (`does(any, becomeBlocked(this))`, `semantics.md` §4.2).
   - The Subject is fixed inside the declaration and no hole decides agreement: the verb is
-    written as printed. `controllerSacrifices` stays `"<subject>'s controller sacrifices it"`.
-- A hole is `<name>`; angle brackets never appear in Oracle text. Square brackets do (cleave), so
-  they are never markup.
+    written as printed. `controllerSacrifices` stays `"$subject's controller sacrifices it"`.
 - A spelling with several parses keeps every parse that recovers to its `body`, and fails to load
   if none does. A wording difference with the same meaning lives in which Template a card calls,
   never in the AST.
 
 ## Done when
 
-- `docs/decisions/syl.md` §2 states the conventions, and the glossary has an entry for a
-  spelling's holes.
+- `docs/decisions/spelling.md` §1 states the inflection rule and §7 the notation, which
+  `docs/decisions/syl.md` §2 points at, and the glossary has a **Hole** entry.
+- Every `<name>` Hole under `plugins/` is written `$name`, or `$<name>` where a word character
+  follows it.
 - In separate corpus commits: every spelling follows the three inflection cases, and every
   `TODO(spelling)` whose wording needs no optional or repeated segment is resolved, either written
   or replaced by the specific missing wording.
@@ -53,10 +53,10 @@ ticket's corpus rewrite migrates every `<name>` Hole to `$name`.
 
 ## Not in scope
 
-How a spelling expresses optional and repeated segments (a list hole, a
-defaulted or `Option` parameter), which is open. The spelling crate itself.
+Writing the optional parts and list Holes `TODO(spelling)` markers need:
+`syl-spelling-optional-segments`. The spelling crate itself.
 
 ## Pointers
 
-`docs/decisions/syl.md` §2,
+`docs/decisions/spelling.md` §1 and §7, `docs/decisions/syl.md` §2,
 `docs/decisions/lexicon.md` §1, `crates/syl/`.

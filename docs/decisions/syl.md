@@ -87,7 +87,10 @@ location is not stated by the declaration, and it can disagree with what the dec
   `confers`, `rules`). Why: a word's frames, spelling and meaning are one fact, so they have one
   source. Keyword `parameters` are spelling frames and live in `lexical`. A Primitive Keyword
   Ability is the exception: its `lexical` is on its label primitive at `KeywordLabel`, and its
-  `spelling` and meaning (`primitiveKeyword(<label>)`) are on its Template at `Ability` (§3).
+  `spelling` and meaning (`primitiveKeyword(firstStrike)`) are on its Template at `Ability` (§3).
+- **A `spelling` is written in the notation of [`spelling.md`](./spelling.md) §7**, where a Hole
+  is `$name`, the sigil that reads the same parameter in `body`. The corpus still writes a Hole
+  `<name>`, which `syl-spelling-conventions` migrates.
 - **Citations live in comments.** There is no `rule` field; `cargo xtask cite` checks the comments.
 - **Paths are for people.** Folder and file names never carry meaning.
 
@@ -166,8 +169,8 @@ declared word at any other sort is wrapped by a coercion or by a written primiti
 ## 5. Read Order
 
 Read order is printed order. A declaration's parameters are read in the order its spelling prints
-them, with no per-declaration exception: where the printed order differs ("When <event>, if
-<condition>, <action>"), the declaration's parameters are reordered to match. Why: reference
+them, with no per-declaration exception: where the printed order differs ("When $event, if
+$condition, $action"), the declaration's parameters are reordered to match. Why: reference
 resolution sees what the text says first as first, spelling renders a declaration in its parameter
 order, and a reference oracle keyed to printed text lines up with the term only if the two orders
 agree.

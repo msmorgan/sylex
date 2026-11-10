@@ -16,17 +16,14 @@ wordings that differ only by such a part become near-duplicate Template families
 
 Written against the spine (`cleanup-step6-spine`).
 
-## Open questions
+## Design
 
-The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `$xs<join>` lists,
-`( … )` optional parts, `<Category: …>` Tails); where this ticket's text differs, §7 governs.
-
-- How a spelling expresses an optional segment (tied to a defaulted or `Option` parameter), a
-  repeated segment (a `List` parameter) and list formatting ("A, B, and C").
+- The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `$xs<join>` lists,
+  `( … )` optional parts, `<Category: …>` Tails); where this ticket's text differs, §7 governs.
 
 ## Done when
 
-- `docs/decisions/syl.md` §2 states the notation, and `sylex_syl` parses and formats it.
+- `sylex_syl` parses and formats the notation `docs/decisions/spelling.md` §7 states.
 - Every `TODO(spelling)` that needed an optional or repeated segment is written with it.
 - The near-duplicate Template families that differed only by such a segment are each one
   Template; the landing lists the merges.
@@ -41,4 +38,4 @@ The other spelling conventions (verb inflection, the hole syntax): `syl-spelling
 
 ## Pointers
 
-`docs/decisions/syl.md` §2, `crates/syl/`, `rg 'TODO\(spelling\)' plugins/`.
+`docs/decisions/spelling.md` §7, `crates/syl/`, `rg 'TODO\(spelling\)' plugins/`.
