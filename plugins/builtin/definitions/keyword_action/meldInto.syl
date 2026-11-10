@@ -3,5 +3,5 @@ action meldInto(subject: NounPhrase, into: String) {
   lexical = {verbs = [{lemma = "meld", frames = [TransitiveWithPP(["into"])]}]},
   deed = "meld",
   spelling = "meld <subject> into <into>",
-  body = move($subject, anywhere, battlefield, arrival, [entersMelded($into)])
+  body = move($subject, anywhere, battlefield, [entersMelded($into)])
 }

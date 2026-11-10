@@ -9,7 +9,7 @@ card singleFaced({
       at(
         beginningOfPossessed(endStep, eachPlayer),
         putCounters(
-          eventCount(putIntoFromBattlefield(a(isCreature), yourGraveyard), any, soFarThisTurn),
+          eventCount(putInto(a(isCreature), yourGraveyard, from = battlefield), any, soFarThisTurn),
           printedKind(p1p1Counter),
           thisCreature))],
     power = 2,

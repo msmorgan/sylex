@@ -21,6 +21,5 @@ ability cascade {
             allOf(and([isCard, was(exile(which), thisWay), not(was(cast(which), thisWay))])),
             anywhere,
             onBottom,
-            arrival,
             [inOrder(randomOrder)])]))]
 }

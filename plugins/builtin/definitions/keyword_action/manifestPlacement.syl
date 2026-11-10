@@ -2,5 +2,5 @@
 action manifestPlacement(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "manifest", frames = [Monotransitive]}]},
   deed = "manifest",
-  body = move($subject, anywhere, battlefield, arrival, [])
+  body = move($subject, anywhere, battlefield, [])
 }

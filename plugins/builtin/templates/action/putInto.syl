@@ -1,6 +1,5 @@
 # "put <subject> into <destination> [from <from>] [<riders>]", as "in any order" or "under
-# its owner's control". From the battlefield it is `putIntoFromBattlefield`, observed on its
-# departure.
+# its owner's control". "Put into a graveyard from the battlefield" writes its origin as `from`.
 template putInto(
   subject: NounPhrase,
   destination: Location,

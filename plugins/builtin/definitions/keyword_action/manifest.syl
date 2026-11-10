@@ -4,5 +4,5 @@ action manifest(subject: NounPhrase) {
   spelling = "manifest <subject>",
   body = sequentially([
       turnFaceDown($subject, faceDownCreature),
-      move($subject, anywhere, battlefield, arrival, [faceDownAs(faceDownCreature)])])
+      move($subject, anywhere, battlefield, [faceDownAs(faceDownCreature)])])
 }

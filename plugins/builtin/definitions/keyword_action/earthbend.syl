@@ -15,8 +15,6 @@ action earthbend(amount: Amount) {
             addedAbilities([haste])])),
       putCounters($amount, printedKind(p1p1Counter), that(land)),
       delay(
-        or([
-            does(actor(that(land)), die),
-            does(any, move(that(land), battlefield, exileZone, departure, []))]),
+        or([does(actor(that(land)), die), does(any, move(that(land), battlefield, exileZone, []))]),
         returnToBattlefield(that(land), [entersAs(tapped), under(actor)]))])
 }

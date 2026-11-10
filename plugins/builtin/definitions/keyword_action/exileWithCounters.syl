@@ -3,10 +3,5 @@ action exileWithCounters(subject: NounPhrase, amount: Amount, kind: CounterKind)
   spelling = "exile <subject> with <amount> <kind> counters on it",
   lexical = {verbs = [{lemma = "exile", frames = [Monotransitive]}]},
   deed = "exile",
-  body = move(
-    $subject,
-    anywhere,
-    exileZone,
-    arrival,
-    [withCounters($amount, printedKind($kind), fresh)])
+  body = move($subject, anywhere, exileZone, [withCounters($amount, printedKind($kind), fresh)])
 }

@@ -18,6 +18,5 @@ ability ripple(amount: Amount) {
               allOf(and([isCard, was(reveal(which), thisWay), not(was(cast(which), thisWay))])),
               anywhere,
               onBottom,
-              arrival,
               [inOrder(anyOrder)])])))]
 }

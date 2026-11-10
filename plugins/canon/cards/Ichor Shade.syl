@@ -7,7 +7,7 @@ card singleFaced({
       at(
         beginningOfYour(endStep),
         if = was(
-          putIntoFromBattlefield(a(or([isArtifact, isCreature])), graveyard),
+          putInto(a(or([isArtifact, isCreature])), graveyard, from = battlefield),
           within(soFarThisTurn)),
         action = putCounters(1, printedKind(p1p1Counter), thisCreature))],
     power = 2,

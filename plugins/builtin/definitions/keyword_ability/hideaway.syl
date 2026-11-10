@@ -12,7 +12,7 @@ ability hideaway(amount: Amount) {
       sequentially([
           lookAt(topSlice($amount)),
           exileFaceDown(someOf(oneThrough(1), them)),
-          move(theRest, anywhere, onBottom, arrival, [inOrder(randomOrder)]),
+          move(theRest, anywhere, onBottom, [inOrder(randomOrder)]),
           establishThroughout(
             conjunction([
                 visibility(lookAt, you, objects(the(and([was(exile(which)), isCard])))),

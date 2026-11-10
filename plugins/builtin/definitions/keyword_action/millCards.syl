@@ -4,5 +4,5 @@ action millCards(cards: NounPhrase) {
   lexical = {verbs = [{lemma = "mill", frames = [Monotransitive]}]},
   deed = "mill",
   spelling = "mill <cards>",
-  body = move($cards, library, graveyard, arrival, [])
+  body = move($cards, library, graveyard, [])
 }

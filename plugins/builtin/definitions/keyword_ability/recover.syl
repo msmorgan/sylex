@@ -6,6 +6,6 @@ ability recover(cost: Cost) {
   spelling = "recover <cost>",
   body = [
     when(
-      does(any, move(a(isCreature), battlefield, yourGraveyard, departure, [])),
+      does(any, move(a(isCreature), battlefield, yourGraveyard, [])),
       may(pay($cost, once), returnToHand(this, yourGraveyard), exile(this)))]
 }

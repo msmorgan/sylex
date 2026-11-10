@@ -9,4 +9,6 @@ card singleFaced({
             and([
                 isPermanentCard,
                 in(yourGraveyard),
-                was(putIntoFromBattlefield(which, yourGraveyard), within(soFarThisTurn))]))))]})
+                was(
+                  putInto(which, yourGraveyard, from = battlefield),
+                  within(soFarThisTurn))]))))]})

@@ -1,12 +1,9 @@
-# [CR#704.5m] An Aura that is not attached is put into its owner's graveyard. The move is from
-# the battlefield, so it is observed on its departure [CR#603.6c,603.10a].
+# [CR#704.5m] An Aura that is not attached is put into its owner's graveyard.
 subtype aura {
   lexical = {lemma = "Aura"},
   spelling = "Aura",
   kind = [enchantment],
   name = "Aura",
   confers = [
-    stateBased(
-      not(isAttached(thisAura)),
-      move(thisAura, zone(battlefield, none), graveyard, departure, []))]
+    stateBased(not(isAttached(thisAura)), move(thisAura, zone(battlefield, none), graveyard, []))]
 }

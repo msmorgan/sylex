@@ -2,5 +2,5 @@
 action exile(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "exile", frames = [Monotransitive]}]},
   spelling = "exile <subject>",
-  body = move($subject, anywhere, exileZone, arrival, [])
+  body = move($subject, anywhere, exileZone, [])
 }

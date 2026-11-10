@@ -2,5 +2,5 @@
 action destroy(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "destroy", frames = [Monotransitive]}]},
   spelling = "destroy <subject>",
-  body = move($subject, zone(battlefield, none), graveyard, departure, [])
+  body = move($subject, zone(battlefield, none), graveyard, [])
 }
