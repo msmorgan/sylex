@@ -1,2 +1,6 @@
-# Authoring primitive for `Predicate.coinCameUp`.
+# "whose coin comes up <face>": each player or object a coin was flipped for whose coin came up
+# `face` [CR#705.2] (Goblin Assassin, Rakdos, the Showstopper). It shares no read with die
+# results: a coin comes up a face, while a die result is a number [CR#706.2], and a value stands
+# only at its own sort (`syl.md` §2), so one typed read cannot return both. It is not
+# `compareOver` over `coinsShowing`, which counts the coins of a flip, not the coin of one member.
 primitive coinCameUp(face: CoinFace): Predicate = CoinCameUp

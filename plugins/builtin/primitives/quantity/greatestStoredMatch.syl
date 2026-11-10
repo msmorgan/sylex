@@ -1,2 +1,4 @@
-# The greatest number of matching stored die results on the subject.
+# "the greatest number of stored results on <subject> of the same value" (Centaur of Attention).
+# It is not `aggregateOver` or `superlative`: a stored result is noted information, not an object
+# [CR#706.8a], so no `Predicate` ranges over stored results.
 primitive greatestStoredMatch(subject: NounPhrase): Amount = GreatestStoredMatch

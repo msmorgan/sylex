@@ -1,2 +1,3 @@
-# Store die results on the subject.
+# Store the results of the dice just rolled on `on`: note each die's kind and result
+# [CR#706.8a].
 primitive storeResults(on: NounPhrase): Action = StoreResults

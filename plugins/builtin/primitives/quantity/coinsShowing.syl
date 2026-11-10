@@ -1,4 +1,7 @@
-# The number of coins showing the specified face.
+# The number of coins of the flip that came up `face` [CR#705.2] (Ral Zarek, Guest Lecturer). It
+# shares no read with die results: a coin comes up a face, while a die result is a number
+# [CR#706.2], and a value stands only at its own sort (`syl.md` §2), so one typed read cannot
+# return both.
 primitive coinsShowing(face: CoinFace): Amount = CoinsShowing {
   spelling = "the number of coins that came up <face>"
 }

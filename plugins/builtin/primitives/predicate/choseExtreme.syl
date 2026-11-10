@@ -1,2 +1,6 @@
-# Authoring primitive for `Predicate.choseExtreme`.
+# "with the <op> number": each player whose secretly chosen number is the `op` of the numbers
+# chosen, ties included (Menacing Ogre: "each player with the highest number"). It is not
+# `superlative` or `compareOver` over `chosenNumber`: `chosenNumber` reads the number of the one
+# choice its `ref` names, no `ChoiceRef` names the number a given player chose, and no `ProjAxis`
+# measures it, so neither can measure each player by their own number.
 primitive choseExtreme(op: AggregateOp): Predicate = ChoseExtreme

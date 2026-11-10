@@ -1,3 +1,6 @@
-# A results table: one row per result range [CR#706.3a]
-# [CR#706.3a]
+# A results table: one row per result range, each meaning "If the result was in this range,
+# [effect]" [CR#706.3a]. It is not a `doIf` per row: `resultIn` tests a result against a range
+# `Quantity`, but it is a `RollWatch`, not a `Condition`, and declaration bodies are first-order
+# data with no higher-order parameters (`syl.md` §2), so no Template can turn each row into a
+# `doIf`.
 primitive applyResultsTable(rows: List(RollRow)): Action = ApplyResultsTable

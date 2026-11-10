@@ -1,4 +1,6 @@
-# The actor rolled doubles.
+# "you rolled doubles": the result of each of the actor's rolls is equal to the other [CR#706.5].
+# It compares the rolls with one another, not a result with a bound, so `anyResultIs` cannot say
+# it.
 primitive rolledDoubles: Condition = RolledDoubles {
   spelling = "you rolled doubles"
 }

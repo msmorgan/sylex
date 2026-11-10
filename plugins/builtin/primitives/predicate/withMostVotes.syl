@@ -1,4 +1,8 @@
-# Authoring primitive for `Predicate.withMostVotes`.
+# "with the most votes or tied for most votes": each of a vote's choices that got the most votes,
+# ties included (Council's Judgment, Custodi Squire) [CR#701.38a]. It is not `superlative` over
+# `votesFor`: its choices are objects or other variables, not words [CR#701.38b], and `votesFor`
+# counts the votes for one named word. No `ProjAxis` measures the votes a choice got, so
+# `superlative` has nothing to rank by.
 primitive withMostVotes: Predicate = WithMostVotes {
   spelling = "with the most votes"
 }

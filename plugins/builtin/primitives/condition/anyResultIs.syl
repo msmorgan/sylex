@@ -1,2 +1,6 @@
-# Compare a die result with the specified bound.
+# "if any of those results was <comparator> <bound>": some one of the results of the dice rolled
+# compares with `bound`; each die has its own result [CR#706.2]. It is not `compareAmt`: no
+# `Amount` reads one result of several. It shares no read with coins, whose results are faces,
+# not numbers [CR#705.2], since a value stands only at its own sort (`syl.md` §2) and one typed
+# read cannot return both.
 primitive anyResultIs(comparator: Comparator, bound: Amount): Condition = AnyResultIs
