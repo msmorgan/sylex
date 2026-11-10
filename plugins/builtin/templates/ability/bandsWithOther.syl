@@ -1,0 +1,5 @@
+# "bands with other <quality>" [CR#702.22b]
+template bandsWithOther(quality: Predicate): Ability {
+  spelling = "bands with other <quality>",
+  body = primitiveKeyword(bandsWithOther, quality = $quality)
+}

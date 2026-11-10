@@ -1,0 +1,5 @@
+# "trample" [CR#702.19a]
+template trample: Ability {
+  spelling = "trample",
+  body = primitiveKeyword(trample)
+}

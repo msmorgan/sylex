@@ -1,0 +1,5 @@
+# Trample is a static ability that modifies the rules for assigning an attacking creature’s combat
+# damage. [CR#702.19a]
+primitive trample: KeywordLabel = Trample {
+  lexical = {lemma = "trample", parameters = [[], [Quality(Some("over"))]]}
+}

@@ -1,0 +1,5 @@
+# "double strike" [CR#702.4a]
+template doubleStrike: Ability {
+  spelling = "double strike",
+  body = primitiveKeyword(doubleStrike)
+}

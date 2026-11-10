@@ -1,0 +1,5 @@
+# "first strike" [CR#702.7a]
+template firstStrike: Ability {
+  spelling = "first strike",
+  body = primitiveKeyword(firstStrike)
+}

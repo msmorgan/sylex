@@ -1,0 +1,5 @@
+# "banding" [CR#702.22a]
+template banding: Ability {
+  spelling = "banding",
+  body = primitiveKeyword(banding)
+}

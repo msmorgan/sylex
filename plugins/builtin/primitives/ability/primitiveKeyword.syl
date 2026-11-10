@@ -1,0 +1,7 @@
+# A Primitive Keyword Ability: one the engine implements natively rather than as a Definition.
+# `keyword` is its label, and `quality` the quality its printed form names ("bands with other
+# <quality>" [CR#702.22b]). Each such keyword's `lexical` is on its label primitive and its
+# `spelling` on its Template, so its word has two declarations where `syl.md` §2 asks for one.
+primitive primitiveKeyword(
+  keyword: KeywordLabel,
+  quality: Option(Predicate) = none): Ability = PrimitiveKeyword

@@ -1,0 +1,4 @@
+# Banding is a static ability that modifies the rules for combat. [CR#702.22a]
+primitive banding: KeywordLabel = Banding {
+  lexical = {lemma = "banding", verbs = [{lemma = "band", frames = [TransitiveWithPP(["with"])]}]}
+}
