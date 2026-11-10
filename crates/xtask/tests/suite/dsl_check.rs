@@ -586,20 +586,33 @@ fn a_card_face_is_a_characteristics_record() {
     assert_eq!(kinds(&source), [RefusalKind::IntegerAt(s("Color"))]);
 }
 
+/// A subtype's `kind` is the list of card types it is correlated with: a
+/// shared family names a Template at `List(CardType)` (Spirit and Arcane), a
+/// single-type family a list literal (Siege). A lone card type is no list.
 #[test]
-fn a_spell_subtype_kind_is_not_resolved() {
+fn a_subtype_kind_is_a_list_of_card_types() {
     assert_eq!(
-        kinds(
-            "template spell: Int { body = 1 }\n\
-             card_type creature { }\n\
+        refusals(&[(
+            "a.syl",
+            "card_type creature { }\n\
+             card_type kindred { }\n\
+             card_type instant { }\n\
+             card_type sorcery { }\n\
+             card_type battle { }\n\
+             template creature: List(CardType) { body = [creature, kindred] }\n\
+             template spell: List(CardType) { body = [instant, sorcery] }\n\
+             subtype spirit { kind = creature }\n\
              subtype arcane { kind = spell }\n\
-             subtype elf { kind = creature }\n\
-             subtype bad { kind = arcane }"
-        ),
-        [RefusalKind::UnknownWord {
-            word: s("arcane"),
-            sort: s("CardType")
-        }]
+             subtype siege { kind = [battle] }\n\
+             subtype bad { kind = battle }"
+        )]),
+        [(
+            RefusalKind::UnknownWord {
+                word: s("battle"),
+                sort: s("List(CardType)")
+            },
+            s("battle")
+        )]
     );
 }
 

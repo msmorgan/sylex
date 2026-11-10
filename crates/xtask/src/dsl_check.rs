@@ -46,7 +46,6 @@ use self::schema::Form;
 use self::schema::KINDS;
 use self::schema::Kind;
 use self::schema::RECORDS;
-use self::schema::TextWord;
 use self::sort::SortKey;
 use self::sort::sort_key;
 
@@ -111,9 +110,7 @@ impl fmt::Display for Summary {
 #[derive(Debug, Clone)]
 struct Slot {
     name: String,
-    /// `None`: written but not resolved, for the one temporary exception that
-    /// needs it (`schema::TextWord`).
-    sort: Option<SortKey>,
+    sort: SortKey,
     optional: bool,
 }
 
@@ -288,7 +285,7 @@ fn header(declaration: &Declaration, ring: bool) -> Result<Decl<'_>, Refusal> {
         }
         params.push(Slot {
             name: param_name.to_owned(),
-            sort: Some(sort_key(&param.sort)?),
+            sort: sort_key(&param.sort)?,
             optional: param.default.is_some(),
         });
     }
@@ -385,10 +382,7 @@ fn known_sorts(decls: &[Decl<'_>], registry: &Registry) -> BTreeSet<String> {
     produced.extend(RECORDS.iter().map(|record| record.sort.to_owned()));
     let mut consumed = BTreeSet::new();
     for param in decls.iter().flat_map(|decl| &decl.params) {
-        add(
-            param.sort.as_ref().expect("parameters have sorts"),
-            &mut consumed,
-        );
+        add(&param.sort, &mut consumed);
     }
     for kind in KINDS {
         let secondary = kind.secondary.map(|secondary| secondary.sort);
@@ -450,10 +444,7 @@ fn resolve(
         // A default reads only the parameters before it.
         for (index, param) in named.params.iter().filter_map(Item::node).enumerate() {
             if let Some(default) = &param.default {
-                let sort = decl.params[index]
-                    .sort
-                    .as_ref()
-                    .expect("parameters have sorts");
+                let sort = &decl.params[index].sort;
                 let params = &decl.params[..index];
                 Resolver {
                     registry,
@@ -515,23 +506,16 @@ impl Resolver<'_> {
         if decl.kind.record_fields && !own_fields {
             return self.record(block, &decl.sort);
         }
-        let mut slots: Vec<Slot> = decl
+        let slots: Vec<Slot> = decl
             .kind
             .fields
             .iter()
             .map(|spec| Slot {
                 name: spec.name.to_owned(),
-                sort: Some(spec.sort.map_or_else(|| decl.sort.clone(), SortKey::table)),
+                sort: spec.sort.map_or_else(|| decl.sort.clone(), SortKey::table),
                 optional: !spec.required,
             })
             .collect();
-        // Temporary: `syl-subtype-card-types` deletes this exception.
-        if let Some(TextWord { field, word }) = decl.kind.text_word
-            && decl.field(field).is_some_and(|value| is_bare(value, word))
-        {
-            let slot = slots.iter_mut().find(|slot| slot.name == field);
-            slot.expect("the text word's field is the kind's").sort = None;
-        }
         self.fields(block, &slots, &at);
     }
 
@@ -552,11 +536,7 @@ impl Resolver<'_> {
                 continue;
             }
             match slots.iter().find(|slot| slot.name == name) {
-                Some(slot) => {
-                    if let Some(sort) = &slot.sort {
-                        self.value(&field.value, sort);
-                    }
-                }
+                Some(slot) => self.value(&field.value, &slot.sort),
                 None => self.refuse(
                     field.name.span,
                     RefusalKind::UnknownField {
@@ -592,7 +572,7 @@ impl Resolver<'_> {
             .iter()
             .map(|(name, sort, optional)| Slot {
                 name: (*name).to_owned(),
-                sort: Some(SortKey::table(sort)),
+                sort: SortKey::table(sort),
                 optional: *optional,
             })
             .collect();
@@ -669,7 +649,7 @@ impl Resolver<'_> {
         let Some(param) = self.params.iter().find(|p| p.name == name) else {
             return self.refuse(span, RefusalKind::UnknownParameter(name.to_owned()));
         };
-        let sort = param.sort.as_ref().expect("parameters have sorts");
+        let sort = &param.sort;
         if sort != expected && expected.option_inner() != Some(sort) {
             self.refuse(
                 span,
@@ -727,10 +707,7 @@ impl Resolver<'_> {
                 continue;
             }
             bound.push(&param.name);
-            self.value(
-                &arg.value,
-                param.sort.as_ref().expect("parameters have sorts"),
-            );
+            self.value(&arg.value, &param.sort);
         }
         for param in &signature.params {
             if !param.optional && !bound.contains(&param.name.as_str()) {

@@ -26,17 +26,6 @@ pub struct Kind {
     /// When the block writes none of `fields`, it writes the fields of the
     /// kind's record sort directly.
     pub record_fields: bool,
-    /// Temporary: a field whose bare `word` is read as text, a word that
-    /// never resolves. `syl-subtype-card-types` deletes this exception.
-    pub text_word: Option<TextWord>,
-}
-
-/// Temporary: `field = word` is read as text. `syl-subtype-card-types`
-/// deletes this exception.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct TextWord {
-    pub field: &'static str,
-    pub word: &'static str,
 }
 
 /// How a declaration kind is written.
@@ -106,7 +95,6 @@ const fn kind(word: &'static str, sort: &'static str, fields: &'static [FieldSpe
         secondary: None,
         catalog: false,
         record_fields: false,
-        text_word: None,
     }
 }
 
@@ -207,21 +195,16 @@ pub const KINDS: &[Kind] = &[
             CONFERS,
         ],
     ),
-    Kind {
-        text_word: Some(TextWord {
-            field: "kind",
-            word: "spell",
-        }),
-        ..catalog(
-            "subtype",
-            "Subtype",
-            &[
-                required("kind", "CardType"),
-                field("name", "String"),
-                CONFERS,
-            ],
-        )
-    },
+    catalog(
+        "subtype",
+        "Subtype",
+        &[
+            // The card types it is correlated with [CR#205.3c,205.3d].
+            required("kind", "List(CardType)"),
+            field("name", "String"),
+            CONFERS,
+        ],
+    ),
     catalog(
         "card_type",
         "CardType",
