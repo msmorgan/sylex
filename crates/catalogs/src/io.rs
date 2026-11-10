@@ -51,30 +51,6 @@ impl CatalogSet {
         )
     }
 
-    /// Publish canonical catalogs and their corpus-checked nickname artifact
-    /// together.
-    ///
-    /// # Errors
-    /// Returns an error if rendering or atomic directory replacement fails.
-    pub fn write_to_with_nicknames(
-        &self,
-        output: impl AsRef<Path>,
-        nicknames: &crate::CardNameNicknames,
-    ) -> Result<(), CatalogError> {
-        write_rendered_directory_with_placement(
-            output.as_ref(),
-            || {
-                let mut files = CatalogKind::ALL
-                    .into_iter()
-                    .map(|kind| render(kind.filename(), self.get(kind)))
-                    .collect::<Result<Vec<_>, _>>()?;
-                files.push((crate::CardNameNicknames::FILENAME, nicknames.render()?));
-                Ok(files)
-            },
-            |source, destination| fs::rename(source, destination),
-        )
-    }
-
     #[cfg(test)]
     fn write_to_with_placement(
         &self,

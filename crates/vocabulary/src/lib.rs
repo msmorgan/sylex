@@ -10,6 +10,7 @@ mod build;
 #[macro_use]
 mod data_text;
 mod names;
+mod shortening;
 pub mod schema;
 
 use std::path::PathBuf;
@@ -32,7 +33,7 @@ use crate::build::card_scoped;
 use crate::build::exact;
 use crate::build::source;
 pub use crate::data_text::read_data_file;
-pub use crate::names::AttestedShortenings;
+pub use crate::shortening::AttestedShortenings;
 pub use crate::names::shortened_name;
 use crate::schema::AbilityWord;
 use crate::schema::AdjectiveDecl;
@@ -126,9 +127,9 @@ const CITED_NAMES: &str = "catalogs/cited_names.ron";
 const PLURAL_NAMES: &str = "catalogs/plural_names.ron";
 /// The card-name catalog, relative to the repository root.
 pub const CARD_NAMES: &str = "data/gen/catalogs/card-names.txt";
-/// The shortened spellings each card's own text uses for it [CR#201.5c],
-/// relative to the repository root.
-pub const SHORTENED_NAMES: &str = "data/gen/catalogs/card-name-nicknames.json";
+/// The pinned Oracle corpus, relative to the repository root; each legendary
+/// face's Shortened Name [CR#201.5c] is computed from it.
+pub const ORACLE_CARDS: &str = "data/scryfall/oracle-cards.jsonl";
 
 fn parse<T: DeserializeOwned>(path: &str) -> Result<T, SourceError> {
     let text = FILES
@@ -183,24 +184,15 @@ pub struct LexicalEnvironment {
 
 impl LexicalEnvironment {
     /// Loads every data file, the card names at [`card_names_path`] and
-    /// their attested shortenings at [`shortened_names_path`].
+    /// their attested shortenings computed from the corpus at
+    /// [`oracle_cards_path`].
     ///
     /// # Errors
-    /// An unreadable card-name or shortening file, or any
+    /// An unreadable card-name or corpus file, or any
     /// [`Sources::environment`] error.
     pub fn load() -> Result<Self, SourceError> {
         let names = read(&card_names_path())?;
         Sources::load()?.environment(&names, &AttestedShortenings::load()?)
-    }
-}
-
-impl AttestedShortenings {
-    /// Loads the attested shortenings at [`shortened_names_path`].
-    ///
-    /// # Errors
-    /// An unreadable or malformed file.
-    pub fn load() -> Result<Self, SourceError> {
-        Self::parse(&read(&shortened_names_path())?)
     }
 }
 
@@ -219,12 +211,12 @@ pub fn card_names_path() -> PathBuf {
         .join(CARD_NAMES)
 }
 
-/// The attested-shortening catalog in this repository.
+/// The Oracle corpus in this repository.
 #[must_use]
-pub fn shortened_names_path() -> PathBuf {
+pub fn oracle_cards_path() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../..")
-        .join(SHORTENED_NAMES)
+        .join(ORACLE_CARDS)
 }
 
 impl Sources {

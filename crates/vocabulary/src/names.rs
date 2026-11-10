@@ -1,6 +1,5 @@
 //! Card names [CR#201.1] and their Shortened Names [CR#201.5c].
 
-use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
 use sylex_lexicon::Binding;
@@ -12,37 +11,9 @@ use sylex_lexicon::Lexicon;
 use sylex_lexicon::SourceKind;
 
 use crate::CARD_NAMES;
-use crate::SourceError;
+use crate::AttestedShortenings;
 use crate::build::exact;
 use crate::build::source;
-
-/// The shortened spelling each card's own text uses for it, keyed by full
-/// card name: the corpus attestation generated into
-/// `data/gen/catalogs/card-name-nicknames.json`.
-#[derive(Debug, Clone, Default, PartialEq, Eq, serde::Deserialize)]
-pub struct AttestedShortenings {
-    #[serde(rename = "nicknames")]
-    shortenings: BTreeMap<String, String>,
-}
-
-impl AttestedShortenings {
-    /// Parses the generated catalog.
-    ///
-    /// # Errors
-    /// Malformed JSON.
-    pub fn parse(text: &str) -> Result<Self, SourceError> {
-        serde_json::from_str(text).map_err(|error| SourceError::Format {
-            path: crate::SHORTENED_NAMES.to_owned(),
-            message: error.to_string(),
-        })
-    }
-
-    /// The shortened spelling `name`'s own text uses, if any.
-    #[must_use]
-    pub fn get(&self, name: &str) -> Option<&str> {
-        self.shortenings.get(name).map(String::as_str)
-    }
-}
 
 /// The Shortened Name of a full card name: the shortened spelling its own
 /// text uses for it [CR#201.5c] (`attested`). A card whose text never

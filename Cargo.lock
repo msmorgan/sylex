@@ -1443,8 +1443,6 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "sha2",
- "sylex_lexicon",
  "sylex_upstream",
  "tempfile",
  "thiserror",
@@ -1658,6 +1656,7 @@ dependencies = [
  "serde_json",
  "sylex_lexicon",
  "sylex_syntax",
+ "sylex_upstream",
  "thiserror",
 ]
 

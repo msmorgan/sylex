@@ -1,51 +1,42 @@
+//! The shortened spelling each card's own text uses for it [CR#201.5c],
+//! computed from the Oracle corpus as the card names load.
+
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
-use std::fmt::Write as FmtWrite;
-use std::fs;
 use std::fs::File;
-use std::io::Cursor;
-use std::io::Read;
-use std::path::Path;
+use std::io::BufRead;
+use std::io::BufReader;
 
-use serde::Deserialize;
-use serde::Serialize;
-use sha2::Digest;
-use sha2::Sha256;
 use sylex_lexicon::Numeral;
 use sylex_lexicon::NumeralCodec;
 use sylex_upstream::scryfall::OracleCardReader;
 
-use crate::CatalogError;
-use crate::error::IoContext;
+use crate::SourceError;
 
-/// Attested shortened spellings keyed by full card name, with corpus
-/// provenance.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct CardNameNicknames {
-    version: u32,
-    corpus_size: u64,
-    corpus_sha256: String,
-    nicknames: BTreeMap<String, String>,
+/// The shortened spelling each legendary permanent face's own Oracle text
+/// uses for it, keyed by full card name.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct AttestedShortenings {
+    shortenings: BTreeMap<String, String>,
 }
 
-impl CardNameNicknames {
-    pub const FILENAME: &'static str = "card-name-nicknames.json";
-
-    /// Derive shortened spellings from the exact corpus bytes used by
-    /// generation.
+impl AttestedShortenings {
+    /// Computes every face's attested shortening from the Oracle corpus.
     ///
     /// # Errors
-    /// Returns an error if a source record fails `OracleCardReader` validation.
-    pub fn generate(bytes: &[u8]) -> Result<Self, CatalogError> {
+    /// A corpus record that fails `OracleCardReader` validation.
+    pub fn from_corpus(corpus: impl BufRead) -> Result<Self, SourceError> {
         let mut titles = BTreeSet::new();
-        let mut units = Vec::new();
-        for card in OracleCardReader::new(Cursor::new(bytes)) {
-            let card = card?;
+        let mut faces = Vec::new();
+        for card in OracleCardReader::new(corpus) {
+            let card = card.map_err(|error| SourceError::Format {
+                path: crate::ORACLE_CARDS.to_owned(),
+                message: error.to_string(),
+            })?;
             for unit in card.oracle_units() {
                 titles.insert(unit.display_name().to_owned());
                 if card.supported() && legendary_permanent(unit.type_line()) {
-                    units.push((
+                    faces.push((
                         unit.display_name().to_owned(),
                         unit.oracle_text().unwrap_or("").to_owned(),
                     ));
@@ -53,80 +44,33 @@ impl CardNameNicknames {
             }
         }
         let titles = title_index(&titles);
-        let nicknames = units
+        let shortenings = faces
             .iter()
             .filter_map(|(name, text)| {
                 attested_short_name(name, text, &titles)
                     .map(|short| (name.clone(), short.to_owned()))
             })
             .collect();
-        Ok(Self {
-            version: 1,
-            corpus_size: bytes.len() as u64,
-            corpus_sha256: hex_digest(Sha256::digest(bytes)),
-            nicknames,
-        })
+        Ok(Self { shortenings })
     }
 
-    /// Read a generated catalog and verify its source size and SHA-256.
+    /// Computes the shortenings from the Oracle corpus in this repository.
     ///
     /// # Errors
-    /// Missing, malformed, unsupported-version or stale catalogs request
-    /// regeneration.
-    pub fn load(directory: &Path, corpus: &Path) -> Result<Self, CatalogError> {
-        let path = directory.join(Self::FILENAME);
-        let bytes = fs::read(&path).map_err(|error| CatalogError::NicknameCatalog {
-            path: path.clone(),
-            reason: error.to_string(),
+    /// An unreadable corpus, or any [`Self::from_corpus`] error.
+    pub fn load() -> Result<Self, SourceError> {
+        let path = crate::oracle_cards_path();
+        let file = File::open(&path).map_err(|error| SourceError::Io {
+            path: path.display().to_string(),
+            message: error.to_string(),
         })?;
-        let catalog: Self =
-            serde_json::from_slice(&bytes).map_err(|error| CatalogError::NicknameCatalog {
-                path: path.clone(),
-                reason: error.to_string(),
-            })?;
-        let mut file = File::open(corpus).at("opening nickname source", corpus)?;
-        let size = file
-            .metadata()
-            .at("reading nickname source size", corpus)?
-            .len();
-        if catalog.version != 1 || size != catalog.corpus_size {
-            return Err(CatalogError::NicknameCatalog {
-                path,
-                reason: "stale corpus size or catalog version".into(),
-            });
-        }
-        let mut hasher = Sha256::new();
-        let mut buffer = vec![0_u8; 64 * 1024];
-        loop {
-            let count = file
-                .read(&mut buffer)
-                .at("hashing nickname source", corpus)?;
-            if count == 0 {
-                break;
-            }
-            hasher.update(&buffer[..count]);
-        }
-        if hex_digest(hasher.finalize()) != catalog.corpus_sha256 {
-            return Err(CatalogError::NicknameCatalog {
-                path,
-                reason: "stale corpus SHA-256".into(),
-            });
-        }
-        Ok(catalog)
+        Self::from_corpus(BufReader::new(file))
     }
 
+    /// The shortened spelling `name`'s own text uses, if any.
     #[must_use]
-    pub fn nicknames(&self) -> &BTreeMap<String, String> {
-        &self.nicknames
-    }
-
-    pub(crate) fn render(&self) -> Result<String, CatalogError> {
-        serde_json::to_string(self)
-            .map(|json| format!("{json}\n"))
-            .map_err(|source| CatalogError::Json {
-                path: Self::FILENAME.into(),
-                source,
-            })
+    pub fn get(&self, name: &str) -> Option<&str> {
+        self.shortenings.get(name).map(String::as_str)
     }
 }
 
@@ -237,18 +181,8 @@ fn short_name(name: &str) -> Option<&str> {
     (candidate != name && !candidate.is_empty()).then_some(candidate)
 }
 
-fn hex_digest(bytes: impl IntoIterator<Item = u8>) -> String {
-    let mut result = String::with_capacity(64);
-    for byte in bytes {
-        write!(result, "{byte:02x}").expect("writing to a String is infallible");
-    }
-    result
-}
-
 #[cfg(test)]
 mod tests {
-    use std::io::BufReader;
-
     use super::*;
 
     #[test]
@@ -276,8 +210,7 @@ mod tests {
 
     #[test]
     fn only_standalone_short_references_in_pinned_oracle_text_become_aliases() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-        let file = File::open(root.join("data/scryfall/oracle-cards.jsonl")).unwrap();
+        let file = File::open(crate::oracle_cards_path()).unwrap();
         let expected = BTreeMap::from([
             ("Captain Sisay", None),
             ("Shang-Chi and the Ten Rings", Some("Shang-Chi")),
@@ -305,18 +238,13 @@ mod tests {
             }
         }
         assert_eq!(observed.len(), expected.len());
-        let aliases = CardNameNicknames::generate(
-            &fs::read(root.join("data/scryfall/oracle-cards.jsonl")).unwrap(),
-        )
-        .unwrap()
-        .nicknames()
-        .clone();
+        let aliases = AttestedShortenings::load().unwrap();
         let titles = title_index(&titles);
         assert!(observed["Nissa Revane"].contains("named Nissa's Chosen"));
         for (name, text) in observed {
             let short = expected[name.as_str()];
             assert_eq!(attested_short_name(&name, &text, &titles), short, "{name}");
-            assert_eq!(aliases.get(&name).map(String::as_str), short, "{name}");
+            assert_eq!(aliases.get(&name), short, "{name}");
         }
     }
 

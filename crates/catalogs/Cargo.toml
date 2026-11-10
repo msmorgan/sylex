@@ -14,5 +14,3 @@ sylex_upstream = { version = "0.1.0", path = "../upstream" }
 regex = "1.12.3"
 tempfile = "3.27.0"
 serde = { version = "1.0.228", features = ["derive"] }
-sha2 = "0.11.0"
-sylex_lexicon = { version = "0.1.0", path = "../lexicon" }

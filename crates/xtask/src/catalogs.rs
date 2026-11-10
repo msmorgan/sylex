@@ -10,7 +10,6 @@ use std::path::PathBuf;
 use anyhow::Context;
 use clap::Args;
 use clap::Subcommand;
-use sylex_catalogs::CardNameNicknames;
 use sylex_catalogs::CatalogSet;
 use sylex_catalogs::compare_directories;
 use sylex_catalogs::legacy::LegacyCatalogSet;
@@ -134,8 +133,7 @@ fn write_catalogs(cr_path: &Path, oracle_cards_path: &Path, output: &Path) -> an
             oracle_cards_path.display()
         )
     })?;
-    let nicknames = CardNameNicknames::generate(&bytes)?;
-    Ok(catalogs.write_to_with_nicknames(output, &nicknames)?)
+    Ok(catalogs.write_to(output)?)
 }
 
 #[cfg(test)]
@@ -182,7 +180,6 @@ mod tests {
                 "ability-words.txt",
                 "artifact-types.txt",
                 "battle-types.txt",
-                "card-name-nicknames.json",
                 "card-names.txt",
                 "card-types.txt",
                 "counter-kind-phrases.txt",
