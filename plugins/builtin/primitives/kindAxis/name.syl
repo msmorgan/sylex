@@ -1,0 +1,5 @@
+# One kind per name: an object is in the group of each name it has, and an object with no name is
+# in no group, since it has the same name as no other object [CR#201.2a].
+primitive name: KindAxis = Name {
+  spelling = "name"
+}

@@ -1,0 +1,43 @@
+# [CR#205.4d,704.5j] "If two or more legendary permanents with the same name are controlled by the
+# same player, that player chooses one of them, and the rest are put into their owners' graveyards.
+# This is called the "legend rule."" Card text names it, so it is a named row rather than part of
+# `legendary`. Scoped to players, so "you" is the player, as in `playerDamageLifeLoss`. Each name
+# two or more of them have in common is one group; the player chooses one permanent of each group,
+# and the rest are put into their owners' graveyards together, as one event [CR#704.3]. Two
+# permanents have the same name if they have at least one name in common, and one with no name
+# shares none [CR#201.2a], so a legendary permanent that shares its name with no other is in no
+# group and is not chosen.
+sba legendRule {
+  lexical = {lemma = "legend rule"},
+  spelling = "legend rule",
+  body = {
+    scope = isPlayer,
+    when = thereAre(
+      withTheSameName(counted(orMore(2), and([hasSupertype(legendary), isPermanent, youControl])))),
+    then = sequentially([
+        doForEachKind(
+          name,
+          allOf(
+            and([
+                hasSupertype(legendary),
+                isPermanent,
+                youControl,
+                shares(
+                  cardName,
+                  share,
+                  a(and([isOther, hasSupertype(legendary), isPermanent, youControl])))])),
+          cardName,
+          choose(a(and([hasSupertype(legendary), isPermanent, youControl, named(chosenName)])))),
+        putInto(
+          each(
+            and([
+                hasSupertype(legendary),
+                isPermanent,
+                youControl,
+                shares(
+                  cardName,
+                  share,
+                  a(and([isOther, hasSupertype(legendary), isPermanent, youControl]))),
+                notChosen])),
+          graveyard)])}
+}
