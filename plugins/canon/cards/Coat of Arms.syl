@@ -4,7 +4,6 @@ card singleFaced({
     types = [artifact],
     text = [
       static(
-        getsPt(
+        getsBoth(
           each(isCreature),
-          up(forEach(lit(1), and([isCreature, isOther, shares(subtype(creature), share, it)]))),
           up(forEach(lit(1), and([isCreature, isOther, shares(subtype(creature), share, it)])))))]})

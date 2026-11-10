@@ -10,8 +10,5 @@ token virtuousRoleToken {
       text = [
         enchant(isCreature),
         static(
-          getsPt(
-            enchanted(creature),
-            up(forEach(lit(1), and([isEnchantment, youControl]))),
-            up(forEach(lit(1), and([isEnchantment, youControl])))))]}}
+          getsBoth(enchanted(creature), up(forEach(lit(1), and([isEnchantment, youControl])))))]}}
 }

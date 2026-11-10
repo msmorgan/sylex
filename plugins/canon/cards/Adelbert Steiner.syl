@@ -7,9 +7,6 @@ card singleFaced({
     text = [
       lifelink,
       static(
-        getsPt(
-          thisCreature,
-          up(forEach(lit(1), and([hasSubtype(equipment), youControl]))),
-          up(forEach(lit(1), and([hasSubtype(equipment), youControl])))))],
+        getsBoth(thisCreature, up(forEach(lit(1), and([hasSubtype(equipment), youControl])))))],
     power = lit(2),
     toughness = lit(1)})

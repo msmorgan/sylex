@@ -5,10 +5,6 @@ card singleFaced({
     subtypes = [elemental],
     text = [
       static(entersChoosingPlayer(thisCreature, anOpponent)),
-      static(
-        getsPt(
-          thisCreature,
-          down(countOf(cardIn(handOf(the(isChosenPlayer))))),
-          down(countOf(cardIn(handOf(the(isChosenPlayer)))))))],
+      static(getsBoth(thisCreature, down(countOf(cardIn(handOf(the(isChosenPlayer)))))))],
     power = lit(7),
     toughness = lit(7)})
