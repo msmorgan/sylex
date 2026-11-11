@@ -285,7 +285,9 @@ of a token it creates, even where another card has that name (*a Tarmogoyf
 token*). It is in scope only on that card.
 
 **Name Number**:
-The declared grammatical Number of a name, for agreement.
+The grammatical Number of a name, which the lexicon does not declare: where its
+text shows agreement, the agreeing Clause records it in the Reading, and the
+name's own node stays unvalued (`docs/decisions/lexicon.md` §2, §6).
 
 **Targeting Marker**:
 The Determinative *target* that ends the Determiner of a target description

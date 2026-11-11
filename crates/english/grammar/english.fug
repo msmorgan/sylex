@@ -148,8 +148,10 @@ category CardTypes
 category Subtypes
 category KeywordList
 category Quality
-// A name's Number is the lexicon's (*When The Notary Hobbits enter*). Never
-// another card's name, which `Lex(Catalog)` does not admit.
+// A name is number-neutral: the agreement its text shows fixes its Number
+// (*When The Notary Hobbits enter*, *Mizzium Mortars deals*), and where the
+// text shows none it stays unvalued. Never another card's name, which
+// `Lex(Catalog)` does not admit.
 category Name [Number]
 // A name cited as a name: after *named*, as the parameter of *Partner
 // with* [CR#702.124j], and as the complement of *among* after *from*,

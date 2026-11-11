@@ -48,10 +48,14 @@ is a reviewable fact, and the rules that analyze a form are the rules that
 realize it.
 
 **A missing feature is inapplicable, not a wildcard.** Forms spelled alike keep
-their own Feature Bundles. The one merge is a finite form spelled alike in both
-numbers (*entered*, *can*), which is one bundle unmarked for Number. Why: two
-bundles would be two Readings differing in a Number the text does not mark, a
-second tree ([English](english.md) §8).
+their own Feature Bundles. Two kinds of form are each one bundle unmarked for
+Number: a finite form spelled alike in both numbers (*entered*, *can*), and a
+name (§6). Where the text shows agreement, the agreeing Clause records the
+Number in the Reading (*When The Notary Hobbits enter* is a Plural Clause,
+*Mizzium Mortars deals* a Singular one), and the form's own node stays
+unvalued; where the text shows none, the Number stays unvalued. Why: two bundles would be two
+Readings differing in a Number the text does not mark, a second tree
+([English](english.md) §8).
 
 **A form has one spelling, and its context selects it.** Each slot of a Lexeme
 is spelled one way, so each lexical value realizes one way. Oracle text has no
@@ -159,6 +163,11 @@ the scope its text would be parsed in. Why: one name is one Lexeme, and a
 spelling chosen apart from the form would be a free variant the tree does not
 record; a scope checked by parsing alone would admit a tree that no parse of
 its text yields.
+
+**A name is number-neutral.** No name declares a Number: a proper name has the
+Number of what it names, which only its text shows, so its Lexeme is unmarked
+for Number (§2). Why: a declared Number is knowledge of the cards before
+parsing them.
 
 **Another card's name stands only after *named*, *Partner with* or *from
 among*.** A card's full name is spelled on every face, and off its own card it

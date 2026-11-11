@@ -1,8 +1,8 @@
 //! Another card's name stands only after *named*, *Partner with* or *from
-//! among* (`docs/decisions/lexicon.md` §6), so it never reads as a Subject however its Number is declared. With
-//! every card name number-neutral, as a parse that reads a name's Number off
-//! its agreement needs, *Exile*, *Remove* and *Turn* (of *Turn // Burn*) are
-//! other cards' names that would otherwise read *[Name] targets …* here.
+//! among* (`docs/decisions/lexicon.md` §6), so it never reads as a Subject.
+//! A card name is number-neutral, its Number read off the agreement the text
+//! shows, so *Exile*, *Remove* and *Turn* (of *Turn // Burn*) are other
+//! cards' names that would otherwise read *[Name] targets …* here.
 
 use sylex_lexicon::Lexicon;
 use sylex_vocabulary::LexicalEnvironment;
@@ -35,20 +35,16 @@ const UNITS: [(&str, &str); 6] = [
     ),
 ];
 
-/// The lexicon with every card name number-neutral and, unless
-/// `card_names` holds, no longer marked a card name: its Full form alone,
-/// with no name form, and its Shortened form dropped.
-fn neutral(env: &LexicalEnvironment, card_names: bool) -> Lexicon {
+/// The lexicon with no card name marked a card name: each name's Full form
+/// alone, with no name form, and its Shortened form dropped.
+fn unmarked(env: &LexicalEnvironment) -> Lexicon {
     let lexemes = env.lexicon.lexemes().values().cloned().map(|mut lexeme| {
         if lexeme.card_name {
-            lexeme.properties.features.remove("Number");
-            lexeme.card_name = card_names;
-            if !card_names {
-                lexeme
-                    .forms
-                    .retain(|slot| slot.features.name == Some(sylex_lexicon::NameForm::Full));
-                lexeme.forms[0].features.name = None;
-            }
+            lexeme.card_name = false;
+            lexeme
+                .forms
+                .retain(|slot| slot.features.name == Some(sylex_lexicon::NameForm::Full));
+            lexeme.forms[0].features.name = None;
         }
         lexeme
     });
@@ -80,9 +76,9 @@ fn named_readings(lexicon: &Lexicon, env: &LexicalEnvironment) -> Vec<(&'static 
 }
 
 #[test]
-fn another_card_s_name_is_no_subject_even_when_number_neutral() {
+fn another_card_s_name_is_no_subject() {
     let env = LexicalEnvironment::load().unwrap();
-    let named = named_readings(&neutral(&env, true), &env);
+    let named = named_readings(&env.lexicon, &env);
     assert!(named.iter().all(|(_, n)| *n == 0), "{named:?}");
 }
 
@@ -91,6 +87,6 @@ fn another_card_s_name_is_no_subject_even_when_number_neutral() {
 #[test]
 fn without_the_card_name_feature_each_unit_reads_a_name_as_subject() {
     let env = LexicalEnvironment::load().unwrap();
-    let named = named_readings(&neutral(&env, false), &env);
+    let named = named_readings(&unmarked(&env), &env);
     assert!(named.iter().all(|(_, n)| *n > 0), "{named:?}");
 }

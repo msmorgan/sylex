@@ -74,7 +74,7 @@ pub enum SourceError {
 
 /// Every data file of this crate, by path: embedded at build time in release
 /// and wasm builds, read at run time in dev builds ([`data_text!`]).
-static FILES: [(&str, LazyLock<String>); 21] = [
+static FILES: [(&str, LazyLock<String>); 20] = [
     (CLOSED_CLASS, data_text!("lexicon/english/closed_class.ron")),
     (PREPOSITIONS, data_text!("lexicon/english/prepositions.ron")),
     (VERBS, data_text!("lexicon/english/verbs.ron")),
@@ -101,7 +101,6 @@ static FILES: [(&str, LazyLock<String>); 21] = [
     (ANCHOR_WORDS, data_text!("catalogs/anchor_words.ron")),
     (VOTE_OPTIONS, data_text!("catalogs/vote_options.ron")),
     (CITED_NAMES, data_text!("catalogs/cited_names.ron")),
-    (PLURAL_NAMES, data_text!("catalogs/plural_names.ron")),
 ];
 
 pub(crate) const CLOSED_CLASS: &str = "lexicon/english/closed_class.ron";
@@ -127,7 +126,6 @@ const INTRODUCED_NAMES: &str = "catalogs/introduced_names.ron";
 const ANCHOR_WORDS: &str = "catalogs/anchor_words.ron";
 const VOTE_OPTIONS: &str = "catalogs/vote_options.ron";
 const CITED_NAMES: &str = "catalogs/cited_names.ron";
-const PLURAL_NAMES: &str = "catalogs/plural_names.ron";
 /// The card-name catalog, relative to the repository root.
 pub const CARD_NAMES: &str = "data/gen/catalogs/card-names.txt";
 fn parse<T: DeserializeOwned>(path: &str) -> Result<T, SourceError> {
@@ -169,9 +167,6 @@ pub struct Sources {
     pub anchor_words: Vec<AnchorWord>,
     pub vote_options: Vec<ScopedName>,
     pub cited_names: Vec<ScopedName>,
-    /// The plural names (`catalogs/plural_names.ron`); every other name is
-    /// singular.
-    pub plural_names: Vec<String>,
 }
 
 /// A Lexicon and the Subcategorization Frames of its Lexemes.
@@ -235,7 +230,6 @@ impl Sources {
             anchor_words: parse(ANCHOR_WORDS)?,
             vote_options: parse(VOTE_OPTIONS)?,
             cited_names: parse(CITED_NAMES)?,
-            plural_names: parse(PLURAL_NAMES)?,
         })
     }
 
@@ -251,7 +245,6 @@ impl Sources {
         self.catalogs(&mut builder)?;
         let (mut lexemes, mut frames) = builder.finish()?;
         self.parameter_patterns(&mut frames);
-        self.name_numbers(&mut lexemes);
         check_core_and_catalogs_disjoint(&lexemes)?;
         mark_lexical_adjectival_passives(&mut lexemes)?;
         Ok((lexemes, frames))
@@ -269,17 +262,7 @@ impl Sources {
     ) -> Result<LexicalEnvironment, SourceError> {
         let (mut lexemes, frames) = self.vocabulary()?;
         let vocabulary = Lexicon::new(lexemes.clone())?;
-        let mut card_names = names::card_names(card_names, shortened, &vocabulary);
-        self.name_numbers(&mut card_names);
-        if let Some(missing) = self
-            .plural_names
-            .iter()
-            .find(|plural| !card_names.iter().any(|name| name.lemma == **plural))
-        {
-            return Err(SourceError::Invalid(format!(
-                "plural name `{missing}` names no card"
-            )));
-        }
+        let card_names = names::card_names(card_names, shortened, &vocabulary);
         Self::check_card_scopes(&lexemes, &card_names)?;
         lexemes.extend(card_names);
         Ok(LexicalEnvironment {
@@ -953,25 +936,6 @@ impl Sources {
             .flat_map(|family| self.subtypes.get(family).into_iter().flatten())
             .map(|decl| decl.entry().lemma.to_lowercase())
             .collect()
-    }
-}
-
-impl Sources {
-    /// Values the Number of each name: a proper name has the number of what
-    /// it names, plural only for a collection (CGEL, Ch. 5 §20.2.1, p. 517),
-    /// so a name is singular unless `catalogs/plural_names.ron` lists it.
-    fn name_numbers(&self, lexemes: &mut [Lexeme]) {
-        for lexeme in lexemes
-            .iter_mut()
-            .filter(|lexeme| lexeme.category == Category::Catalog)
-        {
-            let number =
-                if self.plural_names.contains(&lexeme.lemma) { "Plural" } else { "Singular" };
-            lexeme
-                .properties
-                .features
-                .insert("Number".into(), Ident::new(number));
-        }
     }
 }
 
