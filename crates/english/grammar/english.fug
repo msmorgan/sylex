@@ -1319,7 +1319,9 @@ AdverbModifiedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
 AdverbMultipliedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
     where modifier.AdjunctPosition = Multiplying
 // *Both* floated after a plural Object (*put two cards from your hand both
-// on top of your library*). A Subject has FloatedEach.
+// on top of your library or both on the bottom of your library*, Dream
+// Cache), where the second *both* is the second Cluster's own Object. A
+// Subject has FloatedEach.
 FloatedObjectBoth: ComplementNounPhrase -> NounPhrase adjunct:Word(Both) { uncoordinated: [head] }
     where head.Number = Plural,
           head.NounKind != Numeric,
@@ -1438,14 +1440,6 @@ RelativeTime: RelativeTemporalNominal -> Nominal modifier:RelativeClause
           head.NounKind = modifier.NounKind
 RelativeTimePostmodifier: RelativeTemporalNominal ->
     RelativeTemporalNominal modifier:TemporalNounPhrase { cost: 2 }
-// A frequency adverb and its interval, comma-set (*Twice this turn, ...*).
-// *Twice* is no Front adverb, which would admit *Twice that many counters
-// are put ...* without the comma.
-PreposedFrequency: Clause -> adverb:AdverbPhrase adjunct:TemporalNounPhrase ',' Clause {
-    transparent: [head],
-}
-    where adverb.AdjunctPosition = Multiplying,
-          $.FrontPosition = Occupied
 // *This turn, ...*; *The next time ..., ...*.
 PreposedTemporalAdjunct: Clause -> adjunct:TemporalNounPhrase ',' Clause { transparent: [head] }
     where $.FrontPosition = Occupied
@@ -2775,8 +2769,11 @@ PostposedRelative: VerbPhrase ->
     where head.Gap = NP,
           modifier.ClauseMarking = Relative,
           object.Number = modifier.Number
-// A bare relative postposes only past an adjectival Complement (*at
-// random*), which has no noun of its own to modify in place.
+// A bare relative postposed past *at random* (*choose a creature at random
+// this Aura can enchant*, Infectious Rage; Volatile Chimera).
+// `adjunct.ComplementKind = AdjP`: an admission gate (ADR §6) against a
+// relative postposed onto the Object past any other Preposition Phrase
+// (*Draw a card for each Human [you control]*, Mass Appeal).
 PostposedBareRelative: VerbPhrase ->
     VerbPhrase object:ComplementNounPhrase adjunct:Hosted(PrepositionPhrase, Predicate)
     modifier:RelativeClause { cost: 2, heavy: [modifier] }
@@ -2784,8 +2781,9 @@ PostposedBareRelative: VerbPhrase ->
           adjunct.ComplementKind = AdjP,
           modifier.ClauseMarking = Unmarked,
           object.Number = modifier.Number
-// *A card at random exiled with ...*: a bare passive postposed past a
-// manner Preposition Phrase.
+// *Choose a card at random exiled with ...* (Gorex, the Tombshell; Omenpath
+// Journey): a bare passive postposed past *at random*.
+// `adjunct.ComplementKind = AdjP`: PostposedBareRelative's gate.
 PostposedParticipialModifier: VerbPhrase ->
     VerbPhrase object:ComplementNounPhrase adjunct:Hosted(PrepositionPhrase, Predicate)
     modifier:VerbPhrase { cost: 2, heavy: [modifier] }
