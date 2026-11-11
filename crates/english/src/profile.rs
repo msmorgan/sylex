@@ -458,7 +458,7 @@ impl<'e> Profiler<'e> {
             } else if chars[at].is_alphanumeric() {
                 let mut end = at + 1;
                 while end < chars.len()
-                    && (chars[end].is_alphanumeric() || matches!(chars[end], '\'' | '’' | '-'))
+                    && (chars[end].is_alphanumeric() || matches!(chars[end], '\'' | '-'))
                 {
                     end += 1;
                 }

@@ -101,7 +101,7 @@ impl AnalyzedText {
             let mut end = start + 1;
             while end < self.tokens.len()
                 && (word_character(self.tokens[end])
-                    || matches!(self.tokens[end], '\'' | '’')
+                    || self.tokens[end] == '\''
                         && end + 1 < self.tokens.len()
                         && word_character(self.tokens[end + 1]))
             {
@@ -806,7 +806,7 @@ fn valid_word(word: &str, binding: Binding) -> bool {
                     && characters[index - 1].is_alphabetic()
                     && index + 1 < characters.len()
                     && characters[index + 1].is_alphabetic()
-                || matches!(ch, '\'' | '’' | '-')
+                || matches!(ch, '\'' | '-')
                     && (index > 0 && word_character(characters[index - 1])
                         || matches!(binding, Binding::Suffix | Binding::Bound))
                     && (index + 1 < characters.len() && word_character(characters[index + 1])
