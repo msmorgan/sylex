@@ -1,0 +1,6 @@
+subtype kwejian {
+  lexical = {lemma = "Kwejian"},
+  spelling = "Kwejian",
+  types = [creature, kindred],
+  name = "Kwejian"
+}

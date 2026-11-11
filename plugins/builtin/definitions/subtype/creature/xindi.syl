@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype xindi {
+  lexical = {lemma = "Xindi", plural = "Xindi"},
+  spelling = "Xindi",
+  types = [creature, kindred],
+  name = "Xindi"
+}

@@ -1,0 +1,6 @@
+subtype melkotian {
+  lexical = {lemma = "Melkotian"},
+  spelling = "Melkotian",
+  types = [creature, kindred],
+  name = "Melkotian"
+}

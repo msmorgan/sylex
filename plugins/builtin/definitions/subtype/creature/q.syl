@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype q {
+  lexical = {lemma = "Q", plural = "Q"},
+  spelling = "Q",
+  types = [creature, kindred],
+  name = "Q"
+}

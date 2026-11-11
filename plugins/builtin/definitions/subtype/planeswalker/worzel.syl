@@ -1,0 +1,6 @@
+subtype worzel {
+  lexical = {lemma = "Worzel"},
+  spelling = "Worzel",
+  types = [planeswalker],
+  name = "Worzel"
+}

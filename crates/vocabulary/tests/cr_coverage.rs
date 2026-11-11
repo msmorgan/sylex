@@ -68,7 +68,11 @@ const KEYWORD_ABILITIES_IN_SUBRULES: [(&str, &str); 2] =
 
 /// Scryfall's inventory lists words that are not ability words of
 /// Vintage-playable cards.
-const SCRYFALL_ABILITY_WORD_EXCLUSIONS: [(&str, Excluded); 8] = [
+/// Rulebreaker is printed only on cards that are not Vintage-legal.
+const ABILITY_WORD_EXCLUSIONS: [(&str, Excluded); 1] = [("rulebreaker", NoVintageCard)];
+
+const SCRYFALL_ABILITY_WORD_EXCLUSIONS: [(&str, Excluded); 9] = [
+    ("actualize", NoVintageCard),
     ("covercast", NoVintageCard),
     ("hero's reward", NoVintageCard),
     ("kinfall", UnSet),
@@ -390,7 +394,7 @@ fn ability_words() {
     assert_covers(
         "ability words [CR#207.2c]",
         &list(&rules, "[CR#207.2c]", "The ability words are "),
-        &[],
+        &ABILITY_WORD_EXCLUSIONS,
         &listed(AbilityWordListing::Rules),
     );
     // Scryfall's inventory adds the printed ability words the CR omits.

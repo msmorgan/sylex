@@ -1,0 +1,6 @@
+subtype sifa {
+  lexical = {lemma = "Sifa"},
+  spelling = "Sifa",
+  types = [planeswalker],
+  name = "Sifa"
+}

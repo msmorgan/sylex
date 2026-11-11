@@ -1,0 +1,5 @@
+ability_word battlefront(ability: Ability) {
+  lexical = {lemma = "battlefront", listed = Rules},
+  spelling = "battlefront — <ability>",
+  body = $ability
+}

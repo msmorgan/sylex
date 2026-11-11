@@ -1,0 +1,6 @@
+subtype denobulan {
+  lexical = {lemma = "Denobulan"},
+  spelling = "Denobulan",
+  types = [creature, kindred],
+  name = "Denobulan"
+}

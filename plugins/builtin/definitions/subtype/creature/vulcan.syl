@@ -1,0 +1,6 @@
+subtype vulcan {
+  lexical = {lemma = "Vulcan"},
+  spelling = "Vulcan",
+  types = [creature, kindred],
+  name = "Vulcan"
+}

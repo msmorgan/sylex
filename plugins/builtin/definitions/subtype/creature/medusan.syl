@@ -1,0 +1,6 @@
+subtype medusan {
+  lexical = {lemma = "Medusan"},
+  spelling = "Medusan",
+  types = [creature, kindred],
+  name = "Medusan"
+}

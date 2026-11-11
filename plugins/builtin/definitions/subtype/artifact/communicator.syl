@@ -1,0 +1,6 @@
+subtype communicator {
+  lexical = {lemma = "Communicator"},
+  spelling = "Communicator",
+  types = [artifact],
+  name = "Communicator"
+}

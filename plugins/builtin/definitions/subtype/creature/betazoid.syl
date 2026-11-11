@@ -1,0 +1,6 @@
+subtype betazoid {
+  lexical = {lemma = "Betazoid"},
+  spelling = "Betazoid",
+  types = [creature, kindred],
+  name = "Betazoid"
+}

@@ -246,4 +246,7 @@
             frames: [Amount],
         ),
     ]),
+    (rule: "[CR#701.72]", name: "Assimilate", verbs: [
+        (lemma: "assimilate", frames: [Monotransitive]),
+    ]),
 ]

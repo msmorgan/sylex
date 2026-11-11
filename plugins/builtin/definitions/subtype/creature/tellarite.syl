@@ -1,0 +1,6 @@
+subtype tellarite {
+  lexical = {lemma = "Tellarite"},
+  spelling = "Tellarite",
+  types = [creature, kindred],
+  name = "Tellarite"
+}

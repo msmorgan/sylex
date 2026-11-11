@@ -1,0 +1,6 @@
+subtype feroz {
+  lexical = {lemma = "Feroz"},
+  spelling = "Feroz",
+  types = [planeswalker],
+  name = "Feroz"
+}

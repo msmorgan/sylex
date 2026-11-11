@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype ferengi {
+  lexical = {lemma = "Ferengi", plural = "Ferengi"},
+  spelling = "Ferengi",
+  types = [creature, kindred],
+  name = "Ferengi"
+}

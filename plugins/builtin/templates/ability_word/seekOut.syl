@@ -1,0 +1,5 @@
+ability_word seekOut(ability: Ability) {
+  lexical = {lemma = "seek out", listed = Rules},
+  spelling = "seek out — <ability>",
+  body = $ability
+}

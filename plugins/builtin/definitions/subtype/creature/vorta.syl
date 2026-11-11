@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype vorta {
+  lexical = {lemma = "Vorta", plural = "Vorta"},
+  spelling = "Vorta",
+  types = [creature, kindred],
+  name = "Vorta"
+}

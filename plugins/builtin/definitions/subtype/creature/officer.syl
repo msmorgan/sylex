@@ -1,0 +1,6 @@
+subtype officer {
+  lexical = {lemma = "Officer"},
+  spelling = "Officer",
+  types = [creature, kindred],
+  name = "Officer"
+}

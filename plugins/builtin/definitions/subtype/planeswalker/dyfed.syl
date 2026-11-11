@@ -1,0 +1,6 @@
+subtype dyfed {
+  lexical = {lemma = "Dyfed"},
+  spelling = "Dyfed",
+  types = [planeswalker],
+  name = "Dyfed"
+}

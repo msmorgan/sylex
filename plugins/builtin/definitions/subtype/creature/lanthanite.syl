@@ -1,0 +1,6 @@
+subtype lanthanite {
+  lexical = {lemma = "Lanthanite"},
+  spelling = "Lanthanite",
+  types = [creature, kindred],
+  name = "Lanthanite"
+}

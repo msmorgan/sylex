@@ -1,0 +1,6 @@
+subtype klingon {
+  lexical = {lemma = "Klingon"},
+  spelling = "Klingon",
+  types = [creature, kindred],
+  name = "Klingon"
+}

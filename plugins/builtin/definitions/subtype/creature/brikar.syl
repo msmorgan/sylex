@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype brikar {
+  lexical = {lemma = "Brikar", plural = "Brikar"},
+  spelling = "Brikar",
+  types = [creature, kindred],
+  name = "Brikar"
+}

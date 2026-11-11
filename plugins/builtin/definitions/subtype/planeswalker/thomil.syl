@@ -1,0 +1,6 @@
+subtype thomil {
+  lexical = {lemma = "Thomil"},
+  spelling = "Thomil",
+  types = [planeswalker],
+  name = "Thomil"
+}

@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype gorn {
+  lexical = {lemma = "Gorn", plural = "Gorn"},
+  spelling = "Gorn",
+  types = [creature, kindred],
+  name = "Gorn"
+}

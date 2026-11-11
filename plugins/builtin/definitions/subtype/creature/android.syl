@@ -1,0 +1,6 @@
+subtype android {
+  lexical = {lemma = "Android"},
+  spelling = "Android",
+  types = [creature, kindred],
+  name = "Android"
+}

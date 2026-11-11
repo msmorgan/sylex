@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype hirogen {
+  lexical = {lemma = "Hirogen", plural = "Hirogen"},
+  spelling = "Hirogen",
+  types = [creature, kindred],
+  name = "Hirogen"
+}

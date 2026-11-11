@@ -1,0 +1,5 @@
+ability_word federation(ability: Ability) {
+  lexical = {lemma = "federation", listed = Rules},
+  spelling = "federation — <ability>",
+  body = $ability
+}

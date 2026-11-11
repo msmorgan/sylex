@@ -1,0 +1,6 @@
+subtype edosian {
+  lexical = {lemma = "Edosian"},
+  spelling = "Edosian",
+  types = [creature, kindred],
+  name = "Edosian"
+}

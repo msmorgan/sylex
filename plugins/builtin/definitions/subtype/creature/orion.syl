@@ -1,0 +1,6 @@
+subtype orion {
+  lexical = {lemma = "Orion"},
+  spelling = "Orion",
+  types = [creature, kindred],
+  name = "Orion"
+}

@@ -1,0 +1,6 @@
+subtype kelpien {
+  lexical = {lemma = "Kelpien"},
+  spelling = "Kelpien",
+  types = [creature, kindred],
+  name = "Kelpien"
+}

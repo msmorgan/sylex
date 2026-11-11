@@ -1,0 +1,6 @@
+subtype tribble {
+  lexical = {lemma = "Tribble"},
+  spelling = "Tribble",
+  types = [creature, kindred],
+  name = "Tribble"
+}

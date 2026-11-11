@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype ocampa {
+  lexical = {lemma = "Ocampa", plural = "Ocampa"},
+  spelling = "Ocampa",
+  types = [creature, kindred],
+  name = "Ocampa"
+}

@@ -1,0 +1,4 @@
+counter peaceCounter {
+  lexical = {lemma = "peace counter"},
+  spelling = "peace counter"
+}

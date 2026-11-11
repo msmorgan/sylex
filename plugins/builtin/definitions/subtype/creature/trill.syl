@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype trill {
+  lexical = {lemma = "Trill", plural = "Trill"},
+  spelling = "Trill",
+  types = [creature, kindred],
+  name = "Trill"
+}

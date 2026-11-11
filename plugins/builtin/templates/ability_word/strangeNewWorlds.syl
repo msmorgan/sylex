@@ -1,0 +1,5 @@
+ability_word strangeNewWorlds(ability: Ability) {
+  lexical = {lemma = "strange new worlds", listed = Rules},
+  spelling = "strange new worlds — <ability>",
+  body = $ability
+}

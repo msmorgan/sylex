@@ -1,0 +1,6 @@
+subtype greensleeves {
+  lexical = {lemma = "Greensleeves"},
+  spelling = "Greensleeves",
+  types = [planeswalker],
+  name = "Greensleeves"
+}

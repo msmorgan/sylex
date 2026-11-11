@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype jemhadar {
+  lexical = {lemma = "Jem'Hadar", plural = "Jem'Hadar"},
+  spelling = "Jem'Hadar",
+  types = [creature, kindred],
+  name = "Jem'Hadar"
+}

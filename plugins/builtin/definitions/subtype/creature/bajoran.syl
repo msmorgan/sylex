@@ -1,0 +1,6 @@
+subtype bajoran {
+  lexical = {lemma = "Bajoran"},
+  spelling = "Bajoran",
+  types = [creature, kindred],
+  name = "Bajoran"
+}

@@ -1,0 +1,6 @@
+subtype caitian {
+  lexical = {lemma = "Caitian"},
+  spelling = "Caitian",
+  types = [creature, kindred],
+  name = "Caitian"
+}

@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype nakuhl {
+  lexical = {lemma = "Na'kuhl", plural = "Na'kuhl"},
+  spelling = "Na'kuhl",
+  types = [creature, kindred],
+  name = "Na'kuhl"
+}

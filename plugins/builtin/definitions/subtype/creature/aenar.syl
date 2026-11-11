@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype aenar {
+  lexical = {lemma = "Aenar", plural = "Aenar"},
+  spelling = "Aenar",
+  types = [creature, kindred],
+  name = "Aenar"
+}

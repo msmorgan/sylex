@@ -1,0 +1,6 @@
+subtype excalbian {
+  lexical = {lemma = "Excalbian"},
+  spelling = "Excalbian",
+  types = [creature, kindred],
+  name = "Excalbian"
+}

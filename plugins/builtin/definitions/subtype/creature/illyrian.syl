@@ -1,0 +1,6 @@
+subtype illyrian {
+  lexical = {lemma = "Illyrian"},
+  spelling = "Illyrian",
+  types = [creature, kindred],
+  name = "Illyrian"
+}

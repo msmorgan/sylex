@@ -1,0 +1,6 @@
+subtype arzakon {
+  lexical = {lemma = "Arzakon"},
+  spelling = "Arzakon",
+  types = [planeswalker],
+  name = "Arzakon"
+}

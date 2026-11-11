@@ -1,0 +1,7 @@
+# No supported Oracle rules-text plural is attested; catalog membership cannot supply one.
+subtype vauNakat {
+  lexical = {lemma = "Vau-N'Akat", plural = "Vau-N'Akat"},
+  spelling = "Vau-N'Akat",
+  types = [creature, kindred],
+  name = "Vau-N'Akat"
+}
