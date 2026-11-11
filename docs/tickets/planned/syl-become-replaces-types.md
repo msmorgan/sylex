@@ -1,8 +1,8 @@
 ---
-needs: [cleanup-step6-spine, syl-spelling-optional-segments]
+needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-nominal-descriptions, syl-continuous-effect-subject]
 ---
 
-# Plain `become` replaces types; the retaining forms are named for their wording
+# Characteristic-setting is written as printed, and plain `become` replaces types
 
 ## Why
 
@@ -24,8 +24,15 @@ All four callers print a retaining form:
 
 `QualityOp` has `sets` (`primitives/qualityOp/sets.syl`), as `becomeColor` already uses.
 
-Written against the spine (`cleanup-step6-spine`). `syl-spelling-optional-segments` writes
-`become.syl`'s duration `TODO(spelling)`, which this ticket also rewrites, and lands first.
+What an object is set to is written as a raw record with no wording: the three `become` calls
+above and `amass.syl`'s, 30 `bundle(…)` payloads of `qualityChange` in 27 canon files (*Blood
+Moon*'s "Nonbasic lands are Mountains", *Frogify*, *Gideon, Ally of Zendikar*, *Arcum's
+Weathervane*, …), and *Yedora, Grave Gardener*'s `faceDownAs` ("It's a Forest land"). A record
+cannot say what the cards print apart: "becomes a 3/3 Angel creature" against "with base power and
+toughness 3/3" (*Gift of Tusks*), "that's still a planeswalker" (*Gideon, Ally of Zendikar*), "is
+no longer snow" (*Arcum's Weathervane*). *Frogify* ("Enchanted creature loses all abilities and is
+a blue Frog creature with base power and toughness 1/1") writes `it` as the subject of two of its
+three parts, where the card prints one subject and no "it".
 
 ## Design
 
@@ -34,10 +41,23 @@ Written against the spine (`cleanup-step6-spine`). `syl-spelling-optional-segmen
   wording says [CR#205.1b], so the meaning lives in which Template a card calls
   (`syl-spelling-conventions`).
 
+## Open questions
+
+- **How what an object becomes is written.** Options: (a) as the copula's complement, a
+  `Predicative` built from `syl-nominal-descriptions`'s sorts ("a 3/3 Angel creature with
+  flying", "a Forest land", "snow"), lowered to the characteristics it sets; (b) a fixed-slot
+  Template per shape of record, as `creatureToken` is for tokens. Recommendation: (a), which
+  `syl-token-records-to-templates` asks the same of for created tokens; the two answers are one.
+- **The subject.** `become`, `qualityChange` and `becomeColor` take their subject first; with
+  `syl-continuous-effect-subject` they take none. Recommendation: write these calls against
+  that ticket's declarations, so *Frogify*'s one printed subject is written once.
+
 ## Done when
 
-- Every caller is checked against its Oracle text and calls the form it prints; the landing lists
-  each caller with its printed wording.
+- The open questions are answered.
+- No raw `{characteristics = …}` record remains outside a token slot under `plugins/`; every
+  caller is checked against its Oracle text and calls the form it prints, and the landing lists
+  each with its printed wording.
 - No Template whose name says "become" keeps the old types unless its name says so.
 - *Gift of Tusks* ("Until end of turn, target creature loses all abilities and becomes a green
   Elephant with base power and toughness 3/3.") is written in `plugins/canon/` with plain
@@ -47,9 +67,16 @@ Written against the spine (`cleanup-step6-spine`). `syl-spelling-optional-segmen
   `cargo xtask cite check --list-noncompliant` is empty and `cargo xtask cite check` reports
   0 stale, after `cargo xtask cite bless` for newly cited rules.
 
+## Not in scope
+
+- Records in a token slot: `syl-token-records-to-templates`.
+- Copy exceptions ("except it has haste"), the `CopyExcept` declarations.
+
 ## Pointers
 
 `plugins/builtin/templates/action/{become,becomeColor}.syl`,
 `plugins/builtin/templates/ability/qualityChange.syl`, `plugins/builtin/primitives/qualityOp/`,
+`plugins/builtin/primitives/static/bundle.syl`, `plugins/builtin/primitives/zone/faceDownAs.syl`,
 `plugins/builtin/definitions/keyword_action/amass.syl`,
-`plugins/canon/cards/{Answered Prayers,Dread Slaver,Infernal Vessel}.syl`.
+`plugins/canon/cards/{Answered Prayers,Dread Slaver,Infernal Vessel,Frogify,Yedora, Grave
+Gardener}.syl`; `docs/evidence/syl-token-records-to-templates/scan.out`.

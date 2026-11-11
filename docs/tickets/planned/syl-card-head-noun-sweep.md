@@ -31,31 +31,30 @@ the term holds words the text does not have:
 One builtin body has no head at all: hexproof, "This permanent can't be the target of spells or
 abilities your opponents control" [CR#702.11b], writes `allOf(and([in(stack), opponentsControl]))`.
 
-This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
-
-Written against the surface (`cleanup-step6-surface`).
+Written against the surface (`cleanup-step6-surface`), after `syl-nominal-descriptions` makes a
+description a `Nominal` with its own head. That ticket's respell writes the dropped "card" where a
+type word stands before it, and drops an unprinted card type beside a subtype; the sites below are
+the rest.
 
 ## Done when
 
-- Every canon description where Oracle prints "permanent" carries `isPermanent`, and every one
-  where it prints "card" carries `isCard` (or uses `cardIn(zone)`, which is
-  `and([isCard, in(zone)])`), immediately after the last color conjunct, as in
-  `and([hasColor(blue), isCard, in(yourHand)])`. A type word before "card" is written by
-  `syl-type-word-templates`, whose respell restores the dropped "card" at the type-word sites this
-  ticket listed and drops the unprinted card types beside a subtype.
+- Every canon description where Oracle prints "permanent" or "card" has that word as its
+  nominal's head, with the modifiers it prints before and after it ("a blue card from your
+  hand").
 - The sweep covers at least these sites, found by scanning conjunctions with a non-battlefield
   zone and searches (the scan misses nested conjunctions, so check each card's Oracle text, not
   only the scan): *Seedborn Muse*, *Blatant Thievery*, *Mutagen Connoisseur* ("transformed
-  permanent you control") (`isPermanent`); *Drach'Nyen*
-  (`powerOf(the(in(exiledWith(thisEquipment))))` → `cardIn`), *Aven Shrine*, *Vraska's Scorn*
+  permanent you control") (head "permanent"); *Drach'Nyen*
+  (`powerOf(the(in(exiledWith(thisEquipment))))`, head "card"), *Aven Shrine*, *Vraska's Scorn*
   and *Tower Winder* (`named(…)`), *Force of Will*, *Sunscour*, the five Shoals (*Shining*,
-  *Disrupting*, *Blazing*, *Sickening*, *Nourishing*), *Rune Snag* (`isCard`).
-- A printed "on the battlefield" is written `in(battlefield)`, not `isPermanent`: *Topple* and
+  *Disrupting*, *Blazing*, *Sickening*, *Nourishing*), *Rune Snag* (head "card").
+- A printed "on the battlefield" is written as the postmodifier `in(battlefield)`, not as the head
+  "permanent": *Topple* and
   *Éomer of the Riddermark* ("among creatures on the battlefield").
 - Hexproof's body writes the printed heads "spells or abilities".
-- Nothing else in a site changes: not its determiner, quantity, zone or other conjuncts, and no
+- Nothing else in a site changes: not its determiner, quantity, zone or other modifiers, and no
   Template, Definition or primitive other than hexproof's body.
-- `rg 'allOf\(youControl\)' plugins/canon/cards` is empty.
+- No canon description is headless where its card prints a head.
 - If adding a head noun makes a later reference in the card ("that card", "it") resolve
   differently or fail, the site is reported, not left without its head noun.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
@@ -65,7 +64,8 @@ Written against the surface (`cleanup-step6-surface`).
 - A card not yet in `plugins/canon/cards/` is spelled with its head nouns when it is written.
 - Printed "it" written as a self-reference (`thisCreature` for "it"):
   `syl-printed-it-self-references`.
-- A head noun as a slot of its own: `syl-description-head-noun`.
+- Type words before a dropped "card", and unprinted card types beside a subtype:
+  `syl-nominal-descriptions`.
 
 ## Pointers
 

@@ -1,5 +1,5 @@
 ---
-needs: [syl-printed-it-self-references, syl-argument-naming, syl-condition-first-static, syl-lookback-point-from-trigger, syl-single-face-card-call, syl-implicit-coercions, syl-number-snapshot, syl-self-name-references, syl-underscore-file-names]
+needs: [syl-printed-it-self-references, syl-argument-naming, syl-condition-first-static, syl-lookback-point-from-trigger, syl-single-face-card-call, syl-implicit-coercions, syl-number-snapshot, syl-self-name-references, syl-underscore-file-names, syl-nominal-descriptions]
 ---
 
 # One `this(head)` replaces the 21 `this<Head>` Templates and bare `this`
@@ -34,14 +34,18 @@ and leaves the "this spell" sites (*Abolish*'s `altCost(this, …)`, *Embercleav
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
+`syl-nominal-descriptions` merges `NounWord`, the sort of `headed`'s head and of the head this
+ticket's `this` takes, into `Nominal`, and lands first, so the `this<Head>` sites are rewritten
+against the head's final sort.
+
 ## Design
 
-- `this(head: NounWord)` takes the name `this`, and nullary `this` is retired.
+- `this(head: Nominal)` takes the name `this`, and nullary `this` is retired.
 - Every bare `this` becomes `this(<head>)` with the head its CR or Oracle text prints:
   card-zone keywords and conferrals take `this(card)` (cycling [CR#702.29a]); type and permanent
   rules take `this(creature)`, `this(planeswalker)`, `this(battle)` or `this(permanent)`; and
   zone-independent ones take `this(object)` (changeling [CR#702.73a]).
-- `object` is a new `NounWord`, the CR's object [CR#109.1].
+- `object` is a new head word at `Nominal`, the CR's object [CR#109.1].
 
 ## Done when
 

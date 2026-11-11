@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine]
+needs: [cleanup-step6-spine, syl-nominal-descriptions, syl-sequentially-wordings]
 ---
 
 # Put every list's elements in printed order
@@ -20,13 +20,16 @@ printed before the noun (`hasSupertype`, `non(…)`, `hasColor`, `isTapped`, `is
 (*Gloom*). That count misses a modifier in a later position (`isOther`, `isNontoken`) or written
 `not(…)`, and counts some postmodifiers, so the sweep surveys every list.
 
-Written against the spine (`cleanup-step6-spine`).
+Written against the spine (`cleanup-step6-spine`). Two tickets rewrite these lists first:
+`syl-nominal-descriptions` makes a description a nominal whose premodifiers, head and
+postmodifiers its respell writes in printed order, and `syl-sequentially-wordings` rewrites the
+`sequentially` steps into the Templates that spell them. This ticket reorders what is left.
 
 ## Done when
 
 - Every list in `plugins/` whose element order differs from the order its card or declaration
-  prints them is reordered to match: the conjuncts of `and([…])`, `or([…])` and `andOr([…])`, and
-  the steps of `sequentially([…])`. A list whose printed order is not determined by the text (a
+  prints them is reordered to match: the elements of each coordination, of each
+  `nominal`'s two modifier lists, and of each sequence of steps. A list whose printed order is not determined by the text (a
   conjunct no word prints) is left as it is, and the landing lists those.
 - The reordered corpus means the same: a one-off script, kept in `docs/evidence/`, checks that
   every reordered list holds the same elements before and after, and that nothing else in the

@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine]
+needs: [cleanup-step6-spine, syl-continuous-effect-subject]
 ---
 
 # One sort for a power/toughness change
@@ -12,6 +12,9 @@ beyond the first": one "for each" scaling both numbers, which an `Amount`-level 
 only write twice. *Mutagen Connoisseur*'s `getsPt(thisCreature, up(forEach(1, …)), up(0))` for
 "+1/+0 for each" recovers a second way, as a flat 1 beside a scaled 0. `getsBoth` goes the
 other way and writes one delta for the two numbers of "+N/+N", which the text prints as two.
+
+`syl-continuous-effect-subject` takes the subject out of `get`, `getsPt` and `getsBoth` and
+rewrites their calls, and lands first, so each call is rewritten against its final shape.
 
 ## Design
 

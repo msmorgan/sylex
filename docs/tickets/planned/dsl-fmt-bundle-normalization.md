@@ -17,7 +17,9 @@ The `.syl` formatter (`sylex_syl`'s printer, which `cargo xtask dsl fmt` runs) c
 reads one file's syntax and resolves no sort, and `subtype(goblin)` is the `NounWord` primitive
 at a head noun but the `TextWord` one in a text change, with identical syntax. `cargo xtask dsl
 check` cannot refuse the wrapped form without making the primitive uncallable at its to-sort.
-This follows step 6 (`cleanup-step6-syl`).
+This follows step 6 (`cleanup-step6-syl`), in which `syl-nominal-descriptions` replaces the two
+`NounWord` coercions with coercions into `Nominal` and `PreModifier`; the rewrite covers whichever
+coercions exist then.
 
 ## Design
 
@@ -31,8 +33,9 @@ This follows step 6 (`cleanup-step6-syl`).
 
 - After `cargo xtask dsl fmt`, no call in `plugins/` writes a wrap a coercion supplies, and each
   rewritten file resolves to the same tree as before.
-- `cargo xtask dsl fmt --check` fails on a fixture that writes `lit(3)` at an `Amount` slot or
-  `type(creature)` at a `NounWord` slot, and passes on `subtype(goblin)` at a `TextWord` slot.
+- `cargo xtask dsl fmt --check` fails on a fixture that writes `lit(3)` at an `Amount` slot or a
+  card-type wrap at a slot a card-type coercion reaches, and passes on `subtype(goblin)` at a
+  `TextWord` slot.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p xtask` and
   `cargo clippy -p xtask --tests -- -D warnings` pass.
 

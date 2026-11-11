@@ -20,8 +20,8 @@ Written against the surface (`cleanup-step6-surface`).
 
 - An unrounded fraction amount exists for half and for a third (*Pox*), spelled "half <amount>"
   and "a third of <amount>".
-- `roundEachTime(mode, action)` wraps the sentence it covers and is spelled as that sentence
-  followed by "Round <mode> each time.". It wraps the whole sentence, so a "then" chain of several
+- `roundEachTime(action, mode)` wraps the sentence it covers and is spelled as that sentence
+  followed by "Round <mode> each time.", its parameters in that printed order (`syl.md` §5). It wraps the whole sentence, so a "then" chain of several
   Actions (*Pox*, *Fraying Omnipotence*) is covered; it is not a trailing step that looks back at
   the step before it.
 - The checks are structural: every fraction inside the wrapped Action is unrounded and at least

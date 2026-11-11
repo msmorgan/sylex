@@ -1,5 +1,5 @@
 ---
-needs: [syl-single-face-card-call, cleanup-step6-spine, syl-number-snapshot]
+needs: [syl-single-face-card-call, cleanup-step6-spine, syl-number-snapshot, syl-nominal-descriptions]
 ---
 
 # "Each" and the referent it introduces
@@ -12,7 +12,8 @@ own fix.
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
-Written against the spine (`cleanup-step6-spine`).
+Written against the spine (`cleanup-step6-spine`), after `syl-nominal-descriptions`, which
+retypes the `each…` determiners and rewrites their callers' descriptions.
 
 ## Design
 
