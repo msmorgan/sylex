@@ -1,5 +1,5 @@
-//! Another card's name stands only after *named* or *Partner with*
-//! (`docs/decisions/lexicon.md` §6), so it never reads as a Subject however its Number is declared. With
+//! Another card's name stands only after *named*, *Partner with* or *from
+//! among* (`docs/decisions/lexicon.md` §6), so it never reads as a Subject however its Number is declared. With
 //! every card name number-neutral, as a parse that reads a name's Number off
 //! its agreement needs, *Exile*, *Remove* and *Turn* (of *Turn // Burn*) are
 //! other cards' names that would otherwise read *[Name] targets …* here.

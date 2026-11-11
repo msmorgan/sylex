@@ -135,7 +135,8 @@ fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
 
     // A scoped name may be spelled like a card's name (Disa the Restless's
     // *create a Tarmogoyf token*): another card's name stands only after
-    // *named* or *Partner with*, so the two never compete elsewhere.
+    // *named*, *Partner with* or *from among*, so the two never compete
+    // elsewhere.
     let env = sources
         .environment(&format!("{card_names}Marit Lage\n"), &none)
         .unwrap();

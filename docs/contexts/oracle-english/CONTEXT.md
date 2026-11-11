@@ -264,8 +264,10 @@ grammar reads it as any other Proper Name.
 **Another Card's Name**:
 A card's full name in the text of any face but its own. Only a position that
 opts in admits it, through the grammar's `OtherCardName()` symbol: the
-predicative complement of *named* (*cards named Relentless Rats*) and the
-Keyword Parameter of *Partner with* [CR#702.124j].
+predicative complement of *named* (*cards named Relentless Rats*), the
+Keyword Parameter of *Partner with* [CR#702.124j], and the complement of
+*among* after *from*, wherever that phrase attaches, as in the options of a
+choice (*choose a card name ... from among Disenchant, ..., and Black Lotus*).
 
 **Introduced Name**:
 A name a card's own text gives an object that is not a card, such as the name

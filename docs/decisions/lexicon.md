@@ -140,22 +140,28 @@ admits the Shortened form; the scope is keyed by form, not by spelling. Why:
 one name is one Lexeme, and a spelling chosen apart from the form would be a
 free variant the tree does not record.
 
-**Another card's name stands only after *named* or *Partner with*.** A card's
-full name is spelled on every face, and off its own card it is another card's
-name, which a position admits only by opting in: no leaf symbol of the grammar
-admits it but `OtherCardName()`, which admits nothing else. Two positions opt
-in, as a `NameComplement`: the predicative complement of *named* (*cards named
-Relentless Rats*), alone or coordinated, and the Keyword Parameter of *Partner
-with*, whose name is the one its ability searches for as *a card named [name]*
-[CR#702.124j]. Any other position, a Subject, Object, possessor or premodifier
-among them, refuses it with no clause of its own. There, where the face's own
-Shortened Name is spelled alike, both are Readings and the face's own ranks
-first. A name a card
-gives an object, or a vote option, spelled like another card's name is listed
-as that card's Introduced Name or vote option (*create a Tarmogoyf token*,
-*votes for Redhorn Pass or Mines of Moria*). Why: a card's text mentions
-another card by name only in those positions, and a card name read anywhere
-else is another word misread (*Exile* in *Exile target attacking creature*).
+**Another card's name stands only after *named*, *Partner with* or *from
+among*.** A card's full name is spelled on every face, and off its own card it
+is another card's name, which a position admits only by opting in: no leaf
+symbol of the grammar admits it but `OtherCardName()`, which admits nothing
+else. Three positions opt in, as a `NameComplement`, alone or coordinated: the
+predicative complement of *named* (*cards named Relentless Rats*); the Keyword
+Parameter of *Partner with*, whose name is the one its ability searches for as
+*a card named [name]* [CR#702.124j]; and the complement of *among* after *from*,
+wherever that phrase attaches, as in the options of a choice (*choose a card
+name ... from among Disenchant, ..., and Black Lotus*). *From* selects that
+*among* phrase by its Complement's kind and *among* takes a name only so
+selected, as *do the same for* selects *for* with a cited word
+(`PPWith(["for"], Mention)`): a name after *among* under any other head (*divide
+it among Black Lotus*) is refused. Any other position, a Subject, Object,
+possessor or premodifier among them, refuses another card's name with no clause
+of its own. There, where the face's own Shortened Name is spelled alike, both
+are Readings and the face's own ranks first. A name a card gives an object, or
+a vote option, spelled like another card's name is listed as that card's
+Introduced Name or vote option (*create a Tarmogoyf token*, *votes for Redhorn
+Pass or Mines of Moria*). Why: a card's text mentions another card by name only
+in those positions, and a card name read anywhere else is another word misread
+(*Exile* in *Exile target attacking creature*).
 
 **Bound keywords are analyzed in parts**, a suffix on a stem from its declared
 stem classes, so *islandwalk* needs no declaration [CR#702.14a]. A stem is

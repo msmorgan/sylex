@@ -64,8 +64,8 @@ fn a_distributive_adjunct_attaches_to_the_outermost_predicate() {
 
 /// On Nicol Bolas, the Deceiver, *Nicol Bolas* is the face's own Shortened
 /// Name and also the full name of another card. As a Subject it is the
-/// face's own name alone: another card's name stands only after *named*
-/// or *Partner with*.
+/// face's own name alone: another card's name stands only after *named*,
+/// *Partner with* or *from among*.
 #[test]
 fn a_subject_spelled_like_another_card_s_name_is_the_face_s_own() {
     let env = LexicalEnvironment::load().unwrap();
