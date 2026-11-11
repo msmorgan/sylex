@@ -214,7 +214,9 @@ impl Parse<'_> {
     fn leaf_binding(&self, leaf: usize, lexicon: &Lexicon) -> Result<Binding, RealizationFault> {
         let leaf = &self.forest.leaves[leaf];
         let source = &self.tokens[leaf.start..leaf.end];
-        let realized = lexicon.realize(&leaf.reading).unwrap_or_default();
+        let realized = lexicon
+            .realize(&leaf.reading)
+            .expect("a forest leaf is a lexical match, which its lexicon licenses");
         if !realized.chars().eq(source.iter().copied()) {
             return Err(RealizationFault::Spelling {
                 start: leaf.start,
