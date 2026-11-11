@@ -15,8 +15,11 @@ card singleFaced({
                     dealDamage(recipient = which),
                     within = within(soFarThisTurn))]))),
           die),
-        sequentially([
-            returnToBattlefield(it, riders = [under(you)]),
-            become(that(creature), {characteristics = {colors = [black], subtypes = [zombie]}})]))],
+        returnToBattlefield(
+          it,
+          riders = [
+            under(you),
+            withCharacteristicEdits(
+              [colors(adds, colors([black])), typeLine(adds, {subtypes = [zombie]})])]))],
     power = 3,
     toughness = 5})

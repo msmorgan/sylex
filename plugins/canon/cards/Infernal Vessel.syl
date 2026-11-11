@@ -7,8 +7,11 @@ card singleFaced({
       when(
         does(actor(thisCreature), die),
         if = not(is(it, hasSubtype(demon))),
-        sequentially([
-            returnToBattlefieldWithCounters(it, ownerOf(it), 2, p1p1Counter),
-            become(it, {characteristics = {subtypes = [demon]}})]))],
+        returnToBattlefield(
+          it,
+          riders = [
+            under(ownerOf(it)),
+            withCounters(2, printedKind(p1p1Counter), fresh),
+            withCharacteristicEdits([typeLine(adds, {subtypes = [demon]})])]))],
     power = 2,
     toughness = 1})
