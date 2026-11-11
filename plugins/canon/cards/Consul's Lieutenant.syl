@@ -8,11 +8,11 @@ card singleFaced({
       renown(1),
       whenever(
         does(actor(thisCreature), attack),
+        if = is(it, hasDesignation(renowned)),
         get(
           allOf(and([isCreature, isAttacking, youControl, isOther])),
           up(1),
           up(1),
-          duration = untilEndOfTurn),
-        if = is(it, hasDesignation(renowned)))],
+          duration = untilEndOfTurn))],
     power = 2,
     toughness = 1})

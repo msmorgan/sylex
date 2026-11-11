@@ -8,7 +8,7 @@ card singleFaced({
       ascend,
       whenever(
         does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-        draw(1),
-        if = is(you, hasDesignation(citysBlessing)))],
+        if = is(you, hasDesignation(citysBlessing)),
+        draw(1))],
     power = 2,
     toughness = 4})

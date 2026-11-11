@@ -10,5 +10,5 @@ card singleFaced({
         putCounters(1, printedKind(luckCounter), thisEnchantment)),
       at(
         beginningOfYour(upkeep),
-        winGame,
-        if = compareAmt(countersOn(luckCounter, thisEnchantment), atLeast, 10))]})
+        if = compareAmt(countersOn(luckCounter, thisEnchantment), atLeast, 10),
+        winGame)]})

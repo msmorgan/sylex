@@ -7,7 +7,7 @@ card singleFaced({
       kicker(mana([generic(4), pip(green)])),
       when(
         does(actor(thisCreature), enter),
-        gainLife(10),
-        if = keywordCostPaid(kicker, thisCreature))],
+        if = keywordCostPaid(kicker, thisCreature),
+        gainLife(10))],
     power = 2,
     toughness = 3})

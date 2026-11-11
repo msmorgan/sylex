@@ -15,11 +15,11 @@ card singleFaced({
               fresh)])),
       whenever(
         does(actor(a(and([isNontoken, and([isCreature, youControl])]))), enter),
+        if = is(thisCreature, hasCounter),
         doForEachKind(
           counterKind,
           domain = thisCreature,
           counterKind,
-          putCounters(statOf(boundCounter, thisCreature), thatKind, that(creature))),
-        if = is(thisCreature, hasCounter))],
+          putCounters(statOf(boundCounter, thisCreature), thatKind, that(creature))))],
     power = 2,
     toughness = 2})

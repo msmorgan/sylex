@@ -22,12 +22,13 @@ ability suspend(amount: Amount, cost: Cost) {
         exileWithCounters(thisCard, $amount, timeCounter))),
     at(
       beginningOfYour(upkeep),
-      removeCounters(oneThrough(1), printedKind(timeCounter), thisCard),
       if = is(
         thisCard,
-        and([in(exileZone), hasKeyword(theKeyword(suspend)), hasCounter(kind = timeCounter)]))),
+        and([in(exileZone), hasKeyword(theKeyword(suspend)), hasCounter(kind = timeCounter)])),
+      removeCounters(oneThrough(1), printedKind(timeCounter), thisCard)),
     when(
       does(any, removeCounters(theLast, printedKind(timeCounter), thisCard)),
+      if = is(thisCard, in(exileZone)),
       sequentially(
         steps = [
           may(play(thisCard, altCost = withoutPaying)),
@@ -40,6 +41,5 @@ ability suspend(amount: Amount, cost: Cost) {
                 or(
                   disjuncts = [
                     is(that(spell), youControl),
-                    is(becomes(that(spell)), youControl)]))))]),
-      if = is(thisCard, in(exileZone)))]
+                    is(becomes(that(spell)), youControl)]))))]))]
 }

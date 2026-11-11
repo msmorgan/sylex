@@ -7,7 +7,7 @@ card singleFaced({
       spectacle(mana([generic(3), pip(black), pip(red)])),
       when(
         does(actor(thisCreature), enter),
-        instruct(eachOpponent, discard(a(cardIn(hand)))),
-        if = keywordCostPaid(spectacle, thisCreature))],
+        if = keywordCostPaid(spectacle, thisCreature),
+        instruct(eachOpponent, discard(a(cardIn(hand)))))],
     power = 4,
     toughness = 2})

@@ -11,7 +11,7 @@ ability gift(promise: Action) {
     ifPermanentType(
       when(
         does(actor(thisPermanent), enter),
-        instruct(the(isChosenPlayer), $promise),
-        if = keywordCostPaid(gift, this)),
+        if = keywordCostPaid(gift, this),
+        instruct(the(isChosenPlayer), $promise)),
       spell(doIf(keywordCostPaid(gift, this), instruct(the(isChosenPlayer), $promise))))]
 }

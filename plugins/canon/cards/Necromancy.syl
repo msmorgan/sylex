@@ -6,6 +6,7 @@ card singleFaced({
       asThoughFlashSacrificedAtCleanup,
       when(
         does(actor(thisEnchantment), enter),
+        if = is(it, in(battlefield)),
         sequentially(
           steps = [
             establish(
@@ -19,5 +20,4 @@ card singleFaced({
             attachTo(thisEnchantment, it),
             delay(
               does(actor(thisEnchantment), leave),
-              instruct(controllerOf(that(creature)), sacrifice(it)))]),
-        if = is(it, in(battlefield)))]})
+              instruct(controllerOf(that(creature)), sacrifice(it)))]))]})

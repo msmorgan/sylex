@@ -10,7 +10,7 @@ card singleFaced({
       indestructible,
       whenever(
         does(by(you), putCounters(anyAmount, anyKind, a(and([isCreature, isOther])))),
-        may(putCounters(thatMuch, thoseCounters, this)),
-        if = is(it, not(hasSubtype(kree))))],
+        if = is(it, not(hasSubtype(kree))),
+        may(putCounters(thatMuch, thoseCounters, this)))],
     power = 4,
     toughness = 4})

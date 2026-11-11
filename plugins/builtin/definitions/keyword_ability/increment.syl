@@ -7,15 +7,12 @@ ability increment {
   body = [
     whenever(
       does(actor(you), cast(a(isSpell))),
-      putCounters(1, printedKind(p1p1Counter), thisCreature),
       if = and(
         conjuncts = [
           is(thisPermanent, isCreature),
           or(
             disjuncts = [
               compareAmt(manaValueSpentToCast(that(spell)), greater, powerOf(thisCreature)),
-              compareAmt(
-                manaValueSpentToCast(that(spell)),
-                greater,
-                toughnessOf(thisCreature))])]))]
+              compareAmt(manaValueSpentToCast(that(spell)), greater, toughnessOf(thisCreature))])]),
+      putCounters(1, printedKind(p1p1Counter), thisCreature))]
 }

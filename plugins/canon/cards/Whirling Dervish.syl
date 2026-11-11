@@ -7,7 +7,7 @@ card singleFaced({
       protection(hasColor(black)),
       at(
         beginningOfEach(endStep),
-        putCounters(1, printedKind(p1p1Counter), it),
-        if = did(actor(thisCreature), dealDamage(recipient = anOpponent), within(soFarThisTurn)))],
+        if = did(actor(thisCreature), dealDamage(recipient = anOpponent), within(soFarThisTurn)),
+        putCounters(1, printedKind(p1p1Counter), it))],
     power = 1,
     toughness = 1})

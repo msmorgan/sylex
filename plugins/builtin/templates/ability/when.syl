@@ -6,9 +6,9 @@
 # [CR#603.1,113.3c,603.4]
 template when(
   event: GameEvent,
+  if: Option(Condition) = none,
   action: Action,
-  limit: Option(UsageLimit) = none,
-  if: Option(Condition) = none): Ability {
+  limit: Option(UsageLimit) = none): Ability {
   # TODO(spelling): Include or omit the clauses supplied by limit and if.
   body = triggered(when($event), intervening = $if, $action, limit = $limit)
 }

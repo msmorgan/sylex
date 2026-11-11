@@ -5,16 +5,16 @@ card singleFaced({
     text = [
       at(
         beginningOfYour(upkeep),
+        if = exists(
+          compareOver(
+            isOpponent,
+            countOf(and([isLand, controlledBy(they)])),
+            greater,
+            countOf(and([isLand, youControl])))),
         may(
           sequentially(
             steps = [
               search(yourLibrary, for = counted(upTo(3), and([isLand, hasSupertype(basic)]))),
               reveal(those(card)),
               putInto(those(card), hand),
-              shuffle])),
-        if = exists(
-          compareOver(
-            isOpponent,
-            countOf(and([isLand, controlledBy(they)])),
-            greater,
-            countOf(and([isLand, youControl])))))]})
+              shuffle])))]})

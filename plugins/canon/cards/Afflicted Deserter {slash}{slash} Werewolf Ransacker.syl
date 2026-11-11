@@ -6,8 +6,8 @@ card transforming({
     text = [
       at(
         beginningOfEach(upkeep),
-        transform(thisCreature),
-        if = not(did(any, cast(a(isSpell)), within(lastTurn))))],
+        if = not(did(any, cast(a(isSpell)), within(lastTurn))),
+        transform(thisCreature))],
     power = 3,
     toughness = 2},
   {
@@ -27,10 +27,10 @@ card transforming({
                 dealDamage(amount = 3, recipient = controllerOf(that(artifact)))))])),
       at(
         beginningOfEach(upkeep),
-        transform(thisCreature),
         if = compareAmt(
           aggregateOver(max, isPlayer, eventCount(cast(a(isSpell)), actor(they), lastTurn)),
           atLeast,
-          2))],
+          2),
+        transform(thisCreature))],
     power = 5,
     toughness = 4})

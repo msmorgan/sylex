@@ -6,6 +6,9 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), enter),
+        if = thereAre(
+          withTheSameName(
+            counted(orMore(2), and([isPermanent, non(isLand), isNontoken, youControl])))),
         create(
           1,
           written({
@@ -13,9 +16,6 @@ card singleFaced({
                 types = [artifact, creature],
                 subtypes = [construct],
                 power = 4,
-                toughness = 4}})),
-        if = thereAre(
-          withTheSameName(
-            counted(orMore(2), and([isPermanent, non(isLand), isNontoken, youControl])))))],
+                toughness = 4}})))],
     power = 4,
     toughness = 4})

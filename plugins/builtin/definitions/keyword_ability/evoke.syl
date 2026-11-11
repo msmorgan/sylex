@@ -9,6 +9,6 @@ ability evoke(cost: Cost) {
     static(can(actor(you), cast(thisCard, altCost = payingInstead($cost)))),
     when(
       does(actor(thisPermanent), enter),
-      instruct(controllerOf(thisPermanent), sacrifice(thisPermanent)),
-      if = keywordCostPaid(evoke, thisPermanent))]
+      if = keywordCostPaid(evoke, thisPermanent),
+      instruct(controllerOf(thisPermanent), sacrifice(thisPermanent)))]
 }

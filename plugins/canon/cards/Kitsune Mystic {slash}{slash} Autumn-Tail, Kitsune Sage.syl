@@ -6,8 +6,8 @@ card flip({
     text = [
       at(
         beginningOfEach(endStep),
-        flip(thisCreature),
-        if = is(thisCreature, attachedBy(enchanted, counted(orMore(2), hasSubtype(aura)))))],
+        if = is(thisCreature, attachedBy(enchanted, counted(orMore(2), hasSubtype(aura)))),
+        flip(thisCreature))],
     power = 2,
     toughness = 3},
   {

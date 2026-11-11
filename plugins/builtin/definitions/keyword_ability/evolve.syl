@@ -7,9 +7,9 @@ ability evolve {
   body = [
     whenever(
       does(actor(a(and([isCreature, youControl]))), enter),
-      putCounters(1, printedKind(p1p1Counter), thisCreature),
       if = or(
         disjuncts = [
           compareAmt(powerOf(that(creature)), greater, powerOf(thisCreature)),
-          compareAmt(toughnessOf(that(creature)), greater, toughnessOf(thisCreature))]))]
+          compareAmt(toughnessOf(that(creature)), greater, toughnessOf(thisCreature))]),
+      putCounters(1, printedKind(p1p1Counter), thisCreature))]
 }

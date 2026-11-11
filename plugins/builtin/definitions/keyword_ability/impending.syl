@@ -23,9 +23,9 @@ ability impending(amount: Amount, cost: Cost) {
         characteristicChange(thisPermanent, edits = [typeLine(loses, {types = [creature]})]))),
     at(
       beginningOfYour(endStep),
-      removeCounters(oneThrough(1), printedKind(timeCounter), thisPermanent),
       if = and(
         conjuncts = [
           keywordCostPaid(impending, thisPermanent),
-          is(thisPermanent, hasCounter(kind = timeCounter))]))]
+          is(thisPermanent, hasCounter(kind = timeCounter))]),
+      removeCounters(oneThrough(1), printedKind(timeCounter), thisPermanent))]
 }

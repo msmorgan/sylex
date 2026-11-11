@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), enter),
-        addMana(symbols([pip(red), pip(red), pip(red)])),
-        if = is(it, did(actor(you), cast(which, from = yourHand), within = thisObject)))],
+        if = is(it, did(actor(you), cast(which, from = yourHand), within = thisObject)),
+        addMana(symbols([pip(red), pip(red), pip(red)])))],
     power = 3,
     toughness = 3})

@@ -5,8 +5,8 @@ card singleFaced({
     text = [
       whenever(
         does(actor(a(and([isCreature, anOpponentControls]))), setStatus(tapped, actor)),
-        may(draw(1)),
-        if = is(it, not(inCombat(declaredAttacker)))),
+        if = is(it, not(inCombat(declaredAttacker))),
+        may(draw(1))),
       activated(
         mana([generic(4), pip(blue)]),
         tap(target(and([isCreature, not(hasKeyword(theKeyword(flying)))]))))]})

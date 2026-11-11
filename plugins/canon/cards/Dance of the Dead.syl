@@ -7,6 +7,7 @@ card singleFaced({
       enchant(and([isCreature, isCard, in(graveyard)])),
       when(
         does(actor(thisAura), enter),
+        if = is(it, in(battlefield)),
         sequentially(
           steps = [
             establish(
@@ -22,8 +23,7 @@ card singleFaced({
             attachTo(thisAura, it),
             delay(
               does(actor(thisAura), leave),
-              instruct(controllerOf(that(creature)), sacrifice(it)))]),
-        if = is(it, in(battlefield))),
+              instruct(controllerOf(that(creature)), sacrifice(it)))])),
       static(
         conjunction(
           [getsPt(enchanted(creature), up(1), up(1)), doesntUntap(it, controllerOf(it))],

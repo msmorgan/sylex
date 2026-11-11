@@ -15,6 +15,6 @@ card singleFaced({
                 putOntoBattlefield(thisLand)])))),
       at(
         beginningOfYour(upkeep),
-        gainLife(1),
-        if = compareAmt(countOf(and([isLand, youControl])), atMost, 3)),
+        if = compareAmt(countOf(and([isLand, youControl])), atMost, 3),
+        gainLife(1)),
       activated(tapSymbol, addMana(symbols([colorlessPip])))]})

@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       flying,
       prowl(mana([generic(2), pip(blue)])),
-      when(does(actor(thisCreature), enter), draw(1), if = keywordCostPaid(prowl, thisCreature))],
+      when(does(actor(thisCreature), enter), if = keywordCostPaid(prowl, thisCreature), draw(1))],
     power = 3,
     toughness = 1})

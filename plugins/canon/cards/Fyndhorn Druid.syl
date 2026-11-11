@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), die),
-        gainLife(4),
-        if = was(becomeBlocked(it), within(soFarThisTurn)))],
+        if = was(becomeBlocked(it), within(soFarThisTurn)),
+        gainLife(4))],
     power = 2,
     toughness = 2})

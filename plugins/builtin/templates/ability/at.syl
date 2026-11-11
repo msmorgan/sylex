@@ -2,9 +2,9 @@
 # [CR#603.2b]
 template at(
   point: TurnPoint,
+  if: Option(Condition) = none,
   action: Action,
-  limit: Option(UsageLimit) = none,
-  if: Option(Condition) = none): Ability {
+  limit: Option(UsageLimit) = none): Ability {
   # TODO(spelling): Include or omit the clauses supplied by limit and if.
   spelling = "At <point>, <action>",
   body = triggered(at($point), intervening = $if, $action, limit = $limit)

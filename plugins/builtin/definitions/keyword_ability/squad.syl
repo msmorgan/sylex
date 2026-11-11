@@ -8,6 +8,6 @@ ability squad(cost: Cost) {
     static(addedCost(this, optional, plusAdditional($cost, times = anyNumberOfTimes))),
     when(
       does(actor(thisCreature), enter),
-      create(timesPaid(byKeyword(squad), thisCreature), copyOf(thisCreature)),
-      if = keywordCostPaid(squad, thisCreature))]
+      if = keywordCostPaid(squad, thisCreature),
+      create(timesPaid(byKeyword(squad), thisCreature), copyOf(thisCreature)))]
 }

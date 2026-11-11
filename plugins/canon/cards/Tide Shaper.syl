@@ -7,10 +7,10 @@ card singleFaced({
       kicker(mana([generic(1)])),
       when(
         does(actor(thisCreature), enter),
+        if = keywordCostPaid(kicker, thisCreature),
         establish(
           qualityChange(target(isLand), sets, bundle({characteristics = {subtypes = [island]}})),
-          duration = forAsLongAs(is(thisCreature, in(battlefield)))),
-        if = keywordCostPaid(kicker, thisCreature)),
+          duration = forAsLongAs(is(thisCreature, in(battlefield))))),
       static(
         onlyWhile(
           getsPt(thisCreature, up(1), up(1)),
