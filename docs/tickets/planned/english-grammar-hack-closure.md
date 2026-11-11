@@ -40,6 +40,14 @@ disagree, and joins `needs:` if it is moved to `planned/`:
 | Coordination gates on Noun Phrases, noun premodifiers and relatives | `english-coordination-gate-review` |
 | Comments that claim more than their equations enforce | `english-comment-equation-drift` |
 | Categories that restate Productions as twins | `english-category-restriction` |
+| A determined slash measure marked as a compound's first base | `english-measure-nominal-compound-part` |
+| Postposed Object modifiers built on an open Gap | `english-postposed-modifier-gap` |
+| `SingularOrQuantified` and the quantified plural it claims | `english-singular-or-quantified-value` |
+| Number transparency for *any number of* only | `english-transparent-quantity-determiners` |
+| Stranded auxiliaries licensed by spelling | `english-stranded-auxiliary-lookahead` |
+| Features that carry several unrelated meanings | `english-features-as-tags` |
+| Modifiers made determinatives before a bare singular noun | `english-bare-singular-determinatives` |
+| Complement selection written as grammar classes | `english-frames-held-in-grammar` |
 
 ## Done when
 
