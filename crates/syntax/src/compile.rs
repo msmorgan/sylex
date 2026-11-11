@@ -1921,6 +1921,22 @@ impl<'a> Binder<'a> {
                 }
             })
             .transpose()?;
+        if central.is_none() && (central_heads.is_some() || !central_families.is_empty()) {
+            return Err(invalid(format!(
+                "valence `{phrase}`: `central_heads` or `central_families` without `central`"
+            )));
+        }
+        if let Some(family) = central_families.iter().find(|family| {
+            matches!(
+                family,
+                FrameFamily::Catenative | FrameFamily::ComplexCatenative
+            )
+        }) {
+            return Err(invalid(format!(
+                "valence `{phrase}`: central family `{family:?}` is catenative, which takes no \
+                 central Adjunct"
+            )));
+        }
         let central = central
             .as_deref()
             .map(|category| {

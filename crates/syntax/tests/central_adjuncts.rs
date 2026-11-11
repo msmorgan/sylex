@@ -39,6 +39,7 @@ const FRAMES: &str = r#"(
         "v:be": [
             (family: Copular, slots: [(relation: PredicativeComplement, fill: Pred)]),
             (family: Prepositional, slots: [(relation: Complement, fill: PP(["p:on"]))]),
+            (family: Catenative, slots: [(relation: Complement, fill: BareInf)]),
         ],
         "v:become": [(family: Copular, slots: [(relation: PredicativeComplement, fill: Pred)])],
         "v:remain": [
@@ -57,6 +58,7 @@ fn grammar(valence: &str) -> Result<CompiledGrammar, sylex_syntax::LoadError> {
 root Sentence
 feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
 category AdverbPhrase
+category BareInf
 category CentralAdjunct {{ function }}
 category NounPhrase
 category Predicative {{ function }}
@@ -67,11 +69,13 @@ class BeVerb = ["v:be"]
 slot NP = NounPhrase
 slot PP = PrepositionPhrase
 slot Pred = Predicative
+slot BareInf = BareInf
 Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
 Noun: NounPhrase -> Lex(Noun)
 Adverb: AdverbPhrase -> Lex(Adverb)
 CentralAdverb: CentralAdjunct -> AdverbPhrase
 PrepositionalPredicative: Predicative -> Hosted(PrepositionPhrase, Nominal)
+BareInfinitival: BareInf -> VerbPhrase where head.VerbForm = Plain
 {valence}
 valence PrepositionPhrase {{ head: Preposition }}
         "#
@@ -163,6 +167,25 @@ fn a_lexical_verb_sharing_the_frame_takes_none() {
 }
 
 #[test]
+fn a_central_heads_catenative_frame_derives_no_central_phrase() {
+    let grammar = grammar(CENTRAL).unwrap();
+    // The catenative frame derives its own phrase, and no central one.
+    assert!(grammar.production_ids().any(|id| id.contains("Catenative")));
+    let central: Vec<&str> = grammar
+        .production_ids()
+        .filter(|id| id.contains("/central"))
+        .collect();
+    assert!(
+        central.iter().any(|id| id.contains("Prepositional")),
+        "{central:?}"
+    );
+    assert!(
+        !central.iter().any(|id| id.contains("Catenative")),
+        "{central:?}"
+    );
+}
+
+#[test]
 fn a_central_adjunct_needs_its_heads_and_a_verb() {
     for (valence, defect) in [
         (
@@ -176,6 +199,22 @@ fn a_central_adjunct_needs_its_heads_and_a_verb() {
         (
             "valence VerbPhrase { head: Verb }\nvalence NounPhrase { head: Noun, central: CentralAdjunct, central_heads: BeVerb }",
             "`central` on a non-verb head",
+        ),
+        (
+            "valence VerbPhrase { head: Verb, central_heads: BeVerb }",
+            "without `central`",
+        ),
+        (
+            "valence VerbPhrase { head: Verb, central_families: [Copular] }",
+            "without `central`",
+        ),
+        (
+            "valence VerbPhrase { head: Verb, central: CentralAdjunct, central_heads: BeVerb, central_families: [Catenative] }",
+            "is catenative",
+        ),
+        (
+            "valence VerbPhrase { head: Verb, central: CentralAdjunct, central_heads: BeVerb, central_families: [ComplexCatenative] }",
+            "is catenative",
         ),
     ] {
         let error = grammar(valence).unwrap_err();
