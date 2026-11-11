@@ -309,7 +309,7 @@ Event decisions:
   leaves-the-battlefield one ([CR#603.6c]). Arms of one `or` can differ: *Syr Konrad, the Grim*'s
   "another creature dies", "a creature card is put into a graveyard from anywhere other than the
   battlefield" and "a creature card leaves your graveyard" look back, look after and look back.
-  The derivation reads an arm's event through `triggerEvent`, through the `and` at
+  The derivation reads an arm's event through `triggerEvent`, through the `or` at
   `TriggerCondition` (each trigger condition of which is an arm, as each arm of an event `or`
   is), and through `timed`, whose Timing is read at the same point as its event:
   *Market Gnome*'s "is exiled from the battlefield while you're activating a craft ability" is a

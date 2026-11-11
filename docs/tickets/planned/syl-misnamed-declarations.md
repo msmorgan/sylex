@@ -6,7 +6,7 @@ needs: [syl-argument-naming, syl-single-face-card-call]
 
 ## Why
 
-Five declarations are named or spelled for one use, or read poorly for what they build:
+Six declarations are named or spelled for one use, or read poorly for what they build:
 
 - `modifiesPrecedingAction` (`primitives/timing/`) is a `Duration` spelled "It can't be
   regenerated", though it is any rider that modifies the action before it [CR#608.2c].
@@ -20,6 +20,14 @@ Five declarations are named or spelled for one use, or read poorly for what they
   (`doesnt(actor(thisEffect), remove(thisAura))`, *Black Ward*). It is renamed `subject(np)`. The
   noun-phrase word `actor` (`primitives/pronoun/actor.syl`), which reads the Actor, keeps its
   name.
+- `and` at `TriggerCondition` (`primitives/triggerCondition/and.syl`) is named for the printed
+  coordinator, but it means that the ability triggers when any of its conditions is met
+  [CR#603.1b,603.2]. The primitive is renamed `or`, for its meaning, and spelled with the "or"
+  join. The printed "and" becomes a Template `and` over it (`templates/triggerCondition/`), and
+  the Template `or` (`templates/triggerCondition/or.syl`) is removed, since the primitive is now
+  what *Tenuous Truce*'s printed "or" spells. 6 canon cards call `and` there (*Autarch Mammoth*,
+  *Bartered Cow*, *Balemurk Leech*, *Crack in Time*, *Up the Beanstalk*, *Shrine of Boundless
+  Growth*) and 1 calls `or` (*Tenuous Truce*); nothing in `plugins/builtin/` calls either.
 
 `syl-argument-naming` rewrites 4 arguments that hold these declarations' calls, and lands first.
 
@@ -35,6 +43,9 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
   reports the counts it compared. The glossary entry **Subject**
   (`docs/contexts/game-model/CONTEXT.md`), `syl.md` §2 and `semantics.md` §4.2, §4.6 and §4.7
   name `subject(…)`.
+- The trigger-condition primitive is `or`, the printed "and" is the Template `and` over it, and
+  no Template `or` exists at `TriggerCondition`; each of the 7 callers is checked against its
+  card's Oracle text, so the 6 that print "and" call `and` and *Tenuous Truce* calls `or`.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
@@ -43,4 +54,6 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 `plugins/builtin/primitives/timing/{modifiesPrecedingAction,thisObject}.syl`,
 `plugins/builtin/primitives/period/thisObject.syl`,
 `plugins/builtin/templates/pronoun/splitOverPermanent.syl`, `plugins/builtin/primitives/noun/actor.syl`,
-`plugins/builtin/primitives/static/doesnt.syl`.
+`plugins/builtin/primitives/static/doesnt.syl`,
+`plugins/builtin/primitives/triggerCondition/and.syl`,
+`plugins/builtin/templates/triggerCondition/or.syl`.
