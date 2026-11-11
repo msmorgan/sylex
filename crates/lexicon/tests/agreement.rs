@@ -96,7 +96,7 @@ fn lexicon() -> Lexicon {
     genitive.binding = sylex_lexicon::Binding::Suffix;
     let count_noun = |id: &str| Lexeme::noun(id, id, vec![Countability::Count], source(id));
     let mut vampire = count_noun("Vampire");
-    vampire.properties.prefix_hyphenation = Hyphenation::Hyphenated;
+    vampire.properties.prefix_hyphenation = Some(Hyphenation::Hyphenated);
     // The zero plural (*four Eldrazi Spawn*).
     let mut spawn = count_noun("Spawn");
     for slot in &mut spawn.forms {
@@ -256,4 +256,42 @@ fn each_allomorph_realizes_one_spelling_its_neighbor_selects() {
     );
     assert!(agree(&lexicon, &octopus, &suffixed) && !agree(&lexicon, &octopus, &bare));
     assert!(agree(&lexicon, &rats, &suffixed) && !agree(&lexicon, &rats, &bare));
+}
+
+/// Only a Category that hosts a prefix has a prefix hyphenation, so *non*
+/// agrees with no word of another (*non-* before the article *a* is no
+/// word), and no other Lexeme declares one.
+#[test]
+fn only_a_prefix_host_has_a_prefix_hyphenation() {
+    let lexicon = lexicon();
+    let article = value(
+        "a",
+        WordForm::Invariant,
+        FeatureBundle {
+            following_onset: Some(Onset::Consonant),
+            ..FeatureBundle::default()
+        },
+    );
+    assert_eq!(
+        lexicon.edges(&article).unwrap().left.prefix_hyphenation,
+        None
+    );
+    for hyphenation in [Hyphenation::Solid, Hyphenation::Hyphenated] {
+        let prefix = value(
+            "non",
+            WordForm::Invariant,
+            FeatureBundle {
+                hyphenation: Some(hyphenation),
+                ..FeatureBundle::default()
+            },
+        );
+        assert!(!agree(&lexicon, &prefix, &article));
+    }
+    let mut the = Lexeme::invariant("the", "the", Category::Determinative, source("the"));
+    the.properties.prefix_hyphenation = Some(Hyphenation::Hyphenated);
+    assert!(Lexicon::new([the]).is_err());
+    // A host is solid by default, so only *Hyphenated* is declared.
+    let mut land = Lexeme::noun("land", "land", vec![Countability::Count], source("land"));
+    land.properties.prefix_hyphenation = Some(Hyphenation::Solid);
+    assert!(Lexicon::new([land]).is_err());
 }

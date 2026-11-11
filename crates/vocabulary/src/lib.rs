@@ -492,11 +492,19 @@ impl Sources {
         }
         for (lemma, (decl, families)) in &subtypes {
             let id = format!("subtype:{lemma}");
-            builder.noun(&id, &decl.entry(), catalog(SUBTYPES, &id));
-            let lexeme = builder.lexemes.last_mut().expect("just pushed");
             // A prefix joins a subtype with a hyphen (*non-Vampire*;
-            // `docs/oracle-style-guide.md` §7, Negation with non-).
-            lexeme.properties.prefix_hyphenation = sylex_lexicon::Hyphenation::Hyphenated;
+            // `docs/oracle-style-guide.md` §7, Negation with non-), so no
+            // subtype declares it.
+            let mut entry = decl.entry();
+            if entry.prefix_hyphenation.is_some() {
+                return Err(SourceError::Invalid(format!(
+                    "subtype `{lemma}` declares a prefix hyphenation, which every subtype takes \
+                     hyphenated"
+                )));
+            }
+            entry.prefix_hyphenation = Some(sylex_lexicon::Hyphenation::Hyphenated);
+            builder.noun(&id, &entry, catalog(SUBTYPES, &id));
+            let lexeme = builder.lexemes.last_mut().expect("just pushed");
             lexeme.properties.classes = families
                 .iter()
                 .map(|family| Ident::new(&format!("{family:?}Type")))
@@ -516,7 +524,7 @@ impl Sources {
                 plural: None,
                 frames: Vec::new(),
                 variable: false,
-                prefix_hyphenation: sylex_lexicon::Hyphenation::Solid,
+                prefix_hyphenation: None,
             };
             builder.noun(&id, &entry, catalog(COUNTERS, &id));
             // A counter's name is its kind, the first base of its Compound

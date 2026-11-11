@@ -23,9 +23,13 @@ pub struct LexicalProperties {
     pub countability: Vec<crate::Countability>,
     /// Declared distribution features retained by name for the grammar adapter.
     pub features: BTreeMap<dpsi::Ident, dpsi::Ident>,
-    /// How a prefix before the Lexeme joins it ([`crate::FeatureBundle::hyphenation`]).
+    /// How a prefix before the Lexeme joins it
+    /// ([`crate::FeatureBundle::hyphenation`]), declared only where it is
+    /// `Hyphenated`: a host is `Solid` by default, and declaring that is
+    /// refused. Only a Lexeme of a Category that hosts a prefix declares it
+    /// ([`crate::Category::hosts_prefix`]).
     #[serde(default)]
-    pub prefix_hyphenation: crate::Hyphenation,
+    pub prefix_hyphenation: Option<crate::Hyphenation>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]

@@ -257,10 +257,11 @@ pub struct NounEntry {
     /// pp. 266-269). `type` has it.
     #[serde(default)]
     pub variable: bool,
-    /// How a prefix joins the noun: hyphenated, as before a subtype, which the
-    /// loader marks itself (*non-Vampire*), or solid (*nonland*).
+    /// How a prefix joins the noun, where it is not solid, the default
+    /// (*nonland*): hyphenated (*non-outlaw*). A subtype takes it hyphenated
+    /// without declaring it (*non-Vampire*).
     #[serde(default)]
-    pub prefix_hyphenation: Hyphenation,
+    pub prefix_hyphenation: Option<Hyphenation>,
 }
 
 fn count() -> Vec<Countability> {
@@ -288,7 +289,7 @@ impl NounDecl {
                 plural: None,
                 frames: Vec::new(),
                 variable: false,
-                prefix_hyphenation: Hyphenation::Solid,
+                prefix_hyphenation: None,
             },
             Self::Entry(entry) => entry.clone(),
         }

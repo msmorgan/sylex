@@ -85,7 +85,7 @@ fn a_frame_belongs_to_its_head_category() {
             plural: None,
             frames: vec![FrameSpec::Monotransitive],
             variable: false,
-            prefix_hyphenation: sylex_lexicon::Hyphenation::Solid,
+            prefix_hyphenation: None,
         }));
     rejects(&sources, "is not a frame of a Noun");
 }
@@ -187,4 +187,16 @@ fn a_name_is_singular_unless_listed_plural_and_a_plural_name_names_a_card() {
         .unwrap_err()
         .to_string();
     assert!(error.contains("names no card"), "{error}");
+}
+
+/// Every subtype takes a prefix hyphenated (*non-Vampire*), so none declares
+/// it: a declaration would be overwritten or contradicted.
+#[test]
+fn a_subtype_declares_no_prefix_hyphenation() {
+    let mut sources = Sources::load().unwrap();
+    let decls = sources.subtypes.values_mut().next().unwrap();
+    let mut entry = decls[0].entry();
+    entry.prefix_hyphenation = Some(sylex_lexicon::Hyphenation::Hyphenated);
+    decls[0] = sylex_vocabulary::schema::NounDecl::Entry(entry);
+    rejects(&sources, "declares a prefix hyphenation");
 }

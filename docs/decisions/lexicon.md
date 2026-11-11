@@ -48,27 +48,29 @@ numbers (*entered*, *can*), which is one bundle unmarked for Number. Why: two
 bundles would be two Readings differing in a Number the text does not mark, a
 second tree ([English](english.md) §8).
 
-**A form has one spelling, and its context selects it.** Each slot of a
-Lexeme is spelled one way, so each lexical value realizes one way. Oracle
-text has no free variation, and no curly quotation mark or apostrophe. Its
-allomorphs are forms of one Lexeme told apart by an Adjacency Agreement
-feature, which the word next to it fixes as a subject fixes a verb's Number:
-the indefinite article's by the Onset of the word after it (*a creature*, *an
-artifact*, *an 8/8*, *a +1/+1 counter*), *non*'s by how the host after it takes
-a prefix, hyphenated before a subtype or *outlaw* and solid before any other
-word (*non-Vampire*, *nonland*), and the genitive's by the host before it: the
-bare genitive after any Plural noun form ending in *s*, regular or irregular,
-and after the singular of a noun spelled alike in both numbers with final *s*,
-and the *'s* genitive after any other form, a singular ending in *s* whose
-plural differs and a name ending in *s* included (*players'*, *elves'*,
-*Thalakos'* singular or plural, *player's*, *Spawn's*, *Swarm of Rats's*; CGEL,
-Ch. 18 §4.2 [35], p. 1596, where *species* takes the bare genitive "in the
-singular as well as the plural", and the bare genitive of a name is only a
-variant, [35ii], which Oracle does not write). The host's realized forms decide
-it: no word lists the hosts. The grammar checks the agreement between each word and the
-next, whatever Constituents they end and begin. Why: a free choice of spelling
-lets the parser accept *a artifact* and *players's*, and leaves realization
-nothing to derive the spelling from but the source text.
+**A form has one spelling, and its context selects it.** Each slot of a Lexeme
+is spelled one way, so each lexical value realizes one way. Oracle text has no
+free variation, and no curly quotation mark or apostrophe. Its allomorphs are
+forms of one Lexeme told apart by an Adjacency Agreement feature, which the
+word next to it fixes as a subject fixes a verb's Number: the indefinite
+article's by the Onset of the word after it (*a creature*, *an artifact*, *an
+8/8*, *a +1/+1 counter*), *non*'s by how the host after it takes a prefix,
+hyphenated before a subtype or *outlaw* and solid before any other noun,
+adjective or verb (*non-Vampire*, *nonland*, *nonattacking*), while a word of
+any other Category takes no prefix and agrees with neither, and the genitive's
+by the host before it: the bare genitive after any Plural noun form ending in
+*s*, regular or irregular, and after the singular of a noun spelled alike in
+both numbers with final *s*, and the *'s* genitive after any other form, a
+singular ending in *s* whose plural differs and a name ending in *s* included
+(*players'*, *elves'*, *Thalakos'* singular or plural, *player's*, *Spawn's*,
+*Swarm of Rats's*; CGEL, Ch. 18 §4.2 [35], p. 1596, where *species* takes the
+bare genitive "in the singular as well as the plural", and the bare genitive of
+a name is only a variant, [35ii], which Oracle does not write). The host's
+realized forms decide it: no word lists the hosts. The grammar checks the
+agreement between each word and the next, whatever Constituents they end and
+begin. Why: a free choice of spelling lets the parser accept *a artifact* and
+*players's*, and leaves realization nothing to derive the spelling from but the
+source text.
 
 **A word in two Parts of Speech is two Lexemes**, related by Conversion, never
 one Lexeme with a fused-head use standing in for the other: *red* is a noun in
@@ -156,20 +158,20 @@ symbol of the grammar admits it but `OtherCardName()`, which admits nothing
 else. Three positions opt in, as a `NameComplement`, alone or coordinated: the
 predicative complement of *named* (*cards named Relentless Rats*); the Keyword
 Parameter of *Partner with*, whose name is the one its ability searches for as
-*a card named [name]* [CR#702.124j]; and the complement of *among* after *from*,
-wherever that phrase attaches, as in the options of a choice (*choose a card
-name ... from among Disenchant, ..., and Black Lotus*). *From* selects that
-*among* phrase by its Complement's kind and *among* takes a name only so
+*a card named [name]* [CR#702.124j]; and the complement of *among* after
+*from*, wherever that phrase attaches, as in the options of a choice (*choose a
+card name ... from among Disenchant, ..., and Black Lotus*). *From* selects
+that *among* phrase by its Complement's kind and *among* takes a name only so
 selected, as *do the same for* selects *for* with a cited word
-(`PPWith(["for"], Mention)`): a name after *among* under any other head (*divide
-it among Black Lotus*) is refused. Any other position, a Subject, Object,
-possessor or premodifier among them, refuses another card's name with no clause
-of its own. A name a card gives an object, or
-a vote option, spelled like another card's name is listed as that card's
-Introduced Name or vote option (*create a Tarmogoyf token*, *votes for Redhorn
-Pass or Mines of Moria*). Why: a card's text mentions another card by name only
-in those positions, and a card name read anywhere else is another word misread
-(*Exile* in *Exile target attacking creature*).
+(`PPWith(["for"], Mention)`): a name after *among* under any other head
+(*divide it among Black Lotus*) is refused. Any other position, a Subject,
+Object, possessor or premodifier among them, refuses another card's name with
+no clause of its own. A name a card gives an object, or a vote option, spelled
+like another card's name is listed as that card's Introduced Name or vote
+option (*create a Tarmogoyf token*, *votes for Redhorn Pass or Mines of
+Moria*). Why: a card's text mentions another card by name only in those
+positions, and a card name read anywhere else is another word misread (*Exile*
+in *Exile target attacking creature*).
 
 **Bound keywords are analyzed in parts**, a suffix on a stem from its declared
 stem classes, so *islandwalk* needs no declaration [CR#702.14a]. A stem is

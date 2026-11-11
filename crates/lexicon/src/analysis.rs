@@ -229,6 +229,23 @@ impl Lexicon {
             }
             let mut slots = BTreeSet::new();
             let mut realized_surfaces = BTreeSet::new();
+            let prefix_hyphenation = match (
+                lexeme.category.hosts_prefix(),
+                lexeme.properties.prefix_hyphenation,
+            ) {
+                (true, Some(crate::Hyphenation::Solid)) => {
+                    return Err(error(
+                        "a declared prefix hyphenation its host takes by default",
+                    ));
+                }
+                (true, declared) => Some(declared.unwrap_or(crate::Hyphenation::Solid)),
+                (false, None) => None,
+                (false, Some(_)) => {
+                    return Err(error(
+                        "prefix hyphenation on a Lexeme whose Category hosts no prefix",
+                    ));
+                }
+            };
             let plurals: BTreeSet<String> = lexeme
                 .forms
                 .iter()
@@ -272,7 +289,7 @@ impl Lexicon {
                 let edges = crate::Edges {
                     left: crate::LeftEdge {
                         onset: features.onset,
-                        prefix_hyphenation: lexeme.properties.prefix_hyphenation,
+                        prefix_hyphenation,
                         genitive: declaration.features.genitive,
                     },
                     right: crate::RightEdge {

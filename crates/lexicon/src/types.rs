@@ -32,6 +32,16 @@ pub enum Category {
     Symbol,
 }
 
+impl Category {
+    /// Whether a word of the Category hosts a prefix: a noun (*nonland*,
+    /// *non-Vampire*), an adjective (*nonlegendary*) or a verb's participle
+    /// (*nonattacking*).
+    #[must_use]
+    pub fn hosts_prefix(self) -> bool {
+        matches!(self, Self::Noun | Self::Adjective | Self::Verb)
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]
 pub enum Number {
     Singular,
@@ -66,12 +76,10 @@ pub enum Case {
 
 /// How a prefix joins its host: solid (*nonland*) or with a hyphen
 /// (*non-Vampire*; `docs/oracle-style-guide.md` §7, Negation with non-). The
-/// host's lexical property selects it: an unmarked host is `Solid`.
-#[derive(
-    Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Deserialize, Ord, PartialOrd, Serialize,
-)]
+/// host's lexical property selects it: a host that declares none is `Solid`,
+/// and a word of a Category that hosts no prefix has none.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Ord, PartialOrd, Serialize)]
 pub enum Hyphenation {
-    #[default]
     Solid,
     Hyphenated,
 }
@@ -187,8 +195,9 @@ pub struct LeftEdge {
     /// Its Onset, which an article before it agrees with; `None` when no
     /// pronunciation is known, which no article agrees with.
     pub onset: Option<Onset>,
-    /// How a prefix before it joins it.
-    pub prefix_hyphenation: Hyphenation,
+    /// How a prefix before it joins it; `None` when its Category hosts no
+    /// prefix, which no prefix agrees with.
+    pub prefix_hyphenation: Option<Hyphenation>,
     /// Its [`FeatureBundle::genitive`].
     pub genitive: Option<GenitiveAlternant>,
 }
@@ -215,15 +224,15 @@ pub struct Edges {
 }
 
 impl Edges {
-    /// The edges of a word with no Adjacency Agreement dimension, no
-    /// hyphenated prefix and no Plural noun form, such as a numeral or a
-    /// Flavor Word, with its Onset.
+    /// The edges of a word with no Adjacency Agreement dimension that hosts
+    /// no prefix and is no Plural noun form, such as a numeral or a Flavor
+    /// Word, with its Onset.
     #[must_use]
     pub fn plain(onset: Option<Onset>) -> Self {
         Self {
             left: LeftEdge {
                 onset,
-                prefix_hyphenation: Hyphenation::Solid,
+                prefix_hyphenation: None,
                 genitive: None,
             },
             right: RightEdge {
@@ -246,7 +255,7 @@ impl RightEdge {
             .is_none_or(|onset| next.onset == Some(onset))
             && self
                 .hyphenation
-                .is_none_or(|hyphenation| hyphenation == next.prefix_hyphenation)
+                .is_none_or(|hyphenation| next.prefix_hyphenation == Some(hyphenation))
             && next
                 .genitive
                 .is_none_or(|genitive| genitive == self.genitive_host)
