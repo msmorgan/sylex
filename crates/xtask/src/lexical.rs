@@ -22,7 +22,6 @@ use sylex_lexicon::LexicalReading;
 use sylex_lexicon::Lexicon;
 use sylex_lexicon::Source;
 use sylex_lexicon::SourceKind;
-use sylex_vocabulary::card_name_id;
 
 use crate::raw_corpus::CorpusSelectionArgs;
 use crate::raw_corpus::SelectedCorpus;
@@ -349,9 +348,7 @@ fn analyze_face(face: &SelectedFace, lexicon: &Lexicon) -> Result<Option<(FaceRe
     let Some(raw) = face.text.as_deref() else {
         return Ok(None);
     };
-    // A face's text names its own face and card [CR#201.5c].
-    let scope = CardScope::own_names([card_name_id(&face.name), card_name_id(&face.group_name)]);
-    let analyzed = lexicon.analyze_source_scoped(raw, None, &scope);
+    let analyzed = lexicon.analyze_source_scoped(raw, None, &face.scope);
     let mut inventory = Inventory::default();
     let (words, unrecognized_nonwords) = account_text(&analyzed, lexicon, &mut inventory)
         .with_context(|| format!("lexical laws for {} ({})", face.name, face.identity))?;

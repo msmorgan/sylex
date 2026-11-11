@@ -13,7 +13,8 @@ use sylex_syntax::Constituent;
 use sylex_syntax::Gap;
 use sylex_syntax::Parse;
 use sylex_syntax::Reading;
-use sylex_vocabulary::card_name_id;
+
+use crate::corpus::own_names_by_face;
 
 /// More Readings than this and an entry is not evaluated tree by tree.
 pub const READING_LIMIT: u128 = 4096;
@@ -341,10 +342,24 @@ fn parse_assertion(text: &str) -> Result<Assertion, String> {
     Ok(assertion)
 }
 
-/// The card names an entry puts in scope.
+/// The card names an entry puts in scope: the [`crate::corpus::own_names`] of
+/// the face its `<card=NAME>` names, as the census reads that face's text.
+///
+/// # Panics
+/// On a `<card=NAME>` that names no face of the supported corpus.
 #[must_use]
 pub fn scope(entry: &Judgment) -> CardScope {
-    CardScope::own_names(entry.card.iter().map(|c| card_name_id(c)))
+    entry.card.as_ref().map_or_else(CardScope::default, |card| {
+        own_names_by_face()
+            .get(card)
+            .unwrap_or_else(|| {
+                panic!(
+                    "{}: `<card={card}>` names no face of the supported corpus",
+                    entry.location
+                )
+            })
+            .clone()
+    })
 }
 
 /// Round-trip law 2 for one Reading of `parse`: admitted, realized, and

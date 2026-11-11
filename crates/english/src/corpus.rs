@@ -13,12 +13,16 @@
 //! convention its printed card keeps, the census reads the corrected text and
 //! the grammar is not relaxed for the slip.
 
+use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::io::BufRead;
+use std::sync::OnceLock;
 
 use sylex_lexicon::CardScope;
+use sylex_lexicon::LexemeId;
 use sylex_upstream::oracle_text::strip_reminder_text;
 use sylex_upstream::scryfall::OracleCardReader;
+use sylex_upstream::scryfall::OracleUnit;
 use sylex_vocabulary::card_name_id;
 
 /// One Card Face record of the supported corpus.
@@ -30,8 +34,7 @@ pub struct Face {
     pub name: String,
     /// The whole card's name.
     pub card: String,
-    /// Card-name lexemes in scope on this face: its own name and its
-    /// card's [CR#201.5c].
+    /// Card-name lexemes in scope on this face: its [`own_names`].
     pub scope: CardScope,
     pub type_line: Option<String>,
     /// Oracle rules text, reminder text included, with the face's Editorial
@@ -186,6 +189,63 @@ pub enum CorpusError {
     Read(String),
 }
 
+/// The card names a face's text uses as its own: the face's name and its
+/// card's [CR#201.5c], and on a card of a meld pair the name of the meld
+/// result the pair melds into [CR#712.4a], which the data records as the
+/// card's `meld_result` part.
+///
+/// The faces of a double-faced card are named apart
+/// [CR#712.8d,712.8e,712.8f], and two faces that shorten to one spelling
+/// (*Ral*) name one object, not two, so a face's text shortens its own name.
+#[must_use]
+pub fn own_names(unit: &OracleUnit<'_>) -> CardScope {
+    CardScope::own_names(own_name_ids(unit))
+}
+
+fn own_name_ids<'u>(unit: &'u OracleUnit<'_>) -> impl Iterator<Item = LexemeId> + 'u {
+    let melded = unit
+        .related_cards()
+        .iter()
+        .filter(|part| part.component == "meld_result")
+        .map(|part| part.name.as_str());
+    [unit.display_name(), unit.group_name()]
+        .into_iter()
+        .chain(melded)
+        .map(card_name_id)
+}
+
+/// The [`own_names`] of every supported face of the pinned snapshot at
+/// `data/scryfall/oracle-cards.jsonl`, by face name. A name more than one
+/// face has (a prepared spell's) has the names of all of them.
+///
+/// # Panics
+/// On a missing or unreadable snapshot.
+#[must_use]
+pub fn own_names_by_face() -> &'static BTreeMap<String, CardScope> {
+    static INDEX: OnceLock<BTreeMap<String, CardScope>> = OnceLock::new();
+    INDEX.get_or_init(|| {
+        let reader = sylex_upstream::scryfall::oracle_cards()
+            .unwrap_or_else(|e| panic!("reading the Oracle Cards snapshot: {e}"));
+        let mut index = BTreeMap::<String, BTreeSet<LexemeId>>::new();
+        for card in reader {
+            let card = card.unwrap_or_else(|e| panic!("reading the Oracle Cards snapshot: {e}"));
+            if !card.supported() {
+                continue;
+            }
+            for unit in card.oracle_units() {
+                index
+                    .entry(unit.display_name().to_owned())
+                    .or_default()
+                    .extend(own_name_ids(&unit));
+            }
+        }
+        index
+            .into_iter()
+            .map(|(face, names)| (face, CardScope::own_names(names)))
+            .collect()
+    })
+}
+
 /// The rules-text units of a face: its paragraph lines after balanced
 /// reminder text is removed (a keyword line's semicolon separators becoming
 /// commas with it), trimmed, without empty lines. A line break
@@ -241,14 +301,7 @@ impl Corpus {
                 continue;
             }
             for unit in card.oracle_units() {
-                // A face's text shortens its own name: the faces of a
-                // double-faced card are named apart [CR#712.8d,712.8e,712.8f],
-                // and two faces that shorten to one spelling (*Ral*) name one
-                // object, not two.
-                let scope = CardScope::own_names([
-                    card_name_id(unit.display_name()),
-                    card_name_id(&card.name),
-                ]);
+                let scope = own_names(&unit);
                 let face = Face {
                     identity: unit.identity().to_string(),
                     name: unit.display_name().to_owned(),
@@ -417,6 +470,32 @@ mod tests {
             [
                 CardScope::own_names([card_name_id("Ral, Monsoon Mage"), card]),
                 CardScope::own_names([card_name_id("Ral, Leyline Prodigy"), card]),
+            ]
+        );
+    }
+
+    #[test]
+    fn both_cards_of_a_meld_pair_have_the_meld_result_s_name_in_scope() {
+        let parts = r#""all_parts":[{"object":"related_card","id":"r","component":"meld_result","name":"Brisela, Voice of Nightmares","type_line":"Legendary Creature — Eldrazi Angel"},{"object":"related_card","id":"g","component":"meld_part","name":"Gisela, the Broken Blade","type_line":"Legendary Creature — Angel Horror"},{"object":"related_card","id":"b","component":"meld_part","name":"Bruna, the Fading Light","type_line":"Legendary Creature — Angel Horror"}]"#;
+        let input = [
+            format!(
+                r#"{{"object":"card","id":"g","oracle_id":"g","name":"Gisela, the Broken Blade","layout":"meld","legalities":{{"vintage":"legal"}},{parts}}}"#
+            ),
+            format!(
+                r#"{{"object":"card","id":"b","oracle_id":"b","name":"Bruna, the Fading Light","layout":"meld","legalities":{{"vintage":"legal"}},{parts}}}"#
+            ),
+            r#"{"object":"card","id":"l","oracle_id":"l","name":"Lightning Bolt","layout":"normal","legalities":{"vintage":"legal"}}"#.to_owned(),
+        ]
+        .join("\n");
+        let corpus = Corpus::read(std::io::Cursor::new(input), |_| true).unwrap();
+        let result = card_name_id("Brisela, Voice of Nightmares");
+        let scopes: Vec<_> = corpus.faces.iter().map(|f| f.scope.clone()).collect();
+        assert_eq!(
+            scopes,
+            [
+                CardScope::own_names([card_name_id("Gisela, the Broken Blade"), result]),
+                CardScope::own_names([card_name_id("Bruna, the Fading Light"), result]),
+                CardScope::own_names([card_name_id("Lightning Bolt")]),
             ]
         );
     }

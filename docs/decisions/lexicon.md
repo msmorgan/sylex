@@ -142,7 +142,10 @@ term are a second tree of its analysis ([English](english.md) §8).
 
 **Names are scoped.** A card's own name, full or Shortened, is its own only in
 the text of its own face [CR#201.5,201.5c,712.8d..712.8f], and everywhere in
-that text. A card has a Shortened Name only where its own text uses one, and
+that text. The name of a meld result is also own on both cards of its meld
+pair, which the card data records as each card's meld result: one card's text
+melds the pair into it by name [CR#712.4a], and its partner's text never
+names it. A card has a Shortened Name only where its own text uses one, and
 never one that other vocabulary in scope on that card already spells: a token
 name or Introduced Name always, any other word unless it is the name before the
 comma or a planeswalker type. Why: admitted everywhere, every word spelled like

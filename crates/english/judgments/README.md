@@ -35,8 +35,11 @@ equals, none of whose Readings satisfies that entry, is `known-wrong-only`.
   [What a negative entry may claim](#what-a-negative-entry-may-claim)).
   The text is parsed as the grammar's root unless the mark names a Category,
   as in `+NounPhrase` or `*PrepositionPhrase`.
-- **Card.** `<card=Seedborn Muse>` puts that card's names in scope, for a
-  self-reference by its full or Shortened Name ([CR#201.5,201.5c]).
+- **Card.** `<card=Seedborn Muse>` puts the own names of the face so named
+  in scope, as the census reads that face's text
+  (`sylex_english::corpus::own_names`), for a self-reference by its full or
+  Shortened Name ([CR#201.5,201.5c]). A name no supported face has is an
+  error.
 - **Text.** The exact expression, with its final punctuation; it runs to the
   end of the line or to `=>`.
 - **Assertions** follow `=>`, separated by `;`. `||` separates alternative

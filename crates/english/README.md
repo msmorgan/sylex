@@ -60,8 +60,9 @@ per seed sentence.
 
 `corpus` reads the supported corpus (Vintage legal or restricted, outside
 `set_type: funny`) from `data/scryfall/oracle-cards.jsonl` through
-`sylex_upstream`, one `Face` per Card Face record with its own name and its
-card's in lexical scope. Each face yields Corpus Units: its Type Line, and each
+`sylex_upstream`, one `Face` per Card Face record with its own names
+(`corpus::own_names`: its name, its card's and, on a meld card, its meld
+result's) in lexical scope. Each face yields Corpus Units: its Type Line, and each
 paragraph line of its rules text after balanced reminder text is removed
 (`sylex_upstream::oracle_text::strip_reminder_text`). The split needs no parse.
 
