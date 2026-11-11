@@ -1,0 +1,13 @@
+card singleFaced({
+    name = "Borg Queen, Perfection Manifest",
+    cost = [generic(4), pip(black), pip(black)],
+    supertypes = [legendary],
+    types = [artifact, creature],
+    subtypes = [borg, noble],
+    text = [
+      static(getsPt(allOf(and([isArtifact, isCreature, youControl])), up(2), up(0))),
+      when(
+        does(actor(this), enter),
+        assimilate(target(and([isCreature, isCard, in(graveyardOf(anOpponent))]))))],
+    power = 1,
+    toughness = 4})

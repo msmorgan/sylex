@@ -1,0 +1,23 @@
+# The Best of Both Worlds: "the Borg assimilated with this Saga" names only the permanent its
+# chapter I ability assimilated, the two abilities being linked [CR#701.72c,607.1].
+card singleFaced({
+    name = "The Best of Both Worlds",
+    cost = [generic(4), pip(white), pip(blue)],
+    types = [enchantment],
+    subtypes = [saga],
+    text = [
+      when(
+        chapterMark([1]),
+        assimilate(target(and([non(isArtifact), isCreature, anOpponentControls])))),
+      when(
+        chapterMark([2]),
+        get(
+          allOf(and([isArtifact, isCreature, youControl])),
+          up(2),
+          up(2),
+          duration = untilEndOfTurn)),
+      when(
+        chapterMark([3]),
+        sequentially([
+            exile(the(and([hasSubtype(borg), did(by(thisSaga), assimilate(which))]))),
+            returnToBattlefield(it, riders = [under(ownerOf(it))])]))]})

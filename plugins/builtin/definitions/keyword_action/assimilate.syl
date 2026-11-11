@@ -1,0 +1,23 @@
+# "assimilate <subject>": the performer gains control of a permanent and puts a +1/+1 counter on
+# it [CR#701.72a], or puts a permanent card from another zone onto the battlefield under their
+# control with a +1/+1 counter on it [CR#701.72b]; either way it becomes a Borg artifact creature.
+# A "Borg artifact creature" keeps its other card types and its subtypes other than creature
+# types, while Borg replaces its creature types [CR#205.1b]: artifact and creature are added, and
+# Borg is set as its creature type [CR#205.1a].
+action assimilate(subject: NounPhrase) {
+  lexical = {verbs = [{lemma = "assimilate", frames = [Monotransitive]}]},
+  spelling = "assimilate <subject>",
+  body = sequentially([
+      doIf(
+        is($subject, in(battlefield)),
+        sequentially([gainControl($subject), putCounters(1, printedKind(p1p1Counter), $subject)]),
+        otherwise = move(
+          $subject,
+          anywhere,
+          battlefield,
+          [under(actor), withCounters(1, printedKind(p1p1Counter), fresh)])),
+      establish(
+        characteristicChange(
+          $subject,
+          [typeLine(adds, {types = [artifact, creature]}), typeLine(sets, {subtypes = [borg]})]))])
+}
