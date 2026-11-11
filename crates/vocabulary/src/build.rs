@@ -121,12 +121,6 @@ impl Builder {
             "DeterminativeDistribution".into(),
             Ident::new(&format!("{:?}", entry.distribution)),
         );
-        // Every determinative values `Cardinality`: a lexical one is not a
-        // cardinal numeral, whose Production values it `Cardinal`.
-        lexeme
-            .properties
-            .features
-            .insert("Cardinality".into(), Ident::new("NonCardinal"));
         lexeme.forms[0].features.number = entry.number;
         if let Some(allomorphs) = &entry.allomorphs {
             let slot = lexeme.forms.remove(0);

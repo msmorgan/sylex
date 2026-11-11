@@ -101,9 +101,6 @@ feature PronounKind = Personal | Existential | Relative
 feature DeterminativeDistribution =
     | Dependent | Independent | Numerical | IndefiniteArticle | Distributive | Deictic
     | SingularOrQuantified | FreeChoice | Multiplier | Targeting
-// A cardinal numeral or a coordination with one (*ten or more*; CGEL
-// 15§3.3(d):1330).
-feature Cardinality = Cardinal | NonCardinal
 feature Case = Plain | Nominative | Accusative | Genitive
 feature Countability = Count | Mass
 // `Linking`: a connective initial in its Linked Conjunct. `Multiplying`: a
@@ -313,7 +310,7 @@ category FusableDeterminer : DeterminerPhrase [Number, Countability, NounKind]
 category FusedQuantity : DeterminerPhrase [Number, Countability]
 // A determinative's Complement has a Number of its own (*all but one*).
 category DeterminerPhrase [
-    Number, Countability, DeterminativeDistribution, Cardinality, NounKind, ComplementKind,
+    Number, Countability, DeterminativeDistribution, NounKind, ComplementKind,
     ObliqueNumber, ObliqueKind, ObliqueDetermination, ObliqueDistribution,
 ]
 // A determiner ending in the Targeting Marker; an outer determiner or
@@ -1708,14 +1705,12 @@ ComparativeAmount: Amount ->
     where quantifier.Countability = Mass,
           complement.NounKind = Numeric,
           $.ComplementKind = PP
-// A sum adjective after a numerically quantified Noun Phrase (*ten or more
-// creature cards total*), as *net* and *gross* follow specific sums (*fifty
-// dollars net*; CGEL 5§14.2:445–446), never a bare or definite one.
-// `Carry`, since an unvalued determiner would pass a `Require`.
+// A sum adjective after a determined Noun Phrase (*ten or more creature
+// cards total*, Avatar of Woe), as *net* and *gross* follow specific sums
+// (*fifty dollars net*; CGEL 5§14.2:445–446).
 SumQualifiedNounPhrase: NounPhrase ->
     determiner:DeterminerPhrase Nominal modifier:Class(SumAdjective)
-    where determiner.Cardinality := Cardinal,
-          $.DeterminativeDistribution = determiner.DeterminativeDistribution,
+    where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third,
@@ -2124,7 +2119,6 @@ FloatedAll: Clause -> subject:NounPhrase adjunct:Word(All) VerbPhrase { transpar
           $.ClauseMarking = Unmarked
 NumericalDetermination: DeterminerPhrase -> NumericalDeterminer
     where $.DeterminativeDistribution = Numerical,
-          $.Cardinality = Cardinal,
           $.ComplementKind = Intransitive
 MeasuredMass: NounPhrase -> determiner:DeterminerPhrase Nominal
     where determiner.DeterminativeDistribution = Numerical,
@@ -3439,7 +3433,6 @@ coordination SymbolCosts { coordinators: Coordinator }
 coordination DeterminerPhrase {
     coordinators: Coordinator,
     proximate: [Number, Countability, DeterminativeDistribution, NounKind],
-    resolve: [Cardinality -> Cardinal],
 }
 // Numbers alone are an Amount coordination (*X is 2 or 3*), never also
 // a fused quantity over them (ADR §8).
