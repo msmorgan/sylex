@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-where-letter-supplement]
+needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-where-letter-supplement, syl-spelling-conventions]
 ---
 
 # Each printed sequence of instructions is a Template over `sequentially`

@@ -7,8 +7,9 @@ needs: [syl-parameter-sigil, lean-retirement, syl-spelling-optional-segments, sy
 ## Why
 
 `spelling` strings are to be parsed through the English grammar with typed holes, but
-today they inflect verbs inconsistently, and 151 `TODO(spelling)` markers stand where a spelling
-is missing, many carrying generated text instead of a reason.
+today they inflect verbs inconsistently, they still write a Hole `<name>` (777 Holes on 594
+`spelling` lines), and 167 `TODO(spelling)` markers, all under `plugins/builtin/`, stand where a
+spelling is missing, many carrying generated text instead of a reason.
 
 Two narrower tickets rewrite spellings this ticket also normalizes, and land first:
 `syl-spelling-optional-segments` (the merged `enters…`, `activatedOnly…`, `prevent…` and
@@ -27,17 +28,19 @@ ticket's corpus rewrite migrates every `<name>` Hole to `$name`.
   - The grammatical Subject is a parameter: the hole stays and the verb is still uninflected.
     `becomeBlocked(subject)` is `"$subject become blocked"`, likewise `becomeBlocking`,
     `stopBlocking` and `phaseOutUntil`. These keep `subject` because their Subject is the
-    patient, not the performer (`does(any, becomeBlocked(this))`, `semantics.md` §4.2).
+    patient, not the performer (`does(any, becomeBlocked(this))`, `semantics.md` §4.2), so passive
+    subject promotion never applies to them (`spelling.md`, its closed rules).
   - The Subject is fixed inside the declaration and no hole decides agreement: the verb is
     written as printed. `controllerSacrifices` stays `"$subject's controller sacrifices it"`.
-- A spelling with several parses keeps every parse that recovers to its `body`, and fails to load
-  if none does. A wording difference with the same meaning lives in which Template a card calls,
+- A spelling that parses in several ways is several Constructions (`spelling.md`, the notation's
+  load checks). A wording difference with the same meaning lives in which Template a card calls,
   never in the AST.
+- A spelling's Holes stand in its declaration's parameter order, which is printed order, as
+  arguments are written in declaration order (`syl.md` §2, §5); a spelling whose Hole order
+  differs is `syl-printed-read-order`'s to reorder, not this ticket's.
 
 ## Done when
 
-- `docs/decisions/spelling.md` §1 states the inflection rule and §7 the notation, which
-  `docs/decisions/syl.md` §2 points at, and the glossary has a **Hole** entry.
 - Every `<name>` Hole under `plugins/` is written `$name`, with a `~` tie where letters abut
   it.
 - In separate corpus commits: every spelling follows the three inflection cases, and every

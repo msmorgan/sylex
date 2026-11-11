@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-spelling-optional-segments]
+needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-spelling-conventions]
 ---
 
 # Descriptions are nominals: a head with its pre- and postmodifiers

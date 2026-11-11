@@ -1,5 +1,5 @@
 ---
-needs: [syl-single-face-card-call, cleanup-step6-spine, syl-spelling-optional-segments, syl-nominal-descriptions]
+needs: [syl-single-face-card-call, cleanup-step6-spine, syl-spelling-optional-segments, syl-nominal-descriptions, syl-spelling-conventions]
 ---
 
 # Zone words mean what they say, and prepositions stay out of `Location`

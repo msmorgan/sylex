@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-spelling-optional-segments]
+needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-spelling-conventions]
 ---
 
 # ", where X is …" is written as a supplement of what it follows
