@@ -5,8 +5,8 @@ card singleFaced({
     text = [
       static(mayDeclineUntap(thisArtifact, you)),
       activated(
-        compound(costs = [mana([generic(2)]), tapSymbol, perform(sacrifice(a(isCreature)))]),
+        compound([mana([generic(2)]), tapSymbol, perform(sacrifice(a(isCreature)))]),
         gainControl(
           target(isCreature),
           duration = forAsLongAs(
-            and(conjuncts = [is(thisArtifact, youControl), is(thisArtifact, isTapped)]))))]})
+            and([is(thisArtifact, youControl), is(thisArtifact, isTapped)]))))]})

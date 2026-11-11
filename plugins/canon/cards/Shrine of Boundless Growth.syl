@@ -9,6 +9,6 @@ card singleFaced({
             whenever(does(actor(you), cast(a(and([isSpell, hasColor(green)])))))]),
         putCounters(1, printedKind(chargeCounter), thisArtifact)),
       activated(
-        compound(costs = [tapSymbol, perform(sacrifice(thisArtifact))]),
+        compound([tapSymbol, perform(sacrifice(thisArtifact))]),
         addMana(
           counted(times(1, countersOn(chargeCounter, thisArtifact)), symbols([colorlessPip]))))]})

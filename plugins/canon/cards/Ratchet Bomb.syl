@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       activated(tapSymbol, putCounters(1, printedKind(chargeCounter), thisArtifact)),
       activated(
-        compound(costs = [tapSymbol, perform(sacrifice(thisArtifact))]),
+        compound([tapSymbol, perform(sacrifice(thisArtifact))]),
         destroy(
           each(
             and([

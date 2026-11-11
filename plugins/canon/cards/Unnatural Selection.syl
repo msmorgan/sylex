@@ -5,8 +5,7 @@ card singleFaced({
     text = [
       activated(
         mana([generic(1)]),
-        sequentially(
-          steps = [
+        sequentially([
             choose(a(qualityFrom(subtype(creature), typeOtherThan(wall)))),
             establishThroughout(
               qualityChange(target(isCreature), sets, chosenQuality(ofChosen(subtype(creature)))),

@@ -4,8 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             destroy(target(and([isCreature, hasManaValue(equal, letter(x))]))),
             doIf(
               did(actor(that(creature)), die, thisWay),

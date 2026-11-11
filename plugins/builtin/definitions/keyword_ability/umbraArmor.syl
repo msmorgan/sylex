@@ -7,5 +7,5 @@ ability umbraArmor {
     static(
       replace(
         would(any, destroy(enchanted(permanent))),
-        instead(sequentially(steps = [clearDamage(enchanted(permanent)), destroy(thisAura)]))))]
+        instead(sequentially([clearDamage(enchanted(permanent)), destroy(thisAura)]))))]
 }

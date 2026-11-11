@@ -4,8 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             lookAt(topSlice(6)),
             putOntoBattlefield(
               fromAmong(upTo(2), and([isCreature, hasManaValue(atMost, 3)]), them)),

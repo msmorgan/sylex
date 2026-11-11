@@ -7,8 +7,7 @@ card singleFaced({
     text = [
       activated(
         loyaltySymbol(up(1)),
-        sequentially(
-          steps = [
+        sequentially([
             establishThroughout(
               qualityChange(
                 thisPlaneswalker,

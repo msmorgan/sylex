@@ -11,8 +11,7 @@ card singleFaced({
         "Midnight Entity",
         whenever(
           does(actor(thisVehicle), attack),
-          sequentially(
-            steps = [
+          sequentially([
               faceAVillainousChoice(
                 instruct(defendingPlayer, sacrifice(a(isCreature))),
                 gainControl(
@@ -20,7 +19,7 @@ card singleFaced({
                   duration = untilEndOfTurn)),
               doIf(
                 did(actor(you), gainControlOf(a(isCreature)), thisWay),
-                sequentially(steps = [tap(it), becomeAttacking(it, defendingPlayer)]))]))),
+                sequentially([tap(it), becomeAttacking(it, defendingPlayer)]))]))),
       crew(2)],
     power = 3,
     toughness = 4})

@@ -1,2 +1,2 @@
 # At least one timing constraint applies.
-primitive or(disjuncts: List(Timing) = []): Timing = Or
+primitive or(disjuncts: List(Timing)): Timing = Or

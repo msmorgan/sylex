@@ -4,8 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             instruct(eachPlayer, choose(a(and([isPermanent, non(isLand), controlledBy(they)])))),
             returnToHand(allOf(and([isPermanent, non(isLand), notChosen]))),
             doForEach(

@@ -2,5 +2,5 @@
 # [CR#704.5q]
 template smallerOf(a: Amount, b: Amount): Amount {
   spelling = "the smaller of <a> and <b>",
-  body = aggregateOf(min, amounts = [$a, $b])
+  body = aggregateOf(min, [$a, $b])
 }

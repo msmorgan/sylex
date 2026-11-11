@@ -7,8 +7,7 @@ card singleFaced({
       councilsDilemma(
         when(
           does(actor(thisCreature), enter),
-          sequentially(
-            steps = [
+          sequentially([
               instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["sprout", "harvest"]))),
               putCounters(times(2, votesFor("sprout")), printedKind(p1p1Counter), thisCreature),
               gainLife(times(3, votesFor("harvest")))])))],

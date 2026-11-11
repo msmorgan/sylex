@@ -9,8 +9,7 @@ card singleFaced({
       activated(loyaltySymbol(down(2)), instruct(target(isPlayer), sacrifice(a(isCreature)))),
       activated(
         loyaltySymbol(down(6)),
-        sequentially(
-          steps = [
+        sequentially([
             separateIntoPiles(allOf(and([isPermanent, controlledBy(target(isPlayer))])), 2),
             instruct(they, sacrifice(allOf(and([isPermanent, inPile(pileOfChoice(they))]))))]))],
     loyalty = 3})

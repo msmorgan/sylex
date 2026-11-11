@@ -11,9 +11,7 @@ ability cipher {
         is(this, isCard),
         may(
           sequentially(
-            steps = [
-              exile(thisSpell),
-              relate(this, encodedOn, a(and([isCreature, youControl])))])))),
+            [exile(thisSpell), relate(this, encodedOn, a(and([isCreature, youControl])))])))),
     static(
       abilityGrant(
         counterpart(encodedOn, this),
@@ -21,8 +19,7 @@ ability cipher {
           whenever(
             does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
             may(
-              sequentially(
-                steps = [
+              sequentially([
                   copy(
                     fromCardZone,
                     the(and([isCard, related(encodedOn, counterpart = thisCreature)])),

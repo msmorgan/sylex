@@ -9,9 +9,8 @@ token landerToken {
       subtypes = [lander],
       text = [
         activated(
-          compound(costs = [mana([generic(2)]), tapSymbol, perform(sacrifice(thisToken))]),
-          sequentially(
-            steps = [
+          compound([mana([generic(2)]), tapSymbol, perform(sacrifice(thisToken))]),
+          sequentially([
               search(yourLibrary, for = a(and([isLand, hasSupertype(basic)]))),
               putOntoBattlefieldTapped(it),
               shuffle]))]}}

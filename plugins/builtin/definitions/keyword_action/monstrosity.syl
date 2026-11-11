@@ -7,8 +7,7 @@ action monstrosity(amount: Amount) {
   spelling = "monstrosity <amount>",
   body = doIf(
     not(is(thisPermanent, hasDesignation(monstrous))),
-    sequentially(
-      steps = [
+    sequentially([
         putCounters($amount, printedKind(p1p1Counter), thisPermanent),
         gainDesignation(thisPermanent, monstrous)]))
 }

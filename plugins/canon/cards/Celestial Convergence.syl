@@ -6,8 +6,7 @@ card singleFaced({
       static(entersWithCounters(thisEnchantment, 7, omenCounter)),
       at(
         beginningOfYour(upkeep),
-        sequentially(
-          steps = [
+        sequentially([
             removeCounters(exactly(1), printedKind(omenCounter), thisEnchantment),
             doIf(
               compareAmt(countersOn(omenCounter, thisEnchantment), atMost, 0),

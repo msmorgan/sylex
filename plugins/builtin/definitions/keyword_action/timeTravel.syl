@@ -5,8 +5,7 @@
 action timeTravel {
   lexical = {verbs = [{lemma = "time travel", frames = [Intransitive]}]},
   spelling = "time travel",
-  body = sequentially(
-    steps = [
+  body = sequentially([
       choose(
         counted(
           anyNumber,

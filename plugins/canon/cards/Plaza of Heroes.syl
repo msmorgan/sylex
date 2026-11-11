@@ -15,7 +15,7 @@ card singleFaced({
             1,
             ofAnyColorAmong(allOf(and([hasSupertype(legendary), isPermanent, youControl])))))),
       activated(
-        compound(costs = [mana([generic(3)]), tapSymbol, perform(exile(thisLand))]),
+        compound([mana([generic(3)]), tapSymbol, perform(exile(thisLand))]),
         gain(
           target(and([hasSupertype(legendary), isCreature])),
           [hexproof, indestructible],

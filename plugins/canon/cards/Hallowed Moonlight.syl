@@ -4,8 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             replaceEvent(
               would(
                 actor(a(and([isCreature, not(did(any, cast(which), within = thisObject))]))),

@@ -13,7 +13,7 @@ ability emergeFrom(quality: Predicate, cost: Cost) {
         cast(
           thisSpell,
           altCost = payingInstead(
-            compound(costs = [$cost, perform(sacrifice(a(and([$quality, isPermanent]))))]))))),
+            compound([$cost, perform(sacrifice(a(and([$quality, isPermanent]))))]))))),
     static(
       if(
         keywordCostPaid(emerge, thisSpell),

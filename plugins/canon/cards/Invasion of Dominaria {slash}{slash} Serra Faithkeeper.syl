@@ -3,7 +3,7 @@ card transforming({
     cost = [generic(2), pip(white)],
     types = [battle],
     subtypes = [siege],
-    text = [when(does(actor(thisSiege), enter), sequentially(steps = [gainLife(4), draw(1)]))],
+    text = [when(does(actor(thisSiege), enter), sequentially([gainLife(4), draw(1)]))],
     defense = 5},
   {
     name = "Serra Faithkeeper",

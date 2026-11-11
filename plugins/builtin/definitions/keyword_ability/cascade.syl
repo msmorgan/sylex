@@ -5,22 +5,18 @@ ability cascade {
   body = [
     when(
       does(actor(you), cast(thisSpell)),
-      sequentially(
-        steps = [
+      sequentially([
           exile(
             run(
               top,
               and([
                   non(isLand),
-                  compare(less, statOf(stat(manaValue), thisSpell), axes = [stat(manaValue)])]),
+                  compare(less, statOf(stat(manaValue), thisSpell), [stat(manaValue)])]),
               libraryOf(you))),
           may(
             cast(
               that(card),
-              resulting = compare(
-                less,
-                statOf(stat(manaValue), thisSpell),
-                axes = [stat(manaValue)]),
+              resulting = compare(less, statOf(stat(manaValue), thisSpell), [stat(manaValue)]),
               altCost = withoutPaying)),
           move(
             allOf(

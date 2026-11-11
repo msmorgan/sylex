@@ -4,8 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             establishFor(
               target(isCreature),
               [qualityChange(it, sets, colored(colors([red]))), abilityGrant(it, [haste])],

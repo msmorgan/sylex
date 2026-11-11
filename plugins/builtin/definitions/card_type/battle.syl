@@ -17,9 +17,7 @@ card_type battle {
     damageResult(loseCounters(printedKind(defenseCounter), thatMuch, agent = this)),
     stateBased(
       and(
-        conjuncts = [
-          not(is(this, hasSubtype(siege))),
-          compareAmt(countersOn(defenseCounter, this), equal, 0)]),
+        [not(is(this, hasSubtype(siege))), compareAmt(countersOn(defenseCounter, this), equal, 0)]),
       putInto(this, graveyard)),
     property(
       onlyUnless(

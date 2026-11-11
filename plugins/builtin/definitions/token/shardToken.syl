@@ -8,6 +8,6 @@ token shardToken {
       subtypes = [shard],
       text = [
         activated(
-          compound(costs = [mana([generic(2)]), perform(sacrifice(thisToken))]),
-          sequentially(steps = [scry(1), draw(1)]))]}}
+          compound([mana([generic(2)]), perform(sacrifice(thisToken))]),
+          sequentially([scry(1), draw(1)]))]}}
 }

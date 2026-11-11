@@ -15,8 +15,7 @@ card singleFaced({
       activated(loyaltySymbol(down(2)), destroy(target(and([isCreature, isTapped])))),
       activated(
         loyaltySymbol(up(0)),
-        sequentially(
-          steps = [
+        sequentially([
             establishThroughout(
               qualityChange(
                 thisPlaneswalker,

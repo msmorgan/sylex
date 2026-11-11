@@ -9,6 +9,6 @@ card singleFaced({
       static(can(actor(you), cast(bare(and([isSpell, isInstantOrSorcery])), from = onTop))),
       whenever(
         does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])), from = yourLibrary)),
-        sequentially(steps = [copyOnStack(it), may(chooseNewTargets(that(copy)))]))],
+        sequentially([copyOnStack(it), may(chooseNewTargets(that(copy)))]))],
     power = 2,
     toughness = 4})

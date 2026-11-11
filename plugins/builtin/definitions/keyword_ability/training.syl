@@ -7,8 +7,7 @@ ability training {
     whenever(
       does(
         actor(
-          and(
-            phrases = [
+          and([
               thisCreature,
               counted(
                 orMore(1),

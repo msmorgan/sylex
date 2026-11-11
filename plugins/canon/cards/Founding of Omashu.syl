@@ -4,8 +4,8 @@ card singleFaced({
     types = [enchantment],
     subtypes = [saga],
     text = [
-      when(chapterMark(chapters = [1]), create(2, written(creatureToken(1, 1, [white], [ally])))),
-      when(chapterMark(chapters = [2]), may(discard(a(cardIn(yourHand))), ifDid = draw(1))),
+      when(chapterMark([1]), create(2, written(creatureToken(1, 1, [white], [ally])))),
+      when(chapterMark([2]), may(discard(a(cardIn(yourHand))), ifDid = draw(1))),
       when(
-        chapterMark(chapters = [3]),
+        chapterMark([3]),
         get(allOf(and([isCreature, youControl])), up(1), up(0), duration = untilEndOfTurn))]})

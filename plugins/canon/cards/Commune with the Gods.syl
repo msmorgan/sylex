@@ -4,8 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             reveal(topSlice(5)),
             may(putInto(fromAmong(exactly(1), or([isCreature, isEnchantment]), them), hand)),
             putInto(theRest, graveyard)]))]})

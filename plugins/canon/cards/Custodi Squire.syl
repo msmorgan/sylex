@@ -8,8 +8,7 @@ card singleFaced({
       willOfTheCouncil(
         when(
           does(actor(thisCreature), enter),
-          sequentially(
-            steps = [
+          sequentially([
               instruct(
                 eachPlayer,
                 voteStartingWith(

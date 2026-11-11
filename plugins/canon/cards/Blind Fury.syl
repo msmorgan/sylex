@@ -4,8 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             establishThroughout(abilityLoss(allOf(isCreature), [written(trample)]), untilEndOfTurn),
             establishThroughout(
               replace(

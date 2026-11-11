@@ -1,5 +1,5 @@
 # "both <left> and <right>"
 template both(left: NounPhrase, right: NounPhrase): NounPhrase {
   spelling = "both <left> and <right>",
-  body = and(phrases = [$left, $right])
+  body = and([$left, $right])
 }

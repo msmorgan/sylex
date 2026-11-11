@@ -13,10 +13,8 @@ card singleFaced({
             outcome = unpaid,
             whose = thisEnchantment,
             keyword = cumulativeUpkeep)),
-        sequentially(
-          steps = [
-            simultaneously(
-              steps = [
+        sequentially([
+            simultaneously([
                 instruct(
                   this,
                   dealDamage(

@@ -15,8 +15,7 @@ card singleFaced({
                     dealDamage(recipient = which),
                     within = within(soFarThisTurn))]))),
           die),
-        sequentially(
-          steps = [
+        sequentially([
             returnToBattlefield(it, riders = [under(you)]),
             become(that(creature), {characteristics = {colors = [black], subtypes = [zombie]}})]))],
     power = 3,

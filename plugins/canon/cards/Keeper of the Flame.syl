@@ -5,14 +5,11 @@ card singleFaced({
     subtypes = [human, wizard],
     text = [
       activated(
-        compound(costs = [mana([pip(red)]), tapSymbol]),
-        sequentially(
-          steps = [
+        compound([mana([pip(red)]), tapSymbol]),
+        sequentially([
             chooseWhile(
               target(
-                and([
-                    isOpponent,
-                    compare(greater, lifeTotalOf(you), axes = [playerStat(lifeTotal)])])),
+                and([isOpponent, compare(greater, lifeTotalOf(you), [playerStat(lifeTotal)])])),
               whileDoing(does(actor(you), activate(thisAbility)))),
             instruct(thisCreature, dealDamage(amount = 2, recipient = that(player)))]))],
     power = 1,

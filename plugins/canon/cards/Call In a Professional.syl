@@ -4,8 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             establishThroughout(cant(actor(bare(isPlayer)), gainLife(anyAmount)), thisTurn),
             establishThroughout(
               cant(any, preventDamage(allDamage, damage = would(any, dealDamage))),

@@ -4,8 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             gainLife(powerOf(target(isCreature))),
             establishThroughout(
               replace(

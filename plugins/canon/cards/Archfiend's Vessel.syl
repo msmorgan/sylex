@@ -7,8 +7,7 @@ card singleFaced({
       lifelink,
       when(
         does(actor(thisCreature), enter),
-        if = or(
-          disjuncts = [
+        if = or([
             did(actor(it), enter(from = yourGraveyard), triggering),
             is(it, did(actor(you), cast(which, from = yourGraveyard), within = thisObject))]),
         doIfDone(

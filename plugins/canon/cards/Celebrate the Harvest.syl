@@ -4,8 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             search(
               yourLibrary,
               for = counted(upToOf(letter(x)), and([isLand, hasSupertype(basic)]))),

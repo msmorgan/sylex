@@ -7,8 +7,7 @@ card singleFaced({
       spell(
         may(
           putOntoBattlefield(a(and([isCreature, cardIn(yourHand)]))),
-          ifDid = sequentially(
-            steps = [
+          ifDid = sequentially([
               gain(that(creature), [haste]),
               atNext(beginningOfNext(endStep), sacrifice(that(creature)))]))),
       splice(hasSubtype(arcane), mana([generic(2), pip(red), pip(red)]))]})

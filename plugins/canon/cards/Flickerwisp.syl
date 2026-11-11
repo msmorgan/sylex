@@ -7,8 +7,7 @@ card singleFaced({
       flying,
       when(
         does(actor(thisCreature), enter),
-        sequentially(
-          steps = [
+        sequentially([
             exile(target(and([isPermanent, isOther]))),
             atNext(
               beginningOfNext(endStep),

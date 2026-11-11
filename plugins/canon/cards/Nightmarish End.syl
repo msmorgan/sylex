@@ -4,7 +4,6 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             get(target(isCreature), down(letter(x)), down(letter(x)), duration = untilEndOfTurn),
             define(x, countOf(cardIn(yourHand)))]))]})

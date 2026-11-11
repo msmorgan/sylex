@@ -5,8 +5,7 @@
 # [CR#307.5a]
 template asSorcery: Timing {
   spelling = "only as a sorcery",
-  body = and(
-    conjuncts = [
+  body = and([
       whileTrue(hasPriority(you)),
       inPart(mainPhase, you, current),
       whileTrue(not(exists(in(stack))))])

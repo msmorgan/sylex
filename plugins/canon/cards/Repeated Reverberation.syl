@@ -11,6 +11,4 @@ card singleFaced({
               does(actor(you), activate(a(abilityHead(loyalty))))]),
           thisTurn,
           sequentially(
-            steps = [
-              copyOnStack(that(stackObject), times = 2),
-              may(chooseNewTargets(those(copy)))])))]})
+            [copyOnStack(that(stackObject), times = 2), may(chooseNewTargets(those(copy)))])))]})

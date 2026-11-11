@@ -1,5 +1,5 @@
 # "<left> or <right>"
 template eitherOf(left: NounPhrase, right: NounPhrase): NounPhrase {
   spelling = "<left> or <right>",
-  body = or(phrases = [$left, $right])
+  body = or([$left, $right])
 }

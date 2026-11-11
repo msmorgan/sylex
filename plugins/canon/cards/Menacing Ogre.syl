@@ -8,8 +8,7 @@ card singleFaced({
       haste,
       when(
         does(actor(thisCreature), enter),
-        sequentially(
-          steps = [
+        sequentially([
             instruct(eachPlayer, choose(a(quality(number)), disclosure = secretly)),
             revealChoices(numbers),
             instruct(each(and([isPlayer, choseExtreme(max)])), loseLife(thatMuch)),

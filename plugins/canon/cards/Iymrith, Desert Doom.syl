@@ -10,8 +10,6 @@ card singleFaced({
       whenever(
         does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
         sequentially(
-          steps = [
-            draw(1),
-            doIf(compareAmt(countOf(cardIn(yourHand)), less, 3), draw(theDifference))]))],
+          [draw(1), doIf(compareAmt(countOf(cardIn(yourHand)), less, 3), draw(theDifference))]))],
     power = 5,
     toughness = 5})

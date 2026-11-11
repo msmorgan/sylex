@@ -16,8 +16,7 @@ card singleFaced({
                     dealDamage(recipient = which),
                     within = within(soFarThisTurn))]))),
           die),
-        sequentially(
-          steps = [
+        sequentially([
             returnToBattlefield(that(card), riders = [under(you)]),
             attachTo(thisEquipment, that(creature))])),
       equip(mana([generic(4)]))]})

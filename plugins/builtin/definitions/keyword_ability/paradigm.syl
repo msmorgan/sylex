@@ -18,8 +18,6 @@ ability paradigm {
           reached(beginningOfYour(firstMain)),
           restOfGame,
           sequentially(
-            steps = [
-              copy(inZone(exile), this, 1, []),
-              may(cast(that(copy), altCost = withoutPaying))])))),
+            [copy(inZone(exile), this, 1, []), may(cast(that(copy), altCost = withoutPaying))])))),
     spell(exile(thisSpell))]
 }

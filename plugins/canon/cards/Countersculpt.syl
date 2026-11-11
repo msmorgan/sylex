@@ -7,5 +7,5 @@ card singleFaced({
         addedCost(
           this,
           mandatory,
-          plusAdditional(or(costs = [perform(behold(hasSubtype(jace))), mana([generic(1)])])))),
-      spell(sequentially(steps = [counter(target(isSpell)), empowerJace(1)]))]})
+          plusAdditional(or([perform(behold(hasSubtype(jace))), mana([generic(1)])])))),
+      spell(sequentially([counter(target(isSpell)), empowerJace(1)]))]})

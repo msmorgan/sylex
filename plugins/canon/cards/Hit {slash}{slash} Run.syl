@@ -7,8 +7,7 @@ card split({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             instruct(target(isPlayer), sacrifice(aTheirChoice(or([isArtifact, isCreature])))),
             instruct(
               this,

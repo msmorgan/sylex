@@ -5,8 +5,7 @@ card singleFaced({
     text = [
       when(
         does(actor(a(and([isCreature, youControl]))), enter),
-        sequentially(
-          steps = [
+        sequentially([
             gainLife(1),
             doIf(
               not(is(thisEnchantment, isCreature)),

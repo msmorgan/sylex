@@ -8,8 +8,7 @@ card singleFaced({
       whenever(
         does(actor(a(and([isNontoken, and([isCreature, youControl]), isOther]))), die),
         may(
-          sequentially(
-            steps = [
+          sequentially([
               returnToBattlefield(
                 it,
                 riders = [

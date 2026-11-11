@@ -1,2 +1,2 @@
 # The chapter numbers in a Saga chapter ability.
-primitive chapterMark(chapters: List(Nat) = []): GameEvent = ChapterMark
+primitive chapterMark(chapters: List(Nat)): GameEvent = ChapterMark

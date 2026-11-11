@@ -5,8 +5,7 @@ card singleFaced({
     text = [
       static(
         if(
-          and(
-            conjuncts = [
+          and([
               exists(and([isLand, hasSubtype(plains), anOpponentControls])),
               exists(and([isLand, hasSubtype(swamp), youControl]))]),
           can(actor(you), cast(thisSpell, altCost = withoutPaying)))),

@@ -6,8 +6,7 @@ card singleFaced({
     text = [
       whenever(
         or([does(actor(thisCreature), enter), does(actor(thisCreature), attack)]),
-        sequentially(
-          steps = [
+        sequentially([
             exile(target(cardIn(graveyard))),
             putCounters(1, printedKind(p1p1Counter), thisCreature)])),
       alsoForKeywords(
@@ -18,7 +17,7 @@ card singleFaced({
               thatKeyword,
               and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
             exists(and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])))),
-        keywords = [
+        [
           theKeyword(flying),
           theKeyword(firstStrike),
           theKeyword(doubleStrike),

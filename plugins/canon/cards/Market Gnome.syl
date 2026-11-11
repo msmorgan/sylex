@@ -4,11 +4,11 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [gnome],
     text = [
-      when(does(actor(thisCreature), die), sequentially(steps = [gainLife(1), draw(1)])),
+      when(does(actor(thisCreature), die), sequentially([gainLife(1), draw(1)])),
       when(
         timed(
           does(any, exile(thisCreature)),
           whileDoing(does(actor(you), activate(a(abilityHead(keyword(craft))))))),
-        sequentially(steps = [gainLife(1), draw(1)]))],
+        sequentially([gainLife(1), draw(1)]))],
     power = 0,
     toughness = 3})

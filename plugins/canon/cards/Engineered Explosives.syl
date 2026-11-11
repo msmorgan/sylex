@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(entersWithCounters(thisArtifact, colorsSpentToCast(thisArtifact), chargeCounter)),
       activated(
-        compound(costs = [mana([generic(2)]), perform(sacrifice(thisArtifact))]),
+        compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]),
         destroy(
           each(
             and([

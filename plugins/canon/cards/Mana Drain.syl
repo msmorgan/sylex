@@ -7,8 +7,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             counter(target(isSpell)),
             atNext(
               beginningOf(mainPhase, you, nextTime(player = you)),

@@ -7,8 +7,7 @@ ability backup(amount: Amount) {
   body = [
     when(
       does(actor(thisCreature), enter),
-      sequentially(
-        steps = [
+      sequentially([
           putCounters($amount, printedKind(p1p1Counter), target(isCreature)),
           doIf(
             is(that(creature), and([isCreature, isOther])),

@@ -6,9 +6,8 @@ card singleFaced({
     types = [artifact],
     text = [
       activated(
-        compound(costs = [mana([generic(3)]), tapSymbol]),
-        sequentially(
-          steps = [
+        compound([mana([generic(3)]), tapSymbol]),
+        sequentially([
             choose(a(quality(cardName))),
             reveal(aAtRandom(cardIn(yourHand))),
             doIf(

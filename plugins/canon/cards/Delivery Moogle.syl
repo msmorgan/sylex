@@ -7,8 +7,7 @@ card singleFaced({
       flying,
       when(
         does(actor(thisCreature), enter),
-        sequentially(
-          steps = [
+        sequentially([
             searchLibraryOrGraveyard(a(and([isArtifact, hasManaValue(atMost, 2)]))),
             reveal(it),
             putInto(it, hand),

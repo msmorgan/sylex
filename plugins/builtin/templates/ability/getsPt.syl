@@ -6,5 +6,5 @@ template getsPt(
   spelling = "<subject> gets <powerValue>/<toughnessValue>",
   body = characteristicChange(
     $subject,
-    edits = [stat(power, $powerValue), stat(toughness, $toughnessValue)])
+    [stat(power, $powerValue), stat(toughness, $toughnessValue)])
 }

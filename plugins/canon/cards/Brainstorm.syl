@@ -4,8 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             draw(3),
             putInto(
               counted(exactly(2), cardIn(yourHand)),

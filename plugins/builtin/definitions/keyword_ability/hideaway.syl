@@ -9,8 +9,7 @@ ability hideaway(amount: Amount) {
   body = [
     when(
       does(actor(thisPermanent), enter),
-      sequentially(
-        steps = [
+      sequentially([
           lookAt(topSlice($amount)),
           exileFaceDown(someOf(oneThrough(1), them)),
           move(theRest, anywhere, onBottom, [inOrder(randomOrder)]),

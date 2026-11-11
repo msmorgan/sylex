@@ -4,8 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             establishThroughout(
               replace(
                 would(any, dealDamage(recipient = target(isCreature))),

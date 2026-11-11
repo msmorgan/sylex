@@ -21,7 +21,7 @@ card singleFaced({
                   anOpponentControls,
                   hasKeyword(thatKeyword),
                   not(named(printedName("Escaped Shapeshifter")))])))),
-        keywords = [
+        [
           theKeyword(flying),
           theKeyword(firstStrike),
           theKeyword(trample),

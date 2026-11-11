@@ -11,7 +11,4 @@ card singleFaced({
       when(
         does(actor(enchanted(player)), loseGame),
         sequentially(
-          steps = [
-            gainLife(letter(x)),
-            draw(letter(x)),
-            define(x, countersOn(spiteCounter, thisAura))]))]})
+          [gainLife(letter(x)), draw(letter(x)), define(x, countersOn(spiteCounter, thisAura))]))]})

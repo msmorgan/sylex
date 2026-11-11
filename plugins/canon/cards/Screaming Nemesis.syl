@@ -7,8 +7,7 @@ card singleFaced({
       haste,
       whenever(
         does(any, dealDamage(recipient = thisCreature)),
-        sequentially(
-          steps = [
+        sequentially([
             instruct(it, dealDamage(amount = thatMuch, recipient = target(isAnyOtherTarget))),
             doIf(
               was(dealDamage(recipient = a(isPlayer)), thisWay),

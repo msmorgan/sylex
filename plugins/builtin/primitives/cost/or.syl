@@ -1,2 +1,2 @@
 # A choice between alternative costs.
-primitive or(costs: List(Cost) = []): Cost = Or
+primitive or(costs: List(Cost)): Cost = Or

@@ -14,8 +14,7 @@ ability harmonize(cost: Cost) {
           this,
           from = yourGraveyard,
           altCost = payingInstead(
-            compound(
-              costs = [
+            compound([
                 $cost,
                 perform(
                   tap(counted(upTo(1), and([isUntapped, and([isCreature, youControl])]))))]))))),

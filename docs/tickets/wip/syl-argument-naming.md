@@ -30,6 +30,8 @@ Written against the spine (`cleanup-step6-spine`).
 - A named argument whose written value equals the parameter's declared default is refused.
 - Arguments are written in declaration order, a named one in its declared place among the
   positional ones; a declaration's parameter order is never changed to suit the rule.
+- A list parameter that every caller passes has no `[]` default, so it is required and
+  positional (`sequentially([...])`); one some caller omits keeps its default and is named.
 
 ## Done when
 

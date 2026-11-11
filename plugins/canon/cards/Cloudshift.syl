@@ -4,7 +4,6 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             exile(target(and([isCreature, youControl]))),
             returnToBattlefield(that(card), riders = [under(you)])]))]})

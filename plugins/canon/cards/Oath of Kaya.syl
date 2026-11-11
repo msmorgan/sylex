@@ -7,9 +7,7 @@ card singleFaced({
       when(
         does(actor(this), enter),
         sequentially(
-          steps = [
-            instruct(this, dealDamage(amount = 3, recipient = target(isAnyTarget))),
-            gainLife(3)])),
+          [instruct(this, dealDamage(amount = 3, recipient = target(isAnyTarget))), gainLife(3)])),
       whenever(
         does(
           actor(anOpponent),
@@ -17,6 +15,4 @@ card singleFaced({
             counted(orMore(1), isCreature),
             defender = a(and([isPlaneswalker, youControl])))),
         sequentially(
-          steps = [
-            instruct(this, dealDamage(amount = 2, recipient = that(player))),
-            gainLife(2)]))]})
+          [instruct(this, dealDamage(amount = 2, recipient = that(player))), gainLife(2)]))]})

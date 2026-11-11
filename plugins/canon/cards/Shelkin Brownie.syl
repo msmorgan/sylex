@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [ouphe],
     text = [
       activated(
-        compound(costs = [tapSymbol]),
+        compound([tapSymbol]),
         establishThroughout(
           abilityLoss(target(isCreature), [abilities(anyIn({word = bandsWithOther}))]),
           untilEndOfTurn))],

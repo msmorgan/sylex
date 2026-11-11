@@ -11,12 +11,10 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             lookAt(topSlice(3)),
             replace(
-              sequentially(
-                steps = [
+              sequentially([
                   putInto(someOf(exactly(1), them), hand),
                   putInto(theRest, onBottom, riders = [inOrder(anyOrder)])]),
               doIf(
@@ -25,7 +23,6 @@ card singleFaced({
                     a(and([isInstant, cardIn(yourGraveyard)])),
                     a(and([isSorcery, cardIn(yourGraveyard)])))),
                 instead(
-                  sequentially(
-                    steps = [
+                  sequentially([
                       putInto(someOf(exactly(2), them), hand),
                       putInto(theRest, onBottom, riders = [inOrder(anyOrder)])]))))]))]})

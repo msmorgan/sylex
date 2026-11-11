@@ -1,2 +1,2 @@
 # All of the listed conditions hold.
-primitive and(conjuncts: List(Condition) = []): Condition = And
+primitive and(conjuncts: List(Condition)): Condition = And

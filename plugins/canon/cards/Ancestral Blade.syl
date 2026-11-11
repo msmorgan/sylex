@@ -6,8 +6,7 @@ card singleFaced({
     text = [
       when(
         does(actor(thisEquipment), enter),
-        sequentially(
-          steps = [
+        sequentially([
             create(1, written(creatureToken(1, 1, [white], [soldier]))),
             attachTo(thisEquipment, thatToken)])),
       static(getsPt(equipped(creature), up(1), up(1))),

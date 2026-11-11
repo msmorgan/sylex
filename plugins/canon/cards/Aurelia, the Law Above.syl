@@ -12,8 +12,6 @@ card singleFaced({
       whenever(
         does(actor(a(isPlayer)), attackWith(counted(orMore(5), isCreature))),
         sequentially(
-          steps = [
-            instruct(this, dealDamage(amount = 3, recipient = eachOpponent)),
-            gainLife(3)]))],
+          [instruct(this, dealDamage(amount = 3, recipient = eachOpponent)), gainLife(3)]))],
     power = 4,
     toughness = 4})

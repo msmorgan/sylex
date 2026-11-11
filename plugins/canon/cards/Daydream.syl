@@ -4,8 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             exile(target(and([isCreature, youControl]))),
             returnToBattlefieldWithCounters(that(card), ownerOf(that(card)), 1, p1p1Counter)])),
       flashback(mana([generic(2), pip(white)]))]})

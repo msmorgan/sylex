@@ -10,8 +10,7 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), enter),
-        sequentially(
-          steps = [
+        sequentially([
             gainControl(target(and([isCreature, anOpponentControls])), duration = untilEndOfTurn),
             untap(it),
             gain(it, [lifelink, haste], duration = untilEndOfTurn)])),

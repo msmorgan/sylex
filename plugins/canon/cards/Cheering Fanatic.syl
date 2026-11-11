@@ -6,8 +6,7 @@ card singleFaced({
     text = [
       whenever(
         does(actor(thisCreature), attack),
-        sequentially(
-          steps = [
+        sequentially([
             choose(a(quality(cardName))),
             establishThroughout(
               costShift(allOf(and([isSpell, ofChosen(cardName)])), less(1)),

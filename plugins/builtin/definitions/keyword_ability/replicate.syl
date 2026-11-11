@@ -10,8 +10,7 @@ ability replicate(cost: Cost) {
     when(
       does(actor(you), cast(thisSpell)),
       if = keywordCostPaid(replicate, thisSpell),
-      sequentially(
-        steps = [
+      sequentially([
           copyOnStack(thisSpell, times = timesPaid(byKeyword(replicate), thisSpell)),
           may(chooseNewTargets(those(copy)))]))]
 }

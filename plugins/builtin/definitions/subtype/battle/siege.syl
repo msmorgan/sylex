@@ -12,10 +12,9 @@ subtype siege {
       when(
         does(any, removeCounters(theLast, printedKind(defenseCounter), thisPermanent)),
         sequentially(
-          steps = [exile(it), may(cast(it, resulting = isTransformed, altCost = withoutPaying))]))),
+          [exile(it), may(cast(it, resulting = isTransformed, altCost = withoutPaying))]))),
     stateBased(
-      and(
-        conjuncts = [
+      and([
           compareAmt(countersOn(defenseCounter, this), equal, 0),
           not(exists(and([abilityOf(this), triggeredNotLeftStack])))]),
       putInto(this, graveyard))]

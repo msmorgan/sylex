@@ -7,7 +7,6 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             separateIntoPiles(allOf(and([isCreature, controlledBy(target(isPlayer))])), 2),
             destroyPluralCantRegenerate(allOf(and([isCreature, inPile(pileOfChoice(they))])))]))]})

@@ -11,8 +11,7 @@ card singleFaced({
     text = [
       coven(
         spell(
-          sequentially(
-            steps = [
+          sequentially([
               choose(
                 both(
                   target(and([isCreature, youControl])),

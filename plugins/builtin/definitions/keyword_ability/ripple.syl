@@ -10,8 +10,7 @@ ability ripple(amount: Amount) {
       does(actor(you), cast(thisSpell)),
       may(
         reveal(slice(top, $amount, libraryOf(you))),
-        ifDid = sequentially(
-          steps = [
+        ifDid = sequentially([
             cast(
               nounPhraseSomeOf(counted(anyNumber), shares(cardName, share, this), those(card)),
               altCost = withoutPaying),

@@ -15,8 +15,7 @@ card singleFaced({
           instead(preventDamage(allDamage)))),
       activated(
         mana([variable]),
-        sequentially(
-          steps = [
+        sequentially([
             putCounters(1, printedKind(sleightCounter), thisAura),
             choose(a(quality(color))),
             define(x, countersOn(sleightCounter, thisAura))]))]})

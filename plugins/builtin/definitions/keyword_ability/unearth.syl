@@ -7,8 +7,7 @@ ability unearth(cost: Cost) {
   body = [
     activatedOnlyDuring(
       $cost,
-      sequentially(
-        steps = [
+      sequentially([
           returnToBattlefield(thisCard, from = yourGraveyard),
           gain(thisPermanent, [haste]),
           atNext(beginningOfNext(endStep), exile(thisPermanent)),

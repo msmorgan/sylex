@@ -9,5 +9,5 @@ ability extort {
       does(actor(you), cast(a(isSpell))),
       may(
         pay(mana([hybridPip(white, black)]), once),
-        ifDid = sequentially(steps = [instruct(eachOpponent, loseLife(1)), gainLife(thatMuch)])))]
+        ifDid = sequentially([instruct(eachOpponent, loseLife(1)), gainLife(thatMuch)])))]
 }

@@ -8,7 +8,7 @@ card singleFaced({
           replace(
             would(
               actor(aYourChoice(isSource)),
-              dealDamage(recipient = andOr(phrases = [you, allOf(and([isCreature, youControl]))]))),
+              dealDamage(recipient = andOr([you, allOf(and([isCreature, youControl]))]))),
             instead(
               preventDamage(
                 allDamage,

@@ -4,8 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             establish(abilityGrant(allOf(and([isCreature, youControl])), [indestructible])),
             extraTurn(1),
             atNext(beginningOfThatTurns(endStep), loseGame)]))]})

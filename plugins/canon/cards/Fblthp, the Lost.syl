@@ -10,8 +10,7 @@ card singleFaced({
         replace(
           draw(1),
           doIf(
-            or(
-              disjuncts = [
+            or([
                 did(actor(it), enter(from = yourLibrary), triggering),
                 is(it, did(any, cast(which, from = yourLibrary), within = thisObject))]),
             instead(draw(2))))),

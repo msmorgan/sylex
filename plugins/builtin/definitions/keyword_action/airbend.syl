@@ -5,8 +5,7 @@ action airbend(subject: NounPhrase) {
   lexical = {
     verbs = [{lemma = "airbend", past = "airbent", frames = [Monotransitive, Intransitive]}]},
   spelling = "airbend <subject>",
-  body = sequentially(
-    steps = [
+  body = sequentially([
       exile($subject),
       doForEach(
         allOf(and([isCard, did(any, exile(which), within = thisWay)])),

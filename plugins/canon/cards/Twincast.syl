@@ -4,7 +4,6 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             copyOnStack(target(and([isInstantOrSorcery, isSpell]))),
             may(chooseNewTargets(that(copy)))]))]})

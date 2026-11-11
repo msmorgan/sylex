@@ -13,7 +13,7 @@ card singleFaced({
               thisCreature,
               thatKeyword,
               and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])))),
-        keywords = [
+        [
           theKeyword(flying),
           theKeyword(fear),
           theKeyword(firstStrike),

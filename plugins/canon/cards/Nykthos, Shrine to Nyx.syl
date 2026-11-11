@@ -5,8 +5,7 @@ card singleFaced({
     text = [
       activated(tapSymbol, addMana(symbols([colorlessPip]))),
       activated(
-        compound(costs = [mana([generic(2)]), tapSymbol]),
-        sequentially(
-          steps = [
+        compound([mana([generic(2)]), tapSymbol]),
+        sequentially([
             choose(a(quality(color))),
             addMana(counted(devotion(you, thatColor), ofTheChosenColor))]))]})

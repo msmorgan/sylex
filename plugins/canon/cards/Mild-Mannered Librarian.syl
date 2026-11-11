@@ -6,8 +6,7 @@ card singleFaced({
     text = [
       activatedOnlyOnce(
         mana([generic(3), pip(green)]),
-        sequentially(
-          steps = [
+        sequentially([
             establish(
               qualityChange(
                 thisCreature,

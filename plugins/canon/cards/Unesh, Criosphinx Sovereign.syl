@@ -15,8 +15,7 @@ card singleFaced({
         does(
           actor(eitherOf(thisCreature, a(and([hasSubtype(sphinx), youControl, isOther])))),
           enter),
-        sequentially(
-          steps = [
+        sequentially([
             reveal(topSlice(4)),
             instruct(anOpponent, separateIntoPiles(them, 2)),
             putInto(onePile, hand),

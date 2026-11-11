@@ -6,12 +6,11 @@ card transforming({
     subtypes = [garruk],
     text = [
       when(
-        stateHolds(is(thisPlaneswalker, compare(atMost, 2, axes = [counter(loyaltyCounter)]))),
+        stateHolds(is(thisPlaneswalker, compare(atMost, 2, [counter(loyaltyCounter)]))),
         transform(thisPlaneswalker)),
       activated(
         loyaltySymbol(up(0)),
-        sequentially(
-          steps = [
+        sequentially([
             instruct(thisPlaneswalker, dealDamage(amount = 3, recipient = target(isCreature))),
             dealDamageOwnPower(that(creature), thisPlaneswalker)])),
       activated(loyaltySymbol(up(0)), create(1, written(creatureToken(2, 2, [green], [wolf]))))],
@@ -39,15 +38,10 @@ card transforming({
         doIfDone(
           sacrifice(a(isCreature)),
           ifDid = sequentially(
-            steps = [
-              search(yourLibrary, for = a(isCreature)),
-              reveal(it),
-              putInto(it, hand),
-              shuffle]))),
+            [search(yourLibrary, for = a(isCreature)), reveal(it), putInto(it, hand), shuffle]))),
       activated(
         loyaltySymbol(down(3)),
-        sequentially(
-          steps = [
+        sequentially([
             establishFor(
               allOf(and([isCreature, youControl])),
               [abilityGrant(them, [trample]), getsPt(them, up(letter(x)), up(letter(x)))],

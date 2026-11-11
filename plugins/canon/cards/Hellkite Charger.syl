@@ -11,8 +11,6 @@ card singleFaced({
         may(
           pay(mana([generic(5), pip(red), pip(red)]), once),
           ifDid = sequentially(
-            steps = [
-              untap(allOf(and([isCreature, isAttacking]))),
-              additionalPhase(combat, none, 1)])))],
+            [untap(allOf(and([isCreature, isAttacking]))), additionalPhase(combat, none, 1)])))],
     power = 5,
     toughness = 5})

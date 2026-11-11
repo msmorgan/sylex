@@ -5,14 +5,12 @@
 action learn {
   lexical = {verbs = [{lemma = "learn", frames = [Intransitive]}]},
   spelling = "learn",
-  body = sequentially(
-    steps = [
+  body = sequentially([
       may(discard(a(isCard)), ifDid = draw(1)),
       doIf(
         not(exists(and([isCard, was(discard(which), within = thisWay)]))),
         may(
-          sequentially(
-            steps = [
+          sequentially([
               reveal(a(and([isCard, hasSubtype(lesson), ownedBy(actor), outsideTheGame]))),
               putInto(it, handOf(actor))])))])
 }

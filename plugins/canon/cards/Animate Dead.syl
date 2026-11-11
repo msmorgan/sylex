@@ -8,8 +8,7 @@ card singleFaced({
       when(
         does(actor(thisAura), enter),
         if = is(it, in(battlefield)),
-        sequentially(
-          steps = [
+        sequentially([
             establish(
               conjunction([
                   abilityLoss(it, [written(enchant(and([isCreature, isCard, in(graveyard)])))]),

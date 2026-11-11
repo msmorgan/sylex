@@ -10,5 +10,5 @@ card singleFaced({
             would(actor(a(isCreature)), dealDamage(recipient = you, kind = combat)),
             instead(preventDamage(ofThatDamage(1)))))),
       activated(
-        compound(costs = [mana([generic(2)]), tapSymbol]),
+        compound([mana([generic(2)]), tapSymbol]),
         get(allOf(and([isCreature, isAttacking])), up(1), up(0), duration = untilEndOfTurn))]})

@@ -7,8 +7,7 @@ ability storied {
   body = [
     static(
       whileHolds(
-        and(
-          conjuncts = [
+        and([
             compareAmt(
               countOf(
                 and([

@@ -5,6 +5,4 @@ card singleFaced({
     text = [
       spell(
         sequentially(
-          steps = [
-            draw(letter(x)),
-            define(x, distinctCount(cardType, allOf(cardIn(yourGraveyard))))]))]})
+          [draw(letter(x)), define(x, distinctCount(cardType, allOf(cardIn(yourGraveyard))))]))]})

@@ -4,12 +4,10 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             instruct(target(isOpponent), loseLife(4)),
             may(
-              sequentially(
-                steps = [
+              sequentially([
                   searchLibraryOrGraveyard(a(named(printedName("Vraska, Scheming Gorgon")))),
                   reveal(it),
                   putInto(it, hand)])),

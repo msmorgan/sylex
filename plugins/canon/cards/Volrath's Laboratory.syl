@@ -7,7 +7,7 @@ card singleFaced({
         conjunction(
           [entersChoosing(thisArtifact, color), entersChoosing(thisArtifact, subtype(creature))])),
       activated(
-        compound(costs = [mana([generic(5)]), tapSymbol]),
+        compound([mana([generic(5)]), tapSymbol]),
         create(
           1,
           written({

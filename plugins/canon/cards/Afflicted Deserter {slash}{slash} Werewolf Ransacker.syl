@@ -17,8 +17,7 @@ card transforming({
     text = [
       whenever(
         does(any, transform(thisCreature, into = named(printedName("Werewolf Ransacker")))),
-        sequentially(
-          steps = [
+        sequentially([
             may(destroy(target(isArtifact))),
             doIf(
               did(actor(that(artifact)), putInto(actor, graveyard), thisWay),

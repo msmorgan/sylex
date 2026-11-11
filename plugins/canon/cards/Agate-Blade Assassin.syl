@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(actor(thisCreature), attack),
-        sequentially(steps = [instruct(defendingPlayer, loseLife(1)), gainLife(1)]))],
+        sequentially([instruct(defendingPlayer, loseLife(1)), gainLife(1)]))],
     power = 1,
     toughness = 3})

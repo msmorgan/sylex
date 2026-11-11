@@ -11,5 +11,5 @@ card singleFaced({
           createObject(anyAmount, token(copyOf(a(isToken)), [])),
           within(soFarThisTurn))),
       activated(
-        compound(costs = [mana([generic(8)]), tapSymbol, perform(sacrifice(thisArtifact))]),
+        compound([mana([generic(8)]), tapSymbol, perform(sacrifice(thisArtifact))]),
         create(1, written(creatureToken(10, 10, [], [eldrazi]))))]})

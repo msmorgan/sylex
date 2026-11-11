@@ -13,7 +13,7 @@ card singleFaced({
               thisCreature,
               thatKeyword,
               and([isCreature, in(graveyard), hasKeyword(thatKeyword)])))),
-        keywords = [
+        [
           theKeyword(flying),
           theKeyword(fear),
           theKeyword(firstStrike),

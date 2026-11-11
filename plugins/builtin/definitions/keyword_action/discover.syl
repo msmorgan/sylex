@@ -2,18 +2,17 @@
 action discover(amount: Amount) {
   lexical = {verbs = [{lemma = "discover", frames = [Amount, Intransitive]}]},
   spelling = "discover <amount>",
-  body = sequentially(
-    steps = [
+  body = sequentially([
       exile(
         run(
           top,
-          and([non(isLand), compare(atMost, $amount, axes = [stat(manaValue)])]),
+          and([non(isLand), compare(atMost, $amount, [stat(manaValue)])]),
           libraryOf(actor))),
       withContinuation(
         optional,
         cast(
           that(card),
-          resulting = compare(atMost, $amount, axes = [stat(manaValue)]),
+          resulting = compare(atMost, $amount, [stat(manaValue)]),
           altCost = withoutPaying),
         ifNot = putInto(that(card), hand)),
       move(theRest, anywhere, onBottom, [inOrder(randomOrder)])])

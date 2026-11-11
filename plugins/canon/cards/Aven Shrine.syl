@@ -5,7 +5,6 @@ card singleFaced({
     text = [
       whenever(
         does(actor(a(isPlayer)), cast(a(isSpell))),
-        sequentially(
-          steps = [
+        sequentially([
             instruct(they, gainLife(letter(x))),
             define(x, countOf(and([in(graveyard), shares(cardName, share, that(spell))])))]))]})

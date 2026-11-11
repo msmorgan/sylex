@@ -4,8 +4,7 @@
 action theRingTemptsYou {
   lexical = {verbs = [{lemma = "tempt", frames = [Monotransitive]}], nouns = ["Ring"]},
   spelling = "The Ring tempts you",
-  body = sequentially(
-    steps = [
+  body = sequentially([
       doIf(
         not(exists(and([isEmblem, named(printedName("The Ring")), ownedBy(actor)]))),
         getNamedEmblem(
@@ -14,7 +13,7 @@ action theRingTemptsYou {
             static(
               characteristicChange(
                 allOf(and([hasDesignation(ringBearer), youControl])),
-                edits = [typeLine(adds, {supertypes = [legendary]})])),
+                [typeLine(adds, {supertypes = [legendary]})])),
             static(
               cant(
                 by(
@@ -31,8 +30,7 @@ action theRingTemptsYou {
                   eventCount(
                     ownScope(
                       theRingTemptsYou,
-                      sequentially(
-                        steps = [
+                      sequentially([
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
                     actor(you),
@@ -44,15 +42,14 @@ action theRingTemptsYou {
                   [
                     whenever(
                       does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
-                      sequentially(steps = [draw(1), discard(a(cardIn(hand)))]))]))),
+                      sequentially([draw(1), discard(a(cardIn(hand)))]))]))),
             static(
               asLongAs(
                 compareAmt(
                   eventCount(
                     ownScope(
                       theRingTemptsYou,
-                      sequentially(
-                        steps = [
+                      sequentially([
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
                     actor(you),
@@ -73,8 +70,7 @@ action theRingTemptsYou {
                   eventCount(
                     ownScope(
                       theRingTemptsYou,
-                      sequentially(
-                        steps = [
+                      sequentially([
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
                     actor(you),

@@ -6,7 +6,7 @@ card singleFaced({
     subtypes = [human, merfolk],
     text = [
       activated(
-        compound(costs = [mana([pip(green), pip(blue)]), tapSymbol]),
+        compound([mana([pip(green), pip(blue)]), tapSymbol]),
         doubleCounters(target(or([isArtifact, isCreature, isLand]))))],
     power = 1,
     toughness = 4})

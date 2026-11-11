@@ -8,8 +8,7 @@ card singleFaced({
       deathtouch,
       when(
         does(actor(thisCreature), enter),
-        sequentially(
-          steps = [
+        sequentially([
             searchLibraryOrGraveyard(a(named(printedName("Command Tower")))),
             reveal(it),
             putInto(it, hand),

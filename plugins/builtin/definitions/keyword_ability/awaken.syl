@@ -10,13 +10,12 @@ ability awaken(amount: Amount, cost: Cost) {
     spell(
       doIf(
         keywordCostPaid(awaken, this),
-        sequentially(
-          steps = [
+        sequentially([
             putCounters($amount, printedKind(p1p1Counter), target(and([isLand, youControl]))),
             establish(
               characteristicChange(
                 that(land),
-                edits = [
+                [
                   typeLine(adds, {types = [creature], subtypes = [elemental]}),
                   stat(power, set(0)),
                   stat(toughness, set(0)),

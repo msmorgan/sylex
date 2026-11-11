@@ -4,8 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             get(
               target(and([isCreature, or([isAttacking, isBlocking])])),
               up(4),

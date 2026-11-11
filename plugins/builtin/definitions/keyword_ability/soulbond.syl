@@ -10,8 +10,7 @@ ability soulbond {
   body = [
     when(
       does(actor(thisCreature), enter),
-      if = and(
-        conjuncts = [
+      if = and([
           is(thisCreature, and([youControl, not(related(paired))])),
           exists(and([and([isCreature, youControl, isOther]), not(related(paired))]))]),
       may(
@@ -21,8 +20,7 @@ ability soulbond {
           a(and([and([isCreature, youControl, isOther]), not(related(paired))]))))),
     whenever(
       does(actor(a(and([isCreature, youControl, isOther]))), enter),
-      if = and(
-        conjuncts = [
+      if = and([
           is(thisCreature, and([youControl, not(related(paired))])),
           is(that(creature), and([youControl, not(related(paired))]))]),
       may(relate(that(creature), paired, thisCreature)))]

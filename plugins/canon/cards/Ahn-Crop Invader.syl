@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(partScope(turn, you, abilityGrant(thisCreature, [firstStrike]))),
       activated(
-        compound(costs = [mana([generic(1)]), perform(sacrifice(a(and([isCreature, isOther]))))]),
+        compound([mana([generic(1)]), perform(sacrifice(a(and([isCreature, isOther]))))]),
         get(thisCreature, up(2), up(0), duration = untilEndOfTurn))],
     power = 2,
     toughness = 2})

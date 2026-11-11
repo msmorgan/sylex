@@ -1,2 +1,2 @@
 # At least one listed condition holds.
-primitive or(disjuncts: List(Condition) = []): Condition = Or
+primitive or(disjuncts: List(Condition)): Condition = Or

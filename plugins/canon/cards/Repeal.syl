@@ -4,7 +4,6 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             returnToHand(target(and([non(isLand), isPermanent, hasManaValue(equal, letter(x))]))),
             draw(1)]))]})

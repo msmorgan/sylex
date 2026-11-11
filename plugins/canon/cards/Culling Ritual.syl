@@ -4,8 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             destroy(each(and([non(isLand), isPermanent, hasManaValue(atMost, 2)]))),
             addMana(
               counted(

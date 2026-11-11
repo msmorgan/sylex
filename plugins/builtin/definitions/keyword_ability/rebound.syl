@@ -14,8 +14,7 @@ ability rebound {
         doIf(
           is(thisSpell, did(any, cast(which, from = yourHand), within = thisObject)),
           instead(
-            sequentially(
-              steps = [
+            sequentially([
                 exile(thisSpell),
                 atNext(
                   beginningOf(upkeep, you, nextTime),

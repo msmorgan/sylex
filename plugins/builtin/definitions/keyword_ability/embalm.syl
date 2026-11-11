@@ -9,7 +9,7 @@ ability embalm(cost: Cost) {
   spelling = "embalm <cost>",
   body = [
     activatedOnlyDuring(
-      compound(costs = [$cost, perform(exileFrom(thisCard, yourGraveyard))]),
+      compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),
       create(
         1,
         copyOf(

@@ -9,4 +9,4 @@ card singleFaced({
         may(
           pay(mana([generic(2)]), once),
           ifDid = sequentially(
-            steps = [copyOnStack(that(ability)), may(chooseNewTargets(that(copied(ability))))])))]})
+            [copyOnStack(that(ability)), may(chooseNewTargets(that(copied(ability))))])))]})

@@ -29,8 +29,7 @@ ability suspend(amount: Amount, cost: Cost) {
     when(
       does(any, removeCounters(theLast, printedKind(timeCounter), thisCard)),
       if = is(thisCard, in(exileZone)),
-      sequentially(
-        steps = [
+      sequentially([
           may(play(thisCard, altCost = withoutPaying)),
           doIf(
             did(actor(you), cast(a(and([isCreature, isSpell]))), thisWay),
@@ -38,8 +37,5 @@ ability suspend(amount: Amount, cost: Cost) {
               that(spell),
               [haste],
               duration = forAsLongAs(
-                or(
-                  disjuncts = [
-                    is(that(spell), youControl),
-                    is(becomes(that(spell)), youControl)]))))]))]
+                or([is(that(spell), youControl), is(becomes(that(spell)), youControl)]))))]))]
 }

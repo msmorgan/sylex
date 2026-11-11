@@ -12,8 +12,7 @@ card singleFaced({
     text = [
       whenever(
         does(actor(eitherOf(thisCreature, a(and([hasSubtype(ally), youControl, isOther])))), enter),
-        sequentially(
-          steps = [
+        sequentially([
             may(destroy(target(isArtifact))),
             doIf(
               did(actor(that(artifact)), putInto(actor, graveyard), thisWay),

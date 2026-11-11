@@ -13,8 +13,7 @@ card transforming({
           duration = untilEndOfTurn)),
       activated(
         loyaltySymbol(up(0)),
-        sequentially(
-          steps = [
+        sequentially([
             create(1, written(creatureToken(2, 2, [green], [wolf]))),
             transform(thisPlaneswalker)]))],
     loyalty = 3},
@@ -32,8 +31,7 @@ card transforming({
           duration = untilEndOfTurn)),
       activated(
         loyaltySymbol(down(1)),
-        sequentially(
-          steps = [
+        sequentially([
             instruct(this, dealDamage(amount = 3, recipient = target(isAnyTarget))),
             transform(thisPlaneswalker)])),
       activated(

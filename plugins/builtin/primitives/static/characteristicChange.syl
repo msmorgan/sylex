@@ -1,4 +1,4 @@
 # Authoring primitive for `StaticSpec.characteristicChange`.
 primitive characteristicChange(
   subject: NounPhrase,
-  edits: List(CharacteristicEdit) = []): StaticSpec = CharacteristicChange
+  edits: List(CharacteristicEdit)): StaticSpec = CharacteristicChange

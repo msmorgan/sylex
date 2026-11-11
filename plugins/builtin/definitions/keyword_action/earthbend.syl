@@ -4,12 +4,11 @@
 action earthbend(amount: Amount) {
   lexical = {verbs = [{lemma = "earthbend", past = "earthbent", frames = [Amount, Intransitive]}]},
   spelling = "earthbend <amount>",
-  body = sequentially(
-    steps = [
+  body = sequentially([
       establish(
         characteristicChange(
           target(and([isLand, actorControls])),
-          edits = [
+          [
             typeLine(adds, {types = [creature]}),
             stat(power, set(0)),
             stat(toughness, set(0)),

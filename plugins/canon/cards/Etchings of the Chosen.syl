@@ -7,8 +7,7 @@ card singleFaced({
       static(
         getsPt(allOf(and([isCreature, youControl, ofChosen(subtype(creature))])), up(1), up(1))),
       activated(
-        compound(
-          costs = [
+        compound([
             mana([generic(1)]),
             perform(sacrifice(a(and([isCreature, ofChosen(subtype(creature))]))))]),
         gain(target(and([isCreature, youControl])), [indestructible], duration = untilEndOfTurn))]})

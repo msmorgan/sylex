@@ -6,8 +6,7 @@ card singleFaced({
       static(
         altCost(
           payingInstead(
-            compound(
-              costs = [
+            compound([
                 perform(payLife(amount = 1)),
                 perform(exile(a(and([hasColor(blue), in(yourHand)]))))])),
           this)),

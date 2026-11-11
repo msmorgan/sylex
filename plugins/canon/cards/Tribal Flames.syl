@@ -7,8 +7,7 @@ card singleFaced({
     text = [
       domain(
         spell(
-          sequentially(
-            steps = [
+          sequentially([
               instruct(this, dealDamage(amount = letter(x), recipient = target(isAnyTarget))),
               define(
                 x,

@@ -5,8 +5,7 @@ card singleFaced({
     text = [
       activatedOnlyDuring(
         mana([generic(3), pip(red), pip(red)]),
-        sequentially(
-          steps = [
+        sequentially([
             untap(allOf(and([isCreature, youControl]))),
             additionalPhase(combat, mainPhase, 1, followedBy = mainPhase)]),
         asSorcery)]})

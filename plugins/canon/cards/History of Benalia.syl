@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [saga],
     text = [
       when(
-        chapterMark(chapters = [1, 2]),
+        chapterMark([1, 2]),
         create(
           1,
           written({
@@ -17,7 +17,7 @@ card singleFaced({
                 power = 2,
                 toughness = 2}}))),
       when(
-        chapterMark(chapters = [3]),
+        chapterMark([3]),
         get(
           allOf(and([hasSubtype(knight), youControl])),
           up(2),

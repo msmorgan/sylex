@@ -17,6 +17,5 @@ ability foretell(cost: Cost) {
       specialAction(
         duringPart(turn, whose = you),
         mana([generic(2)]),
-        sequentially(
-          steps = [exileFaceDownFrom(thisCard, yourHand), gainDesignation(it, foretold)])))]
+        sequentially([exileFaceDownFrom(thisCard, yourHand), gainDesignation(it, foretold)])))]
 }

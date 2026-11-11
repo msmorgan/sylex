@@ -5,12 +5,11 @@ card singleFaced({
     text = [
       spell(
         doIf(
-          and(
-            conjuncts = [
+          and([
               is(this, did(any, cast(which, from = yourHand), within = thisObject)),
               did(
                 actor(you),
                 cast(a(and([isSpell, isOther, named(printedName("Approach of the Second Sun"))]))),
                 within(thisGame))]),
           winGame,
-          otherwise = sequentially(steps = [putInto(this, fromTop(7, library)), gainLife(7)])))]})
+          otherwise = sequentially([putInto(this, fromTop(7, library)), gainLife(7)])))]})

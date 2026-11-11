@@ -9,6 +9,6 @@ card singleFaced({
           equipped(creature),
           [
             activated(
-              compound(costs = [tapSymbol, perform(unattach(theGrantor(permanent)))]),
+              compound([tapSymbol, perform(unattach(theGrantor(permanent)))]),
               tap(target(isCreature)))])),
       equip(mana([generic(1)]))]})

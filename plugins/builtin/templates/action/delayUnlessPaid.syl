@@ -6,8 +6,7 @@
 # [CR#116.2c]
 template delayUnlessPaid(event: GameEvent, action: Action, player: NounPhrase, cost: Cost): Action {
   spelling = "<action> at <event> unless <player> pays <cost> before that step",
-  body = sequentially(
-    steps = [
+  body = sequentially([
       delay($event, $action),
       establish(
         specialAction(

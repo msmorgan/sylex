@@ -9,8 +9,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             choose(
               both(
                 target(and([isCreature, youControl])),

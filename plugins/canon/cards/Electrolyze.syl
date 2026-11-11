@@ -3,6 +3,4 @@ card singleFaced({
     cost = [generic(1), pip(blue), pip(red)],
     types = [instant],
     text = [
-      spell(
-        sequentially(
-          steps = [dealDivided(this, 2, targets(oneThrough(2), isAnyTarget)), draw(1)]))]})
+      spell(sequentially([dealDivided(this, 2, targets(oneThrough(2), isAnyTarget)), draw(1)]))]})

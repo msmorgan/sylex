@@ -12,8 +12,7 @@ card singleFaced({
             this,
             from = yourGraveyard,
             altCost = payingInstead(
-              compound(
-                costs = [
+              compound([
                   mana([pip(black), pip(black)]),
                   perform(sacrifice(counted(exactly(2), isCreature)))])))))],
     power = 6,

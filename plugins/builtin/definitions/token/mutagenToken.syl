@@ -8,7 +8,7 @@ token mutagenToken {
       subtypes = [mutagen],
       text = [
         activatedOnlyDuring(
-          compound(costs = [mana([generic(1)]), tapSymbol, perform(sacrifice(thisToken))]),
+          compound([mana([generic(1)]), tapSymbol, perform(sacrifice(thisToken))]),
           putCounters(1, printedKind(p1p1Counter), target(isCreature)),
           asSorcery)]}}
 }

@@ -6,8 +6,7 @@ card singleFaced({
     text = [
       whenever(
         does(actor(thisCreature), attack),
-        sequentially(
-          steps = [
+        sequentially([
             exile(topSlice(1)),
             doIf(
               is(it, and([isCard, isCreature])),

@@ -4,8 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             rollDice(sides = sides(20)),
             applyResultsTable([
                 rollRow(
@@ -13,8 +12,7 @@ card singleFaced({
                   instruct(this, dealDamage(amount = 3, recipient = each(isCreature)))),
                 rollRow(
                   fromTo(10, 19),
-                  sequentially(
-                    steps = [
+                  sequentially([
                       may(choose(a(isCreature))),
                       instruct(
                         this,

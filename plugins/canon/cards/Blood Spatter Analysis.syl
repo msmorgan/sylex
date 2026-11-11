@@ -10,8 +10,7 @@ card singleFaced({
           dealDamage(amount = 3, recipient = target(and([isCreature, anOpponentControls]))))),
       whenever(
         does(actor(counted(orMore(1), isCreature)), die),
-        sequentially(
-          steps = [
+        sequentially([
             mill(1),
             putCounters(1, printedKind(bloodstainCounter), thisEnchantment),
             triggerReflexively(

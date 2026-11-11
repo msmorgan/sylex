@@ -6,8 +6,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             counter(target(isSpell)),
             create(letter(x), defined(treasureToken)),
             define(x, statOf(stat(manaValue), that(spell)))]))]})

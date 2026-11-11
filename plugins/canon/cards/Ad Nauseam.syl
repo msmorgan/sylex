@@ -4,8 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially(
-          steps = [
+        sequentially([
             reveal(topSlice(1)),
             putInto(that(card), hand),
             loseLife(statOf(stat(manaValue), it)),

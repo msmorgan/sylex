@@ -18,8 +18,7 @@ ability warp(cost: Cost) {
           keywordCostPaid(warp, thisSpell),
           atNext(
             beginningOfNext(endStep),
-            sequentially(
-              steps = [
+            sequentially([
                 exile(becomes(thisSpell)),
                 establishThroughout(
                   can(actor(ownerOf(it)), cast(it, from = exileZone)),

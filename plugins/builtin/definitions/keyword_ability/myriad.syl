@@ -8,8 +8,7 @@ ability myriad {
   body = [
     whenever(
       does(actor(thisCreature), attack),
-      sequentially(
-        steps = [
+      sequentially([
           doForEach(
             each(and([isOpponent, otherThan(defendingPlayer)])),
             may(
@@ -18,8 +17,7 @@ ability myriad {
                 copyOf(thisCreature),
                 riders = [
                   entersAs(tapped),
-                  entersAttacking(
-                    or(phrases = [they, a(and([isPlaneswalker, controlledBy(they)]))]))]))),
+                  entersAttacking(or([they, a(and([isPlaneswalker, controlledBy(they)]))]))]))),
           doIf(
             compareAmt(numberOf(thoseTokens), atLeast, 1),
             atNext(endOfCombat, exile(thoseTokens)))]))]

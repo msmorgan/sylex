@@ -7,8 +7,7 @@ ability ninjutsu(cost: Cost) {
   spelling = "ninjutsu <cost>",
   body = [
     activated(
-      compound(
-        costs = [
+      compound([
           $cost,
           perform(reveal(this)),
           perform(returnToHand(a(and([isCreature, isAttacking, isUnblocked, youControl]))))]),

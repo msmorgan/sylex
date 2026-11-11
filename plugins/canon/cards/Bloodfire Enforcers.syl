@@ -7,8 +7,7 @@ card singleFaced({
       static(
         onlyWhile(
           abilityGrant(thisCreature, [firstStrike, trample]),
-          and(
-            conjuncts = [
+          and([
               exists(and([isInstant, in(yourGraveyard)])),
               exists(and([isSorcery, in(yourGraveyard)]))])))],
     power = 5,

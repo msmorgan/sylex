@@ -4,9 +4,8 @@ card singleFaced({
     types = [artifact],
     text = [
       activated(
-        compound(costs = [mana([generic(4)]), tapSymbol]),
-        sequentially(
-          steps = [
+        compound([mana([generic(4)]), tapSymbol]),
+        sequentially([
             reveal(topSlice(1)),
             doIf(
               is(it, shares(cardName, share, a(cardIn(yourGraveyard)))),

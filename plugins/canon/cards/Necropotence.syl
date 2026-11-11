@@ -7,8 +7,7 @@ card singleFaced({
       whenever(does(actor(you), discard(a(isCard))), exileFrom(that(card), yourGraveyard)),
       activated(
         perform(payLife(amount = 1)),
-        sequentially(
-          steps = [
+        sequentially([
             exileFaceDown(topSlice(1)),
             atNext(
               beginningOf(endStep, you, nextTime(player = you)),

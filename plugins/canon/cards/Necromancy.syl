@@ -7,8 +7,7 @@ card singleFaced({
       when(
         does(actor(thisEnchantment), enter),
         if = is(it, in(battlefield)),
-        sequentially(
-          steps = [
+        sequentially([
             establish(
               conjunction([
                   addSubtype(it, aura),

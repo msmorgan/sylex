@@ -6,8 +6,7 @@ card singleFaced({
         replace(
           would(actor(thisLand), enter),
           instead(
-            sequentially(
-              steps = [
+            sequentially([
                 sacrifice(
                   each(
                     and(

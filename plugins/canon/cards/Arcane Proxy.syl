@@ -8,8 +8,7 @@ card prototype({
       when(
         does(actor(thisCreature), enter),
         if = is(it, did(actor(you), cast(which), within = thisObject)),
-        sequentially(
-          steps = [
+        sequentially([
             exile(
               target(
                 and([

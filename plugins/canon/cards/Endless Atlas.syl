@@ -4,6 +4,6 @@ card singleFaced({
     types = [artifact],
     text = [
       activatedOnlyIf(
-        compound(costs = [mana([generic(2)]), tapSymbol]),
+        compound([mana([generic(2)]), tapSymbol]),
         draw(1),
         thereAre(withTheSameName(counted(orMore(3), and([isLand, youControl])))))]})

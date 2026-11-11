@@ -7,8 +7,7 @@ card singleFaced({
       flying,
       when(
         does(actor(thisCreature), enter),
-        sequentially(
-          steps = [
+        sequentially([
             reveal(topSlice(5)),
             instruct(anOpponent, separateIntoPiles(them, 2)),
             putInto(onePile, hand),

@@ -8,8 +8,7 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), enter),
-        sequentially(
-          steps = [
+        sequentially([
             instruct(
               eachPlayer,
               chooseStartingWith(you, counted(upTo(5), and([isPermanent, controlledBy(they)])))),

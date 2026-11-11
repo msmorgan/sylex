@@ -6,10 +6,7 @@ card singleFaced({
       spell(
         establishThroughout(
           replace(
-            would(
-              any,
-              dealDamage(
-                recipient = andOr(phrases = [you, allOf(and([isPermanent, youControl]))]))),
+            would(any, dealDamage(recipient = andOr([you, allOf(and([isPermanent, youControl]))]))),
             instead(
               preventDamage(
                 theNext(letter(x)),

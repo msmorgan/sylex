@@ -8,15 +8,13 @@ ability ascend {
     ifPermanentType(
       static(
         whileHolds(
-          and(
-            conjuncts = [
+          and([
               compareAmt(countOf(and([isPermanent, youControl])), atLeast, 10),
               not(is(you, hasDesignation(citysBlessing)))]),
           gainDesignation(you, citysBlessing, duration = restOfGame))),
       spell(
         doIf(
-          and(
-            conjuncts = [
+          and([
               compareAmt(countOf(and([isPermanent, youControl])), atLeast, 10),
               not(is(you, hasDesignation(citysBlessing)))]),
           gainDesignation(you, citysBlessing, duration = restOfGame))))]

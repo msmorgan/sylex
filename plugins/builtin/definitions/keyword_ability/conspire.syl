@@ -19,5 +19,5 @@ ability conspire {
     when(
       does(actor(you), cast(thisSpell)),
       if = keywordCostPaid(conspire, thisSpell),
-      sequentially(steps = [copyOnStack(thisSpell), may(chooseNewTargets(that(copy)))]))]
+      sequentially([copyOnStack(thisSpell), may(chooseNewTargets(that(copy)))]))]
 }

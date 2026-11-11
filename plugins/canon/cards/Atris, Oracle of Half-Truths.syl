@@ -8,8 +8,7 @@ card singleFaced({
       menace,
       when(
         does(actor(thisCreature), enter),
-        sequentially(
-          steps = [
+        sequentially([
             instruct(target(isOpponent), lookAt(topSlice(3))),
             instruct(they, separateIntoPiles(them, 2, faces = [faceDown, faceUp])),
             putInto(onePile, hand),

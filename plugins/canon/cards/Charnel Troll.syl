@@ -13,9 +13,7 @@ card singleFaced({
           ifNot = sacrifice(thisCreature))),
       activated(
         compound(
-          costs = [
-            mana([pip(black), pip(green)]),
-            perform(discard(a(and([isCreature, in(yourHand)]))))]),
+          [mana([pip(black), pip(green)]), perform(discard(a(and([isCreature, in(yourHand)]))))]),
         putCounters(1, printedKind(p1p1Counter), thisCreature))],
     power = 4,
     toughness = 4})

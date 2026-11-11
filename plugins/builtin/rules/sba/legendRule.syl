@@ -17,8 +17,7 @@ sba legendRule {
     scope = isPlayer,
     when = thereAre(
       withTheSameName(counted(orMore(2), and([hasSupertype(legendary), isPermanent, youControl])))),
-    then = sequentially(
-      steps = [
+    then = sequentially([
         doForEachKind(
           name,
           domain = allOf(

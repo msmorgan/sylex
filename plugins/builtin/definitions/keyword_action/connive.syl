@@ -7,8 +7,7 @@ action connive(amount: Amount = 1) {
   spelling = "connive <amount>",
   body = instruct(
     controllerOf(actor),
-    sequentially(
-      steps = [
+    sequentially([
         draw($amount),
         discard(counted(exactlyOf($amount), isCard)),
         doForEach(
