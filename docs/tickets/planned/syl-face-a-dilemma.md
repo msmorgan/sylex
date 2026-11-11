@@ -2,7 +2,7 @@
 needs: []
 ---
 
-# English and semantics: facing a dilemma
+# Syl: facing a dilemma
 
 ## Why
 
