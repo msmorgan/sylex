@@ -29,26 +29,18 @@ attaches it as a supplement to three different hosts, never inside the amount's 
 
 - An unrounded fraction amount exists for half and for a third (*Pox*), spelled "half $amount"
   and "a third of $amount".
-- `roundEachTime(action, mode)` wraps the sentence it covers and is spelled as that sentence
-  followed by "Round $mode each time.", its parameters in that printed order (`syl.md` §5). It
-  wraps the whole sentence, so a "then" chain of several Actions (*Pox*, *Fraying Omnipotence*) is
-  covered; it is not a trailing step that looks back at the step before it.
+- `roundEachTime(action, mode)` wraps the run of sentences it covers and is spelled as that run
+  followed by "Round $mode each time.", its parameters in that printed order (`syl.md` §5). Its
+  `action` Hole holds a run (`spelling.md` §2): *Saw in Half*'s holds the two sentences before
+  the rounding sentence, and *Hydroid Krasis*'s the one. Its own phrase is a run too, so `when`'s
+  effect Hole holds it, and the trigger clause printed in its first sentence governs it by the run
+  rule. It wraps the whole run, so a "then" chain of several Actions (*Pox*, *Fraying
+  Omnipotence*) is covered; it is not a trailing step that looks back at the step before it.
 - The rounded `half` keeps one expansion and prints its rounding as a Tail: one Template per host
   the Readings give (the interleaved complement, the cost, the clause), each its own wording.
 
 ## Open questions
 
-- **An Action whose wording is two sentences.** "$action. Round $mode each time." is a run of two
-  sentences (`SentenceSequence`), while spelling's closed rules name a run of sentences only for
-  a trigger condition over several sentences. *Hydroid Krasis* ("When you cast this spell, you
-  gain half X life and draw half X cards. Round down each time.") is that case: the trigger
-  condition stands in the first sentence of a two-sentence effect. *Saw in Half* is not: its
-  rounding sentence follows the second of its three sentences ("Destroy target creature. If that
-  creature dies this way, … . Round up each time."), under no trigger. Options: a wording at
-  `Action` may be one fragment spanning several sentences, which is substitution of one fragment;
-  or the rounding sentence is the spell's or ability's, a wrapper at the level of its text.
-  Recommendation: the first, stated in `spelling.md` beside the trigger rule, since the wrapper
-  is the Action's own meaning.
 - **The Tails' names and placement.** Recommendation: named for their host; the placement among
   the host's other adjuncts follows `syl-tail-placement`, which lands first through the surface
   gate.

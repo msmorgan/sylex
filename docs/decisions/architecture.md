@@ -131,10 +131,10 @@ wording — pairs one fixed fragment of English structure with the call it
 spells, the fragment's Holes linked to the call's parameters. Constructions
 combine by substitution only, never by adjunction. Two closed rules cover two
 places where English and the term part: a passive prints the complement its
-Action's frame promotes as its context's subject, and a trigger clause fronted in the
-first sentence of an effect of several sentences governs them all. Three closed
-extensions cover more: optional and list Holes, a Tail printed away from its
-Hole, and Factoring of what a coordination's arms share
+Action's frame promotes as its context's subject, and a dependent printed in the
+first sentence of a run of consecutive sentences, which a Hole may hold, may
+govern the whole run. Three closed extensions cover more: optional and list
+Holes, a Tail printed away from its Hole, and Factoring of what a coordination's arms share
 ([Spelling](spelling.md) §2–3). What these do not yet cover is open
 ([Spelling](spelling.md) §10). A derivation builds both sides at once, so the
 same grammar recovers a resolved term from a Reading and spells a resolved term

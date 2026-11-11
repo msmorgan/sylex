@@ -73,14 +73,30 @@ Why substitution only:
 - **The term is the derivation with nothing beside it** (§4). Under substitution each call
   spells one subtree of the Reading, so where a call stands in the term is where its wording
   stands in the Reading.
-- **`.syl` sorts line up with English constituents.** A Hole is one constituent, so a
-  parameter's sort is the sort of one phrase of the Reading. That is what lets the sort of a slot
-  decide a word's coercion ([`.syl`](syl.md) §3): "creature" is a noun phrase's head at one sort
-  and a modifier at another, and the slot it fills says which.
+- **`.syl` sorts line up with English constituents.** A Hole is one constituent, or a run of
+  sentences (below), so a parameter's sort is the sort of one phrase of the Reading. That is what
+  lets the sort of a slot decide a word's coercion ([`.syl`](syl.md) §3): "creature" is a noun
+  phrase's head at one sort and a modifier at another, and the slot it fills says which.
 
 Substitution is in no lower complexity class than one-sided adjunction, which is context-free
 and cubic too (§8). What it buys is the shape of what recovery searches and of what the term
 records.
+
+**A Hole may hold a run of sentences.** A run is one or more consecutive sentences of a
+sentence sequence. A text has no syntactic structure above the sentence: the English grammar
+builds a sequence by right recursion (`SentenceSequence`, `crates/english/grammar/english.fug`),
+which is one grouping chosen for the forest, so spelling reads a sentence sequence as flat, and a
+run fills a Hole whether or not it is a node of the Reading. A Hole of sort `Action` holds a run,
+and so does a Hole whose argument's own phrase is a run, as `replaceEvent`'s `replacement` Hole
+holds `instead` over one (below). A Construction's fixed words may follow such a Hole as a
+sentence of their own, which is plain substitution. Aggravated Assault prints "{3}{R}{R}: Untap
+all creatures you control. After this main phase, there is an additional combat phase followed
+by an additional main phase. Activate only as a sorcery." `activatedOnlyDuring`'s wording "$cost:
+$action. Activate only $timing." holds the run of the first two sentences in its `action` Hole,
+a run the Reading has no node for: its `SentenceSequence` nodes span all three sentences and the
+last two. Academy Wall's "Whenever you cast an instant or sorcery spell, you may draw a card. If
+you do, discard a card. This ability triggers only once each turn." is the same shape, with the
+last sentence the wording of `whenever`'s usage limit after the run in its effect Hole.
 
 Where English attaches a word inside or beside a phrase, the term has the structure English
 has, or a Template holds the word in its one fixed fragment:
@@ -164,34 +180,80 @@ Why: voice is already the Subject's choice ([Semantics](semantics.md) §4.2), so
 two Holes the term already holds in one fixed way, and it adds no place for words: the
 promoted phrase takes the subject position the context's own wording has.
 
-**A fronted trigger clause over several sentences.** A triggered ability is written
-"[When/Whenever/At] [trigger condition or event], [effect]" [CR#603.1], and one with an
-intervening "if" clause "When/Whenever/At [trigger event], if [condition], [effect]" [CR#603.4].
-Its effect may be several sentences. Boommobile prints "When this Vehicle enters, add four mana of
-any one color. Spend this mana only to activate abilities." In the Reading, "When this Vehicle
-enters," is a front dependent of the first sentence's clause. In the term, `when(event, action)`
-takes the whole effect, both sentences, as its `action`. With an intervening "if", the Reading
-stacks both clauses as front dependents of the first sentence: Eon Frolicker's "When this
-creature enters, if you cast it, target opponent takes an extra turn after this one. Until your
-next turn, you and planeswalkers you control gain protection from that player." has "When this
-creature enters," over "if you cast it, target opponent takes …", and the second sentence
-outside both. The trigger rule: the fronted clauses of a
-trigger's Construction, its trigger clause and any intervening "if" clause, may govern an effect
-of several sentences, and they are printed at the front of the first of them. It holds for the
-fronted clauses of a triggered ability, a delayed trigger ("At the beginning of the next end step,
-…") and a reflexive one ("When you do, …"). A delayed trigger clause printed after its effect is
-ordinary substitution within its one sentence: Aetherling's "Return it to the battlefield under
-its owner's control at the beginning of the next end step." Why: the term cannot follow English
-here, because the whole effect belongs to the one ability, and writing only the first sentence
-under the trigger would leave the rest outside it. Nor does the English grammar change for the
-layer above it (§5, §9).
+**The run rule: a dependent printed in a run's first sentence may govern the whole run.** The
+Construction whose wording prints the dependent takes the run in its Hole, and the dependent
+stands where that wording places it in the run's first sentence, before the sentence's clause or
+after its verb phrase. The run's other sentences follow the first as they are printed. The rule
+applies only to a Hole that holds a run (above), so a dependent whose Construction has no such
+Hole never governs one: "until end of turn" is a `Duration` argument of its effect's own call,
+and it stays an adjunct of its one sentence.
 
-The same mismatch appears in other contexts, which the trigger rule does not cover: a
-postposed delayed trigger clause that governs a later sentence, a fronted replacement clause
-over several sentences, and a sentence printed after a run of several sentences. They are one
-open question (§10). So substitution, the extensions of §3 and these two rules are the
-operations this design states; what they do not cover is listed in §10, and a wording that needs
-something else is a defect in this design, reported and settled here.
+- **A fronted trigger clause.** A triggered ability is written "[When/Whenever/At] [trigger
+  condition or event], [effect]" [CR#603.1], and one with an intervening "if" clause
+  "When/Whenever/At [trigger event], if [condition], [effect]" [CR#603.4]. Boommobile prints
+  "When this Vehicle enters, add four mana of any one color. Spend this mana only to activate
+  abilities." In the Reading, "When this Vehicle enters," is a front adjunct of the first
+  sentence's clause, and `when(event, action)` takes the run of both sentences as its `action`.
+  With an intervening "if", the Reading stacks both clauses as front dependents of the first
+  sentence: Eon Frolicker's "When this creature enters, if you cast it, target opponent takes an
+  extra turn after this one. Until your next turn, you and planeswalkers you control gain
+  protection from that player." has "When this creature enters," over "if you cast it, target
+  opponent takes …", and the second sentence outside both. The same holds for a delayed trigger
+  ("At the beginning of the next end step, …") and a reflexive one ("When you do, …").
+- **A fronted replacement with "instead".** Eruth, Tormented Prophet prints "If you would draw a
+  card, exile the top two cards of your library instead. You may play those cards this turn."
+  The replaced event never happens, and a modified event occurs instead [CR#614.6]; the second
+  sentence reads the cards the first exiled, so the replacement is the run of both sentences. Two
+  Constructions each print a dependent in the run's first sentence. `instead` prints its word
+  after the first sentence's verb phrase, over its `action` Hole, which holds the run.
+  `replaceEvent` prints its would-clause "If you would draw a card," at the front of the first
+  sentence, over its `replacement` Hole, which holds `instead` over the run. Enduring Renewal and
+  Chains of Mephistopheles have the same shape.
+- **A postposed delayed trigger clause.** Goblin Kites prints "{R}: Target creature you control
+  with toughness 2 or less gains flying until end of turn. Flip a coin at the beginning of the
+  next end step. If you lose the flip, sacrifice that creature." A delayed triggered ability does
+  something at a later time, and its trigger word won't usually begin it [CR#603.7]. The coin is
+  flipped when the delayed trigger resolves, and the sacrifice depends on that flip, so the
+  delayed trigger's effect is the run of the second and third sentences. "at the beginning of the
+  next end step" is an adjunct after the verb phrase "Flip a coin", in the run's first sentence,
+  which is the second sentence of the ability's effect: the run a dependent governs starts at the
+  sentence that prints it, wherever that sentence stands in the sequence. The Template that prints
+  a delayed trigger's point after its action is not yet declared (`atNext`'s `TODO(spelling)`).
+
+The rule does not choose a run's length. Recovery yields a candidate for each run the Hole can
+hold that starts at the dependent's sentence, and a candidate the checker or the discourse
+reading refuses drops out (§5). 30 of the 371 lines that print a delayed trigger clause after its
+effect print a further sentence after it, and other fronted dependents are followed by more
+sentences too: "As long as …," on 16 lines, "Until end of turn," on 33 and "If <condition>," on
+524. Where the dependent's Construction has a Hole that holds a run, each such line has a
+candidate per run, and the term may follow English where a branch's output reaches later text
+([Semantics](semantics.md) §2.2).
+
+A sentence printed after a run that it governs is not in the run's first sentence, and the run
+rule does not cover it. It needs no rule: it is its Construction's own wording after a Hole that
+holds the run, which is substitution (above). "Activate only as a sorcery." and "This ability
+triggers only once each turn." are such sentences, and so is a rounding instruction. Saw in Half
+prints "Destroy target creature. If that creature dies this way, its controller creates two tokens
+that are copies of that creature, except their power is half that creature's power and their
+toughness is half that creature's toughness. Round up each time." The rounding is a Construction
+over the Action it covers, whose wording is that Action followed by "Round $mode each time." and
+whose Action Hole holds the run of the first two sentences, with every fraction inside it
+unrounded (`syl-round-each-time`; the card writes `half(up, …)` at each fraction today). Its own
+phrase is a run too, so a Hole may hold it: Hydroid Krasis's "When you cast this spell, you gain
+half X life and draw half X cards. Round down each time." is `when` whose effect Hole holds the
+rounding Construction's run of two sentences, and "When you cast this spell," governs that run by
+the run rule.
+
+Why: the term cannot follow English here, because the whole run belongs to the one context, and
+writing only the first sentence under it would leave the rest outside. One rule covers every
+context whose Hole holds a run, so a new context with an effect of several sentences needs no
+rule of its own. Nor does the English grammar change for the layer above it (§5, §9). The cost
+is in recovery: it matches Holes against runs, spans of sibling sentences, and not only against
+nodes, and an ability of n sentences has n(n+1)/2 runs, on the order of n²/2 (§8).
+
+So substitution, the extensions of §3 and these two rules are the operations this design
+states; what they do not cover is listed in §10, and a wording that needs something else is a
+defect in this design, reported and settled here.
 
 ## 3. The three extensions
 
@@ -359,13 +421,14 @@ beside the term.
 
 Substitution makes that hold directly: each call's wording is one fixed fragment, so, outside the
 extensions, the two rules and the nodes the English layer derives, each call spells one subtree of
-the Reading (§2). The extensions and closed rules keep it, because each relates parts of the
-Reading to calls the term already has. A Tail is an argument, at some depth, of the call that
-spells its phrase, as the `forEach` inside a verb's amount is. Factoring prints a parameter of the
-coordination's own call (§3.3). Passive subject promotion links the complement the passive of an
-Action's frame promotes to the Subject position of the context that takes the Action, and the
-trigger rule links a fronted trigger clause to its whole effect; in both, the context is a call
-that takes the Action as an argument. None needs a node the term would not otherwise have.
+the Reading, or one run of its sentences (§2). The extensions and closed rules keep it, because
+each relates parts of the Reading to calls the term already has. A Tail is an argument, at some
+depth, of the call that spells its phrase, as the `forEach` inside a verb's amount is. Factoring
+prints a parameter of the coordination's own call (§3.3). Passive subject promotion links the
+complement the passive of an Action's frame promotes to the Subject position of the context that
+takes the Action, and the run rule links a dependent printed in a run's first sentence to the
+whole run; in both, the context is a call that takes the Action as an argument. None needs a node
+the term would not otherwise have.
 
 So wording is carried by exactly two things: **which Template a card calls, and the printed
 order of a list's elements** (§3.1). Two wordings with one meaning are two Templates with one
@@ -394,10 +457,11 @@ invents and the other discards, which the canonical form does not store
 **The English grammar.** Its Productions, its Readings and its Packed Forest do not change.
 A Reading is a tree, so it already has every Adjunct and Modifier on one side of the host
 whose Category licenses it, and a shared dependent beside its coordination
-([English](english.md) §3). Recovery
-reads the Packed Forest and never parses text again ([English](english.md) §4): a
-Construction's wording is matched against forest nodes. The grammar still names no Catalog item
-and carries no meaning ([English](english.md) §1–2).
+([English](english.md) §3). Recovery reads the Packed Forest and never parses text again
+([English](english.md) §4): a Construction's wording is matched against forest nodes, and a Hole
+that holds a run against a span of sibling sentences (§2), which reads the grammar's
+`SentenceSequence` as flat and adds no node to it. The grammar still names no Catalog item and
+carries no meaning ([English](english.md) §1–2).
 
 **The shape of the resolved term.** A term is a tree of calls with named and positional
 arguments, lists and records. The two closed rules, Tails and Factoring are relations between
@@ -435,9 +499,10 @@ keeps it:
 - A Tail has one position and one placement for a given Template, so two printed positions are
   two Templates.
 - An Action prints its frame's passive exactly when the Subject is `any` or `by(np)` (§2). A
-  fronted trigger clause over several sentences is printed at the front of the first, and a
-  trigger clause printed after its effect is a different Template. So neither rule leaves a choice
-  open.
+  dependent that governs a run is printed where its Construction's wording places it in the run's
+  first sentence, and the run's sentences are its argument's, printed in order; a trigger clause
+  printed after its effect is a different Template from one printed before it. So neither rule
+  leaves a choice open.
 - A shared phrase is written once and printed once, and a phrase the text repeats is written
   again, so the two forms are two terms (§3.3).
 
@@ -529,11 +594,11 @@ beside it and holds no Tail.
 
 **The notation does not yet express the two closed rules of §2.** Nothing marks a context's
 Subject Hole and Action Hole as the pair passive subject promotion links, which Action's
-parameter fills the promoted position, or a trigger's effect Hole as one that may hold several
-sentences. Until it does, a promoted Subject and the effect Hole of `when`, `whenever`, `at`
-and the delayed and reflexive triggers stand outside the check that a variant is English
-(below): that check substitutes a phrase for each Hole where the Hole stands, and under either
-rule the printed phrase stands elsewhere (§10).
+parameter fills the promoted position, a Hole as one that may hold a run of sentences, or the
+dependent a Construction prints in that run's first sentence. Until it does, a promoted Subject
+and a Hole that holds a run stand outside the check that a variant is English (below): that
+check substitutes one phrase for each Hole where the Hole stands, and under either rule the
+printed material stands elsewhere (§10).
 
 **No escape exists, because none is needed.** None of `$`, `~`, `(`, `)`, `<` and `>` occurs
 in the analyzed Oracle text ([Lexicon](lexicon.md) §1). `$`, `~`, `<` and `>` occur in no
@@ -606,17 +671,20 @@ all, because no spelling crate exists. This section separates the two.
   about relating a forest to terms.
 - **The extensions and closed rules are outside those results.** An optional part or a list
   Hole abbreviates a finite or regular family of wordings. A Tail links an Adjunct to a call
-  some arguments below its phrase, Factoring relates one phrase to several arms, and the two
-  rules of §2 link a Hole's phrase to a position in another Construction's fragment. None
+  some arguments below its phrase, Factoring relates one phrase to several arms, a Hole may
+  hold a run of sentences that is no node, and the two rules of §2 link a Hole's phrase to a
+  position in another Construction's fragment. None
   belongs to a published synchronous formalism, and no bound is claimed for them here.
-- **Recovery's cost is a design expectation.** Recovery never parses text, so its work is
-  matching Constructions against the nodes of a forest the parser has already built. The
-  expectation is that each match is local: a Construction looks at one node and its Holes'
-  nodes, a Tail at one enclosing phrase, Factoring at one coordination, passive subject
-  promotion at one context and its Action, the trigger rule at the first sentence of one
-  ability's effect. Whether that keeps recovery proportional to the forest is for the spelling
-  crate to measure on the corpus, and a Construction that makes recovery enumerate trees instead
-  of reading the forest is a defect ([English](english.md) §4).
+- **Recovery's cost is a design expectation.** Recovery never parses text, so its work is matching
+  Constructions against the nodes of a forest the parser has already built. The expectation is
+  that each match is local: a Construction looks at one node and its Holes' nodes, a Tail at one
+  enclosing phrase, Factoring at one coordination, passive subject promotion at one context and
+  its Action, the run rule at the first sentence of one run. A Hole that holds a run is the known
+  exception to matching against nodes: recovery matches it against spans of sibling sentences, and
+  an ability of n sentences has n(n+1)/2 runs, on the order of n²/2 candidate spans. Whether that
+  keeps recovery proportional to the forest is for the spelling crate to measure on the corpus,
+  and a Construction that makes recovery enumerate trees instead of reading the forest is a defect
+  ([English](english.md) §4).
 
 ## 9. Rejected alternatives
 
@@ -628,7 +696,7 @@ all, because no spelling crate exists. This section separates the two.
   the term records it beside its calls or two derivations share one term. A phrase that another
   Construction adjoined into is no longer the phrase of one argument, so a slot's sort no longer
   names one constituent. What it served is covered without it: the passive under a context by
-  passive subject promotion, a fronted trigger over several sentences by the trigger rule,
+  passive subject promotion, a dependent over several sentences by the run rule,
   modifiers on both sides of a noun by a nominal's two lists, and an adverb by substitution over
   a subjectless verb phrase or a Template per placement (§2).
 - **Wrapping adjunction**, a full or regular-form synchronous tree-adjoining grammar, in which an
@@ -639,105 +707,27 @@ all, because no spelling crate exists. This section separates the two.
   measures, which is a Tail (§3.2). It would add every cost of one-sided adjunction and more,
   and it still would not provide Factoring (§3.3).
 - **Substitution with no extensions or closed rules**, a plain synchronous tree-substitution
-  grammar. It cannot print a passive under its context or a trigger at the front of the first
-  of several sentences (§2), it needs a wording per combination of optional parameters (§3.1)
+  grammar. It cannot print a passive under its context or a dependent in the first of several
+  sentences it governs (§2), it needs a wording per combination of optional parameters (§3.1)
   and a Template per verb for every detached quantity (§3.2), and it cannot print a shared
   phrase once (§3.3).
 - **Copying a shared phrase into each arm**, or re-mentioning it there with an anaphor the card
   does not print. The first duplicates targets and Referents, and the second puts a word in the
   term that the text does not have (§3.3).
-- **Fixing every mismatch in the term.** Surface faithfulness ([Semantics](semantics.md) §1,
-  item 1) moves into the term each mismatch the term can follow: a nominal's premodifier and
-  postmodifier lists, and a verb phrase without its subject (§2). Three mismatches stay with
-  the grammar: a detached quantity, the passive and the fronted trigger. An optional `per`
-  parameter on each of about thirty verbs, in place of a Tail, is rejected because scaling an
-  amount from outside its Action needs a primitive that reaches into the Action to change its
-  amount, which is a second place for one value. The passive stays a closed rule, because voice
-  is the English layer's to derive from the frame (§1). A trigger attached at the level of the
-  Ability in the English grammar, in place of the trigger rule, is rejected because it changes
-  the English grammar for the sake of the layer above it.
+- **Fixing every mismatch in the term.** Surface faithfulness ([Semantics](semantics.md) §1, item
+  1) moves into the term each mismatch the term can follow: a nominal's premodifier and
+  postmodifier lists, and a verb phrase without its subject (§2). Three mismatches stay with the
+  grammar: a detached quantity, the passive and a dependent over a run of sentences. An optional
+  `per` parameter on each of about thirty verbs, in place of a Tail, is rejected because scaling
+  an amount from outside its Action needs a primitive that reaches into the Action to change its
+  amount, which is a second place for one value. The passive stays a closed rule, because voice is
+  the English layer's to derive from the frame (§1). A dependent attached at the level of the
+  Ability or the sentence sequence in the English grammar, in place of the run rule, is rejected
+  because it changes the English grammar for the sake of the layer above it.
 
 ## 10. Open
 
 The notation of §7 has no form yet for the placeholder a coordination's arms hold (§3.3).
-
-**A dependent of one sentence that the term relates to a run of sentences.** English attaches
-a clause or a word to one sentence where the term relates it to several. The trigger rule of §2
-covers one case, the fronted trigger clause (Boommobile). These are not covered:
-
-- **A postposed delayed trigger clause over a later sentence.** Goblin Kites prints "Flip a coin
-  at the beginning of the next end step. If you lose the flip, sacrifice that creature." The
-  coin is flipped when the delayed trigger resolves, so the second sentence belongs to its
-  effect. 371 lines print a delayed trigger clause after its effect, 30 of them with a further
-  sentence after it; which of those the clause governs is a question for each card.
-- **A fronted replacement clause over several sentences.** Eruth, Tormented Prophet prints "If
-  you would draw a card, exile the top two cards of your library instead. You may play those
-  cards this turn." The replaced event never happens, and a modified event occurs instead
-  [CR#614.6]. The second sentence reads the cards the first exiled, so the term relates the
-  replacement to both sentences, while "instead" and the "If" clause are printed in the
-  first. Enduring Renewal and Chains of Mephistopheles have the same shape. 47 lines print a
-  fronted "If … would …" sentence with "instead" followed by another sentence.
-- **A sentence after a run.** A triggered ability is written with its instructions, if any, after
-  its effect [CR#603.1]; those that limit its targets or say it can't be countered are not part of
-  the effect [CR#603.1a]. Academy Wall prints "Whenever you cast an instant or sorcery spell, you
-  may draw a card. If you do, discard a card. This ability triggers only once each turn." An
-  activated ability may carry a restriction on its use [CR#602.5b], printed after its effect:
-  Aggravated Assault prints "{3}{R}{R}: Untap all creatures you control. After this main phase,
-  there is an additional combat phase followed by an additional main phase. Activate only as a
-  sorcery." 207 cards print such a sentence after an effect of two or more sentences. A
-  Construction whose own wording is two sentences can be followed by another sentence too: Advice
-  from the Fae prints "If you control more creatures than each other player, put two of those
-  cards into your hand. Otherwise, put one of them into your hand. Then put the rest on the bottom
-  of your library in any order." 173 cards print "If you do", "Otherwise" or a like two-sentence
-  wording followed by another sentence. A rounding instruction is such a sentence too: Saw in
-  Half prints "Destroy target creature. If that creature dies this way, its controller creates two
-  tokens that are copies of that creature, except their power is half that creature's power and
-  their toughness is half that creature's toughness. Round up each time.", a sentence after a run
-  of two that the term relates to the halved values inside the second. Hydroid Krasis prints
-  "When you cast this spell, you gain half X life and draw half X cards. Round down each time."
-  after a one-sentence effect. 6 lines print "Round up each time." or "Round down each time.",
-  1 of them after an effect of two or more sentences.
-- **Other fronted dependents followed by more sentences**: "As long as …," on 16 lines, "Until
-  end of turn," on 33 and "If <condition>," on 524. These count every line where such a sentence
-  has a successor; which of them the dependent governs is a question for each card, and the term
-  may follow English where a branch's output reaches later text ([Semantics](semantics.md)
-  §2.2).
-
-The English grammar builds a sentence sequence by right recursion (`SentenceSequence`), so a run
-of sentences that another sentence follows, or that a dependent inside its first sentence
-governs, is no node of the Reading, and no Hole stands for it. Two answers are candidates:
-
-- **(a) A run of consecutive sentences is something a Hole can fill.** A text has no syntactic
-  structure above the sentence, and the grammar's right recursion is one grouping chosen for
-  the forest, so spelling reads a sentence sequence as flat. One rule, "a dependent printed in a
-  run's first sentence may govern the run", replaces the trigger rule. It applies only to a
-  Hole whose sort can be a run of sentences, an effect or a replacement's Action, so a trailing
-  adjunct of the first sentence such as "until end of turn" is never read as governing the run.
-  Boommobile: `when`'s effect Hole holds the run of two sentences, and "When this Vehicle
-  enters," governs it, as now. Eruth: two Constructions each print a dependent in the run's
-  first sentence. `replace` prints its would-clause "If you would draw a card," at the front of
-  its replacement Hole, which holds `instead` over the run; `instead` prints its word after the
-  first sentence's verb phrase, over its Action Hole, which holds the run. "Instead" is
-  postposed, as is Goblin Kites' delayed clause, which is why the rule says "dependent" and not
-  "fronted clause". In Abundance, `instead`'s Action is a `may`, and its word stands inside the
-  `may`'s verb phrase, a Template per placement (§2). Academy Wall: `may`'s
-  two sentences are one run in `when`'s effect Hole, and "This ability triggers only once each
-  turn." follows it as `when`'s own wording, which is plain substitution. Advice from the Fae:
-  the `doIf` with "Otherwise" is a run of two that is one element of the sequence, and "Then
-  put the rest …" the next element. The cost is that recovery matches Holes against runs, spans
-  of sibling sentences, and not only against nodes; an ability of n sentences has about n²/2
-  runs.
-- **(b) A closed rule per context.** The trigger rule stays, and each other context gets its
-  own: a replacement rule (Eruth, Enduring Renewal), which must also place "instead" in the
-  first sentence; a rule for a postposed delayed trigger (Goblin Kites); a rule for a sentence
-  after a run, which Academy Wall needs together with the trigger rule and Aggravated Assault
-  alone; and a rule for `sequentially`, since Advice from the Fae has no fronted dependent at
-  all. That is at least four more rules, and each new context with an argument of several
-  sentences is one more.
-
-Recommendation: (a). It states one rule where (b) states five, it is the reading the English
-grammar already implies by grouping a sequence one fixed way, and Boommobile's term and wording
-are the same under it.
 
 **A Tail whose declaration prints nothing in place.** Its Hole has no node in the Reading, so
 "the nearest phrase above the Hole" names nothing, and a rule by position, such as the smallest
@@ -760,9 +750,10 @@ a passive "is" over "also goaded" (`CentralAdverbial` over the passive participl
 Which Reading `spell` yields for such a wording is not settled.
 
 **The notation for the two closed rules.** §7 has no mark for a context's Subject and Action
-Holes, for which of the Action's parameters passive subject promotion moves, or for a
-trigger's effect Hole. Until it has, a promoted Subject and a trigger's effect Hole stand outside
-the check that a variant is English.
+Holes, for which of the Action's parameters passive subject promotion moves, for a Hole that
+may hold a run of sentences, or for the dependent a Construction prints in the run's first
+sentence. Until it has, a promoted Subject and a Hole that holds a run stand outside the check
+that a variant is English.
 
 **Which passive a term prints.** English has two passives of `deal`. Panther Habit prints "If
 equipped creature would be dealt damage", the passive of the ditransitive frame `deal` declares

@@ -39,21 +39,29 @@ of the sequences and lands first, so the steps this ticket spells are the printe
   and "then" between steps are two Templates, `$steps<and>` and `$steps<then>`.
 - A verb-phrase coordination under one subject is one `instruct` over one Template of the steps,
   as `spelling.md` writes a shared subject (shared material at a coordination).
+- Separate sentences are a list Hole whose elements are runs of sentences (`spelling.md` §2, a
+  Hole may hold a run), juxtaposed, each period coming from its own sentence: spelling reads a
+  sentence sequence as flat, so the grammar's right-recursive `SentenceSequence` imposes no
+  grouping on the steps. A step whose own wording is several sentences is one element: *Advice
+  from the Fae*'s "If you control more creatures than each other player, put two of those cards
+  into your hand. Otherwise, put one of them into your hand." is one `doIf` step, and "Then put
+  the rest on the bottom of your library in any order." the next. A sequence that a dependent
+  printed in its first sentence governs (a trigger clause, `replaceEvent`'s would-clause) is
+  governed whole by the run rule, so no Template here prints that dependent.
 
 ## Open questions
 
-- **The comma and the sentence break.** ", and", ", then" and ". " are not joins: `spelling.md`'s
+- **The comma before a coordinator.** ", and" and ", then" are not joins: `spelling.md`'s
   notation has a closed set (nothing, `","`, `"and"`, `"or"`, `"and/or"`, `"then"`), and a
   Reading stores no punctuation, which realization derives. Yet the grammar builds the
   delimited and undelimited coordinations as different trees, and a wording's fixed text may
   already hold a comma (`when`'s "When $event, if $condition, $action", `syl.md` §5). Options:
-  the English layer derives the comma or period from structure, and one Template serves both;
-  or the Readings differ, and the delimited forms are fixed Templates whose wording holds the
-  comma ("$first, then $rest"), with §6 saying so; or sentences are juxtaposed `Sentence`
-  elements with the `<>` join, each period coming from its sentence. Recommendation: parse the
-  lines of *Cloudshift*, *Agate-Blade Assassin*, *Duneblast* and *Juxtapose* first and record
-  their Readings; where the comma or period separates two Readings, fixed Templates, and
-  `spelling.md` states the case where it says what punctuation a wording holds.
+  the English layer derives the comma from structure, and one Template serves both; or the
+  Readings differ, and the delimited forms are fixed Templates whose wording holds the comma
+  ("$first, then $rest"), with §6 saying so. Recommendation: parse the lines of *Cloudshift*,
+  *Agate-Blade Assassin* and *Land Equilibrium* first and record their Readings; where the comma
+  separates two Readings, fixed Templates, and `spelling.md` states the case where it says what
+  punctuation a wording holds.
 - **Names** for the Templates. Recommendation: named for their wording, chosen with the answer
   above; the glossary's **Linked Coordination** names the ", then" form.
 
@@ -77,8 +85,9 @@ of the sequences and lands first, so the steps this ticket spells are the printe
 
 ## Pointers
 
-- `docs/decisions/spelling.md` (shared material at a coordination, the resolved term as the derivation, the round
-  trip, the notation); `docs/decisions/syl.md` §5
+- `docs/decisions/spelling.md` (a Hole that holds a run and the run rule in §2, shared material
+  at a coordination, the resolved term as the derivation, the round trip, the notation);
+  `docs/decisions/syl.md` §5
 - `plugins/builtin/primitives/action/sequentially.syl`;
   `plugins/canon/cards/{Duneblast,Cloudshift,Agate-Blade Assassin,Bonus Round,Juxtapose}.syl`
 - `crates/english/grammar/english.fug` (`SentenceSequence`, `LinkedClause`, `LinkedVerbPhrase`),
