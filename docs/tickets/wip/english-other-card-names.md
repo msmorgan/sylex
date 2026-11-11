@@ -18,8 +18,9 @@ mentions another card by name in the "named" construct ("a card named Relentless
 
 - A card's own name (full or Shortened [CR#201.5c]) is in scope only on its own face, everywhere
   in that text.
-- Another card's full name carries a feature that admits it only in the "named" construct, and
-  nowhere else.
+- Another card's full name is refused by every position by default and admitted only where a
+  position opts in to it: the "named" construct and the Keyword Parameter of *Partner with*,
+  whose ability searches for *a card named [name]* [CR#702.124j].
 
 ## Done when
 

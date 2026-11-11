@@ -1,8 +1,8 @@
 # Comparative and equality adjective phrases (equal to, less than, greater than, other than) with their complements
 + Target creature you control deals damage equal to its power to any target. => NounPhrase "damage equal to its power"; AdjectivePhrase "equal to its power"; NounPhrase "its power"; !PrepositionPhrase "to its power" as Modifier of damage; !PrepositionPhrase "to its power" as Adjunct of deal
 + You gain life equal to that card's power. => NounPhrase "life equal to that card's power"; AdjectivePhrase "equal to that card's power"; NounPhrase "that card's power"; !PrepositionPhrase "to that card's power" as Modifier of life; !PrepositionPhrase "to that card's power" as Adjunct of gain
-+ Freedom Fighter Recruit's power is equal to the number of creatures you control. => AdjectivePhrase "equal to the number of creatures you control" as PredicativeComplement of be
-+ Massive Raid deals damage to any target equal to the number of creatures you control. => AdjectivePhrase "equal to the number of creatures you control"
++ <card=Freedom Fighter Recruit> Freedom Fighter Recruit's power is equal to the number of creatures you control. => AdjectivePhrase "equal to the number of creatures you control" as PredicativeComplement of be
++ <card=Massive Raid> Massive Raid deals damage to any target equal to the number of creatures you control. => AdjectivePhrase "equal to the number of creatures you control"
 +AdjectivePhrase equal to its power => NounPhrase "its power"; readings 1
 +AdjectivePhrase less than or equal to this creature's power => NounPhrase "this creature's power"; readings 1
 +AdjectivePhrase less than this creature's power => readings 1

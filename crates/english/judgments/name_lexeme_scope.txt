@@ -1,4 +1,4 @@
-# A card's Shortened Name is in scope only on that card's own text [CR#201.5c]; subtype nouns on type lines; full card names with "and" as one name
+# A card's own name, full or Shortened, is in scope only on that card's own text [CR#201.5c]; another card's name stands only after *named* or *Partner with* [CR#702.124j]; subtype nouns on type lines; full card names with "and" as one name
 * Chandra deals 2 damage to any target.
 * Jace draws two cards.
 * Ajani deals 2 damage to any target.
@@ -20,5 +20,20 @@
 + Basic Land — Forest
 + Instant — Arcane
 # from: Aang and Katara
-+ Aang and Katara enter. => NounPhrase "Aang and Katara" as Subject of enter
++ <card=Aang and Katara> Aang and Katara enter. => NounPhrase "Aang and Katara" as Subject of enter
 +VerbPhrase <card=The Hive> named Wasp
+# from: Lightning Bolt; off its own card the name is another card's
+* Lightning Bolt deals 3 damage to any target.
++ <card=Lightning Bolt> Lightning Bolt deals 3 damage to any target. => NounPhrase "Lightning Bolt" as Subject of deal
+# from: Tarmogoyf; off its own card the name is no possessor either
+* Tarmogoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1.
++ <card=Tarmogoyf> Tarmogoyf's power is equal to the number of card types among cards in all graveyards and its toughness is equal to that number plus 1. => NounPhrase "Tarmogoyf's power" as Subject of be
+# *Exile*, *Remove* and *Turn* (of Turn // Burn) are other cards' names, never a Subject here
++ <card=Excise> Exile target attacking creature unless its controller pays {X}. => !Name "Exile"
++ <card=Soul Nova> Exile target attacking creature and all Equipment attached to it. => !Name "Exile"
++ <card=Unified Strike> Exile target attacking creature if its power is less than or equal to the number of Soldiers on the battlefield. => !Name "Exile"
++ <card=Mystifying Maze> {4}, {T}: Exile target attacking creature an opponent controls. At the beginning of the next end step, return it to the battlefield tapped under its owner's control. => !Name "Exile"
++ <card=Reconnaissance> {0}: Remove target attacking creature you control from combat and untap it. => !Name "Remove"
++ <card=Kaust, Eyes of the Glade> {T}: Turn target face-down attacking creature you control face up. => !Name "Turn"
+# after *named*, another card's name is a Name Complement, alone or coordinated
++ <card=Dragonstorm Forecaster> {2}, {T}: Search your library for a card named Dragonstorm Globe or Boulderborn Dragon, reveal it, put it into your hand, then shuffle. => NameComplement "Dragonstorm Globe or Boulderborn Dragon" as PredicativeComplement of name

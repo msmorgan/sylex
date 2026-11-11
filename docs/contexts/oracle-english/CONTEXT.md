@@ -249,9 +249,20 @@ The CR term [CR#614.12c]. It is in scope only on the cards that print it.
 A shortened card name [CR#201.5c], in scope only in the text of the face whose
 name it shortens.
 
+**Own Name**:
+A card's name, full or Shortened, in the text of its own face [CR#201.5]. The
+grammar reads it as any other Proper Name.
+
+**Another Card's Name**:
+A card's full name in the text of any face but its own. Only a position that
+opts in admits it, through the grammar's `OtherCardName()` symbol: the
+predicative complement of *named* (*cards named Relentless Rats*) and the
+Keyword Parameter of *Partner with* [CR#702.124j].
+
 **Introduced Name**:
-A name a card's own text gives an object that is not any card's name, such as
-the name of a token it creates. It is in scope only on that card.
+A name a card's own text gives an object that is not a card, such as the name
+of a token it creates, even where another card has that name (*a Tarmogoyf
+token*). It is in scope only on that card.
 
 **Name Number**:
 The declared grammatical Number of a name, for agreement.

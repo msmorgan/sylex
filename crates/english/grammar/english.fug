@@ -203,9 +203,16 @@ category KeywordList
 category Quality
 // A name has the Number of what it names, from the lexicon: singular
 // unless it names a collection (*When The Notary Hobbits enter*;
-// CGEL, Ch. 5 §20.2.1, p. 517), so never *Turn target ...* with
-// *Turn* a name and *target* a plural verb.
+// CGEL, Ch. 5 §20.2.1, p. 517). It is never another card's name,
+// which `Lex(Catalog)` does not admit, so never *Exile target ...*
+// with *Exile* a card's name and *target* its verb.
 category Name [Number]
+// A name cited as a name: the predicative complement of *named*
+// (*cards named Relentless Rats*) and the Keyword Parameter of
+// *Partner with*, the name of *a card named [name]* [CR#702.124j].
+// Only these positions opt in to another card's name, through
+// `OtherCardName()` (`docs/decisions/lexicon.md` §6).
+category NameComplement
 category Condition
 category Measure
 category Symbols
@@ -736,7 +743,7 @@ class SharedHeadCompound { typed }
 slot TypeModifier = TypeModifier
 slot NonManaCost = NonManaCost
 slot Quality = Quality
-slot Name = Name
+slot Name = NameComplement
 slot Ability = Ability
 slot Condition = Condition
 slot Measure = Measure
@@ -1030,12 +1037,13 @@ NominalPhraseQuality: Quality -> NounPhrase
 // be a second tree for it (`docs/decisions/english.md`
 // §8).
 AdjectivalQuality: Quality -> AdjectivePhrase where head.QualityHead := Fused
-// Another card's full name costs one more than the face's own name,
+NamedParameter: Name -> Lex(Catalog)
+NameAsComplement: NameComplement -> Name { cost: 0 }
+// Another card's full name costs one more than a Name,
 // so the face's own Shortened Name [CR#201.5c] ranks first where the
 // two are spelled alike (*Nicol Bolas* on Nicol Bolas, the Ravager).
-// Both stay Readings: full names are in scope everywhere
-// (`docs/decisions/lexicon.md` §6).
-NamedParameter: Name -> Lex(Catalog) { scoped: [head] }
+// Both stay Readings.
+OtherCardNameComplement: NameComplement -> OtherCardName() { cost: 2 }
 SlashMeasure: Measure -> first:SignedAmount '/':Bound second:SignedAmount
 MeasureHeader: Header -> Measure
 RangeHeader: Header -> marker:Class(RangeMarker) lower:Amount '-':Bound upper:Amount
@@ -3661,6 +3669,8 @@ coordination KeywordPhrase { coordinators: Coordinator, unshared: [KeywordForm, 
 coordination QuotedAbility { coordinators: Coordinator }
 // *left or right*; *artifact, creature, or land*.
 coordination Mention { coordinators: Coordinator }
+// *named Crown of Empires and Scepter of Empires*.
+coordination NameComplement { coordinators: Coordinator }
 // A medial conjunct may be a Subject remnant, its Subject the
 // initial Clause's, with whose Number and Person it agrees (*you gain
 // 4 life, draw four cards, and he deals 4 damage*, never *you gain 4

@@ -2,7 +2,7 @@
 + Its power and toughness are equal to this creature's power and toughness. => NounPhrase "Its power and toughness" as Subject of be; Nominal "power and toughness"
 * Its power and toughness is equal to this creature's power and toughness.
 # from: Lord of Extinction
-+ Lord of Extinction's power and toughness are equal to the number of cards in all graveyards. => NounPhrase "Lord of Extinction's power and toughness" as Subject of be; Nominal "power and toughness"
++ <card=Lord of Extinction> Lord of Extinction's power and toughness are equal to the number of cards in all graveyards. => NounPhrase "Lord of Extinction's power and toughness" as Subject of be; Nominal "power and toughness"
 * Lord of Extinction's power and toughness is equal to the number of cards in all graveyards.
 # from: Gemini Engine
 + Its power is equal to this creature's power.

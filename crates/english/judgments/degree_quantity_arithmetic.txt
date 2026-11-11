@@ -9,5 +9,5 @@
 +PrepositionPhrase plus 2
 +PrepositionPhrase minus one
 # from: Lightning Storm
-+ X is 3 plus the number of charge counters on Lightning Storm. => NounPhrase "3 plus the number of charge counters on Lightning Storm" as PredicativeComplement of be
++ <card=Lightning Storm> X is 3 plus the number of charge counters on Lightning Storm. => NounPhrase "3 plus the number of charge counters on Lightning Storm" as PredicativeComplement of be
 + If one or more +1/+1 counters would be put on a creature you control, twice that many +1/+1 counters are put on it instead. => NounPhrase "twice that many +1/+1 counters"

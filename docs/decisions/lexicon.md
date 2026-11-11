@@ -103,14 +103,30 @@ term are a second tree of its analysis ([English](english.md) §8).
 
 ## 6. Names and notation
 
-**Names are scoped.** A card has a Shortened Name only where its own text uses
-one, and never one that other vocabulary in scope on that card already spells:
-a token name or Introduced Name always, any other word unless it is the name
-before the comma or a planeswalker type. It is in scope only in the text of the
-face whose name it shortens [CR#201.5c,712.8d..712.8f]; where another card's
-full name is spelled alike, both are Readings and the face's own ranks first.
-Why: admitted everywhere, every word spelled like one would be read as a name
-on every card.
+**Names are scoped.** A card's own name, full or Shortened, is its own only in
+the text of its own face [CR#201.5,201.5c,712.8d..712.8f], and everywhere in
+that text. A card has a Shortened Name only where its own text uses one, and
+never one that other vocabulary in scope on that card already spells: a token
+name or Introduced Name always, any other word unless it is the name before the
+comma or a planeswalker type. Why: admitted everywhere, every word spelled like
+one would be read as a name on every card.
+
+**Another card's name stands only after *named* or *Partner with*.** A card's
+full name is spelled on every face, and off its own card it is another card's
+name, which a position admits only by opting in: no leaf symbol of the grammar
+admits it but `OtherCardName()`, which admits nothing else. Two positions opt
+in, as a `NameComplement`: the predicative complement of *named* (*cards named
+Relentless Rats*), alone or coordinated, and the Keyword Parameter of *Partner
+with*, whose name is the one its ability searches for as *a card named [name]*
+[CR#702.124j]. Any other position, a Subject, Object, possessor or premodifier
+among them, refuses it with no clause of its own. There, where the face's own
+Shortened Name is spelled alike, both are Readings and the face's own ranks
+first. A name a card
+gives an object, or a vote option, spelled like another card's name is listed
+as that card's Introduced Name or vote option (*create a Tarmogoyf token*,
+*votes for Redhorn Pass or Mines of Moria*). Why: a card's text mentions
+another card by name only in those positions, and a card name read anywhere
+else is another word misread (*Exile* in *Exile target attacking creature*).
 
 **Bound keywords are analyzed in parts**, a suffix on a stem from its declared
 stem classes, so *islandwalk* needs no declaration [CR#702.14a]. A stem is

@@ -1,5 +1,5 @@
 # To-infinitival purpose clauses as adjuncts of spend, sacrifice and pay (spent to cast, only to cast), including in noun-phrase postmodifiers, passives and perfects
-+ Molten Note deals damage to target creature equal to the amount of mana spent to cast this spell. => Clause "to cast this spell" as Adjunct of spend
++ <card=Molten Note> Molten Note deals damage to target creature equal to the amount of mana spent to cast this spell. => Clause "to cast this spell" as Adjunct of spend
 + Converge — This creature enters with a +1/+1 counter on it for each color of mana spent to cast it. => Clause "to cast it" as Adjunct of spend
 + Converge — Put X +1/+1 counters on target creature, where X is the number of colors of mana spent to cast this spell. => Clause "to cast this spell" as Adjunct of spend
 + When you spend this mana to cast a Dragon creature spell, you gain 2 life. => Clause "to cast a Dragon creature spell" as Adjunct of spend

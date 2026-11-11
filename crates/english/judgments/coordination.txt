@@ -14,7 +14,7 @@
 + Equipped creature has trample and lifelink. => KeywordPhrase "trample and lifelink" as Object of have
 + Kicker {1}{U} and/or {B}
 +AdjectivePhrase less than or equal to this creature's power => NounPhrase "this creature's power"; readings 1
-+ Flora Colossus's power and toughness are each equal to the number of lands you control. => NounPhrase "Flora Colossus's power and toughness" as Subject of be; AdjectivePhrase "each equal to the number of lands you control"
++ <card=Flora Colossus> Flora Colossus's power and toughness are each equal to the number of lands you control. => NounPhrase "Flora Colossus's power and toughness" as Subject of be; AdjectivePhrase "each equal to the number of lands you control"
 + It deals 1 damage to each of up to one target creature, up to one target player, and/or up to one target planeswalker. => NounPhrase "up to one target creature, up to one target player, and/or up to one target planeswalker"
 + Cast this spell only during the declare attackers step and only if you've been attacked this step. => PrepositionPhrase "only during the declare attackers step"; PrepositionPhrase "only if you've been attacked this step"
 +AdjectivePhrase less than or equal to this creature's power => NounPhrase "this creature's power" as Complement of than; NounPhrase "this creature's power" as Complement of to
@@ -33,7 +33,7 @@
 + Activate only during your turn and only once each turn. => PrepositionPhrase "only during your turn"; AdverbPhrase "only once each turn"
 + Return it to the battlefield tapped and attacking. => AdjectivePhrase "tapped"; VerbPhrase "attacking"
 + Look at the top three cards of your library. Put one of them into your hand and the rest into your graveyard. => NounPhrase "one of them" as Object of put; NounPhrase "the rest" as Object of put
-+ Arc Trail deals 2 damage to any target and 1 damage to any other target. => NounPhrase "2 damage" as Object of deal; NounPhrase "1 damage" as Object of deal
++ <card=Arc Trail> Arc Trail deals 2 damage to any target and 1 damage to any other target. => NounPhrase "2 damage" as Object of deal; NounPhrase "1 damage" as Object of deal
 # from: Sphere of Annihilation
 +NounPhrase creatures with mana value less than or equal to the number of void counters on it => NounPhrase "the number of void counters on it" as Complement of than; PrepositionPhrase "on it" as Modifier of "void counter"
 # from: Subterranean Tremors

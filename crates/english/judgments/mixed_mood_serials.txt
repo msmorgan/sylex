@@ -14,4 +14,4 @@
 +Clause another creature dies, or a creature card is put into a graveyard from anywhere other than the battlefield, or a creature card leaves your graveyard
 # A declarative and then an imperative opening with a fronted dependent, the
 # comma between the clauses omitted (CGEL, Ch. 20 §3.2.1, p. 1739).
-+ Scorching Lava deals 2 damage to any target. If this spell was kicked, that creature can't be regenerated this turn and if it would die this turn, exile it instead. => Clause "that creature can't be regenerated this turn"; Clause "if it would die this turn, exile it instead"
++ <card=Scorching Lava> Scorching Lava deals 2 damage to any target. If this spell was kicked, that creature can't be regenerated this turn and if it would die this turn, exile it instead. => Clause "that creature can't be regenerated this turn"; Clause "if it would die this turn, exile it instead"

@@ -28,8 +28,7 @@ fn forest_keys_equal_tree_keys_over_the_judgment_set() {
             }
             for (key, reading) in parse.best_ranked(usize::MAX) {
                 checked += 1;
-                let scope = sylex_english::judgment::scope(entry);
-                if grammar.ranking_key(&reading, &env.lexicon, &scope) != Ok(key) {
+                if grammar.ranking_key(&reading, &env.lexicon) != Ok(key) {
                     failures.push(format!("{}: {}", entry.location, entry.text));
                     break;
                 }
@@ -64,33 +63,69 @@ fn a_distributive_adjunct_attaches_to_the_outermost_predicate() {
 }
 
 /// On Nicol Bolas, the Deceiver, *Nicol Bolas* is the face's own Shortened
-/// Name and also the full name of another card. Both stay Readings; the
-/// face's own name ranks first, in the forest and on the tree alike.
+/// Name and also the full name of another card. As a Subject it is the
+/// face's own name alone: another card's name stands only after *named*
+/// or *Partner with*.
 #[test]
-fn a_face_s_own_name_ranks_before_another_card_s_name_spelled_alike() {
+fn a_subject_spelled_like_another_card_s_name_is_the_face_s_own() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     let own = sylex_english::corpus::card_name_lexeme("Nicol Bolas, the Deceiver");
     let scope = std::collections::BTreeSet::from([own]);
     let text = "Nicol Bolas deals 7 damage to each opponent.";
     let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
-    let names = |reading: &sylex_syntax::Reading| {
-        let (_, constituents) = grammar.constituents(reading, &env.lexicon).unwrap();
-        constituents
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
+    assert_eq!(ranked.len(), 1);
+    assert!(
+        names(&grammar, &env, &ranked[0].1)
             .iter()
-            .filter_map(|c| c.head)
-            .filter(|h| h.as_str().starts_with("name:"))
-            .collect::<Vec<_>>()
-    };
+            .all(|h| *h == own)
+    );
+}
+
+/// After *named*, the face's own Shortened Name and another card's full name
+/// spelled alike are both Readings, and the face's own ranks first, in the
+/// forest and on the tree alike. A minimal repro on Nicol Bolas, the
+/// Deceiver: no card prints *named* before its own Shortened Name.
+#[test]
+fn after_named_a_face_s_own_name_ranks_before_another_card_s_spelled_alike() {
+    let env = LexicalEnvironment::load().unwrap();
+    let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
+    let own = sylex_english::corpus::card_name_lexeme("Nicol Bolas, the Deceiver");
+    let scope = std::collections::BTreeSet::from([own]);
+    let text = "Search your library for a card named Nicol Bolas.";
+    let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
     let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     assert_eq!(ranked.len(), 2);
     let other = sylex_english::corpus::card_name_lexeme("Nicol Bolas");
-    assert!(names(&ranked[0].1).iter().all(|h| *h == own));
-    assert!(names(&ranked[1].1).iter().all(|h| *h == other));
+    assert!(
+        names(&grammar, &env, &ranked[0].1)
+            .iter()
+            .all(|h| *h == own)
+    );
+    assert!(
+        names(&grammar, &env, &ranked[1].1)
+            .iter()
+            .all(|h| *h == other)
+    );
     assert!(ranked[0].0 < ranked[1].0);
     for (key, reading) in &ranked {
-        assert_eq!(grammar.ranking_key(reading, &env.lexicon, &scope), Ok(*key));
+        assert_eq!(grammar.ranking_key(reading, &env.lexicon), Ok(*key));
     }
+}
+
+/// The card names that head a Reading's Constituents.
+fn names(
+    grammar: &sylex_syntax::CompiledGrammar,
+    env: &LexicalEnvironment,
+    reading: &sylex_syntax::Reading,
+) -> Vec<sylex_lexicon::LexemeId> {
+    let (_, constituents) = grammar.constituents(reading, &env.lexicon).unwrap();
+    constituents
+        .iter()
+        .filter_map(|c| c.head)
+        .filter(|h| env.lexicon.lexemes()[h].card_name)
+        .collect()
 }
 
 /// One forest item packs prefixes that divide its text differently: here the
@@ -108,7 +143,7 @@ fn forest_keys_follow_each_packed_prefix_s_own_division_of_the_text() {
     let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     let mut objects = std::collections::BTreeSet::new();
     for (key, reading) in &ranked {
-        assert_eq!(grammar.ranking_key(reading, &env.lexicon, &scope), Ok(*key));
+        assert_eq!(grammar.ranking_key(reading, &env.lexicon), Ok(*key));
         let (realized, constituents) = grammar.constituents(reading, &env.lexicon).unwrap();
         objects.extend(
             constituents

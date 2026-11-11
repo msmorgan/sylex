@@ -194,8 +194,7 @@ fn every_word_a_judgment_names_is_declared() {
     // A card name is no lemma: *Greater Good* does not declare *greater*.
     let declared = |name: &str| {
         lexemes.iter().any(|(id, l)| {
-            id.as_str() == name
-                || !id.as_str().starts_with("name:") && l.lemma.eq_ignore_ascii_case(name)
+            id.as_str() == name || !l.card_name && l.lemma.eq_ignore_ascii_case(name)
         })
     };
     let mut unknown = Vec::new();

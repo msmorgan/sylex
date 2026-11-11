@@ -36,7 +36,7 @@ equals, none of whose Readings satisfies that entry, is `known-wrong-only`.
   The text is parsed as the grammar's root unless the mark names a Category,
   as in `+NounPhrase` or `*PrepositionPhrase`.
 - **Card.** `<card=Seedborn Muse>` puts that card's names in scope, for a
-  Shortened Name or a self-reference ([CR#201.5c]).
+  self-reference by its full or Shortened Name ([CR#201.5,201.5c]).
 - **Text.** The exact expression, with its final punctuation; it runs to the
   end of the line or to `=>`.
 - **Assertions** follow `=>`, separated by `;`. `||` separates alternative
@@ -160,10 +160,13 @@ Each was settled while adjudicating the migrated judgments.
 - A multiword term declared as one lexeme is one leaf, named by its quoted
   lemma (`as Modifier of "combat damage"`), except where its words straddle a
   constituent boundary (*the first time [counters have been put ...]*).
-- Full card names are in scope everywhere; `<card=...>` is needed only for a
-  Shortened Name or a self-reference by name.
+- A card's own name, full or Shortened, is its own only on that card:
+  `<card=...>` is needed for any self-reference by name. Without it a card
+  name is another card's, which stands only after *named* (`NameComplement
+  "Relentless Rats"`) or *Partner with* ([CR#702.124j]).
 - `*` holds when the text has no Reading for any reason, an undeclared word
-  included: an off-card Shortened Name is a free negative.
+  included: an off-card Shortened Name is a free negative, and so is another
+  card's name outside *named*.
 
 ## Examples
 
