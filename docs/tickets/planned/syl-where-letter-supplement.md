@@ -27,19 +27,37 @@ a shared subject, or to a keyword line's item (the comma-set Supplement adjuncts
 Neither form has a wording that prints ", where", and `syl-sequentially-wordings` would otherwise
 spell a `define` step as a sequenced instruction.
 
+In the Readings (`cargo xtask english parse`) the clause supplement adjoins the finite clause
+that holds the letter, inside any fronted dependent: *Aven Shrine*'s "Whenever a player casts a
+spell, that player gains X life, where X is …" puts it on "that player gains X life", inside the
+trigger's clause; *Surrakar Spellblade*'s "…, you may draw X cards, where X is …" on "you may draw
+X cards"; *Alistair, the Brigadier*'s "If you do, creatures you control get +X/+X until end of
+turn, where X is …" on the clause after "If you do,", past its duration.
+
 ## Design
 
 - One Template per host sort (Action, StaticSpec, and the keyword-line item where a keyword
   prints "X, where X is …"), each taking its host and its letter definitions, worded
   "$host, where $definitions<and>", added as a card needs it. The supplement stands at its host's
   right edge, so the host is a Hole and the wording is substitution.
+- The Action Template's host is the Action that makes the finite clause the supplement adjoins: a
+  Handoff (*Aven Shrine*), `may` (*Surrakar Spellblade*), `establish` with its duration
+  (*Alistair*) or an imperative (*Celebrate the Harvest*). A trigger or a fronted "If you do,"
+  stays outside it, as their own calls over it.
 
 ## Open questions
 
-- **A supplement on a non-final conjunct** ("searches their library for up to X basic land cards,
-  where X is …, puts them onto the battlefield tapped, then shuffles"): the supplement's host is
-  that conjunct's verb phrase. Recommendation: the Template at Action takes the conjunct as its
-  host, inside the sequence.
+- **A supplement on a non-final conjunct.** *Collective Voyage* prints "Each player searches their
+  library for up to X basic land cards, where X is the total amount of mana paid this way, puts
+  them onto the battlefield tapped, then shuffles." The Reading adjoins the supplement to the
+  first verb-phrase conjunct ("searches their library for up to X basic land cards") inside the
+  linked coordination, by an adjunct the grammar admits only on a non-final conjunct (`nonfinal`).
+  A standalone wording "$host, where $definitions<and>" at that verb phrase is no English on its
+  own, so the load check that every variant of a `spelling` parses would refuse it. Options: the
+  load check parses a wording in the context its Category allows (a non-final conjunct); or the
+  supplement is part of the coordination's Template, which takes the first step's definitions.
+  Recommendation: the coordination's Template, which keeps the load check context-free and is
+  one Template beside `syl-sequentially-wordings`'s.
 - **Names.** Recommendation: named for the wording; the owner names it.
 
 ## Done when

@@ -2,7 +2,7 @@
 needs: [syl-spelling-conventions, lean-retirement, cleanup-step6-surface]
 ---
 
-# "Round up each time." as a construct in its own position
+# Rounding is printed where it is: "Round up each time." and ", rounded up"
 
 ## Why
 
@@ -10,32 +10,67 @@ Six Vintage-legal cards end a sentence of fractions with "Round up each time." o
 down each time.": *Peer into the Abyss*, *Fraying Omnipotence*, *Pox*, *Hydroid Krasis*, *Pox
 Plague* and *Saw in Half*. `Saw in Half.syl` writes `half(up, …)` on each fraction, so spelling
 cannot give back the shared sentence, and the only way out would be single-purpose Templates
-like `basePtHalfRoundedUpOf`. The inline ", rounded up/down" is a different construction and
-stays on its own fraction: *Banshee* and *Aspect of Wolf* round two fractions of one sentence in
-different directions.
+like `basePtHalfRoundedUpOf`.
 
-Written against the surface (`cleanup-step6-surface`).
+The inline ", rounded up" or ", rounded down" is a different construction and stays on its own
+fraction: *Banshee* and *Aspect of Wolf* round two fractions of one sentence in different
+directions. `half` (`plugins/builtin/primitives/quantity/half.syl`) spells it inside the amount,
+"half $amount, rounded $rounding", but no Reading puts it there. `cargo xtask english parse`
+attaches it as a supplement to three different hosts, never inside the amount's noun phrase:
+
+- in a verb's complements, before the next one: *Banshee*'s "deals half X damage, rounded down,
+  to any target, and half X damage, rounded up, to you" (`InterleavedSupplement`);
+- in a cost: *Lurking Evil*'s "Pay half your life, rounded up:" (`SupplementedVerbalCost`);
+- at the end of a clause, after a ", where X is …" supplement: "Create X 2/2 black Zombie creature
+  tokens with decayed, where X is half the number of creature cards in your graveyard, rounded
+  up." (`ParticipialSupplement`, over the whole clause and its "where" supplement).
+
+## Design
+
+- An unrounded fraction amount exists for half and for a third (*Pox*), spelled "half $amount"
+  and "a third of $amount".
+- `roundEachTime(action, mode)` wraps the sentence it covers and is spelled as that sentence
+  followed by "Round $mode each time.", its parameters in that printed order (`syl.md` §5). It
+  wraps the whole sentence, so a "then" chain of several Actions (*Pox*, *Fraying Omnipotence*) is
+  covered; it is not a trailing step that looks back at the step before it.
+- The rounded `half` keeps one expansion and prints its rounding as a Tail: one Template per host
+  the Readings give (the interleaved complement, the cost, the clause), each its own wording.
+
+## Open questions
+
+- **An Action whose wording is two sentences.** "$action. Round $mode each time." is a run of two
+  sentences (`SentenceSequence`), while spelling's closed rules name a run of sentences only for
+  a trigger condition over several sentences. *Hydroid Krasis* ("When you cast this spell, you
+  gain half X life and draw half X cards. Round down each time.") is that case: the trigger
+  condition stands in the first sentence of a two-sentence effect. *Saw in Half* is not: its
+  rounding sentence follows the second of its three sentences ("Destroy target creature. If that
+  creature dies this way, … . Round up each time."), under no trigger. Options: a wording at
+  `Action` may be one fragment spanning several sentences, which is substitution of one fragment;
+  or the rounding sentence is the spell's or ability's, a wrapper at the level of its text.
+  Recommendation: the first, stated in `spelling.md` beside the trigger rule, since the wrapper
+  is the Action's own meaning.
+- **The Tails' names and placement.** Recommendation: named for their host; the placement among
+  the host's other adjuncts follows `syl-tail-placement`, which lands first through the surface
+  gate.
 
 ## Done when
 
-- An unrounded fraction amount exists for half and for a third (*Pox*), spelled "half <amount>"
-  and "a third of <amount>".
-- `roundEachTime(action, mode)` wraps the sentence it covers and is spelled as that sentence
-  followed by "Round <mode> each time.", its parameters in that printed order (`syl.md` §5). It wraps the whole sentence, so a "then" chain of several
-  Actions (*Pox*, *Fraying Omnipotence*) is covered; it is not a trailing step that looks back at
-  the step before it.
+- The open questions are answered and written in `docs/decisions/spelling.md` and the
+  declarations' doc comments.
 - The checks are structural: every fraction inside the wrapped Action is unrounded and at least
   one exists; an unrounded fraction that no `roundEachTime` wraps is refused, because the spell or
   ability must say which way to round [CR#107.1a]. Each refusal has a test: an unrounded fraction
   nothing wraps, an "each time" with no fraction, a rounded fraction inside an "each time".
-- *Saw in Half* is re-encoded with it, and *Pox* or *Fraying Omnipotence* is added as the witness
-  for a "then" chain; a test shows every fraction of that chain is covered.
-- `half` (rounded) is unchanged and *Banshee*-style sentences still use it.
-- The `roundEachTime` declaration's doc comment records the construct.
+- *Saw in Half* is re-encoded with `roundEachTime`, and *Pox* or *Fraying Omnipotence* is added as
+  the witness for a "then" chain; a test shows every fraction of that chain is covered.
+- `half`'s spelling prints no rounding inside the amount, and every rounded `half` in `plugins/`
+  calls the Tail of its printed host, each checked against Oracle text; *Banshee* and *Lurking
+  Evil* are in `plugins/canon/cards/` as the interleaved and cost witnesses.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 
-`plugins/builtin/primitives/quantity/half.syl`,
-`plugins/canon/cards/Saw in Half.syl`.
+`plugins/builtin/primitives/quantity/half.syl`, `plugins/canon/cards/Saw in Half.syl`;
+`crates/english/grammar/english.fug` (`InterleavedSupplement`, `SupplementedVerbalCost`,
+`ParticipialSupplement`, `SentenceSequence`).

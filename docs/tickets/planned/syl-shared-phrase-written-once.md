@@ -65,7 +65,8 @@ other.
   placeholder in place of `it`), and coordinated participles sharing a patient (*Cephalid
   Illusionist*'s "dealt to and dealt by target creature you control"), and determined phrases
   sharing their nominal (*Balthor the Defiled*'s "all black and all red creature cards", two
-  determiners and premodifiers over one printed "creature cards"). Recommendation: one
+  determiners and premodifiers over one printed "creature cards", which waits on the Reading
+  `english-shared-nominal-determiner-coordination` adds). Recommendation: one
   declaration per sort that coordinates, added as a card needs it, starting with the first three.
 - "Can't attack or block" forbids each, so the `or` under `cant` means neither. Recommendation:
   write the printed `or` and let the deontic rule distribute over it, since the text says "or".

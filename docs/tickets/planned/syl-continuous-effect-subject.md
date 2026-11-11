@@ -64,33 +64,39 @@ Tunnel*'s "gets +1/+0 and can't be blocked", the coordination still binds it onc
 
 ## Open questions
 
-- **Where the duration stands.** One duration may cover two verbs under one subject (*Predator's
-  Strike*, *Abandon Reason*), two clauses with two subjects (*Moku, Meandering Drummer*: "Moku
-  gets +2/+1 and creatures you control gain haste until end of turn"), or be printed before the
-  subject (*Gift of Tusks*: "Until end of turn, target creature loses all abilities and becomes a
-  green Elephant with base power and toughness 3/3."). So the duration belongs to no one subject.
-  Options:
-  - (a) The declaration that takes the subject also takes the duration. It cannot write *Moku*'s
-    one duration over two subjects, or *Gift of Tusks*'s fronted one, without a second duration
-    or another declaration per shape.
-  - (b) Taking a subject builds a StaticSpec from the subject and the subjectless phrase, and the
-    duration stays where it is today, on `establish(spec, duration)`, whose spec may be a
-    `conjunction` of such StaticSpecs. Templates over `establish` give its wordings: the duration
-    after the spec ("… until end of turn") and before it ("Until end of turn, …").
+- **Where the duration stands.** In the Readings (`cargo xtask english parse`) a trailing
+  duration adjoins the verb phrase, below the subject, not the clause: "Target creature gets
+  +3/+3 until end of turn." is `SubjectPredicate(NP, VP(VP "gets +3/+3", PP "until end of
+  turn"))`, so "Target creature gets +3/+3" is no constituent. *Predator's Strike* attaches it to
+  the verb-phrase coordination "gets +3/+3 and gains trample"; *Abandon Reason* the same, under
+  `FloatedEach`; *Efflorescence*'s "also" wraps "gains trample and indestructible until end of
+  turn", duration included. Two shapes are clause-level: *Gift of Tusks*'s fronted "Until end of
+  turn, target creature loses all abilities and becomes …" adjoins the clause, and *Moku,
+  Meandering Drummer*'s "Moku gets +2/+1 and creatures you control gain haste until end of turn"
+  attaches one duration to a coordination of two clauses (`CoordinatedClauseAdjunct`, which
+  requires its head to be a coordination). Options:
+  - (a) The duration attaches to the subjectless phrase, "$effect $duration", and that phrase
+    substitutes into whatever gives it its subject: the plain clause, floated "each", "also".
+    Clause-level wordings remain only for the fronted duration ("$duration, $spec") and for two
+    or more coordinated clauses sharing a trailing duration. `establish(spec, duration)` stays
+    the expansion; since a first-order Template cannot place one argument inside another's call,
+    the subject reaches the phrase's StaticSpec as a binding the subject-giving declaration makes
+    (as `instruct` binds the Actor of its Action), read by the phrase's subject.
+  - (b) A clause-level "$spec $duration" over a subject-taking StaticSpec. It has no constituent
+    to spell for a single subject, since the duration sits inside the verb phrase.
 
-  Recommendation: (b). It writes all four cards with one duration each, `get` and `gain` already
-  expand to `establish` over a StaticSpec, and a static ability (*Glorious Anthem*) is the same
-  StaticSpec with no `establish`.
+  Recommendation: (a), which every parse above fits.
 - **The Action and StaticSpec split.** `gain` and `get` are Actions (`get` is
   `establish(getsPt(…), $duration)`), while `getsPt` and `abilityGrant` are StaticSpecs with the
-  same wording. Under (b) above there is one subjectless phrase per verb, the StaticSpec that
-  gives it a subject, and `establish` for the one-shot: no Action-level subject form remains.
-  Recommendation: follow (b); `gain`, `get` and `getsBoth` at `Action` are deleted.
-- **Names.** The sort for the subjectless phrase, the StaticSpec that gives it a subject, and the
-  `establish` Templates for each placement of the duration. `instruct` names a Handoff, which
+  same wording. Under (a) above there is one subjectless phrase per verb, a duration form of it,
+  the declaration that gives it a subject, and `establish` as the one-shot's expansion.
+  Recommendation: follow (a); `gain`, `get` and `getsBoth` at `Action` are deleted.
+- **Names.** The sort for the subjectless phrase, the declaration that gives it a subject and
+  the word that reads that subject inside it, and the duration Templates (the phrase-level one,
+  the fronted one, the coordinated-clauses one). `instruct` names a Handoff, which
   makes its subject the Actor (glossary **Handoff**), and a creature that gets +3/+3 performs
-  nothing, so it is not reused. Recommendation: the owner names the sort and the StaticSpec, with
-  glossary entries; the Templates are named for their wording.
+  nothing, so it is not reused. Recommendation: the owner names the sort, the declaration and the word,
+  with glossary entries; the Templates are named for their wording.
 - **The subject-first replacement statics** `entersTapped` (13 canon calls),
   `entersWithCounters` (12 canon, 8 builtin), `entersWithAdditionalCounters` (8) and `enters`
   (3, 4) have the same shape. Recommendation: leave them, since what they replace is an event

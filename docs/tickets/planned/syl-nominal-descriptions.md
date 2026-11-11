@@ -86,26 +86,38 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
   wrapper stands outside the determiner, so it prints "with different names" after "from your
   graveyard". `withDifferentNames` and `withTheSameName` (7 files call them) are
   `NounPhrase -> NounPhrase` over `agree`, an Agreement that holds of the group, not of each member
-  (glossary **Agreement**), so a `PostModifier` in the member list would test each card alone.
-  Options: a `PostModifier` whose meaning the determiner lifts to the group it forms; or a
-  Template at `NounPhrase` taking the determiner's quantity and the nominal, with the group words
-  printed between the nominal's postmodifiers. Recommendation: the second, which keeps the
-  Agreement on the group and the words in printed order.
+  (glossary **Agreement**). In the Readings (`cargo xtask english parse`) "with different names"
+  is an ordinary postmodifier of the nominal (`Nominal+PrepositionPhrase/After/Nominal`), with
+  other postmodifiers on either side of it: *Behold the Sinister Six!*'s "up to six target
+  creature cards with different names from your graveyard", *Turtles Forever*'s "exactly four
+  legendary creature cards you own with different names". The determiners vary ("any number of",
+  "up to six target", "exactly four", "up to four"). Options:
+  - a `PostModifier` in `nominal.post`, in its printed place, whose Agreement lowering reads off
+    the enclosing plural determiner's group. Its cost: as a member postmodifier it would test each
+    card alone, so lowering must lift it, and a determiner that forms no group (a singular one)
+    must refuse it;
+  - a Template at `NounPhrase` taking the determiner and the nominal. It cannot print the group
+    words between the nominal's postmodifiers by substitution, since they stand inside the
+    nominal, and it needs a variant per determiner.
+
+  Recommendation: the `PostModifier`, which matches the Readings, with the refusal for a
+  determiner that forms no group.
 - **One operator printed on both sides of the head.** `nominal(pre, head, post)` gives each
   modifier one side. Two constructions put one operator's words on both:
   - an ordinal over a head and its relative: *Highspire Bell-Ringer*'s "The second spell you cast
     each turn costs {1} less to cast", which ranks the spells cast each turn, and is written today
-    with the ordinal inside the lookback (`did(…, ordinal = {ordinal = nth(2), per = turn})`);
-  - a comparative premodifier with its "than" complement after the head
-    (`ComparativeIndirectComplement`, `crates/english/grammar/english.fug`): *Conformer Shuriken*'s granted
-    "If that creature has greater power than this creature", *Death's Oasis*'s "a creature card
-    with lesser mana value than the creature that died".
+    with the ordinal inside the lookback (`did(…, ordinal = {ordinal = nth(2), per = turn})`). The
+    Reading is the determiner "The" over the nominal "second spell you cast each turn", whose
+    premodifier "second" and relative "you cast each turn" both attach to "spell";
+  - a comparative premodifier with its "than" complement after the head: *Conformer Shuriken*'s
+    granted "If that creature has greater power than this creature", one Nominal node
+    (`ComparativeIndirectComplement`) holding "greater", "power" and "than this creature";
+    *Death's Oasis*'s "a creature card with lesser mana value than the creature that died".
 
-  Options: a Template at `Nominal` per construction whose wording has fixed words and Holes on
-  both sides of the head Hole ("the $ordinal $head $relative"), which is substitution, as any
-  wording with fixed words on both sides of its Holes is; or a premodifier and a postmodifier that
-  the checker pairs. Recommendation: the Templates, one per construction, each with its card as
-  caller.
+  Options: a Template at `Nominal` per construction whose wording has Holes on both sides of the
+  head Hole ("$ordinal $head $relative", the determiner staying outside it), which is
+  substitution of one fragment; or a premodifier and a postmodifier that the checker pairs.
+  Recommendation: the Templates, one per construction, each with its card as caller.
 - **Two well-sorted trees for one nominal.** "Artifact or enchantment you control" is
   `nominal(or([artifact, enchantment]), post = [youControl])` or
   `or([artifact, nominal(enchantment, post = [youControl])])`, and nothing in the ADRs picks
@@ -219,8 +231,9 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
 - Created tokens and characteristic-setting complements: `syl-token-records-to-templates`,
   `syl-become-replaces-types`.
 - Repeated determiners over one shared nominal: *Balthor the Defiled*'s "Each player returns all
-  black and all red creature cards from their graveyard to the battlefield". It is a coordination
-  of two determined phrases that print their shared head once, which `spelling.md`'s shared material at a coordination governs:
+  black and all red creature cards from their graveyard to the battlefield". The English grammar
+  has no Reading for it yet (it misreads "all black" as a noun phrase of its own):
+  `english-shared-nominal-determiner-coordination`. Its term waits on that Reading, and
   `syl-shared-phrase-written-once` lists it among the coordinations that take a shared phrase.
 - Location postmodifiers ("in your graveyard", "exiled with …") beyond the retype:
   `syl-zone-words`.

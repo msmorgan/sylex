@@ -54,17 +54,19 @@ in `docs/evidence/syl-token-records-to-templates/`.
   `creatureToken` example is rewritten.
 - **A named token** ("create Marit Lage, a legendary 20/20 … token"; *Tuktuk the Explorer*; *There
   and Back Again*'s "Create Smaug, a legendary 6/6 red Dragon creature token …"; *Bonny Pall,
-  Clearcutter*'s "create Beau, a legendary blue Ox creature token …"). The English grammar reads
-  the name as the clause's object and the description as a supplement of the whole clause:
-  `NounPhraseSupplement: Clause -> Clause ',' supplement:NounPhrase` (`crates/english/grammar/english.fug`),
-  whose comment says Oracle uses it for a named token's description. So the description is not
-  inside the object noun phrase, and a wording "$name, $spec" at the object's Hole would print it
-  before anything else the clause prints after its object. Options: a Template taking the name and
-  the description, with the description a Tail on the clause (`<Clause: , $spec>`, `spelling.md`
-  on Tails); or a `token` Definition in the card's plugin. Recommendation: the Template with the Tail,
-  since `token` Definitions are the tokens the rules define (`plugins/builtin/definitions/token/`)
-  and a Template adds no meaning. The name sets the token's name in place of its subtypes plus
-  "Token" [CR#111.4].
+  Clearcutter*'s "create Beau, a legendary blue Ox creature token …"). The English grammar reads the
+  name as the clause's object and the description as a supplement of the whole clause:
+  `NounPhraseSupplement: Clause -> Clause ',' supplement:NounPhrase`
+  (`crates/english/grammar/english.fug`), whose comment says Oracle uses it for a named token's
+  description. *Dark Depths*'s Reading (`cargo xtask english parse`) is that: the supplement over
+  the imperative clause "create Marit Lage", inside the fronted "If you do,". So the description is
+  not inside the object noun phrase, and a wording "$name, $spec" at the object's Hole would print
+  it before anything else the clause prints after its object. Options: a Template taking the name
+  and the description, with the description a Tail on the clause (`<Clause: , $spec>`, `spelling.md`
+  on Tails); or a `token` Definition in the card's plugin. Recommendation: the Template with the
+  Tail, since `token` Definitions are the tokens the rules define
+  (`plugins/builtin/definitions/token/`) and a Template adds no meaning. The name sets the token's
+  name in place of its subtypes plus "Token" [CR#111.4].
 - **A token's ability that names the token.** Smaug's "When Smaug dies, create fourteen Treasure
   tokens." and Beau's "Beau's power and toughness are each equal to the number of lands you
   control." name the token their ability is on, which means that object [CR#201.5].
@@ -73,9 +75,16 @@ in `docs/evidence/syl-token-records-to-templates/`.
   which lists the case among its open questions; this ticket writes these cards after it.
 - **A token named for a card** (*Tarmogoyf Nest*'s granted "{1}{G}, {T}: Create a Tarmogoyf
   token."): a token created by name with no other characteristics takes the characteristics of
-  the Oracle card of that name [CR#111.11]. Recommendation: a premodifier at `Nominal` that takes a
-  card name, before the head `token`, whose lowering reads the named card. A predefined token
-  ("a Treasure token") stays its `token` Definition.
+  the Oracle card of that name [CR#111.11]. The Reading carries "Tarmogoyf" as an Introduced Name
+  (`introduced_name:Tarmogoyf`, a name modifier of the nominal "Tarmogoyf token"), listed for
+  *Disa the Restless* and *Tarmogoyf Nest* in `crates/vocabulary/catalogs/introduced_names.ron`;
+  another card's name is admitted only after "named" or "Partner with" (`docs/decisions/lexicon.md`
+  §6). Options: the `.syl` value is that Introduced Name, a name premodifier before the head
+  `token`, whose lowering reads the Oracle card of the same name for the characteristics; or the
+  grammar admits another card's name before "token" as a third opting-in position, and the value
+  is that card's name. Recommendation: the Introduced Name, which is the leaf the Reading carries
+  and keeps §6's two positions; lowering's lookup by name is [CR#111.11]'s own rule. A predefined
+  token ("a Treasure token") stays its `token` Definition.
 - **Chosen qualities** (*Volrath's Laboratory*, *Riptide Replicator*, *Sarpadian Empires, Vol.
   VII*, which print "creature token of the chosen color and type"). Recommendation: under (a), a
   postmodifier "of the chosen color and type"; under (b), a Template with fixed `ofChosen(color)`
