@@ -50,11 +50,12 @@ feature ComplementKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | ExpandableClause
     | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase
     | QuotedAbility | Mention | FixedFrameNP | Cost | Intransitive | AmountOrNP | Name
-// The Slot Kind of a determinative's Preposition Phrase's Complement.
+// The Slot Kind of a determinative's Preposition Phrase's Complement: the
+// values of ComplementKind, which it agrees with.
 feature ObliqueKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | ExpandableClause
     | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase
-    | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP
+    | QuotedAbility | Mention | FixedFrameNP | Cost | Intransitive | AmountOrNP | Name
 // `Quantity`: only *number*, the number-transparent noun (*any number
 // of target creatures*; CGEL 5§3.3:349–351). `Serial`: only *time*, a
 // frequency or multiplier head (*three times*; CGEL 8§9:715).

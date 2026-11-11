@@ -1298,11 +1298,21 @@ impl<'a> Binder<'a> {
                     }
                     draft.joint_exclusions.push(joint);
                 }
-                Equation::Agree(a, b) => {
-                    let a = self.paths(draft, a)?;
-                    let b = self.paths(draft, b)?;
+                Equation::Agree(a_text, b_text) => {
+                    let a = self.paths(draft, a_text)?;
+                    let b = self.paths(draft, b_text)?;
                     for &a in &a {
                         for &b in &b {
+                            // Values are compared by index: two features
+                            // agree only over one domain.
+                            let feature = |p: Path| match p {
+                                Path::Mother(f) | Path::Child(_, f) => f,
+                            };
+                            if self.out.values[feature(a)] != self.out.values[feature(b)] {
+                                return Err(invalid(format!(
+                                    "`{a_text} = {b_text}`: the features' values differ"
+                                )));
+                            }
                             draft.equations.push((a, Target::Path(b)));
                         }
                     }

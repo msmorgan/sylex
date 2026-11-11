@@ -331,6 +331,18 @@ fn load_errors() {
         );
         assert!(load_error(&policing).contains("policing"), "{suffix}");
     }
+    // Values agree by index, so two features agree only over one domain.
+    let agreeing = swap(
+        "feature VerbForm = ",
+        "feature Count = Singular | Plural | Dual\n    feature VerbForm = ",
+    )
+    .replacen("category Nominal [Number]", "category Nominal [Number, Count]", 1)
+    .replacen(
+        "Noun: Nominal -> Lex(Noun)",
+        "Noun: Nominal -> Lex(Noun) where $.Count = $.Number",
+        1,
+    );
+    assert!(load_error(&agreeing).contains("values differ"));
     // The CR-catalog ban: a keyword action is catalog vocabulary.
     assert!(
         load_error(&swap("word This = \"d:this\"", "word This = \"v:destroy\""))
