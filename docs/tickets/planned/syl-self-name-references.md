@@ -13,7 +13,8 @@ instead, treated as the full name [CR#201.5c]: *Urza, Lord High Artificer*'s "Wh
 One face can print both: *Immard, the Stormcleaver* says "Whenever Immard, the Stormcleaver
 enters" and "Immard deals 4 damage to any target". Written as `this`, the printed name, the
 Shortened Name and "this creature" are one term, so spelling can't render what the card prints
-and nothing checks it.
+and nothing checks it. Some sites write a `this<Head>` Template where the card prints its name:
+*Atris, Oracle of Half-Truths* prints "When Atris enters" and writes `thisCreature`.
 
 `syl-printed-it-self-references` rewrites canon self-reference sites to `it` first, and
 `syl-this-head-template` rewrites the sites that print "this <head>" after; all three rewrite
