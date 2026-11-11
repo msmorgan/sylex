@@ -5,6 +5,8 @@
 * Gandalf deals 2 damage to any target.
 * Niv-Mizzet deals 1 damage to any target.
 + <card=Chandra, Pyromaster> Chandra deals 2 damage to any target. => NounPhrase "Chandra" as Subject of deal
+# a Shortened Name is in scope on its own card alone, not on another
+* <card=Lightning Bolt> Chandra deals 2 damage to any target.
 + <card=Ajani Vengeant> Ajani deals 2 damage to any target. => NounPhrase "Ajani" as Subject of deal
 # from: Gandalf the Grey
 + <card=Gandalf the Grey> Gandalf deals 3 damage to each opponent. => NounPhrase "Gandalf" as Subject of deal

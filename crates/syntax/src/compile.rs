@@ -108,6 +108,9 @@ pub struct CompiledGrammar {
     /// case, as a mask (`step::form_bit`), where they are more than the
     /// value's own form (`LeafFacts::forms`).
     pub(crate) homograph_forms: BTreeMap<sylex_lexicon::LexicalValue, u16>,
+    /// The Adjacency Agreement edges of every licensed word value
+    /// (`sylex_lexicon::Lexicon::edges`).
+    pub(crate) edges: BTreeMap<sylex_lexicon::LexicalValue, sylex_lexicon::Edges>,
     /// The card names of the lexicon [CR#201.1]: a leaf of one the face's
     /// scope does not hold is another card's name
     /// (`LeafFacts::other_card_name`).
@@ -808,6 +811,16 @@ impl<'a> Binder<'a> {
                 root,
                 lexemes,
                 homograph_forms: homograph_forms(lexicon),
+                edges: lexicon
+                    .values()
+                    .map(|value| {
+                        let reading = sylex_lexicon::LexicalReading::Word(value.clone());
+                        let edges = lexicon
+                            .edges(&reading)
+                            .expect("every licensed value has its edges");
+                        (value.clone(), edges)
+                    })
+                    .collect(),
                 card_names: lexicon
                     .lexemes()
                     .values()

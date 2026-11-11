@@ -43,6 +43,7 @@ pub(crate) struct Leaf {
     pub end: usize,
     pub reading: LexicalReading,
     pub facts: LeafFacts,
+    pub edges: sylex_lexicon::Edges,
 }
 
 /// A child of a partial Production in a Packed Forest: a completed
@@ -451,12 +452,16 @@ impl CompiledGrammar {
                 continue;
             }
             if let Some(facts) = self.leaf_facts(&found.reading, &analyzed.scope) {
+                let edges = self
+                    .leaf_edges(&found.reading)
+                    .expect("an analyzed lexical match is licensed by the grammar's lexicon");
                 by_start[found.start].push(forest.leaves.len());
                 forest.leaves.push(Leaf {
                     start: found.start,
                     end: found.end,
                     reading: found.reading.clone(),
                     facts,
+                    edges,
                 });
             }
         }
@@ -656,7 +661,7 @@ impl CompiledGrammar {
                             if !self.leaf_matches(leaf_test, facts) {
                                 continue;
                             }
-                            let view = ChildView::Leaf(facts);
+                            let view = ChildView::Leaf(facts, forest.leaves[leaf].edges);
                             if !production.spacing_matches(
                                 &forest.items[id].state,
                                 dot,

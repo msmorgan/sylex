@@ -19,3 +19,14 @@
 + Draw a card.
 + Flying, trample
 + Creatures have flying.
+# The article agrees with the Onset of the word after it, whatever that word heads
+# from: Krark-Clan Ironworks
+*Clause Sacrifice a artifact
+# from: Ogre Marauder
+*NounPhrase an creature
+# from: Kiora Bests the Sea God
+*NounPhrase a 8/8 blue Kraken creature token
+# from: Abigale, Poet Laureate; a sign is spoken *plus* or *minus*
+*NounPhrase an +1/+1 counter
+# from: Baleful Ammit
++NounPhrase a -1/-1 counter

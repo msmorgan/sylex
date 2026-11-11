@@ -569,6 +569,8 @@ pub(crate) fn resolve(
         start: State {
             first_glues: None,
             last_glues: false,
+            first_edge: None,
+            last_edge: None,
             vars,
             gap: None,
             // A Gap the Production introduces before a later child is not
@@ -650,6 +652,12 @@ pub(crate) enum Fronting {
 pub(crate) struct Summary {
     pub first_glues: bool,
     pub last_glues: bool,
+    /// The left edge of its first word, which the word before it agrees
+    /// with ([`sylex_lexicon::RightEdge::agrees`]); `None` when it has no
+    /// word.
+    pub first_edge: Option<sylex_lexicon::LeftEdge>,
+    /// The right edge of its last word, which the word after it agrees with.
+    pub last_edge: Option<sylex_lexicon::RightEdge>,
     /// Feature values in Category feature order; slots past the Category's
     /// features stay unset.
     pub values: [FeatureValue; MAX_CATEGORY_FEATURES],
@@ -902,7 +910,8 @@ pub(crate) struct LeafFacts {
 
 pub(crate) enum ChildView<'a> {
     Node(&'a Summary),
-    Leaf(&'a LeafFacts),
+    /// A lexical leaf, with its Adjacency Agreement edges.
+    Leaf(&'a LeafFacts, sylex_lexicon::Edges),
     Punct,
 }
 
@@ -912,6 +921,10 @@ pub(crate) enum ChildView<'a> {
 pub(crate) struct State {
     pub first_glues: Option<bool>,
     pub last_glues: bool,
+    /// The left edge of the first word so far (`Summary::first_edge`).
+    first_edge: Option<sylex_lexicon::LeftEdge>,
+    /// The right edge of the last word so far (`Summary::last_edge`).
+    last_edge: Option<sylex_lexicon::RightEdge>,
     vars: [FeatureValue; MAX_PRODUCTION_VARS],
     gap: Option<Gap>,
     gap_right_edge: bool,
@@ -1022,7 +1035,7 @@ impl Production {
         use crate::reading::glues_before;
         let (mut first, mut last) = match child {
             ChildView::Node(summary) => (summary.first_glues, summary.last_glues),
-            ChildView::Leaf(leaf) => (glues_before(leaf.binding), glues_after(leaf.binding)),
+            ChildView::Leaf(leaf, _) => (glues_before(leaf.binding), glues_after(leaf.binding)),
             ChildView::Punct => match self.rhs[position] {
                 Symbol::Punct(_, binding) => (glues_before(binding), glues_after(binding)),
                 _ => (false, false),
@@ -1149,7 +1162,7 @@ impl Production {
         }
         match child {
             ChildView::Node(summary) => next.head_final = summary.head_final,
-            ChildView::Leaf(_) => next.head_final = true,
+            ChildView::Leaf(..) => next.head_final = true,
             ChildView::Punct => {}
         }
     }
@@ -1183,7 +1196,7 @@ impl Production {
                         .filter(|p| grammar.unextended_prepositions.contains(p))
                 };
             }
-            ChildView::Leaf(_) => next.final_preposition = None,
+            ChildView::Leaf(..) => next.final_preposition = None,
             ChildView::Punct => {}
         }
         Some(())
@@ -1224,7 +1237,7 @@ impl Production {
                     None
                 };
             }
-            ChildView::Leaf(_) => next.final_adjunct = None,
+            ChildView::Leaf(..) => next.final_adjunct = None,
             ChildView::Punct => {}
         }
         Some(())
@@ -1244,7 +1257,7 @@ impl Production {
     ) -> Option<()> {
         let head_forms = match child {
             ChildView::Node(summary) => summary.head_forms,
-            ChildView::Leaf(leaf) => leaf.forms,
+            ChildView::Leaf(leaf, _) => leaf.forms,
             ChildView::Punct => 0,
         };
         if self.lexical_head == Some(position) {
@@ -1259,7 +1272,7 @@ impl Production {
                 return None;
             }
             ChildView::Node(summary) => next.ellipsis = summary.ellipsis,
-            ChildView::Leaf(_) => next.ellipsis = 0,
+            ChildView::Leaf(..) => next.ellipsis = 0,
         }
         Some(())
     }
@@ -1280,7 +1293,7 @@ impl Production {
     ) -> Option<()> {
         let (cluster, other, bare) = match child {
             ChildView::Node(summary) => (summary.cluster, summary.cluster_other, summary.bare),
-            ChildView::Leaf(_) => (0, 0, Bare::NONE),
+            ChildView::Leaf(..) => (0, 0, Bare::NONE),
             ChildView::Punct => return Some(()),
         };
         let shape = |c: u16| (c != 0).then(|| grammar.cluster_shapes[usize::from(c - 1)]);
@@ -1343,7 +1356,7 @@ impl Production {
                 summary.preposition.map(|(p, _)| p),
                 summary.cluster_preposition,
             ),
-            ChildView::Leaf(leaf) => (None, leaf.lexeme, None, None),
+            ChildView::Leaf(leaf, _) => (None, leaf.lexeme, None, None),
             ChildView::Punct => return Some(()),
         };
         if self.remnant == RemnantRole::SharesHead && self.head == Some(position) {
@@ -1359,7 +1372,7 @@ impl Production {
             }
             return Some(());
         }
-        if !self.head_line[position] || matches!(child, ChildView::Leaf(_)) {
+        if !self.head_line[position] || matches!(child, ChildView::Leaf(..)) {
             return Some(());
         }
         if self.head_line.iter().filter(|h| **h).count() < 2 {
@@ -1453,7 +1466,7 @@ impl Production {
                 next.omitted_complement = summary.omitted_complement;
                 next.after_unlike_omissions = summary.unlike_omissions;
             }
-            ChildView::Leaf(_) | ChildView::Punct => {
+            ChildView::Leaf(..) | ChildView::Punct => {
                 next.omitted_complement = 0;
                 next.after_unlike_omissions = false;
             }
@@ -1466,7 +1479,7 @@ impl Production {
     fn weigh(&self, position: usize, child: &ChildView<'_>) -> Option<u8> {
         let leaves = match child {
             ChildView::Node(summary) => summary.leaves,
-            ChildView::Leaf(_) => 1,
+            ChildView::Leaf(..) => 1,
             ChildView::Punct => 0,
         };
         match self.weights.iter().find(|(at, _)| *at == position) {
@@ -1825,6 +1838,28 @@ impl Production {
         next.open_comma = false;
         next.first_glues.get_or_insert(first);
         next.last_glues = last;
+        // Adjacency Agreement holds between each word and the next, whatever
+        // Constituents they end and begin. A spoken mark (*a +8/+8
+        // creature*) is a word; an empty child and any other mark have none.
+        let (first_edge, last_edge) = match child {
+            ChildView::Node(summary) => (summary.first_edge, summary.last_edge),
+            ChildView::Leaf(_, edges) => (Some(edges.left), Some(edges.right)),
+            ChildView::Punct => {
+                let Symbol::Punct(mark, _) = self.rhs[position] else {
+                    unreachable!("a punctuation child stands at a punctuation symbol");
+                };
+                sylex_lexicon::mark_onset(mark)
+                    .map(|onset| sylex_lexicon::Edges::plain(Some(onset)))
+                    .map_or((None, None), |edges| (Some(edges.left), Some(edges.right)))
+            }
+        };
+        if let (Some(before), Some(after)) = (state.last_edge, first_edge)
+            && !before.agrees(after)
+        {
+            return None;
+        }
+        next.first_edge = state.first_edge.or(first_edge);
+        next.last_edge = last_edge.or(state.last_edge);
         next.unwritten_period =
             matches!(child, ChildView::Node(summary) if summary.unwritten_period);
         next.leaves = (next.leaves + self.weigh(position, child)?).min(2);
@@ -1838,7 +1873,7 @@ impl Production {
         let lookup = |feature: usize| -> Option<u16> {
             match child {
                 ChildView::Node(summary) => self.node_value(grammar, position, summary, feature),
-                ChildView::Leaf(leaf) => leaf.features[feature],
+                ChildView::Leaf(leaf, _) => leaf.features[feature],
                 ChildView::Punct => None,
             }
         };
@@ -1956,7 +1991,7 @@ impl Production {
                 }
                 self.priority(grammar, &mut next, position, summary)?;
             }
-            ChildView::Leaf(leaf) => self.accept_leaf(grammar, &mut next, position, leaf),
+            ChildView::Leaf(leaf, _) => self.accept_leaf(grammar, &mut next, position, leaf),
             ChildView::Punct => {}
         }
         Some(next)
@@ -2019,6 +2054,8 @@ impl Production {
         Some(Summary {
             first_glues: state.first_glues.unwrap_or(false),
             last_glues: state.last_glues,
+            first_edge: state.first_edge,
+            last_edge: state.last_edge,
             values,
             gap,
             gap_right_edge: state.gap_right_edge && state.shared_gap_right_edge,
@@ -2186,6 +2223,18 @@ impl CompiledGrammar {
             Test::PrepositionFrame(frame) => {
                 facts.is_some_and(|f| f.preposition_frames.contains(frame))
             }
+        }
+    }
+
+    /// The Adjacency Agreement edges of a lexical value this grammar's
+    /// lexicon licenses.
+    pub(crate) fn leaf_edges(&self, reading: &LexicalReading) -> Option<sylex_lexicon::Edges> {
+        match reading {
+            LexicalReading::Word(value) => self.edges.get(value).copied(),
+            LexicalReading::Numeral { value, .. } => Some(sylex_lexicon::Edges::plain(
+                sylex_lexicon::numeral_onset(*value),
+            )),
+            LexicalReading::FlavorWord { .. } => Some(sylex_lexicon::Edges::plain(None)),
         }
     }
 

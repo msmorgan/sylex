@@ -1,0 +1,12 @@
+# The host selects the genitive's form: the bare genitive, an apostrophe alone, after any Plural noun form ending in *s*, regular or irregular, and the *'s* genitive after any other form, a singular ending in *s* included (CGEL, Ch. 18 §4.2 [35i], pp. 1595–1596)
+# from: Sorcerous Sight
++NounPhrase target opponent's hand
+*NounPhrase target opponent' hand
+# from: Captivating Gyre
++NounPhrase their owners' hands
+*NounPhrase their owners's hands
+# from: Reverse the Sands
++NounPhrase any number of players' life totals
+*NounPhrase any number of players's life totals
+# a card name is no Plural noun form, even ending in *s*
++ <card=Swarm of Rats> Swarm of Rats's power is equal to the number of Rats you control.

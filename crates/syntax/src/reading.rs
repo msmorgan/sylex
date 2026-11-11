@@ -1140,10 +1140,11 @@ impl CompiledGrammar {
                     };
                     lexicon.realize(value).map_err(|_| AdmissionError::Leaf)?;
                     let facts = self.leaf_facts(value, scope).ok_or(AdmissionError::Leaf)?;
+                    let edges = self.leaf_edges(value).ok_or(AdmissionError::Leaf)?;
                     if !self.leaf_matches(test, &facts) {
                         return Err(reject("leaf does not satisfy its symbol"));
                     }
-                    production.accept(self, &state, position, &ChildView::Leaf(&facts))
+                    production.accept(self, &state, position, &ChildView::Leaf(&facts, edges))
                 }
                 Symbol::Cat { category, .. } => {
                     let Some(child) = children.next() else {

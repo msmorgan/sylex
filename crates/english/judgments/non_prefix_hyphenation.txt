@@ -1,0 +1,10 @@
+# *non* joins its host with a hyphen before a subtype or *outlaw*, and solid before any other word (`docs/oracle-style-guide.md` §7, Negation with non-): the host selects the form
+# from: Olivia's Wrath
++NounPhrase each non-Vampire creature
+*NounPhrase each nonVampire creature
+# from: Utter End
++NounPhrase target nonland permanent
+*NounPhrase target non-land permanent
+# from: Shoot the Sheriff
++NounPhrase target non-outlaw creature
+*NounPhrase target nonoutlaw creature
