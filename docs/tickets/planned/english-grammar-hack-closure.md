@@ -1,5 +1,5 @@
 ---
-needs: [english-require-on-unvalued-features, english-object-coordination-exclusions, english-outside-the-game-frame, english-fused-each-partitive, english-specifying-clause, english-tied-for-superlatives, english-synesis-each-partitive, english-renamed-children-head-agreement, english-interleaved-manner-gate, english-single-card-productions, english-cgel-citation-corrections, english-gate-ablation-records]
+needs: [english-require-on-unvalued-features, english-object-coordination-exclusions, english-outside-the-game-frame, english-fused-each-partitive, english-specifying-clause, english-tied-for-superlatives, english-synesis-each-partitive, english-renamed-children-head-agreement, english-interleaved-manner-gate, english-single-card-productions, english-cgel-citation-corrections, english-gate-ablation-records, english-targeting-marker-recursion]
 ---
 
 # Epic: every construct in the English grammar is the right mechanism, honestly described
@@ -28,6 +28,7 @@ the rows in its `needs:` are closed.
 | Productions serving one or two cards | `english-single-card-productions` | General rule stated for a single card |
 | Citations that do not support their claim | `english-cgel-citation-corrections` | Comment accuracy |
 | Gates with no ablation record | `english-gate-ablation-records` | Working rule not followed |
+| A determined Targeting Marker taken as a Marker again | `english-targeting-marker-recursion` | Equation admits more than the comment |
 
 These are not required for this ticket to close. Each rests on a single reading, or on two that
 disagree, and joins `needs:` if it is moved to `planned/`:
