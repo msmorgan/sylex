@@ -19,22 +19,24 @@ Written against the spine (`cleanup-step6-spine`).
 
 ## Design
 
-- The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `~` ties, `$xs<join>`
-  lists (a join is nothing, `,`, `and`, `or`, `and/or` or `then`, never chosen by a parameter),
-  `( … )` optional parts, `<~Category: …>` and `<~inner Category: …>` Tails) with its load rules;
-  where this ticket's text differs, §7 governs.
+- The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `$name@Form` printed
+  forms, `$name*` run Holes, `~` ties, `$xs<join>` lists (a join is nothing, `,`, `.`, `and`,
+  `or`, `and/or` or `then`, never chosen by a parameter), `( … )` optional parts,
+  `<~Category: …>` and `<~inner Category: …>` Tails) with its load rules; where this ticket's text
+  differs, §7 governs.
 
 ## Done when
 
-- `sylex_syl` parses and formats the notation `docs/decisions/spelling.md` §7 states.
+- `sylex_syl` parses and formats the notation `docs/decisions/spelling.md` §7 states, form labels,
+  `*` and the `<.>` join included, and refuses a form outside §7's set, with a negative test.
 - Every `TODO(spelling)` that needed an optional or repeated segment is written with it.
-- The notation has no mark yet for the Holes the two closed rules of `spelling.md` link: a
-  context's Subject and Action Holes under passive subject promotion (`does`, `would`, `did`,
-  `cant`, `must`, `can`, `gatedBy`, `doesnt`), and a trigger's effect Hole that may hold several
-  sentences (`when`, `whenever`, `at`, the delayed and reflexive triggers). Their optional parts
-  are written like any other, no mark is invented for those Holes, and the landing lists these
-  declarations as standing outside the check that a variant is English until `spelling.md`
-  gives the mark.
+- The notation has no mark yet for the Holes passive subject promotion links: a context's
+  Subject and Action Holes (`does`, `would`, `did`, `cant`, `must`, `can`, `gatedBy`, `doesnt`).
+  Their optional parts are written like any other, no mark is invented for those Holes, and the
+  landing lists these declarations as standing outside the check that a variant is English until
+  `spelling.md` gives the mark.
+- The optional parts this ticket writes leave form labels, `*` and `<.>` joins unwritten; that
+  is `syl-spelling-forms-and-runs`'s.
 - The parser refuses a join chosen by a parameter (`$xs<$name>`), with a negative test.
 - No `coord` primitive has a `spelling` (`plugins/builtin/primitives/{noun,predicate,zone}/coord.syl`
   have none today; each takes its `coordinator` as an argument), and the coordinator word is the

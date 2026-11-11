@@ -17,7 +17,7 @@ One `Location` sort also holds phrases of different kinds: bare zones ("the batt
 hand", `library` "its owner's library"), pile positions with their preposition (`onTop` "on top
 of its owner's library", `onBottom` "on the bottom of its owner's library", `place` "the $end of
 $pile"), pile positions without one (`topOf` "the top of $loc"), Position Phrases (`fromTop`
-"$n~th from the top of $loc"), and a participle (`exiledWith` "exiled with $source"). The
+"$n@Ordinal from the top of $loc"), and a participle (`exiledWith` "exiled with $source"). The
 declarations that take a `Location` add their own preposition: `putInto`'s doc comment reads
 "put $subject into $destination (from $from)", `play`'s "(from $from)", and `cardIn` is spelled
 "card in $zone". `putInto` and `play`'s `from` have no `spelling` yet, so the collisions below are

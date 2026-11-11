@@ -31,7 +31,7 @@ attaches it as a supplement to three different hosts, never inside the amount's 
   and "a third of $amount".
 - `roundEachTime(action, mode)` wraps the run of sentences it covers and is spelled as that run
   followed by "Round $mode each time.", its parameters in that printed order (`syl.md` §5). Its
-  `action` Hole holds a run (`spelling.md` §2): *Saw in Half*'s holds the two sentences before
+  `action` Hole holds a run, `$action*` (`spelling.md` §2, §7): *Saw in Half*'s holds the two sentences before
   the rounding sentence, and *Hydroid Krasis*'s the one. Its own phrase is a run too, so `when`'s
   effect Hole holds it, and the trigger clause printed in its first sentence governs it by the run
   rule. It wraps the whole run, so a "then" chain of several Actions (*Pox*, *Fraying

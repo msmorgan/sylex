@@ -17,10 +17,12 @@ Two narrower tickets rewrite spellings this ticket also normalizes, and land fir
 
 ## Design
 
-The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `~` ties, `$xs<join>`
-lists (a fixed join, never one chosen by a parameter), `( … )` optional parts, `<~Category: …>` and
-`<~inner Category: …>` Tails); where this ticket's text differs, §7 governs. This ticket's corpus
-rewrite migrates every `<name>` Hole to `$name`.
+The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `$name@Form` printed
+forms, `$name*` run Holes, `~` ties, `$xs<join>` lists (a fixed join, never one chosen by a
+parameter), `( … )` optional parts, `<~Category: …>` and `<~inner Category: …>` Tails); where this
+ticket's text differs, §7 governs. This ticket's corpus rewrite migrates every `<name>` Hole to
+`$name`. An ordinal is a form, not a tie: `fromTop`'s and `fromBottom`'s "<n>th from …" become
+"$n@Ordinal from …", and no `$n~th` is written.
 
 - A verb is written uninflected wherever its agreement depends on a hole or on the performer;
   agreement is solved when the clause is rendered. Three cases:
@@ -51,8 +53,9 @@ rewrite migrates every `<name>` Hole to `$name`.
 
 ## Done when
 
-- Every `<name>` Hole under `plugins/` is written `$name`, with a `~` tie where letters abut
-  it.
+- Every `<name>` Hole under `plugins/` is written `$name`, with a `~` tie where a declared affix
+  abuts it (`landwalk`, `typecycling`, `non`), and `fromTop` and `fromBottom` write their ordinal
+  `$n@Ordinal`; no spelling under `plugins/` contains `~th`.
 - In separate corpus commits: every spelling follows the three inflection cases, and every
   `TODO(spelling)` whose wording needs no optional or repeated segment is resolved, either written
   or replaced by the specific missing wording.
@@ -67,7 +70,9 @@ rewrite migrates every `<name>` Hole to `$name`.
 ## Not in scope
 
 Writing the optional parts and list Holes `TODO(spelling)` markers need:
-`syl-spelling-optional-segments`. The spelling crate itself.
+`syl-spelling-optional-segments`. Form labels other than the ordinal, `Counting`, the `one`
+Template, `*` run Holes and `<.>` joins: `syl-spelling-forms-and-runs`. The spelling crate
+itself.
 
 ## Pointers
 
