@@ -18,9 +18,10 @@ rewrites their calls, and lands first, so each call is rewritten against its fin
 
 ## Design
 
-- A power/toughness change is one value of its own sort, built from its two deltas by one
-  primitive, and `get`, `getsPt` and what they expand to take it whole
-  (`docs/decisions/spelling.md`, on Tails and "for each").
+- A power/toughness change is one value of the sort `PtChange`, built from its two deltas by the
+  primitive `pt(power, toughness)`, matching the `Pt` in `getsPt` and `definesPt`; its glossary
+  entry is **Power/Toughness Change**, beside **Delta** for one number's change. `get`, `getsPt`
+  and what they expand to take it whole (`docs/decisions/spelling.md`, on Tails and "for each").
 - `forEach` is declared at that sort: it takes a change and a Predicate and scales the whole
   change.
 - A bare "+N/+N" is two printed values and is written as two. `getsBoth` is deleted at `Action`
@@ -28,9 +29,6 @@ rewrites their calls, and lands first, so each call is rewritten against its fin
 
 ## Open questions
 
-- The sort's name and its word. The glossary has **Delta** for one number's change and nothing
-  for the pair. Recommendation: sort `PtChange`, glossary entry "Power/Toughness Change", built
-  by `pt(power, toughness)`, matching the `Pt` already in `getsPt` and `definesPt`.
 - **Coordinated and multiplied changes.** The English grammar coordinates measures
   (`coordination MeasureNounPhrase`, `crates/english/grammar/english.fug`) and
   multiplies one (`AdverbMultipliedMeasure`, "gets twice -X/-X"), and cards print
