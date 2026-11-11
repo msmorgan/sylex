@@ -99,7 +99,7 @@ pub struct TriggerBindings {
     /// event-role channel and enters the ability through its `EventAmount`
     /// region parameter ("whenever you gain life, … that much").
     pub event_amount: Option<Uint>,
-    /// The firing counter event's `(before, after)` totals ([CR#714.2b]) —
+    /// The firing counter event's `(before, after)` totals ([CR#715.2b]) —
     /// the channel `Condition::Crossed` reads, at the intervening-if gate
     /// and again at the resolution recheck ([CR#603.4]). `None` for facts
     /// that fix no totals.
@@ -794,7 +794,7 @@ impl GameState {
         frame
     }
 
-    /// The firing event's provenance roles ([CR#603.2e,608.2k,120.3,714.2b]) —
+    /// The firing event's provenance roles ([CR#603.2e,608.2k,120.3,715.2b]) —
     /// the AGENT (the acting/moved object) as `that_object` with its
     /// responsible-player ACTOR as `that_player`, the kind-poly PATIENT as
     /// `that_patient`, the combat DEFENDING player, the amount-carrying
@@ -909,7 +909,7 @@ impl GameState {
             GameEvent::Act(crate::event::Act { batch, .. }) => *batch,
             _ => None,
         };
-        // The counter event's before/after totals ([CR#714.2b]) — the
+        // The counter event's before/after totals ([CR#715.2b]) — the
         // `Condition::Crossed` channel.
         let crossed = match event {
             GameEvent::CounterPlaced(CounterPlaced { before, after, .. }) => {
@@ -1059,7 +1059,7 @@ impl GameState {
                 crate::derive::derived_abilities_of(self, live_id, source);
             // Whether this watcher is a battlefield permanent showing its BACK
             // face — exactly when `abilities_of_source` sources its section-1
-            // printed abilities from the back face ([CR#712.8e]), so those
+            // printed abilities from the back face ([CR#712.6d]), so those
             // triggers must be captured by value (see `created` below).
             let showing_back = live_id.is_some_and(|id| {
                 let o = self.objects.obj(id);
@@ -1132,7 +1132,7 @@ impl GameState {
                 //  * a CONFERRED trigger (idx past the printed spine) has no
                 //    index-stable identity, and
                 //  * a back-up permanent's section-1 PRINTED trigger is sourced
-                //    from its BACK face ([CR#712.8e]); if the permanent leaves
+                //    from its BACK face ([CR#712.6d]); if the permanent leaves
                 //    the battlefield between firing and resolution ([CR#603.3]
                 //    — a trigger resolves independently of its source),
                 //    `abilities_of_source` finds no live battlefield object and
@@ -1503,7 +1503,7 @@ enum Watcher {
     Leaving(LkiSnapshot),
 }
 
-/// The firing event's provenance roles ([CR#603.2e,608.2k,120.3,714.2b]),
+/// The firing event's provenance roles ([CR#603.2e,608.2k,120.3,715.2b]),
 /// derived once by [`GameState::event_roles`] and folded onto a trigger's
 /// bindings by [`EventRoles::bindings_over`]. Shared by the printed and the
 /// delayed/reflexive scans so both carry identical event context to
@@ -3425,7 +3425,7 @@ mod tests {
         );
     }
 
-    /// The game-scope day/night flip ([CR#731.1a] — "day becomes night"
+    /// The game-scope day/night flip ([CR#732.1a] — "day becomes night"
     /// loses one designation and gains the other) is a generic named enum
     /// designation transition. `to` distinguishes Day from Night; omitting it
     /// matches either transition. A game-scope fact has no carrier, so only
@@ -3743,7 +3743,7 @@ mod tests {
     /// printed IDENTICALLY on both faces, so it's visible to the scan
     /// regardless of which face is showing when the fact fires — isolating
     /// the bare `StateBecame(Transformed)` trigger from the destination-
-    /// narrowed "transforms into X" reading ([CR#701.27e]), which is out of
+    /// narrowed "transforms into X" reading ([CR#701.27f]), which is out of
     /// scope here.
     fn transform_watcher_dfc() -> sylex_card::Card {
         use sylex_card::Card;
@@ -3838,7 +3838,7 @@ mod tests {
         assert_eq!(
             state.objects.obj(dfc).side,
             Side::Back,
-            "the DFC actually flipped [CR#712.18]"
+            "the DFC actually flipped [CR#712.15]"
         );
     }
 
@@ -3884,15 +3884,15 @@ mod tests {
     /// transforming DFC driven through the REAL `Action::Transform` path
     /// (Task 5/6), asserting the full contract in one pass rather than
     /// piecemeal:
-    ///  1. It enters FRONT-up ([CR#712.14]) — 1/1 "Delverish", no Trample.
+    ///  1. It enters FRONT-up ([CR#712.11]) — 1/1 "Delverish", no Trample.
     ///  2. An until-end-of-turn +2/+2 applied BEFORE transforming survives the
-    ///     flip on the SAME `ObjectId` ([CR#712.18]): back base 3/2 + 2/2 =
+    ///     flip on the SAME `ObjectId` ([CR#712.15]): back base 3/2 + 2/2 =
     ///     5/4, and the back face's Trample (absent on the front) becomes
     ///     visible through the layered view — exercising the face-aware read
     ///     end-to-end through a genuine transform, not a hand-set `side`.
     ///  3. A genuine zone change (dies to the graveyard, then returns to the
     ///     battlefield as a NEW object, [CR#400.7]) resets to FRONT-up
-    ///     ([CR#712.14]): back to 1/1 "Delverish", no Trample.
+    ///     ([CR#712.11]): back to 1/1 "Delverish", no Trample.
     ///
     /// If Tasks 1-6 are complete this needs no new production code; a
     /// failing assertion here points at a real gap (e.g. a direct
@@ -3917,7 +3917,7 @@ mod tests {
         let mut state = empty_game();
         let delver = put_synthetic_on_field(&mut state, delverish_aberration(), PlayerId(0));
 
-        // 1. Enters front-up [CR#712.14].
+        // 1. Enters front-up [CR#712.11].
         let view = state.layers();
         assert_eq!(view.power(delver), Some(1), "front-up shows front power 1");
         assert_eq!(
@@ -3975,26 +3975,26 @@ mod tests {
         );
         assert!(
             state.objects.get(delver).is_some(),
-            "transform preserves the SAME ObjectId — no remint [CR#712.18]"
+            "transform preserves the SAME ObjectId — no remint [CR#712.15]"
         );
 
         let view = state.layers();
         assert_eq!(
             view.power(delver),
             Some(5),
-            "back base power 3 + 2/2 UEOT (survived the flip) = 5 [CR#712.18]"
+            "back base power 3 + 2/2 UEOT (survived the flip) = 5 [CR#712.15]"
         );
         assert_eq!(
             view.toughness(delver),
             Some(4),
-            "back base toughness 2 + 2/2 UEOT (survived the flip) = 4 [CR#712.18]"
+            "back base toughness 2 + 2/2 UEOT (survived the flip) = 4 [CR#712.15]"
         );
         assert!(
             has_keyword(&view, delver, &KeywordAbility::Trample),
             "the back face's Trample is now visible through the layered view"
         );
 
-        // 3. A genuine zone change resets to front-up [CR#712.14]: dies to
+        // 3. A genuine zone change resets to front-up [CR#712.11]: dies to
         // the graveyard (a real remint, [CR#400.7]) then returns to the
         // battlefield as yet another new object.
         state.run_effect(
@@ -4042,7 +4042,7 @@ mod tests {
         assert_eq!(
             state.objects.obj(reentered).side,
             Side::Front,
-            "re-entering the battlefield resets to front-up [CR#712.14]"
+            "re-entering the battlefield resets to front-up [CR#712.11]"
         );
         let view = state.layers();
         assert_eq!(
@@ -4068,7 +4068,7 @@ mod tests {
     /// Unlike `delver_transforms_end_to_end` (a bare `Act(Transform)`), the top
     /// card's card TYPE decides whether the optional transform even offers:
     ///  1. an INSTANT on top → the condition holds, the reveal is accepted, and
-    ///     ~ transforms to the 3/2 back ([CR#712.18]);
+    ///     ~ transforms to the 3/2 back ([CR#712.15]);
     ///  2. a CREATURE on top → the condition fails, nothing offers, and ~ stays
     ///     the 1/1 front.
     #[test]
@@ -4184,14 +4184,14 @@ mod tests {
             assert_eq!(
                 state.objects.obj(d).side,
                 Side::Front,
-                "enters front-up [CR#712.14]"
+                "enters front-up [CR#712.11]"
             );
             assert_eq!(state.layers().power(d), Some(1), "the front face is 1/1");
 
             state.run_effect(upkeep_effect(), &crate::test_support::frame_src(&state, d));
             // Drive resolution, saying "yes" to the optional reveal; break the
             // instant the flip lands (NOT on an empty agenda — that would drain
-            // into `empty_game`'s ambient turn cascade, [CR#712.18]).
+            // into `empty_game`'s ambient turn cascade, [CR#712.15]).
             for _ in 0..40 {
                 if state.objects.obj(d).side == Side::Back {
                     break;
@@ -4209,7 +4209,7 @@ mod tests {
             assert_eq!(
                 state.layers().power(d),
                 Some(3),
-                "the back face reads 3/2 through the layered view [CR#712.18]"
+                "the back face reads 3/2 through the layered view [CR#712.15]"
             );
         }
 
@@ -5015,7 +5015,7 @@ mod tests {
         (state, id, back_trigger)
     }
 
-    /// [Task 5b regression][CR#712.8e]: a back-up permanent's section-1 printed
+    /// [Task 5b regression][CR#712.6d]: a back-up permanent's section-1 printed
     /// trigger is captured BY VALUE at fire time (`created: Some`), NOT by the
     /// `(source, idx)` index channel. `abilities_of_source` now sources section
     /// 1 from the back face, so the index re-read at resolution would need
@@ -5053,7 +5053,7 @@ mod tests {
         );
     }
 
-    /// [Task 5b regression][CR#603.3,712.8e]: the scenario the by-value capture
+    /// [Task 5b regression][CR#603.3,712.6d]: the scenario the by-value capture
     /// exists for. A back-up permanent fires a section-1 printed trigger, then
     /// LEAVES the battlefield (destroyed/sacrificed/bounced) before the trigger
     /// resolves — a trigger resolves independently of its source ([CR#603.3]).
@@ -6370,9 +6370,9 @@ mod tests {
         }
     }
 
-    /// The saga-chapter walk-through ([CR#714.2b]): three chapter abilities
+    /// The saga-chapter walk-through ([CR#715.2b]): three chapter abilities
     /// authored through the `Chapter` MACRO (`Chapter(n: [N], effect: …)` —
-    /// the [CR#714.2b] "{rN}—[`Instruction`]" spelling, expanding to
+    /// the [CR#715.2b] "{rN}—[`Instruction`]" spelling, expanding to
     /// `OneOrMore(CounterPlaced(kind: LoreCounter, on: Ref(This)))` gated by
     /// `Crossed` at thresholds 1/2/3) against a counter-DOUBLED
     /// 0→2 lore jump arriving as ONE batch fact — chapter I fires

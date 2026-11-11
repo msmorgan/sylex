@@ -56,7 +56,7 @@ impl GameState {
     /// ([CR#611.3b] — statics function only on the battlefield). Effect sources
     /// are read from the CURRENT face's printed abilities — a back-up two-faced
     /// permanent sources its player-static from its BACK face
-    /// ([CR#712.8e]) — flattened the same way the trigger and object-layer
+    /// ([CR#712.6d]) — flattened the same way the trigger and object-layer
     /// scans flatten composites (so a keyword-composite static is visited).
     /// Reading printed (not layer-derived) abilities keeps this cycle-safe;
     /// a `ModifyPlayer` granted by a layer-6 effect is a rare seam.
@@ -251,11 +251,11 @@ mod tests {
         assert_eq!(state.effective_max_hand_size(PlayerId(1)), Some(7));
     }
 
-    /// [Task 5b][CR#712.8e]: a battlefield permanent showing its BACK face
+    /// [Task 5b][CR#712.6d]: a battlefield permanent showing its BACK face
     /// sources its `ModifyPlayer` player-static from the back face. A
     /// transforming DFC whose FRONT carries no player-static and whose BACK
-    /// raises land plays is inert front-up ([CR#712.8d]) and lifts its
-    /// controller to two land plays once back-up ([CR#712.8e]).
+    /// raises land plays is inert front-up ([CR#712.6c]) and lifts its
+    /// controller to two land plays once back-up ([CR#712.6d]).
     #[test]
     fn back_up_permanent_sources_player_static_from_back_face() {
         use sylex_card::Card;
@@ -293,7 +293,7 @@ mod tests {
         state.zones.battlefield.push(id);
 
         // Front-up: the front face carries no player-static — the base one land
-        // play ([CR#712.8d]).
+        // play ([CR#712.6c]).
         assert_eq!(
             state.effective_land_plays_per_turn(PlayerId(0)),
             1,
@@ -303,7 +303,7 @@ mod tests {
         state.objects.obj_mut(id).side = Side::Back;
 
         // Back-up: the back face's Exploration-style static now applies
-        // ([CR#712.8e]).
+        // ([CR#712.6d]).
         assert_eq!(
             state.effective_land_plays_per_turn(PlayerId(0)),
             2,

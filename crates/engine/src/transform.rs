@@ -12,9 +12,9 @@ use crate::state::GameState;
 /// Whether an instruction to transform `object` actually does anything
 /// ([CR#701.27a]). Only a battlefield permanent whose CARD is a Transforming
 /// two-faced card, and whose destination face is not an instant/sorcery
-/// ([CR#701.27d]), transforms; every other case is a silent no-op (fizzle,
+/// ([CR#701.27e]), transforms; every other case is a silent no-op (fizzle,
 /// never panic). The Transforming-DFC test is on the backing CARD, not on the
-/// object's (possibly copied) characteristics ([CR#701.27c,712.9] — a Clone of
+/// object's (possibly copied) characteristics ([CR#701.27d,712.7] — a Clone of
 /// a DFC's face is not itself a DFC and can't transform).
 #[must_use]
 pub(crate) fn transform_legal(state: &GameState, object: ObjectId) -> bool {
@@ -29,7 +29,7 @@ pub(crate) fn transform_legal(state: &GameState, object: ObjectId) -> bool {
     let Some(card_id) = obj.card_id() else {
         return false;
     };
-    // [CR#701.27c,712.9]: only a transforming two-faced CARD transforms.
+    // [CR#701.27d,712.7]: only a transforming two-faced CARD transforms.
     let Card::DoubleFaced {
         layout: DoubleFacedLayout::Transforming,
         front,
@@ -38,7 +38,7 @@ pub(crate) fn transform_legal(state: &GameState, object: ObjectId) -> bool {
     else {
         return false;
     };
-    // [CR#701.27d]: nothing happens if the destination face is instant/sorcery.
+    // [CR#701.27e]: nothing happens if the destination face is instant/sorcery.
     let dest = match obj.side {
         Side::Front => back,
         Side::Back => front,

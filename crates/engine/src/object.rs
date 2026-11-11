@@ -80,17 +80,17 @@ pub struct CardInstance {
     /// `is_object_class` reports `Emblem` so every card/type/permanent
     /// filter excludes it.
     pub is_emblem: bool,
-    /// Base copiable values for the FRONT face ([CR#712.8d]) — the face every
-    /// object presents off the battlefield ([CR#712.8a]) and the default on it.
+    /// Base copiable values for the FRONT face ([CR#712.6c]) — the face every
+    /// object presents off the battlefield ([CR#712.6a]) and the default on it.
     pub(crate) front: FaceCache,
     /// Present only for `Card::DoubleFaced` — the back face's base values
-    /// ([CR#712.8e]).
+    /// ([CR#712.6d]).
     pub(crate) back: Option<FaceCache>,
 }
 
 impl CardInstance {
     /// The base cache for the given face — back only when this is a two-faced
-    /// card and `Side::Back` is requested, else front ([CR#712.8d,712.8e]).
+    /// card and `Side::Back` is requested, else front ([CR#712.6c,712.6d]).
     pub(crate) fn face_cache(&self, side: crate::object::Side) -> &FaceCache {
         match (side, &self.back) {
             (crate::object::Side::Back, Some(back)) => back,
@@ -237,7 +237,7 @@ pub enum ObjectSource {
 }
 
 /// Which face of a double-faced card a battlefield permanent currently shows
-/// ([CR#712.8d,712.8e]). Meaningful only for a `Card::DoubleFaced { layout:
+/// ([CR#712.6c,712.6d]). Meaningful only for a `Card::DoubleFaced { layout:
 /// DoubleFacedLayout::Transforming, .. }` on the battlefield; every other
 /// object stays `Front`.
 /// Distinct from the morph `status::Face { Up, Down }` — that is face-up vs
@@ -314,9 +314,9 @@ pub struct GameObject {
     /// attachment becomes unattached ([CR#701.3d]) — `mint` always sets it
     /// `None`, and a zone change remints a fresh object.
     pub attached_to: Option<ObjectId>,
-    /// The face this permanent currently shows ([CR#712.18]: a transform does
+    /// The face this permanent currently shows ([CR#712.15]: a transform does
     /// not remint, so this persists across a flip; a zone change remints and it
-    /// resets to `Front`, [CR#712.14]). Meaningful only on the battlefield.
+    /// resets to `Front`, [CR#712.11]). Meaningful only on the battlefield.
     pub side: Side,
     /// `None` for a player proxy.
     pub zone: Option<Zone>,
@@ -574,7 +574,7 @@ mod tests {
         assert_eq!(
             store.obj(id).side,
             Side::Front,
-            "objects enter Front-face-up [CR#712.14]"
+            "objects enter Front-face-up [CR#712.11]"
         );
     }
 }

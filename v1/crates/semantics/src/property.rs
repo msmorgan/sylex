@@ -12,12 +12,12 @@ use crate::Reference;
 use crate::ability::Ability;
 
 /// What bearing a subtype or counter confers on objects that have it
-/// ([CR#305.6,714.3a,714.3c,714.4,704.5m,122.1]), typed by execution flavor so
+/// ([CR#305.6,715.3a,715.3c,715.4,704.5m,122.1]), typed by execution flavor so
 /// each piece gets the right semantics.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Expand, Serialize)]
 pub enum Property {
     /// Joins ability derivation like printed text: layer-6-strippable,
-    /// stack-using if triggered ([CR#305.6,714.3a]). Boxed like
+    /// stack-using if triggered ([CR#305.6,715.3a]). Boxed like
     /// `Modification::GainAbility`; serde keeps the RON flat.
     Ability(Arc<Ability>),
     /// A continuous effect ([CR#611]) — the "boost" flavor. Applied at the
@@ -32,14 +32,14 @@ pub enum Property {
     Continuous(Reference, Modification),
     /// A subtype-derived state-based action, checked in the engine's
     /// [CR#704.3] sweep — no stack, no response window. The Saga sacrifice
-    /// ([CR#714.4]) and the Aura attachment check ([CR#704.5m]) are the
+    /// ([CR#715.4]) and the Aura attachment check ([CR#704.5m]) are the
     /// canonical instances. Parses today; the engine executes it in
     /// stage 3.
     StateBased {
         condition: Arc<Condition>,
         effect: Arc<OneShotEffect>,
     },
-    /// Executed as a turn-based action — no stack ([CR#714.3c]). Parses
+    /// Executed as a turn-based action — no stack ([CR#715.3c]). Parses
     /// today; the engine executes it in stage 3.
     TurnBased {
         at: PhaseStep,

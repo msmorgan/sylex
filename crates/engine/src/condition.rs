@@ -158,18 +158,18 @@ impl GameState {
                     .any(|view| self.eval(event, view, crate::eval::Lane::History, &bindings))
             }
 
-            // [CR#714.2b]: "the total was less than N and became at least N"
+            // [CR#715.2b]: "the total was less than N and became at least N"
             // — read off the firing counter fact's before/after channel
             // (never recomputed; `value` is the checker's tie to that
             // antecedent). A doubled 0→2 placement is ONE fact whose
             // crossing satisfies both a threshold of 1 and of 2. A range
-            // ([CR#714.2c]) lists more than one threshold; the gate holds if
+            // ([CR#715.2c]) lists more than one threshold; the gate holds if
             // the fact carried the count across ANY of them.
             Condition::Crossed { thresholds, .. } => {
                 let Some((before, after)) = self.activation_crossed(frame.activation) else {
                     todo!(
                         "engine seam: Crossed evaluated with no before/after channel in the frame \
-                         ([CR#714.2b]) — only the Chapter trigger gate threads one; \
+                         ([CR#715.2b]) — only the Chapter trigger gate threads one; \
                          owner: engine-crossed-channel-scope"
                     )
                 };

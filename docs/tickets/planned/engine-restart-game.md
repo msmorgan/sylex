@@ -7,7 +7,7 @@ needs: []
 
 Karn Liberated's "−14: Restart the game, leaving in exile all non-Aura permanent cards exiled with
 Karn. Then put those cards onto the battlefield under your control." is the only way to restart a
-game [CR#727.1]. Core's `Action::RestartGame` is nullary, so it cannot name exempted cards, and
+game [CR#728.1]. Core's `Action::RestartGame` is nullary, so it cannot name exempted cards, and
 its engine arm in `crates/engine/src/resolve/player_action.rs` is a `todo!`. The engine also does
 not track which cards were exiled with a given source; `.syl` spells that link as `exiledWith`.
 
@@ -17,11 +17,11 @@ not track which cards were exiled with a given source; `.syl` spells that link a
   [CR#607.2a] well enough to select it.
 - Restarting ends the current game with no winner, loser or draw, and starts a new one with every
   card involved in the old game, phased-out permanents included, except the exempted cards.
-  Ownership is unchanged [CR#727.1,727.2,727.5].
+  Ownership is unchanged [CR#728.1,728.2,728.5].
 - The new game follows the start-of-game procedure, with the restarting effect's controller as
-  the starting player [CR#727.1a].
+  the starting player [CR#728.1a].
 - The rest of the restarting effect runs just before the first turn's untap step with no player
-  holding priority. Its triggers wait for the first priority [CR#727.4].
+  holding priority. Its triggers wait for the first priority [CR#728.4].
 - A Karn Liberated test: an exiled non-Aura permanent card ends up on the battlefield under Karn's
   controller in the new game, and an exiled Aura card does not stay in exile.
 

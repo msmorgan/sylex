@@ -7,7 +7,7 @@ needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-module
 ## Why
 
 38 Vintage-legal cards venture into the dungeon, and the initiative has two inherent
-triggers that venture into Undercity [CR#726.2]. `.syl` has no venture action and no dungeon card,
+triggers that venture into Undercity [CR#727.2]. `.syl` has no venture action and no dungeon card,
 so `designation/initiative.syl` carries only its third ability.
 
 Written against the surface (`cleanup-step6-surface`).
@@ -28,7 +28,7 @@ Written against the surface (`cleanup-step6-surface`).
   command zone [CR#309.2b].
 - The bottommost-room state-based action is a rules row [CR#309.6], and completing a dungeon is
   that card's removal from the game [CR#309.7].
-- `initiative.syl` carries all three inherent abilities [CR#726.2], and its comment about the
+- `initiative.syl` carries all three inherent abilities [CR#727.2], and its comment about the
   missing two is gone.
 - At least one venturing card is in canon.
 - Declaration order stays the printed order (`syl.md` §5).

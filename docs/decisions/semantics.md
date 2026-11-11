@@ -321,7 +321,7 @@ Event decisions:
 - **Damage with no kind written** is the effect's own noncombat damage in an instruction, and all
   damage in a pattern ([CR#120.2b]).
 - **A counter or die pattern watches its written amount.** `1` matches each occurrence; `anyAmount`
-  matches the event ([CR#603.2c,714.2b]).
+  matches the event ([CR#603.2c,715.2b]).
 - **Pattern-only heads.** `gainControlOf` is a pattern head only; performed control change is
   `establish(controlGrant(…))` ([CR#613.1b]). `anyCost` and `anyBallot` likewise appear only in
   patterns.
@@ -410,7 +410,7 @@ Event decisions:
   - `alongside`: as part of the event; "enters with" ([CR#603.6d]).
   - `withRiders`: the entering happens with Entry Riders.
 - **Being an effect follows from the enclosing node.** No Action carries an effect flag, so a
-  Saga's turn-based lore counter is no effect ([CR#614.16,714.3c]). A performer and a cause are
+  Saga's turn-based lore counter is no effect ([CR#614.16,715.3c]). A performer and a cause are
   independent. `thisEffect`, what a sentence calls "this effect", is found the same way: it is the
   effect of the enclosing spell or ability.
 - **A negative declarative** `doesnt(subj, action)` says what its Subject does not do. It is no

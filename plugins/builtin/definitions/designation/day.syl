@@ -1,5 +1,5 @@
 # Day and night, the designations the game itself holds, exactly one once either is held
-# [CR#731.1].
+# [CR#732.1].
 designation day {
   lexical = {
     nouns = [{lemma = "day", countability = [Mass]}, {lemma = "night", countability = [Mass]}]},

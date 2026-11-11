@@ -190,13 +190,13 @@ pub enum CorpusError {
 
 /// The card names a face's text uses as its own: the face's name and its
 /// card's, in every form [CR#201.5c], and on a meld card the name of its meld
-/// result, whose face is half on that card's back [CR#712.4], which the data
+/// result, whose face is half on that card's back [CR#713.1], which the data
 /// records as the card's `meld_result` part. The meld result's name is in its
 /// Full form alone: it is the name of neither card, so neither card's text
 /// shortens it.
 ///
 /// The faces of a double-faced card are named apart
-/// [CR#712.8d,712.8e,712.8f], and two faces that shorten to one spelling
+/// [CR#712.6c,712.6d,712.6e], and two faces that shorten to one spelling
 /// (*Ral*) name one object, not two, so a face's text shortens its own name.
 #[must_use]
 pub fn own_names(unit: &OracleUnit<'_>) -> CardScope {

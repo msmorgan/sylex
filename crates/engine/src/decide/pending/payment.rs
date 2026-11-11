@@ -6,7 +6,7 @@ use crate::player::ManaActionId;
 use crate::player::PlayerId;
 use crate::state::GameState;
 
-/// The legal [CR#733] sets of activated mana actions that may be reversed
+/// The legal [CR#734] sets of activated mana actions that may be reversed
 /// while abandoning an announcement. Each entry is a complete set; the
 /// engine does not repair an illegal partial answer.
 #[derive(Debug, Clone, PartialEq, Eq)]

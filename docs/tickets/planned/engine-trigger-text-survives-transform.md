@@ -9,7 +9,7 @@ A triggered ability on the stack "has the text of the ability that created it" [
 exists independently of its source [CR#113.7a]. The engine instead stores most printed triggers
 by index (`StackObject::Triggered { ability, created: None }`) and re-reads the body from the
 source with `derive::abilities_of_source`, which is face-aware: a permanent with its back face up
-sources its printed abilities from the back face [CR#712.8e]. Triggers that fire while the back
+sources its printed abilities from the back face [CR#712.6d]. Triggers that fire while the back
 face is up are captured by value (`showing_back` in `trigger.rs`), but a trigger that fires
 front-up and whose source then transforms before it resolves is re-read from the back face's
 list: a different or shorter list, so the read panics or finds the wrong ability.

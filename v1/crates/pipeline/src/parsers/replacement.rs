@@ -408,7 +408,7 @@ mod tests {
     #[test]
     fn enters_with_counters_named_kinds() {
         // Named (non-pip) counter kinds resolve through the same `Counter`
-        // reverse index ([CR#122.1c] shield; [CR#721.2a] charge).
+        // reverse index ([CR#122.1c] shield; [CR#722.2a] charge).
         assert_eq!(
             rep_with_macros("~ enters with a shield counter on it.").as_deref(),
             Some("EntersWithCounters(ShieldCounter, 1)")

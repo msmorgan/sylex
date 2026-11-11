@@ -311,7 +311,7 @@ fn base_values(state: &GameState, id: ObjectId) -> DerivedObject {
     let card = obj.card_id().expect("card-backed object");
     let instance = state.cards.get(card);
     // The object's CURRENT face and its matching precomputed cache
-    // ([CR#712.8d,712.8e]): a back-up two-faced permanent derives from its
+    // ([CR#712.6c,712.6d]): a back-up two-faced permanent derives from its
     // back face.
     let face = crate::derive::face_of(state, id);
     let cache = instance.face_cache(obj.side);
@@ -1289,7 +1289,7 @@ fn eval_stat_of(
 }
 
 /// The thresholds `abilities` watch a crossing of — the [`Condition::Crossed`]
-/// intervening-if of each triggered ability ([CR#714.2b]). [CR#714.2d]'s final
+/// intervening-if of each triggered ability ([CR#715.2b]). [CR#715.2d]'s final
 /// chapter number is the greatest of them.
 pub(crate) fn watched_thresholds(abilities: &[Ability]) -> impl Iterator<Item = &Count> {
     abilities
@@ -1430,7 +1430,7 @@ fn eval_count(
                 .and_then(|o| o.counters.get(kind.as_str()).copied())
                 .map_or(0, |c| Int::try_from(c).expect("counter count fits Int"))
         }
-        // [CR#714.2d]: the greatest chapter number among the object's own
+        // [CR#715.2d]: the greatest chapter number among the object's own
         // abilities, read off the derivation in progress so a stripped chapter
         // ([CR#613.1f]) stops counting. 0 when nothing watches a crossing.
         Count::GreatestWatchedThreshold(reference) => {
@@ -3245,7 +3245,7 @@ mod tests {
     }
 
     /// engine-transform: a permanent's base characteristics reflect its CURRENT
-    /// face ([CR#712.8d,712.8e]). A hand-authored transforming DFC shows FRONT
+    /// face ([CR#712.6c,712.6d]). A hand-authored transforming DFC shows FRONT
     /// P/T while `Side::Front`, and BACK P/T once its `side` flips to `Back`
     /// (driven directly here; Task 5 makes `Transform` set it).
     #[test]
@@ -3289,12 +3289,12 @@ mod tests {
         assert_eq!(
             state.layers().power(id),
             Some(1),
-            "front-up shows front P [CR#712.8d]"
+            "front-up shows front P [CR#712.6c]"
         );
 
         state.objects.obj_mut(id).side = Side::Back;
         let view = state.layers();
-        assert_eq!(view.power(id), Some(3), "back-up shows back P [CR#712.8e]");
+        assert_eq!(view.power(id), Some(3), "back-up shows back P [CR#712.6d]");
         assert_eq!(view.toughness(id), Some(2), "back-up shows back T");
     }
 

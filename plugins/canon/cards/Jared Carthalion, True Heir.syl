@@ -1,5 +1,5 @@
 # Jared Carthalion, True Heir: "You can't become the monarch this turn" is a prohibition over
-# `gainDesignation`, an event head [CR#101.2,725.1].
+# `gainDesignation`, an event head [CR#101.2,726.1].
 card singleFaced({
     name = "Jared Carthalion, True Heir",
     cost = [pip(red), pip(green), pip(white)],

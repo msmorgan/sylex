@@ -11,8 +11,8 @@ the player-scope flag: it records the player and emits `GotDesignation`, and doe
 designation only one player can hold or one that a permanent holds. Five mechanics need what is
 missing:
 
-- **Single holder with eviction**: only one player is the monarch [CR#725.3] or has the initiative
-  [CR#726.3]; as a player gains it, the current holder loses it.
+- **Single holder with eviction**: only one player is the monarch [CR#726.3] or has the initiative
+  [CR#727.3]; as a player gains it, the current holder loses it.
 - **Object scope**: goaded [CR#701.15b] and suspected [CR#701.60b] are designations a permanent
   has. The engine's `DesignationStore.objects` already stores per-object instances, and
   `Designated(name)` filter reads are live against it, but nothing grants into it.

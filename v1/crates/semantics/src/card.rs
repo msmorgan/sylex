@@ -49,7 +49,7 @@ pub struct CardFace {
 }
 
 /// How a two-faced card's faces are arranged. The layouts share ONE card shape
-/// (two full faces, [CR#712.8] — each face has its own characteristics); what
+/// (two full faces, [CR#712.6] — each face has its own characteristics); what
 /// differs per layout — transforming, casting either face, casting halves, the
 /// adventure exile state, flipping — is the engine's job, not the grammar's.
 /// Single-faced "layouts" (saga, class, leveler, …) are NOT here: their
@@ -63,7 +63,7 @@ pub enum FaceLayout {
     /// A split card — two halves on one face ([CR#709.1]).
     Split,
     /// An adventurer card — a permanent face with an Adventure spell face
-    /// ([CR#715.1]).
+    /// ([CR#716.1]).
     Adventure,
     /// A Kamigawa-style flip card — one card, flipped half ([CR#710.1]).
     Flip,
@@ -83,7 +83,7 @@ pub enum Card {
     Normal(CardFace),
     /// A TWO-faced card: `front` (the primary/default face) and `back`,
     /// arranged per `layout`. Each face is a full [`CardFace`] with its own
-    /// characteristics ([CR#712.8]).
+    /// characteristics ([CR#712.6]).
     TwoFaced {
         layout: FaceLayout,
         front: CardFace,

@@ -518,7 +518,7 @@ pub enum EventFilter {
     /// "becomes goaded" — `of` matches the gaining carrier (player proxy or
     /// object). `to` narrows an enum designation's new value; game-scope
     /// day/night is `DesignationChanged(name: "DayNight", to: "Day")`
-    /// ([CR#731.1]).
+    /// ([CR#732.1]).
     DesignationChanged {
         name: Ident,
         #[serde(default = "Predicate::any")]

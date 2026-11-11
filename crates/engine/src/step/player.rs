@@ -97,7 +97,7 @@ impl EventApply for CounterPlaced {
     // and DROPS the key, so an absent kind reads as zero everywhere
     // (the layer-7c P/T read, `HasCounter`). The occurred fact
     // carries the carrier's before/after TOTALS, apply-computed —
-    // the [CR#714.2b] `Crossed` reads run off the fact, never a
+    // the [CR#715.2b] `Crossed` reads run off the fact, never a
     // post-hoc map read.
     fn apply(&self, g: &mut GameState) -> Option<GameEvent> {
         let entry = g
@@ -177,7 +177,7 @@ pub(crate) fn handle_untapped(g: &mut GameState, id: ObjectId) -> Option<GameEve
 }
 
 /// `Transformed` carries a bare `ObjectId` (like `Untapped`); apply toggles
-/// the object's face in place ([CR#712.18] — no remint).
+/// the object's face in place ([CR#712.15] — no remint).
 pub(crate) fn handle_transformed(g: &mut GameState, id: ObjectId) -> Option<GameEvent> {
     let obj = g.objects.obj_mut(id);
     obj.side = match obj.side {

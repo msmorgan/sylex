@@ -1,4 +1,4 @@
-// [CR#714.2c]: one `Chapter` atom carries multiple literal thresholds so the
+// [CR#715.2c]: one `Chapter` atom carries multiple literal thresholds so the
 // shared effect renders with each chapter marker.
 Normal(
     name: "Test Saga Range",

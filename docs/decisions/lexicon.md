@@ -141,11 +141,11 @@ term are a second tree of its analysis ([English](english.md) §8).
 ## 6. Names and notation
 
 **Names are scoped.** A card's own name, full or Shortened, is its own only in
-the text of its own face [CR#201.5,201.5c,712.8d..712.8f], and everywhere in
+the text of its own face [CR#201.5,201.5c,712.6c..712.6e], and everywhere in
 that text. The name of a meld result is also own on both cards of its meld
-pair, since each carries half of its face on its back [CR#712.4], as the card
+pair, since each carries half of its face on its back [CR#713.1], as the card
 data records for each: the text of the card with the meld ability melds the
-pair into it by name [CR#712.4a], and its partner's text never names it. Only
+pair into it by name [CR#713.1a], and its partner's text never names it. Only
 its Full form is in scope there: it is the name of neither card, so neither
 card's text shortens it, and *Mishra* on Phyrexian Dragon Engine is no name. A
 card has a Shortened Name only where its own text uses one, and never one that

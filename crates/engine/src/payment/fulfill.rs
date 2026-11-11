@@ -810,7 +810,7 @@ impl GameState {
     /// spend its register; the next non-action IOU begins another payment
     /// block. The projection is discarded whether the check succeeds or
     /// fails, so no cost mutation or random observation escapes preflight
-    /// ([CR#601.2h,733.1]).
+    /// ([CR#601.2h,734.1]).
     fn preflight_decision_body(
         &mut self,
         outstanding: &[PaymentIou],

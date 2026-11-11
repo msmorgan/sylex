@@ -6,7 +6,7 @@ needs: [engine-transform]
 ## Why
 
 A double-faced permanent with its back face up has only its back face's characteristics, except
-that its mana value uses the front face's mana cost [CR#712.8e]. `engine-transform` made
+that its mana value uses the front face's mana cost [CR#712.6d]. `engine-transform` made
 `base_values`, `abilities_of_source` and the player statics read the current face
 (`derive::face_of`), but other battlefield reads still use `derive::face`, which is always the
 front face:
@@ -41,7 +41,7 @@ exercises these reads.
   enters with the original's side up [CR#707.8,707.8a]. For example, Cackling Counterpart on a
   transformed Delver of Secrets makes a double-faced token, back face up.
 - Reads off the battlefield and off the stack, cast-time reads and mana value stay on the front
-  face [CR#712.8a,712.8e].
+  face [CR#712.6a,712.6d].
 - Tests cover each read with a back-face-up permanent: a real double-faced card, or a minimal
   repro derived from one.
 

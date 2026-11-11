@@ -6,7 +6,7 @@ needs: []
 ## Why
 
 `Condition::Crossed` ("if the number of lore counters on it was less than N and became at least N",
-[CR#714.2b]) reads the before/after counts that the firing counter-placement fact puts in the
+[CR#715.2b]) reads the before/after counts that the firing counter-placement fact puts in the
 frame. Only a Saga chapter's intervening-if condition supplies that channel, at both the printed
 and the delayed trigger gate and again at resolution, and that path works. Every other
 `condition_holds` caller builds a frame with no channel: an activated ability's "Activate only if"

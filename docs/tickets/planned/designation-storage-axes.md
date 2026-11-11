@@ -11,7 +11,7 @@ core's `DesignationDef::Stored` (`crates/core/src/designation.rs`). `.syl` desig
 `scope` and, for the monarch and the initiative, `sole = true`, so a Ring-bearer's uniqueness for
 each controller, day and night excluding each other, and saddled lasting until end of turn are
 stated nowhere a reader of `.syl` can see. Either the declarations carry these values, because
-something reading `.syl` needs them (holder eviction [CR#725.3,726.3,701.54a,310.9f]), or they are
+something reading `.syl` needs them (holder eviction [CR#726.3,727.3,701.54a,310.9f]), or they are
 engine-only state that lowering supplies.
 
 The values, wherever they come to live:
@@ -61,12 +61,12 @@ Rows core's axes cannot state yet:
 - `DesignationShape::Relation` ("A relation to another object") has no user: no designation links
   two objects. It goes.
 - `day` and `night` are two designations, and once the game has one it has exactly one of them
-  from then on [CR#731.1]. PerGame uniqueness does not state that they exclude each other.
+  from then on [CR#732.1]. PerGame uniqueness does not state that they exclude each other.
 - `PerPlayer` meant "each player may hold one" for citysBlessing and enduringStory and "at most one
   object for each player" for ringBearer. Any number of players may hold the city's blessing or an
   enduring story [CR#702.131c,702.195b], so those rows are None; the per-controller limit is
   ringBearer's alone.
-- `level` reads as 1 on a permanent without one [CR#716.2d]; Number has no default.
+- `level` reads as 1 on a permanent without one [CR#717.2d]; Number has no default.
 
 ## Open questions
 

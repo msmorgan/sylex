@@ -259,7 +259,7 @@ impl GameState {
                         .unwrap_or(0),
                 }
             }
-            // [CR#714.2d]: the greatest chapter number among the referenced
+            // [CR#715.2d]: the greatest chapter number among the referenced
             // object's DERIVED abilities — a stripped chapter ([CR#613.1f])
             // stops counting. 0 when nothing watches a crossing.
             Count::GreatestWatchedThreshold(reference) => self

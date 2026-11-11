@@ -136,10 +136,10 @@ pub enum Action {
     /// part of the verb.
     Counter(Reference),
     /// Turn a transforming double-faced permanent to its other face
-    /// ([CR#701.27a]). No-op on a non-DFC permanent ([CR#701.27c]) or when the
-    /// destination face is an instant/sorcery ([CR#701.27d]). Convert
+    /// ([CR#701.27a]). No-op on a non-DFC permanent ([CR#701.27d]) or when the
+    /// destination face is an instant/sorcery ([CR#701.27e]). Convert
     /// ([CR#701.28a]) is the same operation. Identity is preserved — a
-    /// transform does not remint ([CR#712.18]).
+    /// transform does not remint ([CR#712.15]).
     Transform(Reference),
     /// The referenced object ceases to exist ([CR#704.5d,707.10a]) — no zone
     /// move, no card left behind. Today the only reachable target is a
@@ -342,7 +342,7 @@ pub enum Action {
     GetDesignation(Reference, crate::Ident),
     /// Set a GAME-scope enum designation to the named value. Day/night is the
     /// founding consumer: `SetGameDesignation("DayNight", "Day")` replaces
-    /// the mechanic-specific `BecomeDay` action ([CR#731.1]). Both names are
+    /// the mechanic-specific `BecomeDay` action ([CR#732.1]). Both names are
     /// open vocabulary backed by a [`crate::DesignationDecl`]; this primitive
     /// is not specific to day/night.
     SetGameDesignation(crate::Ident, crate::Ident),
@@ -446,14 +446,14 @@ pub enum Action {
     /// suppressed by a matching `CantLose` outcome gate. A player who
     /// would win and lose simultaneously loses ([CR#104.3f]).
     LoseGame(Reference),
-    /// Restart the game ([CR#727.1]) — a TERMINAL with explicit carryover
-    /// (every card involved comes along, ownership unchanged [CR#727.2];
-    /// effects may exempt cards [CR#727.5]; trailing instructions execute
-    /// just before the new first untap step [CR#727.4]), never a state
-    /// reset. Slotless (Law 3): the actor binding IS [CR#727.1a] — the
+    /// Restart the game ([CR#728.1]) — a TERMINAL with explicit carryover
+    /// (every card involved comes along, ownership unchanged [CR#728.2];
+    /// effects may exempt cards [CR#728.5]; trailing instructions execute
+    /// just before the new first untap step [CR#728.4]), never a state
+    /// reset. Slotless (Law 3): the actor binding IS [CR#728.1a] — the
     /// restarting effect's controller (cause-context, not a role slot)
     /// starts the new game. The restarted game ends with no winner, loser,
-    /// or draw. Subgames ([CR#729]) are a different, deferred concept (a
+    /// or draw. Subgames ([CR#730]) are a different, deferred concept (a
     /// context push, not a restart).
     RestartGame,
     /// Shuffle a collection ([CR#701.24a]: "to shuffle **a library or a
@@ -463,7 +463,7 @@ pub enum Action {
     /// temporary pile is read through a pile-valued [`Selection::Reg`]. An
     /// INFORMATION event too: order knowledge is destroyed for everyone, and
     /// revealed cards in the library stop being revealed and become new
-    /// objects ([CR#701.20d]). Why library actions never rewind: [CR#733.1].
+    /// objects ([CR#701.20d]). Why library actions never rewind: [CR#734.1].
     Shuffle(Selection),
     /// Reveal the referenced object to all players ([CR#701.20a]); `to` names a
     /// player instead = "look at" — same operation shown to a subset

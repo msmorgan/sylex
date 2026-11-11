@@ -31,7 +31,7 @@ code.
 
 ## Not in scope
 
-Melded and merged permanents [CR#712.21a,730.3a]. The engine represents
+Melded and merged permanents [CR#713.8a,731.3a]. The engine represents
 neither today. When they are added, a melded or merged permanent put into its owner's graveyard
 or library must reach that same arrangement decision.
 

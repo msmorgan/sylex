@@ -15,7 +15,7 @@ Some designations carry an effect by rule, but their `.syl` declarations confer 
   controller of the permanent, spell, or ability that caused it to be goaded if able [CR#701.15b].
 - `prepared`: as a permanent gains the designation, its controller creates a copy in exile with
   only its prepare spell's characteristics, and may cast that copy while the permanent stays
-  prepared [CR#722.3c].
+  prepared [CR#723.3c].
 
 Each states its effect nowhere in `.syl`, so a card that suspects, goads or prepares a creature
 reads as giving it a bare marker. `monarch` and `initiative` already confer theirs.
@@ -24,7 +24,7 @@ reads as giving it a bare marker. `monarch` and `initiative` already confer thei
 
 - How `goaded`'s conferral names the player its creature must attack other than: the controller
   of what caused this goading, one per goader [CR#701.15c].
-- Whether `prepared`'s exile copy [CR#722.3c] is a conferral on the designation or a rule row
+- Whether `prepared`'s exile copy [CR#723.3c] is a conferral on the designation or a rule row
   under `plugins/builtin/rules/`.
 
 ## Done when
@@ -38,7 +38,7 @@ reads as giving it a bare marker. `monarch` and `initiative` already confer thei
 ## Not in scope
 
 - The preparation mechanic beyond the `prepared` designation's own conferral: preparation cards'
-  inset prepare spells and their other rules [CR#722].
+  inset prepare spells and their other rules [CR#723].
 - The engine side of goad: evaluating the attack requirement (`engine-combat-requirements`) and
   storing one goaded instance per goader with its own duration (`designation-storage-axes`).
 

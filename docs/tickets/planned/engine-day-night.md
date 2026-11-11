@@ -6,7 +6,7 @@ needs: [engine-transform, engine-trigger-text-survives-transform, engine-transfo
 ## Why
 
 Day and night are designations the game itself holds. The game starts with neither, and once one
-is held it always holds exactly one [CR#731.1]. About 50 Vintage-legal cards read or change day
+is held it always holds exactly one [CR#732.1]. About 50 Vintage-legal cards read or change day
 and night; 35 of them have daybound. Core can already change the designation and watch it:
 `Action::SetGameDesignation("DayNight", "Day")` writes `DesignationStore.game` as
 `DesignationValue::Mode`, and the `EventFilter::DesignationChanged { name, to }` trigger filter
@@ -16,9 +16,9 @@ the rest:
 
 - **A game-scope read.** `StatePredicate::Designated` evaluates only object and player
   designations (`crates/engine/src/target.rs`), so "if it's night" cannot be read.
-- **The untap-step check** [CR#502.2,731.2]: if it's day and the previous turn's active player
+- **The untap-step check** [CR#502.2,732.2]: if it's day and the previous turn's active player
   cast no spells, it becomes night. If it's night and they cast two or more, it becomes day. If
-  it's neither, no check happens [CR#731.2c]. This is a turn-based action the engine performs.
+  it's neither, no check happens [CR#732.2c]. This is a turn-based action the engine performs.
 - **Daybound and nightbound.** Their statics [CR#702.145b,702.145e]: a daybound permanent enters
   transformed at night; "as it becomes night/day", a permanent with the matching face up
   transforms; and it can't transform except through its own keyword. The keywords also have

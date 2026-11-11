@@ -123,7 +123,7 @@ it needs from the instances is read through what each instance publishes, as tox
   ten-counter loss is open on `syl-counter-conferrals`.
 - Goad's per-goader storage [CR#701.15c]: one goaded instance per goader is the engine's
   (`designation-storage-axes`), not a multiplicity of `confers` or `rules`.
-- `prepared`'s exile copy [CR#722.3c]: whether it is a conferral or a row is open on
+- `prepared`'s exile copy [CR#723.3c]: whether it is a conferral or a row is open on
   `syl-designation-conferrals`.
 - Companion's pregame timing word: the word for "before the game begins" is
   `syl-companion-pregame-rule`'s; that its row is scoped to players is not.

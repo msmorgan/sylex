@@ -31,16 +31,16 @@
     // "left half unlocked" and "right half unlocked" are the unlocked designations;
     // Oracle names them by the adjective ("unlocked doors").
     (rule: "[CR#709.5c]", name: "Unlocked", adjectives: ["unlocked"]),
-    // The indexed Class header uses this noun with a numeral [CR#716.2a].
-    (rule: "[CR#716.2b]", name: "Level", nouns: [(lemma: "level", parameters: [[Head, Slot(Amount)]])]),
-    (rule: "[CR#719.3b]", name: "Solved", adjectives: ["solved"]),
-    // "unprepared" is the lost state [CR#722.3b].
-    (rule: "[CR#722.3a]", name: "Prepared", adjectives: ["prepared", "unprepared"]),
-    (rule: "[CR#725.1]", name: "Monarch", nouns: ["monarch"]),
-    (rule: "[CR#726.1]", name: "Initiative", nouns: ["initiative"]),
+    // The indexed Class header uses this noun with a numeral [CR#717.2a].
+    (rule: "[CR#717.2b]", name: "Level", nouns: [(lemma: "level", parameters: [[Head, Slot(Amount)]])]),
+    (rule: "[CR#720.3b]", name: "Solved", adjectives: ["solved"]),
+    // "unprepared" is the lost state [CR#723.3b].
+    (rule: "[CR#723.3a]", name: "Prepared", adjectives: ["prepared", "unprepared"]),
+    (rule: "[CR#726.1]", name: "Monarch", nouns: ["monarch"]),
+    (rule: "[CR#727.1]", name: "Initiative", nouns: ["initiative"]),
     // Day and night are uncountable: "it becomes day".
     (
-        rule: "[CR#731.1]",
+        rule: "[CR#732.1]",
         name: "Day and night",
         nouns: [
             (lemma: "day", countability: [Mass]),

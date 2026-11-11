@@ -349,7 +349,7 @@ fn named_quantity_macros_expand_to_range() {
 
 /// The open-vocabulary REGISTRIES load as plugin data with their dependent
 /// index columns: counter rows carry `scope` ([CR#122.1,122.1f]),
-/// designation rows their `Stored` scope ([CR#725.1] Monarch on players,
+/// designation rows their `Stored` scope ([CR#726.1] Monarch on players,
 /// [CR#903.3] Commander on cards), and every `KeywordAbility`-kind macro
 /// derives a `KeywordDecl` whose `ParamShape` mirrors its typed parameter
 /// signature ([CR#702] keyword one-liners).
@@ -540,8 +540,8 @@ fn wave_macros_expand_to_their_blessed_bodies() {
         "a multikicker cost IS a kicker cost ([CR#702.33c])"
     );
 
-    // Chapter — sagas as data ([CR#714.2b]): OneOrMore + Crossed, a plain
-    // REMOVABLE triggered ability (NOT Innate: [CR#714.2d] contemplates a
+    // Chapter — sagas as data ([CR#715.2b]): OneOrMore + Crossed, a plain
+    // REMOVABLE triggered ability (NOT Innate: [CR#715.2d] contemplates a
     // Saga that has lost its chapter abilities, so they cannot be innate).
     let semantic: sylex_semantics_v1::Ability = plugin
         .macros
@@ -549,14 +549,14 @@ fn wave_macros_expand_to_their_blessed_bodies() {
         .unwrap();
     let chapter: Ability = semantic.lower();
     let Ability::Triggered(t) = &chapter else {
-        panic!("a chapter is a plain removable triggered ability ([CR#714.2,714.2d])");
+        panic!("a chapter is a plain removable triggered ability ([CR#715.2,715.2d])");
     };
     assert!(
         matches!(&t.event, sylex_core::EventFilter::OneOrMore(_)),
         "one occurrence per placement batch ([CR#603.2c])"
     );
     let Some(sylex_core::Condition::Crossed { thresholds, .. }) = &t.condition else {
-        panic!("the [CR#714.2b] was-less-than/became-at-least gate");
+        panic!("the [CR#715.2b] was-less-than/became-at-least gate");
     };
     assert_eq!(
         thresholds,
@@ -565,7 +565,7 @@ fn wave_macros_expand_to_their_blessed_bodies() {
     );
 }
 
-/// A chapter RANGE `{rN1}, {rN2}—[Effect]` ([CR#714.2c]) is ONE `Chapter`
+/// A chapter RANGE `{rN1}, {rN2}—[Effect]` ([CR#715.2c]) is ONE `Chapter`
 /// atom with a multi-number `n`, expanding to a single removable triggered
 /// ability whose `Crossed` gate lists every chapter number.
 #[test]
@@ -577,10 +577,10 @@ fn chapter_range_expands_to_plural_thresholds() {
         .unwrap();
     let chapter: Ability = semantic.lower();
     let Ability::Triggered(t) = &chapter else {
-        panic!("a chapter is a plain removable triggered ability ([CR#714.2,714.2d])");
+        panic!("a chapter is a plain removable triggered ability ([CR#715.2,715.2d])");
     };
     let Some(sylex_core::Condition::Crossed { thresholds, .. }) = &t.condition else {
-        panic!("the [CR#714.2b] crossing gate");
+        panic!("the [CR#715.2b] crossing gate");
     };
     assert_eq!(
         thresholds,
@@ -588,7 +588,7 @@ fn chapter_range_expands_to_plural_thresholds() {
             sylex_core::Count::Literal(2),
             sylex_core::Count::Literal(3)
         ]),
-        "a range lists every chapter number ([CR#714.2c])"
+        "a range lists every chapter number ([CR#715.2c])"
     );
 }
 

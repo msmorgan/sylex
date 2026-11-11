@@ -7,9 +7,9 @@ needs: [cleanup-step6-surface]
 ## Why
 
 `cast`'s and `play`'s `payment` (sort `PlayPayment`) holds the characteristics a spell is cast
-with: `faceDown(spec, cost)` (morph, megamorph, disguise), `prototyped` [CR#718.3],
+with: `faceDown(spec, cost)` (morph, megamorph, disguise), `prototyped` [CR#719.3],
 `fused` [CR#702.102a], `transformedPaying(cost)` and its Template `convertedPaying` (disturb,
-more than meets the eye) [CR#712.8c]. Two of them also carry the alternative cost they are paid
+more than meets the eye) [CR#712.6b]. Two of them also carry the alternative cost they are paid
 with, which `cast`'s `altCost` slot holds for every other cast, so a cast characteristic and an
 alternative cost are written two ways. A term can write `payment = faceDown(spec, cost)` together
 with `altCost = …`, two alternative costs on one spell, which [CR#118.9a] forbids; no term in

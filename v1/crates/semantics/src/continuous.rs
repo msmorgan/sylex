@@ -401,7 +401,7 @@ pub enum StaticEffect {
     /// part of the SBA sweep. The Aura must-be-attached rule ([CR#704.5m]) is
     /// `Sba { when: Not(LegallyAttached(Ref(This))), then: Move(Ref(This),
     /// Graveyard) }`; the universal SBA-as-data primitive generalizes (a Saga's
-    /// [CR#714.4] sacrifice is `Sba(lore≥final, Sacrifice(Ref(This)))`). The
+    /// [CR#715.4] sacrifice is `Sba(lore≥final, Sacrifice(Ref(This)))`). The
     /// SBA sweep reads these statics generically — it never branches on the
     /// Aura/Equipment/Fortification subtype. `then` is boxed (an
     /// `OneShotEffect` dominates `StaticEffect`'s size; `Box` only for the

@@ -2,7 +2,7 @@
 # life loss damage dealt to you causes, not a replacement, since nothing happens instead
 # [CR#120.3a,614.1a]. The damage is still dealt and its other results still happen, so combat
 # damage still makes its creature's controller the monarch, which the reminder text says
-# [CR#120.3f,725.2].
+# [CR#120.3f,726.2].
 card singleFaced({
     name = "Archon of Coronation",
     cost = [generic(4), pip(white), pip(white)],

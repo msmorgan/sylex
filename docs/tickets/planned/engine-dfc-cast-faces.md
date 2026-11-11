@@ -13,15 +13,15 @@ distinguish the two kinds (`DoubleFacedLayout::{Transforming, ModalDfc}`; `card 
 cast-time face:
 
 - **Modal double-faced cards** (98 Vintage-legal). The player chooses which face to cast before
-  putting it on the stack [CR#712.11b]. Only that face is evaluated for castability and only it is
-  put on the stack [CR#712.11c]. Playing one as a land chooses a land face, and it enters with that
-  face up [CR#712.12]. The Pathway lands are the witnesses: their back face is a land too.
+  putting it on the stack [CR#712.8b]. Only that face is evaluated for castability and only it is
+  put on the stack [CR#712.8c]. Playing one as a land chooses a land face, and it enters with that
+  face up [CR#712.9]. The Pathway lands are the witnesses: their back face is a land too.
 - **Casting a nonmodal card "transformed" or "converted"**, for example the `transformedPaying`
-  play payment ([CR#712.8c,702.146a], disturb) or a defeated Siege cast transformed (`engine-battles`). The spell is put on the
-  stack back face up [CR#712.11a] with only the back face's characteristics, and its mana value
-  comes from the front face's mana cost [CR#712.8c].
+  play payment ([CR#712.6b,702.146a], disturb) or a defeated Siege cast transformed (`engine-battles`). The spell is put on the
+  stack back face up [CR#712.8a] with only the back face's characteristics, and its mana value
+  comes from the front face's mana cost [CR#712.6b].
 
-A resolving double-faced spell enters with the face that was up on the stack [CR#712.13].
+A resolving double-faced spell enters with the face that was up on the stack [CR#712.10].
 
 ## Done when
 

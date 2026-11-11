@@ -1,6 +1,6 @@
-// [CR#714]: a Saga. The [Saga] subtype confers the enters-with-lore-counter
-// ([CR#714.3a]), the turn-based lore increment ([CR#714.3c]) and the
-// final-chapter sacrifice ([CR#714.4]). Chapter thresholds belong to the card.
+// [CR#715]: a Saga. The [Saga] subtype confers the enters-with-lore-counter
+// ([CR#715.3a]), the turn-based lore increment ([CR#715.3c]) and the
+// final-chapter sacrifice ([CR#715.4]). Chapter thresholds belong to the card.
 Normal(
     name: "Test Saga",
     mana_cost: [Generic(1), White],

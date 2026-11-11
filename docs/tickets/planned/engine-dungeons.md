@@ -5,7 +5,7 @@ needs: []
 
 ## Why
 
-Venture into the dungeon [CR#701.49], the initiative [CR#726.2] and "if you've completed a
+Venture into the dungeon [CR#701.49], the initiative [CR#727.2] and "if you've completed a
 dungeon" all need engine state that does not exist: no venture-marker position, no dungeon cards
 outside the game, no room abilities, no record of completed dungeons. `Type::Dungeon` exists in
 core and `plugins/builtin/definitions/card_type/dungeon.syl` declares the card type, but

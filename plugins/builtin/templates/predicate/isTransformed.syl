@@ -1,6 +1,6 @@
 # A transformed permanent is the whole double-faced permanent with its back face up
-# [CR#701.27g].
-# [CR#701.27g]
+# [CR#701.27h].
+# [CR#701.27h]
 template isTransformed: Predicate {
   spelling = "transformed",
   body = currentFace(back)

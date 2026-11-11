@@ -25,7 +25,7 @@ so their text does not round-trip:
   around the whole replacement instead of inside its would-clause.
 - `onlyUnless` ("<spec> unless <condition>") is written for texts that print no "unless": the
   battle's protector choice ([CR#310.9a] "If it has no battle types, only its controller can be
-  its protector"), the Saga's lore counter ([CR#714.3a] "Each Saga without read ahead"),
+  its protector"), the Saga's lore counter ([CR#715.3a] "Each Saga without read ahead"),
   `foretoldCardCast` ([CR#702.143d] "after the turn it became a foretold card has ended") and
   `plottedCardCast` ([CR#702.170d] "during any turn after the turn in which it became plotted").
 - *Suppression Field* and *Tithe Taker* print "… cost {2} more to activate unless they're mana

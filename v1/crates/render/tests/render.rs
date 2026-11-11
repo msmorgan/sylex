@@ -1275,7 +1275,7 @@ fn renders_enters_with_counters_named_kind() {
 }
 
 /// A Saga's chapter abilities render with their Roman-numeral chapter markers
-/// ([CR#714.2a] — "I", "II", "III") and the em-dash lead, effect rendered
+/// ([CR#715.2a] — "I", "II", "III") and the em-dash lead, effect rendered
 /// structurally.
 #[test]
 fn renders_saga_chapter_roman_markers() {
@@ -1297,7 +1297,7 @@ fn renders_saga_chapter_roman_markers() {
     );
 }
 
-/// A chapter RANGE ([CR#714.2c]) renders its numbers joined — "II, III —".
+/// A chapter RANGE ([CR#715.2c]) renders its numbers joined — "II, III —".
 #[test]
 fn renders_saga_chapter_range_marker() {
     let r = render_card_face(&testing_face("Test Saga Range"));

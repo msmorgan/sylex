@@ -5,21 +5,21 @@ needs: [core-saga-chapters, engine-counters-api]
 
 ## Why
 
-The engine fires chapter abilities on crossed lore thresholds [CR#714.2b] and sacrifices a
-finished Saga through a `Property::StateBased` conferral [CR#714.4]. The rest of a Saga's life is
+The engine fires chapter abilities on crossed lore thresholds [CR#715.2b] and sacrifices a
+finished Saga through a `Property::StateBased` conferral [CR#715.4]. The rest of a Saga's life is
 not executed:
 
 - No executor runs `Property::TurnBased` (its doc in `crates/core/src/property.rs` says so), so the
   lore counter a player puts on each of their Sagas with chapter abilities as their precombat main
-  phase begins [CR#714.3c] never arrives.
-- The sacrifice condition lacks [CR#714.4]'s "and it isn't the source of a chapter ability that
+  phase begins [CR#715.3c] never arrives.
+- The sacrifice condition lacks [CR#715.4]'s "and it isn't the source of a chapter ability that
   has triggered but not yet left the stack": the engine's Saga row (`saga_subtype()` in the
   `crates/engine/src/sba.rs` tests) checks only the lore count against the final chapter number,
   so a Saga at its last chapter is sacrificed before that chapter resolves.
 - Read ahead is unbuilt: choosing a starting lore count between one and the final chapter number
-  as the Saga enters [CR#702.155b,714.3b], and chapter abilities not triggering the turn it entered
+  as the Saga enters [CR#702.155b,715.3b], and chapter abilities not triggering the turn it entered
   unless the lore count equals their chapter number [CR#702.155a].
-- No engine test covers a Saga without read ahead entering with one lore counter [CR#714.3a].
+- No engine test covers a Saga without read ahead entering with one lore counter [CR#715.3a].
 
 ## Done when
 

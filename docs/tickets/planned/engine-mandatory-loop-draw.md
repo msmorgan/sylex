@@ -7,7 +7,7 @@ needs: []
 ## Why
 
 A game that enters a loop of mandatory actions, repeating a sequence of events with no way
-to stop, is a draw; a loop that contains an optional action is not [CR#104.4b,732.4]. The engine
+to stop, is a draw; a loop that contains an optional action is not [CR#104.4b,733.4]. The engine
 has `GameOutcome::Draw` but sets it only when no player is left. `GameState` and `GameImage` have
 no equality or stable hash, so the engine cannot tell that it has returned to an earlier state,
 and such a game never ends.

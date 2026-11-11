@@ -31,9 +31,9 @@ pub fn face(card: &Card) -> &CardFace {
 }
 
 /// The face an object currently presents on the battlefield
-/// ([CR#712.8d,712.8e]): the back face iff it's a two-faced card showing its
+/// ([CR#712.6c,712.6d]): the back face iff it's a two-faced card showing its
 /// back (`Side::Back`), else the front. Off the battlefield use `face` (front
-/// only, [CR#712.8a]).
+/// only, [CR#712.6a]).
 #[must_use]
 pub fn face_of(state: &GameState, id: ObjectId) -> &CardFace {
     let obj = state.objects.obj(id);
@@ -188,10 +188,10 @@ pub fn abilities_of_source(state: &GameState, source: ObjectSource) -> Vec<Abili
     match source {
         ObjectSource::Card(card) => {
             // A BATTLEFIELD permanent showing its back sources its printed
-            // abilities from the current (back) face ([CR#712.8e]); off the
+            // abilities from the current (back) face ([CR#712.6d]); off the
             // battlefield — any other zone, an LKI/reminted source with no live
             // battlefield object — a DFC has only its front characteristics
-            // ([CR#712.8a]). Resolve the source to its live battlefield object
+            // ([CR#712.6a]). Resolve the source to its live battlefield object
             // (the canonical `ob.source == source` lookup) to read the CURRENT
             // face; else front. Reading the same face on BOTH the placement
             // scan (via [`derived_abilities_of`]) and the
@@ -322,7 +322,7 @@ pub(crate) fn derived_abilities_of(
 /// (`instance.face_cache(side).printed`) before any layer op appends.
 /// [`derived_abilities_of`] skips exactly this many entries of the layer view
 /// to isolate the layer-granted tail, so this MUST count the object's CURRENT
-/// face: a back-up two-faced permanent seeds from its BACK face ([CR#712.8e]),
+/// face: a back-up two-faced permanent seeds from its BACK face ([CR#712.6d]),
 /// and a stale front-length skip would mis-slice the tail when the faces differ
 /// in printed length. A non-card-backed / absent id contributes 0.
 fn printed_base_len(state: &GameState, id: ObjectId) -> usize {
@@ -555,10 +555,10 @@ mod tests {
         );
     }
 
-    /// [Task 5b][CR#712.8e]: a BATTLEFIELD permanent showing its back sources
+    /// [Task 5b][CR#712.6d]: a BATTLEFIELD permanent showing its back sources
     /// its PRINTED triggered abilities — the trigger-scan spine
     /// `abilities_of_source` — from the BACK face; a front-up (or
-    /// off-battlefield) permanent sources them from the front ([CR#712.8a]).
+    /// off-battlefield) permanent sources them from the front ([CR#712.6a]).
     /// The two faces carry DIFFERENT printed lengths (0 vs 1), so the
     /// derived skip-count (`printed_base_len`, section 3 of
     /// `derived_abilities_of`) is exercised too: the back trigger must land
@@ -634,7 +634,7 @@ mod tests {
                 .iter()
                 .any(|a| a.as_triggered().is_some()),
             "front-up permanent sources no triggered ability from its vanilla \
-             front face [CR#712.8d]"
+             front face [CR#712.6c]"
         );
 
         // Flip to the back face (Task 5 wires `Transform` to set this; driven
@@ -642,7 +642,7 @@ mod tests {
         state.objects.obj_mut(id).side = Side::Back;
 
         // Back-up: the trigger scan sources the back face's trigger
-        // [CR#712.8e].
+        // [CR#712.6d].
         let triggers: Vec<_> = super::abilities_of_source(&state, source)
             .into_iter()
             .filter(|a| a.as_triggered().is_some())
@@ -651,7 +651,7 @@ mod tests {
             triggers,
             vec![Ability::triggered(back_trigger.clone())],
             "back-up permanent sources its back face's triggered ability \
-             [CR#712.8e]"
+             [CR#712.6d]"
         );
 
         // Skip-count regression: `derived_abilities_of` is the exact

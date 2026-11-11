@@ -12,7 +12,7 @@ Of the counter declarations in `plugins/builtin/definitions/counter/`, only `p1p
 comment, though a keyword counter makes its bearer gain that keyword [CR#122.1b]. The counters
 the rules give an effect state it only in a comment: a shield counter's replacement and prevention
 effects [CR#122.1c], a stun counter's replacement effect [CR#122.1d], a finality counter's
-replacement effect [CR#122.1h], a rad counter's inherent triggered ability [CR#122.1i,728.1] and a
+replacement effect [CR#122.1h], a rad counter's inherent triggered ability [CR#122.1i,729.1] and a
 hone counter's +1/+0 to the creature its Equipment is attached to [CR#122.1j]. A player with ten or
 more poison counters loses the game [CR#122.1f,704.5c], but `poison.syl` has no `confers`, and no
 state-based row under `plugins/builtin/rules/` writes it.
@@ -24,7 +24,7 @@ Written against the surface (`cleanup-step6-surface`).
 - A per-counter effect stays in the counter's `confers`: the keyword counters' keywords
   [CR#122.1b] and hone [CR#122.1j]. A once-for-one-or-more effect goes in its `rules`, scoped with
   `hasCounter(<kind>)`: shield [CR#122.1c], stun [CR#122.1d], finality [CR#122.1h], rad
-  [CR#122.1i,728.1] and the ten-poison loss [CR#122.1f,704.5c] (spec §3).
+  [CR#122.1i,729.1] and the ten-poison loss [CR#122.1f,704.5c] (spec §3).
 
 ## Open questions
 
@@ -38,7 +38,7 @@ Written against the surface (`cleanup-step6-surface`).
   `indestructibleCounter`, `lifelinkCounter`, `menaceCounter`, `reachCounter`, `shadowCounter`,
   `trampleCounter`, `vigilanceCounter`) confers its keyword as `flyingCounter` does.
 - `shieldCounter` [CR#122.1c], `stunCounter` [CR#122.1d], `finalityCounter` [CR#122.1h],
-  `radCounter` [CR#122.1i,728.1] and `honeCounter` [CR#122.1j] write the effect their rule
+  `radCounter` [CR#122.1i,729.1] and `honeCounter` [CR#122.1j] write the effect their rule
   states, hone in `confers` and the others in `rules`.
 - `poison` writes the ten-counter loss in `rules` [CR#122.1f,704.5c].
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass;

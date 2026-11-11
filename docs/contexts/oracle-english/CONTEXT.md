@@ -271,7 +271,7 @@ only where it holds one of its cards.
 A card's name, full or Shortened, in the text of its own face [CR#201.5], and
 the full name of a meld result, never its Shortened Name, in the text of either
 card of its meld pair, each of which carries half of the result's face
-[CR#712.4]. The grammar reads it as any other Proper Name.
+[CR#713.1]. The grammar reads it as any other Proper Name.
 
 **Another Card's Name**:
 A card's full name in the text of a face where it is no Own Name: any face but

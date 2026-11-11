@@ -13,7 +13,7 @@ use sylex_core::TypeDef;
 /// The printed characteristics [CR#109.3] shared by a Card Face and by a
 /// rules-defined set of Alternative Characteristics (a flip card's upside-down
 /// half [CR#710.1], an adventurer card's inset Adventure characteristics
-/// [CR#715.2]).
+/// [CR#716.2]).
 #[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Characteristics {
     pub name: Arc<str>,
@@ -49,7 +49,7 @@ pub struct Characteristics {
 }
 
 /// A Card Face: the [`Characteristics`] printed on something the CR calls a
-/// face — nonmeld double-faced front/back [CR#712.1], split's two faces on one
+/// face — a double-faced card's front/back [CR#712.1], split's two faces on one
 /// side [CR#709.1], and the ordinary (non-alternative) side of a flip or
 /// adventurer card — plus whatever else its layout adds, which today is
 /// nothing.
@@ -92,10 +92,10 @@ impl From<Characteristics> for CardFace {
     }
 }
 
-/// How a nonmeld double-faced card's two faces are arranged. Meld's oversized
-/// back ([CR#712.4]) is the exception [CR#712.1] states and isn't a
-/// [`CardFace`] pair, so it isn't a layout here — `DoubleFaced` never stands
-/// in for a meld card.
+/// How a double-faced card's two faces are arranged. A meld card is not a
+/// double-faced card [CR#712.1,713.1]: its back is half of an oversized card
+/// face, not a [`CardFace`] pair, so it isn't a layout here — `DoubleFaced`
+/// never stands in for a meld card.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub enum DoubleFacedLayout {
     /// A transforming (nonmodal) double-faced card ([CR#712.2]).
@@ -107,9 +107,9 @@ pub enum DoubleFacedLayout {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Card {
     Normal(CardFace),
-    /// A nonmeld double-faced card: `front` (the primary/default face) and
+    /// A double-faced card: `front` (the primary/default face) and
     /// `back`, both full Card Faces with their own characteristics
-    /// ([CR#712.1,712.8]).
+    /// ([CR#712.1,712.6]).
     DoubleFaced {
         layout: DoubleFacedLayout,
         front: CardFace,
@@ -126,9 +126,9 @@ pub enum Card {
         normal: CardFace,
         alternative: Characteristics,
     },
-    /// An adventurer card ([CR#715]): normal characteristics plus the
+    /// An adventurer card ([CR#716]): normal characteristics plus the
     /// Alternative Characteristics of its Adventure spell — not an
-    /// Adventure face ([CR#715.2]).
+    /// Adventure face ([CR#716.2]).
     Adventurer {
         normal: CardFace,
         adventure: Characteristics,
@@ -138,7 +138,7 @@ pub enum Card {
 impl Card {
     /// The card's primary Card Face: its one face, or the front/left/normal
     /// side of a multi-part card — the face an object presents off the
-    /// battlefield ([CR#712.8a]) and by default on it ([CR#712.8d]).
+    /// battlefield ([CR#712.6a]) and by default on it ([CR#712.6c]).
     #[must_use]
     pub fn primary_face(&self) -> &CardFace {
         match self {
@@ -166,7 +166,7 @@ mod tests {
         CardFace::from(characteristics(name))
     }
 
-    /// Delver of Secrets // Insectile Aberration: a nonmeld double-faced card
+    /// Delver of Secrets // Insectile Aberration: a double-faced card
     /// has front and back Card Faces ([CR#712.1]).
     #[test]
     fn double_faced_witness_has_front_and_back_card_faces() {
@@ -227,7 +227,7 @@ mod tests {
 
     /// Merfolk Secretkeeper // Venture Deeper: an adventurer card has normal
     /// characteristics plus alternative Adventure characteristics, not an
-    /// Adventure face ([CR#715.2]).
+    /// Adventure face ([CR#716.2]).
     #[test]
     fn adventurer_witness_has_normal_and_alternative_adventure_characteristics() {
         let card = Card::Adventurer {

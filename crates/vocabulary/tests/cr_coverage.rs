@@ -62,9 +62,9 @@ const KEYWORD_ABILITY_EXCLUSIONS: [(&str, Excluded); 3] = [
 
 /// Keyword abilities defined by subrules rather than their own [CR#702]
 /// heading: *To solve* is one of the Case's "two special keyword abilities"
-/// [CR#719.3,719.3a]; nightbound shares daybound's heading [CR#702.145e].
+/// [CR#720.3,720.3a]; nightbound shares daybound's heading [CR#702.145e].
 const KEYWORD_ABILITIES_IN_SUBRULES: [(&str, &str); 2] =
-    [("[CR#719.3a]", "To Solve"), ("[CR#702.145e]", "Nightbound")];
+    [("[CR#720.3a]", "To Solve"), ("[CR#702.145e]", "Nightbound")];
 
 /// Scryfall's inventory lists words that are not ability words of
 /// Vintage-playable cards.

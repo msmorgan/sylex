@@ -2658,7 +2658,7 @@ mod tests {
     }
 
     /// `CounterPlaced`'s apply fills the carrier's before/after TOTALS onto
-    /// the occurred fact ([CR#714.2b] — `Crossed` reads them off the fact):
+    /// the occurred fact ([CR#715.2b] — `Crossed` reads them off the fact):
     /// a second placement sees the first's total as its `before`.
     #[test]
     fn counter_placed_apply_fills_before_and_after_totals() {
@@ -3301,7 +3301,7 @@ mod tests {
     }
 
     /// engine-transform: applying `Transformed` toggles a transforming DFC's
-    /// `Side` in place, front↔back, identity preserved ([CR#712.18]).
+    /// `Side` in place, front↔back, identity preserved ([CR#712.15]).
     #[test]
     fn transformed_event_toggles_side() {
         use sylex_card::Card;
@@ -3336,7 +3336,7 @@ mod tests {
         assert_eq!(
             state.objects.obj(id).side,
             Side::Back,
-            "transform flips to back [CR#712.18]"
+            "transform flips to back [CR#712.15]"
         );
         state.apply(GameEvent::Transformed(id));
         assert_eq!(

@@ -200,7 +200,7 @@ A Permanent the creature-like combat rules apply to, whether or not it may attac
 
 **Designation**:
 A named marker an Object, a Player or the game holds that is neither an Ability nor a copiable
-value: the monarch, goaded, day ([CR#701.15b,731.1]).
+value: the monarch, goaded, day ([CR#701.15b,732.1]).
 
 **Relation**:
 A named link between two Objects that one ability makes and others read: haunting, soulbond,

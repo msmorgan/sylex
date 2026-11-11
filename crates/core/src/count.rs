@@ -213,12 +213,12 @@ pub enum Count {
     CounterCount(Arc<Reference>, crate::CounterRef),
     /// The greatest threshold a referenced object's own abilities watch a
     /// crossing of ([`Condition::Crossed`](crate::Condition::Crossed)) — a
-    /// Saga's final chapter number ([CR#714.2d], "the greatest value among
+    /// Saga's final chapter number ([CR#715.2d], "the greatest value among
     /// chapter abilities it has"), read generically: a chapter ability's
-    /// intervening-if IS a `Crossed` gate ([CR#714.2b]), so the greatest
+    /// intervening-if IS a `Crossed` gate ([CR#715.2b]), so the greatest
     /// entry across the object's `Crossed` thresholds is that number. Read
     /// off the DERIVED abilities, so a permanent that lost them ([CR#613.1f])
-    /// reads 0 — [CR#714.2d]'s "if a Saga somehow has no chapter abilities,
+    /// reads 0 — [CR#715.2d]'s "if a Saga somehow has no chapter abilities,
     /// its final chapter number is 0". The `Reference` is boxed, like its
     /// `CounterCount` peer.
     GreatestWatchedThreshold(Arc<Reference>),

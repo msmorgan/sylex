@@ -81,7 +81,7 @@ pub enum Condition {
         within: Lookback,
     },
     /// The watched `value` was below a threshold before the triggering
-    /// occurrence and became at least it after — [CR#714.2b]'s "the number of
+    /// occurrence and became at least it after — [CR#715.2b]'s "the number of
     /// lore counters on it was less than N and became at least N", verbatim: a
     /// chapter ability's intervening-if. `value` NAMES the crossing quantity
     /// (a saga's lore total, `CounterCount(This, LoreCounter)`) for the
@@ -91,10 +91,10 @@ pub enum Condition {
     /// chapter II observe.
     ///
     /// `thresholds` holds ONE OR MORE chapter numbers: a range
-    /// `{rN1}, {rN2}—[Effect]` ([CR#714.2c] — the same effect at each listed
+    /// `{rN1}, {rN2}—[Effect]` ([CR#715.2c] — the same effect at each listed
     /// chapter) is one condition whose crossing fires if the fact carried the
     /// count across ANY of them. Each threshold is a plain [`Count`] — crossing
-    /// is inherently "became AT LEAST N" ([CR#714.2b]), so no comparator is
+    /// is inherently "became AT LEAST N" ([CR#715.2b]), so no comparator is
     /// stored. (Per-crossed-member firing when a single doubled batch crosses
     /// two members of one range at once is engine-sagas follow-up; normal
     /// one-at-a-time play fires each member on its own placement event.)
@@ -173,8 +173,8 @@ mod tests {
         );
     }
 
-    /// A chapter's crossing gate ([CR#714.2b]) holds ONE OR MORE thresholds:
-    /// a range `{rN1}, {rN2}—[Effect]` ([CR#714.2c]) fires at each listed
+    /// A chapter's crossing gate ([CR#715.2b]) holds ONE OR MORE thresholds:
+    /// a range `{rN1}, {rN2}—[Effect]` ([CR#715.2c]) fires at each listed
     /// chapter number. Reads the bare-numeral `thresholds` list and
     /// round-trips.
     #[test]
@@ -191,7 +191,7 @@ mod tests {
         assert_eq!(read(&written), v, "round-trips");
     }
 
-    /// A single chapter is a one-element `thresholds` list ([CR#714.2b]).
+    /// A single chapter is a one-element `thresholds` list ([CR#715.2b]).
     #[test]
     fn crossed_reads_single_threshold() {
         let v = read("Crossed(value: CounterCount(This, LoreCounter), thresholds: [1])");

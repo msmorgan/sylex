@@ -23,7 +23,7 @@ pub enum LossReason {
     /// Concession ([CR#104.3a]) — immediate, any time, and UNSTOPPABLE:
     /// the single exception to card-beats-rules ([CR#101.1]); no `CantLose`
     /// gate touches it, and a controlled player's controller can't prevent
-    /// it ([CR#723.6]).
+    /// it ([CR#724.6]).
     Conceded,
     /// "A player loses the game" effect outcome ([CR#104.3e]); suppressed by
     /// a matching `CantLose` gate.
@@ -455,12 +455,12 @@ pub struct CounterPlaced {
     /// The carrier's total of `kind` BEFORE this placement — filled at
     /// apply (emitters leave `0`), alongside `after`, so a chapter
     /// ability's `Crossed` gate reads "the total was less than N and
-    /// became at least N" off the one fact [CR#714.2b] — a doubled
+    /// became at least N" off the one fact [CR#715.2b] — a doubled
     /// placement is still ONE fact whose `after - before` is the doubled
     /// amount.
     pub before: Uint,
     /// The carrier's total of `kind` AFTER this placement (apply-filled,
-    /// like `before`) [CR#714.2b].
+    /// like `before`) [CR#715.2b].
     pub after: Uint,
     pub cause: Option<Cause>,
 }
@@ -528,8 +528,8 @@ pub struct Revealed {
 }
 
 /// A GAME-scope designation transition in the designation registry (day/night,
-/// [CR#731.1] — "day becomes night" = losing one designation and
-/// gaining the other, [CR#731.1a]). Shaped, unbuilt: designation
+/// [CR#732.1] — "day becomes night" = losing one designation and
+/// gaining the other, [CR#732.1a]). Shaped, unbuilt: designation
 /// GRANTING effects are unbuilt seams. Object/player designation
 /// deltas ride their own facts when granting lands.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -721,7 +721,7 @@ pub enum GameEvent {
     Untapped(ObjectId, Option<Cause>),
     /// A permanent turned to its other face ([CR#701.27a]) — carries the
     /// object, like `Untapped`. Apply toggles its `Side`; identity is
-    /// preserved ([CR#712.18]).
+    /// preserved ([CR#712.15]).
     Transformed(ObjectId),
     // No intent event is a bespoke variant: destruction, draw, AND discard are
     // keyword actions (above). Discard is the per-card `Act(Discard)`
@@ -794,7 +794,7 @@ pub enum GameEvent {
     /// order knowledge is destroyed for every player; revealed cards in
     /// it stop being revealed and become new objects ([CR#701.20d] —
     /// revealed-state reset is unbuilt). Why library actions never
-    /// rewind: [CR#733.1].
+    /// rewind: [CR#734.1].
     Shuffled(PlayerId),
     BecameTarget(BecameTarget),
     ControlChanged(ControlChanged),

@@ -1,4 +1,4 @@
-// Charge counters ([CR#122.1] counters in general; e.g. [CR#721.2a]'s
+// Charge counters ([CR#122.1] counters in general; e.g. [CR#722.2a]'s
 // station threshold reads "N or more charge counters on it"): a MARKER
 // counter with no conferred bearing of its own — every card effect that cares
 // reads its count directly (`CounterCount(This, ChargeCounter)`) or spends it

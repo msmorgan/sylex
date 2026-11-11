@@ -1,5 +1,5 @@
-# "whenever it becomes <designation>": the game gaining it [CR#731.1,731.1a].
-# [CR#731.1,731.1a]
+# "whenever it becomes <designation>": the game gaining it [CR#732.1,732.1a].
+# [CR#732.1,732.1a]
 template gameBecomes(designation: DesignationLabel): GameEvent {
   spelling = "whenever it becomes <designation>",
   body = does(any, setGameDesignation($designation))

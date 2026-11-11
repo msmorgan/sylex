@@ -13,12 +13,12 @@ use crate::StaticSpec;
 use crate::ability::Ability;
 
 /// What bearing a subtype or counter confers on objects that have it
-/// ([CR#305.6,714.3a,714.3c,714.4,704.5m,122.1]), typed by execution flavor so
+/// ([CR#305.6,715.3a,715.3c,715.4,704.5m,122.1]), typed by execution flavor so
 /// each piece gets the right semantics.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub enum Property {
     /// Joins ability derivation like printed text: layer-6-strippable,
-    /// stack-using if triggered ([CR#305.6,714.3a]). Boxed like
+    /// stack-using if triggered ([CR#305.6,715.3a]). Boxed like
     /// `Modification::GainAbility`; serde keeps the RON flat.
     Ability(Arc<Ability>),
     /// A continuous effect ([CR#611]) — the "boost" flavor. Applied at the
@@ -36,13 +36,13 @@ pub enum Property {
     /// subtype's or counter's [CR#704] rule: an SBA is a game action, never an
     /// ability ([CR#704.1,704.1a]), so this flavor confers no ability at all
     /// (see [`Property::conferred_ability`]). The Aura attachment check
-    /// ([CR#704.5m]), the Saga sacrifice ([CR#714.4]) and the -1/-1
+    /// ([CR#704.5m]), the Saga sacrifice ([CR#715.4]) and the -1/-1
     /// annihilation ([CR#704.5q]) are the canonical instances.
     StateBased {
         condition: Arc<Condition>,
         effect: Arc<Instruction>,
     },
-    /// Executed as a turn-based action — no stack ([CR#714.3c]). Parses
+    /// Executed as a turn-based action — no stack ([CR#715.3c]). Parses
     /// today; the engine executes it in stage 3.
     TurnBased {
         at: PhaseStep,
@@ -74,7 +74,7 @@ impl Property {
     /// hierarchy, so it is visible to card-facing queries and removable at
     /// layer 6 like printed text. A basic land type's intrinsic "{T}: Add
     /// [mana]" ([CR#305.6]) and a Saga's intrinsic enters-with-a-lore-counter
-    /// replacement ([CR#714.3a]) are both real abilities and behave like it.
+    /// replacement ([CR#715.3a]) are both real abilities and behave like it.
     /// THE one emission path: every registry (subtype, counter, designation)
     /// that turns a conferral into a bearer ability routes through here — no
     /// per-registry special case.

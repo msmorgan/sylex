@@ -327,7 +327,7 @@ impl GameState {
                         object: to_id,
                         kind,
                         amount: n,
-                        // Apply-computed totals ([CR#714.2b]).
+                        // Apply-computed totals ([CR#715.2b]).
                         before: 0,
                         after: 0,
                         cause: place_cause.clone(),
@@ -470,10 +470,10 @@ impl GameState {
             }
             // [CR#701.27a]: flip each targeted transforming DFC. No-op (fizzle,
             // never panic) on a non-transforming-DFC permanent — the check is on
-            // the CARD, not copied characteristics ([CR#701.27c,712.9]) — or when
-            // the destination face is an instant/sorcery ([CR#701.27d]). Identity
+            // the CARD, not copied characteristics ([CR#701.27d,712.7]) — or when
+            // the destination face is an instant/sorcery ([CR#701.27e]). Identity
             // is preserved by the apply, which toggles `side` without reminting
-            // ([CR#712.18]).
+            // ([CR#712.15]).
             Action::Transform(sel) => {
                 let mut events = Vec::new();
                 for object in self.eval_reference_set(sel, frame) {
@@ -5114,7 +5114,7 @@ mod tests {
 
     /// A game-scope enum designation transition is generic vocabulary: the
     /// action emits and applies the named mode, and setting the same mode again
-    /// is idempotent ([CR#731.1] is the founding `DayNight` consumer).
+    /// is idempotent ([CR#732.1] is the founding `DayNight` consumer).
     #[test]
     fn set_game_designation_applies_named_mode_once() {
         use crate::state::DesignationValue;
@@ -5277,7 +5277,7 @@ mod tests {
 
     /// Mint (on the battlefield, player 0) a transforming DFC whose front and
     /// back are creature faces with the given P/T, its `side` starting `Front`
-    /// ([CR#712.14]). Mirrors the layer-test DFC setup.
+    /// ([CR#712.11]). Mirrors the layer-test DFC setup.
     fn transforming_dfc_on_field(
         state: &mut GameState,
         front_pt: (sylex_core::Int, sylex_core::Int),
@@ -5312,7 +5312,7 @@ mod tests {
 
     /// [CR#701.27a]: resolving `Transform(This)` on a transforming DFC flips it
     /// to its other face — the layered view then shows the back face's
-    /// characteristics ([CR#712.8e]) and `side` is `Back`. [CR#701.27c,712.9]:
+    /// characteristics ([CR#712.6d]) and `side` is `Back`. [CR#701.27d,712.7]:
     /// the same instruction on a `Normal` card (no other face) does nothing —
     /// no `Transformed` fact, characteristics unchanged.
     #[test]
@@ -5351,12 +5351,12 @@ mod tests {
         assert_eq!(
             state.layers().power(dfc),
             Some(3),
-            "the DFC now shows its back face's power [CR#712.8e]"
+            "the DFC now shows its back face's power [CR#712.6d]"
         );
         assert_eq!(
             state.objects.obj(dfc).side,
             Side::Back,
-            "side flipped to Back [CR#712.18]"
+            "side flipped to Back [CR#712.15]"
         );
         assert!(
             logged(
@@ -5376,7 +5376,7 @@ mod tests {
         assert_eq!(
             state.layers().power(normal),
             Some(2),
-            "a Normal card's characteristics are unchanged [CR#701.27c,712.9]"
+            "a Normal card's characteristics are unchanged [CR#701.27d,712.7]"
         );
         assert_eq!(
             state.objects.obj(normal).side,
@@ -5392,7 +5392,7 @@ mod tests {
         );
     }
 
-    /// [CR#701.27d]: resolving `Transform(This)` when the destination face is an
+    /// [CR#701.27e]: resolving `Transform(This)` when the destination face is an
     /// instant/sorcery does nothing — the front stays up, characteristics
     /// unchanged, no `Transformed` fact.
     #[test]
@@ -5436,12 +5436,12 @@ mod tests {
         assert_eq!(
             state.layers().power(id),
             Some(2),
-            "front face stays up — no flip into an instant/sorcery [CR#701.27d]"
+            "front face stays up — no flip into an instant/sorcery [CR#701.27e]"
         );
         assert_eq!(
             state.objects.obj(id).side,
             Side::Front,
-            "side is still Front [CR#701.27d]"
+            "side is still Front [CR#701.27e]"
         );
         assert!(
             !logged(

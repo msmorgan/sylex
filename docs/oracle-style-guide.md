@@ -2636,7 +2636,7 @@ reminder, then striated threshold sections. A threshold line begins:
 
 or opens a section whose following lines share that threshold. Use an Arabic
 number plus `+`, spaces around the vertical bar, and normal ability grammar to
-the right [CR#721.1..721.4].
+the right [CR#722.1..722.4].
 
 Do not write the threshold as `8 or more —`, and do not confuse a Station
 threshold with a leveler band.
@@ -2658,7 +2658,7 @@ combined-name ` // ` separator into a face's rules sentences.
 - A meld component may carry `(Melds with [Name].)` as a standalone reminder.
 - A prepare card's permanent and prepare spell have separate text. Use the
   designation forms `becomes prepared` and `unprepares it` exactly
-  [CR#722.3a..722.3b].
+  [CR#723.3a..723.3b].
 - Flip, reversible, mutate, and prototype layouts do not license alternate
   punctuation outside their named fixed structures.
 

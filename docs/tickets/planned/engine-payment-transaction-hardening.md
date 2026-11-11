@@ -44,7 +44,7 @@ mana-ability classification, activation legality and runner machinery:
 ## Done when
 
 - `DeclinePayment` is an unconditional exit: it never returns `DecisionError` and never leaves an
-  unpayable announcement open. A record retained under [CR#733.1] keeps the records it depends
+  unpayable announcement open. A record retained under [CR#734.1] keeps the records it depends
   on.
 - `Ability::mana_profile` applies every [CR#605.1a] criterion, including "its cost and effect
   don't move any card to or from a library", inspecting nested `Move`, `MoveGroup`, draw,
@@ -66,12 +66,12 @@ mana-ability classification, activation legality and runner machinery:
   [CR#106.6]. Advice never changes legality.
 - Affordability stays out of announcement-time legality.
 - Mana-reversal selection does not enumerate every subset; it preserves dependency ordering,
-  [CR#733.1] barriers, independent `ManaActionId` selection and the runner's maximal-reversal
+  [CR#734.1] barriers, independent `ManaActionId` selection and the runner's maximal-reversal
   policy, with no fixed-width limit on the number of candidate actions.
 - The prompt lists a fulfillment as rescindable only while payment progress is `Idle`.
 - Each item above has a focused regression, including:
   - declining after fulfillment A moves a card from battlefield to graveyard and B moves that
-    reminted card from graveyard to a library (retained under [CR#733.1]) reconstructs a legal
+    reminted card from graveyard to a library (retained under [CR#734.1]) reconstructs a legal
     state and emits the incident;
   - library movement in the cost and in the effect each disqualify a mana ability, with a
     non-library control and modal `ByAnnouncedMode` unchanged;

@@ -1,23 +1,23 @@
-// Saga ([CR#714]) — the enchantment subtype whose registry row confers the
+// Saga ([CR#715]) — the enchantment subtype whose registry row confers the
 // rules OF THE SUBTYPE (as `Innate` / registry properties, never card
 // text):
 //
-//   - ENTERS with a lore counter ([CR#714.3a] — "This Saga enters with a
+//   - ENTERS with a lore counter ([CR#715.3a] — "This Saga enters with a
 //     lore counter on it", a [CR#614.1c] self-replacement): the same
 //     `Also(would: ThisEnters, …)` augment Modular uses. Read-ahead sagas
-//     ([CR#714.3b]) choose their starting chapter instead — a future row.
-//   - The TURN-BASED lore increment ([CR#714.3c] — as a player's precombat
+//     ([CR#715.3b]) choose their starting chapter instead — a future row.
+//   - The TURN-BASED lore increment ([CR#715.3c] — as a player's precombat
 //     main phase begins, that player puts a lore counter on each Saga they
 //     control with one or more chapter abilities; no stack): `TurnBased`
 //     fires on the BEARER'S CONTROLLER'S
 //     own precombat main. Engine execution of registry `TurnBased` rows is
 //     stage 3; the chapter triggers themselves execute today.
 //
-// The FINAL-CHAPTER sacrifice SBA ([CR#714.4]) is a `StateBased` conferral
+// The FINAL-CHAPTER sacrifice SBA ([CR#715.4]) is a `StateBased` conferral
 // of this subtype, comparing the lore total to the card's own final chapter
-// number ([CR#714.2d]). This grammar has no term for that number, so the row
+// number ([CR#715.2d]). This grammar has no term for that number, so the row
 // lives on the v2 stub; see the ticket's landing record. Chapters themselves
-// are the `Chapter` ability macro ([CR#714.2b]).
+// are the `Chapter` ability macro ([CR#715.2b]).
 (
     name: "Saga",
     kinds: [Subtype],
@@ -25,13 +25,13 @@
         name: "Saga",
         types: [Enchantment],
         confers: [
-            // [CR#714.3a]: a Saga "has the intrinsic ability" that it enters
+            // [CR#715.3a]: a Saga "has the intrinsic ability" that it enters
             // with a lore counter — a real ability, unwrapped.
             Ability(Static(Replacement(Also(
                 would: ThisEnters,
                 also: PutCounters(This, LoreCounter, 1),
             )))),
-            // [CR#714.3c]: the turn-based lore increment.
+            // [CR#715.3c]: the turn-based lore increment.
             TurnBased(
                 at: PrecombatMain,
                 effect: PutCounters(This, LoreCounter, 1),

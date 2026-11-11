@@ -314,7 +314,7 @@ impl GameState {
             }
             Action::RestartGame => {
                 todo!(
-                    "engine seam: restarting the game ([CR#727.1] — a terminal \
+                    "engine seam: restarting the game ([CR#728.1] — a terminal \
                      with carryover, not a reset); owner: engine-restart-game"
                 )
             }
@@ -567,7 +567,7 @@ impl GameState {
                             // state is Ident-keyed); the semantic ref is a `CounterRef`.
                             kind: kind.0,
                             amount: n,
-                            // Apply-computed totals ([CR#714.2b]).
+                            // Apply-computed totals ([CR#715.2b]).
                             before: 0,
                             after: 0,
                             cause: Some(

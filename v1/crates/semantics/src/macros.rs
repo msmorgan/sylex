@@ -61,7 +61,7 @@ pub fn param_types() -> ParamTypeSet {
     // (`KeywordAbility(abilities: [...])`).
     param_types.add_typed::<Vec<da::Ability>>("Abilities");
     // A LIST of counts (`[1]`, `[2, 3]`) — the one-or-more chapter numbers a
-    // saga `Chapter`'s crossing gate holds ([CR#714.2c] ranges), spliced into
+    // saga `Chapter`'s crossing gate holds ([CR#715.2c] ranges), spliced into
     // `Crossed { thresholds }`; distinct from the single `Count`.
     param_types.add_typed::<Vec<da::Count>>("Counts");
     // Every macroable grammar kind gets its own-name validator.

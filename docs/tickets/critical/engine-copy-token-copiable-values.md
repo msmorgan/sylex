@@ -38,8 +38,7 @@ indicator.
 
 ## Not in scope
 
-- Defense. [CR#707.2]'s list of copiable values leaves out defense; whether a copy of a battle
-  carries its printed defense is an open question for the owner.
+- Defense, which [CR#707.2] also lists among the copiable values.
 
 ## Pointers
 

@@ -119,13 +119,13 @@ core with an error that names the card. What a run-time read can still find is
 
 A Card Face is the characteristics printed on what the CR calls a face
 [CR#709.1,712.1]. A flip card's upside-down half [CR#710.1] and an adventurer
-card's Adventure [CR#715.2] are Alternative Characteristics, not faces, and the
-types keep them apart. A meld card is double-faced [CR#712.1], but its back is
-half of an oversized card face [CR#712.4], so it is not a `CardFace` pair and
+card's Adventure [CR#716.2] are Alternative Characteristics, not faces, and the
+types keep them apart. A meld card is not a double-faced card [CR#712.1]: its
+back is half of an oversized card face [CR#713.1], so it is not a `CardFace` pair and
 `Card::DoubleFaced` never stands in for a meld card.
 
 Why: Alternative Characteristics are not a face. They apply only under one
 condition, a flipped permanent on the battlefield [CR#710.1b] or an Adventure
-spell on the stack [CR#715.3b], and a flipped permanent still keeps its normal
+spell on the stack [CR#716.3b], and a flipped permanent still keeps its normal
 color and mana cost [CR#710.1c]. Each half of a split card is a face whose
 characteristics combine with the other's [CR#709.4b,709.4c].

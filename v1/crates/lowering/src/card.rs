@@ -6,7 +6,7 @@ use crate::Lower;
 
 // The grammar's `CardFace` is a characteristic set: `TwoFaced`'s `back` is a
 // flip card's alternative characteristics [CR#710.1] or an Adventure's
-// [CR#715.2] as often as it is a face, so this lowers to `Characteristics` and
+// [CR#716.2] as often as it is a face, so this lowers to `Characteristics` and
 // the `Card` impl below wraps the ones that really are faces.
 impl Lower for sylex_semantics_v1::CardFace {
     type Target = sylex_card::Characteristics;
@@ -37,7 +37,7 @@ impl Lower for sylex_semantics_v1::CardFace {
 /// whose instruction removes its own object from the battlefield is therefore
 /// a [CR#704.5]-shaped state-based action wearing a static ability; its home
 /// is a `Property::StateBased` conferral on the type or subtype whose rule it
-/// is, or an `SbaRule` ([CR#714.4] the Saga sacrifice, [CR#704.5m] the Aura
+/// is, or an `SbaRule` ([CR#715.4] the Saga sacrifice, [CR#704.5m] the Aura
 /// graveyard rule). Ascend ([CR#702.131b]) is a genuine static and passes: it
 /// grants a designation and removes nothing.
 fn refuse_rules_defined_sba(abilities: &[sylex_core::Ability]) {
@@ -123,7 +123,7 @@ impl Lower for sylex_semantics_v1::Card {
                 alternative: back.lower(),
             },
             // Adventurer cards have normal characteristics plus alternative
-            // Adventure characteristics, not an Adventure face [CR#715.2].
+            // Adventure characteristics, not an Adventure face [CR#716.2].
             Self::TwoFaced {
                 layout: sylex_semantics_v1::FaceLayout::Adventure,
                 front,
@@ -150,7 +150,7 @@ mod tests {
     use crate::minimal::*;
 
     /// A card-level state-checked static that removes its own object restates
-    /// a rules-defined state-based action ([CR#704.1,704.1a,714.4]), so the
+    /// a rules-defined state-based action ([CR#704.1,704.1a,715.4]), so the
     /// card does not compile.
     #[test]
     fn a_self_removing_state_checked_static_is_refused() {

@@ -7,7 +7,7 @@ needs: []
 
 The engine walks a fixed turn (`turn::successor`) and has no way to change it. Effects can add
 turns [CR#500.7], phases [CR#500.8] and steps [CR#500.9,500.10], skip a step, phase or turn
-[CR#500.11,614.10], or end the turn [CR#724.1]. `Action::ExtraPhase` exists in core but its engine
+[CR#500.11,614.10], or end the turn [CR#725.1]. `Action::ExtraPhase` exists in core but its engine
 arm is a `todo!()` naming this ticket (`resolve/action.rs`). `Replacement::Skip` exists in core and
 the replacement registry passes it through to a step-elision pass that does not exist
 (`replace_registry.rs`). There is no extra-turn or end-the-turn action. Examples: Time Walk,
@@ -22,7 +22,7 @@ Relentless Assault, Stasis, Fatespinner, Time Stop, Sundial of the Infinite.
 - A `Replacement::Skip` makes the engine proceed past the step, phase or turn as though it didn't
   exist; anything scheduled for "the next" occurrence waits for the first one not skipped
   [CR#500.11,614.10,614.10a].
-- Ending the turn follows [CR#724.1a..724.1f].
+- Ending the turn follows [CR#725.1a..725.1f].
 - Each is tested with one of the real cards above.
 
 ## Pointers

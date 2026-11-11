@@ -215,9 +215,9 @@ pub enum EngineIncident {
 }
 
 /// A spell or activated-ability announcement abandoned before payment was
-/// submitted. Task-local replay metadata records whether [CR#733.1] forced any
+/// submitted. Task-local replay metadata records whether [CR#734.1] forced any
 /// speculative operations to survive recovery before the player receives
-/// priority again and may take a different action ([CR#733.2]).
+/// priority again and may take a different action ([CR#734.2]).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PaymentDeclined {
     pub player: crate::player::PlayerId,

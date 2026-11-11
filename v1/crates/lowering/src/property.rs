@@ -29,7 +29,7 @@ impl Lower for sylex_semantics_v1::Property {
 /// explicit that stating a quality is "neither granting an ability nor setting
 /// a characteristic", so it lands on the ability-free
 /// [`sylex_core::Property::Static`]. Everything else is a real conferred
-/// ability ([CR#305.6] a basic land type's mana ability, [CR#714.3a] a Saga's
+/// ability ([CR#305.6] a basic land type's mana ability, [CR#715.3a] a Saga's
 /// enters-with-a-lore-counter replacement) and stays `Property::Ability`.
 fn ability_conferral(ability: std::sync::Arc<sylex_core::Ability>) -> sylex_core::Property {
     if let sylex_core::Ability::Static(region) = ability.as_ref() {

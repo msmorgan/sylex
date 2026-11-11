@@ -150,7 +150,7 @@ fn rules(view: &CardView) -> Vec<String> {
     let mut body: Vec<String> = Vec::new();
     let mut idx = 0;
     while idx < view.abilities.len() {
-        // A saga chapter ([CR#714.2]) prints its Roman-numeral marker, not the
+        // A saga chapter ([CR#715.2]) prints its Roman-numeral marker, not the
         // generic trigger phrasing — intercept the remembered `Chapter`
         // invocation before the structural peel below.
         if let Some(line) = chapter_line(&view.abilities[idx], view) {
@@ -290,7 +290,7 @@ fn rules(view: &CardView) -> Vec<String> {
 ///
 /// This peels ONLY `Expanded`, so it reaches a macro whose expansion is a
 /// directly-dispatched arm (`EntersWithCounters` → `Ability::Static`). A saga
-/// `Chapter` (`Expanded(Triggered(...))`, [CR#714.2]) is intercepted by
+/// `Chapter` (`Expanded(Triggered(...))`, [CR#715.2]) is intercepted by
 /// [`chapter_line`] BEFORE this peel, so it prints its Roman-numeral marker
 /// rather than the generic trigger phrasing its bare `Triggered` would yield.
 fn peel_expanded(ability: &Ability) -> &Ability {
@@ -300,7 +300,7 @@ fn peel_expanded(ability: &Ability) -> &Ability {
     }
 }
 
-/// An integer as a Roman numeral ([CR#714.2a] — a chapter symbol's numeral:
+/// An integer as a Roman numeral ([CR#715.2a] — a chapter symbol's numeral:
 /// I, II, III, IV, …). `0` yields the empty string; chapters are always ≥ 1.
 fn roman(mut n: u32) -> String {
     const TABLE: &[(u32, &str)] = &[
@@ -328,8 +328,8 @@ fn roman(mut n: u32) -> String {
     out
 }
 
-/// Render a saga chapter ability ([CR#714.2b]) as its printed line —
-/// "`<markers>` — `<effect>`" ("I — …", "II, III — …", [CR#714.2a..714.2c]) —
+/// Render a saga chapter ability ([CR#715.2b]) as its printed line —
+/// "`<markers>` — `<effect>`" ("I — …", "II, III — …", [CR#715.2a..715.2c]) —
 /// from the remembered `Chapter` invocation: the markers are its `Crossed`
 /// gate's thresholds as Roman numerals, and the effect renders structurally
 /// like a spell's. Returns `None` for any non-`Chapter` ability (and for the

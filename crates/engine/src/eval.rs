@@ -273,7 +273,7 @@ pub(crate) struct FactView<'a> {
     pub won: Option<bool>,
     /// The step/phase of a `StepBegins` record ([CR#603.2b]).
     pub step: Option<PhaseStep>,
-    /// A designation record's `(name, becomes)` ([CR#109.3,731.1a]) —
+    /// A designation record's `(name, becomes)` ([CR#109.3,732.1a]) —
     /// `becomes` only for game-scope transitions (day/night).
     pub designation: Option<(Cow<'a, Ident>, Option<Cow<'a, Ident>>)>,
     /// The printed keyword-action name of an `Act` fact ([CR#701]) —
@@ -598,7 +598,7 @@ impl<'a> FactView<'a> {
                 v.object = Some(part(*o));
                 v.cause = cause.as_ref().map(Cow::Borrowed);
             }
-            // [CR#701.27a,712.18]: the transform status transition — same
+            // [CR#701.27a,712.15]: the transform status transition — same
             // shape as `Tapped`/`Untapped`, matched by `StateBecame`.
             GameEvent::Transformed(o) => {
                 v = FactView::bare(FactKind::StateBecame(StateChange::Transformed), state);
