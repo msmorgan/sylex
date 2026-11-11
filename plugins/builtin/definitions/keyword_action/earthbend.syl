@@ -1,6 +1,5 @@
 # Earthbend N: target land you control becomes a 0/0 land creature with haste, gets N +1/+1
 # counters, and returns tapped under your control when it dies or is exiled. [CR#701.66a]
-# [CR#701.66a]
 action earthbend(amount: Amount) {
   lexical = {verbs = [{lemma = "earthbend", past = "earthbent", frames = [Amount, Intransitive]}]},
   spelling = "earthbend <amount>",

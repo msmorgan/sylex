@@ -1,6 +1,5 @@
 # "As <subject> enters, [secretly] choose <chosen>": a replacement effect whose choice is made
 # before the permanent enters [CR#603.6d,614.1c,614.12a].
-# [CR#603.6d,614.1c,614.12a]
 template entryChoice(
   subject: NounPhrase,
   chosen: NounPhrase,

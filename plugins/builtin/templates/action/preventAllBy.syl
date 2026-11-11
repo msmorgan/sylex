@@ -1,5 +1,4 @@
 # "Prevent all <kind> damage that would be dealt [to <to>] by <source> [duration]" [CR#615.1].
-# [CR#615.1]
 template preventAllBy(
   source: NounPhrase,
   to: NounPhrase,

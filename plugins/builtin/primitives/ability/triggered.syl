@@ -3,7 +3,6 @@
 # ("When this creature enters and whenever it attacks while saddled") are one disjunction of
 # trigger conditions, printed with "and" (`and`) or "or" (`or`) [CR#603.1b].
 # TODO(spelling): Include or omit the clauses supplied by intervening and limit.
-# [CR#603.1,603.4,603.1b]
 primitive triggered(
   condition: TriggerCondition,
   intervening: Option(Condition) = none,

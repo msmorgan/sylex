@@ -1,5 +1,4 @@
 # "At <point>, <action>": "at" names a Turn Point [CR#603.2b].
-# [CR#603.2b]
 template at(
   point: TurnPoint,
   if: Option(Condition) = none,

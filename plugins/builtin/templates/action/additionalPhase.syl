@@ -1,6 +1,5 @@
 # "there is an additional <part> [after <anchor>] [, followed by an additional <next>]": phases
 # added to the current turn [CR#500.8].
-# [CR#500.8]
 template additionalPhase(
   part: TurnPart,
   anchor: Option(TurnPart),

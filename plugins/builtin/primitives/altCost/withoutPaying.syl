@@ -1,5 +1,4 @@
 # "without paying its mana cost": an alternative cost [CR#118.9].
-# [CR#118.9]
 primitive withoutPaying: AltCost = WithoutPaying {
   spelling = "without paying its mana cost"
 }

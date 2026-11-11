@@ -4,5 +4,4 @@
 # you cast a spell with mana value 5 or greater"), and each condition prints its own trigger word.
 # *Tenuous Truce* prints "or" instead and writes `or`, a Template over this.
 # TODO(spelling): Format and coordinate the conditions list entries with "and".
-# [CR#603.1b,603.2]
 primitive and(conditions: List(TriggerCondition)): TriggerCondition = And

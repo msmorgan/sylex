@@ -4,8 +4,6 @@
 # in time is derived from its pattern (`docs/decisions/semantics.md` §4.6) [CR#603.10a]; "from
 # anywhere" is not a leaves-the-battlefield trigger, even when the object comes from the
 # battlefield [CR#603.6c].
-# [CR#400.7]
-# [CR#603.6c]
 template zoneChange(
   subject: NounPhrase,
   destination: Location,

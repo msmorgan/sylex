@@ -3,7 +3,6 @@
 # control", *Tenuous Truce*). The ability triggers when any of them is met [CR#603.1b,603.2], as
 # with the printed coordinator "and", so the meaning is `and`'s.
 # TODO(spelling): Format and coordinate the conditions list entries with "or".
-# [CR#603.1b,603.2]
 template or(conditions: List(TriggerCondition)): TriggerCondition {
   body = and($conditions)
 }

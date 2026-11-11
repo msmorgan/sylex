@@ -1,7 +1,6 @@
 # "[<controller>] gain[s] control of <subject> [duration]": the performer by default, so "gain
 # control of target creature" and "target player gains control of …" (`instruct`) read alike
 # [CR#613.1b].
-# [CR#613.1b]
 template gainControl(
   subject: NounPhrase,
   duration: Option(Duration) = none,

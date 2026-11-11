@@ -1,6 +1,5 @@
 # "Choose one or more — [cost] — <mode>; …" [CR#702.172a]: each mode a `Mode` record with its
 # additional cost.
-# [CR#702.172a]
 template chooseSpree(modes: List(Mode)): Action {
   # TODO(spelling): Include or omit each mode's cost clause. Format and coordinate the modes list
   # entries, including the empty case.

@@ -4,7 +4,6 @@
 # `by (allOf …)` instead puts a requirement on each creature ("must be blocked by all creatures
 # able to block it"). `unless` is its printed "unless <condition>", read inside it
 # (`docs/decisions/semantics.md` §4.7).
-# [CR#509.1c]
 template must(
   subj: Subject,
   action: Action,

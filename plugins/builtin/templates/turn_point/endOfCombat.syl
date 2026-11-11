@@ -1,6 +1,5 @@
 # "end of combat": abilities that trigger "at end of combat" trigger as the end of combat step
 # begins [CR#511.2].
-# [CR#511.2]
 template endOfCombat: TurnPoint {
   spelling = "end of combat",
   body = beginningOf(endOfCombat, none, eachTime)

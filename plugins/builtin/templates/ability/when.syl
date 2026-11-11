@@ -3,7 +3,6 @@
 # [CR#603.4]; a concurrent condition or timing window ("while saddled", "during your turn")
 # belongs to the event (`timed`). An ability with joined trigger conditions writes `triggered`
 # over their `and` or `or`.
-# [CR#603.1,113.3c,603.4]
 template when(
   event: GameEvent,
   if: Option(Condition) = none,

@@ -1,4 +1,3 @@
 # "a [<state>] door of <room>" [CR#709.5j]
-# [CR#709.5j]
 # TODO(spelling): Include or omit the clauses supplied by state.
 primitive doorOf(state: Option(LockState), room: NounPhrase): Door = DoorOf

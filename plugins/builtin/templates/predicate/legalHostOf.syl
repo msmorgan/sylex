@@ -1,5 +1,4 @@
 # "a legal object or player for <attachment> to enchant" [CR#303.4f,303.4g]
-# [CR#303.4f,303.4g]
 template legalHostOf(attachment: NounPhrase): Predicate {
   spelling = "a legal object or player for <attachment> to enchant",
   body = legalAttachment(host, $attachment)

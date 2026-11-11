@@ -1,5 +1,4 @@
 # "<subject> crews <vehicle>" [CR#702.122a]
-# [CR#702.122a]
 primitive crew(vehicle: NounPhrase): Action = Crew {
   spelling = "crews <vehicle>"
 }

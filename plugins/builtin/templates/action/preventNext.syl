@@ -1,6 +1,5 @@
 # "Prevent the next N <kind> damage that would be dealt [to <to>] [duration]": a shield, used
 # up as it prevents [CR#615.7].
-# [CR#615.7]
 template preventNext(
   to: NounPhrase,
   amount: Amount,

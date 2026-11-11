@@ -3,7 +3,6 @@
 # [CR#116.2c]: the special action establishes that the delayed trigger can't trigger, with no
 # Duration, since the text states none. Once it has triggered, paying no longer stops it. The text names the delayed trigger nowhere, so the special action reads
 # the most recently created delayed trigger directly.
-# [CR#116.2c]
 template delayUnlessPaid(event: GameEvent, action: Action, player: NounPhrase, cost: Cost): Action {
   spelling = "<action> at <event> unless <player> pays <cost> before that step",
   body = sequentially([

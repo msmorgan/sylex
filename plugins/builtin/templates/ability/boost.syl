@@ -1,7 +1,5 @@
 # What one +X/+Y counter confers [CR#122.1a]: "+X/+Y" to its bearer [CR#613.4c]. A counter
 # definition's conferral is per counter (`RegistryDefinition.counter`), so the deltas read no count.
-# [CR#122.1a]
-# [CR#613.4c]
 template boost(powerValue: Delta(Amount), toughnessValue: Delta(Amount)): Conferral {
   body = property(
     characteristicChange(this, [stat(power, $powerValue), stat(toughness, $toughnessValue)]))

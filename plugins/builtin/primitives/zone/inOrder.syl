@@ -1,4 +1,3 @@
 # "in any order", "in a random order" [CR#401.4]
-# [CR#401.4]
 # TODO(spelling): The arrangement selects chosen, random, or otherwise specified ordering.
 primitive inOrder(arrangement: Arrangement): MoveRider = InOrder

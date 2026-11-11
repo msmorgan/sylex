@@ -1,4 +1,3 @@
 # "<subject> blocks [<attacker>]" [CR#509.1a]
-# [CR#509.1a]
 # TODO(spelling): Omit the object when attacker is any; otherwise name the blocked attacker.
 primitive block(attacker: NounPhrase = any): Action = Block

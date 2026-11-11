@@ -1,5 +1,4 @@
 # "costs <cost> less", symbol by symbol [CR#702.48c,118.7]
-# [CR#702.48c,118.7]
 template lessBySymbols(cost: ManaCostTerm): CostShift {
   spelling = "costs <cost> less",
   body = bySymbols(down($cost))

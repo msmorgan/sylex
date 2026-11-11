@@ -1,7 +1,6 @@
 # "<body>. When you do, <trigger>" [CR#603.12]. The reflexive ability triggers once for each time
 # its event happens during the resolution, but once in all for a cost paid any number of times
 # [CR#603.12a].
-# [CR#603.12,603.12a]
 # TODO(spelling): Include or omit the clauses supplied by event.
 primitive triggerReflexively(
   body: Action,

@@ -1,5 +1,4 @@
 # "{G/P}": a Phyrexian mana symbol [CR#107.4f].
-# [CR#107.4f]
 template phyrexianPip(color: Color): ManaSymbol {
   spelling = "{<color>/P}",
   body = phyrexian($color, none)

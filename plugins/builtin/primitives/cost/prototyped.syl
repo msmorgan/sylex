@@ -1,5 +1,4 @@
 # "prototyped": with its prototype frame's mana cost, power and toughness [CR#719.3].
-# [CR#719.3]
 primitive prototyped: PlayPayment = Prototyped {
   spelling = "prototyped"
 }

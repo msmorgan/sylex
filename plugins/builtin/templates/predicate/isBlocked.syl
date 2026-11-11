@@ -1,6 +1,5 @@
 # "blocked": an attacking creature that blockers were declared for, or that an effect made
 # blocked, until it is removed from combat [CR#509.1h,506.4].
-# [CR#509.1h,506.4]
 template isBlocked: Predicate {
   spelling = "blocked",
   body = inCombat(blockedBy)

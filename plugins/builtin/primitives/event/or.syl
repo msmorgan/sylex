@@ -4,5 +4,4 @@
 # TODO(spelling): Format and coordinate the events list entries. Arms with one subject print it
 # once ("attacks or blocks"), even when it stands in two roles ("blocks or becomes blocked",
 # "dies or is exiled").
-# [CR#603.2]
 primitive or(events: List(GameEvent)): GameEvent = Or

@@ -1,8 +1,6 @@
 # "only as a sorcery": while you have priority, during your main phase, while the stack is
 # empty [CR#307.5]. Its negation, "any time a sorcery couldn't have been cast", therefore also
 # holds without priority [CR#307.5a].
-# [CR#307.5]
-# [CR#307.5a]
 template asSorcery: Timing {
   spelling = "only as a sorcery",
   body = and([

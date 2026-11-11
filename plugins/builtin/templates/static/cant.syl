@@ -4,9 +4,6 @@
 # [CR#120.3a]. `unless` is its printed "unless <condition>", read inside the prohibition
 # (`docs/decisions/semantics.md` §4.7): "A player can't cast a legendary instant or sorcery spell
 # unless that player controls …" [CR#205.4e].
-# [CR#101.2]
-# [CR#120.3a]
-# [CR#205.4e]
 template cant(
   subj: Subject,
   action: Action,

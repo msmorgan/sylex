@@ -1,5 +1,4 @@
 # A flavor word in italics before an ability [CR#207.2d].
-# [CR#207.2d]
 template flavorWord(word: String, ability: Ability): Ability {
   body = italicHead(flavorWord($word), $ability)
 }

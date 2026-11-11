@@ -2,7 +2,6 @@
 # hexproof and indestructible" adds each of the two as an ability of its own [CR#113.2c,613.1f].
 # TODO(spelling): Include or omit the clauses supplied by duration. Coordinate the abilities list
 # entries with "and".
-# [CR#113.2c,613.1f]
 template gain(
   subject: NounPhrase,
   abilities: List(Ability),

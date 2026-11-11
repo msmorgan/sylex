@@ -1,7 +1,5 @@
 # "<subj> can <action>": a permission [CR#101.2], with `rider` the later text that modifies the
 # act it permits [CR#608.2c] (`DeonticMods.rider`).
-# [CR#101.2]
-# [CR#608.2c]
 template can(
   subj: Subject,
   action: Action,

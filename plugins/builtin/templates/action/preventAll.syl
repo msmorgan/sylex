@@ -1,7 +1,6 @@
 # "Prevent all <kind> damage that would be dealt [to <to>] [duration]": a prevention effect,
 # a replacement of each such damage event by its prevention [CR#615.1]. `to` left `any` is damage
 # dealt to anything.
-# [CR#615.1]
 template preventAll(
   to: NounPhrase,
   duration: Option(Duration),

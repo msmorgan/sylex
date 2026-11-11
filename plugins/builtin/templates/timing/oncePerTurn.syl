@@ -1,5 +1,4 @@
 # "only once each turn" [CR#602.5b]
-# [CR#602.5b]
 template oncePerTurn: UsageLimit {
   spelling = "only once each turn",
   body = usageLimit(1, turn)

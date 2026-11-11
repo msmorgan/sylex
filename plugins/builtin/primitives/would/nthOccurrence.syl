@@ -1,6 +1,5 @@
 # "the <ordinal> time <clause> [each <per>]": the replaced event's ordinal, as "The first time
 # you would create one or more tokens each turn" [CR#614.1].
-# [CR#614.1]
 # TODO(spelling): Include or omit the clauses supplied by per.
 primitive nthOccurrence(
   ordinal: Ordinal,

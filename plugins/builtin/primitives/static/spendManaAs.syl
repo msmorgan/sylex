@@ -1,5 +1,4 @@
 # "spend mana as though it were mana of <as> [to <purpose>]" [CR#609.4b]
-# [CR#609.4b]
 # TODO(spelling): Include or omit the clauses supplied by what, purpose.
 primitive spendManaAs(
   what: Option(ColorOrColorless),

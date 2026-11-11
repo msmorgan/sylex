@@ -1,5 +1,4 @@
 # "an <parity> mana value" [CR#202.3]
-# [CR#202.3]
 primitive manaValueParity(parity: Parity): DeckTrait = ManaValueParity {
   spelling = "an <parity> mana value"
 }

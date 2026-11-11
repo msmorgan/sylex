@@ -1,6 +1,5 @@
 # "Replace all instances of the word 'target' with the word 'each'" (overload
 # [CR#702.96a]).
-# [CR#702.96a]
 primitive targetToEach: TextChange = TargetToEach {
   spelling = "Replace all instances of the word 'target' with the word 'each'"
 }

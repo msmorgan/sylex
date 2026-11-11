@@ -1,5 +1,4 @@
 # "multicolored": an object of two or more colors [CR#105.2b].
-# [CR#105.2b]
 template isMulticolored: Predicate {
   spelling = "multicolored",
   body = colorCount(atLeast, 2)

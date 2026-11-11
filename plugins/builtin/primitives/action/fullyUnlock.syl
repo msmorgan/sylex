@@ -1,5 +1,4 @@
 # "fully unlock <room>": both its halves unlocked [CR#709.5i].
-# [CR#709.5i]
 primitive fullyUnlock(room: NounPhrase): Action = FullyUnlock {
   spelling = "fully unlock <room>"
 }

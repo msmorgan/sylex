@@ -1,6 +1,5 @@
 # "at <point>": "at" names a Turn Point, whose beginning is the trigger event [CR#603.2b];
 # "when" and "whenever" take an event instead.
-# [CR#603.2b]
 template at(point: TurnPoint): TriggerCondition {
   spelling = "at <point>",
   body = triggerEvent(reached($point))
