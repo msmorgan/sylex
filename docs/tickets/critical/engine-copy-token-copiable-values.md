@@ -2,15 +2,15 @@
 needs: []
 ---
 
-# Engine: a token made as a copy keeps the copied mana cost and loyalty, so its color and mana value come from that cost
+# Engine: a token made as a copy keeps the copied mana cost, loyalty and defense, so its color and mana value come from that cost
 
 ## Why
 
-A copy acquires the original's copiable values, mana cost and loyalty among them [CR#707.2],
-and a token has a mana cost when the effect that creates it says so [CR#202.1b]. The engine
-drops both: `token_from_copiable` (`crates/engine/src/copy.rs`) builds a `Token`, which has no
-mana-cost or loyalty slot, and `push_token` (`crates/engine/src/object.rs`) mints every token
-with an empty mana cost and no loyalty. An Offspring token of Agate Instigator ({1}{R}) is
+A copy acquires the original's copiable values, mana cost, loyalty and defense among them
+[CR#707.2], and a token has a mana cost when the effect that creates it says so [CR#202.1b]. The
+engine drops all three: `token_from_copiable` (`crates/engine/src/copy.rs`) builds a `Token`,
+which has no mana-cost, loyalty or defense slot, and `push_token` (`crates/engine/src/object.rs`)
+mints every token with an empty mana cost and no loyalty or defense. An Offspring token of Agate Instigator ({1}{R}) is
 therefore colorless with mana value 0; Populate and every other token-copy path are affected
 the same way. Cackling Counterpart's ruling ("If the copied creature has {X} in its mana cost,
 X is considered to be 0") presupposes the cost carries over.
@@ -25,8 +25,8 @@ indicator.
 
 ## Done when
 
-- A token created as a copy has the copied mana cost and loyalty; its color and mana value
-  derive from that cost.
+- A token created as a copy has the copied mana cost, loyalty and defense; its color and mana
+  value derive from that cost.
 - `base_colors` is the union of the mana cost's colors and the color indicator's.
 - Core can say "it has no mana cost" as a copy exception. Embalm and Eternalize use it, and their
   color exception wins over the color the copied cost would give.
@@ -35,10 +35,6 @@ indicator.
   [CR#202.2e] for that claim; the rule is [CR#202.1b]).
 - Tests: an Offspring token of Agate Instigator is red with mana value 2; a copy of a creature
   with {X} in its cost has mana value with X as 0; an embalmed token is white with mana value 0.
-
-## Not in scope
-
-- Defense, which [CR#707.2] also lists among the copiable values.
 
 ## Pointers
 
